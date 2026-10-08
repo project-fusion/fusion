@@ -660,7 +660,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       auditName(
         this,
         () => null,
-        'Give it a `label`, or a heading in the `header` slot.',
+        'dialog',
         () =>
           this.label !== '' ||
           this.namedByHeader ||

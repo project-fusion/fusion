@@ -1,6 +1,6 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { auditName } from '#audit-name'
+import { auditField } from '#audit-name'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { hostAria } from '../../utils/host-aria/host-aria.js'
 
@@ -747,17 +747,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
          the element the label points at, and a group, which has none, is named
          by its label or by its host. The `value` part, where a field shows its
          value or its placeholder, names nothing. */
-      auditName(
-        this,
-        () => this.namedControl,
-        'Give it a `label`, an `aria-label`, words in its label, or a `<label for>` that names it.',
-        () =>
-          this.labeled ||
-          [...this.children].some(
-            (child) => child.slot === 'label' && (child.textContent ?? '').trim() !== '',
-          ),
-        () => this.partNamed('value'),
-      )
+      auditField(this)
     }
   }
 

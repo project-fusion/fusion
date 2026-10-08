@@ -550,7 +550,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
       auditName(
         this,
         () => null,
-        'Give it a `label`, such as "Getting started".',
+        'tour',
         () => this.label !== '',
       )
     }

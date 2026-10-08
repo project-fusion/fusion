@@ -212,11 +212,7 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
     /* Once the row is first drawn, which for a page's row is when the page
        first shows: until then there is no row to name. */
     if (this.partNamed('item')) {
-      auditName(
-        this,
-        () => this.partNamed('item'),
-        'Give the row words in its default slot, or a label on the icon it holds.',
-      )
+      auditName(this, () => this.partNamed('item'), 'row')
     }
   }
 

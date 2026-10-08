@@ -868,7 +868,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       auditName(
         this,
         () => null,
-        'Give it a `label`, such as "Project photos".',
+        'lightbox',
         () => this.label !== '',
       )
       dialog.showModal()

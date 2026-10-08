@@ -964,7 +964,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     auditName(
       this,
       () => null,
-      'Give it a `label` that says what the map shows, such as "Stores in Edinburgh".',
+      'map',
       () => this.label !== '',
     )
   }

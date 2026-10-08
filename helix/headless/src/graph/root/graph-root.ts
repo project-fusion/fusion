@@ -638,7 +638,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     auditName(
       this,
       () => null,
-      'Give it a `label` that says what the notes are, such as "Research notes".',
+      'graph',
       () => this.label !== '',
     )
   }

@@ -3851,7 +3851,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     auditName(
       this,
       () => null,
-      'Give it a `label` that says what the board holds, such as "Release plan".',
+      'canvas',
       () => this.label !== '',
     )
     if (this.waiting) {

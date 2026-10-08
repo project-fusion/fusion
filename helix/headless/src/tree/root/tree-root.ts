@@ -934,7 +934,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
     auditName(
       this,
       () => null,
-      'Give it a `label` that says what it holds, such as "Files".',
+      'tree',
       () => this.hasAttribute('label') || this.label !== 'Tree',
     )
   }

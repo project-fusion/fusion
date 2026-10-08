@@ -507,7 +507,7 @@ export class HelixHeadlessButtonGroup extends HelixElement {
     auditName(
       this,
       () => null,
-      'Give it a `label`, or an `aria-label` that says what the buttons are for.',
+      'button-group',
       () => this.label !== '',
     )
   }

@@ -8,11 +8,13 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
  * `HTMLSlotElement` rather than bun's.
  */
 let auditName: typeof import('./audit-name.js').auditName
+let auditField: typeof import('./audit-name.js').auditField
+let auditIconControl: typeof import('./audit-name.js').auditIconControl
 let hasName: typeof import('./audit-name.js').hasName
 
 beforeAll(async () => {
   registerDom()
-  ;({ auditName, hasName } = await import('./audit-name.js'))
+  ;({ auditField, auditIconControl, auditName, hasName } = await import('./audit-name.js'))
 })
 
 describe('the name estimate', () => {
@@ -178,5 +180,45 @@ describe('the warning', () => {
         host.remove()
       }),
     ).toEqual([])
+  })
+
+  /* MixinField hands the audit nothing but itself, so its closures and its
+     sentence ship in a development build only. */
+  test('a field is read by its control, its label, and the part that shows its value', async () => {
+    const field = (labeled: boolean, slotted: string): HTMLElement => {
+      document.body.innerHTML = `<span>${slotted}</span>`
+      const host = document.body.lastElementChild as HTMLElement
+      const root = host.attachShadow({ mode: 'open' })
+      root.innerHTML = '<input placeholder="Email">'
+      return Object.assign(host, {
+        labeled,
+        namedControl: root.querySelector('input'),
+        partNamed: () => null,
+      })
+    }
+    expect(await warned(() => auditField(field(false, '')))).toEqual([
+      '<span> is named only by its placeholder, which is gone once a person types. Give it a `label`, an `aria-label`, words in its label, or a `<label for>` that names it.',
+    ])
+    expect(await warned(() => auditField(field(true, '')))).toEqual([])
+    expect(await warned(() => auditField(field(false, '<b slot="label">Email</b>')))).toEqual([])
+  })
+
+  /* Icon hands over itself and its label, so the lookup for the control it
+     sits in ships in a development build only. */
+  test('a control whose only content is an unnamed icon is reported for the icon', async () => {
+    const icon = (control: string): HTMLElement => {
+      document.body.innerHTML = control
+      return document.body.querySelector('i') as HTMLElement
+    }
+    expect(await warned(() => auditIconControl(icon('<button><i></i></button>'), ''))).toEqual([
+      '<button> has no accessible name, so a screen reader announces it by its role alone. Its only content is <i>, which is decorative: give the icon a `label`, or the control an `aria-label`.',
+    ])
+    expect(await warned(() => auditIconControl(icon('<button><i></i></button>'), 'Save'))).toEqual(
+      [],
+    )
+    expect(await warned(() => auditIconControl(icon('<button><i></i>Save</button>'), ''))).toEqual(
+      [],
+    )
+    expect(await warned(() => auditIconControl(icon('<div><i></i></div>'), ''))).toEqual([])
   })
 })

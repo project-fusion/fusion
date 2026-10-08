@@ -1155,7 +1155,7 @@ export class HelixSandbox extends HelixElement {
           const tabs = [...this.renderRoot.querySelectorAll<HTMLElement>('[part~="file"]')]
           return tabs.find((tab) => !tab.textContent?.trim()) ?? tabs[0]
         },
-        'Give each source pane a `label` or a `name`, which its file tab shows.',
+        'sandbox',
       )
     }
   }

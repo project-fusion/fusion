@@ -1768,7 +1768,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     auditName(
       this,
       () => null,
-      'Give it a `label`, or put a heading in its `heading` slot, that says what the rows are.',
+      'table',
       () => this.label !== '' || this.headings.length > 0,
     )
     if (this.childrenKnown) {

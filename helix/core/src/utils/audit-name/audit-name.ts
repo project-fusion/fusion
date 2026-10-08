@@ -90,7 +90,37 @@ const implicitRole = (element: HTMLElement): string => {
  * brotli. A key costs a word, and the sentence lives here.
  */
 const FIXES = new Map([
+  ['accordion-item', 'Write its title in the `summary` slot.'],
   ['button', 'Give it words, a `label`, or an `aria-label`.'],
+  ['button-group', 'Give it a `label`, or an `aria-label` that says what the buttons are for.'],
+  ['canvas', 'Give it a `label` that says what the board holds, such as "Release plan".'],
+  ['dialog', 'Give it a `label`, or a heading in the `header` slot.'],
+  [
+    'field',
+    'Give it a `label`, an `aria-label`, words in its label, or a `<label for>` that names it.',
+  ],
+  ['graph', 'Give it a `label` that says what the notes are, such as "Research notes".'],
+  ['lightbox', 'Give it a `label`, such as "Project photos".'],
+  ['list', 'Give it a `label`, or an `aria-label` that says what the rows are.'],
+  ['map', 'Give it a `label` that says what the map shows, such as "Stores in Edinburgh".'],
+  ['popover', 'Give it a `label`, or a heading in the panel.'],
+  ['row', 'Give the row words in its default slot, or a label on the icon it holds.'],
+  ['sandbox', 'Give each source pane a `label` or a `name`, which its file tab shows.'],
+  [
+    'table',
+    'Give it a `label`, or put a heading in its `heading` slot, that says what the rows are.',
+  ],
+  [
+    'time-picker',
+    'Give it a `label`, a label in the `label` slot, or an `aria-label` that says what the time is for.',
+  ],
+  [
+    'toggle',
+    'Give it words in its default slot, an `aria-label`, or a label on the icon it holds.',
+  ],
+  ['tour', 'Give it a `label`, such as "Getting started".'],
+  ['tree', 'Give it a `label` that says what it holds, such as "Files".'],
+  ['video', 'Give it a `label` that says what the video shows, such as "Product tour".'],
   ['virtual-list', 'Give it a `label`, or an `aria-label` that says what the items are.'],
 ])
 
@@ -178,4 +208,62 @@ export const auditName = (
       tag: host.localName,
     })
   })
+}
+
+/** What `auditField` reads on a field, through a cast, since `MixinField` keeps them protected. */
+interface Field extends HTMLElement {
+  readonly labeled: boolean
+  readonly namedControl: HTMLElement | null
+  partNamed(name: string): Element | null
+}
+
+/**
+ * Asks whether a field is named, as `auditName` does, with what every field
+ * answers it by: the control its label points at, a label it was given or one
+ * slotted with words in it, and the `value` part, whose words are no name.
+ *
+ * **Here rather than at the call in `MixinField`**, for the reason `FIXES` is
+ * here: the call is a no-op in production, and the closures it was handed were
+ * in every field's bundle anyway.
+ */
+export const auditField = (host: HTMLElement): void => {
+  const field = host as Field
+  auditName(
+    field,
+    () => field.namedControl,
+    'field',
+    () =>
+      field.labeled ||
+      [...field.children].some(
+        (child) => child.slot === 'label' && (child.textContent ?? '').trim() !== '',
+      ),
+    () => field.partNamed('value'),
+  )
+}
+
+/**
+ * Asks the button or link a decorative icon sits in whether it has a name.
+ * Its content is the icon alone where it has none, and the warning says so.
+ * `label` is the icon's own, which names it, and the control with it.
+ *
+ * Words or a named picture beside the icon name the control from its
+ * content, which the audit reads for a button and not for a link.
+ */
+export const auditIconControl = (icon: HTMLElement, label: string): void => {
+  if (label !== '' || icon.hasAttribute('aria-label')) {
+    return
+  }
+  const control = icon.closest<HTMLElement>(
+    'a[href], button, summary, [role="button"], [role="link"]',
+  )
+  if (control) {
+    auditName(
+      control,
+      () => null,
+      `Its only content is <${icon.localName}>, which is decorative: give the icon a \`label\`, or the control an \`aria-label\`.`,
+      () =>
+        (control.textContent ?? '').trim() !== '' ||
+        control.querySelector('[alt]:not([alt=""]), [aria-label]:not([aria-label=""])') !== null,
+    )
+  }
 }

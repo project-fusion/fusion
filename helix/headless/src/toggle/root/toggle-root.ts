@@ -151,11 +151,7 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
     this.finishHydration()
     /* A toggle that shows only an icon is announced as "toggle button,
        pressed" and nothing else. Development builds only. */
-    auditName(
-      this,
-      () => this.partNamed('item'),
-      'Give it words in its default slot, an `aria-label`, or a label on the icon it holds.',
-    )
+    auditName(this, () => this.partNamed('item'), 'toggle')
   }
 
   /**
