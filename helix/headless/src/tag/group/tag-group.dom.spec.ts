@@ -538,7 +538,9 @@ describe('what a sheet can read of a tag in a group', () => {
     const [apple, , plum] = one.tags as [Tag, Tag, Tag]
     /* happy-dom does not decide `:focus-visible`, so the cell says it shows a ring. */
     for (const tag of [apple, plum]) {
-      cell(tag).matches = (selector: string) => selector === ':focus-visible'
+      Object.defineProperty(cell(tag), 'matches', {
+        value: (selector: string): boolean => selector === ':focus-visible',
+      })
     }
     cell(apple).focus()
     expect(hasState(apple, 'focus-visible')).toBe(true)
