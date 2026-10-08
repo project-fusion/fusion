@@ -135,8 +135,9 @@ export class HelixHeadlessTagGroup extends HelixElement {
   selectionMode?: TagSelectionMode
 
   /**
-   * The selected tags' values, separated by commas, since a value may hold a
-   * space.
+   * The selected tags' values, separated by commas with no space, as Toggle
+   * Group and Table write theirs, since a value may hold a space. A value
+   * written with a space after each comma is read the same way.
    *
    * Set it to start with tags selected. A tag's value is its `value`, or its
    * words where it has none.
@@ -178,7 +179,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
       : this.value
           .map((one) => String(one).trim())
           .filter((one) => one !== '')
-          .join(', ')
+          .join(',')
   }
 
   /** The tags the group holds, in order. */
@@ -288,11 +289,15 @@ export class HelixHeadlessTagGroup extends HelixElement {
   }
 
   /**
-   * Asks for `value` to become `next`, where it changes and where it leaves a
+   * Asks for `value` to become `asked`, where it changes and where it leaves a
    * tag selected under `disallow-empty-selection`.
    */
-  private ask(next: string): void {
-    if (next === this.written) {
+  private ask(asked: string): void {
+    /* Written with a bare comma, as Toggle Group and Table write theirs. A
+       value written with spaces after its commas is read the same way and
+       counts as the same list. */
+    const next = commaList(asked).join(',')
+    if (next === commaList(this.written).join(',')) {
       return
     }
     if (this.disallowEmptySelection && commaList(next).length === 0) {
@@ -330,7 +335,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
 
   /** Asks for `value` to hold these tags' values, in their order. */
   private choose(tags: readonly HelixHeadlessTag[]): void {
-    this.ask([...new Set(tags.map((tag) => this.valueFor(tag)))].join(', '))
+    this.ask([...new Set(tags.map((tag) => this.valueFor(tag)))].join(','))
   }
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
@@ -441,7 +446,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
       const left = this.tags.map((one) => this.valueFor(one))
       const pruned = prunedValue(this.written, this.valueFor(tag), left)
       if (pruned !== this.written) {
-        this.value = pruned
+        this.value = commaList(pruned).join(',')
         this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
       }
       const active = document.activeElement
