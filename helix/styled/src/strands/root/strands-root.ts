@@ -51,6 +51,13 @@ const OPENING_PATIENCE = 500
 const TRAVEL_EASE = 0.09
 
 /**
+ * How fast a `speed` of `1` moves, against the time the motion was written
+ * in. A slow drift reads as depth; at the written pace the strands' crossings
+ * flicker past before a reader can follow one.
+ */
+const PACE = 0.25
+
+/**
  * @summary A ribbon of fine strands of light, drawn in your theme's colors, in its own box or down a whole page.
  *
  * @description
@@ -60,7 +67,7 @@ const TRAVEL_EASE = 0.09
  * roll over one another, and light runs along them.
  *
  * Its palette comes from the tokens. The strands are `--helix-color-primary`,
- * a few are `--helix-color-info` for depth, and the page they light is
+ * a few are `--helix-color-accent` for depth, and the page they light is
  * `--helix-color-background`. On a light page the light becomes ink, because
  * light added to near-white cannot be seen.
  *
@@ -111,7 +118,7 @@ const TRAVEL_EASE = 0.09
  * @cssproperty --strands-glow - The color of most strands. Defaults to `--helix-color-primary`.
  * @cssproperty --strands-ground - The page the light is added to. Defaults to `--helix-color-background`.
  * @cssproperty --strands-peak - The hottest strands, and on a light page the ink the light darkens toward. Defaults to `--helix-color-primary-hover` on a dark page and `--helix-color-primary-active` on a light one.
- * @cssproperty --strands-tint - The color of a few strands, for depth. Defaults to `--helix-color-info`.
+ * @cssproperty --strands-tint - The color of a few strands, for depth. Defaults to `--helix-color-accent`, which is the primary itself unless the theme relates an accent to the brand, as `accent: { from: 'brand', rotate: 40 }` does.
  *
  * @cssstate fallback - The element shows its gradient: the renderer draws on the CPU, there is no WebGL, or the browser took the context back. Cleared once the ribbon draws again.
  */
@@ -122,7 +129,7 @@ export class HelixStrands extends HelixElement {
   /**
    * Where the form sits across the box, as a share of the width: the fan's
    * bend or the ribbon's axis. `0` is the left edge and `1` the right. A wave
-   * crosses the whole width and does not read it. Unset, a fan bends at `0.4`
+   * crosses the whole width and does not read it. Unset, a fan bends at `0.5`
    * and a ribbon runs down the middle.
    *
    * **A share rather than a length**, so the ribbon keeps its place when the
@@ -145,7 +152,7 @@ export class HelixStrands extends HelixElement {
    * that range. The ribbon as a whole keeps its strength.
    */
   @property({ type: Number })
-  contrast = 0.5
+  contrast = 1
 
   /**
    * How many strands the ribbon has, from `0`, sixty, to `1`, three hundred and
@@ -161,7 +168,7 @@ export class HelixStrands extends HelixElement {
    * and out of focus.
    */
   @property({ type: Number })
-  depth = 0.6
+  depth = 1
 
   /**
    * How differently each strand moves, from `0`, the whole ribbon rolling and
@@ -169,7 +176,7 @@ export class HelixStrands extends HelixElement {
    * over the others. Clamped to that range.
    */
   @property({ type: Number })
-  drift = 0.5
+  drift = 1
 
   /** Overall brightness, as a multiplier on the light. */
   @property({ type: Number })
@@ -181,7 +188,7 @@ export class HelixStrands extends HelixElement {
    * form, such as a fan's bend or a wave, stays sharp whatever this says.
    */
   @property({ type: Number })
-  softness = 0.55
+  softness = 0
 
   /** How fast the ribbon moves, as a multiplier on time. `0` holds it still. */
   @property({ type: Number })
@@ -731,7 +738,7 @@ export class HelixStrands extends HelixElement {
     }
     const step = Math.min(this.held, MAX_FRAME_STEP)
     this.held = 0
-    this.elapsed += step * Math.max(0, this.speed)
+    this.elapsed += step * PACE * Math.max(0, this.speed)
     if (this.travel) {
       const target = window.scrollY
       this.offset += (target - this.offset) * (1 - Math.exp(-step / TRAVEL_EASE))

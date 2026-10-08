@@ -39,7 +39,7 @@ export const RESTING_PALETTE: StrandsPalette = {
  * above the element, and the token otherwise:
  *
  * - `color`: `--strands-glow`, or `primary`.
- * - `text-decoration-color`: `--strands-tint`, or `info`.
+ * - `text-decoration-color`: `--strands-tint`, or `accent`.
  * - `outline-color`: `--strands-ground`, or the background.
  * - `caret-color` and `column-rule-color`: `--strands-peak`, or the dark and
  *   the light page's own peak.
