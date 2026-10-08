@@ -118,6 +118,20 @@ describe('graph frame', () => {
     expect(rows(host)[3]?.hasAttribute('aria-describedby')).toBe(false)
   })
 
+  /* A row could only ever say a note's name. */
+  test('noteContent draws each row, and the row is still named by the note', async () => {
+    const host = await graph('default-active="a"')
+    ;(host as Graph & { noteContent?: (node: GraphNode) => unknown }).noteContent = (node) =>
+      `${node.label} (${node.id})`
+    await host.updateComplete
+    const [selected, to] = rows(host)
+    expect(selected?.querySelector('[part="note-name"]')?.textContent).toBe('Alpha (a)')
+    expect(selected?.getAttribute('aria-label')).toBe('Alpha')
+    expect(to?.getAttribute('aria-describedby')).not.toBeNull()
+    const plain = await graph()
+    expect(rows(plain)[0]?.hasAttribute('aria-label')).toBe(false)
+  })
+
   test('moves a neighbor ahead of notes that sort before it', async () => {
     const host = await graph('default-active="e"')
     expect(names(host)).toEqual(['Echo', 'Delta', 'Alpha', 'Bravo', 'Charlie'])

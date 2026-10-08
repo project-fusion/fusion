@@ -281,6 +281,20 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @property({ attribute: 'no-panel', reflect: true, type: Boolean })
   noPanel = false
 
+  /**
+   * What each note's row in the list shows in place of its name: a function
+   * given the note that returns text, an element or a Lit template.
+   *
+   * For an icon by its kind, or a date under its name, as React Aria's
+   * `ListBoxItem` takes children. The row is still named by the note's name,
+   * which typeahead and the search find it by, and described by how it stands
+   * to the selected note. Return the name with your content where it should
+   * still show. A property only, there being no way to write a function in
+   * markup.
+   */
+  @property({ attribute: false })
+  noteContent?: ((node: GraphNode) => unknown) | undefined
+
   /** The list's name, read by screen readers, and the name of the button that opens it with `no-panel`. */
   @words
   @property({ attribute: 'notes-label' })
@@ -897,12 +911,13 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
         aria-posinset=${index + 1}
         aria-setsize=${total}
         aria-describedby=${relation ? `note-${index}-relation` : nothing}
+        aria-label=${this.noteContent ? nameOf(entry.node) : nothing}
         @click=${() => {
           this.cursor = index
           this.choose(index)
         }}
       >
-        <span part="note-name">${nameOf(entry.node)}</span>
+        <span part="note-name">${this.noteContent ? this.noteContent(entry.node) : nameOf(entry.node)}</span>
         ${relation ? html`<span part="note-relation" id=${`note-${index}-relation`} aria-hidden="true">${relation}</span>` : nothing}
       </div>`
       },
