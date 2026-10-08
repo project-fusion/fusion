@@ -305,6 +305,12 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
        code in place, and announcing the refused one sent an auto-submit a code
        the field does not hold. */
     if (applied && this.value === code && code.length === this.count) {
+      /* The verdict for the whole code first, which the update reports.
+         Measured in Chromium before this: typing `1234` one key at a time
+         left the form holding the `tooShort` verdict for `123`, so
+         `autosubmit` and a `requestSubmit()` in `helix-complete` met
+         `invalid` and never submitted. */
+      this.runPendingUpdate()
       this.dispatchEvent(new HelixCompleteEvent({ value: code }))
       /* And a native `change`, because a filled code is this control's commit:
          the field's own `change` waits for it to lose focus. */
