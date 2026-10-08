@@ -129,6 +129,8 @@ import { HelixNextEvent } from './next.js'
 import { HelixPanelResizeEvent } from './panel-resize.js'
 import { HelixPastedEvent } from './pasted.js'
 import { HelixPinEvent } from './pin.js'
+import { HelixPlotChangeEvent } from './plot-change.js'
+import { HelixPlotTurnEvent } from './plot-turn.js'
 import { HelixPressEvent } from './press.js'
 import { HelixPreviewEvent } from './preview.js'
 import { HelixPreviousEvent } from './previous.js'
@@ -189,6 +191,8 @@ export type {
   NavigateDetail,
   OpenDetail,
   PasteDetail,
+  PlotChangeDetail,
+  PlotTurnDetail,
   PressDetail,
   PressPointerType,
   RangeDetail,
@@ -281,6 +285,8 @@ export {
   HelixPanelResizeEvent,
   HelixPastedEvent,
   HelixPinEvent,
+  HelixPlotChangeEvent,
+  HelixPlotTurnEvent,
   HelixPressEvent,
   HelixPreviewEvent,
   HelixPreviousEvent,
@@ -389,6 +395,8 @@ const registry = {
   HelixPanelResizeEvent,
   HelixPastedEvent,
   HelixPinEvent,
+  HelixPlotChangeEvent,
+  HelixPlotTurnEvent,
   HelixPressEvent,
   HelixPreviewEvent,
   HelixPreviousEvent,

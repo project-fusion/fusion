@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { contextBudget, type Holder } from './budget.js'
+import { contextBudget, type Holder, pageBudget } from './context-budget.js'
 
 /** A drawing that records what the budget asked of it. */
 const drawing = (name: string, log: string[]): Holder => ({
@@ -68,5 +68,8 @@ describe('the context budget', () => {
     budget.far(b, 1)
     expect(log).toEqual([])
     expect(budget.holding).toBe(1)
+  })
+  test('every copy on a page shares one budget', () => {
+    expect(pageBudget()).toBe(pageBudget())
   })
 })

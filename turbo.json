@@ -492,13 +492,15 @@
     // measuring. The entry imports `@fusion.dev/helix`, whose own `^build`
     // brings the core, the headless tier and the icons, and the stylesheets
     // are `@fusion.dev/helix-styles`' output. The map chunk beside it imports
-    // `@fusion.dev/helix-map`, the connector and the style compiler, and the
-    // graph chunk `@fusion.dev/helix-graph`.
+    // `@fusion.dev/helix-map`, the connector and the style compiler, the
+    // graph chunk `@fusion.dev/helix-graph`, and the plot chunk
+    // `@fusion.dev/helix-plot`.
     "frame": {
       "dependsOn": [
         "@fusion.dev/helix#build",
         "@fusion.dev/helix-graph#build",
         "@fusion.dev/helix-map#build",
+        "@fusion.dev/helix-plot#build",
         "@fusion.dev/helix-styles#build"
       ],
       "inputs": [
@@ -510,6 +512,7 @@
         "preview/preview-graph-three-entry.ts",
         "preview/preview-map-entry.ts",
         "preview/preview-maplibre-entry.ts",
+        "preview/preview-plot-three-entry.ts",
         "utils/map-view/map-view.ts",
         "preview/preview-frame.css",
         "public/fonts/**",
@@ -671,6 +674,7 @@
         "$TURBO_ROOT$/helix/styled/src/**/*.dom.spec.ts",
         "$TURBO_ROOT$/helix/graph/src/**/*.ts",
         "$TURBO_ROOT$/helix/map/src/**/*.ts",
+        "$TURBO_ROOT$/helix/plot/src/**/*.ts",
         "$TURBO_ROOT$/helix/testing/src/browser.ts",
         "$TURBO_ROOT$/fusion/scripts/lib/workspace.mjs",
         "$TURBO_ROOT$/fusion/site/scripts/build-specs.mjs"

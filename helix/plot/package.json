@@ -1,0 +1,61 @@
+{
+  "name": "@fusion.dev/helix-plot",
+  "description": "Connects the Helix 3D Scatter chart to three.js, which draws its points in three dimensions.",
+  "version": "0.184.0",
+  "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
+  "repository": {
+    "directory": "helix/plot",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./three": {
+      "types": "./dist/three/index.d.ts",
+      "default": "./dist/three/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
+    "test": "bun run test:pure && bun run test:dom",
+    "test:dom": "bun test dom.spec",
+    "test:pure": "bun test pure.spec",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "dependencies": {
+    "@fusion.dev/helix-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@fusion.dev/helix-headless": "workspace:*",
+    "@fusion.dev/helix-testing": "workspace:*",
+    "@types/bun": "^1.4.2",
+    "@types/three": "^0.186.0",
+    "three": "^0.186.1"
+  },
+  "homepage": "https://fusion.dev",
+  "keywords": [
+    "3d",
+    "chart",
+    "scatter",
+    "three.js",
+    "webgl"
+  ],
+  "peerDependencies": {
+    "three": ">=0.160.0 <0.200.0"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}
