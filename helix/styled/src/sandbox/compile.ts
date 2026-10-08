@@ -43,25 +43,14 @@ type Transform = (
 ) => Promise<{ code: string; sourceMap?: Record<string, unknown> }>
 
 /**
- * The worker's script. Each message names the compiler's address, which it
- * loads once, and again after a load that failed, and is answered with what
- * `transform` returned or with what went wrong.
+ * The worker's script, written short since it ships as a string no minifier
+ * reads. Each message is a number, the compiler's address, the source and the
+ * options. The worker loads the address once, and again after a load that
+ * failed, and answers with the number and what `transform` returned, or the
+ * number and what went wrong.
  */
-const WORKER = `const loaded = {}
-onmessage = async ({ data: [id, address, source, options] }) => {
-  let compiler
-  try {
-    compiler = await (loaded[address] ??= import(address))
-  } catch (error) {
-    delete loaded[address]
-    return postMessage([id, undefined, options.filePath + ' needs ' + address + ', which did not load: ' + error])
-  }
-  try {
-    postMessage([id, compiler.transform(source, options)])
-  } catch (error) {
-    postMessage([id, undefined, String(error && error.message)])
-  }
-}`
+const WORKER =
+  'const l={};onmessage=async({data:[i,a,s,o]})=>{let c;try{c=await(l[a]??=import(a))}catch(e){delete l[a];return postMessage([i,,o.filePath+" needs "+a+", which did not load: "+e])}try{postMessage([i,c.transform(s,o)])}catch(e){postMessage([i,,String(e?.message)])}}'
 
 /** The one worker every preview on the page compiles in, started on the first compile. */
 let worker: Worker | undefined
