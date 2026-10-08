@@ -520,6 +520,7 @@ export {
   type LinkTarget,
 } from './utils/follow-link/follow-link.js'
 export { formatNumbers } from './utils/format-numbers/format-numbers.js'
+export { glyphPath } from './utils/glyph-path/glyph-path.js'
 export {
   type GridBounds,
   type GridKeys,

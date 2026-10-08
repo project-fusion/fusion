@@ -1,6 +1,6 @@
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type TemplateResult } from 'lit'
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { glyphPath } from '../glyph-path/glyph-path.js'
 
 /** What a dismiss button says, does and holds. */
 export interface DrawDismissOptions {
@@ -49,5 +49,5 @@ export const drawDismiss = ({
 /** The cross a dismiss button shows where nothing is slotted: `<svg part="dismiss-mark">`. */
 export const drawDismissGlyph = (): TemplateResult =>
   html`<svg part="dismiss-mark" viewBox=${x.viewBox} fill="currentColor" aria-hidden="true">
-    ${unsafeSVG(x.content)}
+    <path d=${glyphPath(x)}></path>
   </svg>`

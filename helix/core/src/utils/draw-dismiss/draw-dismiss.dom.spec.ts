@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
+import { x } from '@fusion.dev/helix-icons'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* Imported once the page exists, since Lit reads `document` as it loads. */
@@ -38,6 +39,10 @@ describe('a dismiss button', () => {
     const mark = slot.querySelector('svg') as SVGElement
     expect(mark.getAttribute('part')).toBe('dismiss-mark')
     expect(mark.getAttribute('aria-hidden')).toBe('true')
+    /* The cross is written as its path, with no directive to parse it. */
+    expect(mark.innerHTML.replace(/<!--[^>]*-->|\s/g, '')).toBe(
+      x.content.replace(/\s/g, '').replace('/>', '></path>'),
+    )
   })
 
   test('a press dismisses', () => {
