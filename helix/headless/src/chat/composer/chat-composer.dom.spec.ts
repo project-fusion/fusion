@@ -5,7 +5,7 @@ import { formValue, hasState, mount, part, registerDom } from '@fusion.dev/helix
 
 beforeAll(async () => {
   registerDom()
-  await import('../index.js')
+  await import('./index.js')
 })
 
 interface Composer extends HTMLElement {

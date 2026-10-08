@@ -7,6 +7,7 @@ import transcript from '../.examples/transcript.html' with { type: 'text' }
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../composer/index.js')
 })
 
 /* Browser only: happy-dom does not run a script inserted by script. */

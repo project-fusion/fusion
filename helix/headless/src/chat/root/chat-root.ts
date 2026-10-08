@@ -1,4 +1,5 @@
 import {
+  auditChildren,
   ChildrenController,
   customElement,
   deepActiveElement,
@@ -201,6 +202,17 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * types, set `typing` to their name: the status band draws three dots and
  * "Ada is typing" (`typing-label`), which a screen reader hears, and clearing
  * it takes them away. Anything slotted into `status` is drawn first.
+ *
+ * **The composer is an import of its own**, so a transcript that only shows
+ * turns carries none of it. A page with a composer imports it beside the chat:
+ *
+ * ```js
+ * import '@fusion.dev/helix/chat'
+ * import '@fusion.dev/helix/chat/composer'
+ * ```
+ *
+ * In development, a chat holding a composer nobody registered says so once the
+ * page has loaded, with the line to add.
  *
  * **Keyboard.** The transcript moves between turns the way a feed does. Each
  * turn says its place, such as "3 of 40", windowed or not. The transcript is
@@ -1017,6 +1029,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    auditChildren(this, 'chat-composer', 'chat/composer', 'nobody can write a turn')
     /* The one thing inside a turn worth hearing about, and `attributeFilter`
        keeps it to that: a subtree watch of `state` alone never sees a token. */
     this.addEventListener('keydown', this.handleKeydown)

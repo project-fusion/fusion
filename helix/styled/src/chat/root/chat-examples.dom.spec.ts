@@ -23,6 +23,7 @@ beforeAll(async () => {
   registerDom()
   await import('../../orb/index.js')
   await import('../index.js')
+  await import('../composer/index.js')
   await import('../../flex/index.js')
   await import('../../list/index.js')
   await import('../../button/index.js')
