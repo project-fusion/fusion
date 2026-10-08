@@ -106,6 +106,30 @@ export const indentLines = (
 export const outdentLines = (source: string, from: number, to: number): SourceEdit | undefined =>
   eachLine(source, from, to, (line) => line.replace(/^(?: {1,2}|\t)/, ''))
 
+/**
+ * What Enter does: a new line with the indentation of the line it breaks, one
+ * level deeper after an opening bracket, and with the closing bracket on a
+ * line of its own where the caret is between a pair. `undefined` for a line
+ * at the margin with no bracket before the caret, which takes the platform's
+ * own Enter.
+ */
+export const breakLine = (
+  source: string,
+  from: number,
+  to: number,
+  unit = '  ',
+): SourceEdit | undefined => {
+  const start = source.lastIndexOf('\n', from - 1) + 1
+  const indent = /^[ \t]*/.exec(source.slice(start, from))?.[0] ?? ''
+  const opens = OPENERS.indexOf(source[from - 1] ?? '\n')
+  if (opens < 0 && indent === '') {
+    return undefined
+  }
+  const line = `\n${indent}${opens < 0 ? '' : unit}`
+  const text = opens >= 0 && source[to] === CLOSERS[opens] ? `${line}\n${indent}` : line
+  return { from, selection: [from + line.length, from + line.length], text, to }
+}
+
 /** Escapes a comment marker for a regular expression. */
 const literal = (text: string): string => text.replace(/[*/]/g, '\\$&')
 

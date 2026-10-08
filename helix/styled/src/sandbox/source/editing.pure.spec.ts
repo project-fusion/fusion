@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  breakLine,
   closeBracket,
   deletePair,
   indentLines,
@@ -38,6 +39,18 @@ describe('indenting lines', () => {
     const source = '    a\n\tb\nc'
     expect(apply(source, outdentLines(source, 0, source.length))[0]).toBe('  a\nb\nc')
     expect(outdentLines('c', 0, 0)).toBeUndefined()
+  })
+})
+
+describe('breaking a line', () => {
+  test('keeps the indentation of the line, and leaves a line at the margin to the platform', () => {
+    expect(apply('  a', breakLine('  a', 3, 3))).toEqual(['  a\n  ', [6, 6]])
+    expect(breakLine('a', 1, 1)).toBeUndefined()
+  })
+
+  test('indents after an opening bracket, and puts the closing one of a pair on its own line', () => {
+    expect(apply('f(', breakLine('f(', 2, 2))).toEqual(['f(\n  ', [5, 5]])
+    expect(apply('  {}', breakLine('  {}', 3, 3))).toEqual(['  {\n    \n  }', [8, 8]])
   })
 })
 
