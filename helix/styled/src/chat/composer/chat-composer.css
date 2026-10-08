@@ -32,6 +32,18 @@
   outline-color: var(--helix-color-danger);
 }
 
+/* The `feedback` message, under the box as every field's is under its own,
+   in the danger color and a step heavier than body text. */
+[part="feedback"] {
+  color: var(--helix-color-danger);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  line-height: var(--helix-leading-normal);
+  margin: var(--helix-space-none);
+  margin-block-start: var(--helix-space-2xs);
+}
+
 /* The field owns no edge and no ground of its own: it is the inside of the box
    above, and a second border inside the first is the double-struck look every
    field rule in this library exists to prevent.

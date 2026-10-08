@@ -42,6 +42,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * Sending an empty required composer counts as trying. Tabbing past an empty
  * composer marks nothing.
  *
+ * **`feedback` is a message of your own about the draft**, such as one your
+ * server sent back. While it is set, the composer is invalid at once, does
+ * not send or submit, shows the message under the field, and a screen reader
+ * hears it as it appears. Clear it to let the draft go.
+ *
  * **`typing` says whether the user is writing**, and `helix-typing` is sent
  * each time it changes: when they start, and when they send or stop for
  * `typing-timeout` milliseconds. Pass it on to show "is typing" to the other
@@ -62,13 +67,14 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * @csspart composer - The whole composer.
  * @csspart end - The box around the `end` slot.
+ * @csspart feedback - The `feedback` message, under the field while it is set.
  * @csspart field - The text field.
  * @csspart mark - The icon inside the send button.
  * @csspart send - The send button.
  * @csspart start - The box around the `start` slot.
  * @csspart tools - The row under the field.
  *
- * @cssstate invalid - The draft fails `required`, `minlength`, `maxlength`, or a custom error, and the reader has tried to send or submit it, or edited the field and left it.
+ * @cssstate invalid - The draft fails `required`, `minlength`, `maxlength`, or a custom error, and the reader has tried to send or submit it, or edited the field and left it. Or `feedback` is set.
  */
 @customElement('helix-headless-chat-composer')
 export class HelixHeadlessChatComposer extends HelixFormElement {
@@ -84,6 +90,14 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
   @words
   @property()
   label = 'Message'
+
+  /**
+   * A message about the draft, shown under the field. While set, the composer
+   * is invalid, does not send, and does not submit, as a field's `feedback`
+   * does, and the message is announced as it appears.
+   */
+  @property()
+  feedback = ''
 
   /**
    * The most characters a draft can have. The field stops taking more.
@@ -253,6 +267,11 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
     return this.getAttribute('value') ?? ''
   }
 
+  /** @internal `feedback` marks the composer invalid, as a field's does. */
+  protected override get validityFeedback(): string {
+    return this.feedback
+  }
+
   /** Puts back the draft the markup declared when the form is reset. */
   override formResetCallback(): void {
     super.formResetCallback()
@@ -309,7 +328,7 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
     if (field?.validity) {
       this.internals.setValidity(field.validity, field.validationMessage, field)
     }
-    const invalid = this.touched && !this.internals.validity.valid
+    const invalid = this.feedback !== '' || (this.touched && !this.internals.validity.valid)
     this.toggleState('invalid', invalid)
     /* **`false` while nothing is shown**: a host with a role and no
        `aria-invalid` is judged by its validity, and Chromium exposed an
@@ -393,6 +412,7 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
         minlength=${this.minLength ?? nothing}
         maxlength=${this.maxLength ?? nothing}
         aria-invalid=${this.shownInvalid ? 'true' : nothing}
+        aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
         ?disabled=${this.isDisabled}
         @change=${this.handleChange}
         @input=${this.handleInput}
@@ -403,7 +423,11 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
         <span part="end"><slot name="end"></slot></span>
         ${this.renderSend()}
       </div>
-    </div>`
+    </div>${
+      this.feedback === ''
+        ? nothing
+        : html`<p part="feedback" id="feedback" role="alert">${this.feedback}</p>`
+    }`
   }
 
   /**
