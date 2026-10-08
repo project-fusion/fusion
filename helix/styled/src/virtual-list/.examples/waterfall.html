@@ -1,0 +1,43 @@
+<!-- @summary Two thousand cards of different heights in three columns, each placed under the column that ends highest, with Down and Up moving along a column and Left and Right across. -->
+
+<helix-virtual-list
+  columns="3"
+  estimate="96"
+  gap="8"
+  id="cards"
+  label="Cards"
+  layout="waterfall"
+>
+  <template>
+    <div class="waterfallCard">
+      <span
+        class="waterfallChip"
+        data-field-style="chip"
+      ></span>
+      <span data-field="name"></span>
+    </div>
+  </template>
+</helix-virtual-list>
+
+<script>
+  /* Five heights, so no line of three cards ends level and each card goes
+     under whichever column is shortest when it comes. */
+  document.getElementById('cards').items = Array.from({ length: 2000 }, (_, index) => ({
+    chip: `block-size: ${48 + ((index * 3) % 5) * 20}px`,
+    name: `Card ${index + 1}`,
+  }))
+</script>
+
+<style>
+  .waterfallCard {
+    box-sizing: border-box;
+    display: grid;
+    gap: var(--helix-space-2xs);
+    padding: var(--helix-space-2xs);
+  }
+
+  .waterfallChip {
+    background-color: color-mix(in oklab, var(--helix-color-primary) 18%, transparent);
+    border-radius: var(--helix-radii-sm);
+  }
+</style>

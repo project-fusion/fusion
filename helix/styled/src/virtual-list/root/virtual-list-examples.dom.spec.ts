@@ -4,6 +4,7 @@ import choosing from '../.examples/choosing.html' with { type: 'text' }
 import grid from '../.examples/grid.html' with { type: 'text' }
 import loadingMore from '../.examples/loading-more.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
+import waterfall from '../.examples/waterfall.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -85,4 +86,39 @@ describe('the grid example', () => {
       expect((document.activeElement as HTMLElement).dataset.index).toBe('5')
     },
   )
+})
+
+describe('the waterfall example', () => {
+  run('stands each card under the column that ends highest, and Down keeps to it', async () => {
+    await example(waterfall)
+    await idle()
+    await idle()
+    const list = document.getElementById('cards') as HTMLElement
+    const cards = [...list.querySelectorAll<HTMLElement>('[data-index]')]
+      .sort((a, b) => Number(a.dataset.index) - Number(b.dataset.index))
+      .slice(0, 9)
+      .map((card) => card.getBoundingClientRect())
+    const lefts = [...new Set(cards.map((card) => Math.round(card.left)))].sort((a, b) => a - b)
+    expect(lefts).toHaveLength(3)
+    // Each card's top is the end of the column it went to, eight below the card above.
+    const top = Math.min(...cards.map((card) => card.top))
+    const ends = [0, 0, 0]
+    for (const card of cards) {
+      const column = ends.indexOf(Math.min(...ends))
+      expect(Math.round(card.left)).toBe(lefts[column] as number)
+      expect(Math.abs(card.top - top - (ends[column] as number))).toBeLessThan(1)
+      ends[column] = (ends[column] as number) + card.height + 8
+    }
+    // The cards are different heights, so no line of three ends level.
+    expect(new Set(cards.slice(0, 3).map((card) => Math.round(card.height))).size).toBeGreaterThan(
+      1,
+    )
+    ;(list.querySelector('[data-index="0"]') as HTMLElement).focus()
+    ;(document.activeElement as HTMLElement).dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowDown' }),
+    )
+    await idle()
+    const below = (document.activeElement as HTMLElement).getBoundingClientRect()
+    expect(Math.round(below.left)).toBe(lefts[0] as number)
+  })
 })

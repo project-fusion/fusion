@@ -91,7 +91,11 @@ export class VirtualListReorderController implements ReactiveController {
   private get enabled(): boolean {
     const host = this.host
     return (
-      host.reorderable && host.columns <= 1 && host.minColumnWidth <= 0 && host.sectionField === ''
+      host.reorderable &&
+      host.columns <= 1 &&
+      host.minColumnWidth <= 0 &&
+      host.sectionField === '' &&
+      host.layout !== 'waterfall'
     )
   }
 
