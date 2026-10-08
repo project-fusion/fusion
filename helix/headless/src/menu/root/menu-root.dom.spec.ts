@@ -70,7 +70,7 @@ describe('the checked rows in one place', () => {
         updateComplete: Promise<unknown>
       }
       await row.updateComplete
-      ;(row.shadowRoot?.querySelector('[part="item"]') as HTMLElement).click()
+      ;(part(row, 'item') as HTMLElement).click()
       await host.updateComplete
     }
     await press('large')
