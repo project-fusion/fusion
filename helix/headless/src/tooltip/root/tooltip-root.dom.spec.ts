@@ -582,6 +582,16 @@ describe('the wrapping form', () => {
     expect(warnings.length).toBe(1)
   })
 
+  /* A reference to the element around the trigger resolves, so a plain
+     trigger naming the tooltip that wraps it is described at rest, and the
+     warning told that consumer to rewrite it in the `for` form. */
+  test('and says nothing where the trigger names the tooltip that wraps it', async () => {
+    const warnings = await warned(
+      '<helix-headless-tooltip id="tip" content="Regenerates the manifests"><button aria-describedby="tip">Analyze</button></helix-headless-tooltip>',
+    )
+    expect(warnings).toEqual([])
+  })
+
   /* An icon button named Settings under a tooltip reading Settings loses a
      reader nothing. A copy button draws exactly that in its own shadow root,
      where its consumer could not have acted on the warning. */
