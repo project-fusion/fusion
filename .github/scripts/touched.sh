@@ -19,7 +19,11 @@ total=$(printf '%s\n' "$changed" | grep -c . || true)
 # `fusion/docs/`, where the writing lives, and a `.md` anywhere: no browser job
 # reads one, and every document, README and convention file is `.md`. The
 # `.mdx` under the docs packages are not here, because the site renders them.
-skippable=$(printf '%s\n' "$changed" | grep -cE '^(fusion/docs/|cortex/|\.claude/|\.agents/)|\.md$' || true)
+#
+# **`proof/` until the browser checks run on it.** Nothing a browser job reads
+# imports it today. The day `fusion/scripts` takes `settle`, `pool` or `shard`
+# from the package, or a check pictures through `proof`, it leaves this list.
+skippable=$(printf '%s\n' "$changed" | grep -cE '^(fusion/docs/|cortex/|proof/|\.claude/|\.agents/)|\.md$' || true)
 
 if [ "$total" -gt 0 ] && [ "$total" -eq "$skippable" ]; then
   echo 'browser=false' >> "$GITHUB_OUTPUT"
