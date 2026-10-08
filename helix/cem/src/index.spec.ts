@@ -31,8 +31,8 @@ describe('dependenciesOf', () => {
   test('reaches the manifests beneath the ones a package names', () => {
     expect([...dependenciesOf(at('sandbox')).keys()]).toEqual([
       '@fusion.dev/helix-core',
-      '@fusion.dev/helix',
       '@fusion.dev/helix-headless',
+      '@fusion.dev/helix',
     ])
   })
 
