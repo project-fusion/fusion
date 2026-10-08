@@ -14,6 +14,7 @@ Helix has these chart families, and each one has its own API page:
 - `Scatter Chart`
 - `Donut Chart`
 - `Heatmap`
+- `Isometric Heatmap`
 - `Sparkline`
 - `Trend`
 - `Legend`, which all of the charts share
@@ -39,6 +40,11 @@ Choose a chart by the question it answers.
 - **Whether two measures relate.** `Scatter Chart`, with one point per row.
 - **How each day or check went.** `Heatmap`, for uptime, contributions, or
   activity.
+- **The same days, as a relief.** `Isometric Heatmap` reads the same table as
+  `Heatmap` and draws each reading as a prism as tall as its value. Use it where
+  the overall shape matters more than any one exact value, such as a busy
+  stretch in a year of commits. The tooltip and the table carry the exact
+  values.
 - **The shape of a series beside its number.** `Sparkline`, drawn with no axes.
   Use `Trend` to show which way one measurement moved and whether that is good
   news.

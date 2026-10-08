@@ -47,6 +47,7 @@ import { iconArt } from './art/icon'
 import { iconButtonArt } from './art/icon-button'
 import { imageArt } from './art/image'
 import { inputArt } from './art/input'
+import { isometricHeatmapArt } from './art/isometric-heatmap'
 import { kbdArt } from './art/kbd'
 import { legendArt } from './art/legend'
 import { lightboxArt } from './art/lightbox'
@@ -112,7 +113,7 @@ import { virtualListArt } from './art/virtual-list'
  * Every family has an entry, and every entry is a file under `art/` named for
  * the family it draws. The system they all obey is `system.md`.
  *
- * **One hundred and six, not the one hundred and five folders in `helix/styled/src`.** The catalog is
+ * **One hundred and seven, not the one hundred and six folders in `helix/styled/src`.** The catalog is
  * built from the manifests, so it also carries `editor` and `sandbox` from
  * `@fusion.dev/helix-sandbox`. The count that matters is whatever `getFamilies`
  * returns, never a directory listing.
@@ -196,6 +197,7 @@ const art: Record<string, ReactNode> = {
   'icon-button': iconButtonArt,
   image: imageArt,
   input: inputArt,
+  'isometric-heatmap': isometricHeatmapArt,
   kbd: kbdArt,
   legend: legendArt,
   lightbox: lightboxArt,

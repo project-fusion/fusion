@@ -1,0 +1,209 @@
+/* The drawing scales through its `viewBox`, so the sheet decides one length:
+   how large a cell may grow. The strip is that many cells across, measured at
+   30 degrees, and never wider than its box. */
+:host {
+  --_isometric-heatmap-cell: var(--isometric-heatmap-cell-size, 1.25rem);
+
+  /* **The tones are Heatmap's, copied rather than composed.** A family may not
+     import another family's sheet, and moving these into `shared/` would grow
+     Heatmap's own bundle. `isometric-heatmap-root.dom.spec.ts` fails when the
+     two copies differ. */
+  --heatmap-tone-accent: var(--helix-color-accent);
+  --heatmap-tone-danger: var(--helix-color-danger);
+  --heatmap-tone-info: var(--helix-color-info);
+  --heatmap-tone-muted: var(--helix-color-surface-sunken);
+  --heatmap-tone-primary: var(--helix-color-primary);
+  --heatmap-tone-success: var(--helix-color-success);
+  --heatmap-tone-warning: var(--helix-color-warning);
+  --heatmap-tone-1: color-mix(
+    in oklab,
+    var(--helix-color-primary-active) 20%,
+    var(--helix-color-surface-sunken)
+  );
+  --heatmap-tone-2: color-mix(
+    in oklab,
+    var(--helix-color-primary-active) 40%,
+    var(--helix-color-surface-sunken)
+  );
+  --heatmap-tone-3: color-mix(
+    in oklab,
+    var(--helix-color-primary-active) 60%,
+    var(--helix-color-surface-sunken)
+  );
+  --heatmap-tone-4: color-mix(
+    in oklab,
+    var(--helix-color-primary-active) 80%,
+    var(--helix-color-surface-sunken)
+  );
+  --heatmap-tone-5: var(--helix-color-primary-active);
+
+  /* A grid of one track, so the footer is as wide as the strip. */
+  display: grid;
+  grid-template-columns: minmax(0, max-content);
+}
+
+/* **0.866 is the cosine of 30 degrees**, the share of its edge a cell takes
+   across the page. The track is the strip's own width, and `max-inline-size`
+   shrinks it with a narrow box, where the element draws fewer columns. */
+[part~="strip"] {
+  inline-size: calc(var(--isometric-heatmap-span, 1) * 0.866 * var(--_isometric-heatmap-cell));
+  max-inline-size: 100%;
+  /* The tooltip's mark is placed against this box. */
+  position: relative;
+}
+
+/* `overflow: visible`, so the ring on a prism at the edge is not cut. */
+[part="drawing"] {
+  block-size: auto;
+  display: block;
+  inline-size: 100%;
+  overflow: visible;
+}
+
+/* **Every face is shaded from the cell's tone**, so one brand color themes the
+   whole relief. The light falls from the upper left: the top takes the tone,
+   the left face is darker, and the right face darker still. A cell with no
+   tone takes the quietest ground the palette has, as on the flat strip. */
+[part~="cell"] {
+  --_isometric-heatmap-top: var(--heatmap-tone, var(--helix-color-surface-sunken));
+  --_isometric-heatmap-left: color-mix(
+    in oklab,
+    var(--_isometric-heatmap-top),
+    black var(--isometric-heatmap-left-shade, 22%)
+  );
+  --_isometric-heatmap-right: color-mix(
+    in oklab,
+    var(--_isometric-heatmap-top),
+    black var(--isometric-heatmap-right-shade, 38%)
+  );
+}
+
+[part~="top-face"] {
+  --_isometric-heatmap-face: var(--_isometric-heatmap-top);
+}
+
+[part~="left-face"] {
+  --_isometric-heatmap-face: var(--_isometric-heatmap-left);
+}
+
+[part~="right-face"] {
+  --_isometric-heatmap-face: var(--_isometric-heatmap-right);
+}
+
+/* **Each face draws its edges in an ink that contrasts with it**: white on a
+   face darker than the middle of the lightness scale, and black on a lighter
+   one. Shaded toward black, the sides of the darkest step are black, so an
+   edge in a fixed color drew a tall prism as one black shape. A quarter of the
+   ink is an edge, and all of it is the ring on the prism the pointer or the
+   keys rest on, which a fixed color would lose on half the ramp. */
+[part~="cell"] > * {
+  --_isometric-heatmap-ink: oklch(
+    from var(--_isometric-heatmap-face) clamp(0, (0.6 - l) * 1000, 1) 0 0
+  );
+  fill: var(--_isometric-heatmap-face);
+  stroke: color-mix(in oklab, var(--_isometric-heatmap-face), var(--_isometric-heatmap-ink) 25%);
+  stroke-linejoin: round;
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+/* A selected prism, under `selection-mode`, has dashed edges, so it reads
+   apart from the prism the keys rest on. */
+[part~="cell-selected"] > * {
+  stroke: var(--isometric-heatmap-selected-color, var(--_isometric-heatmap-ink));
+  stroke-dasharray: 3px 2px;
+  stroke-width: var(--helix-border-thick);
+}
+
+@media (hover: hover) {
+  [part~="cell"]:hover > * {
+    stroke: var(--_isometric-heatmap-ink);
+    stroke-dasharray: none;
+    stroke-width: var(--helix-border-thick);
+  }
+}
+
+[part~="cell-active"] > * {
+  stroke: var(--_isometric-heatmap-ink);
+  stroke-dasharray: none;
+  stroke-width: var(--helix-border-thick);
+}
+
+/* The strip takes focus once it has cells to read, so it draws the ring. */
+[part~="strip"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The readout, the overview, the selection count, and the table drawn from
+   `data` are for screen readers. */
+[part="live"],
+[part="overview"],
+[part="selection"],
+[part="table"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* The footer is `meter`'s three-slot arrangement: start, summary, end. */
+[part="footer"] {
+  align-items: baseline;
+  color: var(--helix-color-foreground-subtle);
+  display: grid;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-xs);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  padding-block-start: var(--helix-space-xs);
+}
+
+[part="summary"] {
+  text-align: center;
+}
+
+[part="end"] {
+  text-align: end;
+}
+
+[part="footer"][data-empty] {
+  display: none;
+}
+
+[part="empty"],
+[part="loading"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  text-align: center;
+}
+
+/* Print: an edge on every face, so the prisms stay countable whatever the
+   fills come out as. */
+@media print {
+  [part~="cell"] > * {
+    stroke: var(--helix-color-border);
+    stroke-width: var(--helix-border-thin);
+  }
+}
+
+/* Forced colors: the tones are the reading, so the faces keep them, and every
+   edge is drawn in the system's text color. The prism the keys rest on and a
+   selected prism take the system's Highlight. */
+@media (forced-colors: active) {
+  [part~="cell"] > * {
+    forced-color-adjust: none;
+    stroke: CanvasText;
+  }
+
+  [part~="cell-active"] > *,
+  [part~="cell-selected"] > * {
+    stroke: Highlight;
+    stroke-width: var(--helix-border-thick);
+  }
+}
