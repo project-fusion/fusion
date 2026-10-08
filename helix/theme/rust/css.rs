@@ -402,9 +402,9 @@ fn text_ramp(theme: &Theme, namespace: &str, lines: &mut Vec<String>) {
     /* **Compounded from the rounded step, not from the base.** A designer builds
     a scale by taking the last round number and multiplying it, which is why real
     ramps are whole pixels the whole way up; compounding from the base and
-    rounding once at the end lets the unrounded error accumulate up the ramp.
+    rounding once at the end makes each step a ratio of a size nobody sees.
     Measured at 1.32: 18, 24, 32, 42 from the rounded chain against 18, 24, 32,
-    43 from the base, where the top step is 42.5 before it rounds. */
+    43 from the base, and 43 is 1.34 times the 32 below it. */
     let mut above: Vec<f64> = Vec::with_capacity(4);
     for index in 0..4 {
         let from = if index == 0 { body } else { above[index - 1] };
