@@ -22,6 +22,15 @@
 # `1.96` is the toolchain CI builds with, and the floor `rust-version` names.
 set -euo pipefail
 
+# **Every `node_modules` is removed before the install.** Vercel restores them
+# from the previous deploy's build cache, and `bun install` adds what the
+# lockfile lists without removing what it no longer lists. On October 8, 2026
+# that kept five nested copies of `@lezer/highlight` 1.2.3 that `bun.lock` had
+# dropped, and production shipped code samples with no colors.
+# `fusion/site/scripts/check-highlight.mjs` fails the build on that tree.
+rm -rf node_modules
+find cortex fusion helix -type d -name node_modules -prune -exec rm -rf {} +
+
 bun install
 
 # **The toolchain is asked for by version, not accepted because one is there.**

@@ -11,7 +11,7 @@
   },
   "type": "module",
   "scripts": {
-    "build": "next build",
+    "build": "next build && bun scripts/check-highlight.mjs",
     "catalog": "bun scripts/build-catalog.mjs",
     "dev": "bun scripts/dev.mjs",
     "faces": "bun scripts/build-faces.mjs",
