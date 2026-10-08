@@ -125,9 +125,10 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  *
  * The plot runs left to right in every text direction, as a number line does.
  * The plot, its axes, and the axis names sit in a `plane` part with
- * `dir="ltr"`. The axis names carry `dir="auto"`, so a name in Arabic or Hebrew
- * reads in its own direction. The summary and the tooltip bubble follow the
- * page's direction.
+ * `dir="ltr"`, and the arrow keys follow the drawing: Right moves to the next
+ * point on a right-to-left page too. The axis names carry `dir="auto"`, so a
+ * name in Arabic or Hebrew reads in its own direction. The summary and the
+ * tooltip bubble follow the page's direction.
  *
  * **A tap shows the reading under it**, and keeps it until a tap lands
  * elsewhere. `helix-reading-change` says each move of the reading, by pointer,
@@ -149,7 +150,7 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * | Key | What it does |
  * |---|---|
  * | Tab | Moves focus to the plot and shows the first reading. |
- * | Right, Left | Moves to the next or the previous point, left to right across the plot. On a right-to-left page, Left moves to the next. |
+ * | Right, Left | Moves to the next or the previous point, left to right across the plot, on a right-to-left page too. |
  * | Down, Up | Moves among the series of the point. With one series, moves to the next or the previous point. |
  * | Home, End | Moves to the first or the last point. |
  * | Page Down, Page Up | Moves a tenth of the points on or back. |
@@ -300,6 +301,9 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
        Here rather than in a constructor, where the manifest's analyzer reads
        the assignment as a member of this class. */
     this.pointer.axis = 'none'
+    /* The plane is drawn left to right on every page, so the right arrow moves
+       to the point on the right there too. */
+    this.pointer.drawnLtr = true
     /* The reading's moves and presses, sent as `helix-reading-change` and
        `helix-reading-press`. */
     this.pointer.onReading = (heard, detail) =>
