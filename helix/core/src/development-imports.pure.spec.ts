@@ -31,6 +31,7 @@ describe('the development-only audits in the published files', () => {
   test('each `#` import has an export that publishes the same files', () => {
     const exported = pkg.exports as unknown as Record<string, Record<string, string>>
     expect(Object.keys(pkg.imports).sort()).toEqual([
+      '#audit-children',
       '#audit-name',
       '#audit-nesting',
       '#audit-served',
@@ -38,6 +39,7 @@ describe('the development-only audits in the published files', () => {
       '#react-audit',
     ])
     for (const [key, subpath] of [
+      ['#audit-children', './audits/children'],
       ['#audit-name', './audits/name'],
       ['#audit-nesting', './audits/nesting'],
       ['#audit-served', './audits/served'],

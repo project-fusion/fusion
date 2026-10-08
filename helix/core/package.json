@@ -17,6 +17,12 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./audits/children": {
+      "types": "./dist/utils/audit-children/audit-children.d.ts",
+      "development": "./dist/utils/audit-children/audit-children.js",
+      "helix-development": "./dist/utils/audit-children/audit-children.js",
+      "default": "./dist/utils/audit-children/audit-children-off.js"
+    },
     "./audits/name": {
       "types": "./dist/utils/audit-name/audit-name.d.ts",
       "development": "./dist/utils/audit-name/audit-name.js",
@@ -78,6 +84,11 @@
   },
   "homepage": "https://fusion.dev",
   "imports": {
+    "#audit-children": {
+      "development": "./src/utils/audit-children/audit-children.ts",
+      "helix-development": "./src/utils/audit-children/audit-children.ts",
+      "default": "./src/utils/audit-children/audit-children-off.ts"
+    },
     "#audit-name": {
       "development": "./src/utils/audit-name/audit-name.ts",
       "helix-development": "./src/utils/audit-name/audit-name.ts",
