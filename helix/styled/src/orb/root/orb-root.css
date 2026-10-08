@@ -22,7 +22,19 @@
   display: inline-block;
   flex-shrink: 0;
   inline-size: var(--orb-size, var(--_orb-size));
+  /* For a shape the page slots, which is laid over the box. */
+  position: relative;
   vertical-align: middle;
+}
+
+/* A shape of the page's own fills the box the dots were drawn in. Absolute,
+   so it covers the canvas before script has hidden it, and a server's markup
+   is right on arrival. */
+::slotted(*) {
+  block-size: 100%;
+  inline-size: 100%;
+  inset: 0;
+  position: absolute;
 }
 
 :host([size="sm"]) {
@@ -37,6 +49,9 @@
    `size` attribute and a consumer's own `inline-size` all work the same way and
    none of them has to be read by script. */
 [part="canvas"] {
+  /* The tempo rides as the colors below do, on a property that does nothing without an
+     animation name, and the engine checks it for a number that is not negative. */
+  animation-iteration-count: var(--orb-speed, 1);
   block-size: 100%;
   /* **Both ends of the ramp are carried on real color properties, because a
      custom property does not resolve to one.** `getComputedStyle` hands back a
