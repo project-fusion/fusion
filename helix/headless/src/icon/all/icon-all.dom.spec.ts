@@ -26,14 +26,14 @@ const SMALL = [
 
 describe('the names the entries register', () => {
   test('the family entry registers the small set', async () => {
-    const { resolveIcon } = await import('./index.js')
+    const { resolveIcon } = await import('../index.js')
     for (const name of SMALL) {
       expect(resolveIcon(name)).toBe(icons[name])
     }
   })
 
   test('and icon/all registers every glyph of the set', async () => {
-    const { resolveIcon } = await import('./all/index.js')
+    const { resolveIcon } = await import('./index.js')
     for (const [name, glyph] of Object.entries(icons)) {
       expect(resolveIcon(name)).toBe(glyph)
     }
