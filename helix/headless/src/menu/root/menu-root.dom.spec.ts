@@ -76,6 +76,39 @@ describe('moving through a menu with the keyboard', () => {
     expect(focused(at(rows, 0))).toBe(at(rows, 2))
   })
 
+  /* The APG's menus, React Aria's and Radix's move focus with the pointer.
+     Measured in Chromium before this: in the default drill mode, hovering
+     Paste left focus on Cut, so the keys then moved from a row the reader was
+     not pointing at. */
+  test('a mouse resting on a row moves focus to it', async () => {
+    const { host, rows } = await opened()
+    press(host, 'ArrowDown')
+    expect(focused(at(rows, 0))).toBe(at(rows, 0))
+    at(rows, 2).dispatchEvent(
+      new PointerEvent('pointermove', { bubbles: true, composed: true, pointerType: 'mouse' }),
+    )
+    expect(focused(at(rows, 0))).toBe(at(rows, 2))
+    press(host, 'ArrowUp')
+    expect(focused(at(rows, 0))).toBe(at(rows, 1))
+  })
+
+  /* Measured in Chromium before this: removing the focused row sent focus to
+     the body, and the menu then ignored every key. */
+  test('removing the focused row moves focus to the row in its place', async () => {
+    const { host, rows } = await opened()
+    press(host, 'End')
+    expect(focused(at(rows, 0))).toBe(at(rows, 2))
+    at(rows, 2).remove()
+    await new Promise((resolve) => setTimeout(resolve))
+    expect(focused(at(rows, 0))).toBe(at(rows, 1))
+    press(host, 'ArrowUp')
+    expect(focused(at(rows, 0))).toBe(at(rows, 0))
+    /* One from the middle gives focus to the row that took its place. */
+    at(rows, 0).remove()
+    await new Promise((resolve) => setTimeout(resolve))
+    expect(focused(at(rows, 1))).toBe(at(rows, 1))
+  })
+
   test('Home and End go to the ends', async () => {
     const { host, rows } = await opened()
     press(host, 'End')
@@ -544,6 +577,32 @@ describe('menu submenus, coming and going', () => {
     at(host, 'field').select()
     await host.updateComplete
     expect(hasState(host, 'drilled')).toBe(true)
+  })
+
+  /* React Aria and Radix name a submenu by the row that opens it. Measured
+     before this: a reader drilled into a page was still in a menu named by
+     the trigger. */
+  test('a submenu page is named by its row, and the top page by its own name again', async () => {
+    const host = await deep()
+    host.open = true
+    await host.updateComplete
+    const surface = part(host, 'surface') as HTMLElement
+    expect(surface.getAttribute('aria-label')).toBe('Filter')
+    expect(surface.hasAttribute('aria-labelledby')).toBe(false)
+
+    at(host, 'field').select()
+    await host.updateComplete
+    expect(surface.getAttribute('aria-labelledby')).toBe('title')
+    const title = host.shadowRoot?.getElementById('title')
+    expect(title?.textContent?.trim()).toBe('Disposition')
+    expect(surface.contains(title as Node)).toBe(true)
+
+    host.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowLeft' }),
+    )
+    await host.updateComplete
+    expect(hasState(host, 'drilled')).toBe(false)
+    expect(surface.hasAttribute('aria-labelledby')).toBe(false)
   })
 
   test('every row on the way to the open page keeps its own slot', async () => {

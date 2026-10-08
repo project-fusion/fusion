@@ -81,7 +81,9 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  *
  * Submenus drill down by default. A submenu replaces the panel's content, and a
  * back row returns to the previous page. One panel stays inside a narrow
- * window, and works on touch screens, which have no hover.
+ * window, and works on touch screens, which have no hover. Focus follows a
+ * mouse resting on a row in either mode, and a drilled page is a `menu` named
+ * by the row that opened it.
  *
  * **`submenus="flyout"` opens each submenu in a panel of its own beside its
  * row**, as React Aria's `SubmenuTrigger` and Radix's `Sub` do. Resting the
@@ -618,6 +620,59 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     }
   }
 
+  /** Watches for rows taken away while the menu is open. */
+  private rowWatch: MutationObserver | undefined
+
+  /**
+   * Moves the reader to a neighbor when the page takes away the row they were
+   * on: the row that took its place, or the one before it where it was the
+   * last. A menu with no rows left closes and gives focus to its trigger.
+   *
+   * **Focus went to the body**, and the menu then ignored every key, its
+   * listener being on the host: measured in Chromium, removing the focused
+   * row and pressing ArrowUp did nothing. List and Virtual List move focus to
+   * a neighbor the same way, as React Aria's collections do. With `filterable`,
+   * focus stays in the field and the highlight moves. Focus a reader put
+   * anywhere but the body is left there.
+   */
+  private readonly followRemoved = (records: MutationRecord[]): void => {
+    if (!this.open) {
+      return
+    }
+    /* Or still the row taken away, which is where happy-dom leaves it. */
+    const active = deepActiveElement()
+    const lost = active === null || active === document.body || !active.isConnected
+    const record = records.find((one) =>
+      [...one.removedNodes].some(
+        (node) => isItem(node as Element) && (this.filterable ? node === this.highlighted : lost),
+      ),
+    )
+    if (!record) {
+      return
+    }
+    const items = this.items
+    const after = (from: Node | null, step: 'nextSibling' | 'previousSibling') => {
+      for (let node = from; node; node = node[step]) {
+        if (items.includes(node as HelixHeadlessMenuItem)) {
+          return node as HelixHeadlessMenuItem
+        }
+      }
+      return undefined
+    }
+    const next =
+      after(record.nextSibling, 'nextSibling') ??
+      after(record.previousSibling, 'previousSibling') ??
+      items.at(-1)
+    if (this.filterable || next) {
+      this.reach(next)
+      return
+    }
+    this.hide()
+    if (!this.context) {
+      this.trigger.focus()
+    }
+  }
+
   /** Opens the menu. */
   show(): void {
     this.openAt('first')
@@ -789,6 +844,9 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     if (item) {
       this.revealRow(item)
     }
+    /* After `aria`, which forwards the host's names again as focus arrives
+       and would take a submenu page's name back to the top page's. */
+    this.nameSurface()
   }
 
   /** Scrolls the panel that holds a row to show it. */
@@ -1011,12 +1069,17 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   }
 
   /**
-   * A mouse resting on a row, under `flyout`: focus follows it, and after a
-   * moment the row's submenu opens, or the submenus below the row's own page
+   * A mouse resting on a row: focus follows it, and under `flyout`, after a
+   * moment, the row's submenu opens, or the submenus below the row's own page
    * close. Not while the pointer is crossing toward an open submenu.
+   *
+   * **In every mode**, as the APG's menus, React Aria's and Radix's have it.
+   * Under `drill` the pointer did not move focus, so the row under the
+   * pointer and the row the keys moved from were two rows, measured in
+   * Chromium: hovering Delete left focus on Cut.
    */
   private readonly handleHover = (event: PointerEvent): void => {
-    if (!(this.flies || this.filterable) || !this.open || event.pointerType !== 'mouse') {
+    if (!this.open || event.pointerType !== 'mouse') {
       return
     }
     const row = event
@@ -1107,6 +1170,8 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.addEventListener('pointercancel', this.handlePointerCancel)
     this.addEventListener('click', this.handleHeldClick, true)
     this.addEventListener('focusin', this.handleTriggerFocusIn)
+    this.rowWatch = new MutationObserver(this.followRemoved)
+    this.rowWatch.observe(this, { childList: true, subtree: true })
     /* A frame after the first render, when a plain trigger is first told the
        menu is closed. Not in the first render: a framework that rendered the
        trigger on a server may still be hydrating it then. */
@@ -1137,6 +1202,8 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.removeEventListener('pointercancel', this.handlePointerCancel)
     this.removeEventListener('click', this.handleHeldClick, true)
     this.removeEventListener('focusin', this.handleTriggerFocusIn)
+    this.rowWatch?.disconnect()
+    this.rowWatch = undefined
     if (this.described) {
       unlinkDescription(this.described, this)
       this.described = undefined
@@ -1204,8 +1271,12 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     }
   }
 
+  /** Whether the surface is named by a submenu's page, which `nameSurface` undoes at the top. */
+  private namedByPage = false
+
   /**
-   * Names the surface by its trigger, where nothing else names it.
+   * Names the surface by its trigger, where nothing else names it, and a
+   * submenu's page by its title.
    *
    * By element reference, which is the one direction that crosses: the surface
    * is in this shadow root and the trigger is in the tree around it. A host
@@ -1216,7 +1287,25 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     const surface = this.menuBox as
       | (HTMLElement & { ariaLabelledByElements?: Element[] | null })
       | null
-    if (!surface || !('ariaLabelledByElements' in surface)) {
+    if (!surface) {
+      return
+    }
+    /* **A submenu's page is named by its row**, the title over it, as a
+       flyout submenu is named by the row that opens it in React Aria and
+       Radix. Measured before this: a reader drilled into "Share" was still in
+       a menu called "Actions". By id, which reaches within this shadow root,
+       and over any name the host forwards, which names the top page. */
+    if (!this.flies && !this.drilldown.atRoot && this.partNamed('title')) {
+      surface.setAttribute('aria-labelledby', 'title')
+      this.namedByPage = true
+      return
+    }
+    if (this.namedByPage) {
+      this.namedByPage = false
+      surface.removeAttribute('aria-labelledby')
+      this.aria.forward()
+    }
+    if (!('ariaLabelledByElements' in surface)) {
       return
     }
     if (this.hasAttribute('aria-labelledby')) {
@@ -1341,7 +1430,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
                 ${unsafeSVG(caretLeft.content)}
               </svg>
             </button>
-            <span part="title">${this.drilldown.label}</span>
+            <span part="title" id="title">${this.drilldown.label}</span>
           </div>`
     }
       <slot @slotchange=${(event: Event) => this.countRows(event)}></slot>
