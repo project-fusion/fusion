@@ -461,15 +461,3 @@
    See `[data-substrate]` there. */
 
 
-/* The showcase band's words, on the field beside the live panel. On a phone
-   the shell has no inset, so the words take one back, as `.fieldStack` does. */
-.split {
-  align-items: start;
-  gap: var(--helix-space-xl);
-}
-
-@media (max-width: 40rem) {
-  .split > :first-child {
-    padding-inline: var(--site-inset);
-  }
-}
