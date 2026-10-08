@@ -878,3 +878,40 @@ describe('aura shader', () => {
     expect(FRAGMENT).not.toContain('//')
   })
 })
+
+/* WCAG 2.2.2 asks that motion lasting more than five seconds can be paused,
+   and the aura offered only a `paused` property for a page's own control. */
+describe('aura pause control', () => {
+  type Aura = HTMLElement & { paused: boolean; updateComplete: Promise<boolean> }
+  const control = (host: HTMLElement): HTMLButtonElement | null =>
+    host.shadowRoot?.querySelector('[part="pause"]') ?? null
+
+  test('is drawn only under `pause-control`', async () => {
+    expect(control(await mount(undrawn()))).toBeNull()
+    expect(control(await mount(undrawn('pause-control')))?.tagName).toBe('BUTTON')
+  })
+
+  test('is a toggle named once, pressed while the field is paused, and says so', async () => {
+    const host = (await mount(undrawn('pause-control'))) as Aura
+    const button = control(host) as HTMLButtonElement
+    let changes = 0
+    host.addEventListener('change', () => {
+      changes += 1
+    })
+    expect([button.getAttribute('aria-label'), button.getAttribute('aria-pressed')]).toEqual([
+      'Pause the motion',
+      'false',
+    ])
+    button.click()
+    await host.updateComplete
+    expect([host.paused, button.getAttribute('aria-pressed'), changes]).toEqual([true, 'true', 1])
+    button.click()
+    await host.updateComplete
+    expect([host.paused, button.getAttribute('aria-pressed'), changes]).toEqual([false, 'false', 2])
+  })
+
+  test('takes its name from `pause-label`', async () => {
+    const host = await mount(undrawn('pause-control pause-label="Stop"'))
+    expect(control(host)?.getAttribute('aria-label')).toBe('Stop')
+  })
+})
