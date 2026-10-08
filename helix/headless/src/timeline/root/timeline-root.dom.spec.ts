@@ -58,4 +58,25 @@ describe('a timeline', () => {
     expect(marker).not.toBeNull()
     expect(marker.querySelector('slot[name="marker"]')).not.toBeNull()
   })
+
+  /* A feed fetching more entries had nowhere to say so. */
+  test('says it is loading more, in an entry after the last, while loading is set', async () => {
+    const host = (await timeline(three)) as HTMLElement & {
+      loading: boolean
+      updateComplete: Promise<boolean>
+    }
+    expect(part(host, 'loading')).toBeNull()
+    host.loading = true
+    await host.updateComplete
+    const loading = part(host, 'loading') as HTMLElement
+    expect(loading.getAttribute('role')).toBe('listitem')
+    expect(loading.textContent?.trim()).toBe('Loading more')
+    const internals = (host as unknown as { internals: ElementInternals }).internals
+    expect(internals.ariaBusy).toBe('true')
+    expect(internals.states.has('loading')).toBe(true)
+    host.loading = false
+    await host.updateComplete
+    expect(part(host, 'loading')).toBeNull()
+    expect(internals.ariaBusy).toBeNull()
+  })
 })

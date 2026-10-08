@@ -29,7 +29,9 @@ type TimelineTone = 'danger' | 'info' | 'neutral' | 'primary' | 'success' | 'war
  * hours ago", from `datetime`, where the `time` slot is empty. The words move
  * on as they go stale, "3 hours ago" becoming "4 hours ago", with one wakeup
  * shared by every reading on the page, as `FormatDate` keeps its own. They are
- * in the language of the page, or of the nearest `lang`.
+ * in the language of the page, or of the nearest `lang`. The whole date and
+ * time is the reading's `title`, so a pointer resting on "3 hours ago" shows
+ * when it was, and a screen reader reads it as the description.
  *
  * Each entry draws the connector line that arrives at it and hides it when it
  * is the first entry, using `:host(:first-child)`. This needs no index, no
@@ -105,6 +107,9 @@ export class HelixHeadlessTimelineItem extends HelixElement {
    */
   private reading = ''
 
+  /** The whole date and time `datetime` names, the reading's title under `relative`. */
+  private whole = ''
+
   /** The instant `datetime` names, where `relative` asks for a reading of it. */
   private get moment(): Date | undefined {
     if (this.relative === undefined || this.datetime === '') {
@@ -174,6 +179,15 @@ export class HelixHeadlessTimelineItem extends HelixElement {
     }
     const moment = this.moment
     this.reading = moment ? this.readingAt(moment, new Date(this.clock.now)).text : ''
+    /* A date alone is midnight UTC to `Date`, so it is written in UTC, or
+       west of Greenwich it would be the day before. */
+    const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(this.datetime)
+    this.whole = moment
+      ? new Intl.DateTimeFormat(wordsLocale(this), {
+          dateStyle: 'long',
+          ...(dateOnly ? { timeZone: 'UTC' } : { timeStyle: 'short' }),
+        }).format(moment)
+      : ''
     hostAria(this.internals, { role: 'listitem' })
   }
 
@@ -228,6 +242,7 @@ export class HelixHeadlessTimelineItem extends HelixElement {
           : html`<time
               part="time"
               datetime=${this.datetime}
+              title=${this.whole || nothing}
               >${when}</time
             >`
       }

@@ -124,6 +124,20 @@ describe('a relative time', () => {
     expect(reading(await entry(`lang="en" datetime="${at}"`, 'Shipped'))).toBe('')
   })
 
+  /* "3 hours ago" said when, and never what day that was. */
+  test('carries the whole date as its title, and none without relative', async () => {
+    const timed = await entry('lang="en" relative datetime="2026-08-19T09:12"', 'Shipped')
+    expect(part(timed, 'time')?.getAttribute('title')).toBe(
+      new Intl.DateTimeFormat('en', { dateStyle: 'long', timeStyle: 'short' }).format(
+        new Date('2026-08-19T09:12'),
+      ),
+    )
+    const day = await entry('lang="en" relative datetime="2026-08-19"', 'Shipped')
+    expect(part(day, 'time')?.getAttribute('title')).toBe('August 19, 2026')
+    const plain = await entry('lang="en" datetime="2026-08-19T09:12"', 'Shipped')
+    expect(part(plain, 'time')?.hasAttribute('title')).toBe(false)
+  })
+
   test('an entry taken off the page stops asking', async () => {
     const element = await entry(`relative datetime="${new Date().toISOString()}"`, 'Shipped')
     const before = ticker()?.waiting.size ?? 0
