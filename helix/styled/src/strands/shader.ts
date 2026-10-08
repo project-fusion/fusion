@@ -166,6 +166,7 @@ uniform vec3 uGlow;
 uniform vec3 uTint;
 uniform vec3 uPeak;
 out float vSide;
+out float vSigma;
 out vec3 vColor;
 ${PATH}
 void main() {
@@ -187,11 +188,21 @@ void main() {
   float base = mix(0.35, 1.3, r7 * r7) * uDpr * (1.0 + (0.3 + 0.5 * uDepth) * a.z);
   float focus = uDepth * smoothstep(-0.1, -0.9, a.z) * 10.0 * uDpr;
   float w = max(base + soft * mix(8.0, 36.0, r6) * uDpr + focus, 1.0);
-  float drawW = w + 2.5 * uDpr;
+  /* **A profile no narrower than a pixel can carry.** The strand's light falls
+     off across it as a Gaussian a quarter of its width wide, which for a strand
+     a pixel wide is a quarter of a pixel: narrower than the pixels sampling it,
+     so a thin strand broke into a row of dots wherever it ran between pixel
+     centers. Its spread is held to at least 0.7 of a device pixel, and its peak
+     comes down by the same factor, so it carries the same light and reads as
+     one continuous thread. The quad covers three spreads either side. */
+  float designed = w * 0.228;
+  float sigma = max(designed, 0.7);
+  float drawW = max(w, sigma * 6.0) + 2.5 * uDpr;
   vec2 res = uView * uDpr;
   vec2 px = a.xy * uDpr + nrm * aVert.y * drawW * 0.5;
   gl_Position = vec4(px.x / res.x * 2.0 - 1.0, 1.0 - px.y / res.y * 2.0, 0.0, 1.0);
-  vSide = aVert.y * drawW / w;
+  vSide = aVert.y * drawW * 0.5;
+  vSigma = sigma;
   float shimmer = 0.5 + 0.5 * sin(info.z * 0.044 - uTime * (2.0 + 2.0 * r5) + r6 * 6.283);
   shimmer *= shimmer;
   /* Contrast spreads the strands' brightness: a few burn and most fall back.
@@ -205,7 +216,7 @@ void main() {
   float rest = mix(0.35, 0.15, uContrast);
   vec3 col = mix(uGlow, uTint, step(0.83, r6) * 0.9);
   col = mix(col, uPeak, step(0.93, r7) * 0.6);
-  vColor = col * energy * info.x * (rest + (1.0 - rest) * shimmer) * bright * depth;
+  vColor = col * energy * info.x * (rest + (1.0 - rest) * shimmer) * bright * depth * (designed / sigma);
 }
 `
 
@@ -213,11 +224,13 @@ void main() {
 export const LINE_FRAGMENT = `#version 300 es
 precision highp float;
 in float vSide;
+in float vSigma;
 in vec3 vColor;
 uniform float uScale;
 out vec4 outColor;
 void main() {
-  outColor = vec4(vColor * exp(-vSide * vSide * 2.4) * uScale, 1.0);
+  float d = vSide / vSigma;
+  outColor = vec4(vColor * exp(-0.5 * d * d) * uScale, 1.0);
 }
 `
 
