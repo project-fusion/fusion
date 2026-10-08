@@ -120,14 +120,21 @@ const bend = (
   /* Evenly spaced, because a spline through points spaced unevenly bends
      hardest where the spacing changes, which put a fold in the arm. The upper
      arm fades in from above the box; the lower one widens toward the
-     ribbon's width and dims toward its brightness. */
+     ribbon's width and dims toward its brightness.
+
+     **The pinch is a bell, not a V.** Every strand sits at a share of the
+     width from the centerline, so where the width bends, every strand off
+     the center bends with it. Narrowed in straight lines to a point, from
+     0.094 one point below the apex to 0.02 at it, the outer strands turned a
+     corner about 70 pixels round at the pinch. A Gaussian narrows them over
+     a third of the height with no corner anywhere. */
+  const pinch = (down: number): number => 1 - Math.exp(-((down / 0.32) ** 2))
   const points: PathPoint[] = []
   for (let step = -7; step * 0.15 <= reach + 1e-9; step++) {
     const down = step * 0.15
     const upper = down < 0
-    const wide = upper
-      ? 0.02 + (WIDTH.bend - 0.02) * Math.min(1, -down / 0.6)
-      : 0.02 + (WIDTH.bend * 1.4 - 0.02) * (down / reach)
+    const far = upper ? WIDTH.bend : WIDTH.bend + WIDTH.bend * 0.4 * (down / reach)
+    const wide = 0.02 + (far - 0.02) * pinch(down)
     const glow = upper ? Math.max(0, 1 + down * 1.07) : 1 - down * 0.73
     points.push([out(down), y + down * height, wide, GLOW.bend * glow])
   }
@@ -490,6 +497,43 @@ export const catmull = (p0: number, p1: number, p2: number, p3: number, f: numbe
       (2 * p0 - 5 * p1 + 4 * p2 - p3) * f2 +
       (-p0 + 3 * p1 - 3 * p2 + p3) * f3)
   )
+}
+
+/**
+ * How far along the drawn centerline each point is, in CSS pixels, for the
+ * shader to set every frequency by.
+ *
+ * **Arc length, which only grows.** The shader used the sum of a point's `y`
+ * and its `x` in pixels, which grows down a page and across a wave heading
+ * right, and runs backward wherever the path heads left faster than it heads
+ * down: on a bend's upper arm, and across a wave sweeping left. There the
+ * strands' twist and waves ran in reverse, and every strand turned a corner
+ * at the same place.
+ *
+ * Sixteen samples a segment of the same spline the shader draws.
+ *
+ * @param points The path.
+ * @param width The box's width, in CSS pixels, which `x` is a share of.
+ */
+export const arcLengths = (points: readonly PathPoint[], width: number): Float32Array => {
+  const n = points.length
+  const out = new Float32Array(n)
+  const at = (i: number, c: number): number => points[Math.max(0, Math.min(n - 1, i))]?.[c] ?? 0
+  let total = 0
+  for (let i = 0; i < n - 1; i++) {
+    let x = at(i, 0) * width
+    let y = at(i, 1)
+    for (let k = 1; k <= 16; k++) {
+      const f = k / 16
+      const nx = catmull(at(i - 1, 0), at(i, 0), at(i + 1, 0), at(i + 2, 0), f) * width
+      const ny = catmull(at(i - 1, 1), at(i, 1), at(i + 1, 1), at(i + 2, 1), f)
+      total += Math.hypot(nx - x, ny - y)
+      x = nx
+      y = ny
+    }
+    out[i + 1] = total
+  }
+  return out
 }
 
 /**

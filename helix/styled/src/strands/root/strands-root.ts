@@ -13,6 +13,7 @@ import { html } from 'lit'
 import { property } from 'lit/decorators.js'
 import { paletteOf, RESTING_PALETTE, type StrandsPalette } from '../palette.js'
 import {
+  arcLengths,
   boxPath,
   lookup,
   MAX_POINTS,
@@ -266,6 +267,9 @@ export class HelixStrands extends HelixElement {
   /** The path, padded to the shader's array, and how many points are in use. */
   private readonly points = new Float32Array(MAX_POINTS * 4)
   private count = 0
+
+  /** How far along the path each point is, in pixels, four to a slot as the shader reads them. */
+  private lengths = new Float32Array(MAX_POINTS)
 
   /** In `travel`, the path's `y` at even steps of its parameter. */
   private table: Float32Array = new Float32Array(1)
@@ -573,6 +577,8 @@ export class HelixStrands extends HelixElement {
       this.points.set(point, i * 4)
     })
     this.count = path.length
+    this.lengths.fill(0)
+    this.lengths.set(arcLengths(path, this.box.width))
   }
 
   /** The stops inside, each with its target's place on the page. A stop naming nothing is skipped. */
@@ -669,6 +675,7 @@ export class HelixStrands extends HelixElement {
         drift: share(this.drift),
         dust: Math.round(Math.min(MAX_DUST, Math.max(0, this.dust * DUST))),
         gain: Math.max(0, this.gain),
+        lengths: this.lengths,
         points: this.points,
         range,
         scroll: this.travel ? this.offset : 0,

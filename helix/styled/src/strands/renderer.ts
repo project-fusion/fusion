@@ -51,6 +51,8 @@ export interface StrandsFrame {
   depth: number
   /** How many specks of dust drift around the strands. */
   dust: number
+  /** How far along the path each point is, in CSS pixels, padded like `points`. */
+  lengths: Float32Array
   /** How differently each strand moves, from `0`, as one, to `1`. */
   drift: number
   /** The device pixels per CSS pixel the buffer was sized at. */
@@ -309,6 +311,7 @@ export class StrandsRenderer {
     const { gl } = this
     gl.useProgram(program.program)
     gl.uniform4fv(program.uniforms.get('uPts') ?? null, frame.points)
+    gl.uniform4fv(program.uniforms.get('uLen') ?? null, frame.lengths)
     gl.uniform1i(program.uniforms.get('uCount') ?? null, frame.count)
     gl.uniform2f(program.uniforms.get('uView') ?? null, frame.view[0], frame.view[1])
     gl.uniform1f(program.uniforms.get('uScroll') ?? null, frame.scroll)
