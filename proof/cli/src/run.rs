@@ -670,6 +670,10 @@ pub fn run(options: &Options) -> Outcome<Code> {
         }
     }
 
+    /* Only for a whole set: a shot that could not be taken is a baseline this
+    environment never agreed with. */
+    let write_fingerprint =
+        write_fingerprint && !results.values().any(|fate| matches!(fate, Fate::Broken(_)));
     if write_fingerprint {
         write(&fingerprint_path, here.to_text().as_bytes())?;
     }
