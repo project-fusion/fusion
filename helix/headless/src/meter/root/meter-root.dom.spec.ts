@@ -53,7 +53,17 @@ describe('meter', () => {
   test('and a percentage stands in where they were not', async () => {
     const host = await meter('show-value value="42"')
     expect(part(host, 'value')?.textContent?.trim()).toBe('42%')
-    expect(internals(host).ariaValueText).toBeNull()
+    expect(internals(host).ariaValueText).toBe('42%')
+  })
+
+  /* The meter drew 56% and a screen reader said 18, the value, where Progress
+     with the same attributes said 56%. */
+  test('says the share it draws, where the value is no percentage', async () => {
+    const host = await meter('max="32" show-value value="18"')
+    expect(part(host, 'value')?.textContent?.trim()).toBe('56%')
+    expect(internals(host).ariaValueText).toBe('56%')
+    const hidden = await meter('max="32" value="18"')
+    expect(internals(hidden).ariaValueText).toBe('56%')
   })
 
   /* Written by concatenation it ignored the locale: no space before the sign
@@ -204,7 +214,7 @@ describe('meter beyond its range', () => {
   test('and a reading inside the range is marked at neither', async () => {
     const host = await meter('value="40"')
     expect(part(host, 'indicator')?.getAttribute('data-beyond')).toBeNull()
-    expect(internals(host).ariaValueText).toBeNull()
+    expect(internals(host).ariaValueText).toBe('40%')
   })
 
   test('the band and the overrun are part names on the fill, where a stylesheet can reach them', async () => {

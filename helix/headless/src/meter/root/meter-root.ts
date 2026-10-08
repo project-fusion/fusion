@@ -397,12 +397,12 @@ export class HelixHeadlessMeter extends HelixElement {
     this.internals.ariaValueMin = String(min)
     this.internals.ariaValueMax = String(max)
     this.internals.ariaValueNow = String(this.reading)
-    /* The consumer's words where they gave any, and otherwise nothing at all
-       *unless* the value is past an end. `ariaValueNow` has to sit inside the
-       range, so it is the only place a reader can be told that 250 is not 100.
-       Under `format-options` the words shown are the words said. */
-    this.internals.ariaValueText =
-      this.valueText || this.formatOptions !== undefined || this.beyond ? this.text : null
+    /* The words the meter shows, said whether or not they are shown, as
+       `Progress` says them. Left to the platform, 18 of 32 was read as "18"
+       where the meter draws 56%, and a value past an end as the end itself:
+       `ariaValueNow` has to sit inside the range, so this is the only place a
+       reader can be told that 250 is not 100. */
+    this.internals.ariaValueText = this.text
     const band = this.computedBand
     const beyond = this.beyond
     this.toggleState('fair', band === 'fair')
