@@ -22,7 +22,7 @@ import {
   type StrandsVariant,
   visibleRange,
 } from '../path.js'
-import { MAX_STRANDS, MIN_STRANDS, StrandsRenderer } from '../renderer.js'
+import { DUST, MAX_DUST, MAX_STRANDS, MIN_STRANDS, StrandsRenderer } from '../renderer.js'
 import { styles } from './strands-root.css.js'
 
 /** The widest either edge of the drawing buffer may get, in device pixels. Aura's ceiling, for Aura's reason. */
@@ -177,6 +177,14 @@ export class HelixStrands extends HelixElement {
    */
   @property({ type: Number })
   drift = 1
+
+  /**
+   * How many specks of dust drift around the strands, as a multiplier: `0`
+   * draws none, `1` six hundred, and `4`, the most, two thousand four
+   * hundred. They gather where the ribbon is brightest.
+   */
+  @property({ type: Number })
+  dust = 1
 
   /** Overall brightness, as a multiplier on the light. */
   @property({ type: Number })
@@ -659,6 +667,7 @@ export class HelixStrands extends HelixElement {
         depth: share(this.depth),
         dpr: this.dpr,
         drift: share(this.drift),
+        dust: Math.round(Math.min(MAX_DUST, Math.max(0, this.dust * DUST))),
         gain: Math.max(0, this.gain),
         points: this.points,
         range,
