@@ -70,6 +70,7 @@ export class HelixHeadlessLightboxItem extends HelixElement {
 
   /**
    * The item's identifier. The root compares its `active` value against it.
+   * Without one, the item is named by its place in the set, counted from 1.
    */
   @property()
   value = ''
