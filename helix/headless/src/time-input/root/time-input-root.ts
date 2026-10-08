@@ -291,6 +291,14 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
   mode?: 'multiple' | 'range'
 
   /**
+   * The words on the list's button that chooses the current time, drawn with
+   * `show-now`.
+   */
+  @words
+  @property({ attribute: 'now-label' })
+  nowLabel = 'Now'
+
+  /**
    * Placeholder text shown before a time is entered.
    */
   @words
@@ -341,6 +349,14 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
    */
   @property({ type: Boolean })
   seconds = false
+
+  /**
+   * Draws a button under the times in the list that chooses the current time,
+   * moved to the nearest time on offer. See Time Picker's `show-now`. Its words
+   * are `now-label`.
+   */
+  @property({ attribute: 'show-now', type: Boolean })
+  showNow = false
 
   /**
    * How far apart the offered times are, in minutes, or in seconds with
@@ -735,7 +751,9 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
       locale=${handedLocale(this) || nothing}
       max=${this.max}
       min=${this.min}
+      now-label=${this.nowLabel}
       ?seconds=${this.seconds}
+      ?show-now=${this.showNow}
       step=${this.step}
       .value=${this.picked}
       @helix-before-change=${this.handlePicked}
