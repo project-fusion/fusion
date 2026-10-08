@@ -1,0 +1,26 @@
+{
+  "name": "@fusion.dev/proof-darwin-arm64",
+  "description": "The `proof` binary for macOS on Apple silicon. Installed by `@fusion.dev/proof`, which runs it.",
+  "version": "0.0.0-dev",
+  "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
+  "repository": {
+    "directory": "proof/cli/platforms/darwin-arm64",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "files": [
+    "proof"
+  ],
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "cpu": [
+    "arm64"
+  ],
+  "homepage": "https://fusion.dev",
+  "os": [
+    "darwin"
+  ],
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

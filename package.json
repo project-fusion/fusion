@@ -30,7 +30,7 @@
     "check:spec:visual": "turbo run frame && bun fusion/scripts/check-visual.mjs",
     "check:spec:visual-parity": "turbo run frame && bun fusion/scripts/check-visual-parity.mjs",
     "check:withheld": "bun fusion/scripts/check-withheld.mjs",
-    "clean": "rm -rf node_modules target .turbo && find cortex fusion helix -type d \\( -name dist -o -name node_modules -o -name .next -o -name .next-dev -o -name .turbo -o -name .tsbuild \\) -prune -exec rm -rf {} +",
+    "clean": "rm -rf node_modules target .turbo && find cortex fusion helix proof -type d \\( -name dist -o -name node_modules -o -name .next -o -name .next-dev -o -name .turbo -o -name .tsbuild \\) -prune -exec rm -rf {} +",
     "dev": "turbo run dev",
     "eval": "turbo run analyze token-layer && bun fusion/scripts/build-eval.mjs && bun fusion/scripts/run-eval.mjs",
     "fix": "bun run fix:order && bun run fix:format && bun run fix:examples && bun run fix:dialect && bun run fix:tag-order && turbo run token-layer && bun run helix component check --only tokens",
@@ -50,6 +50,7 @@
     "measure:browser": "turbo run frame specs && bun fusion/scripts/measure-browser.mjs",
     "prepare": "git rev-parse --git-dir > /dev/null 2>&1 && git config core.hooksPath .githooks || true",
     "probe:stuck": "bun fusion/scripts/probe-stuck-spec.mjs",
+    "proof": "bun proof/cli/npm/bin.mjs",
     "queue": "bun fusion/scripts/check-queue.mjs",
     "regen": "bun run fix && bun run analyze && bun run gen:element-events && turbo run token-layer && bun run gen:metrics && turbo run register && turbo run samples && turbo run docs && turbo run build --filter=@fusion.dev/helix-docs && turbo run content && turbo run catalog && turbo run themed-page && bun run gen:eval",
     "rs:build": "cargo build --workspace",
@@ -95,6 +96,8 @@
     "fusion/site",
     "helix/*",
     "helix/cli/npm",
-    "helix/cli/platforms/*"
+    "helix/cli/platforms/*",
+    "proof/cli/npm",
+    "proof/cli/platforms/*"
   ]
 }
