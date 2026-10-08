@@ -20,6 +20,33 @@
   grid-area: 1 / 1;
 }
 
+/* Under `show-label`, the words sit in a second cell beside the icon, and the
+   button grows to hold them. */
+:host([show-label]) [part="button"] {
+  column-gap: var(--helix-space-xs);
+  grid-auto-flow: column;
+  inline-size: auto;
+  padding-inline: var(--helix-space-sm);
+}
+
+/* The three words share one cell, so the widest sets the width and a press
+   does not resize the button. A hidden one keeps its room. */
+[part="text"] {
+  display: inline-grid;
+  font-weight: var(--helix-weight-medium);
+  grid-area: 1 / 2;
+  justify-items: start;
+}
+
+[part="text"] > span {
+  grid-area: 1 / 1;
+}
+
+[part="text"] > [hidden] {
+  display: block;
+  visibility: hidden;
+}
+
 /* A slot is `display: contents`, which `[hidden]` in the UA sheet does not
    beat, so hiding one takes a rule. Not scoped to `[part="button"]`: the two
    marks sit behind `renderCopyIcon` and `renderCopiedIcon`, which a tier may

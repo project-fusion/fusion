@@ -71,6 +71,9 @@ const warmth = (): Warmth => {
  * describes a Helix component and leaves a plain element undescribed. In the
  * `for` form the tooltip itself is out of the accessibility tree while its
  * bubble is down, so you meet its words once, as the trigger's description.
+ * A trigger whose name is already the tooltip's words, such as an icon button
+ * named Settings under a tooltip reading Settings, is not described by them
+ * again.
  *
  * The tooltip shows on hover and on focus. It hides on pointer leave, on blur,
  * on Escape, and when the trigger is activated. The pointer can move from the
@@ -722,16 +725,28 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    * plain element in the consumer's markup. See `linkDescription`.
    */
   private link(light: boolean, target: Element = focusTarget(this.trigger)): void {
-    if (this.linked === target) {
+    const describes = this.describes
+    if (this.linked === target && describes) {
       return
     }
     if (this.linked) {
       unlinkDescription(this.linked, this)
       this.linked = undefined
     }
-    if (linkDescription(target, this, light)) {
+    if (describes && linkDescription(target, this, light)) {
       this.linked = target
     }
+  }
+
+  /**
+   * Whether the bubble's words add anything to the trigger: they are not
+   * empty, and they are not the trigger's own name, such as an icon button
+   * named Settings under a tooltip reading Settings, which a screen reader
+   * read as "Settings, Settings".
+   */
+  private get describes(): boolean {
+    const text = this.describedText
+    return text !== '' && !this.triggerSays(text)
   }
 
   /** A reader arriving on the trigger, which is late enough to write the link. */
@@ -897,6 +912,14 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
        is no longer `display: none` and `showPopover` is safe on it. */
     if (changed.has('for')) {
       this.bind()
+    }
+    /* The words changed, so the trigger is described again, or no longer,
+       where they now add nothing to its name. */
+    if (this.linked && !this.describes) {
+      unlinkDescription(this.linked, this)
+      this.linked = undefined
+    } else if (!this.linked && this.bound) {
+      this.link(false)
     }
     if (changed.has('open')) {
       const warm = warmth()

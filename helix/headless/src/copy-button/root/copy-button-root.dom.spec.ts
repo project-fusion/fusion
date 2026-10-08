@@ -157,6 +157,21 @@ describe('what it says and shows', () => {
     await press(el)
     expect([tip.content, button.getAttribute('aria-label')]).toEqual(['Taken', 'Taken'])
   })
+
+  /* Its tooltip says what its name says, so a description by the tooltip read
+     every name twice: "Copy, Copy". */
+  test('is not described by a tooltip that repeats its name', async () => {
+    const el = (await mount(
+      '<helix-headless-copy-button value="one"></helix-headless-copy-button>',
+    )) as Updatable
+    const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement & {
+      ariaDescribedByElements: Element[] | null
+    }
+    /* happy-dom has no element reflection, so the accessor is stood in. */
+    Object.defineProperty(button, 'ariaDescribedByElements', { value: null, writable: true })
+    button.dispatchEvent(new Event('focusin', { bubbles: true, composed: true }))
+    expect(button.ariaDescribedByElements).toBeNull()
+  })
 })
 
 /**
@@ -344,5 +359,66 @@ describe('the result of a copy', () => {
     expect(refused.shadowRoot?.querySelector('[part="live"]')?.textContent?.trim()).toBe(
       'Not copied',
     )
+  })
+})
+
+describe('the tooltip and the words', () => {
+  type Tip = Updatable & { content: string; open: boolean; placement: string }
+  const tipOf = (el: Element): Tip | null =>
+    el.shadowRoot?.querySelector('helix-headless-tooltip') as Tip | null
+
+  test('tooltip-placement is the side the tooltip prefers', async () => {
+    const el = await mount(
+      '<helix-headless-copy-button tooltip-placement="bottom" value="one"></helix-headless-copy-button>',
+    )
+    expect(tipOf(el)?.placement).toBe('bottom')
+  })
+
+  test('tooltip="none" draws no tooltip, and the button still says the result', async () => {
+    clipboard('accept')
+    const el = (await mount(
+      '<helix-headless-copy-button tooltip="none" value="one"></helix-headless-copy-button>',
+    )) as Updatable
+    expect(tipOf(el)).toBeNull()
+    await press(el)
+    const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
+    expect(button.getAttribute('aria-label')).toBe('Copied')
+  })
+
+  test('tooltip="copy" has no words at rest, and shows the result after a press', async () => {
+    clipboard('accept')
+    const el = (await mount(
+      '<helix-headless-copy-button tooltip="copy" feedback-duration="30" value="one"></helix-headless-copy-button>',
+    )) as Updatable
+    const tip = tipOf(el) as Tip
+    expect(tip.content).toBe('')
+    await press(el)
+    await tip.updateComplete
+    expect([tip.content, tip.open]).toEqual(['Copied', true])
+    await new Promise((done) => setTimeout(done, 60))
+    await el.updateComplete
+    await tip.updateComplete
+    expect([tip.content, tip.open]).toEqual(['', false])
+  })
+
+  test('show-label draws the name as words, and the result in their place', async () => {
+    clipboard('accept')
+    const el = (await mount(
+      '<helix-headless-copy-button show-label label="Copy link" value="one"></helix-headless-copy-button>',
+    )) as Updatable
+    const shown = (): string[] =>
+      [...(el.shadowRoot?.querySelectorAll('[part="text"] > span') ?? [])]
+        .filter((span) => !span.hasAttribute('hidden'))
+        .map((span) => span.textContent ?? '')
+    const text = el.shadowRoot?.querySelector('[part="text"]')
+    expect(text?.getAttribute('aria-hidden')).toBe('true')
+    expect(shown()).toEqual(['Copy link'])
+    await press(el)
+    expect(shown()).toEqual(['Copied'])
+  })
+
+  test('without show-label it draws no words', async () => {
+    const el = await mount('<helix-headless-copy-button value="one"></helix-headless-copy-button>')
+    expect(el.shadowRoot?.querySelector('[part="text"]')).toBeNull()
   })
 })
