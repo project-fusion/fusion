@@ -25,16 +25,25 @@ use fusion_rules::exit::Code;
 use std::io::{BufRead, Write};
 use std::path::PathBuf;
 
-/// The protocol revisions this speaks, newest first.
+/// The handshake revisions this speaks, newest first.
 ///
-/// The handshake revisions, through `2025-11-25`, which is the first with
-/// structured results that every client in use speaks. A client asking for one
-/// of these is answered in it, and any other is answered with the newest, which
-/// is the negotiation the specification asks for. `2026-07-28` drops the
-/// handshake for per-request versions, and a client of both eras probes with
-/// `server/discover`, is told there is no such method, and falls back to
-/// `initialize`.
+/// A client that opens with `initialize` and asks for one of these is answered
+/// in it, and any other is answered with the newest, which is the negotiation
+/// the specification asks for.
 const PROTOCOLS: [&str; 4] = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
+
+/// The per-request revision this speaks.
+///
+/// **Both eras on one pipe**, which the specification allows a server: a
+/// request carrying its version in `_meta` is served by this revision's rules,
+/// with no handshake and no state, and `initialize` selects the old ones. A
+/// client of both eras probes with `server/discover`, which this answers.
+const MODERN: &str = "2026-07-28";
+
+/// The `_meta` keys this revision reads and writes.
+const VERSION_KEY: &str = "io.modelcontextprotocol/protocolVersion";
+const CAPABILITIES_KEY: &str = "io.modelcontextprotocol/clientCapabilities";
+const SERVER_KEY: &str = "io.modelcontextprotocol/serverInfo";
 
 /// What the client is told once, at `initialize`: the rules an agent writing
 /// Helix needs before its first call.
@@ -115,7 +124,87 @@ fn handle(line: &str) -> Option<String> {
     /* No id means a notification, which by specification gets no response at all:
     a reply to one is a message a client cannot match to anything. */
     let id = request.get("id")?;
+    let meta = request.pointer("/params/_meta");
+    if let Some(asked) = meta.and_then(|meta| meta.get(VERSION_KEY)) {
+        return Some(modern(&request, method, id, asked, meta));
+    }
+    if method == "server/discover" {
+        return Some(error(
+            id,
+            -32602,
+            &format!("server/discover needs `{VERSION_KEY}` in `_meta`"),
+        ));
+    }
+    Some(match answer(&request, method) {
+        Ok(payload) => result(id, &payload),
+        Err((code, message)) => error(id, code, &message),
+    })
+}
 
+/// A request in the per-request revision: its version checked, its
+/// capabilities required, and each result marked complete and signed.
+fn modern(
+    request: &serde_json::Value,
+    method: &str,
+    id: &serde_json::Value,
+    asked: &serde_json::Value,
+    meta: Option<&serde_json::Value>,
+) -> String {
+    if asked.as_str() != Some(MODERN) {
+        let mut supported = vec![MODERN];
+        supported.extend(PROTOCOLS);
+        return serde_json::json!({
+            "error": {
+                "code": -32022,
+                "data": { "requested": asked, "supported": supported },
+                "message": "Unsupported protocol version",
+            },
+            "id": id,
+            "jsonrpc": "2.0",
+        })
+        .to_string();
+    }
+    if meta.and_then(|meta| meta.get(CAPABILITIES_KEY)).is_none() {
+        return error(id, -32602, &format!("`_meta` needs `{CAPABILITIES_KEY}`"));
+    }
+    let payload = if method == "server/discover" {
+        let mut supported = vec![MODERN];
+        supported.extend(PROTOCOLS);
+        Ok(serde_json::json!({
+            "capabilities": { "tools": {} },
+            "instructions": INSTRUCTIONS,
+            "supportedVersions": supported,
+        }))
+    } else if method == "initialize" {
+        Err((
+            -32601,
+            "initialize is not part of 2026-07-28; send each request with its `_meta`".to_owned(),
+        ))
+    } else {
+        answer(request, method)
+    };
+    match payload {
+        Ok(mut payload) => {
+            if let Some(object) = payload.as_object_mut() {
+                object.insert("resultType".to_owned(), "complete".into());
+                object.insert(
+                    "_meta".to_owned(),
+                    serde_json::json!({ SERVER_KEY: server_info() }),
+                );
+            }
+            result(id, &payload)
+        }
+        Err((code, message)) => error(id, code, &message),
+    }
+}
+
+/// The server's name and version, as both eras report them.
+fn server_info() -> serde_json::Value {
+    serde_json::json!({ "name": "helix", "title": "Helix", "version": crate::shipped() })
+}
+
+/// The result of one request in either era, or its error code and message.
+fn answer(request: &serde_json::Value, method: &str) -> Result<serde_json::Value, (i64, String)> {
     match method {
         "initialize" => {
             let asked = request
@@ -125,27 +214,17 @@ fn handle(line: &str) -> Option<String> {
             let spoken = asked
                 .and_then(|asked| PROTOCOLS.iter().find(|known| **known == asked))
                 .unwrap_or(&PROTOCOLS[0]);
-            Some(result(
-                id,
-                &serde_json::json!({
-                    "capabilities": { "tools": {} },
-                    "instructions": INSTRUCTIONS,
-                    "protocolVersion": spoken,
-                    "serverInfo": {
-                        "name": "helix",
-                        "title": "Helix",
-                        "version": crate::shipped(),
-                    },
-                }),
-            ))
+            Ok(serde_json::json!({
+                "capabilities": { "tools": {} },
+                "instructions": INSTRUCTIONS,
+                "protocolVersion": spoken,
+                "serverInfo": server_info(),
+            }))
         }
         /* Answered with an empty result, as the specification requires of
         every receiver, so a client checking the server is alive is told so. */
-        "ping" => Some(result(id, &serde_json::json!({}))),
-        "tools/list" => Some(result(
-            id,
-            &serde_json::json!({ "tools": tools::catalog() }),
-        )),
+        "ping" => Ok(serde_json::json!({})),
+        "tools/list" => Ok(serde_json::json!({ "tools": tools::catalog() })),
         "tools/call" => {
             let name = request
                 .get("params")
@@ -160,17 +239,17 @@ fn handle(line: &str) -> Option<String> {
             /* The project is where the client started the server, which is
             where its `node_modules` is. */
             let from = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-            Some(match tools::call(name, &arguments, &from) {
-                Ok(answer) => result(id, &structured(&answer)),
+            Ok(match tools::call(name, &arguments, &from) {
+                Ok(answer) => structured(&answer),
                 /* **A tool failure is a result, not a protocol error.** The
                 specification is explicit and the reason is practical: a model
                 can read `isError` and try again, where a JSON-RPC error is the
                 transport saying the call never happened. An unparseable intent
                 is an answer. */
-                Err(why) => result(id, &content(&why, true)),
+                Err(why) => content(&why, true),
             })
         }
-        _ => Some(error(id, -32601, &format!("no method named {method}"))),
+        _ => Err((-32601, format!("no method named {method}"))),
     }
 }
 

@@ -279,3 +279,45 @@ fn the_audit_has_the_keys_the_command_line_prints() {
     assert_eq!(keys(&served), keys(&printed));
     assert_eq!(served["pairings"], printed["pairings"]);
 }
+
+/// The `_meta` every `2026-07-28` request carries.
+const MODERN_META: &str = r#""_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientCapabilities":{}}"#;
+
+/// **The per-request revision, with no handshake.** `server/discover` names
+/// every revision this speaks, and each result is marked complete and signed
+/// with the server's name.
+#[test]
+fn a_2026_07_28_client_discovers_and_calls_with_no_handshake() {
+    let discover = format!(
+        r#"{{"jsonrpc":"2.0","id":1,"method":"server/discover","params":{{{MODERN_META}}}}}"#
+    );
+    let list =
+        format!(r#"{{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{{{MODERN_META}}}}}"#);
+    let replies = talk(&[&discover, &list]);
+    let found = &replies[0]["result"];
+    assert_eq!(found["resultType"], "complete");
+    assert_eq!(found["supportedVersions"][0], "2026-07-28");
+    assert!(found["supportedVersions"]
+        .as_array()
+        .is_some_and(|all| all.iter().any(|one| one == "2025-11-25")));
+    assert_eq!(
+        found["_meta"]["io.modelcontextprotocol/serverInfo"]["name"],
+        "helix"
+    );
+    assert!(found["instructions"].is_string());
+    assert_eq!(replies[1]["result"]["resultType"], "complete");
+    assert!(replies[1]["result"]["tools"].is_array());
+}
+
+#[test]
+fn a_revision_it_does_not_speak_is_refused_with_the_ones_it_does() {
+    let replies = talk(&[
+        r#"{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"1900-01-01","io.modelcontextprotocol/clientCapabilities":{}}}}"#,
+        r#"{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28"}}}"#,
+    ]);
+    assert_eq!(replies[0]["error"]["code"], -32022);
+    assert_eq!(replies[0]["error"]["data"]["requested"], "1900-01-01");
+    assert_eq!(replies[0]["error"]["data"]["supported"][0], "2026-07-28");
+    /* No capabilities is a malformed request, by the specification's rule. */
+    assert_eq!(replies[1]["error"]["code"], -32602);
+}
