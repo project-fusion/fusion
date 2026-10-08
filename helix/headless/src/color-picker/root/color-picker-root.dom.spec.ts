@@ -953,6 +953,28 @@ describe('the square named with the picker', () => {
     const bare = await picker()
     expect(part(bare, 'grid-saturation')?.getAttribute('aria-label')).toBe('Saturation')
   })
+
+  /* The ramps and the number fields said the channel alone, so two pickers on
+     a page gave two sliders named "Hue", measured in Chromium's tree. */
+  test('and before every other channel: the ramps and the number fields', async () => {
+    const named = await picker('label="Brand color" alpha channel-fields format="hsl"')
+    const ramps = [...(named.shadowRoot?.querySelectorAll('[part="channel"]') ?? [])].map((ramp) =>
+      ramp.getAttribute('label'),
+    )
+    expect(ramps).toEqual(['Brand color, Hue', 'Brand color, Opacity'])
+    const fields = [...(named.shadowRoot?.querySelectorAll('[part="field-input"]') ?? [])].map(
+      (field) => field.getAttribute('aria-label'),
+    )
+    expect(fields).toEqual([
+      'Brand color, Hue',
+      'Brand color, Saturation',
+      'Brand color, Lightness',
+      'Brand color, Opacity',
+    ])
+    const bare = await picker('channel-fields')
+    expect(part(bare, 'channel')?.getAttribute('label')).toBe('Hue')
+    expect(part(bare, 'field-input')?.hasAttribute('aria-label')).toBe(false)
+  })
 })
 
 describe('a number field for each channel', () => {
