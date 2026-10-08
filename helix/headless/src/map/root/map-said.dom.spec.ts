@@ -12,6 +12,8 @@ import { mount, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../compass/index.js')
+  await import('../layers/index.js')
 })
 
 type Frame = HTMLElement & {

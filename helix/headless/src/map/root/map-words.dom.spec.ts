@@ -10,6 +10,9 @@ import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-tes
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../compass/index.js')
+  await import('../layers/index.js')
+  await import('../points/index.js')
 })
 
 afterEach(() => {

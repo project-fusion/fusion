@@ -10,6 +10,8 @@ let mapLibreDriver: typeof import('./maplibre-driver.js').mapLibreDriver
 beforeAll(async () => {
   registerDom()
   await import('@fusion.dev/helix-headless/map')
+  await import('@fusion.dev/helix-headless/map/compass')
+  await import('@fusion.dev/helix-headless/map/layers')
   ;({ connectMap } = await import('../connect-map/connect-map.js'))
   ;({ mapLibreDriver } = await import('./maplibre-driver.js'))
 })

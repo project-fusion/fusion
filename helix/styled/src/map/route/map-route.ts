@@ -1,5 +1,5 @@
 import { customElement } from '@fusion.dev/helix-core'
-import { HelixHeadlessMapRoute } from '@fusion.dev/helix-headless/map'
+import { HelixHeadlessMapRoute } from '@fusion.dev/helix-headless/map/route'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './map-route.css.js'

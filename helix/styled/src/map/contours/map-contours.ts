@@ -1,5 +1,5 @@
 import { customElement } from '@fusion.dev/helix-core'
-import { HelixHeadlessMapContours } from '@fusion.dev/helix-headless/map'
+import { HelixHeadlessMapContours } from '@fusion.dev/helix-headless/map/contours'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './map-contours.css.js'
 

@@ -4,6 +4,9 @@ import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/d
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../compass/index.js')
+  await import('../layers/index.js')
+  await import('../route/index.js')
 })
 
 type Frame = HTMLElement & { updateComplete: Promise<boolean> }

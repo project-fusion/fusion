@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { rendered, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
+import './index.js'
 
 describe('map points server output', () => {
   test('points draw nothing of their own, the renderer being what draws them', () => {

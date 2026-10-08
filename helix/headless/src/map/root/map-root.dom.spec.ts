@@ -4,6 +4,9 @@ import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/do
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../compass/index.js')
+  await import('../layers/index.js')
+  await import('../route/index.js')
 })
 
 type Map = HTMLElement & {

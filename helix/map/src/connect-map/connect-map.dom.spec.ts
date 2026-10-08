@@ -11,6 +11,17 @@ let connectMap: typeof import('./connect-map.js').connectMap
 beforeAll(async () => {
   registerDom()
   await import('@fusion.dev/helix-headless/map')
+  await import('@fusion.dev/helix-headless/map/compass')
+  await import('@fusion.dev/helix-headless/map/layers')
+  await import('@fusion.dev/helix-headless/map/area')
+  await import('@fusion.dev/helix-headless/map/buildings')
+  await import('@fusion.dev/helix-headless/map/contours')
+  await import('@fusion.dev/helix-headless/map/landcover')
+  await import('@fusion.dev/helix-headless/map/points')
+  await import('@fusion.dev/helix-headless/map/position')
+  await import('@fusion.dev/helix-headless/map/raster')
+  await import('@fusion.dev/helix-headless/map/route')
+  await import('@fusion.dev/helix-headless/map/terrain')
   ;({ connectMap } = await import('./connect-map.js'))
 })
 

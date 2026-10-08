@@ -37,6 +37,7 @@ Create the map with a style from your theme, then connect it to the frame:
 
 ```js
 import '@fusion.dev/helix/map'
+import '@fusion.dev/helix/map/compass'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { colorsReady, connectMap } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
@@ -57,6 +58,27 @@ const connection = connectMap(frame, mapLibreDriver(map))
 connection.fit({ animate: false })
 followTheme(map, frame, style)
 ```
+
+The family's entry registers the frame and its markers. The compass, which
+the frame shows by default, is an import of its own, and so are the layers
+menu and each kind of layer, so a map carries only what it draws:
+
+| What the map shows | The entry to import |
+|---|---|
+| The compass, and the pan and rotate buttons around it | `@fusion.dev/helix/map/compass` |
+| The layers button and its menu, where `controls` names `layers` | `@fusion.dev/helix/map/layers` |
+| An area | `@fusion.dev/helix/map/area` |
+| Buildings in 3D | `@fusion.dev/helix/map/buildings` |
+| Contour lines | `@fusion.dev/helix/map/contours` |
+| Land cover | `@fusion.dev/helix/map/landcover` |
+| A points layer | `@fusion.dev/helix/map/points` |
+| A live position | `@fusion.dev/helix/map/position` |
+| Tiles over the map, or imagery | `@fusion.dev/helix/map/raster` |
+| A route | `@fusion.dev/helix/map/route` |
+| Terrain | `@fusion.dev/helix/map/terrain` |
+
+In development, a map that asks for one of these without its entry says so in
+the console once the page has loaded, with the line to add.
 
 ## What the connector does
 

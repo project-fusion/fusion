@@ -7,6 +7,17 @@ import weather from '../.examples/weather.html' with { type: 'text' }
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../compass/index.js')
+  await import('../layers/index.js')
+  await import('../area/index.js')
+  await import('../buildings/index.js')
+  await import('../contours/index.js')
+  await import('../landcover/index.js')
+  await import('../points/index.js')
+  await import('../position/index.js')
+  await import('../raster/index.js')
+  await import('../route/index.js')
+  await import('../terrain/index.js')
   await import('../../text/index.js')
 })
 

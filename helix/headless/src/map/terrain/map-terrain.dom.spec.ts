@@ -4,6 +4,7 @@ import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('./index.js')
 })
 
 type Terrain = HTMLElement & {

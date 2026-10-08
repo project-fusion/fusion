@@ -9,6 +9,8 @@ import {
 } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
+import '../compass/index.js'
+import '../layers/index.js'
 
 const served = () =>
   withoutStyles(ssr(html`<helix-headless-map label="Edinburgh"></helix-headless-map>`))

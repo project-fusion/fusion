@@ -2,32 +2,9 @@ import { customElement, HelixElement, HelixMapPartChangeEvent, words } from '@fu
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 
-/** A place a line passes through or a shape is drawn around, in degrees. */
-export interface MapPoint {
-  lat: number
-  lng: number
-}
+import { type MapPoint, pointsConverter } from '../shape.js'
 
-/**
- * `points` as it is written: `lat,lng` pairs separated by spaces, the order a
- * marker's own `lat` and `lng` read in. A pair that is not two numbers is
- * dropped rather than drawn at the origin, **an empty side included**:
- * `Number('')` is 0, so `30.1,` from a record with no longitude was a vertex
- * off West Africa.
- */
-export const pointsOf = (value: string | null): MapPoint[] =>
-  (value ?? '')
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((pair) => pair.split(','))
-    .filter((pair) => pair.length === 2 && pair.every((one) => one.trim() !== ''))
-    .map((pair) => pair.map(Number))
-    .filter((pair) => pair.every((one) => Number.isFinite(one)))
-    .map(([lat, lng]) => ({ lat: lat as number, lng: lng as number }))
-
-/** `points` read from its attribute, which is written and never reflected. */
-export const pointsConverter = { fromAttribute: pointsOf }
+export type { MapPoint } from '../shape.js'
 
 /**
  * @summary A line on a map, such as a route between stops.

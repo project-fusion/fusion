@@ -1,11 +1,11 @@
 import {
+  auditChildren,
+  auditEntry,
   auditName,
   customElement,
   focusItemOf,
   formatWords,
   HelixActivateEvent,
-  HelixBeforeChangeEvent,
-  HelixBeforeToggleEvent,
   HelixElement,
   HelixMapClusterEvent,
   HelixMapPanEvent,
@@ -14,36 +14,20 @@ import {
   HelixMapRotateEvent,
   HelixMapTiltEvent,
   HelixMapZoomEvent,
-  HelixToggleEvent,
   hostAria,
   KeyboardNavigationController,
   MixinViewport,
-  requestChange,
   type ViewportControlsPlacement,
   type ViewportPanDetail,
   type ViewportZoomDetail,
   words,
 } from '@fusion.dev/helix-core'
-import {
-  buildings,
-  cloudRain,
-  dotsNine,
-  type HelixIcon,
-  leaf,
-  mountains,
-  path,
-  polygon,
-  stack,
-  target,
-} from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { live } from 'lit/directives/live.js'
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { HelixHeadlessMapMarker } from '../marker/map-marker.js'
 
 /** What the frame reads off a layer, which is all its list and menu need. */
-interface MapLayer extends Element {
+export interface MapLayer extends Element {
   description?: string | undefined
   /** A raster layer's: whether it is imagery of the ground. */
   ground?: boolean | undefined
@@ -66,39 +50,6 @@ export type MapControlsPlacement = ViewportControlsPlacement
 /** How the map draws the ground: the themed map, imagery under its roads and names, or imagery alone. */
 export type MapType = 'hybrid' | 'satellite' | 'standard'
 
-/** The map types, in the order the menu offers them. */
-const MAP_TYPES: readonly MapType[] = ['standard', 'hybrid', 'satellite']
-
-/**
- * A layer's picture in the layers menu, by what it draws: a path for a route,
- * a shape for an area, dots for points, buildings, mountains for terrain,
- * rings for contour lines, a leaf for land cover, and a rain cloud for tiles
- * over the map, such as weather. Imagery of the ground
- * is a map type, with a card of its own.
- */
-const iconOf = (layer: MapLayer | undefined): HelixIcon => {
-  switch (layer?.layerKind) {
-    case 'route':
-      return path
-    case 'area':
-      return polygon
-    case 'points':
-      return dotsNine
-    case 'buildings':
-      return buildings
-    case 'terrain':
-      return mountains
-    case 'contours':
-      return target
-    case 'landcover':
-      return leaf
-    case 'raster':
-      return cloudRain
-    default:
-      return stack
-  }
-}
-
 /** Degrees a rotate button or key turns the map. */
 const ROTATE_STEP = 15
 
@@ -107,6 +58,34 @@ const TILT_STEP = 10
 
 /** The tilt the 3D button goes to, in degrees from looking straight down. */
 const TILTED = 50
+
+/** The layers that have an entry of their own, each `map/<layer>`. */
+const LAYERS = [
+  'area',
+  'buildings',
+  'contours',
+  'landcover',
+  'points',
+  'position',
+  'raster',
+  'route',
+  'terrain',
+] as const
+
+/**
+ * What the family's own entries add to the frame once imported: the compass
+ * from `map/compass` and the layers menu from `map/layers`.
+ *
+ * **Set on the class by the entry**, so each tier's entry hands in its own
+ * sheet, and a frame whose page never imports one carries none of its code.
+ */
+export interface MapAdditions {
+  compass?: (map: HelixHeadlessMap, pan: boolean, rotate: boolean) => TemplateResult
+  layersMenu?: (map: HelixHeadlessMap) => TemplateResult | typeof nothing
+}
+
+/** What the entries have added to this frame's class. */
+const added = (map: HelixHeadlessMap): MapAdditions => map.constructor as MapAdditions
 
 /** Whether a marker has a place to stand, which the connector needs to show it. */
 const placed = (marker: HelixHeadlessMapMarker): boolean =>
@@ -170,6 +149,24 @@ const SETTLES = 400
  *
  * Markers, routes, areas, live positions, and points layers go inside the
  * frame as child elements.
+ *
+ * **The compass, the layers menu, and each kind of layer are imports of their
+ * own**, so a map carries only what it draws. The family's entry registers
+ * the frame and its markers. A map with the default controls, the layers
+ * menu, and a route imports:
+ *
+ * ```js
+ * import '@fusion.dev/helix/map'
+ * import '@fusion.dev/helix/map/compass'
+ * import '@fusion.dev/helix/map/layers'
+ * import '@fusion.dev/helix/map/route'
+ * ```
+ *
+ * Each layer's entry is named for its kind: `map/area`, `map/buildings`,
+ * `map/contours`, `map/landcover`, `map/points`, `map/position`, `map/raster`,
+ * `map/route`, and `map/terrain`. In development, a map whose controls ask for
+ * the compass or the menu, or that holds a layer, without the entry says so
+ * once the page has loaded, with the line to add.
  *
  * @since 0.100.0
  * @status experimental
@@ -582,56 +579,9 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     )
   }
 
-  /** Whether the layers menu is open. */
-  @state()
-  private layersOpen = false
-
   /* A layer a page hides or shows itself, which its checkbox and the list
      follow. Made on connection, so the server never builds one. */
   private hiding?: MutationObserver
-
-  /** Closes the layers menu on a press anywhere outside the frame. */
-  private readonly handleOutside = (event: PointerEvent): void => {
-    if (!event.composedPath().includes(this)) {
-      this.layersOpen = false
-    }
-  }
-
-  /**
-   * Closes the layers menu when focus moves on from its button and the menu,
-   * as a Tab past the last tile does. Focus leaving the page, with nothing
-   * focused in its place, leaves the menu as it is.
-   */
-  private readonly handleMenuFocusOut = (event: FocusEvent): void => {
-    const to = event.relatedTarget as Node | null
-    if (!(this.layersOpen && to)) {
-      return
-    }
-    const owners = this.renderRoot.querySelectorAll('[part="layers-toggle"], [part="layers-menu"]')
-    if (![...owners].some((owner) => owner.contains(to))) {
-      this.layersOpen = false
-    }
-  }
-
-  /**
-   * Keys pressed in the layers menu. Escape closes it and returns to its
-   * button, and no key reaches the region, where the arrows would pan the map.
-   */
-  private readonly handleMenuKeydown = (event: KeyboardEvent): void => {
-    event.stopPropagation()
-    if (event.key === 'Escape' && this.layersOpen) {
-      this.layersOpen = false
-      this.renderRoot.querySelector<HTMLElement>('[part="layers-toggle"]')?.focus()
-    }
-  }
-
-  /**
-   * The imagery among the layers: raster layers drawn as the ground, which the
-   * map types show and hide rather than a tile of their own.
-   */
-  private get imagery(): MapLayer[] {
-    return this.layers.filter((layer) => layer.layerKind === 'raster' && layer.ground === true)
-  }
 
   /**
    * Whether a layer is drawn: not hidden, and, for imagery of the ground, while
@@ -644,87 +594,6 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    */
   private shown(layer: MapLayer): boolean {
     return !layer.hidden && !(layer.layerKind === 'raster' && layer.ground && !this.mapType)
-  }
-
-  /** A map type's name on its card. */
-  private nameOf(type: MapType): string {
-    return type === 'hybrid'
-      ? this.hybridLabel
-      : type === 'satellite'
-        ? this.satelliteLabel
-        : this.standardLabel
-  }
-
-  /**
-   * Shows or hides layers, which `connectMap` draws or takes off the map.
-   *
-   * **Asked first, from the layer.** The tile wrote `hidden` onto the
-   * consumer's element and said nothing, so a page could neither keep the
-   * choice nor keep its own state in step. The request comes from the first
-   * layer of the tile, which is the element the page wrote. Once `hidden`
-   * holds the answer, the same layer sends `helix-toggle`, the request's verb
-   * without `before`, since the platform has no word for a layer shown.
-   */
-  private showLayers(layers: readonly MapLayer[], shown: boolean): void {
-    const first = layers[0]
-    if (!first) {
-      return
-    }
-    const applied = requestChange({
-      apply: () => {
-        for (const layer of layers) {
-          layer.hidden = !shown
-        }
-        this.requestUpdate()
-      },
-      event: (checked) => new HelixBeforeToggleEvent({ checked }),
-      host: first,
-      next: shown,
-    })
-    if (applied) {
-      first.dispatchEvent(new HelixToggleEvent({ checked: shown }))
-    }
-  }
-
-  /** Asks for a map type, and sends `change` once it holds. */
-  private chooseMapType(type: MapType): void {
-    const applied = requestChange({
-      apply: (value) => {
-        this.mapType = value === 'standard' ? undefined : (value as 'hybrid' | 'satellite')
-      },
-      event: (value) => new HelixBeforeChangeEvent({ value }),
-      host: this,
-      next: type as string,
-    })
-    if (applied) {
-      this.dispatchEvent(new Event('change', { bubbles: true }))
-    } else {
-      /* Refused: the radio the reader pressed is checked, and the type is not. */
-      this.requestUpdate()
-    }
-  }
-
-  /**
-   * The layers menu's entries, in the order the layers are written: a layer
-   * of its own, or every layer in a group, at the place of the first.
-   */
-  private get layerEntries(): MapLayer[][] {
-    const entries: MapLayer[][] = []
-    const groups = new Map<string, MapLayer[]>()
-    const imagery = this.imagery
-    for (const layer of this.layers.filter((one) => !imagery.includes(one))) {
-      const had = layer.group ? groups.get(layer.group) : undefined
-      if (had) {
-        had.push(layer)
-        continue
-      }
-      const entry = [layer]
-      entries.push(entry)
-      if (layer.group) {
-        groups.set(layer.group, entry)
-      }
-    }
-    return entries
   }
 
   /**
@@ -922,6 +791,21 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    for (const layer of LAYERS) {
+      auditChildren(this, `map-${layer}`, `map/${layer}`, 'the map neither draws nor lists it')
+    }
+    auditEntry(
+      this,
+      'map/compass',
+      'has the compass among its controls',
+      () => this.drawsCompass && !added(this).compass,
+    )
+    auditEntry(
+      this,
+      'map/layers',
+      'names `layers` in `controls`',
+      () => this.drawsControls('layers') && this.layers.length > 0 && !added(this).layersMenu,
+    )
     this.addEventListener(HelixMapPartChangeEvent.eventName, this.handlePartChange)
     this.addEventListener('click', this.handleClick)
     this.addEventListener('focusin', this.handleFocusIn)
@@ -937,7 +821,6 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     clearTimeout(this.settling)
     this.settling = undefined
     this.hiding?.disconnect()
-    document.removeEventListener('pointerdown', this.handleOutside)
     this.removeEventListener(HelixMapPartChangeEvent.eventName, this.handlePartChange)
     this.removeEventListener('click', this.handleClick)
     this.removeEventListener('focusin', this.handleFocusIn)
@@ -981,13 +864,6 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     if (changed.has('mapType')) {
       this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'layer' }))
     }
-    if (changed.has('layersOpen')) {
-      if (this.layersOpen) {
-        document.addEventListener('pointerdown', this.handleOutside)
-      } else {
-        document.removeEventListener('pointerdown', this.handleOutside)
-      }
-    }
     const markers = this.markers
     /* On the cluster standing for the marker the stop was on, while it is
        gathered, so Tab still reaches the map's places, and on a placed
@@ -1030,165 +906,21 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   }
 
   /**
-   * The layers button and its menu: a tile for each layer or group, in the
-   * order they are written, with its picture and name, pressed while it is
-   * shown. A group's tile is pressed while any of its layers is shown.
+   * The layers button and its menu, which `map/layers` draws: nothing until
+   * it is imported.
    */
   protected renderLayersMenu(): TemplateResult | typeof nothing {
-    const layers = this.layers
-    if (!this.drawsControls('layers') || layers.length === 0) {
-      return nothing
-    }
-    const entries = this.layerEntries
-    return html`<button
-        part="layers-toggle"
-        aria-controls="layers-menu"
-        aria-expanded=${this.layersOpen ? 'true' : 'false'}
-        aria-label=${this.layersLabel}
-        type="button"
-        @click=${() => {
-          this.layersOpen = !this.layersOpen
-          /* Opening asks the connector for fresh previews of the map types. */
-          if (this.layersOpen) {
-            this.dispatchEvent(new HelixMapPartChangeEvent({ kind: 'menu' }))
-          }
-        }}
-        @focusout=${this.handleMenuFocusOut}
-        @keydown=${this.handleMenuKeydown}
-      >
-        <slot name="layers-icon">
-          <svg aria-hidden="true" fill="currentColor" height="16" viewBox=${stack.viewBox} width="16">
-            ${unsafeSVG(stack.content)}
-          </svg>
-        </slot>
-      </button>
-      <div
-        part="layers-menu"
-        id="layers-menu"
-        role="group"
-        aria-label=${this.layersLabel}
-        ?hidden=${!this.layersOpen}
-        @focusout=${this.handleMenuFocusOut}
-        @keydown=${this.handleMenuKeydown}
-      >
-        ${this.imagery.length > 0 ? this.renderMapTypes() : nothing}
-        ${
-          entries.length > 0
-            ? html`<div part="layer-choices">
-                ${entries.map((entry) => {
-                  const shown = entry.some((layer) => !layer.hidden)
-                  return html`<button
-                    part="layer-choice"
-                    aria-pressed=${shown ? 'true' : 'false'}
-                    type="button"
-                    @click=${() => this.showLayers(entry, !shown)}
-                  >
-                    <svg part="layer-icon" aria-hidden="true" fill="currentColor" viewBox=${iconOf(entry[0]).viewBox}>
-                      ${unsafeSVG(iconOf(entry[0]).content)}
-                    </svg>
-                    <span part="layer-name">${entry[0]?.label ?? ''}</span>
-                  </button>`
-                })}
-              </div>`
-            : nothing
-        }
-      </div>`
-  }
-
-  /**
-   * The map types, as cards with a picture of the map in each: Standard,
-   * Hybrid, and Satellite. One is chosen, so they are radio buttons, and the
-   * arrow keys move between them as a group of radios does.
-   */
-  private renderMapTypes(): TemplateResult {
-    const chosen = this.mapType ?? 'standard'
-    return html`<div part="map-types" role="radiogroup" aria-label=${this.mapTypeLabel}>
-      ${MAP_TYPES.map((type) => {
-        const preview = this.mapPreviews[type]
-        return html`<label part="map-type">
-          <input
-            type="radio"
-            name="map-type"
-            .checked=${live(chosen === type)}
-            @change=${(event: Event) => {
-              event.stopPropagation()
-              this.chooseMapType(type)
-            }}
-          />
-          ${
-            preview
-              ? html`<img part="map-type-preview" alt="" src=${preview} />`
-              : html`<span part="map-type-preview"></span>`
-          }
-          <span part="map-type-name">${this.nameOf(type)}</span>
-        </label>`
-      })}
-    </div>`
+    return this.drawsControls('layers') && this.layers.length > 0
+      ? (added(this).layersMenu?.(this) ?? nothing)
+      : nothing
   }
 
   /**
    * The compass, and the pan and rotate buttons around it where `controls`
-   * names them.
-   *
-   * **One control for which way the map faces and where it goes.** The needle
-   * turns with the map and points north; pressing it turns the map back. The
-   * arrows around it are the way to move and turn the map without dragging,
-   * which a pointer otherwise needs.
+   * names them, which `map/compass` draws: nothing until it is imported.
    */
-  protected renderCompass(pan: boolean, rotate: boolean): TemplateResult {
-    const { faceNorthLabel } = this
-    return html`<div part="compass">
-      ${
-        rotate
-          ? html`<button part="rotate-left" aria-label=${this.rotateLeftLabel} type="button" @click=${() => this.rotate(-ROTATE_STEP)}>
-              <slot name="rotate-left-icon">↺</slot>
-            </button>`
-          : nothing
-      }
-      ${
-        pan
-          ? html`<button part="pan-up" aria-label=${this.panLabel('up')} type="button" @click=${() => this.pan('up')}>
-              <slot name="pan-up-icon">${this.panGlyph('up')}</slot>
-            </button>`
-          : nothing
-      }
-      ${
-        rotate
-          ? html`<button part="rotate-right" aria-label=${this.rotateRightLabel} type="button" @click=${() => this.rotate(ROTATE_STEP)}>
-              <slot name="rotate-right-icon">↻</slot>
-            </button>`
-          : nothing
-      }
-      ${
-        pan
-          ? html`<button part="pan-start" aria-label=${this.panLabel('start')} type="button" @click=${() => this.pan('start')}>
-              <slot name="pan-start-icon">${this.panGlyph('start')}</slot>
-            </button>`
-          : nothing
-      }
-      <button part="face-north" aria-label=${faceNorthLabel} type="button" style=${`--map-needle-turn: ${-this.bearing}deg`} @click=${() => this.faceNorth()}>
-        <slot name="face-north-icon">
-          <svg part="needle" aria-hidden="true" viewBox="0 0 16 16">
-            <path data-end="north" d="M8 1.5 10.5 8h-5Z" />
-            <path data-end="south" d="M8 14.5 5.5 8h5Z" />
-          </svg>
-        </slot>
-      </button>
-      ${
-        pan
-          ? html`<button part="pan-end" aria-label=${this.panLabel('end')} type="button" @click=${() => this.pan('end')}>
-              <slot name="pan-end-icon">${this.panGlyph('end')}</slot>
-            </button>`
-          : nothing
-      }
-      ${
-        pan
-          ? html`<button part="pan-down" aria-label=${this.panLabel('down')} type="button" @click=${() => this.pan('down')}>
-              <slot name="pan-down-icon">${this.panGlyph('down')}</slot>
-            </button>`
-          : nothing
-      }
-    </div>`
+  protected renderCompass(pan: boolean, rotate: boolean): TemplateResult | typeof nothing {
+    return added(this).compass?.(this, pan, rotate) ?? nothing
   }
 
   /**
@@ -1308,7 +1040,6 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     hostAria(this.internals, { label: this.label })
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
-    this.toggleState('layers-open', this.layersOpen)
     /* Whole degrees, as the readout says them: a map settling a hair off
        north is facing north to a reader, and to a stylesheet. */
     this.toggleState('rotated', Math.round(this.bearing) % 360 !== 0)

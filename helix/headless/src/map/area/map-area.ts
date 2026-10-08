@@ -1,7 +1,7 @@
 import { customElement, HelixElement, HelixMapPartChangeEvent, words } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
-import { type MapPoint, pointsConverter } from '../route/map-route.js'
+import { type MapPoint, pointsConverter } from '../shape.js'
 
 /**
  * @summary A shape on a map, such as a delivery zone.

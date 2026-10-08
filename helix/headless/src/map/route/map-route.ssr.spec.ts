@@ -2,6 +2,8 @@ import { describe, expect, test } from 'bun:test'
 import { rendered, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
+import '../area/index.js'
+import './index.js'
 
 describe('map route and area server output', () => {
   test('a route and an area draw nothing of their own, the renderer being what draws them', () => {

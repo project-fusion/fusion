@@ -1,5 +1,5 @@
 import { customElement } from '@fusion.dev/helix-core'
-import { HelixHeadlessMapTerrain } from '@fusion.dev/helix-headless/map'
+import { HelixHeadlessMapTerrain } from '@fusion.dev/helix-headless/map/terrain'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './map-terrain.css.js'
 

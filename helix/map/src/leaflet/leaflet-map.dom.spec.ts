@@ -9,6 +9,8 @@ let leafletDriver: typeof import('./leaflet-driver.js').leafletDriver
 beforeAll(async () => {
   registerDom()
   await import('@fusion.dev/helix-headless/map')
+  await import('@fusion.dev/helix-headless/map/compass')
+  await import('@fusion.dev/helix-headless/map/layers')
   ;({ connectMap } = await import('../connect-map/connect-map.js'))
   ;({ leafletDriver } = await import('./leaflet-driver.js'))
 })

@@ -1,0 +1,69 @@
+/* The compass and the arrows round it, which `@fusion.dev/helix/map/compass`
+   adopts into the map after the map's own sheet. */
+
+/* **The compass's own icon is the needle's size**, where the shared sheet
+   gives every other control's icon the size of its glyph. */
+[part="controls"] [part="face-north"] ::slotted(*) {
+  --icon-size: var(--helix-size-icon-md);
+
+  block-size: var(--helix-size-icon-md);
+  inline-size: var(--helix-size-icon-md);
+}
+
+/* ========================================================= the compass === */
+
+/* **The arrows ring the compass**, where a page adds them: up, down, and the
+   sides for panning, and the top corners for turning. The compass takes the
+   corner every button in the column takes. */
+[part="compass"] {
+  border-radius: var(--helix-radii-sm);
+  display: grid;
+  grid-template-areas:
+    "rotl   up     rotr"
+    "start  north  end"
+    ".      down   .";
+  place-items: center;
+}
+
+[part="rotate-left"] {
+  grid-area: rotl;
+}
+[part="rotate-right"] {
+  grid-area: rotr;
+}
+[part="face-north"] {
+  grid-area: north;
+}
+
+/* The arrows are small and bare on the disc. */
+[part="compass"] > :not([part="face-north"]) {
+  background-color: transparent;
+  block-size: calc(var(--helix-size-control-sm) * 0.75);
+  border-color: transparent;
+  box-shadow: none;
+  font-size: var(--helix-text-xs);
+  inline-size: calc(var(--helix-size-control-sm) * 0.75);
+}
+
+/* **A panel behind the arrows**, where a page asks for them, so they read
+   as one control with the compass. The compass alone is one round button. */
+[part="compass"]:has(> :not([part="face-north"])) {
+  background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
+  box-shadow:
+    var(--helix-shadow-floating),
+    0 0 0 var(--helix-border-floating) var(--helix-color-border);
+}
+
+/* The needle turns with the map: north in the danger red a compass paints its
+   north in, south in the ink. */
+[part="needle"] {
+  block-size: var(--helix-size-icon-md);
+  inline-size: var(--helix-size-icon-md);
+  transform: rotate(var(--map-needle-turn, 0deg));
+}
+[part="needle"] [data-end="north"] {
+  fill: var(--map-needle-north-color, var(--helix-color-danger));
+}
+[part="needle"] [data-end="south"] {
+  fill: var(--map-needle-south-color, var(--helix-color-foreground-muted));
+}

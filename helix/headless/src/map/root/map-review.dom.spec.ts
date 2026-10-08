@@ -7,6 +7,10 @@ import { hasState, mount, registerDom, settle, type Updatable } from '@fusion.de
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../compass/index.js')
+  await import('../layers/index.js')
+  await import('../raster/index.js')
+  await import('../route/index.js')
 })
 
 type Frame = Updatable & {

@@ -5,6 +5,12 @@ import type { MapPoint } from './map-route.js'
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../compass/index.js')
+  await import('../layers/index.js')
+  await import('../area/index.js')
+  await import('../buildings/index.js')
+  await import('../raster/index.js')
+  await import('./index.js')
 })
 
 type Layer = HTMLElement & {
