@@ -215,8 +215,10 @@ describe('where an action lives', () => {
 })
 
 describe('structure', () => {
-  test('the item is a list item, so the list it sits in is a real list', async () => {
-    expect(role(await item())).toBe('listitem')
+  test('the row is an article and the host carries no role, so the feed owns the article', async () => {
+    const element = await item()
+    expect(role(element) ?? null).toBeNull()
+    expect(part(element, 'item')?.getAttribute('role')).toBe('article')
   })
 
   test('dismiss is drawn only when it is offered', async () => {

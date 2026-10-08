@@ -5,7 +5,6 @@ import {
   focusableElements,
   HelixElement,
   HelixReadEvent,
-  hostAria,
   MixinDismissible,
   requestChange,
   slotFilled,
@@ -217,12 +216,6 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { role: 'listitem' })
-    /* Through internals, so a feed that holds one page of a longer list says
-       where the reader is in the whole of it without writing onto the
-       consumer's element. */
-    this.internals.ariaPosInSet = this.position > 0 ? String(this.position) : null
-    this.internals.ariaSetSize = this.setSize === 0 ? null : String(this.setSize)
     /* The mirror the stylesheet selects on, kept off the host's attributes for
        the reason on `read` itself. */
     this.toggleState('read', this.read)
@@ -354,14 +347,22 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
 
   protected override render(): TemplateResult {
     /* **The row takes focus itself**, so a reader moves through the feed with
-       the arrow keys, row by row, and reads each one by its label. A group named
-       by the label, because a focused box with no role and no name is read as
-       nothing at all. `tabindex` is the feed's to choose: one row is the stop,
-       the rest are reached with the arrows. */
+       the arrow keys, row by row, and reads each one by its label. An
+       `article` named by the label, as the APG feed pattern has each entry, so
+       the row a reader is on is the article a screen reader counts: the host
+       carries no role, and the feed owns the articles through it. `tabindex`
+       is the feed's to choose: one row is the stop, the rest are reached with
+       the arrows.
+
+       Its place and the feed's size are on the article too, so a feed that
+       holds one page of a longer list says where the reader is in the whole of
+       it without writing onto the consumer's element. */
     return html`<div
       part="item"
-      role="group"
+      role="article"
       aria-labelledby="label"
+      aria-posinset=${this.position > 0 ? String(this.position) : nothing}
+      aria-setsize=${this.setSize === 0 ? nothing : String(this.setSize)}
       tabindex=${this.stop ? 0 : -1}
     >
       <span part="media"><slot name="media"></slot></span>
