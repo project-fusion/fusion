@@ -81,11 +81,18 @@ export function SiteFooter() {
           <helix-text emphasis="subtle" variant="caption">
             Interface and AI software.
           </helix-text>
-          {/* **The Helix release the site runs on.** Read from the package,
-              which each release stamps, so it never trails one. */}
-          <helix-text emphasis="muted" variant="caption">
+          {/* **The Helix release the site runs on**, as a tag: a piece of
+              metadata, set apart from the tagline above it rather than read as
+              a third line of it. Read from the package, which each release
+              stamps, so it never trails one. */}
+          <helix-tag
+            class={styles.footerVersion}
+            data-density="sm"
+            emphasis="outlined"
+            tone="neutral"
+          >
             Helix {VERSION}
-          </helix-text>
+          </helix-tag>
 
           {/* **Anchors, not `helix-icon-button`.** That component is a
               `button` and takes no `href`, which is the rule its own docs
