@@ -129,6 +129,7 @@ pub fn start(config: &Config, base: &Path, driver: &mut Driver) -> Outcome<Serve
                 ),
             ));
         }
+        eprintln!("proof: {} answers, started by `{command}`.", served.url);
     }
     Ok(servers)
 }
