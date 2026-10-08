@@ -374,7 +374,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * first paint that shows one cell and then expands is a flicker on every load.
    */
   @state()
-  private width: number | undefined = undefined
+  protected width: number | undefined = undefined
 
   /**
    * The cell and gap the strip is drawing, in pixels, once it has been read.
@@ -430,14 +430,14 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
   private shaped: string | undefined = undefined
 
   /** The region a change of selection is said in, rendered from the first change. */
-  private readonly status = new StatusController(this)
+  protected readonly status = new StatusController(this)
 
   /**
    * The name each drawn cell stands for in `value`: the date its row's header
    * carries in a `<time datetime>`, or the header's words where it carries
    * none.
    */
-  private keysOf(cells: readonly Reading[]): string[] {
+  protected keysOf(cells: readonly Reading[]): string[] {
     const offset = this.points.length - cells.length
     const rows = this.sourceRows
     return cells.map((_, index) => {
@@ -501,7 +501,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
   }
 
   /** Notes where the keys rest before the pointer controller moves them. */
-  private readonly onStripKeydown = (): void => {
+  protected readonly onStripKeydown = (): void => {
     this.left = this.pointer.at
   }
 
@@ -540,7 +540,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * A press on a cell selects it, under `selection-mode`, and Shift takes the
    * rectangle to it under `selection-shape="rectangle"`.
    */
-  private readonly onClick = (event: MouseEvent): void => {
+  protected readonly onClick = (event: MouseEvent): void => {
     const cell = (event.target as Element | null)?.closest?.('[part~="cell"]')
     const index = Number(cell?.getAttribute('data-index') ?? -1)
     if (!cell || !Number.isInteger(index) || index < 0) {
@@ -567,7 +567,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * cell along, while the tooltip still counted rows and named the day beside
    * the one under the pointer.
    */
-  private get points(): Reading[] {
+  protected get points(): Reading[] {
     const series = this.series[0]
     if (!series) {
       return []
@@ -582,7 +582,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * need it, and a `rows="0"` or a `rows="2.5"` that reached one of them and not
    * the other would draw a strip whose columns and whose capacity disagreed.
    */
-  private get rowCount(): number {
+  protected get rowCount(): number {
     return Math.max(1, Math.floor(this.rows) || 1)
   }
 
@@ -593,17 +593,17 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * it is for; otherwise what the strip draws, and the declared default only
    * until the first measurement lands.
    */
-  private get cellPx(): number {
+  protected get cellPx(): number {
     return this.hasAttribute('min-cell') ? this.minCell : (this.metrics?.cell ?? this.minCell)
   }
 
   /** The gap the arithmetic should plan around, on the same terms as `cellPx`. */
-  private get gapPx(): number {
+  protected get gapPx(): number {
     return this.hasAttribute('gap') ? this.gap : (this.metrics?.gap ?? this.gap)
   }
 
   /** How many cells the container has room for, as a whole number of columns. */
-  private get room(): number {
+  protected get room(): number {
     return fits(
       this.points.length,
       this.width ?? Number.NaN,
@@ -659,7 +659,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * The tail rather than the head: a status strip that drops the newest days to
    * keep the oldest is answering a question nobody asked.
    */
-  private get drawn(): Reading[] {
+  protected get drawn(): Reading[] {
     const all = this.points
     return all.slice(Math.max(0, all.length - this.room))
   }
@@ -1001,7 +1001,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * bubbles, so one handler covers however many cells there are, and unlike
    * `mouseover` it is delivered for a pen.
    */
-  private readonly onPointerOver = (event: PointerEvent): void => {
+  protected readonly onPointerOver = (event: PointerEvent): void => {
     /* A mouse or a pen, the rule every chart's pointer keeps: a touch opened
        the bubble under the finger and left it there after the finger lifted. */
     if (!this.pointer.accepts(event)) {
@@ -1013,7 +1013,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
   }
 
   /* A tap shows the cell under the finger and keeps it, as on every chart. */
-  private readonly onPointerUp = (event: PointerEvent): void => {
+  protected readonly onPointerUp = (event: PointerEvent): void => {
     if (event.pointerType !== 'touch') {
       return
     }
@@ -1025,7 +1025,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
   }
 
   /* A cell the keys chose stays when the pointer leaves, as on every chart. */
-  private readonly onPointerLeave = (): void => {
+  protected readonly onPointerLeave = (): void => {
     if (!this.pointer.keyed) {
       this.pointer.set(-1)
     }
