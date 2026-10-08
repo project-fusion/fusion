@@ -59,6 +59,22 @@ describe('the unregistered-child audit', () => {
     expect(warnings[0]).toContain("Import '@fusion.dev/helix/option'.")
   })
 
+  test('reports a child the host draws from data, with none in its light DOM', async () => {
+    const warnings: string[] = []
+    console.warn = (message: string) => warnings.push(message)
+    auditChildren(
+      container('w-listbox', 'w-', ''),
+      'option',
+      'option',
+      'the items draw nothing',
+      true,
+    )
+    await painted()
+    expect(warnings).toEqual([
+      "<w-option> in <w-listbox> is not registered, so the items draw nothing. Import '@fusion.dev/helix-headless/option'.",
+    ])
+  })
+
   test('says nothing for a registered child, or for none', async () => {
     const warnings: string[] = []
     console.warn = (message: string) => warnings.push(message)

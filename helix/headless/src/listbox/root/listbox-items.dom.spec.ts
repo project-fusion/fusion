@@ -11,8 +11,7 @@ import {
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
-  /* Registered here, so a spec reads the drawn options at once: the list
-     registers them itself on its first draw, which `listbox-children` holds. */
+  /* The options `items` draws are the page's import, as written ones are. */
   await import('../../option/index.js')
 })
 

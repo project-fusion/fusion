@@ -73,10 +73,6 @@ export class HelixFilterInput extends HelixHeadlessFilterInput {
     collectionStateStyles,
     styles,
   ]
-
-  protected override defineOption(): Promise<unknown> {
-    return import('../../option/root/index.js')
-  }
 }
 
 declare global {

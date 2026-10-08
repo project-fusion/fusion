@@ -57,36 +57,34 @@ describe('a listbox whose options were never imported', () => {
   })
 })
 
-/* The options `items` draws are drawn in the list's own shadow root, where the
-   page never writes one, so the list registers them itself, and only then. */
-describe('a listbox drawing `items`', () => {
-  test('registers the option it draws, and a list of children does not ask', async () => {
+/* The options `items` draws are the Option family's too, and the page imports
+   them: registered by the list, they would be registered by every Select,
+   Combobox and Command, which each draw one. */
+describe('a listbox drawing `items` whose option was never imported', () => {
+  test('is reported once, with the import to add', async () => {
     const { HelixHeadlessListbox } = await import('../index.js')
-    const { HelixHeadlessOption } = await import('../../option/index.js')
-    let asked = 0
     customElements.define(
       'spec-items-listbox',
       class extends HelixHeadlessListbox {
         static override tier = 'spec-items-'
-        protected override defineOption(): Promise<unknown> {
-          asked += 1
-          customElements.define('spec-items-option', class extends HelixHeadlessOption {})
-          return Promise.resolve()
-        }
       },
     )
-    await told(
-      '<spec-items-listbox label="Fruit"><spec-items-option value="a">Apple</spec-items-option></spec-items-listbox>',
-    )
-    expect(asked).toBe(0)
     document.body.innerHTML = '<spec-items-listbox label="Fruit"></spec-items-listbox>'
     const list = document.body.firstElementChild as Updatable & { items: unknown[] }
+    const key = Symbol.for('fusion.dev/helix/runtime-log')
+    const log = (globalThis as Record<symbol, unknown>)[key]
+    const before = Array.isArray(log) ? log.length : 0
     list.items = ['Apple', 'Banana']
     await settle(list)
-    expect(asked).toBe(1)
-    expect(customElements.get('spec-items-option')).toBeDefined()
     list.items = ['Cherry']
     await settle(list)
-    expect(asked).toBe(1)
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+    const after = (globalThis as Record<symbol, unknown>)[key]
+    const heard = ((Array.isArray(after) ? after.slice(before) : []) as Report[]).filter(
+      (one) => one.kind === 'unregistered-part',
+    )
+    expect(heard.map((one) => one.message)).toEqual([
+      "<spec-items-option> in <spec-items-listbox> is not registered, so the items draw no choices. Import '@fusion.dev/helix-headless/option'.",
+    ])
   })
 })

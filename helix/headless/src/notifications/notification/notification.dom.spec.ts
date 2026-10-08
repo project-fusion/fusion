@@ -363,7 +363,8 @@ describe('focus when a row is dismissed', () => {
     )
     const rows = [...feed.querySelectorAll('helix-headless-notification')] as Item[]
     await Promise.all(rows.map((row) => row.updateComplete))
-    await (feed.querySelector('helix-headless-notification-group') as Item).updateComplete
+    await (feed.querySelector('helix-headless-notification-group') as unknown as Item)
+      .updateComplete
     return rows
   }
 
