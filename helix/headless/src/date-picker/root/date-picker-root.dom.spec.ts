@@ -691,6 +691,22 @@ describe('the bounds of a date picker', () => {
     expect(late.internals.validationMessage.startsWith('Too late: ')).toBe(true)
   })
 
+  /* Date Input reported a range ending before it starts, and a calendar
+     handed the same pair from a script reported it valid. */
+  test('make a range that ends before it starts invalid, as Date Input does', async () => {
+    const backward = (await calendar(
+      'mode="range" default-value="2026-06-03,2026-05-09" locale="en-US"',
+    )) as Checked
+    await backward.updateComplete
+    expect(backward.internals.validity.rangeUnderflow).toBe(true)
+    expect(backward.internals.validationMessage).toBe('Choose an end on or after June 3, 2026.')
+    const forward = (await calendar(
+      'mode="range" default-value="2026-05-09,2026-06-03"',
+    )) as Checked
+    await forward.updateComplete
+    expect(forward.internals.validity.valid).toBe(true)
+  })
+
   test('and a barred day or one off the step invalid too', async () => {
     const barred = (await calendar(
       'disable-dates="2026-08-12" default-value="2026-08-12"',

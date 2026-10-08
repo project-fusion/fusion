@@ -91,6 +91,8 @@ const dates = (value: string): string[] =>
  * digits or the arrow keys. Alt+Down opens the calendar from a segment. A
  * `range` is two rows with a dash between them, the start and the end, as
  * React Aria's DateRangePicker draws them, and `multiple` keeps the text.
+ * A range whose end is before its start reports `rangeUnderflow`, as Date
+ * Picker does, with `range-order-message`.
  *
  * Text that is not a date gives the form an empty value, as a native date
  * field does, and `value` keeps the text so it can be corrected.
@@ -537,6 +539,14 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    * The message shown when a date is after `max`. `{max}` is replaced with
    * `max`, written the way the field writes dates.
    */
+  /**
+   * The message shown when a range ends before it starts. `{start}` is
+   * replaced with the start, written the way the field writes dates.
+   */
+  @words
+  @property({ attribute: 'range-order-message' })
+  rangeOrderMessage = 'Choose an end on or after {start}.'
+
   @words
   @property({ attribute: 'range-overflow-message' })
   rangeOverflowMessage = 'Choose a date on or before {max}.'
@@ -900,6 +910,18 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
     }
     if (this.mode === 'range' && held.length > 2) {
       return this.rangeLengthMessage
+    }
+    /* An end before its start, as Date Picker reports one. Measured before
+       this: a segmented range stepped to 2026-06-03 to 2026-05-09 reported
+       valid and was submitted, where React Aria's DateRangePicker reports it
+       invalid. `rangeUnderflow`, since the end is under the bound its start
+       sets. */
+    const [start, end] = held
+    if (this.mode === 'range' && start !== undefined && end !== undefined && end < start) {
+      return [
+        'rangeUnderflow',
+        formatWords(this, 'rangeOrderMessage', { start: this.written(start) }),
+      ]
     }
     return ''
   }

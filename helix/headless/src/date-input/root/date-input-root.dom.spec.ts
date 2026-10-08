@@ -1123,6 +1123,19 @@ describe('segmented', () => {
     expect(host.value).toBe('')
     expect(host.internals.validity.badInput).toBe(true)
   })
+  /* Measured before this: the start stepped a month past the end, the field
+     reported valid, and the form sent 2026-06-03 and 2026-05-09, where React
+     Aria's DateRangePicker reports the range invalid. */
+  test('a range whose start is moved past its end is under its bound', async () => {
+    const host = (await field(
+      'segmented mode="range" name="trip" locale="en-US" default-value="2026-05-01,2026-05-09"',
+    )) as InputDate & { internals: ElementInternals }
+    expect(host.internals.validity.valid).toBe(true)
+    await press(host, segments(host)[0] as HTMLElement, 'ArrowUp')
+    expect(host.value).toBe('2026-06-01,2026-05-09')
+    expect(host.internals.validity.rangeUnderflow).toBe(true)
+    expect(host.internals.validationMessage).toBe('Choose an end on or after June 1, 2026.')
+  })
 })
 
 describe('a segmented date input and autofill', () => {
