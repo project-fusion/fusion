@@ -86,8 +86,8 @@ export interface VirtualizeOptions {
    * many columns. The window is then every item that reaches into the box, in
    * the order of the set, and a host draws each item at its column,
    * `waterfall.lane(index)`, and at `offsetOf(index)` down the set, which
-   * `extent()` is the length of. Items are placed by measurement, so a host
-   * supplies `rows`. None by default.
+   * `offsetOf(count)` is the length of. Items are placed by measurement, so a
+   * host supplies `rows`. None by default.
    */
   waterfall?: () => Waterfall | undefined
 }
@@ -541,14 +541,10 @@ export class VirtualizeController implements ReactiveController {
       return
     }
     const overscan = this.options.overscan ?? 4
-    const choose = (): Window => {
-      const lanes = this.laned(total)
-      return lanes
-        ? this.inLanes(box, total, overscan, lanes)
-        : this.measuring()
-          ? this.placed(box, total, overscan)
-          : this.uniform(box, total, size, overscan)
-    }
+    const choose = (): Window =>
+      this.measuring()
+        ? this.placed(box, total, overscan)
+        : this.uniform(box, total, size, overscan)
     let next = choose()
     /* The spacer cannot carry a negative drift past zero, and a positive one
        at the start of the set would leave room above the first row. Squared
@@ -686,29 +682,24 @@ export class VirtualizeController implements ReactiveController {
     return lanes
   }
 
-  /** Where item `index` starts down the set, before any drift: in its column, or after the items before it. */
+  /**
+   * Where item `index` starts down the set, before any drift: after the items
+   * before it, or in its column of a waterfall, where the starts never go back
+   * up either.
+   */
   private startOf(index: number, total: number): number {
     return this.laned(total)?.start(index) ?? this.heights.before(index, total)
   }
 
   /**
-   * The waterfall's window: from the first item that reaches into the box to
-   * the last that starts in it, each widened by the overscan's lines of
-   * items. The drift is carried as `before`, where a host draws it as the
-   * room above every item.
+   * The item at `offset`: the last to start at or before it, or in a
+   * waterfall the first to reach past it.
    */
-  private inLanes(box: HTMLElement, total: number, overscan: number, lanes: Waterfall): Window {
-    const top = this.offset(box)
-    const lead = this.lead(box)
-    const more = overscan * lanes.lanes
-    const first = Math.max(0, lanes.from(this.heading < 0 ? top - lead : top) - more)
-    const bottom = top + this.span(box) + (this.heading > 0 ? lead : 0)
-    return {
-      after: 0,
-      before: this.drift,
-      first: Math.min(first, total),
-      last: Math.min(total, lanes.to(bottom) + more),
-    }
+  private indexAt(offset: number, total: number): number {
+    const lanes = this.laned(total)
+    return lanes
+      ? Math.min(lanes.from(offset), Math.max(0, total - 1))
+      : this.heights.indexAt(offset, total)
   }
 
   /**
@@ -722,16 +713,18 @@ export class VirtualizeController implements ReactiveController {
     const top = this.offset(box)
     const lead = this.lead(box)
     const from = this.heading < 0 ? top - lead : top
-    const first = Math.max(0, this.heights.indexAt(from, total) - overscan)
+    /* A line of a waterfall's columns at a time. */
+    const more = overscan * (this.laned(total)?.lanes ?? 1)
+    const first = Math.max(0, this.indexAt(from, total) - more)
     const bottom = top + this.span(box) + (this.heading > 0 ? lead : 0)
-    let last = this.heights.indexAt(top, total)
-    while (last < total && this.heights.before(last, total) < bottom) {
+    let last = this.indexAt(top, total)
+    while (last < total && this.startOf(last, total) < bottom) {
       last += 1
     }
-    last = Math.min(total, last + overscan)
+    last = Math.min(total, last + more)
     return {
-      after: Math.max(0, this.heights.total(total) - this.heights.before(last, total)),
-      before: this.heights.before(first, total) + this.drift,
+      after: Math.max(0, this.startOf(total, total) - this.startOf(last, total)),
+      before: this.startOf(first, total) + this.drift,
       first,
       last,
     }
@@ -754,19 +747,14 @@ export class VirtualizeController implements ReactiveController {
     }
     const top = Math.max(0, this.offset(box))
     const bottom = top + this.span(box)
-    const lanes = this.laned(total)
-    if (lanes) {
-      const first = Math.min(lanes.from(top), total)
-      return { first, last: Math.max(first, Math.min(total, lanes.to(bottom))) }
-    }
     if (!this.measuring()) {
       const size = this.line()
       const first = Math.min(Math.floor(top / size), total)
       return { first, last: Math.max(first, Math.min(total, Math.ceil(bottom / size))) }
     }
-    const first = this.heights.indexAt(top, total)
+    const first = this.indexAt(top, total)
     let last = first
-    while (last < total && this.heights.before(last, total) < bottom) {
+    while (last < total && this.startOf(last, total) < bottom) {
       last += 1
     }
     return { first, last }
@@ -784,19 +772,9 @@ export class VirtualizeController implements ReactiveController {
     if (!box) {
       return 0
     }
-    return Math.max(0, this.extent() - Math.max(0, this.offset(box)) - this.span(box))
-  }
-
-  /**
-   * How long the whole set is along the scroll axis, in pixels: what was
-   * measured and estimated, or where the longest column of a waterfall ends.
-   */
-  extent(): number {
     const total = Math.max(0, this.options.count())
-    return (
-      this.laned(total)?.length() ??
-      (this.measuring() ? this.heights.total(total) : total * this.line())
-    )
+    const length = this.measuring() ? this.startOf(total, total) : total * this.line()
+    return Math.max(0, length - Math.max(0, this.offset(box)) - this.span(box))
   }
 
   /**
@@ -912,7 +890,7 @@ export class VirtualizeController implements ReactiveController {
     const box = this.options.container()
     const from = box ? this.noteClamp(box) : this.lastTop
     const top = box ? this.offset(box) : 0
-    const anchor = this.target ?? this.laned(total)?.from(top) ?? this.heights.indexAt(top, total)
+    const anchor = this.target ?? this.indexAt(top, total)
     const was = this.startOf(anchor, total)
     let news = false
     for (const { element, index } of rows) {
