@@ -195,6 +195,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
       '--show': () => this.show(),
       '--toggle': () => this.toggleOpen(),
     },
+    expanded: () => this.open,
   })
 
   /**

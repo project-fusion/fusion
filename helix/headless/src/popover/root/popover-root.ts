@@ -44,7 +44,9 @@ import { hideOutside } from '../hide-outside.js'
  *
  * It opens on click and from a command. `command="--show"` and the related
  * commands work as they do on `Dialog` and `Drawer`, so a button anywhere on
- * the page can open the popover with no script.
+ * the page can open the popover with no script. From its first press, a
+ * button that opens it this way says whether the popover is open: a Helix
+ * button through `expanded`, and any other element with `aria-expanded`.
  *
  * **Opening moves focus into the panel**, to the first control in it, or to the
  * panel itself where it holds none, and closing from inside gives it back to
@@ -296,6 +298,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
         }
       },
     },
+    expanded: () => this.open,
   })
 
   /** The element the panel opens against. */

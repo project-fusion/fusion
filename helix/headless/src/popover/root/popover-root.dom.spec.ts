@@ -74,6 +74,30 @@ describe('popover', () => {
     expect(hasState(target, 'open')).toBe(true)
   })
 
+  /* Measured in Chromium before this: a `command="--toggle"` button opened
+     the popover and its node had no expanded state, where React Aria's trigger
+     says it on every overlay it opens. */
+  test('a button that opens it by a command says whether it is open', async () => {
+    const button = (await mount(
+      `<button command="--toggle" commandfor="told">Open</button>
+       <helix-headless-popover id="told" label="Details"><span>Body</span></helix-headless-popover>`,
+    )) as HTMLButtonElement
+    const target = button.nextElementSibling as Popover
+    await target.updateComplete
+    const send = async (): Promise<void> => {
+      const event = new Event('command', { cancelable: true })
+      Object.assign(event, { command: '--toggle', source: button })
+      target.dispatchEvent(event)
+      await target.updateComplete
+    }
+    await send()
+    expect(target.open).toBe(true)
+    expect(button.getAttribute('aria-expanded')).toBe('true')
+    await send()
+    expect(target.open).toBe(false)
+    expect(button.getAttribute('aria-expanded')).toBe('false')
+  })
+
   test('the panel is hidden while closed and shown while open', async () => {
     const host = await popover()
     expect((part(host, 'popover') as HTMLElement).hasAttribute('hidden')).toBe(true)

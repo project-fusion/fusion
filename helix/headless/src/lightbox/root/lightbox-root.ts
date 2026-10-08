@@ -456,6 +456,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       '--show': () => this.show(),
       '--toggle': () => this.toggleOpen(),
     },
+    expanded: () => this.open,
   })
 
   /**
