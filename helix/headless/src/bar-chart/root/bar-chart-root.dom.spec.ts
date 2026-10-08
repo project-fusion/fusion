@@ -250,7 +250,7 @@ describe('a blank cell', () => {
     const host = await chart(GAP, 'for="gap"')
     const groups = [...(host.shadowRoot?.querySelectorAll('[part~="group"]') ?? [])]
     const heights = groups.map((group) =>
-      [...group.querySelectorAll('[part="bar"]')].map((bar) => [
+      [...group.querySelectorAll('[part~="bar"]')].map((bar) => [
         bar.getAttribute('data-series'),
         Number(bar.getAttribute('height')),
       ]),
@@ -391,13 +391,13 @@ describe('stacked', () => {
      each join. */
   describe('marks the segment at each far end, which the stylesheet rounds', () => {
     /* Each category's segments in series order: an end's `data-end`, and `-`
-       for a segment that is not an end. The part and the attribute must agree. */
+       for a segment that is not an end. The parts and the attribute must agree. */
+    const PARTS = { '-': 'bar', negative: 'bar bar-end bar-end-negative', positive: 'bar bar-end' }
     const ends = (host: HTMLElement): string[][] =>
       [...(host.shadowRoot?.querySelectorAll('[part~="group"]') ?? [])].map((group) =>
         [...group.querySelectorAll('[part~="bar"]')].map((one) => {
-          const end = one.getAttribute('data-end') ?? '-'
-          const marked = one.getAttribute('part') === 'bar bar-end'
-          return marked === (end !== '-') ? end : `mismatch ${end}`
+          const end = (one.getAttribute('data-end') ?? '-') as keyof typeof PARTS
+          return one.getAttribute('part') === PARTS[end] ? end : `mismatch ${end}`
         }),
       )
     const table = (rows: string): string => `<table id="signs">
@@ -456,12 +456,22 @@ describe('stacked', () => {
       expect(ends(host)).toEqual([['-', 'negative', 'positive']])
     })
 
-    test('none when the columns stand side by side', async () => {
+    /* A column alone is its own far end. A negative one was rounded at its
+       foot, on the baseline, because nothing said which way it grew. */
+    test('every column when they stand side by side, by its sign', async () => {
       const host = await chart(
-        table('<tr><th>Q1</th><td>3</td><td>-4</td><td>2</td></tr>'),
+        table('<tr><th>Q1</th><td>3</td><td>-4</td><td>0</td></tr>'),
         'for="signs"',
       )
-      expect(ends(host)).toEqual([['-', '-', '-']])
+      expect(ends(host)).toEqual([['positive', 'negative', '-']])
+    })
+
+    test('every column when they stand side by side and run across', async () => {
+      const host = await chart(
+        table('<tr><th>Q1</th><td>-3</td><td>4</td><td>-2</td></tr>'),
+        'for="signs" orientation="horizontal"',
+      )
+      expect(ends(host)).toEqual([['negative', 'positive', 'negative']])
     })
   })
 })
