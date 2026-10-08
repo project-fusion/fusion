@@ -14,6 +14,7 @@ import {
   MixinField,
   MixinTokens,
   PopoverController,
+  reportRuntime,
   restoreValue,
   StatusController,
   scrollItemIntoView,
@@ -26,8 +27,26 @@ import { property, state } from 'lit/decorators.js'
 import type { HelixHeadlessFilterChip } from '../chip/filter-chip.js'
 import { HelixHeadlessFilterField } from '../field/filter-field.js'
 import { readFilterText } from '../grammar.js'
-import { HelixHeadlessFilterMenu } from '../menu/filter-menu.js'
 import { currentTerm, suggests, tokenEntry } from '../suggest.js'
+
+/**
+ * A picker that holds what is ticked for its fields, which is what `FilterMenu`
+ * is.
+ *
+ * **By shape rather than by class**, because the picker has an entry of its
+ * own, `filter-input/menu`, so a field that never shows one does not carry
+ * `Menu` with it. Importing the class here to test it would put it back into
+ * every field.
+ */
+interface FieldPicker extends Element {
+  apply(field: string, values: readonly string[], operator?: string): boolean
+  readonly fields: readonly HelixHeadlessFilterField[]
+}
+
+/** Whether an element is a picker of fields. */
+const picks = (element: Element): element is FieldPicker =>
+  typeof (element as Partial<FieldPicker>).apply === 'function' &&
+  Array.isArray((element as Partial<FieldPicker>).fields)
 
 /** A token that answers a request to go, which is what `Tag` is. */
 type DismissibleToken = Element & { dismiss(): boolean }
@@ -116,6 +135,12 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * inside this element, outside the menu. It is not assigned to a slot, so
  * nothing draws it and the menu has no page for it, and the grammar still reads
  * it.
+ *
+ * **The picker has an entry of its own.** `FilterMenu` draws its pages with
+ * `Menu`, which a field without a picker does not need, so this family's entry
+ * leaves it out. A page that writes one imports
+ * `@fusion.dev/helix/filter-input/menu` as well, and a picker written without it
+ * is reported once the page has loaded, with the entry to add.
  *
  * **Suggestions.** Slot options into `suggestions` and the field shows them,
  * moves through them with the arrow keys, and presses one on Enter. The option
@@ -600,9 +625,9 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    * that the menu never heard about leaves the value unticked in a list the
    * reader is about to open.
    */
-  private menuFor(field: string): HelixHeadlessFilterMenu | null {
+  private menuFor(field: string): FieldPicker | null {
     for (const menu of this.querySelectorAll('*')) {
-      if (!(menu instanceof HelixHeadlessFilterMenu)) {
+      if (!picks(menu)) {
         continue
       }
       if (menu.fields.some((declared) => (declared.name ?? '') === field)) {
@@ -1083,6 +1108,38 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
        render root to query until this render made one. */
     this.handleTokens()
     this.refreshSuggesting()
+    this.auditPicker()
+  }
+
+  /**
+   * Says so when a picker is written in the field and never registered.
+   *
+   * The picker has an entry of its own, so a page that imports only the field
+   * gets an inert element there: a trigger that opens nothing. Asked once the
+   * page has loaded and painted, so an entry a later module imports is not
+   * taken for a missing one.
+   */
+  private auditPicker(): void {
+    const { tier } = this.constructor as typeof HelixFormElement
+    const tag = `${tier}filter-menu`
+    const check = (): void => {
+      if (this.isConnected && this.querySelector(tag) && !customElements.get(tag)) {
+        const entry = tier === 'helix-' ? '@fusion.dev/helix' : '@fusion.dev/helix-headless'
+        reportRuntime({
+          kind: 'unregistered-part',
+          message: `<${tag}> in <${this.localName}> is not registered, so its trigger opens nothing. Import '${entry}/filter-input/menu'.`,
+          tag: this.localName,
+        })
+      }
+    }
+    const frame = (): void => {
+      requestAnimationFrame(check)
+    }
+    if (document.readyState === 'complete') {
+      frame()
+    } else {
+      window.addEventListener('load', frame, { once: true })
+    }
   }
 
   protected override updated(changed: PropertyValues): void {

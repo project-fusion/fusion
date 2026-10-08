@@ -4,6 +4,7 @@ import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-tes
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../menu/index.js')
   // The declared values are options, and an unregistered one never upgrades.
   await import('../../option/index.js')
   // The chips are what a dismissal comes from, so they have to upgrade too.
@@ -363,5 +364,42 @@ describe('a field that keeps its own chips', () => {
     await press(host)
     await settle(host)
     expect(chipsOf(host)).toHaveLength(0)
+  })
+})
+
+/* The picker has an entry of its own, so a page that imports only the field
+   and writes a picker gets an inert element, and is told which entry to add. */
+describe('a picker whose entry was never imported', () => {
+  const told = async (markup: string): Promise<{ kind: string; message: string }[]> => {
+    const key = Symbol.for('fusion.dev/helix/runtime-log')
+    const log = (globalThis as Record<symbol, unknown>)[key]
+    const before = Array.isArray(log) ? log.length : 0
+    document.body.innerHTML = markup
+    await settle(document.body.firstElementChild as Updatable)
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+    const after = (globalThis as Record<symbol, unknown>)[key]
+    return (Array.isArray(after) ? after.slice(before) : []) as { kind: string; message: string }[]
+  }
+
+  test('is reported with the entry to import', async () => {
+    const { HelixHeadlessFilterInput } = await import('../index.js')
+    customElements.define(
+      'spec-filter-input',
+      class extends HelixHeadlessFilterInput {
+        static override tier = 'spec-'
+      },
+    )
+    const heard = await told(
+      '<spec-filter-input label="Filter rows"><spec-filter-menu slot="start"></spec-filter-menu></spec-filter-input>',
+    )
+    const report = heard.find((one) => one.kind === 'unregistered-part')
+    expect(report?.message).toContain("'@fusion.dev/helix-headless/filter-input/menu'")
+  })
+
+  test('and a registered one is not', async () => {
+    const heard = await told(
+      `<helix-headless-filter-input label="Filter rows">${FIELDS}</helix-headless-filter-input>`,
+    )
+    expect(heard.filter((one) => one.kind === 'unregistered-part')).toEqual([])
   })
 })

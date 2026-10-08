@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { hasPart, partTag, rendered, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
+import '../menu/index.js'
 
 describe('filter input server output', () => {
   /**

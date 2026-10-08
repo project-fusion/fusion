@@ -10,6 +10,7 @@ import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-tes
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../menu/index.js')
   await import('../../option/index.js')
 })
 

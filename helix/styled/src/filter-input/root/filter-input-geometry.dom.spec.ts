@@ -4,6 +4,7 @@ import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/d
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../menu/index.js')
   await import('../../button/index.js')
 })
 

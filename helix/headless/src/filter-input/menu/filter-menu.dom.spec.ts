@@ -4,6 +4,7 @@ import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('./index.js')
   await import('../../menu/index.js')
   await import('../../option/index.js')
 })

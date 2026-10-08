@@ -96,6 +96,8 @@ export type RuntimeKind =
   | 'unlinked-trigger'
   /** A Text is rendered as a label, a deprecated value whose shadow root reaches no control. */
   | 'unreachable-label'
+  /** A part with an entry of its own is in the page and its entry was never imported, so it does nothing. */
+  | 'unregistered-part'
   /** A QR code holds a logo at a correction level below `H`, so it may not scan. */
   | 'unscannable-logo'
   /** A virtualized list's box has no height of its own, so its window never settles. */
