@@ -102,6 +102,14 @@ export interface FloatingOptions {
   anchor: () => HTMLElement | null | undefined
 
   /**
+   * How far to slide the floating element along the side it is placed on, in
+   * pixels: rightward on the top or the bottom, downward on the left or the
+   * right, and toward the end of the line where the placement names `-end`.
+   * Floating UI's `crossAxis` offset, React Aria's `crossOffset`.
+   */
+  crossOffset?: number | (() => number)
+
+  /**
    * An element to point at the anchor, positioned against whichever side the
    * floating element landed on.
    */
@@ -109,6 +117,14 @@ export interface FloatingOptions {
 
   /** The element being placed. */
   floating: () => HTMLElement | null | undefined
+
+  /**
+   * How close to the window's edges the floating element may come, in
+   * pixels, when it slides or is capped to fit, and, where it is given, when
+   * it flips. Defaults to 8 for the first two and none for flipping. React
+   * Aria's `containerPadding`, Radix's `collisionPadding`.
+   */
+  padding?: number | (() => number | undefined)
 
   /**
    * Whether to try another side when the preferred one does not fit.
@@ -344,7 +360,17 @@ export class FloatingController implements ReactiveController {
       typeof this.options.placement === 'function'
         ? this.options.placement()
         : this.options.placement
-    const middleware: Middleware[] = [offset(gap ?? 0)]
+    const cross =
+      typeof this.options.crossOffset === 'function'
+        ? this.options.crossOffset()
+        : (this.options.crossOffset ?? 0)
+    const asked =
+      typeof this.options.padding === 'function' ? this.options.padding() : this.options.padding
+    const margin = asked ?? 8
+    /* Flipping keeps no margin unless one was asked for, which is how every
+       surface here has always flipped; sliding and capping keep eight. */
+    const edge = asked === undefined ? {} : { padding: asked }
+    const middleware: Middleware[] = [offset({ crossAxis: cross, mainAxis: gap ?? 0 })]
     let room: number | undefined
     if (this.options.flip !== false) {
       const side = (preferred ?? 'bottom-start').split('-')[0]
@@ -382,14 +408,14 @@ export class FloatingController implements ReactiveController {
       middleware.push(
         flip(
           side === 'left' || side === 'right'
-            ? { crossAxis: 'alignment', fallbackAxisSideDirection: 'end' }
-            : {},
+            ? { crossAxis: 'alignment', fallbackAxisSideDirection: 'end', ...edge }
+            : edge,
         ),
       )
     }
     if (this.options.shift !== false) {
       const inside = this.options.within?.()
-      middleware.push(shift({ padding: 8, ...(inside ? { boundary: inside } : {}) }))
+      middleware.push(shift({ padding: margin, ...(inside ? { boundary: inside } : {}) }))
     }
     if (this.options.resize !== false) {
       middleware.push(
@@ -423,7 +449,7 @@ export class FloatingController implements ReactiveController {
               `${matchedInlineSize(rects.reference.width, availableWidth)}px`,
             )
           },
-          padding: 8,
+          padding: margin,
         }),
       )
     }

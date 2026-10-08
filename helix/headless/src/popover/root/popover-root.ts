@@ -9,6 +9,7 @@ import {
   FocusScopeController,
   HelixElement,
   headingIn,
+  lockScroll,
   MixinControllerOpen,
   OpenPhaseController,
   type Placement,
@@ -17,6 +18,7 @@ import {
   type Side,
   sideOf,
   tellDisclosure,
+  unlockScroll,
   words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -56,8 +58,12 @@ import { hideOutside } from '../hide-outside.js'
  * `modal` keeps `Tab` inside the panel while it is open and says so with
  * `aria-modal`, for a panel that has to be answered before the page goes on.
  * The rest of the page is hidden from screen readers with `aria-hidden` while
- * it is open, so the virtual cursor stays in the panel too. Without it the
- * popover does not trap focus.
+ * it is open, so the virtual cursor stays in the panel too, and the page does
+ * not scroll behind it. Without it the popover does not trap focus.
+ *
+ * A press outside closes the panel and leaves focus where the press put it.
+ * Where it put focus nowhere, as a press on text or on the page's background
+ * does, focus goes back to the trigger.
  *
  * The panel's name is `label` when you set it. Otherwise it is the first
  * heading in the panel, or the elements an `aria-labelledby` on the host names.
@@ -73,10 +79,16 @@ import { hideOutside } from '../hide-outside.js'
  * | Escape | Closes the panel and puts focus back on the trigger. |
  * | Tab, Shift+Tab | Moves through the controls in the panel. Leaving the panel and the trigger closes it. With `modal`, moves from the last control round to the first and from the first round to the last. |
  *
+ * The panel opens against the trigger, or against the element `anchor` names,
+ * such as a field beside the button that opens it. `offset` moves it away from
+ * that element, `cross-offset` slides it along the side it is on, and
+ * `container-padding` keeps it that far from the window's edges.
+ *
  * `arrow` draws a point on the panel's edge facing the trigger. The side the
- * panel landed on is on the host as `:state(placed-top)` and its kin, and the
- * trigger's width is on the panel as `--floating-anchor-inline-size`, for a
- * panel as wide as its trigger:
+ * panel landed on is on the host as `:state(placed-top)` and its kin, its
+ * alignment along that side as `:state(aligned-start)` or
+ * `:state(aligned-end)`, and the trigger's width is on the panel as
+ * `--floating-anchor-inline-size`, for a panel as wide as its trigger:
  *
  * ```css
  * helix-popover::part(popover) {
@@ -108,6 +120,8 @@ import { hideOutside } from '../hide-outside.js'
  * @cssproperty --floating-anchor-inline-size - The trigger's width, written on the panel while it is open, as in `min-inline-size: var(--floating-anchor-inline-size)`. Read it; a value set here is written over.
  * @cssproperty --floating-available-block-size - The room between the panel and the edge of the screen it opens toward, written on the panel while it is open. Read it; a value set here is written over.
  *
+ * @cssstate aligned-end - While the panel is aligned to the end of the side it sits on.
+ * @cssstate aligned-start - While the panel is aligned to the start of the side it sits on.
  * @cssstate entering - From the moment the panel shows until its entrance has finished.
  * @cssstate exiting - From the moment the panel hides until its exit has finished.
  * @cssstate open - While the popover is open.
@@ -123,6 +137,31 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
    * `registerWords('de', { 'helix-popover': { fallbackLabel: 'Popup' } })`.
    */
   static words = 'helix-popover'
+
+  /**
+   * The element the panel opens against, where that is not the trigger: its
+   * `id` in the same document or shadow root, or the element itself. Left
+   * empty, the panel opens against the trigger, or against the button whose
+   * command opened it.
+   */
+  @property()
+  anchor: Element | string = ''
+
+  /**
+   * How close to the window's edges the panel may come, in pixels, when it
+   * slides, shrinks or moves to the other side to fit. Left unset, it slides
+   * and shrinks to 8 pixels from an edge and moves to the other side only
+   * once it would cross one.
+   */
+  @property({ attribute: 'container-padding', type: Number })
+  containerPadding?: number
+
+  /**
+   * How far to slide the panel along the side it is on, in pixels: to the
+   * right on the top or the bottom, and down on the left or the right.
+   */
+  @property({ attribute: 'cross-offset', type: Number })
+  crossOffset = 0
 
   /**
    * Draws a point on the panel's edge facing the trigger.
@@ -194,7 +233,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   })
 
   private readonly panel = new PopoverController(this, {
-    anchor: () => this.trigger,
+    anchor: () => this.placedAgainst,
     arrow: () => this.partNamed('arrow'),
     /* The host *and* whatever invoked it, never the panel alone. An outside
        press is measured against this, and the host is not a box to rely on, a
@@ -204,15 +243,18 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
        give it: pressing it while the panel is open should close it once, not
        close it on `pointerdown` and reopen it on the `click` that follows. */
     boundary: (): (HTMLElement | undefined)[] => [this, this.invoker],
+    crossOffset: () => this.crossOffset,
     /* Measured to the point where there is one, as `Tooltip` measures it: the
        arrow is a square turned on its center, which reaches `n / sqrt(2)` past
        the edge it sits on. */
     offset: () => this.offset + arrowReach(this.partNamed('arrow')),
-    onDismiss: () => this.hide(),
+    onDismiss: () => this.dismiss(),
     /* The side the panel landed on, for a sheet outside that draws by side,
        where no attribute can follow `::part()`. As `Tooltip` records it. */
     onPlace: (placement) => {
       const side = sideOf(placement)
+      this.toggleState('aligned-end', placement.endsWith('-end'))
+      this.toggleState('aligned-start', placement.endsWith('-start'))
       this.toggleState('placed-bottom', side === 'bottom')
       this.toggleState('placed-left', side === 'left')
       this.toggleState('placed-right', side === 'right')
@@ -220,6 +262,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
       this.side = side
     },
     open: () => this.open,
+    padding: () => this.containerPadding,
     placement: () => this.placement,
     surface: () => this.partNamed('popover'),
   })
@@ -302,6 +345,18 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   })
 
   /** The element the panel opens against. */
+  private get placedAgainst(): HTMLElement {
+    /* `anchor` first, which a consumer asked for by name. */
+    const named =
+      typeof this.anchor === 'string'
+        ? this.anchor === ''
+          ? null
+          : (this.getRootNode() as Document | ShadowRoot).getElementById?.(this.anchor)
+        : this.anchor
+    return named instanceof HTMLElement ? named : this.trigger
+  }
+
+  /** The element that opened the panel, which focus goes back to. */
   private get trigger(): HTMLElement {
     /* The invoker first, where there is one: a command names the element the
        reader actually pressed, and it is a better anchor than a slotted trigger
@@ -310,6 +365,30 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
       this.invoker ??
       anchorElement(this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]'), this)
     )
+  }
+
+  /**
+   * A press outside, or Escape, closing the panel.
+   *
+   * **Focus goes back to the trigger where the press put it nowhere.** The
+   * press is heard on `pointerdown`, and the browser moves focus a moment
+   * later: onto what was pressed where that takes focus, and to the body where
+   * it does not. A popover dismissed by a press on text was left with focus on
+   * the body, measured in Chromium, where React Aria's returns it to the
+   * trigger. Read after the press, once the browser has moved it.
+   */
+  private dismiss(): void {
+    const inside = this.focusInside
+    this.hide()
+    if (!inside) {
+      return
+    }
+    setTimeout(() => {
+      const active = deepActiveElement()
+      if (!this.open && (active === null || active === document.body)) {
+        this.trigger.focus()
+      }
+    })
   }
 
   /** Opens the panel. */
@@ -475,6 +554,14 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     } else if (!hide && this.showOutside) {
       this.showOutside()
       this.showOutside = undefined
+    }
+    /* And holds the page still, as `Dialog` does and React Aria's modal
+       popover does: a wheel over the page moved it under a panel the reader
+       had to answer first. */
+    if (hide) {
+      lockScroll(this)
+    } else {
+      unlockScroll(this)
     }
   }
 
