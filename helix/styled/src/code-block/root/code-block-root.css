@@ -278,6 +278,12 @@
   padding: var(--helix-space-xs);
 }
 
+/* An icon slotted before the expand button's words. */
+::slotted([slot="expand-icon"]) {
+  margin-inline-end: var(--helix-space-xs);
+  vertical-align: middle;
+}
+
 [part="expand"]:hover {
   color: var(--helix-color-foreground);
 }
@@ -309,7 +315,7 @@
 /* The band behind a run of marked lines, placed by the block where the lines
    are laid out, and drawn behind the code: the code is its own stacking
    context, so a band below zero paints over its ground and under its text. */
-[part="mark"] {
+[part~="mark"] {
   background-color: var(
     --code-block-mark-color,
     color-mix(in oklab, var(--helix-color-primary) 12%, transparent)
@@ -324,6 +330,26 @@
   pointer-events: none;
   position: absolute;
   z-index: var(--helix-layer-beneath);
+}
+
+/* Lines `added-lines` and `removed-lines` mark, in the colors a diff gives
+   its added and removed lines. */
+[part~="mark-added"] {
+  background-color: color-mix(
+    in oklab,
+    var(--code-block-added-color, var(--helix-color-success)) 14%,
+    transparent
+  );
+  border-inline-start-color: var(--code-block-added-color, var(--helix-color-success));
+}
+
+[part~="mark-removed"] {
+  background-color: color-mix(
+    in oklab,
+    var(--code-block-removed-color, var(--helix-color-danger)) 14%,
+    transparent
+  );
+  border-inline-start-color: var(--code-block-removed-color, var(--helix-color-danger));
 }
 
 /* The numbers beside the code, level with its lines: the gutter is in the same
