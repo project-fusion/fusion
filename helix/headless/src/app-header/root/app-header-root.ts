@@ -259,11 +259,11 @@ export class HelixHeadlessAppHeader extends MixinControllerOpen(HelixElement) {
     }
   }
 
-  /** Whether the bar is out of the way, under `hide-on-scroll`. */
-  private away = false
-
   /** Where the page was last scrolled to, to tell down from up. */
   private lastY = 0
+
+  /** Whether the bar is out of the way, under `hide-on-scroll`. */
+  private away = false
 
   /** Shows a hidden bar again when focus moves into it. */
   private readonly handleFocusIn = (): void => {
