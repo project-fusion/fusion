@@ -33,6 +33,56 @@ const menu = async (
     `<helix-headless-menu label="Actions"><button slot="trigger">Open</button>${rows}</helix-headless-menu>`,
   )) as Menu
 
+/* React Aria's `selectedKeys` and `onSelectionChange`: the choices read and
+   set in one place, and one event as a reader changes them. */
+describe('the checked rows in one place', () => {
+  const choices = async (): Promise<Menu & { checkedValues: string[] }> =>
+    (await mount(
+      `<helix-headless-menu label="View"><button slot="trigger">View</button>
+        <helix-headless-menu-item value="wrap" checkable checked>Word wrap</helix-headless-menu-item>
+        <helix-headless-menu-item value="small" exclusive checked>Small</helix-headless-menu-item>
+        <helix-headless-menu-item value="large" exclusive>Large</helix-headless-menu-item>
+        <helix-headless-menu-item value="close">Close</helix-headless-menu-item>
+      </helix-headless-menu>`,
+    )) as Menu & { checkedValues: string[] }
+
+  test('`checkedValues` reads the checked rows and sets exactly those', async () => {
+    const host = await choices()
+    expect(host.checkedValues).toEqual(['wrap', 'small'])
+    host.checkedValues = ['large']
+    const row = (value: string) =>
+      host.querySelector(`[value="${value}"]`) as HTMLElement & { checked: boolean }
+    expect(row('wrap').checked).toBe(false)
+    expect(row('small').checked).toBe(false)
+    expect(row('large').checked).toBe(true)
+  })
+
+  test('a reader’s choice sends `change` once, and a command sends none', async () => {
+    const host = await choices()
+    host.open = true
+    await host.updateComplete
+    let heard = 0
+    host.addEventListener('change', () => {
+      heard += 1
+    })
+    const press = async (value: string): Promise<void> => {
+      const row = host.querySelector(`[value="${value}"]`) as HTMLElement & {
+        updateComplete: Promise<unknown>
+      }
+      await row.updateComplete
+      ;(row.shadowRoot?.querySelector('[part="item"]') as HTMLElement).click()
+      await host.updateComplete
+    }
+    await press('large')
+    expect(heard).toBe(1)
+    expect(host.checkedValues).toEqual(['wrap', 'large'])
+    host.open = true
+    await host.updateComplete
+    await press('close')
+    expect(heard).toBe(1)
+  })
+})
+
 /* Data Table's and Web Awesome's status slots: the empty and loading lines
    take content of a page's own, with the text as the fallback. */
 describe('the empty and loading lines', () => {
