@@ -5,6 +5,9 @@
 **Building.** Phase 0 is done: the domain, the packages, and the release lane.
 Phase 1 is underway: `proof test` and `proof update` picture HTML files and
 compare them with their baselines, and `proof compare` compares two PNG files.
+Fusion runs it on every Helix example: `check:spec:visual` and `visual:update`
+are `proof test` and `proof update` with the root
+[proof.config.ts](../proof.config.ts).
 What each later phase adds is the roadmap in
 [cli/npm/README.md](cli/npm/README.md), the page npm shows.
 
