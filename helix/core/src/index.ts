@@ -308,6 +308,7 @@ export {
 } from './events/events.js'
 export { HelixElement, whenHydrated } from './helix-element/helix-element.js'
 export { HelixFormElement } from './helix-form-element/helix-form-element.js'
+export { HelixFormElementBase } from './helix-form-element/helix-form-element-base.js'
 export {
   MixinChartSource,
   type MixinChartSourceInterface,

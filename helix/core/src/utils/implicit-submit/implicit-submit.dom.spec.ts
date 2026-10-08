@@ -17,6 +17,9 @@ beforeAll(async () => {
   registerDom()
   const { html } = await import('lit')
   const { HelixFormElement } = await import('../../helix-form-element/helix-form-element.js')
+  const { HelixFormElementBase } = await import(
+    '../../helix-form-element/helix-form-element-base.js'
+  )
   ;({ defaultButton, submitImplicitly, submits, submitsOnEnter } = await import(
     './implicit-submit.js'
   ))
@@ -32,9 +35,11 @@ beforeAll(async () => {
       }
     },
   )
+  /* On the base a Button extends, which reports no verdict of its own and is
+     still the form's default button. */
   customElements.define(
     'probe-submit-button',
-    class extends HelixFormElement {
+    class extends HelixFormElementBase {
       protected override get submitsForm(): boolean {
         return true
       }
