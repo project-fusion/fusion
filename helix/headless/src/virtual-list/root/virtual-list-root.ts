@@ -21,6 +21,7 @@ import {
   typesCharacter,
   VIRTUAL_RULE,
   VirtualizeController,
+  Waterfall,
   words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, render, type TemplateResult } from 'lit'
@@ -78,6 +79,9 @@ const nextSectionId = (): string => {
 /** The rows in the tree: the list's children, or a section's in a list with sections. */
 const ROWS = ':scope > [data-index], :scope > [data-section] > [data-index]'
 
+/** The start of the name of the slot each line of a grid is drawn in. */
+const LINE = 'helix-line-'
+
 /**
  * @summary A list that renders only the rows of a long set that are on screen.
  *
@@ -108,6 +112,32 @@ const ROWS = ':scope > [data-index], :scope > [data-section] > [data-index]'
  * smallest item size, and follows the box as it resizes. `gap` spaces the rows, and the columns
  * of a grid, by a number of pixels the list counts in each row's place.
  *
+ * A grid without `selection-mode` is a grid to a reader, as the APG's grid
+ * and React Aria's grid list are: the box is a `grid` with `aria-rowcount`
+ * and `aria-colcount`, each line drawn is a `row` with `aria-rowindex`, and
+ * each item a `gridcell` with `aria-colindex`. Each line is a slot of the
+ * list's own, so your rows stay its children: give an item one element. With
+ * `selection-mode` it stays a list box of options, as React Aria's list box
+ * in a grid layout does.
+ *
+ * **A waterfall.** `layout="waterfall"` puts each item, in the order of the
+ * set, under the column that ends highest so far, the leftmost of a tie, as a
+ * wall of photos of different heights is, and as React Aria's waterfall
+ * layout and TanStack Virtual's lanes do. `columns`, or `min-column-width`,
+ * says how many columns. Every item is measured, at the width of its column,
+ * and placed at its column and its height, so items of any height leave no
+ * holes. The list draws the items that reach into the box, and the item
+ * holding focus. A reader hears a list, or a list box, in the order of the
+ * set, which is also the order Tab and a screen reader's own keys take.
+ *
+ * In a waterfall, Down and Up move along the column to the next or the
+ * previous item in it, Right and Left move to the next or the previous
+ * column, to the item there that sits beside this one the most, or the
+ * nearest above where none does, and Page Down and Page Up move a box down
+ * or up the column. Home and End go to the first and the last item of the
+ * set, and Shift with a key takes in the items between in the order of the
+ * set.
+ *
  * **Across.** `orientation="horizontal"` lays the items out along a line and
  * scrolls it sideways, as a strip of cards does, windowed the same way:
  * `estimate` is then an item's width, and the box needs an inline size.
@@ -126,10 +156,11 @@ const ROWS = ':scope > [data-index], :scope > [data-section] > [data-index]'
  *
  * | Key | What it does |
  * |---|---|
- * | Down, Up | Moves to the next or the previous item, or in a grid to the item in the same column on the next or the previous line. |
- * | Right, Left | In a grid, moves to the next or the previous item along the line, the other way round on a right-to-left page. In a list that runs across, moves to the next or the previous item the same way, and Down and Up are left to the row. |
- * | Home, End | Moves to the first or the last item. |
- * | Page Down, Page Up | Moves by the number of items, or of lines in a grid, on screen. |
+ * | Down, Up | Moves to the next or the previous item, or in a grid to the item in the same column on the next or the previous line, or in a waterfall to the next or the previous item down the same column. |
+ * | Right, Left | In a grid, moves to the next or the previous item along the line, the other way round on a right-to-left page. In a waterfall, moves to the item beside in the next or the previous column. In a list that runs across, moves to the next or the previous item the same way, and Down and Up are left to the row. |
+ * | Home, End | Moves to the first or the last item. In a grid without `selection-mode`, to the first or the last item of the line. |
+ * | Control or Command with Home or End | In a grid without `selection-mode`, moves to the first or the last item. |
+ * | Page Down, Page Up | Moves by the number of items, or of lines in a grid, on screen, or in a waterfall a box down or up the column. |
  * | A letter or a word | Moves to the next item whose text starts with what you typed. |
  * | Escape | Lets go of every chosen item, in a list with `selection-mode`. |
  * | Alt with Up or Down | In a `reorderable` list, moves the item a place. Alt with Home or End moves it to either end. |
@@ -144,8 +175,9 @@ const ROWS = ':scope > [data-index], :scope > [data-section] > [data-index]'
  * or the item itself when it is a string or a number.
  *
  * Each row says its place in the whole set with `aria-posinset` and
- * `aria-setsize`, so a screen reader says "4,000 of 10,000". The row holding
- * focus stays drawn when it scrolls out.
+ * `aria-setsize`, so a screen reader says "4,000 of 10,000", and each cell of
+ * a grid its line and its column. The row holding focus stays drawn when it
+ * scrolls out.
  *
  * **Selecting.** `selection-mode` makes the list a list box a reader chooses
  * from: `single` selects one item and `multiple` any number. Space or a press
@@ -267,6 +299,17 @@ export class HelixHeadlessVirtualList extends HelixElement {
    */
   @property({ type: Number })
   columns = 1
+
+  /**
+   * How items of more than one column are laid out. `grid`, the default, puts
+   * them in lines of equal columns. `waterfall` puts each item, in the order
+   * of the set, under the column that ends highest, as a wall of photos of
+   * different heights is: `columns`, or `min-column-width`, says how many
+   * columns. Rows of a waterfall are measured, and Up and Down move along a
+   * column.
+   */
+  @property()
+  layout: 'grid' | 'waterfall' = 'grid'
 
   /**
    * The keys of the items a reader cannot choose or move to, separated by
@@ -408,7 +451,8 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * with an arrow moves the row the keys are on, and a pointer drags a row.
    * The list moves no item itself: you move your `items` on `helix-reorder`.
    * Without that import it does nothing, so a list that never moves items
-   * carries none of the code. A list of one column, without sections.
+   * carries none of the code. A list of one column, without sections or a
+   * waterfall.
    */
   @property({ type: Boolean })
   reorderable = false
@@ -546,6 +590,10 @@ export class HelixHeadlessVirtualList extends HelixElement {
     horizontal: () => this.horizontal,
     measured: () => this.measured,
     rows: () => this.lines(),
+    waterfall: () => {
+      this.lanes.lanes = this.columnCount
+      return this.waterfall ? this.lanes : undefined
+    },
   })
 
   /**
@@ -563,11 +611,42 @@ export class HelixHeadlessVirtualList extends HelixElement {
     return Number.isFinite(this.gap) && this.gap > 0 ? this.gap : 0
   }
 
+  /** Where each item of a waterfall stands, which the controller places. */
+  private readonly lanes = new Waterfall()
+
+  /** Whether the items are laid out as a waterfall, each down a column. */
+  private get waterfall(): boolean {
+    return this.layout === 'waterfall'
+  }
+
   /**
-   * How many items a line holds: as many as fit at `min-column-width` where
-   * it is set and the box has a width, and `columns` otherwise, at least one.
+   * Whether the list is a grid a reader reads, and not a list box: lines of
+   * columns with no `selection-mode`, which are `grid`, `row` and `gridcell`
+   * to a reader, as the APG's grid and React Aria's grid list are.
+   */
+  private get lined(): boolean {
+    return (
+      !this.selectionMode &&
+      !this.waterfall &&
+      !this.horizontal &&
+      this.sections === undefined &&
+      (this.across > 1 || this.minColumnWidth > 0)
+    )
+  }
+
+  /**
+   * How many items a line holds, which a waterfall draws one at a time: its
+   * columns are not lines.
    */
   private get across(): number {
+    return this.waterfall ? 1 : this.columnCount
+  }
+
+  /**
+   * How many columns there are: as many as fit at `min-column-width` where
+   * it is set and the box has a width, and `columns` otherwise, at least one.
+   */
+  private get columnCount(): number {
     if (this.minColumnWidth > 0 && this.boxWidth > 0) {
       const space = this.space
       return Math.max(1, Math.floor((this.boxWidth + space) / (this.minColumnWidth + space)))
@@ -582,13 +661,20 @@ export class HelixHeadlessVirtualList extends HelixElement {
   /** Watches the box's width, for `min-column-width`. */
   private widthWatch: ResizeObserver | undefined
 
-  /** The items to a line the measurements were taken at. */
-  private measuredAcross = 1
+  /** The items to a line the measurements were taken at, or a waterfall's columns and width. */
+  private measuredAcross: number | string = 1
 
-  /** Watches the box for its width while `min-column-width` asks for it. */
+  /**
+   * Watches the box for its width while `min-column-width` asks for it, or a
+   * waterfall, whose items are as tall as their width makes them.
+   */
   private watchWidth(): void {
     const viewport = this.partNamed('viewport')
-    if (this.minColumnWidth <= 0 || !viewport || typeof ResizeObserver === 'undefined') {
+    if (
+      (this.minColumnWidth <= 0 && !this.waterfall) ||
+      !viewport ||
+      typeof ResizeObserver === 'undefined'
+    ) {
       this.widthWatch?.disconnect()
       this.widthWatch = undefined
       return
@@ -619,9 +705,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
     return sections ? entryOf(sections, at) : Math.floor(at / this.across)
   }
 
-  /** Whether the list runs across, which a grid never does. */
+  /** Whether the list runs across, which a grid and a waterfall never do. */
   private get horizontal(): boolean {
-    return this.orientation === 'horizontal' && this.across === 1
+    return this.orientation === 'horizontal' && this.across === 1 && !this.waterfall
   }
 
   /** The sections and the items they were read from, kept until either changes. */
@@ -630,7 +716,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
   /** The sections `section-field` divides the items into, in a list of one column. */
   private get sections(): Sections | undefined {
     const data = this.data
-    if (this.sectionField === '' || data.length === 0 || this.across !== 1) {
+    if (this.sectionField === '' || data.length === 0 || this.columnCount !== 1 || this.waterfall) {
       return undefined
     }
     const read = this.sectionsRead
@@ -736,7 +822,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
        `updated` alone. */
     /* A line holds a different number of items now, so every line measured
        held others. */
-    const across = this.across
+    /* A waterfall's items are as tall as their width makes them, so a new
+       width or a new number of columns measures them all again. */
+    const across = this.waterfall ? `${this.columnCount} ${this.boxWidth}` : this.across
     if (across !== this.measuredAcross) {
       this.measuredAcross = across
       this.virtualize.forget()
@@ -1030,7 +1118,11 @@ export class HelixHeadlessVirtualList extends HelixElement {
       }
     }
     const extend = event.shiftKey && this.selectionMode === 'multiple'
-    if (event.altKey || (toggle && !replacing) || (event.shiftKey && !extend)) {
+    const ends = event.key === 'Home' || event.key === 'End'
+    /* In a grid, Home and End keep to the line, and Control or Command with
+       them goes to either end of the set, as the APG's grid does. */
+    const lined = this.lined
+    if (event.altKey || (toggle && !replacing && !(lined && ends)) || (event.shiftKey && !extend)) {
       return
     }
     const count = this.data.length
@@ -1047,14 +1139,21 @@ export class HelixHeadlessVirtualList extends HelixElement {
           : event.key === 'ArrowDown' || event.key === 'ArrowUp'
             ? ''
             : event.key
-    const stepped = stepIndex(key, at, count, last - first - 1, {
-      across: this.across,
-      forward,
-    })
+    const disabled = (one: number): boolean => this.isDisabled(one)
+    const across = this.across
+    const start = at - (at % across)
+    const stepped =
+      lined && ends && !toggle
+        ? key === 'Home'
+          ? start
+          : Math.min(start + across, count) - 1
+        : this.waterfall && !ends
+          ? this.inWaterfall(key, at, count, forward)
+          : stepIndex(key, at, count, last - first - 1, { across, forward })
     const next =
       stepped === undefined
         ? undefined
-        : skipDisabled(key, at, stepped, count, (one) => this.isDisabled(one), this.across)
+        : skipDisabled(key, at, stepped, count, disabled, this.waterfall ? 1 : across)
     if (next === undefined) {
       if (stepped !== undefined) {
         event.preventDefault()
@@ -1069,6 +1168,25 @@ export class HelixHeadlessVirtualList extends HelixElement {
     } else if (replacing && !toggle) {
       this.press(next)
     }
+  }
+
+  /**
+   * Where a key goes in a waterfall, through the columns `Waterfall.step`
+   * reads: along the column for Down, Up, Page Down and Page Up, and to the
+   * item beside in the next column or the one before for the keys along the
+   * line, the other way round on a right-to-left page. Past a disabled item,
+   * on the same way.
+   */
+  private inWaterfall(key: string, at: number, count: number, forward: string): number | undefined {
+    const way =
+      key === forward ? 'next' : key === 'ArrowLeft' || key === 'ArrowRight' ? 'previous' : key
+    const box = this.partNamed('viewport')
+    let to = this.lanes.step(way, at, count, box?.clientHeight ?? 0)
+    const again = way === 'PageDown' ? 'ArrowDown' : way === 'PageUp' ? 'ArrowUp' : way
+    while (to !== undefined && this.isDisabled(to)) {
+      to = this.lanes.step(again, to, count, 0)
+    }
+    return to
   }
 
   /** The key of item `at` in `value`. See `keyField`. */
@@ -1270,9 +1388,12 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   /**
    * Writes a row's role, and whether it is chosen in a list that selects:
-   * `option` with `aria-selected` there, and `listitem` otherwise, and
-   * `aria-disabled` on an item `disabled-keys` names. Every pass,
-   * since a choice changes no row's content.
+   * `option` with `aria-selected` there, `gridcell` in a grid, and `listitem`
+   * otherwise, and `aria-disabled` on an item `disabled-keys` names. Every
+   * pass, since a choice changes no row's content.
+   *
+   * Its place too: `aria-posinset` and `aria-setsize` in a list, and in a
+   * grid its column, with the line's `row` given by the slot it is drawn in.
    *
    * `data-selected` and `data-disabled` say the same to a stylesheet, as
    * React Aria's rows do, so one rule reads the same in either kind of list.
@@ -1283,7 +1404,24 @@ export class HelixHeadlessVirtualList extends HelixElement {
     chosen: ReadonlySet<string>,
     off: ReadonlySet<string>,
   ): void {
-    element.setAttribute('role', this.selectionMode ? 'option' : 'listitem')
+    const lined = this.lined
+    element.setAttribute('role', this.selectionMode ? 'option' : lined ? 'gridcell' : 'listitem')
+    /* In a grid a cell is drawn in its line's slot, which the line's `row`
+       holds, so the cell is the row's to a reader and still this list's
+       child to a stylesheet. */
+    const across = this.across
+    for (const [name, value] of [
+      ['aria-colindex', lined ? (at % across) + 1 : undefined],
+      ['aria-posinset', lined ? undefined : at + 1],
+      ['aria-setsize', lined ? undefined : this.data.length],
+      ['slot', lined ? `${LINE}${Math.floor(at / across)}` : undefined],
+    ] as const) {
+      if (value === undefined) {
+        element.removeAttribute(name)
+      } else {
+        element.setAttribute(name, String(value))
+      }
+    }
     const selected = Boolean(this.selectionMode) && chosen.has(this.keyAt(at))
     if (this.selectionMode) {
       element.setAttribute('aria-selected', String(selected))
@@ -1300,14 +1438,15 @@ export class HelixHeadlessVirtualList extends HelixElement {
     element.toggleAttribute('data-disabled', disabled)
   }
 
-  /** Writes a row's place in the set. */
+  /**
+   * Writes which item a row drew, for the controller to measure it against:
+   * the real index, the same one `aria-posinset` carries one higher.
+   *
+   * `mark` writes the place a reader hears from it, the real index and the
+   * real total, not the position in the window. A reader arrowing through
+   * this should hear where they are in the set.
+   */
   private stamp(element: Element, at: number): void {
-    /* The real index and the real total, not the position in the window. A
-       reader arrowing through this should hear where they are in the set. */
-    element.setAttribute('aria-posinset', String(at + 1))
-    element.setAttribute('aria-setsize', String(this.data.length))
-    /* Which item this drew, for the controller to measure it against. The
-       real index, the same one `aria-posinset` carries one higher. */
     element.setAttribute('data-index', String(at))
   }
 
@@ -1391,16 +1530,18 @@ export class HelixHeadlessVirtualList extends HelixElement {
       this.partNamed<HTMLElement>('after')?.style.setProperty(size, `${spacers.after}px`)
     }
     const sections = this.sections
-    /* Every row is drawn again into its section when the sections change. */
-    const regroup = sections !== this.placedSections
+    /* Every row is drawn again into its section when the sections change,
+       and out of its place in a waterfall when the list stops being one. */
+    const regroup = sections !== this.placedSections || this.waterfall !== this.placedWaterfall
     this.placedSections = sections
+    this.placedWaterfall = this.waterfall
     /* A child given a slot of its own, such as `loading`, is the consumer's. */
     const children = [
       ...[...this.children].filter(
         (child): child is HTMLElement =>
           child !== template &&
           child instanceof HTMLElement &&
-          !child.hasAttribute('slot') &&
+          (child.dataset.index !== undefined || !child.hasAttribute('slot')) &&
           !child.hasAttribute('data-section'),
       ),
       ...this.querySelectorAll<HTMLElement>(':scope > [data-section] > [data-index]'),
@@ -1467,9 +1608,30 @@ export class HelixHeadlessVirtualList extends HelixElement {
     })
     const chosen = this.chosen
     const off = this.disabled
+    const lines = this.lined ? [...new Set(plan.wanted.map((at) => this.lineOf(at)))] : []
+    if (lines.join() !== this.drawnLines.join()) {
+      /* The render draws a `row` for each, and in `willUpdate` it is the
+         render about to run. */
+      this.drawnLines = lines
+      this.requestUpdate()
+    }
+    const gap = this.space
+    const columns = this.columnCount
     for (const [at, group] of drawn) {
       for (const element of group) {
         this.mark(element, at, chosen, off)
+        if (this.waterfall) {
+          /* At its column and as far down as the columns place it, the
+             width of a column, from the inline start of the set. */
+          const style = (element as HTMLElement).style
+          style.setProperty('position', 'absolute')
+          style.setProperty('inset-block-start', `${this.virtualize.offsetOf(at)}px`)
+          style.setProperty(
+            'inset-inline-start',
+            `calc((100% + ${gap}px) * ${this.lanes.lane(at)} / ${columns})`,
+          )
+          style.setProperty('inline-size', `calc((100% - ${gap * (columns - 1)}px) / ${columns})`)
+        }
       }
       const stop = at === this.active
       group[0]?.setAttribute('tabindex', stop ? '0' : '-1')
@@ -1499,6 +1661,12 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   /** The sections the rows were last placed in. */
   private placedSections: Sections | undefined
+
+  /** Whether the rows were last placed in a waterfall. */
+  private placedWaterfall = false
+
+  /** The lines of a grid drawn on the last pass, each a `row` the render draws a slot in. */
+  private drawnLines: number[] = []
 
   /** The function the drawn headers were drawn by, so a new one draws them again. */
   private headedBy: VirtualListSectionRenderer | undefined
@@ -1581,6 +1749,11 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * own room, and so do the headers drawn with their sections from outside it.
    */
   private spacerSizes(): { after: number; before: number } {
+    /* A waterfall's items stand where the columns put them, in a box as long
+       as the set, so nothing stands in for the others. */
+    if (this.waterfall) {
+      return { after: 0, before: 0 }
+    }
     const kept = this.hasUpdated ? this.keptIndex() : undefined
     const room = this.virtualize.spacers(kept === undefined ? undefined : this.lineOf(kept))
     const sections = this.sections
@@ -1615,6 +1788,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     const size = horizontal ? 'inline-size' : 'block-size'
     const flex = horizontal ? '; flex: none' : ''
     const gap = this.space
+    const grid = gap === 0 ? '' : `; gap: ${gap}px; padding-block-end: ${gap}px`
     /* Only once the browser has read the source, so a server and a list whose
        items are on their way say nothing about an empty set. `readFor` is set
        by the read in `willUpdate`, so the first render after it draws the row;
@@ -1624,10 +1798,18 @@ export class HelixHeadlessVirtualList extends HelixElement {
       !this.loading &&
       this.data.length === 0 &&
       (this.emptyLabel !== '' || this.querySelector(':scope > [slot="empty"]') !== null)
+    const lined = this.lined
+    /* A row of a list, or in a grid a line of one cell, for the two rows that
+       are not items. */
+    const own = (content: TemplateResult): TemplateResult =>
+      lined ? html`<div role="gridcell">${content}</div>` : content
+    const role = this.selectionMode ? 'option' : lined ? 'row' : 'listitem'
     return html`<div
       data-scroller
       part="viewport"
-      role=${this.selectionMode ? 'listbox' : 'list'}
+      role=${this.selectionMode ? 'listbox' : lined ? 'grid' : 'list'}
+      aria-colcount=${lined ? across : nothing}
+      aria-rowcount=${lined ? Math.ceil(this.data.length / across) : nothing}
       aria-multiselectable=${this.selectionMode === 'multiple' ? 'true' : nothing}
       aria-busy=${this.loading ? 'true' : nothing}
       aria-label=${this.label}
@@ -1639,21 +1821,41 @@ export class HelixHeadlessVirtualList extends HelixElement {
       }}
     >
       <div part="before" style="${size}: ${before}px${flex}"></div>
+      ${
+        /* A grid a reader reads draws a `row` for each line drawn, around the
+           slot its cells are drawn in. Each row is a subgrid of the columns,
+           so a line is as tall as its tallest cell, as before. */
+        lined
+          ? html`<div style=${`display: grid; grid-template-columns: repeat(${across}, minmax(0, 1fr))${grid}`}>
+              ${this.drawnLines.map(
+                (line) => html`<div
+                  aria-rowindex=${line + 1}
+                  role="row"
+                  style="display: grid; grid-column: 1 / -1; grid-template-columns: subgrid"
+                >
+                  <slot name=${`${LINE}${line}`}></slot>
+                </div>`,
+              )}
+            </div>`
+          : nothing
+      }
       <slot
         style=${
           /* A gap after the last drawn row as well, which the spacer below
-             counts as part of the row before it. */
-          horizontal
-            ? `display: flex; flex: none${
-                gap === 0 ? '' : `; column-gap: ${gap}px; padding-inline-end: ${gap}px`
-              }`
-            : across === 1
-              ? gap === 0
-                ? nothing
-                : `display: flex; flex-direction: column; row-gap: ${gap}px; padding-block-end: ${gap}px`
-              : `display: grid; grid-template-columns: repeat(${across}, minmax(0, 1fr))${
-                  gap === 0 ? '' : `; gap: ${gap}px; padding-block-end: ${gap}px`
+             counts as part of the row before it. A waterfall is as long as
+             its longest column, and its items stand in it where the columns
+             put them. */
+          this.waterfall
+            ? `display: block; position: relative; block-size: ${this.virtualize.extent() + this.virtualize.window.before}px`
+            : horizontal
+              ? `display: flex; flex: none${
+                  gap === 0 ? '' : `; column-gap: ${gap}px; padding-inline-end: ${gap}px`
                 }`
+              : across === 1 || lined
+                ? gap === 0
+                  ? nothing
+                  : `display: flex; flex-direction: column; row-gap: ${gap}px; padding-block-end: ${gap}px`
+                : `display: grid; grid-template-columns: repeat(${across}, minmax(0, 1fr))${grid}`
         }
       ></slot>
       <div part="after" style="${size}: ${after}px${flex}"></div>
@@ -1661,15 +1863,15 @@ export class HelixHeadlessVirtualList extends HelixElement {
         /* An item of the list that is not one of the set, so it carries no
            place in it, as React Aria's loading row does. */
         this.loading
-          ? html`<div part="loading" role=${this.selectionMode ? 'option' : 'listitem'}>
-              <slot name="loading">${this.loadingLabel}</slot>
+          ? html`<div part="loading" role=${role}>
+              ${own(html`<slot name="loading">${this.loadingLabel}</slot>`)}
             </div>`
           : nothing
       }
       ${
         empty
-          ? html`<div part="empty" role=${this.selectionMode ? 'option' : 'listitem'}>
-              <slot name="empty">${this.emptyLabel}</slot>
+          ? html`<div part="empty" role=${role}>
+              ${own(html`<slot name="empty">${this.emptyLabel}</slot>`)}
             </div>`
           : nothing
       }
