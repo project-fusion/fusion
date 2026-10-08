@@ -342,6 +342,21 @@ describe('what the form is told', () => {
     expect([...(formValue(host) as FormData).keys()]).toEqual(['second'])
   })
 
+  /* A native file input sends neither `input` nor `change` on
+     `form.reset()`, measured in Chromium, where this field sent both. */
+  test('a reset empties the field and sends no input or change', async () => {
+    const host = (await field('name="files"')) as InputFile & { formResetCallback(): void }
+    await choose(host, 'one.txt')
+    const heard: string[] = []
+    for (const type of ['input', 'change']) {
+      host.addEventListener(type, () => heard.push(type))
+    }
+    host.formResetCallback()
+    await host.updateComplete
+    expect(host.files).toEqual([])
+    expect(heard).toEqual([])
+  })
+
   test('and a required that is taken off', async () => {
     const host = (await field('required')) as InputFile & {
       required: boolean
