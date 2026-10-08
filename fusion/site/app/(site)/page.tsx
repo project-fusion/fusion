@@ -48,7 +48,7 @@ export default function Home() {
             and above the close. Scrolling travels along it. Strands is a Helix
             component, so the light behind the page is the product too. */}
         <helix-strands class={styles.reelStrands} travel>
-          <helix-strands-stop at={0.86} for="hero" variant="bend"></helix-strands-stop>
+          <helix-strands-stop at={0.9} for="hero-copy" variant="sweep"></helix-strands-stop>
           <helix-strands-stop for="proof" variant="waves"></helix-strands-stop>
           <helix-strands-stop for="close" variant="waves"></helix-strands-stop>
         </helix-strands>
