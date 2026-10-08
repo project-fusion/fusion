@@ -34,7 +34,7 @@ describe('what a group is called and how many it stands for', () => {
   test('it is an article of the feed holding a named feed, not a landmark per day', async () => {
     /* A feed owns articles and nothing else, so a group inside it is one, and
        its notifications the articles of a feed of their own, as the APG feed
-       pattern has them. As a list, the scorers' feed checks found no feed. */
+       pattern has them, so a screen reader's feed commands reach the rows. */
     const el = await group()
     expect(role(el)).toBe('article')
     const items = part(el, 'items') as HTMLElement
