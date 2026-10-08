@@ -33,6 +33,26 @@ const menu = async (
     `<helix-headless-menu label="Actions"><button slot="trigger">Open</button>${rows}</helix-headless-menu>`,
   )) as Menu
 
+/* Data Table's and Web Awesome's status slots: the empty and loading lines
+   take content of a page's own, with the text as the fallback. */
+describe('the empty and loading lines', () => {
+  test('are slots, with the text as their fallback', async () => {
+    const empty = (await mount(
+      `<helix-headless-menu label="Actions" empty-text="Nothing here"><button slot="trigger">Open</button></helix-headless-menu>`,
+    )) as Menu
+    empty.open = true
+    await empty.updateComplete
+    const slot = part(empty, 'empty')?.querySelector('slot[name="empty"]')
+    expect(slot?.textContent?.trim()).toBe('Nothing here')
+    const busy = (await mount(
+      `<helix-headless-menu label="Actions" loading><button slot="trigger">Open</button></helix-headless-menu>`,
+    )) as Menu
+    busy.open = true
+    await busy.updateComplete
+    expect(part(busy, 'loading')?.querySelector('slot[name="loading"]')).not.toBeNull()
+  })
+})
+
 describe('moving through a menu with the keyboard', () => {
   /* The arrow keys are a shared controller's business, and these say what the
      menu asks of it. */
