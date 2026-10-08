@@ -1,5 +1,11 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  mount,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 /**
  * A field showing a message says it is wrong, on the control a reader is on.
@@ -204,6 +210,72 @@ describe('a required field checked from a script', () => {
       expect(shown(host)).toBe(true)
     })
   }
+})
+
+/**
+ * A script that checks a whole form learns its verdict, and no field in it
+ * shows anything.
+ *
+ * `form.checkValidity()` fires `invalid` on every failing control, and the
+ * fields took that as a submission attempt: an untouched required Checkbox
+ * checked through its form turned `:state(invalid)` on and showed its message
+ * in an alert. A native required checkbox in the same form stays off
+ * `:user-invalid`, measured in Chromium. The field's own `checkValidity()`
+ * was quiet already; this is the call on the form, which the platform runs
+ * without asking the field.
+ *
+ * Across the shapes that listen for the attempt, in one form: the field
+ * mixin's controls, a group, the pickers' feedback mixin, and the chat
+ * composer. In the browser only: happy-dom's `form.checkValidity()` asks no
+ * form-associated custom element, so there the call fires nothing to judge.
+ */
+describe('a form checked from a script', () => {
+  beforeAll(async () => {
+    await Promise.all([
+      import('./chat/index.js'),
+      import('./checkbox-group/index.js'),
+      import('./date-picker/index.js'),
+    ])
+  })
+
+  const FIELDS = [
+    '<helix-headless-checkbox name="a" required>Accept</helix-headless-checkbox>',
+    '<helix-headless-checkbox-group label="Pick" required><helix-headless-checkbox value="x">X</helix-headless-checkbox></helix-headless-checkbox-group>',
+    '<helix-headless-chat-composer label="Message" required></helix-headless-chat-composer>',
+    '<helix-headless-color-input label="Color" name="c" required></helix-headless-color-input>',
+    '<helix-headless-combobox label="Fruit" name="f" required></helix-headless-combobox>',
+    '<helix-headless-date-picker label="Day" name="d" required></helix-headless-date-picker>',
+    '<helix-headless-input label="Name" name="n" required></helix-headless-input>',
+    '<helix-headless-time-input label="Start" name="t" required></helix-headless-time-input>',
+  ]
+
+  type Checked = Updatable & { checkValidity(): boolean }
+
+  ;(hasLayout() ? test : test.skip)(
+    'form.checkValidity() fires invalid on each field and marks none',
+    async () => {
+      const form = (await mount(`<form>${FIELDS.join('')}</form>`)) as unknown as HTMLFormElement
+      const hosts = [...form.children] as Checked[]
+      await Promise.all(hosts.map((host) => settle(host)))
+      const fired = new Set<Element>()
+      for (const host of hosts) {
+        host.addEventListener('invalid', () => fired.add(host))
+      }
+      expect(form.checkValidity()).toBe(false)
+      expect(fired.size).toBe(hosts.length)
+      await Promise.all(hosts.map((host) => settle(host)))
+      const marked = hosts
+        .filter((host) => {
+          const internals = (host as unknown as { internals: ElementInternals }).internals
+          return (
+            (internals.states as unknown as Set<string>).has('invalid') ||
+            internals.ariaInvalid === 'true'
+          )
+        })
+        .map((host) => host.localName)
+      expect(marked).toEqual([])
+    },
+  )
 })
 
 /**
