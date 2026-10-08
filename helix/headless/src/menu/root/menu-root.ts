@@ -118,6 +118,11 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * trigger's width, for a menu as wide as its trigger:
  * `helix-menu::part(surface) { min-inline-size: var(--floating-anchor-inline-size) }`.
  *
+ * **The choices in one place.** `checkedValues` holds the values of the rows
+ * that are checked, anywhere in the menu, and setting it checks exactly
+ * those rows, as React Aria's `selectedKeys` does. `change` is sent on the
+ * menu when a reader's choice changes it.
+ *
  * With `context`, the trigger is an area and the menu is its context menu: a
  * right-click, a long press, Shift+F10 or the menu key over the area opens it
  * at the pointer, or at the area's corner from the keyboard, as Radix's context
@@ -162,6 +167,7 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @event {HelixBeforeCloseEvent} helix-before-close - The menu is about to close. Cancelable: cancel it to keep it open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The menu is about to open. Cancelable: cancel it to keep it closed.
  * @event {HelixFilterEvent} helix-filter - The text in the filter field changed, with the new text in `detail.value`. Cancelable: cancel it to keep every row showing and narrow the rows yourself.
+ * @event {Event} change - A reader's choice checked or unchecked rows. Read `checkedValues` for the rows that are checked now.
  * @event {HelixSelectEvent} helix-select - An item was chosen. Cancelable: cancel it to keep the menu open.
  * @event {ToggleEvent} toggle - The menu opened or closed. The event carries `newState` and `oldState`.
  *
@@ -816,6 +822,48 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.updateComplete.then(() => this.reach(leaving ?? undefined))
   }
 
+  /** The choice rows anywhere in the menu, in document order. */
+  private get choiceRows(): HelixHeadlessMenuItem[] {
+    return [...this.querySelectorAll('*')].filter(
+      (node): node is HelixHeadlessMenuItem =>
+        isItem(node) && (node as HelixHeadlessMenuItem).choice,
+    )
+  }
+
+  /**
+   * The values of the choice rows that are checked, anywhere in the menu, in
+   * document order.
+   *
+   * Set it to check exactly those rows and uncheck every other choice row, as
+   * React Aria's `selectedKeys` controls a menu's selection from one place.
+   * Each row keeps its own `checked` too, which this reads and writes. `change`
+   * is sent on the menu when a reader's choice changes it.
+   */
+  get checkedValues(): string[] {
+    return this.choiceRows.filter((row) => row.checked).map((row) => row.value)
+  }
+
+  set checkedValues(values: readonly string[]) {
+    const wanted = new Set(values)
+    for (const row of this.choiceRows) {
+      row.checked = wanted.has(row.value)
+    }
+    this.toldChecked = this.checkedValues.join('\u0000')
+  }
+
+  /** The checked values `change` last said, joined, so a choice that moved nothing says nothing. */
+  private toldChecked: string | undefined
+
+  /** Sends `change` when a reader's choice has changed which rows are checked. */
+  private tellChecked(): void {
+    const now = this.checkedValues.join('\u0000')
+    const before = this.toldChecked
+    this.toldChecked = now
+    if (before !== undefined && before !== now) {
+      this.dispatchEvent(new Event('change', { bubbles: true }))
+    }
+  }
+
   private readonly handleSelect = (event: Event): void => {
     const item = event.target
     /* Under `flyout`, a row on any open panel, which a press can reach. */
@@ -826,6 +874,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
       return
     }
     const chosen = item as HelixHeadlessMenuItem
+    this.tellChecked()
     if (chosen.hasSubmenu) {
       // A row that opens a page has not chosen anything, so its select does not
       // leave this element: a consumer listening for a choice would otherwise
@@ -1229,6 +1278,11 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    /* What is checked as the menu opens, so the first choice after it is
+       compared with the rows as the reader found them. */
+    if (changed.has('open') && this.open) {
+      this.toldChecked = this.checkedValues.join('\u0000')
+    }
     // Every update, so a trigger slotted after the first render is told too.
     // An area a context menu opens over is no button and is told nothing.
     if (!this.context) {
