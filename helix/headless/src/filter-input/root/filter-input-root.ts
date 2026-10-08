@@ -684,6 +684,14 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    *
    * Everything else in the row is untouched: a plain `Tag`, or a chip for
    * something no `FilterField` declares, is the consumer's to answer.
+   *
+   * **Heard on the way down, in the capture phase**, because the chip is a
+   * child of this element and its request passes here before it reaches the
+   * chip's listeners or comes back up. Stopped there, no listener on the chip,
+   * on this element or above it hears it. Heard on the way up, `stopPropagation`
+   * kept it from the ancestors and not from this element's other listeners, so a
+   * consumer listening on the field heard `helix-dismiss` as well as the
+   * `helix-facet` that answered it.
    */
   private readonly handleDismiss = (event: Event): void => {
     const chip = event.composedPath()[0]
@@ -1027,13 +1035,13 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('helix-dismiss', this.handleDismiss)
+    this.addEventListener('helix-dismiss', this.handleDismiss, { capture: true })
     this.addEventListener(HelixFacetEvent.eventName, this.handleFacet)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-dismiss', this.handleDismiss)
+    this.removeEventListener('helix-dismiss', this.handleDismiss, { capture: true })
     this.removeEventListener(HelixFacetEvent.eventName, this.handleFacet)
   }
 

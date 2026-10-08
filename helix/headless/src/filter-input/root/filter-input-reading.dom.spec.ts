@@ -221,6 +221,32 @@ describe('a chip asking to go', () => {
     expect(menu.valuesFor('disposition')).toEqual([])
   })
 
+  /* The field's documented contract: such a chip sends `helix-facet` instead
+     of `helix-dismiss`. A listener on the field, added after it connected,
+     heard both, because the field took the request on its own host, where
+     `stopPropagation` keeps nothing from the host's other listeners. */
+  test('sends helix-facet and no helix-dismiss to a listener on the field', async () => {
+    const host = await mount()
+    const menu = (host as HTMLElement).querySelector('helix-headless-filter-menu') as unknown as {
+      apply: (field: string, values: readonly string[]) => boolean
+    }
+    menu.apply('disposition', ['refunded'])
+    const chip = await chipFor(host, 'disposition')
+    const heard = watch(host)
+    let dismissed = 0
+    const count = (): void => {
+      dismissed += 1
+    }
+    host.addEventListener('helix-dismiss', count)
+    document.addEventListener('helix-dismiss', count)
+
+    ;(chip as unknown as { dismiss: () => boolean }).dismiss()
+    await settle(host)
+    document.removeEventListener('helix-dismiss', count)
+    expect(heard).toHaveLength(1)
+    expect(dismissed).toBe(0)
+  })
+
   /* The bug this closes: the chip went and the menu did not hear, so the value
      stayed ticked and pressing it again *unticked* it. The reader pressed
      `Refunded` and nothing came back. */
