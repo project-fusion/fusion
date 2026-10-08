@@ -102,6 +102,18 @@ impl Project {
                         }),
                     ),
                     (
+                        "lint.json",
+                        json!({
+                            "package": "@fusion.dev/helix",
+                            "tags": {
+                                "helix-menu": { "attributes": {}, "family": "menu", "hooks": [], "parts": [], "written": [] },
+                                "helix-option": { "attributes": {}, "family": "option", "hooks": [], "parts": [], "written": [] },
+                                "helix-select": { "attributes": { "emphasis": ["ghost"] }, "family": "select", "hooks": [], "parts": [], "written": [] },
+                            },
+                            "version": "1.2.3",
+                        }),
+                    ),
+                    (
                         "examples.json",
                         json!({
                             "examples": {
@@ -394,7 +406,7 @@ fn every_tool_declares_an_output_schema_and_read_only_annotations() {
     let project = Project::helix("list");
     let replies = project.talk(&[json!({ "id": 1, "jsonrpc": "2.0", "method": "tools/list" })]);
     let tools = replies[0]["result"]["tools"].as_array().expect("tools");
-    assert_eq!(tools.len(), 7);
+    assert_eq!(tools.len(), 8);
     for tool in tools {
         assert_eq!(tool["outputSchema"]["type"], "object", "{}", tool["name"]);
         assert_eq!(
@@ -470,4 +482,50 @@ fn mcp_init_adds_the_server_and_keeps_the_others() {
     )
     .expect("JSON");
     assert_eq!(config["servers"]["helix"]["type"], "stdio");
+}
+
+/// **The check is the scan**, narrowed to a snippet: the same findings
+/// `helix scan --stdin` prints, judged against the project's imports.
+#[test]
+fn check_judges_a_snippet_as_the_scan_does() {
+    let project = Project::helix("check");
+    std::fs::create_dir_all(project.path().join("src")).expect("a source folder");
+    std::fs::write(
+        project.path().join("src/main.ts"),
+        "import '@fusion.dev/helix/select'\n",
+    )
+    .expect("a module");
+    let code = r#"<helix-select emphasis="loud"><helix-option>A</helix-option></helix-select>"#;
+    let result = project.call("helix_check", &json!({ "code": code, "language": "html" }));
+    assert_eq!(result["isError"], false, "{result}");
+    let checked = &result["structuredContent"];
+    let kinds: Vec<&str> = checked["findings"]
+        .as_array()
+        .expect("findings")
+        .iter()
+        .filter_map(|finding| finding["kind"].as_str())
+        .collect();
+    assert_eq!(kinds, ["invalid-value", "unimported-tag"]);
+    assert_eq!(
+        checked["counts"],
+        json!({ "error": 1, "info": 0, "warn": 1 })
+    );
+
+    let mut child = Command::new(binary())
+        .args(["--json", "scan", "--stdin", "html"])
+        .current_dir(project.path())
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .expect("helix runs");
+    child
+        .stdin
+        .take()
+        .expect("a pipe")
+        .write_all(code.as_bytes())
+        .expect("the scan is reading");
+    let output = child.wait_with_output().expect("helix exits");
+    assert_eq!(output.status.code(), Some(1), "an error finding exits 1");
+    let scanned: Value = serde_json::from_slice(&output.stdout).expect("the run is JSON");
+    assert_eq!(scanned["findings"], checked["findings"]);
 }

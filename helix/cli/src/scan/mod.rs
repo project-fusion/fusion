@@ -25,6 +25,7 @@ mod config;
 mod css;
 mod files;
 mod identity;
+mod installed;
 mod jsx;
 mod lint;
 mod markup;
@@ -48,6 +49,7 @@ use crate::args::Scan;
 use analyze::{Analyzer, Found, Raw};
 use css::StyleRule;
 use files::Kind;
+use installed::Installed;
 use lint::Index;
 use markup::{Element, Template};
 use usage::Usage;
@@ -90,6 +92,9 @@ struct Read {
     /// element's own.
     templates: Vec<(String, Vec<Element>, bool)>,
     used: HashSet<String>,
+    /// Every Helix specifier a module or a page imports, the barrels as the
+    /// package's name.
+    imports: HashSet<String>,
 }
 
 impl Read {
@@ -104,26 +109,35 @@ impl Read {
             self.coverage.unreadable.push((relative, "threw"));
             return;
         };
+        self.text(path, relative, kind, &text);
+    }
+
+    /// Reads one file's text, which may be a file on disk or a snippet given
+    /// on stdin under a name of its own.
+    fn text(&mut self, path: &Path, relative: String, kind: Kind, text: &str) {
         self.coverage.files += 1;
-        self.used.extend(css::reads(&text).map(str::to_owned));
+        self.used.extend(css::reads(text).map(str::to_owned));
+        if matches!(kind, Kind::Module { .. } | Kind::Template) {
+            self.imports.extend(installed::imports(text));
+        }
         match kind {
             Kind::Sheet { line_comments } => {
                 self.coverage.sheets += 1;
                 self.coverage.read += 1;
                 self.sheets
-                    .push((relative, css::read(&text, 1, line_comments), false));
+                    .push((relative, css::read(text, 1, line_comments), false));
             }
-            Kind::Template => self.template(relative, markup::read(&text, 1), false),
+            Kind::Template => self.template(relative, markup::read(text, 1), false),
             Kind::Mdx => self.template(
                 relative,
-                markup::read(&markup::without_code(&text), 1),
+                markup::read(&markup::without_code(text), 1),
                 false,
             ),
             Kind::Module { jsx } => {
                 let source = SourceType::from_path(path)
                     .unwrap_or_else(|_| SourceType::tsx())
                     .with_jsx(jsx);
-                match jsx::read(&text, source) {
+                match jsx::read(text, source) {
                     Some(template) => {
                         let own = !template.defines.is_empty();
                         self.template(relative, template, own);
@@ -379,8 +393,13 @@ fn project(root: &Path, build: Option<&Path>) -> Read {
 
 /// What the text proves, and what it leaves to the page. A Helix element's
 /// own markup is the library's, and is not judged.
-fn analyzed(read: &Read, index: &Index, listing: &HashMap<String, Vec<String>>) -> Found {
-    let mut analyzer = Analyzer::new(index, listing, &read.used);
+fn analyzed(
+    read: &Read,
+    index: &Index,
+    listing: &HashMap<String, Vec<String>>,
+    installed: &Installed,
+) -> Found {
+    let mut analyzer = Analyzer::new(index, listing, &read.used).with(installed, &read.imports);
     analyzer.declare(
         read.templates
             .iter()
@@ -444,7 +463,104 @@ fn judged(found: &Found, index: &Index, rules: Option<&Value>) -> Judged {
 }
 
 /// Reads the project, writes the run, and exits 1 on a finding at `error`.
+///
+/// # Errors
+///
+/// [`Failure`] where the project cannot be read, no Helix package is
+/// installed, or the settings or stdin cannot be read.
 pub fn run(args: &Scan, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
+    let snippet = match &args.stdin {
+        Some(_) => {
+            let mut code = String::new();
+            std::io::Read::read_to_string(&mut std::io::stdin(), &mut code)
+                .map_err(|error| Failure::input("Could not read stdin", error.to_string()))?;
+            Some(code)
+        }
+        None => None,
+    };
+    let (run, notes) = scanned(args, from, snippet.as_deref())?;
+    if json {
+        fusion_rules::say!("{run}");
+    } else {
+        print(&run, paint);
+        for note in notes {
+            fusion_rules::say!("{}", paint.dim(&note));
+        }
+    }
+    let failed = run["findings"].as_array().is_some_and(|findings| {
+        findings
+            .iter()
+            .any(|finding| finding["severity"] == "error")
+    });
+    Ok(if failed { Code::Failed } else { Code::Ok })
+}
+
+/// The name a snippet given on stdin is judged under, by its language.
+fn snippet_name(language: &str) -> String {
+    format!("<stdin>.{language}")
+}
+
+/// The files a narrowed run reports, relative to the root, with a snippet
+/// read in under a name of its own, and those files moved first. `None`
+/// where the run reports the whole project.
+fn narrow(
+    args: &Scan,
+    from: &Path,
+    root: &Path,
+    read: &mut Read,
+    snippet: Option<&str>,
+) -> Outcome<Option<HashSet<String>>> {
+    let mut only: Option<HashSet<String>> = None;
+    if !args.file.is_empty() {
+        only = Some(
+            args.file
+                .iter()
+                .map(|file| {
+                    let path = from.join(file);
+                    let absolute = std::path::absolute(&path).unwrap_or(path);
+                    absolute
+                        .strip_prefix(root)
+                        .unwrap_or(&absolute)
+                        .to_string_lossy()
+                        .replace('\\', "/")
+                })
+                .collect(),
+        );
+    }
+    if let (Some(language), Some(code)) = (&args.stdin, snippet) {
+        let name = snippet_name(language);
+        let Some(kind) = files::kind(Path::new(&name)) else {
+            return Err(Failure::input(
+                format!("cannot read stdin as {language}"),
+                "the scan reads html, vue, svelte, astro, js, jsx, ts, tsx, css, scss, and less",
+            ));
+        };
+        read.text(Path::new(&name), name.clone(), kind, code);
+        only.get_or_insert_with(HashSet::new).insert(name);
+    }
+    /* **The asked-for files first.** A finding is reported once, at the first
+    place it is seen, so a mistake the snippet shares with another file is
+    placed in the snippet, where the caller looks for it. */
+    if let Some(only) = &only {
+        read.templates
+            .sort_by_key(|(path, _, _)| !only.contains(path));
+        read.sheets.sort_by_key(|(path, _, _)| !only.contains(path));
+    }
+    Ok(only)
+}
+
+/// The run, and the notes a person reads under it.
+///
+/// **`--file` and `--stdin` narrow what is reported, not what is read.** The
+/// whole project is read either way, so a file is judged against every
+/// import, hook, and `var()` the project holds, and only its own findings are
+/// kept.
+///
+/// # Errors
+///
+/// [`Failure`] where the project cannot be read, no Helix package is
+/// installed, or the settings cannot be read.
+pub fn scanned(args: &Scan, from: &Path, snippet: Option<&str>) -> Outcome<(Value, Vec<String>)> {
     let started = Instant::now();
     let at = now();
     let given = args
@@ -466,10 +582,25 @@ pub fn run(args: &Scan, from: &Path, json: bool, paint: Paint) -> Outcome<Code> 
         None => None,
     };
 
-    let read = project(&root, build.as_deref());
+    let mut read = project(&root, build.as_deref());
+    let only = narrow(args, from, &root, &mut read, snippet)?;
     let listing = index.hooks();
     let rules = resolved.rules.as_ref();
-    let judged = judged(&analyzed(&read, &index, &listing), &index, rules);
+    let published = Installed::read(&root);
+    let mut judged = judged(
+        &analyzed(&read, &index, &listing, &published),
+        &index,
+        rules,
+    );
+    if let Some(only) = &only {
+        let kept = |finding: &Value| {
+            finding["origin"]["sheet"]
+                .as_str()
+                .is_some_and(|sheet| only.contains(sheet))
+        };
+        judged.findings.retain(kept);
+        judged.unsettled.retain(kept);
+    }
 
     let mut usage = Usage::default();
     for (_, elements, own) in &read.templates {
@@ -531,20 +662,8 @@ pub fn run(args: &Scan, from: &Path, json: bool, paint: Paint) -> Outcome<Code> 
             )
         })?;
     }
-    if json {
-        fusion_rules::say!("{run}");
-    } else {
-        print(&run, paint);
-        for note in notes(&read.coverage, &usage, weight.as_ref(), args.out.as_deref()) {
-            fusion_rules::say!("{}", paint.dim(&note));
-        }
-    }
-    let failed = run["findings"].as_array().is_some_and(|findings| {
-        findings
-            .iter()
-            .any(|finding| finding["severity"] == "error")
-    });
-    Ok(if failed { Code::Failed } else { Code::Ok })
+    let notes = notes(&read.coverage, &usage, weight.as_ref(), args.out.as_deref());
+    Ok((run, notes))
 }
 
 /// Prints the run's counts, then each finding and each unsettled fault with

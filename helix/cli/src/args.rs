@@ -177,6 +177,16 @@ pub struct Scan {
     /// project, then in the directory it runs in.
     #[arg(long, value_name = "PATH")]
     pub config: Option<PathBuf>,
+
+    /// Report only this file's findings. Repeat for each. The whole project
+    /// is still read, so the file is judged against every import it has.
+    #[arg(long, value_name = "PATH")]
+    pub file: Vec<PathBuf>,
+
+    /// Read a snippet from stdin, in this language, such as `tsx` or `css`,
+    /// and report only its findings, judged against the project.
+    #[arg(long, value_name = "LANGUAGE")]
+    pub stdin: Option<String>,
 }
 
 #[derive(Debug, Subcommand)]

@@ -96,13 +96,15 @@ These checks run on your project, and each one prints JSON with `--json`:
 
 | Command | What it finds |
 |---|---|
-| `helix scan` | Unknown tags, attributes, values, and slots, parts no element publishes, and hook names one or two edits from a real one, each with its file and line |
+| `helix scan` | Unknown tags, attributes, values, slots, parts, hooks, React event props, and tokens, a `--_helix-` primitive read, `[disabled]` on a form control, and a tag whose entry nothing imports, each with its file and line |
 | `helix theme audit` | Every foreground and background pair in your theme that misses its contrast target |
 | `initDiagnostics()` from `@fusion.dev/helix-diagnostics` | The same findings on the running page, and what the library reports as it runs, such as an option nobody imported |
 
 `helix scan` and `helix theme audit` exit 1 when they find an error and 0 when
 they find none. Run them after you write Helix code, and fix each finding
-before you finish.
+before you finish. `helix scan --file <path>` reports one file's findings, and
+`helix scan --stdin tsx` reads a snippet from stdin. Both still read the whole
+project, so an import in another file counts.
 
 ## The index
 
@@ -148,7 +150,7 @@ the file your client reads and keeps every other server in it:
 | `vscode` | `.vscode/mcp.json` |
 
 The server runs `npx @fusion.dev/helix-cli mcp`, which is the copy in your
-project. It has seven tools:
+project. It has eight tools:
 
 | Tool | What it returns |
 |---|---|
@@ -157,6 +159,7 @@ project. It has seven tools:
 | `helix_example` | One example as HTML and TSX, with its stylesheet and the import lines it needs |
 | `helix_imports` | The import lines for a list of tags, and the closest tag to any unknown one |
 | `helix_tokens` | The semantic tokens, by a word in the name or description and by category |
+| `helix_check` | The findings `helix scan` reports for the files you name, or for a snippet before you write it |
 | `helix_audit_theme` | Every foreground and background pair a brand color derives to, with its ratio and target |
 | `helix_derive_theme` | The theme's CSS |
 
