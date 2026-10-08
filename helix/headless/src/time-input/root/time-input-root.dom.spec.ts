@@ -242,7 +242,10 @@ describe('the list a time input opens', () => {
     const host = await field('show-now now-label="Right now"')
     host.open = true
     await host.updateComplete
-    const list = picker(host) as HTMLElement & { updateComplete: Promise<unknown>; value: string }
+    const list = picker(host) as unknown as HTMLElement & {
+      updateComplete: Promise<unknown>
+      value: string
+    }
     await list.updateComplete
     const now = part(list, 'now') as HTMLButtonElement
     expect(now.textContent).toBe('Right now')
