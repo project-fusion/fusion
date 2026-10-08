@@ -614,6 +614,18 @@ describe('zooming into the shown item', () => {
     await host.updateComplete
     expect(live()).toBe('2 of 3')
   })
+
+  /* Said only after the pause a pinch needs, a reader pressing `+` and
+     listening at once heard the place, "1 of 3", and no scale. */
+  test('and says a key’s step at once', async () => {
+    const host = await opened('max-zoom="3"')
+    const live = (): string => part(host, 'live')?.textContent?.trim() ?? ''
+    const dialog = part(host, 'dialog') as HTMLElement
+    dialog.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: '+' }))
+    await new Promise((done) => setTimeout(done, 0))
+    await host.updateComplete
+    expect(live()).toBe('Zoomed to 150%')
+  })
 })
 
 describe('the header and the footer', () => {
