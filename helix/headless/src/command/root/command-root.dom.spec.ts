@@ -638,3 +638,14 @@ describe('a palette whose Home and End go to the list', () => {
     expect(key(field, 'End')).toBe(false)
   })
 })
+
+/* React Aria's Autocomplete wraps a grid as well as a list, and the palette
+   held only a stack of commands. */
+describe('a palette laid out in a grid', () => {
+  test('hands the layout to its list, which the arrow keys then follow', async () => {
+    const host = await palette(markup.replace('label="Commands"', 'label="Commands" layout="grid"'))
+    expect((listbox(host) as HTMLElement & { layout?: string }).layout).toBe('grid')
+    const plain = await palette()
+    expect(listbox(plain).hasAttribute('layout')).toBe(false)
+  })
+})

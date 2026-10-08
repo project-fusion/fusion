@@ -203,6 +203,14 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   homeEnd?: 'list'
 
   /**
+   * How the commands are laid out, as Listbox's `layout`: `grid` draws them in
+   * rows and columns, for a palette of icons or emoji, and the arrow keys
+   * follow the rows and the columns. Absent is one command under another.
+   */
+  @property({ reflect: true })
+  layout?: 'grid' | 'stack'
+
+  /**
    * Draws the palette in the page, where it stands, with no dialog: a search
    * over a list of commands, as React Aria's Autocomplete is drawn.
    *
@@ -685,6 +693,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         ?loading=${this.loading}
         .items=${this.items}
         .fieldHomeEnd=${this.homeEnd === 'list'}
+        layout=${this.layout ?? nothing}
         filterable
         @helix-before-change=${this.handleChange}
         @helix-filter=${this.handleFilter}
