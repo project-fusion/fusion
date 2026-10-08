@@ -34,7 +34,8 @@
     "build-element-events": "./build-element-events.mjs",
     "build-elements-css": "./build-elements-css.mjs",
     "build-metrics": "./build-metrics.mjs",
-    "build-styles": "./build-styles.mjs"
+    "build-styles": "./build-styles.mjs",
+    "split-tests": "./split-tests.mjs"
   },
   "scripts": {
     "test": "bun test"
