@@ -39,28 +39,6 @@ inputs:
     description: The Playwright version, when the caller knows it. Read from the Playwright installed in the working directory when not given.
     default: ''
 
-runs: Azure's copy did not answer, apt
-# moved to `archive.ubuntu.com`, and the job sat in `apt-get update` with no
-# output until its 15-minute timeout. Over 3,007 browser jobs that day the step
-# took 20 seconds at the median, 309 at the 95th percentile and 967 at the
-# worst, and 45 jobs reached the timeout. From the cache it takes 7 to 20.
-#
-# **Keyed on the runner image because the set is a difference.** Most of what
-# Chromium needs is on the image already. apt fetches the rest, and upgrades the
-# few libraries the image holds an older build of, FreeType and Mesa among them.
-# The same files installed on a newer image could downgrade what it ships, so a
-# new image is a new key. The fonts in the set decide what a picture shows, and
-# these are the packages, at the versions, the baselines were taken with.
-#
-# **A miss installs from the mirror with a limit and a second try.** apt gives
-# up on a silent connection after 20 seconds and retries, each attempt is
-# capped at four minutes, and the second attempt drops the first mirror from
-# the runner's list. A miss caches what it fetched only when every package apt
-# installed or upgraded is there as a file, so a hit never installs part of the
-# set.
-name: Install Chromium
-description: Restores the Playwright browser for the version the lockfile holds, and its system packages for the runner image, and installs both.
-
 runs:
   using: composite
   steps:
