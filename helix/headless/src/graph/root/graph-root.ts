@@ -256,6 +256,15 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @property({ attribute: 'legend-label' })
   legendLabel = 'Groups'
 
+  /**
+   * What screen readers hear when a walk along the links reaches a note that
+   * has no link to follow, or goes back to a note: `{note}` for its name and
+   * `{count}` for how many notes the list holds that it links to or from.
+   */
+  @words
+  @property({ attribute: 'link-count-label' })
+  linkCountLabel = '{note}. {count, plural, =0 {No links} one {# link} other {# links}}'
+
   /** How a note linked both to and from the selected one is described, with `{note}`. */
   @words
   @property({ attribute: 'linked-both-label' })
@@ -274,15 +283,6 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @words
   @property({ attribute: 'links-to-label' })
   linksToLabel = 'Links to {note}'
-
-  /**
-   * What screen readers hear when a walk along the links reaches a note that
-   * has no link to follow, or goes back to a note: `{note}` for its name and
-   * `{count}` for how many notes the list holds that it links to or from.
-   */
-  @words
-  @property({ attribute: 'link-count-label' })
-  linkCountLabel = '{note}. {count, plural, =0 {No links} one {# link} other {# links}}'
 
   /**
    * Marks the graph as busy while its notes arrive: the list is `aria-busy`,
@@ -380,6 +380,11 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @property({ attribute: 'two-finger-hint-label' })
   override twoFingerHintLabel = 'Use two fingers to move the graph'
 
+  /** The line shown while the graph, with `gestures="activate"`, has the gestures. */
+  @words
+  @property({ attribute: 'using-label' })
+  override usingLabel = 'Using the graph. Press Escape to scroll the page again.'
+
   /**
    * What screen readers hear when a walk along the links moves to a note:
    * `{note}` for its name, `{relation}` for how it stands to the note the
@@ -389,11 +394,6 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @words
   @property({ attribute: 'walk-label' })
   walkLabel = '{note}. {relation}. {index} of {count}'
-
-  /** The line shown while the graph, with `gestures="activate"`, has the gestures. */
-  @words
-  @property({ attribute: 'using-label' })
-  override usingLabel = 'Using the graph. Press Escape to scroll the page again.'
 
   /**
    * The hint shown when the wheel scrolls past the graph with

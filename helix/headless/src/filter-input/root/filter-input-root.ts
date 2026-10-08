@@ -309,14 +309,6 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   clearLabel = 'Clear'
 
   /**
-   * Whether the panel narrows itself to the suggestions that hold the term
-   * being typed, as React Aria's Autocomplete filters. Off, the panel shows
-   * what you slot and you narrow it.
-   */
-  @property({ attribute: 'filter-suggestions', type: Boolean })
-  filterSuggestions = false
-
-  /**
    * How long typing rests before `source` is asked, in milliseconds. A delay
    * sends one request for a word in place of one for each letter. The arrow
    * keys and Enter ask at once. `0` asks on every keystroke.
@@ -325,15 +317,12 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   filterDelay = 0
 
   /**
-   * Where the suggestions come from: a function given the term at the caret,
-   * the field it is a value of, the whole text, and an `AbortSignal`, which
-   * returns the suggestions or a promise of them. Each is a string, or a
-   * `value` with a `label` and `disabled`. The field draws them as options in
-   * the panel, beside any you slot. A property only, there being no way to
-   * write a function in markup. See the class description.
+   * Whether the panel narrows itself to the suggestions that hold the term
+   * being typed, as React Aria's Autocomplete filters. Off, the panel shows
+   * what you slot and you narrow it.
    */
-  @property({ attribute: false })
-  source?: FilterSource | undefined
+  @property({ attribute: 'filter-suggestions', type: Boolean })
+  filterSuggestions = false
 
   /**
    * Whether the suggestions are still loading, such as while a request for the
@@ -370,6 +359,17 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
    */
   @property()
   placeholder = ''
+
+  /**
+   * Where the suggestions come from: a function given the term at the caret,
+   * the field it is a value of, the whole text, and an `AbortSignal`, which
+   * returns the suggestions or a promise of them. Each is a string, or a
+   * `value` with a `label` and `disabled`. The field draws them as options in
+   * the panel, beside any you slot. A property only, there being no way to
+   * write a function in markup. See the class description.
+   */
+  @property({ attribute: false })
+  source?: FilterSource | undefined
 
   /**
    * What a reader hears for one suggestion, where `suggestions-label` should
