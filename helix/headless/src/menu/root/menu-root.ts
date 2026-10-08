@@ -7,6 +7,7 @@ import {
   deepContains,
   filterKeeps,
   focusTarget,
+  formatWords,
   HelixElement,
   HelixFilterEvent,
   inlineStep,
@@ -139,7 +140,8 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * field: Up and Down Arrow move the highlight through the rows that are left,
  * Enter chooses the highlighted row, Right Arrow opens its submenu, Left Arrow
  * on a submenu goes back, and Escape clears the filter and then closes the
- * menu. Home, End and the other keys move the caret and type. The field names
+ * menu. A screen reader hears how many rows the filter keeps
+ * (`results-label`). Home, End and the other keys move the caret and type. The field names
  * the highlighted row with `aria-activedescendant`, and the rows are a `menu`
  * after the field. Cancel `helix-filter` to keep every row
  * showing and narrow the rows yourself, such as by replacing them with rows
@@ -152,6 +154,8 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @documentation https://fusion.dev/helix/components/menu
  *
  * @slot - The items.
+ * @slot empty - What the menu shows when it has no items, for content richer than `empty-text`.
+ * @slot loading - What the menu shows while its items load, for content richer than `loading-text`.
  * @slot no-results - What the menu shows when the filter keeps no rows, for content richer than `no-results-text`.
  * @slot trigger - The control that opens the menu, or with `context` the area a context menu opens over.
  *
@@ -190,6 +194,10 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * `registerWords('de', { 'helix-menu': { backLabel: 'Zurück' } })`.
    */
   static words = 'helix-menu'
+
+  /* The `empty` and `loading` slots, with `empty-text` and `loading-text` as
+     their fallback, as Data Table has them. */
+  protected override statusSlots = true
 
   /**
    * The text of the row that returns from a submenu.
@@ -333,6 +341,15 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   @words
   @property({ attribute: 'no-results-text' })
   noResultsText = 'No matches'
+
+  /**
+   * What a screen reader hears when the filter narrows the rows. `{count}` is
+   * how many rows are left, written in the locale, and each language writes
+   * the forms it has, as Listbox's `results-label` does.
+   */
+  @words
+  @property({ attribute: 'results-label' })
+  resultsLabel = '{count, plural, one {# result} other {# results}}'
 
   /**
    * Space between the trigger and the surface, in pixels.
@@ -1406,9 +1423,19 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        reader asked, fixed to the viewport. Drawn only while there is one. */
     const point = this.context && this.point
     const filtering = this.filtering
-    /* What a filter that keeps no rows says, shown and announced. */
-    const none = filtering && !this.rowsOf(this.filterPage).some((row) => this.kept(row))
-    this.announced = none ? this.noResultsText : ''
+    /* What a filter that keeps no rows says, shown and announced, and how
+       many it keeps where it keeps some, announced, as React Aria and Web
+       Awesome say the count. Only "No matches" was said before this, so a
+       filter that kept forty rows and one that kept one sounded the same. */
+    const count = filtering
+      ? this.rowsOf(this.filterPage).filter((row) => this.kept(row)).length
+      : 0
+    const none = filtering && count === 0
+    this.announced = none
+      ? this.noResultsText
+      : filtering
+        ? formatWords(this, 'resultsLabel', { count })
+        : ''
     const rows = html`${
       // A header rather than a row in the list. The way back is not one of
       // the things on this page, and putting it in the list means an arrow

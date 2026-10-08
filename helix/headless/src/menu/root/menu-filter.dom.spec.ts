@@ -128,6 +128,18 @@ describe('a filterable menu', () => {
     expect(highlighted(host)).toEqual([])
   })
 
+  /* Only "No matches" was said before this, so a filter that kept forty rows
+     and one that kept one sounded the same. React Aria and Web Awesome say
+     the count. */
+  test('says how many rows the filter keeps, and nothing with no filter', async () => {
+    const host = await opened()
+    expect(part(host, 'live')?.textContent?.trim()).toBe('')
+    await type(host, 'c')
+    expect(part(host, 'live')?.textContent?.trim()).toBe('2 results')
+    await type(host, 'cut')
+    expect(part(host, 'live')?.textContent?.trim()).toBe('1 result')
+  })
+
   test('Escape empties the filter, and a second Escape closes the menu', async () => {
     const host = await opened()
     await type(host, 'cu')
