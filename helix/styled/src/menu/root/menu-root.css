@@ -150,41 +150,6 @@
   display: none;
 }
 
-/* The filter field, a row of its own over the rows, which stays in view as
-   they scroll. The surface's own fill behind it, so a row scrolled under it
-   does not show through. */
-[part="search-field"] {
-  appearance: none;
-  background-color: var(--menu-background-color, var(--helix-color-surface-overlay));
-  border: none;
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
-  box-sizing: border-box;
-  color: var(--helix-color-foreground);
-  display: block;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-medium);
-  inline-size: 100%;
-  inset-block-start: calc(var(--helix-space-xs) * -1);
-  margin-block: calc(var(--helix-space-xs) * -1) var(--helix-space-xs);
-  min-block-size: var(--helix-size-control);
-  padding-inline: var(--helix-space-sm);
-  position: sticky;
-  z-index: 1;
-}
-
-/* No ring: the field is where focus stays, and the caret says so. Listbox's
-   filter field draws none for the same reason. */
-[part="search-field"]:focus-visible {
-  outline: none;
-}
-
-/* A divider separates nothing while the filter has hidden rows on either side
-   of it. */
-[part="surface"][data-filtered] slot::slotted(helix-divider) {
-  display: none;
-}
-
 /* What a collection says instead of rows is `shared/collection/state`'s. */
 
 /* Rows that are already there stay, and dim, while a new set arrives. Removing
