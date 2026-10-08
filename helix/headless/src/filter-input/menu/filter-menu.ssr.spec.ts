@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { hostAttributes, rendered, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
+import './index.js'
 import '../../option/index.js'
 
 /**

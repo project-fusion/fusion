@@ -57,6 +57,10 @@ import '../../menu/index.js'
  * `Notification` does for a read. Call `preventDefault()` on `helix-facet` to
  * cancel the change.
  *
+ * Imported from its own entry, `@fusion.dev/helix-headless/filter-input/menu`, which registers
+ * it with the `Menu` it draws its pages with. The family's entry leaves it out,
+ * so a field without a picker does not carry `Menu`.
+ *
  * @since 0.25.0
  * @status stable
  * @category forms

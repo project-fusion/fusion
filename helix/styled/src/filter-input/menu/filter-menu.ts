@@ -1,5 +1,5 @@
 import { customElement } from '@fusion.dev/helix-core'
-import { HelixHeadlessFilterMenu } from '@fusion.dev/helix-headless/filter-input'
+import { HelixHeadlessFilterMenu } from '@fusion.dev/helix-headless/filter-input/menu'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './filter-menu.css.js'
 import '../../divider/index.js'
@@ -15,6 +15,10 @@ import '../../menu/index.js'
  *
  * The headless element documents the model, including why a tick applies a
  * filter immediately and why the menu decides the operator.
+ *
+ * Imported from its own entry, `@fusion.dev/helix/filter-input/menu`, which registers
+ * it with the `Menu` it draws its pages with. The family's entry leaves it out,
+ * so a field without a picker does not carry `Menu`.
  *
  * @since 0.25.0
  * @status stable
