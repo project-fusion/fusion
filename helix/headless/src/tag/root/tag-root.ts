@@ -39,6 +39,12 @@ import { property } from 'lit/decorators.js'
  * selected. Its remove button leaves the tab order there, Delete and Backspace
  * doing its job from the row.
  *
+ * **Styling a tag by what is happening to it.** `:state(selected)` while it is
+ * selected, `:state(focus-visible)` while its cell shows keyboard focus,
+ * `[disabled]` while it is out of reach, and the host's own `:hover` and
+ * `:active` under the pointer, as React Aria's `data-hovered` and
+ * `data-pressed` are.
+ *
  * @since 0.1.0
  * @status stable
  * @category markers
@@ -58,6 +64,7 @@ import { property } from 'lit/decorators.js'
  * @csspart link - The link around the label, under `href`.
  * @csspart start - The category before the label.
  *
+ * @cssstate focus-visible - The tag's cell has keyboard focus that the browser shows, in a `Tag.Group`.
  * @cssstate selected - The tag is selected in a `Tag.Group` that selects.
  */
 @customElement('helix-headless-tag')
@@ -216,6 +223,21 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
     this.finishHydration()
   }
 
+  /**
+   * Says whether the cell shows keyboard focus, as `:focus-visible` does, so a
+   * sheet outside can draw the ring on the tag by the host.
+   */
+  private readonly handleCellFocus = (event: FocusEvent): void => {
+    const cell = event.currentTarget as HTMLElement
+    let shown = false
+    try {
+      shown = event.type === 'focus' && cell.matches(':focus-visible')
+    } catch {
+      /* An engine that cannot parse `:focus-visible` shows no ring. */
+    }
+    this.toggleState('focus-visible', shown)
+  }
+
   protected override render(): TemplateResult {
     const content = html`<slot name="start" part="start"></slot>${this.renderLabel()}${
       this.dismissible ? this.renderDismiss() : nothing
@@ -228,6 +250,8 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
           part="cell"
           role="gridcell"
           tabindex=${this.focusable ? '0' : '-1'}
+          @focus=${this.handleCellFocus}
+          @blur=${this.handleCellFocus}
           >${content}</span
         >`
       : content
