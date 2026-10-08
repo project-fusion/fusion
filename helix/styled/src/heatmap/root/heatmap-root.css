@@ -258,7 +258,8 @@
    character per line down a twelve pixel column; and the fix a document sheet
    would need, selecting the strip by what it contains, is one `::part()` cannot
    express. Out of the grid, neither tier needs a rule at all. */
-[part="empty"] {
+[part="empty"],
+[part="loading"] {
   color: var(--helix-color-foreground-subtle);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
