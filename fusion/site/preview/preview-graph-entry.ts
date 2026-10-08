@@ -31,15 +31,37 @@ const start = (frame: HTMLElement): (() => void) => {
   /* **An isometric diagram is SVG**, drawn by Helix with no renderer to make,
      so it shares this chunk and costs it a few kilobytes. */
   if (asked.previewGraph === 'isometric') {
-    const connection = connectGraph(
-      frame,
-      isometricDriver(box, {
-        flat: asked.previewGraphFlat !== undefined,
-        shape: asked.previewGraphShape as never,
-      }),
-    )
+    const number = (value: string | undefined): number | undefined =>
+      value === undefined || value === '' ? undefined : Number(value)
+    const driver = isometricDriver(box, {
+      flat: asked.previewGraphFlat !== undefined,
+      shape: asked.previewGraphShape as never,
+      tilt: number(asked.previewGraphTilt),
+      turn: number(asked.previewGraphTurn),
+    })
+    const connection = connectGraph(frame, driver)
+    /* **A button marked `data-preview-graph-turn-by` turns the view** by its
+       degrees, which is `driver.turnBy(degrees)` on a page of your own, and
+       one marked `data-preview-graph-tilt-to` tilts it to its degrees, which
+       is `driver.turnTo({ tilt })`. */
+    const turn = (event: Event): void => {
+      const button = (event.target as Element | null)?.closest<HTMLElement>(
+        '[data-preview-graph-turn-by], [data-preview-graph-tilt-to]',
+      )
+      if (!button || !frame.contains(button)) {
+        return
+      }
+      const tilt = number(button.dataset.previewGraphTiltTo)
+      if (tilt === undefined) {
+        driver.turnBy(Number(button.dataset.previewGraphTurnBy) || 0)
+      } else {
+        driver.turnTo({ tilt })
+      }
+    }
+    frame.addEventListener('click', turn)
     window.addEventListener(RESTYLED, connection.restyle)
     return () => {
+      frame.removeEventListener('click', turn)
       window.removeEventListener(RESTYLED, connection.restyle)
       connection.disconnect()
     }

@@ -1,0 +1,45 @@
+<!-- @summary A data pipeline whose notes give no places: the driver lays them out in columns along the links, sources first, turned so the flow runs across the page. -->
+
+<!-- Preview frame: data-preview-graph-turn sets the bearing the diagram is seen from; on your page, connectGraph(frame, isometricDriver(box, { turn: 25 })) does. -->
+<helix-graph
+  data-preview-graph="isometric"
+  data-preview-graph-turn="25"
+  id="pipeline"
+  label="Data pipeline"
+  legend
+>
+  <div data-preview-graph-canvas></div>
+</helix-graph>
+
+<script>
+  const diagram = document.getElementById('pipeline')
+
+  /* No note gives an x or a y, so the driver lays them out in columns along the links. */
+  diagram.nodes = [
+    { group: 'Sources', id: 'app-db', label: 'App database', shape: 'circle' },
+    { group: 'Sources', id: 'billing', label: 'Billing API' },
+    { group: 'Sources', id: 'clicks', label: 'Clickstream' },
+    { group: 'Stream', id: 'stream', label: 'Event stream', shape: 'diamond', size: 5 },
+    { group: 'Processing', id: 'enrich', label: 'Enrichment' },
+    { group: 'Processing', id: 'dedupe', label: 'Deduplication' },
+    { group: 'Reports', id: 'rollups', label: 'Daily rollups' },
+    { group: 'Storage', id: 'warehouse', label: 'Warehouse', shape: 'circle', size: 6 },
+    { group: 'Storage', id: 'lake', label: 'Data lake', shape: 'circle', size: 4 },
+    { group: 'Reports', id: 'revenue', label: 'Revenue report' },
+    { group: 'Reports', id: 'churn', label: 'Churn dashboard' },
+  ]
+
+  diagram.links = [
+    { source: 'app-db', target: 'stream' },
+    { source: 'billing', target: 'stream' },
+    { source: 'clicks', target: 'stream' },
+    { source: 'stream', target: 'enrich' },
+    { source: 'enrich', target: 'dedupe' },
+    { source: 'dedupe', target: 'warehouse' },
+    { source: 'dedupe', target: 'lake' },
+    { source: 'warehouse', target: 'rollups' },
+    { source: 'lake', target: 'rollups' },
+    { source: 'rollups', target: 'revenue' },
+    { source: 'rollups', target: 'churn' },
+  ]
+</script>

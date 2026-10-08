@@ -12,10 +12,10 @@
 </helix-graph>
 
 <script>
-  const architecture = document.getElementById('architecture')
+  const diagram = document.getElementById('architecture')
 
   /* Each note stands on a cell of the floor: x across, y back. */
-  architecture.nodes = [
+  diagram.nodes = [
     { group: 'Edge', id: 'cdn', label: 'CDN', size: 3, x: 0, y: 0 },
     { group: 'Edge', id: 'gateway', label: 'API gateway', size: 5, x: 2, y: 0 },
     { group: 'Services', id: 'accounts', label: 'Accounts', x: 5, y: 2 },
@@ -27,7 +27,7 @@
     { group: 'Data', id: 'events', label: 'Event stream', shape: 'diamond', size: 4, x: 10, y: 1 },
   ]
 
-  architecture.links = [
+  diagram.links = [
     { source: 'cdn', target: 'gateway' },
     { source: 'gateway', target: 'accounts' },
     { source: 'gateway', target: 'orders' },

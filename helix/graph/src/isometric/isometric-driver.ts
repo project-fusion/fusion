@@ -5,11 +5,15 @@ import { type GraphLooks, mixRgb, type NodeLook } from '../connect-graph/looks.j
 import type { GraphPoint } from '../connect-graph/seed.js'
 import { type Box, clearOf, ease, gesturesHeld, isLight } from '../overlay/overlay.js'
 import {
+  type Camera,
   depthOrder,
   floorLine,
+  ISOMETRIC,
+  LOWEST_TILT,
+  layered,
   type Point,
   plate,
-  project,
+  projectionOf,
   type Solid,
   snapToCells,
   solid,
@@ -18,7 +22,7 @@ import {
 
 /** How the diagram is drawn where a note does not say. */
 export interface IsometricDriverOptions {
-  /** Draws every note at no height, which lays the diagram flat as a plan. */
+  /** Draws every note at no height, which lays the diagram flat on its floor. */
   flat?: boolean | undefined
   /** Whether each group's name is written on its plate. On by default. */
   groupLabels?: boolean | undefined
@@ -27,6 +31,32 @@ export interface IsometricDriverOptions {
    * `circle` or `ring`, a cylinder; `diamond`, a pyramid.
    */
   shape?: NodeLook['shape']
+  /**
+   * How high above the floor the diagram is seen from, in degrees: 35.26,
+   * the isometric angle, by default, down to 15, and up to 90, a plan seen
+   * from straight above.
+   */
+  tilt?: number | undefined
+  /**
+   * The compass bearing the diagram is seen from, in degrees: 45, its front
+   * left corner, by default. 135 is its front right, 225 its back right, and
+   * 315 its back left.
+   */
+  turn?: number | undefined
+}
+
+/** The isometric driver, which a page can also turn. */
+export interface IsometricDriver extends GraphDriver {
+  /** Where the diagram is seen from now: its `turn` and `tilt`, in degrees. */
+  camera(): Camera
+  /**
+   * Turns the view about the middle of the box by `degrees`: 90 brings the
+   * next corner round to the front. Animated unless `animate` is false or the
+   * reader asked for less motion.
+   */
+  turnBy(degrees: number, animate?: boolean): void
+  /** Moves the camera to a `turn` or a `tilt`, or both, as `turnBy` moves it. */
+  turnTo(camera: Partial<Camera>, animate?: boolean): void
 }
 
 const SVG = 'http://www.w3.org/2000/svg'
@@ -73,13 +103,17 @@ const escaped = (text: string): string =>
 /** How wide a name is drawn, measured without a canvas, as the snapshot measures it. */
 const widthOf = (text: string, size: number): number => text.length * size * 0.56
 
-/**
- * A face's color, shaded for the light it takes from the upper left: the
- * top in the note's own color, the left side darker, and the right darker
- * still.
- */
-const shaded = (color: string, light: 'left' | 'right' | 'top'): string =>
-  light === 'top' ? color : mixRgb(color, 'rgb(0, 0, 0)', light === 'left' ? 0.2 : 0.36)
+/** A face's color: the note's own, darkened as far as the face turns from the light. */
+const shaded = (color: string, darken: number): string =>
+  darken <= 0 ? color : mixRgb(color, 'rgb(0, 0, 0)', darken)
+
+/** How far a Shift-drag turns the view, in degrees for each pixel across, and tilts it for each pixel down. */
+const TURN_PER_PIXEL = 0.5
+const TILT_PER_PIXEL = 0.35
+
+/** Whether the reader asked for less motion. */
+const still = (): boolean =>
+  typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /**
  * An edge in an ink that contrasts with its face: a quarter of the way to
@@ -111,8 +145,9 @@ interface View {
  * **Each note is a solid on a floor of cells**, standing at its `x` and `y`:
  * a note at `x: 2, y: 1` is two cells across and one back. Its `shape` picks
  * the solid, a square a block, a circle a cylinder, and a diamond a pyramid,
- * and its size sets its height. A note given no place is put on the nearest
- * free cell beside the notes it links to.
+ * and its size sets its height. A diagram that gives no note a place is laid
+ * out in columns along its links, and a note added without one goes to the
+ * nearest free cell beside the notes it links to.
  *
  * **The faces are shaded from the note's own color**, its tone's or its
  * group's, so the diagram takes the theme. Links run along the floor with an
@@ -123,11 +158,16 @@ interface View {
  * text as crisp as the page's. The frame's list, search, and keys work as
  * they do with every driver. Drag to pan and use the wheel to zoom, as the
  * frame's `gestures` allows.
+ *
+ * **The view turns and tilts.** `turn` and `tilt` set where it is seen from,
+ * `turnBy(90)` brings the next corner round, and Shift with a drag turns it
+ * across and tilts it up and down. The faces a solid shows and how each is
+ * shaded follow the camera, with the light from the upper left of the page.
  */
 export const isometricDriver = (
   container: HTMLElement,
   options: IsometricDriverOptions = {},
-): GraphDriver => {
+): IsometricDriver => {
   const svg = document.createElementNS(SVG, 'svg')
   /* The frame's list is what a reader reads the graph from, so the drawing
      is a picture beside it. */
@@ -157,6 +197,12 @@ export const isometricDriver = (
   let hovered: string | undefined
   let mode: ViewportGestureMode = 'free'
   let view: View = { scale: 48, x: 0, y: 0 }
+  let camera: Camera = {
+    tilt: Math.min(Math.max(options.tilt ?? ISOMETRIC.tilt, LOWEST_TILT), 90),
+    turn: options.turn ?? ISOMETRIC.turn,
+  }
+  let projection = projectionOf(camera)
+  let turning = 0
   /* Whether the view is still the driver's own framing of the whole diagram,
      which a resize frames again. Any other move is kept, scaled with the box. */
   let framed = false
@@ -170,6 +216,10 @@ export const isometricDriver = (
     return { height: box.height || 1, width: box.width || 1 }
   }
 
+  /** A note's group, as the frame last named the groups. */
+  const groupOf = (id: string): string | undefined =>
+    groups.find((group) => group.ids.includes(id))?.name
+
   const shapeOf = (id: string): Solid => solidOf(looks?.node(id).shape ?? options.shape ?? 'square')
 
   const tallness = (node: DrawnNode): number => (options.flat ? 0 : heightOf(node.size))
@@ -177,8 +227,9 @@ export const isometricDriver = (
   /** Every note as a solid, in the order to paint them. */
   const solids = () =>
     depthOrder(
+      projection,
       [...nodes.values()].map((node) => ({
-        drawn: solid(shapeOf(node.id), node.x, node.y, FOOTPRINT, tallness(node)),
+        drawn: solid(projection, shapeOf(node.id), node.x, node.y, FOOTPRINT, tallness(node)),
         height: tallness(node),
         node,
         x: node.x,
@@ -195,12 +246,37 @@ export const isometricDriver = (
     const points: Point[] = []
     for (const node of chosen) {
       const half = FOOTPRINT / 2 + (ids ? 0 : MARGIN)
-      points.push(
-        project(node.x - half, node.y - half),
-        project(node.x + half, node.y + half),
-        project(node.x + half, node.y - half),
-        project(node.x - half, node.y + half, tallness(node) + 0.5),
-      )
+      /* Every corner of the footprint, low and raised, since any of them can
+         be the solid's edge on the page from some turn. */
+      for (const [dx, dy] of [
+        [-1, -1],
+        [1, -1],
+        [1, 1],
+        [-1, 1],
+      ] as const) {
+        points.push(
+          projection.at(node.x + dx * half, node.y + dy * half),
+          projection.at(node.x + dx * half, node.y + dy * half, tallness(node) + 0.5),
+        )
+      }
+    }
+    /* The whole diagram takes in each group's plate, whose corners stand
+       beyond every footprint once the view is turned off the isometric. */
+    if (!ids) {
+      for (const group of groups) {
+        const members = group.ids.flatMap((id) => nodes.get(id) ?? [])
+        if (members.length === 0) {
+          continue
+        }
+        const reach = MARGIN + FOOTPRINT / 2
+        const xs = members.map((node) => node.x)
+        const ys = members.map((node) => node.y)
+        for (const x of [Math.min(...xs) - reach, Math.max(...xs) + reach]) {
+          for (const y of [Math.min(...ys) - reach, Math.max(...ys) + reach]) {
+            points.push(projection.at(x, y))
+          }
+        }
+      }
     }
     const xs = points.map((point) => point.x)
     const ys = points.map((point) => point.y)
@@ -269,7 +345,7 @@ export const isometricDriver = (
         const node = nodes.get(id)
         return node && own.has(id) && !looks?.node(id).hidden ? [{ x: node.x, y: node.y }] : []
       })
-      const drawn = plate(places, MARGIN + FOOTPRINT / 2)
+      const drawn = plate(projection, places, MARGIN + FOOTPRINT / 2)
       if (!drawn) {
         continue
       }
@@ -305,15 +381,15 @@ export const isometricDriver = (
       const along = { x: dx / length, y: dy / length }
       const side = { x: -along.y, y: along.x }
       const middle = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 }
-      const tip = project(middle.x + along.x * 0.14, middle.y + along.y * 0.14)
+      const tip = projection.at(middle.x + along.x * 0.14, middle.y + along.y * 0.14)
       const wing = (sign: 1 | -1) =>
-        project(
+        projection.at(
           middle.x - along.x * 0.14 + side.x * 0.12 * sign,
           middle.y - along.y * 0.14 + side.y * 0.12 * sign,
         )
       const [one, other] = [wing(1), wing(-1)]
       ;(look?.raised ? raised : rest).push(
-        `<path d="${floorLine(from, to)}" fill="none" stroke="${color}" stroke-linecap="round" stroke-width="${width}" vector-effect="non-scaling-stroke"/>` +
+        `<path d="${floorLine(projection, from, to)}" fill="none" stroke="${color}" stroke-linecap="round" stroke-width="${width}" vector-effect="non-scaling-stroke"/>` +
           `<path d="M${one.x} ${one.y}L${tip.x} ${tip.y}L${other.x} ${other.y}Z" fill="${color}"/>`,
       )
     }
@@ -330,7 +406,7 @@ export const isometricDriver = (
       const color = look?.color ?? 'rgb(128, 128, 128)'
       const faces = drawn.faces
         .map((face) => {
-          const fill = shaded(color, face.light)
+          const fill = shaded(color, face.darken)
           return `<path d="${face.d}" fill="${fill}" stroke="${edgeOf(fill)}" stroke-linejoin="round" stroke-width="1" vector-effect="non-scaling-stroke"/>`
         })
         .join('')
@@ -339,7 +415,7 @@ export const isometricDriver = (
       const ink = looks?.ink ?? 'currentColor'
       const ringed = look?.selected ? 2.5 : node.id === hovered || look?.keyed ? 1.5 : 0
       const glow = look?.selected
-        ? `<path d="${solid(shapeOf(node.id), node.x, node.y, FOOTPRINT + 0.5, 0).outline}" fill="${color}" fill-opacity="0.22"/>`
+        ? `<path d="${solid(projection, shapeOf(node.id), node.x, node.y, FOOTPRINT + 0.5, 0).outline}" fill="${color}" fill-opacity="0.22"/>`
         : ''
       const ring =
         ringed > 0
@@ -407,19 +483,31 @@ export const isometricDriver = (
           const node = nodes.get(id)
           return node && !current.node(id).hidden ? [{ x: node.x, y: node.y }] : []
         })
-        const drawn = plate(places, MARGIN + FOOTPRINT / 2)
+        const drawn = plate(projection, places, MARGIN + FOOTPRINT / 2)
         if (!drawn) {
           continue
         }
-        const low = {
-          x: Math.min(...places.map((place) => place.x)) - MARGIN - FOOTPRINT / 2,
-          y: Math.min(...places.map((place) => place.y)) - MARGIN - FOOTPRINT / 2,
-        }
-        const at = project(low.x + 0.15, low.y + 0.12)
         const small = GROUP / view.scale
-        const half = Math.sqrt(3) / 2
+        /* Clear of every name drawn, or left out: two plates that meet
+           would write their names into each other, and the legend still
+           names the group. */
+        const length = group.name.length * small * 0.74
+        const end = {
+          x: drawn.start.x + drawn.along.x * length,
+          y: drawn.start.y + drawn.along.y * length,
+        }
+        const box: Box = {
+          bottom: Math.max(drawn.start.y, end.y) + small * 0.6,
+          left: Math.min(drawn.start.x, end.x),
+          right: Math.max(drawn.start.x, end.x),
+          top: Math.min(drawn.start.y, end.y) - small * 0.6,
+        }
+        if (!clearOf(box, taken)) {
+          continue
+        }
+        taken.push(box)
         marks.push(
-          `<text fill="${group.color}" fill-opacity="${group.faded ? 0.4 : 0.95}" font-size="${small}" font-weight="650" letter-spacing="${small * 0.12}" stroke="none" transform="matrix(${half} 0.5 ${-half} 0.5 ${at.x} ${at.y})">${escaped(group.name.toLocaleUpperCase())}</text>`,
+          `<text fill="${group.color}" fill-opacity="${group.faded ? 0.4 : 0.95}" font-size="${small}" font-weight="650" letter-spacing="${small * 0.12}" stroke="none" transform="${drawn.transform}">${escaped(group.name.toLocaleUpperCase())}</text>`,
         )
       }
     }
@@ -443,10 +531,81 @@ export const isometricDriver = (
     }
   }
 
+  /** Whether the whole diagram is in the box now, which a turn keeps whole. */
+  const showsAll = (): boolean => {
+    const box = boundsOf()
+    if (!box) {
+      return false
+    }
+    const { height, width } = sizeOfBox()
+    const across = width / view.scale / 2
+    const down = height / view.scale / 2
+    const slack = 1 / view.scale
+    return (
+      box.left >= view.x - across - slack &&
+      box.right <= view.x + across + slack &&
+      box.top >= view.y - down - slack &&
+      box.bottom <= view.y + down + slack
+    )
+  }
+
+  /**
+   * Puts the camera at `next` and draws the diagram from there. **A diagram
+   * seen whole stays whole**, framed again from the new side; otherwise the
+   * floor under the middle of the box stays there, so a turn swings the
+   * diagram about what the reader was looking at.
+   */
+  const place = (next: Camera, whole: boolean): void => {
+    const middle = projection.floorAt({ x: view.x, y: view.y })
+    camera = { tilt: Math.min(Math.max(next.tilt, LOWEST_TILT), 90), turn: next.turn }
+    projection = projectionOf(camera)
+    const box = whole ? boundsOf() : undefined
+    if (box) {
+      view = framing(box)
+      framed = true
+    } else {
+      const at = projection.at(middle.x, middle.y)
+      view = { ...view, x: at.x, y: at.y }
+    }
+    render()
+    show()
+  }
+
+  /** Moves the camera to `next`, the shorter way round, over two steps where `animate`, or at once. */
+  const aim = (next: Camera, animate: boolean): void => {
+    cancelAnimationFrame(turning)
+    const from = camera
+    const whole = framed || showsAll()
+    /* The shorter way round, so 350 to 10 turns twenty degrees and not three hundred and forty. */
+    const turn = from.turn + ((((next.turn - from.turn) % 360) + 540) % 360) - 180
+    if (!animate) {
+      place({ tilt: next.tilt, turn }, whole)
+      return
+    }
+    const started = performance.now()
+    const frame = (now: number): void => {
+      const at = Math.min((now - started) / (STEP * 2), 1)
+      const eased = ease(at)
+      place(
+        {
+          tilt: from.tilt + (next.tilt - from.tilt) * eased,
+          turn: from.turn + (turn - from.turn) * eased,
+        },
+        whole,
+      )
+      if (at < 1) {
+        turning = requestAnimationFrame(frame)
+      }
+    }
+    turning = requestAnimationFrame(frame)
+  }
+
   /* Drag to pan and the wheel to zoom, as far as the frame's gestures allow:
      `gesturesHeld` keeps the wheel and touches from here in the modes that
      leave them to the page. A press that did not move is a press. */
-  let dragging: { id: number; moved: boolean; x: number; y: number } | undefined
+  let dragging:
+    | { id: number; moved: boolean; turning: boolean; whole: boolean; x: number; y: number }
+    | undefined
   const onDown = (event: PointerEvent): void => {
     if (
       event.button !== 0 ||
@@ -456,7 +615,14 @@ export const isometricDriver = (
       dragging = undefined
       return
     }
-    dragging = { id: event.pointerId, moved: false, x: event.clientX, y: event.clientY }
+    dragging = {
+      id: event.pointerId,
+      moved: false,
+      turning: event.shiftKey,
+      whole: event.shiftKey && (framed || showsAll()),
+      x: event.clientX,
+      y: event.clientY,
+    }
   }
   const onMove = (event: PointerEvent): void => {
     const target = (event.target as Element | null)?.closest?.('[data-id]')
@@ -476,11 +642,30 @@ export const isometricDriver = (
     }
     if (!dragging.moved) {
       dragging.moved = true
-      svg.setPointerCapture?.(event.pointerId)
+      /* Captured where the browser still tracks the pointer, so a drag
+         that leaves the box keeps going; a pointer it no longer tracks
+         throws here, and the drag goes on inside the box. */
+      try {
+        svg.setPointerCapture?.(event.pointerId)
+      } catch {
+        /* Nothing to capture. */
+      }
     }
     dragging.x = event.clientX
     dragging.y = event.clientY
     cancelAnimationFrame(gliding)
+    if (dragging.turning) {
+      /* Shift with a drag turns the view across and tilts it up and down. */
+      cancelAnimationFrame(turning)
+      place(
+        {
+          tilt: camera.tilt + dy * TILT_PER_PIXEL,
+          turn: camera.turn - dx * TURN_PER_PIXEL,
+        },
+        dragging.whole,
+      )
+      return
+    }
     framed = false
     view = { ...view, x: view.x - dx / view.scale, y: view.y - dy / view.scale }
     show()
@@ -552,10 +737,12 @@ export const isometricDriver = (
   }
 
   return {
+    /* A bearing from 0 to 360, however far round the view was turned to reach it. */
+    camera: () => ({ tilt: camera.tilt, turn: ((camera.turn % 360) + 360) % 360 }),
     center: (id, animate) => {
       const node = nodes.get(id)
       if (node) {
-        const peak = project(node.x, node.y, tallness(node) / 2)
+        const peak = projection.at(node.x, node.y, tallness(node) / 2)
         go({ ...view, x: peak.x, y: peak.y }, animate)
       }
     },
@@ -585,7 +772,13 @@ export const isometricDriver = (
     groups: (next) => {
       groups = next
       drawPlates()
-      drawNames()
+      /* The plates are part of the whole, so a diagram framed whole is
+         framed again around them. */
+      if (framed) {
+        fitAll(false)
+      } else {
+        drawNames()
+      }
     },
     look: (next) => {
       looks = next
@@ -601,8 +794,17 @@ export const isometricDriver = (
       go({ ...view, x: view.x + x / view.scale, y: view.y + y / view.scale }, animate)
     },
     settle: (unplaced, placed) => {
+      /* **A diagram that places none of its notes is laid out in columns**
+         along its links; a note added beside placed ones goes to the
+         nearest free cell next to them. */
       const seeded = new Map([...nodes].map(([id, node]) => [id, { x: node.x, y: node.y }]))
-      const cells = snapToCells(seeded, unplaced)
+      const cells =
+        unplaced.size === nodes.size
+          ? layered(
+              [...nodes.keys()].map((id) => ({ group: groupOf(id), id })),
+              [...links.values()],
+            )
+          : snapToCells(seeded, unplaced)
       for (const [id, cell] of cells) {
         const node = nodes.get(id)
         if (node) {
@@ -623,6 +825,7 @@ export const isometricDriver = (
     },
     stop: () => {
       cancelAnimationFrame(gliding)
+      cancelAnimationFrame(turning)
       sized?.disconnect()
       held.stop()
       svg.removeEventListener('pointerdown', onDown)
@@ -631,6 +834,12 @@ export const isometricDriver = (
       svg.removeEventListener('pointerleave', onLeave)
       svg.removeEventListener('wheel', onWheel)
       svg.remove()
+    },
+    turnBy: (degrees, animate = !still()) => {
+      aim({ tilt: camera.tilt, turn: camera.turn + degrees }, animate)
+    },
+    turnTo: (next, animate = !still()) => {
+      aim({ tilt: next.tilt ?? camera.tilt, turn: next.turn ?? camera.turn }, animate)
     },
     update: (changes) => {
       for (const id of changes.removeNodes) {
