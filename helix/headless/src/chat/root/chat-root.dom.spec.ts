@@ -27,6 +27,7 @@ const assigned = (element: HTMLElement, name: string): Element[] =>
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../turns/index.js')
   await import('../composer/index.js')
 })
 

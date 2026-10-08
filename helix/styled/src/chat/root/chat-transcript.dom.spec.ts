@@ -9,6 +9,7 @@ import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/d
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../turns/index.js')
 })
 
 const geometry = hasLayout() ? test : (): void => {}

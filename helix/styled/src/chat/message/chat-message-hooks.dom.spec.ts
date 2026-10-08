@@ -13,6 +13,7 @@ import {
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../turns/index.js')
 })
 
 const geometry = hasLayout() ? test : (): void => {}

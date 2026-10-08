@@ -1,5 +1,6 @@
 import {
   auditChildren,
+  auditEntry,
   ChildrenController,
   customElement,
   deepActiveElement,
@@ -14,7 +15,6 @@ import {
   MixinCollection,
   onUnlessFalse,
   type Rendered,
-  reportRuntime,
   requestChange,
   SCROLLER_RULE,
   UpgradeController,
@@ -25,13 +25,9 @@ import {
   wordsConverter,
 } from '@fusion.dev/helix-core'
 import { arrowDown } from '@fusion.dev/helix-icons'
-import { nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { keyed } from 'lit/directives/keyed.js'
-import { repeat } from 'lit/directives/repeat.js'
-/* `static-html`'s `html`, because a turn fed as data is drawn with the tier's
-   own message tag, and an interpolated tag is a static value. */
-import { html } from 'lit/static-html.js'
 import type { HelixHeadlessChatMessage } from '../message/chat-message.js'
 import { authorWords, TURN_WORDS, type TurnWords } from '../naming.js'
 
@@ -67,42 +63,20 @@ export interface ChatTurn {
 }
 
 /**
- * What a fed turn's parts are called a second time, while the turn is one a
- * stylesheet draws apart: `<part>-<state>`, as a state drawn on a part is, for
- * each part the styled tier draws differently from inside the message.
+ * What the family's own entries add to the chat once imported: the turns
+ * drawn from `turns`, from `chat/turns`.
  *
- * **Only `me` has a name.** `author` is free text, so the plain names are
- * everyone else's.
- *
- * **Literal `inner: outer` lists**, because `helix component` reads them here
- * to hold each name to its prefix and its `@csspart`, and a name put together
- * from pieces is one no rule can read.
+ * **Set on the class by the entry**, so a chat whose page never imports it
+ * carries none of its code.
  */
-const SECOND_NAMES = {
-  author: {
-    me: 'avatar: message-avatar-mine, body: message-body-mine, content: message-content-mine, message: message-mine, meta: message-meta-mine',
-  },
-  state: {
-    failed: 'meta: message-meta-failed',
-    sending: 'content: message-content-sending',
-    streaming: 'content: message-content-streaming',
-  },
-} as const
-
-/**
- * What `table` holds under `key`. Own keys only: `author` is free text, and a
- * turn by `constructor` would otherwise read the source of a function.
- */
-const ownEntry = (
-  table: Readonly<Record<string, string>>,
-  key: string | undefined,
-): string | undefined => (key !== undefined && Object.hasOwn(table, key) ? table[key] : undefined)
-
-/** The names `key` adds from `table`, as the tail of an `exportparts` list. */
-const secondNames = (table: Readonly<Record<string, string>>, key: string | undefined): string => {
-  const names = ownEntry(table, key)
-  return names === undefined ? '' : `, ${names}`
+export interface ChatAdditions {
+  drawTurns?: (chat: HelixHeadlessChat) => TemplateResult
+  followTurns?: (chat: HelixHeadlessChat, previous: readonly ChatTurn[] | undefined) => void
+  revealTurn?: (chat: HelixHeadlessChat, at: number) => Promise<HTMLElement | undefined>
 }
+
+/** What the entries have added to this chat's class. */
+const added = (chat: HelixHeadlessChat): ChatAdditions => chat.constructor as ChatAdditions
 
 /** A turn as the announcer reads it, whichever way it was handed over. */
 interface Heard {
@@ -182,8 +156,10 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * Pass the turns as children or as `turns` data. Do not use both: a chat given
  * both draws every turn from `turns` and then the children, and says so once
  * in the console. Children render from the server and suit most
- * conversations. `turns` draws a long
- * transcript one window at a time, so the log needs a block size of its own.
+ * conversations. `turns` draws a long transcript one window at a time, so the
+ * log needs a block size of its own, and it is an import of its own,
+ * `@fusion.dev/helix/chat/turns`: a chat given `turns` without it draws its
+ * children alone, and in development says so with the line to add.
  *
  * The log scrolls on this tier. It carries `data-scroller`, and `core` ships
  * `[data-scroller] { overflow: auto }` into every shadow root, so pinning,
@@ -616,9 +592,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     return this.filled?.has(name) ?? true
   }
 
-  /** Whether the turns are data rather than children. */
+  /** Whether the turns are data rather than children: `turns`, drawn by `chat/turns`. */
   private get fed(): boolean {
-    return this.turns.length > 0
+    return this.turns.length > 0 && added(this).drawTurns !== undefined
   }
 
   /** The turns declared as children, in the order they are written. */
@@ -1086,53 +1062,18 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
       }
     }
     if (changed.has('turns')) {
-      this.follow(changed.get('turns') as readonly ChatTurn[] | undefined)
+      added(this).followTurns?.(this, changed.get('turns') as readonly ChatTurn[] | undefined)
+      auditEntry(
+        this,
+        'chat/turns',
+        'was given `turns`',
+        () => this.turns.length > 0 && !added(this).drawTurns,
+      )
     }
-    this.warnMixed()
     this.toggleState('pinned', this.pinned)
     this.toggleState('typing', this.typing !== '')
     this.toggleState('loading', this.history === 'loading')
-    this.toggleState(
-      'empty',
-      this.childrenKnown && this.turns.length === 0 && this.messages.length === 0,
-    )
-  }
-
-  /** Whether the chat has said it was given turns both ways. */
-  private warnedMixed = false
-
-  /** Says once that turns arrived both as children and as `turns`. */
-  private warnMixed(): void {
-    if (this.warnedMixed || this.turns.length === 0 || this.messages.length === 0) {
-      return
-    }
-    this.warnedMixed = true
-    reportRuntime({
-      kind: 'mixed-turns',
-      message: `A chat was given ${this.messages.length} turns as children and ${this.turns.length} as \`turns\`, and draws the children after every turn from \`turns\`. Pass one or the other.`,
-      tag: this.localName,
-    })
-  }
-
-  /**
-   * Keeps the window on the same turns when the set changes around them.
-   *
-   * Turns added before the first one are history, and the controller is told
-   * how many so every measurement moves with its turn. A first turn that is gone
-   * means the set was trimmed or replaced, and a measurement that now names a
-   * different turn is worse than the estimate.
-   */
-  private follow(previous: readonly ChatTurn[] | undefined): void {
-    if (!previous?.length || this.turns.length === 0) {
-      return
-    }
-    const first = this.identity(previous[0])
-    const at = this.turns.findIndex((turn) => this.identity(turn) === first)
-    if (at > 0) {
-      this.virtualize.shift(at)
-    } else if (at < 0) {
-      this.virtualize.forget()
-    }
+    this.toggleState('empty', this.childrenKnown && !this.fed && this.messages.length === 0)
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -1294,26 +1235,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   /** Draws turn `at` where it is windowed and not drawn, and visits it. */
   private async showTurn(at: number): Promise<void> {
-    if (this.fed) {
-      const drawn = (): HTMLElement | null | undefined =>
-        this.renderRoot
-          ?.querySelector<HTMLElement>(`[part="turn"][data-index="${at}"]`)
-          ?.querySelector<HTMLElement>(':scope > *')
-      if (!drawn()) {
-        this.virtualize.reveal(at)
-        this.virtualize.measure()
-        this.requestUpdate()
-        await this.updateComplete
-      }
-      const turn = drawn()
-      if (turn) {
-        this.visit(turn)
-      }
-      return
-    }
-    const message = this.messages[at]
-    if (message) {
-      this.visit(message)
+    const turn = this.fed ? await added(this).revealTurn?.(this, at) : this.messages[at]
+    if (turn) {
+      this.visit(turn)
     }
   }
 
@@ -1488,38 +1412,6 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   }
 
   /** The turns fed as data, a window of them, between the room the rest would take. */
-  private renderTurns(): TemplateResult {
-    const { after, before, first, last } = this.virtualize.window
-    const message = this.tag('chat-message')
-    /* `flex: none` inline, because the room is only room if it keeps its size:
-       an empty flex item in a log that is a flex column shrinks to nothing, and
-       with the spacers gone the window grew until it had drawn every turn. */
-    return html`<div part="before" role="presentation" style="block-size: ${before}px; flex: none"></div>
-      ${repeat(
-        this.turns.slice(first, last),
-        (turn, offset) => turn.key ?? first + offset,
-        (turn, offset) =>
-          html`<div part="turn" data-index=${first + offset}>
-            <${message}
-              exportparts="actions: message-actions, avatar: message-avatar, body: message-body,
-                content: message-content, indicator: message-indicator, mark: message-mark, message,
-                meta: message-meta, retry: message-retry, sources: message-sources,
-                state: message-state, time: message-time${secondNames(SECOND_NAMES.author, turn.author)}${secondNames(SECOND_NAMES.state, turn.state)}"
-              author=${turn.author ?? nothing}
-              author-label=${turn.authorLabel ?? nothing}
-              at=${turn.at ?? nothing}
-              style=${ownEntry(this.authorStyles, turn.author) ?? nothing}
-              .turnWords=${this.words}
-              .turnPosition=${first + offset + 1}
-              .turnCount=${this.turns.length}
-              .failedLabel=${this.failedLabel}
-              state=${turn.state ?? nothing}
-            >${turn.text}</${message}>
-          </div>`,
-      )}
-      <div part="after" role="presentation" style="block-size: ${after}px; flex: none"></div>`
-  }
-
   /**
    * The `resume` slot, with the way back drawn where nothing is slotted, behind a seam:
    * the slot answers a page, and this answers the tier above.
@@ -1533,6 +1425,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   }
 
   protected override render(): TemplateResult {
+    const { drawTurns } = added(this)
     const away = !this.pinned
     const fed = this.fed
     /* The header stands while either half of it is filled: a conversation with
@@ -1556,7 +1449,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         @scroll=${this.handleScroll}
       >
         ${this.history === 'loading' ? html`<p part="history">${this.historyText}</p>` : nothing}
-        ${fed ? this.renderTurns() : nothing}
+        ${fed && drawTurns ? drawTurns(this) : nothing}
         <slot name="messages" @slotchange=${this.handleSlotChange}></slot>
         ${
           /* Not empty where nobody can know yet: a server, and the render that

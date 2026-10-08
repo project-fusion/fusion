@@ -8,6 +8,7 @@ beforeAll(async () => {
   registerDom()
   await import('../index.js')
   await import('../composer/index.js')
+  await import('../turns/index.js')
 })
 
 /* Browser only: happy-dom does not run a script inserted by script. */
