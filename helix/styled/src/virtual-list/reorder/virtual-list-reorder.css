@@ -1,0 +1,75 @@
+/* What a reorderable virtual list adopts into its own shadow root while it
+   reorders, so a list that never moves items carries none of it. A row is
+   your element, so a move is drawn on the slotted row by the data attribute
+   the entry writes on it. */
+
+/* A whole row is what a pointer drags, so it says so anywhere in it, and a
+   drag across rows moves the row without selecting their words. */
+::slotted([data-index]) {
+  cursor: grab;
+  user-select: none;
+}
+
+::slotted([data-dragging]) {
+  opacity: var(--virtual-list-dragging-opacity, 0.5);
+}
+
+/* The line where the row would land, drawn inside the row's edge as a
+   shadow, so nothing moves and a row's own pseudo-elements stay the page's. */
+::slotted([data-drop-before]) {
+  box-shadow: inset 0 var(--virtual-list-drop-indicator-size, var(--helix-border-thick)) 0 0
+    var(--virtual-list-drop-indicator-color, var(--helix-color-primary));
+}
+
+::slotted([data-drop-after]) {
+  box-shadow: inset 0 calc(-1 * var(--virtual-list-drop-indicator-size, var(--helix-border-thick)))
+    0 0 var(--virtual-list-drop-indicator-color, var(--helix-color-primary));
+}
+
+/* Across, the line stands at the start or the end of the row, which a
+   right-to-left page mirrors. */
+:host(:state(horizontal)) ::slotted([data-drop-before]) {
+  box-shadow: inset var(--virtual-list-drop-indicator-size, var(--helix-border-thick)) 0 0 0
+    var(--virtual-list-drop-indicator-color, var(--helix-color-primary));
+}
+
+:host(:state(horizontal)) ::slotted([data-drop-after]) {
+  box-shadow: inset calc(-1 * var(--virtual-list-drop-indicator-size, var(--helix-border-thick))) 0
+    0 0 var(--virtual-list-drop-indicator-color, var(--helix-color-primary));
+}
+
+:host(:state(horizontal):dir(rtl)) ::slotted([data-drop-before]) {
+  box-shadow: inset calc(-1 * var(--virtual-list-drop-indicator-size, var(--helix-border-thick))) 0
+    0 0 var(--virtual-list-drop-indicator-color, var(--helix-color-primary));
+}
+
+:host(:state(horizontal):dir(rtl)) ::slotted([data-drop-after]) {
+  box-shadow: inset var(--virtual-list-drop-indicator-size, var(--helix-border-thick)) 0 0 0
+    var(--virtual-list-drop-indicator-color, var(--helix-color-primary));
+}
+
+/* The copy of a row a pointer drags, drawn in the top layer and raised over
+   the page while the row itself stays in place, faded. It has no transition,
+   so it follows the pointer with nothing animated. Selected as the list's one
+   popover, which is the `drag-preview` part the entry draws. */
+[popover] {
+  background-color: var(
+    --virtual-list-drag-preview-background-color,
+    var(--helix-color-surface-raised)
+  );
+  border: none;
+  border-radius: var(--virtual-list-drag-preview-radius, var(--helix-radii-sm));
+  box-shadow: var(--virtual-list-drag-preview-shadow, var(--helix-shadow-floating));
+  opacity: var(--virtual-list-drag-preview-opacity, 0.9);
+}
+
+/* The region each move is said in, clipped out of the picture and kept in the
+   accessibility tree. */
+[data-reorder-live] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}

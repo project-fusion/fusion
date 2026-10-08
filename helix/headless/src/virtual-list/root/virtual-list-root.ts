@@ -130,6 +130,7 @@ const ROWS = ':scope > [data-index], :scope > [data-section] > [data-index]'
  * | Page Down, Page Up | Moves by the number of items, or of lines in a grid, on screen. |
  * | A letter or a word | Moves to the next item whose text starts with what you typed. |
  * | Escape | Lets go of every chosen item, in a list with `selection-mode`. |
+ * | Alt with Up or Down | In a `reorderable` list, moves the item a place. Alt with Home or End moves it to either end. |
  * | Tab | Moves into the focused row's own links and buttons, then out of the list. |
  *
  * An item that is not drawn is scrolled into view and focused, so a keyboard
@@ -178,6 +179,23 @@ const ROWS = ':scope > [data-index], :scope > [data-section] > [data-index]'
  * the last item says "Loading more" (`loading-label`, or your own content in
  * the `loading` slot). `scrollToIndex` takes a reader to an item.
  *
+ * **Moving items** is a separate import, `@fusion.dev/helix/virtual-list/reorder`,
+ * as React Aria's drag and drop is. With it imported, `reorderable` lets a
+ * reader move items in a list of one column without sections:
+ *
+ * - Alt with Up or Down moves the item the keys are on a place, and Alt with
+ *   Home or End to either end, as the APG's rearrangeable listbox does.
+ * - A pointer drags a whole row. A press that does not travel is still a
+ *   press. The list scrolls near an edge, and an item far down a long set is
+ *   reached by dragging to the edge.
+ * - A drop sends `helix-before-reorder`, which you can refuse, and then
+ *   `helix-reorder`, whose `keys` hold every item's key in the new order.
+ *   **You move the items**: set `items` to them in that order. The keys stay
+ *   on the item that moved.
+ * - Each move is said in a region screen readers announce. The row being
+ *   dragged carries `data-dragging`, and the row a drop would land beside
+ *   `data-drop-before` or `data-drop-after`.
+ *
  * **An empty list.** Set `empty-label`, or put your own content in the `empty`
  * slot, for a row shown when there are no items and none are loading, such as
  * "No messages yet" and a link to write one. Without either, an empty list
@@ -215,8 +233,10 @@ const ROWS = ':scope > [data-index], :scope > [data-section] > [data-index]'
  *
  * @event {Event} change - Fired once a press or a key has changed which items are selected, in a list with `selection-mode`.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press or a key changes which items are selected, with the `value` it would leave. Cancelable.
+ * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when an item is dropped at a new place, in a `reorderable` list with `@fusion.dev/helix/virtual-list/reorder` imported, with every key in the new order. Cancelable: cancel it to keep the item where it is.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader comes within one screen of the last item, once for each length of the set.
  * @event {HelixRangeChangeEvent} helix-range-change - Fired when the items on screen change, with the new `first` and `last`, which `range` also holds.
+ * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Set `items` to the order in `keys`. Cancelable: cancel it to say the move did not happen.
  *
  * @csspart after - The space that stands in for the rows below the rendered ones.
  * @csspart before - The space that stands in for the rows above the rendered ones.
@@ -377,6 +397,17 @@ export class HelixHeadlessVirtualList extends HelixElement {
    */
   @property({ attribute: false })
   renderSection: VirtualListSectionRenderer | undefined
+
+  /**
+   * Lets a reader move items, once `@fusion.dev/helix/virtual-list/reorder`
+   * (or `@fusion.dev/helix-headless/virtual-list/reorder`) is imported: Alt
+   * with an arrow moves the row the keys are on, and a pointer drags a row.
+   * The list moves no item itself: you move your `items` on `helix-reorder`.
+   * Without that import it does nothing, so a list that never moves items
+   * carries none of the code. A list of one column, without sections.
+   */
+  @property({ type: Boolean })
+  reorderable = false
 
   /**
    * The field of each item that names its section, as a key or a path of
@@ -1041,8 +1072,8 @@ export class HelixHeadlessVirtualList extends HelixElement {
     return keyOf(this.data[at], at, this.keyField)
   }
 
-  /** Every item's key, in the order of the set. */
-  private keys(): string[] {
+  /** @internal Every item's key, in the order of the set, which the reorder entry moves. */
+  keys(): string[] {
     return this.data.map((_, at) => this.keyAt(at))
   }
 
@@ -1142,10 +1173,10 @@ export class HelixHeadlessVirtualList extends HelixElement {
   }
 
   /**
-   * Focuses the row for item `index`, scrolling it into view and drawing it
-   * first when it is not drawn.
+   * @internal Focuses the row for item `index`, scrolling it into view and
+   * drawing it first when it is not drawn.
    */
-  private async focusIndex(index: number): Promise<void> {
+  async focusIndex(index: number): Promise<void> {
     this.active = index
     /* Drawn whether or not the window reaches it. Placed by the estimate, the
        window can stop short of a row once the rows it measured turn out
