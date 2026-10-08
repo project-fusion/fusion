@@ -305,3 +305,29 @@ describe('a menu row with no name', () => {
     }
   })
 })
+
+/* Option says `disabled` as a state, which a framework's property and the
+   attribute both reach; a row said it only as the attribute. */
+describe('the states a row says', () => {
+  test('disabled, from the attribute or the property', async () => {
+    const host = (await row('disabled')) as HTMLElement & {
+      disabled: boolean
+      updateComplete: Promise<unknown>
+    }
+    expect(hasState(host, 'disabled')).toBe(true)
+    host.disabled = false
+    await host.updateComplete
+    expect(hasState(host, 'disabled')).toBe(false)
+  })
+
+  test('expanded, while its flyout submenu is open', async () => {
+    const host = (await row()) as HTMLElement & {
+      expanded: boolean
+      updateComplete: Promise<unknown>
+    }
+    expect(hasState(host, 'expanded')).toBe(false)
+    host.expanded = true
+    await host.updateComplete
+    expect(hasState(host, 'expanded')).toBe(true)
+  })
+})
