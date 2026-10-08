@@ -393,3 +393,49 @@ describe('the highlighted suggestion', () => {
     expect(said).toEqual(['true', 'false'])
   })
 })
+
+/* WA's combobox and this library's Combobox give their panel a loading line and
+   a no-results line, each with a slot; the suggestions panel had neither. */
+describe('a panel that is loading or finds nothing', () => {
+  const states = (host: Updatable): Set<string> =>
+    (host as unknown as { internals: ElementInternals }).internals.states as unknown as Set<string>
+
+  test('opens on the loading line, says it, and shows the suggestions once they come', async () => {
+    const host = await mount([], 'loading')
+    await enter(host)
+    expect(surface(host)?.hidden).toBe(false)
+    expect(control(host).getAttribute('role')).toBe('combobox')
+    expect(part(host as HTMLElement, 'loading')?.hidden).toBe(false)
+    expect(part(host as HTMLElement, 'loading')?.textContent?.trim()).toBe('Loading')
+    expect(part(host as HTMLElement, 'live')?.textContent).toBe('Loading')
+    expect(states(host).has('loading')).toBe(true)
+    const option = document.createElement('helix-headless-option')
+    option.slot = 'suggestions'
+    option.setAttribute('value', 'open')
+    option.textContent = 'Open'
+    ;(host as HTMLElement).append(option)
+    ;(host as HTMLElement & { loading: boolean }).loading = false
+    await settle(host)
+    expect(part(host as HTMLElement, 'loading')?.hidden).toBe(true)
+    expect(part(host as HTMLElement, 'live')?.textContent).toBe('1 suggestion')
+    expect(states(host).has('loading')).toBe(false)
+  })
+
+  test('says no-results-text when the filter hides every suggestion, and closes without it', async () => {
+    const host = await mount(
+      ['Open', 'Closed'],
+      'filter-suggestions no-results-text="No filters match"',
+    )
+    await enter(host)
+    await type(host, 'zzz')
+    expect(surface(host)?.hidden).toBe(false)
+    expect(part(host as HTMLElement, 'empty')?.hidden).toBe(false)
+    expect(part(host as HTMLElement, 'empty')?.textContent?.trim()).toBe('No filters match')
+    expect(part(host as HTMLElement, 'live')?.textContent).toBe('No filters match')
+    expect(states(host).has('no-results')).toBe(true)
+    const quiet = await mount(['Open', 'Closed'], 'filter-suggestions')
+    await enter(quiet)
+    await type(quiet, 'zzz')
+    expect(surface(quiet)?.hidden).toBe(true)
+  })
+})

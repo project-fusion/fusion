@@ -26,10 +26,12 @@ describe('filter input server output', () => {
        chip, the rest from the input, so an element that died fails here. */
     expect(servedParts(markup)).toEqual([
       'control',
+      'empty',
       'field',
       'label',
       'lead',
       'live',
+      'loading',
       'menu',
       'surface',
       'tags',

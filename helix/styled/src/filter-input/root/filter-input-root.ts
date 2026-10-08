@@ -5,6 +5,7 @@ import type { CSSResultGroup } from 'lit'
    element registers on import: a consumer importing this family alone would
    otherwise get inert unknown elements in the panel. */
 import '../../option/index.js'
+import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
@@ -73,6 +74,7 @@ export class HelixFilterInput extends HelixHeadlessFilterInput {
     tagRowStyles,
     floatingPanelStyles,
     floatingEntranceStyles,
+    collectionStateStyles,
     styles,
   ]
 }
