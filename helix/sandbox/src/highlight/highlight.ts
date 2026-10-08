@@ -1,7 +1,7 @@
 import { cssLanguage } from '@codemirror/lang-css'
 import { htmlLanguage } from '@codemirror/lang-html'
 import { javascriptLanguage, tsxLanguage, typescriptLanguage } from '@codemirror/lang-javascript'
-import { classHighlighter, highlightCode } from '@lezer/highlight'
+import { classHighlighter, type Highlighter, highlightCode } from '@lezer/highlight'
 import { shellLanguage } from './shell.js'
 
 /**
@@ -59,15 +59,21 @@ const escapeHtml = (text: string): string =>
  *
  * `classHighlighter` emits Lezer's own `tok-` class names. Mapping those to
  * colors is the consumer's, because the classes are stable and the palette is
- * not: the site paints them from `--helix-color-syntax-*`.
+ * not: the site paints them from `--helix-color-syntax-*`. Pass another
+ * `highlighter` for other classes, as `@fusion.dev/helix-sandbox/code-block`
+ * passes the editor's own style.
  */
-export const highlight = (code: string, language: HighlightLanguage): string => {
+export const highlight = (
+  code: string,
+  language: HighlightLanguage,
+  highlighter: Highlighter = classHighlighter,
+): string => {
   const tree = PARSERS[language].parser.parse(code)
   let out = ''
   highlightCode(
     code,
     tree,
-    classHighlighter,
+    highlighter,
     (text, classes) => {
       out += classes ? `<span class="${classes}">${escapeHtml(text)}</span>` : escapeHtml(text)
     },

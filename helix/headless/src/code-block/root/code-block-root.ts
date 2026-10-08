@@ -9,7 +9,7 @@ import {
   requestValue,
   words,
 } from '@fusion.dev/helix-core'
-import { nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { type CSSResult, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 import { html } from 'lit/static-html.js'
@@ -25,6 +25,61 @@ import {
   pairLines,
   parsePatch,
 } from '../patch.js'
+
+/**
+ * Turns code into highlighted markup for a block's `language`, or returns
+ * `undefined` for a language it does not read, which the block then draws
+ * plain.
+ */
+export type CodeBlockHighlighter = (code: string, language: string) => string | undefined
+
+/** The highlighter `registerHighlighter` gave every block, and its sheet. */
+let registered: { highlighter: CodeBlockHighlighter; sheet: CSSResult | undefined } | undefined
+
+/** Gives a block the registered sheet, once, where it has a shadow root to hold it. */
+const adoptRegistered = (block: HelixHeadlessCodeBlock): void => {
+  const root = block.shadowRoot
+  const sheet = registered?.sheet?.styleSheet
+  if (root && sheet && !root.adoptedStyleSheets.includes(sheet)) {
+    root.adoptedStyleSheets = [...root.adoptedStyleSheets, sheet]
+  }
+}
+
+/** The blocks already on the page, in the document and in every open shadow root in it. */
+const blocksOnPage = (root: ParentNode = document): HelixHeadlessCodeBlock[] =>
+  [...root.querySelectorAll('*')].flatMap((node) => [
+    ...(node instanceof HelixHeadlessCodeBlock ? [node] : []),
+    ...(node.shadowRoot ? blocksOnPage(node.shadowRoot) : []),
+  ])
+
+/**
+ * Gives every Code Block of both tiers a highlighter, for the blocks that set
+ * no `highlight` of their own, and the sheet that colors what it returns.
+ *
+ * **Opt-in, so a page that shows plain code carries no grammar.** Code Block
+ * ships none: a grammar is the larger part of any highlighter, and a block
+ * that registers one for every page makes every page pay for it. A page that
+ * wants color imports one entry that calls this, such as
+ * `@fusion.dev/helix-sandbox/code-block`, which reads `css`, `html`, `js`,
+ * `jsx`, `sh`, `ts` and `tsx` with the sandbox's Lezer grammars and colors
+ * them from the `--helix-color-syntax-*` tokens.
+ *
+ * A block's own `highlight` wins over this. Blocks already on the page draw
+ * again with it, and every block built after has it. `undefined` takes it
+ * away again.
+ */
+export const registerHighlighter = (
+  highlighter: CodeBlockHighlighter | undefined,
+  sheet?: CSSResult,
+): void => {
+  registered = highlighter ? { highlighter, sheet } : undefined
+  if (typeof document !== 'undefined') {
+    for (const block of blocksOnPage()) {
+      adoptRegistered(block)
+      block.requestUpdate()
+    }
+  }
+}
 
 /**
  * Keeps the copy button's press inside the block. What the press did reaches
@@ -89,6 +144,20 @@ const nameOf = (block: Element): string => {
  * block's `language`, so one function serves every block. The code stays in
  * the slot, so the copy button and the page's own text are the code as
  * written.
+ *
+ * **Code Block ships no grammar**, so a page that shows plain code carries
+ * none. For color with no highlighter of your own, import one entry beside
+ * the block's, which colors every block by its `language` (`css`, `html`,
+ * `js`, `jsx`, `sh`, `ts` or `tsx`) with the Lezer grammars of the sandbox's
+ * editor, in the editor's colors:
+ *
+ * ```js
+ * import '@fusion.dev/helix/code-block'
+ * import '@fusion.dev/helix-sandbox/code-block'
+ * ```
+ *
+ * `registerHighlighter` is how that entry does it, and how a page registers
+ * any highlighter once for every block.
  *
  * Set `expandable` on a block whose height is capped, such as by
  * `--code-block-max-block-size`, and a button under it shows every line and
@@ -361,6 +430,10 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * in the slot, so the copy button copies it as written and a reader without
    * the script still has it. Not called on a server, which has no code to
    * read, nor for a diff.
+   *
+   * Absent, the block draws with the highlighter `registerHighlighter` gave
+   * every block, where an entry such as `@fusion.dev/helix-sandbox/code-block`
+   * registered one, and plain otherwise.
    */
   @property({ attribute: false })
   highlight?: (code: string, language: string) => string
@@ -909,6 +982,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
+    adoptRegistered(this)
   }
 
   protected override render(): TemplateResult {
@@ -925,11 +999,10 @@ export class HelixHeadlessCodeBlock extends HelixElement {
        is reported as uncaught and the code is drawn plain, as Sandbox Source
        draws its source. */
     let highlighted: string | undefined
+    const highlight = this.highlight ?? registered?.highlighter
     try {
-      highlighted =
-        this.highlight && text !== ''
-          ? highlightedLines(this.highlight(text, this.language))
-          : undefined
+      const markup = highlight && text !== '' ? highlight(text, this.language) : undefined
+      highlighted = markup === undefined ? undefined : highlightedLines(markup)
     } catch (error) {
       globalThis.reportError?.(error)
     }
