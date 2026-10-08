@@ -62,6 +62,47 @@ const firstTabStop = (node: Element | ShadowRoot): HTMLElement | null => {
   return null
 }
 
+/** How many `form.checkValidity()` calls are running, nested ones included. */
+let formChecks = 0
+
+/** Whether `form.checkValidity()` is wrapped yet, done once per copy of this module. */
+let formChecksWatched = false
+
+/**
+ * Wraps `HTMLFormElement.prototype.checkValidity` so a control can tell its
+ * `invalid` from a form's check apart from one from a submission attempt.
+ *
+ * **The platform gives the two no difference to read.** Measured in Chromium,
+ * the `invalid` that `form.checkValidity()` fires and the one a submit button,
+ * Enter in a field, or `form.requestSubmit()` fires are alike: both trusted,
+ * both cancelable, both dispatched in the call, with `window.event` the
+ * `invalid` itself and the same user activation. Yet the platform treats them
+ * apart: after a submission attempt every invalid native field in the form
+ * matches `:user-invalid`, and after `form.checkValidity()` none does. So the
+ * check is the call that is marked, for as long as it runs, and every other
+ * source keeps counting as an attempt. Shoelace wraps a form's validity calls
+ * for the same reason.
+ *
+ * Only the check is wrapped. The platform runs a submission's validation
+ * without calling it, so a submit button, Enter and `requestSubmit()` still
+ * reach a control as an attempt.
+ */
+const watchFormChecks = (): void => {
+  if (formChecksWatched || typeof HTMLFormElement === 'undefined') {
+    return
+  }
+  formChecksWatched = true
+  const check = HTMLFormElement.prototype.checkValidity
+  HTMLFormElement.prototype.checkValidity = function checkValidity(this: HTMLFormElement) {
+    formChecks += 1
+    try {
+      return check.call(this)
+    } finally {
+      formChecks -= 1
+    }
+  }
+}
+
 /**
  * @summary Base for every element that participates in a form.
  *
@@ -453,11 +494,13 @@ export class HelixFormElement extends HelixElement {
    * required `<input>` checked from a script fires `invalid` and does not match
    * `:user-invalid`, measured in Chromium. Every layer that takes `invalid` as
    * a reader's attempt asks this first, so a script that checks an untouched
-   * field does not mark it wrong. A submission, `reportValidity()`, and the
-   * reader's own edits still do.
+   * field does not mark it wrong. The same holds for `form.checkValidity()`,
+   * which fires `invalid` on every control in the form and marks no native
+   * one. A submission, `reportValidity()`, and the reader's own edits still
+   * mark it.
    */
   protected get checkingValidity(): boolean {
-    return this.checkInProgress
+    return this.checkInProgress || formChecks > 0
   }
 
   /**
@@ -536,6 +579,7 @@ export class HelixFormElement extends HelixElement {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    watchFormChecks()
     this.addEventListener('click', this.focusFromLabel)
     this.addEventListener('invalid', this.refreshAnchor)
     /* A `<label for>` a framework renders after the control names it through
