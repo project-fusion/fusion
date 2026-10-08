@@ -148,10 +148,10 @@ const nameOf = (block: Element): string => {
  *
  * @slot - The code.
  * @slot actions - Controls for the block, in the header before the copy button.
- * @slot expand-icon - An icon on the button that shows every line of a capped block, before its words.
- * @slot label - The block's name in the header, such as a file icon beside the file name. Replaces `label` and `language` there, and draws the header.
  * @slot copied-icon - The copy button's icon after a copy. Defaults to a check mark.
  * @slot copy-icon - The copy button's icon before a copy. Defaults to a clipboard.
+ * @slot expand-icon - An icon on the button that shows every line of a capped block, before its words.
+ * @slot label - The block's name in the header, such as a file icon beside the file name. Replaces `label` and `language` there, and draws the header.
  *
  * @event {Event} change - A file tab showed its file, whose name `file` now holds.
  * @event {HelixBeforeChangeEvent} helix-before-change - A file tab is about to show its file, with the file's name in `detail.value`. Cancelable: cancel it to keep the file shown.
@@ -193,9 +193,9 @@ const nameOf = (block: Element): string => {
  * @csspart header - The bar that holds the name and the copy button, shown when there is a name.
  * @csspart hunk - In a diff, a `@@` line saying where the lines under it are.
  * @csspart label - The block's name: its `label`, or its `language` where it has no label.
+ * @csspart mark - The band behind a run of lines `mark-lines`, `added-lines` or `removed-lines` names. The block writes where the run is laid out into `--code-block-mark-start`, `--code-block-mark-size`, and `--code-block-mark-inline-size` on it. Hidden from the accessibility tree.
  * @csspart mark-added - The band behind a run of lines `added-lines` names. Applied with `mark`.
  * @csspart mark-removed - The band behind a run of lines `removed-lines` names. Applied with `mark`.
- * @csspart mark - The band behind a run of lines `mark-lines`, `added-lines` or `removed-lines` names. The block writes where the run is laid out into `--code-block-mark-start`, `--code-block-mark-size`, and `--code-block-mark-inline-size` on it. Hidden from the accessibility tree.
  * @csspart marker - In a diff, the `+`, `-`, or space that starts a line.
  * @csspart new - In a split diff, the new version's `<pre>`.
  * @csspart number - In a diff, a line number. In a `wrap` block with `line-numbers`, one line's number in the gutter, which the block makes as tall as the line it numbers through `--code-block-line-size`.
