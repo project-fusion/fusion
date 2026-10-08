@@ -169,10 +169,10 @@ describe('the built-in frame document', () => {
       const answered = new Promise<void>((resolve) => {
         answer = resolve
       })
-      compilers.set(
-        cdn,
-        answered.then(() => (source: string) => ({ code: source.replace(/: number/g, '') })),
-      )
+      compilers.set(cdn, async (source: string) => {
+        await answered
+        return { code: source.replace(/: number/g, '') }
+      })
       return answer
     }
 

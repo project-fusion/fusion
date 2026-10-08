@@ -9,16 +9,13 @@ const asked = new Map<string, Record<string, unknown>>()
  * from, so no spec reaches the network. It strips `: number` and fails on `<<`.
  */
 const stub = (cdn: string): void => {
-  compilers.set(
-    cdn,
-    Promise.resolve((source: string, options: Record<string, unknown>) => {
-      asked.set(options.filePath as string, options)
-      if (source.includes('<<')) {
-        throw new Error(`Error transforming ${options.filePath}: Unexpected token (1:9)`)
-      }
-      return { code: source.replace(/: number/g, ''), sourceMap: { mappings: 'AAAA', version: 3 } }
-    }),
-  )
+  compilers.set(cdn, async (source: string, options: Record<string, unknown>) => {
+    asked.set(options.filePath as string, options)
+    if (source.includes('<<')) {
+      throw new Error(`Error transforming ${options.filePath}: Unexpected token (1:9)`)
+    }
+    return { code: source.replace(/: number/g, ''), sourceMap: { mappings: 'AAAA', version: 3 } }
+  })
 }
 
 afterEach(() => {
@@ -68,12 +65,12 @@ describe('a module in TypeScript or JSX', () => {
     )
   })
 
-  test('loads the pinned compiler from `cdn`, and says so when it does not load, then tries again', async () => {
-    const code = await compile('test-nowhere:/', 'app.ts', 'export {}')
-    expect(code).toStartWith(
-      `throw new SyntaxError("app.ts needs ${COMPILER} from test-nowhere:/, which did not load:`,
+  /* In a worker, whose script imports the compiler from `cdn`, so no bundler
+     reads the import. Here, `cdn` is a folder with no compiler in it. */
+  test('loads the pinned compiler from `cdn` in a worker, and says so when it does not load', async () => {
+    const nowhere = new URL('./no-compiler-here/', import.meta.url).href
+    expect(await compile(nowhere, 'app.ts', 'export {}')).toStartWith(
+      `throw new SyntaxError("app.ts needs ${nowhere}${COMPILER}, which did not load:`,
     )
-    await Promise.resolve()
-    expect(compilers.has('test-nowhere:/')).toBe(false)
   })
 })
