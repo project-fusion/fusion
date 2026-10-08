@@ -74,7 +74,8 @@
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "dependencies": {
     "@floating-ui/dom": "^1.8.0",
-    "@fusion.dev/helix-icons": "workspace:*"
+    "@fusion.dev/helix-icons": "workspace:*",
+    "tslib": "^2.8.1"
   },
   "devDependencies": {
     "@fusion.dev/helix-cem": "workspace:*",

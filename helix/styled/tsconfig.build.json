@@ -1,4 +1,9 @@
 {
+  // One `__decorate`, imported from tslib by every module with a decorator, in
+  // place of a copy of it written into each of them.
+  "compilerOptions": {
+    "importHelpers": true
+  },
   "exclude": ["src/**/*.spec.ts", "src/*/.examples/**"],
   "extends": "./tsconfig.json"
 }
