@@ -425,6 +425,14 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   previousYearsLabel = 'Earlier years'
 
   /**
+   * The validation message for a range that ends before it starts. `{start}`
+   * is replaced with the start, written as a date in `locale`.
+   */
+  @words
+  @property({ attribute: 'range-order-message' })
+  rangeOrderMessage = 'Choose an end on or after {start}.'
+
+  /**
    * The validation message for a date after `max`. `{max}` is replaced with
    * `max`, written as a date in `locale`.
    */
@@ -1008,14 +1016,6 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     super.disconnectedCallback()
     this.removeEventListener('keydown', this.handleKeydown)
   }
-
-  /**
-   * The validation message for a range that ends before it starts. `{start}`
-   * is replaced with the start, written as a date in `locale`.
-   */
-  @words
-  @property({ attribute: 'range-order-message' })
-  rangeOrderMessage = 'Choose an end on or after {start}.'
 
   /**
    * The validation message for a date before `min`. `{min}` is replaced with
