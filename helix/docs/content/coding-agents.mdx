@@ -100,7 +100,7 @@ These checks run on your project, and each one prints JSON with `--json`:
 
 | Command | What it finds |
 |---|---|
-| `helix scan` | Unknown tags, attributes, values, slots, parts, hooks, React event props, and tokens, a `--_helix-` primitive read, `[disabled]` on a form control, and a tag whose entry nothing imports, each with its file and line |
+| `helix scan` | Unknown tags, attributes, values, slots, parts, hooks, React event props, and tokens, a `--_helix-` primitive read, `[disabled]` on a form control, a selector on an attribute the element never writes back, and a tag whose entry nothing imports, each with its file and line |
 | `helix theme audit` | Every foreground and background pair in your theme that misses its contrast target |
 | `initDiagnostics()` from `@fusion.dev/helix-diagnostics` | The same findings on the running page, and what the library reports as it runs, such as an option nobody imported |
 

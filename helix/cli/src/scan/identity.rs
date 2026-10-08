@@ -12,7 +12,7 @@ use std::sync::LazyLock;
 use regex::Regex;
 
 /// Every fault class, stable across versions, as `report.ts` lists them.
-pub const KINDS: [&str; 14] = [
+pub const KINDS: [&str; 15] = [
     "dead-hook",
     "dead-part",
     "disabled-attribute",
@@ -27,14 +27,20 @@ pub const KINDS: [&str; 14] = [
     "unknown-slot",
     "unknown-tag",
     "unknown-token",
+    "unreflected-attribute",
 ];
 
 /// What a fault is about: `styling` for parts and hooks, `markup` for
 /// attributes, and `integrity` for the page and the library disagreeing.
 pub fn category(kind: &str) -> &'static str {
     match kind {
-        "dead-hook" | "dead-part" | "disabled-attribute" | "primitive-token"
-        | "unforwarded-part" | "unknown-token" => "styling",
+        "dead-hook"
+        | "dead-part"
+        | "disabled-attribute"
+        | "primitive-token"
+        | "unforwarded-part"
+        | "unknown-token"
+        | "unreflected-attribute" => "styling",
         "invalid-value" | "unknown-attribute" | "unknown-event" | "unknown-slot" => "markup",
         _ => "integrity",
     }
@@ -55,7 +61,7 @@ pub fn owner(kind: &str) -> &'static str {
 /// written.
 pub fn shipped(kind: &str) -> &'static str {
     match kind {
-        "unforwarded-part" | "unimported-tag" => "warn",
+        "unforwarded-part" | "unimported-tag" | "unreflected-attribute" => "warn",
         _ => "error",
     }
 }

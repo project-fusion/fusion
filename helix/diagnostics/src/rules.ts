@@ -67,6 +67,9 @@ export const SHIPPED_RULES: Readonly<Record<Kind, Severity>> = {
   'unknown-slot': 'error',
   'unknown-tag': 'error',
   'unknown-token': 'error',
+  /* A warning, because a page whose markup always carries the attribute, as
+     a static page or a server render with no client navigation does, works. */
+  'unreflected-attribute': 'warn',
 }
 
 const SEVERITIES = new Set(['error', 'info', 'off', 'warn'])

@@ -109,6 +109,18 @@ pub struct Raw {
     pub tag: String,
 }
 
+/// A Helix tag carrying an attribute selector, with the attribute's name.
+static UNREFLECTED: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(helix-[a-z0-9-]+)(?:[.#:][\w-]+(?:\([^)]*\))?)*\[\s*([a-zA-Z][\w-]*)")
+        .expect("a literal pattern")
+});
+
+/// Attributes every element writes back, being reflected IDL attributes of
+/// `HTMLElement`, so a selector on one matches however it was set.
+const ALWAYS_WRITTEN: [&str; 11] = [
+    "class", "dir", "hidden", "id", "lang", "part", "role", "slot", "style", "tabindex", "title",
+];
+
 /// A Helix tag carrying an attribute selector for `disabled`.
 static DISABLED: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(helix-[a-z0-9-]+)\[\s*disabled\s*\]").expect("a literal pattern")
@@ -310,6 +322,7 @@ impl<'a> Analyzer<'a> {
             if !own {
                 self.disabled(rule, &origin);
                 self.tokens(rule, &origin);
+                self.unreflected(rule, &origin);
             }
             let known: Vec<String> = targets(&rule.selector)
                 .into_iter()
@@ -660,6 +673,46 @@ impl<'a> Analyzer<'a> {
                 message: format!("`{tag}[disabled]` misses a `{tag}` that a `<fieldset disabled>` disables, which sets no attribute, so it looks enabled and takes no input. Write `{tag}:disabled`."),
                 origin: origin(),
                 subject: format!("{tag}[disabled]"),
+                tag: tag.to_owned(),
+            });
+        }
+    }
+
+    /// A rule selecting a Helix tag by an attribute it takes and never writes
+    /// back, which matches only markup a server wrote: on a client navigation
+    /// a framework sets the property, and the attribute is never there. The
+    /// page diagnostics judge a class selector too, from the elements it
+    /// reaches; the text names the tag, so this judges a tag-qualified one.
+    fn unreflected(&mut self, rule: &StyleRule, origin: &dyn Fn() -> Origin) {
+        let mut seen = HashSet::new();
+        for found in UNREFLECTED.captures_iter(&rule.selector) {
+            let tag = found.get(1).map_or("", |one| one.as_str());
+            let attribute = found.get(2).map_or("", |one| one.as_str());
+            if ALWAYS_WRITTEN.contains(&attribute)
+                || attribute.starts_with("aria-")
+                || attribute.starts_with("data-")
+                || !seen.insert((tag.to_owned(), attribute.to_owned()))
+            {
+                continue;
+            }
+            let Some(published) = self.index.get(tag) else {
+                continue;
+            };
+            let Some(reflected) = &published.reflected else {
+                continue;
+            };
+            if reflected.contains(attribute)
+                || published.written.contains(attribute)
+                || published.attribute(attribute).is_none()
+            {
+                continue;
+            }
+            self.found.findings.push(Raw {
+                expected: None,
+                kind: "unreflected-attribute",
+                message: format!("`{}` selects `{tag}` by `{attribute}`, which the element takes and never writes back to itself, so the rule matches only markup a server wrote: after a client navigation the property is set and the attribute is absent. Select a class or an attribute the element reflects, or set `{attribute}` as an attribute.", rule.selector),
+                origin: origin(),
+                subject: format!("{} [{attribute}]", rule.selector),
                 tag: tag.to_owned(),
             });
         }
@@ -1028,6 +1081,38 @@ mod tests {
                 ),
                 ("disabled-attribute", "helix-card[disabled]".to_owned()),
             ]
+        );
+    }
+
+    #[test]
+    fn a_tag_selected_by_an_attribute_it_never_writes_back_is_found() {
+        let index = Index::of(&[LintData {
+            package: "@fusion.dev/helix".to_owned(),
+            tags: serde_json::json!({
+                "helix-slider": { "attributes": { "label": null, "required": null }, "family": "slider", "hooks": [], "parts": [], "reflected": ["required"], "written": [] },
+                "helix-card": { "attributes": { "label": null }, "family": "card", "hooks": [], "parts": [], "written": [] }
+            })
+            .as_object()
+            .expect("an object")
+            .clone(),
+            version: None,
+        }]);
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let mut analyzer = Analyzer::new(&index, &listing, &used);
+        let rules = crate::scan::css::read(
+            "helix-slider.channel[label=\"Saturation\"], helix-slider[required], helix-slider[data-x], helix-card[label] { color: red }",
+            1,
+            false,
+        );
+        analyzer.sheet("a.css", &rules, false);
+        /* Card's lint data says nothing of reflection, so it is not judged. */
+        assert_eq!(
+            kinds(&analyzer),
+            [(
+                "unreflected-attribute",
+                "helix-slider.channel[label=\"Saturation\"], helix-slider[required], helix-slider[data-x], helix-card[label] [label]".to_owned()
+            )]
         );
     }
 

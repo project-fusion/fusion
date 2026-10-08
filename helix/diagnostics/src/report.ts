@@ -115,6 +115,7 @@ export const KINDS = [
   'unknown-slot',
   'unknown-tag',
   'unknown-token',
+  'unreflected-attribute',
 ] as const
 
 /** A fault class. */

@@ -28,7 +28,14 @@ export interface ManifestSource {
     path?: string
     declarations?: Array<{
       attributes?: Array<{ name: string; type?: { text?: string } }>
-      members?: Array<{ kind?: string; name: string; readonly?: boolean; static?: boolean }>
+      members?: Array<{
+        attribute?: string
+        kind?: string
+        name: string
+        readonly?: boolean
+        reflects?: boolean
+        static?: boolean
+      }>
       cssParts?: Array<{ name: string }>
       cssProperties?: Array<{ name: string }>
       slots?: Array<{ name: string }>
@@ -69,6 +76,12 @@ export interface LintTag {
    * lint data written before 0.165, which a reader takes as unknown.
    */
   slots?: string[]
+  /**
+   * The attributes a property writes back to the element when it is set, so a
+   * selector on one matches however the property was set. Absent from lint data
+   * written before this field, which a reader takes as unknown.
+   */
+  reflected?: string[]
   /** The attributes the element writes on itself: one named for a read-only member. */
   written: string[]
 }
@@ -100,11 +113,15 @@ export const lintOf = (manifest: ManifestSource, name: string): LintData => {
         family,
         hooks: [],
         parts: [],
+        reflected: [],
         slots: [],
         written: [],
       }
       tags[tag] = entry
       for (const member of declaration.members ?? []) {
+        if (member.reflects && member.attribute) {
+          entry.reflected?.push(member.attribute)
+        }
         if (member.readonly && !member.static && member.kind === 'field') {
           entry.written.push(
             member.name,
@@ -126,6 +143,7 @@ export const lintOf = (manifest: ManifestSource, name: string): LintData => {
     entry.parts = [...new Set(entry.parts)]
     entry.hooks = [...new Set(entry.hooks)]
     entry.slots = [...new Set(entry.slots)]
+    entry.reflected = [...new Set(entry.reflected)]
   }
   return {
     package: manifest.helix?.package ?? name,
@@ -153,6 +171,11 @@ export interface Published {
   /** The family, from the module's path: `button` for `src/button/root/button-root.ts`. */
   family?: string | undefined
   hooks: Map<string, Set<string>>
+  /**
+   * The attributes a property writes back when it is set. Absent where a tier's
+   * lint data predates the field, which says nothing either way.
+   */
+  reflected?: Set<string> | undefined
   /**
    * The attributes the element writes on itself: one named for a read-only
    * member, as `helix-notifications` writes `unread`. Output, so never a
@@ -187,6 +210,12 @@ export const index = (tiers: Tier[]): Map<string, Published> => {
       }
       for (const name of entry.written) {
         element.written.add(name)
+      }
+      if (entry.reflected) {
+        element.reflected ??= new Set()
+        for (const name of entry.reflected) {
+          element.reflected.add(name)
+        }
       }
       for (const [name, values] of Object.entries(entry.attributes)) {
         element.attributes.set(name, values ? new Set(values) : null)

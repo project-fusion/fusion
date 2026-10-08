@@ -35,6 +35,9 @@ pub struct Published {
     pub hooks: Vec<(String, BTreeSet<String>)>,
     /// Each part, with the packages that publish it, in the order first seen.
     pub parts: Vec<(String, BTreeSet<String>)>,
+    /// The attributes a property writes back when set, or `None` where the
+    /// lint data predates them and so says nothing either way.
+    pub reflected: Option<BTreeSet<String>>,
     /// The slots it has, the default one as `""`, or `None` where the lint
     /// data predates them and so says nothing either way.
     pub slots: Option<BTreeSet<String>>,
@@ -128,6 +131,12 @@ impl Index {
                 }
                 /* A tier that lists slots says what the tag has; one that
                 does not says nothing, which leaves the check off. */
+                if entry.get("reflected").is_some() {
+                    element
+                        .reflected
+                        .get_or_insert_with(BTreeSet::new)
+                        .extend(strings(entry.get("reflected")));
+                }
                 if entry.get("slots").is_some() {
                     element
                         .slots
