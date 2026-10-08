@@ -742,6 +742,17 @@ describe('where the tab stop goes', () => {
     await cal.updateComplete
     expect(stop(cal)).toContain('August 5, 2026')
   })
+
+  /* Measured before this: with `min` past the first of the month, Tab into the
+     grid landed on the first, which is unavailable. */
+  test('to the first day that can be chosen, in either mode', async () => {
+    const range = await calendar('mode="range" default-month="2026-03-01" min="2026-03-03"')
+    expect(stop(range)).toBe('Tuesday, March 3, 2026')
+    const single = await calendar(
+      'default-month="2026-08" min="2026-08-10" disable-dates="2026-08-10"',
+    )
+    expect(stop(single)).toBe('Tuesday, August 11, 2026')
+  })
 })
 
 describe('the first day of the week', () => {

@@ -570,16 +570,28 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * to the first of the month. Measured before today was a candidate: a
    * calendar with no value opened on October 5 with its stop on "Thursday,
    * October 1".
+   *
+   * Today counts only where it can be chosen, and the fallback is the first
+   * day of the month that can, so a reader tabbing in lands on a date they can
+   * pick. Measured before: with `min="2026-03-03"`, the stop sat on "Sunday,
+   * March 1, 2026", unavailable. A month with nothing to choose keeps its
+   * first day, so the grid still has a way in.
    */
   private get anchor(): Date {
     const shown = this.shown
+    const today = asDate(todayIn(this.timeZone))
     for (const candidate of [
       asDate(this.focused),
       asDate(this.selected[0] ?? ''),
-      asDate(todayIn(this.timeZone)),
+      today && !this.barred(today) ? today : null,
     ]) {
       if (candidate && this.system.same(candidate, shown)) {
         return candidate
+      }
+    }
+    for (let day = shown; this.system.same(day, shown); day = addDays(day, 1)) {
+      if (!this.barred(day)) {
+        return day
       }
     }
     return shown
