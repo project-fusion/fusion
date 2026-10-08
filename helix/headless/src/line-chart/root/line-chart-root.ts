@@ -82,6 +82,18 @@ import '../../tooltip/index.js'
  * there until readings arrive. The `empty` and `loading` slots take markup in
  * their place, such as a link to add the first reading.
  *
+ * **Keyboard.** The plot is one tab stop.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Tab | Moves focus to the plot and shows the first reading. |
+ * | Right, Left | Moves to the next or the previous reading. On a right-to-left page, Left moves to the next. |
+ * | Down, Up | Moves among the series of the reading. With one series, moves to the next or the previous reading. |
+ * | Home, End | Moves to the first or the last reading. |
+ * | Page Down, Page Up | Moves a tenth of the readings on or back. |
+ * | Enter, Space | Presses the reading shown, which sends `helix-reading-press`. |
+ * | Escape | Puts the reading and its tooltip away. |
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
@@ -110,9 +122,10 @@ import '../../tooltip/index.js'
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart marker - The mark on one reading, under `markers`, and on a reading with a blank on either side. Placed with `inset-inline-start` and `inset-block-start`, and carries its series color as `--chart-series`.
  * @csspart marker-lone - A `marker` on a reading with a blank on either side, which no line reaches. Set alongside `marker`.
- * @csspart plot - The drawing, which takes focus to be read by key.
+ * @csspart plot - The drawing, which takes focus to be read by key. With nothing to draw, a group named as the chart is, holding the `empty` or `loading` part.
  * @csspart summary - The chart's name and each series' latest reading, written as a sentence for screen readers. Hide it visually.
  * @csspart svg - The drawing surface the lines and areas sit on.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
  * @csspart terminus - The mark on one series' last reading.
  * @csspart tick - One number on the axis, placed with `inset-block-start` at its level.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
@@ -135,6 +148,10 @@ import '../../tooltip/index.js'
  * @cssproperty --chart-terminus-x - Where a series' last reading sits horizontally, as a percentage. Written by the component.
  * @cssproperty --chart-terminus-y - Where a series' last reading sits vertically, as a percentage. Written by the component.
  * @cssproperty --line-chart-axis - The width of the axis, in `ch`, set from the widest number on it. Written by the component on the axis.
+ *
+ * @cssstate active - While a reading is shown, under the pointer or the keys, with its tooltip open.
+ * @cssstate empty - While the `empty` part stands in the plot.
+ * @cssstate loading - While the `loading` part stands in the plot.
  */
 @customElement('helix-headless-line-chart')
 export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
@@ -366,7 +383,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
        in it, which is also how the pointer and the tooltip count them. */
     const readings = series.length === 0 ? [] : this.sourceRows.map((row) => row.label)
     if (readings.length === 0) {
-      return html`<div id=${CHART_PLOT} part="plot">${this.renderStatus()}</div>`
+      return this.renderEmpty()
     }
 
     const domain = this.range(series)
@@ -388,7 +405,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     const slot = PLOT_WIDTH / readings.length
     const x = linear([0, Math.max(readings.length - 1, 1)], [slot / 2, PLOT_WIDTH - slot / 2])
 
-    return html`${this.valueAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}${this.renderSummary(series)}`
+    return html`${this.valueAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}${this.renderSummary(series)}${this.renderTable()}`
   }
 
   /**
