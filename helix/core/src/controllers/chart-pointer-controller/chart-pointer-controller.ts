@@ -540,6 +540,8 @@ export class ChartPointerController implements ReactiveController {
       if (this.at >= 0) {
         event.preventDefault()
         this.clear()
+        /* The key put the reading away, which `onReading` is told. */
+        this.by = 'keyboard'
       }
       return
     }
