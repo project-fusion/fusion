@@ -303,6 +303,31 @@ describe('reading a sparkline', () => {
     expect(part(host, 'readout')?.textContent).toBe('8')
   })
 
+  /* A page could not hear which reading a reader was on, as it can on every
+     other chart. */
+  test('the reading is sent as it moves, and when Enter presses it', async () => {
+    await mount(
+      `<div><table id="week"><tbody><tr><th>Mon</th><td>4</td></tr><tr><th>Tue</th><td>6</td></tr></tbody></table><helix-headless-sparkline for="week" label="Deploys"></helix-headless-sparkline></div>`,
+    )
+    const host = document.querySelector('helix-headless-sparkline') as Spark
+    await host.updateComplete
+    const heard: [string, { index: number; label: string; pointerType: string }][] = []
+    for (const type of ['helix-reading-change', 'helix-reading-press']) {
+      host.addEventListener(type, (event) => {
+        const { index, label, pointerType } = (event as CustomEvent).detail
+        heard.push([type, { index, label, pointerType }])
+      })
+    }
+    await press(host, 'End')
+    await press(host, 'Enter')
+    await press(host, 'Escape')
+    expect(heard).toEqual([
+      ['helix-reading-change', { index: 1, label: 'Tue', pointerType: 'keyboard' }],
+      ['helix-reading-press', { index: 1, label: 'Tue', pointerType: 'keyboard' }],
+      ['helix-reading-change', { index: -1, label: '', pointerType: 'keyboard' }],
+    ])
+  })
+
   test('`marks` marks the highest and the lowest reading, and absent marks none', async () => {
     const host = await spark('values="5 9 1 6" marks="high low"')
     expect(part(host, 'high')?.getAttribute('style')).toContain('inset-block-start: 0%')

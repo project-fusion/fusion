@@ -8,6 +8,8 @@ import {
   formatNumbers,
   formatWords,
   HelixElement,
+  HelixReadingChangeEvent,
+  HelixReadingPressEvent,
   linear,
   linePath,
   PLOT_WIDTH,
@@ -57,6 +59,10 @@ const STRIP_HEIGHT = 32
  * the lowest, in `overview-label`: "From 12 to 20, highest 30, lowest 8". An
  * `aria-label` on the element names it as `label` does.
  *
+ * `helix-reading-change` says each move of the reading, by pointer, tap or
+ * key, and `helix-reading-press` says a reading was clicked, tapped, or pressed
+ * with Enter or Space, as on every chart.
+ *
  * A pointer resting on the drawing shows the reading under it: the `cursor`
  * part marks it and the `readout` part writes it. `marks` adds a mark on the
  * highest and the lowest reading, and `range` draws a band between two values,
@@ -71,11 +77,25 @@ const STRIP_HEIGHT = 32
  * the component computes and CSS cannot, so a stylesheet can draw the sparkline
  * without measuring anything.
  *
+ * **Keyboard.** A sparkline with a `label` is one tab stop.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Tab | Moves focus to the drawing and shows the first reading, where there is a `label`. |
+ * | Any arrow | Right and Down move to the next reading, Left and Up to the previous. On a right-to-left page, Left moves to the next. |
+ * | Home, End | Moves to the first or the last reading. |
+ * | Page Down, Page Up | Moves a tenth of the readings on or back. |
+ * | Enter, Space | Presses the reading shown, which sends `helix-reading-press`. |
+ * | Escape | Puts the reading and its tooltip away. |
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
  * @aliases Micro Chart, Trend Line, Inline Chart
  * @documentation https://fusion.dev/helix/components/sparkline
+ *
+ * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the reading, or `-1` for none, with its row's `label` from a table and the `pointerType` that moved it.
+ * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart area - The region between the line and the bottom of its range.
  * @csspart bar - One column, drawn when `plot="bar"`.
@@ -261,13 +281,13 @@ export class HelixHeadlessSparkline extends HelixElement {
   protected readonly source = new SourceController(this)
 
   /**
-   * Finds the reading a pointer or a key rests on, as it does for every
-   * chart, so a sparkline is read the way they are.
+   * @internal Finds the reading a pointer or a key rests on, as it does for
+   * every chart, so a sparkline is read the way they are.
    */
   readonly pointer = new ChartPointerController(this)
 
   /**
-   * Hears an `aria-label` written on the sparkline, which no property mirrors,
+   * @internal Hears an `aria-label` written on the sparkline, which no property mirrors,
    * because it names the drawing as `label` does, as on every chart.
    */
   static override get observedAttributes(): string[] {
@@ -275,11 +295,27 @@ export class HelixHeadlessSparkline extends HelixElement {
     return [...super.observedAttributes, 'aria-label']
   }
 
-  /** Called by the browser when an observed attribute changes; a new `aria-label` renames the drawing. */
+  /** @internal Called by the browser when an observed attribute changes; a new `aria-label` renames the drawing. */
   override attributeChangedCallback(name: string, old: string | null, value: string | null): void {
     super.attributeChangedCallback(name, old, value)
     if (name === 'aria-label') {
       this.requestUpdate()
+    }
+  }
+
+  /**
+   * Sends the reading's moves and presses as `helix-reading-change` and
+   * `helix-reading-press`, named by the table's row where there is one. Here
+   * and not in a constructor, where the manifest's analyzer reads the
+   * assignment as a member of this class.
+   */
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.pointer.onReading = (heard, detail) => {
+      const told = { ...detail, label: this.source.rows[detail.index]?.label ?? '' }
+      this.dispatchEvent(
+        heard === 'press' ? new HelixReadingPressEvent(told) : new HelixReadingChangeEvent(told),
+      )
     }
   }
 
