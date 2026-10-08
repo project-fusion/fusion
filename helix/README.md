@@ -9,7 +9,7 @@ which is which.
 
 | Package | Publishes as | What it is |
 |---|---|---|
-| `cli` | `helix-cli` | `helix`, the Rust command line: `component`, `theme`, `new`, `mcp` |
+| `cli` | `helix-cli` | `helix`, the Rust command line: `component`, `theme`, `new`, `scan`, `api`, `mcp` |
 | `create-app` | `create-helix-app` | `npm create @fusion.dev/helix-app`, which runs `helix new` |
 | `core` | `helix-core` | base classes, mixins, decorators, utilities |
 | `diagnostics` | `helix-diagnostics` | finds the mistakes that are valid CSS |

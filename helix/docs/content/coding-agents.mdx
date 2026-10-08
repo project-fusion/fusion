@@ -130,28 +130,56 @@ Each family page has a menu beside its title with:
 The links send the URL, because the URL stays current. A pasted copy starts to
 go stale as soon as you paste it.
 
-## Compute a theme with `helix mcp`
+## The Helix MCP server
 
 ```sh
-helix mcp
+helix mcp init --client claude
 ```
 
-The three sources above are fixed sets. Every tag, token, and example is
-published, and an agent can fetch it. None of them has the theme for *your*
-brand color. The input is a color, and there are infinitely many colors, so
-Helix has to compute the theme when an agent requests it.
+`helix mcp` runs an MCP server over stdio. It answers from the Helix packages
+your project installs, so every answer is for the version you build with, and
+each one names that package and version. `helix mcp init` adds the server to
+the file your client reads and keeps every other server in it:
 
-`helix mcp` runs an MCP server over stdio with two tools:
+| Client | File |
+|---|---|
+| `claude` | `.mcp.json` |
+| `cursor` | `.cursor/mcp.json` |
+| `vscode` | `.vscode/mcp.json` |
 
-- `helix_audit_theme` measures every foreground against the background it is
-  painted on. It reports each pair with its ratio and target.
-- `helix_derive_theme` returns the CSS.
+The server runs `npx @fusion.dev/helix-cli mcp`, which is the copy in your
+project. It has seven tools:
 
-Both take the same JSON that a `helix.theme.json` file holds.
+| Tool | What it returns |
+|---|---|
+| `helix_find` | The families that answer a name, an alias, a tag, or a purpose, best first |
+| `helix_family` | One family's tags, properties and their unions, events and their React props, slots, parts, custom properties, words, and import lines |
+| `helix_example` | One example as HTML and TSX, with its stylesheet and the import lines it needs |
+| `helix_imports` | The import lines for a list of tags, and the closest tag to any unknown one |
+| `helix_tokens` | The semantic tokens, by a word in the name or description and by category |
+| `helix_audit_theme` | Every foreground and background pair a brand color derives to, with its ratio and target |
+| `helix_derive_theme` | The theme's CSS |
 
-**`helix mcp` does not return a palette that fails its own targets**, the same
-as `helix theme build`. A failing palette pasted into a stylesheet is worse than
-a warning above it, and an agent does not read warnings.
+Each result is structured, with an output schema, and the same JSON as text.
+A name that matches more than one family, such as `Dropdown`, returns an error
+listing each family. The theme tools take the same JSON that a
+`helix.theme.json` file holds.
+
+Each lookup is also a command, for a script or a person:
+
+```sh
+helix api find dropdown
+helix api family select
+helix api example select
+helix api imports helix-select helix-option
+helix api tokens surface --category color
+```
+
+`--json` prints what the MCP tool returns.
+
+**`helix_derive_theme` does not return a palette that fails its own targets**,
+the same as `helix theme build`. A failing palette pasted into a stylesheet is
+worse than a warning above it, and an agent does not read warnings.
 
 You run `helix mcp` yourself, and we do not host it. A server we operated would
 be one more service between you and your own tokens. `helix mcp` is a
@@ -160,14 +188,9 @@ no network requests.
 
 ## What we do not publish for agents
 
-**`llms-full.txt`, or any other whole-library download.** A single file with
-every page goes out of date as soon as anything changes. Each link in `llms.txt`
-can be cached on its own and stays current on its own.
+**`llms-full.txt`, or any other whole-library download of the pages.** A single
+file with every page goes out of date as soon as anything changes. Each link in
+`llms.txt` can be cached on its own and stays current on its own.
 
-The two sources already here cover what such a file would be for. `llms.txt` is
-the index, in one request, and each family's `.md` file is its document. Fetch
-the families you use.
-
-**A search index.** The site has a search index for people. There is nothing an
-agent can query yet. Reading `llms.txt` and the documents it names takes less
-work than learning most search APIs.
+`llms.txt` is the index, in one request, and each family's `.md` file is its
+document. Fetch the families you use, or ask `helix mcp`.

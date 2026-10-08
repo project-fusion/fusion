@@ -8,10 +8,8 @@ import tokens from '@fusion.dev/helix-styles/tokens.json'
  * token with its value and category. An agent that arrived through `llms.txt`
  * cannot: the tokens page is prose about the system and names seven.
  *
- * **This is also what keeps the MCP server honest.** Whether a token exists is a
- * closed set and belongs in a file; what a brand color derives to is a function
- * of an input nobody can enumerate, and that is the only thing left that a static
- * surface genuinely cannot answer.
+ * **The same file `helix_tokens` reads.** `helix mcp` answers from the copy a
+ * project installs, and this is the copy for an agent with no install.
  */
 export const dynamic = 'force-static'
 

@@ -248,18 +248,15 @@ directory you own. You paste the line above, and you can delete it.
 
 ## Install the Helix MCP server
 
-```json
-{
-  "mcpServers": {
-    "helix": { "command": "helix", "args": ["mcp"] }
-  }
-}
+```sh
+helix mcp init --client claude
 ```
 
-`helix mcp` is a subcommand of the CLI. It serves MCP over stdio, which Claude,
-Cursor, Windsurf, and Zed all read. It computes the theme a given brand color
-produces, which no document can list. It runs on your machine, talks to a client
-you chose, and makes no network requests.
+`helix mcp` answers from the Helix packages your project installs: families,
+examples, import lines, tokens, and the theme a brand color produces. `--client`
+takes `claude`, `cursor`, or `vscode`, and writes the server into the file that
+client reads. [Coding agents](./coding-agents) lists the tools. It runs on your
+machine, talks to a client you chose, and makes no network requests.
 
 ## What this guide does not cover
 
@@ -267,10 +264,9 @@ you chose, and makes no network requests.
 and hooks change with the library, and they are in a file you can fetch. A list
 of them here would be a second copy that goes stale. Fetch the family.
 
-**The theme a brand color produces.** Helix computes it, so use `helix mcp`, an
-MCP server over stdio with `helix_audit_theme` and `helix_derive_theme`. Both
-take the same JSON that a `helix.theme.json` file holds. It runs on your
-machine, and we do not host it.
+**The theme a brand color produces.** Helix computes it, so call
+`helix_derive_theme`, or run `helix theme build`. Both take the same JSON that a
+`helix.theme.json` file holds.
 
 **Whether a component fits your case.** Read the examples to decide. Every
 family's `.md` file includes them as text, and
