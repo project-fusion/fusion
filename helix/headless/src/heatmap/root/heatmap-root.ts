@@ -406,7 +406,15 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
 
   private announced: number | undefined = undefined
 
-  /** Where a range taken in with Shift starts: the cell last pressed, or none. */
+  /**
+   * Where a range taken in with Shift starts: the row of the table whose cell
+   * was last pressed, or none.
+   *
+   * **The row, and not the cell's place among those drawn.** A narrow strip
+   * draws the newest whole columns, so a resize that drops or adds a column
+   * moves every cell's place, and an anchor kept as a place started the next
+   * range on another day.
+   */
   private anchor = -1
 
   /** The cell the keys rested on before the key now being handled moved them. */
@@ -460,7 +468,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
     if (!mode || key === undefined || key === '') {
       return
     }
-    this.anchor = index
+    this.anchor = this.dropped + index
     this.base = undefined
     this.choose(pressedValue(mode, this.value, key))
   }
@@ -471,18 +479,23 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * Without an anchor it starts where the keys were.
    */
   private stretch(to: number): void {
-    const keys = this.keysOf(this.drawn)
-    if (this.anchor < 0) {
-      this.anchor = this.left < 0 ? to : this.left
+    const all = this.keysOf(this.points)
+    const dropped = this.dropped
+    if (all[this.anchor] === undefined) {
+      this.anchor = dropped + (this.left < 0 ? to : this.left)
     }
     if (this.base === undefined || this.value !== this.shaped) {
-      const corner = keys[this.anchor]
+      const corner = all[this.anchor]
       this.base = commaList(this.value).filter((one) => one !== corner)
     }
-    const taken = rectangleOf(keys.length, this.rowCount, this.anchor, to).map(
-      (at) => keys[at] ?? '',
-    )
-    const all = this.keysOf(this.points)
+    /* Over every row, shifted so the columns fall where the strip draws them:
+       the strip drops whole columns, so the shift is the same at every width.
+       An anchor in a column no longer drawn still takes in its corner. */
+    const rows = this.rowCount
+    const shift = (rows - (dropped % rows)) % rows
+    const taken = rectangleOf(all.length + shift, rows, this.anchor + shift, dropped + to + shift)
+      .filter((at) => at >= shift)
+      .map((at) => all[at - shift] ?? '')
     this.choose(inSequence([...this.base, ...taken].filter(Boolean), all).join(', '))
     this.shaped = this.value
   }
@@ -515,8 +528,9 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
       this.stretch(at)
       return
     }
-    const keys = this.keysOf(this.drawn)
-    const added = rangeAdd(commaList(this.value), keys, this.anchor < 0 ? at : this.anchor, at)
+    const keys = this.keysOf(this.points)
+    const from = keys[this.anchor] === undefined ? -1 : this.anchor
+    const added = rangeAdd(commaList(this.value), keys, from, this.dropped + at)
     if (added) {
       this.choose(added.join(', '))
     }
@@ -648,6 +662,11 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
   private get drawn(): Reading[] {
     const all = this.points
     return all.slice(Math.max(0, all.length - this.room))
+  }
+
+  /** How many of the oldest rows a narrow strip leaves undrawn. */
+  private get dropped(): number {
+    return Math.max(0, this.points.length - this.room)
   }
 
   /**
