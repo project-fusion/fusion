@@ -379,6 +379,15 @@ jobs:
       - name: Every rule counts something
         run: bun run check:spec:floors
 
+      # **The specs that `tests` leaves out, because they read what `metrics`
+      # writes.** The `helix-docs` specs import the generated docs modules, and
+      # `docs` waits on `metrics`, which `warm` builds. The site has no specs
+      # today. Its node in the graph reaches the `helix-docs` build, and it is
+      # named here so a spec it gains runs in one of the two jobs. Together
+      # with the filter in `tests`, the two runs cover `turbo run test` once.
+      - name: The specs that read the docs build
+        run: bunx turbo run test --filter=@fusion.dev/helix-docs --filter=@fusion.dev/site
+
       - name: The tree is unchanged by verifying it
         run: git diff --exit-code
 
@@ -472,8 +481,16 @@ jobs:
   # shim specs put their own `PATH` in front of every binary they run, cargo
   # included. Together the two took 321 seconds on 15 Sep 2026, one after the
   # other, with most of the Rust job's toolchain idle through the specs.
+  #
+  # **They start after `warm-browser`, which builds what they read.** Every
+  # spec outside `helix-docs` reads the components and the testing harness.
+  # `warm-browser` builds both about two minutes before `warm` finishes
+  # measuring bundles and running `next build`, and the rest of the graph is
+  # a few small compiles. `helix-docs` and the site wait on `metrics` through
+  # `docs`, so the filter leaves them out here and `floors` runs them after
+  # `warm`. Together the two runs cover `turbo run test` once.
   tests:
-    needs: warm
+    needs: warm-browser
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -482,7 +499,7 @@ jobs:
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
       - name: Run the specs
-        run: bun run test
+        run: bunx turbo run test --filter=!@fusion.dev/helix-docs --filter=!@fusion.dev/site
 
   # **Cargo, from the first second of the run.** It was one job holding every
   # step that touches Rust, and `needs: warm` put the toolchain install, the
