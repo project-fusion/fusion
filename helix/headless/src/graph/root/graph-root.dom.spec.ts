@@ -106,10 +106,16 @@ describe('graph frame', () => {
     const [selected, to, from] = rows(host)
     expect(selected?.getAttribute('aria-selected')).toBe('true')
     expect(selected?.getAttribute('part')).toContain('note-selected')
-    expect(to?.getAttribute('aria-description')).toBe('Linked from Alpha')
-    expect(from?.getAttribute('aria-description')).toBe('Links to Alpha')
+    /* Described by the words drawn beside the name, by reference, which
+       every screen reader reads, where `aria-description` is a draft. */
+    const said = (row?: HTMLElement): string | undefined =>
+      host.shadowRoot?.getElementById(row?.getAttribute('aria-describedby') ?? '')?.textContent ??
+      undefined
+    expect(said(to)).toBe('Linked from Alpha')
+    expect(said(from)).toBe('Links to Alpha')
+    expect(to?.hasAttribute('aria-description')).toBe(false)
     expect(to?.getAttribute('part')).toContain('note-linked')
-    expect(rows(host)[3]?.hasAttribute('aria-description')).toBe(false)
+    expect(rows(host)[3]?.hasAttribute('aria-describedby')).toBe(false)
   })
 
   test('moves a neighbor ahead of notes that sort before it', async () => {
@@ -617,10 +623,12 @@ describe('a list with no notes', () => {
     expect(rows(host)).toHaveLength(0)
   })
 
-  test('lists its keys on the frame and on the list', async () => {
+  /* The frame's keys pan and zoom, which are its commands. The list's are a
+     listbox's own moves, which `aria-keyshortcuts` is not for. */
+  test('lists its pan and zoom keys on the frame, and none on the list', async () => {
     const host = await graph()
     expect(part(host, 'region')?.getAttribute('aria-keyshortcuts')).toContain('Plus')
-    expect(list(host).getAttribute('aria-keyshortcuts')).toContain('PageDown')
+    expect(list(host).hasAttribute('aria-keyshortcuts')).toBe(false)
   })
 })
 
