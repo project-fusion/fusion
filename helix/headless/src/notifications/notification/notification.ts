@@ -3,11 +3,13 @@ import {
   deepActiveElement,
   deepContains,
   focusableElements,
+  formatWords,
   HelixElement,
   HelixReadEvent,
   MixinDismissible,
   requestChange,
   slotFilled,
+  slottedWords,
   words,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
@@ -301,7 +303,7 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
     return html`<button
       part="dismiss"
       type="button"
-      aria-label=${this.dismissLabel}
+      aria-label=${this.dismissName}
       @click=${this.handleDismiss}
     >
       <slot name="dismiss">
@@ -384,6 +386,46 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
     </div>`
   }
 
+  /**
+   * The dismiss control's name, read by screen readers, with `{label}` for the
+   * row's own words.
+   *
+   * One sentence with the words in it, so a translation puts them where its
+   * language does: `registerWords('de', { 'helix-notification': { dismissLabel:
+   * '{label} schließen' } })`.
+   */
+  @words
+  @property({ attribute: 'dismiss-label' })
+  override dismissLabel = 'Dismiss {label}'
+
+  /**
+   * The dismiss control's name: `dismissLabel` with the row's words.
+   *
+   * **Named for its row**, because a feed of rows each with a control named
+   * Dismiss is a list of buttons that says nothing about which notice each one
+   * ends. The words are the default slot's, the ones `helix-dismiss` reports,
+   * so a row's actions are not read into it. A page's own `dismiss-label` with
+   * no `{label}` is followed by them, unless it holds them already, as `Tag`
+   * names its remove button. Read from the children, so the verb alone on a
+   * server, until the update after.
+   */
+  private get dismissName(): string {
+    const { dismissLabel } = this
+    const label = this.childrenKnown ? slottedWords(this, ['']) : ''
+    if (dismissLabel.includes('{label}')) {
+      return formatWords(this, 'dismissLabel', { label }).trim()
+    }
+    return label === '' || dismissLabel.includes(label) ? dismissLabel : `${dismissLabel} ${label}`
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    /* New words in the default slot change no property, so they rename the
+       dismiss control through this. On the root, so the served template is
+       unchanged: a `slotchange` bubbles to it from every slot. */
+    this.renderRoot.addEventListener('slotchange', () => this.requestUpdate())
+  }
+
   /* Content arriving from the light DOM changes no property here, so nothing
      would schedule the re-read. Bound to the slot rather than to the host,
      because `slotchange` bubbles and is not composed: it reaches the shadow root
@@ -425,8 +467,14 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   }
 
   /**
-   * Where focus goes when this row leaves: the next row's first control, the
-   * one before, then the first control left in the feed.
+   * Where focus goes when this row leaves: the next row, the one before, then
+   * the first control left in the feed.
+   *
+   * **The row itself, and not a control in it**, because the row is what a
+   * reader moves through the feed by, and every row takes focus. Sent to the
+   * next dismiss control, focus passed over each row with no controls between,
+   * and to Load more where no row after had one. Focused, the row becomes the
+   * feed's stop, as one reached with the arrows does.
    */
   private neighbor(): HTMLElement | null {
     let feed = this.parentElement
@@ -441,8 +489,7 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
     const at = rows.indexOf(this)
     const order = [...rows.slice(at + 1), ...rows.slice(0, Math.max(at, 0)).reverse()]
     for (const row of order) {
-      const target =
-        row.shadowRoot?.querySelector<HTMLElement>('[part="dismiss"]') ?? focusableElements(row)[0]
+      const target = row.shadowRoot?.querySelector<HTMLElement>('[part="item"]')
       if (target) {
         return target
       }

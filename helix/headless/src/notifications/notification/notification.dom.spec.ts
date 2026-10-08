@@ -301,7 +301,81 @@ describe('focus when a row is dismissed', () => {
     dismiss?.click()
     expect([one?.isConnected, two?.shadowRoot?.activeElement?.getAttribute('part')]).toEqual([
       false,
-      'dismiss',
+      'item',
     ])
+  })
+
+  /* The row is where a reader moves through the feed, so it is where focus
+     lands. Sent to the next dismiss control instead, focus passed over every
+     row with no controls between, and over the rest of the feed to Load more
+     where no row after had one. */
+  test('lands on the next row, one with no controls included', async () => {
+    const feed = await mount(
+      `<helix-headless-notifications>
+        <helix-headless-notification id="a" dismissible>A</helix-headless-notification>
+        <helix-headless-notification id="b">B</helix-headless-notification>
+        <helix-headless-notification id="c">C</helix-headless-notification>
+        <helix-headless-notification id="e" dismissible>E</helix-headless-notification>
+      </helix-headless-notifications>`,
+    )
+    const rows = [...feed.querySelectorAll('helix-headless-notification')] as Item[]
+    await Promise.all(rows.map((row) => row.updateComplete))
+    const [a, b] = rows
+    const dismiss = a?.shadowRoot?.querySelector<HTMLElement>('[part="dismiss"]')
+    dismiss?.focus()
+    dismiss?.click()
+    expect([a?.isConnected, b?.shadowRoot?.activeElement?.getAttribute('part')]).toEqual([
+      false,
+      'item',
+    ])
+  })
+
+  test('and on the row before, where it was the last', async () => {
+    const feed = await mount(
+      `<helix-headless-notifications>
+        <helix-headless-notification id="first">First</helix-headless-notification>
+        <helix-headless-notification id="last" dismissible>Last</helix-headless-notification>
+      </helix-headless-notifications>`,
+    )
+    const [first, last] = [...feed.querySelectorAll('helix-headless-notification')] as Item[]
+    await first?.updateComplete
+    await last?.updateComplete
+    const dismiss = last?.shadowRoot?.querySelector<HTMLElement>('[part="dismiss"]')
+    dismiss?.focus()
+    dismiss?.click()
+    expect(first?.shadowRoot?.activeElement?.getAttribute('part')).toBe('item')
+  })
+})
+
+describe('the dismiss control’s name', () => {
+  /* Two rows each with a control named Dismiss are two buttons that say
+     nothing about which notice each one ends. */
+  test('names the row it dismisses', async () => {
+    const element = (await mount(
+      `<helix-headless-notification dismissible>Build failed<button slot="actions">Retry</button></helix-headless-notification>`,
+    )) as Item
+    expect(part(element, 'dismiss')?.getAttribute('aria-label')).toBe('Dismiss Build failed')
+  })
+
+  test('in words a page translates, with the row’s words where the language puts them', async () => {
+    const element = (await mount(
+      `<helix-headless-notification dismissible dismiss-label="{label} schließen">Build failed</helix-headless-notification>`,
+    )) as Item
+    expect(part(element, 'dismiss')?.getAttribute('aria-label')).toBe('Build failed schließen')
+  })
+
+  test('and a page’s own verb is followed by them', async () => {
+    const element = (await mount(
+      `<helix-headless-notification dismissible dismiss-label="Clear">Build failed</helix-headless-notification>`,
+    )) as Item
+    expect(part(element, 'dismiss')?.getAttribute('aria-label')).toBe('Clear Build failed')
+  })
+
+  test('and follows the row’s words when they change', async () => {
+    const element = await item('dismissible')
+    element.textContent = 'Deploy finished'
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await element.updateComplete
+    expect(part(element, 'dismiss')?.getAttribute('aria-label')).toBe('Dismiss Deploy finished')
   })
 })
