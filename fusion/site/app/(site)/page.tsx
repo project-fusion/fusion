@@ -6,6 +6,7 @@ import { DerivationDiagrams } from '@/components/derivation-diagram/derivation-d
 import { Eyebrow } from '@/components/eyebrow/eyebrow'
 import { Hero } from '@/components/hero/hero'
 import { Lede } from '@/components/lede/lede'
+import { PageStrands } from '@/components/page-strands/page-strands'
 import { ProofBand } from '@/components/proof-band/proof-band'
 import { SectionTitle } from '@/components/section-title/section-title'
 import { Showcase } from '@/components/showcase/showcase'
@@ -49,11 +50,7 @@ export default function Home() {
             margin behind the sections, and sweeps across above the numbers
             and above the close. Scrolling travels along it. Strands is a Helix
             component, so the light behind the page is the product too. */}
-        <helix-strands class={styles.reelStrands} dust={1.3} quiet="hero-words" speed={1.2} travel>
-          <helix-strands-stop at={0.9} for="problem-card" variant="sweep"></helix-strands-stop>
-          <helix-strands-stop for="proof" variant="waves"></helix-strands-stop>
-          <helix-strands-stop for="close" variant="waves"></helix-strands-stop>
-        </helix-strands>
+        <PageStrands className={styles.reelStrands} />
 
         <Hero announcement={announcements} />
 

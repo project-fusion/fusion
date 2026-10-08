@@ -12,6 +12,8 @@ export { COLOR_MODE_KEY as STORAGE_KEY } from '@/utils/color-mode/color-mode'
 
 import { type ColorMode, COLOR_MODE_KEY as STORAGE_KEY } from '@/utils/color-mode/color-mode'
 
+import { MOTION_KEY, type Motion } from '@/utils/motion/motion'
+
 const TIER_KEY = 'fusion-api-tier'
 
 /**
@@ -27,6 +29,17 @@ const apply = (mode: ColorMode): void => {
     return
   }
   document.documentElement.dataset.colorMode = mode
+}
+
+/**
+ * Puts the motion choice on the document, where the page's moving light reads it.
+ */
+const applyMotion = (motion: Motion): void => {
+  if (motion === 'on') {
+    delete document.documentElement.dataset.motion
+    return
+  }
+  document.documentElement.dataset.motion = motion
 }
 
 /**
@@ -51,6 +64,7 @@ interface Props {
 export function PreferencesDrawer({ onOpenChange, open }: Props) {
   const [mode, setMode] = useState<ColorMode>('system')
   const [tier, setTier] = useState<ApiTier>('styled')
+  const [motion, setMotion] = useState<Motion>('on')
 
   // Read after mount. The server has no localStorage, so choosing a mode during
   // render would make the first paint disagree with the stored choice.
@@ -65,6 +79,9 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
        what that page is; what this browser last chose is not, and a link must
        never re-set somebody's own drawer. The page has already written the
        attribute server-side, so this leaves it alone rather than racing it. */
+    if (window.localStorage.getItem(MOTION_KEY) === 'off') {
+      setMotion('off')
+    }
     const storedTier = window.localStorage.getItem(TIER_KEY) as ApiTier | null
     const asked = new URLSearchParams(window.location.search).get('tier')
     if (storedTier) {
@@ -111,6 +128,12 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
     }
   }, [open])
 
+  const chooseMotion = (next: Motion) => {
+    setMotion(next)
+    applyMotion(next)
+    window.localStorage.setItem(MOTION_KEY, next)
+  }
+
   const chooseTier = (next: ApiTier) => {
     setTier(next)
     applyTier(next)
@@ -147,6 +170,20 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
           <helix-toggle value="system">System</helix-toggle>
           <helix-toggle value="light">Light</helix-toggle>
           <helix-toggle value="dark">Dark</helix-toggle>
+        </helix-toggle-group>
+
+        {/* **The way to stop the light behind a page**, which moves on its own
+            for as long as the page is open. Here, where the reader can reach
+            it from any page, rather than as a button over the light itself.
+            The device's reduced-motion setting stills it whatever this says. */}
+        <helix-toggle-group
+          hint="Off holds the moving light behind the landing page still."
+          label="Background motion"
+          onChange={(event) => chooseMotion(event.currentTarget.value as Motion)}
+          value={motion}
+        >
+          <helix-toggle value="on">On</helix-toggle>
+          <helix-toggle value="off">Off</helix-toggle>
         </helix-toggle-group>
 
         {/* Headless first, styled second, which is the order the tiers are in:
