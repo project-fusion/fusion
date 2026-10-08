@@ -1,6 +1,11 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
-import { scrollItemIntoView, scrollingAncestor, scrollRoom } from './scroll-item-into-view.js'
+import {
+  scrollItemIntoView,
+  scrollingAncestor,
+  scrollRoom,
+  scrollWithin,
+} from './scroll-item-into-view.js'
 
 /**
  * Bringing an item into its own scroller, and moving nothing else.
@@ -186,6 +191,20 @@ describe('which box gets scrolled', () => {
     boxed(item, { bottom: 130, left: 0, right: 50, top: 110 })
     scrollItemIntoView(item, { scroller })
     expect(asked).toHaveLength(1)
+  })
+
+  /* Tabs, Graph and Outline hold their scroller, and take the walk into no
+     bundle of their own. */
+  test('or the caller handed it over, which takes no walk at all', () => {
+    document.body.innerHTML = '<div><span></span></div>'
+    const scroller = document.body.firstElementChild as HTMLElement
+    const item = scroller.firstElementChild as HTMLElement
+    const asked: unknown[] = []
+    scroller.scrollBy = ((options: unknown) => asked.push(options)) as never
+    boxed(scroller, VIEW)
+    boxed(item, { bottom: 130, left: 10, right: 50, top: 110 })
+    scrollWithin(item, scroller, { padding: 4 })
+    expect(asked).toEqual([{ behavior: 'instant', left: 0, top: 34 }])
   })
 })
 
