@@ -112,10 +112,16 @@ const state = {
   workers: 1,
 }
 
-/** `relative` resolved inside `directory`, or undefined when it escapes it. */
+/**
+ * `relative` resolved inside `directory`, or undefined when it escapes it.
+ *
+ * The directory is resolved too, because a mount named with a trailing slash
+ * arrives as `fonts/`, and `fonts/` plus a separator is a prefix no file has.
+ */
 const inside = (directory, relative) => {
-  const file = resolve(directory, relative)
-  return file === directory || file.startsWith(directory + sep) ? file : undefined
+  const root = resolve(directory)
+  const file = resolve(root, relative)
+  return file === root || file.startsWith(root + sep) ? file : undefined
 }
 
 /** What the server answers for `path`: a file, a document, or nothing. */
