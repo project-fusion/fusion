@@ -749,8 +749,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
    * Requests a new shown item, and returns whether it moved.
    *
    * Where `active` names nothing, it is first written with the item on
-   * screen, so `helix-activate` names that item as `previous` rather than an
-   * empty string the reader never saw.
+   * screen, so `helix-activate` names the item you saw as `previous`.
    */
   override requestActive(next: string, cause?: string): boolean {
     const items = this.items
