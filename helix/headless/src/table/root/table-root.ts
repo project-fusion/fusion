@@ -29,7 +29,6 @@ import {
   requestChange,
   scrollingAncestor,
   sort,
-  splitValues,
   toggleEvery,
   treeArrow,
   VIRTUAL_RULE,
@@ -45,58 +44,10 @@ import '../../checkbox/index.js'
 import { edgeOf, type HelixHeadlessTableColumn } from '../column/table-column.js'
 import { type GridCell, type LeadColumn, TableGridController } from '../grid-controller.js'
 import type { HelixHeadlessTableRow } from '../row/table-row.js'
+import { tracksOf } from '../tracks.js'
 
 /** A row as the table reads it: the consumer's element, a table row where it is one. */
 type Row = Element & Partial<HelixHeadlessTableRow>
-
-/**
- * The first `wanted` tracks of a track list, one entry each, so every declared
- * column can take the one in its place.
- *
- * Split on the spaces between tracks and never inside a function, so
- * `minmax(0, 1fr)` stays one track. A `repeat()` with a count is that many
- * tracks, written out; an automatic one names no count and yields none. Line
- * names go with the track after them.
- *
- * Everything above the split is a fact about a grid track list rather than
- * about a value list, which is why only the split itself is shared.
- *
- * **A track the grid would refuse yields nothing either**, where the platform
- * can say. One invalid track makes the whole `grid-template-columns` invalid,
- * which a grid ignores in silence and draws as one column. That is the failure
- * that once had `columns` deprecated, a list of headings handed over as widths,
- * and dealt out a track at a time it costs the one column its width and no
- * more.
- */
-const tracksOf = (list: string, wanted: number): string[] => {
-  const words = splitValues(list, ' ')
-  const valid = (track: string): boolean =>
-    typeof CSS === 'undefined' || CSS.supports('grid-template-columns', track)
-  const tracks: string[] = []
-  let names = ''
-  for (const one of words) {
-    if (tracks.length >= wanted) {
-      break
-    }
-    if (one.startsWith('[')) {
-      names += `${one} `
-      continue
-    }
-    const repeat = /^repeat\(\s*(\d+)\s*,(.*)\)$/is.exec(one)
-    if (repeat) {
-      const inner = tracksOf(repeat[2] ?? '', wanted)
-      for (let time = 0; time < Number(repeat[1]) && tracks.length < wanted; time += 1) {
-        tracks.push(
-          ...inner.map((track, index) => (time === 0 && index === 0 ? names + track : track)),
-        )
-      }
-    } else if (!/^repeat\(/i.test(one)) {
-      tracks.push(valid(names + one) ? names + one : '')
-    }
-    names = ''
-  }
-  return tracks.slice(0, wanted)
-}
 
 /**
  * The most characters a column may hold at its widest and still never wrap.
@@ -392,13 +343,11 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * **It is also the only track list a server can send.** The shim has no tree
    * to walk, so a render there knows of no columns and this attribute is the
    * whole answer: a table given one lays its grid out in the first paint, and a
-   * table sized only by its columns is one track wide until it upgrades.
+   * table sized only by its columns takes, until it upgrades, a track for each
+   * column at the width a column with no `width` takes (`helix.css`).
    *
-   * **Data Table has none of this, and should not.** Its columns are its schema
-   * rather than an option, so there is always a column to write a `width` on
-   * and a list here would be a second way to say what that says. This table's
-   * cells are markup, and a table written as rows of cells with no column
-   * declared in it has nowhere else to be sized from.
+   * Data Table takes the same list, for the same reason: a data table that
+   * serves its first page as rows is laid out by it before it upgrades.
    */
   @property()
   columns = ''

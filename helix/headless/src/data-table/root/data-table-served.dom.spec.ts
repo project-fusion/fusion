@@ -133,6 +133,52 @@ describe('a data table whose page served its first page', () => {
   })
 })
 
+/* **The pagination's row is held while the served rows stand in.** With no
+ * count the pagination has one page and draws nothing, so a row would appear
+ * under the rows once they arrive and move everything below it. The footer is
+ * marked for the styled tier to keep its height while the served page is
+ * full, and only then: a shorter page is the whole result. */
+describe('the pagination under the rows the page served', () => {
+  const footer = (element: Table): Element | null => part(element, 'footer')
+
+  test('is held while a full served page stands in, and let go once the rows draw', async () => {
+    const element = await table(served(['alpha', 30], ['bravo', 4]))
+    expect(footer(element)?.hasAttribute('data-held')).toBe(true)
+    element.rows = files
+    await element.updateComplete
+    expect(footer(element)?.hasAttribute('data-held')).toBe(false)
+  })
+
+  test('is not held under a served page shorter than a page, which is the whole result', async () => {
+    const element = await table(served(['alpha', 30]))
+    expect(footer(element)?.hasAttribute('data-held')).toBe(false)
+  })
+
+  test('is not held when the table draws no pagination', async () => {
+    const element = await table(served(['alpha', 30], ['bravo', 4]))
+    ;(element as Table & { paginated: boolean }).paginated = false
+    await element.updateComplete
+    expect(footer(element)?.hasAttribute('data-held')).toBe(false)
+  })
+})
+
+/* **The checkbox and grip headings stay over their columns while the served
+ * rows stand in**: the styled tier leads each served row with a box in their
+ * place, so they are drawn from the start. */
+describe('the checkbox and grip headings over the rows the page served', () => {
+  test('are drawn while the served rows stand in', async () => {
+    const element = (await mount(
+      `<helix-headless-data-table label="Files" row-key="name" reorderable-rows selectable>
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+        ${served(['alpha', 30])}
+      </helix-headless-data-table>`,
+    )) as Table
+    expect(shown(element)).toHaveLength(1)
+    expect(part(element, 'select-all')).not.toBeNull()
+    expect(part(element, 'grip-head')).not.toBeNull()
+  })
+})
+
 describe('a data table whose page served no rows', () => {
   test('has no slot for them, and says it is empty while `rows` is', async () => {
     const element = await table('')
