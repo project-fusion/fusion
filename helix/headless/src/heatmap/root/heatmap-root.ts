@@ -7,14 +7,17 @@ import {
   drawTooltip,
   formatWords,
   HelixElement,
+  HelixReadingChangeEvent,
+  HelixReadingPressEvent,
   HelixResizeEvent,
   MixinChartSource,
+  MixinChartStatus,
   markRegion,
   pressedValue,
-  type ReadingCursor,
   rangeAdd,
   requestValue,
   StatusController,
+  spokenReading,
   words,
   writtenList,
   writtenNumbers,
@@ -71,6 +74,25 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * `helix-before-change` and tells with `change`, and the `selection` part says
  * how many are selected, in `selection-label`.
  *
+ * **Under `selection-mode` the strip is a grid**, so the selection is state a
+ * reader is told rather than words alone: each column of the strip is a `row`,
+ * a week with `rows="7"`, and each cell a `gridcell` named by its row in the
+ * table and carrying `aria-selected`. The strip says
+ * `aria-multiselectable` under `multiple` and points at the cell the keys rest
+ * on with `aria-activedescendant`, so a screen reader reads that cell, and the
+ * `live` part stays quiet. Without `selection-mode` nothing is selectable, and
+ * the strip is an application with the readout, as every chart's plot is.
+ *
+ * **Readings are sent as every chart sends them.** `helix-reading-change`
+ * says each move of the reading, by pointer, tap or key, and
+ * `helix-reading-press` a reading clicked, tapped, or pressed with Enter or
+ * Space, each with the row of the table in `index`.
+ *
+ * **Nothing to draw.** A table with no readings shows `empty-text`, "No
+ * readings", under the strip, and `loading` shows `loading-text` there until
+ * readings arrive. The `empty` and `loading` slots take markup in place of
+ * either, as on every chart.
+ *
  * **Keyboard.** The strip is one tab stop once it has cells.
  *
  * | Key | What it does |
@@ -80,7 +102,7 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * | Right, Left | Moves a column on or back, a week with `rows="7"`. On a right-to-left page, Left moves on. |
  * | Home, End | Moves to the first or the last cell. |
  * | Page Down, Page Up | Moves a month on or back where the rows carry dates, and four columns otherwise. |
- * | Enter, Space | Selects the cell, or lets it go, under `selection-mode`. |
+ * | Enter, Space | Presses the cell, which sends `helix-reading-press`, and selects it or lets it go under `selection-mode`. |
  * | Shift with an arrow, Home, End, Page Up or Page Down | Selects every cell from the last one pressed to where the key went, under `selection-mode="multiple"`. |
  * | Escape | Puts the cell's tooltip away. |
  *
@@ -90,22 +112,28 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @aliases Contribution graph, Uptime strip, Calendar heatmap, Activity graph
  * @documentation https://fusion.dev/helix/components/heatmap
  *
+ * @slot empty - Content shown under the strip when the table has no readings, such as a link to add the first. Falls back to `empty-text`.
  * @slot end - Below the strip, at the trailing edge: usually the newest date.
+ * @slot loading - Content shown under the strip while `loading` is set and there are no readings yet. Falls back to `loading-text`.
  * @slot start - Below the strip, at the leading edge: usually the oldest date.
  * @slot summary - Below the strip, in the middle: a summary of the range shown.
  *
  * @event {Event} change - Fired once a press or a key has changed which cells are selected.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press or a key changes which cells are selected, with the `value` it would leave. Cancelable.
+ * @event {HelixReadingChangeEvent} helix-reading-change - The reading shown moved, or was put away: `index` is the row, or `-1` for none, with its `label`, the `series` the keys rest on, and the `pointerType` that moved it.
+ * @event {HelixReadingPressEvent} helix-reading-press - A reading was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  * @event {HelixResizeEvent} helix-resize - Fired when the number of cells drawn changes, with the new number.
  *
  * @csspart cell - One reading.
  * @csspart cell-active - The cell the pointer or the keys rest on. Set alongside `cell`.
  * @csspart cell-selected - A cell that is selected, under `selection-mode`. Set alongside `cell`.
- * @csspart empty - Shown when the table has no readings. It stays hidden until the table can be read: on the server and during hydration, there is no document to resolve `for` in.
+ * @csspart empty - The words under the strip when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration, there being no document to resolve `for` in.
  * @csspart end - The trailing slot's box.
  * @csspart footer - The three-slot row under the strip.
+ * @csspart loading - The words under the strip while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart live - The readout: a polite live region that says the cell the keys moved to. Hide it visually.
  * @csspart mark - The invisible point the tooltip is anchored to.
+ * @csspart row - A column of cells, which a grid reads as a row, under `selection-mode`. It draws no box.
  * @csspart overview - The busiest reading and the total of the readings drawn, written as a sentence for screen readers, which describes the strip. Rendered once there are cells. Hide it visually.
  * @csspart selection - A polite region that says how many cells are selected after a change, rendered from the first change. Hide it visually.
  * @csspart start - The leading slot's box.
@@ -146,9 +174,10 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  *
  * @cssstate active - While a cell is shown, under the pointer or the keys, with its tooltip open.
  * @cssstate empty - While the `empty` part stands in place of the cells.
+ * @cssstate loading - While the `loading` part stands in place of the cells.
  */
 @customElement('helix-headless-heatmap')
-export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
+export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(HelixElement)) {
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-heatmap': { emptyText: 'Keine Werte' } })`.
@@ -162,16 +191,6 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   @words
   @property({ attribute: 'busiest-label' })
   busiestLabel = 'Busiest'
-
-  /**
-   * Shown when the table has no readings in it.
-   *
-   * Never shown while the table cannot be read at all, which is a server render
-   * and the hydrating one after it: see `sourceKnown`.
-   */
-  @words
-  @property({ attribute: 'empty-text' })
-  emptyText = 'No readings'
 
   /**
    * Space between cells, in CSS pixels. It is a number for the same reason
@@ -225,9 +244,11 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   rows = 1
 
   /**
-   * What the readout adds for a selected cell, under `selection-mode`, after
-   * where the cell stands: "Day 1: 0 (1 of 14, selected)". Empty adds
-   * nothing.
+   * What the readout added for a selected cell, under `selection-mode`.
+   *
+   * @deprecated The strip is a grid under `selection-mode`, and each cell says
+   * whether it is selected with `aria-selected`, in the reader's own words, so
+   * the readout says nothing there and this is not read.
    */
   @words
   @property({ attribute: 'selected-label' })
@@ -467,31 +488,6 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
   }
 
   /**
-   * Whether this render can tell a table with no readings from one it has not
-   * resolved yet.
-   *
-   * **Unknown is not empty, which is what an empty state must never say.**
-   * `for` names an id and resolving an id wants a document, so a server has
-   * none and a hydrating render must not look either. Without this the server
-   * drew "No readings" over a table holding ninety days of them, a crawler read
-   * that sentence, and the strip flipped to a full one on hydration: the fault
-   * `MixinCollection` names for a slotted collection, arriving through the one
-   * channel that mixin cannot see.
-   *
-   * The same shape as `childrenKnown`, asked of a tree that can answer about
-   * ids rather than of one that holds children. An id that resolves to nothing
-   * in a browser is still known, and still empty: a `for` naming no table
-   * should say so rather than sit blank, which is why this asks
-   * `searchableById` and not `elementById`.
-   *
-   * `readingsKnown` asks it for every chart, and for `data` too, which a
-   * server does not draw.
-   */
-  private get sourceKnown(): boolean {
-    return this.readingsKnown
-  }
-
-  /**
    * `rows` as a usable count, which is not always what the attribute says.
    *
    * One place rather than two: the fit arithmetic and the grid template both
@@ -616,6 +612,21 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    /* The strip's own handlers find the cell under a pointer, which is a place
+       in two dimensions, so the controller's search along one axis stays out.
+       It still owns `at`, the keys and the tooltip. Here rather than in a
+       constructor, where the manifest's analyzer reads the assignment as a
+       member of this class. */
+    this.pointer.axis = 'none'
+    /* Sent with the row of the table, which is not the cell's place among
+       those drawn once a narrow strip has dropped the oldest. */
+    this.pointer.onReading = (heard, detail) => {
+      const row = detail.index < 0 ? -1 : this.points.length - this.drawn.length + detail.index
+      const told = { ...detail, index: row, label: this.sourceRows[row]?.label ?? '' }
+      this.dispatchEvent(
+        heard === 'press' ? new HelixReadingPressEvent(told) : new HelixReadingChangeEvent(told),
+      )
+    }
     this.addEventListener('keydown', this.onKeydown)
     /* Guarded because Lit SSR provides no `ResizeObserver`, and a component that
        measures itself to render has to render without the measurement first. */
@@ -659,8 +670,6 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     super.updated(changed)
     this.markEmpty()
     this.measure()
-    this.toggleState('active', this.pointer.at >= 0)
-    this.toggleState('empty', this.drawn.length === 0 && this.sourceKnown)
     /* Written here rather than reflected, and announced only on a change: a
        consumer recomputing a summary from this is doing work, and an event per
        resize frame is work per frame.
@@ -699,53 +708,60 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
        **A strip with cells takes focus and is an application**, the role every
        chart's plot takes, because its cells are read by key: the arrows walk
        the days, a column at a time across, and the readout says each one. An
-       empty strip has nothing to read and stays a picture. */
+       empty strip has nothing to read and stays a picture. Under
+       `selection-mode` it is a grid instead, whose cells say whether they are
+       selected; see the class description. */
     const readable = cells.length > 0
+    const grid = readable && this.selectionMode !== undefined
     const keys = this.selectionMode ? this.keysOf(cells) : []
     const chosen = new Set(this.selectionMode ? commaList(this.value) : [])
+    const drawn = cells.map((reading, index) => {
+      const tone = toneOf(reading, bounds, palette)
+      const active = this.pointer.at === index
+      const picked = chosen.has(keys[index] ?? '')
+      const part = `cell${active ? ' cell-active' : ''}${picked ? ' cell-selected' : ''}`
+      if (grid) {
+        return this.renderGridCell(index, part, picked, tone)
+      }
+      /* **Two templates rather than one with a conditional style, and the
+         reason is that an absent tone has to mean an absent declaration.**
+         `--heatmap-tone: var(--heatmap-tone-undefined)` is not an unset
+         property, it is a property set to the guaranteed-invalid value, and
+         `var(--heatmap-tone, …)` then declines to use its own fallback because
+         the property *is* set. An untoned cell came out transparent rather
+         than taking the quiet ground the sheet has for it. */
+      return tone === undefined
+        ? html`<span
+                      part=${part}
+                      data-index=${index}
+                    ></span>`
+        : html`<span
+                part=${part}
+                data-index=${index}
+                data-tone=${tone}
+                style="--heatmap-tone: var(--heatmap-tone-${tone})"
+              ></span>`
+    })
+    const at = this.pointer.at
     return html`<div
+        aria-activedescendant=${grid && at >= 0 ? `cell-${at}` : nothing}
         aria-describedby=${readable ? 'helix-chart-summary' : nothing}
         aria-label=${this.named || this.stripLabel}
+        aria-multiselectable=${grid && this.selectionMode === 'multiple' ? 'true' : nothing}
         part="strip"
         id=${CHART_PLOT}
-        role=${readable ? 'application' : 'img'}
+        role=${grid ? 'grid' : readable ? 'application' : 'img'}
         style="--heatmap-rows: ${this.rowCount}"
         tabindex=${readable ? '0' : nothing}
         @click=${this.onClick}
         @pointerover=${this.onPointerOver}
         @pointerleave=${this.onPointerLeave}
+        @pointerup=${this.onPointerUp}
       >
-        ${
-          cells.length === 0
-            ? nothing
-            : cells.map((reading, index) => {
-                const tone = toneOf(reading, bounds, palette)
-                /* **Two templates rather than one with a conditional style, and
-                   the reason is that an absent tone has to mean an absent
-                   declaration.** `--heatmap-tone: var(--heatmap-tone-undefined)`
-                   is not an unset property, it is a property set to the
-                   guaranteed-invalid value, and `var(--heatmap-tone, …)` then
-                   declines to use its own fallback because the property *is*
-                   set. An untoned cell came out transparent rather than taking
-                   the quiet ground the sheet has for it. */
-                const active = this.pointer.at === index
-                const picked = chosen.has(keys[index] ?? '')
-                return tone === undefined
-                  ? html`<span
-                      part="cell${active ? ' cell-active' : ''}${picked ? ' cell-selected' : ''}"
-                      data-index=${index}
-                    ></span>`
-                  : html`<span
-                part="cell${active ? ' cell-active' : ''}${picked ? ' cell-selected' : ''}"
-                data-index=${index}
-                data-tone=${tone}
-                style="--heatmap-tone: var(--heatmap-tone-${tone})"
-              ></span>`
-              })
-        }
-        ${this.renderTooltip()}
+        ${grid ? this.renderRows(drawn) : drawn}
+        ${this.renderTooltip(grid)}
       </div>
-      ${cells.length === 0 && this.sourceKnown ? html`<p part="empty">${this.emptyText}</p>` : nothing}
+      ${cells.length === 0 ? this.renderStatus() : nothing}
       <div part="footer">
         <span part="start"><slot name="start"></slot></span>
         <span part="summary"><slot name="summary"></slot></span>
@@ -755,6 +771,52 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
           ? html`<span part="selection" role="status">${this.status.said}</span>`
           : nothing
       }${this.renderTable()}`
+  }
+
+  /**
+   * The cells as a grid's rows, one for each column of the strip, so a week
+   * is a row with `rows="7"` and a status strip is one row.
+   *
+   * **A column, because that is the order the cells are in.** The strip fills
+   * down the column and then across, so a row wrapping a column keeps every
+   * cell where it was, and `display: contents` keeps the wrapper out of the
+   * strip's grid, drawing no box, which is a mechanism and not a look. A row
+   * across the strip would have taken cells out of order and moved them.
+   */
+  private renderRows(cells: TemplateResult[]): TemplateResult[] {
+    const size = this.rowCount === 1 ? cells.length : this.rowCount
+    const rows: TemplateResult[] = []
+    for (let start = 0; start < cells.length; start += size) {
+      rows.push(
+        html`<div part="row" role="row" style="display: contents">${cells.slice(start, start + size)}</div>`,
+      )
+    }
+    return rows
+  }
+
+  /**
+   * One cell under `selection-mode`: a `gridcell` named by its row in the
+   * table, its reading and its place, and saying whether it is selected, which
+   * a reader hears on reaching it as the strip's active descendant.
+   */
+  private renderGridCell(
+    index: number,
+    part: string,
+    picked: boolean,
+    tone: string | undefined,
+  ): TemplateResult {
+    const row = this.sourceRows[this.points.length - this.drawn.length + index]
+    const name = row ? spokenReading(row) : ''
+    return html`<span
+      aria-label=${name || nothing}
+      aria-selected=${picked ? 'true' : 'false'}
+      data-index=${index}
+      data-tone=${tone ?? nothing}
+      id="cell-${index}"
+      part=${part}
+      role="gridcell"
+      style=${tone === undefined ? nothing : `--heatmap-tone: var(--heatmap-tone-${tone})`}
+    ></span>`
   }
 
   /**
@@ -802,8 +864,10 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
    * that is usually wider, so a percentage of the box lands between cells. The
    * pitch is `cell + gap` and both are measured.
    */
-  protected renderTooltip(): TemplateResult | typeof nothing {
+  protected renderTooltip(grid = false): TemplateResult | typeof nothing {
     const at = this.pointer.at
+    /* A grid's active cell is what a reader hears, so the readout is not drawn
+       there: the two would say each cell twice. */
     if (at < 0) {
       return drawTooltip(
         this.sourceRows,
@@ -811,7 +875,7 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
         this.tag('tooltip'),
         undefined,
         undefined,
-        this.pointer,
+        grid ? undefined : this.pointer,
       )
     }
     /* `sourceRows` is indexed over every reading and the strip draws a tail of
@@ -833,31 +897,8 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
         y: `${row * (cell + gap)}px`,
       },
       undefined,
-      this.reading(at),
+      grid ? undefined : this.pointer,
     )
-  }
-
-  /**
-   * The readout's cursor: the pointer, with the selected word after where a
-   * selected cell stands, so a reader moving through the strip hears which
-   * cells are in the selection and not only how many.
-   */
-  private reading(at: number): ReadingCursor {
-    const pointer = this.pointer
-    const key = this.keysOf(this.drawn)[at] ?? ''
-    if (!this.selectionMode || key === '' || this.selectedLabel === '') {
-      return pointer
-    }
-    if (!commaList(this.value).includes(key)) {
-      return pointer
-    }
-    return {
-      column: pointer.column,
-      keyed: pointer.keyed,
-      position: pointer.position,
-      shows: (cell) => pointer.shows(cell),
-      state: this.selectedLabel,
-    }
   }
 
   /**
@@ -876,6 +917,18 @@ export class HelixHeadlessHeatmap extends MixinChartSource(HelixElement) {
     const cell = (event.target as Element | null)?.closest?.('[part~="cell"]')
     const index = Number(cell?.getAttribute('data-index') ?? -1)
     this.pointer.set(Number.isInteger(index) ? index : -1)
+  }
+
+  /* A tap shows the cell under the finger and keeps it, as on every chart. */
+  private readonly onPointerUp = (event: PointerEvent): void => {
+    if (event.pointerType !== 'touch') {
+      return
+    }
+    const cell = (event.target as Element | null)?.closest?.('[part~="cell"]')
+    const index = Number(cell?.getAttribute('data-index') ?? -1)
+    if (cell && Number.isInteger(index) && index >= 0) {
+      this.pointer.tapTo(index)
+    }
   }
 
   /* A cell the keys chose stays when the pointer leaves, as on every chart. */

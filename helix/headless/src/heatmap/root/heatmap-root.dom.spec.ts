@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* The strip, after hydration.
  *
@@ -518,23 +518,45 @@ describe('selecting cells', () => {
     expect(element.value).toBe('Mon, Wed')
   })
 
-  /* The count says how many; the readout says which. A selected cell read the
-     same as any other, so a reader could not find the days in the selection. */
-  test('the readout says a cell is selected, in the consumer’s words', async () => {
+  /* The count says how many, and each cell says whether it is in the
+     selection: under `selection-mode` the strip is a grid, its cells
+     gridcells carrying `aria-selected`, and the keys move its active
+     descendant. Said in live text only, the selection was words and no state. */
+  test('is a grid whose cells say whether they are selected', async () => {
     const element = (await strip('selection-mode="multiple"', WEEK)) as Selecting
+    const plot = part(element, 'strip')
+    expect(plot?.getAttribute('role')).toBe('grid')
+    expect(plot?.getAttribute('aria-multiselectable')).toBe('true')
+    expect(part(element, 'row')?.getAttribute('role')).toBe('row')
     key(element, 'Home')
     key(element, ' ')
     await element.updateComplete
-    expect(part(element, 'live')?.textContent).toBe('Mon: 1 (1 of 4, selected)')
+    const active = element.shadowRoot?.getElementById(
+      plot?.getAttribute('aria-activedescendant') ?? '',
+    )
+    expect(active?.getAttribute('role')).toBe('gridcell')
+    expect(active?.getAttribute('aria-label')).toBe('Mon: 1')
+    expect(cells(element).map((one) => one.getAttribute('aria-selected'))).toEqual([
+      'true',
+      'false',
+      'false',
+      'false',
+    ])
     key(element, 'ArrowRight')
     await element.updateComplete
-    expect(part(element, 'live')?.textContent).toBe('Tue: 2 (2 of 4)')
-    key(element, 'ArrowLeft')
-    await element.updateComplete
-    expect(part(element, 'live')?.textContent).toBe('Mon: 1 (1 of 4, selected)')
-    element.setAttribute('selected-label', 'gewählt')
-    await element.updateComplete
-    expect(part(element, 'live')?.textContent).toBe('Mon: 1 (1 of 4, gewählt)')
+    expect(plot?.getAttribute('aria-activedescendant')).toBe('cell-1')
+    // The active cell is what a reader hears, so the readout is not drawn.
+    expect(part(element, 'live')).toBeNull()
+  })
+
+  test('says one at a time under `single`, and is no grid without a mode', async () => {
+    const single = await strip('selection-mode="single"', WEEK)
+    expect(part(single, 'strip')?.getAttribute('role')).toBe('grid')
+    expect(part(single, 'strip')?.hasAttribute('aria-multiselectable')).toBe(false)
+    const plain = await strip('', WEEK)
+    expect(part(plain, 'strip')?.getAttribute('role')).toBe('application')
+    expect(part(plain, 'row')).toBeNull()
+    expect(cells(plain).some((one) => one.hasAttribute('role'))).toBe(false)
   })
 
   /* The value named each day by its header's words, "1 Jun", where the
@@ -560,7 +582,7 @@ describe('selecting cells', () => {
   test('selects nothing without `selection-mode`', async () => {
     const element = (await strip('', WEEK)) as Selecting
     key(element, 'Home')
-    expect(key(element, ' ').defaultPrevented).toBe(false)
+    key(element, ' ')
     ;(cells(element)[1] as HTMLElement).click()
     expect(element.value).toBe('')
   })
@@ -610,5 +632,87 @@ describe('a strip drawn from data', () => {
       ['Mon', '2'],
       ['Tue', '5'],
     ])
+  })
+})
+
+/* Every other chart says it is waiting with `loading` and takes markup in
+   place of its empty and loading words; the strip had its own empty line and
+   no way to say it was waiting. */
+describe('nothing to draw', () => {
+  test('`loading` shows its words, or what a page slotted, until readings arrive', async () => {
+    const element = await strip('loading', [])
+    expect(part(element, 'loading')?.textContent?.trim()).toBe('Loading readings')
+    expect(hasState(element, 'loading')).toBe(true)
+    expect(part(element, 'empty')).toBeNull()
+    const slotted = (await mount(
+      `<div>${table([])}<helix-headless-heatmap for="uptime" loading><span slot="loading">Fetching</span></helix-headless-heatmap></div>`,
+    )) as HTMLElement
+    const host = slotted.querySelector('helix-headless-heatmap') as Strip
+    await host.updateComplete
+    expect(part(host, 'loading')?.querySelector('slot[name="loading"]')).not.toBeNull()
+  })
+
+  test('a table with no readings shows the empty words in their slot, and a loaded strip keeps its cells', async () => {
+    const empty = await strip('', [])
+    expect(part(empty, 'empty')?.querySelector('slot[name="empty"]')?.textContent).toBe(
+      'No readings',
+    )
+    expect(hasState(empty, 'empty')).toBe(true)
+    const refreshing = await strip('loading', [['Mon', 1]])
+    expect(cells(refreshing)).toHaveLength(1)
+    expect(part(refreshing, 'loading')).toBeNull()
+  })
+})
+
+/* The other charts send `helix-reading-change` and `helix-reading-press`; the
+   strip sent neither, so a page wiring one handler across its charts heard
+   nothing from it. */
+describe('readings, as every chart sends them', () => {
+  const heard = (element: HTMLElement): string[] => {
+    const said: string[] = []
+    for (const type of ['helix-reading-change', 'helix-reading-press']) {
+      element.addEventListener(type, (event) => {
+        const { index, label, pointerType } = (
+          event as CustomEvent<{ index: number; label: string; pointerType: string }>
+        ).detail
+        said.push(`${type.slice(14)} ${index} ${label} ${pointerType}`)
+      })
+    }
+    return said
+  }
+
+  test('a move by key and a press, with the row and its label', async () => {
+    const element = await strip('', [
+      ['Mon', 1],
+      ['Tue', 2],
+    ])
+    const said = heard(element)
+    for (const key of ['Home', 'ArrowDown', 'Enter']) {
+      part(element, 'strip')?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+      await element.updateComplete
+    }
+    expect(said).toEqual(['change 0 Mon keyboard', 'change 1 Tue keyboard', 'press 1 Tue keyboard'])
+  })
+
+  test('the row of the table, where a narrow strip drew only the newest', async () => {
+    const days = Array.from({ length: 40 }, (_, day) => [`Day ${day + 1}`, day] as [string, number])
+    const element = await strip('min-cell="10"', days)
+    ;(element as unknown as { width: number }).width = 100
+    await element.updateComplete
+    const drawn = cells(element).length
+    expect(drawn).toBeLessThan(40)
+    const said = heard(element)
+    part(element, 'strip')?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Home',
+      }),
+    )
+    await element.updateComplete
+    expect(said).toEqual([`change ${40 - drawn} Day ${41 - drawn} keyboard`])
   })
 })
