@@ -40,6 +40,8 @@ export interface ReferenceExample {
   css: string
   description: string
   html: string
+  /** The import lines that register what the example writes, printed above it. */
+  imports?: string[]
   label: string
 }
 
@@ -72,6 +74,11 @@ export interface ReferenceOptions {
   lede?: string[]
   /** Top-level heading. */
   title?: string
+  /**
+   * The import block for each family, keyed by family slug, printed under a
+   * Usage heading before the first element. The catalog's `usage` is it.
+   */
+  usage?: Record<string, string[]>
 }
 
 /**
@@ -292,6 +299,9 @@ const shown = (depth: number, examples: ReferenceExample[]): string[] => {
     if (example.description) {
       lines.push(example.description, '')
     }
+    if (example.imports && example.imports.length > 0) {
+      lines.push('```js', ...example.imports, '```', '')
+    }
     lines.push('```html', withoutSummary(example.html), '```', '')
     if (example.css) {
       lines.push('```css', example.css, '```', '')
@@ -333,6 +343,10 @@ export const reference = (manifest: HelixManifest, options: ReferenceOptions = {
   for (const { family, parts } of families) {
     if (families.length > 1) {
       lines.push(`## ${startCase(family)}`, '')
+    }
+    const usage = options.usage?.[family] ?? []
+    if (usage.length > 0) {
+      lines.push(`${'#'.repeat(depth)} Usage`, '', '```js', ...usage, '```', '')
     }
     for (const { declaration, part } of parts) {
       lines.push(...element(depth, declaration, part))

@@ -192,6 +192,9 @@ for (const family of families) {
       ],
       lede: facts.length > 0 ? [...facts.map(([key, value]) => `- **${key}:** ${value}`), ''] : [],
       title: family.label,
+      /* The styled block, as the page shows by default: the `.md` documents
+         the styled manifest, and the headless block is in the `.json`. */
+      usage: { [family.slug]: family.usage.styled },
     }),
   )
 }
