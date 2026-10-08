@@ -29,7 +29,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * The composer clears only when no listener cancels the send, so the text is
  * kept when you cancel a send that failed.
  *
- * **In a form, the draft is the composer's value**, submitted under `name`. A
+ * **In a form, the draft is the composer's value**, submitted under `name`,
+ * and an empty draft submits an empty entry, as a native textarea does. A
  * form reset puts back the `value` the markup declared, and a `<fieldset
  * disabled>` turns the composer off. Sending is still `helix-send`, and it
  * does not submit the form.
@@ -316,11 +317,12 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.markEmpty()
-    /* Nothing where nothing is written, so an empty composer submits no entry.
-       The draft is the state either way, so a browser restoring the form puts
-       back a draft the reader emptied as empty, and not the declared one. */
+    /* An empty entry where nothing is written, as a native textarea submits
+       `draft=`. The draft is the state too, so a browser restoring the form
+       puts back a draft the reader emptied as empty, and not the declared
+       one. */
     if (changed.has('value')) {
-      this.internals.setFormValue(this.value === '' ? null : this.value, this.value)
+      this.internals.setFormValue(this.value, this.value)
     }
     /* The browser's verdict on the field, copied with the field as the anchor,
        so the message is in the reader's language and points at the text. */
