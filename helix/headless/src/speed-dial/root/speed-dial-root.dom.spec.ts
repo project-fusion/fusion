@@ -120,12 +120,11 @@ describe('a speed dial', () => {
     expect((part(host, 'actions') as HTMLElement).hasAttribute('hidden')).toBe(false)
   })
 
-  test('and a trigger that cannot hold it is left alone rather than written to', async () => {
+  test('and a plain trigger is left alone until a reader reaches it', async () => {
     /* A plain `<button slot="trigger">` has no shadow root to keep the state out
-       of the markup and no property to take it. Writing the attribute anyway is
-       the mismatch above, so nothing is written and `tellDisclosure` says so
-       once on the console. The reader loses the announcement, which is the cost
-       this records rather than hides. */
+       of the markup and no property to take it. Writing the attribute before
+       hydration is the mismatch above, so nothing is written while nobody has
+       reached the trigger. */
     const { host } = await dial()
     const trigger = host.querySelector('button[slot="trigger"]') as HTMLElement
     expect(trigger.hasAttribute('aria-expanded')).toBe(false)
@@ -133,6 +132,44 @@ describe('a speed dial', () => {
     host.open = true
     await host.updateComplete
     expect(trigger.hasAttribute('aria-expanded')).toBe(false)
+    expect(trigger.hasAttribute('aria-haspopup')).toBe(false)
+  })
+
+  test('and says it opens a menu, and whether it is open, once a reader reaches it', async () => {
+    /* After hydration, which a reader's focus or pointer is, the attributes are
+       no mismatch: React compares what it rendered only while it hydrates. */
+    const { host } = await dial()
+    const trigger = host.querySelector('button[slot="trigger"]') as HTMLElement
+    trigger.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    await host.updateComplete
+    expect([trigger.getAttribute('aria-haspopup'), trigger.getAttribute('aria-expanded')]).toEqual([
+      'menu',
+      'false',
+    ])
+    pressTrigger(host)
+    await host.updateComplete
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    press(host, 'Escape')
+    await host.updateComplete
+    expect(trigger.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  test('a plain trigger that says its own state is not written to', async () => {
+    const host = (await mount(
+      `<helix-headless-speed-dial label="Actions">
+        <button slot="trigger" aria-haspopup="true" aria-expanded="false">Open</button>
+        <helix-headless-speed-dial-item value="share">Share</helix-headless-speed-dial-item>
+      </helix-headless-speed-dial>`,
+    )) as Dial
+    await host.updateComplete
+    const trigger = host.querySelector('button[slot="trigger"]') as HTMLElement
+    trigger.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    pressTrigger(host)
+    await host.updateComplete
+    expect([trigger.getAttribute('aria-haspopup'), trigger.getAttribute('aria-expanded')]).toEqual([
+      'true',
+      'false',
+    ])
   })
 
   test('a default trigger carries the name and says it opens a menu', async () => {
