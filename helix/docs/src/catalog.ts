@@ -74,6 +74,12 @@ export interface Element {
   cssProperties: ApiMember[]
   cssStates: ApiMember[]
   description: string
+  /**
+   * The entry that registers the element, under the tier's package: the
+   * family's own, such as `filter-input`, or one of its own where the family's
+   * leaves it out, such as `filter-input/menu`.
+   */
+  entry: string
   events: EventDoc[]
   label: string
   methods: ApiMember[]
@@ -398,6 +404,30 @@ const examplesOf = (
 }
 
 /**
+ * The entry each module is imported through, by its path without the
+ * extension: the shortest `index.ts` that re-exports it, so a part the
+ * family's entry registers is read as the family's, and one only its own
+ * entry registers, such as `filter-input/menu`, as that entry.
+ */
+const entriesOf = (manifest: HelixManifest): Map<string, string> => {
+  const entries = new Map<string, string>()
+  for (const module of manifest.modules ?? []) {
+    const entry = /^src\/(.+)\/index\.ts$/.exec(module.path ?? '')?.[1]
+    if (!entry) {
+      continue
+    }
+    for (const exported of module.exports ?? []) {
+      const from = exported.declaration?.module?.replace(/\.[jt]s$/, '')
+      const held = from === undefined ? undefined : entries.get(from)
+      if (from !== undefined && (held === undefined || entry.length < held.length)) {
+        entries.set(from, entry)
+      }
+    }
+  }
+  return entries
+}
+
+/**
  * Every family across the given manifests, alphabetical, each with its elements
  * and examples.
  *
@@ -408,7 +438,10 @@ const examplesOf = (
  */
 export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = []): Family[] => {
   const byFamily = new Map<string, HelixDeclaration[]>()
+  /* Where each element is imported from, which the reference's usage shows. */
+  const entryOf = new Map<HelixDeclaration, string>()
   for (const manifest of manifests) {
+    const entries = entriesOf(manifest)
     for (const module of manifest.modules ?? []) {
       for (const declaration of module.declarations ?? []) {
         if (!declaration.tagName) {
@@ -419,6 +452,7 @@ export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = 
           continue
         }
         byFamily.set(family, [...(byFamily.get(family) ?? []), declaration])
+        entryOf.set(declaration, entries.get((module.path ?? '').replace(/\.[jt]s$/, '')) ?? family)
       }
     }
   }
@@ -460,6 +494,7 @@ export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = 
             cssProperties: members(entry.cssProperties),
             cssStates: members(entry.cssStates),
             description: entry.description ?? '',
+            entry: entryOf.get(entry) ?? slug,
             events: (entry.events ?? []).map((event) => ({
               description: event.description ?? '',
               name: event.name ?? '',

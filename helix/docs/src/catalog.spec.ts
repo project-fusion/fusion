@@ -179,3 +179,65 @@ describe('examples', () => {
     expect(findInCatalog(catalog([manifest], examples), 'qr-code')?.examples).toHaveLength(1)
   })
 })
+
+/* `FilterMenu` registers only through `filter-input/menu`, and the reference's
+   usage showed the family's import alone, so a page that wrote a picker got an
+   inert element. */
+describe('entries', () => {
+  const split: HelixManifest = {
+    modules: [
+      {
+        declarations: [{ name: 'HelixFilterInput', tagName: 'helix-filter-input' }],
+        path: 'src/filter-input/root/filter-input-root.ts',
+      },
+      {
+        declarations: [{ name: 'HelixFilterMenu', tagName: 'helix-filter-menu' }],
+        path: 'src/filter-input/menu/filter-menu.ts',
+      },
+      {
+        exports: [
+          { declaration: { module: 'src/filter-input/root/filter-input-root.js', name: '*' } },
+        ],
+        path: 'src/filter-input/index.ts',
+      },
+      {
+        exports: [{ declaration: { module: 'src/filter-input/menu/filter-menu.js', name: '*' } }],
+        path: 'src/filter-input/menu/index.ts',
+      },
+      {
+        declarations: [{ name: 'HelixOption', tagName: 'helix-option' }],
+        path: 'src/option/root/option-root.ts',
+      },
+      {
+        exports: [{ declaration: { module: 'src/option/root/option-root.js', name: '*' } }],
+        path: 'src/option/root/index.ts',
+      },
+      {
+        exports: [{ declaration: { module: 'src/option/root/option-root.js', name: '*' } }],
+        path: 'src/option/index.ts',
+      },
+    ],
+  }
+  const entries = (slug: string): Record<string, string> =>
+    Object.fromEntries(
+      (findInCatalog(catalog([split]), slug)?.elements ?? []).map((element) => [
+        element.tagName,
+        element.entry,
+      ]),
+    )
+
+  test('names the entry that registers each element, where it is not the family’s', () => {
+    expect(entries('filter-input')).toEqual({
+      'helix-filter-input': 'filter-input',
+      'helix-filter-menu': 'filter-input/menu',
+    })
+  })
+
+  test('reads a part the family’s entry registers as the family’s, beside a narrower entry', () => {
+    expect(entries('option')).toEqual({ 'helix-option': 'option' })
+  })
+
+  test('falls back to the family where no entry says', () => {
+    expect(catalog([manifest])[0]?.elements[0]?.entry).toBe('pagination')
+  })
+})
