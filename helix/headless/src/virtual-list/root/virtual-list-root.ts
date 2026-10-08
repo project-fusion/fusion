@@ -527,7 +527,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     target: () => this.partNamed('viewport'),
     /* A list with no name is announced as a list and nothing more, and only a
        window of its rows is there to say what it holds. Development builds only. */
-    unnamed: 'Give it a `label`, or an `aria-label` that says what the items are.',
+    unnamed: 'virtual-list',
   })
 
   /* No `overscan` property. The controller's four is a frame of fast scrolling

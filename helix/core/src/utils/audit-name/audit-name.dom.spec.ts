@@ -101,6 +101,14 @@ describe('the warning', () => {
     expect(await warned(() => auditName(host, () => control, 'Give it words.'))).toEqual([])
   })
 
+  /* Button passes a key, so its sentence ships in a development build only. */
+  test('says the sentence a key names', async () => {
+    const { control, host } = button('<b></b>', '<svg></svg>')
+    expect(await warned(() => auditName(host, () => control, 'button'))).toEqual([
+      '<b> has no accessible name, so a screen reader announces it by its role alone. Give it words, a `label`, or an `aria-label`.',
+    ])
+  })
+
   test('words in it, read through a slot, name a button', async () => {
     const { control, host } = button('<span>Save</span>', '<slot></slot>')
     expect(await warned(() => auditName(host, () => control, ''))).toEqual([])
