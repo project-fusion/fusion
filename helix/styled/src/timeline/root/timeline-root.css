@@ -87,6 +87,11 @@
   padding-block-start: var(--timeline-gap, var(--helix-space-lg));
 }
 
+/* Across the page, it stands at the end of the row, level with the times. */
+:host([orientation="horizontal"]) [part="loading"] {
+  padding-block-start: var(--helix-space-none);
+}
+
 /* Print: what happened and when.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this
