@@ -77,9 +77,9 @@ const keyOf = (item: HelixHeadlessLightboxItem, index: number): string =>
  * `--lightbox-pan-x` and `--lightbox-pan-y`, written only while zoomed, and a
  * swipe moves to the next item only while the item is at its own size. With
  * `controls`, the viewer also draws zoom-out and zoom-in controls, for a
- * pointer with no wheel and no second finger. Once a reader stops zooming, the
- * live region says the new scale in the words of `zoom-status-label`, such as
- * "Zoomed to 150%".
+ * pointer with no wheel and no second finger. Once a reader stops zooming, and
+ * at once for a key or a zoom control, the live region says the new scale in
+ * the words of `zoom-status-label`, such as "Zoomed to 150%".
  *
  * Each item is a slide: a `group` with the role description in
  * `slide-role-label`, named by its `label` or by `slide-label`. A touch or a pen
@@ -399,13 +399,21 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     }
   }
 
-  /** Says the new scale in the live region, a moment after the last change. */
+  /** Whether the zoom is changing by one discrete step, a key or a control, which is said at once. */
+  private zoomStep = false
+
+  /**
+   * Says the new scale in the live region: a moment after the last change of
+   * a pinch, a drag or the wheel, and at once for a key or a zoom control,
+   * which is one change a reader is waiting to hear. Said only after the
+   * pause, a reader pressing `+` heard nothing until it ended.
+   */
   private sayZoom(): void {
     if (this.quietZoom || !this.open || this.zoomStatusLabel === '') {
       this.zoomSaid.cancel()
       return
     }
-    this.zoomSaid.start(400, () => {
+    this.zoomSaid.start(this.zoomStep ? 0 : 400, () => {
       this.announcement = formatWords(this, 'zoomStatusLabel', {
         percent: percentOf(this.zoomScale),
         scale: this.zoomScale,
@@ -664,7 +672,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
     } else if (key === '-') {
       this.zoomOut()
     } else if (key === '0') {
-      this.zoomer.reset()
+      this.stepZoom(() => this.zoomer.reset())
     } else {
       return false
     }
@@ -697,12 +705,22 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
 
   /** Zooms in by half again, as `+` and the zoom-in control do. */
   private zoomIn(): void {
-    this.zoomer.zoomTo(this.zoomer.scale * 1.5)
+    this.stepZoom(() => this.zoomer.zoomTo(this.zoomer.scale * 1.5))
   }
 
   /** Zooms out by as much, as `-` and the zoom-out control do. */
   private zoomOut(): void {
-    this.zoomer.zoomTo(this.zoomer.scale / 1.5)
+    this.stepZoom(() => this.zoomer.zoomTo(this.zoomer.scale / 1.5))
+  }
+
+  /** Changes the zoom by one discrete step, which `sayZoom` says at once. */
+  private stepZoom(change: () => void): void {
+    this.zoomStep = true
+    try {
+      change()
+    } finally {
+      this.zoomStep = false
+    }
   }
 
   /** Home and End, which are an index rather than a step. */
