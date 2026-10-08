@@ -332,10 +332,10 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  *
  * @slot - The board's `helix-canvas-node` and `helix-canvas-edge` elements, drawn on the plane.
  * @slot empty - Content shown when the document has no nodes.
- * @slot loading - Content shown while `loading` is set, such as a progress bar while the document arrives.
  * @slot footer - Content below the board.
  * @slot fullscreen-icon - Replaces the glyph inside the fullscreen button.
  * @slot header - Content above the board.
+ * @slot loading - Content shown while `loading` is set, such as a progress bar while the document arrives.
  * @slot pan-down-icon - Replaces the glyph inside the pan down button.
  * @slot pan-end-icon - Replaces the glyph inside the button that pans toward the end of a line of text.
  * @slot pan-start-icon - Replaces the glyph inside the button that pans toward the start of a line of text.
