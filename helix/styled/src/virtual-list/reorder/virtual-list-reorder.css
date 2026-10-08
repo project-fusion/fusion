@@ -57,7 +57,8 @@
     --virtual-list-drag-preview-background-color,
     var(--helix-color-surface-raised)
   );
-  border: none;
+  border: var(--virtual-list-drag-preview-border-width, var(--helix-border-floating)) solid
+    var(--virtual-list-drag-preview-border-color, var(--helix-color-border));
   border-radius: var(--virtual-list-drag-preview-radius, var(--helix-radii-sm));
   box-shadow: var(--virtual-list-drag-preview-shadow, var(--helix-shadow-floating));
   opacity: var(--virtual-list-drag-preview-opacity, 0.9);
