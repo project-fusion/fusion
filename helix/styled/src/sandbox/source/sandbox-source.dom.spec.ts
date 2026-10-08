@@ -628,3 +628,14 @@ describe('the source given', () => {
     expect(pane.modified).toBe(false)
   })
 })
+
+describe('a source that is read only', () => {
+  test('cannot be edited, and Tab and the editing keys do nothing of their own', async () => {
+    const { field, host } = await select('readonly value="a"', 1)
+    expect(field.readOnly).toBe(true)
+    expect(field.hasAttribute('aria-describedby')).toBe(false)
+    expect(press(field, 'Tab').defaultPrevented).toBe(false)
+    expect(chord(field, ']').defaultPrevented).toBe(false)
+    expect(host.value).toBe('a')
+  })
+})

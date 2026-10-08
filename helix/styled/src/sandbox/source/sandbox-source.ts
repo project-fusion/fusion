@@ -323,6 +323,14 @@ export class HelixSandboxSource extends HelixElement {
   name = 'html'
 
   /**
+   * Whether the source is read only: it can be selected and copied, and not
+   * edited, as Sandpack's `readOnly` file is. Tab moves focus out of a field
+   * that is read only.
+   */
+  @property({ attribute: 'readonly', reflect: true, type: Boolean })
+  readOnly = false
+
+  /**
    * Whether Tab indents the source. When it is off, Tab moves focus.
    */
   @property({ attribute: 'tab-indents', converter: onUnlessFalse })
@@ -595,6 +603,10 @@ export class HelixSandboxSource extends HelixElement {
 
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     const field = event.target as HTMLTextAreaElement
+    /* A field nobody can edit takes no key of its own, so Tab moves focus. */
+    if (this.readOnly) {
+      return
+    }
     if (this.completionKey(event, field)) {
       return
     }
@@ -842,11 +854,12 @@ export class HelixSandboxSource extends HelixElement {
           ? formatWords(this, 'fieldNameLabel', { field: this.fieldLabel, name: this.label })
           : this.fieldLabel
       }
-      aria-describedby=${this.tabIndents ? 'keys' : nothing}
+      aria-describedby=${this.tabIndents && !this.readOnly ? 'keys' : nothing}
       aria-autocomplete=${this.complete ? 'list' : nothing}
       aria-controls=${this.offered ? 'completions' : nothing}
       aria-activedescendant=${this.offered ? `completion-${this.chosen}` : nothing}
       spellcheck="false"
+      ?readonly=${this.readOnly}
       .value=${this.value}
       @blur=${this.close}
       @focus=${this.reportCaret}
