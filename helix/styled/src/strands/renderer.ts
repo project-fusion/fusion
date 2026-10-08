@@ -24,8 +24,16 @@ const DUST = 600
 
 /** What one frame needs, all of it already resolved by the element. */
 export interface StrandsFrame {
+  /** How much the glow around the strands adds, as a multiplier. */
+  bloom: number
+  /** How far apart the brightest and dimmest strands are, from `0` to `1`. */
+  contrast: number
   /** How many of the path's points are in use. */
   count: number
+  /** How much nearness shows, from `0`, flat, to `1`. */
+  depth: number
+  /** How differently each strand moves, from `0`, as one, to `1`. */
+  drift: number
   /** The device pixels per CSS pixel the buffer was sized at. */
   dpr: number
   /** Overall brightness. */
@@ -188,6 +196,7 @@ export class StrandsRenderer {
       this.vec3(this.line, 'uTint', palette.tint)
       this.vec3(this.line, 'uPeak', palette.peak)
       this.float(this.line, 'uSoftness', frame.softness)
+      this.float(this.line, 'uContrast', frame.contrast)
       gl.bindVertexArray(this.ribbon)
       gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, (SEGMENTS + 1) * 2, frame.strands)
 
@@ -218,6 +227,7 @@ export class StrandsRenderer {
     this.vec3(this.composite, 'uInk', palette.peak)
     this.float(this.composite, 'uLight', palette.light ? 1 : 0)
     this.float(this.composite, 'uGain', (1.7 * frame.gain) / this.scale)
+    this.float(this.composite, 'uBloom', frame.bloom)
     gl.bindVertexArray(this.empty)
     gl.drawArrays(gl.TRIANGLES, 0, 3)
   }
@@ -284,6 +294,8 @@ export class StrandsRenderer {
     gl.uniform2f(program.uniforms.get('uT') ?? null, frame.range[0], frame.range[1])
     gl.uniform1f(program.uniforms.get('uTime') ?? null, frame.time)
     gl.uniform1f(program.uniforms.get('uSpread') ?? null, frame.spread)
+    gl.uniform1f(program.uniforms.get('uDepth') ?? null, frame.depth)
+    gl.uniform1f(program.uniforms.get('uDrift') ?? null, frame.drift)
     gl.uniform1f(program.uniforms.get('uDpr') ?? null, frame.dpr)
     gl.uniform1f(program.uniforms.get('uScale') ?? null, this.scale)
   }
