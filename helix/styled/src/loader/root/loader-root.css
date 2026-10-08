@@ -33,6 +33,12 @@
   --_loader-size: var(--helix-size-loader-lg);
 }
 
+/* What the loader stands in for, in the one cell the ring is drawn in, so the
+   ring centers over it and the loader takes the larger of the two boxes. */
+[part="content"] {
+  grid-area: 1 / 1;
+}
+
 [part="svg"] {
   animation: helix-loader-turn var(--loader-duration, var(--_loader-turn)) linear infinite;
   grid-area: 1 / 1;

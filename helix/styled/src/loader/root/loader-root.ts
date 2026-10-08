@@ -17,6 +17,9 @@ import { styles } from './loader-root.css.js'
  * While `delay` runs, the loader keeps its size and draws nothing, so the line
  * it sits in does not move when it appears.
  *
+ * With something in the `content` slot, the loader takes the larger of the ring
+ * and the content, and the ring centers over the content while the work runs.
+ *
  * @since 0.1.0
  * @status stable
  * @category feedback
