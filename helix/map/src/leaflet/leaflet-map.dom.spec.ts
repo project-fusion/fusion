@@ -82,4 +82,59 @@ describe('a frame on a Leaflet map', () => {
       map.remove()
     }
   })
+
+  test('the zoom button and keys zoom the map a level, each level is said, and a marker off screen is brought into view', async () => {
+    const L = await import('leaflet')
+    const host = (await mount(
+      `<helix-headless-map label="Harbor" style="display: block; inline-size: 400px">
+        <div data-renderer style="inline-size: 400px; block-size: 300px"></div>
+        <helix-headless-map-marker label="Depot" lat="51.505" lng="-0.1"></helix-headless-map-marker>
+        <helix-headless-map-marker label="Lighthouse" lat="51.6" lng="0.3"></helix-headless-map-marker>
+      </helix-headless-map>`,
+    )) as HTMLElement & { updateComplete: Promise<boolean> }
+    await host.updateComplete
+    const map = L.map(host.querySelector('[data-renderer]') as HTMLElement, {
+      center: [51.505, -0.09],
+      zoom: 13,
+    })
+    const connection = connectMap(host, leafletDriver(map, L))
+    try {
+      const region = part(host, 'region') as HTMLElement
+      const live = (): string => part(host, 'live')?.textContent?.trim() ?? ''
+      const [depot, lighthouse] = [
+        ...host.querySelectorAll('helix-headless-map-marker'),
+      ] as HTMLElement[]
+      expect(await until(() => hasState(depot as HTMLElement, 'placed'))).toBe(true)
+
+      /* Leaflet's own zoom buttons give way to the frame's, which zoom it. */
+      expect(map.getContainer().querySelector('.leaflet-control-zoom')).toBeNull()
+      ;(part(host, 'zoom-in') as HTMLElement).click()
+      expect(await until(() => map.getZoom() === 14)).toBe(true)
+      expect(await until(() => live() === 'Zoom level 14')).toBe(true)
+      region.focus()
+      region.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, composed: true, key: '-' }),
+      )
+      expect(await until(() => map.getZoom() === 13)).toBe(true)
+      expect(await until(() => live() === 'Zoom level 13')).toBe(true)
+
+      /* The second marker is off screen at this zoom, and walking to it brings it in. */
+      const inView = (lat: number, lng: number): boolean => {
+        const { x, y } = map.latLngToContainerPoint([lat, lng])
+        return x >= 0 && x <= 400 && y >= 0 && y <= 300
+      }
+      expect(inView(51.6, 0.3)).toBe(false)
+      ;(depot as HTMLElement).focus()
+      ;(depot as HTMLElement).shadowRoot
+        ?.querySelector('[part="marker"]')
+        ?.dispatchEvent(
+          new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowDown' }),
+        )
+      expect(await until(() => document.activeElement === lighthouse)).toBe(true)
+      expect(await until(() => inView(51.6, 0.3))).toBe(true)
+    } finally {
+      connection.disconnect()
+      map.remove()
+    }
+  })
 })

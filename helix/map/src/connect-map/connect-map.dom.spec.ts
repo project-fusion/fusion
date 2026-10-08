@@ -91,8 +91,18 @@ const frame = async (inside = ''): Promise<Frame> => {
 
 const credit = (host: HTMLElement): HTMLElement | null => host.querySelector('[slot="attribution"]')
 
+/* The page's own, put back after each spec that replaced it. **Put back,
+   and deleted only where there was none**: in a browser, deleting it took the
+   page's `matchMedia` away from every spec after this file, and MapLibre,
+   which reads it on every move, stopped moving. */
+const original = (globalThis as { matchMedia?: unknown }).matchMedia
+
 afterEach(() => {
-  delete (globalThis as { matchMedia?: unknown }).matchMedia
+  if (original === undefined) {
+    delete (globalThis as { matchMedia?: unknown }).matchMedia
+  } else {
+    ;(globalThis as { matchMedia?: unknown }).matchMedia = original
+  }
 })
 
 describe('connectMap', () => {
