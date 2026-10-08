@@ -21,7 +21,7 @@ import {
  * message, `aria-describedby`, so a family that gains a control is covered
  * without this file being edited.
  */
-/** The form's own `checkValidity()`, read before any Helix control connects. */
+/* The form's own `checkValidity()`, read before any Helix control connects. */
 let nativeCheck: () => boolean
 
 beforeAll(async () => {
