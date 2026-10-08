@@ -387,6 +387,31 @@ describe('a time picker drawn from outside', () => {
     expect(row(other)).not.toContain('item-selected')
     expect(chosen?.getAttribute('exportparts')).toContain('item-selected: option-item-selected')
   })
+
+  /* Drawing seats left beside a time took a fork of the whole picker. */
+  test('timeContent draws each row, and the row is still named and found by its time', async () => {
+    const host = (await picker('min="09:00" max="10:00" step="30" lang="en"')) as Time & {
+      timeContent?: (time: string, written: string) => unknown
+    }
+    host.timeContent = (time, written) => {
+      const end = document.createElement('span')
+      end.slot = 'end'
+      end.textContent = time === '09:30' ? 'Full' : '2 left'
+      const fragment = document.createDocumentFragment()
+      fragment.append(written, end)
+      return fragment
+    }
+    await host.updateComplete
+    const row = options(host).find(
+      (one) => one.getAttribute('value') === '09:30',
+    ) as HTMLElement & {
+      text: string
+    }
+    expect(row.querySelector('[slot="end"]')?.textContent).toBe('Full')
+    expect(row.getAttribute('aria-label')).toBe(row.text)
+    expect(row.text).not.toContain('Full')
+    expect(options(await picker()).some((one) => one.hasAttribute('aria-label'))).toBe(false)
+  })
 })
 
 describe('a time picker opens on its answer', () => {
