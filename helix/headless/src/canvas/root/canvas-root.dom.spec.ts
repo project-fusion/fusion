@@ -1093,6 +1093,24 @@ describe('canvas connections and removal', () => {
  * a filter, another person's edit, an undo. Map refocuses a neighbor the same
  * way. Measured before this: focus fell to the page's body.
  */
+/* A board whose document was still on its way had no way to say so. */
+describe('a board loading its document', () => {
+  test('is busy, shows the loading slot, and takes the loading state, while loading is set', async () => {
+    const host = (await canvas('loading', '<p slot="loading">Opening the board</p>')) as Canvas & {
+      loading: boolean
+    }
+    const region = part(host, 'region') as HTMLElement
+    expect(region.getAttribute('aria-busy')).toBe('true')
+    expect(host.shadowRoot?.querySelector('slot[name="loading"]')).not.toBeNull()
+    expect(hasState(host, 'loading')).toBe(true)
+    host.loading = false
+    await host.updateComplete
+    expect(region.hasAttribute('aria-busy')).toBe(false)
+    expect(host.shadowRoot?.querySelector('slot[name="loading"]')).toBeNull()
+    expect(hasState(host, 'loading')).toBe(false)
+  })
+})
+
 describe('a focused card the page removes', () => {
   const turns = async (host: Canvas): Promise<void> => {
     for (let turn = 0; turn < 4; turn++) {
