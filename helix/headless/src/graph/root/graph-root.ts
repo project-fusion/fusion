@@ -339,6 +339,15 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @property({ attribute: 'selected-label' })
   selectedLabel = 'Selected'
 
+  /**
+   * What screen readers hear after a reader selects a note, in the list or in
+   * the drawing, with `{note}` for its name and `{count}` for how many notes
+   * the list then holds, written with `count-label`.
+   */
+  @words
+  @property({ attribute: 'selection-label' })
+  selectionLabel = '{note}, selected. {count}'
+
   /** The hint shown when one finger swipes over the graph with `gestures="cooperative"`. */
   @words
   @property({ attribute: 'two-finger-hint-label' })
@@ -625,7 +634,9 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
         this.selectionAsked = undefined
         const chosen = this.nodes.find((node) => node.id === this.active)
         if (chosen) {
-          this.say(`${nameOf(chosen)}, ${this.selectedLabel}. ${this.countText()}`)
+          this.say(
+            formatWords(this, 'selectionLabel', { count: this.countText(), note: nameOf(chosen) }),
+          )
         }
       }
     }

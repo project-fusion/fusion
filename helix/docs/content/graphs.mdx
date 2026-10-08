@@ -437,8 +437,9 @@ leaves removing it to your framework.
   to it, such as "Linked from Roadmap". They hear the count when a search or
   the legend changes it.
 - When you select a note, in the list or in the drawing, screen readers hear
-  its name and how many notes the list holds, such as "Roadmap, Selected. 4
-  notes". A selection your page writes to `active` is not said.
+  its name and how many notes the list holds, such as "Roadmap, selected. 4
+  notes", from `selection-label`. A selection your page writes to `active` is
+  not said.
 - After the arrow keys, plus, minus, or the buttons move the drawing, screen
   readers hear which way it went, such as "Moved right" or "Zoomed in".
   `connectGraph` tells the frame once the drawing has moved. If you answer
@@ -447,6 +448,7 @@ leaves removing it to your framework.
 - When you change `nodes` or `links`, the list keeps the note the keys are on.
   When that note is removed, the keys move to the note that took its row.
 - Change the words with `search-label`, `count-label`, `selected-label`,
+  `selection-label`,
   `links-to-label`, `linked-from-label`, `linked-both-label`,
   `moved-up-label`, `moved-down-label`, `moved-left-label`,
   `moved-right-label`, `zoomed-in-label`, and `zoomed-out-label`, or register

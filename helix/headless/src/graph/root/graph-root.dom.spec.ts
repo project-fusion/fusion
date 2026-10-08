@@ -325,15 +325,15 @@ describe('graph frame', () => {
     key(list(host), 'Enter')
     await settle(host)
     expect(host.active).toBe('a')
-    expect(live()).toBe('Alpha, Selected. 3 notes')
+    expect(live()).toBe('Alpha, selected. 3 notes')
     /* From the drawing, through the same request `connectGraph` makes. */
     ;(host as Graph & { requestActive(id: string): boolean }).requestActive('d')
     await settle(host)
-    expect(live()).toBe('Delta, Selected. 2 notes')
+    expect(live()).toBe('Delta, selected. 2 notes')
     /* A selection the page writes is the page's to say. */
     host.active = 'b'
     await settle(host)
-    expect(live()).toBe('Delta, Selected. 2 notes')
+    expect(live()).toBe('Delta, selected. 2 notes')
   })
 
   test('a new selection still reads the list from its top', async () => {
