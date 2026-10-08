@@ -234,7 +234,7 @@ const still = (page, readyProperty) =>
     await new Promise((done) =>
       requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(done))),
     )
-    await document.fonts.ready
+    await Promise.race([document.fonts.ready, new Promise((done) => setTimeout(done, 10000))])
     if (readyProperty) {
       await Promise.race([
         Promise.all(
@@ -262,11 +262,12 @@ const still = (page, readyProperty) =>
   }, readyProperty ?? null)
 
 /** One entry, every shot of it from one navigation. */
-const take = async (page, item, readyProperty) => {
+const take = async (page, item, readyProperty, progress) => {
   const started = performance.now()
   let error = null
   try {
     for (const [index, shot] of item.shots.entries()) {
+      progress.stage = index === 0 ? 'loading the page' : `settling for ${shot.name}`
       await page.setViewportSize({ height: shot.height, width: shot.width })
       await page.emulateMedia({ colorScheme: shot.scheme })
       if (index === 0) {
@@ -292,6 +293,7 @@ const take = async (page, item, readyProperty) => {
           [STYLE_ID, shot.harness],
         )
       }
+      progress.stage = `settling for ${shot.name}`
       await still(page, readyProperty)
       /* A face the page asked for and could not load draws in the platform's
          fallback, and a baseline taken that way defends the wrong face. */
@@ -304,11 +306,16 @@ const take = async (page, item, readyProperty) => {
       /* `animations: 'disabled'` cancels infinite animations to their first
          frame and finishes finite ones, so a picture is of one definite moment:
          Fusion's spinner moved 17 pixels between two takes without it. */
+      progress.stage = `capturing ${shot.name}`
       const png = await page.screenshot({ animations: 'disabled', fullPage: true })
+      if (progress.abandoned) {
+        return
+      }
       say({ key: item.key, op: 'shot', png: png.toString('base64'), shot: shot.name })
       /* After the first picture, on the page that was pictured, so what the
          inspection reads cannot move a pixel of that picture. */
       if (index === 0 && item.inspect) {
+        progress.stage = 'inspecting the page'
         state.runs.push({
           entry: item.entry,
           result: await state.config.inspect.run({ entry: item.entry, page }),
@@ -318,7 +325,50 @@ const take = async (page, item, readyProperty) => {
   } catch (caught) {
     error = caught instanceof Error ? caught.message.split('\n')[0] : String(caught)
   }
-  say({ error, key: item.key, op: 'item', seconds: (performance.now() - started) / 1000 })
+  if (progress.abandoned) {
+    return
+  }
+  const seconds = (performance.now() - started) / 1000
+  console.error(
+    `proof: ${item.key}: ${error === null ? `${item.shots.length} ${item.shots.length === 1 ? 'shot' : 'shots'}` : 'failed'} in ${seconds.toFixed(1)} s`,
+  )
+  say({ error, key: item.key, op: 'item', seconds })
+}
+
+/**
+ * Seconds an entry may take for each of its shots before it is given up on.
+ *
+ * **Every wait in a picture is bounded, and so is the whole of one.** A page
+ * that stops drawing frames leaves an `evaluate` waiting on a frame that
+ * never comes, and an unbounded run is a job that hangs until CI kills it and
+ * says nothing about which page did it.
+ */
+const PER_SHOT = 60
+
+/**
+ * One entry on the lane's page, given up on after its time with the stage it
+ * reached named. The page it was stuck on is closed and the lane gets a new
+ * one in the same context, so the entries after it start clean.
+ */
+const bounded = async (lane, item, readyProperty) => {
+  const progress = { abandoned: false, stage: 'starting' }
+  const limit = PER_SHOT * item.shots.length
+  let timer
+  const expired = new Promise((done) => {
+    timer = setTimeout(() => done(true), limit * 1000)
+  })
+  const finished = await Promise.race([take(lane.page, item, readyProperty, progress), expired])
+  clearTimeout(timer)
+  if (finished !== true) {
+    return
+  }
+  progress.abandoned = true
+  const message = `did not finish in ${limit} seconds, stuck ${progress.stage}`
+  console.error(`proof: ${item.key}: ${message}`)
+  say({ error: message, key: item.key, op: 'item', seconds: limit })
+  const context = lane.page.context()
+  await lane.page.close().catch(() => {})
+  lane.page = await context.newPage()
 }
 
 /**
@@ -352,7 +402,7 @@ const lanes = async (count) => {
         return state.origins.has(origin) ? route.continue() : route.abort()
       })
     }
-    state.lanes.push(await context.newPage())
+    state.lanes.push({ page: await context.newPage() })
   }
   return state.lanes.slice(0, count)
 }
@@ -366,11 +416,12 @@ const handlers = {
     /* **Worker `k` takes items `k`, `k + n`, and so on**, rather than the next
        free one off a queue, so which entries shared a page is a function of
        the worker count and a finding can be reproduced by running again. */
-    const pages = await lanes(Math.min(state.workers, items.length))
+    const taken = await lanes(Math.min(state.workers, items.length))
     await Promise.all(
-      pages.map(async (page, k) => {
-        for (let at = k; at < items.length; at += pages.length) {
-          await take(page, items[at], readyProperty)
+      taken.map(async (lane, k) => {
+        for (let at = k; at < items.length; at += taken.length) {
+          console.error(`proof: ${items[at].key}: picturing`)
+          await bounded(lane, items[at], readyProperty)
         }
       }),
     )
