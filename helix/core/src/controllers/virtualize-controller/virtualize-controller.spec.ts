@@ -1013,8 +1013,9 @@ describe('a set laid out as a waterfall', () => {
   test('draws every item that reaches into the box, a line of three at a time', () => {
     // Every item at 20, three to a line: the box of 100 holds five lines.
     const { controller } = laid(0)
-    expect(controller.window).toEqual({ after: 0, before: 0, first: 0, last: 15 })
-    expect(controller.extent()).toBe(2000)
+    expect(controller.window).toEqual({ after: 1900, before: 0, first: 0, last: 15 })
+    // The set is as long as its longest column.
+    expect(controller.offsetOf(300)).toBe(2000)
     const { controller: down } = laid(200)
     expect(down.window.first).toBe(30)
     expect(down.visible()).toEqual({ first: 30, last: 45 })
@@ -1047,6 +1048,6 @@ describe('a set laid out as a waterfall', () => {
     })
     controller.measure()
     expect(controller.window.last).toBe(5)
-    expect(controller.extent()).toBe(6000)
+    expect(controller.offsetOf(300)).toBe(6000)
   })
 })
