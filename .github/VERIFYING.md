@@ -55,7 +55,13 @@ two counts asks nothing of `-v` and means the same thing to every grep.
 
 `setup-bun` caches the binary and not what it installs, so each job used to pay a
 cold resolve of the whole tree. The cache is keyed on `bun.lock`, which is exactly
-what decides the answer. The four steps every job starts with are one local
+what decides the answer. The key leaves out the workspaces' own `version`
+lines, because a release stamp rewrites those lines and nothing else, and no
+workspace is downloaded. The cache is saved on `main` and restored on other
+branches, because an entry a pull request saves is visible to that pull
+request only. Each stamp used to write a new 420 MB entry on `main` and on
+every pull request that rebased, and the repository's 10 GB limit then evicted
+the Cargo cache that the helix binary builds from. The four steps every job starts with are one local
 action, `.github/actions/setup`, which reads the bun version off
 `packageManager` so the runtime CI runs on is the one the lockfile was written
 by, and there is no second copy of that number to bump.
