@@ -615,9 +615,12 @@ export class HelixHeadlessButton extends HelixFormElementBase {
     this.watchForm(null)
   }
 
-  /** Called by the browser when the button's form changes. */
-  override formAssociatedCallback(form: HTMLFormElement | null): void {
-    super.formAssociatedCallback(form)
+  /**
+   * Called by the browser when the button's form changes. Its own rather than
+   * an override: the base a button extends watches no form's checks, because
+   * a button reports no verdict of its own.
+   */
+  formAssociatedCallback(form: HTMLFormElement | null): void {
     this.watchForm(form)
   }
 
