@@ -326,6 +326,16 @@ fn unknown_family(tier: &Tier, name: &str) -> Failure {
     failure
 }
 
+/// Where the styled tier's example pictures are published.
+const SITE: &str = "https://fusion.dev";
+
+/// The environment the tier's baselines were taken in, as `examples.json`
+/// records it, or null.
+fn environment_of(tier: &Tier) -> Value {
+    read_json(&tier.dir.join("examples.json"))
+        .map_or(Value::Null, |read| read["environment"].clone())
+}
+
 /// The examples a tier ships for one family.
 fn examples_of(tier: &Tier, slug: &str) -> Outcome<Vec<Value>> {
     let path = tier.dir.join("examples.json");
@@ -399,10 +409,31 @@ pub fn example(from: &Path, name: &str, slug: Option<&str>, tier: Option<&str>) 
                 .collect(),
         ));
     };
+    /* **The pictures are the site's**, which publishes the styled tier's
+    baselines beside each family's files: the latest release's, taken in the
+    environment `examples.json` records. A render compared to one is fair only
+    in that environment. */
+    let renders: Vec<Value> = if tier.name == "styled" {
+        chosen["renders"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .map(|render| {
+                json!({
+                    "shot": render["shot"],
+                    "url": format!("{SITE}/helix/components/{family_slug}/{}", text(&render["file"])),
+                })
+            })
+            .collect()
+    } else {
+        Vec::new()
+    };
     Ok(json!({
+        "environment": environment_of(tier),
         "example": chosen,
         "family": family_slug,
         "package": tier.package,
+        "renders": renders,
         "version": tier.version,
     }))
 }

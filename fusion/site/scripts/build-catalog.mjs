@@ -25,7 +25,15 @@
  * beside `next dev`. That is the trade the warning asks for, and it is worth
  * naming rather than discovering.
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { dirname, join } from 'node:path'
 import { catalog, pages as docPages, reference } from '@fusion.dev/helix-docs'
 import { findSitePage, sitePageSources } from '@fusion.dev/insights'
@@ -71,6 +79,10 @@ const manifests = MANIFESTS.map((path) => {
 })
 
 const examples = []
+/* The styled tier's baseline pictures, served beside each family's files so
+   a reader can compare a render of its own to the one the visual check keeps.
+   The headless tier's are pictures of a hand-written sheet, not of Helix. */
+const pictured = []
 for (const source of EXAMPLES) {
   if (!existsSync(source)) {
     continue
@@ -80,7 +92,14 @@ for (const source of EXAMPLES) {
     if (!family.isDirectory() || !existsSync(dir)) {
       continue
     }
-    for (const file of readdirSync(dir)) {
+    const listed = readdirSync(dir)
+    const pictures = listed.filter((file) => file.endsWith('.png'))
+    if (source === EXAMPLES[0]) {
+      pictured.push(
+        ...pictures.map((file) => ({ family: family.name, file, from: join(dir, file) })),
+      )
+    }
+    for (const file of listed) {
       if (!file.endsWith('.html')) {
         continue
       }
@@ -101,6 +120,9 @@ for (const source of EXAMPLES) {
         css: existsSync(stylesheet) ? readFileSync(stylesheet, 'utf8').trim() : '',
         family: family.name,
         html: readFileSync(join(dir, file), 'utf8').trim(),
+        /* Only the pictures the site serves, so every render a family's file
+           lists is one a reader can open. */
+        pictures: source === EXAMPLES[0] ? pictures : [],
         slug,
         tsx: existsSync(authored)
           ? readFileSync(authored, 'utf8').trim().replaceAll(sheet, `'./styles.css'`)
@@ -137,6 +159,10 @@ rmSync(COMPONENTS, { force: true, recursive: true })
 rmSync(DOCS, { force: true, recursive: true })
 mkdirSync(COMPONENTS, { recursive: true })
 mkdirSync(DOCS, { recursive: true })
+for (const { family, file, from } of pictured) {
+  mkdirSync(join(COMPONENTS, family), { recursive: true })
+  copyFileSync(from, join(COMPONENTS, family, file))
+}
 
 /* The prose documents, cleared by file rather than by folder.
  *

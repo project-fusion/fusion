@@ -43,6 +43,8 @@ export interface ReferenceExample {
   /** The import lines that register what the example writes, printed above it. */
   imports?: string[]
   label: string
+  /** The baseline pictures, linked under the example beside the family's `.md`. */
+  renders?: { file: string; shot: string }[]
 }
 
 /** What to put above the reference, for a caller that generates a file. */
@@ -277,7 +279,7 @@ const element = (depth: number, declaration: HelixDeclaration, part: string): st
 const withoutSummary = (html: string): string => html.replace(/^<!--\s*@summary[\s\S]*?-->\n*/, '')
 
 /** One family's examples, as the markdown a reader or an agent can run. */
-const shown = (depth: number, examples: ReferenceExample[]): string[] => {
+const shown = (depth: number, family: string, examples: ReferenceExample[]): string[] => {
   if (examples.length === 0) {
     return []
   }
@@ -293,6 +295,12 @@ const shown = (depth: number, examples: ReferenceExample[]): string[] => {
     lines.push('```html', withoutSummary(example.html), '```', '')
     if (example.css) {
       lines.push('```css', example.css, '```', '')
+    }
+    if (example.renders && example.renders.length > 0) {
+      lines.push(
+        `Pictured: ${example.renders.map((render) => `[${render.shot}](${family}/${render.file})`).join(', ')}.`,
+        '',
+      )
     }
   }
   return lines
@@ -339,7 +347,7 @@ export const reference = (manifest: HelixManifest, options: ReferenceOptions = {
     for (const { declaration, part } of parts) {
       lines.push(...element(depth, declaration, part))
     }
-    lines.push(...shown(depth, options.examples?.[family] ?? []))
+    lines.push(...shown(depth, family, options.examples?.[family] ?? []))
   }
   return `${lines
     .join('\n')

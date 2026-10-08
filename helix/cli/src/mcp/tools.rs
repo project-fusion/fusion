@@ -135,10 +135,10 @@ pub fn catalog() -> Vec<Value> {
         }),
         json!({
             "annotations": annotations("Read a Helix example"),
-            "description": "Returns one example of a Helix family as HTML and TSX, with its stylesheet and `imports`, the import lines that register every element it writes. Copy the imports with the markup.",
+            "description": "Returns one example of a Helix family as HTML and TSX, with its stylesheet and `imports`, the import lines that register every element it writes. Copy the imports with the markup. Where the example is pictured, `renders` links its canonical pictures, wide, narrow, and dark, taken in `environment`: compare a render of your own to them.",
             "inputSchema": strings(&[("family", "The family's slug, label, alias, or one of its tags."), ("example", "The example's slug, from helix_family. Defaults to the family's preview."), TIER], &["family"]),
             "name": "helix_example",
-            "outputSchema": output(&[("example", "object"), ("family", "string"), ("package", "string"), ("version", "string")]),
+            "outputSchema": output(&[("example", "object"), ("family", "string"), ("package", "string"), ("renders", "array"), ("version", "string")]),
             "title": "Read a Helix example",
         }),
         json!({

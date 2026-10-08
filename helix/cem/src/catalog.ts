@@ -129,6 +129,13 @@ export interface Example {
    */
   layout?: string
   /**
+   * The pictures of the example that the visual check keeps as its baselines,
+   * by shot: `wide`, `narrow`, and `dark`, each a file beside the example. Empty
+   * where the example is not pictured. A reader compares a render of its own
+   * to these.
+   */
+  renders: Render[]
+  /**
    * The least height the preview pane should give this example, in pixels.
    *
    * Present on the six overlay families and nowhere else. Height is derived
@@ -162,6 +169,31 @@ export interface Example {
    */
   tier: 'headless' | 'styled'
 }
+
+/** One baseline picture of an example: the shot it is and its file name. */
+export interface Render {
+  file: string
+  shot: string
+}
+
+/**
+ * The shots a baseline file name can carry after the example's slug. The wide
+ * shot has none: `preview.png` beside `preview.narrow.png` and
+ * `preview.dark.png`.
+ */
+const SHOTS = ['dark', 'narrow']
+
+/** The baselines among `files` that picture the example `slug`. */
+export const rendersOf = (slug: string, files: readonly string[]): Render[] =>
+  files
+    .flatMap((file): Render[] => {
+      if (file === `${slug}.png`) {
+        return [{ file, shot: 'wide' }]
+      }
+      const shot = file.startsWith(`${slug}.`) ? file.slice(slug.length + 1, -'.png'.length) : ''
+      return file.endsWith('.png') && SHOTS.includes(shot) ? [{ file, shot }] : []
+    })
+    .sort((a, b) => a.file.localeCompare(b.file))
 
 export interface Family {
   aliases: string[]
@@ -216,6 +248,11 @@ export interface ExampleSource {
   /** Family folder the example was found in. */
   family: string
   html: string
+  /**
+   * The picture files beside the example, which `rendersOf` reads its
+   * baselines from. Absent where the caller did not list them.
+   */
+  pictures?: string[]
   /** File name without its extension: `preview`, `headless`, `cards.headless`. */
   slug: string
   /** The authored TSX beside the HTML, never a conversion of it. */
@@ -432,6 +469,7 @@ const examplesOf = (
           label: startCase(mirrored),
           ...(layout ? { layout } : {}),
           ...(min ? { min } : {}),
+          renders: rendersOf(source.slug, source.pictures ?? []),
           slug: source.slug,
           tier: (source.html.includes('<helix-headless-') ? 'headless' : 'styled') as
             | 'headless'

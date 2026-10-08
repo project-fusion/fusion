@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { catalog, type ExampleSource, findInCatalog } from './catalog.js'
+import { catalog, type ExampleSource, findInCatalog, rendersOf } from './catalog.js'
 import type { HelixManifest } from './types.js'
 
 const manifest: HelixManifest = {
@@ -348,6 +348,25 @@ describe('import lines', () => {
     expect([select?.elements[0]?.specifier, select?.elements[0]?.words]).toEqual([
       '@fusion.dev/helix/select',
       ['placeholder'],
+    ])
+  })
+})
+
+describe('renders', () => {
+  test('are the wide, narrow, and dark baselines beside an example, and nothing else', () => {
+    expect(
+      rendersOf('preview', [
+        'preview.png',
+        'preview.dark.png',
+        'preview.narrow.png',
+        'preview.wide.png',
+        'cards.png',
+        'preview-x.png',
+      ]),
+    ).toEqual([
+      { file: 'preview.dark.png', shot: 'dark' },
+      { file: 'preview.narrow.png', shot: 'narrow' },
+      { file: 'preview.png', shot: 'wide' },
     ])
   })
 })

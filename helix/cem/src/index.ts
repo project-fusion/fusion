@@ -82,6 +82,27 @@ const API = 'api.json'
 const EXAMPLES = 'examples.json'
 
 /**
+ * The environment the baselines were taken in, from the nearest
+ * `proof.fingerprint.json` up: the browser, the fonts, the system. A render
+ * compared to a baseline is fair only in the same one. `null` where there is
+ * none.
+ */
+const environmentOf = (cwd: string): unknown => {
+  let dir = resolve(cwd)
+  for (;;) {
+    const file = join(dir, 'proof.fingerprint.json')
+    if (existsSync(file)) {
+      return JSON.parse(readFileSync(file, 'utf8')) as unknown
+    }
+    const parent = dirname(dir)
+    if (parent === dir) {
+      return null
+    }
+    dir = parent
+  }
+}
+
+/**
  * The example files under `src/<family>/.examples`, as the site reads them:
  * the HTML is the list, and the stylesheet and the TSX beside it are optional.
  */
@@ -96,7 +117,9 @@ const examplesOnDisk = (cwd: string): ExampleSource[] => {
     if (!family.isDirectory() || !existsSync(dir)) {
       continue
     }
-    for (const file of readdirSync(dir).sort()) {
+    const listed = readdirSync(dir).sort()
+    const pictures = listed.filter((file) => file.endsWith('.png'))
+    for (const file of listed) {
       if (!file.endsWith('.html')) {
         continue
       }
@@ -107,6 +130,7 @@ const examplesOnDisk = (cwd: string): ExampleSource[] => {
         css: read(`${slug}.css`),
         family: family.name,
         html: read(file),
+        pictures,
         slug,
         tsx: read(`${slug}.tsx`),
       })
@@ -294,7 +318,7 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
     )
     writeFileSync(
       join(cwd, EXAMPLES),
-      `${JSON.stringify({ examples: Object.fromEntries(families.map((family) => [family.slug, family.examples])), package: name })}\n`,
+      `${JSON.stringify({ environment: environmentOf(cwd), examples: Object.fromEntries(families.map((family) => [family.slug, family.examples])), package: name })}\n`,
     )
   }
   const context: HelixContext = {
@@ -324,6 +348,8 @@ export {
   type Family,
   findInCatalog,
   type PropertyDoc,
+  type Render,
+  rendersOf,
 } from './catalog.js'
 export { displayName, place, startCase, tierOf } from './naming.js'
 export type {
