@@ -6,8 +6,8 @@ import {
   IndicatorController,
   plainClick,
   reflectElements,
-  scrollItemIntoView,
   scrollingAncestor,
+  scrollWithin,
   words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -433,7 +433,7 @@ export class HelixHeadlessOutline extends HelixElement {
     const sections = this.scroller
     const node = scrollingAncestor(link, { axis: 'y', overflowing: true, stop: this.page })
     if (node && node !== sections && !node.contains(sections)) {
-      scrollItemIntoView(link, { scroller: node })
+      scrollWithin(link, node)
     }
   }
 

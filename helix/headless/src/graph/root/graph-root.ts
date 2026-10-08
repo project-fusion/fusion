@@ -17,8 +17,8 @@ import {
   MixinControllerActive,
   MixinViewport,
   SCROLLER_RULE,
-  scrollItemIntoView,
   scrollRoom,
+  scrollWithin,
   Typeahead,
   typeaheadBy,
   VIRTUAL_RULE,
@@ -885,7 +885,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     if (this.cursor >= first && this.cursor < last) {
       const row = this.renderRoot.querySelector?.<HTMLElement>(`[data-index="${this.cursor}"]`)
       if (row) {
-        scrollItemIntoView(row, { scroller: list })
+        scrollWithin(row, list)
       }
       return
     }

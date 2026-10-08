@@ -670,6 +670,7 @@ export {
   scrollItemIntoView,
   scrollingAncestor,
   scrollRoom,
+  scrollWithin,
 } from './utils/scroll-item-into-view/scroll-item-into-view.js'
 export { lockScroll, scrollHolders, unlockScroll } from './utils/scroll-lock/scroll-lock.js'
 export { slotFilled, slotNamed } from './utils/slot-filled/slot-filled.js'

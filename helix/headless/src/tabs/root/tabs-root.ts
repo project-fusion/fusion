@@ -10,7 +10,7 @@ import {
   KeyboardNavigationController,
   MIRROR_RULE,
   MixinControllerActive,
-  scrollItemIntoView,
+  scrollWithin,
   whenHydrated,
   words,
 } from '@fusion.dev/helix-core'
@@ -476,7 +476,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     const tab = this.tabs.find((one) => one.selected)
     if (strip && tab) {
       /* Clear of a scroll button holding to the edge it comes in at. */
-      scrollItemIntoView(tab, { padding: this.scrollControls ? 40 : 0, scroller: strip })
+      scrollWithin(tab, strip, { padding: this.scrollControls ? 40 : 0 })
     }
   }
 

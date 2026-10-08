@@ -129,12 +129,25 @@ const climb = (node: HTMLElement): HTMLElement | null => {
 }
 
 export const scrollItemIntoView = (item: HTMLElement, options: ScrollItemOptions = {}): void => {
-  const { padding = 0, smooth = false } = options
   const scroller = options.scroller ?? scrollingAncestor(item)
-  if (!scroller) {
-    return
+  if (scroller) {
+    scrollWithin(item, scroller, options)
   }
+}
 
+/**
+ * `scrollItemIntoView` in a scroller the caller already holds.
+ *
+ * **For a family that always knows its scroller**, as Tabs knows its strip:
+ * `scrollingAncestor` and the walk it takes are then in no bundle of its own,
+ * where the fallback carried them into every one. Measured October 8, 2026,
+ * bundled alone, brotli: about 165 bytes on Tabs.
+ */
+export const scrollWithin = (
+  item: HTMLElement,
+  scroller: HTMLElement,
+  { padding = 0, smooth = false }: Omit<ScrollItemOptions, 'scroller'> = {},
+): void => {
   /* Measured from the boxes rather than from `offsetLeft`, which is relative to
      the offset parent and is only the scroller when nothing between them is
      positioned. The rectangles are relative to the viewport, so the difference
