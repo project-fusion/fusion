@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   customElement,
   deepActiveElement,
+  glyphPath,
   HelixActivateEvent,
   HelixElement,
   IndicatorController,
@@ -16,7 +17,6 @@ import {
 import { caretDown, caretLeft, caretRight, caretUp } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { HelixHeadlessTabPanel } from '../panel/tab-panel.js'
 import { HelixHeadlessTab } from '../tab/tab.js'
 
@@ -546,8 +546,8 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     const icon = down ? (toward > 0 ? caretDown : caretUp) : toward > 0 ? caretRight : caretLeft
     const mirror = down ? nothing : ''
     return toward > 0
-      ? html`<slot name="scroll-end-icon"><svg part="scroll-end-mark" data-mirror=${mirror} aria-hidden="true" fill="currentColor" viewBox=${icon.viewBox}>${unsafeSVG(icon.content)}</svg></slot>`
-      : html`<slot name="scroll-start-icon"><svg part="scroll-start-mark" data-mirror=${mirror} aria-hidden="true" fill="currentColor" viewBox=${icon.viewBox}>${unsafeSVG(icon.content)}</svg></slot>`
+      ? html`<slot name="scroll-end-icon"><svg part="scroll-end-mark" data-mirror=${mirror} aria-hidden="true" fill="currentColor" viewBox=${icon.viewBox}><path d=${glyphPath(icon)}></path></svg></slot>`
+      : html`<slot name="scroll-start-icon"><svg part="scroll-start-mark" data-mirror=${mirror} aria-hidden="true" fill="currentColor" viewBox=${icon.viewBox}><path d=${glyphPath(icon)}></path></svg></slot>`
   }
 
   protected override render(): TemplateResult {

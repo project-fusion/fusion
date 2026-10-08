@@ -1,5 +1,6 @@
 import {
   customElement,
+  glyphPath,
   HelixElement,
   MixinDismissible,
   MixinSelectableItem,
@@ -10,7 +11,6 @@ import {
 import { x } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 
 /**
  * @summary One tab in a tab list.
@@ -145,7 +145,7 @@ export class HelixHeadlessTab extends MixinDismissible(MixinSelectableItem(Helix
     }
     return html`<span part="dismiss" aria-hidden="true" title=${this.dismissLabel} @click=${this.handleDismissPress}
       ><slot name="dismiss-icon"
-        ><svg part="dismiss-mark" fill="currentColor" viewBox=${x.viewBox} aria-hidden="true">${unsafeSVG(x.content)}</svg></slot
+        ><svg part="dismiss-mark" fill="currentColor" viewBox=${x.viewBox} aria-hidden="true"><path d=${glyphPath(x)}></path></svg></slot
       ></span
     >`
   }
