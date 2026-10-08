@@ -71,11 +71,20 @@ const DEDICATED = new Set([
  * build measures a dist nobody produced, which passes on a machine where an
  * earlier build left one and fails on a runner.
  *
+ * **The build is `build-for-checks.sh`, which is `bun run build` without
+ * `next build`.** No check reads `.next`, and `warm` builds the same set, so a
+ * shard restores every task of it. The script says how it finds the site's
+ * other tasks.
+ *
  * All three are cached tasks, so with a warm remote cache they cost a restore.
  * Without one every shard pays the build, which is why the remote cache is a
  * precondition for this split rather than a refinement of it.
  */
-const PREREQUISITES = ['bun run build', 'bun run analyze', 'turbo run catalog']
+const PREREQUISITES = [
+  'bash .github/scripts/build-for-checks.sh',
+  'bun run analyze',
+  'turbo run catalog',
+]
 
 const steps = readVerify()
 const checks = steps.filter((step) => !DEDICATED.has(step) && !PREREQUISITES.includes(step))

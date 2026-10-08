@@ -249,15 +249,19 @@ jobs:
   # is warm across runs and cold within one.
   # [VERIFYING.md](../VERIFYING.md#one-build-before-the-jobs-that-would-each-do-their-own)
   #
-  # **One turbo run, and not the three steps it was.** `bun run build` already
-  # reaches `analyze` and `catalog`, and a second invocation hashed a tree the
-  # first had filled with generated files: `analyze` missed, and rebuilt
-  # fourteen tasks in 81 seconds. Named together, the three are one graph.
+  # **The build every later job reads, which leaves out `next build`.** No job
+  # after this one reads `.next`, and `next build` was about 55 seconds at the
+  # end of this job that every later job waited for. `build-for-checks.sh` is
+  # the same build in every job that restores it, so the hashes agree, and
+  # `packaging` builds the site. A second turbo invocation once rebuilt
+  # fourteen tasks here because `analyze` hashed the files the first had
+  # generated; `analyze` no longer reads them, which `VERIFYING.md` explains.
   #
   # **The runner is a repository variable, `WARM_RUNNER`, and `ubuntu-latest`
   # without one.** On a change that rebuilds the components, `warm` is about
-  # four minutes on two cores, most of it `metrics` compressing every bundle and
-  # `next build`, and both use every core they get. A larger x64 runner named in
+  # four minutes on two cores. Most of it is `analyze` formatting the framework
+  # typings, which runs on one core, and `metrics` compressing the bundles it
+  # has not measured before, which uses every core it gets. A larger x64 runner named in
   # the variable takes that time down with no change here. It has to be x64:
   # `RUNNER_ARCH` is in every turbo key, so an Arm runner's build is one no
   # other job here can restore.
@@ -286,12 +290,12 @@ jobs:
       # `bunx`, because `turbo` is a workspace binary and a `run:` step does not
       # get the PATH `bun run` arranges: bare `turbo` here is exit 127.
       #
-      # The three `PREREQUISITES` in `run-checks.mjs`, named rather than
-      # derived because this job exists to fill a cache and a wrong guess costs
-      # a restore, not a wrong answer: a task this misses is one the shard
-      # builds itself.
+      # The three `PREREQUISITES` in `run-checks.mjs`. The site's tasks,
+      # `catalog` among them, come from the script, and `analyze` is named
+      # here. A task this job misses costs a later job a build of its own and
+      # changes no answer.
       - name: Build, and write the manifests and the catalog
-        run: bunx turbo run build analyze catalog
+        run: .github/scripts/build-for-checks.sh analyze
       # Saved from every branch. The file is about 40 KB, and the next push to
       # the same pull request is the run most likely to find its bundles in
       # it. It holds the sizes of one page, so it does not grow.
@@ -377,7 +381,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Build
-        run: bun run build
+        run: .github/scripts/build-for-checks.sh
 
       - name: Every rule counts something
         run: bun run check:spec:floors
@@ -411,6 +415,12 @@ jobs:
   # three framework typings, and `build` does not produce them, so without it
   # the tarballs ship without files their own manifests promise. After `warm`,
   # so both are a restore rather than the 214 seconds they were.
+  #
+  # **`next build` runs here, inside `smoke:template`.** `warm` leaves it out
+  # because no job after `warm` reads `.next` (see `build-for-checks.sh`), and
+  # `smoke:template` builds the whole workspace, the site included. So this is
+  # the job where `next build` and `check-highlight.mjs` run, and where either
+  # fails.
   #
   # **`smoke:template` builds them itself, so the job does not build first.**
   # Turbo hashes a task's inputs when a run starts, and some of those inputs
@@ -488,8 +498,8 @@ jobs:
   # **They start after `warm-browser`, which builds what they read.** Every
   # spec outside `helix-docs` reads the components and the testing harness.
   # `warm-browser` builds both about two minutes before `warm` finishes
-  # measuring bundles and running `next build`, and the rest of the graph is
-  # a few small compiles. `helix-docs` and the site wait on `metrics` through
+  # writing the docs and measuring bundles, and the rest of the graph is a
+  # few small compiles. `helix-docs` and the site wait on `metrics` through
   # `docs`, so the filter leaves them out here and `floors` runs them after
   # `warm`. Together the two runs cover `turbo run test` once.
   tests:
@@ -624,7 +634,7 @@ jobs:
           add-rust-environment-hash-key: false
           prefix-key: v0-rust-1.96
       - name: Build
-        run: bun run build
+        run: .github/scripts/build-for-checks.sh
       # Ahead of the checks rather than left to the npm shim, so one compile
       # serves all four and a failure to build is reported as one.
       - name: Build the Rust workspace
