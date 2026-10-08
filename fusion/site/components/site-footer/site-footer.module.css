@@ -56,6 +56,16 @@
   grid-column: 2;
 }
 
+/* The version tag at its own width. A grid item stretches across its column,
+   which would draw the tag's outline the full width of the brand. */
+.footerVersion {
+  /* The tagline's ink rather than the tag's own, so the outline sets it apart
+     and the label does not outshine the line above it. */
+  --tag-foreground-color: var(--helix-color-foreground-subtle);
+
+  justify-self: start;
+}
+
 /* The mark set to its glyph rather than to its box. **An icon is padded and a
    logo in a lockup is not.** `fusion.svg` draws into a 256 viewBox with the
    artwork spanning 42.5 to 213.9, which is 16.6 percent of clear space on each
