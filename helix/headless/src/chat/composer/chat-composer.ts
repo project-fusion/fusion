@@ -85,19 +85,19 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
   static words = 'helix-chat-composer'
 
   /**
-   * The field's name, read by screen readers.
-   */
-  @words
-  @property()
-  label = 'Message'
-
-  /**
    * A message about the draft, shown under the field. While set, the composer
    * is invalid, does not send, and does not submit, as a field's `feedback`
    * does, and the message is announced as it appears.
    */
   @property()
   feedback = ''
+
+  /**
+   * The field's name, read by screen readers.
+   */
+  @words
+  @property()
+  label = 'Message'
 
   /**
    * The most characters a draft can have. The field stops taking more.

@@ -150,6 +150,15 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   anchor: Element | string = ''
 
   /**
+   * Draws a point on the panel's edge facing the trigger.
+   *
+   * Off by default, which is the house style: a panel that opens from its
+   * trigger already reads as belonging to it.
+   */
+  @property({ type: Boolean })
+  arrow = false
+
+  /**
    * How close to the window's edges the panel may come, in pixels, when it
    * slides, shrinks or moves to the other side to fit. Left unset, it slides
    * and shrinks to 8 pixels from an edge and moves to the other side only
@@ -166,29 +175,20 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   crossOffset = 0
 
   /**
-   * Whether the panel moves to the other side of the trigger when its own
-   * side has no room. On by default. Write `flip="false"` to keep it on its
-   * side, where it shrinks to fit, as React Aria's `shouldFlip` turns off.
-   */
-  @property({ converter: onUnlessFalse })
-  flip = true
-
-  /**
-   * Draws a point on the panel's edge facing the trigger.
-   *
-   * Off by default, which is the house style: a panel that opens from its
-   * trigger already reads as belonging to it.
-   */
-  @property({ type: Boolean })
-  arrow = false
-
-  /**
    * The panel's name where nothing else names it: no `label`, no heading in
    * the panel, and no `aria-labelledby` on the host.
    */
   @words
   @property({ attribute: 'fallback-label' })
   fallbackLabel = 'Popover'
+
+  /**
+   * Whether the panel moves to the other side of the trigger when its own
+   * side has no room. On by default. Write `flip="false"` to keep it on its
+   * side, where it shrinks to fit, as React Aria's `shouldFlip` turns off.
+   */
+  @property({ converter: onUnlessFalse })
+  flip = true
 
   /**
    * The panel's name, read by screen readers. Left empty, the first heading in
