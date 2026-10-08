@@ -165,3 +165,14 @@
     print-color-adjust: economy;
   }
 }
+
+/* Forced colors paint every background the page's Canvas color, so each key
+   lost its swatch while the chart beside it kept its colors. The swatch keeps
+   its series' color, bounded in the system's text color. */
+@media (forced-colors: active) {
+  [part~="entry"]::before {
+    forced-color-adjust: none;
+    outline: var(--helix-border-thin) solid CanvasText;
+    outline-offset: calc(var(--helix-border-thin) * -1);
+  }
+}

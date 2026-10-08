@@ -312,3 +312,14 @@ slot[name="icon"]::slotted(*) {
     box-shadow: none;
   }
 }
+
+/* Forced colors paint every background the page's Canvas color, so a dot badge
+   drew nothing and a count lost its pill. A tone is what the badge says, so
+   the mark keeps its fill and its ink, and a hairline in the system's text
+   color bounds it on any canvas. */
+@media (forced-colors: active) {
+  [part="indicator"] {
+    forced-color-adjust: none;
+    outline: var(--helix-border-thin) solid CanvasText;
+  }
+}

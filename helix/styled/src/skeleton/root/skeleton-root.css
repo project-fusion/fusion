@@ -201,3 +201,13 @@
     display: none;
   }
 }
+
+/* Forced colors paint every background the page's Canvas color, so the
+   placeholder was a blank the size of what it holds a place for. It is
+   outlined in GrayText, the system's color for what is not there yet. */
+@media (forced-colors: active) {
+  [part~="skeleton"] {
+    outline: var(--helix-border-thin) solid GrayText;
+    outline-offset: calc(var(--helix-border-thin) * -1);
+  }
+}

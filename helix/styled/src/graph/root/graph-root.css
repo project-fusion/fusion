@@ -497,6 +497,12 @@ slot[name="filter-icon"]::slotted(*) {
     color: GrayText;
   }
 
+  /* The notes are drawn on a canvas, which forced colors leave alone, so the
+     swatch that keys their colors keeps its own. */
+  [part="legend-swatch"] {
+    forced-color-adjust: none;
+  }
+
   [part="list"]:focus-visible [part~="note-cursor"] {
     outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
     outline-offset: calc(var(--helix-size-focus-offset) * -1);

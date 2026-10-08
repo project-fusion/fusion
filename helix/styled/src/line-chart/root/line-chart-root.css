@@ -290,6 +290,14 @@
   }
 }
 
+/* Forced colors: a marker is a background in its series' color, which the
+   browser replaced with the canvas. It keeps the color its line keeps. */
+@media (forced-colors: active) {
+  [part~="marker"] {
+    forced-color-adjust: none;
+  }
+}
+
 /*
  * *Emphasis, and it takes three values.** `area` stays the boolean that decides
  *    whether a wash is drawn at all, on the tier below, because whether a shape
