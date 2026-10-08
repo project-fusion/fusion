@@ -118,8 +118,14 @@ export const parseNumber = (
   const one = format.formatToParts(1)
   const of = (type: string, from = parts): string[] =>
     from.filter((part) => part.type === type).map((part) => part.value)
-  const group = of('group')[0] ?? ','
-  const decimal = of('decimal')[0] ?? '.'
+  /* **The separators are the locale's, read from its plain format where the
+     options write none**: a percent shows no fraction and `useGrouping: false`
+     no groups, so the sample lacked the part. Measured before this: a
+     zero-fraction percent in `de-DE` fell back to a point for the decimal,
+     the same mark as its group, and refused both `0.25` and `12,5 %`. */
+  const plain = formatter(locale, undefined).formatToParts(-12345.6)
+  const group = of('group')[0] ?? of('group', plain)[0] ?? ','
+  const decimal = of('decimal')[0] ?? of('decimal', plain)[0] ?? '.'
   const named = (from: Intl.NumberFormatPart[]): string[] => [
     ...of('currency', from),
     ...of('percentSign', from),
