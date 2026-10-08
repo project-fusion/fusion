@@ -30,6 +30,10 @@ export interface PlacedStop {
   height: number
   /** The target's top, in page pixels. */
   top: number
+  /** The target's left edge, as a share of the width, where it is known. */
+  left?: number | undefined
+  /** The target's right edge, as a share of the width, where it is known. */
+  right?: number | undefined
   variant: StrandsVariant
 }
 
@@ -63,7 +67,7 @@ const GLOW = { bend: 1, ribbon: 0.36, sweep: 0.8, waves: 0.7 } as const
  * pushing the near strands further out, it ran most of half a page wide and
  * read as loose strands rather than a band.
  */
-const WIDTH = { bend: 0.12, ribbon: 0.18, sweep: 0.09, waves: 0.06 } as const
+const WIDTH = { bend: 0.12, ribbon: 0.18, sweep: 0.05, waves: 0.06 } as const
 
 /** Where a bend's apex sits across its box, when `at` is not given. */
 const BEND_AT = 0.5
@@ -383,7 +387,7 @@ export const boxPath = (
   if (variant === 'sweep') {
     /* From above the corner `at` names to the far side below the box. */
     return pagePath(
-      [{ at, height: height * 0.1, top: 0, variant: 'sweep' }],
+      [{ at, height: height * 0.6, left: 0.08, right: 0.92, top: height * 0.4, variant: 'sweep' }],
       'ribbon',
       width,
       height,
@@ -460,9 +464,16 @@ const tightestIn = (
  * eighty passes.
  *
  * Across only: a point keeps its place down the page, so a form keeps the
- * section it was pinned to.
+ * section it was pinned to. A form whose turns are tight by design, a sweep
+ * landing on a corner, names its points in `kept`: they hold the reach rule
+ * by narrowing, and easing them would move the corner they land on.
  */
-const relax = (points: PathPoint[], width: number, height: number): PathPoint[] => {
+const relax = (
+  points: PathPoint[],
+  width: number,
+  height: number,
+  kept: ReadonlySet<number>,
+): PathPoint[] => {
   const out = points.map((point): PathPoint => [...point])
   const floor = 0.3 * Math.min(width, height)
   const ease = (i: number): void => {
@@ -476,6 +487,9 @@ const relax = (points: PathPoint[], width: number, height: number): PathPoint[] 
   for (let pass = 0; pass < 80; pass++) {
     let eased = false
     for (let i = 1; i < out.length - 2; i++) {
+      if (kept.has(i) || kept.has(i + 1)) {
+        continue
+      }
       const { radius, reach } = tightestIn(out, i, width)
       if (radius < Math.max(reach * 1.1, floor)) {
         ease(i)
@@ -548,6 +562,8 @@ export const pagePath = (
   /* Whether the ribbon carries on out of the wave before it, lit, rather
      than coming back in from the edge. */
   let carried = false
+  /* Points a form laid with tight turns on purpose, which `relax` leaves. */
+  const kept = new Set<number>()
 
   const gap = (to: number, next: StrandsVariant | undefined): void => {
     /* **A ribbon a wave carried on runs on to the next form**, however near
@@ -647,7 +663,10 @@ export const pagePath = (
 
   for (const [index, stop] of placed.entries()) {
     joined = undefined
-    gap(stop.top, stop.variant)
+    /* A sweep comes in from the page's top corner, so no ribbon leads to it. */
+    if (stop.variant !== 'sweep') {
+      gap(stop.top, stop.variant)
+    }
     carried = false
     if (stop.variant === 'bend') {
       const span = Math.min(stop.height, height)
@@ -718,61 +737,62 @@ export const pagePath = (
       }
       fromRight = true
     } else if (stop.variant === 'sweep') {
-      /* **A sweep goes around its target, never behind it.** Point it at the
-         words it has to leave clear. It comes down the page at the edge on
-         the side \`at\` is nearer, clear of the target, turns once it is
-         below the target, crosses the page in half a sine, and lands on the
-         far side most of a screen lower, where the ribbon carries on.
+      /* **A sweep comes in at the page's top corner and lands on its
+         target's.** It runs down the page's edge on the side \`at\` is nearer,
+         turns across just above its target, crosses the page there, and turns
+         down at the target's far top corner, where the ribbon carries on. Point
+         it at the section it lands on: everything above that section's top,
+         such as a hero's words, stays clear of it but for the edge it comes
+         down.
 
-         **It pinches at its turns.** Both turns come in less than a screen,
-         far tighter than a ribbon's strands reach, so the band narrows to a
-         thread where it turns and widens through the crossing, everywhere as
-         wide as the turn it is on allows: a band that twists edge on as it
-         turns. */
+         **Narrow, and narrower at its turns.** The crossing runs in the gap
+         above the target, so its band is a thread a twentieth of the width,
+         and each turn is a sixth of a screen round, which no band wider than
+         the turn allows can take; it narrows there to what the turn allows. */
       const right = (stop.at ?? 0.9) >= 0.5
       const way = right ? -1 : 1
-      const from = right ? (narrow ? 1.12 : 1.04) : narrow ? -0.12 : -0.04
-      const to = 0.5 + way * shape.sweep
-      const wide = narrow ? 0.12 : WIDTH.sweep
+      const edge = (right ? (narrow ? 1.1 : 1.03) : narrow ? -0.1 : -0.03) * width
+      const land = (right ? (stop.left ?? 0.06) : (stop.right ?? 0.94)) * width
+      const thread = narrow ? 0.12 : WIDTH.sweep
       const glow = narrow ? GLOW.sweep * 0.65 : GLOW.sweep
-      const turns = stop.top + stop.height
-      const lands = turns + height * 0.85
-      const descent = lands - turns
-      const across = (to - from) * width
-      const spacing = height * 0.08
-      /* As wide as a turn this round allows, from the reach `reachOf` lays
-         the path by, and never wider than the sweep's own width. */
-      const allowed = (radius: number): number =>
-        Math.max(0.006, Math.min(wide, (radius / 1.15 - WOBBLE) / (SPREAD * width * REACH)))
-      const radiusAt = (f: number): number => {
-        const slope = ((across * Math.PI) / (2 * descent)) * Math.sin(Math.PI * f)
-        const bend = Math.abs(
-          ((across * Math.PI ** 2) / (2 * descent ** 2)) * Math.cos(Math.PI * f),
-        )
-        return bend < 1e-9 ? Number.POSITIVE_INFINITY : (1 + slope * slope) ** 1.5 / bend
+      const r = height * 0.16
+      const level = stop.top - r
+      const allowedFor = (radius: number): number =>
+        Math.max(0.006, Math.min(thread, (radius / 1.15 - WOBBLE) / (SPREAD * width * REACH)))
+      const pinch = allowedFor(r)
+      const step = ((Math.PI / 2) * r) / 5
+      const route: [number, number, number][] = []
+      /* Down the edge, from above the page, easing to the turn's thread. */
+      const above = Math.min(0, level - r) - height * 0.5
+      const down = Math.max(1, Math.ceil((level - r - above) / (step * 1.6)))
+      for (let k = 0; k < down; k++) {
+        const y = above + ((level - r - above) * k) / down
+        route.push([edge, y, Math.max(0, 1 - (level - r - y) / (r * 1.5))])
       }
-      /* Down the edge, easing to the thread the first turn allows. */
-      const pinch = allowed(radiusAt(0))
-      const top = Math.min(stop.top, 0) - height * 0.5
-      const run = Math.max(1, Math.ceil((turns - top) / (height * RIBBON_STEP)))
-      for (let k = 0; k < run; k++) {
-        const f = k / run
-        const y = top + (turns - top) * f
-        const near = Math.max(0, 1 - (turns - y) / (height * 0.6))
-        points.push([from, y, wide + (pinch - wide) * near * near, glow * Math.min(1, k / 2)])
+      /* The first turn, from heading down to heading across. */
+      for (let k = 0; k <= 5; k++) {
+        const phi = (k / 5) * (Math.PI / 2)
+        route.push([edge + way * r - way * r * Math.cos(phi), level - r + r * Math.sin(phi), 1])
       }
-      /* Across, at the turn's spacing. */
-      const count = Math.max(6, Math.ceil(descent / spacing))
-      for (let k = 0; k <= count; k++) {
-        const f = k / count
-        points.push([
-          from + ((to - from) * (1 - Math.cos(Math.PI * f))) / 2,
-          turns + descent * f,
-          allowed(radiusAt(f)),
-          glow,
-        ])
+      /* Across, just above the target. */
+      const from = edge + way * r
+      const to = land - way * r
+      const across = Math.max(1, Math.ceil(Math.abs(to - from) / (step * 1.6)))
+      for (let k = 1; k < across; k++) {
+        const x = from + ((to - from) * k) / across
+        const near = Math.min(Math.abs(x - from), Math.abs(x - to))
+        route.push([x, level, Math.max(0, 1 - near / (r * 1.5))])
       }
-      carryFrom(way, allowed(radiusAt(1)), glow, spacing)
+      /* The second turn, from heading across to heading down, at the corner. */
+      for (let k = 0; k <= 5; k++) {
+        const phi = (k / 5) * (Math.PI / 2)
+        route.push([to + way * r * Math.sin(phi), level + r - r * Math.cos(phi), 1])
+      }
+      route.forEach(([x, y, turning], k) => {
+        kept.add(points.length)
+        points.push([x / width, y, thread + (pinch - thread) * turning, glow * Math.min(1, k / 2)])
+      })
+      carryFrom(way, pinch, glow, step)
     } else if (stop.variant === 'waves') {
       const carries =
         joined !== undefined && ribbonAfter(stop.top + height * 0.5, placed[index + 1])
@@ -868,7 +888,7 @@ export const pagePath = (
   const before = points.at(-2) ?? last
   const on: PathPoint = [2 * last[0] - before[0], 2 * last[1] - before[1], last[2], 0]
   points.push(on, [on[0], Math.max(on[1], page) + height, last[2], 0])
-  return relax(points.slice(0, MAX_POINTS), width, height)
+  return relax(points.slice(0, MAX_POINTS), width, height, kept)
 }
 
 /** One coordinate of a uniform Catmull-Rom segment, the same one the shader runs. */
