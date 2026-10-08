@@ -1,6 +1,9 @@
 /* The missing-name warning, which a production build resolves to a function
    that does nothing. See `utils/audit-name`. */
 export { auditName } from '#audit-name'
+/* The unslotted-item warning, which a production build resolves to a function
+   that does nothing. See `utils/audit-nesting`. */
+export { auditNesting } from '#audit-nesting'
 /* The served-rows check, which a production build resolves to a function that
    does nothing. See `utils/audit-served`. */
 export { auditServed } from '#audit-served'

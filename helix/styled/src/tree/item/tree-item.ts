@@ -18,7 +18,7 @@ import { styles } from './tree-item.css.js'
  * @aliases TreeNode, Branch, Leaf
  * @documentation https://fusion.dev/helix/components/tree
  *
- * @slot - The item's label.
+ * @slot - The item's label. A nested item does not go here: give it `slot="children"`. In a development build, an item nested here is reported.
  * @slot chevron - Replaces the expand and collapse mark of a branch. A slotted icon is sized and
  *   turned like the drawn one.
  * @slot children - Nested items, which make this a branch.

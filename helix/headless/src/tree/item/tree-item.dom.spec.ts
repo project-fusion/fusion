@@ -20,6 +20,24 @@ const items = (host: HTMLElement): HTMLElement[] => [
 ]
 
 describe('tree item structure', () => {
+  /* An item nested with no `slot="children"` was read as words in its
+     parent's label, "src app.ts", and drawn as a leaf, and nothing said so. */
+  test('says in development that an item nested without its slot is read as the label', async () => {
+    const warnings: string[] = []
+    const warn = console.warn
+    console.warn = (message: string) => warnings.push(String(message))
+    try {
+      await mount(mixed)
+      expect(warnings.filter((one) => one.includes('slot="children"'))).toEqual([])
+      await mount(
+        '<helix-headless-tree label="Files"><helix-headless-tree-item>src<helix-headless-tree-item>app.ts</helix-headless-tree-item></helix-headless-tree-item></helix-headless-tree>',
+      )
+      expect(warnings.filter((one) => one.includes('slot="children"'))).toHaveLength(1)
+    } finally {
+      console.warn = warn
+    }
+  })
+
   test('a branch draws a chevron and a leaf does not', async () => {
     const tree = await mount(mixed)
     const [branch, , leaf] = items(tree)

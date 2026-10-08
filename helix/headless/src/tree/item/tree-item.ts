@@ -1,4 +1,5 @@
 import {
+  auditNesting,
   customElement,
   HelixElement,
   HelixLoadEvent,
@@ -25,9 +26,9 @@ export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
  * Each item is an element because it holds state: whether it is open, selected,
  * and focused.
  *
- * An item is a branch when something is slotted into `children`. This is
- * detected on the client, so server-rendered markup shows a leaf and the twisty
- * appears on hydration.
+ * An item is a branch when an item is slotted into `children`, with
+ * `slot="children"` on each nested item. This is detected on the client, so
+ * server-rendered markup shows a leaf and the twisty appears on hydration.
  *
  * **`href` makes the whole row a link**, rendered as an `<a>`. Enter, middle
  * click, and the status bar then work anywhere on the row.
@@ -54,7 +55,7 @@ export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
  * @aliases TreeNode, Branch, Leaf
  * @documentation https://fusion.dev/helix/components/tree
  *
- * @slot - The item's label.
+ * @slot - The item's label. A nested item does not go here: give it `slot="children"`. In a development build, an item nested here is reported.
  * @slot chevron - Replaces the expand and collapse mark of a branch, such as with your own icon.
  * @slot children - Nested items, which make this a branch.
  * @slot end - Content after the label, at the far side of the row, such as a count or a state.
@@ -252,6 +253,13 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
     slot?.addEventListener('slotchange', () => {
       this.branch = slot.assignedElements().length > 0
     })
+    /* An item nested without `slot="children"` lands in the label and is drawn
+       as words. Said once, in development builds only, and also as the label
+       changes, for an item a framework adds later. */
+    auditNesting(this, 'children')
+    this.renderRoot
+      .querySelector<HTMLSlotElement>('[part="label"] > slot')
+      ?.addEventListener('slotchange', () => auditNesting(this, 'children'))
   }
 
   /**
