@@ -592,6 +592,9 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       const paint = ink
         ? `--chart-series: var(--bar-chart-tone-${ink}, var(--chart-series-${seriesIndex(tone)})); --chart-bar-wash: url(#helix-bar-wash-tone-${ink})`
         : `--chart-series: var(--chart-series-${seriesIndex(tone)}); --chart-bar-wash: url(#helix-bar-wash-${seriesIndex(tone)})`
+      /* Compared out here, because every quoted word inside a part's
+         interpolation is read as a name the element can carry. */
+      const below = end === 'negative'
       return sideways
         ? svg`<rect
             data-end=${end ?? nothing}
@@ -599,7 +602,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
             data-tone=${ink ?? nothing}
             height=${thickness}
             style=${paint}
-            part="bar${end ? ' bar-end' : ''}${end === 'negative' ? ' bar-end-negative' : ''}"
+            part="bar${end ? ' bar-end' : ''}${below ? ' bar-end-negative' : ''}"
             width=${size}
             x=${along}
             y=${across}
@@ -610,7 +613,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
             data-tone=${ink ?? nothing}
             height=${size}
             style=${paint}
-            part="bar${end ? ' bar-end' : ''}${end === 'negative' ? ' bar-end-negative' : ''}"
+            part="bar${end ? ' bar-end' : ''}${below ? ' bar-end-negative' : ''}"
             width=${thickness}
             x=${across}
             y=${along}
