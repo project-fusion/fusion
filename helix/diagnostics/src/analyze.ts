@@ -271,6 +271,94 @@ const loose = (
   return findings
 }
 
+/**
+ * Attributes a property sets on the element without reflection, so it never
+ * writes them back. A page leaves them out of its markup unless a server wrote
+ * them, which is where `writes` comes from.
+ */
+const ALWAYS_WRITTEN = new Set([
+  'class',
+  'dir',
+  'hidden',
+  'id',
+  'lang',
+  'part',
+  'role',
+  'slot',
+  'style',
+  'tabindex',
+  'title',
+])
+
+/** An attribute selector and the compound it sits in. */
+const SELECTS = /([^\s>+~,()]*)\[\s*([a-zA-Z][\w-]*)\s*[~^|$*]?=?[^\]]*\]/g
+
+/**
+ * A rule selecting a Helix element by an attribute the element takes and
+ * never writes back to itself.
+ *
+ * **It works in exactly one navigation mode.** A server writes the attribute
+ * into the markup, so a reload matches. On a client navigation React and Vue
+ * set a declared property instead, Lit does not reflect it, and the selector
+ * matches nothing. The elements are read from the page, by the compound
+ * without its attribute, so a class selector is judged as well as a tag.
+ */
+const unreflected = (
+  selector: string,
+  located: Located,
+  tags: Map<string, Published>,
+  from: Document | undefined,
+): Raw[] => {
+  if (!from || !selector.includes('[')) {
+    return []
+  }
+  const found: Raw[] = []
+  const seen = new Set<string>()
+  for (const [, compound = '', attribute = ''] of selector.matchAll(SELECTS)) {
+    if (
+      ALWAYS_WRITTEN.has(attribute) ||
+      attribute.startsWith('aria-') ||
+      attribute.startsWith('data-') ||
+      seen.has(attribute)
+    ) {
+      continue
+    }
+    const base = compound.replace(/\[[^\]]*\]/g, '').replace(/::?[\w-]+(\([^)]*\))?/g, '')
+    if (!base) {
+      continue
+    }
+    let reached: Element[]
+    try {
+      reached = [...from.querySelectorAll(base)]
+    } catch {
+      continue
+    }
+    const tag = reached
+      .map((element) => element.localName)
+      .find((name) => {
+        const published = tags.get(name)
+        return (
+          published?.reflected !== undefined &&
+          published.attributes.has(attribute) &&
+          !published.reflected.has(attribute) &&
+          !published.written.has(attribute)
+        )
+      })
+    if (!tag) {
+      continue
+    }
+    seen.add(attribute)
+    found.push({
+      kind: 'unreflected-attribute',
+      message: `\`${selector}\` selects \`${tag}\` by \`${attribute}\`, which the element takes and never writes back to itself, so the rule matches only markup a server wrote: after a client navigation the property is set and the attribute is absent. Select a class or an attribute the element reflects, or set \`${attribute}\` as an attribute.`,
+      origin: origin(located),
+      subject: `${selector} [${attribute}]`,
+      tag,
+    })
+  }
+  return found
+}
+
 const origin = (located: Located): Origin => ({
   cssText: located.rule.cssText,
   index: located.index,
@@ -336,6 +424,7 @@ export const analyze = (
     if (!selector) {
       continue
     }
+    findings.push(...unreflected(selector, located, tags, from))
 
     for (const { names, tag } of selector.includes('helix-') ? parts(selector) : []) {
       const element = tags.get(tag)

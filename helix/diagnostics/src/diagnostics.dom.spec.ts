@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
-import type { Report } from './report.js'
+import type { Published } from './manifest.js'
+import type { Raw, Report } from './report.js'
 
 /**
  * The collector, against the faults it exists to find.
@@ -1293,6 +1294,58 @@ describe('a hook answered by a rule the page reads it in', () => {
   })
 })
 
+describe('unreflected attributes', () => {
+  const reflecting: Map<string, Published> = new Map([
+    [
+      'helix-slider',
+      {
+        attributes: new Map([
+          ['label', null],
+          ['required', null],
+        ]),
+        hooks: new Map(),
+        parts: new Map(),
+        reflected: new Set(['required']),
+        written: new Set(),
+      },
+    ],
+  ])
+  const found = (markup: string, css: string): Raw[] => {
+    document.body.innerHTML = markup
+    const style = document.createElement('style')
+    style.textContent = css
+    document.head.append(style)
+    const { rules } = collect(document)
+    const findings = analyze(rules, reflecting, document).filter(
+      (one) => one.kind === 'unreflected-attribute',
+    )
+    style.remove()
+    document.body.innerHTML = ''
+    return findings
+  }
+
+  test('a class selector reaching a Helix element by an attribute it never writes back is a finding', () => {
+    const [one, ...rest] = found(
+      '<helix-slider class="channel"></helix-slider>',
+      '.channel[label="Saturation"] { color: red }',
+    )
+    expect([one?.tag, one?.subject, rest.length]).toEqual([
+      'helix-slider',
+      '.channel[label="Saturation"] [label]',
+      0,
+    ])
+  })
+
+  test('a reflected attribute, a data attribute, and an element the rule does not reach are not', () => {
+    expect(
+      found(
+        '<helix-slider class="channel"></helix-slider><div class="other"></div>',
+        '.channel[required], .channel[data-x], .other[label] { color: red }',
+      ),
+    ).toEqual([])
+  })
+})
+
 describe('lint data', () => {
   test('lint data is the manifest less everything diagnostics never reads, and indexes the same', () => {
     const lints = tiers.map((tier) => ({ lint: lintOf(tier.manifest, tier.name) }))
@@ -1302,6 +1355,7 @@ describe('lint data', () => {
       family: undefined,
       hooks: ['--button-background-color', '--button-radius'],
       parts: ['button', 'icon'],
+      reflected: [],
       slots: [],
       written: [],
     })

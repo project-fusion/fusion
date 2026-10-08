@@ -275,6 +275,7 @@ works on it:
 | `disabled-attribute` | error | A rule styles a form control's `[disabled]`, which a control disabled by a `<fieldset disabled>` does not carry. Write `:disabled`. Found by `helix scan` |
 | `primitive-token` | error | A rule reads a `--_helix-` primitive, which is internal to `@fusion.dev/helix-styles`. Found by `helix scan` |
 | `unknown-token` | error | A rule reads or sets a `--helix-` name the token set does not have, so it falls back silently. Found by `helix scan` |
+| `unreflected-attribute` | warn | A rule selects a Helix element by an attribute it takes and never writes back, so it matches only markup a server wrote and nothing after a client navigation |
 | `duplicate-registration` | error | Two copies of Helix are on the page |
 | `manifest-skew` | error | The manifest is from another version than the page runs. It replaces every other finding, since each would be judged against the wrong version. Turned off, the page is judged as usual |
 
