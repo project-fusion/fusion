@@ -48,7 +48,8 @@ import { property, state } from 'lit/decorators.js'
  *
  * Left and Right swap on a right-to-left page. The marks are a `radiogroup`
  * named by `label`, and each score is a `radio` named by `option-label`, such
- * as "3 out of 5". A read-only rating is one `img` named by its score.
+ * as "3 out of 5". A read-only rating is one `img` named by its label and
+ * then its score, such as "Quality 3 out of 5".
  *
  * @since 0.1.0
  * @status stable
@@ -232,6 +233,15 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
      generic beside it: a host `aria-labelledby` and a page's `<label>` named
      the host and left the radiogroup unnamed. */
   protected readonly aria = new AriaForwardController(this, {
+    /* A read-only rating is named by its label and then its score, so a page's
+       `<label>` or a host `aria-labelledby` is followed by the score too. */
+    labelledByAfter: () => {
+      const score = this.readOnly ? this.renderRoot?.querySelector('#score') : null
+      return score ? [score] : []
+    },
+    /* Its own label is the only name of its own: a read-only rating carries
+       its score as an `aria-label`, and a page's `<label>` still names it. */
+    named: () => this.labeled,
     target: () => this.partNamed('marks'),
   })
 
@@ -673,8 +683,8 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
     <div
       part="marks"
       role=${this.readOnly ? 'img' : 'radiogroup'}
-      aria-label=${this.readOnly ? said : nothing}
-      aria-labelledby=${!this.readOnly && this.labeled ? this.labelId : nothing}
+      aria-label=${this.readOnly && !this.labeled ? said : nothing}
+      aria-labelledby=${this.labeled ? (this.readOnly ? `${this.labelId} score` : this.labelId) : nothing}
       aria-describedby=${this.describedBy ?? nothing}
       aria-invalid=${this.invalidity ?? nothing}
       aria-required=${this.required && !this.readOnly ? 'true' : nothing}
@@ -743,6 +753,10 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
           >${showing}</span
         >`
         : nothing
+    }
+    ${
+      /* The score a read-only rating is named by after its label. */
+      this.readOnly ? html`<span id="score" hidden>${said}</span>` : nothing
     }
     </div>
     ${this.renderHint()}${this.renderFeedback()}`
