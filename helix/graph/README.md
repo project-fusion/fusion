@@ -1,7 +1,8 @@
 # @fusion.dev/helix-graph
 
 Connects the Helix `Graph` frame to whatever draws the graph: Sigma.js, cosmos.gl,
-three.js, or a driver of your own, colored from your tokens.
+three.js, an isometric diagram in SVG, or a driver of your own, colored from
+your tokens.
 
 ```sh
 bun add @fusion.dev/helix @fusion.dev/helix-graph sigma graphology graphology-layout-forceatlas2
@@ -350,6 +351,36 @@ connectGraph(frame, threeDriver(box), {
 | `groupLabels` | `true` | `false` leaves each group unnamed |
 | `layoutLimit` | `10000` | The longest a layout runs, in milliseconds |
 
+## An isometric diagram
+
+**`isometricDriver(box)` draws the graph as an isometric diagram in SVG**, for
+architecture and flow diagrams. It needs no renderer:
+
+```js
+import { isometricDriver } from '@fusion.dev/helix-graph/isometric'
+
+connectGraph(frame, isometricDriver(frame.querySelector('div')))
+```
+
+- Each note is a solid standing on a cell of the floor at its `x` and `y`, and
+  a note with no place is put on the nearest free cell beside the notes it
+  links to.
+- A note's `shape` picks its solid: `square` a block, `circle` or `ring` a
+  cylinder, and `diamond` a pyramid. Its size sets its height.
+- Each face is shaded from the note's color, and each edge is drawn in an ink
+  that contrasts with its face, so the darkest note still reads as a solid.
+- Each group stands on a plate in its color, with its name written along the
+  floor. Links run along the floor with an arrow halfway.
+- The view frames the whole diagram, and frames it again when the box changes
+  size until the reader pans or zooms. Drag to pan and use the wheel to zoom,
+  as the frame's `gestures` allows.
+
+| `isometricDriver` option | Default | What else it takes |
+|---|---|---|
+| `flat` | `false` | `true` draws every note at no height, as a plan |
+| `groupLabels` | `true` | `false` leaves each group's plate unnamed |
+| `shape` | `square` | `circle`, `ring` or `diamond`, for every note that does not say |
+
 ## What it exports
 
 | Import | What |
@@ -358,6 +389,7 @@ connectGraph(frame, threeDriver(box), {
 | `@fusion.dev/helix-graph/sigma` | `sigmaDriver(sigma, options)`, and the types `SigmaDriverOptions`, `SigmaGraph`, `SigmaLayout` and `SigmaRenderer` |
 | `@fusion.dev/helix-graph/cosmos` | `cosmosDriver(graph, box, options)`, and the types `CosmosDriverOptions` and `CosmosGraph` |
 | `@fusion.dev/helix-graph/three` | `threeDriver(box, options)`, and the type `ThreeDriverOptions` |
+| `@fusion.dev/helix-graph/isometric` | `isometricDriver(box, options)`, and the type `IsometricDriverOptions` |
 | `@fusion.dev/helix-graph/shapes` | `shapeFromTriangles`, `shapeFromSvg`, `shapeFromImage`, `shapeFromPath`, `shapeFromInside`, `inflate`, `sphere`, `torus`, `cuboid`, `onSphere`, `surfaceOf`, and the types `ImageOptions`, `ShapeField` and `TriangleOptions` |
 | `@fusion.dev/helix-graph/model` | `shapeFromModel(source, options)`, which needs three.js |
 | `@fusion.dev/helix-graph/snapshot` | `graphSnapshot(nodes, links, options)`, an SVG of the graph to paint before the renderer loads, and the types `GraphSnapshotOptions`, `SnapshotLink` and `SnapshotNode` |

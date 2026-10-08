@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import architecture from '../.examples/architecture.html' with { type: 'text' }
 import brain from '../.examples/brain.html' with { type: 'text' }
 import brain3d from '../.examples/brain-3d.html' with { type: 'text' }
 import knot from '../.examples/knot.html' with { type: 'text' }
@@ -159,4 +160,45 @@ describe('the knot example', () => {
       expect(graph.nodes.filter((node) => node.shape === 'square')).toHaveLength(30)
     },
   )
+})
+
+describe('the architecture example', () => {
+  run(
+    'asks for the isometric diagram, places every note on a cell, and opens on Orders with its links',
+    async () => {
+      await example(architecture)
+      await idle()
+      const graph = document.querySelector('helix-graph') as unknown as HTMLElement & {
+        nodes: { group: string; shape?: string; x?: number; y?: number }[]
+      }
+      expect(graph.dataset.previewGraph).toBe('isometric')
+      expect(
+        graph.nodes.every((node) => Number.isInteger(node.x) && Number.isInteger(node.y)),
+      ).toBe(true)
+      expect(new Set(graph.nodes.map((node) => node.group))).toEqual(
+        new Set(['Data', 'Edge', 'Services']),
+      )
+      expect(names(graph).slice(0, 4)).toEqual([
+        'Orders',
+        'API gateway',
+        'Event stream',
+        'Order ledger',
+      ])
+    },
+  )
+
+  run('a press on a store in the list selects it and puts it first', async () => {
+    await example(architecture)
+    await idle()
+    const graph = document.querySelector('helix-graph') as unknown as HTMLElement & {
+      active: string
+    }
+    const row = [
+      ...(graph.shadowRoot?.querySelectorAll<HTMLElement>('[role="option"]') ?? []),
+    ].find((option) => option.textContent?.includes('Search index'))
+    row?.click()
+    await idle()
+    expect(graph.active).toBe('index')
+    expect(names(graph)[0]).toBe('Search index')
+  })
 })

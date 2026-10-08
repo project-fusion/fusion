@@ -53,10 +53,12 @@ import {
  * @summary A frame around a graph of notes drawn by another library, and the list that makes it readable.
  *
  * @description
- * Helix draws no graph. A force layout of thousands of notes is physics and
- * WebGL, which a renderer such as Sigma.js does. Put the renderer's box in the
- * frame, and `connectGraph` from `@fusion.dev/helix-graph` draws `nodes` and
- * `links` in it and keeps it in step with the frame.
+ * The frame draws no graph itself. A force layout of thousands of notes is
+ * physics and WebGL, which a renderer such as Sigma.js does, and an
+ * architecture diagram is drawn by `isometricDriver` from
+ * `@fusion.dev/helix-graph/isometric`. Put the drawing's box in the frame, and
+ * `connectGraph` from `@fusion.dev/helix-graph` draws `nodes` and `links` in
+ * it and keeps it in step with the frame.
  *
  * What the frame adds is what a drawing of a graph cannot do: a list of every
  * note beside it, which is the graph for a screen reader and a quick way to
