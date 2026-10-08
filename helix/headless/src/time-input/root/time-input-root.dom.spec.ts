@@ -228,6 +228,31 @@ describe('the list a time input opens', () => {
     expect(host.open).toBe(true)
   })
 
+  test('draws no button for the current time unless `show-now` asks for one', async () => {
+    const host = await field()
+    host.open = true
+    await host.updateComplete
+    await (picker(host) as unknown as { updateComplete: Promise<unknown> }).updateComplete
+    expect(part(picker(host), 'now')).toBeNull()
+  })
+
+  /* Measured before this: the field handed its picker neither, so a time
+     input could never offer the shortcut its own picker has. */
+  test('hands `show-now` and `now-label` to its list, whose button sets the field', async () => {
+    const host = await field('show-now now-label="Right now"')
+    host.open = true
+    await host.updateComplete
+    const list = picker(host) as HTMLElement & { updateComplete: Promise<unknown>; value: string }
+    await list.updateComplete
+    const now = part(list, 'now') as HTMLButtonElement
+    expect(now.textContent).toBe('Right now')
+    now.click()
+    await host.updateComplete
+    expect(host.value).toMatch(/^\d\d:(00|15|30|45)$/)
+    expect(list.value).toBe(host.value)
+    expect(host.open).toBe(false)
+  })
+
   test('keeps a refused time off its list as well as off the field', async () => {
     const host = await field('default-value="09:30"')
     host.addEventListener('helix-before-change', (event) => event.preventDefault())
