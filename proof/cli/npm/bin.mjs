@@ -115,8 +115,22 @@ const onPath = () => {
   return undefined
 }
 
+/**
+ * What the binary needs to start the capture driver: the runtime that ran this
+ * shim, and the driver beside it. Set only where the caller has not set them,
+ * so `PROOF_RUNTIME=node bun run proof` still means node.
+ */
+const DRIVER_ENV = {
+  ...process.env,
+  PROOF_DRIVER: process.env.PROOF_DRIVER ?? join(HERE, 'driver.mjs'),
+  PROOF_RUNTIME: process.env.PROOF_RUNTIME ?? process.execPath,
+}
+
 const run = (binary) => {
-  const { status, error } = spawnSync(binary, process.argv.slice(2), { stdio: 'inherit' })
+  const { status, error } = spawnSync(binary, process.argv.slice(2), {
+    env: DRIVER_ENV,
+    stdio: 'inherit',
+  })
   /* A status means it ran. Bun sets `error` on any exit but zero, to a
      `SystemError` reading "null", so asking `error` alone reported every failed
      check as a binary that would not start, and exited 70 for its 1. */

@@ -366,6 +366,9 @@
         "@fusion.dev/proof-linux-x64": "proof/cli/platforms/linux-x64",
         "@fusion.dev/proof-win32-x64": "proof/cli/platforms/win32-x64",
       },
+      "peerDependencies": {
+        "playwright": ">=1.50",
+      },
     },
     "proof/cli/platforms/darwin-arm64": {
       "name": "@fusion.dev/proof-darwin-arm64",
@@ -496,7 +499,7 @@
 
     "@fusion.dev/insights": ["@fusion.dev/insights@workspace:fusion/docs/insights", { "devDependencies": { "@fusion.dev/scripts": "fusion/scripts" } }],
 
-    "@fusion.dev/proof": ["@fusion.dev/proof@workspace:proof/cli/npm", { "optionalDependencies": { "@fusion.dev/proof-darwin-arm64": "proof/cli/platforms/darwin-arm64", "@fusion.dev/proof-darwin-x64": "proof/cli/platforms/darwin-x64", "@fusion.dev/proof-linux-arm64": "proof/cli/platforms/linux-arm64", "@fusion.dev/proof-linux-x64": "proof/cli/platforms/linux-x64", "@fusion.dev/proof-win32-x64": "proof/cli/platforms/win32-x64" }, "bin": { "proof": "./bin.mjs" } }],
+    "@fusion.dev/proof": ["@fusion.dev/proof@workspace:proof/cli/npm", { "optionalDependencies": { "@fusion.dev/proof-darwin-arm64": "proof/cli/platforms/darwin-arm64", "@fusion.dev/proof-darwin-x64": "proof/cli/platforms/darwin-x64", "@fusion.dev/proof-linux-arm64": "proof/cli/platforms/linux-arm64", "@fusion.dev/proof-linux-x64": "proof/cli/platforms/linux-x64", "@fusion.dev/proof-win32-x64": "proof/cli/platforms/win32-x64" }, "peerDependencies": { "playwright": ">=1.50" }, "bin": { "proof": "./bin.mjs" } }],
 
     "@fusion.dev/proof-darwin-arm64": ["@fusion.dev/proof-darwin-arm64@workspace:proof/cli/platforms/darwin-arm64", {}],
 
