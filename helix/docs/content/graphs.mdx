@@ -130,8 +130,9 @@ const connection = connectGraph(frame, isometricDriver(frame.querySelector('div'
 ```
 
 - **Each note stands on a cell of the floor** at its `x` and `y`: `x` runs
-  across, and `y` runs back. A note with no `x` and `y` is put on the nearest
-  free cell beside the notes it links to.
+  across, and `y` runs back. When no note gives a place, the driver lays the
+  notes out in columns along the links, sources first. A note added without a
+  place goes to the nearest free cell beside the notes it links to.
 - **A note's `shape` picks its solid.** `square` is a block, which is the
   default, `circle` is a cylinder, and `diamond` is a pyramid. Its `size` sets
   its height.
@@ -142,7 +143,35 @@ const connection = connectGraph(frame, isometricDriver(frame.querySelector('div'
   link runs.
 
 Drag to pan, and use the wheel to zoom. Set `flat: true` to draw every note at
-no height, as a plan. The drawing is still, so there is no motion to pause.
+no height. The drawing moves only when the reader moves it, so there is no
+motion to pause.
+
+### Turn and tilt the view
+
+`turn` is the compass bearing the diagram is seen from, in degrees, and `tilt`
+is the camera's height above the floor. The defaults are the isometric view:
+`turn: 45`, the front left corner, and `tilt: 35.26`. `tilt` runs from 15 to
+90, which is a plan seen from straight above.
+
+```js
+const driver = isometricDriver(box, { turn: 20, tilt: 55 })
+connectGraph(frame, driver)
+
+driver.turnBy(90) // brings the next corner round to the front
+driver.turnTo({ tilt: 90 }) // looks from straight above
+```
+
+- **The faces and the light follow the camera.** Each solid shows the faces
+  turned toward the camera, and the light falls from the upper left of the
+  page.
+- **A diagram seen whole stays whole** as it turns. Otherwise the view turns
+  about the middle of the box.
+- **Shift with a drag** turns the view across and tilts it up and down.
+- **`turnBy` and `turnTo` animate**, unless the reader asked for reduced
+  motion.
+
+Give your turn buttons labels that name the diagram, such as "Turn the diagram
+left".
 
 ## Free the renderer
 

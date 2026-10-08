@@ -1,4 +1,7 @@
-const nodes = [
+import type { HelixGraph } from '@fusion.dev/helix'
+
+/* Each note stands on a cell of the floor: x across, y back. */
+const nodes: HelixGraph['nodes'] = [
   { group: 'Edge', id: 'cdn', label: 'CDN', size: 3, x: 0, y: 0 },
   { group: 'Edge', id: 'gateway', label: 'API gateway', size: 5, x: 2, y: 0 },
   { group: 'Services', id: 'accounts', label: 'Accounts', x: 5, y: 2 },
@@ -10,7 +13,7 @@ const nodes = [
   { group: 'Data', id: 'events', label: 'Event stream', shape: 'diamond', size: 4, x: 10, y: 1 },
 ]
 
-const links = [
+const links: HelixGraph['links'] = [
   { source: 'cdn', target: 'gateway' },
   { source: 'gateway', target: 'accounts' },
   { source: 'gateway', target: 'orders' },

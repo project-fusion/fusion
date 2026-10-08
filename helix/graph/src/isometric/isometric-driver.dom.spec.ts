@@ -175,6 +175,74 @@ describe('isometricDriver', () => {
     expect(cache).not.toEqual({ x: 2, y: 0 })
   })
 
+  test('turning the view draws the diagram from the new side, the nearest note last', () => {
+    const { driver, layer } = drawn()
+    const order = () => [...layer('notes').children].map((one) => one.getAttribute('data-id'))
+    expect(order()).toEqual(['gateway', 'ledger', 'orders'])
+    driver.turnTo({ turn: 225 }, false)
+    expect(driver.camera().turn).toBe(225)
+    /* From the back right the orders block stands furthest away. */
+    expect(order()).toEqual(['orders', 'ledger', 'gateway'])
+  })
+
+  test('a turn goes the shorter way round, and a tilt is held between 15 and 90 degrees', () => {
+    const { driver } = drawn()
+    driver.turnTo({ turn: 10 }, false)
+    driver.turnBy(-20, false)
+    expect(driver.camera().turn).toBe(350)
+    driver.turnTo({ tilt: 5 }, false)
+    expect(driver.camera().tilt).toBe(15)
+    driver.turnTo({ tilt: 120 }, false)
+    expect(driver.camera().tilt).toBe(90)
+  })
+
+  test('seen from straight above, every solid is its top alone', () => {
+    const { driver, layer } = drawn()
+    driver.turnTo({ tilt: 90 }, false)
+    for (const one of layer('notes').children) {
+      expect(one.querySelectorAll('path')).toHaveLength(1)
+    }
+  })
+
+  test('Shift with a drag turns the view, and a plain drag does not', () => {
+    const { driver, svg } = drawn()
+    const drag = (shiftKey: boolean) => {
+      svg.dispatchEvent(
+        new PointerEvent('pointerdown', {
+          bubbles: true,
+          button: 0,
+          clientX: 100,
+          clientY: 100,
+          pointerId: 2,
+          shiftKey,
+        }),
+      )
+      svg.dispatchEvent(
+        new PointerEvent('pointermove', {
+          bubbles: true,
+          clientX: 140,
+          clientY: 100,
+          pointerId: 2,
+          shiftKey,
+        }),
+      )
+      svg.dispatchEvent(
+        new PointerEvent('pointerup', {
+          bubbles: true,
+          button: 0,
+          clientX: 140,
+          clientY: 100,
+          pointerId: 2,
+          shiftKey,
+        }),
+      )
+    }
+    drag(false)
+    expect(driver.camera().turn).toBe(45)
+    drag(true)
+    expect(driver.camera().turn).toBe(25)
+  })
+
   test('stopping takes the drawing away', () => {
     const { box, driver } = drawn()
     driver.stop?.()

@@ -6,7 +6,10 @@ import brain3d from '../.examples/brain-3d.html' with { type: 'text' }
 import knot from '../.examples/knot.html' with { type: 'text' }
 import large from '../.examples/large.html' with { type: 'text' }
 import live from '../.examples/live.html' with { type: 'text' }
+import network from '../.examples/network.html' with { type: 'text' }
+import pipeline from '../.examples/pipeline.html' with { type: 'text' }
 import preview from '../.examples/preview.html' with { type: 'text' }
+import turning from '../.examples/turning.html' with { type: 'text' }
 
 beforeAll(async () => {
   registerDom()
@@ -200,5 +203,54 @@ describe('the architecture example', () => {
     await idle()
     expect(graph.active).toBe('index')
     expect(names(graph)[0]).toBe('Search index')
+  })
+})
+
+describe('the turning example', () => {
+  run(
+    'carries buttons that turn the diagram a quarter each way and tilt it to a plan',
+    async () => {
+      await example(turning)
+      await idle()
+      const graph = document.querySelector('helix-graph') as HTMLElement
+      const buttons = [...graph.querySelectorAll<HTMLElement>('[slot="header"] helix-button')]
+      expect(buttons.map((button) => button.textContent?.trim())).toEqual([
+        'Turn the diagram left',
+        'Turn the diagram right',
+        'Look from above',
+        'Look from the side',
+      ])
+      expect(
+        buttons.map(
+          (button) => button.dataset.previewGraphTurnBy ?? button.dataset.previewGraphTiltTo,
+        ),
+      ).toEqual(['-90', '90', '90', '35.26'])
+    },
+  )
+})
+
+describe('the pipeline example', () => {
+  run('gives no note a place, so the driver places every one', async () => {
+    await example(pipeline)
+    await idle()
+    const graph = document.querySelector('helix-graph') as unknown as HTMLElement & {
+      nodes: { x?: number; y?: number }[]
+    }
+    expect(graph.dataset.previewGraph).toBe('isometric')
+    expect(graph.nodes).toHaveLength(11)
+    expect(graph.nodes.some((node) => node.x !== undefined || node.y !== undefined)).toBe(false)
+  })
+})
+
+describe('the network example', () => {
+  run('asks for a steeper camera, turned a little from the front', async () => {
+    await example(network)
+    await idle()
+    const graph = document.querySelector('helix-graph') as unknown as HTMLElement & {
+      nodes: { group: string }[]
+    }
+    expect(graph.dataset.previewGraphTilt).toBe('55')
+    expect(graph.dataset.previewGraphTurn).toBe('20')
+    expect(new Set(graph.nodes.map((node) => node.group)).size).toBe(5)
   })
 })

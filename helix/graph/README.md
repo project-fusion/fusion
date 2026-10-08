@@ -362,9 +362,10 @@ import { isometricDriver } from '@fusion.dev/helix-graph/isometric'
 connectGraph(frame, isometricDriver(frame.querySelector('div')))
 ```
 
-- Each note is a solid standing on a cell of the floor at its `x` and `y`, and
-  a note with no place is put on the nearest free cell beside the notes it
-  links to.
+- Each note is a solid standing on a cell of the floor at its `x` and `y`. A
+  diagram that gives no note a place is laid out in columns along its links,
+  and a note added without one goes to the nearest free cell beside the notes
+  it links to.
 - A note's `shape` picks its solid: `square` a block, `circle` or `ring` a
   cylinder, and `diamond` a pyramid. Its size sets its height.
 - Each face is shaded from the note's color, and each edge is drawn in an ink
@@ -375,11 +376,24 @@ connectGraph(frame, isometricDriver(frame.querySelector('div')))
   size until the reader pans or zooms. Drag to pan and use the wheel to zoom,
   as the frame's `gestures` allows.
 
+- `turn` and `tilt` set where the diagram is seen from. `driver.turnBy(90)`
+  brings the next corner round, `driver.turnTo({ tilt: 90 })` looks from
+  straight above, and Shift with a drag turns and tilts it. The faces each
+  solid shows, and their shading, follow the camera.
+
 | `isometricDriver` option | Default | What else it takes |
 |---|---|---|
-| `flat` | `false` | `true` draws every note at no height, as a plan |
+| `flat` | `false` | `true` draws every note at no height |
 | `groupLabels` | `true` | `false` leaves each group's plate unnamed |
 | `shape` | `square` | `circle`, `ring` or `diamond`, for every note that does not say |
+| `tilt` | `35.26` | The camera's height above the floor in degrees, from `15` to `90`, a plan from straight above |
+| `turn` | `45` | The compass bearing the diagram is seen from, in degrees |
+
+| `isometricDriver` method | What it does |
+|---|---|
+| `camera()` | Where the diagram is seen from now: `{ turn, tilt }` |
+| `turnBy(degrees, animate)` | Turns the view by `degrees`. Animated unless `animate` is false or the reader asked for reduced motion |
+| `turnTo({ turn, tilt }, animate)` | Moves the camera to a bearing, a height, or both |
 
 ## What it exports
 
@@ -389,7 +403,7 @@ connectGraph(frame, isometricDriver(frame.querySelector('div')))
 | `@fusion.dev/helix-graph/sigma` | `sigmaDriver(sigma, options)`, and the types `SigmaDriverOptions`, `SigmaGraph`, `SigmaLayout` and `SigmaRenderer` |
 | `@fusion.dev/helix-graph/cosmos` | `cosmosDriver(graph, box, options)`, and the types `CosmosDriverOptions` and `CosmosGraph` |
 | `@fusion.dev/helix-graph/three` | `threeDriver(box, options)`, and the type `ThreeDriverOptions` |
-| `@fusion.dev/helix-graph/isometric` | `isometricDriver(box, options)`, and the type `IsometricDriverOptions` |
+| `@fusion.dev/helix-graph/isometric` | `isometricDriver(box, options)`, `ISOMETRIC`, the camera it starts from, and the types `Camera`, `IsometricDriver` and `IsometricDriverOptions` |
 | `@fusion.dev/helix-graph/shapes` | `shapeFromTriangles`, `shapeFromSvg`, `shapeFromImage`, `shapeFromPath`, `shapeFromInside`, `inflate`, `sphere`, `torus`, `cuboid`, `onSphere`, `surfaceOf`, and the types `ImageOptions`, `ShapeField` and `TriangleOptions` |
 | `@fusion.dev/helix-graph/model` | `shapeFromModel(source, options)`, which needs three.js |
 | `@fusion.dev/helix-graph/snapshot` | `graphSnapshot(nodes, links, options)`, an SVG of the graph to paint before the renderer loads, and the types `GraphSnapshotOptions`, `SnapshotLink` and `SnapshotNode` |
