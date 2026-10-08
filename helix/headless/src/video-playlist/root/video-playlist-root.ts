@@ -41,6 +41,12 @@ type Player = HTMLElement & {
  * captions, and poster treatment. `Sandbox` takes its preview and `Menu` its
  * trigger the same way.
  *
+ * **The player is a `Video` or a plain `<video>`.** Either takes `src` and
+ * `poster` from the entry, is named by it, plays on, and answers Shift with N
+ * or P while focused. A plain `<video>` has no previous and next controls
+ * that send `helix-previous` or `helix-next`, so its moves are the entries,
+ * the menu, and your own buttons calling `previous()` and `next()`.
+ *
  * **Entries are markup.** React skips properties it would set imperatively
  * during hydration, so an array property on a custom element is missing on the
  * first paint of a server-rendered page. `using-the-elements.mdx` has the
@@ -73,7 +79,8 @@ type Player = HTMLElement & {
  *
  * **The player is named by the current entry**, and the device's own media
  * controls show the entry as the title. A player you gave a `label` keeps
- * your name, and only the title follows the entry.
+ * your name, and only the title follows the entry. A plain `<video>` is
+ * named through `aria-label`, unless you wrote one.
  *
  * **Keyboard.** The entries take one stop in the tab order: the entry you
  * last focused, or the current entry before you have focused one. Enter or
@@ -346,6 +353,31 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
    * Before they focus one, the current entry holds it.
    */
   private stop: string | undefined
+
+  /** The name this playlist last wrote on a plain media player, to tell it from yours. */
+  private wroteName: string | undefined
+
+  /**
+   * Names the player by the entry.
+   *
+   * The consumer's own name for the player stands. Only a player named by
+   * nobody takes the entry's words as its name: `label` on a player that has
+   * one, and `aria-label` on a plain `<video>` or `<audio>`, which has none and
+   * was heard as an unnamed video.
+   */
+  private name(player: Player, text: string): void {
+    if (player instanceof HTMLMediaElement) {
+      const own = player.getAttribute('aria-label')
+      if (own === null || own === this.wroteName) {
+        player.setAttribute('aria-label', text)
+        this.wroteName = text
+      }
+      return
+    }
+    if (!player.hasAttribute('label')) {
+      player.label = text
+    }
+  }
 
   /** The entry the player was last pointed at. */
   private pointed: HelixHeadlessVideoPlaylistItem | undefined
@@ -746,11 +778,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
       }
       player.poster = current.poster
       player.mediaTitle = current.text
-      /* The consumer's own name for the player stands. Only a player named by
-         nobody takes the entry's words as its name. */
-      if (!player.hasAttribute('label')) {
-        player.label = current.text
-      }
+      this.name(player, current.text)
       if (this.chased) {
         this.status.say(formatWords(this, 'playingLabel', { title: current.text }))
         /* After the player has rendered, not now. `src` here is the element's

@@ -80,6 +80,29 @@ describe('a video playlist', () => {
     expect((player(host) as Player & { mediaTitle: string }).mediaTitle).toBe('One')
   })
 
+  /* A plain `<video>` has no `label`: the name written there reached nothing,
+     and a screen reader heard an unnamed video. */
+  test('names a plain video by the entry, and follows it, unless you named it', async () => {
+    const host = (await mount(`<helix-headless-video-playlist default-active="one" label="Episodes">
+      <video slot="player"></video>
+      <helix-headless-video-playlist-item src="/one.mp4" value="one">One</helix-headless-video-playlist-item>
+      <helix-headless-video-playlist-item src="/two.mp4" value="two">Two</helix-headless-video-playlist-item>
+    </helix-headless-video-playlist>`)) as Playlist
+    await host.updateComplete
+    const video = host.querySelector('video') as HTMLVideoElement
+    expect(video.getAttribute('aria-label')).toBe('One')
+    host.requestActive('two')
+    await host.updateComplete
+    expect(video.getAttribute('aria-label')).toBe('Two')
+    const named =
+      (await mount(`<helix-headless-video-playlist default-active="one" label="Episodes">
+      <video aria-label="Lessons" slot="player"></video>
+      <helix-headless-video-playlist-item src="/one.mp4" value="one">One</helix-headless-video-playlist-item>
+    </helix-headless-video-playlist>`)) as Playlist
+    await named.updateComplete
+    expect(named.querySelector('video')?.getAttribute('aria-label')).toBe('Lessons')
+  })
+
   test('choosing an entry moves the player', async () => {
     const host = await list()
     await host.updateComplete
