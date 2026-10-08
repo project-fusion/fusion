@@ -7,6 +7,7 @@ import styles from './band.module.css'
  */
 export function Band({
   card = true,
+  cardId,
   children,
   id,
   shell = 'flex',
@@ -16,11 +17,13 @@ export function Band({
   card?: boolean
   children: ReactNode
   id?: string | undefined
+  /** An id for the card itself, for something that has to find its edges. */
+  cardId?: string | undefined
   shell?: 'flex' | 'plain'
   wide?: boolean | undefined
 }) {
   const inner = card ? (
-    <div className={styles.bandCard} data-material="glass" data-substrate>
+    <div className={styles.bandCard} data-material="glass" data-substrate id={cardId}>
       {children}
     </div>
   ) : (
