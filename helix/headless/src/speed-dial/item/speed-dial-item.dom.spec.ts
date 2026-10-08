@@ -56,6 +56,23 @@ describe('one speed dial action', () => {
     expect(value).toBe('save')
   })
 
+  /* A script's `click()` lands on the host, which answers nothing, so it chose
+     nothing where a native button's chooses. */
+  test('is chosen by its own click(), once, as a native button is', async () => {
+    const host = await action()
+    const heard: string[] = []
+    host.addEventListener('helix-select', (event) => {
+      heard.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    let clicks = 0
+    host.addEventListener('click', () => {
+      clicks += 1
+    })
+    host.click()
+    expect(heard).toEqual(['save'])
+    expect(clicks).toBe(1)
+  })
+
   /* The mark is what a dial is read by, so both boxes are always rendered and
      the name sits beside the mark rather than replacing it. */
   test('keeps a box for the mark and a box for the name, always', async () => {

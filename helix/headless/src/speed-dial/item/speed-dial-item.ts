@@ -125,6 +125,20 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
     this.focus()
   }
 
+  /**
+   * Presses the action, as `click()` presses a native button: passed to the
+   * control inside, which is what answers a click, so a script's `click()`
+   * chooses the action and follows its link, once.
+   */
+  override click(): void {
+    const control = this.partNamed('item')
+    if (control) {
+      control.click()
+    } else {
+      super.click()
+    }
+  }
+
   /** Chooses the action, the same as pressing it. */
   select(): void {
     this.choose()

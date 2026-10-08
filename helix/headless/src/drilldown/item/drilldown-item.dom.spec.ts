@@ -32,6 +32,23 @@ describe('one drilldown row', () => {
     expect(item?.getAttribute('type')).toBe('button')
   })
 
+  /* A script's `click()` lands on the host, which answers nothing, so it chose
+     no row where a press on the control does. */
+  test('is chosen by its own click(), once, as by a press on its control', async () => {
+    const host = await row()
+    const heard: string[] = []
+    host.addEventListener('helix-select', (event) => {
+      heard.push((event as CustomEvent<{ value: string }>).detail.value)
+    })
+    let clicks = 0
+    host.addEventListener('click', () => {
+      clicks += 1
+    })
+    host.click()
+    expect(heard).toEqual(['a'])
+    expect(clicks).toBe(1)
+  })
+
   /* `menuitem` because the stack says `role="menu"`. A menu whose children are
      buttons is not a menu: the two roles contradict each other, and a reader is
      told the count of items by one and the kind of them by the other. */

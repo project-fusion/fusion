@@ -90,6 +90,45 @@ describe('button form participation', () => {
     expect(submitted).toBe(1)
   })
 
+  /* A native button acts on `click()`: a script's, an automation's, a test's.
+     The host is not the control, so a click dispatched on it reached nothing
+     that submits, and `helixButton.click()` did nothing at all. */
+  test('the host’s own click() submits, as a native button’s does', async () => {
+    document.body.innerHTML =
+      '<form><helix-headless-button type="submit">Send</helix-headless-button></form>'
+    const form = document.querySelector('form') as HTMLFormElement
+    const button = document.querySelector('helix-headless-button') as Updatable
+    await button.updateComplete
+
+    let submitted = 0
+    form.requestSubmit = () => {
+      submitted += 1
+    }
+    let clicks = 0
+    button.addEventListener('click', () => {
+      clicks += 1
+    })
+    button.click()
+    expect(submitted).toBe(1)
+    // One click reaches the page, as one does from a native button.
+    expect(clicks).toBe(1)
+  })
+
+  test('and a disabled host’s click() does nothing', async () => {
+    document.body.innerHTML =
+      '<form><helix-headless-button type="submit" disabled>Send</helix-headless-button></form>'
+    const form = document.querySelector('form') as HTMLFormElement
+    const button = document.querySelector('helix-headless-button') as Updatable
+    await button.updateComplete
+
+    let submitted = 0
+    form.requestSubmit = () => {
+      submitted += 1
+    }
+    button.click()
+    expect(submitted).toBe(0)
+  })
+
   test('a plain button leaves its form alone', async () => {
     document.body.innerHTML = '<form><helix-headless-button>Nothing</helix-headless-button></form>'
     const form = document.querySelector('form') as HTMLFormElement
@@ -452,6 +491,22 @@ describe('what pressed the button', () => {
     inner.click()
     inner.click()
     expect(kinds).toEqual(['virtual', 'keyboard', 'virtual'])
+  })
+
+  test('the host’s own click() presses it, and is virtual', async () => {
+    const host = await mount('<helix-headless-button>Save</helix-headless-button>')
+    const kinds = heard(host)
+    host.click()
+    expect(kinds).toEqual(['virtual'])
+  })
+
+  test('and so does an icon button’s', async () => {
+    const host = await mount(
+      '<helix-headless-icon-button label="Save"></helix-headless-icon-button>',
+    )
+    const kinds = heard(host)
+    host.click()
+    expect(kinds).toEqual(['virtual'])
   })
 
   test('a click after a pen goes down is the pen', async () => {

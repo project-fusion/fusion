@@ -363,6 +363,26 @@ export class HelixHeadlessButton extends HelixFormElement {
     this.announcePress(event)
   }
 
+  /**
+   * Presses the button, as `click()` presses a native one: the command is sent,
+   * the form submits or resets, and `helix-press` says `virtual`.
+   *
+   * **Passed to the inner control, because a click on the host reaches nothing
+   * that acts.** The control in the shadow root is what answers a click, so
+   * `click()` from a script, an automation or a test, dispatched on the host,
+   * submitted nothing and sent no `helix-press`. The control's own click reaches
+   * the host's listeners once, retargeted, as one from a native button does. A
+   * disabled button does nothing, and a pending one refuses the press.
+   */
+  override click(): void {
+    const control = this.partNamed('button')
+    if (control) {
+      control.click()
+    } else {
+      super.click()
+    }
+  }
+
   /** What a press does: sends the command, and submits or resets the form. */
   private act(): void {
     /* **Re-linked here, and this is the line that makes a trigger reliable.**

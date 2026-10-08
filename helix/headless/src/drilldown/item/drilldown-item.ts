@@ -336,6 +336,20 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
     >`
   }
 
+  /**
+   * Presses the row, as `click()` presses a native button: passed to the
+   * control inside, which is what answers a click, so a script's `click()`
+   * chooses the row, or follows its link, once.
+   */
+  override click(): void {
+    const control = this.partNamed('item')
+    if (control) {
+      control.click()
+    } else {
+      super.click()
+    }
+  }
+
   protected override render(): TemplateResult | typeof nothing {
     /* A row above the page showing passes its page through as well: the row
        that opens the page showing is one of its page's rows, so without the

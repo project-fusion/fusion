@@ -748,6 +748,20 @@ export class HelixHeadlessMenuItem extends HelixElement {
     return this.virtual && this.onPage && !this.showingSubmenu
   }
 
+  /**
+   * Presses the row, as `click()` presses a native button: passed to the
+   * control inside, which is what answers a click, so a script's `click()`
+   * chooses the row, or follows its link, once.
+   */
+  override click(): void {
+    const control = this.partNamed('item')
+    if (control) {
+      control.click()
+    } else {
+      super.click()
+    }
+  }
+
   protected override render(): TemplateResult | typeof nothing {
     const submenu = this.hasSubmenu
     const ticks = this.choice
