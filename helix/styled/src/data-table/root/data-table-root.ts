@@ -27,7 +27,9 @@ import '../../pagination/index.js'
  * Write it under the columns as `helix-table-row` and `helix-table-cell`
  * elements. `@fusion.dev/helix-styles/helix.css` lays them out as the table
  * draws them before it upgrades, and the table shows them until `rows` holds a
- * row.
+ * row. It holds the checkbox column and the pagination's row from the first
+ * paint, and takes the widths from `columns`, so nothing moves when the table
+ * upgrades or draws its own rows.
  *
  * @since 0.1.0
  * @status stable

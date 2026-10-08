@@ -77,15 +77,21 @@ const aligned = sorted.map((tag) => `${tag}[align]`).join(',\n')
    table has upgraded and until it draws its own rows.
 
    Up to ten columns are counted, more than any example declares, and each
-   column takes the track a column with no `width` takes. A column with a
-   `width` takes its own once the table upgrades. */
+   column takes the track a column with no `width` takes. A `width` is the
+   column's own attribute, which no rule on the table can read, so a table that
+   serves its rows takes its widths from `columns` on itself, which a rule can. */
 const COUNTED = 10
 const SERVED = 'helix-data-table:not(:defined):has(> helix-table-row)'
 const VISIBLE = 'helix-table-column:not([hidden])'
+/* The attributes that put a checkbox or a grip column ahead of the columns. */
+const LEAD = '[selectable], [reorderable-rows]:not([child-field])'
+const BOTH = '[selectable][reorderable-rows]:not([child-field])'
+/* The attributes that draw a pagination under the rows. */
+const PAGED = ':is([page-size]:not([page-size="0"]), [paginated])'
 const tracks = Array.from(
   { length: COUNTED },
   (_, at) =>
-    `helix-data-table:not(:defined):has(> helix-table-column:nth-of-type(${at + 1}):last-of-type) {\n  --_data-table-count: ${at + 1};\n}`,
+    `:is(helix-data-table, helix-table):not(:defined):has(> helix-table-column:nth-of-type(${at + 1}):last-of-type) {\n  --_table-count: ${at + 1};\n}`,
 ).join('\n\n')
 /* `end` alone, which every numeric column here sets: a column set to the
    center is centered once the table upgrades. */
@@ -120,10 +126,107 @@ ${SERVED} {
 }
 
 helix-data-table:not(:defined) {
-  --data-table-template: repeat(var(--_data-table-count, 1), minmax(max-content, 1fr));
+  --data-table-template: var(--_data-table-lead,) repeat(var(--_table-count, 1), minmax(max-content, 1fr));
 }
 
 ${tracks}
+
+/* **The widths a column asks for, from \`columns\`**, where the browser can read
+ * an attribute into a track list. Where it cannot, the columns take the tracks
+ * counted above until the table upgrades. A server rendering declarative shadow
+ * DOM writes the same list into the grid itself, so that path needs no rule.
+ */
+@supports (grid-template-columns: attr(columns type(*))) {
+  helix-data-table:not(:defined)[columns] {
+    --data-table-template: var(--_data-table-lead,) attr(columns type(*));
+  }
+}
+
+/* **The checkbox and grip columns, from the first paint.** The table draws them
+ * ahead of the columns, as tracks that take what they hold, and the rows the
+ * page served have no cells there. Each row leads with a box of the same size
+ * in their place, and the headings start after it, so nothing moves when the
+ * table draws its own. Both together are two tracks under one box, each set to
+ * the width its cell takes.
+ */
+helix-data-table:not(:defined):is(${LEAD}) {
+  --_data-table-lead: max-content;
+}
+
+helix-data-table:not(:defined)${BOTH} {
+  --_data-table-lead: calc(1em + 2 * var(--data-table-padding-inline, var(--helix-space-sm)))
+    calc(var(--checkbox-size, var(--helix-size-checkbox)) + 2 * var(--data-table-padding-inline, var(--helix-space-sm)));
+}
+
+${SERVED}:is(${LEAD})::before,
+helix-data-table:is(${LEAD}) > helix-table-row:not([hidden])::before {
+  border-block-end: var(--helix-border-thin) solid
+    var(--data-table-rule-color, var(--helix-color-border));
+  content: '';
+  grid-column: 1;
+}
+
+helix-data-table:is(${LEAD}) > helix-table-row:last-of-type::before {
+  border-block-end-color: transparent;
+}
+
+helix-data-table:where(${LEAD}) > helix-table-row:not([hidden])::before {
+  block-size: 1em;
+  box-sizing: content-box;
+  inline-size: 1em;
+  padding-block: var(--data-table-padding-block, var(--helix-space-sm));
+  padding-inline: var(--data-table-padding-inline, var(--helix-space-sm));
+}
+
+helix-data-table[selectable] > helix-table-row:not([hidden])::before {
+  block-size: var(--checkbox-size, var(--helix-size-checkbox));
+  inline-size: var(--checkbox-size, var(--helix-size-checkbox));
+}
+
+${SERVED}${BOTH}::before,
+helix-data-table${BOTH} > helix-table-row:not([hidden])::before {
+  grid-column: 1 / span 2;
+  inline-size: auto;
+}
+
+
+/* **A table served with declarative shadow DOM** lays its headings and cells
+ * out in its shadow root's grid, which takes its tracks from the columns once
+ * the table upgrades: the same count, at the track a column with no \`width\`
+ * takes, until then. A table that sets \`columns\` is sent that list by the
+ * server, which wins.
+ */
+helix-table:not(:defined):has(> helix-table-column) {
+  --table-template: var(--_table-lead,) repeat(var(--_table-count, 1), minmax(max-content, 1fr));
+}
+
+/* Its grip and checkbox columns, which the rows draw once the table upgrades
+ * and tells them it has them: until then each row leads with an empty box in
+ * their place, under the headings the server sent for them, at the width
+ * their cells take.
+ */
+helix-table:not(:defined)[reorderable] {
+  --_table-lead: calc(var(--helix-space-2xs) + 1em + var(--helix-space-sm));
+}
+
+helix-table:not(:defined)[selectable] {
+  --_table-lead: calc(var(--checkbox-size, var(--helix-size-checkbox)) + var(--helix-space-md));
+}
+
+helix-table:not(:defined)[reorderable][selectable] {
+  --_table-lead: calc(var(--helix-space-2xs) + 1em + var(--helix-space-sm))
+    calc(var(--checkbox-size, var(--helix-size-checkbox)) + var(--helix-space-md));
+}
+
+helix-table:not(:defined):is([reorderable], [selectable]) > helix-table-row:not([hidden])::before {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  content: '';
+  grid-column: 1;
+}
+
+helix-table:not(:defined)[reorderable][selectable] > helix-table-row:not([hidden])::before {
+  grid-column: 1 / span 2;
+}
 
 /* A heading, as the column draws it in its own shadow root once it upgrades:
  * the same rule, height, inset and weight. Under declarative shadow DOM the
@@ -189,14 +292,16 @@ helix-data-table > helix-table-row:last-of-type > helix-table-cell {
 /* Each cell takes its column's edge, by its place in the row. */
 ${edges}
 
-/* Once the table upgrades it draws its checkbox and grip columns first, which
- * the served rows have no cells for.
+/* The first heading and each row's first cell, after the checkbox and grip
+ * columns. A tree grid draws no grips.
  */
-helix-data-table:defined:is([selectable], [reorderable-rows]) > helix-table-row > :first-child {
+${SERVED}:is(${LEAD}) > helix-table-column:first-of-type,
+helix-data-table:is(${LEAD}) > helix-table-row > :first-child {
   grid-column-start: 2;
 }
 
-helix-data-table:defined[selectable][reorderable-rows] > helix-table-row > :first-child {
+${SERVED}${BOTH} > helix-table-column:first-of-type,
+helix-data-table${BOTH} > helix-table-row > :first-child {
   grid-column-start: 3;
 }
 
@@ -223,6 +328,25 @@ ${SERVED} > [slot="footer"] {
 
 ${SERVED}:has(> [slot="footer"])::part(footer) {
   padding-block-start: 0;
+}
+
+/* **The pagination's row, held from the first paint.** The table draws its
+ * pagination once it knows how many rows there are, below the rows and beside
+ * anything in the footer, so the room it takes is kept here: under the rows,
+ * or as the least height of the footer, whose content sits in the middle of
+ * it as the pagination's row sets it.
+ */
+${SERVED}${PAGED}:not(:has(> [slot="footer"]))::after {
+  block-size: var(--pagination-size, var(--helix-size-control-tight));
+  content: '';
+  grid-column: 1 / -1;
+  margin-block-start: var(--data-table-footer-gap, var(--helix-space-sm));
+  order: 1;
+}
+
+${SERVED}${PAGED} > [slot="footer"] {
+  align-content: center;
+  min-block-size: var(--pagination-size, var(--helix-size-control-tight));
 }
 
 ${SERVED} > :is([slot="empty"], [slot="error"], [slot="loading"]) {

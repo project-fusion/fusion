@@ -78,6 +78,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import type { HelixHeadlessTableColumn } from '../../table/column/table-column.js'
 import { edgeOf } from '../../table/edge.js'
+import { tracksOf } from '../../table/tracks.js'
 import '../../checkbox/index.js'
 import '../../pagination/index.js'
 import { toggledOpen } from '../keys.js'
@@ -219,11 +220,12 @@ const isControl = (element: HTMLElement): boolean =>
  * `csv()` returns the result as text: every row that passes the filter, in the
  * order and the columns on screen. Saving the file is up to you.
  *
- * `DataTable` has no `columns` attribute. Each `TableColumn` is part of the
- * schema, so you size a column with its own `width`. `Table` has `columns`
- * because its cells are markup you write and it can have no columns at all.
- * Written on `DataTable`, `columns` has no effect, so watch for it when you
- * move a table from `Table` to `DataTable`.
+ * Size a column with its own `width`, or every column at once with `columns`,
+ * a track list dealt out one track to a column in the order they are written,
+ * as `Table` deals it. A column's `width` wins in its place. **A table that
+ * serves its first page takes its widths from `columns`**: a server and a
+ * stylesheet can read the table's own attributes and not its columns', so the
+ * served rows are laid out at the widths the table draws.
  *
  * **The columns are an import of their own.** A column is the Table family's
  * `TableColumn`, which the data table does not register, so a page that writes
@@ -384,6 +386,20 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    */
   @property({ attribute: 'child-field', reflect: true })
   childField?: string
+
+  /**
+   * The column tracks, as a grid track list such as `2fr 1fr max-content`,
+   * dealt out one track to a column in the order the columns are written. A
+   * column's own `width` wins in its place, and a column it does not reach
+   * takes the track a column with no `width` takes.
+   *
+   * **The one track list a server can send.** A server rendering this element
+   * has no columns to read a `width` from, and neither has a stylesheet laying
+   * out the rows a page served before the table upgrades, so a table sized here
+   * lays those rows out at the widths it draws.
+   */
+  @property()
+  columns = ''
 
   /**
    * The keys of the rows open at the start, separated by commas. Used until
@@ -1382,16 +1398,30 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       .map((column) => ({ field: column.field, order: (row: DataRow) => column.order(row) }))
   }
 
-  /** The track list, from the columns if there are any. */
+  /**
+   * The track list: each column's `width`, or its track in `columns`, or the
+   * track a column with neither takes.
+   *
+   * A render that knows no columns, on a server or hydrating what one sent,
+   * has `columns` alone, and sends it as it is.
+   */
   private get template(): string {
     const declared = this.shownColumns
-    if (declared.length === 0) {
-      return ''
-    }
-    const tracks = declared.map((column) => column.track).join(' ')
+    const written = this.tableColumns
+    const listed = tracksOf(this.columns, written.length)
+    const tracks =
+      written.length === 0
+        ? this.columns
+        : declared
+            .map((column) =>
+              column.width ? column.track : listed[written.indexOf(column)] || column.track,
+            )
+            .join(' ')
     /* The grips and the checkboxes take what they need and no more, ahead of
        everything. */
-    return [...Array.from({ length: this.lead }, () => 'max-content'), tracks].join(' ')
+    return tracks
+      ? [...Array.from({ length: this.lead }, () => 'max-content'), tracks].join(' ')
+      : ''
   }
 
   /**
@@ -2620,6 +2650,15 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     const counted = this.mode === 'server' ? Math.max(this.total, available) : matched
     /* Nor while the served rows stand in for rows that have not arrived. */
     const countKnown = counted > 0 || (this.sourceKnown && !serving)
+    /* **The pagination's row is held while it cannot be drawn.** With no count
+       it has one page and draws nothing, and then a row appears under the rows
+       once they arrive. Held while the served page is full, so the result may
+       run on; a shorter one is the whole result, on one page. */
+    const held =
+      serving &&
+      this.paginated &&
+      !countKnown &&
+      (!this.sourceKnown || this.servedRows.length >= this.pageSize)
     /* **On the grid, which is the host.** `aria-rowcount` and `aria-colcount`
        belong to a table or a grid and mean nothing on a `rowgroup`, which is
        where they sat, so a windowed or paged result never said how long it
@@ -2639,14 +2678,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       >
         <div part="head" role="row" aria-rowindex="1">
           ${
-            /* None on a server, whose page has no cells under them: the served
-               rows start at the first column, and a box above them would set
-               every heading one column off its values until hydration. */
-            this.rowGrips && this.sourceKnown
-              ? this.renderGripHead(headStop && this.currentColumn === 0)
-              : nothing
+            /* Served too: each row the page served leads with a box of the
+               same size in their place, from `helix.css`, so the headings
+               stay over their values. */
+            this.rowGrips ? this.renderGripHead(headStop && this.currentColumn === 0) : nothing
           }${
-            this.selectable && this.sourceKnown
+            this.selectable
               ? this.renderSelectAll(headStop && this.currentColumn === this.selectAt)
               : nothing
           }${
@@ -2676,7 +2713,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         ${this.renderMore(page)}${this.errorText === '' ? this.renderStatus(filled, 'gridcell') : this.renderError()}
       </div>
       ${this.errorText === '' ? this.renderLive(filled) : html`<span part="live" role="status">${this.errorText}</span>`}
-      <div part="footer">
+      <div part="footer" ?data-held=${held}>
         <slot name="footer"></slot>
         ${
           this.paginated

@@ -925,6 +925,46 @@ describe('a hidden column', () => {
   })
 })
 
+/**
+ * `columns`, the track list a server and a stylesheet can read, dealt out one
+ * track to a column in the order they are written, as `Table` deals it.
+ */
+describe('the column tracks in `columns`', () => {
+  const template = (element: HTMLElement): string =>
+    part(element, 'table')?.getAttribute('style') ?? ''
+
+  test('gives each column the track in its place, and a `width` wins in its own', async () => {
+    const { element, remove } = await mount(`
+      <helix-headless-data-table label="Files" columns="2fr 6rem max-content" selectable row-key="name">
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+        <helix-headless-table-column field="size" width="8rem">Size</helix-headless-table-column>
+        <helix-headless-table-column field="kind">Kind</helix-headless-table-column>
+      </helix-headless-data-table>`)
+    expect(template(element)).toBe('--data-table-template: max-content 2fr 8rem max-content')
+    remove()
+  })
+
+  test('keeps a track with its column when the order moves it', async () => {
+    const { element, remove } = await mount(`
+      <helix-headless-data-table label="Files" columns="2fr 6rem" default-order="size name">
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+        <helix-headless-table-column field="size">Size</helix-headless-table-column>
+      </helix-headless-data-table>`)
+    expect(template(element)).toBe('--data-table-template: 6rem 2fr')
+    remove()
+  })
+
+  test('leaves a column it does not reach the track a column with no `width` takes', async () => {
+    const { element, remove } = await mount(`
+      <helix-headless-data-table label="Files" columns="2fr">
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+        <helix-headless-table-column field="size">Size</helix-headless-table-column>
+      </helix-headless-data-table>`)
+    expect(template(element)).toBe('--data-table-template: 2fr minmax(max-content, 1fr)')
+    remove()
+  })
+})
+
 /* What this family says where there is nothing in it, and while it is fetching.
  *
  * **The words, the moment they appear and which of the two beats the other

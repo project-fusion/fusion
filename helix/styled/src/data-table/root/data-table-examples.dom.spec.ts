@@ -243,3 +243,98 @@ describe('the serving example', () => {
     expect(drawn).toEqual(served)
   })
 })
+
+/* **Before the table upgrades, as a server's page arrives.** A frame of its own
+ * has a registry of its own, so the same markup there stays undefined, laid
+ * out by `helix.css` alone. Each heading and cell, and the table's height with
+ * the pagination's row in it, must stand where the upgraded table puts them,
+ * and the drawn rows where the served ones stood. */
+describe('a data table that serves its first page, before it upgrades', () => {
+  type Box = (number | string)[]
+
+  /** Every heading and cell, by its place in the host, and the host's height. */
+  const layout = (host: Element): Box[] => {
+    const origin = host.getBoundingClientRect()
+    const box = (one: Element): Box => {
+      const shown =
+        getComputedStyle(one).display === 'contents'
+          ? (one.shadowRoot?.querySelector('[part="column"]') ?? one)
+          : one
+      const { height, width, x, y } = shown.getBoundingClientRect()
+      return [
+        one.textContent?.trim() ?? '',
+        ...[x - origin.x, y - origin.y, width, height].map((value) => Math.round(value)),
+      ]
+    }
+    const drawn = [...(host.shadowRoot?.querySelectorAll('[part~="row"] [part~="cell"]') ?? [])]
+    const cells = drawn.length > 0 ? drawn : [...host.querySelectorAll('helix-table-cell')]
+    return [
+      ['height', Math.round(origin.height)],
+      ...[...host.querySelectorAll(':scope > helix-table-column')].map(box),
+      ...cells.map(box),
+    ]
+  }
+
+  /** The markup in a frame with this page's stylesheets and no definitions. */
+  const unupgraded = async (markup: string, width: number): Promise<Element> => {
+    const frame = document.createElement('iframe')
+    frame.style.cssText = `border: 0; block-size: 900px; inline-size: ${width}px`
+    const sheets = [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')]
+      .map((link) => `<link rel="stylesheet" href="${link.href}">`)
+      .join('')
+    frame.srcdoc = `<!doctype html>${sheets}<body style="margin: 0">${markup}</body>`
+    const loaded = new Promise((done) => frame.addEventListener('load', done, { once: true }))
+    document.body.append(frame)
+    await loaded
+    const host = frame.contentDocument?.querySelector('helix-data-table') as Element
+    expect(frame.contentWindow?.customElements.get('helix-data-table')).toBeUndefined()
+    return host
+  }
+
+  const sized = `<helix-data-table
+    columns="minmax(5.5rem, 1.6fr) minmax(4.5rem, 1fr) max-content"
+    default-sort="name:asc"
+    id="roster"
+    label="Roster"
+    page-size="2"
+    row-key="name"
+    selectable
+  >
+    <helix-table-column field="name" sortable>Name</helix-table-column>
+    <helix-table-column field="team">Team</helix-table-column>
+    <helix-table-column field="reviews" text-align="end">Reviews</helix-table-column>
+    <helix-table-row><helix-table-cell header>Ada Okonkwo</helix-table-cell><helix-table-cell>Platform</helix-table-cell><helix-table-cell>184</helix-table-cell></helix-table-row>
+    <helix-table-row><helix-table-cell header>Bruno Salas</helix-table-cell><helix-table-cell>Payments</helix-table-cell><helix-table-cell>96</helix-table-cell></helix-table-row>
+    <span slot="footer">3 people</span>
+  </helix-data-table>`
+  const people = [
+    { name: 'Ada Okonkwo', reviews: 184, team: 'Platform' },
+    { name: 'Bruno Salas', reviews: 96, team: 'Payments' },
+    { name: 'Cai Wen', reviews: 231, team: 'Platform' },
+  ]
+
+  run('the served example stands still from the first paint to the drawn rows', async () => {
+    const [markup, script] = String(serving).split('<script>')
+    await example(markup)
+    await idle()
+    const files = document.getElementById('files') as HTMLElement
+    const upgraded = layout(files)
+    const before = layout(await unupgraded(String(markup), files.getBoundingClientRect().width))
+    expect(before).toEqual(upgraded)
+    new Function(String(script).replace('</script>', ''))()
+    await idle()
+    expect(layout(files)).toEqual(upgraded)
+  })
+
+  run('widths in `columns`, the checkbox column and a footer stand still too', async () => {
+    await example(sized)
+    await idle()
+    const roster = document.getElementById('roster') as HTMLElement & { rows: unknown[] }
+    const upgraded = layout(roster)
+    const before = layout(await unupgraded(sized, roster.getBoundingClientRect().width))
+    expect(before).toEqual(upgraded)
+    roster.rows = people
+    await idle()
+    expect(layout(roster)).toEqual(upgraded)
+  })
+})

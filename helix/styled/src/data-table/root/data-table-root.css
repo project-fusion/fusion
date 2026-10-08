@@ -185,6 +185,13 @@
   padding-inline: var(--data-table-padding-inline, var(--helix-space-sm));
 }
 
+/* The grip heading holds nothing, and takes a grip's width anyway, so the
+   column is as wide before the rows draw their grips as after. */
+[part="grip-head"]::before {
+  content: "";
+  inline-size: 1em;
+}
+
 [part~="row"]:last-of-type [part~="select"],
 [part~="row"]:last-of-type [part="row-grip"] {
   border-block-end-color: transparent;
@@ -286,6 +293,33 @@
    the start is the one that leaves it where it was. */
 [part="pagination"] {
   margin-inline-start: auto;
+}
+
+/* **The pagination's row, kept while the rows the page served stand in.** The
+   pagination has no count to page through until the table draws its own rows,
+   so it draws nothing, and the row it takes would appear under the rows then.
+   The footer keeps its height, and the pagination its place, unseen. */
+[part="footer"][data-held] {
+  min-block-size: calc(
+    var(--pagination-size, var(--helix-size-control-tight)) +
+    var(--data-table-footer-gap, var(--helix-space-sm))
+  );
+}
+
+[part="footer"][data-held] [part="pagination"] {
+  visibility: hidden;
+}
+
+/* **One box for each of these before the table upgrades, and it is this
+   sheet's.** Without declarative shadow DOM, `helix.css` draws the checkbox
+   heading and holds the pagination's row on the host's own pseudo-elements,
+   since there is nothing else to draw them on. With it, the served root has
+   both already, and a rule from outside beats this sheet's `:host` unless
+   this one is important. */
+:host(:not(:defined))::before,
+:host(:not(:defined))::after {
+  /* biome-ignore lint/complexity/noImportantStyles: a document rule beats a shadow root's normal one, and only an important one here wins it back, before upgrade alone. */
+  content: none !important;
 }
 
 /* What a collection says instead of rows is `shared/collection/state`'s. This

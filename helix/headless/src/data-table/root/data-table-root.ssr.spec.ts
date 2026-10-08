@@ -88,11 +88,11 @@ describe('data table server output', () => {
   })
 
   /**
-   * The checkbox and grip headings wait for hydration, because the rows the
-   * page served have no cells under them: a box before the headings would set
-   * each one a column off its values until then.
+   * The checkbox and grip headings are served over their columns: each row the
+   * page served leads with a box of the same size in their place, from
+   * `helix.css`, so a heading stands over its values from the first paint.
    */
-  test('the checkbox and grip headings are not served', () => {
+  test('the checkbox and grip headings are served', () => {
     const served = rendered(
       withoutStyles(
         ssr(html`<helix-headless-data-table
@@ -105,8 +105,38 @@ describe('data table server output', () => {
       ),
       'helix-headless-data-table',
     )
-    expect(served).not.toContain('part="select-all"')
-    expect(served).not.toContain('part="grip-head"')
+    expect(served).toContain('part="select-all"')
+    expect(served).toContain('part="grip-head"')
+  })
+
+  /**
+   * **`columns` is the one track list a server can send.** It has no columns to
+   * read a `width` from, so a table sized by its own attribute is laid out at
+   * its widths from the first paint, the checkbox column ahead of them.
+   */
+  test('the track list in `columns` is served, after the checkbox column', () => {
+    const served = ssr(html`<helix-headless-data-table
+      columns="2fr 8rem"
+      label="Files"
+      row-key="name"
+      selectable
+    ></helix-headless-data-table>`)
+    expect(partTag(served, 'table')).toContain('--data-table-template: max-content 2fr 8rem')
+    expect(partTag(markup, 'table')).not.toContain('--data-table-template')
+  })
+
+  /**
+   * **The pagination's row is held on a server**, which cannot count the rows
+   * a page served: the footer says so, and the styled tier keeps its height,
+   * so nothing below moves once the rows arrive and the pagination draws.
+   */
+  test("the footer holds the pagination's row on a server", () => {
+    const paged = ssr(html`<helix-headless-data-table
+      label="Files"
+      page-size="2"
+    ></helix-headless-data-table>`)
+    expect(partTag(paged, 'footer')).toContain('data-held')
+    expect(partTag(markup, 'footer')).not.toContain('data-held')
   })
 
   test('the host writes no attributes of its own, so hydration has nothing to reconcile', () => {
