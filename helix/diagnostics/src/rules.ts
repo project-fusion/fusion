@@ -52,13 +52,21 @@ export type Rules = Partial<Record<Kind, Override | Override[]>>
 export const SHIPPED_RULES: Readonly<Record<Kind, Severity>> = {
   'dead-hook': 'error',
   'dead-part': 'error',
+  'disabled-attribute': 'error',
   'duplicate-registration': 'error',
   'invalid-value': 'error',
   'manifest-skew': 'error',
+  'primitive-token': 'error',
   'unforwarded-part': 'warn',
+  /* A warning, because a read of the code cannot see every way a page
+     registers elements: a dynamic import of a computed path, or a bundle
+     served from the page's own host. */
+  'unimported-tag': 'warn',
   'unknown-attribute': 'error',
+  'unknown-event': 'error',
   'unknown-slot': 'error',
   'unknown-tag': 'error',
+  'unknown-token': 'error',
 }
 
 const SEVERITIES = new Set(['error', 'info', 'off', 'warn'])

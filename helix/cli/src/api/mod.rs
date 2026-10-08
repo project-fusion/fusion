@@ -490,3 +490,17 @@ pub fn tokens(from: &Path, query: Option<&str>, category: Option<&str>) -> Outco
         "version": version_of(&dir),
     }))
 }
+
+/// Every semantic token name the installed token set lists, or `None` where
+/// `@fusion.dev/helix-styles` is not installed.
+pub fn token_names(from: &Path) -> Option<std::collections::HashSet<String>> {
+    let dir = installed(from, STYLES)?;
+    let set = read_json(&dir.join("dist").join("tokens.json")).ok()?;
+    Some(
+        set["tokens"]
+            .as_array()?
+            .iter()
+            .filter_map(|token| token["name"].as_str().map(str::to_owned))
+            .collect(),
+    )
+}
