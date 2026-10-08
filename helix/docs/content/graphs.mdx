@@ -430,9 +430,15 @@ leaves removing it to your framework.
   whose name starts with it, and Enter or Space selects a note.
 - In the search field, Down moves into the list, and Escape empties the search.
   With `no-panel`, Escape on an empty search closes the list.
+- The legend is a toolbar and one tab stop. Arrow keys, Home, and End move
+  between its groups, typing a letter moves to the next group whose name
+  starts with it, and Space or Enter shows or hides a group.
 - Screen readers read the selected note first, then how each other note links
   to it, such as "Linked from Roadmap". They hear the count when a search or
   the legend changes it.
+- When you select a note, in the list or in the drawing, screen readers hear
+  its name and how many notes the list holds, such as "Roadmap, Selected. 4
+  notes". A selection your page writes to `active` is not said.
 - After the arrow keys, plus, minus, or the buttons move the drawing, screen
   readers hear which way it went, such as "Moved right" or "Zoomed in".
   `connectGraph` tells the frame once the drawing has moved. If you answer

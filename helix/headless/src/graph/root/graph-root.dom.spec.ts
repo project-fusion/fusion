@@ -318,6 +318,24 @@ describe('graph frame', () => {
     expect(current()).toBe('Alpha')
   })
 
+  test('a selection a reader makes is said, with how many notes the local graph holds', async () => {
+    const host = await graph('depth="1"')
+    const live = () => part(host, 'live')?.textContent
+    /* The first row, whose id the keys stay on once it is selected. */
+    key(list(host), 'Enter')
+    await settle(host)
+    expect(host.active).toBe('a')
+    expect(live()).toBe('Alpha, Selected. 3 notes')
+    /* From the drawing, through the same request `connectGraph` makes. */
+    ;(host as Graph & { requestActive(id: string): boolean }).requestActive('d')
+    await settle(host)
+    expect(live()).toBe('Delta, Selected. 2 notes')
+    /* A selection the page writes is the page's to say. */
+    host.active = 'b'
+    await settle(host)
+    expect(live()).toBe('Delta, Selected. 2 notes')
+  })
+
   test('a new selection still reads the list from its top', async () => {
     const host = await graph()
     key(list(host), 'End')
@@ -379,7 +397,7 @@ describe('graph frame', () => {
     ]
     const host = await graph('legend', grouped)
     const legend = part(host, 'legend') as HTMLElement
-    expect(legend.getAttribute('role')).toBe('group')
+    expect(legend.getAttribute('role')).toBe('toolbar')
     expect(legend.getAttribute('aria-label')).toBe('Groups')
     const items = [...legend.querySelectorAll('button')]
     expect(items.map((item) => item.textContent?.trim())).toEqual(['alerts', 'home', 'work'])
@@ -420,6 +438,38 @@ describe('graph frame', () => {
     expect(host.hiddenGroups).toEqual([])
     expect(names(host).length).toBe(4)
     expect(part(host, 'live')?.textContent).toBe('4 notes')
+  })
+
+  test('the legend is one tab stop, and the arrows, Home, End and letters move along it without panning', async () => {
+    const grouped: GraphNode[] = [
+      { group: 'work', id: 'a', label: 'Alpha' },
+      { group: 'home', id: 'b', label: 'Bravo' },
+      { group: 'alerts', id: 'c', label: 'Charlie' },
+    ]
+    const host = await graph('legend', grouped)
+    const panned: unknown[] = []
+    host.addEventListener('helix-graph-pan', (event) => panned.push(event))
+    const items = (): HTMLButtonElement[] => [
+      ...(part(host, 'legend') as HTMLElement).querySelectorAll('button'),
+    ]
+    const stops = (): string[] => items().map((item) => item.getAttribute('tabindex') ?? '')
+    const focused = (): string => host.shadowRoot?.activeElement?.textContent?.trim() ?? ''
+    expect(stops()).toEqual(['0', '-1', '-1'])
+    items()[0]?.focus()
+    key(items()[0] as HTMLElement, 'ArrowRight')
+    await settle(host)
+    expect(focused()).toBe('home')
+    expect(stops()).toEqual(['-1', '0', '-1'])
+    key(items()[1] as HTMLElement, 'End')
+    await settle(host)
+    expect(focused()).toBe('work')
+    key(items()[2] as HTMLElement, 'ArrowRight')
+    await settle(host)
+    expect(focused()).toBe('alerts')
+    key(items()[0] as HTMLElement, 'h')
+    await settle(host)
+    expect(focused()).toBe('home')
+    expect(panned).toEqual([])
   })
 
   test('a page that cancels the filter keeps every group as it was', async () => {

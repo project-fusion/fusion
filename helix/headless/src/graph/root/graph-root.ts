@@ -1,6 +1,7 @@
 import {
   auditName,
   customElement,
+  focusItemOf,
   formatWords,
   type GraphSignalDetail,
   HelixElement,
@@ -11,11 +12,13 @@ import {
   HelixGraphReadyEvent,
   HelixGraphSignalEvent,
   HelixGraphZoomEvent,
+  KeyboardNavigationController,
   MixinControllerActive,
   MixinViewport,
   scrollItemIntoView,
   scrollRoom,
   Typeahead,
+  typeaheadBy,
   type ViewportPanDetail,
   type ViewportZoomDetail,
   VirtualizeController,
@@ -63,7 +66,9 @@ import {
  *
  * Set `legend` to name the groups over the drawing, each a button that shows
  * or hides its notes. `hiddenGroups` holds the groups turned off, and the
- * list holds only what the drawing shows.
+ * list holds only what the drawing shows. The legend is a toolbar and one tab
+ * stop: the arrow keys, Home, End and a group's first letters move between
+ * its buttons, and Space or Enter presses one.
  *
  * `nodes` and `links` are properties, never markup: a graph of ten thousand
  * notes as ten thousand elements would cost what the renderer exists to save.
@@ -116,7 +121,7 @@ import {
  * @csspart gesture-hint - Words over the graph for a moment when it lets a gesture pass to the page, such as how to zoom it.
  * @csspart gesture-status - The line shown while a graph with `gestures="activate"` has the gestures.
  * @csspart header - The strip above the graph.
- * @csspart legend - The groups over the drawing, with `legend`, each a button that shows or hides its notes.
+ * @csspart legend - The groups over the drawing, with `legend`: a toolbar of buttons, each showing or hiding its notes, which is one tab stop.
  * @csspart legend-item - One group in the legend, pressed while its notes are shown. Carries `data-tone` where every note in the group has the same tone, which colors the notes over the group's own color.
  * @csspart legend-item-hidden - A group in the legend whose notes are hidden.
  * @csspart legend-swatch - The mark in a group's color, before its name.
@@ -409,6 +414,33 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   /** Whether the next change of the list's rows is one a reader asked for by the legend, whose count is then said. */
   private countAsked = false
 
+  /**
+   * The note a reader last asked to select, in the list or in the drawing,
+   * until it is selected: by the frame, or by a page that refused the request
+   * and wrote `active` itself.
+   */
+  private selectionAsked: string | undefined
+
+  /** The legend's button that holds its one tab stop, by place: the one a reader was last on, or the first. */
+  @state()
+  private legendStop = 0
+
+  /**
+   * The arrow keys, Home, End and typed letters among the legend's buttons,
+   * so a legend of twelve groups is one tab stop, as the `Legend` family's
+   * toolbar is. Only a press that starts on a legend button moves: the frame's
+   * own arrows pan the drawing, and the list's walk the notes.
+   */
+  protected readonly legendKeys = new KeyboardNavigationController(this, {
+    items: () =>
+      [
+        ...(this.renderRoot?.querySelectorAll?.<HTMLButtonElement>('[part~="legend-item"]') ?? []),
+      ].map((button) => focusItemOf(button, { words: button.textContent?.trim() ?? '' })),
+    origin: 'focus',
+    selects: () => false,
+    typeahead: typeaheadBy((item) => (item as { words?: string }).words ?? ''),
+  })
+
   private readonly virtualize = new VirtualizeController(this, {
     container: () => this.partNamed('list'),
     count: () => this.entries.length,
@@ -583,6 +615,19 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
         this.countAsked = false
         this.say(this.countText())
       }
+      /* **A selection a reader made is said**: the note, and how many notes
+         the list then holds, since `depth` narrows it to the local graph. A
+         reader selecting in the drawing is away from the list, and one
+         pressing the first row kept the same row under the keys, so a screen
+         reader heard nothing either way. A selection the page writes is the
+         page's to say. */
+      if (changed.has('active') && this.active !== '' && this.active === this.selectionAsked) {
+        this.selectionAsked = undefined
+        const chosen = this.nodes.find((node) => node.id === this.active)
+        if (chosen) {
+          this.say(`${nameOf(chosen)}, ${this.selectedLabel}. ${this.countText()}`)
+        }
+      }
     }
   }
 
@@ -664,20 +709,36 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       return nothing
     }
     const hidden = new Set(this.hiddenGroups)
-    return html`<div part="legend" role="group" aria-label=${this.legendLabel}>
-      ${this.groups.map(({ name, tone }) => {
+    const stop = Math.min(this.legendStop, this.groups.length - 1)
+    /* **A toolbar**, the role that says the arrows move among its buttons,
+       and one tab stop: a group of twelve buttons was twelve stops between
+       the controls and the list. */
+    return html`<div part="legend" role="toolbar" aria-label=${this.legendLabel}>
+      ${this.groups.map(({ name, tone }, index) => {
         const shown = !hidden.has(name)
         return html`<button
           part="legend-item${shown ? '' : ' legend-item-hidden'}"
           type="button"
+          tabindex=${index === stop ? '0' : '-1'}
           aria-pressed=${shown ? 'true' : 'false'}
           data-tone=${tone ?? nothing}
           @click=${() => this.toggleGroup(name)}
+          @focus=${() => {
+            this.legendStop = index
+          }}
         >
           <span part="legend-swatch" aria-hidden="true"></span>${name}
         </button>`
       })}
     </div>`
+  }
+
+  /** Asks for a note to be selected, and remembers the ask, so the selection is said once it lands. */
+  override requestActive(next: string, cause?: string): boolean {
+    if (next !== this.active) {
+      this.selectionAsked = next
+    }
+    return super.requestActive(next, cause)
   }
 
   /** Selects the note a row names, through the request a page can refuse. */
