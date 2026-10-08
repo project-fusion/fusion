@@ -342,7 +342,21 @@ describe('ranges and replacing', () => {
     expect(list.value).toBe('a,b,e')
     key(cell(a), ' ', { shiftKey: true })
     await settle(list)
-    expect(list.value).toBe('a,b,e,d')
+    expect(list.value).toBe('a,b,d,e')
+  })
+
+  test('writes its value in row order, whatever order the rows were chosen in, as Data Table does', async () => {
+    const list = await rows5()
+    const [a, , , d] = list.rows as [Row, Row, Row, Row]
+    const asked: string[] = []
+    list.addEventListener('helix-before-change', (event) =>
+      asked.push((event as CustomEvent<{ value: string }>).detail.value),
+    )
+    click(cell(d))
+    click(cell(a))
+    await settle(list)
+    expect(asked).toEqual(['d', 'a,d'])
+    expect(list.value).toBe('a,d')
   })
 
   test('Control or Command with A selects every row a key can reach', async () => {
@@ -431,7 +445,7 @@ describe('ranges and replacing', () => {
     expect(list.value).toBe('d')
     click(cell(a), { metaKey: true })
     await settle(list)
-    expect(list.value).toBe('d,a')
+    expect(list.value).toBe('a,d')
   })
 
   test('a row is named by its label and described by its description, not its controls', async () => {
