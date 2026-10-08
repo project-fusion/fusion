@@ -268,6 +268,18 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
+      # **The bundle sizes the last run measured.** `metrics` looks each bundle
+      # up here before it compresses one, and `build-metrics.mjs` says why a
+      # stored size cannot be stale. A turbo miss restores no outputs, so
+      # without this cache a change to one family compressed every family
+      # again. The key never matches exactly. The prefix finds the newest entry
+      # that this branch or `main` saved.
+      - name: Restore the measured bundle sizes
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: metrics-sizes-${{ runner.os }}-${{ runner.arch }}-${{ github.run_id }}
+          path: .local/metrics/sizes.json
+          restore-keys: metrics-sizes-${{ runner.os }}-${{ runner.arch }}-
       # `bunx`, because `turbo` is a workspace binary and a `run:` step does not
       # get the PATH `bun run` arranges: bare `turbo` here is exit 127.
       #
@@ -277,6 +289,18 @@ jobs:
       # builds itself.
       - name: Build, and write the manifests and the catalog
         run: bunx turbo run build analyze catalog
+      # Saved from every branch. The file is about 40 KB, and the next push to
+      # the same pull request is the run most likely to find its bundles in
+      # it. It holds the sizes of one page, so it does not grow.
+      - name: Look for the measured bundle sizes
+        id: sizes
+        run: if [ -f .local/metrics/sizes.json ]; then echo "found=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Save the measured bundle sizes
+        if: steps.sizes.outputs.found == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: metrics-sizes-${{ runner.os }}-${{ runner.arch }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .local/metrics/sizes.json
 
   # **The part of the build the browser jobs render, on its own.** They read the
   # frame and the spec bundles and nothing else of the site, and those wait for
