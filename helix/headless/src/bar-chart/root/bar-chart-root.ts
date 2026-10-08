@@ -31,6 +31,14 @@ import { type StackEnd, stackEnds, stackedReadings, stackFarEnds, stackSpans } f
 import '../../tooltip/index.js'
 
 /**
+ * A cell's `data-tone`, where it is a name a custom property can carry, or
+ * `undefined`. The name is written into a `style` attribute, so anything but
+ * letters, digits, and hyphens is refused rather than read as more CSS.
+ */
+const toned = (tone: string | undefined): string | undefined =>
+  tone && /^[a-z][a-z0-9-]*$/.test(tone) ? tone : undefined
+
+/**
  * @summary A chart that draws a table's categories as columns.
  *
  * @description
@@ -144,7 +152,13 @@ import '../../tooltip/index.js'
  *
  * @cssproperty --bar-chart-axis - The width of an axis, in `ch`, set from the widest number on it. The chart sets it on the axis itself, and only when the categories run along the bottom. In a horizontal chart the axis is a row, one line high.
  * @cssproperty --bar-chart-secondary - The color of the secondary axis, when one series is on it. The chart sets it from that series' `--chart-series-*` property, so the axis is drawn in whatever color that property resolves to.
- * @cssproperty --bar-chart-tone-primary - The color of a bar whose cell says `data-tone="primary"`. A tone with no property of its own falls back to the bar's series color, and the same holds for `accent`, `info`, `success`, `warning`, `danger`, and `muted`, and for a name you define.
+ * @cssproperty --bar-chart-tone-primary - The color of a bar whose cell says `data-tone="primary"`. A tone with no property of its own falls back to the bar's series color, and the same holds for a name you define.
+ * @cssproperty --bar-chart-tone-accent - The color of a bar whose cell says `data-tone="accent"`.
+ * @cssproperty --bar-chart-tone-info - The color of a bar whose cell says `data-tone="info"`.
+ * @cssproperty --bar-chart-tone-success - The color of a bar whose cell says `data-tone="success"`.
+ * @cssproperty --bar-chart-tone-warning - The color of a bar whose cell says `data-tone="warning"`.
+ * @cssproperty --bar-chart-tone-danger - The color of a bar whose cell says `data-tone="danger"`.
+ * @cssproperty --bar-chart-tone-muted - The color of a bar whose cell says `data-tone="muted"`.
  * @cssproperty --chart-bar-wash - The gradient for a bar, named per bar so the styled
  *   tier can use it as the `fill`. It is always drawn, and used only when
  *   `wash="gradient"` is set.
@@ -153,14 +167,6 @@ import '../../tooltip/index.js'
  * @cssstate empty - While the `empty` part stands in the plot.
  * @cssstate loading - While the `loading` part stands in the plot.
  */
-/**
- * A cell's `data-tone`, where it is a name a custom property can carry, or
- * `undefined`. The name is written into a `style` attribute, so anything but
- * letters, digits, and hyphens is refused rather than read as more CSS.
- */
-const toned = (tone: string | undefined): string | undefined =>
-  tone && /^[a-z][a-z0-9-]*$/.test(tone) ? tone : undefined
-
 @customElement('helix-headless-bar-chart')
 export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
   /**
