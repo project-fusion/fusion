@@ -214,7 +214,7 @@ export class HelixBarChart extends HelixHeadlessBarChart {
     const outlined = slots(this.outlined)
     const subtle = slots(this.subtle)
     const glass = slots(this.glass)
-    for (const bar of this.renderRoot.querySelectorAll<SVGRectElement>('[part="bar"]')) {
+    for (const bar of this.renderRoot.querySelectorAll<SVGRectElement>('[part~="bar"]')) {
       const at = Number(bar.dataset.series)
       mark(bar, 'emphasis', outlined.has(at) ? 'outlined' : subtle.has(at) ? 'subtle' : undefined)
       mark(bar, 'material', glass.has(at) ? 'glass' : undefined)

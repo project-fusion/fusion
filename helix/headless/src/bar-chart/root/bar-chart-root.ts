@@ -27,7 +27,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-import { stackEnds, stackedReadings, stackSpans } from '../stack.js'
+import { type StackEnd, stackEnds, stackedReadings, stackFarEnds, stackSpans } from '../stack.js'
 import '../../tooltip/index.js'
 
 /**
@@ -100,7 +100,8 @@ import '../../tooltip/index.js'
  *
  * @csspart axis - The numbers of one scale: the primary under `value-axis`, and both when `secondary` splits the chart into two scales.
  * @csspart band - The category band under the pointer.
- * @csspart bar - One column.
+ * @csspart bar - One column. Under `stacked`, one segment of a category's column.
+ * @csspart bar-end - Under `stacked`, the segment at a column's far end: the last positive segment above zero and the last negative one below it. Its `data-end` is `positive` or `negative`. A blank or a zero segment is never the end. Set together with `bar`.
  * @csspart bar-wash-end - The far stop of a bar's gradient, where one is used.
  * @csspart bar-wash-start - The stop of a bar's gradient at its base.
  * @csspart baseline - The line the columns stand on.
@@ -554,6 +555,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       tone: number,
       scale: (value: number) => number,
       from?: number,
+      end?: StackEnd,
     ): TemplateResult => {
       const at = scale(value)
       const base = from === undefined ? floor : scale(from)
@@ -566,19 +568,21 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       const across = index * slot + slot * 0.14 + depth * stride + gap / 2
       return sideways
         ? svg`<rect
+            data-end=${end ?? nothing}
             data-series=${seriesIndex(tone)}
             height=${thickness}
             style="--chart-series: var(--chart-series-${seriesIndex(tone)}); --chart-bar-wash: url(#helix-bar-wash-${seriesIndex(tone)})"
-            part="bar"
+            part="bar${end ? ' bar-end' : ''}"
             width=${size}
             x=${along}
             y=${across}
           />`
         : svg`<rect
+            data-end=${end ?? nothing}
             data-series=${seriesIndex(tone)}
             height=${size}
             style="--chart-series: var(--chart-series-${seriesIndex(tone)}); --chart-bar-wash: url(#helix-bar-wash-${seriesIndex(tone)})"
-            part="bar"
+            part="bar${end ? ' bar-end' : ''}"
             width=${thickness}
             x=${across}
             y=${along}
@@ -690,15 +694,21 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       tone: number,
       scale: (value: number) => number,
       from?: number,
+      end?: StackEnd,
     ) => TemplateResult,
   ): TemplateResult[] {
     const scales = [...new Set(columns.map(({ one }) => against(one)))]
     return scales.flatMap((scale) => {
       const mine = columns.filter(({ one }) => against(one) === scale)
-      const spans = stackSpans(mine.map(({ slots }) => slots[index]?.value))
+      const values = mine.map(({ slots }) => slots[index]?.value)
+      const spans = stackSpans(values)
+      /* The stylesheet rounds a bar at its far end. In a stack only the
+         outermost segment in each direction has a far end, and the segments
+         between meet square. */
+      const ends = stackFarEnds(values)
       return mine.flatMap(({ tone }, place) => {
         const span = spans[place]
-        return span === undefined ? [] : [bar(span[1], index, 0, tone, scale, span[0])]
+        return span === undefined ? [] : [bar(span[1], index, 0, tone, scale, span[0], ends[place])]
       })
     })
   }

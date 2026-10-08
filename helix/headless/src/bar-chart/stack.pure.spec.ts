@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { stackEnds, stackedReadings, stackSpans } from './stack.js'
+import { stackEnds, stackedReadings, stackFarEnds, stackSpans } from './stack.js'
 
 describe('a stack of columns', () => {
   test('stands each positive reading on the ones before it', () => {
@@ -40,6 +40,40 @@ describe('a stack of columns', () => {
         ]),
       ),
     ).toBe(-2)
+  })
+})
+
+describe('the far ends of a stack', () => {
+  test('is the last positive segment when every reading is positive', () => {
+    expect(stackFarEnds([3, 4, 2])).toEqual([undefined, undefined, 'positive'])
+  })
+
+  test('is the last negative segment when every reading is negative', () => {
+    expect(stackFarEnds([-3, -4, -2])).toEqual([undefined, undefined, 'negative'])
+  })
+
+  test('is one segment in each direction when the stack grows both ways', () => {
+    expect(stackFarEnds([3, -2, 4, -1, 1])).toEqual([
+      undefined,
+      undefined,
+      undefined,
+      'negative',
+      'positive',
+    ])
+  })
+
+  test('skips a blank or a zero after the end', () => {
+    expect(stackFarEnds([3, 4, undefined, 0])).toEqual([
+      undefined,
+      'positive',
+      undefined,
+      undefined,
+    ])
+    expect(stackFarEnds([-3, 0, undefined])).toEqual(['negative', undefined, undefined])
+  })
+
+  test('has no end when nothing has length', () => {
+    expect(stackFarEnds([0, undefined])).toEqual([undefined, undefined])
   })
 })
 

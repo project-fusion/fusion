@@ -47,16 +47,36 @@
  * zero. There is no per-corner radius on an SVG rect, so the shape is drawn
  * square and the corners are taken off with a clip.
  */
-[part="bar"] {
+[part~="bar"] {
   --_bar-chart-corners: var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0 0;
   --_bar-chart-base: 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) / 2) 0;
   clip-path: inset(var(--_bar-chart-foot, 0) round var(--_bar-chart-corners));
   fill: var(--_bar-chart-series);
 }
 
-:host([orientation="horizontal"]) [part="bar"] {
+:host([orientation="horizontal"]) [part~="bar"] {
   --_bar-chart-corners: 0 var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px) 0;
   --_bar-chart-base: 0 0 0 calc(var(--bar-chart-bar-stroke, var(--helix-border-thick)) / 2);
+}
+
+/*
+ *  A stack is one column, so only its far ends are rounded.
+ *
+ * Rounding every segment cuts a notch at each join. The headless tier marks
+ * the outermost segment in each direction as `bar-end`, and the segments
+ * between meet square. The end below zero grows the other way, so its round
+ * corners are the bottom ones, or the left ones when the bars run across.
+ */
+:host([stacked]) [part~="bar"]:not([part~="bar-end"]) {
+  --_bar-chart-corners: 0;
+}
+
+:host([stacked]) [part~="bar-end"][data-end="negative"] {
+  --_bar-chart-corners: 0 0 var(--bar-chart-bar-radius, 2px) var(--bar-chart-bar-radius, 2px);
+}
+
+:host([stacked][orientation="horizontal"]) [part~="bar-end"][data-end="negative"] {
+  --_bar-chart-corners: var(--bar-chart-bar-radius, 2px) 0 0 var(--bar-chart-bar-radius, 2px);
 }
 
 [part="labels"] {
@@ -126,7 +146,7 @@
  * time. `data-series` stays, because it is what a spec asserts and what a
  * document rule reaching in through the light DOM would still use.
  */
-[part="bar"],
+[part~="bar"],
 [part="line"] {
   --_bar-chart-series: var(--chart-series);
 }
@@ -152,7 +172,7 @@
  * `decelerate` is monotonic, so every frame is a value between where the reading
  * was and where it is.
  */
-[part="bar"] {
+[part~="bar"] {
   transition:
     height var(--helix-duration-normal) var(--helix-easing-decelerate),
     width var(--helix-duration-normal) var(--helix-easing-decelerate),
@@ -161,12 +181,12 @@
 }
 
 @starting-style {
-  :host(:not([orientation="horizontal"])) [part="bar"] {
+  :host(:not([orientation="horizontal"])) [part~="bar"] {
     height: 0;
     y: 100;
   }
 
-  :host([orientation="horizontal"]) [part="bar"] {
+  :host([orientation="horizontal"]) [part~="bar"] {
     width: 0;
   }
 }
@@ -363,7 +383,7 @@
  *    every pairing of the two axes, which is the cross product a second axis
  *    exists to avoid.
  */
-[part="bar"] {
+[part~="bar"] {
   fill-opacity: calc(var(--_bar-chart-area, 1) * var(--_bar-chart-through, 1));
   stroke-opacity: var(--_bar-chart-through, 1);
 }
@@ -391,8 +411,8 @@
  * stretched by however wide the element is, and a 1.5 draws as a band uneven
  * between the vertical edges and the horizontal ones.
  */
-[part="bar"][data-emphasis="outlined"],
-:host([emphasis="outlined"]) [part="bar"]:not([data-emphasis]) {
+[part~="bar"][data-emphasis="outlined"],
+:host([emphasis="outlined"]) [part~="bar"]:not([data-emphasis]) {
   /* **No line across the base.** A bar grows from the baseline and is measured
      against the rule there; an edge across the base draws a second rule a stroke
      inside the real one.
@@ -412,8 +432,8 @@
 
 /* A wash under the same edge, which is the quiet end of the axis: the column
    keeps its area and its boundary and stops claiming to be the point. */
-[part="bar"][data-emphasis="subtle"],
-:host([emphasis="subtle"]) [part="bar"]:not([data-emphasis]) {
+[part~="bar"][data-emphasis="subtle"],
+:host([emphasis="subtle"]) [part~="bar"]:not([data-emphasis]) {
   --_bar-chart-area: 0.2;
 
   /* The base, for the reason `outlined` gives above it. */
@@ -423,7 +443,7 @@
   vector-effect: non-scaling-stroke;
 }
 
-[part="bar"] {
+[part~="bar"] {
   --_bar-chart-shade: color-mix(
     in oklab,
     var(--_bar-chart-series) 60%,
@@ -437,8 +457,8 @@
  *    what a material policy exists to stop. The gridlines read through, which is
  *    what translucency is *for* here rather than decoration.
  */
-[part="bar"][data-material="glass"],
-:host([material="glass"]) [part="bar"]:not([data-material]) {
+[part~="bar"][data-material="glass"],
+:host([material="glass"]) [part~="bar"]:not([data-material]) {
   --_bar-chart-through: calc(0.62 * var(--helix-material-opacity));
 }
 /* `frosted` admits less, which on a mark is more ink rather than more ground.
@@ -449,12 +469,12 @@
 
    **Chart-wide only, and there is no per-bar arm.** The per-series material
    property is `glass`, which writes `data-material="glass"` or nothing, so a
-   `[part="bar"][data-material="frosted"]` beside the selector below was a rule
+   `[part~="bar"][data-material="frosted"]` beside the selector below was a rule
    nothing could ever satisfy: valid CSS matching nothing, no error and no
    warning, which is the failure the conventions call out by name. Adding one
    wants a second per-series property rather than a selector, and `glass` is the
    point of the axis a chart reaches for. */
-:host([material="frosted"]) [part="bar"]:not([data-material]) {
+:host([material="frosted"]) [part~="bar"]:not([data-material]) {
   --_bar-chart-through: calc(0.88 * var(--helix-material-opacity));
 }
 
@@ -464,7 +484,7 @@
  *    names, and pointed at per bar because CSS cannot build a fragment id from a
  *    variable.
  */
-:host([wash="gradient"]) [part="bar"] {
+:host([wash="gradient"]) [part~="bar"] {
   fill: var(--chart-bar-wash);
 }
 
