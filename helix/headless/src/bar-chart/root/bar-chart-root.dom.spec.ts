@@ -397,7 +397,18 @@ describe('stacked', () => {
       [...(host.shadowRoot?.querySelectorAll('[part~="group"]') ?? [])].map((group) =>
         [...group.querySelectorAll('[part~="bar"]')].map((one) => {
           const end = (one.getAttribute('data-end') ?? '-') as keyof typeof PARTS
-          return one.getAttribute('part') === PARTS[end] ? end : `mismatch ${end}`
+          const named = one.getAttribute('part')?.replace(' bar-negative', '')
+          return named === PARTS[end] ? end : `mismatch ${end}`
+        }),
+      )
+    /* Each category's segments: `-` below zero, `+` above it, `0` with no
+       length. Only the far end was marked, so an outlined segment below zero
+       in the middle of a stack left open the wrong edge. */
+    const signs = (host: HTMLElement): string[][] =>
+      [...(host.shadowRoot?.querySelectorAll('[part~="group"]') ?? [])].map((group) =>
+        [...group.querySelectorAll('[part~="bar"]')].map((one) => {
+          const below = one.matches('[part~="bar-negative"]')
+          return below ? '-' : Number(one.getAttribute('height')) > 0 ? '+' : '0'
         }),
       )
     const table = (rows: string): string => `<table id="signs">
@@ -454,6 +465,33 @@ describe('stacked', () => {
         'for="signs" stacked orientation="horizontal"',
       )
       expect(ends(host)).toEqual([['-', 'negative', 'positive']])
+    })
+
+    test('every segment below zero is marked by its sign, at the end or not', async () => {
+      const host = await chart(
+        table(
+          '<tr><th>Q1</th><td>-3</td><td>-4</td><td>-2</td></tr><tr><th>Q2</th><td>3</td><td>-2</td><td>0</td></tr>',
+        ),
+        'for="signs" stacked',
+      )
+      expect(signs(host)).toEqual([
+        ['-', '-', '-'],
+        ['+', '-', '0'],
+      ])
+      const first = host.shadowRoot?.querySelector('[part~="bar"]')
+      expect(first?.getAttribute('part')).toBe('bar bar-negative')
+    })
+
+    test('every column below zero when they stand side by side', async () => {
+      const host = await chart(
+        table('<tr><th>Q1</th><td>3</td><td>-4</td><td>0</td></tr>'),
+        'for="signs"',
+      )
+      expect(signs(host)).toEqual([['+', '-', '0']])
+      const parts = [...(host.shadowRoot?.querySelectorAll('[part~="bar"]') ?? [])].map((one) =>
+        one.getAttribute('part'),
+      )
+      expect(parts).toEqual(['bar bar-end', 'bar bar-negative bar-end bar-end-negative', 'bar'])
     })
 
     /* A column alone is its own far end. A negative one was rounded at its
