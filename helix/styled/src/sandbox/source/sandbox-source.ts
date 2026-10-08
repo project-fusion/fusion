@@ -14,6 +14,7 @@ import { html, nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { drawnRuns, type SandboxToken, type SandboxTokenizer } from '../tokens.js'
 import {
+  breakLine,
   type Completions,
   closeBracket,
   deletePair,
@@ -155,8 +156,9 @@ const quietOf = (runs: readonly SandboxToken[], length: number): Uint8Array => {
  * that wraps keeps one number. The numbers are drawn, and hidden from screen
  * readers, which read the field.
  *
- * Enter keeps the indentation of the line it breaks, and the new line is
- * undone with the next undo as typing is.
+ * Enter keeps the indentation of the line it breaks, one level deeper after
+ * an opening bracket, and puts the closing bracket of an empty pair on a line
+ * of its own. The new line is undone with the next undo as typing is.
  *
  * **The editing keys are CodeMirror's.** Tab with text selected indents every
  * line the selection touches. `Mod+]` indents the lines and `Mod+[` outdents
@@ -695,17 +697,16 @@ export class HelixSandboxSource extends HelixElement {
   }
 
   /**
-   * Breaks the line with the indentation it has, where it has some. A line at
-   * the margin is left to the platform's own Enter.
+   * Breaks the line with the indentation it has, one level deeper after an
+   * opening bracket. A line at the margin with no bracket is left to the
+   * platform's own Enter.
    */
   private breakLine(event: KeyboardEvent): void {
     const field = event.target as HTMLTextAreaElement
-    const at = field.selectionStart ?? 0
-    const start = field.value.lastIndexOf('\n', at - 1) + 1
-    const indent = /^[ \t]*/.exec(field.value.slice(start, at))?.[0] ?? ''
-    if (indent !== '') {
+    const change = breakLine(field.value, field.selectionStart, field.selectionEnd)
+    if (change) {
       event.preventDefault()
-      this.insert(field, `\n${indent}`)
+      this.apply(field, change)
     }
   }
 

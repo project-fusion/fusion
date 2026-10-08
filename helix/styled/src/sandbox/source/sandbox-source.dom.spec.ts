@@ -401,13 +401,23 @@ describe('a new line', () => {
     expect(host.value).toBe('p {\n  color: red;\n  ')
   })
 
-  test('is the platform’s own where the line has no indentation', async () => {
+  test('is the platform’s own where the line has no indentation and no bracket opens', async () => {
     const host = await source()
     const field = part(host, 'source') as HTMLTextAreaElement
-    field.value = 'p {'
-    field.selectionStart = 3
-    field.selectionEnd = 3
+    field.value = 'p'
+    field.selectionStart = 1
+    field.selectionEnd = 1
     expect(press(field, 'Enter').defaultPrevented).toBe(false)
+  })
+
+  test('goes one level deeper after an opening bracket, with the closing one below', async () => {
+    const host = await source('value="p {}"')
+    await host.updateComplete
+    const field = part(host, 'source') as HTMLTextAreaElement
+    field.setSelectionRange(3, 3)
+    expect(press(field, 'Enter').defaultPrevented).toBe(true)
+    expect(host.value).toBe('p {\n  \n}')
+    expect(field.selectionStart).toBe(6)
   })
 })
 
