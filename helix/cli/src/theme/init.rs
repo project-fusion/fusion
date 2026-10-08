@@ -7,6 +7,8 @@ use fusion_rules::exit::Code;
 
 use crate::args::Init;
 use crate::config::FILE;
+use crate::theme::modes;
+use fusion_helix_theme::intent::ThemeIntent;
 
 /// # Errors
 ///
@@ -46,6 +48,21 @@ pub fn run(args: &Init, from: &Path, json: bool) -> Outcome<Code> {
     that ignores the key. Serde's `deny_unknown_fields` does not compose with
     `flatten`, so allowing one key through costs the typo-catching that is the
     reason unknown keys are refused. Both halves land together or neither. */
+    /* **The brand is read before anything is written**, by the same reader
+    `build` uses. A starter file holding a brand the engine cannot read is a
+    file every later command refuses, and the refusal arrives one command after
+    the mistake. */
+    if let Some(brand) = &args.brand {
+        let intent: ThemeIntent = serde_json::from_value(serde_json::json!({ "brand": brand }))
+            .map_err(|failure| {
+                Failure::input(format!("cannot use --brand {brand}"), failure.to_string())
+            })?;
+        modes(&intent).map_err(|failure| {
+            Failure::input(format!("cannot use --brand {brand}"), failure.to_string())
+                .hint("helix theme init --brand '#0b3d91'")
+        })?;
+    }
+
     let starter = match &args.brand {
         Some(brand) => format!("{{\n  \"brand\": \"{brand}\"\n}}\n"),
         None => "{}\n".to_owned(),
@@ -58,7 +75,7 @@ pub fn run(args: &Init, from: &Path, json: bool) -> Outcome<Code> {
     })?;
 
     if json {
-        println!(
+        fusion_rules::say!(
             "{}",
             serde_json::json!({ "brand": args.brand, "written": path.display().to_string() })
         );

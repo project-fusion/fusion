@@ -428,7 +428,7 @@ pub fn diff(args: &ManifestDiff, from: &Path, json: bool) -> Result<Code, Failur
                 |one| serde_json::json!({ "after": one.after, "at": one.at, "before": one.before }),
             )
             .collect();
-        println!(
+        fusion_rules::say!(
             "{:#}",
             serde_json::json!({ "differences": rows, "same": found.is_empty() })
         );
@@ -440,7 +440,7 @@ pub fn diff(args: &ManifestDiff, from: &Path, json: bool) -> Result<Code, Failur
     }
 
     if found.is_empty() {
-        println!("manifest: the two say the same thing");
+        fusion_rules::say!("manifest: the two say the same thing");
         return Ok(Code::Ok);
     }
 
@@ -450,21 +450,21 @@ pub fn diff(args: &ManifestDiff, from: &Path, json: bool) -> Result<Code, Failur
         args.limit.min(found.len())
     };
     for one in found.iter().take(shown) {
-        println!("  {}", one.at);
+        fusion_rules::say!("  {}", one.at);
         match (&one.before, &one.after) {
             (Some(was), Some(is)) => {
-                println!("    was  {was}");
-                println!("    now  {is}");
+                fusion_rules::say!("    was  {was}");
+                fusion_rules::say!("    now  {is}");
             }
-            (Some(was), None) => println!("    was  {was}, and is gone"),
-            (None, Some(is)) => println!("    new  {is}"),
+            (Some(was), None) => fusion_rules::say!("    was  {was}, and is gone"),
+            (None, Some(is)) => fusion_rules::say!("    new  {is}"),
             (None, None) => {}
         }
     }
     if shown < found.len() {
-        println!("  … and {} more", found.len() - shown);
+        fusion_rules::say!("  … and {} more", found.len() - shown);
     }
-    println!(
+    fusion_rules::say!(
         "manifest: {} difference(s) between {} and {}",
         found.len(),
         args.before.display(),
@@ -513,7 +513,7 @@ pub fn generate(args: &ManifestBuild, from: &Path, _json: bool) -> Result<Code, 
     a person looking at what a layer produced, and neither is served by one
     line of six megabytes. */
     let given = args.package.to_string_lossy().replace('\\', "/");
-    println!(
+    fusion_rules::say!(
         "{:#}",
         build::build(&package, &given, &args.tier, &dependencies)
     );

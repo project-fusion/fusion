@@ -134,7 +134,7 @@ pub fn audit(
     let reports = measure(&selected, &context);
 
     if json {
-        println!("{:#}", said(&reports, listed));
+        fusion_rules::say!("{:#}", said(&reports, listed));
         return Ok(verdict(&reports));
     }
     told(&register);
@@ -168,7 +168,7 @@ pub fn audit(
     for (rule, report) in &reports {
         /* Padded before painting: a width applies to bytes, and an escape
         sequence is bytes that occupy no column. */
-        println!(
+        fusion_rules::say!(
             "{} {}{} {} checked",
             if report.ok() { " " } else { "x" },
             paint.bold(&format!("{:<width$}", rule.name)),
@@ -180,21 +180,21 @@ pub fn audit(
         .iter()
         .filter(|(_, report)| !report.notes.is_empty())
     {
-        println!();
-        println!(
+        fusion_rules::say!();
+        fusion_rules::say!(
             "{} {}",
             paint.bold(rule.name),
             paint.dim(&format!("{} noted, not failing", report.notes.len()))
         );
         for note in &report.notes {
-            println!("  {note}");
+            fusion_rules::say!("  {note}");
         }
     }
-    println!();
+    fusion_rules::say!();
     speak(&reports, paint);
     let code = verdict(&reports);
     if code == Code::Ok {
-        println!(
+        fusion_rules::say!(
             "{NOUN}: {} rule{}, every one clean",
             reports.len(),
             if reports.len() == 1 { "" } else { "s" }
@@ -213,7 +213,7 @@ pub fn check(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code
     } = prepare(args, from)?;
     let reports = measure(&selected, &context);
     if json {
-        println!("{:#}", said(&reports, listed));
+        fusion_rules::say!("{:#}", said(&reports, listed));
         return Ok(verdict(&reports));
     }
     /* **Even here, where silence is the shape of success.** What `check` is
@@ -245,7 +245,7 @@ pub fn fix(args: &Rules, from: &Path, json: bool, paint: Paint) -> Result<Code, 
 /// The register, one line per module, before anything is measured.
 fn told(register: &[String]) {
     for line in register {
-        println!("{line}");
+        fusion_rules::say!("{line}");
     }
 }
 

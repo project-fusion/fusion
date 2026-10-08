@@ -530,11 +530,11 @@ pub fn run(args: &Scan, from: &Path, json: bool, paint: Paint) -> Outcome<Code> 
         })?;
     }
     if json {
-        println!("{run}");
+        fusion_rules::say!("{run}");
     } else {
         print(&run, paint);
         for note in notes(&read.coverage, &usage, weight.as_ref(), args.out.as_deref()) {
-            println!("{}", paint.dim(&note));
+            fusion_rules::say!("{}", paint.dim(&note));
         }
     }
     let failed = run["findings"].as_array().is_some_and(|findings| {
@@ -568,7 +568,7 @@ fn print(run: &Value, paint: Paint) {
             "file"
         ),
     );
-    println!(
+    fusion_rules::say!(
         "{}",
         if of("error") + of("warn") > 0 {
             paint.fail(&heading)
@@ -586,13 +586,13 @@ fn print(run: &Value, paint: Paint) {
                 .map(|entry| ("unsettled".to_owned(), entry)),
         );
     for (label, entry) in labeled {
-        println!(
+        fusion_rules::say!(
             "  {} {}",
             paint.bold(&format!("{label} {}", text(entry, "kind"))),
             text(entry, "subject")
         );
-        println!("    {}", text(entry, "message"));
-        println!(
+        fusion_rules::say!("    {}", text(entry, "message"));
+        fusion_rules::say!(
             "    {}",
             paint.dim(&format!(
                 "in {}:{}",

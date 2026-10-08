@@ -981,6 +981,7 @@ dependencies = [
 name = "fusion-rules"
 version = "0.0.0-dev"
 dependencies = [
+ "clap",
  "ratatui",
  "serde",
  "serde_json",

@@ -211,7 +211,7 @@ impl Verb {
 }
 
 fn main() {
-    let cli = Cli::parse();
+    let cli: Cli = fusion_rules::args::parse(PRODUCT);
     let paint = if cli.json {
         Paint::never()
     } else {
@@ -307,7 +307,7 @@ fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
     per module is what stops one arriving without anybody noticing. */
     if !cli.json {
         for line in &register {
-            println!("{line}");
+            fusion_rules::say!("{line}");
         }
     }
 
@@ -371,7 +371,7 @@ fn report(
         if let Some(fields) = said.as_object_mut() {
             fields.insert("plugins".to_owned(), listed.clone());
         }
-        println!("{said:#}");
+        fusion_rules::say!("{said:#}");
         return Ok(verdict(&reports));
     }
 
@@ -402,7 +402,7 @@ fn report(
             } else {
                 paint.fail("x")
             };
-            println!(
+            fusion_rules::say!(
                 "{mark} {}{} {} checked",
                 paint.bold(&format!("{:<15}", rule.name)),
                 report.checked,
@@ -416,17 +416,17 @@ fn report(
             .iter()
             .filter(|(_, report)| !report.notes.is_empty())
         {
-            println!();
-            println!(
+            fusion_rules::say!();
+            fusion_rules::say!(
                 "{} {}",
                 paint.bold(rule.name),
                 paint.dim(&format!("{} noted, not failing", report.notes.len()))
             );
             for note in &report.notes {
-                println!("  {note}");
+                fusion_rules::say!("  {note}");
             }
         }
-        println!();
+        fusion_rules::say!();
     }
 
     for (rule, report) in &failed {
@@ -456,7 +456,7 @@ fn report(
     }
 
     if matches!(form, Form::Printed { loud: true }) {
-        println!("fusion: {} rules, every one clean", reports.len());
+        fusion_rules::say!("fusion: {} rules, every one clean", reports.len());
     }
     Ok(Code::Ok)
 }
