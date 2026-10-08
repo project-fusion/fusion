@@ -1,0 +1,12 @@
+<!-- @summary A loader that stands in for a button while it saves, keeping the button's size, beside one that is `idle` and shows its button. -->
+<helix-flex gap="sm">
+  <helix-loader label="Saving">
+    <helix-button slot="content">Save changes</helix-button>
+  </helix-loader>
+  <helix-loader
+    idle
+    label="Saving"
+  >
+    <helix-button slot="content">Save changes</helix-button>
+  </helix-loader>
+</helix-flex>
