@@ -104,7 +104,10 @@ export function Example() {
           </tr>
         </tbody>
       </table>
-      <helix-bar-chart for="net"></helix-bar-chart>
+      <helix-bar-chart
+        emphasis="outlined"
+        for="net"
+      ></helix-bar-chart>
     </helix-flex>
   )
 }
