@@ -1296,6 +1296,25 @@ describe('a date input reads a date as its locale writes one', () => {
     expect(german.value).toBe('2026-08-04')
   })
 
+  /* It named a pattern token, "Enter a date as YYYY-MM-DD.", to a reader whose
+     field showed `August 4, 2026`. */
+  test('text that is no date names a date as the field writes one, and that date reads back', async () => {
+    const host = await field('locale="en-US"')
+    await type(host, 'soon')
+    const internals = (host as unknown as { internals: ElementInternals }).internals
+    expect(internals.validationMessage).toBe('Enter a date such as August 24, 2026.')
+    await type(host, 'August 24, 2026')
+    control(host).dispatchEvent(new Event('change'))
+    await host.updateComplete
+    expect(host.value).toBe('2026-08-24')
+    const german = await field(
+      'locale="de-DE" date-style="medium" default-value="bald" mode="range"',
+    )
+    expect((german as unknown as { internals: ElementInternals }).internals.validationMessage).toBe(
+      'Enter dates such as 24.08.2026, separated by commas.',
+    )
+  })
+
   /* Measured before this: `Aug 4, 2026`, the date the field shows when idle
      in en-US, stayed text, the comma read as two dates in one. */
   test('with a comma inside the one date', async () => {
