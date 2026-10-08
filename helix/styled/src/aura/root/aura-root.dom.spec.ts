@@ -277,6 +277,13 @@ describe('aura', () => {
     expect(sheet).not.toMatch(/var\(--_aura-glow\)\s+0%/)
   })
 
+  test('paused is a property that starts cleared, and the attribute sets it', async () => {
+    const host = (await mount(undrawn('paused'))) as HTMLElement & { paused?: boolean }
+    expect(host.paused).toBe(true)
+    const moving = (await mount(undrawn())) as HTMLElement & { paused?: boolean }
+    expect(moving.paused).toBe(false)
+  })
+
   test('the variant reflects and the numbers do not', async () => {
     // Reflection exists so a selector can reach a value. The fallback gradient
     // selects on `variant`; nothing selects on `speed`.
@@ -706,6 +713,28 @@ describe('aura', () => {
       expect(await until(() => draws.count >= 2)).toBe(true)
       host.style.setProperty('--aura-glow', 'rgb(255, 0, 0)')
       expect(await until(() => host.palette.glow.join() === '1,0,0')).toBe(true)
+    })
+
+    /* WCAG 2.2.2 asks for a way to stop motion that runs for more than five
+       seconds, and the only one was `speed="0"`, which still drew every frame. */
+    test('paused holds the frame it shows and books none, until it is cleared', async () => {
+      const host = (await mount(drawn())) as HTMLElement & {
+        paused: boolean
+        updateComplete: Promise<unknown>
+      }
+      const draws = countDraws(host)
+      if (!draws) {
+        return
+      }
+      expect(await until(() => draws.count >= 2)).toBe(true)
+      host.paused = true
+      await host.updateComplete
+      const held = draws.count
+      expect(await framesBooked(4)).toBe(0)
+      expect(draws.count).toBe(held)
+      host.paused = false
+      await host.updateComplete
+      expect(await until(() => draws.count >= held + 2)).toBe(true)
     })
 
     test('a color hook changed while the loop is stopped paints one frame in it', async () => {
