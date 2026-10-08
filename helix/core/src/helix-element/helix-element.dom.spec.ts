@@ -619,3 +619,39 @@ describe('a composed tag', () => {
     expect(imports).toEqual(["import type { StaticValue } from 'lit/static-html.js'"])
   })
 })
+
+describe('the rules every shadow root gets', () => {
+  /** The text of the sheet `finalizeStyles` puts first, for a class. */
+  const first = (element: unknown): string =>
+    (element as { elementStyles: Array<{ cssText?: string }> }).elementStyles[0]?.cssText ?? ''
+
+  test('are box-sizing, hidden and settled, with no mark rule', async () => {
+    const { HelixElement } = await import('./helix-element.js')
+    class Plain extends HelixElement {}
+    customElements.define('probe-plain-marks', Plain)
+    const text = first(Plain)
+    expect(text).toContain('box-sizing:border-box')
+    expect(text).toContain(":host([hidden]:not([hidden='until-found']))")
+    expect(text).toContain(':state(settled)')
+    expect(text).not.toContain('data-')
+  })
+
+  /* Between `HIDDEN` and `SETTLED`, which is where all four sat when every
+     shadow root carried them, so the cascade is the one it was. */
+  test('and the rules a class names for its marks, before settled', async () => {
+    const { HelixElement } = await import('./helix-element.js')
+    const { MIRROR_RULE, SCROLLER_RULE } = await import('./mark-rules.js')
+    class Marked extends HelixElement {
+      protected static override markRules = [SCROLLER_RULE, MIRROR_RULE]
+    }
+    class Inherited extends Marked {}
+    customElements.define('probe-marked', Marked)
+    customElements.define('probe-marked-inherited', Inherited)
+    for (const one of [Marked, Inherited]) {
+      const text = first(one)
+      expect(text.indexOf('until-found')).toBeLessThan(text.indexOf(SCROLLER_RULE))
+      expect(text.indexOf(SCROLLER_RULE)).toBeLessThan(text.indexOf(MIRROR_RULE))
+      expect(text.indexOf(MIRROR_RULE)).toBeLessThan(text.indexOf(':state(settled)'))
+    }
+  })
+})

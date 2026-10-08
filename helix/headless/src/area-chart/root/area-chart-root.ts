@@ -11,6 +11,7 @@ import {
   HelixReadingPressEvent,
   linear,
   linePath,
+  MIRROR_RULE,
   MixinChartSource,
   MixinChartStatus,
   PLOT_HEIGHT,
@@ -192,6 +193,8 @@ export interface AreaStack {
  */
 @customElement('helix-headless-area-chart')
 export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-area-chart': { totalLabel: 'Summe' } })`.

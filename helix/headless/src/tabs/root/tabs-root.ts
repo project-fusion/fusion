@@ -7,6 +7,7 @@ import {
   IndicatorController,
   isRtl,
   KeyboardNavigationController,
+  MIRROR_RULE,
   MixinControllerActive,
   scrollItemIntoView,
   whenHydrated,
@@ -112,6 +113,8 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  */
 @customElement('helix-headless-tabs')
 export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-tabs': { label: 'Reiter' } })`.

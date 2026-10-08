@@ -16,10 +16,12 @@ import {
   KeyboardNavigationController,
   MixinControllerActive,
   MixinViewport,
+  SCROLLER_RULE,
   scrollItemIntoView,
   scrollRoom,
   Typeahead,
   typeaheadBy,
+  VIRTUAL_RULE,
   type ViewportPanDetail,
   type ViewportZoomDetail,
   VirtualizeController,
@@ -180,6 +182,8 @@ import {
  */
 @customElement('helix-headless-graph')
 export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(HelixElement)) {
+  protected static override markRules = [SCROLLER_RULE, VIRTUAL_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-graph': { searchLabel: 'Notiz suchen' } })`.

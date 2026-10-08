@@ -8,6 +8,7 @@ import {
   inlineStep,
   KeyboardNavigationController,
   keyClaimed,
+  MIRROR_RULE,
   MixinCollection,
   type NavigableItem,
   slottedWords,
@@ -100,6 +101,8 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  */
 @customElement('helix-headless-drilldown')
 export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-drilldown': { backLabel: 'Zurück' } })`.

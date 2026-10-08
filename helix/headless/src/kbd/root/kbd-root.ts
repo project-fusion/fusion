@@ -10,6 +10,7 @@ import {
   matchesChord,
   onApple,
   printableChord,
+  SPOKEN_RULE,
   wordsConverter,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -101,6 +102,8 @@ const UNTYPED = new Set([
  */
 @customElement('helix-headless-kbd')
 export class HelixHeadlessKbd extends HelixElement {
+  protected static override markRules = [SPOKEN_RULE]
+
   /**
    * What the chord does to the control `for` names once it is pressed:
    * `focus` moves focus to the control and `click` presses it.

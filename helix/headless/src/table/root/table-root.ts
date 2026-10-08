@@ -32,6 +32,7 @@ import {
   splitValues,
   toggleEvery,
   treeArrow,
+  VIRTUAL_RULE,
   VirtualizeController,
   whenHydrated,
   words,
@@ -339,6 +340,8 @@ const ESTIMATE = 40
  */
 @customElement('helix-headless-table')
 export class HelixHeadlessTable extends MixinCollection(HelixElement) {
+  protected static override markRules = [VIRTUAL_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-table': { selectAllLabel: 'Alle Zeilen auswählen' } })`.

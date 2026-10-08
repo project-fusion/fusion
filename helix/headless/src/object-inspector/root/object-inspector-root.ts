@@ -14,14 +14,17 @@ import {
   HelixFilterEvent,
   HelixFilteredEvent,
   inlineStep,
+  MIRROR_RULE,
   pageRows,
   requestChange,
+  SCROLLER_RULE,
   StatusController,
   scrollItemIntoView,
   scrollRoom,
   searchableById,
   Typeahead,
   treeArrow,
+  VIRTUAL_RULE,
   VirtualizeController,
   words,
   wordsLocale,
@@ -214,6 +217,8 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  */
 @customElement('helix-headless-object-inspector')
 export class HelixHeadlessObjectInspector extends HelixElement {
+  protected static override markRules = [SCROLLER_RULE, VIRTUAL_RULE, MIRROR_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-object-inspector': { copyValueLabel: 'Wert kopieren' } })`.

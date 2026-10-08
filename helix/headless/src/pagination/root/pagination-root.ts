@@ -8,6 +8,7 @@ import {
   HelixElement,
   HelixNavigateEvent,
   hostAria,
+  MIRROR_RULE,
   requestChange,
   words,
   wordsLocale,
@@ -128,6 +129,8 @@ const fill = (template: string, page: number, pages: number): string =>
  */
 @customElement('helix-headless-pagination')
 export class HelixHeadlessPagination extends HelixElement {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-pagination': { nextLabel: 'Nächste Seite' } })`.

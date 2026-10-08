@@ -15,7 +15,9 @@ import {
   type Rendered,
   reportRuntime,
   requestChange,
+  SCROLLER_RULE,
   UpgradeController,
+  VIRTUAL_RULE,
   VirtualizeController,
   whenHydrated,
   words,
@@ -296,6 +298,8 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  */
 @customElement('helix-headless-chat')
 export class HelixHeadlessChat extends MixinCollection(HelixElement) {
+  protected static override markRules = [SCROLLER_RULE, VIRTUAL_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-chat': { typingLabel: '{author} schreibt' } })`.

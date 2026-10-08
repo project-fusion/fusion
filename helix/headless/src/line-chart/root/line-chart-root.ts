@@ -13,6 +13,7 @@ import {
   HelixReadingPressEvent,
   linear,
   linePath,
+  MIRROR_RULE,
   MixinChartSource,
   MixinChartStatus,
   PLOT_HEIGHT,
@@ -155,6 +156,8 @@ import '../../tooltip/index.js'
  */
 @customElement('helix-headless-line-chart')
 export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-line-chart': { positionLabel: '{position} von {count}' } })`.

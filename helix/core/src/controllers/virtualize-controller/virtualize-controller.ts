@@ -342,7 +342,9 @@ export class VirtualizeController implements ReactiveController {
        read as a move whose event is still to come. */
     this.lastTop = this.scrolled(box)
     /* Takes the box out of the browser's scroll anchoring, through a rule
-       `HelixElement` ships into every shadow root. See `VIRTUAL` there. */
+       `HelixElement` ships into the shadow root of a host that names
+       `VIRTUAL_RULE` in its `markRules`. See `VIRTUAL_RULE` in
+       `mark-rules.ts`. */
     box.setAttribute('data-virtual', '')
     this.watching = true
   }

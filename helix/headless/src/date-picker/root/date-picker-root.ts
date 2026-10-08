@@ -15,6 +15,7 @@ import {
   hostAria,
   inlineStep,
   commaList as list,
+  MIRROR_RULE,
   MixinControllerValue,
   MixinPickerFeedback,
   type MonthCalendar,
@@ -26,6 +27,7 @@ import {
   periodKey,
   reportValues,
   requestChange,
+  SPOKEN_RULE,
   todayIn,
   weekendOf,
   weekStartOf,
@@ -176,6 +178,8 @@ const firstOf = (year: number, month: number): Date =>
 export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   MixinControllerValue(HelixFormElement),
 ) {
+  protected static override markRules = [SPOKEN_RULE, MIRROR_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-date-picker': { nextLabel: 'Nächster Monat' } })`.

@@ -11,6 +11,7 @@ import {
   HelixReadingPressEvent,
   linear,
   linePath,
+  MIRROR_RULE,
   MixinChartSource,
   MixinChartStatus,
   PLOT_HEIGHT,
@@ -170,6 +171,8 @@ const toned = (tone: string | undefined): string | undefined =>
  */
 @customElement('helix-headless-bar-chart')
 export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
+  protected static override markRules = [MIRROR_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-bar-chart': { highestLabel: 'Höchster Wert' } })`.

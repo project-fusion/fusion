@@ -355,7 +355,7 @@ if (hasLayout()) {
  * process first, and in a run that mixes the server specs in, the root holds
  * none. What is being checked is that the rule is there and that the component
  * marked its box, which is the whole of the contract; that a marked box with a bounded height actually scrolls was
- * measured in Chromium and is written up on `SCROLLER`.
+ * measured in Chromium and is written up on `SCROLLER_RULE`.
  */
 describe('the box a headless consumer gets', () => {
   test('is marked as the one that scrolls, so `scrollTop` exists at all', async () => {
