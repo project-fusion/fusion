@@ -81,7 +81,8 @@ const says = (element: Element | null, state: string): boolean => {
  * | `hotkey`, Command or Control with K by default | Opens the palette from anywhere on the page, or closes it. With `inline`, puts focus in its filter field. |
  * | Down, Up | Moves the highlight to the next or the previous command, round from the last to the first. |
  * | Page Down, Page Up | Moves the highlight by as many commands as the list shows at once. |
- * | Home, End, Left, Right | Move the caret in the filter field. |
+ * | Home, End | Move the caret in the filter field. With `home-end="list"`, move the highlight to the first or the last command. |
+ * | Left, Right | Move the caret in the filter field. |
  * | Enter | Runs the highlighted command, or follows it where it is a link, and closes the palette. On a command with `opens`, shows its page. |
  * | Command or Control with Enter | Takes the highlighted command's `alternate` destination, where it has one. |
  * | Backspace | In an empty filter on a page, goes back to the page before. |
@@ -190,6 +191,16 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   @property()
   hotkey = 'mod+k'
+
+  /**
+   * Where Home and End go from the filter field.
+   *
+   * Absent, they move the caret, as APG's combobox has them. `list` moves the
+   * highlight to the first or the last command, as React Aria's Autocomplete
+   * does, and Shift with either still selects the text.
+   */
+  @property({ attribute: 'home-end' })
+  homeEnd?: 'list'
 
   /**
    * Draws the palette in the page, where it stands, with no dialog: a search
@@ -673,6 +684,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         results-label=${this.resultsLabel}
         ?loading=${this.loading}
         .items=${this.items}
+        .fieldHomeEnd=${this.homeEnd === 'list'}
         filterable
         @helix-before-change=${this.handleChange}
         @helix-filter=${this.handleFilter}

@@ -268,6 +268,14 @@ export class HelixHeadlessListbox extends MixinCollection(
   filterable = false
 
   /**
+   * @internal Set by `Command` under `home-end="list"`: whether Home and End
+   * in the filter field move the highlight, without Shift, rather than the
+   * caret. A property, as coordination between elements.
+   */
+  @property({ attribute: false })
+  fieldHomeEnd = false
+
+  /**
    * How long typing in the filter field rests before the list is filtered, in
    * milliseconds. `0` filters on every keystroke.
    *
@@ -893,7 +901,8 @@ export class HelixHeadlessListbox extends MixinCollection(
       (event.key === 'Home' || event.key === 'End')
     const grid = this.layout === 'grid' && !this.data.records
     const along = grid && !typing ? inlineStep(this, event.key) : 0
-    if (!fieldRange && !along && !(typing ? FIELD_MOVES : MOVES).has(event.key)) {
+    const fieldMoves = this.fieldHomeEnd && !event.shiftKey ? MOVES : FIELD_MOVES
+    if (!fieldRange && !along && !(typing ? fieldMoves : MOVES).has(event.key)) {
       return
     }
     event.preventDefault()
