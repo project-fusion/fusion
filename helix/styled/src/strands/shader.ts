@@ -1,5 +1,14 @@
 import { MAX_POINTS } from './path.js'
 
+/** The most elements a ribbon dims behind, through the root's \`quiet\`. */
+export const MAX_QUIET = 4
+
+/** The share of its light the ribbon keeps behind a quiet element: a faint glow. */
+const QUIET_FLOOR = '0.18'
+
+/** How far either side of a quiet element's edge the light eases, in CSS pixels. */
+const QUIET_FEATHER = '72.0'
+
 /*
  * The programs that draw the ribbon: the strands and the dust into a float
  * buffer with additive light, two blur levels of bloom, and the composite over
@@ -47,6 +56,7 @@ uniform float uTime;
 uniform float uSpread;
 uniform float uDepth;
 uniform float uDrift;
+uniform vec4 uQuiet[${MAX_QUIET}];
 
 float h1(float n) { return fract(sin(n * 127.1 + 311.7) * 43758.5453); }
 
@@ -67,6 +77,26 @@ vec4 spline(float t) {
 }
 
 vec2 place(vec4 c) { return vec2(c.x * uView.x, c.y - uScroll); }
+
+/* **Quiet behind words.** Each rect the root names, left, top, right and
+   bottom in the path's own pixels, dims the light inside it to a faint glow,
+   easing back to full over a feather either side of its edge. An unused rect
+   is empty, and a point is never inside it. */
+float quietAt(vec2 p) {
+  vec2 at = vec2(p.x, p.y + uScroll);
+  float light = 1.0;
+  for (int i = 0; i < ${MAX_QUIET}; i++) {
+    vec4 r = uQuiet[i];
+    if (r.z <= r.x) {
+      continue;
+    }
+    vec2 size = (r.zw - r.xy) * 0.5;
+    vec2 off = abs(at - (r.xy + size)) - size;
+    float outside = length(max(off, 0.0)) + min(max(off.x, off.y), 0.0);
+    light = min(light, mix(${QUIET_FLOOR}, 1.0, smoothstep(-${QUIET_FEATHER}, ${QUIET_FEATHER}, outside)));
+  }
+  return light;
+}
 
 float len(int i) {
   int k = clamp(i, 0, uCount - 1);
@@ -228,7 +258,7 @@ void main() {
   float rest = mix(0.35, 0.15, uContrast);
   vec3 col = mix(uGlow, uTint, step(0.83, r6) * 0.9);
   col = mix(col, uPeak, step(0.93, r7) * 0.6);
-  vColor = col * energy * info.x * (rest + (1.0 - rest) * shimmer) * bright * depth * (designed / sigma);
+  vColor = col * energy * info.x * (rest + (1.0 - rest) * shimmer) * bright * depth * (designed / sigma) * quietAt(a.xy);
 }
 `
 
@@ -270,7 +300,7 @@ void main() {
   float tw = 0.35 + 0.65 * (0.5 + 0.5 * sin(uTime * (0.5 + 1.8 * r) + r2 * 40.0));
   /* By the root of the ribbon's brightness, so specks show along a dim ribbon
      as well as round a bright bend. */
-  vColor = mix(uGlow, uPeak, 0.55) * tw * mix(0.2, 0.9, r) * sqrt(info.x) * 0.8;
+  vColor = mix(uGlow, uPeak, 0.55) * tw * mix(0.2, 0.9, r) * sqrt(info.x) * 0.8 * quietAt(a.xy + off);
 }
 `
 

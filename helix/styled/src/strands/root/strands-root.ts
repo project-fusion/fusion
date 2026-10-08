@@ -23,7 +23,14 @@ import {
   type StrandsVariant,
   visibleRange,
 } from '../path.js'
-import { DUST, MAX_DUST, MAX_STRANDS, MIN_STRANDS, StrandsRenderer } from '../renderer.js'
+import {
+  DUST,
+  MAX_DUST,
+  MAX_QUIET,
+  MAX_STRANDS,
+  MIN_STRANDS,
+  StrandsRenderer,
+} from '../renderer.js'
 import { styles } from './strands-root.css.js'
 
 /** The widest either edge of the drawing buffer may get, in device pixels. Aura's ceiling, for Aura's reason. */
@@ -75,8 +82,12 @@ const PACE = 0.25
  * **Four forms, set with `variant`.** `bend` turns bright strands through one
  * tight point, with its arms opening to the right. `ribbon`, the default, is a
  * broad, soft ribbon in long curves. `sweep` enters at a top corner, the one
- * `at` is nearer, and crosses to the far side by the bottom. `waves` is sharp
+ * `at` is nearer, and crosses in one diagonal to the far side. `waves` is sharp
  * strands crossing the full width.
+ *
+ * **Quiet behind words.** `quiet` names elements, such as a hero's words, that
+ * the light dims behind to a faint glow, so a bright ribbon can cross the page
+ * under them and they stay crisp.
  *
  * **In its own box, by default.** The element fills the box it is given, the
  * way an image does, and `at` places the bend's apex or the ribbon's axis across
@@ -195,6 +206,15 @@ export class HelixStrands extends HelixElement {
   gain = 1
 
   /**
+   * The ids of elements the light dims behind, separated by spaces, such as
+   * a hero's words. Inside each, the ribbon keeps a faint glow, so words over
+   * it stay crisp and nothing busy runs under them, and it eases back to full
+   * a short way past each edge. Up to four; ids that name nothing are skipped.
+   */
+  @property()
+  quiet?: string
+
+  /**
    * The share of strands drawn out of focus where the ribbon is wide, from `0`,
    * every strand sharp, to `1`, every one soft. Clamped to that range. A tight
    * form, such as a bend's apex or a wave, stays sharp whatever this says.
@@ -274,6 +294,9 @@ export class HelixStrands extends HelixElement {
   /** How far along the path each point is, in pixels, four to a slot as the shader reads them. */
   private lengths = new Float32Array(MAX_POINTS)
 
+  /** The rects the light dims behind, in the path's pixels, from `quiet`. */
+  private readonly quietRects = new Float32Array(MAX_QUIET * 4)
+
   /** In `travel`, the path's `y` at even steps of its parameter. */
   private table: Float32Array = new Float32Array(1)
 
@@ -323,7 +346,12 @@ export class HelixStrands extends HelixElement {
     if (changed.has('travel') && this.hasUpdated && this.canvas) {
       this.watchPage(this.travel)
     }
-    if (changed.has('variant') || changed.has('at') || changed.has('travel')) {
+    if (
+      changed.has('variant') ||
+      changed.has('at') ||
+      changed.has('travel') ||
+      changed.has('quiet')
+    ) {
       this.layout()
     }
     this.paintOnce()
@@ -582,6 +610,34 @@ export class HelixStrands extends HelixElement {
     this.count = path.length
     this.lengths.fill(0)
     this.lengths.set(arcLengths(path, this.box.width))
+    this.measureQuiet()
+  }
+
+  /**
+   * The rects of the elements `quiet` names: on the page in `travel`, where
+   * the path is laid in page pixels, and inside the box otherwise.
+   */
+  private measureQuiet(): void {
+    this.quietRects.fill(0)
+    const origin = this.travel ? { left: 0, top: -window.scrollY } : this.getBoundingClientRect()
+    let slot = 0
+    for (const name of (this.quiet ?? '').split(/\s+/)) {
+      const target = name ? elementById(this, name) : null
+      if (!target || slot >= MAX_QUIET) {
+        continue
+      }
+      const rect = target.getBoundingClientRect()
+      this.quietRects.set(
+        [
+          rect.left - origin.left,
+          rect.top - origin.top,
+          rect.right - origin.left,
+          rect.bottom - origin.top,
+        ],
+        slot * 4,
+      )
+      slot += 1
+    }
   }
 
   /** The stops inside, each with its target's place on the page. A stop naming nothing is skipped. */
@@ -683,6 +739,7 @@ export class HelixStrands extends HelixElement {
         gain: Math.max(0, this.gain),
         lengths: this.lengths,
         points: this.points,
+        quiet: this.quietRects,
         range,
         scroll: this.travel ? this.offset : 0,
         softness: Math.min(1, Math.max(0, this.softness)),
