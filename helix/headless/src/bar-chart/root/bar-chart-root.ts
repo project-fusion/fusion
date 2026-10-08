@@ -63,6 +63,11 @@ import '../../tooltip/index.js'
  * tap or key, and `helix-reading-press` says a reading was clicked, tapped, or
  * pressed with Enter or Space, for a page that opens what a reading stands for.
  *
+ * **A cell's `data-tone` colors its own bar**, such as `data-tone="primary"`
+ * on the one reading a chart is about, so one column of numbers can single
+ * a bar out without a second column to color it. Without one, a bar takes
+ * its series' color.
+ *
  * **`data` takes the readings as data** where the page has no table to point
  * `for` at, in a table's shape: the column headings, then one row per reading
  * with its label first. A table is still the better source where the page can
@@ -139,6 +144,7 @@ import '../../tooltip/index.js'
  *
  * @cssproperty --bar-chart-axis - The width of an axis, in `ch`, set from the widest number on it. The chart sets it on the axis itself, and only when the categories run along the bottom. In a horizontal chart the axis is a row, one line high.
  * @cssproperty --bar-chart-secondary - The color of the secondary axis, when one series is on it. The chart sets it from that series' `--chart-series-*` property, so the axis is drawn in whatever color that property resolves to.
+ * @cssproperty --bar-chart-tone-primary - The color of a bar whose cell says `data-tone="primary"`. A tone with no property of its own falls back to the bar's series color, and the same holds for `accent`, `info`, `success`, `warning`, `danger`, and `muted`, and for a name you define.
  * @cssproperty --chart-bar-wash - The gradient for a bar, named per bar so the styled
  *   tier can use it as the `fill`. It is always drawn, and used only when
  *   `wash="gradient"` is set.
@@ -147,6 +153,14 @@ import '../../tooltip/index.js'
  * @cssstate empty - While the `empty` part stands in the plot.
  * @cssstate loading - While the `loading` part stands in the plot.
  */
+/**
+ * A cell's `data-tone`, where it is a name a custom property can carry, or
+ * `undefined`. The name is written into a `style` attribute, so anything but
+ * letters, digits, and hyphens is refused rather than read as more CSS.
+ */
+const toned = (tone: string | undefined): string | undefined =>
+  tone && /^[a-z][a-z0-9-]*$/.test(tone) ? tone : undefined
+
 @customElement('helix-headless-bar-chart')
 export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
   /**
@@ -556,6 +570,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       scale: (value: number) => number,
       from?: number,
       end?: StackEnd,
+      named?: string,
     ): TemplateResult => {
       const at = scale(value)
       const base = from === undefined ? floor : scale(from)
@@ -566,12 +581,17 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
          numbers are one decision written twice: move the 0.72 alone and every
          group slides off center with nothing on screen to say so. */
       const across = index * slot + slot * 0.14 + depth * stride + gap / 2
+      const ink = toned(named)
+      const paint = ink
+        ? `--chart-series: var(--bar-chart-tone-${ink}, var(--chart-series-${seriesIndex(tone)})); --chart-bar-wash: url(#helix-bar-wash-tone-${ink})`
+        : `--chart-series: var(--chart-series-${seriesIndex(tone)}); --chart-bar-wash: url(#helix-bar-wash-${seriesIndex(tone)})`
       return sideways
         ? svg`<rect
             data-end=${end ?? nothing}
             data-series=${seriesIndex(tone)}
+            data-tone=${ink ?? nothing}
             height=${thickness}
-            style="--chart-series: var(--chart-series-${seriesIndex(tone)}); --chart-bar-wash: url(#helix-bar-wash-${seriesIndex(tone)})"
+            style=${paint}
             part="bar${end ? ' bar-end' : ''}"
             width=${size}
             x=${along}
@@ -580,8 +600,9 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
         : svg`<rect
             data-end=${end ?? nothing}
             data-series=${seriesIndex(tone)}
+            data-tone=${ink ?? nothing}
             height=${size}
-            style="--chart-series: var(--chart-series-${seriesIndex(tone)}); --chart-bar-wash: url(#helix-bar-wash-${seriesIndex(tone)})"
+            style=${paint}
             part="bar${end ? ' bar-end' : ''}"
             width=${thickness}
             x=${across}
@@ -630,6 +651,21 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
                 <stop offset="1" part="bar-wash-end" />
               </linearGradient>`,
             )}
+            ${[...new Set(series.flatMap((one) => one.points.map((point) => toned(point.tone))))]
+              .filter((ink): ink is string => ink !== undefined)
+              .map(
+                (ink) => svg`<linearGradient
+                id="helix-bar-wash-tone-${ink}"
+                style="--chart-series: var(--bar-chart-tone-${ink}, var(--chart-series-1))"
+                x1="0"
+                x2=${sideways ? '1' : '0'}
+                y1="0"
+                y2=${sideways ? '0' : '1'}
+              >
+                <stop offset="0" part="bar-wash-start" />
+                <stop offset="1" part="bar-wash-end" />
+              </linearGradient>`,
+              )}
           </defs>`
         }
         ${this.renderGridlines(y, domain, sideways, categories.length)}
@@ -658,7 +694,16 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
                    A column of no height would claim a zero. */
                       return point === undefined
                         ? nothing
-                        : bar(point.value, index, depth, tone, against(one))
+                        : bar(
+                            point.value,
+                            index,
+                            depth,
+                            tone,
+                            against(one),
+                            undefined,
+                            undefined,
+                            point.tone,
+                          )
                     })
               }
             </g>`,
@@ -695,6 +740,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       scale: (value: number) => number,
       from?: number,
       end?: StackEnd,
+      named?: string,
     ) => TemplateResult,
   ): TemplateResult[] {
     const scales = [...new Set(columns.map(({ one }) => against(one)))]
@@ -706,9 +752,11 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
          outermost segment in each direction has a far end, and the segments
          between meet square. */
       const ends = stackFarEnds(values)
-      return mine.flatMap(({ tone }, place) => {
+      return mine.flatMap(({ slots, tone }, place) => {
         const span = spans[place]
-        return span === undefined ? [] : [bar(span[1], index, 0, tone, scale, span[0], ends[place])]
+        return span === undefined
+          ? []
+          : [bar(span[1], index, 0, tone, scale, span[0], ends[place], slots[index]?.tone)]
       })
     })
   }

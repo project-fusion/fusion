@@ -109,6 +109,36 @@ describe('bar chart', () => {
     expect(bars(host)[0]?.getAttribute('data-series')).toBe('1')
   })
 
+  test("a cell's data-tone colors its own bar, and the rest keep their series", async () => {
+    /* One column can single a bar out: a page used to split it into two
+       columns to color one bar, and every tooltip then named the empty one. */
+    const table = REVENUE.replace(
+      '<td data-value="50">',
+      '<td data-tone="primary" data-value="50">',
+    ).replace('id="revenue"', 'id="toned"')
+    const host = await chart(table, 'for="toned"')
+    const [first, second] = bars(host)
+    expect(second?.getAttribute('data-tone')).toBe('primary')
+    expect(second?.getAttribute('style')).toContain(
+      'var(--bar-chart-tone-primary, var(--chart-series-1))',
+    )
+    expect(second?.getAttribute('style')).toContain('url(#helix-bar-wash-tone-primary)')
+    expect(host.shadowRoot?.querySelector('#helix-bar-wash-tone-primary')).not.toBeNull()
+    expect(first?.hasAttribute('data-tone')).toBe(false)
+    expect(first?.getAttribute('style')).toContain('var(--chart-series-1)')
+  })
+
+  test('a tone that is not a plain name is refused rather than written as CSS', async () => {
+    const table = REVENUE.replace(
+      '<td data-value="50">',
+      '<td data-tone="x); background: red; --y: (" data-value="50">',
+    ).replace('id="revenue"', 'id="hostile"')
+    const host = await chart(table, 'for="hostile"')
+    const second = bars(host)[1]
+    expect(second?.hasAttribute('data-tone')).toBe(false)
+    expect(second?.getAttribute('style')).not.toContain('background')
+  })
+
   test('the drawing is hidden and the table is the readable version', async () => {
     /* A screen reader hearing both hears the same numbers twice, once as data
        and once as a description of a picture of the data. The plot around the

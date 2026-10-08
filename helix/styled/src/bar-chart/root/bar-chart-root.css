@@ -127,6 +127,14 @@
   grid-auto-columns: auto;
   grid-auto-flow: row;
   grid-auto-rows: 1fr;
+
+  /* **The plot's height, not the row's.** The two sit in one row, and a page
+     that sized the host itself, `block-size` in place of
+     `--bar-chart-block-size`, made the row taller than the plot: the names
+     stretched to the row and the bars kept to the plot, so each name sat
+     further below its bar than the one above it. */
+  align-self: start;
+  block-size: var(--bar-chart-block-size, 12em);
 }
 
 :host([orientation="horizontal"]) [part="label"] {
@@ -149,6 +157,19 @@
 [part~="bar"],
 [part="line"] {
   --_bar-chart-series: var(--chart-series);
+}
+
+/* The tones a cell can name with `data-tone`, from the tokens, as the
+   heatmap's are. A bar whose tone has no property here takes its series'
+   color, which the headless tier writes as the fallback. */
+:host {
+  --bar-chart-tone-accent: var(--helix-color-accent);
+  --bar-chart-tone-danger: var(--helix-color-danger);
+  --bar-chart-tone-info: var(--helix-color-info);
+  --bar-chart-tone-muted: var(--helix-color-foreground-subtle);
+  --bar-chart-tone-primary: var(--helix-color-primary);
+  --bar-chart-tone-success: var(--helix-color-success);
+  --bar-chart-tone-warning: var(--helix-color-warning);
 }
 /*
  *  The groups the tooltip is not about, faded.
