@@ -29,6 +29,11 @@ import { MAX_POINTS } from './path.js'
  * out, as perspective puts it. `uDrift` gives each strand its own pace and
  * starting angle for the roll, and its own wave, so at `0` the ribbon turns as
  * one sheet and at `1` its strands cross over one another.
+ *
+ * **Every strand turns gently.** The twist runs once in about 3,100 pixels
+ * of path and each strand's own wave once in about 1,000, so the tightest
+ * turn a strand makes, at the edge of a wide ribbon, is about 400 pixels
+ * round. Twice those rates curled the strands like loose hair.
  */
 const PATH = `
 uniform vec4 uPts[${MAX_POINTS}];
@@ -78,7 +83,7 @@ vec3 strandAt(float id, float t, out vec3 info) {
   float z = (r4 - 0.5) * 2.0;
   float along = c.y + c.x * uView.x;
   float pace = 1.0 + uDrift * (r8 - 0.5) * 1.2;
-  float th = along * 0.0033 * (1.0 + uDrift * (r9 - 0.5) * 0.5) + uTime * 0.25 * pace
+  float th = along * 0.002 * (1.0 + uDrift * (r9 - 0.5) * 0.3) + uTime * 0.25 * pace
     + r2 * (0.5 + uDrift * 2.6);
   float width = c.z * uSpread;
   float fan = width * uView.x * (1.0 + 0.25 * sin(uTime * 0.4 + along * 0.0045));
@@ -87,8 +92,8 @@ vec3 strandAt(float id, float t, out vec3 info) {
   float st = sin(th);
   float depth = clamp((z * 0.55 * ct - n * st) / 1.15, -1.0, 1.0);
   float lat = sway + fan * (n * ct + z * 0.55 * st) * (1.0 + uDepth * 0.35 * depth);
-  lat += sin(along * 0.01 * (1.0 + uDrift * (r9 - 0.5) * 1.2) + uTime * (0.6 + 0.5 * r1) * pace
-    + r1 * 6.283) * 12.0 * (0.3 + r3) * (1.0 + uDrift);
+  lat += sin(along * 0.006 * (1.0 + uDrift * (r9 - 0.5) * 0.3) + uTime * (0.6 + 0.5 * r1) * pace
+    + r1 * 6.283) * 12.0 * (0.3 + r3) * (1.0 + uDrift * 0.5);
   info = vec3(max(c.w, 0.0), width, along);
   return vec3(p + nr * lat, depth);
 }

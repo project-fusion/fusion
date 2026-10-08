@@ -7,6 +7,7 @@ import {
   type PathPoint,
   type PlacedStop,
   pagePath,
+  TURN,
   visibleRange,
 } from './path.js'
 
@@ -18,9 +19,39 @@ const narrowest = (points: readonly PathPoint[]): PathPoint =>
 const lit = (points: readonly PathPoint[]): PathPoint[] =>
   points.filter(([x, , , brightness]) => brightness > 0 && x > 0 && x < 1)
 
+/**
+ * The radius of the tightest turn a reader can see, in pixels: the drawn
+ * spline, sampled finely, where it is lit and inside the box.
+ */
+const tightest = (points: readonly PathPoint[], width: number, height: number): number => {
+  const n = points.length
+  const at = (k: number, c: number): number => points[Math.max(0, Math.min(n - 1, k))]?.[c] ?? 0
+  const sample = (s: number): [number, number, number] => {
+    const i = Math.min(Math.floor(s), n - 2)
+    const f = s - i
+    const along = (c: number): number =>
+      catmull(at(i - 1, c), at(i, c), at(i + 1, c), at(i + 2, c), f)
+    return [along(0) * width, along(1), along(3)]
+  }
+  let least = Number.POSITIVE_INFINITY
+  for (let s = 0.02; s < n - 1.02; s += 0.02) {
+    const [x0, y0] = sample(s - 0.02)
+    const [x1, y1, glow] = sample(s)
+    const [x2, y2] = sample(s + 0.02)
+    if (glow < 0.15 || x1 < 0 || x1 > width || y1 < 0 || y1 > height) {
+      continue
+    }
+    const area = Math.abs((x1 - x0) * (y2 - y0) - (y1 - y0) * (x2 - x0)) / 2
+    const sides =
+      Math.hypot(x1 - x0, y1 - y0) * Math.hypot(x2 - x1, y2 - y1) * Math.hypot(x2 - x0, y2 - y0)
+    least = Math.min(least, area < 1e-9 ? Number.POSITIVE_INFINITY : sides / (4 * area))
+  }
+  return least
+}
+
 describe('strands box path', () => {
   test('a fan bends at its narrowest and brightest point, where `at` puts it, 58% down', () => {
-    const points = boxPath('fan', 0.3, 400)
+    const points = boxPath('fan', 0.3, 400, 800)
     const bend = narrowest(points)
     expect(bend[0]).toBe(0.3)
     expect(bend[1]).toBeCloseTo(232)
@@ -28,7 +59,7 @@ describe('strands box path', () => {
   })
 
   test("a fan's arms leave the box above and below the bend, opening to the right", () => {
-    const points = boxPath('fan', undefined, 400)
+    const points = boxPath('fan', undefined, 400, 800)
     const first = points[0] as PathPoint
     const last = points.at(-1) as PathPoint
     const bend = narrowest(points)
@@ -42,23 +73,43 @@ describe('strands box path', () => {
     /* The narrow rule is for the viewport in `travel`. A box is the frame the
        consumer chose, so a box only a few hundred pixels wide must not push the
        bend to the edge, which is what an early version did. */
-    expect(narrowest(boxPath('fan', 0.2, 300))[0]).toBe(0.2)
+    expect(narrowest(boxPath('fan', 0.2, 300, 240))[0]).toBe(0.2)
   })
 
   test('a wave enters off one edge and leaves off the other, through the middle', () => {
-    const points = boxPath('waves', undefined, 400)
+    const points = boxPath('waves', undefined, 400, 800)
     const xs = points.map(([x]) => x)
     expect(Math.min(...xs)).toBeLessThan(0)
     expect(Math.max(...xs)).toBeGreaterThan(1)
-    for (const [, y, , brightness] of points) {
-      if (brightness > 0) {
+    for (const [x, y] of points) {
+      if (x >= 0 && x <= 1) {
         expect(Math.abs(y - 200)).toBeLessThanOrEqual(18)
       }
     }
   })
 
+  test('no form turns tighter than half the box is tall, at any shape of box', () => {
+    /* A fan's bend a few dozen pixels round folded the light, and a ribbon in
+       a wide, short box crammed its swing into a tight curve. The spline is
+       sampled, so a turn may read a few per cent under its true radius. */
+    for (const [width, height] of [
+      [1440, 500],
+      [800, 400],
+      [300, 400],
+    ] as const) {
+      for (const variant of ['fan', 'ribbon', 'waves'] as const) {
+        const points = boxPath(variant, undefined, height, width)
+        expect(tightest(points, width, height)).toBeGreaterThan(height * TURN * 0.9)
+      }
+    }
+  })
+
+  test("a fan's bend is its tightest turn, at exactly the floor", () => {
+    expect(tightest(boxPath('fan', 0.4, 500, 1440), 1440, 500)).toBeCloseTo(250, -1)
+  })
+
   test('a ribbon runs the full height of the box around `at`, with nothing unlit inside it', () => {
-    const points = boxPath('ribbon', 0.6, 400)
+    const points = boxPath('ribbon', 0.6, 400, 800)
     const ys = points.map(([, y]) => y)
     expect(Math.min(...ys)).toBeLessThan(0)
     expect(Math.max(...ys)).toBeGreaterThan(400)
@@ -125,33 +176,21 @@ describe('strands page path', () => {
     }
   })
 
-  test("hands a fan's lower arm to the ribbon without turning back", () => {
-    /* The arm used to run out to the side, and the ribbon started back toward
-       the middle, so the two met in a hook at the edge of the hero. */
-    const points = pagePath([stop(0, 'fan')], 'ribbon', view.width, view.height, 6400)
-    const bend = points.indexOf(narrowest(points))
-    const exit = points[bend + 2] as PathPoint
-    const next = points[bend + 3] as PathPoint
-    expect(next[1]).toBeGreaterThan(exit[1])
-    expect(Math.abs(next[0] - exit[0])).toBeLessThan(0.1)
-    /* And at the ribbon's width or near it, which used to triple at once. */
-    expect(next[2] / exit[2]).toBeLessThan(1.7)
-  })
-
-  test('leans a ribbon into a wave from the side the ribbon is on', () => {
-    const points = pagePath(
-      [stop(0, 'fan'), stop(4000, 'waves')],
-      'ribbon',
-      view.width,
-      view.height,
-      6400,
-    )
-    const lead = points.findIndex(([, y, width]) => width < 0.2 && y > 3000)
-    const ribbon = points[lead - 1] as PathPoint
-    const into = points[lead] as PathPoint
-    expect(into[0] > 0.5).toBe(ribbon[0] > 0.5)
-    /* The turn is spread over most of a screen, not taken in a corner. */
-    expect(into[1] - ribbon[1]).toBeGreaterThan(view.height * 0.5)
+  test('never turns tight where it is lit, from the fan through the waves and back', () => {
+    /* Each hand-over used to meet in a corner: the fan's arm and the ribbon
+       in a hook, a ribbon heading out to its side and the wave it doubled
+       back to reach, and a ribbon coming back across after a wave. A tenth of
+       the screen's height is generous; on a page a hand-over now turns
+       through more than a quarter of it. */
+    const layouts: [number, number, PlacedStop[], number][] = [
+      [1440, 900, [stop(57, 'fan', 0.47), stop(5379, 'waves'), stop(8345, 'waves')], 9068],
+      [1280, 800, [stop(0, 'fan'), stop(3000, 'waves'), stop(7000, 'waves')], 8000],
+      [390, 844, [stop(57, 'fan', 0.47), stop(7207, 'waves'), stop(12200, 'waves')], 13409],
+    ]
+    for (const [width, height, stops, page] of layouts) {
+      const points = pagePath(stops, 'ribbon', width, height, page)
+      expect(tightest(points, width, page)).toBeGreaterThan(0.25 * Math.min(width, height))
+    }
   })
 
   test('ends on the last wave rather than bringing the ribbon back', () => {
