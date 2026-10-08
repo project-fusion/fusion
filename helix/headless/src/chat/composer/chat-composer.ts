@@ -164,6 +164,18 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
   /** Whether the reader has tried to send or submit the draft, or edited it and left. */
   private touched = false
 
+  /**
+   * Whether the reader has typed in the field since it last held a fresh
+   * draft: since it rendered, since a send cleared it, or since a reset.
+   *
+   * **A send clears the field, and the field still sends `change` as it is
+   * left**, because the platform compares the text with what it held when it
+   * was focused. Measured in Chromium before this: a required composer sent
+   * "hi", cleared, and on Tab showed itself invalid over an empty draft
+   * nobody had written.
+   */
+  private edited = false
+
   /** Whether the composer shows that its draft is wrong. */
   @state()
   private shownInvalid = false
@@ -228,6 +240,7 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
     /* An empty field after a send is a fresh draft, so a required composer
        does not show itself wrong. */
     this.touched = false
+    this.edited = false
     this.markTyping(false)
     return true
   }
@@ -245,6 +258,7 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
     super.formResetCallback()
     this.value = this.declared
     this.touched = false
+    this.edited = false
     this.requestUpdate()
   }
 
@@ -252,6 +266,13 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
   private readonly touch = (): void => {
     this.touched = true
     this.requestUpdate()
+  }
+
+  /** The field's `change`, which counts only after the reader typed in it. */
+  private readonly handleChange = (): void => {
+    if (this.edited) {
+      this.touch()
+    }
   }
 
   /** Brings back the draft when the browser restores the form. */
@@ -373,7 +394,7 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
         maxlength=${this.maxLength ?? nothing}
         aria-invalid=${this.shownInvalid ? 'true' : nothing}
         ?disabled=${this.isDisabled}
-        @change=${this.touch}
+        @change=${this.handleChange}
         @input=${this.handleInput}
         @keydown=${this.handleKey}
       ></textarea>
@@ -401,6 +422,7 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
   private readonly handleInput = (event: Event): void => {
     event.stopPropagation()
     this.value = (event.target as HTMLTextAreaElement).value
+    this.edited = true
     /* On the composer alone, without bubbling, the way a media element sends
        its events. A transcript speaks for the controls it holds, and a bubbling
        `input` from the composer slotted into one was the transcript speaking in

@@ -384,6 +384,34 @@ describe('constraints', () => {
     expect(sent).toBe(1)
   })
 
+  /* Measured in Chromium before this: a required composer sent "hi", cleared
+     itself, and on Tab showed itself invalid, because the field sends `change`
+     as it is left whenever its text differs from what it held on focus. */
+  test('a required composer cleared by its own send stays unmarked when left', async () => {
+    const element = (await composer('required')) as Checked
+    const field = part(element, 'field') as HTMLTextAreaElement
+    await type(element, 'hi')
+    press(element, 'Enter')
+    await element.updateComplete
+    expect(element.value).toBe('')
+    field.dispatchEvent(new Event('change'))
+    await element.updateComplete
+    await element.updateComplete
+    expect(hasState(element, 'invalid')).toBe(false)
+    expect(field.hasAttribute('aria-invalid')).toBe(false)
+  })
+
+  test('and one the reader emptied by hand is marked when left', async () => {
+    const element = (await composer('required')) as Checked
+    const field = part(element, 'field') as HTMLTextAreaElement
+    await type(element, 'hi')
+    await type(element, '')
+    field.dispatchEvent(new Event('change'))
+    await element.updateComplete
+    await element.updateComplete
+    expect(hasState(element, 'invalid')).toBe(true)
+  })
+
   test('a reset takes the mark away', async () => {
     const element = (await composer('required')) as Checked
     element.dispatchEvent(new Event('invalid'))
