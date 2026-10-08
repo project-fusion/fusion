@@ -25,6 +25,9 @@ import { defineConfig } from '@fusion.dev/proof'
 export default defineConfig({
   retake:
     'Dispatch the `Visual baselines` workflow on your branch with the suite `site`, and review the pull request it opens.',
+  /* Next.js writes `next-route-announcer` and never defines it, so only
+     Helix's own elements are awaited, and each of them is required. */
+  settle: { elements: 'helix-', readyProperty: 'whenSettled' },
   shots: [
     { name: 'wide', scheme: 'light', width: 1440 },
     { name: 'phone', scheme: 'light', width: 390 },

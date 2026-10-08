@@ -197,17 +197,17 @@ const respond = (request, response) => {
  * Unbounded, a page naming an element the bundle does not define hangs the
  * run with no output. This gives up after five seconds and names the tags.
  */
-const upgrades = (page) =>
-  page.evaluate(async () => {
+const upgrades = (page, prefix) =>
+  page.evaluate(async (prefix) => {
     const pending = [
       ...new Set([...document.querySelectorAll(':not(:defined)')].map((one) => one.localName)),
-    ]
+    ].filter((tag) => tag.startsWith(prefix))
     await Promise.race([
       Promise.all(pending.map((tag) => customElements.whenDefined(tag))),
       new Promise((done) => setTimeout(done, 5000)),
     ])
     return pending.filter((tag) => customElements.get(tag) === undefined)
-  })
+  }, prefix ?? '')
 
 /**
  * Waits for the page to hold still: three frames, the fonts, each element's
@@ -261,8 +261,26 @@ const still = (page, readyProperty) =>
     }
   }, readyProperty ?? null)
 
+/**
+ * `promise`, or a refusal after `seconds`.
+ *
+ * **A timer of its own, because an abort signal is not one everywhere.** A
+ * server that accepts a connection and never answers leaves a fetch waiting,
+ * and a runtime that does not honor `AbortSignal.timeout` on it waits with it.
+ */
+const within = (seconds, promise, what) => {
+  let timer
+  const expired = new Promise((_, refuse) => {
+    timer = setTimeout(
+      () => refuse(new Error(`${what} did not answer within ${seconds} seconds`)),
+      seconds * 1000,
+    )
+  })
+  return Promise.race([promise, expired]).finally(() => clearTimeout(timer))
+}
+
 /** One entry, every shot of it from one navigation. */
-const take = async (page, item, readyProperty, progress) => {
+const take = async (page, item, { elements, readyProperty }, progress) => {
   const started = performance.now()
   let error = null
   try {
@@ -276,7 +294,7 @@ const take = async (page, item, readyProperty, progress) => {
         const address =
           item.url ?? `${state.origin}${item.path}?proof=${encodeURIComponent(item.key)}`
         await page.goto(address, { waitUntil: 'load' })
-        const missing = await upgrades(page)
+        const missing = await upgrades(page, elements)
         if (missing.length > 0) {
           throw new Error(
             `nothing defines ${missing.map((tag) => `<${tag}>`).join(', ')}, after five seconds of waiting`,
@@ -350,14 +368,14 @@ const PER_SHOT = 60
  * reached named. The page it was stuck on is closed and the lane gets a new
  * one in the same context, so the entries after it start clean.
  */
-const bounded = async (lane, item, readyProperty) => {
+const bounded = async (lane, item, settle) => {
   const progress = { abandoned: false, stage: 'starting' }
   const limit = PER_SHOT * item.shots.length
   let timer
   const expired = new Promise((done) => {
     timer = setTimeout(() => done(true), limit * 1000)
   })
-  const finished = await Promise.race([take(lane.page, item, readyProperty, progress), expired])
+  const finished = await Promise.race([take(lane.page, item, settle, progress), expired])
   clearTimeout(timer)
   if (finished !== true) {
     return
@@ -408,7 +426,7 @@ const lanes = async (count) => {
 }
 
 const handlers = {
-  async capture({ items, readyProperty }) {
+  async capture({ elements, items, readyProperty }) {
     for (const item of items.filter((one) => one.path !== undefined)) {
       state.documents.set(item.key, item.html)
       state.pages.set(item.path, { dir: item.dir, files: item.files ?? {} })
@@ -421,7 +439,7 @@ const handlers = {
       taken.map(async (lane, k) => {
         for (let at = k; at < items.length; at += taken.length) {
           console.error(`proof: ${items[at].key}: picturing`)
-          await bounded(lane, items[at], readyProperty)
+          await bounded(lane, items[at], { elements, readyProperty })
         }
       }),
     )
@@ -454,8 +472,13 @@ const handlers = {
   },
 
   async fetch({ url }) {
-    const answer = await fetch(url, { redirect: 'follow' })
-    say({ ok: answer.ok, op: 'fetched', status: answer.status, text: await answer.text() })
+    const answer = await within(30, fetch(url, { redirect: 'follow' }), url)
+    say({
+      ok: answer.ok,
+      op: 'fetched',
+      status: answer.status,
+      text: await within(30, answer.text(), url),
+    })
   },
 
   async finish({ update }) {
@@ -484,7 +507,7 @@ const handlers = {
     const deadline = Date.now() + seconds * 1000
     for (;;) {
       try {
-        await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(5000) })
+        await within(5, fetch(url, { redirect: 'manual' }), url)
         say({ op: 'waited', up: true })
         return
       } catch {
