@@ -1245,6 +1245,27 @@ describe('a combobox heard through VoiceOver', () => {
     })
   })
 
+  /* The option was looked up by the whole comma list, so a choice in a
+     `multiple` field was never said: letting Ruby go left the region on
+     "Ruby, selected". */
+  test('says the option a choice changed, with multiple', async () => {
+    await onPlatform('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', async () => {
+      const host = await combobox('value="rb" multiple')
+      control(host).focus()
+      await press(host, 'ArrowDown')
+      await settled(host)
+      expect(await said(host)).toBe('3 results. Ruby, selected')
+      await press(host, 'Enter')
+      await settled(host)
+      expect(await said(host)).toBe('Ruby')
+      await press(host, 'ArrowDown')
+      await settled(host)
+      await press(host, 'Enter')
+      await settled(host)
+      expect(await said(host)).toBe('Go, selected')
+    })
+  })
+
   test('counts what the typing left, when typing opens the list', async () => {
     /* Measured before this: typing "g" said "3 results. Go" over a list showing
        one option, and after two Escapes typing "r" said "Rust" with no count. */

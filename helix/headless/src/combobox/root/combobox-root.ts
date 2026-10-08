@@ -583,11 +583,16 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
    * "France", and the form received two entries.
    */
   private get values(): string[] {
+    return this.valuesIn(this.value)
+  }
+
+  /** The values a value holds, read as `values` reads this element's own. */
+  private valuesIn(value: string): string[] {
     const known = new Set(this.created)
     for (const option of optionsAmong(this.knownChildren)) {
       known.add(option.value)
     }
-    return chosenValues(this.value, known, this.multiple)
+    return chosenValues(value, known, this.multiple)
   }
 
   /** The answers created here, which no option holds, kept so their commas read as theirs. */
@@ -1175,6 +1180,28 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   }
 
   /**
+   * Says the option a choice changed, for VoiceOver, which says nothing when
+   * `aria-selected` changes: `Beta, selected` for one taken, and its words
+   * alone for one let go, as the highlight says an option not chosen.
+   *
+   * **The option the choice changed, read from the values before and after.**
+   * With `multiple` the value is the whole list, and the option was looked up
+   * by it, so no option matched and no choice was ever said: measured with
+   * Beta chosen, Enter let it go and the live region kept `Beta, selected`.
+   */
+  private sayChoice(before: readonly string[], after: readonly string[]): void {
+    const taken = this.multiple ? after.find((one) => !before.includes(one)) : after[0]
+    const changed = taken ?? before.find((one) => !after.includes(one))
+    const option = this.listbox?.options.find((one) => one.value === changed)
+    if (!option) {
+      return
+    }
+    this.status.say(
+      taken === undefined ? option.text : formatWords(this, 'selectedLabel', { name: option.text }),
+    )
+  }
+
+  /**
    * Takes what the list announced and stops it there.
    *
    * The listbox says `helix-before-change` under its own name, and a consumer
@@ -1189,15 +1216,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
        since this element passes `.value` down and that is a consumer declaring
        ownership. */
     const { value } = (event as HelixBeforeChangeEvent).detail
+    const before = this.values
     /* And nothing happens on a refusal. Refusing a change should leave the
        control where it was, not clear the filter and shut the panel as though
        it had been taken. */
     if (!this.requestValue(value)) {
       return
     }
-    const chosen = this.listbox?.options.find((option) => option.value === value)
-    if (chosen && onApple()) {
-      this.status.say(formatWords(this, 'selectedLabel', { name: chosen.text }))
+    if (onApple()) {
+      this.sayChoice(before, this.valuesIn(value))
     }
     // Either way the search is spent: it found what it was for.
     this.emptied = false
