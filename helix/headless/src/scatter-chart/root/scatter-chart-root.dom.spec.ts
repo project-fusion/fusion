@@ -239,6 +239,29 @@ describe('reading by key', () => {
     expect(said).toEqual(['A', 'B', 'C'])
     expect(part(host, 'live')?.textContent).toContain('(3 of 3)')
   })
+
+  /* The plane is drawn left to right on every page, and the arrows followed the
+     page: on a right-to-left page Right did nothing from the first point and
+     Left moved to the point drawn on its right. */
+  test('the arrows follow the drawing on a right-to-left page', async () => {
+    document.documentElement.setAttribute('dir', 'rtl')
+    try {
+      const host = (await chart(SPEND, 'for="spend"')) as HTMLElement & {
+        updateComplete: Promise<boolean>
+      }
+      const said: string[] = []
+      for (const key of ['Home', 'ArrowRight', 'ArrowRight', 'ArrowLeft']) {
+        part(host, 'plot')?.dispatchEvent(
+          new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+        )
+        await host.updateComplete
+        said.push(part(host, 'tooltip-label')?.textContent ?? '')
+      }
+      expect(said).toEqual(['A', 'B', 'C', 'B'])
+    } finally {
+      document.documentElement.removeAttribute('dir')
+    }
+  })
 })
 
 describe('trend', () => {

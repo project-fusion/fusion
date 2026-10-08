@@ -174,6 +174,13 @@ export class ChartPointerController implements ReactiveController {
   axis: 'block' | 'inline' | 'none' = 'inline'
 
   /**
+   * Whether the plot is drawn left to right on every page, as Scatter Chart's
+   * plane is, so the arrows follow the drawing rather than the page's
+   * direction. Off, the arrow pointing along the line of text moves on.
+   */
+  drawnLtr = false
+
+  /**
    * Hears the reading: `change` each time it moves or is put away, and
    * `press` when it is clicked, tapped, or pressed with Enter or Space.
    *
@@ -585,7 +592,7 @@ export class ChartPointerController implements ReactiveController {
         count,
         grid: this.grid,
         page: this.page(count),
-        rtl: isRtl(this.host),
+        rtl: !this.drawnLtr && isRtl(this.host),
         series: this.columns().length,
       },
     )
