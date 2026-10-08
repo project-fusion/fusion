@@ -969,9 +969,12 @@ dependencies = [
 name = "fusion-proof-cli"
 version = "0.0.0-dev"
 dependencies = [
+ "base64",
  "clap",
  "fusion-rules",
  "png",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

@@ -10,11 +10,18 @@
 //! capture code and leaves the capture time the same.
 //!
 //! **The commands land with the work that makes them true**, so the help text
-//! never lists one that does nothing. `compare` is the first, and it needs no
-//! browser and no Node.
+//! never lists one that does nothing. `compare` needs no browser and no Node;
+//! `test` and `update` start the driver once per run.
 
+mod config;
 mod diff;
+mod discover;
+mod driver;
+mod fingerprint;
+mod harness;
 mod image;
+mod run;
+mod shard;
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -54,8 +61,63 @@ struct Cli {
     command: Command,
 }
 
+/// What `test` and `update` share.
+#[derive(Debug, clap::Args)]
+struct Selection {
+    /// The config file. `proof.config.ts`, `.mjs` or `.js` in the working
+    /// directory when not given.
+    #[arg(long, value_name = "PATH")]
+    config: Option<PathBuf>,
+    /// Entries to picture, each by its name in every source or by its id,
+    /// `source/name`. Every entry when none is given.
+    #[arg(value_name = "ENTRY")]
+    entries: Vec<String>,
+    /// How many shards the run is split into, with `--shard`.
+    #[arg(long, value_name = "N", requires = "shard")]
+    of: Option<usize>,
+    /// Which shard this run takes, counted from 0, with `--of`.
+    #[arg(long, value_name = "I", requires = "of")]
+    shard: Option<usize>,
+    /// How many pages capture at once. Every core but one, and four at most,
+    /// when not given.
+    #[arg(long, value_name = "N", value_parser = clap::value_parser!(u16).range(1..))]
+    workers: Option<u16>,
+}
+
+impl Selection {
+    fn options(&self, update: bool) -> Outcome<run::Options> {
+        let shard = match (self.shard, self.of) {
+            (Some(index), Some(of)) => Some(
+                shard::Shard::new(index, of)
+                    .map_err(|why| Failure::new(Code::Usage, "--shard", why))?,
+            ),
+            _ => None,
+        };
+        Ok(run::Options {
+            config: self.config.clone(),
+            names: self.entries.clone(),
+            shard,
+            update,
+            workers: self.workers.map(usize::from),
+        })
+    }
+}
+
 #[derive(Debug, Subcommand)]
 enum Command {
+    /// Picture every entry and compare each shot with its baseline.
+    ///
+    /// Exits 0 when every shot matches, and 1 when one differs, changed size,
+    /// has no baseline, or could not be taken. A difference writes an image of
+    /// it beside the baseline. On a platform other than the config's, it says
+    /// so and exits 0.
+    Test(Selection),
+    /// Picture every entry and write the baselines the comparison rejects.
+    ///
+    /// A shot that matches its baseline is left alone, so the files an update
+    /// writes are the ones that changed. An update of every entry also writes
+    /// the environment fingerprint.
+    Update(Selection),
     /// Compare two PNG files pixel by pixel, and fail when they differ.
     ///
     /// Exits 0 when no pixel differs, and 1 when a pixel differs or the two
@@ -172,6 +234,12 @@ fn main() -> ExitCode {
             diff,
             threshold,
         } => compare(baseline, current, diff.as_deref(), *threshold),
+        Command::Test(selection) => selection
+            .options(false)
+            .and_then(|options| run::run(&options)),
+        Command::Update(selection) => selection
+            .options(true)
+            .and_then(|options| run::run(&options)),
     };
     let code = outcome.unwrap_or_else(|failure| {
         eprintln!("{}", failure.render(PRODUCT));

@@ -3,8 +3,9 @@
 **Fusion Proof**, visual regression testing with baselines kept in git.
 
 **Building.** Phase 0 is done: the domain, the packages, and the release lane.
-Phase 1 has started: `proof compare` compares two PNG files, and nothing
-captures yet. What each later phase adds is the roadmap in
+Phase 1 is underway: `proof test` and `proof update` picture HTML files and
+compare them with their baselines, and `proof compare` compares two PNG files.
+What each later phase adds is the roadmap in
 [cli/npm/README.md](cli/npm/README.md), the page npm shows.
 
 Packages are flat inside this folder, one directory each, the same arrangement

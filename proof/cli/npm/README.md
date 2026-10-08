@@ -5,30 +5,124 @@ pictures of your pages and components in a real browser, compares each one to
 a baseline kept in your git repository, and fails the run when a picture
 changes.
 
-**Fusion Proof is in development.** This package installs the `proof` command,
-and `proof compare` is the one command that works today. The rest of this page
-describes what we are building.
+**Fusion Proof is in development.** It pictures plain HTML files today. Server
+and Storybook sources, the HTML report, and the GitHub Action come next, in the
+roadmap below.
 
 ```sh
-proof compare baseline.png current.png --diff difference.png
-```
-
-`proof compare` exits 0 when every pixel matches and 1 when a pixel differs or
-the two pictures are different sizes. `--diff` writes an image of the
-difference: the baseline in gray, the differing pixels red, and the pixels left
-out as antialiasing yellow. `--threshold` sets how far apart two colors may be
-and still count as the same pixel, from 0 to 1, and is 0.1 unless you set it.
-The comparison is `pixelmatch`'s, ported to Rust, and it needs no browser and no
-Node.
-
-```sh
-npm install --save-dev @fusion.dev/proof
+npm install --save-dev @fusion.dev/proof playwright
+npx playwright install --with-deps chromium
 ```
 
 The command is a native binary, and npm installs the build for your machine
 beside this package: macOS and Linux on Arm and x86-64, and Windows on x86-64.
 An install that skips optional dependencies skips it too, and `proof` then
 names the package it is missing. `PROOF_BIN` names a binary to run instead.
+Capture runs in Playwright, which you install beside it.
+
+## Commands
+
+```sh
+proof test                    compare every shot, and fail on a difference
+proof test button             only the entries named button
+proof update                  write only the baselines the comparison rejects
+proof test --shard 0 --of 4   the first of four shards, for CI
+proof compare a.png b.png     compare two PNG files, with no browser
+```
+
+- **`proof test`** pictures every entry and compares each shot with its
+  baseline. It exits 1 when a shot differs, changes size, has no baseline, or
+  cannot be taken, and writes an image of each difference beside its baseline,
+  named `<stem><suffix>.diff.png`. Add `*.diff.png` to your `.gitignore`.
+- **`proof update`** pictures every entry and writes a baseline only where the
+  comparison would fail. Review the files it writes before you commit them.
+- **`proof compare`** compares two PNG files. `--diff` writes the image of the
+  difference, and `--threshold` sets how far apart two colors may be and still
+  count as the same pixel, from 0 to 1.
+
+Each run ends with one line that says what it compared and what it skipped.
+`--config` names the config file, `--workers` sets how many pages capture at
+once, and `--shard` with `--of` takes one shard of a run split across jobs.
+
+## The config
+
+`proof.config.ts`, in the directory you run `proof` from:
+
+```ts
+import { defineConfig } from '@fusion.dev/proof'
+
+export default defineConfig({
+  serve: { '/theme.css': 'dist/theme.css' },
+  shots: [
+    { name: 'wide', scheme: 'light', width: 1280 },
+    { name: 'phone', scheme: 'light', width: 390 },
+    { name: 'dark', scheme: 'dark', width: 1280 },
+  ],
+  sources: [
+    {
+      glob: '{name}/example.html',
+      kind: 'html',
+      name: 'components',
+      root: 'src',
+      styles: ['/theme.css'],
+    },
+  ],
+})
+```
+
+- **`sources`**: where the entries come from. An `html` source reads every file
+  its `glob` matches under `root`. `{name}` is the path segment that names the
+  entry, `*` matches within a segment, and `**` matches any number of
+  directories. Each file is pictured inside a document that links `styles`,
+  loads `scripts` with `defer`, and sets the color scheme, the background, the
+  text color, the width, and a 24-pixel inset on `body`. `harness: false`
+  pictures the file as it is. `files` answers a relative request from a page
+  with another file beside it, such as `{ 'styles.css': '{stem}.css' }`.
+- **`shots`**: the pictures taken of each entry. A wide width, a phone width,
+  and dark when you give none. Each baseline is written beside its entry as
+  `<stem>.<name>.png`, and `suffix` changes `.<name>`.
+- **`serve`**: URL paths served from disk, relative to the config. A path that
+  ends in `/` serves a directory.
+- **`settle.readyProperty`**: a property your elements carry holding a promise
+  that resolves once they have rendered. Proof awaits it before each shot.
+- **`diff`**: `threshold`, 0.1 unless you set it, and `pixels`, how many pixels
+  may differ, 0 unless you set it.
+- **`exceptions`**: each names an `entry`, optionally a `shot`, and a `reason`.
+  `unstable: true` skips the shot and names it in every run. `pixels` lets the
+  shot differ by that many, and the run fails once the shot stops differing, so
+  an exception that is no longer needed is removed.
+- **`inspect`**: `run` is called with the Playwright page after each entry's
+  first shot, and `report` once at the end with everything `run` returned.
+  `report` returns `{ failed: true }` to fail the run.
+- **`shard`**: `cost` maps entry names to measured seconds, so shards are packed
+  by time. Entries with no measurement weigh `perShot` seconds a shot.
+- **`timings`**: a file to write each entry name's seconds to, which is how you
+  measure `shard.cost`.
+- **`retake`**: a sentence telling your team how to retake baselines, printed
+  when a run fails.
+- **`fingerprint`**, **`network`**, and **`platform`** are described below.
+
+## What every run does
+
+- **Capture holds still.** Before each shot Proof waits for every custom
+  element to be defined, the fonts to load, each element's ready promise, and
+  the page's boxes and scroll offsets to stay the same for three frames. It
+  emulates reduced motion and takes the shot with animations disabled. A font
+  that fails to load fails the entry.
+- **One page load for all the shots of an entry.** The viewport, the color
+  scheme, and the harness style change between shots on the same page.
+- **A difference is taken again from a fresh page load.** A shot that matches
+  on the second take passes, and the run names it.
+- **Requests stay on the harness origin.** Every request to another host is
+  refused, so a baseline never records what another server returned.
+  `network: 'open'` turns that off.
+- **Baselines are taken and compared on Linux.** On another platform `proof
+  test` says so and exits 0. `platform: 'any'` compares wherever it runs.
+- **The environment is recorded.** `proof update` of every entry writes
+  `proof.fingerprint.json`: the platform, the operating system release, the
+  browser version, and a hash of the installed fonts. A run on an environment
+  that differs stops and names what differs, because every picture would
+  differ for that reason alone.
 
 ## How it works
 
