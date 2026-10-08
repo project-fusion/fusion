@@ -420,7 +420,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * Which way the list runs. `horizontal` lays the items out along a line
    * and scrolls it sideways: Left and Right move between items, the other
    * way round on a right-to-left page, and `estimate` is an item's width. A
-   * grid always runs down.
+   * grid and a waterfall always run down.
    */
   @property()
   orientation: 'horizontal' | 'vertical' = 'vertical'
@@ -1846,7 +1846,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
              its longest column, and its items stand in it where the columns
              put them. */
           this.waterfall
-            ? `display: block; position: relative; block-size: ${this.virtualize.extent() + this.virtualize.window.before}px`
+            ? `display: block; position: relative; block-size: ${this.virtualize.offsetOf(this.data.length)}px`
             : horizontal
               ? `display: flex; flex: none${
                   gap === 0 ? '' : `; column-gap: ${gap}px; padding-inline-end: ${gap}px`

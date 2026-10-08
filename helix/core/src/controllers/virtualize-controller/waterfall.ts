@@ -76,7 +76,7 @@ export class Waterfall {
     this.extent = furthest
   }
 
-  /** Where item `index` starts. */
+  /** Where item `index` starts, and where the set ends for an index past it. */
   start(index: number): number {
     return this.starts[index] ?? this.extent
   }
