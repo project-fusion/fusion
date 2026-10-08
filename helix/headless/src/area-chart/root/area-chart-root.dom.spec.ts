@@ -407,6 +407,38 @@ describe('from data', () => {
     }
   })
 
+  /* Drawn from data, a chart had no table on the page for a screen reader to
+     read, and its summary gives only what the readings come to. */
+  test('renders the readings as a table, and none where a table on the page was read', async () => {
+    const chart = (await mount(
+      '<helix-headless-area-chart></helix-headless-area-chart>',
+    )) as HTMLElement & { data: unknown; updateComplete: Promise<boolean> }
+    chart.data = DATA
+    await chart.updateComplete
+    const table = part(chart, 'table')
+    expect(table?.querySelector('caption')?.textContent).toBe('Sessions by channel')
+    expect(
+      [...(table?.querySelectorAll('th[scope="col"]') ?? [])].map((th) => th.textContent),
+    ).toEqual(['Month', 'Direct', 'Referral'])
+    expect(
+      [...(table?.querySelectorAll('tbody tr') ?? [])].map((tr) =>
+        [...tr.children].map((cell) => cell.textContent),
+      ),
+    ).toEqual([
+      ['Jan', '10', '4'],
+      ['Feb', '20', '8'],
+      ['Mar', '15', '6'],
+    ])
+    await mount(
+      `<div><table id="t"><thead><tr><th>Month</th><th>Direct</th></tr></thead><tbody><tr><th>Jan</th><td>3</td></tr></tbody></table><helix-headless-area-chart for="t"></helix-headless-area-chart></div>`,
+    )
+    const read = document.querySelector('helix-headless-area-chart') as HTMLElement & {
+      updateComplete: Promise<boolean>
+    }
+    await read.updateComplete
+    expect(part(read, 'table')).toBeNull()
+  })
+
   test('a table named by for wins over data', async () => {
     await mount(
       `<div><table id="t"><caption>From the table</caption><thead><tr><th>Month</th><th>Direct</th></tr></thead><tbody><tr><th>Jan</th><td>3</td></tr></tbody></table><helix-headless-area-chart for="t"></helix-headless-area-chart></div>`,

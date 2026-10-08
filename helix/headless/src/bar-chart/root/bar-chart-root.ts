@@ -73,6 +73,19 @@ import '../../tooltip/index.js'
  * there until readings arrive. The `empty` and `loading` slots take markup in
  * their place, such as a link to add the first reading.
  *
+ * **Keyboard.** The plot is one tab stop.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Tab | Moves focus to the plot and shows the first reading. |
+ * | Right, Left | Moves to the next or the previous reading. On a right-to-left page, Left moves to the next. |
+ * | Down, Up | Moves among the series of the reading. With one series, moves to the next or the previous reading. |
+ * | Down, Up under `orientation="horizontal"` | Moves to the next or the previous reading, and Right and Left move among the series. |
+ * | Home, End | Moves to the first or the last reading. |
+ * | Page Down, Page Up | Moves a tenth of the readings on or back. |
+ * | Enter, Space | Presses the reading shown, which sends `helix-reading-press`. |
+ * | Escape | Puts the reading and its tooltip away. |
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
@@ -101,9 +114,10 @@ import '../../tooltip/index.js'
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
- * @csspart plot - The drawing, which takes focus to be read by key.
+ * @csspart plot - The drawing, which takes focus to be read by key. With nothing to draw, a group named as the chart is, holding the `empty` or `loading` part.
  * @csspart summary - The chart's name and each series' highest reading, written as a sentence for screen readers. Hide it visually.
  * @csspart svg - The drawing surface the bars and lines sit on.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
  * @csspart tick - One number on an axis.
  * @csspart tooltip - The tooltip bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
@@ -127,6 +141,10 @@ import '../../tooltip/index.js'
  * @cssproperty --chart-bar-wash - The gradient for a bar, named per bar so the styled
  *   tier can use it as the `fill`. It is always drawn, and used only when
  *   `wash="gradient"` is set.
+ *
+ * @cssstate active - While a reading is shown, under the pointer or the keys, with its tooltip open.
+ * @cssstate empty - While the `empty` part stands in the plot.
+ * @cssstate loading - While the `loading` part stands in the plot.
  */
 @customElement('helix-headless-bar-chart')
 export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
@@ -339,7 +357,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
        category off the axis and every other series slid one place left. */
     const categories = series.length === 0 ? [] : this.sourceRows.map((row) => row.label)
     if (categories.length === 0) {
-      return html`<div id=${CHART_PLOT} part="plot">${this.renderStatus()}</div>`
+      return this.renderEmpty()
     }
 
     /* Zero at both ends, so a series that goes negative gets a baseline inside
@@ -426,7 +444,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
         : this.renderAxis(y, domain, 'primary', sideways, widest)
     }${this.renderPlot(series, categories, y, domain, floor, z)}${
       z === undefined ? nothing : this.renderAxis(z, other, 'secondary', sideways, widest, tint)
-    }${this.renderLabels(categories)}${this.renderSummary(series)}`
+    }${this.renderLabels(categories)}${this.renderSummary(series)}${this.renderTable()}`
   }
 
   /**

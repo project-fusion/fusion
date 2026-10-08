@@ -126,6 +126,18 @@ export interface AreaStack {
  * there until readings arrive. The `empty` and `loading` slots take markup in
  * their place, such as a link to add the first reading.
  *
+ * **Keyboard.** The plot is one tab stop.
+ *
+ * | Key | What it does |
+ * |---|---|
+ * | Tab | Moves focus to the plot and shows the first reading. |
+ * | Right, Left | Moves to the next or the previous reading. On a right-to-left page, Left moves to the next. |
+ * | Down, Up | Moves among the series of the reading. With one series, moves to the next or the previous reading. |
+ * | Home, End | Moves to the first or the last reading. |
+ * | Page Down, Page Up | Moves a tenth of the readings on or back. |
+ * | Enter, Space | Presses the reading shown, which sends `helix-reading-press`. |
+ * | Escape | Puts the reading and its tooltip away. |
+ *
  * @since 0.1.0
  * @status stable
  * @category charts
@@ -150,9 +162,10 @@ export interface AreaStack {
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
- * @csspart plot - The drawing, which takes focus to be read by key.
+ * @csspart plot - The drawing, which takes focus to be read by key. With nothing to draw, a group named as the chart is, holding the `empty` or `loading` part.
  * @csspart summary - The total and each part's share at the latest reading, written as a sentence for screen readers.
  * @csspart svg - The drawing surface the bands sit on.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
  * @csspart tick - One number on the axis, placed with `inset-block-start` at its level.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
@@ -172,6 +185,10 @@ export interface AreaStack {
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssproperty --area-chart-axis - The width of the axis, in `ch`, set from the widest number on it. Written by the component on the axis.
+ *
+ * @cssstate active - While a reading is shown, under the pointer or the keys, with its tooltip open.
+ * @cssstate empty - While the `empty` part stands in the plot.
+ * @cssstate loading - While the `loading` part stands in the plot.
  */
 @customElement('helix-headless-area-chart')
 export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(HelixElement)) {
@@ -377,7 +394,7 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
     const rows = this.sourceRows
     const stack = this.stack
     if (rows.length === 0 || stack.columns.length === 0) {
-      return html`<div id=${CHART_PLOT} part="plot">${this.renderStatus()}</div>`
+      return this.renderEmpty()
     }
     const top = this.overlap
       ? Math.max(0, ...stack.layers.flat())
@@ -392,7 +409,7 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
     const slot = PLOT_WIDTH / rows.length
     const x = linear([0, Math.max(rows.length - 1, 1)], [slot / 2, PLOT_WIDTH - slot / 2])
     return html`${this.valueAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(stack, rows.length, x, y, domain)}
-      ${this.renderLabels(rows.map((row) => row.label))} ${this.renderSummary(stack, rows)}`
+      ${this.renderLabels(rows.map((row) => row.label))} ${this.renderSummary(stack, rows)}${this.renderTable()}`
   }
 
   /**
