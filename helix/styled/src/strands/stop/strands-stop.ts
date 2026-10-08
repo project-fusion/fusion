@@ -11,8 +11,9 @@ import { styles } from './strands-stop.css.js'
  * @description
  * Placed inside a `helix-strands` with `travel`, a stop names an element with
  * `for` and says which form the ribbon takes when the page reaches it: a `bend`
- * turning through it, a `ribbon` passing through `at`, or `waves` crossing at
- * its top edge. The stops are read in page order, whatever order they are
+ * turning through it, a `ribbon` passing through `at`, a `sweep` entering at
+ * its top corner on the side `at` is nearer and crossing to the far side by its
+ * bottom, or `waves` crossing at its top edge. The stops are read in page order, whatever order they are
  * written in, and a stop naming no element is skipped.
  *
  * A stop draws nothing itself and is never shown.
