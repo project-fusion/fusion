@@ -19,6 +19,7 @@ const SETTLE = 120
 import type { CSSResultGroup } from 'lit'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { COMPILED, compile } from '../compile.js'
 import { defaultFrame, withScript } from '../frame.js'
 import { styles as sheet } from './sandbox-preview.css.js'
 
@@ -125,6 +126,15 @@ export type PreviewMessage =
  * such as `utils.js`, to its source, and `import { add } from './utils.js'`
  * in the `js` pane or in another module loads it. A sandbox writes each pane
  * named for a module file here.
+ *
+ * **A module in TypeScript or JSX runs too**: a path ending in `.ts`, `.tsx`
+ * or `.jsx` is compiled to JavaScript first, and imported by its path or by
+ * its path without the extension. The compiler, Sucrase, loads from `cdn` the
+ * first time a module needs it, so the package carries none and a preview
+ * with no such module loads none. JSX compiles to the automatic runtime,
+ * `react/jsx-runtime`, from `dependencies`, or to the one a
+ * `@jsxImportSource` comment names. What fails to compile shows in the
+ * `error` part as an error the example threw, when the example imports it.
  *
  * **Examples render in a frame**, so an example's styles and scripts do not
  * affect the page around the sandbox, and `position: fixed` stays inside the
@@ -326,6 +336,19 @@ export class HelixSandboxPreview extends HelixElement {
   @state()
   private failure: string | undefined
 
+  /** Each module file compiled to JavaScript, by its path and source. */
+  private compiled = new Map<string, string>()
+
+  /** The module files being compiled, by their path and source. */
+  private readonly compiling = new Set<string>()
+
+  /**
+   * The import map the built-in document loads with: the last one with every
+   * module file compiled, so a frame never loads without one an example
+   * imports.
+   */
+  private map: Record<string, string> = {}
+
   /** Says the preview failed with `text`, or, with none, that it has not. */
   private fail(text?: string): void {
     this.failure = text
@@ -346,18 +369,54 @@ export class HelixSandboxPreview extends HelixElement {
    * and by the address its neighbors import it at, each package in
    * `dependencies` and the paths under it, and `imports` over all of them.
    */
-  private get importMap(): Record<string, string> {
+  private get importMap(): Record<string, string> | undefined {
     const map: Record<string, string> = {}
     for (const [name, version] of Object.entries(this.dependencies ?? {})) {
       const address = `${this.cdn}${name}@${version}`
       map[name] = address
       map[`${name}/`] = `${address}/`
     }
+    const compiled = new Map<string, string>()
     for (const [given, source] of Object.entries(this.modules ?? {})) {
       const path = given.replace(/^\.?\//, '')
-      map[`./${path}`] = map[`sandbox:/${path}`] = moduleText(path, source)
+      if (!COMPILED.test(path)) {
+        map[`./${path}`] = map[`sandbox:/${path}`] = moduleText(path, source)
+        continue
+      }
+      const key = `${path}\u0000${source}`
+      const code = this.compiled.get(key)
+      if (code === undefined) {
+        this.compileModule(key, path, source)
+        continue
+      }
+      compiled.set(key, code)
+      const text = moduleText(path, code)
+      const bare = path.replace(COMPILED, '')
+      map[`./${path}`] = map[`sandbox:/${path}`] = text
+      map[`./${bare}`] ??= map[`sandbox:/${bare}`] ??= text
     }
-    return { ...map, ...this.imports }
+    /* Only what the modules hold now, so an edit does not keep every version. */
+    this.compiled = compiled
+    return this.compiling.size > 0 ? undefined : { ...map, ...this.imports }
+  }
+
+  /**
+   * Compiles a module file, once, then draws again with it. Not on a server,
+   * which loads no frame.
+   */
+  private compileModule(key: string, path: string, source: string): void {
+    if (this.compiling.has(key) || typeof document === 'undefined') {
+      return
+    }
+    this.compiling.add(key)
+    void compile(this.cdn, path, source).then((code) => {
+      this.compiling.delete(key)
+      this.compiled.set(key, code)
+      this.requestUpdate()
+      /* A map that came out the same loads no new document, and the source
+         held back while this compiled goes out now. */
+      void this.updateComplete.then(() => this.send())
+    })
   }
 
   /**
@@ -515,9 +574,12 @@ export class HelixSandboxPreview extends HelixElement {
     }
   }
 
-  /** Sends the current source to the frame, once it is listening. */
+  /**
+   * Sends the current source to the frame, once it is listening and no
+   * module it may import is still compiling.
+   */
   private send(): void {
-    if (!this.ready) {
+    if (!this.ready || this.compiling.size > 0) {
       return
     }
     this.frame?.contentWindow?.postMessage(this.message, HelixSandboxPreview.target)
@@ -551,7 +613,7 @@ export class HelixSandboxPreview extends HelixElement {
     frame.title = this.label
     frame.style.cssText = 'block-size: 100vh; border: none; display: block; inline-size: 100vw'
     if (this.src === '') {
-      frame.srcdoc = defaultFrame(this.importMap)
+      frame.srcdoc = defaultFrame(this.map)
     } else {
       /* As this element's own frame resolved it, against this page, which the
          tab's blank document does not share. */
@@ -598,7 +660,7 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
     }
     this.unready()
     if (this.src === '') {
-      frame.srcdoc = defaultFrame(this.importMap)
+      frame.srcdoc = defaultFrame(this.map)
       return
     }
     frame.src = this.src
@@ -619,12 +681,21 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
     this.toggleState('loading', true)
   }
 
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    /* Held at the last map while a module compiles, so the frame does not load
+       without it and fail on the import. */
+    if (this.src === '') {
+      this.map = this.importMap ?? this.map
+    }
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     // A new document has to say it is listening again before anything is sent.
     /* A new import map is a new document as well, the built-in one loading
        again with it. */
-    const map = this.src === '' ? JSON.stringify(this.importMap) : ''
+    const map = this.src === '' ? JSON.stringify(this.map) : ''
     const remapped = map !== this.loadedMap
     this.loadedMap = map
     if (changed.has('src') || remapped) {
@@ -673,7 +744,7 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
       part="frame"
       @load=${this.handleFrameLoad}
       src=${this.src || nothing}
-      srcdoc=${this.src === '' ? defaultFrame(this.importMap) : nothing}
+      srcdoc=${this.src === '' ? defaultFrame(this.map) : nothing}
       title=${this.label}
       aria-describedby=${this.failure === undefined ? nothing : 'error'}
       allow="clipboard-write *; fullscreen *"

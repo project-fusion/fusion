@@ -1,5 +1,6 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { compilers } from '../compile.js'
 
 beforeAll(async () => {
   registerDom()
@@ -148,6 +149,69 @@ describe('the built-in frame document', () => {
     expect(text(map['./utils.js'])).toBe("export * from 'sandbox:/lib/math.js'")
     /* The same module either way, so it runs once. */
     expect(map['sandbox:/utils.js']).toBe(map['./utils.js'])
+  })
+
+  describe('a module in TypeScript or JSX', () => {
+    type Modular = Preview & { modules: Record<string, string> }
+    const mapOf = (own: HTMLElement): Record<string, string> =>
+      JSON.parse(
+        (part(own, 'frame')?.getAttribute('srcdoc') ?? '').match(
+          /<script type="importmap">(.*?)<\/script>/,
+        )?.[1] ?? '{"imports":{}}',
+      ).imports
+    const text = (address = ''): string =>
+      decodeURIComponent(address.replace(/^data:[^,]*,/, '')).split('\n//# sourceMappingURL')[0] ??
+      ''
+
+    /** A compiler that answers when told to, standing where the preview loads Sucrase from. */
+    const held = (cdn: string): (() => void) => {
+      let answer: () => void = () => {}
+      const answered = new Promise<void>((resolve) => {
+        answer = resolve
+      })
+      compilers.set(
+        cdn,
+        answered.then(() => (source: string) => ({ code: source.replace(/: number/g, '') })),
+      )
+      return answer
+    }
+
+    const compiled = async (own: Preview): Promise<void> => {
+      for (let turn = 0; turn < 5; turn += 1) {
+        await new Promise((resolve) => setTimeout(resolve, 0))
+        await own.updateComplete
+      }
+    }
+
+    afterEach(() => {
+      compilers.clear()
+    })
+
+    test('is compiled before the frame loads it, and imported by its path or without its extension', async () => {
+      const answer = held('test-a:/')
+      const own = (await preview('src="" cdn="test-a:/"')) as Modular
+      own.modules = {
+        'app.tsx': 'export const two: number = 2',
+        'utils.js': "export * from './app'",
+      }
+      await own.updateComplete
+      /* Held at the map it had, so the frame does not load without the module. */
+      expect(mapOf(own)['./utils.js']).toBeUndefined()
+      answer()
+      await compiled(own)
+      const map = mapOf(own)
+      expect(text(map['./app.tsx'])).toBe('export const two = 2')
+      expect(map['./app']).toBe(map['./app.tsx'] as string)
+      expect(map['sandbox:/app']).toBe(map['./app.tsx'] as string)
+      expect(text(map['./utils.js'])).toBe("export * from 'sandbox:/app'")
+    })
+
+    test('loads no compiler where every module is JavaScript', async () => {
+      const own = (await preview('src="" cdn="test-b:/"')) as Modular
+      own.modules = { 'utils.js': 'export const one = 1' }
+      await own.updateComplete
+      expect(compilers.has('test-b:/')).toBe(false)
+    })
   })
 
   test('keeps the sandbox, with scripts and no origin of its own', async () => {
