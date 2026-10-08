@@ -421,8 +421,7 @@ export class HelixSandbox extends HelixElement {
 
   /** Notes the source panes, which are files where there are several. */
   private readFiles(): void {
-    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="source"]')
-    const panes = slot?.assignedElements({ flatten: true }) ?? []
+    const panes = this.sources
     const files = panes.length > 1 ? panes : []
     if (files.length !== this.files.length || files.some((pane, at) => pane !== this.files[at])) {
       this.files = files
@@ -601,10 +600,7 @@ export class HelixSandbox extends HelixElement {
     if (!(target instanceof Node)) {
       return false
     }
-    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="source"]')
-    return (slot?.assignedElements({ flatten: true }) ?? []).some(
-      (pane) => pane === target || pane.contains(target),
-    )
+    return this.sources.some((pane) => pane === target || pane.contains(target))
   }
 
   /**
@@ -689,8 +685,7 @@ export class HelixSandbox extends HelixElement {
    */
   private readonly seed = (): void => {
     this.readFiles()
-    const slot = this.renderRoot.querySelector<HTMLSlotElement>('slot[name="source"]')
-    for (const pane of slot?.assignedElements({ flatten: true }) ?? []) {
+    for (const pane of this.sources) {
       const { name, value } = pane as Element & { name?: unknown; value?: unknown }
       const text = typeof value === 'string' ? value : pane.getAttribute('value')
       if (text !== null && !this.given.has(pane)) {
