@@ -1227,6 +1227,33 @@ describe('the window splitter keys and names', () => {
     expect(host.position).toBe(60)
   })
 
+  /* Zag's panels each say whether they can be collapsed. */
+  test('collapsible="end" makes Enter collapse the end pane, and the start pane stops at the edge', async () => {
+    const host = (await splitter('collapsible="end" default-position="60"')) as Collapsing
+    await press(host, 'Enter')
+    expect(host.collapsed).toBe('end')
+    expect(host.position).toBe(100)
+    await press(host, 'Enter')
+    expect([host.collapsed, host.position]).toEqual([undefined, 60])
+    await press(host, 'Home')
+    expect([host.collapsed, host.position]).toEqual([undefined, 0])
+  })
+
+  test('collapsible="none" keeps both panes open, by Enter or at an edge', async () => {
+    const host = (await splitter('collapsible="none" default-position="60"')) as Collapsing
+    await press(host, 'Enter')
+    expect([host.collapsed, host.position]).toEqual([undefined, 60])
+    await press(host, 'End')
+    expect([host.collapsed, host.position]).toEqual([undefined, 100])
+  })
+
+  test('end-min keeps room for the end pane, as min does for the start pane', async () => {
+    const host = await splitter('default-position="50" end-min="30" max="90"')
+    await press(host, 'End')
+    expect(host.position).toBe(70)
+    expect(separator(host).getAttribute('aria-valuemax')).toBe('70')
+  })
+
   test('and a refused collapse leaves the pane open', async () => {
     const host = (await splitter('default-position="60"')) as Collapsing
     host.addEventListener('helix-before-collapse', (event) => event.preventDefault())
