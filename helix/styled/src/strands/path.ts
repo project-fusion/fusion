@@ -250,8 +250,14 @@ export interface PathShape {
   sweep: number
 }
 
-/** The shape a page draws unless it asks for another. */
-export const SHAPE: PathShape = { lean: 0, period: 1, sweep: 0.4, swing: 1 }
+/**
+ * The shape a page draws unless it asks for another: calm, the ribbon
+ * swinging six tenths of the most its turns allow over S curves 2.4 screens
+ * long, resting a tenth of the width right of the middle. Compared down the
+ * whole landing page against wider, quicker, and leaning shapes, this one
+ * read as one long current rather than a ribbon zigzagging between cards.
+ */
+export const SHAPE: PathShape = { lean: 0.1, period: 1.4, sweep: 0.4, swing: 0.6 }
 
 /**
  * How far a ribbon swings either side of its axis, as a share of the width.
@@ -609,11 +615,17 @@ export const pagePath = (
          the strands were wide. On a phone the apex sits at the right edge
          and the ribbon cannot run that way, so the arm runs off the screen
          and the ribbon comes back in at its crest. */
-      const slope = BEND_EXIT / TURN
+      /* **The arm ends no steeper than the ribbon can run.** Its slope grows
+         as it leaves the apex, and a calm ribbon, swinging little over long
+         curves, is never as steep as the arm at `BEND_EXIT`: the two met at an
+         angle. The arm stops at the last of its points whose slope the
+         ribbon's curve reaches, so the curve picks it up at that slope. */
       const swing = swingOf(height, width, narrow, shape)
       const steepest = (swing * width * Math.PI) / (period * height)
+      const reach = Math.max(0.15, Math.floor(Math.min(BEND_EXIT, steepest * TURN) / 0.15) * 0.15)
+      const slope = reach / TURN
       const a = Math.acos(Math.min(1, slope / steepest))
-      const bent = bend(stop.top, span, at, narrow, width, narrow ? 0.6 : BEND_EXIT)
+      const bent = bend(stop.top, span, at, narrow, width, narrow ? 0.6 : reach)
       const exit = bent.at(-1) as PathPoint
       points.push(...bent)
       if (!narrow) {
