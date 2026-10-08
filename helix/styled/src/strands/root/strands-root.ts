@@ -72,9 +72,11 @@ const PACE = 0.25
  * `--helix-color-background`. On a light page the light becomes ink, because
  * light added to near-white cannot be seen.
  *
- * **Three forms, set with `variant`.** `bend` turns bright strands through one tight point, with its
- * arms opening to the right. `ribbon`, the default, is a broad, soft ribbon in
- * long curves. `waves` is sharp strands crossing the full width.
+ * **Four forms, set with `variant`.** `bend` turns bright strands through one
+ * tight point, with its arms opening to the right. `ribbon`, the default, is a
+ * broad, soft ribbon in long curves. `sweep` enters at a top corner, the one
+ * `at` is nearer, and crosses to the far side by the bottom. `waves` is sharp
+ * strands crossing the full width.
  *
  * **In its own box, by default.** The element fills the box it is given, the
  * way an image does, and `at` places the bend's apex or the ribbon's axis across
@@ -599,7 +601,8 @@ export class HelixStrands extends HelixElement {
         at: Number.isFinite(at) ? at : undefined,
         height: rect.height,
         top: rect.top + scroll,
-        variant: variant === 'bend' || variant === 'waves' ? variant : 'ribbon',
+        variant:
+          variant === 'bend' || variant === 'sweep' || variant === 'waves' ? variant : 'ribbon',
       })
     }
     return placed

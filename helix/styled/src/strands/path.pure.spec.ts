@@ -316,6 +316,25 @@ describe('strands reach', () => {
   })
 })
 
+describe('strands sweep', () => {
+  test('stays at the edge beside its target, and crosses only below it', () => {
+    /* A sweep is pointed at the words it has to leave clear, so nothing lit
+       crosses the middle of the page until the target ends. */
+    const target: PlacedStop = { at: 0.9, height: 450, top: 220, variant: 'sweep' }
+    const points = pagePath([target], 'ribbon', 1440, 900, 6000)
+    /* Its centerline runs just past the edge, with its strands reaching in. */
+    const beside = points.filter(
+      ([, y, , brightness]) => brightness > 0 && y > 0 && y < target.top + target.height,
+    )
+    expect(beside.length).toBeGreaterThan(0)
+    for (const [x] of beside) {
+      expect(x).toBeGreaterThan(0.95)
+    }
+    const after = lit(points).filter(([, y]) => y > target.top + target.height + 900 * 0.8)
+    expect(Math.min(...after.map(([x]) => x))).toBeLessThan(0.3)
+  })
+})
+
 describe('strands arc length', () => {
   const grows = (lengths: Float32Array): boolean =>
     lengths.every((one, i) => i === 0 || one > (lengths[i - 1] ?? 0))
