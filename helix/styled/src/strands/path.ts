@@ -67,7 +67,7 @@ const GLOW = { bend: 1, ribbon: 0.36, sweep: 0.8, waves: 0.7 } as const
  * pushing the near strands further out, it ran most of half a page wide and
  * read as loose strands rather than a band.
  */
-const WIDTH = { bend: 0.12, ribbon: 0.18, sweep: 0.05, waves: 0.06 } as const
+const WIDTH = { bend: 0.12, ribbon: 0.18, sweep: 0.16, waves: 0.06 } as const
 
 /** Where a bend's apex sits across its box, when `at` is not given. */
 const BEND_AT = 0.5
@@ -737,62 +737,50 @@ export const pagePath = (
       }
       fromRight = true
     } else if (stop.variant === 'sweep') {
-      /* **A sweep comes in at the page's top corner and lands on its
-         target's.** It runs down the page's edge on the side \`at\` is nearer,
-         turns across just above its target, crosses the page there, and turns
-         down at the target's far top corner, where the ribbon carries on. Point
-         it at the section it lands on: everything above that section's top,
-         such as a hero's words, stays clear of it but for the edge it comes
-         down.
+      /* **A sweep crosses the page in one diagonal**, half a sine from a crest
+         above the page's top corner on the side `at` is nearer to a crest
+         at its target's far top corner, where the ribbon carries on down the
+         page. Point it at the section it lands on. The upper crest sits a
+         third of a screen above the page, so the strand comes in at the corner
+         already heading across. To keep words over it legible, name them in
+         the root's `quiet`, and the light dims behind them.
 
-         **Narrow, and narrower at its turns.** The crossing runs in the gap
-         above the target, so its band is a thread a twentieth of the width,
-         and each turn is a sixth of a screen round, which no band wider than
-         the turn allows can take; it narrows there to what the turn allows. */
+         **Full where it runs straight, narrower where it turns.** Its width
+         at each point is the most the turn there allows, so the band is at
+         full breadth through the long middle of the diagonal and narrows only
+         into the crest it lands on. */
       const right = (stop.at ?? 0.9) >= 0.5
       const way = right ? -1 : 1
-      const edge = (right ? (narrow ? 1.1 : 1.03) : narrow ? -0.1 : -0.03) * width
-      const land = (right ? (stop.left ?? 0.06) : (stop.right ?? 0.94)) * width
-      const thread = narrow ? 0.12 : WIDTH.sweep
+      const from = right ? 0.98 : 0.02
+      const land = right ? (stop.left ?? 0.06) : (stop.right ?? 0.94)
+      const full = narrow ? 0.3 : WIDTH.sweep
       const glow = narrow ? GLOW.sweep * 0.65 : GLOW.sweep
-      const r = height * 0.16
-      const level = stop.top - r
-      const allowedFor = (radius: number): number =>
-        Math.max(0.006, Math.min(thread, (radius / 1.15 - WOBBLE) / (SPREAD * width * REACH)))
-      const pinch = allowedFor(r)
-      const step = ((Math.PI / 2) * r) / 5
-      const route: [number, number, number][] = []
-      /* Down the edge, from above the page, easing to the turn's thread. */
-      const above = Math.min(0, level - r) - height * 0.5
-      const down = Math.max(1, Math.ceil((level - r - above) / (step * 1.6)))
-      for (let k = 0; k < down; k++) {
-        const y = above + ((level - r - above) * k) / down
-        route.push([edge, y, Math.max(0, 1 - (level - r - y) / (r * 1.5))])
+      const begins = Math.min(stop.top, 0) - height * 0.35
+      const descent = stop.top - begins
+      const across = (land - from) * width
+      const allowed = (radius: number): number =>
+        Math.max(0.006, Math.min(full, (radius / 1.15 - WOBBLE) / (SPREAD * width * REACH)))
+      const radiusAt = (f: number): number => {
+        const slope = ((across * Math.PI) / (2 * descent)) * Math.sin(Math.PI * f)
+        const bend = Math.abs(
+          ((across * Math.PI ** 2) / (2 * descent ** 2)) * Math.cos(Math.PI * f),
+        )
+        return bend < 1e-9 ? Number.POSITIVE_INFINITY : (1 + slope * slope) ** 1.5 / bend
       }
-      /* The first turn, from heading down to heading across. */
-      for (let k = 0; k <= 5; k++) {
-        const phi = (k / 5) * (Math.PI / 2)
-        route.push([edge + way * r - way * r * Math.cos(phi), level - r + r * Math.sin(phi), 1])
-      }
-      /* Across, just above the target. */
-      const from = edge + way * r
-      const to = land - way * r
-      const across = Math.max(1, Math.ceil(Math.abs(to - from) / (step * 1.6)))
-      for (let k = 1; k < across; k++) {
-        const x = from + ((to - from) * k) / across
-        const near = Math.min(Math.abs(x - from), Math.abs(x - to))
-        route.push([x, level, Math.max(0, 1 - near / (r * 1.5))])
-      }
-      /* The second turn, from heading across to heading down, at the corner. */
-      for (let k = 0; k <= 5; k++) {
-        const phi = (k / 5) * (Math.PI / 2)
-        route.push([to + way * r * Math.sin(phi), level + r - r * Math.cos(phi), 1])
-      }
-      route.forEach(([x, y, turning], k) => {
+      const spacing = height * 0.08
+      const count = Math.max(8, Math.ceil(descent / spacing))
+      points.push([from, begins - height * 0.4, allowed(radiusAt(0)), 0])
+      for (let k = 0; k <= count; k++) {
+        const f = k / count
         kept.add(points.length)
-        points.push([x / width, y, thread + (pinch - thread) * turning, glow * Math.min(1, k / 2)])
-      })
-      carryFrom(way, pinch, glow, step)
+        points.push([
+          from + ((land - from) * (1 - Math.cos(Math.PI * f))) / 2,
+          begins + descent * f,
+          allowed(radiusAt(f)),
+          glow * Math.min(1, (k + 1) / 3),
+        ])
+      }
+      carryFrom(way, allowed(radiusAt(1)), glow, descent / count)
     } else if (stop.variant === 'waves') {
       const carries =
         joined !== undefined && ribbonAfter(stop.top + height * 0.5, placed[index + 1])

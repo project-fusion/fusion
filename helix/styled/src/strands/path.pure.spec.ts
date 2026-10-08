@@ -329,14 +329,20 @@ describe('strands sweep', () => {
   const points = pagePath([card], 'ribbon', 1440, 900, 6000)
   const shown = points.filter(([, y, , brightness]) => brightness > 0 && y > 0)
 
-  test('comes down the page at the right edge until just above its target', () => {
-    /* Its centerline runs just past the edge, with its strands reaching in,
-       so a hero's words in the middle of the page stay clear. */
-    const above = shown.filter(([, y]) => y < card.top - 900 * 0.32 - 1)
-    expect(above.length).toBeGreaterThan(0)
-    for (const [x] of above) {
-      expect(x).toBeGreaterThan(1)
-    }
+  test('comes in at the top right corner and crosses in one diagonal', () => {
+    /* At the top of the page it is near the right edge, and from there it
+       only heads left until it lands, so it never doubles back. */
+    const top = shown.find(([, y]) => y >= 0)
+    expect(top?.[0]).toBeGreaterThan(0.8)
+    const crossing = shown.filter(([, y]) => y <= card.top)
+    crossing.forEach(([x], i) => {
+      expect(x).toBeLessThanOrEqual((crossing[i - 1]?.[0] ?? 1) + 1e-6)
+    })
+  })
+
+  test('is at its full width through the middle of the diagonal', () => {
+    const middle = shown.find(([, y]) => y > card.top * 0.4)
+    expect(middle?.[2]).toBeCloseTo(0.16, 2)
   })
 
   test("lands on the target's top left corner, heading down", () => {

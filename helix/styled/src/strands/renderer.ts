@@ -8,8 +8,11 @@ import {
   DUST_VERTEX,
   LINE_FRAGMENT,
   LINE_VERTEX,
+  MAX_QUIET,
   QUAD_VERTEX,
 } from './shader.js'
+
+export { MAX_QUIET }
 
 /** The most strands a ribbon draws, at `density` 1. */
 export const MAX_STRANDS = 340
@@ -59,6 +62,12 @@ export interface StrandsFrame {
   gain: number
   /** The path, four floats a point, padded to the uniform array's length. */
   points: Float32Array
+  /**
+   * The rects the light dims behind, as left, top, right and bottom in the
+   * path's pixels, four floats each for `MAX_QUIET` rects. An unused one is
+   * all zeros.
+   */
+  quiet: Float32Array
   /** The stretch of the path on screen, as a range of its parameter. */
   range: readonly [number, number]
   /** How far the page is scrolled, in CSS pixels, or `0` inside a box. */
@@ -310,6 +319,7 @@ export class StrandsRenderer {
     gl.useProgram(program.program)
     gl.uniform4fv(program.uniforms.get('uPts') ?? null, frame.points)
     gl.uniform4fv(program.uniforms.get('uLen') ?? null, frame.lengths)
+    gl.uniform4fv(program.uniforms.get('uQuiet') ?? null, frame.quiet)
     gl.uniform1i(program.uniforms.get('uCount') ?? null, frame.count)
     gl.uniform2f(program.uniforms.get('uView') ?? null, frame.view[0], frame.view[1])
     gl.uniform1f(program.uniforms.get('uScroll') ?? null, frame.scroll)
