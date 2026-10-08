@@ -49,6 +49,7 @@ describe('a picker’s feedback', () => {
   test('is a message under it, a verdict the form reads, and a mark on it', async () => {
     const host = await mount('feedback="Pick a weekday"')
     expect(host.shadowRoot?.querySelector('[part="feedback"]')?.textContent).toBe('Pick a weekday')
+    expect(host.shadowRoot?.querySelector('[part="feedback"]')?.getAttribute('role')).toBe('alert')
     expect(host.validity.customError).toBe(true)
     expect(host.validationMessage).toBe('Pick a weekday')
     expect(host.internals.ariaInvalid).toBe('true')

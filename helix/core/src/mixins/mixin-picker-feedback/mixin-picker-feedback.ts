@@ -169,11 +169,16 @@ export const MixinPickerFeedback = <T extends Constructor<HelixFormElement>>(Bas
       hostAria(this.internals, { describedBy: line ? [line] : [] })
     }
 
-    /** The `feedback` line, or nothing while there is none. */
+    /**
+     * The `feedback` line, or nothing while there is none.
+     *
+     * `role="alert"`, as a field's feedback line has, so the message is
+     * announced when it appears and the label and hint are not read with it.
+     */
     protected renderPickerFeedback(): TemplateResult | typeof nothing {
       return this.feedback === ''
         ? nothing
-        : html`<p part="feedback" id="feedback">${this.feedback}</p>`
+        : html`<p part="feedback" id="feedback" role="alert">${this.feedback}</p>`
     }
   }
 
