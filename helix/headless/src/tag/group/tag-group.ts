@@ -45,7 +45,8 @@ export type TagSelectionMode = SelectionMode
  * not disabled. `selection-behavior="replace"` selects the tag a reader
  * presses or moves to alone, as a file list does, and Control or Command
  * with a press or Space adds or takes out one tag. `disallow-empty-selection`
- * keeps one tag selected once one is. `value` holds the
+ * keeps one tag selected once one is, and Escape lets go of the selection
+ * otherwise. `value` holds the
  * selected tags' values, separated by commas, and a change asks with
  * `helix-before-change` and tells with `change`. Enter on a tag with an
  * `href` follows its link. A `disabled` tag is passed over. A selected tag
@@ -356,6 +357,17 @@ export class HelixHeadlessTagGroup extends HelixElement {
       return
     }
     if (event.ctrlKey || event.metaKey) {
+      return
+    }
+    /* Escape lets go of the selection, as React Aria's TagGroup does, and
+       keeps the key from closing what holds the group only where there was
+       something to let go of. */
+    if (event.key === 'Escape') {
+      if (this.selectionMode && this.written !== '' && !this.disallowEmptySelection) {
+        event.preventDefault()
+        event.stopPropagation()
+        this.ask('')
+      }
       return
     }
     /* The keyboard controller, listening first, has already moved focus. */
