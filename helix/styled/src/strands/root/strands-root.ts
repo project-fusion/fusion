@@ -133,11 +133,43 @@ export class HelixStrands extends HelixElement {
   at?: number
 
   /**
+   * How much the glow around the strands adds, as a multiplier. `0` draws the
+   * strands alone, crisp and dimmer, and `1` is the default glow.
+   */
+  @property({ type: Number })
+  bloom = 1
+
+  /**
+   * How far apart the brightest and dimmest strands are, from `0`, most of
+   * them alike, to `1`, a few burning bright over many faint ones. Clamped to
+   * that range. The ribbon as a whole keeps its strength.
+   */
+  @property({ type: Number })
+  contrast = 0.5
+
+  /**
    * How many strands the ribbon has, from `0`, sixty, to `1`, three hundred and
    * forty. Clamped to that range.
    */
   @property({ type: Number })
   density = 0.8
+
+  /**
+   * How much the ribbon's depth shows, from `0`, flat, to `1`. Clamped to that
+   * range. The strands at the front of the ribbon's roll are drawn thicker,
+   * brighter, and further from its axis, and those at the back thinner, dimmer,
+   * and out of focus.
+   */
+  @property({ type: Number })
+  depth = 0.6
+
+  /**
+   * How differently each strand moves, from `0`, the whole ribbon rolling and
+   * waving as one, to `1`, each strand at its own pace and angle, crossing
+   * over the others. Clamped to that range.
+   */
+  @property({ type: Number })
+  drift = 0.5
 
   /** Overall brightness, as a multiplier on the light. */
   @property({ type: Number })
@@ -611,10 +643,15 @@ export class HelixStrands extends HelixElement {
       ? visibleRange(this.table, this.offset - view[1] * 0.4, this.offset + view[1] * 1.4)
       : ([0, 1] as const)
     const density = Math.min(1, Math.max(0, this.density))
+    const share = (value: number): number => Math.min(1, Math.max(0, value))
     renderer.render(
       {
+        bloom: Math.max(0, this.bloom),
+        contrast: share(this.contrast),
         count: this.count,
+        depth: share(this.depth),
         dpr: this.dpr,
+        drift: share(this.drift),
         gain: Math.max(0, this.gain),
         points: this.points,
         range,
