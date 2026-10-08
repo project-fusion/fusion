@@ -1,4 +1,10 @@
-import { CopyController, customElement, HelixCopyErrorEvent, words } from '@fusion.dev/helix-core'
+import {
+  CopyController,
+  customElement,
+  HelixCopyErrorEvent,
+  type Placement,
+  words,
+} from '@fusion.dev/helix-core'
 import { check, copy, x } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -38,7 +44,17 @@ import '../../tooltip/index.js'
  * The button is named `label`, or the host's `aria-label`, and its name
  * changes to `copied-label` or `error-label` for the moment after a press. The
  * same words are said in a live region, so a screen reader hears the result,
- * and the tooltip shows them.
+ * and the tooltip shows them. The tooltip does not also describe the button,
+ * since its words are the button's name.
+ *
+ * **The tooltip.** It shows the name on hover and focus and the result after a
+ * press. `tooltip="copy"` shows it only for the result, and `tooltip="none"`
+ * draws none, as Web Awesome's copy button offers. `tooltip-placement` is the
+ * side it prefers, and it moves to another side where that one does not fit.
+ *
+ * **Words on the button.** `show-label` draws the name beside the icon, and
+ * the result in its place after a press. The button is as wide as the longest
+ * of the three, so a press does not resize it.
  *
  * @since 0.1.0
  * @status stable
@@ -57,6 +73,7 @@ import '../../tooltip/index.js'
  * @csspart live - The live region that says `copied-label` or `error-label` after a press, and `pending-label` when the button becomes pending under focus. It is rendered from the first time it says anything.
  * @csspart mark - The clipboard icon, and the confirmation icon that replaces it.
  * @csspart spinner - The ring a pending button turns, an empty element the styled button draws over the icon. It is rendered only while the button is pending.
+ * @csspart text - The words beside the icon, under `show-label`. It holds all three, `label`, `copied-label` and `error-label`, with all but the current one hidden.
  * @csspart tooltip - The tooltip bubble, forwarded from the tooltip inside the button.
  * @csspart tooltip-arrow - The tooltip's arrow, which points at the button.
  * @csspart tooltip-arrow-bottom - The arrow while the bubble is below the button, on the bubble's top edge. Set together with `tooltip-arrow`.
@@ -71,7 +88,6 @@ import '../../tooltip/index.js'
  * @cssstate copied - The moment after a successful copy, while `copied-label` names the button.
  * @cssstate failed - The moment after a press that put nothing on the clipboard, while `error-label` names the button.
  *
- * @withheld csspart text - Button's words, which this does not render: the label is the icon's name.
  * @withheld slot end - Button's, which this does not render.
  * @withheld slot start - Button's, which this does not render.
  */
@@ -127,6 +143,28 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   @words
   @property()
   override label = 'Copy'
+
+  /**
+   * Draws the name as words beside the icon, and the result in their place
+   * after a press. The button stays as wide as the longest of them.
+   */
+  @property({ attribute: 'show-label', reflect: true, type: Boolean })
+  showLabel = false
+
+  /**
+   * When the tooltip shows: `full` on hover and focus and after a press,
+   * `copy` only after a press, to show the result, and `none` never, for a
+   * button whose result shows another way, such as under `show-label`.
+   */
+  @property({ reflect: true })
+  tooltip: 'copy' | 'full' | 'none' = 'full'
+
+  /**
+   * The side the tooltip prefers. It moves to another side where this one
+   * does not fit.
+   */
+  @property({ attribute: 'tooltip-placement' })
+  tooltipPlacement: Placement = 'top'
 
   /**
    * The text copied to the clipboard.
@@ -210,6 +248,29 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
     super.willUpdate(changed)
     this.toggleState('copied', this.copied)
     this.toggleState('failed', this.failed)
+  }
+
+  /** Whether the last render showed a result, so `tooltip="copy"` opens and closes on the change. */
+  private showedResult = false
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    const result = this.copied || this.failed
+    if (result === this.showedResult) {
+      return
+    }
+    this.showedResult = result
+    if (this.tooltip !== 'copy') {
+      return
+    }
+    const tip = this.renderRoot.querySelector<HTMLElement & { hide(): void; show(): void }>(
+      '[data-copy-tooltip]',
+    )
+    if (result) {
+      tip?.show()
+    } else {
+      tip?.hide()
+    }
   }
 
   /** @internal A copy button never submits, so it is no form's default button. */
@@ -313,7 +374,7 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
       @keydown=${this.notePress}
       @pointerdown=${this.notePress}
     >
-      ${this.renderCopiedIcon()} ${this.renderFailedIcon()} ${this.renderCopyIcon()}${this.renderSpinner()}
+      ${this.renderCopiedIcon()} ${this.renderFailedIcon()} ${this.renderCopyIcon()}${this.renderSpinner()}${this.renderText()}
       </button>`,
     )}${this.renderLive()}`
   }
@@ -355,6 +416,25 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   }
 
   /**
+   * The words beside the icon, under `show-label`, behind a seam of its own.
+   *
+   * All three are drawn and only the current one shows, so the button is as
+   * wide as the longest of them and a press does not resize it. Hidden from a
+   * screen reader, which hears the same words as the button's name.
+   */
+  protected renderText(): TemplateResult | typeof nothing {
+    if (!this.showLabel) {
+      return nothing
+    }
+    const resting = !this.copied && !this.failed
+    return html`<span part="text" aria-hidden="true"
+      ><span ?hidden=${!resting}>${this.namedBy || this.label}</span
+      ><span ?hidden=${!this.copied}>${this.copiedLabel}</span
+      ><span ?hidden=${!this.failed}>${this.errorLabel}</span
+    ></span>`
+  }
+
+  /**
    * The bubble the control sits inside, behind a seam.
    *
    * It takes the control rather than rendering it, because this one wraps: a
@@ -368,7 +448,14 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
        about it. Without it the tooltip hid on the same click that swapped its
        content to Copied, so the words this component takes such care over were
        written and then taken off screen in the same frame. */
-    return html`<${this.tag('tooltip')} content=${this.says} persist
+    if (this.tooltip === 'none') {
+      return control
+    }
+    /* Under `copy` the bubble has no words at rest, so hover and focus have
+       nothing to show, and `updated` opens it on a result. */
+    const content = this.tooltip === 'copy' && !this.copied && !this.failed ? '' : this.says
+    return html`<${this.tag('tooltip')} content=${content} persist
+    data-copy-tooltip placement=${this.tooltipPlacement}
     exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom,
       arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right,
       arrow-top: tooltip-arrow-top, tooltip, tooltip-bottom, tooltip-left, tooltip-right,
