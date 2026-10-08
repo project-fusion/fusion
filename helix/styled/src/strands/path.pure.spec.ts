@@ -8,6 +8,7 @@ import {
   type PathPoint,
   type PlacedStop,
   pagePath,
+  SPREAD,
   TURN,
   visibleRange,
 } from './path.js'
@@ -238,6 +239,58 @@ describe('strands page path', () => {
   test('never carries more points than the shader holds', () => {
     const points = pagePath([], 'ribbon', view.width, view.height, 800 * 200)
     expect(points.length).toBeLessThanOrEqual(MAX_POINTS)
+  })
+})
+
+describe('strands reach', () => {
+  test('no lit turn on the screen is tighter than its strands reach to either side', () => {
+    /* The strands are the centerline moved sideways by up to the ribbon's
+       breadth, so on the inside of a turn tighter than that they fold back
+       over themselves. Measured with the same reach the path is laid by, at
+       the default spread, on a page whose bend sits far to the right, which
+       is what folded the hand-over into the ribbon. */
+    const stop = (top: number, variant: PlacedStop['variant'], at?: number): PlacedStop => ({
+      at,
+      height: 900,
+      top,
+      variant,
+    })
+    for (const [width, height] of [
+      [1440, 900],
+      [2000, 1150],
+    ] as const) {
+      const points = pagePath(
+        [stop(0, 'bend', 0.86), stop(3700, 'waves'), stop(7000, 'waves')],
+        'ribbon',
+        width,
+        height,
+        7600,
+      )
+      const n = points.length
+      const at = (k: number, c: number): number => points[Math.max(0, Math.min(n - 1, k))]?.[c] ?? 0
+      for (let s = 0.05; s < n - 1.05; s += 0.05) {
+        const i = Math.min(Math.floor(s), n - 2)
+        const curve = (f: number, c: number): number =>
+          catmull(at(i - 1, c), at(i, c), at(i + 1, c), at(i + 2, c), f)
+        const point = (f: number): [number, number] => [curve(f, 0) * width, curve(f, 1)]
+        const f = s - i
+        const [ax, ay] = point(Math.max(0, f - 0.04))
+        const [bx, by] = point(f)
+        const [cx, cy] = point(Math.min(1, f + 0.04))
+        const glow = curve(f, 3)
+        const area = Math.abs((bx - ax) * (cy - ay) - (by - ay) * (cx - ax)) / 2
+        if (glow < 0.1 || bx < 0 || bx > width || area < 1e-6) {
+          continue
+        }
+        const radius =
+          (Math.hypot(bx - ax, by - ay) *
+            Math.hypot(cx - bx, cy - by) *
+            Math.hypot(cx - ax, cy - ay)) /
+          (4 * area)
+        const reach = Math.max(0, curve(f, 2)) * SPREAD * width * 1.3 + 40
+        expect(radius).toBeGreaterThan(reach * 0.85)
+      }
+    }
   })
 })
 
