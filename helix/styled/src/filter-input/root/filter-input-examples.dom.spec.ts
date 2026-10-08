@@ -15,7 +15,7 @@ beforeAll(async () => {
   await import('../index.js')
   await import('../menu/index.js')
   await import('../../button/index.js')
-  await import('../../icon/index.js')
+  await import('../../icon/all/index.js')
   await import('../../menu/index.js')
   await import('../../option/index.js')
 })

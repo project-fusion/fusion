@@ -3,7 +3,8 @@ import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
-  await import('../index.js')
+  // `gear` is outside the small set the family's entry registers.
+  await import('../all/index.js')
 })
 
 /* The stylesheet the element adopts, as text. happy-dom resolves no cascade,

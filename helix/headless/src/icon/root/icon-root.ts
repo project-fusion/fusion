@@ -30,8 +30,11 @@ import { afterPageSettles } from '../settle.js'
  * a dark background. Shapes that set their own `fill` or `stroke` are
  * unaffected.
  *
- * **A name is looked up in a registry.** The family's entry registers the
- * whole set, so any name in it draws. The element's own entry,
+ * **A name is looked up in a registry.** The family's entry registers a small
+ * set: the four carets, `arrow-left`, `arrow-right`, `check`, `x`, `plus`,
+ * `minus`, `magnifying-glass`, `info` and `warning`. `icon/all` registers the
+ * whole set, so any name in it draws, and a name that resolves to nothing
+ * says to import it. The element's own entry,
  * `@fusion.dev/helix-headless/icon/root`, registers none: a page that imports
  * it and calls `registerIcons` with the glyphs it names ships those and no
  * others. `registerIconLibrary` resolves names under a prefix of your own,
@@ -113,12 +116,10 @@ export class HelixHeadlessIcon extends HelixElement {
    * The name of the icon in the Helix set.
    *
    * **A lookup, and the reason both this and `icon` exist.** A name is a string,
-   * so it is what markup can carry, and resolving one means an index of the
-   * whole set that no bundler can shake: 15 kB for a consumer who renders one
-   * mark. An attribute is the only thing an HTML author can write, and that is
-   * worth the index; a consumer who would rather not pay it imports the
-   * element from `icon/root` and registers the glyphs it names, or hands over
-   * the value instead.
+   * so it is what markup can carry, and resolving one means an index that no
+   * bundler can shake. The family's entry indexes a small set, `icon/all`
+   * indexes the whole set at 15 kB, and `icon/root` indexes nothing, for a
+   * page that registers the glyphs it names or hands over the value instead.
    *
    * A name written `prefix:name` asks the library registered under that
    * prefix.
@@ -324,8 +325,12 @@ export class HelixHeadlessIcon extends HelixElement {
       message:
         this.src === ''
           ? `<${this.localName} name="${asked}"> names no registered icon, so it draws ` +
-            'nothing. Check the name, register the glyph with `registerIcons`, or import it ' +
-            'and pass it as `icon`.'
+            `nothing. For a glyph of the Helix set, import '${
+              this.localName.startsWith('helix-headless-')
+                ? '@fusion.dev/helix-headless'
+                : '@fusion.dev/helix'
+            }/icon/all', which registers every one. Otherwise check the name, or register ` +
+            'the glyph with `registerIcons`.'
           : `<${this.localName} src="${asked}"> could not be fetched as an SVG file, so it ` +
             'draws nothing. Check the URL, and that the file is an `<svg>`.',
       tag: this.localName,
