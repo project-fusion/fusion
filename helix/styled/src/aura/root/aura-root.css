@@ -96,7 +96,7 @@
   background-color: var(--aura-pause-background-color, var(--helix-color-surface-overlay));
   block-size: var(--helix-size-control-sm);
   border: var(--helix-border-floating) solid var(--helix-color-border);
-  border-radius: var(--helix-radii-full);
+  border-radius: var(--helix-radii-sm);
   box-shadow: var(--helix-shadow-floating);
   color: var(--helix-color-foreground);
   cursor: pointer;

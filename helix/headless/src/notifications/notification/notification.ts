@@ -117,6 +117,18 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   defaultRead = false
 
   /**
+   * The dismiss control's name, read by screen readers, with `{label}` for the
+   * row's own words.
+   *
+   * One sentence with the words in it, so a translation puts them where its
+   * language does: `registerWords('de', { 'helix-notification': { dismissLabel:
+   * '{label} schließen' } })`.
+   */
+  @words
+  @property({ attribute: 'dismiss-label' })
+  override dismissLabel = 'Dismiss {label}'
+
+  /**
    * Locale for the timestamp.
    *
    * Empty is the runtime's own.
@@ -172,16 +184,6 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
    */
   @property({ attribute: false })
   stop = true
-
-  /**
-   * What a screen reader hears before an unread notification's text.
-   *
-   * The unread mark is drawn, so a reader who cannot see it hears this word in
-   * its place. Translate it with the rest of your interface.
-   */
-  @words
-  @property({ attribute: 'unread-label' })
-  unreadLabel = 'Unread'
 
   /**
    * @internal Read by the list to identify its children across the light DOM,
@@ -387,16 +389,14 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   }
 
   /**
-   * The dismiss control's name, read by screen readers, with `{label}` for the
-   * row's own words.
+   * What a screen reader hears before an unread notification's text.
    *
-   * One sentence with the words in it, so a translation puts them where its
-   * language does: `registerWords('de', { 'helix-notification': { dismissLabel:
-   * '{label} schließen' } })`.
+   * The unread mark is drawn, so a reader who cannot see it hears this word in
+   * its place. Translate it with the rest of your interface.
    */
   @words
-  @property({ attribute: 'dismiss-label' })
-  override dismissLabel = 'Dismiss {label}'
+  @property({ attribute: 'unread-label' })
+  unreadLabel = 'Unread'
 
   /**
    * The dismiss control's name: `dismissLabel` with the row's words.

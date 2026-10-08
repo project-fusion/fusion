@@ -134,6 +134,7 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @csspart loading - The words under the strip while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart overview - The busiest reading and the total of the readings drawn, written as a sentence for screen readers, which describes the strip. Rendered once there are cells. Hide it visually.
+ * @csspart plot - The same element as `strip`, under the name every chart gives the drawing that takes focus.
  * @csspart row - A column of cells, which a grid reads as a row, under `selection-mode`. It draws no box.
  * @csspart selection - A polite region that says how many cells are selected after a change, rendered from the first change. Hide it visually.
  * @csspart start - The leading slot's box.
@@ -719,9 +720,8 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
       const tone = toneOf(reading, bounds, palette)
       const active = this.pointer.at === index
       const picked = chosen.has(keys[index] ?? '')
-      const part = `cell${active ? ' cell-active' : ''}${picked ? ' cell-selected' : ''}`
       if (grid) {
-        return this.renderGridCell(index, part, picked, tone)
+        return this.renderGridCell(index, active, picked, tone)
       }
       /* **Two templates rather than one with a conditional style, and the
          reason is that an absent tone has to mean an absent declaration.**
@@ -732,11 +732,11 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
          than taking the quiet ground the sheet has for it. */
       return tone === undefined
         ? html`<span
-                      part=${part}
+                      part="cell${active ? ' cell-active' : ''}${picked ? ' cell-selected' : ''}"
                       data-index=${index}
                     ></span>`
         : html`<span
-                part=${part}
+                part="cell${active ? ' cell-active' : ''}${picked ? ' cell-selected' : ''}"
                 data-index=${index}
                 data-tone=${tone}
                 style="--heatmap-tone: var(--heatmap-tone-${tone})"
@@ -748,7 +748,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
         aria-describedby=${readable ? 'helix-chart-summary' : nothing}
         aria-label=${this.named || this.stripLabel}
         aria-multiselectable=${grid && this.selectionMode === 'multiple' ? 'true' : nothing}
-        part="strip"
+        part="strip plot"
         id=${CHART_PLOT}
         role=${grid ? 'grid' : readable ? 'application' : 'img'}
         style="--heatmap-rows: ${this.rowCount}"
@@ -801,7 +801,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    */
   private renderGridCell(
     index: number,
-    part: string,
+    active: boolean,
     picked: boolean,
     tone: string | undefined,
   ): TemplateResult {
@@ -813,7 +813,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
       data-index=${index}
       data-tone=${tone ?? nothing}
       id="cell-${index}"
-      part=${part}
+      part="cell${active ? ' cell-active' : ''}${picked ? ' cell-selected' : ''}"
       role="gridcell"
       style=${tone === undefined ? nothing : `--heatmap-tone: var(--heatmap-tone-${tone})`}
     ></span>`

@@ -223,6 +223,14 @@ export class HelixAura extends HelixElement {
   interactive = false
 
   /**
+   * Whether the aura draws its own control that pauses the field and starts it
+   * again, in its trailing corner. Absent draws none, for a page with a pause
+   * control of its own.
+   */
+  @property({ attribute: 'pause-control', type: Boolean })
+  pauseControl = false
+
+  /**
    * Whether the field holds still on the frame it shows.
    *
    * Set it from a pause control on your page, so a reader can stop the motion,
@@ -232,14 +240,6 @@ export class HelixAura extends HelixElement {
    */
   @property({ type: Boolean })
   paused = false
-
-  /**
-   * Whether the aura draws its own control that pauses the field and starts it
-   * again, in its trailing corner. Absent draws none, for a page with a pause
-   * control of its own.
-   */
-  @property({ attribute: 'pause-control', type: Boolean })
-  pauseControl = false
 
   /**
    * The pause control's name, read by screen readers. The control is a toggle
