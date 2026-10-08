@@ -36,6 +36,14 @@ import { type Offset, percentOf } from '../zoom.js'
 import { ZoomController } from '../zoom-controller.js'
 
 /**
+ * What names an item in `active`: its `value`, or its place in the set,
+ * counted from 1, where it has none, as in `Steps`. A set written without
+ * values still moves, and `active="2"` names its second item.
+ */
+const keyOf = (item: HelixHeadlessLightboxItem, index: number): string =>
+  item.value || String(index + 1)
+
+/**
  * @summary A viewer that shows one item at a time over the page.
  *
  * @description
@@ -50,7 +58,9 @@ import { ZoomController } from '../zoom-controller.js'
  *
  * A lightbox shows one item at a time and has no scrolling track, so `active`
  * holds the current item, as in `Tabs`. The arrow keys change the item while
- * focus stays in the dialog.
+ * focus stays in the dialog. `active` names an item by its `value`, and an
+ * item with no `value` by its place, counted from 1, as in `Steps`, so a set
+ * written without values moves and `helix-activate` says `1`, `2` and so on.
  *
  * Set `controls` for the viewer's own previous, next and close controls, named
  * by `previous-label`, `next-label` and `dismiss-label`, whose glyphs you can
@@ -577,7 +587,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       : Math.min(Math.max(from + by, 0), last)
     const target = items[next]
     if (target && target !== shown) {
-      this.requestActive(target.value)
+      this.requestActive(keyOf(target, next))
     }
   }
 
@@ -699,7 +709,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   private toEnd(at: number): void {
     const target = this.items[at]
     if (target && target !== this.shown) {
-      this.requestActive(target.value)
+      this.requestActive(keyOf(target, at))
     }
   }
 
@@ -707,8 +717,30 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   private zoomedItem: HelixHeadlessLightboxItem | undefined = undefined
 
   /** The item on screen: the one `active` names, or the first where it names none. */
-  private get shown() {
-    return resolveActiveItem(this.active ?? '', this.items)
+  private get shown(): HelixHeadlessLightboxItem | undefined {
+    return this.named(this.items)
+  }
+
+  /** The item `active` names, by `value` or by place, or the first where it names none. */
+  private named(items: HelixHeadlessLightboxItem[]): HelixHeadlessLightboxItem | undefined {
+    const keyed = items.map((item, index) => ({ item, value: keyOf(item, index) }))
+    return resolveActiveItem(this.active ?? '', keyed)?.item
+  }
+
+  /**
+   * Requests a new shown item, and returns whether it moved.
+   *
+   * Where `active` names nothing, it is first written with the item on
+   * screen, so `helix-activate` names that item as `previous` rather than an
+   * empty string the reader never saw.
+   */
+  override requestActive(next: string, cause?: string): boolean {
+    const items = this.items
+    const shown = this.active === '' ? this.shown : undefined
+    if (shown) {
+      this.active = keyOf(shown, items.indexOf(shown))
+    }
+    return super.requestActive(next, cause)
   }
 
   /**
@@ -841,7 +873,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
    */
   private mark(): void {
     const items = this.items
-    const current = resolveActiveItem(this.active, items)
+    const current = this.named(items)
     items.forEach((item, at) => {
       item.current = item === current
       /* Once the item has hydrated, so its first render is the server's. */
@@ -880,7 +912,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       return
     }
     const items = this.items
-    const current = resolveActiveItem(this.active, items)
+    const current = this.named(items)
     const at = current ? items.indexOf(current) : -1
     this.announcement =
       at === -1 || !current
@@ -895,7 +927,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
   /** The shown item's place in the set, in the words of `status-label`. */
   private place(): string {
     const items = this.items
-    const current = resolveActiveItem(this.active, items)
+    const current = this.named(items)
     return current
       ? formatWords(this, 'statusLabel', {
           count: items.length,

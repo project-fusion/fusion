@@ -126,6 +126,61 @@ describe('lightbox', () => {
     expect(host.active).toBe('one')
   })
 
+  test('the first move names the item on screen as the one it left', async () => {
+    /* `active` named nothing until the first move, so `helix-activate` said the
+       reader left '', a picture they never saw. */
+    const host = await lightbox('open')
+    await host.updateComplete
+    const said: unknown[] = []
+    host.addEventListener('helix-activate', (event) => said.push((event as CustomEvent).detail))
+    const dialog = part(host, 'dialog') as HTMLElement
+    dialog.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' }))
+    await host.updateComplete
+    expect(said).toEqual([{ previous: 'one', value: 'two' }])
+  })
+
+  describe('a set written without values', () => {
+    /* Every item's `value` was '', so a step asked to show '', which names the
+       first item, and the set never moved. Named by place instead, as Steps is. */
+    const unnamed = async (extra = ''): Promise<Lightbox> =>
+      (await mount(
+        `<helix-headless-lightbox label="Photos" ${extra}>
+          <helix-headless-lightbox-item label="A harbour"></helix-headless-lightbox-item>
+          <helix-headless-lightbox-item label="A hill"></helix-headless-lightbox-item>
+          <helix-headless-lightbox-item label="A street"></helix-headless-lightbox-item>
+        </helix-headless-lightbox>`,
+      )) as Lightbox
+    const at = (host: Lightbox): number =>
+      [...host.children].findIndex((child) => (child as { current?: boolean }).current)
+
+    test('moves with the arrows, End and next(), named by place', async () => {
+      const host = await unnamed('open')
+      await host.updateComplete
+      const said: unknown[] = []
+      host.addEventListener('helix-activate', (event) => said.push((event as CustomEvent).detail))
+      const dialog = part(host, 'dialog') as HTMLElement
+      dialog.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowRight' }))
+      await host.updateComplete
+      expect([at(host), host.active]).toEqual([1, '2'])
+      dialog.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'End' }))
+      await host.updateComplete
+      expect(at(host)).toBe(2)
+      host.previous()
+      await host.updateComplete
+      expect(at(host)).toBe(1)
+      expect(said).toEqual([
+        { previous: '1', value: '2' },
+        { previous: '2', value: '3' },
+        { previous: '3', value: '2' },
+      ])
+    })
+
+    test('and `active` names an item by its place', async () => {
+      const host = await unnamed('active="3"')
+      expect(at(host)).toBe(2)
+    })
+  })
+
   test('it says where in the set the reader is, once they have moved', async () => {
     const host = await lightbox('open')
     await host.updateComplete
