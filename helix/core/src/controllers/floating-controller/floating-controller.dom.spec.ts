@@ -162,3 +162,36 @@ describe('the arrow', () => {
     }
   })
 })
+
+/* React Aria's `crossOffset`, Radix's `alignOffset`, Shoelace's `skidding`.
+   happy-dom lays nothing out, so the anchor is a box of no size at the origin
+   and the slide is the whole of the position along the side. */
+describe('the slide along the side', () => {
+  const placed = async (crossOffset?: number): Promise<string> => {
+    document.body.innerHTML =
+      '<div id="host"><button id="anchor">open</button><div id="floating"></div></div>'
+    const host = document.getElementById('host') as HTMLElement
+    Object.assign(host, { addController: () => {}, requestUpdate: () => {} })
+    const floating = document.getElementById('floating') as HTMLElement
+    const controller = new FloatingController(host as never, {
+      anchor: () => document.getElementById('anchor'),
+      ...(crossOffset === undefined ? {} : { crossOffset: () => crossOffset }),
+      floating: () => floating,
+      placement: 'bottom-start',
+      /* The window has no size here, so sliding back into it would undo the
+         offset under test. */
+      shift: false,
+    })
+    live.push(controller)
+    controller.start()
+    controller.update()
+    await new Promise((done) => setTimeout(done, 0))
+    return floating.style.translate
+  }
+
+  test('moves the floating element along the side by `crossOffset`', async () => {
+    const plain = await placed()
+    const slid = await placed(40)
+    expect(Number.parseFloat(slid)).toBe(Number.parseFloat(plain) + 40)
+  })
+})

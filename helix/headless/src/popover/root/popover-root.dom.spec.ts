@@ -472,6 +472,26 @@ describe('the page around a modal popover', () => {
     expect(beside.hasAttribute('aria-hidden')).toBe(false)
   })
 
+  /* React Aria's modal popover holds the page still. Before this a wheel
+     over the page moved it under a panel the reader had to answer first. */
+  test('does not scroll while it is open', async () => {
+    const page = await mount(
+      `<div><helix-headless-popover modal label="Filters">
+          <button slot="trigger">Filters</button>
+          <button>Apply</button>
+        </helix-headless-popover></div>`,
+    )
+    const host = page.querySelector('helix-headless-popover') as Popover
+    const root = document.documentElement
+    const before = root.style.overflow
+    host.show()
+    await host.updateComplete
+    expect(root.style.overflow).toBe('hidden')
+    host.hide()
+    await host.updateComplete
+    expect(root.style.overflow).toBe(before)
+  })
+
   test('is left alone around an ordinary one', async () => {
     const page = await mount(
       `<div><p id="beside">Beside</p>
@@ -483,6 +503,68 @@ describe('the page around a modal popover', () => {
     host.show()
     await host.updateComplete
     expect(page.querySelector('#beside')?.hasAttribute('aria-hidden')).toBe(false)
+  })
+})
+
+describe('a press outside that puts focus nowhere', () => {
+  /* The press is heard on `pointerdown`, and the browser moves focus after
+     it: to the body, for a press on text. Measured in Chromium before this,
+     focus stayed there. React Aria returns it to the trigger. */
+  test('gives focus back to the trigger once the browser has moved it', async () => {
+    const page = await mount(
+      `<div><p id="beside">Beside</p>
+        <helix-headless-popover modal label="Filters">
+          <button slot="trigger">Filters</button>
+          <button>Apply</button>
+        </helix-headless-popover></div>`,
+    )
+    const host = page.querySelector('helix-headless-popover') as Popover
+    const trigger = host.querySelector('[slot="trigger"]') as HTMLElement
+    const apply = host.querySelector('button:not([slot])') as HTMLElement
+    host.show()
+    await host.updateComplete
+    apply.focus()
+    const beside = page.querySelector('#beside') as HTMLElement
+    beside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, composed: true }))
+    /* What the browser does next for a press on text. */
+    ;(document.activeElement as HTMLElement | null)?.blur()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await host.updateComplete
+    expect(host.open).toBe(false)
+    expect(document.activeElement).toBe(trigger)
+  })
+})
+
+describe('where the panel opens', () => {
+  /* Radix's `Popover.Anchor`, Shoelace's `anchor`: a panel that hangs off a
+     field while a button beside it opens it. */
+  test('`anchor` names the element it opens against, by id or as an element', async () => {
+    const page = await mount(
+      `<div><input id="field" />
+        <helix-headless-popover anchor="field" label="Details">
+          <button slot="trigger">Open</button><span>Body</span>
+        </helix-headless-popover></div>`,
+    )
+    const host = page.querySelector('helix-headless-popover') as Popover & {
+      anchor: Element | string
+      placedAgainst: HTMLElement
+    }
+    expect(host.placedAgainst).toBe(page.querySelector('#field') as HTMLElement)
+    const other = document.createElement('span')
+    page.append(other)
+    host.anchor = other
+    expect(host.placedAgainst).toBe(other)
+    host.anchor = ''
+    expect(host.placedAgainst).toBe(host.querySelector('[slot="trigger"]') as HTMLElement)
+  })
+
+  test('the alignment it landed on is a state, beside the side', async () => {
+    const host = await popover('placement="bottom-end"')
+    host.show()
+    await host.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(hasState(host, 'aligned-end')).toBe(true)
+    expect(hasState(host, 'aligned-start')).toBe(false)
   })
 })
 
