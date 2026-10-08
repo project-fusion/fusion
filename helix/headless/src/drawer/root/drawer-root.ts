@@ -106,6 +106,10 @@ import { startsSwipe } from '../swipe-start.js'
  * <helix-headless-drawer id="nav">…</helix-headless-drawer>
  * ```
  *
+ * From its first press, a button that opens the drawer this way says whether
+ * the drawer is open: a Helix button through `expanded`, and any other
+ * element with `aria-expanded`.
+ *
  * @since 0.1.0
  * @status stable
  * @category overlays
@@ -155,6 +159,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
       '--show': () => this.requestOpen(true),
       '--toggle': () => this.toggleOpen(),
     },
+    expanded: () => this.open,
   })
 
   /**

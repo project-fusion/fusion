@@ -61,10 +61,22 @@ export class HelixFallbackCommandEvent extends Event {
   }
 }
 
+/**
+ * The commands that open a host, whose invokers are disclosure buttons. A
+ * `--close`, or a `--next` inside a lightbox, discloses nothing.
+ */
+const OPENING = new Set(['--show', '--toggle'])
+
 /** What the host answers to, by command name. */
 export interface CommandOptions {
   /** Each command the host implements, keyed by the name a trigger writes. */
   commands: Record<string, (source: Element | null) => void>
+  /**
+   * Whether the host is open, for a host a command opens and closes. Given,
+   * each invoker that has sent `--show` or `--toggle` says so with
+   * `aria-expanded`.
+   */
+  expanded?: () => boolean
 }
 
 /**
@@ -108,20 +120,101 @@ export class CommandController implements ReactiveController {
     host.addController(this)
   }
 
+  /**
+   * The invokers this host tells whether it is open: each one that sent an
+   * opening command, unless it carried `aria-expanded` of its own before then.
+   */
+  private readonly invokers = new Set<Element>()
+
+  /** Invokers that carried `aria-expanded` before a command, which stay the consumer's. */
+  private readonly theirs = new WeakSet<Element>()
+
   private readonly handle = (event: Event): void => {
     const command = (event as CommandLike).command
     const run = this.options.commands[command]
     if (!run) {
       return
     }
-    run((event as CommandLike).source)
+    const source = (event as CommandLike).source
+    if (OPENING.has(command)) {
+      this.note(source)
+    }
+    run(source)
+  }
+
+  /**
+   * Takes the invoker on as one to tell, for a host that opens.
+   *
+   * **The platform says it for a native popover and not for this.** Chromium
+   * exposes a `popovertarget` button, or one with `command="toggle-popover"`,
+   * as expanded or collapsed, and a custom command reaches a custom element
+   * with nothing said. Measured before this: a `command="--toggle"` button
+   * opened a Popover and its node had no expanded state. React Aria's trigger
+   * says `aria-expanded` on every overlay it opens.
+   *
+   * From the first command on, so nothing is written onto markup a server
+   * sent until a reader presses. A plain invoker is also pointed at the host
+   * through `ariaControlsElements`, which writes no attribute.
+   */
+  private note(source: Element | null): void {
+    if (!this.options.expanded || !source || this.invokers.has(source) || this.theirs.has(source)) {
+      return
+    }
+    if (source.hasAttribute('aria-expanded')) {
+      this.theirs.add(source)
+      return
+    }
+    this.invokers.add(source)
+    if (!source.localName.includes('-') && 'ariaControlsElements' in source) {
+      ;(source as Element & { ariaControlsElements: Element[] | null }).ariaControlsElements = [
+        this.host,
+      ]
+    }
+    this.tell()
+  }
+
+  /** Writes the host's state on each invoker it tells, forgetting one that has left. */
+  private tell(): void {
+    const expanded = this.options.expanded
+    if (!expanded) {
+      return
+    }
+    const open = expanded()
+    for (const invoker of this.invokers) {
+      if (invoker.isConnected) {
+        this.write(invoker, open)
+      } else {
+        this.invokers.delete(invoker)
+      }
+    }
+  }
+
+  /**
+   * Says `open` on one invoker: a Helix control through its `expanded`
+   * property, which its own button carries and which puts nothing in the
+   * markup, and a plain element through `aria-expanded`.
+   */
+  private write(invoker: Element, open: boolean): void {
+    if (invoker.localName.includes('-')) {
+      ;(invoker as unknown as { expanded?: boolean }).expanded = open
+    } else if (invoker.getAttribute('aria-expanded') !== String(open)) {
+      invoker.setAttribute('aria-expanded', String(open))
+    }
   }
 
   hostConnected(): void {
     this.host.addEventListener('command', this.handle)
   }
 
+  hostUpdated(): void {
+    this.tell()
+  }
+
+  /* A host that leaves the page is shut, so its invokers say so. */
   hostDisconnected(): void {
     this.host.removeEventListener('command', this.handle)
+    for (const invoker of this.invokers) {
+      this.write(invoker, false)
+    }
   }
 }

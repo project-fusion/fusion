@@ -147,3 +147,63 @@ describe('a host that has left the page', () => {
     expect(heard).toEqual([])
   })
 })
+
+/* Chromium says a native popover's invoker is expanded or collapsed, and says
+   nothing for a custom command. Measured before this: a `command="--toggle"`
+   button opened a Popover and its node had no expanded state. */
+describe('a host a command opens', () => {
+  const opening = () => {
+    document.body.innerHTML =
+      '<button id="trigger">go</button><button id="shut">x</button><span id="target"></span>'
+    const host = document.getElementById('target') as HTMLElement
+    let open = false
+    let updated = (): void => {}
+    Object.assign(host, { addController: () => {} })
+    const run = new CommandController(host as never, {
+      commands: {
+        '--close': () => {
+          open = false
+          updated()
+        },
+        '--toggle': () => {
+          open = !open
+          updated()
+        },
+      },
+      expanded: () => open,
+    })
+    updated = () => run.hostUpdated()
+    run.hostConnected()
+    return { host, run }
+  }
+
+  test('tells the invoker whether it is open, from its first command', () => {
+    const { host } = opening()
+    expect(trigger().hasAttribute('aria-expanded')).toBe(false)
+    host.dispatchEvent(new HelixFallbackCommandEvent('--toggle', trigger()))
+    expect(trigger().getAttribute('aria-expanded')).toBe('true')
+    host.dispatchEvent(new HelixFallbackCommandEvent('--toggle', trigger()))
+    expect(trigger().getAttribute('aria-expanded')).toBe('false')
+  })
+
+  test('and leaves alone a close button, and an invoker that says it already', () => {
+    const { host } = opening()
+    const shut = document.getElementById('shut') as HTMLElement
+    host.dispatchEvent(new HelixFallbackCommandEvent('--toggle', trigger()))
+    host.dispatchEvent(new HelixFallbackCommandEvent('--close', shut))
+    expect(shut.hasAttribute('aria-expanded')).toBe(false)
+    expect(trigger().getAttribute('aria-expanded')).toBe('false')
+
+    const { host: again } = opening()
+    trigger().setAttribute('aria-expanded', 'mixed')
+    again.dispatchEvent(new HelixFallbackCommandEvent('--toggle', trigger()))
+    expect(trigger().getAttribute('aria-expanded')).toBe('mixed')
+  })
+
+  test('says it is shut once the host leaves the page', () => {
+    const { host, run } = opening()
+    host.dispatchEvent(new HelixFallbackCommandEvent('--toggle', trigger()))
+    run.hostDisconnected()
+    expect(trigger().getAttribute('aria-expanded')).toBe('false')
+  })
+})
