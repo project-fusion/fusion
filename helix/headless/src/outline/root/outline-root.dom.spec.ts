@@ -224,6 +224,31 @@ describe('the levels of a flat run', () => {
     expect(lists(nav)).toBe('[#a [#b] #c]')
   })
 
+  test('each carry their depth in the outline, as data-depth, from data-level', async () => {
+    const nav = await outline(
+      '<a href="#a">A</a><a href="#b" data-level="2">B</a><a href="#c" data-level="4">C</a>' +
+        '<a href="#d" data-level="2">D</a><a href="#e">E</a>',
+    )
+    expect([...nav.querySelectorAll('a')].map((link) => link.getAttribute('data-depth'))).toEqual([
+      '1',
+      '2',
+      '3',
+      '2',
+      '1',
+    ])
+  })
+
+  test('and from the list items around them, in a list a consumer wrote', async () => {
+    const nav = await outline(
+      '<ul><li><a href="#a">A</a><ul><li><a href="#b">B</a></li></ul></li><li><a href="#c">C</a></li></ul>',
+    )
+    expect([...nav.querySelectorAll('a')].map((link) => link.getAttribute('data-depth'))).toEqual([
+      '1',
+      '2',
+      '1',
+    ])
+  })
+
   test('are left to a list a consumer wrote, which has its levels already', async () => {
     const nav = await outline('<ul><li><a href="#a">A</a></li></ul>')
     expect(lists(nav)).toBe('none')

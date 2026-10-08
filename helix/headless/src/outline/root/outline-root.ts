@@ -60,6 +60,22 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  * headings are far apart, none is in the band and no section is marked, and
  * when they are close together, several are in the band at once.
  *
+ * **Several sections at once.** `marks="visible"` marks the link of every
+ * section with part of it on screen, from the reading line to the bottom of
+ * what the sections scroll in, as Zag's table of contents marks its active
+ * ids. The mark then runs from the first of those links to the last, and
+ * `marked` lists their ids in page order.
+ *
+ * **Going to a section from code.** `scrollToSection(id)` scrolls to the
+ * section as a press on its link does, with `behavior`, and marks its link at
+ * once.
+ *
+ * **Styling a link by its state.** Each link the outline finds carries
+ * `data-depth`, its depth in the outline from `1`, nested lists and
+ * `data-level` alike, and `aria-current="location"` while its section is
+ * marked, so `a[aria-current]` and `a[data-depth="2"]` are the hooks for a
+ * rule of yours.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -106,6 +122,7 @@ export class HelixHeadlessOutline extends HelixElement {
     active: () => this.links.find((link) => link.hasAttribute('aria-current')),
     indicator: () => this.partNamed('indicator'),
     surface: () => this.partNamed('nav'),
+    through: () => this.links.findLast((link) => link.hasAttribute('aria-current')),
   })
 
   /**
@@ -150,6 +167,14 @@ export class HelixHeadlessOutline extends HelixElement {
   label = 'On this page'
 
   /**
+   * Which links are marked. `reading` marks the one section being read, the
+   * last whose heading has passed the reading line. `visible` marks every
+   * section with part of it on screen, and the mark runs across their links.
+   */
+  @property()
+  marks: 'reading' | 'visible' = 'reading'
+
+  /**
    * How far below the top of the scroll container a heading counts as reached,
    * in pixels. The scroll container is the window or the panel the sections
    * scroll in.
@@ -174,6 +199,18 @@ export class HelixHeadlessOutline extends HelixElement {
   get current(): string {
     return this.reading
   }
+
+  /**
+   * The ids of the sections whose links are marked, in page order: the one
+   * `current` names, or under `marks="visible"` every section on screen.
+   * Read-only, for the reason `current` gives.
+   */
+  get marked(): string[] {
+    return [...this.markedIds]
+  }
+
+  /** What `marked` reports, which only `markTo` writes. */
+  private markedIds: string[] = []
 
   /**
    * What `current` reports, which only `mark` writes.
@@ -315,13 +352,35 @@ export class HelixHeadlessOutline extends HelixElement {
      * are at the end". That is a fact about the page rather than a choice made
      * here: the component cannot invent room to scroll. */
     const active = this.atEnd ? sections.at(-1) : (passed.at(-1) ?? sections[0])
-    this.markTo(active)
+    const shown = this.marks === 'visible' ? this.onScreen(sections, origin, scroller) : []
+    this.markTo(shown.length > 0 ? shown : active ? [active] : [])
+  }
+
+  /**
+   * The sections with part of them on screen, under `marks="visible"`: each
+   * runs from its own target to the next one's, and the last to the end of the
+   * page.
+   */
+  private onScreen(
+    sections: { link: HTMLAnchorElement; target: Element }[],
+    origin: number,
+    scroller: Element,
+  ): { link: HTMLAnchorElement; target: Element }[] {
+    const line = origin + this.offset
+    const bottom =
+      origin + (scroller === this.page ? this.page.clientHeight : scroller.clientHeight)
+    const tops = sections.map(({ target }) => target.getBoundingClientRect().top)
+    return sections.filter((_, at) => {
+      const end = tops[at + 1] ?? Number.POSITIVE_INFINITY
+      return (tops[at] ?? 0) < bottom - 1 && end > line + 1
+    })
   }
 
   /** Where the destination is set, whether measured or asked for. */
-  private markTo(active: { link: HTMLAnchorElement; target: Element } | undefined): void {
+  private markTo(marked: { link: HTMLAnchorElement; target: Element }[]): void {
+    const on = new Set(marked.map(({ target }) => target))
     for (const { link, target } of this.sections) {
-      if (target === active?.target) {
+      if (on.has(target)) {
         link.setAttribute('aria-current', 'location')
       } else {
         link.removeAttribute('aria-current')
@@ -345,9 +404,12 @@ export class HelixHeadlessOutline extends HelixElement {
      * computes it again. Every other family firing the before event routes it
      * through `requestChange` and applies the answer. This one has only the
      * notification to give, so it gives the library's word for that. */
+    const active = marked[0]
     const next = active?.target.id ?? ''
-    if (next !== this.reading) {
+    const ids = marked.map(({ target }) => target.id)
+    if (next !== this.reading || ids.join(' ') !== this.markedIds.join(' ')) {
       this.reading = next
+      this.markedIds = ids
       /* And move the mark to it. Measured straight after the write, which is
        * after the style lands: a bounding box is read from a resolved style,
        * so a current link set in heavier weight and rewrapped onto a second
@@ -532,8 +594,44 @@ export class HelixHeadlessOutline extends HelixElement {
      * `landing` is cleared when the page stops moving, by the same `scrollend`
      * and timeout pair the mark uses elsewhere, because a scroll that is
      * interrupted by a reader grabbing the page has to hand the marker back. */
+    if (this.travel(section, this.behavior !== 'auto')) {
+      event.preventDefault()
+      /* The three things the anchor would have done and the scroll does not.
+         The history entry keeps Back working and the address bar copyable;
+         the focus move is what stops Tab continuing from the contents list.
+         `preventScroll` because the scroll is already under way and focusing
+         would fight it, instantly, wherever `smooth` was asked for. */
+      globalThis.history?.pushState(null, '', link?.getAttribute('href') ?? '')
+      const target = section.target as HTMLElement
+      if (!target.hasAttribute('tabindex')) {
+        target.setAttribute('tabindex', '-1')
+      }
+      target.focus({ preventScroll: true })
+    }
+  }
+
+  /**
+   * Scrolls to the section with this id, as a press on its link does, with
+   * `behavior`, and marks its link at once. The address and focus stay where
+   * they are. Returns whether the outline has a link to that section.
+   */
+  scrollToSection(id: string): boolean {
+    const section = this.sections.find(({ target }) => target.id === id)
+    if (!section) {
+      return false
+    }
+    this.travel(section, true)
+    return true
+  }
+
+  /**
+   * Marks the section a reader asked for, and holds the mark there until the
+   * page stops moving. Scrolls to it where `scroll` says this element does
+   * the scrolling, and returns whether it did.
+   */
+  private travel(section: { link: HTMLAnchorElement; target: Element }, scroll: boolean): boolean {
     this.landing = section
-    this.markTo(section)
+    this.markTo([section])
     this.unland()
     const arrive = (): void => {
       this.unland()
@@ -546,26 +644,15 @@ export class HelixHeadlessOutline extends HelixElement {
     document.addEventListener('scrollend', arrive, { capture: true, once: true })
     this.landed = setTimeout(arrive, 1200)
 
-    if (this.behavior === 'auto') {
-      return
+    if (!scroll) {
+      return false
     }
-    event.preventDefault()
     const reduced = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
     section.target.scrollIntoView({
       behavior: reduced && this.behavior === 'smooth' ? 'instant' : this.behavior,
       block: 'start',
     })
-    /* The three things the anchor would have done and the scroll does not. The
-       history entry keeps Back working and the address bar copyable; the focus
-       move is what stops Tab continuing from the contents list. `preventScroll`
-       because the scroll above is already under way and focusing would fight it,
-       instantly, wherever `smooth` was asked for. */
-    globalThis.history?.pushState(null, '', link?.getAttribute('href') ?? '')
-    const target = section.target as HTMLElement
-    if (!target.hasAttribute('tabindex')) {
-      target.setAttribute('tabindex', '-1')
-    }
-    target.focus({ preventScroll: true })
+    return true
   }
 
   /**
@@ -608,8 +695,47 @@ export class HelixHeadlessOutline extends HelixElement {
    * life of the page.
    */
   private readonly handleSlotChange = (): void => {
+    this.writeDepths()
     this.watch()
     this.indicator.place()
+  }
+
+  /**
+   * Writes each link's depth in the outline, from 1, as `data-depth`: the
+   * list items around it inside the outline, or for a flat run, its place in
+   * the lists `data-level` makes of it.
+   *
+   * On the consumer's links, as `aria-current` is, and only after the first
+   * render, where a framework has hydrated them.
+   */
+  private writeDepths(): void {
+    const links = this.links
+    const items = new Map<HTMLAnchorElement, number>()
+    for (const link of links) {
+      let count = 0
+      for (let node = link.parentElement; node && node !== this; node = node.parentElement) {
+        count += node.localName === 'li' ? 1 : 0
+      }
+      items.set(link, count)
+    }
+    const flat = links.filter((link) => items.get(link) === 0)
+    const depth = new Map<HTMLAnchorElement, number>()
+    const walk = (branches: Branch[], at: number): void => {
+      for (const branch of branches) {
+        const link = flat[branch.index]
+        if (link) {
+          depth.set(link, at)
+        }
+        walk(branch.children, at + 1)
+      }
+    }
+    walk(nest(flat.map((link) => levelOf(link.getAttribute('data-level')))), 1)
+    for (const link of links) {
+      const at = String(depth.get(link) ?? items.get(link) ?? 1)
+      if (link.getAttribute('data-depth') !== at) {
+        link.setAttribute('data-depth', at)
+      }
+    }
   }
 
   override disconnectedCallback(): void {
@@ -739,6 +865,7 @@ export class HelixHeadlessOutline extends HelixElement {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     this.assign()
+    this.writeDepths()
     this.nameByHeading()
     /* The reading line moved, so where the reader is may have changed without
        the page having moved at all. Nothing else would notice: the observer
@@ -746,6 +873,8 @@ export class HelixHeadlessOutline extends HelixElement {
        means rather than whether anything did. */
     if (changed.has('offset')) {
       this.reach()
+    }
+    if (changed.has('offset') || changed.has('marks')) {
       this.mark()
     }
     /* Try again while there is nothing being watched. Cheap: `watch` returns on
