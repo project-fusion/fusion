@@ -70,13 +70,26 @@ describe('the axes', () => {
       .filter((line) => line.getAttribute('x1') === line.getAttribute('x2'))
       .map((line) => line.getBoundingClientRect().left)
       .sort((a, b) => a - b)
+    /* The one at the far edge ends at its rule, and every other is centered. */
     const labels = all(host, 'x-tick')
-      .map((tick) => middle(tick).x)
+      .map((tick) =>
+        tick.dataset.edge === 'end' ? tick.getBoundingClientRect().right : middle(tick).x,
+      )
       .sort((a, b) => a - b)
     expect(labels).toHaveLength(rules.length)
     labels.forEach((x, index) => {
       expect(Math.abs(x - (rules[index] ?? 0))).toBeLessThan(2)
     })
+  })
+
+  /* Centered on the plot's right edge, the last number hung half past the
+     chart, and a box around it cut it off. */
+  geometry('keep the last label across inside the chart', async () => {
+    const host = await chart()
+    const last = all(host, 'x-tick').at(-1) as HTMLElement
+    expect(last.getBoundingClientRect().right).toBeLessThanOrEqual(
+      host.getBoundingClientRect().right + 0.5,
+    )
   })
 
   geometry('keep the labels up beside the plot, not over it', async () => {

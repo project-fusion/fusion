@@ -135,6 +135,12 @@
   translate: -50% 0;
 }
 
+/* The label at the far end ends at the plot's edge: centered on it, half the
+   number hung past the chart and was cut off by the box the chart sits in. */
+[part="x-tick"][data-edge="end"] {
+  translate: -100% 0;
+}
+
 [part="y-tick"] {
   align-self: start;
   inset-block-start: var(--chart-tick);
