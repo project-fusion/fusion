@@ -386,6 +386,7 @@ export {
   type ViewportGestures,
   type ViewportWay,
 } from './mixins/mixin-viewport/mixin-viewport.js'
+export { adoptSheet } from './utils/adopt-sheet/adopt-sheet.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { arrowReach, sideOf } from './utils/arrow/arrow.js'
 export { assignSlots } from './utils/assign-slots/assign-slots.js'
