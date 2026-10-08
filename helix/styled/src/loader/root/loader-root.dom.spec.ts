@@ -39,3 +39,20 @@ describe('loader hooks', () => {
     expect(rule(':host')).toContain('--_loader-stroke: 2')
   })
 })
+
+/* Under reduced motion the base layer sets every duration token to 0.01ms, so a
+   crawl scaled from one turned the arc about eight thousand times a second. */
+describe('loader under reduced motion', () => {
+  const reduced = (): string[] =>
+    sheet()
+      .split('@media (prefers-reduced-motion: reduce)')
+      .slice(1)
+      .map((block) => block.split(/\n}\n|}\s*}/)[0] ?? '')
+
+  test('the turn slows to one turn in four seconds, on no duration token', () => {
+    const turn = reduced().find((block) => /\[part="svg"\]\s*\{/.test(block)) ?? ''
+    expect(turn).toContain('animation-duration: var(--_loader-crawl)')
+    expect(turn).not.toContain('--helix-duration')
+    expect(rule(':host')).toContain('--_loader-crawl: 4s')
+  })
+})
