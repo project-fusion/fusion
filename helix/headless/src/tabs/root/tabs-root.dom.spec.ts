@@ -112,6 +112,37 @@ describe('tabs selection', () => {
   })
 })
 
+/* With no `active` and no `default-active`, the first tab drew selected and
+   `active` read `''` until the reader moved. */
+describe('the tab a set opens on', () => {
+  test('is what `active` reports', async () => {
+    const host = (await mount(`
+      <helix-headless-tabs>
+        <helix-headless-tab disabled value="zero">Zero</helix-headless-tab>
+        <helix-headless-tab value="one">One</helix-headless-tab>
+        <helix-headless-tab value="two">Two</helix-headless-tab>
+        <helix-headless-tab-panel slot="panels" value="one">First</helix-headless-tab-panel>
+        <helix-headless-tab-panel slot="panels" value="two">Second</helix-headless-tab-panel>
+      </helix-headless-tabs>`)) as Updatable & { active: string }
+    const heard: Event[] = []
+    host.addEventListener('helix-activate', (event) => heard.push(event))
+    await turn(host)
+    expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
+    expect(host.active).toBe('one')
+    expect(heard).toEqual([])
+  })
+
+  test('and a tab the markup marked selected is too', async () => {
+    const host = (await mount(`
+      <helix-headless-tabs>
+        <helix-headless-tab value="one">One</helix-headless-tab>
+        <helix-headless-tab selected value="two">Two</helix-headless-tab>
+      </helix-headless-tabs>`)) as Updatable & { active: string }
+    await turn(host)
+    expect(host.active).toBe('two')
+  })
+})
+
 describe('tabs keyboard', () => {
   /* From a named element, not from "whichever is selected".
    *
