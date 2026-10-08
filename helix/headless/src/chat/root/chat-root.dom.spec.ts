@@ -402,6 +402,17 @@ describe('turns given both ways', () => {
   })
 })
 
+/* `core` ships `[data-scroller] { overflow: auto }`. Before the mark the
+   overflow came from the styled sheet, so pinning, history and the window did
+   nothing on a page that loads only the headless tier. */
+describe('the transcript on the headless tier', () => {
+  test('marks the log as the box it scrolls', async () => {
+    const element = (await mount(markup())) as Chat
+    await element.updateComplete
+    expect(part(element, 'log')?.hasAttribute('data-scroller')).toBe(true)
+  })
+})
+
 describe('a transcript with nothing in it', () => {
   test('says the consumer’s words once it has looked', async () => {
     const host = await mount(

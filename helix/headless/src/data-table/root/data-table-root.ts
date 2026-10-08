@@ -296,7 +296,7 @@ const isControl = (element: HTMLElement): boolean =>
  * @csspart select - The cell that holds a row's checkbox.
  * @csspart select-all - The heading that holds the checkbox that selects every row.
  * @csspart select-selected - Added to `select` in a selected row.
- * @csspart table - The grid.
+ * @csspart table - The grid. While `windowed`, the box that scrolls, which needs only a block size on this tier.
  * @csspart toggle - The mark in a row header that a press opens and closes its row by, in a tree grid.
  * @csspart toggle-mark - The caret in `toggle`. It points along the line while the row is closed and down while it is open.
  * @csspart toggle-open - Added to `toggle` while its row is open.
@@ -859,6 +859,10 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * Off by default. Windowing costs a scroll listener, a measurement per row
    * drawn, and a `block-size` on the scrolling box, and a table of twenty rows
    * should pay none of them.
+   *
+   * While windowed, the `table` part scrolls on this tier: it carries
+   * `data-scroller`, and `core` ships `[data-scroller] { overflow: auto }` into
+   * every shadow root. You still need to give it a block size.
    */
   @property({ reflect: true, type: Boolean })
   windowed = false
@@ -1030,12 +1034,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /* No `overscan`. The controller's four is a frame of fast scrolling at a 32
      pixel row, which is a fact about the platform rather than a preference.
 
-     **The box this scrolls carries no `data-scroller`**, which is a departure
-     from the rule in `HelixElement` rather than an oversight: the `overflow`
-     and the height that make the window mean anything both come from the styled
-     sheet, so a page loading only `helix/headless` draws the spacers into a box
-     with nothing to scroll. Marking it here is the fix and it moves layout, so
-     it is measured rather than assumed, for `Megamenu`'s reason. */
+     **The box this scrolls carries `data-scroller` while windowed**, the rule
+     in `HelixElement`. Before this it took its `overflow` from the styled
+     sheet, so a page loading only `helix/headless` drew every row: measured in
+     Chromium, 5,001 rows for 5,000. Marking it moved nothing on the styled
+     tier, whose `overflow-x: auto` already made the box a scroll container on
+     both axes, which is the measurement `Megamenu` asks for. */
   private readonly virtualize = new VirtualizeController(this, {
     /* Null while `windowed` is off, which is what keeps the controller inert
        rather than conditionally constructed: a controller is built once and
@@ -2603,6 +2607,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         part="table"
         role="rowgroup"
         aria-busy=${this.loading ? 'true' : nothing}
+        ?data-scroller=${this.windowed}
         style=${template ? `--data-table-template: ${template}` : nothing}
         @scroll=${this.handleScroll}
       >
