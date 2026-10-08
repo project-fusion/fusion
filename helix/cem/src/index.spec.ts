@@ -28,11 +28,14 @@ describe('dependenciesOf', () => {
 
   // The analyzer followed imports through the dependencies' own files, so a
   // package naming only the styled tier was given headless and core as well.
+  // In the order the package names them, each followed by what it reaches. The
+  // sandbox names headless itself since its code-block entry imports it, so
+  // headless comes second rather than after the styled tier that reaches it.
   test('reaches the manifests beneath the ones a package names', () => {
     expect([...dependenciesOf(at('sandbox')).keys()]).toEqual([
       '@fusion.dev/helix-core',
-      '@fusion.dev/helix',
       '@fusion.dev/helix-headless',
+      '@fusion.dev/helix',
     ])
   })
 
