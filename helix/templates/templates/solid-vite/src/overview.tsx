@@ -1,4 +1,5 @@
-import { members } from './data.ts'
+import { For } from 'solid-js'
+import { firstPage, members } from './data.ts'
 import { DOCS } from './docs.ts'
 
 /**
@@ -8,6 +9,11 @@ import { DOCS } from './docs.ts'
  * elements you can read in the HTML, and `rows` is the whole result handed over
  * at once, since a table of ten thousand rows cannot be written out as
  * elements. The table sorts, pages, and selects out of that array on its own.
+ *
+ * **The first page is markup too.** A page rendered on a server sends these rows
+ * in its HTML, so the table is readable before the script runs. Here the table
+ * draws its own rows from `members` at once, and the rows keep the page the same
+ * as one a server renders.
  *
  * **Selection is keyed on `row-key`, so it survives a sort and a page.**
  * `app.css` paints the chosen row through the parts the table names for it.
@@ -55,6 +61,17 @@ export function Overview() {
           <helix-table-column field="reviews" sortable text-align="end" width="max-content">
             Reviews
           </helix-table-column>
+
+          <For each={firstPage}>
+            {(member) => (
+              <helix-table-row>
+                <helix-table-cell header>{member.name}</helix-table-cell>
+                <helix-table-cell>{member.team}</helix-table-cell>
+                <helix-table-cell>{member.role}</helix-table-cell>
+                <helix-table-cell>{member.reviews}</helix-table-cell>
+              </helix-table-row>
+            )}
+          </For>
 
           {/* The footer is a row across the table: anything you slot goes at the
               start, and the table's own pagination sits at the end. */}

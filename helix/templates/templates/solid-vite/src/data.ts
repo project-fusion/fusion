@@ -63,6 +63,17 @@ export const members: readonly Member[] = [
   { id: 'm-12', name: 'Lena Fischer', reviews: 12, role: 'Engineer', team: 'Design' },
 ]
 
+/**
+ * The first page, in the table's sort and page size: by name, six to a page.
+ *
+ * Written out as rows under the columns, so a page rendered on a server carries
+ * the values and the table is readable before the script runs. The table draws
+ * its own rows from `members` in their place.
+ */
+export const firstPage: readonly Member[] = members
+  .toSorted((a, b) => a.name.localeCompare(b.name))
+  .slice(0, 6)
+
 /** The teams the form offers, read from the roster so the two cannot disagree. */
 export const teams: readonly string[] = [...new Set(members.map((one) => one.team))].toSorted()
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { members } from './data.ts'
+import { firstPage, members } from './data.ts'
 import { DOCS } from './docs.ts'
 </script>
 
@@ -50,6 +50,15 @@ import { DOCS } from './docs.ts'
         <helix-table-column field="reviews" sortable text-align="end" width="max-content">
           Reviews
         </helix-table-column>
+
+        <!-- The first page as rows, so a page rendered on a server carries the
+             values. The table draws its own rows from `members` in their place. -->
+        <helix-table-row v-for="member in firstPage" :key="member.id">
+          <helix-table-cell header>{{ member.name }}</helix-table-cell>
+          <helix-table-cell>{{ member.team }}</helix-table-cell>
+          <helix-table-cell>{{ member.role }}</helix-table-cell>
+          <helix-table-cell>{{ member.reviews }}</helix-table-cell>
+        </helix-table-row>
 
         <!-- The footer is a row across the table: anything you slot goes at the
              start, and the table's own pagination sits at the end. -->

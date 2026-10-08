@@ -1,8 +1,5 @@
-import { members } from './data'
+import { firstPage, members } from './data'
 import { DOCS } from './docs'
-
-/* The first page, in the table's sort and page size. */
-const firstPage = [...members].sort((a, b) => a.name.localeCompare(b.name)).slice(0, 6)
 
 /**
  * The data view.

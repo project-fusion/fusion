@@ -1,5 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
-import { members } from './data'
+import { firstPage, members } from './data'
 import { DOCS } from './docs'
 
 /**
@@ -21,5 +21,6 @@ import { DOCS } from './docs'
 })
 export class Overview {
   protected readonly docs = DOCS
+  protected readonly firstPage = firstPage
   protected readonly members = members
 }
