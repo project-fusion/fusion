@@ -155,9 +155,11 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    * When the tooltip shows: `full` on hover and focus and after a press,
    * `copy` only after a press, to show the result, and `none` never, for a
    * button whose result shows another way, such as under `show-label`.
+   *
+   * Unset is `full`, and the attribute stays absent until you write it.
    */
-  @property({ reflect: true })
-  tooltip: 'copy' | 'full' | 'none' = 'full'
+  @property()
+  tooltip?: 'copy' | 'full' | 'none'
 
   /**
    * The side the tooltip prefers. It moves to another side where this one
