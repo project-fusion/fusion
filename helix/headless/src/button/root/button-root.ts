@@ -596,7 +596,8 @@ export class HelixHeadlessButton extends HelixFormElement {
   }
 
   /** Called by the browser when the button's form changes. */
-  formAssociatedCallback(form: HTMLFormElement | null): void {
+  override formAssociatedCallback(form: HTMLFormElement | null): void {
+    super.formAssociatedCallback(form)
     this.watchForm(form)
   }
 
