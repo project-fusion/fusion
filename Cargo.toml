@@ -13,6 +13,7 @@ members = [
 	"fusion/rules",
 	"helix/cli",
 	"helix/theme",
+	"proof/cli",
 ]
 
 # Shared dependency versions live here once (lockstep policy). Crates reference

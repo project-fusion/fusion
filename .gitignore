@@ -100,3 +100,8 @@ fusion/site/public/maplibre/
 # committed: a checkout builds its own into `target/`.
 helix/cli/platforms/*/helix
 helix/cli/platforms/*/helix.exe
+
+# The `proof` binary each platform package ships, placed by the release the
+# same way as `helix`.
+proof/cli/platforms/*/proof
+proof/cli/platforms/*/proof.exe
