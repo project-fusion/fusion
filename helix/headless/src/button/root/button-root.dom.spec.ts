@@ -277,10 +277,16 @@ describe('button as its form’s default button', () => {
       event.preventDefault()
       submitted += 1
     })
+    const pressed: string[] = []
+    button.addEventListener('helix-press', (event) => {
+      pressed.push((event as CustomEvent<{ pointerType: string }>).detail.pointerType)
+    })
     const enter = new KeyboardEvent('keypress', { bubbles: true, cancelable: true, key: 'Enter' })
     form.querySelector('input')?.dispatchEvent(enter)
     expect(submitted).toBe(1)
     expect(enter.defaultPrevented).toBe(true)
+    /* Enter pressed it, where the script click it makes read as `virtual`. */
+    expect(pressed).toEqual(['keyboard'])
   })
 
   test('and not where a native submit button comes first', async () => {
