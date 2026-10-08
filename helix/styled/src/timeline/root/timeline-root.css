@@ -78,6 +78,15 @@
   min-inline-size: 0;
 }
 
+/* The entry that says more are on their way, in the time's ink, a gap below
+   the last entry. */
+[part="loading"] {
+  color: var(--timeline-time-color, var(--helix-color-foreground-muted));
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  padding-block-start: var(--timeline-gap, var(--helix-space-lg));
+}
+
 /* Print: what happened and when.
  *
  * `@media print` does not cross a shadow boundary, so a page cannot answer this

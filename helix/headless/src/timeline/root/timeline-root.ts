@@ -1,5 +1,5 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { customElement, HelixElement, hostAria, words } from '@fusion.dev/helix-core'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
 /**
@@ -28,6 +28,12 @@ import { property } from 'lit/decorators.js'
  * Write the entries in the order the events happened, oldest or newest first,
  * and the layout only moves where they are drawn.
  *
+ * **A feed that loads more entries sets `loading` while it fetches.** The
+ * timeline is busy, and an entry after the last says "Loading more"
+ * (`loading-label`, or your own content in the `loading` slot). Put a button
+ * that asks for more after the timeline, and move focus to the first new
+ * entry when they arrive.
+ *
  * @since 0.1.0
  * @status stable
  * @category data
@@ -35,17 +41,44 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/timeline
  *
  * @slot - The entries, and any groups of them.
+ * @slot loading - Content for the entry after the last while `loading` is set. Falls back to `loading-label`.
+ *
+ * @csspart loading - The entry after the last while `loading` is set.
+ *
+ * @cssstate loading - While `loading` is set.
  */
 @customElement('helix-headless-timeline')
 export class HelixHeadlessTimeline extends HelixElement {
+  /**
+   * The key this family's words are registered under, its styled tag:
+   * `registerWords('de', { 'helix-timeline': { loadingLabel: 'Wird geladen' } })`.
+   */
+  static words = 'helix-timeline'
+
   /**
    * Accessible name for the timeline, for people who reach it out of context.
    */
   @property()
   label = ''
 
+  /**
+   * Marks the timeline as busy fetching more entries, and draws an entry
+   * after the last that says so.
+   */
+  @property({ reflect: true, type: Boolean })
+  loading = false
+
+  /** The text of the entry drawn while `loading` is set, where the `loading` slot is empty. */
+  @words
+  @property({ attribute: 'loading-label' })
+  loadingLabel = 'Loading more'
+
   protected override render(): TemplateResult {
-    return html`<slot></slot>`
+    return html`<slot></slot>${
+      this.loading
+        ? html`<div part="loading" role="listitem"><slot name="loading">${this.loadingLabel}</slot></div>`
+        : nothing
+    }`
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -54,6 +87,8 @@ export class HelixHeadlessTimeline extends HelixElement {
        there for a screen reader without being markup the server never wrote.
        `Steps` says the same about its own list. */
     hostAria(this.internals, { label: this.label, role: 'list' })
+    this.internals.ariaBusy = this.loading ? 'true' : null
+    this.toggleState('loading', this.loading)
   }
 }
 
