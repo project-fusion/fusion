@@ -25,6 +25,10 @@ jobs:
   # Which domains this merge releases, and by how much, read off the subjects it
   # brought. Never a label, and the range runs from the domain's last release
   # rather than from this merge: [RELEASING.md](../RELEASING.md#why-the-range-runs-from-the-tag).
+  #
+  # **A domain under `held` in `fusion.json` is left out here**, so it gets no
+  # version job, no binaries and no leg below, and spends no number:
+  # [RELEASING.md](../RELEASING.md#a-held-domain).
   intent:
     runs-on: ubuntu-latest
     timeout-minutes: 5

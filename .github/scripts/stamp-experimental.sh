@@ -16,7 +16,10 @@ short=$(git rev-parse --short=7 HEAD)
 : > /tmp/released
 
 base=$(git merge-base "$BASE_SHA" HEAD)
-resolved=$(bun fusion/scripts/bump.mjs "$base..HEAD")
+# A held domain is not on the registry, so a preview would stop at its first
+# package: [RELEASING.md](../RELEASING.md#a-held-domain).
+held=$(jq -r '.held // {} | keys | join(",")' fusion.json)
+resolved=$(bun fusion/scripts/bump.mjs "$base..HEAD" --held "$held")
 
 while IFS=$'\t' read -r domain level; do
   [ -n "$level" ] || continue

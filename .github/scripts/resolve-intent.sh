@@ -5,8 +5,14 @@
 # and spending one without publishing must not close the window over the work
 # that number was for.
 #
+# **A domain named under `held` in `fusion.json` gets no leg**, whatever its
+# subjects ask, so a merge builds and tests it and publishes none of it:
+# [RELEASING.md](../RELEASING.md#a-held-domain).
+#
 # Reads: SHA. Writes: `domains` on GITHUB_OUTPUT.
 set -euo pipefail
+
+held=$(jq -r '.held // {} | keys | join(",")' fusion.json)
 
 : > /tmp/entries
 for domain in helix cortex proof; do
@@ -21,7 +27,7 @@ for domain in helix cortex proof; do
   if [ -z "$last" ] || [ "${major%%.*}" = '0' ]; then
     zero=(--zero "$domain")
   fi
-  bun fusion/scripts/bump.mjs "$range" "${zero[@]}" \
+  bun fusion/scripts/bump.mjs "$range" "${zero[@]}" --held "$held" \
     | jq -c --arg d "$domain" '.[] | select(.domain == $d)' >> /tmp/entries
 done
 

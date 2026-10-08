@@ -56,6 +56,8 @@ jobs:
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
 
+      # A domain under `held` in `fusion.json` is left out, so it gets no
+      # binaries and no preview: [RELEASING.md](../RELEASING.md#a-held-domain).
       - name: Work out the versions
         id: plan
         env:

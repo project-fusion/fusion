@@ -48,7 +48,9 @@ number from the `proof-v*` and `proof-attempt-v*` tags, `binaries.yml` builds
 platform package before `publish.mjs` packs them.
 [RELEASING.md](../.github/RELEASING.md) has the model.
 
-**The first publish is a person's**, because trusted publishing cannot publish
-a package the registry has never seen. Until the placeholders exist the
-release refuses Proof before it allocates a number:
-[RELEASING.md](../.github/RELEASING.md#a-new-package).
+**Proof is held.** `held` in `fusion.json` keeps it out of the release, so a
+`feat(proof)` merge builds and tests it, publishes nothing, and spends no
+number. Trusted publishing cannot publish a package the registry has never
+seen, so the first publish is a person's: bootstrap the placeholders, register
+trusted publishing, then delete the entry.
+[RELEASING.md](../.github/RELEASING.md#a-held-domain) has the steps.

@@ -92,6 +92,11 @@ pub struct Settings {
     /// lockstep and what may be published beside what.
     pub domains: Vec<String>,
 
+    /// Domains the release leaves out until they are on the registry, each
+    /// with the reason. The release scripts read it; `publishable` holds every
+    /// name in it to a domain.
+    pub held: BTreeMap<String, String>,
+
     /// Roots whose modules run under a framework that hydrates, where
     /// registering a custom element at module scope is a fault.
     pub hydrates: Vec<String>,

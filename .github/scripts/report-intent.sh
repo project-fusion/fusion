@@ -105,9 +105,18 @@ for domain in helix cortex proof; do
   fi
 done
 
-resolved=$(gh api "repos/$REPO/pulls/$NUMBER/commits" --paginate --slurp \
-  | jq -j '.[][].commit.message + "\u0000"' \
-  | bun /tmp/bump.mjs --stdin ${zero:+--zero "$zero"})
+# **Held domains from the base's `fusion.json`**, the checkout this job has, and
+# reported as held so the comment says what merging would actually publish:
+# [RELEASING.md](../RELEASING.md#a-held-domain).
+held=$(jq -r '.held // {} | keys | join(",")' fusion.json)
+
+gh api "repos/$REPO/pulls/$NUMBER/commits" --paginate --slurp \
+  | jq -j '.[][].commit.message + "\u0000"' > /tmp/messages
+resolved=$(bun /tmp/bump.mjs --stdin ${zero:+--zero "$zero"} --held "$held" < /tmp/messages)
+asked=$(bun /tmp/bump.mjs --stdin ${zero:+--zero "$zero"} < /tmp/messages)
+kept=$(jq -r --argjson released "$resolved" \
+  '[.[] | select(.domain as $d | $released | map(.domain) | index($d) | not) | .domain] | join("`, `")' \
+  <<<"$asked")
 
 majors=$(jq -r '[.[] | select(.level == "major") | .domain] | join("`, `")' <<<"$resolved")
 
@@ -118,6 +127,10 @@ report=$(
     echo 'Nothing. No subject carries a `helix`, `cortex`, or `proof` scope with a releasing type.'
   else
     jq -r '.[] | "- `\(.domain)`: **\(.level)**"' <<<"$resolved"
+  fi
+  if [ -n "$kept" ]; then
+    echo
+    echo "Held, so not released: \`$kept\`. \`held\` in \`fusion.json\` keeps it out of the release until it is on the registry."
   fi
   if [ -n "$majors" ]; then
     echo
