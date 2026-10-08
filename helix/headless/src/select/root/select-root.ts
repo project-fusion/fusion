@@ -11,6 +11,7 @@ import {
   HelixFormElement,
   hostAria,
   hostWords,
+  inlineStep,
   isRtl,
   MixinControllerOpen,
   MixinControllerValue,
@@ -65,7 +66,7 @@ import { over } from '../align.js'
  * | Down, Enter, Space | Opens the list on the chosen option, or the first. |
  * | Up | Opens the list on the chosen option, or the last. |
  * | Home, End | Opens the list on the first or the last option. |
- * | Left, Right | Chooses the option before or after the chosen one without opening, as React Aria's Select does, in either direction of text. |
+ * | Left, Right | Chooses the option before or after the chosen one without opening, as React Aria's Select does. On a right-to-left page Left chooses the one after. |
  * | A letter or a word | Chooses the option whose words start with what you typed, as a native `<select>` does. With `multiple`, opens the list on it. |
  *
  * In the open list, which is a `Listbox`:
@@ -696,7 +697,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * middle of those letters is one of them. With `multiple`, a letter opens the
    * list on the match instead, because adding to a set is a choice the reader
    * makes in the list. ArrowLeft and ArrowRight choose the option before and
-   * after the chosen one.
+   * after the chosen one, the other way round on a right-to-left page.
    */
   private readonly handleTriggerKeydown = (event: KeyboardEvent): void => {
     const listbox = this.listbox
@@ -715,9 +716,12 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       return
     }
     /* The option before or after the chosen one, as React Aria's Select and a
-       native select on Windows step. The same way round in either direction
-       of text, since the list they step through runs down the page. */
-    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
+       native select on Windows step. **The key pointing where the line runs
+       takes the next one**, which is `inlineStep`'s rule for every horizontal
+       pair here: on a right-to-left page ArrowLeft goes on. Before this,
+       ArrowRight went on in either direction, so a closed select on an Arabic
+       page moved against every other control on the line. */
+    const step = inlineStep(this, event.key)
     if (step !== 0 && !this.multiple && !(event.altKey || event.ctrlKey || event.metaKey)) {
       event.preventDefault()
       const reachable = this.items
