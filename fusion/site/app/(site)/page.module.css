@@ -460,4 +460,15 @@
    elements are made of glass, because that is a page saying what its panels are.
    See `[data-substrate]` there. */
 
-
+/**
+ * Room at the foot of the page for the pill to float over nothing.
+ */
+.fabClearance {
+  padding-block-end: calc(
+    var(--helix-space-lg) *
+    2 +
+    var(--helix-size-control-md) +
+    var(--helix-space-2xs) +
+    env(safe-area-inset-bottom, 0px)
+  );
+}
