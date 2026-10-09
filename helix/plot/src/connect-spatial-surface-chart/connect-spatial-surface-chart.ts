@@ -23,7 +23,7 @@ export interface SurfaceField {
   acrosses: readonly number[]
   axes: Axes
   cells: readonly SurfaceCell[]
-  /** The contour lines at each tick of the height, each segment two places across and in depth, which `contours` draws on the floor. */
+  /** The contour lines at each tick of the height, each segment two places across and in depth, which `contours` draws on the surface. */
   contours?: readonly {
     level: number
     segments: readonly (readonly [readonly [number, number], readonly [number, number]])[]

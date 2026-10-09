@@ -101,7 +101,7 @@ describe('the frame', () => {
 })
 
 describe('the contours', () => {
-  test('under contours, a line for each height inside the readings is drawn on the floor, under the surface', async () => {
+  test('under contours, the lines at each height inside the readings are drawn on the surface, each after its square', async () => {
     const element = await plot()
     expect(element.shadowRoot?.querySelectorAll('[part="contour"]')).toHaveLength(0)
     element.setAttribute('contours', '')
@@ -111,13 +111,11 @@ describe('the contours', () => {
     for (const contour of contours) {
       expect(contour.getAttribute('style')).toMatch(/--spatial-surface-chart-level: [\d.]+/)
     }
-    /* Drawn before the faces, so the surface stands over them. */
-    const drawing = part(element, 'drawing') as Element
-    const first = [...drawing.children].findIndex((one) => one.getAttribute('part') === 'face')
-    const last = [...drawing.children].findLastIndex(
-      (one) => one.getAttribute('part') === 'contour',
-    )
-    expect(last).toBeLessThan(first)
+    /* Each straight after a face, so the faces in front cover it as they cover that face. */
+    for (const contour of contours) {
+      const before = contour.previousElementSibling?.getAttribute('part')
+      expect(before === 'face' || before === 'contour').toBe(true)
+    }
   })
 })
 

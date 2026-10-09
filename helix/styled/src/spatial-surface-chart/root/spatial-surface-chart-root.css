@@ -87,19 +87,6 @@
    little darker where it is light**, as the spatial heatmap's edges are: on
    a ramp that ends near black, a darker rule vanished and the top of the
    surface was one black shape. */
-/* A contour line on the floor, colored along the ramp by its height, as the
-   surface over it is. */
-[part="contour"] {
-  fill: none;
-  stroke: color-mix(
-    in oklab,
-    var(--_spatial-surface-chart-high) calc(var(--spatial-surface-chart-level, 0) * 100%),
-    var(--_spatial-surface-chart-low)
-  );
-  stroke-width: var(--helix-border-thick);
-  vector-effect: non-scaling-stroke;
-}
-
 [part="face"] {
   --_spatial-surface-chart-color: color-mix(
     in oklab,
@@ -121,6 +108,24 @@
   stroke-linejoin: round;
   stroke-opacity: var(--_spatial-surface-chart-through, 1);
   stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+/* A contour line on the surface, colored along the ramp by its height a step
+   stronger than the face under it, so it reads over the face. */
+[part="contour"] {
+  --_spatial-surface-chart-contour: oklch(
+    from
+      color-mix(
+        in oklab,
+        var(--_spatial-surface-chart-high) calc(var(--spatial-surface-chart-level, 0) * 100%),
+        var(--_spatial-surface-chart-low)
+      )
+      calc(l + clamp(-0.18, (0.6 - l) * 1000, 0.22)) c h
+  );
+  fill: none;
+  stroke: var(--_spatial-surface-chart-contour);
+  stroke-width: var(--helix-border-thick);
   vector-effect: non-scaling-stroke;
 }
 

@@ -15,7 +15,7 @@ import type {
   SpatialSurfaceChartDriver,
   SurfaceField,
 } from '../connect-spatial-surface-chart/connect-spatial-surface-chart.js'
-import { createStage, HALF, inBox, lookThrough } from './stage.js'
+import { createStage, edgeOf, HALF, inBox, lookThrough } from './stage.js'
 
 /** How far off the pointer's line of sight a reading is still under it, in radians: about 16 pixels in a chart's box. */
 const REACH = 0.03
@@ -91,7 +91,7 @@ export const threeSurfaceDriver = (
     vertexColors: true,
   })
   const rules = new LineSegments(new BufferGeometry(), ruleMaterial)
-  /* The contour lines on the floor, under `contours`, in the ramp's colors. */
+  /* The contour lines on the surface, under `contours`, in the ramp's colors. */
   const contourMaterial = new LineBasicMaterial({ vertexColors: true })
   const contours = new LineSegments(new BufferGeometry(), contourMaterial)
 
@@ -243,18 +243,39 @@ export const threeSurfaceDriver = (
       const floor: number[] = []
       const floorTints: number[] = []
       const [bottom, top] = [next.lowest ?? least, next.highest ?? most]
+      /* Each contour line where it crosses each triangle of the surface, so
+         it lies on the faces as they are drawn: a line straight across a
+         square of the grid would pass under the fold between its two. */
       for (const contour of next.contours ?? []) {
         tint.lerpColors(low, high, top === bottom ? 0.5 : (contour.level - bottom) / (top - bottom))
-        for (const [from, to] of contour.segments) {
-          floor.push(
-            inBox(next.axes.x, from[0]),
-            -HALF,
-            inBox(next.axes.z, from[1]),
-            inBox(next.axes.x, to[0]),
-            -HALF,
-            inBox(next.axes.z, to[1]),
-          )
-          floorTints.push(tint.r, tint.g, tint.b, tint.r, tint.g, tint.b)
+        /* A step from the face under it, as the chart's own drawing draws it. */
+        tint.copy(edgeOf(tint))
+        for (let at = 0; at + 2 < faces.length; at += 3) {
+          const corners = faces.slice(at, at + 3)
+          const crossings: number[] = []
+          for (const [from, to] of [
+            [corners[0], corners[1]],
+            [corners[1], corners[2]],
+            [corners[2], corners[0]],
+          ] as const) {
+            const [one, other] = [next.cells[from ?? 0]?.value, next.cells[to ?? 0]?.value]
+            if (
+              one === undefined ||
+              other === undefined ||
+              one >= contour.level === other >= contour.level
+            ) {
+              continue
+            }
+            const along = (contour.level - one) / (other - one)
+            for (let axis = 0; axis < 3; axis++) {
+              const start = positions[(from ?? 0) * 3 + axis] ?? 0
+              crossings.push(start + ((positions[(to ?? 0) * 3 + axis] ?? 0) - start) * along)
+            }
+          }
+          if (crossings.length === 6) {
+            floor.push(...crossings)
+            floorTints.push(tint.r, tint.g, tint.b, tint.r, tint.g, tint.b)
+          }
         }
       }
       contours.geometry.dispose()
