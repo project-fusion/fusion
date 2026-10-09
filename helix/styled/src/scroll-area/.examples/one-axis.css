@@ -5,8 +5,11 @@ helix-scroll-area {
   inline-size: 20rem;
 }
 
+/* One entry a line, as the log's lines are blocks, whatever whitespace stands
+   between them in the markup. */
 helix-scroll-area helix-text {
   --text-font-size: var(--helix-text-xs);
+  display: block;
   margin: 0 0 var(--helix-space-xs);
   padding-inline-end: var(--helix-space-md);
 }
