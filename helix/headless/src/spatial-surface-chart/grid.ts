@@ -40,7 +40,7 @@ export interface SurfaceField {
   /** The lowest and the highest reading, which every level is measured between. */
   lowest: number
   highest: number
-  /** The contour lines at each tick of the height inside the readings, which `contours` draws on the floor. */
+  /** The contour lines at each tick of the height inside the readings, which `contours` draws on the surface. */
   contours: Contour[]
 }
 
@@ -123,6 +123,8 @@ export interface Contour {
   level: number
   /** Each segment as two places, across and in depth. */
   segments: Array<[[number, number], [number, number]]>
+  /** The square of the grid each segment crosses, by its first corner's place in `cells`, in the order of `segments`. */
+  squares: number[]
 }
 
 /**
@@ -139,6 +141,7 @@ export const contoursOf = (field: SurfaceField, levels: readonly number[]): Cont
     field.cells[across * depths + depth]?.value
   return levels.map((level) => {
     const segments: Contour['segments'] = []
+    const squares: number[] = []
     for (let across = 0; across + 1 < field.acrosses.length; across++) {
       for (let depth = 0; depth + 1 < depths; depth++) {
         const corners = [
@@ -179,8 +182,10 @@ export const contoursOf = (field: SurfaceField, levels: readonly number[]): Cont
             ([from, to]) => (values[from] as number) >= level !== (values[to] as number) >= level,
           )
           .map(([from, to]) => place(from, to))
+        const square = across * depths + depth
         if (crossed.length === 2) {
           segments.push([crossed[0] as [number, number], crossed[1] as [number, number]])
+          squares.push(square)
         } else if (crossed.length === 4) {
           const [bottom, right, top, left] = crossed as [
             [number, number],
@@ -194,10 +199,11 @@ export const contoursOf = (field: SurfaceField, levels: readonly number[]): Cont
           } else {
             segments.push([bottom, left], [right, top])
           }
+          squares.push(square, square)
         }
       }
     }
-    return { level, segments }
+    return { level, segments, squares }
   })
 }
 

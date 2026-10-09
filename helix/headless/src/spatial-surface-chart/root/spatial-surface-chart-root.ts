@@ -130,7 +130,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @event {HelixReadingPressEvent} helix-reading-press - A place was clicked or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart axis-name - A measure's name, along its edge of the box, in the chart's own drawing.
- * @csspart contour - One contour line on the floor of the box, drawn under `contours`, at one height, colored along the ramp by it.
+ * @csspart contour - The pieces of one contour line that cross one square of the surface, drawn under `contours` at their height, colored along the ramp by it.
  * @csspart drawing - The chart's own drawing in SVG: the box, its grid and numbers, and the surface.
  * @csspart empty - The words when the table has no readings: the `empty` slot, falling back to `empty-text`.
  * @csspart face - One square of the surface between four readings, or a triangle where one is missing, shaded by its height and by which way it faces.
@@ -180,9 +180,9 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
   static words = 'helix-spatial-surface-chart'
 
   /**
-   * Draws the surface's contour lines on the floor of the box, at each tick
-   * of its height, in the ramp's colors, so its shape reads from above as on
-   * a map. A renderer draws them too.
+   * Draws the surface's contour lines on it, at each tick of its height, in
+   * the ramp's colors, so its shape reads as on a map and two places at the
+   * same height read as such. A renderer draws them too.
    */
   @property({ reflect: true, type: Boolean })
   contours = false
@@ -491,6 +491,7 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
       level: number
       points: BoxPoint[]
       shade: number
+      square: number
     }> = []
     for (let across = 0; across + 1 < field.acrosses.length; across++) {
       for (let depth = 0; depth + 1 < depths; depth++) {
@@ -512,6 +513,7 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
             ) / corners.length,
           points,
           shade: shadeOf(points),
+          square: here,
         })
       }
     }
@@ -535,9 +537,9 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
-      >${this.noBox ? nothing : drawBox(view)}${this.contours ? this.renderContours(field, view.on) : nothing}${faces.map(
+      >${this.noBox ? nothing : drawBox(view)}${faces.map(
         (face) =>
-          svg`<path d=${shape(face.points.map((point) => view.on(point)))} data-corners=${face.corners.join(' ')} part="face" style="--spatial-surface-chart-level: ${short(face.level)}; --spatial-surface-chart-shade: ${short(face.shade)}"></path>`,
+          svg`<path d=${shape(face.points.map((point) => view.on(point)))} data-corners=${face.corners.join(' ')} part="face" style="--spatial-surface-chart-level: ${short(face.level)}; --spatial-surface-chart-shade: ${short(face.shade)}"></path>${this.contours ? this.renderContoursIn(field, face.square, view.on) : nothing}`,
       )}${
         active
           ? svg`<circle cx=${active.x} cy=${active.y} part="ring" r="0.085"></circle><foreignObject height="0.001" overflow="visible" width="0.001" x=${active.x} y=${active.y}>${this.renderOwnTooltip(row)}</foreignObject>`
@@ -547,27 +549,36 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
   }
 
   /**
-   * The contour lines on the floor of the box, one path for each height,
-   * drawn under the surface so it stands over them.
+   * The contour lines that cross one square of the grid, at their heights, as
+   * one path for each, drawn straight after the square's face so the faces
+   * in front of it cover them as they cover the face.
    */
-  private renderContours(
+  private renderContoursIn(
     field: SurfaceField,
+    square: number,
     on: (point: BoxPoint) => { x: number; y: number },
   ): SVGTemplateResult[] {
     const { highest, lowest } = field
     const short = (value: number): number => Math.round(value * 1000) / 1000
-    return field.contours.map((contour) => {
-      const d = contour.segments
+    return field.contours.flatMap((contour) => {
+      const pieces = contour.segments.filter((_, at) => contour.squares[at] === square)
+      if (pieces.length === 0) {
+        return []
+      }
+      const height = inBox(field.axes.y, contour.level)
+      const d = pieces
         .map(([from, to]) => {
           const [a, b] = [
-            on([inBox(field.axes.x, from[0]), -1, inBox(field.axes.z, from[1])]),
-            on([inBox(field.axes.x, to[0]), -1, inBox(field.axes.z, to[1])]),
+            on([inBox(field.axes.x, from[0]), height, inBox(field.axes.z, from[1])]),
+            on([inBox(field.axes.x, to[0]), height, inBox(field.axes.z, to[1])]),
           ]
           return `M${short(a.x)} ${short(a.y)}L${short(b.x)} ${short(b.y)}`
         })
         .join('')
       const level = highest === lowest ? 0.5 : (contour.level - lowest) / (highest - lowest)
-      return svg`<path d=${d} part="contour" style="--spatial-surface-chart-level: ${short(level)}"></path>`
+      return [
+        svg`<path d=${d} part="contour" style="--spatial-surface-chart-level: ${short(level)}"></path>`,
+      ]
     })
   }
 
