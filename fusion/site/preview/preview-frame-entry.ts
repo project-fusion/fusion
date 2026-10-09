@@ -132,7 +132,7 @@ const mountGraphs = (root: HTMLElement, at: number): void => {
   /* A spatial heatmap or chart three.js draws, from a chunk of its own. */
   if (
     root.querySelector(
-      ':is(helix-spatial-bar-chart, helix-spatial-heatmap, helix-spatial-scatter-chart, helix-spatial-surface-chart)[data-preview-plot="three"]',
+      ':is(helix-spatial-bar-chart, helix-spatial-heatmap, helix-spatial-ribbon-chart, helix-spatial-scatter-chart, helix-spatial-surface-chart)[data-preview-plot="three"]',
     )
   ) {
     void load(__PREVIEW_PLOT_THREE_URL__)

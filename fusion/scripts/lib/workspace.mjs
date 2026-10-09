@@ -118,7 +118,7 @@ export const TIERS = [SOURCE.headless, SOURCE.styled]
 /**
  * The packages that connect a family to someone else's renderer, by the
  * family they serve: `connectGraph` and its drivers for Graph, `connectMap`
- * and its drivers for Map, and from the plot package, which serves four
+ * and its drivers for Map, and from the plot package, which serves five
  * families, the folder of each one's connector. Their DOM specs run with the
  * family's in a browser, where a driver meets a real canvas, a real WebGL
  * context, and a layout, none of which happy-dom has.
@@ -128,6 +128,7 @@ export const CONNECTORS = {
   map: SOURCE.map,
   'spatial-bar-chart': `${SOURCE.plot}/connect-spatial-bar-chart`,
   'spatial-heatmap': `${SOURCE.plot}/connect-spatial-heatmap`,
+  'spatial-ribbon-chart': `${SOURCE.plot}/connect-spatial-ribbon-chart`,
   'spatial-scatter-chart': `${SOURCE.plot}/connect-spatial-scatter-chart`,
   'spatial-surface-chart': `${SOURCE.plot}/connect-spatial-surface-chart`,
 }
