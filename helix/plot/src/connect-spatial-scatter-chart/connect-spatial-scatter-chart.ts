@@ -38,7 +38,7 @@ export type SpatialScatterChartConnection = PlotConnection
  * driver, colors each group from the page's series tokens, marks the point
  * the keys rest on, turns the view for Shift with an arrow, and puts a point
  * pressed in the drawing on the chart's reading. Once the driver has drawn,
- * the chart hides its flat scatter; `disconnect()` shows it again.
+ * the chart hides its own SVG drawing; `disconnect()` shows it again.
  */
 export const connectSpatialScatterChart = (
   frame: HTMLElement,
