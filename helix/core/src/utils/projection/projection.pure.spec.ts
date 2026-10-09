@@ -62,6 +62,17 @@ describe('a solid', () => {
     expect(low.faces).toHaveLength(2)
   })
 
+  test('a block given a depth is that deep back and its width across', () => {
+    const top = corners(solid(iso, 'block', 0, 0, 2, 0, 1).faces[0]?.d ?? '')
+    const floor = top.map(([x, y]) => iso.floorAt({ x, y }))
+    expect(
+      Math.max(...floor.map((point) => point.x)) - Math.min(...floor.map((point) => point.x)),
+    ).toBeCloseTo(2)
+    expect(
+      Math.max(...floor.map((point) => point.y)) - Math.min(...floor.map((point) => point.y)),
+    ).toBeCloseTo(1)
+  })
+
   test('a flat block shows its top alone', () => {
     expect(solid(iso, 'block', 0, 0, 1, 0).faces).toHaveLength(1)
   })

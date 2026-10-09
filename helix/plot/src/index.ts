@@ -44,3 +44,10 @@ export {
   type SurfaceCell,
   type SurfaceField,
 } from './connect-spatial-surface-chart/connect-spatial-surface-chart.js'
+export {
+  connectSpatialTreemap,
+  type SpatialTreemapConnection,
+  type SpatialTreemapDriver,
+  type TreemapBlock,
+  type TreemapField,
+} from './connect-spatial-treemap/connect-spatial-treemap.js'

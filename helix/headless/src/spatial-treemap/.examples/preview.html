@@ -1,0 +1,119 @@
+<!-- @summary Requests a minute and response time for fifteen services in four teams, drawn in 3D in SVG: each block as large as its requests and as tall as its response time, in its team's gray. Drag to turn the blocks, or press Shift with an arrow. -->
+
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<table
+  data-hidden-visually
+  id="services"
+>
+  <caption>Requests and response time by service</caption>
+  <thead>
+    <tr>
+      <th scope="col">Service</th>
+      <th scope="col">Team</th>
+      <th scope="col">Requests a minute</th>
+      <th scope="col">p95 response (ms)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Gateway</th>
+      <td>Platform</td>
+      <td>4200</td>
+      <td>85</td>
+    </tr>
+    <tr>
+      <th scope="row">Auth</th>
+      <td>Platform</td>
+      <td>2600</td>
+      <td>40</td>
+    </tr>
+    <tr>
+      <th scope="row">Search</th>
+      <td>Platform</td>
+      <td>1800</td>
+      <td>210</td>
+    </tr>
+    <tr>
+      <th scope="row">Config</th>
+      <td>Platform</td>
+      <td>400</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <th scope="row">Checkout</th>
+      <td>Payments</td>
+      <td>1500</td>
+      <td>320</td>
+    </tr>
+    <tr>
+      <th scope="row">Billing</th>
+      <td>Payments</td>
+      <td>900</td>
+      <td>180</td>
+    </tr>
+    <tr>
+      <th scope="row">Ledger</th>
+      <td>Payments</td>
+      <td>600</td>
+      <td>140</td>
+    </tr>
+    <tr>
+      <th scope="row">Refunds</th>
+      <td>Payments</td>
+      <td>200</td>
+      <td>260</td>
+    </tr>
+    <tr>
+      <th scope="row">Recommendations</th>
+      <td>Growth</td>
+      <td>1300</td>
+      <td>240</td>
+    </tr>
+    <tr>
+      <th scope="row">Email</th>
+      <td>Growth</td>
+      <td>500</td>
+      <td>90</td>
+    </tr>
+    <tr>
+      <th scope="row">Experiments</th>
+      <td>Growth</td>
+      <td>350</td>
+      <td>60</td>
+    </tr>
+    <tr>
+      <th scope="row">Ingest</th>
+      <td>Data</td>
+      <td>2100</td>
+      <td>120</td>
+    </tr>
+    <tr>
+      <th scope="row">Warehouse</th>
+      <td>Data</td>
+      <td>800</td>
+      <td>190</td>
+    </tr>
+    <tr>
+      <th scope="row">Reports</th>
+      <td>Data</td>
+      <td>450</td>
+      <td>410</td>
+    </tr>
+    <tr>
+      <th scope="row">Exports</th>
+      <td>Data</td>
+      <td>250</td>
+      <td>300</td>
+    </tr>
+  </tbody>
+</table>
+
+<helix-headless-spatial-treemap
+  for="services"
+  group-by="Team"
+  label="Requests and response time by service"
+></helix-headless-spatial-treemap>

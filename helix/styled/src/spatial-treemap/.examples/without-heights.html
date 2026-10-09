@@ -1,0 +1,98 @@
+<!-- @summary The same services by requests alone. With no second numeric column, the blocks stand as one slab, a treemap seen in 3D. -->
+
+<table
+  data-hidden-visually
+  id="services"
+>
+  <caption>Requests and response time by service</caption>
+  <thead>
+    <tr>
+      <th scope="col">Service</th>
+      <th scope="col">Team</th>
+      <th scope="col">Requests a minute</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Gateway</th>
+      <td>Platform</td>
+      <td>4200</td>
+    </tr>
+    <tr>
+      <th scope="row">Auth</th>
+      <td>Platform</td>
+      <td>2600</td>
+    </tr>
+    <tr>
+      <th scope="row">Search</th>
+      <td>Platform</td>
+      <td>1800</td>
+    </tr>
+    <tr>
+      <th scope="row">Config</th>
+      <td>Platform</td>
+      <td>400</td>
+    </tr>
+    <tr>
+      <th scope="row">Checkout</th>
+      <td>Payments</td>
+      <td>1500</td>
+    </tr>
+    <tr>
+      <th scope="row">Billing</th>
+      <td>Payments</td>
+      <td>900</td>
+    </tr>
+    <tr>
+      <th scope="row">Ledger</th>
+      <td>Payments</td>
+      <td>600</td>
+    </tr>
+    <tr>
+      <th scope="row">Refunds</th>
+      <td>Payments</td>
+      <td>200</td>
+    </tr>
+    <tr>
+      <th scope="row">Recommendations</th>
+      <td>Growth</td>
+      <td>1300</td>
+    </tr>
+    <tr>
+      <th scope="row">Email</th>
+      <td>Growth</td>
+      <td>500</td>
+    </tr>
+    <tr>
+      <th scope="row">Experiments</th>
+      <td>Growth</td>
+      <td>350</td>
+    </tr>
+    <tr>
+      <th scope="row">Ingest</th>
+      <td>Data</td>
+      <td>2100</td>
+    </tr>
+    <tr>
+      <th scope="row">Warehouse</th>
+      <td>Data</td>
+      <td>800</td>
+    </tr>
+    <tr>
+      <th scope="row">Reports</th>
+      <td>Data</td>
+      <td>450</td>
+    </tr>
+    <tr>
+      <th scope="row">Exports</th>
+      <td>Data</td>
+      <td>250</td>
+    </tr>
+  </tbody>
+</table>
+
+<helix-spatial-treemap
+  for="services"
+  group-by="Team"
+  label="Requests and response time by service"
+></helix-spatial-treemap>

@@ -3,3 +3,4 @@ export { type ThreeHeatmapDriverOptions, threeHeatmapDriver } from './heatmap-dr
 export { type ThreeRibbonDriverOptions, threeRibbonDriver } from './ribbon-driver.js'
 export { type ThreeScatterDriverOptions, threeScatterDriver } from './scatter-driver.js'
 export { type ThreeSurfaceDriverOptions, threeSurfaceDriver } from './surface-driver.js'
+export { type ThreeTreemapDriverOptions, threeTreemapDriver } from './treemap-driver.js'
