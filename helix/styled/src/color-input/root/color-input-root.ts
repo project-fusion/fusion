@@ -43,6 +43,8 @@ import { styles } from './color-input-root.css.js'
  *   keeps a lift by default.
  * @cssproperty --color-input-swatch-radius - Corner radius of the swatch in `variant="swatch"`.
  * @cssproperty --color-input-swatch-size - Edge length of the swatch in `variant="swatch"`.
+ *
+ * @replaces input[type=color]
  */
 @customElement('helix-color-input')
 export class HelixColorInput extends HelixHeadlessColorInput {

@@ -30,6 +30,8 @@ import { styles } from './kbd-root.css.js'
  * @cssproperty --kbd-padding-inline - The space either side of the key's label.
  * @cssproperty --kbd-radius - How far the key's corners are rounded.
  * @cssproperty --kbd-separator-color - The color of the `+` between two keys of a chord under `caps`.
+ *
+ * @replaces kbd
  */
 @customElement('helix-kbd')
 export class HelixKbd extends HelixHeadlessKbd {

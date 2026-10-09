@@ -54,6 +54,7 @@ const SERVER_KEY: &str = "io.modelcontextprotocol/serverInfo";
 pub const INSTRUCTIONS: &str = "Helix is a library of web components. These tools answer from the Helix packages installed in this project, and each answer names the package and version it read.\n\n\
 - Look up a family with helix_family before writing its tags. Write only the tags, attributes, values, slots, parts, events, and custom properties it lists. If it is not listed, it does not exist, so do not use it.\n\
 - Find a family by name or purpose with helix_find.\n\
+- Use a Helix element for everything Helix has a family for, and a native element only for page structure such as main, section, form, div, and a. helix_find answers a native tag, such as button or h1, with the family that replaces it.\n\
 - Import every family you write. Copy the lines from `usage` or from an example's `imports`, or call helix_imports with every tag the file writes. A family does not register another family's elements written inside it, such as Option inside Select.\n\
 - In React, use each event's `reactProp` exactly, such as onhelix-before-change.\n\
 - Style with the tokens helix_tokens lists, then a component's custom properties, then its parts. Never read a --_helix- primitive.\n\

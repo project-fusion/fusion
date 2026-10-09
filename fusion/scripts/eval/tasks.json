@@ -2,7 +2,7 @@
   "tasks": [
     {
       "id": "select",
-      "prompt": "Using Helix, build this as a page: A native select with a label and a hint.",
+      "prompt": "Using Helix, build this as a page: A select with a label and a hint.",
       "requires": ["helix-option", "helix-select"]
     },
     {
@@ -73,12 +73,12 @@
     {
       "id": "drawer",
       "prompt": "Using Helix, build this as a page: A panel that slides in from an edge, opened by a button.",
-      "requires": ["helix-drawer"]
+      "requires": ["helix-button", "helix-drawer"]
     },
     {
       "id": "dialog",
       "prompt": "Using Helix, build this as a page: A dialog opened by a button, with actions in its footer.",
-      "requires": ["helix-dialog"]
+      "requires": ["helix-button", "helix-dialog"]
     },
     {
       "id": "checkbox-group",
@@ -99,6 +99,42 @@
       "id": "themed-card",
       "prompt": "Using Helix, build a storage card on a page, styled only with Helix tokens and the card's own custom properties: the page on the surface color with medium padding, and the card with a medium gap and the border color.",
       "requires": ["helix-card"]
+    },
+    {
+      "id": "settings-page",
+      "prompt": "Using Helix, build a settings page: a heading, a Profile section with name and email fields, a Notifications section with two switches, and Save and Cancel buttons.",
+      "requires": ["helix-button", "helix-input", "helix-switch", "helix-text"]
+    },
+    {
+      "id": "sign-up",
+      "prompt": "Using Helix, build a sign-up page: a heading, a short sentence under it, email and password fields, a checkbox to accept the terms, and a submit button.",
+      "requires": ["helix-button", "helix-checkbox", "helix-input", "helix-text"]
+    },
+    {
+      "id": "dashboard",
+      "prompt": "Using Helix, build a dashboard page: a heading, three figures for this month in a row, and a table of recent orders.",
+      "requires": ["helix-stat", "helix-table", "helix-text"]
+    },
+    {
+      "id": "profile",
+      "prompt": "Using Helix, build a profile card: a picture of the person, their name and role, a short bio, a list of three skills, and a Follow button.",
+      "requires": ["helix-avatar", "helix-button", "helix-card", "helix-list", "helix-text"]
+    },
+    {
+      "id": "article",
+      "prompt": "Using Helix, build an article page: a title, a byline, an image, two paragraphs, a quote, a code sample, and a rule before the footer line.",
+      "requires": [
+        "helix-blockquote",
+        "helix-code-block",
+        "helix-divider",
+        "helix-image",
+        "helix-text"
+      ]
+    },
+    {
+      "id": "pricing",
+      "prompt": "Using Helix, build a pricing page: a heading and three plans side by side, each with a name, a price, a list of what it includes, and a button to choose it.",
+      "requires": ["helix-button", "helix-card", "helix-list", "helix-text"]
     }
   ]
 }

@@ -1,0 +1,43 @@
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-text
+    as="h1"
+    variant="title"
+  >Create your account</helix-text>
+  <helix-text>Start a free trial. No card is needed.</helix-text>
+  <form>
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-input
+        autocomplete="email"
+        label="Email"
+        name="email"
+        required
+        type="email"
+      ></helix-input>
+      <helix-input
+        autocomplete="new-password"
+        hint="At least 12 characters"
+        label="Password"
+        name="password"
+        required
+        type="password"
+      ></helix-input>
+      <helix-checkbox
+        label="I accept the terms of service"
+        name="terms"
+        required
+        value="accepted"
+      ></helix-checkbox>
+      <helix-button
+        emphasis="solid"
+        tone="primary"
+        type="submit"
+      >Create account</helix-button>
+    </helix-flex>
+  </form>
+</helix-flex>

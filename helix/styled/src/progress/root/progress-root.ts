@@ -41,6 +41,8 @@ import { styles } from './progress-root.css.js'
  * @cssproperty --progress-value-color - The color of the value shown under `show-value`.
  * @cssproperty --progress-value-gap - The space between the bar and the value under `show-value`.
  * @cssproperty --progress-value-size - The type size of the value shown under `show-value`.
+ *
+ * @replaces progress
  */
 @customElement('helix-progress')
 export class HelixProgress extends HelixHeadlessProgress {

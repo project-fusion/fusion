@@ -202,6 +202,13 @@ fn score(family: &Value, query: &str) -> usize {
             .map(|alias| alias.to_lowercase()),
     );
     names.extend(tags(family));
+    /* A native element's name finds the family that stands in for it:
+    `button` is Button, and `h1` is Text. */
+    names.extend(
+        strings(&family["replaces"])
+            .iter()
+            .map(|one| one.split('[').next().unwrap_or(one).to_owned()),
+    );
     if names
         .iter()
         .any(|name| *name == query || name.replace(' ', "-") == query)
@@ -249,6 +256,7 @@ pub fn find(from: &Path, query: &str, limit: usize) -> Outcome<Value> {
             json!({
                 "aliases": family["aliases"],
                 "category": family["category"],
+                "replaces": family["replaces"],
                 "label": family["label"],
                 "package": tier.package,
                 "slug": family["slug"],

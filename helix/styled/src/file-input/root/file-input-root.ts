@@ -48,6 +48,8 @@ import { styles } from './file-input-root.css.js'
  * @cssproperty --file-input-remove-color-hover - The remove button's icon under the pointer.
  * @cssproperty --file-input-status-color - The words beside a file's upload bar.
  * @cssproperty --file-input-status-color-error - The words beside a file whose upload failed.
+ *
+ * @replaces input[type=file]
  */
 @customElement('helix-file-input')
 export class HelixFileInput extends HelixHeadlessFileInput {

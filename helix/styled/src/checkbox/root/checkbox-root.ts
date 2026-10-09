@@ -33,6 +33,8 @@ import { styles } from './checkbox-root.css.js'
  * @cssproperty --checkbox-icon-size - The width and height of an icon slotted into `check` or `dash`. It fills the box by default.
  * @cssproperty --checkbox-mark-color - The color of the check mark and the dash, and of an icon slotted into `check` or `dash`.
  * @cssproperty --checkbox-size - The width and height of the box.
+ *
+ * @replaces input[type=checkbox]
  */
 @customElement('helix-checkbox')
 export class HelixCheckbox extends HelixHeadlessCheckbox {

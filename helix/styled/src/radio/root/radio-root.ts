@@ -30,6 +30,8 @@ import { styles } from './radio-root.css.js'
  * @cssproperty --radio-indicator-size - The width and height of an icon slotted into `indicator`. Three quarters of the circle by default.
  * @cssproperty --radio-mark-color - The color of the dot, or of an icon slotted into `indicator`.
  * @cssproperty --radio-size - The diameter of the circle.
+ *
+ * @replaces input[type=radio]
  */
 @customElement('helix-radio')
 export class HelixRadio extends HelixHeadlessRadio {

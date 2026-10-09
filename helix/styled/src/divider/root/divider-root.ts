@@ -37,6 +37,8 @@ import { styles } from './divider-root.css.js'
  * @cssproperty --divider-padding-end - The space removed from the end of the line only.
  * @cssproperty --divider-padding-start - The space removed from the start of the line only.
  * @cssproperty --divider-thickness - The thickness of the line.
+ *
+ * @replaces hr
  */
 @customElement('helix-divider')
 export class HelixDivider extends HelixHeadlessDivider {

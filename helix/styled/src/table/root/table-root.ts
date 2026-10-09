@@ -44,6 +44,8 @@ import '../../checkbox/index.js'
  * @cssproperty --table-title-color - The color of the words in the `heading` slot.
  * @cssproperty --table-title-gap - The space between the `heading` slot and the grid.
  * @cssproperty --table-title-text - The font size of the words in the `heading` slot.
+ *
+ * @replaces table
  */
 @customElement('helix-table')
 export class HelixTable extends HelixHeadlessTable {

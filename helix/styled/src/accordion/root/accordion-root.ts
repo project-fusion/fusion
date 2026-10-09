@@ -22,6 +22,8 @@ import { styles } from './accordion-root.css.js'
  * @cssproperty --accordion-border-color - The color of the lines between items, and of each item's border when outlined.
  * @cssproperty --accordion-gap - The space between items when outlined. Otherwise items share an edge.
  * @cssproperty --accordion-radius - The corner radius of each item when outlined.
+ *
+ * @replaces details
  */
 @customElement('helix-accordion')
 export class HelixAccordion extends HelixHeadlessAccordion {

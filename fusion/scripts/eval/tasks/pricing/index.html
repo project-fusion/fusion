@@ -1,0 +1,70 @@
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-text
+    as="h1"
+    text-align="center"
+    variant="title"
+  >Plans</helix-text>
+  <helix-grid
+    gap="md"
+    min="16rem"
+  >
+    <helix-card
+      aria-labelledby="plan-free"
+      separation="outlined"
+    >
+      <helix-text
+        as="h2"
+        id="plan-free"
+        slot="header"
+        variant="subheading"
+      >Free</helix-text>
+      <helix-text variant="title">$0</helix-text>
+      <helix-list label="Free includes">
+        <helix-list-item>One project</helix-list-item>
+        <helix-list-item>Community support</helix-list-item>
+      </helix-list>
+      <helix-button slot="footer">Choose Free</helix-button>
+    </helix-card>
+    <helix-card
+      aria-labelledby="plan-team"
+      separation="outlined"
+    >
+      <helix-text
+        as="h2"
+        id="plan-team"
+        slot="header"
+        variant="subheading"
+      >Team</helix-text>
+      <helix-text variant="title">$12 a seat</helix-text>
+      <helix-list label="Team includes">
+        <helix-list-item>Unlimited projects</helix-list-item>
+        <helix-list-item>Email support</helix-list-item>
+      </helix-list>
+      <helix-button
+        emphasis="solid"
+        slot="footer"
+        tone="primary"
+      >Choose Team</helix-button>
+    </helix-card>
+    <helix-card
+      aria-labelledby="plan-business"
+      separation="outlined"
+    >
+      <helix-text
+        as="h2"
+        id="plan-business"
+        slot="header"
+        variant="subheading"
+      >Business</helix-text>
+      <helix-text variant="title">$24 a seat</helix-text>
+      <helix-list label="Business includes">
+        <helix-list-item>Single sign-on</helix-list-item>
+        <helix-list-item>Priority support</helix-list-item>
+      </helix-list>
+      <helix-button slot="footer">Choose Business</helix-button>
+    </helix-card>
+  </helix-grid>
+</helix-flex>

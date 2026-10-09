@@ -197,6 +197,11 @@ export const rendersOf = (slug: string, files: readonly string[]): Render[] =>
 
 export interface Family {
   aliases: string[]
+  /**
+   * The native elements the family stands in for, from `@replaces`: `button`,
+   * or `input[type=checkbox]`. `helix scan` reports each one a page writes.
+   */
+  replaces: string[]
   /** What the component is for, from `@category`. The gallery groups on it. */
   category: string
   documentation: string
@@ -562,6 +567,7 @@ export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = 
 
       return {
         aliases: [...new Set(roots.flatMap((entry) => entry.helix?.aliases ?? []))],
+        replaces: [...new Set(roots.flatMap((entry) => entry.helix?.replaces ?? []))],
         category: root.helix?.category ?? '',
         documentation: root.helix?.documentation ?? '',
         elements: entries

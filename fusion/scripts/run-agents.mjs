@@ -199,6 +199,7 @@ for (const arm of arms) {
   for (const one of all.grades) {
     const result = results.find((r) => r.arm === arm && r.task === one.id)
     if (result) {
+      result.coverage = one.coverage
       result.passed = one.passed
       result.reasons = one.reasons
     }
@@ -214,6 +215,7 @@ const summary = Object.fromEntries(
       arm,
       {
         cost: mine.reduce((sum, one) => sum + (one.cost ?? 0), 0),
+        coverage: mine.reduce((sum, one) => sum + (one.coverage ?? 0), 0) / (mine.length || 1),
         passed: mine.filter((one) => one.passed).length,
         total: mine.length,
       },
@@ -225,6 +227,8 @@ writeFileSync(
   `${JSON.stringify({ model, results, summary, tasks: tasks.map((t) => t.id) }, null, 2)}\n`,
 )
 for (const [arm, one] of Object.entries(summary)) {
-  console.log(`${arm.padEnd(6)} ${one.passed} of ${one.total} pass, $${one.cost.toFixed(2)}`)
+  console.log(
+    `${arm.padEnd(6)} ${one.passed} of ${one.total} pass, ${Math.round(one.coverage * 100)}% Helix, $${one.cost.toFixed(2)}`,
+  )
 }
 console.log(`\nResults and pages in ${out}. The scratch project is ${scratch}.`)

@@ -204,6 +204,9 @@ export interface HelixMetadata {
   /** Other names people search for. Tag is also a Chip. */
   aliases?: string[]
 
+  /** The native elements the family stands in for, from `@replaces`. */
+  replaces?: string[]
+
   /**
    * What the component is for, and the one axis the catalog groups on.
    *

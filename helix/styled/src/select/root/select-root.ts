@@ -37,6 +37,8 @@ import '../../listbox/index.js'
  * @cssproperty --select-shadow - Shadow under the panel. Defaults to
  *   `--helix-shadow-floating`, because the panel can sit over any content.
  * @cssproperty --select-surface-max-block-size - Maximum height of the panel.
+ *
+ * @replaces select
  */
 @customElement('helix-select')
 export class HelixSelect extends HelixHeadlessSelect {

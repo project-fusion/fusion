@@ -52,6 +52,8 @@ import { styles } from './date-input-root.css.js'
  * @cssproperty --date-input-shadow - The shadow under the panel. It follows
  *   `--helix-shadow-floating`. The panel can sit over any content, so it has a
  *   shadow by default.
+ *
+ * @replaces input[type=date]
  */
 @customElement('helix-date-input')
 export class HelixDateInput extends HelixHeadlessDateInput {

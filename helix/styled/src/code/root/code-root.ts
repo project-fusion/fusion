@@ -26,6 +26,8 @@ import { styles } from './code-root.css.js'
  * `space-2xs`, so a bracket next to the fragment sits close to it.
  * @cssproperty --code-radius - Corner radius of the wash. Defaults to `radii-sm`.
  * @cssproperty --code-size - The fragment's size. Defaults to `text-sm`.
+ *
+ * @replaces code
  */
 @customElement('helix-code')
 export class HelixCode extends HelixHeadlessCode {
