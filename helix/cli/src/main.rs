@@ -17,7 +17,6 @@
 
 mod api;
 mod args;
-#[cfg(feature = "internal")]
 mod component;
 mod config;
 mod diagnostics;
@@ -33,9 +32,7 @@ use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
 use fusion_rules::style::Paint;
 
-#[cfg(feature = "internal")]
-use crate::args::Component;
-use crate::args::{Api, Cli, Manifest, McpVerb, Noun, Theme};
+use crate::args::{Api, Cli, Component, Manifest, McpVerb, Noun, Theme};
 
 /// The word every printed failure opens with, and the corner of every screen.
 const PRODUCT: &str = "helix";
@@ -87,13 +84,13 @@ fn main() {
                 fusion_rules::exit::Code::Ok
             })
         }
-        #[cfg(feature = "internal")]
         Noun::Component { verb } => match verb {
             Component::Audit(args) => component::run::audit(args, &from, cli.json, paint),
             Component::Check(args) => component::run::check(args, &from, cli.json, paint),
             Component::Fix(args) => component::run::fix(args, &from, cli.json, paint),
         },
         Noun::Manifest { verb } => match verb {
+            #[cfg(feature = "internal")]
             Manifest::Build(args) => manifest::generate(args, &from, cli.json),
             Manifest::Diff(args) => manifest::diff(args, &from, cli.json),
         },

@@ -212,8 +212,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if "$BINARY" component --help >/dev/null 2>&1; then
-            echo "::error::$BINARY has \`helix component\`, which only this repository's builds carry"
+          # `stable` is one of Helix's own conventions, so a published binary
+          # does not know it, and the rules it does know are the public set.
+          said=$("$BINARY" --json component check --only stable 2>&1 >/dev/null || true)
+          if ! jq -e '.error.choices | length > 0 and (index("stable") | not)' <<<"$said" >/dev/null; then
+            echo "::error::$BINARY runs Helix's own component rules, which only this repository's builds carry: $said"
+            exit 1
+          fi
+          if "$BINARY" manifest build --help >/dev/null 2>&1; then
+            echo "::error::$BINARY has \`helix manifest build\`, which only this repository's builds carry"
             exit 1
           fi
 

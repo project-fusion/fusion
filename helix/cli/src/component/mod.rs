@@ -480,11 +480,53 @@ pub struct Layer {
     pub source: String,
 }
 
+/// The rules a project built on Helix's base classes runs, which are the whole
+/// set in a published binary.
+///
+/// **Each one was run on a project outside this repository** that subclasses a
+/// headless element, with one mistake planted per rule, and caught it. They
+/// read what any component documents and writes: its `@csspart`, `@cssstate`,
+/// `@cssproperty` and `@property` declarations, its lifecycle, and what it
+/// listens for. The rest hold Helix to its own house conventions, or read
+/// Helix's own layering, event registry, or manifest, and would check nothing
+/// elsewhere, which is worse than not running.
+#[cfg_attr(
+    all(feature = "internal", not(test)),
+    expect(
+        dead_code,
+        reason = "read by the published build, which runs only these"
+    )
+)]
+pub const PUBLIC: [&str; 10] = [
+    "attribute-names",
+    "constructed",
+    "hooks",
+    "leaks",
+    "observers",
+    "parts",
+    "reflected",
+    "reflected-defaults",
+    "restated",
+    "states",
+];
+
+/// Every rule this build carries: all of them in this repository's builds, and
+/// [`PUBLIC`] in a published binary.
+pub fn all() -> Vec<Rule> {
+    let rules = every();
+    #[cfg(not(feature = "internal"))]
+    let rules: Vec<Rule> = rules
+        .into_iter()
+        .filter(|rule| PUBLIC.contains(&rule.name))
+        .collect();
+    rules
+}
+
 /* A table rather than a function: four lines per rule, no branches, and it grows
 by one entry per port. Splitting it would put half the rules somewhere else and
 make the set harder to read, which is the opposite of what the lint is for. */
 #[allow(clippy::too_many_lines)]
-pub fn all() -> Vec<Rule> {
+fn every() -> Vec<Rule> {
     vec![
         Rule {
             fix: None,
@@ -945,4 +987,19 @@ pub fn sources(directory: &Path, found: &mut Vec<PathBuf>) {
         },
         found,
     );
+}
+
+#[cfg(test)]
+mod public {
+    use super::{every, PUBLIC};
+
+    /// A public name that names no rule would leave a published binary
+    /// running less than it says, with nothing reporting it.
+    #[test]
+    fn every_public_rule_is_a_rule() {
+        let names: Vec<&str> = every().iter().map(|rule| rule.name).collect();
+        for name in PUBLIC {
+            assert!(names.contains(&name), "{name} is in PUBLIC and is no rule");
+        }
+    }
 }
