@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, registerDom } from '@fusion.dev/helix-testing/dom'
-import type { PlotColors } from '../connect-plot/connect-plot.js'
+import { hasLayout, hasState, mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import type { Corners, PlotColors } from '../connect-plot/connect-plot.js'
 import type { SpatialHeatmapDriver, SpatialHeatmapField } from './connect-spatial-heatmap.js'
 
 let connectSpatialHeatmap: typeof import('./connect-spatial-heatmap.js').connectSpatialHeatmap
@@ -23,11 +23,7 @@ interface Chart extends HTMLElement {
 const recording = () => {
   const told: {
     colors?: PlotColors
-    corners?:
-      | ((
-          at: { end: { x: number; y: number }; start: { x: number; y: number } } | undefined,
-        ) => void)
-      | undefined
+    corners?: ((at: Corners | undefined) => void) | undefined
     drawn: SpatialHeatmapField[]
   } = { drawn: [] }
   const driver: SpatialHeatmapDriver = {
@@ -67,7 +63,7 @@ describe('connectSpatialHeatmap', () => {
             <tr><th scope="row">Wed</th><td data-value="0">0</td></tr>
           </tbody>
         </table>
-        <helix-headless-spatial-heatmap for="commits" rows="2" style="display: block" thresholds="1 3" tones="1 2"><div slot="renderer"></div></helix-headless-spatial-heatmap>
+        <helix-headless-spatial-heatmap for="commits" rows="2" style="display: block" thresholds="1 3" tones="1 2"><div slot="renderer"></div><span slot="start">Mon</span><span slot="end">Wed</span></helix-headless-spatial-heatmap>
       </div>`,
     )) as HTMLElement
     const element = host.querySelector('helix-headless-spatial-heatmap') as Chart
@@ -85,11 +81,26 @@ describe('connectSpatialHeatmap', () => {
       'tone-2',
     ])
     expect(hasState(element, 'drawn')).toBe(true)
-    /* Where the driver draws the front edge's ends, the labels stand. */
-    told.corners?.({ end: { x: 0.7, y: 0.8 }, start: { x: 0.1, y: 0.4 } })
+    /* Where the driver draws the front edge's ends, the labels stand, under
+       them and clear of the box round the relief, where there is a layout to
+       measure them in. */
+    told.corners?.({
+      end: { x: 0.7, y: 0.8 },
+      outline: [
+        { x: 0.1, y: 0.2 },
+        { x: 0.9, y: 0.2 },
+        { x: 0.7, y: 0.8 },
+        { x: 0.1, y: 0.4 },
+      ],
+      start: { x: 0.1, y: 0.4 },
+    })
     await settle(element)
-    const footer = element.shadowRoot?.querySelector('[part="footer"]')?.getAttribute('style') ?? ''
-    expect(footer).toContain('--spatial-heatmap-start-x: 0.1')
-    expect(footer).toContain('--spatial-heatmap-end-x: 0.7')
+    if (hasLayout()) {
+      for (const name of ['start', 'end']) {
+        const label = element.shadowRoot?.querySelector(`[part="${name}"]`) as HTMLElement
+        expect(label.hasAttribute('data-placed')).toBe(true)
+        expect(label.style.getPropertyValue('--spatial-heatmap-label-y')).toMatch(/px$/)
+      }
+    }
   })
 })
