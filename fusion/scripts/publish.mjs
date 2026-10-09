@@ -207,9 +207,26 @@ const tokenConfig = () => {
  * number is allocated.
  *
  * **A restricted package answers 404 to a reader without access**, which is
- * what a missing one answers too, so every package absent at once is a
- * credential and not a domain nobody has published.
+ * what a missing one answers too. So when every package of the domain is
+ * absent at once, a package of another domain is asked as well, one this
+ * credential should be able to see. If it can, the credential reads the scope
+ * and the domain is new, which is what a bootstrap is for: Locus's first
+ * bootstrap stopped here, on October 8, 2026, logged in, with every package
+ * genuinely absent. If it cannot, the credential is the fault.
  */
+const visible = (name, config) => {
+  try {
+    run(
+      'npm',
+      ['view', name, 'name', ...(config === undefined ? [] : ['--userconfig', config])],
+      root,
+    )
+    return true
+  } catch {
+    return false
+  }
+}
+
 const unpublished = () => {
   const config = tokenConfig()
   const absent = []
@@ -228,11 +245,19 @@ const unpublished = () => {
       absent.push(name)
     }
   }
-  if (packages.length > 1 && absent.length === packages.length) {
+  const witness = [...manifests()].find(
+    ([name, { manifest }]) => domainOf(name) !== domain && publishes(manifest),
+  )?.[0]
+  if (
+    packages.length > 1 &&
+    absent.length === packages.length &&
+    (witness === undefined || !visible(witness, config))
+  ) {
     fail(
       `The registry shows none of the ${packages.length} ${domain} packages, which is a ` +
-        'credential rather than a domain nobody has published: a restricted package answers 404 ' +
-        'to a reader without access. Set `NPM_TOKEN`, or log in.',
+        `credential rather than a domain nobody has published: ${witness ?? 'no package of another domain'} ` +
+        'is hidden too, and a restricted package answers 404 to a reader without access. Set ' +
+        '`NPM_TOKEN`, or log in.',
     )
   }
   return absent
