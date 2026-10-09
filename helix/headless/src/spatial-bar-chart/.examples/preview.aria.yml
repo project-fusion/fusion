@@ -1,0 +1,43 @@
+- table "Signups by region and quarter":
+  - caption: Signups by region and quarter
+  - rowgroup:
+    - row "Region Q1 Q2 Q3 Q4":
+      - columnheader "Region"
+      - columnheader "Q1"
+      - columnheader "Q2"
+      - columnheader "Q3"
+      - columnheader "Q4"
+  - rowgroup:
+    - row "North 420 465 510 580":
+      - rowheader "North"
+      - cell "420"
+      - cell "465"
+      - cell "510"
+      - cell "580"
+    - row "South 310 355 340 390":
+      - rowheader "South"
+      - cell "310"
+      - cell "355"
+      - cell "340"
+      - cell "390"
+    - row "East 520 560 615 690":
+      - rowheader "East"
+      - cell "520"
+      - cell "560"
+      - cell "615"
+      - cell "690"
+    - row "West 260 300 345 410":
+      - rowheader "West"
+      - cell "260"
+      - cell "300"
+      - cell "345"
+      - cell "410"
+    - row "Central 180 210 205 240":
+      - rowheader "Central"
+      - cell "180"
+      - cell "210"
+      - cell "205"
+      - cell "240"
+- application "Signups by region and quarter":
+  - status
+- paragraph: 20 bars in 4 series over 5 categories, from 180 to 690.
