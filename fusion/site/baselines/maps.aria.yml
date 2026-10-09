@@ -1,0 +1,263 @@
+- link "Fusion":
+  - /url: /
+- navigation "Sections":
+  - button "Products"
+  - link "Services":
+    - /url: /company/services
+  - link "Insights":
+    - /url: /insights
+- button "Search Ctrl+K"
+- link "Fusion source on GitHub":
+  - /url: https://github.com/project-fusion
+- button "Preferences"
+- main:
+  - text: Helix Building
+  - heading "Interactive maps in your brand’s colors" [level=1]
+  - paragraph: Add places, routes, and live positions to a map drawn by MapLibre or Leaflet, styled with your theme.
+  - link "Get started":
+    - /url: "#get-started"
+  - link "Build your theme":
+    - /url: /helix/theme?layout=map
+  - group "Map of Austin":
+    - region "Map"
+    - img "Walker":
+      - img
+    - status: Walking to Rainey Street
+    - button "UT Tower, passed"
+    - button "Texas Capitol, passed"
+    - button "Franklin Barbecue, passed"
+    - button "Rainey Street"
+    - button "Congress Avenue Bridge"
+    - button "Terry Black’s Barbecue"
+    - button "Barton Springs Pool"
+    - button "The Driskill and 1886 Café & Bakery"
+    - list "Map layers":
+      - listitem: Walking route, From UT Tower to Barton Springs Pool, past all seven places in order
+      - listitem: Walk from UT Tower to the route
+      - listitem: Walk from the route to Barton Springs Pool
+      - listitem: 3D buildings
+    - group "Map controls":
+      - button "Fill the screen": ⤢
+      - button "Map layers"
+      - button "Show in 3D" [pressed]: 3D
+      - button "Zoom in": +
+      - button "Zoom out": −
+      - button "Face north"
+    - status
+  - group "Customize the map":
+    - text: Customize the map
+    - group "Brand":
+      - text: Brand
+      - button "Site brand" [pressed]
+      - button "Neutral"
+      - button "Teal"
+      - button "Violet"
+      - button "Coral"
+      - button "Amber"
+      - button "Pink"
+    - text: Mode
+    - radio "Site" [checked]
+    - radio "Light"
+    - radio "Dark"
+  - paragraph: Why Helix
+  - heading "Themed maps, written in HTML" [level=2]
+  - paragraph: Your brand
+  - paragraph: Styled with your theme.
+  - list:
+    - listitem: Light and dark maps from the same theme.
+    - listitem: Your brand color on the main roads.
+    - listitem: Labels, landmarks, and highway signs in your theme’s typeface.
+    - listitem: Labels that meet your contrast target.
+    - listitem: Map movement that uses your theme’s motion settings.
+  - paragraph: HTML elements
+  - paragraph: Places and routes written as HTML.
+  - list:
+    - listitem: Add markers, routes, areas, and live positions as elements inside the map.
+    - listitem: Set their colors with the same tones as other Helix components.
+    - listitem: Add terrain, 3D buildings, satellite imagery, and weather radar the same way.
+    - listitem: Change an attribute and the map updates.
+  - paragraph: Your renderer
+  - paragraph: Works with MapLibre or Leaflet.
+  - list:
+    - listitem: Use the renderer and version you already have.
+    - listitem: Connect another renderer by writing a small driver.
+    - listitem: Map tiles from OpenStreetMap, with no API key.
+  - paragraph: Thousands of points
+  - heading "Austin’s cafés, bars, and restaurants" [level=2]
+  - paragraph: 3,252 places, loaded from one GeoJSON file.
+  - text: The markup
+  - button "Copy code, The markup"
+  - code: <helix-map label="Food and drink in Austin"> <div id="map"></div> <helix-map-points label="Food and drink" src="/maps/austin-food-and-drink.geojson" cluster ></helix-map-points> </helix-map>
+  - group "Food and drink in Austin, 3,252 places":
+    - list "Map layers":
+      - listitem: Food and drink, 3,252 places from OpenStreetMap
+    - group "Map controls":
+      - button "Fill the screen": ⤢
+      - button "Zoom in": +
+      - button "Zoom out": −
+      - button "Face north"
+    - status
+  - text: Press a count to zoom in. Press a point to see its name.
+  - paragraph: What you can add
+  - heading "All HTML elements" [level=2]
+  - paragraph: Place markers, routes, and live positions inside the map. Each takes a tone, such as primary or danger, for its color.
+  - paragraph: Markers
+  - text: Named places on the map. A marker can hold a letter or an icon, take a shape such as a ring or a pin, and be marked as passed once someone has visited it.
+  - code: <helix-map-marker>
+  - paragraph: Clusters
+  - text: Markers that would overlap combine into one count, which splits apart as you zoom in. Places at the same address spread out when you press their count.
+  - code: <helix-map cluster>
+  - paragraph: Routes and areas
+  - text: Lines and shapes drawn under the map’s place names. A route can show how much of it has been traveled, and dotted sections for the walk to a place off the road.
+  - code: <helix-map-route>
+  - code: <helix-map-area>
+  - paragraph: A live position
+  - text: A moving point or arrow, with a ring that shows how accurate its location is. Update its description, such as “Two stops away”, and screen readers announce it.
+  - code: <helix-map-position>
+  - paragraph: Terrain
+  - heading "Yosemite Valley in 3D" [level=2]
+  - paragraph: Terrain raises Yosemite Valley to its real height, contour lines trace its heights in feet, and land cover colors its forests and bare rock. Open the layers menu to switch to satellite imagery.
+  - text: The markup
+  - button "Copy code, The markup"
+  - code: "<helix-map controls=\"zoom compass tilt layers fullscreen\" > <div id=\"map\"></div> <helix-map-landcover></helix-map-landcover> <helix-map-terrain src=\"https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png\" raised ></helix-map-terrain> <helix-map-contours src=\"https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png\" unit=\"feet\" ></helix-map-contours> </helix-map>"
+  - group "Yosemite Valley in 3D":
+    - list "Map layers":
+      - listitem: Land cover
+      - listitem: Terrain
+      - listitem: Contour lines
+    - group "Map controls":
+      - button "Fill the screen": ⤢
+      - button "Map layers"
+      - button "Show in 3D": 3D
+      - button "Zoom in": +
+      - button "Zoom out": −
+      - button "Face north"
+    - status
+  - text: Press 3D to lay the valley flat. Open the layers menu for satellite imagery.
+  - paragraph: Layers
+  - heading "One menu for every layer" [level=2]
+  - paragraph: Terrain, buildings, imagery, and weather are each an HTML element you place inside the map.
+  - paragraph: 3D buildings
+  - text: Buildings raised to their real heights, from the map’s own tiles. Press the 3D button to tilt the map and see them, and press it again to lay them flat.
+  - code: <helix-map-buildings>
+  - paragraph: Terrain
+  - text: Hills and valleys shaded by their slopes. Add the raised attribute and the ground rises to its real height when you tilt the map.
+  - code: <helix-map-terrain>
+  - paragraph: Contour lines
+  - text: Lines of equal height, closer together as you zoom in. Every fifth line is heavier and labeled with its height, in meters or feet.
+  - code: <helix-map-contours>
+  - paragraph: Land cover
+  - text: The ground colored by what covers it, such as forest, farmland, sand, and ice. Each color is mixed into your theme’s land color.
+  - code: <helix-map-landcover>
+  - paragraph: Satellite imagery
+  - text: Aerial photographs of the ground. The layers menu shows Standard, Hybrid, and Satellite as cards, each with a picture of the map.
+  - code: <helix-map-raster ground>
+  - paragraph: Weather radar
+  - text: Tiles laid over the map, such as weather radar, under your routes and place names. Give the layer several frames, such as the last hour of radar, and it plays them in order.
+  - code: <helix-map-raster frames>
+  - paragraph: Weather radar
+  - heading "Rain across the United States" [level=2]
+  - paragraph: Rain and storms across the United States over the last 50 minutes, in 10-minute steps, laid over a map in your theme. Press Play radar to watch the rain move.
+  - text: The markup
+  - button "Copy code, The markup"
+  - code: "<helix-map label=\"Weather radar over the United States\" > <div id=\"map\"></div> <helix-map-raster label=\"Weather radar\" attribution=\"NWS radar from the Iowa Environmental Mesonet\" max-zoom=\"10\" frames=\" /maps/radar/50/{z}/{x}/{y}.png /maps/radar/40/{z}/{x}/{y}.png /maps/radar/30/{z}/{x}/{y}.png /maps/radar/20/{z}/{x}/{y}.png /maps/radar/10/{z}/{x}/{y}.png /maps/radar/0/{z}/{x}/{y}.png \" ></helix-map-raster> </helix-map>"
+  - text: The radar is the National Weather Service’s, from the Iowa Environmental Mesonet. We clean and recolor its tiles for this site. On your page, set the frames attribute to your own tile server or to the Mesonet’s tiles.
+  - group "Weather radar over the United States":
+    - list "Map layers":
+      - listitem: Weather radar, The last 50 minutes, in 10-minute steps
+    - group "Map controls":
+      - button "Fill the screen": ⤢
+      - button "Zoom in": +
+      - button "Zoom out": −
+      - button "Face north"
+    - status
+  - button "Show the next frame"
+  - paragraph: On every map
+  - heading "Landmarks, highway signs, and your typeface" [level=2]
+  - paragraph: The style Helix makes from your theme draws landmarks, highway signs, and a globe on every map. An option on the style or the frame adds each of the rest.
+  - paragraph: Landmarks
+  - text: Parks, museums, schools, hotels, hospitals, and stations, each marked with an icon in a color for its kind. Cafés and shops appear as you zoom in to a street.
+  - code: mapLibreStyle(colors)
+  - paragraph: Highway signs
+  - text: Interstate, US route, and state route numbers on signs drawn from the official shapes, placed along the road.
+  - code: mapLibreStyle(colors)
+  - paragraph: Your typeface
+  - text: Place names, road names, and sign numbers in the typeface your theme uses. MapLibre draws the letters from the font your page has already loaded.
+  - code: "mapLibreStyle(colors, { font })"
+  - paragraph: A globe
+  - text: "Zoom out and the world is drawn as a globe. It turns into the flat map as you zoom in. Pass globe: false for a flat map at every zoom."
+  - code: mapLibreStyle(colors)
+  - paragraph: A compass and a 3D button
+  - text: The compass needle points north as the map turns, and pressing it turns the map back to north. The 3D button tilts the map and raises its buildings and terrain.
+  - code: controls="compass tilt"
+  - paragraph: A layers menu
+  - text: One button opens a menu with a tile for each layer you add. Press a tile to turn its layer on or off. A route and its dotted legs share one tile.
+  - code: controls="layers"
+  - paragraph: Get started
+  - heading "Install with one command" [level=2]
+  - paragraph: Helix, the map connector, and MapLibre. The Maps guide shows how to add a map, connect it, and style it with your theme.
+  - text: Install
+  - button "Copy code, Install"
+  - code: bun add @fusion.dev/helix @fusion.dev/helix-map maplibre-gl
+  - link "Read the Maps guide":
+    - /url: /helix/docs/maps
+  - paragraph: Under the hood
+  - heading "Six parts, from elements to tiles" [level=2]
+  - paragraph: MapLibre or Leaflet draws the map itself.
+  - list:
+    - listitem:
+      - paragraph: Elements
+      - paragraph: Layers
+      - text: Markers, routes, areas, live positions, and data layers, written as HTML elements inside the map. Building
+    - listitem:
+      - paragraph: Interface
+      - paragraph: The frame
+      - text: The box around the map, with a column of controls, keyboard controls, and a footer for the map credit. The controls are zoom buttons, a compass, a 3D button, and a layers menu. Active
+    - listitem:
+      - paragraph: Integration
+      - paragraph: The connector
+      - text: Connects the frame to the renderer. It turns the frame’s buttons and keys into map movement, draws the layers you add, and moves the renderer’s credit into the frame. Building
+    - listitem:
+      - paragraph: Rendering
+      - paragraph: The renderer
+      - text: Draws the map. Use MapLibre, Leaflet, or a driver you write for another renderer. MapLibre or Leaflet
+    - listitem:
+      - paragraph: Theme
+      - paragraph: The style
+      - text: A MapLibre style made from your theme, with your brand color on the main roads and light and dark versions from the same settings. It draws landmarks, highway signs, and labels in your theme’s typeface. Building
+    - listitem:
+      - paragraph: Data
+      - paragraph: Tiles
+      - text: Map tiles we will build from OpenStreetMap and serve with no API key or per-view cost. Until then, maps use OpenFreeMap tiles, which use the same format. Declared
+- contentinfo:
+  - img "Fusion"
+  - text: Fusion Development Group Interface and AI software.
+  - link "Fusion on GitHub":
+    - /url: https://github.com/project-fusion
+  - link "Fusion on LinkedIn":
+    - /url: https://www.linkedin.com/company/project-fusion
+  - link "Fusion on X":
+    - /url: https://x.com/fusiondotdev
+  - navigation "Footer":
+    - text: Products
+    - link "Helix":
+      - /url: /helix
+    - link "Cortex":
+      - /url: /cortex
+    - text: Company
+    - link "Services":
+      - /url: /company/services
+    - link "Insights":
+      - /url: /insights
+    - link "Thesis":
+      - /url: /company/thesis
+    - link "Contact":
+      - /url: /contact
+    - text: Legal
+    - link "Terms of use":
+      - /url: /legal/terms
+    - link "Privacy":
+      - /url: /legal/privacy
+    - link "Acceptable use":
+      - /url: /legal/acceptable-use
+- alert
