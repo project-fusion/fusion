@@ -32,6 +32,8 @@ import { styles } from './list-root.css.js'
  * @cssproperty --list-marker-gutter - The space that the markers of ordered and unordered lists sit in.
  * @cssproperty --list-rail-inline-size - The width of the rail's track.
  * @cssproperty --list-rail-style - The counter style of the rail's numbers. Takes any `list-style-type`.
+ *
+ * @replaces ul, ol
  */
 @customElement('helix-list')
 export class HelixList extends HelixHeadlessList {

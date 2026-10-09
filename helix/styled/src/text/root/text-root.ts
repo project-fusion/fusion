@@ -70,6 +70,8 @@ const TAGS: Record<string, StaticValue> = {
  * @cssproperty --text-font-weight - The weight. Overrides the ramp's.
  * @cssproperty --text-letter-spacing - The tracking. Overrides the ramp's.
  * @cssproperty --text-line-height - The leading. Overrides the ramp's.
+ *
+ * @replaces h1, h2, h3, h4, h5, h6, p
  */
 @customElement('helix-text')
 export class HelixText extends HelixElement {

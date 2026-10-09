@@ -1,0 +1,72 @@
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-text
+    as="h1"
+    variant="title"
+  >Settings</helix-text>
+  <helix-card
+    aria-labelledby="profile-title"
+    separation="outlined"
+  >
+    <helix-text
+      as="h2"
+      id="profile-title"
+      slot="header"
+      variant="subheading"
+    >Profile</helix-text>
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-input
+        autocomplete="name"
+        label="Name"
+        name="name"
+      ></helix-input>
+      <helix-input
+        autocomplete="email"
+        label="Email"
+        name="email"
+        type="email"
+      ></helix-input>
+    </helix-flex>
+  </helix-card>
+  <helix-card
+    aria-labelledby="notifications-title"
+    separation="outlined"
+  >
+    <helix-text
+      as="h2"
+      id="notifications-title"
+      slot="header"
+      variant="subheading"
+    >Notifications</helix-text>
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
+      <helix-switch
+        hint="Get an email when someone mentions you"
+        label="Email notifications"
+        name="email-notifications"
+      ></helix-switch>
+      <helix-switch
+        hint="A summary of the week, every Monday"
+        label="Weekly digest"
+        name="weekly-digest"
+      ></helix-switch>
+    </helix-flex>
+  </helix-card>
+  <helix-button-group
+    label="Settings actions"
+    variant="spaced"
+  >
+    <helix-button
+      emphasis="solid"
+      tone="primary"
+    >Save</helix-button>
+    <helix-button emphasis="ghost">Cancel</helix-button>
+  </helix-button-group>
+</helix-flex>

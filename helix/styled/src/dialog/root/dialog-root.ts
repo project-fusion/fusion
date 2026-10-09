@@ -33,6 +33,8 @@ import { styles } from './dialog-root.css.js'
  * @cssproperty --dialog-scrim - The tint over the page behind the dialog. Set it on the host, because a `var()` written inside `::backdrop` cannot read a token.
  * @cssproperty --dialog-shadow - Shadow under the panel. Follows `--helix-shadow-floating`. A
  *   floating surface can sit over any content, so it has a shadow by default.
+ *
+ * @replaces dialog
  */
 @customElement('helix-dialog')
 export class HelixDialog extends HelixHeadlessDialog {

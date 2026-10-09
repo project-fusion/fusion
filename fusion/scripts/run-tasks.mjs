@@ -18,6 +18,12 @@
  * one passes. A reference that fails is a stale task, or a scan that reports
  * a correct page, and both are faults in this repository.
  *
+ * **A native element Helix has a family for fails a page**, since `helix
+ * scan` reports it as `native-element` at `warn`. Beside the verdict, each
+ * grade carries `coverage`: of the elements Helix could have written, the
+ * share it did. Two pages that both pass can still differ there, which is
+ * what tells two ways of prompting an agent apart.
+ *
  * `--answers <dir>` grades an agent's pages, one folder per task id, and
  * prints the pass rate. `--json` prints the grades as data.
  */
@@ -56,6 +62,19 @@ const grade = (task) => {
     }
   }
   const run = JSON.parse(scanned.stdout)
+  /* Each native-element finding stands for every element it groups, which
+     its message counts when there is more than one. */
+  const native = run.findings
+    .filter((finding) => finding.kind === 'native-element')
+    .reduce(
+      (sum, finding) => sum + Number(/On (\d+) elements\./.exec(finding.message)?.[1] ?? 1),
+      0,
+    )
+  const written = Object.values(run.usage.tags).reduce(
+    (sum, one) => sum + (typeof one === 'number' ? one : (one?.count ?? 1)),
+    0,
+  )
+  const coverage = written + native === 0 ? 1 : written / (written + native)
   const reasons = [
     ...run.findings
       .filter((finding) => finding.severity === 'error' || finding.severity === 'warn')
@@ -65,7 +84,7 @@ const grade = (task) => {
       ),
     ...task.requires.filter((tag) => !(tag in run.usage.tags)).map((tag) => `writes no <${tag}>`),
   ]
-  return { id: task.id, passed: reasons.length === 0, reasons }
+  return { coverage, id: task.id, passed: reasons.length === 0, reasons }
 }
 
 const grades = suite.tasks.map(grade)
@@ -75,7 +94,9 @@ if (json) {
   console.log(JSON.stringify({ grades, passed, total: grades.length }))
 } else {
   for (const one of grades) {
-    console.log(`${one.passed ? 'pass' : 'FAIL'}  ${one.id}`)
+    console.log(
+      `${one.passed ? 'pass' : 'FAIL'}  ${one.id}${one.coverage === undefined ? '' : `  ${Math.round(one.coverage * 100)}% Helix`}`,
+    )
     for (const reason of one.reasons) {
       console.log(`      ${reason}`)
     }

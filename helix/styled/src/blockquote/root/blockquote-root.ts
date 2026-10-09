@@ -37,6 +37,8 @@ import { styles } from './blockquote-root.css.js'
  * @cssproperty --blockquote-mark-color - The color of the mark `marks` draws, the subtle foreground by default.
  * @cssproperty --blockquote-mark-size - The font size of the mark `marks` draws.
  * @cssproperty --blockquote-size - The font size of the quoted passage.
+ *
+ * @replaces blockquote
  */
 @customElement('helix-blockquote')
 export class HelixBlockquote extends HelixHeadlessBlockquote {

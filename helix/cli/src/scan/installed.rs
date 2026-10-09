@@ -14,6 +14,19 @@ use regex::Regex;
 
 use crate::api::Library;
 
+/// A native element an installed family stands in for.
+pub struct Replacement {
+    /// The native tag, such as `input`.
+    pub native: String,
+    /// The `type` it has, for an `input`: `checkbox`. `None` is any `input`
+    /// without one.
+    pub kind: Option<String>,
+    /// The Helix tag that stands in for it, such as `helix-checkbox`.
+    pub helix: String,
+    /// The entry that registers that tag.
+    pub specifier: String,
+}
+
 /// What the checks beyond the lint data read.
 #[derive(Default)]
 pub struct Installed {
@@ -27,6 +40,9 @@ pub struct Installed {
     pub specifiers: HashMap<String, String>,
     /// Every semantic token name, or `None` where the token set is not installed.
     pub tokens: Option<HashSet<String>>,
+    /// The native elements the installed families stand in for, the styled
+    /// tier's tag first where both tiers publish one.
+    pub replaces: Vec<Replacement>,
 }
 
 impl Installed {
@@ -41,6 +57,7 @@ impl Installed {
         };
         for tier in &library.tiers {
             for family in &tier.families {
+                installed.replace(family);
                 for element in family["elements"].as_array().into_iter().flatten() {
                     let tag = element["tagName"].as_str().unwrap_or_default().to_owned();
                     if let Some(specifier) = element["specifier"].as_str() {
@@ -78,6 +95,58 @@ impl Installed {
             }
         }
         installed
+    }
+
+    /// The family's `replaces`, each pointing at its root tag, where no tier
+    /// read before named the same native element: the styled tier's.
+    fn replace(&mut self, family: &serde_json::Value) {
+        let slug = family["slug"].as_str().unwrap_or_default();
+        let Some(root) = family["elements"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .find(|element| {
+                element["tagName"]
+                    .as_str()
+                    .is_some_and(|tag| tag == format!("helix-{slug}") || tag == format!("helix-headless-{slug}"))
+            })
+        else {
+            return;
+        };
+        let helix = root["tagName"].as_str().unwrap_or_default().to_owned();
+        let specifier = root["specifier"].as_str().unwrap_or_default().to_owned();
+        for selector in family["replaces"].as_array().into_iter().flatten().filter_map(|one| one.as_str()) {
+            let (native, kind) = match selector.split_once("[type=") {
+                Some((tag, rest)) => (tag.to_owned(), Some(rest.trim_end_matches(']').to_owned())),
+                None => (selector.to_owned(), None),
+            };
+            let taken = self.replaces.iter().any(|one| one.native == native && one.kind == kind);
+            /* The styled tier's tag wins over the headless one's. */
+            if taken && helix.starts_with("helix-headless-") {
+                continue;
+            }
+            self.replaces.retain(|one| !(one.native == native && one.kind == kind));
+            self.replaces.push(Replacement {
+                native,
+                kind,
+                helix: helix.clone(),
+                specifier: specifier.clone(),
+            });
+        }
+    }
+
+    /// The family that stands in for a native element, by its tag and, for
+    /// an `input`, its `type`: none written is `text`, and a `type` the page
+    /// binds at run time is not judged.
+    pub fn replacement(&self, tag: &str, kind: Option<&str>) -> Option<&Replacement> {
+        self.replaces.iter().find(|one| {
+            one.native == tag
+                && match (&one.kind, kind) {
+                    (None, None) => true,
+                    (Some(wanted), Some(written)) => wanted == written,
+                    _ => false,
+                }
+        })
     }
 
     /// Whether `tag` is registered by something the project imports: its own

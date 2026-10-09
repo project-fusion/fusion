@@ -293,6 +293,7 @@ works on it:
 | `primitive-token` | error | A rule reads a `--_helix-` primitive, which is internal to `@fusion.dev/helix-styles`. Found by `helix scan` |
 | `unknown-token` | error | A rule reads or sets a `--helix-` name the token set does not have, so it falls back silently. Found by `helix scan` |
 | `unreflected-attribute` | warn | A rule selects a Helix element by an attribute it takes and never writes back, so it matches only markup a server wrote and nothing after a client navigation |
+| `native-element` | warn | A native element is written where an installed Helix family stands in for it, such as `<button>` for `helix-button` or `<p>` for `helix-text`. Found by `helix scan`, from the templates |
 | `duplicate-registration` | error | Two copies of Helix are on the page |
 | `manifest-skew` | error | The manifest is from another version than the page runs. It replaces every other finding, since each would be judged against the wrong version. Turned off, the page is judged as usual |
 

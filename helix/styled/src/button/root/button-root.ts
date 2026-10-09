@@ -55,6 +55,8 @@ import { styles } from './button-root.css.js'
  *
  * @cssstate pending - The button is pending: `pending` is set. A ring turns over its hidden words.
  * @cssstate pressed - A Button Group in a selection mode has this button pressed.
+ *
+ * @replaces button, input[type=submit], input[type=button], input[type=reset]
  */
 @customElement('helix-button')
 export class HelixButton extends MixinControlSurface(HelixHeadlessButton) {

@@ -52,6 +52,8 @@ import { styles } from './number-input-root.css.js'
  * @cssproperty --number-input-stepper-color-hover - Icon color of a stepper button under the pointer.
  * @cssproperty --number-input-stepper-icon-size - Width and height of the stepper icons, drawn or slotted.
  * @cssproperty --number-input-stepper-size - Width of each stepper button.
+ *
+ * @replaces input[type=number]
  */
 @customElement('helix-number-input')
 export class HelixNumberInput extends HelixHeadlessNumberInput {

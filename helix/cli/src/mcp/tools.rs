@@ -121,7 +121,7 @@ pub fn catalog() -> Vec<Value> {
     vec![
         json!({
             "annotations": annotations("Find a Helix family"),
-            "description": "Finds the Helix families that answer a name, an alias, a tag, or a purpose, such as `dropdown` or `date picker`, best first. Use it before writing a component you have not looked up. Each match has its slug, which helix_family takes.",
+            "description": "Finds the Helix families that answer a name, an alias, a tag, a native element such as `button` or `h1`, or a purpose, such as `dropdown` or `date picker`, best first. Use it before writing a component you have not looked up. Each match has its slug, which helix_family takes.",
             "inputSchema": {
                 "properties": {
                     "limit": { "description": "How many families to list. Defaults to 10.", "type": "integer" },
@@ -174,7 +174,7 @@ pub fn catalog() -> Vec<Value> {
         }),
         json!({
             "annotations": annotations("Check Helix code"),
-            "description": "Checks Helix code you wrote against the installed packages, as `helix scan` does: unknown tags, attributes, values, slots, parts, hooks, events, and tokens, a `--_helix-` primitive read, `[disabled]` on a form control, and a tag whose entry nothing imports. Pass `files`, paths in the project, or `code` with its `language`. The whole project is read, so imports elsewhere count. Fix every finding at `error`.",
+            "description": "Checks Helix code you wrote against the installed packages, as `helix scan` does: unknown tags, attributes, values, slots, parts, hooks, events, and tokens, a `--_helix-` primitive read, `[disabled]` on a form control, a tag whose entry nothing imports, and a native element a Helix family replaces. Pass `files`, paths in the project, or `code` with its `language`. The whole project is read, so imports elsewhere count. Fix every finding at `error`.",
             "inputSchema": {
                 "properties": {
                     "code": { "description": "A snippet to check before you write it.", "type": "string" },

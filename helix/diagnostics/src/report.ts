@@ -107,6 +107,7 @@ export const KINDS = [
   'duplicate-registration',
   'invalid-value',
   'manifest-skew',
+  'native-element',
   'primitive-token',
   'unforwarded-part',
   'unimported-tag',

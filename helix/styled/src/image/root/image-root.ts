@@ -26,6 +26,8 @@ import { styles } from './image-root.css.js'
  * @cssproperty --image-placeholder-color - The background behind the placeholder and the fallback.
  * @cssproperty --image-position - Which part of the image stays in view when it is cropped, as an `object-position` value.
  * @cssproperty --image-radius - The corner radius when `shape` is `rounded`.
+ *
+ * @replaces img, picture
  */
 @customElement('helix-image')
 export class HelixImage extends HelixHeadlessImage {

@@ -1,5 +1,5 @@
 ---
-description: Five mistakes that look like Helix bugs, and the files an agent should read.
+description: Which elements to write, five mistakes that look like Helix bugs, and the files an agent should read.
 parent: coding-agents
 section: Getting started
 title: Using Helix with an agent
@@ -17,6 +17,32 @@ This guide is in two places, and both say the same thing:
 [Link your tool to this guide](#link-your-tool-to-this-guide) says how to point
 each tool at one of them. [The MCP server](./coding-agents) works with any
 vendor and runs code, and Claude, Cursor, Windsurf, and Zed all support it.
+
+## Use a Helix family wherever one exists
+
+Write a Helix element for everything Helix has a family for, and a native
+element only for page structure. Before you write a native element, ask whether
+a family stands in for it:
+
+- `helix api find <tag>`, or the MCP tool `helix_find`, answers a native tag
+  with its family: `button` finds Button, and `h1` finds Text.
+- Each family's file lists the native elements it replaces under `replaces`.
+
+These native elements have families:
+
+- controls: `button`, `input` of every visible type, `select`, and `textarea`
+- overlays and disclosure: `dialog` and `details`
+- text: `h1` to `h6` and `p`, which `helix-text` writes with `as="h1"` and the
+  rest
+- content: `img`, `picture`, `hr`, `ul`, `ol`, `table`, `code`, `pre`, `kbd`,
+  `blockquote`, `q`, `video`, `progress`, and `meter`
+
+Page structure stays native: `main`, `section`, `article`, `header`, `footer`,
+`nav`, `form`, `label`, `div`, `span`, and `a`. So does markup a CMS writes
+inside `data-prose`.
+
+`helix scan` and the MCP tool `helix_check` report each native element a page
+writes where an installed family stands in for it, as `native-element`.
 
 ## Read the family before writing its tags
 

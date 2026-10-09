@@ -47,6 +47,8 @@ import { styles } from './time-input-root.css.js'
  *   with nothing in it, in `segmented`. It matches the text field's placeholder.
  * @cssproperty --time-input-shadow - Shadow under the panel. Defaults to
  *   `--helix-shadow-floating`, because the panel can sit over any content.
+ *
+ * @replaces input[type=time]
  */
 @customElement('helix-time-input')
 export class HelixTimeInput extends HelixHeadlessTimeInput {

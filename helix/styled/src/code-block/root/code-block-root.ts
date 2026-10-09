@@ -47,6 +47,8 @@ import '../../copy-button/index.js'
  * @cssproperty --code-block-max-block-size - The tallest the code grows before it scrolls, or until `expandable`'s button shows every line. The default is no limit.
  * @cssproperty --code-block-radius - The corner radius of the header's top and the block's bottom, which form one shape.
  * @cssproperty --code-block-removed-color - The color a diff's removed lines are tinted in and their `-` is drawn in. The danger color by default.
+ *
+ * @replaces pre
  */
 @customElement('helix-code-block')
 export class HelixCodeBlock extends HelixHeadlessCodeBlock {

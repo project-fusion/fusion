@@ -25,6 +25,8 @@ import { styles } from './textarea-root.css.js'
  * @cssproperty --textarea-padding - Space between the edge of the field and the text.
  * @cssproperty --textarea-radius - Corner radius of the field.
  * @cssproperty --textarea-resize - Which way a reader can drag the field: `vertical` by default, `none`, `both` or `horizontal`. A field under `auto-grow` has nothing to drag.
+ *
+ * @replaces textarea
  */
 @customElement('helix-textarea')
 export class HelixTextarea extends HelixHeadlessTextarea {

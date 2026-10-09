@@ -616,6 +616,9 @@ impl<'a> Analyzer<'a> {
                 for raw in also {
                     keep(&mut grouped, &mut keys, raw);
                 }
+                if let Some(raw) = self.native(path, position, element, elements) {
+                    keep(&mut grouped, &mut keys, raw);
+                }
                 let Some(published) = self.index.get(&element.tag) else {
                     if let Some(raw) = self.unknown_tag(path, position, element) {
                         keep(&mut grouped, &mut keys, raw);
@@ -870,6 +873,103 @@ impl<'a> Analyzer<'a> {
             },
             subject: format!("<{tag}>"),
             tag: tag.to_owned(),
+        })
+    }
+
+    /// A native element written where an installed Helix family stands in for
+    /// it: `<button>` where `helix-button` is installed, `<p>` where
+    /// `helix-text` is.
+    ///
+    /// **Only what Helix covers.** Page structure has no family and is left
+    /// alone: `main`, `section`, `form`, `div`, `span`, `a` and the rest. So is
+    /// anything inside `data-prose`, which is markup a CMS wrote and Helix's
+    /// prose recipe styles, anything inside an `svg` or `math`, whose
+    /// elements share names with HTML's and are not HTML, and an element a
+    /// Helix element reads through `for`, such as a chart's data table.
+    fn native(
+        &self,
+        path: &str,
+        position: usize,
+        element: &Element,
+        elements: &[Element],
+    ) -> Option<Raw> {
+        let (installed, _) = self.installed?;
+        let tag = element.tag.as_str();
+        if tag.contains('-') || tag.contains(':') {
+            return None;
+        }
+        let written = element
+            .attributes
+            .iter()
+            .find(|one| one.name == "type")
+            .map(|one| &one.value);
+        let kind = match written {
+            None => None,
+            Some(Value::Literal(kind)) => Some(kind.to_ascii_lowercase()),
+            /* A `type` set at run time is not one this can read. */
+            Some(_) => return None,
+        };
+        let replacement = installed.replacement(tag, kind.as_deref())?;
+        /* **A native element a Helix element reads is data.** A chart draws
+        the `<table>` its `for` names, which stays a table for a screen
+        reader. */
+        let id = element.attributes.iter().find_map(|one| match &one.value {
+            Value::Literal(id) if one.name == "id" => Some(id.as_str()),
+            _ => None,
+        });
+        if let Some(id) = id {
+            let named = elements.iter().any(|other| {
+                other.tag.starts_with("helix-")
+                    && other.attributes.iter().any(|one| {
+                        one.name == "for" && matches!(&one.value, Value::Literal(value) if value == id)
+                    })
+            });
+            if named {
+                return None;
+            }
+        }
+        let mut parent = element.parent;
+        while let Some(at) = parent {
+            let above = elements.get(at)?;
+            if above.tag == "svg"
+                || above.tag == "math"
+                || above.attributes.iter().any(|one| one.name == "data-prose")
+            {
+                return None;
+            }
+            parent = above.parent;
+        }
+        let helix = replacement.helix.as_str();
+        let specifier = replacement.specifier.as_str();
+        /* **The element to write keeps the native one's meaning** where the
+        family takes it as a value: `helix-text` writes an `h1` given
+        `as="h1"`. */
+        let keeps = self
+            .index
+            .get(helix)
+            .and_then(|published| match published.attribute("as") {
+                Some(Allows::OneOf(allows)) if allows.iter().any(|one| one == tag) => {
+                    Some(format!("<{helix} as=\"{tag}\">"))
+                }
+                _ => None,
+            })
+            .unwrap_or_else(|| format!("<{helix}>"));
+        let subject = match &kind {
+            Some(kind) => format!("<{tag} type=\"{kind}\">"),
+            None => format!("<{tag}>"),
+        };
+        Some(Raw {
+            expected: Some(helix.to_owned()),
+            kind: "native-element",
+            message: format!("`{subject}` is a native element, and the installed `{helix}` stands in for it, drawn and behaving as the rest of Helix does. Write `{keeps}` and import `{specifier}`."),
+            origin: Origin {
+                index: position,
+                line: element.line,
+                sheet: path.to_owned(),
+                text: element.text.clone(),
+            },
+            subject,
+            tag: helix.to_owned(),
         })
     }
 
@@ -1253,6 +1353,49 @@ mod tests {
         let mut analyzer = Analyzer::new(&index, &listing, &used).with(&installed, &barrel);
         analyzer.markup([("a.html", page.elements.as_slice())]);
         assert!(kinds(&analyzer).is_empty());
+    }
+
+    #[test]
+    fn a_native_element_an_installed_family_stands_in_for_is_found() {
+        let index = index();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let mut installed = installed();
+        for (native, kind, helix) in [
+            ("button", None, "helix-button"),
+            ("input", Some("checkbox"), "helix-checkbox"),
+            ("input", None, "helix-input"),
+            ("p", None, "helix-text"),
+            ("table", None, "helix-table"),
+        ] {
+            installed.replaces.push(super::super::installed::Replacement {
+                native: native.to_owned(),
+                kind: kind.map(str::to_owned),
+                helix: helix.to_owned(),
+                specifier: format!("@fusion.dev/helix/{}", &helix["helix-".len()..]),
+            });
+        }
+        let imports: HashSet<String> = ["@fusion.dev/helix".to_owned()].into();
+        let page = markup::read(
+            "<main><p>Hi</p><button>Go</button><input type=\"checkbox\"><input type=\"hidden\"><input><div><span>x</span></div><article data-prose><p>From a CMS</p></article><svg><p></p></svg><table id=\"sales\"></table><helix-bar-chart for=\"sales\"></helix-bar-chart></main>",
+            1,
+        );
+        let mut analyzer = Analyzer::new(&index, &listing, &used).with(&installed, &imports);
+        analyzer.markup([("a.html", page.elements.as_slice())]);
+        let mut found: Vec<_> = kinds(&analyzer)
+            .into_iter()
+            .filter(|(kind, _)| *kind == "native-element")
+            .collect();
+        found.sort();
+        assert_eq!(
+            found,
+            [
+                ("native-element", "<button>".to_owned()),
+                ("native-element", "<input type=\"checkbox\">".to_owned()),
+                ("native-element", "<input>".to_owned()),
+                ("native-element", "<p>".to_owned()),
+            ]
+        );
     }
 
     #[test]

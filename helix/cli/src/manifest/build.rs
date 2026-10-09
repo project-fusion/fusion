@@ -863,6 +863,24 @@ fn rooted(package: &Path, given: &str) -> String {
         .join("/")
 }
 
+/// Whether `selector` is a tag, or a tag with a `type`: `input[type=range]`.
+fn replaced(selector: &str) -> bool {
+    let (tag, rest) = selector
+        .find('[')
+        .map_or((selector, ""), |at| selector.split_at(at));
+    let tag_ok = !tag.is_empty()
+        && tag.starts_with(|one: char| one.is_ascii_lowercase())
+        && tag.chars().all(|one| one.is_ascii_lowercase() || one.is_ascii_digit());
+    let rest_ok = rest.is_empty()
+        || rest
+            .strip_prefix("[type=")
+            .and_then(|one| one.strip_suffix(']'))
+            .is_some_and(|kind| {
+                !kind.is_empty() && kind.chars().all(|one| one.is_ascii_lowercase() || one == '-')
+            });
+    tag_ok && rest_ok
+}
+
 fn helix(one: &Declared, path: &str, tier: &str, package: &Path, given: &str) -> Option<Value> {
     let documented = &one.documented;
     let is_component = one.is_element;
@@ -899,6 +917,20 @@ fn helix(one: &Declared, path: &str, tier: &str, package: &Path, given: &str) ->
         .collect();
     if !aliases.is_empty() {
         block.insert("aliases".to_owned(), json!(aliases));
+    }
+    /* **The native elements the family stands in for**, as `button` or
+    `input[type=checkbox]`. `helix scan` reports each one a page writes where
+    the family is installed, and `helix api find` answers a native name with
+    the family. Anything not shaped as a tag, with at most a `type`, is dropped
+    rather than published as a selector nothing reads. */
+    let replaces: Vec<String> = single("replaces")
+        .unwrap_or_default()
+        .split(',')
+        .map(|one| one.trim().to_owned())
+        .filter(|one| replaced(one))
+        .collect();
+    if !replaces.is_empty() {
+        block.insert("replaces".to_owned(), json!(replaces));
     }
     /* **`@groups` is held to a list and a typo is dropped rather than kept.**
     The plugin's own reason: a misspelling lands a family in a group of one,

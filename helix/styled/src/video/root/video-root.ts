@@ -38,6 +38,8 @@ import { styles } from './video-root.css.js'
  * does not shift when the number changes.
  * @cssproperty --video-start-size - Width of the large play button.
  * @cssproperty --video-well-color - Color behind the picture and in the letterbox bars.
+ *
+ * @replaces video
  */
 @customElement('helix-video')
 export class HelixVideo extends HelixHeadlessVideo {

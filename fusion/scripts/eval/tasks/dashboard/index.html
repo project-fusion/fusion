@@ -1,0 +1,43 @@
+<helix-flex
+  direction="column"
+  gap="lg"
+>
+  <helix-text
+    as="h1"
+    variant="title"
+  >Overview</helix-text>
+  <helix-stat-group
+    divided
+    label="This month"
+  >
+    <helix-stat>
+      1,284
+      <span slot="label">Orders</span>
+    </helix-stat>
+    <helix-stat>
+      48,210
+      <span slot="label">Revenue</span>
+      <span slot="unit">USD</span>
+    </helix-stat>
+    <helix-stat>
+      3.2
+      <span slot="label">Refund rate</span>
+      <span slot="unit">%</span>
+    </helix-stat>
+  </helix-stat-group>
+  <helix-table label="Recent orders">
+    <helix-table-column>Order</helix-table-column>
+    <helix-table-column>Customer</helix-table-column>
+    <helix-table-column>Total</helix-table-column>
+    <helix-table-row>
+      <helix-table-cell header>#1042</helix-table-cell>
+      <helix-table-cell>Ada Lovelace</helix-table-cell>
+      <helix-table-cell>$120.00</helix-table-cell>
+    </helix-table-row>
+    <helix-table-row>
+      <helix-table-cell header>#1041</helix-table-cell>
+      <helix-table-cell>Grace Hopper</helix-table-cell>
+      <helix-table-cell>$84.50</helix-table-cell>
+    </helix-table-row>
+  </helix-table>
+</helix-flex>

@@ -58,6 +58,8 @@ import { styles } from './meter-root.css.js'
  * @cssproperty --meter-value-color - The color of the reading shown under `show-value`.
  * @cssproperty --meter-value-gap - The space between the bar and the reading under `show-value`.
  * @cssproperty --meter-value-size - The type size of the reading shown under `show-value`.
+ *
+ * @replaces meter
  */
 @customElement('helix-meter')
 export class HelixMeter extends HelixHeadlessMeter {

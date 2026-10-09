@@ -34,6 +34,8 @@ import { styles } from './input-root.css.js'
  * @cssproperty --input-padding-inline - Space between the edge of the field and what is inside it.
  * @cssproperty --input-radius - Corner radius of the field.
  * @cssproperty --input-size - Height of the field.
+ *
+ * @replaces input, input[type=text], input[type=email], input[type=password], input[type=search], input[type=tel], input[type=url]
  */
 @customElement('helix-input')
 export class HelixInput extends HelixHeadlessInput {

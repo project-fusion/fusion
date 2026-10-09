@@ -37,6 +37,8 @@ import { styles } from './slider-root.css.js'
  * @cssproperty --slider-track-color - The color of the unfilled part of the track.
  * @cssproperty --slider-track-image - An image for the whole track, such as a gradient for a slider whose value is a color.
  * @cssproperty --slider-track-size - The thickness of the track. It matches the progress bar's size by default.
+ *
+ * @replaces input[type=range]
  */
 @customElement('helix-slider')
 export class HelixSlider extends HelixHeadlessSlider {
