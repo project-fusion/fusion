@@ -8,11 +8,13 @@
  * that installed Helix the way a consumer does, and the page it writes is
  * graded by `run-tasks.mjs --answers`, the grader the reference pages pass.
  *
- * **Three arms, because one number says nothing.** `docs` has the installed
+ * **Four arms, because one number says nothing.** `docs` has the installed
  * packages and nothing else, so the agent reads what `node_modules` holds.
  * `skill` adds the guide Helix ships as a skill, linked where the guide says.
- * `mcp` adds `helix mcp` as well. The gap between them is what each surface is
- * worth, which is the question the agent surfaces exist to answer.
+ * `mcp` adds `helix mcp` as well. `plugin` installs the Claude Code plugin in
+ * `helix/plugin` in their place, the one step a user takes. The gap between
+ * them is what each surface is worth, which is the question the agent
+ * surfaces exist to answer.
  *
  * **Each agent sees its own folder and the installed packages, and nothing
  * else**: no shell, no web, no settings but the project's, and every other
@@ -42,16 +44,18 @@ import { join, resolve } from 'node:path'
 import { argument } from '@fusion.dev/scripts/argv'
 import { manifests, root } from '@fusion.dev/scripts/workspace'
 
-/** The packages a page built with Helix installs. */
+/** The packages a page built with Helix installs, and the command line the
+    plugin's MCP server runs through `npx`. */
 const PACKAGES = [
   '@fusion.dev/helix',
+  '@fusion.dev/helix-cli',
   '@fusion.dev/helix-core',
   '@fusion.dev/helix-headless',
   '@fusion.dev/helix-icons',
   '@fusion.dev/helix-styles',
 ]
 
-const ARMS = ['docs', 'skill', 'mcp']
+const ARMS = ['docs', 'skill', 'mcp', 'plugin']
 
 const suite = JSON.parse(readFileSync(join(root, 'fusion/scripts/eval/tasks.json'), 'utf8'))
 const asked = argument('tasks')?.split(',')
@@ -116,7 +120,8 @@ const attempt = (arm, task) => {
     '--model',
     model,
     '--output-format',
-    'json',
+    'stream-json',
+    '--verbose',
     '--permission-mode',
     'acceptEdits',
     '--setting-sources',
@@ -131,7 +136,7 @@ const attempt = (arm, task) => {
     'Bash,WebFetch,WebSearch,Task',
   ]
   const tools = [...TOOLS]
-  if (arm !== 'docs') {
+  if (arm === 'skill' || arm === 'mcp') {
     /* Where the guide says to link it, for Claude Code. */
     mkdirSync(join(folder, '.claude/skills/helix'), { recursive: true })
     cpSync(skill, join(folder, '.claude/skills/helix/SKILL.md'))
@@ -146,18 +151,49 @@ const attempt = (arm, task) => {
     args.push('--mcp-config', config)
     tools.push('mcp__helix')
   }
+  /* **The plugin as a user installs it.** Its skill loads from the folder.
+     Its MCP server is the plugin's own `.mcp.json` handed over as written,
+     since `--strict-mcp-config`, which keeps the user's own servers out of
+     every arm, keeps a plugin's out too. */
+  if (arm === 'plugin') {
+    const plugin = join(root, 'helix/plugin')
+    args.push('--plugin-dir', plugin, '--mcp-config', join(plugin, '.mcp.json'))
+    tools.push('Skill', 'mcp__helix')
+  }
   args.push('--allowedTools', tools.join(','))
   const started = Date.now()
   const ran = spawnSync('claude', args, {
     cwd: folder,
     encoding: 'utf8',
+    /* The binary from this tree, which the installed command line's shim
+       runs first, since a checkout has no platform package to install. */
+    env: { ...process.env, HELIX_BIN: helix },
     maxBuffer: 1024 * 1024 * 64,
   })
-  let said = {}
-  try {
-    said = JSON.parse(ran.stdout)
-  } catch {
-    said = { error: (ran.stderr || ran.stdout).trim().slice(0, 400) }
+  /* **Streamed, for the tools each agent reached for**, which is what says
+     why two arms differ: an arm with the skill whose agent never read it is
+     the docs arm under another name. The last line is the result. */
+  const lines = ran.stdout
+    .split('\n')
+    .filter((line) => line.startsWith('{'))
+    .map((line) => {
+      try {
+        return JSON.parse(line)
+      } catch {
+        return {}
+      }
+    })
+  const said = lines.findLast((line) => line.type === 'result') ?? {
+    error: (ran.stderr || ran.stdout).trim().slice(0, 400),
+  }
+  const used = {}
+  for (const line of lines) {
+    for (const part of line.type === 'assistant' ? (line.message?.content ?? []) : []) {
+      if (part.type === 'tool_use') {
+        const name = part.name === 'Skill' ? `Skill(${part.input?.skill ?? ''})` : part.name
+        used[name] = (used[name] ?? 0) + 1
+      }
+    }
   }
   return {
     arm,
@@ -165,6 +201,7 @@ const attempt = (arm, task) => {
     error: said.is_error ? String(said.result ?? said.subtype) : (said.error ?? null),
     seconds: Math.round((Date.now() - started) / 1000),
     task: task.id,
+    tools: used,
     turns: said.num_turns ?? null,
   }
 }

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "helix": {
+      "args": ["@fusion.dev/helix-cli", "mcp"],
+      "command": "npx"
+    }
+  }
+}
