@@ -11,6 +11,7 @@ export function Example() {
           as="h3"
           id="glass-title"
           slot="header"
+          variant="title"
         >
           Storage
         </helix-text>
@@ -25,6 +26,7 @@ export function Example() {
           as="h3"
           id="frosted-title"
           slot="header"
+          variant="title"
         >
           Team members
         </helix-text>
@@ -39,6 +41,7 @@ export function Example() {
           as="h3"
           id="transparent-title"
           slot="header"
+          variant="title"
         >
           Next invoice
         </helix-text>
@@ -53,6 +56,7 @@ export function Example() {
           as="h3"
           id="opaque-title"
           slot="header"
+          variant="title"
         >
           Notifications
         </helix-text>

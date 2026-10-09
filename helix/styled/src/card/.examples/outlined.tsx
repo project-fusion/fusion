@@ -8,6 +8,7 @@ export function Example() {
         as="h3"
         id="outlined-title"
         slot="header"
+        variant="title"
       >
         Notifications
       </helix-text>

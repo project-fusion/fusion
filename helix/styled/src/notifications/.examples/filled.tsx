@@ -10,6 +10,7 @@ export function Example() {
       <helix-text
         as="h2"
         slot="header"
+        variant="title"
       >
         Notifications
       </helix-text>

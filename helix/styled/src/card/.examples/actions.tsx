@@ -5,6 +5,7 @@ export function Example() {
         as="h3"
         id="actions-title"
         slot="header"
+        variant="title"
       >
         Weekly report
       </helix-text>

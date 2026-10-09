@@ -12,6 +12,7 @@ export function Example() {
         as="h3"
         id="sessions-title"
         slot="header"
+        variant="title"
       >
         Sessions
       </helix-text>

@@ -8,6 +8,7 @@ export function Example() {
         as="h3"
         id="elevated-title"
         slot="header"
+        variant="title"
       >
         Team plan
       </helix-text>

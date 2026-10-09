@@ -12,6 +12,7 @@ export function Example() {
       <helix-text
         as="h3"
         id="review-title"
+        variant="title"
       >
         Quarterly review
       </helix-text>

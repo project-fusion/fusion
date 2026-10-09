@@ -8,6 +8,7 @@ export function Example() {
         as="h3"
         id="card-title"
         slot="header"
+        variant="title"
       >
         Storage
       </helix-text>

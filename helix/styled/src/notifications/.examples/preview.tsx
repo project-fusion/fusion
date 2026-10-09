@@ -24,6 +24,7 @@ export function Example() {
       <helix-text
         as="h2"
         slot="header"
+        variant="title"
       >
         Notifications
       </helix-text>
@@ -71,7 +72,7 @@ export function Example() {
         Your invitation to the <strong>Platform</strong> team was accepted.
       </helix-notification>
       <a
-        data-link="quiet"
+        data-button="subtle"
         href="#all"
         slot="footer"
       >

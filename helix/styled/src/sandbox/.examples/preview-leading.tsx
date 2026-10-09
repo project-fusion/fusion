@@ -19,7 +19,12 @@ export function Example() {
             iframe, which needs a document to load. */}
         <div slot="preview">
           <helix-card>
-            <helix-text as="h3">Quarterly review</helix-text>
+            <helix-text
+              as="h3"
+              variant="title"
+            >
+              Quarterly review
+            </helix-text>
             <helix-text as="p">Due on September 9.</helix-text>
           </helix-card>
         </div>
