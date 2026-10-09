@@ -1,21 +1,23 @@
 # @fusion.dev/cli
 
-The npm shim for the `fusion` command. **Private**: it is how this workspace's
-own checks reach a Rust binary from a `bun run` line.
+The Fusion command line. `fusion` runs each Fusion product's own command line,
+so one command reaches all of them.
 
 ```sh
-bun run fusion x workspace       # the rules a workspace is held to
-bun run fusion x prose check     # every doc block, judged
-bun run fusion x spec check      # the spec rules
+fusion helix scan              # the Helix command line
+fusion locus test              # the Fusion Locus command line
 ```
 
-**A near-copy of `helix/cli/npm/bin.mjs`, deliberately.** Sharing one would put
-a file in the fusion domain on the publish path of a helix package, and
-per-domain lockstep exists so a release of either does not wait on the other.
+| Route | What it does |
+|---|---|
+| `helix` | Runs `helix` from `@fusion.dev/helix-cli` with the rest of the line, and returns its exit code |
+| `locus` | Runs `locus` from `@fusion.dev/locus` the same way |
 
-**Resolution order, each step for a reason.** `FUSION_BIN` first, because a
-caller that knows better should not have to argue. Then the cargo target
-directory, release before debug, honoring `CARGO_TARGET_DIR`. Then `PATH`. Only
-then a build, and only when cargo is present. What that last step replaces is a
-check dying with `spawn fusion ENOENT`, which tells a reader nothing about which
-of four causes they have.
+`fusion` looks for each product's command in this order: the `HELIX_BIN` or
+`LOCUS_BIN` variable, a cargo build of it, `node_modules/.bin` from the directory
+it runs in up, and then `PATH`. A product that is not installed names the package to install.
+
+`--json` and `--no-color` written before `helix` are passed to it. Every flag
+after a product's name is that product's.
+
+MIT
