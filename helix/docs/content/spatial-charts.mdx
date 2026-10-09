@@ -159,8 +159,11 @@ view, except under `selection-mode="multiple"`, where it selects a range.
 
 In three.js, a step of Shift with an arrow moves over a quarter of a second,
 and with reduced motion set it happens at once. In the SVG drawing, a step
-happens at once, and a drag turns the view as the pointer moves. No spatial
-chart turns by itself.
+happens at once, and a drag turns the view as the pointer moves. Both drawings
+turn round the middle of the data and keep their size through a drag, so
+nothing else on the page moves. Once the drag ends, the SVG drawing settles
+into the space that fits it, at once with reduced motion set. No spatial chart
+turns by itself.
 
 ## Color a spatial chart
 
