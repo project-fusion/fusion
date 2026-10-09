@@ -16,7 +16,14 @@ import {
   spokenReading,
   words,
 } from '@fusion.dev/helix-core'
-import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
+import {
+  html,
+  nothing,
+  type PropertyValues,
+  type SVGTemplateResult,
+  svg,
+  type TemplateResult,
+} from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import {
@@ -123,6 +130,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @event {HelixReadingPressEvent} helix-reading-press - A place was clicked or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
  * @csspart axis-name - A measure's name, along its edge of the box, in the chart's own drawing.
+ * @csspart contour - One contour line on the floor of the box, drawn under `contours`, at one height, colored along the ramp by it.
  * @csspart drawing - The chart's own drawing in SVG: the box, its grid and numbers, and the surface.
  * @csspart empty - The words when the table has no readings: the `empty` slot, falling back to `empty-text`.
  * @csspart face - One square of the surface between four readings, or a triangle where one is missing, shaded by its height and by which way it faces.
@@ -170,6 +178,14 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
    * `registerWords('de', { 'helix-spatial-surface-chart': { emptyText: 'Keine Werte' } })`.
    */
   static words = 'helix-spatial-surface-chart'
+
+  /**
+   * Draws the surface's contour lines on the floor of the box, at each tick
+   * of its height, in the ramp's colors, so its shape reads from above as on
+   * a map. A renderer draws them too.
+   */
+  @property({ reflect: true, type: Boolean })
+  contours = false
 
   /**
    * Draws no box: no edges, grid, numbers, or names, so the readings stand
@@ -519,7 +535,7 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
-      >${this.noBox ? nothing : drawBox(view)}${faces.map(
+      >${this.noBox ? nothing : drawBox(view)}${this.contours ? this.renderContours(field, view.on) : nothing}${faces.map(
         (face) =>
           svg`<path d=${shape(face.points.map((point) => view.on(point)))} data-corners=${face.corners.join(' ')} part="face" style="--spatial-surface-chart-level: ${short(face.level)}; --spatial-surface-chart-shade: ${short(face.shade)}"></path>`,
       )}${
@@ -528,6 +544,31 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
           : nothing
       }</svg>
     </div>`
+  }
+
+  /**
+   * The contour lines on the floor of the box, one path for each height,
+   * drawn under the surface so it stands over them.
+   */
+  private renderContours(
+    field: SurfaceField,
+    on: (point: BoxPoint) => { x: number; y: number },
+  ): SVGTemplateResult[] {
+    const { highest, lowest } = field
+    const short = (value: number): number => Math.round(value * 1000) / 1000
+    return field.contours.map((contour) => {
+      const d = contour.segments
+        .map(([from, to]) => {
+          const [a, b] = [
+            on([inBox(field.axes.x, from[0]), -1, inBox(field.axes.z, from[1])]),
+            on([inBox(field.axes.x, to[0]), -1, inBox(field.axes.z, to[1])]),
+          ]
+          return `M${short(a.x)} ${short(a.y)}L${short(b.x)} ${short(b.y)}`
+        })
+        .join('')
+      const level = highest === lowest ? 0.5 : (contour.level - lowest) / (highest - lowest)
+      return svg`<path d=${d} part="contour" style="--spatial-surface-chart-level: ${short(level)}"></path>`
+    })
   }
 
   /** The readout: the reading at the place in words, once the keys have moved to one. */

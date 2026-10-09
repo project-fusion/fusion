@@ -78,6 +78,17 @@ describe('the frame', () => {
     expect(hasState(element, 'drawn')).toBe(true)
   })
 
+  test('under drop-lines, each point has a line straight down to the floor, in its group color', async () => {
+    const element = await plot('group-by="Team" drop-lines')
+    const lines = [...(element.shadowRoot?.querySelectorAll('[part="drop-line"]') ?? [])]
+    const points = element.shadowRoot?.querySelectorAll('[part~="point"]') ?? []
+    expect(lines).toHaveLength(points.length)
+    for (const line of lines) {
+      expect(line.getAttribute('d')).toMatch(/^M[\d.-]+ [\d.-]+L[\d.-]+ [\d.-]+$/)
+      expect(line.getAttribute('style')).toMatch(/--chart-series: var\(--chart-series-\d+\)/)
+    }
+  })
+
   test('the plot is named, described by its summary, and takes focus', async () => {
     const element = await plot()
     const box = part(element, 'plot')

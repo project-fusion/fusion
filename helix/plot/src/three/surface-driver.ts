@@ -91,6 +91,9 @@ export const threeSurfaceDriver = (
     vertexColors: true,
   })
   const rules = new LineSegments(new BufferGeometry(), ruleMaterial)
+  /* The contour lines on the floor, under `contours`, in the ramp's colors. */
+  const contourMaterial = new LineBasicMaterial({ vertexColors: true })
+  const contours = new LineSegments(new BufferGeometry(), contourMaterial)
 
   const stage = createStage(container, {
     density: options.density,
@@ -149,7 +152,7 @@ export const threeSurfaceDriver = (
   const sky = new HemisphereLight(0xffffff, 0xffffff, 2.2)
   const sun = new DirectionalLight(0xffffff, 1)
   sun.position.set(-2, 4, 1)
-  stage.scene.add(surface, rules, sky, sun)
+  stage.scene.add(contours, surface, rules, sky, sun)
 
   return {
     draw: (next, colors, font) => {
@@ -237,6 +240,29 @@ export const threeSurfaceDriver = (
       ruled.setAttribute('position', new Float32BufferAttribute(lines, 3))
       ruled.setAttribute('color', new Float32BufferAttribute(lineTints, 3))
       rules.geometry = ruled
+      const floor: number[] = []
+      const floorTints: number[] = []
+      const [bottom, top] = [next.lowest ?? least, next.highest ?? most]
+      for (const contour of next.contours ?? []) {
+        tint.lerpColors(low, high, top === bottom ? 0.5 : (contour.level - bottom) / (top - bottom))
+        for (const [from, to] of contour.segments) {
+          floor.push(
+            inBox(next.axes.x, from[0]),
+            -HALF,
+            inBox(next.axes.z, from[1]),
+            inBox(next.axes.x, to[0]),
+            -HALF,
+            inBox(next.axes.z, to[1]),
+          )
+          floorTints.push(tint.r, tint.g, tint.b, tint.r, tint.g, tint.b)
+        }
+      }
+      contours.geometry.dispose()
+      const lined = new BufferGeometry()
+      lined.setAttribute('position', new Float32BufferAttribute(floor, 3))
+      lined.setAttribute('color', new Float32BufferAttribute(floorTints, 3))
+      contours.geometry = lined
+      contours.visible = colors.look.contours
       lookThrough(surfaceMaterial, (emphasis === 'subtle' ? 0.2 : 1) * through)
       lookThrough(ruleMaterial, (wire ? 1 : 0.3) * through)
       ruleMaterial.transparent = true
@@ -253,6 +279,8 @@ export const threeSurfaceDriver = (
       surfaceMaterial.dispose()
       rules.geometry.dispose()
       ruleMaterial.dispose()
+      contours.geometry.dispose()
+      contourMaterial.dispose()
       stage.stop()
     },
     turnBy: (across, up, animate) => stage.turnBy(across, up, animate),

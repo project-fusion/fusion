@@ -3,6 +3,8 @@ import {
   CanvasTexture,
   Color,
   Float32BufferAttribute,
+  LineBasicMaterial,
+  LineSegments,
   Points,
   PointsMaterial,
   Vector3,
@@ -11,7 +13,7 @@ import type {
   Field,
   SpatialScatterChartDriver,
 } from '../connect-spatial-scatter-chart/connect-spatial-scatter-chart.js'
-import { createStage, inBox, lookThrough } from './stage.js'
+import { createStage, HALF, inBox, lookThrough } from './stage.js'
 
 /** How the three.js scatter driver behaves where the page does not say. */
 export interface ThreeScatterDriverOptions {
@@ -112,6 +114,13 @@ export const threeScatterDriver = (
     vertexColors: true,
   })
   const points = new Points(new BufferGeometry(), pointMaterial)
+  /* Each point's line down to the floor, under `drop-lines`, see-through. */
+  const dropMaterial = new LineBasicMaterial({
+    opacity: 0.45,
+    transparent: true,
+    vertexColors: true,
+  })
+  const drops = new LineSegments(new BufferGeometry(), dropMaterial)
 
   const stage = createStage(container, {
     density: options.density,
@@ -134,7 +143,7 @@ export const threeScatterDriver = (
       return found
     },
   })
-  stage.scene.add(points)
+  stage.scene.add(drops, points)
 
   return {
     draw: (next, colors, font) => {
@@ -153,6 +162,31 @@ export const threeScatterDriver = (
       geometry.setAttribute('position', new Float32BufferAttribute(positions, 3))
       geometry.setAttribute('color', new Float32BufferAttribute(tints, 3))
       points.geometry = geometry
+      drops.geometry.dispose()
+      const lines = new BufferGeometry()
+      const feet: number[] = []
+      for (let at = 0; at < positions.length; at += 3) {
+        feet.push(
+          positions[at] as number,
+          positions[at + 1] as number,
+          positions[at + 2] as number,
+          positions[at] as number,
+          -HALF,
+          positions[at + 2] as number,
+        )
+      }
+      lines.setAttribute('position', new Float32BufferAttribute(feet, 3))
+      lines.setAttribute(
+        'color',
+        new Float32BufferAttribute(
+          tints.flatMap((_, at) =>
+            at % 3 === 0 ? [...tints.slice(at, at + 3), ...tints.slice(at, at + 3)] : [],
+          ),
+          3,
+        ),
+      )
+      drops.geometry = lines
+      drops.visible = colors.look.drops
       const { emphasis, through } = colors.look
       const inside = emphasis === 'outlined' ? 0.6 : emphasis === 'subtle' ? 0.2 : 1
       if (inside < 1 && !rings.has(inside)) {
@@ -178,6 +212,8 @@ export const threeScatterDriver = (
       points.geometry.dispose()
       pointMaterial.dispose()
       pointTexture.dispose()
+      drops.geometry.dispose()
+      dropMaterial.dispose()
       for (const texture of rings.values()) {
         texture.dispose()
       }
