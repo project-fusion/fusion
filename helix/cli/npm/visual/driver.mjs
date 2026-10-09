@@ -762,6 +762,48 @@ const handlers = {
     say({ browser: `chromium ${state.browser.version()}`, op: 'started' })
   },
 
+  /* **Each group asked in turn, and an answer that fails is one group's
+     failure.** A key that is missing or refused fails every request alike,
+     so the first such failure is the answer for the rest. */
+  async triage({ groups, model, provider, system, url }) {
+    const settings = { model, system, url }
+    const answers = []
+    let stopped = null
+    let client = null
+    if (provider === 'anthropic') {
+      try {
+        client = new (await anthropic())()
+      } catch (caught) {
+        stopped = caught instanceof Error ? caught.message.split('\n')[0] : String(caught)
+      }
+    }
+    for (const group of groups) {
+      if (stopped !== null) {
+        answers.push({ error: stopped })
+        continue
+      }
+      try {
+        const answer =
+          provider === 'anthropic'
+            ? await askClaude(client, settings, group)
+            : await askOllama(settings, group)
+        answers.push(answer)
+      } catch (caught) {
+        const why = caught instanceof Error ? caught.message.split('\n')[0] : String(caught)
+        answers.push({ error: why })
+        if (caught?.status === 401 || caught?.status === 403 || caught?.code === 'ECONNREFUSED') {
+          stopped = why
+        }
+      }
+    }
+    /* A failure that stopped every request is said once, for the run. */
+    say({
+      answers,
+      op: 'triaged',
+      stopped: answers.every((one) => one.error === stopped) ? stopped : null,
+    })
+  },
+
   /* Polls until anything answers, a refusal of the connection being the one
      thing that means nothing is listening yet. */
   async wait({ seconds, url }) {
@@ -800,6 +842,109 @@ const playwright = async () => {
     throw new Error(
       '`helix visual` pictures pages with Playwright, which is not installed. Install it with `npm install --save-dev playwright`, then its browser with `npx playwright install chromium`.',
     )
+  }
+}
+
+/**
+ * The Anthropic SDK, or a failure that says how to install it: an optional
+ * peer for the same reason Playwright is, needed only by a config that asks
+ * for a triage.
+ */
+const anthropic = async () => {
+  try {
+    return (await import('@anthropic-ai/sdk')).default
+  } catch (error) {
+    if (
+      error?.code !== 'ERR_MODULE_NOT_FOUND' ||
+      !String(error.message).includes("'@anthropic-ai/sdk'")
+    ) {
+      throw error
+    }
+    throw new Error(
+      'the config asks for a triage by Claude, through the Anthropic SDK, which is not installed. Install it with `npm install --save-dev @anthropic-ai/sdk`.',
+    )
+  }
+}
+
+/** The answer every triage request is held to. */
+const VERDICT = {
+  additionalProperties: false,
+  properties: {
+    explanation: { type: 'string' },
+    verdict: { enum: ['intended', 'unintended', 'unclear'], type: 'string' },
+  },
+  required: ['verdict', 'explanation'],
+  type: 'object',
+}
+
+/**
+ * One group asked of Claude: the words and any pictures, answered as JSON
+ * held to `VERDICT`. A request a safety classifier declines goes to the
+ * fallback model Anthropic routes it to, and one declined there too is an
+ * answer of its own, not a failure of the run.
+ */
+const askClaude = async (client, { model, system }, { images, text }) => {
+  const response = await client.beta.messages.create({
+    betas: ['server-side-fallback-2026-07-01'],
+    fallbacks: 'default',
+    max_tokens: 16000,
+    messages: [
+      {
+        content: [
+          ...images.map((data) => ({
+            source: { data, media_type: 'image/png', type: 'base64' },
+            type: 'image',
+          })),
+          { text, type: 'text' },
+        ],
+        role: 'user',
+      },
+    ],
+    model,
+    output_config: { effort: 'medium', format: { schema: VERDICT, type: 'json_schema' } },
+    system,
+  })
+  const usage = response.usage ?? {}
+  const input =
+    (usage.input_tokens ?? 0) +
+    (usage.cache_creation_input_tokens ?? 0) +
+    (usage.cache_read_input_tokens ?? 0)
+  const output = usage.output_tokens ?? 0
+  if (response.stop_reason === 'refusal') {
+    return { error: 'the model declined to answer', input, output }
+  }
+  const words = response.content.find((block) => block.type === 'text')?.text ?? ''
+  return { ...JSON.parse(words), input, output }
+}
+
+/**
+ * One group asked of a model on an Ollama endpoint, with the same answer
+ * asked for through its `format`.
+ */
+const askOllama = async ({ model, system, url }, { images, text }) => {
+  const answer = await fetch(`${(url ?? 'http://127.0.0.1:11434').replace(/\/+$/, '')}/api/chat`, {
+    body: JSON.stringify({
+      format: VERDICT,
+      messages: [
+        { content: system, role: 'system' },
+        { content: text, images, role: 'user' },
+      ],
+      model,
+      stream: false,
+    }),
+    headers: { 'content-type': 'application/json' },
+    method: 'POST',
+  })
+  if (!answer.ok) {
+    throw new Error(
+      `the endpoint answered ${answer.status}: ${(await answer.text()).slice(0, 200)}`,
+    )
+  }
+  const body = await answer.json()
+  return {
+    ...JSON.parse(body.message?.content ?? '{}'),
+    input: body.prompt_eval_count ?? 0,
+    output: body.eval_count ?? 0,
   }
 }
 

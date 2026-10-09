@@ -85,7 +85,32 @@ pub struct Run<'a> {
     pub scope: &'a str,
     /// Each unstable shot left out, with its reason.
     pub skipped: Vec<String>,
+    /// The changes, grouped by what they happened to, the largest first.
+    pub groups: Vec<crate::triage::Group>,
+    /// What a triage asked and what it cost, when one ran.
+    pub triaged: Option<String>,
     pub update: bool,
+}
+
+/// Whether the groups say more than the list of failures already does: some
+/// group holds more than one shot, or a model answered.
+fn grouped(run: &Run) -> bool {
+    run.groups
+        .iter()
+        .any(|one| one.members.len() > 1 || one.verdict.is_some())
+}
+
+/// One group, as the terminal prints it.
+fn printed(group: &crate::triage::Group) -> String {
+    let mut out = format!(
+        "{}: {}",
+        plural(group.members.len(), "shot", "shots"),
+        group.signature
+    );
+    if let (Some(verdict), Some(explanation)) = (&group.verdict, &group.explanation) {
+        let _ = write!(out, "\n    {verdict}: {explanation}");
+    }
+    out
 }
 
 fn plural(count: usize, one: &str, many: &str) -> String {
@@ -281,6 +306,20 @@ pub fn finish(run: &Run) -> Code {
     if !failures.is_empty() {
         say!("\n  {}\n", failures.join("\n  "));
     }
+    if grouped(run) {
+        say!(
+            "helix: the changes fall into {}, the largest first:\n\n  {}\n",
+            plural(run.groups.len(), "group", "groups"),
+            run.groups
+                .iter()
+                .map(printed)
+                .collect::<Vec<_>>()
+                .join("\n  ")
+        );
+    }
+    if let Some(triaged) = &run.triaged {
+        say!("{triaged}");
+    }
     if !run.findings.is_empty() {
         say!("\n  {}\n", run.findings.join("\n  "));
     }
@@ -385,7 +424,14 @@ fn record(run: &Run, verdict: &str, failed: bool) -> Value {
     json!({
         "failed": failed,
         "findings": run.findings,
+        "groups": run.groups.iter().map(|one| json!({
+            "explanation": one.explanation,
+            "members": one.members,
+            "signature": one.signature,
+            "verdict": one.verdict,
+        })).collect::<Vec<_>>(),
         "mode": if run.update { "update" } else { "test" },
+        "triage": run.triaged,
         "shots": rows,
         "skipped": run.skipped,
         /* Read where the list follows it. */
@@ -456,6 +502,28 @@ fn escape(text: &str) -> String {
         .replace('"', "&quot;")
 }
 
+/// The groups of changes, as the items of a list.
+fn grouped_html(record: &Value) -> String {
+    let empty = Vec::new();
+    let mut groups = String::new();
+    for one in record["groups"].as_array().unwrap_or(&empty) {
+        let members = one["members"].as_array().map_or(0, Vec::len);
+        let answer = match (one["verdict"].as_str(), one["explanation"].as_str()) {
+            (Some(verdict), Some(explanation)) => {
+                format!("<br><em>{}</em>: {}", escape(verdict), escape(explanation))
+            }
+            _ => String::new(),
+        };
+        let _ = write!(
+            groups,
+            "<li><strong>{}</strong>: {}{answer}</li>",
+            escape(&plural(members, "shot", "shots")),
+            escape(one["signature"].as_str().unwrap_or_default())
+        );
+    }
+    groups
+}
+
 /// The page: the verdict, then each failed shot with its baseline, capture and
 /// diff side by side and a swipe between the first two.
 fn html(record: &Value) -> String {
@@ -519,6 +587,7 @@ fn html(record: &Value) -> String {
             escape(one["detail"].as_str().unwrap_or_default())
         );
     }
+    let groups = grouped_html(record);
     let mut findings = String::new();
     for one in record["findings"]
         .as_array()
@@ -546,8 +615,9 @@ fn html(record: &Value) -> String {
     };
     format!(
         "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\
-<title>Visual test report</title><style>{STYLE}</style><main><h1>Visual test report</h1><p class=\"verdict\">{}</p>{}{}{}{}</main><script>{SCRIPT}</script></html>\n",
+<title>Visual test report</title><style>{STYLE}</style><main><h1>Visual test report</h1><p class=\"verdict\">{}</p>{}{}{}{}{}</main><script>{SCRIPT}</script></html>\n",
         escape(record["verdict"].as_str().unwrap_or_default()),
+        list("Changes, grouped", &groups),
         cards,
         list("Page checks", &findings),
         list("Notes", &notes),
@@ -574,6 +644,32 @@ pub fn markdown(record: &Value) -> String {
     let mut out = String::from("### Visual tests\n\n");
     let _ = writeln!(out, "{}\n", record["verdict"].as_str().unwrap_or_default());
     let empty = Vec::new();
+    let groups = record["groups"].as_array().unwrap_or(&empty);
+    if groups
+        .iter()
+        .any(|one| one["members"].as_array().map_or(0, Vec::len) > 1 || one["verdict"].is_string())
+    {
+        out.push_str("Changes, grouped:\n\n");
+        for one in groups {
+            let _ = write!(
+                out,
+                "- **{}**: {}",
+                plural(
+                    one["members"].as_array().map_or(0, Vec::len),
+                    "shot",
+                    "shots"
+                ),
+                one["signature"].as_str().unwrap_or_default()
+            );
+            if let (Some(verdict), Some(explanation)) =
+                (one["verdict"].as_str(), one["explanation"].as_str())
+            {
+                let _ = write!(out, " *{verdict}*: {explanation}");
+            }
+            out.push('\n');
+        }
+        out.push('\n');
+    }
     let rows: Vec<&Value> = record["shots"]
         .as_array()
         .unwrap_or(&empty)

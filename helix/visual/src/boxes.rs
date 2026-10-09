@@ -13,7 +13,7 @@
 use std::collections::BTreeMap;
 use std::io::Cursor;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::image::Image;
@@ -29,7 +29,7 @@ const REGIONS: usize = 5;
 const CELL: usize = 16;
 
 /// Where one named element sat in a picture.
-#[derive(Clone, Debug, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct Placed {
     pub height: f64,
     /// The named elements above it, itself, and its place among namesakes.
@@ -82,6 +82,16 @@ pub fn embed(png: &[u8], boxes: &Value) -> Vec<u8> {
     out.extend_from_slice(&chunk);
     out.extend_from_slice(&png[at..]);
     out
+}
+
+/// A baseline with the capture's boxes written into its own bytes, when the
+/// baseline carries none and the capture has some.
+pub fn carry(baseline: &[u8], capture: &[u8]) -> Option<Vec<u8>> {
+    if read(baseline).is_some() {
+        return None;
+    }
+    let boxes = read(capture)?;
+    Some(embed(baseline, &serde_json::to_value(boxes).ok()?))
 }
 
 /// The boxes a picture carries, or none when it was written without them.
