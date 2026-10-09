@@ -279,7 +279,7 @@
     },
     "helix/plot": {
       "name": "@fusion.dev/helix-plot",
-      "version": "0.184.0",
+      "version": "0.187.0",
       "dependencies": {
         "@fusion.dev/helix-core": "helix/core",
       },
