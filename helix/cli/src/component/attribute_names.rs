@@ -58,8 +58,10 @@ const EXCUSED: [(&str, &str); 1] = [("defaultMuted", "muted")];
 /// Options may hold nested parens, so the inner group tolerates one level of
 /// them, which is what a `converter` object and a `type` between them need.
 static DECLARATION: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"@property\(((?:[^()]|\([^()]*\))*)\)\s*\n\s*(?:override\s+)?(?:get\s+)?(\w+)")
-        .expect("the declaration pattern is a literal and compiles")
+    Regex::new(
+        r"@property\(((?:[^()]|\([^()]*\))*)\)[ \t]*(?:\n\s*)?(?:override\s+)?(?:get\s+)?(\w+)",
+    )
+    .expect("the declaration pattern is a literal and compiles")
 });
 
 pub fn run(context: &Context) -> Report {

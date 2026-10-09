@@ -155,6 +155,41 @@ TypeScript declares custom elements this way. The interface merges from your
 source, and a generated file cannot name a class that is not in the same
 program.
 
+## Check your components with `helix component`
+
+`helix component` checks the components you write on Helix's base classes. Name
+the folders that hold them in `helix.json` at your project's root:
+
+```json
+{ "tiers": ["src/components"] }
+```
+
+Then run it:
+
+```sh
+helix component audit
+helix component check
+```
+
+`audit` prints each rule and what it found, and `check` prints nothing when
+there is nothing to report. Both exit 1 on a finding, and `--json` prints the
+findings as data. The rules check what your components document and write:
+
+| Rule | What it checks |
+|---|---|
+| `parts` | A `@csspart` you document is rendered, and a `part` you render is documented |
+| `states` | A custom state you record is documented with `@cssstate`, and a documented one is recorded |
+| `hooks` | A `@cssproperty` you document is read, and one you read is documented |
+| `restated` | A part, a slot, or an event is declared once |
+| `reflected` | A property that reflects has no default, so a host carries no attribute nobody wrote |
+| `reflected-defaults` | A reflected property writes no attribute on upgrade that a server did not send |
+| `attribute-names` | A property that mirrors a platform attribute answers to the platform's spelling |
+| `constructed` | No class field reads the element's attributes in its initializer, where a parsed element has none yet |
+| `observers` | An observer built once is not torn down by a lifecycle that runs many times |
+| `leaks` | A listener on something the element does not own is removed when the element is |
+
+`--only parts,states` runs a few of them.
+
 ## What the headless tier handles for you
 
 ### Tree-shaking

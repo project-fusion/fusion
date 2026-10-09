@@ -78,10 +78,10 @@ pub enum Noun {
     },
 
     /* **The design system saying whether you extended it correctly**, rather
-    than a linter to be configured into usefulness. Only in this repository's
-    builds: the published binary is built without the `internal` feature. */
+    than a linter to be configured into usefulness. A published binary carries
+    the rules any project built on Helix's base classes can run; this
+    repository's builds carry Helix's own conventions as well. */
     /// Hold components to the conventions Helix is built on.
-    #[cfg(feature = "internal")]
     ///
     /// Reads the tiers named by a `helix` key in `fusion.json`, or by
     /// `helix.json` where that product is not in use.
@@ -298,17 +298,18 @@ pub enum Manifest {
     /// made to prove it in a pipeline.
     Diff(ManifestDiff),
 
-    /* **Not wired into any build.** Held to the analyzer's output by `diff`
-    until it matches, and only then does anything read it. Until that day this
-    is a generator being measured rather than one being used. */
+    /* **This repository's generator, so only in its builds.** `helix-cem`
+    runs it to write each tier's manifest, and it reads Helix's own source
+    conventions, so a published binary leaves it out. */
     /// Generate a manifest from a package's sources.
     ///
-    /// Writes to stdout. Incomplete: the layers it has been taken through are
-    /// the ones `diff` reports no difference in.
+    /// Writes to stdout.
+    #[cfg(feature = "internal")]
     Build(ManifestBuild),
 }
 
 /// What `manifest build` takes.
+#[cfg(feature = "internal")]
 #[derive(Args, Debug)]
 pub struct ManifestBuild {
     /// The package to read, which is the directory holding its `src`.
@@ -352,7 +353,6 @@ pub struct ManifestDiff {
 }
 
 /// What can be asked of the component rules.
-#[cfg(feature = "internal")]
 #[derive(Debug, Subcommand)]
 pub enum Component {
     /// Report every rule and what it found, and exit 1 on a finding.
@@ -364,7 +364,6 @@ pub enum Component {
 }
 
 /// What `component audit` takes, which is the rules plus how to show them.
-#[cfg(feature = "internal")]
 #[derive(Args, Debug)]
 pub struct ComponentAudit {
     #[command(flatten)]
@@ -382,7 +381,6 @@ pub struct ComponentAudit {
 }
 
 /// What the component verbs take.
-#[cfg(feature = "internal")]
 #[derive(Args, Debug)]
 pub struct Rules {
     /// Run just these rules.

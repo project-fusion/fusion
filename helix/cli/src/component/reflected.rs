@@ -38,7 +38,7 @@ const RESTING: [&str; 3] = ["false", "undefined", "null"];
 
 static DECLARATION: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(
-        r"(?m)@property\(\{[^}]*reflect:\s*true[^}]*\}\)\s*\n\s*(?:override\s+)?(?:declare\s+)?(\w+)\s*(?::[^=\n]+)?(?:=\s*([^\n]+?))?\s*$",
+        r"(?m)@property\(\{[^}]*reflect:\s*true[^}]*\}\)[ \t]*(?:\n\s*)?(?:override\s+)?(?:declare\s+)?(\w+)\s*(?::[^=\n]+)?(?:=\s*([^\n]+?))?\s*$",
     )
     .expect("the declaration pattern is a literal and compiles")
 });

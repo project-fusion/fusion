@@ -66,9 +66,22 @@ pub fn run(context: &Context) -> Report {
     let mut findings = Vec::new();
     let mut checked = 0;
 
-    for layer in &context.settings.layers {
+    /* **The layers where a project declares them, else its tiers**: a project
+    built on Helix with one tier of its own declares no layers, and its sources
+    are still declarations that can repeat. */
+    let directories: Vec<std::path::PathBuf> = if context.settings.layers.is_empty() {
+        context.settings.roots(&context.root)
+    } else {
+        context
+            .settings
+            .layers
+            .iter()
+            .map(|layer| context.root.join(&layer.source))
+            .collect()
+    };
+    for directory in &directories {
         let mut files = Vec::new();
-        sources(&context.root.join(&layer.source), &mut files);
+        sources(directory, &mut files);
         for file in files {
             let Ok(text) = fs::read_to_string(&file) else {
                 continue;

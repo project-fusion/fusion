@@ -21,9 +21,10 @@ than reimplementing it.
 
 The `internal` feature holds them. It is on by default, so every build in this
 repository has `x`, and `binaries.yml` builds with `--no-default-features`, so a
-published binary does not. `helix component` sits behind the same feature in the
-`helix` binary. `x` is the name the Rust compiler's own repository gives its
-internal tooling.
+published binary does not. In the `helix` binary the same feature holds Helix's
+own component rules and `helix manifest build`: a published `helix component`
+runs only the rules a project built on Helix's base classes can use. `x` is the
+name the Rust compiler's own repository gives its internal tooling.
 
 | Noun | What it holds | Rules |
 |---|---|---|

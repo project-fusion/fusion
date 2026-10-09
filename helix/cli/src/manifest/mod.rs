@@ -21,22 +21,34 @@
 //! the same manifest: it would churn every diff that touched it and the reason
 //! it does not is that something sorts them.
 
+#[cfg(feature = "internal")]
 pub mod build;
+#[cfg(feature = "internal")]
 pub mod inherit;
+/* Read whole by the generator, which a published build leaves out, and in
+part by the rules, so what only the generator calls is unused there. */
+#[cfg_attr(not(feature = "internal"), allow(dead_code))]
 pub mod jsdoc;
+#[cfg(feature = "internal")]
 pub mod order;
+#[cfg_attr(not(feature = "internal"), allow(dead_code))]
 pub mod parse;
+#[cfg_attr(not(feature = "internal"), allow(dead_code))]
 pub mod unions;
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
+#[cfg(feature = "internal")]
+use std::path::PathBuf;
 
 use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
 use serde_json::Value;
 
-use crate::args::{ManifestBuild, ManifestDiff};
+#[cfg(feature = "internal")]
+use crate::args::ManifestBuild;
+use crate::args::ManifestDiff;
 
 /// One disagreement, addressed the way a reader would go looking for it.
 #[derive(Debug)]
@@ -474,6 +486,7 @@ pub fn diff(args: &ManifestDiff, from: &Path, json: bool) -> Result<Code, Failur
 }
 
 /// Generate a manifest and write it out.
+#[cfg(feature = "internal")]
 pub fn generate(args: &ManifestBuild, from: &Path, _json: bool) -> Result<Code, Failure> {
     let package = if args.package.is_absolute() {
         args.package.clone()
