@@ -91,15 +91,15 @@ fixes a sanitizing flaw in earlier versions, so use 6.4.1 or later.
 - Land uses `surface`.
 - Water uses `info`.
 - Parks use `success`.
-- Main roads use `primary`, your brand color.
+- Main roads use `primary`, your brand color, or ink with no brand.
 - Smaller roads, buildings, borders, and labels use `foreground`.
 
 It also draws landmarks, highway signs, and neighborhood names:
 
 - A landmark is an icon on a disc and its name, in a color for its kind:
   parks, museums, schools, hotels, hospitals, stations, and stadiums from zoom
-  14, and food and shops from zoom 16. Each color is a fixed hue at your brand
-  color's lightness, so the kinds stay apart in any theme.
+  14, and food and shops from zoom 16. Each color is a fixed hue at the
+  lightness of `primary`, so the kinds stay apart in any theme.
 - A highway's number is on its sign, drawn to the Federal Highway
   Administration's outlines: the red and blue Interstate shield, the white US
   route shield, the white circle of a state route, and a plain plate for other

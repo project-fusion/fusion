@@ -21,21 +21,27 @@
    Pulled up by the height of the bar and padded back down by it, so the band
    starts *behind* the banner rather than below it. Without that the two
    appearances are the same picture until the reader scrolls. It is also what a
-   page with a glass header actually does with its hero. */
+   page with a glass header actually does with its hero.
+
+   **In the tint, so the bar reads over it in either mode.** The bar's text is
+   the page's ink, and glass lets the band through. A solid `primary-surface`
+   band is the opposite of the page with no brand set, black in light and
+   near-white in dark, and the bar's text failed against it in both. The tint
+   keeps the page's polarity and still carries the brand where one is set. */
 .band {
   align-content: center;
   margin-block-start: calc(var(--helix-size-header) * -1);
-  background-color: var(--helix-color-primary-surface);
+  background-color: var(--helix-color-primary-subtle);
   background-image:
     repeating-linear-gradient(
       to right,
       transparent 0 3rem,
-      color-mix(in oklab, var(--helix-color-foreground-on-accent) 24%, transparent) 3rem 3.0625rem
+      color-mix(in oklab, var(--helix-color-foreground) 24%, transparent) 3rem 3.0625rem
     ),
     repeating-linear-gradient(
       to bottom,
       transparent 0 3rem,
-      color-mix(in oklab, var(--helix-color-foreground-on-accent) 24%, transparent) 3rem 3.0625rem
+      color-mix(in oklab, var(--helix-color-foreground) 24%, transparent) 3rem 3.0625rem
     );
   display: grid;
   gap: var(--helix-space-sm);
@@ -45,7 +51,7 @@
 }
 
 .band helix-text {
-  color: var(--helix-color-foreground-on-accent);
+  color: var(--helix-color-foreground);
 }
 
 .prose {

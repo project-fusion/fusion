@@ -29,12 +29,12 @@
     repeating-linear-gradient(
       to right,
       transparent 0 3rem,
-      color-mix(in oklab, var(--helix-color-foreground-on-accent) 24%, transparent) 3rem 3.0625rem
+      color-mix(in oklab, var(--helix-color-foreground) 24%, transparent) 3rem 3.0625rem
     ),
     repeating-linear-gradient(
       to bottom,
       transparent 0 3rem,
-      color-mix(in oklab, var(--helix-color-foreground-on-accent) 24%, transparent) 3rem 3.0625rem
+      color-mix(in oklab, var(--helix-color-foreground) 24%, transparent) 3rem 3.0625rem
     );
   display: grid;
   gap: var(--helix-space-sm);
@@ -44,7 +44,7 @@
 }
 
 .band helix-text {
-  color: var(--helix-color-foreground-on-accent);
+  color: var(--helix-color-foreground);
 }
 
 .prose {
@@ -77,8 +77,8 @@
    belong together: `data-color-mode="dark"` sets the scheme on this subtree, and
    a plain `surface` under it is neutral-900 in either mode.
 
-   Nothing else in the file moves, because `foreground-on-accent` is neutral-0
-   with no second arm. */
+   The text and the lines are `foreground`, which the same attribute makes
+   light here. */
 .band {
   background-color: var(--helix-color-surface);
 }
