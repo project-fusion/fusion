@@ -10,6 +10,7 @@
 //! stopped when the run ends, whatever the outcome, with its whole process
 //! group, since `npm run start` is a shell that starts the server as a child.
 
+use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 
@@ -359,62 +360,149 @@ fn catalog_pages(source: &CatalogSource, base: &Path) -> Outcome<Vec<(String, St
         .collect())
 }
 
+/// The two sides of each pair a `pairs` source's `prepare` builds, with the
+/// files it asks the harness to serve.
+///
+/// **`changed` is handed to `prepare` and read by nothing here.** Which entries
+/// a change reaches is a fact about the project, such as which components
+/// compose which, so the config decides and returns only those.
+fn pair_entries(
+    index: usize,
+    name: &str,
+    changed: Option<&str>,
+    driver: &mut Driver,
+    serve: &mut BTreeMap<String, PathBuf>,
+) -> Outcome<Vec<Entry>> {
+    let source = || format!("the source `{name}`");
+    let answer = driver
+        .ask(&json!({ "changed": changed, "op": "prepare", "source": name }))
+        .map_err(|why| Failure::input(source(), why))?;
+    if let Some(note) = answer["note"].as_str() {
+        eprintln!("helix: {name}: {note}");
+    }
+    if let Some(mounts) = answer["serve"].as_object() {
+        for (url, path) in mounts {
+            let Some(path) = path.as_str() else {
+                return Err(Failure::input(
+                    source(),
+                    format!("`prepare` serves {url} from something that is not a path"),
+                ));
+            };
+            serve.insert(url.clone(), PathBuf::from(path));
+        }
+    }
+    let listed = answer["pairs"]
+        .as_array()
+        .ok_or_else(|| Failure::input(source(), "`prepare` returned no `pairs` array"))?;
+    let mut out = Vec::new();
+    for pair in listed {
+        let Some(entry) = pair["name"].as_str().filter(|one| !one.is_empty()) else {
+            return Err(Failure::input(
+                source(),
+                format!("a pair has no `name`: {pair}"),
+            ));
+        };
+        for side in ["a", "b"] {
+            let given = &pair[side];
+            if given["body"].as_str().is_none()
+                && given["url"].as_str().is_none()
+                && given["error"].as_str().is_none()
+            {
+                return Err(Failure::input(
+                    source(),
+                    format!(
+                        "the pair `{entry}` gives its side `{side}` no `body`, `url` or `error`"
+                    ),
+                ));
+            }
+        }
+        out.push(Entry {
+            dir: PathBuf::new(),
+            file: None,
+            group: pair["group"].as_str().unwrap_or(entry).to_string(),
+            id: format!("{name}/{entry}"),
+            name: entry.to_string(),
+            sides: Some(Box::new([pair["a"].clone(), pair["b"].clone()])),
+            source: index,
+            stem: String::new(),
+            url: None,
+        });
+    }
+    Ok(out)
+}
+
 /// Every entry of every source, in config order and then in each source's
-/// own order.
+/// own order, and the files the sources ask the harness to serve.
 ///
 /// # Errors
 ///
 /// A source that cannot be listed, or two entries with one id.
-pub fn entries(config: &Config, base: &Path, driver: &mut Driver) -> Outcome<Vec<Entry>> {
+pub fn entries(
+    config: &Config,
+    base: &Path,
+    driver: &mut Driver,
+    changed: Option<&str>,
+) -> Outcome<(Vec<Entry>, BTreeMap<String, PathBuf>)> {
     let mut out: Vec<Entry> = Vec::new();
+    let mut serve = BTreeMap::new();
     for (index, source) in config.sources.iter().enumerate() {
         let name = source.name().to_string();
-        let found: Vec<Entry> = if let Source::Html(html) = source {
-            let root = base.join(&html.root);
-            discover::matches(&root, &html.glob)
-                .map_err(|why| Failure::input(format!("the source `{name}`"), why))?
-                .into_iter()
-                .map(|(entry, file)| Entry {
-                    dir: file.parent().map(Path::to_path_buf).unwrap_or_default(),
-                    id: format!("{name}/{entry}"),
-                    name: entry,
-                    source: index,
-                    stem: file
-                        .file_stem()
-                        .map(|stem| stem.to_string_lossy().into_owned())
-                        .unwrap_or_default(),
-                    file: Some(file),
-                    url: None,
-                })
-                .collect()
-        } else {
-            let pages = match source {
-                Source::Server(one) => server_pages(one, driver)?,
-                Source::Storybook(one) => storybook_pages(one, driver)?,
-                Source::Catalog(one) => catalog_pages(one, base)?,
-                Source::Html(_) => unreachable!("matched above"),
-            };
-            let dir: PathBuf = source
-                .server()
-                .map(|served| base.join(&served.baselines))
-                .unwrap_or_default();
-            pages
-                .into_iter()
-                .map(|(entry, url)| Entry {
-                    dir: dir.clone(),
-                    file: None,
-                    id: format!("{name}/{entry}"),
-                    stem: entry.clone(),
-                    name: entry,
-                    source: index,
-                    url: Some(url),
-                })
-                .collect()
+        let found: Vec<Entry> = match source {
+            Source::Html(html) => {
+                let root = base.join(&html.root);
+                discover::matches(&root, &html.glob)
+                    .map_err(|why| Failure::input(format!("the source `{name}`"), why))?
+                    .into_iter()
+                    .map(|(entry, file)| Entry {
+                        dir: file.parent().map(Path::to_path_buf).unwrap_or_default(),
+                        group: entry.clone(),
+                        id: format!("{name}/{entry}"),
+                        name: entry,
+                        sides: None,
+                        source: index,
+                        stem: file
+                            .file_stem()
+                            .map(|stem| stem.to_string_lossy().into_owned())
+                            .unwrap_or_default(),
+                        file: Some(file),
+                        url: None,
+                    })
+                    .collect()
+            }
+            Source::Pairs(_) => pair_entries(index, &name, changed, driver, &mut serve)?,
+            _ => {
+                let pages = match source {
+                    Source::Server(one) => server_pages(one, driver)?,
+                    Source::Storybook(one) => storybook_pages(one, driver)?,
+                    Source::Catalog(one) => catalog_pages(one, base)?,
+                    Source::Html(_) | Source::Pairs(_) => unreachable!("matched above"),
+                };
+                let dir: PathBuf = source
+                    .server()
+                    .map(|served| base.join(&served.baselines))
+                    .unwrap_or_default();
+                pages
+                    .into_iter()
+                    .map(|(entry, url)| Entry {
+                        dir: dir.clone(),
+                        file: None,
+                        group: entry.clone(),
+                        id: format!("{name}/{entry}"),
+                        sides: None,
+                        stem: entry.clone(),
+                        name: entry,
+                        source: index,
+                        url: Some(url),
+                    })
+                    .collect()
+            }
         };
         for entry in found {
-            if entry.name.is_empty()
-                || entry.name.contains(['/', '\\'])
-                || entry.name.starts_with('.')
+            /* A pair writes no baseline, so its name may carry a path. */
+            if entry.sides.is_none()
+                && (entry.name.is_empty()
+                    || entry.name.contains(['/', '\\'])
+                    || entry.name.starts_with('.'))
             {
                 return Err(Failure::input(
                     format!("the source `{name}`"),
@@ -433,10 +521,17 @@ pub fn entries(config: &Config, base: &Path, driver: &mut Driver) -> Outcome<Vec
             out.push(entry);
         }
     }
-    if out.is_empty() {
+    /* A pairs source whose `prepare` found nothing the change reaches is a
+    run with nothing to do, and says so; every other empty list is a
+    config that matches nothing. */
+    let only_pairs = config
+        .sources
+        .iter()
+        .all(|source| matches!(source, Source::Pairs(_)));
+    if out.is_empty() && !only_pairs {
         return Err(Failure::input("the sources", "they list no entry"));
     }
-    Ok(out)
+    Ok((out, serve))
 }
 
 #[cfg(test)]

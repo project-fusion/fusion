@@ -15,6 +15,7 @@
 //! teaches nothing. An update holds a picture that matched on the second take.
 
 use std::collections::BTreeMap;
+use std::fmt::Write as _;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -31,6 +32,7 @@ use crate::fingerprint::Fingerprint;
 use crate::harness;
 use crate::image;
 use crate::out::say;
+use crate::pairs;
 use crate::report;
 use crate::shard::{self, Shard};
 use crate::sources;
@@ -40,6 +42,9 @@ const NAMES: [&str; 3] = ["visual.config.ts", "visual.config.mjs", "visual.confi
 
 /// What the command line asked for.
 pub struct Options {
+    /// A git ref handed to a pairs source's `prepare`, which decides what a
+    /// change since it reaches.
+    pub changed: Option<String>,
     pub config: Option<PathBuf>,
     pub names: Vec<String>,
     pub shard: Option<Shard>,
@@ -51,7 +56,15 @@ pub struct Options {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Measure {
     Pixels(usize),
-    Similarity { floor: f64, score: f64 },
+    Similarity {
+        floor: f64,
+        score: f64,
+    },
+    /// The two sides of a pair are different sizes.
+    Size {
+        a: (u32, u32),
+        b: (u32, u32),
+    },
 }
 
 impl Measure {
@@ -62,12 +75,13 @@ impl Measure {
             Self::Similarity { floor, score } => {
                 format!("the structural similarity is {score:.4} against a floor of {floor}")
             }
+            Self::Size { a, b } => format!("the two sides are {}x{} and {}x{}", a.0, a.1, b.0, b.1),
         }
     }
 }
 
 /// What became of one shot.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum Fate {
     /// The capture failed, and why.
     Broken(String),
@@ -111,7 +125,7 @@ impl Fate {
 
 /// What the comparison found, before anything is written.
 #[derive(Clone, Copy, Debug, PartialEq)]
-enum Verdict {
+pub(crate) enum Verdict {
     Matched,
     Missing,
     Resized { from: (u32, u32), to: (u32, u32) },
@@ -121,7 +135,7 @@ enum Verdict {
 
 /// Compares a capture with its baseline, by the diff its source uses and
 /// allowing `allowed` pixels in the pixel mode.
-fn judge(
+pub(crate) fn judge(
     baseline: Option<&[u8]>,
     current: &[u8],
     diff: &Diff,
@@ -202,7 +216,7 @@ fn relative(base: &Path, path: &Path) -> String {
         .replace('\\', "/")
 }
 
-fn exception_for<'a>(
+pub(crate) fn exception_for<'a>(
     exceptions: &'a [Exception],
     entry: &Entry,
     shot: &Shot,
@@ -224,9 +238,13 @@ fn paths(entry: &Entry, shot: &Shot) -> (PathBuf, PathBuf) {
 
 /// One shot in the shape the driver takes. The harness rules are for an HTML
 /// entry, which the harness wrote the document of.
-fn shot_request(config: &Config, entry: &Entry, shot: &Shot) -> Value {
+pub(crate) fn shot_request(config: &Config, entry: &Entry, shot: &Shot) -> Value {
     let harness = match &config.sources[entry.source] {
         Source::Html(html) => html
+            .harness
+            .resolved()
+            .map(|harness| harness::css(&harness, shot)),
+        Source::Pairs(pairs) => pairs
             .harness
             .resolved()
             .map(|harness| harness::css(&harness, shot)),
@@ -242,11 +260,16 @@ fn shot_request(config: &Config, entry: &Entry, shot: &Shot) -> Value {
 }
 
 /// One entry, with the shots to take of it, in the shape the driver takes.
-fn item(config: &Config, entry: &Entry, shots: &[&Shot], inspect: bool) -> Outcome<Value> {
+/// `first` is its first take, the one the page is inspected, checked and
+/// snapshotted on; a second take only pictures.
+fn item(config: &Config, entry: &Entry, shots: &[&Shot], first: bool) -> Outcome<Value> {
     let source = &config.sources[entry.source];
+    let code = config.checks.code.resolved().filter(|_| first);
     let mut out = json!({
+        "aria": first && config.aria,
+        "checks": { "code": code.map(|check| json!({ "minimum": check.minimum, "selector": check.selector })) },
         "entry": { "file": entry.file, "id": entry.id, "name": entry.name, "source": source.name(), "url": entry.url },
-        "inspect": inspect,
+        "inspect": first && config.inspect,
         "key": entry.id,
         "shots": shots.iter().map(|shot| shot_request(config, entry, shot)).collect::<Vec<_>>(),
     });
@@ -268,6 +291,7 @@ fn item(config: &Config, entry: &Entry, shots: &[&Shot], inspect: bool) -> Outco
             .resolved()
             .map(|harness| harness::css(&harness, shots[0]))
             .as_deref(),
+        "",
         &body,
     );
     let files: BTreeMap<&String, String> = html
@@ -284,14 +308,22 @@ fn item(config: &Config, entry: &Entry, shots: &[&Shot], inspect: bool) -> Outco
 
 /// The pictures one capture request produced, by entry and shot index, with
 /// the seconds each entry took and the failures the driver reported.
-struct Captured {
-    broken: BTreeMap<usize, String>,
-    pictures: BTreeMap<(usize, usize), Vec<u8>>,
-    seconds: BTreeMap<usize, f64>,
+pub(crate) struct Captured {
+    /// Each page's accessibility snapshot, when the config keeps them.
+    pub(crate) aria: BTreeMap<usize, String>,
+    pub(crate) broken: BTreeMap<usize, String>,
+    /// Console errors each page logged, for a pair's sides.
+    pub(crate) errors: BTreeMap<usize, Vec<String>>,
+    /// What the config's page checks found on each page.
+    pub(crate) findings: BTreeMap<usize, Vec<String>>,
+    pub(crate) pictures: BTreeMap<(usize, usize), Vec<u8>>,
+    /// What a pairs source's `check` found on each page.
+    pub(crate) problems: BTreeMap<usize, Vec<String>>,
+    pub(crate) seconds: BTreeMap<usize, f64>,
 }
 
 /// Sends a capture and reads every line it streams back.
-fn capture(
+pub(crate) fn capture(
     driver: &mut Driver,
     items: &[Value],
     keys: &BTreeMap<String, usize>,
@@ -303,8 +335,12 @@ fn capture(
         .send(&json!({ "elements": elements, "items": items, "op": "capture", "readyProperty": ready }))
         .map_err(internal)?;
     let mut captured = Captured {
+        aria: BTreeMap::new(),
         broken: BTreeMap::new(),
+        errors: BTreeMap::new(),
+        findings: BTreeMap::new(),
         pictures: BTreeMap::new(),
+        problems: BTreeMap::new(),
         seconds: BTreeMap::new(),
     };
     loop {
@@ -341,6 +377,23 @@ fn capture(
                     .insert(entry, line["seconds"].as_f64().unwrap_or(0.0));
                 if let Some(error) = line["error"].as_str() {
                     captured.broken.insert(entry, error.to_string());
+                }
+                let strings = |field: &str| -> Vec<String> {
+                    line[field]
+                        .as_array()
+                        .map(|all| {
+                            all.iter()
+                                .filter_map(Value::as_str)
+                                .map(str::to_string)
+                                .collect()
+                        })
+                        .unwrap_or_default()
+                };
+                captured.errors.insert(entry, strings("errors"));
+                captured.problems.insert(entry, strings("problems"));
+                captured.findings.insert(entry, strings("findings"));
+                if let Some(snapshot) = line["aria"].as_str() {
+                    captured.aria.insert(entry, snapshot.to_string());
                 }
             }
             _ => {
@@ -435,8 +488,27 @@ pub fn run(options: &Options) -> Outcome<Code> {
     /* Before discovery, because a sitemap and a Storybook index are read from
     the server that serves them. */
     let servers = sources::start(&config, &base, &mut driver)?;
-    let every = sources::entries(&config, &base, &mut driver)?;
-    for exception in &config.exceptions {
+    let (mut every, offered) =
+        sources::entries(&config, &base, &mut driver, options.changed.as_deref())?;
+    /* A pair keeps no baseline, so an update has nothing of it to write. */
+    if options.update {
+        every.retain(|entry| entry.sides.is_none());
+        if every.is_empty() {
+            driver.close();
+            return Ok(report::stopped(
+                true,
+                false,
+                "helix: every entry is a pair, which compares two renders and keeps no baseline, so there is nothing to update.",
+            ));
+        }
+    }
+    /* Only an unscoped list is the whole of it: a pairs source scoped by
+    `--changed` leaves out entries an exception may rightly name. */
+    for exception in config
+        .exceptions
+        .iter()
+        .filter(|_| options.changed.is_none())
+    {
         if !every
             .iter()
             .any(|entry| entry.id == exception.entry || entry.name == exception.entry)
@@ -450,7 +522,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
     for name in &options.names {
         if !every
             .iter()
-            .any(|entry| entry.id == *name || entry.name == *name)
+            .any(|entry| entry.id == *name || entry.name == *name || entry.group == *name)
         {
             return Err(Failure::input(
                 format!("`{name}`"),
@@ -465,7 +537,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
                 || options
                     .names
                     .iter()
-                    .any(|name| *name == entry.id || *name == entry.name)
+                    .any(|name| *name == entry.id || *name == entry.name || *name == entry.group)
         })
         .collect();
 
@@ -486,7 +558,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
             for entry in &named {
                 #[allow(clippy::cast_precision_loss)] // A count of shots.
                 let shots = taken(entry).len() as f64;
-                *weights.entry(entry.name.clone()).or_default() += config.shard.per_shot * shots;
+                *weights.entry(entry.group.clone()).or_default() += config.shard.per_shot * shots;
             }
             for (name, weight) in &mut weights {
                 if let Some(measured) = config.shard.cost.get(name) {
@@ -496,7 +568,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
             let placed = shard::assign(&weights, asked.of);
             named
                 .into_iter()
-                .filter(|entry| placed.get(&entry.name) == Some(&asked.index))
+                .filter(|entry| placed.get(&entry.group) == Some(&asked.index))
                 .collect()
         }
     };
@@ -510,10 +582,13 @@ pub fn run(options: &Options) -> Outcome<Code> {
         return Ok(report::stopped(
             options.update,
             false,
-            &format!(
-                "helix: {} holds none of the entries, which the other shards picture.",
-                options.shard.map(Shard::label).unwrap_or_default()
-            ),
+            &match options.shard {
+                Some(asked) => format!(
+                    "helix: {} holds none of the entries, which the other shards picture.",
+                    asked.label()
+                ),
+                None => "helix: no entry is in this run, so nothing was compared.".to_string(),
+            },
         ));
     }
 
@@ -529,6 +604,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
         }
         serve.insert(url.clone(), on_disk);
     }
+    serve.extend(offered);
 
     let fingerprint_path = base.join(&config.fingerprint);
     let recorded: Option<Fingerprint> = match fs::read_to_string(&fingerprint_path) {
@@ -566,6 +642,9 @@ pub fn run(options: &Options) -> Outcome<Code> {
     let here = Fingerprint::here(started["browser"].as_str().unwrap_or("unknown"));
 
     let whole = options.names.is_empty() && options.shard.is_none();
+    /* A run of pairs alone compares no baseline, so no environment is part of
+    its answer. */
+    let baselined = mine.iter().any(|entry| entry.sides.is_none());
     let retake = config
         .retake
         .clone()
@@ -573,6 +652,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
     let differences = recorded.as_ref().map(|taken| here.differences(taken));
     let mut write_fingerprint = false;
     match (&differences, options.update) {
+        _ if !baselined => {}
         (Some(found), _) if found.is_empty() => {}
         (_, true) if whole => write_fingerprint = true,
         (None, true) => {
@@ -635,13 +715,13 @@ pub fn run(options: &Options) -> Outcome<Code> {
         config.settle.elements.as_deref(),
     );
     let mut items = Vec::new();
-    for entry in &mine {
+    for entry in mine.iter().filter(|entry| entry.sides.is_none()) {
         let shots: Vec<&Shot> = taken(entry)
             .into_iter()
             .map(|at| &config.shots[at])
             .collect();
         if !shots.is_empty() {
-            items.push(item(&config, entry, &shots, config.inspect)?);
+            items.push(item(&config, entry, &shots, true)?);
         }
     }
     let first = capture(&mut driver, &items, &keys, &config.shots, ready)?;
@@ -656,7 +736,11 @@ pub fn run(options: &Options) -> Outcome<Code> {
     let mut results: BTreeMap<(usize, usize), Fate> = BTreeMap::new();
     let mut currents: BTreeMap<(usize, usize), Vec<u8>> = BTreeMap::new();
     let mut again: Vec<(usize, usize)> = Vec::new();
-    for (at, entry) in mine.iter().enumerate() {
+    for (at, entry) in mine
+        .iter()
+        .enumerate()
+        .filter(|(_, entry)| entry.sides.is_none())
+    {
         for shot in taken(entry) {
             let picture = &config.shots[shot];
             if let Some(why) = first.broken.get(&at) {
@@ -693,6 +777,56 @@ pub fn run(options: &Options) -> Outcome<Code> {
             }
         }
     }
+
+    /* The accessibility snapshot, one an entry, judged as text against the
+    file beside its baselines and kept in the results under an index past
+    the last shot. A page that broke has none to judge. */
+    let aria = config.shots.len();
+    if config.aria {
+        for (at, entry) in mine
+            .iter()
+            .enumerate()
+            .filter(|(_, entry)| entry.sides.is_none())
+        {
+            let Some(snapshot) = first.aria.get(&at) else {
+                continue;
+            };
+            let file = aria_path(entry);
+            let fate = match fs::read_to_string(&file).ok() {
+                Some(kept) if kept == *snapshot => {
+                    if options.update {
+                        Fate::Held
+                    } else {
+                        Fate::Matched
+                    }
+                }
+                _ if options.update => {
+                    let why = if file.exists() {
+                        "it differs"
+                    } else {
+                        "it had no snapshot"
+                    };
+                    write(&file, snapshot.as_bytes())?;
+                    Fate::Written(why)
+                }
+                None => Fate::Missing,
+                Some(kept) => Fate::Broken(aria_difference(&kept, snapshot)),
+            };
+            results.insert((at, aria), fate);
+        }
+    }
+    let findings: Vec<String> = mine
+        .iter()
+        .enumerate()
+        .flat_map(|(at, entry)| {
+            first
+                .findings
+                .get(&at)
+                .into_iter()
+                .flatten()
+                .map(move |finding| format!("{}: {finding}", entry.id))
+        })
+        .collect();
 
     if !again.is_empty() {
         let mut items = Vec::new();
@@ -756,6 +890,23 @@ pub fn run(options: &Options) -> Outcome<Code> {
         }
     }
 
+    let paired: Vec<(usize, &Entry, Vec<usize>)> = mine
+        .iter()
+        .enumerate()
+        .filter(|(_, entry)| entry.sides.is_some())
+        .map(|(at, entry)| (at, *entry, taken(entry)))
+        .collect();
+    let compared = if paired.is_empty() {
+        None
+    } else {
+        Some(pairs::compare(&mut driver, &config, &paired, ready)?)
+    };
+    if let Some(compared) = &compared {
+        for (key, fate) in &compared.fates {
+            results.insert(*key, fate.clone());
+        }
+    }
+
     let inspected_failed = if config.inspect {
         let finished = driver
             .ask(&json!({ "op": "finish", "update": options.update }))
@@ -769,8 +920,9 @@ pub fn run(options: &Options) -> Outcome<Code> {
 
     if let Some(timings) = &config.timings {
         let mut by_name: BTreeMap<&str, f64> = BTreeMap::new();
-        for (at, seconds) in &first.seconds {
-            *by_name.entry(mine[*at].name.as_str()).or_default() += seconds;
+        let paired_seconds = compared.iter().flat_map(|one| one.seconds.iter());
+        for (at, seconds) in first.seconds.iter().chain(paired_seconds) {
+            *by_name.entry(mine[*at].group.as_str()).or_default() += seconds;
         }
         let text = serde_json::to_string_pretty(&by_name).unwrap_or_default() + "\n";
         write(&base.join(timings), text.as_bytes())?;
@@ -779,7 +931,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
     /* The diff image of a shot that no longer differs is from a run that is
     over, and uploading it would show a failure that is not this one. */
     for (&(at, shot), result) in &results {
-        if !matches!(result, Fate::Differs { .. }) {
+        if shot != aria && mine[at].sides.is_none() && !matches!(result, Fate::Differs { .. }) {
             let (_, marked) = paths(mine[at], &config.shots[shot]);
             let _ = fs::remove_file(marked);
         }
@@ -809,15 +961,47 @@ pub fn run(options: &Options) -> Outcome<Code> {
     let rows = results
         .iter()
         .map(|(&(at, shot), fate)| {
+            let source = &config.sources[mine[at].source];
+            if let Source::Pairs(pairs) = source {
+                let pictures = compared
+                    .as_ref()
+                    .and_then(|one| one.pictures.get(&(at, shot)));
+                return report::Row {
+                    baseline: report::Picture::Bytes(pictures.map(|(a, _, _)| a.as_slice())),
+                    current: pictures.map(|(_, b, _)| b.as_slice()),
+                    diff: report::Picture::Bytes(pictures.and_then(|(_, _, diff)| diff.as_deref())),
+                    entry: &mine[at].id,
+                    fate,
+                    labels: [pairs.labels[0].as_str(), pairs.labels[1].as_str()],
+                    pair: true,
+                    shot: &config.shots[shot].name,
+                    source: source.name(),
+                };
+            }
+            if shot == aria {
+                return report::Row {
+                    baseline: report::Picture::File(None),
+                    current: None,
+                    diff: report::Picture::File(None),
+                    entry: &mine[at].id,
+                    fate,
+                    labels: ["Kept", "Taken"],
+                    pair: false,
+                    shot: "accessibility",
+                    source: source.name(),
+                };
+            }
             let (baseline, marked) = paths(mine[at], &config.shots[shot]);
             report::Row {
-                baseline,
+                baseline: report::Picture::File(Some(baseline)),
                 current: currents.get(&(at, shot)).map(Vec::as_slice),
-                diff: matches!(fate, Fate::Differs { .. }).then_some(marked),
+                diff: report::Picture::File(matches!(fate, Fate::Differs { .. }).then_some(marked)),
                 entry: &mine[at].id,
                 fate,
+                labels: ["Baseline", "Capture"],
+                pair: false,
                 shot: &config.shots[shot].name,
-                source: config.sources[mine[at].source].name(),
+                source: source.name(),
             }
         })
         .collect();
@@ -825,6 +1009,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
         base: &base,
         dir: base.join(&config.report),
         entries: mine.len(),
+        findings,
         fingerprint: write_fingerprint.then_some(fingerprint_path),
         inspected_failed,
         retake: &retake,
@@ -833,6 +1018,45 @@ pub fn run(options: &Options) -> Outcome<Code> {
         skipped,
         update: options.update,
     }))
+}
+
+/// Where an entry's accessibility snapshot is kept: beside its baselines, as
+/// `<stem>.aria.yml`.
+fn aria_path(entry: &Entry) -> PathBuf {
+    entry.dir.join(format!("{}.aria.yml", entry.stem))
+}
+
+/// The lines two accessibility snapshots do not share, the first few of each,
+/// as a sentence.
+fn aria_difference(kept: &str, taken: &str) -> String {
+    let gone: Vec<&str> = kept
+        .lines()
+        .filter(|line| !taken.lines().any(|one| one == *line))
+        .collect();
+    let new: Vec<&str> = taken
+        .lines()
+        .filter(|line| !kept.lines().any(|one| one == *line))
+        .collect();
+    let sample = |lines: &[&str]| {
+        lines
+            .iter()
+            .take(3)
+            .map(|line| line.trim())
+            .collect::<Vec<_>>()
+            .join(" | ")
+    };
+    let mut said = String::from("the accessibility snapshot differs from the one kept");
+    if !gone.is_empty() {
+        let _ = write!(said, "; {} gone: {}", gone.len(), sample(&gone));
+    }
+    if !new.is_empty() {
+        let _ = write!(said, "; {} new: {}", new.len(), sample(&new));
+    }
+    if gone.is_empty() && new.is_empty() {
+        said.push_str(", in the order of its lines");
+    }
+    said.push('.');
+    said
 }
 
 /// What a first-take verdict that needs no second take becomes, writing the
@@ -870,7 +1094,7 @@ fn settle(
     })
 }
 
-fn write(path: &Path, bytes: &[u8]) -> Outcome<()> {
+pub(crate) fn write(path: &Path, bytes: &[u8]) -> Outcome<()> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).map_err(|error| {
             Failure::input(
@@ -906,6 +1130,17 @@ mod tests {
 
     fn pixel() -> Diff {
         Diff::default()
+    }
+
+    #[test]
+    fn an_accessibility_difference_names_the_lines_each_side_lacks() {
+        let kept = "- heading \"Save\"\n- button \"Save\"\n";
+        let taken = "- heading \"Save\"\n- button \"Saved\"\n";
+        assert_eq!(
+            aria_difference(kept, taken),
+            "the accessibility snapshot differs from the one kept; 1 gone: - button \"Save\"; 1 new: - button \"Saved\"."
+        );
+        assert!(aria_difference("- a\n- b\n", "- b\n- a\n").ends_with("in the order of its lines."));
     }
 
     #[test]
@@ -971,6 +1206,7 @@ mod tests {
 
     fn exception(pixels: Option<usize>) -> Exception {
         Exception {
+            differs: false,
             entry: "a".to_string(),
             measured: Some("3 pixels on 4 runs".to_string()),
             pixels,

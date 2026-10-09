@@ -28,6 +28,7 @@ mod fingerprint;
 mod harness;
 mod image;
 mod out;
+mod pairs;
 mod report;
 mod run;
 mod shard;
@@ -65,6 +66,10 @@ fn shipped() -> &'static str {
 /// What `test` and `update` share.
 #[derive(Debug, clap::Args)]
 pub struct Selection {
+    /// A git ref, handed to a pairs source's `prepare`, which decides what
+    /// a change since it reaches.
+    #[arg(long, value_name = "REF")]
+    changed: Option<String>,
     /// The config file. `visual.config.ts`, `.mjs` or `.js` in the working
     /// directory when not given.
     #[arg(long, value_name = "PATH")]
@@ -95,6 +100,7 @@ impl Selection {
             _ => None,
         };
         Ok(run::Options {
+            changed: self.changed.clone(),
             config: self.config.clone(),
             names: self.entries.clone(),
             shard,

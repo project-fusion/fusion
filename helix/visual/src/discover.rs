@@ -28,6 +28,9 @@ pub struct Entry {
     pub dir: PathBuf,
     /// The HTML file, for an entry the harness serves.
     pub file: Option<PathBuf>,
+    /// What the entry is packed into shards and timed by: its name, or the
+    /// group a pair's `prepare` gave it, such as a component family.
+    pub group: String,
     /// `source/name`, unique across the run.
     pub id: String,
     /// What the glob named it: one name may have an entry in several sources.
@@ -37,6 +40,8 @@ pub struct Entry {
     /// What the baselines' file names start with: an HTML file's name
     /// without its extension, or the entry's name.
     pub stem: String,
+    /// The two sides of a pair, as its source's `prepare` described them.
+    pub sides: Option<Box<[serde_json::Value; 2]>>,
     /// The page's address, for an entry on a server.
     pub url: Option<String>,
 }
