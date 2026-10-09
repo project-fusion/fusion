@@ -26,6 +26,10 @@ const fn target(client: Client) -> (&'static str, &'static str) {
         Client::Claude => (".mcp.json", "mcpServers"),
         Client::Cursor => (".cursor/mcp.json", "mcpServers"),
         Client::Vscode => (".vscode/mcp.json", "servers"),
+        Client::Gemini => (".gemini/settings.json", "mcpServers"),
+        Client::Opencode => ("opencode.json", "mcp"),
+        Client::Roo => (".roo/mcp.json", "mcpServers"),
+        Client::Junie => (".junie/mcp/mcp.json", "mcpServers"),
     }
 }
 
@@ -34,7 +38,15 @@ fn entry(client: Client) -> Value {
     let args = json!(["@fusion.dev/helix-cli", "mcp"]);
     match client {
         Client::Vscode => json!({ "args": args, "command": "npx", "type": "stdio" }),
-        Client::Claude | Client::Cursor => json!({ "args": args, "command": "npx" }),
+        /* One array, the command first, and on until turned off. */
+        Client::Opencode => json!({
+            "command": ["npx", "@fusion.dev/helix-cli", "mcp"],
+            "enabled": true,
+            "type": "local",
+        }),
+        Client::Claude | Client::Cursor | Client::Gemini | Client::Roo | Client::Junie => {
+            json!({ "args": args, "command": "npx" })
+        }
     }
 }
 
@@ -121,5 +133,9 @@ const fn name(client: Client) -> &'static str {
         Client::Claude => "claude",
         Client::Cursor => "cursor",
         Client::Vscode => "vscode",
+        Client::Gemini => "gemini",
+        Client::Opencode => "opencode",
+        Client::Roo => "roo",
+        Client::Junie => "junie",
     }
 }

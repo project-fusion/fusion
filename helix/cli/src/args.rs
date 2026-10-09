@@ -475,6 +475,14 @@ pub enum Client {
     Cursor,
     /// VS Code: `.vscode/mcp.json`.
     Vscode,
+    /// Gemini CLI: `.gemini/settings.json`.
+    Gemini,
+    /// opencode: `opencode.json`.
+    Opencode,
+    /// Roo Code: `.roo/mcp.json`.
+    Roo,
+    /// Junie: `.junie/mcp/mcp.json`.
+    Junie,
 }
 
 /// What can be asked of the installed packages.

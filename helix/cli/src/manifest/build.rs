@@ -870,13 +870,18 @@ fn replaced(selector: &str) -> bool {
         .map_or((selector, ""), |at| selector.split_at(at));
     let tag_ok = !tag.is_empty()
         && tag.starts_with(|one: char| one.is_ascii_lowercase())
-        && tag.chars().all(|one| one.is_ascii_lowercase() || one.is_ascii_digit());
+        && tag
+            .chars()
+            .all(|one| one.is_ascii_lowercase() || one.is_ascii_digit());
     let rest_ok = rest.is_empty()
         || rest
             .strip_prefix("[type=")
             .and_then(|one| one.strip_suffix(']'))
             .is_some_and(|kind| {
-                !kind.is_empty() && kind.chars().all(|one| one.is_ascii_lowercase() || one == '-')
+                !kind.is_empty()
+                    && kind
+                        .chars()
+                        .all(|one| one.is_ascii_lowercase() || one == '-')
             });
     tag_ok && rest_ok
 }
