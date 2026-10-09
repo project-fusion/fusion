@@ -93,6 +93,30 @@
   grid-area: switch;
 }
 
+/**
+ * **On a phone the switch keeps its name for a screen reader and gives its
+ * width to the views.** Four views and the word "Showing" do not fit across
+ * 390, and the fourth wrapped onto a row of its own. The label is clipped the
+ * way `[data-hidden-visually]` clips, so it still names the group.
+ */
+@media (width < 30rem) {
+  .showcaseSwitch::part(label) {
+    block-size: 1px;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+  }
+
+  /* The rule that divides the label from the views, with no label to divide. */
+  .showcaseSwitch::part(track)::before {
+    display: none;
+  }
+}
+
 /*
  * *No `align-items` on the grid, only on the row that wants it.**
  *
@@ -165,6 +189,23 @@
 
 /* The ring at the size of the cell it is in, not the size a page would give
    it. */
+/**
+ * **One plot height for all four charts with depth.** The drawings scale with
+ * the card's width, so a taller plot only adds empty ground round them:
+ * measured at 22rem, the surface drew at the same size with 100px of nothing
+ * round it. Below this the height binds instead and the drawings shrink: at
+ * 10rem the axis names were too small to read. At 12rem the view is 574 at
+ * 1440, against 460 to 526 for the other views, and 637 at 1024, where the
+ * controls view is 669, so the panel moves little when the cycle reaches it.
+ */
+.showcaseSpatial {
+  --spatial-bar-chart-block-size: var(--_showcase-spatial);
+  --spatial-scatter-chart-block-size: var(--_showcase-spatial);
+  --spatial-surface-chart-block-size: var(--_showcase-spatial);
+  --spatial-treemap-block-size: var(--_showcase-spatial);
+  --_showcase-spatial: 12rem;
+}
+
 .showcaseRing {
   --donut-chart-size: 8rem;
 }
