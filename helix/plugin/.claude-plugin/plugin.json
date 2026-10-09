@@ -1,0 +1,14 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "helix",
+  "version": "0.187.0",
+  "description": "Helix for Claude Code: the guide to writing pages with Helix's web components, and the Helix MCP server, which looks up the installed packages and checks the code and the page you wrote.",
+  "author": {
+    "name": "Fusion",
+    "url": "https://fusion.dev"
+  },
+  "homepage": "https://fusion.dev/helix/docs/using-helix-with-an-agent",
+  "repository": "https://github.com/project-fusion/fusion",
+  "license": "MIT",
+  "keywords": ["helix", "design-system", "web-components", "mcp"]
+}

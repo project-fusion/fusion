@@ -245,6 +245,17 @@ if (flag('write')) {
     written.push(crate)
   }
 
+  /* **The domain's Claude Code plugin**, where it has one, at the same
+     number: a plugin installed from this repository says which release it
+     came with. */
+  const plugin = join(root, DOMAINS[domain], 'plugin/.claude-plugin/plugin.json')
+  if (existsSync(plugin)) {
+    const manifest = JSON.parse(readFileSync(plugin, 'utf8'))
+    manifest.version = version
+    writeFileSync(plugin, `${JSON.stringify(manifest, null, 2)}\n`)
+    written.push(`${DOMAINS[domain]}/plugin`)
+  }
+
   console.error(`${domain} ${version}: stamped ${written.length} manifests (${written.join(', ')})`)
 }
 

@@ -241,6 +241,21 @@ A recipe sets appearance only. It has none of these:
 
 If you are adding a script to a recipe, use the component.
 
+## Install the Claude Code plugin
+
+In Claude Code, one plugin gives you both this guide and the Helix MCP server:
+
+```sh
+claude plugin marketplace add project-fusion/fusion
+claude plugin install helix@fusion
+```
+
+The plugin's guide follows the latest release of Helix, and points to the copy
+in `node_modules` that matches the version you installed. Its MCP server runs
+`npx @fusion.dev/helix-cli mcp`, the command line your project installs, so the
+answers are your version's. In other tools, link the guide and install the
+server as the next two sections describe.
+
 ## Link your tool to this guide
 
 **Point your tool at the guide, and do not copy it.** A copy starts to go stale
