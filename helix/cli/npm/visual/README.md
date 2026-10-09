@@ -127,7 +127,8 @@ export default defineConfig({
 - **`checks.contrast`**: fails a run on an ink below WCAG 2.1 AA against the
   ground it is painted on, in each color scheme the shots picture. The ground
   is composited through every translucent layer, and a ground that is a
-  picture or a video is not judged. `rules` names the colors of lines that
+  picture or a video is not judged. Text hidden from the accessibility tree is
+  a glyph for the eye, and answers to the 3:1 of a graphic. `rules` names the colors of lines that
   separate, which answer to no target.
 - Each check takes `ignore`, selectors it leaves alone with everything inside
   them, and an exception's `checks` excuses one entry from the checks it names.

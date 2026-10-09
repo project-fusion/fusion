@@ -683,7 +683,18 @@ export const readPage = (page, options) =>
         }
         const size = Number.parseFloat(style.fontSize)
         const bold = Number.parseInt(style.fontWeight, 10) >= 700
-        const wanted = !text || size >= large || (bold && size >= largeBold) ? component : target
+        /* **Text hidden from the accessibility tree is a glyph drawn for the
+           eye**, an arrow beside a link's words, and a graphic answers to the
+           graphic's target. */
+        let drawn = false
+        for (let at = element; at; at = up(at)) {
+          if (at.nodeType === Node.ELEMENT_NODE && at.getAttribute('aria-hidden') === 'true') {
+            drawn = true
+            break
+          }
+        }
+        const wanted =
+          !text || drawn || size >= large || (bold && size >= largeBold) ? component : target
         const flat = ink.a === 1 ? ink : over(ink, ground.color)
         const measured = ratio(flat, ground.color)
         if (measured < wanted) {
