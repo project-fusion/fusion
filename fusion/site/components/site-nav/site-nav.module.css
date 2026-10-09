@@ -105,3 +105,172 @@
   background-color: var(--helix-color-surface-raised);
   color: var(--helix-color-foreground);
 }
+
+/* ------------------------------------------------------------ the band ---- */
+
+/* Two regions: the tiles, and the column of text links past a rule. Side by
+   side from the page's measure up, and stacked below it, where the column
+   turns into a row of links under the tiles. The panel's own grid is
+   `auto-fit` columns of one size, which is right for a panel of lists and
+   wrong for a band whose left half is a grid of pictures, so the tracks are
+   restated at both widths: measured at 820, the component's tracks put the
+   column beside two tiles to a row and the band ran to 727 pixels.
+
+   **A measure and a column width, named here and never written into the
+   tracks**, for the reason `site.css` gives: a raw length in a spacing property
+   reads as a token that got away. 80rem is the page's own measure, which the
+   band needs where the panel of lists wanted 52: five tiles and a column of
+   sentences do not fit in 832 pixels. */
+.navPanel::part(surface) {
+  --site-panel-column: 16rem;
+  --site-panel-measure: 80rem;
+
+  column-gap: var(--helix-space-2xl);
+  grid-auto-flow: row;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--helix-space-xl);
+}
+
+@media (width >= 80rem) {
+  .navPanel::part(surface) {
+    grid-template-columns: minmax(0, 1fr) var(--site-panel-column);
+  }
+}
+
+/* Five tiles to a row wherever the bar is shown, and never a row of four and
+   one alone under it: `auto-fit` collapses the tracks nothing fills, so the
+   five stretch to whatever is there. 7rem is the narrowest a tile goes, at
+   768, where "Graph" and its stage still fit on one line. */
+.tiles {
+  --site-tile-min: 7rem;
+
+  display: grid;
+  gap: var(--helix-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(var(--site-tile-min), 1fr));
+}
+
+/* A picture, a name and a sentence, stacked. **These anchors sit inside the
+   nav, so they match `helix-navigation a`**, which fills the bar's height,
+   centers one word and refuses to wrap it: each of those is undone here, the
+   way the base layer's own row recipe undoes them for a row. No inset of its
+   own, since a hover paints nothing and the ring is drawn outside. */
+.tile {
+  align-content: start;
+  block-size: auto;
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  display: grid;
+  font-weight: var(--helix-weight-regular);
+  gap: var(--helix-space-2xs);
+  justify-content: stretch;
+  justify-items: start;
+  padding: var(--helix-space-none);
+  text-decoration: none;
+  white-space: normal;
+}
+
+/* Pointing at a tile plays its picture and darkens its sentence, and paints
+   nothing behind it: the bar's own 5% wash is a strip behind a word, and
+   behind a picture it is a gray card. */
+.tile:hover {
+  background-color: transparent;
+}
+
+.tile:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The picture. The gallery frame carries no border and no radius of its own,
+   a card clipping it to a corner, so here it gets the hairline and the corner
+   a card would have given it. The page's own ground, so on the glass sheet it
+   reads as a picture of a page. */
+.tile > :global(.componentArt) {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  inline-size: 100%;
+  margin-block-end: var(--helix-space-2xs);
+  transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Where you are, said on the picture's edge. A tile has no leading cell for
+   the row recipe's dot, and a dot beside a picture reads as a bullet. */
+.tile[aria-current="page"] > :global(.componentArt) {
+  border-color: var(--helix-color-primary);
+}
+
+/* The name, with its stage beside it where it carries one. `1lh` for the
+   reason `site.css` gives the rows: a tag is taller than the text, and a flex
+   line grows to its tallest item. */
+.tileName {
+  align-items: center;
+  block-size: 1lh;
+  display: flex;
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-semibold);
+  gap: var(--helix-space-sm);
+}
+
+.tileSummary {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.tile:hover .tileSummary {
+  color: var(--helix-color-foreground);
+}
+
+/* The text links. Under the tiles they are a row past a rule across the top,
+   as many to a line as fit; beside them they are the column the panel has
+   always had, past a rule down the side. `div.column` and not `.column`,
+   because the base layer's group recipe is an attribute selector of the same
+   weight and the one written later would win. */
+div.column {
+  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+  display: grid;
+  gap: var(--helix-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(var(--site-panel-column), 1fr));
+  padding-block-start: var(--helix-space-md);
+}
+
+/* The rows no longer touch, so the pull that made two touching rows share
+   their band comes off, at a weight that beats the base layer's pair. And the
+   rows hang out by their own inset, the dot's cell and the gap after it, so
+   their names start where the tiles do: measured at 1024 with the pull
+   absent, the tiles at 48 and "Docs" at 80. */
+div.column > [data-megamenu-item] {
+  /* Every row in the line is as tall as the tallest, and a row's own tracks
+     must not share that height out: measured at 1024, a one-line sentence sat
+     ten pixels lower than its two-line neighbors because the name's track had
+     taken the slack. */
+  align-content: start;
+  margin-inline-start: calc(
+    (var(--helix-space-sm) + var(--helix-space-xs) + var(--helix-space-sm)) *
+    -1
+  );
+}
+
+div.column > [data-megamenu-item] + [data-megamenu-item] {
+  margin-block-start: var(--helix-space-none);
+}
+
+@media (width >= 80rem) {
+  div.column {
+    border-block-start: 0;
+    border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--helix-space-xs);
+    padding-block-start: var(--helix-space-none);
+    padding-inline-start: var(--helix-space-xl);
+  }
+
+  div.column > [data-megamenu-item] {
+    margin-inline-start: var(--helix-space-none);
+  }
+
+  div.column > [data-megamenu-item] + [data-megamenu-item] {
+    margin-block-start: calc(var(--helix-space-xs) * -1);
+  }
+}
