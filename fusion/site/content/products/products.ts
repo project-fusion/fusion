@@ -181,7 +181,7 @@ export const PRODUCTS: Product[] = [
          destinations people want, not for a tidy model of the routes. */
       {
         href: '/helix/docs',
-        summary: 'Install Helix, build a theme, and learn how it works.',
+        summary: 'How to install and use Helix.',
         title: 'Docs',
       },
       /* The rest of the text column. Docs is the front door, and these two
@@ -191,30 +191,30 @@ export const PRODUCTS: Product[] = [
          link to a thing and never to a position in a list. */
       {
         href: '/helix/docs/installation',
-        summary: 'What to install, and the order of the stylesheets.',
+        summary: 'What to install, in what order.',
         title: 'Installation',
       },
       {
         href: '/helix/docs/theming',
-        summary: 'Compute a complete token set from your brand color.',
+        summary: 'Tokens from your brand color.',
         title: 'Deriving a theme',
       },
       {
         href: '/helix/components',
         picture: 'components',
-        summary: 'Every component, with its API and a live example.',
+        summary: 'Every component and its API.',
         title: 'Components',
       },
       {
         href: '/helix/sandbox',
         picture: 'sandbox',
-        summary: 'Edit an example and see the result beside the code.',
+        summary: 'Edit code, see the result.',
         title: 'Sandbox',
       },
       {
         href: '/helix/theme',
         picture: 'theme',
-        summary: 'Build a palette from your brand color and check its contrast.',
+        summary: 'A palette from your brand.',
         title: 'Theme builder',
       },
       /* A part of Helix rather than a third product: its argument is Helix's,
@@ -225,7 +225,7 @@ export const PRODUCTS: Product[] = [
         href: '/helix/maps',
         picture: 'map',
         stage: 'Building',
-        summary: 'Interactive maps in your brand’s colors.',
+        summary: 'Maps in your brand’s colors.',
         title: 'Maps',
       },
       /* Beside Maps, for Maps' reason: its argument is Helix's, a graph in
@@ -235,7 +235,7 @@ export const PRODUCTS: Product[] = [
         href: '/helix/graph',
         picture: 'graph',
         stage: 'Building',
-        summary: 'Interactive graphs in your brand’s colors, in 2D and 3D.',
+        summary: 'Graphs in 2D and 3D.',
         title: 'Graph',
       },
     ],
