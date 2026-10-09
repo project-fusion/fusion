@@ -54,8 +54,9 @@ const TURNS: Record<string, { across: number; up: number }> = {
  *
  * **Helix draws the frame, and a renderer draws the points in 3D.** Put a
  * box for the renderer inside the chart, and `connectSpatialScatterChart` from
- * `@fusion.dev/helix-plot` draws the points in it with three.js and keeps it
- * in step with the chart. Until a renderer has drawn, and where none is
+ * `@fusion.dev/helix-plot`, given `threeScatterDriver` from
+ * `@fusion.dev/helix-plot/three`, draws the points in it with three.js and
+ * keeps it in step with the chart. Until a renderer has drawn, and where none is
  * connected, the chart draws the points in 3D itself, in SVG, from the same
  * place the renderer's camera starts: a picture a print and a page without
  * WebGL show too, which a drag or Shift with an arrow turns.

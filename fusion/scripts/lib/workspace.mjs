@@ -118,7 +118,7 @@ export const TIERS = [SOURCE.headless, SOURCE.styled]
 /**
  * The packages that connect a family to someone else's renderer, by the
  * family they serve: `connectGraph` and its drivers for Graph, `connectMap`
- * and its drivers for Map, and from the plot package, which serves two
+ * and its drivers for Map, and from the plot package, which serves three
  * families, the folder of each one's connector. Their DOM specs run with the
  * family's in a browser, where a driver meets a real canvas, a real WebGL
  * context, and a layout, none of which happy-dom has.

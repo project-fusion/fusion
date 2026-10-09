@@ -171,9 +171,11 @@
       "devDependencies": {
         "@fusion.dev/helix": "helix/styled",
         "@fusion.dev/helix-cem": "helix/cem",
+        "@fusion.dev/helix-graph": "helix/graph",
         "@fusion.dev/helix-headless": "helix/headless",
         "@fusion.dev/helix-icons": "helix/icons",
         "@fusion.dev/helix-map": "helix/map",
+        "@fusion.dev/helix-plot": "helix/plot",
         "@fusion.dev/helix-styles": "helix/styles",
         "@fusion.dev/helix-testing": "helix/testing",
         "@fusion.dev/helix-theme": "helix/theme",
@@ -468,7 +470,7 @@
 
     "@fusion.dev/helix-diagnostics": ["@fusion.dev/helix-diagnostics@workspace:helix/diagnostics", { "devDependencies": { "@fusion.dev/helix-testing": "helix/testing", "@types/bun": "^1.4.2" } }],
 
-    "@fusion.dev/helix-docs": ["@fusion.dev/helix-docs@workspace:helix/docs", { "devDependencies": { "@fusion.dev/helix": "helix/styled", "@fusion.dev/helix-cem": "helix/cem", "@fusion.dev/helix-headless": "helix/headless", "@fusion.dev/helix-icons": "helix/icons", "@fusion.dev/helix-map": "helix/map", "@fusion.dev/helix-styles": "helix/styles", "@fusion.dev/helix-testing": "helix/testing", "@fusion.dev/helix-theme": "helix/theme", "@fusion.dev/scripts": "fusion/scripts", "lit": "^3.2.1", "playwright": "^1.63.0" } }],
+    "@fusion.dev/helix-docs": ["@fusion.dev/helix-docs@workspace:helix/docs", { "devDependencies": { "@fusion.dev/helix": "helix/styled", "@fusion.dev/helix-cem": "helix/cem", "@fusion.dev/helix-graph": "helix/graph", "@fusion.dev/helix-headless": "helix/headless", "@fusion.dev/helix-icons": "helix/icons", "@fusion.dev/helix-map": "helix/map", "@fusion.dev/helix-plot": "helix/plot", "@fusion.dev/helix-styles": "helix/styles", "@fusion.dev/helix-testing": "helix/testing", "@fusion.dev/helix-theme": "helix/theme", "@fusion.dev/scripts": "fusion/scripts", "lit": "^3.2.1", "playwright": "^1.63.0" } }],
 
     "@fusion.dev/helix-gallery": ["@fusion.dev/helix-gallery@workspace:helix/gallery", { "devDependencies": { "@types/react": "^19.3.0", "react": "^19.3.0" }, "peerDependencies": { "react": "^19.3.0" } }],
 

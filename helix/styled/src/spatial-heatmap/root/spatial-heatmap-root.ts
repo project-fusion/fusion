@@ -11,7 +11,8 @@ import '../../tooltip/index.js'
  * @description
  * Each reading is a prism. The top face takes the cell's tone, and the two
  * sides are the same tone, shaded darker, so the whole relief follows your
- * theme's colors.
+ * theme's colors. The chart draws the relief in SVG, and
+ * `@fusion.dev/helix-plot` can draw it with three.js.
  *
  * `tones="1 2 3 4 5"` uses the same five-step ramp as `Heatmap`, so the tone
  * and the height both show the value. Set `--spatial-heatmap-cell-size` to

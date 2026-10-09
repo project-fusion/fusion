@@ -9,8 +9,8 @@ import '../../tooltip/index.js'
  * @summary A chart that draws a height over a grid as a surface in three dimensions, for a measure that varies over two others.
  *
  * @description
- * The surface is drawn in 3D by a renderer the page connects, and as a flat
- * grid seen from above until it has drawn. Every height is shaded along one
+ * The chart draws the surface in 3D in SVG, and `@fusion.dev/helix-plot` can
+ * draw it with three.js. Every height is shaded along one
  * ramp from the theme's primary color, quiet where it is low and strong where
  * it is high, so the two drawings agree.
  *

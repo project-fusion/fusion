@@ -10,9 +10,9 @@ import '../../tooltip/index.js'
  * @summary A chart that plots each row as a point in three dimensions, for data with three measures.
  *
  * @description
- * The points are drawn in 3D by a renderer the page connects, and as a flat
- * scatter of the first two measures until it has drawn. Each group takes a
- * series color from the theme, as every chart's series does.
+ * The chart draws the points in 3D in SVG, and `@fusion.dev/helix-plot` can
+ * draw them with three.js. Each group takes a series color from the theme, as
+ * every chart's series does, in both drawings.
  *
  * @since 0.190.0
  * @status experimental

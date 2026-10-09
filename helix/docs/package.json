@@ -38,9 +38,11 @@
   "devDependencies": {
     "@fusion.dev/helix": "workspace:*",
     "@fusion.dev/helix-cem": "workspace:*",
+    "@fusion.dev/helix-graph": "workspace:*",
     "@fusion.dev/helix-headless": "workspace:*",
     "@fusion.dev/helix-icons": "workspace:*",
     "@fusion.dev/helix-map": "workspace:*",
+    "@fusion.dev/helix-plot": "workspace:*",
     "@fusion.dev/helix-styles": "workspace:*",
     "@fusion.dev/helix-testing": "workspace:*",
     "@fusion.dev/helix-theme": "workspace:*",

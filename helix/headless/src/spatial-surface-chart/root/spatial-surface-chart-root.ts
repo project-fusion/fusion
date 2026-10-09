@@ -66,8 +66,9 @@ const TURNS: Record<string, { across: number; up: number }> = {
  *
  * **Helix draws the frame, and a renderer draws the surface in 3D.** Put a
  * box for the renderer inside the chart, and `connectSpatialSurfaceChart` from
- * `@fusion.dev/helix-plot` draws the surface in it with three.js, shaded from
- * low to high in the theme's colors. Until a renderer has drawn, and where
+ * `@fusion.dev/helix-plot`, given `threeSurfaceDriver` from
+ * `@fusion.dev/helix-plot/three`, draws the surface in it with three.js,
+ * shaded from low to high in the theme's colors. Until a renderer has drawn, and where
  * none is connected, the chart draws the surface in 3D itself, in SVG, from
  * the same place the renderer's camera starts: a picture a print and a page
  * without WebGL show too, which a drag or Shift with an arrow turns.
