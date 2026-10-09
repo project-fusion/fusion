@@ -62,20 +62,23 @@
     launch.append(edge)
   })
 
-  // The page edits a card's content. Here, an input replaces the text.
+  // The page edits a card's content. Here, a Helix input replaces the text.
   launch.addEventListener('helix-canvas-edit', (event) => {
     const card = launch.querySelector(`helix-canvas-node[name="${event.detail.name}"]`)
     const text = card?.querySelector('span')
     if (!text) {
       return
     }
-    const field = document.createElement('input')
+    const field = document.createElement('helix-input')
     field.setAttribute('aria-label', 'Card text')
     field.value = text.textContent
+    // Once: taking the field out of the page blurs it, which calls this again.
+    let finished = false
     const done = (keep) => {
-      if (!field.isConnected) {
+      if (finished || !field.isConnected) {
         return
       }
+      finished = true
       if (keep && field.value.trim()) {
         text.textContent = field.value.trim()
       }
@@ -90,8 +93,11 @@
       }
     })
     text.replaceWith(field)
-    field.focus()
-    field.select()
+    // Its field renders once it is connected, so select the text after that.
+    field.updateComplete.then(() => {
+      field.focus()
+      field.select()
+    })
   })
 
   // The event names every card and connection to remove. Names are unique only

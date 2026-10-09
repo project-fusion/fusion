@@ -1,4 +1,5 @@
 import './editing.css'
+import type { HelixInput } from '@fusion.dev/helix'
 import { useRef, useState } from 'react'
 
 type Side = 'top' | 'right' | 'bottom' | 'left'
@@ -85,28 +86,30 @@ export function Example() {
           y={card.y}
         >
           {editing === card.name ? (
-            // An input replaces the text while the card is edited.
-            <input
+            // A Helix input replaces the text while the card is edited.
+            <helix-input
               aria-label="Card text"
-              defaultValue={card.text}
-              onBlur={(event) => save(card.name, event.currentTarget.value)}
+              default-value={card.text}
+              onBlur={(event) => save(card.name, (event.currentTarget as HelixInput).value)}
               onKeyDown={(event) => {
+                const field = event.currentTarget as HelixInput
                 if (event.key === 'Enter' || event.key === 'Escape') {
                   event.preventDefault()
                   if (event.key === 'Escape') {
-                    event.currentTarget.value = card.text
+                    field.value = card.text
                   }
                   // Back to the card, since the input goes when it is saved.
-                  const holder = event.currentTarget.closest(
-                    'helix-canvas-node',
-                  ) as HTMLElement | null
-                  event.currentTarget.blur()
+                  const holder = field.closest('helix-canvas-node') as HTMLElement | null
+                  field.blur()
                   holder?.focus()
                 }
               }}
-              ref={(field) => {
-                field?.focus()
-                field?.select()
+              ref={(field: HelixInput | null) => {
+                // Its field renders once it is connected, so select after that.
+                void field?.updateComplete.then(() => {
+                  field.focus()
+                  field.select()
+                })
               }}
             />
           ) : (
