@@ -55,10 +55,6 @@ export const CoverageBand = () => {
           <Lede>
             Charts, data tables, chat, and date pickers use the same tokens as your buttons.
           </Lede>
-          <helix-text as="p" data-measure emphasis="muted">
-            Every system in the table ships buttons, form controls, menus, and dialogs. The table
-            lists the jobs beyond those, and which systems publish an element for each one.
-          </helix-text>
 
           <ul aria-label="Key" className={styles.legend}>
             <li data-state="ships">
@@ -91,8 +87,7 @@ export const CoverageBand = () => {
               {ADDED}
             </helix-text>
             <helix-text as="p" emphasis="muted" variant="caption">
-              The median a component adds, compressed, to a page that already has one. Every
-              component shares the same runtime.
+              Added by a typical component after the first, compressed.
             </helix-text>
           </div>
 
@@ -169,7 +164,8 @@ export const CoverageBand = () => {
             </table>
           </div>
           <helix-text as="p" class={styles.source} emphasis="muted" variant="caption">
-            Read from each system's published manifest on {measuredOn(MEASURED)}.{' '}
+            Every system ships buttons, form controls, menus, and dialogs, so the table lists the
+            rest. Read from each system's manifest on {measuredOn(MEASURED)}.{' '}
             <span className={styles.hint}>Hover a mark to see the element.</span>
           </helix-text>
         </div>
