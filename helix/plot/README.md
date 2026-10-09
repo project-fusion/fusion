@@ -100,4 +100,4 @@ const connection = connectSpatialSurfaceChart(chart, threeSurfaceDriver(chart.qu
 | `@fusion.dev/helix-plot` | `connectSpatialScatterChart(chart, driver)`, `connectSpatialSurfaceChart(chart, driver)`, `plotColorsFrom(chart, groups)`, and the types `Axes`, `Axis`, `Field`, `PlotColors`, `PlotConnection`, `PlotDriver`, `Point`, `SpatialScatterChartConnection`, `SpatialScatterChartDriver`, `SpatialSurfaceChartConnection`, `SpatialSurfaceChartDriver`, `SurfaceCell` and `SurfaceField` |
 | `@fusion.dev/helix-plot/three` | `threeScatterDriver(box, options)` and `threeSurfaceDriver(box, options)`, and the types `ThreeScatterDriverOptions` and `ThreeSurfaceDriverOptions` |
 
-**three.js is a peer**, so a page brings the version it has.
+**three.js is an optional peer**, so a page brings the version it has. `@fusion.dev/helix-plot` itself never imports it: only `@fusion.dev/helix-plot/three` does, so a page with a driver of its own needs no three.js.
