@@ -1,0 +1,103 @@
+/* The ramp a height is shaded along, low to high: one hue getting louder, as
+   the heatmap's is, so a reader compares two places by weight. The 3D
+   renderer reads the same two hooks, with the same defaults. */
+:host {
+  --_surface-3d-high: var(--surface-3d-high, var(--helix-color-primary-active));
+  --_surface-3d-low: var(
+    --surface-3d-low,
+    color-mix(in oklab, var(--helix-color-primary-active) 15%, var(--helix-color-surface-sunken))
+  );
+
+  display: block;
+}
+
+[part="plot"] {
+  background-color: var(--helix-color-surface-sunken);
+  block-size: var(--surface-3d-block-size, 22em);
+  border-radius: var(--helix-radii-md);
+  overflow: hidden;
+  position: relative;
+}
+
+::slotted(*) {
+  inset: 0;
+  position: absolute;
+}
+
+[part="plot"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The grid seen from above, one column a place across. */
+[part="fallback"] {
+  display: grid;
+  gap: var(--helix-border-thin);
+  grid-template-columns: repeat(var(--surface-3d-columns, 1), minmax(0, 1fr));
+  inset: var(--helix-space-lg);
+  position: absolute;
+}
+
+[part="fallback"][hidden] {
+  display: none;
+}
+
+/* **A place with no reading has no level, and so no fill**: the mix below
+   is then invalid and the place keeps the plot's ground, an open cell
+   rather than the lowest one. */
+[part~="cell"] {
+  background-color: color-mix(
+    in oklab,
+    var(--_surface-3d-high) calc(var(--surface-3d-level) * 100%),
+    var(--_surface-3d-low)
+  );
+  border-radius: calc(var(--helix-radii-sm) * 0.5);
+}
+
+[part~="cell-active"] {
+  outline: var(--helix-border-thick) solid var(--helix-color-foreground);
+  outline-offset: var(--helix-border-thin);
+}
+
+/* The readout, the summary, and the table drawn from `data` are for screen readers. */
+[part="live"],
+[part="summary"],
+[part="table"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+[part="empty"],
+[part="loading"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  text-align: center;
+}
+
+@media print {
+  [part~="cell"] {
+    outline: var(--helix-border-thin) solid var(--helix-color-border);
+    outline-offset: calc(var(--helix-border-thin) * -1);
+  }
+}
+
+/* Forced colors paint every background the page's Canvas color, so the
+   places keep their shades and take an edge in the system's text color. */
+@media (forced-colors: active) {
+  [part~="cell"] {
+    forced-color-adjust: none;
+    outline: var(--helix-border-thin) solid CanvasText;
+    outline-offset: calc(var(--helix-border-thin) * -1);
+  }
+
+  [part~="cell-active"] {
+    outline: var(--helix-border-thick) solid Highlight;
+  }
+}
