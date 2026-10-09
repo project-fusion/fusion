@@ -98,8 +98,9 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * correctly and a screen reader still reads the grid in order.
  *
  * **A renderer can draw it in 3D instead.** Put a box for it in the
- * `renderer` slot, and `connectSpatialHeatmap` from `@fusion.dev/helix-plot`
- * draws the prisms in it with three.js, lit, in the same tones, in a view
+ * `renderer` slot, and `connectSpatialHeatmap` from `@fusion.dev/helix-plot`,
+ * given `threeHeatmapDriver` from `@fusion.dev/helix-plot/three`, draws the
+ * prisms in it with three.js, lit, in the same tones, in a view
  * that drags round and zooms. The chart publishes its readings in `field`,
  * and its own drawing stays under the renderer's, unseen, where a screen
  * reader and the keys still reach it. Shift with an arrow turns the view,
