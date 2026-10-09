@@ -3,17 +3,34 @@ import {
   commaList,
   customElement,
   drawTooltip,
+  HelixPlotChangeEvent,
+  HelixPlotTurnEvent,
   MIRROR_RULE,
   spokenReading,
   writtenList,
   writtenNumbers,
 } from '@fusion.dev/helix-core'
-import { html, nothing, type SVGTemplateResult, svg, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import {
+  html,
+  nothing,
+  type PropertyValues,
+  type SVGTemplateResult,
+  svg,
+  type TemplateResult,
+} from 'lit'
+import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import { fits, toneOf } from '../../heatmap/root/buckets.js'
 import { HelixHeadlessHeatmap } from '../../heatmap/root/heatmap-root.js'
 import { ACROSS, type Base, heightsOf, highestOf, type Relief, reliefOf } from '../projection.js'
+
+/** The arrow keys that turn a renderer's view while Shift is held, and which way each turns it. */
+const TURNS: Record<string, { across: number; up: number }> = {
+  ArrowDown: { across: 0, up: -1 },
+  ArrowLeft: { across: -1, up: 0 },
+  ArrowRight: { across: 1, up: 0 },
+  ArrowUp: { across: 0, up: 1 },
+}
 
 /**
  * @summary A heatmap drawn as a relief, where each reading stands as tall as its value.
@@ -52,6 +69,14 @@ import { ACROSS, type Base, heightsOf, highestOf, type Relief, reliefOf } from '
  * **The drawing is SVG and holds still.** It scales with its box through its
  * `viewBox`, needs no WebGL, and has no motion to pause.
  *
+ * **A renderer can draw it in 3D instead.** Put a box for it in the
+ * `renderer` slot, and `connectSpatialHeatmap` from `@fusion.dev/helix-plot`
+ * draws the prisms in it with three.js, lit, in the same tones, in a view
+ * that drags round and zooms. The chart publishes its readings in `field`,
+ * and its own drawing stays under the renderer's, unseen, where a screen
+ * reader and the keys still reach it. Shift with an arrow turns the view,
+ * except under `selection-mode="multiple"`, where it selects.
+ *
  * **Keyboard.** The keys are `Heatmap`'s. Down moves to the next reading in a
  * column, drawn down to the left, and Right to the same reading in the next
  * column, drawn down to the right.
@@ -65,6 +90,7 @@ import { ACROSS, type Base, heightsOf, highestOf, type Relief, reliefOf } from '
  * | Page Down, Page Up | Moves a month on or back where the rows carry dates, and four columns otherwise. |
  * | Enter, Space | Presses the cell, which sends `helix-reading-press`, and selects it or lets it go under `selection-mode`. |
  * | Shift with an arrow, Home, End, Page Up or Page Down | Selects every cell from the last one pressed to where the key went, under `selection-mode="multiple"`. |
+ * | Shift with an arrow | Turns a renderer's view, where one is connected and `selection-mode` is not `multiple`. |
  * | Escape | Puts the cell's tooltip away. |
  *
  * @since 0.185.0
@@ -72,6 +98,11 @@ import { ACROSS, type Base, heightsOf, highestOf, type Relief, reliefOf } from '
  * @category charts
  * @aliases Isometric heatmap, Isometric chart, 3D heatmap, Relief chart, Isometric contribution graph
  * @documentation https://fusion.dev/helix/components/spatial-heatmap
+ *
+ * @slot renderer - The renderer's box, which a 3D drawing is made in, over the chart's own.
+ *
+ * @event {HelixPlotChangeEvent} helix-plot-change - The readings drawn or the reading the keys rest on changed, which a renderer is told. It stays on the chart.
+ * @event {HelixPlotTurnEvent} helix-plot-turn - Shift with an arrow asked a renderer's view to turn, by a step across or up.
  *
  * @csspart base - The slab the prisms stand on: a group holding its top and its two sides. Hidden from screen readers.
  * @csspart base-left - The slab's side toward the viewer at the lower left, under the strip's last row.
@@ -89,6 +120,8 @@ import { ACROSS, type Base, heightsOf, highestOf, type Relief, reliefOf } from '
  * @cssproperty --spatial-heatmap-end-x - Where the front edge ends, under the newest column, across the drawing, from 0 at its inline start to 1. The component writes it on the footer, and a stylesheet that stands the `end` label there reads it.
  * @cssproperty --spatial-heatmap-span - How many cells the drawing spans across: its columns and its rows together. The component writes it on the strip, and a stylesheet that caps the cell size reads it.
  * @cssproperty --spatial-heatmap-start-y - How far down the drawing the front edge starts, under the first column, as a share of the drawing's width. The component writes it on the footer, and a stylesheet that stands the `start` label there reads it.
+ *
+ * @cssstate drawn - While a renderer has drawn the relief, and the chart's own drawing stays unseen under it.
  */
 @customElement('helix-headless-spatial-heatmap')
 export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
@@ -115,6 +148,139 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
 
   /** The prisms drawn on the last render, which the tooltip is placed against. */
   private shown: Relief | undefined = undefined
+
+  /** Whether a renderer has drawn the relief, which its own drawing then stays under. */
+  @state()
+  private rendered = false
+
+  /** Where the renderer draws the reading, which the tooltip points at. */
+  @state()
+  private place: { x: number; y: number } | undefined
+
+  /** The field last told, and the reading, so a renderer is told of a change only. */
+  private told = { at: -1, field: '' }
+
+  /**
+   * What a renderer draws: every reading drawn, down each column and then
+   * across, with its place on the grid, its height in cells, and its tone.
+   */
+  get field(): {
+    cells: Array<{
+      column: number
+      height: number
+      label: string
+      row: number
+      tone?: string | undefined
+    }>
+    columns: number
+    rows: number
+  } {
+    const cells = this.drawn
+    const rows = this.rowCount
+    const bounds = writtenNumbers(this.thresholds)
+    const palette = writtenList(this.tones)
+    const tallest = this.flat ? 0 : Math.max(0, this.relief || 0)
+    const heights = heightsOf(
+      cells.map((point) => point.value),
+      highestOf(this.points.map((point) => point.value)),
+      tallest,
+    )
+    const first = this.points.length - cells.length
+    return {
+      cells: cells.map((cell, index) => ({
+        column: Math.floor(index / rows),
+        height: heights[index] ?? 0,
+        label: this.sourceRows[first + index]?.label ?? '',
+        row: index % rows,
+        tone: toneOf(cell, bounds, palette),
+      })),
+      columns: Math.ceil(cells.length / rows),
+      rows: Math.min(rows, cells.length),
+    }
+  }
+
+  /** The reading the pointer or the keys rest on, as its place in `field.cells`, or `-1`. */
+  get active(): number {
+    return this.pointer.at
+  }
+
+  /**
+   * Says whether a renderer has drawn the relief, which its own drawing then
+   * stays under, or shows it again. Called by the connector.
+   */
+  rendererDrawn(on = true): void {
+    this.rendered = on
+    this.toggleState('drawn', on)
+  }
+
+  /**
+   * Puts the reading on the prism at `index`, or lets it go with `-1`, as a
+   * pointer resting on it in the renderer's drawing or a press there does.
+   * A touch keeps it until a tap lands elsewhere, and a mouse leaving a
+   * reading the keys moved to leaves it. Called by the connector.
+   */
+  requestActive(index: number, kind: 'mouse' | 'pen' | 'touch' = 'mouse'): void {
+    if (kind === 'touch') {
+      this.pointer.tapTo(index)
+    } else if (index >= 0 || !this.pointer.keyed) {
+      this.pointer.set(index)
+    }
+  }
+
+  /**
+   * Says where the renderer draws the reading, as fractions of the strip from
+   * its top left, or `undefined` while it draws none. The tooltip points
+   * there. Called by the connector.
+   */
+  placeReading(at: { x: number; y: number } | undefined): void {
+    this.place = at
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    /* Told only on a change, so a renderer draws again only when it must. */
+    const field = JSON.stringify(this.field)
+    if (field !== this.told.field) {
+      this.told.field = field
+      this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'data' }))
+    }
+    if (this.pointer.at !== this.told.at) {
+      this.told.at = this.pointer.at
+      this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'focus' }))
+    }
+    /* The tooltip follows the reading while the view turns, which moves its
+       mark without anything the tooltip watches changing size. */
+    if (changed.has('place' as keyof this)) {
+      ;(
+        this.renderRoot.querySelector('[for="helix-chart-mark"]') as
+          | (Element & { reposition?: () => void })
+          | null
+      )?.reposition?.()
+    }
+  }
+
+  /**
+   * Shift with an arrow turns a renderer's view, and moves no reading,
+   * except under `selection-mode="multiple"`, where it selects a range.
+   */
+  private readonly onTurnKeydown = (event: KeyboardEvent): void => {
+    const turn = TURNS[event.key]
+    if (
+      !this.rendered ||
+      !event.shiftKey ||
+      !turn ||
+      this.selectionMode === 'multiple' ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey
+    ) {
+      this.onStripKeydown()
+      return
+    }
+    event.preventDefault()
+    event.stopPropagation()
+    this.dispatchEvent(new HelixPlotTurnEvent(turn))
+  }
 
   /**
    * How many readings fit, as whole columns, newest kept.
@@ -183,6 +349,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
           data-mirror
           part="drawing"
           role=${grid ? 'none' : nothing}
+          style=${this.rendered ? 'opacity: 0' : nothing}
           viewBox="${box.x} ${box.y} ${box.width} ${box.height}"
           xmlns="http://www.w3.org/2000/svg"
         >${relief.base ? this.renderBase(relief.base) : nothing}${grid ? this.renderPrismRows(prisms) : prisms}</svg>`
@@ -198,11 +365,11 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
         style="--spatial-heatmap-span: ${Math.ceil(cells.length / this.rowCount) + Math.min(this.rowCount, cells.length)}"
         tabindex=${readable ? '0' : nothing}
         @click=${this.onClick}
-        @keydown=${this.onStripKeydown}
+        @keydown=${this.onTurnKeydown}
         @pointerover=${this.onPointerOver}
         @pointerleave=${this.onPointerLeave}
         @pointerup=${this.onPointerUp}
-      >${drawing}${this.renderTooltip(grid)}</div>
+      ><slot name="renderer"></slot>${drawing}${this.renderTooltip(grid)}</div>
       ${cells.length === 0 ? this.renderStatus() : nothing}
       <div part="footer" style=${this.cornersStyle(relief)}>
         <span part="start"><slot name="start"></slot></span>
@@ -294,6 +461,20 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
     const prism = this.shown?.prisms[at]
     const box = this.shown?.box
     const reading = grid ? undefined : this.pointer
+    /* Over the renderer's drawing, at the reading's place there. */
+    if (this.rendered) {
+      const place = this.place
+      return drawTooltip(
+        this.sourceRows,
+        at >= 0 && place ? this.points.length - this.drawn.length + at : -1,
+        this.tag('tooltip'),
+        place
+          ? { fixed: true, placement: 'top', x: `${place.x * 100}%`, y: `${place.y * 100}%` }
+          : undefined,
+        undefined,
+        reading,
+      )
+    }
     if (at < 0 || !prism || !box || box.width <= 0 || box.height <= 0) {
       return drawTooltip(this.sourceRows, -1, this.tag('tooltip'), undefined, undefined, reading)
     }

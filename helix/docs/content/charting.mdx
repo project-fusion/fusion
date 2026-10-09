@@ -49,10 +49,11 @@ Choose a chart by the question it answers.
   over two ranges, such as load by hour and by day. Its table carries the exact
   values.
 
-Both spatial charts draw themselves in 3D in SVG, which a server, a print, and
-a page without WebGL all show, and which Shift with an arrow turns.
-`@fusion.dev/helix-plot` draws them with three.js instead, for a view you can
-drag round, zoom, and see in perspective.
+The spatial charts and `Spatial Heatmap` draw themselves in 3D in SVG, which a
+server, a print, and a page without WebGL all show. Shift with an arrow turns
+the spatial charts' drawing. `@fusion.dev/helix-plot` draws all three with
+three.js instead, lit and in perspective, in a view you can drag round and
+zoom.
 - **How each day or check went.** `Heatmap`, for uptime, contributions, or
   activity.
 - **The same days, as a relief.** `Spatial Heatmap` reads the same table as

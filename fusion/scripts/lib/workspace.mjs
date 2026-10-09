@@ -126,6 +126,7 @@ export const TIERS = [SOURCE.headless, SOURCE.styled]
 export const CONNECTORS = {
   graph: SOURCE.graph,
   map: SOURCE.map,
+  'spatial-heatmap': `${SOURCE.plot}/connect-spatial-heatmap`,
   'spatial-scatter-chart': `${SOURCE.plot}/connect-spatial-scatter-chart`,
   'spatial-surface-chart': `${SOURCE.plot}/connect-spatial-surface-chart`,
 }

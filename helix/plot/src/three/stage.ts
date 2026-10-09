@@ -313,12 +313,57 @@ export const createStage = (
       : undefined
   seen?.observe(container)
 
+  /**
+   * What a driver asked the view to hold, if it asked: the box around what
+   * it draws, which the camera stands just far enough back to see whole.
+   */
+  let framed: { high: Vector3; low: Vector3 } | undefined
+  const fit = (): void => {
+    if (!framed) {
+      return
+    }
+    const { high, low } = framed
+    const center = low.clone().add(high).multiplyScalar(0.5)
+    const toward = camera.position.clone().sub(controls.target).normalize()
+    /* The camera's own across and up, looking from `toward` at the middle. */
+    const right = new Vector3(0, 1, 0).cross(toward).normalize()
+    const up = toward.clone().cross(right).normalize()
+    const tanUp = Math.tan((camera.fov * Math.PI) / 360)
+    const tanAcross = tanUp * camera.aspect
+    /* **Far enough that every corner of the box is inside the view**, each
+       corner's distance off the middle over the tangent of half the view,
+       plus how far toward the camera it stands. A sphere around a flat
+       relief left most of the view empty. */
+    let distance = 0
+    for (const x of [low.x, high.x]) {
+      for (const y of [low.y, high.y]) {
+        for (const z of [low.z, high.z]) {
+          const corner = new Vector3(x, y, z).sub(center)
+          const ahead = corner.dot(toward)
+          distance = Math.max(
+            distance,
+            ahead + Math.abs(corner.dot(right)) / tanAcross,
+            ahead + Math.abs(corner.dot(up)) / tanUp,
+          )
+        }
+      }
+    }
+    distance *= 1.06
+    controls.target.copy(center)
+    camera.position.copy(center).add(toward.multiplyScalar(distance))
+    controls.minDistance = distance * 0.35
+    controls.maxDistance = distance * 3
+    camera.lookAt(controls.target)
+    controls.update()
+  }
+
   const resize = (): void => {
     const width = Math.max(container.clientWidth, 1)
     const height = Math.max(container.clientHeight, 1)
     renderer.setSize(width, height, false)
     camera.aspect = width / height
     camera.updateProjectionMatrix()
+    fit()
     invalidate()
   }
   const sized =
@@ -404,6 +449,20 @@ export const createStage = (
   canvas.addEventListener('pointerleave', onLeave)
 
   return {
+    /**
+     * Holds the box from `low` to `high` around what is drawn in view, from
+     * `toward` where given, a direction from the middle toward the camera, or
+     * from where the camera stands. Again on every resize, from wherever the
+     * camera stands then.
+     */
+    frame: (low: Vector3, high: Vector3, toward?: Vector3): void => {
+      framed = { high: high.clone(), low: low.clone() }
+      if (toward) {
+        camera.position.copy(controls.target).add(toward.clone().normalize())
+      }
+      fit()
+      invalidate()
+    },
     invalidate,
     /** Hears the reading a mouse or a pen rests on, `-1` for none. Returns what stops listening. */
     onHover: (listener: (index: number, kind: PointerKind) => void): (() => void) => {

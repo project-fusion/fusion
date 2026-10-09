@@ -52,6 +52,13 @@
   position: relative;
 }
 
+/* A renderer's box lies over the chart's own drawing, which stays under it,
+   unseen, where a screen reader and the keys still reach it. */
+::slotted([slot="renderer"]) {
+  inset: 0;
+  position: absolute;
+}
+
 /* `overflow: visible`, so the ring on a prism at the edge is not cut. */
 [part="drawing"] {
   block-size: auto;
@@ -214,6 +221,20 @@
 
 [part="summary"] {
   text-align: center;
+}
+
+/* **While a renderer draws, the labels are a plain row** under the strip,
+   first at the start and last at the end: the renderer's relief turns, so
+   no corner of it stays where the chart's own drawing put its corners. */
+:host(:state(drawn)) [part="footer"] {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+:host(:state(drawn)) [part="start"],
+:host(:state(drawn)) [part="end"] {
+  margin: var(--helix-space-none);
+  position: static;
+  translate: none;
 }
 
 [part="footer"][data-empty] {
