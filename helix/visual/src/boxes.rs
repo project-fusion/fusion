@@ -230,6 +230,41 @@ fn movement(now: &Placed, before: &Placed) -> String {
     }
 }
 
+/// The named elements inside `holder` and in the region that moved or
+/// changed size, the smallest first, as a clause: a card that grew is told
+/// with the badge that moved inside it.
+fn inside(region: Region, holder: &Placed, now: &[Placed], before: &[Placed]) -> String {
+    const MOST: usize = 3;
+    let prefix = format!("{} ", holder.key);
+    let mut moved: Vec<(&Placed, &Placed)> = now
+        .iter()
+        .filter(|one| one.key.starts_with(&prefix) && covered(region, one) > 0.0)
+        .filter_map(|one| {
+            let old = before.iter().find(|old| old.key == one.key)?;
+            let shifted = [
+                one.x - old.x,
+                one.y - old.y,
+                one.width - old.width,
+                one.height - old.height,
+            ]
+            .iter()
+            .any(|delta| delta.round() != 0.0);
+            shifted.then_some((one, old))
+        })
+        .collect();
+    moved.sort_by(|a, b| (a.0.width * a.0.height).total_cmp(&(b.0.width * b.0.height)));
+    let said: Vec<String> = moved
+        .iter()
+        .take(MOST)
+        .map(|(one, old)| format!("`{}` {}", &one.key[prefix.len()..], movement(one, old)))
+        .collect();
+    if said.is_empty() {
+        String::new()
+    } else {
+        format!("; inside it, {}", said.join(", and "))
+    }
+}
+
 /// One line for each region a diff marked: where it is, the element it
 /// happened to and the file that defines it, and how that element moved from
 /// where the baseline had it, when the baseline carries its boxes.
@@ -259,7 +294,11 @@ pub fn attribute(
             let how = match before {
                 None => String::new(),
                 Some(boxes) => match boxes.iter().find(|old| old.key == one.key) {
-                    Some(old) => format!(", {}", movement(one, old)),
+                    Some(old) => format!(
+                        ", {}{}",
+                        movement(one, old),
+                        inside(region, one, now, boxes)
+                    ),
                     None => ", which the baseline does not have".to_string(),
                 },
             };
@@ -387,6 +426,30 @@ mod tests {
         assert_eq!(
             attribute(&[region], &now, None, &BTreeMap::new()),
             ["10 by 10 px at 10, 10: `helix-card helix-badge`"]
+        );
+    }
+
+    #[test]
+    fn a_holder_that_grew_is_told_with_what_moved_inside_it() {
+        let region = Region {
+            height: 64,
+            width: 352,
+            x: 16,
+            y: 96,
+        };
+        let before = [
+            placed("my-card", 24.0, 24.0, 334.0, 124.0),
+            placed("my-card h2", 41.0, 61.0, 300.0, 28.0),
+            placed("my-card span", 41.0, 109.0, 43.0, 22.0),
+        ];
+        let now = [
+            placed("my-card", 24.0, 24.0, 334.0, 128.0),
+            placed("my-card h2", 41.0, 61.0, 300.0, 28.0),
+            placed("my-card span", 41.0, 113.0, 43.0, 22.0),
+        ];
+        assert_eq!(
+            attribute(&[region], &now, Some(&before), &BTreeMap::new()),
+            ["352 by 64 px at 16, 96: `my-card`, now 4 px taller; inside it, `span` moved 4 px down"]
         );
     }
 

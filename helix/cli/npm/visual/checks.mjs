@@ -522,7 +522,14 @@ export const readPage = (page, options) =>
           }
           node = up(node)
         }
-        return null
+        /* **What is left is the canvas**, which the browser paints behind a
+           page that gives its root no background: white, or dark under a dark
+           `color-scheme`. */
+        let composited = canvas
+        while (stack.length > 0) {
+          composited = over(stack.pop(), composited)
+        }
+        return { color: composited, on: document.documentElement }
       }
 
       /* A shadow root's `elementsFromPoint` reports the outer stack again, so
@@ -560,6 +567,20 @@ export const readPage = (page, options) =>
         }
         return false
       }
+
+      const canvas = (() => {
+        const probe = document.createElement('span')
+        probe.style.backgroundColor = 'Canvas'
+        document.documentElement.append(probe)
+        const color = parse(getComputedStyle(probe).backgroundColor) ?? {
+          a: 1,
+          b: 255,
+          g: 255,
+          r: 255,
+        }
+        probe.remove()
+        return { ...color, a: 1 }
+      })()
 
       /* The colors that draw a rule and not an ink, read off the live page:
          a line that separates is held to no target meant for a glyph. */
