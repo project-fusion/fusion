@@ -94,7 +94,7 @@ describe('connectSpatialScatterChart', () => {
     const { driver, told } = recording()
     connectSpatialScatterChart(element, driver)
     await settle(element)
-    expect(told.colors?.look).toEqual({ emphasis: 'solid', through: 1 })
+    expect(told.colors?.look).toEqual({ box: true, emphasis: 'solid', through: 1 })
     const drawn = told.drawn.length
     element.setAttribute('emphasis', 'outlined')
     element.setAttribute('material', 'glass')
@@ -103,6 +103,10 @@ describe('connectSpatialScatterChart', () => {
     expect(told.colors?.look.emphasis).toBe('outlined')
     /* Glass lets 0.62 through, scaled by the theme's material opacity, 1 where none is set. */
     expect(told.colors?.look.through).toBeCloseTo(0.62)
+    /* And with no box, which the driver then leaves undrawn. */
+    element.setAttribute('no-box', '')
+    await settle(element)
+    expect(told.colors?.look.box).toBe(false)
   })
 
   test('marks the point the keys rest on, and a press in the drawing puts the reading there', async () => {

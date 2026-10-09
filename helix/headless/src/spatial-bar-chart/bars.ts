@@ -7,7 +7,7 @@
  * when it is not.
  */
 
-import { type Drawn, type Projection, solid, ticks } from '@fusion.dev/helix-core'
+import { type Drawn, type PagePoint, type Projection, solid, ticks } from '@fusion.dev/helix-core'
 import { type FieldRow, niceRange, type PlotAxis } from '../spatial-scatter-chart/field.js'
 import { type BoxExtent, inBox } from '../spatial-scatter-chart/view.js'
 
@@ -123,6 +123,8 @@ const FOOTPRINT = 0.6
 
 /** A bar as the chart's own drawing paints it. */
 export interface DrawnBar {
+  /** The block's eight corners on the page, which a drawing with no box is framed around. */
+  corners: PagePoint[]
   drawn: Drawn
   height: number
   index: number
@@ -159,8 +161,13 @@ export const barsDrawn = (field: BarField, projection: Projection): DrawnBar[] =
       ...projection,
       at: (px, py, pz = 0) => projection.at(px, py, pz + base),
     }
-    return [
-      { drawn: solid(lifted, 'block', x, y, spacing * FOOTPRINT, height), height, index, x, y },
-    ]
+    const width = spacing * FOOTPRINT
+    const corners: PagePoint[] = []
+    for (const cx of [x - width / 2, x + width / 2]) {
+      for (const cy of [y - width / 2, y + width / 2]) {
+        corners.push(lifted.at(cx, cy, 0), lifted.at(cx, cy, height))
+      }
+    }
+    return [{ corners, drawn: solid(lifted, 'block', x, y, width, height), height, index, x, y }]
   })
 }

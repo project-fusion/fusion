@@ -52,9 +52,10 @@ export interface PlotColors {
    * edge in the mark's color over a fill faded toward `page`) or `subtle` (a
    * faint wash under that edge), and `through` how much of the mark comes
    * through, 1 with no material, `glass` 0.62 and `frosted` 0.88, times the
-   * theme's `--helix-material-opacity`.
+   * theme's `--helix-material-opacity`. `box` is whether the box, its grid,
+   * and its numbers and names are drawn, which the chart's `no-box` turns off.
    */
-  look: { emphasis: 'outlined' | 'solid' | 'subtle'; through: number }
+  look: { box: boolean; emphasis: 'outlined' | 'solid' | 'subtle'; through: number }
   /** The page a faded fill moves toward: `background`. */
   page: string
   /** The ticks' numbers: `foreground-muted`. */
@@ -218,6 +219,7 @@ export const plotColorsFrom = (
     )
     const scale = Number.isFinite(strength) ? strength : 1
     const look: PlotColors['look'] = {
+      box: !chart.hasAttribute('no-box'),
       emphasis: emphasis === 'outlined' || emphasis === 'subtle' ? emphasis : 'solid',
       through: material === 'glass' ? 0.62 * scale : material === 'frosted' ? 0.88 * scale : 1,
     }
@@ -333,15 +335,15 @@ export const connectPlot = <F extends object>(
   const stopTheme = watchTheme(frame, () => {
     draw()
   })
-  /* **Drawn again when the chart's `emphasis` or `material` changes**, which
-     changes how its marks look and nothing it publishes in `field`. */
+  /* **Drawn again when the chart's `emphasis`, `material`, or `no-box`
+     changes**, which changes how it looks and nothing it publishes in `field`. */
   const looks =
     typeof MutationObserver === 'function'
       ? new MutationObserver(() => {
           draw()
         })
       : undefined
-  looks?.observe(frame, { attributeFilter: ['emphasis', 'material'], attributes: true })
+  looks?.observe(frame, { attributeFilter: ['emphasis', 'material', 'no-box'], attributes: true })
 
   /* After the chart's first render, which is when it has read its table. */
   void Promise.resolve(chart.updateComplete).then(draw)

@@ -28,6 +28,7 @@ import {
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import {
+  boundsOf,
   boxView,
   DragTurn,
   drawBox,
@@ -163,6 +164,15 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
    * `registerWords('de', { 'helix-spatial-bar-chart': { emptyText: 'Keine Werte' } })`.
    */
   static words = 'helix-spatial-bar-chart'
+
+  /**
+   * Draws no box: no edges, grid, numbers, or names, so the readings stand
+   * alone and fill the plot, as a picture on a product's own page does. The
+   * table, the summary, the tooltip, and the keys still carry every value,
+   * and a renderer draws no box either.
+   */
+  @property({ attribute: 'no-box', reflect: true, type: Boolean })
+  noBox = false
 
   /**
    * What the readout says for a place with no value. `{category}` and
@@ -419,11 +429,19 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
    * drawing, until a renderer has drawn and where none is connected.
    */
   private renderFallback(field: BarField, at: number): TemplateResult {
-    const view = boxView(field.axes, this.camera)
+    const view = boxView(field.axes, this.camera, [], this.noBox)
     const bars = barsDrawn(field, view.projection)
     const active = bars.find((bar) => bar.index === at)
     const cell = field.cells[at]
-    const bounds = this.drag.frame(view.bounds, view.on([0, 0, 0]))
+    const bounds = this.drag.frame(
+      this.noBox
+        ? boundsOf(
+            bars.flatMap((bar) => bar.corners),
+            0.1,
+          )
+        : view.bounds,
+      view.on([0, 0, 0]),
+    )
     return html`<div aria-hidden="true" dir="ltr" ?hidden=${this.rendered} part="fallback">
       <svg
         part="drawing"
@@ -436,7 +454,7 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
-      >${drawBox(view)}${depthOrder(view.projection, bars).map((bar) =>
+      >${this.noBox ? nothing : drawBox(view)}${depthOrder(view.projection, bars).map((bar) =>
         this.renderBar(field, bar, at),
       )}${
         active

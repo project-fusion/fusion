@@ -91,6 +91,23 @@ describe('the frame', () => {
     expect(order.indexOf(1)).toBeLessThan(order.indexOf(0))
   })
 
+  test('with no box, draws the bars alone, framed around them, and still says every value', async () => {
+    const element = await plot()
+    const boxed = part(element, 'drawing')?.getAttribute('viewBox')?.split(' ').map(Number) ?? []
+    element.setAttribute('no-box', '')
+    await element.updateComplete
+    expect(part(element, 'grid')).toBeNull()
+    expect(element.shadowRoot?.querySelectorAll('[part="tick"], [part="axis-name"]')).toHaveLength(
+      0,
+    )
+    expect(bars(element)).toHaveLength(5)
+    const bare = part(element, 'drawing')?.getAttribute('viewBox')?.split(' ').map(Number) ?? []
+    /* Narrower and lower than a frame that holds the box and its names. */
+    expect(bare[2]).toBeLessThan(boxed[2] as number)
+    expect(bare[3]).toBeLessThan(boxed[3] as number)
+    expect(part(element, 'summary')?.textContent).toContain('5 bars')
+  })
+
   test('says what it shows in a sentence', async () => {
     const element = await plot()
     expect(part(element, 'summary')?.textContent).toBe(

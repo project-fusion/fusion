@@ -97,6 +97,7 @@ export const boxView = (
   axes: { extent?: BoxExtent | undefined; x: PlotAxis; y: PlotAxis; z: PlotAxis },
   camera: Camera,
   extra: readonly PagePoint[] = [],
+  bare = false,
 ): BoxView => {
   const projection = projectionOf(camera)
   const [ex, ey, ez] = axes.extent ?? [1, 1, 1]
@@ -141,11 +142,14 @@ export const boxView = (
       text: axis.labels?.[index] ?? tickText(tick),
     })),
   })
-  const labels: ViewLabel[] = boxLabels(
-    (point) => ({ ...on(point), depth: depth(point) }),
-    { x: text(axes.x), y: text(axes.y), z: text(axes.z) },
-    { gap: LABEL_GAP, name: NAME_SIZE, tick: TICK_SIZE, wide: WIDE },
-  )
+  /* A bare box writes nothing along its edges. */
+  const labels: ViewLabel[] = bare
+    ? []
+    : boxLabels(
+        (point) => ({ ...on(point), depth: depth(point) }),
+        { x: text(axes.x), y: text(axes.y), z: text(axes.z) },
+        { gap: LABEL_GAP, name: NAME_SIZE, tick: TICK_SIZE, wide: WIDE },
+      )
   /* The bounds hold every line, every label at about its width, and every
      reading, so nothing is cut at the edge of the drawing. */
   const corners: PagePoint[] = []
@@ -168,10 +172,29 @@ export const boxView = (
   return {
     bounds: { height: Math.max(...ys) - top, width: Math.max(...xs) - left, x: left, y: top },
     depth,
-    grid: lines.join(''),
+    grid: bare ? '' : lines.join(''),
     labels,
     on,
     projection,
+  }
+}
+
+/**
+ * The part of the page that holds `points`, `pad` beyond them on every side:
+ * the frame of a drawing with no box, which fits its readings alone.
+ */
+export const boundsOf = (points: readonly PagePoint[], pad: number): BoxView['bounds'] => {
+  if (points.length === 0) {
+    return { height: 2 * pad, width: 2 * pad, x: -pad, y: -pad }
+  }
+  const xs = points.map((point) => point.x)
+  const ys = points.map((point) => point.y)
+  const [left, top] = [Math.min(...xs) - pad, Math.min(...ys) - pad]
+  return {
+    height: Math.max(...ys) + pad - top,
+    width: Math.max(...xs) + pad - left,
+    x: left,
+    y: top,
   }
 }
 
