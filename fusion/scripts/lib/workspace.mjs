@@ -126,8 +126,8 @@ export const TIERS = [SOURCE.headless, SOURCE.styled]
 export const CONNECTORS = {
   graph: SOURCE.graph,
   map: SOURCE.map,
-  'scatter-3d': `${SOURCE.plot}/connect-scatter-3d`,
-  'surface-3d': `${SOURCE.plot}/connect-surface-3d`,
+  'spatial-scatter-chart': `${SOURCE.plot}/connect-spatial-scatter-chart`,
+  'spatial-surface-chart': `${SOURCE.plot}/connect-spatial-surface-chart`,
 }
 
 /** Every workspace directory, with `dir/*` globs expanded. */

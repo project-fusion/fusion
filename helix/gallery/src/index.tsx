@@ -47,7 +47,6 @@ import { iconArt } from './art/icon'
 import { iconButtonArt } from './art/icon-button'
 import { imageArt } from './art/image'
 import { inputArt } from './art/input'
-import { isometricHeatmapArt } from './art/isometric-heatmap'
 import { kbdArt } from './art/kbd'
 import { legendArt } from './art/legend'
 import { lightboxArt } from './art/lightbox'
@@ -75,7 +74,6 @@ import { quoteArt } from './art/quote'
 import { radioArt } from './art/radio'
 import { ratingArt } from './art/rating'
 import { sandboxArt } from './art/sandbox'
-import { scatter3dArt } from './art/scatter-3d'
 import { scatterChartArt } from './art/scatter-chart'
 import { scrollAreaArt } from './art/scroll-area'
 import { selectArt } from './art/select'
@@ -83,12 +81,14 @@ import { skeletonArt } from './art/skeleton'
 import { skipLinkArt } from './art/skip-link'
 import { sliderArt } from './art/slider'
 import { sparklineArt } from './art/sparkline'
+import { spatialHeatmapArt } from './art/spatial-heatmap'
+import { spatialScatterChartArt } from './art/spatial-scatter-chart'
+import { spatialSurfaceChartArt } from './art/spatial-surface-chart'
 import { speedDialArt } from './art/speed-dial'
 import { splitterArt } from './art/splitter'
 import { statArt } from './art/stat'
 import { stepsArt } from './art/steps'
 import { strandsArt } from './art/strands'
-import { surface3dArt } from './art/surface-3d'
 import { switchArt } from './art/switch'
 import { tableArt } from './art/table'
 import { tabsArt } from './art/tabs'
@@ -199,7 +199,6 @@ const art: Record<string, ReactNode> = {
   'icon-button': iconButtonArt,
   image: imageArt,
   input: inputArt,
-  'isometric-heatmap': isometricHeatmapArt,
   kbd: kbdArt,
   legend: legendArt,
   lightbox: lightboxArt,
@@ -227,7 +226,6 @@ const art: Record<string, ReactNode> = {
   radio: radioArt,
   rating: ratingArt,
   sandbox: sandboxArt,
-  'scatter-3d': scatter3dArt,
   'scatter-chart': scatterChartArt,
   'scroll-area': scrollAreaArt,
   select: selectArt,
@@ -235,12 +233,14 @@ const art: Record<string, ReactNode> = {
   'skip-link': skipLinkArt,
   slider: sliderArt,
   sparkline: sparklineArt,
+  'spatial-heatmap': spatialHeatmapArt,
+  'spatial-scatter-chart': spatialScatterChartArt,
+  'spatial-surface-chart': spatialSurfaceChartArt,
   'speed-dial': speedDialArt,
   splitter: splitterArt,
   stat: statArt,
   steps: stepsArt,
   strands: strandsArt,
-  'surface-3d': surface3dArt,
   switch: switchArt,
   table: tableArt,
   tabs: tabsArt,
