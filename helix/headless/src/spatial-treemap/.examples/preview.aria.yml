@@ -1,0 +1,87 @@
+- table "Requests and response time by service":
+  - caption: Requests and response time by service
+  - rowgroup:
+    - row "Service Team Requests a minute p95 response (ms)":
+      - columnheader "Service"
+      - columnheader "Team"
+      - columnheader "Requests a minute"
+      - columnheader "p95 response (ms)"
+  - rowgroup:
+    - row "Gateway Platform 4200 85":
+      - rowheader "Gateway"
+      - cell "Platform"
+      - cell "4200"
+      - cell "85"
+    - row "Auth Platform 2600 40":
+      - rowheader "Auth"
+      - cell "Platform"
+      - cell "2600"
+      - cell "40"
+    - row "Search Platform 1800 210":
+      - rowheader "Search"
+      - cell "Platform"
+      - cell "1800"
+      - cell "210"
+    - row "Config Platform 400 25":
+      - rowheader "Config"
+      - cell "Platform"
+      - cell "400"
+      - cell "25"
+    - row "Checkout Payments 1500 320":
+      - rowheader "Checkout"
+      - cell "Payments"
+      - cell "1500"
+      - cell "320"
+    - row "Billing Payments 900 180":
+      - rowheader "Billing"
+      - cell "Payments"
+      - cell "900"
+      - cell "180"
+    - row "Ledger Payments 600 140":
+      - rowheader "Ledger"
+      - cell "Payments"
+      - cell "600"
+      - cell "140"
+    - row "Refunds Payments 200 260":
+      - rowheader "Refunds"
+      - cell "Payments"
+      - cell "200"
+      - cell "260"
+    - row "Recommendations Growth 1300 240":
+      - rowheader "Recommendations"
+      - cell "Growth"
+      - cell "1300"
+      - cell "240"
+    - row "Email Growth 500 90":
+      - rowheader "Email"
+      - cell "Growth"
+      - cell "500"
+      - cell "90"
+    - row "Experiments Growth 350 60":
+      - rowheader "Experiments"
+      - cell "Growth"
+      - cell "350"
+      - cell "60"
+    - row "Ingest Data 2100 120":
+      - rowheader "Ingest"
+      - cell "Data"
+      - cell "2100"
+      - cell "120"
+    - row "Warehouse Data 800 190":
+      - rowheader "Warehouse"
+      - cell "Data"
+      - cell "800"
+      - cell "190"
+    - row "Reports Data 450 410":
+      - rowheader "Reports"
+      - cell "Data"
+      - cell "450"
+      - cell "410"
+    - row "Exports Data 250 300":
+      - rowheader "Exports"
+      - cell "Data"
+      - cell "250"
+      - cell "300"
+- application "Requests and response time by service":
+  - status
+- paragraph: 15 items in 4 groups, sized from 200 to 4,200.
