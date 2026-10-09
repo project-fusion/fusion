@@ -167,10 +167,13 @@ export const boxLabels = (
       continue
     }
     const box = size(axis.name, true)
+    /* Clear of the number at the top of the upright, where there is one,
+       which the name stood on and so left out. */
+    const topped = axis.ticks.some((tick) => tick.at > 1 - 1e-6)
     names.push({
       ...(key === 'y'
         ? /* Over the top of the upright, where a name reads level. */
-          off(to, { x: 0, y: -1 }, box, sizes.gap)
+          off(to, { x: 0, y: -1 }, box, sizes.gap + (topped ? sizes.tick / 2 : 0))
         : off(seen(along(0)), out, box, sizes.gap * 2 + deepest)),
       text: axis.name,
     })
