@@ -44,6 +44,16 @@ export default defineConfig({
     contrast: { rules: ['var(--helix-color-border)'] },
     overlap: true,
   },
+  exceptions: [
+    {
+      checks: ['contrast'],
+      entry: 'home',
+      measured:
+        "the news kicker's badge, #ffffff on #4192ff in dark, 3.10:1; its arrow, #1068da on #e2edfb in light, 4.42:1",
+      reason:
+        'With a brand seed set, `foreground-on-primary` is a fixed white, and dark mode lightens `primary` under it. The fix is in the theme, and this exception fails the run once it lands.',
+    },
+  ],
   manifest: [
     '../../helix/headless/custom-elements.json',
     '../../helix/styled/custom-elements.json',
