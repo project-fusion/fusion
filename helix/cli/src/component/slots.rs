@@ -40,8 +40,6 @@ use std::sync::LazyLock;
 use regex::Regex;
 use serde_json::Value;
 
-use crate::component::installed::Installed;
-use crate::component::project::Project;
 use crate::component::text::{line_of, uncommented};
 use crate::component::{Context, Finding, Report};
 
@@ -261,8 +259,7 @@ fn located(context: &Context, tiers: &[std::path::PathBuf], family: &str) -> Str
 /// manifests.
 fn extended(context: &Context) -> Report {
     let unit = "documented slot names checked against the ones their family renders";
-    let project = Project::read(context);
-    let installed = Installed::read(&context.root);
+    let project = context.project();
     let mut findings = Vec::new();
     let mut checked = 0;
     let mut unreadable = BTreeSet::new();
@@ -272,8 +269,8 @@ fn extended(context: &Context) -> Report {
             continue;
         }
         let (base, _) = project.grounded(extension);
-        let mut available: BTreeSet<String> = installed
-            .as_ref()
+        let mut available: BTreeSet<String> = context
+            .installed()
             .and_then(|one| one.classes.get(base))
             .map(|one| one.slots.clone())
             .unwrap_or_default();
@@ -340,8 +337,8 @@ fn extended(context: &Context) -> Report {
 /// The slots of the Helix class a chain ends on, where it ends on one the
 /// project extends rather than one it declares: its manifest lists them.
 fn inherited(
+    context: &Context,
     declared: &BTreeMap<String, Declared>,
-    installed: Option<&Installed>,
     class: &str,
 ) -> BTreeSet<String> {
     let mut last = class;
@@ -350,7 +347,8 @@ fn inherited(
             break;
         };
         if !declared.contains_key(parent) {
-            return installed
+            return context
+                .installed()
                 .and_then(|one| one.classes.get(parent))
                 .map(|helix| helix.slots.clone())
                 .unwrap_or_default();
@@ -366,7 +364,6 @@ pub fn run(context: &Context) -> Report {
     if declared.is_empty() {
         return extended(context);
     }
-    let installed = Installed::read(&context.root);
     let tiers: Vec<std::path::PathBuf> = context.settings.roots(&context.root);
     let mut findings = Vec::new();
     let mut checked = 0;
@@ -406,7 +403,7 @@ pub fn run(context: &Context) -> Report {
         }
 
         let mut available = shared.clone();
-        available.extend(inherited(&declared, installed.as_ref(), class));
+        available.extend(inherited(context, &declared, class));
         let mut assembled = false;
         for family in &families {
             let known = per_family.entry(family.clone()).or_insert_with(|| {

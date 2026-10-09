@@ -323,6 +323,9 @@
     // `src/**` did not is the package's other tracked files, `package.json`
     // among them, which `helix-cem` reads for the manifests it builds against.
     //
+    // `visual.fingerprint.json` is read for the environment each example's
+    // pictures were taken in, which `examples.json` records.
+    //
     // The generated files it leaves out are each accounted for. The generator
     // does not read `element-events.generated.ts`, which is written from this
     // task's output. It does read each `.css.ts`, which is `styles`' output, so
@@ -337,7 +340,8 @@
         "$TURBO_ROOT$/Cargo.lock",
         "$TURBO_ROOT$/Cargo.toml",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
-        "$TURBO_ROOT$/helix/cli/src/**"
+        "$TURBO_ROOT$/helix/cli/src/**",
+        "$TURBO_ROOT$/visual.fingerprint.json"
       ],
       "outputs": [
         "api.json",

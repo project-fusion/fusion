@@ -15,8 +15,6 @@
 //! project registers are read from its own sources, an `@customElement` or a
 //! `customElements.define` with a literal name.
 
-use crate::component::installed::Installed;
-use crate::component::project::Project;
 use crate::component::text::line_of;
 use crate::component::{Context, Finding, Report};
 
@@ -25,7 +23,7 @@ pub fn run(context: &Context) -> Report {
     let mut checked = 0;
     let unit = "components built on a Helix one";
 
-    let Some(installed) = Installed::read(&context.root) else {
+    let Some(installed) = context.installed() else {
         return Report {
             checked,
             findings,
@@ -33,11 +31,13 @@ pub fn run(context: &Context) -> Report {
             unit,
         };
     };
-    let project = Project::read(context);
+    let project = context.project();
 
     for extension in &project.extensions {
-        /* Helix's own classes keep Helix's prefixes on purpose. */
-        if extension.class.starts_with("Helix") {
+        /* A class the installed packages publish is Helix's own, which keeps
+        Helix's prefixes on purpose: this repository's styled tier, read as a
+        project. */
+        if installed.classes.contains_key(&extension.class) {
             continue;
         }
         let (base, tier) = project.grounded(extension);

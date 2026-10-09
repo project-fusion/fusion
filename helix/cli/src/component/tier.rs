@@ -35,8 +35,6 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::installed::Installed;
-use crate::component::project::Project;
 use crate::component::text::line_of;
 use crate::component::{sources, Context, Finding, Report};
 
@@ -47,7 +45,7 @@ static OVERRIDE: LazyLock<Regex> = LazyLock::new(|| {
 /// A project's classes built on a Helix one that renders children.
 fn extended(context: &Context) -> Report {
     let unit = "components inheriting a `tag()` call";
-    let Some(installed) = Installed::read(&context.root) else {
+    let Some(installed) = context.installed() else {
         return Report {
             checked: 0,
             findings: Vec::new(),
@@ -55,7 +53,7 @@ fn extended(context: &Context) -> Report {
             unit,
         };
     };
-    let project = Project::read(context);
+    let project = context.project();
     let mut findings = Vec::new();
     let mut checked = 0;
     for extension in &project.extensions {

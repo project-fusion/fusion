@@ -69,6 +69,19 @@ fn project() -> &'static Path {
             "src/plain/plain.ts",
             "export class AcmePlain extends HelixHeadlessCombobox {}\n",
         );
+        /* Two classes in one module, the second with no prefix of its own. */
+        write(
+            &project,
+            "src/pair/pair.ts",
+            "export class AcmePairA extends HelixHeadlessTag {\n  static override tier = 'acme-'\n}\n\nexport class AcmePairB extends HelixHeadlessCombobox {}\n",
+        );
+        /* A project class named like one of Helix's, which is still the
+        project's to register children for. */
+        write(
+            &project,
+            "src/lookalike/lookalike.ts",
+            "import '../listbox/listbox.js'\nimport '../tag/tag.js'\n\n@customElement('acme-lookalike')\nexport class HelixLookalike extends HelixHeadlessCombobox {\n  static override tier = 'acme-'\n}\n",
+        );
         /* Writes a tag of the project's own and imports nothing. */
         write(
             &project,
@@ -122,6 +135,7 @@ fn registered_holds_every_child_to_a_registration_under_the_prefix() {
         [
             "src/combobox/combobox.ts:11 AcmeCombobox renders `<acme-option>`, which nothing in the project registers",
             "src/listbox/listbox.ts:2 AcmeListbox renders `<acme-option>`, which nothing in the project registers",
+            "src/lookalike/lookalike.ts:5 HelixLookalike renders `<acme-option>`, which nothing in the project registers",
         ]
     );
 }
@@ -130,7 +144,10 @@ fn registered_holds_every_child_to_a_registration_under_the_prefix() {
 fn tier_holds_a_class_that_renders_children_to_a_prefix() {
     assert_eq!(
         findings("tier"),
-        ["src/plain/plain.ts:1 AcmePlain inherits a template that renders children and sets no `tier`, so it renders Helix's own children inside your element"]
+        [
+            "src/pair/pair.ts:5 AcmePairB inherits a template that renders children and sets no `tier`, so it renders Helix's own children inside your element",
+            "src/plain/plain.ts:1 AcmePlain inherits a template that renders children and sets no `tier`, so it renders Helix's own children inside your element",
+        ]
     );
 }
 

@@ -38,8 +38,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::installed::Installed;
-use crate::component::project::{specifier, Project};
+use crate::component::project::specifier;
 use crate::component::text::{line_of, uncommented};
 use crate::component::{family, sources, Context, Finding, Layer, Report};
 
@@ -208,8 +207,8 @@ static OPENED: LazyLock<Regex> = LazyLock::new(|| {
 /// children under its prefix and its own templates' tags alike, is one it
 /// imports the registration of.
 fn extended(context: &Context) -> Report {
-    let project = Project::read(context);
-    let installed = Installed::read(&context.root);
+    let project = context.project();
+    let installed = context.installed();
     /* Each module and the tags it renders, with the line that renders each. */
     let mut rendered: BTreeMap<usize, BTreeMap<String, usize>> = BTreeMap::new();
     for extension in &project.extensions {
@@ -241,6 +240,8 @@ fn extended(context: &Context) -> Report {
     let mut checked = 0;
     for (at, tags) in &rendered {
         let module = &project.modules[*at];
+        /* Walked once per module and not once per tag it renders. */
+        let reached = project.reachable(*at);
         for (tag, line) in tags {
             /* A tag the project does not register is Helix's, or another
             package's, and `scan` judges whether it is imported. */
@@ -248,7 +249,7 @@ fn extended(context: &Context) -> Report {
                 continue;
             };
             checked += 1;
-            if owner == *at || project.reaches(*at, owner) {
+            if reached.contains(&owner) {
                 continue;
             }
             findings.push(Finding {

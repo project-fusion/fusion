@@ -213,14 +213,23 @@ impl Project {
         let mut registers = BTreeMap::new();
         let mut imports = Vec::new();
         for (at, module) in modules.iter().enumerate() {
-            for found in CLASS.captures_iter(&module.code) {
+            let classes: Vec<_> = CLASS.captures_iter(&module.code).collect();
+            for (index, found) in classes.iter().enumerate() {
                 let start = found.get(0).map_or(0, |one| one.start());
+                /* The class's own body, up to the next class, so a module
+                holding two reads each one's prefix and not the first. */
+                let end = classes
+                    .get(index + 1)
+                    .and_then(|next| next.get(0))
+                    .map_or(module.code.len(), |next| next.start());
                 extensions.push(Extension {
                     module: at,
                     class: found[1].to_owned(),
                     base: found[2].to_owned(),
                     at: start,
-                    tier: TIER.captures(&module.code).map(|one| one[1].to_owned()),
+                    tier: TIER
+                        .captures(&module.code[start..end])
+                        .map(|one| one[1].to_owned()),
                     docs: docs_above(&module.text, start),
                 });
             }
@@ -252,21 +261,19 @@ impl Project {
         }
     }
 
-    /// Whether `from` imports `to`, directly or through what it imports.
-    pub fn reaches(&self, from: usize, to: usize) -> bool {
+    /// Every module `from` imports, directly or through what it imports, and
+    /// itself.
+    pub fn reachable(&self, from: usize) -> BTreeSet<usize> {
         let mut seen = BTreeSet::from([from]);
         let mut next = vec![from];
         while let Some(at) = next.pop() {
-            if at == to {
-                return true;
-            }
             for &one in self.imports.get(at).into_iter().flatten() {
                 if seen.insert(one) {
                     next.push(one);
                 }
             }
         }
-        false
+        seen
     }
 
     /// The class a project class extends, where the project declares it.

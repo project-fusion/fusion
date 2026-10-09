@@ -45,8 +45,6 @@ use regex::Regex;
 use crate::component::compositions::{
     compositions, exposed_as, part_docs_by_tag, second_name_of, Site,
 };
-use crate::component::installed::Installed;
-use crate::component::project::Project;
 use crate::component::text::{blanked, flattened, line_of, uncommented};
 use crate::component::{sources, walk_outside, Context, Finding, Report};
 
@@ -317,22 +315,21 @@ fn outside(
 /// under each lists them, with the `@csspart` lines its own chain adds.
 fn extended_docs(context: &Context) -> PartDocs {
     let mut docs = PartDocs::new();
-    let installed = Installed::read(&context.root);
-    for class in installed.iter().flat_map(|one| one.classes.values()) {
+    let installed = context.installed();
+    for class in installed.into_iter().flat_map(|one| one.classes.values()) {
         if let Some(tag) = &class.tag {
             docs.entry(tag.clone())
                 .or_default()
                 .extend(class.parts.clone());
         }
     }
-    let project = Project::read(context);
+    let project = context.project();
     for (tag, class) in &project.registers {
         let Some(extension) = project.extension(class) else {
             continue;
         };
         let (base, _) = project.grounded(extension);
         let mut parts = installed
-            .as_ref()
             .and_then(|one| one.classes.get(base))
             .map(|one| one.parts.clone())
             .unwrap_or_default();
@@ -364,8 +361,12 @@ pub fn run(context: &Context) -> Report {
     added: a project class's parts include the Helix class's under it, which
     its own sources never list. */
     let mut docs = part_docs_by_tag(context);
-    for (tag, parts) in extended_docs(context) {
-        docs.entry(tag).or_default().extend(parts);
+    /* Two layers are this repository, whose own sources describe every tag
+    and whose outside selectors are read by suffix. */
+    if context.settings.layers.len() < 2 {
+        for (tag, parts) in extended_docs(context) {
+            docs.entry(tag).or_default().extend(parts);
+        }
     }
     let mut findings = Vec::new();
     let forwarded = composed(context, &docs, &mut findings);
