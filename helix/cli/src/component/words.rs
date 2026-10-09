@@ -18,6 +18,10 @@
 //! 3. No plain template literal joins a word property with other text. The
 //!    order of a sentence is the translator's, so it belongs in the message.
 //!
+//! **The same in a project built on Helix**, whose components declare
+//! `@words` and `static words` from `@fusion.dev/helix-core` and are
+//! translated by the same registry.
+//!
 //! **A component that has not moved yet is counted, not failed.** The registry
 //! arrived with Combobox and Data Table on it and every other family still to
 //! move, so the count is visible work, in the notes, until it reaches zero.
@@ -333,8 +337,9 @@ pub fn run(context: &Context) -> Report {
                 }
                 if let Some(first) = properties.iter().find(|one| one.words) {
                     findings.push(Finding {
-                        detail: "Name the family's styled tag, `static words = 'helix-…'`, so a \
-                                 page can register words for it."
+                        detail: "Set `static words` to the tag a page registers the family's \
+                                 words under, such as its own tag, so a page can register words \
+                                 for it."
                             .to_owned(),
                         file: at(first.at),
                         message: format!(

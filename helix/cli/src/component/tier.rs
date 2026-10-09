@@ -23,26 +23,85 @@
 //! class; the class above inherits the method and has only to declare the prefix
 //! it should compose with. Keying on the outer file finds nothing at all, which
 //! is a check that passes by looking in the wrong place.
+//!
+//! **A project built on Helix makes the same mistake one step out.** Its class
+//! extends a Helix one, and the template it inherits renders children under the
+//! prefix the class sets. With none set, it renders Helix's own children
+//! inside the project's element. What each Helix class renders is read from
+//! the installed manifests.
 
 use std::fs;
 use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::installed::Installed;
+use crate::component::project::Project;
+use crate::component::text::line_of;
 use crate::component::{sources, Context, Finding, Report};
 
 static OVERRIDE: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"static\s+override\s+tier\s*=\s*'([^']*)'").expect("a literal pattern compiles")
 });
 
-pub fn run(context: &Context) -> Report {
-    let [base, over, ..] = context.settings.layers.as_slice() else {
+/// A project's classes built on a Helix one that renders children.
+fn extended(context: &Context) -> Report {
+    let unit = "components inheriting a `tag()` call";
+    let Some(installed) = Installed::read(&context.root) else {
         return Report {
             checked: 0,
             findings: Vec::new(),
-            notes: Vec::new(),
-            unit: "components inheriting a `tag()` call",
+            notes: vec!["no Helix package's manifest in node_modules, so what a Helix class renders is unknown".to_owned()],
+            unit,
         };
+    };
+    let project = Project::read(context);
+    let mut findings = Vec::new();
+    let mut checked = 0;
+    for extension in &project.extensions {
+        let (base, tier) = project.grounded(extension);
+        let children = installed.renders(base);
+        if children.is_empty() {
+            continue;
+        }
+        checked += 1;
+        if tier.is_some() {
+            continue;
+        }
+        let module = &project.modules[extension.module];
+        findings.push(Finding {
+            detail: format!(
+                "{base} renders {} under the prefix its class sets. Add `static override tier = \
+                 'your-'` and register each child under that prefix.",
+                children
+                    .iter()
+                    .map(|child| format!("`{child}`"))
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            ),
+            file: format!(
+                "{}:{}",
+                context.relative(&module.path),
+                line_of(&module.text, extension.at)
+            ),
+            message: format!(
+                "{} inherits a template that renders children and sets no `tier`, so it renders \
+                 Helix's own children inside your element",
+                extension.class
+            ),
+        });
+    }
+    Report {
+        checked,
+        findings,
+        notes: Vec::new(),
+        unit,
+    }
+}
+
+pub fn run(context: &Context) -> Report {
+    let [base, over, ..] = context.settings.layers.as_slice() else {
+        return extended(context);
     };
     let root = context.root.join(&base.source);
     let above = context.root.join(&over.source);

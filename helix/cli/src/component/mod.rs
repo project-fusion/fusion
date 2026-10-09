@@ -68,6 +68,7 @@ pub mod grafted;
 pub mod grounds;
 pub mod hook_names;
 pub mod hooks;
+pub mod installed;
 pub mod leaks;
 pub mod motion;
 pub mod observers;
@@ -77,6 +78,7 @@ pub mod parts;
 pub mod platform_fidelity;
 pub mod plugins;
 pub mod print;
+pub mod project;
 pub mod properties;
 pub mod reachable;
 pub mod recipes;
@@ -488,10 +490,11 @@ pub struct Layer {
 /// **Each one was run on a project outside this repository** that subclasses a
 /// headless element, with one mistake planted per rule, and caught it. They
 /// read what any component documents and writes: its `@csspart`, `@cssstate`,
-/// `@cssproperty` and `@property` declarations, its lifecycle, and what it
-/// listens for. The rest hold Helix to its own house conventions, or read
-/// Helix's own layering, event registry, or manifest, and would check nothing
-/// elsewhere, which is worse than not running.
+/// `@cssproperty`, `@slot` and `@property` declarations, its lifecycle, what it
+/// listens for, and what it imports. Where a rule reads Helix's own two layers,
+/// a project with one is read through the installed manifests instead. The
+/// rest hold Helix to its own house conventions, or read its event registry,
+/// and would check nothing elsewhere, which is worse than not running.
 #[cfg_attr(
     all(feature = "internal", not(test)),
     expect(
@@ -499,10 +502,12 @@ pub struct Layer {
         reason = "read by the published build, which runs only these"
     )
 )]
-pub const PUBLIC: [&str; 12] = [
+pub const PUBLIC: [&str; 17] = [
     "attribute-names",
+    "composed",
     "constructed",
     "dispatched",
+    "exportparts",
     "hooks",
     "leaks",
     "observers",
@@ -511,7 +516,10 @@ pub const PUBLIC: [&str; 12] = [
     "reflected-defaults",
     "registered",
     "restated",
+    "slots",
     "states",
+    "tier",
+    "words",
 ];
 
 /// Every rule this build carries: all of them in this repository's builds, and

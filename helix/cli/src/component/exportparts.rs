@@ -29,6 +29,12 @@
 //! a part nothing publishes is dead in all four and silent in all four. Nothing
 //! else looks there: the rules about parts read a component's own sheet and
 //! stop.
+//!
+//! **A project built on Helix is held to the second half.** Its classes take
+//! their parts from the Helix class under them, which the installed manifest
+//! lists, and add the `@csspart` lines above them. A `::part()` the project
+//! writes at its own tags or at Helix's is checked against those, in the
+//! folders `outside` names, or the project's tiers where it names none.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
@@ -39,6 +45,8 @@ use regex::Regex;
 use crate::component::compositions::{
     compositions, exposed_as, part_docs_by_tag, second_name_of, Site,
 };
+use crate::component::installed::Installed;
+use crate::component::project::Project;
 use crate::component::text::{blanked, flattened, line_of, uncommented};
 use crate::component::{sources, walk_outside, Context, Finding, Report};
 
@@ -244,11 +252,16 @@ fn collisions(
 }
 
 /// Every `::part()` written from outside a component, wherever it is written.
-fn outside(context: &Context, docs: &PartDocs, findings: &mut Vec<Finding>) -> usize {
+fn outside(
+    context: &Context,
+    docs: &PartDocs,
+    folders: &[std::path::PathBuf],
+    findings: &mut Vec<Finding>,
+) -> usize {
     let mut checked = 0;
-    for root in &context.settings.outside {
+    for root in folders {
         let mut files = Vec::new();
-        walk_outside(&context.root.join(root), &mut files);
+        walk_outside(root, &mut files);
         for file in files {
             let Ok(raw) = fs::read_to_string(&file) else {
                 continue;
@@ -299,11 +312,64 @@ fn outside(context: &Context, docs: &PartDocs, findings: &mut Vec<Finding>) -> u
     checked
 }
 
+/// Every part each tag publishes in a project with one layer: Helix's tags as
+/// the installed manifests list them, and the project's as the Helix class
+/// under each lists them, with the `@csspart` lines its own chain adds.
+fn extended_docs(context: &Context) -> PartDocs {
+    let mut docs = PartDocs::new();
+    let installed = Installed::read(&context.root);
+    for class in installed.iter().flat_map(|one| one.classes.values()) {
+        if let Some(tag) = &class.tag {
+            docs.entry(tag.clone())
+                .or_default()
+                .extend(class.parts.clone());
+        }
+    }
+    let project = Project::read(context);
+    for (tag, class) in &project.registers {
+        let Some(extension) = project.extension(class) else {
+            continue;
+        };
+        let (base, _) = project.grounded(extension);
+        let mut parts = installed
+            .as_ref()
+            .and_then(|one| one.classes.get(base))
+            .map(|one| one.parts.clone())
+            .unwrap_or_default();
+        let mut at = Some(extension);
+        for _ in 0..8 {
+            let Some(one) = at else {
+                break;
+            };
+            parts.extend(one.parts());
+            at = project.extension(&one.base);
+        }
+        docs.insert(tag.clone(), parts);
+    }
+    docs
+}
+
 pub fn run(context: &Context) -> Report {
-    let docs = part_docs_by_tag(context);
+    let folders: Vec<std::path::PathBuf> = if context.settings.outside.is_empty() {
+        context.settings.roots(&context.root)
+    } else {
+        context
+            .settings
+            .outside
+            .iter()
+            .map(|one| context.root.join(one))
+            .collect()
+    };
+    /* What the project declares, with what the installed packages publish
+    added: a project class's parts include the Helix class's under it, which
+    its own sources never list. */
+    let mut docs = part_docs_by_tag(context);
+    for (tag, parts) in extended_docs(context) {
+        docs.entry(tag).or_default().extend(parts);
+    }
     let mut findings = Vec::new();
     let forwarded = composed(context, &docs, &mut findings);
-    let checked = outside(context, &docs, &mut findings);
+    let checked = outside(context, &docs, &folders, &mut findings);
     Report {
         checked: forwarded + checked,
         findings,
