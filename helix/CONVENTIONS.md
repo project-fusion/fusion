@@ -143,6 +143,13 @@ an `overflow` they had no way of knowing was missing.
   `aura/shader.ts` and `orb/shapes.ts`. A part's folder holds the part, so a
   reader opening `root/` finds the element and its sheet and not the
   arithmetic behind them.
+- **A tier's `src` holds folders and its `index.ts`.** A spec that holds every
+  family, or several of them, sits in `src/specs/`: `hydration.dom.spec.ts`,
+  `native-events.dom.spec.ts`, `forced-colors.dom.spec.ts`. A module that is
+  not a family gets a folder of its own with no `index.ts`, which keeps it out
+  of every check that reads a family: `rehype/rehype.ts`, exported as
+  `./rehype`. The ambient `example-sheets.d.ts` sits beside the tsconfigs that
+  name it.
 - **A region becomes an element only when it has behavior, state, or API.**
   Otherwise it is a slot. Card's header, body, and footer carried none of the
   three, so five elements became one and a title became a real `<h2>` the

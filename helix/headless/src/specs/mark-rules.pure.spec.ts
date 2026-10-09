@@ -9,18 +9,21 @@ import { join, relative } from 'node:path'
    starts the controller that writes one, to naming exactly the rules it needs,
    in the order `mark-rules.ts` declares them. */
 
+/** The tier's source, which this file sits one folder inside. */
+const SOURCE = join(import.meta.dir, '..')
+
 /** Every module of this tier's source, as a path relative to it. */
 const modules = (): string[] =>
-  readdirSync(import.meta.dir, { recursive: true, withFileTypes: true })
+  readdirSync(SOURCE, { recursive: true, withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith('.ts'))
     .filter((entry) => !entry.name.includes('.spec.') && !entry.name.endsWith('.css.ts'))
-    .map((entry) => relative(import.meta.dir, join(entry.parentPath, entry.name)))
+    .map((entry) => relative(SOURCE, join(entry.parentPath, entry.name)))
     .filter((path) => !path.startsWith('.') && !path.includes('/.examples/'))
     .sort()
 
 /** A module's code, its comments taken out: a comment naming a mark writes none. */
 const code = (path: string): string =>
-  readFileSync(join(import.meta.dir, path), 'utf8')
+  readFileSync(join(SOURCE, path), 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, '')
     .replace(/^\s*\/\/.*$/gm, '')
 

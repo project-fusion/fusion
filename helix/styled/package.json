@@ -25,8 +25,8 @@
     "./jsx": "./types/jsx.d.ts",
     "./lint.json": "./lint.json",
     "./rehype": {
-      "types": "./dist/rehype.d.ts",
-      "default": "./dist/rehype.js"
+      "types": "./dist/rehype/rehype.d.ts",
+      "default": "./dist/rehype/rehype.js"
     },
     "./svelte": "./types/svelte.d.ts",
     "./vue": "./types/vue.d.ts",

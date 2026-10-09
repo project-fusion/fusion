@@ -30,24 +30,24 @@ beforeAll(async () => {
   /* The families this exercises, not the barrel: see `native-events.dom.spec.ts`
      for why importing the barrel here would empty `hydration.dom.spec.ts`. */
   await Promise.all([
-    import('./checkbox/index.js'),
-    import('./color-input/index.js'),
-    import('./color-picker/index.js'),
-    import('./combobox/index.js'),
-    import('./date-input/index.js'),
-    import('./file-input/index.js'),
-    import('./filter-input/index.js'),
-    import('./input/index.js'),
-    import('./listbox/index.js'),
-    import('./number-input/index.js'),
-    import('./pin-input/index.js'),
-    import('./rating/index.js'),
-    import('./select/index.js'),
-    import('./slider/index.js'),
-    import('./switch/index.js'),
-    import('./textarea/index.js'),
-    import('./time-input/index.js'),
-    import('./time-picker/index.js'),
+    import('../checkbox/index.js'),
+    import('../color-input/index.js'),
+    import('../color-picker/index.js'),
+    import('../combobox/index.js'),
+    import('../date-input/index.js'),
+    import('../file-input/index.js'),
+    import('../filter-input/index.js'),
+    import('../input/index.js'),
+    import('../listbox/index.js'),
+    import('../number-input/index.js'),
+    import('../pin-input/index.js'),
+    import('../rating/index.js'),
+    import('../select/index.js'),
+    import('../slider/index.js'),
+    import('../switch/index.js'),
+    import('../textarea/index.js'),
+    import('../time-input/index.js'),
+    import('../time-picker/index.js'),
   ])
 })
 
@@ -167,7 +167,7 @@ describe('a field written aria-invalid', () => {
  */
 describe('a required field checked from a script', () => {
   beforeAll(async () => {
-    await import('./chat/index.js')
+    await import('../chat/index.js')
   })
 
   const CHECKED = [
@@ -236,9 +236,9 @@ describe('a required field checked from a script', () => {
 describe('a form checked from a script', () => {
   beforeAll(async () => {
     await Promise.all([
-      import('./chat/index.js'),
-      import('./checkbox-group/index.js'),
-      import('./date-picker/index.js'),
+      import('../chat/index.js'),
+      import('../checkbox-group/index.js'),
+      import('../date-picker/index.js'),
     ])
   })
 
