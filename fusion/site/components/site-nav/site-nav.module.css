@@ -183,23 +183,13 @@
 
 /* The picture, on the band and not on a plate. The gallery frame paints the
    page's ground behind every drawing, which is right on a card and wrong
-   here: an opaque rectangle on the glass sheet, with a hairline around it,
-   read as a card, and a band of five cards is a shelf. The drawing carries
-   its own silhouette, so the ground goes and the border with it. The radius
-   stays for the ring below. */
+   here: an opaque rectangle on the glass sheet read as a card, and a band of
+   five cards is a shelf. The drawing carries its own silhouette, so the
+   ground goes, and nothing is drawn around it. */
 .tile > :global(.componentArt) {
   background: transparent;
-  border: var(--helix-border-thin) solid transparent;
-  border-radius: var(--helix-radii-sm);
   inline-size: 100%;
   margin-block-end: var(--helix-space-2xs);
-  transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
-}
-
-/* Where you are, as a ring around the picture. A tile has no leading cell for
-   the row recipe's dot, and a dot beside a picture reads as a bullet. */
-.tile[aria-current="page"] > :global(.componentArt) {
-  border-color: var(--helix-color-primary);
 }
 
 /* The name, with its stage beside it where it carries one. `1lh` for the
@@ -212,6 +202,13 @@
   font-size: var(--helix-text-sm);
   font-weight: var(--helix-weight-semibold);
   gap: var(--helix-space-sm);
+}
+
+/* Where you are, said by the name. A ring around the picture was the one box
+   left in the band; a dot beside a picture reads as a bullet; the name in the
+   primary is the row recipe's dot, carried by the word. */
+.tile[aria-current="page"] .tileName {
+  color: var(--helix-color-primary);
 }
 
 .tileSummary {
