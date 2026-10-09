@@ -18,9 +18,8 @@ export interface Destination {
    *
    * A destination with a picture is a tile and one without is a row in the
    * panel's text column. The split is Tesla's: the things you open and use get
-   * a picture, and the things you read get a line. A name here is a family slug
-   * the gallery already draws, or one of the site's own drawings in
-   * `site-nav/tiles.tsx`, and the panel looks the name up in both.
+   * a picture, and the things you read get a line. The name is the drawing's
+   * in `site-nav/tiles.tsx`, which draws every tile.
    */
   picture?: string
   /**
