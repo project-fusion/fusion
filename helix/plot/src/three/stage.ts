@@ -75,11 +75,14 @@ export interface StageOptions {
   density?: number | undefined
 }
 
-/** One reading named in the drawing: where it stands in the box, and what it says. */
-export interface Named {
-  at: Vector3
-  text: string
+/** Where a reading is drawn, as fractions of the box the drawing fills, from its top left. */
+export interface Place {
+  x: number
+  y: number
 }
+
+/** What moved a reading: the kinds of pointer a chart's readings name. */
+export type PointerKind = 'mouse' | 'pen' | 'touch'
 
 /** The box's edges and a grid at the ticks, on its floor and its two back walls. */
 const gridLines = (axes: Axes): number[] => {
@@ -114,15 +117,14 @@ const gridLines = (axes: Axes): number[] => {
 /**
  * The stage a 3D plot is drawn on, in `container`.
  *
- * `named` is asked on every frame for the reading to name over the drawing,
- * the one under the pointer or the keys. `pick` is asked which reading a
- * ray through the pointer meets, `-1` for none, and `press` hears a press
- * that did not drag.
+ * `pick` is asked which reading a ray through the pointer meets, `-1` for
+ * none. `onHover` hears the reading a mouse or a pen rests on, `onPress` a
+ * press that did not drag, and `onPlace` where the ringed reading is drawn
+ * after each frame, which is where the chart points its tooltip.
  */
 export const createStage = (
   container: HTMLElement,
   options: StageOptions & {
-    named: () => Named | undefined
     pick: (ray: Raycaster) => number
   },
 ) => {
@@ -182,8 +184,27 @@ export const createStage = (
   let colors: PlotColors | undefined
   let font = 'sans-serif'
   let stopped = false
-  let press: ((index: number) => void) | undefined
-  let hover: ((index: number) => void) | undefined
+  let press: ((index: number, kind: PointerKind) => void) | undefined
+  let hover: ((index: number, kind: PointerKind) => void) | undefined
+  let place: ((at: Place | undefined) => void) | undefined
+  let placed: Place | undefined
+
+  /* Where the ringed reading is drawn, told only when it moves. */
+  const tellPlace = (): void => {
+    let at: Place | undefined
+    if (marker.visible) {
+      const on = marker.position.clone().project(camera)
+      at = on.z > 1 ? undefined : { x: (on.x + 1) / 2, y: (1 - on.y) / 2 }
+    }
+    const moved =
+      at === undefined || placed === undefined
+        ? at !== placed
+        : Math.abs(at.x - placed.x) > 1e-4 || Math.abs(at.y - placed.y) > 1e-4
+    if (moved) {
+      placed = at
+      place?.(at)
+    }
+  }
 
   /** Every name and number, placed over where its place in the box is drawn. */
   const drawLabels = (): void => {
@@ -220,10 +241,6 @@ export const createStage = (
     label(new Vector3(0, -h, h + 0.35), x.name, true)
     label(new Vector3(h + 0.62, -h, 0), z.name, true)
     label(new Vector3(-h, h + 0.28, h), y.name, true)
-    const shown = options.named()
-    if (shown) {
-      label(shown.at.clone().add(new Vector3(0, 0.16, 0)), shown.text, true)
-    }
     labels.replaceChildren(...marks)
     /* **Kept inside the plot**, whichever way it is turned: a name at the
        edge of a narrow plot ran off it. Measured once laid out, a few dozen
@@ -278,6 +295,7 @@ export const createStage = (
     dirty = false
     renderer.render(scene, camera)
     drawLabels()
+    tellPlace()
     if (turn && !pending) {
       pending = requestAnimationFrame(tick)
     }
@@ -345,6 +363,8 @@ export const createStage = (
     )
     return options.pick(raycaster)
   }
+  const kindOf = (event: PointerEvent): PointerKind =>
+    event.pointerType === 'touch' || event.pointerType === 'pen' ? event.pointerType : 'mouse'
   let down: { x: number; y: number } | undefined
   let hovered = -1
   const onDown = (event: PointerEvent): void => {
@@ -356,31 +376,51 @@ export const createStage = (
     if (!was || Math.hypot(event.clientX - was.x, event.clientY - was.y) >= DRAG) {
       return
     }
-    press?.(pickAt(event))
+    press?.(pickAt(event), kindOf(event))
   }
-  const onMove = (event: PointerEvent): void => {
-    if (down) {
-      return
-    }
-    const next = pickAt(event)
+  /* **Only a mouse or a pen hovers**, as on every chart: a finger passing over
+     the drawing turns it, and a tap is its hover, which `press` hears. */
+  const hoverTo = (next: number, kind: PointerKind): void => {
     if (next !== hovered) {
       hovered = next
       canvas.style.cursor = next >= 0 ? 'pointer' : ''
-      hover?.(next)
-      invalidate()
+      hover?.(next, kind)
+    }
+  }
+  const onMove = (event: PointerEvent): void => {
+    if (down || event.pointerType === 'touch') {
+      return
+    }
+    hoverTo(pickAt(event), kindOf(event))
+  }
+  const onLeave = (event: PointerEvent): void => {
+    if (event.pointerType !== 'touch') {
+      hoverTo(-1, kindOf(event))
     }
   }
   canvas.addEventListener('pointerdown', onDown)
   canvas.addEventListener('pointerup', onUp)
   canvas.addEventListener('pointermove', onMove)
+  canvas.addEventListener('pointerleave', onLeave)
 
   return {
     invalidate,
-    /** Hears the reading under the pointer, `-1` for none. */
-    onHover: (listener: (index: number) => void): void => {
+    /** Hears the reading a mouse or a pen rests on, `-1` for none. Returns what stops listening. */
+    onHover: (listener: (index: number, kind: PointerKind) => void): (() => void) => {
       hover = listener
+      return () => {
+        hover = undefined
+      }
     },
-    onPress: (listener: (index: number) => void): (() => void) => {
+    /** Hears where the ringed reading is drawn after each frame that moves it, or that none is. */
+    onPlace: (listener: (at: Place | undefined) => void): (() => void) => {
+      place = listener
+      listener(placed)
+      return () => {
+        place = undefined
+      }
+    },
+    onPress: (listener: (index: number, kind: PointerKind) => void): (() => void) => {
       press = listener
       return () => {
         press = undefined
@@ -422,6 +462,7 @@ export const createStage = (
       canvas.removeEventListener('pointerdown', onDown)
       canvas.removeEventListener('pointerup', onUp)
       canvas.removeEventListener('pointermove', onMove)
+      canvas.removeEventListener('pointerleave', onLeave)
       controls.dispose()
       grid.geometry.dispose()
       gridMaterial.dispose()

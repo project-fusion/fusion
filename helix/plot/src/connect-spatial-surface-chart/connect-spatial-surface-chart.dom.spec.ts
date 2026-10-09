@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
-import type { PlotColors } from '../connect-plot/connect-plot.js'
+import type { Place, PlotColors, PointerKind } from '../connect-plot/connect-plot.js'
 import type { SpatialSurfaceChartDriver, SurfaceField } from './connect-spatial-surface-chart.js'
 
 let connectSpatialSurfaceChart: typeof import('./connect-spatial-surface-chart.js').connectSpatialSurfaceChart
@@ -13,8 +13,9 @@ beforeAll(async () => {
 
 /* The connection between a surface and a driver that records what it was
  * told. The three.js driver needs WebGL, which no DOM spec has; what is held
- * here is what the surface's connection decides beyond the scatter's: the
- * ramp it is shaded along. */
+ * here is what the surface's connection decides beyond the scatter's, the
+ * ramp it is shaded along, and the hover and the place every spatial chart's
+ * tooltip is driven by. */
 
 interface Chart extends HTMLElement {
   active: number
@@ -22,7 +23,13 @@ interface Chart extends HTMLElement {
 }
 
 const recording = () => {
-  const told: { colors?: PlotColors; drawn: SurfaceField[]; focus: number[] } = {
+  const told: {
+    colors?: PlotColors
+    drawn: SurfaceField[]
+    focus: number[]
+    hover?: ((index: number, kind: PointerKind) => void) | undefined
+    place?: ((at: Place | undefined) => void) | undefined
+  } = {
     drawn: [],
     focus: [],
   }
@@ -32,6 +39,18 @@ const recording = () => {
       told.colors = colors
     },
     focus: (index) => told.focus.push(index),
+    onHover: (hover) => {
+      told.hover = hover
+      return () => {
+        told.hover = undefined
+      }
+    },
+    onPlace: (place) => {
+      told.place = place
+      return () => {
+        told.place = undefined
+      }
+    },
     turnBy: () => {},
   }
   return { driver, told }
@@ -100,5 +119,24 @@ describe('connectSpatialSurfaceChart', () => {
     ;(element as unknown as { requestActive(index: number): void }).requestActive(2)
     await settle(element)
     expect(told.focus.at(-1)).toBe(2)
+  })
+
+  test('a reading hovered in the drawing is the chart’s, and its tooltip points where it is drawn', async () => {
+    const element = await chart()
+    const { driver, told } = recording()
+    const connection = connectSpatialSurfaceChart(element, driver)
+    await settle(element)
+    told.hover?.(2, 'mouse')
+    told.place?.({ x: 0.4, y: 0.3 })
+    await settle(element)
+    expect(element.active).toBe(2)
+    expect(part(element, 'tooltip-label')?.textContent).toBe('Mon 1h')
+    told.hover?.(-1, 'mouse')
+    await settle(element)
+    expect(element.active).toBe(-1)
+    connection.disconnect()
+    await settle(element)
+    expect(told.hover).toBeUndefined()
+    expect(part(element, 'tooltip-anchor')).toBeNull()
   })
 })

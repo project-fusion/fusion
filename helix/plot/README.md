@@ -39,8 +39,10 @@ const connection = connectSpatialScatterChart(chart, threeScatterDriver(chart.qu
 - **Dragging turns the box, and the wheel and a pinch bring it nearer.** Shift
   with an arrow on the chart turns it a step of 15 degrees. It never turns by
   itself.
-- **A point pressed in the drawing is the chart's reading**, as one reached by
-  the keys is, and it is ringed and named with its numbers.
+- **A point the mouse rests on, or one tapped or pressed, is the chart's
+  reading**, as one reached by the keys is. It is ringed in the drawing, and
+  the chart shows its row in the tooltip every Helix chart shows, pointed at
+  the ring and following it as the view turns.
 - **It draws only while something moves**, and asks the browser for no frames
   at rest or while its box is out of view.
 - **Every three.js drawing Helix makes on a page shares six WebGL contexts**,
@@ -82,9 +84,9 @@ const connection = connectSpatialSurfaceChart(chart, threeSurfaceDriver(chart.qu
   `--spatial-surface-chart-high`, which default to a quiet tint of the theme's
   `primary-active` and to `primary-active` itself. It is lit from above and
   ruled along the grid.
-- **A place pressed in the drawing is the chart's reading**, and it is ringed
-  and named with its reading. The left and right arrows move across, and the
-  down and up arrows in depth.
+- **A place the mouse rests on, or one tapped or pressed, is the chart's
+  reading**, ringed and shown in the chart's tooltip as the scatter's is. The
+  left and right arrows move across, and the down and up arrows in depth.
 - The box, the turning, the frames, and the shared contexts are the scatter's.
 - **Until the renderer has drawn, the chart draws its grid flat**, seen from
   above, each place shaded by its height.

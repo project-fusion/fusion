@@ -2,12 +2,14 @@ import {
   AriaForwardController,
   CHART_PLOT,
   customElement,
+  drawTooltip,
   formatWords,
   HelixElement,
   HelixPlotChangeEvent,
   HelixPlotTurnEvent,
   HelixReadingChangeEvent,
   HelixReadingPressEvent,
+  isRtl,
   MixinChartSource,
   MixinChartStatus,
   spokenReading,
@@ -15,6 +17,7 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import '../../tooltip/index.js'
 import { along, fieldOf, type PlotField, type PlotPoint } from '../field.js'
 
 /** How many series colors the palette has, after which the groups take them again. */
@@ -55,6 +58,10 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * says the point's row in words, and the renderer marks it. Shift with an
  * arrow turns the view, and Escape lets the point go.
  *
+ * **A reading shows its row in a tooltip**, as on every chart: the point a
+ * mouse or a pen rests on in the drawing, the point tapped, or the one the
+ * keys move to, once a renderer has drawn.
+ *
  * **Readings are sent as every chart sends them.** `helix-reading-change`
  * says each move of the reading, by pointer or key, and `helix-reading-press`
  * a point clicked, tapped, or pressed with Enter or Space, each with the row
@@ -91,11 +98,28 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart fallback - The flat scatter of the first two measures, drawn until a renderer has drawn and where none is connected. Hidden from screen readers.
  * @csspart live - The readout: a polite live region that says the point the keys moved to. Hide it visually.
  * @csspart loading - The words while `loading` is set and there are no points.
+ * @csspart mark - The invisible point the tooltip is anchored to, where the renderer draws the reading.
  * @csspart plot - The box the drawing fills, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart point - One point of the flat scatter, placed by percentage.
  * @csspart point-active - The point the keys rest on, in the flat scatter. Set alongside `point`.
  * @csspart summary - The three measures and the number of points, written as a sentence for screen readers, which describes the plot. Hide it visually.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
+ * @csspart tooltip - The bubble, forwarded from `Tooltip`.
+ * @csspart tooltip-anchor - The `Tooltip` element itself.
+ * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
+ * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, on its top edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-arrow-left - The point while the bubble is left of the reading, on its right edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-arrow-right - The point while the bubble is right of the reading, on its left edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-arrow-top - The point while the bubble is above the reading, on its bottom edge. Set alongside `tooltip-arrow`.
+ * @csspart tooltip-bottom - The bubble while it is below the reading. Set alongside `tooltip`.
+ * @csspart tooltip-cell - One column's name and value inside the tooltip.
+ * @csspart tooltip-cell-current - The cell a chart's series keys rest on, which every chart's tooltip can mark. This chart marks none, since its readout says the measure. Set alongside `tooltip-cell`.
+ * @csspart tooltip-label - The row's own name inside the tooltip.
+ * @csspart tooltip-left - The bubble while it is left of the reading. Set alongside `tooltip`.
+ * @csspart tooltip-name - A column's name inside the tooltip.
+ * @csspart tooltip-right - The bubble while it is right of the reading. Set alongside `tooltip`.
+ * @csspart tooltip-top - The bubble while it is above the reading. Set alongside `tooltip`.
+ * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssstate active - While a point is shown, under the pointer or the keys.
  * @cssstate drawn - While a renderer has drawn the points, and the flat scatter is hidden.
@@ -133,6 +157,10 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
   /** Whether a renderer has drawn the points, which hides the flat scatter. */
   @state()
   private rendered = false
+
+  /** Where the renderer draws the reading, which the tooltip points at. */
+  @state()
+  private place: { x: number; y: number } | undefined
 
   /** The field last read, kept so a change of it can be told. */
   private last: PlotField | undefined = undefined
@@ -174,11 +202,26 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
   }
 
   /**
-   * Puts the keys' reading on the point at `index`, or lets it go with `-1`,
-   * as a press in the renderer's drawing does. Called by the connector.
+   * Puts the reading on the point at `index`, or lets it go with `-1`, as a
+   * pointer resting on it in the renderer's drawing or a press there does.
+   * A touch keeps it until a tap lands elsewhere, and a mouse leaving a
+   * reading the keys moved to leaves it. Called by the connector.
    */
-  requestActive(index: number): void {
-    this.pointer.set(index)
+  requestActive(index: number, kind: 'mouse' | 'pen' | 'touch' = 'mouse'): void {
+    if (kind === 'touch') {
+      this.pointer.tapTo(index)
+    } else if (index >= 0 || !this.pointer.keyed) {
+      this.pointer.set(index)
+    }
+  }
+
+  /**
+   * Says where the renderer draws the reading, as fractions of the plot from
+   * its top left, or `undefined` while it draws none. The tooltip points
+   * there. Called by the connector.
+   */
+  placeReading(at: { x: number; y: number } | undefined): void {
+    this.place = at
   }
 
   override connectedCallback(): void {
@@ -214,6 +257,15 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
       this.told = this.pointer.at
       this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'focus' }))
     }
+    /* The tooltip follows the reading while the view turns, which moves its
+       mark without anything the tooltip watches changing size. */
+    if (changed.has('place' as keyof this)) {
+      ;(
+        this.renderRoot.querySelector('[for="helix-chart-mark"]') as
+          | (Element & { reposition?: () => void })
+          | null
+      )?.reposition?.()
+    }
   }
 
   /** Shift with an arrow asks the renderer to turn the view, and moves no reading. */
@@ -244,6 +296,7 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
         <slot></slot>
         ${readable ? this.renderFallback(field, at) : nothing}
         ${this.renderLive(points, at)}
+        ${this.renderTooltip(points[at]?.row)}
       </div>
       ${readable ? this.renderSummary(field) : this.renderStatus()}${this.renderTable()}`
   }
@@ -283,6 +336,33 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
           )
         : ''
     return html`<span aria-live="polite" part="live" role="status">${said}</span>`
+  }
+
+  /**
+   * The reading's row in the tooltip every chart shows, pointed at where the
+   * renderer draws it. Only once a renderer has drawn, since the flat
+   * drawing is a stand-in.
+   */
+  private renderTooltip(row: number | undefined): TemplateResult | typeof nothing {
+    const place = this.place
+    if (!this.rendered || !place || row === undefined || !this.sourceRows[row]) {
+      return nothing
+    }
+    /* A row's names and values are words, and read the way the page does,
+       while the drawing is the same on every page. */
+    return drawTooltip(
+      this.sourceRows,
+      row,
+      this.tag('tooltip'),
+      {
+        dir: isRtl(this) ? 'rtl' : 'ltr',
+        fixed: true,
+        placement: 'top',
+        x: `${place.x * 100}%`,
+        y: `${place.y * 100}%`,
+      },
+      () => undefined,
+    )
   }
 
   /** What the plot shows, in a sentence, which describes the plot. */
