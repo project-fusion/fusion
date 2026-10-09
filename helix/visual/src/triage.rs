@@ -1,11 +1,12 @@
 //! The changes a failed run found, grouped by what they happened to, and,
 //! when the config asks, explained by a model.
 //!
-//! **Grouping needs no model.** Each change is told by its attribution: the
-//! element under each region, the file that defines it, and how it moved. A
-//! signature is those words with each region's place, each element's place
-//! among its namesakes, and each `#id` left out, so a token change across 300
-//! pictures that moved one kind of element is one group with 300 members.
+//! **Grouping needs no model.** Each region of a change is told by its
+//! attribution: the element under it, the file that defines it, and how it
+//! moved. A region's signature is those words with its place, each element's
+//! place among its namesakes, and each `#id` left out, and a shot joins the
+//! group of every region it has, so a token change that moved one kind of
+//! element across 300 pictures is one group with 300 members.
 //!
 //! **A model only explains and orders.** One request a group, the largest
 //! first and as many as the config's cap, with the attribution, the
@@ -107,49 +108,62 @@ fn files_of(line: &str) -> Option<String> {
     Some(line[at..end].to_string())
 }
 
-/// The signature of one change.
-fn signature(entry: &str, change: &Change) -> String {
+/// The signatures of one change, one a region: a shot whose button and badge
+/// both changed is in the button's group and in the badge's.
+fn signatures(entry: &str, change: &Change) -> Vec<(String, Vec<String>)> {
     match change {
         Change::Differs(lines) if !lines.is_empty() => {
-            let mut words: Vec<String> =
-                lines.iter().map(|line| kind(&plain(told(line)))).collect();
-            words.sort();
-            words.dedup();
-            words.join("; ")
+            let mut found: Vec<(String, Vec<String>)> = Vec::new();
+            for line in *lines {
+                let signature = kind(&plain(told(line)));
+                match found.iter_mut().find(|(one, _)| *one == signature) {
+                    Some((_, kept)) => kept.push(line.clone()),
+                    None => found.push((signature, vec![line.clone()])),
+                }
+            }
+            found
         }
-        Change::Differs(_) => {
-            format!("{entry}: the picture differs, and its baseline carries no boxes to say where")
-        }
+        Change::Differs(_) => vec![(
+            format!("{entry}: the picture differs, and its baseline carries no boxes to say where"),
+            Vec::new(),
+        )],
         Change::Resized { from, to } => {
             let wider = i64::from(to.0) - i64::from(from.0);
             let taller = i64::from(to.1) - i64::from(from.1);
-            format!("the page is {wider:+} px wider and {taller:+} px taller")
+            vec![(
+                format!("the page is {wider:+} px wider and {taller:+} px taller"),
+                Vec::new(),
+            )]
         }
-        Change::Aria(sentence) => format!("the accessibility snapshot: {sentence}"),
+        Change::Aria(sentence) => vec![(
+            format!("the accessibility snapshot: {sentence}"),
+            Vec::new(),
+        )],
     }
 }
 
-/// The changes, grouped by signature, the largest group first.
+/// The changes, grouped by the signature of each region, the largest group
+/// first. A shot is a member of every group one of its regions is in.
 pub fn group(changes: &[(String, String, Change)]) -> Vec<Group> {
     let mut groups: Vec<Group> = Vec::new();
     for (entry, shot, change) in changes {
-        let signature = signature(entry, change);
-        let at = if let Some(at) = groups.iter().position(|one| one.signature == signature) {
-            at
-        } else {
-            let lines = match change {
-                Change::Differs(lines) => lines.to_vec(),
-                _ => Vec::new(),
+        let member = format!("{entry}, {shot}");
+        for (signature, lines) in signatures(entry, change) {
+            let at = if let Some(at) = groups.iter().position(|one| one.signature == signature) {
+                at
+            } else {
+                groups.push(Group {
+                    files: lines.iter().filter_map(|line| files_of(line)).collect(),
+                    lines,
+                    signature,
+                    ..Group::default()
+                });
+                groups.len() - 1
             };
-            groups.push(Group {
-                files: lines.iter().filter_map(|line| files_of(line)).collect(),
-                lines,
-                signature,
-                ..Group::default()
-            });
-            groups.len() - 1
-        };
-        groups[at].members.push(format!("{entry}, {shot}"));
+            if !groups[at].members.contains(&member) {
+                groups[at].members.push(member.clone());
+            }
+        }
     }
     groups.sort_by(|a, b| {
         b.members
@@ -331,6 +345,33 @@ mod tests {
             groups[0].files,
             BTreeSet::from(["src/badge.ts".to_string()])
         );
+    }
+
+    #[test]
+    fn a_shot_with_two_changed_regions_is_in_both_groups() {
+        let both = vec![
+            "40 by 20 px at 0, 0: `helix-button::part(control)` (src/button.ts), drawn differently where it was".to_string(),
+            "20 by 10 px at 60, 0: `helix-badge` (src/badge.ts), drawn differently where it was".to_string(),
+        ];
+        let one = vec!["40 by 20 px at 9, 9: `helix-button::part(control)` (src/button.ts), drawn differently where it was".to_string()];
+        let groups = group(&[
+            (
+                "styled/card".to_string(),
+                "wide".to_string(),
+                Change::Differs(&both),
+            ),
+            (
+                "styled/form".to_string(),
+                "wide".to_string(),
+                Change::Differs(&one),
+            ),
+        ]);
+        assert_eq!(groups.len(), 2);
+        assert_eq!(
+            groups[0].members,
+            ["styled/card, wide", "styled/form, wide"]
+        );
+        assert_eq!(groups[1].members, ["styled/card, wide"]);
     }
 
     #[test]
