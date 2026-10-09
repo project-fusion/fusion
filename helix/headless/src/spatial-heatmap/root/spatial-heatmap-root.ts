@@ -381,7 +381,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
           data-mirror
           part="drawing"
           role=${grid ? 'none' : nothing}
-          style=${this.rendered ? 'opacity: 0' : nothing}
+          style=${this.rendered ? 'opacity: 0; pointer-events: none' : nothing}
           viewBox="${box.x} ${box.y} ${box.width} ${box.height}"
           xmlns="http://www.w3.org/2000/svg"
         >${relief.base ? this.renderBase(relief.base) : nothing}${grid ? this.renderPrismRows(prisms) : prisms}</svg>`
@@ -398,9 +398,9 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
         tabindex=${readable ? '0' : nothing}
         @click=${this.onClick}
         @keydown=${this.onTurnKeydown}
-        @pointerover=${this.onPointerOver}
+        @pointerover=${this.rendered ? undefined : this.onPointerOver}
         @pointerleave=${this.onPointerLeave}
-        @pointerup=${this.onPointerUp}
+        @pointerup=${this.rendered ? undefined : this.onPointerUp}
       ><slot name="renderer"></slot>${drawing}${this.renderTooltip(grid)}</div>
       ${cells.length === 0 ? this.renderStatus() : nothing}
       <div part="footer" style=${this.cornersStyle(relief)}>

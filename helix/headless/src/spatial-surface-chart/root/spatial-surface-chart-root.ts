@@ -332,16 +332,36 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
     this.dispatchEvent(new HelixPlotTurnEvent(turn))
   }
 
-  /** A mouse or a pen over the chart's own drawing puts the reading on the place nearest it. */
+  /** The reading a pointer event is over, as `onDrawingMove` finds it, or `-1`. */
+  private placeAt(event: PointerEvent, reach?: number): number {
+    const drawing = event.currentTarget as SVGSVGElement
+    const face = (event.composedPath()[0] as Element | undefined)?.closest?.('[part="face"]')
+    const corners = new Set(
+      (face?.getAttribute('data-corners') ?? '').split(' ').filter(Boolean).map(Number),
+    )
+    if (corners.size > 0) {
+      return nearestTo(
+        drawing,
+        event,
+        this.placed.filter((place) => corners.has(place.index)),
+        Number.POSITIVE_INFINITY,
+      )
+    }
+    return nearestTo(drawing, event, this.placed, reach)
+  }
+
+  /**
+   * A mouse or a pen over the chart's own drawing puts the reading on the
+   * place nearest it: over a face, the face's nearest corner on the screen,
+   * so any point of the surface finds a reading, and otherwise a place
+   * within reach. The face under the pointer is the one in front, since the
+   * faces are painted back to front.
+   */
   private readonly onDrawingMove = (event: PointerEvent): void => {
     if (event.pointerType === 'touch') {
       return
     }
-    const drawing = event.currentTarget as SVGSVGElement
-    this.requestActive(
-      nearestTo(drawing, event, this.placed),
-      event.pointerType === 'pen' ? 'pen' : 'mouse',
-    )
+    this.requestActive(this.placeAt(event), event.pointerType === 'pen' ? 'pen' : 'mouse')
   }
 
   private readonly onDrawingLeave = (event: PointerEvent): void => {
@@ -353,10 +373,7 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
   /** A tap is a touch reader's hover: it shows the place nearest it until a tap lands elsewhere. */
   private readonly onDrawingTap = (event: PointerEvent): void => {
     if (event.pointerType === 'touch') {
-      this.requestActive(
-        nearestTo(event.currentTarget as SVGSVGElement, event, this.placed, 24),
-        'touch',
-      )
+      this.requestActive(this.placeAt(event, 24), 'touch')
     }
   }
 
@@ -403,7 +420,13 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
     )
     const places = boxed.flatMap((box, index) => (box ? [{ index, ...view.on(box) }] : []))
     this.placed = places
-    const faces: Array<{ depth: number; level: number; points: BoxPoint[]; shade: number }> = []
+    const faces: Array<{
+      corners: number[]
+      depth: number
+      level: number
+      points: BoxPoint[]
+      shade: number
+    }> = []
     for (let across = 0; across + 1 < field.acrosses.length; across++) {
       for (let depth = 0; depth + 1 < depths; depth++) {
         const here = across * depths + depth
@@ -415,6 +438,7 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
         }
         const points = corners.map((index) => boxed[index] as BoxPoint)
         faces.push({
+          corners,
           depth: points.reduce((sum, point) => sum + view.depth(point), 0) / points.length,
           level:
             corners.reduce(
@@ -442,7 +466,7 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
         @pointerup=${this.onDrawingTap}
       >${drawBox(view)}${faces.map(
         (face) =>
-          svg`<path d=${shape(face.points.map((point) => view.on(point)))} part="face" style="--spatial-surface-chart-level: ${short(face.level)}; --spatial-surface-chart-shade: ${short(face.shade)}"></path>`,
+          svg`<path d=${shape(face.points.map((point) => view.on(point)))} data-corners=${face.corners.join(' ')} part="face" style="--spatial-surface-chart-level: ${short(face.level)}; --spatial-surface-chart-shade: ${short(face.shade)}"></path>`,
       )}${
         active
           ? svg`<circle cx=${active.x} cy=${active.y} part="ring" r="0.085"></circle><foreignObject height="0.001" overflow="visible" width="0.001" x=${active.x} y=${active.y}>${this.renderOwnTooltip(row)}</foreignObject>`

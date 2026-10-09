@@ -17,6 +17,9 @@ import type {
 } from '../connect-spatial-surface-chart/connect-spatial-surface-chart.js'
 import { createStage, HALF, inBox } from './stage.js'
 
+/** How far off the pointer's line of sight a reading is still under it, in radians: about 16 pixels in a chart's box. */
+const REACH = 0.03
+
 /** How the three.js surface driver behaves where the page does not say. */
 export interface ThreeSurfaceDriverOptions {
   /**
@@ -87,13 +90,41 @@ export const threeSurfaceDriver = (
 
   const stage = createStage(container, {
     density: options.density,
-    /* The corner nearest where the ray meets the surface. */
+    /* **The reading nearest the pointer's line of sight that the surface
+       does not hide**, measured as an angle so it reads as a distance on the
+       screen, and otherwise the nearest corner of the face the pointer is
+       over. Taken from the face alone, a reading on the surface's edge was
+       out of reach, and over a large face near the camera the face's own
+       corner won over a reading drawn right under the pointer. */
     pick: (ray) => {
       const hit = ray.intersectObject(surface)[0]
+      const position = surface.geometry.getAttribute('position')
+      if (field && position) {
+        const corner = new Vector3()
+        let found = -1
+        let nearest = REACH
+        field.cells.forEach((cell, index) => {
+          if (cell.value === undefined) {
+            return
+          }
+          corner.fromBufferAttribute(position, index)
+          const along = corner.clone().sub(ray.ray.origin).dot(ray.ray.direction)
+          if (along <= 0 || (hit && along > hit.distance + 0.03)) {
+            return
+          }
+          const away = ray.ray.distanceToPoint(corner) / along
+          if (away < nearest) {
+            nearest = away
+            found = index
+          }
+        })
+        if (found >= 0) {
+          return found
+        }
+      }
       if (!hit?.face) {
         return -1
       }
-      const position = surface.geometry.getAttribute('position')
       const corner = new Vector3()
       let nearest = -1
       let distance = Number.POSITIVE_INFINITY
