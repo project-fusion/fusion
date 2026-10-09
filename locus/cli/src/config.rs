@@ -54,6 +54,10 @@ pub struct Config {
     pub shard: Shard,
     #[serde(default = "shots")]
     pub shots: Vec<Shot>,
+    /// A stylesheet applied while each picture is taken and removed after,
+    /// to hold still what `mask` alone cannot, such as a masked element whose
+    /// width follows its text.
+    pub style: Option<String>,
     pub sources: Vec<Source>,
     /// Where to write the seconds each entry name took, when set.
     pub timings: Option<String>,
