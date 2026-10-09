@@ -12,6 +12,9 @@ version = "0.0.0-dev"
 # The driver sends each picture inside a JSON line.
 base64 = "0.22"
 clap = { version = "4", features = ["derive"] }
+# The checksum of the chunk that carries a baseline's element boxes, the one
+# the PNG codec already uses.
+crc32fast = "1"
 # **The error and exit-code contract `helix` prints with.** Shared with the
 # other command lines and owned by none of them, so this is no dependency on the
 # fusion domain: the crate's `lib.rs` carries the argument.

@@ -26,6 +26,8 @@ use crate::run::Fate;
 
 /// One shot as the report sees it.
 pub struct Row<'a> {
+    /// What each changed region of a shot that differs happened to.
+    pub attribution: &'a [String],
     /// The baseline, or a pair's first side.
     pub baseline: Picture<'a>,
     /// The capture, or a pair's second side, for a shot that failed.
@@ -156,7 +158,11 @@ pub fn finish(run: &Run) -> Code {
             fate if fate.fails() => {
                 baseline_failures += usize::from(!row.pair);
                 pair_differences += usize::from(row.pair && matches!(fate, Fate::Differs { .. }));
-                failures.push(format!("{what}: {sentence}"));
+                let mut failure = format!("{what}: {sentence}");
+                for line in row.attribution {
+                    let _ = write!(failure, "\n    {line}");
+                }
+                failures.push(failure);
             }
             Fate::Steadied | Fate::Tolerated { .. } => notes.push(format!("{what}: {sentence}")),
             Fate::Held => held += 1,
@@ -359,6 +365,9 @@ fn record(run: &Run, verdict: &str, failed: bool) -> Value {
                 "shot": row.shot,
                 "source": row.source,
             });
+            if !row.attribution.is_empty() {
+                record["attribution"] = json!(row.attribution);
+            }
             if row.fate.fails() {
                 if row.baseline.present() {
                     record["baseline"] = json!(format!("shots/{at}-baseline.png"));
@@ -413,6 +422,22 @@ fn write(run: &Run, record: &Value) -> std::io::Result<()> {
     )?;
     fs::write(run.dir.join("index.html"), html(record))?;
     Ok(())
+}
+
+/// What each changed region happened to, as a list, or nothing.
+fn changes(shot: &Value) -> String {
+    let lines: Vec<String> = shot["attribution"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(Value::as_str)
+        .map(|line| format!("<li>{}</li>", escape(line)))
+        .collect();
+    if lines.is_empty() {
+        String::new()
+    } else {
+        format!("<ul class=\"changes\">{}</ul>", lines.concat())
+    }
 }
 
 /// A detail sentence, which continues `entry, shot:` in the printed form,
@@ -472,9 +497,10 @@ fn html(record: &Value) -> String {
         };
         let _ = write!(
             cards,
-            "<section><h2>{}</h2><p>{}</p><div class=\"three\">{}{}{}</div>{swipe}</section>",
+            "<section><h2>{}</h2><p>{}</p>{}<div class=\"three\">{}{}{}</div>{swipe}</section>",
             escape(&title),
             escape(&sentence(shot["detail"].as_str().unwrap_or_default())),
+            changes(shot),
             picture("baseline", first),
             picture("current", second),
             picture("diff", "Difference"),
@@ -557,12 +583,21 @@ pub fn markdown(record: &Value) -> String {
     if !rows.is_empty() {
         out.push_str("| Entry | Shot | Result |\n|---|---|---|\n");
         for row in rows {
+            let mut detail = sentence(row["detail"].as_str().unwrap_or_default());
+            for line in row["attribution"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(Value::as_str)
+            {
+                let _ = write!(detail, "<br>{line}");
+            }
             let _ = writeln!(
                 out,
                 "| {} | {} | {} |",
                 row["entry"].as_str().unwrap_or_default(),
                 row["shot"].as_str().unwrap_or_default(),
-                sentence(row["detail"].as_str().unwrap_or_default()).replace('|', "\\|")
+                detail.replace('|', "\\|")
             );
         }
     }

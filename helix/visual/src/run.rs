@@ -24,6 +24,7 @@ use fusion_rules::error::{Failure, Outcome};
 use fusion_rules::exit::Code;
 use serde_json::{json, Value};
 
+use crate::boxes;
 use crate::config::{Config, Diff, Exception, Mode, Network, Platform, Shot, Source, CHECKS};
 use crate::diff;
 use crate::discover::Entry;
@@ -228,6 +229,30 @@ pub(crate) fn exception_for<'a>(
     })
 }
 
+/// Each tag the config's manifests declare, and the file that defines it,
+/// relative to the config. A manifest that cannot be read is said once, and
+/// the run goes on without it.
+fn manifests(config: &Config, base: &Path) -> BTreeMap<String, String> {
+    let mut found = BTreeMap::new();
+    for name in &config.manifest {
+        let path = base.join(name);
+        match fs::read_to_string(&path)
+            .map_err(|error| error.to_string().to_lowercase())
+            .and_then(|text| serde_json::from_str::<Value>(&text).map_err(|error| error.to_string()))
+        {
+            Ok(manifest) => {
+                let folder = Path::new(name)
+                    .parent()
+                    .map(|one| one.to_string_lossy().replace('\\', "/"))
+                    .unwrap_or_default();
+                found.extend(boxes::tags(&manifest, &folder));
+            }
+            Err(why) => say!("helix: cannot read the manifest {name}, so no change is traced to a file through it: {why}"),
+        }
+    }
+    found
+}
+
 /// The exception that excuses this entry from the check by this name.
 fn excused<'a>(exceptions: &'a [Exception], entry: &Entry, check: &str) -> Option<&'a Exception> {
     exceptions.iter().find(|one| {
@@ -284,6 +309,7 @@ fn item(config: &Config, entry: &Entry, shots: &[&Shot], first: bool) -> Outcome
             "overlap": on(checks.overlap.resolved().map(|check| json!(check))),
         },
         "entry": { "file": entry.file, "id": entry.id, "name": entry.name, "source": source.name(), "url": entry.url },
+        "boxes": false,
         "inspect": first && config.inspect,
         "key": entry.id,
         "shots": shots.iter().map(|shot| shot_request(config, entry, shot)).collect::<Vec<_>>(),
@@ -380,6 +406,13 @@ pub(crate) fn capture(
                     .map_err(|error| {
                         internal(format!("a picture of {key} that is not base64: {error}"))
                     })?;
+                /* The boxes ride in the picture, so a baseline written from
+                it keeps them and a diff of it can read them. */
+                let bytes = if line["boxes"].is_array() {
+                    boxes::embed(&bytes, &line["boxes"])
+                } else {
+                    bytes
+                };
                 captured.pictures.insert((entry, shot), bytes);
             }
             Some("item") => {
@@ -751,7 +784,11 @@ pub fn run(options: &Options) -> Outcome<Code> {
             .map(|at| &config.shots[at])
             .collect();
         if !shots.is_empty() {
-            items.push(item(&config, entry, &shots, true)?);
+            let mut one = item(&config, entry, &shots, true)?;
+            /* An update writes what it takes, so every picture carries its
+            boxes into the baseline it may become. */
+            one["boxes"] = Value::Bool(options.update);
+            items.push(one);
         }
     }
     let first = capture(&mut driver, &items, &keys, &config.shots, ready)?;
@@ -765,6 +802,8 @@ pub fn run(options: &Options) -> Outcome<Code> {
 
     let mut results: BTreeMap<(usize, usize), Fate> = BTreeMap::new();
     let mut currents: BTreeMap<(usize, usize), Vec<u8>> = BTreeMap::new();
+    let mut attributions: BTreeMap<(usize, usize), Vec<String>> = BTreeMap::new();
+    let files = manifests(&config, &base);
     let mut again: Vec<(usize, usize)> = Vec::new();
     for (at, entry) in mine
         .iter()
@@ -879,6 +918,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
             let entry = mine[at];
             let key = format!("{}#{}", entry.id, config.shots[shot].name);
             let mut one = item(&config, entry, &[&config.shots[shot]], false)?;
+            one["boxes"] = Value::Bool(true);
             one["key"] = Value::String(key.clone());
             retake_keys.insert(key, at);
             items.push(one);
@@ -914,10 +954,22 @@ pub fn run(options: &Options) -> Outcome<Code> {
                             Fate::Resized { from, to }
                         }
                         Ok(Verdict::Differs(measure)) => {
-                            let before = image::decode(existing.as_deref().unwrap_or_default())
-                                .map_err(|why| internal(why.clone()))?;
+                            let kept = existing.as_deref().unwrap_or_default();
+                            let before =
+                                image::decode(kept).map_err(|why| internal(why.clone()))?;
                             let after = image::decode(bytes).map_err(internal)?;
                             let (_, drawn) = diff::marked(&before, &after, diff.threshold);
+                            if let Some(now) = boxes::read(bytes) {
+                                attributions.insert(
+                                    (at, shot),
+                                    boxes::attribute(
+                                        &boxes::regions(&drawn),
+                                        &now,
+                                        boxes::read(kept).as_deref(),
+                                        &files,
+                                    ),
+                                );
+                            }
                             let encoded = image::encode(&drawn).map_err(internal)?;
                             write(&marked, &encoded)?;
                             currents.insert((at, shot), bytes.clone());
@@ -1011,6 +1063,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
                     .as_ref()
                     .and_then(|one| one.pictures.get(&(at, shot)));
                 return report::Row {
+                    attribution: &[],
                     baseline: report::Picture::Bytes(pictures.map(|(a, _, _)| a.as_slice())),
                     current: pictures.map(|(_, b, _)| b.as_slice()),
                     diff: report::Picture::Bytes(pictures.and_then(|(_, _, diff)| diff.as_deref())),
@@ -1024,6 +1077,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
             }
             if shot == aria {
                 return report::Row {
+                    attribution: &[],
                     baseline: report::Picture::File(None),
                     current: None,
                     diff: report::Picture::File(None),
@@ -1037,6 +1091,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
             }
             let (baseline, marked) = paths(mine[at], &config.shots[shot]);
             report::Row {
+                attribution: attributions.get(&(at, shot)).map_or(&[], Vec::as_slice),
                 baseline: report::Picture::File(Some(baseline)),
                 current: currents.get(&(at, shot)).map(Vec::as_slice),
                 diff: report::Picture::File(matches!(fate, Fate::Differs { .. }).then_some(marked)),

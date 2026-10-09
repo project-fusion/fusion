@@ -44,6 +44,10 @@ export default defineConfig({
     contrast: { rules: ['var(--helix-color-border)'] },
     overlap: true,
   },
+  manifest: [
+    '../../helix/headless/custom-elements.json',
+    '../../helix/styled/custom-elements.json',
+  ],
   /* The footer's Helix version, which every release changes on every page.
      Painted over, and held at one width while each picture is taken, because
      the tag's width follows its digits: 0.186.0 and 0.187.0 masked boxes

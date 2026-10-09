@@ -31,6 +31,10 @@ pub struct Config {
     pub diff: Diff,
     #[serde(default)]
     pub exceptions: Vec<Exception>,
+    /// Custom elements manifests, relative to the config, which say the file
+    /// that defines each tag a change is traced to.
+    #[serde(default)]
+    pub manifest: Vec<String>,
     /// Selectors whose elements are painted over in every picture and left out
     /// of every accessibility snapshot, for what changes on its own and says
     /// nothing about the page: a version number, a date.

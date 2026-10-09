@@ -574,3 +574,87 @@ export const readPage = (page, options) =>
 
     return findings
   }, options)
+
+/**
+ * Where each element a reader would name sat when the page was pictured, in
+ * the picture's own pixels.
+ *
+ * **Named, because a change is told by what it happened to.** A custom
+ * element and each part it lays out, anything with an `id` or a
+ * `data-testid`, and the landmarks, headings, controls and pictures a page is
+ * read by. Each is keyed by the named elements above it and its place among
+ * its namesakes, so the same element is found again in another picture of the
+ * page, which is how a run says it moved.
+ */
+export const boxesOf = (page) =>
+  page.evaluate(() => {
+    const LIMIT = 4000
+    const READ =
+      'header, nav, main, aside, footer, section, form, h1, h2, h3, h4, h5, h6, a[href], button, input, select, textarea, img, svg, video, canvas, [role]'
+    const up = (node) => {
+      if (node.assignedSlot) {
+        return node.assignedSlot
+      }
+      if (node.parentElement) {
+        return node.parentElement
+      }
+      const above = node.getRootNode()
+      return above instanceof ShadowRoot ? above.host : null
+    }
+    const label = (element) => {
+      if (element.part?.length > 0) {
+        const holder = element.getRootNode()
+        return `${holder instanceof ShadowRoot ? '' : element.localName}::part(${[...element.part].join(' ')})`
+      }
+      if (element.id) {
+        return `${element.localName}#${element.id}`
+      }
+      const test = element.getAttribute('data-testid')
+      return test ? `${element.localName}[data-testid="${test}"]` : element.localName
+    }
+    const named = (element) =>
+      element.localName.includes('-') ||
+      element.part?.length > 0 ||
+      element.id !== '' ||
+      element.hasAttribute('data-testid') ||
+      element.matches(READ)
+    /* What holds an element in a key: the custom elements and the elements
+       with an `id` above it, which a reader names it by. */
+    const holds = (element) => element.localName.includes('-') || element.id !== ''
+    const found = []
+    const seen = new Map()
+    const visit = (root) => {
+      for (const element of root.querySelectorAll('*')) {
+        if (found.length >= LIMIT) {
+          return
+        }
+        if (named(element)) {
+          const box = element.getBoundingClientRect()
+          if (box.width > 0 && box.height > 0) {
+            const path = [label(element)]
+            for (let at = up(element); at; at = up(at)) {
+              if (at.nodeType === Node.ELEMENT_NODE && holds(at)) {
+                path.unshift(label(at))
+              }
+            }
+            const joined = path.join(' ')
+            const count = (seen.get(joined) ?? 0) + 1
+            seen.set(joined, count)
+            found.push({
+              height: Math.round(box.height),
+              key: count === 1 ? joined : `${joined} (${count})`,
+              tag: element.localName,
+              width: Math.round(box.width),
+              x: Math.round(box.left + window.scrollX),
+              y: Math.round(box.top + window.scrollY),
+            })
+          }
+        }
+        if (element.shadowRoot) {
+          visit(element.shadowRoot)
+        }
+      }
+    }
+    visit(document)
+    return found
+  })
