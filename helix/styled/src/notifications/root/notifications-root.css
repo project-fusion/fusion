@@ -108,11 +108,17 @@
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
+  /* **The label stays on one line, and the title gives way.** A flex item
+     shrinks to its longest word, so a larger heading or a longer translation
+     wrapped "Mark all as read" onto two lines beside it. The title is the one
+     that can take a second line. */
+  flex: none;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   padding-block: var(--helix-space-2xs);
   padding-inline: var(--helix-space-2xs);
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+  white-space: nowrap;
 }
 
 /* Ink rather than a line, which is how every other quiet control in this
