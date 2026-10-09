@@ -201,6 +201,11 @@ export interface Config {
   fingerprint?: string
   /** Checks of your own on each page, after its first picture. */
   inspect?: Inspect
+  /**
+   * Selectors whose elements are painted over in one fixed color in every picture, for what changes on its
+   * own and says nothing about the page, such as a version number or a date.
+   */
+  mask?: string[]
   /** `origin` refuses every request off the harness origin, and is the default. `open` lets them through. */
   network?: 'open' | 'origin'
   /** `linux` takes and compares baselines on Linux alone, and is the default. `any` compares wherever it runs. */

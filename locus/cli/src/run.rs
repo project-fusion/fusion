@@ -542,6 +542,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
     let started = driver
         .ask(&json!({
             "network": match config.network { Network::Origin => "origin", Network::Open => "open" },
+            "mask": config.mask,
             "op": "start",
             "origins": origins,
             "serve": serve,
