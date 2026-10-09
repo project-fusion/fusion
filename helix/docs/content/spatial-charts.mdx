@@ -143,6 +143,26 @@ Chromium on an Apple silicon Mac:
 A slower machine reaches these sizes sooner. three.js draws each chart on the
 graphics card.
 
+## Draw a chart for a landing page
+
+`no-box` draws `Spatial Bar Chart`, `Spatial Scatter Chart`, or `Spatial Surface
+Chart` with no box, grid, numbers, or names, and nothing behind it, so the
+readings stand on the page as a picture does:
+
+```html
+<helix-spatial-surface-chart
+  emphasis="outlined"
+  for="load"
+  label="Load over a week"
+  no-box
+></helix-spatial-surface-chart>
+```
+
+The table, the summary, the tooltip, and the keys still carry every value, and
+three.js draws no box either. `Spatial Heatmap` has no box, and its `start` and
+`end` slots are the only names it draws, so leave them empty for the same
+picture.
+
 ## When a 3D bar chart fits
 
 A flat `Bar Chart` is read more exactly. Studies of 3D bars measure readers

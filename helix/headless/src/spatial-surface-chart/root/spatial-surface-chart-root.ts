@@ -21,6 +21,7 @@ import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import {
   type BoxPoint,
+  boundsOf,
   boxView,
   DragTurn,
   drawBox,
@@ -169,6 +170,15 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
    * `registerWords('de', { 'helix-spatial-surface-chart': { emptyText: 'Keine Werte' } })`.
    */
   static words = 'helix-spatial-surface-chart'
+
+  /**
+   * Draws no box: no edges, grid, numbers, or names, so the readings stand
+   * alone and fill the plot, as a picture on a product's own page does. The
+   * table, the summary, the tooltip, and the keys still carry every value,
+   * and a renderer draws no box either.
+   */
+  @property({ attribute: 'no-box', reflect: true, type: Boolean })
+  noBox = false
 
   /**
    * What the readout says for a place with no reading. `{x}` and `{z}` are
@@ -446,7 +456,7 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
    * has drawn and where none is connected.
    */
   private renderFallback(field: SurfaceField, at: number): TemplateResult {
-    const view = boxView(field.axes, this.camera)
+    const view = boxView(field.axes, this.camera, [], this.noBox)
     const depths = field.depths.length
     const boxed = field.cells.map((cell): BoxPoint | undefined =>
       cell.value === undefined
@@ -492,7 +502,10 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
     faces.sort((one, other) => one.depth - other.depth)
     const active = places.find((place) => place.index === at)
     const row = field.cells[at]?.row
-    const bounds = this.drag.frame(view.bounds, view.on([0, 0, 0]))
+    const bounds = this.drag.frame(
+      this.noBox ? boundsOf(places, 0.1) : view.bounds,
+      view.on([0, 0, 0]),
+    )
     const short = (value: number): number => Math.round(value * 1000) / 1000
     return html`<div aria-hidden="true" dir="ltr" ?hidden=${this.rendered} part="fallback">
       <svg
@@ -506,7 +519,7 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
-      >${drawBox(view)}${faces.map(
+      >${this.noBox ? nothing : drawBox(view)}${faces.map(
         (face) =>
           svg`<path d=${shape(face.points.map((point) => view.on(point)))} data-corners=${face.corners.join(' ')} part="face" style="--spatial-surface-chart-level: ${short(face.level)}; --spatial-surface-chart-shade: ${short(face.shade)}"></path>`,
       )}${

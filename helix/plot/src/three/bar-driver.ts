@@ -1,5 +1,7 @@
 import {
+  Box3,
   BoxGeometry,
+  type BufferAttribute,
   BufferGeometry,
   Color,
   DirectionalLight,
@@ -150,11 +152,19 @@ export const threeBarDriver = (
         one.dispose()
       }
       stage.setAxes(next.axes, colors, font)
-      /* Framed around the box, whose proportions are the grid's. */
-      stage.frame(
-        new Vector3(-HALF * ex, -HALF * ey, -HALF * ez),
-        new Vector3(HALF * ex, HALF * ey, HALF * ez),
-      )
+      /* Framed around the box, whose proportions are the grid's, or with no
+         box around the bars alone, so they fill the view. */
+      if (colors.look.box || tops.size === 0) {
+        stage.frame(
+          new Vector3(-HALF * ex, -HALF * ey, -HALF * ez),
+          new Vector3(HALF * ex, HALF * ey, HALF * ez),
+        )
+      } else {
+        const around = new Box3().setFromBufferAttribute(
+          bars.geometry.getAttribute('position') as BufferAttribute,
+        )
+        stage.frame(around.min, around.max)
+      }
     },
     focus: (index) => {
       stage.setMarker(field ? tops.get(index) : undefined)
