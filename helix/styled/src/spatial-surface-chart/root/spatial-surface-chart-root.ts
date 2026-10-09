@@ -14,7 +14,7 @@ import '../../tooltip/index.js'
  * ramp from the theme's primary color, quiet where it is low and strong where
  * it is high, so the two drawings agree.
  *
- * @since 0.185.0
+ * @since 0.188.0
  * @status experimental
  * @category charts
  * @documentation https://fusion.dev/helix/components/spatial-surface-chart
