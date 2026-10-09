@@ -492,6 +492,30 @@ fn mcp_init_adds_the_server_and_keeps_the_others() {
     )
     .expect("JSON");
     assert_eq!(config["servers"]["helix"]["type"], "stdio");
+
+    /* Each other client's own file and shape. */
+    for (client, file, key) in [
+        ("gemini", ".gemini/settings.json", "mcpServers"),
+        ("roo", ".roo/mcp.json", "mcpServers"),
+        ("junie", ".junie/mcp/mcp.json", "mcpServers"),
+        ("opencode", "opencode.json", "mcp"),
+    ] {
+        let written = project.run(&["mcp", "init", "--client", client]);
+        assert_eq!(written.status.code(), Some(0), "{client}");
+        let config: Value = serde_json::from_str(
+            &std::fs::read_to_string(project.path().join(file)).expect("the config"),
+        )
+        .expect("JSON");
+        let entry = &config[key]["helix"];
+        if client == "opencode" {
+            assert_eq!(
+                *entry,
+                json!({ "command": ["npx", "@fusion.dev/helix-cli", "mcp"], "enabled": true, "type": "local" })
+            );
+        } else {
+            assert_eq!(entry["command"], "npx", "{client}");
+        }
+    }
 }
 
 /// **The check is the scan**, narrowed to a snippet: the same findings

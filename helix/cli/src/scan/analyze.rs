@@ -921,7 +921,8 @@ impl<'a> Analyzer<'a> {
             let named = elements.iter().any(|other| {
                 other.tag.starts_with("helix-")
                     && other.attributes.iter().any(|one| {
-                        one.name == "for" && matches!(&one.value, Value::Literal(value) if value == id)
+                        one.name == "for"
+                            && matches!(&one.value, Value::Literal(value) if value == id)
                     })
             });
             if named {
@@ -1387,12 +1388,14 @@ mod tests {
             ("p", None, "helix-text"),
             ("table", None, "helix-table"),
         ] {
-            installed.replaces.push(super::super::installed::Replacement {
-                native: native.to_owned(),
-                kind: kind.map(str::to_owned),
-                helix: helix.to_owned(),
-                specifier: format!("@fusion.dev/helix/{}", &helix["helix-".len()..]),
-            });
+            installed
+                .replaces
+                .push(super::super::installed::Replacement {
+                    native: native.to_owned(),
+                    kind: kind.map(str::to_owned),
+                    helix: helix.to_owned(),
+                    specifier: format!("@fusion.dev/helix/{}", &helix["helix-".len()..]),
+                });
         }
         let imports: HashSet<String> = ["@fusion.dev/helix".to_owned()].into();
         let page = markup::read(
@@ -1461,7 +1464,10 @@ mod tests {
             kinds(&analyzer),
             [
                 ("unknown-event", "<helix-card onHelixSelect>".to_owned()),
-                ("unknown-event", "<helix-card onhelix-before-open>".to_owned()),
+                (
+                    "unknown-event",
+                    "<helix-card onhelix-before-open>".to_owned()
+                ),
                 ("unknown-event", "<helix-card onhelix-selcet>".to_owned()),
             ]
         );

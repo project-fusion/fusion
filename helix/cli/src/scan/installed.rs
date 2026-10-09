@@ -116,26 +116,35 @@ impl Installed {
             .into_iter()
             .flatten()
             .find(|element| {
-                element["tagName"]
-                    .as_str()
-                    .is_some_and(|tag| tag == format!("helix-{slug}") || tag == format!("helix-headless-{slug}"))
+                element["tagName"].as_str().is_some_and(|tag| {
+                    tag == format!("helix-{slug}") || tag == format!("helix-headless-{slug}")
+                })
             })
         else {
             return;
         };
         let helix = root["tagName"].as_str().unwrap_or_default().to_owned();
         let specifier = root["specifier"].as_str().unwrap_or_default().to_owned();
-        for selector in family["replaces"].as_array().into_iter().flatten().filter_map(|one| one.as_str()) {
+        for selector in family["replaces"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(|one| one.as_str())
+        {
             let (native, kind) = match selector.split_once("[type=") {
                 Some((tag, rest)) => (tag.to_owned(), Some(rest.trim_end_matches(']').to_owned())),
                 None => (selector.to_owned(), None),
             };
-            let taken = self.replaces.iter().any(|one| one.native == native && one.kind == kind);
+            let taken = self
+                .replaces
+                .iter()
+                .any(|one| one.native == native && one.kind == kind);
             /* The styled tier's tag wins over the headless one's. */
             if taken && helix.starts_with("helix-headless-") {
                 continue;
             }
-            self.replaces.retain(|one| !(one.native == native && one.kind == kind));
+            self.replaces
+                .retain(|one| !(one.native == native && one.kind == kind));
             self.replaces.push(Replacement {
                 native,
                 kind,
