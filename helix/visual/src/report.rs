@@ -692,6 +692,9 @@ pub fn markdown(record: &Value) -> String {
             );
         }
     }
+    if let Some(triaged) = record["triage"].as_str() {
+        let _ = writeln!(out, "\n{triaged}");
+    }
     out
 }
 
