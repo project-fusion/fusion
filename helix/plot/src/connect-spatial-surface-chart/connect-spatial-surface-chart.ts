@@ -42,8 +42,8 @@ export type SpatialSurfaceChartConnection = PlotConnection
  * driver, shaded along the ramp `--spatial-surface-chart-low` to `--spatial-surface-chart-high`,
  * marks the place the keys rest on, turns the view for Shift with an arrow,
  * and puts a place pressed in the drawing on the chart's reading. Once the
- * driver has drawn, the chart hides its flat grid; `disconnect()` shows it
- * again.
+ * driver has drawn, the chart hides its own SVG drawing; `disconnect()`
+ * shows it again.
  */
 export const connectSpatialSurfaceChart = (
   frame: HTMLElement,

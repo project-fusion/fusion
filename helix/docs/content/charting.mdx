@@ -47,7 +47,12 @@ Choose a chart by the question it answers.
 - **How one measure rises and falls over two others.** `Spatial Surface Chart`, with one
   row per place on a grid, drawn as a surface you can turn. Use it for a measure
   over two ranges, such as load by hour and by day. Its table carries the exact
-  values, and its flat grid shades each place by its height.
+  values.
+
+Both spatial charts draw themselves in 3D in SVG, which a server, a print, and
+a page without WebGL all show, and which Shift with an arrow turns.
+`@fusion.dev/helix-plot` draws them with three.js instead, for a view you can
+drag round, zoom, and see in perspective.
 - **How each day or check went.** `Heatmap`, for uptime, contributions, or
   activity.
 - **The same days, as a relief.** `Spatial Heatmap` reads the same table as

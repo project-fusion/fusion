@@ -48,8 +48,9 @@ const connection = connectSpatialScatterChart(chart, threeScatterDriver(chart.qu
 - **Every three.js drawing Helix makes on a page shares six WebGL contexts**,
   the graph's and the plot's alike. Past six, one far off screen gives its
   context back and takes it again as it comes near.
-- **Until the renderer has drawn, the chart draws a flat scatter** of the
-  first two measures, and it draws it again after `connection.disconnect()`.
+- **Until the renderer has drawn, the chart draws the points in 3D itself**,
+  in SVG, from about where the renderer's camera starts, and it draws them
+  again after `connection.disconnect()`.
 
 | `threeScatterDriver` option | Default | What else it takes |
 |---|---|---|
@@ -88,8 +89,8 @@ const connection = connectSpatialSurfaceChart(chart, threeSurfaceDriver(chart.qu
   reading**, ringed and shown in the chart's tooltip as the scatter's is. The
   left and right arrows move across, and the down and up arrows in depth.
 - The box, the turning, the frames, and the shared contexts are the scatter's.
-- **Until the renderer has drawn, the chart draws its grid flat**, seen from
-  above, each place shaded by its height.
+- **Until the renderer has drawn, the chart draws the surface in 3D itself**,
+  in SVG, as the scatter draws its points.
 
 | `threeSurfaceDriver` option | Default | What else it takes |
 |---|---|---|

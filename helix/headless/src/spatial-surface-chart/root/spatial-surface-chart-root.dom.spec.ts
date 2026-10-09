@@ -59,16 +59,24 @@ describe('the frame', () => {
     expect(element.field.cells.map((cell) => cell.value)).toEqual([10, 20, 30, 40, 50, undefined])
   })
 
-  test('draws the grid flat until a renderer has drawn, each place by its height', async () => {
+  test('draws the surface in 3D itself until a renderer has drawn, a face to each square of readings', async () => {
     const element = await plot()
+    expect(part(element, 'drawing')?.localName).toBe('svg')
+    expect(part(element, 'grid')?.getAttribute('d')).toMatch(/^M/)
+    const faces = [...(element.shadowRoot?.querySelectorAll('[part="face"]') ?? [])]
+    /* Two squares across one step in depth: the first whole, and the second
+       missing hour 2 of day 2, so the triangle of its other three. */
+    expect(faces).toHaveLength(2)
+    const corners = faces.map((face) => (face.getAttribute('d')?.match(/L/g) ?? []).length + 1)
+    expect(corners.sort()).toEqual([3, 4])
+    const levels = faces.map((face) =>
+      Number(/--spatial-surface-chart-level: ([\d.]+)/.exec(face.getAttribute('style') ?? '')?.[1]),
+    )
+    expect(levels.sort()).toEqual([0.375, 0.75])
+    for (const face of faces) {
+      expect(face.getAttribute('style')).toMatch(/--spatial-surface-chart-shade: [\d.]+/)
+    }
     const fallback = part(element, 'fallback')
-    expect(fallback?.getAttribute('style')).toContain('--spatial-surface-chart-columns: 3')
-    const cells = [...(element.shadowRoot?.querySelectorAll('[part~="cell"]') ?? [])]
-    expect(cells).toHaveLength(6)
-    /* The first day at the back, on top, as the renderer first shows it: day 1, then day 2. */
-    expect(cells[0]?.getAttribute('style')).toContain('--spatial-surface-chart-level: 0')
-    expect(cells[2]?.getAttribute('style')).toContain('--spatial-surface-chart-level: 1')
-    expect(cells[5]?.hasAttribute('style')).toBe(false)
     element.drawn()
     await element.updateComplete
     expect(fallback?.hasAttribute('hidden')).toBe(true)

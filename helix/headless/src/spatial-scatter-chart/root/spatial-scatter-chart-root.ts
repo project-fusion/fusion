@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  type Camera,
   CHART_PLOT,
   customElement,
   drawTooltip,
@@ -15,10 +16,20 @@ import {
   spokenReading,
   words,
 } from '@fusion.dev/helix-core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
-import { along, fieldOf, type PlotField, type PlotPoint } from '../field.js'
+import { fieldOf, type PlotField, type PlotPoint } from '../field.js'
+import {
+  type BoxPoint,
+  boxView,
+  drawBox,
+  inBox,
+  nearestTo,
+  type Placed,
+  SPATIAL_VIEW,
+  turned,
+} from '../view.js'
 
 /** How many series colors the palette has, after which the groups take them again. */
 const SERIES = 24
@@ -44,8 +55,9 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * box for the renderer inside the chart, and `connectSpatialScatterChart` from
  * `@fusion.dev/helix-plot` draws the points in it with three.js and keeps it
  * in step with the chart. Until a renderer has drawn, and where none is
- * connected, the chart draws the first two measures as a flat scatter, so
- * the page always shows the points.
+ * connected, the chart draws the points in 3D itself, in SVG, from the same
+ * place the renderer's camera starts: a still picture the server, a print,
+ * and a page without WebGL all show, which Shift with an arrow turns.
  *
  * **The table is the reading.** Every number is in it, and screen readers
  * read it. The `summary` part names the three measures and the number of
@@ -94,16 +106,21 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading moved, or was put away: `index` is the row, or `-1` for none, with its `label` and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A point was clicked, tapped, or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
+ * @csspart axis-name - A measure's name, along its edge of the box, in the chart's own drawing.
+ * @csspart drawing - The chart's own drawing in SVG: the box, its grid and numbers, and the points.
  * @csspart empty - The words when the table has no points: the `empty` slot, falling back to `empty-text`.
- * @csspart fallback - The flat scatter of the first two measures, drawn until a renderer has drawn and where none is connected. Hidden from screen readers.
+ * @csspart fallback - The box the chart's own drawing fills, shown until a renderer has drawn and where none is connected. Hidden from screen readers.
+ * @csspart grid - The box's edges and its grid at the ticks, in the chart's own drawing.
  * @csspart live - The readout: a polite live region that says the point the keys moved to. Hide it visually.
  * @csspart loading - The words while `loading` is set and there are no points.
  * @csspart mark - The invisible point the tooltip is anchored to, where the renderer draws the reading.
  * @csspart plot - The box the drawing fills, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
- * @csspart point - One point of the flat scatter, placed by percentage.
- * @csspart point-active - The point the keys rest on, in the flat scatter. Set alongside `point`.
+ * @csspart point - One point of the chart's own drawing.
+ * @csspart point-active - The point the pointer or the keys rest on, in the chart's own drawing. Set alongside `point`.
+ * @csspart ring - The ring around the point the pointer or the keys rest on, drawn over every point.
  * @csspart summary - The three measures and the number of points, written as a sentence for screen readers, which describes the plot. Hide it visually.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
+ * @csspart tick - A number at a tick, along its edge of the box, in the chart's own drawing.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
@@ -122,7 +139,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssstate active - While a point is shown, under the pointer or the keys.
- * @cssstate drawn - While a renderer has drawn the points, and the flat scatter is hidden.
+ * @cssstate drawn - While a renderer has drawn the points, and the chart's own drawing is hidden.
  * @cssstate empty - While the `empty` part stands in place of the points.
  * @cssstate loading - While the `loading` part stands in place of the points.
  */
@@ -154,9 +171,16 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
   summaryLabel =
     '{count, plural, one {# point} other {# points}}: {x} across, {y} up, and {z} in depth.'
 
-  /** Whether a renderer has drawn the points, which hides the flat scatter. */
+  /** Whether a renderer has drawn the points, which hides the chart's own drawing. */
   @state()
   private rendered = false
+
+  /** Where the chart's own drawing is seen from, which Shift with an arrow turns. */
+  @state()
+  private camera: Camera = SPATIAL_VIEW
+
+  /** Each point where the chart's own drawing put it, which the pointer finds. */
+  private placed: Placed[] = []
 
   /** Where the renderer draws the reading, which the tooltip points at. */
   @state()
@@ -193,8 +217,8 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
   }
 
   /**
-   * Says whether a renderer has drawn the points, which hides the flat
-   * scatter or shows it again. Called by the connector.
+   * Says whether a renderer has drawn the points, which hides the chart's
+   * own drawing or shows it again. Called by the connector.
    */
   drawn(on = true): void {
     this.rendered = on
@@ -268,7 +292,10 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
     }
   }
 
-  /** Shift with an arrow asks the renderer to turn the view, and moves no reading. */
+  /**
+   * Shift with an arrow turns the view, the chart's own drawing and the
+   * renderer's alike, and moves no reading.
+   */
   private readonly onPlotKeydown = (event: KeyboardEvent): void => {
     const turn = TURNS[event.key]
     if (!event.shiftKey || !turn || event.altKey || event.ctrlKey || event.metaKey) {
@@ -276,7 +303,36 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
     }
     event.preventDefault()
     event.stopPropagation()
+    this.camera = turned(this.camera, turn.across, turn.up)
     this.dispatchEvent(new HelixPlotTurnEvent(turn))
+  }
+
+  /** A mouse or a pen over the chart's own drawing puts the reading on the point nearest it. */
+  private readonly onDrawingMove = (event: PointerEvent): void => {
+    if (event.pointerType === 'touch') {
+      return
+    }
+    const drawing = event.currentTarget as SVGSVGElement
+    this.requestActive(
+      nearestTo(drawing, event, this.placed),
+      event.pointerType === 'pen' ? 'pen' : 'mouse',
+    )
+  }
+
+  private readonly onDrawingLeave = (event: PointerEvent): void => {
+    if (event.pointerType !== 'touch') {
+      this.requestActive(-1, 'mouse')
+    }
+  }
+
+  /** A tap is a touch reader's hover: it shows the point nearest it until a tap lands elsewhere. */
+  private readonly onDrawingTap = (event: PointerEvent): void => {
+    if (event.pointerType === 'touch') {
+      this.requestActive(
+        nearestTo(event.currentTarget as SVGSVGElement, event, this.placed, 24),
+        'touch',
+      )
+    }
   }
 
   protected override render(): TemplateResult {
@@ -302,22 +358,42 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
   }
 
   /**
-   * The first two measures as a flat scatter, across and up, for the page to
-   * show until a renderer has drawn and where none is connected. Left to
-   * right in every text direction, as a number line is.
+   * The points in 3D, in SVG: the box with its grid, numbers, and names, and
+   * each point painted back to front, as the camera sees them. The chart's
+   * own drawing, until a renderer has drawn and where none is connected.
    */
   private renderFallback(field: PlotField, at: number): TemplateResult {
-    return html`<div
-      aria-hidden="true"
-      dir="ltr"
-      ?hidden=${this.rendered}
-      part="fallback"
-    >${field.points.map(
-      (point, index) => html`<span
-          part="point${index === at ? ' point-active' : ''}"
-          style="left: ${along(field.axes.x, point.x) * 100}%; top: ${(1 - along(field.axes.y, point.y)) * 100}%; --chart-series: var(--chart-series-${(point.groupIndex % SERIES) + 1})"
-        ></span>`,
-    )}</div>`
+    const view = boxView(field.axes, this.camera)
+    const places = field.points.map((point, index) => {
+      const box: BoxPoint = [
+        inBox(field.axes.x, point.x),
+        inBox(field.axes.y, point.y),
+        inBox(field.axes.z, point.z),
+      ]
+      return { depth: view.depth(box), index, point, ...view.on(box) }
+    })
+    this.placed = places
+    const painted = [...places].sort((one, other) => one.depth - other.depth)
+    const active = places[at]
+    const { bounds } = view
+    return html`<div aria-hidden="true" dir="ltr" ?hidden=${this.rendered} part="fallback">
+      <svg
+        part="drawing"
+        preserveAspectRatio="xMidYMid meet"
+        viewBox="${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}"
+        xmlns="http://www.w3.org/2000/svg"
+        @pointerleave=${this.onDrawingLeave}
+        @pointermove=${this.onDrawingMove}
+        @pointerup=${this.onDrawingTap}
+      >${drawBox(view)}${painted.map(
+        (place) =>
+          svg`<circle cx=${place.x} cy=${place.y} part="point${place.index === at ? ' point-active' : ''}" r="0.045" style="--chart-series: var(--chart-series-${(place.point.groupIndex % SERIES) + 1})"></circle>`,
+      )}${
+        active
+          ? svg`<circle cx=${active.x} cy=${active.y} part="ring" r="0.085"></circle><foreignObject height="0.001" overflow="visible" width="0.001" x=${active.x} y=${active.y}>${this.renderOwnTooltip(active.point.row)}</foreignObject>`
+          : nothing
+      }</svg>
+    </div>`
   }
 
   /** The readout: the point's row in words, once the keys have moved to one. */
@@ -339,9 +415,26 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
   }
 
   /**
+   * The reading's row in the tooltip, pointed at the point in the chart's
+   * own drawing, which holds it at the point's place.
+   */
+  private renderOwnTooltip(row: number): TemplateResult | typeof nothing {
+    if (this.rendered || !this.sourceRows[row]) {
+      return nothing
+    }
+    return drawTooltip(
+      this.sourceRows,
+      row,
+      this.tag('tooltip'),
+      { dir: isRtl(this) ? 'rtl' : 'ltr', fixed: true, placement: 'top', x: '0%', y: '0%' },
+      () => undefined,
+    )
+  }
+
+  /**
    * The reading's row in the tooltip every chart shows, pointed at where the
-   * renderer draws it. Only once a renderer has drawn, since the flat
-   * drawing is a stand-in.
+   * renderer draws it. Only once a renderer has drawn; until then the
+   * chart's own drawing holds the tooltip at the reading.
    */
   private renderTooltip(row: number | undefined): TemplateResult | typeof nothing {
     const place = this.place

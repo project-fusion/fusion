@@ -21,7 +21,7 @@ const sheet = (): string => {
 }
 
 describe('the styled spatial scatter chart', () => {
-  test('its plot takes focus, and its flat scatter colors each group by a series token', async () => {
+  test('its plot takes focus, and its own drawing colors each group by a series token', async () => {
     const host = await mount(`<div>
       <table id="people" data-hidden-visually>
         <thead><tr><th>Name</th><th>Team</th><th>Age</th><th>Tenure</th><th>Score</th></tr></thead>

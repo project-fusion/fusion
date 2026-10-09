@@ -21,7 +21,7 @@ const sheet = (): string => {
 }
 
 describe('the styled spatial surface chart', () => {
-  test('its plot takes focus, and its flat grid shades each place along the ramp', async () => {
+  test('its plot takes focus, it draws itself in SVG, and its faces are shaded along the ramp', async () => {
     const host = await mount(`<div>
       <table id="load" data-hidden-visually>
         <thead><tr><th>Slot</th><th>Hour</th><th>Day</th><th>Load</th></tr></thead>
@@ -37,7 +37,7 @@ describe('the styled spatial surface chart', () => {
     }
     await element.updateComplete
     expect(part(element, 'plot')?.getAttribute('tabindex')).toBe('0')
-    expect(element.shadowRoot?.querySelectorAll('[part~="cell"]')).toHaveLength(2)
+    expect(part(element, 'drawing')?.localName).toBe('svg')
     expect(sheet()).toContain('--spatial-surface-chart-high')
     expect(sheet()).toContain('--spatial-surface-chart-low')
   })

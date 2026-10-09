@@ -2,7 +2,7 @@
   display: block;
 }
 
-/* The box the 3D drawing is made in, and the flat scatter beside it until
+/* The box the 3D drawing is made in, and the chart's own drawing in it until
    then. The renderer's box is the page's own element, and it fills the plot. */
 [part="plot"] {
   background-color: var(--helix-color-surface-sunken);
@@ -22,10 +22,10 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* The flat scatter, inset from the box so no point sits half outside it. */
+/* The chart's own drawing, inset from the box so the names along its edges
+   have room. It scales as a whole through its `viewBox`. */
 [part="fallback"] {
-  inset: var(--helix-space-lg);
-  pointer-events: none;
+  inset: var(--helix-space-md);
   position: absolute;
 }
 
@@ -33,18 +33,55 @@
   display: none;
 }
 
+[part="drawing"] {
+  block-size: 100%;
+  display: block;
+  font-family: var(--helix-font-sans);
+  inline-size: 100%;
+  overflow: visible;
+}
+
+/* The box and its grid: the muted ink, see-through, as the renderer draws them. */
+[part="grid"] {
+  fill: none;
+  opacity: 0.35;
+  stroke: var(--helix-color-foreground-muted);
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+[part="tick"] {
+  fill: var(--helix-color-foreground-muted);
+  font-weight: var(--helix-weight-medium);
+}
+
+[part="axis-name"] {
+  fill: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-semibold);
+}
+
+/* A point in its group's color, edged in the plot's ground so a point in
+   front reads apart from one behind it. */
 [part~="point"] {
-  background-color: var(--chart-series, var(--helix-color-primary));
-  block-size: var(--spatial-scatter-chart-point-size, 0.5rem);
-  border-radius: var(--helix-radii-full);
-  inline-size: var(--spatial-scatter-chart-point-size, 0.5rem);
-  position: absolute;
+  fill: var(--chart-series, var(--helix-color-primary));
+  stroke: var(--helix-color-surface-sunken);
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+/* **Centered on the point**: inside the drawing, the mark's one pixel is one
+   of the `viewBox`'s units, many pixels on the page, and a bubble pointed
+   at its middle missed the point by half of it. */
+foreignObject > [part="mark"] {
   translate: -50% -50%;
 }
 
-[part~="point-active"] {
-  outline: var(--helix-border-thick) solid var(--helix-color-foreground);
-  outline-offset: var(--helix-border-thin);
+[part="ring"] {
+  fill: none;
+  pointer-events: none;
+  stroke: var(--helix-color-foreground);
+  stroke-width: var(--helix-border-thick);
+  vector-effect: non-scaling-stroke;
 }
 
 /* The readout, the summary, and the table drawn from `data` are for screen readers. */
@@ -72,7 +109,7 @@
 /* Print: a point is a fill, so each takes an edge as well. */
 @media print {
   [part~="point"] {
-    outline: var(--helix-border-thin) solid var(--helix-color-border);
+    stroke: var(--helix-color-border);
   }
 }
 
@@ -81,10 +118,19 @@
 @media (forced-colors: active) {
   [part~="point"] {
     forced-color-adjust: none;
-    outline: var(--helix-border-thin) solid CanvasText;
+    stroke: CanvasText;
   }
 
-  [part~="point-active"] {
-    outline: var(--helix-border-thick) solid Highlight;
+  [part="grid"] {
+    stroke: CanvasText;
+  }
+
+  [part="tick"],
+  [part="axis-name"] {
+    fill: CanvasText;
+  }
+
+  [part="ring"] {
+    stroke: Highlight;
   }
 }
