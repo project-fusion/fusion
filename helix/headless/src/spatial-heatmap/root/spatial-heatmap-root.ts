@@ -31,10 +31,19 @@ import {
   type Base,
   heightsOf,
   highestOf,
+  type LabelSize,
+  labelPlaces,
+  type Point,
   type Prism,
   type Relief,
   reliefOf,
 } from '../projection.js'
+
+/** How far a label stands below what it clears, in pixels. */
+const LABEL_GAP = 4
+
+/** Where a renderer draws the front edge's two ends, and the corners of the box round the relief. */
+type DrawnCorners = { end: Point; outline?: Point[]; start: Point }
 
 /** The arrow keys that turn a renderer's view while Shift is held, and which way each turns it. */
 const TURNS: Record<string, { across: number; up: number }> = {
@@ -78,11 +87,12 @@ const TURNS: Record<string, { across: number; up: number }> = {
  *
  * **The prisms stand on a slab**, the `base`, which reaches a little past the
  * grid, so the relief reads as one object. The `start` and `end` slots name
- * the two ends of the front edge, which is the strip's first and last column:
- * the component writes where those corners are on the `footer`, and a
- * stylesheet stands each label at its corner. A renderer tells the chart where
- * it draws those corners, so the labels stand at them there too, and follow
- * them as the view turns.
+ * the two ends of the front edge, the long edge nearer the reader, which is
+ * the strip's first and last column. The component measures where each label
+ * stands under its corner, clear of the drawing, and writes it on the label as
+ * `--spatial-heatmap-label-x` and `--spatial-heatmap-label-y`. A renderer
+ * tells the chart where it draws those corners, so the labels stand at them
+ * there too, and follow them as the view turns.
  *
  * **`gap` and `min-cell` set the smallest cell.** The drawing scales as a
  * whole, so a wider box draws larger cells and the gap grows with them. A box
@@ -147,7 +157,9 @@ const TURNS: Record<string, { across: number; up: number }> = {
  *
  * @cssproperty --spatial-heatmap-depth - How tall the drawing is for its width. The component writes it on the footer, and a stylesheet that stands the `start` and `end` labels at their corners reads it.
  * @cssproperty --spatial-heatmap-end-x - Where the front edge ends, under the newest column, across the drawing, from 0 at its inline start to 1. The component writes it on the footer, and a stylesheet that stands the `end` label there reads it.
- * @cssproperty --spatial-heatmap-end-y - How far down the drawing the front edge ends, under the newest column, as a share of the drawing's width: its whole depth in the chart's own drawing, and wherever a renderer draws it. The component writes it on the footer, and a stylesheet that stands the `end` label there reads it.
+ * @cssproperty --spatial-heatmap-end-y - How far down the drawing the front edge ends, under the newest column, as a share of the drawing's width, in the chart's own drawing and wherever a renderer draws it. The component writes it on the footer, and a stylesheet that stands the `end` label there reads it.
+ * @cssproperty --spatial-heatmap-label-x - Where the `start` or the `end` label stands clear of the drawing, from the footer's inline start, in pixels. The component measures it and writes it on the label, with `data-placed`, as the view turns.
+ * @cssproperty --spatial-heatmap-label-y - Where the `start` or the `end` label stands clear of the drawing, from the footer's top, in pixels. The component measures it and writes it on the label, with `data-placed`, as the view turns.
  * @cssproperty --spatial-heatmap-span - How many cells the drawing spans across: its columns and its rows together. The component writes it on the strip, and a stylesheet that caps the cell size reads it.
  * @cssproperty --spatial-heatmap-start-x - Where the front edge starts, under the first column, across the drawing, from 0 at its inline start to 1, in the chart's own drawing and wherever a renderer draws it. The component writes it on the footer, and a stylesheet that stands the `start` label there reads it.
  * @cssproperty --spatial-heatmap-start-y - How far down the drawing the front edge starts, under the first column, as a share of the drawing's width. The component writes it on the footer, and a stylesheet that stands the `start` label there reads it.
@@ -228,7 +240,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
 
   /** Where the renderer draws the two ends of the front edge, which the first and last labels stand at. */
   @state()
-  private corners: { end: { x: number; y: number }; start: { x: number; y: number } } | undefined
+  private corners: DrawnCorners | undefined
 
   /** The field last told, and the reading, so a renderer is told of a change only. */
   private told = { at: -1, field: '' }
@@ -316,9 +328,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
    * last place they had. The `start` and `end` labels stand there. Called by
    * the connector.
    */
-  placeCorners(
-    at: { end: { x: number; y: number }; start: { x: number; y: number } } | undefined,
-  ): void {
+  placeCorners(at: DrawnCorners | undefined): void {
     if (at || !this.rendered) {
       this.corners = at
     }
@@ -326,6 +336,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.placeLabels()
     /* Told only on a change, so a renderer draws again only when it must. */
     const field = JSON.stringify(this.field)
     if (field !== this.told.field) {
@@ -510,6 +521,76 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
   }
 
   /**
+   * Stands the first and last labels under their ends of the front edge,
+   * clear of the drawing, as the page lays them out: on each label,
+   * `--spatial-heatmap-label-x` from the footer's inline start and
+   * `--spatial-heatmap-label-y` from its top, and `data-placed` once it has
+   * a place. **Measured**, because a label is the page's type and the
+   * drawing scales with its box, so neither size is known before layout.
+   */
+  private placeLabels(): void {
+    const footer = this.partNamed('footer')
+    const [end, start] = [this.partNamed('end'), this.partNamed('start')]
+    const relief = this.shown
+    if (!footer || !end || !start || !relief?.corners) {
+      return
+    }
+    const labels = { end, start }
+    const frame = footer.getBoundingClientRect()
+    if (frame.width <= 0) {
+      return
+    }
+    let drawn: DrawnCorners = { ...relief.corners, outline: relief.outline }
+    let page: (point: Point) => Point
+    /* A renderer's drawing is cut at the strip's edge, so a label stands no
+       lower than a gap below it. */
+    let lowest = Number.POSITIVE_INFINITY
+    if (this.rendered) {
+      const strip = this.partNamed('strip')?.getBoundingClientRect()
+      if (!this.corners?.outline || !strip) {
+        return
+      }
+      drawn = this.corners
+      lowest = strip.bottom - frame.top + LABEL_GAP
+      page = (point) => ({
+        x: strip.left + point.x * strip.width - frame.left,
+        y: strip.top + point.y * strip.height - frame.top,
+      })
+    } else {
+      /* Through the drawing's own transform, which a right-to-left page
+         mirrors. */
+      const matrix = this.partNamed<SVGSVGElement>('drawing')?.getScreenCTM?.()
+      if (!matrix) {
+        return
+      }
+      page = (point) => ({
+        x: matrix.a * point.x + matrix.c * point.y + matrix.e - frame.left,
+        y: matrix.b * point.x + matrix.d * point.y + matrix.f - frame.top,
+      })
+    }
+    const sizeOf = (label: HTMLElement): LabelSize => {
+      const { height, width } = label.getBoundingClientRect()
+      return { height, width }
+    }
+    const sizes = { end: sizeOf(labels.end), start: sizeOf(labels.start) }
+    const placed = labelPlaces(
+      (drawn.outline ?? []).map(page),
+      { end: page(drawn.end), start: page(drawn.start) },
+      sizes,
+      frame.width,
+      LABEL_GAP,
+      lowest,
+    )
+    for (const key of ['start', 'end'] as const) {
+      const at = placed[key]
+      const inline = isRtl(this) ? frame.width - at.x - sizes[key].width : at.x
+      labels[key].style.setProperty('--spatial-heatmap-label-x', `${Math.round(inline)}px`)
+      labels[key].style.setProperty('--spatial-heatmap-label-y', `${Math.round(at.y)}px`)
+      labels[key].toggleAttribute('data-placed', true)
+    }
+  }
+
+  /**
    * Where the front edge's two ends stand, for the labels that name them.
    * **As shares of the drawing's width**, the one length a percentage margin
    * is measured against, so a sheet places a label with no height to read.
@@ -532,7 +613,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
       : { x: (corners.start.x - box.x) / box.width, y: (corners.start.y - box.y) / box.width }
     const end = drawn
       ? { x: across(drawn.end.x), y: drawn.end.y * depth }
-      : { x: (corners.end.x - box.x) / box.width, y: depth }
+      : { x: (corners.end.x - box.x) / box.width, y: (corners.end.y - box.y) / box.width }
     return [
       `--spatial-heatmap-depth: ${share(depth)}`,
       `--spatial-heatmap-end-x: ${share(end.x)}`,

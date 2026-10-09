@@ -14,6 +14,8 @@
  */
 
 import {
+  type BoxAxisText,
+  boxLabels,
   type Camera,
   type PagePoint,
   type Projection,
@@ -76,6 +78,9 @@ const WIDE = 0.58
 export const TICK_SIZE = 0.13
 export const NAME_SIZE = 0.15
 
+/** The space between an edge and its numbers, and between the numbers and the name, in the box's units. */
+const LABEL_GAP = 0.06
+
 /**
  * The box for `axes`, seen from `camera`, and the readings' own places on
  * the page, which `extra` adds to the bounds.
@@ -119,24 +124,16 @@ export const boxView = (
     line([-1, y, -1], [1, y, -1])
     line([-1, y, -1], [-1, y, 1])
   }
-  const labels: ViewLabel[] = []
-  const label = (at: BoxPoint, text: string, name = false): void => {
-    labels.push({ name, text, ...on(at) })
-  }
-  for (const tick of axes.x.ticks) {
-    label([inBox(axes.x, tick), -1, 1.14], tickText(tick))
-  }
-  for (const tick of axes.z.ticks) {
-    label([1.14, -1, inBox(axes.z, tick)], tickText(tick))
-  }
-  /* The up axis' lowest tick is the floor, at the corner the across axis'
-     first number already takes, so it is left to the floor's grid. */
-  for (const tick of axes.y.ticks.slice(1)) {
-    label([-1.14, inBox(axes.y, tick), 1], tickText(tick))
-  }
-  label([0, -1, 1.38], axes.x.name, true)
-  label([1.6, -1, 0], axes.z.name, true)
-  label([-1, 1.28, 1], axes.y.name, true)
+  /* Along the edges that face the reader, which a turn changes. */
+  const text = (axis: PlotAxis): BoxAxisText => ({
+    name: axis.name,
+    ticks: axis.ticks.map((tick) => ({ at: inBox(axis, tick), text: tickText(tick) })),
+  })
+  const labels: ViewLabel[] = boxLabels(
+    (point) => ({ ...on(point), depth: depth(point) }),
+    { x: text(axes.x), y: text(axes.y), z: text(axes.z) },
+    { gap: LABEL_GAP, name: NAME_SIZE, tick: TICK_SIZE, wide: WIDE },
+  )
   /* The bounds hold every line, every label at about its width, and every
      reading, so nothing is cut at the edge of the drawing. */
   const corners: PagePoint[] = []

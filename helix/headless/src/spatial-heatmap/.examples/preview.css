@@ -79,8 +79,8 @@ helix-headless-spatial-heatmap::part(tooltip-anchor) {
   position: absolute;
 }
 
-/* The first and last labels stand at the ends of the front edge, where the
-   component writes them on the footer, as shares of the drawing's width. */
+/* The first and last labels stand where the component measures them, under
+   their ends of the front edge and clear of the drawing. */
 helix-headless-spatial-heatmap::part(footer) {
   color: var(--_gray-muted);
   font-size: 0.75rem;
@@ -88,23 +88,12 @@ helix-headless-spatial-heatmap::part(footer) {
   position: relative;
 }
 
-helix-headless-spatial-heatmap::part(start) {
-  inset-block-start: 0;
-  inset-inline-start: calc(var(--spatial-heatmap-start-x) * 100%);
-  margin-block-start: calc(
-    (var(--spatial-heatmap-start-y) - var(--spatial-heatmap-depth)) *
-    100% +
-    1lh
-  );
-  position: absolute;
-}
-
+helix-headless-spatial-heatmap::part(start),
 helix-headless-spatial-heatmap::part(end) {
-  inset-block-start: 0;
-  margin-block-start: calc((var(--spatial-heatmap-end-y) - var(--spatial-heatmap-depth)) * 100%);
-  inset-inline-start: calc(var(--spatial-heatmap-end-x) * 100%);
+  inset-block-start: var(--spatial-heatmap-label-y, 0);
+  inset-inline-start: var(--spatial-heatmap-label-x, 0);
   position: absolute;
-  translate: -50% 0;
+  white-space: nowrap;
 }
 
 helix-headless-spatial-heatmap::part(live),

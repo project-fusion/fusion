@@ -18,6 +18,7 @@
 import {
   type Camera,
   depthOrder,
+  hullOf,
   ISOMETRIC,
   type PagePoint,
   type Projection,
@@ -67,13 +68,16 @@ export interface Relief {
   /** The box every face fits in, in cells: its left, top, width, and height. */
   box: { height: number; width: number; x: number; y: number }
   /**
-   * The two ends of the front edge, at the foot of the slab: `start` at the
-   * left corner, under the first column, and `end` at the bottom corner,
-   * under the last. The strip's first and last labels stand there.
+   * The two ends of the front edge, the long edge at the foot of the slab
+   * nearer the reader: `start` under the first column, and `end` under the
+   * last. From the isometric camera they are the left corner and the bottom
+   * one. The strip's first and last labels stand there.
    */
   corners: { end: Point; start: Point } | undefined
   /** The middle of the grid, halfway up the tallest prism, which a drag turns the view round. */
   middle: Point
+  /** The corners of the box the slab and the tallest prism fill, which every face stands inside. */
+  outline: Point[]
   /**
    * The prisms' places in `prisms`, back to front, the order to paint them
    * in. From the isometric camera it is the order of the readings.
@@ -224,6 +228,7 @@ export const reliefOf = (
       corners: undefined,
       middle: { x: 0, y: 0 },
       order: [],
+      outline: [],
       prisms,
     }
   }
@@ -238,16 +243,105 @@ export const reliefOf = (
   const xs = points.map((point) => point.x)
   const ys = points.map((point) => point.y)
   const [left, top] = [Math.min(...xs), Math.min(...ys)]
+  const tallest = Math.max(0, ...heights)
+  /* The long edge nearer the reader: under the last row from the isometric
+     camera, and under the first once the strip is turned round. */
+  const [lastRow, firstRow] = [-(deep + MARGIN), MARGIN]
+  const front =
+    projection.depth(columns / 2, lastRow) >= projection.depth(columns / 2, firstRow)
+      ? lastRow
+      : firstRow
+  const outline: Point[] = []
+  for (const x of [-MARGIN, columns + MARGIN]) {
+    for (const y of [lastRow, firstRow]) {
+      outline.push(projection.at(x, y, -THICKNESS), projection.at(x, y, tallest))
+    }
+  }
   return {
     base,
     box: { height: Math.max(...ys) - top, width: Math.max(...xs) - left, x: left, y: top },
-    /* Under the first column's last row, and under the last column's. */
     corners: {
-      end: projection.at(columns + MARGIN, -(deep + MARGIN), -THICKNESS),
-      start: projection.at(-MARGIN, -(deep + MARGIN), -THICKNESS),
+      end: projection.at(columns + MARGIN, front, -THICKNESS),
+      start: projection.at(-MARGIN, front, -THICKNESS),
     },
-    middle: projection.at(columns / 2, -deep / 2, Math.max(0, ...heights) / 2),
+    middle: projection.at(columns / 2, -deep / 2, tallest / 2),
     order: depthOrder(projection, places).map((place) => place.index),
+    outline,
     prisms,
   }
+}
+
+/** A label's size on the page. */
+export interface LabelSize {
+  height: number
+  width: number
+}
+
+/**
+ * The lowest the outline `hull` reaches on the page between `left` and
+ * `right`, or `-Infinity` where it does not reach that far across.
+ */
+const lowestOver = (hull: readonly Point[], left: number, right: number): number => {
+  let lowest = Number.NEGATIVE_INFINITY
+  hull.forEach((from, index) => {
+    const to = hull[(index + 1) % hull.length] as Point
+    const [a, b] = from.x <= to.x ? [from, to] : [to, from]
+    if (b.x < left || a.x > right) {
+      return
+    }
+    const at = (x: number): number =>
+      b.x === a.x ? Math.max(a.y, b.y) : a.y + ((x - a.x) / (b.x - a.x)) * (b.y - a.y)
+    lowest = Math.max(lowest, at(Math.max(a.x, left)), at(Math.min(b.x, right)))
+  })
+  return lowest
+}
+
+/**
+ * Where the strip's first and last labels stand, as the top left of each,
+ * on a page where the drawing's `outline` and its front edge's `corners`
+ * stand where given and the labels may run from 0 to `span` across.
+ *
+ * **Under its corner, and clear of the drawing.** A label runs away from the
+ * front edge, so the edge does not fall across it, and stays inside the
+ * span, which can move it under the edge; it then stands as far down as the
+ * outline reaches over it, and no lower than `lowest`, where a renderer's
+ * drawing is cut. Where the two would meet, as when the strip is seen end on,
+ * the last stands under the first, or beside it where there is no room below.
+ */
+export const labelPlaces = (
+  outline: readonly Point[],
+  corners: { end: Point; start: Point },
+  sizes: { end: LabelSize; start: LabelSize },
+  span: number,
+  gap: number,
+  lowest = Number.POSITIVE_INFINITY,
+): { end: Point; start: Point } => {
+  const hull = hullOf(outline)
+  const across = (left: number, size: LabelSize): number =>
+    Math.max(0, Math.min(left, span - size.width))
+  const place = (at: Point, toward: Point, size: LabelSize): Point => {
+    const away = Math.sign(toward.x - at.x)
+    const wanted = away > 0 ? at.x - size.width : away < 0 ? at.x : at.x - size.width / 2
+    const left = across(wanted, size)
+    const top = Math.max(at.y, lowestOver(hull, left, left + size.width)) + gap
+    return { x: left, y: Math.min(top, lowest) }
+  }
+  const start = place(corners.start, corners.end, sizes.start)
+  const end = place(corners.end, corners.start, sizes.end)
+  const meet =
+    start.x < end.x + sizes.end.width &&
+    end.x < start.x + sizes.start.width &&
+    start.y < end.y + sizes.end.height &&
+    end.y < start.y + sizes.start.height
+  if (!meet) {
+    return { end, start }
+  }
+  const under = start.y + sizes.start.height + gap / 2
+  if (under <= lowest) {
+    return { end: { ...end, y: under }, start }
+  }
+  /* Beside the first, on the side the last corner is. */
+  const right = corners.end.x >= corners.start.x
+  const beside = right ? start.x + sizes.start.width + gap : start.x - sizes.end.width - gap
+  return { end: { x: across(beside, sizes.end), y: start.y }, start }
 }

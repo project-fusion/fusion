@@ -1,4 +1,11 @@
-import { type Holder, pageBudget } from '@fusion.dev/helix-core'
+import {
+  type BoxAxisText,
+  type BoxPlace,
+  boxLabels,
+  type Holder,
+  pageBudget,
+  type SeenPlace,
+} from '@fusion.dev/helix-core'
 import {
   BufferGeometry,
   CanvasTexture,
@@ -147,7 +154,8 @@ export const createStage = (
      are as crisp as the page's own and take its typeface. */
   const labels = document.createElement('div')
   labels.setAttribute('aria-hidden', 'true')
-  labels.style.cssText = 'position:absolute;inset:0;pointer-events:none;overflow:hidden'
+  labels.style.cssText =
+    'position:absolute;inset:0;pointer-events:none;overflow:hidden;user-select:none;-webkit-user-select:none'
   container.append(labels)
 
   const scene = new Scene()
@@ -169,6 +177,10 @@ export const createStage = (
   controls.minDistance = 2.5
   controls.maxDistance = 12
   controls.rotateSpeed = 0.7
+  /* **Never under the floor**, as a step of Shift with an arrow is held: a
+     drag up went on past level and showed the slab from below. */
+  controls.minPolarAngle = 0.15
+  controls.maxPolarAngle = Math.PI / 2 - 0.02
 
   const gridMaterial = new LineBasicMaterial({ opacity: 0.35, transparent: true })
   const grid = new LineSegments(new BufferGeometry(), gridMaterial)
@@ -244,11 +256,7 @@ export const createStage = (
     const width = container.clientWidth
     const height = container.clientHeight
     const marks: HTMLElement[] = []
-    const label = (at: Vector3, text: string, strong = false): void => {
-      const on = at.clone().project(camera)
-      if (on.z > 1) {
-        return
-      }
+    const label = (left: number, top: number, text: string, strong = false): void => {
       const mark = document.createElement('span')
       mark.textContent = text
       /* **In the theme's type scale**: the names and numbers are page text in
@@ -258,25 +266,29 @@ export const createStage = (
       const weight = strong
         ? 'var(--helix-weight-semibold, 600)'
         : 'var(--helix-weight-medium, 500)'
-      mark.style.cssText = `position:absolute;left:${((on.x + 1) / 2) * width}px;top:${((1 - on.y) / 2) * height}px;translate:-50% -50%;white-space:nowrap;font-family:${font};font-size:${size};font-weight:${weight};line-height:1;color:${strong ? colors?.ink : colors?.quiet};text-shadow:0 0 3px ${colors?.ground},0 0 3px ${colors?.ground}`
+      mark.style.cssText = `position:absolute;left:${left}px;top:${top}px;translate:-50% -50%;white-space:nowrap;font-family:${font};font-size:${size};font-weight:${weight};line-height:1;color:${strong ? colors?.ink : colors?.quiet};text-shadow:0 0 3px ${colors?.ground},0 0 3px ${colors?.ground}`
       marks.push(mark)
     }
-    const h = HALF
-    const { x, y, z } = axes
-    for (const tick of x.ticks) {
-      label(new Vector3(inBox(x, tick), -h, h + 0.12), tickText(tick))
+    /* **Along the edges that face the reader**, as the chart's own drawing
+       writes them, so a turn moves them to the edges in front. */
+    const place = new Vector3()
+    const seen = ([x, y, z]: BoxPlace): SeenPlace => {
+      place.set(x * HALF, y * HALF, z * HALF)
+      const depth = -place.distanceTo(camera.position)
+      const on = place.project(camera)
+      return { depth, x: ((on.x + 1) / 2) * width, y: ((1 - on.y) / 2) * height }
     }
-    for (const tick of z.ticks) {
-      label(new Vector3(h + 0.12, -h, inBox(z, tick)), tickText(tick))
+    const text = (axis: Axis): BoxAxisText => ({
+      name: axis.name,
+      ticks: axis.ticks.map((tick) => ({ at: inBox(axis, tick) / HALF, text: tickText(tick) })),
+    })
+    for (const one of boxLabels(
+      seen,
+      { x: text(axes.x), y: text(axes.y), z: text(axes.z) },
+      { gap: 6, name: 13, tick: 11, wide: 0.58 },
+    )) {
+      label(one.x, one.y, one.text, one.name)
     }
-    /* The up axis' lowest tick is the floor, at the corner the across axis'
-       first number already takes, so it is left to the floor's grid. */
-    for (const tick of y.ticks.slice(1)) {
-      label(new Vector3(-h - 0.12, inBox(y, tick), h), tickText(tick))
-    }
-    label(new Vector3(0, -h, h + 0.35), x.name, true)
-    label(new Vector3(h + 0.62, -h, 0), z.name, true)
-    label(new Vector3(-h, h + 0.28, h), y.name, true)
     labels.replaceChildren(...marks)
     /* **Kept inside the plot**, whichever way it is turned: a name at the
        edge of a narrow plot ran off it. Measured once laid out, a few dozen

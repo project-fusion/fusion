@@ -398,6 +398,14 @@ export {
   drawAutofill,
 } from './utils/autofill-select/autofill-select.js'
 export {
+  type BoxAxisText,
+  type BoxLabel,
+  type BoxLabelSizes,
+  type BoxPlace,
+  boxLabels,
+  type SeenPlace,
+} from './utils/box-labels/box-labels.js'
+export {
   addDays,
   addMonths,
   type Barring,
@@ -583,6 +591,7 @@ export {
   type Drawn,
   depthOrder,
   type Face,
+  hullOf,
   ISOMETRIC,
   LOWEST_TILT,
   type PagePoint,
