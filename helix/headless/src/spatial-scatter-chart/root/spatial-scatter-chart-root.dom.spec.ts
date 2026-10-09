@@ -55,11 +55,23 @@ describe('the frame', () => {
     expect(element.field.groups).toEqual(['Core', 'Tools'])
   })
 
-  test('draws a flat scatter until a renderer has drawn, colored by group', async () => {
+  test('draws the points in 3D itself until a renderer has drawn, each in its group’s color', async () => {
     const element = await plot()
+    expect(part(element, 'drawing')?.localName).toBe('svg')
+    expect(part(element, 'grid')?.getAttribute('d')).toMatch(/^M/)
+    expect(
+      [...(element.shadowRoot?.querySelectorAll('[part="axis-name"]') ?? [])].map(
+        (name) => name.textContent,
+      ),
+    ).toEqual(['Age', 'Score', 'Tenure'])
     const points = [...(element.shadowRoot?.querySelectorAll('[part~="point"]') ?? [])]
     expect(points).toHaveLength(3)
-    expect(points[1]?.getAttribute('style')).toContain('--chart-series: var(--chart-series-2)')
+    /* Painted back to front, so each says its group's color whatever its place. */
+    expect(points.map((point) => point.getAttribute('style')).sort()).toEqual([
+      '--chart-series: var(--chart-series-1)',
+      '--chart-series: var(--chart-series-1)',
+      '--chart-series: var(--chart-series-2)',
+    ])
     element.drawn()
     await element.updateComplete
     expect(part(element, 'fallback')?.hasAttribute('hidden')).toBe(true)
@@ -125,12 +137,14 @@ describe('the keys', () => {
 })
 
 describe('the tooltip', () => {
-  test('shows the reading’s row where the renderer draws it, once a renderer has drawn', async () => {
+  test('shows the reading’s row at its point in the chart’s own drawing, and then where the renderer draws it', async () => {
     const element = (await plot()) as Plot & { placeReading(at?: { x: number; y: number }): void }
     element.requestActive(1)
     element.placeReading({ x: 0.5, y: 0.25 })
     await element.updateComplete
-    expect(part(element, 'tooltip-anchor')).toBeNull()
+    expect(part(element, 'tooltip-label')?.textContent).toBe('Grace')
+    expect(part(element, 'mark')?.parentElement?.localName).toBe('foreignObject')
+    expect(part(element, 'ring')).not.toBeNull()
     element.drawn()
     await element.updateComplete
     expect(part(element, 'tooltip-label')?.textContent).toBe('Grace')

@@ -77,7 +77,7 @@ const settle = async (element: Chart) => {
 }
 
 describe('connectSpatialScatterChart', () => {
-  test('draws the chart’s points in the driver, colored by the series, and hides the flat scatter', async () => {
+  test('draws the chart’s points in the driver, colored by the series, and hides the chart’s own drawing', async () => {
     const element = await chart()
     const { driver, told } = recording()
     connectSpatialScatterChart(element, driver)
@@ -119,7 +119,7 @@ describe('connectSpatialScatterChart', () => {
     expect(told.turns.map(([across, up]) => [across, up])).toEqual([[1, 0]])
   })
 
-  test('disconnecting frees the driver and shows the flat scatter again', async () => {
+  test('disconnecting frees the driver and shows the chart’s own drawing again', async () => {
     const element = await chart()
     const { driver, told } = recording()
     const connection = connectSpatialScatterChart(element, driver)

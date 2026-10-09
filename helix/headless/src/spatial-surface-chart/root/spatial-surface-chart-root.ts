@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  type Camera,
   CHART_PLOT,
   customElement,
   drawTooltip,
@@ -15,10 +16,34 @@ import {
   spokenReading,
   words,
 } from '@fusion.dev/helix-core'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
+import {
+  type BoxPoint,
+  boxView,
+  drawBox,
+  inBox,
+  nearestTo,
+  type Placed,
+  SPATIAL_VIEW,
+  shape,
+  turned,
+} from '../../spatial-scatter-chart/view.js'
 import { levelOf, type SurfaceField, surfaceOf } from '../grid.js'
+
+/**
+ * Where the light comes from, in the box: from the left, above, and a little
+ * in front, so a slope facing the upper left of the page reads lightest.
+ */
+const LIGHT: BoxPoint = (() => {
+  const [x, y, z] = [-0.45, 1, 0.35]
+  const length = Math.hypot(x, y, z)
+  return [x / length, y / length, z / length]
+})()
+
+/** How much a face turned fully from the light is darkened, as a share of lightness. */
+const SHADE = 0.3
 
 /** The arrow keys that turn the view while Shift is held, and which way each turns it. */
 const TURNS: Record<string, { across: number; up: number }> = {
@@ -42,8 +67,9 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * box for the renderer inside the chart, and `connectSpatialSurfaceChart` from
  * `@fusion.dev/helix-plot` draws the surface in it with three.js, shaded from
  * low to high in the theme's colors. Until a renderer has drawn, and where
- * none is connected, the chart draws the grid flat, each cell as dark as its
- * height, as a heatmap does.
+ * none is connected, the chart draws the surface in 3D itself, in SVG, from
+ * the same place the renderer's camera starts: a still picture the server, a
+ * print, and a page without WebGL all show, which Shift with an arrow turns.
  *
  * **The table is the reading.** Every number is in it, and screen readers
  * read it. The `summary` part names the measures, the number of readings,
@@ -93,16 +119,20 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @event {HelixReadingChangeEvent} helix-reading-change - The reading moved, or was put away: `index` is the row, or `-1` for none or a place with no reading, with its `label` and the `pointerType` that moved it.
  * @event {HelixReadingPressEvent} helix-reading-press - A place was clicked or pressed with Enter or Space, with the same detail as `helix-reading-change`.
  *
- * @csspart cell - One place of the flat grid, as dark as its height.
- * @csspart cell-active - The place the keys rest on, in the flat grid. Set alongside `cell`.
+ * @csspart axis-name - A measure's name, along its edge of the box, in the chart's own drawing.
+ * @csspart drawing - The chart's own drawing in SVG: the box, its grid and numbers, and the surface.
  * @csspart empty - The words when the table has no readings: the `empty` slot, falling back to `empty-text`.
- * @csspart fallback - The flat grid of heights, drawn until a renderer has drawn and where none is connected. Hidden from screen readers.
+ * @csspart face - One square of the surface between four readings, or a triangle where one is missing, shaded by its height and by which way it faces.
+ * @csspart fallback - The box the chart's own drawing fills, shown until a renderer has drawn and where none is connected. Hidden from screen readers.
+ * @csspart grid - The box's edges and its grid at the ticks, in the chart's own drawing.
  * @csspart live - The readout: a polite live region that says the place the keys moved to. Hide it visually.
  * @csspart loading - The words while `loading` is set and there are no readings.
  * @csspart mark - The invisible point the tooltip is anchored to, where the renderer draws the reading.
  * @csspart plot - The box the drawing fills, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
+ * @csspart ring - The ring around the reading the pointer or the keys rest on, drawn over the surface.
  * @csspart summary - The measures, the number of readings, and the range of heights, written as a sentence for screen readers, which describes the plot. Hide it visually.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
+ * @csspart tick - A number at a tick, along its edge of the box, in the chart's own drawing.
  * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
@@ -120,11 +150,11 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart tooltip-top - The bubble while it is above the reading. Set alongside `tooltip`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
- * @cssproperty --spatial-surface-chart-columns - How many places across the flat grid has. The component writes it on the grid, and the stylesheet that lays the grid out reads it.
- * @cssproperty --spatial-surface-chart-level - How high a place's reading stands between the lowest and the highest, from 0 to 1. The component writes it on each place with a reading, and the stylesheet that shades the place reads it.
+ * @cssproperty --spatial-surface-chart-level - How high a face of the surface stands between the lowest reading and the highest, from 0 to 1: its corners' average. The component writes it on each face, and the stylesheet that colors the face along the ramp reads it.
+ * @cssproperty --spatial-surface-chart-shade - How far a face of the surface turns from the light, as a share of lightness to take from its color, from 0 facing it to about 0.3. The component writes it on each face, and the stylesheet that shades the face reads it.
  *
  * @cssstate active - While a place is shown, under the pointer or the keys.
- * @cssstate drawn - While a renderer has drawn the surface, and the flat grid is hidden.
+ * @cssstate drawn - While a renderer has drawn the surface, and the chart's own drawing is hidden.
  * @cssstate empty - While the `empty` part stands in place of the readings.
  * @cssstate loading - While the `loading` part stands in place of the readings.
  */
@@ -163,9 +193,16 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
   summaryLabel =
     '{count, plural, one {# reading} other {# readings}} of {y} over {x} and {z}, from {low} to {high}.'
 
-  /** Whether a renderer has drawn the surface, which hides the flat grid. */
+  /** Whether a renderer has drawn the surface, which hides the chart's own drawing. */
   @state()
   private rendered = false
+
+  /** Where the chart's own drawing is seen from, which Shift with an arrow turns. */
+  @state()
+  private camera: Camera = SPATIAL_VIEW
+
+  /** Each reading where the chart's own drawing put it, which the pointer finds. */
+  private placed: Placed[] = []
 
   /** Where the renderer draws the reading, which the tooltip points at. */
   @state()
@@ -202,8 +239,8 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
   }
 
   /**
-   * Says whether a renderer has drawn the surface, which hides the flat grid
-   * or shows it again. Called by the connector.
+   * Says whether a renderer has drawn the surface, which hides the chart's
+   * own drawing or shows it again. Called by the connector.
    */
   drawn(on = true): void {
     this.rendered = on
@@ -280,7 +317,10 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
     }
   }
 
-  /** Shift with an arrow asks the renderer to turn the view, and moves no reading. */
+  /**
+   * Shift with an arrow turns the view, the chart's own drawing and the
+   * renderer's alike, and moves no reading.
+   */
   private readonly onPlotKeydown = (event: KeyboardEvent): void => {
     const turn = TURNS[event.key]
     if (!event.shiftKey || !turn || event.altKey || event.ctrlKey || event.metaKey) {
@@ -288,7 +328,36 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
     }
     event.preventDefault()
     event.stopPropagation()
+    this.camera = turned(this.camera, turn.across, turn.up)
     this.dispatchEvent(new HelixPlotTurnEvent(turn))
+  }
+
+  /** A mouse or a pen over the chart's own drawing puts the reading on the place nearest it. */
+  private readonly onDrawingMove = (event: PointerEvent): void => {
+    if (event.pointerType === 'touch') {
+      return
+    }
+    const drawing = event.currentTarget as SVGSVGElement
+    this.requestActive(
+      nearestTo(drawing, event, this.placed),
+      event.pointerType === 'pen' ? 'pen' : 'mouse',
+    )
+  }
+
+  private readonly onDrawingLeave = (event: PointerEvent): void => {
+    if (event.pointerType !== 'touch') {
+      this.requestActive(-1, 'mouse')
+    }
+  }
+
+  /** A tap is a touch reader's hover: it shows the place nearest it until a tap lands elsewhere. */
+  private readonly onDrawingTap = (event: PointerEvent): void => {
+    if (event.pointerType === 'touch') {
+      this.requestActive(
+        nearestTo(event.currentTarget as SVGSVGElement, event, this.placed, 24),
+        'touch',
+      )
+    }
   }
 
   protected override render(): TemplateResult {
@@ -313,31 +382,73 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
   }
 
   /**
-   * The grid drawn flat, each place as dark as its height, as a heatmap
-   * draws it: across from left to right, and in depth from the top down, so
-   * it is the surface seen from above with its first place in depth at the
-   * back, as the renderer first shows it, and the down arrow moves down it.
-   * Left to right in every text direction, as a number line is.
+   * The surface in 3D, in SVG: the box with its grid, numbers, and names, and
+   * each square of the grid between four readings as a face, painted back to
+   * front, colored by its height and shaded by which way it faces. A place
+   * with no reading leaves a hole, and a square missing one corner is the
+   * triangle of the other three. The chart's own drawing, until a renderer
+   * has drawn and where none is connected.
    */
   private renderFallback(field: SurfaceField, at: number): TemplateResult {
+    const view = boxView(field.axes, this.camera)
     const depths = field.depths.length
-    const order = field.depths.flatMap((_, depth) =>
-      field.acrosses.map((_, across) => across * depths + depth),
+    const boxed = field.cells.map((cell): BoxPoint | undefined =>
+      cell.value === undefined
+        ? undefined
+        : [
+            inBox(field.axes.x, cell.x),
+            inBox(field.axes.y, cell.value),
+            inBox(field.axes.z, cell.z),
+          ],
     )
-    return html`<div
-      aria-hidden="true"
-      dir="ltr"
-      ?hidden=${this.rendered}
-      part="fallback"
-      style="--spatial-surface-chart-columns: ${field.acrosses.length}"
-    >${order.map((index) => {
-      const cell = field.cells[index]
-      const level = cell ? levelOf(field, cell) : undefined
-      return html`<span
-        part="cell${index === at ? ' cell-active' : ''}"
-        style=${level === undefined ? nothing : `--spatial-surface-chart-level: ${Math.round(level * 1000) / 1000}`}
-      ></span>`
-    })}</div>`
+    const places = boxed.flatMap((box, index) => (box ? [{ index, ...view.on(box) }] : []))
+    this.placed = places
+    const faces: Array<{ depth: number; level: number; points: BoxPoint[]; shade: number }> = []
+    for (let across = 0; across + 1 < field.acrosses.length; across++) {
+      for (let depth = 0; depth + 1 < depths; depth++) {
+        const here = across * depths + depth
+        const corners = [here, here + depths, here + depths + 1, here + 1].filter(
+          (index) => boxed[index] !== undefined,
+        )
+        if (corners.length < 3) {
+          continue
+        }
+        const points = corners.map((index) => boxed[index] as BoxPoint)
+        faces.push({
+          depth: points.reduce((sum, point) => sum + view.depth(point), 0) / points.length,
+          level:
+            corners.reduce(
+              (sum, index) => sum + (levelOf(field, field.cells[index] as never) ?? 0),
+              0,
+            ) / corners.length,
+          points,
+          shade: shadeOf(points),
+        })
+      }
+    }
+    faces.sort((one, other) => one.depth - other.depth)
+    const active = places.find((place) => place.index === at)
+    const row = field.cells[at]?.row
+    const { bounds } = view
+    const short = (value: number): number => Math.round(value * 1000) / 1000
+    return html`<div aria-hidden="true" dir="ltr" ?hidden=${this.rendered} part="fallback">
+      <svg
+        part="drawing"
+        preserveAspectRatio="xMidYMid meet"
+        viewBox="${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}"
+        xmlns="http://www.w3.org/2000/svg"
+        @pointerleave=${this.onDrawingLeave}
+        @pointermove=${this.onDrawingMove}
+        @pointerup=${this.onDrawingTap}
+      >${drawBox(view)}${faces.map(
+        (face) =>
+          svg`<path d=${shape(face.points.map((point) => view.on(point)))} part="face" style="--spatial-surface-chart-level: ${short(face.level)}; --spatial-surface-chart-shade: ${short(face.shade)}"></path>`,
+      )}${
+        active
+          ? svg`<circle cx=${active.x} cy=${active.y} part="ring" r="0.085"></circle><foreignObject height="0.001" overflow="visible" width="0.001" x=${active.x} y=${active.y}>${this.renderOwnTooltip(row)}</foreignObject>`
+          : nothing
+      }</svg>
+    </div>`
   }
 
   /** The readout: the reading at the place in words, once the keys have moved to one. */
@@ -364,9 +475,26 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
   }
 
   /**
+   * The reading's row in the tooltip, pointed at its place in the chart's own
+   * drawing, which holds it there.
+   */
+  private renderOwnTooltip(row: number | undefined): TemplateResult | typeof nothing {
+    if (this.rendered || row === undefined || !this.sourceRows[row]) {
+      return nothing
+    }
+    return drawTooltip(
+      this.sourceRows,
+      row,
+      this.tag('tooltip'),
+      { dir: isRtl(this) ? 'rtl' : 'ltr', fixed: true, placement: 'top', x: '0%', y: '0%' },
+      () => undefined,
+    )
+  }
+
+  /**
    * The reading's row in the tooltip every chart shows, pointed at where the
-   * renderer draws it. Only once a renderer has drawn, since the flat
-   * drawing is a stand-in.
+   * renderer draws it. Only once a renderer has drawn; until then the
+   * chart's own drawing holds the tooltip at the reading.
    */
   private renderTooltip(row: number | undefined): TemplateResult | typeof nothing {
     const place = this.place
@@ -403,6 +531,29 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
     })
     return html`<p id="helix-chart-summary" part="summary">${said}</p>`
   }
+}
+
+/**
+ * How far a face turns from the light, as a share of lightness to take from
+ * its color: none for a face toward the light, and `SHADE` for one turned
+ * fully away. Its upward side counts, so a face seen from below is shaded as
+ * the same slope seen from above.
+ */
+const shadeOf = (points: readonly BoxPoint[]): number => {
+  const [a, b, c] = points as [BoxPoint, BoxPoint, BoxPoint]
+  const u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]]
+  const v = [c[0] - a[0], c[1] - a[1], c[2] - a[2]]
+  let n = [
+    (u[1] as number) * (v[2] as number) - (u[2] as number) * (v[1] as number),
+    (u[2] as number) * (v[0] as number) - (u[0] as number) * (v[2] as number),
+    (u[0] as number) * (v[1] as number) - (u[1] as number) * (v[0] as number),
+  ] as [number, number, number]
+  if (n[1] < 0) {
+    n = [-n[0], -n[1], -n[2]]
+  }
+  const length = Math.hypot(...n) || 1
+  const lit = (n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]) / length
+  return Math.min(SHADE, Math.max(0, (1 - lit) * SHADE))
 }
 
 declare global {

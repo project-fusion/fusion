@@ -83,7 +83,7 @@ const settle = async (element: Chart) => {
 }
 
 describe('connectSpatialSurfaceChart', () => {
-  test('draws the grid in the driver and hides the flat grid', async () => {
+  test('draws the grid in the driver and hides the chart’s own drawing', async () => {
     const element = await chart()
     const { driver, told } = recording()
     connectSpatialSurfaceChart(element, driver)

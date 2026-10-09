@@ -32,12 +32,10 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* The grid seen from above, one column a place across. */
+/* The chart's own drawing, inset from the box so the names along its edges
+   have room. It scales as a whole through its `viewBox`. */
 [part="fallback"] {
-  display: grid;
-  gap: var(--helix-border-thin);
-  grid-template-columns: repeat(var(--spatial-surface-chart-columns, 1), minmax(0, 1fr));
-  inset: var(--helix-space-lg);
+  inset: var(--helix-space-md);
   position: absolute;
 }
 
@@ -45,21 +43,71 @@
   display: none;
 }
 
-/* **A place with no reading has no level, and so no fill**: the mix below
-   is then invalid and the place keeps the plot's ground, an open cell
-   rather than the lowest one. */
-[part~="cell"] {
-  background-color: color-mix(
-    in oklab,
-    var(--_spatial-surface-chart-high) calc(var(--spatial-surface-chart-level) * 100%),
-    var(--_spatial-surface-chart-low)
-  );
-  border-radius: calc(var(--helix-radii-sm) * 0.5);
+[part="drawing"] {
+  block-size: 100%;
+  display: block;
+  font-family: var(--helix-font-sans);
+  inline-size: 100%;
+  overflow: visible;
 }
 
-[part~="cell-active"] {
-  outline: var(--helix-border-thick) solid var(--helix-color-foreground);
-  outline-offset: var(--helix-border-thin);
+/* The box and its grid: the muted ink, see-through, as the renderer draws them. */
+[part="grid"] {
+  fill: none;
+  opacity: 0.35;
+  stroke: var(--helix-color-foreground-muted);
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+[part="tick"] {
+  fill: var(--helix-color-foreground-muted);
+  font-weight: var(--helix-weight-medium);
+}
+
+[part="axis-name"] {
+  fill: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-semibold);
+}
+
+/* **A face takes its height's color on the ramp, less light as it turns
+   from the light**, which the component writes as its shade. **It is ruled
+   along the grid a little lighter than itself where it is dark, and a
+   little darker where it is light**, as the spatial heatmap's edges are: on
+   a ramp that ends near black, a darker rule vanished and the top of the
+   surface was one black shape. */
+[part="face"] {
+  --_spatial-surface-chart-color: color-mix(
+    in oklab,
+    var(--_spatial-surface-chart-high) calc(var(--spatial-surface-chart-level, 0) * 100%),
+    var(--_spatial-surface-chart-low)
+  );
+  --_spatial-surface-chart-lit: oklch(
+    from var(--_spatial-surface-chart-color) calc(l - var(--spatial-surface-chart-shade, 0)) c h
+  );
+  --_spatial-surface-chart-rule: oklch(
+    from var(--_spatial-surface-chart-lit) calc(l + clamp(-0.1, (0.6 - l) * 1000, 0.14)) c h
+  );
+  fill: var(--_spatial-surface-chart-lit);
+  stroke: var(--_spatial-surface-chart-rule);
+  stroke-linejoin: round;
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+/* **Centered on the reading**: inside the drawing, the mark's one pixel is
+   one of the `viewBox`'s units, many pixels on the page, and a bubble
+   pointed at its middle missed the reading by half of it. */
+foreignObject > [part="mark"] {
+  translate: -50% -50%;
+}
+
+[part="ring"] {
+  fill: none;
+  pointer-events: none;
+  stroke: var(--helix-color-foreground);
+  stroke-width: var(--helix-border-thick);
+  vector-effect: non-scaling-stroke;
 }
 
 /* The readout, the summary, and the table drawn from `data` are for screen readers. */
@@ -85,22 +133,29 @@
 }
 
 @media print {
-  [part~="cell"] {
-    outline: var(--helix-border-thin) solid var(--helix-color-border);
-    outline-offset: calc(var(--helix-border-thin) * -1);
+  [part="face"] {
+    stroke: var(--helix-color-border);
   }
 }
 
-/* Forced colors paint every background the page's Canvas color, so the
-   places keep their shades and take an edge in the system's text color. */
+/* Forced colors: the faces keep their colors, which are the reading, and
+   every line is drawn in the system's text color. */
 @media (forced-colors: active) {
-  [part~="cell"] {
+  [part="face"] {
     forced-color-adjust: none;
-    outline: var(--helix-border-thin) solid CanvasText;
-    outline-offset: calc(var(--helix-border-thin) * -1);
+    stroke: CanvasText;
   }
 
-  [part~="cell-active"] {
-    outline: var(--helix-border-thick) solid Highlight;
+  [part="grid"] {
+    stroke: CanvasText;
+  }
+
+  [part="tick"],
+  [part="axis-name"] {
+    fill: CanvasText;
+  }
+
+  [part="ring"] {
+    stroke: Highlight;
   }
 }
