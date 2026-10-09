@@ -206,6 +206,13 @@
   --_showcase-spatial: 12rem;
 }
 
+/* The charts stand on the card's own glass, with no sunken ground of their
+   own behind them. The box, its grid, and its numbers stay, which `no-box`
+   would remove with the ground. */
+.showcaseSpatial::part(plot) {
+  background-color: transparent;
+}
+
 .showcaseRing {
   --donut-chart-size: 8rem;
 }
