@@ -19,6 +19,12 @@
   white-space: nowrap;
 }
 
+/* Fixed, as the base layer has it: the 1px box does not bind on a table, and
+   an absolutely positioned one lengthened the page by its full height. */
+table[data-hidden-visually] {
+  position: fixed;
+}
+
 helix-headless-spatial-surface-chart {
   display: block;
 }
