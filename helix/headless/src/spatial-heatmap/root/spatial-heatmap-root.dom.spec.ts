@@ -244,6 +244,33 @@ describe('a renderer', () => {
     expect(turns).toHaveLength(1)
   })
 
+  test('the first and last labels stand where it draws the ends of the front edge', async () => {
+    const element = (await relief('rows="2"', readings)) as Framed & {
+      placeCorners(at?: { end: { x: number; y: number }; start: { x: number; y: number } }): void
+    }
+    const read = (name: string): number => {
+      const style = part(element, 'footer')?.getAttribute('style') ?? ''
+      return Number(
+        new RegExp(`--spatial-heatmap-${name}: ([\\d.]+)`).exec(style)?.[1] ?? Number.NaN,
+      )
+    }
+    /* The chart's own drawing: the start at the left edge, the end at the foot. */
+    expect(read('start-x')).toBe(0)
+    expect(read('end-y')).toBe(read('depth'))
+    element.rendererDrawn()
+    element.placeCorners({ end: { x: 0.6, y: 0.9 }, start: { x: 0.2, y: 0.5 } })
+    await element.updateComplete
+    const depth = read('depth')
+    expect(read('start-x')).toBe(0.2)
+    expect(read('start-y')).toBeCloseTo(0.5 * depth, 3)
+    expect(read('end-x')).toBe(0.6)
+    expect(read('end-y')).toBeCloseTo(0.9 * depth, 3)
+    /* Out of view, the labels keep where they were. */
+    element.placeCorners(undefined)
+    await element.updateComplete
+    expect(read('start-x')).toBe(0.2)
+  })
+
   test('a reading hovered in its drawing is the chart’s, and is told as a change', async () => {
     const element = (await relief('rows="2"', readings)) as Framed
     const kinds: string[] = []

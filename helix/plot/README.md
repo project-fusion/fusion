@@ -129,8 +129,9 @@ const connection = connectSpatialHeatmap(chart, threeHeatmapDriver(box))
   screen reader and the keys still reach it, `selection-mode` included.
 - **Shift with an arrow turns the view**, except under
   `selection-mode="multiple"`, where it selects a range as it always has.
-- While the renderer draws, the `start` and `end` labels stand in a row
-  under the strip, since the relief turns and its corners move.
+- **The `start` and `end` labels stand at the two ends of the front edge**
+  where the renderer draws them, as they do in the chart's own drawing, and
+  follow them as the view turns.
 
 | `threeHeatmapDriver` option | Default | What else it takes |
 |---|---|---|

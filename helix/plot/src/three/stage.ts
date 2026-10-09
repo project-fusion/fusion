@@ -189,6 +189,35 @@ export const createStage = (
   let place: ((at: Place | undefined) => void) | undefined
   let placed: Place | undefined
 
+  /* Places in the scene a driver asked to follow on the page, and who hears them. */
+  let tracked:
+    | { heard: (at: Place[] | undefined) => void; points: Vector3[]; was?: Place[] | undefined }
+    | undefined
+
+  /* Where each tracked place is drawn, told only when one moves, and as none
+     while any of them is behind the camera. */
+  const tellTracked = (): void => {
+    if (!tracked) {
+      return
+    }
+    const now = tracked.points.map((point) => point.clone().project(camera))
+    const at = now.some((on) => on.z > 1)
+      ? undefined
+      : now.map((on) => ({ x: (on.x + 1) / 2, y: (1 - on.y) / 2 }))
+    const was = tracked.was
+    const moved =
+      at === undefined || was === undefined
+        ? at !== was
+        : at.some((one, index) => {
+            const other = was[index] as Place
+            return Math.abs(one.x - other.x) > 1e-4 || Math.abs(one.y - other.y) > 1e-4
+          })
+    if (moved) {
+      tracked.was = at
+      tracked.heard(at)
+    }
+  }
+
   /* Where the ringed reading is drawn, told only when it moves. */
   const tellPlace = (): void => {
     let at: Place | undefined
@@ -296,6 +325,7 @@ export const createStage = (
     renderer.render(scene, camera)
     drawLabels()
     tellPlace()
+    tellTracked()
     if (turn && !pending) {
       pending = requestAnimationFrame(tick)
     }
@@ -530,6 +560,19 @@ export const createStage = (
       renderer.dispose()
       canvas.remove()
       labels.remove()
+    },
+    /**
+     * Follows `points` in the scene on the page: `heard` is told where each is
+     * drawn, as fractions of the box from its top left, after every frame
+     * that moves one, and `undefined` while one is behind the camera. Returns
+     * what stops following.
+     */
+    track: (points: Vector3[], heard: (at: Place[] | undefined) => void): (() => void) => {
+      tracked = { heard, points: points.map((point) => point.clone()) }
+      invalidate()
+      return () => {
+        tracked = undefined
+      }
     },
     turnBy: (across: number, up: number, animate: boolean): void => {
       const from = new Spherical().setFromVector3(camera.position.clone().sub(controls.target))

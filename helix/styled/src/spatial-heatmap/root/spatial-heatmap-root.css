@@ -181,10 +181,12 @@
 
 /* **The first and last labels stand at the ends of the front edge**, which
    is the strip's first and last column, rather than at the corners of the
-   box around the drawing, which is empty there. The footer is as wide as the
-   strip, so a percentage margin is a share of the drawing's width, which is
-   what the component writes the corners as. The summary keeps the footer's
-   line, and the footer keeps a line for the end label when there is none. */
+   box around the drawing, which is empty there. A renderer's corners move as
+   its view turns, and the component writes where they are each time. The
+   footer is as wide as the strip, so a percentage margin is a share of the
+   drawing's width, which is what the component writes the corners as. The
+   summary keeps the footer's line, and the footer keeps a line for the end
+   label when there is none. */
 [part="footer"] {
   color: var(--helix-color-foreground-subtle);
   display: grid;
@@ -200,7 +202,7 @@
    falling away to the right under a short label such as a month. */
 [part="start"] {
   inset-block-start: 0;
-  inset-inline-start: 0;
+  inset-inline-start: calc(var(--spatial-heatmap-start-x, 0) * 100%);
   margin-block-start: calc(
     (var(--spatial-heatmap-start-y, 0) - var(--spatial-heatmap-depth, 0)) *
     100% +
@@ -210,9 +212,14 @@
   white-space: nowrap;
 }
 
-/* Under the bottom corner, centered on it. */
+/* Under the bottom corner, centered on it: at the foot of the drawing in the
+   chart's own, and wherever a renderer draws that corner, as it turns. */
 [part="end"] {
   inset-block-start: 0;
+  margin-block-start: calc(
+    (var(--spatial-heatmap-end-y, 0) - var(--spatial-heatmap-depth, 0)) *
+    100%
+  );
   inset-inline-start: calc(var(--spatial-heatmap-end-x, 1) * 100%);
   position: absolute;
   translate: -50% 0;
@@ -221,20 +228,6 @@
 
 [part="summary"] {
   text-align: center;
-}
-
-/* **While a renderer draws, the labels are a plain row** under the strip,
-   first at the start and last at the end: the renderer's relief turns, so
-   no corner of it stays where the chart's own drawing put its corners. */
-:host(:state(drawn)) [part="footer"] {
-  grid-template-columns: auto minmax(0, 1fr) auto;
-}
-
-:host(:state(drawn)) [part="start"],
-:host(:state(drawn)) [part="end"] {
-  margin: var(--helix-space-none);
-  position: static;
-  translate: none;
 }
 
 [part="footer"][data-empty] {

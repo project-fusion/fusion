@@ -21,13 +21,27 @@ interface Chart extends HTMLElement {
 }
 
 const recording = () => {
-  const told: { colors?: PlotColors; drawn: SpatialHeatmapField[] } = { drawn: [] }
+  const told: {
+    colors?: PlotColors
+    corners?:
+      | ((
+          at: { end: { x: number; y: number }; start: { x: number; y: number } } | undefined,
+        ) => void)
+      | undefined
+    drawn: SpatialHeatmapField[]
+  } = { drawn: [] }
   const driver: SpatialHeatmapDriver = {
     draw: (field, colors) => {
       told.drawn.push(field)
       told.colors = colors
     },
     focus: () => {},
+    onCorners: (corners) => {
+      told.corners = corners
+      return () => {
+        told.corners = undefined
+      }
+    },
     turnBy: () => {},
   }
   return { driver, told }
@@ -71,5 +85,11 @@ describe('connectSpatialHeatmap', () => {
       'tone-2',
     ])
     expect(hasState(element, 'drawn')).toBe(true)
+    /* Where the driver draws the front edge's ends, the labels stand. */
+    told.corners?.({ end: { x: 0.7, y: 0.8 }, start: { x: 0.1, y: 0.4 } })
+    await settle(element)
+    const footer = element.shadowRoot?.querySelector('[part="footer"]')?.getAttribute('style') ?? ''
+    expect(footer).toContain('--spatial-heatmap-start-x: 0.1')
+    expect(footer).toContain('--spatial-heatmap-end-x: 0.7')
   })
 })

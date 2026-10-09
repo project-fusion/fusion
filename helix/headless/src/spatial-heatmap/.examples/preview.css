@@ -88,7 +88,7 @@ helix-headless-spatial-heatmap::part(footer) {
 
 helix-headless-spatial-heatmap::part(start) {
   inset-block-start: 0;
-  inset-inline-start: 0;
+  inset-inline-start: calc(var(--spatial-heatmap-start-x) * 100%);
   margin-block-start: calc(
     (var(--spatial-heatmap-start-y) - var(--spatial-heatmap-depth)) *
     100% +
@@ -99,6 +99,7 @@ helix-headless-spatial-heatmap::part(start) {
 
 helix-headless-spatial-heatmap::part(end) {
   inset-block-start: 0;
+  margin-block-start: calc((var(--spatial-heatmap-end-y) - var(--spatial-heatmap-depth)) * 100%);
   inset-inline-start: calc(var(--spatial-heatmap-end-x) * 100%);
   position: absolute;
   translate: -50% 0;
