@@ -82,9 +82,6 @@
       "helix/sandbox/custom-elements.json"
     ]
   },
-  "held": {
-    "locus": "Not on the registry yet. Bootstrap it, register trusted publishing, then delete this entry: .github/RELEASING.md#a-held-domain."
-  },
   "helix": {
     "accepted": {
       "color-foreground-subtle on color-surface-sunken": "The engine does not emit `foreground-subtle` at all: the readable range supports one quiet step and not two, so the stylesheet keeps its own and the engine does not pretend to have solved it."
