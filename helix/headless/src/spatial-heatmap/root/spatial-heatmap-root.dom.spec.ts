@@ -181,6 +181,84 @@ describe('the base and the corners', () => {
   })
 })
 
+describe('a renderer', () => {
+  type Framed = Relief & {
+    field: {
+      cells: Array<{ column: number; height: number; label: string; row: number; tone?: string }>
+      columns: number
+      rows: number
+    }
+    rendererDrawn(on?: boolean): void
+    requestActive(index: number, kind?: 'mouse' | 'pen' | 'touch'): void
+    selectionMode?: string
+  }
+
+  const readings: Array<[string, number]> = [
+    ['Mon', 4],
+    ['Tue', 2],
+    ['Wed', 0],
+  ]
+
+  test('is told every reading drawn, its place on the grid, its height, and its tone', async () => {
+    const element = (await relief('rows="2" thresholds="1 3" tones="1 2"', readings)) as Framed
+    expect(element.field.columns).toBe(2)
+    expect(element.field.rows).toBe(2)
+    expect(element.field.cells.map((cell) => [cell.label, cell.column, cell.row])).toEqual([
+      ['Mon', 0, 0],
+      ['Tue', 0, 1],
+      ['Wed', 1, 0],
+    ])
+    expect(element.field.cells[0]?.height).toBe(2)
+    expect(element.field.cells[1]?.height).toBe(1)
+  })
+
+  test('draws over the chart’s own drawing, which stays under it for a reader and the keys', async () => {
+    const element = (await relief('rows="2"', readings)) as Framed
+    const slot = element.shadowRoot?.querySelector('slot[name="renderer"]')
+    expect(slot?.parentElement).toBe(part(element, 'strip'))
+    element.rendererDrawn()
+    await element.updateComplete
+    expect(part(element, 'drawing')?.getAttribute('style')).toBe('opacity: 0')
+    expect(part(element, 'drawing')).not.toBeNull()
+  })
+
+  test('Shift with an arrow turns its view, and selects instead under multiple selection', async () => {
+    const element = (await relief('rows="2"', readings)) as Framed
+    const turns: unknown[] = []
+    element.addEventListener('helix-plot-turn', (event) =>
+      turns.push((event as CustomEvent).detail),
+    )
+    const shift = (key: string) =>
+      part(element, 'strip')?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, composed: true, key, shiftKey: true }),
+      )
+    shift('ArrowRight')
+    expect(turns).toEqual([])
+    element.rendererDrawn()
+    await element.updateComplete
+    shift('ArrowRight')
+    expect(turns).toEqual([{ across: 1, up: 0 }])
+    element.setAttribute('selection-mode', 'multiple')
+    await element.updateComplete
+    shift('ArrowLeft')
+    expect(turns).toHaveLength(1)
+  })
+
+  test('a reading hovered in its drawing is the chart’s, and is told as a change', async () => {
+    const element = (await relief('rows="2"', readings)) as Framed
+    const kinds: string[] = []
+    element.addEventListener('helix-plot-change', (event) =>
+      kinds.push((event as CustomEvent).detail.kind),
+    )
+    element.requestActive(1, 'mouse')
+    await element.updateComplete
+    expect(
+      element.shadowRoot?.querySelector('[part~="cell-active"]')?.getAttribute('data-index'),
+    ).toBe('1')
+    expect(kinds).toContain('focus')
+  })
+})
+
 describe('the width', () => {
   /**
    * **A strip at 30 degrees spends its rows across the page too.** At the

@@ -9,6 +9,13 @@ export {
   plotColorsFrom,
 } from './connect-plot/connect-plot.js'
 export {
+  connectSpatialHeatmap,
+  type HeatmapCell,
+  type SpatialHeatmapConnection,
+  type SpatialHeatmapDriver,
+  type SpatialHeatmapField,
+} from './connect-spatial-heatmap/connect-spatial-heatmap.js'
+export {
   connectSpatialScatterChart,
   type Field,
   type Point,

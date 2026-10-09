@@ -12,7 +12,7 @@ beforeAll(async () => {
 
 interface Plot extends HTMLElement {
   active: number
-  drawn(on?: boolean): void
+  rendererDrawn(on?: boolean): void
   field: { groups: string[]; points: { label: string; x: number }[] }
   requestActive(index: number, kind?: 'mouse' | 'pen' | 'touch'): void
   updateComplete: Promise<unknown>
@@ -72,7 +72,7 @@ describe('the frame', () => {
       '--chart-series: var(--chart-series-1)',
       '--chart-series: var(--chart-series-2)',
     ])
-    element.drawn()
+    element.rendererDrawn()
     await element.updateComplete
     expect(part(element, 'fallback')?.hasAttribute('hidden')).toBe(true)
     expect(hasState(element, 'drawn')).toBe(true)
@@ -145,7 +145,7 @@ describe('the tooltip', () => {
     expect(part(element, 'tooltip-label')?.textContent).toBe('Grace')
     expect(part(element, 'mark')?.parentElement?.localName).toBe('foreignObject')
     expect(part(element, 'ring')).not.toBeNull()
-    element.drawn()
+    element.rendererDrawn()
     await element.updateComplete
     expect(part(element, 'tooltip-label')?.textContent).toBe('Grace')
     const mark = part(element, 'mark') as HTMLElement

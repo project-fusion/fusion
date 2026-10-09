@@ -1,7 +1,9 @@
 # @fusion.dev/helix-plot
 
-Connects the Helix `Spatial Scatter Chart` and `Spatial Surface Chart` charts to three.js, which
-draws them in three dimensions, colored from your tokens.
+Connects the Helix `Spatial Heatmap`, `Spatial Scatter Chart` and
+`Spatial Surface Chart` to three.js, which draws them in three dimensions,
+lit, in a view you can drag round and zoom, colored from your tokens. Each
+also draws itself in SVG, which this package replaces where it is connected.
 
 ```sh
 bun add @fusion.dev/helix @fusion.dev/helix-plot three
@@ -96,11 +98,49 @@ const connection = connectSpatialSurfaceChart(chart, threeSurfaceDriver(chart.qu
 |---|---|---|
 | `density` | screen × 1.5, 2 to 3; on a touch screen, the screen's own, at most 2 | How many pixels the drawing has for each of the page's |
 
+## A heatmap
+
+`Spatial Heatmap` takes the renderer's box in its `renderer` slot, since its
+table sits inside it:
+
+```html
+<helix-spatial-heatmap for="commits" rows="7">
+  <table id="commits">…</table>
+  <div slot="renderer"></div>
+</helix-spatial-heatmap>
+```
+
+```js
+import '@fusion.dev/helix/spatial-heatmap'
+import { connectSpatialHeatmap } from '@fusion.dev/helix-plot'
+import { threeHeatmapDriver } from '@fusion.dev/helix-plot/three'
+
+const chart = document.querySelector('helix-spatial-heatmap')
+const box = chart.querySelector('[slot="renderer"]')
+const connection = connectSpatialHeatmap(chart, threeHeatmapDriver(box))
+```
+
+- **Each reading is a prism on a slab**, as tall as the chart's own drawing
+  stands it and in its tone from the `--heatmap-tone-*` tokens, lit from
+  above, with each edge set a little apart from its face.
+- **The view starts at the isometric angle** the chart's own drawing is seen
+  from, fitted to the relief, so nothing jumps when the renderer takes over.
+- **The chart's own drawing stays under the renderer's, unseen**, where a
+  screen reader and the keys still reach it, `selection-mode` included.
+- **Shift with an arrow turns the view**, except under
+  `selection-mode="multiple"`, where it selects a range as it always has.
+- While the renderer draws, the `start` and `end` labels stand in a row
+  under the strip, since the relief turns and its corners move.
+
+| `threeHeatmapDriver` option | Default | What else it takes |
+|---|---|---|
+| `density` | screen × 1.5, 2 to 3; on a touch screen, the screen's own, at most 2 | How many pixels the drawing has for each of the page's |
+
 ## What it exports
 
 | Import | What |
 |---|---|
-| `@fusion.dev/helix-plot` | `connectSpatialScatterChart(chart, driver)`, `connectSpatialSurfaceChart(chart, driver)`, `plotColorsFrom(chart, groups)`, and the types `Axes`, `Axis`, `Field`, `PlotColors`, `PlotConnection`, `PlotDriver`, `Point`, `SpatialScatterChartConnection`, `SpatialScatterChartDriver`, `SpatialSurfaceChartConnection`, `SpatialSurfaceChartDriver`, `SurfaceCell` and `SurfaceField` |
-| `@fusion.dev/helix-plot/three` | `threeScatterDriver(box, options)` and `threeSurfaceDriver(box, options)`, and the types `ThreeScatterDriverOptions` and `ThreeSurfaceDriverOptions` |
+| `@fusion.dev/helix-plot` | `connectSpatialHeatmap(chart, driver)`, `connectSpatialScatterChart(chart, driver)`, `connectSpatialSurfaceChart(chart, driver)`, `plotColorsFrom(chart, groups, extra)`, and the types `Axes`, `Axis`, `Field`, `HeatmapCell`, `Place`, `PlotColors`, `PlotConnection`, `PlotDriver`, `Point`, `PointerKind`, `SpatialHeatmapConnection`, `SpatialHeatmapDriver`, `SpatialHeatmapField`, `SpatialScatterChartConnection`, `SpatialScatterChartDriver`, `SpatialSurfaceChartConnection`, `SpatialSurfaceChartDriver`, `SurfaceCell` and `SurfaceField` |
+| `@fusion.dev/helix-plot/three` | `threeHeatmapDriver(box, options)`, `threeScatterDriver(box, options)` and `threeSurfaceDriver(box, options)`, and the types `ThreeHeatmapDriverOptions`, `ThreeScatterDriverOptions` and `ThreeSurfaceDriverOptions` |
 
 **three.js is an optional peer**, so a page brings the version it has. `@fusion.dev/helix-plot` itself never imports it: only `@fusion.dev/helix-plot/three` does, so a page with a driver of its own needs no three.js.

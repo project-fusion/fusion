@@ -12,7 +12,7 @@ beforeAll(async () => {
 
 interface Plot extends HTMLElement {
   active: number
-  drawn(on?: boolean): void
+  rendererDrawn(on?: boolean): void
   field: { acrosses: number[]; cells: { label?: string; value?: number }[]; depths: number[] }
   requestActive(index: number, kind?: 'mouse' | 'pen' | 'touch'): void
   updateComplete: Promise<unknown>
@@ -77,7 +77,7 @@ describe('the frame', () => {
       expect(face.getAttribute('style')).toMatch(/--spatial-surface-chart-shade: [\d.]+/)
     }
     const fallback = part(element, 'fallback')
-    element.drawn()
+    element.rendererDrawn()
     await element.updateComplete
     expect(fallback?.hasAttribute('hidden')).toBe(true)
     expect(hasState(element, 'drawn')).toBe(true)
@@ -168,7 +168,7 @@ describe('the keys', () => {
 describe('the tooltip', () => {
   test('shows the reading’s row where the renderer draws it, and none for an open place', async () => {
     const element = (await plot()) as Plot & { placeReading(at?: { x: number; y: number }): void }
-    element.drawn()
+    element.rendererDrawn()
     element.placeReading({ x: 0.2, y: 0.6 })
     element.requestActive(3)
     await element.updateComplete
