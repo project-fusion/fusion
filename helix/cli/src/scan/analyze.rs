@@ -997,11 +997,15 @@ impl<'a> Analyzer<'a> {
             }
             /* **A listener on an ancestor runs for an event that bubbles**, and
             Helix's mostly do: `onhelix-dismiss` on a wrapper hears every tag in
-            it. The manifest does not say which events bubble, so a hyphenated
-            name some element dispatches is taken as heard. A camel-case name
+            it. The catalog says which events stop at their element, such as
+            `helix-before-open`, and only those are reported on a wrapper. One
+            the catalog does not describe is taken as heard. A camel-case name
             is still reported, since React listens for it as written and
             nothing dispatches that. */
-            if !name.starts_with("onHelix") && installed.dispatched.contains(&event) {
+            if !name.starts_with("onHelix")
+                && installed.dispatched.contains(&event)
+                && !installed.still.contains(&event)
+            {
                 continue;
             }
             let props: Vec<&str> = mine.iter().map(|(_, prop)| prop.as_str()).collect();
@@ -1010,7 +1014,11 @@ impl<'a> Analyzer<'a> {
                 .find(|(dispatched, _)| *dispatched == event)
                 .map(|(_, prop)| prop.clone())
                 .or_else(|| nearest(name, props.iter().copied(), None).map(str::to_owned));
-            let message = if installed.dispatched.contains(&event)
+            let message = if installed.still.contains(&event)
+                && !mine.iter().any(|(one, _)| *one == event)
+            {
+                format!("`{event}` stops at the element that sends it, and `{tag}` sends none, so `{name}` here never runs. Put the listener on the element that dispatches `{event}`.")
+            } else if installed.dispatched.contains(&event)
                 && !mine.iter().any(|(one, _)| *one == event)
             {
                 format!("`{tag}` does not dispatch `{event}`, so `{name}` never runs. React wires an `on` prop only on the element that dispatches the event.")
@@ -1217,6 +1225,8 @@ mod tests {
         );
         installed.dispatched.insert("helix-select".to_owned());
         installed.dispatched.insert("helix-dismiss".to_owned());
+        installed.dispatched.insert("helix-before-open".to_owned());
+        installed.still.insert("helix-before-open".to_owned());
         installed.forms.insert("helix-card".to_owned());
         installed
     }
@@ -1441,7 +1451,7 @@ mod tests {
         let installed = installed();
         let imports: HashSet<String> = ["@fusion.dev/helix".to_owned()].into();
         let page = crate::scan::jsx::read(
-            "export const A = () => <helix-card onhelix-select={f} onHelixSelect={f} onhelix-dismiss={f} onClick={f} onhelix-selcet={f} />",
+            "export const A = () => <helix-card onhelix-select={f} onHelixSelect={f} onhelix-dismiss={f} onhelix-before-open={f} onClick={f} onhelix-selcet={f} />",
             oxc_span::SourceType::tsx(),
         )
         .expect("JSX");
@@ -1451,11 +1461,14 @@ mod tests {
             kinds(&analyzer),
             [
                 ("unknown-event", "<helix-card onHelixSelect>".to_owned()),
+                ("unknown-event", "<helix-card onhelix-before-open>".to_owned()),
                 ("unknown-event", "<helix-card onhelix-selcet>".to_owned()),
             ]
         );
         /* `onhelix-dismiss` is another element's event, and one that bubbles,
-        so a card holding tags hears it and is not reported. */
+        so a card holding tags hears it and is not reported.
+        `helix-before-open` stops at the element that sends it, so on the card
+        it is. */
         /* The same props in HTML are not React's, and are not judged. */
         let mut analyzer = Analyzer::new(&index, &listing, &used).with(&installed, &imports);
         analyzer.markup([("a.html", page.elements.as_slice())]);

@@ -32,6 +32,9 @@ pub struct Replacement {
 pub struct Installed {
     /// Every event name any element dispatches.
     pub dispatched: HashSet<String>,
+    /// The events that stop at the element that sends them, so a listener on
+    /// an ancestor never hears one: `helix-before-open` among them.
+    pub still: HashSet<String>,
     /// Each tag's events, as `(name, reactProp)`.
     pub events: HashMap<String, Vec<(String, String)>>,
     /// The tags that are form controls, which `:disabled` matches.
@@ -64,6 +67,13 @@ impl Installed {
                         installed
                             .specifiers
                             .insert(tag.clone(), specifier.to_owned());
+                    }
+                    for event in element["events"].as_array().into_iter().flatten() {
+                        if event["bubbles"] == false {
+                            if let Some(name) = event["name"].as_str() {
+                                installed.still.insert(name.to_owned());
+                            }
+                        }
                     }
                     let events: Vec<(String, String)> = element["events"]
                         .as_array()
