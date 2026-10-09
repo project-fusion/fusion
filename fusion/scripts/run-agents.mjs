@@ -8,8 +8,11 @@
  * that installed Helix the way a consumer does, and the page it writes is
  * graded by `run-tasks.mjs --answers`, the grader the reference pages pass.
  *
- * **Four arms, because one number says nothing.** `docs` has the installed
+ * **Five arms, because one number says nothing.** `docs` has the installed
  * packages and nothing else, so the agent reads what `node_modules` holds.
+ * `web` adds the site's own docs, fetched from fusion.dev, where the prompt
+ * says they are: the fair alternative to a skill, which an agent with the
+ * address would read the same way.
  * `skill` adds the guide Helix ships as a skill, linked where the guide says.
  * `mcp` adds `helix mcp` as well. `plugin` installs the Claude Code plugin in
  * `helix/plugin` in their place, the one step a user takes. The gap between
@@ -55,7 +58,7 @@ const PACKAGES = [
   '@fusion.dev/helix-styles',
 ]
 
-const ARMS = ['docs', 'skill', 'mcp', 'plugin']
+const ARMS = ['docs', 'web', 'skill', 'mcp', 'plugin']
 
 const suite = JSON.parse(readFileSync(join(root, 'fusion/scripts/eval/tasks.json'), 'utf8'))
 const asked = argument('tasks')?.split(',')
@@ -116,7 +119,7 @@ const attempt = (arm, task) => {
   mkdirSync(folder, { recursive: true })
   const args = [
     '-p',
-    `${task.prompt}\n\nHelix is installed in this project's node_modules. Write the page in this folder as index.html, with its imports and code in main.ts, or in .tsx files for React.`,
+    `${task.prompt}\n\nHelix is installed in this project's node_modules.${arm === 'web' ? " Helix's documentation is at https://fusion.dev/llms.txt." : ''} Write the page in this folder as index.html, with its imports and code in main.ts, or in .tsx files for React.`,
     '--model',
     model,
     '--output-format',
@@ -133,9 +136,10 @@ const attempt = (arm, task) => {
     '--add-dir',
     modules,
     '--disallowedTools',
-    'Bash,WebFetch,WebSearch,Task',
+    arm === 'web' ? 'Bash,WebSearch,Task' : 'Bash,WebFetch,WebSearch,Task',
   ]
-  const tools = [...TOOLS]
+  /* The web arm reaches the site and nothing else. */
+  const tools = arm === 'web' ? [...TOOLS, 'WebFetch(domain:fusion.dev)'] : [...TOOLS]
   if (arm === 'skill' || arm === 'mcp') {
     /* Where the guide says to link it, for Claude Code. */
     mkdirSync(join(folder, '.claude/skills/helix'), { recursive: true })

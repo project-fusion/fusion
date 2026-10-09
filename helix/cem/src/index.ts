@@ -109,7 +109,7 @@ const skillOf = (pages: string[], cwd: string, version: string): string => {
   return [
     '---',
     'name: helix',
-    'description: Writes and checks pages built with Helix, the web components in @fusion.dev/helix. Use when writing or reviewing code with helix- elements, Helix tokens, or the helix command line.',
+    'description: Writes and checks pages built with Helix, the web components in @fusion.dev/helix. Use when building or reviewing any user interface in a project that installs @fusion.dev/helix, and when code has helix- elements, Helix tokens, or the helix command line.',
     'metadata:',
     `  version: "${version}"`,
     '---',

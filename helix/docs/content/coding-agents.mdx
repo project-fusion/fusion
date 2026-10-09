@@ -1,5 +1,5 @@
 ---
-description: The files an AI agent can read to write Helix code, and where to find each one.
+description: Install Helix for a coding agent, and the files an agent can read to write Helix code.
 order: 4
 section: Getting started
 title: Coding agents
@@ -10,6 +10,72 @@ title: Coding agents
 We publish Helix as text for agents that write Helix code, so an agent does not
 need to read the rendered website. Three sources give it the library as text.
 We generate all three from the same sources as this site.
+
+## Install the plugin
+
+Helix's plugin gives an agent the [Helix skill](./using-helix-with-an-agent) and
+the Helix MCP server in one install. The server runs
+`npx @fusion.dev/helix-cli mcp`, the command line your project installs, so its
+answers are your version's.
+
+| Tool | Install |
+|---|---|
+| Claude Code | `claude plugin marketplace add project-fusion/fusion`, then `claude plugin install helix@fusion` |
+| Cursor | `/plugin marketplace add https://github.com/project-fusion/fusion` in Cursor's agent, then install `helix`. A team marketplace can import the repository instead |
+| VS Code | Add `"chat.plugins.marketplaces": ["project-fusion/fusion"]` to your settings, search `@agentPlugins` in the Extensions view, and install `helix` |
+| GitHub Copilot CLI | `copilot plugin install project-fusion/fusion:helix/plugin` |
+| Codex | `codex plugin marketplace add project-fusion/fusion`, then `codex plugin add helix@fusion` |
+| Devin | `devin plugins install project-fusion/fusion#helix/plugin` |
+| Gemini CLI | `gemini skills install https://github.com/project-fusion/fusion.git --path helix/plugin/skills/helix`, for the skill alone |
+
+The plugin follows the latest release of Helix. Its skill points to the copy in
+`node_modules`, which matches the version you installed.
+
+## Link the skill without a plugin
+
+**Point your tool at the skill, and do not copy it.** A copy starts to go stale
+as soon as you paste it, and the skill changes with the library. The skill in
+the package matches the Helix you installed.
+
+Most tools read skills from `.agents/skills`, and Claude Code and Cline from
+`.claude/skills`. Link it into the one your tool reads:
+
+```sh
+mkdir -p .agents/skills
+ln -s ../../node_modules/@fusion.dev/helix/skills/helix .agents/skills/helix
+```
+
+Other tools read a file in your repository. Add a line to it that names the
+skill, or this page:
+
+```md
+Helix: read node_modules/@fusion.dev/helix/skills/helix/SKILL.md before
+writing components, and node_modules/@fusion.dev/helix/api.json for the API.
+```
+
+| Tool | Where it goes |
+|---|---|
+| Claude Code | `.claude/skills/helix`, or a line in `AGENTS.md` or `CLAUDE.md` |
+| Cursor | `.cursor/rules/` |
+| GitHub Copilot | `.github/copilot-instructions.md` |
+| Anything else | Whatever it reads. The line is the same |
+
+We do not write those files for you, and we chose this on purpose. You would
+have to maintain a file we generated in your repository against our changes. A
+tool that rewrote it on install would be a dependency you did not ask for, in a
+directory you own. You add the link or the line, and you can delete it.
+
+## Install the Helix MCP server
+
+```sh
+helix mcp init --client claude
+```
+
+`helix mcp` answers from the Helix packages your project installs: families,
+examples, import lines, tokens, and the theme a brand color produces. `--client`
+takes `claude`, `cursor`, or `vscode`, and writes the server into the file that
+client reads. [The Helix MCP server](#the-helix-mcp-server) lists the tools. It runs on your
+machine, talks to a client you chose, and makes no network requests.
 
 ## The manifest
 
@@ -78,37 +144,12 @@ agent uses most:
 - `specifier` and `words` on each element: the line that registers it, and the
   properties `registerWords` translates
 
-## Import every family you write
-
-Each tag needs its family's entry imported. A family registers its own parts,
-so `@fusion.dev/helix/tabs` registers Tab and Tab Panel. A family does not
-register another family's elements that you write inside it:
-
-```js
-import '@fusion.dev/helix/select'
-import '@fusion.dev/helix/option'
-```
-
-Without the Option import, the options are unknown elements and the Select
-offers nothing. The same is true
-of the layout around an example: a Button inside a Flex needs both imports.
-Copy the import lines above an example together with its markup.
-
 ## Check the code you wrote
 
-These checks run on your project, and each one prints JSON with `--json`:
-
-| Command | What it finds |
-|---|---|
-| `helix scan` | Unknown tags, attributes, values, slots, parts, hooks, React event props, and tokens, a `--_helix-` primitive read, `[disabled]` on a form control, a selector on an attribute the element never writes back, and a tag whose entry nothing imports, each with its file and line |
-| `helix theme audit` | Every foreground and background pair in your theme that misses its contrast target |
-| `initDiagnostics()` from `@fusion.dev/helix-diagnostics` | The same findings on the running page, and what the library reports as it runs, such as an option nobody imported |
-
-`helix scan` and `helix theme audit` exit 1 when they find an error and 0 when
-they find none. Run them after you write Helix code, and fix each finding
-before you finish. `helix scan --file <path>` reports one file's findings, and
-`helix scan --stdin tsx` reads a snippet from stdin. Both still read the whole
-project, so an import in another file counts.
+`helix scan`, `helix diagnostics --once`, and `helix theme audit` check what an
+agent wrote, and the MCP server runs the same checks.
+[Using Helix with an agent](./using-helix-with-an-agent#check-the-code-you-wrote)
+lists what each finds.
 
 ## The index
 
