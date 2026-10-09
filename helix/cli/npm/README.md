@@ -22,7 +22,7 @@ helix mcp init --client claude
 
 | Verb | What it does |
 |---|---|
-| `component` | Checks the components you build on Helix's base classes: parts, states, hooks, reflection, attribute names, lifecycle, and listeners. Reads the folders named by `tiers` in `helix.json`. `--only <rule>` runs some of them |
+| `component` | Checks the components you build on Helix's base classes: registration under your prefix, parts, states, hooks, reflection, attribute names, lifecycle, and listeners. Reads the folders named by `tiers` in `helix.json`. `--only <rule>` runs some of them |
 | `theme` | `init` a starter intent, `build` it to CSS, `audit` every contrast pair, `check` in CI |
 | `new` | Scaffolds a project from a Helix template |
 | `diagnostics` | Receives the runs `initDiagnostics()` sends from your app and prints each new finding. `--out <path>` writes the CI file, `--port` picks the port, 7417 by default, and `--config <path>` names the settings served to the page |

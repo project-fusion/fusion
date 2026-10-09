@@ -82,6 +82,7 @@ pub mod recipes;
 pub mod redeclared;
 pub mod reflected;
 pub mod reflected_defaults;
+pub mod registered;
 pub mod registry;
 pub mod resolved;
 pub mod restated;
@@ -497,7 +498,7 @@ pub struct Layer {
         reason = "read by the published build, which runs only these"
     )
 )]
-pub const PUBLIC: [&str; 10] = [
+pub const PUBLIC: [&str; 11] = [
     "attribute-names",
     "constructed",
     "hooks",
@@ -506,6 +507,7 @@ pub const PUBLIC: [&str; 10] = [
     "parts",
     "reflected",
     "reflected-defaults",
+    "registered",
     "restated",
     "states",
 ];
@@ -797,6 +799,12 @@ fn every() -> Vec<Rule> {
             name: "reflected-defaults",
             run: Runner::Source(reflected_defaults::run),
             summary: "a reflected property is silent until something sets it",
+        },
+        Rule {
+            fix: None,
+            name: "registered",
+            run: Runner::Source(registered::run),
+            summary: "a component built on a headless one registers everything it renders, under its own prefix",
         },
         Rule {
             fix: None,
