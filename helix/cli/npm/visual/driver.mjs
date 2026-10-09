@@ -39,7 +39,7 @@ import { createServer } from 'node:http'
 import { extname, resolve, sep } from 'node:path'
 import { StringDecoder } from 'node:string_decoder'
 import { pathToFileURL } from 'node:url'
-import { readPage } from './checks.mjs'
+import { boxesOf, readPage } from './checks.mjs'
 
 /** The `id` of the harness `<style>` the binary writes into every page. */
 const STYLE_ID = 'helix-visual-harness'
@@ -435,7 +435,10 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
       if (progress.abandoned) {
         return
       }
-      say({ key: item.key, op: 'shot', png: png.toString('base64'), shot: shot.name })
+      /* Where the named elements sat in this picture, when the run asked:
+         written into a baseline, and read to say what a change happened to. */
+      const boxes = item.boxes ? await boxesOf(page) : null
+      say({ boxes, key: item.key, op: 'shot', png: png.toString('base64'), shot: shot.name })
       /* After the first picture, on the page that was pictured, so what the
          inspection reads cannot move a pixel of that picture. */
       if (index === 0 && item.inspect) {

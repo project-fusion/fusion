@@ -19,6 +19,7 @@
 //! never lists one that does nothing. `compare` needs no browser and no Node;
 //! `test` and `update` start the driver once per run.
 
+mod boxes;
 mod config;
 mod diagnose;
 mod diff;

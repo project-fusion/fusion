@@ -131,6 +131,11 @@ export default defineConfig({
   separate, which answer to no target.
 - Each check takes `ignore`, selectors it leaves alone with everything inside
   them, and an exception's `checks` excuses one entry from the checks it names.
+- **`manifest`**: custom elements manifests, relative to the config. A shot
+  that differs is told region by region: the element a reader would name that
+  covers the region, and the file a manifest says defines it. A baseline
+  carries its elements' boxes inside its PNG once a run writes it, and from
+  then on the run also says how far each element moved.
 - **`diff`**: how a shot is compared, for the whole config or for one source.
   `mode: 'pixel'` counts the pixels past `threshold`, 0.1 unless you set it,
   and fails above `pixels`, 0 unless you set it. `mode: 'perceptual'` scores

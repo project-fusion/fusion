@@ -342,6 +342,11 @@ export interface Config {
   /** Checks of your own on each page, after its first picture. */
   inspect?: Inspect
   /**
+   * Custom elements manifests, `custom-elements.json`, relative to the config. A change traced to a custom
+   * element names the file its manifest says defines it.
+   */
+  manifest?: string[]
+  /**
    * Selectors whose elements are painted over in one fixed color in every picture and left out of every
    * accessibility snapshot, for what changes on its own and says nothing about the page, such as a version
    * number or a date.

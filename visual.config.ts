@@ -116,6 +116,9 @@ export default defineConfig({
       )
     },
   },
+  /* What a changed region is traced to: each tag's file, from the manifests
+     the build writes. */
+  manifest: ['helix/headless/custom-elements.json', 'helix/styled/custom-elements.json'],
   retake:
     'Dispatch the `Visual baselines` workflow on your branch and review the pull request it opens.',
   serve: {
