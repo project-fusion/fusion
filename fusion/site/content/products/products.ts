@@ -14,6 +14,16 @@ export interface Destination {
    */
   href?: string
   /**
+   * The drawing on its tile in the masthead panel, where it has one.
+   *
+   * A destination with a picture is a tile and one without is a row in the
+   * panel's text column. The split is Tesla's: the things you open and use get
+   * a picture, and the things you read get a line. A name here is a family slug
+   * the gallery already draws, or one of the site's own drawings in
+   * `site-nav/tiles.tsx`, and the panel looks the name up in both.
+   */
+  picture?: string
+  /**
    * The sentence under the name, which is what the panel is for.
    */
   summary: string
@@ -138,12 +148,11 @@ export interface Product {
 /**
  * The two substrates, which are the only two products.
  *
- * **The masthead says `Products` and lists these, not the verticals.** A
- * vertical is a division and a product is a thing you use: nobody uses Fusion
- * Design, they use Helix. The verticals still ride in the panel's third
- * column, so a reader who wants the shape of the company gets it one click
- * away rather than from a menu that promised products and handed over
- * divisions.
+ * **The masthead names each product, and lists no verticals.** A vertical is
+ * a division and a product is a thing you use: nobody uses Fusion Design, they
+ * use Helix. A product with pictured destinations gets its own panel, a band of
+ * tiles beside a column of text links. A product with none is a plain link to
+ * its page until it has pages to tile: today that is Cortex.
  *
  * Engram, Trace and Recall are rows carrying their stage rather than a link,
  * because the division of Cortex is the argument even before the modules are
@@ -176,18 +185,36 @@ export const PRODUCTS: Product[] = [
         summary: 'Install Helix, build a theme, and learn how it works.',
         title: 'Docs',
       },
+      /* The rest of the text column. Docs is the front door, and these two
+         are the pages a reader arrives wanting by name: how to install it,
+         and how the palette is computed, which is the idea the whole system
+         rests on. Named pages with their own slugs, so a link to each is a
+         link to a thing and never to a position in a list. */
+      {
+        href: '/helix/docs/installation',
+        summary: 'What to install, and the order of the stylesheets.',
+        title: 'Installation',
+      },
+      {
+        href: '/helix/docs/theming',
+        summary: 'Compute a complete token set from your brand color.',
+        title: 'Deriving a theme',
+      },
       {
         href: '/helix/components',
+        picture: 'components',
         summary: 'Every component, with its API and a live example.',
         title: 'Components',
       },
       {
         href: '/helix/sandbox',
+        picture: 'sandbox',
         summary: 'Edit an example and see the result beside the code.',
         title: 'Sandbox',
       },
       {
         href: '/helix/theme',
+        picture: 'theme',
         summary: 'Build a palette from your brand color and check its contrast.',
         title: 'Theme builder',
       },
@@ -197,6 +224,7 @@ export const PRODUCTS: Product[] = [
          above are how Helix is used and this is a thing built with it. */
       {
         href: '/helix/maps',
+        picture: 'map',
         stage: 'Building',
         summary: 'Interactive maps in your brand’s colors.',
         title: 'Maps',
@@ -206,6 +234,7 @@ export const PRODUCTS: Product[] = [
          Helix it is Sigma.js, cosmos.gl, or three.js and somebody's data. */
       {
         href: '/helix/graph',
+        picture: 'graph',
         stage: 'Building',
         summary: 'Interactive graphs in your brand’s colors, in 2D and 3D.',
         title: 'Graph',

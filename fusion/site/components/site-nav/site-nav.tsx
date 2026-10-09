@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { PreferencesDrawer } from '@/components/preferences/preferences'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
+import { Picture } from '@/components/site-nav/tiles'
 import { Wordmark } from '@/components/wordmark/wordmark'
 import { PRODUCTS } from '@/content/products/products'
 import { stageAppearance } from '@/content/verticals/verticals'
@@ -203,9 +204,10 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
   const [open, setOpen] = useState(false)
 
   const [prefsOpen, setPrefsOpen] = useState(false)
-  const [panelDown, setPanelDown] = useState(false)
-
-  const panelRef = useRef<HelixMegamenu>(null)
+  /* The panel that is down, or none. The element itself and never a flag,
+     because the sheet has to measure the one that opened and a product's panel
+     is one of several. */
+  const [openPanel, setOpenPanel] = useState<HelixMegamenu | null>(null)
   const headerRef = useRef<HelixAppHeader>(null)
 
   /* Whether the bar has something under it, read off the bar rather than
@@ -261,8 +263,8 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
        component's own name. A query that matches nothing is not an error: this
        returns early, the sheet stays at the bar's own height, and the only
        symptom is a navigation panel you can read the hero through. */
-    const panel = panelRef.current?.shadowRoot?.querySelector('[part="surface"]')
-    if (!panelDown || !panel) {
+    const panel = openPanel?.shadowRoot?.querySelector('[part="surface"]')
+    if (!panel) {
       return
     }
     const measure = () => setPanelBottom(panel.getBoundingClientRect().bottom)
@@ -270,7 +272,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
     const watch = new ResizeObserver(measure)
     watch.observe(panel)
     return () => watch.disconnect()
-  }, [panelDown])
+  }, [openPanel])
 
   const within = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
 
@@ -283,10 +285,6 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
      it, which is the state a hero is guaranteed not to still be in. */
   const onHero = pathname === '/' || pathname === '/helix' || pathname === '/insights'
 
-  /* Products is current wherever a product is, which is the whole of what the
-     panel contains. */
-  const onProducts = PRODUCTS.some((product) => within(product.href))
-
   return (
     <>
       {/* The one glass, under both the bar and the panel.
@@ -296,8 +294,8 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           because nothing transitions out of the DOM. */}
       <div
         className={styles.navGlass}
-        data-lit={scrolled || panelDown ? '' : undefined}
-        style={panelDown && panelBottom ? { blockSize: `${panelBottom}px` } : undefined}
+        data-lit={scrolled || openPanel ? '' : undefined}
+        style={openPanel && panelBottom ? { blockSize: `${panelBottom}px` } : undefined}
       />
 
       <helix-app-header
@@ -315,106 +313,86 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
         </a>
 
         <helix-navigation class={styles.wideOnly} label="Sections">
-          {/* `aria-current` on the host rather than on the trigger inside it.
-                `Navigation` measures its marker against the elements assigned
-                to its slot and reads `aria-current` off each, so the attribute
-                has to be on the element that is actually in the row. The
-                trigger is rendered in the megamenu's own shadow root, where the
-                marker cannot see it, and where we could not write an attribute
-                without slotting a replacement, which would cost the
-                `aria-expanded` the component manages on its own button. */}
-          {/* `suppressHydrationWarning`, for the same reason the gallery's
-                options carry it: the element owns this node once it upgrades.
-                It watches the viewport and writes `data-narrow` onto its own
-                host to say the panel has become a band, which a custom element
-                registering early does before React hydrates the subtree, so
-                React finds an attribute on the server HTML that its own render
-                never produced. The server cannot know the width, so this is
-                expected rather than a symptom. */}
-          <helix-megamenu
-            class={styles.navPanel}
-            label="Products"
-            onhelix-before-close={() => setPanelDown(false)}
-            /* Both fire before the panel moves and both are cancelable, so
-                 the bar starts changing on the same frame the reveal starts
-                 rather than a frame behind it. */
-            onhelix-before-open={() => setPanelDown(true)}
-            ref={panelRef}
-            suppressHydrationWarning
-            variant="band"
-          >
-            {/*
-             *  The trigger is slotted, and it has to be.
-             *
-             *                   `label` names the button the component renders in its own
-             *                   shadow root, and this repo ships no declarative shadow DOM, so
-             *                   that button does not exist until the bundle loads and the
-             *                   element upgrades. Measured on `/helix`: the word `Products`
-             *                   appeared in the served HTML only as an attribute, so the
-             *                   masthead's first item was an empty box until hydration, and
-             *                   because `aria-current` put the navigation's marker on that box
-             *                   it drew a filled pill around nothing. With JavaScript off it
-             *                   never arrived at all.
-             */}
-            {/* And it says it opens something, which only this markup can:
-                 the component has no shadow root of the button's to write
-                 `aria-expanded` into, and writing it onto the button after
-                 hydration would be a mismatch. `panelDown` is the panel's own
-                 state, heard from its events. */}
-            <button
-              aria-current={onProducts ? 'page' : undefined}
-              aria-expanded={panelDown}
-              data-navigation-item
-              slot="trigger"
-              suppressHydrationWarning
-              type="button"
-            >
-              Products
-            </button>
-            {PRODUCTS.map((product) => (
-              <div data-megamenu-group key={product.name}>
-                {/* The mark sits with the name and nowhere else in the
-                      column. `helix-icon` carries no label here: the words
-                      beside it are the accessible reading, so the mark is
-                      decoration rather than a second reading of the same
-                      word. */}
-                <h3 data-megamenu-heading>
-                  <helix-icon name={product.mark}></helix-icon>
-                  {product.name}. {product.role}
-                </h3>
-                {product.destinations.map((destination) =>
-                  /* A module that is named and not yet built is a `div`, not a
-                       disabled link. There is nowhere for it to go, so an anchor
-                       would be a promise the href cannot keep, and
-                       `aria-disabled` on a real link leaves it in the tab order
-                       announcing itself as somewhere you cannot follow. A row
-                       that is not interactive simply is not one. */
-                  destination.href === undefined ? (
-                    <div data-megamenu-item data-soon key={destination.title}>
-                      <strong>
-                        {destination.title}
-                        {destination.stage && (
-                          <helix-tag data-density="sm" tone={stageAppearance(destination.stage)}>
-                            {destination.stage}
-                          </helix-tag>
-                        )}
-                      </strong>
-                      <span>{destination.summary}</span>
-                    </div>
-                  ) : (
+          {PRODUCTS.map((product) => {
+            const tiles = product.destinations.filter((destination) => destination.picture)
+            /* A product with nothing to picture is a word in the bar that goes
+               to its page. A panel of one link and three stage rows is the
+               weakest version of the pattern, so Cortex earns its panel on the
+               day it has pages to tile. */
+            if (tiles.length === 0) {
+              return (
+                <Link
+                  aria-current={within(product.href) ? 'page' : undefined}
+                  href={product.href}
+                  key={product.href}
+                >
+                  {product.name}
+                </Link>
+              )
+            }
+            const column = product.destinations.filter((destination) => !destination.picture)
+            return (
+              /* `aria-current` on the host and not on the trigger inside it.
+                 `Navigation` measures its marker against the elements assigned
+                 to its slot and reads `aria-current` off each, so the
+                 attribute has to be on the element that is actually in the
+                 row. The trigger is rendered in the megamenu's own shadow
+                 root, where the marker cannot see it, and where we could not
+                 write an attribute without slotting a replacement, which would
+                 cost the `aria-expanded` the component manages on its own
+                 button. */
+              /* `suppressHydrationWarning`, for the same reason the gallery's
+                 options carry it: the element owns this node once it upgrades.
+                 It watches the viewport and writes `data-narrow` onto its own
+                 host to say the panel has become a band, which a custom
+                 element registering early does before React hydrates the
+                 subtree, so React finds an attribute on the server HTML that
+                 its own render never produced. The server cannot know the
+                 width, so this is expected and is not a symptom. */
+              <helix-megamenu
+                class={styles.navPanel}
+                key={product.href}
+                label={product.name}
+                onhelix-before-close={() => setOpenPanel(null)}
+                /* Both fire before the panel moves and both are cancelable, so
+                   the bar starts changing on the same frame the reveal starts
+                   and never a frame behind it. The panel says which one it is,
+                   so the sheet measures the panel that is actually down. */
+                onhelix-before-open={(event) => setOpenPanel(event.currentTarget as HelixMegamenu)}
+                suppressHydrationWarning
+                variant="band"
+              >
+                {/* And it says it opens something, which only this markup can:
+                    the component has no shadow root of the button's to write
+                    `aria-expanded` into, and writing it onto the button after
+                    hydration would be a mismatch. `openPanel` is the panel's
+                    own state, heard from its events. */}
+                <button
+                  aria-current={within(product.href) ? 'page' : undefined}
+                  aria-expanded={openPanel?.getAttribute('label') === product.name}
+                  data-navigation-item
+                  slot="trigger"
+                  suppressHydrationWarning
+                  type="button"
+                >
+                  {product.name}
+                </button>
+
+                {/* The tiles: the things you open and use, each with a picture
+                    of itself. The anchor holds the drawing directly, because
+                    the gallery's motion keys on the element holding the
+                    `<svg>`, so pointing at a tile plays its picture the way
+                    pointing at a gallery card does. */}
+                <div className={styles.tiles}>
+                  {tiles.map((destination) => (
                     <Link
                       aria-current={pathname === destination.href ? 'page' : undefined}
-                      data-megamenu-item
-                      href={destination.href}
-                      key={destination.href}
+                      className={styles.tile}
+                      href={destination.href ?? product.href}
+                      key={destination.title}
                     >
-                      {/*
-                       *  Two rows, and the second is held to one line. A
-                       *                           summary that wraps turns a row of names into a
-                       *                           paragraph to read before choosing, so a narrow panel
-                       *                           truncates rather than reflows.
-                       */}
-                      <strong>
+                      {destination.picture && <Picture name={destination.picture} />}
+                      <strong className={styles.tileName}>
                         {destination.title}
                         {destination.stage && (
                           <helix-tag data-density="sm" tone={stageAppearance(destination.stage)}>
@@ -422,14 +400,58 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                           </helix-tag>
                         )}
                       </strong>
-                      <span>{destination.summary}</span>
+                      <span className={styles.tileSummary}>{destination.summary}</span>
                     </Link>
-                  ),
-                )}
-              </div>
-            ))}
-          </helix-megamenu>
+                  ))}
+                </div>
 
+                {/* The column: the things you read, as rows of text past a
+                    rule. The base layer's megamenu recipe draws these, so the
+                    rows are the ones the panel has always had. */}
+                <div className={styles.column} data-megamenu-group>
+                  {column.map((destination) =>
+                    /* A module named and not yet built is not a link, and is
+                       not a disabled link either. There is nowhere for it to
+                       go, so an anchor would be a promise the href cannot
+                       keep, and `aria-disabled` on a real link leaves it in
+                       the tab order announcing itself as somewhere you cannot
+                       follow. A row that is not interactive simply is not
+                       one. */
+                    destination.href === undefined ? (
+                      <div data-megamenu-item data-soon key={destination.title}>
+                        <strong>
+                          {destination.title}
+                          {destination.stage && (
+                            <helix-tag data-density="sm" tone={stageAppearance(destination.stage)}>
+                              {destination.stage}
+                            </helix-tag>
+                          )}
+                        </strong>
+                        <span>{destination.summary}</span>
+                      </div>
+                    ) : (
+                      <Link
+                        aria-current={pathname === destination.href ? 'page' : undefined}
+                        data-megamenu-item
+                        href={destination.href}
+                        key={destination.href}
+                      >
+                        <strong>
+                          {destination.title}
+                          {destination.stage && (
+                            <helix-tag data-density="sm" tone={stageAppearance(destination.stage)}>
+                              {destination.stage}
+                            </helix-tag>
+                          )}
+                        </strong>
+                        <span>{destination.summary}</span>
+                      </Link>
+                    ),
+                  )}
+                </div>
+              </helix-megamenu>
+            )
+          })}
           {SECTIONS.map((section) => (
             <Link
               aria-current={within(section.href) ? 'page' : undefined}
