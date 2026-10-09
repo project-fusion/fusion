@@ -4,11 +4,14 @@
   aria-labelledby="review-title"
   orientation="horizontal"
 >
-  <img
+  <helix-image
     alt=""
     slot="media"
     src="/media/scale/ocean-sun.jpg"
-  />
-  <h3 id="review-title">Quarterly review</h3>
-  <p>Revenue, costs, and goals for the last three months.</p>
+  ></helix-image>
+  <helix-text
+    as="h3"
+    id="review-title"
+  >Quarterly review</helix-text>
+  <helix-text as="p">Revenue, costs, and goals for the last three months.</helix-text>
 </helix-card>

@@ -1,17 +1,14 @@
-import './context.css'
-
 export function Example() {
   return (
     <helix-menu
       context
       label="Edit"
     >
-      <textarea
-        aria-label="Notes"
-        className="area"
-        defaultValue="Right-click in this field."
+      <helix-textarea
+        default-value="Right-click in this field."
+        label="Notes"
         slot="trigger"
-      />
+      ></helix-textarea>
 
       <helix-menu-item
         shortcut="mod+x"

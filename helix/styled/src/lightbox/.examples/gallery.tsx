@@ -47,10 +47,10 @@ export function Example() {
           label="Seawater over pale sand"
           value="seawater"
         >
-          <img
+          <helix-image
             alt="Seawater over pale sand"
             src="/media/scale/seawater-800.jpg"
-          />
+          ></helix-image>
           <helix-text slot="description">Shallow water at the beach in the morning.</helix-text>
         </helix-lightbox-item>
 
@@ -58,10 +58,10 @@ export function Example() {
           label="The sun low over open water"
           value="ocean-sun"
         >
-          <img
+          <helix-image
             alt="The sun low over open water"
             src="/media/scale/ocean-sun.jpg"
-          />
+          ></helix-image>
           <helix-text slot="description">Sunset over the ocean the same day.</helix-text>
         </helix-lightbox-item>
       </helix-lightbox>

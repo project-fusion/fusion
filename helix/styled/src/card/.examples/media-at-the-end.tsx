@@ -8,12 +8,13 @@ export function Example() {
       media-placement="end"
       separation="outlined"
     >
-      <h3
+      <helix-text
+        as="h3"
         id="sessions-title"
         slot="header"
       >
         Sessions
-      </h3>
+      </helix-text>
       <helix-text
         as="p"
         variant="display"

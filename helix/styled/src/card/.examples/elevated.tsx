@@ -4,12 +4,13 @@ export function Example() {
       aria-labelledby="elevated-title"
       separation="elevated"
     >
-      <h3
+      <helix-text
+        as="h3"
         id="elevated-title"
         slot="header"
       >
         Team plan
-      </h3>
+      </helix-text>
       Invite up to 10 people and share projects with your team.
       <helix-button
         emphasis="ghost"

@@ -6,7 +6,9 @@ export function Example() {
       label="Unsaved changes"
       persistent
     >
-      <p>You have two unsaved changes. Save or discard them to continue.</p>
+      <helix-text as="p">
+        You have two unsaved changes. Save or discard them to continue.
+      </helix-text>
       <helix-button-group
         label="Dialog actions"
         slot="footer"

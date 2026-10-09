@@ -4,12 +4,13 @@ export function Example() {
       aria-labelledby="plain-title"
       separation="plain"
     >
-      <h3
+      <helix-text
+        as="h3"
         id="plain-title"
         slot="header"
       >
         Profile
-      </h3>
+      </helix-text>
       Update your name, photo, and contact details.
       <helix-button
         emphasis="ghost"

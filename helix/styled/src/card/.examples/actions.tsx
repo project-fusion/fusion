@@ -1,12 +1,13 @@
 export function Example() {
   return (
     <helix-card aria-labelledby="actions-title">
-      <h3
+      <helix-text
+        as="h3"
         id="actions-title"
         slot="header"
       >
         Weekly report
-      </h3>
+      </helix-text>
       <helix-button
         emphasis="ghost"
         slot="header-actions"

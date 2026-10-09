@@ -7,7 +7,12 @@ export function Example() {
       label="Notifications"
       separation="filled"
     >
-      <h2 slot="header">Notifications</h2>
+      <helix-text
+        as="h2"
+        slot="header"
+      >
+        Notifications
+      </helix-text>
 
       <helix-notification
         at="2026-09-09T03:00:00Z"
@@ -74,12 +79,13 @@ export function Example() {
         <span>
           <strong>Santos Kling</strong> left a comment on <strong>Q4 planning</strong>
         </span>
-        <p
+        <helix-text
+          as="p"
           className="quote"
           slot="detail"
         >
           Where can I find the process for submitting invoices and for reviewing a contract?
-        </p>
+        </helix-text>
       </helix-notification>
     </helix-notifications>
   )

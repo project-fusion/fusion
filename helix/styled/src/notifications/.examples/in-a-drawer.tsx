@@ -28,7 +28,7 @@ export function Example() {
   const body: Record<string, React.ReactNode> = {
     build: (
       <>
-        Build <strong>#4821</strong> failed on <code>main</code>
+        Build <strong>#4821</strong> failed on <helix-code>main</helix-code>
         <helix-button
           emphasis="ghost"
           slot="actions"

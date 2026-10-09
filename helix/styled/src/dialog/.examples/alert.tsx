@@ -6,8 +6,15 @@ export function Example() {
       dismissible
       id="delete-project"
     >
-      <h2 slot="header">Delete project</h2>
-      <p>The project and its history are deleted for everyone on your team.</p>
+      <helix-text
+        as="h2"
+        slot="header"
+      >
+        Delete project
+      </helix-text>
+      <helix-text as="p">
+        The project and its history are deleted for everyone on your team.
+      </helix-text>
       <helix-button-group
         label="Dialog actions"
         slot="footer"

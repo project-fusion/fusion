@@ -13,7 +13,7 @@ export function Example() {
           >
             Website redesign
           </helix-text>
-          <p>Updated 2 hours ago by Alex Kim.</p>
+          <helix-text as="p">Updated 2 hours ago by Alex Kim.</helix-text>
         </helix-card>
       </a>
       <a
@@ -29,7 +29,7 @@ export function Example() {
           >
             Mobile app
           </helix-text>
-          <p>Updated yesterday by Maria Lopez.</p>
+          <helix-text as="p">Updated yesterday by Maria Lopez.</helix-text>
         </helix-card>
       </a>
     </helix-flex>

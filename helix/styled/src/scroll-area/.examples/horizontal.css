@@ -18,7 +18,6 @@ helix-scroll-area {
   flex: 0 0 11rem;
 }
 
-.cards h3 {
-  font-size: var(--helix-text-md);
-  margin: 0;
+.cards helix-text {
+  --text-font-size: var(--helix-text-md);
 }

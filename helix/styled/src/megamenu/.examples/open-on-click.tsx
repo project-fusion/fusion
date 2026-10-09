@@ -7,7 +7,12 @@ export function Example() {
         open-on="click"
       >
         <div data-megamenu-group>
-          <h3 data-megamenu-heading>Build</h3>
+          <helix-text
+            as="h3"
+            data-megamenu-heading
+          >
+            Build
+          </helix-text>
           <a
             data-megamenu-item
             href="#helix"
@@ -18,7 +23,12 @@ export function Example() {
           </a>
         </div>
         <div data-megamenu-group>
-          <h3 data-megamenu-heading>Run</h3>
+          <helix-text
+            as="h3"
+            data-megamenu-heading
+          >
+            Run
+          </helix-text>
           <a
             data-megamenu-item
             href="#trace"

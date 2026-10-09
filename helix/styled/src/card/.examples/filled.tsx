@@ -4,12 +4,13 @@ export function Example() {
       aria-labelledby="filled-title"
       separation="filled"
     >
-      <h3
+      <helix-text
+        as="h3"
         id="filled-title"
         slot="header"
       >
         Storage
-      </h3>
+      </helix-text>
       You have used 8 GB of your 10 GB of storage.
       <helix-button
         emphasis="ghost"

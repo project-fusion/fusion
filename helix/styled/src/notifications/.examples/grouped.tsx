@@ -6,7 +6,12 @@ export function Example() {
       className="feed"
       label="Notifications"
     >
-      <h2 slot="header">Notifications</h2>
+      <helix-text
+        as="h2"
+        slot="header"
+      >
+        Notifications
+      </helix-text>
 
       {/* Notifications are grouped by day here. Your code decides the groups
           and their labels. */}

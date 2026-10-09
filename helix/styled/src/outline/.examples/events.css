@@ -4,7 +4,7 @@
   padding-inline: var(--helix-space-sm);
 }
 
-.reading h2 {
+.reading helix-text {
   margin-block-start: 0;
 }
 

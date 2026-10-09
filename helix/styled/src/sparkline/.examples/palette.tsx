@@ -14,7 +14,12 @@ export function Example() {
     <div className="palette">
       {TONES.map((tone, group) => (
         <Fragment key={tone}>
-          <p className="tone">{tone}</p>
+          <helix-text
+            as="p"
+            className="tone"
+          >
+            {tone}
+          </helix-text>
           {Array.from({ length: PER_TONE }, (_, step) => group * PER_TONE + step + 1).map(
             (series) => (
               <Fragment key={series}>
