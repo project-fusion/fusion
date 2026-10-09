@@ -801,6 +801,53 @@ jobs:
             .helix/dsd
             .local/diagnostics/*.json
 
+  # **The examples' changes as one summary, when a visual shard failed.** Each
+  # shard groups only the shots it pictured, so one change across the corpus
+  # arrives as a group in every shard that holds a piece of it. This merges the
+  # shards' reports into one set of groups, the largest first, and asks a model
+  # about each once, which is where the triage in `visual.config.ts` runs: a
+  # shard leaves it to the merge. The groups go to this run's summary page.
+  #
+  # **Never a failure of the build.** The shards already failed or passed, and
+  # a model that is down or a key a fork pull request does not get is no reason
+  # to call the run anything else. Only this job gets the key.
+  visual-triage:
+    needs: [browser]
+    if: ${{ always() && needs.browser.result == 'failure' }}  # dialect:quoted, GitHub's own function
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    env:
+      BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+    steps:
+      # Full history, for the diff a triage reads from `BASE`.
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          filter: blob:none
+
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+
+      - name: Fetch the visual shards' reports
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: reports
+          pattern: visual-diffs-visual-*
+
+      - name: Merge them, and ask about each group
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          shopt -s nullglob
+          reports=(reports/*/.helix/visual)
+          if [ "${#reports[@]}" -eq 0 ]; then
+            echo "No visual shard left a report, so there is nothing to merge." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          bun helix/cli/npm/bin.mjs visual report --merge "${reports[@]}" --changed "$BASE" --markdown >> "$GITHUB_STEP_SUMMARY"
+
   # **The site's pages, pictured by `helix visual`'s own GitHub Action.** Five
   # pages at 1440 and 390 light and 1440 dark, from `next start` over the build
   # `warm` made, compared with the baselines under `fusion/site/baselines`.
