@@ -19,7 +19,8 @@
 //!   the data element after it existed and rendered nothing.
 //!
 //! **The harness style carries an id**, so the driver can rewrite it for the
-//! next shot on the same page: one navigation per entry for every shot.
+//! next shot of the same width on the same page, and serve a page loaded for a
+//! shot at a new width styled for that shot.
 
 use std::fmt::Write as _;
 

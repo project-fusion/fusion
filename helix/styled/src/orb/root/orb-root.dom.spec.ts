@@ -554,3 +554,41 @@ describe('reading a color the engine resolved but did not convert', () => {
     })
   }
 })
+
+/* A still orb, which a page that paused its motion leaves drawn once, follows
+ * a change of its colors, as a theme switched to dark changes them. Only a
+ * browser paints. */
+describe('a still orb', () => {
+  const painting =
+    typeof document !== 'undefined' && !!document.createElement('canvas').getContext('2d')
+
+  if (painting) {
+    test('draws again in the new colors once its colors change', async () => {
+      const { pauseMotion } = await import('@fusion.dev/helix-core')
+      const host = (await mount(
+        '<helix-orb state="idle" style="--orb-color: rgb(255 0 0); --orb-ground: rgb(255 0 0)"></helix-orb>',
+      )) as Upgraded
+      await readyToMove(host)
+      pauseMotion()
+      try {
+        const canvas = host.shadowRoot?.querySelector('canvas') as HTMLCanvasElement
+        const ended = new Promise((done) =>
+          canvas.addEventListener('transitionend', done, { once: true }),
+        )
+        host.style.setProperty('--orb-color', 'rgb(0 0 255)')
+        host.style.setProperty('--orb-ground', 'rgb(0 0 255)')
+        await ended
+        const pixels = canvas.getContext('2d')?.getImageData(0, 0, canvas.width, canvas.height).data
+        let [red, blue] = [0, 0]
+        for (let index = 0; index < (pixels?.length ?? 0); index += 4) {
+          red += pixels?.[index] ?? 0
+          blue += pixels?.[index + 2] ?? 0
+        }
+        expect(blue).toBeGreaterThan(0)
+        expect(red).toBe(0)
+      } finally {
+        pauseMotion(false)
+      }
+    })
+  }
+})
