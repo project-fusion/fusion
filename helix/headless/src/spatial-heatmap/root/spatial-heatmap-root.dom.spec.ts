@@ -46,7 +46,15 @@ const relief = async (attributes: string, readings: Array<[string, number, strin
   return element
 }
 
-const cells = (element: HTMLElement) => [
+/** The painted prisms in the order of the readings, which the view may paint in another. */
+const cells = (element: HTMLElement) =>
+  [...(element.shadowRoot?.querySelectorAll('[part~="cell"]') ?? [])].sort(
+    (one, other) =>
+      Number(one.getAttribute('data-index')) - Number(other.getAttribute('data-index')),
+  )
+
+/** The painted prisms in the order the drawing holds them, which is the order they are painted in. */
+const cellsInDocument = (element: HTMLElement) => [
   ...(element.shadowRoot?.querySelectorAll('[part~="cell"]') ?? []),
 ]
 
@@ -79,8 +87,9 @@ describe('the drawing', () => {
     }
   })
 
-  /* The right face spans the prism's height and half a cell more, which is
-     its own slope across the page, so the difference is the height alone. */
+  /* A side spans its prism's height and its own slope across the page, the
+     same on every prism, so two sides differ by their heights alone. A
+     reading of nothing stands at no height, and shows no side. */
   test('a reading twice another stands twice as tall', async () => {
     const element = await relief('relief="4"', [
       ['Mon', 2],
@@ -88,9 +97,8 @@ describe('the drawing', () => {
       ['Wed', 0],
     ])
     const [low, high, none] = cells(element)
-    const slope = tallness(side(none))
-    expect(tallness(side(high)) - slope).toBeCloseTo(4, 2)
-    expect(tallness(side(low)) - slope).toBeCloseTo(2, 2)
+    expect(tallness(side(high)) - tallness(side(low))).toBeCloseTo(2, 2)
+    expect(side(none)).toBeNull()
   })
 
   test('flat lays every prism down', async () => {
@@ -98,11 +106,10 @@ describe('the drawing', () => {
       ['Mon', 2],
       ['Tue', 4],
     ])
-    const [low, high] = cells(element)
-    expect(tallness(side(high))).toBeCloseTo(tallness(side(low)), 3)
+    expect(cells(element).map(side)).toEqual([null, null])
     element.flat = false
     await element.updateComplete
-    expect(tallness(side(cells(element)[1]))).toBeGreaterThan(tallness(side(low)))
+    expect(tallness(side(cells(element)[1]))).toBeGreaterThan(tallness(side(cells(element)[0])))
   })
 
   test('a cell takes its tone as the flat strip gives it', async () => {
@@ -359,6 +366,34 @@ describe('selection', () => {
     )
     expect(selected).toEqual(['false', 'true', 'false'])
     expect(cells(element)[1]?.getAttribute('part')).toBe('cell cell-selected')
+    /* The painted prisms are pictures of the cells, hidden from a reader. */
+    expect(cells(element).every((cell) => cell.getAttribute('aria-hidden') === 'true')).toBe(true)
+  })
+
+  test('Shift with an arrow turns the view, and the grid keeps the order of the readings', async () => {
+    const element = await relief('selection-mode="single" rows="2"', [
+      ['Mon', 1],
+      ['Tue', 2],
+      ['Wed', 3],
+      ['Thu', 4],
+    ])
+    const order = () => cellsInDocument(element).map((cell) => cell.getAttribute('data-index'))
+    const before = order()
+    const press = (key: string) =>
+      part(element, 'strip')?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, composed: true, key, shiftKey: true }),
+      )
+    for (let step = 0; step < 12; step++) {
+      press('ArrowRight')
+    }
+    await element.updateComplete
+    /* Half round, the newest reading is painted first. */
+    expect(order()).not.toEqual(before)
+    expect(order()[0]).toBe('3')
+    const named = [...(element.shadowRoot?.querySelectorAll('[role="gridcell"]') ?? [])].map(
+      (cell) => cell.id,
+    )
+    expect(named).toEqual(['cell-0', 'cell-1', 'cell-2', 'cell-3'])
   })
 })
 

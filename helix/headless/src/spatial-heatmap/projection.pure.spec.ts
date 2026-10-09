@@ -50,11 +50,12 @@ describe('the relief', () => {
     const top = corners(prisms[0]?.top ?? '')
     const right = corners(prisms[0]?.right ?? '')
     expect(prisms[0]?.peak.y).toBeCloseTo(0.5 - 2)
-    /* The right face runs from the top's front and right corners down to the
-       floor beneath them. */
-    expect(right[0]).toEqual(top[2] as [number, number])
-    expect(right[1]).toEqual(top[1] as [number, number])
-    expect((right[2]?.[1] ?? 0) - (right[1]?.[1] ?? 0)).toBeCloseTo(2)
+    /* The darker side runs from two of the top's corners down to the floor
+       beneath them, two cells lower. */
+    const onTop = (x: number, y: number) =>
+      top.some(([tx, ty]) => Math.abs(tx - x) < 1e-3 && Math.abs(ty - y) < 1e-3)
+    expect(right.filter(([x, y]) => onTop(x, y))).toHaveLength(2)
+    expect(right.filter(([x, y]) => onTop(x, y - 2))).toHaveLength(2)
   })
 
   /**
@@ -71,15 +72,18 @@ describe('the relief', () => {
   })
 
   test('the footprint leaves a gap between neighbors', () => {
-    const whole = corners(reliefOf([0], 1, 1).prisms[0]?.top ?? '')
-    const most = corners(reliefOf([0], 1, 0.8).prisms[0]?.top ?? '')
+    const rightmost = (data: string) => Math.max(...corners(data).map(([x]) => x))
+    const whole = rightmost(reliefOf([0], 1, 1).prisms[0]?.top ?? '')
+    const most = rightmost(reliefOf([0], 1, 0.8).prisms[0]?.top ?? '')
     /* The right corner, pulled in by a tenth of a cell at each end. */
-    expect((whole[1]?.[0] ?? 0) - (most[1]?.[0] ?? 0)).toBeCloseTo(0.2 * ACROSS)
+    expect(whole - most).toBeCloseTo(0.2 * ACROSS)
   })
 
   test('the box holds every corner, the tallest top included', () => {
     const { box, prisms } = reliefOf([0, 3, 1, 0], 2, 1)
-    const all = prisms.flatMap((prism) => [prism.top, prism.left, prism.right].flatMap(corners))
+    const all = prisms.flatMap((prism) =>
+      [prism.top, prism.left, prism.right].filter(Boolean).flatMap(corners),
+    )
     for (const [x, y] of all) {
       expect(x).toBeGreaterThanOrEqual(box.x - 1e-3)
       expect(x).toBeLessThanOrEqual(box.x + box.width + 1e-3)
@@ -108,12 +112,58 @@ describe('the relief', () => {
       base: undefined,
       box: { height: 0, width: 0, x: 0, y: 0 },
       corners: undefined,
+      order: [],
       prisms: [],
     })
   })
 
   test('a number is written short, and never as minus zero', () => {
     const { prisms } = reliefOf([0], 1, 1)
-    expect(prisms[0]?.top).toBe('M0 0L0.866 0.5L0 1L-0.866 0.5Z')
+    const top = prisms[0]?.top ?? ''
+    expect(top).not.toContain('-0 ')
+    expect(
+      corners(top)
+        .map(([x, y]) => `${x} ${y}`)
+        .sort(),
+    ).toEqual(['-0.866 0.5', '0 0', '0 1', '0.866 0.5'].sort())
+  })
+})
+
+describe('a turned relief', () => {
+  test('from the isometric camera, the order to paint in is the order of the readings', () => {
+    const { order } = reliefOf([1, 1, 1, 1, 1, 1], 2, 0.8)
+    /* Level readings on one diagonal may come in either order, since they do
+       not overlap; each column still comes after the one behind it. */
+    expect(order.indexOf(0)).toBeLessThan(order.indexOf(3))
+    expect(order.indexOf(1)).toBeLessThan(order.indexOf(5))
+  })
+
+  test('turned half round, the newest reading is painted first and the oldest last', () => {
+    const { order } = reliefOf([1, 1, 1, 1, 1, 1], 2, 0.8, { tilt: 35, turn: 225 })
+    expect(order[0]).toBe(5)
+    expect(order.at(-1)).toBe(0)
+  })
+
+  test('turned, the box still holds every face', () => {
+    const { box, prisms, base } = reliefOf([0, 3, 1, 2], 2, 0.8, { tilt: 50, turn: 100 })
+    const all = [
+      ...prisms.flatMap((prism) => [prism.top, prism.left, prism.right]),
+      base?.top ?? '',
+      base?.left ?? '',
+      base?.right ?? '',
+    ]
+      .filter(Boolean)
+      .flatMap(corners)
+    for (const [x, y] of all) {
+      expect(x).toBeGreaterThanOrEqual(box.x - 1e-3)
+      expect(x).toBeLessThanOrEqual(box.x + box.width + 1e-3)
+      expect(y).toBeGreaterThanOrEqual(box.y - 1e-3)
+      expect(y).toBeLessThanOrEqual(box.y + box.height + 1e-3)
+    }
+  })
+
+  test('seen from straight above, a prism shows its top alone', () => {
+    const { prisms } = reliefOf([2], 1, 1, { tilt: 90, turn: 45 })
+    expect([prisms[0]?.left, prisms[0]?.right]).toEqual(['', ''])
   })
 })

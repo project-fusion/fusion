@@ -1,10 +1,12 @@
 import {
+  type Camera,
   CHART_PLOT,
   commaList,
   customElement,
   drawTooltip,
   HelixPlotChangeEvent,
   HelixPlotTurnEvent,
+  ISOMETRIC,
   isRtl,
   MIRROR_RULE,
   spokenReading,
@@ -23,7 +25,16 @@ import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import { fits, toneOf } from '../../heatmap/root/buckets.js'
 import { HelixHeadlessHeatmap } from '../../heatmap/root/heatmap-root.js'
-import { ACROSS, type Base, heightsOf, highestOf, type Relief, reliefOf } from '../projection.js'
+import { turned } from '../../spatial-scatter-chart/view.js'
+import {
+  ACROSS,
+  type Base,
+  heightsOf,
+  highestOf,
+  type Prism,
+  type Relief,
+  reliefOf,
+} from '../projection.js'
 
 /** The arrow keys that turn a renderer's view while Shift is held, and which way each turns it. */
 const TURNS: Record<string, { across: number; up: number }> = {
@@ -78,7 +89,12 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * too narrow for every column at `min-cell` draws the newest that fit.
  *
  * **The drawing is SVG and holds still.** It scales with its box through its
- * `viewBox`, needs no WebGL, and has no motion to pause.
+ * `viewBox`, needs no WebGL, and has no motion to pause. Shift with an arrow
+ * turns it a step, or tilts it, from the isometric view it starts at.
+ * **Under `selection-mode`, the prisms are painted back to front for the
+ * view, and the grid's rows and cells stand beside them in the table's
+ * order**, holding no drawing of their own, so a turned view paints
+ * correctly and a screen reader still reads the grid in order.
  *
  * **A renderer can draw it in 3D instead.** Put a box for it in the
  * `renderer` slot, and `connectSpatialHeatmap` from `@fusion.dev/helix-plot`
@@ -101,7 +117,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * | Page Down, Page Up | Moves a month on or back where the rows carry dates, and four columns otherwise. |
  * | Enter, Space | Presses the cell, which sends `helix-reading-press`, and selects it or lets it go under `selection-mode`. |
  * | Shift with an arrow, Home, End, Page Up or Page Down | Selects every cell from the last one pressed to where the key went, under `selection-mode="multiple"`. |
- * | Shift with an arrow | Turns a renderer's view, where one is connected and `selection-mode` is not `multiple`. |
+ * | Shift with an arrow | Turns the view a step, or a renderer's where one is connected, except under `selection-mode="multiple"`. |
  * | Escape | Puts the cell's tooltip away. |
  *
  * @since 0.190.0
@@ -119,11 +135,11 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart base-left - The slab's side toward the viewer at the lower left, under the strip's last row.
  * @csspart base-right - The slab's side toward the viewer at the lower right, under the newest column.
  * @csspart base-top - The slab's top, which is the floor the prisms stand on.
- * @csspart cell - One reading: a group holding its three faces.
+ * @csspart cell - One reading drawn as a prism: a group holding the faces the view shows. Under `selection-mode` it is the picture of a grid cell, hidden from screen readers.
  * @csspart drawing - The SVG every prism is drawn in. It is mirrored on a right-to-left page.
- * @csspart left-face - The face of a prism toward the next row, drawn at its lower left.
- * @csspart right-face - The face of a prism toward the next column, drawn at its lower right.
- * @csspart row - A column of prisms, which a grid reads as a row, under `selection-mode`.
+ * @csspart left-face - The side of a prism facing the light more: from the isometric view, the side toward the next row, drawn at its lower left. Left out where the view shows no side.
+ * @csspart right-face - The side of a prism facing the light less: from the isometric view, the side toward the next column, drawn at its lower right. Left out where the view shows one side or none.
+ * @csspart row - A column of the strip, which a grid reads as a row, under `selection-mode`. It holds the column's grid cells, which draw nothing: the prisms are painted apart, in the order the view needs.
  * @csspart strip - The box the drawing fills, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart top-face - The top of a prism, which carries the reading's tone.
  *
@@ -161,6 +177,10 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
 
   /** The prisms drawn on the last render, which the tooltip is placed against. */
   private shown: Relief | undefined = undefined
+
+  /** Where the chart's own drawing is seen from, which Shift with an arrow turns. */
+  @state()
+  private camera: Camera = ISOMETRIC
 
   /** Whether a renderer has drawn the relief, which its own drawing then stays under. */
   @state()
@@ -292,13 +312,13 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
   }
 
   /**
-   * Shift with an arrow turns a renderer's view, and moves no reading,
-   * except under `selection-mode="multiple"`, where it selects a range.
+   * Shift with an arrow turns the view, the chart's own drawing or a
+   * renderer's, and moves no reading, except under
+   * `selection-mode="multiple"`, where it selects a range.
    */
   private readonly onTurnKeydown = (event: KeyboardEvent): void => {
     const turn = TURNS[event.key]
     if (
-      !this.rendered ||
       !event.shiftKey ||
       !turn ||
       this.selectionMode === 'multiple' ||
@@ -311,7 +331,11 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
     }
     event.preventDefault()
     event.stopPropagation()
-    this.dispatchEvent(new HelixPlotTurnEvent(turn))
+    if (this.rendered) {
+      this.dispatchEvent(new HelixPlotTurnEvent(turn))
+    } else {
+      this.camera = turned(this.camera, turn.across, turn.up)
+    }
   }
 
   /**
@@ -346,7 +370,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
       highest,
       tallest,
     )
-    return reliefOf(heights, this.rowCount, this.cellPx / (this.cellPx + this.gapPx))
+    return reliefOf(heights, this.rowCount, this.cellPx / (this.cellPx + this.gapPx), this.camera)
   }
 
   protected override render(): TemplateResult {
@@ -360,16 +384,14 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
     const relief = this.drawnRelief()
     this.shown = relief
     const at = this.pointer.at
-    const prisms = relief.prisms.map((prism) =>
+    /* Painted back to front for the view, whatever the order of the readings. */
+    const prisms = relief.order.map((index) =>
       this.renderPrism(
-        prism.index,
-        prism.top,
-        prism.left,
-        prism.right,
-        at === prism.index,
-        chosen.has(keys[prism.index] ?? ''),
+        relief.prisms[index] as Prism,
+        at === index,
+        chosen.has(keys[index] ?? ''),
         grid,
-        toneOf(cells[prism.index] ?? { value: undefined }, bounds, palette),
+        toneOf(cells[index] ?? { value: undefined }, bounds, palette),
       ),
     )
     const { box } = relief
@@ -384,7 +406,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
           style=${this.rendered ? 'opacity: 0; pointer-events: none' : nothing}
           viewBox="${box.x} ${box.y} ${box.width} ${box.height}"
           xmlns="http://www.w3.org/2000/svg"
-        >${relief.base ? this.renderBase(relief.base) : nothing}${grid ? this.renderPrismRows(prisms) : prisms}</svg>`
+        >${relief.base ? this.renderBase(relief.base) : nothing}${prisms}${grid ? this.renderGridRows(cells.length, keys, chosen) : nothing}</svg>`
       : nothing
     return html`<div
         aria-activedescendant=${grid && at >= 0 ? `cell-${at}` : nothing}
@@ -416,33 +438,24 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
 
   /**
    * One reading as a prism. The sides come first, so the top face is painted
-   * over the edge they share with it.
-   *
-   * Under `selection-mode` the prism is a `gridcell` named by its row in the
-   * table and saying whether it is selected, as the flat strip's cell is.
+   * over the edge they share with it, and a side the view does not show is
+   * left out. Under `selection-mode` it is the picture of a grid cell, hidden
+   * from a screen reader, which reads the cell itself.
    */
   private renderPrism(
-    index: number,
-    top: string,
-    left: string,
-    right: string,
+    prism: Prism,
     active: boolean,
     picked: boolean,
     grid: boolean,
     tone: string | undefined,
   ): SVGTemplateResult {
-    const row = grid ? this.sourceRows[this.points.length - this.drawn.length + index] : undefined
-    const name = row ? spokenReading(row) : ''
     return svg`<g
-      aria-label=${grid && name ? name : nothing}
-      aria-selected=${grid ? (picked ? 'true' : 'false') : nothing}
-      data-index=${index}
+      aria-hidden=${grid ? 'true' : nothing}
+      data-index=${prism.index}
       data-tone=${tone ?? nothing}
-      id=${grid ? `cell-${index}` : nothing}
       part="cell${active ? ' cell-active' : ''}${picked ? ' cell-selected' : ''}"
-      role=${grid ? 'gridcell' : nothing}
       style=${tone === undefined ? nothing : `--heatmap-tone: var(--heatmap-tone-${tone})`}
-    ><path d=${left} part="left-face"></path><path d=${right} part="right-face"></path><path d=${top} part="top-face"></path></g>`
+    >${prism.left ? svg`<path d=${prism.left} part="left-face"></path>` : nothing}${prism.right ? svg`<path d=${prism.right} part="right-face"></path>` : nothing}<path d=${prism.top} part="top-face"></path></g>`
   }
 
   /**
@@ -487,14 +500,29 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
   }
 
   /**
-   * The prisms as a grid's rows, one for each column of the strip, which is
-   * also the order they are painted in.
+   * The grid's rows, one for each column of the strip, and its cells in the
+   * table's order, each named by its row and saying whether it is selected,
+   * as the flat strip's cell is. They hold no drawing: the prisms are painted
+   * apart, in the order the view needs.
    */
-  private renderPrismRows(prisms: SVGTemplateResult[]): SVGTemplateResult[] {
-    const size = this.rowCount === 1 ? prisms.length : this.rowCount
+  private renderGridRows(
+    count: number,
+    keys: readonly string[],
+    chosen: ReadonlySet<string>,
+  ): SVGTemplateResult[] {
+    const size = this.rowCount === 1 ? count : this.rowCount
+    const first = this.points.length - this.drawn.length
     const rows: SVGTemplateResult[] = []
-    for (let start = 0; start < prisms.length; start += size) {
-      rows.push(svg`<g part="row" role="row">${prisms.slice(start, start + size)}</g>`)
+    for (let start = 0; start < count; start += size) {
+      const cells: SVGTemplateResult[] = []
+      for (let index = start; index < Math.min(start + size, count); index++) {
+        const row = this.sourceRows[first + index]
+        const name = row ? spokenReading(row) : ''
+        cells.push(
+          svg`<g aria-label=${name || nothing} aria-selected=${chosen.has(keys[index] ?? '') ? 'true' : 'false'} id=${`cell-${index}`} role="gridcell"></g>`,
+        )
+      }
+      rows.push(svg`<g part="row" role="row">${cells}</g>`)
     }
     return rows
   }
