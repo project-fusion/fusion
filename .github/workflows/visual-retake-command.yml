@@ -27,8 +27,12 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Dispatch a retake of the entries named
+        # `GH_REPO`, because nothing is checked out for `gh` to read the
+        # repository from, and a comment's job has no need to check anything
+        # out.
         env:
           BODY: ${{ github.event.comment.body }}
+          GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
           NUMBER: ${{ github.event.issue.number }}
         run: |
