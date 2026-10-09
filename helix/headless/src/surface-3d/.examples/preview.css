@@ -1,0 +1,70 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-low: light-dark(#e2e2e5, #2e2e33);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+/* The table is the chart's reading, for screen readers, and a page with no
+   Helix stylesheet hides it itself: `data-hidden-visually` is a Helix rule. */
+[data-hidden-visually] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+helix-headless-surface-3d {
+  display: block;
+}
+
+helix-headless-surface-3d::part(plot) {
+  background-color: var(--_gray-subtle);
+  block-size: 20rem;
+  border-radius: 0.5rem;
+  position: relative;
+}
+
+helix-headless-surface-3d::part(plot):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+/* One column a place across, which the chart writes as `--surface-3d-columns`. */
+helix-headless-surface-3d::part(fallback) {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(var(--surface-3d-columns), minmax(0, 1fr));
+  inset: 1.5rem;
+  position: absolute;
+}
+
+/* Each place shaded by its height, which the chart writes as `--surface-3d-level`. */
+helix-headless-surface-3d::part(cell) {
+  background-color: color-mix(
+    in oklab,
+    var(--_gray-strong) calc(var(--surface-3d-level) * 100%),
+    var(--_gray-low)
+  );
+}
+
+helix-headless-surface-3d::part(cell-active) {
+  outline: 2px solid var(--_gray-strong);
+  outline-offset: 1px;
+}
+
+helix-headless-surface-3d::part(live),
+helix-headless-surface-3d::part(summary) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
