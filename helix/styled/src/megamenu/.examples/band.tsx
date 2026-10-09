@@ -8,7 +8,12 @@ export function Example() {
           variant="band"
         >
           <div data-megamenu-group>
-            <h3 data-megamenu-heading>Work</h3>
+            <helix-text
+              as="h3"
+              data-megamenu-heading
+            >
+              Work
+            </helix-text>
             <a
               data-megamenu-item
               href="#helix"
@@ -27,7 +32,12 @@ export function Example() {
             </a>
           </div>
           <div data-megamenu-group>
-            <h3 data-megamenu-heading>Insights</h3>
+            <helix-text
+              as="h3"
+              data-megamenu-heading
+            >
+              Insights
+            </helix-text>
             <a
               data-megamenu-item
               href="#cortex"
@@ -46,7 +56,12 @@ export function Example() {
             </a>
           </div>
           <div data-megamenu-group>
-            <h3 data-megamenu-heading>Connect</h3>
+            <helix-text
+              as="h3"
+              data-megamenu-heading
+            >
+              Connect
+            </helix-text>
             <a
               data-megamenu-item
               href="#grid"
@@ -65,7 +80,12 @@ export function Example() {
             </a>
           </div>
           <div data-megamenu-group>
-            <h3 data-megamenu-heading>More</h3>
+            <helix-text
+              as="h3"
+              data-megamenu-heading
+            >
+              More
+            </helix-text>
             <a
               data-navigation-item
               href="#docs"

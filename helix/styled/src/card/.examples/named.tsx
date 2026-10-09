@@ -4,7 +4,12 @@ export function Example() {
       label="Storage"
       separation="outlined"
     >
-      <h3 slot="header">Storage</h3>
+      <helix-text
+        as="h3"
+        slot="header"
+      >
+        Storage
+      </helix-text>
       You have used 8 GB of the 10 GB in your plan.
       <helix-button
         emphasis="ghost"

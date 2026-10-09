@@ -43,7 +43,12 @@ export function Example() {
           onToggle={moved}
         >
           <div data-megamenu-group>
-            <h3 data-megamenu-heading>Work</h3>
+            <helix-text
+              as="h3"
+              data-megamenu-heading
+            >
+              Work
+            </helix-text>
             <a
               data-megamenu-item
               href="#helix"

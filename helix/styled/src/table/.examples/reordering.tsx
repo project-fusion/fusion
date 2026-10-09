@@ -19,7 +19,12 @@ export function Example() {
       onhelix-reorder={reordered}
       reorderable
     >
-      <h3 slot="heading">Print queue</h3>
+      <helix-text
+        as="h3"
+        slot="heading"
+      >
+        Print queue
+      </helix-text>
       <helix-table-column width="14rem">Document</helix-table-column>
       <helix-table-column>Pages</helix-table-column>
 

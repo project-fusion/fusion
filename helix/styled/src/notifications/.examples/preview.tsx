@@ -21,7 +21,12 @@ export function Example() {
       label="Notifications"
       mark-all
     >
-      <h2 slot="header">Notifications</h2>
+      <helix-text
+        as="h2"
+        slot="header"
+      >
+        Notifications
+      </helix-text>
       <helix-notification
         at={at[0]}
         dismissible
@@ -46,7 +51,7 @@ export function Example() {
           name="warning"
           slot="media"
         ></helix-icon>
-        Build <strong>#4821</strong> failed on <code>main</code>
+        Build <strong>#4821</strong> failed on <helix-code>main</helix-code>
         <helix-button
           emphasis="subtle"
           slot="actions"

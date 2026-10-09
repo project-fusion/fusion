@@ -11,8 +11,8 @@ export function Example() {
       gap="md"
     >
       <helix-text variant="body">
-        Press <helix-kbd keys="mod+k" /> to search. The shortcut <code>mod+k</code> shows as ⌘K on a
-        Mac and Ctrl+K on other computers.
+        Press <helix-kbd keys="mod+k" /> to search. The shortcut <helix-code>mod+k</helix-code>{' '}
+        shows as ⌘K on a Mac and Ctrl+K on other computers.
       </helix-text>
 
       <helix-input

@@ -4,12 +4,13 @@ export function Example() {
       aria-labelledby="card-title"
       separation="outlined"
     >
-      <h3
+      <helix-text
+        as="h3"
         id="card-title"
         slot="header"
       >
         Storage
-      </h3>
+      </helix-text>
       You have used 8 GB of the 10 GB in your plan. Delete old files or upgrade to add space.
       <helix-button
         emphasis="ghost"

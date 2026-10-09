@@ -5,9 +5,8 @@ helix-scroll-area {
   inline-size: 20rem;
 }
 
-helix-scroll-area pre {
-  font-family: var(--helix-font-mono);
-  font-size: var(--helix-text-xs);
+helix-scroll-area helix-text {
+  --text-font-size: var(--helix-text-xs);
   margin: 0 0 var(--helix-space-xs);
   padding-inline-end: var(--helix-space-md);
 }

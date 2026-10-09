@@ -1,19 +1,14 @@
 <!-- @summary A context menu that opens where you right-click the field, or press Shift+F10 in it. -->
 <!-- @min 300 -->
-<link
-  href="styles.css"
-  rel="stylesheet"
->
-
 <helix-menu
   context
   label="Edit"
 >
-  <textarea
-    aria-label="Notes"
-    class="area"
+  <helix-textarea
+    default-value="Right-click in this field."
+    label="Notes"
     slot="trigger"
-  >Right-click in this field.</textarea>
+  ></helix-textarea>
 
   <helix-menu-item
     shortcut="mod+x"

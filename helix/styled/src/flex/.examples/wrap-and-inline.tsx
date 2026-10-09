@@ -19,7 +19,7 @@ export function Example() {
         <helix-tag>Security</helix-tag>
       </helix-flex>
 
-      <p>
+      <helix-text as="p">
         Deploys need{' '}
         <helix-flex
           gap="2xs"
@@ -29,7 +29,7 @@ export function Example() {
           <helix-tag tone="warning">review</helix-tag>
         </helix-flex>{' '}
         before they reach production.
-      </p>
+      </helix-text>
     </helix-flex>
   )
 }

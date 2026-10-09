@@ -4,7 +4,12 @@ export function Example() {
       <a href="#overview">Overview</a>
       <helix-megamenu label="Products">
         <div data-megamenu-group>
-          <h3 data-megamenu-heading>Work</h3>
+          <helix-text
+            as="h3"
+            data-megamenu-heading
+          >
+            Work
+          </helix-text>
           <a
             data-megamenu-item
             href="#helix"
@@ -23,7 +28,12 @@ export function Example() {
           </a>
         </div>
         <div data-megamenu-group>
-          <h3 data-megamenu-heading>Insights</h3>
+          <helix-text
+            as="h3"
+            data-megamenu-heading
+          >
+            Insights
+          </helix-text>
           <a
             data-megamenu-item
             href="#cortex"

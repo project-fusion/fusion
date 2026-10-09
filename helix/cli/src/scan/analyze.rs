@@ -975,7 +975,7 @@ impl<'a> Analyzer<'a> {
 
     /// The React `on` props on an element that bind nothing: a name in Helix's
     /// camel case, which React reads as an event of that exact name, and a
-    /// hyphenated name the element does not dispatch.
+    /// hyphenated name no element dispatches.
     fn events(&self, path: &str, position: usize, element: &Element) -> Vec<Raw> {
         let Some((installed, _)) = self.installed else {
             return Vec::new();
@@ -993,6 +993,15 @@ impl<'a> Analyzer<'a> {
                 continue;
             };
             if mine.iter().any(|(_, prop)| prop == name) {
+                continue;
+            }
+            /* **A listener on an ancestor runs for an event that bubbles**, and
+            Helix's mostly do: `onhelix-dismiss` on a wrapper hears every tag in
+            it. The manifest does not say which events bubble, so a hyphenated
+            name some element dispatches is taken as heard. A camel-case name
+            is still reported, since React listens for it as written and
+            nothing dispatches that. */
+            if !name.starts_with("onHelix") && installed.dispatched.contains(&event) {
                 continue;
             }
             let props: Vec<&str> = mine.iter().map(|(_, prop)| prop.as_str()).collect();
@@ -1442,10 +1451,11 @@ mod tests {
             kinds(&analyzer),
             [
                 ("unknown-event", "<helix-card onHelixSelect>".to_owned()),
-                ("unknown-event", "<helix-card onhelix-dismiss>".to_owned()),
                 ("unknown-event", "<helix-card onhelix-selcet>".to_owned()),
             ]
         );
+        /* `onhelix-dismiss` is another element's event, and one that bubbles,
+        so a card holding tags hears it and is not reported. */
         /* The same props in HTML are not React's, and are not judged. */
         let mut analyzer = Analyzer::new(&index, &listing, &used).with(&installed, &imports);
         analyzer.markup([("a.html", page.elements.as_slice())]);

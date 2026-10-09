@@ -40,13 +40,13 @@ export function Example() {
 
       <div className="reading">
         <section id="install">
-          <h2>Install</h2>Add the package to your project.
+          <helix-text as="h2">Install</helix-text>Add the package to your project.
         </section>
         <section id="usage">
-          <h2>Usage</h2>Create a client with your API key.
+          <helix-text as="h2">Usage</helix-text>Create a client with your API key.
         </section>
         <section id="api">
-          <h2>API</h2>Each method lists its parameters.
+          <helix-text as="h2">API</helix-text>Each method lists its parameters.
         </section>
       </div>
 

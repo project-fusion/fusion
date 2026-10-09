@@ -7,12 +7,13 @@ export function Example() {
         aria-labelledby="glass-title"
         material="glass"
       >
-        <h3
+        <helix-text
+          as="h3"
           id="glass-title"
           slot="header"
         >
           Storage
-        </h3>
+        </helix-text>
         You have used 8 GB of your 10 GB of storage.
       </helix-card>
 
@@ -20,12 +21,13 @@ export function Example() {
         aria-labelledby="frosted-title"
         material="frosted"
       >
-        <h3
+        <helix-text
+          as="h3"
           id="frosted-title"
           slot="header"
         >
           Team members
-        </h3>
+        </helix-text>
         Six people have access to this project.
       </helix-card>
 
@@ -33,12 +35,13 @@ export function Example() {
         aria-labelledby="transparent-title"
         material="transparent"
       >
-        <h3
+        <helix-text
+          as="h3"
           id="transparent-title"
           slot="header"
         >
           Next invoice
-        </h3>
+        </helix-text>
         Your next invoice is due on October 1, 2026.
       </helix-card>
 
@@ -46,12 +49,13 @@ export function Example() {
         aria-labelledby="opaque-title"
         separation="elevated"
       >
-        <h3
+        <helix-text
+          as="h3"
           id="opaque-title"
           slot="header"
         >
           Notifications
-        </h3>
+        </helix-text>
         You have three unread messages.
       </helix-card>
     </div>

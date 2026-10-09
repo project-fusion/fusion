@@ -4,7 +4,7 @@ helix-scroll-area {
   inline-size: 20rem;
 }
 
-helix-scroll-area p {
+helix-scroll-area helix-text {
   margin: 0 0 var(--helix-space-sm);
   padding-inline-end: var(--helix-space-md);
 }
