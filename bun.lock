@@ -84,7 +84,7 @@
     },
     "helix/cem": {
       "name": "@fusion.dev/helix-cem",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "dependencies": {
         "@fusion.dev/helix-cli": "helix/cli/npm",
         "@fusion.dev/helix-diagnostics": "helix/diagnostics",
@@ -96,7 +96,7 @@
     },
     "helix/cli/npm": {
       "name": "@fusion.dev/helix-cli",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "optionalDependencies": {
         "@fusion.dev/helix-cli-darwin-arm64": "helix/cli/platforms/darwin-arm64",
         "@fusion.dev/helix-cli-darwin-x64": "helix/cli/platforms/darwin-x64",
@@ -113,27 +113,27 @@
     },
     "helix/cli/platforms/darwin-arm64": {
       "name": "@fusion.dev/helix-cli-darwin-arm64",
-      "version": "0.188.0",
+      "version": "0.190.0",
     },
     "helix/cli/platforms/darwin-x64": {
       "name": "@fusion.dev/helix-cli-darwin-x64",
-      "version": "0.188.0",
+      "version": "0.190.0",
     },
     "helix/cli/platforms/linux-arm64": {
       "name": "@fusion.dev/helix-cli-linux-arm64",
-      "version": "0.188.0",
+      "version": "0.190.0",
     },
     "helix/cli/platforms/linux-x64": {
       "name": "@fusion.dev/helix-cli-linux-x64",
-      "version": "0.188.0",
+      "version": "0.190.0",
     },
     "helix/cli/platforms/win32-x64": {
       "name": "@fusion.dev/helix-cli-win32-x64",
-      "version": "0.188.0",
+      "version": "0.190.0",
     },
     "helix/core": {
       "name": "@fusion.dev/helix-core",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "dependencies": {
         "@floating-ui/dom": "^1.8.0",
         "@fusion.dev/helix-icons": "helix/icons",
@@ -151,7 +151,7 @@
     },
     "helix/create-app": {
       "name": "@fusion.dev/create-helix-app",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "dependencies": {
         "@fusion.dev/helix-cli": "helix/cli/npm",
         "@fusion.dev/helix-templates": "helix/templates",
@@ -159,7 +159,7 @@
     },
     "helix/diagnostics": {
       "name": "@fusion.dev/helix-diagnostics",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "devDependencies": {
         "@fusion.dev/helix-testing": "helix/testing",
         "@types/bun": "^1.4.2",
@@ -167,7 +167,7 @@
     },
     "helix/docs": {
       "name": "@fusion.dev/helix-docs",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "devDependencies": {
         "@fusion.dev/helix": "helix/styled",
         "@fusion.dev/helix-cem": "helix/cem",
@@ -184,7 +184,7 @@
     },
     "helix/gallery": {
       "name": "@fusion.dev/helix-gallery",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "devDependencies": {
         "@types/react": "^19.3.0",
         "react": "^19.3.0",
@@ -195,7 +195,7 @@
     },
     "helix/graph": {
       "name": "@fusion.dev/helix-graph",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "dependencies": {
         "@fusion.dev/helix-core": "helix/core",
       },
@@ -228,7 +228,7 @@
     },
     "helix/headless": {
       "name": "@fusion.dev/helix-headless",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "dependencies": {
         "@fusion.dev/helix-core": "helix/core",
         "@fusion.dev/helix-icons": "helix/icons",
@@ -250,7 +250,7 @@
     },
     "helix/icons": {
       "name": "@fusion.dev/helix-icons",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "dependencies": {
         "svgo": "^4.1.0",
       },
@@ -260,7 +260,7 @@
     },
     "helix/map": {
       "name": "@fusion.dev/helix-map",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "dependencies": {
         "@fusion.dev/helix-core": "helix/core",
         "@fusion.dev/helix-icons": "helix/icons",
@@ -279,7 +279,7 @@
     },
     "helix/plot": {
       "name": "@fusion.dev/helix-plot",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "dependencies": {
         "@fusion.dev/helix-core": "helix/core",
       },
@@ -299,7 +299,7 @@
     },
     "helix/sandbox": {
       "name": "@fusion.dev/helix-sandbox",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "dependencies": {
         "@codemirror/lang-css": "^6.3.1",
         "@codemirror/lang-html": "^6.4.12",
@@ -328,7 +328,7 @@
     },
     "helix/styled": {
       "name": "@fusion.dev/helix",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "dependencies": {
         "@fusion.dev/helix-core": "helix/core",
         "@fusion.dev/helix-headless": "helix/headless",
@@ -354,21 +354,21 @@
     },
     "helix/styles": {
       "name": "@fusion.dev/helix-styles",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "devDependencies": {
         "@fusion.dev/scripts": "fusion/scripts",
       },
     },
     "helix/templates": {
       "name": "@fusion.dev/helix-templates",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "devDependencies": {
         "@fusion.dev/scripts": "fusion/scripts",
       },
     },
     "helix/testing": {
       "name": "@fusion.dev/helix-testing",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "devDependencies": {
         "@happy-dom/global-registrator": "^20.14.5",
         "@lit-labs/ssr": "^4.1.0",
@@ -378,7 +378,7 @@
     },
     "helix/theme": {
       "name": "@fusion.dev/helix-theme",
-      "version": "0.188.0",
+      "version": "0.190.0",
       "devDependencies": {
         "@fusion.dev/scripts": "fusion/scripts",
       },
