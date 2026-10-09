@@ -81,6 +81,34 @@ fn kind(text: &str) -> String {
     out
 }
 
+/// Words with each key cut to its last custom element and what is inside it:
+/// a button is a button whether a dialog or a sandbox holds it.
+fn innermost(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    let mut parts = text.split('`');
+    if let Some(first) = parts.next() {
+        out.push_str(first);
+    }
+    for (at, part) in parts.enumerate() {
+        out.push('`');
+        if at % 2 == 1 {
+            out.push_str(part);
+            continue;
+        }
+        let segments: Vec<&str> = part.split(' ').collect();
+        let custom = |segment: &&str| {
+            let tag = segment
+                .split(['#', '[', '.', ':'])
+                .next()
+                .unwrap_or_default();
+            tag.contains('-') && tag.starts_with(|one: char| one.is_ascii_lowercase())
+        };
+        let from = segments.iter().rposition(custom).unwrap_or(0);
+        out.push_str(&segments[from..].join(" "));
+    }
+    out
+}
+
 /// Words without each element's place among its namesakes, the ` (2)` a key
 /// carries.
 fn plain(text: &str) -> String {
@@ -115,7 +143,7 @@ fn signatures(entry: &str, change: &Change) -> Vec<(String, Vec<String>)> {
         Change::Differs(lines) if !lines.is_empty() => {
             let mut found: Vec<(String, Vec<String>)> = Vec::new();
             for line in *lines {
-                let signature = kind(&plain(told(line)));
+                let signature = innermost(&kind(&plain(told(line))));
                 match found.iter_mut().find(|(one, _)| *one == signature) {
                     Some((_, kept)) => kept.push(line.clone()),
                     None => found.push((signature, vec![line.clone()])),
@@ -374,7 +402,7 @@ mod tests {
         );
         assert_eq!(
             groups[0].signature,
-            "`helix-card helix-badge` (src/badge.ts), moved 2 px down"
+            "`helix-badge` (src/badge.ts), moved 2 px down"
         );
         assert_eq!(
             groups[0].files,
@@ -407,6 +435,19 @@ mod tests {
             ["styled/card, wide", "styled/form, wide"]
         );
         assert_eq!(groups[1].members, ["styled/card, wide"]);
+    }
+
+    #[test]
+    fn a_button_is_a_button_whatever_holds_it() {
+        assert_eq!(
+            innermost("`helix-sandbox ::part(body) ::part(panes) helix-button` (src/button.ts)"),
+            "`helix-button` (src/button.ts)"
+        );
+        assert_eq!(
+            innermost("`helix-timeline helix-timeline-item ::part(rail)`, moved 2 px down"),
+            "`helix-timeline-item ::part(rail)`, moved 2 px down"
+        );
+        assert_eq!(innermost("`main h2`"), "`main h2`");
     }
 
     #[test]

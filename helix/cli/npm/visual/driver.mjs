@@ -791,7 +791,16 @@ const handlers = {
       } catch (caught) {
         const why = caught instanceof Error ? caught.message.split('\n')[0] : String(caught)
         answers.push({ error: why })
-        if (caught?.status === 401 || caught?.status === 403 || caught?.code === 'ECONNREFUSED') {
+        /* A refused key, an endpoint that is down, or the same failure
+           twice running, a balance that has run out among them, is one that
+           every request after it would meet. */
+        const before = answers.at(-2)
+        if (
+          caught?.status === 401 ||
+          caught?.status === 403 ||
+          caught?.code === 'ECONNREFUSED' ||
+          before?.error === why
+        ) {
           stopped = why
         }
       }
