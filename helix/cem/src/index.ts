@@ -123,6 +123,50 @@ const skillOf = (pages: string[], cwd: string, version: string): string => {
 }
 
 /**
+ * Whether each Helix event bubbles, by name, read from the event classes in
+ * `@fusion.dev/helix-core`: each declares `static readonly eventName` and
+ * passes `bubbles` to `super()`. From the source where the package has it, as
+ * in this repository, and from what it built otherwise.
+ *
+ * **What a scan needs to judge a listener on a wrapper.** A coordination event
+ * such as `helix-dismiss` reaches an ancestor; a lifecycle event such as
+ * `helix-before-open` stops at the element that sent it.
+ */
+const bubblingOf = (cwd: string): Map<string, boolean> => {
+  const found = new Map<string, boolean>()
+  let core: string
+  try {
+    core = dirname(
+      createRequire(join(cwd, 'package.json')).resolve('@fusion.dev/helix-core/package.json'),
+    )
+  } catch {
+    return found
+  }
+  const folder = [join(core, 'src', 'events'), join(core, 'dist', 'events')].find((one) =>
+    existsSync(one),
+  )
+  if (folder === undefined) {
+    return found
+  }
+  for (const file of readdirSync(folder)) {
+    if (!/\.(ts|js)$/.test(file) || /\.(d|spec|pure\.spec)\.ts$|\.d\.ts$/.test(file)) {
+      continue
+    }
+    const text = readFileSync(join(folder, file), 'utf8')
+    /* Each class from its declaration to the next one, so a file holding two
+       pairs each name with its own options. */
+    for (const block of text.split(/\bclass\s+/).slice(1)) {
+      const name = /static\s+(?:readonly\s+)?eventName\s*=\s*['"]([a-z][\w-]*)['"]/.exec(block)?.[1]
+      const bubbles = /bubbles:\s*(true|false)/.exec(block)?.[1]
+      if (name !== undefined && bubbles !== undefined) {
+        found.set(name, bubbles === 'true')
+      }
+    }
+  }
+  return found
+}
+
+/**
  * The environment the baselines were taken in, from the nearest
  * `visual.fingerprint.json` up: the browser, the fonts, the system. A render
  * compared to a baseline is fair only in the same one. `null` where there is
@@ -360,7 +404,11 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
       .filter(([dependency]) => dependency.startsWith('@fusion.dev/helix'))
       .map(([, at]) => JSON.parse(readFileSync(at, 'utf8')) as HelixManifest)
     const own = options.tier === 'headless' ? 'headless' : 'styled'
-    const families = catalog([customElementsManifest, ...below], examplesOnDisk(cwd))
+    const families = catalog(
+      [customElementsManifest, ...below],
+      examplesOnDisk(cwd),
+      bubblingOf(cwd),
+    )
       .map((family) => ({
         ...family,
         elements: family.elements.filter((element) => element.tier === own),

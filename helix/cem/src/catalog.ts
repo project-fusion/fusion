@@ -64,6 +64,8 @@ export interface PropertyDoc {
 }
 
 export interface EventDoc {
+  /** Whether a listener on an ancestor hears it, where the event's class says. */
+  bubbles?: boolean | undefined
   description: string
   name: string
   reactProp: string
@@ -518,7 +520,11 @@ const entriesOf = (manifest: HelixManifest): Map<string, string> => {
  * reference: `helix-button-group` is one family and `helix-tab` is a part
  * of another, and nothing in the name says which.
  */
-export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = []): Family[] => {
+export const catalog = (
+  manifests: HelixManifest[],
+  examples: ExampleSource[] = [],
+  bubbling: ReadonlyMap<string, boolean> = new Map(),
+): Family[] => {
   const byFamily = new Map<string, HelixDeclaration[]>()
   /* Where each element is imported from, which the reference's usage shows. */
   const entryOf = new Map<HelixDeclaration, string>()
@@ -578,6 +584,10 @@ export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = 
             description: entry.description ?? '',
             entry: entryOf.get(entry) ?? slug,
             events: (entry.events ?? []).map((event) => ({
+              /* Whether a listener on an ancestor hears it, where the event's
+                 class says. Absent where it does not, as for an event a
+                 component builds by name. */
+              bubbles: bubbling.get(event.name ?? ''),
               description: event.description ?? '',
               name: event.name ?? '',
               reactProp: event.reactProp ?? `on${event.name ?? ''}`,
