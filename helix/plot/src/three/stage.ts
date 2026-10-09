@@ -251,7 +251,14 @@ export const createStage = (
       }
       const mark = document.createElement('span')
       mark.textContent = text
-      mark.style.cssText = `position:absolute;left:${((on.x + 1) / 2) * width}px;top:${((1 - on.y) / 2) * height}px;translate:-50% -50%;white-space:nowrap;font:${strong ? 600 : 500} ${strong ? 13 : 11}px ${font};color:${strong ? colors?.ink : colors?.quiet};text-shadow:0 0 3px ${colors?.ground},0 0 3px ${colors?.ground}`
+      /* **In the theme's type scale**: the names and numbers are page text in
+         the chart, so the theme's size and weight tokens reach them, with
+         the sizes they had before as fallbacks where no theme is loaded. */
+      const size = strong ? 'var(--helix-text-sm, 13px)' : 'var(--helix-text-xs, 11px)'
+      const weight = strong
+        ? 'var(--helix-weight-semibold, 600)'
+        : 'var(--helix-weight-medium, 500)'
+      mark.style.cssText = `position:absolute;left:${((on.x + 1) / 2) * width}px;top:${((1 - on.y) / 2) * height}px;translate:-50% -50%;white-space:nowrap;font-family:${font};font-size:${size};font-weight:${weight};line-height:1;color:${strong ? colors?.ink : colors?.quiet};text-shadow:0 0 3px ${colors?.ground},0 0 3px ${colors?.ground}`
       marks.push(mark)
     }
     const h = HALF
@@ -353,30 +360,60 @@ export const createStage = (
       return
     }
     const { high, low } = framed
-    const center = low.clone().add(high).multiplyScalar(0.5)
     const toward = camera.position.clone().sub(controls.target).normalize()
     /* The camera's own across and up, looking from `toward` at the middle. */
     const right = new Vector3(0, 1, 0).cross(toward).normalize()
     const up = toward.clone().cross(right).normalize()
     const tanUp = Math.tan((camera.fov * Math.PI) / 360)
     const tanAcross = tanUp * camera.aspect
+    const corners: Vector3[] = []
+    for (const x of [low.x, high.x]) {
+      for (const y of [low.y, high.y]) {
+        for (const z of [low.z, high.z]) {
+          corners.push(new Vector3(x, y, z))
+        }
+      }
+    }
     /* **Far enough that every corner of the box is inside the view**, each
        corner's distance off the middle over the tangent of half the view,
        plus how far toward the camera it stands. A sphere around a flat
        relief left most of the view empty. */
-    let distance = 0
-    for (const x of [low.x, high.x]) {
-      for (const y of [low.y, high.y]) {
-        for (const z of [low.z, high.z]) {
-          const corner = new Vector3(x, y, z).sub(center)
-          const ahead = corner.dot(toward)
-          distance = Math.max(
-            distance,
-            ahead + Math.abs(corner.dot(right)) / tanAcross,
-            ahead + Math.abs(corner.dot(up)) / tanUp,
-          )
-        }
+    const distanceFrom = (center: Vector3): number => {
+      let far = 0
+      for (const corner of corners) {
+        const off = corner.clone().sub(center)
+        const ahead = off.dot(toward)
+        far = Math.max(
+          far,
+          ahead + Math.abs(off.dot(right)) / tanAcross,
+          ahead + Math.abs(off.dot(up)) / tanUp,
+        )
       }
+      return far
+    }
+    /* **Aimed at the middle of what is drawn, not of the box.** In
+       perspective the near corner lands lower on the page than the far one,
+       and a view aimed at the box's middle left an empty band over a relief.
+       So the aim moves until the corners' extremes on the page are even on
+       each side, a few rounds being enough to settle it. */
+    const center = low.clone().add(high).multiplyScalar(0.5)
+    let distance = distanceFrom(center)
+    for (let round = 0; round < 4; round++) {
+      let [left, rightmost, bottom, top] = [Infinity, -Infinity, Infinity, -Infinity]
+      for (const corner of corners) {
+        const off = corner.clone().sub(center)
+        const depth = Math.max(distance - off.dot(toward), 1e-6)
+        const across = off.dot(right) / depth / tanAcross
+        const rise = off.dot(up) / depth / tanUp
+        left = Math.min(left, across)
+        rightmost = Math.max(rightmost, across)
+        bottom = Math.min(bottom, rise)
+        top = Math.max(top, rise)
+      }
+      center
+        .add(right.clone().multiplyScalar(((left + rightmost) / 2) * tanAcross * distance))
+        .add(up.clone().multiplyScalar(((bottom + top) / 2) * tanUp * distance))
+      distance = distanceFrom(center)
     }
     distance *= 1.06
     controls.target.copy(center)
