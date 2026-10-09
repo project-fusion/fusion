@@ -256,6 +256,25 @@ if (flag('write')) {
     written.push(`${DOMAINS[domain]}/plugin`)
   }
 
+  /* **The domain's agent plugin**, where it has one, at the same number in
+     each manifest a harness reads: the portable `plugin.json`, Claude Code's,
+     and Cursor's. A harness keeps a user on the version it cached until this
+     string changes. */
+  for (const manifest of [
+    'plugin.json',
+    '.claude-plugin/plugin.json',
+    '.cursor-plugin/plugin.json',
+  ]) {
+    const plugin = join(root, DOMAINS[domain], 'plugin', manifest)
+    if (!existsSync(plugin)) {
+      continue
+    }
+    const parsed = JSON.parse(readFileSync(plugin, 'utf8'))
+    parsed.version = version
+    writeFileSync(plugin, `${JSON.stringify(parsed, null, 2)}\n`)
+    written.push(`${DOMAINS[domain]}/plugin/${manifest}`)
+  }
+
   console.error(`${domain} ${version}: stamped ${written.length} manifests (${written.join(', ')})`)
 }
 

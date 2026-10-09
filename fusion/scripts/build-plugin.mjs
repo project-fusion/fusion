@@ -13,6 +13,12 @@
  * project's own install is, and a release changes it only when the guide
  * changes.
  *
+ * **And holds the plugin's files to each other.** Each harness reads one
+ * manifest and one MCP file of its own: the portable `plugin.json` and
+ * `mcp.json`, Claude Code's `.claude-plugin/plugin.json` and `.mcp.json`, and
+ * Cursor's `.cursor-plugin/plugin.json`. They describe one plugin, so `--check`
+ * fails where any of them disagrees with the portable pair.
+ *
  *   bun fusion/scripts/build-plugin.mjs          # write it
  *   bun fusion/scripts/build-plugin.mjs --check  # fail where it is stale
  */
@@ -44,7 +50,29 @@ if (written === packaged) {
   process.exit(1)
 }
 
+/** What every manifest says the same way, and what every MCP file runs. */
+const read = (path) => JSON.parse(readFileSync(join(root, 'helix/plugin', path), 'utf8'))
+const shared = ({ $schema, ...rest }) => JSON.stringify(rest)
+const servers = (file) =>
+  JSON.stringify(
+    Object.fromEntries(
+      Object.entries(file.mcpServers).map(([name, { args, command }]) => [name, { args, command }]),
+    ),
+  )
+const disagreeing = [
+  ...['.claude-plugin/plugin.json', '.cursor-plugin/plugin.json']
+    .filter((path) => shared(read(path)) !== shared(read('plugin.json')))
+    .map((path) => `helix/plugin/${path} says something helix/plugin/plugin.json does not`),
+  ...(servers(read('.mcp.json')) === servers(read('mcp.json'))
+    ? []
+    : ['helix/plugin/.mcp.json runs a server helix/plugin/mcp.json does not']),
+]
+
 if (process.argv.includes('--check')) {
+  if (disagreeing.length > 0) {
+    console.error(`build-plugin: ${disagreeing.join('; ')}.`)
+    process.exit(1)
+  }
   const committed = existsSync(target) ? readFileSync(target, 'utf8') : ''
   if (committed !== written) {
     console.error(
