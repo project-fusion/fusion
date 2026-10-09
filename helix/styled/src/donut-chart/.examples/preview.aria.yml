@@ -1,0 +1,22 @@
+- table "Sessions by source":
+  - caption: Sessions by source
+  - rowgroup:
+    - row "Source Share":
+      - columnheader "Source"
+      - columnheader "Share"
+  - rowgroup:
+    - row "Direct 4,200":
+      - rowheader "Direct"
+      - cell "4,200"
+    - row "Search 3,100":
+      - rowheader "Search"
+      - cell "3,100"
+    - row "Referral 1,800":
+      - rowheader "Referral"
+      - cell "1,800"
+    - row "Social 900":
+      - rowheader "Social"
+      - cell "900"
+- application "Sessions by source":
+  - status
+- paragraph: "Sessions by source: Direct 42%, Search 31%, Referral 18%, Social 9%."

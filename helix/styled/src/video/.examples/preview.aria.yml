@@ -1,0 +1,9 @@
+- group "Product walkthrough":
+  - status
+  - alert: This video could not be played
+  - button "Play"
+  - text: 0:00 / 0:00
+  - slider "Seek": "0"
+  - button "Mute"
+  - slider "Volume": "1"
+  - button "Fullscreen"

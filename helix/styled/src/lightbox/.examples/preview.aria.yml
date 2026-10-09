@@ -1,0 +1,9 @@
+- button "Open gallery"
+- dialog "Beach photos":
+  - button "Previous picture"
+  - button "Next picture"
+  - button "Close"
+  - group "Seawater over pale sand":
+    - img "Seawater over pale sand"
+    - text: Shallow water at the beach in the morning.
+  - status: 1 of 2

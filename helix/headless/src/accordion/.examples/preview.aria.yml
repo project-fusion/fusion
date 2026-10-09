@@ -1,0 +1,5 @@
+- heading "Shipping" [level=3]:
+  - button "Shipping" [expanded]
+- region "Shipping": Orders ship within two business days. You receive a tracking number by email.
+- heading "Returns" [level=3]:
+  - button "Returns"

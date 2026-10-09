@@ -1,0 +1,4 @@
+- text: Starts
+- combobox "Starts"
+- button "Choose a time"
+- paragraph: Choose a time or type one

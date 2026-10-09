@@ -1,0 +1,6 @@
+- application "Sessions over seven days, as bars"
+- status
+- application "Sessions over seven days, as a line"
+- status
+- application "Sessions over seven days, as an area"
+- status

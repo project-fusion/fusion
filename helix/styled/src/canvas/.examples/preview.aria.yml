@@ -1,0 +1,12 @@
+- group "Document approval":
+  - group "Before publishing"
+  - article "Write the draft"
+  - button "From Write the draft to Review the draft"
+  - article "Review the draft"
+  - button "From Review the draft to Publish the draft"
+  - article "Publish the draft"
+  - group "Board controls":
+    - button "Zoom in": +
+    - button "Zoom out": −
+    - button "Fill the screen": ⤢
+  - status

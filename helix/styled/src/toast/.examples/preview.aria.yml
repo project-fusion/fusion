@@ -1,0 +1,9 @@
+- img "Success"
+- text: Project saved.
+- button "Dismiss"
+- img "Error"
+- text: Could not reach the server.
+- button "Retry"
+- button "Dismiss"
+- status
+- alert

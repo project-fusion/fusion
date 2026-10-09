@@ -1,0 +1,9 @@
+- region "Release notes":
+  - paragraph: You can now export reports as CSV files.
+  - paragraph: Search results load faster on large projects.
+  - paragraph: Invoices now show the tax for each line item.
+  - paragraph: Shared folders show who added each file.
+  - paragraph: You can pin projects to the top of your list.
+  - paragraph: Comments now support mentions and links.
+  - paragraph: Dark mode is available in settings.
+  - paragraph: Team admins can now remove members.

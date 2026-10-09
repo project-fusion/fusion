@@ -1,0 +1,28 @@
+- heading "Notifications" [level=2]
+- button "Mark all as read"
+- feed "Notifications":
+  - article "Unread Ada Okonjo approved your deploy to production.":
+    - img "Unread"
+    - strong: Ada Okonjo
+    - text: approved your deploy to production.
+    - button "View"
+    - time: 3m
+    - button "Dismiss Ada Okonjo approved your deploy to production."
+  - 'article "Unread Build #4821 failed on main"':
+    - img "Unread"
+    - text: Build
+    - strong: "#4821"
+    - text: failed on
+    - code: main
+    - button "Logs"
+    - time: 42m
+    - 'button "Dismiss Build #4821 failed on main"'
+  - article "Your invitation to the Platform team was accepted.":
+    - text: Your invitation to the
+    - strong: Platform
+    - text: team was accepted.
+    - time: 1d
+    - button "Dismiss Your invitation to the Platform team was accepted."
+- status
+- link "See everything":
+  - /url: "#all"

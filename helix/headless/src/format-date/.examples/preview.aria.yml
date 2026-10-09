@@ -1,0 +1,12 @@
+- term: "Elapsed:"
+- definition:
+  - time: 42m
+- term: "Date:"
+- definition:
+  - time: Mar 14, 2026
+- term: "Time:"
+- definition:
+  - time: 3:09 PM
+- term: "Weekday:"
+- definition:
+  - time: Saturday, March 14

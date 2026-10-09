@@ -1,0 +1,6 @@
+- list:
+  - link "Home":
+    - /url: "#home"
+  - link "Projects":
+    - /url: "#section"
+  - text: Website redesign

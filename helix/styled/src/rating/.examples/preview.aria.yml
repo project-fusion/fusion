@@ -1,0 +1,7 @@
+- text: Rate your order
+- radiogroup "Rate your order":
+  - radio "1 out of 5"
+  - radio "2 out of 5"
+  - radio "3 out of 5" [checked]
+  - radio "4 out of 5"
+  - radio "5 out of 5"

@@ -1,0 +1,28 @@
+- table "Visits by source":
+  - caption: Visits by source
+  - rowgroup:
+    - row "Week Direct Search Referral":
+      - columnheader "Week"
+      - columnheader "Direct"
+      - columnheader "Search"
+      - columnheader "Referral"
+  - rowgroup:
+    - row "W1 1204 812 240":
+      - rowheader "W1"
+      - cell "1204"
+      - cell "812"
+      - cell "240"
+    - row "W2 1388 964 221":
+      - rowheader "W2"
+      - cell "1388"
+      - cell "964"
+      - cell "221"
+    - row "W3 1502 1030 287":
+      - rowheader "W3"
+      - cell "1502"
+      - cell "1030"
+      - cell "287"
+- list "Visits by source":
+  - listitem: Direct
+  - listitem: Search
+  - listitem: Referral

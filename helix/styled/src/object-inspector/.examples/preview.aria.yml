@@ -1,0 +1,37 @@
+- text: GET /v1/deployments/dpl_8f2c
+- treegrid "GET /v1/deployments/dpl_8f2c":
+  - 'row "{…} 8 keys" [expanded] [level=1]':
+    - 'gridcell "{…} 8 keys"'
+  - 'row "build: {…} 2 keys" [expanded] [level=2]':
+    - 'gridcell "build: {…} 2 keys"'
+  - 'row "cache: {…} 2 keys" [level=3]':
+    - 'gridcell "cache: {…} 2 keys"'
+  - 'row "duration: 41.2" [level=3]':
+    - 'gridcell "duration: 41.2"'
+  - 'row "createdAt: 1767225600000" [level=2]':
+    - 'gridcell "createdAt: 1767225600000"'
+  - 'row "id: \"dpl_8f2c\"" [level=2]':
+    - 'gridcell "id: \"dpl_8f2c\""'
+  - 'row "meta: {…} 3 keys" [expanded] [level=2]':
+    - 'gridcell "meta: {…} 3 keys"'
+  - 'row "author: \"Ada Okonjo\"" [level=3]':
+    - 'gridcell "author: \"Ada Okonjo\""'
+  - 'row "branch: \"main\"" [level=3]':
+    - 'gridcell "branch: \"main\""'
+  - 'row "commit: \"4f2a9c1e\"" [level=3]':
+    - 'gridcell "commit: \"4f2a9c1e\""'
+  - 'row "public: true" [level=2]':
+    - 'gridcell "public: true"'
+  - 'row "regions: […] 3 items" [expanded] [level=2]':
+    - 'gridcell "regions: […] 3 items"'
+  - 'row "0: \"iad1\"" [level=3]':
+    - 'gridcell "0: \"iad1\""'
+  - 'row "1: \"sfo1\"" [level=3]':
+    - 'gridcell "1: \"sfo1\""'
+  - 'row "2: \"fra1\"" [level=3]':
+    - 'gridcell "2: \"fra1\""'
+  - 'row "state: \"READY\"" [level=2]':
+    - 'gridcell "state: \"READY\""'
+  - 'row "target: null" [level=2]':
+    - 'gridcell "target: null"'
+- button "Copy value"
