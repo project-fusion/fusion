@@ -1344,9 +1344,7 @@ export class HelixHeadlessCarousel extends HelixElement {
        the client agree about whether it is running. A reader's stop survives a
        reconnection because `stopped` outlives it. */
     if (!this.hasUpdated) {
-      /* Still where the reader asked for less motion or the page paused it,
-         which a server, with neither, never is. */
-      this.rotating = this.autoplay && !reducedMotion() && !motionPaused()
+      this.rotating = this.autoplay
     }
     /* A move of the index is somewhere the reader arrived, so a drag still
        coasting has nothing left to show. Its `scrollend` would have cleared
@@ -1378,6 +1376,13 @@ export class HelixHeadlessCarousel extends HelixElement {
     super.firstUpdated(changed)
     this.watchPane()
     this.finishHydration()
+    /* **Still where the reader asked for less motion or the page paused it**,
+       which a server knows neither of. Stopped once the markup has hydrated,
+       so the client's first render matches the server's, and before
+       `updated` starts the timer, so it never turns once. */
+    if (this.rotating && (reducedMotion() || motionPaused())) {
+      this.rotating = false
+    }
   }
 
   protected override updated(changed: PropertyValues): void {

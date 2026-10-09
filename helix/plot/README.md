@@ -6,6 +6,8 @@ tokens: `Spatial Bar Chart`, `Spatial Heatmap`, `Spatial Ribbon Chart`,
 `Spatial Scatter Chart`, `Spatial Surface Chart`, and `Spatial Treemap`. Each
 also draws itself in SVG, which this package replaces where it is connected.
 
+The spatial charts and this package are experimental, so their API can change.
+
 ```sh
 bun add @fusion.dev/helix @fusion.dev/helix-plot three
 ```
