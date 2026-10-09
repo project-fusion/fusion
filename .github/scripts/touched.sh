@@ -20,9 +20,9 @@ total=$(printf '%s\n' "$changed" | grep -c . || true)
 # reads one, and every document, README and convention file is `.md`. The
 # `.mdx` under the docs packages are not here, because the site renders them.
 #
-# **Not `locus/`**, because `check:spec:visual` pictures every example through
-# it: a change to the capture driver or the diff moves what the visual shards
-# compare.
+# **Not `helix/visual/`**, because `check:spec:visual` pictures every example
+# through it: a change to the capture driver or the diff moves what the visual
+# shards compare.
 skippable=$(printf '%s\n' "$changed" | grep -cE '^(fusion/docs/|cortex/|\.claude/|\.agents/)|\.md$' || true)
 
 if [ "$total" -gt 0 ] && [ "$total" -eq "$skippable" ]; then

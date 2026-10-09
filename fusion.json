@@ -72,7 +72,7 @@
     "whilst": "while",
     "wilful": "willful"
   },
-  "domains": ["cortex", "helix", "locus"],
+  "domains": ["cortex", "helix"],
   "gallery": {
     "art": "helix/gallery/src",
     "families": "helix/styled/src",

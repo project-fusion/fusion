@@ -27,11 +27,11 @@
     "check:spec:diagnostics": "turbo run @fusion.dev/helix#analyze @fusion.dev/helix-headless#analyze frame && bun fusion/scripts/check-diagnostics.mjs",
     "check:spec:dsd": "turbo run frame && bun fusion/scripts/check-dsd.mjs",
     "check:spec:floors": "bun fusion/scripts/check-floors.mjs",
-    "check:spec:site": "turbo run build --filter=@fusion.dev/site && bun locus/cli/npm/bin.mjs test --config fusion/site/locus.config.ts",
-    "check:spec:visual": "turbo run frame && bun locus/cli/npm/bin.mjs test",
+    "check:spec:site": "turbo run build --filter=@fusion.dev/site && bun helix/cli/npm/bin.mjs visual test --config fusion/site/visual.config.ts",
+    "check:spec:visual": "turbo run frame && bun helix/cli/npm/bin.mjs visual test",
     "check:spec:visual-parity": "turbo run frame && bun fusion/scripts/check-visual-parity.mjs",
     "check:withheld": "bun fusion/scripts/check-withheld.mjs",
-    "clean": "rm -rf node_modules target .turbo && find cortex fusion helix locus -type d \\( -name dist -o -name node_modules -o -name .next -o -name .next-dev -o -name .turbo -o -name .tsbuild \\) -prune -exec rm -rf {} +",
+    "clean": "rm -rf node_modules target .turbo && find cortex fusion helix -type d \\( -name dist -o -name node_modules -o -name .next -o -name .next-dev -o -name .turbo -o -name .tsbuild \\) -prune -exec rm -rf {} +",
     "dev": "turbo run dev",
     "eval": "turbo run analyze token-layer && bun fusion/scripts/build-eval.mjs && bun fusion/scripts/run-eval.mjs && bun fusion/scripts/run-tasks.mjs",
     "fix": "bun run fix:order && bun run fix:format && bun run fix:examples && bun run fix:dialect && bun run fix:tag-order && turbo run token-layer && bun run helix component check --only tokens",
@@ -48,7 +48,6 @@
     "helix": "bun helix/cli/npm/bin.mjs",
     "insight": "bun fusion/scripts/new-insight.mjs",
     "lint": "biome lint .",
-    "locus": "bun locus/cli/npm/bin.mjs",
     "measure:browser": "turbo run frame specs && bun fusion/scripts/measure-browser.mjs",
     "prepare": "git rev-parse --git-dir > /dev/null 2>&1 && git config core.hooksPath .githooks || true",
     "probe:stuck": "bun fusion/scripts/probe-stuck-spec.mjs",
@@ -68,8 +67,8 @@
     "trust": "bun fusion/scripts/trust.mjs",
     "typecheck": "turbo run typecheck",
     "verify": "biome ci . && turbo run token-layer -- --check && bun run typecheck && bun run analyze && bun run check:cli && turbo run docs-check && turbo run samples -- --check && bun run check:gen:eval && turbo run content -- --check && turbo run catalog && turbo run routes-check && turbo run register -- --check && bun run check:gen:metrics && bun run check:css:seeds && turbo run wasm-check && bun run check:prose && bun run check:withheld && turbo run themed-page-check && bun run check:gen:element-events && bun run fusion x spec check && bun run check:spec:floors && bun run test && bun run rs:check && bun run rs:test",
-    "visual:update": "turbo run frame && bun locus/cli/npm/bin.mjs update",
-    "visual:update-site": "turbo run build --filter=@fusion.dev/site && bun locus/cli/npm/bin.mjs update --config fusion/site/locus.config.ts",
+    "visual:update": "turbo run frame && bun helix/cli/npm/bin.mjs visual update",
+    "visual:update-site": "turbo run build --filter=@fusion.dev/site && bun helix/cli/npm/bin.mjs visual update --config fusion/site/visual.config.ts",
     "watch": "turbo watch frame catalog --filter=@fusion.dev/site"
   },
   "devDependencies": {
@@ -98,8 +97,6 @@
     "fusion/site",
     "helix/*",
     "helix/cli/npm",
-    "helix/cli/platforms/*",
-    "locus/cli/npm",
-    "locus/cli/platforms/*"
+    "helix/cli/platforms/*"
   ]
 }

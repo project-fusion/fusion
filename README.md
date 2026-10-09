@@ -179,13 +179,12 @@ bare leaf names recur across domains.
 | | `npm create @fusion.dev/helix-app` | [helix/create-app](helix/create-app/README.md) |
 | | the editor and spec runner | [helix/sandbox](helix/sandbox/README.md) |
 | | analyzer config, card art, spec helpers, the CLI | `cem` `gallery` `testing` `cli` |
+| | the visual tests behind `helix visual` | [helix/visual](helix/visual/README.md) |
 | **[Cortex](cortex/README.md)** | memory, provenance, context | |
 | | the substrate | `cortex/core` |
 | | provenance capture | `cortex/trace` |
 | | the memory store | `cortex/engram` |
 | | the documentation, as content | [cortex/docs](cortex/docs/README.md) |
-| **[Locus](locus/README.md)** | visual regression testing, in development | |
-| | `locus`, the Rust core, its npm package and the capture driver | `locus/cli` |
 | **[Fusion](fusion/README.md)** | what belongs to the company | |
 | | the published writing | `fusion/docs` |
 | | the site that renders all of it | `fusion/site` |

@@ -91,8 +91,8 @@ fusion/site/public/maplibre/
 # history is the baseline a reviewer approved, not the run that disagreed.
 *.diff.png
 *.parity.png
-# The report Fusion Locus writes on every run, beside each config.
-.locus/
+# The report `helix visual` writes on every run, beside each config.
+.helix/visual/
 
 # A second checkout of this repo, so tracking it would track everything twice.
 .claude/worktrees/
@@ -108,7 +108,3 @@ fusion/site/public/maplibre/
 helix/cli/platforms/*/helix
 helix/cli/platforms/*/helix.exe
 
-# The `locus` binary each platform package ships, placed by the release the
-# same way as `helix`.
-locus/cli/platforms/*/locus
-locus/cli/platforms/*/locus.exe

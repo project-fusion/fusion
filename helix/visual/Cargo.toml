@@ -1,0 +1,28 @@
+[package]
+name = "fusion-helix-visual"
+description = "Helix's visual tests: pictures of each page, compared with baselines kept in git."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+# Its own, never `workspace = true`. See the note in the root manifest.
+version = "0.0.0-dev"
+
+[dependencies]
+# The driver sends each picture inside a JSON line.
+base64 = "0.22"
+clap = { version = "4", features = ["derive"] }
+# **The error and exit-code contract `helix` prints with.** Shared with the
+# other command lines and owned by none of them, so this is no dependency on the
+# fusion domain: the crate's `lib.rs` carries the argument.
+fusion-rules = { workspace = true }
+# **The PNG codec, in Rust and with no system library.** It decodes about twice
+# as fast as `pngjs` and encodes a diff image about eighty times as fast,
+# measured in the proposal on an 8.1 megapixel page, and it cross-compiles to
+# every platform package with nothing to link.
+png = "0.18"
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[lints]
+workspace = true

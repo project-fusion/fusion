@@ -54,7 +54,7 @@ fn unrenderable(text: &str) -> Option<&'static str> {
     }
     /* A path into this repository is a maintainer's landmark: a reader of
     `--help` has this tool and not necessarily its source. */
-    if ["`cortex/", "`fusion/", "`helix/", "`locus/"]
+    if ["`cortex/", "`fusion/", "`helix/"]
         .iter()
         .any(|root| text.contains(root))
     {

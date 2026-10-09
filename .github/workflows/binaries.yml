@@ -1,4 +1,4 @@
-# The `helix` and `locus` binaries, built for every platform package.
+# The `helix` binary, built for every platform package.
 #
 # Called by `release.yml` and `release-experimental.yml` before they pack, with
 # the domain and the version they are about to publish. Each binary lands as an
@@ -6,10 +6,9 @@
 # package's `files` says, and `publish.mjs` refuses a platform package without
 # it: [RELEASING.md](../RELEASING.md#the-binary).
 #
-# **And on a pull request that could break one**, both domains, at the
-# placeholder and uploading nothing. A platform that stops compiling would
-# otherwise be found by the release, which then ships nothing of that domain
-# until somebody fixes it.
+# **And on a pull request that could break one**, at the placeholder and
+# uploading nothing. A platform that stops compiling would otherwise be found by
+# the release, which then ships nothing of that domain until somebody fixes it.
 #
 # **One build serves many releases.** The binary reads its version from the
 # package installed beside it rather than compiling one in, so the cache below
@@ -22,7 +21,7 @@ on:
   workflow_call:
     inputs:
       domain:
-        description: The domain whose command line to build, `helix` or `locus`.
+        description: The domain whose command line to build, `helix`.
         required: true
         type: string
       version:
@@ -38,7 +37,7 @@ on:
       - fusion/rules/**
       - helix/cli/**
       - helix/theme/**
-      - locus/cli/**
+      - helix/visual/**
 
 permissions:
   contents: read
@@ -51,8 +50,8 @@ jobs:
       # nothing there, so the first failure is the answer.
       fail-fast: true
       matrix:
-        # The one domain a release asked for, and both on a pull request.
-        domain: ${{ fromJSON(inputs.domain && format('["{0}"]', inputs.domain) || '["helix", "locus"]') }}
+        # The one domain a release asked for, and Helix on a pull request.
+        domain: ${{ fromJSON(inputs.domain && format('["{0}"]', inputs.domain) || '["helix"]') }}
         platform: [darwin-arm64, darwin-x64, linux-arm64, linux-x64, win32-x64]
         # **Keyed on `platform` alone.** An entry naming a domain matches no
         # combination when the release asked for the other one, and GitHub then
@@ -110,29 +109,22 @@ jobs:
       #
       # **Narrower than this workflow's `pull_request` filter, on purpose.**
       # That filter says what could break a build and this says what changes
-      # one. `helix/cli/**` and `locus/cli/**` cover the npm manifests, which
-      # the release stamps on every publish, and `helix/theme/**` covers that
-      # package's TypeScript, which the crate does not read: hashing any of them
-      # meant a key that moved when the binary did not. The crate's sources are
+      # one. `helix/cli/**` covers the npm manifests, which the release stamps
+      # on every publish, and `helix/theme/**` covers that package's TypeScript,
+      # which the crate does not read: hashing any of them meant a key that
+      # moved when the binary did not. The crate's sources are
       # `helix/theme/rust`.
-      #
-      # **One list per domain**, so a change to one binary's sources leaves the
-      # other's cached build where it is.
       - name: Restore a binary built from these sources
         id: built
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           key: >-
-            ${{ matrix.domain }}-cli-${{ matrix.target }}-${{ matrix.domain == 'helix'
-            && hashFiles(
+            ${{ matrix.domain }}-cli-${{ matrix.target }}-${{ hashFiles(
             '.github/workflows/binaries.yml', 'Cargo.lock', 'Cargo.toml',
             'fusion/rules/Cargo.toml', 'fusion/rules/src/**',
             'helix/cli/Cargo.toml', 'helix/cli/src/**',
-            'helix/theme/Cargo.toml', 'helix/theme/rust/**')
-            || hashFiles(
-            '.github/workflows/binaries.yml', 'Cargo.lock', 'Cargo.toml',
-            'fusion/rules/Cargo.toml', 'fusion/rules/src/**',
-            'locus/cli/Cargo.toml', 'locus/cli/src/**') }}
+            'helix/theme/Cargo.toml', 'helix/theme/rust/**',
+            'helix/visual/Cargo.toml', 'helix/visual/src/**') }}
           path: ${{ env.BINARY }}
 
       # Statically linked, so one binary runs on a glibc distribution and on
@@ -223,6 +215,14 @@ jobs:
             echo "::error::$BINARY has \`helix manifest build\`, which only this repository's builds carry"
             exit 1
           fi
+
+      # **And carries the visual tests**, which every published build does: a
+      # binary that lost the noun would install a `helix visual` that is not
+      # there.
+      - name: Prove it carries the visual tests
+        if: matrix.runs && matrix.domain == 'helix'
+        shell: bash
+        run: '"$BINARY" visual compare --help >/dev/null'
 
       - name: Upload
         if: inputs.version != ''

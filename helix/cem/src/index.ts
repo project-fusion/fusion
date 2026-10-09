@@ -124,14 +124,14 @@ const skillOf = (pages: string[], cwd: string, version: string): string => {
 
 /**
  * The environment the baselines were taken in, from the nearest
- * `locus.fingerprint.json` up: the browser, the fonts, the system. A render
+ * `visual.fingerprint.json` up: the browser, the fonts, the system. A render
  * compared to a baseline is fair only in the same one. `null` where there is
  * none.
  */
 const environmentOf = (cwd: string): unknown => {
   let dir = resolve(cwd)
   for (;;) {
-    const file = join(dir, 'locus.fingerprint.json')
+    const file = join(dir, 'visual.fingerprint.json')
     if (existsSync(file)) {
       return JSON.parse(readFileSync(file, 'utf8')) as unknown
     }

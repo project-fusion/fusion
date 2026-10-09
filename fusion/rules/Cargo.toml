@@ -1,6 +1,6 @@
 [package]
 name = "fusion-rules"
-description = "What the Fusion, Helix and Locus command lines hold in common: a rule, its report, and the runner that measures a set of them."
+description = "What the Fusion and Helix command lines hold in common: a rule, its report, and the runner that measures a set of them."
 edition.workspace = true
 license.workspace = true
 publish.workspace = true

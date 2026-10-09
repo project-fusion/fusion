@@ -2,8 +2,8 @@
 //! repository's own checks behind `x`.
 //!
 //! **Each product's command line is routed, never reimplemented.** `fusion
-//! helix ...` and `fusion locus ...` hand the rest of the line to that binary and
-//! return its exit code, and each works on its own without this one.
+//! helix ...` hands the rest of the line to that binary and returns its exit
+//! code, and it works on its own without this one.
 //!
 //! **This repository's checks are under `x`, and only in its own builds.**
 //! `workspace`, `prose` and `spec` hold this repository to its conventions, which
@@ -54,7 +54,7 @@ fn shipped() -> &'static str {
 #[derive(Debug, Parser)]
 #[command(
     name = "fusion",
-    about = "The Fusion command line: Helix, Locus, and the checks this repository holds itself to.",
+    about = "The Fusion command line: Helix, and the checks this repository holds itself to.",
     version = shipped(),
     subcommand_required = true,
     arg_required_else_help = true
@@ -97,16 +97,6 @@ enum Noun {
     #[command(disable_help_flag = true)]
     Helix {
         /// Everything after `helix`, handed over as written.
-        #[arg(allow_hyphen_values = true, trailing_var_arg = true)]
-        args: Vec<String>,
-    },
-    /// Run the Fusion Locus command line, which owns its own nouns.
-    ///
-    /// Everything after `locus` is passed to it as written, and its exit code
-    /// is returned. Needs `locus` installed.
-    #[command(disable_help_flag = true)]
-    Locus {
-        /// Everything after `locus`, handed over as written.
         #[arg(allow_hyphen_values = true, trailing_var_arg = true)]
         args: Vec<String>,
     },
@@ -173,7 +163,7 @@ fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
     match &cli.noun {
         /* **The channel flags reach `helix`**, which takes both, when they are
         written before its name: `fusion --json helix scan` would otherwise
-        swallow `--json` and print prose. Locus takes neither. */
+        swallow `--json` and print prose. */
         Noun::Helix { args } => {
             let mut forwarded: Vec<String> = Vec::new();
             if cli.json {
@@ -185,7 +175,6 @@ fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
             forwarded.extend(args.iter().cloned());
             route::to("helix", &forwarded)
         }
-        Noun::Locus { args } => route::to("locus", args),
         #[cfg(feature = "internal")]
         Noun::X { noun } => x::run(noun, cli.json, paint),
     }

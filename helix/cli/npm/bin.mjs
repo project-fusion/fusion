@@ -145,8 +145,23 @@ const onPath = () => {
   return undefined
 }
 
+/**
+ * What `helix visual` needs to start its capture driver: the runtime that ran
+ * this shim, and the driver beside it. Set only where the caller has not set
+ * them, so `HELIX_VISUAL_RUNTIME=node bun run helix visual test` still means
+ * node.
+ */
+const DRIVER_ENV = {
+  ...process.env,
+  HELIX_VISUAL_DRIVER: process.env.HELIX_VISUAL_DRIVER ?? join(HERE, 'visual', 'driver.mjs'),
+  HELIX_VISUAL_RUNTIME: process.env.HELIX_VISUAL_RUNTIME ?? process.execPath,
+}
+
 const run = (binary) => {
-  const { status, error } = spawnSync(binary, process.argv.slice(2), { stdio: 'inherit' })
+  const { status, error } = spawnSync(binary, process.argv.slice(2), {
+    env: DRIVER_ENV,
+    stdio: 'inherit',
+  })
   /* A status means it ran. Bun sets `error` on any exit but zero, to a
      `SystemError` reading "null", so asking `error` alone reported every failed
      check as a binary that would not start, and exited 70 for its 1. */

@@ -930,6 +930,7 @@ version = "0.0.0-dev"
 dependencies = [
  "clap",
  "fusion-helix-theme",
+ "fusion-helix-visual",
  "fusion-plugins",
  "fusion-rules",
  "oxc_allocator",
@@ -937,6 +938,7 @@ dependencies = [
  "oxc_ast_visit",
  "oxc_parser",
  "oxc_span",
+ "png",
  "ratatui",
  "regex",
  "serde",
@@ -954,7 +956,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "fusion-locus-cli"
+name = "fusion-helix-visual"
 version = "0.0.0-dev"
 dependencies = [
  "base64",

@@ -1,6 +1,6 @@
 {
   "name": "@fusion.dev/helix-cli",
-  "description": "The Helix command line, for a workspace that reaches it through npm.",
+  "description": "The Helix command line, for a workspace that reaches it through npm, and the visual tests it runs.",
   "version": "0.187.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
@@ -10,8 +10,17 @@
     "url": "git+https://github.com/project-fusion/fusion.git"
   },
   "type": "module",
+  "exports": {
+    "./bin.mjs": "./bin.mjs",
+    "./package.json": "./package.json",
+    "./visual": {
+      "types": "./visual/index.d.ts",
+      "default": "./visual/index.mjs"
+    }
+  },
   "files": [
-    "bin.mjs"
+    "bin.mjs",
+    "visual"
   ],
   "bin": {
     "helix": "./bin.mjs"
@@ -26,7 +35,10 @@
     "cli",
     "design-system",
     "scaffold",
-    "theme"
+    "theme",
+    "playwright",
+    "screenshot",
+    "visual-regression"
   ],
   "optionalDependencies": {
     "@fusion.dev/helix-cli-darwin-arm64": "workspace:*",
@@ -34,6 +46,14 @@
     "@fusion.dev/helix-cli-linux-arm64": "workspace:*",
     "@fusion.dev/helix-cli-linux-x64": "workspace:*",
     "@fusion.dev/helix-cli-win32-x64": "workspace:*"
+  },
+  "peerDependencies": {
+    "playwright": ">=1.50"
+  },
+  "peerDependenciesMeta": {
+    "playwright": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "restricted"
