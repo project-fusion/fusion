@@ -24,7 +24,7 @@ use fusion_rules::error::{Failure, Outcome};
 use fusion_rules::exit::Code;
 use serde_json::{json, Value};
 
-use crate::config::{Config, Diff, Exception, Mode, Network, Platform, Shot, Source};
+use crate::config::{Config, Diff, Exception, Mode, Network, Platform, Shot, Source, CHECKS};
 use crate::diff;
 use crate::discover::Entry;
 use crate::driver::Driver;
@@ -222,8 +222,17 @@ pub(crate) fn exception_for<'a>(
     shot: &Shot,
 ) -> Option<&'a Exception> {
     exceptions.iter().find(|one| {
-        (one.entry == entry.id || one.entry == entry.name)
+        one.checks.is_empty()
+            && (one.entry == entry.id || one.entry == entry.name)
             && one.shot.as_ref().is_none_or(|name| *name == shot.name)
+    })
+}
+
+/// The exception that excuses this entry from the check by this name.
+fn excused<'a>(exceptions: &'a [Exception], entry: &Entry, check: &str) -> Option<&'a Exception> {
+    exceptions.iter().find(|one| {
+        (one.entry == entry.id || one.entry == entry.name)
+            && one.checks.iter().any(|name| name == check)
     })
 }
 
@@ -264,10 +273,16 @@ pub(crate) fn shot_request(config: &Config, entry: &Entry, shot: &Shot) -> Value
 /// snapshotted on; a second take only pictures.
 fn item(config: &Config, entry: &Entry, shots: &[&Shot], first: bool) -> Outcome<Value> {
     let source = &config.sources[entry.source];
-    let code = config.checks.code.resolved().filter(|_| first);
+    let checks = &config.checks;
+    let on = |value: Option<Value>| value.filter(|_| first);
     let mut out = json!({
         "aria": first && config.aria.kept(),
-        "checks": { "code": code.map(|check| json!({ "minimum": check.minimum, "selector": check.selector })) },
+        "checks": {
+            "clipped": on(checks.clipped.resolved().map(|check| json!(check))),
+            "code": on(checks.code.resolved().map(|check| json!({ "minimum": check.minimum, "selector": check.selector }))),
+            "contrast": on(checks.contrast.resolved().map(|check| json!(check))),
+            "overlap": on(checks.overlap.resolved().map(|check| json!(check))),
+        },
         "entry": { "file": entry.file, "id": entry.id, "name": entry.name, "source": source.name(), "url": entry.url },
         "inspect": first && config.inspect,
         "key": entry.id,
@@ -314,8 +329,9 @@ pub(crate) struct Captured {
     pub(crate) broken: BTreeMap<usize, String>,
     /// Console errors each page logged, for a pair's sides.
     pub(crate) errors: BTreeMap<usize, Vec<String>>,
-    /// What the config's page checks found on each page.
-    pub(crate) findings: BTreeMap<usize, Vec<String>>,
+    /// What the config's page checks found on each page, each as the
+    /// check's name and its sentence.
+    pub(crate) findings: BTreeMap<usize, Vec<(String, String)>>,
     pub(crate) pictures: BTreeMap<(usize, usize), Vec<u8>>,
     /// What a pairs source's `check` found on each page.
     pub(crate) problems: BTreeMap<usize, Vec<String>>,
@@ -391,7 +407,20 @@ pub(crate) fn capture(
                 };
                 captured.errors.insert(entry, strings("errors"));
                 captured.problems.insert(entry, strings("problems"));
-                captured.findings.insert(entry, strings("findings"));
+                let found = line["findings"]
+                    .as_array()
+                    .map(|all| {
+                        all.iter()
+                            .filter_map(|one| {
+                                Some((
+                                    one["check"].as_str()?.to_string(),
+                                    one["text"].as_str()?.to_string(),
+                                ))
+                            })
+                            .collect()
+                    })
+                    .unwrap_or_default();
+                captured.findings.insert(entry, found);
                 if let Some(snapshot) = line["aria"].as_str() {
                     captured.aria.insert(entry, snapshot.to_string());
                 }
@@ -816,18 +845,32 @@ pub fn run(options: &Options) -> Outcome<Code> {
             results.insert((at, aria), fate);
         }
     }
-    let findings: Vec<String> = mine
-        .iter()
-        .enumerate()
-        .flat_map(|(at, entry)| {
-            first
-                .findings
-                .get(&at)
-                .into_iter()
-                .flatten()
-                .map(move |finding| format!("{}: {finding}", entry.id))
-        })
-        .collect();
+    /* A finding an exception excuses is left out. An excuse whose check
+    found nothing on a page that was read is spent, and says so. */
+    let mut findings: Vec<String> = Vec::new();
+    for (at, entry) in mine.iter().enumerate() {
+        let Some(found) = first.findings.get(&at) else {
+            continue;
+        };
+        for (check, text) in found {
+            if excused(&config.exceptions, entry, check).is_none() {
+                findings.push(format!("{}: {text}", entry.id));
+            }
+        }
+        if first.broken.contains_key(&at) {
+            continue;
+        }
+        for check in CHECKS {
+            if excused(&config.exceptions, entry, check).is_some()
+                && !found.iter().any(|(name, _)| name == check)
+            {
+                findings.push(format!(
+                    "{}: the exception excusing it from `{check}` is spent, since the check found nothing on it. Remove it from the config.",
+                    entry.id
+                ));
+            }
+        }
+    }
 
     if !again.is_empty() {
         let mut items = Vec::new();
@@ -1207,6 +1250,7 @@ mod tests {
 
     fn exception(pixels: Option<usize>) -> Exception {
         Exception {
+            checks: Vec::new(),
             differs: false,
             entry: "a".to_string(),
             measured: Some("3 pixels on 4 runs".to_string()),

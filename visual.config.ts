@@ -77,6 +77,11 @@ export default defineConfig({
   /* Each example's accessibility tree beside its pictures, so a lost name or
      role fails where no pixel moved. */
   aria: true,
+  /* Text a box cuts off, and text or controls that collide in the flow, on
+     each example as it was pictured. Contrast runs in its own job, which
+     renders each example in the sandbox frame and reports the modeled pairs
+     no example paints. */
+  checks: { clipped: true, overlap: true },
   inspect: {
     /* The CI sink over every example this shard pictured: the file the
        `telemetry` job sends, and the summary here. A dead part, a dead hook,

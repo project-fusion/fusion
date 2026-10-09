@@ -266,6 +266,11 @@ export interface Inspect<Result = unknown> {
 
 /** One exception to the comparison, with the reason it exists. */
 export interface Exception {
+  /**
+   * Page checks whose findings on this entry are excused, by name: `clipped`, `code`, `contrast` or
+   * `overlap`. Each fails the run once its check finds nothing on the entry.
+   */
+  checks?: Array<'clipped' | 'code' | 'contrast' | 'overlap'>
   /** A known difference between a pair's two sides, tolerated however large. It fails the run once the two match on two takes. */
   differs?: boolean
   /** An entry's id, `styled/aura`, or its name in every source, `aura`. */
@@ -299,6 +304,34 @@ export interface Config {
      * `minimum`, 20 when not given, for the fewest characters a block holds before it is judged.
      */
     code?: boolean | { minimum?: number; selector?: string }
+    /**
+     * A box under `overflow: hidden` or `clip` that cuts off its own text, where no `text-overflow` or line
+     * clamp says it means to. Only words that cross the box's edge count, so slides scrolled wholly out of
+     * view do not. `ignore` names elements the check leaves alone, with everything inside them.
+     */
+    clipped?: boolean | { ignore?: string[] }
+    /**
+     * Each ink against the ground it is painted on, in every color scheme the shots picture, against WCAG
+     * 2.1 AA: `target`, 4.5, for text, and `component`, 3, for icons and for text from `large` pixels, 24, or
+     * from `largeBold` when bold, 18.66. A ground behind a picture, a video or a background image is not one
+     * color, and is not judged. `rules` are colors that draw a line that separates, held to no target.
+     */
+    contrast?:
+      | boolean
+      | {
+          component?: number
+          ignore?: string[]
+          large?: number
+          largeBold?: number
+          rules?: string[]
+          target?: number
+        }
+    /**
+     * Two boxes of text or controls that draw over each other in the flow. A box positioned absolutely,
+     * fixed or sticky, given a `z-index`, transformed, floated or in the top layer is placed on purpose, and
+     * leaves the pair alone.
+     */
+    overlap?: boolean | { ignore?: string[] }
   }
   /** How a shot is compared with its baseline, unless its source sets its own. */
   diff?: Diff

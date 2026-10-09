@@ -116,6 +116,21 @@ export default defineConfig({
   one color, as a highlighter that failed leaves it. It reads the page after
   the first shot and needs no baseline. `selector` names your code blocks and
   `minimum` the fewest characters a block holds before it is judged.
+- **`checks.clipped`**: fails a run on a box under `overflow: hidden` that cuts
+  off its own text, where no `text-overflow` or line clamp says it means to.
+  Only words that cross the edge count, so a carousel's slides out of view do
+  not.
+- **`checks.overlap`**: fails a run on two boxes of text or controls that draw
+  over each other in the flow. A box positioned absolutely, fixed or sticky,
+  given a `z-index`, transformed, floated or in the top layer is placed on
+  purpose, and leaves the pair alone.
+- **`checks.contrast`**: fails a run on an ink below WCAG 2.1 AA against the
+  ground it is painted on, in each color scheme the shots picture. The ground
+  is composited through every translucent layer, and a ground that is a
+  picture or a video is not judged. `rules` names the colors of lines that
+  separate, which answer to no target.
+- Each check takes `ignore`, selectors it leaves alone with everything inside
+  them, and an exception's `checks` excuses one entry from the checks it names.
 - **`diff`**: how a shot is compared, for the whole config or for one source.
   `mode: 'pixel'` counts the pixels past `threshold`, 0.1 unless you set it,
   and fails above `pixels`, 0 unless you set it. `mode: 'perceptual'` scores
@@ -126,6 +141,8 @@ export default defineConfig({
   shot differ by that many, and the run fails once the shot stops differing, so
   an exception that is no longer needed is removed. `differs: true` tolerates a
   known difference between a pair's two sides, and fails once they match.
+  `checks` excuses the entry from the page checks it names, and fails once a
+  named check finds nothing there.
 - **`inspect`**: `run` is called with the Playwright page after each entry's
   first shot, and `report` once at the end with everything `run` returned.
   `report` returns `{ failed: true }` to fail the run.

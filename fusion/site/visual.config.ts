@@ -35,7 +35,15 @@ export default defineConfig({
      `span`, and the sandbox's editor draws its lines in `.cm-content`. The home
      page's install block is two lines of plain text by design, so it holds no
      `span` and is not judged. */
-  checks: { code: { selector: 'helix-code-block:has(> span), .cm-content' } },
+  checks: {
+    clipped: true,
+    code: { selector: 'helix-code-block:has(> span), .cm-content' },
+    /* Every ink on every page in light and dark, which nothing measured on
+       the site before. `color-border` draws lines that separate, and answers
+       to no target. */
+    contrast: { rules: ['var(--helix-color-border)'] },
+    overlap: true,
+  },
   /* The footer's Helix version, which every release changes on every page.
      Painted over, and held at one width while each picture is taken, because
      the tag's width follows its digits: 0.186.0 and 0.187.0 masked boxes
