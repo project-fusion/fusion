@@ -55,6 +55,11 @@
   "peerDependencies": {
     "three": ">=0.160.0 <0.200.0"
   },
+  "peerDependenciesMeta": {
+    "three": {
+      "optional": true
+    }
+  },
   "publishConfig": {
     "access": "restricted"
   }
