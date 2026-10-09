@@ -26,12 +26,12 @@
   // The typings come in by path, since `analyze` writes them here; the site
   // already takes the same file as `@fusion.dev/helix/jsx`. `example-sheets.d.ts`
   // is the `*.css` an example imports for its side effect, and says why it
-  // lives under `src`.
+  // sits beside this file.
   "compilerOptions": {
     "jsx": "preserve",
     "noEmit": true
   },
   "exclude": [],
   "extends": "./tsconfig.json",
-  "include": ["src/*/.examples/**/*.tsx", "src/example-sheets.d.ts", "types/jsx.d.ts"]
+  "include": ["src/*/.examples/**/*.tsx", "example-sheets.d.ts", "types/jsx.d.ts"]
 }

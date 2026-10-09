@@ -26,7 +26,7 @@ beforeAll(async () => {
       'legend',
       'graph',
       'map',
-    ].map((family) => import(`./${family}/index.js`)),
+    ].map((family) => import(`../${family}/index.js`)),
   )
 })
 

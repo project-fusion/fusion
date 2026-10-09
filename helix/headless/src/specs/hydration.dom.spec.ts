@@ -53,7 +53,7 @@ beforeAll(async () => {
      before this file runs silently shrinks the list to a floor count, which
      names nothing about the cause. `definedTags` reads what the generated
      registration left and gives the same answer whoever imported first. */
-  await import('./index.js')
+  await import('../index.js')
   const { definedTags } = await import('@fusion.dev/helix-core')
   definitions = definedTags().flatMap((tag) => {
     const ctor = customElements.get(tag)

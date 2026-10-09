@@ -9,9 +9,10 @@
  *
  * **The wildcard cannot be narrowed, so the scope is which projects see the
  * file.** `declare module './*.css'` is refused outright, TS2436, and a bare
- * `*.css` is the only form the language offers. Under `src` it is in the
- * sources project, where the specs are, and `tsconfig.examples.json` names it
- * for the examples. Not in `types/`, which `files` publishes: a
+ * `*.css` is the only form the language offers. `tsconfig.json` names it for
+ * the sources project, where the specs are, and `tsconfig.examples.json` for
+ * the examples. It sits beside them rather than under `src`, which holds the
+ * families. Not in `types/`, which `files` publishes: a
  * `declare module '*.css'` in a consumer's `node_modules` would satisfy their
  * own stylesheet imports and mask a missing declaration of their own. Verified
  * against a packed tarball, which is how the first attempt at this, in

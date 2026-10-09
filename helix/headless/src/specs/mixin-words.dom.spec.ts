@@ -25,16 +25,16 @@ beforeAll(async () => {
   /* The families this exercises, not the barrel: see `native-events.dom.spec.ts`
      for why importing the barrel here would empty `hydration.dom.spec.ts`. */
   await Promise.all([
-    import('./callout/index.js'),
-    import('./checkbox/index.js'),
-    import('./date-input/index.js'),
-    import('./filter-input/index.js'),
-    import('./line-chart/index.js'),
-    import('./option/index.js'),
-    import('./select/index.js'),
-    import('./switch/index.js'),
-    import('./tag/index.js'),
-    import('./tree/index.js'),
+    import('../callout/index.js'),
+    import('../checkbox/index.js'),
+    import('../date-input/index.js'),
+    import('../filter-input/index.js'),
+    import('../line-chart/index.js'),
+    import('../option/index.js'),
+    import('../select/index.js'),
+    import('../switch/index.js'),
+    import('../tag/index.js'),
+    import('../tree/index.js'),
   ])
 })
 

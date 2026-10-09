@@ -1,5 +1,5 @@
 {
   "exclude": ["src/*/.examples/**"],
   "extends": "../../tsconfig.package.json",
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "example-sheets.d.ts"]
 }

@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import { rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
-import './input/index.js'
-import './select/index.js'
+import '../input/index.js'
+import '../select/index.js'
 
 /**
  * A field a server renders already failing is sent failing.

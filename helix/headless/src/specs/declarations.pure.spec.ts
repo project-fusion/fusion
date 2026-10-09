@@ -7,16 +7,19 @@ import { join, relative } from 'node:path'
    JSDoc, so an event or a slot that is only in the code is missing from every
    one of them, with the element working. */
 
+/** The tier's source, which this file sits one folder inside. */
+const SOURCE = join(import.meta.dir, '..')
+
 /** Every module of this tier's source, as a path relative to it. */
 const modules = (): string[] =>
-  readdirSync(import.meta.dir, { recursive: true, withFileTypes: true })
+  readdirSync(SOURCE, { recursive: true, withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith('.ts'))
     .filter((entry) => !entry.name.includes('.spec.') && !entry.name.endsWith('.css.ts'))
-    .map((entry) => relative(import.meta.dir, join(entry.parentPath, entry.name)))
+    .map((entry) => relative(SOURCE, join(entry.parentPath, entry.name)))
     .filter((path) => !path.startsWith('.') && !path.includes('/.examples/'))
     .sort()
 
-const read = (path: string): string => readFileSync(join(import.meta.dir, path), 'utf8')
+const read = (path: string): string => readFileSync(join(SOURCE, path), 'utf8')
 
 describe('the toggle event', () => {
   /** The modules whose element opens and closes through `MixinControllerOpen`. */
