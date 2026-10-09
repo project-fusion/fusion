@@ -134,7 +134,7 @@ const SERIES = 24
  * @csspart loading - The words while `loading` is set and there are no readings.
  * @csspart mark - The invisible point the tooltip is anchored to, where the renderer draws the reading.
  * @csspart plot - The box the drawing fills, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
- * @csspart ring - The outline around the block the pointer or the keys rest on, drawn over the blocks.
+ * @csspart ring - The outline around the block the pointer or the keys rest on, painted after it, so the blocks in front of it cover it.
  * @csspart summary - The number of items and groups and the range of their sizes, written as a sentence for screen readers, which describes the plot. Hide it visually.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
  * @csspart tick - A height at a tick, along its edge of the box, in the chart's own drawing.
@@ -451,11 +451,15 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
-      >${this.noBox ? nothing : drawBox(view)}${paintOrder(view.projection, blocks).map((block) =>
-        this.renderBlock(field, block, at),
+      >${this.noBox ? nothing : drawBox(view)}${paintOrder(view.projection, blocks).map(
+        (block) =>
+          /* The ring straight after its block, so the blocks in front cover
+             it as they cover the block: drawn over them all, it traced their
+             faces and read as theirs. */
+          svg`${this.renderBlock(field, block, at)}${block === active ? svg`<path d=${active.drawn.outline} part="ring"></path>` : nothing}`,
       )}${
         active
-          ? svg`<path d=${active.drawn.outline} part="ring"></path><foreignObject height="0.001" overflow="visible" width="0.001" x=${active.drawn.peak.x} y=${active.drawn.peak.y}>${this.renderOwnTooltip(field.blocks[at]?.row)}</foreignObject>`
+          ? svg`<foreignObject height="0.001" overflow="visible" width="0.001" x=${active.drawn.peak.x} y=${active.drawn.peak.y}>${this.renderOwnTooltip(field.blocks[at]?.row)}</foreignObject>`
           : nothing
       }</svg>
     </div>`
