@@ -137,12 +137,27 @@ describe('a long layout', () => {
   test('past five seconds, the frame offers a button that stops it', async () => {
     const host = await frame()
     let stopped = 0
-    ;(host as Frame & { settling(stop?: () => void): void }).settling(() => {
-      stopped += 1
-    })
+    /* The five seconds are caught and run at once, since a browser spec has
+       two seconds to finish. */
+    const wait = globalThis.setTimeout
+    let fiveSeconds: (() => void) | undefined
+    globalThis.setTimeout = ((run: () => void, delay?: number) => {
+      if (delay === 5000) {
+        fiveSeconds = run
+        return 0
+      }
+      return wait(run, delay)
+    }) as typeof setTimeout
+    try {
+      ;(host as Frame & { settling(stop?: () => void): void }).settling(() => {
+        stopped += 1
+      })
+    } finally {
+      globalThis.setTimeout = wait
+    }
     await host.updateComplete
     expect(part(host, 'stop-layout')).toBeNull()
-    await new Promise((done) => setTimeout(done, 5100))
+    fiveSeconds?.()
     await host.updateComplete
     const button = part(host, 'stop-layout') as HTMLButtonElement
     expect(button.textContent?.trim()).toBe('Stop the layout')
@@ -151,7 +166,7 @@ describe('a long layout', () => {
     expect(stopped).toBe(1)
     expect(part(host, 'stop-layout')).toBeNull()
     expect(hasState(host, 'settling')).toBe(false)
-  }, 8000)
+  })
 })
 
 describe('connectGraph', () => {
