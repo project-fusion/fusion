@@ -143,6 +143,20 @@ Chromium on an Apple silicon Mac:
 A slower machine reaches these sizes sooner. three.js draws each chart on the
 graphics card.
 
+## Read a place off the floor
+
+Two options draw onto the floor of the box, to help you read where a reading
+stands:
+
+- `drop-lines` on `Spatial Scatter Chart` draws a line from each point straight
+  down to the floor, in its group's color, so where a point stands across and in
+  depth reads off the floor's grid.
+- `contours` on `Spatial Surface Chart` draws the surface's contour lines on the
+  floor at each tick of its height, in the ramp's colors, so its shape reads from
+  above as on a map.
+
+three.js draws both as well.
+
 ## Draw a chart for a landing page
 
 `no-box` draws `Spatial Bar Chart`, `Spatial Scatter Chart`, or `Spatial Surface

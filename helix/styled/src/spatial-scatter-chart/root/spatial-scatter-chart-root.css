@@ -71,6 +71,15 @@
   font-weight: var(--helix-weight-semibold);
 }
 
+/* A point's line down to the floor, in its group's color, quiet beside the
+   point it stands under. */
+[part="drop-line"] {
+  opacity: 0.45;
+  stroke: var(--chart-series, var(--helix-color-primary));
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
 /* A point in its group's color, edged in the plot's ground so a point in
    front reads apart from one behind it. */
 [part~="point"] {
@@ -166,6 +175,10 @@ foreignObject > [part="mark"] {
 @media (forced-colors: active) {
   [part~="point"] {
     forced-color-adjust: none;
+    stroke: CanvasText;
+  }
+
+  [part="drop-line"] {
     stroke: CanvasText;
   }
 

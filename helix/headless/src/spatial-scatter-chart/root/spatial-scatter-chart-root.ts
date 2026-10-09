@@ -13,6 +13,7 @@ import {
   isRtl,
   MixinChartSource,
   MixinChartStatus,
+  shortNumber,
   spokenReading,
   words,
 } from '@fusion.dev/helix-core'
@@ -111,6 +112,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  *
  * @csspart axis-name - A measure's name, along its edge of the box, in the chart's own drawing.
  * @csspart drawing - The chart's own drawing in SVG: the box, its grid and numbers, and the points.
+ * @csspart drop-line - The line from a point straight down to the floor of the box, drawn under `drop-lines`, in its group's color.
  * @csspart empty - The words when the table has no points: the `empty` slot, falling back to `empty-text`.
  * @csspart fallback - The box the chart's own drawing fills, shown until a renderer has drawn and where none is connected. Hidden from screen readers.
  * @csspart grid - The box's edges and its grid at the ticks, in the chart's own drawing.
@@ -155,6 +157,14 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
    * `registerWords('de', { 'helix-spatial-scatter-chart': { emptyText: 'Keine Punkte' } })`.
    */
   static words = 'helix-spatial-scatter-chart'
+
+  /**
+   * Draws a line from each point straight down to the floor of the box, in
+   * its group's color, so where a point stands across and in depth reads off
+   * the floor's grid. A renderer draws them too.
+   */
+  @property({ attribute: 'drop-lines', reflect: true, type: Boolean })
+  dropLines = false
 
   /** The column of text that puts each point in a group, by its heading. None by default. */
   @property({ attribute: 'group-by' })
@@ -423,7 +433,13 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
         inBox(field.axes.y, point.y),
         inBox(field.axes.z, point.z),
       ]
-      return { depth: view.depth(box), index, point, ...view.on(box) }
+      return {
+        depth: view.depth(box),
+        foot: view.on([box[0], -1, box[2]]),
+        index,
+        point,
+        ...view.on(box),
+      }
     })
     this.placed = places
     const painted = [...places].sort((one, other) => one.depth - other.depth)
@@ -446,7 +462,7 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
         @pointerup=${this.onDrawingTap}
       >${this.noBox ? nothing : drawBox(view)}${painted.map(
         (place) =>
-          svg`<circle cx=${place.x} cy=${place.y} part="point${place.index === at ? ' point-active' : ''}" r="0.045" style="--chart-series: var(--chart-series-${(place.point.groupIndex % SERIES) + 1})"></circle>`,
+          svg`${this.dropLines ? svg`<path d="M${shortNumber(place.x)} ${shortNumber(place.y)}L${shortNumber(place.foot.x)} ${shortNumber(place.foot.y)}" part="drop-line" style="--chart-series: var(--chart-series-${(place.point.groupIndex % SERIES) + 1})"></path>` : nothing}<circle cx=${place.x} cy=${place.y} part="point${place.index === at ? ' point-active' : ''}" r="0.045" style="--chart-series: var(--chart-series-${(place.point.groupIndex % SERIES) + 1})"></circle>`,
       )}${
         active
           ? svg`<circle cx=${active.x} cy=${active.y} part="ring" r="0.085"></circle><foreignObject height="0.001" overflow="visible" width="0.001" x=${active.x} y=${active.y}>${this.renderOwnTooltip(active.point.row)}</foreignObject>`

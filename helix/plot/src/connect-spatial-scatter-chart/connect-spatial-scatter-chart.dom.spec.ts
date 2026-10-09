@@ -94,7 +94,13 @@ describe('connectSpatialScatterChart', () => {
     const { driver, told } = recording()
     connectSpatialScatterChart(element, driver)
     await settle(element)
-    expect(told.colors?.look).toEqual({ box: true, emphasis: 'solid', through: 1 })
+    expect(told.colors?.look).toEqual({
+      box: true,
+      contours: false,
+      drops: false,
+      emphasis: 'solid',
+      through: 1,
+    })
     const drawn = told.drawn.length
     element.setAttribute('emphasis', 'outlined')
     element.setAttribute('material', 'glass')

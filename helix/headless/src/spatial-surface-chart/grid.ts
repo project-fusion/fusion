@@ -40,6 +40,8 @@ export interface SurfaceField {
   /** The lowest and the highest reading, which every level is measured between. */
   lowest: number
   highest: number
+  /** The contour lines at each tick of the height inside the readings, which `contours` draws on the floor. */
+  contours: Contour[]
 }
 
 /**
@@ -79,7 +81,7 @@ export const surfaceOf = (rows: readonly FieldRow[], columns: readonly number[])
     const range: [number, number] = exact && low < high ? [low, high] : niceRange(low, high)
     return { name: nameOf(column), range, ticks: ticks(range) }
   }
-  return {
+  const field: SurfaceField = {
     acrosses,
     axes: {
       x: axis(xAt, acrosses, true),
@@ -91,11 +93,16 @@ export const surfaceOf = (rows: readonly FieldRow[], columns: readonly number[])
       z: axis(zAt, depths, true),
     },
     cells,
+    contours: [],
     depths,
     highest: read.length > 0 ? Math.max(...read.map((one) => one.value)) : 0,
     lowest: read.length > 0 ? Math.min(...read.map((one) => one.value)) : 0,
     readings: read.length,
   }
+  /* Found once with the grid, so a renderer and the chart's own drawing draw
+     the same lines. */
+  field.contours = contoursOf(field, contourLevels(field))
+  return field
 }
 
 /** How high a cell stands between the lowest and the highest reading, from 0 to 1, or undefined where it has none. */
@@ -109,3 +116,91 @@ export const levelOf = (field: SurfaceField, cell: SurfaceCell): number | undefi
   const { highest: high, lowest: low } = field
   return high === low ? 0.5 : (cell.value - low) / (high - low)
 }
+
+/** A contour line's pieces at one height: each a straight segment from one place on the floor to another, in the table's own numbers. */
+export interface Contour {
+  /** The height the line runs at. */
+  level: number
+  /** Each segment as two places, across and in depth. */
+  segments: Array<[[number, number], [number, number]]>
+}
+
+/**
+ * The surface's contour lines at `levels`, by marching squares: in each
+ * square of the grid whose four readings are all there, a line crosses each
+ * edge whose two ends stand either side of the level, at the place along it
+ * the level falls. A square whose diagonal corners stand on the same side
+ * is read by the middle of the square, the average of its four corners, so
+ * the two lines through it never cross.
+ */
+export const contoursOf = (field: SurfaceField, levels: readonly number[]): Contour[] => {
+  const depths = field.depths.length
+  const value = (across: number, depth: number): number | undefined =>
+    field.cells[across * depths + depth]?.value
+  return levels.map((level) => {
+    const segments: Contour['segments'] = []
+    for (let across = 0; across + 1 < field.acrosses.length; across++) {
+      for (let depth = 0; depth + 1 < depths; depth++) {
+        const corners = [
+          [across, depth],
+          [across + 1, depth],
+          [across + 1, depth + 1],
+          [across, depth + 1],
+        ] as const
+        const values = corners.map(([a, d]) => value(a, d))
+        if (values.some((one) => one === undefined)) {
+          continue
+        }
+        const [v0, v1, v2, v3] = values as [number, number, number, number]
+        const place = (from: number, to: number): [number, number] => {
+          const [a, b] = [
+            corners[from] as readonly [number, number],
+            corners[to] as readonly [number, number],
+          ]
+          const [va, vb] = [values[from] as number, values[to] as number]
+          const t = vb === va ? 0.5 : (level - va) / (vb - va)
+          const at = (i: number, j: number): number =>
+            (field.acrosses[i] as number) +
+            ((field.acrosses[j] as number) - (field.acrosses[i] as number)) * t
+          const deep = (i: number, j: number): number =>
+            (field.depths[i] as number) +
+            ((field.depths[j] as number) - (field.depths[i] as number)) * t
+          return [at(a[0], b[0]), deep(a[1], b[1])]
+        }
+        /* The four edges, round the square: its bottom, right, top, and left. */
+        const edges: Array<[number, number]> = [
+          [0, 1],
+          [1, 2],
+          [3, 2],
+          [0, 3],
+        ]
+        const crossed = edges
+          .filter(
+            ([from, to]) => (values[from] as number) >= level !== (values[to] as number) >= level,
+          )
+          .map(([from, to]) => place(from, to))
+        if (crossed.length === 2) {
+          segments.push([crossed[0] as [number, number], crossed[1] as [number, number]])
+        } else if (crossed.length === 4) {
+          const [bottom, right, top, left] = crossed as [
+            [number, number],
+            [number, number],
+            [number, number],
+            [number, number],
+          ]
+          const middle = (v0 + v1 + v2 + v3) / 4 >= level
+          if (middle === v0 >= level) {
+            segments.push([bottom, right], [top, left])
+          } else {
+            segments.push([bottom, left], [right, top])
+          }
+        }
+      }
+    }
+    return { level, segments }
+  })
+}
+
+/** The levels a surface's contour lines run at: its height's ticks strictly between its lowest and highest reading. */
+export const contourLevels = (field: SurfaceField): number[] =>
+  field.axes.y.ticks.filter((tick) => tick > field.lowest && tick < field.highest)

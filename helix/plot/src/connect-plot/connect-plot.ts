@@ -54,8 +54,17 @@ export interface PlotColors {
    * through, 1 with no material, `glass` 0.62 and `frosted` 0.88, times the
    * theme's `--helix-material-opacity`. `box` is whether the box, its grid,
    * and its numbers and names are drawn, which the chart's `no-box` turns off.
+   * `contours` and `drops` are whether a surface's contour lines and a
+   * scatter's lines down to the floor are drawn, as its `contours` and
+   * `drop-lines` ask.
    */
-  look: { box: boolean; emphasis: 'outlined' | 'solid' | 'subtle'; through: number }
+  look: {
+    box: boolean
+    contours: boolean
+    drops: boolean
+    emphasis: 'outlined' | 'solid' | 'subtle'
+    through: number
+  }
   /** The page a faded fill moves toward: `background`. */
   page: string
   /** The ticks' numbers: `foreground-muted`. */
@@ -220,6 +229,8 @@ export const plotColorsFrom = (
     const scale = Number.isFinite(strength) ? strength : 1
     const look: PlotColors['look'] = {
       box: !chart.hasAttribute('no-box'),
+      contours: chart.hasAttribute('contours'),
+      drops: chart.hasAttribute('drop-lines'),
       emphasis: emphasis === 'outlined' || emphasis === 'subtle' ? emphasis : 'solid',
       through: material === 'glass' ? 0.62 * scale : material === 'frosted' ? 0.88 * scale : 1,
     }
@@ -335,15 +346,18 @@ export const connectPlot = <F extends object>(
   const stopTheme = watchTheme(frame, () => {
     draw()
   })
-  /* **Drawn again when the chart's `emphasis`, `material`, or `no-box`
-     changes**, which changes how it looks and nothing it publishes in `field`. */
+  /* **Drawn again when an attribute that changes how the chart looks
+     changes**, which changes nothing it publishes in `field`. */
   const looks =
     typeof MutationObserver === 'function'
       ? new MutationObserver(() => {
           draw()
         })
       : undefined
-  looks?.observe(frame, { attributeFilter: ['emphasis', 'material', 'no-box'], attributes: true })
+  looks?.observe(frame, {
+    attributeFilter: ['contours', 'drop-lines', 'emphasis', 'material', 'no-box'],
+    attributes: true,
+  })
 
   /* After the chart's first render, which is when it has read its table. */
   void Promise.resolve(chart.updateComplete).then(draw)

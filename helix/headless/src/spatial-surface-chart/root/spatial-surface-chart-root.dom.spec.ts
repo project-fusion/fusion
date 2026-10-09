@@ -100,6 +100,27 @@ describe('the frame', () => {
   })
 })
 
+describe('the contours', () => {
+  test('under contours, a line for each height inside the readings is drawn on the floor, under the surface', async () => {
+    const element = await plot()
+    expect(element.shadowRoot?.querySelectorAll('[part="contour"]')).toHaveLength(0)
+    element.setAttribute('contours', '')
+    await element.updateComplete
+    const contours = [...(element.shadowRoot?.querySelectorAll('[part="contour"]') ?? [])]
+    expect(contours.length).toBeGreaterThan(0)
+    for (const contour of contours) {
+      expect(contour.getAttribute('style')).toMatch(/--spatial-surface-chart-level: [\d.]+/)
+    }
+    /* Drawn before the faces, so the surface stands over them. */
+    const drawing = part(element, 'drawing') as Element
+    const first = [...drawing.children].findIndex((one) => one.getAttribute('part') === 'face')
+    const last = [...drawing.children].findLastIndex(
+      (one) => one.getAttribute('part') === 'contour',
+    )
+    expect(last).toBeLessThan(first)
+  })
+})
+
 describe('the keys', () => {
   test('the left and right arrows move across, and the down and up arrows in depth', async () => {
     const element = await plot()
