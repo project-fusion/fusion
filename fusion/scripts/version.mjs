@@ -245,21 +245,17 @@ if (flag('write')) {
     written.push(crate)
   }
 
-  /* **The domain's Claude Code plugin**, where it has one, at the same
-     number: a plugin installed from this repository says which release it
-     came with. */
-  const plugin = join(root, DOMAINS[domain], 'plugin/.claude-plugin/plugin.json')
-  if (existsSync(plugin)) {
-    const manifest = JSON.parse(readFileSync(plugin, 'utf8'))
-    manifest.version = version
-    writeFileSync(plugin, `${JSON.stringify(manifest, null, 2)}\n`)
-    written.push(`${DOMAINS[domain]}/plugin`)
-  }
-
   /* **The domain's agent plugin**, where it has one, at the same number in
      each manifest a harness reads: the portable `plugin.json`, Claude Code's,
      and Cursor's. A harness keeps a user on the version it cached until this
-     string changes. */
+     string changes.
+
+     **Only the version line changes**, the way `src/version.ts` is stamped.
+     `JSON.stringify` puts each array item on its own line, which biome accepts
+     in a `package.json` and refuses everywhere else, so the 0.194.0 stamp
+     wrote `keywords` in a shape `biome ci` fails. The stamp commit carries
+     `[skip ci]`, so biome first read these files in the pre-push hook of the
+     next push that changed them. */
   for (const manifest of [
     'plugin.json',
     '.claude-plugin/plugin.json',
@@ -269,9 +265,12 @@ if (flag('write')) {
     if (!existsSync(plugin)) {
       continue
     }
-    const parsed = JSON.parse(readFileSync(plugin, 'utf8'))
-    parsed.version = version
-    writeFileSync(plugin, `${JSON.stringify(parsed, null, 2)}\n`)
+    const source = readFileSync(plugin, 'utf8')
+    const stamped = source.replace(/^ {2}"version": "[^"]*"/m, `  "version": "${version}"`)
+    if (JSON.parse(stamped).version !== version) {
+      fail(`${plugin} has no top-level \`"version": "…"\` line to stamp.`)
+    }
+    writeFileSync(plugin, stamped)
     written.push(`${DOMAINS[domain]}/plugin/${manifest}`)
   }
 
