@@ -95,6 +95,9 @@ struct Read {
     /// Every Helix specifier a module or a page imports, the barrels as the
     /// package's name.
     imports: HashSet<String>,
+    /// Each `helix-` event a module listens for by name: the file, the line,
+    /// and the name.
+    listened: Vec<(String, usize, String)>,
 }
 
 impl Read {
@@ -119,6 +122,9 @@ impl Read {
         self.used.extend(css::reads(text).map(str::to_owned));
         if matches!(kind, Kind::Module { .. } | Kind::Template) {
             self.imports.extend(installed::imports(text));
+            for (line, name) in installed::listened(text) {
+                self.listened.push((relative.clone(), line, name));
+            }
         }
         match kind {
             Kind::Sheet { line_comments } => {
@@ -409,6 +415,7 @@ fn analyzed(
     for (path, rules, own) in &read.sheets {
         analyzer.sheet(path, rules, *own);
     }
+    analyzer.listened(&read.listened);
     analyzer.markup(
         read.templates
             .iter()

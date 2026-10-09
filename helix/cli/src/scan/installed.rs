@@ -116,9 +116,35 @@ pub fn imports(text: &str) -> impl Iterator<Item = String> + '_ {
     })
 }
 
+/// A listener added for a `helix-` event by name.
+static LISTENED: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"addEventListener\(\s*['"`](helix-[a-z0-9-]+)['"`]"#).expect("a literal pattern")
+});
+
+/// Each `helix-` event `text` listens for by name, with its line.
+pub fn listened(text: &str) -> impl Iterator<Item = (usize, String)> + '_ {
+    LISTENED.captures_iter(text).filter_map(move |found| {
+        let name = found.get(1)?;
+        let line = text[..name.start()].lines().count().max(1);
+        Some((line, name.as_str().to_owned()))
+    })
+}
+
 #[cfg(test)]
 mod tests {
-    use super::imports;
+    use super::{imports, listened};
+
+    #[test]
+    fn listeners_name_their_helix_events_and_lines() {
+        let text = "el.addEventListener('helix-change', f)\nwindow.addEventListener(\"resize\", g)\nb.addEventListener( `helix-before-open` , h)\n";
+        assert_eq!(
+            listened(text).collect::<Vec<_>>(),
+            [
+                (1, "helix-change".to_owned()),
+                (3, "helix-before-open".to_owned())
+            ]
+        );
+    }
 
     #[test]
     fn imports_read_specifiers_entries_and_cdn_paths() {
