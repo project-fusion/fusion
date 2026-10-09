@@ -1,0 +1,71 @@
+# The `locus` binary, on disk and named by `LOCUS_BIN`, in any job that runs
+# the visual check.
+#
+# **`check:spec:visual` runs Fusion Locus**, whose core is Rust, and the browser
+# jobs have no toolchain and should not need one. Without `LOCUS_BIN` the npm
+# shim builds the whole workspace with cargo before it runs anything, which is
+# minutes of every visual shard.
+#
+# **Restored from `actions/cache`, the way `.github/actions/helix` restores
+# `helix`**, and for its reason: a Dependabot pull request gets no secrets and
+# so no `TURBO_TOKEN`, and this cache reaches it anyway.
+#
+# **Keyed on what the binary is compiled from, and nothing else.** The crate,
+# `fusion-rules`, the lockfile and the toolchain. On a pull request that touches
+# none of them this is one restore and no Rust at all. `warm-browser` runs it
+# first, so the job that misses builds and saves it before any visual shard
+# starts, and `seed` builds it on `main` when it is missing there.
+#
+# **Built with optimizations and without link-time optimization**, as `helix`
+# is here: LTO is for the binaries we ship, and here it would only make a
+# rebuild slower.
+name: Put the locus binary on disk
+description: Restores the `locus` binary built from this tree, or builds and saves it, and points `LOCUS_BIN` at it.
+
+runs:
+  using: composite
+  steps:
+    - name: Restore the locus binary
+      id: restore
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        # `1.96` is the toolchain below, said again because a key cannot read a
+        # step's input.
+        key: locus-${{ runner.os }}-${{ runner.arch }}-1.96-release-${{ hashFiles('Cargo.lock', 'Cargo.toml', 'locus/cli/Cargo.toml', 'locus/cli/src/**', 'fusion/rules/Cargo.toml', 'fusion/rules/src/**') }}
+        path: target/ci/locus
+
+    - name: Install Rust
+      if: steps.restore.outputs.cache-hit != 'true'
+      uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
+      with:
+        toolchain: 1.96
+
+    - name: Restore the Cargo cache
+      if: steps.restore.outputs.cache-hit != 'true'
+      uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      with:
+        add-rust-environment-hash-key: false
+        prefix-key: v0-rust-1.96
+        shared-key: locus-release
+
+    - name: Build the locus binary
+      if: steps.restore.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        CARGO_PROFILE_RELEASE_LTO: 'false'
+      run: |
+        set -euo pipefail
+        cargo build -p fusion-locus-cli --locked --release
+        mkdir -p target/ci
+        cp target/release/locus target/ci/locus
+
+    - name: Save the locus binary
+      if: steps.restore.outputs.cache-hit != 'true'
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        key: ${{ steps.restore.outputs.cache-primary-key }}
+        path: target/ci/locus
+
+    - name: Point the shim at it
+      shell: bash
+      run: echo "LOCUS_BIN=$GITHUB_WORKSPACE/target/ci/locus" >> "$GITHUB_ENV"

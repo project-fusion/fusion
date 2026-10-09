@@ -1,0 +1,26 @@
+{
+  "name": "@fusion.dev/locus-darwin-x64",
+  "description": "The `locus` binary for macOS on Intel. Installed by `@fusion.dev/locus`, which runs it.",
+  "version": "0.0.0-dev",
+  "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
+  "repository": {
+    "directory": "locus/cli/platforms/darwin-x64",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "files": [
+    "locus"
+  ],
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "cpu": [
+    "x64"
+  ],
+  "homepage": "https://fusion.dev",
+  "os": [
+    "darwin"
+  ],
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

@@ -954,6 +954,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "fusion-locus-cli"
+version = "0.0.0-dev"
+dependencies = [
+ "base64",
+ "clap",
+ "fusion-rules",
+ "png",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "fusion-plugins"
 version = "0.0.0-dev"
 dependencies = [
@@ -963,18 +975,6 @@ dependencies = [
  "sha2 0.11.0",
  "wasmtime",
  "wit-component 0.260.0",
-]
-
-[[package]]
-name = "fusion-proof-cli"
-version = "0.0.0-dev"
-dependencies = [
- "base64",
- "clap",
- "fusion-rules",
- "png",
- "serde",
- "serde_json",
 ]
 
 [[package]]

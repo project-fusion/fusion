@@ -4,8 +4,8 @@
 #
 # `download-artifact` gives each artifact a directory of its own, named for it,
 # and the artifact is named for the domain and the platform: `helix-cli-linux-x64`
-# holds the binary for `helix/cli/platforms/linux-x64`, and `proof-cli-linux-x64`
-# the one for `proof/cli/platforms/linux-x64`. The binary is named for the
+# holds the binary for `helix/cli/platforms/linux-x64`, and `locus-cli-linux-x64`
+# the one for `locus/cli/platforms/linux-x64`. The binary is named for the
 # domain. The mode does not survive the upload, which is why the `chmod`;
 # `publish.mjs` refuses a binary that is not executable, and this is what stops
 # it getting that far.

@@ -356,38 +356,38 @@
         "@fusion.dev/scripts": "fusion/scripts",
       },
     },
-    "proof/cli/npm": {
-      "name": "@fusion.dev/proof",
+    "locus/cli/npm": {
+      "name": "@fusion.dev/locus",
       "version": "0.0.0-dev",
       "optionalDependencies": {
-        "@fusion.dev/proof-darwin-arm64": "proof/cli/platforms/darwin-arm64",
-        "@fusion.dev/proof-darwin-x64": "proof/cli/platforms/darwin-x64",
-        "@fusion.dev/proof-linux-arm64": "proof/cli/platforms/linux-arm64",
-        "@fusion.dev/proof-linux-x64": "proof/cli/platforms/linux-x64",
-        "@fusion.dev/proof-win32-x64": "proof/cli/platforms/win32-x64",
+        "@fusion.dev/locus-darwin-arm64": "locus/cli/platforms/darwin-arm64",
+        "@fusion.dev/locus-darwin-x64": "locus/cli/platforms/darwin-x64",
+        "@fusion.dev/locus-linux-arm64": "locus/cli/platforms/linux-arm64",
+        "@fusion.dev/locus-linux-x64": "locus/cli/platforms/linux-x64",
+        "@fusion.dev/locus-win32-x64": "locus/cli/platforms/win32-x64",
       },
       "peerDependencies": {
         "playwright": ">=1.50",
       },
     },
-    "proof/cli/platforms/darwin-arm64": {
-      "name": "@fusion.dev/proof-darwin-arm64",
+    "locus/cli/platforms/darwin-arm64": {
+      "name": "@fusion.dev/locus-darwin-arm64",
       "version": "0.0.0-dev",
     },
-    "proof/cli/platforms/darwin-x64": {
-      "name": "@fusion.dev/proof-darwin-x64",
+    "locus/cli/platforms/darwin-x64": {
+      "name": "@fusion.dev/locus-darwin-x64",
       "version": "0.0.0-dev",
     },
-    "proof/cli/platforms/linux-arm64": {
-      "name": "@fusion.dev/proof-linux-arm64",
+    "locus/cli/platforms/linux-arm64": {
+      "name": "@fusion.dev/locus-linux-arm64",
       "version": "0.0.0-dev",
     },
-    "proof/cli/platforms/linux-x64": {
-      "name": "@fusion.dev/proof-linux-x64",
+    "locus/cli/platforms/linux-x64": {
+      "name": "@fusion.dev/locus-linux-x64",
       "version": "0.0.0-dev",
     },
-    "proof/cli/platforms/win32-x64": {
-      "name": "@fusion.dev/proof-win32-x64",
+    "locus/cli/platforms/win32-x64": {
+      "name": "@fusion.dev/locus-win32-x64",
       "version": "0.0.0-dev",
     },
   },
@@ -499,19 +499,19 @@
 
     "@fusion.dev/insights": ["@fusion.dev/insights@workspace:fusion/docs/insights", { "devDependencies": { "@fusion.dev/scripts": "fusion/scripts" } }],
 
-    "@fusion.dev/proof": ["@fusion.dev/proof@workspace:proof/cli/npm", { "optionalDependencies": { "@fusion.dev/proof-darwin-arm64": "proof/cli/platforms/darwin-arm64", "@fusion.dev/proof-darwin-x64": "proof/cli/platforms/darwin-x64", "@fusion.dev/proof-linux-arm64": "proof/cli/platforms/linux-arm64", "@fusion.dev/proof-linux-x64": "proof/cli/platforms/linux-x64", "@fusion.dev/proof-win32-x64": "proof/cli/platforms/win32-x64" }, "peerDependencies": { "playwright": ">=1.50" }, "bin": { "proof": "./bin.mjs" } }],
+    "@fusion.dev/locus": ["@fusion.dev/locus@workspace:locus/cli/npm", { "optionalDependencies": { "@fusion.dev/locus-darwin-arm64": "locus/cli/platforms/darwin-arm64", "@fusion.dev/locus-darwin-x64": "locus/cli/platforms/darwin-x64", "@fusion.dev/locus-linux-arm64": "locus/cli/platforms/linux-arm64", "@fusion.dev/locus-linux-x64": "locus/cli/platforms/linux-x64", "@fusion.dev/locus-win32-x64": "locus/cli/platforms/win32-x64" }, "peerDependencies": { "playwright": ">=1.50" }, "bin": { "locus": "./bin.mjs" } }],
 
-    "@fusion.dev/proof-darwin-arm64": ["@fusion.dev/proof-darwin-arm64@workspace:proof/cli/platforms/darwin-arm64", {}],
+    "@fusion.dev/locus-darwin-arm64": ["@fusion.dev/locus-darwin-arm64@workspace:locus/cli/platforms/darwin-arm64", {}],
 
-    "@fusion.dev/proof-darwin-x64": ["@fusion.dev/proof-darwin-x64@workspace:proof/cli/platforms/darwin-x64", {}],
+    "@fusion.dev/locus-darwin-x64": ["@fusion.dev/locus-darwin-x64@workspace:locus/cli/platforms/darwin-x64", {}],
 
-    "@fusion.dev/proof-linux-arm64": ["@fusion.dev/proof-linux-arm64@workspace:proof/cli/platforms/linux-arm64", {}],
+    "@fusion.dev/locus-linux-arm64": ["@fusion.dev/locus-linux-arm64@workspace:locus/cli/platforms/linux-arm64", {}],
 
-    "@fusion.dev/proof-linux-x64": ["@fusion.dev/proof-linux-x64@workspace:proof/cli/platforms/linux-x64", {}],
+    "@fusion.dev/locus-linux-x64": ["@fusion.dev/locus-linux-x64@workspace:locus/cli/platforms/linux-x64", {}],
 
-    "@fusion.dev/proof-win32-x64": ["@fusion.dev/proof-win32-x64@workspace:proof/cli/platforms/win32-x64", {}],
+    "@fusion.dev/locus-win32-x64": ["@fusion.dev/locus-win32-x64@workspace:locus/cli/platforms/win32-x64", {}],
 
-    "@fusion.dev/scripts": ["@fusion.dev/scripts@workspace:fusion/scripts", { "devDependencies": { "@fusion.dev/helix-testing": "helix/testing", "lit": "^3.2.1", "pixelmatch": "^7.2.0", "playwright": "^1.63.0", "pngjs": "^7.0.0" }, "bin": { "build-element-events": "./build-element-events.mjs", "build-elements-css": "./build-elements-css.mjs", "build-metrics": "./build-metrics.mjs", "build-styles": "./build-styles.mjs" } }],
+    "@fusion.dev/scripts": ["@fusion.dev/scripts@workspace:fusion/scripts", { "devDependencies": { "@fusion.dev/helix-testing": "helix/testing", "lit": "^3.2.1", "pixelmatch": "^7.2.0", "playwright": "^1.63.0", "pngjs": "^7.0.0" }, "bin": { "build-element-events": "./build-element-events.mjs", "build-elements-css": "./build-elements-css.mjs", "build-metrics": "./build-metrics.mjs", "build-styles": "./build-styles.mjs", "split-tests": "./split-tests.mjs" } }],
 
     "@fusion.dev/site": ["@fusion.dev/site@workspace:fusion/site", { "dependencies": { "@cosmos.gl/graph": "^3.4.2", "@fusion.dev/helix": "helix/styled", "@fusion.dev/helix-docs": "helix/docs", "@fusion.dev/helix-gallery": "helix/gallery", "@fusion.dev/helix-graph": "helix/graph", "@fusion.dev/helix-map": "helix/map", "@fusion.dev/helix-sandbox": "helix/sandbox", "@fusion.dev/helix-styles": "helix/styles", "@fusion.dev/helix-theme": "helix/theme", "@fusion.dev/insights": "fusion/docs/insights", "@luma.gl/core": "~9.3.6", "@luma.gl/webgl": "~9.3.6", "d3-force-3d": "^3.0.6", "graphology": "^0.26.0", "graphology-layout-forceatlas2": "^0.10.1", "maplibre-gl": "^6.12.0", "next": "^16.3.8", "react": "^19.3.0", "react-dom": "^19.3.0", "sharp": "^0.35.3", "sigma": "^3.0.3", "three": "^0.186.1" }, "devDependencies": { "@fusion.dev/helix-testing": "helix/testing", "@fusion.dev/scripts": "fusion/scripts", "@mdx-js/mdx": "^3.1.1", "@types/react": "^19.3.0", "@types/react-dom": "^19.3.0", "meshoptimizer": "^1.3.0", "remark-frontmatter": "^5.0.0", "remark-gfm": "^4.0.1" } }],
 

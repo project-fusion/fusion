@@ -1,11 +1,11 @@
 # Chromium and the system packages it links against, restored when they can be.
 #
-# **Fusion Proof's browser install, with Fusion's two facts.** The version is
+# **Fusion Locus's browser install, with Fusion's two facts.** The version is
 # read off `bun.lock`, which every job has before it installs anything, and
 # Playwright runs through `bunx`, since no job here installs Node. The cache
 # keys are the ones `seed` in `verify.yml` looks up, so `main` keeps filling
 # the caches every pull request reads. The reasoning for each step is in
-# `proof/action/browser/action.yml`.
+# `locus/action/browser/action.yml`.
 name: Install Chromium
 description: Restores the Playwright browser for the version the lockfile holds, and its system packages for the runner image, and installs both.
 
@@ -22,7 +22,7 @@ runs:
         echo "version=$version" >> "$GITHUB_OUTPUT"
 
     - name: Install Chromium
-      uses: ./proof/action/browser
+      uses: ./locus/action/browser
       with:
         playwright: bunx playwright
         version: ${{ steps.version.outputs.version }}

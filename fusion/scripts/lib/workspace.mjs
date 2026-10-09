@@ -31,7 +31,7 @@ export const root = resolve(import.meta.dirname, '../../..')
  * prefix.
  */
 export const SCOPE = '@fusion.dev/'
-export const DOMAINS = { cortex: 'cortex', helix: 'helix', proof: 'proof' }
+export const DOMAINS = { cortex: 'cortex', helix: 'helix', locus: 'locus' }
 
 /**
  * What the design system prefixes its element names with.
