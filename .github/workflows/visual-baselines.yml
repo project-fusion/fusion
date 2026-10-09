@@ -32,6 +32,13 @@ concurrency:
 on:
   workflow_dispatch:
     inputs:
+      # Writes the element boxes into each matching baseline that has none, so a
+      # later change is traced to what it happened to and how far it moved.
+      # Only the chunk is added: the pixels and the rest of each file stay.
+      boxes:
+        default: false
+        description: Also write the element boxes into each matching baseline that has none
+        type: boolean
       family:
         description: A single entry to retake, an example family in both tiers or a site page, or blank for every one
         required: false
@@ -98,7 +105,7 @@ jobs:
       - name: Retake the baselines
         uses: ./helix/visual/action
         with:
-          args: ${{ inputs.suite == 'site' && '--config fusion/site/visual.config.ts' || '' }} ${{ inputs.family }}
+          args: ${{ inputs.suite == 'site' && '--config fusion/site/visual.config.ts' || '' }} ${{ inputs.boxes && '--boxes' || '' }} ${{ inputs.family }}
           branch: ${{ inputs.suite == 'site' && 'visual-baselines-site-' || 'visual-baselines-' }}${{ github.ref_name }}
           commit-message: 'test(visual): retake the baselines'
           helix: bun helix/cli/npm/bin.mjs

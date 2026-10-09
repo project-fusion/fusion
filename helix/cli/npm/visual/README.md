@@ -24,6 +24,7 @@ rest of `helix` needs no browser, so Playwright is an optional peer, and
 helix visual test                    compare every shot, and fail on a difference
 helix visual test button             only the entries named button
 helix visual update                  write only the baselines the comparison rejects
+helix visual update --boxes          also write element boxes into baselines that have none
 helix visual test --shard 0 --of 4   the first of four shards, for CI
 helix visual report                  open the report of the last run
 helix visual compare a.png b.png     compare two PNG files, with no browser
@@ -35,6 +36,9 @@ helix visual compare a.png b.png     compare two PNG files, with no browser
   named `<stem><suffix>.diff.png`. Add `*.diff.png` to your `.gitignore`.
 - **`helix visual update`** pictures every entry and writes a baseline only where the
   comparison would fail. Review the files it writes before you commit them.
+  `--boxes` also writes the element boxes into each matching baseline that has
+  none, inside its own PNG, leaving its pixels as they are, so the run can say
+  how far a changed element moved.
 - **`helix visual report`** opens the report the last run wrote. `--markdown` prints
   its summary as Markdown instead, for a CI job's summary page.
 - **`helix visual compare`** compares two PNG files. `--diff` writes the image of the
@@ -137,6 +141,24 @@ export default defineConfig({
   covers the region, and the file a manifest says defines it. A baseline
   carries its elements' boxes inside its PNG once a run writes it, and from
   then on the run also says how far each element moved.
+- **`triage`**: a model that explains each group of changes a failed run
+  found, as intended, unintended, or unclear, with a sentence on why. It
+  never approves a baseline: the answers are the order to review in. Off when
+  not given, and then no run makes a network call.
+  - `provider: 'anthropic'`, the default, asks Claude through
+    `@fusion.dev/helix-cli`'s optional peer `@anthropic-ai/sdk`, with the
+    key the SDK finds, `ANTHROPIC_API_KEY` among them. `model` is
+    `claude-opus-5-5` unless you name another.
+  - `provider: 'ollama'` asks a model on an Ollama endpoint, `url`,
+    `http://127.0.0.1:11434` unless you name another, so nothing leaves your
+    machine. `model` names what you pulled.
+  - Only words are sent: the attribution, the accessibility difference, and
+    the diff of the attributed files since the run's `--changed` ref.
+    `images: true` also sends the baseline and the capture of each group's
+    largest region, cropped and no wider than 512 pixels.
+  - `groups`, 10 unless you set it, caps the requests a run makes, the
+    largest group first. A run with no differences makes none, and the last
+    line says how many tokens each run read and wrote.
 - **`diff`**: how a shot is compared, for the whole config or for one source.
   `mode: 'pixel'` counts the pixels past `threshold`, 0.1 unless you set it,
   and fails above `pixels`, 0 unless you set it. `mode: 'perceptual'` scores
@@ -210,6 +232,11 @@ picture is committed.
   scheme, and the harness style change between shots on the same page.
 - **A difference is taken again from a fresh page load.** A shot that matches
   on the second take passes, and the run names it.
+- **Changes are grouped by what they happened to.** Each region of a shot
+  that differs is traced to the element under it, and shots whose changes
+  read the same, apart from where they are and each element's `id`, are one
+  group: a token change that moved one kind of element across 300 pictures is
+  one group of 300. No model is involved.
 - **Requests stay on the harness origin.** Every request to another host is
   refused, so a baseline never records what another server returned.
   `network: 'open'` turns that off.

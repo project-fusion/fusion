@@ -34,6 +34,7 @@ mod report;
 mod run;
 mod shard;
 mod sources;
+mod triage;
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -101,6 +102,7 @@ impl Selection {
             _ => None,
         };
         Ok(run::Options {
+            boxes: false,
             changed: self.changed.clone(),
             config: self.config.clone(),
             names: self.entries.clone(),
@@ -140,7 +142,15 @@ pub enum Visual {
     /// A shot that matches its baseline is left alone, so the files an update
     /// writes are the ones that changed. An update of every entry also writes
     /// the environment fingerprint.
-    Update(Selection),
+    Update {
+        #[command(flatten)]
+        selection: Selection,
+        /// Also write the element boxes into each matching baseline that has
+        /// none, inside its own PNG, so a later change is traced to what it
+        /// happened to and how far it moved. Its pixels are left as they are.
+        #[arg(long)]
+        boxes: bool,
+    },
     /// Compare two PNG files pixel by pixel, and fail when they differ.
     ///
     /// Exits 0 when no pixel differs, and 1 when a pixel differs or the two
@@ -299,8 +309,9 @@ pub fn run(verb: &Visual, json: bool) -> Outcome<Code> {
         Visual::Test(selection) => selection
             .options(false)
             .and_then(|options| run::run(&options)),
-        Visual::Update(selection) => selection
-            .options(true)
-            .and_then(|options| run::run(&options)),
+        Visual::Update { selection, boxes } => selection.options(true).and_then(|mut options| {
+            options.boxes = *boxes;
+            run::run(&options)
+        }),
     }
 }

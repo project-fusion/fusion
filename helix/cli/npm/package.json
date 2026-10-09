@@ -48,9 +48,13 @@
     "@fusion.dev/helix-cli-win32-x64": "workspace:*"
   },
   "peerDependencies": {
+    "@anthropic-ai/sdk": ">=0.132",
     "playwright": ">=1.50"
   },
   "peerDependenciesMeta": {
+    "@anthropic-ai/sdk": {
+      "optional": true
+    },
     "playwright": {
       "optional": true
     }
