@@ -103,6 +103,8 @@ const state = {
    */
   documents: new Map(),
   lanes: [],
+  /** Selectors painted over in every picture. */
+  mask: [],
   network: 'origin',
   origin: undefined,
   /** The origins requests may reach: the harness's and each source's server. */
@@ -325,7 +327,14 @@ const take = async (page, item, { elements, readyProperty }, progress) => {
          frame and finishes finite ones, so a picture is of one definite moment:
          Fusion's spinner moved 17 pixels between two takes without it. */
       progress.stage = `capturing ${shot.name}`
-      const png = await page.screenshot({ animations: 'disabled', fullPage: true })
+      /* A masked element is painted over in one fixed color, so what changes
+         on its own, a version number, moves no pixel. */
+      const png = await page.screenshot({
+        animations: 'disabled',
+        fullPage: true,
+        mask: state.mask.map((selector) => page.locator(selector)),
+        maskColor: '#ff00ff',
+      })
       if (progress.abandoned) {
         return
       }
@@ -486,7 +495,8 @@ const handlers = {
     say({ failed: Boolean(reported?.failed), op: 'finished' })
   },
 
-  async start({ network, origins = [], serve, workers }) {
+  async start({ mask = [], network, origins = [], serve, workers }) {
+    state.mask = mask
     state.network = network
     state.workers = workers
     state.serve = Object.entries(serve)

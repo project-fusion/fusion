@@ -23,6 +23,9 @@
 import { defineConfig } from '@fusion.dev/locus'
 
 export default defineConfig({
+  /* The footer's Helix version, which every release changes on every page.
+     Painted over, so a release moves no site picture. */
+  mask: ['[data-site-footer] helix-tag'],
   retake:
     'Dispatch the `Visual baselines` workflow on your branch with the suite `site`, and review the pull request it opens.',
   /* Next.js writes `next-route-announcer` and never defines it, so only

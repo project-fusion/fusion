@@ -115,6 +115,8 @@ export default defineConfig({
   by time. Entries with no measurement weigh `perShot` seconds a shot.
 - **`timings`**: a file to write each entry name's seconds to, which is how you
   measure `shard.cost`.
+- **`mask`**: selectors whose elements are painted over in one fixed color in
+  every picture, for what changes on its own, such as a version number.
 - **`report`**: where each run writes its report, `.locus/report` unless you
   set it. Add `.locus/` to your `.gitignore`.
 - **`retake`**: a sentence telling your team how to retake baselines, printed
