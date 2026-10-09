@@ -25,6 +25,7 @@ use fusion_rules::exit::Code;
 use serde_json::{json, Value};
 
 use crate::boxes;
+use crate::config;
 use crate::config::{Config, Diff, Exception, Mode, Network, Platform, Shot, Source, CHECKS};
 use crate::diff;
 use crate::discover::Entry;
@@ -37,14 +38,18 @@ use crate::pairs;
 use crate::report;
 use crate::shard::{self, Shard};
 use crate::sources;
+use crate::triage;
 
 /// The config file names looked for, in order, when none is given.
 const NAMES: [&str; 3] = ["visual.config.ts", "visual.config.mjs", "visual.config.js"];
 
 /// What the command line asked for.
 pub struct Options {
+    /// Whether an update also writes the boxes into each matching baseline
+    /// that has none.
+    pub boxes: bool,
     /// A git ref handed to a pairs source's `prepare`, which decides what a
-    /// change since it reaches.
+    /// change since it reaches, and the base a triage reads the diff from.
     pub changed: Option<String>,
     pub config: Option<PathBuf>,
     pub names: Vec<String>,
@@ -227,6 +232,149 @@ pub(crate) fn exception_for<'a>(
             && (one.entry == entry.id || one.entry == entry.name)
             && one.shot.as_ref().is_none_or(|name| *name == shot.name)
     })
+}
+
+/// The changes the run found, grouped by what they happened to.
+fn group_changes(
+    mine: &[&Entry],
+    config: &Config,
+    results: &BTreeMap<(usize, usize), Fate>,
+    attributions: &BTreeMap<(usize, usize), Vec<String>>,
+) -> Vec<triage::Group> {
+    let aria = config.shots.len();
+    let none: Vec<String> = Vec::new();
+    let mut changes = Vec::new();
+    for (&(at, shot), fate) in results {
+        let name = if shot == aria {
+            "accessibility"
+        } else {
+            config.shots[shot].name.as_str()
+        };
+        let change = match fate {
+            Fate::Differs { .. } => {
+                triage::Change::Differs(attributions.get(&(at, shot)).unwrap_or(&none))
+            }
+            Fate::Resized { from, to } => triage::Change::Resized {
+                from: *from,
+                to: *to,
+            },
+            Fate::Broken(sentence) if shot == aria => triage::Change::Aria(sentence),
+            _ => continue,
+        };
+        changes.push((mine[at].id.clone(), name.to_string(), change));
+    }
+    triage::group(&changes)
+}
+
+/// The baseline and capture bytes of each changed shot, by `entry, shot`, for
+/// a triage that may send pictures.
+fn first_pictures(
+    mine: &[&Entry],
+    config: &Config,
+    currents: &BTreeMap<(usize, usize), Vec<u8>>,
+) -> BTreeMap<String, (Vec<u8>, Vec<u8>)> {
+    currents
+        .iter()
+        .filter(|((_, shot), _)| *shot < config.shots.len())
+        .filter_map(|(&(at, shot), capture)| {
+            let (baseline, _) = paths(mine[at], &config.shots[shot]);
+            let kept = fs::read(baseline).ok()?;
+            Some((
+                format!("{}, {}", mine[at].id, config.shots[shot].name),
+                (kept, capture.clone()),
+            ))
+        })
+        .collect()
+}
+
+/// Asks the triage's model about each group, the largest first and no more
+/// than its cap, and writes each answer into its group. Returns the sentence
+/// the report prints about what was asked and what it cost in tokens, or why
+/// nothing could be asked: a triage that fails leaves the run's verdict alone.
+fn ask(
+    driver: &mut Driver,
+    triage: &config::Triage,
+    groups: &mut [triage::Group],
+    base: &Path,
+    reference: Option<&str>,
+    pictures: &BTreeMap<String, (Vec<u8>, Vec<u8>)>,
+) -> String {
+    let asked = groups.len().min(triage.groups);
+    let requests: Vec<Value> = groups[..asked]
+        .iter()
+        .map(|group| {
+            let diff = reference.and_then(|one| triage::diff(base, one, &group.files));
+            let images = if triage.images {
+                group
+                    .members
+                    .first()
+                    .and_then(|member| pictures.get(member))
+                    .map(|(kept, taken)| triage::pictures(group, kept, taken))
+                    .unwrap_or_default()
+            } else {
+                Vec::new()
+            };
+            json!({
+                "images": images,
+                "text": triage::request(group, diff.as_deref(), reference, !images.is_empty()),
+            })
+        })
+        .collect();
+    let answer = match driver.ask(&json!({
+            "groups": requests,
+            "model": triage.model(),
+            "op": "triage",
+            "provider": match triage.provider { config::Provider::Anthropic => "anthropic", config::Provider::Ollama => "ollama" },
+            "system": triage::SYSTEM,
+            "url": triage.url,
+        })) {
+        Ok(answer) => answer,
+        Err(why) => {
+            return format!(
+                "helix: the triage by {} could not run, so the groups are unexplained: {why}",
+                triage.model()
+            )
+        }
+    };
+    if let Some(why) = answer["stopped"].as_str() {
+        return format!(
+            "helix: the triage by {} could not run, so the groups are unexplained: {why}",
+            triage.model()
+        );
+    }
+    let (mut read, mut written, mut failed) = (0_u64, 0_u64, 0_usize);
+    for (group, one) in groups
+        .iter_mut()
+        .zip(answer["answers"].as_array().into_iter().flatten())
+    {
+        read += one["input"].as_u64().unwrap_or(0);
+        written += one["output"].as_u64().unwrap_or(0);
+        if let Some(why) = one["error"].as_str() {
+            failed += 1;
+            group.verdict = Some("unclear".to_string());
+            group.explanation = Some(format!("the model gave no answer: {why}"));
+        } else {
+            group.verdict = one["verdict"].as_str().map(str::to_string);
+            group.explanation = one["explanation"].as_str().map(str::to_string);
+        }
+    }
+    let skipped = groups.len() - asked;
+    format!(
+        "helix: triage asked {} about {asked} of {} {}{}, reading {read} tokens and writing {written}.{}",
+        triage.model(),
+        groups.len(),
+        if groups.len() == 1 { "group" } else { "groups" },
+        if skipped > 0 {
+            format!(", the largest first, and left {skipped} to its cap of {}", triage.groups)
+        } else {
+            String::new()
+        },
+        if failed > 0 {
+            format!(" {failed} went unanswered, said beside each.")
+        } else {
+            String::new()
+        },
+    )
 }
 
 /// Each tag the config's manifests declare, and the file that defines it,
@@ -840,7 +988,10 @@ pub fn run(options: &Options) -> Outcome<Code> {
                     if verdict == Verdict::Missing && !options.update {
                         currents.insert((at, shot), bytes.clone());
                     }
-                    let result = settle(verdict, exception, options.update, &baseline, bytes)?;
+                    let mut result = settle(verdict, exception, options.update, &baseline, bytes)?;
+                    if matches!(result, Fate::Held) && options.boxes {
+                        result = carry(existing.as_deref(), bytes, &baseline)?.unwrap_or(result);
+                    }
                     results.insert((at, shot), result);
                 }
             }
@@ -943,7 +1094,13 @@ pub fn run(options: &Options) -> Outcome<Code> {
                         allowed_for(entry, picture),
                     ) {
                         Err(why) => Fate::Broken(why),
-                        Ok(Verdict::Matched | Verdict::Within(_)) if options.update => Fate::Held,
+                        Ok(Verdict::Matched | Verdict::Within(_)) if options.update => {
+                            if options.boxes {
+                                carry(existing.as_deref(), bytes, &baseline)?.unwrap_or(Fate::Held)
+                            } else {
+                                Fate::Held
+                            }
+                        }
                         Ok(Verdict::Matched | Verdict::Within(_)) => Fate::Steadied,
                         Ok(_) if options.update => {
                             write(&baseline, bytes)?;
@@ -1002,6 +1159,21 @@ pub fn run(options: &Options) -> Outcome<Code> {
             results.insert(*key, fate.clone());
         }
     }
+
+    /* The changes, grouped, and explained when the config asks: before the
+    driver closes, because it is what makes the requests. */
+    let mut groups = group_changes(&mine, &config, &results, &attributions);
+    let triaged = match &config.triage {
+        Some(triage) if !groups.is_empty() => Some(ask(
+            &mut driver,
+            triage,
+            &mut groups,
+            &base,
+            options.changed.as_deref(),
+            &first_pictures(&mine, &config, &currents),
+        )),
+        _ => None,
+    };
 
     let inspected_failed = if config.inspect {
         let finished = driver
@@ -1115,6 +1287,8 @@ pub fn run(options: &Options) -> Outcome<Code> {
         rows,
         scope: &scope,
         skipped,
+        groups,
+        triaged,
         update: options.update,
     }))
 }
@@ -1191,6 +1365,23 @@ fn settle(
             unreachable!("a difference is taken again before it is settled")
         }
     })
+}
+
+/// Writes a capture's boxes into a matching baseline that has none, inside
+/// the baseline's own bytes, so its pixels and the rest of the file stay as
+/// they were. Nothing when the baseline already carries boxes or the capture
+/// has none to give.
+fn carry(existing: Option<&[u8]>, capture: &[u8], baseline: &Path) -> Outcome<Option<Fate>> {
+    let Some(kept) = existing else {
+        return Ok(None);
+    };
+    match boxes::carry(kept, capture) {
+        Some(bytes) => {
+            write(baseline, &bytes)?;
+            Ok(Some(Fate::Written("it carried no boxes")))
+        }
+        None => Ok(None),
+    }
 }
 
 pub(crate) fn write(path: &Path, bytes: &[u8]) -> Outcome<()> {

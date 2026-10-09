@@ -392,6 +392,23 @@ export interface Config {
   style?: string
   /** A file to write the seconds each entry name took, relative to the config. */
   timings?: string
+  /**
+   * A model that explains each group of changes a failed run found, as intended, unintended or unclear. It
+   * never approves a baseline. Off when not given, and then no run makes a network call. Only words are sent
+   * unless `images` is `true`.
+   */
+  triage?: {
+    /** How many groups are asked about, the largest first. 10 when not given. */
+    groups?: number
+    /** Whether the baseline and capture of each group's largest region are sent, cropped. */
+    images?: boolean
+    /** The model. `claude-opus-5-5` for `anthropic` when not given; required for `ollama`. */
+    model?: string
+    /** `anthropic`, through the optional peer `@anthropic-ai/sdk`, or `ollama`, on an endpoint of your own. */
+    provider?: 'anthropic' | 'ollama'
+    /** The Ollama endpoint. `http://127.0.0.1:11434` when not given. */
+    url?: string
+  }
 }
 
 /** Returns the config unchanged, typed. */

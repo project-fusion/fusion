@@ -74,6 +74,9 @@ pub struct Config {
     pub sources: Vec<Source>,
     /// Where to write the seconds each entry name took, when set.
     pub timings: Option<String>,
+    /// A model that explains each group of changes a failed run found. Off
+    /// when not given, and then no run makes a network call.
+    pub triage: Option<Triage>,
 }
 
 fn fingerprint() -> String {
@@ -163,6 +166,49 @@ pub struct Checks {
     /// with nothing placing either on purpose.
     #[serde(default)]
     pub overlap: Setting<IgnoreCheck>,
+}
+
+/// Where a failed run's groups of changes are sent to be explained.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Triage {
+    /// How many groups are asked about, the largest first: the cost of a run
+    /// is at most this many requests.
+    #[serde(default = "triage_groups")]
+    pub groups: usize,
+    /// Whether the baseline and the capture of each group's largest region
+    /// are sent too. Off, only words leave the machine.
+    #[serde(default)]
+    pub images: bool,
+    /// The model. `claude-opus-5-5` for `anthropic` when not given, and
+    /// required for `ollama`.
+    pub model: Option<String>,
+    #[serde(default)]
+    pub provider: Provider,
+    /// An `ollama` endpoint. `http://127.0.0.1:11434` when not given.
+    pub url: Option<String>,
+}
+
+fn triage_groups() -> usize {
+    10
+}
+
+/// Who answers a triage.
+#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum Provider {
+    /// Claude, through the Anthropic SDK and the key the SDK finds.
+    #[default]
+    Anthropic,
+    /// A model on an Ollama endpoint, which can be this machine.
+    Ollama,
+}
+
+impl Triage {
+    /// The model a request names.
+    pub fn model(&self) -> &str {
+        self.model.as_deref().unwrap_or("claude-opus-5-5")
+    }
 }
 
 /// The names an exception's `checks` may use.
@@ -776,6 +822,19 @@ impl Config {
         Ok(())
     }
 
+    /// A triage that would ask about nothing, or ask an endpoint for no model.
+    fn validate_triage(&self) -> Result<(), String> {
+        if let Some(triage) = &self.triage {
+            if triage.groups == 0 {
+                return Err("`triage.groups` is how many groups are asked about, and 0 asks about none: leave `triage` out instead".to_string());
+            }
+            if triage.provider == Provider::Ollama && triage.model.is_none() {
+                return Err("`triage` with the provider `ollama` names its `model`, since an endpoint serves whatever was pulled".to_string());
+            }
+        }
+        Ok(())
+    }
+
     fn validate(&self) -> Result<(), String> {
         if self.sources.is_empty() {
             return Err("`sources` names nothing to picture".to_string());
@@ -872,6 +931,7 @@ impl Config {
                 }
             }
         }
+        self.validate_triage()?;
         if !self.shard.per_shot.is_finite() || self.shard.per_shot <= 0.0 {
             return Err("`shard.perShot` is a number of seconds above zero".to_string());
         }
