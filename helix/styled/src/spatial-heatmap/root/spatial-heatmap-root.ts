@@ -17,14 +17,14 @@ import '../../tooltip/index.js'
  * and the height both show the value. Set `--spatial-heatmap-cell-size` to
  * change how large a cell may grow.
  *
- * @since 0.185.0
+ * @since 0.188.0
  * @status experimental
  * @category charts
  * @documentation https://fusion.dev/helix/components/spatial-heatmap
  *
  * @cssproperty --spatial-heatmap-cell-size - The largest a cell grows, along its edge. The strip is never wider than its box, and draws smaller cells to fit.
- * @cssproperty --spatial-heatmap-left-shade - How much darker the left face is than the top, as a percentage mixed toward black.
- * @cssproperty --spatial-heatmap-right-shade - How much darker the right face is than the top, as a percentage mixed toward black.
+ * @cssproperty --spatial-heatmap-left-shade - How much less light the left face is than the top, as a step of OKLCH lightness from 0 to 1. 0.07 by default.
+ * @cssproperty --spatial-heatmap-right-shade - How much less light the right face is than the top, as a step of OKLCH lightness from 0 to 1. 0.14 by default.
  * @cssproperty --spatial-heatmap-selected-color - The color of the dashed edges of a selected prism, under `selection-mode`. By default, white on a dark face and black on a light one.
  */
 @customElement('helix-spatial-heatmap')
