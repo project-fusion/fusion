@@ -1,0 +1,353 @@
+- link "Fusion":
+  - /url: /
+- navigation "Sections":
+  - button "Products"
+  - link "Services":
+    - /url: /company/services
+  - link "Insights":
+    - /url: /insights
+- button "Search Ctrl+K"
+- link "Fusion source on GitHub":
+  - /url: https://github.com/project-fusion
+- button "Preferences"
+- main:
+  - navigation "Helix documentation":
+    - tree "Helix documentation":
+      - treeitem "Getting started" [level=1]
+      - treeitem "Foundations" [level=1]
+      - treeitem "Theming" [level=1]
+      - treeitem "Essentials" [level=1]
+      - treeitem "Components" [expanded] [level=1]:
+        - text: Components
+        - group:
+          - treeitem "All components" [level=2]
+          - treeitem "Accordion" [level=2]
+          - treeitem "Announcement" [level=2]
+          - treeitem "App Header" [level=2]
+          - treeitem "Area Chart" [level=2]
+          - treeitem "Aura" [level=2]
+          - treeitem "Avatar" [level=2]
+          - treeitem "Badge" [level=2]
+          - treeitem "Bar Chart" [level=2]
+          - treeitem "Blockquote" [level=2]
+          - treeitem "Breadcrumbs" [level=2]
+          - treeitem "Button" [level=2] [selected]
+          - treeitem "Button Group" [level=2]
+          - treeitem "Callout" [level=2]
+          - treeitem "Canvas" [level=2]
+          - treeitem "Card" [level=2]
+          - treeitem "Carousel" [level=2]
+          - treeitem "Chat" [level=2]
+          - treeitem "Checkbox" [level=2]
+          - treeitem "Checkbox Group" [level=2]
+          - treeitem "Code" [level=2]
+          - treeitem "Code Block" [level=2]
+          - treeitem "Color Input" [level=2]
+          - treeitem "Color Picker" [level=2]
+          - treeitem "Combobox" [level=2]
+          - treeitem "Command" [level=2]
+          - treeitem "Copy Button" [level=2]
+          - treeitem "Data Table" [level=2]
+          - treeitem "Date Input" [level=2]
+          - treeitem "Date Picker" [level=2]
+          - treeitem "Description List" [level=2]
+          - treeitem "Dialog" [level=2]
+          - treeitem "Divider" [level=2]
+          - treeitem "Donut Chart" [level=2]
+          - treeitem "Drawer" [level=2]
+          - treeitem "Drilldown" [level=2]
+          - treeitem "Empty" [level=2]
+          - treeitem "File Input" [level=2]
+          - treeitem "Filter Input" [level=2]
+          - treeitem "Flex" [level=2]
+          - treeitem "Format Date" [level=2]
+          - treeitem "Graph" [level=2]
+          - treeitem "Grid" [level=2]
+          - treeitem "Heatmap" [level=2]
+          - treeitem "Icon" [level=2]
+          - treeitem "Icon Button" [level=2]
+          - treeitem "Image" [level=2]
+          - treeitem "Input" [level=2]
+          - treeitem "Isometric Heatmap" [level=2]
+          - treeitem "Kbd" [level=2]
+          - treeitem "Legend" [level=2]
+          - treeitem "Lightbox" [level=2]
+          - treeitem "Line Chart" [level=2]
+          - treeitem "List" [level=2]
+          - treeitem "Listbox" [level=2]
+          - treeitem "Loader" [level=2]
+          - treeitem "Map" [level=2]
+          - treeitem "Megamenu" [level=2]
+          - treeitem "Menu" [level=2]
+          - treeitem "Meter" [level=2]
+          - treeitem "Navigation" [level=2]
+          - treeitem "Notifications" [level=2]
+          - treeitem "Number Input" [level=2]
+          - treeitem "Object Inspector" [level=2]
+          - treeitem "Option" [level=2]
+          - treeitem "Orb" [level=2]
+          - treeitem "Outline" [level=2]
+          - treeitem "Pagination" [level=2]
+          - treeitem "Pin Input" [level=2]
+          - treeitem "Popover" [level=2]
+          - treeitem "Progress" [level=2]
+          - treeitem "QR Code" [level=2]
+          - treeitem "Quote" [level=2]
+          - treeitem "Radio" [level=2]
+          - treeitem "Rating" [level=2]
+          - treeitem "Sandbox" [level=2]
+          - treeitem "Scatter Chart" [level=2]
+          - treeitem "Scroll Area" [level=2]
+          - treeitem "Select" [level=2]
+          - treeitem "Skeleton" [level=2]
+          - treeitem "Skip Link" [level=2]
+          - treeitem "Slider" [level=2]
+          - treeitem "Sparkline" [level=2]
+          - treeitem "Speed Dial" [level=2]
+          - treeitem "Splitter" [level=2]
+          - treeitem "Stat" [level=2]
+          - treeitem "Steps" [level=2]
+          - treeitem "Strands" [level=2]
+          - treeitem "Switch" [level=2]
+          - treeitem "Table" [level=2]
+          - treeitem "Tabs" [level=2]
+          - treeitem "Tag" [level=2]
+          - treeitem "Text" [level=2]
+          - treeitem "Textarea" [level=2]
+          - treeitem "Time Input" [level=2]
+          - treeitem "Time Picker" [level=2]
+          - treeitem "Timeline" [level=2]
+          - treeitem "Toast" [level=2]
+          - treeitem "Toggle" [level=2]
+          - treeitem "Toolbar" [level=2]
+          - treeitem "Tooltip" [level=2]
+          - treeitem "Tour" [level=2]
+          - treeitem "Tree" [level=2]
+          - treeitem "Trend" [level=2]
+          - treeitem "Video" [level=2]
+          - treeitem "Video Playlist" [level=2]
+          - treeitem "Virtual List" [level=2]
+      - treeitem "Tooling" [level=1]
+    - status
+  - article:
+    - heading "Button" [level=1]
+    - link "View Source":
+      - /url: https://github.com/project-fusion/fusion/tree/main/helix/styled/src/button
+    - button "More"
+    - status
+    - paragraph: Triggers an action, submits a form, or navigates.
+    - text: Stable Since 0.1.0 Actions
+    - heading "Link to Usage Usage" [level=2]:
+      - link "Link to Usage":
+        - /url: "#usage"
+      - text: Usage
+    - code: import '@fusion.dev/helix/button'
+    - button "Copy code"
+    - heading "Link to Preview Preview" [level=2]:
+      - link "Link to Preview":
+        - /url: "#preview"
+      - text: Preview
+    - iframe
+    - separator "Resize preview pane"
+    - button "index.html" [pressed]
+    - button "styles.css"
+    - button "Copy index.html"
+    - button "Centered layout"
+    - link "Open in the sandbox":
+      - /url: /helix/sandbox?e=button.preview
+    - textbox "Example source"
+    - heading "Link to API Reference API Reference" [level=2]:
+      - link "Link to API Reference":
+        - /url: "#api"
+      - text: API Reference
+    - heading "Link to Root Root" [level=3]:
+      - link "Link to Root":
+        - /url: "#helix-button"
+      - text: Root
+    - text: helix-button
+    - paragraph: Triggers an action, submits a form, or navigates.
+    - table "Properties":
+      - row "Prop Type Default Description"
+      - text: command string "" What to send when the button is activated, and what to send it to.
+      - link "Open the Invoker Commands specification":
+        - /url: https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-command
+      - text: commandFor string "" The id of the element the command is sent to.
+      - link "Open the Invoker Commands specification":
+        - /url: https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-commandfor
+      - text: "commandForElement Element|null The element this button's command is sent to, resolved. disabled boolean false Whether the control is disabled and cannot be used. emphasis \"ghost\"|\"outlined\"|\"solid\"|\"subtle\" How much fill the control is drawn with. expanded boolean Whether this button is a disclosure trigger, and whether its panel is open. focusable boolean true Whether the button holds its group's tab stop. formAction string \"\" Where this button's submission goes, overriding the form's own. formEnctype string \"\" How the submission is encoded, overriding the form's own. formMethod string \"\" Which HTTP method the submission uses, overriding the form's own. formNoValidate boolean false Whether this submission skips the form's validation. formTarget string \"\" Which browsing context the response lands in, overriding the form's own. label string The button's name, read by screen readers, for a button whose content is not text. name string \"\" The name the control's value is submitted under. pending boolean false Whether the action the button started is still running. pendingLabel string \"Loading\" What a reader hears when the button becomes pending while it has focus. popup \"dialog\"|\"grid\"|\"listbox\"|\"menu\"|\"tree\" What kind of panel this button opens, where it opens one:"
+      - code: menu
+      - text: for a
+      - code: Menu
+      - text: . tone "accent"|"danger"|"neutral"|"primary" Which color the control is drawn in, by what it means. type "button"|"submit"|"reset" "button" What activating the button does to its form. value string "" The value this button submits under its own
+      - code: name
+      - text: ", as a native submit button does. width \"auto\"|\"full\" How much of the available width the button takes."
+    - status
+    - table "Read":
+      - 'row "Read Read: Read-only. These report something the element worked out, and assigning to one throws, which is why they have no default. Type Description"':
+        - text: Read
+        - 'button "Read: Read-only. These report something the element worked out, and assigning to one throws, which is why they have no default."'
+        - text: Type Description
+      - text: form HTMLFormElement|null The form the control belongs to, or
+      - code: "null"
+      - text: .
+      - link "Open the form-associated custom elements specification":
+        - /url: https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements
+      - text: labels NodeList The labels associated with the control.
+      - link "Open the form-associated custom elements specification":
+        - /url: https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements
+      - text: validationMessage string The message the browser would show for the control, or an empty string. validity ValidityState Whether the control meets its constraints, and why not.
+      - link "Open the ElementInternals.validity specification":
+        - /url: https://developer.mozilla.org/docs/Web/API/ElementInternals/validity
+      - text: whenSettled Promise<void> Resolves a frame after the first update, when transitions are switched on. willValidate boolean Whether the control is checked when its form is submitted.
+    - status
+    - table "Slot":
+      - row "Slot Description"
+      - text: (default) The button's label. end Content after the label. start Content before the label, usually an icon.
+    - status
+    - table "Event":
+      - row "Event Type Description"
+      - text: helix-press HelixPressEvent Fired when a press acts, with
+      - code: detail.pointerType
+      - text: saying what pressed the button.
+    - status
+    - table "Method":
+      - row "Method Type Description"
+      - text: checkValidity () => boolean Returns whether the control is valid, and fires
+      - code: invalid
+      - text: "on it when it is not. The control shows no message for it:"
+      - code: reportValidity()
+      - text: does that. click () => void Presses the button, as
+      - code: click()
+      - text: "presses a native one: the command is sent, the form submits or resets, and"
+      - code: helix-press
+      - text: says
+      - code: virtual
+      - text: ". focus (options: FocusOptions) => void Moves focus to the control, as focusing a native control does. reportValidity () => boolean Returns whether the control is valid, and when it is not, fires"
+      - code: invalid
+      - text: "and shows the browser's message at the control. setCustomValidity (message: string) => void Marks the control invalid with"
+      - code: message
+      - text: ", or clears that with an empty string, as on a native control. The form does not submit while it is set."
+    - status
+    - table "Part":
+      - row "Part Description"
+      - text: button The inner control. live The live region that says
+      - code: pending-label
+      - text: when the button becomes pending under focus. It is clipped out of view and still read. spinner The ring a pending button turns over its words, sized and colored by the
+      - code: "--button-spinner-*"
+      - text: hooks. text The button's words, which the styled button trims to their capitals and baseline so the letters sit at the middle in any font.
+    - status
+    - table "CSS Property":
+      - row "CSS Property Description"
+      - text: "--button-background-color Fill behind the button, in every state. --button-background-color-hover Fill behind the button under the pointer. Without it,"
+      - code: "--button-background-color"
+      - text: also applies on hover. --button-border-color Edge color of an outlined button. The other emphases draw no edge. --button-foreground-color Label and icon color. --button-gap Space between the label and the content on either side of it. --button-inline-size Minimum width. It inherits, so you can set it once on a section for every button inside it. --button-padding-inline Inline padding, for a container with spacing of its own. --button-radius Corner radius of the control. --button-radius-end Trailing corners, which a group flattens. --button-radius-end-end The bottom trailing corner, for a group stacking down. --button-radius-end-start The bottom leading corner, for a group stacking down. --button-radius-start Leading corners, which a group flattens. --button-radius-start-end The top trailing corner, for a group stacking down. --button-radius-start-start The top leading corner, for a group stacking down. --button-size Height of the control, for a row height outside the density steps. --button-spinner-color Color of the ring a pending button turns. It follows the label's color. --button-spinner-duration How long the ring takes to turn once. --button-spinner-size Size of the ring a pending button turns. Defaults to the size of its icons.
+    - status
+    - table "Custom state":
+      - row "Custom state Description"
+      - text: "pending The button is pending:"
+      - code: pending
+      - text: is set. A ring turns over its hidden words. pressed A Button Group in a selection mode has this button pressed. settled Set one frame after the first render. Transitions wait for it, so an element does not animate its own arrival.
+    - status
+    - heading "Link to Examples Examples" [level=2]:
+      - link "Link to Examples":
+        - /url: "#examples"
+      - text: Examples
+    - table "Examples":
+      - row "Name Description"
+      - link "Accent":
+        - /url: /helix/sandbox?e=button.accent
+      - text: The
+      - code: accent
+      - text: tone, a second emphasis derived from your brand color.
+      - link "As Link":
+        - /url: /helix/sandbox?e=button.as-link
+      - text: A button that navigates, rendered as an anchor.
+      - link "Disabled":
+        - /url: /helix/sandbox?e=button.disabled
+      - text: Disabled buttons in several appearances, including one disabled by its fieldset.
+      - link "Emphasis":
+        - /url: /helix/sandbox?e=button.emphasis
+      - text: Each emphasis in the neutral, primary, and danger tones.
+      - link "Form Overrides":
+        - /url: /helix/sandbox?e=button.form-overrides
+      - text: Three submit buttons on one form, each setting where and how its own submission goes.
+      - link "Hugging":
+        - /url: /helix/sandbox?e=button.hugging
+      - text: Buttons in a narrow column, one as wide as the column and one as wide as its label.
+      - link "Pending":
+        - /url: /helix/sandbox?e=button.pending
+      - text: "A button that waits after a press: it keeps focus, refuses another press, and says Saving to a screen reader."
+      - link "Preview":
+        - /url: /helix/sandbox?e=button.preview
+      - text: Buttons in each appearance and tone, the two settings that style a button.
+      - link "Tones":
+        - /url: /helix/sandbox?e=button.tones
+      - text: The four tones, which mark what an action means.
+      - link "Width":
+        - /url: /helix/sandbox?e=button.width
+      - text: Buttons at their own width, at a standard width set by
+      - code: "--button-inline-size"
+      - text: ", and at full width with"
+      - code: width
+      - text: .
+      - link "With Slots":
+        - /url: /helix/sandbox?e=button.with-slots
+      - text: Icons at either end of the label, placed in the
+      - code: start
+      - text: and
+      - code: end
+      - text: slots.
+    - status
+  - complementary:
+    - text: On this page
+    - navigation "On this page":
+      - list:
+        - listitem:
+          - link "Usage":
+            - /url: "#usage"
+        - listitem:
+          - link "Preview":
+            - /url: "#preview"
+        - listitem:
+          - link "API Reference":
+            - /url: "#api"
+          - list:
+            - listitem:
+              - link "Root":
+                - /url: "#helix-button"
+            - listitem
+        - listitem:
+          - link "Examples":
+            - /url: "#examples"
+- contentinfo:
+  - img "Fusion"
+  - text: Fusion Development Group Interface and AI software. Helix 0.187.0
+  - link "Fusion on GitHub":
+    - /url: https://github.com/project-fusion
+  - link "Fusion on LinkedIn":
+    - /url: https://www.linkedin.com/company/project-fusion
+  - link "Fusion on X":
+    - /url: https://x.com/fusiondotdev
+  - navigation "Footer":
+    - text: Products
+    - link "Helix":
+      - /url: /helix
+    - link "Cortex":
+      - /url: /cortex
+    - text: Company
+    - link "Services":
+      - /url: /company/services
+    - link "Insights":
+      - /url: /insights
+    - link "Thesis":
+      - /url: /company/thesis
+    - link "Contact":
+      - /url: /contact
+    - text: Legal
+    - link "Terms of use":
+      - /url: /legal/terms
+    - link "Privacy":
+      - /url: /legal/privacy
+    - link "Acceptable use":
+      - /url: /legal/acceptable-use
+- alert
