@@ -238,6 +238,11 @@ export interface Config {
   shots?: Shot[]
   /** Where entries come from. */
   sources: Source[]
+  /**
+   * A stylesheet applied while each picture is taken and removed after, to hold still what `mask` alone
+   * cannot, such as a masked element whose width follows its text.
+   */
+  style?: string
   /** A file to write the seconds each entry name took, relative to the config. */
   timings?: string
 }

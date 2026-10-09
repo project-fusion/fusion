@@ -115,6 +115,8 @@ const state = {
   runs: [],
   serve: [],
   server: undefined,
+  /** A stylesheet applied while each picture is taken. */
+  style: undefined,
   workers: 1,
 }
 
@@ -334,6 +336,7 @@ const take = async (page, item, { elements, readyProperty }, progress) => {
         fullPage: true,
         mask: state.mask.map((selector) => page.locator(selector)),
         maskColor: '#ff00ff',
+        style: state.style,
       })
       if (progress.abandoned) {
         return
@@ -495,8 +498,9 @@ const handlers = {
     say({ failed: Boolean(reported?.failed), op: 'finished' })
   },
 
-  async start({ mask = [], network, origins = [], serve, workers }) {
+  async start({ mask = [], network, origins = [], serve, style = null, workers }) {
     state.mask = mask
+    state.style = style ?? undefined
     state.network = network
     state.workers = workers
     state.serve = Object.entries(serve)

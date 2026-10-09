@@ -24,7 +24,9 @@ import { defineConfig } from '@fusion.dev/locus'
 
 export default defineConfig({
   /* The footer's Helix version, which every release changes on every page.
-     Painted over, so a release moves no site picture. */
+     Painted over, and held at one width while each picture is taken, because
+     the tag's width follows its digits: 0.186.0 and 0.187.0 masked boxes
+     differed by 72 pixels at their edge. */
   mask: ['[data-site-footer] helix-tag'],
   retake:
     'Dispatch the `Visual baselines` workflow on your branch with the suite `site`, and review the pull request it opens.',
@@ -52,4 +54,5 @@ export default defineConfig({
       url: 'http://127.0.0.1:3417',
     },
   ],
+  style: '[data-site-footer] helix-tag { inline-size: 7rem !important; }',
 })

@@ -117,6 +117,8 @@ export default defineConfig({
   measure `shard.cost`.
 - **`mask`**: selectors whose elements are painted over in one fixed color in
   every picture, for what changes on its own, such as a version number.
+- **`style`**: a stylesheet applied while each picture is taken, to hold still
+  what `mask` cannot, such as a masked element whose width follows its text.
 - **`report`**: where each run writes its report, `.locus/report` unless you
   set it. Add `.locus/` to your `.gitignore`.
 - **`retake`**: a sentence telling your team how to retake baselines, printed
