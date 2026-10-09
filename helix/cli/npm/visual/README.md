@@ -28,6 +28,7 @@ helix visual update --boxes          also write element boxes into baselines tha
 helix visual test --shard 0 --of 4   the first of four shards, for CI
 helix visual report                  open the report of the last run
 helix visual report --merge a b      the groups of several shards' reports as one
+helix visual report --history runs   what earlier runs' records say
 helix visual compare a.png b.png     compare two PNG files, with no browser
 ```
 
@@ -46,6 +47,11 @@ helix visual compare a.png b.png     compare two PNG files, with no browser
   `run.json`, and prints their changes as one set of groups, so a change
   spread across shards is one group. With a `triage` in the config, a merge
   asks about each group once, reading the diff since `--changed`.
+  `--history` takes the records of earlier runs, each a `run.json` or a
+  directory holding any number, and names the shots that needed a second
+  take in more than one run or that differed and matched on one commit, and
+  the changes that failed on more than one branch. With `--merge`, each group
+  also names the other branches it failed on lately.
 - **`helix visual compare`** compares two PNG files. `--diff` writes the image of the
   difference, and `--threshold` sets how far apart two colors may be and still
   count as the same pixel, from 0 to 1.
@@ -288,6 +294,50 @@ The Action lives in the Fusion repository, in `helix/visual/action`.
 `args` passes arguments to `helix visual`, such as `--config` or `--shard`.
 `helix` and `playwright` name the commands that run each,
 `npx --no-install helix` and `npx --no-install playwright` unless you set them.
+
+- **Every check keeps its run record**, the report's `run.json`, as an
+  artifact named `visual-run-<job>-<index>` for `keep` days, 30 unless you set
+  it. Each record names the commit and the branch it ran on.
+- **`history: 30`** reads the records of the last 30 runs of the workflow and
+  adds what they say to the summary. It reads them with the workflow's token,
+  so the job needs `permissions: actions: read`. Nothing is stored outside
+  your Actions artifacts.
+
+## Review on the pull request
+
+A workflow can let a reviewer retake the entries they have looked at with a
+comment, using only the retake workflow you already run. This one takes
+`/retake styled/badge site/home` from anyone who can push, on a branch of the
+repository, and dispatches the retake there:
+
+```yaml
+name: Retake on request
+on:
+  issue_comment:
+    types: [created]
+permissions:
+  actions: write
+  contents: read
+  pull-requests: write
+jobs:
+  retake:
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/retake') && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) }}
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          BODY: ${{ github.event.comment.body }}
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ github.event.issue.number }}
+        run: |
+          head=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$NUMBER" --jq .head.ref)
+          entries=$(head -n 1 <<<"$BODY" | sed 's#^/retake##' | tr -s ' ' '\n' | grep -E '^[a-z0-9-]+(/[a-z0-9-]+)?$' | tr '\n' ' ')
+          gh workflow run visual-baselines.yml --ref "$head" -f entries="$entries"
+```
+
+It dispatches a `visual-baselines.yml` that runs the Action with
+`mode: retake` and passes an `entries` input in `args`. Read the comment from
+the environment, as this does, and never paste it into a command. The retake opens its own pull request into the branch, which is
+where the pictures are looked at before they land.
 
 ## How it works
 

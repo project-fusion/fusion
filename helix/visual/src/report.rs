@@ -89,6 +89,8 @@ pub struct Run<'a> {
     pub groups: Vec<crate::triage::Group>,
     /// What a triage asked and what it cost, when one ran.
     pub triaged: Option<String>,
+    /// Where the run happened: its commit, its ref and its time.
+    pub origin: crate::history::Origin,
     pub update: bool,
 }
 
@@ -109,6 +111,13 @@ pub fn printed(group: &crate::triage::Group) -> String {
     );
     if let (Some(verdict), Some(explanation)) = (&group.verdict, &group.explanation) {
         let _ = write!(out, "\n    {verdict}: {explanation}");
+    }
+    if !group.elsewhere.is_empty() {
+        let _ = write!(
+            out,
+            "\n    also failing lately on {}",
+            group.elsewhere.join(", ")
+        );
     }
     out
 }
@@ -426,9 +435,10 @@ fn record(run: &Run, verdict: &str, failed: bool) -> Value {
         "findings": run.findings,
         "groups": run.groups.iter().map(crate::triage::Group::record).collect::<Vec<_>>(),
         "mode": if run.update { "update" } else { "test" },
-        "triage": run.triaged,
+        "run": run.origin.record(),
         "shots": rows,
         "skipped": run.skipped,
+        "triage": run.triaged,
         /* Read where the list follows it. */
         "verdict": verdict.replace(", listed above.", ", listed below."),
         "version": crate::shipped(),
@@ -648,7 +658,7 @@ pub fn markdown(record: &Value) -> String {
         for one in groups {
             let _ = write!(
                 out,
-                "- **{}**: {}",
+                "- **{}**: {}.",
                 plural(
                     one["members"].as_array().map_or(0, Vec::len),
                     "shot",
@@ -656,6 +666,15 @@ pub fn markdown(record: &Value) -> String {
                 ),
                 one["signature"].as_str().unwrap_or_default()
             );
+            let elsewhere: Vec<&str> = one["elsewhere"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(Value::as_str)
+                .collect();
+            if !elsewhere.is_empty() {
+                let _ = write!(out, " Also failing lately on {}.", elsewhere.join(", "));
+            }
             if let (Some(verdict), Some(explanation)) =
                 (one["verdict"].as_str(), one["explanation"].as_str())
             {
@@ -694,6 +713,18 @@ pub fn markdown(record: &Value) -> String {
     }
     if let Some(triaged) = record["triage"].as_str() {
         let _ = writeln!(out, "\n{triaged}");
+    }
+    let lines: Vec<&str> = record["history"]["lines"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(Value::as_str)
+        .collect();
+    if !lines.is_empty() {
+        out.push_str("\nHistory:\n\n");
+        for line in lines {
+            let _ = writeln!(out, "- {line}");
+        }
     }
     out
 }

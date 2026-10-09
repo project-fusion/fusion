@@ -27,6 +27,7 @@ mod discover;
 mod driver;
 mod fingerprint;
 mod harness;
+mod history;
 mod image;
 mod out;
 mod pairs;
@@ -141,8 +142,13 @@ pub enum Visual {
         /// are one group, asked about once when the config has a triage.
         #[arg(long, value_name = "REPORT", num_args = 1..)]
         merge: Vec<PathBuf>,
+        /// The records of earlier runs, each a `run.json` or a directory
+        /// holding any number: the shots that keep needing a second take, and
+        /// the changes failing on branches that did not make them.
+        #[arg(long, value_name = "RUNS", num_args = 1..)]
+        history: Vec<PathBuf>,
         /// The git ref a merge's triage reads the diff from.
-        #[arg(long, value_name = "REF", requires = "merge")]
+        #[arg(long, value_name = "REF")]
         changed: Option<String>,
     },
     /// Picture every entry and write the baselines the comparison rejects.
@@ -316,11 +322,16 @@ pub fn run(verb: &Visual, json: bool) -> Outcome<Code> {
         Visual::Report {
             changed,
             config,
+            history,
             markdown,
             merge,
-        } if !merge.is_empty() => {
-            run::merge_reports(config.as_deref(), merge, changed.as_deref(), *markdown)
-        }
+        } if !merge.is_empty() || !history.is_empty() => run::merge_reports(
+            config.as_deref(),
+            merge,
+            history,
+            changed.as_deref(),
+            *markdown,
+        ),
         Visual::Report {
             config, markdown, ..
         } => run::open_report(config.as_deref(), *markdown),

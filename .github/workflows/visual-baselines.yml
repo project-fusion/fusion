@@ -40,7 +40,7 @@ on:
         description: Also write the element boxes into each matching baseline that has none
         type: boolean
       family:
-        description: A single entry to retake, an example family in both tiers or a site page, or blank for every one
+        description: The entries to retake, separated by spaces, each an example family in both tiers or a site page, or blank for every one
         required: false
         type: string
       suite:
