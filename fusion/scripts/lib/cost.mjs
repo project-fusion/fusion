@@ -85,7 +85,7 @@ const scaled = (task) => {
 
 /**
  * Every family `task` was measured over, as `{ family: seconds on a runner }`,
- * for a reader that takes plain data: Fusion Proof's `shard.cost`, which packs
+ * for a reader that takes plain data: Fusion Locus's `shard.cost`, which packs
  * the visual shards by the same seconds `costOf` gives the plan.
  */
 export const measured = (task) => Object.fromEntries(scaled(task) ?? [])

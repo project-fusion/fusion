@@ -39,7 +39,7 @@ describe('which scopes release', () => {
   test('every domain, and the first segment names them', () => {
     expect(resolve(['fix(helix/cli): x'])).toEqual([{ domain: 'helix', level: 'patch' }])
     expect(resolve(['fix(cortex/docs): x'])).toEqual([{ domain: 'cortex', level: 'patch' }])
-    expect(resolve(['feat(proof/cli): x'])).toEqual([{ domain: 'proof', level: 'minor' }])
+    expect(resolve(['feat(locus/cli): x'])).toEqual([{ domain: 'locus', level: 'minor' }])
   })
 
   test('a scope outside them, or none at all, releases nothing', () => {
@@ -126,8 +126,8 @@ describe('a held domain', () => {
      the release: its subjects ask for a bump and the matrix gets no leg, so a
      merge publishes nothing of it and spends no number. */
   test('gets no release leg, whatever its subjects ask', () => {
-    const messages = ['feat(proof): x', 'fix(proof/cli)!: y', 'fix(helix): z']
-    expect(resolve(messages, new Set(), new Set(['proof']))).toEqual([
+    const messages = ['feat(locus): x', 'fix(locus/cli)!: y', 'fix(helix): z']
+    expect(resolve(messages, new Set(), new Set(['locus']))).toEqual([
       { domain: 'helix', level: 'patch' },
     ])
   })
@@ -140,16 +140,16 @@ describe('a held domain', () => {
           [join(ROOT, 'fusion/scripts/bump.mjs'), '--stdin', ...flags],
           {
             encoding: 'utf8',
-            input: 'feat(proof): x\0fix(cortex): y\0',
+            input: 'feat(locus): x\0fix(cortex): y\0',
           },
         ),
       )
     expect(run()).toEqual([
       { domain: 'cortex', level: 'patch' },
-      { domain: 'proof', level: 'minor' },
+      { domain: 'locus', level: 'minor' },
     ])
-    expect(run('--held', 'proof')).toEqual([{ domain: 'cortex', level: 'patch' }])
-    expect(run('--held', 'proof', '--zero', 'cortex')).toEqual([
+    expect(run('--held', 'locus')).toEqual([{ domain: 'cortex', level: 'patch' }])
+    expect(run('--held', 'locus', '--zero', 'cortex')).toEqual([
       { domain: 'cortex', level: 'patch' },
     ])
   })

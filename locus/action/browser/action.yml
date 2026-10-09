@@ -1,0 +1,86 @@
+# Chromium and the system packages it links against, restored from the cache
+# when they can be: Fusion Locus's browser install, for any project.
+#
+# **The browser is keyed on the Playwright version and nothing else**, because
+# that is what decides which browser build `playwright install` fetches. Keyed
+# on a lockfile, any dependency bump downloads the same browser again.
+#
+# **The headless shell and not the whole browser.** `chromium.launch()` runs
+# the shell unless it is given a channel, and Locus gives none.
+#
+# **The system packages are cached as the `.deb` files apt fetched**, keyed on
+# the runner image and the Playwright version. On a hit `dpkg` installs them
+# from the cache and the job never contacts the Ubuntu mirror. On October 7,
+# 2026 the mirror stalled often enough that 45 of 3,007 of Fusion's browser
+# jobs reached their 15-minute timeout in `apt-get update`; from the cache the
+# step takes 7 to 20 seconds.
+#
+# **Keyed on the runner image because the set is a difference.** Most of what
+# Chromium needs is on the image already, and apt fetches the rest and upgrades
+# a few libraries the image holds an older build of. The same files installed
+# on a newer image could downgrade what it ships, so a new image is a new key.
+# The fonts in the set decide what a picture shows, which is why Locus's
+# environment fingerprint hashes them.
+#
+# **A miss installs from the mirror with a limit and a second try.** apt gives
+# up on a silent connection after 20 seconds and retries, each attempt is
+# capped at four minutes, and the second attempt drops the first mirror from
+# the runner's list. A miss caches what it fetched only when every package apt
+# installed or upgraded is there as a file, so a hit never installs part of the
+# set.
+name: Install Chromium for Fusion Locus
+description: Restores the Playwright browser and its system packages from the cache, and installs both.
+
+inputs:
+  playwright:
+    description: The command that runs Playwright's command line, such as `npx --no-install playwright` or `bunx playwright`.
+    default: npx --no-install playwright
+  version:
+    description: The Playwright version, when the caller knows it. Read from the Playwright installed in the working directory when not given.
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    - name: Read the Playwright version and the runner image
+      id: version
+      shell: bash
+      env:
+        PLAYWRIGHT: ${{ inputs.playwright }}
+        VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        version="$VERSION"
+        if [ -z "$version" ]; then
+          version=$($PLAYWRIGHT --version | awk '{ print $2 }')
+        fi
+        [ -n "$version" ] || { echo "::error::No Playwright version: install playwright, or pass \`version\`."; exit 1; }
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+        # Every GitHub-hosted runner sets `ImageOS` and `ImageVersion`. Without
+        # them nothing names the packages the machine already holds, and the
+        # packages come from the mirror.
+        if [ -n "${ImageOS:-}" ] && [ -n "${ImageVersion:-}" ]; then
+          echo "image=$ImageOS-$ImageVersion" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Restore the browser
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        key: playwright-${{ runner.os }}-${{ steps.version.outputs.version }}
+        path: ~/.cache/ms-playwright
+
+    - name: Restore the system packages
+      id: packages
+      if: steps.version.outputs.image != ''
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        key: playwright-deps-${{ steps.version.outputs.image }}-${{ steps.version.outputs.version }}
+        path: ~/.cache/playwright-deps
+
+    - name: Install the system packages and Chromium
+      shell: bash
+      env:
+        HIT: ${{ steps.packages.outputs.cache-hit }}
+        IMAGE: ${{ steps.version.outputs.image }}
+        PLAYWRIGHT: ${{ inputs.playwright }}
+      run: bash "$GITHUB_ACTION_PATH/install.sh"

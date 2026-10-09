@@ -325,7 +325,7 @@ fn agreed(
 ///
 /// **A misspelled name holds nothing back.** The release scripts drop the
 /// domains `held` names from the matrix and read nothing else, so `proff`
-/// there would leave Proof releasing on the next merge, to a registry that has
+/// there would leave Locus releasing on the next merge, to a registry that has
 /// never seen it, with a clean workspace reporting the hold in place.
 fn held(context: &Context, findings: &mut Vec<Finding>) -> usize {
     for (domain, reason) in &context.settings.held {

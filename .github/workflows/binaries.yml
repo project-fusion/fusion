@@ -1,4 +1,4 @@
-# The `helix` and `proof` binaries, built for every platform package.
+# The `helix` and `locus` binaries, built for every platform package.
 #
 # Called by `release.yml` and `release-experimental.yml` before they pack, with
 # the domain and the version they are about to publish. Each binary lands as an
@@ -22,7 +22,7 @@ on:
   workflow_call:
     inputs:
       domain:
-        description: The domain whose command line to build, `helix` or `proof`.
+        description: The domain whose command line to build, `helix` or `locus`.
         required: true
         type: string
       version:
@@ -38,7 +38,7 @@ on:
       - fusion/rules/**
       - helix/cli/**
       - helix/theme/**
-      - proof/cli/**
+      - locus/cli/**
 
 permissions:
   contents: read
@@ -52,7 +52,7 @@ jobs:
       fail-fast: true
       matrix:
         # The one domain a release asked for, and both on a pull request.
-        domain: ${{ fromJSON(inputs.domain && format('["{0}"]', inputs.domain) || '["helix", "proof"]') }}
+        domain: ${{ fromJSON(inputs.domain && format('["{0}"]', inputs.domain) || '["helix", "locus"]') }}
         platform: [darwin-arm64, darwin-x64, linux-arm64, linux-x64, win32-x64]
         # **Keyed on `platform` alone.** An entry naming a domain matches no
         # combination when the release asked for the other one, and GitHub then
@@ -110,7 +110,7 @@ jobs:
       #
       # **Narrower than this workflow's `pull_request` filter, on purpose.**
       # That filter says what could break a build and this says what changes
-      # one. `helix/cli/**` and `proof/cli/**` cover the npm manifests, which
+      # one. `helix/cli/**` and `locus/cli/**` cover the npm manifests, which
       # the release stamps on every publish, and `helix/theme/**` covers that
       # package's TypeScript, which the crate does not read: hashing any of them
       # meant a key that moved when the binary did not. The crate's sources are
@@ -132,7 +132,7 @@ jobs:
             || hashFiles(
             '.github/workflows/binaries.yml', 'Cargo.lock', 'Cargo.toml',
             'fusion/rules/Cargo.toml', 'fusion/rules/src/**',
-            'proof/cli/Cargo.toml', 'proof/cli/src/**') }}
+            'locus/cli/Cargo.toml', 'locus/cli/src/**') }}
           path: ${{ env.BINARY }}
 
       # Statically linked, so one binary runs on a glibc distribution and on

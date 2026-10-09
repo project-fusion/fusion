@@ -3,10 +3,10 @@
 # **A baseline is a Linux artifact and development is darwin.** No headless
 # example sets `font-family`, so the font stack, rasterizer and antialiasing all
 # differ and a baseline taken on a Mac fails on `ubuntu-latest` at nearly every
-# glyph. Fusion Proof, which `check:spec:visual` runs, refuses to compare across
+# glyph. Fusion Locus, which `check:spec:visual` runs, refuses to compare across
 # platforms rather than widening a threshold until real faults fit under it, and
 # records the environment the baselines were taken in beside them, in
-# `proof.fingerprint.json`.
+# `locus.fingerprint.json`.
 #
 # **`workflow_dispatch`, never a trigger.** A baseline that refreshes itself on
 # push agrees with whatever just landed and reports success forever. A person
@@ -69,8 +69,8 @@ jobs:
       - name: Build
         run: bun run build
 
-      - name: Put the proof binary on disk
-        uses: ./.github/actions/proof
+      - name: Put the locus binary on disk
+        uses: ./.github/actions/locus
 
       # **An App token, because `GITHUB_TOKEN` opens a pull request nothing
       # will check.** GitHub does not run `pull_request` workflows for events
@@ -86,7 +86,7 @@ jobs:
           app-id: ${{ vars.STAMP_APP_ID }}
           private-key: ${{ secrets.STAMP_APP_PRIVATE_KEY }}
 
-      # **Fusion Proof's own Action**, so the retake mode a consumer uses is the
+      # **Fusion Locus's own Action**, so the retake mode a consumer uses is the
       # one these baselines are taken with. It installs the browser and its
       # system packages from the cache `verify` reads: the packages carry the
       # fonts, and the fingerprint holds the fonts, so a retake installed
@@ -99,12 +99,12 @@ jobs:
       # `bump.mjs` maps `chore` to `patch`, so a baseline carrying a `helix`
       # scope would ask for a release. Only `test` and `ci` release nothing.
       - name: Retake the baselines
-        uses: ./proof/action
+        uses: ./locus/action
         with:
-          args: ${{ inputs.suite == 'site' && '--config fusion/site/proof.config.ts' || '' }} ${{ inputs.family }}
+          args: ${{ inputs.suite == 'site' && '--config fusion/site/locus.config.ts' || '' }} ${{ inputs.family }}
           branch: ${{ inputs.suite == 'site' && 'visual-baselines-site-' || 'visual-baselines-' }}${{ github.ref_name }}
           commit-message: 'test(visual): retake the baselines'
           mode: retake
           playwright: bunx playwright
-          proof: bun proof/cli/npm/bin.mjs
+          locus: bun locus/cli/npm/bin.mjs
           token: ${{ steps.app.outputs.token }}

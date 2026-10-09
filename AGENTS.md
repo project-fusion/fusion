@@ -11,8 +11,8 @@ for `helix/**`, [cortex/CONVENTIONS.md](cortex/CONVENTIONS.md) for `cortex/**`. 
 
 - **Two cores.** **Helix** is the DNA (design system). **Cortex** is the mind
   (memory, provenance, context). Products build *on top of* them.
-- **Fusion Proof** is visual regression testing with baselines kept in git, a
-  tool for any web project. Building: [proof/README.md](proof/README.md) has
+- **Fusion Locus** is visual regression testing with baselines kept in git, a
+  tool for any web project. Building: [locus/README.md](locus/README.md) has
   the decisions and the phases.
 - **Thesis: intelligence belongs in the foundation.** An intelligent design
   system, intelligent tooling and intelligent services, built on one substrate
@@ -173,7 +173,7 @@ Rust for backend and substrate cores. TypeScript for frontend.
 helix/     styles core headless styled icons theme cem docs diagnostics
            gallery sandbox testing cli templates create-app
 cortex/    core trace engram docs
-proof/     cli: the Rust core, its npm package and the capture driver
+locus/     cli: the Rust core, its npm package and the capture driver
 fusion/    cli docs plugins rules scripts site: what belongs to the company
            rather than to a product. `docs/insights` is the published writing;
            `rules` is the crate every command line takes, which is what a rule
@@ -326,12 +326,12 @@ directions, so the day the flag changes is the day the workflow has to.
 
 - **Verticals get descriptive names**: Fusion Studio, Fusion Design, Fusion
   Mind.
-- **Products get evocative names**: Helix, Cortex, Proof. A module earns one
+- **Products get evocative names**: Helix, Cortex, Locus. A module earns one
   only when it carries a differentiated idea: inside Cortex that is exactly
   three, Engram (memory), Trace (provenance), Recall (context). The rest stay
   descriptive.
 - **npm scopes name the domain, not the audience**: `@fusion.dev/helix-*`,
-  `@fusion.dev/cortex-*` and `@fusion.dev/proof-*` for anything belonging to
+  `@fusion.dev/cortex-*` and `@fusion.dev/locus-*` for anything belonging to
   that product, `@fusion.dev/*` for what spans the company. Package names drop
   the product prefix: `@fusion.dev/helix`, not `@fusion.dev/helix-helix-styled`.
 - **`private` decides what ships, and the scope does not.** A package can belong

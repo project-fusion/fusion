@@ -72,7 +72,7 @@
     "whilst": "while",
     "wilful": "willful"
   },
-  "domains": ["cortex", "helix", "proof"],
+  "domains": ["cortex", "helix", "locus"],
   "gallery": {
     "art": "helix/gallery/src",
     "families": "helix/styled/src",
@@ -83,7 +83,7 @@
     ]
   },
   "held": {
-    "proof": "Not on the registry yet. Bootstrap it, register trusted publishing, then delete this entry: .github/RELEASING.md#a-held-domain."
+    "locus": "Not on the registry yet. Bootstrap it, register trusted publishing, then delete this entry: .github/RELEASING.md#a-held-domain."
   },
   "helix": {
     "accepted": {

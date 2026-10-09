@@ -225,7 +225,7 @@ if (failed > 0) {
         '  bun run build\n' +
         '  node fusion/scripts/publish.mjs --domain helix --tag exp-0\n' +
         '  node fusion/scripts/publish.mjs --domain cortex --tag exp-0\n' +
-        '  node fusion/scripts/publish.mjs --domain proof --tag exp-0\n',
+        '  node fusion/scripts/publish.mjs --domain locus --tag exp-0\n',
     )
   }
   if (challenged.size > 0) {

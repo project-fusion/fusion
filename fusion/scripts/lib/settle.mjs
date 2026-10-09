@@ -39,7 +39,7 @@ export const awaitUpgrades = (tab, prefix = '') =>
  */
 export const awaitStill = (tab) =>
   tab.evaluate(async () => {
-    /* Three frames, as Fusion Proof's driver waits for `check:spec:visual`.
+    /* Three frames, as Fusion Locus's driver waits for `check:spec:visual`.
        React mounts in a task of its own and an example that sets state in an
        effect, which the timestamped ones do, needs the render that follows it. */
     await new Promise((done) =>

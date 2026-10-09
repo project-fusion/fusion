@@ -15,7 +15,7 @@ set -euo pipefail
 held=$(jq -r '.held // {} | keys | join(",")' fusion.json)
 
 : > /tmp/entries
-for domain in helix cortex proof; do
+for domain in helix cortex locus; do
   last=$(git tag --list "$domain-v*" --sort=-v:refname | head -1)
   # No tag is the first release, and the range is then all of history.
   range=$SHA

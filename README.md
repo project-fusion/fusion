@@ -184,8 +184,8 @@ bare leaf names recur across domains.
 | | provenance capture | `cortex/trace` |
 | | the memory store | `cortex/engram` |
 | | the documentation, as content | [cortex/docs](cortex/docs/README.md) |
-| **[Proof](proof/README.md)** | visual regression testing, in development | |
-| | `proof`, the Rust core, its npm package and the capture driver | `proof/cli` |
+| **[Locus](locus/README.md)** | visual regression testing, in development | |
+| | `locus`, the Rust core, its npm package and the capture driver | `locus/cli` |
 | **[Fusion](fusion/README.md)** | what belongs to the company | |
 | | the published writing | `fusion/docs` |
 | | the site that renders all of it | `fusion/site` |

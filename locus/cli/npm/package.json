@@ -1,0 +1,53 @@
+{
+  "name": "@fusion.dev/locus",
+  "description": "Fusion Locus, visual regression testing for any web project, with baselines kept in git.",
+  "version": "0.0.0-dev",
+  "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
+  "repository": {
+    "directory": "locus/cli/npm",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./index.mjs"
+    }
+  },
+  "files": [
+    "bin.mjs",
+    "driver.mjs",
+    "index.mjs",
+    "types"
+  ],
+  "bin": {
+    "locus": "./bin.mjs"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "homepage": "https://fusion.dev",
+  "keywords": [
+    "locus",
+    "cli",
+    "playwright",
+    "screenshot",
+    "visual-regression"
+  ],
+  "optionalDependencies": {
+    "@fusion.dev/locus-darwin-arm64": "workspace:*",
+    "@fusion.dev/locus-darwin-x64": "workspace:*",
+    "@fusion.dev/locus-linux-arm64": "workspace:*",
+    "@fusion.dev/locus-linux-x64": "workspace:*",
+    "@fusion.dev/locus-win32-x64": "workspace:*"
+  },
+  "peerDependencies": {
+    "playwright": ">=1.50"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

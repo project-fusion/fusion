@@ -41,7 +41,7 @@ jobs:
       contents: read
     outputs:
       helix: ${{ steps.plan.outputs.helix }}
-      proof: ${{ steps.plan.outputs.proof }}
+      locus: ${{ steps.plan.outputs.locus }}
     env:
       NUMBER: ${{ github.event.pull_request.number }}
     steps:
@@ -66,7 +66,7 @@ jobs:
           set -euo pipefail
           .github/scripts/stamp-experimental.sh
           echo "helix=$(awk '$1 == "helix" { print $2 }' /tmp/released)" >> "$GITHUB_OUTPUT"
-          echo "proof=$(awk '$1 == "proof" { print $2 }' /tmp/released)" >> "$GITHUB_OUTPUT"
+          echo "locus=$(awk '$1 == "locus" { print $2 }' /tmp/released)" >> "$GITHUB_OUTPUT"
 
   helix-binaries:
     needs: plan
@@ -76,19 +76,19 @@ jobs:
       domain: helix
       version: ${{ needs.plan.outputs.helix }}
 
-  proof-binaries:
+  locus-binaries:
     needs: plan
-    if: needs.plan.outputs.proof != ''
+    if: needs.plan.outputs.locus != ''
     uses: ./.github/workflows/binaries.yml
     with:
-      domain: proof
-      version: ${{ needs.plan.outputs.proof }}
+      domain: locus
+      version: ${{ needs.plan.outputs.locus }}
 
   # Written out, since the default skips a job whose dependency was skipped and
   # each binaries job is whenever nothing touches its domain.
   publish:
-    needs: [plan, helix-binaries, proof-binaries]
-    if: ${{ !cancelled() && needs.plan.result == 'success' && (needs.plan.outputs.helix == '' || needs.helix-binaries.result == 'success') && (needs.plan.outputs.proof == '' || needs.proof-binaries.result == 'success') }}  # dialect:quoted, GitHub's function
+    needs: [plan, helix-binaries, locus-binaries]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && (needs.plan.outputs.helix == '' || needs.helix-binaries.result == 'success') && (needs.plan.outputs.locus == '' || needs.locus-binaries.result == 'success') }}  # dialect:quoted, GitHub's function
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: experimental
@@ -165,16 +165,16 @@ jobs:
         if: needs.plan.outputs.helix != ''
         run: .github/scripts/place-binaries.sh helix "$RUNNER_TEMP/binaries"
 
-      - name: Fetch the Proof binaries
-        if: needs.plan.outputs.proof != ''
+      - name: Fetch the Locus binaries
+        if: needs.plan.outputs.locus != ''
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          pattern: proof-cli-*
+          pattern: locus-cli-*
           path: ${{ runner.temp }}/binaries
 
-      - name: Put each Proof binary in its platform package
-        if: needs.plan.outputs.proof != ''
-        run: .github/scripts/place-binaries.sh proof "$RUNNER_TEMP/binaries"
+      - name: Put each Locus binary in its platform package
+        if: needs.plan.outputs.locus != ''
+        run: .github/scripts/place-binaries.sh locus "$RUNNER_TEMP/binaries"
 
       # Against the tarballs, from outside the workspace, before anything is
       # published. A version can be deprecated but never taken back.
