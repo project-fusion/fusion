@@ -1,4 +1,4 @@
-//! The tools: five lookups, a check, and two derivations.
+//! The tools: five lookups, two checks, and two derivations.
 //!
 //! **The lookups answer from the installed packages.** Each is one decision an
 //! agent makes while writing a page: which family, what it takes, an example
@@ -10,6 +10,8 @@
 //! **The check is `helix scan` on the agent's own code**: files in the
 //! project, or a snippet before it is written, judged against everything the
 //! project installs and imports, with the findings in the scan's own shape.
+//! **The page check is its other half**: the agent's page, opened headless and
+//! diagnosed as it runs, which finds what a read of the code cannot.
 //!
 //! **The derivations answer what no file can hold**: what a brand color
 //! derives to, and whether it clears its contrast targets. They split the way
@@ -66,13 +68,20 @@ fn intent_schema() -> Value {
     })
 }
 
-/// The annotations every tool carries: none of them writes anything or
-/// reaches the network, and the same call gives the same answer.
+/// The annotations a tool carries: none of them writes anything, and the
+/// same call gives the same answer. Only the page check reaches past the
+/// project, to the page it is given.
 fn annotations(title: &str) -> Value {
+    with_world(title, false)
+}
+
+/// The annotations, with whether the tool reaches anything outside the
+/// project.
+fn with_world(title: &str, open: bool) -> Value {
     json!({
         "destructiveHint": false,
         "idempotentHint": true,
-        "openWorldHint": false,
+        "openWorldHint": open,
         "readOnlyHint": true,
         "title": title,
     })
@@ -177,6 +186,20 @@ pub fn catalog() -> Vec<Value> {
             "name": "helix_check",
             "outputSchema": output(&[("counts", "object"), ("findings", "array"), ("unsettled", "array"), ("versions", "object")]),
             "title": "Check Helix code",
+        }),
+        json!({
+            "annotations": with_world("Check a Helix page", true),
+            "description": "Opens each page headless and runs the installed Helix diagnostics in it once it holds still, as `helix diagnostics --once` does: what a read of the code cannot see, such as a part that never rendered, an event no element dispatches, an element with no accessible name, and what the library logged as the page ran. Pass `urls`, such as your dev server's `http://localhost:3000/`. Needs `@fusion.dev/helix-diagnostics` and Playwright installed. Fix every finding at `error`.",
+            "inputSchema": {
+                "properties": {
+                    "urls": { "description": "The pages to open, each a full address.", "items": { "type": "string" }, "type": "array" },
+                },
+                "required": ["urls"],
+                "type": "object",
+            },
+            "name": "helix_check_page",
+            "outputSchema": output(&[("counts", "object"), ("failed", "array"), ("runs", "array")]),
+            "title": "Check a Helix page",
         }),
         json!({
             "annotations": annotations("Derive a Helix theme"),
@@ -287,6 +310,7 @@ pub fn call(name: &str, arguments: &Value, from: &Path) -> Result<Answer, String
         .map(Answer::of)
         .map_err(|failure| said(&failure)),
         "helix_check" => check(arguments, from),
+        "helix_check_page" => check_page(arguments, from),
         "helix_audit_theme" | "helix_derive_theme" => theme(name, arguments),
         _ => Err(format!(
             "no tool named {name}. This server has {}.",
@@ -332,6 +356,59 @@ fn check(arguments: &Value, from: &Path) -> Result<Answer, String> {
         "findings": run["findings"],
         "unsettled": run["unsettled"],
         "versions": run["versions"],
+    })))
+}
+
+/// `helix diagnostics --once`, on the pages asked about: each run with its
+/// findings and runtime events, and each page that could not be opened.
+fn check_page(arguments: &Value, from: &Path) -> Result<Answer, String> {
+    let urls: Vec<String> = arguments["urls"]
+        .as_array()
+        .map(|urls| {
+            urls.iter()
+                .filter_map(Value::as_str)
+                .map(str::to_owned)
+                .collect()
+        })
+        .unwrap_or_default();
+    if urls.is_empty() {
+        return Err("`urls` is required, as an array of page addresses.".to_owned());
+    }
+    let answered =
+        crate::diagnostics::pages(from, &urls, None).map_err(|failure| said(&failure))?;
+    let (failed, runs): (Vec<Value>, Vec<Value>) = urls
+        .iter()
+        .zip(answered)
+        .map(|(url, run)| match run.get("error") {
+            Some(error) => (Some(json!({ "error": error, "url": url })), None),
+            None => (
+                None,
+                Some(json!({
+                    "findings": run["findings"],
+                    "page": run.pointer("/run/page").cloned().unwrap_or(Value::Null),
+                    "runtime": run["runtime"],
+                    "url": url,
+                })),
+            ),
+        })
+        .fold(
+            (Vec::new(), Vec::new()),
+            |(mut failed, mut runs), (one, two)| {
+                failed.extend(one);
+                runs.extend(two);
+                (failed, runs)
+            },
+        );
+    let count = |severity: &str| {
+        runs.iter()
+            .flat_map(|run| run["findings"].as_array().into_iter().flatten())
+            .filter(|one| one["severity"] == severity)
+            .count()
+    };
+    Ok(Answer::of(json!({
+        "counts": { "error": count("error"), "info": count("info"), "warn": count("warn") },
+        "failed": failed,
+        "runs": runs,
     })))
 }
 

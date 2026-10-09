@@ -274,3 +274,27 @@ fn a_runtime_event_is_counted_and_printed_once_and_one_a_finding_says_is_left_ou
     );
     assert!(relay.printed().is_empty());
 }
+
+/// `--once` runs the diagnostics the project installed, so a project without
+/// them is told which package to add, before any browser starts.
+#[test]
+fn once_names_the_package_it_needs_when_the_diagnostics_are_not_installed() {
+    let project = std::env::temp_dir().join(format!("helix-once-{}", std::process::id()));
+    std::fs::create_dir_all(&project).expect("a directory");
+    let output = Command::new(binary())
+        .args(["diagnostics", "--once", "http://127.0.0.1:9/"])
+        .current_dir(&project)
+        .output()
+        .expect("helix runs");
+    assert_eq!(output.status.code(), Some(3));
+    let said = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        said.contains("@fusion.dev/helix-diagnostics is not installed"),
+        "{said}"
+    );
+    assert!(
+        said.contains("npm install --save-dev @fusion.dev/helix-diagnostics"),
+        "{said}"
+    );
+    let _ = std::fs::remove_dir_all(&project);
+}

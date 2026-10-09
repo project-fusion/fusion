@@ -18,6 +18,11 @@
 //! counts, new findings, and new runtime events whenever it prints them, for a
 //! script or an agent reading the stream.
 //!
+//! **`--once` opens the pages itself instead.** Each is loaded headless
+//! through the capture driver `helix visual` runs, the installed diagnostics
+//! run in it, and each run prints as a posted one would before the command
+//! exits, which is the page half of `helix scan` for an agent or a CI job.
+//!
 //! The standard library's listener and nothing else: a dev tool answering one
 //! page at a time needs no server framework, and the CLI ships to every
 //! consumer.
@@ -47,8 +52,103 @@ const PATIENCE: Duration = Duration::from_secs(5);
 /// page's console and overlay leave out the same ones.
 const AS_FINDINGS: [&str; 1] = ["duplicate-registration"];
 
-/// Serves until stopped.
+/// The packages a page's diagnostics are judged against, as `diagnose()`
+/// names its tiers.
+const TIERS: [&str; 2] = ["@fusion.dev/helix", "@fusion.dev/helix-headless"];
+
+/// A file in an installed package, from `from`'s `node_modules` up.
+fn installed(from: &Path, package: &str, file: &str) -> Option<PathBuf> {
+    from.ancestors()
+        .map(|dir| dir.join("node_modules").join(package).join(file))
+        .find(|path| path.exists())
+}
+
+/// Each page opened headless and diagnosed once against the installed
+/// packages: its run, or `{ error, url }` where it could not be.
+///
+/// # Errors
+///
+/// The diagnostics or every Helix package are not installed, or no browser
+/// would start.
+pub fn pages(from: &Path, urls: &[String], config: Option<&Path>) -> Outcome<Vec<Value>> {
+    let dist = installed(from, "@fusion.dev/helix-diagnostics", "dist")
+        .filter(|dist| dist.join("index.js").is_file())
+        .ok_or_else(|| {
+            Failure::input(
+                "@fusion.dev/helix-diagnostics is not installed",
+                "the page runs the installed diagnostics, and there are none in node_modules",
+            )
+            .hint("npm install --save-dev @fusion.dev/helix-diagnostics")
+        })?;
+    let tiers: Vec<Value> = TIERS
+        .iter()
+        .filter_map(|name| {
+            let path = installed(from, name, "custom-elements.json")?;
+            let manifest: Value =
+                serde_json::from_str(&std::fs::read_to_string(path).ok()?).ok()?;
+            Some(json!({ "manifest": manifest, "name": name }))
+        })
+        .collect();
+    if tiers.is_empty() {
+        return Err(Failure::input(
+            "no Helix package is installed",
+            "a page is judged against the manifests of the Helix packages in node_modules",
+        )
+        .hint("npm install @fusion.dev/helix"));
+    }
+    let settings = config.map_or_else(|| from.join("helix-diagnostics.json"), Path::to_path_buf);
+    let file = std::fs::read_to_string(&settings)
+        .ok()
+        .and_then(|text| serde_json::from_str::<Value>(&text).ok());
+    fusion_helix_visual::diagnose(
+        from,
+        &fusion_helix_visual::Pages {
+            dist,
+            file,
+            ready: Some("whenSettled"),
+            tiers,
+            urls,
+        },
+    )
+    .map_err(|why| Failure::input("cannot open the pages", why))
+}
+
+/// Each page opened, diagnosed once, and printed, and the code the worst of
+/// them earned.
+fn once(args: &Diagnostics, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
+    let runs = pages(from, &args.once, args.config.as_deref())?;
+    let mut relay = Relay::new(args.out.clone(), json, paint);
+    let mut code = Code::Ok;
+    for (url, run) in args.once.iter().zip(runs) {
+        if let Some(error) = run.get("error").and_then(Value::as_str) {
+            if json {
+                fusion_rules::say!("{}", json!({ "error": error, "page": url }));
+            } else {
+                eprintln!("helix diagnostics: {url}: {error}");
+            }
+            code = Code::Input;
+            continue;
+        }
+        let errors = run
+            .get("findings")
+            .and_then(Value::as_array)
+            .into_iter()
+            .flatten()
+            .any(|finding| finding.get("severity").and_then(Value::as_str) == Some("error"));
+        if errors && code == Code::Ok {
+            code = Code::Failed;
+        }
+        relay.take(run);
+    }
+    Ok(code)
+}
+
+/// Serves until stopped, or with `--once`, diagnoses the pages it names and
+/// exits.
 pub fn run(args: &Diagnostics, from: &Path, json: bool, paint: Paint) -> Outcome<Code> {
+    if !args.once.is_empty() {
+        return once(args, from, json, paint);
+    }
     let listener = TcpListener::bind(("127.0.0.1", args.port)).map_err(|error| {
         Failure::new(
             Code::Input,

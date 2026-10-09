@@ -20,6 +20,7 @@
 //! `test` and `update` start the driver once per run.
 
 mod config;
+mod diagnose;
 mod diff;
 mod discover;
 mod driver;
@@ -40,6 +41,7 @@ use fusion_rules::error::{Failure, Outcome};
 use fusion_rules::exit::Code;
 use serde_json::json;
 
+pub use crate::diagnose::{diagnose, Pages};
 use crate::out::say;
 
 /// The word every printed line opens with: the command, since this is one of

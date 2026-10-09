@@ -15,6 +15,8 @@
  * - `capture` pictures entries, answering `shot` for each picture as it is
  *   taken, `item` when an entry is done, and `captured` at the end.
  * - `finish` hands the config's `inspect.report` every run it collected.
+ * - `diagnose` opens pages and runs the installed diagnostics in each, for
+ *   `helix diagnostics --once`.
  * - `close` closes the browser and the server and exits.
  *
  * Any request that fails answers `error`, with the reason.
@@ -31,7 +33,7 @@
  * tests: auto-waiting, disabled animations, request routing, media emulation,
  * `ariaSnapshot()`, Firefox and WebKit, and `playwright install --with-deps`.
  */
-import { readFileSync, readSync, statSync, writeSync } from 'node:fs'
+import { existsSync, readFileSync, readSync, statSync, writeSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, resolve, sep } from 'node:path'
 import { StringDecoder } from 'node:string_decoder'
@@ -39,6 +41,9 @@ import { pathToFileURL } from 'node:url'
 
 /** The `id` of the harness `<style>` the binary writes into every page. */
 const STYLE_ID = 'helix-visual-harness'
+
+/** Where `diagnose` serves the diagnostics on a page's own origin. */
+const DIAGNOSTICS = '__helix-diagnostics'
 
 /* **Read and written synchronously, on the descriptors themselves.** Bun
    1.1.43, the runtime Fusion's CI pins, hands a script nothing from a piped
@@ -481,6 +486,55 @@ const handlers = {
       config: { ...JSON.parse(JSON.stringify(values)), inspect: inspect !== undefined },
       op: 'config',
     })
+  },
+
+  /* **Each page's own diagnostics, with nothing added to the app.** The
+     installed `@fusion.dev/helix-diagnostics` is served on each page's own
+     origin, under a path no app uses, so a policy that allows only `'self'`
+     scripts allows it, and the page imports it once it holds still and runs
+     one `diagnose()` against the installed manifests. The runtime events the
+     library logged as the page loaded are in the run, which is the half a
+     read of the code cannot see. */
+  async diagnose({ dist, file, readyProperty, tiers, urls }) {
+    const { chromium } = await playwright()
+    state.browser ??= await chromium.launch()
+    const context = await state.browser.newContext({ reducedMotion: 'reduce' })
+    await context.route(`**/${DIAGNOSTICS}/**`, async (route) => {
+      const name = new URL(route.request().url()).pathname.split(`/${DIAGNOSTICS}/`)[1] ?? ''
+      const path = inside(dist, name)
+      if (path === undefined || !existsSync(path)) {
+        await route.fulfill({ status: 404 })
+        return
+      }
+      await route.fulfill({ body: readFileSync(path), contentType: 'text/javascript' })
+    })
+    const runs = []
+    for (const url of urls) {
+      const page = await context.newPage()
+      try {
+        const answered = await page.goto(url, { waitUntil: 'load' })
+        /* A page that is not there is no clean page. */
+        if (answered !== null && !answered.ok()) {
+          throw new Error(`answered ${answered.status()}`)
+        }
+        await still(page, readyProperty)
+        runs.push(
+          await page.evaluate(
+            async ({ entry, file, tiers }) => {
+              const { diagnose } = await import(entry)
+              return diagnose({ environment: 'development', file: file ?? undefined, tiers })
+            },
+            { entry: `/${DIAGNOSTICS}/index.js`, file, tiers },
+          ),
+        )
+      } catch (caught) {
+        runs.push({ error: caught instanceof Error ? caught.message : String(caught), url })
+      } finally {
+        await page.close().catch(() => {})
+      }
+    }
+    await context.close().catch(() => {})
+    say({ op: 'diagnosed', runs })
   },
 
   async fetch({ url }) {

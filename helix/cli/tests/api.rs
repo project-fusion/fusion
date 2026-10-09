@@ -416,7 +416,7 @@ fn every_tool_declares_an_output_schema_and_read_only_annotations() {
     let project = Project::helix("list");
     let replies = project.talk(&[json!({ "id": 1, "jsonrpc": "2.0", "method": "tools/list" })]);
     let tools = replies[0]["result"]["tools"].as_array().expect("tools");
-    assert_eq!(tools.len(), 8);
+    assert_eq!(tools.len(), 9);
     for tool in tools {
         assert_eq!(tool["outputSchema"]["type"], "object", "{}", tool["name"]);
         assert_eq!(

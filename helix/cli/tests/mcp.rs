@@ -79,6 +79,7 @@ fn it_negotiates_and_lists_its_tools() {
             "helix_imports",
             "helix_tokens",
             "helix_check",
+            "helix_check_page",
             "helix_derive_theme",
             "helix_audit_theme"
         ]
