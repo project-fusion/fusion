@@ -25,6 +25,18 @@
  * repository's source. The packages are packed from this tree and installed
  * once, outside the repository, where no workspace links them back.
  *
+ * **Graded twice: the code, and the page running.** `run-tasks.mjs` reads
+ * what the agent wrote. Each page is then bundled, served on a local port,
+ * and opened headless by `helix diagnostics --once`, which reports what only
+ * a running page shows: an event listened for on an element that never
+ * hears it, a part that never rendered, what the library logged. A page that
+ * does not build fails, as it would for a user. `--no-runtime` skips this.
+ *
+ * **It resumes.** Each run's result and page are saved to `--out` as it
+ * finishes, so a usage limit or an expired sign-in part way through costs
+ * nothing done: the same command again runs only what is missing, and grades
+ * everything.
+ *
  * **A model answers differently on every run**, so this records a result and
  * fails nothing. It needs Claude Code installed and signed in, and spends
  * what each run costs, capped per run by `--budget`.
@@ -32,7 +44,7 @@
  *   bun fusion/scripts/run-agents.mjs --tasks select,tabs --arms docs,skill,mcp
  *   bun fusion/scripts/run-agents.mjs --model sonnet --budget 1 --out .local/agents/pilot
  */
-import { execFileSync, spawnSync } from 'node:child_process'
+import { execFileSync, spawn, spawnSync } from 'node:child_process'
 import {
   cpSync,
   existsSync,
@@ -53,6 +65,7 @@ const PACKAGES = [
   '@fusion.dev/helix',
   '@fusion.dev/helix-cli',
   '@fusion.dev/helix-core',
+  '@fusion.dev/helix-diagnostics',
   '@fusion.dev/helix-headless',
   '@fusion.dev/helix-icons',
   '@fusion.dev/helix-styles',
@@ -69,6 +82,7 @@ const budget = argument('budget') ?? '1'
 const out = resolve(
   argument('out') ?? join(root, '.local/agents', new Date().toISOString().slice(0, 16)),
 )
+const runtime = !process.argv.includes('--no-runtime')
 
 for (const arm of arms) {
   if (!ARMS.includes(arm)) {
@@ -101,9 +115,15 @@ for (const name of PACKAGES) {
   run('bun', ['pm', 'pack', '--destination', into], join(root, directories.get(name)))
   dependencies[name] = `file:${join(into, readdirSync(into)[0])}`
 }
+/* From the registry: React, for the tasks that ask for it, and Playwright at
+   this repository's version, which the runtime check opens each page with in
+   the browser this machine already has for it. */
+const playwright = JSON.parse(
+  readFileSync(join(root, 'node_modules/playwright/package.json'), 'utf8'),
+).version
 writeFileSync(
   join(project, 'package.json'),
-  `${JSON.stringify({ dependencies, name: 'agents', overrides: dependencies, private: true, type: 'module' }, null, 2)}\n`,
+  `${JSON.stringify({ dependencies: { ...dependencies, playwright, react: '^19.0.0', 'react-dom': '^19.0.0' }, name: 'agents', overrides: dependencies, private: true, type: 'module' }, null, 2)}\n`,
 )
 run('bun', ['install'], project)
 const modules = join(project, 'node_modules')
@@ -210,20 +230,46 @@ const attempt = (arm, task) => {
   }
 }
 
-const results = []
+/* **What an earlier run of the same `--out` finished**, kept: its pages go
+   back where grading reads them, and only what is missing runs. */
+const saved = join(out, 'attempts.json')
+mkdirSync(join(out, 'runs'), { recursive: true })
+const results = existsSync(saved)
+  ? JSON.parse(readFileSync(saved, 'utf8')).filter(
+      (one) => arms.includes(one.arm) && tasks.some((task) => task.id === one.task),
+    )
+  : []
+if (results.length > 0) {
+  cpSync(join(out, 'runs'), join(project, 'runs'), { recursive: true })
+  console.error(`run-agents: ${results.length} runs kept from ${out}`)
+}
 for (const arm of arms) {
   for (const task of tasks) {
+    if (results.some((one) => one.arm === arm && one.task === task.id)) {
+      continue
+    }
     const one = attempt(arm, task)
     console.error(
       `run-agents: ${arm} ${task.id}: ${one.turns ?? '?'} turns, $${one.cost?.toFixed(3) ?? '?'}, ${one.seconds} s${one.error ? `, ${one.error}` : ''}`,
     )
-    results.push(one)
     /* A run that never reached the model says nothing about Helix, and every
-       run after it would say the same, so the whole set stops here. */
-    if (one.cost === 0 && /authenticate|log ?in|credit balance|rate limit/i.test(one.error ?? '')) {
-      console.error(`run-agents: stopped, since no run can reach the model: ${one.error}`)
+       run after it would say the same, so the whole set stops here, with
+       everything finished already saved. The same command resumes. */
+    if (
+      one.cost === 0 &&
+      /authenticate|log ?in|credit balance|rate limit|usage limit/i.test(one.error ?? '')
+    ) {
+      console.error(
+        `run-agents: stopped, since no run can reach the model: ${one.error}\n` +
+          `  ${results.length} runs are saved in ${out}. Run the same command again to go on.`,
+      )
       process.exit(1)
     }
+    results.push(one)
+    cpSync(join(project, 'runs', arm, task.id), join(out, 'runs', arm, task.id), {
+      recursive: true,
+    })
+    writeFileSync(saved, `${JSON.stringify(results, null, 2)}\n`)
   }
 }
 
@@ -247,8 +293,117 @@ for (const arm of arms) {
   }
 }
 
-mkdirSync(out, { recursive: true })
-cpSync(join(project, 'runs'), join(out, 'runs'), { recursive: true })
+/** The module script a page loads, or the `main` file the prompt asked for. */
+const entryOf = (folder) => {
+  const page = existsSync(join(folder, 'index.html'))
+    ? readFileSync(join(folder, 'index.html'), 'utf8')
+    : ''
+  const named = /<script[^>]*type="module"[^>]*src="\.?\/?([^"]+)"/.exec(page)?.[1]
+  return [named, 'main.tsx', 'main.ts'].find(
+    (one) => one !== undefined && existsSync(join(folder, one)),
+  )
+}
+
+/**
+ * Each page bundled into `dist` beside it, a folder the scan leaves out: its script, the CSS the script
+ * imports, and its own `index.html` loading both. `undefined` where it built,
+ * or why it did not.
+ */
+const serve = (folder) => {
+  const entry = entryOf(folder)
+  if (entry === undefined) {
+    return 'the page names no script to load'
+  }
+  const into = join(folder, 'dist')
+  const built = spawnSync(
+    'bun',
+    ['build', entry, '--outdir', into, '--target', 'browser', '--experimental-css'],
+    { cwd: folder, encoding: 'utf8' },
+  )
+  if (built.status !== 0) {
+    return `the page does not build: ${(built.stderr || built.stdout).trim().split('\n')[0]}`
+  }
+  const stem = entry.replace(/\.[^.]+$/, '')
+  const page = existsSync(join(folder, 'index.html'))
+    ? readFileSync(join(folder, 'index.html'), 'utf8')
+    : '<!doctype html><html><head></head><body><div id="root"></div></body></html>'
+  const styles = existsSync(join(into, `${stem}.css`))
+    ? `<link rel="stylesheet" href="./${stem}.css">`
+    : ''
+  const script = `<script type="module" src="./${stem}.js"></script>`
+  const markup = page.replace(/<script[^>]*type="module"[^>]*><\/script>/g, '')
+  /* A whole document takes the two where they go, and a fragment of markup is
+     set in one. */
+  const html = /<\/body>/i.test(markup)
+    ? markup.replace(/<\/head>/i, `${styles}</head>`).replace(/<\/body>/i, `${script}</body>`)
+    : `<!doctype html><html><head><meta charset="utf-8">${styles}</head><body>${markup}${script}</body></html>`
+  writeFileSync(join(into, 'index.html'), html)
+  return undefined
+}
+
+/* **The page running, through `helix diagnostics --once`.** One server over
+   the project, and one pass per arm over every page that built. */
+if (runtime) {
+  const port = 8800 + Math.floor(Math.random() * 100)
+  const server = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1'], {
+    cwd: project,
+    stdio: 'ignore',
+  })
+  await new Promise((done) => setTimeout(done, 800))
+  try {
+    for (const arm of arms) {
+      const urls = []
+      for (const one of results.filter((each) => each.arm === arm)) {
+        const why = serve(join(project, 'runs', arm, one.task))
+        if (why === undefined) {
+          urls.push([one, `/runs/${arm}/${one.task}/dist/index.html`])
+        } else {
+          one.passed = false
+          one.reasons = [...(one.reasons ?? []), why]
+        }
+      }
+      if (urls.length === 0) {
+        continue
+      }
+      const once = urls.flatMap(([, path]) => ['--once', `http://127.0.0.1:${port}${path}`])
+      const diagnosed = spawnSync(helix, ['--json', 'diagnostics', ...once], {
+        cwd: project,
+        encoding: 'utf8',
+        maxBuffer: 1024 * 1024 * 64,
+      })
+      /* One line a page, in the order asked, each naming its page. */
+      const lines = diagnosed.stdout
+        .split('\n')
+        .filter((line) => line.startsWith('{'))
+        .map((line) => JSON.parse(line))
+      urls.forEach(([one, path], at) => {
+        const line =
+          lines.find((each) => each.page === path || String(each.page).endsWith(path)) ?? lines[at]
+        if (line === undefined) {
+          return
+        }
+        const faults = line.error
+          ? [`the page did not open: ${line.error}`]
+          : (line.findings ?? [])
+              .filter((finding) => finding.severity === 'error')
+              .map((finding) => `runtime ${finding.kind}: ${finding.message}`)
+        one.runtime = faults.length === 0
+        if (faults.length > 0) {
+          one.passed = false
+          one.reasons = [...(one.reasons ?? []), ...faults]
+        }
+      })
+    }
+  } finally {
+    server.kill()
+  }
+}
+
+/* The pages as written, without what was built from them. */
+cpSync(join(project, 'runs'), join(out, 'runs'), {
+  filter: (source) => !source.split('/').includes('dist'),
+  recursive: true,
+})
 const summary = Object.fromEntries(
   arms.map((arm) => {
     const mine = results.filter((one) => one.arm === arm)
