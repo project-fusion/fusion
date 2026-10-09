@@ -3,9 +3,8 @@
 //!
 //! **A library, and `helix` is its one caller.** The `visual` noun is
 //! [`Visual`], and `helix` hands it to [`run`] and prints what comes back the
-//! way it prints every other noun's answer. It was its own command, `locus`,
-//! until October 8, 2026, when it moved under Helix: the design system and
-//! the pictures of it ship as one install, at one version.
+//! way it prints every other noun's answer: the design system and the
+//! pictures of it ship as one install, at one version.
 //!
 //! **A Rust core with capture in Node, decided on October 8, 2026.** This
 //! crate holds the config, discovery, sharding, baselines, the environment

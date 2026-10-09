@@ -210,9 +210,9 @@ const tokenConfig = () => {
  * what a missing one answers too. So when every package of the domain is
  * absent at once, a package of another domain is asked as well, one this
  * credential should be able to see. If it can, the credential reads the scope
- * and the domain is new, which is what a bootstrap is for: the first
- * bootstrap of `@fusion.dev/locus`, now `helix visual`, stopped here, on
- * October 8, 2026, logged in, with every package genuinely absent. If it cannot, the credential is the fault.
+ * and the domain is new, which is what a bootstrap is for: a first bootstrap
+ * stopped here on October 8, 2026, logged in, with every package genuinely
+ * absent. If it cannot, the credential is the fault.
  */
 const visible = (name, config) => {
   try {
