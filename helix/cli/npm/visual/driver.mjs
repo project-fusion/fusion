@@ -502,7 +502,7 @@ const handlers = {
     await context.route(`**/${DIAGNOSTICS}/**`, async (route) => {
       const name = new URL(route.request().url()).pathname.split(`/${DIAGNOSTICS}/`)[1] ?? ''
       const path = inside(dist, name)
-      if (path === undefined || !existsSync(path)) {
+      if (path === undefined || !existsSync(path) || !statSync(path).isFile()) {
         await route.fulfill({ status: 404 })
         return
       }

@@ -129,15 +129,38 @@ pub struct Context {
     pub settings: Settings,
     /// Every `custom-elements.json` beside a tier or a layer, parsed once.
     manifests: OnceLock<BTreeMap<PathBuf, Value>>,
+    /// The project's own components, read once for every rule that asks.
+    project: OnceLock<project::Project>,
+    /// The installed Helix packages' classes, read once.
+    installed: OnceLock<Option<installed::Installed>>,
 }
 
 impl Context {
     pub fn new(root: PathBuf, settings: Settings) -> Self {
         Self {
+            installed: OnceLock::new(),
             manifests: OnceLock::new(),
+            project: OnceLock::new(),
             root,
             settings,
         }
+    }
+
+    /// The project's own components, read on the first rule that asks.
+    ///
+    /// **Once, for the same reason as the manifests**: six rules read the
+    /// project's classes, and each reading every source file again was six
+    /// walks of the tree for one answer.
+    pub fn project(&self) -> &project::Project {
+        self.project.get_or_init(|| project::Project::read(self))
+    }
+
+    /// The classes the installed Helix packages publish, parsed once, or
+    /// `None` where none is installed.
+    pub fn installed(&self) -> Option<&installed::Installed> {
+        self.installed
+            .get_or_init(|| installed::Installed::read(&self.root))
+            .as_ref()
     }
 
     /// The manifest of the package whose source is `source`, if analyzed.
