@@ -48,12 +48,6 @@ Choose a chart by the question it answers.
   row per place on a grid, drawn as a surface you can turn. Use it for a measure
   over two ranges, such as load by hour and by day. Its table carries the exact
   values.
-
-The spatial charts and `Spatial Heatmap` draw themselves in 3D in SVG, which a
-server, a print, and a page without WebGL all show. Shift with an arrow turns
-the spatial charts' drawing. `@fusion.dev/helix-plot` draws all three with
-three.js instead, lit and in perspective, in a view you can drag round and
-zoom.
 - **How each day or check went.** `Heatmap`, for uptime, contributions, or
   activity.
 - **The same days, as a relief.** `Spatial Heatmap` reads the same table as
@@ -64,6 +58,12 @@ zoom.
 - **The shape of a series beside its number.** `Sparkline`, drawn with no axes.
   Use `Trend` to show which way one measurement moved and whether that is good
   news.
+
+The spatial charts and `Spatial Heatmap` draw themselves in 3D in SVG, which a
+print and a page without WebGL show too, and a drag or Shift with an arrow
+turns. `@fusion.dev/helix-plot` can also draw all three with three.js, lit and
+in perspective, in a view you can drag round and zoom. The
+[spatial charts guide](/helix/docs/spatial-charts) covers both.
 
 ## Charts read their data from a table
 

@@ -25,7 +25,7 @@ import { property, state } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import { fits, toneOf } from '../../heatmap/root/buckets.js'
 import { HelixHeadlessHeatmap } from '../../heatmap/root/heatmap-root.js'
-import { turned } from '../../spatial-scatter-chart/view.js'
+import { DragTurn, turned } from '../../spatial-scatter-chart/view.js'
 import {
   ACROSS,
   type Base,
@@ -89,8 +89,9 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * too narrow for every column at `min-cell` draws the newest that fit.
  *
  * **The drawing is SVG and holds still.** It scales with its box through its
- * `viewBox`, needs no WebGL, and has no motion to pause. Shift with an arrow
- * turns it a step, or tilts it, from the isometric view it starts at.
+ * `viewBox`, needs no WebGL, and has no motion to pause. A drag turns it and
+ * tilts it, and Shift with an arrow turns it a step, from the isometric view
+ * it starts at.
  * **Under `selection-mode`, the prisms are painted back to front for the
  * view, and the grid's rows and cells stand beside them in the table's
  * order**, holding no drawing of their own, so a turned view paints
@@ -178,9 +179,40 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
   /** The prisms drawn on the last render, which the tooltip is placed against. */
   private shown: Relief | undefined = undefined
 
-  /** Where the chart's own drawing is seen from, which Shift with an arrow turns. */
+  /** Where the chart's own drawing is seen from, which a drag or Shift with an arrow turns. */
   @state()
   private camera: Camera = ISOMETRIC
+
+  /** A drag across the chart's own drawing, which turns its view. */
+  private readonly drag = new DragTurn((next) => {
+    this.camera = next(this.camera)
+  })
+
+  private readonly onDrawingDown = (event: PointerEvent): void => {
+    this.drag.down(event)
+  }
+
+  private readonly onDrawingMove = (event: PointerEvent): void => {
+    this.drag.move(event)
+  }
+
+  private readonly onDrawingUp = (event: PointerEvent): void => {
+    this.drag.up(event)
+  }
+
+  /** A tap shows the prism under it, unless the touch was a drag, which turned the view. */
+  private readonly onStripUp = (event: PointerEvent): void => {
+    if (!this.drag.dragged) {
+      this.onPointerUp(event)
+    }
+  }
+
+  /** A pointer passing over a prism shows it, unless it is turning the view. */
+  private readonly onPrismOver = (event: PointerEvent): void => {
+    if (!this.drag.moving) {
+      this.onPointerOver(event)
+    }
+  }
 
   /** Whether a renderer has drawn the relief, which its own drawing then stays under. */
   @state()
@@ -406,6 +438,10 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
           style=${this.rendered ? 'opacity: 0; pointer-events: none' : nothing}
           viewBox="${box.x} ${box.y} ${box.width} ${box.height}"
           xmlns="http://www.w3.org/2000/svg"
+          @click=${this.drag.click}
+          @pointerdown=${this.onDrawingDown}
+          @pointermove=${this.onDrawingMove}
+          @pointerup=${this.onDrawingUp}
         >${relief.base ? this.renderBase(relief.base) : nothing}${prisms}${grid ? this.renderGridRows(cells.length, keys, chosen) : nothing}</svg>`
       : nothing
     return html`<div
@@ -420,9 +456,9 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
         tabindex=${readable ? '0' : nothing}
         @click=${this.onClick}
         @keydown=${this.onTurnKeydown}
-        @pointerover=${this.rendered ? undefined : this.onPointerOver}
+        @pointerover=${this.rendered ? undefined : this.onPrismOver}
         @pointerleave=${this.onPointerLeave}
-        @pointerup=${this.rendered ? undefined : this.onPointerUp}
+        @pointerup=${this.rendered ? undefined : this.onStripUp}
       ><slot name="renderer"></slot>${drawing}${this.renderTooltip(grid)}</div>
       ${cells.length === 0 ? this.renderStatus() : nothing}
       <div part="footer" style=${this.cornersStyle(relief)}>

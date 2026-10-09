@@ -39,6 +39,11 @@
   font-family: var(--helix-font-sans);
   inline-size: 100%;
   overflow: visible;
+  /* A touch moving across turns the view, and one moving up and down scrolls
+     the page. A drag selects no text on its way, the names along the box
+     included. */
+  touch-action: pan-y;
+  user-select: none;
 }
 
 /* The box and its grid: the muted ink, see-through, as the renderer draws them. */

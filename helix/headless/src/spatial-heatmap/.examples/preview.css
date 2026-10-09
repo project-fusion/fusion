@@ -31,6 +31,8 @@ helix-headless-spatial-heatmap::part(strip) {
 helix-headless-spatial-heatmap::part(drawing) {
   display: block;
   overflow: visible;
+  touch-action: pan-y;
+  user-select: none;
 }
 
 /* Each side is the face's tone a step less light, and the slab is a step

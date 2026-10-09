@@ -404,3 +404,57 @@ describe('nothing to draw', () => {
     expect(part(element, 'empty')?.textContent?.trim()).toBe('No readings')
   })
 })
+
+describe('a drag', () => {
+  const pointer = (type: string, x: number, y: number) =>
+    new PointerEvent(type, {
+      bubbles: true,
+      button: 0,
+      clientX: x,
+      clientY: y,
+      composed: true,
+      pointerId: 1,
+      pointerType: 'mouse',
+    })
+
+  test('across the drawing turns the view, and a press that hardly moves does not', async () => {
+    const element = await relief('rows="2"', [
+      ['Mon', 1],
+      ['Tue', 2],
+      ['Wed', 3],
+    ])
+    const drawing = part(element, 'drawing') as Element
+    const before = part(element, 'base-top')?.getAttribute('d')
+    drawing.dispatchEvent(pointer('pointerdown', 100, 100))
+    drawing.dispatchEvent(pointer('pointermove', 102, 101))
+    drawing.dispatchEvent(pointer('pointerup', 102, 101))
+    await element.updateComplete
+    expect(part(element, 'base-top')?.getAttribute('d')).toBe(before)
+    drawing.dispatchEvent(pointer('pointerdown', 100, 100))
+    drawing.dispatchEvent(pointer('pointermove', 160, 120))
+    drawing.dispatchEvent(pointer('pointerup', 160, 120))
+    await element.updateComplete
+    expect(part(element, 'base-top')?.getAttribute('d')).not.toBe(before)
+  })
+
+  test('the click that ends a drag presses nothing', async () => {
+    const element = await relief('rows="2"', [
+      ['Mon', 1],
+      ['Tue', 2],
+      ['Wed', 3],
+    ])
+    const presses: unknown[] = []
+    element.addEventListener('helix-reading-press', (event) => presses.push(event))
+    /* With a reading on the chart, which a click on the plot presses. */
+    ;(element as unknown as { requestActive(index: number): void }).requestActive(0)
+    await element.updateComplete
+    const drawing = part(element, 'drawing') as Element
+    drawing.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    expect(presses).toHaveLength(1)
+    drawing.dispatchEvent(pointer('pointerdown', 100, 100))
+    drawing.dispatchEvent(pointer('pointermove', 160, 120))
+    drawing.dispatchEvent(pointer('pointerup', 160, 120))
+    drawing.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }))
+    expect(presses).toHaveLength(1)
+  })
+})
