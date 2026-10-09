@@ -270,6 +270,11 @@
       - text: Meter
       - link "Meter documentation":
         - /url: /helix/components/meter
+    - treeitem "Motion Toggle Motion Toggle documentation Experimental" [level=1]:
+      - text: Motion Toggle
+      - link "Motion Toggle documentation":
+        - /url: /helix/components/motion-toggle
+      - img "Experimental"
     - treeitem "Navigation Navigation documentation" [level=1]:
       - text: Navigation
       - link "Navigation documentation":
@@ -372,6 +377,11 @@
       - link "Spatial Heatmap documentation":
         - /url: /helix/components/spatial-heatmap
       - img "Experimental"
+    - treeitem "Spatial Ribbon Chart Spatial Ribbon Chart documentation Experimental" [level=1]:
+      - text: Spatial Ribbon Chart
+      - link "Spatial Ribbon Chart documentation":
+        - /url: /helix/components/spatial-ribbon-chart
+      - img "Experimental"
     - treeitem "Spatial Scatter Chart Spatial Scatter Chart documentation Experimental" [level=1]:
       - text: Spatial Scatter Chart
       - link "Spatial Scatter Chart documentation":
@@ -381,6 +391,11 @@
       - text: Spatial Surface Chart
       - link "Spatial Surface Chart documentation":
         - /url: /helix/components/spatial-surface-chart
+      - img "Experimental"
+    - treeitem "Spatial Treemap Spatial Treemap documentation Experimental" [level=1]:
+      - text: Spatial Treemap
+      - link "Spatial Treemap documentation":
+        - /url: /helix/components/spatial-treemap
       - img "Experimental"
     - treeitem "Speed Dial Speed Dial documentation" [level=1]:
       - text: Speed Dial

@@ -104,7 +104,7 @@
   - paragraph: Package size
   - heading "Measured on every release" [level=2]
   - paragraph: From the built packages, compressed with Brotli as a CDN serves them.
-  - paragraph: "109"
+  - paragraph: "112"
   - paragraph: Components
   - paragraph: Each has a headless tier with its behavior and a styled tier with its design.
   - paragraph: 2.3 kB
