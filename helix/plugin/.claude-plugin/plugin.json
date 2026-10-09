@@ -6,12 +6,7 @@
   },
   "description": "Helix for coding agents: the guide to writing pages with Helix's web components, as a skill, and the Helix MCP server, which looks up the installed packages and checks the code and the page you wrote.",
   "homepage": "https://fusion.dev/helix/docs/coding-agents",
-  "keywords": [
-    "helix",
-    "design-system",
-    "web-components",
-    "mcp"
-  ],
+  "keywords": ["helix", "design-system", "web-components", "mcp"],
   "license": "MIT",
   "name": "helix",
   "repository": "https://github.com/project-fusion/fusion",
