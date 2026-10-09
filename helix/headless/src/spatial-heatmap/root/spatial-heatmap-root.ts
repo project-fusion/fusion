@@ -53,6 +53,14 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * and its own entry point carries the drawing, so a page using only `Heatmap`
  * loads none of it.
  *
+ * **It was `helix-isometric-heatmap` until 0.188.0**, and
+ * `helix-headless-isometric-heatmap` in the headless tier. The old tags are
+ * gone, and so are the `--isometric-heatmap-*` hooks, which are
+ * `--spatial-heatmap-*`, and the words key, which is `helix-spatial-heatmap`.
+ * The two shade hooks now take a step of lightness, such as `0.07`, where they
+ * took a percentage mixed toward black. Every attribute, part, and event kept
+ * its name.
+ *
  * **`flat` lays every prism down** at no height, which leaves the tones on a
  * plane at the same angle.
  *
@@ -93,7 +101,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * | Shift with an arrow | Turns a renderer's view, where one is connected and `selection-mode` is not `multiple`. |
  * | Escape | Puts the cell's tooltip away. |
  *
- * @since 0.185.0
+ * @since 0.188.0
  * @status experimental
  * @category charts
  * @aliases Isometric heatmap, Isometric chart, 3D heatmap, Relief chart, Isometric contribution graph

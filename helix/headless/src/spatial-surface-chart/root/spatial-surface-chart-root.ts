@@ -104,7 +104,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * | Enter, Space | Presses the place, which sends `helix-reading-press`. |
  * | Escape | Lets the place go. |
  *
- * @since 0.185.0
+ * @since 0.188.0
  * @status experimental
  * @category charts
  * @aliases 3D surface chart, 3D surface plot, Surface chart, Height map, Terrain chart
