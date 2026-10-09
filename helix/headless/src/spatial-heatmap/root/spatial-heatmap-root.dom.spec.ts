@@ -218,7 +218,9 @@ describe('a renderer', () => {
     expect(slot?.parentElement === part(element, 'strip')).toBe(true)
     element.rendererDrawn()
     await element.updateComplete
-    expect(part(element, 'drawing')?.getAttribute('style')).toBe('opacity: 0')
+    /* Unseen, and never under the pointer: at opacity 0 it painted over the
+       renderer's box and took every pointer event from it. */
+    expect(part(element, 'drawing')?.getAttribute('style')).toBe('opacity: 0; pointer-events: none')
     expect(part(element, 'drawing')).not.toBeNull()
   })
 

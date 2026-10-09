@@ -26,6 +26,9 @@ export interface ThreeScatterDriverOptions {
   pointSize?: number | undefined
 }
 
+/** How far off the pointer's line of sight a point is still under it, in radians: about 16 pixels in a chart's box. */
+const REACH = 0.03
+
 /** A round point, drawn once and used as every point's sprite. */
 const dot = (): CanvasTexture => {
   const canvas = document.createElement('canvas')
@@ -98,9 +101,23 @@ export const threeScatterDriver = (
 
   const stage = createStage(container, {
     density: options.density,
+    /* **The point nearest the pointer's line of sight**, measured as an
+       angle so it reads as a distance on the screen at any depth. three.js
+       lists every point within reach nearest the camera first, and taking
+       the first put the reading on a point in front of the one under the
+       pointer. */
     pick: (ray) => {
-      ray.params.Points = { threshold: 0.06 }
-      return ray.intersectObject(points)[0]?.index ?? -1
+      ray.params.Points = { threshold: 0.2 }
+      let found = -1
+      let nearest = REACH
+      for (const hit of ray.intersectObject(points)) {
+        const away = (hit.distanceToRay ?? Number.POSITIVE_INFINITY) / Math.max(hit.distance, 1e-6)
+        if (hit.index !== undefined && away < nearest) {
+          nearest = away
+          found = hit.index
+        }
+      }
+      return found
     },
   })
   stage.scene.add(points)
