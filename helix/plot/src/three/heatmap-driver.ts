@@ -13,6 +13,7 @@ import {
   Vector3,
 } from 'three'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
+import type { Place } from '../connect-plot/connect-plot.js'
 import type {
   SpatialHeatmapDriver,
   SpatialHeatmapField,
@@ -87,6 +88,9 @@ export const threeHeatmapDriver = (
   let field: SpatialHeatmapField | undefined
   /** Whether the view has been framed yet, which only the first drawing does from the isometric angle. */
   let framed = false
+  /** Who hears where the front edge's ends are drawn, and what stops the stage following them. */
+  let cornered: ((at: { end: Place; start: Place } | undefined) => void) | undefined
+  let unfollow: (() => void) | undefined
   /** Where each reading's top stands, which the ring and the tooltip point at. */
   let tops: Vector3[] = []
 
@@ -178,9 +182,26 @@ export const threeHeatmapDriver = (
         framed ? undefined : new Vector3(1, 1, 1),
       )
       framed = true
+      /* **The two ends of the front edge, at the foot of the slab**, under the
+         first column's last row and the last column's, as the chart's own
+         drawing names them, followed on the page as the view turns. */
+      unfollow?.()
+      const foot = FLOOR - THICKNESS * unit
+      unfollow = stage.track(
+        [new Vector3(-wide / 2, foot, deep / 2), new Vector3(wide / 2, foot, deep / 2)],
+        (at) => {
+          cornered?.(at ? { end: at[1] as Place, start: at[0] as Place } : undefined)
+        },
+      )
     },
     focus: (index) => {
       stage.setMarker(tops[index])
+    },
+    onCorners: (listener) => {
+      cornered = listener
+      return () => {
+        cornered = undefined
+      }
     },
     onHover: (listener) => stage.onHover(listener),
     onPlace: (listener) => stage.onPlace(listener),

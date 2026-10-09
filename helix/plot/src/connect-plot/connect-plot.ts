@@ -76,6 +76,13 @@ export interface PlotDriver<F> {
    */
   onPlace?(place: (at: Place | undefined) => void): () => void
   /**
+   * Calls `corners` with where the drawing's named corners are drawn, the
+   * two ends of a spatial heatmap's front edge, whenever a frame moves them,
+   * and with `undefined` while they are out of view. The chart stands its
+   * first and last labels there. Returns what stops listening.
+   */
+  onCorners?(corners: (at: { end: Place; start: Place } | undefined) => void): () => void
+  /**
    * Calls `press` with a reading's index when the reader presses it in the
    * drawing, and with `-1` when they press where none is. Returns what stops
    * listening.
@@ -104,6 +111,7 @@ interface Chart<F> extends HTMLElement {
   active?: number
   rendererDrawn?(on?: boolean): void
   field?: F
+  placeCorners?(at: { end: Place; start: Place } | undefined): void
   placeReading?(at: Place | undefined): void
   requestActive?(index: number, kind?: PointerKind): void
   updateComplete?: Promise<unknown>
@@ -265,6 +273,9 @@ export const connectPlot = <F extends object>(
   const stopPlace = driver.onPlace?.((at) => {
     chart.placeReading?.(at)
   })
+  const stopCorners = driver.onCorners?.((at) => {
+    chart.placeCorners?.(at)
+  })
   const stopTheme = watchTheme(frame, () => {
     draw()
   })
@@ -280,7 +291,9 @@ export const connectPlot = <F extends object>(
       stopPress?.()
       stopHover?.()
       stopPlace?.()
+      stopCorners?.()
       chart.placeReading?.(undefined)
+      chart.placeCorners?.(undefined)
       stopTheme()
       driver.stop?.()
       chart.rendererDrawn?.(false)

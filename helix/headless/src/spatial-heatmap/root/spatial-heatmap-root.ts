@@ -5,6 +5,7 @@ import {
   drawTooltip,
   HelixPlotChangeEvent,
   HelixPlotTurnEvent,
+  isRtl,
   MIRROR_RULE,
   spokenReading,
   writtenList,
@@ -68,7 +69,9 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * grid, so the relief reads as one object. The `start` and `end` slots name
  * the two ends of the front edge, which is the strip's first and last column:
  * the component writes where those corners are on the `footer`, and a
- * stylesheet stands each label at its corner.
+ * stylesheet stands each label at its corner. A renderer tells the chart where
+ * it draws those corners, so the labels stand at them there too, and follow
+ * them as the view turns.
  *
  * **`gap` and `min-cell` set the smallest cell.** The drawing scales as a
  * whole, so a wider box draws larger cells and the gap grows with them. A box
@@ -124,9 +127,11 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart strip - The box the drawing fills, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart top-face - The top of a prism, which carries the reading's tone.
  *
- * @cssproperty --spatial-heatmap-depth - How tall the drawing is for its width. The component writes it on the footer, and a stylesheet that stands the `start` label at its corner reads it.
+ * @cssproperty --spatial-heatmap-depth - How tall the drawing is for its width. The component writes it on the footer, and a stylesheet that stands the `start` and `end` labels at their corners reads it.
  * @cssproperty --spatial-heatmap-end-x - Where the front edge ends, under the newest column, across the drawing, from 0 at its inline start to 1. The component writes it on the footer, and a stylesheet that stands the `end` label there reads it.
+ * @cssproperty --spatial-heatmap-end-y - How far down the drawing the front edge ends, under the newest column, as a share of the drawing's width: its whole depth in the chart's own drawing, and wherever a renderer draws it. The component writes it on the footer, and a stylesheet that stands the `end` label there reads it.
  * @cssproperty --spatial-heatmap-span - How many cells the drawing spans across: its columns and its rows together. The component writes it on the strip, and a stylesheet that caps the cell size reads it.
+ * @cssproperty --spatial-heatmap-start-x - Where the front edge starts, under the first column, across the drawing, from 0 at its inline start to 1: 0 in the chart's own drawing, and wherever a renderer draws it. The component writes it on the footer, and a stylesheet that stands the `start` label there reads it.
  * @cssproperty --spatial-heatmap-start-y - How far down the drawing the front edge starts, under the first column, as a share of the drawing's width. The component writes it on the footer, and a stylesheet that stands the `start` label there reads it.
  *
  * @cssstate drawn - While a renderer has drawn the relief, and the chart's own drawing stays unseen under it.
@@ -164,6 +169,10 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
   /** Where the renderer draws the reading, which the tooltip points at. */
   @state()
   private place: { x: number; y: number } | undefined
+
+  /** Where the renderer draws the two ends of the front edge, which the first and last labels stand at. */
+  @state()
+  private corners: { end: { x: number; y: number }; start: { x: number; y: number } } | undefined
 
   /** The field last told, and the reading, so a renderer is told of a change only. */
   private told = { at: -1, field: '' }
@@ -242,6 +251,21 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
    */
   placeReading(at: { x: number; y: number } | undefined): void {
     this.place = at
+  }
+
+  /**
+   * Says where the renderer draws the two ends of the front edge, under the
+   * first column and the last, as fractions of the strip from its top left,
+   * or `undefined` while they are out of view, where the labels keep the
+   * last place they had. The `start` and `end` labels stand there. Called by
+   * the connector.
+   */
+  placeCorners(
+    at: { end: { x: number; y: number }; start: { x: number; y: number } } | undefined,
+  ): void {
+    if (at || !this.rendered) {
+      this.corners = at
+    }
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -440,10 +464,25 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
       return nothing
     }
     const share = (value: number): number => Math.round(value * 10000) / 10000
+    const depth = box.height / box.width
+    /* **Where a renderer draws them, while one does**, as fractions of the
+       strip, which its drawing fills and which keeps the chart's own drawing's
+       shape. The renderer's drawing is not mirrored on a right-to-left page,
+       so across is turned round to run from the inline start there. */
+    const drawn = this.rendered ? this.corners : undefined
+    const across = (x: number): number => (isRtl(this) ? 1 - x : x)
+    const start = drawn
+      ? { x: across(drawn.start.x), y: drawn.start.y * depth }
+      : { x: 0, y: (corners.start.y - box.y) / box.width }
+    const end = drawn
+      ? { x: across(drawn.end.x), y: drawn.end.y * depth }
+      : { x: (corners.end.x - box.x) / box.width, y: depth }
     return [
-      `--spatial-heatmap-depth: ${share(box.height / box.width)}`,
-      `--spatial-heatmap-end-x: ${share((corners.end.x - box.x) / box.width)}`,
-      `--spatial-heatmap-start-y: ${share((corners.start.y - box.y) / box.width)}`,
+      `--spatial-heatmap-depth: ${share(depth)}`,
+      `--spatial-heatmap-end-x: ${share(end.x)}`,
+      `--spatial-heatmap-end-y: ${share(end.y)}`,
+      `--spatial-heatmap-start-x: ${share(start.x)}`,
+      `--spatial-heatmap-start-y: ${share(start.y)}`,
     ].join('; ')
   }
 
