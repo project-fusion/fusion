@@ -76,11 +76,13 @@ describe('the styled spatial heatmap', () => {
 
   test("the sides are shaded from the top face's tone", () => {
     const text = sheet('helix-spatial-heatmap')
+    /* Lowered in lightness from the top's own tone, which keeps its hue,
+       rather than mixed toward black. */
     expect(text).toMatch(
-      /--_spatial-heatmap-left:\s*color-mix\(\s*in oklab,\s*var\(--_spatial-heatmap-top\)/,
+      /--_spatial-heatmap-left:\s*oklch\(\s*from var\(--_spatial-heatmap-top\) calc\(l - /,
     )
     expect(text).toMatch(
-      /--_spatial-heatmap-right:\s*color-mix\(\s*in oklab,\s*var\(--_spatial-heatmap-top\)/,
+      /--_spatial-heatmap-right:\s*oklch\(\s*from var\(--_spatial-heatmap-top\) calc\(l - /,
     )
   })
 })

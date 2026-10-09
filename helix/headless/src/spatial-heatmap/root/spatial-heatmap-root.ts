@@ -13,7 +13,7 @@ import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
 import { fits, toneOf } from '../../heatmap/root/buckets.js'
 import { HelixHeadlessHeatmap } from '../../heatmap/root/heatmap-root.js'
-import { ACROSS, heightsOf, highestOf, type Relief, reliefOf } from '../projection.js'
+import { ACROSS, type Base, heightsOf, highestOf, type Relief, reliefOf } from '../projection.js'
 
 /**
  * @summary A heatmap drawn as a relief, where each reading stands as tall as its value.
@@ -38,6 +38,12 @@ import { ACROSS, heightsOf, highestOf, type Relief, reliefOf } from '../projecti
  *
  * **`flat` lays every prism down** at no height, which leaves the tones on a
  * plane at the same angle.
+ *
+ * **The prisms stand on a slab**, the `base`, which reaches a little past the
+ * grid, so the relief reads as one object. The `start` and `end` slots name
+ * the two ends of the front edge, which is the strip's first and last column:
+ * the component writes where those corners are on the `footer`, and a
+ * stylesheet stands each label at its corner.
  *
  * **`gap` and `min-cell` set the smallest cell.** The drawing scales as a
  * whole, so a wider box draws larger cells and the gap grows with them. A box
@@ -67,6 +73,10 @@ import { ACROSS, heightsOf, highestOf, type Relief, reliefOf } from '../projecti
  * @aliases Isometric heatmap, Isometric chart, 3D heatmap, Relief chart, Isometric contribution graph
  * @documentation https://fusion.dev/helix/components/spatial-heatmap
  *
+ * @csspart base - The slab the prisms stand on: a group holding its top and its two sides. Hidden from screen readers.
+ * @csspart base-left - The slab's side toward the viewer at the lower left, under the strip's last row.
+ * @csspart base-right - The slab's side toward the viewer at the lower right, under the newest column.
+ * @csspart base-top - The slab's top, which is the floor the prisms stand on.
  * @csspart cell - One reading: a group holding its three faces.
  * @csspart drawing - The SVG every prism is drawn in. It is mirrored on a right-to-left page.
  * @csspart left-face - The face of a prism toward the next row, drawn at its lower left.
@@ -75,7 +85,10 @@ import { ACROSS, heightsOf, highestOf, type Relief, reliefOf } from '../projecti
  * @csspart strip - The box the drawing fills, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart top-face - The top of a prism, which carries the reading's tone.
  *
+ * @cssproperty --spatial-heatmap-depth - How tall the drawing is for its width. The component writes it on the footer, and a stylesheet that stands the `start` label at its corner reads it.
+ * @cssproperty --spatial-heatmap-end-x - Where the front edge ends, under the newest column, across the drawing, from 0 at its inline start to 1. The component writes it on the footer, and a stylesheet that stands the `end` label there reads it.
  * @cssproperty --spatial-heatmap-span - How many cells the drawing spans across: its columns and its rows together. The component writes it on the strip, and a stylesheet that caps the cell size reads it.
+ * @cssproperty --spatial-heatmap-start-y - How far down the drawing the front edge starts, under the first column, as a share of the drawing's width. The component writes it on the footer, and a stylesheet that stands the `start` label there reads it.
  */
 @customElement('helix-headless-spatial-heatmap')
 export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
@@ -172,7 +185,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
           role=${grid ? 'none' : nothing}
           viewBox="${box.x} ${box.y} ${box.width} ${box.height}"
           xmlns="http://www.w3.org/2000/svg"
-        >${grid ? this.renderPrismRows(prisms) : prisms}</svg>`
+        >${relief.base ? this.renderBase(relief.base) : nothing}${grid ? this.renderPrismRows(prisms) : prisms}</svg>`
       : nothing
     return html`<div
         aria-activedescendant=${grid && at >= 0 ? `cell-${at}` : nothing}
@@ -191,7 +204,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
         @pointerup=${this.onPointerUp}
       >${drawing}${this.renderTooltip(grid)}</div>
       ${cells.length === 0 ? this.renderStatus() : nothing}
-      <div part="footer">
+      <div part="footer" style=${this.cornersStyle(relief)}>
         <span part="start"><slot name="start"></slot></span>
         <span part="summary"><slot name="summary"></slot></span>
         <span part="end"><slot name="end"></slot></span>
@@ -231,6 +244,32 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
       role=${grid ? 'gridcell' : nothing}
       style=${tone === undefined ? nothing : `--heatmap-tone: var(--heatmap-tone-${tone})`}
     ><path d=${left} part="left-face"></path><path d=${right} part="right-face"></path><path d=${top} part="top-face"></path></g>`
+  }
+
+  /**
+   * The slab under the prisms, painted first so every prism stands on it.
+   * Hidden from screen readers, and out of a grid's rows.
+   */
+  private renderBase(base: Base): SVGTemplateResult {
+    return svg`<g aria-hidden="true" part="base"><path d=${base.left} part="base-left"></path><path d=${base.right} part="base-right"></path><path d=${base.top} part="base-top"></path></g>`
+  }
+
+  /**
+   * Where the front edge's two ends stand, for the labels that name them.
+   * **As shares of the drawing's width**, the one length a percentage margin
+   * is measured against, so a sheet places a label with no height to read.
+   */
+  private cornersStyle(relief: Relief): string | typeof nothing {
+    const { box, corners } = relief
+    if (!corners || box.width <= 0) {
+      return nothing
+    }
+    const share = (value: number): number => Math.round(value * 10000) / 10000
+    return [
+      `--spatial-heatmap-depth: ${share(box.height / box.width)}`,
+      `--spatial-heatmap-end-x: ${share((corners.end.x - box.x) / box.width)}`,
+      `--spatial-heatmap-start-y: ${share((corners.start.y - box.y) / box.width)}`,
+    ].join('; ')
   }
 
   /**
