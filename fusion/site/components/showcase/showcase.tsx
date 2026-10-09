@@ -19,6 +19,7 @@ import styles from './showcase.module.css'
 const VIEWS = [
   { label: 'Controls', name: 'controls' },
   { label: 'Data', name: 'data' },
+  { label: 'Depth', name: 'depth' },
   { label: 'Surfaces', name: 'surfaces' },
 ] as const
 
@@ -33,6 +34,76 @@ const FACES = [
   { label: 'Fine', mouth: 'M8.5 15.3h7', value: 'fine' },
   { label: 'Good', mouth: 'M8.5 14.7q3.5 1.8 7 0', value: 'good' },
   { label: 'Great', mouth: 'M8.5 14q3.5 3.4 7 0', value: 'great' },
+] as const
+
+/**
+ * **A week of load, every two hours, worked out rather than typed.** A quiet
+ * night, two peaks a day either side of lunch, a busy midweek, and a quiet
+ * weekend, so the surface has a shape worth turning. Computed from a formula with no
+ * randomness, so the server and the browser draw the same surface and the
+ * visual baselines hold still.
+ */
+const LOAD = Array.from({ length: 7 }, (_, day) =>
+  Array.from({ length: 12 }, (_, slot) => {
+    const hour = slot * 2
+    const peak = (at: number, width: number) => Math.exp(-(((hour - at) / width) ** 2))
+    /* Two peaks a day, mid-morning and late afternoon, with a dip at lunch. */
+    const daytime = peak(10, 3) + 0.85 * peak(16, 3.2)
+    /* Busiest midweek, quiet at the weekend. */
+    const week = [0.8, 0.95, 1, 0.9, 0.75, 0.4, 0.3][day] ?? 1
+    return { day: day + 1, hour, value: Math.round(110 + 1300 * daytime * week) }
+  }),
+).flat()
+
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
+
+/** Signups by region and quarter, the spatial bar chart's own example. */
+const QUARTERS = ['Q1', 'Q2', 'Q3', 'Q4'] as const
+
+const SIGNUPS = [
+  { region: 'North', values: [420, 465, 510, 580] },
+  { region: 'South', values: [310, 355, 340, 390] },
+  { region: 'East', values: [520, 560, 615, 690] },
+  { region: 'West', values: [260, 300, 345, 410] },
+].map((one) => ({
+  region: one.region,
+  values: QUARTERS.map((quarter, index) => ({ quarter, value: one.values[index] })),
+}))
+
+/**
+ * **Three groups of customers, placed by a formula.** A sine hash stands in
+ * for randomness, so the server and the browser draw the same cloud.
+ */
+const SEGMENTS = [
+  { age: 21, name: 'Students', spend: 420, visits: 8 },
+  { age: 36, name: 'Families', spend: 1350, visits: 4 },
+  { age: 58, name: 'Retirees', spend: 820, visits: 12 },
+] as const
+
+const CUSTOMERS = SEGMENTS.flatMap((segment, group) =>
+  Array.from({ length: 12 }, (_, index) => {
+    const jitter = (salt: number) =>
+      (Math.abs(Math.sin((group * 12 + index) * 12.9898 + salt) * 43758.5453) % 1) - 0.5
+    return {
+      age: Math.round(segment.age + jitter(1) * 14),
+      name: `${segment.name} ${index + 1}`,
+      segment: segment.name,
+      spend: Math.round(segment.spend + jitter(2) * 600),
+      visits: Math.max(1, Math.round(segment.visits + jitter(3) * 8)),
+    }
+  }),
+)
+
+/** Requests and response time by service, the treemap's own example. */
+const SERVICES = [
+  { name: 'Gateway', p95: 85, requests: 4200, team: 'Platform' },
+  { name: 'Auth', p95: 40, requests: 2600, team: 'Platform' },
+  { name: 'Search', p95: 210, requests: 3100, team: 'Product' },
+  { name: 'Catalog', p95: 120, requests: 2200, team: 'Product' },
+  { name: 'Checkout', p95: 260, requests: 1400, team: 'Product' },
+  { name: 'Billing', p95: 180, requests: 900, team: 'Finance' },
+  { name: 'Ledger', p95: 95, requests: 700, team: 'Finance' },
+  { name: 'Reports', p95: 300, requests: 500, team: 'Finance' },
 ] as const
 
 /** How long a view holds before the next one, when nobody is looking at it. */
@@ -449,6 +520,169 @@ export function Showcase(): React.ReactElement {
               renders for nobody. A Packages table is the one worth adding first
               if this panel ever gets taller, being the only place a table and a
               sparkline would appear together. */}
+        </div>
+
+        {/* **Four charts with depth, drawn in SVG, in the Data view's grid.**
+            No three.js and no WebGL: the SVG drawing renders on the server,
+            turns on a drag, and picks up the theme the way every other view
+            does, so changing the brand color recolors these too. Four cards,
+            because the drawings scale with a card's width rather than its
+            height, and two rows of them come to the height of the other views.
+            One note above the grid says what is true of all four: they are
+            experimental, and a drag turns them. Above, because the stage fades
+            out its last sixth and the note under the grid faded with it. A pointer inside the stage
+            holds the panel on this view while a reader turns one. */}
+        <div className={styles.showcaseView} hidden={view !== 'depth'}>
+          <helix-flex
+            align-items="center"
+            class={styles.showcaseWide}
+            data-density="sm"
+            gap="sm"
+            wrap
+          >
+            <helix-tag>Experimental</helix-tag>
+            <helix-text emphasis="muted" variant="caption">
+              Drag a chart to turn it.
+            </helix-text>
+          </helix-flex>
+
+          <helix-card class="showcaseCard" data-card-edge separation="outlined">
+            <helix-flex direction="column" gap="sm">
+              <helix-text variant="body-strong">Load over a week</helix-text>
+              <table data-hidden-visually id="showcase-load">
+                <caption>Requests a minute over a week</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Slot</th>
+                    <th scope="col">Hour</th>
+                    <th scope="col">Day</th>
+                    <th scope="col">Requests a minute</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {LOAD.map((one) => (
+                    <tr key={`${one.day}-${one.hour}`}>
+                      <th scope="row">
+                        {DAYS[one.day - 1]} {String(one.hour).padStart(2, '0')}:00
+                      </th>
+                      <td>{one.hour}</td>
+                      <td>{one.day}</td>
+                      <td>{one.value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <helix-spatial-surface-chart
+                class={styles.showcaseSpatial}
+                contours
+                for="showcase-load"
+                label="Requests a minute over a week"
+              ></helix-spatial-surface-chart>
+            </helix-flex>
+          </helix-card>
+
+          <helix-card class="showcaseCard" data-card-edge separation="outlined">
+            <helix-flex direction="column" gap="sm">
+              <helix-text variant="body-strong">Signups by region</helix-text>
+              <table data-hidden-visually id="showcase-signups">
+                <caption>Signups by region and quarter</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Region</th>
+                    {QUARTERS.map((quarter) => (
+                      <th key={quarter} scope="col">
+                        {quarter}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {SIGNUPS.map((one) => (
+                    <tr key={one.region}>
+                      <th scope="row">{one.region}</th>
+                      {one.values.map((cell) => (
+                        <td key={cell.quarter}>{cell.value}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <helix-spatial-bar-chart
+                class={styles.showcaseSpatial}
+                emphasis="outlined"
+                for="showcase-signups"
+                label="Signups by region and quarter"
+              ></helix-spatial-bar-chart>
+            </helix-flex>
+          </helix-card>
+
+          <helix-card class="showcaseCard" data-card-edge separation="outlined">
+            <helix-flex direction="column" gap="sm">
+              <helix-text variant="body-strong">Customers by age and spend</helix-text>
+              <table data-hidden-visually id="showcase-customers">
+                <caption>Customers</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Customer</th>
+                    <th scope="col">Segment</th>
+                    <th scope="col">Age</th>
+                    <th scope="col">Yearly spend</th>
+                    <th scope="col">Visits a month</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {CUSTOMERS.map((one) => (
+                    <tr key={one.name}>
+                      <th scope="row">{one.name}</th>
+                      <td>{one.segment}</td>
+                      <td>{one.age}</td>
+                      <td>{one.spend}</td>
+                      <td>{one.visits}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <helix-spatial-scatter-chart
+                class={styles.showcaseSpatial}
+                for="showcase-customers"
+                group-by="Segment"
+                label="Customers by age, yearly spend, and visits a month"
+              ></helix-spatial-scatter-chart>
+            </helix-flex>
+          </helix-card>
+
+          <helix-card class="showcaseCard" data-card-edge separation="outlined">
+            <helix-flex direction="column" gap="sm">
+              <helix-text variant="body-strong">Requests by service</helix-text>
+              <table data-hidden-visually id="showcase-services">
+                <caption>Requests and response time by service</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Service</th>
+                    <th scope="col">Team</th>
+                    <th scope="col">Requests a minute</th>
+                    <th scope="col">p95 response (ms)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {SERVICES.map((one) => (
+                    <tr key={one.name}>
+                      <th scope="row">{one.name}</th>
+                      <td>{one.team}</td>
+                      <td>{one.requests}</td>
+                      <td>{one.p95}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <helix-spatial-treemap
+                class={styles.showcaseSpatial}
+                for="showcase-services"
+                group-by="Team"
+                label="Requests and response time by service"
+              ></helix-spatial-treemap>
+            </helix-flex>
+          </helix-card>
         </div>
 
         <div className={styles.showcaseView} hidden={view !== 'surfaces'}>
