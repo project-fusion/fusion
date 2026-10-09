@@ -8,7 +8,7 @@
 }
 
 /* The table is the chart's reading, for screen readers, and a page with no
-   Helix stylesheet hides it itself: \`data-hidden-visually\` is a Helix rule. */
+   Helix stylesheet hides it itself: `data-hidden-visually` is a Helix rule. */
 [data-hidden-visually] {
   block-size: 1px;
   clip-path: inset(50%);
@@ -17,6 +17,12 @@
   overflow: hidden;
   position: absolute;
   white-space: nowrap;
+}
+
+/* Fixed, as the base layer has it: the 1px box does not bind on a table, and
+   an absolutely positioned one lengthened the page by its full height. */
+table[data-hidden-visually] {
+  position: fixed;
 }
 
 helix-headless-spatial-scatter-chart {
