@@ -789,7 +789,15 @@ const handlers = {
             : await askOllama(settings, group)
         answers.push(answer)
       } catch (caught) {
-        const why = caught instanceof Error ? caught.message.split('\n')[0] : String(caught)
+        /* The API's own sentence when it gave one, without the request id
+           that makes every failure's text unique. */
+        const said = caught?.error?.error?.message
+        const why =
+          typeof said === 'string'
+            ? `${caught.status}: ${said}`
+            : caught instanceof Error
+              ? caught.message.split('\n')[0]
+              : String(caught)
         answers.push({ error: why })
         /* A refused key, an endpoint that is down, or the same failure
            twice running, a balance that has run out among them, is one that
