@@ -17,7 +17,7 @@ import '../../tooltip/index.js'
  * and the height both show the value. Set `--spatial-heatmap-cell-size` to
  * change how large a cell may grow.
  *
- * @since 0.189.0
+ * @since 0.190.0
  * @status experimental
  * @category charts
  * @documentation https://fusion.dev/helix/components/spatial-heatmap

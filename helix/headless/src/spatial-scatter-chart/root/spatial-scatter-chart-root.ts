@@ -91,7 +91,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * | Enter, Space | Presses the point, which sends `helix-reading-press`. |
  * | Escape | Lets the point go. |
  *
- * @since 0.189.0
+ * @since 0.190.0
  * @status experimental
  * @category charts
  * @aliases 3D scatter chart, 3D scatter plot, Point cloud, Three-dimensional scatter
