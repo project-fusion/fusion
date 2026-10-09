@@ -215,7 +215,7 @@ describe('a renderer', () => {
   test('draws over the chart’s own drawing, which stays under it for a reader and the keys', async () => {
     const element = (await relief('rows="2"', readings)) as Framed
     const slot = element.shadowRoot?.querySelector('slot[name="renderer"]')
-    expect(slot?.parentElement).toBe(part(element, 'strip'))
+    expect(slot?.parentElement === part(element, 'strip')).toBe(true)
     element.rendererDrawn()
     await element.updateComplete
     expect(part(element, 'drawing')?.getAttribute('style')).toBe('opacity: 0')
