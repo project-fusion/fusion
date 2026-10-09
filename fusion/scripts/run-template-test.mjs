@@ -329,11 +329,23 @@ for (const name of packed) {
   }
 
   /* **A binary is not a module, and probing it as one invents a promise the
-     package never made.** `@fusion.dev/helix-cli` ships `bin.mjs` and nothing
-     else (no `exports`, no `main`, no `types`), so the probe wrote
+     package never made.** `@fusion.dev/helix-cli` once shipped `bin.mjs` and
+     nothing else (no `exports`, no `main`, no `types`), so the probe wrote
      `import * as m from '@fusion.dev/helix-cli'` and TypeScript answered
      TS2307. That read as a packaging fault and was the manifest being correct.
-     What such a package does promise is the binary, so that is what is checked. */
+     What a package with a `bin` promises is the file, so that is what is
+     checked, whatever else it exports. */
+  const binaries = new Set(
+    Object.values(manifest.bin ?? {}).map((file) => file.replace(/^\.\//, '')),
+  )
+  for (const [command, file] of Object.entries(manifest.bin ?? {})) {
+    if (!existsSync(join(installed, file))) {
+      problems.push(
+        `${name}: declares the \`${command}\` binary as \`${file}\`, which did not ship. ` +
+          'Named in `bin` and missing from `files`, most likely.',
+      )
+    }
+  }
   const importable = ['exports', 'main', 'module', 'types'].some(
     (field) => manifest[field] !== undefined,
   )
@@ -342,15 +354,6 @@ for (const name of packed) {
       problems.push(
         `${name}: publishes no module surface and no binary, so nothing in it is reachable.`,
       )
-      continue
-    }
-    for (const [command, file] of Object.entries(manifest.bin)) {
-      if (!existsSync(join(installed, file))) {
-        problems.push(
-          `${name}: declares the \`${command}\` binary as \`${file}\`, which did not ship. ` +
-            'Named in `bin` and missing from `files`, most likely.',
-        )
-      }
     }
     continue
   }
@@ -364,7 +367,12 @@ for (const name of packed) {
       continue
     }
     /* Only what TypeScript can be asked about. Content and stylesheets are
-       resolved by a bundler, and their existence above is the whole check. */
+       resolved by a bundler, and their existence above is the whole check. A
+       subpath that is the package's own binary is exported so a script can
+       find the file, and is no module to import. */
+    if (file !== undefined && binaries.has(file.replace(/^\.\//, ''))) {
+      continue
+    }
     if (file === undefined || /\.(m?js|m?ts|d\.ts)$/.test(file)) {
       imports.push(subpath === '.' ? name : `${name}/${subpath.slice(2)}`)
     }
