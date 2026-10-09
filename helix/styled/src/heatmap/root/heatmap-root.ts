@@ -22,6 +22,7 @@ import '../../tooltip/index.js'
  * @since 0.1.0
  * @status stable
  * @category charts
+ * @groups charts
  * @documentation https://fusion.dev/helix/components/heatmap
  *
  * @slot end - Below the strip, at the trailing edge.
