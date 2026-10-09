@@ -1,8 +1,8 @@
 # @fusion.dev/helix-cli
 
 The Helix command line. Derives themes, scaffolds a project, checks a project's
-code against the Helix it installed, looks up the installed packages, and serves
-all of it to an agent.
+code against the Helix it installed, pictures its pages against baselines kept
+in git, looks up the installed packages, and serves all of it to an agent.
 
 ```sh
 npm install --save-dev @fusion.dev/helix-cli
@@ -28,6 +28,7 @@ helix mcp init --client claude
 | `diagnostics` | Receives the runs `initDiagnostics()` sends from your app and prints each new finding. `--out <path>` writes the CI file, `--port` picks the port, 7417 by default, and `--config <path>` names the settings served to the page |
 | `scan` | Reads your project's stylesheets, templates, and modules, and prints each finding with its file and line. `--build <dir>` weighs each Helix family in your bundle, `--out <path>` writes the run to the CI file, `--config <path>` names the settings, `--file <path>` reports one file's findings, and `--stdin <language>` checks a snippet |
 | `api` | Looks up the installed Helix packages: `find` a family, a `family`'s API, an `example` with its imports, the `imports` for a list of tags, and `tokens` |
+| `visual` | Pictures each page in a real browser and compares it with a baseline kept in git: `test`, `update` the baselines, open the `report`, and `compare` two PNG files. Reads `visual.config.ts`, and needs Playwright installed. [The guide](https://github.com/project-fusion/fusion/blob/main/helix/cli/npm/visual/README.md) has the config and the GitHub Action |
 | `mcp` | Serves the same lookups, the scan, and the theme derivation to an agent over stdio, as an MCP server. `mcp init --client claude\|cursor\|vscode` writes the client's configuration |
 
 `--json` is on every verb, in a shape a script can read without parsing

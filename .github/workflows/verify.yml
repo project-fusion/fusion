@@ -144,9 +144,6 @@ jobs:
       # A hit is one restore of the binary; a miss builds and saves it.
       - name: Put the helix binary on disk
         uses: ./.github/actions/helix
-      # The same for `locus`, which the visual shards run.
-      - name: Put the locus binary on disk
-        uses: ./.github/actions/locus
 
   # The shard counts live in one place each and the matrices are built from
   # them, so a matrix of six against `--of 8` cannot silently drop a third of
@@ -330,12 +327,6 @@ jobs:
         uses: ./.github/actions/setup
       - name: Build the frame and the spec bundles
         run: bunx turbo run frame specs
-      # **The `locus` binary the visual shards run, built here when it is not
-      # cached**, so the shards restore it and none of them compiles it. A miss
-      # is a change to the Rust under `locus/cli` or `fusion/rules`, and costs
-      # this job about a minute after the build above.
-      - name: Put the locus binary on disk
-        uses: ./.github/actions/locus
 
   # **Three shards, because they are off the critical path.** Every check here
   # is seconds of work behind a job's setup, so ten shards finished no sooner
@@ -722,12 +713,6 @@ jobs:
       - name: Install Chromium
         uses: ./.github/actions/browser
 
-      # `check:spec:visual` runs Fusion Locus, and `warm-browser` saved the
-      # binary for this tree, so this is a restore.
-      - name: Put the locus binary on disk
-        if: matrix.task == 'visual'
-        uses: ./.github/actions/locus
-
       # Each check builds what it reads, `turbo run frame` first, which after
       # `warm-browser` is a restore.
       - name: ${{ matrix.label }}
@@ -816,10 +801,10 @@ jobs:
             .local/dsd/diff/*.png
             .local/diagnostics/*.json
 
-  # **The site's pages, pictured by Fusion Locus's own GitHub Action.** Five
+  # **The site's pages, pictured by `helix visual`'s own GitHub Action.** Five
   # pages at 1440 and 390 light and 1440 dark, from `next start` over the build
   # `warm` made, compared with the baselines under `fusion/site/baselines`.
-  # `fusion/site/locus.config.ts` says why each page is there.
+  # `fusion/site/visual.config.ts` says why each page is there.
   #
   # **After `warm`, because `next build` is the slow half of it**, and a
   # restore here. It runs beside `tests`, which also waits on `warm`, and
@@ -838,19 +823,17 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
-      - name: Put the locus binary on disk
-        uses: ./.github/actions/locus
       # `warm` built it, so this is a restore of `.next`.
       - name: Build the site
         run: bunx turbo run build --filter=@fusion.dev/site
       - name: Picture the site
-        uses: ./locus/action
+        uses: ./helix/visual/action
         with:
-          args: --config fusion/site/locus.config.ts
+          args: --config fusion/site/visual.config.ts
+          helix: bun helix/cli/npm/bin.mjs
           mode: check
           playwright: bunx playwright
-          locus: bun locus/cli/npm/bin.mjs
-          report: fusion/site/.locus/report
+          report: fusion/site/.helix/visual
 
   # **The examples' diagnostics, sent to the console when a tree lands on
   # `main`**, where each finding becomes an issue with a state: stage 8 of the

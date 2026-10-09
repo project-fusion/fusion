@@ -103,6 +103,10 @@ fn main() {
             Theme::Check(args) => theme::audit::check(args, &from, cli.json),
             Theme::Init(args) => theme::init::run(args, &from, cli.json),
         },
+        /* **The pictures print their own lines and take no `--json`**: a run
+        writes `run.json` beside its report, which is the shape a script reads,
+        and `report --markdown` is the summary a CI job appends. */
+        Noun::Visual { verb } => fusion_helix_visual::run(verb),
     };
 
     std::process::exit(match outcome {

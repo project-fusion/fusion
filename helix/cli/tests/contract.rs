@@ -345,6 +345,7 @@ fn a_usage_error_under_json_is_a_json_error_with_the_choices() {
                 "new",
                 "scan",
                 "theme",
+                "visual",
             ],
         ),
         (

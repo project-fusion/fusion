@@ -106,9 +106,9 @@ const EXEMPT = [
   'fusion/scripts/check-contrast.mjs',
   'fusion/scripts/check-diagnostics.mjs',
   'fusion/scripts/check-dsd.mjs',
-  'locus/cli/npm/bin.mjs test',
+  'helix/cli/npm/bin.mjs visual test',
   /* The site suite, which `verify.yml` gives a job of its own beside them. */
-  'locus/cli/npm/bin.mjs test --config fusion/site/locus.config.ts',
+  'helix/cli/npm/bin.mjs visual test --config fusion/site/visual.config.ts',
   'fusion/scripts/check-visual-parity.mjs',
   /* The three that compare a committed file against a fresh derivation of the
      whole corpus. What guards a generator is that its output is committed and

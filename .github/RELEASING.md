@@ -112,12 +112,16 @@ and skips the rest.
 | `helix-cli-linux-x64` | `ubuntu-latest` | `x86_64-unknown-linux-musl` |
 | `helix-cli-win32-x64` | `windows-latest` | `x86_64-pc-windows-msvc` |
 
-**`locus` ships the same way.** `@fusion.dev/locus` is its launcher, and
-`@fusion.dev/locus-<platform>` are its platform packages, one for each row
-above. `binaries.yml` takes the domain as an input and builds the
-`fusion-<domain>-cli` crate, so both commands share one workflow, one runner
-table and one proof of the version. A pull request that could break either
-builds both.
+**`helix visual` ships inside it.** The visual tests are a library crate,
+`fusion-helix-visual`, that `fusion-helix-cli` links, and their capture driver
+ships in `@fusion.dev/helix-cli` beside the shim, so there is one binary and one
+set of platform packages. `binaries.yml` takes the domain as an input and builds
+the `fusion-<domain>-cli` crate.
+
+**`@fusion.dev/locus` is retired.** The visual tests published as their own
+command, `locus`, at 0.1.0 before they moved under Helix. That version and its
+five platform packages stay on the registry, deprecated with a message naming
+`helix visual`, and nothing here publishes them again.
 
 **Built before the release computes its number, from the same tags.**
 `binaries.yml` builds each platform, the release computes the number,
@@ -144,7 +148,7 @@ release has stamped it, which is the arrangement a consumer installs.
 **A Linux binary is static**, linked against musl, so one file runs on a glibc
 distribution and on Alpine alike, and the packages declare no `libc`.
 
-**A Helix or Locus release with no binaries refuses in its first step**, before
+**A Helix release with no binaries refuses in its first step**, before
 a number is allocated. A Cortex release in the same run goes ahead.
 
 **Nothing in a checkout needs them.** The files are gitignored, and the shim runs
@@ -188,7 +192,7 @@ out.** `held` in `fusion.json` maps each such domain to the reason:
 
 ```json
 "held": {
-  "locus": "Not on the registry yet. ..."
+  "<domain>": "Not on the registry yet. ..."
 }
 ```
 
@@ -214,7 +218,7 @@ reads the list.
 
 1. Publish the placeholders, once, from a machine that is logged in to npm:
    `bun run build`, then
-   `node fusion/scripts/publish.mjs --domain locus --bootstrap`.
+   `node fusion/scripts/publish.mjs --domain <domain> --bootstrap`.
 2. Register trusted publishing for them: `bun run trust --apply`.
 3. Delete the domain's entry under `held` in `fusion.json`. Merging that
    change releases the domain, because the intent reads `fusion.json` from the
@@ -236,7 +240,7 @@ can be read, and so its reasoning sits with the code rather than above the step.
 | `stamp-manifests.sh` | Writes the published version back into the manifests |
 | `stamp-experimental.sh` | Stamps a preview version into every domain a branch touches |
 | `comment-install.sh` | Comments on the pull request with how to install it |
-| `place-binaries.sh` | Puts each built `helix` or `locus` in its platform package, executable |
+| `place-binaries.sh` | Puts each built `helix` in its platform package, executable |
 | `touched.sh` | Whether a push can reach the browser, so `verify` can skip |
 
 ## Why the range runs from the tag

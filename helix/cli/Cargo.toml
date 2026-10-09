@@ -20,6 +20,10 @@ path = "src/main.rs"
 # and keeps its WASM wrapper buildable without dragging the command surface into
 # `@fusion.dev/helix-theme`.
 fusion-helix-theme = { path = "../theme", features = ["serde"] }
+# **The visual tests, a library with this binary as its one caller.** Its own
+# crate so the config, the codecs, the diff and the report keep the boundary
+# they had as a command of their own, and `helix visual` is one noun here.
+fusion-helix-visual = { path = "../visual" }
 # **The host that runs a rule somebody else wrote.** It knows what a module is
 # and not what a component is, so the payload a plugin receives is composed here
 # and the sandbox is enforced there.
@@ -53,6 +57,9 @@ oxc_ast_visit = "0.152.0"
 # toolchain does for them: the end-to-end test takes the path an author takes
 # rather than reading an artifact somebody committed.
 wit-component = "0.260"
+# `helix visual compare`'s tests write their own pictures rather than reading
+# committed ones.
+png = "0.18"
 
 # **On in every build here, and off in the binaries `binaries.yml` publishes**,
 # which build with `--no-default-features`. It holds `helix component`, the rules Helix's own components are held to:

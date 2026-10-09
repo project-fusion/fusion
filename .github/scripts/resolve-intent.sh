@@ -15,7 +15,7 @@ set -euo pipefail
 held=$(jq -r '.held // {} | keys | join(",")' fusion.json)
 
 : > /tmp/entries
-for domain in helix cortex locus; do
+for domain in helix cortex; do
   # **`sed -n 1p` and not `head -1`, which closes the pipe on `git` early.** Under
   # `pipefail` a writer killed by SIGPIPE fails the step with 141, and it is a
   # race: `git` writes the list in 4,096-byte buffers, and the day the Helix tags

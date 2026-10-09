@@ -137,6 +137,22 @@ pub enum Noun {
         #[command(subcommand)]
         verb: Theme,
     },
+
+    /* **A noun for the pictures of a project**, beside `scan` and
+    `diagnostics`, which read its code and its pages. The verbs and their
+    flags are the visual crate's own, so its help text is written where its
+    behavior is. */
+    /// Picture each page and compare it with a baseline kept in git.
+    ///
+    /// Reads `visual.config.ts` beside where it runs. `test` compares, `update`
+    /// writes the baselines the comparison rejects, `report` opens the last
+    /// run, and `compare` holds two PNG files to each other. `test` and
+    /// `update` need Playwright installed.
+    #[command(subcommand_required = true, arg_required_else_help = true)]
+    Visual {
+        #[command(subcommand)]
+        verb: fusion_helix_visual::Visual,
+    },
 }
 
 /// What `helix diagnostics` takes.
