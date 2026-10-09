@@ -567,7 +567,6 @@ export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = 
 
       return {
         aliases: [...new Set(roots.flatMap((entry) => entry.helix?.aliases ?? []))],
-        replaces: [...new Set(roots.flatMap((entry) => entry.helix?.replaces ?? []))],
         category: root.helix?.category ?? '',
         documentation: root.helix?.documentation ?? '',
         elements: entries
@@ -612,6 +611,7 @@ export const catalog = (manifests: HelixManifest[], examples: ExampleSource[] = 
         examples: examplesOf(slug, root.helix, examples),
         imports: importsOf(slug, entries),
         label: startCase(slug),
+        replaces: [...new Set(roots.flatMap((entry) => entry.helix?.replaces ?? []))],
         since: root.helix?.since ?? '',
         slug,
         source: root.helix?.source ?? '',
