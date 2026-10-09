@@ -76,7 +76,7 @@ export default defineConfig({
 })
 ```
 
-- **`sources`**: where the entries come from, four kinds:
+- **`sources`**: where the entries come from, five kinds:
   - `html` reads every file its `glob` matches under `root`, described next.
   - `server` pictures a server's `routes`, and every route its `sitemap` lists.
     `/` is named `index`, and a route given as `{ name, path }` takes its name.
@@ -84,6 +84,7 @@ export default defineConfig({
     `include` and `exclude` filter them by tag.
   - `catalog` pictures every `{ id, url }` in a JSON file, each `url` relative to
     the server.
+  - `pairs` compares two renders of each entry with each other, described below.
 
   The three on a server take its `url`, a `start` command that runs only when
   nothing answers there and is stopped when the run ends, and `baselines`, the
@@ -102,6 +103,15 @@ export default defineConfig({
   ends in `/` serves a directory.
 - **`settle.readyProperty`**: a property your elements carry holding a promise
   that resolves once they have rendered. `helix visual` awaits it before each shot.
+  `settle.elements` limits the custom elements a run waits for to one tag
+  prefix, for a framework that writes hyphenated tags it never defines.
+- **`aria`**: keeps each entry's accessibility snapshot, Playwright's
+  `ariaSnapshot()` of its page, beside its baselines as `<stem>.aria.yml`, and
+  compares it as text, so a lost label fails even when no pixel moved.
+- **`checks.code`**: fails a run on a code block that draws all of its text in
+  one color, as a highlighter that failed leaves it. It reads the page after
+  the first shot and needs no baseline. `selector` names your code blocks and
+  `minimum` the fewest characters a block holds before it is judged.
 - **`diff`**: how a shot is compared, for the whole config or for one source.
   `mode: 'pixel'` counts the pixels past `threshold`, 0.1 unless you set it,
   and fails above `pixels`, 0 unless you set it. `mode: 'perceptual'` scores
@@ -110,7 +120,8 @@ export default defineConfig({
 - **`exceptions`**: each names an `entry`, optionally a `shot`, and a `reason`.
   `unstable: true` skips the shot and names it in every run. `pixels` lets the
   shot differ by that many, and the run fails once the shot stops differing, so
-  an exception that is no longer needed is removed.
+  an exception that is no longer needed is removed. `differs: true` tolerates a
+  known difference between a pair's two sides, and fails once they match.
 - **`inspect`**: `run` is called with the Playwright page after each entry's
   first shot, and `report` once at the end with everything `run` returned.
   `report` returns `{ failed: true }` to fail the run.
@@ -127,6 +138,38 @@ export default defineConfig({
 - **`retake`**: a sentence telling your team how to retake baselines, printed
   when a run fails.
 - **`fingerprint`**, **`network`**, and **`platform`** are described below.
+
+## Pairs
+
+A `pairs` source compares two renders of each entry with each other, with no
+baseline: React against plain HTML, a server render against a client render, a
+framework wrapper against the element it wraps. Both sides render on one machine
+seconds apart, so the platform cancels out. Pairs run anywhere, and nothing they
+picture is committed.
+
+```ts
+{
+  kind: 'pairs',
+  labels: ['HTML', 'TSX'],
+  name: 'parity',
+  prepare: async ({ changed }) => ({
+    pairs: [{ a: { body: html }, b: { body: '<div id="root"></div>' }, name: 'button' }],
+    serve: { '/bundle/': '/absolute/path/to/bundles/' },
+  }),
+}
+```
+
+- **`prepare`** builds the pairs. It runs in Node, so it can call your bundler
+  or your server renderer, and it receives the git ref `--changed` named. Each
+  side is a `body` the harness wraps, with its own `styles`, `scripts`, `head`,
+  `dir`, and `files`, or a `url`, or an `error` when it could not be built.
+- **`check`** is called on each side's page after its first shot, with the page
+  and every console message it logged, and returns problems that fail the pair.
+- **`errors`** counts console errors: `new`, an error the second side logs and
+  the first does not, is the default, `any` counts all of them, and `ignore`
+  none.
+- **`compare: false`** judges a pair by its `check`, its errors, and its tags
+  alone, with no pictures compared.
 
 ## What every run does
 

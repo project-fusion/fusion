@@ -95,7 +95,7 @@ const EXEMPT = [
   /* The five that `verify.yml` gives their own `browser` jobs. Running them
      here too makes one shard render the entire browser matrix a second time,
      single file, while the six jobs built for it sit idle, and that shard then
-     sets the critical path for the whole workflow. `check-dsd` is the costliest
+     sets the critical path for the whole workflow. Hydration is the costliest
      of them: its corpus hydrates every example, and run from here it took
      `verify` from a few minutes to half an hour.
 
@@ -105,11 +105,11 @@ const EXEMPT = [
      empty directory reports a confident zero. */
   'fusion/scripts/check-contrast.mjs',
   'fusion/scripts/check-diagnostics.mjs',
-  'fusion/scripts/check-dsd.mjs',
+  'helix/cli/npm/bin.mjs visual test --config visual.dsd.config.ts',
   'helix/cli/npm/bin.mjs visual test',
   /* The site suite, which `verify.yml` gives a job of its own beside them. */
   'helix/cli/npm/bin.mjs visual test --config fusion/site/visual.config.ts',
-  'fusion/scripts/check-visual-parity.mjs',
+  'helix/cli/npm/bin.mjs visual test --config visual.parity.config.ts',
   /* The three that compare a committed file against a fresh derivation of the
      whole corpus. What guards a generator is that its output is committed and
      read; running these here would measure every family a second time for
