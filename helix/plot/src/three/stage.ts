@@ -9,6 +9,7 @@ import {
 import {
   BufferGeometry,
   CanvasTexture,
+  Color,
   Float32BufferAttribute,
   LineBasicMaterial,
   LineSegments,
@@ -56,6 +57,17 @@ export const lookThrough = (material: Material, amount: number): void => {
   material.needsUpdate = true
 }
 
+/**
+ * An edge a little lighter than a dark face and a little darker than a light
+ * one, as the charts' own drawings draw them, so every block keeps its form
+ * on every step of a ramp.
+ */
+export const edgeOf = (face: Color): Color => {
+  const hsl = { h: 0, l: 0, s: 0 }
+  face.getHSL(hsl)
+  return face.clone().lerp(new Color(hsl.l < 0.5 ? 0xffffff : 0x000000), hsl.l < 0.5 ? 0.22 : 0.18)
+}
+
 /** Eases in and out. */
 const ease = (at: number): number => (at < 0.5 ? 2 * at * at : 1 - (-2 * at + 2) ** 2 / 2)
 
@@ -83,8 +95,9 @@ const ring = (): CanvasTexture => {
   return new CanvasTexture(canvas)
 }
 
-/** The plot's three axes: across, up, and in depth. */
+/** The plot's three axes: across, up, and in depth, and how long the box is along each, where not a cube. */
 export interface Axes {
+  extent?: readonly [number, number, number] | undefined
   x: Axis
   y: Axis
   z: Axis
@@ -108,8 +121,9 @@ export type PointerKind = 'mouse' | 'pen' | 'touch'
 /** The box's edges and a grid at the ticks, on its floor and its two back walls. */
 const gridLines = (axes: Axes): number[] => {
   const lines: number[] = []
+  const [ex, ey, ez] = axes.extent ?? [1, 1, 1]
   const line = (from: [number, number, number], to: [number, number, number]): void => {
-    lines.push(...from, ...to)
+    lines.push(from[0] * ex, from[1] * ey, from[2] * ez, to[0] * ex, to[1] * ey, to[2] * ez)
   }
   const h = HALF
   /* The box's twelve edges. */
@@ -120,11 +134,11 @@ const gridLines = (axes: Axes): number[] => {
       line([a, b, -h], [a, b, h])
     }
   }
-  for (const x of axes.x.ticks.map((tick) => inBox(axes.x, tick))) {
+  for (const x of (axes.x.rules ?? axes.x.ticks).map((tick) => inBox(axes.x, tick))) {
     line([x, -h, -h], [x, -h, h])
     line([x, -h, -h], [x, h, -h])
   }
-  for (const z of axes.z.ticks.map((tick) => inBox(axes.z, tick))) {
+  for (const z of (axes.z.rules ?? axes.z.ticks).map((tick) => inBox(axes.z, tick))) {
     line([-h, -h, z], [h, -h, z])
     line([-h, -h, z], [-h, h, z])
   }
@@ -287,14 +301,18 @@ export const createStage = (
        writes them, so a turn moves them to the edges in front. */
     const place = new Vector3()
     const seen = ([x, y, z]: BoxPlace): SeenPlace => {
-      place.set(x * HALF, y * HALF, z * HALF)
+      const [ex, ey, ez] = axes?.extent ?? [1, 1, 1]
+      place.set(x * HALF * ex, y * HALF * ey, z * HALF * ez)
       const depth = -place.distanceTo(camera.position)
       const on = place.project(camera)
       return { depth, x: ((on.x + 1) / 2) * width, y: ((1 - on.y) / 2) * height }
     }
     const text = (axis: Axis): BoxAxisText => ({
       name: axis.name,
-      ticks: axis.ticks.map((tick) => ({ at: inBox(axis, tick) / HALF, text: tickText(tick) })),
+      ticks: axis.ticks.map((tick, index) => ({
+        at: inBox(axis, tick) / HALF,
+        text: axis.labels?.[index] ?? tickText(tick),
+      })),
     })
     for (const one of boxLabels(
       seen,

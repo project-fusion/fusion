@@ -6,9 +6,11 @@ title: Spatial charts
 
 # Spatial charts
 
-Helix has three charts drawn in three dimensions. Each reads its numbers from a
+Helix has four charts drawn in three dimensions. Each reads its numbers from a
 table in the document, as every Helix chart does:
 
+- `Spatial Bar Chart` stands a bar for each category and series, each as tall
+  as its value, such as signups by region and by quarter.
 - `Spatial Heatmap` draws a strip of days as a relief, each day a prism as tall
   as its reading.
 - `Spatial Scatter Chart` places each row as a point in a box, by three measures
@@ -48,6 +50,10 @@ Put the table in the document, and point the chart at it with `for`:
 
 Each chart reads its columns in its own way:
 
+- **Spatial Bar Chart** reads its table as `Bar Chart` does: each row is a
+  category, and each numeric column a series. Categories run across and series
+  back in depth, the first series in front, so one series is a single row of
+  bars.
 - **Spatial Scatter Chart** takes the first three numeric columns as across, up,
   and in depth. `group-by` names a column of text that colors each point by its
   group.
@@ -91,6 +97,7 @@ Each chart has its own connector and driver:
 
 | Chart | Connector | Driver |
 |---|---|---|
+| `Spatial Bar Chart` | `connectSpatialBarChart` | `threeBarDriver` |
 | `Spatial Heatmap` | `connectSpatialHeatmap` | `threeHeatmapDriver` |
 | `Spatial Scatter Chart` | `connectSpatialScatterChart` | `threeScatterDriver` |
 | `Spatial Surface Chart` | `connectSpatialSurfaceChart` | `threeSurfaceDriver` |
@@ -131,9 +138,19 @@ Chromium on an Apple silicon Mac:
 | `Spatial Scatter Chart` | 2,000 points | 5,000 points: 67 ms a turn step |
 | `Spatial Surface Chart` | 900 readings, a grid of 30 by 30 | 1,600 readings: 50 ms, and 3,600: 113 ms |
 | `Spatial Heatmap` | 365 days | 730 days: 50 ms, and 1,825: 132 ms |
+| `Spatial Bar Chart` | 400 bars | 800 bars: 66 ms, and 1,600: 124 ms |
 
 A slower machine reaches these sizes sooner. three.js draws each chart on the
 graphics card.
+
+## When a 3D bar chart fits
+
+A flat `Bar Chart` is read more exactly. Studies of 3D bars measure readers
+judging a value less closely than on flat ones, and a bar can stand behind
+another. Use `Spatial Bar Chart` where the shape across two sets of names
+matters more than any one value, such as which regions grew in which quarters.
+A drag turns the view to show a bar another hides, and the tooltip and the
+table carry every exact value.
 
 ## Read a chart with the pointer and the keys
 
@@ -153,6 +170,10 @@ The plot takes focus, and the keys move the reading:
 | Shift with an arrow | Turns the view a step | Turns the view a step |
 | Enter, Space | Presses the point | Presses the place |
 | Escape | Lets the reading go | Lets the reading go |
+
+`Spatial Bar Chart` reads as `Spatial Surface Chart` does: the left and right
+arrows move from category to category, and the down and up arrows from series to
+series.
 
 `Spatial Heatmap` takes `Heatmap`'s keys, and Shift with an arrow turns its
 view, except under `selection-mode="multiple"`, where it selects a range.
@@ -175,6 +196,9 @@ the two ends of its front edge, clear of the relief.
 
 Each chart takes its colors from your theme, and these hooks change them:
 
+- **Spatial Bar Chart**: each series takes a series color,
+  `--chart-series-1` and on, and each face of a bar is that color darkened by
+  how far it turns from the light.
 - **Spatial Scatter Chart**: each group takes a series color,
   `--chart-series-1` and on.
 - **Spatial Surface Chart**: the surface is shaded from `--spatial-surface-chart-low`

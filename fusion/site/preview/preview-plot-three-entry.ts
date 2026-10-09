@@ -7,11 +7,13 @@
  */
 
 import {
+  connectSpatialBarChart,
   connectSpatialHeatmap,
   connectSpatialScatterChart,
   connectSpatialSurfaceChart,
 } from '@fusion.dev/helix-plot'
 import {
+  threeBarDriver,
   threeHeatmapDriver,
   threeScatterDriver,
   threeSurfaceDriver,
@@ -29,7 +31,9 @@ const start = (chart: HTMLElement): (() => void) => {
       ? connectSpatialHeatmap(chart, threeHeatmapDriver(box))
       : chart.localName === 'helix-spatial-surface-chart'
         ? connectSpatialSurfaceChart(chart, threeSurfaceDriver(box))
-        : connectSpatialScatterChart(chart, threeScatterDriver(box))
+        : chart.localName === 'helix-spatial-bar-chart'
+          ? connectSpatialBarChart(chart, threeBarDriver(box))
+          : connectSpatialScatterChart(chart, threeScatterDriver(box))
   window.addEventListener(RESTYLED, connection.restyle)
   return () => {
     window.removeEventListener(RESTYLED, connection.restyle)
@@ -41,7 +45,7 @@ window.helixPreviewPlotThree = {
   mount(root) {
     const unmounts = [
       ...root.querySelectorAll<HTMLElement>(
-        ':is(helix-spatial-heatmap, helix-spatial-scatter-chart, helix-spatial-surface-chart)[data-preview-plot="three"]',
+        ':is(helix-spatial-bar-chart, helix-spatial-heatmap, helix-spatial-scatter-chart, helix-spatial-surface-chart)[data-preview-plot="three"]',
       ),
     ].map(start)
     return () => {

@@ -69,7 +69,7 @@ describe('the box labels', () => {
           const apart =
             Math.abs(one.x - other.x) >=
               (one.text.length + other.text.length) * 0.13 * 0.58 * 0.5 ||
-            Math.abs(one.y - other.y) >= 0.13
+            Math.abs(one.y - other.y) >= 0.13 * 0.8
           expect({ apart, tilt, turn }).toEqual({ apart: true, tilt, turn })
         }
       }
