@@ -101,7 +101,7 @@ const SERIES = 24
  * | Enter, Space | Presses the bar, which sends `helix-reading-press`. |
  * | Escape | Lets the bar go. |
  *
- * @since 0.194.0
+ * @since 0.196.0
  * @status experimental
  * @category charts
  * @aliases 3D bar chart, 3D column chart, Isometric bar chart, Isometric column chart, Bar chart in 3D
