@@ -10,8 +10,8 @@
 //!
 //! **A model only explains and orders.** One request a group, the largest
 //! first and as many as the config's cap, with the attribution, the
-//! accessibility difference, and the diff of the attributed files since the
-//! run's `--changed` ref. Pictures leave the machine only when the config
+//! accessibility difference, the diff of the attributed files since the
+//! run's `--changed` ref, and the names of every file changed since it. Pictures leave the machine only when the config
 //! says `images: true`. The answer is intended, unintended or unclear, and it
 //! never approves a baseline: it is the order a person reviews in.
 
@@ -201,6 +201,26 @@ pub fn diff(base: &Path, reference: &str, files: &BTreeSet<String>) -> Option<St
     ))
 }
 
+/// Every file changed since `reference`, read with git in `base`, so a model
+/// sees a shared file that moved, a token sheet, though no attributed element
+/// is defined in it. A request names the first [`NAMES`].
+pub fn changed(base: &Path, reference: &str) -> Option<Vec<String>> {
+    let output = Command::new("git")
+        .current_dir(base)
+        .args(["diff", "--name-only", reference])
+        .output()
+        .ok()?;
+    output.status.success().then(|| {
+        String::from_utf8_lossy(&output.stdout)
+            .lines()
+            .map(str::to_string)
+            .collect()
+    })
+}
+
+/// The most changed files a request names.
+const NAMES: usize = 200;
+
 /// The region an attribution line names: `W by H px at X, Y`.
 fn region(line: &str) -> Option<(u32, u32, u32, u32)> {
     let (size, place) = line.split_once(": ")?.0.split_once(" px at ")?;
@@ -266,7 +286,13 @@ changed and why, naming the part of the diff that explains it when one does. You
 reviews every one, in the order your answers give.";
 
 /// The words of one group's request.
-pub fn request(group: &Group, diff: Option<&str>, reference: Option<&str>, images: bool) -> String {
+pub fn request(
+    group: &Group,
+    diff: Option<&str>,
+    reference: Option<&str>,
+    changed: &[String],
+    images: bool,
+) -> String {
     let mut text = String::new();
     let _ = writeln!(text, "{} changed this way:", group.members.len());
     for member in group.members.iter().take(10) {
@@ -293,6 +319,15 @@ pub fn request(group: &Group, diff: Option<&str>, reference: Option<&str>, image
         ),
         (_, None) => writeln!(text, "\nNo diff was given: the run was not told what to compare the code with."),
     };
+    if !changed.is_empty() {
+        let _ = writeln!(text, "\nEvery file the pull request changes:");
+        for name in changed.iter().take(NAMES) {
+            let _ = writeln!(text, "- {name}");
+        }
+        if changed.len() > NAMES {
+            let _ = writeln!(text, "- and {} more", changed.len() - NAMES);
+        }
+    }
     if images {
         let _ = writeln!(text, "\nThe two pictures are the baseline and then the capture, cropped to the largest region.");
     }
@@ -425,6 +460,6 @@ mod tests {
             signature: "`helix-card`, moved 2 px down".to_string(),
             ..Group::default()
         };
-        assert!(request(&one, None, None, false).contains("No diff was given"));
+        assert!(request(&one, None, None, &[], false).contains("No diff was given"));
     }
 }

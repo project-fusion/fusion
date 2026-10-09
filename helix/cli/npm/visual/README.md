@@ -152,8 +152,9 @@ export default defineConfig({
   - `provider: 'ollama'` asks a model on an Ollama endpoint, `url`,
     `http://127.0.0.1:11434` unless you name another, so nothing leaves your
     machine. `model` names what you pulled.
-  - Only words are sent: the attribution, the accessibility difference, and
-    the diff of the attributed files since the run's `--changed` ref.
+  - Only words are sent: the attribution, the accessibility difference, the
+    diff of the attributed files since the run's `--changed` ref, and the
+    names of every file changed since it.
     `images: true` also sends the baseline and the capture of each group's
     largest region, cropped and no wider than 512 pixels.
   - `groups`, 10 unless you set it, caps the requests a run makes, the

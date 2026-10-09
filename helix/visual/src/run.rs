@@ -300,6 +300,9 @@ fn ask(
     pictures: &BTreeMap<String, (Vec<u8>, Vec<u8>)>,
 ) -> String {
     let asked = groups.len().min(triage.groups);
+    let changed = reference
+        .and_then(|one| triage::changed(base, one))
+        .unwrap_or_default();
     let requests: Vec<Value> = groups[..asked]
         .iter()
         .map(|group| {
@@ -316,7 +319,7 @@ fn ask(
             };
             json!({
                 "images": images,
-                "text": triage::request(group, diff.as_deref(), reference, !images.is_empty()),
+                "text": triage::request(group, diff.as_deref(), reference, &changed, !images.is_empty()),
             })
         })
         .collect();
