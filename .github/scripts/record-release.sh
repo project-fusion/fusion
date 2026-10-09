@@ -29,7 +29,12 @@ tag="$DOMAIN-v$VERSION"
 # `helix-attempt-v*` does not match `helix-v*`, so a burnt number is not mistaken
 # for the last release. Same distinction version computation reads, from the
 # other side.
-prev=$(git tag --list "$DOMAIN-v*" --sort=-v:refname | head -1)
+# **`sed -n 1p` and not `head -1`, which closes the pipe on `git` early.** Under
+# `pipefail` a writer killed by SIGPIPE fails the step with 141, and it is a
+# race: `git` writes the list in 4,096-byte buffers, and the day the Helix tags
+# passed that (286 tags, 4,098 bytes, at `helix-v0.183.0` on October 8, 2026)
+# every release stopped in its first step. `sed` reads it all.
+prev=$(git tag --list "$DOMAIN-v*" --sort=-v:refname | sed -n 1p)
 
 notes() {
   git log --first-parent --format='%H' "$@" | while read -r commit; do

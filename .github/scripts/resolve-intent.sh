@@ -16,7 +16,12 @@ held=$(jq -r '.held // {} | keys | join(",")' fusion.json)
 
 : > /tmp/entries
 for domain in helix cortex locus; do
-  last=$(git tag --list "$domain-v*" --sort=-v:refname | head -1)
+  # **`sed -n 1p` and not `head -1`, which closes the pipe on `git` early.** Under
+  # `pipefail` a writer killed by SIGPIPE fails the step with 141, and it is a
+  # race: `git` writes the list in 4,096-byte buffers, and the day the Helix tags
+  # passed that (286 tags, 4,098 bytes, at `helix-v0.183.0` on October 8, 2026)
+  # every release stopped in its first step. `sed` reads it all.
+  last=$(git tag --list "$domain-v*" --sort=-v:refname | sed -n 1p)
   # No tag is the first release, and the range is then all of history.
   range=$SHA
   [ -n "$last" ] && range="$last..$SHA"
