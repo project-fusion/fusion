@@ -129,8 +129,8 @@ const mountGraphs = (root: HTMLElement, at: number): void => {
       })
       .catch((error: unknown) => console.error(String(error)))
   }
-  /* A 3D Scatter chart three.js draws, from a chunk of its own. */
-  if (root.querySelector('helix-scatter-3d[data-preview-plot="three"]')) {
+  /* A 3D chart three.js draws, scatter or surface, from a chunk of its own. */
+  if (root.querySelector(':is(helix-scatter-3d, helix-surface-3d)[data-preview-plot="three"]')) {
     void load(__PREVIEW_PLOT_THREE_URL__)
       .then(() => {
         if (at === generation && window.helixPreviewPlotThree) {

@@ -13,6 +13,7 @@ Helix has these chart families, and each one has its own API page:
 - `Area Chart`
 - `Scatter Chart`
 - `Scatter 3D`, drawn in three dimensions by `@fusion.dev/helix-plot`
+- `Surface 3D`, drawn in three dimensions by `@fusion.dev/helix-plot`
 - `Donut Chart`
 - `Heatmap`
 - `Isometric Heatmap`
@@ -43,6 +44,10 @@ Choose a chart by the question it answers.
   3D`, with one point per row in a box you can turn. Use it for data that has
   three dimensions, such as clusters or embeddings. Its table and its flat
   scatter carry the exact values.
+- **How one measure rises and falls over two others.** `Surface 3D`, with one
+  row per place on a grid, drawn as a surface you can turn. Use it for a measure
+  over two ranges, such as load by hour and by day. Its table carries the exact
+  values, and its flat grid shades each place by its height.
 - **How each day or check went.** `Heatmap`, for uptime, contributions, or
   activity.
 - **The same days, as a relief.** `Isometric Heatmap` reads the same table as

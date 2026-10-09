@@ -118,11 +118,17 @@ export const TIERS = [SOURCE.headless, SOURCE.styled]
 /**
  * The packages that connect a family to someone else's renderer, by the
  * family they serve: `connectGraph` and its drivers for Graph, `connectMap`
- * and its drivers for Map, `connectScatter3d` and its driver for 3D Scatter. Their DOM specs run with the family's in a
- * browser, where a driver meets a real canvas, a real WebGL context, and a
- * layout, none of which happy-dom has.
+ * and its drivers for Map, and from the plot package, which serves two
+ * families, the folder of each one's connector. Their DOM specs run with the
+ * family's in a browser, where a driver meets a real canvas, a real WebGL
+ * context, and a layout, none of which happy-dom has.
  */
-export const CONNECTORS = { graph: SOURCE.graph, map: SOURCE.map, 'scatter-3d': SOURCE.plot }
+export const CONNECTORS = {
+  graph: SOURCE.graph,
+  map: SOURCE.map,
+  'scatter-3d': `${SOURCE.plot}/connect-scatter-3d`,
+  'surface-3d': `${SOURCE.plot}/connect-surface-3d`,
+}
 
 /** Every workspace directory, with `dir/*` globs expanded. */
 export function directories() {
