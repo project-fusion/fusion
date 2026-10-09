@@ -14,7 +14,7 @@
 //! on a flaky picture teaches people to run it again, and one that hides it
 //! teaches nothing. An update holds a picture that matched on the second take.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Write as _;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -356,9 +356,18 @@ fn ask(
             failed += 1;
             group.verdict = Some("unclear".to_string());
             group.explanation = Some(format!("the model gave no answer: {why}"));
-        } else {
+        } else if let Some(said) = one["explanation"]
+            .as_str()
+            .map(str::trim)
+            .filter(|said| !said.is_empty())
+        {
             group.verdict = one["verdict"].as_str().map(str::to_string);
-            group.explanation = one["explanation"].as_str().map(str::to_string);
+            group.explanation = Some(said.to_string());
+        } else {
+            /* A verdict with no reason is no verdict a person can check. */
+            group.verdict = Some("unclear".to_string());
+            group.explanation =
+                Some("the model gave a verdict with no reason, so it is not used".to_string());
         }
     }
     let skipped = groups.len() - asked;
@@ -675,6 +684,114 @@ pub fn open_report(config: Option<&Path>, markdown: bool) -> Outcome<Code> {
             .stdout(std::process::Stdio::null())
             .stderr(std::process::Stdio::null())
             .status();
+    }
+    Ok(Code::Ok)
+}
+
+/// `helix visual report --merge`: the groups of several runs' reports as one,
+/// asked about once each when the config has a triage, printed, and written
+/// as Markdown with `markdown`.
+pub fn merge_reports(
+    config: Option<&Path>,
+    runs: &[PathBuf],
+    reference: Option<&str>,
+    markdown: bool,
+) -> Outcome<Code> {
+    let (_, base, mut driver, config) = load(config)?;
+    let mut groups = Vec::new();
+    let mut pictures = BTreeMap::new();
+    let mut read = 0;
+    for run in runs {
+        let record = if run.is_dir() {
+            run.join("run.json")
+        } else {
+            run.clone()
+        };
+        let Ok(text) = fs::read_to_string(&record) else {
+            say!(
+                "helix: there is no report at {}, so it is left out.",
+                record.display()
+            );
+            continue;
+        };
+        let value: Value = serde_json::from_str(&text).map_err(|error| {
+            Failure::input(
+                format!("cannot read {}", record.display()),
+                error.to_string(),
+            )
+        })?;
+        read += 1;
+        let folder = record.parent().unwrap_or(Path::new("."));
+        groups.extend(
+            value["groups"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(triage::Group::read),
+        );
+        /* The baseline and capture each failed shot left in its report, for a
+        triage that may send pictures. */
+        for shot in value["shots"].as_array().into_iter().flatten() {
+            let (Some(entry), Some(name)) = (shot["entry"].as_str(), shot["shot"].as_str()) else {
+                continue;
+            };
+            let file = |field: &str| {
+                shot[field]
+                    .as_str()
+                    .and_then(|at| fs::read(folder.join(at)).ok())
+            };
+            if let (Some(kept), Some(taken)) = (file("baseline"), file("current")) {
+                pictures.insert(format!("{entry}, {name}"), (kept, taken));
+            }
+        }
+    }
+    let mut groups = triage::merge(groups);
+    let triaged = match &config.triage {
+        Some(triage) if !groups.is_empty() => Some(ask(
+            &mut driver,
+            triage,
+            &mut groups,
+            &base,
+            reference,
+            &pictures,
+        )),
+        _ => None,
+    };
+    driver.close();
+    let shots: BTreeSet<&String> = groups.iter().flat_map(|one| &one.members).collect();
+    let verdict = format!(
+        "helix: {} {} hold {} that changed, in {}.",
+        read,
+        if read == 1 { "report" } else { "reports" },
+        if shots.len() == 1 {
+            "1 shot".to_string()
+        } else {
+            format!("{} shots", shots.len())
+        },
+        if groups.len() == 1 {
+            "1 group".to_string()
+        } else {
+            format!("{} groups", groups.len())
+        },
+    );
+    let record = json!({
+        "groups": groups.iter().map(triage::Group::record).collect::<Vec<_>>(),
+        "shots": [],
+        "triage": triaged,
+        "verdict": verdict,
+    });
+    if crate::out::json() {
+        println!("{record}");
+    } else if markdown {
+        print!("{}", report::markdown(&record));
+    } else {
+        say!("{verdict}");
+        for group in &groups {
+            say!("  {}", report::printed(group));
+        }
+        if let Some(triaged) = &triaged {
+            say!("{triaged}");
+        }
     }
     Ok(Code::Ok)
 }
@@ -1167,6 +1284,12 @@ pub fn run(options: &Options) -> Outcome<Code> {
     driver closes, because it is what makes the requests. */
     let mut groups = group_changes(&mine, &config, &results, &attributions);
     let triaged = match &config.triage {
+        /* A shard sees part of the run, and a group split across shards would
+        be asked about once in each: the merge of the shards asks once. */
+        Some(_) if !groups.is_empty() && options.shard.is_some() => Some(
+            "helix: this run is one shard, so its groups are asked about when the shards' reports are merged, with `helix visual report --merge`."
+                .to_string(),
+        ),
         Some(triage) if !groups.is_empty() => Some(ask(
             &mut driver,
             triage,

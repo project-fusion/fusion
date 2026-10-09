@@ -160,4 +160,9 @@ export default defineConfig({
      `measure:browser --from` merges a run's worth of them. */
   // biome-ignore lint/suspicious/noUndeclaredEnvVars: `helix visual` runs outside turbo, so no task's cache reads it.
   timings: process.env.BROWSER_COST,
+  /* A model asked about each group of changes a failed run found, once for
+     the whole run: a shard leaves it to `helix visual report --merge`, which
+     the `visual-triage` job in `verify.yml` runs. Without a key it says it
+     could not run, and the groups stand. */
+  triage: { groups: 10 },
 })

@@ -101,7 +101,7 @@ fn grouped(run: &Run) -> bool {
 }
 
 /// One group, as the terminal prints it.
-fn printed(group: &crate::triage::Group) -> String {
+pub fn printed(group: &crate::triage::Group) -> String {
     let mut out = format!(
         "{}: {}",
         plural(group.members.len(), "shot", "shots"),
@@ -424,12 +424,7 @@ fn record(run: &Run, verdict: &str, failed: bool) -> Value {
     json!({
         "failed": failed,
         "findings": run.findings,
-        "groups": run.groups.iter().map(|one| json!({
-            "explanation": one.explanation,
-            "members": one.members,
-            "signature": one.signature,
-            "verdict": one.verdict,
-        })).collect::<Vec<_>>(),
+        "groups": run.groups.iter().map(crate::triage::Group::record).collect::<Vec<_>>(),
         "mode": if run.update { "update" } else { "test" },
         "triage": run.triaged,
         "shots": rows,

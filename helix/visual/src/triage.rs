@@ -58,6 +58,72 @@ pub struct Group {
     pub verdict: Option<String>,
 }
 
+impl Group {
+    /// The group as `run.json` keeps it, with what a merge of shards needs to
+    /// ask about it again.
+    pub fn record(&self) -> serde_json::Value {
+        serde_json::json!({
+            "explanation": self.explanation,
+            "files": self.files,
+            "lines": self.lines,
+            "members": self.members,
+            "signature": self.signature,
+            "verdict": self.verdict,
+        })
+    }
+
+    /// A group read back from `run.json`.
+    pub fn read(value: &serde_json::Value) -> Option<Self> {
+        let strings = |field: &str| -> Vec<String> {
+            value[field]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .filter_map(serde_json::Value::as_str)
+                .map(str::to_string)
+                .collect()
+        };
+        Some(Self {
+            explanation: None,
+            files: strings("files").into_iter().collect(),
+            lines: strings("lines"),
+            members: strings("members"),
+            signature: value["signature"].as_str()?.to_string(),
+            verdict: None,
+        })
+    }
+}
+
+/// The groups of several runs as one: groups that share a signature are one
+/// group with every member, the largest first. A shard's own verdicts are
+/// left behind, because a merge asks again about the whole group.
+pub fn merge(runs: impl IntoIterator<Item = Group>) -> Vec<Group> {
+    let mut merged: Vec<Group> = Vec::new();
+    for group in runs {
+        match merged
+            .iter_mut()
+            .find(|one| one.signature == group.signature)
+        {
+            Some(one) => {
+                for member in group.members {
+                    if !one.members.contains(&member) {
+                        one.members.push(member);
+                    }
+                }
+                one.files.extend(group.files);
+            }
+            None => merged.push(group),
+        }
+    }
+    merged.sort_by(|a, b| {
+        b.members
+            .len()
+            .cmp(&a.members.len())
+            .then(a.signature.cmp(&b.signature))
+    });
+    merged
+}
+
 /// An attribution line without its region's place: the words after
 /// `W by H px at X, Y: `.
 fn told(line: &str) -> &str {
@@ -241,9 +307,20 @@ pub fn changed(base: &Path, reference: &str) -> Option<Vec<String>> {
     output.status.success().then(|| {
         String::from_utf8_lossy(&output.stdout)
             .lines()
+            .filter(|name| !kept(name))
             .map(str::to_string)
             .collect()
     })
+}
+
+/// Whether a file is one a run keeps, a picture, a snapshot or a
+/// fingerprint: a failing run has not retaken them yet, and naming them
+/// would read to a model as the author expecting the change.
+fn kept(name: &str) -> bool {
+    let lower = name.to_ascii_lowercase();
+    [".png", ".aria.yml", "fingerprint.json"]
+        .iter()
+        .any(|end| lower.ends_with(end))
 }
 
 /// The most changed files a request names.
@@ -341,9 +418,13 @@ pub fn request(
             text,
             "\nThe pull request's diff since {reference} of the files those elements come from:\n```diff\n{diff}\n```"
         ),
-        (_, Some(reference)) => writeln!(
+        (_, Some(reference)) if !group.files.is_empty() => writeln!(
             text,
-            "\nThe pull request changes none of the files those elements come from since {reference}, or the change names no file."
+            "\nThe pull request changes none of the files those elements come from since {reference}."
+        ),
+        (_, Some(_)) => writeln!(
+            text,
+            "\nNo source file is named for these elements, so there is no diff of their own to show."
         ),
         (_, None) => writeln!(text, "\nNo diff was given: the run was not told what to compare the code with."),
     };
@@ -448,6 +529,32 @@ mod tests {
             "`helix-timeline-item ::part(rail)`, moved 2 px down"
         );
         assert_eq!(innermost("`main h2`"), "`main h2`");
+    }
+
+    #[test]
+    fn shards_that_saw_one_change_merge_into_one_group() {
+        let one = |members: &[&str]| Group {
+            members: members.iter().map(|member| (*member).to_string()).collect(),
+            signature: "`helix-button`, drawn differently where it was".to_string(),
+            ..Group::default()
+        };
+        let other = Group {
+            members: vec!["styled/meter, wide".to_string()],
+            signature: "`helix-meter`, drawn differently where it was".to_string(),
+            ..Group::default()
+        };
+        let merged = merge([
+            one(&["styled/button, wide"]),
+            other,
+            one(&["styled/dialog, wide", "styled/button, wide"]),
+        ]);
+        assert_eq!(merged.len(), 2);
+        assert_eq!(
+            merged[0].members,
+            ["styled/button, wide", "styled/dialog, wide"]
+        );
+        let back = Group::read(&merged[1].record()).unwrap();
+        assert_eq!(back.signature, merged[1].signature);
     }
 
     #[test]
