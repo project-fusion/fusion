@@ -1,9 +1,11 @@
 export {
   type Axes,
   type Axis,
+  type Place,
   type PlotColors,
   type PlotConnection,
   type PlotDriver,
+  type PointerKind,
   plotColorsFrom,
 } from './connect-plot/connect-plot.js'
 export {

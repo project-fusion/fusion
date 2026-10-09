@@ -14,7 +14,7 @@ interface Plot extends HTMLElement {
   active: number
   drawn(on?: boolean): void
   field: { acrosses: number[]; cells: { label?: string; value?: number }[]; depths: number[] }
-  requestActive(index: number): void
+  requestActive(index: number, kind?: 'mouse' | 'pen' | 'touch'): void
   updateComplete: Promise<unknown>
 }
 
@@ -154,6 +154,20 @@ describe('the keys', () => {
     await element.updateComplete
     expect(element.active).toBe(4)
     expect(kinds).toContain('focus')
+  })
+})
+
+describe('the tooltip', () => {
+  test('shows the reading’s row where the renderer draws it, and none for an open place', async () => {
+    const element = (await plot()) as Plot & { placeReading(at?: { x: number; y: number }): void }
+    element.drawn()
+    element.placeReading({ x: 0.2, y: 0.6 })
+    element.requestActive(3)
+    await element.updateComplete
+    expect(part(element, 'tooltip-label')?.textContent).toBe('Tue 1h')
+    element.requestActive(5)
+    await element.updateComplete
+    expect(part(element, 'tooltip-anchor')).toBeNull()
   })
 })
 

@@ -27,7 +27,7 @@ const recording = () => {
     colors?: PlotColors
     drawn: Field[]
     focus: number[]
-    press?: ((index: number) => void) | undefined
+    press?: ((index: number, kind: 'mouse' | 'pen' | 'touch') => void) | undefined
     stopped: boolean
     turns: Array<[number, number, boolean]>
   } = { drawn: [], focus: [], stopped: false, turns: [] }
@@ -94,11 +94,11 @@ describe('connectSpatialScatterChart', () => {
     const { driver, told } = recording()
     connectSpatialScatterChart(element, driver)
     await settle(element)
-    told.press?.(1)
+    told.press?.(1, 'mouse')
     await settle(element)
     expect(element.active).toBe(1)
     expect(told.focus.at(-1)).toBe(1)
-    told.press?.(-1)
+    told.press?.(-1, 'mouse')
     await settle(element)
     expect(told.focus.at(-1)).toBe(-1)
   })

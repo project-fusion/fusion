@@ -14,7 +14,7 @@ interface Plot extends HTMLElement {
   active: number
   drawn(on?: boolean): void
   field: { groups: string[]; points: { label: string; x: number }[] }
-  requestActive(index: number): void
+  requestActive(index: number, kind?: 'mouse' | 'pen' | 'touch'): void
   updateComplete: Promise<unknown>
 }
 
@@ -121,6 +121,34 @@ describe('the keys', () => {
     await element.updateComplete
     expect(element.active).toBe(2)
     expect(kinds).toContain('focus')
+  })
+})
+
+describe('the tooltip', () => {
+  test('shows the reading’s row where the renderer draws it, once a renderer has drawn', async () => {
+    const element = (await plot()) as Plot & { placeReading(at?: { x: number; y: number }): void }
+    element.requestActive(1)
+    element.placeReading({ x: 0.5, y: 0.25 })
+    await element.updateComplete
+    expect(part(element, 'tooltip-anchor')).toBeNull()
+    element.drawn()
+    await element.updateComplete
+    expect(part(element, 'tooltip-label')?.textContent).toBe('Grace')
+    const mark = part(element, 'mark') as HTMLElement
+    expect([mark.style.left, mark.style.top]).toEqual(['50%', '25%'])
+  })
+
+  test('a mouse leaving the drawing lets a hovered reading go, and keeps one the keys moved to', async () => {
+    const element = await plot()
+    element.requestActive(1, 'mouse')
+    element.requestActive(-1, 'mouse')
+    await element.updateComplete
+    expect(element.active).toBe(-1)
+    key(element, 'ArrowRight')
+    await element.updateComplete
+    element.requestActive(-1, 'mouse')
+    await element.updateComplete
+    expect(element.active).toBe(0)
   })
 })
 

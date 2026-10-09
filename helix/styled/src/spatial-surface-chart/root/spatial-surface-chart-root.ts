@@ -1,7 +1,9 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSpatialSurfaceChart } from '@fusion.dev/helix-headless/spatial-surface-chart'
 import type { CSSResultGroup } from 'lit'
+import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './spatial-surface-chart-root.css.js'
+import '../../tooltip/index.js'
 
 /**
  * @summary A chart that draws a height over a grid as a surface in three dimensions, for a measure that varies over two others.
@@ -25,7 +27,7 @@ import { styles } from './spatial-surface-chart-root.css.js'
 export class HelixSpatialSurfaceChart extends HelixHeadlessSpatialSurfaceChart {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [tooltipStyles, styles]
 }
 
 declare global {
