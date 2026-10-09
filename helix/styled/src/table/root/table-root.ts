@@ -19,6 +19,7 @@ import '../../checkbox/index.js'
  * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The table's rows.
+ * @slot columns - The columns, as `TableColumn` elements. The table moves each column here itself, so markup that runs in a browser leaves it out; a server-rendered page writes `slot="columns"` on each column so the headings sit in place before the table upgrades.
  * @slot empty - Content shown when there are no rows and none are loading, such as a picture and a link. Falls back to `empty-text`, which the live region still says.
  * @slot error - Content shown while `error-text` is set, such as a button that tries again. Falls back to `error-text`, which the live region still says.
  * @slot heading - Words that name the table, shown above it in the weight of a heading.
