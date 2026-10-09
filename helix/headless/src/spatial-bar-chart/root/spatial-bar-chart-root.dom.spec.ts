@@ -170,4 +170,14 @@ describe('the pointer', () => {
     expect(element.active).toBe(2)
     expect(part(element, 'ring')?.getAttribute('d')).toMatch(/^M/)
   })
+
+  test('the outline is painted straight after its bar, so the bars in front cover it', async () => {
+    const element = await plot()
+    element.requestActive(0)
+    await element.updateComplete
+    const ring = part(element, 'ring')
+    expect(ring?.previousElementSibling?.getAttribute('data-index')).toBe('0')
+    /* The first bar stands in front, so bars are painted after its outline. */
+    expect(ring?.nextElementSibling?.getAttribute('part')).toContain('bar')
+  })
 })
