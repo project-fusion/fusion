@@ -578,6 +578,21 @@ export { applyOwnRule, type OwnRule } from './utils/own-rule/own-rule.js'
 export { plainClick } from './utils/plain-click/plain-click.js'
 export { appleTouch, onAndroid, onApple, type Platform } from './utils/platform/platform.js'
 export { pressType, type RecentPress } from './utils/press-type/press-type.js'
+export {
+  type Camera,
+  type Drawn,
+  depthOrder,
+  type Face,
+  ISOMETRIC,
+  LOWEST_TILT,
+  type PagePoint,
+  type Projection,
+  pathData,
+  projectionOf,
+  type Solid,
+  shortNumber,
+  solid,
+} from './utils/projection/projection.js'
 export { rangeAdd } from './utils/range-add/range-add.js'
 export {
   type ColorBytes,
