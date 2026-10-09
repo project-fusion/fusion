@@ -374,18 +374,12 @@ export class HelixAura extends HelixElement {
    * also runs a short transition on the canvas, and its end paints one frame.
    * That covers a reader who asked for no motion.
    */
-  /* The default theme's dark page, ink on black, until the first read. */
-  private palette: AuraPalette = { ...RESTING_PALETTE }
-
-  /** The canvas's live computed style, and the five colors it last carried. */
-  private carried: { canvas: HTMLCanvasElement; style: CSSStyleDeclaration; text: string } | null =
-    null
-
-  /** Why the gradient shows, while it does, or `undefined` while the shader draws. */
-  private fallback: HelixAuraFallbackEvent['detail']['reason'] | undefined
-
-  /** Why the last `build` drew nothing, for the fallback it leads to. */
-  private refused: HelixAuraFallbackEvent['detail']['reason'] = 'unavailable'
+  private palette: { glow: TokenColor; ground: TokenColor; haze: TokenColor; peak: TokenColor } = {
+    glow: [0.29, 0.61, 1],
+    ground: [0, 0, 0],
+    haze: [0.02, 0.15, 0.34],
+    peak: [1, 1, 1],
+  }
 
   private canvas: HTMLCanvasElement | null = null
   private gl: WebGL2RenderingContext | null = null
@@ -902,15 +896,22 @@ export class HelixAura extends HelixElement {
    * Resolves the ramp, converting only when the colors the canvas carries
    * moved since the last read.
    *
-   * From the canvas's own computed style, which carries each stop on a color
-   * property: the `--aura-*` hook where a page set one, and the token
-   * otherwise. `paletteOf` says which property is which, and how the peak is
-   * chosen for a light page or a dark one.
+   * Light pages peak on a deep brand blue and dark ones on the foreground, and
+   * the ground is what says which: mixing a saturated hue toward near-black
+   * takes the chroma out of exactly the pixels carrying the most of it. Read
+   * from the ground's own luminance rather than asked of the color mode, which
+   * is a private token this tier may not reach for.
    */
   private readPalette(): void {
-    const canvas = this.canvas
-    if (!canvas) {
-      return
+    const ground = this.tokens.read('--helix-color-background', [0, 0, 0])
+    const light = ground[0] * 0.2126 + ground[1] * 0.7152 + ground[2] * 0.0722 > 0.5
+    this.palette = {
+      glow: this.tokens.read('--helix-color-primary', [0.29, 0.61, 1]),
+      ground,
+      haze: this.tokens.read('--helix-color-primary-subtle', [0.02, 0.15, 0.34]),
+      peak: light
+        ? this.tokens.read('--helix-color-primary-active', [0.1, 0.2, 0.55])
+        : this.tokens.read('--helix-color-foreground', [1, 1, 1]),
     }
     if (this.carried?.canvas !== canvas) {
       this.carried = { canvas, style: getComputedStyle(canvas), text: '' }

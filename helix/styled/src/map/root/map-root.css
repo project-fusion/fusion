@@ -227,9 +227,9 @@
 /* **Pressed while the map is tilted**, in the brand's fill, so the one
    toggle among the buttons says which view is showing. */
 [part="tilt"][aria-pressed="true"] {
-  background-color: var(--map-chosen-color, var(--helix-color-primary-surface));
-  border-color: var(--map-chosen-color, var(--helix-color-primary-surface));
-  color: var(--helix-color-foreground-on-primary);
+  background-color: var(--helix-color-primary-surface);
+  border-color: var(--helix-color-primary-surface);
+  color: var(--helix-color-foreground-on-accent);
 }
 
 [part="tilt"][aria-pressed="true"]:hover {
