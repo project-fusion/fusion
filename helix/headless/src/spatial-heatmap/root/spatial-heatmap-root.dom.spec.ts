@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* The relief, after hydration.
  *
@@ -154,7 +154,7 @@ describe('the drawing', () => {
   })
 })
 
-describe('the base and the corners', () => {
+describe('the base', () => {
   test('the prisms stand on a slab, hidden from a reader and painted first', async () => {
     const element = await relief('rows="2"', [
       ['Mon', 3],
@@ -167,24 +167,6 @@ describe('the base and the corners', () => {
     expect(
       ['base-left', 'base-right', 'base-top'].map((name) => part(element, name)?.localName),
     ).toEqual(['path', 'path', 'path'])
-  })
-
-  test('the footer says where the front edge starts and ends, as shares of the width', async () => {
-    const element = await relief('rows="2"', [
-      ['Mon', 3],
-      ['Tue', 1],
-      ['Wed', 2],
-    ])
-    const style = part(element, 'footer')?.getAttribute('style') ?? ''
-    const read = (name: string): number =>
-      Number(new RegExp(`--spatial-heatmap-${name}: ([\\d.]+)`).exec(style)?.[1] ?? Number.NaN)
-    /* Two columns of two rows: the left corner stands partway down, the
-       bottom corner partway across, and the drawing is less tall than wide. */
-    expect(read('start-y')).toBeGreaterThan(0)
-    expect(read('start-y')).toBeLessThan(read('depth'))
-    expect(read('end-x')).toBeGreaterThan(0)
-    expect(read('end-x')).toBeLessThan(1)
-    expect(read('depth')).toBeGreaterThan(0)
   })
 })
 
@@ -253,32 +235,63 @@ describe('a renderer', () => {
     expect(turns).toHaveLength(1)
   })
 
-  test('the first and last labels stand where it draws the ends of the front edge', async () => {
-    const element = (await relief('rows="2"', readings)) as Framed & {
-      placeCorners(at?: { end: { x: number; y: number }; start: { x: number; y: number } }): void
-    }
-    const read = (name: string): number => {
-      const style = part(element, 'footer')?.getAttribute('style') ?? ''
-      return Number(
-        new RegExp(`--spatial-heatmap-${name}: ([\\d.]+)`).exec(style)?.[1] ?? Number.NaN,
-      )
-    }
-    /* The chart's own drawing: the start at the left edge, the end at the foot. */
-    expect(read('start-x')).toBe(0)
-    expect(read('end-y')).toBe(read('depth'))
-    element.rendererDrawn()
-    element.placeCorners({ end: { x: 0.6, y: 0.9 }, start: { x: 0.2, y: 0.5 } })
-    await element.updateComplete
-    const depth = read('depth')
-    expect(read('start-x')).toBe(0.2)
-    expect(read('start-y')).toBeCloseTo(0.5 * depth, 3)
-    expect(read('end-x')).toBe(0.6)
-    expect(read('end-y')).toBeCloseTo(0.9 * depth, 3)
-    /* Out of view, the labels keep where they were. */
-    element.placeCorners(undefined)
-    await element.updateComplete
-    expect(read('start-x')).toBe(0.2)
-  })
+  /* Measured, so held where there is a layout to measure in. */
+  const laid = hasLayout() ? test : (): void => {}
+
+  laid(
+    'the first and last labels stand under the ends of the front edge, in either drawing',
+    async () => {
+      const host = (await mount(
+        `<div style="inline-size: 30rem">${table(readings)}<helix-headless-spatial-heatmap for="commits" rows="2" style="display: block"><span slot="start">First</span><span slot="end">Last</span></helix-headless-spatial-heatmap></div>`,
+      )) as HTMLElement
+      const element = host.querySelector('helix-headless-spatial-heatmap') as Framed & {
+        placeCorners(at?: {
+          end: { x: number; y: number }
+          outline?: Array<{ x: number; y: number }>
+          start: { x: number; y: number }
+        }): void
+      }
+      await element.updateComplete
+      const label = (name: string) => {
+        const box = part(element, name) as HTMLElement
+        return {
+          placed: box.hasAttribute('data-placed'),
+          x: Number.parseFloat(box.style.getPropertyValue('--spatial-heatmap-label-x')),
+          y: Number.parseFloat(box.style.getPropertyValue('--spatial-heatmap-label-y')),
+        }
+      }
+      /* The chart's own drawing: both placed, inside the footer's width. */
+      const footer = (part(element, 'footer') as HTMLElement).getBoundingClientRect()
+      for (const name of ['start', 'end']) {
+        const at = label(name)
+        expect(at.placed).toBe(true)
+        expect(at.x).toBeGreaterThanOrEqual(0)
+        expect(at.x).toBeLessThanOrEqual(footer.width)
+      }
+      /* A renderer's: under where it draws the start, which stands halfway
+       down the strip. */
+      element.rendererDrawn()
+      element.placeCorners({
+        end: { x: 0.6, y: 0.9 },
+        outline: [
+          { x: 0.2, y: 0.1 },
+          { x: 0.8, y: 0.1 },
+          { x: 0.6, y: 0.9 },
+          { x: 0.2, y: 0.5 },
+        ],
+        start: { x: 0.2, y: 0.5 },
+      })
+      await element.updateComplete
+      const strip = (part(element, 'strip') as HTMLElement).getBoundingClientRect()
+      const below = strip.top + strip.height * 0.5 - footer.top
+      expect(label('start').y).toBeGreaterThan(below)
+      /* Out of view, the labels keep where they were. */
+      const kept = label('start')
+      element.placeCorners(undefined)
+      await element.updateComplete
+      expect(label('start')).toEqual(kept)
+    },
+  )
 
   test('a reading hovered in its drawing is the chart’s, and is told as a change', async () => {
     const element = (await relief('rows="2"', readings)) as Framed

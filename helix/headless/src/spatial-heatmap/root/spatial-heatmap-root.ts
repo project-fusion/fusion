@@ -155,14 +155,9 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart strip - The box the drawing fills, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart top-face - The top of a prism, which carries the reading's tone.
  *
- * @cssproperty --spatial-heatmap-depth - How tall the drawing is for its width. The component writes it on the footer, and a stylesheet that stands the `start` and `end` labels at their corners reads it.
- * @cssproperty --spatial-heatmap-end-x - Where the front edge ends, under the newest column, across the drawing, from 0 at its inline start to 1. The component writes it on the footer, and a stylesheet that stands the `end` label there reads it.
- * @cssproperty --spatial-heatmap-end-y - How far down the drawing the front edge ends, under the newest column, as a share of the drawing's width, in the chart's own drawing and wherever a renderer draws it. The component writes it on the footer, and a stylesheet that stands the `end` label there reads it.
  * @cssproperty --spatial-heatmap-label-x - Where the `start` or the `end` label stands clear of the drawing, from the footer's inline start, in pixels. The component measures it and writes it on the label, with `data-placed`, as the view turns.
  * @cssproperty --spatial-heatmap-label-y - Where the `start` or the `end` label stands clear of the drawing, from the footer's top, in pixels. The component measures it and writes it on the label, with `data-placed`, as the view turns.
  * @cssproperty --spatial-heatmap-span - How many cells the drawing spans across: its columns and its rows together. The component writes it on the strip, and a stylesheet that caps the cell size reads it.
- * @cssproperty --spatial-heatmap-start-x - Where the front edge starts, under the first column, across the drawing, from 0 at its inline start to 1, in the chart's own drawing and wherever a renderer draws it. The component writes it on the footer, and a stylesheet that stands the `start` label there reads it.
- * @cssproperty --spatial-heatmap-start-y - How far down the drawing the front edge starts, under the first column, as a share of the drawing's width. The component writes it on the footer, and a stylesheet that stands the `start` label there reads it.
  *
  * @cssstate drawn - While a renderer has drawn the relief, and the chart's own drawing stays unseen under it.
  */
@@ -195,6 +190,15 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
   /** Where the chart's own drawing is seen from, which a drag or Shift with an arrow turns. */
   @state()
   private camera: Camera = ISOMETRIC
+
+  /** What places the first and last labels again when one of them, or the footer, changes size. */
+  private labelSizes: ResizeObserver | undefined = undefined
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.labelSizes?.disconnect()
+    this.labelSizes = undefined
+  }
 
   /** A drag across the chart's own drawing, which turns its view. */
   private readonly drag = new DragTurn(
@@ -479,7 +483,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
         @pointerup=${this.rendered ? undefined : this.onStripUp}
       ><slot name="renderer"></slot>${drawing}${this.renderTooltip(grid)}</div>
       ${cells.length === 0 ? this.renderStatus() : nothing}
-      <div part="footer" style=${this.cornersStyle(relief)}>
+      <div part="footer">
         <span part="start"><slot name="start"></slot></span>
         <span part="summary"><slot name="summary"></slot></span>
         <span part="end"><slot name="end"></slot></span>
@@ -536,6 +540,16 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
       return
     }
     const labels = { end, start }
+    /* **Again whenever a label or the footer changes size**, as a webfont
+       arriving after the first measure changes a label's width, and with it
+       how far down the front edge reaches over it. Guarded because Lit SSR
+       provides no `ResizeObserver`. */
+    if (!this.labelSizes && typeof ResizeObserver !== 'undefined') {
+      this.labelSizes = new ResizeObserver(() => this.placeLabels())
+      for (const box of [footer, start, end]) {
+        this.labelSizes.observe(box)
+      }
+    }
     const frame = footer.getBoundingClientRect()
     if (frame.width <= 0) {
       return
@@ -588,39 +602,6 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
       labels[key].style.setProperty('--spatial-heatmap-label-y', `${Math.round(at.y)}px`)
       labels[key].toggleAttribute('data-placed', true)
     }
-  }
-
-  /**
-   * Where the front edge's two ends stand, for the labels that name them.
-   * **As shares of the drawing's width**, the one length a percentage margin
-   * is measured against, so a sheet places a label with no height to read.
-   */
-  private cornersStyle(relief: Relief): string | typeof nothing {
-    const { box, corners } = relief
-    if (!corners || box.width <= 0) {
-      return nothing
-    }
-    const share = (value: number): number => Math.round(value * 10000) / 10000
-    const depth = box.height / box.width
-    /* **Where a renderer draws them, while one does**, as fractions of the
-       strip, which its drawing fills and which keeps the chart's own drawing's
-       shape. The renderer's drawing is not mirrored on a right-to-left page,
-       so across is turned round to run from the inline start there. */
-    const drawn = this.rendered ? this.corners : undefined
-    const across = (x: number): number => (isRtl(this) ? 1 - x : x)
-    const start = drawn
-      ? { x: across(drawn.start.x), y: drawn.start.y * depth }
-      : { x: (corners.start.x - box.x) / box.width, y: (corners.start.y - box.y) / box.width }
-    const end = drawn
-      ? { x: across(drawn.end.x), y: drawn.end.y * depth }
-      : { x: (corners.end.x - box.x) / box.width, y: (corners.end.y - box.y) / box.width }
-    return [
-      `--spatial-heatmap-depth: ${share(depth)}`,
-      `--spatial-heatmap-end-x: ${share(end.x)}`,
-      `--spatial-heatmap-end-y: ${share(end.y)}`,
-      `--spatial-heatmap-start-x: ${share(start.x)}`,
-      `--spatial-heatmap-start-y: ${share(start.y)}`,
-    ].join('; ')
   }
 
   /**
