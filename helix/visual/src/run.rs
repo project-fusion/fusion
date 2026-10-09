@@ -30,6 +30,7 @@ use crate::driver::Driver;
 use crate::fingerprint::Fingerprint;
 use crate::harness;
 use crate::image;
+use crate::out::say;
 use crate::report;
 use crate::shard::{self, Shard};
 use crate::sources;
@@ -379,6 +380,12 @@ pub fn open_report(config: Option<&Path>, markdown: bool) -> Outcome<Code> {
         )
         .hint("helix visual test")
     })?;
+    /* Under `--json` the record is the answer, printed as written, and
+    nothing is opened: a script asked for data and not for a window. */
+    if crate::out::json() {
+        print!("{text}");
+        return Ok(Code::Ok);
+    }
     if markdown {
         let value: Value = serde_json::from_str(&text).map_err(|error| {
             Failure::input(
@@ -390,7 +397,7 @@ pub fn open_report(config: Option<&Path>, markdown: bool) -> Outcome<Code> {
         return Ok(Code::Ok);
     }
     let page = dir.join("index.html");
-    println!("helix: the report is {}", page.display());
+    say!("helix: the report is {}", page.display());
     let opener = match std::env::consts::OS {
         "macos" => Some("open"),
         "linux" => Some("xdg-open"),
@@ -413,13 +420,16 @@ pub fn run(options: &Options) -> Outcome<Code> {
     let internal = |why: String| Failure::new(Code::Internal, "the driver", why);
 
     if config.platform == Platform::Linux && std::env::consts::OS != "linux" {
-        println!(
-            "helix: skipped on {}. Baselines are taken and compared on linux, because text rasterization and \
-             antialiasing differ by platform, so a comparison across them would differ on nearly every glyph.",
-            std::env::consts::OS
-        );
         driver.close();
-        return Ok(Code::Ok);
+        return Ok(report::stopped(
+            options.update,
+            false,
+            &format!(
+                "helix: skipped on {}. Baselines are taken and compared on linux, because text rasterization and \
+                 antialiasing differ by platform, so a comparison across them would differ on nearly every glyph.",
+                std::env::consts::OS
+            ),
+        ));
     }
 
     /* Before discovery, because a sitemap and a Storybook index are read from
@@ -496,12 +506,15 @@ pub fn run(options: &Options) -> Outcome<Code> {
         (None, true) => String::new(),
     };
     if mine.is_empty() {
-        println!(
-            "helix: {} holds none of the entries, which the other shards picture.",
-            options.shard.map(Shard::label).unwrap_or_default()
-        );
         driver.close();
-        return Ok(Code::Ok);
+        return Ok(report::stopped(
+            options.update,
+            false,
+            &format!(
+                "helix: {} holds none of the entries, which the other shards picture.",
+                options.shard.map(Shard::label).unwrap_or_default()
+            ),
+        ));
     }
 
     let mut serve = BTreeMap::new();
@@ -563,40 +576,52 @@ pub fn run(options: &Options) -> Outcome<Code> {
         (Some(found), _) if found.is_empty() => {}
         (_, true) if whole => write_fingerprint = true,
         (None, true) => {
-            println!(
-                "helix: there is no environment fingerprint at {}, and a retake of part of the set cannot \
-                 write one for all of it. Retake every entry.",
-                relative(&base, &fingerprint_path)
-            );
             driver.close();
-            return Ok(Code::Failed);
+            return Ok(report::stopped(
+                options.update,
+                true,
+                &format!(
+                    "helix: there is no environment fingerprint at {}, and a retake of part of the set cannot \
+                     write one for all of it. Retake every entry.",
+                    relative(&base, &fingerprint_path)
+                ),
+            ));
         }
         (Some(found), true) => {
-            println!(
-                "helix: the environment differs from the one the baselines were taken in: {}. A retake of part \
-                 of the set would mix two environments. Retake every entry.",
-                found.join(", ")
-            );
             driver.close();
-            return Ok(Code::Failed);
+            return Ok(report::stopped(
+                options.update,
+                true,
+                &format!(
+                    "helix: the environment differs from the one the baselines were taken in: {}. A retake of part \
+                     of the set would mix two environments. Retake every entry.",
+                    found.join(", ")
+                ),
+            ));
         }
         (None, false) => {
-            println!(
-                "helix: there is no environment fingerprint at {}, so nothing says where the baselines were \
-                 taken. {retake}",
-                relative(&base, &fingerprint_path)
-            );
             driver.close();
-            return Ok(Code::Failed);
+            return Ok(report::stopped(
+                options.update,
+                true,
+                &format!(
+                    "helix: there is no environment fingerprint at {}, so nothing says where the baselines were \
+                     taken. {retake}",
+                    relative(&base, &fingerprint_path)
+                ),
+            ));
         }
         (Some(found), false) => {
-            println!(
-                "helix: the environment differs from the one the baselines were taken in: {}. The pictures \
-                 would differ for that reason alone, so nothing was compared. {retake}",
-                found.join(", ")
-            );
             driver.close();
-            return Ok(Code::Failed);
+            return Ok(report::stopped(
+                options.update,
+                true,
+                &format!(
+                    "helix: the environment differs from the one the baselines were taken in: {}. The pictures \
+                     would differ for that reason alone, so nothing was compared. {retake}",
+                    found.join(", ")
+                ),
+            ));
         }
     }
 
@@ -983,7 +1008,8 @@ mod tests {
 
     #[test]
     fn an_update_writes_a_missing_baseline_and_a_test_fails_on_it() {
-        let at = std::env::temp_dir().join(format!("helix-visual-settle-{}/a.png", std::process::id()));
+        let at =
+            std::env::temp_dir().join(format!("helix-visual-settle-{}/a.png", std::process::id()));
         assert!(matches!(
             settle(Verdict::Missing, None, false, &at, b"x").unwrap(),
             Fate::Missing

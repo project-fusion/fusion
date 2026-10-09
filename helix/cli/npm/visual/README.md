@@ -45,6 +45,11 @@ Each run ends with one line that says what it compared and what it skipped.
 `--config` names the config file, `--workers` sets how many pages capture at
 once, and `--shard` with `--of` takes one shard of a run split across jobs.
 
+`helix --json visual …` prints one JSON document on stdout and moves the
+sentences to stderr: `test` and `update` print the run's record, the same as
+the report's `run.json`, `report` prints the last one, and `compare` prints
+whether the two pictures match and how many pixels differ.
+
 ## The config
 
 `visual.config.ts`, in the directory you run `helix visual` from:

@@ -21,6 +21,7 @@ use std::path::{Path, PathBuf};
 use fusion_rules::exit::Code;
 use serde_json::{json, Value};
 
+use crate::out::say;
 use crate::run::Fate;
 
 /// One shot as the report sees it.
@@ -192,28 +193,29 @@ pub fn finish(run: &Run) -> Code {
     }
 
     for note in &notes {
-        println!("helix: {note}");
+        say!("helix: {note}");
     }
     if !failures.is_empty() {
-        println!("\n  {}\n", failures.join("\n  "));
+        say!("\n  {}\n", failures.join("\n  "));
     }
-    println!("{verdict}");
+    say!("{verdict}");
     if run.update && !written.is_empty() {
-        println!("helix: review each written picture before committing it. A baseline records whatever was on screen as correct.");
+        say!("helix: review each written picture before committing it. A baseline records whatever was on screen as correct.");
     }
     if !run.update && !failures.is_empty() {
-        println!(
+        say!(
             "helix: if the change was meant, retake the baselines. {}",
             run.retake
         );
     }
     if run.inspected_failed {
-        println!("helix: the config's inspect reported a failure, above.");
+        say!("helix: the config's inspect reported a failure, above.");
     }
 
     let failed = !failures.is_empty() || run.inspected_failed;
-    match write(run, &verdict, failed) {
-        Ok(()) => println!(
+    let record = record(run, &verdict, failed);
+    match write(run, &record) {
+        Ok(()) => say!(
             "helix: the report is in {}.",
             relative(run.base, &run.dir.join("index.html"))
         ),
@@ -222,6 +224,9 @@ pub fn finish(run: &Run) -> Code {
             run.dir.display()
         ),
     }
+    if crate::out::json() {
+        println!("{record}");
+    }
     if failed {
         Code::Failed
     } else {
@@ -229,40 +234,62 @@ pub fn finish(run: &Run) -> Code {
     }
 }
 
-/// `run.json`, `index.html`, and the pictures of each failed shot.
-fn write(run: &Run, verdict: &str, failed: bool) -> std::io::Result<()> {
-    if run.dir.exists() {
-        fs::remove_dir_all(&run.dir)?;
+/// A run that stopped before it pictured anything: the sentence that says
+/// why, and under `--json` the same document a finished run prints, with no
+/// shots.
+pub fn stopped(update: bool, failed: bool, verdict: &str) -> Code {
+    say!("{verdict}");
+    if crate::out::json() {
+        println!(
+            "{}",
+            json!({
+                "failed": failed,
+                "mode": if update { "update" } else { "test" },
+                "shots": [],
+                "skipped": [],
+                "verdict": verdict,
+                "version": crate::shipped(),
+            })
+        );
     }
-    let pictures = run.dir.join("shots");
-    fs::create_dir_all(&pictures)?;
-    let mut rows = Vec::new();
-    for (at, row) in run.rows.iter().enumerate() {
-        let (result, detail) = described(row, run.base);
-        let mut record = json!({
-            "detail": detail,
-            "entry": row.entry,
-            "result": result,
-            "shot": row.shot,
-            "source": row.source,
-        });
-        if row.fate.fails() {
-            if row.baseline.is_file() {
-                fs::copy(&row.baseline, pictures.join(format!("{at}-baseline.png")))?;
-                record["baseline"] = json!(format!("shots/{at}-baseline.png"));
-            }
-            if let Some(current) = row.current {
-                fs::write(pictures.join(format!("{at}-current.png")), current)?;
-                record["current"] = json!(format!("shots/{at}-current.png"));
-            }
-            if let Some(diff) = row.diff.as_ref().filter(|diff| diff.is_file()) {
-                fs::copy(diff, pictures.join(format!("{at}-diff.png")))?;
-                record["diff"] = json!(format!("shots/{at}-diff.png"));
-            }
-        }
-        rows.push(record);
+    if failed {
+        Code::Failed
+    } else {
+        Code::Ok
     }
-    let record = json!({
+}
+
+/// What `run.json` holds, and what `--json` prints: each shot with its
+/// result, and the verdict.
+fn record(run: &Run, verdict: &str, failed: bool) -> Value {
+    let rows: Vec<Value> = run
+        .rows
+        .iter()
+        .enumerate()
+        .map(|(at, row)| {
+            let (result, detail) = described(row, run.base);
+            let mut record = json!({
+                "detail": detail,
+                "entry": row.entry,
+                "result": result,
+                "shot": row.shot,
+                "source": row.source,
+            });
+            if row.fate.fails() {
+                if row.baseline.is_file() {
+                    record["baseline"] = json!(format!("shots/{at}-baseline.png"));
+                }
+                if row.current.is_some() {
+                    record["current"] = json!(format!("shots/{at}-current.png"));
+                }
+                if row.diff.as_ref().is_some_and(|diff| diff.is_file()) {
+                    record["diff"] = json!(format!("shots/{at}-diff.png"));
+                }
+            }
+            record
+        })
+        .collect();
+    json!({
         "failed": failed,
         "mode": if run.update { "update" } else { "test" },
         "shots": rows,
@@ -270,15 +297,39 @@ fn write(run: &Run, verdict: &str, failed: bool) -> std::io::Result<()> {
         /* Read where the list follows it. */
         "verdict": verdict.replace(", listed above.", ", listed below."),
         "version": crate::shipped(),
-    });
+    })
+}
+
+/// `run.json`, `index.html`, and the pictures of each failed shot, at the
+/// paths the record names.
+fn write(run: &Run, record: &Value) -> std::io::Result<()> {
+    if run.dir.exists() {
+        fs::remove_dir_all(&run.dir)?;
+    }
+    let pictures = run.dir.join("shots");
+    fs::create_dir_all(&pictures)?;
+    for (at, row) in run.rows.iter().enumerate() {
+        if !row.fate.fails() {
+            continue;
+        }
+        if row.baseline.is_file() {
+            fs::copy(&row.baseline, pictures.join(format!("{at}-baseline.png")))?;
+        }
+        if let Some(current) = row.current {
+            fs::write(pictures.join(format!("{at}-current.png")), current)?;
+        }
+        if let Some(diff) = row.diff.as_ref().filter(|diff| diff.is_file()) {
+            fs::copy(diff, pictures.join(format!("{at}-diff.png")))?;
+        }
+    }
     fs::write(
         run.dir.join("run.json"),
         format!(
             "{}\n",
-            serde_json::to_string_pretty(&record).unwrap_or_default()
+            serde_json::to_string_pretty(record).unwrap_or_default()
         ),
     )?;
-    fs::write(run.dir.join("index.html"), html(&record))?;
+    fs::write(run.dir.join("index.html"), html(record))?;
     Ok(())
 }
 
