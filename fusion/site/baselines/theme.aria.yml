@@ -1,0 +1,105 @@
+- button "Menu"
+- link "Fusion":
+  - /url: /
+- button "Search Ctrl+K"
+- button "Preferences"
+- heading "Theme builder" [level=1]
+- button "Reset" [disabled]
+- text: Start from ink, or describe a brand. Every pair the palette produces is measured against the ground it lands on. Preview
+- button "Preview Logistics platform": Logistics platform
+- paragraph: Only the words change. The palette is the same whichever you pick.
+- text: Layout
+- button "Layout Marketing site": Marketing site
+- paragraph: How much page there is. Minimal has no chart and nothing that floats; Local business is a services site, with prices and questions; Map is a live map with a panel over it.
+- switch "Brand color"
+- text: Brand color
+- paragraph: "Off, the palette is ink: near-black in light mode and near-white in dark."
+- text: Color scheme
+- button "Color scheme Site": Site
+- paragraph: Which half of the palette you see. Site follows the site's own mode; both halves are emitted either way.
+- text: Light page
+- textbox "Light page":
+  - /placeholder: "#000000"
+  - text: "#ffffff"
+- button "Choose a color"
+- paragraph: The page's color in light.
+- text: Dark page
+- textbox "Dark page":
+  - /placeholder: "#000000"
+  - text: "#000000"
+- button "Choose a color"
+- paragraph: The page's color in dark.
+- switch "Color one band"
+- text: Color one band
+- paragraph: The figures band in Marketing site, or the announcement in Local business, in a color of its own.
+- text: Contrast target
+- button "Contrast target 4.5, AA": 4.5, AA
+- paragraph: The ratio every foreground has to clear against the ground it lands on.
+- text: Saturation
+- slider "Saturation": "100"
+- paragraph: How much of the brand’s chroma the palette keeps. Zero is gray.
+- text: Accent angle
+- slider "Accent angle" [disabled]: "0"
+- paragraph: How far around the wheel the accent sits from the brand, in degrees. At 0 it is the brand. With no brand, it is the ink.
+- text: Density
+- slider "Density": "100"
+- paragraph: Control heights and the spacing scale, as a percentage of the shipped one.
+- text: Corner radius
+- slider "Corner radius": "50"
+- paragraph: As a percentage of the shipped radii. Zero is square.
+- text: Font stylesheet
+- textbox "Font stylesheet":
+  - /placeholder: https://
+- paragraph: The stylesheet that declares your own faces. Type a family's name into a face field to use it. Loaded only in the preview.
+- text: Body face
+- combobox "Body face"
+- text: Display face
+- combobox "Display face"
+- paragraph: Headings. Follows the body face where it is left alone.
+- text: Mono face
+- combobox "Mono face"
+- text: Status harmony
+- slider "Status harmony": "50"
+- paragraph: How far the statuses follow the palette's loudness.
+- text: Status hue allowance
+- slider "Status hue allowance": "20"
+- paragraph: How far a status may rotate, in degrees, to clear a role it collides with.
+- text: Body size
+- slider "Body size": "14"
+- paragraph: The base size in pixels. Every UI step is measured off it.
+- text: Type scale
+- slider "Type scale": "132"
+- paragraph: The ratio between the display steps.
+- text: Motion
+- button "Motion Default": Default
+- paragraph: The pace and the curve together. Default keeps the stylesheet’s own.
+- text: Separation, in flow
+- radio "Border" [checked]
+- radio "Shadow"
+- radio "Fill"
+- radio "Space"
+- text: Separation, floating
+- radio "Shadow" [checked]
+- radio "Border"
+- radio "Fill"
+- text: Material blur
+- slider "Material blur": "16"
+- paragraph: Pixels behind a translucent surface. Zero is flat.
+- text: Material opacity
+- slider "Material opacity": "100"
+- paragraph: How opaque those surfaces are. Below 100 they stop being a known ground.
+- separator "Resize panes"
+- button "Hide controls"
+- button "97 pass"
+- button "3 unverifiable"
+- iframe
+- separator "Preview and artifact"
+- textbox "The generated stylesheet"
+- separator "The audit"
+- tablist "The audit":
+  - tab "Contrast" [selected]
+  - tab "Collisions"
+  - tab "Unverifiable (3)"
+- text: All 97 measured pairs clear their target. Each is a foreground against a ground the surface model says it lands on, rather than against the page alone.
+- separator "Preview, artifact and audit"
+- alert
