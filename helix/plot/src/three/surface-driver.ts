@@ -15,7 +15,7 @@ import type {
   SpatialSurfaceChartDriver,
   SurfaceField,
 } from '../connect-spatial-surface-chart/connect-spatial-surface-chart.js'
-import { createStage, HALF, inBox } from './stage.js'
+import { createStage, HALF, inBox, lookThrough } from './stage.js'
 
 /** How far off the pointer's line of sight a reading is still under it, in radians: about 16 pixels in a chart's box. */
 const REACH = 0.03
@@ -85,7 +85,11 @@ export const threeSurfaceDriver = (
     vertexColors: true,
   })
   const surface = new Mesh(new BufferGeometry(), surfaceMaterial)
-  const ruleMaterial = new LineBasicMaterial({ opacity: 0.3, transparent: true })
+  const ruleMaterial = new LineBasicMaterial({
+    opacity: 0.3,
+    transparent: true,
+    vertexColors: true,
+  })
   const rules = new LineSegments(new BufferGeometry(), ruleMaterial)
 
   const stage = createStage(container, {
@@ -155,7 +159,13 @@ export const threeSurfaceDriver = (
       const tints: number[] = []
       const low = new Color(colors.ramp.low)
       const high = new Color(colors.ramp.high)
+      const page = new Color(colors.page)
+      const ink = new Color(colors.ink)
+      const { emphasis, through } = colors.look
       const tint = new Color()
+      /* The ramp's color at each corner, which the wireframe of `outlined`
+         and `subtle` is drawn in. */
+      const ramp: number[] = []
       const values = next.cells.flatMap((cell) => (cell.value === undefined ? [] : [cell.value]))
       const [least, most] = [Math.min(...values), Math.max(...values)]
       next.cells.forEach((cell, index) => {
@@ -166,17 +176,30 @@ export const threeSurfaceDriver = (
         const level =
           cell.value === undefined || most === least ? 0.5 : (cell.value - least) / (most - least)
         tint.lerpColors(low, high, level)
+        ramp.push(tint.r, tint.g, tint.b)
+        /* `outlined` fades the surface toward the page, as the chart's own
+           drawing does. */
+        if (emphasis === 'outlined') {
+          tint.lerp(page, 0.4)
+        }
         tints.push(tint.r, tint.g, tint.b)
       })
       const has = (index: number): boolean => next.cells[index]?.value !== undefined
       const faces: number[] = []
       const lines: number[] = []
+      const lineTints: number[] = []
+      /* The grid's rules in the ink, faint, over a filled surface; in the
+         ramp's colors and whole, as a wireframe, under the other emphases. */
+      const wire = emphasis !== 'solid'
       const line = (from: number, to: number): void => {
         if (has(from) && has(to)) {
           lines.push(
             ...positions.slice(from * 3, from * 3 + 3),
             ...positions.slice(to * 3, to * 3 + 3),
           )
+          for (const at of [from, to]) {
+            lineTints.push(...(wire ? ramp.slice(at * 3, at * 3 + 3) : [ink.r, ink.g, ink.b]))
+          }
         }
       }
       for (let across = 0; across < next.acrosses.length; across++) {
@@ -212,8 +235,11 @@ export const threeSurfaceDriver = (
       rules.geometry.dispose()
       const ruled = new BufferGeometry()
       ruled.setAttribute('position', new Float32BufferAttribute(lines, 3))
+      ruled.setAttribute('color', new Float32BufferAttribute(lineTints, 3))
       rules.geometry = ruled
-      ruleMaterial.color.setStyle(colors.ink)
+      lookThrough(surfaceMaterial, (emphasis === 'subtle' ? 0.2 : 1) * through)
+      lookThrough(ruleMaterial, (wire ? 1 : 0.3) * through)
+      ruleMaterial.transparent = true
       stage.setAxes(next.axes, colors, font)
     },
     focus: (index) => {

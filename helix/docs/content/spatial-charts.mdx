@@ -185,7 +185,17 @@ Each chart takes its colors from your theme, and these hooks change them:
   `--spatial-heatmap-right-shade` set how much less light each side of a prism
   is than its top.
 
-three.js reads the same colors, so the two drawings agree. It lights the
+`emphasis` and `material` change how the marks are drawn, as on every chart:
+
+- `emphasis="outlined"` draws each mark as its edge over a fill faded toward
+  the page. On `Spatial Surface Chart` it is a wireframe.
+- `emphasis="subtle"` draws a faint wash under the same edge, which shows what
+  stands behind a prism, a point, or a fold of the surface.
+- `material="glass"` lets the most of what is behind each mark through, and
+  `material="frosted"` less.
+
+three.js reads the same colors, `emphasis`, and `material`, so the two drawings
+agree. It lights the
 prisms and the surface itself, so the two shade hooks apply to the SVG drawing
 alone.
 

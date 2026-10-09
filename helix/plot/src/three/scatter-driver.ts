@@ -11,7 +11,7 @@ import type {
   Field,
   SpatialScatterChartDriver,
 } from '../connect-spatial-scatter-chart/connect-spatial-scatter-chart.js'
-import { createStage, inBox } from './stage.js'
+import { createStage, inBox, lookThrough } from './stage.js'
 
 /** How the three.js scatter driver behaves where the page does not say. */
 export interface ThreeScatterDriverOptions {
@@ -30,15 +30,27 @@ export interface ThreeScatterDriverOptions {
 const REACH = 0.03
 
 /** A round point, drawn once and used as every point's sprite. */
-const dot = (): CanvasTexture => {
+const dot = (): CanvasTexture => ringed(1)
+
+/**
+ * A dot whose inside lets `inside` of the point's color through and whose
+ * ring is whole: `outlined` at 0.6 and `subtle` at 0.2, which over the page
+ * is the point's color faded toward it, as the chart's own drawing paints.
+ */
+const ringed = (inside: number): CanvasTexture => {
   const canvas = document.createElement('canvas')
   canvas.width = canvas.height = 64
   const context = canvas.getContext('2d')
   if (context) {
     context.beginPath()
     context.arc(32, 32, 28, 0, Math.PI * 2)
-    context.fillStyle = '#fff'
+    context.fillStyle = `rgba(255, 255, 255, ${inside})`
     context.fill()
+    if (inside < 1) {
+      context.lineWidth = 7
+      context.strokeStyle = '#fff'
+      context.stroke()
+    }
   }
   return new CanvasTexture(canvas)
 }
@@ -86,6 +98,8 @@ export const threeScatterDriver = (
   }
 
   const pointTexture = dot()
+  /* The textures `outlined` and `subtle` draw with, made as they are first asked for. */
+  const rings = new Map<number, CanvasTexture>()
   const pointMaterial = new PointsMaterial({
     alphaTest: 0.5,
     map: pointTexture,
@@ -139,6 +153,19 @@ export const threeScatterDriver = (
       geometry.setAttribute('position', new Float32BufferAttribute(positions, 3))
       geometry.setAttribute('color', new Float32BufferAttribute(tints, 3))
       points.geometry = geometry
+      const { emphasis, through } = colors.look
+      const inside = emphasis === 'outlined' ? 0.6 : emphasis === 'subtle' ? 0.2 : 1
+      if (inside < 1 && !rings.has(inside)) {
+        rings.set(inside, ringed(inside))
+      }
+      pointMaterial.map = rings.get(inside) ?? pointTexture
+      /* A faded inside is drawn, so only the empty corners are cut. */
+      pointMaterial.alphaTest = inside < 1 ? 0.05 : 0.5
+      lookThrough(pointMaterial, through)
+      if (inside < 1) {
+        pointMaterial.transparent = true
+        pointMaterial.depthWrite = false
+      }
       stage.setAxes(next.axes, colors, font)
     },
     focus: (index) => {
@@ -151,6 +178,9 @@ export const threeScatterDriver = (
       points.geometry.dispose()
       pointMaterial.dispose()
       pointTexture.dispose()
+      for (const texture of rings.values()) {
+        texture.dispose()
+      }
       stage.stop()
     },
     turnBy: (across, up, animate) => stage.turnBy(across, up, animate),

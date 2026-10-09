@@ -12,6 +12,7 @@ import {
   Float32BufferAttribute,
   LineBasicMaterial,
   LineSegments,
+  type Material,
   PerspectiveCamera,
   Raycaster,
   Scene,
@@ -41,6 +42,19 @@ const DRAG = 4
 
 /** The box's half edge, in three.js's units: what is plotted stands between -1 and 1 on each axis. */
 export const HALF = 1
+
+/**
+ * Lets `amount` of a mark's material through, as `material` and a `subtle`
+ * emphasis ask: opaque at 1, and see-through below it, where a mark writes
+ * no depth so the marks behind it still draw.
+ */
+export const lookThrough = (material: Material, amount: number): void => {
+  const clear = amount < 1
+  material.opacity = amount
+  material.transparent = clear
+  material.depthWrite = !clear
+  material.needsUpdate = true
+}
 
 /** Eases in and out. */
 const ease = (at: number): number => (at < 0.5 ? 2 * at * at : 1 - (-2 * at + 2) ** 2 / 2)

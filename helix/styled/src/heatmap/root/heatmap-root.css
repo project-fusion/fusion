@@ -99,9 +99,46 @@
    dot: ninety of them read as beads on a string. Halved they read as cells, and
    the value still comes off the seed. */
 [part~="cell"] {
-  background-color: var(--heatmap-tone, var(--helix-color-surface-sunken));
+  --_heatmap-paint: var(--heatmap-tone, var(--helix-color-surface-sunken));
+
+  background-color: color-mix(
+    in oklab,
+    var(--_heatmap-fill, var(--_heatmap-paint))
+      calc(var(--_heatmap-area, 1) * var(--_heatmap-through, 1) * 100%),
+    transparent
+  );
   border-radius: var(--heatmap-cell-radius, calc(var(--helix-radii-sm) * 0.5));
   inline-size: var(--_heatmap-cell-width);
+}
+
+/*
+ * **Emphasis and material, as every chart reads them.** `outlined` is a
+ *    cell's edge in its tone over a fill faded toward the page, and `subtle`
+ *    a faint wash under the same edge. The edge is a ring inside the cell, so
+ *    a cell keeps its size; a selected cell's ring is drawn over it.
+ */
+:host([emphasis="outlined"]) [part~="cell"]:not([part~="cell-selected"]),
+:host([emphasis="subtle"]) [part~="cell"]:not([part~="cell-selected"]) {
+  box-shadow: inset 0 0 0 var(--helix-border-thin)
+    color-mix(in oklab, var(--_heatmap-paint) calc(var(--_heatmap-through, 1) * 100%), transparent);
+}
+
+:host([emphasis="outlined"]) [part~="cell"] {
+  --_heatmap-fill: color-mix(in oklab, var(--_heatmap-paint) 60%, var(--helix-color-background));
+}
+
+:host([emphasis="subtle"]) [part~="cell"] {
+  --_heatmap-area: 0.2;
+}
+
+:host([material="glass"]) {
+  --_heatmap-through: calc(0.62 * var(--helix-material-opacity));
+}
+
+/* `frosted` admits less, which on a mark is more ink: 0.88 against glass's
+   0.62, the relationship the surface tokens carry. */
+:host([material="frosted"]) {
+  --_heatmap-through: calc(0.88 * var(--helix-material-opacity));
 }
 
 /* The tooltip, on the terms the other charts already set. The mark is a point

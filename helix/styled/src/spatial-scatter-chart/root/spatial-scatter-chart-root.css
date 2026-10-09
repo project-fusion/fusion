@@ -68,10 +68,47 @@
 /* A point in its group's color, edged in the plot's ground so a point in
    front reads apart from one behind it. */
 [part~="point"] {
-  fill: var(--chart-series, var(--helix-color-primary));
-  stroke: var(--helix-color-surface-sunken);
-  stroke-width: var(--helix-border-thin);
+  fill: var(--_spatial-scatter-chart-fill, var(--chart-series, var(--helix-color-primary)));
+  fill-opacity: calc(
+    var(--_spatial-scatter-chart-area, 1) *
+    var(--_spatial-scatter-chart-through, 1)
+  );
+  stroke: var(--_spatial-scatter-chart-line, var(--helix-color-surface-sunken));
+  stroke-opacity: var(--_spatial-scatter-chart-through, 1);
+  stroke-width: var(--_spatial-scatter-chart-weight, var(--helix-border-thin));
   vector-effect: non-scaling-stroke;
+}
+
+/*
+ * **Emphasis and material, as every chart reads them.** `emphasis` decides
+ *    what a point draws and `material` how much of it comes through, and the
+ *    paint multiplies the two. `outlined` is a ring in the group's color over
+ *    a dot faded toward the page, and `subtle` the same ring over a faint dot.
+ */
+:host([emphasis="outlined"]) [part~="point"] {
+  --_spatial-scatter-chart-fill: color-mix(
+    in oklab,
+    var(--chart-series, var(--helix-color-primary)) 60%,
+    var(--helix-color-background)
+  );
+  --_spatial-scatter-chart-line: var(--chart-series, var(--helix-color-primary));
+  --_spatial-scatter-chart-weight: var(--helix-border-thick);
+}
+
+:host([emphasis="subtle"]) [part~="point"] {
+  --_spatial-scatter-chart-area: 0.2;
+  --_spatial-scatter-chart-line: var(--chart-series, var(--helix-color-primary));
+  --_spatial-scatter-chart-weight: var(--helix-border-thick);
+}
+
+:host([material="glass"]) {
+  --_spatial-scatter-chart-through: calc(0.62 * var(--helix-material-opacity));
+}
+
+/* `frosted` admits less, which on a mark is more ink: 0.88 against glass's
+   0.62, the relationship the surface tokens carry. */
+:host([material="frosted"]) {
+  --_spatial-scatter-chart-through: calc(0.88 * var(--helix-material-opacity));
 }
 
 /* **Centered on the point**: inside the drawing, the mark's one pixel is one

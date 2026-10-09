@@ -93,11 +93,46 @@
   --_spatial-surface-chart-rule: oklch(
     from var(--_spatial-surface-chart-lit) calc(l + clamp(-0.1, (0.6 - l) * 1000, 0.14)) c h
   );
-  fill: var(--_spatial-surface-chart-lit);
-  stroke: var(--_spatial-surface-chart-rule);
+  fill: var(--_spatial-surface-chart-fill, var(--_spatial-surface-chart-lit));
+  fill-opacity: calc(
+    var(--_spatial-surface-chart-area, 1) *
+    var(--_spatial-surface-chart-through, 1)
+  );
+  stroke: var(--_spatial-surface-chart-line, var(--_spatial-surface-chart-rule));
   stroke-linejoin: round;
+  stroke-opacity: var(--_spatial-surface-chart-through, 1);
   stroke-width: var(--helix-border-thin);
   vector-effect: non-scaling-stroke;
+}
+
+/*
+ * **Emphasis and material, as every chart reads them.** `outlined` is a
+ *    wireframe in the ramp's colors over a surface faded toward the page, and
+ *    `subtle` the same wireframe over a faint surface the grid behind shows
+ *    through, so a reading the surface hid from this side can be seen.
+ */
+:host([emphasis="outlined"]) [part="face"] {
+  --_spatial-surface-chart-fill: color-mix(
+    in oklab,
+    var(--_spatial-surface-chart-lit) 60%,
+    var(--helix-color-background)
+  );
+  --_spatial-surface-chart-line: var(--_spatial-surface-chart-color);
+}
+
+:host([emphasis="subtle"]) [part="face"] {
+  --_spatial-surface-chart-area: 0.2;
+  --_spatial-surface-chart-line: var(--_spatial-surface-chart-color);
+}
+
+:host([material="glass"]) {
+  --_spatial-surface-chart-through: calc(0.62 * var(--helix-material-opacity));
+}
+
+/* `frosted` admits less, which on a mark is more ink: 0.88 against glass's
+   0.62, the relationship the surface tokens carry. */
+:host([material="frosted"]) {
+  --_spatial-surface-chart-through: calc(0.88 * var(--helix-material-opacity));
 }
 
 /* **Centered on the reading**: inside the drawing, the mark's one pixel is
