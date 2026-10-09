@@ -287,8 +287,10 @@ export interface Config {
   /**
    * Whether each entry's accessibility snapshot, Playwright's `ariaSnapshot()` of its page, is kept beside
    * its baselines as `<stem>.aria.yml` and compared as text. A lost label fails even when no pixel moved.
+   * `{ hide }` keeps it and leaves out the elements its selectors name, as `mask` does, for what is read
+   * aloud and never drawn, which `mask` would paint over by its box.
    */
-  aria?: boolean
+  aria?: boolean | { hide: string[] }
   /** Checks run on each entry's page after its first shot, which need no baseline. */
   checks?: {
     /**
@@ -307,8 +309,9 @@ export interface Config {
   /** Checks of your own on each page, after its first picture. */
   inspect?: Inspect
   /**
-   * Selectors whose elements are painted over in one fixed color in every picture, for what changes on its
-   * own and says nothing about the page, such as a version number or a date.
+   * Selectors whose elements are painted over in one fixed color in every picture and left out of every
+   * accessibility snapshot, for what changes on its own and says nothing about the page, such as a version
+   * number or a date.
    */
   mask?: string[]
   /** `origin` refuses every request off the harness origin, and is the default. `open` lets them through. */
