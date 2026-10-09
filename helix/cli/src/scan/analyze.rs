@@ -18,7 +18,7 @@
 //! misspelling, as the page judges it. Whether anything under the selector
 //! has the hook is the page's to say, and a scan says nothing about it.
 
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::sync::LazyLock;
 
 use regex::Regex;
@@ -112,6 +112,12 @@ pub struct Raw {
 /// A Helix tag carrying an attribute selector, with the attribute's name.
 static UNREFLECTED: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(helix-[a-z0-9-]+)(?:[.#:][\w-]+(?:\([^)]*\))?)*\[\s*([a-zA-Z][\w-]*)")
+        .expect("a literal pattern")
+});
+
+/// A class carrying an attribute selector, with the attribute's name.
+static CLASS_ATTRIBUTE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"\.([\w-]+)(?:[.#:][\w-]+(?:\([^)]*\))?)*\[\s*([a-zA-Z][\w-]*)")
         .expect("a literal pattern")
 });
 
@@ -257,6 +263,8 @@ pub struct Analyzer<'a> {
     suggested: HashMap<String, Option<String>>,
     /// Every part name the project's own templates write, `part="name"`.
     declared: HashSet<String>,
+    /// The Helix tags each class is written on, read from the templates.
+    classes: HashMap<String, BTreeSet<String>>,
     /// What the installed packages publish beyond their lint data, and the
     /// Helix specifiers the project imports, where the scan has them.
     installed: Option<(&'a Installed, &'a HashSet<String>)>,
@@ -275,6 +283,7 @@ impl<'a> Analyzer<'a> {
             used,
             suggested: HashMap::new(),
             declared: HashSet::new(),
+            classes: HashMap::new(),
             installed: None,
             found: Found::default(),
         }
@@ -299,6 +308,18 @@ impl<'a> Analyzer<'a> {
                     {
                         self.declared
                             .extend(value.split_whitespace().map(str::to_owned));
+                    }
+                    if let ("class", Value::Literal(value)) =
+                        (&attribute.name[..], &attribute.value)
+                    {
+                        if element.tag.starts_with("helix-") {
+                            for class in value.split_whitespace() {
+                                self.classes
+                                    .entry(class.to_owned())
+                                    .or_default()
+                                    .insert(element.tag.clone());
+                            }
+                        }
                     }
                 }
             }
@@ -721,9 +742,19 @@ impl<'a> Analyzer<'a> {
     /// reaches; the text names the tag, so this judges a tag-qualified one.
     fn unreflected(&mut self, rule: &StyleRule, origin: &dyn Fn() -> Origin) {
         let mut seen = HashSet::new();
-        for found in UNREFLECTED.captures_iter(&rule.selector) {
-            let tag = found.get(1).map_or("", |one| one.as_str());
-            let attribute = found.get(2).map_or("", |one| one.as_str());
+        /* A tag named in the selector, and the Helix tags a class in it is
+        written on in the templates. */
+        let mut reached: Vec<(String, String)> = UNREFLECTED
+            .captures_iter(&rule.selector)
+            .map(|found| (found[1].to_owned(), found[2].to_owned()))
+            .collect();
+        for found in CLASS_ATTRIBUTE.captures_iter(&rule.selector) {
+            for tag in self.classes.get(&found[1]).into_iter().flatten() {
+                reached.push((tag.clone(), found[2].to_owned()));
+            }
+        }
+        for (tag, attribute) in &reached {
+            let (tag, attribute) = (tag.as_str(), attribute.as_str());
             if ALWAYS_WRITTEN.contains(&attribute)
                 || attribute.starts_with("aria-")
                 || attribute.starts_with("data-")
@@ -1148,6 +1179,42 @@ mod tests {
             [(
                 "unreflected-attribute",
                 "helix-slider.channel[label=\"Saturation\"], helix-slider[required], helix-slider[data-x], helix-card[label] [label]".to_owned()
+            )]
+        );
+    }
+
+    #[test]
+    fn a_class_selector_reaching_a_helix_element_by_an_unreflected_attribute_is_found() {
+        let index = Index::of(&[LintData {
+            package: "@fusion.dev/helix".to_owned(),
+            tags: serde_json::json!({
+                "helix-slider": { "attributes": { "label": null }, "family": "slider", "hooks": [], "parts": [], "reflected": [], "written": [] }
+            })
+            .as_object()
+            .expect("an object")
+            .clone(),
+            version: None,
+        }]);
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let mut analyzer = Analyzer::new(&index, &listing, &used);
+        let page = crate::scan::jsx::read(
+            "export const A = () => <helix-slider className={styles.channel} label=\"Saturation\" />",
+            oxc_span::SourceType::tsx(),
+        )
+        .expect("JSX");
+        analyzer.declare([page.elements.as_slice()]);
+        let rules = crate::scan::css::read(
+            ".channel[label=\"Saturation\"] { color: red } .other[label] { color: red }",
+            1,
+            false,
+        );
+        analyzer.sheet("a.module.css", &rules, false);
+        assert_eq!(
+            kinds(&analyzer),
+            [(
+                "unreflected-attribute",
+                ".channel[label=\"Saturation\"] [label]".to_owned()
             )]
         );
     }
