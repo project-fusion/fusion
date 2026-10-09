@@ -26,6 +26,11 @@
 //!
 //! The default slot is exempt. `@slot -` documents the unnamed slot, which every
 //! component with content has and which no `<slot name>` spells.
+//!
+//! **A project built on Helix is read from its sources.** It may have no
+//! manifest, and its class documents slots in the comment above it: each is
+//! one the Helix class under it takes, which the installed manifest lists with
+//! what it inherits, or one a template in the project's own chain renders.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
@@ -35,7 +40,9 @@ use std::sync::LazyLock;
 use regex::Regex;
 use serde_json::Value;
 
-use crate::component::text::uncommented;
+use crate::component::installed::Installed;
+use crate::component::project::Project;
+use crate::component::text::{line_of, uncommented};
 use crate::component::{Context, Finding, Report};
 
 /// What may come before a slot's name: attributes, and bindings stepped over
@@ -250,8 +257,116 @@ fn located(context: &Context, tiers: &[std::path::PathBuf], family: &str) -> Str
         .join(", ")
 }
 
+/// A project with one layer, read from its sources and the installed
+/// manifests.
+fn extended(context: &Context) -> Report {
+    let unit = "documented slot names checked against the ones their family renders";
+    let project = Project::read(context);
+    let installed = Installed::read(&context.root);
+    let mut findings = Vec::new();
+    let mut checked = 0;
+    let mut unreadable = BTreeSet::new();
+    for extension in &project.extensions {
+        let documented = extension.slots();
+        if documented.is_empty() {
+            continue;
+        }
+        let (base, _) = project.grounded(extension);
+        let mut available: BTreeSet<String> = installed
+            .as_ref()
+            .and_then(|one| one.classes.get(base))
+            .map(|one| one.slots.clone())
+            .unwrap_or_default();
+        /* The project's own chain, down to the Helix class. */
+        let mut at = Some(extension);
+        let mut assembled = false;
+        for _ in 0..8 {
+            let Some(one) = at else {
+                break;
+            };
+            let code = &project.modules[one.module].code;
+            available.extend(RENDERED.captures_iter(code).map(|hit| hit[1].to_owned()));
+            assembled = assembled || COMPUTED.is_match(code);
+            at = project.extension(&one.base);
+        }
+        if assembled {
+            unreadable.insert(extension.class.clone());
+            continue;
+        }
+        /* Nothing known about the base and nothing rendered: no answer to
+        judge against, so no finding. */
+        if available.is_empty() {
+            continue;
+        }
+        let module = &project.modules[extension.module];
+        for name in &documented {
+            checked += 1;
+            if available.contains(name) {
+                continue;
+            }
+            findings.push(unrendered(
+                format!(
+                    "{}:{}",
+                    context.relative(&module.path),
+                    line_of(&module.text, extension.at)
+                ),
+                &extension.class,
+                name,
+                base,
+                &available,
+            ));
+        }
+    }
+    let notes = if unreadable.is_empty() {
+        Vec::new()
+    } else {
+        vec![format!(
+            "assembled at run time, so their slots are not checked: {}",
+            unreadable
+                .iter()
+                .map(|one| format!("`{one}`"))
+                .collect::<Vec<String>>()
+                .join(", ")
+        )]
+    };
+    Report {
+        checked,
+        findings,
+        notes,
+        unit,
+    }
+}
+
+/// The slots of the Helix class a chain ends on, where it ends on one the
+/// project extends rather than one it declares: its manifest lists them.
+fn inherited(
+    declared: &BTreeMap<String, Declared>,
+    installed: Option<&Installed>,
+    class: &str,
+) -> BTreeSet<String> {
+    let mut last = class;
+    for _ in 0..8 {
+        let Some(parent) = declared.get(last).and_then(|one| one.parent.as_ref()) else {
+            break;
+        };
+        if !declared.contains_key(parent) {
+            return installed
+                .and_then(|one| one.classes.get(parent))
+                .map(|helix| helix.slots.clone())
+                .unwrap_or_default();
+        }
+        last = parent;
+    }
+    BTreeSet::new()
+}
+
 pub fn run(context: &Context) -> Report {
     let declared = declared(context);
+    /* A project with no manifest of its own is read from its sources. */
+    if declared.is_empty() {
+        return extended(context);
+    }
+    let installed = Installed::read(&context.root);
     let tiers: Vec<std::path::PathBuf> = context.settings.roots(&context.root);
     let mut findings = Vec::new();
     let mut checked = 0;
@@ -291,6 +406,7 @@ pub fn run(context: &Context) -> Report {
         }
 
         let mut available = shared.clone();
+        available.extend(inherited(&declared, installed.as_ref(), class));
         let mut assembled = false;
         for family in &families {
             let known = per_family.entry(family.clone()).or_insert_with(|| {

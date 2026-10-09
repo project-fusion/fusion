@@ -24,6 +24,13 @@
 //! **And a template that interpolates needs the prefix to interpolate with.** A
 //! file inheriting such a template without overriding the layer prefix renders
 //! base children inside a styled shadow root.
+//!
+//! **A project built on Helix has one layer and the same obligation.** A class
+//! it builds on a Helix one renders that class's children under its own prefix,
+//! and its templates may write its own tags. Each of those tags is registered
+//! by some module of the project, and the module rendering it imports that
+//! module, directly or through what it imports, or a page importing the one
+//! component gets an inert element.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
@@ -31,7 +38,9 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
-use crate::component::text::uncommented;
+use crate::component::installed::Installed;
+use crate::component::project::{specifier, Project};
+use crate::component::text::{line_of, uncommented};
 use crate::component::{family, sources, Context, Finding, Layer, Report};
 
 static DEFINED: LazyLock<Regex> = LazyLock::new(|| {
@@ -190,14 +199,82 @@ fn unlayered(
     checked
 }
 
+/// A custom element opened in a template.
+static OPENED: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"<([a-z][a-z0-9]*-[a-z0-9-]+)[\s>/]").expect("a literal pattern compiles")
+});
+
+/// A project with one layer: every tag a module renders, its Helix base's
+/// children under its prefix and its own templates' tags alike, is one it
+/// imports the registration of.
+fn extended(context: &Context) -> Report {
+    let project = Project::read(context);
+    let installed = Installed::read(&context.root);
+    /* Each module and the tags it renders, with the line that renders each. */
+    let mut rendered: BTreeMap<usize, BTreeMap<String, usize>> = BTreeMap::new();
+    for extension in &project.extensions {
+        let (base, tier) = project.grounded(extension);
+        let (Some(installed), Some(prefix)) = (&installed, tier) else {
+            continue;
+        };
+        let line = line_of(&project.modules[extension.module].text, extension.at);
+        for child in installed.renders(base) {
+            rendered
+                .entry(extension.module)
+                .or_default()
+                .entry(format!("{prefix}{child}"))
+                .or_insert(line);
+        }
+    }
+    for (at, module) in project.modules.iter().enumerate() {
+        for found in OPENED.captures_iter(&module.code) {
+            let start = found.get(1).map_or(0, |one| one.start());
+            rendered
+                .entry(at)
+                .or_default()
+                .entry(found[1].to_owned())
+                .or_insert_with(|| line_of(&module.code, start));
+        }
+    }
+
+    let mut findings = Vec::new();
+    let mut checked = 0;
+    for (at, tags) in &rendered {
+        let module = &project.modules[*at];
+        for (tag, line) in tags {
+            /* A tag the project does not register is Helix's, or another
+            package's, and `scan` judges whether it is imported. */
+            let Some(&owner) = project.defined.get(tag) else {
+                continue;
+            };
+            checked += 1;
+            if owner == *at || project.reaches(*at, owner) {
+                continue;
+            }
+            findings.push(Finding {
+                detail: format!(
+                    "Import the module that registers it: `import '{}'`.",
+                    specifier(&module.path, &project.modules[owner].path)
+                ),
+                file: format!("{}:{line}", context.relative(&module.path)),
+                message: format!(
+                    "renders `<{tag}>` and never imports the module that registers it, so a page \
+                     importing this component alone gets an inert element"
+                ),
+            });
+        }
+    }
+    Report {
+        checked,
+        findings,
+        notes: Vec::new(),
+        unit: "rendered tags",
+    }
+}
+
 pub fn run(context: &Context) -> Report {
     let [base, over, ..] = context.settings.layers.as_slice() else {
-        return Report {
-            checked: 0,
-            findings: Vec::new(),
-            notes: Vec::new(),
-            unit: "rendered tags",
-        };
+        return extended(context);
     };
     let prefixes: Vec<&str> = context
         .settings
