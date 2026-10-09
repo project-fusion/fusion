@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/locus-darwin-arm64",
   "description": "The `locus` binary for macOS on Apple silicon. Installed by `@fusion.dev/locus`, which runs it.",
-  "version": "0.0.0-dev",
+  "version": "0.1.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {

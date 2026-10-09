@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/locus",
   "description": "Fusion Locus, visual regression testing for any web project, with baselines kept in git.",
-  "version": "0.0.0-dev",
+  "version": "0.1.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {

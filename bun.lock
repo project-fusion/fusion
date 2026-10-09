@@ -358,7 +358,7 @@
     },
     "locus/cli/npm": {
       "name": "@fusion.dev/locus",
-      "version": "0.0.0-dev",
+      "version": "0.1.0",
       "optionalDependencies": {
         "@fusion.dev/locus-darwin-arm64": "locus/cli/platforms/darwin-arm64",
         "@fusion.dev/locus-darwin-x64": "locus/cli/platforms/darwin-x64",
@@ -372,23 +372,23 @@
     },
     "locus/cli/platforms/darwin-arm64": {
       "name": "@fusion.dev/locus-darwin-arm64",
-      "version": "0.0.0-dev",
+      "version": "0.1.0",
     },
     "locus/cli/platforms/darwin-x64": {
       "name": "@fusion.dev/locus-darwin-x64",
-      "version": "0.0.0-dev",
+      "version": "0.1.0",
     },
     "locus/cli/platforms/linux-arm64": {
       "name": "@fusion.dev/locus-linux-arm64",
-      "version": "0.0.0-dev",
+      "version": "0.1.0",
     },
     "locus/cli/platforms/linux-x64": {
       "name": "@fusion.dev/locus-linux-x64",
-      "version": "0.0.0-dev",
+      "version": "0.1.0",
     },
     "locus/cli/platforms/win32-x64": {
       "name": "@fusion.dev/locus-win32-x64",
-      "version": "0.0.0-dev",
+      "version": "0.1.0",
     },
   },
   "overrides": {

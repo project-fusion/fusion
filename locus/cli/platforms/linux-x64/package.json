@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/locus-linux-x64",
   "description": "The `locus` binary for Linux on x86-64, statically linked. Installed by `@fusion.dev/locus`, which runs it.",
-  "version": "0.0.0-dev",
+  "version": "0.1.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
