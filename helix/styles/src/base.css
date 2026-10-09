@@ -1604,6 +1604,22 @@ helix-toast:not([data-color-mode]) {
    loses its table semantics in the accessibility tree, which is the one thing
    this rule exists to keep.
 
+   **A hidden table is fixed, so a long one does not lengthen the page.** An
+   absolutely positioned box adds its full height to the page's scrolling area,
+   and a table keeps its full height. Measured in Chromium at 640 by 800, an
+   84-row table beside a `Line Chart` made the page 2405 tall, in the document
+   and inside `Flex`, `Card`, `Grid` and `Scroll Area`. A fixed box adds nothing
+   to the page's scrolling area, so the page stays 800 tall. The accessibility
+   tree still holds the table with its caption, rows, headers and cells, and the
+   chart reads all 84 rows through `for`.
+
+   **A `transform` or a `filter` on an ancestor undoes it.** Either one makes
+   the ancestor the fixed table's containing block, and the page was 2405 tall
+   again. `contain: layout` and `container-type` also hold a fixed box but keep
+   its overflow inside, so the page stayed 800 tall under both. Under a
+   transform or a filter, wrap the table in a `<div data-hidden-visually>`,
+   whose 1px box binds and clips the table.
+
    The skip link hides itself the same way until focus reaches it, in its own
    sheet, so it is hidden with or without this file. */
 [data-hidden-visually] {
@@ -1616,4 +1632,8 @@ helix-toast:not([data-color-mode]) {
   padding: var(--helix-space-none);
   position: absolute;
   white-space: nowrap;
+}
+
+table[data-hidden-visually] {
+  position: fixed;
 }

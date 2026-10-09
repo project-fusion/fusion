@@ -87,6 +87,17 @@ table should not be seen, hide it visually, and the data is still there:
 >…</table>
 ```
 
+A table hidden this way takes no room on the page, however many rows it has.
+Inside an element with a `transform` or a `filter`, a long hidden table still
+lengthens that element's scrolling area. Wrap the table in a hidden `<div>`
+there:
+
+```html
+<div data-hidden-visually>
+  <table id="revenue">…</table>
+</div>
+```
+
 The table's caption becomes the chart's accessible name unless you set `label`.
 The caption usually has the right words already.
 
