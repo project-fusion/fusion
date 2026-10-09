@@ -30,9 +30,9 @@ pub struct Config {
     pub diff: Diff,
     #[serde(default)]
     pub exceptions: Vec<Exception>,
-    /// Selectors whose elements are painted over in every picture, for what
-    /// changes on its own and says nothing about the page: a version number,
-    /// a date.
+    /// Selectors whose elements are painted over in every picture and left out
+    /// of every accessibility snapshot, for what changes on its own and says
+    /// nothing about the page: a version number, a date.
     #[serde(default)]
     pub mask: Vec<String>,
     /// Where the environment fingerprint is kept, relative to the config.

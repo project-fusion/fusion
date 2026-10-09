@@ -130,7 +130,8 @@ export default defineConfig({
 - **`timings`**: a file to write each entry name's seconds to, which is how you
   measure `shard.cost`.
 - **`mask`**: selectors whose elements are painted over in one fixed color in
-  every picture, for what changes on its own, such as a version number.
+  every picture and left out of every accessibility snapshot, for what changes
+  on its own, such as a version number.
 - **`style`**: a stylesheet applied while each picture is taken, to hold still
   what `mask` cannot, such as a masked element whose width follows its text.
 - **`report`**: where each run writes its report, `.helix/visual` unless you

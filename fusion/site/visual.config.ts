@@ -40,8 +40,10 @@ export default defineConfig({
      The home page's chart of one button in five systems, because Helix's bar
      weighs a runtime that carries the version: the stamp from 0.186.1 to
      0.187.0 moved the bar's end by 2 pixels. The chart keeps one size, because
-     the longest bar sets its scale. */
-  mask: ['[data-site-footer] helix-tag', 'helix-bar-chart[for="proof-button"]'],
+     the longest bar sets its scale. The table the chart reads holds the same
+     bytes for a screen reader, so it is masked too: it draws in one pixel, and
+     the mask keeps it out of the accessibility snapshot. */
+  mask: ['[data-site-footer] helix-tag', 'helix-bar-chart[for="proof-button"]', '#proof-button'],
   retake:
     'Dispatch the `Visual baselines` workflow on your branch with the suite `site`, and review the pull request it opens.',
   /* Next.js writes `next-route-announcer` and never defines it, so only
