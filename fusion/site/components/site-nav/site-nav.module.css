@@ -181,19 +181,22 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* The picture. The gallery frame carries no border and no radius of its own,
-   a card clipping it to a corner, so here it gets the hairline and the corner
-   a card would have given it. The page's own ground, so on the glass sheet it
-   reads as a picture of a page. */
+/* The picture, on the band and not on a plate. The gallery frame paints the
+   page's ground behind every drawing, which is right on a card and wrong
+   here: an opaque rectangle on the glass sheet, with a hairline around it,
+   read as a card, and a band of five cards is a shelf. The drawing carries
+   its own silhouette, so the ground goes and the border with it. The radius
+   stays for the ring below. */
 .tile > :global(.componentArt) {
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+  background: transparent;
+  border: var(--helix-border-thin) solid transparent;
   border-radius: var(--helix-radii-sm);
   inline-size: 100%;
   margin-block-end: var(--helix-space-2xs);
   transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* Where you are, said on the picture's edge. A tile has no leading cell for
+/* Where you are, as a ring around the picture. A tile has no leading cell for
    the row recipe's dot, and a dot beside a picture reads as a bullet. */
 .tile[aria-current="page"] > :global(.componentArt) {
   border-color: var(--helix-color-primary);
