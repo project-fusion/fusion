@@ -102,7 +102,7 @@ const SERIES = 24
  * | Enter, Space | Presses the reading, which sends `helix-reading-press`. |
  * | Escape | Lets the reading go. |
  *
- * @since 0.198.0
+ * @since 0.199.0
  * @status experimental
  * @category charts
  * @aliases 3D ribbon chart, 3D line chart, Ribbon chart, Waterfall plot, Line chart in 3D

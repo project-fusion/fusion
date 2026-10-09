@@ -16,7 +16,7 @@ import '../../tooltip/index.js'
  * from the light. The chart draws the ribbons in 3D in SVG, and
  * `@fusion.dev/helix-plot` can draw them with three.js.
  *
- * @since 0.198.0
+ * @since 0.199.0
  * @status experimental
  * @category charts
  * @groups charts
