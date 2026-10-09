@@ -1,5 +1,5 @@
 ---
-description: Which elements to write, five mistakes that look like Helix bugs, and the files an agent should read.
+description: The rules an agent follows to write Helix code, and the five mistakes that look like Helix bugs.
 parent: coding-agents
 section: Getting started
 title: Using Helix with an agent
@@ -8,15 +8,10 @@ title: Using Helix with an agent
 
 # Using Helix with an agent
 
-This guide is in two places, and both say the same thing:
-
-- this page, which [llms.txt](https://fusion.dev/llms.txt) indexes
-- `skills/helix/SKILL.md` inside `@fusion.dev/helix`, which matches the version
-  you installed and works offline
-
-[Link your tool to this guide](#link-your-tool-to-this-guide) says how to point
-each tool at one of them. [The MCP server](./coding-agents) works with any
-vendor and runs code, and Claude, Cursor, Windsurf, and Zed all support it.
+This guide is what an agent reads before writing Helix code. It is also the
+`helix` skill: `skills/helix/SKILL.md` in `@fusion.dev/helix`, which matches the
+version installed, and the skill in Helix's plugin for coding agents. [Coding
+agents](./coding-agents) says how to install the plugin or link the skill.
 
 ## Use a Helix family wherever one exists
 
@@ -44,31 +39,21 @@ inside `data-prose`.
 `helix scan` and the MCP tool `helix_check` report each native element a page
 writes where an installed family stands in for it, as `native-element`.
 
-## Read the family before writing its tags
+## Look up a family before writing its tags
 
-```
-https://fusion.dev/helix/components/<family>.md
-https://fusion.dev/helix/components/<family>.json
-```
+Each family's API is in the packages you installed, and on this site:
 
-Each family's file lists:
+- `helix api family <family>`, or the MCP tool `helix_family`
+- `node_modules/@fusion.dev/helix/api.json`
+- `https://fusion.dev/helix/components/<family>.md` and `.json`
 
-- the import lines for the family
-- every tag
-- every property, with its literal union
-- every event, with its class and its React prop
-- every slot, part, and custom property
-- the examples, each with the import lines it needs
+Each lists the import lines, every tag, every property with its literal union,
+every event with its React prop, every slot, part, and custom property, and the
+examples with the imports each one needs.
 
 **If a tag is not in a family's file, it does not exist.** A property value
-outside a declared union is invalid. Property types are literal unions for this
-reason. `'ghost' | 'outlined' | 'solid' | 'subtle'` shows you the values, and a
-named type such as `ButtonEmphasis` sends you somewhere else to find them.
-
-The manifest at `https://fusion.dev/helix/custom-elements.json` holds every
-family in one file, which is several megabytes. Read the families you use.
-Start from `https://fusion.dev/llms.txt`. In one request, it names every
-document and the machine-readable sources.
+outside a declared union is invalid. Find a family by name, alias, or purpose
+with `helix api find`, or the MCP tool `helix_find`.
 
 ## Five mistakes that look like Helix bugs
 
@@ -173,12 +158,9 @@ Each missing layer has its own symptom:
 - Unstyled headings mean `base.css` is missing.
 - No color anywhere means `primitives.css` or `tokens.css` is missing.
 
-To tell the last two apart, look at the stylesheet. The screen looks the same.
-Without `tokens.css`, nothing declares `--helix-color-*`. Without
-`primitives.css`, all 185 semantic tokens are declared and every color resolves
-to `rgba(0, 0, 0, 0)`, because `tokens.css` refers to a primitive 297 times and
-to nothing else. A missing `primitives.css` looks like a working install, and
-`helix.css` exists to prevent it.
+To tell the last two apart, look at the stylesheet. Without `tokens.css`,
+nothing declares `--helix-color-*`. Without `primitives.css`, every token is
+declared and every color resolves to transparent.
 
 ## Choosing a component family
 
@@ -218,88 +200,25 @@ You can style a component in three ways. Try them in this order:
 belong to `@fusion.dev/helix-styles`. The underscore marks them as internal.
 Read the semantic tokens that refer to them.
 
-## Styling HTML without custom elements
+## Markup Helix does not render
 
-`@fusion.dev/helix-styles` is plain CSS with no JavaScript. It includes recipes
-for markup that Helix does not render:
+HTML that a CMS or a Markdown library writes, inside an element with
+`data-prose`, takes Helix's typography from `@fusion.dev/helix-styles` and needs
+no Helix elements. Everywhere else, write the Helix element.
 
-```html
-<button
-  data-button="solid"
-  data-button-tone="primary"
->Save</button>
-<article data-prose><h2>From a CMS</h2></article>
-<div data-density="sm">…</div>
-```
+## Check the code you wrote
 
-A recipe sets appearance only. It has none of these:
+Run these after you write Helix code, and fix every finding at `error` and
+`warn` before you finish. Each prints JSON with `--json`.
 
-- state
-- form participation
-- focus trapping
-- keyboard handling
+| Command | MCP tool | What it finds |
+|---|---|---|
+| `helix scan` | `helix_check` | Unknown tags, attributes, values, slots, parts, hooks, events, and tokens, a native element a Helix family replaces, a missing import, and the rest, each with its file and line |
+| `helix diagnostics --once <url>` | `helix_check_page` | The same on the running page, and what the library logged as it ran |
+| `helix theme audit` | `helix_audit_theme` | Every foreground and background pair in your theme that misses its contrast target |
 
-If you are adding a script to a recipe, use the component.
-
-## Install the Claude Code plugin
-
-In Claude Code, one plugin gives you both this guide and the Helix MCP server:
-
-```sh
-claude plugin marketplace add project-fusion/fusion
-claude plugin install helix@fusion
-```
-
-The plugin's guide follows the latest release of Helix, and points to the copy
-in `node_modules` that matches the version you installed. Its MCP server runs
-`npx @fusion.dev/helix-cli mcp`, the command line your project installs, so the
-answers are your version's. In other tools, link the guide and install the
-server as the next two sections describe.
-
-## Link your tool to this guide
-
-**Point your tool at the guide, and do not copy it.** A copy starts to go stale
-as soon as you paste it, and the guide changes with the library.
-
-The skill in the package matches the Helix you installed. In Claude Code, link
-it into your project's skills folder:
-
-```sh
-mkdir -p .claude/skills
-ln -s ../../node_modules/@fusion.dev/helix/skills/helix .claude/skills/helix
-```
-
-Other tools read a file in your repository. Add a line to it that names the
-skill, or this page:
-
-```md
-Helix: read node_modules/@fusion.dev/helix/skills/helix/SKILL.md before
-writing components, and node_modules/@fusion.dev/helix/api.json for the API.
-```
-
-| Tool | Where it goes |
-|---|---|
-| Claude Code | `.claude/skills/helix`, or a line in `AGENTS.md` or `CLAUDE.md` |
-| Cursor | `.cursor/rules/` |
-| GitHub Copilot | `.github/copilot-instructions.md` |
-| Anything else | Whatever it reads. The line is the same |
-
-We do not write those files for you, and we chose this on purpose. You would
-have to maintain a file we generated in your repository against our changes. A
-tool that rewrote it on install would be a dependency you did not ask for, in a
-directory you own. You add the link or the line, and you can delete it.
-
-## Install the Helix MCP server
-
-```sh
-helix mcp init --client claude
-```
-
-`helix mcp` answers from the Helix packages your project installs: families,
-examples, import lines, tokens, and the theme a brand color produces. `--client`
-takes `claude`, `cursor`, or `vscode`, and writes the server into the file that
-client reads. [Coding agents](./coding-agents) lists the tools. It runs on your
-machine, talks to a client you chose, and makes no network requests.
+`helix scan --file <path>` reports one file's findings and still reads the whole
+project, so an import in another file counts.
 
 ## What this guide does not cover
 

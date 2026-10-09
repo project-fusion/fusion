@@ -335,7 +335,6 @@
       "dependsOn": ["^build", "styles"],
       "inputs": [
         "$TURBO_DEFAULT$",
-        "$TURBO_ROOT$/helix/docs/content/coding-agents.mdx",
         "$TURBO_ROOT$/helix/docs/content/using-helix-with-an-agent.mdx",
         "$TURBO_ROOT$/Cargo.lock",
         "$TURBO_ROOT$/Cargo.toml",
