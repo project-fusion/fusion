@@ -31,8 +31,11 @@
   background: color-mix(in oklab, var(--helix-color-primary) 20%, transparent);
 }
 
+/* **On `primary-surface`, the fill its label is solved against.** `primary`
+   is an ink, which dark mode lightens so it reads as text on a dark page, and
+   white on it measured 3.10:1. */
 .kickerBadge {
-  background: var(--helix-color-primary);
+  background: var(--helix-color-primary-surface);
   border-radius: var(--helix-radii-sm);
   color: var(--helix-color-foreground-on-primary);
   font-size: var(--helix-text-xs);

@@ -312,9 +312,10 @@ export interface Config {
     clipped?: boolean | { ignore?: string[] }
     /**
      * Each ink against the ground it is painted on, in every color scheme the shots picture, against WCAG
-     * 2.1 AA: `target`, 4.5, for text, and `component`, 3, for icons and for text from `large` pixels, 24, or
-     * from `largeBold` when bold, 18.66. A ground behind a picture, a video or a background image is not one
-     * color, and is not judged. `rules` are colors that draw a line that separates, held to no target.
+     * 2.1 AA: `target`, 4.5, for text, and `component`, 3, for icons, for text hidden from the accessibility
+     * tree, and for text from `large` pixels, 24, or from `largeBold` when bold, 18.66. A ground behind a
+     * picture, a video or a background image is not one color, and is not judged. `rules` are colors that
+     * draw a line that separates, held to no target.
      */
     contrast?:
       | boolean
