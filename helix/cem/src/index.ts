@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { lintOf, type ManifestSource } from '@fusion.dev/helix-diagnostics'
@@ -36,6 +36,17 @@ export interface HelixCemOptions {
    * `src/card/root/card-root.ts`, which resolve for nobody downstream.
    */
   packageName?: string
+
+  /**
+   * The documentation pages the package ships as an agent skill, relative to
+   * the package, written to `skills/helix/SKILL.md`.
+   *
+   * **In the package, so the guide is the installed version's.** An agent
+   * reading it from `node_modules` reads what this release does, offline, and
+   * nothing is written into the consumer's project unless they point a tool at
+   * it. Absent, the package ships no skill.
+   */
+  skill?: string[]
 
   /** Which design-system tier this package ships. */
   tier: NonNullable<HelixMetadata['tier']>
@@ -80,6 +91,38 @@ const API = 'api.json'
 
 /** The tier's examples by family, each with the import lines it needs. */
 const EXAMPLES = 'examples.json'
+
+/** Where the documentation pages a skill links to are published. */
+const DOCS = 'https://fusion.dev/helix/docs'
+
+/**
+ * The agent skill, from the documentation pages it names: their bodies under
+ * one heading each, their links made absolute, and the package's version in
+ * the frontmatter so an agent can tell which release it is reading.
+ */
+const skillOf = (pages: string[], cwd: string, version: string): string => {
+  const sections = pages.map((page) => {
+    const text = readFileSync(resolve(cwd, page), 'utf8')
+    const body = text.replace(/^---\n[\s\S]*?\n---\n/, '').trim()
+    return body
+      .replace(/^(#{1,5}) /gm, '#$1 ')
+      .replace(/\]\(\.\/([a-z0-9-]+)\)/g, `](${DOCS}/$1)`)
+  })
+  return [
+    '---',
+    'name: helix',
+    'description: Writes and checks pages built with Helix, the web components in @fusion.dev/helix. Use when writing or reviewing code with helix- elements, Helix tokens, or the helix command line.',
+    'metadata:',
+    `  version: "${version}"`,
+    '---',
+    '',
+    '# Helix',
+    '',
+    `This guide is for @fusion.dev/helix ${version}, the version installed beside it.`,
+    '',
+    ...sections.flatMap((section) => [section, '']),
+  ].join('\n')
+}
 
 /**
  * The environment the baselines were taken in, from the nearest
@@ -329,6 +372,13 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
       join(cwd, API),
       `${JSON.stringify({ families: families.map(({ examples: _, ...family }) => family), package: name })}\n`,
     )
+    if (options.skill) {
+      const version =
+        (JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf8')) as { version?: string })
+          .version ?? ''
+      mkdirSync(join(cwd, 'skills', 'helix'), { recursive: true })
+      writeFileSync(join(cwd, 'skills', 'helix', 'SKILL.md'), skillOf(options.skill, cwd, version))
+    }
     writeFileSync(
       join(cwd, EXAMPLES),
       `${JSON.stringify({ environment: environmentOf(cwd), examples: Object.fromEntries(families.map((family) => [family.slug, family.examples])), package: name })}\n`,

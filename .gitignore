@@ -58,6 +58,8 @@ helix/*/lint.json
 # The catalog and examples `analyze` writes beside it, for `helix mcp`.
 helix/*/api.json
 helix/*/examples.json
+# The agent skill `analyze` writes from the documentation, for the package.
+helix/*/skills/
 jsx.d.ts
 svelte.d.ts
 vue.d.ts
