@@ -583,6 +583,13 @@ export {
 } from './utils/number-format/number-format.js'
 export { onUnlessFalse } from './utils/on-unless-false/on-unless-false.js'
 export { applyOwnRule, type OwnRule } from './utils/own-rule/own-rule.js'
+export {
+  MOTION_ATTRIBUTE,
+  motionPaused,
+  onMotionChange,
+  pauseMotion,
+  reducedMotion,
+} from './utils/page-motion/page-motion.js'
 export { plainClick } from './utils/plain-click/plain-click.js'
 export { appleTouch, onAndroid, onApple, type Platform } from './utils/platform/platform.js'
 export { pressType, type RecentPress } from './utils/press-type/press-type.js'

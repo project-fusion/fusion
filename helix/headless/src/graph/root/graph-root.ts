@@ -49,6 +49,9 @@ import {
   withoutGroups,
 } from './graph-model.js'
 
+/** How long a layout runs before the frame offers to stop it, in milliseconds: WCAG 2.2.2's five seconds. */
+const LONG_LAYOUT = 5000
+
 /**
  * @summary A frame around a graph of notes drawn by another library, and the list that makes it readable.
  *
@@ -165,7 +168,9 @@ import {
  * @csspart region - The frame: the drawing, its controls and the list.
  * @csspart search - The bar holding the icon, the search field and the count.
  * @csspart search-field - The field that finds a note by its name.
+ * @csspart settling - What is said while a layout runs unseen, where the reader asked for less motion or the page paused its motion, over the hidden drawing.
  * @csspart stage - The drawing and its controls.
+ * @csspart stop-layout - The button that stops a layout that has run past five seconds, where the notes stand.
  * @csspart viewport - The box the renderer draws in.
  * @csspart zoom-in - The zoom in button.
  * @csspart zoom-out - The zoom out button.
@@ -179,6 +184,8 @@ import {
  * @cssstate ready - The graph has been drawn whole, after `helix-graph-ready`.
  * @cssstate searching - The search field holds words, and the list holds only the notes they find.
  * @cssstate selected - A note is selected, in the list or in the drawing.
+ * @cssstate settling - A layout is running.
+ * @cssstate settling-unseen - A layout is running with the drawing hidden, where the reader asked for less motion or the page paused its motion.
  * @cssstate sharing - The page keeps the plain wheel and one finger, with `gestures="cooperative"` or while a graph with `gestures="activate"` waits to be pressed.
  * @cssstate using - A graph with `gestures="activate"` has been pressed and has the gestures.
  */
@@ -381,6 +388,19 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @property({ attribute: 'selection-label' })
   selectionLabel = '{note}, selected. {count}'
 
+  /**
+   * What the `settling` part says while a layout runs unseen, where the reader
+   * asked for less motion or the page paused its motion.
+   */
+  @words
+  @property({ attribute: 'settling-label' })
+  settlingLabel = 'Placing the notes'
+
+  /** What the button that stops a long layout says. */
+  @words
+  @property({ attribute: 'stop-layout-label' })
+  stopLayoutLabel = 'Stop the layout'
+
   /** The hint shown when one finger swipes over the graph with `gestures="cooperative"`. */
   @words
   @property({ attribute: 'two-finger-hint-label' })
@@ -442,6 +462,17 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   /** Whether the list has the focus, so the drawing marks the note its keys are on. */
   @state()
   private listKeys = false
+
+  /** The layout running, what stops it, and whether it is shown, while one runs. */
+  @state()
+  private layout: { stop: () => void; unseen: boolean } | undefined
+
+  /** Whether the layout has run long enough to offer the button that stops it. */
+  @state()
+  private stoppable = false
+
+  /** What offers the stop once the layout has run five seconds. */
+  private stopping: ReturnType<typeof setTimeout> | undefined
 
   /**
    * The notes a walk along the links stepped from, by `id`, the last the one
@@ -581,6 +612,55 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
    */
   laidOut(positions: Record<string, { x: number; y: number; z?: number | undefined }>): void {
     this.dispatchEvent(new HelixGraphLayoutEvent({ positions }))
+  }
+
+  /**
+   * Says a layout is running, with what ends it where the notes stand, or
+   * with nothing, that it has ended. Called by `connectGraph`.
+   *
+   * **A layout that runs past five seconds offers a button that stops it**,
+   * the `stop-layout` part, as WCAG 2.2.2 asks of motion that starts by itself
+   * and runs that long. **`unseen` hides the drawing while the notes move**,
+   * which the connector asks for where the reader asked for less motion or
+   * the page paused its motion: the `settling` part says the notes are being
+   * placed, and the drawing shows them where they settle.
+   */
+  settling(stop?: () => void, unseen = false): void {
+    clearTimeout(this.stopping)
+    this.stopping = undefined
+    this.stoppable = false
+    this.layout = stop ? { stop, unseen } : undefined
+    this.toggleState('settling', stop !== undefined)
+    this.toggleState('settling-unseen', stop !== undefined && unseen)
+    if (stop) {
+      this.stopping = setTimeout(() => {
+        this.stoppable = true
+      }, LONG_LAYOUT)
+    }
+  }
+
+  /** The stop button ends the layout where the notes stand. */
+  private readonly handleStopLayout = (): void => {
+    const stop = this.layout?.stop
+    this.settling()
+    stop?.()
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    /* Back from a move with a layout still running, the stop is offered on
+       the same terms, which the disconnect called off. */
+    if (this.layout && !this.stoppable && this.stopping === undefined) {
+      this.stopping = setTimeout(() => {
+        this.stoppable = true
+      }, LONG_LAYOUT)
+    }
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    clearTimeout(this.stopping)
+    this.stopping = undefined
   }
 
   /**
@@ -1315,6 +1395,18 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
           <div part="viewport">
             <slot></slot>
             ${this.renderGestures()}
+            ${
+              this.layout?.unseen
+                ? html`<div part="settling" role="status">${this.settlingLabel}</div>`
+                : nothing
+            }
+            ${
+              this.stoppable
+                ? html`<button part="stop-layout" type="button" @click=${this.handleStopLayout}>
+                    ${this.stopLayoutLabel}
+                  </button>`
+                : nothing
+            }
           </div>
           ${this.renderControls()} ${this.renderLegend()}
         </div>

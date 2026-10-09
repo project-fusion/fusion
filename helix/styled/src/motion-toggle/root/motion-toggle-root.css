@@ -1,0 +1,76 @@
+:host {
+  display: inline-block;
+}
+
+/* **A quiet button on the floating surface**, as the controls over a map and
+   `Aura`'s own pause are, so it reads over a page's header or over a drawing
+   alike: square with the icon alone, and as wide as its text with text. */
+[part="button"] {
+  align-items: center;
+  background-color: var(--motion-toggle-background-color, var(--helix-color-surface-overlay));
+  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-floating);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-xs);
+  justify-content: center;
+  min-block-size: var(--helix-size-control-sm);
+  min-inline-size: var(--helix-size-control-sm);
+  /* Room either side of the icon and any text beside it, which a square
+     button with the icon alone keeps inside its least width. */
+  padding: 0 var(--helix-space-xs);
+}
+
+[part="icon"] {
+  display: inline-flex;
+}
+
+[part="icon"] svg,
+[part="icon"] ::slotted(*) {
+  block-size: var(--helix-size-icon-sm);
+  inline-size: var(--helix-size-icon-sm);
+}
+
+[part="button"]:hover {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 10%,
+    var(--motion-toggle-background-color, var(--helix-color-surface-overlay))
+  );
+}
+
+[part="button"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Paused: the button reads pressed, in the ink of a chosen control. */
+:host(:state(paused)) [part="button"] {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 16%,
+    var(--motion-toggle-background-color, var(--helix-color-surface-overlay))
+  );
+}
+
+/* A pause control means nothing on paper, where nothing moves. */
+@media print {
+  :host {
+    display: none;
+  }
+}
+
+@media (forced-colors: active) {
+  [part="button"] {
+    border-color: ButtonText;
+  }
+
+  :host(:state(paused)) [part="button"] {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+}

@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import type { ViewportGestureMode } from '@fusion.dev/helix-core'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { DrawnLink, DrawnNode, GraphChanges, GraphDriver } from './connect-graph.js'
 import type { GraphPoint } from './seed.js'
 
@@ -30,6 +30,7 @@ const recording = (withLayout = true, incremental = false) => {
     centered: [] as string[],
     drawn: [] as { links: DrawnLink[]; nodes: DrawnNode[] }[],
     gestures: [] as ViewportGestureMode[],
+    kept: 0,
     panned: [] as [number, number][],
     signals: [] as [string, string][],
     stopped: false,
@@ -62,7 +63,12 @@ const recording = (withLayout = true, incremental = false) => {
           settle: (waiting, placed) => {
             unplaced = waiting
             settle = placed
-            return () => {
+            return (keep?: boolean) => {
+              /* Ended where the notes stand, which it says, as a driver does. */
+              if (keep) {
+                asked.kept += 1
+                placed(new Map())
+              }
               settle = undefined
             }
           },
@@ -95,6 +101,58 @@ const settled = async (host: Frame): Promise<void> => {
   await host.updateComplete
   await new Promise((done) => setTimeout(done, 20))
 }
+
+describe('a long layout', () => {
+  test('while it runs, the frame says so, and the page pausing its motion ends it where the notes stand', async () => {
+    const { pauseMotion } = await import('@fusion.dev/helix-core')
+    const host = await frame()
+    const recorder = recording()
+    connectGraph(host, recorder.driver)
+    await settled(host)
+    expect(hasState(host, 'settling')).toBe(true)
+    expect(hasState(host, 'settling-unseen')).toBe(false)
+    pauseMotion()
+    await settled(host)
+    expect(recorder.asked.kept).toBe(1)
+    expect(hasState(host, 'settling')).toBe(false)
+    pauseMotion(false)
+  })
+
+  test('on a page that has paused its motion, it runs unseen, and says the notes are being placed', async () => {
+    const { pauseMotion } = await import('@fusion.dev/helix-core')
+    pauseMotion()
+    const host = await frame()
+    const recorder = recording()
+    connectGraph(host, recorder.driver)
+    await settled(host)
+    expect(hasState(host, 'settling-unseen')).toBe(true)
+    expect(part(host, 'settling')?.textContent).toBe('Placing the notes')
+    pauseMotion(false)
+    recorder.settle({ a: { x: 0, y: 0 }, b: { x: 5, y: 5 }, c: { x: -5, y: 5 } })
+    await settled(host)
+    expect(hasState(host, 'settling-unseen')).toBe(false)
+    expect(part(host, 'settling')).toBeNull()
+  })
+
+  test('past five seconds, the frame offers a button that stops it', async () => {
+    const host = await frame()
+    let stopped = 0
+    ;(host as Frame & { settling(stop?: () => void): void }).settling(() => {
+      stopped += 1
+    })
+    await host.updateComplete
+    expect(part(host, 'stop-layout')).toBeNull()
+    await new Promise((done) => setTimeout(done, 5100))
+    await host.updateComplete
+    const button = part(host, 'stop-layout') as HTMLButtonElement
+    expect(button.textContent?.trim()).toBe('Stop the layout')
+    button.click()
+    await host.updateComplete
+    expect(stopped).toBe(1)
+    expect(part(host, 'stop-layout')).toBeNull()
+    expect(hasState(host, 'settling')).toBe(false)
+  }, 8000)
+})
 
 describe('connectGraph', () => {
   test('draws the frame’s notes, and leaves out a link to a note it does not hold', async () => {

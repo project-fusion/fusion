@@ -683,7 +683,12 @@ export const cosmosDriver = (
       /* The view follows the layout as it opens out, so the reader watches
          all of it settle, until they move the view themselves. */
       const fitting = setInterval(() => fitAll(FOLLOW), FOLLOW)
-      return () => {
+      return (keep = false) => {
+        /* Ended where the notes stand, and heard. */
+        if (keep && !done) {
+          finish()
+          return
+        }
         done = true
         clearTimeout(limit)
         clearInterval(fitting)

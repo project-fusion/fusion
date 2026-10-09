@@ -1,4 +1,4 @@
-import { type Holder, pageBudget, reportRuntime } from '@fusion.dev/helix-core'
+import { type Holder, motionPaused, pageBudget, reportRuntime } from '@fusion.dev/helix-core'
 import type { Simulation, SimulationNode } from 'd3-force-3d'
 import {
   AdditiveBlending,
@@ -523,7 +523,7 @@ export const threeDriver = (
   controls.enableDamping = !still()
   controls.dampingFactor = 0.08
   controls.rotateSpeed = 0.6
-  controls.autoRotate = !still() && options.autoRotate !== false
+  controls.autoRotate = !still() && !motionPaused() && options.autoRotate !== false
   controls.autoRotateSpeed = 0.5
 
   /* Each note's place in the arrays, which are by index. */
@@ -1471,9 +1471,11 @@ export const threeDriver = (
       }
     }
     /* Turning by itself for its first five seconds, while nobody is on a
-       note, and never again once the reader has handled it. */
+       note and the page has not paused its motion, and never again once the
+       reader has handled it. */
     controls.autoRotate =
       !still() &&
+      !motionPaused() &&
       options.autoRotate !== false &&
       !touched &&
       hovered === undefined &&
@@ -1858,7 +1860,18 @@ export const threeDriver = (
             placed(new Map(nodes.map((node) => [node.id, { x: node.x, y: node.y, z: node.z }])))
           }
         })
-      return () => {
+      return (keep = false) => {
+        /* Ended where the notes stand, and heard: by the layout where it has
+           started, and where it is still loading, from where they began. */
+        if (keep && !done) {
+          if (layout) {
+            layout.done()
+          } else {
+            done = true
+            placed(new Map(nodes.map((node) => [node.id, { x: node.x, y: node.y, z: node.z }])))
+          }
+          return
+        }
         done = true
         layout = undefined
       }
