@@ -60,6 +60,9 @@ helix/*/api.json
 helix/*/examples.json
 # The agent skill `analyze` writes from the documentation, for the package.
 helix/*/skills/
+# The Claude Code plugin's skill is committed: a plugin installs from the
+# repository as it stands, and `check:gen:eval` holds it to the packaged one.
+!helix/plugin/skills/
 jsx.d.ts
 svelte.d.ts
 vue.d.ts

@@ -1,16 +1,16 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "description": "Fusion's plugins for Claude Code.",
   "name": "fusion",
   "owner": {
     "name": "Fusion",
     "url": "https://fusion.dev"
   },
-  "description": "Fusion's plugins for Claude Code.",
   "plugins": [
     {
+      "description": "The guide to writing pages with Helix, and the Helix MCP server.",
       "name": "helix",
-      "source": "./helix/plugin",
-      "description": "The guide to writing pages with Helix, and the Helix MCP server."
+      "source": "./helix/plugin"
     }
   ]
 }
