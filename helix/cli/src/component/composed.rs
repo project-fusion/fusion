@@ -212,7 +212,7 @@ fn extended(context: &Context) -> Report {
     /* Each module and the tags it renders, with the line that renders each. */
     let mut rendered: BTreeMap<usize, BTreeMap<String, usize>> = BTreeMap::new();
     for extension in &project.extensions {
-        let (base, tier) = project.grounded(extension);
+        let (base, tier) = project.grounded(extension, context.installed());
         let (Some(installed), Some(prefix)) = (&installed, tier) else {
             continue;
         };

@@ -14,6 +14,7 @@ use std::sync::LazyLock;
 
 use regex::Regex;
 
+use crate::component::installed::Installed;
 use crate::component::text::uncommented;
 use crate::component::{sources, Context};
 
@@ -283,10 +284,23 @@ impl Project {
 
     /// The Helix class a project class rests on, through any project classes
     /// between them, and the first prefix set on the way down.
-    pub fn grounded<'a>(&'a self, from: &'a Extension) -> (&'a str, Option<&'a str>) {
+    ///
+    /// **The walk stops at the first class the installed packages describe**,
+    /// since their manifest is the answer for it and everything under it. In
+    /// this repository the headless tier is source as well as a package, and
+    /// walking on past `HelixHeadlessCombobox` reached a base that renders
+    /// nothing.
+    pub fn grounded<'a>(
+        &'a self,
+        from: &'a Extension,
+        installed: Option<&Installed>,
+    ) -> (&'a str, Option<&'a str>) {
         let mut at = from;
         let mut tier = from.tier.as_deref();
         for _ in 0..8 {
+            if installed.is_some_and(|one| one.classes.contains_key(&at.base)) {
+                break;
+            }
             let Some(next) = self.extension(&at.base) else {
                 break;
             };
