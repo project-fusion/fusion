@@ -30,6 +30,7 @@
       "types": "./dist/rehype/rehype.d.ts",
       "default": "./dist/rehype/rehype.js"
     },
+    "./skills/*": "./skills/*",
     "./svelte": "./types/svelte.d.ts",
     "./vue": "./types/vue.d.ts",
     "./words": "./types/words.d.ts"
@@ -40,6 +41,7 @@
     "dist",
     "examples.json",
     "lint.json",
+    "skills",
     "types"
   ],
   "customElements": "custom-elements.json",

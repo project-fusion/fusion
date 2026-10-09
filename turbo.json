@@ -332,6 +332,8 @@
       "dependsOn": ["^build", "styles"],
       "inputs": [
         "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/helix/docs/content/coding-agents.mdx",
+        "$TURBO_ROOT$/helix/docs/content/using-helix-with-an-agent.mdx",
         "$TURBO_ROOT$/Cargo.lock",
         "$TURBO_ROOT$/Cargo.toml",
         "$TURBO_ROOT$/helix/cli/Cargo.toml",
@@ -342,6 +344,7 @@
         "custom-elements.json",
         "examples.json",
         "lint.json",
+        "skills/**",
         "types/jsx.d.ts",
         "types/svelte.d.ts",
         "types/vue.d.ts",

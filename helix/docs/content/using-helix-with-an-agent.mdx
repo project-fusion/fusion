@@ -8,21 +8,15 @@ title: Using Helix with an agent
 
 # Using Helix with an agent
 
-**We publish this guide as a web page so that every tool can read it.** It began
-as `.claude/skills/using-helix/SKILL.md`, a file format that one vendor reads in
-a repository. Every other vendor reads its own file:
+This guide is in two places, and both say the same thing:
 
-- Cursor reads `.cursor/rules`.
-- Copilot reads `.github/copilot-instructions.md`.
+- this page, which [llms.txt](https://fusion.dev/llms.txt) indexes
+- `skills/helix/SKILL.md` inside `@fusion.dev/helix`, which matches the version
+  you installed and works offline
 
-If you install the published packages, you have none of these files. You have
-this site and no checkout of our repository.
-
-So the guide lives in one place, here, at a URL that
-[llms.txt](https://fusion.dev/llms.txt) indexes and that each of those files can
-link to. Paste the link into the file your tool reads. [The MCP
-server](./coding-agents) works with any vendor and runs code, and Claude,
-Cursor, Windsurf, and Zed all support it.
+[Link your tool to this guide](#link-your-tool-to-this-guide) says how to point
+each tool at one of them. [The MCP server](./coding-agents) works with any
+vendor and runs code, and Claude, Cursor, Windsurf, and Zed all support it.
 
 ## Read the family before writing its tags
 
@@ -223,20 +217,28 @@ If you are adding a script to a recipe, use the component.
 
 ## Link your tool to this guide
 
-**Link to this page from your instructions file, and do not copy it.** Each tool
-that reads project instructions reads a file in your repository, and each tool
-reads a different one. A copy starts to go stale as soon as you paste it, and
-this page changes with the library.
+**Point your tool at the guide, and do not copy it.** A copy starts to go stale
+as soon as you paste it, and the guide changes with the library.
+
+The skill in the package matches the Helix you installed. In Claude Code, link
+it into your project's skills folder:
+
+```sh
+mkdir -p .claude/skills
+ln -s ../../node_modules/@fusion.dev/helix/skills/helix .claude/skills/helix
+```
+
+Other tools read a file in your repository. Add a line to it that names the
+skill, or this page:
 
 ```md
-Helix: read https://fusion.dev/helix/docs/using-helix-with-an-agent
-before writing components, and https://fusion.dev/helix/custom-elements.json
-for the API.
+Helix: read node_modules/@fusion.dev/helix/skills/helix/SKILL.md before
+writing components, and node_modules/@fusion.dev/helix/api.json for the API.
 ```
 
 | Tool | Where it goes |
 |---|---|
-| Claude Code | `AGENTS.md` or `CLAUDE.md`, or a skill in `.claude/skills/` |
+| Claude Code | `.claude/skills/helix`, or a line in `AGENTS.md` or `CLAUDE.md` |
 | Cursor | `.cursor/rules/` |
 | GitHub Copilot | `.github/copilot-instructions.md` |
 | Anything else | Whatever it reads. The line is the same |
@@ -244,7 +246,7 @@ for the API.
 We do not write those files for you, and we chose this on purpose. You would
 have to maintain a file we generated in your repository against our changes. A
 tool that rewrote it on install would be a dependency you did not ask for, in a
-directory you own. You paste the line above, and you can delete it.
+directory you own. You add the link or the line, and you can delete it.
 
 ## Install the Helix MCP server
 
