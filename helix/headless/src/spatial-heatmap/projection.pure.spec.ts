@@ -112,6 +112,7 @@ describe('the relief', () => {
       base: undefined,
       box: { height: 0, width: 0, x: 0, y: 0 },
       corners: undefined,
+      middle: { x: 0, y: 0 },
       order: [],
       prisms: [],
     })

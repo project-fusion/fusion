@@ -182,9 +182,12 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
   private camera: Camera = SPATIAL_VIEW
 
   /** A drag across the chart's own drawing, which turns its view. */
-  private readonly drag = new DragTurn((next) => {
-    this.camera = next(this.camera)
-  })
+  private readonly drag = new DragTurn(
+    (next) => {
+      this.camera = next(this.camera)
+    },
+    () => this.requestUpdate(),
+  )
 
   /** Each point where the chart's own drawing put it, which the pointer finds. */
   private placed: Placed[] = []
@@ -348,6 +351,11 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
     this.drag.down(event)
   }
 
+  /** A press the browser took back, such as for a scroll, which ends a drag as a release does. */
+  private readonly onDrawingCancel = (event: PointerEvent): void => {
+    this.drag.up(event)
+  }
+
   private readonly onDrawingLeave = (event: PointerEvent): void => {
     if (event.pointerType !== 'touch') {
       this.requestActive(-1, 'mouse')
@@ -410,7 +418,7 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
     this.placed = places
     const painted = [...places].sort((one, other) => one.depth - other.depth)
     const active = places[at]
-    const { bounds } = view
+    const bounds = this.drag.frame(view.bounds, view.on([0, 0, 0]))
     return html`<div aria-hidden="true" dir="ltr" ?hidden=${this.rendered} part="fallback">
       <svg
         part="drawing"
@@ -418,6 +426,7 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
         viewBox="${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}"
         xmlns="http://www.w3.org/2000/svg"
         @click=${this.drag.click}
+        @pointercancel=${this.onDrawingCancel}
         @pointerdown=${this.onDrawingDown}
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}

@@ -72,6 +72,8 @@ export interface Relief {
    * under the last. The strip's first and last labels stand there.
    */
   corners: { end: Point; start: Point } | undefined
+  /** The middle of the grid, halfway up the tallest prism, which a drag turns the view round. */
+  middle: Point
   /**
    * The prisms' places in `prisms`, back to front, the order to paint them
    * in. From the isometric camera it is the order of the readings.
@@ -220,6 +222,7 @@ export const reliefOf = (
       base: undefined,
       box: { height: 0, width: 0, x: 0, y: 0 },
       corners: undefined,
+      middle: { x: 0, y: 0 },
       order: [],
       prisms,
     }
@@ -243,6 +246,7 @@ export const reliefOf = (
       end: projection.at(columns + MARGIN, -(deep + MARGIN), -THICKNESS),
       start: projection.at(-MARGIN, -(deep + MARGIN), -THICKNESS),
     },
+    middle: projection.at(columns / 2, -deep / 2, Math.max(0, ...heights) / 2),
     order: depthOrder(projection, places).map((place) => place.index),
     prisms,
   }

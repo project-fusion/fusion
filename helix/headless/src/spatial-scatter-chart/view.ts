@@ -233,6 +233,23 @@ const TILT_PER_PIXEL = 0.35
 /** How far a press moves before it is a drag, in pixels, which a click never does. */
 const DRAG = 4
 
+/** How long the drawing takes to settle into its frame once a drag ends, in milliseconds, as long as the renderer's turn. */
+const SETTLE = 250
+
+/** The part of the page a drawing shows, as its `viewBox`: its left, top, width, and height. */
+export interface Frame {
+  height: number
+  width: number
+  x: number
+  y: number
+}
+
+/** The time now, in milliseconds. */
+const now = (): number => globalThis.performance?.now() ?? Date.now()
+
+/** Fast at first and slow to rest. */
+const easeOut = (t: number): number => 1 - (1 - t) ** 3
+
 /**
  * A drag across a spatial chart's own drawing, which turns its view as the
  * pointer moves: across turns it, and down tilts it. **A press that moves
@@ -240,16 +257,38 @@ const DRAG = 4
  * a point, and the click that ends a drag is the drag's: `dragged` says so,
  * for the chart to keep it from pressing anything.
  *
+ * **The drawing turns in place.** Through a drag, `frame` holds the drawing
+ * at the size it had when the drag began, with the middle of the data where
+ * it stood, as the renderer's camera turns round its target. The drawing
+ * may reach past its edges as it turns, and nothing on the page moves. Once
+ * the drag ends, it settles into the frame that fits it.
+ *
  * A touch turns the view when it moves across, and the page's stylesheet
  * leaves a touch moving up and down to scroll the page.
  */
 export class DragTurn {
   private held: { id: number; moved: boolean; x: number; y: number } | undefined
 
+  /** The frame and the middle of the data, as the last render drew them. */
+  private last: { frame: Frame; middle: PagePoint } | undefined
+
+  /** The frame held through a drag, and where the middle of the data stands in it. */
+  private kept: { frame: Frame; middle: PagePoint } | undefined
+
+  /** The frame a drag ended on, and when it ended, while the drawing settles. */
+  private settling: { from: Frame; start: number } | undefined
+
   /** Whether the press that ended last was a drag. */
   dragged = false
 
-  constructor(private readonly turn: (next: (camera: Camera) => Camera) => void) {}
+  /**
+   * `turn` moves the view, and `redraw` asks for a render, which `frame`
+   * needs once a drag ends and on each step as the drawing settles.
+   */
+  constructor(
+    private readonly turn: (next: (camera: Camera) => Camera) => void,
+    private readonly redraw: () => void,
+  ) {}
 
   /** Whether a drag is moving the view now. */
   get moving(): boolean {
@@ -302,7 +341,51 @@ export class DragTurn {
     }
     this.held = undefined
     this.dragged = held.moved
+    if (held.moved) {
+      this.redraw()
+    }
     return held.moved
+  }
+
+  /**
+   * The frame to draw in, given the one that fits the drawing now and where
+   * the middle of the data stands on the page. Called on every render.
+   */
+  frame(fits: Frame, middle: PagePoint): Frame {
+    let shown = fits
+    if (this.moving) {
+      this.settling = undefined
+      const from = this.last ?? { frame: fits, middle }
+      this.kept ??= {
+        frame: from.frame,
+        middle: { x: from.middle.x - from.frame.x, y: from.middle.y - from.frame.y },
+      }
+      const { frame, middle: at } = this.kept
+      shown = { height: frame.height, width: frame.width, x: middle.x - at.x, y: middle.y - at.y }
+    } else if (this.kept) {
+      this.kept = undefined
+      const still = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+      this.settling = still || !this.last ? undefined : { from: this.last.frame, start: now() }
+    }
+    if (this.settling && !this.moving) {
+      const { from, start } = this.settling
+      const t = (now() - start) / SETTLE
+      if (t >= 1) {
+        this.settling = undefined
+      } else {
+        const k = easeOut(Math.max(0, t))
+        const toward = (a: number, b: number): number => a + (b - a) * k
+        shown = {
+          height: toward(from.height, fits.height),
+          width: toward(from.width, fits.width),
+          x: toward(from.x, fits.x),
+          y: toward(from.y, fits.y),
+        }
+        globalThis.requestAnimationFrame?.(() => this.redraw())
+      }
+    }
+    this.last = { frame: shown, middle }
+    return shown
   }
 
   /** Keeps the click that ends a drag from pressing a reading. */

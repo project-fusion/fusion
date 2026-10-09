@@ -149,7 +149,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @cssproperty --spatial-heatmap-end-x - Where the front edge ends, under the newest column, across the drawing, from 0 at its inline start to 1. The component writes it on the footer, and a stylesheet that stands the `end` label there reads it.
  * @cssproperty --spatial-heatmap-end-y - How far down the drawing the front edge ends, under the newest column, as a share of the drawing's width: its whole depth in the chart's own drawing, and wherever a renderer draws it. The component writes it on the footer, and a stylesheet that stands the `end` label there reads it.
  * @cssproperty --spatial-heatmap-span - How many cells the drawing spans across: its columns and its rows together. The component writes it on the strip, and a stylesheet that caps the cell size reads it.
- * @cssproperty --spatial-heatmap-start-x - Where the front edge starts, under the first column, across the drawing, from 0 at its inline start to 1: 0 in the chart's own drawing, and wherever a renderer draws it. The component writes it on the footer, and a stylesheet that stands the `start` label there reads it.
+ * @cssproperty --spatial-heatmap-start-x - Where the front edge starts, under the first column, across the drawing, from 0 at its inline start to 1, in the chart's own drawing and wherever a renderer draws it. The component writes it on the footer, and a stylesheet that stands the `start` label there reads it.
  * @cssproperty --spatial-heatmap-start-y - How far down the drawing the front edge starts, under the first column, as a share of the drawing's width. The component writes it on the footer, and a stylesheet that stands the `start` label there reads it.
  *
  * @cssstate drawn - While a renderer has drawn the relief, and the chart's own drawing stays unseen under it.
@@ -185,9 +185,12 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
   private camera: Camera = ISOMETRIC
 
   /** A drag across the chart's own drawing, which turns its view. */
-  private readonly drag = new DragTurn((next) => {
-    this.camera = next(this.camera)
-  })
+  private readonly drag = new DragTurn(
+    (next) => {
+      this.camera = next(this.camera)
+    },
+    () => this.requestUpdate(),
+  )
 
   private readonly onDrawingDown = (event: PointerEvent): void => {
     this.drag.down(event)
@@ -414,7 +417,9 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
     const grid = readable && this.selectionMode !== undefined
     const keys = this.selectionMode ? this.keysOf(cells) : []
     const chosen = new Set(this.selectionMode ? commaList(this.value) : [])
-    const relief = this.drawnRelief()
+    /* Held at its size through a drag, so it turns in place. */
+    const fits = this.drawnRelief()
+    const relief = { ...fits, box: this.drag.frame(fits.box, fits.middle) }
     this.shown = relief
     const at = this.pointer.at
     /* Painted back to front for the view, whatever the order of the readings. */
@@ -440,6 +445,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
           viewBox="${box.x} ${box.y} ${box.width} ${box.height}"
           xmlns="http://www.w3.org/2000/svg"
           @click=${this.drag.click}
+          @pointercancel=${this.onDrawingUp}
           @pointerdown=${this.onDrawingDown}
           @pointermove=${this.onDrawingMove}
           @pointerup=${this.onDrawingUp}
@@ -523,7 +529,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
     const across = (x: number): number => (isRtl(this) ? 1 - x : x)
     const start = drawn
       ? { x: across(drawn.start.x), y: drawn.start.y * depth }
-      : { x: 0, y: (corners.start.y - box.y) / box.width }
+      : { x: (corners.start.x - box.x) / box.width, y: (corners.start.y - box.y) / box.width }
     const end = drawn
       ? { x: across(drawn.end.x), y: drawn.end.y * depth }
       : { x: (corners.end.x - box.x) / box.width, y: depth }
