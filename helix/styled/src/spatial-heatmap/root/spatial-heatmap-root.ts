@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSpatialHeatmap } from '@fusion.dev/helix-headless/spatial-heatmap'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './spatial-heatmap-root.css.js'
 import '../../tooltip/index.js'
@@ -34,6 +35,30 @@ export class HelixSpatialHeatmap extends HelixHeadlessSpatialHeatmap {
   static override tier = 'helix-'
 
   static override styles: CSSResultGroup = [tooltipStyles, styles]
+
+  /**
+   * How strongly the prisms are drawn, as on every chart.
+   *
+   * `outlined` is a prism as its edges in its tone over faces faded toward the
+   * page, and `subtle` a faint wash of the tone under the same edges, which
+   * shows the prisms behind it. Absent is the filled prism, per the rule that
+   * a reflected property takes no default, and `solid` writes it out. A
+   * renderer draws the prisms the same way.
+   *
+   * It composes with `material`: emphasis decides what is drawn, and material
+   * how much of it comes through. The ring on the prism the keys rest on keeps
+   * its own ink.
+   */
+  @property({ reflect: true })
+  emphasis?: 'outlined' | 'solid' | 'subtle'
+
+  /**
+   * How much of each mark comes through, as on every chart: `glass` admits the
+   * most of what is behind it, `frosted` less, and absent is opaque. The
+   * strength is the theme's, scaled by `--helix-material-opacity`.
+   */
+  @property({ reflect: true })
+  material?: 'frosted' | 'glass'
 
   /**
    * The smallest cell, in CSS pixels, before the strip draws fewer columns.

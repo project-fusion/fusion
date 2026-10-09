@@ -36,6 +36,17 @@ export interface PlotColors {
   groups: string[]
   /** The names and the ring on what the keys rest on: `foreground`. */
   ink: string
+  /**
+   * How the marks are drawn, from the chart's `emphasis` and `material`, as
+   * the chart's own drawing reads them: `emphasis` is `solid`, `outlined` (an
+   * edge in the mark's color over a fill faded toward `page`) or `subtle` (a
+   * faint wash under that edge), and `through` how much of the mark comes
+   * through, 1 with no material, `glass` 0.62 and `frosted` 0.88, times the
+   * theme's `--helix-material-opacity`.
+   */
+  look: { emphasis: 'outlined' | 'solid' | 'subtle'; through: number }
+  /** The page a faded fill moves toward: `background`. */
+  page: string
   /** The ticks' numbers: `foreground-muted`. */
   quiet: string
   /**
@@ -180,14 +191,25 @@ export const plotColorsFrom = (
         ? null
         : read(`var(--helix-color-${name})`)
     }
-    const [grid, ground, ink, quiet] = [
+    const [grid, ground, ink, quiet, page] = [
       'border',
       'surface-sunken',
       'foreground',
       'foreground-muted',
+      'background',
     ].map(token)
     if (!grid || !ground || !ink || !quiet) {
       return null
+    }
+    const emphasis = chart.getAttribute('emphasis')
+    const material = chart.getAttribute('material')
+    const strength = Number.parseFloat(
+      getComputedStyle(chart).getPropertyValue('--helix-material-opacity'),
+    )
+    const scale = Number.isFinite(strength) ? strength : 1
+    const look: PlotColors['look'] = {
+      emphasis: emphasis === 'outlined' || emphasis === 'subtle' ? emphasis : 'solid',
+      through: material === 'glass' ? 0.62 * scale : material === 'frosted' ? 0.88 * scale : 1,
     }
     const colors: string[] = []
     for (let at = 0; at < Math.max(groups, 1); at++) {
@@ -204,7 +226,17 @@ export const plotColorsFrom = (
     for (const [name, value] of Object.entries(extra)) {
       named[name] = read(value) ?? ink
     }
-    return { extra: named, grid, ground, groups: colors, ink, quiet, ramp: { high, low } }
+    return {
+      extra: named,
+      grid,
+      ground,
+      groups: colors,
+      ink,
+      look,
+      page: page ?? ground,
+      quiet,
+      ramp: { high, low },
+    }
   } finally {
     probe.remove()
   }
@@ -291,6 +323,15 @@ export const connectPlot = <F extends object>(
   const stopTheme = watchTheme(frame, () => {
     draw()
   })
+  /* **Drawn again when the chart's `emphasis` or `material` changes**, which
+     changes how its marks look and nothing it publishes in `field`. */
+  const looks =
+    typeof MutationObserver === 'function'
+      ? new MutationObserver(() => {
+          draw()
+        })
+      : undefined
+  looks?.observe(frame, { attributeFilter: ['emphasis', 'material'], attributes: true })
 
   /* After the chart's first render, which is when it has read its table. */
   void Promise.resolve(chart.updateComplete).then(draw)
@@ -307,6 +348,7 @@ export const connectPlot = <F extends object>(
       chart.placeReading?.(undefined)
       chart.placeCorners?.(undefined)
       stopTheme()
+      looks?.disconnect()
       driver.stop?.()
       chart.rendererDrawn?.(false)
     },

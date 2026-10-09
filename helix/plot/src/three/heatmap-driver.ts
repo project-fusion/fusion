@@ -18,7 +18,7 @@ import type {
   SpatialHeatmapDriver,
   SpatialHeatmapField,
 } from '../connect-spatial-heatmap/connect-spatial-heatmap.js'
-import { createStage } from './stage.js'
+import { createStage, lookThrough } from './stage.js'
 
 /** How the three.js heatmap driver behaves where the page does not say. */
 export interface ThreeHeatmapDriverOptions {
@@ -139,19 +139,28 @@ export const threeHeatmapDriver = (
       field = next
       const unit = SPAN / Math.max(next.columns, next.rows, 1)
       const tile = new Color(colors.extra.tile ?? colors.ground)
+      const page = new Color(colors.page)
+      const { emphasis, through } = colors.look
       const solids: BufferGeometry[] = []
       const lines: BufferGeometry[] = []
       tops = next.cells.map((cell) => {
-        const color = cell.tone ? new Color(colors.extra[`tone-${cell.tone}`] ?? colors.ink) : tile
+        const tone = cell.tone ? new Color(colors.extra[`tone-${cell.tone}`] ?? colors.ink) : tile
+        /* As the chart's own drawing paints them: `outlined` fades the faces
+           toward the page and draws the edges in the tone, and `subtle` is a
+           faint wash under the same edges. */
+        const color = emphasis === 'outlined' ? tone.clone().lerp(page, 0.4) : tone
         const tall = Math.max(cell.height, TILE) * unit
         const x = (cell.column + 0.5 - next.columns / 2) * unit
         const z = (cell.row + 0.5 - next.rows / 2) * unit
         const box = new BoxGeometry(unit * FOOTPRINT, tall, unit * FOOTPRINT)
         box.translate(x, FLOOR + tall / 2, z)
         solids.push(painted(box, color))
-        lines.push(painted(new EdgesGeometry(box), edgeOf(color)))
+        lines.push(painted(new EdgesGeometry(box), emphasis === 'solid' ? edgeOf(color) : tone))
         return new Vector3(x, FLOOR + tall, z)
       })
+      const area = emphasis === 'subtle' ? 0.2 : 1
+      lookThrough(prismMaterial, area * through)
+      lookThrough(edgeMaterial, through)
       prisms.geometry.dispose()
       edges.geometry.dispose()
       prisms.geometry = (solids.length > 0 && mergeGeometries(solids)) || new BufferGeometry()
