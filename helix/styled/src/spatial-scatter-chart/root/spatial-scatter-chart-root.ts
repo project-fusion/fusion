@@ -2,7 +2,9 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSpatialScatterChart } from '@fusion.dev/helix-headless/spatial-scatter-chart'
 import type { CSSResultGroup } from 'lit'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
+import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './spatial-scatter-chart-root.css.js'
+import '../../tooltip/index.js'
 
 /**
  * @summary A chart that plots each row as a point in three dimensions, for data with three measures.
@@ -24,7 +26,7 @@ import { styles } from './spatial-scatter-chart-root.css.js'
 export class HelixSpatialScatterChart extends HelixHeadlessSpatialScatterChart {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [seriesStyles, styles]
+  static override styles: CSSResultGroup = [seriesStyles, tooltipStyles, styles]
 }
 
 declare global {

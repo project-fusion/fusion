@@ -15,7 +15,7 @@ import type {
   SpatialSurfaceChartDriver,
   SurfaceField,
 } from '../connect-spatial-surface-chart/connect-spatial-surface-chart.js'
-import { createStage, HALF, inBox, tickText } from './stage.js'
+import { createStage, HALF, inBox } from './stage.js'
 
 /** How the three.js surface driver behaves where the page does not say. */
 export interface ThreeSurfaceDriverOptions {
@@ -59,8 +59,6 @@ export const threeSurfaceDriver = (
   options: ThreeSurfaceDriverOptions = {},
 ): SpatialSurfaceChartDriver => {
   let field: SurfaceField | undefined
-  let active = -1
-  let hovered = -1
 
   /** A place's corner in the box, or none where the table has no reading for it. */
   const placeOf = (index: number): Vector3 | undefined => {
@@ -89,15 +87,6 @@ export const threeSurfaceDriver = (
 
   const stage = createStage(container, {
     density: options.density,
-    /* The place the pointer or the keys rest on, named with its reading. */
-    named: () => {
-      const shown = hovered >= 0 ? hovered : active
-      const cell = field?.cells[shown]
-      const at = placeOf(shown)
-      return cell?.value !== undefined && at
-        ? { at, text: `${cell.label ?? ''}: ${tickText(cell.value)}` }
-        : undefined
-    },
     /* The corner nearest where the ray meets the surface. */
     pick: (ray) => {
       const hit = ray.intersectObject(surface)[0]
@@ -126,9 +115,6 @@ export const threeSurfaceDriver = (
   const sun = new DirectionalLight(0xffffff, 1)
   sun.position.set(-2, 4, 1)
   stage.scene.add(surface, rules, sky, sun)
-  stage.onHover((index) => {
-    hovered = index
-  })
 
   return {
     draw: (next, colors, font) => {
@@ -200,9 +186,10 @@ export const threeSurfaceDriver = (
       stage.setAxes(next.axes, colors, font)
     },
     focus: (index) => {
-      active = index
       stage.setMarker(placeOf(index))
     },
+    onHover: (listener) => stage.onHover(listener),
+    onPlace: (listener) => stage.onPlace(listener),
     onPress: (listener) => stage.onPress(listener),
     stop: () => {
       surface.geometry.dispose()

@@ -40,6 +40,15 @@ export interface PlotColors {
   ramp: { high: string; low: string }
 }
 
+/** What moved a reading in the drawing. */
+export type PointerKind = 'mouse' | 'pen' | 'touch'
+
+/** Where a reading is drawn, as fractions of the box the drawing fills, from its top left. */
+export interface Place {
+  x: number
+  y: number
+}
+
 /**
  * What a renderer has to answer for a 3D chart to drive it, and nothing that
  * is the same for every renderer: that is the connector's.
@@ -50,11 +59,23 @@ export interface PlotDriver<F> {
   /** Marks the reading at `index` as the one the keys rest on, or none with `-1`. */
   focus(index: number): void
   /**
+   * Calls `hover` with the index of the reading a mouse or a pen rests on in
+   * the drawing, and with `-1` when it rests on none. Returns what stops
+   * listening.
+   */
+  onHover?(hover: (index: number, kind: PointerKind) => void): () => void
+  /**
+   * Calls `place` with where the reading `focus` marked is drawn, whenever a
+   * frame moves it, and with `undefined` while none is marked or it is out of
+   * view. The chart points its tooltip there. Returns what stops listening.
+   */
+  onPlace?(place: (at: Place | undefined) => void): () => void
+  /**
    * Calls `press` with a reading's index when the reader presses it in the
    * drawing, and with `-1` when they press where none is. Returns what stops
    * listening.
    */
-  onPress?(press: (index: number) => void): () => void
+  onPress?(press: (index: number, kind: PointerKind) => void): () => void
   /** Turns the view by steps across and up, over a short animation or at once. */
   turnBy(across: number, up: number, animate: boolean): void
   /** Removes whatever the driver added to the page, and frees its renderer. */
@@ -78,7 +99,8 @@ interface Chart<F> extends HTMLElement {
   active?: number
   drawn?(on?: boolean): void
   field?: F
-  requestActive?(index: number): void
+  placeReading?(at: Place | undefined): void
+  requestActive?(index: number, kind?: PointerKind): void
   updateComplete?: Promise<unknown>
 }
 
@@ -153,8 +175,9 @@ export const plotColorsFrom = (chart: Element, groups: number): PlotColors | nul
 
 /**
  * Connects a 3D chart to a driver: draws the chart's field, colors it from
- * the page's tokens, marks what the keys rest on, turns the view for Shift
- * with an arrow, and puts a reading pressed in the drawing on the chart.
+ * the page's tokens, marks the chart's reading, turns the view for Shift
+ * with an arrow, puts a reading hovered or pressed in the drawing on the
+ * chart, and tells the chart where its reading is drawn, for its tooltip.
  * `groupsOf` says how many group colors the field needs, and `name` is the
  * connector a misuse is reported by.
  */
@@ -210,8 +233,14 @@ export const connectPlot = <F extends object>(
 
   frame.addEventListener(HelixPlotChangeEvent.eventName, handleChange)
   frame.addEventListener(HelixPlotTurnEvent.eventName, handleTurn)
-  const stopPress = driver.onPress?.((index) => {
-    chart.requestActive?.(index)
+  const stopPress = driver.onPress?.((index, kind) => {
+    chart.requestActive?.(index, kind)
+  })
+  const stopHover = driver.onHover?.((index, kind) => {
+    chart.requestActive?.(index, kind)
+  })
+  const stopPlace = driver.onPlace?.((at) => {
+    chart.placeReading?.(at)
   })
   const stopTheme = watchTheme(frame, () => {
     draw()
@@ -226,6 +255,9 @@ export const connectPlot = <F extends object>(
       frame.removeEventListener(HelixPlotChangeEvent.eventName, handleChange)
       frame.removeEventListener(HelixPlotTurnEvent.eventName, handleTurn)
       stopPress?.()
+      stopHover?.()
+      stopPlace?.()
+      chart.placeReading?.(undefined)
       stopTheme()
       driver.stop?.()
       chart.drawn?.(false)

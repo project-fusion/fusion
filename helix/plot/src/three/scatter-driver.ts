@@ -11,7 +11,7 @@ import type {
   Field,
   SpatialScatterChartDriver,
 } from '../connect-spatial-scatter-chart/connect-spatial-scatter-chart.js'
-import { createStage, inBox, tickText } from './stage.js'
+import { createStage, inBox } from './stage.js'
 
 /** How the three.js scatter driver behaves where the page does not say. */
 export interface ThreeScatterDriverOptions {
@@ -68,8 +68,6 @@ export const threeScatterDriver = (
   options: ThreeScatterDriverOptions = {},
 ): SpatialScatterChartDriver => {
   let field: Field | undefined
-  let active = -1
-  let hovered = -1
 
   /** A point's place in the box. */
   const placeOf = (index: number): Vector3 | undefined => {
@@ -100,27 +98,12 @@ export const threeScatterDriver = (
 
   const stage = createStage(container, {
     density: options.density,
-    /* The point the pointer or the keys rest on, named with its numbers. */
-    named: () => {
-      const shown = hovered >= 0 ? hovered : active
-      const point = field?.points[shown]
-      const at = placeOf(shown)
-      return point && at
-        ? {
-            at,
-            text: `${point.label}: ${tickText(point.x)}, ${tickText(point.y)}, ${tickText(point.z)}`,
-          }
-        : undefined
-    },
     pick: (ray) => {
       ray.params.Points = { threshold: 0.06 }
       return ray.intersectObject(points)[0]?.index ?? -1
     },
   })
   stage.scene.add(points)
-  stage.onHover((index) => {
-    hovered = index
-  })
 
   return {
     draw: (next, colors, font) => {
@@ -142,9 +125,10 @@ export const threeScatterDriver = (
       stage.setAxes(next.axes, colors, font)
     },
     focus: (index) => {
-      active = index
       stage.setMarker(placeOf(index))
     },
+    onHover: (listener) => stage.onHover(listener),
+    onPlace: (listener) => stage.onPlace(listener),
     onPress: (listener) => stage.onPress(listener),
     stop: () => {
       points.geometry.dispose()
