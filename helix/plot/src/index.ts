@@ -10,6 +10,13 @@ export {
   plotColorsFrom,
 } from './connect-plot/connect-plot.js'
 export {
+  type BarCell,
+  type BarField,
+  connectSpatialBarChart,
+  type SpatialBarChartConnection,
+  type SpatialBarChartDriver,
+} from './connect-spatial-bar-chart/connect-spatial-bar-chart.js'
+export {
   connectSpatialHeatmap,
   type HeatmapCell,
   type SpatialHeatmapConnection,

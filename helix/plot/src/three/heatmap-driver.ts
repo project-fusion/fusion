@@ -18,7 +18,7 @@ import type {
   SpatialHeatmapDriver,
   SpatialHeatmapField,
 } from '../connect-spatial-heatmap/connect-spatial-heatmap.js'
-import { createStage, lookThrough } from './stage.js'
+import { createStage, edgeOf, lookThrough } from './stage.js'
 
 /** How the three.js heatmap driver behaves where the page does not say. */
 export interface ThreeHeatmapDriverOptions {
@@ -46,17 +46,6 @@ const FLOOR = -0.3
 
 /** How wide the grid is drawn, at most, in the stage's units. */
 const SPAN = 1.9
-
-/**
- * An edge a little lighter than a dark face and a little darker than a light
- * one, as the chart's own drawing draws them, so every prism keeps its form
- * on every step of the ramp.
- */
-const edgeOf = (face: Color): Color => {
-  const hsl = { h: 0, l: 0, s: 0 }
-  face.getHSL(hsl)
-  return face.clone().lerp(new Color(hsl.l < 0.5 ? 0xffffff : 0x000000), hsl.l < 0.5 ? 0.22 : 0.18)
-}
 
 /**
  * Draws a spatial heatmap's readings as prisms in three dimensions with

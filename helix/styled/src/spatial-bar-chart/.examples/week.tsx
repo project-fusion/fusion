@@ -1,0 +1,52 @@
+export function Example() {
+  return (
+    <>
+      <table
+        data-hidden-visually
+        id="deploys"
+      >
+        <caption>Deploys this week</caption>
+        <thead>
+          <tr>
+            <th scope="col">Day</th>
+            <th scope="col">Deploys</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Mon</th>
+            <td>38</td>
+          </tr>
+          <tr>
+            <th scope="row">Tue</th>
+            <td>44</td>
+          </tr>
+          <tr>
+            <th scope="row">Wed</th>
+            <td>41</td>
+          </tr>
+          <tr>
+            <th scope="row">Thu</th>
+            <td>47</td>
+          </tr>
+          <tr>
+            <th scope="row">Fri</th>
+            <td>35</td>
+          </tr>
+          <tr>
+            <th scope="row">Sat</th>
+            <td>9</td>
+          </tr>
+          <tr>
+            <th scope="row">Sun</th>
+            <td>6</td>
+          </tr>
+        </tbody>
+      </table>
+      <helix-spatial-bar-chart
+        for="deploys"
+        label="Deploys this week"
+      ></helix-spatial-bar-chart>
+    </>
+  )
+}

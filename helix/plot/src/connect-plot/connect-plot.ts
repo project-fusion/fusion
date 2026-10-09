@@ -9,13 +9,23 @@ import {
 
 /** One axis of a plot: its column's name, its range, and the ticks on it. */
 export interface Axis {
+  /** The words written at the ticks, for an axis of names such as a bar chart's categories. */
+  labels?: readonly string[] | undefined
   name: string
   range: readonly [number, number]
+  /** Where the grid's lines run along this axis, where not at the ticks. */
+  rules?: readonly number[] | undefined
   ticks: readonly number[]
 }
 
 /** A plot's three axes: across, up, and in depth. */
 export interface Axes {
+  /**
+   * How long the box is along each axis, across, up, and in depth, as a share
+   * of the cube's, where a chart's grid is not square: `[1, 1, 1]` where it
+   * does not say.
+   */
+  readonly extent?: readonly [number, number, number] | undefined
   readonly x: Axis
   readonly y: Axis
   readonly z: Axis

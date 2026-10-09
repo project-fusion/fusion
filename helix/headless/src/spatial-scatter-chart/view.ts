@@ -39,6 +39,14 @@ export const VIEW_STEP = 15
 /** A place in the box: across, up, and in depth, each from -1 to 1. */
 export type BoxPoint = readonly [number, number, number]
 
+/**
+ * How long the box is along each axis, across, up, and in depth, as a share
+ * of the cube's: `[1, 1, 1]` where a chart does not say, and less along an
+ * axis whose grid is shorter, as a bar chart of one series is a long, low
+ * row. A place in the box is still from -1 to 1 along each.
+ */
+export type BoxExtent = readonly [number, number, number]
+
 /** A number or a name written in the drawing, where it stands on the page. */
 export interface ViewLabel {
   /** Whether it is a measure's name, drawn stronger, rather than a tick's number. */
@@ -86,15 +94,16 @@ const LABEL_GAP = 0.06
  * the page, which `extra` adds to the bounds.
  */
 export const boxView = (
-  axes: { x: PlotAxis; y: PlotAxis; z: PlotAxis },
+  axes: { extent?: BoxExtent | undefined; x: PlotAxis; y: PlotAxis; z: PlotAxis },
   camera: Camera,
   extra: readonly PagePoint[] = [],
 ): BoxView => {
   const projection = projectionOf(camera)
+  const [ex, ey, ez] = axes.extent ?? [1, 1, 1]
   /* Across stays across, up is the height, and in depth comes toward the
-     viewer, which is the floor's back turned round. */
-  const on = ([x, y, z]: BoxPoint): PagePoint => projection.at(x, -z, y)
-  const depth = ([x, , z]: BoxPoint): number => projection.depth(x, -z)
+     viewer, which is the floor's back turned round, each scaled to the box. */
+  const on = ([x, y, z]: BoxPoint): PagePoint => projection.at(x * ex, -z * ez, y * ey)
+  const depth = ([x, , z]: BoxPoint): number => projection.depth(x * ex, -z * ez)
   const lines: string[] = []
   const line = (from: BoxPoint, to: BoxPoint): void => {
     const [a, b] = [on(from), on(to)]
@@ -109,17 +118,17 @@ export const boxView = (
   }
   /* The grid on the floor and on the two walls at the back, as the three.js
      driver draws it. */
-  for (const tick of axes.x.ticks) {
+  for (const tick of axes.x.rules ?? axes.x.ticks) {
     const x = inBox(axes.x, tick)
     line([x, -1, -1], [x, -1, 1])
     line([x, -1, -1], [x, 1, -1])
   }
-  for (const tick of axes.z.ticks) {
+  for (const tick of axes.z.rules ?? axes.z.ticks) {
     const z = inBox(axes.z, tick)
     line([-1, -1, z], [1, -1, z])
     line([-1, -1, z], [-1, 1, z])
   }
-  for (const tick of axes.y.ticks) {
+  for (const tick of axes.y.rules ?? axes.y.ticks) {
     const y = inBox(axes.y, tick)
     line([-1, y, -1], [1, y, -1])
     line([-1, y, -1], [-1, y, 1])
@@ -127,7 +136,10 @@ export const boxView = (
   /* Along the edges that face the reader, which a turn changes. */
   const text = (axis: PlotAxis): BoxAxisText => ({
     name: axis.name,
-    ticks: axis.ticks.map((tick) => ({ at: inBox(axis, tick), text: tickText(tick) })),
+    ticks: axis.ticks.map((tick, index) => ({
+      at: inBox(axis, tick),
+      text: axis.labels?.[index] ?? tickText(tick),
+    })),
   })
   const labels: ViewLabel[] = boxLabels(
     (point) => ({ ...on(point), depth: depth(point) }),

@@ -1,7 +1,7 @@
 # @fusion.dev/helix-plot
 
-Connects the Helix `Spatial Heatmap`, `Spatial Scatter Chart` and
-`Spatial Surface Chart` to three.js, which draws them in three dimensions,
+Connects the Helix `Spatial Bar Chart`, `Spatial Heatmap`, `Spatial Scatter
+Chart` and `Spatial Surface Chart` to three.js, which draws them in three dimensions,
 lit, in a view you can drag round and zoom, colored from your tokens. Each
 also draws itself in SVG, which this package replaces where it is connected.
 
@@ -98,6 +98,44 @@ const connection = connectSpatialSurfaceChart(chart, threeSurfaceDriver(chart.qu
 |---|---|---|
 | `density` | screen × 1.5, 2 to 3; on a touch screen, the screen's own, at most 2 | How many pixels the drawing has for each of the page's |
 
+## Bars
+
+`Spatial Bar Chart` connects the same way:
+
+```html
+<table id="signups">…</table>
+
+<helix-spatial-bar-chart for="signups" label="Signups by region and quarter">
+  <div></div>
+</helix-spatial-bar-chart>
+```
+
+```js
+import '@fusion.dev/helix/spatial-bar-chart'
+import { connectSpatialBarChart } from '@fusion.dev/helix-plot'
+import { threeBarDriver } from '@fusion.dev/helix-plot/three'
+
+const chart = document.querySelector('helix-spatial-bar-chart')
+const connection = connectSpatialBarChart(chart, threeBarDriver(chart.querySelector('div')))
+```
+
+- **The chart reads its table as `Bar Chart` does.** Each row is a category
+  and each numeric column a series. The bars stand on a grid of categories
+  across and series in depth, the first series in front, each from zero to its
+  value. The box takes the grid's proportions, so one series is a long, low
+  row.
+- **Each series takes a series color**, `--chart-series-1` and on, lit from
+  above.
+- **A bar the mouse rests on, or one tapped or pressed, is the chart's
+  reading**, ringed and shown in the chart's tooltip. The left and right arrows
+  move from category to category, and the down and up arrows from series to
+  series.
+- The box, the turning, the frames, and the shared contexts are the scatter's.
+
+| `threeBarDriver` option | Default | What else it takes |
+|---|---|---|
+| `density` | screen × 1.5, 2 to 3; on a touch screen, the screen's own, at most 2 | How many pixels the drawing has for each of the page's |
+
 ## A heatmap
 
 `Spatial Heatmap` takes the renderer's box in its `renderer` slot, since its
@@ -141,7 +179,7 @@ const connection = connectSpatialHeatmap(chart, threeHeatmapDriver(box))
 
 | Import | What |
 |---|---|
-| `@fusion.dev/helix-plot` | `connectSpatialHeatmap(chart, driver)`, `connectSpatialScatterChart(chart, driver)`, `connectSpatialSurfaceChart(chart, driver)`, `plotColorsFrom(chart, groups, extra)`, and the types `Axes`, `Axis`, `Field`, `HeatmapCell`, `Place`, `PlotColors`, `PlotConnection`, `PlotDriver`, `Point`, `PointerKind`, `SpatialHeatmapConnection`, `SpatialHeatmapDriver`, `SpatialHeatmapField`, `SpatialScatterChartConnection`, `SpatialScatterChartDriver`, `SpatialSurfaceChartConnection`, `SpatialSurfaceChartDriver`, `SurfaceCell` and `SurfaceField` |
-| `@fusion.dev/helix-plot/three` | `threeHeatmapDriver(box, options)`, `threeScatterDriver(box, options)` and `threeSurfaceDriver(box, options)`, and the types `ThreeHeatmapDriverOptions`, `ThreeScatterDriverOptions` and `ThreeSurfaceDriverOptions` |
+| `@fusion.dev/helix-plot` | `connectSpatialBarChart(chart, driver)`, `connectSpatialHeatmap(chart, driver)`, `connectSpatialScatterChart(chart, driver)`, `connectSpatialSurfaceChart(chart, driver)`, `plotColorsFrom(chart, groups, extra)`, and the types `Axes`, `Axis`, `BarCell`, `BarField`, `Corners`, `Field`, `HeatmapCell`, `Place`, `PlotColors`, `PlotConnection`, `PlotDriver`, `Point`, `PointerKind`, `SpatialBarChartConnection`, `SpatialBarChartDriver`, `SpatialHeatmapConnection`, `SpatialHeatmapDriver`, `SpatialHeatmapField`, `SpatialScatterChartConnection`, `SpatialScatterChartDriver`, `SpatialSurfaceChartConnection`, `SpatialSurfaceChartDriver`, `SurfaceCell` and `SurfaceField` |
+| `@fusion.dev/helix-plot/three` | `threeBarDriver(box, options)`, `threeHeatmapDriver(box, options)`, `threeScatterDriver(box, options)` and `threeSurfaceDriver(box, options)`, and the types `ThreeBarDriverOptions`, `ThreeHeatmapDriverOptions`, `ThreeScatterDriverOptions` and `ThreeSurfaceDriverOptions` |
 
 **three.js is an optional peer**, so a page brings the version it has. `@fusion.dev/helix-plot` itself never imports it: only `@fusion.dev/helix-plot/three` does, so a page with a driver of its own needs no three.js.

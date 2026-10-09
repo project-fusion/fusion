@@ -81,6 +81,7 @@ import { skeletonArt } from './art/skeleton'
 import { skipLinkArt } from './art/skip-link'
 import { sliderArt } from './art/slider'
 import { sparklineArt } from './art/sparkline'
+import { spatialBarChartArt } from './art/spatial-bar-chart'
 import { spatialHeatmapArt } from './art/spatial-heatmap'
 import { spatialScatterChartArt } from './art/spatial-scatter-chart'
 import { spatialSurfaceChartArt } from './art/spatial-surface-chart'
@@ -115,7 +116,7 @@ import { virtualListArt } from './art/virtual-list'
  * Every family has an entry, and every entry is a file under `art/` named for
  * the family it draws. The system they all obey is `system.md`.
  *
- * **One hundred and nine, not the one hundred and eight folders in `helix/styled/src`.** The catalog is
+ * **One hundred and ten, not the one hundred and nine folders in `helix/styled/src`.** The catalog is
  * built from the manifests, so it also carries `editor` and `sandbox` from
  * `@fusion.dev/helix-sandbox`. The count that matters is whatever `getFamilies`
  * returns, never a directory listing.
@@ -233,6 +234,7 @@ const art: Record<string, ReactNode> = {
   'skip-link': skipLinkArt,
   slider: sliderArt,
   sparkline: sparklineArt,
+  'spatial-bar-chart': spatialBarChartArt,
   'spatial-heatmap': spatialHeatmapArt,
   'spatial-scatter-chart': spatialScatterChartArt,
   'spatial-surface-chart': spatialSurfaceChartArt,
