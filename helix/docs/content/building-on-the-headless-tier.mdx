@@ -177,6 +177,7 @@ findings as data. The rules check what your components document and write:
 
 | Rule | What it checks |
 |---|---|
+| `registered` | A component built on a headless one sets `tier`, and every element its base renders is registered under that prefix |
 | `parts` | A `@csspart` you document is rendered, and a `part` you render is documented |
 | `states` | A custom state you record is documented with `@cssstate`, and a documented one is recorded |
 | `hooks` | A `@cssproperty` you document is read, and one you read is documented |
