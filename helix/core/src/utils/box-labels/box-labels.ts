@@ -63,9 +63,16 @@ interface Area {
   y: number
 }
 
+/**
+ * Whether two labels would cover each other. **By their ink**, which stands
+ * about four fifths of a line tall: measured by the whole line, the names of
+ * a bar chart's categories, a line and a quarter apart down a slanted edge,
+ * read as touching and every other one was left out.
+ */
+const INK = 0.8
 const overlaps = (one: Area, other: Area, pad: number): boolean =>
   Math.abs(one.x - other.x) < one.half.width + other.half.width + pad &&
-  Math.abs(one.y - other.y) < one.half.height + other.half.height + pad
+  Math.abs(one.y - other.y) < (one.half.height + other.half.height) * INK + pad
 
 /**
  * The numbers and names of a box's three axes, placed on the page for a
@@ -150,6 +157,9 @@ export const boxLabels = (
       const box = size(tick.text, false)
       ticks.push({ ...off(seen(along(tick.at)), out, box, sizes.gap), text: tick.text })
       deepest = Math.max(deepest, Math.abs(out.x) * box.width + Math.abs(out.y) * box.height)
+    }
+    if (axis.name === '') {
+      continue
     }
     const box = size(axis.name, true)
     names.push({

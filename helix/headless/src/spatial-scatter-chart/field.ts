@@ -32,8 +32,16 @@ export interface PlotPoint {
 
 /** One axis: its column's name, its range widened to round numbers, and the ticks on it. */
 export interface PlotAxis {
+  /**
+   * The words written at the ticks, in their order, for an axis of names such
+   * as a bar chart's categories, which stand at 0, 1, 2 and on. Absent, each
+   * tick is written as its number.
+   */
+  labels?: readonly string[] | undefined
   name: string
   range: [number, number]
+  /** Where the grid's lines run along this axis, where not at the ticks: between the names of an axis of names. */
+  rules?: readonly number[] | undefined
   ticks: number[]
 }
 
