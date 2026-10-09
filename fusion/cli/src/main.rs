@@ -2,7 +2,7 @@
 //! repository's own checks behind `x`.
 //!
 //! **Each product's command line is routed, never reimplemented.** `fusion
-//! helix ...` and `fusion proof ...` hand the rest of the line to that binary and
+//! helix ...` and `fusion locus ...` hand the rest of the line to that binary and
 //! return its exit code, and each works on its own without this one.
 //!
 //! **This repository's checks are under `x`, and only in its own builds.**
@@ -54,7 +54,7 @@ fn shipped() -> &'static str {
 #[derive(Debug, Parser)]
 #[command(
     name = "fusion",
-    about = "The Fusion command line: Helix, Proof, and the checks this repository holds itself to.",
+    about = "The Fusion command line: Helix, Locus, and the checks this repository holds itself to.",
     version = shipped(),
     subcommand_required = true,
     arg_required_else_help = true
@@ -100,13 +100,13 @@ enum Noun {
         #[arg(allow_hyphen_values = true, trailing_var_arg = true)]
         args: Vec<String>,
     },
-    /// Run the Fusion Proof command line, which owns its own nouns.
+    /// Run the Fusion Locus command line, which owns its own nouns.
     ///
-    /// Everything after `proof` is passed to it as written, and its exit code
-    /// is returned. Needs `proof` installed.
+    /// Everything after `locus` is passed to it as written, and its exit code
+    /// is returned. Needs `locus` installed.
     #[command(disable_help_flag = true)]
-    Proof {
-        /// Everything after `proof`, handed over as written.
+    Locus {
+        /// Everything after `locus`, handed over as written.
         #[arg(allow_hyphen_values = true, trailing_var_arg = true)]
         args: Vec<String>,
     },
@@ -172,7 +172,7 @@ const _: () = {
 fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
     match &cli.noun {
         Noun::Helix { args } => route::to("helix", args),
-        Noun::Proof { args } => route::to("proof", args),
+        Noun::Locus { args } => route::to("locus", args),
         #[cfg(feature = "internal")]
         Noun::X { noun } => x::run(noun, cli.json, paint),
     }

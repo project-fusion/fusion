@@ -4,14 +4,14 @@ The Fusion command line. Ships as the `fusion` binary.
 
 ```sh
 fusion helix theme audit    # the Helix command line, routed
-fusion proof test           # the Fusion Proof command line, routed
+fusion locus test           # the Fusion Locus command line, routed
 fusion x workspace check    # this repository's own checks
 ```
 
 | Route | What it does |
 |---|---|
 | `helix` | Runs the `helix` binary with the rest of the line and returns its exit code |
-| `proof` | Runs the `proof` binary the same way |
+| `locus` | Runs the `locus` binary the same way |
 | `x` | Runs the checks this repository holds itself to. Only in this repository's builds |
 
 Each product's command line works on its own, and `fusion` routes to it rather
