@@ -51,6 +51,7 @@ pub mod decided;
 pub mod decorator;
 pub mod derived_steps;
 pub mod disabled;
+pub mod dispatched;
 pub mod displaced;
 pub mod events;
 pub mod example_events;
@@ -498,9 +499,10 @@ pub struct Layer {
         reason = "read by the published build, which runs only these"
     )
 )]
-pub const PUBLIC: [&str; 11] = [
+pub const PUBLIC: [&str; 12] = [
     "attribute-names",
     "constructed",
+    "dispatched",
     "hooks",
     "leaks",
     "observers",
@@ -805,6 +807,12 @@ fn every() -> Vec<Rule> {
             name: "registered",
             run: Runner::Source(registered::run),
             summary: "a component built on a headless one registers everything it renders, under its own prefix",
+        },
+        Rule {
+            fix: None,
+            name: "dispatched",
+            run: Runner::Source(dispatched::run),
+            summary: "an event a component dispatches by name is one it documents",
         },
         Rule {
             fix: None,

@@ -93,3 +93,47 @@ fn a_subclass_registers_everything_its_base_renders_under_its_prefix() {
     );
     let _ = std::fs::remove_dir_all(&project);
 }
+
+/// `dispatched`, on the same kind of project: an event sent by name is one the
+/// class documents.
+#[test]
+fn an_event_a_component_sends_by_name_is_documented() {
+    let project = std::env::temp_dir().join("fusion-helix-dispatched");
+    let _ = std::fs::remove_dir_all(&project);
+    write(
+        &project,
+        "package.json",
+        r#"{ "name": "acme", "private": true }"#,
+    );
+    write(&project, "helix.json", r#"{ "tiers": ["src"] }"#);
+    write(
+        &project,
+        "src/badge/badge.ts",
+        "/**\n * A badge.\n *\n * @event acme-pulse - Fired when the badge pulses.\n */\n@customElement('acme-badge')\nexport class AcmeBadge extends HelixHeadlessBadge {\n  pulse() {\n    this.dispatchEvent(new CustomEvent('acme-pulse'))\n    this.dispatchEvent(new CustomEvent('acme-flash'))\n  }\n}\n",
+    );
+    let output = Command::new(binary())
+        .args([
+            "--json",
+            "component",
+            "check",
+            "--only",
+            "dispatched",
+            "--root",
+        ])
+        .arg(&project)
+        .output()
+        .expect("helix runs");
+    let report: serde_json::Value =
+        serde_json::from_slice(&output.stdout).expect("the report is JSON");
+    let messages: Vec<&str> = report["rules"][0]["findings"]
+        .as_array()
+        .expect("findings")
+        .iter()
+        .filter_map(|finding| finding["message"].as_str())
+        .collect();
+    assert_eq!(
+        messages,
+        ["dispatches `acme-flash`, which no `@event` documents"]
+    );
+    let _ = std::fs::remove_dir_all(&project);
+}
