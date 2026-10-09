@@ -225,3 +225,92 @@ export const nearestTo = (
   }
   return found
 }
+
+/** How far a drag turns the view, in degrees for each pixel across, and tilts it for each pixel down, as the graph's isometric diagram does. */
+const TURN_PER_PIXEL = 0.5
+const TILT_PER_PIXEL = 0.35
+
+/** How far a press moves before it is a drag, in pixels, which a click never does. */
+const DRAG = 4
+
+/**
+ * A drag across a spatial chart's own drawing, which turns its view as the
+ * pointer moves: across turns it, and down tilts it. **A press that moves
+ * less than a few pixels is a press**, so a click still puts the reading on
+ * a point, and the click that ends a drag is the drag's: `dragged` says so,
+ * for the chart to keep it from pressing anything.
+ *
+ * A touch turns the view when it moves across, and the page's stylesheet
+ * leaves a touch moving up and down to scroll the page.
+ */
+export class DragTurn {
+  private held: { id: number; moved: boolean; x: number; y: number } | undefined
+
+  /** Whether the press that ended last was a drag. */
+  dragged = false
+
+  constructor(private readonly turn: (next: (camera: Camera) => Camera) => void) {}
+
+  /** Whether a drag is moving the view now. */
+  get moving(): boolean {
+    return this.held?.moved === true
+  }
+
+  down(event: PointerEvent): void {
+    this.dragged = false
+    this.held =
+      event.button === 0
+        ? { id: event.pointerId, moved: false, x: event.clientX, y: event.clientY }
+        : undefined
+  }
+
+  /** Turns the view for a drag, and says whether the event was one. */
+  move(event: PointerEvent): boolean {
+    const held = this.held
+    if (!held || held.id !== event.pointerId) {
+      return false
+    }
+    const dx = event.clientX - held.x
+    const dy = event.clientY - held.y
+    if (!held.moved && Math.hypot(dx, dy) < DRAG) {
+      return false
+    }
+    if (!held.moved) {
+      held.moved = true
+      /* Captured where the browser still tracks the pointer, so a drag that
+         leaves the drawing keeps going. */
+      try {
+        ;(event.currentTarget as Element | null)?.setPointerCapture?.(event.pointerId)
+      } catch {
+        /* Nothing to capture. */
+      }
+    }
+    held.x = event.clientX
+    held.y = event.clientY
+    this.turn((camera) => ({
+      tilt: Math.min(Math.max(camera.tilt + dy * TILT_PER_PIXEL, 15), 90),
+      turn: camera.turn - dx * TURN_PER_PIXEL,
+    }))
+    return true
+  }
+
+  /** Ends a press, and says whether it was a drag. */
+  up(event: PointerEvent): boolean {
+    const held = this.held
+    if (!held || held.id !== event.pointerId) {
+      return false
+    }
+    this.held = undefined
+    this.dragged = held.moved
+    return held.moved
+  }
+
+  /** Keeps the click that ends a drag from pressing a reading. */
+  readonly click = (event: Event): void => {
+    if (this.dragged) {
+      this.dragged = false
+      event.stopPropagation()
+      event.preventDefault()
+    }
+  }
+}

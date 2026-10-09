@@ -53,6 +53,8 @@ helix-headless-spatial-surface-chart::part(drawing) {
   display: block;
   inline-size: 100%;
   overflow: visible;
+  touch-action: pan-y;
+  user-select: none;
 }
 
 helix-headless-spatial-surface-chart::part(grid) {

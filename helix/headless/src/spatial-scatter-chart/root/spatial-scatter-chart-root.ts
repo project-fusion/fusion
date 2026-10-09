@@ -23,6 +23,7 @@ import { fieldOf, type PlotField, type PlotPoint } from '../field.js'
 import {
   type BoxPoint,
   boxView,
+  DragTurn,
   drawBox,
   inBox,
   nearestTo,
@@ -56,8 +57,8 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * `@fusion.dev/helix-plot` draws the points in it with three.js and keeps it
  * in step with the chart. Until a renderer has drawn, and where none is
  * connected, the chart draws the points in 3D itself, in SVG, from the same
- * place the renderer's camera starts: a still picture the server, a print,
- * and a page without WebGL all show, which Shift with an arrow turns.
+ * place the renderer's camera starts: a picture a print and a page without
+ * WebGL show too, which a drag or Shift with an arrow turns.
  *
  * **The table is the reading.** Every number is in it, and screen readers
  * read it. The `summary` part names the three measures and the number of
@@ -175,9 +176,14 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
   @state()
   private rendered = false
 
-  /** Where the chart's own drawing is seen from, which Shift with an arrow turns. */
+  /** Where the chart's own drawing is seen from, which a drag or Shift with an arrow turns. */
   @state()
   private camera: Camera = SPATIAL_VIEW
+
+  /** A drag across the chart's own drawing, which turns its view. */
+  private readonly drag = new DragTurn((next) => {
+    this.camera = next(this.camera)
+  })
 
   /** Each point where the chart's own drawing put it, which the pointer finds. */
   private placed: Placed[] = []
@@ -309,6 +315,9 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
 
   /** A mouse or a pen over the chart's own drawing puts the reading on the point nearest it. */
   private readonly onDrawingMove = (event: PointerEvent): void => {
+    if (this.drag.move(event)) {
+      return
+    }
     if (event.pointerType === 'touch') {
       return
     }
@@ -319,14 +328,24 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
     )
   }
 
+  private readonly onDrawingDown = (event: PointerEvent): void => {
+    this.drag.down(event)
+  }
+
   private readonly onDrawingLeave = (event: PointerEvent): void => {
     if (event.pointerType !== 'touch') {
       this.requestActive(-1, 'mouse')
     }
   }
 
-  /** A tap is a touch reader's hover: it shows the point nearest it until a tap lands elsewhere. */
+  /**
+   * A tap is a touch reader's hover, unless it was a drag, which turned the
+   * view: it shows the point nearest it until a tap lands elsewhere.
+   */
   private readonly onDrawingTap = (event: PointerEvent): void => {
+    if (this.drag.up(event)) {
+      return
+    }
     if (event.pointerType === 'touch') {
       this.requestActive(
         nearestTo(event.currentTarget as SVGSVGElement, event, this.placed, 24),
@@ -382,6 +401,8 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
         preserveAspectRatio="xMidYMid meet"
         viewBox="${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}"
         xmlns="http://www.w3.org/2000/svg"
+        @click=${this.drag.click}
+        @pointerdown=${this.onDrawingDown}
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
