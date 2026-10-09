@@ -135,6 +135,13 @@
   .navPanel::part(surface) {
     grid-template-columns: minmax(0, 1fr) var(--site-panel-column);
   }
+
+  /* Centered on the band's height, which the column sets: three rows of
+     text stand taller than a row of tiles, and tiles pinned to the top left
+     the band's lower third empty under them. */
+  .tiles {
+    align-self: center;
+  }
 }
 
 /* Five tiles to a row wherever the bar is shown, and never a row of four and
