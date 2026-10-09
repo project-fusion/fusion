@@ -8,6 +8,7 @@ export function Example() {
         as="h3"
         id="plain-title"
         slot="header"
+        variant="title"
       >
         Profile
       </helix-text>

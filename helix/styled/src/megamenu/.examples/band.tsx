@@ -11,6 +11,7 @@ export function Example() {
             <helix-text
               as="h3"
               data-megamenu-heading
+              variant="title"
             >
               Work
             </helix-text>
@@ -35,6 +36,7 @@ export function Example() {
             <helix-text
               as="h3"
               data-megamenu-heading
+              variant="title"
             >
               Insights
             </helix-text>
@@ -59,6 +61,7 @@ export function Example() {
             <helix-text
               as="h3"
               data-megamenu-heading
+              variant="title"
             >
               Connect
             </helix-text>
@@ -83,6 +86,7 @@ export function Example() {
             <helix-text
               as="h3"
               data-megamenu-heading
+              variant="title"
             >
               More
             </helix-text>

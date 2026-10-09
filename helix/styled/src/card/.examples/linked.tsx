@@ -10,6 +10,7 @@ export function Example() {
             as="h3"
             id="redesign-title"
             slot="header"
+            variant="title"
           >
             Website redesign
           </helix-text>
@@ -26,6 +27,7 @@ export function Example() {
             as="h3"
             id="app-title"
             slot="header"
+            variant="title"
           >
             Mobile app
           </helix-text>
