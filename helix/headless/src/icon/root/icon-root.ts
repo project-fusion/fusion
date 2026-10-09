@@ -22,7 +22,7 @@ import { afterPageSettles } from '../settle.js'
  * renders its full inner markup, because most icons are several elements, each
  * with its own stroke and fill.
  *
- * The markup is generated at build time from SVG files in this repository and
+ * The markup is generated at build time from the SVG files Helix ships and
  * never comes from user input, so rendering it with `unsafeSVG` is safe.
  *
  * The `<svg>` carries `fill="currentColor"`. The generator keeps only the inner

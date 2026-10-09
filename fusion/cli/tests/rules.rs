@@ -981,6 +981,41 @@ fn links() {
     );
 }
 
+/// A doc comment in a published package ships in its declarations, so a note
+/// to us there reaches a consumer; the same note in a private package does not.
+#[test]
+fn notes() {
+    plant(
+        "prose",
+        "notes",
+        &[
+            ("fusion.json", EMPTY),
+            ("package.json", ROOT),
+            ("packages/kit/package.json", r#"{ "name": "@acme/kit" }"#),
+            (
+                "packages/kit/src/kit.ts",
+                "/** A kit a consumer imports. */\nexport const kit = 1\n",
+            ),
+            (
+                "packages/tools/package.json",
+                r#"{ "name": "@acme/tools", "private": true }"#,
+            ),
+            (
+                "packages/tools/src/tools.ts",
+                "/** See queue.md for why. */\nexport const tools = 1\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "packages/kit/src/kit.ts",
+                "/**\n * A kit, measured on this repository.\n */\nexport const kit = 1\n",
+            );
+        },
+        "a published doc comment names this repository",
+        "packages/kit/src/kit.ts:2",
+    );
+}
+
 /// The file's own block is held by position, so the fault is the block after
 /// it that sits on a third.
 #[test]

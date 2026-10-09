@@ -6,8 +6,8 @@
  * the text somebody wrote, so `(typeof ORB_STATES)[number]` reached it as a name
  * with no values in it and the reference page listed none: a reader was told the
  * attribute takes an `OrbState` and left to find out what one is. A union on one
- * line is what every reader of this repository's sources can resolve, the `axes`
- * rule included, and no type system is needed to do it.
+ * line is what every reader of the source can resolve, a lint rule included,
+ * and no type system is needed to do it.
  */
 export type OrbState =
   | 'waiting'

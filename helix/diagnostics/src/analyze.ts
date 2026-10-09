@@ -130,8 +130,8 @@ const answersAt = (
  * the buttons it matches, and they answer it themselves.
  *
  * **This is the check a static tool cannot make, and skipping it is a three
- * percent false-positive rate.** Measured on this repository: `landing.module.css`
- * sets `--icon-button-radius` and `--icon-button-size` on `helix-copy-button`,
+ * percent false-positive rate.** Measured on a site built with Helix: one
+ * stylesheet sets `--icon-button-radius` and `--icon-button-size` on `helix-copy-button`,
  * which answers neither, and both work, because a copy button *renders* an icon
  * button and custom properties inherit through a shadow boundary. A rule that
  * reads the manifest alone calls those two dead. A collector running in the
@@ -571,8 +571,8 @@ export const analyze = (
  * it happens, with both class objects in hand, which is a position nothing
  * later can improve on: by the time a page can be scanned, the losing class is
  * unreachable and all that is left is an identity mismatch to infer from. So
- * this reads `duplicateRegistrations()` rather than re-deriving it, which is
- * `AGENTS.md`'s rule about where a fix lives applied to a detector.
+ * this reads `duplicateRegistrations()` and does not re-derive it, so the fact
+ * comes from where the fault starts.
  *
  * The identity check stays as a fallback, for the copy that never went through
  * Helix's own decorator: a fork, a hand-written `customElements.define`, or a

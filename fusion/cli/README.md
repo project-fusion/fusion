@@ -29,7 +29,7 @@ name the Rust compiler's own repository gives its internal tooling.
 | Noun | What it holds | Rules |
 |---|---|---|
 | `workspace` | What a workspace says about itself | `barrels` `help` `icons` `modules` `node` `order` `prerequisites` `publishable` `reaching` `react-bridge` `registration` `scoped` `scripts` `shaders` `shipped` `strays` `warnings` |
-| `prose` | The prose against what it describes | `art` `dashes` `dialect` `documented` `links` `orphans` `references` `repository` `tag-order` `voice` |
+| `prose` | The prose against what it describes | `art` `dashes` `dialect` `documented` `links` `notes` `orphans` `references` `repository` `tag-order` `voice` |
 | `spec` | The specs against being specs | `hazards` `isolated` `matchers` `runners` |
 
 `--only <rule>` runs one. Every group also carries `floors`, which is the rule

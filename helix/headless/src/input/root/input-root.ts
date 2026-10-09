@@ -527,7 +527,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
    * validation.
    *
    * **Not reflected.** Reflection exists so a selector can reach a value, and
-   * no stylesheet in this repository selects on `type`. Reflecting it writes
+   * no Helix stylesheet selects on `type`. Reflecting it writes
    * `type="text"` onto every `<helix-headless-input>` ever rendered, an
    * attribute no consumer's markup has, which is the fault the area rules write
    * up under `Button`'s `href`, `target` and `rel`.

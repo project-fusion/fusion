@@ -67,8 +67,8 @@ export interface ReferenceOptions {
    * Frontmatter, emitted above the heading.
    *
    * Provenance rather than decoration: a generated document should say what it
-   * was generated from, so a reader who finds one detached from this repository
-   * can still tell where to look. Keys are written in the order given, because
+   * was generated from, so a reader who finds one on its own can still tell
+   * where to look. Keys are written in the order given, because
    * a reader scans the first line and `title` is what they want there.
    */
   frontmatter?: Array<[string, string]>

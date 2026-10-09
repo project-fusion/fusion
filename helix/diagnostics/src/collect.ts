@@ -38,8 +38,8 @@ export interface Located {
  * because its class sets `styles = [HelixIconButton.styles, styles].flat()`:
  * it borrows another component's stylesheet outright. That is not inheritance,
  * not a mixin and not a part, so no manifest field describes it and `cem` records
- * nothing. Two correct declarations in this repository's own `landing.module.css`
- * were called dead on the strength of that silence.
+ * nothing. Two correct declarations in a site's stylesheet were called dead on
+ * the strength of that silence.
  *
  * A `var(--x)` inside the element's own shadow styles is direct evidence that
  * the element reads the property, which is a stronger claim than the manifest

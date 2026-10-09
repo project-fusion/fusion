@@ -1628,7 +1628,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * consumer's own markup, which is the change a React consumer's hydration
    * reports and does not patch up. Assignment writes nothing at all.
    *
-   * Safe against the server because this repo ships no declarative shadow DOM:
+   * Safe against the server because Helix ships no declarative shadow DOM:
    * the shadow root exists only after upgrade, and the assignment below runs in
    * that same update. There is no window in which the shadow is present and the
    * assignment has not happened.

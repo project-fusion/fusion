@@ -10,6 +10,7 @@ pub mod dashes;
 pub mod dialect;
 pub mod documented;
 pub mod links;
+pub mod notes;
 pub mod orphans;
 pub mod references;
 pub mod repository;
@@ -50,6 +51,12 @@ pub fn all() -> Vec<Rule> {
             name: "links",
             run: Runner::Source(links::run),
             summary: "every link into this site names an address the site serves",
+        },
+        Rule {
+            fix: None,
+            name: "notes",
+            run: Runner::Source(notes::run),
+            summary: "no published doc comment names a queue row, a file in this checkout, or this repository",
         },
         Rule {
             fix: None,

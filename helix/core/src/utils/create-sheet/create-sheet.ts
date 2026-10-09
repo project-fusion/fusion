@@ -10,7 +10,7 @@ import { type CSSResult, unsafeCSS } from 'lit'
  *
  * The `unsafe` in `unsafeCSS` warns about interpolating untrusted input into a
  * stylesheet. That is not what happens here: the argument is a build-time
- * constant read from a file in this repo, never a runtime value. Wrapping it
+ * constant read from a file in the package, never a runtime value. Wrapping it
  * keeps the warning where it belongs, on `unsafeCSS` itself, and gives one seam
  * to change if constructable stylesheets become the better primitive.
  */
