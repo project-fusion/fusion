@@ -168,6 +168,22 @@ export const readPage = (page, options) =>
           if (ignored(text.parentElement, ignore) || !shown(text.parentElement)) {
             continue
           }
+          /* Words inside a scrolling box below this one are scrolled content,
+             and a line half in view at a scroller's edge is how scrolling
+             looks. */
+          let scrolls = false
+          for (let at = text.parentElement; at && at !== element; at = up(at)) {
+            if (at.nodeType === Node.ELEMENT_NODE) {
+              const { overflowX, overflowY } = getComputedStyle(at)
+              if ([overflowX, overflowY].some((one) => one === 'auto' || one === 'scroll')) {
+                scrolls = true
+                break
+              }
+            }
+          }
+          if (scrolls) {
+            continue
+          }
           for (const rect of rectsOf(text)) {
             const crosses =
               rect.right > left && rect.left < right && rect.bottom > top && rect.top < bottom
@@ -203,41 +219,111 @@ export const readPage = (page, options) =>
 
     /* **Overlap: two boxes that draw over each other with nothing saying
        they should.** Text is judged by its words' own boxes and a control by
-       its border box. A pair where one holds the other is a layout, not an
-       overlap. Either one being placed on purpose is a stacking reason, and
-       the pair is left alone: positioned absolutely, fixed or sticky, given a
-       `z-index`, transformed, floated or in the top layer, itself or any box
-       between it and what holds both. What is left is two boxes in the flow
-       that collide, which is a word running into its neighbor. */
+       its border box. A pair where one holds the other is a layout. Either
+       one being placed on purpose is a stacking reason, and the pair is left
+       alone: positioned absolutely, fixed or sticky, given a `z-index`,
+       transformed, floated or in the top layer, itself or any box between it
+       and what holds both, or put by a grid in the cell the other is in. What
+       is left is two boxes in the flow that collide, which is a word running
+       into its neighbor. */
     if (options.overlap) {
       const { ignore } = options.overlap
       const CONTROL =
         'a[href], button, input:not([type="hidden"]), select, textarea, summary, [role="button"], [role="link"], [role="checkbox"], [role="radio"], [role="switch"], [role="tab"], [role="menuitem"], [role="option"], [role="slider"], [tabindex]:not([tabindex="-1"])'
+      /* **What is in view of a box, not all of it.** A line scrolled out of
+         a list, or past a box that clips, draws nothing where its rectangle
+         says, so each rectangle is cut to the client box of every ancestor
+         that does not let its content overflow. */
+      const views = new Map()
+      const viewOf = (element) => {
+        if (!views.has(element)) {
+          let view = { bottom: Infinity, left: -Infinity, right: Infinity, top: -Infinity }
+          for (let at = up(element); at; at = up(at)) {
+            if (at.nodeType !== Node.ELEMENT_NODE) {
+              continue
+            }
+            const style = getComputedStyle(at)
+            const clipsX = style.overflowX !== 'visible'
+            const clipsY = style.overflowY !== 'visible'
+            if (clipsX || clipsY) {
+              const box = at.getBoundingClientRect()
+              const left = box.left + at.clientLeft
+              const top = box.top + at.clientTop
+              view = {
+                bottom: clipsY ? Math.min(view.bottom, top + at.clientHeight) : view.bottom,
+                left: clipsX ? Math.max(view.left, left) : view.left,
+                right: clipsX ? Math.min(view.right, left + at.clientWidth) : view.right,
+                top: clipsY ? Math.max(view.top, top) : view.top,
+              }
+            }
+          }
+          views.set(element, view)
+        }
+        return views.get(element)
+      }
+      const inView = (element, rects) => {
+        const view = viewOf(element)
+        return rects
+          .map((rect) => {
+            const left = Math.max(rect.left, view.left)
+            const right = Math.min(rect.right, view.right)
+            const top = Math.max(rect.top, view.top)
+            const bottom = Math.min(rect.bottom, view.bottom)
+            return { bottom, height: bottom - top, left, right, top, width: right - left }
+          })
+          .filter((rect) => rect.width > 0 && rect.height > 0)
+      }
       const boxes = []
       for (const element of everything()) {
         if (ignored(element, ignore) || !shown(element)) {
           continue
         }
         if (element.matches(CONTROL)) {
-          boxes.push({ element, rects: [element.getBoundingClientRect()] })
+          const rects = inView(element, [element.getBoundingClientRect()])
+          if (rects.length > 0) {
+            boxes.push({ element, rects })
+          }
           continue
         }
         const own = [...element.childNodes].filter(
           (child) => child.nodeType === Node.TEXT_NODE && child.textContent.trim() !== '',
         )
-        const rects = own.flatMap(rectsOf)
+        /* **The band a line's ink sits in, not its glyph box.** A glyph box
+           runs from the font's ascent to its descent, so the empty space under
+           a large figure's digits reached the label set close below it. A
+           fifth off the top and off the bottom leaves the capitals and the
+           x-height, which is where two lines that collide meet. */
+        const bands = own.flatMap(rectsOf).map((rect) => {
+          const trim = rect.height / 5
+          return {
+            bottom: rect.bottom - trim,
+            height: rect.height - 2 * trim,
+            left: rect.left,
+            right: rect.right,
+            top: rect.top + trim,
+          }
+        })
+        const rects = inView(element, bands)
         if (rects.length > 0) {
           boxes.push({ element, rects })
         }
       }
       const placed = new Map()
+      /* A flex or grid item stacks by `z-index` with no `position`. */
+      const laidOut = (node) => {
+        const parent = up(node)
+        return (
+          parent?.nodeType === Node.ELEMENT_NODE &&
+          /flex|grid/.test(getComputedStyle(parent).display)
+        )
+      }
       const onPurpose = (node) => {
         if (!placed.has(node)) {
           const style = getComputedStyle(node)
           placed.set(
             node,
             ['absolute', 'fixed', 'sticky'].includes(style.position) ||
-              (style.position !== 'static' && style.zIndex !== 'auto') ||
+              (style.zIndex !== 'auto' && (style.position !== 'static' || laidOut(node))) ||
               style.transform !== 'none' ||
               style.translate !== 'none' ||
               style.float !== 'none' ||
@@ -252,6 +338,7 @@ export const readPage = (page, options) =>
           line.add(at)
         }
         let shared = null
+        let fromB = null
         for (let at = b; at; at = up(at)) {
           if (line.has(at)) {
             shared = at
@@ -260,9 +347,31 @@ export const readPage = (page, options) =>
           if (at.nodeType === Node.ELEMENT_NODE && onPurpose(at)) {
             return true
           }
+          fromB = at
         }
+        let fromA = null
         for (let at = a; at && at !== shared; at = up(at)) {
           if (at.nodeType === Node.ELEMENT_NODE && onPurpose(at)) {
+            return true
+          }
+          fromA = at
+        }
+        /* Two items a grid puts in one cell are stacked by its author, as a
+           range slider's two inputs are. */
+        if (
+          shared?.nodeType === Node.ELEMENT_NODE &&
+          fromA?.nodeType === Node.ELEMENT_NODE &&
+          fromB?.nodeType === Node.ELEMENT_NODE &&
+          /grid/.test(getComputedStyle(shared).display)
+        ) {
+          const one = getComputedStyle(fromA)
+          const other = getComputedStyle(fromB)
+          if (
+            one.gridRowStart !== 'auto' &&
+            one.gridColumnStart !== 'auto' &&
+            one.gridRowStart === other.gridRowStart &&
+            one.gridColumnStart === other.gridColumnStart
+          ) {
             return true
           }
         }
@@ -281,11 +390,10 @@ export const readPage = (page, options) =>
             for (const other of b.rects) {
               const width = Math.min(one.right, other.right) - Math.max(one.left, other.left)
               const height = Math.min(one.bottom, other.bottom) - Math.max(one.top, other.top)
-              /* More than a quarter of the shorter box's height, so lines of
-                 text set tight, whose glyph boxes touch by a pixel or two, are
-                 not a collision. */
-              const shorter = Math.min(one.height, other.height)
-              if (width > 2 && height > Math.max(2, shorter / 4)) {
+              /* More than a pixel each way: ink bands do not meet even in
+                 lines set at a line height of 0.9, and a pixel is two borders
+                 drawn as one, as a button group does. */
+              if (width > 2 && height > 1) {
                 if (worst === null || width * height > worst.width * worst.height) {
                   worst = { height, width }
                 }
