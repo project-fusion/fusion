@@ -37,6 +37,9 @@ export interface SurfaceField {
   depths: number[]
   /** How many cells hold a reading. */
   readings: number
+  /** The lowest and the highest reading, which every level is measured between. */
+  lowest: number
+  highest: number
 }
 
 /**
@@ -89,6 +92,8 @@ export const surfaceOf = (rows: readonly FieldRow[], columns: readonly number[])
     },
     cells,
     depths,
+    highest: read.length > 0 ? Math.max(...read.map((one) => one.value)) : 0,
+    lowest: read.length > 0 ? Math.min(...read.map((one) => one.value)) : 0,
     readings: read.length,
   }
 }
@@ -98,7 +103,9 @@ export const levelOf = (field: SurfaceField, cell: SurfaceCell): number | undefi
   if (cell.value === undefined) {
     return undefined
   }
-  const values = field.cells.flatMap((one) => (one.value === undefined ? [] : [one.value]))
-  const [low, high] = [Math.min(...values), Math.max(...values)]
+  /* **Between the field's own lowest and highest**, read once with the grid:
+     scanning every reading for each corner made a surface of a few thousand
+     readings take a second to turn. */
+  const { highest: high, lowest: low } = field
   return high === low ? 0.5 : (cell.value - low) / (high - low)
 }

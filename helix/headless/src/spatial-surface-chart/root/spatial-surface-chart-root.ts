@@ -214,8 +214,8 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
   @state()
   private place: { x: number; y: number } | undefined
 
-  /** The field last read, kept so a change of it can be told. */
-  private last = ''
+  /** The field last told, kept so a change of it can be told. */
+  private last: SurfaceField | undefined
 
   /** The place the keys rested on last, so a change of it can be told. */
   private told = -1
@@ -231,8 +231,18 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
    * renderer reads it.
    */
   get field(): SurfaceField {
-    return surfaceOf(this.sourceRows, this.plottedColumns)
+    /* Read once for each table, which every render, key, and pointer asks
+       for: read afresh each time, a surface of a few thousand readings spent
+       most of a turn reading its table. */
+    const rows = this.sourceRows
+    if (this.memo?.rows !== rows) {
+      this.memo = { field: surfaceOf(rows, this.plottedColumns), rows }
+    }
+    return this.memo.field
   }
+
+  /** The field last read, and the rows it was read from. */
+  private memo: { field: SurfaceField; rows: unknown } | undefined
 
   /** The place the keys or the pointer rest on, as its place in `field.cells`, or `-1`. */
   get active(): number {
@@ -302,8 +312,9 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    /* Told only on a change, so a renderer draws again only when it must. */
-    const field = JSON.stringify(this.field)
+    /* Told only on a change, so a renderer draws again only when it must:
+       the field is read once for each table, so a new one is a change. */
+    const field = this.field
     if (field !== this.last) {
       this.last = field
       this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'data' }))
