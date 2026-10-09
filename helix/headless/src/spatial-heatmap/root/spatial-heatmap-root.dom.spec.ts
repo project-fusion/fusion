@@ -147,6 +147,40 @@ describe('the drawing', () => {
   })
 })
 
+describe('the base and the corners', () => {
+  test('the prisms stand on a slab, hidden from a reader and painted first', async () => {
+    const element = await relief('rows="2"', [
+      ['Mon', 3],
+      ['Tue', 1],
+      ['Wed', 2],
+    ])
+    const base = part(element, 'base')
+    expect(base?.getAttribute('aria-hidden')).toBe('true')
+    expect(part(element, 'drawing')?.firstElementChild).toBe(base)
+    expect(
+      ['base-left', 'base-right', 'base-top'].map((name) => part(element, name)?.localName),
+    ).toEqual(['path', 'path', 'path'])
+  })
+
+  test('the footer says where the front edge starts and ends, as shares of the width', async () => {
+    const element = await relief('rows="2"', [
+      ['Mon', 3],
+      ['Tue', 1],
+      ['Wed', 2],
+    ])
+    const style = part(element, 'footer')?.getAttribute('style') ?? ''
+    const read = (name: string): number =>
+      Number(new RegExp(`--spatial-heatmap-${name}: ([\\d.]+)`).exec(style)?.[1] ?? Number.NaN)
+    /* Two columns of two rows: the left corner stands partway down, the
+       bottom corner partway across, and the drawing is less tall than wide. */
+    expect(read('start-y')).toBeGreaterThan(0)
+    expect(read('start-y')).toBeLessThan(read('depth'))
+    expect(read('end-x')).toBeGreaterThan(0)
+    expect(read('end-x')).toBeLessThan(1)
+    expect(read('depth')).toBeGreaterThan(0)
+  })
+})
+
 describe('the width', () => {
   /**
    * **A strip at 30 degrees spends its rows across the page too.** At the

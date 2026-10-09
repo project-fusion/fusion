@@ -33,16 +33,30 @@ helix-headless-spatial-heatmap::part(drawing) {
   overflow: visible;
 }
 
+/* Each side is the face's tone a step less light, and the slab is a step
+   darker than an empty tile. */
 helix-headless-spatial-heatmap::part(top-face) {
   fill: var(--heatmap-tone, var(--_gray-subtle));
 }
 
 helix-headless-spatial-heatmap::part(left-face) {
-  fill: color-mix(in oklab, var(--heatmap-tone, var(--_gray-subtle)), black 22%);
+  fill: oklch(from var(--heatmap-tone, var(--_gray-subtle)) calc(l - 0.07) c h);
 }
 
 helix-headless-spatial-heatmap::part(right-face) {
-  fill: color-mix(in oklab, var(--heatmap-tone, var(--_gray-subtle)), black 38%);
+  fill: oklch(from var(--heatmap-tone, var(--_gray-subtle)) calc(l - 0.14) c h);
+}
+
+helix-headless-spatial-heatmap::part(base-top) {
+  fill: var(--_gray-fill);
+}
+
+helix-headless-spatial-heatmap::part(base-left) {
+  fill: oklch(from var(--_gray-fill) calc(l - 0.07) c h);
+}
+
+helix-headless-spatial-heatmap::part(base-right) {
+  fill: oklch(from var(--_gray-fill) calc(l - 0.14) c h);
 }
 
 helix-headless-spatial-heatmap::part(cell-active) {
@@ -63,16 +77,31 @@ helix-headless-spatial-heatmap::part(tooltip-anchor) {
   position: absolute;
 }
 
+/* The first and last labels stand at the ends of the front edge, where the
+   component writes them on the footer, as shares of the drawing's width. */
 helix-headless-spatial-heatmap::part(footer) {
   color: var(--_gray-muted);
-  display: grid;
   font-size: 0.75rem;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  padding-block-start: 0.5rem;
+  min-block-size: 1lh;
+  position: relative;
+}
+
+helix-headless-spatial-heatmap::part(start) {
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  margin-block-start: calc(
+    (var(--spatial-heatmap-start-y) - var(--spatial-heatmap-depth)) *
+    100% +
+    1lh
+  );
+  position: absolute;
 }
 
 helix-headless-spatial-heatmap::part(end) {
-  text-align: end;
+  inset-block-start: 0;
+  inset-inline-start: calc(var(--spatial-heatmap-end-x) * 100%);
+  position: absolute;
+  translate: -50% 0;
 }
 
 helix-headless-spatial-heatmap::part(live),
