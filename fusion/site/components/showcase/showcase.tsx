@@ -644,6 +644,7 @@ export function Showcase(): React.ReactElement {
               </table>
               <helix-spatial-scatter-chart
                 class={styles.showcaseSpatial}
+                drop-lines
                 for="showcase-customers"
                 group-by="Segment"
                 label="Customers by age, yearly spend, and visits a month"
