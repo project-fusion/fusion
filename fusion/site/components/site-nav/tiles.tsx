@@ -1,4 +1,3 @@
-import { Art } from '@fusion.dev/helix-gallery'
 import type { CSSProperties, ReactNode } from 'react'
 
 /**
@@ -15,7 +14,47 @@ import type { CSSProperties, ReactNode } from 'react'
  * In the site and not in the gallery, because the gallery is one drawing per
  * family and `fusion x prose` holds that list equal to the catalog in both
  * directions. A picture of a page on this site is this site's content.
+ *
+ * **One brand mark in each, and the rest is ink.** The gallery is monotone
+ * because color there only ever said "this one is emphasized". A tile is a
+ * product shot, and a product shot of a design system themed from your brand
+ * color shows the color: on the one control that takes it, the route the map
+ * draws in it, the note that is selected, and the ramp the theme builder
+ * computes from it. The marks are the primary tokens, through the `artBrand*`
+ * classes in `site-nav.module.css`.
  */
+
+/**
+ * The frame: the `<svg>`, the shadow filter the lifted button needs, and the
+ * `artBody` wrapper the gallery's motion rules move.
+ *
+ * The gallery's frame is 320 by 200 with the subject inside 48 to 272 and 36
+ * to 164, and it draws a dot lattice behind the subject. On a card both are
+ * right. On a tile the margins made each subject small and the dots read as
+ * noise at the size, so the crop is tighter and the lattice is gone: 16 units
+ * either side of the subject and 8 above and below, which is 16 by 9. The
+ * filter has to be in the same document fragment as the shape referencing it,
+ * so each tile carries its own, as each gallery card does.
+ */
+function Frame({ children }: { children: ReactNode }) {
+  return (
+    <svg aria-hidden="true" className="componentArt" viewBox="32 28 256 144">
+      <defs>
+        <filter
+          className="artShadow"
+          height="200%"
+          id="helixArtShadow"
+          width="200%"
+          x="-50%"
+          y="-50%"
+        >
+          <feDropShadow dx="0" dy="4" stdDeviation="5" />
+        </filter>
+      </defs>
+      <g className="artBody">{children}</g>
+    </svg>
+  )
+}
 
 /**
  * The component catalog: six controls at the compact density, in the grid
@@ -26,10 +65,11 @@ import type { CSSProperties, ReactNode } from 'react'
 const componentsArt: ReactNode = (
   <>
     {[
-      /* A button. */
+      /* A button, and the one mark here in the brand: the primary button is
+         the control that takes the color. */
       <g key="button">
-        <rect className="artSolid" height="24" rx="4" width="44" x="60" y="52" />
-        <rect className="artOnSolid" height="6" rx="3" width="20" x="72" y="61" />
+        <rect className="artBrand" height="24" rx="4" width="44" x="60" y="52" />
+        <rect className="artOnBrand" height="6" rx="3" width="20" x="72" y="61" />
       </g>,
       /* A switch, on. */
       <g key="switch">
@@ -112,6 +152,9 @@ const sandboxArt: ReactNode = (
     <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="72" x="56" y="100" />
     <rect className="artInk" fillOpacity="0.28" height="8" rx="4" width="48" x="72" y="120" />
     <rect className="artRule" height="120" width="1" x="160" y="40" />
+    {/* Ink, and not the brand: the sandbox is a tool, and the one themed
+        control beside it in the band already says what a themed control
+        looks like. */}
     <g className="artMotion artLift">
       <g className="artLiftShadow" filter="url(#helixArtShadow)">
         <rect className="artSolid" height="40" rx="4" width="80" x="184" y="80" />
@@ -134,16 +177,20 @@ const sandboxArt: ReactNode = (
  */
 const themeArt: ReactNode = (
   <>
-    <rect className="artSolid" height="40" rx="8" width="40" x="48" y="44" />
+    <rect className="artBrand" height="40" rx="8" width="40" x="48" y="44" />
     <rect className="artInk" fillOpacity="0.55" height="8" rx="4" width="56" x="104" y="60" />
-    {/* Edges on the three steps that would otherwise have no silhouette
-        against the band, and none on the ones that carry their own. */}
+    {/* The ramp the builder computes: from the page's ground through the
+        primary's subtle and muted tints to the primary itself, then the two
+        darks, and the order holds in both modes, each step being the token
+        that sits there in its own mode. Edges on the two steps that would
+        otherwise have no silhouette against the band, and none on the ones
+        that carry their own. */}
     {[
+      { className: 'artPage', edge: true },
       { className: 'artSunken', edge: true },
-      { className: 'artSurface', edge: true },
-      { className: 'artRaised', edge: true },
-      { className: 'artInk', edge: false, opacity: 0.12 },
-      { className: 'artInk', edge: false, opacity: 0.28 },
+      { className: 'artBrandSubtle', edge: false },
+      { className: 'artBrandMuted', edge: false },
+      { className: 'artBrand', edge: false },
       { className: 'artInk', edge: false, opacity: 0.55 },
       { className: 'artSolid', edge: false },
     ].map((step, index) => (
@@ -190,12 +237,8 @@ const mapArt: ReactNode = (
       <path d="M116 36v128" />
       <path d="M204 36v128" />
     </g>
-    <path
-      className="artStroke"
-      d="M48 138c36-6 54 12 84 5s48-24 76-17"
-      strokeOpacity="0.28"
-      strokeWidth="7"
-    />
+    {/* The route, which is what a map themed from your brand draws in it. */}
+    <path className="artBrandStroke" d="M48 138c36-6 54 12 84 5s48-24 76-17" strokeWidth="7" />
     <g className="artMotion artOpen">
       {[
         { d: 'M220 57v-6m-3 3 3-3 3 3', x: 212, y: 46 },
@@ -260,7 +303,7 @@ const graphArt: ReactNode = (
       <circle cx="150" cy="128" r="5" />
       <circle cx="82" cy="134" r="5" />
     </g>
-    <circle className="artSolid" cx="114" cy="98" r="7" />
+    <circle className="artBrand" cx="114" cy="98" r="7" />
     <rect className="artEdge" height="15" rx="4" width="63" x="198.5" y="46.5" />
     <rect className="artInk" fillOpacity="0.12" height="4" rx="2" width="28" x="204" y="52" />
     <rect className="artInk" fillOpacity="0.12" height="16" rx="4" width="64" x="198" y="70" />
@@ -287,5 +330,5 @@ const pictures: Record<string, ReactNode> = {
  */
 export function Picture({ name }: { name: string }) {
   const body = pictures[name]
-  return body ? <Art>{body}</Art> : null
+  return body ? <Frame>{body}</Frame> : null
 }
