@@ -846,7 +846,7 @@ jobs:
             echo "No visual shard left a report, so there is nothing to merge." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          bun helix/cli/npm/bin.mjs visual report --merge "${reports[@]}" --changed "$BASE" --markdown >> "$GITHUB_STEP_SUMMARY"
+          bun helix/cli/npm/bin.mjs visual report --merge "${reports[@]}" --changed "$BASE" --markdown | tee -a "$GITHUB_STEP_SUMMARY"
 
   # **The site's pages, pictured by `helix visual`'s own GitHub Action.** Five
   # pages at 1440 and 390 light and 1440 dark, from `next start` over the build
