@@ -7,7 +7,10 @@ import {
   PointsMaterial,
   Vector3,
 } from 'three'
-import type { Field, Scatter3dDriver } from '../connect-scatter-3d/connect-scatter-3d.js'
+import type {
+  Field,
+  SpatialScatterChartDriver,
+} from '../connect-spatial-scatter-chart/connect-spatial-scatter-chart.js'
 import { createStage, inBox, tickText } from './stage.js'
 
 /** How the three.js scatter driver behaves where the page does not say. */
@@ -38,15 +41,15 @@ const dot = (): CanvasTexture => {
 }
 
 /**
- * Draws a 3D Scatter chart's points in three dimensions with three.js. Pass
- * it to `connectScatter3d` with the element to draw in, which the chart
+ * Draws a Spatial Scatter Chart's points in three dimensions with three.js. Pass
+ * it to `connectSpatialScatterChart` with the element to draw in, which the chart
  * holds in its plot:
  *
  * ```js
- * import { connectScatter3d } from '@fusion.dev/helix-plot'
+ * import { connectSpatialScatterChart } from '@fusion.dev/helix-plot'
  * import { threeScatterDriver } from '@fusion.dev/helix-plot/three'
  *
- * connectScatter3d(chart, threeScatterDriver(chart.querySelector('div')))
+ * connectSpatialScatterChart(chart, threeScatterDriver(chart.querySelector('div')))
  * ```
  *
  * **The points stand in a box**, each axis' range from one side of it to the
@@ -63,7 +66,7 @@ const dot = (): CanvasTexture => {
 export const threeScatterDriver = (
   container: HTMLElement,
   options: ThreeScatterDriverOptions = {},
-): Scatter3dDriver => {
+): SpatialScatterChartDriver => {
   let field: Field | undefined
   let active = -1
   let hovered = -1

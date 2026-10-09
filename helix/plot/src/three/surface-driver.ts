@@ -11,7 +11,10 @@ import {
   MeshLambertMaterial,
   Vector3,
 } from 'three'
-import type { Surface3dDriver, SurfaceField } from '../connect-surface-3d/connect-surface-3d.js'
+import type {
+  SpatialSurfaceChartDriver,
+  SurfaceField,
+} from '../connect-spatial-surface-chart/connect-spatial-surface-chart.js'
 import { createStage, HALF, inBox, tickText } from './stage.js'
 
 /** How the three.js surface driver behaves where the page does not say. */
@@ -26,21 +29,21 @@ export interface ThreeSurfaceDriverOptions {
 }
 
 /**
- * Draws a 3D Surface chart's grid as a surface in three dimensions with
- * three.js. Pass it to `connectSurface3d` with the element to draw in, which
+ * Draws a Spatial Surface Chart's grid as a surface in three dimensions with
+ * three.js. Pass it to `connectSpatialSurfaceChart` with the element to draw in, which
  * the chart holds in its plot:
  *
  * ```js
- * import { connectSurface3d } from '@fusion.dev/helix-plot'
+ * import { connectSpatialSurfaceChart } from '@fusion.dev/helix-plot'
  * import { threeSurfaceDriver } from '@fusion.dev/helix-plot/three'
  *
- * connectSurface3d(chart, threeSurfaceDriver(chart.querySelector('div')))
+ * connectSpatialSurfaceChart(chart, threeSurfaceDriver(chart.querySelector('div')))
  * ```
  *
  * **Each reading is a corner of the surface**, at its place across and in
  * depth and as high as its reading, in a box with a grid on its floor and
  * two of its walls. The surface is shaded along the ramp from
- * `--surface-3d-low` to `--surface-3d-high`, lit from above, and ruled along
+ * `--spatial-surface-chart-low` to `--spatial-surface-chart-high`, lit from above, and ruled along
  * the grid. A place the table has no reading for leaves a hole rather than a
  * pit.
  *
@@ -54,7 +57,7 @@ export interface ThreeSurfaceDriverOptions {
 export const threeSurfaceDriver = (
   container: HTMLElement,
   options: ThreeSurfaceDriverOptions = {},
-): Surface3dDriver => {
+): SpatialSurfaceChartDriver => {
   let field: SurfaceField | undefined
   let active = -1
   let hovered = -1

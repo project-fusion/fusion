@@ -12,11 +12,11 @@ Helix has these chart families, and each one has its own API page:
 - `Line Chart`
 - `Area Chart`
 - `Scatter Chart`
-- `Scatter 3D`, drawn in three dimensions by `@fusion.dev/helix-plot`
-- `Surface 3D`, drawn in three dimensions by `@fusion.dev/helix-plot`
+- `Spatial Scatter Chart`, drawn in three dimensions by `@fusion.dev/helix-plot`
+- `Spatial Surface Chart`, drawn in three dimensions by `@fusion.dev/helix-plot`
 - `Donut Chart`
 - `Heatmap`
-- `Isometric Heatmap`
+- `Spatial Heatmap`
 - `Sparkline`
 - `Trend`
 - `Legend`, which all of the charts share
@@ -44,13 +44,13 @@ Choose a chart by the question it answers.
   3D`, with one point per row in a box you can turn. Use it for data that has
   three dimensions, such as clusters or embeddings. Its table and its flat
   scatter carry the exact values.
-- **How one measure rises and falls over two others.** `Surface 3D`, with one
+- **How one measure rises and falls over two others.** `Spatial Surface Chart`, with one
   row per place on a grid, drawn as a surface you can turn. Use it for a measure
   over two ranges, such as load by hour and by day. Its table carries the exact
   values, and its flat grid shades each place by its height.
 - **How each day or check went.** `Heatmap`, for uptime, contributions, or
   activity.
-- **The same days, as a relief.** `Isometric Heatmap` reads the same table as
+- **The same days, as a relief.** `Spatial Heatmap` reads the same table as
   `Heatmap` and draws each reading as a prism as tall as its value. Use it where
   the overall shape matters more than any one exact value, such as a busy
   stretch in a year of commits. The tooltip and the table carry the exact

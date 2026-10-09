@@ -1,0 +1,70 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+}
+
+/* The table is the chart's reading, for screen readers, and a page with no
+   Helix stylesheet hides it itself: \`data-hidden-visually\` is a Helix rule. */
+[data-hidden-visually] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+helix-headless-spatial-scatter-chart {
+  display: block;
+
+  --chart-series-1: var(--_gray-strong);
+  --chart-series-2: var(--_gray-mark);
+  --chart-series-3: var(--_gray-line);
+}
+
+helix-headless-spatial-scatter-chart::part(plot) {
+  background-color: var(--_gray-subtle);
+  block-size: 20rem;
+  border-radius: 0.5rem;
+  position: relative;
+}
+
+helix-headless-spatial-scatter-chart::part(plot):focus-visible {
+  outline: 2px solid var(--_gray-mark);
+  outline-offset: 2px;
+}
+
+helix-headless-spatial-scatter-chart::part(fallback) {
+  inset: 1.5rem;
+  position: absolute;
+}
+
+helix-headless-spatial-scatter-chart::part(point) {
+  background-color: var(--chart-series);
+  block-size: 0.5rem;
+  border-radius: 50%;
+  inline-size: 0.5rem;
+  position: absolute;
+  translate: -50% -50%;
+}
+
+helix-headless-spatial-scatter-chart::part(point-active) {
+  outline: 2px solid var(--_gray-strong);
+  outline-offset: 2px;
+}
+
+helix-headless-spatial-scatter-chart::part(live),
+helix-headless-spatial-scatter-chart::part(summary) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: 0;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}

@@ -64,7 +64,7 @@ export type RuntimeKind =
   | 'negative-value'
   /** A Graph connector was handed an element that is no Graph frame. */
   | 'not-a-graph'
-  /** A 3D Scatter connector was handed an element that is no 3D Scatter chart. */
+  /** A plot connector was handed an element that is not the spatial chart it connects. */
   | 'not-a-plot'
   /** The browser refused picture in picture. */
   | 'picture-in-picture-refused'

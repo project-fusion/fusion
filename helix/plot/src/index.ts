@@ -7,16 +7,16 @@ export {
   plotColorsFrom,
 } from './connect-plot/connect-plot.js'
 export {
-  connectScatter3d,
+  connectSpatialScatterChart,
   type Field,
   type Point,
-  type Scatter3dConnection,
-  type Scatter3dDriver,
-} from './connect-scatter-3d/connect-scatter-3d.js'
+  type SpatialScatterChartConnection,
+  type SpatialScatterChartDriver,
+} from './connect-spatial-scatter-chart/connect-spatial-scatter-chart.js'
 export {
-  connectSurface3d,
-  type Surface3dConnection,
-  type Surface3dDriver,
+  connectSpatialSurfaceChart,
+  type SpatialSurfaceChartConnection,
+  type SpatialSurfaceChartDriver,
   type SurfaceCell,
   type SurfaceField,
-} from './connect-surface-3d/connect-surface-3d.js'
+} from './connect-spatial-surface-chart/connect-spatial-surface-chart.js'
