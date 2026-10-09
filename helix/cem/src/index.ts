@@ -104,9 +104,7 @@ const skillOf = (pages: string[], cwd: string, version: string): string => {
   const sections = pages.map((page) => {
     const text = readFileSync(resolve(cwd, page), 'utf8')
     const body = text.replace(/^---\n[\s\S]*?\n---\n/, '').trim()
-    return body
-      .replace(/^(#{1,5}) /gm, '#$1 ')
-      .replace(/\]\(\.\/([a-z0-9-]+)\)/g, `](${DOCS}/$1)`)
+    return body.replace(/^(#{1,5}) /gm, '#$1 ').replace(/\]\(\.\/([a-z0-9-]+)\)/g, `](${DOCS}/$1)`)
   })
   return [
     '---',
