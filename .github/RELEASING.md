@@ -119,9 +119,9 @@ set of platform packages. `binaries.yml` takes the domain as an input and builds
 the `fusion-<domain>-cli` crate.
 
 **`@fusion.dev/locus` is retired.** The visual tests published as their own
-command, `locus`, at 0.1.0 before they moved under Helix. That version and its
-five platform packages stay on the registry, deprecated with a message naming
-`helix visual`, and nothing here publishes them again.
+command, `locus`, at 0.1.0 before they moved under Helix. They were never
+public, so that version, its five platform packages, and its tags were removed
+on October 9, 2026, and nothing here publishes them again.
 
 **Built before the release computes its number, from the same tags.**
 `binaries.yml` builds each platform, the release computes the number,
