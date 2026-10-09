@@ -174,6 +174,23 @@ runs in, or the file `--config <path>` names, and refuses a setting that names
 nothing, as the page does. It exits 1 on a finding at `error`, and 3 where the
 project installs no Helix lint data. `--json` prints the run.
 
+## Run it on a page, from the command line
+
+`helix diagnostics --once <url>` opens the page headless, runs this package's
+diagnostics in it once the page holds still, prints each finding and what the
+library logged as it ran, and exits. Nothing is added to your app: the
+command serves the installed package on the page's own origin. Repeat
+`--once` for each page.
+
+```sh
+npx helix diagnostics --once http://localhost:5173/ --once http://localhost:5173/settings
+```
+
+It needs `@fusion.dev/helix-cli` and Playwright installed beside this package.
+It exits 1 on a finding at `error`, and 3 where a page could not be opened.
+`--out` writes the runs to the CI file, and `--json` prints one document a
+page. An agent gets the same runs from the MCP tool `helix_check_page`.
+
 ## Run it once, directly
 
 `diagnose()` is one run, which `initDiagnostics()` makes for you. Call it

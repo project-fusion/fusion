@@ -58,7 +58,8 @@ pub const INSTRUCTIONS: &str = "Helix is a library of web components. These tool
 - In React, use each event's `reactProp` exactly, such as onhelix-before-change.\n\
 - Style with the tokens helix_tokens lists, then a component's custom properties, then its parts. Never read a --_helix- primitive.\n\
 - For a theme, call helix_audit_theme with the brand color, then helix_derive_theme.\n\
-- After writing, call helix_check with the files you changed, or with a snippet before you write it, and fix every finding.";
+- After writing, call helix_check with the files you changed, or with a snippet before you write it, and fix every finding.\n\
+- With the page running, call helix_check_page with its address, and fix every finding.";
 
 /// Serves until the client closes the pipe.
 ///

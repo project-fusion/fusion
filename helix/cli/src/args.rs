@@ -171,6 +171,16 @@ pub struct Diagnostics {
     /// in the directory it runs in.
     #[arg(long, value_name = "PATH")]
     pub config: Option<PathBuf>,
+
+    /// Open this page headless, diagnose it once, print what it found, and
+    /// exit, instead of listening. Repeat for each page.
+    ///
+    /// Needs nothing added to the app: the installed
+    /// `@fusion.dev/helix-diagnostics` runs in the page once it holds still,
+    /// with Playwright, as `helix visual` does. Exits 1 on a finding at
+    /// `error`.
+    #[arg(long, value_name = "URL")]
+    pub once: Vec<String>,
 }
 
 /// What `helix scan` takes.

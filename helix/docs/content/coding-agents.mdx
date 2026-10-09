@@ -154,7 +154,7 @@ the file your client reads and keeps every other server in it:
 | `vscode` | `.vscode/mcp.json` |
 
 The server runs `npx @fusion.dev/helix-cli mcp`, which is the copy in your
-project. It has eight tools:
+project. It has nine tools:
 
 | Tool | What it returns |
 |---|---|
@@ -164,6 +164,7 @@ project. It has eight tools:
 | `helix_imports` | The import lines for a list of tags, and the closest tag to any unknown one |
 | `helix_tokens` | The semantic tokens, by a word in the name or description and by category |
 | `helix_check` | The findings `helix scan` reports for the files you name, or for a snippet before you write it |
+| `helix_check_page` | The findings the page diagnostics report for each address you name, opened headless, with what the library logged as the page ran |
 | `helix_audit_theme` | Every foreground and background pair a brand color derives to, with its ratio and target |
 | `helix_derive_theme` | The theme's CSS |
 
