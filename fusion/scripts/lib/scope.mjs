@@ -43,8 +43,8 @@ const GLOBAL = [
  * shards by the scope the check will compute and not by a copy of it.
  */
 export const OWN = {
-  dsd: ['fusion/scripts/check-dsd.mjs', 'fusion/scripts/render-server.mjs'],
-  parity: ['fusion/scripts/check-visual-parity.mjs'],
+  dsd: ['visual.dsd.config.ts', 'fusion/scripts/render-server.mjs'],
+  parity: ['visual.parity.config.ts'],
 }
 
 const FAMILY_PATH = /^helix\/(?:headless|styled)\/src\/([^/]+)\//

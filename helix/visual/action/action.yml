@@ -44,9 +44,10 @@ inputs:
     description: '`check` to compare, or `retake` to write the baselines and open a pull request.'
     required: true
   paths:
-    description: What a retake commits, as git pathspecs, where `*` crosses directories. Every picture and every fingerprint at its default name unless you set it. Ignored files stay out.
+    description: What a retake commits, as git pathspecs, where `*` crosses directories. Every picture, every accessibility snapshot, and every fingerprint at its default name unless you set it. Ignored files stay out.
     default: |
       *.png
+      *.aria.yml
       *visual.fingerprint.json
   helix:
     description: The command that runs `helix`.

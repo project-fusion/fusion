@@ -18,6 +18,14 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct Config {
+    /// Whether each entry's accessibility snapshot is kept beside its
+    /// baselines, as `<stem>.aria.yml`, and compared as text.
+    #[serde(default)]
+    pub aria: bool,
+    /// Checks run on each entry's page after its first shot, which need no
+    /// baseline.
+    #[serde(default)]
+    pub checks: Checks,
     #[serde(default)]
     pub diff: Diff,
     #[serde(default)]
@@ -130,10 +138,77 @@ fn threshold() -> f64 {
     crate::THRESHOLD
 }
 
+/// The checks a page is read for after its first shot.
+#[derive(Debug, Default, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Checks {
+    /// A code block whose text is drawn in one color: a highlighter that
+    /// failed and left nothing to say so.
+    #[serde(default)]
+    pub code: CodeSetting,
+}
+
+/// `true` or `false`, or where the code blocks are and how long one must be.
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum CodeSetting {
+    Switch(bool),
+    Custom(CodeCheck),
+}
+
+impl Default for CodeSetting {
+    fn default() -> Self {
+        Self::Switch(false)
+    }
+}
+
+impl CodeSetting {
+    pub fn resolved(&self) -> Option<CodeCheck> {
+        match self {
+            Self::Switch(false) => None,
+            Self::Switch(true) => Some(CodeCheck::default()),
+            Self::Custom(check) => Some(check.clone()),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CodeCheck {
+    /// The fewest characters a block holds before it is judged, so a
+    /// one-word sample is not.
+    #[serde(default = "minimum")]
+    pub minimum: usize,
+    /// What a code block is.
+    #[serde(default = "code_selector")]
+    pub selector: String,
+}
+
+impl Default for CodeCheck {
+    fn default() -> Self {
+        Self {
+            minimum: minimum(),
+            selector: code_selector(),
+        }
+    }
+}
+
+fn minimum() -> usize {
+    20
+}
+
+fn code_selector() -> String {
+    "pre code, pre:not(:has(code))".to_string()
+}
+
 /// One exception to the comparison, with the reason it exists.
 #[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Exception {
+    /// A known difference between the two sides of a pair, tolerated however
+    /// large. Spent, and failing the run, once the two match on two takes.
+    #[serde(default)]
+    pub differs: bool,
     /// An entry's id, `styled/aura`, or its name in every source, `aura`.
     pub entry: String,
     /// What was measured to justify it, said beside it in every run.
@@ -266,6 +341,7 @@ fn height() -> u32 {
 pub enum Source {
     Catalog(CatalogSource),
     Html(HtmlSource),
+    Pairs(PairsSource),
     Server(ServerSource),
     Storybook(StorybookSource),
 }
@@ -275,6 +351,7 @@ impl Source {
         match self {
             Self::Catalog(one) => &one.server.name,
             Self::Html(one) => &one.name,
+            Self::Pairs(one) => &one.name,
             Self::Server(one) => &one.server.name,
             Self::Storybook(one) => &one.server.name,
         }
@@ -284,6 +361,7 @@ impl Source {
     pub fn diff(&self) -> Option<&Diff> {
         match self {
             Self::Html(one) => one.diff.as_ref(),
+            Self::Pairs(one) => one.diff.as_ref(),
             _ => self.server().and_then(|server| server.diff.as_ref()),
         }
     }
@@ -292,7 +370,7 @@ impl Source {
     pub fn server(&self) -> Option<&Served> {
         match self {
             Self::Catalog(one) => Some(&one.server),
-            Self::Html(_) => None,
+            Self::Html(_) | Self::Pairs(_) => None,
             Self::Server(one) => Some(&one.server),
             Self::Storybook(one) => Some(&one.server),
         }
@@ -368,6 +446,65 @@ pub struct CatalogSource {
     pub catalog: String,
     #[serde(flatten)]
     pub server: Served,
+}
+
+/// Entries with two sides, compared with each other at every shot and with no
+/// baseline.
+///
+/// **The platform cancels out.** Both sides render on one machine seconds
+/// apart, so a pair runs anywhere, writes nothing to commit, and needs no
+/// fingerprint. React against plain HTML, a server render against a client
+/// render, and a framework wrapper against the element it wraps are each a
+/// pair.
+///
+/// **The config builds the sides**, in `prepare`, which the driver runs and
+/// hands back as data: a bundler, a server renderer or a framework is the
+/// project's to name, and this binary never learns which.
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PairsSource {
+    /// Whether the config gave a `check`, run on each side's page after its
+    /// first shot, whose problems fail the pair.
+    #[serde(default)]
+    pub check: bool,
+    /// Whether the two sides' pictures are compared. Off, a pair is judged by
+    /// its `check`, its errors and its tags alone.
+    #[serde(default = "yes")]
+    pub compare: bool,
+    pub diff: Option<Diff>,
+    #[serde(default)]
+    pub errors: Errors,
+    #[serde(default)]
+    pub harness: HarnessSetting,
+    /// What the two sides are called in a report: `["HTML", "TSX"]`.
+    #[serde(default = "labels")]
+    pub labels: [String; 2],
+    pub name: String,
+    /// Always `true`: the driver says the config gave the function.
+    #[serde(default)]
+    pub prepare: bool,
+}
+
+fn yes() -> bool {
+    true
+}
+
+fn labels() -> [String; 2] {
+    ["a".to_string(), "b".to_string()]
+}
+
+/// Which console errors on a pair's pages fail it.
+#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum Errors {
+    /// An error the second side logs and the first does not, which is what a
+    /// server render that hydrates with a complaint looks like.
+    #[default]
+    New,
+    /// Any error on either side.
+    Any,
+    /// None of them.
+    Ignore,
 }
 
 /// HTML files from a glob, each served from the harness origin inside a
@@ -511,6 +648,14 @@ impl Config {
             }
         }
         for source in &self.sources {
+            if let Source::Pairs(pairs) = source {
+                if !pairs.prepare {
+                    return Err(format!(
+                        "the pairs source `{}` has no `prepare`, the function that builds its pairs",
+                        pairs.name
+                    ));
+                }
+            }
             if let Some(server) = source.server() {
                 if !(server.url.starts_with("http://") || server.url.starts_with("https://")) {
                     return Err(format!(
@@ -581,20 +726,20 @@ impl Config {
                     exception.entry
                 ));
             }
-            match (exception.unstable, exception.pixels) {
-                (true, Some(_)) => {
-                    return Err(format!(
-                        "the exception for `{}` is both unstable and a pixel budget, and an unstable shot is never compared",
-                        exception.entry
-                    ))
-                }
-                (false, None) => {
-                    return Err(format!(
-                        "the exception for `{}` neither marks it unstable nor gives it pixels, so it changes nothing",
-                        exception.entry
-                    ))
-                }
-                _ => {}
+            let kinds = usize::from(exception.unstable)
+                + usize::from(exception.pixels.is_some())
+                + usize::from(exception.differs);
+            if kinds > 1 {
+                return Err(format!(
+                    "the exception for `{}` is more than one of unstable, a pixel budget and a known difference, and it can be one",
+                    exception.entry
+                ));
+            }
+            if kinds == 0 {
+                return Err(format!(
+                    "the exception for `{}` neither marks it unstable, gives it pixels, nor marks a known difference, so it changes nothing",
+                    exception.entry
+                ));
             }
             if let Some(shot) = &exception.shot {
                 if !names.contains(shot.as_str()) {
@@ -699,7 +844,7 @@ mod tests {
             json!([{ "entry": "pages/a", "reason": "moves", "unstable": true, "pixels": 3 }]);
         assert!(Config::parse(value.clone())
             .unwrap_err()
-            .contains("never compared"));
+            .contains("more than one of"));
         value["exceptions"] =
             json!([{ "entry": "pages/a", "reason": "moves", "pixels": 3, "shot": "tall" }]);
         assert!(Config::parse(value)

@@ -11,6 +11,7 @@
  *   stay here, where they run.
  * - `fetch` and `wait` ask a server for a page, or wait for it to answer, so
  *   the binary needs no HTTP of its own.
+ * - `prepare` runs a pairs source's `prepare` and answers with its pairs.
  * - `start` serves the harness origin and launches Chromium.
  * - `capture` pictures entries, answering `shot` for each picture as it is
  *   taken, `item` when an entry is done, and `captured` at the end.
@@ -116,6 +117,8 @@ const state = {
   origins: new Set(),
   /** `/source/name/` to the directory relative requests resolve in, and its renames. */
   pages: new Map(),
+  /** Each pairs source's `prepare` and `check`, by the source's name. */
+  pairs: new Map(),
   /** What `inspect.run` returned for each entry, for `inspect.report`. */
   runs: [],
   serve: [],
@@ -156,7 +159,8 @@ const lookup = (path, document) => {
       if (rest === '') {
         return { html: state.documents.get(document) }
       }
-      return { file: inside(page.dir, page.files[rest] ?? rest) }
+      /* A side with no directory of its own serves nothing beside it. */
+      return { file: page.dir ? inside(page.dir, page.files[rest] ?? rest) : undefined }
     }
     if (at === 0) {
       break
@@ -288,10 +292,54 @@ const within = (seconds, promise, what) => {
   return Promise.race([promise, expired]).finally(() => clearTimeout(timer))
 }
 
+/**
+ * Each code block that draws all of its text in one color, as a sentence.
+ *
+ * **A highlighter that fails leaves nothing to say so.** On October 8, 2026
+ * every code block on Fusion's site lost its colors because two copies of the
+ * highlighting library were installed: the parser tagged tokens with one and
+ * the styles read the other, nothing threw, and the text came out plain. A
+ * block of `minimum` characters or more whose every character resolves to one
+ * color is that fault, and it needs no baseline to see.
+ */
+const codeBlocks = (page, { minimum, selector }) =>
+  page.evaluate(
+    ({ minimum, selector }) => {
+      const found = []
+      for (const block of document.querySelectorAll(selector)) {
+        const colors = new Set()
+        let characters = 0
+        const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT)
+        for (let node = walker.nextNode(); node !== null; node = walker.nextNode()) {
+          const text = node.textContent.replace(/\s+/g, '')
+          if (text === '' || node.parentElement === null) {
+            continue
+          }
+          colors.add(getComputedStyle(node.parentElement).color)
+          characters += text.length
+        }
+        if (characters >= minimum && colors.size === 1) {
+          const sample = block.textContent.trim().replace(/\s+/g, ' ').slice(0, 40)
+          found.push(
+            `a code block draws its ${characters} characters in one color, ${[...colors][0]}: "${sample}"`,
+          )
+        }
+      }
+      return found
+    },
+    { minimum, selector },
+  )
+
 /** One entry, every shot of it from one navigation. */
-const take = async (page, item, { elements, readyProperty }, progress) => {
+const take = async (lane, item, { elements, readyProperty }, progress) => {
+  const { page } = lane
   const started = performance.now()
   let error = null
+  let problems = []
+  let findings = []
+  let aria = null
+  lane.errors.length = 0
+  lane.messages.length = 0
   try {
     for (const [index, shot] of item.shots.entries()) {
       progress.stage = index === 0 ? 'loading the page' : `settling for ${shot.name}`
@@ -356,6 +404,24 @@ const take = async (page, item, { elements, readyProperty }, progress) => {
           result: await state.config.inspect.run({ entry: item.entry, page }),
         })
       }
+      /* The page checks and the accessibility snapshot, on the page that was
+         pictured, after its first picture. */
+      if (index === 0 && item.checks?.code) {
+        progress.stage = 'checking its code blocks'
+        findings = findings.concat(await codeBlocks(page, item.checks.code))
+      }
+      if (index === 0 && item.aria) {
+        progress.stage = 'taking its accessibility snapshot'
+        aria = `${await page.locator('body').ariaSnapshot()}\n`
+      }
+      /* A pair's own check, on each side's page after its first picture. */
+      if (index === 0 && item.check) {
+        progress.stage = 'checking the page'
+        const found = await state.pairs
+          .get(item.check)
+          .check({ console: [...lane.messages], entry: item.entry, page })
+        problems = (Array.isArray(found) ? found : found ? [found] : []).map(String)
+      }
     }
   } catch (caught) {
     error = caught instanceof Error ? caught.message.split('\n')[0] : String(caught)
@@ -367,7 +433,16 @@ const take = async (page, item, { elements, readyProperty }, progress) => {
   console.error(
     `helix: ${item.key}: ${error === null ? `${item.shots.length} ${item.shots.length === 1 ? 'shot' : 'shots'}` : 'failed'} in ${seconds.toFixed(1)} s`,
   )
-  say({ error, key: item.key, op: 'item', seconds })
+  say({
+    aria,
+    error,
+    errors: item.errors ? [...lane.errors] : [],
+    findings,
+    key: item.key,
+    op: 'item',
+    problems,
+    seconds,
+  })
 }
 
 /**
@@ -392,7 +467,7 @@ const bounded = async (lane, item, settle) => {
   const expired = new Promise((done) => {
     timer = setTimeout(() => done(true), limit * 1000)
   })
-  const finished = await Promise.race([take(lane.page, item, settle, progress), expired])
+  const finished = await Promise.race([take(lane, item, settle, progress), expired])
   clearTimeout(timer)
   if (finished !== true) {
     return
@@ -403,7 +478,24 @@ const bounded = async (lane, item, settle) => {
   say({ error: message, key: item.key, op: 'item', seconds: limit })
   const context = lane.page.context()
   await lane.page.close().catch(() => {})
-  lane.page = await context.newPage()
+  lane.page = await listened(lane, await context.newPage())
+}
+
+/**
+ * `page`, with every console message, and the errors and uncaught exceptions
+ * apart, recorded on `lane`, which `take` empties before each entry. A pair
+ * names an error one side logged and the other did not, and a pairs source's
+ * `check` is handed the messages, a warning being something only it can judge.
+ */
+const listened = (lane, page) => {
+  page.on('console', (message) => {
+    lane.messages.push({ text: message.text(), type: message.type() })
+    if (message.type() === 'error') {
+      lane.errors.push(message.text())
+    }
+  })
+  page.on('pageerror', (caught) => lane.errors.push(caught.message))
+  return page
 }
 
 /**
@@ -437,7 +529,9 @@ const lanes = async (count) => {
         return state.origins.has(origin) ? route.continue() : route.abort()
       })
     }
-    state.lanes.push({ page: await context.newPage() })
+    const lane = { errors: [], messages: [] }
+    lane.page = listened(lane, await context.newPage())
+    state.lanes.push(lane)
   }
   return state.lanes.slice(0, count)
 }
@@ -481,9 +575,30 @@ const handlers = {
       )
     }
     state.config = config
+    /* A pairs source's functions stay here and are reported as given. */
+    const sources = (config.sources ?? []).map((source) => {
+      if (source?.kind !== 'pairs') {
+        return source
+      }
+      if (typeof source.prepare !== 'function') {
+        throw new Error(
+          `the pairs source \`${source.name}\` needs \`prepare\`, a function that returns its pairs`,
+        )
+      }
+      if (source.check !== undefined && typeof source.check !== 'function') {
+        throw new Error(
+          `the pairs source \`${source.name}\` gives a \`check\` that is not a function`,
+        )
+      }
+      state.pairs.set(source.name, { check: source.check, prepare: source.prepare })
+      return { ...source, check: source.check !== undefined, prepare: true }
+    })
     const { inspect, ...values } = config
     say({
-      config: { ...JSON.parse(JSON.stringify(values)), inspect: inspect !== undefined },
+      config: {
+        ...JSON.parse(JSON.stringify({ ...values, sources })),
+        inspect: inspect !== undefined,
+      },
       op: 'config',
     })
   },
@@ -550,6 +665,24 @@ const handlers = {
   async finish({ update }) {
     const reported = await state.config.inspect?.report?.(state.runs, { update })
     say({ failed: Boolean(reported?.failed), op: 'finished' })
+  },
+
+  async prepare({ changed, source }) {
+    const pair = state.pairs.get(source)
+    if (pair === undefined) {
+      throw new Error(`no pairs source is called \`${source}\``)
+    }
+    const made = await pair.prepare({ changed: changed ?? undefined })
+    const answer = Array.isArray(made) ? { pairs: made } : (made ?? {})
+    if (!Array.isArray(answer.pairs)) {
+      throw new Error(`\`prepare\` for \`${source}\` returned no \`pairs\` array`)
+    }
+    say({
+      note: answer.note ?? null,
+      op: 'prepared',
+      pairs: answer.pairs,
+      serve: answer.serve ?? {},
+    })
   },
 
   async start({ mask = [], network, origins = [], serve, style = null, workers }) {

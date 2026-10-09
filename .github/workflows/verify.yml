@@ -796,9 +796,9 @@ jobs:
           path: |
             helix/headless/src/*/.examples/preview*.diff.png
             helix/styled/src/*/.examples/preview*.diff.png
-            helix/headless/src/*/.examples/*.parity.png
-            helix/styled/src/*/.examples/*.parity.png
-            .local/dsd/diff/*.png
+            .helix/parity
+            .helix/visual
+            .helix/dsd
             .local/diagnostics/*.json
 
   # **The site's pages, pictured by `helix visual`'s own GitHub Action.** Five

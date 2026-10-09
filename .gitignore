@@ -90,9 +90,11 @@ fusion/site/public/maplibre/
 # The artifact a failed visual comparison leaves behind. What belongs in the
 # history is the baseline a reviewer approved, not the run that disagreed.
 *.diff.png
-*.parity.png
-# The report `helix visual` writes on every run, beside each config.
+# The reports `helix visual` writes on every run, beside each config: the
+# examples', parity's, and hydration's.
 .helix/visual/
+.helix/parity/
+.helix/dsd/
 
 # A second checkout of this repo, so tracking it would track everything twice.
 .claude/worktrees/

@@ -129,8 +129,97 @@ export interface CatalogSource extends Served {
   kind: 'catalog'
 }
 
+/** One side of a pair: a document the harness writes, or a page at an address. */
+export interface Side {
+  /** The markup of the page's body. */
+  body?: string
+  /** The directory relative requests from the page resolve in. Nothing is served beside a side with none. */
+  dir?: string
+  /** Why the side could not be built, such as a server render that threw. The pair fails with it, unpictured. */
+  error?: string
+  /** Relative requests answered by another file in `dir`: `{ 'styles.css': 'preview.css' }`. */
+  files?: Record<string, string>
+  /** Markup placed after the harness style and before the deferred scripts, such as a style of the side's own. */
+  head?: string
+  /** URLs of scripts the page loads, each with `defer`. */
+  scripts?: string[]
+  /** URLs of stylesheets the page links, before the harness style. */
+  styles?: string[]
+  /** A page to load in place of a document, such as a server-rendered route. */
+  url?: string
+}
+
+/** Two sides of one entry, compared with each other. */
+export interface Pair {
+  /** The first side. */
+  a: Side
+  /** The second side. */
+  b: Side
+  /** What the pair is packed into shards and timed by, such as its component family. Its name when not given. */
+  group?: string
+  /** The second half of the pair's id, `<source>/<name>`. May contain `/`. */
+  name: string
+}
+
+/** What a pairs source's `prepare` returns: its pairs, or its pairs with files to serve and a note to print. */
+export type Prepared =
+  | Pair[]
+  | {
+      /** A sentence printed with the run, such as what a scoped run left out. */
+      note?: string
+      /** The pairs. */
+      pairs: Pair[]
+      /** URL paths served from absolute paths on disk, such as a directory of bundles. */
+      serve?: Record<string, string>
+    }
+
+/**
+ * Entries with two sides, compared with each other at every shot and with no baseline: React against
+ * plain HTML, a server render against a client render, a framework wrapper against the element it wraps.
+ * Both sides render on one machine seconds apart, so the platform cancels out and nothing is committed.
+ */
+export interface PairsSource {
+  /**
+   * Called on each side's page after its first shot. Returns problems that fail the pair, or none.
+   * `console` is every message the page logged.
+   */
+  check?: (context: {
+    /** Every console message the page logged, in order. */
+    console: { text: string; type: string }[]
+    /** The pair, and `side`, the label of the side on the page. */
+    entry: Entry & { side: string }
+    /** The Playwright page. */
+    page: Page
+  }) => Promise<string[] | undefined> | string[] | undefined
+  /** Whether the two sides' pictures are compared. `true` when not given. */
+  compare?: boolean
+  /** The diff for this source's shots, in place of the config's. */
+  diff?: Diff
+  /**
+   * Which console errors fail a pair. `new`, an error the second side logs and the first does not, is the
+   * default. `any` counts every error on either side, and `ignore` none.
+   */
+  errors?: 'any' | 'ignore' | 'new'
+  /** The harness's colors and inset, or `false` to picture each side as it is. */
+  harness?: boolean | Harness
+  /** Picks this source out of the others. */
+  kind: 'pairs'
+  /** What the two sides are called in a report. `['a', 'b']` when not given. */
+  labels?: [string, string]
+  /** The first half of each entry's id. One word. */
+  name: string
+  /**
+   * Builds the pairs. `changed` is the git ref `--changed` named, for a source that decides what a change
+   * since it reaches.
+   */
+  prepare: (context: {
+    /** The git ref `--changed` named, when it was given. */
+    changed?: string
+  }) => Promise<Prepared> | Prepared
+}
+
 /** Any source of entries. */
-export type Source = CatalogSource | HtmlSource | ServerSource | StorybookSource
+export type Source = CatalogSource | HtmlSource | PairsSource | ServerSource | StorybookSource
 
 /** An entry as `inspect` sees it. */
 export interface Entry {
@@ -177,6 +266,8 @@ export interface Inspect<Result = unknown> {
 
 /** One exception to the comparison, with the reason it exists. */
 export interface Exception {
+  /** A known difference between a pair's two sides, tolerated however large. It fails the run once the two match on two takes. */
+  differs?: boolean
   /** An entry's id, `styled/aura`, or its name in every source, `aura`. */
   entry: string
   /** What was measured to justify it, said beside it in every run. */
@@ -193,6 +284,20 @@ export interface Exception {
 
 /** A `visual.config.ts`. */
 export interface Config {
+  /**
+   * Whether each entry's accessibility snapshot, Playwright's `ariaSnapshot()` of its page, is kept beside
+   * its baselines as `<stem>.aria.yml` and compared as text. A lost label fails even when no pixel moved.
+   */
+  aria?: boolean
+  /** Checks run on each entry's page after its first shot, which need no baseline. */
+  checks?: {
+    /**
+     * A code block that draws all of its text in one color, as a highlighter that failed leaves it. `true`
+     * reads `pre code` and a `pre` with no `code`; give `selector` for code blocks of your own, and
+     * `minimum`, 20 when not given, for the fewest characters a block holds before it is judged.
+     */
+    code?: boolean | { minimum?: number; selector?: string }
+  }
   /** How a shot is compared with its baseline, unless its source sets its own. */
   diff?: Diff
   /** Exceptions to the comparison, each with its reason. */
