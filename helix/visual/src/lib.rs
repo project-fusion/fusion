@@ -136,6 +136,14 @@ pub enum Visual {
         /// Print the summary as Markdown instead of opening the page.
         #[arg(long)]
         markdown: bool,
+        /// Reports to merge into one summary, each a report directory or its
+        /// `run.json`: the shards of one run. Groups that share a signature
+        /// are one group, asked about once when the config has a triage.
+        #[arg(long, value_name = "REPORT", num_args = 1..)]
+        merge: Vec<PathBuf>,
+        /// The git ref a merge's triage reads the diff from.
+        #[arg(long, value_name = "REF", requires = "merge")]
+        changed: Option<String>,
     },
     /// Picture every entry and write the baselines the comparison rejects.
     ///
@@ -305,7 +313,17 @@ pub fn run(verb: &Visual, json: bool) -> Outcome<Code> {
             diff,
             threshold,
         } => compare(baseline, current, diff.as_deref(), *threshold),
-        Visual::Report { config, markdown } => run::open_report(config.as_deref(), *markdown),
+        Visual::Report {
+            changed,
+            config,
+            markdown,
+            merge,
+        } if !merge.is_empty() => {
+            run::merge_reports(config.as_deref(), merge, changed.as_deref(), *markdown)
+        }
+        Visual::Report {
+            config, markdown, ..
+        } => run::open_report(config.as_deref(), *markdown),
         Visual::Test(selection) => selection
             .options(false)
             .and_then(|options| run::run(&options)),

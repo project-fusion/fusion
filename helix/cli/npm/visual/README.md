@@ -27,6 +27,7 @@ helix visual update                  write only the baselines the comparison rej
 helix visual update --boxes          also write element boxes into baselines that have none
 helix visual test --shard 0 --of 4   the first of four shards, for CI
 helix visual report                  open the report of the last run
+helix visual report --merge a b      the groups of several shards' reports as one
 helix visual compare a.png b.png     compare two PNG files, with no browser
 ```
 
@@ -40,7 +41,11 @@ helix visual compare a.png b.png     compare two PNG files, with no browser
   none, inside its own PNG, leaving its pixels as they are, so the run can say
   how far a changed element moved.
 - **`helix visual report`** opens the report the last run wrote. `--markdown` prints
-  its summary as Markdown instead, for a CI job's summary page.
+  its summary as Markdown instead, for a CI job's summary page. `--merge`
+  takes the reports of a run's shards, each a report directory or its
+  `run.json`, and prints their changes as one set of groups, so a change
+  spread across shards is one group. With a `triage` in the config, a merge
+  asks about each group once, reading the diff since `--changed`.
 - **`helix visual compare`** compares two PNG files. `--diff` writes the image of the
   difference, and `--threshold` sets how far apart two colors may be and still
   count as the same pixel, from 0 to 1.
@@ -157,6 +162,8 @@ export default defineConfig({
     names of every file changed since it.
     `images: true` also sends the baseline and the capture of each group's
     largest region, cropped and no wider than 512 pixels.
+  - A run split into shards leaves the triage to `helix visual report
+    --merge`, which asks once about a group the shards share.
   - `groups`, 10 unless you set it, caps the requests a run makes, the
     largest group first. A run with no differences makes none, and the last
     line says how many tokens each run read and wrote.

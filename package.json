@@ -72,6 +72,7 @@
     "watch": "turbo watch frame catalog --filter=@fusion.dev/site"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "0.132.1",
     "@biomejs/biome": "^2.5.15",
     "@fusion.dev/scripts": "workspace:*",
     "@happy-dom/global-registrator": "^20.14.5",
