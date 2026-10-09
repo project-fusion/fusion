@@ -194,10 +194,34 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
   /** What places the first and last labels again when one of them, or the footer, changes size. */
   private labelSizes: ResizeObserver | undefined = undefined
 
+  override connectedCallback(): void {
+    super.connectedCallback()
+    /* Back from a move, the labels are watched again, which the last
+       disconnect stopped. */
+    this.observeLabels()
+  }
+
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.labelSizes?.disconnect()
     this.labelSizes = undefined
+  }
+
+  /**
+   * Places the labels again whenever one of them or the footer changes size,
+   * as a webfont arriving after the first measure changes a label's width,
+   * and with it how far down the front edge reaches over it. Once the footer
+   * is rendered, and guarded because Lit SSR provides no `ResizeObserver`.
+   */
+  private observeLabels(): void {
+    const boxes = ['footer', 'start', 'end'].map((name) => this.partNamed(name))
+    if (this.labelSizes || typeof ResizeObserver === 'undefined' || boxes.includes(null)) {
+      return
+    }
+    this.labelSizes = new ResizeObserver(() => this.placeLabels())
+    for (const box of boxes) {
+      this.labelSizes.observe(box as HTMLElement)
+    }
   }
 
   /** A drag across the chart's own drawing, which turns its view. */
@@ -540,16 +564,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
       return
     }
     const labels = { end, start }
-    /* **Again whenever a label or the footer changes size**, as a webfont
-       arriving after the first measure changes a label's width, and with it
-       how far down the front edge reaches over it. Guarded because Lit SSR
-       provides no `ResizeObserver`. */
-    if (!this.labelSizes && typeof ResizeObserver !== 'undefined') {
-      this.labelSizes = new ResizeObserver(() => this.placeLabels())
-      for (const box of [footer, start, end]) {
-        this.labelSizes.observe(box)
-      }
-    }
+    this.observeLabels()
     const frame = footer.getBoundingClientRect()
     if (frame.width <= 0) {
       return
