@@ -115,6 +115,27 @@ fn attribute(name: &JSXAttributeName<'_>, value: Option<&JSXAttributeValue<'_>>)
     match name {
         JSXAttributeName::Identifier(identifier) => {
             let name = identifier.name.to_string();
+            /* **`className` is the `class` attribute React writes**, and a CSS
+            module's `styles.channel` is the class `channel` a module
+            stylesheet names, so a rule on that class can be judged against
+            the elements carrying it. */
+            if name == "className" {
+                let value = match value {
+                    Some(JSXAttributeValue::ExpressionContainer(container)) => {
+                        match container.expression.as_expression() {
+                            Some(Expression::StaticMemberExpression(member)) => {
+                                Value::Literal(member.property.name.to_string())
+                            }
+                            _ => literal(),
+                        }
+                    }
+                    _ => literal(),
+                };
+                return Attribute {
+                    name: "class".to_owned(),
+                    value,
+                };
+            }
             let value = if name.chars().any(|one| one.is_ascii_uppercase()) {
                 Value::Skip
             } else {
@@ -349,7 +370,7 @@ mod tests {
                 ("tone", &Value::Literal("primary".to_owned())),
                 ("items", &Value::Skip),
                 ("rowKey", &Value::Skip),
-                ("className", &Value::Skip),
+                ("class", &Value::Literal("x".to_owned())),
                 ("emphasis", &Value::Bound),
                 ("prop:open", &Value::Skip),
             ]
