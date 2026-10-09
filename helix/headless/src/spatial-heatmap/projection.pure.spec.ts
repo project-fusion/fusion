@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { ACROSS, heightsOf, highestOf, reliefOf } from './projection.js'
+import { ACROSS, heightsOf, highestOf, MARGIN, reliefOf, THICKNESS } from './projection.js'
 
 /** The corners of path data written `Mx yLx y…Z`, as numbers. */
 const corners = (data: string): Array<[number, number]> =>
@@ -90,8 +90,26 @@ describe('the relief', () => {
     expect(box.y).toBeCloseTo(0.5 - 3)
   })
 
+  test('the slab reaches past the grid, and the box holds it', () => {
+    const { box, base, corners } = reliefOf([1, 2, 3, 4, 5], 2, 1)
+    /* Three columns of two rows, the last still filling: the slab is the
+       whole grid, its left corner under the first column's last row. */
+    expect(corners?.start.x).toBeCloseTo((-MARGIN - (2 + MARGIN)) * ACROSS)
+    expect(corners?.start.y).toBeCloseTo((-MARGIN + 2 + MARGIN) / 2 + THICKNESS)
+    expect(corners?.end.x).toBeCloseTo((3 + MARGIN - (2 + MARGIN)) * ACROSS)
+    expect(corners?.end.y).toBeCloseTo((3 + MARGIN + 2 + MARGIN) / 2 + THICKNESS)
+    expect(box.x).toBeCloseTo(corners?.start.x ?? 0)
+    expect(box.y + box.height).toBeCloseTo(corners?.end.y ?? 0)
+    expect(base?.top.startsWith('M')).toBe(true)
+  })
+
   test('no readings draw nothing in an empty box', () => {
-    expect(reliefOf([], 7, 1)).toEqual({ box: { height: 0, width: 0, x: 0, y: 0 }, prisms: [] })
+    expect(reliefOf([], 7, 1)).toEqual({
+      base: undefined,
+      box: { height: 0, width: 0, x: 0, y: 0 },
+      corners: undefined,
+      prisms: [],
+    })
   })
 
   test('a number is written short, and never as minus zero', () => {
