@@ -362,6 +362,11 @@
       - text: Sparkline
       - link "Sparkline documentation":
         - /url: /helix/components/sparkline
+    - treeitem "Spatial Bar Chart Spatial Bar Chart documentation Experimental" [level=1]:
+      - text: Spatial Bar Chart
+      - link "Spatial Bar Chart documentation":
+        - /url: /helix/components/spatial-bar-chart
+      - img "Experimental"
     - treeitem "Spatial Heatmap Spatial Heatmap documentation Experimental" [level=1]:
       - text: Spatial Heatmap
       - link "Spatial Heatmap documentation":
