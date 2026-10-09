@@ -39,6 +39,7 @@ import { createServer } from 'node:http'
 import { extname, resolve, sep } from 'node:path'
 import { StringDecoder } from 'node:string_decoder'
 import { pathToFileURL } from 'node:url'
+import { readPage } from './checks.mjs'
 
 /** The `id` of the harness `<style>` the binary writes into every page. */
 const STYLE_ID = 'helix-visual-harness'
@@ -376,6 +377,8 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
   let problems = []
   let findings = []
   let aria = null
+  /* The color schemes contrast has been read in. */
+  const read = new Set()
   lane.errors.length = 0
   lane.messages.length = 0
   try {
@@ -443,10 +446,25 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
         })
       }
       /* The page checks and the accessibility snapshot, on the page that was
-         pictured, after its first picture. */
+         pictured, after its first picture. Contrast reads again after the
+         first picture in each color scheme, because a palette has two halves
+         and only one is on screen at a time. */
       if (index === 0 && item.checks?.code) {
         progress.stage = 'checking its code blocks'
-        findings = findings.concat(await codeBlocks(page, item.checks.code))
+        const blocks = await codeBlocks(page, item.checks.code)
+        findings = findings.concat(blocks.map((text) => ({ check: 'code', text })))
+      }
+      const contrast = item.checks?.contrast && !read.has(shot.scheme)
+      if ((index === 0 && (item.checks?.clipped || item.checks?.overlap)) || contrast) {
+        progress.stage = 'reading the page'
+        read.add(shot.scheme)
+        findings = findings.concat(
+          await readPage(page, {
+            clipped: index === 0 ? (item.checks.clipped ?? null) : null,
+            contrast: contrast ? { ...item.checks.contrast, scheme: shot.scheme } : null,
+            overlap: index === 0 ? (item.checks.overlap ?? null) : null,
+          }),
+        )
       }
       if (index === 0 && item.aria) {
         progress.stage = 'taking its accessibility snapshot'

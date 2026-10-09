@@ -12,7 +12,7 @@
 
 use std::collections::BTreeMap;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 /// The whole file.
 #[derive(Debug, Deserialize)]
@@ -143,34 +143,125 @@ fn threshold() -> f64 {
 #[derive(Debug, Default, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Checks {
+    /// A box under `overflow: hidden` that cuts off its own text, with no
+    /// ellipsis or line clamp to say it means to.
+    #[serde(default)]
+    pub clipped: Setting<IgnoreCheck>,
     /// A code block whose text is drawn in one color: a highlighter that
     /// failed and left nothing to say so.
     #[serde(default)]
-    pub code: CodeSetting,
+    pub code: Setting<CodeCheck>,
+    /// An ink below its target ratio against the ground it is painted on,
+    /// read in each color scheme the shots picture.
+    #[serde(default)]
+    pub contrast: Setting<ContrastCheck>,
+    /// Two boxes of text or controls that draw over each other in the flow,
+    /// with nothing placing either on purpose.
+    #[serde(default)]
+    pub overlap: Setting<IgnoreCheck>,
 }
 
-/// `true` or `false`, or where the code blocks are and how long one must be.
+/// The names an exception's `checks` may use.
+pub const CHECKS: [&str; 4] = ["clipped", "code", "contrast", "overlap"];
+
+impl Checks {
+    /// Whether the check by this name is on.
+    pub fn on(&self, name: &str) -> bool {
+        match name {
+            "clipped" => self.clipped.resolved().is_some(),
+            "code" => self.code.resolved().is_some(),
+            "contrast" => self.contrast.resolved().is_some(),
+            "overlap" => self.overlap.resolved().is_some(),
+            _ => false,
+        }
+    }
+}
+
+/// `true` or `false`, or the check's own settings.
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
-pub enum CodeSetting {
+pub enum Setting<T> {
     Switch(bool),
-    Custom(CodeCheck),
+    Custom(T),
 }
 
-impl Default for CodeSetting {
+impl<T> Default for Setting<T> {
     fn default() -> Self {
         Self::Switch(false)
     }
 }
 
-impl CodeSetting {
-    pub fn resolved(&self) -> Option<CodeCheck> {
+impl<T: Clone + Default> Setting<T> {
+    pub fn resolved(&self) -> Option<T> {
         match self {
             Self::Switch(false) => None,
-            Self::Switch(true) => Some(CodeCheck::default()),
+            Self::Switch(true) => Some(T::default()),
             Self::Custom(check) => Some(check.clone()),
         }
     }
+}
+
+/// A check whose only setting is what it leaves alone.
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct IgnoreCheck {
+    /// Selectors whose elements, and everything inside them, the check does
+    /// not read.
+    #[serde(default)]
+    pub ignore: Vec<String>,
+}
+
+/// Contrast's targets, from WCAG 2.1 AA, and what it leaves alone.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+pub struct ContrastCheck {
+    /// The ratio a graphic, an icon or large text answers to.
+    #[serde(default = "component_target")]
+    pub component: f64,
+    #[serde(default)]
+    pub ignore: Vec<String>,
+    /// The font size, in CSS pixels, from which text is large.
+    #[serde(default = "large_text")]
+    pub large: f64,
+    /// The font size from which bold text is large.
+    #[serde(default = "large_bold_text")]
+    pub large_bold: f64,
+    /// Colors that draw a rule, a line that separates, held to no target:
+    /// any CSS color, a custom property included.
+    #[serde(default)]
+    pub rules: Vec<String>,
+    /// The ratio body text answers to.
+    #[serde(default = "text_target")]
+    pub target: f64,
+}
+
+impl Default for ContrastCheck {
+    fn default() -> Self {
+        Self {
+            component: component_target(),
+            ignore: Vec::new(),
+            large: large_text(),
+            large_bold: large_bold_text(),
+            rules: Vec::new(),
+            target: text_target(),
+        }
+    }
+}
+
+fn component_target() -> f64 {
+    3.0
+}
+
+fn large_text() -> f64 {
+    24.0
+}
+
+fn large_bold_text() -> f64 {
+    18.66
+}
+
+fn text_target() -> f64 {
+    4.5
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -206,6 +297,10 @@ fn code_selector() -> String {
 #[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Exception {
+    /// Page checks whose findings on this entry are excused, by name. Each is
+    /// spent, and fails the run, once its check finds nothing here.
+    #[serde(default)]
+    pub checks: Vec<String>,
     /// A known difference between the two sides of a pair, tolerated however
     /// large. Spent, and failing the run, once the two match on two takes.
     #[serde(default)]
@@ -729,16 +824,38 @@ impl Config {
             }
             let kinds = usize::from(exception.unstable)
                 + usize::from(exception.pixels.is_some())
-                + usize::from(exception.differs);
+                + usize::from(exception.differs)
+                + usize::from(!exception.checks.is_empty());
             if kinds > 1 {
                 return Err(format!(
-                    "the exception for `{}` is more than one of unstable, a pixel budget and a known difference, and it can be one",
+                    "the exception for `{}` is more than one of unstable, a pixel budget, a known difference and excused checks, and it can be one",
                     exception.entry
                 ));
             }
             if kinds == 0 {
                 return Err(format!(
-                    "the exception for `{}` neither marks it unstable, gives it pixels, nor marks a known difference, so it changes nothing",
+                    "the exception for `{}` neither marks it unstable, gives it pixels, marks a known difference, nor excuses a check, so it changes nothing",
+                    exception.entry
+                ));
+            }
+            for check in &exception.checks {
+                if !CHECKS.contains(&check.as_str()) {
+                    return Err(format!(
+                        "the exception for `{}` excuses the check `{check}`, and the checks are {}",
+                        exception.entry,
+                        CHECKS.join(", ")
+                    ));
+                }
+                if !self.checks.on(check) {
+                    return Err(format!(
+                        "the exception for `{}` excuses the check `{check}`, which is off",
+                        exception.entry
+                    ));
+                }
+            }
+            if !exception.checks.is_empty() && exception.shot.is_some() {
+                return Err(format!(
+                    "the exception for `{}` names a shot and excuses a check, and a check reads the page, so it names no shot",
                     exception.entry
                 ));
             }
@@ -846,6 +963,35 @@ mod tests {
         let hiding = Config::parse(value).unwrap();
         assert!(hiding.aria.kept());
         assert_eq!(hiding.aria.hidden(), ["#table"]);
+    }
+
+    #[test]
+    fn a_check_is_on_by_a_flag_or_by_its_settings() {
+        let mut value = minimal();
+        value["checks"] = json!({ "contrast": true, "overlap": { "ignore": [".marquee"] } });
+        let config = Config::parse(value).unwrap();
+        let contrast = config.checks.contrast.resolved().unwrap();
+        assert_eq!((contrast.target, contrast.component), (4.5, 3.0));
+        assert_eq!(
+            config.checks.overlap.resolved().unwrap().ignore,
+            [".marquee"]
+        );
+        assert!(config.checks.clipped.resolved().is_none());
+    }
+
+    #[test]
+    fn an_excused_check_is_one_that_is_on_and_named_right() {
+        let mut value = minimal();
+        value["checks"] = json!({ "clipped": true });
+        value["exceptions"] =
+            json!([{ "entry": "pages/a", "reason": "a marquee", "checks": ["clipped"] }]);
+        assert!(Config::parse(value.clone()).is_ok());
+        value["exceptions"][0]["checks"] = json!(["overlap"]);
+        assert!(Config::parse(value.clone())
+            .unwrap_err()
+            .contains("which is off"));
+        value["exceptions"][0]["checks"] = json!(["clip"]);
+        assert!(Config::parse(value).unwrap_err().contains("the checks are"));
     }
 
     #[test]
