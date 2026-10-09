@@ -6,7 +6,7 @@ title: Spatial charts
 
 # Spatial charts
 
-Helix has five charts drawn in three dimensions. Each reads its numbers from a
+Helix has six charts drawn in three dimensions. Each reads its numbers from a
 table in the document, as every Helix chart does:
 
 - `Spatial Bar Chart` stands a bar for each category and series, each as tall
@@ -20,6 +20,9 @@ table in the document, as every Helix chart does:
   at once.
 - `Spatial Surface Chart` draws one measure as a surface over two others, such
   as load by hour and by day.
+- `Spatial Treemap` shares a floor out among blocks, each as large as one
+  measure and as tall as another, gathered by group, such as each service's
+  requests and its response time.
 
 Each chart draws itself in SVG. `@fusion.dev/helix-plot` can also draw it with
 three.js, in a view you can drag round and zoom.
@@ -67,6 +70,11 @@ Each chart reads its columns in its own way:
 - **Spatial Surface Chart** takes the first numeric column as across, the second
   as depth, and the third as the height. A place on the grid with no reading
   leaves a hole.
+- **Spatial Treemap** takes the first numeric column as each block's size, its
+  share of the floor, and the second as its height. `group-by` names a column
+  of text that gathers its rows into one part of the floor, in one color. With
+  no second numeric column, the blocks stand as one slab. A row with no size
+  is left out.
 - **Spatial Heatmap** reads its table as `Heatmap` does, down each column of
   `rows` and then across. Its table goes inside it.
 
@@ -109,6 +117,7 @@ Each chart has its own connector and driver:
 | `Spatial Ribbon Chart` | `connectSpatialRibbonChart` | `threeRibbonDriver` |
 | `Spatial Scatter Chart` | `connectSpatialScatterChart` | `threeScatterDriver` |
 | `Spatial Surface Chart` | `connectSpatialSurfaceChart` | `threeSurfaceDriver` |
+| `Spatial Treemap` | `connectSpatialTreemap` | `threeTreemapDriver` |
 
 `Spatial Heatmap` takes the element in its `renderer` slot, because its table
 is inside it:
@@ -148,6 +157,7 @@ Chromium on an Apple silicon Mac:
 | `Spatial Heatmap` | 365 days | 730 days: 50 ms, and 1,825: 132 ms |
 | `Spatial Bar Chart` | 400 bars | 800 bars: 66 ms, and 1,600: 124 ms |
 | `Spatial Ribbon Chart` | 800 readings | 1,600 readings: 50 ms, and 3,200: 83 ms |
+| `Spatial Treemap` | 400 blocks | 800 blocks: 68 ms, and 1,600: 151 ms |
 
 A slower machine reaches these sizes sooner. three.js draws each chart on the
 graphics card.
@@ -168,8 +178,9 @@ three.js draws both as well.
 ## Draw a chart for a landing page
 
 `no-box` draws `Spatial Bar Chart`, `Spatial Ribbon Chart`, `Spatial Scatter
-Chart`, or `Spatial Surface Chart` with no box, grid, numbers, or names, and nothing behind it, so the
-readings stand on the page as a picture does:
+Chart`, `Spatial Surface Chart`, or `Spatial Treemap` with no box, grid,
+numbers, or names, and nothing behind it, so the readings stand on the page as
+a picture does:
 
 ```html
 <helix-spatial-surface-chart
@@ -222,6 +233,10 @@ arrows move from category to category, and the down and up arrows from series to
 series. `Spatial Ribbon Chart` reads the same way, from place to place along a
 ribbon and from ribbon to ribbon.
 
+`Spatial Treemap` reads as `Spatial Scatter Chart` does: the left and right
+arrows move from item to item in the table's order, and the down and up arrows
+among the item's measures.
+
 `Spatial Heatmap` takes `Heatmap`'s keys, and Shift with an arrow turns its
 view, except under `selection-mode="multiple"`, where it selects a range.
 
@@ -253,6 +268,9 @@ Each chart takes its colors from your theme, and these hooks change them:
   `--chart-series-1` and on.
 - **Spatial Surface Chart**: the surface is shaded from `--spatial-surface-chart-low`
   to `--spatial-surface-chart-high`.
+- **Spatial Treemap**: each group takes a series color, `--chart-series-1` and
+  on, and each face of a block is that color darkened by how far it turns from
+  the light.
 - **Spatial Heatmap**: each day takes its tone's color, as on `Heatmap`:
   `--heatmap-tone-1` to `--heatmap-tone-5` along the ramp, or a named tone such
   as `--heatmap-tone-success`. `--spatial-heatmap-left-shade` and

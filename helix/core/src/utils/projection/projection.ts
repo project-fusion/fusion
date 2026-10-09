@@ -167,7 +167,9 @@ const ARC = 12
 
 /**
  * A note as a solid, standing on the floor at `x` and `y`, `width` cells
- * across its footprint and `height` cells tall, as the camera sees it.
+ * across its footprint and `height` cells tall, as the camera sees it. A
+ * block or a pyramid is `deep` cells back, as wide as it is deep where that
+ * is not given; a cylinder is round.
  *
  * **Each face is drawn only where it turns toward the camera**, so a block
  * shows its top and the two sides that face the viewer from any turn, and a
@@ -180,8 +182,10 @@ export const solid = (
   y: number,
   width: number,
   height: number,
+  deep = width,
 ): Drawn => {
   const half = width / 2
+  const back = deep / 2
   const tall = Math.max(0, height)
   const on = (corner: Corner): PagePoint => projection.at(corner[0], corner[1], corner[2])
   if (kind === 'cylinder') {
@@ -214,10 +218,10 @@ export const solid = (
   /* The footprint's corners, counterclockwise from the front left as seen
      from above, and the outward direction of the side over each edge. */
   const floor: Corner[] = [
-    [x - half, y - half, 0],
-    [x + half, y - half, 0],
-    [x + half, y + half, 0],
-    [x - half, y + half, 0],
+    [x - half, y - back, 0],
+    [x + half, y - back, 0],
+    [x + half, y + back, 0],
+    [x - half, y + back, 0],
   ]
   const outward: Corner[] = [
     [0, -1, 0],
@@ -233,14 +237,15 @@ export const solid = (
   if (kind === 'pyramid') {
     /* No lower than it is wide, or from the isometric camera its back corner
        would stand above its apex. */
-    const apex: Corner = [x, y, Math.max(tall, width)]
+    const apex: Corner = [x, y, Math.max(tall, width, deep)]
     corners = [...floor, apex]
     peak = on(apex)
     floor.forEach((corner, at) => {
       const next = floor[(at + 1) % 4] as Corner
       const [ox, oy] = outward[at] as Corner
-      /* Leaning back over its edge: out by the apex's height, up by half the width. */
-      const normal: Corner = [ox * apex[2], oy * apex[2], half]
+      /* Leaning back over its edge: out by the apex's height, up by half the
+         footprint across that edge. */
+      const normal: Corner = [ox * apex[2], oy * apex[2], ox === 0 ? back : half]
       if (facing(normal, projection)) {
         faces.push({
           d: pathData([on(corner), on(next), on(apex)]),

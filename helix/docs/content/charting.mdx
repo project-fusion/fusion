@@ -17,6 +17,7 @@ Helix has these chart families, and each one has its own API page:
 - `Spatial Scatter Chart`, drawn in three dimensions
 - `Spatial Surface Chart`, drawn in three dimensions
 - `Donut Chart`
+- `Spatial Treemap`, drawn in three dimensions
 - `Heatmap`
 - `Spatial Heatmap`, drawn in three dimensions
 - `Sparkline`
@@ -49,6 +50,12 @@ Choose a chart by the question it answers.
   share. Use it when the parts add up to a total. `Line Chart` with `area`
   overlaps the series, and `Area Chart` adds them.
 - **Parts of one whole, at one moment.** `Donut Chart`.
+- **How large each item is within its group, and how it stands on a second
+  measure.** `Spatial Treemap`, with a block for each row, its area its size
+  and its height the second measure, gathered by group on a floor you can
+  turn. Use it where many items share a whole, such as each service's
+  requests and its response time. Its table and its tooltip carry the exact
+  values.
 - **Whether two measures relate.** `Scatter Chart`, with one point per row.
 - **Where rows fall on three measures, and which gather together.** `Spatial
   Scatter Chart`, with one point per row in a box you can turn. Use it for data
@@ -69,9 +76,9 @@ Choose a chart by the question it answers.
   Use `Trend` to show which way one measurement moved and whether that is good
   news.
 
-The five spatial charts draw themselves in 3D in SVG, which a
+The six spatial charts draw themselves in 3D in SVG, which a
 print and a page without WebGL show too, and a drag or Shift with an arrow
-turns. `@fusion.dev/helix-plot` can also draw all five with three.js, lit and
+turns. `@fusion.dev/helix-plot` can also draw all six with three.js, lit and
 in perspective, in a view you can drag round and zoom. The
 [spatial charts guide](./spatial-charts) covers both.
 
@@ -144,6 +151,8 @@ reading a chart is usually read for:
 - `Spatial Scatter Chart`: its three measures and its number of points.
 - `Spatial Surface Chart`: its measures, its number of readings, and the range
   of its heights.
+- `Spatial Treemap`: its number of items and groups, and the range of their
+  sizes.
 
 `Heatmap` and `Spatial Heatmap` are each an image with that name. `Sparkline` takes a `label` of its own.
 
@@ -219,8 +228,8 @@ These parts keep their direction:
 - `Spatial Scatter Chart` and `Spatial Surface Chart` are laid out as on a
   left-to-right page, because all three of their axes are measures. Their
   summaries and tooltips follow the page's direction.
-- `Spatial Bar Chart` and `Spatial Ribbon Chart` are laid out as on a
-  left-to-right page too, since each drawing is a box you turn. Its summary and tooltip follow the page's
+- `Spatial Bar Chart`, `Spatial Ribbon Chart`, and `Spatial Treemap` are laid
+  out as on a left-to-right page too, since each drawing is a box you turn. Its summary and tooltip follow the page's
   direction.
 
 To keep a chart left to right on a right-to-left page, such as a number line in
