@@ -131,11 +131,12 @@ export default defineConfig({
      sizes the shards from, so the count it plans and the packing here agree. */
   shard: { cost: measured('visual'), perShot: ESTIMATE.visual.per },
   /* The wide shot keeps the empty suffix, so its baselines keep the name they
-     were first committed under: `preview.png`. */
+     were first committed under: `preview.png`. Dark before narrow, so dark is
+     taken on the wide page in place and only narrow loads it again. */
   shots: [
     { name: 'wide', scheme: 'light', suffix: '', width: 640 },
-    { name: 'narrow', scheme: 'light', width: 390 },
     { name: 'dark', scheme: 'dark', width: 640 },
+    { name: 'narrow', scheme: 'light', width: 390 },
   ],
   sources: [
     {

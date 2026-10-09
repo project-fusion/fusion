@@ -242,8 +242,11 @@ picture is committed.
   the page's boxes and scroll offsets to stay the same for three frames. It
   emulates reduced motion and takes the shot with animations disabled. A font
   that fails to load fails the entry.
-- **One page load for all the shots of an entry.** The viewport, the color
-  scheme, and the harness style change between shots on the same page.
+- **One page load for each width an entry is pictured at.** Shots at the same
+  width change the color scheme and the harness style on the same page, in the
+  order the config lists them. A shot at a new width loads the page again, so
+  nothing a page keeps from being resized reaches its picture. List the shots
+  of one width together.
 - **A difference is taken again from a fresh page load.** A shot that matches
   on the second take passes, and the run names it.
 - **Changes are grouped by what they happened to.** Each region of a shot

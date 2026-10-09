@@ -63,10 +63,12 @@ export default defineConfig({
   /* Next.js writes `next-route-announcer` and never defines it, so only
      Helix's own elements are awaited, and each of them is required. */
   settle: { elements: 'helix-', readyProperty: 'whenSettled' },
+  /* Dark before phone, so dark is taken on the wide page in place and only
+     phone loads it again. */
   shots: [
     { name: 'wide', scheme: 'light', width: 1440 },
-    { name: 'phone', scheme: 'light', width: 390 },
     { name: 'dark', scheme: 'dark', width: 1440 },
+    { name: 'phone', scheme: 'light', width: 390 },
   ],
   sources: [
     {

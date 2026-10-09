@@ -22,11 +22,19 @@
  *
  * Any request that fails answers `error`, with the reason.
  *
- * **One navigation per entry for every shot.** The first shot loads the page;
- * each later one resizes the viewport, switches the emulated scheme, rewrites
- * the harness style and settles again. Measured on October 8, 2026 over 153
- * pictures of 51 examples, that took 242.6 ms a picture against 287.3 ms for a
- * navigation each, and every picture was pixel for pixel the same.
+ * **One navigation for each width an entry is pictured at.** The first shot
+ * loads the page; a later one at the same width switches the emulated scheme,
+ * rewrites the harness style and settles again. Measured on October 8, 2026
+ * over 153 pictures of 51 examples, that took 242.6 ms a picture against 287.3
+ * ms for a navigation each, and every picture was pixel for pixel the same.
+ *
+ * **A new width loads the page again**, served styled for that shot. A page
+ * resized in place can keep what a fresh one never has, and the second take,
+ * which a baseline is written from, is always a fresh load: on Linux a
+ * dialog's text resized from 640 to 390 kept grayscale antialiasing where a
+ * fresh load at 390 drew it in color, so the shot needed a second take in
+ * every run. A change of scheme stays in place, where it tests a component
+ * that has to follow the page's colors.
  *
  * **Node and Playwright, decided on October 8, 2026.** Chromium's work is about
  * 94% of the time of a picture, so a capture written in Rust over the browser
@@ -109,6 +117,8 @@ const state = {
    * the document is named in the query and the path is the entry's.
    */
   documents: new Map(),
+  /** Each entry's harness rules by shot, so a later shot loads styled for itself. */
+  harnesses: new Map(),
   lanes: [],
   /** Selectors painted over in every picture. */
   mask: [],
@@ -173,18 +183,29 @@ const lookup = (path, document) => {
 const respond = (request, response) => {
   let path
   let document
+  let shot
   try {
     const url = new URL(request.url ?? '/', 'http://visual')
     path = decodeURIComponent(url.pathname)
     document = url.searchParams.get('visual')
+    shot = url.searchParams.get('shot')
   } catch {
     response.writeHead(400).end()
     return
   }
   const found = lookup(path, document)
   if (found.html !== undefined) {
+    /* Styled for the shot it is loaded for, where that is not the first. */
+    const rules = shot === null ? undefined : state.harnesses.get(document)?.[Number(shot)]
     response.writeHead(200, { 'content-type': 'text/html' })
-    response.end(found.html)
+    response.end(
+      typeof rules === 'string'
+        ? found.html.replace(
+            new RegExp(`(<style id="${STYLE_ID}">)[^<]*(</style>)`),
+            (_, open, close) => `${open}${rules}${close}`,
+          )
+        : found.html,
+    )
     return
   }
   let body
@@ -381,17 +402,23 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
   const read = new Set()
   lane.errors.length = 0
   lane.messages.length = 0
+  /* The width the page was last loaded at. */
+  let loaded
   try {
     for (const [index, shot] of item.shots.entries()) {
-      progress.stage = index === 0 ? 'loading the page' : `settling for ${shot.name}`
+      const fresh = index === 0 || shot.width !== loaded
+      progress.stage = fresh ? 'loading the page' : `settling for ${shot.name}`
       await page.setViewportSize({ height: shot.height, width: shot.width })
       await page.emulateMedia({ colorScheme: shot.scheme })
-      if (index === 0) {
+      if (fresh) {
         /* An entry on a server has its own address. An HTML entry is served
-           here, its document named in the query. */
+           here, its document named in the query, and the shot it is styled
+           for where that is not the first. */
         const address =
-          item.url ?? `${state.origin}${item.path}?visual=${encodeURIComponent(item.key)}`
+          item.url ??
+          `${state.origin}${item.path}?visual=${encodeURIComponent(item.key)}${index > 0 ? `&shot=${index}` : ''}`
         await page.goto(address, { waitUntil: 'load' })
+        loaded = shot.width
         const missing = await upgrades(page, elements)
         if (missing.length > 0) {
           throw new Error(
@@ -599,6 +626,10 @@ const handlers = {
   async capture({ elements, items, readyProperty }) {
     for (const item of items.filter((one) => one.path !== undefined)) {
       state.documents.set(item.key, item.html)
+      state.harnesses.set(
+        item.key,
+        item.shots.map((shot) => shot.harness),
+      )
       state.pages.set(item.path, { dir: item.dir, files: item.files ?? {} })
     }
     /* **Worker `k` takes items `k`, `k + n`, and so on**, rather than the next

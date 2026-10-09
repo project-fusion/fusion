@@ -385,6 +385,20 @@ export class HelixOrb extends HelixElement {
     this.box = 0
     this.canvas?.removeEventListener('contextlost', this.handleLost)
     this.canvas?.removeEventListener('contextrestored', this.handleRestored)
+    this.canvas?.removeEventListener('transitionend', this.handleRestyle)
+  }
+
+  /**
+   * **One frame for a still orb, once a color the canvas carries has moved**,
+   * as Strands and Aura draw one. A running orb reads the colors on its next
+   * frame, but one drawn once, under reduced motion or with its loop stopped,
+   * kept the ink of the theme it was drawn in: after a switch to dark, dark
+   * dots on a dark ground.
+   */
+  private readonly handleRestyle = (): void => {
+    if (!this.gate.running) {
+      this.paint(0)
+    }
   }
 
   /* Everything the canvas needs, in one place both lifecycles can reach.
@@ -420,6 +434,7 @@ export class HelixOrb extends HelixElement {
     }
     canvas.addEventListener('contextlost', this.handleLost)
     canvas.addEventListener('contextrestored', this.handleRestored)
+    canvas.addEventListener('transitionend', this.handleRestyle)
     /* A restore that landed while it was away, which nothing heard. Asked only
        once a loss was: the method is newer than the canvas, and an engine that
        never reports a loss may not have it. */
