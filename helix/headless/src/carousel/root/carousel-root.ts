@@ -10,6 +10,9 @@ import {
   inlineStep,
   isRtl,
   MIRROR_RULE,
+  motionPaused,
+  onMotionChange,
+  reducedMotion,
   requestChange,
   SCROLLER_RULE,
   words,
@@ -172,6 +175,12 @@ export class HelixHeadlessCarousel extends HelixElement {
 
   /**
    * Whether the carousel advances on its own.
+   *
+   * **Not where the reader asked for less motion**, or where the page has
+   * paused its motion, through `pauseMotion` or `Motion Toggle`: the carousel
+   * starts still, and its rotation control starts it. A page that pauses its
+   * motion later stops the rotation, and one that lets it run again starts it
+   * again, unless the reader stopped it.
    */
   @property({ type: Boolean })
   autoplay = false
@@ -1275,6 +1284,7 @@ export class HelixHeadlessCarousel extends HelixElement {
     super.connectedCallback()
     this.addEventListener('focusin', this.pause)
     this.addEventListener('pointerenter', this.pause)
+    this.unpaused ??= onMotionChange(this.handlePageMotion)
     /* A move in the DOM runs this and schedules no update, so a watch dropped on
        the way out is only rebuilt here. The panes outlive the move, being in the
        shadow root, so there is one to watch already. */
@@ -1296,6 +1306,8 @@ export class HelixHeadlessCarousel extends HelixElement {
     }
     this.removeEventListener('focusin', this.pause)
     this.removeEventListener('pointerenter', this.pause)
+    this.unpaused?.()
+    this.unpaused = undefined
     this.sizes?.disconnect()
     this.sizes = undefined
     this.watched = undefined
@@ -1310,13 +1322,31 @@ export class HelixHeadlessCarousel extends HelixElement {
     }
   }
 
+  /** What stops hearing the page's pause. */
+  private unpaused: (() => void) | undefined
+
+  /**
+   * The page paused its motion, which pauses the rotation, or let it run
+   * again, which starts it again where it was asked for and the reader has
+   * not stopped it.
+   */
+  private readonly handlePageMotion = (paused: boolean): void => {
+    if (paused) {
+      this.pause()
+    } else if (this.autoplay && !this.stopped) {
+      this.rotating = true
+    }
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     /* Seeded from the markup rather than started on connect, so the server and
        the client agree about whether it is running. A reader's stop survives a
        reconnection because `stopped` outlives it. */
     if (!this.hasUpdated) {
-      this.rotating = this.autoplay
+      /* Still where the reader asked for less motion or the page paused it,
+         which a server, with neither, never is. */
+      this.rotating = this.autoplay && !reducedMotion() && !motionPaused()
     }
     /* A move of the index is somewhere the reader arrived, so a drag still
        coasting has nothing left to show. Its `scrollend` would have cleared

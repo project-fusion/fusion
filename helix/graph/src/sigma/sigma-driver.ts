@@ -785,8 +785,13 @@ export const sigmaDriver = <G extends SigmaGraph>(
                 finish()
               }
             }, SAMPLE)
-            return () => {
+            return (keep = false) => {
               if (done) {
+                return
+              }
+              /* Ended where the notes stand, and heard. */
+              if (keep) {
+                finish()
                 return
               }
               done = true

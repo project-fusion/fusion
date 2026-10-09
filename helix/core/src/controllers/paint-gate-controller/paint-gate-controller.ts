@@ -1,4 +1,5 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { motionPaused, onMotionChange } from '../../utils/page-motion/page-motion.js'
 
 /**
  * The longest step one frame is given, in seconds.
@@ -74,6 +75,10 @@ export interface PaintGateOptions {
  * dots. Everything above is the same question in both, which is when a frame is
  * worth drawing, and the answer never mentions the drawing.
  *
+ * **The page's pause stops it too.** A page that pauses its motion, through
+ * `pauseMotion` or `Motion Toggle`, holds every painter on the frame it was
+ * showing, and lets them run again when it lets motion run.
+ *
  * **Every path to a frame is gated, not only the observer's.** The tab's own
  * state is asked in `play` rather than in the intersection callback, because a
  * restored context, a resize, a state change and a preference all play too, and
@@ -120,6 +125,8 @@ export class PaintGateController implements ReactiveController {
 
   private motion: MediaQueryList | undefined
   private sized: ResizeObserver | undefined
+  /** What stops hearing the page's pause. */
+  private unpaused: (() => void) | undefined
   private visible: IntersectionObserver | undefined
 
   constructor(host: ReactiveControllerHost & HTMLElement, options: PaintGateOptions) {
@@ -167,6 +174,7 @@ export class PaintGateController implements ReactiveController {
     this.visible.observe(this.host)
 
     document.addEventListener('visibilitychange', this.handleVisibility)
+    this.unpaused ??= onMotionChange(this.handlePause)
 
     this.sized ??= new ResizeObserver(() => {
       this.options.onResize?.()
@@ -188,6 +196,8 @@ export class PaintGateController implements ReactiveController {
     this.motion?.removeEventListener('change', this.handleMotion)
     this.motion = undefined
     document.removeEventListener('visibilitychange', this.handleVisibility)
+    this.unpaused?.()
+    this.unpaused = undefined
   }
 
   /** Starts the loop, where it is wanted and can be ended. */
@@ -219,6 +229,7 @@ export class PaintGateController implements ReactiveController {
       this.host.isConnected &&
       this.intersecting &&
       !this.reduced &&
+      !motionPaused() &&
       !document.hidden &&
       (this.options.canRun?.() ?? true)
     )
@@ -243,6 +254,15 @@ export class PaintGateController implements ReactiveController {
     }
     this.options.onMotion?.(this.reduced)
     this.play()
+  }
+
+  /** The page paused its motion, or let it run again. */
+  private readonly handlePause = (paused: boolean): void => {
+    if (paused) {
+      this.stop()
+    } else {
+      this.play()
+    }
   }
 
   private readonly handleVisibility = (): void => {

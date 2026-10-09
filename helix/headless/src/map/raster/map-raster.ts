@@ -1,4 +1,12 @@
-import { customElement, HelixElement, HelixMapPartChangeEvent, words } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  HelixMapPartChangeEvent,
+  motionPaused,
+  onMotionChange,
+  reducedMotion,
+  words,
+} from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -22,9 +30,11 @@ const framesConverter = {
  * While `playing` is set, the layer shows the frames in order, `interval`
  * milliseconds each, and starts again from the first.
  *
- * The frames do not play while the user has asked for reduced motion, and the
- * layer shows its last frame. Content that moves for more than five seconds
- * needs a way to pause it, so give `playing` a control on your page.
+ * The frames do not play while the user has asked for reduced motion, or
+ * while the page has paused its motion, through `pauseMotion` or `Motion
+ * Toggle`, and the layer holds the frame it shows. Content that moves for more
+ * than five seconds needs a way to pause it, which `Motion Toggle` gives the
+ * whole page, or give `playing` a control of its own.
  *
  * Put the tile provider's credit in `attribution`. The frame shows it beside
  * the map's own credit.
@@ -121,6 +131,7 @@ export class HelixHeadlessMapRaster extends HelixElement {
      radar moved into a new panel stood still on whichever frame it had. */
   override connectedCallback(): void {
     super.connectedCallback()
+    this.unpaused ??= onMotionChange(() => this.schedule())
     if (this.hasUpdated) {
       this.schedule()
     }
@@ -128,8 +139,13 @@ export class HelixHeadlessMapRaster extends HelixElement {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.unpaused?.()
+    this.unpaused = undefined
     this.stopTimer()
   }
+
+  /** What stops hearing the page's pause, which stops the frames and starts them again. */
+  private unpaused: (() => void) | undefined
 
   private stopTimer(): void {
     if (this.timer !== undefined) {
@@ -142,8 +158,7 @@ export class HelixHeadlessMapRaster extends HelixElement {
   private schedule(): void {
     this.stopTimer()
     const count = this.frames?.length ?? 0
-    const reduced = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
-    if (!this.playing || count < 2 || reduced) {
+    if (!this.playing || count < 2 || reducedMotion() || motionPaused()) {
       return
     }
     this.timer = setInterval(

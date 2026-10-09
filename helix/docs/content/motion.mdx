@@ -92,6 +92,44 @@ The turning `Loader` slows to one turn every four seconds. A loader that stops
 looks broken, and the turn still shows that work is in progress. The pending
 ring on `IconButton` slows the same way.
 
+## Pause the page's motion
+
+Motion that starts by itself and runs longer than five seconds needs a way to
+pause it, under WCAG 2.2.2. `Motion Toggle` pauses all of it on the page at
+once, and a second press lets it run again:
+
+```html
+<helix-motion-toggle>Pause motion</helix-motion-toggle>
+```
+
+While the page's motion is paused:
+
+- `Carousel` stops rotating under `autoplay`.
+- `Video` pauses a video that started itself, and plays it again after.
+- `Aura`, `Orb`, and `Strands` hold the frame they show.
+- A graph that `connectGraph` lays out stops where its notes stand, and its
+  three.js view stops turning.
+- A map layer's `frames` stop on the frame they show.
+
+The choice is the page's, held on the document element as
+`data-helix-motion="paused"`. Set it in your markup to start the page paused,
+or call `pauseMotion` from `@fusion.dev/helix-core`, and select on the
+attribute to pause motion of your own:
+
+```js
+import { pauseMotion } from '@fusion.dev/helix-core'
+
+pauseMotion()
+pauseMotion(false)
+```
+
+With reduced motion set, `Carousel` and `Video` do not start by themselves,
+and a graph lays out its notes with the drawing hidden, then shows them where
+they settle.
+
+A graph layout that runs past five seconds also offers its own button, in the
+graph's frame, that stops it where the notes stand.
+
 ## Starting styles and view transitions
 
 Overlays use `@starting-style` to animate in. It sets a starting value and needs

@@ -4,6 +4,8 @@ import {
   HelixGraphSignalEvent,
   HelixGraphZoomEvent,
   isRtl,
+  motionPaused,
+  onMotionChange,
   reportRuntime,
   type ViewportGestureMode,
   type ViewportPanDetail,
@@ -97,13 +99,16 @@ export interface GraphDriver {
   /**
    * Runs a layout over the drawn graph, moving the notes in `unplaced` and
    * holding the rest, and calls `placed` once it has settled with where every
-   * note ended. Returns what stops it early. Without one, notes stay where the
-   * connector started them.
+   * note ended. Returns what stops it early: called with `true`, it ends the
+   * layout where the notes stand and calls `placed` with that, as the frame's
+   * stop control and the page's pause do; with nothing, it ends it unheard, as
+   * a new drawing does. Without one, notes stay where the connector started
+   * them.
    */
   settle?(
     unplaced: ReadonlySet<string>,
     placed: (positions: ReadonlyMap<string, GraphPoint>) => void,
-  ): () => void
+  ): (keep?: boolean) => void
   /**
    * Which gestures the renderer takes from the page, as the frame's
    * `gestures` decides. `free` is what the renderer did before it was told
@@ -207,6 +212,7 @@ interface Frame extends HTMLElement {
   gestureMode?: ViewportGestureMode
   keyed?: { id: string; walked: boolean } | undefined
   laidOut?(positions: Record<string, GraphPoint>): void
+  settling?(stop?: () => void, unseen?: boolean): void
   moved?(): void
   links?: readonly { label?: string | undefined; source: string; target: string }[]
   nodes?: readonly (NoteFacts & {
@@ -285,7 +291,14 @@ export const connectGraph = (
   let colors: GraphColors | null = null
   /* The looks last handed the driver, which a signal takes its colors from. */
   let current: GraphLooks | undefined
-  let stopSettling: (() => void) | undefined
+  let stopSettling: ((keep?: boolean) => void) | undefined
+  /* **The page pausing its motion ends a layout where the notes stand**, as
+     the frame's stop control does. */
+  const stopPaused = onMotionChange((paused) => {
+    if (paused) {
+      stopSettling?.(true)
+    }
+  })
   let pressed: string | undefined
   let pending = 0
   let connected = true
@@ -410,6 +423,7 @@ export const connectGraph = (
     if (stopSettling) {
       stopSettling()
       stopSettling = undefined
+      graph.settling?.()
     }
     cancelAnimationFrame(pending)
     const nodes = graph.nodes ?? []
@@ -532,8 +546,15 @@ export const connectGraph = (
     first = false
     if (unplaced.size > 0 && driver.settle) {
       waiting = unplaced
+      /* **Unseen where the reader asked for less motion or the page paused
+         it**: the frame hides the drawing while the notes move and shows them
+         where they settle. */
+      const unseen = still() || motionPaused()
+      let finished = false
       stopSettling = driver.settle(unplaced, (settled) => {
+        finished = true
         stopSettling = undefined
+        graph.settling?.()
         /* A driver that finishes after the connection ended is not heard. */
         if (!connected) {
           return
@@ -552,6 +573,15 @@ export const connectGraph = (
           ready()
         }
       })
+      /* **The frame offers a stop once the layout has run a while**, which
+         ends it where the notes stand. Only while it still runs: a driver
+         that settled at once has been heard already. */
+      const stop = stopSettling
+      if (finished) {
+        stopSettling = undefined
+      } else if (stop) {
+        graph.settling?.(() => stop(true), unseen)
+      }
       return
     }
     waiting = new Set()
@@ -740,6 +770,8 @@ export const connectGraph = (
       connected = false
       cancelAnimationFrame(pending)
       stopSettling?.()
+      graph.settling?.()
+      stopPaused()
       stopPress?.()
       stopTheme()
       frame.removeEventListener(HelixGraphPartChangeEvent.eventName, handlePartChange)

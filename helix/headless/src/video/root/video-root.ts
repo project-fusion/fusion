@@ -17,8 +17,11 @@ import {
   IdleController,
   type MediaCopy,
   MediaSessionController,
+  motionPaused,
+  onMotionChange,
   onUnlessFalse,
   RemotePlaybackController,
+  reducedMotion,
   reportRuntime,
   SKIP_SECONDS,
   sameCopies,
@@ -275,6 +278,12 @@ export class HelixHeadlessVideo extends HelixElement {
    * permitted is the browser's policy, and what follows a refused autoplay is a
    * paused player showing its start control, which is the correct thing to be
    * looking at.
+   *
+   * **Not where the reader asked for less motion**, or while the page has
+   * paused its motion, through `pauseMotion` or `Motion Toggle`: the player
+   * waits on its start control. A page that pauses its motion pauses a video
+   * that started itself, and one that lets it run again plays it again. A
+   * video the reader started is theirs, and neither touches it.
    */
   @property({ reflect: true, type: Boolean })
   autoplay = false
@@ -1506,9 +1515,48 @@ export class HelixHeadlessVideo extends HelixElement {
     }
   }
 
+  /** What stops hearing the page's pause. */
+  private unpaused: (() => void) | undefined
+
+  /** Whether the page's pause stopped a video that started itself, which letting motion run starts again. */
+  private heldByPage = false
+
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.unpaused ??= onMotionChange(this.handlePageMotion)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.unpaused?.()
+    this.unpaused = undefined
+  }
+
+  /** The page paused its motion, or let it run again, which a video that started itself follows. */
+  private readonly handlePageMotion = (paused: boolean): void => {
+    const video = this.video
+    if (!video || !this.autoplay) {
+      return
+    }
+    if (paused && !video.paused) {
+      this.heldByPage = true
+      video.pause()
+    } else if (!paused && this.heldByPage) {
+      this.heldByPage = false
+      void this.play()
+    }
+  }
+
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated?.(changed)
     this.finishHydration()
+    /* **A video the server sent starting itself is stopped here** where the
+       reader asked for less motion or the page has paused it: the attribute
+       the parser read started it before this code ran. */
+    if (this.autoplay && (reducedMotion() || motionPaused())) {
+      this.heldByPage = motionPaused()
+      this.video?.pause()
+    }
     /* A player with no `label` is announced by `player-label`, "Video", which
        says nothing of what it shows. Development builds only. A playlist
        names its player before the read. */
@@ -2069,7 +2117,7 @@ export class HelixHeadlessVideo extends HelixElement {
         poster=${this.poster || nothing}
         preload=${this.preload}
         crossorigin=${this.crossOrigin ?? nothing}
-        ?autoplay=${this.autoplay}
+        ?autoplay=${this.autoplay && !reducedMotion() && !motionPaused()}
         ?controls=${this.controls}
         ?disablepictureinpicture=${this.disablePictureInPicture}
         ?disableremoteplayback=${this.disableRemotePlayback}

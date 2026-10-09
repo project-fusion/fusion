@@ -525,3 +525,55 @@ slot[name="filter-icon"]::slotted(*) {
     print-color-adjust: economy;
   }
 }
+
+/* **A layout running unseen**, where the reader asked for less motion or the
+   page paused its motion: the drawing waits hidden while the notes move, and
+   shows them where they settle. The `settling` part says why the box is
+   empty, in the middle of it. */
+:host(:state(settling-unseen)) [part="viewport"] ::slotted(*) {
+  visibility: hidden;
+}
+
+[part="settling"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  inset-block-start: 50%;
+  inset-inline: 0;
+  position: absolute;
+  text-align: center;
+  translate: 0 -50%;
+}
+
+/* **The button that stops a long layout**, floating at the start of the
+   bottom edge, clear of the controls in their corner, in their look: the
+   overlay's surface and the theme's floating edge. */
+[part="stop-layout"] {
+  background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
+  border: var(--helix-border-floating) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-floating);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  inset-block-end: var(--helix-space-sm);
+  inset-inline-start: var(--helix-space-sm);
+  min-block-size: var(--helix-size-control-sm);
+  padding-inline: var(--helix-space-sm);
+  position: absolute;
+  z-index: var(--helix-layer-raised);
+}
+
+[part="stop-layout"]:hover {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 10%,
+    var(--viewport-control-background-color, var(--helix-color-surface-overlay))
+  );
+}
+
+[part="stop-layout"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
