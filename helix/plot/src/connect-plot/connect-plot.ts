@@ -34,8 +34,8 @@ export interface PlotColors {
   /** The ticks' numbers: `foreground-muted`. */
   quiet: string
   /**
-   * The ramp a height is shaded along, from `--surface-3d-low` to
-   * `--surface-3d-high`: a quiet tint of `primary-active` up to it whole.
+   * The ramp a height is shaded along, from `--spatial-surface-chart-low` to
+   * `--spatial-surface-chart-high`: a quiet tint of `primary-active` up to it whole.
    */
   ramp: { high: string; low: string }
 }
@@ -140,10 +140,10 @@ export const plotColorsFrom = (chart: Element, groups: number): PlotColors | nul
         read(`var(--chart-series-${(at % SERIES) + 1}, var(--helix-color-primary))`) ?? ink,
       )
     }
-    const high = read('var(--surface-3d-high, var(--helix-color-primary-active))') ?? ink
+    const high = read('var(--spatial-surface-chart-high, var(--helix-color-primary-active))') ?? ink
     const low =
       read(
-        'var(--surface-3d-low, color-mix(in oklab, var(--helix-color-primary-active) 15%, var(--helix-color-surface-sunken)))',
+        'var(--spatial-surface-chart-low, color-mix(in oklab, var(--helix-color-primary-active) 15%, var(--helix-color-surface-sunken)))',
       ) ?? ground
     return { grid, ground, groups: colors, ink, quiet, ramp: { high, low } }
   } finally {

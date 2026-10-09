@@ -1,6 +1,6 @@
 # @fusion.dev/helix-plot
 
-Connects the Helix `Scatter 3D` and `Surface 3D` charts to three.js, which
+Connects the Helix `Spatial Scatter Chart` and `Spatial Surface Chart` charts to three.js, which
 draws them in three dimensions, colored from your tokens.
 
 ```sh
@@ -13,20 +13,20 @@ draw in:
 ```html
 <table id="customers">…</table>
 
-<helix-scatter-3d for="customers" group-by="Segment" label="Customers">
+<helix-spatial-scatter-chart for="customers" group-by="Segment" label="Customers">
   <div></div>
-</helix-scatter-3d>
+</helix-spatial-scatter-chart>
 ```
 
 Connect the two:
 
 ```js
-import '@fusion.dev/helix/scatter-3d'
-import { connectScatter3d } from '@fusion.dev/helix-plot'
+import '@fusion.dev/helix/spatial-scatter-chart'
+import { connectSpatialScatterChart } from '@fusion.dev/helix-plot'
 import { threeScatterDriver } from '@fusion.dev/helix-plot/three'
 
-const chart = document.querySelector('helix-scatter-3d')
-const connection = connectScatter3d(chart, threeScatterDriver(chart.querySelector('div')))
+const chart = document.querySelector('helix-spatial-scatter-chart')
+const connection = connectSpatialScatterChart(chart, threeScatterDriver(chart.querySelector('div')))
 ```
 
 ## What a scatter does
@@ -56,30 +56,30 @@ const connection = connectScatter3d(chart, threeScatterDriver(chart.querySelecto
 
 ## A surface
 
-`Surface 3D` connects the same way, with its own connector and driver:
+`Spatial Surface Chart` connects the same way, with its own connector and driver:
 
 ```html
 <table id="load">…</table>
 
-<helix-surface-3d for="load" label="Load over a week">
+<helix-spatial-surface-chart for="load" label="Load over a week">
   <div></div>
-</helix-surface-3d>
+</helix-spatial-surface-chart>
 ```
 
 ```js
-import '@fusion.dev/helix/surface-3d'
-import { connectSurface3d } from '@fusion.dev/helix-plot'
+import '@fusion.dev/helix/spatial-surface-chart'
+import { connectSpatialSurfaceChart } from '@fusion.dev/helix-plot'
 import { threeSurfaceDriver } from '@fusion.dev/helix-plot/three'
 
-const chart = document.querySelector('helix-surface-3d')
-const connection = connectSurface3d(chart, threeSurfaceDriver(chart.querySelector('div')))
+const chart = document.querySelector('helix-spatial-surface-chart')
+const connection = connectSpatialSurfaceChart(chart, threeSurfaceDriver(chart.querySelector('div')))
 ```
 
 - **The chart reads its table as a grid.** Each row is one reading: the first
   numeric column is across, the second is in depth, and the third is the
   height. A place on the grid with no reading leaves a hole in the surface.
-- **The surface is shaded along a ramp**, from `--surface-3d-low` to
-  `--surface-3d-high`, which default to a quiet tint of the theme's
+- **The surface is shaded along a ramp**, from `--spatial-surface-chart-low` to
+  `--spatial-surface-chart-high`, which default to a quiet tint of the theme's
   `primary-active` and to `primary-active` itself. It is lit from above and
   ruled along the grid.
 - **A place pressed in the drawing is the chart's reading**, and it is ringed
@@ -97,7 +97,7 @@ const connection = connectSurface3d(chart, threeSurfaceDriver(chart.querySelecto
 
 | Import | What |
 |---|---|
-| `@fusion.dev/helix-plot` | `connectScatter3d(chart, driver)`, `connectSurface3d(chart, driver)`, `plotColorsFrom(chart, groups)`, and the types `Axes`, `Axis`, `Field`, `PlotColors`, `PlotConnection`, `PlotDriver`, `Point`, `Scatter3dConnection`, `Scatter3dDriver`, `Surface3dConnection`, `Surface3dDriver`, `SurfaceCell` and `SurfaceField` |
+| `@fusion.dev/helix-plot` | `connectSpatialScatterChart(chart, driver)`, `connectSpatialSurfaceChart(chart, driver)`, `plotColorsFrom(chart, groups)`, and the types `Axes`, `Axis`, `Field`, `PlotColors`, `PlotConnection`, `PlotDriver`, `Point`, `SpatialScatterChartConnection`, `SpatialScatterChartDriver`, `SpatialSurfaceChartConnection`, `SpatialSurfaceChartDriver`, `SurfaceCell` and `SurfaceField` |
 | `@fusion.dev/helix-plot/three` | `threeScatterDriver(box, options)` and `threeSurfaceDriver(box, options)`, and the types `ThreeScatterDriverOptions` and `ThreeSurfaceDriverOptions` |
 
 **three.js is a peer**, so a page brings the version it has.

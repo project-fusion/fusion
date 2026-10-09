@@ -186,7 +186,7 @@ if (!threeBuilt.success) {
 const threeScript = await threeBuilt.outputs[0].text()
 await writeFile(join(out, 'graph-three.js'), threeScript)
 
-/* The same for a 3D Scatter chart three.js draws. */
+/* The same for a spatial chart three.js draws, scatter or surface. */
 const plotThreeBuilt = await Bun.build({
   entrypoints: [plotThreeEntry],
   format: 'iife',

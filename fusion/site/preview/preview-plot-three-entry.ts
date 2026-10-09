@@ -1,12 +1,12 @@
 /**
- * 3D Scatter and 3D Surface charts drawn by three.js in the preview frame,
+ * Spatial Scatter Chart and Spatial Surface Chart drawn by three.js in the preview frame,
  * loaded only when a render carries one marked `data-preview-plot="three"`.
  *
  * A chunk of its own, beside the graph ones, for the reason they are beside
  * `frame.js`: most renders draw no 3D chart.
  */
 
-import { connectScatter3d, connectSurface3d } from '@fusion.dev/helix-plot'
+import { connectSpatialScatterChart, connectSpatialSurfaceChart } from '@fusion.dev/helix-plot'
 import { threeScatterDriver, threeSurfaceDriver } from '@fusion.dev/helix-plot/three'
 import { RESTYLED } from './preview-events'
 
@@ -17,9 +17,9 @@ const start = (chart: HTMLElement): (() => void) => {
     return () => undefined
   }
   const connection =
-    chart.localName === 'helix-surface-3d'
-      ? connectSurface3d(chart, threeSurfaceDriver(box))
-      : connectScatter3d(chart, threeScatterDriver(box))
+    chart.localName === 'helix-spatial-surface-chart'
+      ? connectSpatialSurfaceChart(chart, threeSurfaceDriver(box))
+      : connectSpatialScatterChart(chart, threeScatterDriver(box))
   window.addEventListener(RESTYLED, connection.restyle)
   return () => {
     window.removeEventListener(RESTYLED, connection.restyle)
@@ -31,7 +31,7 @@ window.helixPreviewPlotThree = {
   mount(root) {
     const unmounts = [
       ...root.querySelectorAll<HTMLElement>(
-        ':is(helix-scatter-3d, helix-surface-3d)[data-preview-plot="three"]',
+        ':is(helix-spatial-scatter-chart, helix-spatial-surface-chart)[data-preview-plot="three"]',
       ),
     ].map(start)
     return () => {
