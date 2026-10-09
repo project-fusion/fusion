@@ -12,7 +12,11 @@ const axis = (name: string): BoxAxisText => ({
 const AXES = { x: axis('Age'), y: axis('Yearly spend'), z: axis('Visits a month') }
 
 /** The labels for the box seen from `turn` and `tilt`, as the SVG drawing sees it, and the box's outline on the page. */
-const seenFrom = (turn: number, tilt: number): { hull: PagePoint[]; labels: BoxLabel[] } => {
+const seenFrom = (
+  turn: number,
+  tilt: number,
+  axes = AXES,
+): { hull: PagePoint[]; labels: BoxLabel[] } => {
   const projection = projectionOf({ tilt, turn })
   const seen = ([x, y, z]: readonly [number, number, number]) => ({
     ...projection.at(x, -z, y),
@@ -26,7 +30,7 @@ const seenFrom = (turn: number, tilt: number): { hull: PagePoint[]; labels: BoxL
       }
     }
   }
-  return { hull: hullOf(corners), labels: boxLabels(seen, AXES, SIZES) }
+  return { hull: hullOf(corners), labels: boxLabels(seen, axes, SIZES) }
 }
 
 /** Whether a point is inside a convex outline, by more than `margin`. */
@@ -100,5 +104,18 @@ describe('the box labels', () => {
         .sort()
     expect(names(42, 25)).toEqual(['Age', 'Visits a month', 'Yearly spend'])
     expect(names(42, 90)).toEqual(['Age', 'Visits a month'])
+  })
+
+  test("the up axis' name stands over its top number, which keeps its place", () => {
+    const axes = {
+      ...AXES,
+      y: { ...AXES.y, ticks: AXES.y.ticks.map((tick, index) => ({ ...tick, text: `${index}k` })) },
+    }
+    for (const { tilt, turn } of VIEWS.filter((view) => view.tilt < 60)) {
+      const texts = seenFrom(turn, tilt, axes).labels.map((label) => label.text)
+      if (texts.includes('Yearly spend')) {
+        expect(texts).toContain('4k')
+      }
+    }
   })
 })
