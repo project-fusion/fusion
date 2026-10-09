@@ -24,6 +24,13 @@ export {
   type SpatialHeatmapField,
 } from './connect-spatial-heatmap/connect-spatial-heatmap.js'
 export {
+  connectSpatialRibbonChart,
+  type RibbonCell,
+  type RibbonField,
+  type SpatialRibbonChartConnection,
+  type SpatialRibbonChartDriver,
+} from './connect-spatial-ribbon-chart/connect-spatial-ribbon-chart.js'
+export {
   connectSpatialScatterChart,
   type Field,
   type Point,

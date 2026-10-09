@@ -1,0 +1,197 @@
+:host {
+  display: block;
+}
+
+/* The box the 3D drawing is made in, and the chart's own drawing in it until
+   then. The renderer's box is the page's own element, and it fills the plot. */
+[part="plot"] {
+  background-color: var(--helix-color-surface-sunken);
+  block-size: var(--spatial-ribbon-chart-block-size, 22em);
+  border-radius: var(--helix-radii-md);
+  overflow: hidden;
+  position: relative;
+}
+
+::slotted(*) {
+  inset: 0;
+  position: absolute;
+}
+
+/* With no box, the readings stand on the page itself, as a picture on a
+   landing page does, with nothing drawn behind them. */
+:host([no-box]) [part="plot"] {
+  background-color: transparent;
+}
+
+[part="plot"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The chart's own drawing, inset from the box so the names along its edges
+   have room. It scales as a whole through its `viewBox`. */
+[part="fallback"] {
+  inset: var(--helix-space-md);
+  position: absolute;
+}
+
+[part="fallback"][hidden] {
+  display: none;
+}
+
+[part="drawing"] {
+  block-size: 100%;
+  display: block;
+  font-family: var(--helix-font-sans);
+  inline-size: 100%;
+  overflow: visible;
+  /* A touch moving across turns the view, and one moving up and down scrolls
+     the page. A drag selects no text on its way, the names along the box
+     included. */
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* The box and its grid: the muted ink, see-through, as the renderer draws them. */
+[part="grid"] {
+  fill: none;
+  opacity: 0.35;
+  stroke: var(--helix-color-foreground-muted);
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+[part="tick"] {
+  fill: var(--helix-color-foreground-muted);
+  font-weight: var(--helix-weight-medium);
+}
+
+[part="axis-name"] {
+  fill: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-semibold);
+}
+
+/* Each face of a ribbon in its series' color, darkened by how far it turns
+   from the light: a level top whole, a steep one and the side shaded, so a
+   ribbon reads as a band from any side. The edge is the face a step lighter
+   where it is dark and darker where it is light. */
+[part~="ribbon"] {
+  --_spatial-ribbon-chart-color: var(--chart-series, var(--helix-color-primary));
+}
+
+[part="face"] {
+  --_spatial-ribbon-chart-face: oklch(
+    from var(--_spatial-ribbon-chart-color) calc(l - var(--spatial-ribbon-chart-shade, 0) * 0.5) c h
+  );
+  --_spatial-ribbon-chart-edge: oklch(
+    from var(--_spatial-ribbon-chart-face) calc(l + clamp(-0.08, (0.6 - l) * 1000, 0.1)) c h
+  );
+
+  fill: var(--_spatial-ribbon-chart-fill, var(--_spatial-ribbon-chart-face));
+  fill-opacity: calc(
+    var(--_spatial-ribbon-chart-area, 1) *
+    var(--_spatial-ribbon-chart-through, 1)
+  );
+  stroke: var(--_spatial-ribbon-chart-line, var(--_spatial-ribbon-chart-edge));
+  stroke-linejoin: round;
+  stroke-opacity: var(--_spatial-ribbon-chart-through, 1);
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+/*
+ * **Emphasis and material, as every chart reads them.** `outlined` is a
+ *    ribbon as its edges in its color over faces faded toward the page, and
+ *    `subtle` the same edges over a faint wash, which shows the ribbons behind.
+ */
+:host([emphasis="outlined"]) [part="face"] {
+  --_spatial-ribbon-chart-fill: color-mix(
+    in oklab,
+    var(--_spatial-ribbon-chart-face) 60%,
+    var(--helix-color-background)
+  );
+  --_spatial-ribbon-chart-line: var(--_spatial-ribbon-chart-color);
+}
+
+:host([emphasis="subtle"]) [part="face"] {
+  --_spatial-ribbon-chart-area: 0.2;
+  --_spatial-ribbon-chart-line: var(--_spatial-ribbon-chart-color);
+}
+
+:host([material="glass"]) {
+  --_spatial-ribbon-chart-through: calc(0.62 * var(--helix-material-opacity));
+}
+
+/* `frosted` admits less, which on a mark is more ink: 0.88 against glass's
+   0.62, the relationship the surface tokens carry. */
+:host([material="frosted"]) {
+  --_spatial-ribbon-chart-through: calc(0.88 * var(--helix-material-opacity));
+}
+
+/* **Centered on the reading**: inside the drawing, the mark's one pixel is
+   one of the `viewBox`'s units, many pixels on the page, and a bubble
+   pointed at its middle missed the reading by half of it. */
+foreignObject > [part="mark"] {
+  translate: -50% -50%;
+}
+
+/* The ring on the reading the pointer or the keys rest on, in the full ink. */
+[part="ring"] {
+  fill: none;
+  pointer-events: none;
+  stroke: var(--helix-color-foreground);
+  stroke-width: var(--helix-border-thick);
+  vector-effect: non-scaling-stroke;
+}
+
+/* The readout, the summary, and the table drawn from `data` are for screen readers. */
+[part="live"],
+[part="summary"],
+[part="table"] {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  margin: var(--helix-space-none);
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+[part="empty"],
+[part="loading"] {
+  color: var(--helix-color-foreground-subtle);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+  text-align: center;
+}
+
+/* Print: a face is a fill, so each takes an edge in the border's ink as well. */
+@media print {
+  [part="face"] {
+    stroke: var(--helix-color-border);
+  }
+}
+
+/* Forced colors paint every background the page's Canvas color, so the
+   ribbons keep their colors, which are the series, and take an edge in the
+   system's text color. */
+@media (forced-colors: active) {
+  [part="face"] {
+    forced-color-adjust: none;
+    stroke: CanvasText;
+  }
+
+  [part="grid"] {
+    stroke: CanvasText;
+  }
+
+  [part="tick"],
+  [part="axis-name"] {
+    fill: CanvasText;
+  }
+
+  [part="ring"] {
+    stroke: Highlight;
+  }
+}

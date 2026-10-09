@@ -6,13 +6,16 @@ title: Spatial charts
 
 # Spatial charts
 
-Helix has four charts drawn in three dimensions. Each reads its numbers from a
+Helix has five charts drawn in three dimensions. Each reads its numbers from a
 table in the document, as every Helix chart does:
 
 - `Spatial Bar Chart` stands a bar for each category and series, each as tall
   as its value, such as signups by region and by quarter.
 - `Spatial Heatmap` draws a strip of days as a relief, each day a prism as tall
   as its reading.
+- `Spatial Ribbon Chart` draws a ribbon for each series, one behind another,
+  its top following the values across, such as latency by region over two
+  weeks.
 - `Spatial Scatter Chart` places each row as a point in a box, by three measures
   at once.
 - `Spatial Surface Chart` draws one measure as a surface over two others, such
@@ -54,6 +57,10 @@ Each chart reads its columns in its own way:
   category, and each numeric column a series. Categories run across and series
   back in depth, the first series in front, so one series is a single row of
   bars.
+- **Spatial Ribbon Chart** reads its table as `Line Chart` does: each row is a
+  place along the ribbons, and each numeric column a series. Places run across
+  and series back in depth, the first series in front. A place with no reading
+  ends a ribbon short.
 - **Spatial Scatter Chart** takes the first three numeric columns as across, up,
   and in depth. `group-by` names a column of text that colors each point by its
   group.
@@ -99,6 +106,7 @@ Each chart has its own connector and driver:
 |---|---|---|
 | `Spatial Bar Chart` | `connectSpatialBarChart` | `threeBarDriver` |
 | `Spatial Heatmap` | `connectSpatialHeatmap` | `threeHeatmapDriver` |
+| `Spatial Ribbon Chart` | `connectSpatialRibbonChart` | `threeRibbonDriver` |
 | `Spatial Scatter Chart` | `connectSpatialScatterChart` | `threeScatterDriver` |
 | `Spatial Surface Chart` | `connectSpatialSurfaceChart` | `threeSurfaceDriver` |
 
@@ -139,28 +147,28 @@ Chromium on an Apple silicon Mac:
 | `Spatial Surface Chart` | 900 readings, a grid of 30 by 30 | 1,600 readings: 50 ms, and 3,600: 113 ms |
 | `Spatial Heatmap` | 365 days | 730 days: 50 ms, and 1,825: 132 ms |
 | `Spatial Bar Chart` | 400 bars | 800 bars: 66 ms, and 1,600: 124 ms |
+| `Spatial Ribbon Chart` | 800 readings | 1,600 readings: 50 ms, and 3,200: 83 ms |
 
 A slower machine reaches these sizes sooner. three.js draws each chart on the
 graphics card.
 
-## Read a place off the floor
+## Read a place more closely
 
-Two options draw onto the floor of the box, to help you read where a reading
-stands:
+Two options help you read where a reading stands:
 
 - `drop-lines` on `Spatial Scatter Chart` draws a line from each point straight
   down to the floor, in its group's color, so where a point stands across and in
   depth reads off the floor's grid.
-- `contours` on `Spatial Surface Chart` draws the surface's contour lines on the
-  floor at each tick of its height, in the ramp's colors, so its shape reads from
-  above as on a map.
+- `contours` on `Spatial Surface Chart` draws the surface's contour lines on it,
+  at each tick of its height, so its shape reads as on a map, and two places at
+  the same height read as such.
 
 three.js draws both as well.
 
 ## Draw a chart for a landing page
 
-`no-box` draws `Spatial Bar Chart`, `Spatial Scatter Chart`, or `Spatial Surface
-Chart` with no box, grid, numbers, or names, and nothing behind it, so the
+`no-box` draws `Spatial Bar Chart`, `Spatial Ribbon Chart`, `Spatial Scatter
+Chart`, or `Spatial Surface Chart` with no box, grid, numbers, or names, and nothing behind it, so the
 readings stand on the page as a picture does:
 
 ```html
@@ -177,7 +185,7 @@ three.js draws no box either. `Spatial Heatmap` has no box, and its `start` and
 `end` slots are the only names it draws, so leave them empty for the same
 picture.
 
-## When a 3D bar chart fits
+## When a 3D bar or ribbon chart fits
 
 A flat `Bar Chart` is read more exactly. Studies of 3D bars measure readers
 judging a value less closely than on flat ones, and a bar can stand behind
@@ -185,6 +193,10 @@ another. Use `Spatial Bar Chart` where the shape across two sets of names
 matters more than any one value, such as which regions grew in which quarters.
 A drag turns the view to show a bar another hides, and the tooltip and the
 table carry every exact value.
+
+The same holds for `Spatial Ribbon Chart` beside `Line Chart`. Use it where
+series cross often enough that their lines tangle, and each in its own depth
+reads apart.
 
 ## Read a chart with the pointer and the keys
 
@@ -207,7 +219,8 @@ The plot takes focus, and the keys move the reading:
 
 `Spatial Bar Chart` reads as `Spatial Surface Chart` does: the left and right
 arrows move from category to category, and the down and up arrows from series to
-series.
+series. `Spatial Ribbon Chart` reads the same way, from place to place along a
+ribbon and from ribbon to ribbon.
 
 `Spatial Heatmap` takes `Heatmap`'s keys, and Shift with an arrow turns its
 view, except under `selection-mode="multiple"`, where it selects a range.
@@ -233,6 +246,9 @@ Each chart takes its colors from your theme, and these hooks change them:
 - **Spatial Bar Chart**: each series takes a series color,
   `--chart-series-1` and on, and each face of a bar is that color darkened by
   how far it turns from the light.
+- **Spatial Ribbon Chart**: each series takes a series color, `--chart-series-1`
+  and on, and each face of a ribbon is that color darkened by how far it turns
+  from the light.
 - **Spatial Scatter Chart**: each group takes a series color,
   `--chart-series-1` and on.
 - **Spatial Surface Chart**: the surface is shaded from `--spatial-surface-chart-low`

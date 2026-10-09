@@ -1,0 +1,129 @@
+export function Example() {
+  return (
+    <>
+      <table
+        data-hidden-visually
+        id="latency"
+      >
+        <caption>Response time by region, first two weeks of September</caption>
+        <thead>
+          <tr>
+            <th scope="col">Day</th>
+            <th scope="col">Frankfurt (ms)</th>
+            <th scope="col">Virginia (ms)</th>
+            <th scope="col">Singapore (ms)</th>
+            <th scope="col">São Paulo (ms)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1 Sep</th>
+            <td>120</td>
+            <td>110</td>
+            <td>196</td>
+            <td>213</td>
+          </tr>
+          <tr>
+            <th scope="row">2 Sep</th>
+            <td>128</td>
+            <td>113</td>
+            <td>191</td>
+            <td>204</td>
+          </tr>
+          <tr>
+            <th scope="row">3 Sep</th>
+            <td>134</td>
+            <td>112</td>
+            <td>184</td>
+            <td>198</td>
+          </tr>
+          <tr>
+            <th scope="row">4 Sep</th>
+            <td>138</td>
+            <td>108</td>
+            <td>176</td>
+            <td>193</td>
+          </tr>
+          <tr>
+            <th scope="row">5 Sep</th>
+            <td>137</td>
+            <td>101</td>
+            <td>169</td>
+            <td>192</td>
+          </tr>
+          <tr>
+            <th scope="row">6 Sep</th>
+            <td>134</td>
+            <td>93</td>
+            <td>164</td>
+            <td>195</td>
+          </tr>
+          <tr>
+            <th scope="row">7 Sep</th>
+            <td>127</td>
+            <td>85</td>
+            <td>202</td>
+            <td>201</td>
+          </tr>
+          <tr>
+            <th scope="row">8 Sep</th>
+            <td>119</td>
+            <td>79</td>
+            <td>204</td>
+            <td>208</td>
+          </tr>
+          <tr>
+            <th scope="row">9 Sep</th>
+            <td>111</td>
+            <td>77</td>
+            <td>209</td>
+            <td>216</td>
+          </tr>
+          <tr>
+            <th scope="row">10 Sep</th>
+            <td>105</td>
+            <td>78</td>
+            <td>177</td>
+            <td>223</td>
+          </tr>
+          <tr>
+            <th scope="row">11 Sep</th>
+            <td>102</td>
+            <td>83</td>
+            <td>185</td>
+            <td>252</td>
+          </tr>
+          <tr>
+            <th scope="row">12 Sep</th>
+            <td>103</td>
+            <td>90</td>
+            <td>192</td>
+            <td>253</td>
+          </tr>
+          <tr>
+            <th scope="row">13 Sep</th>
+            <td>107</td>
+            <td>98</td>
+            <td>197</td>
+            <td>250</td>
+          </tr>
+          <tr>
+            <th scope="row">14 Sep</th>
+            <td>113</td>
+            <td>106</td>
+            <td>198</td>
+            <td>244</td>
+          </tr>
+        </tbody>
+      </table>
+      {/* Preview frame: data-preview-plot="three" has the frame connect three.js; on your page, connectSpatialRibbonChart(chart, threeRibbonDriver(box)) from @fusion.dev/helix-plot and @fusion.dev/helix-plot/three does. */}
+      <helix-spatial-ribbon-chart
+        data-preview-plot="three"
+        for="latency"
+        label="Response time by region"
+      >
+        <div data-preview-plot-canvas></div>
+      </helix-spatial-ribbon-chart>
+    </>
+  )
+}
