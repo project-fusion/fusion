@@ -1,0 +1,165 @@
+---
+description: Add charts drawn in three dimensions to your site, styled with your theme, in SVG or with three.js.
+section: Essentials
+title: Spatial charts
+---
+
+# Spatial charts
+
+Helix has three charts drawn in three dimensions. Each reads its numbers from a
+table in the document, as every Helix chart does:
+
+- `Spatial Heatmap` draws a strip of days as a relief, each day a prism as tall
+  as its reading.
+- `Spatial Scatter Chart` places each row as a point in a box, by three measures
+  at once.
+- `Spatial Surface Chart` draws one measure as a surface over two others, such
+  as load by hour and by day.
+
+Each chart draws itself in SVG. `@fusion.dev/helix-plot` can also draw it with
+three.js, in a view you can drag round and zoom.
+
+## Draw a spatial chart
+
+Put the table in the document, and point the chart at it with `for`:
+
+```html
+<table data-hidden-visually id="load">
+  <caption>Load over a week</caption>
+  <thead>
+    <tr>
+      <th scope="col">Slot</th>
+      <th scope="col">Hour</th>
+      <th scope="col">Day</th>
+      <th scope="col">Requests a minute</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><th scope="row">Mon 08:00</th><td>8</td><td>1</td><td>994</td></tr>
+    …
+  </tbody>
+</table>
+
+<helix-spatial-surface-chart for="load"></helix-spatial-surface-chart>
+```
+
+Each chart reads its columns in its own way:
+
+- **Spatial Scatter Chart** takes the first three numeric columns as across, up,
+  and in depth. `group-by` names a column of text that colors each point by its
+  group.
+- **Spatial Surface Chart** takes the first numeric column as across, the second
+  as depth, and the third as the height. A place on the grid with no reading
+  leaves a hole.
+- **Spatial Heatmap** reads its table as `Heatmap` does, down each column of
+  `rows` and then across. Its table goes inside it.
+
+The drawing is SVG. A server writes the chart's frame, and the drawing arrives
+when the chart reads its table in the browser.
+
+## Draw it with three.js
+
+Install the package and three.js:
+
+```sh
+bun add @fusion.dev/helix-plot three
+```
+
+Put an element inside the chart for three.js to draw in, and connect the two:
+
+```html
+<helix-spatial-scatter-chart for="customers" group-by="Segment">
+  <div></div>
+</helix-spatial-scatter-chart>
+```
+
+```js
+import { connectSpatialScatterChart } from '@fusion.dev/helix-plot'
+import { threeScatterDriver } from '@fusion.dev/helix-plot/three'
+
+const chart = document.querySelector('helix-spatial-scatter-chart')
+const connection = connectSpatialScatterChart(chart, threeScatterDriver(chart.querySelector('div')))
+```
+
+Each chart has its own connector and driver:
+
+| Chart | Connector | Driver |
+|---|---|---|
+| `Spatial Heatmap` | `connectSpatialHeatmap` | `threeHeatmapDriver` |
+| `Spatial Scatter Chart` | `connectSpatialScatterChart` | `threeScatterDriver` |
+| `Spatial Surface Chart` | `connectSpatialSurfaceChart` | `threeSurfaceDriver` |
+
+`Spatial Heatmap` takes the element in its `renderer` slot, because its table
+is inside it:
+
+```html
+<helix-spatial-heatmap for="commits" rows="7">
+  <table id="commits">…</table>
+  <div slot="renderer"></div>
+</helix-spatial-heatmap>
+```
+
+Once three.js has drawn, the chart hides its SVG drawing.
+`connection.disconnect()` frees the renderer and shows the SVG drawing again.
+
+## Choose SVG or three.js
+
+| | SVG | three.js |
+|---|---|---|
+| What it needs | Nothing more than the chart | `@fusion.dev/helix-plot`, three.js, and WebGL |
+| How the view moves | Shift with an arrow turns the scatter and the surface a step | Drag to turn, the wheel or a pinch to zoom, and Shift with an arrow to turn a step |
+| Light | Shaded by which way each face turns, with no perspective | Lit from above, in perspective |
+| Without WebGL | Drawn | Not drawn, and the SVG drawing stays |
+
+Start with SVG. Connect three.js where a reader gains from turning the chart
+freely, or where the data is too large for SVG to draw smoothly.
+
+## Read a chart with the pointer and the keys
+
+A pointer resting on a reading shows its row in the chart's tooltip, the same
+tooltip every Helix chart shows. A tap shows it until a tap lands elsewhere.
+
+The plot takes focus, and the keys move the reading:
+
+| Key | Spatial Scatter Chart | Spatial Surface Chart |
+|---|---|---|
+| Right, Left | The next or the previous point, in the table's order | Across, to the next or the previous place |
+| Up, Down | Among the point's measures, which the readout says first | In depth, back and forward |
+| Home, End | The first or the last point | The first or the last place |
+| Shift with an arrow | Turns the view a step | Turns the view a step |
+| Enter, Space | Presses the point | Presses the place |
+| Escape | Lets the reading go | Lets the reading go |
+
+`Spatial Heatmap` takes `Heatmap`'s keys. Shift with an arrow turns a renderer's
+view, except under `selection-mode="multiple"`, where it selects a range.
+
+In three.js, a turn moves over a quarter of a second, and with reduced motion
+set it happens at once. The SVG drawing turns in one step. No spatial chart
+turns by itself.
+
+## Color a spatial chart
+
+Each chart takes its colors from your theme, and these hooks change them:
+
+- **Spatial Scatter Chart**: each group takes a series color,
+  `--chart-series-1` and on.
+- **Spatial Surface Chart**: the surface is shaded from `--spatial-surface-chart-low`
+  to `--spatial-surface-chart-high`.
+- **Spatial Heatmap**: each day takes its tone's color, as on `Heatmap`:
+  `--heatmap-tone-1` to `--heatmap-tone-5` along the ramp, or a named tone such
+  as `--heatmap-tone-success`. `--spatial-heatmap-left-shade` and
+  `--spatial-heatmap-right-shade` set how much less light each side of a prism
+  is than its top.
+
+three.js reads the same colors, so the two drawings agree. It lights the
+prisms and the surface itself, so the two shade hooks apply to the SVG drawing
+alone.
+
+## Many drawings on one page
+
+Every three.js drawing Helix makes on a page shares six WebGL contexts, the
+spatial charts' and the graphs' alike. Past six, a drawing far off screen gives
+its context back and takes it again as it comes near.
+
+A three.js drawing draws only while something moves. It asks the browser for no
+frames at rest, or while it is out of view.
