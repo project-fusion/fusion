@@ -335,6 +335,21 @@ export const createStage = (
       dirty = true
       if (through >= 1) {
         turn = undefined
+        turned()
+      }
+    }
+    if (settle) {
+      const through = Math.min((now - settle.start) / DURATION, 1)
+      const eased = ease(through)
+      const toward = camera.position.clone().sub(controls.target).normalize()
+      const [near, far] = settle.distance
+      controls.target.lerpVectors(settle.from, settle.to, eased)
+      camera.position.copy(controls.target).add(toward.multiplyScalar(near + (far - near) * eased))
+      camera.lookAt(controls.target)
+      dirty = true
+      if (through >= 1) {
+        settle = undefined
+        controls.update()
       }
     }
     if (!dirty) {
@@ -345,7 +360,7 @@ export const createStage = (
     drawLabels()
     tellPlace()
     tellTracked()
-    if (turn && !pending) {
+    if ((turn || settle) && !pending) {
       pending = requestAnimationFrame(tick)
     }
   }
@@ -367,12 +382,12 @@ export const createStage = (
    * it draws, which the camera stands just far enough back to see whole.
    */
   let framed: { high: Vector3; low: Vector3 } | undefined
-  const fit = (): void => {
-    if (!framed) {
-      return
-    }
-    const { high, low } = framed
-    const toward = camera.position.clone().sub(controls.target).normalize()
+  /** Where the camera is aimed, and how far back it stands, to hold the framed box seen from `toward`. */
+  const fitFrom = (
+    toward: Vector3,
+    box: { high: Vector3; low: Vector3 },
+  ): { center: Vector3; distance: number } => {
+    const { high, low } = box
     /* The camera's own across and up, looking from `toward` at the middle. */
     const right = new Vector3(0, 1, 0).cross(toward).normalize()
     const up = toward.clone().cross(right).normalize()
@@ -427,14 +442,75 @@ export const createStage = (
         .add(up.clone().multiplyScalar(((bottom + top) / 2) * tanUp * distance))
       distance = distanceFrom(center)
     }
-    distance *= 1.06
-    controls.target.copy(center)
-    camera.position.copy(center).add(toward.multiplyScalar(distance))
+    return { center, distance: distance * 1.06 }
+  }
+  /** How near the camera may come and how far it may go, round a box held `distance` back. */
+  const reach = (distance: number): void => {
     controls.minDistance = distance * 0.35
     controls.maxDistance = distance * 3
+  }
+  const fit = (): void => {
+    if (!framed) {
+      return
+    }
+    const toward = camera.position.clone().sub(controls.target).normalize()
+    const { center, distance } = fitFrom(toward, framed)
+    settle = undefined
+    controls.target.copy(center)
+    camera.position.copy(center).add(toward.multiplyScalar(distance))
+    reach(distance)
     camera.lookAt(controls.target)
     controls.update()
   }
+
+  /**
+   * **Held through a turn, and framed again once it ends.** The camera turns
+   * round the middle of what is drawn at the distance it stood, so nothing
+   * jumps while it moves, as the chart's own drawing holds its size through a
+   * drag. Seen from the new side the box can reach past the view, so once a
+   * drag or a step ends the camera eases to the framing for that side, over a
+   * quarter of a second, or at once with reduced motion set. **A zoom the
+   * reader chose is kept**: the camera stands off the new framing by as much
+   * as it stands off the framing it began from, so a wheel or a pinch, which
+   * starts and ends with no turn, leaves the camera where it put it.
+   */
+  let settle: { from: Vector3; start: number; to: Vector3; distance: [number, number] } | undefined
+  /** How far back the framing stood when a turn began. */
+  let began = 0
+  const turning = (): void => {
+    settle = undefined
+    if (framed) {
+      const toward = camera.position.clone().sub(controls.target).normalize()
+      began = fitFrom(toward, framed).distance
+    }
+  }
+  const turned = (): void => {
+    if (!framed || began <= 0) {
+      return
+    }
+    const toward = camera.position.clone().sub(controls.target).normalize()
+    const { center, distance } = fitFrom(toward, framed)
+    reach(distance)
+    const zoomed = camera.position.distanceTo(controls.target) / began
+    const to = { center, distance: distance * zoomed }
+    if (still()) {
+      controls.target.copy(to.center)
+      camera.position.copy(to.center).add(toward.multiplyScalar(to.distance))
+      camera.lookAt(controls.target)
+      controls.update()
+      invalidate()
+      return
+    }
+    settle = {
+      distance: [camera.position.distanceTo(controls.target), to.distance],
+      from: controls.target.clone(),
+      start: performance.now(),
+      to: to.center,
+    }
+    invalidate()
+  }
+  controls.addEventListener('start', turning)
+  controls.addEventListener('end', turned)
 
   const resize = (): void => {
     const width = Math.max(container.clientWidth, 1)
@@ -601,6 +677,8 @@ export const createStage = (
       canvas.removeEventListener('pointerup', onUp)
       canvas.removeEventListener('pointermove', onMove)
       canvas.removeEventListener('pointerleave', onLeave)
+      controls.removeEventListener('start', turning)
+      controls.removeEventListener('end', turned)
       controls.dispose()
       grid.geometry.dispose()
       gridMaterial.dispose()
@@ -624,6 +702,7 @@ export const createStage = (
       }
     },
     turnBy: (across: number, up: number, animate: boolean): void => {
+      turning()
       const from = new Spherical().setFromVector3(camera.position.clone().sub(controls.target))
       const to = from.clone()
       to.theta += across * STEP
@@ -631,6 +710,7 @@ export const createStage = (
       if (!animate || still()) {
         camera.position.setFromSpherical(to).add(controls.target)
         camera.lookAt(controls.target)
+        turned()
         invalidate()
         return
       }
