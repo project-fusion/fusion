@@ -1,0 +1,18 @@
+- group "Episode player":
+  - status
+  - alert: This video could not be played
+  - button "Play"
+  - text: 0:00 / 0:00
+  - slider "Seek": "0"
+  - button "Mute"
+  - slider "Volume": "1"
+  - button "Previous"
+  - button "Next"
+  - button "Fullscreen"
+- list "Episodes":
+  - listitem:
+    - button "Sintel 2:00"
+  - listitem:
+    - button "Tears of Steel 1:10"
+  - listitem:
+    - button "Not available in your region 1:10" [disabled]

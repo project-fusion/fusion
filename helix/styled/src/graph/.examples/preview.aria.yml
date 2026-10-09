@@ -1,0 +1,17 @@
+- group "Company notes":
+  - text: Graph
+  - group "Graph controls":
+    - button "Zoom in": +
+    - button "Zoom out": −
+    - button "Fill the screen": ⤢
+  - combobox "Find a note" [expanded]
+  - listbox "Notes":
+    - option "Pricing" [selected]
+    - option "Budget"
+    - option "Churn review"
+    - option "Plans and tiers"
+    - option "Hiring plan"
+    - option "Onboarding"
+    - option "Roadmap"
+    - option "Support playbook"
+  - status

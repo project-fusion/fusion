@@ -1,0 +1,9 @@
+- button "Previous slide" [disabled]
+- button "Next slide"
+- group "1 of 3": Reports
+- group "2 of 3": Invoices
+- group "3 of 3": Contracts
+- group "Folders slides":
+  - button "Slide 1"
+  - button "Slide 2"
+  - button "Slide 3"

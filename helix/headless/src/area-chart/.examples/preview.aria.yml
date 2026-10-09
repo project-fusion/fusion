@@ -1,0 +1,49 @@
+- table "Visits a month by source":
+  - caption: Visits a month by source
+  - rowgroup:
+    - row "Month Search Direct Referral Social":
+      - columnheader "Month"
+      - columnheader "Search"
+      - columnheader "Direct"
+      - columnheader "Referral"
+      - columnheader "Social"
+  - rowgroup:
+    - row "Jan 420 180 90 60":
+      - rowheader "Jan"
+      - cell "420"
+      - cell "180"
+      - cell "90"
+      - cell "60"
+    - row "Feb 460 190 95 70":
+      - rowheader "Feb"
+      - cell "460"
+      - cell "190"
+      - cell "95"
+      - cell "70"
+    - row "Mar 510 200 110 85":
+      - rowheader "Mar"
+      - cell "510"
+      - cell "200"
+      - cell "110"
+      - cell "85"
+    - row "Apr 540 205 120 110":
+      - rowheader "Apr"
+      - cell "540"
+      - cell "205"
+      - cell "120"
+      - cell "110"
+    - row "May 600 215 118 140":
+      - rowheader "May"
+      - cell "600"
+      - cell "215"
+      - cell "118"
+      - cell "140"
+    - row "Jun 650 220 125 170":
+      - rowheader "Jun"
+      - cell "650"
+      - cell "220"
+      - cell "125"
+      - cell "170"
+- application "Visits a month by source":
+  - status
+- paragraph: "Visits a month by source, Jun: Total 1,165; Search 56%, Direct 19%, Referral 11%, Social 15%."

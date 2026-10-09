@@ -1,0 +1,28 @@
+- table "Sessions a month":
+  - caption: Sessions a month
+  - rowgroup:
+    - row "Month Sessions":
+      - columnheader "Month"
+      - columnheader "Sessions"
+  - rowgroup:
+    - row "Jan 1180":
+      - rowheader "Jan"
+      - cell "1180"
+    - row "Feb 1240":
+      - rowheader "Feb"
+      - cell "1240"
+    - row "Mar 1190":
+      - rowheader "Mar"
+      - cell "1190"
+    - row "Apr 1320":
+      - rowheader "Apr"
+      - cell "1320"
+    - row "May 1410":
+      - rowheader "May"
+      - cell "1410"
+    - row "Jun 1380":
+      - rowheader "Jun"
+      - cell "1380"
+- application "Sessions a month":
+  - status
+- paragraph: "Sessions a month, Jun: Sessions 1380."
