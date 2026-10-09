@@ -293,6 +293,44 @@ const within = (seconds, promise, what) => {
 }
 
 /**
+ * The accessibility snapshot of the page, without what `mask` and `aria.hide`
+ * name.
+ *
+ * **What a run paints over, it does not judge in the snapshot either.** A
+ * masked version number is still text in the accessibility tree, so every
+ * release would change the snapshot that the mask kept out of the picture.
+ * Each masked element is given `aria-hidden` for the snapshot, and the value
+ * it had is put back after.
+ */
+const ariaSnapshot = async (page, mask) => {
+  const MARK = 'data-helix-visual-aria-hidden'
+  for (const selector of mask) {
+    await page.locator(selector).evaluateAll((elements, mark) => {
+      for (const element of elements) {
+        element.setAttribute(mark, element.getAttribute('aria-hidden') ?? '')
+        element.setAttribute('aria-hidden', 'true')
+      }
+    }, MARK)
+  }
+  try {
+    return `${await page.locator('body').ariaSnapshot()}\n`
+  } finally {
+    /* A locator, as above, so an element inside a shadow root is found too. */
+    await page.locator(`[${MARK}]`).evaluateAll((elements, mark) => {
+      for (const element of elements) {
+        const was = element.getAttribute(mark)
+        if (was === '') {
+          element.removeAttribute('aria-hidden')
+        } else {
+          element.setAttribute('aria-hidden', was)
+        }
+        element.removeAttribute(mark)
+      }
+    }, MARK)
+  }
+}
+
+/**
  * Each code block that draws all of its text in one color, as a sentence.
  *
  * **A highlighter that fails leaves nothing to say so.** On October 8, 2026
@@ -412,7 +450,7 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
       }
       if (index === 0 && item.aria) {
         progress.stage = 'taking its accessibility snapshot'
-        aria = `${await page.locator('body').ariaSnapshot()}\n`
+        aria = await ariaSnapshot(page, [...state.mask, ...state.hide])
       }
       /* A pair's own check, on each side's page after its first picture. */
       if (index === 0 && item.check) {
@@ -685,7 +723,8 @@ const handlers = {
     })
   },
 
-  async start({ mask = [], network, origins = [], serve, style = null, workers }) {
+  async start({ hide = [], mask = [], network, origins = [], serve, style = null, workers }) {
+    state.hide = hide
     state.mask = mask
     state.style = style ?? undefined
     state.network = network

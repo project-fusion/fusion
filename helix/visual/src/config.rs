@@ -19,9 +19,10 @@ use serde::Deserialize;
 #[serde(deny_unknown_fields, rename_all = "camelCase")]
 pub struct Config {
     /// Whether each entry's accessibility snapshot is kept beside its
-    /// baselines, as `<stem>.aria.yml`, and compared as text.
+    /// baselines, as `<stem>.aria.yml`, and compared as text, and what it
+    /// leaves out besides what `mask` names.
     #[serde(default)]
-    pub aria: bool,
+    pub aria: Aria,
     /// Checks run on each entry's page after its first shot, which need no
     /// baseline.
     #[serde(default)]
@@ -30,9 +31,9 @@ pub struct Config {
     pub diff: Diff,
     #[serde(default)]
     pub exceptions: Vec<Exception>,
-    /// Selectors whose elements are painted over in every picture, for what
-    /// changes on its own and says nothing about the page: a version number,
-    /// a date.
+    /// Selectors whose elements are painted over in every picture and left out
+    /// of every accessibility snapshot, for what changes on its own and says
+    /// nothing about the page: a version number, a date.
     #[serde(default)]
     pub mask: Vec<String>,
     /// Where the environment fingerprint is kept, relative to the config.
@@ -757,6 +758,40 @@ impl Config {
     }
 }
 
+/// `aria`: `true`, or the elements a snapshot leaves out.
+///
+/// **`hide` is for what is read aloud and never drawn.** `mask` leaves its
+/// elements out of the snapshot too, but it also paints over their boxes, and
+/// a table hidden visually still has the box of its rows: masked, it would
+/// paint over whatever it sits under.
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum Aria {
+    Kept(bool),
+    Hiding { hide: Vec<String> },
+}
+
+impl Default for Aria {
+    fn default() -> Self {
+        Self::Kept(false)
+    }
+}
+
+impl Aria {
+    /// Whether each entry's snapshot is kept.
+    pub fn kept(&self) -> bool {
+        !matches!(self, Self::Kept(false))
+    }
+
+    /// The selectors a snapshot leaves out besides the masked ones.
+    pub fn hidden(&self) -> &[String] {
+        match self {
+            Self::Hiding { hide } => hide,
+            Self::Kept(_) => &[],
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -797,6 +832,20 @@ mod tests {
             ),
             ("#fff", "#fff", 24)
         );
+    }
+
+    #[test]
+    fn a_snapshot_is_kept_by_a_flag_or_by_what_it_hides() {
+        assert!(!Config::parse(minimal()).unwrap().aria.kept());
+        let mut value = minimal();
+        value["aria"] = json!(true);
+        let flagged = Config::parse(value).unwrap();
+        assert!(flagged.aria.kept() && flagged.aria.hidden().is_empty());
+        let mut value = minimal();
+        value["aria"] = json!({ "hide": ["#table"] });
+        let hiding = Config::parse(value).unwrap();
+        assert!(hiding.aria.kept());
+        assert_eq!(hiding.aria.hidden(), ["#table"]);
     }
 
     #[test]
