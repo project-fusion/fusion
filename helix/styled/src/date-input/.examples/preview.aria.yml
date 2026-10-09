@@ -1,0 +1,4 @@
+- text: Starts
+- combobox "Starts"
+- button "Choose a date"
+- paragraph: Any weekday works

@@ -1,0 +1,6 @@
+- navigation "Main":
+  - link "Overview":
+    - /url: "#overview"
+  - button "Products"
+  - link "Pricing":
+    - /url: "#pricing"
