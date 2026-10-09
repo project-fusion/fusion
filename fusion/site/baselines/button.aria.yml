@@ -102,6 +102,7 @@
           - treeitem "Skip Link" [level=2]
           - treeitem "Slider" [level=2]
           - treeitem "Sparkline" [level=2]
+          - treeitem "Spatial Bar Chart" [level=2]
           - treeitem "Spatial Heatmap" [level=2]
           - treeitem "Spatial Scatter Chart" [level=2]
           - treeitem "Spatial Surface Chart" [level=2]
