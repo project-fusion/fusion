@@ -1,0 +1,213 @@
+- link "Fusion":
+  - /url: /
+- navigation "Sections":
+  - button "Products"
+  - link "Services":
+    - /url: /company/services
+  - link "Insights":
+    - /url: /insights
+- button "Search Ctrl+K"
+- link "Fusion source on GitHub":
+  - /url: https://github.com/project-fusion
+- button "Preferences"
+- main:
+  - link "Coming soon Helix ships first":
+    - /url: /announcements
+  - heading "An intelligent design system, and the engineers behind it" [level=1]
+  - paragraph: Ship faster because the system does the checking.
+  - link "Open Helix":
+    - /url: /helix
+  - link "Work with us":
+    - /url: /company/services
+  - code: bun add @fusion.dev/helix
+  - button "Copy the install command"
+  - paragraph: Custom elements, built on Lit. Works in React, Vue, Svelte, or no framework at all.
+  - heading "An interface is cheap to start and expensive to keep" [level=2]
+  - paragraph: The first screen takes a morning. A second brand, a framework migration, and an accessibility audit take the rest of the year, and none of them is visible on the day you start. Helix is built for that later work.
+  - paragraph: Theming
+  - paragraph: Add a second brand with one color
+  - list:
+    - listitem: Enter one brand color and get a full palette
+    - listitem: Helix rejects a palette it cannot make readable
+  - paragraph: Components
+  - paragraph: Switch frameworks without a rewrite
+  - list:
+    - listitem: Custom elements that run in any framework, or in none
+    - listitem: Types for React, Vue, and Svelte from one manifest
+  - paragraph: Checks
+  - paragraph: Find problems before an audit does
+  - list:
+    - listitem: Contrast is measured on every release
+    - listitem: Twelve generators check the code and fail the build when it drifts
+  - paragraph: Agents
+  - paragraph: Give AI agents the reference you read
+  - list:
+    - listitem: Every tag, property, and event in one manifest at a URL
+    - listitem: Every page as Markdown, and every component family as JSON
+  - paragraph: Theming
+  - heading "Every pair checked for contrast" [level=2]
+  - paragraph: You enter one brand color, and Helix computes every token from it.
+  - figure:
+    - img "How a palette is derived from one color A brand color, a saturation, a density and a radius feed a derivation engine, which emits 179 semantic tokens in both schemes with 67 foreground and ground pairs measured.": What you choose brand saturation density radius AA Aa 4.9:1 measured contrast What comes out 179 semantic tokens both schemes 67 pairs measured
+  - paragraph: Components
+  - heading "The panel runs in your browser" [level=2]
+  - paragraph: Each control in it is a custom element from the Helix package.
+  - link "Explore components":
+    - /url: /helix
+  - link "Open the sandbox":
+    - /url: /helix/sandbox
+  - link "Build a theme":
+    - /url: /helix/theme
+  - text: Helix
+  - heading "One brand color, a full palette" [level=3]
+  - text: Pick one brand color, and every surface, border, and text color on this page follows from it. Each text color is checked for contrast against its background.
+  - button "Read about theming"
+  - text: Showing
+  - radio "Controls" [checked]
+  - radio "Data"
+  - radio "Surfaces"
+  - text: Color mode
+  - button "Color mode Dark": Dark
+  - text: Octaves
+  - group "Octaves":
+    - button "Decrease Octaves"
+    - spinbutton "Octaves": "8"
+    - button "Increase Octaves"
+  - text: Bloom
+  - slider "Bloom minimum": "35"
+  - slider "Bloom maximum": "65"
+  - switch "Reduced motion" [checked]
+  - text: Reduced motion
+  - checkbox "Ship with the audit" [checked]
+  - text: Ship with the audit
+  - button "Primary"
+  - button "Secondary"
+  - button "Subtle"
+  - text: Cmd K Tag
+  - button "Notifications"
+  - status "3 unread": "3"
+  - text: Verification code
+  - textbox "Verification code"
+  - text: Documentation
+  - radiogroup "Documentation":
+    - radio "1 out of 5"
+    - radio "2 out of 5"
+    - radio "3 out of 5"
+    - radio "4 out of 5" [checked]
+    - radio "5 out of 5"
+  - text: How did that go
+  - radio "Awful"
+  - radio "Poor"
+  - radio "Fine"
+  - radio "Good" [checked]
+  - radio "Great"
+  - paragraph: Package size
+  - heading "Measured on every release" [level=2]
+  - paragraph: From the built packages, compressed with Brotli as a CDN serves them.
+  - paragraph: "106"
+  - paragraph: Components
+  - paragraph: Each has a headless tier with its behavior and a styled tier with its design.
+  - paragraph: 2.3 kB
+  - paragraph: The token layer, compressed
+  - paragraph: 197 semantic tokens. Every Helix page loads this file.
+  - paragraph: 127.3 kB
+  - paragraph: The derivation engine, compressed
+  - paragraph: Most sites run it when they build and ship none of it. A theme switcher downloads all of it.
+  - paragraph: 78%
+  - paragraph: Of the first component is shared
+  - paragraph: Most of the first component is a runtime that every later component reuses.
+  - heading "One button, five systems" [level=3]
+  - paragraph: Brotli bytes for one button with its runtime, measured the same way on the same day.
+  - link "See how we measure":
+    - /url: /helix/docs/metrics
+  - paragraph: Services
+  - heading "One to eight weeks" [level=2]
+  - paragraph: Every service runs two days a week, alongside your team.
+  - paragraph: AI capability audit
+  - paragraph: Up to two weeks to find out which AI work is worth building. It fits around your roadmap and does not commit you to more.
+  - paragraph: Design system sprint
+  - paragraph: Helix, applied to your product. We build your components in your repository, as working code.
+  - paragraph: Conversational build
+  - paragraph: We build software with you while the specification is still changing, and agree the next step in each conversation.
+  - link "Compare the services":
+    - /url: /company/services
+  - paragraph: Working with us
+  - heading "We build in your codebase" [level=2]
+  - paragraph: The system is already built
+  - paragraph: Helix already has its token layer, components, framework types, sandbox, and build checks. Your project starts from that.
+  - paragraph: The work takes weeks
+  - paragraph: A typical engagement is four weeks at two days a week. The same work started from nothing takes months.
+  - paragraph: You keep all of it
+  - paragraph: The work lands in your repository under your license. We hand it over as we go, so you do not need us on a retainer afterward.
+  - paragraph: We tell you what is not done
+  - paragraph: Every product shows its stage. Active means it ships to users. Building means work is underway and nothing has shipped. Declared means it is planned.
+  - paragraph: Insights
+  - heading "How we decide, and why" [level=2]
+  - link "Read all articles":
+    - /url: /insights
+  - link "Design Decision Helix ships as one open tier Every Helix component is free and open source. A paid tier would hide components from the AI agents that write code with Helix.":
+    - /url: /insights/helix-ships-as-one-open-tier
+    - text: Design Decision
+    - heading "Helix ships as one open tier" [level=3]
+    - text: Every Helix component is free and open source. A paid tier would hide components from the AI agents that write code with Helix.
+  - link "Design Essay A palette from one brand color Helix computes its palette from one brand color. Contrast follows from how the colors are computed, so no one has to review each pair.":
+    - /url: /insights/a-palette-from-one-brand-color
+    - text: Design Essay
+    - heading "A palette from one brand color" [level=3]
+    - text: Helix computes its palette from one brand color. Contrast follows from how the colors are computed, so no one has to review each pair.
+  - link "Design Essay Why Helix has two tiers Large companies have many brands and frameworks. A team that needs a different look can use the headless tier and keep the same components, parts, and events.":
+    - /url: /insights/why-helix-has-two-tiers
+    - text: Design Essay
+    - heading "Why Helix has two tiers" [level=3]
+    - text: Large companies have many brands and frameworks. A team that needs a different look can use the headless tier and keep the same components, parts, and events.
+  - link "Engineering Decision Lockstep versioning, one domain at a time The packages in each domain, such as Helix, share one version number, so a Cortex fix does not change the version of the Helix docs.":
+    - /url: /insights/lockstep-per-domain
+    - text: Engineering Decision
+    - heading "Lockstep versioning, one domain at a time" [level=3]
+    - text: The packages in each domain, such as Helix, share one version number, so a Cortex fix does not change the version of the Helix docs.
+  - heading "Work with us" [level=2]
+  - paragraph: Tell us what you need built. If we are not the right team for it, we will tell you.
+  - link "Start a conversation":
+    - /url: /contact
+  - button "Make it yours"
+  - 'button "Brand color, currently #3b82f6"'
+  - text: Saturation
+  - slider "Saturation": "100"
+  - text: Corner radius
+  - slider "Corner radius": "50"
+  - button "Switch to dark"
+  - button "Reset to the shipped palette" [disabled]
+  - text: every pair clears
+  - button "Close the theme controls"
+- contentinfo:
+  - img "Fusion"
+  - text: Fusion Development Group Interface and AI software.
+  - link "Fusion on GitHub":
+    - /url: https://github.com/project-fusion
+  - link "Fusion on LinkedIn":
+    - /url: https://www.linkedin.com/company/project-fusion
+  - link "Fusion on X":
+    - /url: https://x.com/fusiondotdev
+  - navigation "Footer":
+    - text: Products
+    - link "Helix":
+      - /url: /helix
+    - link "Cortex":
+      - /url: /cortex
+    - text: Company
+    - link "Services":
+      - /url: /company/services
+    - link "Insights":
+      - /url: /insights
+    - link "Thesis":
+      - /url: /company/thesis
+    - link "Contact":
+      - /url: /contact
+    - text: Legal
+    - link "Terms of use":
+      - /url: /legal/terms
+    - link "Privacy":
+      - /url: /legal/privacy
+    - link "Acceptable use":
+      - /url: /legal/acceptable-use
+- alert

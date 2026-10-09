@@ -1,0 +1,468 @@
+- button "Menu"
+- link "Fusion":
+  - /url: /
+- button "Search Ctrl+K"
+- button "Preferences"
+- text: Files
+- radio "index.html" [checked]
+- radio "styles.css"
+- toolbar "Sandbox actions":
+  - button "Copy a link to this example"
+  - button "Sandbox settings"
+  - status
+  - button "Hide examples"
+- textbox "Example, as HTML"
+- separator "Resize source pane"
+- iframe
+- separator "Resize panel"
+- tablist "Panel":
+  - tab "Terminal" [selected]
+  - tab "Specs"
+- log "Console output":
+  - paragraph: Nothing written to the console yet.
+- separator "Resize panes and panel"
+- separator "Resize panes"
+- complementary:
+  - text: Filter examples
+  - searchbox "Filter examples"
+  - text: /
+  - button "Expand all"
+  - tree "Examples":
+    - treeitem "Accordion Accordion documentation" [expanded] [level=1]:
+      - text: Accordion
+      - link "Accordion documentation":
+        - /url: /helix/components/accordion
+      - group:
+        - treeitem "Preview" [level=2] [selected]
+        - treeitem "Chevron At The Start" [level=2]
+        - treeitem "Events" [level=2]
+        - treeitem "Outlined" [level=2]
+        - treeitem "Plain" [level=2]
+        - treeitem "Single" [level=2]
+    - treeitem "Announcement Announcement documentation" [level=1]:
+      - text: Announcement
+      - link "Announcement documentation":
+        - /url: /helix/components/announcement
+    - treeitem "App Header App Header documentation" [level=1]:
+      - text: App Header
+      - link "App Header documentation":
+        - /url: /helix/components/app-header
+    - treeitem "Area Chart Area Chart documentation" [level=1]:
+      - text: Area Chart
+      - link "Area Chart documentation":
+        - /url: /helix/components/area-chart
+    - treeitem "Aura Aura documentation" [level=1]:
+      - text: Aura
+      - link "Aura documentation":
+        - /url: /helix/components/aura
+    - treeitem "Avatar Avatar documentation" [level=1]:
+      - text: Avatar
+      - link "Avatar documentation":
+        - /url: /helix/components/avatar
+    - treeitem "Badge Badge documentation" [level=1]:
+      - text: Badge
+      - link "Badge documentation":
+        - /url: /helix/components/badge
+    - treeitem "Bar Chart Bar Chart documentation" [level=1]:
+      - text: Bar Chart
+      - link "Bar Chart documentation":
+        - /url: /helix/components/bar-chart
+    - treeitem "Blockquote Blockquote documentation" [level=1]:
+      - text: Blockquote
+      - link "Blockquote documentation":
+        - /url: /helix/components/blockquote
+    - treeitem "Breadcrumbs Breadcrumbs documentation" [level=1]:
+      - text: Breadcrumbs
+      - link "Breadcrumbs documentation":
+        - /url: /helix/components/breadcrumbs
+    - treeitem "Button Button documentation" [level=1]:
+      - text: Button
+      - link "Button documentation":
+        - /url: /helix/components/button
+    - treeitem "Button Group Button Group documentation" [level=1]:
+      - text: Button Group
+      - link "Button Group documentation":
+        - /url: /helix/components/button-group
+    - treeitem "Callout Callout documentation" [level=1]:
+      - text: Callout
+      - link "Callout documentation":
+        - /url: /helix/components/callout
+    - treeitem "Canvas Canvas documentation Experimental" [level=1]:
+      - text: Canvas
+      - link "Canvas documentation":
+        - /url: /helix/components/canvas
+      - img "Experimental"
+    - treeitem "Card Card documentation" [level=1]:
+      - text: Card
+      - link "Card documentation":
+        - /url: /helix/components/card
+    - treeitem "Carousel Carousel documentation" [level=1]:
+      - text: Carousel
+      - link "Carousel documentation":
+        - /url: /helix/components/carousel
+    - treeitem "Chat Chat documentation" [level=1]:
+      - text: Chat
+      - link "Chat documentation":
+        - /url: /helix/components/chat
+    - treeitem "Checkbox Checkbox documentation" [level=1]:
+      - text: Checkbox
+      - link "Checkbox documentation":
+        - /url: /helix/components/checkbox
+    - treeitem "Checkbox Group Checkbox Group documentation" [level=1]:
+      - text: Checkbox Group
+      - link "Checkbox Group documentation":
+        - /url: /helix/components/checkbox-group
+    - treeitem "Code Code documentation" [level=1]:
+      - text: Code
+      - link "Code documentation":
+        - /url: /helix/components/code
+    - treeitem "Code Block Code Block documentation" [level=1]:
+      - text: Code Block
+      - link "Code Block documentation":
+        - /url: /helix/components/code-block
+    - treeitem "Color Input Color Input documentation" [level=1]:
+      - text: Color Input
+      - link "Color Input documentation":
+        - /url: /helix/components/color-input
+    - treeitem "Color Picker Color Picker documentation" [level=1]:
+      - text: Color Picker
+      - link "Color Picker documentation":
+        - /url: /helix/components/color-picker
+    - treeitem "Combobox Combobox documentation" [level=1]:
+      - text: Combobox
+      - link "Combobox documentation":
+        - /url: /helix/components/combobox
+    - treeitem "Command Command documentation" [level=1]:
+      - text: Command
+      - link "Command documentation":
+        - /url: /helix/components/command
+    - treeitem "Copy Button Copy Button documentation" [level=1]:
+      - text: Copy Button
+      - link "Copy Button documentation":
+        - /url: /helix/components/copy-button
+    - treeitem "Data Table Data Table documentation" [level=1]:
+      - text: Data Table
+      - link "Data Table documentation":
+        - /url: /helix/components/data-table
+    - treeitem "Date Input Date Input documentation" [level=1]:
+      - text: Date Input
+      - link "Date Input documentation":
+        - /url: /helix/components/date-input
+    - treeitem "Date Picker Date Picker documentation" [level=1]:
+      - text: Date Picker
+      - link "Date Picker documentation":
+        - /url: /helix/components/date-picker
+    - treeitem "Description List Description List documentation" [level=1]:
+      - text: Description List
+      - link "Description List documentation":
+        - /url: /helix/components/description-list
+    - treeitem "Dialog Dialog documentation" [level=1]:
+      - text: Dialog
+      - link "Dialog documentation":
+        - /url: /helix/components/dialog
+    - treeitem "Divider Divider documentation" [level=1]:
+      - text: Divider
+      - link "Divider documentation":
+        - /url: /helix/components/divider
+    - treeitem "Donut Chart Donut Chart documentation" [level=1]:
+      - text: Donut Chart
+      - link "Donut Chart documentation":
+        - /url: /helix/components/donut-chart
+    - treeitem "Drawer Drawer documentation" [level=1]:
+      - text: Drawer
+      - link "Drawer documentation":
+        - /url: /helix/components/drawer
+    - treeitem "Drilldown Drilldown documentation" [level=1]:
+      - text: Drilldown
+      - link "Drilldown documentation":
+        - /url: /helix/components/drilldown
+    - treeitem "Empty Empty documentation" [level=1]:
+      - text: Empty
+      - link "Empty documentation":
+        - /url: /helix/components/empty
+    - treeitem "File Input File Input documentation" [level=1]:
+      - text: File Input
+      - link "File Input documentation":
+        - /url: /helix/components/file-input
+    - treeitem "Filter Input Filter Input documentation" [level=1]:
+      - text: Filter Input
+      - link "Filter Input documentation":
+        - /url: /helix/components/filter-input
+    - treeitem "Flex Flex documentation" [level=1]:
+      - text: Flex
+      - link "Flex documentation":
+        - /url: /helix/components/flex
+    - treeitem "Format Date Format Date documentation" [level=1]:
+      - text: Format Date
+      - link "Format Date documentation":
+        - /url: /helix/components/format-date
+    - treeitem "Graph Graph documentation Experimental" [level=1]:
+      - text: Graph
+      - link "Graph documentation":
+        - /url: /helix/components/graph
+      - img "Experimental"
+    - treeitem "Grid Grid documentation" [level=1]:
+      - text: Grid
+      - link "Grid documentation":
+        - /url: /helix/components/grid
+    - treeitem "Heatmap Heatmap documentation" [level=1]:
+      - text: Heatmap
+      - link "Heatmap documentation":
+        - /url: /helix/components/heatmap
+    - treeitem "Icon Icon documentation" [level=1]:
+      - text: Icon
+      - link "Icon documentation":
+        - /url: /helix/components/icon
+    - treeitem "Icon Button Icon Button documentation" [level=1]:
+      - text: Icon Button
+      - link "Icon Button documentation":
+        - /url: /helix/components/icon-button
+    - treeitem "Image Image documentation" [level=1]:
+      - text: Image
+      - link "Image documentation":
+        - /url: /helix/components/image
+    - treeitem "Input Input documentation" [level=1]:
+      - text: Input
+      - link "Input documentation":
+        - /url: /helix/components/input
+    - treeitem "Isometric Heatmap Isometric Heatmap documentation Experimental" [level=1]:
+      - text: Isometric Heatmap
+      - link "Isometric Heatmap documentation":
+        - /url: /helix/components/isometric-heatmap
+      - img "Experimental"
+    - treeitem "Kbd Kbd documentation" [level=1]:
+      - text: Kbd
+      - link "Kbd documentation":
+        - /url: /helix/components/kbd
+    - treeitem "Legend Legend documentation" [level=1]:
+      - text: Legend
+      - link "Legend documentation":
+        - /url: /helix/components/legend
+    - treeitem "Lightbox Lightbox documentation" [level=1]:
+      - text: Lightbox
+      - link "Lightbox documentation":
+        - /url: /helix/components/lightbox
+    - treeitem "Line Chart Line Chart documentation" [level=1]:
+      - text: Line Chart
+      - link "Line Chart documentation":
+        - /url: /helix/components/line-chart
+    - treeitem "List List documentation" [level=1]:
+      - text: List
+      - link "List documentation":
+        - /url: /helix/components/list
+    - treeitem "Listbox Listbox documentation" [level=1]:
+      - text: Listbox
+      - link "Listbox documentation":
+        - /url: /helix/components/listbox
+    - treeitem "Loader Loader documentation" [level=1]:
+      - text: Loader
+      - link "Loader documentation":
+        - /url: /helix/components/loader
+    - treeitem "Map Map documentation Experimental" [level=1]:
+      - text: Map
+      - link "Map documentation":
+        - /url: /helix/components/map
+      - img "Experimental"
+    - treeitem "Megamenu Megamenu documentation" [level=1]:
+      - text: Megamenu
+      - link "Megamenu documentation":
+        - /url: /helix/components/megamenu
+    - treeitem "Menu Menu documentation" [level=1]:
+      - text: Menu
+      - link "Menu documentation":
+        - /url: /helix/components/menu
+    - treeitem "Meter Meter documentation" [level=1]:
+      - text: Meter
+      - link "Meter documentation":
+        - /url: /helix/components/meter
+    - treeitem "Navigation Navigation documentation" [level=1]:
+      - text: Navigation
+      - link "Navigation documentation":
+        - /url: /helix/components/navigation
+    - treeitem "Notifications Notifications documentation" [level=1]:
+      - text: Notifications
+      - link "Notifications documentation":
+        - /url: /helix/components/notifications
+    - treeitem "Number Input Number Input documentation" [level=1]:
+      - text: Number Input
+      - link "Number Input documentation":
+        - /url: /helix/components/number-input
+    - treeitem "Object Inspector Object Inspector documentation" [level=1]:
+      - text: Object Inspector
+      - link "Object Inspector documentation":
+        - /url: /helix/components/object-inspector
+    - treeitem "Option Option documentation" [level=1]:
+      - text: Option
+      - link "Option documentation":
+        - /url: /helix/components/option
+    - treeitem "Orb Orb documentation" [level=1]:
+      - text: Orb
+      - link "Orb documentation":
+        - /url: /helix/components/orb
+    - treeitem "Outline Outline documentation" [level=1]:
+      - text: Outline
+      - link "Outline documentation":
+        - /url: /helix/components/outline
+    - treeitem "Pagination Pagination documentation" [level=1]:
+      - text: Pagination
+      - link "Pagination documentation":
+        - /url: /helix/components/pagination
+    - treeitem "Pin Input Pin Input documentation" [level=1]:
+      - text: Pin Input
+      - link "Pin Input documentation":
+        - /url: /helix/components/pin-input
+    - treeitem "Popover Popover documentation" [level=1]:
+      - text: Popover
+      - link "Popover documentation":
+        - /url: /helix/components/popover
+    - treeitem "Progress Progress documentation" [level=1]:
+      - text: Progress
+      - link "Progress documentation":
+        - /url: /helix/components/progress
+    - treeitem "QR Code QR Code documentation" [level=1]:
+      - text: QR Code
+      - link "QR Code documentation":
+        - /url: /helix/components/qr-code
+    - treeitem "Quote Quote documentation" [level=1]:
+      - text: Quote
+      - link "Quote documentation":
+        - /url: /helix/components/quote
+    - treeitem "Radio Radio documentation" [level=1]:
+      - text: Radio
+      - link "Radio documentation":
+        - /url: /helix/components/radio
+    - treeitem "Rating Rating documentation" [level=1]:
+      - text: Rating
+      - link "Rating documentation":
+        - /url: /helix/components/rating
+    - treeitem "Sandbox Sandbox documentation" [level=1]:
+      - text: Sandbox
+      - link "Sandbox documentation":
+        - /url: /helix/components/sandbox
+    - treeitem "Scatter Chart Scatter Chart documentation" [level=1]:
+      - text: Scatter Chart
+      - link "Scatter Chart documentation":
+        - /url: /helix/components/scatter-chart
+    - treeitem "Scroll Area Scroll Area documentation" [level=1]:
+      - text: Scroll Area
+      - link "Scroll Area documentation":
+        - /url: /helix/components/scroll-area
+    - treeitem "Select Select documentation" [level=1]:
+      - text: Select
+      - link "Select documentation":
+        - /url: /helix/components/select
+    - treeitem "Skeleton Skeleton documentation" [level=1]:
+      - text: Skeleton
+      - link "Skeleton documentation":
+        - /url: /helix/components/skeleton
+    - treeitem "Skip Link Skip Link documentation" [level=1]:
+      - text: Skip Link
+      - link "Skip Link documentation":
+        - /url: /helix/components/skip-link
+    - treeitem "Slider Slider documentation" [level=1]:
+      - text: Slider
+      - link "Slider documentation":
+        - /url: /helix/components/slider
+    - treeitem "Sparkline Sparkline documentation" [level=1]:
+      - text: Sparkline
+      - link "Sparkline documentation":
+        - /url: /helix/components/sparkline
+    - treeitem "Speed Dial Speed Dial documentation" [level=1]:
+      - text: Speed Dial
+      - link "Speed Dial documentation":
+        - /url: /helix/components/speed-dial
+    - treeitem "Splitter Splitter documentation" [level=1]:
+      - text: Splitter
+      - link "Splitter documentation":
+        - /url: /helix/components/splitter
+    - treeitem "Stat Stat documentation" [level=1]:
+      - text: Stat
+      - link "Stat documentation":
+        - /url: /helix/components/stat
+    - treeitem "Steps Steps documentation" [level=1]:
+      - text: Steps
+      - link "Steps documentation":
+        - /url: /helix/components/steps
+    - treeitem "Strands Strands documentation Experimental" [level=1]:
+      - text: Strands
+      - link "Strands documentation":
+        - /url: /helix/components/strands
+      - img "Experimental"
+    - treeitem "Switch Switch documentation" [level=1]:
+      - text: Switch
+      - link "Switch documentation":
+        - /url: /helix/components/switch
+    - treeitem "Table Table documentation" [level=1]:
+      - text: Table
+      - link "Table documentation":
+        - /url: /helix/components/table
+    - treeitem "Tabs Tabs documentation" [level=1]:
+      - text: Tabs
+      - link "Tabs documentation":
+        - /url: /helix/components/tabs
+    - treeitem "Tag Tag documentation" [level=1]:
+      - text: Tag
+      - link "Tag documentation":
+        - /url: /helix/components/tag
+    - treeitem "Text Text documentation" [level=1]:
+      - text: Text
+      - link "Text documentation":
+        - /url: /helix/components/text
+    - treeitem "Textarea Textarea documentation" [level=1]:
+      - text: Textarea
+      - link "Textarea documentation":
+        - /url: /helix/components/textarea
+    - treeitem "Time Input Time Input documentation" [level=1]:
+      - text: Time Input
+      - link "Time Input documentation":
+        - /url: /helix/components/time-input
+    - treeitem "Time Picker Time Picker documentation" [level=1]:
+      - text: Time Picker
+      - link "Time Picker documentation":
+        - /url: /helix/components/time-picker
+    - treeitem "Timeline Timeline documentation" [level=1]:
+      - text: Timeline
+      - link "Timeline documentation":
+        - /url: /helix/components/timeline
+    - treeitem "Toast Toast documentation" [level=1]:
+      - text: Toast
+      - link "Toast documentation":
+        - /url: /helix/components/toast
+    - treeitem "Toggle Toggle documentation" [level=1]:
+      - text: Toggle
+      - link "Toggle documentation":
+        - /url: /helix/components/toggle
+    - treeitem "Toolbar Toolbar documentation" [level=1]:
+      - text: Toolbar
+      - link "Toolbar documentation":
+        - /url: /helix/components/toolbar
+    - treeitem "Tooltip Tooltip documentation" [level=1]:
+      - text: Tooltip
+      - link "Tooltip documentation":
+        - /url: /helix/components/tooltip
+    - treeitem "Tour Tour documentation" [level=1]:
+      - text: Tour
+      - link "Tour documentation":
+        - /url: /helix/components/tour
+    - treeitem "Tree Tree documentation" [level=1]:
+      - text: Tree
+      - link "Tree documentation":
+        - /url: /helix/components/tree
+    - treeitem "Trend Trend documentation" [level=1]:
+      - text: Trend
+      - link "Trend documentation":
+        - /url: /helix/components/trend
+    - treeitem "Video Video documentation" [level=1]:
+      - text: Video
+      - link "Video documentation":
+        - /url: /helix/components/video
+    - treeitem "Video Playlist Video Playlist documentation" [level=1]:
+      - text: Video Playlist
+      - link "Video Playlist documentation":
+        - /url: /helix/components/video-playlist
+    - treeitem "Virtual List Virtual List documentation" [level=1]:
+      - text: Virtual List
+      - link "Virtual List documentation":
+        - /url: /helix/components/virtual-list
+  - status
+- alert
