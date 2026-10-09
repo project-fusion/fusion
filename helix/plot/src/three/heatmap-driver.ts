@@ -13,7 +13,7 @@ import {
   Vector3,
 } from 'three'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
-import type { Place } from '../connect-plot/connect-plot.js'
+import type { Corners, Place } from '../connect-plot/connect-plot.js'
 import type {
   SpatialHeatmapDriver,
   SpatialHeatmapField,
@@ -89,7 +89,7 @@ export const threeHeatmapDriver = (
   /** Whether the view has been framed yet, which only the first drawing does from the isometric angle. */
   let framed = false
   /** Who hears where the front edge's ends are drawn, and what stops the stage following them. */
-  let cornered: ((at: { end: Place; start: Place } | undefined) => void) | undefined
+  let cornered: ((at: Corners | undefined) => void) | undefined
   let unfollow: (() => void) | undefined
   /** Where each reading's top stands, which the ring and the tooltip point at. */
   let tops: Vector3[] = []
@@ -183,16 +183,36 @@ export const threeHeatmapDriver = (
       )
       framed = true
       /* **The two ends of the front edge, at the foot of the slab**, under the
-         first column's last row and the last column's, as the chart's own
-         drawing names them, followed on the page as the view turns. */
+         first column and the last, along the long edge nearer the reader, as
+         the chart's own drawing names them, and the corners of the box round
+         the relief, which its labels stand clear of. Followed on the page as
+         the view turns. */
       unfollow?.()
       const foot = FLOOR - THICKNESS * unit
-      unfollow = stage.track(
-        [new Vector3(-wide / 2, foot, deep / 2), new Vector3(wide / 2, foot, deep / 2)],
-        (at) => {
-          cornered?.(at ? { end: at[1] as Place, start: at[0] as Place } : undefined)
-        },
-      )
+      const corners: Vector3[] = []
+      for (const x of [-wide / 2, wide / 2]) {
+        for (const z of [deep / 2, -deep / 2]) {
+          corners.push(new Vector3(x, foot, z), new Vector3(x, foot + high, z))
+        }
+      }
+      unfollow = stage.track(corners, (at) => {
+        if (!at) {
+          cornered?.(undefined)
+          return
+        }
+        /* The feet of the four uprights: the last row's side, then the
+           first's, under the first column and then the last. Seen from
+           above, the nearer side stands lower on the page. */
+        const [lastStart, firstStart, lastEnd, firstEnd] = [0, 2, 4, 6].map(
+          (index) => at[index] as Place,
+        ) as [Place, Place, Place, Place]
+        const last = lastStart.y + lastEnd.y >= firstStart.y + firstEnd.y
+        cornered?.({
+          end: last ? lastEnd : firstEnd,
+          outline: at,
+          start: last ? lastStart : firstStart,
+        })
+      })
     },
     focus: (index) => {
       stage.setMarker(tops[index])

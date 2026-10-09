@@ -1,6 +1,7 @@
 export {
   type Axes,
   type Axis,
+  type Corners,
   type Place,
   type PlotColors,
   type PlotConnection,

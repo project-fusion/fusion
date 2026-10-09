@@ -94,8 +94,8 @@ export const shortNumber = (value: number): string => String(Math.round(value * 
 export const pathData = (points: readonly PagePoint[]): string =>
   `M${points.map((point) => `${shortNumber(point.x)} ${shortNumber(point.y)}`).join('L')}Z`
 
-/** The outline around a set of points on the page: their convex hull. */
-const hullOf = (points: readonly PagePoint[]): PagePoint[] => {
+/** The outline around a set of points on the page: their convex hull, in order round it. */
+export const hullOf = (points: readonly PagePoint[]): PagePoint[] => {
   const sorted = [...points].sort((one, other) => one.x - other.x || one.y - other.y)
   if (sorted.length < 3) {
     return sorted

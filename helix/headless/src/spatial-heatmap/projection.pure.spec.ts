@@ -1,5 +1,15 @@
 import { describe, expect, test } from 'bun:test'
-import { ACROSS, heightsOf, highestOf, MARGIN, reliefOf, THICKNESS } from './projection.js'
+import { hullOf } from '@fusion.dev/helix-core'
+import {
+  ACROSS,
+  heightsOf,
+  highestOf,
+  labelPlaces,
+  MARGIN,
+  type Point,
+  reliefOf,
+  THICKNESS,
+} from './projection.js'
 
 /** The corners of path data written `Mx yLx y…Z`, as numbers. */
 const corners = (data: string): Array<[number, number]> =>
@@ -114,6 +124,7 @@ describe('the relief', () => {
       corners: undefined,
       middle: { x: 0, y: 0 },
       order: [],
+      outline: [],
       prisms: [],
     })
   })
@@ -166,5 +177,96 @@ describe('a turned relief', () => {
   test('seen from straight above, a prism shows its top alone', () => {
     const { prisms } = reliefOf([2], 1, 1, { tilt: 90, turn: 45 })
     expect([prisms[0]?.left, prisms[0]?.right]).toEqual(['', ''])
+  })
+})
+
+describe('the first and last labels', () => {
+  const SIZE = { height: 14, width: 48 }
+
+  /** A sixteen-week relief seen from `turn`, scaled to pixels with its box at the left, and where its labels stand. */
+  const placed = (turn: number, tilt = 35) => {
+    const heights = Array.from({ length: 112 }, (_, index) => (index % 5) + 1)
+    const relief = reliefOf(heights, 7, 0.8, { tilt, turn })
+    const scale = 400 / relief.box.width
+    const page = (point: Point): Point => ({
+      x: (point.x - relief.box.x) * scale,
+      y: (point.y - relief.box.y) * scale,
+    })
+    const outline = relief.outline.map(page)
+    const corners = relief.corners as { end: Point; start: Point }
+    const at = labelPlaces(
+      outline,
+      { end: page(corners.end), start: page(corners.start) },
+      { end: SIZE, start: SIZE },
+      400,
+      4,
+    )
+    return { at, corners: { end: page(corners.end), start: page(corners.start) }, outline }
+  }
+
+  test('from every side, each stands inside the span, under its corner, and clear of the drawing', () => {
+    for (let turn = 0; turn < 360; turn += 15) {
+      const { at, corners, outline } = placed(turn)
+      const hull = hullOf(outline)
+      for (const key of ['start', 'end'] as const) {
+        const label = at[key]
+        expect(label.x).toBeGreaterThanOrEqual(0)
+        expect(label.x + SIZE.width).toBeLessThanOrEqual(400 + 1e-6)
+        expect(label.y).toBeGreaterThan(corners[key].y)
+        /* No corner of the outline that stands over the label's span is below its top. */
+        for (const point of hull) {
+          if (point.x >= label.x && point.x <= label.x + SIZE.width) {
+            expect(point.y).toBeLessThan(label.y)
+          }
+        }
+      }
+    }
+  })
+
+  test('the two never stand on one another, even seen end on', () => {
+    for (let turn = 0; turn < 360; turn += 15) {
+      const { at } = placed(turn, 15)
+      const meet =
+        at.start.x < at.end.x + SIZE.width &&
+        at.end.x < at.start.x + SIZE.width &&
+        at.start.y < at.end.y + SIZE.height &&
+        at.end.y < at.start.y + SIZE.height
+      expect({ meet, turn }).toEqual({ meet: false, turn })
+    }
+  })
+
+  test('cut at the bottom, the two stand side by side', () => {
+    const outline = [
+      { x: 0, y: 0 },
+      { x: 100, y: 0 },
+      { x: 100, y: 60 },
+      { x: 0, y: 60 },
+    ]
+    const at = labelPlaces(
+      outline,
+      { end: { x: 52, y: 70 }, start: { x: 50, y: 70 } },
+      { end: SIZE, start: SIZE },
+      400,
+      4,
+      64,
+    )
+    expect(at.start.y).toBe(64)
+    expect(at.end.y).toBe(64)
+    expect(at.end.x).toBeGreaterThanOrEqual(at.start.x + SIZE.width)
+  })
+
+  test('they name the long edge nearer the reader, which stands lower than the middle of the slab', () => {
+    for (let turn = 0; turn < 360; turn += 15) {
+      const relief = reliefOf([1, 2, 3, 4], 2, 1, { tilt: 35, turn })
+      const corners = relief.corners as { end: Point; start: Point }
+      /* The outline's feet, every other corner, round the middle of the slab's
+         foot. Seen along the strip, the two long edges stand level. */
+      const feet = relief.outline.filter((_, index) => index % 2 === 0)
+      const foot = feet.reduce((sum, point) => sum + point.y, 0) / feet.length
+      expect({ lower: (corners.start.y + corners.end.y) / 2 >= foot - 1e-9, turn }).toEqual({
+        lower: true,
+        turn,
+      })
+    }
   })
 })

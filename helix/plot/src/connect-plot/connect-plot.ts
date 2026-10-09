@@ -55,6 +55,17 @@ export interface Place {
 }
 
 /**
+ * Where a spatial heatmap's named corners are drawn: the two ends of its
+ * front edge, the long edge at the foot of the slab nearer the reader, and
+ * the corners of the box round the relief, which the labels stand clear of.
+ */
+export interface Corners {
+  end: Place
+  outline?: Place[]
+  start: Place
+}
+
+/**
  * What a renderer has to answer for a 3D chart to drive it, and nothing that
  * is the same for every renderer: that is the connector's.
  */
@@ -77,11 +88,12 @@ export interface PlotDriver<F> {
   onPlace?(place: (at: Place | undefined) => void): () => void
   /**
    * Calls `corners` with where the drawing's named corners are drawn, the
-   * two ends of a spatial heatmap's front edge, whenever a frame moves them,
-   * and with `undefined` while they are out of view. The chart stands its
-   * first and last labels there. Returns what stops listening.
+   * two ends of a spatial heatmap's front edge and the corners of the box
+   * round it, whenever a frame moves them, and with `undefined` while they
+   * are out of view. The chart stands its first and last labels there, clear
+   * of the box. Returns what stops listening.
    */
-  onCorners?(corners: (at: { end: Place; start: Place } | undefined) => void): () => void
+  onCorners?(corners: (at: Corners | undefined) => void): () => void
   /**
    * Calls `press` with a reading's index when the reader presses it in the
    * drawing, and with `-1` when they press where none is. Returns what stops
@@ -111,7 +123,7 @@ interface Chart<F> extends HTMLElement {
   active?: number
   rendererDrawn?(on?: boolean): void
   field?: F
-  placeCorners?(at: { end: Place; start: Place } | undefined): void
+  placeCorners?(at: Corners | undefined): void
   placeReading?(at: Place | undefined): void
   requestActive?(index: number, kind?: PointerKind): void
   updateComplete?: Promise<unknown>
