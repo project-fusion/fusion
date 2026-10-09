@@ -21,6 +21,7 @@ import '../../tooltip/index.js'
  * @since 0.190.0
  * @status experimental
  * @category charts
+ * @groups charts
  * @documentation https://fusion.dev/helix/components/spatial-heatmap
  *
  * @cssproperty --spatial-heatmap-cell-size - The largest a cell grows, along its edge. The strip is never wider than its box, and draws smaller cells to fit.

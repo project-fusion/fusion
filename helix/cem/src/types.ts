@@ -170,8 +170,8 @@ export type Category = (typeof CATEGORIES)[number]
  * Which families a family is read beside, and owes a consistent answer to.
  *
  * **A second grouping, because `category` cannot be this and measurement says
- * so.** The nine chart-adjacent families span three categories: `charts` holds
- * the six that draw, `feedback` holds `meter` and `progress`, and `overlays`
+ * so.** The chart-adjacent families span three categories: `charts` holds the
+ * ones that draw, `feedback` holds `meter` and `progress`, and `overlays`
  * holds `tooltip`. So a rule keyed on category would never compare a meter
  * against a bar chart.
  *
