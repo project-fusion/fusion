@@ -17,6 +17,7 @@ import '../../tooltip/index.js'
  * @since 0.190.0
  * @status experimental
  * @category charts
+ * @groups charts
  * @documentation https://fusion.dev/helix/components/spatial-surface-chart
  *
  * @cssproperty --spatial-surface-chart-block-size - How tall the plot is.
