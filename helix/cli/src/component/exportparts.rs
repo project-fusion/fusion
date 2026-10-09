@@ -328,7 +328,7 @@ fn extended_docs(context: &Context) -> PartDocs {
         let Some(extension) = project.extension(class) else {
             continue;
         };
-        let (base, _) = project.grounded(extension);
+        let (base, _) = project.grounded(extension, context.installed());
         let mut parts = installed
             .and_then(|one| one.classes.get(base))
             .map(|one| one.parts.clone())

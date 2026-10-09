@@ -22,6 +22,8 @@ const PACKAGES: [&str; 2] = ["@fusion.dev/helix-headless", "@fusion.dev/helix"];
 /// One class a package publishes.
 #[derive(Default)]
 pub struct Class {
+    /// The package that publishes it.
+    pub package: &'static str,
     /// The tag it registers, where it registers one.
     pub tag: Option<String>,
     /// The families it renders inside its shadow root, by their bare names.
@@ -95,6 +97,7 @@ impl Installed {
                     classes.insert(
                         name.to_owned(),
                         Class {
+                            package,
                             tag: declaration["tagName"].as_str().map(str::to_owned),
                             renders,
                             slots: names(&declaration["slots"])

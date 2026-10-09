@@ -57,7 +57,7 @@ fn extended(context: &Context) -> Report {
     let mut findings = Vec::new();
     let mut checked = 0;
     for extension in &project.extensions {
-        let (base, tier) = project.grounded(extension);
+        let (base, tier) = project.grounded(extension, context.installed());
         let children = installed.renders(base);
         if children.is_empty() {
             continue;

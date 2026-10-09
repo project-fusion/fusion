@@ -268,7 +268,7 @@ fn extended(context: &Context) -> Report {
         if documented.is_empty() {
             continue;
         }
-        let (base, _) = project.grounded(extension);
+        let (base, _) = project.grounded(extension, context.installed());
         let mut available: BTreeSet<String> = context
             .installed()
             .and_then(|one| one.classes.get(base))

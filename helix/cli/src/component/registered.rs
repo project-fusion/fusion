@@ -34,13 +34,17 @@ pub fn run(context: &Context) -> Report {
     let project = context.project();
 
     for extension in &project.extensions {
-        /* A class the installed packages publish is Helix's own, which keeps
-        Helix's prefixes on purpose: this repository's styled tier, read as a
-        project. */
-        if installed.classes.contains_key(&extension.class) {
+        /* The headless tier's own classes keep its prefix on purpose. Every
+        other class, Helix's styled tier included, renders under the prefix it
+        sets. */
+        if installed
+            .classes
+            .get(&extension.class)
+            .is_some_and(|one| one.package == "@fusion.dev/helix-headless")
+        {
             continue;
         }
-        let (base, tier) = project.grounded(extension);
+        let (base, tier) = project.grounded(extension, context.installed());
         let children = installed.renders(base);
         /* With no prefix the children are Helix's own, which `tier` reports. */
         let Some(prefix) = tier.filter(|_| !children.is_empty()) else {
