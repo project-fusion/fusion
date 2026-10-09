@@ -13,7 +13,8 @@
  *
  * **A number that would cover another label is left out**, which thins an
  * axis seen at a slant, and an axis whose edge is seen end on is left out
- * whole. Every name is kept.
+ * whole. Every name is kept, and where two axes' labels meet, the axis with
+ * fewer keeps its own.
  *
  * Pure, and measured in the page's own units: the SVG drawing passes its
  * drawing's units, and three.js passes pixels.
@@ -137,7 +138,7 @@ export const boxLabels = (
     y: at.y + out.y * by + (out.y * box.height) / 2,
   })
   const names: Array<Area & { text: string }> = []
-  const ticks: Array<Area & { text: string }> = []
+  const ticks: Array<Area & { text: string; of: number }> = []
   for (const { along, key } of edges) {
     const axis = axes[key]
     const [from, to] = [seen(along(-1)), seen(along(1))]
@@ -155,7 +156,11 @@ export const boxLabels = (
     let deepest = 0
     for (const tick of axis.ticks) {
       const box = size(tick.text, false)
-      ticks.push({ ...off(seen(along(tick.at)), out, box, sizes.gap), text: tick.text })
+      ticks.push({
+        ...off(seen(along(tick.at)), out, box, sizes.gap),
+        of: axis.ticks.length,
+        text: tick.text,
+      })
       deepest = Math.max(deepest, Math.abs(out.x) * box.width + Math.abs(out.y) * box.height)
     }
     if (axis.name === '') {
@@ -177,7 +182,10 @@ export const boxLabels = (
     x: one.x,
     y: one.y,
   }))
-  for (const tick of ticks) {
+  /* **The fewer an axis' labels, the more each one carries**, so an axis of
+     four series' names keeps them where they meet the last of fourteen
+     dates. Stable, so each axis keeps its own order. */
+  for (const tick of [...ticks].sort((one, other) => one.of - other.of)) {
     if (kept.some((other) => overlaps(tick, other, sizes.gap / 2))) {
       continue
     }
