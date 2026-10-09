@@ -1,0 +1,33 @@
+- rowgroup:
+  - row "Name Region Size":
+    - columnheader "Name":
+      - button "Name"
+    - columnheader "Region":
+      - button "Region"
+    - columnheader "Size":
+      - button "Size"
+  - row "archive.tar.gz":
+    - rowheader "archive.tar.gz"
+    - gridcell "us-east-1"
+    - gridcell "4.8 MB"
+  - row "backup.sql":
+    - rowheader "backup.sql"
+    - gridcell "eu-central-1"
+    - gridcell "918.4 kB"
+  - row "index.json":
+    - rowheader "index.json"
+    - gridcell "us-east-1"
+    - gridcell "2.1 kB"
+  - row "manifest.yaml":
+    - rowheader "manifest.yaml"
+    - gridcell "ap-south-1"
+    - gridcell "812 B"
+- status
+- button "Previous page" [disabled]
+- list:
+  - listitem:
+    - button "Page 1": "1"
+  - listitem:
+    - button "Page 2": "2"
+- button "Next page"
+- status

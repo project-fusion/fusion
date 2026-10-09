@@ -1,0 +1,5 @@
+- text: View
+- radio "List" [checked]
+- radio "Grid"
+- radio "Board"
+- paragraph: How the results are laid out

@@ -1,0 +1,17 @@
+- strong: Support
+- log "Support":
+  - text: How can I help?
+  - time: 6 minutes ago
+  - text: The deploy is stuck on the migration step.
+  - time: 4 minutes ago
+  - text: I am checking the migration now
+  - time: 1 minute ago
+  - text: Thanks
+  - img "Error"
+  - text: Not sent
+  - button "Try again"
+- status
+- status: Support is typing
+- textbox "Message":
+  - /placeholder: Write a message
+- button "Send"

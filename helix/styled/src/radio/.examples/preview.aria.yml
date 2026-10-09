@@ -1,0 +1,5 @@
+- text: Plan
+- radio "Free" [checked]
+- radio "Pro"
+- radio "Team"
+- paragraph: Billed monthly

@@ -1,0 +1,8 @@
+- text: Logo
+- navigation "Sections":
+  - link "Overview":
+    - /url: "#one"
+  - link "Projects":
+    - /url: "#two"
+- button "Search"
+- button "Settings"

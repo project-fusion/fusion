@@ -1,0 +1,11 @@
+- link "Skip to content":
+  - /url: "#main"
+- banner:
+  - text: Logo
+  - navigation "Sections":
+    - link "Overview":
+      - /url: "#one"
+    - link "Projects":
+      - /url: "#two"
+- main:
+  - paragraph: Welcome back. You have 3 new messages.

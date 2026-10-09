@@ -1,0 +1,4 @@
+- application "Uptime, last 30 days":
+  - status
+- text: 28 Jul 99.6% uptime Today
+- paragraph: "Busiest: 28 Jul 2026, 100.0%; Total 29.401."

@@ -1,0 +1,10 @@
+- button "Open gallery"
+- dialog "Beach photos":
+  - button "Close"
+  - group "Seawater over pale sand":
+    - img "Seawater over pale sand"
+    - text: Shallow water at the beach in the morning.
+  - group "The sun low over open water":
+    - img "The sun low over open water"
+    - text: Sunset over the ocean the same day.
+  - status: 1 of 2

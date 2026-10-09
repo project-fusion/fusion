@@ -1,0 +1,5 @@
+- menu "Settings":
+  - menuitem "Appearance"
+  - menuitem "Editor"
+  - menuitem "About"
+- status

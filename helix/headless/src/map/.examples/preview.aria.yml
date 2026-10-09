@@ -1,0 +1,9 @@
+- group "Edinburgh city center":
+  - text: Map
+  - group "Map controls":
+    - button "Fill the screen": ⤢
+    - button "Zoom in": +
+    - button "Zoom out": −
+    - button "Face north"
+  - text: © OpenStreetMap contributors
+  - status

@@ -1,0 +1,29 @@
+- navigation "On this page":
+  - list:
+    - listitem:
+      - link "Install":
+        - /url: "#install"
+      - list:
+        - listitem:
+          - link "Requirements":
+            - /url: "#requirements"
+    - listitem:
+      - link "Usage":
+        - /url: "#usage"
+      - list:
+        - listitem:
+          - link "Options":
+            - /url: "#options"
+    - listitem:
+      - link "API":
+        - /url: "#api"
+- heading "Install" [level=2]
+- paragraph: Install the package with your package manager, then import it once in the entry file of your app before you use it.
+- heading "Requirements" [level=2]
+- paragraph: The package needs a current version of Node.js and a browser that supports custom elements and modern JavaScript.
+- heading "Usage" [level=2]
+- paragraph: Create a client with your API key, then call its methods to read and write the projects, files, and users in your account.
+- heading "Options" [level=2]
+- paragraph: Pass options when you create the client to set the request timeout, the number of retries, and the base URL to use.
+- heading "API" [level=2]
+- paragraph: Each method returns a promise. Errors include a code and a message that you can show to the people who use your app.

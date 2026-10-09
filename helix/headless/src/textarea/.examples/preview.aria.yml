@@ -1,0 +1,4 @@
+- text: Project description
+- textbox "Project description":
+  - /placeholder: What is the project about?
+- paragraph: Shown to everyone on the project

@@ -1,0 +1,6 @@
+- text: index.html
+- button "Reset code"
+- textbox "Example source": <helix-button emphasis="solid" tone="primary">Save</helix-button>
+- separator "Resize source pane"
+- button "Save"
+- text: HTML

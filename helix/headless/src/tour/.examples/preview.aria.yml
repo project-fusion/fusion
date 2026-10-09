@@ -1,0 +1,12 @@
+- complementary:
+  - paragraph: Project
+  - paragraph: Drafts
+  - paragraph: Published
+  - paragraph: Archive
+- banner:
+  - button "Publish"
+  - button "Preview"
+  - button "Settings"
+- heading "Quarterly review" [level=2]
+- paragraph: A draft of the third quarter report. Add a summary and the results for each team before you publish.
+- button "Take the tour"
