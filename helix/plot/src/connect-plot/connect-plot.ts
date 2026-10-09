@@ -23,6 +23,11 @@ export interface Axes {
 
 /** The colors a plot is drawn in, each `rgb()`, read from the page's tokens where the chart is. */
 export interface PlotColors {
+  /**
+   * Any further colors the chart names, by the name it gave them: a spatial
+   * heatmap's tones, its empty tiles, and its base.
+   */
+  extra: Record<string, string>
   /** The box's edges and grid lines: `border`. */
   grid: string
   /** What the drawing is laid on: `surface-sunken`. */
@@ -97,7 +102,7 @@ export interface PlotConnection {
 /** A 3D chart as a connector reads it. */
 interface Chart<F> extends HTMLElement {
   active?: number
-  drawn?(on?: boolean): void
+  rendererDrawn?(on?: boolean): void
   field?: F
   placeReading?(at: Place | undefined): void
   requestActive?(index: number, kind?: PointerKind): void
@@ -121,14 +126,22 @@ const still = (): boolean =>
  * page is drawn dark, and from the names the chart's own sheet gives the
  * series, so a page that colors its groups colors them here too.
  */
-export const plotColorsFrom = (chart: Element, groups: number): PlotColors | null => {
+export const plotColorsFrom = (
+  chart: Element,
+  groups: number,
+  extra: Record<string, string> = {},
+): PlotColors | null => {
   if (typeof document === 'undefined') {
     return null
   }
   const probe = document.createElement('span')
   probe.style.display = 'none'
   probe.setAttribute('aria-hidden', 'true')
-  chart.append(probe)
+  /* **In the chart's shadow root**, where it inherits what the chart's own
+     sheet sets on the host and is always drawn: a child of the chart is
+     drawn only where a slot takes it, and the spatial heatmap has no slot
+     for one, so a probe there read no color at all. */
+  ;(chart.shadowRoot ?? chart).append(probe)
   try {
     const read = (value: string): string | null => {
       probe.style.color = ''
@@ -167,7 +180,11 @@ export const plotColorsFrom = (chart: Element, groups: number): PlotColors | nul
       read(
         'var(--spatial-surface-chart-low, color-mix(in oklab, var(--helix-color-primary-active) 15%, var(--helix-color-surface-sunken)))',
       ) ?? ground
-    return { grid, ground, groups: colors, ink, quiet, ramp: { high, low } }
+    const named: Record<string, string> = {}
+    for (const [name, value] of Object.entries(extra)) {
+      named[name] = read(value) ?? ink
+    }
+    return { extra: named, grid, ground, groups: colors, ink, quiet, ramp: { high, low } }
   } finally {
     probe.remove()
   }
@@ -184,7 +201,13 @@ export const plotColorsFrom = (chart: Element, groups: number): PlotColors | nul
 export const connectPlot = <F extends object>(
   frame: HTMLElement,
   driver: PlotDriver<F>,
-  options: { groupsOf: (field: F) => number; name: string; readings: (field: F) => number },
+  options: {
+    /** Further colors to read, by name, as CSS colors that may name the page's tokens. */
+    extraOf?: (field: F) => Record<string, string>
+    groupsOf: (field: F) => number
+    name: string
+    readings: (field: F) => number
+  },
 ): PlotConnection => {
   const chart = frame as Chart<F>
   if (!('field' in frame) || typeof chart.requestActive !== 'function') {
@@ -202,9 +225,9 @@ export const connectPlot = <F extends object>(
     if (!connected || !field) {
       return
     }
-    const colors = plotColorsFrom(frame, options.groupsOf(field))
+    const colors = plotColorsFrom(frame, options.groupsOf(field), options.extraOf?.(field))
     if (!colors || options.readings(field) === 0) {
-      chart.drawn?.(false)
+      chart.rendererDrawn?.(false)
       return
     }
     const font =
@@ -214,7 +237,7 @@ export const connectPlot = <F extends object>(
         .replace(/^["']|["']$/g, '') ?? ''
     driver.draw(field, colors, font || 'sans-serif')
     driver.focus(chart.active ?? -1)
-    chart.drawn?.(true)
+    chart.rendererDrawn?.(true)
   }
 
   const handleChange = (event: Event): void => {
@@ -260,7 +283,7 @@ export const connectPlot = <F extends object>(
       chart.placeReading?.(undefined)
       stopTheme()
       driver.stop?.()
-      chart.drawn?.(false)
+      chart.rendererDrawn?.(false)
     },
     restyle: draw,
   }

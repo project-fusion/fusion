@@ -220,7 +220,7 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
    * Says whether a renderer has drawn the points, which hides the chart's
    * own drawing or shows it again. Called by the connector.
    */
-  drawn(on = true): void {
+  rendererDrawn(on = true): void {
     this.rendered = on
     this.toggleState('drawn', on)
   }
