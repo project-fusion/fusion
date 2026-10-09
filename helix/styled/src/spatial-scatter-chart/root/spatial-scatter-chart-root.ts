@@ -14,7 +14,7 @@ import '../../tooltip/index.js'
  * scatter of the first two measures until it has drawn. Each group takes a
  * series color from the theme, as every chart's series does.
  *
- * @since 0.188.0
+ * @since 0.189.0
  * @status experimental
  * @category charts
  * @documentation https://fusion.dev/helix/components/spatial-scatter-chart

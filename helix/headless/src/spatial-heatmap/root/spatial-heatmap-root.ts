@@ -54,7 +54,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * and its own entry point carries the drawing, so a page using only `Heatmap`
  * loads none of it.
  *
- * **It was `helix-isometric-heatmap` until 0.188.0**, and
+ * **It was `helix-isometric-heatmap` until 0.189.0**, and
  * `helix-headless-isometric-heatmap` in the headless tier. The old tags are
  * gone, and so are the `--isometric-heatmap-*` hooks, which are
  * `--spatial-heatmap-*`, and the words key, which is `helix-spatial-heatmap`.
@@ -104,7 +104,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * | Shift with an arrow | Turns a renderer's view, where one is connected and `selection-mode` is not `multiple`. |
  * | Escape | Puts the cell's tooltip away. |
  *
- * @since 0.188.0
+ * @since 0.189.0
  * @status experimental
  * @category charts
  * @aliases Isometric heatmap, Isometric chart, 3D heatmap, Relief chart, Isometric contribution graph
