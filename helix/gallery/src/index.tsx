@@ -305,19 +305,6 @@ export function ComponentArt({ slug }: { slug: string }) {
   if (!body) {
     return null
   }
-  return <Art>{body}</Art>
-}
-
-/**
- * The frame every drawing sits in: the `<svg>`, the shared shadow filter, the
- * lattice, and the `artBody` wrapper the motion rules move.
- *
- * Exported on its own so a consumer can draw a picture of something that is
- * not a family, such as a site's own destination, in the same system: the same
- * viewBox, the same filter and the same lattice, with a body it wrote itself.
- * `ComponentArt` is this frame around a family's body.
- */
-export function Art({ children }: { children: ReactNode }) {
   return (
     <svg aria-hidden="true" className="componentArt" slot="media" viewBox="0 0 320 200">
       <defs>
@@ -360,7 +347,7 @@ export function Art({ children }: { children: ReactNode }) {
         x="0"
         y="0"
       />
-      <g className="artBody">{children}</g>
+      <g className="artBody">{body}</g>
     </svg>
   )
 }
