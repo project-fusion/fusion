@@ -54,6 +54,29 @@ fn built(name: &str) -> Option<PathBuf> {
     found.pop()
 }
 
+/// The copy a project installed: `node_modules/.bin`, from the directory this
+/// runs in up, which is where npm puts a package's command and where a global
+/// `fusion` would not otherwise look.
+fn installed(name: &str) -> Option<PathBuf> {
+    let here = env::current_dir().ok()?;
+    let file = if cfg!(windows) {
+        format!("{name}.cmd")
+    } else {
+        name.to_owned()
+    };
+    here.ancestors()
+        .map(|dir| dir.join("node_modules").join(".bin").join(&file))
+        .find(|path| path.is_file())
+}
+
+/// The npm package each product's command ships in, which is what to install.
+fn package(product: &str) -> String {
+    match product {
+        "helix" => "@fusion.dev/helix-cli".to_owned(),
+        other => format!("@fusion.dev/{other}"),
+    }
+}
+
 /// Runs another product's command line and returns its exit code.
 ///
 /// # Errors
@@ -67,6 +90,7 @@ pub fn to(product: &str, args: &[String]) -> Outcome<i32> {
     let binary = env::var_os(&variable)
         .map(PathBuf::from)
         .or_else(|| built(product))
+        .or_else(|| installed(product))
         .unwrap_or_else(|| PathBuf::from(product));
 
     match Command::new(&binary).args(args).status() {
@@ -75,11 +99,11 @@ pub fn to(product: &str, args: &[String]) -> Outcome<i32> {
             format!("no `{product}` on this machine"),
             format!(
                 "`fusion {product}` hands the rest of the line to it and does not reimplement \
-                 it, so it has to be installed. Looked at ${variable}, the cargo target \
-                 directory, and `{product}` on PATH"
+                 it, so it has to be installed. Looked at ${variable}, a cargo build, \
+                 node_modules/.bin, and `{product}` on PATH"
             ),
         )
-        .hint(format!("cargo install --path {product}/cli"))),
+        .hint(format!("npm install --save-dev {}", package(product)))),
         Err(error) => Err(Failure::new(
             Code::Internal,
             format!("could not run `{}`", binary.display()),

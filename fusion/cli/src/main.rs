@@ -70,8 +70,8 @@ struct Cli {
     reader's and carries no markup. */
     /// Emit machine-readable JSON on stdout.
     ///
-    /// Available on every verb. Rules, their counts and their findings, in a
-    /// shape a script can read without parsing sentences.
+    /// Passed to `helix` when written before its name, and read by every `x`
+    /// verb. A usage error is JSON on stderr.
     #[arg(long, global = true)]
     json: bool,
 
@@ -171,7 +171,20 @@ const _: () = {
 )]
 fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
     match &cli.noun {
-        Noun::Helix { args } => route::to("helix", args),
+        /* **The channel flags reach `helix`**, which takes both, when they are
+        written before its name: `fusion --json helix scan` would otherwise
+        swallow `--json` and print prose. Locus takes neither. */
+        Noun::Helix { args } => {
+            let mut forwarded: Vec<String> = Vec::new();
+            if cli.json {
+                forwarded.push("--json".to_owned());
+            }
+            if cli.no_color {
+                forwarded.push("--no-color".to_owned());
+            }
+            forwarded.extend(args.iter().cloned());
+            route::to("helix", &forwarded)
+        }
         Noun::Locus { args } => route::to("locus", args),
         #[cfg(feature = "internal")]
         Noun::X { noun } => x::run(noun, cli.json, paint),
