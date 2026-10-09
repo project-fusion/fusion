@@ -163,6 +163,46 @@
   stroke-width: var(--helix-border-thick);
 }
 
+/*
+ * **Emphasis and material, as every chart reads them.** `emphasis` decides
+ *    what a prism draws and `material` how much of it comes through, and the
+ *    paint multiplies the two. Set as properties, so the rings on a prism the
+ *    pointer or the keys rest on, and a selected one, keep their own ink.
+ */
+[part~="cell"] > * {
+  fill: var(--_spatial-heatmap-fill, var(--_spatial-heatmap-face));
+  fill-opacity: calc(var(--_spatial-heatmap-area, 1) * var(--_spatial-heatmap-through, 1));
+  stroke: var(--_spatial-heatmap-line, var(--_spatial-heatmap-edge));
+  stroke-opacity: var(--_spatial-heatmap-through, 1);
+}
+
+/* The edges in the tone, over faces faded toward the page. */
+:host([emphasis="outlined"]) [part~="cell"] > * {
+  --_spatial-heatmap-fill: color-mix(
+    in oklab,
+    var(--_spatial-heatmap-face) 60%,
+    var(--helix-color-background)
+  );
+  --_spatial-heatmap-line: var(--_spatial-heatmap-face);
+}
+
+/* A faint wash under the same edges, which shows the prisms behind. */
+:host([emphasis="subtle"]) [part~="cell"] > * {
+  --_spatial-heatmap-area: 0.2;
+  --_spatial-heatmap-line: var(--_spatial-heatmap-face);
+}
+
+/* *Glass, so the relief is in the same language as the page around it.** */
+:host([material="glass"]) {
+  --_spatial-heatmap-through: calc(0.62 * var(--helix-material-opacity));
+}
+
+/* `frosted` admits less, which on a mark is more ink: 0.88 against glass's
+   0.62, the relationship the surface tokens carry. */
+:host([material="frosted"]) {
+  --_spatial-heatmap-through: calc(0.88 * var(--helix-material-opacity));
+}
+
 /* The strip takes focus once it has cells to read, so it draws the ring. */
 [part~="strip"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);

@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSpatialSurfaceChart } from '@fusion.dev/helix-headless/spatial-surface-chart'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './spatial-surface-chart-root.css.js'
 import '../../tooltip/index.js'
@@ -29,6 +30,31 @@ export class HelixSpatialSurfaceChart extends HelixHeadlessSpatialSurfaceChart {
   static override tier = 'helix-'
 
   static override styles: CSSResultGroup = [tooltipStyles, styles]
+
+  /**
+   * How strongly the surface is drawn, as on every chart.
+   *
+   * `outlined` is a wireframe in the ramp's colors over a surface faded toward
+   * the page, and `subtle` the same wireframe over a faint surface that the
+   * grid behind shows through, so a reading the surface hid from this side can
+   * be seen. Absent is the filled surface, per the rule that a reflected
+   * property takes no default, and `solid` writes it out. A renderer draws the
+   * surface the same way.
+   *
+   * It composes with `material`: emphasis decides what is drawn, and material
+   * how much of it comes through. The ring on the reading the keys rest on
+   * keeps its own ink.
+   */
+  @property({ reflect: true })
+  emphasis?: 'outlined' | 'solid' | 'subtle'
+
+  /**
+   * How much of each mark comes through, as on every chart: `glass` admits the
+   * most of what is behind it, `frosted` less, and absent is opaque. The
+   * strength is the theme's, scaled by `--helix-material-opacity`.
+   */
+  @property({ reflect: true })
+  material?: 'frosted' | 'glass'
 }
 
 declare global {

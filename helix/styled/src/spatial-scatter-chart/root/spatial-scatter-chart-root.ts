@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSpatialScatterChart } from '@fusion.dev/helix-headless/spatial-scatter-chart'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './spatial-scatter-chart-root.css.js'
@@ -27,6 +28,29 @@ export class HelixSpatialScatterChart extends HelixHeadlessSpatialScatterChart {
   static override tier = 'helix-'
 
   static override styles: CSSResultGroup = [seriesStyles, tooltipStyles, styles]
+
+  /**
+   * How strongly the points are drawn, as on every chart.
+   *
+   * `outlined` is a point as a ring in its group's color over a dot faded
+   * toward the page, and `subtle` the same ring over a faint dot. Absent is
+   * the filled dot, per the rule that a reflected property takes no default,
+   * and `solid` writes it out. A renderer draws the points the same way.
+   *
+   * It composes with `material`: emphasis decides what is drawn, and material
+   * how much of it comes through. The ring on the point the keys rest on keeps
+   * its own ink.
+   */
+  @property({ reflect: true })
+  emphasis?: 'outlined' | 'solid' | 'subtle'
+
+  /**
+   * How much of each mark comes through, as on every chart: `glass` admits the
+   * most of what is behind it, `frosted` less, and absent is opaque. The
+   * strength is the theme's, scaled by `--helix-material-opacity`.
+   */
+  @property({ reflect: true })
+  material?: 'frosted' | 'glass'
 }
 
 declare global {
