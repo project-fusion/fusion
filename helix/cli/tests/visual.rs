@@ -12,8 +12,10 @@ fn visual(arguments: &[&str]) -> std::process::Output {
 }
 
 fn scratch(name: &str) -> PathBuf {
-    let directory =
-        std::env::temp_dir().join(format!("helix-visual-compare-{}-{name}", std::process::id()));
+    let directory = std::env::temp_dir().join(format!(
+        "helix-visual-compare-{}-{name}",
+        std::process::id()
+    ));
     std::fs::create_dir_all(&directory).unwrap();
     directory
 }
@@ -98,4 +100,36 @@ fn a_threshold_outside_zero_to_one_is_refused() {
     let ran = visual(&["compare", "a.png", "b.png", "--threshold", "2"]);
     assert_eq!(ran.status.code(), Some(2));
     assert!(text(&ran.stderr).contains("the threshold is from 0 to 1"));
+}
+
+/// Under `--json`, stdout is one object a script reads, and the sentence a
+/// person reads moves to stderr.
+#[test]
+fn json_answers_with_an_object_and_keeps_the_sentence_on_stderr() {
+    let at = scratch("json");
+    let (baseline, current) = (at.join("a.png"), at.join("b.png"));
+    write(&baseline, 3, 3, None);
+    write(&current, 3, 3, Some((1, 1)));
+    let ran = Command::new(env!("CARGO_BIN_EXE_helix"))
+        .args(["--json", "visual", "compare"])
+        .args([&baseline, &current])
+        .output()
+        .expect("the binary runs");
+    assert_eq!(ran.status.code(), Some(1));
+    let answer: serde_json::Value =
+        serde_json::from_slice(&ran.stdout).expect("stdout is one JSON document");
+    assert_eq!(answer["matches"], false);
+    assert_eq!(answer["differing"], 1);
+    assert!(answer["diff"].is_null());
+    assert!(text(&ran.stderr).contains("1 pixel differs"));
+
+    write(&current, 3, 4, None);
+    let resized = Command::new(env!("CARGO_BIN_EXE_helix"))
+        .args(["--json", "visual", "compare"])
+        .args([&baseline, &current])
+        .output()
+        .expect("the binary runs");
+    let answer: serde_json::Value =
+        serde_json::from_slice(&resized.stdout).expect("stdout is one JSON document");
+    assert_eq!(answer["size"]["current"], serde_json::json!([3, 4]));
 }

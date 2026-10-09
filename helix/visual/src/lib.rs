@@ -26,6 +26,7 @@ mod driver;
 mod fingerprint;
 mod harness;
 mod image;
+mod out;
 mod report;
 mod run;
 mod shard;
@@ -37,6 +38,9 @@ use std::path::{Path, PathBuf};
 use clap::Subcommand;
 use fusion_rules::error::{Failure, Outcome};
 use fusion_rules::exit::Code;
+use serde_json::json;
+
+use crate::out::say;
 
 /// The word every printed line opens with: the command, since this is one of
 /// its nouns.
@@ -189,20 +193,34 @@ fn compare(
     let after = read(current)?;
     let named = format!("{} against {}", current.display(), baseline.display());
     if before.width != after.width || before.height != after.height {
-        println!(
+        say!(
             "{PRODUCT}: {named}: {}x{} became {}x{}. A size change is a layout change, and no diff \
              image is written because there is nothing to lay one over.",
             before.width, before.height, after.width, after.height
         );
+        if out::json() {
+            println!(
+                "{}",
+                json!({
+                    "baseline": baseline,
+                    "current": current,
+                    "matches": false,
+                    "size": {
+                        "baseline": [before.width, before.height],
+                        "current": [after.width, after.height],
+                    },
+                })
+            );
+        }
         return Ok(Code::Failed);
     }
     let Some(out) = diff_to else {
         let differing = diff::count(&before, &after, threshold, None);
-        return Ok(verdict(&named, differing, None));
+        return Ok(verdict(baseline, current, differing, None));
     };
     let (differing, marked) = diff::marked(&before, &after, threshold);
     if differing == 0 {
-        return Ok(verdict(&named, 0, None));
+        return Ok(verdict(baseline, current, 0, None));
     }
     let encoded = image::encode(&marked)
         .map_err(|why| Failure::new(Code::Internal, "cannot encode the diff image", why))?;
@@ -212,12 +230,26 @@ fn compare(
             error.to_string().to_lowercase(),
         )
     })?;
-    Ok(verdict(&named, differing, Some(out)))
+    Ok(verdict(baseline, current, differing, Some(out)))
 }
 
-fn verdict(named: &str, differing: usize, written: Option<&Path>) -> Code {
+/// The answer to `compare`, as a sentence and under `--json` as an object.
+fn verdict(baseline: &Path, current: &Path, differing: usize, written: Option<&Path>) -> Code {
+    if out::json() {
+        println!(
+            "{}",
+            json!({
+                "baseline": baseline,
+                "current": current,
+                "diff": written,
+                "differing": differing,
+                "matches": differing == 0,
+            })
+        );
+    }
+    let named = format!("{} against {}", current.display(), baseline.display());
     if differing == 0 {
-        println!("{PRODUCT}: {named}: every pixel matches.");
+        say!("{PRODUCT}: {named}: every pixel matches.");
         return Code::Ok;
     }
     let pixels = if differing == 1 {
@@ -226,11 +258,11 @@ fn verdict(named: &str, differing: usize, written: Option<&Path>) -> Code {
         "pixels differ"
     };
     match written {
-        Some(path) => println!(
+        Some(path) => say!(
             "{PRODUCT}: {named}: {differing} {pixels}, marked in {}.",
             path.display()
         ),
-        None => println!("{PRODUCT}: {named}: {differing} {pixels}."),
+        None => say!("{PRODUCT}: {named}: {differing} {pixels}."),
     }
     Code::Failed
 }
@@ -241,7 +273,12 @@ fn verdict(named: &str, differing: usize, written: Option<&Path>) -> Code {
 ///
 /// A failure `helix` prints in its own format: a config that cannot be read,
 /// a driver that cannot start, a picture that cannot be written.
-pub fn run(verb: &Visual) -> Outcome<Code> {
+///
+/// With `json`, stdout holds one JSON document and the sentences go to
+/// stderr: `test` and `update` print the run's record, which is `run.json`,
+/// `report` prints the last one, and `compare` prints its answer.
+pub fn run(verb: &Visual, json: bool) -> Outcome<Code> {
+    out::claim(json);
     match verb {
         Visual::Compare {
             baseline,
