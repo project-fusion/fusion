@@ -1,5 +1,5 @@
 /**
- * Where each reading of a spatial heatmap stands, in the isometric projection, as SVG path data.
+ * Where each reading of a spatial heatmap stands, seen from a camera that turns and tilts, as SVG path data.
  *
  * Kept apart from the element because it is arithmetic a picture hides: a face
  * drawn in the wrong order is covered by the prism it should cover, and a
@@ -10,11 +10,21 @@
  * the `viewBox` and a server can write it with no width to measure.
  *
  * **The projection is the one every spatial drawing shares**, `helix-core`'s,
- * seen from the isometric camera. What is here is the heatmap's own: which way
- * its columns and rows run, its prisms, and the slab under them.
+ * seen from the isometric camera until the reader turns it. What is here is the
+ * heatmap's own: which way its columns and rows run, its prisms, the slab
+ * under them, and the order to paint them in.
  */
 
-import { ISOMETRIC, type PagePoint, pathData, projectionOf } from '@fusion.dev/helix-core'
+import {
+  type Camera,
+  depthOrder,
+  ISOMETRIC,
+  type PagePoint,
+  type Projection,
+  pathData,
+  projectionOf,
+  solid,
+} from '@fusion.dev/helix-core'
 
 /** How far across the page one step along either axis goes: the cosine of 30 degrees. */
 export const ACROSS = Math.sqrt(3) / 2
@@ -22,23 +32,27 @@ export const ACROSS = Math.sqrt(3) / 2
 /** A point on the page, in cells. */
 export type Point = PagePoint
 
-/** One reading drawn as a prism: three visible faces, as path data. */
+/**
+ * One reading drawn as a prism: the faces the camera sees, as path data. From
+ * the isometric camera, the lighter side is the one toward the next row,
+ * drawn at the lower left, and the darker the one toward the next column.
+ */
 export interface Prism {
   /** The reading's place among those drawn. */
   index: number
-  /** The face toward the next row, drawn at the lower left. */
+  /** The side facing the light more, or `''` where the camera sees no side. */
   left: string
   /** The middle of the top face, which is where the tooltip points. */
   peak: Point
-  /** The face toward the next column, drawn at the lower right. */
+  /** The side facing it less, or `''` where the camera sees one side or none. */
   right: string
   /** The face the reading's tone is painted on. */
   top: string
 }
 
 /**
- * The slab the prisms stand on: its top, which is the floor, and its two
- * sides seen from the front, as path data.
+ * The slab the prisms stand on: its top, which is the floor, and the two
+ * sides the camera sees, lighter first, as path data.
  */
 export interface Base {
   left: string
@@ -58,7 +72,12 @@ export interface Relief {
    * under the last. The strip's first and last labels stand there.
    */
   corners: { end: Point; start: Point } | undefined
-  /** In the order they are painted, which is the order of the readings. */
+  /**
+   * The prisms' places in `prisms`, back to front, the order to paint them
+   * in. From the isometric camera it is the order of the readings.
+   */
+  order: number[]
+  /** In the order of the readings. */
   prisms: Prism[]
 }
 
@@ -92,96 +111,139 @@ export const heightsOf = (
 export const highestOf = (values: readonly (number | undefined)[]): number =>
   values.reduce<number>((high, value) => (value !== undefined && value > high ? value : high), 0)
 
-const isometric = projectionOf(ISOMETRIC)
+/** The floor's place for a grid place: columns run along the floor's across, and rows the way back from it. */
+const floor = (column: number, row: number): { x: number; y: number } => ({ x: column, y: -row })
 
 /**
- * A grid place and a height, on the page. Columns run down to the right and
- * rows down to the left, which is the floor's across and the way back from it.
+ * The sides of a box on the floor the camera sees, lighter first, and its
+ * top, as path data. A box from `low` to `high` along the floor, between the
+ * heights `bottom` and `top`.
  */
-const at = (column: number, row: number, height: number): Point =>
-  isometric.at(column, -row, height)
-
-const path = pathData
+const boxFaces = (
+  projection: Projection,
+  low: { x: number; y: number },
+  high: { x: number; y: number },
+  bottom: number,
+  top: number,
+): { sides: string[]; top: string; points: Point[] } => {
+  const at = (x: number, y: number, z: number): Point => projection.at(x, y, z)
+  const corners: Array<[number, number]> = [
+    [low.x, low.y],
+    [high.x, low.y],
+    [high.x, high.y],
+    [low.x, high.y],
+  ]
+  const outward: Array<[number, number]> = [
+    [0, -1],
+    [1, 0],
+    [0, 1],
+    [-1, 0],
+  ]
+  const sides: Array<{ d: string; light: number }> = []
+  corners.forEach(([x, y], index) => {
+    const [nx, ny] = outward[index] as [number, number]
+    /* Toward the camera only, the one condition a side needs to be seen. */
+    if (nx * projection.toward[0] + ny * projection.toward[1] <= 1e-6) {
+      return
+    }
+    const [x2, y2] = corners[(index + 1) % 4] as [number, number]
+    sides.push({
+      d: pathData([at(x, y, top), at(x2, y2, top), at(x2, y2, bottom), at(x, y, bottom)]),
+      /* How far it faces the right of the page: the light falls from the left. */
+      light: nx * projection.across[0] + ny * projection.across[1],
+    })
+  })
+  sides.sort((one, other) => one.light - other.light)
+  const points = corners.flatMap(([x, y]) => [at(x, y, top), at(x, y, bottom)])
+  return {
+    points,
+    sides: sides.map((side) => side.d),
+    top: pathData(corners.map(([x, y]) => at(x, y, top))),
+  }
+}
 
 /**
  * Every reading as a prism, filling down each column of `rows` and then
- * across, as the flat heatmap does.
+ * across, as the flat heatmap does, seen from `camera`.
  *
- * **Columns run down to the right and rows down to the left, so the order of
- * the readings is the order to paint them in.** A prism can only cover the
- * neighbors behind it, which are the one before it in its column and the one in
- * the same row of the column before, and both come earlier in the table. With
- * the axes the other way round, the newest column would stand at the back and
- * every tall reading in front of it would hide it.
+ * **Columns run down to the right and rows down to the left, from the
+ * isometric camera, so there the order of the readings is the order to paint
+ * them in.** A prism can only cover the neighbors behind it, which are the one
+ * before it in its column and the one in the same row of the column before,
+ * and both come earlier in the table. Turned, the order comes from how near
+ * the camera each prism stands, which is `order`.
  *
  * `footprint` is how much of its cell a prism covers along each edge, so `1`
  * leaves no gap between neighbors.
  */
-export const reliefOf = (heights: readonly number[], rows: number, footprint: number): Relief => {
+export const reliefOf = (
+  heights: readonly number[],
+  rows: number,
+  footprint: number,
+  camera: Camera = ISOMETRIC,
+): Relief => {
+  const projection = projectionOf(camera)
   const count = Math.max(1, Math.floor(rows) || 1)
-  const inset = (1 - Math.min(1, Math.max(0, footprint))) / 2
-  let left = Number.POSITIVE_INFINITY
-  let right = Number.NEGATIVE_INFINITY
-  let top = Number.POSITIVE_INFINITY
-  let bottom = Number.NEGATIVE_INFINITY
-  const prisms = heights.map((height, index): Prism => {
+  const width = Math.min(1, Math.max(0, footprint))
+  const points: Point[] = []
+  const places = heights.map((height, index) => {
     const column = Math.floor(index / count)
     const row = index % count
-    const near = column + inset
-    const far = column + 1 - inset
-    const start = row + inset
-    const end = row + 1 - inset
-    /* The four corners of the footprint, at the floor and at the top: the back
-       one, the one toward the next column, the front one, and the one toward
-       the next row. */
-    const back = at(near, start, height)
-    const across = at(far, start, height)
-    const front = at(far, end, height)
-    const down = at(near, end, height)
-    const acrossFloor = at(far, start, 0)
-    const frontFloor = at(far, end, 0)
-    const downFloor = at(near, end, 0)
-    left = Math.min(left, down.x)
-    right = Math.max(right, across.x)
-    top = Math.min(top, back.y)
-    bottom = Math.max(bottom, frontFloor.y)
+    return { height, index, ...floor(column + 0.5, row + 0.5) }
+  })
+  const prisms = places.map(({ height, index, x, y }): Prism => {
+    const drawn = solid(projection, 'block', x, y, width, height)
+    /* The sides first, lighter first, and the top last, as `solid` gives them. */
+    const sides = drawn.faces.slice(0, -1).sort((one, other) => one.darken - other.darken)
+    const half = width / 2
+    for (const corner of [
+      [x - half, y - half],
+      [x + half, y - half],
+      [x + half, y + half],
+      [x - half, y + half],
+    ] as const) {
+      points.push(
+        projection.at(corner[0], corner[1], 0),
+        projection.at(corner[0], corner[1], height),
+      )
+    }
     return {
       index,
-      left: path([down, front, frontFloor, downFloor]),
-      peak: at(column + 0.5, row + 0.5, height),
-      right: path([front, across, acrossFloor, frontFloor]),
-      top: path([back, across, front, down]),
+      left: sides[0]?.d ?? '',
+      peak: drawn.peak,
+      right: sides[1]?.d ?? '',
+      top: drawn.faces.at(-1)?.d ?? '',
     }
   })
   if (prisms.length === 0) {
-    return { base: undefined, box: { height: 0, width: 0, x: 0, y: 0 }, corners: undefined, prisms }
+    return {
+      base: undefined,
+      box: { height: 0, width: 0, x: 0, y: 0 },
+      corners: undefined,
+      order: [],
+      prisms,
+    }
   }
   /* **The slab is the whole grid**, every column and the rows the first one
      fills, so a last column still filling stands on floor that waits for it. */
   const columns = Math.ceil(heights.length / count)
   const deep = Math.min(count, heights.length)
-  const [first, last] = [-MARGIN, columns + MARGIN]
-  const [near, far] = [-MARGIN, deep + MARGIN]
-  const back = at(first, near, 0)
-  const across = at(last, near, 0)
-  const front = at(last, far, 0)
-  const down = at(first, far, 0)
-  const acrossFoot = at(last, near, -THICKNESS)
-  const frontFoot = at(last, far, -THICKNESS)
-  const downFoot = at(first, far, -THICKNESS)
-  const base: Base = {
-    left: path([down, front, frontFoot, downFoot]),
-    right: path([front, across, acrossFoot, frontFoot]),
-    top: path([back, across, front, down]),
-  }
-  left = Math.min(left, downFoot.x)
-  right = Math.max(right, acrossFoot.x)
-  top = Math.min(top, back.y)
-  bottom = Math.max(bottom, frontFoot.y)
+  const [low, high] = [floor(-MARGIN, deep + MARGIN), floor(columns + MARGIN, -MARGIN)]
+  const slab = boxFaces(projection, low, high, -THICKNESS, 0)
+  const base: Base = { left: slab.sides[0] ?? '', right: slab.sides[1] ?? '', top: slab.top }
+  points.push(...slab.points)
+  const xs = points.map((point) => point.x)
+  const ys = points.map((point) => point.y)
+  const [left, top] = [Math.min(...xs), Math.min(...ys)]
   return {
     base,
-    box: { height: bottom - top, width: right - left, x: left, y: top },
-    corners: { end: frontFoot, start: downFoot },
+    box: { height: Math.max(...ys) - top, width: Math.max(...xs) - left, x: left, y: top },
+    /* Under the first column's last row, and under the last column's. */
+    corners: {
+      end: projection.at(columns + MARGIN, -(deep + MARGIN), -THICKNESS),
+      start: projection.at(-MARGIN, -(deep + MARGIN), -THICKNESS),
+    },
+    order: depthOrder(projection, places).map((place) => place.index),
     prisms,
   }
 }

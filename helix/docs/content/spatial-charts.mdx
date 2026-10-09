@@ -24,7 +24,10 @@ three.js, in a view you can drag round and zoom.
 Put the table in the document, and point the chart at it with `for`:
 
 ```html
-<table data-hidden-visually id="load">
+<table
+  data-hidden-visually
+  id="load"
+>
   <caption>Load over a week</caption>
   <thead>
     <tr>
@@ -68,7 +71,10 @@ bun add @fusion.dev/helix-plot three
 Put an element inside the chart for three.js to draw in, and connect the two:
 
 ```html
-<helix-spatial-scatter-chart for="customers" group-by="Segment">
+<helix-spatial-scatter-chart
+  for="customers"
+  group-by="Segment"
+>
   <div></div>
 </helix-spatial-scatter-chart>
 ```
@@ -93,7 +99,10 @@ Each chart has its own connector and driver:
 is inside it:
 
 ```html
-<helix-spatial-heatmap for="commits" rows="7">
+<helix-spatial-heatmap
+  for="commits"
+  rows="7"
+>
   <table id="commits">…</table>
   <div slot="renderer"></div>
 </helix-spatial-heatmap>
@@ -107,7 +116,7 @@ Once three.js has drawn, the chart hides its SVG drawing.
 | | SVG | three.js |
 |---|---|---|
 | What it needs | Nothing more than the chart | `@fusion.dev/helix-plot`, three.js, and WebGL |
-| How the view moves | Shift with an arrow turns the scatter and the surface a step | Drag to turn, the wheel or a pinch to zoom, and Shift with an arrow to turn a step |
+| How the view moves | Shift with an arrow turns it a step | Drag to turn, the wheel or a pinch to zoom, and Shift with an arrow to turn a step |
 | Light | Shaded by which way each face turns, with no perspective | Lit from above, in perspective |
 | Without WebGL | Drawn | Not drawn, and the SVG drawing stays |
 
@@ -130,7 +139,7 @@ The plot takes focus, and the keys move the reading:
 | Enter, Space | Presses the point | Presses the place |
 | Escape | Lets the reading go | Lets the reading go |
 
-`Spatial Heatmap` takes `Heatmap`'s keys. Shift with an arrow turns a renderer's
+`Spatial Heatmap` takes `Heatmap`'s keys, and Shift with an arrow turns its
 view, except under `selection-mode="multiple"`, where it selects a range.
 
 In three.js, a turn moves over a quarter of a second, and with reduced motion
