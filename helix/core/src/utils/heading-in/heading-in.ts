@@ -1,5 +1,14 @@
-/** What counts as a heading: the six levels, and anything that says it is one. */
-const HEADING = 'h1, h2, h3, h4, h5, h6, [role="heading"]'
+/**
+ * What counts as a heading: the six levels, anything that says it is one, and
+ * an element that draws one of the six from `as`, such as
+ * `<helix-text as="h3">`. That one's heading is in its shadow root, which a
+ * selector run from the page cannot see, so the element counts as the heading.
+ */
+const HEADING = [
+  'h1, h2, h3, h4, h5, h6',
+  '[role="heading"]',
+  '[as="h1"], [as="h2"], [as="h3"], [as="h4"], [as="h5"], [as="h6"]',
+].join(', ')
 
 /**
  * The first heading among some elements or inside them, in order, or `null`.

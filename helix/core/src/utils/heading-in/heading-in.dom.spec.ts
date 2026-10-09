@@ -21,6 +21,14 @@ describe('the heading that names a panel', () => {
     expect(headingIn(make('<div role="heading">Role</div>'))?.textContent).toBe('Role')
   })
 
+  test('is an element that draws a heading from `as`', () => {
+    expect(headingIn(make('<helix-text as="h3">Drawn</helix-text>'))?.textContent).toBe('Drawn')
+    expect(headingIn(make('<div><helix-text as="h2">Inside</helix-text></div>'))?.textContent).toBe(
+      'Inside',
+    )
+    expect(headingIn(make('<helix-text as="p">Body</helix-text>'))).toBeNull()
+  })
+
   test('is nothing where there is none', () => {
     expect(headingIn(make('<p>Text</p>'))).toBeNull()
     expect(headingIn([])).toBeNull()
