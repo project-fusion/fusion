@@ -83,7 +83,7 @@ const OUTPUT: [&str; 3] = [".vercel", "coverage", "wasm"];
 /// A fix in one of these would be undone by the next build.
 fn generated() -> Regex {
     Regex::new(
-        r"(\.generated\.\w+|custom-elements\.json|jsx\.d\.ts|vue\.d\.ts|elements\.css|\.css\.ts|catalog\.generated\.json|peers\.json|oracle\.json|metrics\.mdx)$",
+        r"(\.generated\.\w+|custom-elements\.json|helix/[\w-]+/(?:api|examples|lint)\.json|helix/[\w-]+/skills/[\w-]+/SKILL\.md|jsx\.d\.ts|vue\.d\.ts|elements\.css|\.css\.ts|catalog\.generated\.json|peers\.json|oracle\.json|metrics\.mdx)$",
     )
     .expect("a literal pattern compiles")
 }

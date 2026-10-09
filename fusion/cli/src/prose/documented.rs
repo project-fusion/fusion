@@ -333,6 +333,10 @@ fn answers(map: &Value, subpath: &str) -> Option<String> {
     if let Some(found) = map.get(subpath) {
         return target(found);
     }
+    /* **The longest prefix wins, as Node resolves a pattern**, so a pattern
+    under `./skills/` answers `./skills/helix` ahead of the catch-all, whichever
+    the map lists first. */
+    let mut best: Option<(usize, &str, &Value)> = None;
     for (key, found) in map {
         let Some((head, tail)) = key.split_once('*') else {
             continue;
@@ -340,10 +344,14 @@ fn answers(map: &Value, subpath: &str) -> Option<String> {
         if !subpath.starts_with(head) || !subpath.ends_with(tail) {
             continue;
         }
-        let filled = &subpath[head.len()..subpath.len() - tail.len()];
-        return target(found).map(|path| path.replace('*', filled));
+        if best.is_none_or(|(length, _, _)| head.len() > length) {
+            best = Some((head.len(), key.as_str(), found));
+        }
     }
-    None
+    let (_, key, found) = best?;
+    let (head, tail) = key.split_once('*')?;
+    let filled = &subpath[head.len()..subpath.len() - tail.len()];
+    target(found).map(|path| path.replace('*', filled))
 }
 
 #[expect(
@@ -632,5 +640,28 @@ pub fn run(context: &Context) -> Report {
         findings,
         notes: Vec::new(),
         unit: "API references in the documentation",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::answers;
+
+    /// A specific pattern answers its subpaths whatever order the map lists it
+    /// in, as Node resolves one.
+    #[test]
+    fn the_longest_pattern_prefix_answers() {
+        let map = serde_json::json!({
+            "./*": "./dist/*/index.js",
+            "./skills/*": "./skills/*",
+        });
+        assert_eq!(
+            answers(&map, "./skills/helix/SKILL.md").as_deref(),
+            Some("./skills/helix/SKILL.md")
+        );
+        assert_eq!(
+            answers(&map, "./select").as_deref(),
+            Some("./dist/select/index.js")
+        );
     }
 }
