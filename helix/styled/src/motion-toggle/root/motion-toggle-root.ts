@@ -11,7 +11,7 @@ import { styles } from './motion-toggle-root.css.js'
  * while motion runs and the play icon while it is paused. Text slotted into
  * it stands beside the icon.
  *
- * @since 0.197.0
+ * @since 0.198.0
  * @status experimental
  * @category actions
  * @documentation https://fusion.dev/helix/components/motion-toggle
