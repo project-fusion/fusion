@@ -1,0 +1,97 @@
+- table "Response time by region, first two weeks of September":
+  - caption: Response time by region, first two weeks of September
+  - rowgroup:
+    - row "Day Frankfurt (ms) Virginia (ms) Singapore (ms) São Paulo (ms)":
+      - columnheader "Day"
+      - columnheader "Frankfurt (ms)"
+      - columnheader "Virginia (ms)"
+      - columnheader "Singapore (ms)"
+      - columnheader "São Paulo (ms)"
+  - rowgroup:
+    - row "1 Sep 120 110 196 213":
+      - rowheader "1 Sep"
+      - cell "120"
+      - cell "110"
+      - cell "196"
+      - cell "213"
+    - row "2 Sep 128 113 191 204":
+      - rowheader "2 Sep"
+      - cell "128"
+      - cell "113"
+      - cell "191"
+      - cell "204"
+    - row "3 Sep 134 112 184 198":
+      - rowheader "3 Sep"
+      - cell "134"
+      - cell "112"
+      - cell "184"
+      - cell "198"
+    - row "4 Sep 138 108 176 193":
+      - rowheader "4 Sep"
+      - cell "138"
+      - cell "108"
+      - cell "176"
+      - cell "193"
+    - row "5 Sep 137 101 169 192":
+      - rowheader "5 Sep"
+      - cell "137"
+      - cell "101"
+      - cell "169"
+      - cell "192"
+    - row "6 Sep 134 93 164 195":
+      - rowheader "6 Sep"
+      - cell "134"
+      - cell "93"
+      - cell "164"
+      - cell "195"
+    - row "7 Sep 127 85 202 201":
+      - rowheader "7 Sep"
+      - cell "127"
+      - cell "85"
+      - cell "202"
+      - cell "201"
+    - row "8 Sep 119 79 204 208":
+      - rowheader "8 Sep"
+      - cell "119"
+      - cell "79"
+      - cell "204"
+      - cell "208"
+    - row "9 Sep 111 77 209 216":
+      - rowheader "9 Sep"
+      - cell "111"
+      - cell "77"
+      - cell "209"
+      - cell "216"
+    - row "10 Sep 105 78 177 223":
+      - rowheader "10 Sep"
+      - cell "105"
+      - cell "78"
+      - cell "177"
+      - cell "223"
+    - row "11 Sep 102 83 185 252":
+      - rowheader "11 Sep"
+      - cell "102"
+      - cell "83"
+      - cell "185"
+      - cell "252"
+    - row "12 Sep 103 90 192 253":
+      - rowheader "12 Sep"
+      - cell "103"
+      - cell "90"
+      - cell "192"
+      - cell "253"
+    - row "13 Sep 107 98 197 250":
+      - rowheader "13 Sep"
+      - cell "107"
+      - cell "98"
+      - cell "197"
+      - cell "250"
+    - row "14 Sep 113 106 198 244":
+      - rowheader "14 Sep"
+      - cell "113"
+      - cell "106"
+      - cell "198"
+      - cell "244"
+- application "Response time by region":
+  - status
+- paragraph: 56 readings in 4 series over 14 places, from 77 to 253.
