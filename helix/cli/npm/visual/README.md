@@ -326,6 +326,7 @@ jobs:
     steps:
       - env:
           BODY: ${{ github.event.comment.body }}
+          GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ github.token }}
           NUMBER: ${{ github.event.issue.number }}
         run: |
