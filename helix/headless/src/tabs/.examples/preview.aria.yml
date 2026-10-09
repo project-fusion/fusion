@@ -1,0 +1,4 @@
+- tablist "Project":
+  - tab "Overview" [selected]
+  - tab "Activity"
+- text: A summary of the project and the people on it.

@@ -1,0 +1,3 @@
+- checkbox "Email me about product updates" [checked]
+- text: Email me about product updates
+- paragraph: You can unsubscribe at any time.

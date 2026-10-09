@@ -1,0 +1,10 @@
+- text: Notifications
+- checkbox "Email" [checked]
+- text: Email
+- checkbox "Text message" [checked]
+- text: Text message
+- checkbox "Mobile app"
+- text: Mobile app
+- checkbox "Browser"
+- text: Browser
+- paragraph: Choose where you receive updates.

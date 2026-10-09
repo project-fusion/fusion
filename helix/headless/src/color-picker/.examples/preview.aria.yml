@@ -1,0 +1,8 @@
+- slider "Saturation": "80"
+- slider "Brightness": "100"
+- 'button "Copy #3366ff"'
+- text: Hue
+- slider "Hue": "225"
+- textbox "Color": "#3366ff"
+- button "Sample a color from the screen"
+- 'button "Syntax: hex. Change it."': hex

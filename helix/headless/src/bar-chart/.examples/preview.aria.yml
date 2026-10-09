@@ -1,0 +1,71 @@
+- table "Revenue by quarter":
+  - caption: Revenue by quarter
+  - rowgroup:
+    - row "Quarter Revenue":
+      - columnheader "Quarter"
+      - columnheader "Revenue"
+  - rowgroup:
+    - row "Q1 $128k":
+      - rowheader "Q1"
+      - cell "$128k"
+    - row "Q2 $141k":
+      - rowheader "Q2"
+      - cell "$141k"
+    - row "Q3 $96k":
+      - rowheader "Q3"
+      - cell "$96k"
+    - row "Q4 $164k":
+      - rowheader "Q4"
+      - cell "$164k"
+- application "Revenue by quarter":
+  - status
+- paragraph: "Revenue by quarter. Highest: Revenue Q4 $164k."
+- table "Signups by channel":
+  - caption: Signups by channel
+  - rowgroup:
+    - row "Quarter Direct Partner":
+      - columnheader "Quarter"
+      - columnheader "Direct"
+      - columnheader "Partner"
+  - rowgroup:
+    - row "Q1 84 36":
+      - rowheader "Q1"
+      - cell "84"
+      - cell "36"
+    - row "Q2 92 51":
+      - rowheader "Q2"
+      - cell "92"
+      - cell "51"
+    - row "Q3 70 44":
+      - rowheader "Q3"
+      - cell "70"
+      - cell "44"
+    - row "Q4 101 63":
+      - rowheader "Q4"
+      - cell "101"
+      - cell "63"
+- application "Signups by channel":
+  - status
+- paragraph: "Signups by channel. Highest: Direct Q4 101; Partner Q4 63."
+- table "Net cash by quarter":
+  - caption: Net cash by quarter
+  - rowgroup:
+    - row "Quarter Net":
+      - columnheader "Quarter"
+      - columnheader "Net"
+  - rowgroup:
+    - row "Q1 +$12k":
+      - rowheader "Q1"
+      - cell "+$12k"
+    - row "Q2 -$8k":
+      - rowheader "Q2"
+      - cell "-$8k"
+    - row "Q3 +$5k":
+      - rowheader "Q3"
+      - cell "+$5k"
+    - row "Q4 -$14k":
+      - rowheader "Q4"
+      - cell "-$14k"
+- application "Net cash by quarter":
+  - status
+- paragraph: "Net cash by quarter. Highest: Net Q1 +$12k."

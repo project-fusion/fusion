@@ -1,0 +1,4 @@
+- table "Deployments":
+  - row "Service Region Status"
+  - text: web-app us-east-1 Healthy billing-api eu-west-2 Healthy
+- status

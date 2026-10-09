@@ -1,0 +1,4 @@
+- text: Project name
+- textbox "Project name":
+  - /placeholder: Website redesign
+- paragraph: Visible to your team

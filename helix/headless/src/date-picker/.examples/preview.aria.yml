@@ -1,0 +1,61 @@
+- button "Previous month"
+- text: August 2026
+- button "Next month"
+- grid "August 2026":
+  - row "Sunday Monday Tuesday Wednesday Thursday Friday Saturday":
+    - columnheader "Sunday": Sun
+    - columnheader "Monday": Mon
+    - columnheader "Tuesday": Tue
+    - columnheader "Wednesday": Wed
+    - columnheader "Thursday": Thu
+    - columnheader "Friday": Fri
+    - columnheader "Saturday": Sat
+  - row "Sunday, July 26, 2026 Monday, July 27, 2026 Tuesday, July 28, 2026 Wednesday, July 29, 2026 Thursday, July 30, 2026 Friday, July 31, 2026 Saturday, August 1, 2026":
+    - gridcell "Sunday, July 26, 2026" [disabled]: "26"
+    - gridcell "Monday, July 27, 2026" [disabled]: "27"
+    - gridcell "Tuesday, July 28, 2026" [disabled]: "28"
+    - gridcell "Wednesday, July 29, 2026" [disabled]: "29"
+    - gridcell "Thursday, July 30, 2026" [disabled]: "30"
+    - gridcell "Friday, July 31, 2026" [disabled]: "31"
+    - gridcell "Saturday, August 1, 2026": "1"
+  - row "Sunday, August 2, 2026 Monday, August 3, 2026 Tuesday, August 4, 2026 Wednesday, August 5, 2026 Thursday, August 6, 2026 Friday, August 7, 2026 Saturday, August 8, 2026":
+    - gridcell "Sunday, August 2, 2026": "2"
+    - gridcell "Monday, August 3, 2026": "3"
+    - gridcell "Tuesday, August 4, 2026": "4"
+    - gridcell "Wednesday, August 5, 2026": "5"
+    - gridcell "Thursday, August 6, 2026": "6"
+    - gridcell "Friday, August 7, 2026": "7"
+    - gridcell "Saturday, August 8, 2026": "8"
+  - row "Sunday, August 9, 2026 Monday, August 10, 2026 Tuesday, August 11, 2026 Wednesday, August 12, 2026 Thursday, August 13, 2026 Friday, August 14, 2026 Saturday, August 15, 2026":
+    - gridcell "Sunday, August 9, 2026": "9"
+    - gridcell "Monday, August 10, 2026": "10"
+    - gridcell "Tuesday, August 11, 2026": "11"
+    - gridcell "Wednesday, August 12, 2026": "12"
+    - gridcell "Thursday, August 13, 2026": "13"
+    - gridcell "Friday, August 14, 2026" [selected]: "14"
+    - gridcell "Saturday, August 15, 2026": "15"
+  - row "Sunday, August 16, 2026 Monday, August 17, 2026 Tuesday, August 18, 2026 Wednesday, August 19, 2026 Thursday, August 20, 2026 Friday, August 21, 2026 Saturday, August 22, 2026":
+    - gridcell "Sunday, August 16, 2026": "16"
+    - gridcell "Monday, August 17, 2026": "17"
+    - gridcell "Tuesday, August 18, 2026": "18"
+    - gridcell "Wednesday, August 19, 2026": "19"
+    - gridcell "Thursday, August 20, 2026": "20"
+    - gridcell "Friday, August 21, 2026": "21"
+    - gridcell "Saturday, August 22, 2026": "22"
+  - row "Sunday, August 23, 2026 Monday, August 24, 2026 Tuesday, August 25, 2026 Wednesday, August 26, 2026 Thursday, August 27, 2026 Friday, August 28, 2026 Saturday, August 29, 2026":
+    - gridcell "Sunday, August 23, 2026": "23"
+    - gridcell "Monday, August 24, 2026": "24"
+    - gridcell "Tuesday, August 25, 2026": "25"
+    - gridcell "Wednesday, August 26, 2026": "26"
+    - gridcell "Thursday, August 27, 2026": "27"
+    - gridcell "Friday, August 28, 2026": "28"
+    - gridcell "Saturday, August 29, 2026": "29"
+  - row "Sunday, August 30, 2026 Monday, August 31, 2026 Tuesday, September 1, 2026 Wednesday, September 2, 2026 Thursday, September 3, 2026 Friday, September 4, 2026 Saturday, September 5, 2026":
+    - gridcell "Sunday, August 30, 2026": "30"
+    - gridcell "Monday, August 31, 2026": "31"
+    - gridcell "Tuesday, September 1, 2026" [disabled]: "1"
+    - gridcell "Wednesday, September 2, 2026" [disabled]: "2"
+    - gridcell "Thursday, September 3, 2026" [disabled]: "3"
+    - gridcell "Friday, September 4, 2026" [disabled]: "4"
+    - gridcell "Saturday, September 5, 2026" [disabled]: "5"
+- text: "Selected date: August 14, 2026"

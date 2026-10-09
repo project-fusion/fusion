@@ -1,0 +1,83 @@
+- table "Page weight and load time":
+  - caption: Page weight and load time
+  - rowgroup:
+    - row "Page Weight (KB) Load time (ms)":
+      - columnheader "Page"
+      - columnheader "Weight (KB)"
+      - columnheader "Load time (ms)"
+  - rowgroup:
+    - row "Home 820 1,240":
+      - rowheader "Home"
+      - cell "820"
+      - cell "1,240"
+    - row "Pricing 640 980":
+      - rowheader "Pricing"
+      - cell "640"
+      - cell "980"
+    - row "Plans 652 994":
+      - rowheader "Plans"
+      - cell "652"
+      - cell "994"
+    - row "Compare 631 1,012":
+      - rowheader "Compare"
+      - cell "631"
+      - cell "1,012"
+    - row "Docs 1,180 1,710":
+      - rowheader "Docs"
+      - cell "1,180"
+      - cell "1,710"
+    - row "Blog 1,450 2,050":
+      - rowheader "Blog"
+      - cell "1,450"
+      - cell "2,050"
+    - row "Changelog 530 860":
+      - rowheader "Changelog"
+      - cell "530"
+      - cell "860"
+    - row "Careers 910 1,380":
+      - rowheader "Careers"
+      - cell "910"
+      - cell "1,380"
+    - row "About 470 790":
+      - rowheader "About"
+      - cell "470"
+      - cell "790"
+    - row "Contact 380 690":
+      - rowheader "Contact"
+      - cell "380"
+      - cell "690"
+    - row "Status 290 520":
+      - rowheader "Status"
+      - cell "290"
+      - cell "520"
+    - row "Search 760 1,310":
+      - rowheader "Search"
+      - cell "760"
+      - cell "1,310"
+    - row "Account 1,020 1,490":
+      - rowheader "Account"
+      - cell "1,020"
+      - cell "1,490"
+    - row "Checkout 1,320 1,880":
+      - rowheader "Checkout"
+      - cell "1,320"
+      - cell "1,880"
+    - row "Support 700 1,150":
+      - rowheader "Support"
+      - cell "700"
+      - cell "1,150"
+    - row "Legal 350 610":
+      - rowheader "Legal"
+      - cell "350"
+      - cell "610"
+    - row "Press 980 1,600":
+      - rowheader "Press"
+      - cell "980"
+      - cell "1,600"
+    - row "Events 1,260 1,740":
+      - rowheader "Events"
+      - cell "1,260"
+      - cell "1,740"
+- application "Page weight and load time":
+  - status
+- paragraph: "Page weight and load time. Load time (ms) / Weight (KB): 18 points, correlation +0.99."

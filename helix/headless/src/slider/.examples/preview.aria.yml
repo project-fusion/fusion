@@ -1,0 +1,3 @@
+- text: Volume
+- slider "Volume": "40"
+- paragraph: Applies to notification sounds

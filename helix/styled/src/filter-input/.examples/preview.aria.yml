@@ -1,0 +1,10 @@
+- text: Filter rows Owner Ada
+- button "Remove the owner filter Owner Ada"
+- text: Env Staging
+- button "Remove the env filter Env Staging"
+- text: Status Open
+- button "Remove the status filter Status Open"
+- text: Area Billing
+- button "Remove the area filter Area Billing"
+- textbox "Filter rows":
+  - /placeholder: Add a filter

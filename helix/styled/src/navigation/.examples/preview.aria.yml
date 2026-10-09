@@ -1,0 +1,7 @@
+- navigation "Sections":
+  - link "Overview":
+    - /url: "#one"
+  - link "Activity":
+    - /url: "#two"
+  - link "Settings":
+    - /url: "#three"

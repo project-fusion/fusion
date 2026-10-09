@@ -1,0 +1,8 @@
+- tree "Files":
+  - treeitem "Documents" [expanded] [level=1]:
+    - text: Documents
+    - group:
+      - treeitem "Budget.xlsx" [level=2] [selected]
+      - treeitem "Notes.txt" [level=2]
+  - treeitem "Invoice-1042.pdf" [level=1]
+- status
