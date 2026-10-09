@@ -209,8 +209,21 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
    * left out. A renderer reads it.
    */
   get field(): PlotField {
-    return fieldOf(this.sourceRows, this.plottedColumns, this.groupBy)
+    /* Read once for each table and grouping, which every render, key, and
+       pointer asks for. */
+    const rows = this.sourceRows
+    if (this.memo?.rows !== rows || this.memo.groupBy !== this.groupBy) {
+      this.memo = {
+        field: fieldOf(rows, this.plottedColumns, this.groupBy),
+        groupBy: this.groupBy,
+        rows,
+      }
+    }
+    return this.memo.field
   }
+
+  /** The field last read, and what it was read from. */
+  private memo: { field: PlotField; groupBy: string; rows: unknown } | undefined
 
   /** The point the keys or the pointer rest on, as its place in `field.points`, or `-1`. */
   get active(): number {
@@ -277,9 +290,11 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    /* Told only on a change, so a renderer draws again only when it must. */
+    /* Told only on a change, so a renderer draws again only when it must:
+       the field is read once for each table and grouping, so a new one is a
+       change. */
     const field = this.field
-    if (!this.last || JSON.stringify(field) !== JSON.stringify(this.last)) {
+    if (field !== this.last) {
       this.last = field
       this.dispatchEvent(new HelixPlotChangeEvent({ kind: 'data' }))
     }
