@@ -1,0 +1,404 @@
+/**
+ * The coverage band: an introduction beside a table of what each system ships,
+ * with Helix's column lit from behind.
+ */
+
+/* The table needs the width more than the words do, so the introduction is
+   narrower here than in the showcase's split. */
+@media (min-width: 60rem) {
+  .split {
+    grid-template-columns: minmax(18rem, 24rem) minmax(0, 1fr);
+  }
+}
+
+/**
+ * **The words at the top and the size at the foot, level with the table's
+ * end.** The table is the taller half, so the introduction stretches to its
+ * height and the figure and the link settle to the bottom, which leaves no
+ * empty column under a short block of text.
+ */
+@media (min-width: 60rem) {
+  .added {
+    margin-block-start: auto;
+  }
+}
+
+/* ── The key and the size ──────────────────────────────────────────── */
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-xs) var(--helix-space-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.legend li {
+  align-items: center;
+  color: var(--helix-color-foreground-muted);
+  display: inline-flex;
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-xs);
+}
+
+/* The jobs nobody else in the table covers, as tags in the brand's tone. */
+.alone {
+  display: grid;
+  gap: var(--helix-space-xs);
+}
+
+/**
+ * **One figure, set apart by a rule above it and nothing else.** The size is a
+ * footnote to the table, so it gets a figure and a sentence. A card around it
+ * would make it a second subject.
+ */
+.added {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+  display: grid;
+  gap: var(--helix-space-2xs);
+  padding-block-start: var(--helix-space-md);
+}
+
+.addedValue {
+  font-size: var(--helix-text-xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: 1;
+}
+
+/* ── The table ─────────────────────────────────────────────────────── */
+
+.stage {
+  display: grid;
+  gap: var(--helix-space-md);
+}
+
+/**
+ * **The column widths are stated so the lit column can be placed.** The label
+ * column takes `--label` and every system takes an equal share of the rest,
+ * which `table-layout: fixed` honors exactly.
+ */
+.frame {
+  --col: calc((100% - var(--label)) / var(--systems));
+  --label: 28%;
+
+  position: relative;
+}
+
+@media (width < 40rem) {
+  .frame {
+    --label: 36%;
+  }
+}
+
+/**
+ * **Helix's column, one shape behind every row.** A wash of the brand color
+ * that fades down the column, a hairline edge, and a glow outside it. It sits
+ * under the table, so the marks and the hover read on top of it.
+ */
+.column {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--helix-color-primary) 24%, transparent),
+    color-mix(in oklab, var(--helix-color-primary) 8%, transparent) 45%,
+    color-mix(in oklab, var(--helix-color-primary) 4%, transparent)
+  );
+  border: var(--helix-border-thin) solid
+    color-mix(in oklab, var(--helix-color-primary) 45%, transparent);
+  border-radius: var(--helix-radii-lg);
+  box-shadow:
+    0 0 2.5rem -0.75rem color-mix(in oklab, var(--helix-color-primary) 60%, transparent),
+    inset 0 1px 0 color-mix(in oklab, var(--helix-color-foreground) 12%, transparent);
+  inline-size: var(--col);
+  inset-block: 0;
+  inset-inline-start: calc(var(--label) + var(--ours) * var(--col));
+  position: absolute;
+}
+
+.matrix {
+  border-collapse: separate;
+  border-spacing: 0;
+  inline-size: 100%;
+  position: relative;
+  table-layout: fixed;
+}
+
+.labelColumn {
+  inline-size: var(--label);
+}
+
+/* The header: each system's count over its name, the count the larger. */
+.headCell {
+  font-weight: var(--helix-weight-regular);
+  padding: var(--helix-space-lg) var(--helix-space-2xs) var(--helix-space-sm);
+  text-align: center;
+  vertical-align: bottom;
+}
+
+.head {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.total {
+  color: var(--helix-color-foreground);
+  display: block;
+  font-size: var(--helix-text-3xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+  line-height: 1;
+}
+
+.total[data-empty] {
+  color: var(--helix-color-foreground-muted);
+}
+
+.system {
+  color: var(--helix-color-foreground-muted);
+  display: block;
+  font-size: var(--helix-text-sm);
+  line-height: var(--helix-leading-tight);
+  margin-block-start: var(--helix-space-xs);
+}
+
+[data-ours] .system {
+  color: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-medium);
+}
+
+/* What the counts count, in the corner above the row names. */
+.corner {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  padding: var(--helix-space-sm);
+  text-align: start;
+  vertical-align: bottom;
+}
+
+/* A group's name opens its rows, in the eyebrow's voice. */
+.group th {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: var(--helix-tracking-wider);
+  padding: var(--helix-space-md) var(--helix-space-sm) var(--helix-space-2xs);
+  text-align: start;
+  text-transform: uppercase;
+}
+
+.row > * {
+  padding-block: var(--helix-space-xs);
+  transition: background-color 120ms ease;
+}
+
+.row th {
+  border-end-start-radius: var(--helix-radii-sm);
+  border-start-start-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-regular);
+  overflow-wrap: anywhere;
+  padding-inline: var(--helix-space-sm);
+  text-align: start;
+}
+
+.row td {
+  position: relative;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.row td:last-child {
+  border-end-end-radius: var(--helix-radii-sm);
+  border-start-end-radius: var(--helix-radii-sm);
+}
+
+.row:hover > * {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
+}
+
+/* The last row's padding keeps the lit column's end clear of the last mark. */
+.matrix tbody:last-of-type .row:last-child > * {
+  padding-block-end: var(--helix-space-md);
+}
+
+/* ── The marks ─────────────────────────────────────────────────────── */
+
+/**
+ * **Three shapes, so the key needs no color to be read.** A filled dot for an
+ * element, a ring for an experimental one, and a short dash for none. Helix's
+ * marks are the brand color and glow; everyone else's are the muted ink.
+ */
+.mark {
+  background: var(--helix-color-foreground-muted);
+  block-size: 0.625rem;
+  border-radius: var(--helix-radii-full);
+  box-sizing: border-box;
+  display: inline-block;
+  flex: none;
+  inline-size: 0.625rem;
+  vertical-align: middle;
+}
+
+[data-state="experimental"] > .mark {
+  background: transparent;
+  border: 2px solid var(--helix-color-foreground-muted);
+}
+
+[data-state="none"] > .mark {
+  background: color-mix(in oklab, var(--helix-color-foreground) 22%, transparent);
+  block-size: 2px;
+  inline-size: 0.75rem;
+}
+
+[data-ours][data-state="ships"] > .mark,
+.legend [data-state="ships"] > .mark {
+  background: var(--helix-color-primary);
+  block-size: 0.75rem;
+  box-shadow:
+    0 0 0 0.25rem color-mix(in oklab, var(--helix-color-primary) 22%, transparent),
+    0 0 1rem color-mix(in oklab, var(--helix-color-primary) 70%, transparent);
+  inline-size: 0.75rem;
+}
+
+[data-ours][data-state="experimental"] > .mark,
+.legend [data-state="experimental"] > .mark {
+  block-size: 0.75rem;
+  border-color: var(--helix-color-primary);
+  box-shadow: 0 0 0.75rem color-mix(in oklab, var(--helix-color-primary) 45%, transparent);
+  inline-size: 0.75rem;
+}
+
+/**
+ * **The element's name over its mark, on hover.** The name is the evidence: it
+ * can be looked up in that system's documentation. A screen reader reads the
+ * same name from the cell's hidden text.
+ */
+.row td[data-tag]::after {
+  background: var(--helix-color-surface-raised);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: 0 0.5rem 1.5rem -0.5rem rgb(0 0 0 / 0.4);
+  color: var(--helix-color-foreground);
+  content: attr(data-tag);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  inset-block-end: calc(100% - var(--helix-space-2xs));
+  inset-inline-start: 50%;
+  opacity: 0;
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  pointer-events: none;
+  position: absolute;
+  transform: translate(-50%, 0.25rem);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+/* The last column's name hangs left, or the card's edge would cut it. */
+.row td[data-tag]:last-child::after {
+  inset-inline: auto 0;
+  transform: translate(0, 0.25rem);
+}
+
+.row td[data-tag]:hover::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.row td[data-tag]:last-child:hover::after {
+  transform: none;
+}
+
+.source {
+  padding-inline: var(--helix-space-sm);
+}
+
+/* A touch screen has no hover, so the hint would point at nothing. */
+@media (hover: none) {
+  .hint {
+    display: none;
+  }
+}
+
+/**
+ * **On a phone the names stand up and the counts line up under them.** Five
+ * columns of about fifty pixels cannot hold "Material Web" or "Shoelace" across,
+ * and a wrapped name lifts its count out of line with the others. Turned, every
+ * name fits its column, and with the count below the name the counts share
+ * one baseline whatever the names' lengths.
+ */
+@media (width < 40rem) {
+  .head {
+    flex-direction: column-reverse;
+  }
+
+  .total {
+    font-size: var(--helix-text-xl);
+    margin-block-start: var(--helix-space-xs);
+  }
+
+  .system {
+    margin-block-start: 0;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    writing-mode: vertical-rl;
+  }
+}
+
+/* ── Motion ────────────────────────────────────────────────────────── */
+
+@keyframes coverage-fill {
+  from {
+    clip-path: inset(0 0 100% 0 round var(--helix-radii-lg));
+  }
+
+  to {
+    clip-path: inset(0 0 0 0 round var(--helix-radii-lg));
+  }
+}
+
+@keyframes coverage-mark {
+  from {
+    opacity: 0;
+    scale: 0.2;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/**
+ * **The column fills down as the table scrolls in, and each row's marks arrive
+ * Helix's first.** Behind the same two guards as the page's stagger: a browser
+ * without scroll-driven animation gets the finished table, and so does anybody
+ * who asked for less motion. Each mark runs on its own `view()` timeline, so a
+ * lower row arrives later because it is lower on the page.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .column {
+      animation: coverage-fill linear both;
+      animation-range: entry 0% cover 45%;
+      animation-timeline: view();
+    }
+
+    .row td > .mark {
+      animation: coverage-mark linear both;
+      animation-range: entry 20% entry 80%;
+      animation-timeline: view();
+    }
+
+    .row td:nth-child(n + 3) > .mark {
+      animation-range: entry 45% entry 100%;
+    }
+  }
+}

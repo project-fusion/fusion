@@ -23,12 +23,9 @@
 import { defineConfig } from '@fusion.dev/helix-cli/visual'
 
 export default defineConfig({
-  /* Each page's accessibility tree beside its pictures, without the table the
-     home page's button chart reads, which holds Helix's bytes for a screen
-     reader and so changes with every release, as the chart does. Hidden from
-     the snapshot and not masked, because its box covers the section's
-     heading. */
-  aria: { hide: ['#proof-button'] },
+  /* Each page's accessibility tree beside its pictures, so a lost label fails
+     even when no pixel moved. */
+  aria: true,
   /* The page check that needs no baseline: a code block the highlighter left
      in one color, which is the October 8 fault on any page, pictured or not.
      A highlighted block is a `helix-code-block` holding the highlighter's one
@@ -51,13 +48,8 @@ export default defineConfig({
   /* The footer's Helix version, which every release changes on every page.
      Painted over, and held at one width while each picture is taken, because
      the tag's width follows its digits: 0.186.0 and 0.187.0 masked boxes
-     differed by 72 pixels at their edge.
-
-     The home page's chart of one button in five systems, because Helix's bar
-     weighs a runtime that carries the version: the stamp from 0.186.1 to
-     0.187.0 moved the bar's end by 2 pixels. The chart keeps one size, because
-     the longest bar sets its scale. */
-  mask: ['[data-site-footer] helix-tag', 'helix-bar-chart[for="proof-button"]'],
+     differed by 72 pixels at their edge. */
+  mask: ['[data-site-footer] helix-tag'],
   retake:
     'Comment `/retake` and the pages on the pull request, such as `/retake site/home`, or dispatch the `Visual baselines` workflow on your branch with the suite `site` to retake every one, and review the commit it makes on the branch.',
   /* Next.js writes `next-route-announcer` and never defines it, so only

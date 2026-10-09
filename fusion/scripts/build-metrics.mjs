@@ -67,15 +67,13 @@ import { ARTIFACT, root } from '@fusion.dev/scripts/workspace'
 const OUTPUT = 'helix/docs/content/metrics.mdx'
 
 /**
- * The four claims the landing page prints, emitted rather than copied.
+ * What the landing page prints from this run: the component count, the size a
+ * component adds, and the coverage table, emitted rather than copied.
  *
- * The landing page says "every number here was produced, not written", and a
- * number a generator could produce and a human retypes goes stale on a day
- * nobody is looking.
- *
- * Emitted from this script rather than a generator of its own because every
- * value is already computed for the MDX, and measuring them twice is how
- * two documents come to disagree about one run.
+ * A number a generator could produce and a human retypes goes stale on a day
+ * nobody is looking. Emitted from this script rather than a generator of its
+ * own because every value is already computed for the MDX, and computing them
+ * twice is how two documents come to disagree about one run.
  */
 const CLAIMS_OUT = 'fusion/site/content/landing/claims.generated.ts'
 
@@ -88,6 +86,82 @@ const CLAIMS_OUT = 'fusion/site/content/landing/claims.generated.ts'
  * is the one that cannot.
  */
 const PEERS = 'helix/docs/peers.json'
+
+/**
+ * **The jobs the coverage table asks about, each as the element names that do
+ * it.** A system covers a job when its published manifest defines an element
+ * with one of the names, after its prefix. One list of names for every system,
+ * Helix included, so the table reads manifests and makes no judgment about
+ * anybody's components.
+ *
+ * **Exact names, never a pattern.** Carbon ships `cds-chat-button`, which is
+ * a button and not a chat, and a pattern on `chat` would have counted it.
+ * Every mark on the page has to survive somebody looking up the element.
+ *
+ * **Only jobs Helix does, and that is the table's subject.** Every system here
+ * ships buttons, form controls, menus, and dialogs, so rows for those would
+ * fill every cell and say nothing. The page states that above the table.
+ */
+const CAPABILITIES = [
+  {
+    group: 'Data',
+    rows: [
+      {
+        name: 'Charts',
+        names: [
+          'area-chart',
+          'bar-chart',
+          'chart',
+          'donut-chart',
+          'line-chart',
+          'pie-chart',
+          'scatter-chart',
+          'sparkline',
+        ],
+      },
+      {
+        name: '3D charts',
+        names: [
+          'spatial-bar-chart',
+          'spatial-heatmap',
+          'spatial-ribbon-chart',
+          'spatial-scatter-chart',
+          'spatial-surface-chart',
+          'spatial-treemap',
+        ],
+      },
+      { name: 'Data table', names: ['data-grid', 'data-table', 'table'] },
+      { name: 'Tree', names: ['tree', 'tree-view'] },
+    ],
+  },
+  {
+    group: 'Input',
+    rows: [
+      { name: 'Combobox', names: ['autocomplete', 'combo-box', 'combobox'] },
+      { name: 'Date picker', names: ['calendar', 'date-picker'] },
+      { name: 'Time picker', names: ['time-picker'] },
+      { name: 'Color picker', names: ['color-area', 'color-picker', 'color-wheel'] },
+      { name: 'File upload', names: ['dropzone', 'file-input', 'file-uploader'] },
+    ],
+  },
+  {
+    group: 'Workflow',
+    rows: [
+      { name: 'Chat', names: ['chat'] },
+      { name: 'Command palette', names: ['command', 'command-palette'] },
+      { name: 'Product tour', names: ['coachmark', 'tour'] },
+      { name: 'Node diagrams', names: ['canvas', 'diagram', 'graph'] },
+    ],
+  },
+  {
+    group: 'Media and places',
+    rows: [
+      { name: 'Maps', names: ['map'] },
+      { name: 'Video player', names: ['video', 'video-player'] },
+      { name: 'Carousel', names: ['carousel'] },
+    ],
+  },
+]
 
 /** What a component costs in time, from `turbo run timings`. */
 const TIMINGS = 'helix/docs/timings.json'
@@ -637,6 +711,66 @@ const peers = existsSync(join(root, PEERS))
   ? JSON.parse(readFileSync(join(root, PEERS), 'utf8'))
   : undefined
 
+/**
+ * Helix's elements, from the manifest the styled package publishes, with the
+ * status each declares. The same two lists `turbo run peers` writes for the
+ * other systems.
+ */
+const helixElements = (() => {
+  const manifest = JSON.parse(readFileSync(join(root, 'helix/styled/custom-elements.json'), 'utf8'))
+  const elements = []
+  const experimental = []
+  for (const module of manifest.modules) {
+    for (const one of module.declarations ?? []) {
+      if (!one.tagName) {
+        continue
+      }
+      elements.push(one.tagName)
+      if (one.helix?.status === 'experimental') {
+        experimental.push(one.tagName)
+      }
+    }
+  }
+  return { elements: elements.sort(), experimental: experimental.sort() }
+})()
+
+/**
+ * Each system's element for each job, or nothing. Helix first, then the peers
+ * in the order the size table uses.
+ */
+const coverage = (() => {
+  const systems = [
+    { ...helixElements, name: 'Helix', ours: true, prefix: 'helix-' },
+    ...(peers?.systems ?? []).filter((one) => Array.isArray(one.elements)),
+  ]
+  const find = (system, names) => {
+    const tag = names
+      .map((name) => `${system.prefix}${name}`)
+      .find((one) => system.elements?.includes(one))
+    return tag ? { experimental: system.experimental.includes(tag), tag } : null
+  }
+  const groups = CAPABILITIES.map((group) => ({
+    name: group.group,
+    rows: group.rows.map((row) => ({
+      cells: systems.map((system) => find(system, row.names)),
+      name: row.name,
+    })),
+  }))
+  const totals = systems.map(
+    (_, index) =>
+      groups.flatMap((group) => group.rows).filter((row) => row.cells[index] !== null).length,
+  )
+  return {
+    groups,
+    rows: groups.reduce((sum, group) => sum + group.rows.length, 0),
+    systems: systems.map((one, index) => ({
+      name: one.name,
+      ours: one.ours === true,
+      total: totals[index],
+    })),
+  }
+})()
+
 const median = (values) => {
   const sorted = [...values].sort((a, b) => a - b)
   const middle = Math.floor(sorted.length / 2)
@@ -654,6 +788,15 @@ const cheapest = styled.rows.reduce((low, row) => (row.alone.gzip < low.alone.gz
 const dearest = styled.rows.reduce((high, row) => (row.alone.gzip > high.alone.gzip ? row : high))
 const wholeStyled = packages.find((one) => one.entry === '@fusion.dev/helix')
 const wholeHeadless = packages.find((one) => one.entry === '@fusion.dev/helix-headless')
+
+/** A measured day, the way the site writes dates. */
+const day = (iso) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'UTC',
+    year: 'numeric',
+  })
 
 const kb = (bytes) => `${(bytes / 1000).toFixed(1)} kB`
 
@@ -731,7 +874,7 @@ const comparison = () => {
   return [
     '## Compared with other systems',
     '',
-    `We compare Helix with the libraries of custom elements listed under the table. \`turbo run peers\` measured them on ${peers.measured}. It installs pinned versions into \`.local\` and bundles them with the same harness as the tables above. The Helix rows are measured on every run of \`bun run gen:metrics\`, so they always match this repository.`,
+    `We compare Helix with the libraries of custom elements listed under the table. \`turbo run peers\` measured them on ${day(peers.measured)}. It installs pinned versions into \`.local\` and bundles them with the same harness as the tables above. The Helix rows are measured on every run of \`bun run gen:metrics\`, so they always match this repository.`,
     '',
     `Every system in the table is built on Lit. The runtime is the same library in every column, so the differences come from the components. React component libraries are left out, because comparing a custom element with a React component would measure the framework.`,
     '',
@@ -752,6 +895,37 @@ const comparison = () => {
     ),
     '',
     'Every specifier we measured is in [`peers.json`](https://github.com/project-fusion/fusion/blob/main/helix/docs/peers.json), so you can run the same measurement yourself.',
+    '',
+  ]
+}
+
+/**
+ * What each system ships, from the element names in each one's manifest.
+ *
+ * **Names in the cells, never ticks.** A tick asks you to trust the person who
+ * drew it; an element name can be looked up in that system's documentation.
+ */
+const coverageSection = () => {
+  if (!peers || coverage.systems.length < 2) {
+    return []
+  }
+  const cell = (one) =>
+    one === null ? '' : `\`${one.tag}\`${one.experimental ? ' (experimental)' : ''}`
+  return [
+    '## What each system ships',
+    '',
+    `Every system in the size comparison ships buttons, form controls, menus, and dialogs. This table lists jobs beyond those, and the element each system ships for each job. Each name comes from the manifest the system publishes, read by \`turbo run peers\` on ${day(peers.measured)}. The Helix column reads \`@fusion.dev/helix\` on every run.`,
+    '',
+    'A system covers a job when its manifest defines an element with one of a fixed list of names, after its prefix. The list is the same for every system, and it is in `build-metrics.mjs`. An empty cell means no element has one of those names. A system can still do the job with a pattern, a separate library, or an element under another name.',
+    '',
+    `| Job | ${coverage.systems.map((one) => (one.ours ? `**${one.name}**` : one.name)).join(' | ')} |`,
+    `|---|${coverage.systems.map(() => '---').join('|')}|`,
+    ...coverage.groups.flatMap((group) =>
+      group.rows.map((row) => `| ${row.name} | ${row.cells.map(cell).join(' | ')} |`),
+    ),
+    `| **Jobs covered** | ${coverage.systems.map((one) => `${one.total} of ${coverage.rows}`).join(' | ')} |`,
+    '',
+    'An element marked experimental is one its system has not committed to. Helix and Web Awesome mark these with a status in their manifests, and Material Web publishes them under `labs`.',
     '',
   ]
 }
@@ -901,6 +1075,7 @@ const lines = [
   `The headless tier never had the problem, so it serves as the control. \`@fusion.dev/helix-core\` is \`sideEffects: false\`, and the median headless family is ${grouped(median(headlessGzip))} bytes gzipped alone.`,
   '',
   ...comparison(),
+  ...coverageSection(),
   ...timing(),
   '## Per component',
   '',
@@ -958,90 +1133,51 @@ const written = `${lines
   .trimEnd()}\n`
 const output = join(root, OUTPUT)
 
-const claims = [
-  {
-    label: 'Components',
-    note: 'Each has a headless tier with its behavior and a styled tier with its design.',
-    value: String(styled.rows.length),
-  },
-  {
-    label: 'The token layer, compressed',
-    note: `${TOKEN_COUNT} semantic tokens. Every Helix page loads this file.`,
-    value: kb(stylesheets.find((sheet) => sheet.path.endsWith('dist/tokens.css')).brotli),
-  },
-  {
-    label: 'The derivation engine, compressed',
-    note: 'Most sites run it when they build and ship none of it. A theme switcher downloads all of it.',
-    value: kb(engineEntry.brotli + engineWasm.brotli),
-  },
-  {
-    label: 'Of the first component is shared',
-    note: 'Most of the first component is a runtime that every later component reuses.',
-    value: `${sharedShare}%`,
-  },
-]
-
-/* **The landing page's comparison, from the same two sources the metrics table
-   uses.** Ours is measured on every run from this repository; theirs comes from
-   `helix/docs/peers.json`, which `turbo run peers` writes and which is
-   committed, so this needs no network and 192's pinning is untouched: refreshing
-   the rivals stays a deliberate act with a date on it, and only the copying
-   stops being one.
-
-   Sorted by what is printed. A table claiming to be ordered and not being so is
-   worse than an unordered one, because a reader stops checking. */
-const buttonRivals = (() => {
-  const mine = styled.rows.find((one) => one.family === 'button')
-  if (!peers || !mine) {
-    return []
-  }
-  return [
-    { brotli: mine.alone.brotli, name: 'Helix', ours: true },
-    ...peers.systems
-      .map((system) => ({ brotli: system.parts.button?.brotli, name: system.name }))
-      .filter((one) => typeof one.brotli === 'number'),
-  ].sort((a, b) => a.brotli - b.brotli)
-})()
-
+/**
+ * **The landing page's coverage table, and the one size it still quotes.** The
+ * page used to lead with four size figures and one button in five systems.
+ * Helix's button came first by about one percent, and on the other six
+ * components in the size table it ranked from second to last, so the band
+ * showed the one row we won. Size is a reason not to rule a system out, and the
+ * metrics page keeps the whole table for anybody checking. What the page shows
+ * now is what you can build with the package.
+ *
+ * `ADDED` is the median brotli bytes a styled family adds to a page that
+ * already has the runtime, which is the honest size figure for a second
+ * component and every one after it.
+ */
 const claimsSource = [
   '/* Generated from the built packages by `bun run gen:metrics`. Do not edit. */',
   '',
-  'export interface Claim {',
-  '  /** What was measured, in the fewest words that stay true. */',
-  '  label: string',
-  '  /** Why the number is the one worth printing. Never an adjective. */',
-  '  note: string',
-  '  /** Rendered large. A string because the unit belongs to the figure. */',
-  '  value: string',
+  '/** Styled families in `@fusion.dev/helix`. */',
+  `export const COMPONENTS = ${styled.rows.length}`,
+  '',
+  '/** The median a styled family adds to a page that already has the runtime. */',
+  `export const ADDED = '${kb(median(styled.rows.map((row) => row.added.brotli)))}'`,
+  '',
+  '/** The day `turbo run peers` read the other systems. */',
+  `export const MEASURED = '${peers?.measured ?? ''}'`,
+  '',
+  'export interface CoverageCell {',
+  '  /** Whether the system has not committed to the element. */',
+  '  experimental: boolean',
+  '  /** The element, as the system names it. */',
+  '  tag: string',
   '}',
   '',
-  'export const CLAIMS: readonly Claim[] = [',
-  ...claims.flatMap((claim) => [
-    '  {',
-    `    label: '${claim.label}',`,
-    `    note: '${claim.note.replace(/'/g, "\\'")}',`,
-    `    value: '${claim.value}',`,
-    '  },',
-  ]),
-  ']',
-  '',
-  'export interface Rival {',
-  '  /** Brotli bytes for the one component, alone. */',
-  '  brotli: number',
-  '  name: string',
-  '  /** Ours, which the page marks rather than infers from the name. */',
-  '  ours?: boolean',
+  'export interface Coverage {',
+  '  groups: readonly {',
+  '    name: string',
+  '    /** One cell per system, in the order of `systems`, or null for none. */',
+  '    rows: readonly { cells: readonly (CoverageCell | null)[]; name: string }[]',
+  '  }[]',
+  '  /** How many jobs the table asks about. */',
+  '  rows: number',
+  '  /** Helix first. `total` counts the jobs the system has an element for. */',
+  '  systems: readonly { name: string; ours: boolean; total: number }[]',
   '}',
   '',
-  'export const BUTTON: readonly Rival[] = [',
-  ...buttonRivals.flatMap((rival) => [
-    '  {',
-    `    brotli: ${rival.brotli},`,
-    `    name: '${rival.name}',`,
-    ...(rival.ours ? ['    ours: true,'] : []),
-    '  },',
-  ]),
-  ']',
+  `export const COVERAGE: Coverage = ${JSON.stringify(coverage, null, 2)}`,
   '',
 ].join('\n')
 
