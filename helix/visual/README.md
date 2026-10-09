@@ -31,7 +31,8 @@ Made by the owner on October 8, 2026.
   `locus` in `@fusion.dev/locus`, and moved under Helix the day that version
   shipped: Helix is the design system for any web project, and its tools sit
   under it. One install, one version, and one MCP server that can check a page
-  and picture it. `@fusion.dev/locus` 0.1.0 stays on the registry, deprecated.
+  and picture it. `@fusion.dev/locus` 0.1.0 was never public, and was removed
+  from the registry.
 - **A library crate and not a module of `helix/cli`**, so the config, the
   codecs, the diff, and the report keep the boundary they had as a command, and
   the scan and the theme code cannot reach into them.
