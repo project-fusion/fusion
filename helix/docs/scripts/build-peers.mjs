@@ -28,9 +28,17 @@
  * comparison across a system's whole library would be a comparison of how many
  * components each vendor decided to ship, which is the number that looks most
  * like a measurement and means least.
+ *
+ * **What each system ships is recorded too, as a list of element names.** The
+ * coverage table on the landing page and the metrics page asks a different
+ * question from the size table: whether a system has an element for a job at
+ * all. A count would mean little, as above, so the file keeps the names and
+ * `build-metrics.mjs` looks for the same names in every list. Each list is
+ * read from the manifest the system publishes, so it says what the vendor
+ * says it ships.
  */
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
@@ -46,7 +54,7 @@ const OUTPUT = join(ROOT, 'helix/docs/peers.json')
  * not got to.
  *
  * A check on the calendar would fire for a reason nobody caused, because nothing
- * in this repository changes when Shoelace releases. A check that installed the
+ * in this repository changes when Web Awesome releases. A check that installed the
  * latest on every run would put a registry in the middle of `verify`, which
  * makes an offline machine fail a gate about our own bytes. And there is no
  * dependency-bump schedule to hang it on: this repository has no Dependabot and
@@ -62,7 +70,7 @@ const OUTPUT = join(ROOT, 'helix/docs/peers.json')
  * **Seven components, each a thing every one of the four ships**, under a name
  * nobody has to argue about. `radio` and `switch` are both universal; what
  * differs is only spelling, and a naming note is what the table already uses for
- * `dialog` being Carbon's Modal and `tabs` being Shoelace's Tab Group. Carbon
+ * `dialog` being Carbon's Modal and `tabs` being Web Awesome's Tab Group. Carbon
  * calls a radio a Radio Button and a switch a Toggle, which is the same kind of
  * difference.
  *
@@ -71,7 +79,7 @@ const OUTPUT = join(ROOT, 'helix/docs/peers.json')
  * system and a combobox in another: comparing those compares our reading of
  * somebody else's library rather than the libraries. `tag` fails too, Material
  * shipping a Chip, and `accordion` fails because Material ships none and
- * Shoelace calls its own Details.
+ * Web Awesome calls its own Details.
  *
  * Exact rather than a range, because a caret would silently re-measure on
  * somebody else's machine and the table would say a version it had not read.
@@ -89,9 +97,11 @@ const SYSTEMS = [
       tabs: '@carbon/web-components/es/components/tabs/index.js',
       tooltip: '@carbon/web-components/es/components/tooltip/index.js',
     },
+    manifests: ['@carbon/web-components/custom-elements.json'],
     name: 'Carbon',
-    note: 'Its dialog is Modal, its radio is Radio Button, and its switch is Toggle.',
+    note: 'Its dialog is Modal, its radio is Radio Button, and its switch is Toggle. Its charts are a separate library, `@carbon/charts`, which does not ship custom elements.',
     package: '@carbon/web-components',
+    prefix: 'cds-',
   },
   {
     dependencies: { '@material/web': '2.5.0' },
@@ -103,27 +113,15 @@ const SYSTEMS = [
       switch: '@material/web/switch/switch.js',
       tabs: '@material/web/tabs/tabs.js',
     },
+    manifests: ['@material/web/custom-elements.json'],
     name: 'Material Web',
-    note: 'Ships no tooltip. Its button is measured as the filled one, there being no single button element.',
+    note: 'Ships no tooltip. Its button is measured as the filled one, there being no single button element. Its `labs` elements count as experimental.',
     package: '@material/web',
-  },
-  {
-    dependencies: { '@shoelace-style/shoelace': '2.20.1' },
-    entries: {
-      button: '@shoelace-style/shoelace/dist/components/button/button.js',
-      checkbox: '@shoelace-style/shoelace/dist/components/checkbox/checkbox.js',
-      dialog: '@shoelace-style/shoelace/dist/components/dialog/dialog.js',
-      radio: '@shoelace-style/shoelace/dist/components/radio/radio.js',
-      switch: '@shoelace-style/shoelace/dist/components/switch/switch.js',
-      tabs: '@shoelace-style/shoelace/dist/components/tab-group/tab-group.js',
-      tooltip: '@shoelace-style/shoelace/dist/components/tooltip/tooltip.js',
-    },
-    name: 'Shoelace',
-    note: 'Its tabs element is Tab Group.',
-    package: '@shoelace-style/shoelace',
+    prefix: 'md-',
   },
   {
     dependencies: {
+      '@spectrum-web-components/bundle': '1.12.2',
       '@spectrum-web-components/button': '1.12.2',
       '@spectrum-web-components/checkbox': '1.12.2',
       '@spectrum-web-components/dialog': '1.12.2',
@@ -141,9 +139,31 @@ const SYSTEMS = [
       tabs: '@spectrum-web-components/tabs/sp-tabs.js',
       tooltip: '@spectrum-web-components/tooltip/sp-tooltip.js',
     },
+    /* One package per component, so the list of what Spectrum ships is the
+       packages its `bundle` depends on, each with its own manifest. */
+    glyphs: 'sp-icon-',
+    manifests: 'bundle',
     name: 'Spectrum',
-    note: 'One package per component, so there is no barrel to import by accident.',
+    note: 'One package per component, so there is no barrel to import by accident. Its 1,000 or so icons are each an element, and the list of what it ships leaves them out.',
     package: '@spectrum-web-components/button',
+    prefix: 'sp-',
+  },
+  {
+    dependencies: { '@awesome.me/webawesome': '3.14.0' },
+    entries: {
+      button: '@awesome.me/webawesome/dist/components/button/button.js',
+      checkbox: '@awesome.me/webawesome/dist/components/checkbox/checkbox.js',
+      dialog: '@awesome.me/webawesome/dist/components/dialog/dialog.js',
+      radio: '@awesome.me/webawesome/dist/components/radio/radio.js',
+      switch: '@awesome.me/webawesome/dist/components/switch/switch.js',
+      tabs: '@awesome.me/webawesome/dist/components/tab-group/tab-group.js',
+      tooltip: '@awesome.me/webawesome/dist/components/tooltip/tooltip.js',
+    },
+    manifests: ['@awesome.me/webawesome/dist/custom-elements.json'],
+    name: 'Web Awesome',
+    note: 'The successor to Shoelace, measured from the free package on npm. Web Awesome Pro is sold separately and is not measured. Its tabs element is Tab Group.',
+    package: '@awesome.me/webawesome',
+    prefix: 'wa-',
   },
 ]
 
@@ -183,6 +203,63 @@ const measure = async (name, specifier) => {
     buffer = Buffer.concat([buffer, Buffer.from(await artifact.arrayBuffer())])
   }
   return await sizes(buffer)
+}
+
+/**
+ * Every element a system's manifests define, in two sorted lists.
+ *
+ * **Both manifest shapes are read.** Carbon publishes the older `tags` list and
+ * the others the `modules` schema. **Only names with the system's prefix
+ * count**, which leaves out the story wrappers and demos Carbon's manifest
+ * also lists. An element is experimental when its declaration says so, as
+ * Web Awesome's do, or when it sits under a `labs` path, which is how Material
+ * Web marks the components it has not committed to.
+ */
+const elementsOf = (system) => {
+  const modules = join(SCRATCH, 'node_modules')
+  const manifests =
+    system.manifests === 'bundle'
+      ? Object.keys(
+          JSON.parse(
+            readFileSync(join(modules, '@spectrum-web-components/bundle/package.json'), 'utf8'),
+          ).dependencies,
+        )
+          .map((name) => `${name}/custom-elements.json`)
+          .filter((path) => existsSync(join(modules, path)))
+      : system.manifests
+  const found = new Map()
+  const flagged = new Set()
+  for (const path of manifests) {
+    const manifest = JSON.parse(readFileSync(join(modules, path), 'utf8'))
+    for (const tag of manifest.tags ?? []) {
+      found.set(tag.name, tag.path)
+    }
+    for (const module of manifest.modules ?? []) {
+      for (const one of module.exports ?? []) {
+        if (one.kind === 'custom-element-definition') {
+          found.set(one.name, module.path)
+        }
+      }
+      for (const one of module.declarations ?? []) {
+        if (one.customElement && one.tagName && !found.has(one.tagName)) {
+          found.set(one.tagName, module.path)
+        }
+        if (one.tagName && one.status === 'experimental') {
+          flagged.add(one.tagName)
+        }
+      }
+    }
+  }
+  const kept = [...found].filter(
+    ([tag]) => tag.startsWith(system.prefix) && !(system.glyphs && tag.startsWith(system.glyphs)),
+  )
+  const experimental = kept.filter(
+    ([tag, path]) => flagged.has(tag) || /(^|\/)labs\//.test(path ?? ''),
+  )
+  return {
+    elements: kept.map(([tag]) => tag).sort(),
+    experimental: experimental.map(([tag]) => tag).sort(),
+  }
 }
 
 mkdirSync(SCRATCH, { recursive: true })
@@ -225,10 +302,12 @@ for (const system of SYSTEMS) {
     }
   }
   measured.push({
+    ...elementsOf(system),
     name: system.name,
     note: system.note,
     package: system.package,
     parts,
+    prefix: system.prefix,
     version: installed,
   })
 }

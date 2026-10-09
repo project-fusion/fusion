@@ -2,12 +2,12 @@ import { findSitePage } from '@fusion.dev/insights'
 import Link from 'next/link'
 import { Band, band } from '@/components/band/band'
 import { Claim } from '@/components/claim/claim'
+import { CoverageBand } from '@/components/coverage-band/coverage-band'
 import { DerivationDiagrams } from '@/components/derivation-diagram/derivation-diagram'
 import { Eyebrow } from '@/components/eyebrow/eyebrow'
 import { Hero } from '@/components/hero/hero'
 import { Lede } from '@/components/lede/lede'
 import { PageStrands } from '@/components/page-strands/page-strands'
-import { ProofBand } from '@/components/proof-band/proof-band'
 import { SectionTitle } from '@/components/section-title/section-title'
 import { Showcase } from '@/components/showcase/showcase'
 import { ThemeScope } from '@/components/theme-context/theme-context'
@@ -140,7 +140,7 @@ export default function Home() {
          *           absolutely positioned child does not take part in flow, so it lights
          *           the three bands below it without lengthening any of them.
          */}
-        <ProofBand />
+        <CoverageBand />
 
         {/* Delivery, last, because it is what a convinced reader wants and a
           reason to leave for anyone who is not there yet.
