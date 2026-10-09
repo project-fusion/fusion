@@ -107,7 +107,7 @@ const SERIES = 24
  * | Enter, Space | Presses the item, which sends `helix-reading-press`. |
  * | Escape | Lets the item go. |
  *
- * @since 0.198.0
+ * @since 0.199.0
  * @status experimental
  * @category charts
  * @aliases 3D treemap, Isometric treemap, Treemap in 3D, City map chart
