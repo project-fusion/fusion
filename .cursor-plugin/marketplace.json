@@ -1,0 +1,14 @@
+{
+  "name": "fusion",
+  "owner": {
+    "name": "Fusion",
+    "url": "https://fusion.dev"
+  },
+  "plugins": [
+    {
+      "description": "The guide to writing pages with Helix, and the Helix MCP server.",
+      "name": "helix",
+      "source": "./helix/plugin"
+    }
+  ]
+}

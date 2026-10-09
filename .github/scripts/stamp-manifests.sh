@@ -70,7 +70,7 @@ for attempt in 1 2 3 4; do
     --domain "$DOMAIN" --set "$VERSION" --allow-major --write
   bun install >/dev/null
 
-  git add -- '**/package.json' '**/src/version.ts' '**/.claude-plugin/plugin.json' bun.lock
+  git add -- '**/package.json' '**/src/version.ts' '**/plugin/plugin.json' '**/plugin/.claude-plugin/plugin.json' '**/plugin/.cursor-plugin/plugin.json' bun.lock
   if git diff --cached --quiet; then
     echo "Nothing to stamp: the manifests already read $VERSION." >> "$GITHUB_STEP_SUMMARY"
     exit 0
