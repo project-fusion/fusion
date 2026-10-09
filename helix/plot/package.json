@@ -1,6 +1,6 @@
 {
   "name": "@fusion.dev/helix-plot",
-"description": "Connects the Helix Spatial Bar Chart, Spatial Heatmap, Spatial Scatter Chart, and Spatial Surface Chart to three.js, which draws them in three dimensions.",
+  "description": "Connects the Helix spatial charts to three.js, which draws them in three dimensions: Spatial Bar Chart, Spatial Heatmap, Spatial Ribbon Chart, Spatial Scatter Chart, Spatial Surface Chart, and Spatial Treemap.",
   "version": "0.198.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",

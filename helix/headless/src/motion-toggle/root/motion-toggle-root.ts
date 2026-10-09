@@ -40,7 +40,7 @@ import { property, state } from 'lit/decorators.js'
  * Put it where a reader looks first, such as the page's header. Where the
  * reader asked for reduced motion, nothing moves by itself to begin with.
  *
- * @since 0.197.0
+ * @since 0.198.0
  * @status experimental
  * @category actions
  * @aliases Pause button, Pause animations, Stop motion, Motion control, Animation toggle
