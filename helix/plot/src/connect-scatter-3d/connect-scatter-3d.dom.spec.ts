@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
-import type { Field, PlotColors, Scatter3dDriver } from './connect-scatter-3d.js'
+import type { PlotColors } from '../connect-plot/connect-plot.js'
+import type { Field, Scatter3dDriver } from './connect-scatter-3d.js'
 
 let connectScatter3d: typeof import('./connect-scatter-3d.js').connectScatter3d
 
