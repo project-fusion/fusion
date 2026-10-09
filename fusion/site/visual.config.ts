@@ -23,6 +23,15 @@
 import { defineConfig } from '@fusion.dev/helix-cli/visual'
 
 export default defineConfig({
+  /* Each page's accessibility tree beside its pictures. */
+  aria: true,
+  /* The page check that needs no baseline: a code block the highlighter left
+     in one color, which is the October 8 fault on any page, pictured or not.
+     A highlighted block is a `helix-code-block` holding the highlighter's one
+     `span`, and the sandbox's editor draws its lines in `.cm-content`. The home
+     page's install block is two lines of plain text by design, so it holds no
+     `span` and is not judged. */
+  checks: { code: { selector: 'helix-code-block:has(> span), .cm-content' } },
   /* The footer's Helix version, which every release changes on every page.
      Painted over, and held at one width while each picture is taken, because
      the tag's width follows its digits: 0.186.0 and 0.187.0 masked boxes

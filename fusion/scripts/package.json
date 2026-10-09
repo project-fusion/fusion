@@ -13,6 +13,7 @@
   "exports": {
     "./argv": "./lib/argv.mjs",
     "./cost": "./lib/cost.mjs",
+    "./dsd-fixtures": "./lib/dsd-fixtures.mjs",
     "./emit": "./lib/emit.mjs",
     "./format-open-tags": "./lib/format-open-tags.mjs",
     "./formatted": "./lib/formatted.mjs",

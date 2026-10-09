@@ -74,6 +74,9 @@ const diagnostics = () => {
 }
 
 export default defineConfig({
+  /* Each example's accessibility tree beside its pictures, so a lost name or
+     role fails where no pixel moved. */
+  aria: true,
   inspect: {
     /* The CI sink over every example this shard pictured: the file the
        `telemetry` job sends, and the summary here. A dead part, a dead hook,

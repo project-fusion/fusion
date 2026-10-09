@@ -26,14 +26,47 @@ use crate::run::Fate;
 
 /// One shot as the report sees it.
 pub struct Row<'a> {
-    pub baseline: PathBuf,
-    /// The capture, for a shot that failed.
+    /// The baseline, or a pair's first side.
+    pub baseline: Picture<'a>,
+    /// The capture, or a pair's second side, for a shot that failed.
     pub current: Option<&'a [u8]>,
-    pub diff: Option<PathBuf>,
+    pub diff: Picture<'a>,
     pub entry: &'a str,
     pub fate: &'a Fate,
+    /// What the two pictures are called: `Baseline` and `Capture`, or a
+    /// pair's two sides.
+    pub labels: [&'a str; 2],
+    /// Whether the row is a pair's, whose two sides are compared with each
+    /// other and with no baseline.
+    pub pair: bool,
     pub shot: &'a str,
     pub source: &'a str,
+}
+
+/// A picture on disk, beside its baseline, or one held in memory, which is
+/// where a pair's sides and diffs are, having nowhere in the tree to go.
+pub enum Picture<'a> {
+    Bytes(Option<&'a [u8]>),
+    File(Option<PathBuf>),
+}
+
+impl Picture<'_> {
+    /// Whether there is a picture to write.
+    fn present(&self) -> bool {
+        match self {
+            Self::Bytes(bytes) => bytes.is_some(),
+            Self::File(path) => path.as_ref().is_some_and(|path| path.is_file()),
+        }
+    }
+
+    /// Writes the picture to `to`, when there is one. Returns whether it did.
+    fn copy(&self, to: &Path) -> std::io::Result<bool> {
+        match self {
+            Self::Bytes(Some(bytes)) => fs::write(to, bytes).map(|()| true),
+            Self::File(Some(path)) if path.is_file() => fs::copy(path, to).map(|_| true),
+            _ => Ok(false),
+        }
+    }
 }
 
 /// Everything the report needs from the run.
@@ -41,6 +74,8 @@ pub struct Run<'a> {
     pub base: &'a Path,
     pub dir: PathBuf,
     pub entries: usize,
+    /// What the page checks found, each as `id: sentence`.
+    pub findings: Vec<String>,
     pub fingerprint: Option<PathBuf>,
     pub inspected_failed: bool,
     pub retake: &'a str,
@@ -107,6 +142,8 @@ fn described(row: &Row, base: &Path) -> (&'static str, String) {
 #[allow(clippy::too_many_lines)] // The verdict's every clause, in the order it is printed.
 pub fn finish(run: &Run) -> Code {
     let mut failures = Vec::new();
+    let mut baseline_failures = 0;
+    let mut pair_differences = 0;
     let mut notes = Vec::new();
     let mut written = Vec::new();
     let mut held = 0;
@@ -116,7 +153,11 @@ pub fn finish(run: &Run) -> Code {
         let what = format!("{}, {}", row.entry, row.shot);
         let (_, sentence) = described(row, run.base);
         match row.fate {
-            fate if fate.fails() => failures.push(format!("{what}: {sentence}")),
+            fate if fate.fails() => {
+                baseline_failures += usize::from(!row.pair);
+                pair_differences += usize::from(row.pair && matches!(fate, Fate::Differs { .. }));
+                failures.push(format!("{what}: {sentence}"));
+            }
             Fate::Steadied | Fate::Tolerated { .. } => notes.push(format!("{what}: {sentence}")),
             Fate::Held => held += 1,
             Fate::Written(why) => written.push(format!("{what} ({why})")),
@@ -173,22 +214,58 @@ pub fn finish(run: &Run) -> Code {
         }
         let _ = write!(verdict, " {skipped}");
     } else if failures.is_empty() {
+        let pairs = run.rows.iter().filter(|row| row.pair).count();
+        let matched = if pairs == 0 {
+            "every one matches its baseline"
+        } else if pairs == run.rows.len() {
+            "every pair's two sides match"
+        } else {
+            "every one matches its baseline or its other side"
+        };
         let _ = write!(
             verdict,
-            "helix: compared {counted}{scope}, and every one matches its baseline. {skipped}"
+            "helix: compared {counted}{scope}, and {matched}. {skipped}"
         );
     } else {
+        let one = failures.len() == 1;
+        let failing = if baseline_failures == failures.len() {
+            if one {
+                "does not match its baseline"
+            } else {
+                "do not match their baselines"
+            }
+        } else if pair_differences == failures.len() {
+            if one {
+                "differs between its two sides"
+            } else {
+                "differ between their two sides"
+            }
+        } else if one {
+            "fails"
+        } else {
+            "fail"
+        };
         let _ = write!(
             verdict,
-            "helix: {} of {counted}{scope}{} {} not match {}, listed above. {skipped}",
+            "helix: {} of {counted}{scope}{} {failing}, listed above. {skipped}",
             failures.len(),
             if scope.is_empty() { "" } else { "," },
-            if failures.len() == 1 { "does" } else { "do" },
-            if failures.len() == 1 {
-                "its baseline"
-            } else {
-                "their baselines"
-            },
+        );
+    }
+
+    /* A page check needs no baseline, so it is said beside the comparison
+    and fails a test, and an update, which is about baselines, reports it
+    and is not held up by it. */
+    if !run.findings.is_empty() {
+        let _ = write!(
+            verdict,
+            " {} found a problem, {}.",
+            plural(run.findings.len(), "page check", "page checks"),
+            match (run.update, run.findings.len()) {
+                (true, 1) => "listed above, and holds nothing up",
+                (true, _) => "listed above, and hold nothing up",
+                (false, _) => "listed above",
+            }
         );
     }
 
@@ -198,11 +275,15 @@ pub fn finish(run: &Run) -> Code {
     if !failures.is_empty() {
         say!("\n  {}\n", failures.join("\n  "));
     }
+    if !run.findings.is_empty() {
+        say!("\n  {}\n", run.findings.join("\n  "));
+    }
     say!("{verdict}");
     if run.update && !written.is_empty() {
         say!("helix: review each written picture before committing it. A baseline records whatever was on screen as correct.");
     }
-    if !run.update && !failures.is_empty() {
+    /* A pair keeps no baseline, so a retake is no answer to its failure. */
+    if !run.update && baseline_failures > 0 {
         say!(
             "helix: if the change was meant, retake the baselines. {}",
             run.retake
@@ -212,7 +293,8 @@ pub fn finish(run: &Run) -> Code {
         say!("helix: the config's inspect reported a failure, above.");
     }
 
-    let failed = !failures.is_empty() || run.inspected_failed;
+    let failed =
+        !failures.is_empty() || run.inspected_failed || (!run.update && !run.findings.is_empty());
     let record = record(run, &verdict, failed);
     match write(run, &record) {
         Ok(()) => say!(
@@ -244,6 +326,7 @@ pub fn stopped(update: bool, failed: bool, verdict: &str) -> Code {
             "{}",
             json!({
                 "failed": failed,
+                "findings": [],
                 "mode": if update { "update" } else { "test" },
                 "shots": [],
                 "skipped": [],
@@ -271,18 +354,19 @@ fn record(run: &Run, verdict: &str, failed: bool) -> Value {
             let mut record = json!({
                 "detail": detail,
                 "entry": row.entry,
+                "labels": row.labels,
                 "result": result,
                 "shot": row.shot,
                 "source": row.source,
             });
             if row.fate.fails() {
-                if row.baseline.is_file() {
+                if row.baseline.present() {
                     record["baseline"] = json!(format!("shots/{at}-baseline.png"));
                 }
                 if row.current.is_some() {
                     record["current"] = json!(format!("shots/{at}-current.png"));
                 }
-                if row.diff.as_ref().is_some_and(|diff| diff.is_file()) {
+                if row.diff.present() {
                     record["diff"] = json!(format!("shots/{at}-diff.png"));
                 }
             }
@@ -291,6 +375,7 @@ fn record(run: &Run, verdict: &str, failed: bool) -> Value {
         .collect();
     json!({
         "failed": failed,
+        "findings": run.findings,
         "mode": if run.update { "update" } else { "test" },
         "shots": rows,
         "skipped": run.skipped,
@@ -312,15 +397,12 @@ fn write(run: &Run, record: &Value) -> std::io::Result<()> {
         if !row.fate.fails() {
             continue;
         }
-        if row.baseline.is_file() {
-            fs::copy(&row.baseline, pictures.join(format!("{at}-baseline.png")))?;
-        }
+        row.baseline
+            .copy(&pictures.join(format!("{at}-baseline.png")))?;
         if let Some(current) = row.current {
             fs::write(pictures.join(format!("{at}-current.png")), current)?;
         }
-        if let Some(diff) = row.diff.as_ref().filter(|diff| diff.is_file()) {
-            fs::copy(diff, pictures.join(format!("{at}-diff.png")))?;
-        }
+        row.diff.copy(&pictures.join(format!("{at}-diff.png")))?;
     }
     fs::write(
         run.dir.join("run.json"),
@@ -370,12 +452,20 @@ fn html(record: &Value) -> String {
             None => format!("<figure><figcaption>{label}</figcaption><p class=\"none\">None</p></figure>"),
         }
         };
+        let names: Vec<&str> = shot["labels"]
+            .as_array()
+            .map(|all| all.iter().filter_map(Value::as_str).collect())
+            .unwrap_or_default();
+        let first = names.first().copied().unwrap_or("Baseline");
+        let second = names.get(1).copied().unwrap_or("Capture");
         let swipe = match (shot["baseline"].as_str(), shot["current"].as_str()) {
             (Some(baseline), Some(current)) => format!(
                 "<div class=\"swipe\"><img src=\"{}\" alt=\"\"><img class=\"over\" src=\"{}\" alt=\"\">\
-                 <input type=\"range\" min=\"0\" max=\"100\" value=\"50\" aria-label=\"Swipe between the baseline and the capture of {}\"></div>",
+                 <input type=\"range\" min=\"0\" max=\"100\" value=\"50\" aria-label=\"Swipe between {} and {} of {}\"></div>",
                 escape(baseline),
                 escape(current),
+                escape(first),
+                escape(second),
                 escape(&title)
             ),
             _ => String::new(),
@@ -385,8 +475,8 @@ fn html(record: &Value) -> String {
             "<section><h2>{}</h2><p>{}</p><div class=\"three\">{}{}{}</div>{swipe}</section>",
             escape(&title),
             escape(&sentence(shot["detail"].as_str().unwrap_or_default())),
-            picture("baseline", "Baseline"),
-            picture("current", "Capture"),
+            picture("baseline", first),
+            picture("current", second),
             picture("diff", "Difference"),
         );
     }
@@ -402,6 +492,15 @@ fn html(record: &Value) -> String {
             escape(one["shot"].as_str().unwrap_or_default()),
             escape(one["detail"].as_str().unwrap_or_default())
         );
+    }
+    let mut findings = String::new();
+    for one in record["findings"]
+        .as_array()
+        .unwrap_or(&empty)
+        .iter()
+        .filter_map(Value::as_str)
+    {
+        let _ = write!(findings, "<li>{}</li>", escape(one));
     }
     let mut skipped = String::new();
     for one in record["skipped"]
@@ -421,9 +520,10 @@ fn html(record: &Value) -> String {
     };
     format!(
         "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\
-<title>Visual test report</title><style>{STYLE}</style><main><h1>Visual test report</h1><p class=\"verdict\">{}</p>{}{}{}</main><script>{SCRIPT}</script></html>\n",
+<title>Visual test report</title><style>{STYLE}</style><main><h1>Visual test report</h1><p class=\"verdict\">{}</p>{}{}{}{}</main><script>{SCRIPT}</script></html>\n",
         escape(record["verdict"].as_str().unwrap_or_default()),
         cards,
+        list("Page checks", &findings),
         list("Notes", &notes),
         list("Skipped", &skipped),
     )

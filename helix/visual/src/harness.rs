@@ -44,12 +44,15 @@ pub fn css(harness: &Harness, shot: &Shot) -> String {
     )
 }
 
-/// The document for one entry, styled for its first shot.
+/// The document for one entry, styled for its first shot. `head` is markup of
+/// the entry's own placed after the harness style and before the deferred
+/// scripts, such as a module script or a rule of its own.
 pub fn document(
     title: &str,
     styles: &[String],
     scripts: &[String],
     harness: Option<&str>,
+    head: &str,
     body: &str,
 ) -> String {
     let mut out = String::from("<!doctype html><meta charset=\"utf-8\"><title>");
@@ -61,6 +64,7 @@ pub fn document(
     if let Some(rules) = harness {
         let _ = write!(out, "<style id=\"{STYLE_ID}\">{rules}</style>");
     }
+    out.push_str(head);
     for src in scripts {
         let _ = write!(out, "<script defer src=\"{}\"></script>", escape(src));
     }
@@ -108,6 +112,7 @@ mod tests {
             &["/frame.css".to_string()],
             &["/frame.js".to_string()],
             Some("body{}"),
+            "",
             "<helix-card></helix-card>",
         );
         assert_eq!(
