@@ -688,16 +688,17 @@ pub fn open_report(config: Option<&Path>, markdown: bool) -> Outcome<Code> {
     Ok(Code::Ok)
 }
 
-/// `helix visual report --merge`: the groups of several runs' reports as one,
-/// asked about once each when the config has a triage, printed, and written
-/// as Markdown with `markdown`.
-pub fn merge_reports(
-    config: Option<&Path>,
-    runs: &[PathBuf],
-    reference: Option<&str>,
-    markdown: bool,
-) -> Outcome<Code> {
-    let (_, base, mut driver, config) = load(config)?;
+/// What a merge reads from each report: how many it read, their groups, and
+/// the baseline and capture each failed shot left, by `entry, shot`.
+type Read = (
+    usize,
+    Vec<triage::Group>,
+    BTreeMap<String, (Vec<u8>, Vec<u8>)>,
+);
+
+/// Each report's groups and pictures. A path with no report is said and left
+/// out, and a record that is not JSON fails the merge.
+fn read_reports(runs: &[PathBuf]) -> Outcome<Read> {
     let mut groups = Vec::new();
     let mut pictures = BTreeMap::new();
     let mut read = 0;
@@ -745,7 +746,30 @@ pub fn merge_reports(
             }
         }
     }
+    Ok((read, groups, pictures))
+}
+
+/// `helix visual report --merge`: the groups of several runs' reports as one,
+/// asked about once each when the config has a triage, printed, and written
+/// as Markdown with `markdown`.
+pub fn merge_reports(
+    config: Option<&Path>,
+    runs: &[PathBuf],
+    earlier: &[PathBuf],
+    reference: Option<&str>,
+    markdown: bool,
+) -> Outcome<Code> {
+    let (_, base, mut driver, config) = load(config)?;
+    let history =
+        (!earlier.is_empty()).then(|| crate::history::summarize(&crate::history::gather(earlier)));
+    let (read, groups, pictures) = read_reports(runs)?;
     let mut groups = triage::merge(groups);
+    if let Some(history) = &history {
+        let own = crate::history::Origin::here(&base).reference;
+        for group in &mut groups {
+            group.elsewhere = history.elsewhere(&group.signature, &own);
+        }
+    }
     let triaged = match &config.triage {
         Some(triage) if !groups.is_empty() => Some(ask(
             &mut driver,
@@ -759,23 +783,28 @@ pub fn merge_reports(
     };
     driver.close();
     let shots: BTreeSet<&String> = groups.iter().flat_map(|one| &one.members).collect();
-    let verdict = format!(
-        "helix: {} {} hold {} that changed, in {}.",
-        read,
-        if read == 1 { "report" } else { "reports" },
-        if shots.len() == 1 {
-            "1 shot".to_string()
-        } else {
-            format!("{} shots", shots.len())
-        },
-        if groups.len() == 1 {
-            "1 group".to_string()
-        } else {
-            format!("{} groups", groups.len())
-        },
-    );
+    let verdict = if runs.is_empty() {
+        "helix: the history of earlier runs.".to_string()
+    } else {
+        format!(
+            "helix: {} {} hold {} that changed, in {}.",
+            read,
+            if read == 1 { "report" } else { "reports" },
+            if shots.len() == 1 {
+                "1 shot".to_string()
+            } else {
+                format!("{} shots", shots.len())
+            },
+            if groups.len() == 1 {
+                "1 group".to_string()
+            } else {
+                format!("{} groups", groups.len())
+            },
+        )
+    };
     let record = json!({
         "groups": groups.iter().map(triage::Group::record).collect::<Vec<_>>(),
+        "history": history.as_ref().map(crate::history::Summary::record),
         "shots": [],
         "triage": triaged,
         "verdict": verdict,
@@ -791,6 +820,11 @@ pub fn merge_reports(
         }
         if let Some(triaged) = &triaged {
             say!("{triaged}");
+        }
+        if let Some(history) = &history {
+            for line in history.lines() {
+                say!("helix: {line}");
+            }
         }
     }
     Ok(Code::Ok)
@@ -1415,6 +1449,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
         skipped,
         groups,
         triaged,
+        origin: crate::history::Origin::here(&base),
         update: options.update,
     }))
 }

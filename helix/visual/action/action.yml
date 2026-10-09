@@ -22,6 +22,13 @@
 #       cancel-in-progress: false
 #       group: ${{ github.workflow }}-${{ github.ref }}
 #
+# **Every check keeps its run record**, the report's `run.json`, as an
+# artifact named `visual-run-<job>-<index>` for `keep` days. With `history`
+# above 0, a check reads the records of that many recent runs of its workflow
+# and adds what they say to the summary: the shots that keep needing a second
+# take, and the changes failing on branches that did not make them. It reads
+# them with the workflow's token, which needs `actions: read`.
+#
 # **The commit message releases nothing by default.** `test(visual)` is a
 # conventional commit type that release tooling reads as no release.
 name: Helix visual tests
@@ -49,6 +56,12 @@ inputs:
       *.png
       *.aria.yml
       *visual.fingerprint.json
+  history:
+    description: 'How many recent runs of this workflow a check reads the run records of, to say which shots keep needing a second take and which changes fail on other branches. 0 reads none. Needs `actions: read`.'
+    default: '0'
+  keep:
+    description: How many days a check's run record is kept, for the history of later runs.
+    default: '30'
   helix:
     description: The command that runs `helix`.
     default: npx --no-install helix
@@ -167,6 +180,35 @@ runs:
           else
             $HELIX visual report --markdown >> "$GITHUB_STEP_SUMMARY" || true
           fi
+        fi
+
+    - name: Keep the run record
+      if: always() && inputs.mode == 'check'
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        if-no-files-found: ignore
+        include-hidden-files: true
+        name: visual-run-${{ github.job }}-${{ strategy.job-index }}
+        path: ${{ inputs.working-directory }}/${{ inputs.report }}/run.json
+        retention-days: ${{ inputs.keep }}
+
+    - name: Read the history of earlier runs
+      if: always() && inputs.mode == 'check' && inputs.history != '0'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        ARGS: ${{ inputs.args }}
+        GH_TOKEN: ${{ github.token }}
+        HELIX: ${{ inputs.helix }}
+        HISTORY: ${{ inputs.history }}
+      run: |
+        dir="$RUNNER_TEMP/helix-visual-history"
+        bash "$GITHUB_ACTION_PATH/history.sh" "$HISTORY" "$dir" || true
+        config=$(printf '%s\n' $ARGS | grep -A1 -x -- '--config' | tail -1 || true)
+        if [ -n "$config" ] && [ "$config" != "--config" ]; then
+          $HELIX visual report --history "$dir" --markdown --config "$config" >> "$GITHUB_STEP_SUMMARY" || true
+        else
+          $HELIX visual report --history "$dir" --markdown >> "$GITHUB_STEP_SUMMARY" || true
         fi
 
     - name: Upload the report and the diff images

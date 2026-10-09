@@ -1,0 +1,59 @@
+# **`/retake` on a pull request retakes the entries it names on that branch.**
+# A reviewer who has looked at the pictures comments `/retake styled/badge
+# site/home`, and this dispatches `Visual baselines` on the pull request's
+# branch, the examples and the site's pages each in their own run. The retake
+# opens its own pull request into the branch, to be looked at like any other.
+#
+# **Only from someone who can push**, the repository's owner, members and
+# collaborators, and only for a branch of this repository: a fork's branch is
+# one this token cannot write to. The comment is read from the event's
+# environment and never pasted into a command, and an entry is kept only when
+# it reads as one.
+name: Retake on request
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  actions: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  retake:
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/retake') && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) }}  # dialect:quoted, GitHub's own functions
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch a retake of the entries named
+        env:
+          BODY: ${{ github.event.comment.body }}
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          pr=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$NUMBER")
+          head=$(jq -r '.head.ref' <<<"$pr")
+          from=$(jq -r '.head.repo.full_name' <<<"$pr")
+          if [ "$from" != "$GITHUB_REPOSITORY" ]; then
+            gh pr comment "$NUMBER" --body "A branch from a fork cannot be retaken from here. Retake the baselines on the fork, or ask for them to be taken on a branch of this repository."
+            exit 0
+          fi
+          entries=$(head -n 1 <<<"$BODY" | sed 's#^/retake##' | tr -s ' \t' '\n' | grep -E '^[a-z0-9][a-z0-9-]*(/[a-z0-9][a-z0-9-]*)?$' || true)
+          if [ -z "$entries" ]; then
+            gh pr comment "$NUMBER" --body 'Name the entries to retake after `/retake`, such as `/retake styled/badge site/home`.'
+            exit 0
+          fi
+          site=$(grep '^site/' <<<"$entries" | tr '\n' ' ' || true)
+          examples=$(grep -v '^site/' <<<"$entries" | tr '\n' ' ' || true)
+          said=""
+          if [ -n "${examples// /}" ]; then
+            gh workflow run visual-baselines.yml --ref "$head" -f suite=examples -f family="$examples"
+            said="$said the examples ${examples% }"
+          fi
+          if [ -n "${site// /}" ]; then
+            gh workflow run visual-baselines.yml --ref "$head" -f suite=site -f family="$site"
+            said="$said${said:+, and} the site's ${site% }"
+          fi
+          gh pr comment "$NUMBER" --body "Retaking$said on \`$head\`. Each retake opens a pull request into the branch: look at every picture in it before merging it."

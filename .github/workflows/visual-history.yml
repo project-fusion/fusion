@@ -1,0 +1,36 @@
+# **The examples' visual history, once a week.** Reads the run records the
+# last 100 `verify` runs kept, on every branch, and writes to its summary page
+# the shots that keep needing a second take and the changes that failed on
+# branches that did not make them: the flakes no single run can see.
+#
+# Read from Actions artifacts and nothing else, so it needs no service and
+# keeps nothing of its own.
+name: Visual history
+
+on:
+  schedule:
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+
+      - name: Fetch the records of recent verify runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash helix/visual/action/history.sh 100 "$RUNNER_TEMP/history" visual-run- verify.yml
+
+      - name: Say what they show
+        run: bun helix/cli/npm/bin.mjs visual report --history "$RUNNER_TEMP/history" --markdown | tee -a "$GITHUB_STEP_SUMMARY"

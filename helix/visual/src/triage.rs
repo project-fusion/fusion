@@ -44,6 +44,9 @@ pub enum Change<'a> {
 /// Shots that changed the same way.
 #[derive(Clone, Debug, Default)]
 pub struct Group {
+    /// Other branches whose recent runs failed with this change, from the
+    /// history a merge was given.
+    pub elsewhere: Vec<String>,
     /// The model's explanation, when one was asked for and answered.
     pub explanation: Option<String>,
     /// The files the attribution names, for the diff.
@@ -63,6 +66,7 @@ impl Group {
     /// ask about it again.
     pub fn record(&self) -> serde_json::Value {
         serde_json::json!({
+            "elsewhere": self.elsewhere,
             "explanation": self.explanation,
             "files": self.files,
             "lines": self.lines,
@@ -84,6 +88,7 @@ impl Group {
                 .collect()
         };
         Some(Self {
+            elsewhere: Vec::new(),
             explanation: None,
             files: strings("files").into_iter().collect(),
             lines: strings("lines"),

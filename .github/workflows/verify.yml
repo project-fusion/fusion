@@ -786,6 +786,20 @@ jobs:
           path: .local/diagnostics/examples.json
           retention-days: 14
 
+      # **Every visual shard keeps its run record, passing or not**, for the
+      # history a later run reads: which shots keep needing a second take, and
+      # which changes fail on branches that did not make them. A record is the
+      # report's `run.json` alone, with no pictures.
+      - name: Keep the visual run record
+        if: always() && matrix.task == 'visual'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          if-no-files-found: ignore
+          include-hidden-files: true
+          name: visual-run-${{ matrix.id }}
+          path: .helix/visual/run.json
+          retention-days: 30
+
       - name: Upload the visual diffs
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -811,12 +825,21 @@ jobs:
   # **Never a failure of the build.** The shards already failed or passed, and
   # a model that is down or a key a fork pull request does not get is no reason
   # to call the run anything else. Only this job gets the key.
+  #
+  # **With the history of the last 30 runs**, so a group also failing on
+  # branches that did not make it says so, and on a pull request **as a
+  # comment**, kept to one that each run rewrites, so the reviewer reads the
+  # groups and how to retake them where the review happens.
   visual-triage:
     needs: [browser]
     if: ${{ always() && needs.browser.result == 'failure' }}  # dialect:quoted, GitHub's own function
     runs-on: ubuntu-latest
     timeout-minutes: 10
     continue-on-error: true
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: write
     env:
       BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
     steps:
@@ -836,6 +859,11 @@ jobs:
           path: reports
           pattern: visual-diffs-visual-*
 
+      - name: Fetch the records of earlier runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash helix/visual/action/history.sh 30 "$RUNNER_TEMP/history" || true
+
       - name: Merge them, and ask about each group
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -846,7 +874,31 @@ jobs:
             echo "No visual shard left a report, so there is nothing to merge." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          bun helix/cli/npm/bin.mjs visual report --merge "${reports[@]}" --changed "$BASE" --markdown | tee -a "$GITHUB_STEP_SUMMARY"
+          bun helix/cli/npm/bin.mjs visual report --merge "${reports[@]}" --history "$RUNNER_TEMP/history" --changed "$BASE" --markdown > "$RUNNER_TEMP/summary.md"
+          tee -a "$GITHUB_STEP_SUMMARY" < "$RUNNER_TEMP/summary.md"
+
+      # One comment a pull request, found by its marker and rewritten, so a
+      # pull request that fails ten times carries one summary and not ten. A
+      # fork's token cannot write, which leaves the summary page as the answer.
+      - name: Say it on the pull request
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          [ -s "$RUNNER_TEMP/summary.md" ] || exit 0
+          {
+            echo '<!-- helix-visual -->'
+            cat "$RUNNER_TEMP/summary.md"
+            echo
+            echo 'To retake entries on this branch, comment `/retake` and their names, such as `/retake styled/badge site/home`. Look at each picture before you do.'
+          } > "$RUNNER_TEMP/comment.md"
+          existing=$(gh api "repos/$GITHUB_REPOSITORY/issues/$NUMBER/comments?per_page=100" --jq '[.[] | select(.body | startswith("<!-- helix-visual -->"))][0].id // empty')
+          if [ -n "$existing" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$existing" -F body=@"$RUNNER_TEMP/comment.md" > /dev/null
+          else
+            gh pr comment "$NUMBER" --body-file "$RUNNER_TEMP/comment.md"
+          fi
 
   # **The site's pages, pictured by `helix visual`'s own GitHub Action.** Five
   # pages at 1440 and 390 light and 1440 dark, from `next start` over the build
