@@ -45,8 +45,8 @@ type DisableableHost = ReactiveControllerHost &
  *
  * It adds no API. A group already has `disabled`, from `HelixFormElement` or
  * from the consumer; nothing here introduces a property or a method for anyone
- * to call. By this repo's own rule that makes it a controller and not a mixin:
- * it reacts to a lifecycle and nothing else.
+ * to call. Adding no API is what makes it a controller and not a mixin: it
+ * reacts to a lifecycle and nothing else.
  *
  * So a group states its members once, at construction, and never thinks about
  * it again:

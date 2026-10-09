@@ -184,9 +184,7 @@ export declare class ViewportElement {
  * first and its frame turned out to be a surface a reader can move, fill the
  * screen with, and stop touching: a canvas of notes and a graph of nodes want
  * the same four hundred lines, and the only thing that made them Map's was
- * being written there. Extracted before the second consumer rather than after,
- * which is the opposite of what [#383](queue.md) had to conclude about a
- * controller promoted ahead of one.
+ * being written there. Extracted before the second consumer arrived.
  *
  * **Nothing here moves anything, either.** Both controls ask, through an event
  * a family names, and the answer is the consumer's: the surface a reader is

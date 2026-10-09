@@ -26,8 +26,8 @@ export type TokenColor = [number, number, number]
  * written in next, which is the property worth having in a design system whose
  * palette is derived rather than listed.
  *
- * **A controller and not a mixin**, by this repository's own line: it adds no
- * property or method a consumer sets. It reacts to lifecycle, holding a probe
+ * **A controller and not a mixin**, because it adds no property or method a
+ * consumer sets. It reacts to lifecycle, holding a probe
  * that has to be created after the host connects and removed when it leaves,
  * and it watches for the color mode changing so the host can repaint.
  *
