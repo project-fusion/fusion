@@ -8,16 +8,19 @@
  * **The units are cells.** A step along a column or a row is one cell, and a
  * prism's height is in the same unit, so the drawing scales as a whole through
  * the `viewBox` and a server can write it with no width to measure.
+ *
+ * **The projection is the one every spatial drawing shares**, `helix-core`'s,
+ * seen from the isometric camera. What is here is the heatmap's own: which way
+ * its columns and rows run, its prisms, and the slab under them.
  */
+
+import { ISOMETRIC, type PagePoint, pathData, projectionOf } from '@fusion.dev/helix-core'
 
 /** How far across the page one step along either axis goes: the cosine of 30 degrees. */
 export const ACROSS = Math.sqrt(3) / 2
 
 /** A point on the page, in cells. */
-export interface Point {
-  x: number
-  y: number
-}
+export type Point = PagePoint
 
 /** One reading drawn as a prism: three visible faces, as path data. */
 export interface Prism {
@@ -89,17 +92,16 @@ export const heightsOf = (
 export const highestOf = (values: readonly (number | undefined)[]): number =>
   values.reduce<number>((high, value) => (value !== undefined && value > high ? value : high), 0)
 
-/** A number written short enough for path data, and never as `-0`. */
-const short = (value: number): string => String(Math.round(value * 1000) / 1000 || 0)
+const isometric = projectionOf(ISOMETRIC)
 
-/** A grid place and a height, on the page. Columns run down to the right and rows down to the left. */
-const at = (column: number, row: number, height: number): Point => ({
-  x: (column - row) * ACROSS,
-  y: (column + row) / 2 - height,
-})
+/**
+ * A grid place and a height, on the page. Columns run down to the right and
+ * rows down to the left, which is the floor's across and the way back from it.
+ */
+const at = (column: number, row: number, height: number): Point =>
+  isometric.at(column, -row, height)
 
-const path = (points: readonly Point[]): string =>
-  `M${points.map((point) => `${short(point.x)} ${short(point.y)}`).join('L')}Z`
+const path = pathData
 
 /**
  * Every reading as a prism, filling down each column of `rows` and then
