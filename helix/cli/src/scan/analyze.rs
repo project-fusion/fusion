@@ -678,6 +678,42 @@ impl<'a> Analyzer<'a> {
         }
     }
 
+    /// A listener added by name for a `helix-` event no Helix element
+    /// dispatches, which never runs. The element it is added to is not known
+    /// from the text, so a name some element sends is left alone.
+    pub fn listened(&mut self, listened: &[(String, usize, String)]) {
+        let Some((installed, _)) = self.installed else {
+            return;
+        };
+        if installed.dispatched.is_empty() {
+            return;
+        }
+        let mut seen = HashSet::new();
+        for (path, line, name) in listened {
+            if installed.dispatched.contains(name) || !seen.insert(name.clone()) {
+                continue;
+            }
+            let close = nearest(name, installed.dispatched.iter().map(String::as_str), None)
+                .map(str::to_owned);
+            self.found.findings.push(Raw {
+                message: match &close {
+                    Some(close) => format!("A listener waits for `{name}`, which no Helix element dispatches, so it never runs. The closest event is `{close}`."),
+                    None => format!("A listener waits for `{name}`, which no Helix element dispatches, so it never runs."),
+                },
+                expected: close,
+                kind: "unknown-event",
+                origin: Origin {
+                    index: 0,
+                    line: *line,
+                    sheet: path.clone(),
+                    text: format!("addEventListener('{name}')"),
+                },
+                subject: format!("addEventListener('{name}')"),
+                tag: String::new(),
+            });
+        }
+    }
+
     /// A rule selecting a Helix tag by an attribute it takes and never writes
     /// back, which matches only markup a server wrote: on a client navigation
     /// a framework sets the property, and the attribute is never there. The
@@ -1150,6 +1186,32 @@ mod tests {
         let mut analyzer = Analyzer::new(&index, &listing, &used).with(&installed, &barrel);
         analyzer.markup([("a.html", page.elements.as_slice())]);
         assert!(kinds(&analyzer).is_empty());
+    }
+
+    #[test]
+    fn a_listener_for_a_helix_event_nothing_dispatches_is_found() {
+        let index = index();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let installed = installed();
+        let imports = HashSet::new();
+        let mut analyzer = Analyzer::new(&index, &listing, &used).with(&installed, &imports);
+        analyzer.listened(&[
+            ("a.ts".to_owned(), 3, "helix-selcet".to_owned()),
+            ("a.ts".to_owned(), 4, "helix-select".to_owned()),
+            ("b.ts".to_owned(), 9, "helix-selcet".to_owned()),
+        ]);
+        assert_eq!(
+            kinds(&analyzer),
+            [(
+                "unknown-event",
+                "addEventListener('helix-selcet')".to_owned()
+            )]
+        );
+        assert_eq!(
+            analyzer.found.findings[0].expected.as_deref(),
+            Some("helix-select")
+        );
     }
 
     #[test]
