@@ -27,6 +27,12 @@
   position: absolute;
 }
 
+/* With no box, the readings stand on the page itself, as a picture on a
+   landing page does, with nothing drawn behind them. */
+:host([no-box]) [part="plot"] {
+  background-color: transparent;
+}
+
 [part="plot"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);

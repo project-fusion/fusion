@@ -277,7 +277,8 @@ export const createStage = (
 
   /** Every name and number, placed over where its place in the box is drawn. */
   const drawLabels = (): void => {
-    if (!axes || !colors) {
+    /* None along a box that is not drawn. */
+    if (!axes || !colors?.look.box) {
       labels.replaceChildren()
       return
     }
@@ -682,6 +683,7 @@ export const createStage = (
       const lines = new BufferGeometry()
       lines.setAttribute('position', new Float32BufferAttribute(gridLines(next), 3))
       grid.geometry = lines
+      grid.visible = nextColors.look.box
       /* The muted ink, see-through, which reads on any ground: the border
          color drawn on the sunken surface all but disappeared. */
       gridMaterial.color.setStyle(nextColors.quiet)

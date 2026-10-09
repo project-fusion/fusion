@@ -22,6 +22,7 @@ import '../../tooltip/index.js'
 import { fieldOf, type PlotField, type PlotPoint } from '../field.js'
 import {
   type BoxPoint,
+  boundsOf,
   boxView,
   DragTurn,
   drawBox,
@@ -158,6 +159,15 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
   /** The column of text that puts each point in a group, by its heading. None by default. */
   @property({ attribute: 'group-by' })
   groupBy = ''
+
+  /**
+   * Draws no box: no edges, grid, numbers, or names, so the readings stand
+   * alone and fill the plot, as a picture on a product's own page does. The
+   * table, the summary, the tooltip, and the keys still carry every value,
+   * and a renderer draws no box either.
+   */
+  @property({ attribute: 'no-box', reflect: true, type: Boolean })
+  noBox = false
 
   /** The plot's name where the chart has none: no `aria-label`, `label`, or table caption. */
   @words
@@ -406,7 +416,7 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
    * own drawing, until a renderer has drawn and where none is connected.
    */
   private renderFallback(field: PlotField, at: number): TemplateResult {
-    const view = boxView(field.axes, this.camera)
+    const view = boxView(field.axes, this.camera, [], this.noBox)
     const places = field.points.map((point, index) => {
       const box: BoxPoint = [
         inBox(field.axes.x, point.x),
@@ -418,7 +428,10 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
     this.placed = places
     const painted = [...places].sort((one, other) => one.depth - other.depth)
     const active = places[at]
-    const bounds = this.drag.frame(view.bounds, view.on([0, 0, 0]))
+    const bounds = this.drag.frame(
+      this.noBox ? boundsOf(places, 0.1) : view.bounds,
+      view.on([0, 0, 0]),
+    )
     return html`<div aria-hidden="true" dir="ltr" ?hidden=${this.rendered} part="fallback">
       <svg
         part="drawing"
@@ -431,7 +444,7 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
-      >${drawBox(view)}${painted.map(
+      >${this.noBox ? nothing : drawBox(view)}${painted.map(
         (place) =>
           svg`<circle cx=${place.x} cy=${place.y} part="point${place.index === at ? ' point-active' : ''}" r="0.045" style="--chart-series: var(--chart-series-${(place.point.groupIndex % SERIES) + 1})"></circle>`,
       )}${
