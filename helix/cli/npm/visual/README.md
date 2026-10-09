@@ -107,7 +107,11 @@ export default defineConfig({
   prefix, for a framework that writes hyphenated tags it never defines.
 - **`aria`**: keeps each entry's accessibility snapshot, Playwright's
   `ariaSnapshot()` of its page, beside its baselines as `<stem>.aria.yml`, and
-  compares it as text, so a lost label fails even when no pixel moved.
+  compares it as text, so a lost label fails even when no pixel moved. A
+  snapshot leaves out what `mask` names. `{ hide: [...] }` keeps snapshots and
+  leaves out more, for what is read aloud and never drawn, such as a table
+  hidden visually: masked, its box would be painted over whatever it sits
+  under.
 - **`checks.code`**: fails a run on a code block that draws all of its text in
   one color, as a highlighter that failed leaves it. It reads the page after
   the first shot and needs no baseline. `selector` names your code blocks and
@@ -130,7 +134,8 @@ export default defineConfig({
 - **`timings`**: a file to write each entry name's seconds to, which is how you
   measure `shard.cost`.
 - **`mask`**: selectors whose elements are painted over in one fixed color in
-  every picture, for what changes on its own, such as a version number.
+  every picture and left out of every accessibility snapshot, for what changes
+  on its own, such as a version number.
 - **`style`**: a stylesheet applied while each picture is taken, to hold still
   what `mask` cannot, such as a masked element whose width follows its text.
 - **`report`**: where each run writes its report, `.helix/visual` unless you

@@ -266,7 +266,7 @@ fn item(config: &Config, entry: &Entry, shots: &[&Shot], first: bool) -> Outcome
     let source = &config.sources[entry.source];
     let code = config.checks.code.resolved().filter(|_| first);
     let mut out = json!({
-        "aria": first && config.aria,
+        "aria": first && config.aria.kept(),
         "checks": { "code": code.map(|check| json!({ "minimum": check.minimum, "selector": check.selector })) },
         "entry": { "file": entry.file, "id": entry.id, "name": entry.name, "source": source.name(), "url": entry.url },
         "inspect": first && config.inspect,
@@ -631,6 +631,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
     let started = driver
         .ask(&json!({
             "network": match config.network { Network::Origin => "origin", Network::Open => "open" },
+            "hide": config.aria.hidden(),
             "mask": config.mask,
             "op": "start",
             "style": config.style,
@@ -782,7 +783,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
     file beside its baselines and kept in the results under an index past
     the last shot. A page that broke has none to judge. */
     let aria = config.shots.len();
-    if config.aria {
+    if config.aria.kept() {
         for (at, entry) in mine
             .iter()
             .enumerate()

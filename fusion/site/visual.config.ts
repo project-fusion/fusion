@@ -23,8 +23,12 @@
 import { defineConfig } from '@fusion.dev/helix-cli/visual'
 
 export default defineConfig({
-  /* Each page's accessibility tree beside its pictures. */
-  aria: true,
+  /* Each page's accessibility tree beside its pictures, without the table the
+     home page's button chart reads, which holds Helix's bytes for a screen
+     reader and so changes with every release, as the chart does. Hidden from
+     the snapshot and not masked, because its box covers the section's
+     heading. */
+  aria: { hide: ['#proof-button'] },
   /* The page check that needs no baseline: a code block the highlighter left
      in one color, which is the October 8 fault on any page, pictured or not.
      A highlighted block is a `helix-code-block` holding the highlighter's one
