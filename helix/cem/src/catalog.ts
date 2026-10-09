@@ -659,7 +659,13 @@ export const catalog = (
  */
 const importLines = (html: string, slug: string, specifiers: Map<string, string>): string[] => {
   const needed = new Set<string>()
-  for (const [, tag] of html.matchAll(/<(helix-[a-z0-9-]+)/g)) {
+  /* A tag the markup writes, and one its script makes with `createElement`,
+     which a page copying the example registers all the same. */
+  const tags = [
+    ...html.matchAll(/<(helix-[a-z0-9-]+)/g),
+    ...html.matchAll(/createElement\(\s*['"](helix-[a-z0-9-]+)['"]/g),
+  ]
+  for (const [, tag] of tags) {
     const specifier = specifiers.get(tag ?? '')
     if (specifier) {
       needed.add(specifier)

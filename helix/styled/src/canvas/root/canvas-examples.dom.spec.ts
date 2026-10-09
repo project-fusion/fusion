@@ -12,6 +12,8 @@ import editing from '../.examples/editing.html' with { type: 'text' }
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  /* The editing example opens a card's text in a Helix input. */
+  await import('../../input/index.js')
 })
 
 /* Browser only: happy-dom does not run a script inserted by script. */
@@ -71,7 +73,7 @@ describe('the editing example', () => {
     const launch = document.getElementById('launch') as Updatable
     press(launch, 'demo', 'Enter')
     await settle(launch)
-    const field = named(launch, 'demo')?.querySelector('input')
+    const field = named(launch, 'demo')?.querySelector('helix-input')
     expect(field?.value).toBe('Record a demo')
   })
 
