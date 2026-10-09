@@ -24,7 +24,9 @@ const source = join(root, 'helix/styled/skills/helix/SKILL.md')
 const target = join(root, 'helix/plugin/skills/helix/SKILL.md')
 
 if (!existsSync(source)) {
-  console.error('build-plugin: no packaged guide. Run `turbo run analyze --filter=@fusion.dev/helix` first.')
+  console.error(
+    'build-plugin: no packaged guide. Run `turbo run analyze --filter=@fusion.dev/helix` first.',
+  )
   process.exit(1)
 }
 
@@ -36,14 +38,18 @@ const written = packaged
     'This guide follows the latest release of Helix. A project that installed Helix has the copy for its own version at `node_modules/@fusion.dev/helix/skills/helix/SKILL.md`, and where the two differ, that copy is right.',
   )
 if (written === packaged) {
-  console.error('build-plugin: the packaged guide no longer has the lines this rewrites. Update this script.')
+  console.error(
+    'build-plugin: the packaged guide no longer has the lines this rewrites. Update this script.',
+  )
   process.exit(1)
 }
 
 if (process.argv.includes('--check')) {
   const committed = existsSync(target) ? readFileSync(target, 'utf8') : ''
   if (committed !== written) {
-    console.error('build-plugin: helix/plugin/skills/helix/SKILL.md is stale. Run `bun fusion/scripts/build-plugin.mjs`.')
+    console.error(
+      'build-plugin: helix/plugin/skills/helix/SKILL.md is stale. Run `bun fusion/scripts/build-plugin.mjs`.',
+    )
     process.exit(1)
   }
 } else {
