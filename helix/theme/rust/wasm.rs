@@ -18,13 +18,15 @@
 //! **Errors are `JsError`, so they arrive as exceptions rather than as a shape
 //! the caller has to inspect.** A derivation either produces a theme or refuses
 //! the intent, and a caller who forgets to check a returned discriminant gets a
-//! theme-shaped object full of nothing.
+//! theme-shaped object full of nothing. An intent that cannot be read is
+//! refused by [`read`], which names the field and the value.
 
 use wasm_bindgen::prelude::*;
 
 use crate::css::{to_css, to_css_modes};
 use crate::derive::theme::derive_theme;
 use crate::intent::{Scheme, ThemeIntent};
+use crate::read::read;
 use crate::shape::report;
 
 /// Derives a theme, and renders it under every selector asked for.
@@ -45,8 +47,10 @@ use crate::shape::report;
 /// the intent.
 #[wasm_bindgen(js_name = derive)]
 pub fn derive(intent: &str, selectors: &str) -> Result<String, JsError> {
-    let intent: ThemeIntent = serde_json::from_str(intent)?;
-    let selectors: Vec<String> = serde_json::from_str(selectors)?;
+    let intent: ThemeIntent =
+        read(intent, "the intent").map_err(|refusal| JsError::new(&refusal))?;
+    let selectors: Vec<String> =
+        read(selectors, "selectors").map_err(|refusal| JsError::new(&refusal))?;
     let theme = derive_theme(&intent)?;
 
     let mut report = report(&theme);
@@ -74,8 +78,10 @@ pub fn derive(intent: &str, selectors: &str) -> Result<String, JsError> {
 /// the intent in either mode.
 #[wasm_bindgen(js_name = deriveModes)]
 pub fn derive_modes(intent: &str, selectors: &str) -> Result<String, JsError> {
-    let intent: ThemeIntent = serde_json::from_str(intent)?;
-    let selectors: Vec<String> = serde_json::from_str(selectors)?;
+    let intent: ThemeIntent =
+        read(intent, "the intent").map_err(|refusal| JsError::new(&refusal))?;
+    let selectors: Vec<String> =
+        read(selectors, "selectors").map_err(|refusal| JsError::new(&refusal))?;
     let in_mode = |scheme| {
         let mut one = intent.clone();
         one.scheme = Some(scheme);

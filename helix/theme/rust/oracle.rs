@@ -825,6 +825,89 @@ fn an_intent_that_would_pass_every_check_by_accident_is_refused() {
     );
 }
 
+/// The numbers written into the block as they are, and `status.harmony`.
+/// Nothing measures the first kind, so a value outside its range is a broken
+/// declaration that no violation reports.
+#[test]
+fn a_number_outside_the_range_it_is_meaningful_in_is_refused() {
+    let brand = || Color::Hex("#3b82f6".to_owned());
+    let cases: Vec<(&str, ThemeIntent)> = vec![
+        (
+            "a harmony above 1",
+            ThemeIntent {
+                status: Some(Status {
+                    harmony: Some(2.0),
+                    ..Status::default()
+                }),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
+            "a body size of zero, which sets every step of the ramp to 0rem",
+            ThemeIntent {
+                font: Some(Font {
+                    base: Some(0.0),
+                    ..Font::default()
+                }),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
+            "a NaN body size",
+            ThemeIntent {
+                font: Some(Font {
+                    base: Some(f64::NAN),
+                    ..Font::default()
+                }),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
+            "a negative ratio between the display steps",
+            ThemeIntent {
+                font: Some(Font {
+                    scale: Some(-1.25),
+                    ..Font::default()
+                }),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
+            "a negative motion scale, which writes negative durations",
+            ThemeIntent {
+                motion: Some(Motion {
+                    character: None,
+                    scale: Some(-1.0),
+                }),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
+            "an opacity above 1, which mixes the surface at 200%",
+            ThemeIntent {
+                material: Some(Material {
+                    blur: None,
+                    opacity: Some(2.0),
+                }),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+        (
+            "a negative blur",
+            ThemeIntent {
+                material: Some(Material {
+                    blur: Some(-4.0),
+                    opacity: None,
+                }),
+                ..ThemeIntent::new(brand())
+            },
+        ),
+    ];
+    for (what, intent) in cases {
+        assert!(resolve(&intent).is_err(), "{what} should be refused");
+    }
+}
+
 /// Every theme the oracle records, in the order it records them.
 ///
 /// **The order is the file's order and is load-bearing for review**, not for any

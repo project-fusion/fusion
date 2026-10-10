@@ -70,7 +70,8 @@ mod tests {
     use super::derive_theme;
     use crate::derive::resolve::IntentError;
     use crate::intent::{
-        Background, Brand, BrandPair, Color, From, Neutral, Relation, Scheme, Seed, ThemeIntent,
+        Background, Brand, BrandPair, Color, Font, From, Material, Motion, Neutral, Relation,
+        Scheme, Seed, ThemeIntent,
     };
 
     fn hex(value: &str) -> Color {
@@ -330,5 +331,44 @@ mod tests {
             panic!("an unreadable dark brand is refused on a light derive, got {refused:?}")
         };
         assert_eq!(label, "brand.dark");
+    }
+
+    #[test]
+    fn a_type_motion_or_material_number_outside_its_range_is_refused_by_its_own_name() {
+        let refused = |intent: ThemeIntent| {
+            derive_theme(&intent)
+                .expect_err("the intent is refused")
+                .to_string()
+        };
+        assert_eq!(
+            refused(ThemeIntent {
+                font: Some(Font {
+                    base: Some(0.0),
+                    ..Font::default()
+                }),
+                ..ThemeIntent::ink()
+            }),
+            "font.base must be positive"
+        );
+        assert_eq!(
+            refused(ThemeIntent {
+                motion: Some(Motion {
+                    character: None,
+                    scale: Some(f64::NAN),
+                }),
+                ..ThemeIntent::ink()
+            }),
+            "motion.scale must be a finite number, received NaN"
+        );
+        assert_eq!(
+            refused(ThemeIntent {
+                material: Some(Material {
+                    blur: None,
+                    opacity: Some(2.0),
+                }),
+                ..ThemeIntent::ink()
+            }),
+            "material.opacity must be between 0 and 1"
+        );
     }
 }

@@ -24,6 +24,9 @@ mod wire;
 #[cfg(any(feature = "wasm", test))]
 mod shape;
 
+#[cfg(any(feature = "wasm", all(test, feature = "serde")))]
+mod read;
+
 #[cfg(feature = "wasm")]
 mod wasm;
 

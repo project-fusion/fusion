@@ -26,6 +26,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
+    "test": "bun test src",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "wasm": "bun scripts/build-wasm.mjs",
     "wasm-check": "bun scripts/check-wasm.mjs"

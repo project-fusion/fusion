@@ -17,6 +17,12 @@
 //! Each gets a wire enum that `serde(untagged)` *can* read, and a conversion.
 //! The rest are plain derives on the types themselves.
 //!
+//! **Each wire enum ends in [`Shape`], which reads anything**, so a value that
+//! is none of the union's kinds is refused by the conversion as a type error
+//! naming what the field takes. Without it, serde refuses it with `data did not
+//! match any variant of untagged enum BrandWire`, which names a type in this
+//! file and nothing a consumer wrote.
+//!
 //! **`deny_unknown_fields` everywhere, which is a departure from the
 //! TypeScript** and the right one: a mistyped key is silently ignored by
 //! `JSON.parse` into a structural type, and this is a config file a person hand
@@ -29,7 +35,7 @@
 //! unknown fields allowed, the second matches the first with two keys thrown
 //! away, and a pinned status color becomes a hue nudge without a word.
 
-use serde::de::{Deserializer, Error as _, MapAccess, Visitor};
+use serde::de::{Deserializer, Error as _, IgnoredAny, MapAccess, SeqAccess, Unexpected, Visitor};
 use serde::Deserialize;
 
 use crate::intent::{Brand, BrandPair, Color, Relation, Seed, StatusSeed};
@@ -50,6 +56,7 @@ enum ColorWire {
     only about which error a reader sees when neither matches. */
     Hex(String),
     Oklch(Triple),
+    Other(Shape),
 }
 
 impl<'de> Deserialize<'de> for Color {
@@ -61,6 +68,7 @@ impl<'de> Deserialize<'de> for Color {
                 hue: triple.hue,
                 lightness: triple.lightness,
             }),
+            ColorWire::Other(shape) => return Err(shape.refused("a color this engine can read")),
         })
     }
 }
@@ -73,6 +81,7 @@ enum BrandWire {
     is what keeps the two apart. */
     One(Color),
     Each(BrandPair),
+    Other(Shape),
 }
 
 impl<'de> Deserialize<'de> for Brand {
@@ -80,6 +89,9 @@ impl<'de> Deserialize<'de> for Brand {
         Ok(match BrandWire::deserialize(reader)? {
             BrandWire::One(color) => Self::One(color),
             BrandWire::Each(pair) => Self::Each(pair),
+            BrandWire::Other(shape) => {
+                return Err(shape.refused("a color this engine can read, or one for each scheme"))
+            }
         })
     }
 }
@@ -89,6 +101,7 @@ impl<'de> Deserialize<'de> for Brand {
 enum SeedWire {
     Color(Color),
     Relation(Relation),
+    Other(Shape),
 }
 
 impl<'de> Deserialize<'de> for Seed {
@@ -96,6 +109,11 @@ impl<'de> Deserialize<'de> for Seed {
         Ok(match SeedWire::deserialize(reader)? {
             SeedWire::Color(color) => Self::Color(color),
             SeedWire::Relation(relation) => Self::Relation(relation),
+            SeedWire::Other(shape) => {
+                return Err(
+                    shape.refused("a color this engine can read, or a relation to the brand")
+                )
+            }
         })
     }
 }
@@ -116,6 +134,7 @@ enum StatusSeedWire {
     variant. */
     Color(Color),
     Hue(HueOnly),
+    Other(Shape),
 }
 
 impl<'de> Deserialize<'de> for StatusSeed {
@@ -123,7 +142,96 @@ impl<'de> Deserialize<'de> for StatusSeed {
         Ok(match StatusSeedWire::deserialize(reader)? {
             StatusSeedWire::Color(color) => Self::Color(color),
             StatusSeedWire::Hue(hue) => Self::Hue(hue.hue),
+            StatusSeedWire::Other(shape) => {
+                return Err(shape.refused("a color this engine can read, or a hue"))
+            }
         })
+    }
+}
+
+/// A value that is none of a union's kinds, kept as far as its refusal needs.
+///
+/// **The last kind of every wire enum, and the order is load-bearing**: an
+/// untagged enum takes the first kind that reads, and this one reads anything.
+enum Shape {
+    Bool(bool),
+    Float(f64),
+    Map,
+    Null,
+    Seq,
+    Signed(i64),
+    Text(String),
+    Unsigned(u64),
+}
+
+impl Shape {
+    /// The refusal of this value where `expected` is what the field takes.
+    fn refused<E: serde::de::Error>(&self, expected: &'static str) -> E {
+        let unexpected = match self {
+            Self::Bool(value) => Unexpected::Bool(*value),
+            Self::Float(value) => Unexpected::Float(*value),
+            Self::Map => Unexpected::Map,
+            Self::Null => Unexpected::Unit,
+            Self::Seq => Unexpected::Seq,
+            Self::Signed(value) => Unexpected::Signed(*value),
+            Self::Text(value) => Unexpected::Str(value),
+            Self::Unsigned(value) => Unexpected::Unsigned(*value),
+        };
+        E::invalid_type(unexpected, &expected)
+    }
+}
+
+impl<'de> Deserialize<'de> for Shape {
+    fn deserialize<D: Deserializer<'de>>(reader: D) -> Result<Self, D::Error> {
+        struct Anything;
+
+        impl<'de> Visitor<'de> for Anything {
+            type Value = Shape;
+
+            fn expecting(&self, out: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                out.write_str("any value")
+            }
+
+            fn visit_bool<E>(self, value: bool) -> Result<Shape, E> {
+                Ok(Shape::Bool(value))
+            }
+
+            fn visit_f64<E>(self, value: f64) -> Result<Shape, E> {
+                Ok(Shape::Float(value))
+            }
+
+            fn visit_i64<E>(self, value: i64) -> Result<Shape, E> {
+                Ok(Shape::Signed(value))
+            }
+
+            fn visit_map<M: MapAccess<'de>>(self, mut entries: M) -> Result<Shape, M::Error> {
+                while entries.next_entry::<IgnoredAny, IgnoredAny>()?.is_some() {}
+                Ok(Shape::Map)
+            }
+
+            fn visit_none<E>(self) -> Result<Shape, E> {
+                Ok(Shape::Null)
+            }
+
+            fn visit_seq<S: SeqAccess<'de>>(self, mut items: S) -> Result<Shape, S::Error> {
+                while items.next_element::<IgnoredAny>()?.is_some() {}
+                Ok(Shape::Seq)
+            }
+
+            fn visit_str<E>(self, value: &str) -> Result<Shape, E> {
+                Ok(Shape::Text(value.to_owned()))
+            }
+
+            fn visit_u64<E>(self, value: u64) -> Result<Shape, E> {
+                Ok(Shape::Unsigned(value))
+            }
+
+            fn visit_unit<E>(self) -> Result<Shape, E> {
+                Ok(Shape::Null)
+            }
+        }
+
+        reader.deserialize_any(Anything)
     }
 }
 
@@ -200,5 +308,64 @@ where
 
     fn visit_some<D: Deserializer<'de>>(self, reader: D) -> Result<Self::Value, D::Error> {
         reader.deserialize_map(self.0).map(Some)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::intent::ThemeIntent;
+
+    /// The refusal without its position, which is the file's and not the
+    /// wording's.
+    fn refused(json: &str) -> String {
+        let refusal = serde_json::from_str::<ThemeIntent>(json)
+            .expect_err("the intent is refused")
+            .to_string();
+        refusal
+            .split(" at line ")
+            .next()
+            .unwrap_or_default()
+            .to_owned()
+    }
+
+    #[test]
+    fn a_union_that_reads_as_none_of_its_kinds_says_what_it_takes() {
+        assert_eq!(
+            refused(r#"{"brand": 255}"#),
+            "invalid type: integer `255`, expected a color this engine can read, or one for \
+             each scheme"
+        );
+        assert_eq!(
+            refused(r#"{"background": {"light": true}}"#),
+            "invalid type: boolean `true`, expected a color this engine can read"
+        );
+        assert_eq!(
+            refused(r#"{"accent": {"from": "brand"}}"#),
+            "invalid type: map, expected a color this engine can read, or a relation to the \
+             brand"
+        );
+        assert_eq!(
+            refused(r#"{"status": {"danger": true}}"#),
+            "invalid type: boolean `true`, expected a color this engine can read, or a hue"
+        );
+    }
+
+    #[test]
+    fn each_union_still_reads_every_kind_it_takes() {
+        let intent: ThemeIntent = serde_json::from_str(
+            r##"{
+                "accent": {"from": "brand", "rotate": 180},
+                "background": {"light": {"chroma": 0.01, "hue": 80, "lightness": 0.97}},
+                "brand": {"dark": "#7dd3fc", "light": "#1e3a8a"},
+                "status": {"danger": {"hue": 20}, "info": "#0075af"},
+                "tokens": {"color-primary": {"chroma": 0.2, "hue": 250, "lightness": 0.5}}
+            }"##,
+        )
+        .expect("every kind reads");
+        assert!(matches!(intent.brand, Some(crate::intent::Brand::Each(_))));
+        assert!(matches!(
+            intent.accent,
+            Some(crate::intent::Seed::Relation(_))
+        ));
     }
 }
