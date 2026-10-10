@@ -30,9 +30,10 @@ export interface ManifestSource {
       attributes?: Array<{ name: string; type?: { text?: string } }>
       /**
        * Helix's own fields: `interactive`, the native control the element
-       * draws its content inside, from `@interactive`.
+       * draws its content inside, from `@interactive`, and `family`, the family
+       * an element joins from another package, from `@family`.
        */
-      helix?: { interactive?: string }
+      helix?: { family?: string; interactive?: string }
       members?: Array<{
         attribute?: string
         /** How the attribute turns a boolean property on, where it is one. */
@@ -81,7 +82,7 @@ export interface LintTag {
    * reader takes as unknown.
    */
   booleans?: string[]
-  /** The family, from the module's path. */
+  /** The family, from `@family` or else from the module's path. */
   family?: string | undefined
   hooks: string[]
   /**
@@ -137,7 +138,7 @@ export type Tier =
 export const lintOf = (manifest: ManifestSource, name: string): LintData => {
   const tags: Record<string, LintTag> = {}
   for (const module of manifest.modules ?? []) {
-    const family = /^src\/([^/]+)\//.exec(module.path ?? '')?.[1]
+    const folder = /^src\/([^/]+)\//.exec(module.path ?? '')?.[1]
     for (const declaration of module.declarations ?? []) {
       const tag = declaration.tagName
       if (!tag) {
@@ -146,7 +147,7 @@ export const lintOf = (manifest: ManifestSource, name: string): LintData => {
       const entry: LintTag = tags[tag] ?? {
         attributes: {},
         booleans: [],
-        family,
+        family: declaration.helix?.family ?? folder,
         hooks: [],
         parts: [],
         reflected: [],

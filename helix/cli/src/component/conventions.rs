@@ -25,6 +25,7 @@
 //! through `eachComponent`: the two pick out the same 271 classes across the four
 //! tiers.
 
+use std::collections::HashSet;
 use std::path::Path;
 
 use serde_json::Value;
@@ -129,6 +130,67 @@ fn say(into: &mut Vec<Finding>, file: &str, subject: &str, message: &str, detail
         file: file.to_owned(),
         message: format!("`{subject}` {message}"),
     });
+}
+
+/// Every tag a manifest declares.
+fn tags_in(manifest: &Value) -> HashSet<String> {
+    list(manifest, "modules")
+        .flat_map(|module| list(module, "declarations"))
+        .map(|declaration| text(declaration, "tagName"))
+        .filter(|tag| !tag.is_empty())
+        .map(str::to_owned)
+        .collect()
+}
+
+/// An element in the folder of a family whose root its package does not hold,
+/// with no `@family` to say it joins that family.
+///
+/// **The catalog places an element by its `@family`, and by its folder where
+/// there is none.** A folder that shares a name with a family another package
+/// holds the root of would join the element to that family by coincidence, so
+/// an element that means to join one says so: `helix-sandbox-editor` sits in
+/// `src/sandbox` of `@fusion.dev/helix-sandbox` and carries `@family sandbox`.
+fn joined(
+    declaration: &Value,
+    path: &str,
+    tags: &HashSet<String>,
+    file: &str,
+    into: &mut Vec<Finding>,
+) {
+    if text(declaration, "tagName").is_empty()
+        || declaration
+            .get("helix")
+            .and_then(|one| one.get("family"))
+            .is_some()
+    {
+        return;
+    }
+    let mut parts = path.split('/');
+    let (Some("src"), Some(family), Some(_), Some(_)) =
+        (parts.next(), parts.next(), parts.next(), parts.next())
+    else {
+        return;
+    };
+    let roots = [
+        format!("helix-{family}"),
+        format!("helix-headless-{family}"),
+    ];
+    if roots.iter().any(|root| tags.contains(root)) {
+        return;
+    }
+    say(
+        into,
+        file,
+        text(declaration, "name"),
+        &format!(
+            "sits in the `{family}` family's folder, and its package holds neither `{}` nor `{}`",
+            roots[0], roots[1]
+        ),
+        &format!(
+            "Add `@family {family}` to its doc block to join the family another package holds \
+             the root of, or move it to a folder of its own family."
+        ),
+    );
 }
 
 /// What one component is missing, as findings against the file it lives in.
@@ -289,6 +351,7 @@ pub fn run(context: &Context) -> Report {
         /* A module's path is its package's, so a finding names the file from
         the repository instead, which is where somebody goes to fix it. */
         let package = tier.parent().unwrap_or(Path::new(""));
+        let tags = tags_in(manifest);
         for module in list(manifest, "modules") {
             let file = context.relative(&package.join(text(module, "path")));
             for declaration in list(module, "declarations") {
@@ -302,6 +365,13 @@ pub fn run(context: &Context) -> Report {
                 }
                 checked += 1;
                 judge(declaration, &file, &mut findings);
+                joined(
+                    declaration,
+                    text(module, "path"),
+                    &tags,
+                    &file,
+                    &mut findings,
+                );
             }
         }
     }
@@ -318,7 +388,7 @@ pub fn run(context: &Context) -> Report {
 mod tests {
     use serde_json::{json, Value};
 
-    use super::judge;
+    use super::{joined, judge};
 
     /// A component carrying everything, which each case takes one thing from.
     fn documented(over: &Value) -> Value {
@@ -389,6 +459,31 @@ mod tests {
             "tier": "styled", "part": "Item",
         }});
         assert!(!says(&part, "`@category`"));
+    }
+
+    /// An element in a family's folder joins it by `@family` where its package
+    /// holds no root of that family, and by its folder where the package does.
+    #[test]
+    fn an_element_in_a_family_another_package_holds_names_it() {
+        let editor =
+            json!({ "helix": {}, "name": "HelixSandboxEditor", "tagName": "helix-sandbox-editor" });
+        let path = "src/sandbox/editor/sandbox-editor.ts";
+        let messages = |declaration: &Value, tags: &[&str]| {
+            let mut found = Vec::new();
+            let tags = tags.iter().map(|one| (*one).to_owned()).collect();
+            joined(declaration, path, &tags, "src/x.ts", &mut found);
+            found
+                .into_iter()
+                .map(|one| one.message)
+                .collect::<Vec<String>>()
+        };
+        assert_eq!(
+            messages(&editor, &["helix-sandbox-editor"]),
+            ["`HelixSandboxEditor` sits in the `sandbox` family's folder, and its package holds neither `helix-sandbox` nor `helix-headless-sandbox`"]
+        );
+        let named = json!({ "helix": { "family": "sandbox" }, "name": "HelixSandboxEditor", "tagName": "helix-sandbox-editor" });
+        assert!(messages(&named, &["helix-sandbox-editor"]).is_empty());
+        assert!(messages(&editor, &["helix-sandbox", "helix-sandbox-editor"]).is_empty());
     }
 
     #[test]

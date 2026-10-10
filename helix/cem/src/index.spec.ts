@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { afterManifest, dependenciesOf } from './index.js'
+import { afterManifest, dependenciesOf, peersOf } from './index.js'
 import type { Plugin } from './types.js'
 
 describe('afterManifest', () => {
@@ -68,5 +68,30 @@ describe('dependenciesOf', () => {
 
   test('a package that depends on no manifest is built against none', () => {
     expect([...dependenciesOf(at('core')).keys()]).toEqual([])
+  })
+})
+
+/* `@fusion.dev/helix-sandbox` peers `@fusion.dev/helix`, which holds the
+   Sandbox family's root, so its `api.json` names the package with the
+   family's facts. */
+describe('peersOf', () => {
+  test('reads the manifests of the Helix packages a package peers, and only those built', () => {
+    const root = mkdtempSync(join(tmpdir(), 'helix-cem-'))
+    const write = (directory: string, manifest: object): void => {
+      mkdirSync(join(root, directory), { recursive: true })
+      writeFileSync(join(root, directory, 'package.json'), JSON.stringify(manifest))
+    }
+    try {
+      write('.', {
+        peerDependencies: { '@fusion.dev/helix': '1', '@fusion.dev/helix-map': '1', lit: '3' },
+      })
+      write('node_modules/@fusion.dev/helix', { customElements: 'custom-elements.json' })
+      writeFileSync(join(root, 'node_modules/@fusion.dev/helix/custom-elements.json'), '{}')
+      write('node_modules/@fusion.dev/helix-map', { customElements: 'custom-elements.json' })
+      write('node_modules/lit', { customElements: 'custom-elements.json' })
+      expect([...peersOf(root).keys()]).toEqual(['@fusion.dev/helix'])
+    } finally {
+      rmSync(root, { force: true, recursive: true })
+    }
   })
 })

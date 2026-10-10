@@ -237,6 +237,13 @@ export interface HelixMetadata {
   documentation?: string
 
   /**
+   * The family the element joins, from `@family`, where the package it ships
+   * in holds no root of that family: `sandbox` on `helix-sandbox-editor`. The
+   * catalog reads it before the element's folder.
+   */
+  family?: string
+
+  /**
    * The family's examples, from the `.examples` folder beside its source.
    *
    * The list and the prose, not the markup: the HTML and CSS stay on disk for

@@ -17,6 +17,7 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./api.json": "./api.json",
     "./code-block": {
       "types": "./dist/code-block/index.d.ts",
       "default": "./dist/code-block/index.js"
@@ -26,19 +27,24 @@
       "types": "./dist/editor/index.d.ts",
       "default": "./dist/editor/index.js"
     },
+    "./examples.json": "./examples.json",
     "./highlight": {
       "types": "./dist/highlight/index.d.ts",
       "default": "./dist/highlight/index.js"
     },
     "./jsx": "./types/jsx.d.ts",
+    "./lint.json": "./lint.json",
     "./package.json": "./package.json",
     "./svelte": "./types/svelte.d.ts",
     "./vue": "./types/vue.d.ts",
     "./words": "./types/words.d.ts"
   },
   "files": [
+    "api.json",
     "custom-elements.json",
     "dist",
+    "examples.json",
+    "lint.json",
     "types"
   ],
   "customElements": "custom-elements.json",
@@ -75,6 +81,7 @@
     "@lezer/javascript": "^1.5.4"
   },
   "devDependencies": {
+    "@fusion.dev/helix": "workspace:*",
     "@fusion.dev/helix-cem": "workspace:*",
     "@fusion.dev/helix-testing": "workspace:*",
     "@fusion.dev/scripts": "workspace:*",
@@ -95,7 +102,13 @@
     "web-components"
   ],
   "peerDependencies": {
+    "@fusion.dev/helix": "workspace:*",
     "lit": "^3.2.1"
+  },
+  "peerDependenciesMeta": {
+    "@fusion.dev/helix": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "restricted"

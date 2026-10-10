@@ -11,7 +11,7 @@
  * files hold the markup. Nothing about a component is written down here, which
  * is what keeps a site from drifting away from the library it documents.
  */
-import { displayName, place, startCase, tierOf } from './naming.js'
+import { displayName, familyOf, startCase, tierOf } from './naming.js'
 import type { HelixDeclaration, HelixManifest, HelixMember } from './types.js'
 
 /**
@@ -92,8 +92,8 @@ export interface Element {
   methods: ApiMember[]
   /**
    * The package that publishes the element, from its manifest: a tier's, or
-   * another package's whose element is placed in the family by its folder,
-   * such as `helix-sandbox-editor` from `@fusion.dev/helix-sandbox`.
+   * another package's whose element names the family with `@family`, such as
+   * `helix-sandbox-editor` from `@fusion.dev/helix-sandbox`.
    */
   package: string
   /** Role within the family. `Root` for its primary element. */
@@ -235,6 +235,14 @@ export interface Family {
    */
   imports: string[]
   label: string
+  /**
+   * The package that holds the family's root, `helix-<slug>` or
+   * `helix-headless-<slug>`, and so supplies its facts: the summary,
+   * description, status, since, category, aliases, documentation, and source.
+   * Empty where no package read holds the root, and the facts are empty with
+   * it.
+   */
+  package: string
   since: string
   slug: string
   /** The family's source directory, relative to the repository root. */
@@ -529,10 +537,16 @@ const entriesOf = (manifest: HelixManifest): Map<string, string> => {
  * Every family across the given manifests, alphabetical, each with its elements
  * and examples.
  *
- * The family a declaration belongs to comes from where its file is rather than
- * from its tag name, which is the same reasoning `place()` carries for the
- * reference: `helix-button-group` is one family and `helix-tab` is a part
- * of another, and nothing in the name says which.
+ * The family a declaration belongs to comes from its `@family` or from where
+ * its file is, never from its tag name, which is the same reasoning `place()`
+ * carries for the reference: `helix-button-group` is one family and
+ * `helix-tab` is a part of another, and nothing in the name says which.
+ *
+ * **One family from many packages, and the same answer in any order.** Every
+ * package adds its elements, and only the package holding the family's root
+ * supplies the family's facts, so a part another package publishes cannot
+ * restate what the family is. Nothing here depends on which manifest was read
+ * first: the facts come from the root by its tag, and the elements are sorted.
  */
 export const catalog = (
   manifests: HelixManifest[],
@@ -543,9 +557,9 @@ export const catalog = (
   /* Where each element is imported from, which the reference's usage shows. */
   const entryOf = new Map<HelixDeclaration, string>()
   /* **The package from the manifest, and the tier only where it names none.**
-     A family can hold an element another package publishes, placed there by
-     its folder: `helix-sandbox-editor` is the Sandbox family's Editor, and a
-     specifier read off its tier would import it from `@fusion.dev/helix`. */
+     A family can hold an element another package publishes, named there by
+     its `@family`: `helix-sandbox-editor` is the Sandbox family's Editor, and
+     a specifier read off its tier would import it from `@fusion.dev/helix`. */
   const packageOf = new Map<HelixDeclaration, string>()
   for (const manifest of manifests) {
     const entries = entriesOf(manifest)
@@ -554,7 +568,7 @@ export const catalog = (
         if (!declaration.tagName) {
           continue
         }
-        const { family } = place(module.path)
+        const family = familyOf(declaration, module.path)
         if (!family) {
           continue
         }
@@ -571,12 +585,6 @@ export const catalog = (
 
   const families = [...byFamily.entries()]
     .map(([slug, entries]) => {
-      /* The family's own description comes from its styled root: the element
-         whose tag is the family name, rather than a part of it. */
-      const root =
-        entries.find((entry) => entry.tagName === `helix-${slug}`) ??
-        (entries[0] as HelixDeclaration)
-
       /* **Aliases come from both roots, and every other field from the styled
          one.** An alias is a word somebody searches for, a fact about the
          family rather than about a tier, and fourteen families declare theirs
@@ -594,11 +602,18 @@ export const catalog = (
       const roots = [named(`helix-${slug}`), named(`helix-${HEADLESS}-${slug}`)].filter(
         (entry) => entry !== undefined,
       )
+      /* **The family's facts come from its root, and from no other element.**
+         The first declaration read stood in where there was no styled root,
+         which gave the headless tier's `api.json` a part's summary for 26
+         families (measured October 10, 2026), and gave a package that adds one
+         element to a family the facts of that element. Where no manifest read
+         holds the root, the facts are empty. */
+      const root = roots[0]
 
       return {
         aliases: [...new Set(roots.flatMap((entry) => entry.helix?.aliases ?? []))],
-        category: root.helix?.category ?? '',
-        documentation: root.helix?.documentation ?? '',
+        category: root?.helix?.category ?? '',
+        documentation: root?.helix?.documentation ?? '',
         elements: entries
           .map((entry) => ({
             attributes: members(entry.attributes),
@@ -644,15 +659,16 @@ export const catalog = (
               Number(a.tier === 'headless') - Number(b.tier === 'headless') ||
               a.tagName.localeCompare(b.tagName),
           ),
-        examples: examplesOf(slug, root.helix, examples),
+        examples: examplesOf(slug, root?.helix, examples),
         imports: importsOf(slug, entries),
         label: startCase(slug),
+        package: root ? published(root) : '',
         replaces: [...new Set(roots.flatMap((entry) => entry.helix?.replaces ?? []))],
-        since: root.helix?.since ?? '',
+        since: root?.helix?.since ?? '',
         slug,
-        source: root.helix?.source ?? '',
-        status: root.helix?.status ?? '',
-        summary: root.summary ?? '',
+        source: root?.helix?.source ?? '',
+        status: root?.helix?.status ?? '',
+        summary: root?.summary ?? '',
         usage: { headless: [], styled: [] },
       }
     })
@@ -759,3 +775,53 @@ const importsOf = (slug: string, declarations: readonly HelixDeclaration[]): str
 /** The family of a given slug, from an already-built catalog. */
 export const findInCatalog = (families: Family[], slug: string): Family | undefined =>
   families.find((family) => family.slug === slug)
+
+/**
+ * A family as a package publishes it that holds none of the family's roots:
+ * the elements it adds and the examples it ships, under the family's slug.
+ */
+export interface Contribution {
+  /** Marks a family this package adds elements to and does not hold the root of. */
+  contributes: true
+  elements: Element[]
+  examples: Example[]
+  label: string
+  /**
+   * The package that holds the family's root and supplies its facts, where
+   * one this package was built against holds it.
+   */
+  package?: string
+  slug: string
+}
+
+/**
+ * The families one package publishes, from a catalog read with the packages it
+ * is built against: each with only the elements the package itself publishes.
+ *
+ * **Whole where the package holds the root, and a contribution elsewhere.**
+ * `@fusion.dev/helix-sandbox` publishes `helix-sandbox-editor` in the Sandbox
+ * family, whose root `@fusion.dev/helix` holds, so its `api.json` lists the
+ * editor, marks the family `contributes`, and names `@fusion.dev/helix` as the
+ * package with the facts. Restating the facts there gave a reader two answers
+ * about one family, and the one read from the editor was wrong.
+ */
+export const publishedBy = (families: Family[], name: string): (Contribution | Family)[] =>
+  families.flatMap((family): (Contribution | Family)[] => {
+    const elements = family.elements.filter((element) => element.package === name)
+    if (elements.length === 0) {
+      return []
+    }
+    if (family.package === name) {
+      return [{ ...family, elements }]
+    }
+    return [
+      {
+        contributes: true,
+        elements,
+        examples: family.examples,
+        label: family.label,
+        ...(family.package ? { package: family.package } : {}),
+        slug: family.slug,
+      },
+    ]
+  })

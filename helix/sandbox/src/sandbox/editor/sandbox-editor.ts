@@ -103,6 +103,7 @@ const given = Annotation.define<boolean>()
  * @since 0.1.0
  * @status experimental
  * @category tooling
+ * @family sandbox
  * @aliases Code editor, Source pane
  * @documentation https://fusion.dev/helix/components/sandbox
  *

@@ -1,10 +1,11 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  familyOf as catalogFamilyOf,
   place as catalogPlace,
   startCase as catalogStartCase,
   type HelixManifest,
 } from '@fusion.dev/helix-cem'
-import { place, reference, referenceFamilies, startCase } from './reference.js'
+import { familyOf, place, reference, referenceFamilies, startCase } from './reference.js'
 
 /**
  * A manifest small enough to read, carrying one of everything the renderer
@@ -77,6 +78,9 @@ describe('place', () => {
   test('and names a family and a part as the catalog does', () => {
     for (const path of ['src/qr-code/root/qr-code-root.ts', 'other/thing.ts', undefined]) {
       expect(place(path)).toEqual(catalogPlace(path))
+      for (const declaration of [{}, { helix: { family: 'sandbox' } }]) {
+        expect(familyOf(declaration, path)).toBe(catalogFamilyOf(declaration, path))
+      }
     }
     for (const slug of [
       'api-key',
@@ -96,6 +100,24 @@ describe('referenceFamilies', () => {
     const families = referenceFamilies(manifest)
     expect(families.map((entry) => entry.family)).toEqual(['accordion'])
     expect(families[0]?.parts.map((entry) => entry.part)).toEqual(['root', 'item'])
+  })
+
+  /* `helix-sandbox-editor` ships in another package and joins the Sandbox
+     family with `@family`, as its Editor part. */
+  test('puts an element in the family its @family names, as the part its folder names', () => {
+    const families = referenceFamilies({
+      modules: [
+        ...(manifest.modules ?? []),
+        {
+          declarations: [
+            { helix: { family: 'accordion' }, name: 'HelixPanel', tagName: 'helix-panel' },
+          ],
+          path: 'src/panels/panel/panel.ts',
+        },
+      ],
+    })
+    expect(families.map((entry) => entry.family)).toEqual(['accordion'])
+    expect(families[0]?.parts.map((entry) => entry.part)).toEqual(['root', 'item', 'panel'])
   })
 
   test('skips declarations with no tag and modules outside src', () => {

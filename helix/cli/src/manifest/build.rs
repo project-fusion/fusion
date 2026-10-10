@@ -886,6 +886,16 @@ fn replaced(selector: &str) -> bool {
     tag_ok && rest_ok
 }
 
+/// Whether `word` is a family's slug: lowercase words joined by hyphens.
+fn slug(word: &str) -> bool {
+    word.starts_with(|one: char| one.is_ascii_lowercase())
+        && !word.ends_with('-')
+        && !word.contains("--")
+        && word
+            .chars()
+            .all(|one| one.is_ascii_lowercase() || one.is_ascii_digit() || one == '-')
+}
+
 fn helix(one: &Declared, path: &str, tier: &str, package: &Path, given: &str) -> Option<Value> {
     let documented = &one.documented;
     let is_component = one.is_element;
@@ -959,6 +969,16 @@ fn helix(one: &Declared, path: &str, tier: &str, package: &Path, given: &str) ->
     if !grouped.is_empty() {
         block.insert("groups".to_owned(), json!(grouped));
     }
+    /* **The family an element joins, named where its folder cannot say it.**
+    `helix-sandbox-editor` ships in `@fusion.dev/helix-sandbox` and is a part of
+    the Sandbox family, whose root ships in `@fusion.dev/helix`. A folder of the
+    same name in another package would say so by coincidence, so the catalog,
+    the lint data, and the reference read `@family` first and the folder only
+    where there is none. A word that is not a slug is dropped. */
+    let declared = single("family").filter(|one| slug(one));
+    if let Some(family) = &declared {
+        block.insert("family".to_owned(), json!(family));
+    }
     if is_component {
         block.insert("tier".to_owned(), json!(tier));
         /* **The render graph, published rather than derived and dropped.** A
@@ -1007,6 +1027,7 @@ fn helix(one: &Declared, path: &str, tier: &str, package: &Path, given: &str) ->
                 }
             }
             let prefix = if tier == "headless" { "Base" } else { "" };
+            let family = declared.as_deref().unwrap_or(family);
             block.insert(
                 "group".to_owned(),
                 json!(format!("{prefix}{}", pascal(family))),

@@ -1456,6 +1456,20 @@ exception and is a rule about the question rather than about the tag. It answers
 what a component is for, and `Tabs.Tab` has no answer to that separate from
 `Tabs`: giving it one puts a part in the gallery beside its own root.
 
+**`@family` names the family an element joins from another package.** An
+element is in the family its folder names, `src/<family>/<part>/`, while its
+package holds that family's root. Where the root ships in another package, the
+element says which family it joins: `helix-sandbox-editor` ships in
+`@fusion.dev/helix-sandbox`, the Sandbox family's root ships in
+`@fusion.dev/helix`, and the editor carries `@family sandbox`. The catalog, the
+lint data, and the reference read `@family` first, and the folder still names
+the part. `helix component`'s `conventions` rule refuses an element in a
+family's folder when its package holds neither that family's root nor a
+`@family`, since the folder alone would join it to a family by sharing a name.
+The family's summary, status, since, category, aliases, and source come from
+its root alone, so an element that joins one keeps its own `@status` and adds
+nothing to the family's facts.
+
 **The tag is `@aliases`.** `@alias` is not read by the metadata plugin, and
 `@category` is required: omitting it fails the build.
 
@@ -1466,12 +1480,12 @@ badge a docs page or warn a consumer.
 **The tags come in one order, and the lists inside them sort by name.**
 
 ```
-@summary  @description  @since  @status  @category  @groups  @aliases
-@documentation  @slot  @event  @csspart  @cssproperty  @cssstate
+@summary  @description  @since  @status  @category  @family  @groups
+@aliases  @documentation  @slot  @event  @csspart  @cssproperty  @cssstate
 ```
 
 One blank line between groups and none between the metadata tags, which is what
-makes those six read as a block rather than six statements. `@slot`, `@event`,
+makes them read as one block. `@slot`, `@event`,
 `@csspart`, `@cssproperty` and `@cssstate` sort by name within their own group,
 and the default slot, written with no name at all, sorts first: it is the slot a
 component has before it has any other.
