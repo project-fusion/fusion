@@ -22,7 +22,7 @@ mod tools;
 
 use fusion_rules::error::{Failure, Outcome};
 use fusion_rules::exit::Code;
-use std::io::{BufRead, Write};
+use std::io::{BufRead, IsTerminal, Write};
 use std::path::PathBuf;
 
 /// The handshake revisions this speaks, newest first.
@@ -62,6 +62,19 @@ pub const INSTRUCTIONS: &str = "Helix is a library of web components. These tool
 - After writing, call helix_check with the files you changed, or with a snippet before you write it, and fix every finding.\n\
 - With the page running, call helix_check_page with its address, and fix every finding.";
 
+/// The line printed on stderr where a person starts the server in a terminal,
+/// and `None` where a client starts it with its requests on a pipe.
+///
+/// **A server in a terminal looks like a command that hangs.** It prints
+/// nothing and reads requests nobody will type, so a person who ran
+/// `helix mcp` to see what it does gets a blinking cursor. Stderr, because
+/// stdout is the protocol's, and a client reads every line of it.
+fn hint(terminal: bool) -> Option<&'static str> {
+    terminal.then_some(
+        "helix mcp: an MCP server for a client to start, reading requests on stdin. Add it to a client with `helix mcp init --client <client>`, or press Ctrl-C to stop.",
+    )
+}
+
 /// Serves until the client closes the pipe.
 ///
 /// # Errors
@@ -76,6 +89,9 @@ pub const INSTRUCTIONS: &str = "Helix is a library of web components. These tool
 /// message is still a client and a server that exits takes every later call with
 /// it.
 pub fn run() -> Outcome<Code> {
+    if let Some(line) = hint(std::io::stdin().is_terminal()) {
+        eprintln!("{line}");
+    }
     let input = std::io::stdin().lock();
     let mut output = std::io::stdout().lock();
 
@@ -282,4 +298,17 @@ fn error(id: &serde_json::Value, code: i64, message: &str) -> String {
         "jsonrpc": "2.0",
     })
     .to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::hint;
+
+    #[test]
+    fn a_terminal_is_told_what_the_server_is_and_a_pipe_is_not() {
+        let said = hint(true).expect("a line for a terminal");
+        assert!(said.contains("helix mcp init --client"), "{said}");
+        assert!(!said.contains('\n'), "one line: {said}");
+        assert_eq!(hint(false), None);
+    }
 }

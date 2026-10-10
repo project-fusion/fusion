@@ -20,10 +20,10 @@
  * consumer has: after the target, so a checkout runs what it built rather than
  * a binary a release once placed. A consumer's target is never read: a `helix`
  * there is another program or an old build of ours, and the installed one is
- * the release they asked for. Then whatever is on `PATH`, named out loud in a
- * checkout, because a binary from somewhere else is about to answer questions
- * about this tree. Only then a build, and only in this repository, the one
- * place there is a crate to build.
+ * the release they asked for. Then whatever is on `PATH` that says it is this
+ * command line, named out loud in a checkout, because a binary from somewhere
+ * else is about to answer questions about this tree. Only then a build, and
+ * only in this repository, the one place there is a crate to build.
  *
  * **A build is a fallback and not the plan.** It happens once, prints that it
  * is happening, and a CI pipeline that has already run `cargo build` never
@@ -99,7 +99,7 @@ const hasCargo = () => spawnSync('cargo', ['--version'], { stdio: 'ignore' }).st
 const SELF = realpathSync(fileURLToPath(import.meta.url))
 
 /**
- * The first `helix` on `PATH`, resolved through its symlinks, or undefined.
+ * Each `helix` on `PATH`, in order, resolved through its symlinks.
  *
  * **Walked rather than spawned, because the spawn is the bug.** Probing with
  * `spawnSync('helix', ['--version'])` asks `PATH` to answer, and under
@@ -114,8 +114,9 @@ const SELF = realpathSync(fileURLToPath(import.meta.url))
  * trap is set for a fresh clone, which is what CI and a new contributor both
  * are.
  */
-const onPath = () => {
+function* onPath() {
   const extensions = process.platform === 'win32' ? ['', '.exe', '.cmd', '.bat'] : ['']
+  const seen = new Set()
   for (const directory of (process.env.PATH ?? '').split(delimiter)) {
     if (directory === '') {
       continue
@@ -138,13 +139,47 @@ const onPath = () => {
          says nothing about a real one later in it, and returning here would
          make an installed binary invisible whenever a checkout was in front of
          it. */
-      if (real === SELF) {
+      if (real === SELF || seen.has(real)) {
         continue
       }
-      return real
+      seen.add(real)
+      yield real
     }
   }
-  return undefined
+}
+
+/**
+ * Set while this shim runs a `PATH` entry with `--version --json`, so a copy
+ * of this shim run that way uses only the binary it has installed and never
+ * searches `PATH` itself: two copies with no binary between them would
+ * otherwise run each other without end.
+ */
+const PROBE = 'HELIX_SHIM_PROBE'
+
+/**
+ * Whether `binary` is this command line, read from what it prints for
+ * `--version --json`.
+ *
+ * **The name proves nothing.** On Arch Linux `helix` is the Helix text editor,
+ * and an old `cargo install` of this command line has none of the commands a
+ * project runs now, such as `scan`. This command line prints its package's
+ * name for `--version --json`. The editor exits with an error on `--json`, and
+ * an older build prints its plain version line. Measured 10 Oct 2026 on an
+ * Apple silicon laptop: 4 ms for this command line, and 2 ms for an old build.
+ * The timeout ends a program that never exits.
+ */
+const ours = (binary) => {
+  const asked = spawnSync(binary, ['--version', '--json'], {
+    encoding: 'utf8',
+    env: { ...process.env, [PROBE]: '1' },
+    stdio: ['ignore', 'pipe', 'ignore'],
+    timeout: 2_000,
+  })
+  try {
+    return JSON.parse(asked.stdout ?? '').package === '@fusion.dev/helix-cli'
+  } catch {
+    return false
+  }
 }
 
 /**
@@ -206,8 +241,14 @@ const run = (binary) => {
    features per selection, so alternating `-p fusion-helix-cli` with `--workspace`
    recompiled on every switch, about a second each, where asking for the same
    selection twice is 0.14s. `HELIX_BIN` still outranks everything, and a checkout
-   with no cargo falls through to whatever is already built. */
-if (process.env.HELIX_BIN === undefined && checkout && hasCargo()) {
+   with no cargo falls through to whatever is already built, as a probe from
+   another copy of this shim does: it waits two seconds for an answer. */
+if (
+  process.env.HELIX_BIN === undefined &&
+  process.env[PROBE] === undefined &&
+  checkout &&
+  hasCargo()
+) {
   const fresh = spawnSync('cargo', ['build', '--workspace', '--quiet'], {
     cwd: WORKSPACE,
     stdio: 'inherit',
@@ -227,9 +268,19 @@ if (found && existsSync(found)) {
   run(found)
 }
 
-/* `PATH`, which is what an installed binary looks like. Resolved rather than
-   probed: see `onPath`, where the probe this used to do is what recursed. */
-const installed = onPath()
+/* `PATH`, which is what an installed binary looks like, walked rather than
+   searched by a spawn: see `onPath`, where a spawn of `helix` recursed. Each
+   one found runs only once `ours` says it is this command line, and the
+   others are named below, where the run gives up. */
+const skipped = []
+let installed
+for (const candidate of process.env[PROBE] === undefined ? onPath() : []) {
+  if (ours(candidate)) {
+    installed = candidate
+    break
+  }
+  skipped.push(candidate)
+}
 if (installed) {
   /* **In a checkout, say which binary this is before running it.** Getting here
      means no `target/`, no platform package and no cargo, so what runs is
@@ -254,6 +305,21 @@ if (installed) {
   run(installed)
 }
 
+/** The `helix` binaries on `PATH` that are some other program, named. */
+const foreign = () => {
+  if (skipped.length === 0) {
+    return ''
+  }
+  const one = skipped.length === 1
+  return (
+    `\n\n  Not run, from PATH: ${skipped.map((path) => `\`${path}\``).join(', ')}.\n` +
+    `  ${one ? 'Its output' : 'The output of each'} for \`--version --json\` does not name\n` +
+    `  \`@fusion.dev/helix-cli\`, so ${one ? 'it is' : 'each is'} another program named helix, such\n` +
+    '  as the Helix text editor, or a build of this command line from before that\n' +
+    '  output.'
+  )
+}
+
 /* Installed from the registry, with no platform package for this machine. A
    build would be `cargo build` in somebody else's project, for a crate that is
    not in it. */
@@ -264,7 +330,7 @@ if (!checkout) {
       '  `@fusion.dev/helix-cli`, and it is not installed. Either this machine is not\n' +
       '  one there is a build for, or the install skipped optional dependencies\n' +
       '  (`--omit=optional`, `--no-optional`), in which case install again without it.\n' +
-      '  `HELIX_BIN` names a binary to run instead.',
+      `  \`HELIX_BIN\` names a binary to run instead.${foreign()}`,
   )
   process.exit(69)
 }
@@ -275,7 +341,7 @@ if (!hasCargo()) {
       `  Looked at: $HELIX_BIN, ${join(target, 'release', NAME)},\n` +
       `             ${join(target, 'debug', NAME)}, and \`${NAME}\` on PATH.\n\n` +
       '  Either install the binary, point `HELIX_BIN` at one, or install a Rust\n' +
-      '  toolchain so this can build it.',
+      `  toolchain so this can build it.${foreign()}`,
   )
   process.exit(69)
 }

@@ -461,11 +461,11 @@ Retried rather than serialized, because the fork that holds the handle belongs
 to a thread this test cannot see, and the window closes as soon as that child
 execs. Three tries at 50ms, and the error is still returned if it outlasts them,
 since a binary that is busy for 150ms is saying something else. */
-fn said(binary: &Path) -> String {
+fn asked(binary: &Path, args: &[&str]) -> Output {
     let mut attempt = 0;
-    let output = loop {
+    loop {
         let mut command = Command::new(binary);
-        command.arg("--version").env("NO_COLOR", "1");
+        command.args(args).env("NO_COLOR", "1");
         match command.output() {
             Ok(output) => break output,
             Err(error) if error.kind() == std::io::ErrorKind::ExecutableFileBusy && attempt < 3 => {
@@ -474,8 +474,12 @@ fn said(binary: &Path) -> String {
             }
             Err(error) => panic!("the binary runs: {error:?}"),
         }
-    };
-    out(&output).trim().to_owned()
+    }
+}
+
+/// What `--version` prints, through [`asked`].
+fn said(binary: &Path) -> String {
+    out(&asked(binary, &["--version"])).trim().to_owned()
 }
 
 #[test]
@@ -515,6 +519,37 @@ fn a_binary_with_nothing_to_read_reports_what_it_was_compiled_at() {
     ] {
         assert_eq!(said(&installed(name, manifest)), compiled, "{name}");
     }
+}
+
+/// `--version --json` names the package, which is how the npm shim tells this
+/// command line from another program called `helix` on `PATH`, such as the
+/// Helix text editor. `--version` alone stays the line a release checks.
+#[test]
+fn the_version_as_json_names_the_package() {
+    let platform = installed(
+        "json",
+        Some(r#"{ "name": "@fusion.dev/helix-cli-linux-x64", "version": "9.9.9-proof" }"#),
+    );
+    for question in [
+        ["--version", "--json"],
+        ["--json", "--version"],
+        ["-V", "--json"],
+    ] {
+        let output = asked(&platform, &question);
+        assert_eq!(code(&output), 0, "{question:?}");
+        let said: serde_json::Value =
+            serde_json::from_str(out(&output).trim()).expect("one JSON object");
+        assert_eq!(
+            said,
+            serde_json::json!({
+                "name": "helix",
+                "package": "@fusion.dev/helix-cli",
+                "version": "9.9.9-proof",
+            }),
+            "{question:?}"
+        );
+    }
+    assert_eq!(said(&platform), "helix 9.9.9-proof");
 }
 
 /// Discovery walks up, which is what lets a command run from anywhere in a tree.
