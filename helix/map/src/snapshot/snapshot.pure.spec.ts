@@ -238,13 +238,20 @@ const tileOf = (): Uint8Array => {
   return pbf.finish()
 }
 
-/** A tile server of one tile, the one over null island at zoom 14, which answers what it is asked. */
-const serving = (asked: string[]): typeof fetch =>
+/**
+ * A tile server of one tile, the one over null island at zoom 14, which
+ * answers what it is asked, and names `attribution` as its credit where given.
+ */
+const serving = (asked: string[], attribution?: string): typeof fetch =>
   (async (input: string | URL | Request) => {
     const url = String(input)
     asked.push(url)
     if (url === 'https://tiles.test/tiles.json') {
-      return Response.json({ maxzoom: 14, tiles: ['https://tiles.test/{z}/{x}/{y}.pbf'] })
+      return Response.json({
+        attribution,
+        maxzoom: 14,
+        tiles: ['https://tiles.test/{z}/{x}/{y}.pbf'],
+      })
     }
     if (url === 'https://tiles.test/14/8192/8191.pbf') {
       return new Response(new Uint8Array(tileOf()))
@@ -257,7 +264,7 @@ describe('mapSnapshot', () => {
 
   test('draws the tiles in view in the page’s tokens, water under roads, a road as wide as the style draws it', async () => {
     const asked: string[] = []
-    const svg = await mapSnapshot(view, {
+    const { picture: svg } = await mapSnapshot(view, {
       fetch: serving(asked),
       tiles: 'https://tiles.test/tiles.json',
     })
@@ -284,11 +291,11 @@ describe('mapSnapshot', () => {
   })
 
   test('is nothing where the tiles cannot be read', async () => {
-    const svg = await mapSnapshot(view, {
+    const snapshot = await mapSnapshot(view, {
       fetch: serving([]),
       tiles: 'https://tiles.test/missing.json',
     })
-    expect(svg).toBe('')
+    expect(snapshot).toEqual({ credit: [], markup: '', picture: '' })
   })
 
   /* A snapshot missing a tile looks finished and is not, and a tile that is
@@ -307,7 +314,7 @@ describe('mapSnapshot', () => {
       fetch: answering(() => new Response('<html>Too many requests</html>')),
       tiles: 'https://tiles.test/tiles.json',
     })
-    expect([failed, garbled]).toEqual(['', ''])
+    expect([failed.markup, garbled.markup]).toEqual(['', ''])
   })
 
   test('is nothing where a request takes longer than it is given', async () => {
@@ -316,33 +323,82 @@ describe('mapSnapshot', () => {
       String(input).endsWith('tiles.json')
         ? Response.json({ maxzoom: 14, tiles: ['https://tiles.test/{z}/{x}/{y}.pbf'] })
         : new Promise<Response>(() => {})) as typeof fetch
-    const svg = await mapSnapshot(view, {
+    const { markup } = await mapSnapshot(view, {
       fetch: hanging,
       tiles: 'https://tiles.test/tiles.json',
       timeout: 50,
     })
-    expect(svg).toBe('')
+    expect(markup).toBe('')
   })
 
   test('writes numbers into its markup and nothing else', async () => {
-    const svg = await mapSnapshot(
+    const { markup } = await mapSnapshot(
       { ...view, width: '400" onload="alert(1)' as unknown as number },
       { fetch: serving([]), tiles: 'https://tiles.test/tiles.json' },
     )
-    expect(svg).toBe('')
+    expect(markup).toBe('')
     const drawn = await mapSnapshot(
       { ...view, height: '300' as unknown as number },
       { fetch: serving([]), tiles: 'https://tiles.test/tiles.json' },
     )
-    expect(drawn).toContain('height="300"')
+    expect(drawn.picture).toContain('height="300"')
   })
 
   /* Tiles overlap at their edges, and even-odd emptied every place two covered. */
   test('fills overlapping shapes whole', async () => {
-    const svg = await mapSnapshot(view, {
+    const { picture } = await mapSnapshot(view, {
       fetch: serving([]),
       tiles: 'https://tiles.test/tiles.json',
     })
-    expect(svg).not.toContain('evenodd')
+    expect(picture).not.toContain('evenodd')
+  })
+
+  /* A page that keeps only the snapshot, its script slow or off, showed a
+     map with no credit, which most tile licenses require wherever it shows. */
+  test('carries the credit its tiles name, written in the frame’s attribution slot', async () => {
+    const snapshot = await mapSnapshot(view, {
+      fetch: serving(
+        [],
+        '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
+      ),
+      tiles: 'https://tiles.test/tiles.json',
+    })
+    expect(snapshot.credit).toEqual([
+      { href: 'https://openfreemap.org', text: 'OpenFreeMap' },
+      { text: ' ' },
+      { href: 'https://www.openmaptiles.org/', text: '© OpenMapTiles' },
+      { text: ' Data from ' },
+      { href: 'https://www.openstreetmap.org/copyright', text: 'OpenStreetMap' },
+    ])
+    const link = (href: string, text: string): string =>
+      `<a data-link="quiet" href="${href}" rel="noopener noreferrer" target="_blank">${text}</a>`
+    expect(snapshot.markup).toBe(
+      `${snapshot.picture}<span data-helix-map-credit slot="attribution">${link('https://openfreemap.org', 'OpenFreeMap')} ${link('https://www.openmaptiles.org/', '© OpenMapTiles')} Data from ${link('https://www.openstreetmap.org/copyright', 'OpenStreetMap')}</span>`,
+    )
+    expect(snapshot.picture).not.toContain('attribution')
+  })
+
+  test('writes a credit as words and web links, and nothing that runs', async () => {
+    const { credit, markup } = await mapSnapshot(view, {
+      fetch: serving(
+        [],
+        '<img src=x onerror="alert(1)"><a href="javascript:alert(1)">Tiles</a> &amp; <b title="a>b">"data"</b>',
+      ),
+      tiles: 'https://tiles.test/tiles.json',
+    })
+    expect(credit).toEqual([{ text: 'Tiles' }, { text: ' & ' }, { text: '"data"' }])
+    expect(markup).toContain(
+      '<span data-helix-map-credit slot="attribution">Tiles &#38; &#34;data&#34;</span>',
+    )
+    expect(markup).not.toMatch(/<img|<b|javascript:|onerror/)
+  })
+
+  test('carries no credit where its tiles name none', async () => {
+    const snapshot = await mapSnapshot(view, {
+      fetch: serving([]),
+      tiles: 'https://tiles.test/tiles.json',
+    })
+    expect(snapshot.credit).toEqual([])
+    expect(snapshot.markup).toBe(snapshot.picture)
   })
 })

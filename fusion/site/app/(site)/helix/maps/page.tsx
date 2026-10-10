@@ -168,7 +168,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
       <MapsHero
         painted={painted}
         sent={sent}
-        snapshots={wide && narrow ? { narrow, wide } : undefined}
+        snapshots={wide.picture && narrow.picture ? { narrow, wide } : undefined}
       />
       {/* **One field behind every band**, the landing page's, so the glass
           the cards are made of has something to show through it. */}

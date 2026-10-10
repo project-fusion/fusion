@@ -4,7 +4,9 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import type { HelixActivateEvent, HelixMap } from '@fusion.dev/helix'
 import { colorsReady, connectMap, fontReady, mapFontFrom } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
+import type { MapSnapshot } from '@fusion.dev/helix-map/snapshot'
 import { useEffect, useRef, useState } from 'react'
+import { MapCredit } from '@/components/map-credit/map-credit'
 import { MAP_FAILED } from '@/content/maps/maps'
 import { AUSTIN_PLACES, POINTS_VIEW } from '@/content/maps/points'
 import { loadMapLibre } from '@/utils/maplibre/maplibre'
@@ -40,9 +42,10 @@ export function MapsPoints() {
   /* Said in the map's footer, where a failed load would leave an empty box. */
   const [failed, setFailed] = useState(false)
   const [pressed, setPressed] = useState('')
-  /* The map drawn on the server at `POINTS_VIEW`, shown until MapLibre has
-     drawn, and whether asking for it is over, however it went. */
-  const [snapshot, setSnapshot] = useState('')
+  /* The map drawn on the server at `POINTS_VIEW` and the tiles' credit,
+     shown until MapLibre has drawn, and whether asking for it is over,
+     however it went. */
+  const [snapshot, setSnapshot] = useState<Pick<MapSnapshot, 'credit' | 'picture'>>()
   const [asked, setAsked] = useState(false)
 
   useEffect(() => {
@@ -56,11 +59,15 @@ export function MapsPoints() {
         if (entry?.isIntersecting) {
           near.disconnect()
           fetch(SNAPSHOT)
-            .then((answer) => (answer.ok ? answer.text() : ''))
-            .catch(() => '')
-            .then((svg) => {
+            .then((answer) =>
+              answer.ok
+                ? (answer.json() as Promise<Pick<MapSnapshot, 'credit' | 'picture'>>)
+                : undefined,
+            )
+            .catch(() => undefined)
+            .then((drawn) => {
               if (live) {
-                setSnapshot(svg)
+                setSnapshot(drawn)
                 setAsked(true)
               }
             })
@@ -149,15 +156,18 @@ export function MapsPoints() {
             {MAP_FAILED}
           </helix-text>
         ) : null}
-        {/* The streets before the map has drawn them; the points come with
-            the map. */}
-        {snapshot ? (
-          <div
-            className={styles.mapsSnapshot}
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: an SVG this site drew on its server from map tiles
-            dangerouslySetInnerHTML={{ __html: snapshot }}
-            data-helix-map-snapshot=""
-          />
+        {/* The streets before the map has drawn them, and the tiles' credit
+            in the frame's credit strip; the points come with the map. */}
+        {snapshot?.picture ? (
+          <>
+            <div
+              className={styles.mapsSnapshot}
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: an SVG this site drew on its server from map tiles
+              dangerouslySetInnerHTML={{ __html: snapshot.picture }}
+              data-helix-map-snapshot=""
+            />
+            <MapCredit credit={snapshot.credit} />
+          </>
         ) : null}
         <helix-map-points
           cluster

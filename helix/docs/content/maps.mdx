@@ -217,7 +217,7 @@ const view = {
   zoom: 14,
 }
 const snapshot = await mapSnapshot(view)
-// Inside helix-map, after <div id="map"></div>, write the snapshot's markup.
+// Inside helix-map, after <div id="map"></div>, write snapshot.markup.
 ```
 
 Give MapLibre the same `center`, `zoom`, `pitch`, and `bearing`, and the snapshot
@@ -225,19 +225,55 @@ lines up with the map that replaces it. `width` and `height` are the box it is
 drawn for, and a smaller box shows its middle. A snapshot draws the land, water,
 parks, buildings, and roads, and leaves the labels to MapLibre. Its colors are
 your theme's tokens, so it is light or dark with the page and follows a theme
-change. It resolves to an empty string when any tile it needs cannot be read
+change. Its `markup` is an empty string when any tile it needs cannot be read
 in time, so a snapshot is whole or absent and the map draws in its place. Each
 request is given `timeout` milliseconds, 3000 by default. Cache only a snapshot
-that is not empty.
+whose `markup` is not empty.
 
 A snapshot reads OpenFreeMap's tiles from your server by default. Pass the
 `tiles` you give `mapLibreStyle` as `mapSnapshot(view, { tiles })` to read
 your own.
 
-In a framework that renders the markup for you, such as React, put the snapshot
+**The snapshot carries the map credit.** Most tile licenses require the credit
+wherever the map is shown, including before MapLibre loads and on a page that
+never loads it. `markup` is the picture followed by the credit your tiles
+name, in a `<span slot="attribution">` marked `data-helix-map-credit`, so the
+frame shows the credit from the first paint. `connectMap` hides that credit
+once it writes MapLibre's, which names the same tiles.
+
+A snapshot also holds the two apart: `picture`, the map alone, and `credit`,
+the credit as runs of words and links, each `{ text }` or `{ href, text }`.
+In a framework that renders the markup for you, such as React, put `picture`
 in an element that is a direct child of the frame and has the
-`data-helix-map-snapshot` attribute. `connectMap` hides that element, and leaves
-removing it to your framework.
+`data-helix-map-snapshot` attribute. Write `credit` in a
+`<span slot="attribution" data-helix-map-credit>`, also a direct child of the
+frame:
+
+```jsx
+<helix-map label="Downtown Austin">
+  <div id="map" />
+  <div dangerouslySetInnerHTML={{ __html: snapshot.picture }} data-helix-map-snapshot="" />
+  {snapshot.credit.length > 0 ? (
+    <span data-helix-map-credit="" slot="attribution">
+      {snapshot.credit.map((part, index) =>
+        part.href ? (
+          <a data-link="quiet" href={part.href} key={index} rel="noopener noreferrer" target="_blank">
+            {part.text}
+          </a>
+        ) : (
+          part.text
+        ),
+      )}
+    </span>
+  ) : null}
+</helix-map>
+```
+
+`connectMap` hides both elements, and leaves removing them to your framework.
+
+A credit you slot yourself, with no `data-helix-map-credit`, wins. Write
+`picture` alone beside it. A snapshot credit already in the frame is hidden
+when `connectMap` connects.
 
 A snapshot is a flat map. A map zoomed out past about 6 is a globe in MapLibre,
 so draw snapshots of city and street views.

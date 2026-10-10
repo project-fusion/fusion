@@ -11,8 +11,10 @@ import {
   motionOf,
 } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
+import type { MapSnapshot } from '@fusion.dev/helix-map/snapshot'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { MapCredit } from '@/components/map-credit/map-credit'
 import { ThemeTry } from '@/components/theme-try/theme-try'
 import { MAP_FAILED, MAPS } from '@/content/maps/maps'
 import { WALK } from '@/content/maps/routes'
@@ -95,7 +97,7 @@ export function MapsHero({
   /** A theme the builder sent, which the page opens in. */
   sent?: SentTheme
   /** The map drawn on the server for a wide screen and a narrow one, shown until MapLibre has drawn. */
-  snapshots?: { narrow: string; wide: string } | undefined
+  snapshots?: { narrow: MapSnapshot; wide: MapSnapshot } | undefined
 }) {
   const [intro] = MAPS.blocks
   const scope = useRef<HTMLDivElement>(null)
@@ -425,21 +427,23 @@ export function MapsHero({
             camera the map opens at on a wide screen and on a narrow one,
             over the canvas until MapLibre has drawn its tiles, since it
             paints its land before them. Before the markers, which stand on
-            it. */}
+            it. Its credit is the tiles', the same for both views, in the
+            frame's credit strip until MapLibre writes its own. */}
         {snapshots ? (
           <>
             <div
               className={`${styles.mapsSnapshot} ${styles.mapsSnapshotWide}`}
               // biome-ignore lint/security/noDangerouslySetInnerHtml: an SVG this site drew on its server from map tiles
-              dangerouslySetInnerHTML={{ __html: snapshots.wide }}
+              dangerouslySetInnerHTML={{ __html: snapshots.wide.picture }}
               data-helix-map-snapshot=""
             />
             <div
               className={`${styles.mapsSnapshot} ${styles.mapsSnapshotNarrow}`}
               // biome-ignore lint/security/noDangerouslySetInnerHtml: an SVG this site drew on its server from map tiles
-              dangerouslySetInnerHTML={{ __html: snapshots.narrow }}
+              dangerouslySetInnerHTML={{ __html: snapshots.narrow.picture }}
               data-helix-map-snapshot=""
             />
+            <MapCredit credit={snapshots.wide.credit} />
           </>
         ) : null}
         {/* **The page's ground run in over the map, inside its own box**, so

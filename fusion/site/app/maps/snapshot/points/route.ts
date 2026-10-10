@@ -2,8 +2,11 @@ import { POINTS_VIEW } from '@/content/maps/points'
 import { snapshotOf } from '@/utils/map-snapshot/map-snapshot'
 
 /**
- * The points map's snapshot on the Maps page, at a URL of its own: the
- * markup `mapSnapshot` draws, a picture of the streets in a wrapper.
+ * The points map's snapshot on the Maps page, at a URL of its own: what
+ * `mapSnapshot` draws, as JSON. `picture` is a picture of the streets in a
+ * wrapper, and `credit` is the tiles' credit, which the page writes in the
+ * frame's credit strip. The two are sent apart because the page puts the
+ * picture in an element of its own.
  *
  * **Asked for when a reader nears the map, and not in the page.** The map is
  * far down the page, and its snapshot is about 100 KB of markup, which a prop
@@ -15,14 +18,12 @@ import { snapshotOf } from '@/utils/map-snapshot/map-snapshot'
  * remembered by nobody, so the next reader asks again.
  */
 export async function GET() {
-  const markup = await snapshotOf(POINTS_VIEW)
-  if (markup === '') {
+  const { credit, picture } = await snapshotOf(POINTS_VIEW)
+  if (picture === '') {
     return new Response(null, { headers: { 'cache-control': 'no-store' }, status: 504 })
   }
-  return new Response(markup, {
-    headers: {
-      'cache-control': 'public, max-age=3600, s-maxage=86400',
-      'content-type': 'text/html; charset=utf-8',
-    },
-  })
+  return Response.json(
+    { credit, picture },
+    { headers: { 'cache-control': 'public, max-age=3600, s-maxage=86400' } },
+  )
 }

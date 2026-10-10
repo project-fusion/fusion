@@ -857,6 +857,32 @@ describe('connectMap with a snapshot drawn on the server', () => {
     expect(stopped).toBe(true)
   })
 
+  /* The snapshot credits the map from the first paint, and the renderer's
+     credit takes over, or the page's own wins, with one credit in the strip. */
+  test('the snapshot’s credit stands until the renderer’s is written, and never beside the page’s own', async () => {
+    const snapshotCredit =
+      '<span data-helix-map-credit slot="attribution">OpenFreeMap</span><div data-helix-map-snapshot></div>'
+    const shown = (host: HTMLElement): string[] =>
+      [...host.querySelectorAll<HTMLElement>('[slot="attribution"]')]
+        .filter((one) => !one.hidden)
+        .map((one) => one.textContent ?? '')
+
+    const host = await frame(snapshotCredit)
+    const { driver, seen } = recorder()
+    connectMap(host, driver)
+    expect(shown(host)).toEqual(['OpenFreeMap'])
+    seen.credits = ['<a href="https://openfreemap.org">OpenFreeMap</a> and more']
+    seen.changed?.()
+    await Promise.resolve()
+    expect(shown(host)).toEqual(['OpenFreeMap and more'])
+
+    const own = await frame(`${snapshotCredit}<span slot="attribution">Ours</span>`)
+    const theirs = recorder()
+    theirs.seen.credits = ['Theirs']
+    connectMap(own, theirs.driver)
+    expect(shown(own)).toEqual(['Ours'])
+  })
+
   test('the frame is told when the map is drawn whole, with what stands on it placed again first', async () => {
     const host = (await frame(
       '<div id="canvas"></div><helix-headless-map-marker label="Depot" lat="2" lng="3"></helix-headless-map-marker>',
