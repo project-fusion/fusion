@@ -94,6 +94,46 @@ describe('trend', () => {
   })
 })
 
+/* A price on a market page is colored by which way it moved, and mainland
+   China, Taiwan, and Japan draw a rise in red. The color takes a source of its
+   own, two tokens a page can point the other way. */
+describe('color by movement', () => {
+  const up = '--_trend-color: var(--trend-up-color, var(--helix-color-rise))'
+  const down = '--_trend-color: var(--trend-down-color, var(--helix-color-fall))'
+
+  test('reflects, and the host carries nothing until it is set', async () => {
+    const host = (await mount('<helix-trend movement="up">8%</helix-trend>')) as HTMLElement & {
+      colorBy?: string
+      updateComplete: Promise<boolean>
+    }
+    expect(host.hasAttribute('color-by')).toBe(false)
+    host.colorBy = 'movement'
+    await host.updateComplete
+    expect(host.getAttribute('color-by')).toBe('movement')
+  })
+
+  test('draws a move up and a move down from the rise and fall tokens, through a hook each', () => {
+    expect(rule(':host([color-by="movement"]:state(up))')).toContain(up)
+    expect(rule(':host([color-by="movement"]:state(down))')).toContain(down)
+  })
+
+  /* At equal weight the judgment's color would hold on a trend that sets
+     both. One attribute more, and later in the sheet, the movement wins. */
+  test('follows the judgment in the sheet, so it wins on a trend that sets good', () => {
+    const at = (selector: string): number => sheet().indexOf(selector)
+    expect(at(':host(:state(worse))')).toBeGreaterThan(-1)
+    expect(at(':host([color-by="movement"]:state(up))')).toBeGreaterThan(at(':host(:state(worse))'))
+    expect(at(':host(:not(:defined)[color-by="movement"][movement="down"])')).toBeGreaterThan(
+      at(':host(:not(:defined)[good="down"][movement="up"])'),
+    )
+  })
+
+  test('a served trend is colored by its attributes before the element upgrades', () => {
+    expect(rule(':host(:not(:defined)[color-by="movement"][movement="up"])')).toContain(up)
+    expect(rule(':host(:not(:defined)[color-by="movement"][movement="down"])')).toContain(down)
+  })
+})
+
 describe('trend hooks', () => {
   test('each judgment has a hook that falls back to its status color', () => {
     expect(rule(':host(:state(better))')).toContain(

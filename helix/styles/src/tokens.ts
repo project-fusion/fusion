@@ -479,6 +479,24 @@ export const TOKENS: Token[] = [
   /* The one severity whose two arms are two steps apart rather than one: `600`
      on a page, `400` on a dark surface. */
   ['color-danger', 'light-dark(var(--_helix-danger-600), var(--_helix-danger-400))'],
+  /* **Which way a value moved, for a page that colors by direction.** Markets
+     disagree about the color of a rise: mainland China, Taiwan, and Japan draw
+     it in red and a fall in green, and Hong Kong and most other markets draw a
+     rise in green. A page for one of those three points `rise` at `danger`
+     and `fall` at `success`, under `[data-helix-theme]` as well as `:root`,
+     since this layer declares every token again on a themed element.
+
+     **Aliases of two solved inks, so either way round they clear the text
+     target on every page ground**, and a theme that moves the statuses moves
+     these with them. The engine does not emit them, because a value in a
+     theme block would sit beside the page's own swap and win wherever the
+     block's selector is the more specific, as `:root[data-helix-theme]` is.
+
+     **Not switched by `lang`.** A page's language does not name its market:
+     Hong Kong writes Chinese and draws a rise in green, and a page in English
+     can show Shanghai prices. The page sets these for the market it shows. */
+  ['color-rise', 'var(--helix-color-success)'],
+  ['color-fall', 'var(--helix-color-danger)'],
   /* **Each tone's quiet ink, one step and not two.** A tone's own ink is
      already at the contrast floor, so it cannot go quieter the way
      `foreground-muted` does, by giving up contrast; it gives up color instead:

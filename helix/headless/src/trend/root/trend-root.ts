@@ -46,8 +46,8 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * `good` is unset by default, so a trend with no judgment is gray. For churn,
  * latency, error rate, cost, and bounce rate, up is bad. Set the metric's
  * polarity once with `good`, and the component picks the color from the
- * movement. The judgment is also a custom state, `better` or `worse`, for a
- * sheet of your own.
+ * movement. The judgment is also a custom state, `better` or `worse`, and so
+ * is the movement, `up` or `down`, for a sheet of your own.
  *
  * The movement is also written as a word, so a screen reader reads it. The
  * styled tier hides `part="direction"` visually and keeps it in the
@@ -88,6 +88,8 @@ const readDirection = (value: string | undefined): (typeof DIRECTIONS)[Direction
  * @csspart value - The change written from `value`, hidden while `value` is no number.
  *
  * @cssstate better - The trend moved the way `good` names.
+ * @cssstate down - The trend moved down, as `movement`, the old `direction`, or the sign of `value` says.
+ * @cssstate up - The trend moved up, as `movement`, the old `direction`, or the sign of `value` says.
  * @cssstate worse - The trend moved against the way `good` names.
  */
 @customElement('helix-headless-trend')
@@ -284,6 +286,11 @@ export class HelixHeadlessTrend extends HelixElement {
     const judged = this.judged
     this.toggleState('better', judged === 'better')
     this.toggleState('worse', judged === 'worse')
+    /* The movement as worked out, so a sheet can color by direction when
+       `value` set it and no attribute says which way. */
+    const moved = this.moved
+    this.toggleState('down', moved === 'down')
+    this.toggleState('up', moved === 'up')
   }
 
   protected override render(): TemplateResult {
