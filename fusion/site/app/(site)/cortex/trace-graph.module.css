@@ -61,8 +61,6 @@
   color: var(--helix-color-foreground-subtle);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .rungNames {
