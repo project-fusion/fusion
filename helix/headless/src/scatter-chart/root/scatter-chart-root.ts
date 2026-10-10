@@ -180,7 +180,8 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * @csspart point-active - A point in the row under the pointer. Set alongside `point`.
  * @csspart summary - The text that says how strongly the measures relate, for people who cannot see the points.
  * @csspart svg - The drawing surface the gridlines and the trend lines sit on.
- * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
+ * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
  * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, on its top edge. Set alongside `tooltip-arrow`.

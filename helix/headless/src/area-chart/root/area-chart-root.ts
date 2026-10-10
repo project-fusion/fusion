@@ -1,4 +1,5 @@
 import {
+  CategoryAxisController,
   CHART_PLOT,
   type Curve,
   customElement,
@@ -27,6 +28,19 @@ import {
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
+
+/**
+ * The largest of some numbers, or zero for none or for none above it. A loop,
+ * because spread into `Math.max` four layers of 100,000 readings are more
+ * arguments than a call can take.
+ */
+const highest = (values: readonly number[]): number => {
+  let top = 0
+  for (const value of values) {
+    top = Math.max(top, value)
+  }
+  return top
+}
 
 /* Built once per locale and kept, `Intl.NumberFormat` being expensive to
    construct and cheap to call. */
@@ -157,8 +171,8 @@ export interface AreaStack {
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
  * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart guide - A rule down the reading a pointer is resting on.
- * @csspart label - One reading's name.
- * @csspart labels - The row of reading names.
+ * @csspart label - One reading's name, placed along the row by `--chart-label-start` and `--chart-label-size` with its text centered. Only the names that fit are drawn, the first and the last always.
+ * @csspart labels - The row of reading names, which the names share: lay it out as one grid cell they all stand in.
  * @csspart line - The top edge of one part's band.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
@@ -166,7 +180,8 @@ export interface AreaStack {
  * @csspart plot - The drawing, which takes focus to be read by key. With nothing to draw, a group named as the chart is, holding the `empty` or `loading` part.
  * @csspart summary - The total and each part's share at the latest reading, written as a sentence for screen readers.
  * @csspart svg - The drawing surface the bands sit on.
- * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
+ * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
  * @csspart tick - One number on the axis, placed with `inset-block-start` at its level.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
@@ -186,6 +201,8 @@ export interface AreaStack {
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssproperty --area-chart-axis - The width of the axis, in `ch`, set from the widest number on it. Written by the component on the axis.
+ * @cssproperty --chart-label-size - How much of the row a reading's name has room for, as a percentage. Written by the component on each `label`.
+ * @cssproperty --chart-label-start - Where a reading name's room starts along the row, as a percentage from the inline start. Written by the component on each `label`.
  *
  * @cssstate active - While a reading is shown, under the pointer or the keys, with its tooltip open.
  * @cssstate empty - While the `empty` part stands in the plot.
@@ -242,7 +259,8 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
    * Which rules are drawn across the plot, if any.
    *
    * The same three values `LineChart` takes, with the same fallback: a bare
-   * `gridlines`, or anything unrecognized, rules the levels. Drawn over the bands
+   * `gridlines`, or anything unrecognized, rules the levels, and `category`
+   * rules each reading whose name is drawn. Drawn over the bands
    * rather than under them, because the bands are opaque and a rule under one is
    * a rule nobody sees.
    */
@@ -297,6 +315,12 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
   valueAxis = false
 
   private warnedAboutNegatives = false
+
+  /**
+   * Measures the axis and says which reading names fit on it, which are the
+   * names drawn and the readings `category` gridlines rule.
+   */
+  private readonly names = new CategoryAxisController(this)
 
   /** Whether the levels are ruled, which is every value but `category`. */
   protected get rulesValue(): boolean {
@@ -400,10 +424,10 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
       return this.renderEmpty()
     }
     const top = this.overlap
-      ? Math.max(0, ...stack.layers.flat())
+      ? Math.max(0, ...stack.layers.map(highest))
       : this.share
         ? 1
-        : Math.max(0, ...stack.totals)
+        : highest(stack.totals)
     const domain: [number, number] = [0, top > 0 ? top : 1]
     const y = linear(domain, [PLOT_HEIGHT, 0])
     /* In the middle of each reading's slot, for the reason `LineChart` gives:
@@ -504,7 +528,7 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
       />`
   }
 
-  /** The grid, or nothing, at the levels `ticks` picks and through each reading. */
+  /** The grid, or nothing, at the levels `ticks` picks and through each reading whose name is drawn. */
   protected renderGridlines(
     x: (value: number) => number,
     y: (value: number) => number,
@@ -515,11 +539,13 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
       return nothing
     }
     const down = this.rulesCategory
-      ? Array.from(
-          { length: count },
-          (_, index) =>
-            svg`<line part="gridline" x1=${x(index)} x2=${x(index)} y1="0" y2=${PLOT_HEIGHT} />`,
-        )
+      ? this.names
+          .place(this.sourceRows)
+          .filter((one) => one.at < count)
+          .map(
+            ({ at }) =>
+              svg`<line part="gridline" x1=${x(at)} x2=${x(at)} y1="0" y2=${PLOT_HEIGHT} />`,
+          )
       : []
     /* The floor is the baseline's, and a gridline drawn on top of it is the
        same rule twice. */
@@ -548,10 +574,21 @@ export class HelixHeadlessAreaChart extends MixinChartStatus(MixinChartSource(He
     return svg`<line part="guide" x1=${x(at)} x2=${x(at)} y1="0" y2=${PLOT_HEIGHT} />`
   }
 
-  /** The reading names, as HTML beside the drawing so they do not scale with it. */
+  /**
+   * The reading names, as HTML beside the drawing so they do not scale with it:
+   * the names that fit, each in the room `--chart-label-start` and
+   * `--chart-label-size` place along the axis, as `LineChart` draws them.
+   */
   protected renderLabels(readings: string[]): TemplateResult {
     return html`<div aria-hidden="true" part="labels">
-      ${readings.map((one) => html`<span part="label">${one}</span>`)}
+      ${this.names.place(this.sourceRows).map(
+        ({ at, size, start }) =>
+          html`<span
+              part="label"
+              style="--chart-label-start: ${start}%; --chart-label-size: ${size}%"
+              >${readings[at]}</span
+            >`,
+      )}
     </div>`
   }
 

@@ -1,12 +1,13 @@
 import {
   byRow,
+  CategoryAxisController,
   CHART_PLOT,
   type Curve,
+  columnPoints,
   commaList,
   customElement,
   drawTooltip,
   drawValueAxis,
-  extent,
   formatNumbers,
   HelixElement,
   HelixReadingChangeEvent,
@@ -20,6 +21,7 @@ import {
   PLOT_WIDTH,
   type Point,
   type Series,
+  type SeriesPoint,
   seriesIndex,
   seriesKey,
   ticks,
@@ -29,6 +31,9 @@ import {
 import { html, nothing, svg, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../tooltip/index.js'
+
+/** Two decimals, as a line's path is written, which is more than a 100 unit view box can show. */
+const round = (value: number): number => Math.round(value * 100) / 100
 
 /**
  * @summary A chart that draws series over time as lines, read from a table.
@@ -114,19 +119,21 @@ import '../../tooltip/index.js'
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
  * @csspart gridline - One rule across the plot, under `gridlines`.
  * @csspart guide - A rule down the reading a pointer is resting on.
- * @csspart label - One reading's name.
- * @csspart labels - The row of reading names.
+ * @csspart label - One reading's name, placed along the row by `--chart-label-start` and `--chart-label-size` with its text centered. Only the names that fit are drawn, the first and the last always.
+ * @csspart labels - The row of reading names, which the names share: lay it out as one grid cell they all stand in.
  * @csspart line - The line for one series.
  * @csspart line-dashed - A `line` whose series `dashed` names. Set alongside `line`.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
- * @csspart marker - The mark on one reading, under `markers`, and on a reading with a blank on either side. Placed with `inset-inline-start` and `inset-block-start`, and carries its series color as `--chart-series`.
- * @csspart marker-lone - A `marker` on a reading with a blank on either side, which no line reaches. Set alongside `marker`.
+ * @csspart marker - The marks on one series' readings under `markers`, as one path with a stroke of no length at each reading: give it a round `stroke-linecap`, a `stroke-width` the size of a mark and `vector-effect: non-scaling-stroke`. Carries its series color as `--chart-series`.
+ * @csspart marker-lone - The `marker` path of one series' readings with a blank on either side, which no line reaches and which are marked without `markers`. Set alongside `marker`.
+ * @csspart marker-ring - The same marks again under each series' `marker` paths, to stroke a little wider in the page's color, so a mark reads over the line it sits on.
  * @csspart plot - The drawing, which takes focus to be read by key. With nothing to draw, a group named as the chart is, holding the `empty` or `loading` part.
  * @csspart summary - The chart's name and each series' latest reading, written as a sentence for screen readers. Hide it visually.
  * @csspart svg - The drawing surface the lines and areas sit on.
- * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
+ * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
  * @csspart terminus - The mark on one series' last reading.
  * @csspart tick - One number on the axis, placed with `inset-block-start` at its level.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
@@ -146,6 +153,8 @@ import '../../tooltip/index.js'
  * @csspart tooltip-surface-top - The bubble while it is above the reading, beside `tooltip-surface`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
+ * @cssproperty --chart-label-size - How much of the row a reading's name has room for, as a percentage. Written by the component on each `label`.
+ * @cssproperty --chart-label-start - Where a reading name's room starts along the row, as a percentage from the inline start. Written by the component on each `label`.
  * @cssproperty --chart-terminus-x - Where a series' last reading sits horizontally, as a percentage. Written by the component.
  * @cssproperty --chart-terminus-y - Where a series' last reading sits vertically, as a percentage. Written by the component.
  * @cssproperty --line-chart-axis - The width of the axis, in `ch`, set from the widest number on it. Written by the component on the axis.
@@ -242,8 +251,8 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
    * `ticks` picks, which are round numbers anchored to the number line rather
    * than to where the data starts, so two charts over different ranges rule at
    * the same levels. `category` rules the axis they are *arranged* on, one
-   * through each reading, which is what lets a point be traced down to its
-   * label across a wide chart. `both` draws both.
+   * through each reading whose name is drawn, which is what lets a point be
+   * traced down to its label across a wide chart. `both` draws both.
    *
    * **A bare `gridlines` means `value`**, and so does anything unrecognized.
    * The attribute a consumer reaches for first should be the grid they meant,
@@ -325,16 +334,163 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
   @property({ attribute: 'value-axis', reflect: true, type: Boolean })
   valueAxis = false
 
+  /** The domain last worked out, held while the series, the hidden ones and `zero` are the same. */
+  private ranged: { domain: [number, number]; key: string; series: Series[] } | undefined
+
   /** The domain every series is drawn against, which the tooltip also needs. */
   private range(series: Series[]): [number, number] {
     /* Over the series drawn, so hiding one from a legend fits the scale to
        the rest, which is what hiding a series in a chart is for. */
-    const values = series
-      .filter((one) => this.showsSeries(one.name))
-      .flatMap((one) => one.points.map((point) => point.value))
-    const [low, high] = extent(values.length > 0 ? values : [0])
-    return this.zero ? [Math.min(0, low), Math.max(0, high)] : [low, high]
+    const key = `${this.zero} ${series.map((one) => (this.showsSeries(one.name) ? 1 : 0)).join('')}`
+    if (this.ranged?.series === series && this.ranged.key === key) {
+      return this.ranged.domain
+    }
+    /* A walk over the readings, which builds no array of every value the
+       way handing them to `extent` would. */
+    let low = Number.POSITIVE_INFINITY
+    let high = Number.NEGATIVE_INFINITY
+    for (const one of series) {
+      if (!this.showsSeries(one.name)) {
+        continue
+      }
+      for (const point of one.points) {
+        low = Math.min(low, point.value)
+        high = Math.max(high, point.value)
+      }
+    }
+    const [floor, top] = low <= high ? [low, high] : [0, 0]
+    const domain: [number, number] = this.zero
+      ? [Math.min(0, floor), Math.max(0, top)]
+      : [floor, top]
+    this.ranged = { domain, key, series }
+    return domain
   }
+
+  /**
+   * The two scales, held while the domain and the count are the same, so a
+   * render the pointer asks for draws with the scales the paths were made
+   * with and every path is held.
+   */
+  private scales:
+    | {
+        count: number
+        domain: [number, number]
+        x: (value: number) => number
+        y: (value: number) => number
+      }
+    | undefined
+
+  private scalesOf(
+    domain: [number, number],
+    count: number,
+  ): { x: (value: number) => number; y: (value: number) => number } {
+    const held = this.scales
+    if (
+      held &&
+      held.count === count &&
+      held.domain[0] === domain[0] &&
+      held.domain[1] === domain[1]
+    ) {
+      return held
+    }
+    const y = linear(domain, [PLOT_HEIGHT, 0])
+    /* **A reading sits in the middle of its own slot, not at the edge of the
+       box**, which is what makes the names underneath line up with it.
+     *
+     * Spanning 0 to 100 is the obvious version and is wrong. Each name is
+     * centered in its reading's share of the width, as the bar chart's are,
+     * while the readings would sit at the boundaries between those shares:
+     * measured, the first name centered at a twelfth of the width with its
+     * point at zero. Every label is off by half a slot and the error grows
+     * toward the middle.
+     *
+     * Insetting by half a slot also means a line chart and a bar chart drawn
+     * from the same table stack, which is the arrangement anybody comparing a
+     * total to its parts wants. The cost is that the line stops short of both
+     * edges, and that is the smaller thing to give up. */
+    const slot = PLOT_WIDTH / count
+    const x = linear([0, Math.max(count - 1, 1)], [slot / 2, PLOT_WIDTH - slot / 2])
+    this.scales = { count, domain, x, y }
+    return this.scales
+  }
+
+  /**
+   * Each series' runs and each run's path, held against the scales and the
+   * curve they were drawn with.
+   *
+   * **A render the pointer asks for redraws nothing.** Every move of the
+   * pointer across the plot is a render, and a path through every reading
+   * built again on each one is work a move does not change. A series is a new
+   * object whenever the table is read again, so an edit draws afresh.
+   */
+  private drawn = new WeakMap<
+    Series,
+    {
+      columns: number
+      curve: Curve
+      marks?: { lone: string; markers: boolean; marks: string }
+      runs: Array<{ path: string; points: Point[] }>
+      x: (value: number) => number
+      y: (value: number) => number
+    }
+  >()
+
+  /** A series' unbroken runs as paths, from the held drawing where it still holds. */
+  private runsOf(
+    one: Series,
+    x: (value: number) => number,
+    y: (value: number) => number,
+  ): Array<{ path: string; points: Point[] }> {
+    const curve = this.curve ?? 'smooth'
+    /* The device's pixels across the plot, which a path of more readings than
+       that is drawn at. Before the plot is measured, the window's: that render
+       is replaced before it is painted, and building every reading's segment
+       for it doubled the first frame of 100,000 readings. */
+    const across = this.names.measured || globalThis.innerWidth || 0
+    const columns = Math.round(across * (globalThis.devicePixelRatio || 1))
+    const held = this.drawn.get(one)
+    if (held && held.x === x && held.y === y && held.curve === curve && held.columns === columns) {
+      return held.runs
+    }
+    const runs = this.unbrokenOf(one)
+      .map((run) => {
+        const points: Point[] = run.map((point) => [x(point.at), y(point.value)])
+        return { path: linePath(columnPoints(points, columns, PLOT_WIDTH), curve), points }
+      })
+      .filter((run) => run.path !== '')
+    this.drawn.set(one, { columns, curve, runs, x, y })
+    return runs
+  }
+
+  /** Each series' unbroken runs, held by series, which the paths and the marks both walk. */
+  private unbrokens = new WeakMap<Series, SeriesPoint[][]>()
+
+  private unbrokenOf(one: Series): SeriesPoint[][] {
+    let held = this.unbrokens.get(one)
+    if (held === undefined) {
+      held = unbroken(one)
+      this.unbrokens.set(one, held)
+    }
+    return held
+  }
+
+  /** Each series laid out one slot per row, held for the tooltip, which reads one slot a move. */
+  private slots = new WeakMap<Series, ReturnType<typeof byRow>>()
+
+  private slotsOf(one: Series): ReturnType<typeof byRow> {
+    let held = this.slots.get(one)
+    if (held === undefined || held.length !== this.readings) {
+      held = byRow(one, this.readings)
+      this.slots.set(one, held)
+    }
+    return held
+  }
+
+  /**
+   * Measures the axis and says which reading names fit on it, which are the
+   * names drawn and the readings `category` gridlines rule.
+   */
+  private readonly names = new CategoryAxisController(this)
 
   /**
    * Whether the range always includes zero.
@@ -390,23 +546,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     }
 
     const domain = this.range(series)
-    const y = linear(domain, [PLOT_HEIGHT, 0])
-    /* **A reading sits in the middle of its own slot, not at the edge of the
-       box**, which is what makes the names underneath line up with it.
-     *
-     * Spanning 0 to 100 is the obvious version and is wrong. The labels are a
-     * grid of equal columns, the same row the bar chart uses, so each name is
-     * centered in its share of the width while the readings sit at the
-     * gridlines between those shares: measured, the first name centered at a
-     * twelfth of the width with its point at zero. Every label is off by half
-     * a slot and the error grows toward the middle.
-     *
-     * Insetting by half a slot also means a line chart and a bar chart drawn
-     * from the same table stack, which is the arrangement anybody comparing a
-     * total to its parts wants. The cost is that the line stops short of both
-     * edges, and that is the smaller thing to give up. */
-    const slot = PLOT_WIDTH / readings.length
-    const x = linear([0, Math.max(readings.length - 1, 1)], [slot / 2, PLOT_WIDTH - slot / 2])
+    const { x, y } = this.scalesOf(domain, readings.length)
 
     return html`${this.valueAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}${this.renderSummary(series)}${this.renderTable()}`
   }
@@ -516,9 +656,9 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
         ${this.renderBand(this.readings)}
         ${this.renderGuide(x)}
         ${series.map((one, depth) => this.renderSeries(one, depth, x, y))}
+        ${this.renderMarkers(series, x, y)}
       </svg>
       ${this.renderTermini(ends)}
-      ${this.renderMarkers(series, x, y)}
       ${this.renderTooltip()}
     </div>`
   }
@@ -543,13 +683,19 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
        divides two catchments, which is a fact about the pointer; a rule on the
        reading is the line a reader traces down to the label, which is what a
        category grid is for. The readings sit at slot centers, so the two are
-       half a slot apart and only one of them lands under a point. */
+       half a slot apart and only one of them lands under a point.
+     *
+       Through the readings whose names are drawn, which is every one where
+       every name fits: a rule is traced down to a name, and a rule through
+       each of 10,000 readings is a gray block. */
     const down = this.rulesCategory
-      ? Array.from(
-          { length: count },
-          (_, index) =>
-            svg`<line part="gridline" x1=${x(index)} x2=${x(index)} y1="0" y2=${PLOT_HEIGHT} />`,
-        )
+      ? this.names
+          .place(this.sourceRows)
+          .filter((one) => one.at < count)
+          .map(
+            ({ at }) =>
+              svg`<line part="gridline" x1=${x(at)} x2=${x(at)} y1="0" y2=${PLOT_HEIGHT} />`,
+          )
       : []
     const across = this.rulesValue
       ? ticks(domain).map(
@@ -627,37 +773,92 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
    * The marks on the readings: every one under `markers`, and otherwise only
    * a reading no line reaches, which has a blank on either side.
    *
-   * Elements beside the drawing, as the termini are, so a mark is round in a
-   * drawing `preserveAspectRatio="none"` stretches. Placed from the inline
-   * start, as the drawing is mirrored.
+   * **One path per series for all of its marks**, each mark a stroke of no
+   * length, which a round cap draws as a dot. A mark per element cost an
+   * element per reading, so `markers` on 10,000 readings built 10,000 of them.
+   * `vector-effect: non-scaling-stroke` measures the stroke in the page's
+   * pixels, so the dot is round in a drawing `preserveAspectRatio="none"`
+   * stretches, and the drawing's own mirror places it on a right-to-left page.
+   *
+   * Under each series' marks, the same marks again as the `marker-ring` part,
+   * which a stylesheet strokes wider in the page's color, so a mark reads over
+   * the line it sits on. After every line, so no line crosses a mark.
    */
   protected renderMarkers(
     series: Series[],
     x: (value: number) => number,
     y: (value: number) => number,
   ): TemplateResult | typeof nothing {
-    const marks = series.flatMap((one, depth) =>
-      this.showsSeries(one.name)
-        ? unbroken(one).flatMap((run) =>
-            run.length > 1 && !this.markers
-              ? []
-              : run.map((point) => ({ depth, lone: run.length === 1, point })),
-          )
-        : [],
-    )
-    if (marks.length === 0) {
+    const drawn = series.flatMap((one, depth) => {
+      if (!this.showsSeries(one.name)) {
+        return []
+      }
+      const { lone, marks } = this.marksOf(one, x, y)
+      return lone === '' && marks === '' ? [] : [{ index: seriesIndex(depth), lone, marks }]
+    })
+    if (drawn.length === 0) {
       return nothing
     }
-    return html`${marks.map(
-      ({ depth, lone, point }) =>
-        html`<span
-          aria-hidden="true"
-          part="marker${lone ? ' marker-lone' : ''}"
-          style=${`--chart-series: var(--chart-series-${seriesIndex(depth)}); inset-inline-start: ${
-            (x(point.at) / PLOT_WIDTH) * 100
-          }%; inset-block-start: ${(y(point.value) / PLOT_HEIGHT) * 100}%`}
-        ></span>`,
+    return svg`${drawn.map(
+      ({ index, lone, marks }) =>
+        svg`<path
+          d=${marks + lone}
+          data-series=${index}
+          part="marker-ring"
+        />${
+          marks === ''
+            ? nothing
+            : svg`<path
+                d=${marks}
+                data-series=${index}
+                part="marker"
+                style="--chart-series: var(--chart-series-${index})"
+              />`
+        }${
+          lone === ''
+            ? nothing
+            : svg`<path
+                d=${lone}
+                data-series=${index}
+                part="marker marker-lone"
+                style="--chart-series: var(--chart-series-${index})"
+              />`
+        }`,
     )}`
+  }
+
+  /**
+   * A series' marks as path data, a stroke of no length at each: the runs of
+   * more than one reading under `markers`, and the runs of one always. Held
+   * with the series' paths.
+   */
+  private marksOf(
+    one: Series,
+    x: (value: number) => number,
+    y: (value: number) => number,
+  ): { lone: string; marks: string } {
+    const runs = this.runsOf(one, x, y)
+    const held = this.drawn.get(one)
+    const kept = held?.marks
+    if (kept && kept.markers === this.markers) {
+      return kept
+    }
+    const dot = (point: Point): string => `M${point[0]},${point[1]}h0`
+    let marks = ''
+    let lone = ''
+    for (const run of this.unbrokenOf(one)) {
+      const points = run.map((point): Point => [round(x(point.at)), round(y(point.value))])
+      if (points.length === 1) {
+        lone += dot(points[0] as Point)
+      } else if (this.markers) {
+        marks += points.map(dot).join('')
+      }
+    }
+    const found = { lone, markers: this.markers, marks }
+    if (held && runs === held.runs) {
+      held.marks = found
+    }
+    return found
   }
 
   /** Whether `dashed` names this series, matched as a heading is. */
@@ -682,12 +883,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     if (!this.showsSeries(one.name)) {
       return html`${nothing}`
     }
-    const runs = unbroken(one)
-      .map((run) => {
-        const points: Point[] = run.map((point) => [x(point.at), y(point.value)])
-        return { path: linePath(points, this.curve ?? 'smooth'), points }
-      })
-      .filter((run) => run.path !== '')
+    const runs = this.runsOf(one, x, y)
     if (runs.length === 0) {
       return html`${nothing}`
     }
@@ -727,10 +923,22 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
    * The reading names, as HTML beside the drawing rather than inside it.
    *
    * Inside, they would scale with the box, for the reason the class doc gives.
+   *
+   * The names that fit, each in a room `--chart-label-start` and
+   * `--chart-label-size` place along the axis: every name where every name
+   * fits, and otherwise a regular share of them with the first and the last
+   * kept. See `placeLabels`.
    */
   protected renderLabels(readings: string[]): TemplateResult {
     return html`<div aria-hidden="true" part="labels">
-      ${readings.map((one) => html`<span part="label">${one}</span>`)}
+      ${this.names.place(this.sourceRows).map(
+        ({ at, size, start }) =>
+          html`<span
+              part="label"
+              style="--chart-label-start: ${start}%; --chart-label-size: ${size}%"
+              >${readings[at]}</span
+            >`,
+      )}
     </div>`
   }
 
@@ -758,11 +966,10 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
        line it is describing. `y` counts down in the drawing, so the smallest is
        the highest, and no readings at all would make `Math.min` return
        Infinity. */
-    const domain = this.range(series)
-    const scale = linear(domain, [PLOT_HEIGHT, 0])
+    const { y: scale } = this.scalesOf(this.range(series), this.readings)
     const tops = series
       .filter((one) => this.showsSeries(one.name))
-      .map((one) => byRow(one, this.readings)[at]?.value)
+      .map((one) => this.slotsOf(one)[at]?.value)
       .filter((one): one is number => one !== undefined)
       .map((one) => scale(one))
     const slot = 100 / this.readings

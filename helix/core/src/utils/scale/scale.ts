@@ -1,11 +1,22 @@
 /** A mapping from one numeric interval onto another. */
 export type Scale = (value: number) => number
 
-/** The smallest and largest of a set of numbers, as a scale's domain. */
-export const extent = (values: readonly number[]): [number, number] => [
-  Math.min(...values),
-  Math.max(...values),
-]
+/**
+ * The smallest and largest of a set of numbers, as a scale's domain, and
+ * `[Infinity, -Infinity]` for none, as `Math.min` and `Math.max` answer.
+ *
+ * A loop: spread into `Math.min`, four series of 100,000 readings are more
+ * arguments than a call can take, and the spread threw a `RangeError`.
+ */
+export const extent = (values: readonly number[]): [number, number] => {
+  let low = Number.POSITIVE_INFINITY
+  let high = Number.NEGATIVE_INFINITY
+  for (const value of values) {
+    low = Math.min(low, value)
+    high = Math.max(high, value)
+  }
+  return [low, high]
+}
 
 /**
  * Maps a domain onto a range, linearly.

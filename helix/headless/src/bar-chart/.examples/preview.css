@@ -101,13 +101,15 @@ helix-headless-bar-chart::part(line) {
 
 helix-headless-bar-chart::part(labels) {
   display: grid;
-  grid-auto-columns: 1fr;
-  grid-auto-flow: column;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 helix-headless-bar-chart::part(label) {
   color: var(--_gray-muted);
   font-size: 0.75rem;
+  grid-area: 1 / 1;
+  inline-size: var(--chart-label-size);
+  margin-inline-start: var(--chart-label-start);
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;

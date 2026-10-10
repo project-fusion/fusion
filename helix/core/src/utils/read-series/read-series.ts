@@ -49,6 +49,18 @@ const CELLS =
   'helix-table-cell, helix-headless-table-cell, [role="cell"], [role="gridcell"], [role="rowheader"]'
 const COLUMNS = 'helix-table-column, helix-headless-table-column, [role="columnheader"]'
 
+/**
+ * The largest of some counts, or zero. A loop, because spread into `Math.max`
+ * a table of a few hundred thousand rows is more arguments than a call takes.
+ */
+const widest = (counts: readonly number[]): number => {
+  let most = 0
+  for (const count of counts) {
+    most = Math.max(most, count)
+  }
+  return most
+}
+
 /** Whether an element is a grid rather than a document table. */
 const isGrid = (element: Element): boolean =>
   element.getAttribute('role') === 'table' ||
@@ -74,7 +86,7 @@ const readGrid = (grid: Element): Series[] => {
   const rows = gridRows(grid)
   const names = columns.slice(1).map((cell) => cell.textContent?.trim() ?? '')
   const cellsOf = (row: Element): Element[] => [...row.querySelectorAll(CELLS)]
-  const count = Math.max(0, ...rows.map((row) => cellsOf(row).length - 1))
+  const count = widest(rows.map((row) => cellsOf(row).length - 1))
 
   return Array.from({ length: count }, (_, column) => ({
     name: names[column] ?? grid.getAttribute('label') ?? '',
@@ -159,7 +171,7 @@ export const readSeries = (table: Element): Series[] => {
     .slice(1)
     .map((cell) => cell.textContent?.trim() ?? '')
   const rows = [...(element.tBodies[0]?.rows ?? [])]
-  const columns = Math.max(0, ...rows.map((row) => row.cells.length - 1))
+  const columns = widest(rows.map((row) => row.cells.length - 1))
 
   return plotted(
     Array.from({ length: columns }, (_, column) => ({

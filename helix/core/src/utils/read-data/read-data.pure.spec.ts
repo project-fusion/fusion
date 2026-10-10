@@ -15,7 +15,7 @@ const CHANNELS: ChartData = {
    so every chart drawing from `series` and `sourceRows` draws it unchanged. */
 describe('data read as series', () => {
   test('one per column with numbers, a blank keeping its row, words not a number', () => {
-    expect(seriesFromData(CHANNELS, 'en')).toEqual([
+    expect(seriesFromData(CHANNELS)).toEqual([
       {
         name: 'Direct',
         points: [

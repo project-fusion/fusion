@@ -41,4 +41,11 @@ describe('a linear scale', () => {
     expect(extent([3, 9, 1, 7])).toEqual([1, 9])
     expect(extent([4])).toEqual([4, 4])
   })
+
+  /* Spread into `Math.min`, four series of 100,000 readings threw a
+     `RangeError`, being more arguments than a call can take. */
+  test('extent takes as many values as a chart has readings', () => {
+    const values = Array.from({ length: 400_000 }, (_, at) => at % 1000)
+    expect(extent(values)).toEqual([0, 999])
+  })
 })

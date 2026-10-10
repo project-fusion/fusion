@@ -40,3 +40,36 @@ describe('line chart locale', () => {
     expect(part(await chart('lang="ar"'), 'summary')?.textContent).toBe(`Feb: ${listed}.`)
   })
 })
+
+/* The words beside a page of the table drawn from data are a page's to
+   translate, as the position a key reads out is. */
+describe('the pages of the table drawn from data', () => {
+  test('say the words registered for the family, with the numbers in its locale', async () => {
+    const { clearWords, registerWords } = await import('@fusion.dev/helix-core')
+    registerWords('de', {
+      'helix-line-chart': {
+        nextReadingsLabel: 'Nächste Messwerte',
+        readingsLabel: 'Messwerte {first} bis {last} von {count}',
+      },
+    })
+    try {
+      document.body.innerHTML =
+        '<div lang="de"><helix-headless-line-chart></helix-headless-line-chart></div>'
+      const host = document.querySelector('helix-headless-line-chart') as Updatable & {
+        data: unknown
+      }
+      host.data = {
+        columns: ['Zeit', 'Last'],
+        rows: Array.from({ length: 1500 }, (_, at) => [`t${at}`, at % 7]),
+      }
+      await settle(host)
+      const pages = part(host, 'table-pages')
+      expect(pages?.querySelector('[role="status"]')?.textContent?.trim()).toBe(
+        'Messwerte 1 bis 200 von 1.500',
+      )
+      expect(pages?.querySelectorAll('button')[1]?.textContent).toBe('Nächste Messwerte')
+    } finally {
+      clearWords()
+    }
+  })
+})

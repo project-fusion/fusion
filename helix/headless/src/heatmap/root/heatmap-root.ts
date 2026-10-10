@@ -153,7 +153,8 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @csspart start - The leading slot's box.
  * @csspart strip - The grid of cells, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart summary - The middle slot's box.
- * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
+ * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
  * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, on its top edge. Set alongside `tooltip-arrow`.

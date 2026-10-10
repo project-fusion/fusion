@@ -70,15 +70,21 @@
   vector-effect: non-scaling-stroke;
 }
 
+/* One cell every name stands in, each placed by the room the tier below
+   gives it, which with every name drawn is its own slot. A column of exactly
+   the row's width, so a name too long for its room is cut short and the row
+   keeps its width. */
 [part="labels"] {
   display: grid;
-  grid-auto-columns: 1fr;
-  grid-auto-flow: column;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 [part="label"] {
   color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
+  grid-area: 1 / 1;
+  inline-size: var(--chart-label-size);
+  margin-inline-start: var(--chart-label-start);
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
@@ -152,23 +158,26 @@
   color: var(--chart-series);
 }
 
-/* A mark on a reading, under `markers` and on a reading no line reaches: a
-   dot in its series' color, centered on the reading, ringed in the page's
-   ground so it reads over the line. */
-[part~="marker"] {
-  background-color: var(--chart-series);
-  block-size: var(--line-chart-marker-size, 6px);
-  border-radius: var(--helix-radii-full);
-  box-shadow: 0 0 0 var(--helix-border-thin)
-    var(--line-chart-marker-ring-color, var(--helix-color-background));
-  inline-size: var(--line-chart-marker-size, 6px);
-  pointer-events: none;
-  position: absolute;
-  translate: -50% -50%;
+/* The marks on the readings, under `markers` and on a reading no line
+   reaches: a dot in its series' color on each, ringed in the page's ground so
+   it reads over the line. Each dot is a stroke of no length with a round cap,
+   and `vector-effect` keeps it round in the stretched drawing, for the reason
+   the line gives. */
+[part~="marker"],
+[part="marker-ring"] {
+  fill: none;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
-:host(:dir(rtl)) [part~="marker"] {
-  translate: 50% -50%;
+[part~="marker"] {
+  stroke: var(--chart-series);
+  stroke-width: var(--line-chart-marker-size, 6px);
+}
+
+[part="marker-ring"] {
+  stroke: var(--line-chart-marker-ring-color, var(--helix-color-background));
+  stroke-width: calc(var(--line-chart-marker-size, 6px) + 2 * var(--helix-border-thin));
 }
 
 /*
@@ -304,11 +313,16 @@
   }
 }
 
-/* Forced colors: a marker is a background in its series' color, which the
-   browser replaced with the canvas. It keeps the color its line keeps. */
+/* Forced colors: a mark keeps its series' color, as the line does, and its
+   ring takes the ground the browser paints, which the page's own ground color
+   no longer is. */
 @media (forced-colors: active) {
   [part~="marker"] {
     forced-color-adjust: none;
+  }
+
+  [part="marker-ring"] {
+    stroke: Canvas;
   }
 }
 

@@ -117,6 +117,9 @@ export class SourceController implements ReactiveController {
    */
   private version = 0
 
+  /** The last `data` checked for a table's shape, and whether it had it. */
+  private checked: { data: unknown; fits: boolean } | undefined
+
   private heldRows: Parsed<Row[]> | undefined
   private heldSeries: Parsed<Series[]> | undefined
 
@@ -164,8 +167,12 @@ export class SourceController implements ReactiveController {
       return undefined
     }
     /* Any other shape, such as an array of rows, is read as no readings, and
-       a development build says so. */
-    if (!isChartData(host.data)) {
+       a development build says so. Checked once for each object: the check
+       walks every row, and a render reads this several times. */
+    if (this.checked?.data !== host.data) {
+      this.checked = { data: host.data, fits: isChartData(host.data) }
+    }
+    if (!this.checked.fits) {
       auditData(host as unknown as HTMLElement)
       return undefined
     }
@@ -237,7 +244,7 @@ export class SourceController implements ReactiveController {
    */
   get series(): Series[] {
     this.heldSeries = this.parsed(this.heldSeries, (table, data) =>
-      table ? readSeries(table) : data ? seriesFromData(data, wordsLocale(this.host)) : [],
+      table ? readSeries(table) : data ? seriesFromData(data) : [],
     )
     return this.heldSeries.value
   }
