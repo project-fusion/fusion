@@ -49,7 +49,7 @@ impl std::fmt::Display for Color {
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
-    serde(deny_unknown_fields, rename_all = "camelCase")
+    serde(deny_unknown_fields, expecting = "an object", rename_all = "camelCase")
 )]
 pub struct Relation {
     /// How far, in degrees, the angle may move to clear a role it cannot be told
@@ -102,7 +102,7 @@ pub enum StatusSeed {
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
-    serde(deny_unknown_fields, rename_all = "camelCase")
+    serde(deny_unknown_fields, expecting = "an object", rename_all = "camelCase")
 )]
 pub struct PairingRequest {
     pub background: String,
@@ -119,7 +119,7 @@ pub struct PairingRequest {
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
-    serde(deny_unknown_fields, rename_all = "camelCase")
+    serde(deny_unknown_fields, expecting = "an object", rename_all = "camelCase")
 )]
 pub struct Chroma {
     pub ceiling: Option<f64>,
@@ -133,7 +133,7 @@ pub struct Chroma {
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
-    serde(deny_unknown_fields, rename_all = "camelCase")
+    serde(deny_unknown_fields, expecting = "an object", rename_all = "camelCase")
 )]
 pub struct Material {
     pub blur: Option<f64>,
@@ -160,7 +160,7 @@ pub enum Weight {
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
-    serde(deny_unknown_fields, rename_all = "camelCase")
+    serde(deny_unknown_fields, expecting = "an object", rename_all = "camelCase")
 )]
 pub struct Font {
     /// Body size in pixels, 14 being what ships. The whole ramp is built from it.
@@ -202,7 +202,7 @@ pub enum Character {
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
-    serde(deny_unknown_fields, rename_all = "camelCase")
+    serde(deny_unknown_fields, expecting = "an object", rename_all = "camelCase")
 )]
 pub struct Motion {
     pub character: Option<Character>,
@@ -221,10 +221,18 @@ pub struct Motion {
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
-    serde(deny_unknown_fields, rename_all = "camelCase")
+    serde(deny_unknown_fields, expecting = "an object", rename_all = "camelCase")
 )]
 pub struct Background {
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, deserialize_with = "crate::wire::dark_page")
+    )]
     pub dark: Option<Color>,
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, deserialize_with = "crate::wire::light_page")
+    )]
     pub light: Option<Color>,
 }
 
@@ -257,7 +265,7 @@ pub enum Brand {
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
-    serde(deny_unknown_fields, rename_all = "camelCase")
+    serde(deny_unknown_fields, expecting = "an object", rename_all = "camelCase")
 )]
 pub struct BrandPair {
     pub dark: Option<Color>,
@@ -286,7 +294,7 @@ impl Brand {
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
-    serde(deny_unknown_fields, rename_all = "camelCase")
+    serde(deny_unknown_fields, expecting = "an object", rename_all = "camelCase")
 )]
 pub struct Neutral {
     pub chroma: Option<f64>,
@@ -318,7 +326,7 @@ pub enum Mechanism {
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
-    serde(deny_unknown_fields, rename_all = "camelCase")
+    serde(deny_unknown_fields, expecting = "an object", rename_all = "camelCase")
 )]
 pub struct Separation {
     pub floating: Option<Floating>,
@@ -378,14 +386,30 @@ pub enum Scheme {
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
-    serde(deny_unknown_fields, rename_all = "camelCase")
+    serde(deny_unknown_fields, expecting = "an object", rename_all = "camelCase")
 )]
 pub struct Status {
     pub allowance: Option<f64>,
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, deserialize_with = "crate::wire::danger")
+    )]
     pub danger: Option<StatusSeed>,
     pub harmony: Option<f64>,
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, deserialize_with = "crate::wire::info")
+    )]
     pub info: Option<StatusSeed>,
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, deserialize_with = "crate::wire::success")
+    )]
     pub success: Option<StatusSeed>,
+    #[cfg_attr(
+        feature = "serde",
+        serde(default, deserialize_with = "crate::wire::warning")
+    )]
     pub warning: Option<StatusSeed>,
 }
 
@@ -394,7 +418,7 @@ pub struct Status {
 #[cfg_attr(
     feature = "serde",
     derive(serde::Deserialize),
-    serde(deny_unknown_fields, rename_all = "camelCase")
+    serde(deny_unknown_fields, expecting = "an object", rename_all = "camelCase")
 )]
 pub struct ThemeIntent {
     /// The second emphasis. Unnamed, it is the brand, or the ink where there is
