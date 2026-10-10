@@ -58,15 +58,21 @@ runs:
       with:
         toolchain: 1.96
 
+    # The image's toolchains out of the cache key, for the reason the Rust job
+    # in `verify.yml` gives.
+    - name: Keep the pinned toolchain alone
+      if: steps.restore.outputs.cache-hit != 'true'
+      shell: bash
+      run: rustup toolchain list | awk '!/^1\.96-/ { print $1 }' | xargs -r -n1 rustup toolchain uninstall
+
     # A miss is a change to the Rust, so most of the dependency tree is as it
-    # was: restoring it is what makes this seconds rather than minutes.
+    # was: restoring it is what makes this seconds rather than minutes. The
+    # lockfile and the manifests are in the key, for the reason the Rust job
+    # in `verify.yml` gives.
     - name: Restore the Cargo cache
       if: steps.restore.outputs.cache-hit != 'true'
       uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
       with:
-        # Keyed on the toolchain installed above, without the runner's own
-        # `rustc`, for the reason the Rust job in `verify.yml` gives.
-        add-rust-environment-hash-key: false
         prefix-key: v0-rust-1.96
         shared-key: helix-release
 
