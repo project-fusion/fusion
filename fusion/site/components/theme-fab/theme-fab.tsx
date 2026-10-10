@@ -246,7 +246,7 @@ export const ThemeFab = () => {
                         ? 'Pairs whose contrast falls short of the target for their size.'
                         : c.derived.collisions.length > 0
                           ? 'Two roles landed close enough that they cannot be told apart. Measured as perceptual distance, not contrast.'
-                          : 'Every foreground clears the contrast target for the ground it sits on.'
+                          : 'Every foreground the engine measured clears the contrast target for the ground it sits on.'
                       : 'Nothing derived yet. The page is wearing the palette the stylesheet ships.'
                   }
                   placement="top"
@@ -270,7 +270,7 @@ export const ThemeFab = () => {
                         ? `${c.derived.violations.length} pair${c.derived.violations.length === 1 ? '' : 's'} fail`
                         : c.derived.collisions.length > 0
                           ? 'roles too close'
-                          : 'every pair clears'
+                          : 'every measured pair clears'
                       : 'as shipped'}
                   </span>
                 </helix-tooltip>

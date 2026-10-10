@@ -183,7 +183,7 @@ const PROSE: Route[] = [
   },
   {
     description:
-      'Enter your brand color and get a full palette, with the contrast of every pair measured.',
+      'Enter your brand color and get a full palette. Helix measures the contrast of each pair it solves.',
     kind: 'page',
     path: '/helix/theme',
     priority: 0.6,

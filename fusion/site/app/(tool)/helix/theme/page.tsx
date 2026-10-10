@@ -26,7 +26,8 @@ import { THEMED_CONTEXTS, THEMED_LAYOUTS, THEMED_MARKUP } from './themed-page-ma
  * examined.
  */
 export const metadata = pageMetadata({
-  description: 'Describe a brand. Get a palette every pair of which has been measured.',
+  description:
+    'Describe a brand and get a palette. Helix measures the contrast of each pair it solves.',
   path: '/helix/theme',
   title: 'Theme builder',
 })

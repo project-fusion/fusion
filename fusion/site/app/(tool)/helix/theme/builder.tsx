@@ -826,7 +826,7 @@ export function ThemeBuilder({
                 </helix-tooltip>
               </helix-flex>
               <helix-text variant="caption">
-                Start from ink, or describe a brand. Every pair the palette produces is measured
+                Start from ink, or describe a brand. Each foreground Helix solves is measured
                 against the ground it lands on.
               </helix-text>
             </helix-flex>
@@ -1014,7 +1014,7 @@ export function ThemeBuilder({
             ) : null}
 
             <helix-select
-              hint="The ratio every foreground has to clear against the ground it lands on."
+              hint="The ratio each foreground Helix solves has to clear against the ground it lands on."
               label="Contrast target"
               name="contrast"
               onChange={(event) => setContrastTarget(Number(event.currentTarget.value))}
