@@ -592,15 +592,20 @@ jobs:
       - name: Rust tests
         run: bun run rs:test
 
-  # The checks that run a Rust binary over what the workspace build wrote, which
-  # is why they wait for `warm` and the job above does not.
+  # The checks that run a Rust binary over what the workspace build wrote.
   #
   # **The build is what `references` reads.** That rule asks whether a path a
   # comment names is on disk, and several of them name generated files:
   # `fusion/site/public/sandbox/frame.css` is written by the site build and is
   # gitignored. A shard had it because the shards build first; the Rust job did
   # not, so moving the check there turned seven true references into findings.
-  # After `warm`, so it is a restore rather than a build.
+  #
+  # **From the start of the run, with the Rust first, and not after `warm`.**
+  # Nothing before the workspace build reads it: the toolchain, the Cargo cache
+  # and the compile were 95 seconds of this job, about what `warm` takes, and
+  # behind `warm` they ended the run. So they run beside it, and the build that
+  # follows them restores what `warm` wrote. Where `warm` is not done by then,
+  # turbo builds what is missing here, which is slower and gives the same tree.
   #
   # **These are here rather than in the shard pool** because they are the checks
   # that run a binary: a shard has bun and no cargo, so the npm shim would build
@@ -613,7 +618,8 @@ jobs:
   # naming the exact subpath in a barrel finding, and without it that advice
   # degrades to `dependency/<part>` in words rather than silently.
   cli:
-    needs: warm
+    needs: proven
+    if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -622,7 +628,7 @@ jobs:
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
         with:
-          # It compiles the workspace itself, two steps below.
+          # It compiles the workspace itself, three steps below.
           helix: false
       - name: Install Rust
         uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
@@ -635,12 +641,13 @@ jobs:
         with:
           add-rust-environment-hash-key: false
           prefix-key: v0-rust-1.96
-      - name: Build
-        run: .github/scripts/build-for-checks.sh
       # Ahead of the checks rather than left to the npm shim, so one compile
       # serves all four and a failure to build is reported as one.
       - name: Build the Rust workspace
         run: bun run rs:build
+      # After the compile, by when `warm` has written it, so a restore.
+      - name: Build
+        run: .github/scripts/build-for-checks.sh
       - name: The rules that ship
         run: bun run check:cli
       - name: Seed tokens
