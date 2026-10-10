@@ -80,8 +80,8 @@ jobs:
 
   # When `proven` skipped the run, the caches this workflow reads still want
   # writing where every pull request can read them. A cache a pull request saves
-  # is its own, so with `main` running nothing a new lockfile or a new
-  # Playwright would be fetched afresh by every pull request after it. Each is
+  # is its own, so with `main` running nothing a new Playwright would be fetched
+  # afresh by every pull request after it. Each is
   # looked up first and fetched only when missing, so a hit costs the lookup.
   # Not in the gate's `needs`: it checks nothing, and a cache it could not write
   # is no reason to call a verified tree unverified.
@@ -103,16 +103,6 @@ jobs:
         run: |
           echo "version=$(grep -oE '"playwright-core@[^"]+"' bun.lock | head -1 | tr -d '"' | cut -d@ -f2)" >> "$GITHUB_OUTPUT"
           echo "image=$ImageOS-$ImageVersion" >> "$GITHUB_OUTPUT"
-      - name: Key the dependencies as `.github/actions/setup` keys them
-        id: key
-        run: echo "key=$(.github/scripts/bun-cache-key.sh)" >> "$GITHUB_OUTPUT"
-      - name: Look up the dependencies
-        id: dependencies
-        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          key: ${{ steps.key.outputs.key }}
-          lookup-only: true
-          path: ~/.bun/install/cache
       - name: Look up the browser
         id: browser
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -129,9 +119,9 @@ jobs:
           key: playwright-deps-${{ steps.version.outputs.image }}-${{ steps.version.outputs.version }}
           lookup-only: true
           path: ~/.cache/playwright-deps
-      # Saves the dependencies on its way out when they missed.
+      # Playwright, which installs the browser below.
       - name: Set up bun and the dependencies
-        if: steps.dependencies.outputs.cache-hit != 'true' || steps.browser.outputs.cache-hit != 'true' || steps.packages.outputs.cache-hit != 'true'
+        if: steps.browser.outputs.cache-hit != 'true' || steps.packages.outputs.cache-hit != 'true'
         uses: ./.github/actions/setup
         with:
           # It reads the lockfile and builds nothing.

@@ -5,18 +5,23 @@
 # disagree with. It was an `env` at the top of four workflow files, "held once"
 # in each of them, and the four were the one number a bump had to find.
 #
-# **Keyed on the lockfile, because that is what decides the answer.** The
-# workspaces' own `version` lines are left out of the key: a release stamp
-# rewrites them, and they change nothing that is downloaded. `setup-bun` caches the binary and not what it
-# installs, so without the cache every job pays a cold resolve of the whole
-# tree. `--frozen-lockfile` so a
-# lockfile that does not match `package.json` fails here rather than being
-# quietly updated in CI and not on the machine that pushed.
+# **No cache of what it installs, because the registry is faster.** Measured
+# on 10 Oct 2026, three runs each on the runners here: restoring the 422 MB of
+# `~/.bun/install/cache` took 11 to 13 seconds and the install after it 1 to
+# 2, where `bun install` from the registry with nothing restored took 5 to 9.
+# The cache was one `tar` unpacking every file on one core, and bun fetches and
+# unpacks in parallel. Every job pays this once, and the run's longest chain
+# pays it twice. The entries it saved on `main` held 422 MB of the
+# repository's 10 GB, which the Cargo caches now have.
+#
+# `--frozen-lockfile` so a lockfile that does not match `package.json` fails
+# here rather than being quietly updated in CI and not on the machine that
+# pushed.
 #
 # **`checkout` is not here and cannot be**: a local action is read from the
 # checkout, so the step that fetches it has to run first.
 name: Set up bun and the dependencies
-description: Installs the bun `packageManager` names, restores its cache, and installs the workspace.
+description: Installs the bun `packageManager` names, then the workspace.
 
 inputs:
   dependencies:
@@ -43,38 +48,6 @@ runs:
       uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       with:
         bun-version: ${{ steps.bun.outputs.version }}
-
-    # The lockfile without the lines a release stamp rewrites: the script says
-    # why, and `seed` in `verify.yml` looks the same key up.
-    - name: Key the dependencies on the lockfile
-      if: inputs.dependencies == 'true'
-      id: key
-      shell: bash
-      run: echo "key=$(.github/scripts/bun-cache-key.sh)" >> "$GITHUB_OUTPUT"
-
-    # **Saved on `main`, and restored on every other branch.** A cache that a
-    # pull request saves is visible to that pull request only, so each one
-    # that changed the key wrote 420 MB that no other branch could read. On
-    # October 8, 2026 twelve such entries held 5 GB of the repository's
-    # 10 GB, and the eviction they caused removed the Cargo cache that the
-    # helix binary builds from, which made the next build seven minutes long.
-    # A pull request that changes the lockfile restores the nearest entry, and
-    # `bun install` downloads the difference.
-    - name: Restore the installed dependencies
-      if: inputs.dependencies == 'true' && github.ref != 'refs/heads/main'
-      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-      with:
-        key: ${{ steps.key.outputs.key }}
-        path: ~/.bun/install/cache
-        restore-keys: bun-${{ runner.os }}-
-
-    - name: Cache the installed dependencies
-      if: inputs.dependencies == 'true' && github.ref == 'refs/heads/main'
-      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-      with:
-        key: ${{ steps.key.outputs.key }}
-        path: ~/.bun/install/cache
-        restore-keys: bun-${{ runner.os }}-
 
     - name: Install dependencies
       if: inputs.dependencies == 'true'
