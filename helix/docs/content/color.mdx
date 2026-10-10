@@ -34,6 +34,9 @@ Choose a surface by where the element sits relative to the page. This is the
 choice people most often get wrong. See [Surfaces and
 separation](./surfaces-and-separation).
 
+A field is filled with `well`: 5% of `foreground` laid over whatever the field
+sits on, so its color depends on the surface under the field.
+
 ### Inks
 
 Inks are the colors that go on grounds. The base ink is `foreground`.
@@ -115,6 +118,11 @@ color that already meets the target there is used as it is. For any other color,
 the engine searches for the lightness that meets the target. A pair that cannot
 meet its target, such as one with a color you pinned, is reported in
 `violations`.
+
+`foreground` and `foreground-muted` are also written in fields, so the engine
+solves them against the well over the page, a card, a raised surface, a dialog,
+and a sunken surface. The report names each of these grounds as the well over
+its surface, such as `color-well over color-surface`.
 
 `foreground-subtle` is the one ink the engine does not solve. The range of
 readable grays has room for one quiet ink, and `foreground-muted` is that ink, so
