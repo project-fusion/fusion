@@ -517,6 +517,10 @@ jobs:
   # seconds, and the alternative is either this job waiting for `warm` again or
   # the binary crossing between jobs as an artifact, which buys nothing once the
   # cache is warm and adds a dependency that makes `cli` wait on clippy.
+  #
+  # **Clippy is `clippy` below, beside this.** The two share nothing a cache
+  # can carry: clippy writes metadata and the tests write binaries. One after
+  # the other they were 35 and 122 seconds of the longest job in the run.
   rust:
     needs: proven
     if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
@@ -535,7 +539,6 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
         with:
-          components: clippy
           # **WebAssembly, for the example plugin the host's tests build.** They
           # compile it the way its author would rather than reading a committed
           # artifact, so the target is a dependency of the tests and not of the
@@ -576,10 +579,40 @@ jobs:
             fusion/plugins/example/target-escape
           key: example-plugin
           prefix-key: v0-rust-1.96
-      - name: Clippy
-        run: bun run rs:check
       - name: Rust tests
         run: bun run rs:test
+
+  # **Clippy, beside the tests rather than ahead of them.** It reads the
+  # workspace and writes metadata, so it needs a toolchain and a script runner
+  # and none of the dependencies the tests shell out to.
+  clippy:
+    needs: proven
+    if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' }}  # dialect:quoted, GitHub's function
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # `bun run`, for the script `verify` names, and nothing installed.
+      - name: Set up bun
+        uses: ./.github/actions/setup
+        with:
+          dependencies: 'false'
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
+        with:
+          components: clippy
+          # The floor, for the reason `rust` gives.
+          toolchain: 1.96
+      # Keyed on the job name, which is this job's own entry, and on the
+      # toolchain installed above, for the reasons `rust` gives.
+      - name: Restore the Cargo cache
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          add-rust-environment-hash-key: false
+          prefix-key: v0-rust-1.96
+      - name: Clippy
+        run: bun run rs:check
 
   # The checks that run a Rust binary over what the workspace build wrote.
   #
@@ -1051,7 +1084,7 @@ jobs:
   verify:
     if: always()
     needs:
-      [proven, plan, warm, warm-browser, checks, cli, floors, packaging, lint, types, tests, rust, browser, site]
+      [proven, plan, warm, warm-browser, checks, cli, floors, packaging, lint, types, tests, rust, clippy, browser, site]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
