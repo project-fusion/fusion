@@ -36,6 +36,7 @@ export function SiteMenu({
   onOpenChange,
   onPreferences,
   open,
+  path,
   placement = 'end',
 }: {
   onOpenChange: (open: boolean) => void
@@ -56,9 +57,12 @@ export function SiteMenu({
    * from the start. A panel flying in from the opposite edge to the button that
    * summoned it reads as a second, unrelated thing appearing.
    */
+  /** The page the tree marks current, where it is not the address. */
+  path?: string | undefined
   placement?: 'end' | 'start'
 }) {
-  const pathname = usePathname()
+  const address = usePathname()
+  const pathname = path ?? address
 
   return (
     <helix-drawer
@@ -199,8 +203,21 @@ export function SiteMenu({
 /**
  * Site navigation: the sections, centered in the masthead.
  */
-export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
-  const pathname = usePathname()
+export function SiteNav({
+  findable = [],
+  path,
+}: {
+  findable?: Findable[]
+  /**
+   * The page the masthead marks current, where it is not the address. Only the
+   * loading stand-ins pass one: each is drawn at `/stand-ins/…`, which no item
+   * holds, and the masthead a reader sees while a page loads is already marking
+   * the page on its way.
+   */
+  path?: string | undefined
+}) {
+  const address = usePathname()
+  const pathname = path ?? address
   const [open, setOpen] = useState(false)
 
   const [prefsOpen, setPrefsOpen] = useState(false)
@@ -546,6 +563,7 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
           setPrefsOpen(true)
         }}
         open={open}
+        path={path}
       />
     </>
   )
