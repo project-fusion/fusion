@@ -21,7 +21,13 @@ pub struct Origin {
     /// Seconds since the Unix epoch.
     pub at: u64,
     pub commit: String,
+    /// The commit the run is about. A pull request's run checks out a merge
+    /// of the branch into its base, so `commit` is that merge and this is the
+    /// branch's own commit, which `helix visual accept` holds a checkout to.
+    pub head: String,
     pub reference: String,
+    /// The CI run's page, when a CI service names one.
+    pub url: String,
 }
 
 impl Origin {
@@ -45,17 +51,51 @@ impl Origin {
             .filter_map(|name| std::env::var(name).ok())
             .find(|value| !value.is_empty())
             .unwrap_or_else(|| git(&["rev-parse", "--abbrev-ref", "HEAD"]));
+        let commit = git(&["rev-parse", "HEAD"]);
+        /* GitHub names the branch's commit only in the event that started the
+        run, so it is read from there. */
+        let head = std::env::var("GITHUB_EVENT_PATH")
+            .ok()
+            .and_then(|path| fs::read_to_string(path).ok())
+            .and_then(|text| serde_json::from_str::<Value>(&text).ok())
+            .and_then(|event| {
+                event["pull_request"]["head"]["sha"]
+                    .as_str()
+                    .map(str::to_string)
+            })
+            .unwrap_or_else(|| commit.clone());
+        let variable = |name: &str| std::env::var(name).unwrap_or_default();
+        let url = match (
+            variable("GITHUB_SERVER_URL"),
+            variable("GITHUB_REPOSITORY"),
+            variable("GITHUB_RUN_ID"),
+        ) {
+            (server, repository, id)
+                if !server.is_empty() && !repository.is_empty() && !id.is_empty() =>
+            {
+                format!("{server}/{repository}/actions/runs/{id}")
+            }
+            _ => String::new(),
+        };
         Self {
             at: std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .map_or(0, |since| since.as_secs()),
-            commit: git(&["rev-parse", "HEAD"]),
+            commit,
+            head,
             reference,
+            url,
         }
     }
 
     pub fn record(&self) -> Value {
-        json!({ "at": self.at, "commit": self.commit, "ref": self.reference })
+        json!({
+            "at": self.at,
+            "commit": self.commit,
+            "head": self.head,
+            "ref": self.reference,
+            "url": self.url,
+        })
     }
 }
 
@@ -83,7 +123,9 @@ impl Past {
             origin: Origin {
                 at: run["at"].as_u64().unwrap_or(0),
                 commit: run["commit"].as_str().unwrap_or_default().to_string(),
+                head: run["head"].as_str().unwrap_or_default().to_string(),
                 reference: run["ref"].as_str().unwrap_or_default().to_string(),
+                url: run["url"].as_str().unwrap_or_default().to_string(),
             },
             shots: value["shots"]
                 .as_array()
@@ -289,6 +331,7 @@ mod tests {
                 at,
                 commit: commit.to_string(),
                 reference: reference.to_string(),
+                ..Origin::default()
             },
             shots: shots
                 .iter()
