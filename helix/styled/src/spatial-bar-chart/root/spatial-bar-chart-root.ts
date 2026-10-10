@@ -22,7 +22,7 @@ import '../../tooltip/index.js'
  * @groups charts
  * @documentation https://fusion.dev/helix/components/spatial-bar-chart
  *
- * @cssproperty --spatial-bar-chart-block-size - How tall the plot is.
+ * @cssproperty --spatial-bar-chart-block-size - How tall the plot is. By default, three quarters of its width and 22em at most.
  */
 @customElement('helix-spatial-bar-chart')
 export class HelixSpatialBarChart extends HelixHeadlessSpatialBarChart {

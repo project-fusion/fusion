@@ -264,7 +264,10 @@ picture is committed.
   nothing a page keeps from being resized reaches its picture. List the shots
   of one width together.
 - **A difference is taken again from a fresh page load.** A shot that matches
-  on the second take passes, and the run names it.
+  on the second take passes, and the run names it. The report keeps its first
+  take beside the baseline, marked where they differ, since that picture is the
+  one record of what moved. The action uploads the report for such a run, as it
+  does for one that failed.
 - **Changes are grouped by what they happened to.** Each region of a shot
   that differs is traced to the element under it, and shots whose changes
   read the same, apart from where they are and each element's `id`, are one

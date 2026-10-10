@@ -250,8 +250,23 @@ runs:
           $HELIX visual report --history "$dir" --markdown >> "$GITHUB_STEP_SUMMARY" || true
         fi
 
+    # **A shot that matched only on its second take** sends the report too:
+    # its first take is in it, and that picture is the only record of what
+    # moved.
+    - name: Look for a shot that needed a second take
+      if: always() && inputs.mode == 'check'
+      id: steadied
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        REPORT: ${{ inputs.report }}
+      run: |
+        if grep -q '"result": "steadied"' "$REPORT/run.json" 2>/dev/null; then
+          echo "found=true" >> "$GITHUB_OUTPUT"
+        fi
+
     - name: Upload the report and the diff images
-      if: failure() && inputs.mode == 'check'
+      if: (failure() || steps.steadied.outputs.found == 'true') && inputs.mode == 'check'
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         if-no-files-found: ignore

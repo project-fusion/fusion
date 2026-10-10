@@ -3,6 +3,7 @@ export function Example() {
     <helix-flex
       align-items="center"
       gap="md"
+      justify-content="center"
     >
       <helix-motion-toggle></helix-motion-toggle>
       <helix-motion-toggle>Pause motion</helix-motion-toggle>
