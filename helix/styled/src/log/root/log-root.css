@@ -1,0 +1,192 @@
+/* The sixteen ANSI colors from the theme, so a program's red is the theme's
+   danger and its green the theme's success. A bright color is the same color:
+   a theme has one red, and a second, lighter one beside it would be a color
+   nobody chose. The two ends of the gray ramp keep their order, white being
+   the ink a terminal writes in and bright black the quiet one. Cyan is mixed
+   from blue and green, there being no token for it. */
+:host {
+  --log-ansi-background: var(--log-background-color, var(--helix-color-background));
+  --log-ansi-black: var(--helix-color-foreground);
+  --log-ansi-blue: var(--helix-color-info);
+  --log-ansi-bright-black: var(--helix-color-foreground-subtle);
+  --log-ansi-bright-blue: var(--helix-color-info);
+  --log-ansi-bright-cyan: color-mix(in oklab, var(--helix-color-info), var(--helix-color-success));
+  --log-ansi-bright-green: var(--helix-color-success);
+  --log-ansi-bright-magenta: var(--helix-color-syntax-callable);
+  --log-ansi-bright-red: var(--helix-color-danger);
+  --log-ansi-bright-white: var(--helix-color-foreground);
+  --log-ansi-bright-yellow: var(--helix-color-warning);
+  --log-ansi-cyan: color-mix(in oklab, var(--helix-color-info), var(--helix-color-success));
+  --log-ansi-foreground: var(--log-color, var(--helix-color-foreground));
+  --log-ansi-green: var(--helix-color-success);
+  --log-ansi-magenta: var(--helix-color-syntax-callable);
+  --log-ansi-red: var(--helix-color-danger);
+  --log-ansi-white: var(--helix-color-foreground-muted);
+  --log-ansi-yellow: var(--helix-color-warning);
+
+  /* Four rows, each named, because a hidden grid item leaves the grid and the
+     rows below it would move up a track with that track's sizing, which is
+     what `Chat` measured. Only the lines scroll. */
+  background-color: var(--log-background-color, var(--helix-color-background));
+  border: var(--helix-border-thin) solid var(--log-border-color, var(--helix-color-border));
+  border-radius: var(--log-radius, var(--helix-radii-lg));
+  color: var(--log-color, var(--helix-color-foreground));
+  display: grid;
+  font-family: var(--log-font-family, var(--helix-font-mono));
+  font-size: var(--log-font-size, var(--helix-text-xs));
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  line-height: var(--log-line-height, var(--helix-leading-normal));
+  max-block-size: var(--log-max-block-size, 30rem);
+  min-block-size: 0;
+  overflow: hidden;
+  tab-size: 4;
+}
+
+/* A line longer than the box wraps, rows grow to hold it, and the column of
+   numbers stays a column. The spaces are kept on each line's text and not on
+   the box: kept on the box, the white space between the lines a page writes
+   as children drew a blank row between each pair. */
+:host([wrap]) {
+  --_log-line-size: auto;
+  --_log-white-space: pre-wrap;
+}
+
+::slotted([slot="toolbar"]) {
+  border-block-end: var(--helix-border-thin) solid
+    var(--log-border-color, var(--helix-color-border));
+  font-family: var(--helix-font-sans);
+  grid-row: 1;
+  padding-block: var(--helix-space-xs);
+  padding-inline: var(--log-padding-inline, var(--helix-space-md));
+}
+
+/* What was let go, said once at the top, in the voice of the chrome rather
+   than of the output. */
+[part="dropped"] {
+  background-color: var(--helix-color-surface-sunken);
+  border-block-end: var(--helix-border-thin) solid
+    var(--log-border-color, var(--helix-color-border));
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  grid-row: 2;
+  margin: var(--helix-space-none);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--log-padding-inline, var(--helix-space-md));
+}
+
+[part="dropped"][hidden],
+[part="resume"][hidden] {
+  display: none;
+}
+
+/* The scrollport takes the treatment `ScrollArea` settled on: `thin`, and the
+   shared scrollbar colors after this family's own hooks. */
+[part="log"] {
+  grid-row: 3;
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding-block: var(--helix-space-xs);
+  scrollbar-color: var(--log-scrollbar-thumb-color, var(--helix-scrollbar-thumb-color))
+    var(--log-scrollbar-track-color, var(--helix-scrollbar-track-color));
+  scrollbar-width: thin;
+}
+
+[part="log"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+/* A row drawn from data keeps every line's width, so a row with a background
+   reaches as far as the longest line rather than the edge of the box. */
+[part="row"] {
+  min-inline-size: 100%;
+  inline-size: var(--_log-line-size, max-content);
+}
+
+/* The way back sits over the lines, as `Chat` places it, so offering it moves
+   nothing a reader is reading. */
+[part="resume"] {
+  display: grid;
+  grid-row: 4;
+  justify-items: center;
+  margin-block-start: calc(var(--helix-space-xl) * -1 - var(--helix-space-xs));
+  padding-block-end: var(--helix-space-xs);
+  pointer-events: none;
+  position: relative;
+}
+
+[part="resume"] > * {
+  pointer-events: auto;
+}
+
+[part="resume"] slot::slotted(*) {
+  border: var(--helix-border-floating) solid var(--log-border-color, var(--helix-color-border));
+  box-shadow: var(--helix-shadow-floating);
+}
+
+[part="resume-button"] {
+  all: unset;
+  box-sizing: border-box;
+
+  align-items: center;
+  background-color: var(--helix-color-surface-raised);
+  block-size: var(--helix-size-control-sm);
+  border: var(--helix-border-floating) solid var(--log-border-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--helix-shadow-floating);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-2xs);
+  line-height: var(--helix-leading-tight);
+  padding-inline: var(--helix-space-sm);
+  white-space: nowrap;
+}
+
+[part="resume-button"]:hover {
+  background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 6%,
+    var(--helix-color-surface-raised)
+  );
+}
+
+[part="resume-button"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="resume-mark"] {
+  block-size: var(--helix-size-icon-sm);
+  display: inline-flex;
+  inline-size: var(--helix-size-icon-sm);
+}
+
+[part="resume-mark"] svg {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
+[part="empty"],
+[part="loading"] {
+  --_collection-inset-block: var(--helix-space-lg);
+  --_collection-inset-inline: var(--helix-space-md);
+}
+
+@media print {
+  :host {
+    max-block-size: none;
+  }
+
+  [part="log"] {
+    overflow: visible;
+  }
+
+  [part="resume"] {
+    display: none;
+  }
+}

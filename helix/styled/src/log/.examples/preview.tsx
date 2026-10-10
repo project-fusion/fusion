@@ -1,0 +1,39 @@
+export function Example() {
+  return (
+    <helix-log
+      label="Deployment"
+      line-numbers
+    >
+      <helix-log-line>
+        Cloning github.com/acme/storefront (branch main, commit 4f2a9c1)
+      </helix-log-line>
+      <helix-log-group
+        duration="38s"
+        heading="Install dependencies"
+        status="done"
+      >
+        <helix-log-line>bun install v1.1.43</helix-log-line>
+        <helix-log-line>Resolved 1,214 packages in 2.1s</helix-log-line>
+        <helix-log-line level="warn">warn: glob@7.2.3 is deprecated</helix-log-line>
+        <helix-log-line>Installed 1,214 packages in 36.4s</helix-log-line>
+      </helix-log-group>
+      <helix-log-group
+        default-open
+        duration="1m 12s"
+        heading="Build"
+        status="failed"
+      >
+        <helix-log-line>Creating an optimized production build</helix-log-line>
+        <helix-log-line>Compiled 214 modules for the browser and 37 for the server</helix-log-line>
+        <helix-log-line level="error">
+          Error: Cannot find module './checkout/summary'
+        </helix-log-line>
+        <helix-log-line level="error">Build failed with 1 error</helix-log-line>
+      </helix-log-group>
+      <helix-log-group
+        heading="Deploy"
+        status="skipped"
+      />
+    </helix-log>
+  )
+}

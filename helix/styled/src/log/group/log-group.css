@@ -1,0 +1,97 @@
+:host {
+  display: block;
+}
+
+/* The heading is chrome rather than output, so it is set in the sans face,
+   on one line, as wide as the box. */
+[part="summary"] {
+  all: unset;
+  box-sizing: border-box;
+
+  align-items: center;
+  color: var(--helix-color-foreground);
+  column-gap: var(--helix-space-xs);
+  cursor: pointer;
+  display: flex;
+  font-family: var(--helix-font-sans);
+  font-weight: var(--helix-weight-medium);
+  inline-size: 100%;
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--log-padding-inline, var(--helix-space-md));
+  white-space: nowrap;
+}
+
+[part="summary"]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);
+}
+
+[part="summary"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+/* A shut group's caret points along the line, and turns down as it opens.
+   **It stands in the column of line numbers**, as wide as the widest number
+   and measured in the face the numbers are set in, so the status and the
+   heading start where every line's text does. */
+[part="mark"] {
+  block-size: var(--helix-size-icon-sm);
+  color: var(--helix-color-foreground-subtle);
+  flex: none;
+  font-family: var(--log-font-family, var(--helix-font-mono));
+  inline-size: max(var(--helix-size-icon-sm), calc(var(--log-digits, 2) * 1ch));
+  margin-inline-end: var(--helix-space-xs);
+  rotate: -90deg;
+  transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host(:dir(rtl)) [part="mark"] {
+  rotate: 90deg;
+}
+
+:host(:state(open)) [part="mark"] {
+  rotate: none;
+}
+
+[part="status"] {
+  block-size: var(--helix-size-icon-sm);
+  color: var(--helix-color-foreground-subtle);
+  flex: none;
+  inline-size: var(--helix-size-icon-sm);
+}
+
+:host([status="done"]) [part="status"] {
+  color: var(--helix-color-success);
+}
+
+:host([status="failed"]) [part="status"] {
+  color: var(--helix-color-danger);
+}
+
+:host([status="running"]) [part="status"] {
+  color: var(--helix-color-info);
+}
+
+[part="heading"] {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[part="duration"] {
+  color: var(--helix-color-foreground-muted);
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--helix-weight-regular);
+  margin-inline-start: auto;
+}
+
+[part="content"][hidden] {
+  display: none;
+}
+
+@media print {
+  :host {
+    print-color-adjust: economy;
+  }
+}
