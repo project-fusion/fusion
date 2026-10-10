@@ -1,0 +1,71 @@
+- link "Fusion":
+  - /url: /
+- navigation "Sections":
+  - link "Helix":
+    - /url: /helix
+  - link "Cortex":
+    - /url: /cortex
+  - link "Services":
+    - /url: /company/services
+  - link "Insights":
+    - /url: /insights
+- button "Search Ctrl+K"
+- link "Fusion source on GitHub":
+  - /url: https://github.com/project-fusion
+- button "Preferences"
+- main:
+  - heading [level=1]
+  - paragraph
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - heading [level=3]
+  - status: Loading components
+- contentinfo:
+  - img "Fusion"
+  - text: Fusion Development Group Interface and AI software.
+  - link "Fusion on GitHub":
+    - /url: https://github.com/project-fusion
+  - link "Fusion on LinkedIn":
+    - /url: https://www.linkedin.com/company/project-fusion
+  - link "Fusion on X":
+    - /url: https://x.com/fusiondotdev
+  - navigation "Footer":
+    - text: Products
+    - link "Helix":
+      - /url: /helix
+    - link "Cortex":
+      - /url: /cortex
+    - text: Company
+    - link "Services":
+      - /url: /company/services
+    - link "Insights":
+      - /url: /insights
+    - link "Thesis":
+      - /url: /company/thesis
+    - link "Contact":
+      - /url: /contact
+    - text: Legal
+    - link "Terms of use":
+      - /url: /legal/terms
+    - link "Privacy":
+      - /url: /legal/privacy
+    - link "Acceptable use":
+      - /url: /legal/acceptable-use
+- alert
