@@ -82,9 +82,9 @@ helix-headless-log-line::part(text) {
 }
 
 helix-headless-log-line::part(number) {
-  color: var(--_gray-mark);
+  color: var(--_gray-muted);
   flex: none;
-  min-inline-size: 2ch;
+  min-inline-size: max(0.875rem, calc(var(--log-digits, 2) * 1ch));
   text-align: end;
   user-select: none;
 }
@@ -115,7 +115,9 @@ helix-headless-log-group::part(summary):hover {
 helix-headless-log-group::part(mark) {
   block-size: 0.875rem;
   flex: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   inline-size: 0.875rem;
+  margin-inline: calc(max(0.875rem, calc(var(--log-digits, 2) * 1ch)) - 0.875rem) 0.5rem;
   rotate: -90deg;
 }
 

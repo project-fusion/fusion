@@ -31,16 +31,22 @@
 }
 
 /* A shut group's caret points along the line, and turns down as it opens.
-   **It stands in the column of line numbers**, as wide as the widest number
-   and measured in the face the numbers are set in, so the status and the
-   heading start where every line's text does. */
+   **It stands in the column of line numbers, against its end edge as the
+   numbers are**: the column is `log-line.css`'s `max()` of the caret and the
+   widest number, measured in the face the numbers are set in, and the space
+   after it is the lines' own `md`. So the status and the heading start where
+   every line's text does. */
 [part="mark"] {
   block-size: var(--helix-size-icon-sm);
   color: var(--helix-color-foreground-subtle);
   flex: none;
   font-family: var(--log-font-family, var(--helix-font-mono));
-  inline-size: max(var(--helix-size-icon-sm), calc(var(--log-digits, 2) * 1ch));
-  margin-inline-end: var(--helix-space-xs);
+  inline-size: var(--helix-size-icon-sm);
+  margin-inline-end: calc(var(--helix-space-md) - var(--helix-space-xs));
+  margin-inline-start: calc(
+    max(var(--helix-size-icon-sm), calc(var(--log-digits, 2) * 1ch)) -
+    var(--helix-size-icon-sm)
+  );
   rotate: -90deg;
   transition: rotate var(--helix-duration-fast) var(--helix-easing-standard);
 }

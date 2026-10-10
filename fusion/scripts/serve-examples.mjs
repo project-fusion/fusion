@@ -110,13 +110,18 @@ const page = (family, slug, dark) => {
     type: 'helix-preview-render',
   }
   const payload = JSON.stringify(message).replace(/</g, '\\u003c')
-  return readFileSync(join(frame, 'frame.html'), 'utf8')
-    .replace('<head>', '<head>\n    <base href="/" />')
-    .replace(/<title>[^<]*<\/title>/, `<title>${escaped(`${nameOf(family)}: ${slug}`)}</title>`)
-    .replace(
-      '</body>',
-      `  <script type="module">window.postMessage(${payload}, '*')</script>\n  </body>`,
-    )
+  return (
+    readFileSync(join(frame, 'frame.html'), 'utf8')
+      .replace('<head>', '<head>\n    <base href="/" />')
+      .replace(/<title>[^<]*<\/title>/, `<title>${escaped(`${nameOf(family)}: ${slug}`)}</title>`)
+      /* Sent once the page has loaded, which is after the frame's bootstrap has
+       run its script: the script is inserted rather than written, so a
+       message sent as the document finishes parsing found no listener. */
+      .replace(
+        '</body>',
+        `  <script>addEventListener('load', () => window.postMessage(${payload}, '*'))</script>\n  </body>`,
+      )
+  )
 }
 
 const server = createServer((request, response) => {

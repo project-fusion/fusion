@@ -52,7 +52,18 @@
   --_log-white-space: pre-wrap;
 }
 
+/* **The controls in the toolbar are a step down**, as the actions in `Chat`'s
+   header are: they are the log's chrome rather than its subject, and a 40
+   pixel search field and its label stood as a band taller than six lines of
+   output. */
 ::slotted([slot="toolbar"]) {
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+
   border-block-end: var(--helix-border-thin) solid
     var(--log-border-color, var(--helix-color-border));
   font-family: var(--helix-font-sans);
