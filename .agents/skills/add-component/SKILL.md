@@ -47,6 +47,10 @@ procedure.
   `@event {EventClass}` where applicable. The linter fails the build without the
   first five.
 - Each `@property` gets a one-line description.
+- A numeric attribute reads through core's `numberConverter('name', default)`,
+  and one in milliseconds through `timeConverter`, which also takes `0.3s`. A
+  value that is not a number then keeps the default, where `type: Number`
+  reads `NaN`.
 
 New event? Add a class in a module of its own beside
 `helix/core/src/events/events.ts`, named after the event, carrying its own
