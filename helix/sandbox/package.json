@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-sandbox",
   "description": "A CodeMirror source pane for the Helix sandbox, and a code highlighter for Code Block.",
-  "version": "0.207.2",
+  "version": "0.208.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
