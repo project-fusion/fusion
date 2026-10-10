@@ -32,6 +32,7 @@
     "@fusion.dev/helix-docs": "workspace:*",
     "@fusion.dev/helix-gallery": "workspace:*",
     "@fusion.dev/helix-graph": "workspace:*",
+    "@fusion.dev/helix-icons": "workspace:*",
     "@fusion.dev/helix-map": "workspace:*",
     "@fusion.dev/helix-plot": "workspace:*",
     "@fusion.dev/helix-sandbox": "workspace:*",

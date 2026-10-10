@@ -1,6 +1,29 @@
 /*
  *  The centered fallback, and the delay that keeps it from flashing.
  */
+/* The lockup the masthead's `Wordmark` draws, in plain markup: the mark at
+   2.5rem, `space-xs` from the name, centered on it. */
+.lockup {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--helix-space-xs);
+}
+
+.mark {
+  block-size: 2.5rem;
+  display: block;
+  inline-size: 2.5rem;
+}
+
+/* `Wordmark`'s type, which it sets on `helix-text`'s text part. */
+.name {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-display);
+  font-size: var(--site-text-wordmark);
+  font-weight: var(--helix-weight-semibold);
+  letter-spacing: var(--helix-tracking-tight);
+}
+
 /**
  * The mark, breathing rather than spinning.
  *
