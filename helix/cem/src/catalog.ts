@@ -25,7 +25,10 @@ const CANONICAL = 'preview'
 /* The headless twin's slug, and the suffix every other one carries. */
 const HEADLESS = 'headless'
 
-/** The package each tier publishes, which every import line starts with. */
+/**
+ * The package each tier publishes, for an element whose manifest names no
+ * package and for the other families a description imports.
+ */
 const PACKAGE = { headless: '@fusion.dev/helix-headless', styled: '@fusion.dev/helix' } as const
 const HEADLESS_SUFFIX = /\.headless$/
 
@@ -79,23 +82,34 @@ export interface Element {
   cssStates: ApiMember[]
   description: string
   /**
-   * The entry that registers the element, under the tier's package: the
-   * family's own, such as `filter-input`, or one of its own where the family's
-   * leaves it out, such as `filter-input/menu`.
+   * The entry that registers the element, under its package: the family's
+   * own, such as `filter-input`, or one of its own where the family's leaves it
+   * out, such as `filter-input/menu`.
    */
   entry: string
   events: EventDoc[]
   label: string
   methods: ApiMember[]
+  /**
+   * The package that publishes the element, from its manifest: a tier's, or
+   * another package's whose element is placed in the family by its folder,
+   * such as `helix-sandbox-editor` from `@fusion.dev/helix-sandbox`.
+   */
+  package: string
   /** Role within the family. `Root` for its primary element. */
   part: string
   properties: PropertyDoc[]
   slots: ApiMember[]
   /**
-   * What a page imports to register the element: the tier's package and the
-   * entry, such as `@fusion.dev/helix/option`.
+   * What a page imports to register the element: its package and the entry,
+   * such as `@fusion.dev/helix/option` or `@fusion.dev/helix-sandbox/editor`.
    */
   specifier: string
+  /**
+   * The element's own `@status`, which can differ from the family's: the
+   * family's is its root's.
+   */
+  status: string
   summary: string
   tagName: string
   tier: 'headless' | 'styled'
@@ -528,6 +542,11 @@ export const catalog = (
   const byFamily = new Map<string, HelixDeclaration[]>()
   /* Where each element is imported from, which the reference's usage shows. */
   const entryOf = new Map<HelixDeclaration, string>()
+  /* **The package from the manifest, and the tier only where it names none.**
+     A family can hold an element another package publishes, placed there by
+     its folder: `helix-sandbox-editor` is the Sandbox family's Editor, and a
+     specifier read off its tier would import it from `@fusion.dev/helix`. */
+  const packageOf = new Map<HelixDeclaration, string>()
   for (const manifest of manifests) {
     const entries = entriesOf(manifest)
     for (const module of manifest.modules ?? []) {
@@ -541,9 +560,14 @@ export const catalog = (
         }
         byFamily.set(family, [...(byFamily.get(family) ?? []), declaration])
         entryOf.set(declaration, entries.get((module.path ?? '').replace(/\.[jt]s$/, '')) ?? family)
+        if (manifest.helix?.package) {
+          packageOf.set(declaration, manifest.helix.package)
+        }
       }
     }
   }
+  const published = (declaration: HelixDeclaration): string =>
+    packageOf.get(declaration) ?? PACKAGE[tierOf(declaration.tagName ?? '')]
 
   const families = [...byFamily.entries()]
     .map(([slug, entries]) => {
@@ -595,6 +619,7 @@ export const catalog = (
             })),
             label: displayName(entry.tagName as string),
             methods: methods(entry.members),
+            package: published(entry),
             /* From the manifest, not by stripping the family name off the
                label. The composition plugin already derives this from the
                folder, and "Avatar Group" minus "Avatar" is a string operation
@@ -602,7 +627,8 @@ export const catalog = (
             part: entry.helix?.part ?? '',
             properties: properties(entry.members),
             slots: members(entry.slots),
-            specifier: `${PACKAGE[tierOf(entry.tagName as string)]}/${entryOf.get(entry) ?? slug}`,
+            specifier: `${published(entry)}/${entryOf.get(entry) ?? slug}`,
+            status: entry.helix?.status ?? '',
             summary: entry.summary ?? '',
             tagName: entry.tagName as string,
             tier: tierOf(entry.tagName as string),
@@ -688,22 +714,28 @@ const importLines = (html: string, slug: string, specifiers: Map<string, string>
  * wrote a picker that opened nothing. **The other families are listed**
  * because Select does not register Option: copied without it, the options
  * were unknown elements and the select offered nothing.
+ *
+ * **Each line is an element's own specifier**, its package and its entry, so a
+ * part another package publishes is imported from that package: the Sandbox
+ * family's Editor is `@fusion.dev/helix-sandbox/editor`.
  */
 export const usageOf = (
   family: Pick<Family, 'elements' | 'imports' | 'slug'>,
   tier: 'headless' | 'styled',
 ): string[] => {
-  if (!family.elements.some((element) => element.tier === tier)) {
+  const shown = family.elements.filter((element) => element.tier === tier)
+  if (shown.length === 0) {
     return []
   }
-  const pkg = PACKAGE[tier]
-  const parts = family.elements
-    .filter((element) => element.tier === tier && !element.specifier.endsWith(`/${family.slug}`))
-    .map((element) => `import '${element.specifier}' // ${element.label}`)
+  const own = (element: Element): boolean => element.entry === family.slug
   return [
-    `import '${pkg}/${family.slug}'`,
-    ...new Set(parts),
-    ...family.imports.map((entry) => `import '${pkg}/${entry}' // ${startCase(entry)}`),
+    ...new Set([
+      ...shown.filter(own).map((element) => `import '${element.specifier}'`),
+      ...shown
+        .filter((element) => !own(element))
+        .map((element) => `import '${element.specifier}' // ${element.label}`),
+    ]),
+    ...family.imports.map((entry) => `import '${PACKAGE[tier]}/${entry}' // ${startCase(entry)}`),
   ]
 }
 
