@@ -25,6 +25,8 @@ helix visual test                    compare every shot, and fail on a differenc
 helix visual test button             only the entries named button
 helix visual update                  write only the baselines the comparison rejects
 helix visual update --boxes          also write element boxes into baselines that have none
+helix visual accept                  write the last test's captures into the baselines
+helix visual accept --run 123        the same from a GitHub Actions run, downloaded with gh
 helix visual test --shard 0 --of 4   the first of four shards, for CI
 helix visual report                  open the report of the last run
 helix visual report --merge a b      the groups of several shards' reports as one
@@ -41,6 +43,19 @@ helix visual compare a.png b.png     compare two PNG files, with no browser
   `--boxes` also writes the element boxes into each matching baseline that has
   none, inside its own PNG, leaving its pixels as they are, so the run can say
   how far a changed element moved.
+- **`helix visual accept`** writes the capture of each shot a `test` failed into
+  the baseline it failed against, and the accessibility snapshot of each entry
+  whose snapshot changed. It reads the report the run left, `.helix/visual`
+  unless you name report directories, so nothing is pictured again and each
+  baseline is the picture the report showed. `--run` takes a GitHub Actions
+  run by its ID or the address of its page, downloads its `visual-*`
+  artifacts with the [GitHub CLI](https://cli.github.com), and accepts every
+  report in them. Use it when your machine cannot take baselines, such as a
+  Mac when the baselines are taken on Linux: push, let CI fail, and accept the
+  run. It refuses a run of a commit other than the one checked out, because
+  those captures show other code, unless you pass `--any-commit`. A shot that
+  could not be taken has no capture, and is named. Review the files it writes
+  before you commit them.
 - **`helix visual report`** opens the report the last run wrote. `--markdown` prints
   its summary as Markdown instead, for a CI job's summary page. `--merge`
   takes the reports of a run's shards, each a report directory or its
@@ -62,8 +77,9 @@ once, and `--shard` with `--of` takes one shard of a run split across jobs.
 
 `helix --json visual …` prints one JSON document on stdout and moves the
 sentences to stderr: `test` and `update` print the run's record, the same as
-the report's `run.json`, `report` prints the last one, and `compare` prints
-whether the two pictures match and how many pixels differ.
+the report's `run.json`, `report` prints the last one, `accept` prints what it
+wrote and what it left, and `compare` prints whether the two pictures match and
+how many pixels differ.
 
 ## The config
 
@@ -275,6 +291,11 @@ It lists the shots that needed a second take, the exceptions with their
 measurements, and what was skipped. The directory is emptied at the start of
 each run.
 
+For each failed shot, `run.json` names the capture in the report and the file
+its baseline is kept in, relative to the top of the git repository. It also
+names the commit the run pictured, and on GitHub Actions the run's page. That
+is what `helix visual accept` reads, in this checkout or in another one.
+
 ## The GitHub Action
 
 The Action lives in the Fusion repository, in `helix/visual/action`.
@@ -293,6 +314,17 @@ The Action lives in the Fusion repository, in `helix/visual/action`.
   App or a person: a pull request opened with `GITHUB_TOKEN` starts no checks.
   Run it on `workflow_dispatch` only, with `concurrency` set to queue and never
   cancel, so a retake is asked for and never cut in half.
+- **`mode: accept`** runs `helix visual accept --run` on the check run named by
+  `run`, and delivers what it wrote the way a retake does. It installs no
+  browser. The job needs `permissions: actions: read` to download the run's
+  artifacts.
+- **`push: true`** commits a retake or an accept onto the branch the workflow
+  ran on, with `token`, and comments on the branch's open pull request with the
+  files it changed. Your pull request then shows each changed picture, and its
+  checks run again on the push. The default branch always gets a pull request.
+  A branch that moved after the workflow started is refused, because the
+  pictures show the commit before it. Check out `ref: ${{ github.ref }}` so a
+  queued run starts from the branch as it is.
 
 `args` passes arguments to `helix visual`, such as `--config` or `--shard`.
 `helix` and `playwright` name the commands that run each,
@@ -308,13 +340,14 @@ The Action lives in the Fusion repository, in `helix/visual/action`.
 
 ## Review on the pull request
 
-A workflow can let a reviewer retake the entries they have looked at with a
-comment, using only the retake workflow you already run. This one takes
+A workflow can let a reviewer accept or retake baselines with a comment, using
+only the baselines workflow you already run. This one takes `/accept` and
 `/retake styled/badge site/home` from anyone who can push, on a branch of the
-repository, and dispatches the retake there:
+repository. `/accept` finds the last finished check run of the pull request's
+head commit and accepts its captures. `/retake` takes the entries named again.
 
 ```yaml
-name: Retake on request
+name: Baselines on request
 on:
   issue_comment:
     types: [created]
@@ -323,8 +356,8 @@ permissions:
   contents: read
   pull-requests: write
 jobs:
-  retake:
-    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/retake') && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) }}
+  baselines:
+    if: ${{ github.event.issue.pull_request && (startsWith(github.event.comment.body, '/retake') || startsWith(github.event.comment.body, '/accept')) && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) }}
     runs-on: ubuntu-latest
     steps:
       - env:
@@ -333,23 +366,31 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           NUMBER: ${{ github.event.issue.number }}
         run: |
-          head=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$NUMBER" --jq .head.ref)
+          pr=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$NUMBER")
+          head=$(jq -r .head.ref <<<"$pr")
+          if [ "$(head -n 1 <<<"$BODY" | awk '{ print $1 }')" = /accept ]; then
+            run=$(gh run list --workflow visual.yml --commit "$(jq -r .head.sha <<<"$pr")" --status completed --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+            [ -n "$run" ] && gh workflow run visual-baselines.yml --ref "$head" -f run="$run"
+            exit 0
+          fi
           entries=$(head -n 1 <<<"$BODY" | sed 's#^/retake##' | tr -s ' ' '\n' | grep -E '^[a-z0-9-]+(/[a-z0-9-]+)?$' | tr '\n' ' ')
           gh workflow run visual-baselines.yml --ref "$head" -f entries="$entries"
 ```
 
-It dispatches a `visual-baselines.yml` that runs the Action with
-`mode: retake` and passes an `entries` input in `args`. Read the comment from
-the environment, as this does, and never paste it into a command. The retake opens its own pull request into the branch, which is
-where the pictures are looked at before they land.
+It dispatches a `visual-baselines.yml` that runs the Action with `push: true`,
+in `mode: accept` when it is given a `run` input and in `mode: retake` with an
+`entries` input in `args` otherwise. `visual.yml` is the workflow that runs
+your checks. Read the comment from the environment, as this does, and never
+paste it into a command. The baselines land on the pull request's branch, and
+the pull request is where the pictures are looked at before they merge.
 
 ## How it works
 
 - **Local-first.** `helix visual` runs on your machine and in your CI. It needs no
   hosted service, and no picture leaves your machine unless you turn that on.
 - **Baselines in git.** Each baseline is a file in your repository. A retake
-  writes only the pictures the comparison rejects, and the pull request that
-  carries them is where you review the change.
+  or an accept writes only the pictures the comparison rejects, and the pull
+  request that carries them is where you review the change.
 - **Three shots by default.** A wide width, a phone width, and the dark color
   scheme, each compared to its own baseline.
 - **The environment is part of the baseline.** The browser version, the

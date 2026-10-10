@@ -1,5 +1,6 @@
-# `helix visual` in a GitHub workflow: `check` compares, `retake` writes the
-# baselines and opens a pull request with them.
+# `helix visual` in a GitHub workflow: `check` compares, `retake` takes the
+# baselines again, and `accept` makes the captures of a failed check the
+# baselines.
 #
 # **`check`** installs Chromium from the cache, runs `helix visual test`, writes the
 # run's summary to the job's summary page, and on a failure uploads the report
@@ -11,6 +12,20 @@
 # wrote, on a branch named for the ref it ran on. Give it a token from a
 # GitHub App or a person: a pull request opened with `GITHUB_TOKEN` gets no
 # `pull_request` run, so a required check on it never starts.
+#
+# **`accept`** downloads the `visual-*` artifacts of the check run named by
+# `run` and runs `helix visual accept` on them, which writes each failed shot's
+# capture into its baseline. Nothing is pictured again, so it installs no
+# browser, and the baseline is the picture the check showed. It refuses a run
+# of a commit other than the one checked out. It reads the artifacts with the
+# workflow's token, which needs `actions: read`.
+#
+# **`push: true` commits onto the branch the workflow ran on.** A retake or an
+# accept on a feature branch then needs no second pull request: the pictures
+# are reviewed in the branch's own pull request, which a push with `token`
+# checks again. The default branch always gets a pull request, because a push
+# there would land a baseline nobody reviewed. A branch that moved after the
+# run is refused, because the pictures show the commit before it.
 #
 # **Run a retake on request only, and never cancel one.** A baseline retaken on
 # push agrees with whatever just landed, and a retake killed halfway leaves its
@@ -32,26 +47,26 @@
 # **The commit message releases nothing by default.** `test(visual)` is a
 # conventional commit type that release tooling reads as no release.
 name: Helix visual tests
-description: Visual regression testing with baselines kept in git. Compares on every run, and retakes the baselines into a pull request on request.
+description: Visual regression testing with baselines kept in git. Compares on every run, and retakes the baselines or accepts a failed run's captures on request.
 
 inputs:
   args:
     description: Arguments after `helix visual test` or `helix visual update`, such as `--config site/visual.config.ts` or `--shard 0 --of 4`.
     default: ''
   branch:
-    description: The branch a retake pushes to. One per ref unless you set it.
+    description: The branch a retake or an accept opens its pull request from. One per ref unless you set it.
     default: visual-baselines-${{ github.ref_name }}
   browser:
     description: Whether to install Chromium and its system packages from the cache first.
     default: 'true'
   commit-message:
-    description: The retake's commit message and pull request title.
-    default: 'test(visual): retake the baselines'
+    description: 'The commit message and pull request title of a retake or an accept. `test(visual): retake the baselines` or `test(visual): accept the captures of a check` unless you set it.'
+    default: ''
   mode:
-    description: '`check` to compare, or `retake` to write the baselines and open a pull request.'
+    description: '`check` to compare, `retake` to take the baselines again, or `accept` to make the captures of the check run named by `run` the baselines.'
     required: true
   paths:
-    description: What a retake commits, as git pathspecs, where `*` crosses directories. Every picture, every accessibility snapshot, and every fingerprint at its default name unless you set it. Ignored files stay out.
+    description: What a retake or an accept commits, as git pathspecs, where `*` crosses directories. Every picture, every accessibility snapshot, and every fingerprint at its default name unless you set it. Ignored files stay out.
     default: |
       *.png
       *.aria.yml
@@ -68,11 +83,17 @@ inputs:
   playwright:
     description: The command that runs Playwright's command line, for installing the browser.
     default: npx --no-install playwright
+  push:
+    description: Whether a retake or an accept commits onto the branch the workflow ran on. A pull request on the default branch, and when `false`.
+    default: 'false'
   report:
     description: The config's `report` directory, relative to `working-directory`.
     default: .helix/visual
+  run:
+    description: The check run whose captures an accept makes the baselines, by its ID or the address of its page.
+    default: ''
   token:
-    description: The token a retake opens its pull request with. A GitHub App's or a person's, so the pull request's checks run.
+    description: The token a retake or an accept pushes or opens its pull request with. A GitHub App's or a person's, so the checks run on what it writes.
     default: ''
   working-directory:
     description: Where `helix visual` runs, beside its config.
@@ -85,24 +106,29 @@ runs:
       shell: bash
       env:
         MODE: ${{ inputs.mode }}
+        RUN: ${{ inputs.run }}
         TOKEN: ${{ inputs.token }}
       run: |
         case "$MODE" in
           check) ;;
-          retake)
+          retake | accept)
             if [ -z "$TOKEN" ]; then
-              echo "::error::A retake opens a pull request, and needs \`token\` to do it."
+              echo "::error::A $MODE pushes or opens a pull request, and needs \`token\` to do it."
+              exit 1
+            fi
+            if [ "$MODE" = accept ] && [ -z "$RUN" ]; then
+              echo "::error::An accept takes the captures of a check run, and needs \`run\` to name it."
               exit 1
             fi
             ;;
           *)
-            echo "::error::\`mode\` is \`check\` or \`retake\`, and was \`$MODE\`."
+            echo "::error::\`mode\` is \`check\`, \`retake\`, or \`accept\`, and was \`$MODE\`."
             exit 1
             ;;
         esac
 
     - name: Read the Playwright version and the runner image
-      if: inputs.browser == 'true'
+      if: inputs.browser == 'true' && inputs.mode != 'accept'
       id: version
       shell: bash
       env:
@@ -120,14 +146,14 @@ runs:
         fi
 
     - name: Restore the browser
-      if: inputs.browser == 'true'
+      if: inputs.browser == 'true' && inputs.mode != 'accept'
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         key: playwright-${{ runner.os }}-${{ steps.version.outputs.version }}
         path: ~/.cache/ms-playwright
 
     - name: Restore the system packages
-      if: inputs.browser == 'true' && steps.version.outputs.image != ''
+      if: inputs.browser == 'true' && inputs.mode != 'accept' && steps.version.outputs.image != ''
       id: packages
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
@@ -135,7 +161,7 @@ runs:
         path: ~/.cache/playwright-deps
 
     - name: Install the system packages and Chromium
-      if: inputs.browser == 'true'
+      if: inputs.browser == 'true' && inputs.mode != 'accept'
       shell: bash
       env:
         HIT: ${{ steps.packages.outputs.cache-hit }}
@@ -161,6 +187,19 @@ runs:
         ARGS: ${{ inputs.args }}
         HELIX: ${{ inputs.helix }}
       run: $HELIX visual update $ARGS
+
+    # `GH_REPO`, so `gh` downloads from this repository whatever the checkout's
+    # remotes say.
+    - name: Accept the captures of the check run
+      if: inputs.mode == 'accept'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        GH_REPO: ${{ github.repository }}
+        GH_TOKEN: ${{ github.token }}
+        HELIX: ${{ inputs.helix }}
+        RUN: ${{ inputs.run }}
+      run: $HELIX visual accept --run "$RUN"
 
     # The config is read again for where its report is, so this names it the
     # way the run did. A run that wrote no report has nothing to summarize.
@@ -224,16 +263,93 @@ runs:
           !**/node_modules/**
         retention-days: 14
 
+    # **Where the pictures go.** Onto the branch with `push`, and in a pull
+    # request on the default branch or a ref that is no branch, such as a tag.
+    - name: Decide where the pictures go
+      if: inputs.mode == 'retake' || inputs.mode == 'accept'
+      id: deliver
+      shell: bash
+      env:
+        DEFAULT: ${{ github.event.repository.default_branch }}
+        GIVEN: ${{ inputs.commit-message }}
+        MODE: ${{ inputs.mode }}
+        PUSH: ${{ inputs.push }}
+      run: |
+        set -euo pipefail
+        if [ -n "$GIVEN" ]; then
+          message=$GIVEN
+        elif [ "$MODE" = accept ]; then
+          message='test(visual): accept the captures of a check'
+        else
+          message='test(visual): retake the baselines'
+        fi
+        echo "message=$message" >> "$GITHUB_OUTPUT"
+        if [ "$PUSH" = true ] && [ "$GITHUB_REF_TYPE" = branch ] && [ "$GITHUB_REF_NAME" != "$DEFAULT" ]; then
+          echo "push=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "push=false" >> "$GITHUB_OUTPUT"
+        fi
+
     - name: Open the pull request
-      if: inputs.mode == 'retake'
+      if: (inputs.mode == 'retake' || inputs.mode == 'accept') && steps.deliver.outputs.push != 'true'
       uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
       with:
         add-paths: ${{ inputs.paths }}
         body: |
-          Taken by the `retake` of `helix visual` on `${{ github.ref_name }}`.
+          ${{ inputs.mode == 'accept' && format('Accepted by `helix visual accept` from the captures of run {0}, on `{1}`.', inputs.run, github.ref_name) || format('Taken by the `retake` of `helix visual` on `{0}`.', github.ref_name) }}
 
           **Look at each changed picture before approving.** A baseline is what every later run is compared to, so approving a regression here makes it the expected result. A change to `visual.fingerprint.json` is a change to the environment the baselines are compared in.
         branch: ${{ inputs.branch }}
-        commit-message: ${{ inputs.commit-message }}
-        title: ${{ inputs.commit-message }}
+        commit-message: ${{ steps.deliver.outputs.message }}
+        title: ${{ steps.deliver.outputs.message }}
         token: ${{ inputs.token }}
+
+    # **Pushed with `token`**, so the push starts the branch's checks. The
+    # checkout's own credential is the workflow's token, whose pushes start
+    # none, so it is cleared for the push. **Never rebased**: the pictures show
+    # the commit that was checked out, and a branch that moved since then is
+    # refused for a new run to answer.
+    #
+    # **The pull request hears of it**, because no pull request description
+    # carries the warning a retake's pull request does.
+    - name: Push onto the branch
+      if: (inputs.mode == 'retake' || inputs.mode == 'accept') && steps.deliver.outputs.push == 'true'
+      shell: bash
+      env:
+        ACTOR: ${{ github.actor }}
+        ACTOR_ID: ${{ github.actor_id }}
+        GH_REPO: ${{ github.repository }}
+        GH_TOKEN: ${{ inputs.token }}
+        MESSAGE: ${{ steps.deliver.outputs.message }}
+        MODE: ${{ inputs.mode }}
+        PATHS: ${{ inputs.paths }}
+        TOKEN: ${{ inputs.token }}
+      run: |
+        set -euo pipefail
+        mapfile -t specs < <(grep -v '^[[:space:]]*$' <<<"$PATHS")
+        mapfile -t changed < <(git ls-files --modified --others --exclude-standard -- "${specs[@]}")
+        if [ "${#changed[@]}" -eq 0 ]; then
+          echo "The $MODE wrote no picture that differs from the branch, so nothing was pushed." >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+        fi
+        git add -- "${changed[@]}"
+        git -c user.name='github-actions[bot]' -c user.email='41898283+github-actions[bot]@users.noreply.github.com' \
+          commit --quiet --author="$ACTOR <$ACTOR_ID+$ACTOR@users.noreply.github.com>" -m "$MESSAGE"
+        remote="https://x-access-token:$TOKEN@${GITHUB_SERVER_URL#https://}/$GITHUB_REPOSITORY.git"
+        if ! git -c "http.$GITHUB_SERVER_URL/.extraheader=" push --quiet "$remote" "HEAD:refs/heads/$GITHUB_REF_NAME"; then
+          echo "::error::The push onto \`$GITHUB_REF_NAME\` was refused. When the branch moved after the $MODE started, its pictures show an older commit: run the $MODE again on the branch as it is now."
+          exit 1
+        fi
+        commit=$(git rev-parse HEAD)
+        {
+          echo "The $MODE pushed ${#changed[@]} files onto \`$GITHUB_REF_NAME\` in $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/commit/$commit:"
+          echo
+          printf -- '- `%s`\n' "${changed[@]}"
+          echo
+          echo '**Look at each changed picture before you merge.** A baseline is what every later run is compared to, so merging a regression here makes it the expected result.'
+        } > "$RUNNER_TEMP/helix-visual-pushed.md"
+        cat "$RUNNER_TEMP/helix-visual-pushed.md" >> "$GITHUB_STEP_SUMMARY"
+        number=$(gh pr list --head "$GITHUB_REF_NAME" --state open --json number --jq '.[0].number // empty' || true)
+        if [ -n "$number" ]; then
+          gh pr comment "$number" --body-file "$RUNNER_TEMP/helix-visual-pushed.md" || true
+        fi
