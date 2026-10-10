@@ -21,7 +21,7 @@ export const MAP_STACK: readonly MapLayer[] = [
   {
     body: 'Markers, routes, areas, live positions, and data layers, written as HTML elements inside the map.',
     role: 'Elements',
-    stage: 'Building',
+    stage: 'Active',
     title: 'Layers',
   },
   {
@@ -33,7 +33,7 @@ export const MAP_STACK: readonly MapLayer[] = [
   {
     body: 'Connects the frame to the renderer. It turns the frame’s buttons and keys into map movement, draws the layers you add, and moves the renderer’s credit into the frame.',
     role: 'Integration',
-    stage: 'Building',
+    stage: 'Active',
     title: 'The connector',
   },
   {
@@ -45,7 +45,7 @@ export const MAP_STACK: readonly MapLayer[] = [
   {
     body: 'A MapLibre style made from your theme, with your brand color on the main roads and light and dark versions from the same settings. It draws landmarks, highway signs, and labels in your theme’s typeface.',
     role: 'Theme',
-    stage: 'Building',
+    stage: 'Active',
     title: 'The style',
   },
   {
