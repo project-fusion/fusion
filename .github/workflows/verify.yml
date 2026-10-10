@@ -917,9 +917,14 @@ jobs:
   # `warm` made, compared with the baselines under `fusion/site/baselines`.
   # `fusion/site/visual.config.ts` says why each page is there.
   #
-  # **After `warm`, because `next build` is the slow half of it**, and a
-  # restore here. It runs beside `tests`, which also waits on `warm`, and
-  # finishes inside it, so it adds nothing to the run's wall time.
+  # **After `warm`, which builds everything the site reads.** `next build` is
+  # this job's own, since `warm` leaves it out (see `build-for-checks.sh`), and
+  # with the pictures it made this the last job of a run to finish.
+  #
+  # **Two pages at once.** `helix visual` takes every core but one by default,
+  # which on a runner of two is one page at a time: nine entries for 60 seconds
+  # on run 38065672917, while `next start` serving prebuilt pages used little of
+  # the other core.
   #
   # **Every run, the skippable diffs included.** `touched.sh` lets the browser
   # jobs skip a change under `fusion/docs/`, which no example reads; the site
@@ -934,13 +939,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
-      # `warm` built it, so this is a restore of `.next`.
+      # Everything but `next build` is a restore of what `warm` built.
       - name: Build the site
         run: bunx turbo run build --filter=@fusion.dev/site
       - name: Picture the site
         uses: ./helix/visual/action
         with:
-          args: --config fusion/site/visual.config.ts
+          args: --config fusion/site/visual.config.ts --workers 2
           helix: bun helix/cli/npm/bin.mjs
           mode: check
           playwright: bunx playwright

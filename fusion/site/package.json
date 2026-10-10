@@ -23,7 +23,7 @@
     "start": "next start",
     "themed-page": "bun scripts/build-themed-page.mjs",
     "themed-page-check": "bun scripts/build-themed-page.mjs --check",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "next typegen && tsc -p tsconfig.json --noEmit",
     "wasm-copy": "bun scripts/copy-wasm.mjs"
   },
   "dependencies": {
