@@ -107,26 +107,9 @@
   border-radius: 0;
 }
 
-.cardName {
-  inline-size: 7rem;
-}
-
-/* No experimental mark beside the name: four families of 113 carry one.
-
-   **Three lines of summary from four across, two below.** A row is as tall as
-   its tallest card, and at four and five across a card is about 230 pixels wide,
-   where nearly every row holds a summary of three lines. At three across and
-   below a card is 270 or more, and two lines is what the first rows measure. */
-.cardSummaryMore {
-  display: none;
-}
-
-.cardSummaryEnd {
-  inline-size: 60%;
-}
-
-@media (width >= 73rem) {
-  .cardSummaryMore {
-    display: block;
-  }
+/* The experimental mark beside the name, a square tag, on the families that
+   carry one. */
+.cardMark {
+  aspect-ratio: 1;
+  block-size: var(--helix-size-tag);
 }

@@ -1,8 +1,11 @@
+import { CodeText } from '@/components/code-text/code-text'
 import { FilterBar, filterBar } from '@/components/filter-bar/filter-bar'
 import { GridBand } from '@/components/grid-band/grid-band'
 import { PageHero, pageHero } from '@/components/page-hero/page-hero'
+import { getFamilies } from '../../../../../content/catalog/catalog'
 import styles from './gallery.module.css'
 import loading from './loading.module.css'
+import { SORTS } from './sorts'
 
 /**
  * The gallery, in outline, while the catalog is read.
@@ -17,20 +20,24 @@ import loading from './loading.module.css'
  * `FilterBar` and `GridBand` are the ones the gallery itself renders, and each
  * card is a `helix-card` with the gallery's slots, so this cannot drift into a
  * different layout than the one it precedes. What is invented here is only the
- * boxes inside them, and each line of text is a `data-skeleton="text"` inside a
- * `helix-text` of the variant it stands in for.
+ * boxes inside them.
  *
- * **Twenty cards**, which fill the first screen at every column count the grid
- * steps through and end on a full row at four and at five.
+ * **One card per family, holding the family's own words.** The catalog is a
+ * JSON module the server already holds, so reading it costs this nothing: the
+ * wait is the page rendering 113 drawings. Each card carries its family's name,
+ * its experimental mark where it has one, and its summary, in the page's
+ * default order, as `data-skeleton="words"`: transparent text with a bar behind
+ * each line. A summary that runs to three lines on the page runs to three here,
+ * so each row is the height its row will be.
  */
-const CARDS = Array.from({ length: 20 }, (_, index) => index)
+const FAMILIES = [...getFamilies()].sort(SORTS.name)
 
 export default function Loading() {
   return (
     <>
       {/*
        * *`inert` on the whole stand-in, in one place.** A screen reader being
-       *           read twenty empty cards is being read nothing, slowly, and the wait is
+       *           read a hundred empty cards is being read nothing, slowly, and the wait is
        *           announced once in words at the bottom instead. `inert` rather than
        *           `aria-hidden` on each part: it takes the subtree out of the tab order
        *           as well as out of the accessibility tree, which matters because a
@@ -78,19 +85,22 @@ export default function Loading() {
 
         <GridBand>
           <helix-grid className={styles.familyGrid} columns={5} gap="2xl">
-            {CARDS.map((card) => (
-              <div className={styles.familyCard} key={card}>
+            {FAMILIES.map((family) => (
+              <div className={styles.familyCard} key={family.slug}>
                 <helix-card separation="outlined">
                   <div className={loading.cardArt} data-skeleton slot="media" />
                   <helix-flex align-items="center" gap="sm" justify-content="between" slot="header">
                     <helix-text as="h3" variant="title">
-                      <span className={loading.cardName} data-skeleton="text" />
+                      <span data-skeleton="words">{family.label}</span>
                     </helix-text>
+                    {family.status === 'experimental' && (
+                      <div className={loading.cardMark} data-skeleton />
+                    )}
                   </helix-flex>
                   <helix-text variant="caption">
-                    <span data-skeleton="text" />
-                    <span className={loading.cardSummaryMore} data-skeleton="text" />
-                    <span className={loading.cardSummaryEnd} data-skeleton="text" />
+                    <span data-skeleton="words">
+                      <CodeText>{family.summary}</CodeText>
+                    </span>
                   </helix-text>
                 </helix-card>
               </div>
