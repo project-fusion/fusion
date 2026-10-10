@@ -124,6 +124,11 @@ theme. Map labels meet a contrast target of 4.5 against the land. Pass
 `contrast` to change it, `language` to choose which name each place is labeled
 with, and `tiles` and `glyphs` to use your own tile server.
 
+The tiles come from OpenFreeMap unless you pass `tiles`, and so do the glyphs
+unless you pass `glyphs` or `font`. OpenFreeMap needs no key. Your reader's
+browser requests the map's tiles and glyphs from OpenFreeMap's servers, and
+`mapSnapshot` requests its tiles from them on your server.
+
 Pass `font` to draw the labels in your theme's typeface. MapLibre draws the
 letters in the page from the font your page has loaded, so there are no glyph
 files to fetch. `mapFontFrom(frame)` reads the typeface from your theme, and
@@ -131,6 +136,8 @@ files to fetch. `mapFontFrom(frame)` reads the typeface from your theme, and
 create the map, because MapLibre keeps each letter as first drawn:
 
 ```js
+import { fontReady, mapFontFrom } from '@fusion.dev/helix-map'
+
 const font = mapFontFrom(frame)
 await fontReady(font)
 const map = new maplibregl.Map({ container: 'map', style: mapLibreStyle(colors, { font }) })
@@ -223,6 +230,10 @@ in time, so a snapshot is whole or absent and the map draws in its place. Each
 request is given `timeout` milliseconds, 3000 by default. Cache only a snapshot
 that is not empty.
 
+A snapshot reads OpenFreeMap's tiles from your server by default. Pass the
+`tiles` you give `mapLibreStyle` as `mapSnapshot(view, { tiles })` to read
+your own.
+
 In a framework that renders the markup for you, such as React, put the snapshot
 in an element that is a direct child of the frame and has the
 `data-helix-map-snapshot` attribute. `connectMap` hides that element, and leaves
@@ -304,7 +315,9 @@ finished.
 | `helix-map-contours` | Contour lines, each at one height |
 | `helix-map-landcover` | What covers the ground: forest, grass, farmland, sand, rock, and ice |
 
-Each element takes `tone`, such as `primary` or `danger`, for its color.
+Markers, routes, areas, positions, points, and buildings take `tone`, such as
+`primary` or `danger`, for their color. Raster tiles keep their own colors, and
+terrain, contours, and landcover take theirs from your theme.
 
 ### Markers
 

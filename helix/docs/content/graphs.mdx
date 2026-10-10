@@ -452,6 +452,12 @@ helix-graph:state(ready) > div {
 }
 ```
 
+Use the fade where the layout settles in a moment, such as a graph whose notes
+all have places. Leave a cosmos.gl graph shown. Its layout runs for several
+seconds by design, and the view follows the notes as they spread, so the reader
+watches the graph settle. Faded in on the state, its drawing is hidden for that
+whole time.
+
 ## Draw the graph before it loads
 
 `graphSnapshot(nodes, links, options)` draws the graph on your server as an
