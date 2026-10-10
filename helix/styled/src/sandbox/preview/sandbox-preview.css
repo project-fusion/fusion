@@ -63,3 +63,13 @@
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
+
+/* Transparent until the frame draws, so the page behind it shows through.
+   **A frame's document paints white until it knows its color mode**: Chrome
+   draws an opaque canvas behind a frame whose color scheme differs from its
+   element's, and a frame learns its mode from its stylesheet and the first
+   render, both of which arrive after its first paint. Transparent rather than
+   hidden, since a browser stops drawing a hidden frame from another origin. */
+:host(:state(blank)) [part="frame"] {
+  opacity: 0;
+}

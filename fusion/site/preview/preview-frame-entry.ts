@@ -257,6 +257,9 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
   }
   window.dispatchEvent(new Event(RESTYLED))
   measure()
+  /* The preview holds the frame transparent until this, so a document that
+     has not drawn in the page's color mode yet never shows. */
+  post({ type: 'helix-preview-rendered' })
 })
 
 /**

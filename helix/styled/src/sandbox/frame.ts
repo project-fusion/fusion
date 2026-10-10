@@ -222,6 +222,7 @@ const serveWith = (tools: FrameTools, options: ServePreviewOptions = {}): (() =>
     sheet.textContent = styles
     options.onRender?.(root, fresh)
     measure()
+    post({ type: 'helix-preview-rendered' })
   }
 
   /* **The root and each child it holds.** `centered`, `hug` and `fullscreen`
@@ -288,6 +289,8 @@ const TOOLS: FrameTools = {
  * - Posts every console call, uncaught error, and unhandled promise rejection
  *   as `helix-preview-console`, an uncaught one marked `uncaught`, which marks
  *   the preview `failed`.
+ * - Posts `helix-preview-rendered` after each render, which shows a frame
+ *   the preview held transparent until it drew.
  * - Posts `helix-preview-size` whenever what was drawn changes height.
  * - Posts `helix-preview-press` on every press, so menus outside close.
  *
