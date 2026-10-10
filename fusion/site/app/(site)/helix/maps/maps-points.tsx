@@ -176,7 +176,7 @@ export function MapsPoints() {
           src="/maps/austin-food-and-drink.geojson"
         />
       </helix-map>
-      <helix-text aria-live="polite" emphasis="subtle" variant="caption">
+      <helix-text aria-live="polite" emphasis="muted" variant="caption">
         {pressed
           ? `Pressed: ${pressed}`
           : 'Press a count to zoom in. Press a point to see its name.'}

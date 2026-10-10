@@ -263,7 +263,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
               <SectionTitle>{radar?.title}</SectionTitle>
               <Lede>{radar?.body?.[0]}</Lede>
               <Snippet code={RADAR_MARKUP} label="The markup" language="html" wrap />
-              <helix-text emphasis="subtle" variant="caption">
+              <helix-text emphasis="muted" variant="caption">
                 {radar?.body?.[1]}
               </helix-text>
             </helix-flex>

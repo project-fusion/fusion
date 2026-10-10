@@ -112,7 +112,7 @@ export function MapsTerrain() {
         />
         <helix-map-contours max-zoom="15" src={ELEVATION.src} unit="feet" />
       </helix-map>
-      <helix-text emphasis="subtle" variant="caption">
+      <helix-text emphasis="muted" variant="caption">
         Press 3D to lay the valley flat. Open the layers menu for satellite imagery.
       </helix-text>
     </div>

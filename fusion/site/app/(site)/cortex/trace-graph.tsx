@@ -230,7 +230,7 @@ export function TraceGraph() {
             </helix-text>
           ) : null}
         </helix-graph>
-        <helix-text class={styles.traceCaption} emphasis="subtle" variant="caption">
+        <helix-text class={styles.traceCaption} emphasis="muted" variant="caption">
           {layout === 'rows' ? 'Read from the top down' : 'Read from left to right'}: what came in,
           the facts Engram kept from it, what was retrieved and looked up, the context the model was
           given, and the answer it gave. The chosen answer is lit back to where it came from. An
@@ -294,7 +294,7 @@ export function TraceGraph() {
           >
             {deleted ? 'Restore the trace' : `Delete “${DELETED}”`}
           </helix-button>
-          <helix-text aria-live="polite" emphasis="subtle" variant="caption">
+          <helix-text aria-live="polite" emphasis="muted" variant="caption">
             {deleted
               ? `Deleted “${DELETED}”, the context built from it, and the answer that context produced. The facts it cited and the sources they came from remain.`
               : 'Deleting a memory removes everything derived from it, as Trace does. The September answer cites the superseded price, which is why Engram keeps it.'}

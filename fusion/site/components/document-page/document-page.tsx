@@ -58,12 +58,12 @@ export function DocumentPage({
   const head = (
     <helix-flex align-items="start" direction="column" gap="md">
       {kicker && (
-        /* Full strength on the band, for the same reason as the lede below.
-           Subtle, it measured 3.04:1 on the band in light mode and 3.74:1 in
-           dark, and a 12px label needs 4.5:1. */
+        /* Full strength on the band, for the same reason as the lede below:
+           over the band's pale gradient the quiet ink falls under the 4.5:1 a
+           12px label needs. */
         <helix-text
           class={styles.documentKicker}
-          emphasis={hero ? undefined : 'subtle'}
+          emphasis={hero ? undefined : 'muted'}
           variant="label"
         >
           {kicker}
