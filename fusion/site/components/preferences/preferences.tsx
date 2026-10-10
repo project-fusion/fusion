@@ -177,7 +177,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
             it from any page, rather than as a button over the light itself.
             The device's reduced-motion setting stills it whatever this says. */}
         <helix-toggle-group
-          hint="Off holds the moving light behind the landing page still."
+          hint="Off stills the light behind the page."
           label="Background motion"
           onChange={(event) => chooseMotion(event.currentTarget.value as Motion)}
           value={motion}
@@ -192,7 +192,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
             everyone consumes; where a control sits in a row and which of its
             values is the resting one are different questions. */}
         <helix-toggle-group
-          hint="Styled extends headless, so it shows more."
+          hint="Styled includes everything in headless."
           label="API reference"
           onChange={(event) => chooseTier(event.currentTarget.value as ApiTier)}
           value={tier}
