@@ -10,7 +10,7 @@ import { ThemeScope } from '@/components/theme-context/theme-context'
 import { PRODUCTS } from '@/content/products/products'
 import { findVertical, stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
-import { CortexStrands } from './cortex-strands'
+import { CortexAura } from './cortex-aura'
 import { CORTEX_MODULES } from './modules'
 import styles from './page.module.css'
 import { TraceGraph } from './trace-graph'
@@ -58,7 +58,7 @@ export default function Page() {
   return (
     <ThemeScope>
       <div className={`${styles.reel} ${styles.noRules}`}>
-        <CortexStrands className={styles.reelStrands} />
+        <CortexAura className={styles.reelAura} />
 
         <section className={`${hero.hero} ${styles.productHero}`} id="cortex-hero">
           <helix-flex

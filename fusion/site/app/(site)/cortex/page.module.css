@@ -16,12 +16,23 @@
   position: relative;
 }
 
-.reelStrands {
+/* The field, absolute against the reel so it runs behind the whole page and
+   scrolls with it: fixed to the window, the content would slide over a light
+   that never moves, which is a wallpaper. Faded at the bottom the way the
+   services field is, so it ends before the footer and not at a hard edge.
+   Quieter in light, where a field at full strength reads as a stain on the
+   page, and stronger in dark, where it is the page's only light. */
+.reelAura {
+  block-size: auto;
+  inset: 0;
+  mask-image: linear-gradient(to bottom, black 0%, black 92%, transparent 100%);
+  opacity: light-dark(0.45, 0.75);
   pointer-events: none;
+  position: absolute;
 }
 
 /* Every band sits over the light, so every band is positioned, or it paints
-   under a fixed element instead of over it. */
+   under the field instead of over it. */
 .reel > section {
   position: relative;
 }
