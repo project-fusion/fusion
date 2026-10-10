@@ -26,9 +26,12 @@
  * 84 seconds against 106 planned. So a local reading is scaled onto the `runner`
  * figures below and is the fallback, not the first choice.
  *
- * **One worker locally, because a runner gets one.** Four finish four times
- * sooner and compress the shape further: a family that waits on a decode is
- * delayed no further by the three beside it, while a family that paints is.
+ * **One worker locally, because that is what the costs are counted in.** Four
+ * finish four times sooner and compress the shape further: a family that waits
+ * on a decode is delayed no further by the three beside it, while a family
+ * that paints is. A runner's shard renders two at once, `WORKERS` in
+ * `plan-browser.mjs`, so a run read with `--from` records each family beside
+ * another, which is longer per family than the figures here were taken as.
  *
  * **A check that refuses to run is left unmeasured rather than guessed at.**
  * `check:spec:visual` compares against Linux baselines and exits on anything
