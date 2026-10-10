@@ -1,6 +1,7 @@
 /**
- * The visual tests' config for the site: five pages at 1440 and 390 light and
- * 1440 dark, each pictured whole, from `next start` over the production build.
+ * The visual tests' config for the site: five pages and three loading
+ * stand-ins at 1440 and 390 light and 1440 dark, each pictured whole, from
+ * `next start` over the production build.
  *
  * **The site had no visual check, and production showed why it needed one.**
  * On October 8, 2026 every code block on the site lost its syntax colors,
@@ -15,6 +16,14 @@
  *
  * **Whole pages, decided by the owner on October 8, 2026**, so a fault below
  * the first screen shows too.
+ *
+ * **The loading stand-ins, from October 10, 2026.** The components gallery,
+ * the insights index and a component's reference page each have a
+ * `loading.tsx` that shows while the page renders, which is never long enough
+ * to picture. `/stand-ins/[name]` renders each one on its own, and answers 404
+ * unless the server was started with `SITE_STAND_INS=1`, which `start` below
+ * sets. A stand-in that stops matching the page it precedes shows as a change
+ * here.
  *
  * **Requests stay on the site's own origin**, so the maps page draws without
  * the tiles another host would serve, and the sandbox without the compiler it
@@ -81,8 +90,11 @@ export default defineConfig({
         { name: 'sandbox', path: '/helix/sandbox' },
         { name: 'theme', path: '/helix/theme' },
         { name: 'maps', path: '/helix/maps' },
+        { name: 'components-loading', path: '/stand-ins/components' },
+        { name: 'insights-loading', path: '/stand-ins/insights' },
+        { name: 'reference-loading', path: '/stand-ins/reference' },
       ],
-      start: 'exec bunx next start --hostname 127.0.0.1 --port 3417',
+      start: 'exec env SITE_STAND_INS=1 bunx next start --hostname 127.0.0.1 --port 3417',
       url: 'http://127.0.0.1:3417',
     },
   ],
