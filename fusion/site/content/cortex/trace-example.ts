@@ -35,12 +35,12 @@ interface Example {
  * produced, so the trace reads as gathering toward its output.
  */
 const KINDS = {
-  context: { group: 'Contexts', shape: 'circle', size: 5 },
-  fact: { group: 'Facts, in Engram', shape: 'circle', size: 4 },
-  memory: { group: 'Memories', shape: 'circle', size: 4.5 },
-  output: { group: 'Outputs', shape: 'circle', size: 6.5 },
-  source: { group: 'Sources', shape: 'circle', size: 4 },
-  tool_call: { group: 'Tool calls', shape: 'circle', size: 4 },
+  context: { group: 'Contexts', shape: 'circle', size: 3.5 },
+  fact: { group: 'Facts, in Engram', shape: 'circle', size: 2.8 },
+  memory: { group: 'Memories', shape: 'circle', size: 3.2 },
+  output: { group: 'Outputs', shape: 'circle', size: 4.5 },
+  source: { group: 'Sources', shape: 'circle', size: 2.8 },
+  tool_call: { group: 'Tool calls', shape: 'circle', size: 2.8 },
 } as const
 
 /**
