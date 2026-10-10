@@ -266,52 +266,156 @@ const mapArt: ReactNode = (
 )
 
 /**
- * Graph: linked notes beside the list of them, with one note selected in
- * both. The selected note is the one solid mark and the one plate in the
- * list, and only its links move, written outward from it on hover.
+ * Graph: the notes as spheres standing over an isometric plate, linked, with
+ * one selected.
+ *
+ * **Depth is drawn, and it is the subject.** Graph draws in 3D, so its tile
+ * is the one scene in the band with a floor: a plate in isometric projection
+ * (a point at `x, y, z` lands at `(x - y) * 0.866, (x + y) * 0.5 - z`), and
+ * each note stands over it on a stem, with its shadow on the plate under it.
+ * The stems and shadows are what make the heights read; without them six
+ * circles at six heights are six circles.
+ *
+ * **A sphere is a circle and two overlays.** A white specular at the top
+ * left and a dark rim at the edge, both as gradients with no color of their
+ * own, so the same two shade an ink sphere and the brand sphere in either
+ * mode. The selected note is the brand, with a soft glow of the same color
+ * behind it, and its links are the ones that draw outward on hover.
+ *
+ * Drawn back to front, so a nearer sphere covers a farther link.
  */
+const isometric = (x: number, y: number, z: number) => ({
+  foot: { x: 160 + (x - y) * 0.866, y: 110 + (x + y) * 0.5 },
+  x: 160 + (x - y) * 0.866,
+  y: 110 + (x + y) * 0.5 - z,
+})
+
+const NOTES = {
+  a: { ...isometric(0, 0, 34), r: 7, selected: true },
+  b: { ...isometric(-28, -10, 22), r: 4.5 },
+  c: { ...isometric(22, -26, 46), r: 5.5 },
+  d: { ...isometric(26, 18, 18), r: 4.5 },
+  e: { ...isometric(-12, 30, 40), r: 5 },
+  f: { ...isometric(-34, 24, 12), r: 4 },
+}
+
+type Note = keyof typeof NOTES
+
+const QUIET_LINKS: [Note, Note][] = [
+  ['b', 'f'],
+  ['e', 'f'],
+  ['c', 'd'],
+]
+
+const SELECTED_LINKS: Note[] = ['b', 'c', 'd', 'e']
+
+const BACK_TO_FRONT = (Object.keys(NOTES) as Note[]).sort(
+  (p, q) => NOTES[p].foot.y - NOTES[q].foot.y,
+)
+
 const graphArt: ReactNode = (
   <>
-    <rect className="artRule" height="128" width="1" x="190" y="36" />
-    <g className="artStroke" strokeOpacity="0.12" strokeWidth="1.5">
-      <path d="M152 66L176 92" />
-      <path d="M78 70L64 104L82 134" />
-      <path d="M150 128L118 150" />
-      <path d="M78 70L122 48" />
+    <defs>
+      <radialGradient cx="0.35" cy="0.3" id="helixSphereLight" r="0.65">
+        <stop offset="0" stopColor="#fff" stopOpacity="0.6" />
+        <stop offset="1" stopColor="#fff" stopOpacity="0" />
+      </radialGradient>
+      <radialGradient cx="0.5" cy="0.5" id="helixSphereRim" r="0.5">
+        <stop offset="0.6" stopColor="#000" stopOpacity="0" />
+        <stop offset="1" stopColor="#000" stopOpacity="0.35" />
+      </radialGradient>
+      <filter height="300%" id="helixGlow" width="300%" x="-100%" y="-100%">
+        <feGaussianBlur stdDeviation="5" />
+      </filter>
+    </defs>
+
+    {/* The whole scene, scaled up a quarter about its center so the plate
+        fills the crop: drawn at a size where its numbers are round, and
+        shown at the size the tile has. */}
+    <g transform="translate(160 105) scale(1.25) translate(-160 -105)">
+      {/* The plate: a rhombus 80 by 80 on the ground, 6 thick, lit from the
+        top left so its left face is lighter than its right. */}
+      <g filter="url(#helixArtShadow)">
+        <polygon className="artSurface" points="160,70 229,110 160,150 91,110" />
+      </g>
+      <polygon className="artInk" fillOpacity="0.12" points="91,110 160,150 160,156 91,116" />
+      <polygon className="artInk" fillOpacity="0.28" points="160,150 229,110 229,116 160,156" />
+      <polygon className="artSurface" points="160,70 229,110 160,150 91,110" />
+      <polygon className="artEdge" points="160,70 229,110 160,150 91,110" />
+
+      {/* Each note's shadow on the plate, and the stem it stands on. */}
+      {BACK_TO_FRONT.map((key) => {
+        const note = NOTES[key]
+        return (
+          <g key={key}>
+            <ellipse
+              className="artInk"
+              cx={note.foot.x}
+              cy={note.foot.y}
+              fillOpacity="0.12"
+              rx={note.r + 1}
+              ry={(note.r + 1) / 2}
+            />
+            <line
+              className="artStroke"
+              strokeOpacity="0.12"
+              x1={note.foot.x}
+              x2={note.x}
+              y1={note.foot.y}
+              y2={note.y + note.r}
+            />
+          </g>
+        )
+      })}
+
+      {/* Links between the other notes. */}
+      <g className="artStroke" strokeOpacity="0.28" strokeWidth="1.5">
+        {QUIET_LINKS.map(([p, q]) => (
+          <line key={p + q} x1={NOTES[p].x} x2={NOTES[q].x} y1={NOTES[p].y} y2={NOTES[q].y} />
+        ))}
+      </g>
+
+      {/* The selected note's links, written outward from it. */}
+      {SELECTED_LINKS.map((key, i) => (
+        <path
+          className="artBrandStroke artMotion artDraw"
+          d={`M${NOTES.a.x} ${NOTES.a.y}L${NOTES[key].x} ${NOTES[key].y}`}
+          key={key}
+          pathLength="1"
+          strokeLinecap="round"
+          strokeWidth="1.5"
+          style={{ '--art-i': i } as CSSProperties}
+        />
+      ))}
+
+      {/* The notes, back to front. The selected one glows. */}
+      {BACK_TO_FRONT.map((key) => {
+        const note = NOTES[key]
+        return (
+          <g key={key}>
+            {note.selected && (
+              <circle
+                className="artBrand"
+                cx={note.x}
+                cy={note.y}
+                fillOpacity="0.45"
+                filter="url(#helixGlow)"
+                r={note.r + 6}
+              />
+            )}
+            <circle
+              className={note.selected ? 'artBrand' : 'artInk'}
+              cx={note.x}
+              cy={note.y}
+              fillOpacity={note.selected ? undefined : 0.4}
+              r={note.r}
+            />
+            <circle cx={note.x} cy={note.y} fill="url(#helixSphereRim)" r={note.r} />
+            <circle cx={note.x} cy={note.y} fill="url(#helixSphereLight)" r={note.r} />
+          </g>
+        )
+      })}
     </g>
-    {['M114 98L78 70', 'M114 98L152 66', 'M114 98L150 128', 'M114 98L82 134'].map((d, i) => (
-      <path
-        className="artStroke artMotion artDraw"
-        d={d}
-        key={d}
-        pathLength="1"
-        strokeLinecap="round"
-        strokeOpacity="0.55"
-        strokeWidth="1.5"
-        style={{ '--art-i': i } as CSSProperties}
-      />
-    ))}
-    <g className="artInk" fillOpacity="0.28">
-      <circle cx="176" cy="92" r="4" />
-      <circle cx="64" cy="104" r="4" />
-      <circle cx="118" cy="150" r="4" />
-      <circle cx="122" cy="48" r="4" />
-    </g>
-    <g className="artInk" fillOpacity="0.55">
-      <circle cx="78" cy="70" r="5" />
-      <circle cx="152" cy="66" r="5" />
-      <circle cx="150" cy="128" r="5" />
-      <circle cx="82" cy="134" r="5" />
-    </g>
-    <circle className="artBrand" cx="114" cy="98" r="7" />
-    <rect className="artEdge" height="15" rx="4" width="63" x="198.5" y="46.5" />
-    <rect className="artInk" fillOpacity="0.12" height="4" rx="2" width="28" x="204" y="52" />
-    <rect className="artInk" fillOpacity="0.12" height="16" rx="4" width="64" x="198" y="70" />
-    <rect className="artInk" fillOpacity="0.55" height="4" rx="2" width="36" x="204" y="76" />
-    <rect className="artInk" fillOpacity="0.28" height="4" rx="2" width="42" x="204" y="94" />
-    <rect className="artInk" fillOpacity="0.28" height="4" rx="2" width="30" x="204" y="110" />
-    <rect className="artInk" fillOpacity="0.28" height="4" rx="2" width="38" x="204" y="126" />
-    <rect className="artInk" fillOpacity="0.12" height="4" rx="2" width="44" x="204" y="142" />
   </>
 )
 
