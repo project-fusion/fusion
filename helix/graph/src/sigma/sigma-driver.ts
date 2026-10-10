@@ -616,7 +616,7 @@ export const sigmaDriver = <G extends SigmaGraph>(
           color: lit ? looks.node(near as string).color : look.color,
           glow: strong ? 1 : 0,
           hidden: look.hidden,
-          size: strong ? 1.8 : 0.8,
+          size: strong ? 1.3 : 0.8,
           strong,
           type: 'helix',
           zIndex: strong ? 1 : 0,

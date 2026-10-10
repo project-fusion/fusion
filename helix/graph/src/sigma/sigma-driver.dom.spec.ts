@@ -222,7 +222,7 @@ describe('sigmaDriver', () => {
     expect(edge('e', { from: 'a', to: 'b' })).toMatchObject({
       color: 'rgb(9, 9, 9)',
       glow: 1,
-      size: 1.8,
+      size: 1.3,
       strong: true,
       type: 'helix',
     })
@@ -250,7 +250,7 @@ describe('sigmaDriver', () => {
     expect(edge('e', { from: 'b', to: 'd' })).toMatchObject({
       color: 'rgb(7, 7, 7)',
       glow: 1,
-      size: 1.8,
+      size: 1.3,
       strong: true,
       type: 'helix',
     })
