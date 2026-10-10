@@ -30,7 +30,10 @@
       "types": "./dist/rehype/rehype.d.ts",
       "default": "./dist/rehype/rehype.js"
     },
+    "./shared": null,
+    "./shared/*": null,
     "./skills/*": "./skills/*",
+    "./specs": null,
     "./svelte": "./types/svelte.d.ts",
     "./vue": "./types/vue.d.ts",
     "./words": "./types/words.d.ts"
