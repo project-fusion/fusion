@@ -331,6 +331,30 @@ describe('mapSnapshot', () => {
     expect(markup).toBe('')
   })
 
+  /* The credit is known from the TileJSON before any tile is asked for. A
+     page that wrote nothing for a failed picture showed the map uncredited
+     until the renderer read its own credit, and the site's CI, which reaches
+     no other host from the browser, never. */
+  test('keeps the credit its tiles name where a tile fails, and writes it alone', async () => {
+    const failing = (async (input: string | URL | Request) =>
+      String(input).endsWith('tiles.json')
+        ? Response.json({
+            attribution: '<a href="https://openfreemap.org">OpenFreeMap</a>',
+            maxzoom: 14,
+            tiles: ['https://tiles.test/{z}/{x}/{y}.pbf'],
+          })
+        : new Response(null, { status: 503 })) as typeof fetch
+    const snapshot = await mapSnapshot(view, {
+      fetch: failing,
+      tiles: 'https://tiles.test/tiles.json',
+    })
+    expect(snapshot.picture).toBe('')
+    expect(snapshot.credit).toEqual([{ href: 'https://openfreemap.org', text: 'OpenFreeMap' }])
+    expect(snapshot.markup).toBe(
+      '<span data-helix-map-credit slot="attribution"><a data-link="quiet" href="https://openfreemap.org" rel="noopener noreferrer" target="_blank">OpenFreeMap</a></span>',
+    )
+  })
+
   test('writes numbers into its markup and nothing else', async () => {
     const { markup } = await mapSnapshot(
       { ...view, width: '400" onload="alert(1)' as unknown as number },

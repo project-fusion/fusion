@@ -14,16 +14,26 @@ const DRAWN_BY = process.env.VERCEL_DEPLOYMENT_ID ?? process.env.VERCEL_GIT_COMM
  */
 const PATIENCE = 2000
 
-/* **Only a whole snapshot is kept.** `mapSnapshot` answers empty markup
+/**
+ * A snapshot whose picture could not be drawn, holding the credit
+ * `mapSnapshot` still read from the tiles' TileJSON.
+ */
+class Unpictured extends Error {
+  constructor(readonly snapshot: MapSnapshot) {
+    super('The map snapshot could not be drawn.')
+  }
+}
+
+/* **Only a whole snapshot is kept.** `mapSnapshot` answers an empty picture
    when any tile failed or ran out of time, and kept, that was a Maps page
    with no first paint for a day after one bad minute of the tile server,
    which every deploy is the first to ask. Thrown here, so the cache stores
-   nothing, and caught by `snapshotOf`. */
+   nothing, and caught by `snapshotOf`, which still writes its credit. */
 const cached = unstable_cache(
   async (view: MapView): Promise<MapSnapshot> => {
     const snapshot = await mapSnapshot(view, { timeout: PATIENCE })
-    if (snapshot.markup === '') {
-      throw new Error('The map snapshot could not be drawn.')
+    if (snapshot.picture === '') {
+      throw new Unpictured(snapshot)
     }
     return snapshot
   },
@@ -40,8 +50,14 @@ const cached = unstable_cache(
  * Maps page does for a theme sent from the builder, and still draw it once.
  * **Drawn every time in development**, where the code that draws it changes
  * between one request and the next. **Never throws**: a snapshot that cannot
- * be drawn holds an empty picture and no credit, and the page draws the live
- * map alone.
+ * be drawn holds an empty picture, and the page draws the live map alone.
+ *
+ * **Its credit kept when its picture was not.** The Maps page once rendered
+ * with no credit at all, because one tile ran out of time on the server and
+ * the credit went with the picture: a reader saw the map uncredited until
+ * MapLibre read its own, and the site's visual check, whose browser reaches
+ * no other host, never saw a credit. Said in the server's log, since a page
+ * with no first paint is otherwise silent about why.
  */
 export const snapshotOf = async (view: MapView): Promise<MapSnapshot> => {
   if (process.env.NODE_ENV === 'development') {
@@ -49,7 +65,8 @@ export const snapshotOf = async (view: MapView): Promise<MapSnapshot> => {
   }
   try {
     return await cached(view)
-  } catch {
-    return { credit: [], markup: '', picture: '' }
+  } catch (error) {
+    console.warn(`map snapshot: ${error instanceof Error ? error.message : String(error)}`)
+    return error instanceof Unpictured ? error.snapshot : { credit: [], markup: '', picture: '' }
   }
 }

@@ -166,6 +166,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Par
   return (
     <>
       <MapsHero
+        credit={wide.credit.length > 0 ? wide.credit : narrow.credit}
         painted={painted}
         sent={sent}
         snapshots={wide.picture && narrow.picture ? { narrow, wide } : undefined}
