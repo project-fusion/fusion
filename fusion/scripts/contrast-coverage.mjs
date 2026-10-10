@@ -94,7 +94,7 @@ const server = createServer((request, response) => {
 await new Promise((done) => server.listen(0, '127.0.0.1', done))
 const origin = `http://127.0.0.1:${server.address().port}`
 
-/** Every token the model names. */
+/** Every name the model gives a color, an ink or a ground. */
 const named = [...new Set([...pairs].flatMap((pair) => pair.split(' on ')))]
 
 /* Lightning CSS rewrites `light-dark()` into a shim keyed on the attribute, so
@@ -105,7 +105,12 @@ const scheme = (mode) => {
 }
 
 /* One paint per token, read back through a canvas, the way the measurement
-   reads every ink: hex to the names that resolve to it. */
+   reads every ink: hex to the names that resolve to it.
+
+   **A ground laid over another, `color-well over color-surface`, is read as
+   the measurement reads a field**: the top token through the canvas with its
+   alpha, laid over the opaque one under it, so its hex is the one a run
+   records. */
 const tokens = (names) => {
   const swatch = document.createElement('canvas')
   swatch.width = 1
@@ -114,15 +119,24 @@ const tokens = (names) => {
   const probe = document.createElement('span')
   probe.style.position = 'absolute'
   document.body.append(probe)
-  const found = {}
-  for (const name of names) {
+  const read = (name) => {
     probe.style.color = `var(--helix-${name})`
     brush.fillStyle = '#010203'
     brush.fillStyle = getComputedStyle(probe).color
     brush.clearRect(0, 0, 1, 1)
     brush.fillRect(0, 0, 1, 1)
-    const [r, g, b] = brush.getImageData(0, 0, 1, 1).data
-    const hex = `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`
+    const [r, g, b, a] = brush.getImageData(0, 0, 1, 1).data
+    return { a: a / 255, b, g, r }
+  }
+  const found = {}
+  for (const name of names) {
+    const [top, under] = name.split(' over ').map(read)
+    const color = under
+      ? Object.fromEntries(
+          ['r', 'g', 'b'].map((at) => [at, top[at] * top.a + under[at] * (1 - top.a)]),
+        )
+      : top
+    const hex = `#${['r', 'g', 'b'].map((at) => Math.round(color[at]).toString(16).padStart(2, '0')).join('')}`
     found[hex] = [...(found[hex] ?? []), name]
   }
   probe.remove()

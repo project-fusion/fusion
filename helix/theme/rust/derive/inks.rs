@@ -8,7 +8,10 @@
 use crate::derive::solve::solve_against;
 use crate::derive::surfaces::Surfaces;
 use crate::derive::Cast;
-use crate::oklch::{lightness_for_contrast, shipped_contrast_ratio, Oklch, CONTRAST_STEPS};
+use crate::model::WELL;
+use crate::oklch::{
+    laid_over, lightness_for_contrast, shipped_contrast_ratio, Oklch, CONTRAST_STEPS,
+};
 
 /// What the page is written in.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -21,7 +24,8 @@ pub struct NeutralInks {
     pub muted: Oklch,
 }
 
-/// Solves the three against the page ladder.
+/// Solves the three against the page ladder, and the two a field is written in
+/// against its well on each rung as well.
 ///
 /// **`foreground` is the strongest ink the neutral has**, its end on the side
 /// away from the page: black on a light page, white on a dark one, which is
@@ -51,9 +55,20 @@ pub struct NeutralInks {
 ///
 /// The inverse pair still solves its ink at 1.6 times the target, which is
 /// what the shipped stylesheet's `neutral-50` on `neutral-900` comes to.
+///
+/// **A field's well is laid in the foreground**, so the foreground is chosen
+/// first and the wells are made from it: a field's quiet text is solved against
+/// the color the stylesheet will paint behind it, and a theme whose foreground
+/// changes moves its wells with it.
 #[must_use]
 pub fn neutral_inks(surfaces: Surfaces, neutral: Cast, contrast_target: f64) -> NeutralInks {
     let grounds = surfaces.solved_against();
+    let foreground = strongest(&grounds, neutral);
+    let fielded: Vec<Oklch> = grounds
+        .iter()
+        .copied()
+        .chain(wells(foreground, &grounds))
+        .collect();
     NeutralInks {
         border: lightness_for_contrast(
             neutral.chroma,
@@ -63,18 +78,33 @@ pub fn neutral_inks(surfaces: Surfaces, neutral: Cast, contrast_target: f64) -> 
             None,
             CONTRAST_STEPS,
         ),
-        foreground: strongest(&grounds, neutral),
-        muted: solve_against(&grounds, neutral, contrast_target),
+        foreground,
+        muted: solve_against(&fielded, neutral, contrast_target),
     }
 }
 
-/// Black or white, whichever stands further from every ground, judged by the
-/// worst of the grounds as `solve_against` judges its candidates.
+/// The well over each ground, laid in `foreground`.
+///
+/// Over the grounds the ladder is solved against, which leave `overlay` out:
+/// it is pure white in light, where the well on it is the lightest of all, and
+/// the same color as `raised` in dark, so the well on it is the well on
+/// `raised`.
+fn wells(foreground: Oklch, grounds: &[Oklch]) -> impl Iterator<Item = Oklch> + '_ {
+    grounds
+        .iter()
+        .map(move |ground| laid_over(foreground, WELL.percent, *ground))
+}
+
+/// Black or white, whichever stands further from every ground and from the well
+/// it would fill a field with, judged by the worst of them as `solve_against`
+/// judges its candidates.
 fn strongest(grounds: &[Oklch], neutral: Cast) -> Oklch {
     let worst = |ink: Oklch| {
         grounds
             .iter()
-            .map(|ground| shipped_contrast_ratio(ink, *ground))
+            .copied()
+            .chain(wells(ink, grounds))
+            .map(|ground| shipped_contrast_ratio(ink, ground))
             .fold(f64::INFINITY, f64::min)
     };
     /* No chroma at either end, where there is none to show: a cast at

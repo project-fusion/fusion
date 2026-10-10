@@ -99,6 +99,46 @@ pub const FILLS: [&str; 12] = [
 /// The four severities, which are inks on the page and fills of their own.
 pub const STATUSES: [&str; 4] = ["danger", "info", "success", "warning"];
 
+/// A ground the stylesheet writes as an ink mixed toward transparent, so its
+/// color is the ground under it with the ink laid over.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Wash {
+    /// The ink it is mixed from, by token name.
+    pub ink: &'static str,
+    pub name: &'static str,
+    /// How much of the ink, in percent.
+    pub percent: u8,
+}
+
+/// What a field is filled with, which `tokens.ts` declares as
+/// `color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)`.
+///
+/// **A field sits on any surface of the page ladder**, so the well is measured
+/// over each of them, overlay included, which is what a dialog paints. It is a
+/// ground of five colors, and an ink in a field is measured against all five.
+/// The engine emits no token for it: the stylesheet mixes it from the
+/// foreground the engine emits, so the five move with that foreground.
+pub const WELL: Wash = Wash {
+    ink: "color-foreground",
+    name: "color-well",
+    percent: 5,
+};
+
+/// The name of a wash over one ground, `color-well over color-surface`, which
+/// is the ground a pair over it reports.
+#[must_use]
+pub fn over(wash: Wash, ground: &str) -> String {
+    format!("{} over {ground}", wash.name)
+}
+
+/// The wash and the ground a name such as `color-well over color-surface`
+/// names, or `None` for the name of one token.
+#[must_use]
+pub fn washed(name: &str) -> Option<(Wash, &str)> {
+    let (wash, ground) = name.split_once(" over ")?;
+    (wash == WELL.name).then_some((WELL, ground))
+}
+
 /// `foreground-subtle` is deliberately absent, and the measurement is why.
 ///
 /// #124 solved the two quiet inks against every light ground and found the
@@ -141,12 +181,14 @@ pub static GROUNDS: LazyLock<Vec<Ground>> = LazyLock::new(|| {
     by definition, so what is behind it is the video: unbounded for the same
     reason as the surface above. */
     grounds.push(unbounded("color-overlay"));
-    /* A field's fill is a percentage of the foreground mixed toward transparent,
-    so what is behind it is whatever the control was dropped onto: a page, a
-    card, a raised panel, a tinted band. The ink over it is measured against the
-    grounds it actually composites over, which are already in `PAGE_SURFACES`,
-    and the well only shifts that by the 5% it carries. */
-    grounds.push(unbounded("color-well"));
+    /* **A field's well, once over each surface a field sits on.** The well
+    alone is 5% of the foreground over whatever the field was dropped onto, a
+    different color on every ground, and an ink solved against the bare ladder
+    loses that 5% in every field. Measured in Chromium on October 10, 2026,
+    with the quiet ink solved against the ladder alone: a placeholder at
+    3.89:1 in a dialog on a #333333 page, and at 4.05:1 on a sunken panel in
+    the default theme. */
+    grounds.extend(wells().iter().map(|name| bounded(name)));
     grounds
 });
 
@@ -154,22 +196,34 @@ fn owned(names: &[&str]) -> Vec<String> {
     names.iter().map(|name| (*name).to_owned()).collect()
 }
 
+/// The well over each surface of the page ladder, in the ladder's order.
+fn wells() -> Vec<String> {
+    PAGE_SURFACES
+        .iter()
+        .map(|ground| over(WELL, ground))
+        .collect()
+}
+
 pub static INKS: LazyLock<Vec<Ink>> = LazyLock::new(|| {
     let pages = owned(&PAGE_SURFACES);
     let mut inks = vec![
+        /* Both neutral inks are written in a field: the value in
+        `foreground`, and the placeholder, the unit and the affixes in
+        `muted`. */
         Ink {
             contrast: Contrast::Text,
             grounds: [
                 pages.clone(),
                 owned(&TINTS),
-                owned(&["color-overlay", "color-well"]),
+                owned(&["color-overlay"]),
+                wells(),
             ]
             .concat(),
             name: "color-foreground".to_owned(),
         },
         Ink {
             contrast: Contrast::Text,
-            grounds: pages.clone(),
+            grounds: [pages.clone(), wells()].concat(),
             name: "color-foreground-muted".to_owned(),
         },
         /* **A label per role**, because the roles do not share a polarity. A

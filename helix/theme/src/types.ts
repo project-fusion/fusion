@@ -83,6 +83,11 @@ export type StatusSeed = Color | { hue?: number }
 
 /** One pair to measure, by token name, without the namespace prefix. */
 export interface PairingRequest {
+  /**
+   * The ground. `color-well over color-surface` names a field's well over the
+   * surface it sits on: 5% of the theme's `color-foreground` laid over that
+   * surface, as the stylesheet paints it.
+   */
   background: string
   foreground: string
   /**
@@ -400,6 +405,10 @@ export interface DerivedToken {
 
 /** One measured pair, whatever the outcome. */
 export interface Pairing {
+  /**
+   * The ground, as the request names it. `color-well over color-surface` is a
+   * field's well over that surface.
+   */
   background: string
   foreground: string
   /**

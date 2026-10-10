@@ -84,7 +84,6 @@
   },
   "helix": {
     "accepted": {
-      "color-foreground-muted on color-well": "The well is five percent of the foreground over whatever a field sits on, so it is a different color on every ground and the engine emits none to solve against. Measured on October 10, 2026, `foreground-muted` cleared 4.5:1 on the well over the page in every derived theme tried, and fell to 3.90:1 on the well over a raised surface on a #333333 page, so the model has yet to cover it.",
       "color-surface-media on color-foreground-media": "A QR code paints the media pair the other way up: black modules on white paper in both schemes, from the token layer. The engine emits neither token, and the model holds the pair over a photograph, which no theme can measure."
     },
     "chrome": {

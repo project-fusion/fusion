@@ -105,6 +105,9 @@ pub enum StatusSeed {
     serde(deny_unknown_fields, expecting = "an object", rename_all = "camelCase")
 )]
 pub struct PairingRequest {
+    /// The ground. `color-well over color-surface` names a field's well over
+    /// the surface it sits on: 5% of the theme's `color-foreground` laid over
+    /// that surface, as the stylesheet paints it.
     pub background: String,
     pub foreground: String,
     /// The ratio this pair has to reach. Carried per pair rather than taken from
