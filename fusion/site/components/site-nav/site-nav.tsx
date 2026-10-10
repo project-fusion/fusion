@@ -50,6 +50,8 @@ export function SiteMenu({
    */
   onPreferences?: () => void
   open: boolean
+  /** The page the tree marks current, where it is not the address. */
+  path?: string | undefined
   /**
    * Which edge it arrives from, because a drawer comes from where it was
    * opened. The site's Menu sits at the end of the bar and its panel arrives
@@ -57,8 +59,6 @@ export function SiteMenu({
    * from the start. A panel flying in from the opposite edge to the button that
    * summoned it reads as a second, unrelated thing appearing.
    */
-  /** The page the tree marks current, where it is not the address. */
-  path?: string | undefined
   placement?: 'end' | 'start'
 }) {
   const address = usePathname()
