@@ -1,6 +1,10 @@
 import { describe, expect, test } from 'bun:test'
-import { type HelixManifest, place } from '@fusion.dev/helix-cem'
-import { reference, referenceFamilies } from './reference.js'
+import {
+  place as catalogPlace,
+  startCase as catalogStartCase,
+  type HelixManifest,
+} from '@fusion.dev/helix-cem'
+import { place, reference, referenceFamilies, startCase } from './reference.js'
 
 /**
  * A manifest small enough to read, carrying one of everything the renderer
@@ -66,6 +70,24 @@ describe('place', () => {
     })
     expect(place('other/thing.ts')).toEqual({ family: '', part: '' })
     expect(place(undefined)).toEqual({ family: '', part: '' })
+  })
+
+  /* Two copies, because the catalog's are in a package this one cannot import,
+     and a heading here names a family the way the catalog's label does. */
+  test('and names a family and a part as the catalog does', () => {
+    for (const path of ['src/qr-code/root/qr-code-root.ts', 'other/thing.ts', undefined]) {
+      expect(place(path)).toEqual(catalogPlace(path))
+    }
+    for (const slug of [
+      'api-key',
+      'app-header',
+      'css-id',
+      'go-to-page',
+      'html-ui-url',
+      'qr-code',
+    ]) {
+      expect(startCase(slug)).toBe(catalogStartCase(slug))
+    }
   })
 })
 

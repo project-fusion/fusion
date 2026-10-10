@@ -2,7 +2,7 @@
    and a tree walk, so it runs during the build and the page ships colored
    markup with no client JavaScript spent on it. `helix/styled` never sees it. */
 
-import { startCase } from '@fusion.dev/helix-docs'
+import { startCase } from '@fusion.dev/helix-cem'
 import { highlight } from '@fusion.dev/helix-sandbox/highlight'
 import type { Metadata } from 'next'
 import Link from 'next/link'

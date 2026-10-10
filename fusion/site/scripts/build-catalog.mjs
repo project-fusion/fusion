@@ -35,7 +35,8 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { catalog, pages as docPages, reference } from '@fusion.dev/helix-docs'
+import { catalog } from '@fusion.dev/helix-cem'
+import { pages as docPages, reference } from '@fusion.dev/helix-docs'
 import { findSitePage, sitePageSources } from '@fusion.dev/insights'
 import { ARTIFACT, root, SOURCE } from '@fusion.dev/scripts/workspace'
 
