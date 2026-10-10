@@ -52,54 +52,24 @@
   block-size: var(--helix-size-control-sm);
 }
 
-/* The two tags in the header: the topic, then the kind. */
-.cardTopic,
-.cardKind {
+/* A tag, as wide as its word: the tag's text size and weight, its inset, and
+   its border on each side, around the word in transparent ink. With the
+   attribute, so it outranks the base rule's `display: block` whichever sheet
+   loads last. */
+.cardTag[data-skeleton] {
+  align-items: center;
   block-size: var(--helix-size-tag);
+  box-sizing: border-box;
+  color: transparent;
+  display: inline-flex;
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  padding-inline: calc(var(--helix-space-xs) + var(--helix-border-thin));
+  white-space: nowrap;
 }
 
-.cardTopic {
-  inline-size: 4rem;
-}
-
-.cardKind {
-  inline-size: 4.25rem;
-}
-
-/* **Two lines of title from three across, one below.** A row is as tall as its
-   tallest card, and at three columns and more a card is about 270 pixels wide,
-   where a row of posts nearly always holds a title that wraps. At two columns
-   and on a phone a title fits its line. */
-.cardTitle {
-  inline-size: 80%;
-}
-
-.cardTitleWrap {
-  display: none;
-  inline-size: 45%;
-}
-
-@media (width >= 70rem) {
-  .cardTitle {
-    inline-size: 90%;
-  }
-
-  .cardTitleWrap {
-    display: block;
-  }
-}
-
-/* The summary is clamped to two lines, and a second line rarely runs to the
-   edge. */
-.cardSummaryEnd {
-  inline-size: 70%;
-}
-
-/* The date and the reading time, which the card sets on its end edge. */
-.cardDate {
-  inline-size: 6rem;
-}
-
-.cardMinutes {
-  inline-size: 2.25rem;
+/* The summary is clamped to two lines, like the card's, and the clamp draws its
+   ellipsis in the text's own ink, which the words inside it do not reach. */
+.cardSummary {
+  color: transparent;
 }

@@ -4,9 +4,10 @@ import { CodeText } from '@/components/code-text/code-text'
 import { PRODUCTS } from '@/content/products/products'
 import { findVertical, stageAppearance } from '@/content/verticals/verticals'
 import { pageMetadata } from '@/utils/metadata/metadata'
-import { type Family, getFamilies } from '../../../../../content/catalog/catalog'
+import { getFamilies } from '../../../../../content/catalog/catalog'
 import { ComponentBrowser } from './component-browser'
 import styles from './gallery.module.css'
+import { SORTS } from './sorts'
 
 const vertical = findVertical('/helix')
 const product = PRODUCTS.find((entry) => entry.href === '/helix')
@@ -21,20 +22,6 @@ export const metadata = pageMetadata({
   path: '/helix/components',
   title: 'Components',
 })
-
-/**
- * How the grid may be ordered, and what each one compares.
- *
- * `newest` compares each family's `@since`. Most families share the first
- * version, so the name breaks the tie among them, which makes the order defined
- * whatever order the manifest emits them in.
- */
-const SORTS: Record<string, (a: Family, b: Family) => number> = {
-  category: (a, b) => a.category.localeCompare(b.category) || a.label.localeCompare(b.label),
-  name: (a, b) => a.label.localeCompare(b.label),
-  newest: (a, b) =>
-    b.since.localeCompare(a.since, undefined, { numeric: true }) || a.label.localeCompare(b.label),
-}
 
 /**
  * Sorting is a URL parameter and the server does it. Searching and filtering

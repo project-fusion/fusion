@@ -2,10 +2,11 @@ import { FilterBar, filterBar } from '@/components/filter-bar/filter-bar'
 import { GridBand } from '@/components/grid-band/grid-band'
 import card from '@/components/insight-card/insight-card.module.css'
 import { PageHero, pageHero } from '@/components/page-hero/page-hero'
-import { INSIGHTS } from '../../../content/insights'
+import { formatDate, INSIGHTS } from '../../../content/insights'
 import browser from './insight-browser.module.css'
 import loading from './loading.module.css'
 import styles from './page.module.css'
+import { SORTS } from './sorts'
 
 /**
  * The writing index, in outline, while the registry is sorted.
@@ -18,13 +19,15 @@ import styles from './page.module.css'
  *
  * **Every box sits in the element the page puts its text in.** The hero, the
  * filter bar, the band and each card are the page's own, with the same slots,
- * classes and gaps, and each line is a `data-skeleton="text"` inside a
- * `helix-text` of the variant it stands in for. What lands then lands where the
- * boxes were, at every width, rather than at a height somebody measured once.
+ * classes and gaps. What lands then lands where the boxes were, at every width.
  *
- * **One card per post.** The registry is the list the page renders, and reading
- * its length costs nothing, so the grid is as long as the grid it precedes.
+ * **Each card holds its post's own words.** The registry is metadata the page
+ * reads with no wait, so each card carries the post's topic, kind, title,
+ * summary and date, in the page's default order, as `data-skeleton="words"`:
+ * transparent text with a bar behind each line. A title that wraps on the page
+ * wraps here, and a card is the height its post's card will be.
  */
+const POSTS = [...INSIGHTS].sort(SORTS.newest)
 export default function Loading() {
   return (
     <>
@@ -59,31 +62,36 @@ export default function Loading() {
 
         <GridBand>
           <helix-grid className={styles.insightGrid} columns={5} gap="xl">
-            {INSIGHTS.map((insight) => (
+            {POSTS.map((insight) => (
               <div className={card.insightCard} key={insight.slug}>
                 <helix-card material="glass" separation="elevated">
                   <helix-flex align-items="center" data-density="sm" gap="sm" slot="header" wrap>
-                    <div className={loading.cardTopic} data-skeleton />
-                    <div className={loading.cardKind} data-skeleton />
+                    <span className={loading.cardTag} data-skeleton>
+                      {insight.topic}
+                    </span>
+                    <span className={loading.cardTag} data-skeleton>
+                      {insight.kind}
+                    </span>
                   </helix-flex>
 
                   <helix-flex direction="column" gap="xs">
                     <helix-text as="h3" variant="title">
-                      <span className={loading.cardTitle} data-skeleton="text" />
-                      <span className={loading.cardTitleWrap} data-skeleton="text" />
+                      <span data-skeleton="words">{insight.title}</span>
                     </helix-text>
-                    <helix-text variant="caption">
-                      <span data-skeleton="text" />
-                      <span className={loading.cardSummaryEnd} data-skeleton="text" />
+                    <helix-text
+                      class={`${card.insightSummary} ${loading.cardSummary}`}
+                      variant="caption"
+                    >
+                      <span data-skeleton="words">{insight.summary}</span>
                     </helix-text>
                   </helix-flex>
 
                   <helix-flex align-items="center" gap="sm" slot="footer">
                     <helix-text variant="caption">
-                      <span className={loading.cardDate} data-skeleton="text" />
+                      <span data-skeleton="words">{formatDate(insight.date)}</span>
                     </helix-text>
                     <helix-text variant="caption">
-                      <span className={loading.cardMinutes} data-skeleton="text" />
+                      <span data-skeleton="words">{insight.minutes} min</span>
                     </helix-text>
                   </helix-flex>
                 </helix-card>

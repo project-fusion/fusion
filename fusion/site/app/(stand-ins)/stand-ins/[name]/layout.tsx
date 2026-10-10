@@ -18,5 +18,9 @@ export default async function StandInLayout({
   params: Promise<{ name: string }>
 }) {
   const { name } = await params
-  return <SiteChrome path={STAND_INS[name]?.path}>{children}</SiteChrome>
+  const standIn = STAND_INS[name]
+  if (standIn?.chrome === false) {
+    return children
+  }
+  return <SiteChrome path={standIn?.path}>{children}</SiteChrome>
 }

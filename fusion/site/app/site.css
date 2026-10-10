@@ -639,6 +639,49 @@ helix-app-header {
   box-sizing: border-box;
 }
 
+/* The words a stand-in already knows, drawn as bars. The text is the real
+   title or summary in transparent ink, so it wraps where the loaded text will,
+   and each line is a bar from its first word to its last. The bars are the
+   inline box's own background, cloned onto every line.
+
+   **The sweep is a background here.** An `::after` on a box spanning several
+   lines covers one rectangle around all of them. Three times the width, so a
+   band one line wide crosses it as the box sweep's does, and centered at rest,
+   where the box sweep's band also sits when motion is off. */
+[data-skeleton="words"] {
+  /* Code in the words, such as a summary's `<dialog>`, keeps its face and its
+     padding, so it takes the room it will take, and draws nothing of its own. */
+  --code-background-color: transparent;
+  --code-foreground-color: transparent;
+
+  animation: siteSkeletonWords calc(var(--helix-duration-slow) * 4) ease-in-out infinite;
+  background-image: linear-gradient(
+    90deg,
+    transparent 33.33%,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent) 50%,
+    transparent 66.67%
+  );
+  background-position: 50% 0;
+  background-repeat: no-repeat;
+  background-size: 300% 100%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  color: transparent;
+  display: inline;
+  overflow: visible;
+  position: static;
+}
+
+@keyframes siteSkeletonWords {
+  from {
+    background-position-x: 100%;
+  }
+
+  to {
+    background-position-x: 0%;
+  }
+}
+
 [data-skeleton]::after {
   animation: siteSkeletonSweep calc(var(--helix-duration-slow) * 4) ease-in-out infinite;
   background-image: linear-gradient(
@@ -660,6 +703,13 @@ helix-app-header {
   to {
     transform: translateX(100%);
   }
+}
+
+/* The words turn the box sweep off here, after the rule that draws it, since
+   the two selectors weigh the same. Left on, the sweep's overlay spans the
+   whole card, because a words span is not positioned. */
+[data-skeleton="words"]::after {
+  content: none;
 }
 
 /* The generic fallback's pulse, which is the loader's only variant and so the
@@ -687,6 +737,7 @@ helix-app-header {
 /* A reader who asked for less motion still needs to know it is working, so the
    marks stay and only their movement stops. */
 @media (prefers-reduced-motion: reduce) {
+  [data-skeleton="words"],
   [data-skeleton]::after,
   [data-pulse] {
     animation: none;

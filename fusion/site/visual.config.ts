@@ -1,5 +1,5 @@
 /**
- * The visual tests' config for the site: five pages and three loading
+ * The visual tests' config for the site: five pages and four loading
  * stand-ins at 1440 and 390 light and 1440 dark, each pictured whole, from
  * `next start` over the production build.
  *
@@ -19,8 +19,9 @@
  *
  * **The loading stand-ins, from October 10, 2026.** The components gallery,
  * the insights index and a component's reference page each have a
- * `loading.tsx` that shows while the page renders, which is never long enough
- * to picture. `/stand-ins/[name]` renders each one on its own, and answers 404
+ * `loading.tsx` that shows while the page renders, and the root's wordmark
+ * shows where none of them applies. None shows long enough to picture.
+ * `/stand-ins/[name]` renders each one on its own, and answers 404
  * unless the server was started with `SITE_STAND_INS=1`, which `start` below
  * sets. A stand-in that stops matching the page it precedes shows as a change
  * here.
@@ -33,8 +34,11 @@ import { defineConfig } from '@fusion.dev/helix-cli/visual'
 
 export default defineConfig({
   /* Each page's accessibility tree beside its pictures, so a lost label fails
-     even when no pixel moved. */
-  aria: true,
+     even when no pixel moved. **A loading stand-in is left out of it**, as
+     `inert` leaves it out of what a screen reader hears: Playwright's snapshot
+     does not read `inert`, and recorded the words each card holds to size its
+     bars. The stand-in's spoken status sits outside it and stays. */
+  aria: { hide: ['[inert]:has([data-skeleton])'] },
   /* The page check that needs no baseline: a code block the highlighter left
      in one color, which is the October 8 fault on any page, pictured or not.
      A highlighted block is a `helix-code-block` holding the highlighter's one
@@ -46,8 +50,10 @@ export default defineConfig({
     code: { selector: 'helix-code-block:has(> span), .cm-content' },
     /* Every ink on every page in light and dark, which nothing measured on
        the site before. `color-border` draws lines that separate, and answers
-       to no target. */
-    contrast: { rules: ['var(--helix-color-border)'] },
+       to no target. A loading stand-in's `data-skeleton` boxes hold the words
+       they stand in for in transparent ink, to wrap where the page's text
+       will, and are drawn as bars. */
+    contrast: { ignore: ['[data-skeleton]'], rules: ['var(--helix-color-border)'] },
     overlap: true,
   },
   manifest: [
@@ -93,6 +99,7 @@ export default defineConfig({
         { name: 'components-loading', path: '/stand-ins/components' },
         { name: 'insights-loading', path: '/stand-ins/insights' },
         { name: 'reference-loading', path: '/stand-ins/reference' },
+        { name: 'wordmark-loading', path: '/stand-ins/wordmark' },
       ],
       start: 'exec env SITE_STAND_INS=1 bunx next start --hostname 127.0.0.1 --port 3417',
       url: 'http://127.0.0.1:3417',
