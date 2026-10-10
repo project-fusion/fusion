@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test'
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { build } from './build.js'
@@ -113,5 +113,64 @@ describe('a set of somebody else\u2019s drawings', () => {
     expect(() => build({ out, sources: [{ directory }, { directory }] })).toThrow(
       /resolves to 2 files/,
     )
+  })
+
+  test('a source that is not there is refused, and named', () => {
+    /* Skipped, it wrote a module holding nothing and reported success. */
+    const { directory, out } = planted()
+    const missing = join(directory, 'nothing-here')
+    expect(() => build({ out, sources: [{ directory: missing }] })).toThrow(
+      `no directory at ${missing}`,
+    )
+    expect(() => build({ out, sources: [{ directory }, { directory: missing }] })).toThrow(
+      `no directory at ${missing}`,
+    )
+    expect(existsSync(out)).toBe(false)
+  })
+
+  test('sources holding no glyph are refused, and named with the suffix they were read with', () => {
+    const { directory, out } = planted()
+    expect(() => build({ out, sources: [{ directory, suffix: '-bold' }] })).toThrow(
+      `no SVG files in ${directory} (named *-bold.svg)`,
+    )
+    expect(existsSync(out)).toBe(false)
+  })
+
+  test('a module is written into a directory that is not there yet', () => {
+    const { directory, out } = planted()
+    const nested = join(dirname(out), 'src', 'icons', 'icons.ts')
+    expect(build({ out: nested, sources: [{ directory }] })).toBe(2)
+    expect(readFileSync(nested, 'utf8')).toContain('export const peak: HelixIcon')
+  })
+})
+
+describe('the language of the module', () => {
+  /* A `.js` file holding `import type` and `: HelixIcon` is a module nothing
+     loads, so each is imported here: Bun refuses type syntax in a `.js` or
+     `.mjs` file, as Node does. */
+  for (const extension of ['js', 'mjs']) {
+    test(`a .${extension} path gets JavaScript that loads, with the type in JSDoc`, async () => {
+      const { directory, out } = planted()
+      const script = out.replace(/\.ts$/, `.${extension}`)
+      build({ index: true, out: script, sources: [{ directory }] })
+      const module = readFileSync(script, 'utf8')
+
+      expect(module).not.toContain('import type')
+      expect(module).not.toContain(': HelixIcon')
+      expect(module).toMatch(
+        /@type \{import\('[^']*helix-icons'\)\.HelixIcon\} \*\/\nexport const peak =/,
+      )
+
+      const loaded = await import(script)
+      expect(loaded.peak.viewBox).toBe('0 0 24 24')
+      expect(loaded.icons['ring-heavy']).toBe(loaded.ringHeavy)
+    })
+  }
+
+  test('a .cjs path is refused, the module being an ES module', () => {
+    const { directory, out } = planted()
+    const common = out.replace(/\.ts$/, '.cjs')
+    expect(() => build({ out: common, sources: [{ directory }] })).toThrow(/ES module/)
+    expect(existsSync(common)).toBe(false)
   })
 })
