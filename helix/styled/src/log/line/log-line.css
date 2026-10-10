@@ -17,9 +17,12 @@
 }
 
 /* The numbers are one column, right-aligned to the widest the log holds, and
-   are not copied with the text. */
+   are not copied with the text. Muted rather than subtle, because a number
+   stands on the band of an error or a marked line too: the subtle ink measured
+   4.09:1 on the marked band and 4.45:1 on the error band, under the 4.5:1 the
+   muted ink clears on both. */
 [part="number"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   flex: none;
   font-variant-numeric: tabular-nums;
   min-inline-size: calc(var(--log-digits, 2) * 1ch);
