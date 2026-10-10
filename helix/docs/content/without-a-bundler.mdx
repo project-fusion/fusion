@@ -32,10 +32,10 @@ own URL. Copy the whole `dist` folder and link `helix.css`. We checked this in
 Chromium: one `<link>` makes five requests, and every layer resolves.
 
 *Until August 24, 2026, this page listed `tokens.css` and `base.css` without
-`primitives.css`. `tokens.css` refers to a primitive 297 times and imports
-nothing. If you followed the old instructions, all 185 semantic tokens are
-declared and every color resolves to `rgba(0, 0, 0, 0)`. If your page looks
-unstyled in that way, link `helix.css`.*
+`primitives.css`. `tokens.css` refers to the primitives throughout and imports
+nothing. If you followed the old instructions, every semantic token is declared
+and every color resolves to `rgba(0, 0, 0, 0)`. If your page looks unstyled in
+that way, link `helix.css`.*
 
 `elements.css` matters most on a page with no bundler. Without a bundler, the
 module graph loads over the network, so the markup is on the page longer before
@@ -48,9 +48,11 @@ package made its import relative. Only a bundler resolves a bare specifier in an
 
 `@fusion.dev/helix` imports its dependencies by bare specifiers, such as
 `@fusion.dev/helix-core` and `lit`. A browser resolves a bare specifier only
-through an import map, and the elements import 97 separate subpaths of
-`@fusion.dev/helix-headless`. An import map would need an entry for each one,
-and for each subpath of `lit`.
+through an import map. The elements import a separate subpath of
+`@fusion.dev/helix-headless` for each family, and the package's `exports` maps
+each one to an `index.js` in a folder of its own, so an import map would need an
+entry for each one. A subpath of `lit` is the path of its file, so one `"lit/"` entry
+covers all of them.
 
 To use the elements, load them through a bundler, as
 [Installation](./installation) shows. A CDN that rewrites bare specifiers into

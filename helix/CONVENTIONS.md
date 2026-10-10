@@ -1954,8 +1954,10 @@ page `'use client'` to use a button would not be a design system.
 
 **`@fusion.dev/helix-styles/helix.css` carries it.** `elements.css` is generated
 from the element sources by `fusion/scripts/build-elements-css.mjs` and hides
-each tag with `:not(:defined)` until it upgrades, using `visibility` so the page
-does not reflow. Without it a card arrives as a run of unstyled text and then
+each tag with `:not(:defined)` until it upgrades, using `visibility`. It reserves
+no space, so an element whose upgraded box is larger than its light DOM still
+moves what follows it when it upgrades; only the data table below holds its box
+across the upgrade. Without it a card arrives as a run of unstyled text and then
 snaps into a card. CSS cannot select "any custom element", and a bare
 `:not(:defined)` would also catch Next's own dev overlay, so the tags are
 enumerated.
@@ -2103,8 +2105,9 @@ The naming, which was never about wrappers:
   something untrue to a screen reader while looking right in the markup.
 
   `selected` is chosen out of a set, where choosing is the interaction.
-  `Tabs.Tab`, `Tree.Item` and `Radio` carry it and it is `aria-selected`, which
-  is why it needs an owning role that admits selection.
+  `Tabs.Tab` and `Tree.Item` carry it and it is `aria-selected`, which is why it
+  needs an owning role that admits selection. `Radio` carries it too and writes
+  `aria-checked`, the state its `radio` role takes.
 
   `current` is where the reader *is*, in a set that has an order or a place,
   which is true whether or not anybody chose it. `Steps.Step` and

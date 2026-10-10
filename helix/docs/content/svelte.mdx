@@ -20,17 +20,24 @@ cannot disagree.
 ## Pass props and bind events
 
 ```svelte
-<helix-input label="Name" onchange={(event) => (name = event.target.value)} value={name} />
+<helix-input
+  label="Name"
+  onchange={(event) => (name = event.currentTarget.value)}
+  value={name}
+></helix-input>
 ```
 
 Svelte sets a property when the element has one, and an attribute otherwise. It
 binds `on*` with `addEventListener`. Svelte shows no unknown-element warning,
 and you do not need a compiler flag.
 
+Read the value from `event.currentTarget`, which is typed as the element.
+`event.target` is an `EventTarget | null`, which has no `value`.
+
 Svelte passes objects and arrays as properties on its own:
 
 ```svelte
-<helix-data-table label="People" rows={people} />
+<helix-data-table label="People" rows={people}></helix-data-table>
 ```
 
 Svelte's own attributes are typed on every Helix tag as well, so `onclick`,

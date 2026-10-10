@@ -28,7 +28,7 @@ accept a subset of an axis's values.
   tone="primary"
 >Save</helix-button>
 <helix-card separation="outlined">…</helix-card>
-<helix-megamenu material="glass">…</helix-megamenu>
+<helix-drawer material="glass">…</helix-drawer>
 ```
 
 ## Why there is no `appearance` attribute
@@ -52,9 +52,16 @@ build.
 ## When a property needs two axes
 
 **If two values can apply at the same time, they belong on two axes.**
-`Megamenu` is the example. `variant="band"` sets the layout of its panel, and
-glass is a `material`. A panel can be a band and glass at once, so the two
-values sit on two axes. A panel can also be glass and outlined at once.
+`Card` is the example. `separation` sets where its surface ends, and `material`
+sets what fills it. A card can be outlined and glass at once, so the two values
+sit on two axes:
+
+```html
+<helix-card
+  material="glass"
+  separation="outlined"
+>…</helix-card>
+```
 
 If you are adding a property and cannot decide which axis it belongs on, it is
 usually two properties.

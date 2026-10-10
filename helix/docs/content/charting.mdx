@@ -169,6 +169,17 @@ bar there, and a heatmap draws the cell with no tone. The readings after the gap
 stay under their own labels, and the tooltip for that row still shows the
 row's cells.
 
+A cell holds a number when its whole text reads as one, such as `1200` or
+`-3.5`. A formatted number, such as `1,200` or `$1.2k`, is a gap. To chart a
+formatted cell, write its number in `data-value`:
+
+```html
+<tr><th>Q1</th><td data-value="1200">$1.2k</td><td data-value="800">$800</td></tr>
+```
+
+The chart reads `data-value` when a cell has one, and the cell's text otherwise.
+The table and the tooltip still show `$1.2k`.
+
 ## Series colors
 
 Helix has twenty-four series color tokens, in order, from

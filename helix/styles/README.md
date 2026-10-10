@@ -11,14 +11,15 @@ npm install @fusion.dev/helix-styles
 @import '@fusion.dev/helix-styles/helix.css';
 ```
 
-Or take the pieces:
+Or take the pieces, in the order of the first four rows:
 
 | Entry | What it is |
 |---|---|
-| `tokens.css` | the custom properties, light and dark |
-| `base.css` | element defaults and the reset |
-| `primitives.css` | utility layer |
-| `helix.css` | all four, in order |
+| `primitives.css` | the raw color ramps and scales the tokens are derived from, where the `--helix-seed-*` properties are read. No classes |
+| `tokens.css` | the semantic custom properties, light and dark. They read the primitives, so without `primitives.css` every color resolves to nothing |
+| `base.css` | the element reset and defaults |
+| `elements.css` | hides each Helix element until its definition loads |
+| `helix.css` | the four files above, in that order |
 | `tokens.json` | the same token names for a build step that needs them |
 
 The tokens are the contract every Helix component reads, so overriding one here

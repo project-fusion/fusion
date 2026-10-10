@@ -13,7 +13,7 @@ support in older browsers. Your browser needs every feature Helix uses.
 
 ## What we test
 
-We test in Chromium, through Playwright. The DOM specs run in it, and 83 pixel
+We test in Chromium, through Playwright. The DOM specs run in it, and the pixel
 baselines are captured in it, on Linux, with the network blocked.
 
 We do not run the tests in Firefox or Safari. The rest of this page lists the
@@ -27,9 +27,9 @@ something broken, please report it. Our tests would not have caught it.
 | Custom elements and shadow DOM | Everything |
 | `ElementInternals` | Form participation, and ARIA that has to cross a shadow boundary |
 | Popover API | Every overlay: menu, tooltip, select, combobox, dialog |
-| `light-dark()` | 156 declarations in the shipped stylesheets, 71 of them in the token layer |
+| `light-dark()` | Every color token, and each component color that differs between the modes |
 | `oklch()` | Every color in the system |
-| `:has()` | 11 rules, mostly relational styling of slotted content |
+| `:has()` | Relational styling, mostly of slotted content |
 | `@starting-style` | Entry transitions on overlays |
 | `:state()` | Every boolean state the library publishes: `open`, `checked`, `selected`, `invalid`, `read`, `has-label`, `settled`, `empty`, `controls` |
 | `CSS.highlights` | Filter-match highlighting, in `Command` and `Combobox` |
