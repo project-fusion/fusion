@@ -119,8 +119,8 @@ describe('lines written as children', () => {
     const element = await opened('mark-lines="2-3"')
     expect(lines(element).map((line) => part(line, 'line')?.getAttribute('part'))).toEqual([
       'line',
-      'line line-marked',
-      'line line-warn line-marked',
+      'line line-marked line-grouped',
+      'line line-warn line-marked line-grouped',
     ])
   })
 
@@ -180,5 +180,19 @@ describe('what the log says', () => {
     element.query = 'e'
     await settle(element)
     expect(said(element)).toBe('2 lines match')
+  })
+})
+
+describe('a quiet log', () => {
+  test('says nothing as errors arrive, steps fail, or the run ends', async () => {
+    const element = await opened('quiet')
+    const line = document.createElement('helix-headless-log-line')
+    line.setAttribute('level', 'error')
+    line.textContent = 'Command failed'
+    element.append(line)
+    element.querySelector('helix-headless-log-group')?.setAttribute('status', 'failed')
+    element.done = true
+    await settle(element)
+    expect(said(element)).toBe('')
   })
 })

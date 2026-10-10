@@ -43,6 +43,28 @@
   tab-size: 4;
 }
 
+/* **Plain is a log with nothing of its own around it.** The lines start on
+   the edge the text around them starts on, and the log is as tall as what it
+   holds, since a box that scrolls inside a transcript that scrolls is a trap
+   for the wheel. A page that wants a limit sets `--log-max-block-size`. */
+:host([separation="plain"]) {
+  --log-padding-inline: var(--helix-space-none);
+  /* Each duration right after its heading, since across a wide turn the far
+     edge is a screen away from the step it times. */
+  --_log-duration-start: var(--helix-space-xs);
+
+  background-color: transparent;
+  border: none;
+  border-radius: var(--helix-radii-none);
+  max-block-size: var(--log-max-block-size, none);
+}
+
+/* The ink of whatever holds a plain log, so an agent's work reads as quietly
+   as the turn around it sets it. */
+:host([separation="plain"]) {
+  color: var(--log-color, inherit);
+}
+
 /* A line longer than the box wraps, rows grow to hold it, and the column of
    numbers stays a column. The spaces are kept on each line's text and not on
    the box: kept on the box, the white space between the lines a page writes
@@ -101,6 +123,10 @@
   scrollbar-color: var(--log-scrollbar-thumb-color, var(--helix-scrollbar-thumb-color))
     var(--log-scrollbar-track-color, var(--helix-scrollbar-track-color));
   scrollbar-width: thin;
+}
+
+:host([separation="plain"]) [part="log"] {
+  padding-block: var(--helix-space-none);
 }
 
 [part="log"]:focus-visible {

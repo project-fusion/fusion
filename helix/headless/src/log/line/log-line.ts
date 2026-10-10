@@ -47,6 +47,7 @@ const elapsed = (seconds: number): string => {
  * @csspart line - The row the number, the time, and the text sit in.
  * @csspart line-debug - The row of a line at `debug`.
  * @csspart line-error - The row of a line at `error`.
+ * @csspart line-grouped - The row of a line that belongs to a step, which the styled tier insets under the step's heading where there is no number.
  * @csspart line-marked - The row of a line `mark-lines` names on the log.
  * @csspart line-selected - The row of a line in the log's selection.
  * @csspart line-warn - The row of a line at `warn`.
@@ -87,6 +88,10 @@ export class HelixHeadlessLogLine extends HelixElement {
   /** @internal Set by the log: whether the query hides the line. */
   @property({ attribute: false })
   logFiltered = false
+
+  /** @internal Set by the log: whether the line belongs to a step. */
+  @property({ attribute: false })
+  logGrouped = false
 
   /** @internal Set by the log: the link a number goes to, with `{n}` for the number. */
   @property({ attribute: false })
@@ -250,7 +255,7 @@ export class HelixHeadlessLogLine extends HelixElement {
     }
     const level = this.level
     return html`<div
-      part="line${level ? { debug: ' line-debug', error: ' line-error', info: '', warn: ' line-warn' }[level] : ''}${this.logMarked ? ' line-marked' : ''}${this.logSelected ? ' line-selected' : ''}"
+      part="line${level ? { debug: ' line-debug', error: ' line-error', info: '', warn: ' line-warn' }[level] : ''}${this.logMarked ? ' line-marked' : ''}${this.logSelected ? ' line-selected' : ''}${this.logGrouped ? ' line-grouped' : ''}"
     >${this.renderNumber()}${this.renderTime()}<span part="text">${this.renderText()}</span></div>`
   }
 }

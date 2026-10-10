@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessLog } from '@fusion.dev/helix-headless/log'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './log-root.css.js'
@@ -44,6 +45,22 @@ import '../line/log-line.js'
 @customElement('helix-log')
 export class HelixLog extends HelixHeadlessLog {
   static override tier = 'helix-'
+
+  /**
+   * How the log is set apart from what is around it.
+   *
+   * - `outlined`, the resting look, is a box with an edge and a fill of its
+   *   own, which scrolls after `--log-max-block-size`.
+   * - `plain` has no edge, no fill, no inset and no height of its own: the
+   *   lines start where the text around them does and the log grows with
+   *   them. For a log inside something that already frames it, such as an
+   *   agent's work in a chat turn's `work` slot.
+   *
+   * Both are writable, so a page can say which it means rather than relying
+   * on the absence of an attribute.
+   */
+  @property({ reflect: true })
+  separation?: 'outlined' | 'plain'
 
   static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, styles]
 }

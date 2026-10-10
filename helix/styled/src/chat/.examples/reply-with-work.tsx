@@ -1,0 +1,57 @@
+export function Example() {
+  return (
+    <helix-chat label="Assistant">
+      <helix-chat-message
+        author="me"
+        state="sent"
+      >
+        Why did the last build fail?
+      </helix-chat-message>
+      <helix-chat-message
+        author="them"
+        author-label="Assistant"
+        separation="plain"
+        state="sent"
+      >
+        <helix-log
+          label="Work"
+          quiet
+          separation="plain"
+          slot="work"
+          wrap
+        >
+          <helix-log-group
+            default-open
+            heading="Worked for 38s"
+            status="done"
+          >
+            <helix-log-line>Reading the failed run before any code.</helix-log-line>
+            <helix-log-group
+              duration="4s"
+              heading="Read the run's log"
+              status="done"
+            >
+              <helix-log-line>$ gh run view 38021681000 --log-failed</helix-log-line>
+              <helix-log-line level="error">
+                Error: Cannot find module './checkout/summary'
+              </helix-log-line>
+            </helix-log-group>
+            <helix-log-group
+              duration="2s"
+              heading="Searched the code"
+              status="done"
+            >
+              <helix-log-line>$ rg "checkout/summary" src</helix-log-line>
+              <helix-log-line>
+                src/checkout/index.ts:3: import {'{ Summary }'} from './checkout/summary'
+              </helix-log-line>
+            </helix-log-group>
+          </helix-log-group>
+        </helix-log>
+        The build imports ./checkout/summary from inside src/checkout, so it looks for
+        src/checkout/checkout/summary, which does not exist. Changing the import to ./summary fixes
+        it.
+      </helix-chat-message>
+    </helix-chat>
+  )
+}

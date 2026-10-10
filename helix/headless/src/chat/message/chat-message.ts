@@ -43,6 +43,12 @@ export const FAILED_LABEL = 'Not sent'
  * a page in another language sets them once there. The time moves on by
  * itself, so "now" becomes "1 minute ago" while the page is open.
  *
+ * **An agent's work goes in `work`, and its answer in the content.** The work,
+ * its thinking, the commands it ran and what they printed, is a record read
+ * the way a log is, so a `Log` with `separation="plain"` and `quiet` sits there
+ * above the answer. The chat says the turn once it settles, from the content
+ * alone, so the work is never read aloud as part of the answer.
+ *
  * @since 0.1.0
  * @status stable
  * @category feedback
@@ -55,6 +61,7 @@ export const FAILED_LABEL = 'Not sent'
  * @slot indicator - The indicator shown before the first token arrives.
  * Defaults to the typing indicator.
  * @slot sources - The turn's sources, such as citations, documents, or a retrieved page.
+ * @slot work - What an agent did to arrive at the turn, such as a `Log` of its steps, above the content. A screen reader hears the turn without it.
  *
  * @event {HelixSendEvent} helix-send - Fired when the user retries a failed message. Cancelable: if it is not canceled, the turn is sent again. Canceling it leaves the failure and the retry button as they were.
  *
@@ -70,6 +77,7 @@ export const FAILED_LABEL = 'Not sent'
  * @csspart sources - The turn's sources, under it and outside the bubble.
  * @csspart state - The text that names the turn's state, when there is one to show.
  * @csspart time - The turn's time.
+ * @csspart work - The box around the `work` slot, above the content.
  */
 @customElement('helix-headless-chat-message')
 export class HelixHeadlessChatMessage extends HelixElement {
@@ -334,7 +342,7 @@ export class HelixHeadlessChatMessage extends HelixElement {
        painted into it. The other two are gaps nobody asked for, and the default
        slot is the one the content region holds. */
     markRegion(this.renderRoot, 'content', [''], { hide: false })
-    for (const name of ['sources', 'actions'] as const) {
+    for (const name of ['work', 'sources', 'actions'] as const) {
       markRegion(this.renderRoot, name, [name])
     }
   }
@@ -364,6 +372,7 @@ export class HelixHeadlessChatMessage extends HelixElement {
     return html`<div part="message">
       <span part="avatar"><slot name="avatar"></slot></span>
       <div part="body">
+        <div part="work"><slot name="work" @slotchange=${this.handleFill}></slot></div>
         <div part="content">
           <slot @slotchange=${this.handleFill}></slot>
           ${this.renderIndicator()}

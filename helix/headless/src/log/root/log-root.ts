@@ -150,7 +150,9 @@ interface Heard {
  * arrive, since reading a build aloud line by line helps nobody. A separate
  * status region says each line at `error` once it arrives, each step once it
  * finishes or fails, and the end of the run once `done` is set or `source`
- * ends. Set `done` yourself when output you `write` is complete.
+ * ends. Set `done` yourself when output you `write` is complete. Set `quiet`
+ * where something around the log speaks for it, as a chat turn does for an
+ * agent's work.
  *
  * The log scrolls on this tier. It carries `data-scroller`, so following the
  * newest line and drawing a window work with no stylesheet. Give the log a
@@ -194,6 +196,7 @@ interface Heard {
  * @csspart line - The row of a line drawn from data.
  * @csspart line-debug - The row of a line drawn from data at `debug`.
  * @csspart line-error - The row of a line drawn from data at `error`.
+ * @csspart line-grouped - The row of a line drawn from data that belongs to a step.
  * @csspart line-marked - The row of a line drawn from data that `mark-lines` names.
  * @csspart line-match - Text in a line drawn from data that matches `query`.
  * @csspart line-number - The number of a line drawn from data.
@@ -442,6 +445,15 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
   /** Text a line has to hold to be shown, ignoring case. Empty shows every line. */
   @property()
   query = ''
+
+  /**
+   * Whether the log says nothing to a screen reader as lines arrive, steps
+   * finish, or the run ends. For a log inside something that speaks for it,
+   * such as an agent's work in a chat turn, which the turn announces once it
+   * settles.
+   */
+  @property({ type: Boolean })
+  quiet = false
 
   /** The words on the button that returns to the newest line, where `resume` is empty. */
   @words
@@ -1072,6 +1084,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
         line.logSelectable = this.selectable
         line.logSelected = this.selected(at + 1)
         line.logStop = at + 1 === stop
+        line.logGrouped = this.childGroups.some((group) => group.contains(line))
       })
       if (!filtered && needle !== '') {
         for (const group of this.childGroups) {
@@ -1133,7 +1146,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     const now = this.listen()
     const before = this.heard
     this.heard = now
-    if (this.opening || !before) {
+    if (this.opening || !before || this.quiet) {
       return
     }
     const said: string[] = []
@@ -1413,7 +1426,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     const line = this.tag('log-line')
     const { at, level } = row.line
     return html`<${line}
-      exportparts="line, line-debug, line-error, line-marked, line-selected, line-warn, match: line-match,
+      exportparts="line, line-debug, line-error, line-grouped, line-marked, line-selected, line-warn, match: line-match,
         number: line-number, run: line-run, run-bold: line-run-bold, run-dim: line-run-dim,
         run-italic: line-run-italic, run-strike: line-run-strike, run-underline: line-run-underline,
         text: line-text, time: line-time"
@@ -1428,6 +1441,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
       .logSelectable=${this.selectable}
       .logSelected=${this.selected(row.number)}
       .logStop=${row.number === stop}
+      .logGrouped=${row.line.group !== undefined}
       .logStart=${start}
       .logTimes=${this.timestamps ?? ''}
       .runs=${this.buffer.runsOf(row.line)}
