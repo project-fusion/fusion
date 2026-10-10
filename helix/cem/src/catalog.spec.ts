@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { catalog, type ExampleSource, findInCatalog, rendersOf } from './catalog.js'
+import { catalog, type ExampleSource, findInCatalog, publishedBy, rendersOf } from './catalog.js'
 import type { HelixManifest } from './types.js'
 
 const manifest: HelixManifest = {
@@ -352,8 +352,9 @@ describe('import lines', () => {
   })
 })
 
-/* The sandbox package's editor sits in the Sandbox family's folder, so the
-   reference shows it on that family's page, imported from its own package. */
+/* The sandbox package's editor names the Sandbox family with `@family`, so the
+   reference shows it on that family's page, imported from its own package,
+   and the family's facts stay its root's. */
 describe('another package', () => {
   const styled: HelixManifest = {
     helix: { package: '@fusion.dev/helix', version: '1.0.0' },
@@ -361,7 +362,13 @@ describe('another package', () => {
       {
         declarations: [
           {
-            helix: { since: '0.1.0', status: 'stable' },
+            helix: {
+              aliases: ['Playground'],
+              category: 'tooling',
+              since: '0.1.0',
+              source: 'helix/styled/src/sandbox',
+              status: 'stable',
+            },
             name: 'HelixSandbox',
             summary: 'A source pane and a preview.',
             tagName: 'helix-sandbox',
@@ -381,7 +388,13 @@ describe('another package', () => {
       {
         declarations: [
           {
-            helix: { since: '0.2.0', status: 'experimental' },
+            helix: {
+              aliases: ['Code editor'],
+              category: 'forms',
+              family: 'sandbox',
+              since: '0.2.0',
+              status: 'experimental',
+            },
             name: 'HelixSandboxEditor',
             summary: 'An editable pane of source.',
             tagName: 'helix-sandbox-editor',
@@ -398,12 +411,21 @@ describe('another package', () => {
   const families = catalog([styled, sandbox])
   const family = findInCatalog(families, 'sandbox')
 
-  test('lands in the family its folder names, and adds no family', () => {
+  test('joins the family its @family names, and adds no family', () => {
     expect(families.map((one) => one.slug)).toEqual(['sandbox'])
     expect(family?.elements.map((element) => [element.tagName, element.package])).toEqual([
       ['helix-sandbox', '@fusion.dev/helix'],
       ['helix-sandbox-editor', '@fusion.dev/helix-sandbox'],
     ])
+  })
+
+  test('names the family over its folder', () => {
+    const moved = structuredClone(sandbox)
+    const module = moved.modules?.[0]
+    if (module) {
+      module.path = 'src/editor/root/editor-root.ts'
+    }
+    expect(catalog([styled, moved]).map((one) => one.slug)).toEqual(['sandbox'])
   })
 
   test('is imported from its own package, through the entry that registers it', () => {
@@ -417,17 +439,157 @@ describe('another package', () => {
     })
   })
 
-  test('keeps its own status, and the family keeps its root’s', () => {
-    expect([family?.status, family?.since, family?.summary]).toEqual([
-      'stable',
-      '0.1.0',
-      'A source pane and a preview.',
-    ])
+  test('keeps its own status, and the family keeps every fact of its root’s package', () => {
     expect(family?.elements.map((element) => element.status)).toEqual(['stable', 'experimental'])
+    expect({
+      aliases: family?.aliases,
+      category: family?.category,
+      package: family?.package,
+      since: family?.since,
+      source: family?.source,
+      status: family?.status,
+      summary: family?.summary,
+    }).toEqual({
+      aliases: ['Playground'],
+      category: 'tooling',
+      package: '@fusion.dev/helix',
+      since: '0.1.0',
+      source: 'helix/styled/src/sandbox',
+      status: 'stable',
+      summary: 'A source pane and a preview.',
+    })
+  })
+
+  test('is the same family whichever manifest is read first', () => {
+    const orders = [
+      [styled, sandbox, manifest],
+      [sandbox, styled, manifest],
+      [manifest, sandbox, styled],
+    ]
+    const read = orders.map((order) => JSON.stringify(catalog(order, examples)))
+    expect(new Set(read).size).toBe(1)
+  })
+
+  test('takes no facts where the package holding the root is not read', () => {
+    const alone = findInCatalog(catalog([sandbox]), 'sandbox')
+    expect(alone?.elements.map((element) => element.tagName)).toEqual(['helix-sandbox-editor'])
+    expect({
+      aliases: alone?.aliases,
+      category: alone?.category,
+      package: alone?.package,
+      since: alone?.since,
+      status: alone?.status,
+      summary: alone?.summary,
+    }).toEqual({ aliases: [], category: '', package: '', since: '', status: '', summary: '' })
   })
 
   test('is read from the tier where a manifest names no package', () => {
     expect(catalog([manifest])[0]?.elements[0]?.package).toBe('@fusion.dev/helix')
+  })
+})
+
+/* What each package's `api.json` lists: the package holding the root lists the
+   family whole, and a package adding an element lists that element alone,
+   with none of the family's facts. */
+describe('publishedBy', () => {
+  const styled: HelixManifest = {
+    helix: { package: '@fusion.dev/helix' },
+    modules: [
+      {
+        declarations: [
+          {
+            helix: { status: 'stable' },
+            name: 'HelixSandbox',
+            summary: 'A source pane and a preview.',
+            tagName: 'helix-sandbox',
+          },
+        ],
+        path: 'src/sandbox/root/sandbox-root.ts',
+      },
+    ],
+  }
+  const sandbox: HelixManifest = {
+    helix: { package: '@fusion.dev/helix-sandbox' },
+    modules: [
+      {
+        declarations: [
+          {
+            helix: { family: 'sandbox', status: 'experimental' },
+            name: 'HelixSandboxEditor',
+            summary: 'An editable pane of source.',
+            tagName: 'helix-sandbox-editor',
+          },
+        ],
+        path: 'src/sandbox/editor/sandbox-editor.ts',
+      },
+    ],
+  }
+  const families = catalog([sandbox, styled])
+
+  test('a package holding the root lists the family whole, with its own elements', () => {
+    const [owned] = publishedBy(families, '@fusion.dev/helix')
+    expect(owned && 'contributes' in owned).toBe(false)
+    expect(owned?.elements.map((element) => element.tagName)).toEqual(['helix-sandbox'])
+    expect(owned && 'summary' in owned ? owned.summary : '').toBe('A source pane and a preview.')
+  })
+
+  test('a package adding an element lists it alone, and names the package with the facts', () => {
+    expect(publishedBy(families, '@fusion.dev/helix-sandbox')).toEqual([
+      {
+        contributes: true,
+        elements: [expect.objectContaining({ tagName: 'helix-sandbox-editor' })],
+        examples: [],
+        label: 'Sandbox',
+        package: '@fusion.dev/helix',
+        slug: 'sandbox',
+      },
+    ])
+  })
+
+  test('names no package where none read holds the root', () => {
+    const [alone] = publishedBy(catalog([sandbox]), '@fusion.dev/helix-sandbox')
+    expect(alone && 'package' in alone).toBe(false)
+  })
+})
+
+/* The headless tier is read without the styled one, so its families had no
+   styled root, and the first declaration read gave a part's summary. */
+describe('a family with no styled root', () => {
+  const headless: HelixManifest = {
+    helix: { package: '@fusion.dev/helix-headless' },
+    modules: [
+      {
+        declarations: [
+          {
+            helix: { status: 'experimental' },
+            name: 'HelixHeadlessAccordionItem',
+            summary: 'One collapsible section.',
+            tagName: 'helix-headless-accordion-item',
+          },
+        ],
+        path: 'src/accordion/item/accordion-item.ts',
+      },
+      {
+        declarations: [
+          {
+            helix: { status: 'stable' },
+            name: 'HelixHeadlessAccordion',
+            summary: 'A group of collapsible sections.',
+            tagName: 'helix-headless-accordion',
+          },
+        ],
+        path: 'src/accordion/root/accordion-root.ts',
+      },
+    ],
+  }
+
+  test('reads its facts from the headless root', () => {
+    const [accordion] = catalog([headless])
+    expect([accordion?.summary, accordion?.status, accordion?.package]).toEqual([
+      'A group of collapsible sections.',
+      'stable',
+      '@fusion.dev/helix-headless',
+    ])
   })
 })
 

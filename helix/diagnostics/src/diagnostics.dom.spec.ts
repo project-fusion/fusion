@@ -1550,4 +1550,27 @@ describe('lint data', () => {
     expect([lint.package, lint.version]).toEqual(['@fusion.dev/helix', '0.138.0'])
     expect(lintOf({ modules: [] }, 'given').package).toBe('given')
   })
+
+  /* `helix-sandbox-editor` ships in `@fusion.dev/helix-sandbox` and joins the
+     Sandbox family with `@family`, whatever its folder is called. */
+  test('a tag is in the family its @family names, and in its folder’s where there is none', () => {
+    const lint = lintOf(
+      {
+        modules: [
+          {
+            declarations: [
+              { helix: { family: 'sandbox' }, tagName: 'helix-sandbox-editor' },
+              { tagName: 'helix-code-block' },
+            ],
+            path: 'src/editor/root/editor-root.ts',
+          },
+        ],
+      },
+      '@fusion.dev/helix-sandbox',
+    )
+    expect([
+      lint.tags['helix-sandbox-editor']?.family,
+      lint.tags['helix-code-block']?.family,
+    ]).toEqual(['sandbox', 'editor'])
+  })
 })

@@ -47,3 +47,17 @@ export const place = (path: string | undefined): { family: string; part: string 
   const [, family = '', part = ''] = /^src\/([^/]+)\/([^/]+)\//.exec(path ?? '') ?? []
   return { family, part }
 }
+
+/**
+ * The family a declaration belongs to: the one its `@family` names, and the
+ * one its folder names where it names none.
+ *
+ * **Named, for an element another package publishes.** `helix-sandbox-editor`
+ * ships in `@fusion.dev/helix-sandbox` and is a part of the Sandbox family,
+ * whose root ships in `@fusion.dev/helix`. Read off the folder alone, an element
+ * would join a family by sharing a folder name with it.
+ */
+export const familyOf = (
+  declaration: { helix?: { family?: string } },
+  path: string | undefined,
+): string => declaration.helix?.family ?? place(path).family

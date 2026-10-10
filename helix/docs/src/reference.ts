@@ -57,6 +57,8 @@ export interface ReferenceDeclaration {
   cssStates?: ReferenceEntry[]
   description?: string
   events?: ReferenceEntry[]
+  /** The family the element joins from another package, from `@family`. */
+  helix?: { family?: string }
   members?: ReferenceMember[]
   slots?: ReferenceEntry[]
   summary?: string
@@ -87,6 +89,15 @@ export const place = (path: string | undefined): { family: string; part: string 
   const [, family = '', part = ''] = /^src\/([^/]+)\/([^/]+)\//.exec(path ?? '') ?? []
   return { family, part }
 }
+
+/**
+ * The family a declaration belongs to: the one its `@family` names, and the
+ * one its folder names where it names none.
+ */
+export const familyOf = (
+  declaration: { helix?: { family?: string } },
+  path: string | undefined,
+): string => declaration.helix?.family ?? place(path).family
 
 /**
  * An example, as much of one as a markdown reference prints.
@@ -200,10 +211,11 @@ export const referenceFamilies = (manifest: ReferenceManifest): ReferenceFamily[
       if (!declaration.tagName) {
         continue
       }
-      const { family, part } = place(module.path)
+      const family = familyOf(declaration, module.path)
       if (!family) {
         continue
       }
+      const { part } = place(module.path)
       families.set(family, [...(families.get(family) ?? []), { declaration, part }])
     }
   }

@@ -47,7 +47,8 @@ use crate::rules::{Context, Finding, Report, Unwritten, Written};
 /// events are what a consumer writes markup against, parts and custom properties
 /// are what they write CSS against, and the two pairs are worth not
 /// interleaving. `@cssstate` came later and joins the second pair at its end,
-/// being the third thing a stylesheet names.
+/// being the third thing a stylesheet names. `@family` came later too, and sits
+/// after `@category`, both saying where a component belongs.
 const SECTIONS: [&[&str]; 8] = [
     &["summary"],
     &["description"],
@@ -55,6 +56,7 @@ const SECTIONS: [&[&str]; 8] = [
         "since",
         "status",
         "category",
+        "family",
         "groups",
         "aliases",
         "documentation",

@@ -13,7 +13,7 @@ import { dirname, join, resolve } from 'node:path'
 import { lintOf, type ManifestSource } from '@fusion.dev/helix-diagnostics'
 import { generateJsxTypes } from '@wc-toolkit/jsx-types'
 import { generateVuejsTypes } from '@wc-toolkit/vuejs-types'
-import { catalog, type ExampleSource } from './catalog.js'
+import { catalog, type ExampleSource, publishedBy } from './catalog.js'
 import { jsxBaseProps } from './plugins/jsx-base-props.js'
 import { jsxDeclaredEvents } from './plugins/jsx-declared-events.js'
 import { jsxFrameworkProps } from './plugins/jsx-framework-props.js'
@@ -89,16 +89,19 @@ const MANIFEST = 'custom-elements.json'
 const LINT = 'lint.json'
 
 /**
- * The tier's catalog without its examples: every family with its elements,
+ * The package's catalog without its examples: every family with its elements,
  * their properties, events with React props, slots, parts, hooks, states,
  * words, and the import lines. `helix mcp` answers from it, and it is the
  * same `catalog()` the site's family pages are written from, so an agent and a
  * reader see one answer. About a third of the manifest, which repeats every
  * inherited member on every class.
+ *
+ * A family whose root another package holds is listed with this package's
+ * elements alone and marked `contributes`, as `publishedBy` says.
  */
 const API = 'api.json'
 
-/** The tier's examples by family, each with the import lines it needs. */
+/** The package's examples by family, each with the import lines it needs. */
 const EXAMPLES = 'examples.json'
 
 /** Where the documentation pages a skill links to are published. */
@@ -449,6 +452,35 @@ export const dependenciesOf = (cwd: string): Map<string, string> => {
   return found
 }
 
+/**
+ * The manifests of the Helix packages this one peers, by package name.
+ *
+ * **Read for the families this package adds elements to**, and for nothing
+ * else: `@fusion.dev/helix-sandbox` peers `@fusion.dev/helix`, which holds the
+ * Sandbox family's root, so its `api.json` can name the package that supplies
+ * that family's facts. A peer is not built against, so nothing inherits from
+ * one.
+ */
+export const peersOf = (cwd: string): Map<string, string> => {
+  const found = new Map<string, string>()
+  const pkg = JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf8')) as {
+    peerDependencies?: Record<string, string>
+  }
+  for (const name of Object.keys(pkg.peerDependencies ?? {})) {
+    const root = name.startsWith('@fusion.dev/helix') ? installed(name, cwd) : undefined
+    if (root === undefined) {
+      continue
+    }
+    const declared = (
+      JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')) as { customElements?: string }
+    ).customElements
+    if (declared !== undefined && existsSync(join(root, declared))) {
+      found.set(name, join(root, declared))
+    }
+  }
+  return found
+}
+
 /** The `helix` command, reached through its npm package as any caller would. */
 const helix = (): string => createRequire(import.meta.url).resolve('@fusion.dev/helix-cli/bin.mjs')
 
@@ -485,21 +517,16 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
     /* **Read with the tiers this one builds on, then narrowed to its own.**
        A container's import block can sit on the tier below it alone: Select,
        Combobox, and Data Table write theirs in the headless description, and
-       a styled catalog read on its own lost the Option and Table lines. */
-    const below = [...dependencies]
+       a styled catalog read on its own lost the Option and Table lines. The
+       packages it peers are read too, for the root of a family it adds
+       elements to. */
+    const below = [...new Map([...dependencies, ...peersOf(cwd)])]
       .filter(([dependency]) => dependency.startsWith('@fusion.dev/helix'))
       .map(([, at]) => JSON.parse(readFileSync(at, 'utf8')) as HelixManifest)
-    const own = options.tier === 'headless' ? 'headless' : 'styled'
-    const families = catalog(
-      [customElementsManifest, ...below],
-      examplesOnDisk(cwd),
-      bubblingOf(cwd),
+    const families = publishedBy(
+      catalog([customElementsManifest, ...below], examplesOnDisk(cwd), bubblingOf(cwd)),
+      name,
     )
-      .map((family) => ({
-        ...family,
-        elements: family.elements.filter((element) => element.tier === own),
-      }))
-      .filter((family) => family.elements.length > 0)
     writeFileSync(
       join(cwd, API),
       `${JSON.stringify({ families: families.map(({ examples: _, ...family }) => family), package: name })}\n`,
@@ -535,6 +562,7 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
 
 export {
   type ApiMember,
+  type Contribution,
   catalog,
   type Element,
   type EventDoc,
@@ -543,10 +571,11 @@ export {
   type Family,
   findInCatalog,
   type PropertyDoc,
+  publishedBy,
   type Render,
   rendersOf,
 } from './catalog.js'
-export { displayName, place, startCase, tierOf } from './naming.js'
+export { displayName, familyOf, place, startCase, tierOf } from './naming.js'
 export type {
   Documented,
   HelixAttribute,

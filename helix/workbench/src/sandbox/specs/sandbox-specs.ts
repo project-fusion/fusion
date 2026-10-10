@@ -43,6 +43,7 @@ interface ResultsMessage {
  *
  * @since 0.1.0
  * @status experimental
+ * @family sandbox
  * @aliases Tests, Suite
  * @documentation https://fusion.dev/helix/docs/sandbox
  *

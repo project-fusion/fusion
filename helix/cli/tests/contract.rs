@@ -1553,6 +1553,61 @@ fn a_family_carries_its_examples_and_its_root_alone_does() {
     assert_eq!(said.matches("\"source\"").count(), 1, "nor a second source");
 }
 
+/// An element names the family it joins with `@family`, where the package it
+/// ships in holds no root of that family: `helix-sandbox-editor` ships in
+/// `@fusion.dev/helix-sandbox`, and the Sandbox family's root in
+/// `@fusion.dev/helix`. The folder still names the part.
+#[test]
+fn an_element_names_the_family_it_joins() {
+    let sandbox = Sandbox::new("manifest-family", None);
+    let editor = sandbox.0.join("src/sandbox/editor");
+    let badge = sandbox.0.join("src/badge/root");
+    for at in [&editor, &badge] {
+        std::fs::create_dir_all(at).expect("a source tree");
+    }
+    std::fs::write(
+        editor.join("sandbox-editor.ts"),
+        "/**\n * @summary An editable pane.\n *\n * @since 0.1.0\n * @family sandbox\n */\n\
+         @customElement('helix-sandbox-editor')\nexport class HelixSandboxEditor {}\n",
+    )
+    .expect("a source");
+    /* A word that is not a slug names no family, and the folder decides. */
+    std::fs::write(
+        badge.join("badge-root.ts"),
+        "/**\n * @summary A count.\n *\n * @family Sandbox Things\n */\n\
+         @customElement('helix-badge')\nexport class HelixBadge {}\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0, "{}", err(&output));
+    let parsed: serde_json::Value = serde_json::from_str(&out(&output)).expect("a manifest");
+    let declared = |tag: &str| {
+        parsed["modules"]
+            .as_array()
+            .expect("the modules")
+            .iter()
+            .flat_map(|module| module["declarations"].as_array().into_iter().flatten())
+            .find(|one| one["tagName"] == tag)
+            .unwrap_or_else(|| panic!("{tag} is declared"))["helix"]
+            .clone()
+    };
+    let joined = declared("helix-sandbox-editor");
+    assert_eq!(joined["family"], "sandbox");
+    assert_eq!(joined["group"], "Sandbox");
+    assert_eq!(joined["part"], "Editor");
+    assert!(joined["source"].is_null(), "a part has no source: {joined}");
+    let keys: Vec<&String> = joined.as_object().expect("a block").keys().collect();
+    assert!(
+        keys.iter().position(|one| *one == "family") < keys.iter().position(|one| *one == "tier"),
+        "the family before the tier: {keys:?}"
+    );
+
+    let own = declared("helix-badge");
+    assert!(own["family"].is_null(), "not a slug: {own}");
+    assert_eq!(own["group"], "Badge");
+}
+
 /// What `@property` says about the attribute behind a field.
 ///
 /// The field's own name unless the decorator says otherwise, `false` for a
