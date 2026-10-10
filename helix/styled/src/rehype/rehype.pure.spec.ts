@@ -32,10 +32,12 @@ const textOf = (node: Node): string =>
   node.type === 'text' ? (node.value ?? '') : (node.children ?? []).map(textOf).join('')
 
 describe('rehypeHelix', () => {
-  test('a fence becomes a code block labeled with its language, its last newline dropped', async () => {
+  test('a fence becomes a code block with its language as its label and its language, its last newline dropped', async () => {
     const [block] = top(await treeOf('```ts\nconst a = 1\n```'))
     expect(block?.tagName).toBe('helix-code-block')
-    expect(block?.properties).toEqual({ label: 'ts' })
+    /* `language` is what a highlighter given to `registerHighlighter` is
+       handed. With `label` alone, it was handed an empty string. */
+    expect(block?.properties).toEqual({ label: 'ts', language: 'ts' })
     expect(textOf(block as Node)).toBe('const a = 1')
   })
 
@@ -84,7 +86,7 @@ describe('rehypeHelix', () => {
   test('a fence inside an alert is a code block inside a callout', async () => {
     const [callout] = top(await treeOf('> [!TIP]\n> Run:\n>\n> ```sh\n> bun add x\n> ```'))
     const block = (callout?.children ?? []).find((one) => one.tagName === 'helix-code-block')
-    expect(block?.properties).toEqual({ label: 'sh' })
+    expect(block?.properties).toEqual({ label: 'sh', language: 'sh' })
   })
 
   test('fences or alerts can be left alone, and the headings written in another language', async () => {

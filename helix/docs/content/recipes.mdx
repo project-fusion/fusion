@@ -140,7 +140,7 @@ Three Markdown constructs need components, because HTML alone cannot hold what
 they need:
 
 - **Fenced code** becomes `helix-code-block`, with the fence's language as its
-  `label`. A `<pre>` has no label or copy button.
+  `label` and its `language`. A `<pre>` has no label or copy button.
 - **Alerts** such as `> [!WARNING]` become `helix-callout`. A `<blockquote>` has no
   tone. `NOTE` becomes `tone="info"`, `TIP` becomes `success`, `WARNING` becomes
   `warning`, and `CAUTION` becomes `danger`. `IMPORTANT` has no tone. Each
@@ -155,13 +155,29 @@ The `rehype` plugin from `@fusion.dev/helix/rehype` makes all three changes in t
 tree your Markdown library has already built. It parses nothing, so your
 library, its dialect, and your sanitizing stay yours. Add it to any pipeline
 that reaches rehype, such as `remark` with `remark-rehype`, `react-markdown`, or
-MDX:
+MDX.
+
+Tables are GitHub Flavored Markdown, so your pipeline needs `remark-gfm` to
+parse them. Without it, a table stays a paragraph of pipes. For a `remark`
+pipeline, install:
+
+```sh
+bun add unified remark-parse remark-gfm remark-rehype rehype-stringify
+```
+
+Then add the plugin after `remark-rehype`:
 
 ```js
 import rehypeHelix from '@fusion.dev/helix/rehype'
+import rehypeStringify from 'rehype-stringify'
+import remarkGfm from 'remark-gfm'
+import remarkParse from 'remark-parse'
+import remarkRehype from 'remark-rehype'
+import { unified } from 'unified'
 
 const html = await unified()
   .use(remarkParse)
+  .use(remarkGfm)
   .use(remarkRehype)
   .use(rehypeHelix)
   .use(rehypeStringify)
