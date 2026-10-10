@@ -3,9 +3,10 @@
 //! **The lookups answer from the installed packages.** Each is one decision an
 //! agent makes while writing a page: which family, what it takes, an example
 //! to start from, what to import, which token. Each reads the `api.json`,
-//! `examples.json`, and `tokens.json` the project's Helix packages ship, so an
-//! answer is the installed version's and names it. Each is a `helix api` verb
-//! as well, so a script and an agent get the same answer from one function.
+//! `examples.json`, and `tokens.json` the project's Helix packages ship, every
+//! one that documents its elements, so an answer is the installed versions'
+//! and names them. Each is a `helix api` verb as well, so a script and an
+//! agent get the same answer from one function.
 //!
 //! **The check is `helix scan` on the agent's own code**: files in the
 //! project, or a snippet before it is written, judged against everything the
@@ -136,10 +137,10 @@ pub fn catalog() -> Vec<Value> {
         }),
         json!({
             "annotations": annotations("Read a Helix family"),
-            "description": "Returns one Helix family's API from the installed package: each tag with its properties and their literal unions, attributes, events with the exact React prop, slots, parts, custom properties, custom states, the properties registerWords translates, and `usage`, the import lines to copy. Write only what it lists. Lists the family's examples by slug for helix_example.",
+            "description": "Returns one Helix family's API from the installed packages: each tag with its properties and their literal unions, attributes, events with the exact React prop, slots, parts, custom properties, custom states, the properties registerWords translates, and `usage`, the import lines to copy. A tag another installed package adds to the family, such as helix-sandbox-editor from @fusion.dev/helix-sandbox, is listed with its own import line. Write only what it lists. Lists the family's examples by slug for helix_example. `versions` names each package read, and `missing` says where the family's root is when its package is not installed.",
             "inputSchema": strings(&[("family", "The family's slug, label, alias, or one of its tags, such as `select` or `helix-option`."), TIER], &["family"]),
             "name": "helix_family",
-            "outputSchema": output(&[("examples", "array"), ("family", "object"), ("package", "string"), ("version", "string")]),
+            "outputSchema": output(&[("examples", "array"), ("family", "object"), ("package", "string"), ("version", "string"), ("versions", "object")]),
             "title": "Read a Helix family",
         }),
         json!({

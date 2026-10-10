@@ -58,8 +58,8 @@ impl Installed {
         let Ok(library) = Library::load(root) else {
             return installed;
         };
-        for tier in &library.tiers {
-            for family in &tier.families {
+        for package in &library.packages {
+            for family in &package.families {
                 installed.replace(family);
                 for element in family["elements"].as_array().into_iter().flatten() {
                     let tag = element["tagName"].as_str().unwrap_or_default().to_owned();
@@ -172,20 +172,22 @@ impl Installed {
     /// entry, an entry beneath it, or its package's barrel.
     pub fn imported(&self, tag: &str, imports: &HashSet<String>) -> Option<bool> {
         let specifier = self.specifiers.get(tag)?;
-        let package = if specifier.starts_with("@fusion.dev/helix-headless") {
-            "@fusion.dev/helix-headless"
-        } else {
-            "@fusion.dev/helix"
-        };
-        Some(imports.contains(specifier) || imports.contains(package))
+        /* The package is the specifier's scope and name, whichever package
+        publishes the tag: `@fusion.dev/helix-sandbox` for its editor. */
+        let package = specifier
+            .splitn(3, '/')
+            .take(2)
+            .collect::<Vec<_>>()
+            .join("/");
+        Some(imports.contains(specifier) || imports.contains(&package))
     }
 }
 
 /// A Helix import in a module or a page: a quoted specifier, or a CDN URL
-/// holding one, in either package. The path after the package, if any, is the
-/// entry, with a `dist/` and an `index.js` a CDN path carries taken off.
+/// holding one, in any Helix package. The path after the package, if any, is
+/// the entry, with a `dist/` and an `index.js` a CDN path carries taken off.
 static IMPORT: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r#"['"`](?:[^'"`\s]*/)?(@fusion\.dev/helix(?:-headless)?)(?:@[^/'"`\s]+)?((?:/[A-Za-z0-9._-]+)*)/?['"`]"#)
+    Regex::new(r#"['"`](?:[^'"`\s]*/)?(@fusion\.dev/helix(?:-[a-z0-9]+)*)(?:@[^/'"`\s]+)?((?:/[A-Za-z0-9._-]+)*)/?['"`]"#)
         .expect("a literal pattern")
 });
 
@@ -241,6 +243,7 @@ mod tests {
             import { HelixOption } from "@fusion.dev/helix/option"
             import '@fusion.dev/helix-styles/helix.css'
             import('@fusion.dev/helix-headless')
+            import '@fusion.dev/helix-sandbox/editor'
             <script type="module" src="https://cdn.jsdelivr.net/npm/@fusion.dev/helix@0.184.0/dist/tabs/index.js"></script>
         "#;
         let found: Vec<String> = imports(text).collect();
@@ -249,7 +252,9 @@ mod tests {
             [
                 "@fusion.dev/helix/select",
                 "@fusion.dev/helix/option",
+                "@fusion.dev/helix-styles/helix.css",
                 "@fusion.dev/helix-headless",
+                "@fusion.dev/helix-sandbox/editor",
                 "@fusion.dev/helix/tabs",
             ]
         );

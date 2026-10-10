@@ -56,12 +56,20 @@ pub fn print(answer: &Value, json: bool) {
         return;
     }
     let family = &answer["family"];
-    say!(
-        "{} ({} {})",
-        text(&family["label"]),
-        text(&answer["package"]),
-        text(&answer["version"])
-    );
+    /* Every package the family was read from, with its version, so two
+    installed at different versions say so. */
+    let read: Vec<String> = answer["versions"]
+        .as_object()
+        .map(|all| {
+            all.iter()
+                .map(|(package, version)| format!("{package} {}", text(version)))
+                .collect()
+        })
+        .unwrap_or_default();
+    say!("{} ({})", text(&family["label"]), read.join(", "));
+    if let Some(missing) = answer["missing"].as_str() {
+        say!("{missing}");
+    }
     say!("{}", text(&family["summary"]));
     say!();
     let tier = family["elements"][0]["tier"].as_str().unwrap_or("styled");

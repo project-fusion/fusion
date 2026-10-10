@@ -70,7 +70,8 @@ pub enum Noun {
     /// Look up the installed Helix packages: families, examples, imports, and tokens.
     ///
     /// Reads `api.json`, `examples.json`, and `tokens.json` from the Helix
-    /// packages in `node_modules`, so every answer is the installed version's.
+    /// packages in `node_modules`, every one that publishes `api.json`, so every
+    /// answer is the installed versions'.
     #[command(subcommand_required = true, arg_required_else_help = true)]
     Api {
         #[command(subcommand)]

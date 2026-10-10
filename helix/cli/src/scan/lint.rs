@@ -2,9 +2,10 @@
 //!
 //! **The lint data the page loads, from the copy the project installed.**
 //! `analyze` writes `lint.json` beside each package's `custom-elements.json`,
-//! and every Helix package publishes it, so the version a scan judges against
-//! is the version the project builds with. It is found the way Node finds a
-//! package: in `node_modules`, from the project's root up.
+//! and every Helix package that documents elements publishes it, so the
+//! version a scan judges against is the version the project builds with. It is
+//! found the way Node finds a package: in `node_modules`, from the project's
+//! root up.
 //!
 //! **Indexed as `manifest.ts` indexes it**, tier after tier in the page's
 //! order, `@fusion.dev/helix` before `@fusion.dev/helix-headless`, so a
@@ -207,29 +208,16 @@ fn strings(value: Option<&serde_json::Value>) -> Vec<String> {
 
 /// Where each installed Helix package's lint data is, nearest first.
 ///
-/// **The page's two tiers lead**, `@fusion.dev/helix` and then
-/// `@fusion.dev/helix-headless`, and any other Helix package that publishes
-/// lint data follows in name order.
+/// **The packages that publish it**: each installed `@fusion.dev` package
+/// whose `exports` names `./lint.json` and that is not `private`, which is the
+/// set `helix api` reads `api.json` from. The page's two tiers lead,
+/// `@fusion.dev/helix` and then `@fusion.dev/helix-headless`, and any other
+/// follows in name order, `@fusion.dev/helix-sandbox` among them.
 pub fn find(root: &Path) -> Vec<PathBuf> {
-    let mut found: BTreeMap<String, PathBuf> = BTreeMap::new();
-    let mut at = Some(root);
-    while let Some(dir) = at {
-        let scope = dir.join("node_modules").join("@fusion.dev");
-        if let Ok(entries) = std::fs::read_dir(&scope) {
-            for entry in entries.flatten() {
-                let name = format!("@fusion.dev/{}", entry.file_name().to_string_lossy());
-                let lint = entry.path().join("lint.json");
-                if lint.is_file() && !found.contains_key(&name) {
-                    found.insert(name, lint);
-                }
-            }
-        }
-        at = dir.parent();
-    }
-    let lead = ["@fusion.dev/helix", "@fusion.dev/helix-headless"];
-    let mut ordered: Vec<PathBuf> = lead.iter().filter_map(|name| found.remove(*name)).collect();
-    ordered.extend(found.into_values());
-    ordered
+    crate::api::documented(root, "lint.json")
+        .into_iter()
+        .map(|one| one.file)
+        .collect()
 }
 
 /// Reads each lint data file, saying which one could not be read and why.

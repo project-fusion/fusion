@@ -45,14 +45,31 @@ impl Project {
         Self(path)
     }
 
+    /// A package in `node_modules` holding `files`, each of the catalog files
+    /// among them in its `exports`, as `analyze` and `package.json` ship them.
     fn package(&self, name: &str, version: &str, files: &[(&str, Value)]) -> &Self {
+        let exports: serde_json::Map<String, Value> = files
+            .iter()
+            .filter(|(file, _)| {
+                !file.contains('/')
+                    && Path::new(file)
+                        .extension()
+                        .is_some_and(|one| one.eq_ignore_ascii_case("json"))
+            })
+            .map(|(file, _)| (format!("./{file}"), json!(format!("./{file}"))))
+            .collect();
+        self.written(
+            name,
+            &json!({ "exports": exports, "name": name, "version": version }),
+            files,
+        )
+    }
+
+    /// A package in `node_modules` with this `package.json` and these files.
+    fn written(&self, name: &str, manifest: &Value, files: &[(&str, Value)]) -> &Self {
         let dir = self.0.join("node_modules").join(name);
         std::fs::create_dir_all(&dir).expect("a package directory");
-        std::fs::write(
-            dir.join("package.json"),
-            json!({ "name": name, "version": version }).to_string(),
-        )
-        .expect("a manifest");
+        std::fs::write(dir.join("package.json"), manifest.to_string()).expect("a manifest");
         for (file, body) in files {
             let path = dir.join(file);
             std::fs::create_dir_all(path.parent().expect("a parent")).expect("a directory");
@@ -156,6 +173,62 @@ impl Project {
         project
     }
 
+    /// The styled tier's Sandbox family, as `@fusion.dev/helix` lists it.
+    fn sandbox_root(&self) -> &Self {
+        self.package(
+            "@fusion.dev/helix",
+            "1.2.3",
+            &[(
+                "api.json",
+                json!({
+                    "families": [{
+                        "aliases": ["Playground"],
+                        "category": "tooling",
+                        "elements": [sandbox_element("helix-sandbox", "@fusion.dev/helix", "sandbox", "Sandbox")],
+                        "imports": [],
+                        "label": "Sandbox",
+                        "package": "@fusion.dev/helix",
+                        "since": "0.1.0",
+                        "slug": "sandbox",
+                        "source": "helix/styled/src/sandbox",
+                        "status": "stable",
+                        "summary": "A source pane and a preview.",
+                        "usage": { "headless": [], "styled": ["import '@fusion.dev/helix/sandbox'"] },
+                    }],
+                    "package": "@fusion.dev/helix",
+                }),
+            )],
+        )
+    }
+
+    /// The editor `@fusion.dev/helix-sandbox` adds to the Sandbox family, at
+    /// `version`, as its `analyze` writes it.
+    fn sandbox_editor(&self, version: &str) -> &Self {
+        self.package(
+            "@fusion.dev/helix-sandbox",
+            version,
+            &[
+                (
+                    "api.json",
+                    json!({
+                        "families": [{
+                            "contributes": true,
+                            "elements": [sandbox_element("helix-sandbox-editor", "@fusion.dev/helix-sandbox", "editor", "Sandbox Editor")],
+                            "label": "Sandbox",
+                            "package": "@fusion.dev/helix",
+                            "slug": "sandbox",
+                        }],
+                        "package": "@fusion.dev/helix-sandbox",
+                    }),
+                ),
+                (
+                    "examples.json",
+                    json!({ "environment": null, "examples": { "sandbox": [] }, "package": "@fusion.dev/helix-sandbox" }),
+                ),
+            ],
+        )
+    }
+
     fn run(&self, args: &[&str]) -> Output {
         Command::new(binary())
             .args(args)
@@ -223,6 +296,20 @@ impl Project {
     fn path(&self) -> &Path {
         &self.0
     }
+}
+
+/// An element as `api.json` lists it, with its entry and import line.
+fn sandbox_element(tag: &str, package: &str, entry: &str, label: &str) -> Value {
+    json!({
+        "entry": entry,
+        "events": [],
+        "label": label,
+        "package": package,
+        "properties": [],
+        "specifier": format!("{package}/{entry}"),
+        "tagName": tag,
+        "tier": "styled",
+    })
 }
 
 impl Drop for Project {
@@ -562,4 +649,119 @@ fn check_judges_a_snippet_as_the_scan_does() {
     assert_eq!(output.status.code(), Some(1), "an error finding exits 1");
     let scanned: Value = serde_json::from_slice(&output.stdout).expect("the run is JSON");
     assert_eq!(scanned["findings"], checked["findings"]);
+}
+
+/// **An add-on's element is in the family whose root another package holds**,
+/// with that package's facts, its own import line, and both versions, and
+/// the MCP tool answers the same.
+#[test]
+fn an_add_on_s_element_joins_the_family_with_the_root_s_facts() {
+    let project = Project::new("add-on");
+    project.sandbox_root().sandbox_editor("1.2.4");
+    for name in ["sandbox", "helix-sandbox-editor"] {
+        let answer = project.json(&["api", "family", name]);
+        let family = &answer["family"];
+        assert_eq!(family["slug"], "sandbox", "{name}");
+        assert_eq!(
+            [&family["summary"], &family["status"], &family["source"]],
+            [
+                "A source pane and a preview.",
+                "stable",
+                "helix/styled/src/sandbox"
+            ]
+        );
+        assert_eq!(family["package"], "@fusion.dev/helix");
+        assert!(family.get("contributes").is_none());
+        assert_eq!(
+            family["usage"]["styled"],
+            json!([
+                "import '@fusion.dev/helix/sandbox'",
+                "import '@fusion.dev/helix-sandbox/editor' // Sandbox Editor",
+            ])
+        );
+        assert_eq!(
+            answer["versions"],
+            json!({ "@fusion.dev/helix": "1.2.3", "@fusion.dev/helix-sandbox": "1.2.4" })
+        );
+        assert!(answer.get("missing").is_none());
+    }
+    let result = project.call("helix_family", &json!({ "family": "sandbox" }));
+    assert_eq!(
+        result["structuredContent"],
+        project.json(&["api", "family", "sandbox"])
+    );
+    assert_eq!(
+        project.json(&["api", "imports", "helix-sandbox-editor"])["lines"],
+        json!(["import '@fusion.dev/helix-sandbox/editor'"])
+    );
+    let printed =
+        String::from_utf8(project.run(&["api", "family", "sandbox"]).stdout).expect("utf8");
+    assert!(
+        printed.starts_with("Sandbox (@fusion.dev/helix 1.2.3, @fusion.dev/helix-sandbox 1.2.4)"),
+        "{printed}"
+    );
+}
+
+/// **Where the family's root is not installed, the answer says where it is**
+/// and invents none of the family's facts.
+#[test]
+fn an_add_on_without_its_family_s_root_says_where_the_root_is() {
+    let project = Project::new("add-on-alone");
+    project.sandbox_editor("1.2.4");
+    let answer = project.json(&["api", "family", "sandbox"]);
+    assert_eq!(
+        answer["missing"],
+        "The Sandbox family's root, helix-sandbox, is in @fusion.dev/helix, which is not installed. Install it for the family's summary, status, and examples."
+    );
+    assert!(answer["family"].get("summary").is_none(), "{answer}");
+    assert_eq!(answer["family"]["package"], "@fusion.dev/helix");
+    assert_eq!(answer["package"], "@fusion.dev/helix-sandbox");
+    assert_eq!(
+        answer["family"]["elements"][0]["tagName"],
+        "helix-sandbox-editor"
+    );
+    let result = project.call("helix_family", &json!({ "family": "sandbox" }));
+    assert_eq!(result["structuredContent"], answer);
+}
+
+/// **A package is read where it says it is documented**: its `exports` names
+/// `./api.json` and it is not private.
+#[test]
+fn only_a_package_that_publishes_api_json_and_is_not_private_is_read() {
+    let project = Project::new("documented");
+    project.sandbox_root();
+    let contributes = |tag: &str, package: &str| {
+        json!({
+            "families": [{
+                "contributes": true,
+                "elements": [sandbox_element(tag, package, "specs", "Sandbox Specs")],
+                "label": "Sandbox",
+                "slug": "sandbox",
+            }],
+            "package": package,
+        })
+    };
+    project.written(
+        "@fusion.dev/helix-workbench",
+        &json!({ "exports": { "./api.json": "./api.json" }, "name": "@fusion.dev/helix-workbench", "private": true, "version": "1.2.3" }),
+        &[("api.json", contributes("helix-sandbox-specs", "@fusion.dev/helix-workbench"))],
+    );
+    project.written(
+        "@fusion.dev/helix-extra",
+        &json!({ "name": "@fusion.dev/helix-extra", "version": "1.2.3" }),
+        &[(
+            "api.json",
+            contributes("helix-sandbox-extra", "@fusion.dev/helix-extra"),
+        )],
+    );
+    let answer = project.json(&["api", "family", "sandbox"]);
+    assert_eq!(
+        answer["family"]["elements"]
+            .as_array()
+            .expect("elements")
+            .len(),
+        1,
+        "{answer}"
+    );
+    assert_eq!(answer["versions"], json!({ "@fusion.dev/helix": "1.2.3" }));
 }
