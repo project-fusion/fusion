@@ -43,7 +43,7 @@ const MARKS = {
  * A group starts shut. Write `default-open` on the step a reader should see,
  * such as the one that failed.
  *
- * @since 0.199.0
+ * @since 0.200.0
  * @status experimental
  * @documentation https://fusion.dev/helix/components/log
  *

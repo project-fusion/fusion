@@ -24,7 +24,7 @@ import '../line/log-line.js'
  * one element such as a `Toolbar` or a `Flex`. It sits above the lines with a
  * rule under it.
  *
- * @since 0.199.0
+ * @since 0.200.0
  * @status experimental
  * @category feedback
  * @documentation https://fusion.dev/helix/components/log

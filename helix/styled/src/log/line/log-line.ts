@@ -11,7 +11,7 @@ import { styles } from './log-line.css.js'
  * `warn` or `error` takes a band of its color, and a line `mark-lines` names
  * takes the band `Code Block` draws behind a marked line.
  *
- * @since 0.199.0
+ * @since 0.200.0
  * @status experimental
  * @documentation https://fusion.dev/helix/components/log
  *
