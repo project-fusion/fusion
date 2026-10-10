@@ -87,7 +87,7 @@ export const CoverageBand = () => {
               {ADDED}
             </helix-text>
             <helix-text as="p" emphasis="muted" variant="caption">
-              Added by a typical component after the first, compressed.
+              A typical extra component, compressed.
             </helix-text>
           </div>
 
