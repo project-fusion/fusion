@@ -8,9 +8,10 @@
  * three in the tree your parser already built, after your own sanitizing, and
  * leaves everything else as it is.
  *
- * - A fence becomes `helix-code-block`, labeled with its language. What is
- *   inside the code is kept, so a highlighter that ran before this has its
- *   colors kept too.
+ * - A fence becomes `helix-code-block`, with its language as its `label` and
+ *   its `language`, so a highlighter given to `registerHighlighter` colors it.
+ *   What is inside the code is kept, so a highlighter that ran before this has
+ *   its colors kept too.
  * - An alert, `> [!NOTE]` through `> [!CAUTION]`, becomes `helix-callout`: a
  *   note is `info`, a tip `success`, a warning `warning`, and a caution
  *   `danger`. An important passage has no tone, since none of the four says
@@ -114,7 +115,7 @@ const codeBlockOf = (node: HastNode): HastNode | undefined => {
   const language = languageOf(code)
   return {
     children,
-    properties: language ? { label: language } : {},
+    properties: language ? { label: language, language } : {},
     tagName: 'helix-code-block',
     type: 'element',
   }
