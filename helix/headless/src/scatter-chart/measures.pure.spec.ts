@@ -40,4 +40,9 @@ describe('bubbleWeights', () => {
     expect(bubbleWeights([0, -1])).toEqual([undefined, undefined])
     expect(bubbleWeights([])).toEqual([])
   })
+
+  test('as many sizes as a chart has rows', () => {
+    const sizes = Array.from({ length: 200_000 }, (_, at) => at % 100)
+    expect(bubbleWeights(sizes)[99]).toBe(1)
+  })
 })

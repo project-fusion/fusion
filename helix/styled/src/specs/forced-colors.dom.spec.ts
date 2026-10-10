@@ -69,9 +69,11 @@ describe('under forced colors', () => {
   })
 
   test('a scatter point keeps its series color, ringed in the text color', () => {
-    const point = rule('helix-scatter-chart', '[part~="point"]')
-    expect(point).toContain('forced-color-adjust: none')
-    expect(point).toContain('CanvasText')
+    expect(rule('helix-scatter-chart', '[part="point"]')).toContain('forced-color-adjust: none')
+    expect(rule('helix-scatter-chart', '[part="point-ring"]')).toContain('CanvasText')
+    const active = rule('helix-scatter-chart', '[part="point-active"]')
+    expect(active).toContain('forced-color-adjust: none')
+    expect(active).toContain('Highlight')
   })
 
   test('the end of a line and its markers keep the line’s color', () => {

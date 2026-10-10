@@ -41,7 +41,12 @@ export const measuresOf = (
  * whose largest is not above zero, has no weight.
  */
 export const bubbleWeights = (sizes: readonly (number | undefined)[]): (number | undefined)[] => {
-  const largest = Math.max(0, ...sizes.map((one) => one ?? 0))
+  /* A walk over the sizes: spread into `Math.max`, every size was an
+     argument of one call, and 100,000 rows threw a `RangeError`. */
+  let largest = 0
+  for (const one of sizes) {
+    largest = Math.max(largest, one ?? 0)
+  }
   return sizes.map((one) =>
     one === undefined || largest <= 0 ? undefined : Math.sqrt(Math.max(0, one) / largest),
   )
