@@ -5,6 +5,7 @@ import {
   copyFileSync,
   mkdirSync,
   mkdtempSync,
+  realpathSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -200,6 +201,41 @@ if (process.platform !== 'win32') {
       rmSync(named, { force: true, recursive: true })
       rmSync(other, { force: true, recursive: true })
       rmSync(target, { force: true, recursive: true })
+    })
+  })
+
+  describe('helix naming the templates for `helix new`', () => {
+    test('names the copy this package depends on', () => {
+      /* `npx @fusion.dev/helix-cli new` runs from a directory with no
+         `node_modules`, so the binary's own walk for the templates finds
+         nothing there. The package installed beside the shim is the one it
+         depends on. */
+      const { project, shim } = consumer('templates: $HELIX_TEMPLATES')
+      const templates = join(project, 'node_modules', '@fusion.dev', 'helix-templates')
+      mkdirSync(templates)
+      writeFileSync(
+        join(templates, 'package.json'),
+        '{"name": "@fusion.dev/helix-templates", "exports": {"./templates.json": "./templates.json"}}\n',
+      )
+      writeFileSync(join(templates, 'templates.json'), '{}\n')
+      const ran = run([], { CARGO_TARGET_DIR: join(project, 'target') }, shim)
+
+      expect(ran.stdout).toContain(`templates: ${realpathSync(templates)}`)
+
+      rmSync(project, { force: true, recursive: true })
+    })
+
+    test('and leaves the templates a caller named', () => {
+      const { project, shim } = consumer('templates: $HELIX_TEMPLATES')
+      const ran = run(
+        [],
+        { CARGO_TARGET_DIR: join(project, 'target'), HELIX_TEMPLATES: '/named/by/the/caller' },
+        shim,
+      )
+
+      expect(ran.stdout).toContain('templates: /named/by/the/caller')
+
+      rmSync(project, { force: true, recursive: true })
     })
   })
 }

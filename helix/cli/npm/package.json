@@ -29,6 +29,9 @@
     "test": "bun test"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",
+  "dependencies": {
+    "@fusion.dev/helix-templates": "workspace:*"
+  },
   "homepage": "https://fusion.dev",
   "keywords": [
     "helix",

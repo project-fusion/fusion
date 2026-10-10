@@ -7,13 +7,14 @@
 //! `templates.json` that package generates from its TypeScript register, which a
 //! compiled binary cannot read.
 //!
-//! **It resolves from `node_modules` and does not fetch.** Adding an HTTP client,
-//! a gzip reader and a tar reader to this binary to do what npm already does is
-//! the wrong half of the pair to put it in: `npm create @fusion.dev/helix-app` is
-//! the door for somebody with no workspace yet, and npm downloads the package for
-//! them on the way in, then names it in `HELIX_TEMPLATES`. What is left for the
-//! walk is the case where the package is already resolvable, which is every
-//! workspace that has Helix in it.
+//! **It resolves from `node_modules` and does not fetch.** npm installs the
+//! templates with the command: `@fusion.dev/helix-cli` depends on
+//! `@fusion.dev/helix-templates` at its own version, and its shim names that copy
+//! in `HELIX_TEMPLATES`, as `npm create @fusion.dev/helix-app` does. Fetching
+//! them here would put an HTTP client, a gzip reader, and a tar reader in this
+//! binary, and npm's registry login, proxy, and cache settings with them,
+//! to save an install of 0.27 MB unpacked (measured October 10, 2026). The walk
+//! is for a binary run without the shim, such as one cargo installed.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -75,7 +76,9 @@ struct Template {
 ///
 /// **`HELIX_TEMPLATES` first**, for the same reason `HELIX_BIN` comes first in
 /// the npm shim: a caller who knows better should not have to argue, and the
-/// tests need a package that is not installed anywhere.
+/// tests need a package that is not installed anywhere. It is also how the shim
+/// hands over the copy `@fusion.dev/helix-cli` depends on, so that copy
+/// outranks another version a project installed.
 fn locate(from: &Path) -> Result<PathBuf, Failure> {
     if let Ok(named) = std::env::var("HELIX_TEMPLATES") {
         let path = PathBuf::from(named);

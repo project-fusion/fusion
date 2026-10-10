@@ -978,6 +978,52 @@ fn a_wrong_templates_override_says_so_rather_than_blaming_node_modules() {
     );
 }
 
+/// **The templates named outrank a copy the project installed.** The npm shim
+/// names the copy `@fusion.dev/helix-cli` depends on, at the command's own
+/// version, and another version in the project's `node_modules` must not change
+/// the Helix a new project asks for.
+#[test]
+fn the_named_templates_outrank_a_copy_in_node_modules() {
+    let at = scratch("outranked");
+    let other = at.join("node_modules/@fusion.dev/helix-templates");
+    std::fs::create_dir_all(other.join("templates/react-vite")).expect("another copy");
+    std::fs::write(
+        other.join("package.json"),
+        r#"{ "name": "@fusion.dev/helix-templates", "version": "0.0.1-other" }"#,
+    )
+    .expect("its manifest");
+    std::fs::copy(
+        templates().join("templates.json"),
+        other.join("templates.json"),
+    )
+    .expect("its register");
+    std::fs::write(other.join("templates/react-vite/package.json"), "{}").expect("its file");
+
+    let helix = |output: &Output| -> serde_json::Value {
+        assert_eq!(code(output), 0, "{}", err(output));
+        serde_json::from_str::<serde_json::Value>(&out(output)).expect("parseable")["helix"].clone()
+    };
+
+    /* The walk finds the other copy, so it is a real alternative. */
+    let mut walked = Command::new(binary());
+    walked
+        .args(["new", "walked", "--template", "react-vite", "--json"])
+        .current_dir(&at)
+        .env("NO_COLOR", "1")
+        .env_remove("HELIX_TEMPLATES");
+    assert_eq!(
+        helix(&walked.output().expect("the binary runs")),
+        "0.0.1-other"
+    );
+
+    let own: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(templates().join("package.json")).expect("the templates manifest"),
+    )
+    .expect("a manifest that parses");
+    let named = scaffold(&at, &["new", "named", "--template", "react-vite", "--json"]);
+    assert_eq!(helix(&named), own["version"]);
+}
+
 /// A manifest against itself is the case the oracle has to get right first.
 ///
 /// **A differ that reports nothing is a differ that passes this test**, so it is
