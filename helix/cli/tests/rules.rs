@@ -3155,6 +3155,36 @@ fn vocabulary() {
     );
 }
 
+/// A floating panel is `surface`, and the name Tour Stop gave its own until
+/// October 10, 2026 is refused in its favor: the clean family renders its panel
+/// as `surface`, and the fault renders it as `bubble`.
+#[test]
+fn vocabulary_of_floating_panels() {
+    let stop = |name: &str| {
+        format!(
+            "export class TourStop extends HTMLElement {{
+  render() {{
+    return `<div part=\"{name}\" popover=\"manual\"><slot></slot></div>`;
+  }}
+}}
+"
+        )
+    };
+    plant_in(
+        "vocabulary-floating",
+        "vocabulary",
+        &[
+            ("helix.json", TIERS),
+            ("src/tour/stop.ts", &stop("surface")),
+        ],
+        |tree| {
+            tree.write("src/tour/stop.ts", &stop("bubble"));
+        },
+        "renders `part=\"bubble\"`",
+        "src/tour/stop.ts:3",
+    );
+}
+
 /// A family on the words registry declares every English default `@words`: the
 /// clean class has one word property, and the fault adds a second without it.
 #[test]

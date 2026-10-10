@@ -43,7 +43,7 @@ const ROLES: [(&str, &str); 6] = [
     ("surface", "a floating panel drawn over the page"),
     (
         "viewport",
-        "a scrollport the component reads the position of",
+        "a box showing part of a larger area: a scrollport, or a frame panned and zoomed in",
     ),
 ];
 
@@ -52,7 +52,28 @@ const ROLES: [(&str, &str); 6] = [
 /// **A permanent deny-list, not a queue.** The point of recording that `wrapper`
 /// means `container` is that the next person reaching for it is stopped, rather
 /// than told the entry is stale once nothing renders it.
-const REFUSED: [(&str, &str); 1] = [("wrapper", "container")];
+///
+/// **A floating panel is `surface`, and its common other names are refused.**
+/// Tour Stop published its panel as `bubble` until October 10, 2026, and
+/// `dropdown`, `flyout` and `popup` are what other libraries call the same box.
+/// A family's own name is not refused, although Popover, Tooltip and Dialog each
+/// published their panel under it: `popover`, `tooltip`, `dialog` and `menu` are
+/// also the role a component gives that family when it renders one, which is
+/// where `tooltip-surface` and `dialog-surface` come from, and Slider names the
+/// value beside its thumb `tooltip`.
+///
+/// **The rule reads the spelling.** The source does say which part is the
+/// floating panel: it is the part a host hands `PopoverController` as its
+/// `surface`. The rule does not hold that part to `surface`, because Speed Dial
+/// hands over `actions`, a column of chips with no panel behind them, named for
+/// what it holds. A word naming a thing is outside this registry.
+const REFUSED: [(&str, &str); 5] = [
+    ("bubble", "surface"),
+    ("dropdown", "surface"),
+    ("flyout", "surface"),
+    ("popup", "surface"),
+    ("wrapper", "container"),
+];
 
 /// The slot names that name a position, each with the one thing it means.
 ///

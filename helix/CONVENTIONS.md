@@ -1155,8 +1155,8 @@ least styleable half.
   own. Bare forwarding collides and had: `command` forwarded the listbox's
   `search-field` under a name it also rendered itself, so
   `helix-command::part(search-field)` matched two elements.
-- **A part already named for its role keeps the role alone.** A `dialog` inside
-  the `dialog` role is `dialog`, not `dialog-dialog`. The two forwards that
+- **A part already named for its role keeps the role alone.** A log line's
+  `line` inside the `line` role is `line`, not `line-line`. The two forwards that
   predate the rule were both written this way, which is the usual sign of the
   right one, and what keeps the collapse safe is that the parent may not then
   render the role itself.
@@ -1215,7 +1215,7 @@ bottom edge, so a bubble that flipped below its trigger at the top of a page
 pointed away from it, and a tooltip is usually two shadow roots deep, inside a
 copy button or a chart, where no host state reaches. So the placing pass puts
 the arrow on the edge facing the anchor itself, a tooltip names its bubble and
-its arrow for the side, `tooltip-top` and `arrow-top` while it is above its
+its arrow for the side, `surface-top` and `arrow-top` while it is above its
 trigger, and records `:state(placed-top)` on its host, as Tour Stop does. The
 names are the hosts' literals rather than the controller's: a controller adding
 a part at runtime is one `parts` and `exportparts` cannot read, and a menu or a
@@ -1340,6 +1340,23 @@ own JSDoc as "the floating panel the menu is drawn on", which is the sentence
 five other families spell `surface`. `Megamenu` published `panel` while the
 accessor reading it, one file over, is called `surface`. The third, `wrapper` to
 `container`, was simply the library's only one.
+
+**Every floating panel is `surface`, decided October 10, 2026.** Popover,
+Tooltip and Dialog each published their panel under the component's own name,
+and Tour Stop as `bubble`, so a consumer learned a new word for each panel. A
+floating panel is the box drawn over the page, in the top layer, that holds what
+the component opened, whether it is placed against a trigger or centered. These
+boxes are in the top layer too, are something else, and keep their names:
+
+- Speed Dial's `actions`, a column of chips with no panel behind them.
+- Toast's `region`, a stack fixed to the window that holds the live regions.
+- Lightbox's `dialog`, which is the whole screen.
+- Drawer's `panel`, a sheet anchored to an edge, which the registry has its own
+  word for.
+
+`bubble`, `dropdown`, `flyout` and `popup` are refused. A family's own name is
+not, being also the role a composition gives that family: the tooltip inside a
+copy button is `tooltip-surface`.
 
 **And one word looked like a synonym and was not.** `Steps` renders `body` and
 `content` both, and they are different boxes: `content` is what the stage holds
