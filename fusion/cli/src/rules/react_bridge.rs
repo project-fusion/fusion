@@ -1,10 +1,15 @@
-//! The key the framework bridge reads still exists in the framework installed.
+//! The keys the framework bridge reads still exist in the framework installed.
 //!
 //! **A bridge that finds a framework's own props by an internal prefix is a
 //! measurement, not a contract.** It is how every prefixed event handler
 //! survives hydration, and if the key is renamed or removed those handlers are
 //! silently dead again on any server-rendered page: no error, no warning, and
 //! the component works everywhere the page was not rendered on a server.
+//!
+//! **The mark the framework leaves on a document is the second key.** An
+//! element whose props arrive after its first frame goes on looking for them
+//! only in a document that carries it, so a renamed mark leaves a hydrated
+//! data table empty, and silently, as a renamed props key does.
 //!
 //! **Both bundles**, because a key present in the development build and absent
 //! from the production one fails only where nobody is looking.
@@ -27,7 +32,8 @@ use serde_json::Value;
 use crate::rules::{Context, Finding, Report};
 
 static DECLARED: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"const REACT_PROPS = '([^']+)'").expect("a literal pattern compiles")
+    Regex::new(r"const (REACT_PROPS|REACT_LISTENING) = '([^']+)'")
+        .expect("a literal pattern compiles")
 });
 
 /// A note claiming to have been measured against a named release.
@@ -40,8 +46,9 @@ static MEASURED: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"[Aa]gainst\s+React\s+(\d+\.\d+\.\d+)").expect("a literal pattern compiles")
 });
 
-/// Where the bridge's prefix is declared, found by content rather than by path.
-fn prefix(context: &Context) -> Option<String> {
+/// The bridge's prefixes, each by the name it is declared under, found by
+/// content wherever they are declared.
+fn prefixes(context: &Context) -> Vec<(String, String)> {
     let mut files = Vec::new();
     crawl(
         &context.root,
@@ -51,10 +58,32 @@ fn prefix(context: &Context) -> Option<String> {
         },
         &mut files,
     );
-    files.iter().find_map(|file| {
-        let text = fs::read_to_string(file).ok()?;
-        Some(DECLARED.captures(&text)?[1].to_owned())
-    })
+    let mut found: Vec<(String, String)> = Vec::new();
+    for file in &files {
+        let Ok(text) = fs::read_to_string(file) else {
+            continue;
+        };
+        for one in DECLARED.captures_iter(&text) {
+            if !found.iter().any(|(name, _)| *name == one[1]) {
+                found.push((one[1].to_owned(), one[2].to_owned()));
+            }
+        }
+    }
+    found
+}
+
+/// Why a prefix the installed framework no longer carries matters.
+fn why(name: &str) -> &'static str {
+    if name == "REACT_LISTENING" {
+        "An element whose props arrive after its first frame looks for them only in a \
+         document carrying this mark, which the framework leaves as it makes a root. Find \
+         the mark the framework now leaves on a document it has a root in, and follow it."
+    } else {
+        "The bridge finds the props the framework is holding by that prefix, and it is how \
+         every prefixed handler survives hydration. Check whether the framework has fixed \
+         the underlying issue, in which case the bridge can be deleted, or renamed the key, \
+         in which case follow it."
+    }
 }
 
 pub fn run(context: &Context) -> Report {
@@ -69,12 +98,15 @@ pub fn run(context: &Context) -> Report {
         unit: "framework bundles",
     };
 
-    let (Some(prefix), Ok(installed)) = (
-        prefix(context),
-        fs::read_to_string(context.root.join("node_modules/react-dom/package.json")),
-    ) else {
+    let declared = prefixes(context);
+    let Ok(installed) =
+        fs::read_to_string(context.root.join("node_modules/react-dom/package.json"))
+    else {
         return nothing;
     };
+    if declared.is_empty() {
+        return nothing;
+    }
     let version = serde_json::from_str::<Value>(&installed)
         .ok()
         .and_then(|one| Some(one.get("version")?.as_str()?.to_owned()))
@@ -87,18 +119,16 @@ pub fn run(context: &Context) -> Report {
             continue;
         };
         checked += 1;
-        if text.contains(&prefix) {
-            continue;
+        for (name, prefix) in &declared {
+            if text.contains(prefix.as_str()) {
+                continue;
+            }
+            findings.push(Finding {
+                detail: why(name).to_owned(),
+                file: bundle.to_owned(),
+                message: format!("`{prefix}` is gone from react-dom {version}"),
+            });
         }
-        findings.push(Finding {
-            detail: "The bridge finds the props the framework is holding by that prefix, and it \
-                     is how every prefixed handler survives hydration. Check whether the \
-                     framework has fixed the underlying issue, in which case the bridge can be \
-                     deleted, or renamed the key, in which case follow it."
-                .to_owned(),
-            file: bundle.to_owned(),
-            message: format!("`{prefix}` is gone from react-dom {version}"),
-        });
     }
     if checked == 0 {
         return nothing;

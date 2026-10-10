@@ -594,6 +594,44 @@ fn reaching() {
     );
 }
 
+/// The mark a framework root leaves on its document is the bridge's second
+/// key, held to the installed framework as the props key is.
+#[test]
+fn react_bridge_mark() {
+    let bridge = "const REACT_PROPS = '__reactProps$'\nconst REACT_LISTENING = '_reactListening'\n";
+    let bundle = "var key = '__reactProps$' + suffix;\nvar mark = '_reactListening' + suffix;\n";
+    plant_in(
+        "workspace-react-bridge-mark",
+        "workspace",
+        "react-bridge",
+        &[
+            ("package.json", ROOT),
+            ("fusion.json", EMPTY),
+            ("packages/bridge/src/bridge.ts", bridge),
+            (
+                "node_modules/react-dom/package.json",
+                r#"{ "name": "react-dom", "version": "19.2.8" }"#,
+            ),
+            (
+                "node_modules/react-dom/cjs/react-dom-client.development.js",
+                bundle,
+            ),
+            (
+                "node_modules/react-dom/cjs/react-dom-client.production.js",
+                bundle,
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "node_modules/react-dom/cjs/react-dom-client.development.js",
+                "var key = '__reactProps$' + suffix;\nvar mark = '_reactWatching' + suffix;\n",
+            );
+        },
+        "`_reactListening` is gone from react-dom 19.2.8",
+        "node_modules/react-dom/cjs/react-dom-client.development.js",
+    );
+}
+
 /// The framework's files are read by path, so they are written by hand.
 #[test]
 fn react_bridge() {

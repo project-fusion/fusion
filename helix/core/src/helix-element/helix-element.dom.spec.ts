@@ -376,9 +376,36 @@ describe('the object property React is holding', () => {
     return element
   }
 
+  /**
+   * The mark `createRoot` and `hydrateRoot` leave on the document before React
+   * renders anything, and so before any node there holds props.
+   */
+  const ROOT_MARK = '_reactListening8d1f'
+
+  afterEach(() => {
+    delete (document as unknown as Record<string, unknown>)[ROOT_MARK]
+  })
+
   /** Upgraded before the bag arrives: a definition evaluated with the bundle. */
   const early = (element: Carrier, props: Record<string, unknown>): void => {
+    Object.assign(document, { [ROOT_MARK]: true })
     Object.assign(element, { __reactProps$k9x2: props })
+  }
+
+  /** Counts the timers booked at `LOOK_EVERY` while `run` runs. */
+  const lookTimers = async (run: () => Promise<void>): Promise<number> => {
+    const original = globalThis.setTimeout
+    let booked = 0
+    globalThis.setTimeout = ((handler: () => void, delay?: number) => {
+      booked += delay === 16 ? 1 : 0
+      return original(handler, delay)
+    }) as typeof setTimeout
+    try {
+      await run()
+    } finally {
+      globalThis.setTimeout = original
+    }
+    return booked
   }
 
   test('is assigned by the first update, because a property has to be right before the paint', async () => {
@@ -435,6 +462,67 @@ describe('the object property React is holding', () => {
     await element.updateComplete
 
     expect(element.rows).toBe(rows)
+  })
+
+  /* **The App Router ordering, with the root as late as the bag.** The element
+     upgrades and draws before React has a root on the page, and `hydrateRoot`
+     marks the document only as it starts, frames later. The looking after the
+     first frame is what finds the bag then. */
+  test('is assigned when React makes its root after the first frame', async () => {
+    const rows = [{ name: 'Dara Mbeki' }]
+    const element = document.createElement(carrier) as Carrier
+    document.body.append(element)
+    await element.updateComplete
+    await frame()
+    await new Promise((done) => setTimeout(done, 30))
+    expect(element.rows).toEqual([])
+
+    early(element, { rows })
+    await new Promise((done) => setTimeout(done, 40))
+    await element.updateComplete
+
+    expect(element.rows).toBe(rows)
+  })
+
+  /* **One timer for every element still looking.** Each element booked six of
+     its own, so 1,000 buttons booked 6,000 timers and scanned their own keys at
+     each. One list is looked at on each tick now, and the ticks stop with the
+     last element's window. */
+  test('is looked for by one timer, however many elements wait', async () => {
+    Object.assign(document, { [ROOT_MARK]: true })
+    const elements = Array.from({ length: 20 }, () => {
+      const element = document.createElement(carrier) as Carrier
+      document.body.append(element)
+      return element
+    })
+    const booked = await lookTimers(async () => {
+      await Promise.all(elements.map((element) => element.updateComplete))
+      await frame()
+      await new Promise((done) => setTimeout(done, 200))
+    })
+
+    expect(booked).toBeGreaterThan(0)
+    expect(booked).toBeLessThan(10)
+    expect(await lookTimers(() => new Promise((done) => setTimeout(done, 60)))).toBe(0)
+  })
+
+  /* **A page without React books its ticks and scans no element.** React marks
+     the document before any node holds props, so an element in a document
+     without the mark has nothing to find, and does not look. A bag never sits
+     on a node of such a page; the one written here only shows that nothing
+     read it. */
+  test('is not looked for in a document React has no root in', async () => {
+    const rows = [{ name: 'Eun-ji Park' }]
+    const element = document.createElement(carrier) as Carrier
+    document.body.append(element)
+    await element.updateComplete
+    await frame()
+
+    Object.assign(element, { __reactProps$k9x2: { rows } })
+    await new Promise((done) => setTimeout(done, 60))
+    await element.updateComplete
+
+    expect(element.rows).toEqual([])
   })
 
   /* **The narrowing, and why it is not "apply every prop React is holding".** A
