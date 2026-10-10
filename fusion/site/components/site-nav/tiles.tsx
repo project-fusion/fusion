@@ -637,19 +637,23 @@ const ROADS: { along: 'x' | 'y'; at: number; from: number; to: number }[] = [
 
 const mapArt = (pic: Pic): ReactNode => (
   <Scene dy={-4} pic={pic} scale={1.4}>
-    {ROADS.map((road) => (
-      <Flat
-        className="artInk"
-        d={road.along === 'x' ? 5 : road.to - road.from}
-        fillOpacity={0.28}
-        key={`${road.along}${road.at}`}
-        pic={pic}
-        w={road.along === 'x' ? road.to - road.from : 5}
-        x={road.along === 'x' ? road.from : road.at}
-        y={road.along === 'x' ? road.at : road.from}
-        z={0}
-      />
-    ))}
+    {/* One layer at one opacity, and not a strip at that opacity each: two
+        strips at 0.28 crossing made a square at 0.48 at every junction, so
+        the grid read as a grid of dark squares. */}
+    <g opacity="0.28">
+      {ROADS.map((road) => (
+        <Flat
+          className="artInk"
+          d={road.along === 'x' ? 5 : road.to - road.from}
+          key={`${road.along}${road.at}`}
+          pic={pic}
+          w={road.along === 'x' ? road.to - road.from : 5}
+          x={road.along === 'x' ? road.from : road.at}
+          y={road.along === 'x' ? road.at : road.from}
+          z={0}
+        />
+      ))}
+    </g>
     {/* The route, as a polyline of ground points from the near left corner
         to the pin at the back right. */}
     <polyline
@@ -683,7 +687,7 @@ const mapArt = (pic: Pic): ReactNode => (
         x1={iso(PIN.x, PIN.y, 0, pic).x}
         x2={iso(PIN.x, PIN.y, 0, pic).x}
         y1={iso(PIN.x, PIN.y, 0, pic).y}
-        y2={iso(PIN.x, PIN.y, 16, pic).y}
+        y2={iso(PIN.x, PIN.y, 13, pic).y}
       />
       <circle
         className="artBrand"
@@ -744,6 +748,17 @@ const at = (key: Note, pic: Pic) => iso(NOTES[key].x, NOTES[key].y, NOTES[key].z
 const graphArt = (pic: Pic): ReactNode => (
   <Scene dy={4} pic={pic} scale={1.37}>
     <Plate pic={pic} />
+    {/* The glow first, under the links: drawn with its note, it covered the
+        ends of the links that reach the note, and they read as running into
+        a haze. Under them, they reach the note and the glow sits behind. */}
+    <circle
+      className="artBrand"
+      cx={at('a', pic).x}
+      cy={at('a', pic).y}
+      fillOpacity="0.45"
+      filter={`url(#${pic.ids.glow})`}
+      r={(NOTES.a.r + 6) * at('a', pic).k}
+    />
     <g className="artStroke" strokeOpacity="0.28" strokeWidth="1.5">
       {QUIET_LINKS.map(([p, q]) => (
         <line key={p + q} x1={at(p, pic).x} x2={at(q, pic).x} y1={at(p, pic).y} y2={at(q, pic).y} />
@@ -766,7 +781,6 @@ const graphArt = (pic: Pic): ReactNode => (
         <Sphere
           className={'selected' in note ? 'artBrand' : 'artInk'}
           fillOpacity={'selected' in note ? undefined : 0.4}
-          glow={'selected' in note}
           key={key}
           pic={pic}
           r={note.r}

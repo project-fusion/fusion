@@ -122,7 +122,7 @@
    band needs where the panel of lists wanted 52: five tiles and a column of
    sentences do not fit in 832 pixels. */
 .navPanel::part(surface) {
-  --site-panel-column: 13rem;
+  --site-panel-column: 15rem;
   --site-panel-measure: 80rem;
 
   column-gap: var(--helix-space-2xl);
