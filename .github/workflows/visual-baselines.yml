@@ -1,4 +1,5 @@
-# Retakes the visual baselines, on the one platform allowed to take them.
+# Retakes the visual baselines, on the one platform allowed to take them, or
+# accepts the captures a failed check took there.
 #
 # **A baseline is a Linux artifact and development is darwin.** No headless
 # example sets `font-family`, so the font stack, rasterizer and antialiasing all
@@ -12,9 +13,20 @@
 # push agrees with whatever just landed and reports success forever. A person
 # asks for this and reviews the diff.
 #
-# **A pull request, never a push to `main`.** This is the only workflow here with
-# `contents: write`, and a baseline is what every future run is judged against,
-# so it is the artifact that most needs review.
+# **Onto the branch it ran on, and never a push to `main`.** This is the only
+# workflow here with `contents: write`, and a baseline is what every future run
+# is judged against, so it is the artifact that most needs review. A feature
+# branch has a pull request of its own, which shows each changed picture and
+# runs `verify` again on the push, so the Action commits onto it. A second pull
+# request into the branch cost a `verify` run, a merge, and a pull of the merge
+# into every checkout of the branch, and reviewed nothing the branch's own pull
+# request does not. On `main` the Action opens a pull request.
+#
+# **`run` accepts the captures of a check.** A failed check
+# uploads each failed shot's capture with its report, taken on this platform,
+# so `helix visual accept` writes those into the baselines with no browser and
+# no build. The baseline is then the picture the check showed. It refuses a run
+# of a commit other than the branch's, because those captures show other code.
 name: Visual baselines
 
 # **Queued rather than canceled**, for the reason the timeout below gives: a
@@ -43,6 +55,10 @@ on:
         description: The entries to retake, separated by spaces, each an example family in both tiers or a site page, or blank for every one
         required: false
         type: string
+      run:
+        description: A verify run whose captures to accept, by its ID, in place of a retake. The examples and the site pages it failed on are both accepted
+        required: false
+        type: string
       suite:
         description: The Helix examples, or the site's pages
         default: examples
@@ -50,6 +66,8 @@ on:
         type: choice
 
 permissions:
+  # The artifacts of the run an accept reads.
+  actions: read
   contents: write
   pull-requests: write
 
@@ -60,11 +78,25 @@ jobs:
     # set that is only meaningful whole.
     timeout-minutes: 30
     steps:
+      # **The branch as it is when the run starts.** `/retake` dispatches the
+      # examples and the site as two runs that queue on one branch. The second
+      # has to start from the first one's commit, or its push is refused.
       - name: Check out
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.ref }}
 
       - name: Set up bun and the dependencies
+        if: inputs.run == ''
         uses: ./.github/actions/setup
+
+      # An accept reads reports and writes files, so it needs the `helix`
+      # binary and nothing the build makes.
+      - name: Set up bun and the helix binary
+        if: inputs.run != ''
+        uses: ./.github/actions/setup
+        with:
+          dependencies: 'false'
 
       # Built first: `specs` bundles from source, which imports the generated
       # `.css.ts` files and the other packages' `dist`, and neither is tracked.
@@ -74,6 +106,7 @@ jobs:
       # checkout has none of it and this step is the only thing that supplies
       # it.
       - name: Build
+        if: inputs.run == ''
         run: bun run build
 
       # **An App token, because `GITHUB_TOKEN` opens a pull request nothing
@@ -103,6 +136,7 @@ jobs:
       # `bump.mjs` maps `chore` to `patch`, so a baseline carrying a `helix`
       # scope would ask for a release. Only `test` and `ci` release nothing.
       - name: Retake the baselines
+        if: inputs.run == ''
         uses: ./helix/visual/action
         with:
           args: ${{ inputs.suite == 'site' && '--config fusion/site/visual.config.ts' || '' }} ${{ inputs.boxes && '--boxes' || '' }} ${{ inputs.family }}
@@ -111,4 +145,17 @@ jobs:
           helix: bun helix/cli/npm/bin.mjs
           mode: retake
           playwright: bunx playwright
+          push: 'true'
+          token: ${{ steps.app.outputs.token }}
+
+      - name: Accept the captures of the check
+        if: inputs.run != ''
+        uses: ./helix/visual/action
+        with:
+          branch: visual-baselines-${{ github.ref_name }}
+          commit-message: 'test(visual): accept the captures of verify run ${{ inputs.run }}'
+          helix: bun helix/cli/npm/bin.mjs
+          mode: accept
+          push: 'true'
+          run: ${{ inputs.run }}
           token: ${{ steps.app.outputs.token }}

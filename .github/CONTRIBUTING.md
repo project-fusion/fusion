@@ -70,10 +70,17 @@ which keyboard was used rather than who decided anything.
 ## Pull requests
 
 One change per pull request. `verify` has to pass. If your change is visual,
-`bun run visual:update` on Linux takes the new baselines and the review is the
-diff on them. On macOS or Windows it takes none and says so, because a baseline
-taken there fails in CI. If you do not work on Linux, say so in the pull
-request, and a maintainer retakes them with the Visual baselines workflow.
+its baselines change with it, and the review is the diff on them. Baselines are
+taken on Linux, because a baseline taken on macOS or Windows fails in CI.
+
+- On Linux, `bun run visual:update` takes the new baselines.
+- On another platform, push the change and let `verify` fail. The failed run
+  carries the pictures it took. Run `bun run helix visual accept --run` with
+  the address of the run to write them into your checkout, then review and
+  commit them.
+- A maintainer can also comment `/accept` on the pull request, which commits
+  the run's pictures onto a branch of this repository, or `/retake` and the
+  entries to take them again.
 
 We would rather read a small pull request that does one thing than a large one
 that does four, and we will say so rather than merging it out of politeness.

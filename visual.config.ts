@@ -120,7 +120,7 @@ export default defineConfig({
      the build writes. */
   manifest: ['helix/headless/custom-elements.json', 'helix/styled/custom-elements.json'],
   retake:
-    'Dispatch the `Visual baselines` workflow on your branch and review the pull request it opens.',
+    'Comment `/retake` and the entries on the pull request, or dispatch the `Visual baselines` workflow on your branch to retake every one, and review the commit it makes on the branch.',
   serve: {
     '/fonts/': 'fusion/site/public/fonts/',
     '/frame.css': 'fusion/site/public/sandbox/frame.css',

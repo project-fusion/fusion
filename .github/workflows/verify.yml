@@ -829,7 +829,7 @@ jobs:
   # **With the history of the last 30 runs**, so a group also failing on
   # branches that did not make it says so, and on a pull request **as a
   # comment**, kept to one that each run rewrites, so the reviewer reads the
-  # groups and how to retake them where the review happens.
+  # groups, and how to accept or retake them, where the review happens.
   visual-triage:
     needs: [browser]
     if: ${{ always() && needs.browser.result == 'failure' }}  # dialect:quoted, GitHub's own function
@@ -891,7 +891,7 @@ jobs:
             echo '<!-- helix-visual -->'
             cat "$RUNNER_TEMP/summary.md"
             echo
-            echo 'To retake entries on this branch, comment `/retake` and their names, such as `/retake styled/badge site/home`. Look at each picture before you do.'
+            echo 'Look at each picture first. When every change was meant, comment `/accept` to commit the captures of this run onto the branch as the baselines. To take entries again, comment `/retake` and their names, such as `/retake styled/badge site/home`.'
           } > "$RUNNER_TEMP/comment.md"
           existing=$(gh api "repos/$GITHUB_REPOSITORY/issues/$NUMBER/comments?per_page=100" --jq '[.[] | select(.body | startswith("<!-- helix-visual -->"))][0].id // empty')
           if [ -n "$existing" ]; then
