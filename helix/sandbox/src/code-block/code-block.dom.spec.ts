@@ -12,10 +12,10 @@ beforeAll(async () => {
   registerDom()
   await import('./index.js')
   ;({ codeBlockSheet } = await import('./code-block-highlight.js'))
-  const { highlightStyle } = await import('../editor/root/highlight.js')
+  const { syntaxHighlighter } = await import('../highlight/syntax.js')
   const { tags } = await import('@lezer/highlight')
   const KINDS = { callable: tags.typeName, keyword: tags.keyword, tag: tags.tagName }
-  style = (code, kind) => `${highlightStyle.style([KINDS[kind]])}:${code}`
+  style = (code, kind) => `${syntaxHighlighter.style([KINDS[kind]])}:${code}`
   ;({ registerHighlighter } = await import('@fusion.dev/helix-headless/code-block'))
 })
 

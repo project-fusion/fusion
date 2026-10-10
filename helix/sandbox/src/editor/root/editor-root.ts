@@ -14,10 +14,10 @@ import {
   words,
 } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
-import { html } from 'lit'
+import { html, unsafeCSS } from 'lit'
 import { property } from 'lit/decorators.js'
+import { syntaxHighlighter, syntaxRules } from '../../highlight/syntax.js'
 import { styles } from './editor-root.css.js'
-import { highlightStyle } from './highlight.js'
 
 /**
  * A language the editor knows, by the name a file carries.
@@ -179,7 +179,7 @@ export class HelixSandboxEditor extends HelixElement {
           indentUnit.of('  '),
           EditorState.tabSize.of(2),
           keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
-          syntaxHighlighting(highlightStyle, { fallback: true }),
+          syntaxHighlighting(syntaxHighlighter, { fallback: true }),
           this.language$.of(LANGUAGES[this.language]()),
           this.readOnly$.of(EditorState.readOnly.of(this.readOnly)),
           EditorView.lineWrapping,
@@ -287,7 +287,7 @@ export class HelixSandboxEditor extends HelixElement {
     return html`<div part="editor"></div>`
   }
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [styles, unsafeCSS(syntaxRules)]
 }
 
 declare global {
