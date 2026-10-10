@@ -38,7 +38,10 @@ separation](./surfaces-and-separation).
 
 Inks are the colors that go on grounds. The base ink is `foreground`.
 
-- `foreground-muted` and `foreground-subtle` are for text that recedes.
+- `foreground-muted` is for text that recedes. The engine solves it to the
+  contrast target.
+- `foreground-subtle` recedes further. It is a fixed step of the gray ramp, and
+  the engine does not solve it, so its contrast is not guaranteed.
 - Text on a filled color takes the ink named for that fill:
   - `foreground-on-primary` on `primary-surface`
   - `foreground-on-accent` on `accent-surface`
@@ -52,8 +55,9 @@ Intent colors show what something means.
   `-subtle` variants. With no brand color set, both are ink: near-black in
   light mode and near-white in dark mode.
 - `info`, `success`, `warning`, and `danger` are for status. Each has a
-  `-surface` and a `-surface-hover` variant for the tinted box that holds the
-  message.
+  `-surface` variant, the filled ground that carries `foreground-on-status`,
+  such as a danger button or a badge in a status tone, and a `-surface-hover`
+  variant for that fill under the pointer.
 
 ### Series
 
@@ -98,8 +102,14 @@ OKLCH lets the theme engine *solve* for a palette from your brand color. See
 
 The engine measures each ink against the ground it will be painted on. A brand
 color that already meets the target there is used as it is. For any other color,
-the engine searches for the lightness that meets the target. Every pair it
-produces meets the target.
+the engine searches for the lightness that meets the target. A pair that cannot
+meet its target, such as one with a color you pinned, is reported in
+`violations`.
+
+`foreground-subtle` is the one ink the engine does not solve. The range of
+readable grays has room for one quiet ink, and `foreground-muted` is that ink, so
+`foreground-subtle` stays a fixed step of the stylesheet's gray ramp and its
+contrast is not guaranteed.
 
 The engine can solve only the pairs it knows about, so we check two things:
 

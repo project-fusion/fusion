@@ -29,7 +29,11 @@ changing them one at a time. A change to one value can break the contrast of a
 component elsewhere, and nothing tells you.
 
 `@fusion.dev/helix-theme` computes a complete token set from a few intent
-inputs, and every text and background pair meets its contrast target.
+inputs. It solves each text color against the backgrounds it lands on, measures
+every pair in its surface model, and reports any pair that misses its contrast
+target. `foreground-subtle` is not in the model. It is a fixed step of the
+stylesheet's gray ramp, and the engine does not solve it, so its contrast is not
+guaranteed.
 
 ## Two ways to theme
 

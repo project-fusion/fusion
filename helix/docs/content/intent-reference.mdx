@@ -59,12 +59,20 @@ the gray nearest the page that meets the contrast target, which is a mid gray.
 For black and white, leave out `brand`. Neither applies to a color you pinned. A
 pinned color is used exactly as you set it.
 
+`tokens` sets each value after the engine has solved the rest, so no other color
+is solved against it. Each pair that names the token measures it, and a value
+that misses its target is reported in `violations`. A name the engine does not
+emit is added as a token of your own. No default pair names it, so only a pair
+you list in `pairings` measures it. A value the engine cannot read is skipped: a
+token the engine emits keeps its derived value, and a name it does not emit is
+left out.
+
 ## Contrast
 
 | Field | What it controls |
 |---|---|
 | `contrastTarget` | Target contrast for body text. 4.5 is WCAG AA, and 7 is AAA |
-| `pairings` | Extra foreground and background pairs to solve, in addition to the pairs in the engine's surface model |
+| `pairings` | The foreground and background pairs to measure, by token name. The list replaces the pairs from the engine's surface model. The engine measures each pair and solves none of them, and a pair that names a token the engine does not emit is reported as `unverifiable` |
 
 The default is 4.5, the WCAG 2.1 AA figure. The European Accessibility Act
 refers to WCAG 2.1 AA, so 4.5 is the figure with legal weight.
