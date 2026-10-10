@@ -2449,7 +2449,7 @@ headline preview and reads as "Preview", the one example `helix component`'s
 **Each example carries its own stylesheet, even when it matches a sibling's.**
 A reader takes an example away as one `index.html` and one `styles.css`, so a
 sheet shared between slugs would be a file the copied example needs and does
-not include. Thirteen of Aura's examples ship the same two-line `.stage` rule
+not include. Fourteen of Aura's examples ship the same two-line `.stage` rule
 for that reason, and it is the cost of every example standing alone rather
 than duplication to remove. What is not the example's business goes to the
 base layer instead: the `fieldset` reset ten form examples each carried is in

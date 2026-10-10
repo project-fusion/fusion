@@ -148,7 +148,7 @@ const PROSE: Route[] = [
   },
   {
     description:
-      'Nine animated backgrounds colored by your tokens, with controls for every parameter.',
+      'Twelve animated backgrounds colored by your tokens, with controls for every parameter.',
     kind: 'page',
     path: '/helix/aura',
     priority: 0.4,

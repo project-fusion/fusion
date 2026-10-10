@@ -70,13 +70,13 @@ export const AURA: PageCopy = {
   blocks: [
     {
       body: [
-        'Aura has nine animated backgrounds colored by your tokens. The page shows each one at full size, with controls for every parameter and the response to the pointer. The component is `helix-aura`, and its reference is at `/helix/components/aura`.',
+        'Aura has twelve animated backgrounds colored by your tokens. The page shows each one at full size, with controls for every parameter and the response to the pointer. The component is `helix-aura`, and its reference is at `/helix/components/aura`.',
         'Aura draws with WebGL. In a browser without WebGL, it draws nothing and the page shows its content on the plain background.',
       ],
       title: 'What it is',
     },
   ],
-  lede: 'Nine animated backgrounds colored by your tokens, with controls for every parameter.',
+  lede: 'Twelve animated backgrounds colored by your tokens, with controls for every parameter.',
   source: 'written for this document; the page is a tool and has no prose',
   title: 'Aura',
 }
