@@ -87,11 +87,10 @@
       - text: Callout
       - link "Callout documentation":
         - /url: /helix/components/callout
-    - treeitem "Canvas Canvas documentation Experimental" [level=1]:
+    - treeitem "Canvas Canvas documentation" [level=1]:
       - text: Canvas
       - link "Canvas documentation":
         - /url: /helix/components/canvas
-      - img "Experimental"
     - treeitem "Card Card documentation" [level=1]:
       - text: Card
       - link "Card documentation":
@@ -196,11 +195,10 @@
       - text: Format Date
       - link "Format Date documentation":
         - /url: /helix/components/format-date
-    - treeitem "Graph Graph documentation Experimental" [level=1]:
+    - treeitem "Graph Graph documentation" [level=1]:
       - text: Graph
       - link "Graph documentation":
         - /url: /helix/components/graph
-      - img "Experimental"
     - treeitem "Grid Grid documentation" [level=1]:
       - text: Grid
       - link "Grid documentation":
@@ -258,11 +256,10 @@
       - link "Log documentation":
         - /url: /helix/components/log
       - img "Experimental"
-    - treeitem "Map Map documentation Experimental" [level=1]:
+    - treeitem "Map Map documentation" [level=1]:
       - text: Map
       - link "Map documentation":
         - /url: /helix/components/map
-      - img "Experimental"
     - treeitem "Megamenu Megamenu documentation" [level=1]:
       - text: Megamenu
       - link "Megamenu documentation":
