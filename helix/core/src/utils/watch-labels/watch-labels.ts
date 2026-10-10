@@ -1,5 +1,5 @@
 /** One observer per tree, and the callbacks it runs when a label in it changes. */
-const trees = new Map<Node, Set<() => void>>()
+const trees = new Map<Node, { heard: Set<() => void>; observer: MutationObserver }>()
 
 /** Whether a change touched a `<label>`: one added or taken out, its `for`, or its words. */
 const touchesLabel = ({ addedNodes, removedNodes, target }: MutationRecord): boolean =>
@@ -21,20 +21,19 @@ const touchesLabel = ({ addedNodes, removedNodes, target }: MutationRecord): boo
  *
  * **One observer per tree, whatever the number of controls in it**, so a form
  * of forty fields watches the page once, and a change that touches no label
- * costs one check per record. The returned function stops the watch, and an
- * observer whose controls have all gone stops at the next change it sees.
+ * costs one check per record. The returned function stops the watch, and the
+ * observer goes with the last control in its tree. A tree can be another
+ * element's shadow root, which changes no more once that element is removed,
+ * so an observer left for a later change to stop would keep the root forever.
  */
 export const watchLabels = (host: Node, heard: () => void): (() => void) => {
   const root = host.getRootNode()
-  let callbacks = trees.get(root)
-  if (!callbacks) {
-    const made = new Set<() => void>()
+  let tree = trees.get(root)
+  if (!tree) {
+    const callbacks = new Set<() => void>()
     const observer = new MutationObserver((records) => {
-      if (made.size === 0) {
-        observer.disconnect()
-        trees.delete(root)
-      } else if (records.some(touchesLabel)) {
-        for (const callback of [...made]) {
+      if (records.some(touchesLabel)) {
+        for (const callback of [...callbacks]) {
           callback()
         }
       }
@@ -45,12 +44,16 @@ export const watchLabels = (host: Node, heard: () => void): (() => void) => {
       childList: true,
       subtree: true,
     })
-    callbacks = made
-    trees.set(root, made)
+    tree = { heard: callbacks, observer }
+    trees.set(root, tree)
   }
-  callbacks.add(heard)
-  const watched = callbacks
+  tree.heard.add(heard)
+  const watched = tree
   return () => {
-    watched.delete(heard)
+    watched.heard.delete(heard)
+    if (watched.heard.size === 0 && trees.get(root) === watched) {
+      watched.observer.disconnect()
+      trees.delete(root)
+    }
   }
 }

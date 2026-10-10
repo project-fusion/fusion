@@ -562,8 +562,8 @@ export class HelixHeadlessListbox extends MixinCollection(
     const shown = this.shown.filter((option) => !option.disabled)
     this.typeahead.reset()
     this.parked = where === 'none'
-    const chosen =
-      where === 'selected' ? shown.find((option) => this.values.includes(option.value)) : undefined
+    const values = where === 'selected' ? new Set(this.values) : undefined
+    const chosen = values && shown.find((option) => values.has(option.value))
     this.activeValue =
       where === 'none'
         ? ''
@@ -644,7 +644,8 @@ export class HelixHeadlessListbox extends MixinCollection(
    */
   typeaheadTo(key: string): string | undefined {
     const shown = this.shown.filter((option) => !option.disabled)
-    const from = shown.findIndex((option) => option.value === this.currentValue)
+    const current = this.currentValue
+    const from = shown.findIndex((option) => option.value === current)
     const at = this.typeahead.match(
       key,
       shown.map((option) => option.text),
@@ -1331,6 +1332,11 @@ export class HelixHeadlessListbox extends MixinCollection(
    * Read by `linkActive` as well as by the keys, so the option announced and
    * the option the arrows move from cannot disagree: asking for `activeValue`
    * alone points `aria-activedescendant` at nothing until a key has moved it.
+   *
+   * **Read once before a pass over the options, and never inside it.** It
+   * reads `values`, which walks every option. `highlight` read `values` per
+   * option and `linkActive` read this per option, and a Select of ten thousand
+   * `items` took three seconds to open (measured October 8, 2026).
    */
   private get currentValue(): string {
     return this.activeValue || (this.values[0] ?? '')
@@ -1364,7 +1370,8 @@ export class HelixHeadlessListbox extends MixinCollection(
     if (!list || !('ariaActiveDescendantElement' in list)) {
       return
     }
-    const active = this.elements.find((option) => option.value === this.currentValue)
+    const current = this.currentValue
+    const active = this.elements.find((option) => option.value === current)
     ;(
       list as Element & { ariaActiveDescendantElement: Element | null }
     ).ariaActiveDescendantElement = active ?? null

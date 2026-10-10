@@ -1280,3 +1280,71 @@ describe('an option whose definition loads after it was added', () => {
     expect(hasState(late.element, 'selected')).toBe(true)
   })
 })
+
+describe('a long list', () => {
+  /* `values` walks every option, so reading it once per option made a Select
+     of ten thousand `items` take three seconds to open, and five thousand
+     option children three seconds to create. Counted here, where timing would
+     only be noise: an update, a typeahead and a highlight read `values` as
+     often over two hundred options as over two. The value names the last
+     option, so a read per option scans the whole list. `linkActive` runs only
+     where an element takes `ariaActiveDescendantElement`, which happy-dom
+     does not implement, so every element takes one for the count. */
+  const reads = async (count: number, drawn: boolean): Promise<number> => {
+    const values = Array.from({ length: count }, (_, at) => `o${at}`)
+    const written = drawn
+      ? ''
+      : values
+          .map(
+            (value) => `<helix-headless-option value="${value}">${value}</helix-headless-option>`,
+          )
+          .join('')
+    document.body.innerHTML = `<helix-headless-listbox label="L" default-value="${values.at(-1)}">${written}</helix-headless-listbox>`
+    const host = document.body.firstElementChild as Updatable & {
+      highlight(where: 'selected'): void
+      items: unknown[] | undefined
+      requestUpdate(): void
+      typeaheadTo(key: string): string | undefined
+    }
+    if (drawn) {
+      host.items = values
+    }
+    await settle(host)
+    await settle(host)
+    const real = Object.getOwnPropertyDescriptor(
+      customElements.get('helix-headless-listbox')?.prototype,
+      'values',
+    )
+    let read = 0
+    Object.defineProperty(host, 'values', {
+      configurable: true,
+      get() {
+        read += 1
+        return real?.get?.call(host)
+      },
+    })
+    Object.defineProperty(Element.prototype, 'ariaActiveDescendantElement', {
+      configurable: true,
+      value: null,
+      writable: true,
+    })
+    try {
+      host.requestUpdate()
+      await settle(host)
+      host.typeaheadTo('z')
+      host.highlight('selected')
+    } finally {
+      delete (Element.prototype as { ariaActiveDescendantElement?: unknown })
+        .ariaActiveDescendantElement
+    }
+    return read
+  }
+
+  test('of option children reads its chosen values no more often than a short one', async () => {
+    expect(await reads(200, false)).toBe(await reads(2, false))
+  })
+
+  test('of `items` reads its chosen values no more often than a short one', async () => {
+    expect(await reads(200, true)).toBe(await reads(2, true))
+  })
+})

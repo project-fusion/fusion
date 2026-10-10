@@ -100,4 +100,42 @@ describe('a watch on the labels in a tree', () => {
     await settle()
     expect(heard).toEqual(['a', 'b'])
   })
+
+  test('lets go of a shadow root when the last control in it stops watching', () => {
+    /* A select's field sits in the select's shadow root, which never changes
+       again once the select is removed, so nothing but the stop can end the
+       observer that holds it. Observed through a stand-in, put back
+       afterwards, that records each root observed and each disconnect. */
+    const real = globalThis.MutationObserver
+    const observed: Node[] = []
+    let disconnected = 0
+    globalThis.MutationObserver = class extends real {
+      override disconnect(): void {
+        disconnected += 1
+        super.disconnect()
+      }
+      override observe(target: Node, options?: MutationObserverInit): void {
+        observed.push(target)
+        super.observe(target, options)
+      }
+    }
+    try {
+      document.body.innerHTML = '<div id="outer"></div>'
+      const shadow = (document.getElementById('outer') as HTMLElement).attachShadow({
+        mode: 'open',
+      })
+      shadow.innerHTML = '<span id="a"></span><span id="b"></span>'
+      const stopA = watchLabels(shadow.getElementById('a') as HTMLElement, () => {})
+      const stopB = watchLabels(shadow.getElementById('b') as HTMLElement, () => {})
+      stopA()
+      expect(disconnected).toBe(0)
+      stopB()
+      expect(disconnected).toBe(1)
+      stops.push(watchLabels(shadow.getElementById('a') as HTMLElement, () => {}))
+      expect(observed).toHaveLength(2)
+      expect(observed.every((root) => root === shadow)).toBe(true)
+    } finally {
+      globalThis.MutationObserver = real
+    }
+  })
 })
