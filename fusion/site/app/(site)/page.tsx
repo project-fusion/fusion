@@ -76,7 +76,7 @@ export default function Home() {
               explains, so you can see it is the same subject in more depth. */}
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>Theming</Eyebrow>
-            <SectionTitle>Every pair checked for contrast</SectionTitle>
+            <SectionTitle>Every pair Helix solves, checked for contrast</SectionTitle>
             <Lede>You enter one brand color, and Helix computes every token from it.</Lede>
           </helix-flex>
           <DerivationDiagrams className={band.bandSection} />

@@ -48,9 +48,10 @@ export const THEME_BUILDER: PageCopy = {
     },
     {
       body: [
-        'The contrast column lists every text and background pair, with its contrast ratio measured against the background it is drawn on. Each pair has one of three results:',
+        'The contrast column lists each text and background pair Helix measures, with its contrast ratio against the background it is drawn on. Each pair has one of three results:',
         '- **Met**: the pair meets its contrast target.\n- **Unverifiable**: the background is translucent, so there is no single color to measure against.\n- **Pinned**: you set the color yourself, so Helix did not compute it.',
         'Check the unverifiable pairs before you use the theme.',
+        "`foreground-subtle` is not in the column. It is a fixed step of the stylesheet's gray ramp, and Helix does not solve it, so its contrast is not guaranteed.",
       ],
       title: 'Read the contrast column',
     },
@@ -61,7 +62,7 @@ export const THEME_BUILDER: PageCopy = {
       title: 'Save the inputs',
     },
   ],
-  lede: 'Enter your brand color and get a full palette, with the contrast of every pair measured.',
+  lede: 'Enter your brand color and get a full palette. Helix measures the contrast of each pair it solves.',
   source: 'written for this document; the page is a tool and has no prose',
   title: 'Theme builder',
 }
