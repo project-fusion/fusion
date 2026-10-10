@@ -43,7 +43,7 @@ const PLATES = false
  * perspective is the isometric projection, where a point at `x, y, z` lands at
  * `(x + y) * 0.866, (y - x) * 0.5 - z`.
  */
-const CAMERA = { focal: 260, pitch: 38, yaw: 40 }
+const CAMERA = { focal: Number.POSITIVE_INFINITY, pitch: 42, yaw: 30 }
 
 /*
  * The projection. A point at `x, y, z` on the ground lands at a screen point
@@ -51,7 +51,7 @@ const CAMERA = { focal: 260, pitch: 38, yaw: 40 }
  * canvas, and carries `k`, how much nearer things are drawn larger by, which
  * is 1 without perspective. So a row of things along `x` reads left to right
  * and recedes, the way a line of text on a desk does from a chair. Every
- * scene is drawn at round numbers on an 80 by 80 ground and scaled up a third
+ * scene is drawn at round numbers on an 80 by 80 ground and scaled up a fifth
  * by `Scene` to fill the tile's crop.
  */
 const iso = (x: number, y: number, z: number) => {
@@ -87,6 +87,7 @@ function Box({
   d,
   fillOpacity,
   h,
+  shadow = false,
   w,
   x,
   y,
@@ -95,6 +96,12 @@ function Box({
   d: number
   fillOpacity?: number
   h: number
+  /**
+   * The gallery's drop shadow under it, for a solid object standing on the
+   * ground the projection implies: with no plate to stand on, the shadow is
+   * what says the object has a ground at all.
+   */
+  shadow?: boolean
   w: number
   x: number
   y: number
@@ -109,7 +116,7 @@ function Box({
   const left = points([a, dd, d0, a0])
   const right = points([dd, c, c0, d0])
   return (
-    <g>
+    <g filter={shadow ? 'url(#helixArtShadow)' : undefined}>
       <polygon className={className} fillOpacity={fillOpacity} points={left} />
       <polygon fill="#000" fillOpacity="0.12" points={left} />
       <polygon className={className} fillOpacity={fillOpacity} points={right} />
@@ -250,7 +257,17 @@ function Sphere({
  * with the gradients and filters every scene may use. Defs inside a group are
  * valid SVG and resolve within the tile's own `<svg>`.
  */
-function Scene({ children }: { children: ReactNode }) {
+function Scene({
+  children,
+  dy = 0,
+  scale = 1.2,
+}: {
+  children: ReactNode
+  /** Down by this much after scaling, to center the drawn bounds in the crop. */
+  dy?: number
+  /** The scale that brings the drawn bounds to the width the others have. */
+  scale?: number
+}) {
   return (
     <>
       <defs>
@@ -266,7 +283,9 @@ function Scene({ children }: { children: ReactNode }) {
           <feGaussianBlur stdDeviation="5" />
         </filter>
       </defs>
-      <g transform="translate(160 105) scale(1.35) translate(-160 -105)">{children}</g>
+      <g transform={`translate(160 ${105 + dy}) scale(${scale}) translate(-160 -105)`}>
+        {children}
+      </g>
     </>
   )
 }
@@ -279,27 +298,28 @@ function Scene({ children }: { children: ReactNode }) {
  * reading order on hover, as the gallery's rows do.
  */
 const componentsArt: ReactNode = (
-  <Scene>
+  <Scene dy={-4} scale={1.25}>
     <Plate />
     {[
       /* A button: the key itself is the control. */
-      { brand: true, mark: 'bar', x: -38, y: -32 },
+      { brand: true, mark: 'bar', x: -38, y: -36 },
       /* A switch, on: a track with its knob at the end. */
-      { mark: 'knob', x: -10, y: -32 },
+      { mark: 'knob', x: -10, y: -36 },
       /* A checkbox, checked. */
-      { mark: 'tick', x: 18, y: -32 },
+      { mark: 'tick', x: 18, y: -36 },
       /* A field. */
-      { mark: 'field', x: -38, y: 2 },
+      { mark: 'field', x: -38, y: 6 },
       /* A tag. */
-      { mark: 'tag', x: -10, y: 2 },
+      { mark: 'tag', x: -10, y: 6 },
       /* An avatar. */
-      { mark: 'dot', x: 18, y: 2 },
+      { mark: 'dot', x: 18, y: 6 },
     ].map((key, index) => (
       <g className="artMotion artRow" key={key.mark} style={{ '--art-i': index } as CSSProperties}>
         <Box
           className={key.brand ? 'artBrand' : 'artRaised'}
           d={22}
-          h={6}
+          h={7}
+          shadow
           w={20}
           x={key.x}
           y={key.y}
@@ -391,9 +411,9 @@ const componentsArt: ReactNode = (
  * says what a themed control looks like.
  */
 const sandboxArt: ReactNode = (
-  <Scene>
+  <Scene dy={-10} scale={1.12}>
     <Plate />
-    <Box className="artSunken" d={36} h={2} w={80} x={-40} y={-40} />
+    <Box className="artSunken" d={36} h={2} shadow w={80} x={-40} y={-40} />
     {[
       { w: 26, x: -34, y: -35 },
       { w: 18, x: -30, y: -29 },
@@ -414,7 +434,7 @@ const sandboxArt: ReactNode = (
     ))}
     {/* Raised and not the page's ground: in dark mode the ground is the one
         black in the frame, and a pane of it on the plate read as a hole. */}
-    <Box className="artRaised" d={36} h={2} w={80} x={-40} y={4} />
+    <Box className="artRaised" d={36} h={2} shadow w={80} x={-40} y={4} />
     <g className="artMotion artLift">
       <ellipse
         className="artInk"
@@ -443,9 +463,9 @@ const sandboxArt: ReactNode = (
  * step by step.
  */
 const themeArt: ReactNode = (
-  <Scene>
+  <Scene dy={-12} scale={1.31}>
     <Plate />
-    <Box className="artBrand" d={16} h={16} w={16} x={-36} y={-20} />
+    <Box className="artBrand" d={18} h={22} shadow w={18} x={-38} y={-30} />
     {[
       { className: 'artSunken', tone: 'sunken' },
       { className: 'artBrandSubtle', tone: 'subtle' },
@@ -458,12 +478,13 @@ const themeArt: ReactNode = (
       <g className="artMotion artRow" key={step.tone} style={{ '--art-i': index } as CSSProperties}>
         <Box
           className={step.className}
-          d={18}
+          d={22}
           fillOpacity={step.fillOpacity}
-          h={3}
+          h={4}
+          shadow
           w={9}
           x={-38 + index * 11}
-          y={8}
+          y={4}
         />
       </g>
     ))}
@@ -485,14 +506,14 @@ const PIN = { x: 30, y: -16 }
    `x`, two crossing it along `y`, and two shorter ones joining those. */
 const ROADS: { along: 'x' | 'y'; at: number; from: number; to: number }[] = [
   { along: 'x', at: -14, from: -40, to: 40 },
-  { along: 'y', at: -20, from: -40, to: 30 },
-  { along: 'y', at: 12, from: -30, to: 40 },
-  { along: 'x', at: 18, from: -20, to: 40 },
+  { along: 'y', at: -20, from: -40, to: 40 },
+  { along: 'y', at: 12, from: -40, to: 40 },
+  { along: 'x', at: 18, from: -40, to: 40 },
   { along: 'x', at: -34, from: 12, to: 40 },
 ]
 
 const mapArt: ReactNode = (
-  <Scene>
+  <Scene dy={-4} scale={1.4}>
     {ROADS.map((road) => (
       <Flat
         className="artInk"
@@ -538,25 +559,25 @@ const mapArt: ReactNode = (
         x1={iso(PIN.x, PIN.y, 0).x}
         x2={iso(PIN.x, PIN.y, 0).x}
         y1={iso(PIN.x, PIN.y, 0).y}
-        y2={iso(PIN.x, PIN.y, 22).y}
+        y2={iso(PIN.x, PIN.y, 16).y}
       />
       <circle
         className="artBrand"
-        cx={iso(PIN.x, PIN.y, 26).x}
-        cy={iso(PIN.x, PIN.y, 26).y}
-        r={6 * iso(PIN.x, PIN.y, 26).k}
+        cx={iso(PIN.x, PIN.y, 20).x}
+        cy={iso(PIN.x, PIN.y, 20).y}
+        r={6 * iso(PIN.x, PIN.y, 20).k}
       />
       <circle
-        cx={iso(PIN.x, PIN.y, 26).x}
-        cy={iso(PIN.x, PIN.y, 26).y}
+        cx={iso(PIN.x, PIN.y, 20).x}
+        cy={iso(PIN.x, PIN.y, 20).y}
         fill="url(#helixSphereRim)"
-        r={6 * iso(PIN.x, PIN.y, 26).k}
+        r={6 * iso(PIN.x, PIN.y, 20).k}
       />
       <circle
-        cx={iso(PIN.x, PIN.y, 26).x}
-        cy={iso(PIN.x, PIN.y, 26).y}
+        cx={iso(PIN.x, PIN.y, 20).x}
+        cy={iso(PIN.x, PIN.y, 20).y}
         fill="url(#helixSphereLight)"
-        r={6 * iso(PIN.x, PIN.y, 26).k}
+        r={6 * iso(PIN.x, PIN.y, 20).k}
       />
     </g>
   </Scene>
@@ -570,12 +591,12 @@ const mapArt: ReactNode = (
  * nearer sphere covers a farther link.
  */
 const NOTES = {
-  a: { r: 7, selected: true, x: 0, y: 0, z: 34 },
-  b: { r: 4.5, x: -28, y: -10, z: 22 },
-  c: { r: 5.5, x: 22, y: -26, z: 28 },
-  d: { r: 4.5, x: 26, y: 18, z: 18 },
-  e: { r: 5, x: -12, y: 30, z: 40 },
-  f: { r: 4, x: -34, y: 24, z: 12 },
+  a: { r: 7, selected: true, x: 0, y: 0, z: 20 },
+  b: { r: 5, x: -36, y: -16, z: 12 },
+  c: { r: 6, x: 30, y: -36, z: 16 },
+  d: { r: 5, x: 38, y: 18, z: 8 },
+  e: { r: 5.5, x: -16, y: 38, z: 18 },
+  f: { r: 4.5, x: -40, y: 28, z: 6 },
 }
 
 type Note = keyof typeof NOTES
@@ -597,7 +618,7 @@ const BACK_TO_FRONT = (Object.keys(NOTES) as Note[]).sort(
 const at = (key: Note) => iso(NOTES[key].x, NOTES[key].y, NOTES[key].z)
 
 const graphArt: ReactNode = (
-  <Scene>
+  <Scene dy={4} scale={1.37}>
     <Plate />
     <g className="artStroke" strokeOpacity="0.28" strokeWidth="1.5">
       {QUIET_LINKS.map(([p, q]) => (
