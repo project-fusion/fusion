@@ -1,5 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  hasState,
+  mount,
+  notYetDefined,
+  part,
+  registerDom,
+} from '@fusion.dev/helix-testing/dom'
 
 /* Imported after the DOM is registered, like the elements: the connector
    reaches `@fusion.dev/helix-core`, which evaluates Lit. */
@@ -77,6 +84,41 @@ describe('a frame on a Leaflet map', () => {
         new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowDown' }),
       )
       expect(await until(() => document.activeElement === quay)).toBe(true)
+    } finally {
+      connection.disconnect()
+      map.remove()
+    }
+  })
+
+  /* **As a page writes it**: the frame is in the page, the import defines it,
+     and Leaflet is made in its box on the next line, with no await between
+     them. Leaflet measures the box as it is made and keeps that size. */
+  test('a map made in the same turn the frame is defined has its box, and fits its markers in it', async () => {
+    const L = await import('leaflet')
+    const late = notYetDefined('helix-headless-map')
+    const host = late.element
+    host.setAttribute('label', 'Harbor')
+    host.setAttribute('style', 'display: block; inline-size: 400px')
+    host.innerHTML = `<div data-renderer style="inline-size: 400px; block-size: 300px"></div>
+      <helix-headless-map-marker label="Depot" lat="51.505" lng="-0.1"></helix-headless-map-marker>
+      <helix-headless-map-marker label="Quay" lat="51.51" lng="-0.08"></helix-headless-map-marker>`
+    document.body.replaceChildren(host)
+    late.define()
+    const map = L.map(host.querySelector('[data-renderer]') as HTMLElement, {
+      center: [51.505, -0.09],
+      zoom: 13,
+    })
+    const connection = connectMap(host, leafletDriver(map, L))
+    connection.fit({ animate: false })
+    try {
+      expect(map.getSize()).toMatchObject({ x: 400, y: 300 })
+      for (const [lat, lng] of [
+        [51.505, -0.1],
+        [51.51, -0.08],
+      ] as const) {
+        const { x, y } = map.latLngToContainerPoint([lat, lng])
+        expect([x >= 0 && x <= 400, y >= 0 && y <= 300]).toEqual([true, true])
+      }
     } finally {
       connection.disconnect()
       map.remove()

@@ -930,6 +930,15 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     this.addEventListener('keyup', this.handleMarkerKeyup)
     this.hiding = new MutationObserver(() => this.requestUpdate())
     this.hiding.observe(this, { attributeFilter: ['hidden'], attributes: true, subtree: true })
+    /* **The first render runs as the frame connects, and not a microtask
+       later.** The renderer's box is a child, and a child has no box until
+       the slot it goes in is rendered, so Leaflet made in it on the line
+       after the import read a box of no size, kept it, and fitted the
+       markers at its deepest zoom, off screen. A server's markup already
+       holds the slot, and hydrates when Lit schedules it. */
+    if (!this.hasUpdated && !this.serverRendered) {
+      this.performUpdate()
+    }
   }
 
   override disconnectedCallback(): void {

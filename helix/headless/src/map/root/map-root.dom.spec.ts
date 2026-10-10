@@ -1,5 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  hasState,
+  mount,
+  notYetDefined,
+  part,
+  registerDom,
+  slotted,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -146,6 +154,25 @@ describe('map frame, updates', () => {
     host.setAttribute('label', 'Stores')
     document.body.replaceChildren(host)
     expect(await host.updateComplete).toBe(true)
+  })
+
+  /* A page's order: the frame is in the page, the import defines it, and the
+     page makes its renderer in the box on the next line, with no await
+     between. A renderer measures its box as it is made, and Leaflet keeps
+     the size it read. */
+  test('slots the box for the renderer as it is defined, so the box has a size in the same turn', () => {
+    const late = notYetDefined('helix-headless-map')
+    Object.assign(late.element, { label: 'Stores' })
+    const box = document.createElement('div')
+    box.style.blockSize = '200px'
+    late.element.append(box)
+    document.body.replaceChildren(late.element)
+    late.define()
+    expect(slotted(late.element).includes(box)).toBe(true)
+    if (hasLayout()) {
+      expect(box.getBoundingClientRect().width).toBeGreaterThan(0)
+      expect(box.getBoundingClientRect().height).toBe(200)
+    }
   })
 })
 

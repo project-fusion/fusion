@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, notYetDefined, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /*
  * A real Sigma drawing in WebGL, in a browser that has it: the scene follows
@@ -155,6 +155,44 @@ describe('a Sigma drawing in WebGL', () => {
     expect(live()).toBe('Zoomed in')
     expect(Math.hypot(at('a').x - at('c').x, at('a').y - at('c').y)).toBeGreaterThan(spread * 1.4)
     expect(glow()).toEqual({ a: 0, b: 0, c: 1, d: 0, e: 0 })
+  })
+
+  /* **As the guide writes it**: the frame is in the page, the import defines
+     it, and Sigma is made in its box on the next line, with no await between
+     them. Sigma measures the box as it is made and throws on one with no
+     width. */
+  scene('draws in a box Sigma is given in the same turn the frame is defined', async () => {
+    const [{ default: Sigma }, { default: Graph }, { connectGraph }, { sigmaDriver }] =
+      await Promise.all([
+        import('sigma'),
+        import('graphology'),
+        import('../connect-graph/connect-graph.js'),
+        import('./sigma-driver.js'),
+      ])
+    const late = notYetDefined('helix-headless-graph')
+    const host = late.element as Frame
+    host.setAttribute('label', 'Notes')
+    host.setAttribute('style', `display: block; inline-size: 640px; ${TOKENS}`)
+    host.innerHTML = '<div style="block-size: 360px"></div>'
+    document.body.replaceChildren(host)
+    late.define()
+    host.nodes = [
+      { id: 'a', label: 'Alpha', x: 0, y: 0 },
+      { id: 'b', label: 'Bravo', x: 30, y: 4 },
+    ]
+    host.links = [{ source: 'a', target: 'b' }]
+    const sigma = new Sigma(new Graph(), host.querySelector('div') as HTMLElement)
+    const connection = connectGraph(host, sigmaDriver(sigma))
+    made.push(() => {
+      connection.disconnect()
+      sigma.kill()
+      host.remove()
+    })
+    for (let tries = 0; tries < 60 && !host.ready; tries++) {
+      await wait(50)
+    }
+    expect(host.ready).toBe(true)
+    expect(sigma.getDimensions()).toEqual({ height: 360, width: 640 })
   })
 
   scene('a list arrow moves only the list, and leaves the drawing where it is', async () => {
