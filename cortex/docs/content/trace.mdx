@@ -49,8 +49,8 @@ caller has to check for it.
 | --- | --- | --- |
 | `Source` | Raw input from outside the system | Held fixed |
 | `Memory` | Fact ids, so the memory has one home in Engram | Held fixed |
-| `Context` | The assembled messages, and the strategy that chose them | Recomputed |
-| `ToolCall` | Tool name, arguments, and result | Recomputed |
+| `Context` | The assembled messages, and the strategy that chose them | Held fixed |
+| `ToolCall` | Tool name, arguments, and result | Held fixed |
 | `Output` | Content, model, prompt version, and what it cost | Recomputed |
 
 `ToolCall` stores its arguments and result as `serde_json::Value`. Tool
