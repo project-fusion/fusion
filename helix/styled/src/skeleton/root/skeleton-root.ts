@@ -1,4 +1,4 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { customElement, numberConverter } from '@fusion.dev/helix-core'
 import { HelixHeadlessSkeleton } from '@fusion.dev/helix-headless/skeleton'
 import { type CSSResultGroup, html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -57,7 +57,7 @@ export class HelixSkeleton extends HelixHeadlessSkeleton {
    * Absent, or 1, is one line. Reflected, because the stylesheet sizes a
    * paragraph by it.
    */
-  @property({ reflect: true, type: Number })
+  @property({ converter: numberConverter('lines', undefined), reflect: true })
   lines?: number
 
   /**

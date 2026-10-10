@@ -1,4 +1,10 @@
-import { customElement, formatWords, HelixElement, words } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  formatWords,
+  HelixElement,
+  numberConverter,
+  words,
+} from '@fusion.dev/helix-core'
 import { html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -60,19 +66,19 @@ export class HelixHeadlessPaginationSummary extends HelixElement {
   /**
    * The current page, counting from one.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('page', 1) })
   page = 1
 
   /**
    * How many items are on a page.
    */
-  @property({ attribute: 'page-size', type: Number })
+  @property({ attribute: 'page-size', converter: numberConverter('page-size', 0) })
   pageSize = 0
 
   /**
    * How many items there are across every page.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('total', 0) })
   total = 0
 
   protected override render(): TemplateResult {

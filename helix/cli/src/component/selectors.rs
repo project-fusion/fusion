@@ -99,8 +99,15 @@ fn names_an_element(argument: &str) -> bool {
             .is_some_and(|first| first.is_ascii_alphabetic())
 }
 
+/// A declaration, its options and the member it sits on.
+///
+/// **One level of parentheses inside the options**, as `attribute_names`
+/// reads them, so `converter: numberConverter('columns', undefined)` is a
+/// declaration and not the end of one. Read up to the first closing paren,
+/// a reflected numeric attribute is not declared, and its `:host([columns])`
+/// is reported as selecting an attribute the class does not have.
 static DECLARED_PROPERTY: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"@property\(([^)]*)\)\s*(?:override\s+)?(?:(?:get|set)\s+)?(\w+)")
+    Regex::new(r"@property\(((?:[^()]|\([^()]*\))*)\)\s*(?:override\s+)?(?:(?:get|set)\s+)?(\w+)")
         .expect("a literal pattern compiles")
 });
 

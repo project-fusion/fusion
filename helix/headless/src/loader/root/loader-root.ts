@@ -5,6 +5,7 @@ import {
   HelixElement,
   hostAria,
   reportRuntime,
+  timeConverter,
   words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -79,12 +80,13 @@ export class HelixHeadlessLoader extends HelixElement {
 
   /**
    * How long the loader waits before it shows, in milliseconds, so work that
-   * finishes quickly never flashes one.
+   * finishes quickly never flashes one. The attribute also takes a CSS time,
+   * such as `300ms`.
    *
    * Absent shows it at once. Hidden in the served markup too, so a page that
    * loads quickly never draws it.
    */
-  @property({ type: Number })
+  @property({ converter: timeConverter('delay', 0) })
   delay = 0
 
   /**

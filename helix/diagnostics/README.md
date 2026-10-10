@@ -408,6 +408,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `missing-trigger` | A tooltip's `for` names no element in its own tree |
 | `negative-value` | An area chart was given a negative number, which it draws as none |
 | `not-a-graph` | `connectGraph` was given an element that is not a graph frame |
+| `not-a-number` | A numeric attribute holds something that is not a number, such as `page-size="1O"`, or an attribute in milliseconds something that is not a time, such as `delay="soon"`, so the property keeps its default. Development builds only (the `development` export condition) |
 | `not-a-plot` | `connectSpatialScatterChart` or `connectSpatialSurfaceChart` was given an element that is not the chart it connects |
 | `picture-in-picture-refused` | The browser refused picture in picture |
 | `refused-length` | A grid's `min` is not a length it can write, so it lays out by `columns` |

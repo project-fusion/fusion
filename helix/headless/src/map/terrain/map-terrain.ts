@@ -1,4 +1,10 @@
-import { customElement, HelixElement, HelixMapPartChangeEvent, words } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  HelixMapPartChangeEvent,
+  numberConverter,
+  words,
+} from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -51,7 +57,7 @@ export class HelixHeadlessMapTerrain extends HelixElement {
   encoding: MapTerrainEncoding = 'terrarium'
 
   /** How many times its real height the ground is raised, where `raised` is set. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('exaggeration', 1) })
   exaggeration = 1
 
   /**
@@ -77,7 +83,7 @@ export class HelixHeadlessMapTerrain extends HelixElement {
    * The deepest zoom the provider has tiles for. The map enlarges those tiles
    * at deeper zooms, where it would otherwise ask for tiles that do not exist.
    */
-  @property({ attribute: 'max-zoom', type: Number })
+  @property({ attribute: 'max-zoom', converter: numberConverter('max-zoom', undefined) })
   maxZoom?: number
 
   /** Raises the ground to its real height in 3D. Tilt the map to see it. */

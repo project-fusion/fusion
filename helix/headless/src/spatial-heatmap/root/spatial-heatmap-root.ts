@@ -9,6 +9,7 @@ import {
   ISOMETRIC,
   isRtl,
   MIRROR_RULE,
+  numberConverter,
   spokenReading,
   writtenList,
   writtenNumbers,
@@ -181,7 +182,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
    * How tall the highest reading stands, in cells. Every other reading stands
    * at its share of it.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('relief', 2) })
   relief = 2
 
   /** The prisms drawn on the last render, which the tooltip is placed against. */

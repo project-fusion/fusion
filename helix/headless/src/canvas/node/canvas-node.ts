@@ -1,6 +1,7 @@
 import {
   customElement,
   HelixElement,
+  numberConverter,
   PlacementController,
   wordsLocale,
 } from '@fusion.dev/helix-core'
@@ -123,7 +124,7 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   current = false
 
   /** How tall the card is, in the document's own units. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('height', 0) })
   height = 0
 
   /**
@@ -265,15 +266,15 @@ export class HelixHeadlessCanvasNode extends HelixElement {
   target = false
 
   /** How wide the card is, in the document's own units. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('width', 0) })
   width = 0
 
   /** Where its left edge sits, in the document's own units. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('x', 0) })
   x = 0
 
   /** Where its top edge sits, in the document's own units. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('y', 0) })
   y = 0
 
   protected override willUpdate(changed: PropertyValues): void {

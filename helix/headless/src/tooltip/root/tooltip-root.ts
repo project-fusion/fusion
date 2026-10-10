@@ -8,6 +8,7 @@ import {
   hostAria,
   linkDescription,
   MixinControllerOpen,
+  numberConverter,
   OpenPhaseController,
   onUnlessFalse,
   type Placement,
@@ -15,6 +16,7 @@ import {
   reportRuntime,
   type Side,
   sideOf,
+  timeConverter,
   unlinkDescription,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -137,20 +139,22 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
 
   /**
    * How long the pointer must rest before the bubble appears, in milliseconds.
+   * The attribute also takes a CSS time, such as `0.4s`.
    *
    * Without one, sweeping across a row of controls flashes a tooltip for each
    * of them, which is noise rather than help. Focus opens with no delay: a
    * keyboard reader arriving on a control has already committed to it.
    */
-  @property({ attribute: 'delay', type: Number })
+  @property({ attribute: 'delay', converter: timeConverter('delay', 400) })
   delay = 400
 
   /**
    * How long the bubble stays after the pointer leaves the trigger or the
    * bubble, in milliseconds: the close delay. It is the time a reader has to
-   * cross the gap onto the bubble.
+   * cross the gap onto the bubble. The attribute also takes a CSS time, such as
+   * `0.1s`.
    */
-  @property({ attribute: 'delay-out', type: Number })
+  @property({ attribute: 'delay-out', converter: timeConverter('delay-out', 100) })
   delayOut = 100
 
   /**
@@ -210,7 +214,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    * eight from whatever is nearest, arrow or edge, and a consumer who changes
    * it changes the visible gap rather than a number the arrow then eats into.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('offset', 8, 'pixels') })
   offset = 8
 
   /**
@@ -252,9 +256,9 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
   /**
    * How long after a tooltip hides the next one still shows at once, with no
    * `delay`, in milliseconds. The same skip delay Radix uses. Zero makes every
-   * tooltip wait.
+   * tooltip wait. The attribute also takes a CSS time, such as `0.3s`.
    */
-  @property({ attribute: 'skip-delay', type: Number })
+  @property({ attribute: 'skip-delay', converter: timeConverter('skip-delay', 300) })
   skipDelay = 300
 
   /**

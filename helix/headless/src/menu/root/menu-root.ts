@@ -14,6 +14,7 @@ import {
   MIRROR_RULE,
   MixinCollection,
   MixinControllerOpen,
+  numberConverter,
   OpenPhaseController,
   onUnlessFalse,
   type Placement,
@@ -367,7 +368,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   /**
    * Space between the trigger and the surface, in pixels.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('offset', 4, 'pixels') })
   offset = 4
 
   /**

@@ -5,6 +5,7 @@ import {
   elapsedTime,
   HelixElement,
   type MonthCalendar,
+  numberConverter,
   type Relative,
   RelativeClockController,
   relativeTime,
@@ -184,7 +185,10 @@ export class HelixHeadlessFormatDate extends HelixElement {
    * How many digits of a fraction of a second to write after `second`: 1, 2,
    * or 3, as in 09:41:07.250.
    */
-  @property({ attribute: 'fractional-second-digits', type: Number })
+  @property({
+    attribute: 'fractional-second-digits',
+    converter: numberConverter('fractional-second-digits', undefined),
+  })
   fractionalSecondDigits?: 1 | 2 | 3
 
   /**

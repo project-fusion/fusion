@@ -4,6 +4,7 @@ import {
   HelixAuraFallbackEvent,
   HelixElement,
   MAX_FRAME_STEP,
+  numberConverter,
   PaintGateController,
   readColor,
   words,
@@ -168,7 +169,7 @@ export class HelixAura extends HelixElement {
   /**
    * How soft the falloff is, `0` tight and `1` diffuse.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('bloom', 0.5) })
   bloom = 0.5
 
   /**
@@ -185,13 +186,13 @@ export class HelixAura extends HelixElement {
    * difference between a background that breathes and one that is obviously on
    * a timer.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('drift', 0) })
   drift = 0
 
   /**
    * Overall brightness, as a multiplier on the field.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('gain', 1) })
   gain = 1
 
   /**
@@ -258,19 +259,19 @@ export class HelixAura extends HelixElement {
    * it scales the whole response rather than any one part of it, whichever
    * interaction is in play.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('reach', 1) })
   reach = 1
 
   /**
    * Feature size, as a multiplier on the sampled coordinates.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('scale', 1) })
   scale = 1
 
   /**
    * How fast it drifts, as a multiplier on time.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('speed', 1) })
   speed = 1
 
   /**
@@ -295,13 +296,13 @@ export class HelixAura extends HelixElement {
    * to the angle behind it: the field still wanders, around a bearing that
    * holds the exit where it was put.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('terminus', undefined) })
   terminus?: number
 
   /**
    * The field's rotation, in degrees.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('tilt', 14, 'degrees') })
   tilt = 14
 
   /**
@@ -330,7 +331,7 @@ export class HelixAura extends HelixElement {
    * the argument that alike is what makes a weave read as woven, and a lattice
    * whose cells differed would be a scatter with straight lines in it.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('variance', 1) })
   variance = 1
 
   /**

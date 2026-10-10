@@ -1,4 +1,10 @@
-import { customElement, HelixElement, headingLevel, hostAria } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  headingLevel,
+  hostAria,
+  numberConverter,
+} from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -35,7 +41,7 @@ export class HelixHeadlessTimelineGroup extends HelixElement {
   /**
    * The level of the group's heading, from 1 to 6.
    */
-  @property({ attribute: 'heading-level', type: Number })
+  @property({ attribute: 'heading-level', converter: numberConverter('heading-level', undefined) })
   headingLevel?: number
 
   /**

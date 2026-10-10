@@ -3,6 +3,7 @@ import {
   customElement,
   HelixCopyErrorEvent,
   type Placement,
+  timeConverter,
   words,
 } from '@fusion.dev/helix-core'
 import { check, copy, x } from '@fusion.dev/helix-icons'
@@ -119,9 +120,10 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
 
   /**
    * How long the confirmation or the failure stands, in milliseconds, before
-   * the button goes back to `label`.
+   * the button goes back to `label`. The attribute also takes a CSS time, such
+   * as `1.5s`.
    */
-  @property({ attribute: 'feedback-duration', type: Number })
+  @property({ attribute: 'feedback-duration', converter: timeConverter('feedback-duration', 1600) })
   feedbackDuration = 1600
 
   /**

@@ -26,6 +26,7 @@ import {
   SKIP_SECONDS,
   sameCopies,
   showCaption,
+  timeConverter,
   words,
   writtenList,
   writtenNumbers,
@@ -437,7 +438,7 @@ export class HelixHeadlessVideo extends HelixElement {
 
   /**
    * How long the control bar stays after the pointer stops moving, in
-   * milliseconds.
+   * milliseconds. The attribute also takes a CSS time, such as `2.5s`.
    *
    * A wait rather than leaving with the pointer, or a reader moving across the
    * picture to reach a control watches the bar vanish under them. Zero turns
@@ -447,7 +448,7 @@ export class HelixHeadlessVideo extends HelixElement {
    * The wait is only ever about *idling*. A video that is paused keeps its bar
    * regardless, because a reader who stopped it is deciding what to do next.
    */
-  @property({ attribute: 'idle-delay', type: Number })
+  @property({ attribute: 'idle-delay', converter: timeConverter('idle-delay', 2500) })
   idleDelay = 2500
 
   /**

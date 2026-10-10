@@ -2,7 +2,9 @@ import {
   customElement,
   HelixElement,
   HelixMapPartChangeEvent,
+  numberConverter,
   PlacementController,
+  timeConverter,
   words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -48,14 +50,15 @@ export class HelixHeadlessMapPosition extends HelixElement {
   static words = 'helix-map-position'
 
   /** How accurate the position is, in meters. Drawn as a ring with this radius. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('accuracy', undefined, 'meters') })
   accuracy?: number
 
   /**
    * The least time between announcements, in milliseconds. A change during the
-   * wait is announced when the wait ends.
+   * wait is announced when the wait ends. The attribute also takes a CSS time,
+   * such as `5s`.
    */
-  @property({ attribute: 'announce-every', type: Number })
+  @property({ attribute: 'announce-every', converter: timeConverter('announce-every', 5000) })
   announceEvery = 5000
 
   /** What screen readers announce when it changes, such as "Two stops away". */
@@ -63,7 +66,7 @@ export class HelixHeadlessMapPosition extends HelixElement {
   description?: string
 
   /** The direction it faces, in degrees clockwise from north. Shows an arrow. */
-  @property({ reflect: true, type: Number })
+  @property({ converter: numberConverter('heading', undefined, 'degrees'), reflect: true })
   heading?: number
 
   /** Marks this as a position for the connector, whatever its tag. */
@@ -75,11 +78,11 @@ export class HelixHeadlessMapPosition extends HelixElement {
   label = 'Live position'
 
   /** Latitude, in degrees. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('lat', undefined, 'degrees') })
   lat?: number
 
   /** Longitude, in degrees. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('lng', undefined, 'degrees') })
   lng?: number
 
   /** Where the position was placed, kept in its own shadow root. */

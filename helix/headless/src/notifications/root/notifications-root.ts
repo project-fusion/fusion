@@ -12,6 +12,7 @@ import {
   hostAria,
   MixinCollection,
   markRegion,
+  numberConverter,
   rovingStop,
   UpgradeController,
   whenHydrated,
@@ -196,7 +197,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * Unset, the browser counts the rows it can see, which is right for a feed
    * that holds everything.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('total', undefined) })
   total?: number
 
   /**

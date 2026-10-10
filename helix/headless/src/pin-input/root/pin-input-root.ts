@@ -6,6 +6,7 @@ import {
   HelixFormElement,
   MixinControllerValue,
   MixinField,
+  numberConverter,
   restoreValue,
   submitImplicitly,
   verdictFlags,
@@ -184,7 +185,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   /**
    * How many characters the code has.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('length', 6) })
   length = 6
 
   /**

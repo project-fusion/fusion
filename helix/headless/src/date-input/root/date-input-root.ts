@@ -24,6 +24,7 @@ import {
   type MonthCalendar,
   type MonthSystem,
   monthSystem,
+  numberConverter,
   readWrittenDate,
   words,
   wordsLocale,
@@ -336,7 +337,10 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    * Absent follows `locale`, where the engine knows the week of that language,
    * and is Sunday otherwise.
    */
-  @property({ attribute: 'first-day-of-week', type: Number })
+  @property({
+    attribute: 'first-day-of-week',
+    converter: numberConverter('first-day-of-week', undefined),
+  })
   firstDayOfWeek?: number
 
   /**
@@ -399,7 +403,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    * first. The panel is sized by its content, so this widens it, and where the
    * window has no room for that width it shows one month until there is.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('months', 1) })
   months = 1
 
   /**
@@ -588,7 +592,7 @@ export class HelixHeadlessDateInput extends MixinSegmentedField(
    * where there is one and from 1 January 1970 where there is not, which is the
    * platform's base.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('step', 1, 'days') })
   step = 1
 
   /**

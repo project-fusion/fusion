@@ -5,6 +5,7 @@ import {
   HelixElement,
   hostAria,
   MixinControllerOpen,
+  numberConverter,
   UpgradeController,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -96,7 +97,7 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
    * has been trimmed, and deriving this from the children would make it
    * unsayable. Left off, it is the number of rows.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('count', undefined) })
   count?: number
 
   /**

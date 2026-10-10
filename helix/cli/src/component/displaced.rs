@@ -49,10 +49,11 @@ static TAG: LazyLock<Regex> = LazyLock::new(|| {
 ///
 /// The same shape `properties` reads, and for the same reason: the decorator's
 /// arguments run over several lines and another decorator can sit between it and
-/// the name.
+/// the name. One level of parentheses inside the arguments, so a `converter`
+/// built by a call, such as `numberConverter('max', 100)`, still declares.
 static DECLARED: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(
-        r"(?m)^\s*@property\([^)]*\)\s*(?:\n\s*@[\w.]+\([^)]*\)\s*)*\n\s*(?:accessor\s+|declare\s+|get\s+|override\s+|readonly\s+|set\s+)*([A-Za-z_$][\w$]*)",
+        r"(?m)^\s*@property\((?:[^()]|\([^()]*\))*\)\s*(?:\n\s*@[\w.]+\([^)]*\)\s*)*\n\s*(?:accessor\s+|declare\s+|get\s+|override\s+|readonly\s+|set\s+)*([A-Za-z_$][\w$]*)",
     )
     .expect("a literal pattern compiles")
 });

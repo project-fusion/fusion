@@ -7,6 +7,7 @@ import {
   isRtl,
   MixinControllerValue,
   MixinField,
+  numberConverter,
   reportValues,
   restoreValue,
   words,
@@ -199,14 +200,14 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * step, and marks may come out unevenly spaced when the two disagree. That
    * is the honest picture of the range being offered.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('markers', 0) })
   markers = 0
 
   /**
    * The largest value that can be chosen. Where it is not a number, such as
    * `max="1OO"`, the slider stops at 100, as a native range does.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('max', 100) })
   max = 100
 
   /**
@@ -226,7 +227,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * The smallest value that can be chosen. Where it is not a number, the
    * slider starts at 0, as a native range does.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('min', 0) })
   min = 0
 
   /** The name of a range's lower thumb, read after the slider's label. */
@@ -238,7 +239,10 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * How many steps a range's two thumbs stay apart, as Zag's
    * `minStepsBetweenThumbs`. A thumb pushed closer stops there.
    */
-  @property({ attribute: 'min-steps-between-thumbs', type: Number })
+  @property({
+    attribute: 'min-steps-between-thumbs',
+    converter: numberConverter('min-steps-between-thumbs', 0),
+  })
   minStepsBetweenThumbs = 0
 
   /**
@@ -269,7 +273,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * React Aria's `pageSize` and Zag's `largeStep` do. Absent leaves the keys
    * to the platform, which moves a tenth of the track.
    */
-  @property({ attribute: 'page-step', type: Number })
+  @property({ attribute: 'page-step', converter: numberConverter('page-step', undefined) })
   pageStep?: number
 
   /**
@@ -313,7 +317,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * How far one press of an arrow key moves the thumb. Where it is not a
    * number, the thumb moves by 1, as on a native range.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('step', 1) })
   step = 1
 
   /**
@@ -337,11 +341,11 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   /**
    * `min` as the slider works with it: 0 where it is not a number.
    *
-   * **A bound that is not a number reached the form as `NaN`.** `max="1OO"`
-   * parses to `NaN`, and the value pulled into the bounds was `NaN` with it.
-   * A native range uses its default bound for an attribute it cannot read.
-   * Derived on read, as Rating's `floor` is, so `slider.min` still reports
-   * what you set.
+   * **A bound that is not a number reached the form as `NaN`.** The
+   * attribute is read by `numberConverter`, so `max="1OO"` is 100, as a native
+   * range reads it. This covers the property, which a script can still set
+   * to `NaN`: derived on read, as Rating's `floor` is, so `slider.min` still
+   * reports what the script set.
    */
   private get lowest(): number {
     return Number.isFinite(this.min) ? this.min : 0

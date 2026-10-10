@@ -446,6 +446,46 @@ describe('what moved, said after it moved', () => {
   })
 })
 
+describe('a page size that is not a number', () => {
+  /* `page-size="1O"` was `NaN` to Lit's number converter, which the table
+     reads as 0 on purpose, so a typo showed every row and said nothing. */
+  const warned = async (markup: string): Promise<{ element: Table; warnings: string[] }> => {
+    const warnings: string[] = []
+    const warn = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      const { element } = await mount(markup)
+      return { element, warnings }
+    } finally {
+      console.warn = warn
+    }
+  }
+
+  test('keeps the default size, and says so once', async () => {
+    const seeded = await warned(`
+      <helix-headless-data-table page-size="1O" default-page-size="2">
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      </helix-headless-data-table>`)
+    expect([seeded.element.pageSize, bodyRows(seeded.element).length]).toEqual([2, 2])
+    expect(seeded.warnings.filter((one) => one.includes('page-size="1O"'))).toHaveLength(1)
+    const unseeded = await warned(`
+      <helix-headless-data-table page-size="2O">
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      </helix-headless-data-table>`)
+    expect([unseeded.element.pageSize, bodyRows(unseeded.element).length]).toEqual([0, 4])
+    expect(unseeded.warnings.filter((one) => one.includes('page-size="2O"'))).toHaveLength(1)
+  })
+
+  test('and an explicit 0 still shows every row, with nothing to say', async () => {
+    const zero = await warned(`
+      <helix-headless-data-table page-size="0" default-page-size="2">
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      </helix-headless-data-table>`)
+    expect([zero.element.pageSize, bodyRows(zero.element).length]).toEqual([0, 4])
+    expect(zero.warnings.filter((one) => one.includes('page-size'))).toEqual([])
+  })
+})
+
 describe('controlled and uncontrolled', () => {
   test('`default-sort` seeds an order this element then owns', async () => {
     const { element, remove } = await mount(`

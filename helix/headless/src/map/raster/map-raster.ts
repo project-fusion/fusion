@@ -3,8 +3,10 @@ import {
   HelixElement,
   HelixMapPartChangeEvent,
   motionPaused,
+  numberConverter,
   onMotionChange,
   reducedMotion,
+  timeConverter,
   words,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
@@ -64,7 +66,7 @@ export class HelixHeadlessMapRaster extends HelixElement {
   description?: string
 
   /** Which of `frames` shows, counting from `0`. Starts at the last frame. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('frame', undefined) })
   frame?: number
 
   /** Tile URLs to show in order, one per frame, as a list separated by spaces. */
@@ -86,8 +88,11 @@ export class HelixHeadlessMapRaster extends HelixElement {
   @property()
   group?: string
 
-  /** How long each frame shows while `playing`, in milliseconds. */
-  @property({ type: Number })
+  /**
+   * How long each frame shows while `playing`, in milliseconds. The attribute
+   * also takes a CSS time, such as `0.6s`.
+   */
+  @property({ converter: timeConverter('interval', 600) })
   interval = 600
 
   /** Marks this as a layer for the frame and the connector, whatever its tag. */
@@ -108,11 +113,11 @@ export class HelixHeadlessMapRaster extends HelixElement {
    * The deepest zoom the provider has tiles for. The map enlarges those tiles
    * at deeper zooms, where it would otherwise ask for tiles that do not exist.
    */
-  @property({ attribute: 'max-zoom', type: Number })
+  @property({ attribute: 'max-zoom', converter: numberConverter('max-zoom', undefined) })
   maxZoom?: number
 
   /** How opaque the tiles are, from `0` to `1`. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('opacity', 0.7) })
   opacity = 0.7
 
   /** Whether the frames play in order. Has no effect with one frame, or under reduced motion. */

@@ -9,6 +9,7 @@ import {
   HelixRangeChangeEvent,
   inRowOrder,
   isRtl,
+  numberConverter,
   pressedOwnControl,
   type Rendered,
   rangeAdd,
@@ -297,7 +298,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * items out as a grid of that many equal columns, windowed a line at a
    * time, with Left and Right moving along a line.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('columns', 1) })
   columns = 1
 
   /**
@@ -320,7 +321,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * An estimate rather than a measurement while `measured` is off, which is
    * right whenever the rows really are one height and is the cheaper of the two.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('estimate', 32, 'pixels') })
   estimate = 32
 
   /**
@@ -336,7 +337,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * the rows away from the scroll position the way a margin on each row
    * would.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('gap', 0, 'pixels') })
   gap = 0
 
   /**
@@ -413,7 +414,10 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * out as many columns as fit the box at that width, at least one, and
    * follows the box as it resizes, which `columns` then does not decide.
    */
-  @property({ attribute: 'min-column-width', type: Number })
+  @property({
+    attribute: 'min-column-width',
+    converter: numberConverter('min-column-width', 0, 'pixels'),
+  })
   minColumnWidth = 0
 
   /**

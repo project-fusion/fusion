@@ -6,6 +6,7 @@ import {
   HelixElement,
   headingLevel,
   MixinControllerOpen,
+  numberConverter,
   onUnlessFalse,
 } from '@fusion.dev/helix-core'
 import { caretDown } from '@fusion.dev/helix-icons'
@@ -151,7 +152,7 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
    * Unset takes the accordion's `heading-level`, and 3 where that is unset
    * too.
    */
-  @property({ attribute: 'heading-level', type: Number })
+  @property({ attribute: 'heading-level', converter: numberConverter('heading-level', undefined) })
   headingLevel?: number
 
   /**

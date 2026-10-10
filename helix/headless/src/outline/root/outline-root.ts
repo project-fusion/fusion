@@ -4,6 +4,7 @@ import {
   HelixActivateEvent,
   HelixElement,
   IndicatorController,
+  numberConverter,
   plainClick,
   reflectElements,
   scrollingAncestor,
@@ -183,7 +184,7 @@ export class HelixHeadlessOutline extends HelixElement {
    * a little more: without it the current section changes as a heading slides
    * under the chrome rather than as it reaches the top of what can be seen.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('offset', 0, 'pixels') })
   offset = 0
 
   /**

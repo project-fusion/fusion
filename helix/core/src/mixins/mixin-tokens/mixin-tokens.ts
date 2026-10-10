@@ -4,6 +4,7 @@ import { property, state } from 'lit/decorators.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { drawIcon } from '../../utils/draw-icon/draw-icon.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
+import { numberConverter } from '../../utils/number-converter/number-converter.js'
 import { formatWords, words } from '../../words/words.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
@@ -183,7 +184,7 @@ export const MixinTokens = <T extends Constructor<HelixElement>>(Base: T) => {
     /**
      * How many tokens to show before the rest become a count.
      */
-    @property({ attribute: 'max-tags', type: Number })
+    @property({ attribute: 'max-tags', converter: numberConverter('max-tags', 0) })
     maxTags = 0
 
     /**

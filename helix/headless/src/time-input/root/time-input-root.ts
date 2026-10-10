@@ -20,6 +20,7 @@ import {
   MixinPickerField,
   MixinSegmentedField,
   MixinTokens,
+  numberConverter,
   readWrittenTime,
   slottedWords,
   timeFault,
@@ -362,7 +363,7 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
    * How far apart the offered times are, in minutes, or in seconds with
    * `seconds`.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('step', 15) })
   step = 15
 
   /**

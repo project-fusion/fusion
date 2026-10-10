@@ -1,4 +1,10 @@
-import { customElement, HelixElement, HelixMapPartChangeEvent, words } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  HelixMapPartChangeEvent,
+  numberConverter,
+  words,
+} from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -94,7 +100,7 @@ export class HelixHeadlessMapRoute extends HelixElement {
    * How much of the route has been traveled, from 0 to 1. The traveled part is
    * drawn in a lighter color.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('progress', undefined) })
   progress?: number
 
   /** Tells the frame and the connector the line moved, was renamed or was retoned. */

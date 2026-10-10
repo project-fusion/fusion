@@ -9,6 +9,7 @@ import {
   isRtl,
   MixinControllerValue,
   MixinField,
+  numberConverter,
   type OwnRule,
   restoreValue,
   words,
@@ -135,7 +136,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
    * state. `wrap="hard"` needs it, the two being the pair that decides where
    * the browser inserts the line breaks it submits.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('cols', undefined) })
   cols?: number
 
   /**
@@ -154,14 +155,14 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   /**
    * The most characters the value can have.
    */
-  @property({ attribute: 'maxlength', type: Number })
+  @property({ attribute: 'maxlength', converter: numberConverter('maxlength', undefined) })
   maxLength?: number
 
   /**
    * How many lines an `auto-grow` field grows to before it scrolls. Absent,
    * it grows with all of its text.
    */
-  @property({ attribute: 'max-rows', type: Number })
+  @property({ attribute: 'max-rows', converter: numberConverter('max-rows', undefined) })
   maxRows?: number
 
   /**
@@ -172,7 +173,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
    * No `pattern`: the platform does not give a textarea one, and inventing it
    * would be this library guessing where the point is to stop guessing.
    */
-  @property({ attribute: 'minlength', type: Number })
+  @property({ attribute: 'minlength', converter: numberConverter('minlength', undefined) })
   minLength?: number
 
   /**
@@ -510,7 +511,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
   /**
    * How many lines the box is before anything is typed.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('rows', 3) })
   rows = 3
 
   /**

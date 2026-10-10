@@ -4,6 +4,7 @@ import {
   HelixBeforeChangeEvent,
   HelixFormElement,
   hostWords,
+  numberConverter,
   requestChange,
   words,
   wordsLocale,
@@ -104,7 +105,7 @@ export class HelixHeadlessPaginationSize extends HelixFormElement {
   /**
    * The size to start on when `value` is not set.
    */
-  @property({ attribute: 'default-value', type: Number })
+  @property({ attribute: 'default-value', converter: numberConverter('default-value', 0) })
   defaultValue = 0
 
   /**
@@ -138,7 +139,7 @@ export class HelixHeadlessPaginationSize extends HelixFormElement {
    * `default-value` seeds one this element owns. Same accessor pair as
    * `Pagination.page` and the calendar's `month`.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('value', undefined) })
   get value(): number {
     return this.valueState ?? this.defaultValue
   }

@@ -4,6 +4,7 @@ import {
   formatWords,
   HelixElement,
   HelixMapPartChangeEvent,
+  numberConverter,
   PlacementController,
   words,
   wordsLocale,
@@ -120,11 +121,11 @@ export class HelixHeadlessMapMarker extends HelixElement {
   label?: string
 
   /** Latitude, in degrees. A marker without both `lat` and `lng` is not shown. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('lat', undefined, 'degrees') })
   lat?: number
 
   /** Longitude, in degrees. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('lng', undefined, 'degrees') })
   lng?: number
 
   /**

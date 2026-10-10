@@ -1,4 +1,4 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { customElement, numberConverter } from '@fusion.dev/helix-core'
 import { HelixHeadlessIcon } from '@fusion.dev/helix-headless/icon/root'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -67,7 +67,7 @@ export class HelixIcon extends HelixHeadlessIcon {
    *
    * Absent draws it upright. `--icon-rotate` turns it by any other angle.
    */
-  @property({ reflect: true, type: Number })
+  @property({ converter: numberConverter('rotate', undefined, 'degrees'), reflect: true })
   rotate?: 90 | 180 | 270
 
   static override styles: CSSResultGroup = styles

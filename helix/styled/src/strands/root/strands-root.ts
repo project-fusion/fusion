@@ -5,6 +5,7 @@ import {
   HelixElement,
   HelixStrandsFallbackEvent,
   MAX_FRAME_STEP,
+  numberConverter,
   PaintGateController,
   readColor,
 } from '@fusion.dev/helix-core'
@@ -140,14 +141,14 @@ export class HelixStrands extends HelixElement {
    * box changes shape. Read inside a box only; in `travel` each stop has its
    * own.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('at', undefined) })
   at?: number
 
   /**
    * How much the glow around the strands adds, as a multiplier. `0` draws the
    * strands alone, crisp and dimmer, and `1` is the default glow.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('bloom', 1) })
   bloom = 1
 
   /**
@@ -155,14 +156,14 @@ export class HelixStrands extends HelixElement {
    * them alike, to `1`, a few burning bright over many faint ones. Clamped to
    * that range. The ribbon as a whole keeps its strength.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('contrast', 1) })
   contrast = 1
 
   /**
    * How many strands the ribbon has, from `0`, sixty, to `1`, three hundred and
    * forty. Clamped to that range.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('density', 0.8) })
   density = 0.8
 
   /**
@@ -171,7 +172,7 @@ export class HelixStrands extends HelixElement {
    * brighter, and further from its axis, and those at the back thinner, dimmer,
    * and out of focus.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('depth', 1) })
   depth = 1
 
   /**
@@ -180,7 +181,7 @@ export class HelixStrands extends HelixElement {
    * pace past its middle. Neighbors always move together, so no strand leaves
    * its lane. Clamped to that range.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('drift', 1) })
   drift = 1
 
   /**
@@ -188,11 +189,11 @@ export class HelixStrands extends HelixElement {
    * draws none, `1` six hundred, and `4`, the most, two thousand four
    * hundred. They gather where the ribbon is brightest.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('dust', 1) })
   dust = 1
 
   /** Overall brightness, as a multiplier on the light. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('gain', 1) })
   gain = 1
 
   /**
@@ -209,15 +210,15 @@ export class HelixStrands extends HelixElement {
    * every strand sharp, to `1`, every one soft. Clamped to that range. A tight
    * form, such as a bend's apex or a wave, stays sharp whatever this says.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('softness', 0) })
   softness = 0
 
   /** How fast the ribbon moves, as a multiplier on time. `0` holds it still. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('speed', 1) })
   speed = 1
 
   /** How wide the ribbon is, as a multiplier on each form's own width. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('spread', 1) })
   spread = 1
 
   /**

@@ -18,6 +18,7 @@ import {
   hostAria,
   KeyboardNavigationController,
   MixinViewport,
+  numberConverter,
   requestChange,
   type ViewportControlsPlacement,
   type ViewportPanDetail,
@@ -273,7 +274,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * The map's rotation, in degrees clockwise from north. `connectMap` keeps it
    * current, and the Face north button's needle turns with it.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('bearing', 0, 'degrees') })
   bearing = 0
 
   /**
@@ -376,7 +377,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * `connectMap` keeps it current, and the 3D button is pressed while it is
    * above `0`.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('pitch', 0, 'degrees') })
   pitch = 0
 
   /**
@@ -461,7 +462,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * How far the map is zoomed, in its renderer's levels. `connectMap` keeps it
    * current, and the map says it after a zoom.
    */
-  @property({ attribute: 'zoom-level', type: Number })
+  @property({ attribute: 'zoom-level', converter: numberConverter('zoom-level', undefined) })
   zoomLevel?: number | undefined
 
   /** What the live region says now. */

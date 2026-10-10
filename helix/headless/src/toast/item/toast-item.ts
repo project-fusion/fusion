@@ -14,6 +14,7 @@ import {
   swipeAxis,
   swipeEdge,
   type ToneMark,
+  timeConverter,
   toneMark,
   towardEdge,
 } from '@fusion.dev/helix-core'
@@ -100,12 +101,13 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
 
   /**
    * How long the message stays, in milliseconds. When it is not set, the
-   * message stays until it is dismissed.
+   * message stays until it is dismissed. The attribute also takes a CSS time,
+   * such as `5s`.
    *
    * Read once when the item is first rendered. Changing it afterwards does not
    * restart a message the reader is already partway through.
    */
-  @property({ type: Number })
+  @property({ converter: timeConverter('duration', undefined) })
   duration?: number
 
   /**

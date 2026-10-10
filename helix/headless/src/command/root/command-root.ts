@@ -9,6 +9,7 @@ import {
   MixinControllerOpen,
   matchesChord,
   StatusController,
+  timeConverter,
   words,
 } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -177,11 +178,12 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   emptyText = 'No commands'
 
   /**
-   * How long typing rests before the commands are filtered, in milliseconds,
-   * so a palette filtered on a server sends one `helix-filter` for a word.
-   * `0` filters on every keystroke. See Listbox's `filter-delay`.
+   * How long typing rests before the commands are filtered, in milliseconds, so
+   * a palette filtered on a server sends one `helix-filter` for a word. `0`
+   * filters on every keystroke. See Listbox's `filter-delay`. The attribute
+   * also takes a CSS time, such as `300ms`.
    */
-  @property({ attribute: 'filter-delay', type: Number })
+  @property({ attribute: 'filter-delay', converter: timeConverter('filter-delay', 0) })
   filterDelay = 0
 
   /**

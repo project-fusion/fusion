@@ -5,6 +5,7 @@ import {
   HelixBandEvent,
   HelixElement,
   hostAria,
+  numberConverter,
   readingText,
   StatusController,
   slottedWords,
@@ -148,7 +149,7 @@ export class HelixHeadlessMeter extends HelixElement {
    *
    * Absent leaves the range unbanded.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('high', undefined) })
   high?: number
 
   /**
@@ -194,7 +195,7 @@ export class HelixHeadlessMeter extends HelixElement {
    *
    * Absent leaves the range unbanded.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('low', undefined) })
   low?: number
 
   /**
@@ -205,13 +206,13 @@ export class HelixHeadlessMeter extends HelixElement {
    * is a fraction, and a component that reads `value="72"` as seventy-two times
    * over its maximum is a trap that costs nothing to avoid.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('max', 100) })
   max = 100
 
   /**
    * Bottom of the range.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('min', 0) })
   min = 0
 
   /**
@@ -222,7 +223,7 @@ export class HelixHeadlessMeter extends HelixElement {
    * good, like disk usage, says `optimum="0"`; one where high is good, like a
    * battery, says `optimum="100"`.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('optimum', undefined) })
   optimum?: number
 
   /**
@@ -257,7 +258,7 @@ export class HelixHeadlessMeter extends HelixElement {
    *
    * Outside them, it clamps.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('value', 0) })
   value = 0
 
   /**

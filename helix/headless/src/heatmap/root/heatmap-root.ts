@@ -13,6 +13,7 @@ import {
   MixinChartSource,
   MixinChartStatus,
   markRegion,
+  numberConverter,
   pressedValue,
   rangeAdd,
   requestValue,
@@ -209,7 +210,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * Space between cells, in CSS pixels. It is a number for the same reason
    * `min-cell` is.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('gap', 2, 'pixels') })
   gap = 2
 
   /**
@@ -231,7 +232,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * Zero turns the dropping off altogether, which is right for a strip in a
    * container that cannot get narrow.
    */
-  @property({ attribute: 'min-cell', type: Number })
+  @property({ attribute: 'min-cell', converter: numberConverter('min-cell', 8, 'pixels') })
   minCell = 8
 
   /**
@@ -253,7 +254,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
    * line in weeks, from the right on a right-to-left page, and top to bottom in
    * days.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('rows', 1) })
   rows = 1
 
   /**

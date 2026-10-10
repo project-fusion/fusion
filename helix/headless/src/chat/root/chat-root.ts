@@ -11,6 +11,7 @@ import {
   HelixPinEvent,
   hostAria,
   MixinCollection,
+  numberConverter,
   onUnlessFalse,
   type Rendered,
   reportRuntime,
@@ -462,7 +463,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * not left. The same distance from the top is what counts as reaching the
    * history.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('threshold', 48, 'pixels') })
   threshold = 48
 
   /**

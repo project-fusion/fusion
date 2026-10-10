@@ -1,4 +1,10 @@
-import { customElement, DelayController, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  DelayController,
+  HelixElement,
+  hostAria,
+  timeConverter,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -65,8 +71,9 @@ export const initialsOf = (name: string): string => {
 @customElement('helix-headless-avatar')
 export class HelixHeadlessAvatar extends HelixElement {
   /**
-   * How long, in milliseconds, a picture may take before the initials stand
-   * in for it while it loads.
+   * How long, in milliseconds, a picture may take before the initials stand in
+   * for it while it loads. The attribute also takes a CSS time, such as
+   * `600ms`.
    *
    * Absent keeps the picture's place empty until it arrives or fails. Set,
    * the initials show once the wait is over and the picture
@@ -74,7 +81,7 @@ export class HelixHeadlessAvatar extends HelixElement {
    * without a cached picture flashing initials first. Radix's `delayMs` is the
    * same idea.
    */
-  @property({ attribute: 'fallback-delay', type: Number })
+  @property({ attribute: 'fallback-delay', converter: timeConverter('fallback-delay', undefined) })
   fallbackDelay?: number
 
   /**

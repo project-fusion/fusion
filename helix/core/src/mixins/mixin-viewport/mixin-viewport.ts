@@ -6,6 +6,7 @@ import type { ViewportPanDetail, ViewportZoomDetail } from '../../events/events.
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import { isRtl } from '../../utils/is-rtl/is-rtl.js'
+import { numberConverter, timeConverter } from '../../utils/number-converter/number-converter.js'
 import { formatWords, words } from '../../words/words.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
@@ -301,14 +302,16 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
     gestures?: ViewportGestures
 
     /**
-     * How long, in milliseconds, before the header and footer hide when the user is inactive. `0` keeps them visible.
+     * How long, in milliseconds, before the header and footer hide when the
+     * user is inactive. `0` keeps them visible. The attribute also takes a CSS
+     * time, such as `3s`.
      *
      * Zero keeps it up, which is the default: these controls are how a keyboard
      * reader operates the surface, and chrome that hid itself by default would
      * be the component undoing its own argument. Set it for a display nobody
      * drives.
      */
-    @property({ attribute: 'idle-delay', type: Number })
+    @property({ attribute: 'idle-delay', converter: timeConverter('idle-delay', 0) })
     idleDelay = 0
 
     /**
@@ -341,7 +344,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
      * scale of what is inside it: a quarter of the viewport is the same gesture
      * at any zoom, and a consumer who wants their own units multiplies by them.
      */
-    @property({ attribute: 'pan-step', type: Number })
+    @property({ attribute: 'pan-step', converter: numberConverter('pan-step', 0.25) })
     panStep = 0.25
 
     /** The pan up button's label. */

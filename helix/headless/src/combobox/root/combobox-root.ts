@@ -23,6 +23,7 @@ import {
   reportValues,
   StatusController,
   submitImplicitly,
+  timeConverter,
   UpgradeController,
   words,
   wordsLocale,
@@ -281,14 +282,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
 
   /**
    * How long typing rests before the list is narrowed and `helix-filter` is
-   * sent, in milliseconds.
+   * sent, in milliseconds. The attribute also takes a CSS time, such as
+   * `300ms`.
    *
    * For options filtered on a server, where `helix-filter` starts a request: a
    * delay sends one request for a word instead of one per letter. The arrow
    * keys, Enter and Escape narrow at once on what was typed. `0` narrows on
    * every keystroke. See Listbox's `filter-delay`.
    */
-  @property({ attribute: 'filter-delay', type: Number })
+  @property({ attribute: 'filter-delay', converter: timeConverter('filter-delay', 0) })
   filterDelay = 0
 
   /**

@@ -9,6 +9,7 @@ import {
   HelixNavigateEvent,
   hostAria,
   MIRROR_RULE,
+  numberConverter,
   requestChange,
   words,
   wordsLocale,
@@ -152,7 +153,7 @@ export class HelixHeadlessPagination extends HelixElement {
   /**
    * How many pages to show at each end, whatever the current one is.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('boundaries', 1) })
   boundaries = 1
 
   /**
@@ -173,7 +174,7 @@ export class HelixHeadlessPagination extends HelixElement {
   /**
    * The page to open on when `page` is not set.
    */
-  @property({ attribute: 'default-page', type: Number })
+  @property({ attribute: 'default-page', converter: numberConverter('default-page', 1) })
   defaultPage = 1
 
   /**
@@ -271,7 +272,7 @@ export class HelixHeadlessPagination extends HelixElement {
    *
    * Rounded here too, so `2.7` reads as the 2 it renders.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('page', undefined) })
   get page(): number {
     const asked = this.pageState ?? this.defaultPage
     return Math.min(this.count, Math.max(1, Math.floor(asked) || 1))
@@ -302,7 +303,7 @@ export class HelixHeadlessPagination extends HelixElement {
    * them already say it. A fallback rather than an override: writing this wins,
    * so there is never a question of which of two sources is current.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('pages', 0) })
   pages = 0
 
   /**
@@ -312,7 +313,7 @@ export class HelixHeadlessPagination extends HelixElement {
    * sees the items. It is what turns `total` into a page count, and nothing
    * else.
    */
-  @property({ attribute: 'page-size', type: Number })
+  @property({ attribute: 'page-size', converter: numberConverter('page-size', 0) })
   pageSize = 0
 
   /**
@@ -325,7 +326,7 @@ export class HelixHeadlessPagination extends HelixElement {
   /**
    * How many pages to show either side of the current one.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('siblings', 1) })
   siblings = 1
 
   /**
@@ -350,7 +351,7 @@ export class HelixHeadlessPagination extends HelixElement {
    * Nothing is rendered from it. `Pagination.Summary` is what reads a total out
    * to a reader, and takes its own.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('total', 0) })
   total = 0
 
   /**

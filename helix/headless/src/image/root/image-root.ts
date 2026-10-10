@@ -1,4 +1,10 @@
-import { customElement, DelayController, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  DelayController,
+  HelixElement,
+  reportRuntime,
+  timeConverter,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -105,13 +111,14 @@ export class HelixHeadlessImage extends HelixElement {
   loading?: 'eager' | 'lazy'
 
   /**
-   * How long, in milliseconds, the placeholder waits before it shows.
+   * How long, in milliseconds, the placeholder waits before it shows. The
+   * attribute also takes a CSS time, such as `300ms`.
    *
    * Absent or `0` shows it at once. A picture that arrives inside
    * the wait never shows a placeholder at all, so a cached or fast image does
    * not flash one. Radix's `delayMs` on its avatar fallback is the same idea.
    */
-  @property({ attribute: 'placeholder-delay', type: Number })
+  @property({ attribute: 'placeholder-delay', converter: timeConverter('placeholder-delay', 0) })
   placeholderDelay = 0
 
   /**

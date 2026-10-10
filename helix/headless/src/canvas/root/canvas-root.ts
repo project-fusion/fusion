@@ -27,6 +27,7 @@ import {
   isRtl,
   MixinViewport,
   type MoveDetail,
+  numberConverter,
   type ReconnectDetail,
   type RelabelDetail,
   type ViewportPanDetail,
@@ -695,7 +696,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
    * the same way. A group moves with what it carries, so a card inside one
    * keeps its place in it. Absent, cards land where they are let go.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('snap', undefined) })
   snap?: number
 
   /** The text announced when a connection is stopped before it is requested. */

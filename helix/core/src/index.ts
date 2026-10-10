@@ -577,6 +577,7 @@ export {
 } from './utils/media-copy/media-copy.js'
 export { nameText } from './utils/name-text/name-text.js'
 export { nearest } from './utils/nearest/nearest.js'
+export { numberConverter, timeConverter } from './utils/number-converter/number-converter.js'
 export {
   formatNumber,
   formatPercent,

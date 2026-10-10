@@ -10,6 +10,7 @@ import {
   HelixSelectedEvent,
   hostAria,
   MixinCollection,
+  numberConverter,
   onUnlessFalse,
   requestChange,
   SCROLLER_RULE,
@@ -354,7 +355,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
    * The most lines kept, or 0 to keep them all. Past it the oldest lines are
    * let go, and the line above the log says how many.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('limit', 0) })
   limit = 0
 
   /**
@@ -496,7 +497,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
   }
 
   /** How near the newest line still counts as being at it, in pixels. */
-  @property({ type: Number })
+  @property({ converter: numberConverter('threshold', 48, 'pixels') })
   threshold = 48
 
   /**

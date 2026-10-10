@@ -13,6 +13,7 @@ import {
   HelixResizedEvent,
   inlineStep,
   isRtl,
+  numberConverter,
   requestChange,
   words,
   wordsLocale,
@@ -223,7 +224,7 @@ export class HelixHeadlessSplitter extends HelixElement {
    * only whoever put it there knows that, which is the same reason `min` is a
    * consumer's to set.
    */
-  @property({ attribute: 'collapsed-size', type: Number })
+  @property({ attribute: 'collapsed-size', converter: numberConverter('collapsed-size', 0) })
   collapsedSize = 0
 
   /**
@@ -266,7 +267,7 @@ export class HelixHeadlessSplitter extends HelixElement {
   /**
    * Where the divider starts, when `position` is not set.
    */
-  @property({ attribute: 'default-position', type: Number })
+  @property({ attribute: 'default-position', converter: numberConverter('default-position', 50) })
   defaultPosition = 50
 
   /**
@@ -402,7 +403,7 @@ export class HelixHeadlessSplitter extends HelixElement {
    * `default-position` seeds one this element owns. The same accessor pair
    * `Pagination.page` and the calendar's `month` carry.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('position', undefined) })
   get position(): number {
     const shut = this.collapsed
     if (shut) {
@@ -569,13 +570,16 @@ export class HelixHeadlessSplitter extends HelixElement {
   /**
    * How close a drag has to come to a snap point to land on it, in pixels.
    */
-  @property({ attribute: 'snap-threshold', type: Number })
+  @property({
+    attribute: 'snap-threshold',
+    converter: numberConverter('snap-threshold', 12, 'pixels'),
+  })
   snapThreshold = 12
 
   /**
    * How far one arrow key press moves the divider, as a percentage.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('step', 2) })
   step = 2
 
   /** The position, whoever set it, and `undefined` until somebody has. */

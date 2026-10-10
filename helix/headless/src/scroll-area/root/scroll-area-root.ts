@@ -1,4 +1,4 @@
-import { customElement, HelixElement, SCROLLER_RULE } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, SCROLLER_RULE, timeConverter } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { type Bar, ScrollbarController } from '../scrollbar-controller.js'
@@ -88,9 +88,9 @@ export class HelixHeadlessScrollArea extends HelixElement {
   /**
    * How long the scrollbars stay after the content stops moving, or the pointer
    * leaves, in milliseconds. Read under `scrollbars="scroll"` and
-   * `scrollbars="hover"`.
+   * `scrollbars="hover"`. The attribute also takes a CSS time, such as `0.6s`.
    */
-  @property({ attribute: 'hide-delay', type: Number })
+  @property({ attribute: 'hide-delay', converter: timeConverter('hide-delay', 600) })
   hideDelay = 600
 
   /**

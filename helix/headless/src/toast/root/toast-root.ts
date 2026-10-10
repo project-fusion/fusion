@@ -10,6 +10,7 @@ import {
   HelixElement,
   hostAria,
   matchesChord,
+  numberConverter,
   onApple,
   scrollHolders,
   words,
@@ -129,7 +130,7 @@ export class HelixHeadlessToast extends HelixElement {
    * and with their timers stopped, until a message before them goes. Unset,
    * every message shows.
    */
-  @property({ attribute: 'max-visible', type: Number })
+  @property({ attribute: 'max-visible', converter: numberConverter('max-visible', undefined) })
   maxVisible?: number
 
   /**

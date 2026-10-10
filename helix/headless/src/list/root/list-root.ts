@@ -14,6 +14,7 @@ import {
   inRowOrder,
   KeyboardNavigationController,
   type NavigableItem,
+  numberConverter,
   placeKey,
   pressedOwnControl,
   ReorderController,
@@ -314,7 +315,7 @@ export class HelixHeadlessList extends HelixElement {
    * The number of an ordered list's first row, as `<ol start>` is. Unset counts
    * from one, or down from the number of rows where `reversed`.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('start', undefined) })
   start?: number
 
   /**
