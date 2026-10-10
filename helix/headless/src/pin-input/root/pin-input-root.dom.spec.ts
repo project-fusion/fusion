@@ -76,6 +76,14 @@ const press = async (host: Pin, key: string): Promise<KeyboardEvent> => {
   return event
 }
 
+/** A key typed over the field's selection, which is the box the caret is in. */
+const type = async (host: Pin, key: string): Promise<void> => {
+  const field = control(host)
+  field.setRangeText(key, field.selectionStart ?? 0, field.selectionEnd ?? 0, 'end')
+  field.dispatchEvent(new Event('input', { bubbles: true }))
+  await settle(host)
+}
+
 describe('input pin', () => {
   test('one box per character, drawn from one field', async () => {
     const host = await pin('length="4"')
@@ -499,6 +507,43 @@ describe('a code completed and refused', () => {
     })
     await paste(host, '1234')
     expect(completed).toEqual(['1234'])
+  })
+})
+
+describe('a code a consumer refuses and writes back', () => {
+  /* Measured in Chromium with React: the caret stayed in the box it was in, so
+     every key of a controlled code replaced the first, and typing `123` left
+     `3`. */
+  test('moves the caret on, whether the value is written during the dispatch or after it', async () => {
+    for (const later of [false, true]) {
+      const host = await pin('length="4"')
+      host.addEventListener('helix-before-change', (event) => {
+        event.preventDefault()
+        const { value } = (event as CustomEvent<{ value: string }>).detail
+        if (later) {
+          queueMicrotask(() => {
+            host.value = value
+          })
+        } else {
+          host.value = value
+        }
+      })
+      await arrive(host)
+      for (const key of '123') {
+        await type(host, key)
+      }
+      expect([host.value, activeBox(host)]).toEqual(['123', 3])
+    }
+  })
+
+  test('and leaves it where it was when nothing is written back', async () => {
+    const host = await pin('length="4" default-value="1234"')
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
+    await arrive(host)
+    await press(host, 'Home')
+    await press(host, 'ArrowRight')
+    await type(host, '9')
+    expect([host.value, activeBox(host)]).toEqual(['1234', 1])
   })
 })
 
