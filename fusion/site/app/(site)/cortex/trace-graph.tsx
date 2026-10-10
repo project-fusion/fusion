@@ -206,88 +206,101 @@ export function TraceGraph() {
 
   return (
     <div className={styles.trace}>
-      {/* **Choose an answer, and see what it came from.** The four answers are
-          the way in, since an answer is what a reader asks about. */}
-      <helix-radio-group
-        label="Choose an answer"
-        onChange={(event) => setActive(event.currentTarget.value)}
-        orientation="horizontal"
-        value={answers.some((answer) => answer.id === active) ? active : ''}
-      >
-        {answers.map((answer) => (
-          <helix-radio key={answer.id} value={answer.id}>
-            {answer.label}
-          </helix-radio>
-        ))}
-      </helix-radio-group>
-      <helix-text emphasis="subtle" variant="caption">
-        {layout === 'rows' ? 'Read from the top down' : 'Read from left to right'}: what came in,
-        the facts Engram kept from it, what was retrieved and looked up, the context the model was
-        given, and the answer it gave. The chosen answer is lit back to where it came from.
-      </helix-text>
-      <helix-graph
-        class={styles.traceFrame}
-        gestures="cooperative"
-        label="An example trace of four answers"
-        no-panel
-        ref={frame}
-      >
-        <div className={styles.traceCanvas} ref={box} />
-        {SNAPSHOTS.map((snapshot) => (
-          <div
-            className={styles[snapshot.layout]}
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: an SVG Helix Graph drew from this file's own trace, its names escaped
-            dangerouslySetInnerHTML={{ __html: snapshot.markup }}
-            data-helix-graph-snapshot=""
-            key={snapshot.layout}
-          />
-        ))}
-        {failed ? (
-          <helix-text slot="footer" variant="caption">
-            The trace could not load. Reload the page to try again.
-          </helix-text>
-        ) : null}
-      </helix-graph>
-      {/* The derivation in words, the same walk the drawing lights. */}
-      <helix-card>
-        <helix-flex direction="column" gap="sm">
+      <div className={styles.traceDrawing}>
+        <helix-graph
+          class={styles.traceFrame}
+          gestures="cooperative"
+          label="An example trace of four answers"
+          no-panel
+          ref={frame}
+        >
+          <div className={styles.traceCanvas} ref={box} />
+          {SNAPSHOTS.map((snapshot) => (
+            <div
+              className={styles[snapshot.layout]}
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: an SVG Helix Graph drew from this file's own trace, its names escaped
+              dangerouslySetInnerHTML={{ __html: snapshot.markup }}
+              data-helix-graph-snapshot=""
+              key={snapshot.layout}
+            />
+          ))}
+          {failed ? (
+            <helix-text slot="footer" variant="caption">
+              The trace could not load. Reload the page to try again.
+            </helix-text>
+          ) : null}
+        </helix-graph>
+        <helix-text class={styles.traceCaption} emphasis="subtle" variant="caption">
+          {layout === 'rows' ? 'Read from the top down' : 'Read from left to right'}: what came in,
+          the facts Engram kept from it, what was retrieved and looked up, the context the model was
+          given, and the answer it gave. The chosen answer is lit back to where it came from. An
+          example of four answers from a support assistant, built by Trace and Engram and drawn with
+          Helix Graph.
+        </helix-text>
+      </div>
+      {/* **The answers, the derivation, and the deletion, in a row under the
+          drawing.** The drawing takes the card's whole width, since its names
+          need the room: beside a column it ran out of it and the lit names
+          ran into the next column. An answer is what a reader asks about, so
+          the four are the way in; what the chosen one came from is read
+          beside them in the order a trace is read, nearest first; and the
+          deletion is last, since it is done to what is beside it. */}
+      <div className={styles.traceRow}>
+        <helix-radio-group
+          class={styles.answers}
+          label="Choose an answer"
+          onChange={(event) => setActive(event.currentTarget.value)}
+          orientation="vertical"
+          value={answers.some((answer) => answer.id === active) ? active : ''}
+        >
+          {answers.map((answer) => (
+            <helix-radio key={answer.id} value={answer.id}>
+              {answer.label}
+            </helix-radio>
+          ))}
+        </helix-radio-group>
+
+        {/* The derivation in words, the same walk the drawing lights: a
+            ladder down from the answer to what came in. */}
+        <div className={styles.derivation}>
           <helix-text as="h3" variant="subheading">
             {active ? `What ${nameOf(active)} came from` : 'Choose an answer'}
           </helix-text>
           {kinds.length > 0 ? (
-            <helix-description-list>
+            <ol className={styles.ladder}>
               {kinds.map((kind) => (
-                <helix-description-list-item key={kind.group} label={kind.group}>
-                  {kind.names.join(', ')}
-                </helix-description-list-item>
+                <li className={styles.rung} key={kind.group}>
+                  <span className={styles.rungKind}>{kind.group}</span>
+                  <span className={styles.rungNames}>{kind.names.join(', ')}</span>
+                </li>
               ))}
-            </helix-description-list>
+            </ol>
           ) : (
             <helix-text emphasis="muted">
               {active
                 ? 'Nothing in this trace. It came in from outside.'
-                : 'Choose an answer above, or press a note in the trace.'}
+                : 'Choose an answer, or press a note in the trace.'}
             </helix-text>
           )}
-        </helix-flex>
-      </helix-card>
-      <helix-flex align-items="center" gap="sm" wrap>
-        <helix-button disabled={deleted || undefined} onClick={() => setDeleted(true)}>
-          Delete “{DELETED}”
-        </helix-button>
-        <helix-button
-          disabled={!deleted || undefined}
-          emphasis="subtle"
-          onClick={() => setDeleted(false)}
-        >
-          Restore the trace
-        </helix-button>
-      </helix-flex>
-      <helix-text aria-live="polite" emphasis="subtle" variant="caption">
-        {deleted
-          ? `Deleted “${DELETED}”, the context built from it, and the answer that context produced. The facts it cited and the sources they came from remain.`
-          : 'Deleting a memory removes everything derived from it, as Trace does. The September answer cites the superseded price, which is why Engram keeps it.'}
-      </helix-text>
+        </div>
+
+        {/* **One button, which deletes a memory the way Trace does and then
+            restores it.** Two buttons of which one is always disabled is a
+            form; one that says what it will do next is a control. */}
+        <div className={styles.cascade}>
+          <helix-button
+            emphasis={deleted ? 'subtle' : undefined}
+            onClick={() => setDeleted((was) => !was)}
+          >
+            {deleted ? 'Restore the trace' : `Delete “${DELETED}”`}
+          </helix-button>
+          <helix-text aria-live="polite" emphasis="subtle" variant="caption">
+            {deleted
+              ? `Deleted “${DELETED}”, the context built from it, and the answer that context produced. The facts it cited and the sources they came from remain.`
+              : 'Deleting a memory removes everything derived from it, as Trace does. The September answer cites the superseded price, which is why Engram keeps it.'}
+          </helix-text>
+        </div>
+      </div>
     </div>
   )
 }

@@ -1,13 +1,99 @@
-/* The example trace on the Cortex page: the graph, the two buttons that
-   delete a memory and restore it, and what happened, under it. */
+/* The example trace on the Cortex page: the drawing at the card's width, and
+   under it the answers, the derivation and the deletion in a row. */
+
 .trace {
+  display: grid;
+  gap: var(--helix-space-xl);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* The three parts of the reading under the drawing: side by side from the
+   band's own split width up, with a rule between, and stacked below it. */
+.traceRow {
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (width >= 64rem) {
+  .traceRow {
+    gap: var(--helix-space-xl);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr);
+  }
+
+  .traceRow > * + * {
+    border-inline-start: var(--helix-border-thin) solid var(--helix-material-border);
+    padding-inline-start: var(--helix-space-xl);
+  }
+}
+
+/* The four answers, each a quoted line. */
+.answers {
+  --radio-gap: var(--helix-space-xs);
+}
+
+.derivation {
   display: flex;
   flex-direction: column;
   gap: var(--helix-space-sm);
 }
 
+/* The derivation as a ladder: each rung is what the answer came from at one
+   remove, read down from the answer to what came in. A rule down the left,
+   in the brand, is the thread the drawing lights. */
+.ladder {
+  display: grid;
+  gap: var(--helix-space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rung {
+  border-inline-start: 2px solid color-mix(in oklab, var(--helix-color-primary) 70%, transparent);
+  display: grid;
+  gap: var(--helix-space-3xs);
+  padding-block: var(--helix-space-3xs);
+  padding-inline-start: var(--helix-space-md);
+}
+
+.rungKind {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.rungNames {
+  color: var(--helix-color-foreground);
+  font-size: var(--helix-text-sm);
+  line-height: 1.5;
+}
+
+.cascade {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-sm);
+}
+
+.cascade helix-button {
+  align-self: start;
+}
+
+.traceDrawing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--helix-space-sm);
+  min-inline-size: 0;
+}
+
+/* The drawing on the band's own glass: no fill and no edge of its own, so the
+   notes sit on the light like everything else in the card. */
 .traceFrame {
-  --graph-block-size: min(70svh, 34rem);
+  --graph-background-color: transparent;
+  --graph-block-size: min(60svh, 30rem);
+  --graph-border-color: transparent;
 }
 
 /* **Tall on a phone**, where the trace runs down the screen one note to a
@@ -17,6 +103,10 @@
   .traceFrame {
     --graph-block-size: 62rem;
   }
+}
+
+.traceCaption {
+  max-inline-size: 72ch;
 }
 
 /* The box Sigma draws in, the whole of the frame's drawing. */

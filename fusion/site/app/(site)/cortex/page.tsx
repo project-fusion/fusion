@@ -140,15 +140,14 @@ export default function Page() {
         {/* **What Trace records, drawn with Helix**: an example of the graph
             Trace keeps, in its own terms, and its deletion run on it. Said to
             be an example, since Trace is still being built. */}
-        <Band cardId="trace" id="trace">
+        <Band cardId="trace-card" id="trace">
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>Trace</Eyebrow>
             <SectionTitle>Every answer, traced to its inputs</SectionTitle>
             <Lede>
-              Trace links every output to what it was derived from: the sources it read, the
-              memories it used, the context it assembled, and the tools it called. Each memory cites
-              facts kept in Engram. This example shows four answers from a support assistant, built
-              by Trace and Engram and drawn with Helix Graph. Trace is still being built.
+              Trace links every output to what it was derived from: the sources it read, the facts
+              it used, the context it assembled, and the tools it called. Choose an answer, and the
+              drawing lights everything it came from. Trace is still being built.
             </Lede>
           </helix-flex>
           <div className={band.bandSection}>

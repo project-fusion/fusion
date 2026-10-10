@@ -79,10 +79,12 @@ const COLUMNS: readonly (readonly string[])[] = ORDER.map((kind) =>
 )
 
 /** How far apart the columns are, and the notes in a column, in the graph's units. */
-const ACROSS = 10
+const ACROSS = 12
 const DOWN = 2.6
 /** How much further the columns after the sources start, for the sources' longer names. */
 const SOURCE_NAMES = 3
+/** How much further the outputs start, for the contexts' long names before them. */
+const CONTEXT_NAMES = 3
 
 /** How the trace is laid out: in columns, across a wide screen, or in rows, down a narrow one. */
 export type TraceLayout = 'columns' | 'rows'
@@ -104,19 +106,29 @@ const placesFor = (layout: TraceLayout): Map<string, { x: number; y: number }> =
   let line = 0
   COLUMNS.forEach((column, across) => {
     if (layout === 'columns') {
-      const half = column.length / 2
+      const half = Math.ceil(column.length / 2)
+      /* **Two open rows where the count is odd, one where it is even.** The
+         group's name is drawn at the middle of its notes, and with an odd
+         count the upper half is one longer, which pulls that middle up off a
+         single open row and onto the note above it. */
+      const open = column.length % 2 === 0 ? 1 : 2
       column.forEach((id, down) => {
         /* Up is positive in the drawing, so the first in a column is at the
-           top; the lower half steps down one more, past the open middle row. */
-        const row = down < half ? down : down + 1
+           top; the lower half steps down past the open middle rows. */
+        const row = down < half ? down : down + open
         /* **The tool calls sit half a row off**, between the rows the
            retrievals and contexts share: on a row, the link from a
            retrieval to its context ran straight through a tool call it has
            nothing to do with. */
         const off = ORDER[across] === 'tool_call' ? DOWN / 2 : 0
         /* The sources' names are the longest, so the columns after them
-           start a little further over. */
-        const x = across * ACROSS + (across > 0 ? SOURCE_NAMES : 0)
+           start a little further over; and the contexts' names are the next
+           longest, so the outputs start further over again, or a context's
+           name ran into the answer it produced. */
+        const x =
+          across * ACROSS +
+          (across > 0 ? SOURCE_NAMES : 0) +
+          (ORDER[across] === 'output' ? CONTEXT_NAMES : 0)
         at.set(id, { x, y: (column.length / 2 - row) * DOWN + off })
       })
       return
