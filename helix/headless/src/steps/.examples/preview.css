@@ -55,10 +55,13 @@ helix-headless-step:last-child::after {
   display: none;
 }
 
+/* An upcoming step's mark in the mark's gray: it is the only sign a step is
+   there, so it answers to a graphic's 3:1, which the line's gray missed at
+   1.65:1 in light and 2.21:1 in dark. */
 helix-headless-step::part(marker) {
   align-items: center;
   block-size: 1.25rem;
-  color: var(--_gray-line);
+  color: var(--_gray-mark);
   display: inline-flex;
   grid-column: 1;
   grid-row: 1;

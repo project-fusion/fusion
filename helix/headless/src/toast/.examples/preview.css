@@ -119,7 +119,9 @@ helix-headless-toast-item::part(dismiss) {
   block-size: 2rem;
   border-radius: var(--_radius-control);
   box-sizing: border-box;
-  color: var(--_gray-mark);
+  /* The toast is the inverse of the page, light in dark mode, so its mark
+     takes the darker gray there: the page's mark gray read 2.98:1 on it. */
+  color: light-dark(#8e8e96, #63636b);
   cursor: pointer;
   display: inline-flex;
   inline-size: 2rem;
