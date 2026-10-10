@@ -179,5 +179,9 @@ describe('the pointer', () => {
     expect(ring?.previousElementSibling?.getAttribute('data-index')).toBe('0')
     /* The first bar stands in front, so bars are painted after its outline. */
     expect(ring?.nextElementSibling?.getAttribute('part')).toContain('bar')
+    /* And again over every bar, dashed, where the ones in front hide it. */
+    const behind = part(element, 'ring-behind')
+    expect(behind?.getAttribute('d')).toBe(ring?.getAttribute('d') ?? '')
+    expect(behind?.nextElementSibling?.localName).toBe('foreignObject')
   })
 })

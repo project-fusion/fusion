@@ -86,6 +86,16 @@ helix-headless-spatial-treemap::part(ring) {
   vector-effect: non-scaling-stroke;
 }
 
+/* The same outline over everything, faint and dashed, where others hide it. */
+helix-headless-spatial-treemap::part(ring-behind) {
+  fill: none;
+  opacity: 0.6;
+  stroke: var(--_gray-strong);
+  stroke-dasharray: 3px 2px;
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
 /* The tooltip's mark, centered on the reading it marks. */
 helix-headless-spatial-treemap::part(mark) {
   block-size: 1px;

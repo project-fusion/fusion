@@ -141,6 +141,18 @@ foreignObject > [part="mark"] {
   vector-effect: non-scaling-stroke;
 }
 
+/* The outline again over every bar, faint and dashed: where the bar shows,
+   the ring covers it, and where others hide it, this says where it stands. */
+[part="ring-behind"] {
+  fill: none;
+  opacity: 0.6;
+  pointer-events: none;
+  stroke: var(--helix-color-foreground);
+  stroke-dasharray: 3px 2px;
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
 /* The readout, the summary, and the table drawn from `data` are for screen readers. */
 [part="live"],
 [part="summary"],
@@ -188,7 +200,8 @@ foreignObject > [part="mark"] {
     fill: CanvasText;
   }
 
-  [part="ring"] {
+  [part="ring"],
+  [part="ring-behind"] {
     stroke: Highlight;
   }
 }
