@@ -108,14 +108,9 @@ slot[name="indicator"]::slotted(*) {
 
 :host(:state(active)) [part~="item"],
 :host(:not([disabled])) [part~="item"]:hover {
-  /* A wash of the foreground rather than a step on the surface ladder. */
-  background-color: var(
-    --option-active-color,
-    light-dark(
-      color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
-      color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
-    )
-  );
+  /* A wash of the foreground rather than a step on the surface ladder, and
+     the one the theme engine solves the description's quiet ink against. */
+  background-color: var(--option-active-color, var(--helix-color-hover));
 }
 
 :host([disabled]) [part~="item"] {

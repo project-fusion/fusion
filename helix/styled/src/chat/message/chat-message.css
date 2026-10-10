@@ -398,10 +398,7 @@ slot[name="indicator"]::slotted(helix-orb) {
    underneath rather than a rung on the surface ladder, since this control sits
    on a transcript that may be on a page, a card or a panel. */
 [part="retry"]:hover {
-  background-color: light-dark(
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
-    color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
-  );
+  background-color: var(--helix-color-hover);
 }
 
 [part="retry"]:focus-visible {

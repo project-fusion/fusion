@@ -17,6 +17,8 @@
 
 use std::sync::LazyLock;
 
+use crate::intent::Scheme;
+
 /// A surface something is painted on.
 ///
 /// `bounded` is the interesting field. Contrast is measured against a known
@@ -101,13 +103,31 @@ pub const STATUSES: [&str; 4] = ["danger", "info", "success", "warning"];
 
 /// A ground the stylesheet writes as an ink mixed toward transparent, so its
 /// color is the ground under it with the ink laid over.
+///
+/// **A strength per scheme**, because a token can mix a different amount in
+/// each: `light-dark()` returns a color, so the stylesheet writes two whole
+/// mixes and the engine, which derives one scheme at a time, reads the one its
+/// scheme paints.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Wash {
+    /// How much of the ink on a dark page, in percent.
+    pub dark: u8,
     /// The ink it is mixed from, by token name.
     pub ink: &'static str,
+    /// How much of the ink on a light page, in percent.
+    pub light: u8,
     pub name: &'static str,
-    /// How much of the ink, in percent.
-    pub percent: u8,
+}
+
+impl Wash {
+    /// How much of the ink this scheme paints, in percent.
+    #[must_use]
+    pub fn percent(self, scheme: Scheme) -> u8 {
+        match scheme {
+            Scheme::Dark => self.dark,
+            Scheme::Light => self.light,
+        }
+    }
 }
 
 /// What a field is filled with, which `tokens.ts` declares as
@@ -119,10 +139,34 @@ pub struct Wash {
 /// The engine emits no token for it: the stylesheet mixes it from the
 /// foreground the engine emits, so the five move with that foreground.
 pub const WELL: Wash = Wash {
+    dark: 5,
     ink: "color-foreground",
+    light: 5,
     name: "color-well",
-    percent: 5,
 };
+
+/// What a row is lit with under the pointer or the keyboard, which `tokens.ts`
+/// declares as 8% of the foreground in light and 12% in dark: an option, a
+/// suggestion, a note in a graph's list.
+///
+/// **Quiet text stays on it.** An option's description and a playlist's
+/// running time keep `foreground-muted` while their row is lit, so the quiet
+/// ink is solved against the hover wash over each surface of the ladder, as it
+/// is against the well.
+///
+/// **A lighter wash of the foreground is covered by this one.** A menu item's
+/// 8% in dark, the 6% under the video that is playing, and the 4% of a hovered
+/// log line are the same ink at less strength, so each stands further from the
+/// text than this does, and a pair that clears here clears there.
+pub const HOVER: Wash = Wash {
+    dark: 12,
+    ink: "color-foreground",
+    light: 8,
+    name: "color-hover",
+};
+
+/// Every wash the model names, which is what a ground's name is read against.
+pub const WASHES: [Wash; 2] = [WELL, HOVER];
 
 /// The name of a wash over one ground, `color-well over color-surface`, which
 /// is the ground a pair over it reports.
@@ -132,11 +176,15 @@ pub fn over(wash: Wash, ground: &str) -> String {
 }
 
 /// The wash and the ground a name such as `color-well over color-surface`
-/// names, or `None` for the name of one token.
+/// names, or `None` for the name of one token or of a wash the model does not
+/// have.
 #[must_use]
 pub fn washed(name: &str) -> Option<(Wash, &str)> {
     let (wash, ground) = name.split_once(" over ")?;
-    (wash == WELL.name).then_some((WELL, ground))
+    WASHES
+        .iter()
+        .find(|known| known.name == wash)
+        .map(|known| (*known, ground))
 }
 
 /// `foreground-subtle` is deliberately absent, and the measurement is why.
@@ -189,6 +237,18 @@ pub static GROUNDS: LazyLock<Vec<Ground>> = LazyLock::new(|| {
     3.89:1 in a dialog on a #333333 page, and at 4.05:1 on a sunken panel in
     the default theme. */
     grounds.extend(wells().iter().map(|name| bounded(name)));
+    /* **A lit row over each surface**, for the reason the well is: the wash is
+    a different color on every ground it lands on. Measured in Chromium on
+    October 10, 2026, with the quiet ink solved against the ladder and the
+    well alone: an option's description at 4.31:1 on its lit row on a sunken
+    panel in the default theme, and at 3.65:1 on a raised one in the default
+    dark theme. */
+    grounds.extend(hovers().iter().map(|name| bounded(name)));
+    /* **A field on a tinted row**, such as a selected row of a list that holds
+    one. The tint is a ground of its own, so the well over it is too. Measured
+    the same day: a placeholder at 4.41:1 on the well over `primary-subtle` in
+    the default theme, and at 3.81:1 on a #0b2a33 page. */
+    grounds.extend(tinted_wells().iter().map(|name| bounded(name)));
     grounds
 });
 
@@ -204,12 +264,26 @@ fn wells() -> Vec<String> {
         .collect()
 }
 
+/// The hover wash over each surface of the page ladder, in the ladder's order.
+fn hovers() -> Vec<String> {
+    PAGE_SURFACES
+        .iter()
+        .map(|ground| over(HOVER, ground))
+        .collect()
+}
+
+/// The well over each tint.
+fn tinted_wells() -> Vec<String> {
+    TINTS.iter().map(|tint| over(WELL, tint)).collect()
+}
+
 pub static INKS: LazyLock<Vec<Ink>> = LazyLock::new(|| {
     let pages = owned(&PAGE_SURFACES);
     let mut inks = vec![
         /* Both neutral inks are written in a field: the value in
         `foreground`, and the placeholder, the unit and the affixes in
-        `muted`. */
+        `muted`. Both are written on a lit row, and in a field on a tinted
+        one. */
         Ink {
             contrast: Contrast::Text,
             grounds: [
@@ -217,13 +291,26 @@ pub static INKS: LazyLock<Vec<Ink>> = LazyLock::new(|| {
                 owned(&TINTS),
                 owned(&["color-overlay"]),
                 wells(),
+                hovers(),
+                tinted_wells(),
             ]
             .concat(),
             name: "color-foreground".to_owned(),
         },
+        /* **The quiet ink on a tint as well**: a selected row of a list keeps
+        its description in it on `primary-subtle`. Measured in Chromium on
+        October 10, 2026, solved against the ladder and the well alone, at
+        4.32:1 there on a #4a4a4a page. */
         Ink {
             contrast: Contrast::Text,
-            grounds: [pages.clone(), wells()].concat(),
+            grounds: [
+                pages.clone(),
+                wells(),
+                owned(&TINTS),
+                hovers(),
+                tinted_wells(),
+            ]
+            .concat(),
             name: "color-foreground-muted".to_owned(),
         },
         /* **A label per role**, because the roles do not share a polarity. A

@@ -8,9 +8,11 @@
 use crate::derive::solve::solve_against;
 use crate::derive::surfaces::Surfaces;
 use crate::derive::Cast;
-use crate::model::WELL;
+use crate::intent::Scheme;
+use crate::model::{HOVER, WELL};
 use crate::oklch::{
-    laid_over, lightness_for_contrast, shipped_contrast_ratio, Oklch, CONTRAST_STEPS,
+    fit_to_gamut, laid_over, lightness_for_contrast, shipped_contrast_ratio, Oklch, CONTRAST_STEPS,
+    GAMUT_STEPS,
 };
 
 /// What the page is written in.
@@ -59,16 +61,27 @@ pub struct NeutralInks {
 /// **A field's well is laid in the foreground**, so the foreground is chosen
 /// first and the wells are made from it: a field's quiet text is solved against
 /// the color the stylesheet will paint behind it, and a theme whose foreground
-/// changes moves its wells with it.
+/// changes moves its wells with it. A lit row's wash is laid in it the same
+/// way, at the strength the scheme paints.
+///
+/// **The tints are grounds of their own**, a selected row's `primary-subtle`
+/// and `accent-subtle`, and a field on one fills its well over the tint. They
+/// come from the emphasis phase, which is solved first and needs nothing from
+/// this one.
 #[must_use]
-pub fn neutral_inks(surfaces: Surfaces, neutral: Cast, contrast_target: f64) -> NeutralInks {
-    let grounds = surfaces.solved_against();
+pub fn neutral_inks(
+    surfaces: Surfaces,
+    neutral: Cast,
+    scheme: Scheme,
+    tints: [Oklch; 2],
+    contrast_target: f64,
+) -> NeutralInks {
+    let grounds = Grounds {
+        ladder: surfaces.solved_against(),
+        scheme,
+        tints: tints.map(|tint| fit_to_gamut(tint, GAMUT_STEPS)),
+    };
     let foreground = strongest(&grounds, neutral);
-    let fielded: Vec<Oklch> = grounds
-        .iter()
-        .copied()
-        .chain(wells(foreground, &grounds))
-        .collect();
     NeutralInks {
         border: lightness_for_contrast(
             neutral.chroma,
@@ -79,31 +92,59 @@ pub fn neutral_inks(surfaces: Surfaces, neutral: Cast, contrast_target: f64) -> 
             CONTRAST_STEPS,
         ),
         foreground,
-        muted: solve_against(&fielded, neutral, contrast_target),
+        muted: solve_against(&grounds.under(foreground), neutral, contrast_target),
     }
 }
 
-/// The well over each ground, laid in `foreground`.
-///
-/// Over the grounds the ladder is solved against, which leave `overlay` out:
-/// it is pure white in light, where the well on it is the lightest of all, and
-/// the same color as `raised` in dark, so the well on it is the well on
-/// `raised`.
-fn wells(foreground: Oklch, grounds: &[Oklch]) -> impl Iterator<Item = Oklch> + '_ {
-    grounds
-        .iter()
-        .map(move |ground| laid_over(foreground, WELL.percent, *ground))
+/// What the neutral inks are written on, before the foreground that washes
+/// some of it is chosen.
+struct Grounds {
+    /// The grounds the ladder is solved against, fitted.
+    ladder: [Oklch; 4],
+    scheme: Scheme,
+    /// `primary-subtle` and `accent-subtle`, fitted.
+    tints: [Oklch; 2],
 }
 
-/// Black or white, whichever stands further from every ground and from the well
-/// it would fill a field with, judged by the worst of them as `solve_against`
-/// judges its candidates.
-fn strongest(grounds: &[Oklch], neutral: Cast) -> Oklch {
+impl Grounds {
+    /// Every ground a neutral ink lands on once `foreground` washes them: the
+    /// ladder, the well over each rung, the lit row over each rung, the tints,
+    /// and the well over each tint.
+    ///
+    /// **In the order the model added them**, the ladder and its wells first:
+    /// a tie keeps the earlier candidate, so the order is part of the answer.
+    ///
+    /// Over the grounds the ladder is solved against, which leave `overlay`
+    /// out: it is pure white in light, where a wash on it is the lightest of
+    /// all, and the same color as `raised` in dark, so a wash on it is the wash
+    /// on `raised`.
+    fn under(&self, foreground: Oklch) -> Vec<Oklch> {
+        let washed = |percent: u8, grounds: &[Oklch]| -> Vec<Oklch> {
+            grounds
+                .iter()
+                .map(|ground| laid_over(foreground, percent, *ground))
+                .collect()
+        };
+        let well = WELL.percent(self.scheme);
+        [
+            self.ladder.to_vec(),
+            washed(well, &self.ladder),
+            washed(HOVER.percent(self.scheme), &self.ladder),
+            self.tints.to_vec(),
+            washed(well, &self.tints),
+        ]
+        .concat()
+    }
+}
+
+/// Black or white, whichever stands further from every ground and from the
+/// washes it would lay over them, judged by the worst of them as
+/// `solve_against` judges its candidates.
+fn strongest(grounds: &Grounds, neutral: Cast) -> Oklch {
     let worst = |ink: Oklch| {
         grounds
-            .iter()
-            .copied()
-            .chain(wells(ink, grounds))
+            .under(ink)
+            .into_iter()
             .map(|ground| shipped_contrast_ratio(ink, ground))
             .fold(f64::INFINITY, f64::min)
     };

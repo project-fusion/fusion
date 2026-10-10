@@ -127,6 +127,17 @@ export const TOKENS: Token[] = [
      holds: 1.119, 1.112, 1.114 across page, card and raised, against the
      absolute token's 1.027 to 1.119. */
   ['color-well', 'color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)'],
+  /* **What a row is lit with under the pointer or the keyboard**: an option, a
+     suggestion, a note in a graph's list. A step from its ground for the
+     reason the well is one, and 12% in dark because the same alpha over a dark
+     surface reads as less. Two whole colors for the reason `color-overlay`
+     gives below. The theme engine solves `foreground-muted` against this wash
+     over every surface, as `HOVER` in `helix/theme/rust/model.rs`, so a change
+     to either strength here is a change there as well. */
+  [
+    'color-hover',
+    'light-dark( color-mix(in oklab, var(--helix-color-foreground) 8%, transparent), color-mix(in oklab, var(--helix-color-foreground) 12%, transparent) )',
+  ],
   /* Two whole colors, not one color with a `light-dark()` strength.
      `light-dark()` resolves to a `<color>` and is not valid in a percentage
      slot, so `color-mix(in oklab, neutral-950 light-dark(40%, 64%),

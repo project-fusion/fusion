@@ -83,7 +83,7 @@ left out.
 | Field | What it controls |
 |---|---|
 | `contrastTarget` | Target contrast for body text. 4.5 is WCAG AA, and 7 is AAA |
-| `pairings` | The foreground and background pairs to measure, by token name. A background of `color-well over color-surface` is a field's well over that surface. The list replaces the pairs from the engine's surface model. The engine measures each pair and solves none of them, and a pair that names a token the engine does not emit is reported as `unverifiable` |
+| `pairings` | The foreground and background pairs to measure, by token name. A background of `color-well over color-surface` is a field's well over that surface, and `color-hover over color-surface` is a lit row over it. The list replaces the pairs from the engine's surface model. The engine measures each pair and solves none of them, and a pair that names a token the engine does not emit is reported as `unverifiable` |
 
 The default is 4.5, the WCAG 2.1 AA figure. The European Accessibility Act
 refers to WCAG 2.1 AA, so 4.5 is the figure with legal weight.

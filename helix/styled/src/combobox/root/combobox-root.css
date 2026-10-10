@@ -169,10 +169,7 @@ slot[name="end"]::slotted(*) {
    an option, so it highlights like one, and so does the keyboard on it. */
 [part~="create"]:hover,
 [part~="create-active"] {
-  background-color: light-dark(
-    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
-    color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
-  );
+  background-color: var(--helix-color-hover);
 }
 
 /* Inside the panel's own edge, which the panel clips: an outline drawn outward

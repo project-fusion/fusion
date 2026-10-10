@@ -35,7 +35,9 @@ choice people most often get wrong. See [Surfaces and
 separation](./surfaces-and-separation).
 
 A field is filled with `well`: 5% of `foreground` laid over whatever the field
-sits on, so its color depends on the surface under the field.
+sits on, so its color depends on the surface under the field. A row under the
+pointer or the keyboard, such as an option, is lit with `hover` the same way:
+8% of `foreground` in light and 12% in dark.
 
 ### Inks
 
@@ -123,6 +125,14 @@ meet its target, such as one with a color you pinned, is reported in
 solves them against the well over the page, a card, a raised surface, a dialog,
 and a sunken surface. The report names each of these grounds as the well over
 its surface, such as `color-well over color-surface`.
+
+Both inks are also written on a lit row and on a selected row. The engine solves
+them against these grounds as well:
+
+- `hover` over each of the same five surfaces, such as `color-hover over
+  color-surface`
+- `primary-subtle` and `accent-subtle`, the tints a selected row takes
+- the well over each tint, for a field on a selected row
 
 `foreground-subtle` is the one ink the engine does not solve. The range of
 readable grays has room for one quiet ink, and `foreground-muted` is that ink, so
