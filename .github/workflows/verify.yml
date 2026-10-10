@@ -995,24 +995,34 @@ jobs:
       # request's, and the repository's 10 GB was full on 10 Oct 2026. One
       # entry per set of dependencies, about 250 MB: what it compiled from
       # them holds for every commit that shares them, and the site's own
-      # modules that changed since are compiled again. It is written by the
-      # first run on `main` that verifies a tree itself, since a push that a
-      # pull request verified runs none of this.
+      # modules that changed since are compiled again.
+      #
+      # **Saved after the build, and only when the build wrote it.** A run
+      # whose `next build` is a turbo cache hit compiles nothing and leaves
+      # `.next/cache` empty, and the first entry, saved by `actions/cache` on
+      # its way out of such a run, held 0 bytes under a key that cannot be
+      # written twice. The key carries `turbopack` so that entry is never read.
+      # So the entry is written by the first run on `main` whose site build
+      # ran, and a push that a pull request verified runs none of this.
       - name: Restore the site's build cache
-        if: github.ref != 'refs/heads/main'
+        id: next
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          key: next-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          path: fusion/site/.next/cache
-      - name: Cache the site's build
-        if: github.ref == 'refs/heads/main'
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          key: next-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          key: next-turbopack-${{ runner.os }}-${{ hashFiles('bun.lock') }}
           path: fusion/site/.next/cache
       # Everything but `next build` is a restore of what `warm` built.
       - name: Build the site
         run: bunx turbo run build --filter=@fusion.dev/site
+      - name: Look for what the build compiled
+        id: compiled
+        if: github.ref == 'refs/heads/main' && steps.next.outputs.cache-hit != 'true'
+        run: if [ -d fusion/site/.next/cache/turbopack ]; then echo "found=true" >> "$GITHUB_OUTPUT"; fi
+      - name: Save the site's build cache
+        if: steps.compiled.outputs.found == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: ${{ steps.next.outputs.cache-primary-key }}
+          path: fusion/site/.next/cache
       - name: Picture the site
         uses: ./helix/visual/action
         with:
