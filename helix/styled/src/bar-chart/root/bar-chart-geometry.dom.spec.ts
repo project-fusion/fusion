@@ -238,4 +238,94 @@ if (hasLayout()) {
       expect(mark.left).toBeLessThanOrEqual(first.right)
     })
   })
+
+  /**
+   * A chart of more columns than its plot has pixels, whose columns are paths
+   * and whose reading shown is drawn again over them.
+   *
+   * **Read from the slot under the pointer, and shown where it stands.** An
+   * element a column cost 726 milliseconds a move of the pointer at 10,000
+   * readings, and the column a reader moved to was a tenth of a pixel wide.
+   */
+  describe('bar chart past one column a pixel', () => {
+    afterEach(() => {
+      document.documentElement.removeAttribute('dir')
+    })
+
+    type Wide = HTMLElement & { data: unknown; updateComplete: Promise<unknown> }
+
+    const wide = async (): Promise<Wide> => {
+      await mount(
+        '<div><helix-bar-chart label="Load" style="inline-size: 600px"></helix-bar-chart></div>',
+      )
+      const host = document.querySelector('helix-bar-chart') as Wide
+      host.data = {
+        columns: ['At', 'Load'],
+        rows: Array.from({ length: 5000 }, (_, at) => [`p${at}`, (at % 50) - 10]),
+      }
+      for (let pass = 0; pass < 3; pass++) {
+        await new Promise((resolve) => requestAnimationFrame(resolve))
+        await host.updateComplete
+      }
+      return host
+    }
+
+    const move = async (host: Wide, x: number, y: number): Promise<void> => {
+      host.dispatchEvent(
+        new PointerEvent('pointermove', {
+          bubbles: true,
+          clientX: x,
+          clientY: y,
+          composed: true,
+          pointerType: 'mouse',
+        }),
+      )
+      await host.updateComplete
+    }
+
+    for (const dir of ['ltr', 'rtl'] as const) {
+      test(`the pointer reads the category under it, drawn again two pixels thick, ${dir}`, async () => {
+        document.documentElement.dir = dir
+        const host = await wide()
+        expect(host.shadowRoot?.querySelectorAll('rect[part~="bar"]')).toHaveLength(0)
+        const plot = (part(host, 'plot') as HTMLElement).getBoundingClientRect()
+        /* A quarter of the way along from where the drawing starts. */
+        const x = dir === 'ltr' ? plot.left + plot.width / 4 : plot.right - plot.width / 4
+        await move(host, x, plot.top + plot.height / 2)
+        expect(part(host, 'tooltip-label')?.textContent).toBe('p1250')
+        const shown = host.shadowRoot?.querySelector('[part~="group-active"] [part~="bar"]')
+        const box = (shown as Element).getBoundingClientRect()
+        expect(box.width).toBeGreaterThan(1.99)
+        expect(Math.abs(box.left + box.width / 2 - x)).toBeLessThan(1)
+        expect(getComputedStyle(shown as Element).transitionDuration).toBe('0s')
+      })
+    }
+
+    test('a move of the pointer writes none of the columns again', async () => {
+      const host = await wide()
+      const plot = (part(host, 'plot') as HTMLElement).getBoundingClientRect()
+      const written: string[] = []
+      const watch = new MutationObserver((records) => {
+        for (const record of records) {
+          if ((record.target as Element).localName === 'path') {
+            written.push(record.attributeName ?? '')
+          }
+        }
+      })
+      watch.observe(host.shadowRoot as ShadowRoot, { attributes: true, subtree: true })
+      for (const at of [0.2, 0.4, 0.6]) {
+        await move(host, plot.left + plot.width * at, plot.top + plot.height / 2)
+      }
+      watch.disconnect()
+      expect(written).toEqual([])
+    })
+
+    test('a path of columns has no corner to round', async () => {
+      const host = await wide()
+      for (const path of host.shadowRoot?.querySelectorAll('path[part~="bar"]') ?? []) {
+        const round = /round (.+)\)$/.exec(getComputedStyle(path).clipPath)?.[1] ?? '0px'
+        expect(round.split(/\s+/).every((radius) => Number.parseFloat(radius) === 0)).toBe(true)
+      }
+    })
+  })
 }
