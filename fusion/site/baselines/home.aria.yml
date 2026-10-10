@@ -110,7 +110,7 @@
     - listitem: Ships it as experimental
   - paragraph: 7 jobs only Helix covers
   - text: Charts 3D charts Chat Command palette Node diagrams Maps Video player
-  - paragraph: 3.4 kB
+  - paragraph: 3.3 kB
   - paragraph: A typical extra component, compressed.
   - link "Compare the systems":
     - /url: /helix/docs/metrics#what-each-system-ships
