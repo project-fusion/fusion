@@ -139,6 +139,16 @@ const config: NextConfig = {
       },
     ],
   },
+
+  /**
+   * **The types are checked by `typecheck`, so the build does not check them
+   * again.** `next build` ran its own TypeScript pass over the same
+   * `tsconfig.json`, 11 seconds of the `site` job on CI, the last job of a run
+   * to finish. `typecheck` writes the route types with `next typegen` first,
+   * which is what the build's pass read and `tsc` alone did not, and `verify`
+   * holds every pull request to it before anything reaches `main`.
+   */
+  typescript: { ignoreBuildErrors: true },
 }
 
 export default config
