@@ -14,7 +14,7 @@
   - /url: https://github.com/project-fusion
 - button "Preferences"
 - main:
-  - link "Coming soon Helix ships first":
+  - link "Active Helix ships first":
     - /url: /announcements
   - heading "An intelligent design system, and the engineers behind it" [level=1]
   - paragraph: Ship faster because the system does the checking.
