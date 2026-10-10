@@ -334,12 +334,8 @@ import '@fusion.dev/helix/sandbox'
 import '@fusion.dev/helix-sandbox/editor'
 ```
 
-`language` takes the names a pane carries: `css`, `html`, `js`, `jsx`, `mjs`,
-`sh`, `ts`, and `tsx`. A name the editor does not read draws the source plain,
-and the console says so once. The editor sends `helix-before-edit` and
-`helix-edit` as `helix-sandbox-source` does, and `helix-caret` for the status
-bar. It is `:state(modified)` while it holds an edit, and `reset()` puts back
-the source it was given.
+The [Sandbox reference](/helix/components/sandbox#helix-sandbox-editor) lists
+the editor's properties, events, methods, and states.
 
 `highlight` reads the same grammars as the editor. By default each token is a
 span with Lezer's `tok-` class, for a stylesheet of your own. Pass

@@ -45,7 +45,7 @@
   "sideEffects": [
     "./dist/code-block/index.js",
     "./dist/editor/index.js",
-    "./dist/editor/root/editor-root.js"
+    "./dist/sandbox/editor/sandbox-editor.js"
   ],
   "scripts": {
     "analyze": "bun --bun helix-cem",

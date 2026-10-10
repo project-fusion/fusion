@@ -15,7 +15,7 @@ beforeAll(async () => {
   ;({ tags } = await import('@lezer/highlight'))
   ;({ forceParsing } = await import('@codemirror/language'))
   ;({ EditorView } = await import('@codemirror/view'))
-  await import('./editor-root.js')
+  await import('./sandbox-editor.js')
 })
 
 afterEach(() => {
