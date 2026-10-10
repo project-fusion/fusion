@@ -1,6 +1,15 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { clearWords, registerWords } from '@fusion.dev/helix-core'
+import type {
+  clearWords as ClearWords,
+  registerWords as RegisterWords,
+} from '@fusion.dev/helix-core'
 import { part, registerDom } from '@fusion.dev/helix-testing/dom'
+
+/* Imported once the DOM is registered: core reads the globals it finds as
+   it is evaluated, and a static import breaks the DOM when this file runs
+   first. */
+let clearWords: typeof ClearWords
+let registerWords: typeof RegisterWords
 
 /**
  * List on the words registry: its grips and the steps of a move speak the
@@ -8,6 +17,7 @@ import { part, registerDom } from '@fusion.dev/helix-testing/dom'
  */
 beforeAll(async () => {
   registerDom()
+  ;({ clearWords, registerWords } = await import('@fusion.dev/helix-core'))
   await import('../index.js')
 })
 
