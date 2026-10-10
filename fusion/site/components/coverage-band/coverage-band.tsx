@@ -49,7 +49,7 @@ export const CoverageBand = () => {
   return (
     <Band id="coverage">
       <div className={`${band.bandSplit} ${styles.split}`}>
-        <helix-flex class={`${band.bandSection} ${styles.intro}`} direction="column" gap="md">
+        <helix-flex class={band.bandSection} direction="column" gap="md">
           <Eyebrow>Coverage</Eyebrow>
           <SectionTitle>{COMPONENTS} components in one package</SectionTitle>
           <Lede>
