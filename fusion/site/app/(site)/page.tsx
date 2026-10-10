@@ -96,7 +96,13 @@ export default function Home() {
               <Eyebrow>Components</Eyebrow>
               <SectionTitle>The panel runs in your browser</SectionTitle>
               <Lede>Each control in it is a custom element from the Helix package.</Lede>
-              <helix-flex class="siteActions" data-density="lg" direction="column" gap="md">
+              <helix-flex
+                align-items="start"
+                class="siteActions"
+                data-density="lg"
+                direction="column"
+                gap="md"
+              >
                 <Link data-button="subtle" href="/helix">
                   Explore components
                 </Link>
