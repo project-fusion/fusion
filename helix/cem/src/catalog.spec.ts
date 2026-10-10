@@ -352,6 +352,85 @@ describe('import lines', () => {
   })
 })
 
+/* The sandbox package's editor sits in the Sandbox family's folder, so the
+   reference shows it on that family's page, imported from its own package. */
+describe('another package', () => {
+  const styled: HelixManifest = {
+    helix: { package: '@fusion.dev/helix', version: '1.0.0' },
+    modules: [
+      {
+        declarations: [
+          {
+            helix: { since: '0.1.0', status: 'stable' },
+            name: 'HelixSandbox',
+            summary: 'A source pane and a preview.',
+            tagName: 'helix-sandbox',
+          },
+        ],
+        path: 'src/sandbox/root/sandbox-root.ts',
+      },
+      {
+        exports: [{ declaration: { module: 'src/sandbox/root/sandbox-root.js', name: '*' } }],
+        path: 'src/sandbox/index.ts',
+      },
+    ],
+  }
+  const sandbox: HelixManifest = {
+    helix: { package: '@fusion.dev/helix-sandbox', version: '1.0.0' },
+    modules: [
+      {
+        declarations: [
+          {
+            helix: { since: '0.2.0', status: 'experimental' },
+            name: 'HelixSandboxEditor',
+            summary: 'An editable pane of source.',
+            tagName: 'helix-sandbox-editor',
+          },
+        ],
+        path: 'src/sandbox/editor/sandbox-editor.ts',
+      },
+      {
+        exports: [{ declaration: { module: 'src/sandbox/editor/sandbox-editor.js', name: '*' } }],
+        path: 'src/editor/index.ts',
+      },
+    ],
+  }
+  const families = catalog([styled, sandbox])
+  const family = findInCatalog(families, 'sandbox')
+
+  test('lands in the family its folder names, and adds no family', () => {
+    expect(families.map((one) => one.slug)).toEqual(['sandbox'])
+    expect(family?.elements.map((element) => [element.tagName, element.package])).toEqual([
+      ['helix-sandbox', '@fusion.dev/helix'],
+      ['helix-sandbox-editor', '@fusion.dev/helix-sandbox'],
+    ])
+  })
+
+  test('is imported from its own package, through the entry that registers it', () => {
+    expect(family?.elements[1]?.specifier).toBe('@fusion.dev/helix-sandbox/editor')
+    expect(family?.usage).toEqual({
+      headless: [],
+      styled: [
+        "import '@fusion.dev/helix/sandbox'",
+        "import '@fusion.dev/helix-sandbox/editor' // Sandbox Editor",
+      ],
+    })
+  })
+
+  test('keeps its own status, and the family keeps its root’s', () => {
+    expect([family?.status, family?.since, family?.summary]).toEqual([
+      'stable',
+      '0.1.0',
+      'A source pane and a preview.',
+    ])
+    expect(family?.elements.map((element) => element.status)).toEqual(['stable', 'experimental'])
+  })
+
+  test('is read from the tier where a manifest names no package', () => {
+    expect(catalog([manifest])[0]?.elements[0]?.package).toBe('@fusion.dev/helix')
+  })
+})
+
 describe('renders', () => {
   test('are the wide, narrow, and dark baselines beside an example, and nothing else', () => {
     expect(

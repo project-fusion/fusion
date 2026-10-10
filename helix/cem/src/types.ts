@@ -318,6 +318,11 @@ export interface HelixModule {
 }
 
 export interface HelixManifest {
+  /**
+   * The package and version the manifest describes, from the `package.json`
+   * beside the sources. Absent where that names no version.
+   */
+  helix?: { package?: string; version?: string }
   modules?: HelixModule[]
 }
 
