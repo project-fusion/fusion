@@ -154,47 +154,62 @@ const ALL_FACES: Face[] = [...CATALOG, ...CATALOG_MONO]
 
 /**
  * The options inside a face dropdown: the resting one loose, then the groups.
+ *
+ * **The catalog is written once a reader reaches for the dropdown**, on its
+ * first focus or pointer over it, and `whole` says so. Until then the
+ * dropdown holds only what shows its value: the resting option, a family the
+ * reader named, and the chosen face. Each face is an option, its sample and
+ * a skeleton, and the two catalog dropdowns were 15,182 of the page's 15,707
+ * elements: the browser's first style pass over them took 0.8 s of the
+ * builder's load on an M-series Mac, before Helix could define a single
+ * element.
  */
-const faceOptions = (groups: FaceGroup[], rest: Face, current: string) => (
-  <>
-    <helix-option value={rest.family}>{rest.label}</helix-option>
-    {/* **A family the reader named, kept as an option**, since the field shows
+const faceOptions = (groups: FaceGroup[], rest: Face, current: string, whole: boolean) => {
+  const chosen = whole
+    ? undefined
+    : groups.flatMap((group) => group.faces).find((face) => face.family === current)
+  return (
+    <>
+      <helix-option value={rest.family}>{rest.label}</helix-option>
+      {/* **A family the reader named, kept as an option**, since the field shows
         only a value one of its options holds. */}
-    {current && !ALL_FACES.some((face) => face.family === current) ? (
-      <helix-option-group label="Your own">
-        <helix-option value={current}>{current}</helix-option>
-      </helix-option-group>
-    ) : null}
-    {groups.map((group) => (
-      <helix-option-group key={group.label} label={group.label}>
-        {group.faces.map((face) => (
-          <helix-option key={face.family} value={face.family}>
-            {face.label}
-            {/*
-             * *The specimen, after the name.**
-             */}
-            <span aria-hidden="true" className="themeFace" slot="end">
-              {/* **The face is named here or the sample is a lie.** It is the
+      {current && !ALL_FACES.some((face) => face.family === current) ? (
+        <helix-option-group label="Your own">
+          <helix-option value={current}>{current}</helix-option>
+        </helix-option-group>
+      ) : null}
+      {chosen ? <helix-option value={chosen.family}>{chosen.label}</helix-option> : null}
+      {(whole ? groups : []).map((group) => (
+        <helix-option-group key={group.label} label={group.label}>
+          {group.faces.map((face) => (
+            <helix-option key={face.family} value={face.family}>
+              {face.label}
+              {/*
+               * *The specimen, after the name.**
+               */}
+              <span aria-hidden="true" className="themeFace" slot="end">
+                {/* **The face is named here or the sample is a lie.** It is the
                   one thing in this markup that cannot be moved to a stylesheet,
                   a rule per family being a rule per family. Drop it and every
                   sample renders in the page's own face: a thousand rows showing
                   one typeface wearing a thousand names, which is invisible by
                   eye and shows up only in the rendered glyphs. */}
-              <span
-                className="themeFaceSample"
-                data-face-request={face.preview}
-                style={{ fontFamily: `"${face.family}", var(--helix-font-sans)` }}
-              >
-                {FACE_SAMPLE}
+                <span
+                  className="themeFaceSample"
+                  data-face-request={face.preview}
+                  style={{ fontFamily: `"${face.family}", var(--helix-font-sans)` }}
+                >
+                  {FACE_SAMPLE}
+                </span>
+                <helix-skeleton className="themeFaceWaiting" shape="text" />
               </span>
-              <helix-skeleton className="themeFaceWaiting" shape="text" />
-            </span>
-          </helix-option>
-        ))}
-      </helix-option-group>
-    ))}
-  </>
-)
+            </helix-option>
+          ))}
+        </helix-option-group>
+      ))}
+    </>
+  )
+}
 
 /** Where the band switch starts the band: a deep teal, a band of its own on any light page. */
 const BAND_COLOR = '#0b2a33'
@@ -375,6 +390,11 @@ export function ThemeBuilder({
   const [fontCssText, setFontCssText] = useState(initialSettings.fontCss)
   const [displayFace, setDisplayFace] = useState(initialSettings.displayFace)
   const [monoFace, setMonoFace] = useState(initialSettings.monoFace)
+  /* The face dropdowns a reader has reached for, each holding its whole
+     catalog from then on: see `faceOptions`. */
+  const [reached, setReached] = useState<ReadonlySet<string>>(() => new Set())
+  const reach = (name: string): void =>
+    setReached((was) => (was.has(name) ? was : new Set(was).add(name)))
   const [motion, setMotion] = useState(initialSettings.motion)
   const [textBase, setTextBase] = useState(initialSettings.textBase)
   const [textScale, setTextScale] = useState(initialSettings.textScale)
@@ -1120,11 +1140,13 @@ export function ThemeBuilder({
               label="Body face"
               name="body-face"
               onChange={(event) => setBodyFace(event.currentTarget.value)}
+              onFocus={() => reach('body')}
+              onMouseEnter={() => reach('body')}
               placeholder="System default"
               value={bodyFace}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {faceOptions(FACE_GROUPS, SYSTEM, bodyFace)}
+              {faceOptions(FACE_GROUPS, SYSTEM, bodyFace, reached.has('body'))}
             </helix-combobox>
 
             <helix-combobox
@@ -1134,11 +1156,13 @@ export function ThemeBuilder({
               label="Display face"
               name="display-face"
               onChange={(event) => setDisplayFace(event.currentTarget.value)}
+              onFocus={() => reach('display')}
+              onMouseEnter={() => reach('display')}
               placeholder="Same as body"
               value={displayFace}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {faceOptions(FACE_GROUPS, DISPLAY_REST, displayFace)}
+              {faceOptions(FACE_GROUPS, DISPLAY_REST, displayFace, reached.has('display'))}
             </helix-combobox>
 
             <helix-combobox
@@ -1147,11 +1171,13 @@ export function ThemeBuilder({
               label="Mono face"
               name="mono-face"
               onChange={(event) => setMonoFace(event.currentTarget.value)}
+              onFocus={() => reach('mono')}
+              onMouseEnter={() => reach('mono')}
               placeholder="System mono"
               value={monoFace}
             >
               <helix-icon name="caret-down" slot="indicator"></helix-icon>
-              {faceOptions(MONO_GROUPS, MONO_REST, monoFace)}
+              {faceOptions(MONO_GROUPS, MONO_REST, monoFace, reached.has('mono'))}
             </helix-combobox>
 
             {/* **Hue is meaning and loudness is not**, which is the line this

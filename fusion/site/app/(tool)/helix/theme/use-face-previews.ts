@@ -201,8 +201,28 @@ export function useFacePreviews(root: RefObject<HTMLElement | null>): void {
     for (const sample of host.querySelectorAll<HTMLElement>('[data-face-request]')) {
       observer.observe(sample)
     }
+    /* **Samples written later are watched as well.** A face dropdown writes
+       its catalog the first time a reader reaches for it, so most samples
+       arrive after this effect has run. */
+    const added = new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.addedNodes) {
+          if (!(node instanceof Element)) {
+            continue
+          }
+          if (node.matches('[data-face-request]')) {
+            observer.observe(node)
+          }
+          for (const sample of node.querySelectorAll('[data-face-request]')) {
+            observer.observe(sample)
+          }
+        }
+      }
+    })
+    added.observe(host, { childList: true, subtree: true })
 
     return () => {
+      added.disconnect()
       observer.disconnect()
       if (timer !== undefined) {
         clearTimeout(timer)
