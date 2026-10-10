@@ -12,7 +12,7 @@ import { styles } from './map-area.css.js'
  * `tone` sets another.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Map region, Polygon, Zone
  * @documentation https://fusion.dev/helix/components/map

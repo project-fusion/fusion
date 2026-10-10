@@ -12,7 +12,7 @@ import { styles } from './map-terrain.css.js'
  * light and dark themes and over imagery.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Terrain, Hillshade, Elevation, Relief
  * @documentation https://fusion.dev/helix/components/map

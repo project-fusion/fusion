@@ -11,7 +11,7 @@ import { styles } from './map-landcover.css.js'
  * colored by what covers it in a light or a dark theme.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Land cover, Land use, Vegetation, Ground cover
  * @documentation https://fusion.dev/helix/components/map

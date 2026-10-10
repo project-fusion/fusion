@@ -23,7 +23,7 @@ import { styles } from './canvas-root.css.js'
  * reader meets.
  *
  * @since 0.100.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Board, JSON Canvas, Whiteboard
  * @documentation https://fusion.dev/helix/components/canvas

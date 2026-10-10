@@ -329,7 +329,7 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * back out.
  *
  * @since 0.100.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Board, JSON Canvas, Whiteboard
  * @documentation https://fusion.dev/helix/components/canvas

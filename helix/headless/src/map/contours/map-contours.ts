@@ -20,7 +20,7 @@ import type { MapTerrainEncoding } from '../terrain/map-terrain.js'
  * screen readers.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Contours, Topographic lines, Elevation lines, Isolines
  * @documentation https://fusion.dev/helix/components/map

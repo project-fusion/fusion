@@ -17,7 +17,7 @@ import type { CanvasEnd, CanvasSide } from '../root/canvas-document.js'
  * can also be rendered conditionally.
  *
  * @since 0.100.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases CanvasConnector, BoardEdge
  * @documentation https://fusion.dev/helix/components/canvas

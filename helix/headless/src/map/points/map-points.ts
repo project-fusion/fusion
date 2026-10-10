@@ -68,7 +68,7 @@ export interface MapPointsCollection {
  * count zooms in to it.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Data layer, GeoJSON layer, Point cloud, Point layer
  * @documentation https://fusion.dev/helix/components/map

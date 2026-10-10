@@ -16,7 +16,7 @@ import { property } from 'lit/decorators.js'
  * the layer by its `label` for screen readers.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Land cover, Land use, Vegetation, Ground cover
  * @documentation https://fusion.dev/helix/components/map

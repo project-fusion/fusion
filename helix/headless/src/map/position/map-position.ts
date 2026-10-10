@@ -22,7 +22,7 @@ import { property, state } from 'lit/decorators.js'
  * description when something worth hearing happens, such as "Two stops away".
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Current location, Live position, Tracker, You are here
  * @documentation https://fusion.dev/helix/components/map

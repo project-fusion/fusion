@@ -37,7 +37,7 @@ const BOOKKEEPING = new Set<PropertyKey>([
  * moves focus to the next one, or to the one before where it was the last.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Map pin, Place, Point of interest
  * @documentation https://fusion.dev/helix/components/map

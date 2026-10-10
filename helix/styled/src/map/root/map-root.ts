@@ -24,7 +24,7 @@ import { styles } from './map-root.css.js'
  * a driver for another renderer can have.
  *
  * @since 0.100.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Map frame, Map container, Geo
  * @documentation https://fusion.dev/helix/components/map
