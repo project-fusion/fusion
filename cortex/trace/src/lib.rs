@@ -312,7 +312,7 @@ impl Graph {
     ///
     /// assert_eq!(plan[0], source, "the input comes first");
     /// assert_eq!(plan[3], context, "the target comes last");
-    /// // Both memories are recomputed before the context that reads them.
+    /// // Both memories come before the context that reads them.
     /// assert!(plan[1..3].contains(&left) && plan[1..3].contains(&right));
     /// ```
     #[must_use]
