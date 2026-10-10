@@ -313,6 +313,33 @@ fn icons() {
     );
 }
 
+/// A glyph a file registers itself is a name that resolves there, and a
+/// typo of it is not.
+#[test]
+fn icons_registered_by_the_page() {
+    let page = |name: &str| {
+        format!(
+            "import {{ registerIcons }} from '@acme/icon'\nimport {{ caretDown, peak }} from './glyphs'\n\nregisterIcons([caretDown, peak])\n\nexport const Page = () => <hx-icon name=\"{name}\" />;\n"
+        )
+    };
+    plant_in(
+        "workspace-icons-registered",
+        "workspace",
+        "icons",
+        &[
+            ("package.json", ROOT),
+            ("fusion.json", r#"{ "icons": "icons.txt" }"#),
+            ("icons.txt", "# the set\ncheck\nclose\n"),
+            ("packages/a/src/page.tsx", &page("caret-down")),
+        ],
+        |tree| {
+            tree.write("packages/a/src/page.tsx", &page("peek"));
+        },
+        "`name=\"peek\"` is not in the set",
+        "packages/a/src/page.tsx:6",
+    );
+}
+
 #[test]
 fn modules() {
     const PLAIN: &str = ".page {\n  color: red;\n}\n";
