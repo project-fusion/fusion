@@ -38,10 +38,13 @@ separation](./surfaces-and-separation).
 
 Inks are the colors that go on grounds. The base ink is `foreground`.
 
-- `foreground-muted` is for text that recedes. The engine solves it to the
-  contrast target.
-- `foreground-subtle` recedes further. It is a fixed step of the gray ramp, and
-  the engine does not solve it, so its contrast is not guaranteed.
+- `foreground-muted` is for text that recedes and is still read, such as a
+  placeholder, a hint, or a caption. The engine solves it to the contrast
+  target.
+- `foreground-subtle` recedes further. It is for marks that are not text, such
+  as a separator, a chevron, or a grip, and for the text of a disabled control.
+  It is a fixed step of the gray ramp, and the engine does not solve it, so its
+  contrast is not guaranteed. Use `foreground-muted` for text that is read.
 - Text on a filled color takes the ink named for that fill:
   - `foreground-on-primary` on `primary-surface`
   - `foreground-on-accent` on `accent-surface`
@@ -116,7 +119,9 @@ meet its target, such as one with a color you pinned, is reported in
 `foreground-subtle` is the one ink the engine does not solve. The range of
 readable grays has room for one quiet ink, and `foreground-muted` is that ink, so
 `foreground-subtle` stays a fixed step of the stylesheet's gray ramp and its
-contrast is not guaranteed.
+contrast is not guaranteed. A component paints its quiet text in
+`foreground-muted`, and keeps `foreground-subtle` for marks that are not text and
+for the text of a disabled control.
 
 The engine can solve only the pairs it knows about, so we check two things:
 
