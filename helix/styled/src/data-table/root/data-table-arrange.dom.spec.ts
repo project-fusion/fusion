@@ -225,7 +225,7 @@ const distance = (a: string, b: string): number =>
 describe('a chosen row', () => {
   geometry('is washed off the ground, and the rest are not', async () => {
     const element = await table('selectable default-selected="b"')
-    const rows = [...(element.shadowRoot?.querySelectorAll<HTMLElement>('[part="row"]') ?? [])]
+    const rows = [...(element.shadowRoot?.querySelectorAll<HTMLElement>('[part~="row"]') ?? [])]
     const fill = (row: HTMLElement | undefined): string =>
       getComputedStyle(row?.querySelector('[part~="cell"]') as Element).backgroundColor
     /* Against the ground itself, read inside the table so it inherits the same

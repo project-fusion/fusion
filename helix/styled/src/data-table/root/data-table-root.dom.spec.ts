@@ -116,12 +116,12 @@ describe('a windowed table, where there is layout to window', () => {
   }
 
   const first = (element: HTMLElement) =>
-    element.shadowRoot?.querySelector('[part="row"]') as HTMLElement | null
+    element.shadowRoot?.querySelector('[part~="row"]') as HTMLElement | null
 
   geometry('scrolls the whole result while drawing a window of it', async () => {
     const element = await windowed()
     const box = part(element, 'table') as HTMLElement
-    const drawn = element.shadowRoot?.querySelectorAll('[part="row"]').length ?? 0
+    const drawn = element.shadowRoot?.querySelectorAll('[part~="row"]').length ?? 0
 
     expect(drawn).toBeGreaterThan(0)
     expect(drawn).toBeLessThan(100)
@@ -297,7 +297,7 @@ describe('a hidden column, where there is layout to place the rest', () => {
       const drawn = [...element.querySelectorAll('helix-table-column')]
         .filter((column) => !(column as HTMLElement).hidden)
         .map((column) => (part(column as HTMLElement, 'column') as Element).getBoundingClientRect())
-      const rows = [...(element.shadowRoot?.querySelectorAll('[part="row"]') ?? [])]
+      const rows = [...(element.shadowRoot?.querySelectorAll('[part~="row"]') ?? [])]
       for (const row of rows) {
         const cells = [...row.querySelectorAll('[part~="cell"]')].map((cell) =>
           cell.getBoundingClientRect(),

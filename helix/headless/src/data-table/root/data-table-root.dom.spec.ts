@@ -73,7 +73,7 @@ const cells = (element: HTMLElement) =>
   )
 
 const bodyRows = (element: HTMLElement) => [
-  ...(element.shadowRoot?.querySelectorAll('[part="row"]') ?? []),
+  ...(element.shadowRoot?.querySelectorAll('[part~="row"]') ?? []),
 ]
 
 const heading = (element: HTMLElement) =>
@@ -483,6 +483,55 @@ describe('a page size that is not a number', () => {
       </helix-headless-data-table>`)
     expect([zero.element.pageSize, bodyRows(zero.element).length]).toEqual([0, 4])
     expect(zero.warnings.filter((one) => one.includes('page-size'))).toEqual([])
+  })
+})
+
+describe('the last row', () => {
+  /* Named by the render, so the styled tier draws no rule under it without
+     `:last-of-type`, which restyled every row whenever one came or went. */
+  const named = (element: HTMLElement): (string | undefined)[] =>
+    [...(element.shadowRoot?.querySelectorAll('[part~="row-last"]') ?? [])].map((row) =>
+      row.querySelector('[part~="cell"]')?.textContent?.trim(),
+    )
+
+  test('is named as the rows are sorted, filtered, paged and replaced', async () => {
+    const { element, remove } = await mount(`
+      <helix-headless-data-table page-size="3">
+        <helix-headless-table-column field="name" sortable>Name</helix-headless-table-column>
+      </helix-headless-data-table>`)
+    expect(named(element)).toEqual(['charlie'])
+    element.sort = 'name:desc'
+    await settled(element)
+    expect(named(element)).toEqual(['bravo'])
+    element.search('ha')
+    await settled(element)
+    expect(named(element)).toEqual(['alpha'])
+    element.search('')
+    element.page = 2
+    await settled(element)
+    expect(named(element)).toEqual(['alpha'])
+    element.rows = [{ name: 'echo' }, { name: 'foxtrot' }]
+    await settled(element)
+    expect([element.page, named(element)]).toEqual([1, ['echo']])
+    element.rows = []
+    await settled(element)
+    expect(named(element)).toEqual([])
+    remove()
+  })
+
+  test('is not named under `windowed`, nor above the load-more row', async () => {
+    const windowed = await mount(`
+      <helix-headless-data-table windowed>
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      </helix-headless-data-table>`)
+    expect([bodyRows(windowed.element).length > 0, named(windowed.element)]).toEqual([true, []])
+    windowed.remove()
+    const more = await mount(`
+      <helix-headless-data-table load-more>
+        <helix-headless-table-column field="name">Name</helix-headless-table-column>
+      </helix-headless-data-table>`)
+    expect(named(more.element)).toEqual([])
+    more.remove()
   })
 })
 
