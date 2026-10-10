@@ -471,3 +471,30 @@
     env(safe-area-inset-bottom, 0px)
   );
 }
+
+/* ── The terms under the services ──────────────────────────────────── */
+
+/**
+ * **Two terms and the link to the services, on one line where there is room.**
+ * The terms take equal shares and the link takes what it needs at the end,
+ * level with the terms' first line, so the row reads as a footnote to the
+ * services above it. Stacked below 60rem, where three columns would be narrow
+ * strips of caption text.
+ */
+.terms {
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 60rem) {
+  .terms {
+    align-items: start;
+    gap: var(--helix-space-xl);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  }
+}
+
+.termsAction {
+  align-self: center;
+}

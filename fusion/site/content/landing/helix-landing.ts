@@ -158,33 +158,28 @@ export const MECHANISMS: readonly Capability[] = [
 export const DELIVERY = {
   lede: 'Every service runs two days a week, alongside your team.',
   /**
-   * **How long the services run, from the shortest to the longest.** The
-   * eyebrow names them, so the heading says the one thing a reader weighs
+   * **What you buy and how long it runs, in words a stranger can read.** "One
+   * to eight weeks" alone named a duration and left the reader to guess what
+   * lasted that long. The range stays, because it is the thing a reader weighs
    * first: one to two weeks for the audit, and six to eight for the build.
    */
-  title: 'One to eight weeks',
+  title: 'Hire our engineers for one to eight weeks',
 } as const
 
 /**
- * What hiring the engineering is actually like, in four cards.
+ * What working with us is like, in two lines under the services.
  *
- * **The half of the heading the page was not answering.** "And the engineers
- * behind it" is half the hero, and the other bands are the system, the numbers
- * and the services: everything about what you buy and nothing about what the
- * work is.
+ * **Two, where the band had four.** "The system is already built" and "The work
+ * takes weeks" restated the services above them, which already say what the
+ * work starts from and how long it runs. These two say what the services
+ * cannot: who owns the result, and that we say what is unfinished. They sat in
+ * a band of their own, "We build in your codebase", until it merged into the
+ * services band.
  *
  * Typed here and imported by the Markdown mirror, so the page and the document
  * version of it cannot drift.
  */
 export const ENGAGEMENT: readonly CopyItem[] = [
-  {
-    body: 'Helix already has its token layer, components, framework types, sandbox, and build checks. Your project starts from that.',
-    name: 'The system is already built',
-  },
-  {
-    body: 'A typical engagement is four weeks at two days a week. The same work started from nothing takes months.',
-    name: 'The work takes weeks',
-  },
   {
     body: 'The work lands in your repository under your license. We hand it over as we go, so you do not need us on a retainer afterward.',
     name: 'You keep all of it',
@@ -194,8 +189,3 @@ export const ENGAGEMENT: readonly CopyItem[] = [
     name: 'We tell you what is not done',
   },
 ]
-
-/** The frame above those four cards. */
-export const ENGAGEMENT_COPY = {
-  title: 'We build in your codebase',
-} as const

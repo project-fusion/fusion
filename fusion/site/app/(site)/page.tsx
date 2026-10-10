@@ -12,15 +12,9 @@ import { SectionTitle } from '@/components/section-title/section-title'
 import { Showcase } from '@/components/showcase/showcase'
 import { ThemeScope } from '@/components/theme-context/theme-context'
 import { ThemeFab } from '@/components/theme-fab/theme-fab'
+import { XRay } from '@/components/x-ray/x-ray'
 import { INSIGHTS } from '@/content/insights'
-import {
-  DELIVERY,
-  ENGAGEMENT,
-  ENGAGEMENT_COPY,
-  HERO,
-  MECHANISMS,
-  PROBLEM,
-} from '@/content/landing/helix-landing'
+import { DELIVERY, ENGAGEMENT, HERO, MECHANISMS, PROBLEM } from '@/content/landing/helix-landing'
 import { SERVICES } from '@/content/services/services'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import styles from './page.module.css'
@@ -123,6 +117,7 @@ export default function Home() {
                   <Link data-link="quiet" href="/helix/theme">
                     Build a theme
                   </Link>
+                  <XRay />
                 </helix-flex>
               </helix-flex>
             </helix-flex>
@@ -168,34 +163,28 @@ export default function Home() {
             ))}
           </div>
 
-          <helix-flex class={`${band.bandSection} siteActions`} data-density="lg">
-            <Link data-button="subtle" href="/company/services">
-              Compare the services
-            </Link>
-          </helix-flex>
-        </Band>
-
-        {/* **What the work is, after what it costs.** The band above is three
-          ways to buy and a link to the services; this is the half of the heading
-          those cannot answer. A reader deciding whether to hire engineers wants
-          to know what having them in the repository is like, and the honest
-          answers are that the system is already built, that this is why it is
-          quick, that they keep it, and that we say what is unfinished. */}
-        <Band>
-          <helix-flex class={band.bandSection} direction="column" gap="md">
-            <Eyebrow>Working with us</Eyebrow>
-            <SectionTitle>{ENGAGEMENT_COPY.title}</SectionTitle>
-          </helix-flex>
-
-          <div className={`${band.bandRow} ${styles.stagger}`}>
+          {/* **What the work is like, under what it is.** Two lines that the
+              services cannot say: who owns the result, and that we say what is
+              unfinished. They were a band of their own with two more cards
+              that restated the services, and the page read the offer twice. A
+              quiet row under the services, set smaller than them, because they
+              qualify the offer rather than add to it. */}
+          <div className={`${band.bandSection} ${styles.terms}`}>
             {ENGAGEMENT.map((one) => (
-              <helix-flex class={band.bandCell} direction="column" gap="sm" key={one.name}>
-                <Claim>{one.name}</Claim>
-                <helix-text as="p" emphasis="muted">
+              <helix-flex direction="column" gap="2xs" key={one.name}>
+                <helix-text as="h3" variant="body-strong">
+                  {one.name}
+                </helix-text>
+                <helix-text as="p" emphasis="muted" variant="caption">
                   {one.body}
                 </helix-text>
               </helix-flex>
             ))}
+            <helix-flex class={`${styles.termsAction} siteActions`} data-density="lg">
+              <Link data-button="subtle" href="/company/services">
+                Compare the services
+              </Link>
+            </helix-flex>
           </div>
         </Band>
 
