@@ -24,14 +24,23 @@ interface Example {
   removed: readonly string[]
 }
 
-/** The kinds the example's nodes are, Trace's `NodeKind` and Engram's facts, and how each is drawn. */
+/**
+ * The kinds the example's nodes are, Trace's `NodeKind` and Engram's facts,
+ * and how each is drawn.
+ *
+ * **Every kind a sphere, and larger toward the answer.** The columns already
+ * say what kind a note is, with the group's name over each, so a shape per
+ * kind said it twice, and only a circle takes the glass material the frame
+ * draws a shaded sphere with. Sizes rise from what came in to the answer it
+ * produced, so the trace reads as gathering toward its output.
+ */
 const KINDS = {
-  context: { group: 'Contexts', shape: 'diamond' },
-  fact: { group: 'Facts, in Engram', shape: 'circle' },
-  memory: { group: 'Memories', shape: 'ring' },
-  output: { group: 'Outputs', shape: 'circle' },
-  source: { group: 'Sources', shape: 'square' },
-  tool_call: { group: 'Tool calls', shape: 'diamond' },
+  context: { group: 'Contexts', shape: 'circle', size: 5 },
+  fact: { group: 'Facts, in Engram', shape: 'circle', size: 4 },
+  memory: { group: 'Memories', shape: 'circle', size: 4.5 },
+  output: { group: 'Outputs', shape: 'circle', size: 6.5 },
+  source: { group: 'Sources', shape: 'circle', size: 4 },
+  tool_call: { group: 'Tool calls', shape: 'circle', size: 4 },
 } as const
 
 /**
@@ -56,6 +65,8 @@ export interface TraceNode {
   id: string
   label: string
   shape: 'circle' | 'diamond' | 'ring' | 'square'
+  /** How large the frame draws it, relative to the others. */
+  size: number
   tone?: 'neutral' | 'primary'
   x: number
   y: number

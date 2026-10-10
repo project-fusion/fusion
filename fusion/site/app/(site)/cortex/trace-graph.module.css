@@ -92,7 +92,7 @@
    notes sit on the light like everything else in the card. */
 .traceFrame {
   --graph-background-color: transparent;
-  --graph-block-size: min(60svh, 30rem);
+  --graph-block-size: min(64svh, 34rem);
   --graph-border-color: transparent;
 }
 
