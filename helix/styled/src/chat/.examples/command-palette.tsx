@@ -47,7 +47,7 @@ export function Example() {
             slot="composer"
           >
             <helix-text
-              emphasis="subtle"
+              emphasis="muted"
               slot="start"
               variant="caption"
             >

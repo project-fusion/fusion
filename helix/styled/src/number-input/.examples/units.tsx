@@ -6,7 +6,7 @@ export function Example() {
       min={0}
     >
       <helix-text
-        emphasis="subtle"
+        emphasis="muted"
         slot="end"
         variant="caption"
       >

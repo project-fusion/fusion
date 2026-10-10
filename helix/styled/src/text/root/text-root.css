@@ -149,10 +149,6 @@
   color: var(--helix-color-foreground-muted);
 }
 
-:host([emphasis="subtle"]) {
-  color: var(--helix-color-foreground-subtle);
-}
-
 :host([tone="accent"]) {
   color: var(--helix-color-accent);
 }
@@ -177,27 +173,27 @@
   color: var(--helix-color-warning);
 }
 
-:host([tone="accent"]:is([emphasis="muted"], [emphasis="subtle"])) {
+:host([tone="accent"][emphasis="muted"]) {
   color: var(--helix-color-accent-muted);
 }
 
-:host([tone="danger"]:is([emphasis="muted"], [emphasis="subtle"])) {
+:host([tone="danger"][emphasis="muted"]) {
   color: var(--helix-color-danger-muted);
 }
 
-:host([tone="info"]:is([emphasis="muted"], [emphasis="subtle"])) {
+:host([tone="info"][emphasis="muted"]) {
   color: var(--helix-color-info-muted);
 }
 
-:host([tone="primary"]:is([emphasis="muted"], [emphasis="subtle"])) {
+:host([tone="primary"][emphasis="muted"]) {
   color: var(--helix-color-primary-muted);
 }
 
-:host([tone="success"]:is([emphasis="muted"], [emphasis="subtle"])) {
+:host([tone="success"][emphasis="muted"]) {
   color: var(--helix-color-success-muted);
 }
 
-:host([tone="warning"]:is([emphasis="muted"], [emphasis="subtle"])) {
+:host([tone="warning"][emphasis="muted"]) {
   color: var(--helix-color-warning-muted);
 }
 

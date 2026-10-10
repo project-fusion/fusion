@@ -21,7 +21,7 @@ export function Example() {
           </helix-text>
           <helix-text
             as="span"
-            emphasis="subtle"
+            emphasis="muted"
             variant="caption"
           >
             Nightly backups, kept for 30 days.
@@ -44,7 +44,7 @@ export function Example() {
           </helix-text>
           <helix-text
             as="span"
-            emphasis="subtle"
+            emphasis="muted"
             variant="caption"
           >
             A record of each change and who made it.
