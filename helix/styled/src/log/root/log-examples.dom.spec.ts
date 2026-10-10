@@ -8,6 +8,7 @@ import {
   type Updatable,
 } from '@fusion.dev/helix-testing/dom'
 import search from '../.examples/search.html' with { type: 'text' }
+import vercel from '../.examples/vercel.html' with { type: 'text' }
 import written from '../.examples/written.html' with { type: 'text' }
 
 beforeAll(async () => {
@@ -68,5 +69,22 @@ describe('the search example', () => {
       (line) => part(line as HTMLElement, 'line') !== null,
     )
     expect(shown).toHaveLength(3)
+  })
+})
+
+describe('the vercel example', () => {
+  run('reads each phase as a step, timed from its lines, and its warning apart', async () => {
+    await example(vercel)
+    await settle(log())
+    const groups = [...(log().shadowRoot?.querySelectorAll('[part="row"] > helix-log-group') ?? [])]
+    expect(
+      groups.map((group) => [group.getAttribute('heading'), group.getAttribute('duration')]),
+    ).toEqual([
+      ['vercel build', '1s'],
+      ['install command', '32s'],
+      ['next build', '1m 46s'],
+      ['Deploying outputs', '7s'],
+    ])
+    expect(log().lines.find((line) => line.level === 'warn')?.text).toContain('Detected "engines"')
   })
 })

@@ -24,6 +24,13 @@
    Muted rather than subtle, because a number stands on the band of an error
    or a marked line too: the subtle ink measured 4.09:1 on the marked band and
    4.45:1 on the error band, under the 4.5:1 the muted ink clears on both. */
+/* A number that is a button wears nothing of a button's own. The reset has
+   no weight, so the number's rule below still sets everything it names. */
+:where(button[part="number"]) {
+  all: unset;
+  box-sizing: border-box;
+}
+
 [part="number"] {
   color: var(--helix-color-foreground-muted);
   flex: none;
@@ -34,12 +41,18 @@
   user-select: none;
 }
 
-a[part="number"]:hover {
+a[part="number"]:hover,
+button[part="number"]:hover {
   color: var(--helix-color-foreground);
+  cursor: pointer;
+}
+
+a[part="number"]:hover {
   text-decoration: underline;
 }
 
-a[part="number"]:focus-visible {
+a[part="number"]:focus-visible,
+button[part="number"]:focus-visible {
   border-radius: var(--helix-radii-sm);
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: calc(var(--helix-size-focus-offset) * -1);
@@ -88,6 +101,22 @@ a[part="number"]:focus-visible {
     --log-mark-background-color,
     color-mix(in oklab, var(--helix-color-primary) 12%, transparent)
   );
+}
+
+/* A selected line takes a tint of the info color, as a code host draws a
+   selection, and its number the full ink, so the range reads at the edge.
+   Not the primary the marked band uses: in a neutral theme the primary is
+   near black, and a fifth of it was a flat gray that swallowed the red of an
+   error line under it. */
+[part~="line-selected"] {
+  background-color: var(
+    --log-selected-background-color,
+    color-mix(in oklab, var(--helix-color-info) 14%, transparent)
+  );
+}
+
+[part~="line-selected"] > [part="number"] {
+  color: var(--helix-color-foreground);
 }
 
 [part~="run"] {

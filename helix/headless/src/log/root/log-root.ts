@@ -6,6 +6,8 @@ import {
   HelixElement,
   HelixExpandEvent,
   HelixPinEvent,
+  HelixSelectEvent,
+  HelixSelectedEvent,
   hostAria,
   MixinCollection,
   onUnlessFalse,
@@ -32,10 +34,15 @@ import {
   type LogLine,
   type LogParser,
   type LogStatus,
+  timeOf,
 } from '../buffer.js'
 import type { HelixHeadlessLogGroup } from '../group/log-group.js'
-import { type HelixHeadlessLogLine, type LogTimes, timeOf } from '../line/log-line.js'
+import type { HelixHeadlessLogLine, LogTimes } from '../line/log-line.js'
+import { LOG_FORMATS } from '../parsers.js'
 import { type LogRow, type LogRows, logRows } from '../rows.js'
+
+/** A line the log draws from data, as the log finds it in its own shadow root. */
+type HTMLHeadlessLine = HelixHeadlessLogLine & HTMLElement
 
 /** Text a log reads as it arrives: a stream, or anything `for await` reads. */
 export type LogSource = AsyncIterable<string | Uint8Array> | ReadableStream<string | Uint8Array>
@@ -104,8 +111,15 @@ interface Heard {
  * starts the line over, so a progress bar stays one line, and the line still
  * being written is shown as it stands. ANSI colors and weights are drawn, in
  * the sixteen colors the styled tier takes from your theme, and every other
- * escape code is dropped. Give `parse` a function to read each finished line,
- * such as a level off its prefix or a group off a marker.
+ * escape code is dropped.
+ *
+ * **Read a CI log's own markers with `format`.** `github-actions` reads the
+ * workflow commands a step writes, `::group::` and `::error::` among them,
+ * and the times at the start of a downloaded log. `vercel` reads a Vercel
+ * build log's phases and its warnings. Each step opens as it starts, folds
+ * once it passes, stays open where it failed, and is timed from its lines.
+ * For any other log, give `parse` a function that reads each finished line:
+ * it returns a level, a group, or `open` and `close` to start and end a step.
  *
  * **Steps fold.** Lines that name a group in `groups` stand under its heading,
  * which shows its status and how long it took and opens and closes the lines.
@@ -119,6 +133,18 @@ interface Heard {
  * makes each number a link, such as `#L{n}`. `scrollToLine(n)` takes a reader
  * to one. `timestamps` shows each line's `at`, on the clock or as the time
  * into the run. `mark-lines` marks lines, such as `12, 40-44`.
+ *
+ * **`selectable` lets a reader select lines**, as a code host does: pressing a
+ * number selects its line, and pressing another with Shift selects every line
+ * between them. `selected-lines` holds the selection, such as `12-20`, and
+ * `helix-select` asks before it changes. With a `line-href` that is a
+ * fragment, the address follows the selection, `#L12` or `#L12-L20`, and a
+ * page opened at one selects it and scrolls to it.
+ *
+ * **The numbers are one tab stop.** Where they are links or buttons, Tab
+ * reaches the one a reader last used, or the first selected, and the arrow
+ * keys move between them, with Home and End for the first and the last. With
+ * Shift on a `selectable` log, the selection follows.
  *
  * **What a screen reader hears.** The log is a `log` and stays quiet as lines
  * arrive, since reading a build aloud line by line helps nobody. A separate
@@ -145,8 +171,10 @@ interface Heard {
  * @slot toolbar - Controls above the log, such as a search field or a button that wraps lines.
  *
  * @event {HelixBeforePinEvent} helix-before-pin - Fired when the reader leaves the newest line by scrolling, or comes back to it. Cancelable.
- * @event {HelixExpandEvent} helix-expand - Fired after a reader opens or closes a group drawn from `groups`, with the `id` of every open group in `detail.value`, separated by commas.
+ * @event {HelixExpandEvent} helix-expand - Fired after a reader opens or closes a step drawn from `groups` or opened by a parser, with the `id` of every open group in `detail.value`, separated by commas.
  * @event {HelixPinEvent} helix-pin - Fired after the log follows the newest line or lets go of it, with `true` or `false` in `detail.value`.
+ * @event {HelixSelectEvent} helix-select - Fired when a reader presses a number to change the selection, with the lines asked for in `detail.value`. Cancelable.
+ * @event {HelixSelectedEvent} helix-selected - Fired after the selection changes, with the lines now selected in `detail.value`, such as `12-20`.
  *
  * @csspart after - The space the rows below the drawn ones would take. Only for lines drawn from data.
  * @csspart before - The space the rows above the drawn ones would take. Only for lines drawn from data.
@@ -175,6 +203,7 @@ interface Heard {
  * @csspart line-run-italic - A run drawn italic.
  * @csspart line-run-strike - A run drawn struck through.
  * @csspart line-run-underline - A run drawn underlined.
+ * @csspart line-selected - The row of a line drawn from data that is selected.
  * @csspart line-text - The text of a line drawn from data.
  * @csspart line-time - The time of a line drawn from data.
  * @csspart line-warn - The row of a line drawn from data at `warn`.
@@ -278,6 +307,25 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
   fallbackLabel = 'Log'
 
   /**
+   * The format written text is in, read with a parser Helix ships:
+   * `github-actions` reads a GitHub Actions log's workflow commands into steps
+   * and levels, and `vercel` a Vercel build log's phases and warnings. Absent
+   * reads none. `parse` wins over it.
+   */
+  @property()
+  get format(): 'github-actions' | 'vercel' | undefined {
+    return this.formatValue
+  }
+
+  /* Handed to the buffer at once, for `parse`'s reason. */
+  set format(next: 'github-actions' | 'vercel' | undefined) {
+    const previous = this.formatValue
+    this.formatValue = next
+    this.buffer.parse = this.parseValue ?? this.formatParser
+    this.requestUpdate('format', previous)
+  }
+
+  /**
    * What a screen reader hears when a step finishes or fails. `{heading}` is
    * the step's heading and `{status}` is `done` or `failed`.
    */
@@ -355,19 +403,20 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
 
   /**
    * Reads each finished line of written text: return the fields to set, such
-   * as `level` or `group`, or `null` to drop the line. Lines in `lines` are
-   * taken as they are.
+   * as `level`, `open` or `close` to start or end a step, or `null` to drop
+   * the line. Lines in `lines` are taken as they are. Wins over `format`.
    */
   @property({ attribute: false })
   get parse(): LogParser | undefined {
-    return this.buffer.parse
+    return this.parseValue
   }
 
   /* Handed to the buffer at once, since text written straight after the
      assignment is read before the next update. */
   set parse(next: LogParser | undefined) {
-    const previous = this.buffer.parse
-    this.buffer.parse = next
+    const previous = this.parseValue
+    this.parseValue = next
+    this.buffer.parse = next ?? this.formatParser
     this.requestUpdate('parse', previous)
   }
 
@@ -398,6 +447,21 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
   @words
   @property({ attribute: 'resume-label' })
   resumeLabel = 'Jump to latest'
+
+  /**
+   * Whether pressing a line's number selects the line, and pressing another
+   * with Shift selects every line between them. Each number is then a
+   * button, or a link with `line-href`, and the arrow keys move between them.
+   */
+  @property({ type: Boolean })
+  selectable = false
+
+  /**
+   * The lines selected, as a number or a range such as `12-20`. Empty selects
+   * none. A reader's press asks first: `helix-select` is cancelable.
+   */
+  @property({ attribute: 'selected-lines' })
+  selectedLines = ''
 
   /**
    * Text to read as it arrives, to the end: a `ReadableStream` of text or
@@ -436,6 +500,20 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
 
   @state()
   private pinnedState: boolean | undefined = undefined
+
+  private formatValue: 'github-actions' | 'vercel' | undefined = undefined
+
+  private parseValue: LogParser | undefined = undefined
+
+  /** The number that is the log's one tab stop among its numbers, or 0 before anyone moved. */
+  @state()
+  private stop = 0
+
+  /** The line a Shift press measures a range from. */
+  private selectionAnchor: number | undefined = undefined
+
+  /** The steps the last update saw, which a page's `open` is compared with. */
+  private lastGroups: readonly LogGroup[] = []
 
   @state()
   private doneState: boolean | undefined = undefined
@@ -515,6 +593,38 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
       this.groups.length > 0 ||
       this.sourceValue !== null
     )
+  }
+
+  /** The parser `format` names. */
+  private get formatParser(): LogParser | undefined {
+    return this.formatValue === undefined ? undefined : LOG_FORMATS[this.formatValue]
+  }
+
+  /** The steps from `groups`, then the steps a parser opened. */
+  private get allGroups(): readonly LogGroup[] {
+    return this.buffer.steps.length === 0 ? this.groups : [...this.groups, ...this.buffer.steps]
+  }
+
+  /** Whether the numbers take focus: links with `line-href`, or buttons when `selectable`. */
+  private get interactive(): boolean {
+    return this.lineNumbers && (this.selectable || this.lineHref !== '')
+  }
+
+  /** The selection as its first and last line, or undefined where there is none. */
+  private get selection(): [number, number] | undefined {
+    const found = /^\s*(\d+)(?:\s*-\s*(\d+))?\s*$/.exec(this.selectedLines)
+    if (!found) {
+      return undefined
+    }
+    const first = Number(found[1])
+    const last = Number(found[2] ?? found[1])
+    return [Math.min(first, last), Math.max(first, last)]
+  }
+
+  /** Whether line `number` is selected. */
+  private selected(number: number): boolean {
+    const range = this.selection
+    return range !== undefined && number >= range[0] && number <= range[1]
   }
 
   /** The element that scrolls, once there is one. */
@@ -628,13 +738,232 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     return true
   }
 
+  /**
+   * Asks to select `value`, a line or a range, and applies it unless refused,
+   * then says so and, with a `line-href` that is a fragment such as `#L{n}`,
+   * puts the selection in the address.
+   */
+  private requestSelect(value: string): void {
+    if (value === this.selectedLines) {
+      return
+    }
+    requestChange({
+      apply: (next) => {
+        this.selectedLines = next
+        this.dispatchEvent(new HelixSelectedEvent({ value: next }))
+        this.writeAddress(next)
+      },
+      event: (next) => new HelixSelectEvent({ value: next }),
+      host: this,
+      next: value,
+    })
+  }
+
+  /**
+   * What the address holds for a selection, as `line-href` spells a line:
+   * `#L12`, and `#L12-L20` for a range. Undefined where `line-href` is not a
+   * fragment, since a link elsewhere is the page's to follow.
+   */
+  private address(value: string): string | undefined {
+    if (!this.lineHref.startsWith('#') || !this.lineHref.includes('{n}')) {
+      return undefined
+    }
+    const found = /^(\d+)(?:-(\d+))?$/.exec(value)
+    if (!found) {
+      return undefined
+    }
+    const first = this.lineHref.replaceAll('{n}', found[1] ?? '')
+    return found[2] === undefined
+      ? first
+      : `${first}-${this.lineHref.replaceAll('{n}', found[2]).slice(1)}`
+  }
+
+  /**
+   * Puts a selection in the address without a new history entry, so the back
+   * button leaves the page rather than walking through every line pressed.
+   */
+  private writeAddress(value: string): void {
+    const hash = this.address(value)
+    if (hash !== undefined && typeof history !== 'undefined') {
+      history.replaceState(history.state, '', hash)
+    }
+  }
+
+  /**
+   * Reads a line or a range out of the address, as `line-href` spells one,
+   * selects it where the log is `selectable`, and scrolls to it.
+   */
+  private readonly readAddress = (): void => {
+    if (!this.lineHref.startsWith('#') || !this.lineHref.includes('{n}')) {
+      return
+    }
+    const one = this.lineHref
+      .split('{n}')
+      .map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('(\\d+)')
+    const found = new RegExp(`^${one}(?:-${one.replace(/^#/, '')})?$`).exec(location.hash)
+    if (!found) {
+      return
+    }
+    const first = Number(found[1])
+    const last = Number(found[2] ?? found[1])
+    if (this.selectable) {
+      this.selectedLines =
+        first === last ? String(first) : `${Math.min(first, last)}-${Math.max(first, last)}`
+    }
+    this.selectionAnchor = first
+    this.stop = Math.min(first, last)
+    void this.updateComplete.then(() =>
+      requestAnimationFrame(() => {
+        void this.scrollToLine(Math.min(first, last))
+      }),
+    )
+  }
+
+  /**
+   * The numbers of the lines a reader can move between, in order: what is
+   * drawn from data, or the lines written as children that no query hides
+   * and no shut group folds away.
+   */
+  private reachable(): number[] {
+    if (this.fed) {
+      return this.view.rows.flatMap((row) => (row.kind === 'line' ? [row.number] : []))
+    }
+    return this.childLines.flatMap((line, at) =>
+      !line.logFiltered && this.childGroups.every((group) => group.open || !group.contains(line))
+        ? [at + 1]
+        : [],
+    )
+  }
+
+  /**
+   * The number that is the tab stop among `numbers`: the one a reader last
+   * moved to, else the first selected, else the first.
+   */
+  private stopAmong(numbers: readonly number[]): number {
+    if (numbers.includes(this.stop)) {
+      return this.stop
+    }
+    const range = this.selection
+    const first = range
+      ? numbers.find((number) => number >= range[0] && number <= range[1])
+      : undefined
+    return first ?? numbers[0] ?? 0
+  }
+
+  /** Moves focus to line `number`'s number, drawing it first where it is windowed. */
+  private async focusLine(number: number): Promise<void> {
+    this.stop = number
+    if (this.fed) {
+      const index = this.view.rows.findIndex((row) => row.kind === 'line' && row.number === number)
+      if (index < 0) {
+        return
+      }
+      if (this.pinned) {
+        this.requestPinned(false)
+      }
+      this.virtualize.reveal(index)
+      this.virtualize.measure()
+      this.requestUpdate()
+      await this.updateComplete
+      const line = [
+        ...(this.renderRoot?.querySelectorAll?.<HTMLHeadlessLine>('[part="row"] > *') ?? []),
+      ].find((each) => each.logNumber === number)
+      await line?.updateComplete
+      line?.focusNumber()
+      return
+    }
+    await this.updateComplete
+    const line = this.childLines[number - 1]
+    await line?.updateComplete
+    line?.focusNumber()
+  }
+
+  /** The line a number belongs to, out of an event's path, and its number. */
+  private numberFrom(path: readonly EventTarget[]): number | undefined {
+    const onNumber = path.some(
+      (target) => target instanceof Element && target.getAttribute('part') === 'number',
+    )
+    if (!onNumber) {
+      return undefined
+    }
+    const line = path.find(
+      (target): target is HelixHeadlessLogLine =>
+        typeof target === 'object' && target !== null && 'isLogLine' in target,
+    )
+    return line && line.logNumber > 0 ? line.logNumber : undefined
+  }
+
+  /**
+   * A press on a number selects its line, or with Shift every line from the
+   * last one pressed. A link's own navigation is held back while it selects,
+   * since the selection writes the address itself.
+   */
+  private readonly handleClick = (event: MouseEvent): void => {
+    const number = this.numberFrom(event.composedPath())
+    if (number === undefined) {
+      return
+    }
+    this.stop = number
+    if (!this.selectable) {
+      return
+    }
+    event.preventDefault()
+    const anchor = this.selectionAnchor
+    if (event.shiftKey && anchor !== undefined) {
+      this.requestSelect(`${Math.min(anchor, number)}-${Math.max(anchor, number)}`)
+      return
+    }
+    this.selectionAnchor = number
+    this.requestSelect(String(number))
+  }
+
+  /**
+   * The arrow keys move between numbers, and Home and End go to the first and
+   * the last, from a number with focus. With Shift on a `selectable` log, the
+   * selection follows.
+   */
+  private readonly handleNumberKey = (event: KeyboardEvent): void => {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) {
+      return
+    }
+    const from = this.numberFrom(event.composedPath())
+    if (from === undefined) {
+      return
+    }
+    const numbers = this.reachable()
+    const at = numbers.indexOf(from)
+    const to =
+      event.key === 'ArrowDown'
+        ? numbers[Math.min(numbers.length - 1, at + 1)]
+        : event.key === 'ArrowUp'
+          ? numbers[Math.max(0, at - 1)]
+          : event.key === 'Home'
+            ? numbers[0]
+            : event.key === 'End'
+              ? numbers.at(-1)
+              : undefined
+    if (to === undefined) {
+      return
+    }
+    event.preventDefault()
+    if (event.shiftKey && this.selectable) {
+      const anchor = this.selectionAnchor ?? from
+      this.selectionAnchor = anchor
+      this.requestSelect(
+        anchor === to ? String(to) : `${Math.min(anchor, to)}-${Math.max(anchor, to)}`,
+      )
+    }
+    void this.focusLine(to)
+  }
+
   /** Whether a group drawn from data is open: as the reader left it, or as `groups` seeded it. */
   private isOpen(id: string): boolean {
     const known = this.opened.get(id)
     if (known !== undefined) {
       return known
     }
-    const seeded = this.groups.find((group) => group.id === id)?.open ?? false
+    const seeded = this.allGroups.find((group) => group.id === id)?.open ?? false
     this.opened.set(id, seeded)
     return seeded
   }
@@ -646,7 +975,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
    */
   private reopen(previous: readonly LogGroup[] | undefined): void {
     const before = new Map((previous ?? []).map((group) => [group.id, group.open]))
-    for (const group of this.groups) {
+    for (const group of this.allGroups) {
       if (group.open !== undefined && before.has(group.id) && before.get(group.id) !== group.open) {
         this.opened.set(group.id, group.open)
       }
@@ -729,6 +1058,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     const marks = lineRuns(this.markLines)
     const needle = this.query.trim().toLowerCase()
     const start = this.childLines.map((line) => timeOf(line.at)).find((time) => time !== undefined)
+    const stop = this.interactive ? this.stopAmong(this.reachable()) : 0
     this.childLines.forEach((line, at) => {
       const filtered = needle !== '' && !(line.textContent ?? '').toLowerCase().includes(needle)
       whenHydrated(line, () => {
@@ -739,6 +1069,9 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
         line.logStart = start
         line.logMarked = inRuns(marks, at + 1)
         line.logFiltered = filtered
+        line.logSelectable = this.selectable
+        line.logSelected = this.selected(at + 1)
+        line.logStop = at + 1 === stop
       })
       if (!filtered && needle !== '') {
         for (const group of this.childGroups) {
@@ -769,7 +1102,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
   private listen(): Heard {
     const groups: Heard['groups'] = new Map()
     if (this.fed) {
-      for (const group of this.groups) {
+      for (const group of this.allGroups) {
         groups.set(group.id, { heading: group.heading, status: group.status })
       }
     } else {
@@ -923,10 +1256,14 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
       childList: true,
       subtree: true,
     })
+    this.addEventListener('click', this.handleClick)
+    this.addEventListener('keydown', this.handleNumberKey)
+    window.addEventListener('hashchange', this.readAddress)
     this.opening = true
     requestAnimationFrame(() => {
       this.opening = false
     })
+    this.readAddress()
     if (this.sourceValue !== null && !this.reading) {
       void this.readSource(this.sourceValue)
     }
@@ -934,6 +1271,9 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.removeEventListener('click', this.handleClick)
+    this.removeEventListener('keydown', this.handleNumberKey)
+    window.removeEventListener('hashchange', this.readAddress)
     this.watcher?.disconnect()
     this.watcher = undefined
     this.grower?.disconnect()
@@ -947,9 +1287,10 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'region' })
-    if (changed.has('groups')) {
-      this.reopen(changed.get('groups') as readonly LogGroup[] | undefined)
-    }
+    /* Every update, since a parser's steps change with the text as well as a
+       page's `groups` do. */
+    this.reopen(this.lastGroups)
+    this.lastGroups = this.allGroups
     if (changed.has('limit')) {
       this.buffer.limit = Math.max(0, Math.floor(this.limit || 0))
       this.buffer.write('')
@@ -973,7 +1314,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     if (this.fed) {
       this.view = logRows({
         current: this.buffer.current(),
-        groups: this.groups,
+        groups: this.allGroups,
         lines: this.buffer.lines,
         open: (id) => this.isOpen(id),
         query: this.query,
@@ -1043,7 +1384,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     }
     this.opened.set(id, group.open)
     this.requestUpdate()
-    const open = this.groups.filter((each) => this.isOpen(each.id)).map((each) => each.id)
+    const open = this.allGroups.filter((each) => this.isOpen(each.id)).map((each) => each.id)
     this.dispatchEvent(new HelixExpandEvent({ value: open.join(',') }))
   }
 
@@ -1052,6 +1393,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     row: LogRow,
     marks: ReadonlyArray<[number, number]>,
     start: number | undefined,
+    stop: number,
   ): TemplateResult {
     if (row.kind === 'group') {
       const group = this.tag('log-group')
@@ -1071,7 +1413,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     const line = this.tag('log-line')
     const { at, level } = row.line
     return html`<${line}
-      exportparts="line, line-debug, line-error, line-marked, line-warn, match: line-match,
+      exportparts="line, line-debug, line-error, line-marked, line-selected, line-warn, match: line-match,
         number: line-number, run: line-run, run-bold: line-run-bold, run-dim: line-run-dim,
         run-italic: line-run-italic, run-strike: line-run-strike, run-underline: line-run-underline,
         text: line-text, time: line-time"
@@ -1083,6 +1425,9 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
       .logNumber=${row.number}
       .logNumbers=${this.lineNumbers}
       .logQuery=${this.query}
+      .logSelectable=${this.selectable}
+      .logSelected=${this.selected(row.number)}
+      .logStop=${row.number === stop}
       .logStart=${start}
       .logTimes=${this.timestamps ?? ''}
       .runs=${this.buffer.runsOf(row.line)}
@@ -1121,6 +1466,11 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     const marks = lineRuns(this.markLines)
     /* Once a render, since finding it can walk every line. */
     const start = this.timestamps === 'relative' ? this.firstTime : undefined
+    /* The tab stop among the numbers drawn, so the window always holds one. */
+    const drawn = this.view.rows
+      .slice(first, last)
+      .flatMap((row) => (row.kind === 'line' ? [row.number] : []))
+    const stop = this.interactive ? this.stopAmong(drawn) : 0
     /* `flex: none` inline, because the room is only room if it keeps its size,
        as `Chat` measured. */
     return html`<div part="before" role="presentation" style="block-size: ${before}px; flex: none"></div>
@@ -1128,7 +1478,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
         this.view.rows.slice(first, last),
         (row) => (row.kind === 'group' ? `group:${row.group.id}` : `line:${row.number}`),
         (row, offset) =>
-          html`<div part="row" data-index=${first + offset}>${this.renderRow(row, marks, start)}</div>`,
+          html`<div part="row" data-index=${first + offset}>${this.renderRow(row, marks, start, stop)}</div>`,
       )}
       <div part="after" role="presentation" style="block-size: ${after}px; flex: none"></div>`
   }

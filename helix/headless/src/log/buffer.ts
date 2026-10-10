@@ -36,13 +36,57 @@ export interface LogGroup {
 }
 
 /**
+ * What a parser says about one finished line: the line's fields, and whether
+ * it opens or closes a step.
+ */
+export interface LogParsed extends Partial<LogLine> {
+  /**
+   * Closes the step that is open. Its status is `failed` where a line in it
+   * was at `error`, and `done` otherwise, and its duration runs from its first
+   * line's `at` to this one's, unless either is given here.
+   */
+  close?: boolean | { duration?: string; status?: LogStatus }
+  /**
+   * Opens a step with this heading, closing the one that is open. The lines
+   * after it belong to the step until another opens or this one closes.
+   */
+  open?: string
+}
+
+/**
  * Reads one finished line of written text and says what it is.
  *
- * Return the fields to set, such as a `level` read off a prefix or a `group`
- * read off a marker, and `text` to show something else. Return `null` to drop
- * the line, such as a marker that only opens a group.
+ * Return the fields to set, such as a `level` read off a prefix, and `text` to
+ * show something else. Return `null` to drop the line. Return `open` or
+ * `close` to start or end a step, and the log keeps its steps itself: a line
+ * carrying either is a marker and is dropped, unless the result sets `text`,
+ * in which case an opening line is the step's first and a closing line stands
+ * after it.
  */
-export type LogParser = (text: string) => Partial<LogLine> | null | undefined
+export type LogParser = (text: string) => LogParsed | null | undefined
+
+/** `seconds` as a step's duration reads: `12s`, `1m 12s`, or `1h 2m`. */
+export const stepDuration = (seconds: number): string => {
+  const whole = Math.max(0, Math.round(seconds))
+  if (whole < 60) {
+    return `${whole}s`
+  }
+  if (whole < 3600) {
+    const rest = whole % 60
+    return rest === 0 ? `${Math.floor(whole / 60)}m` : `${Math.floor(whole / 60)}m ${rest}s`
+  }
+  const minutes = Math.floor((whole % 3600) / 60)
+  return minutes === 0 ? `${Math.floor(whole / 3600)}h` : `${Math.floor(whole / 3600)}h ${minutes}m`
+}
+
+/** Milliseconds since the epoch for `at`, or undefined where it names no time. */
+export const timeOf = (at: number | string | undefined): number | undefined => {
+  if (at === undefined || at === '') {
+    return undefined
+  }
+  const time = typeof at === 'number' || /^\d+$/.test(at) ? Number(at) : Date.parse(at)
+  return Number.isFinite(time) ? time : undefined
+}
 
 /**
  * The text of a run, kept as lines.
@@ -62,6 +106,10 @@ export type LogParser = (text: string) => Partial<LogLine> | null | undefined
  * **Color carries from line to line**, as it does in a terminal, so a block
  * that opens with green and closes many lines later is green throughout. It
  * carries through text a carriage return replaced as well.
+ *
+ * **Steps a parser opens are kept here**, in `steps`, each a new object
+ * whenever it changes, so a log can compare one set with the next and see a
+ * step finish.
  */
 export class LogBuffer {
   /** The finished lines kept, oldest first. */
@@ -75,6 +123,16 @@ export class LogBuffer {
 
   /** Reads each finished line of written text. */
   parse: LogParser | undefined = undefined
+
+  /** The steps `parse` opened, in order, replaced as a whole when one changes. */
+  steps: LogGroup[] = []
+
+  /** The step that is open, by its place in `steps`. */
+  private openStep: number | undefined = undefined
+
+  /** Whether a line in the open step was at `error`, and when the step began. */
+  private stepFailed = false
+  private stepStarted: number | undefined = undefined
 
   /** The line still being written, as it reads now. */
   private partial = ''
@@ -125,6 +183,10 @@ export class LogBuffer {
     this.returned = false
     this.lineStyle = {}
     this.shown = undefined
+    this.steps = []
+    this.openStep = undefined
+    this.stepFailed = false
+    this.stepStarted = undefined
     this.trim()
   }
 
@@ -138,7 +200,8 @@ export class LogBuffer {
     if (this.partial === '') {
       return undefined
     }
-    const group = this.lines.at(-1)?.group
+    const group =
+      this.openStep === undefined ? this.lines.at(-1)?.group : this.steps[this.openStep]?.id
     if (this.shown?.text !== this.partial || this.shown.group !== group) {
       this.shown = group === undefined ? { text: this.partial } : { group, text: this.partial }
     }
@@ -170,11 +233,82 @@ export class LogBuffer {
     this.returned = false
     const read = this.parse?.(raw)
     if (read !== null) {
-      const line: LogLine = { ...read, text: read?.text ?? raw }
-      this.runs.set(line, line.text === raw ? flow.runs : parseAnsi(line.text, this.lineStyle).runs)
-      this.lines.push(line)
+      const { close, open, ...fields } = read ?? {}
+      const marker = close !== undefined || open !== undefined
+      const at = timeOf(fields.at)
+      if (close) {
+        this.closeStep(close, at)
+      }
+      if (open !== undefined) {
+        this.openStepNamed(open, at)
+      }
+      if (!marker || Object.hasOwn(fields, 'text')) {
+        const step = this.openStep === undefined ? undefined : this.steps[this.openStep]
+        const line: LogLine = {
+          ...(step && fields.group === undefined ? { group: step.id } : {}),
+          ...fields,
+          text: fields.text ?? raw,
+        }
+        if (step && line.group === step.id) {
+          this.stepFailed ||= line.level === 'error'
+          this.stepStarted ??= at
+          this.stepEnded = at ?? this.stepEnded
+        }
+        this.runs.set(
+          line,
+          line.text === raw ? flow.runs : parseAnsi(line.text, this.lineStyle).runs,
+        )
+        this.lines.push(line)
+      }
     }
     this.lineStyle = flow.style
+  }
+
+  /** When the open step's latest line was written. */
+  private stepEnded: number | undefined = undefined
+
+  /** Opens a step named `heading`, closing the one that is open. */
+  private openStepNamed(heading: string, at: number | undefined): void {
+    if (this.openStep !== undefined) {
+      this.closeStep(true, at)
+    }
+    this.steps = [
+      ...this.steps,
+      { heading, id: `step-${this.steps.length + 1}`, open: true, status: 'running' },
+    ]
+    this.openStep = this.steps.length - 1
+    this.stepFailed = false
+    this.stepStarted = at
+    this.stepEnded = at
+  }
+
+  /**
+   * Closes the open step: failed where one of its lines was at `error`, done
+   * otherwise, timed from its first line to `at`, and folded unless it failed,
+   * as a CI page folds a step that passed.
+   */
+  private closeStep(close: NonNullable<LogParsed['close']>, at: number | undefined): void {
+    const index = this.openStep
+    const step = index === undefined ? undefined : this.steps[index]
+    if (index === undefined || !step) {
+      return
+    }
+    const given = typeof close === 'object' ? close : {}
+    const status = given.status ?? (this.stepFailed ? 'failed' : 'done')
+    const end = at ?? this.stepEnded
+    const duration =
+      given.duration ??
+      (this.stepStarted !== undefined && end !== undefined
+        ? stepDuration((end - this.stepStarted) / 1000)
+        : undefined)
+    const closed: LogGroup = {
+      ...step,
+      ...(duration === undefined ? {} : { duration }),
+      open: status === 'failed',
+      status,
+    }
+    this.steps = this.steps.map((each, place) => (place === index ? closed : each))
+    this.openStep = undefined
   }
 
   /** Lets the oldest lines go past `limit`, all at once. */
