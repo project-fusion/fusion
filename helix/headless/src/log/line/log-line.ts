@@ -8,7 +8,7 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { LogRun } from '../ansi.js'
-import type { LogLevel } from '../buffer.js'
+import { type LogLevel, timeOf } from '../buffer.js'
 import { markMatches } from '../rows.js'
 
 /** A color named for the stylesheet, such as `red`, where anything else is CSS. */
@@ -16,15 +16,6 @@ const NAME = /^[a-z-]+$/
 
 /** How a line's time reads: the clock, or how far into the run it was written. */
 export type LogTimes = 'absolute' | 'relative'
-
-/** Milliseconds since the epoch for `at`, or undefined where it names no time. */
-export const timeOf = (at: number | string | undefined): number | undefined => {
-  if (at === undefined || at === '') {
-    return undefined
-  }
-  const time = typeof at === 'number' || /^\d+$/.test(at) ? Number(at) : Date.parse(at)
-  return Number.isFinite(time) ? time : undefined
-}
 
 /** `seconds` as `m:ss`, or `h:mm:ss` from an hour, which is how far into a run reads. */
 const elapsed = (seconds: number): string => {
@@ -57,9 +48,10 @@ const elapsed = (seconds: number): string => {
  * @csspart line-debug - The row of a line at `debug`.
  * @csspart line-error - The row of a line at `error`.
  * @csspart line-marked - The row of a line `mark-lines` names on the log.
+ * @csspart line-selected - The row of a line in the log's selection.
  * @csspart line-warn - The row of a line at `warn`.
  * @csspart match - Text that matches the log's `query`, in a line the log draws from data.
- * @csspart number - The line's number, shown with `line-numbers`, and a link with `line-href`.
+ * @csspart number - The line's number, shown with `line-numbers`: a link with `line-href`, and a button on a `selectable` log.
  * @csspart run - A stretch of text drawn in an ANSI style, in a line the log draws from data. Its color is `--log-run-color` and its background `--log-run-background-color`.
  * @csspart run-bold - A run drawn bold.
  * @csspart run-dim - A run drawn faint.
@@ -116,9 +108,21 @@ export class HelixHeadlessLogLine extends HelixElement {
   @property({ attribute: false })
   logQuery = ''
 
+  /** @internal Set by the log: whether pressing the number selects the line. */
+  @property({ attribute: false })
+  logSelectable = false
+
+  /** @internal Set by the log: whether the line is in the selection. */
+  @property({ attribute: false })
+  logSelected = false
+
   /** @internal Set by the log: when the first line was written, which `relative` counts from. */
   @property({ attribute: false })
   logStart: number | undefined = undefined
+
+  /** @internal Set by the log: whether the number is the log's one tab stop among its numbers. */
+  @property({ attribute: false })
+  logStop = false
 
   /** @internal Set by the log: how to show the time, or empty to hide it. */
   @property({ attribute: false })
@@ -139,20 +143,45 @@ export class HelixHeadlessLogLine extends HelixElement {
     this.toggleState('filtered', this.logFiltered)
   }
 
-  /** The number, as a link where the log gave one, or as text a screen reader skips. */
+  /**
+   * The number: a link where the log gave `line-href`, a button where the log
+   * is `selectable`, and otherwise text a screen reader skips.
+   *
+   * **One number in the log is a tab stop, and the rest are reached with the
+   * arrow keys**, so a log of a thousand lines is one stop on the way through
+   * the page. The log says which, with `logStop`.
+   */
   private renderNumber(): TemplateResult | typeof nothing {
     if (!this.logNumbers || this.logNumber <= 0) {
       return nothing
     }
     const number = String(this.logNumber)
+    const name = formatWords(this, 'lineLabel', { number: this.logNumber })
+    const stop = this.logStop ? 0 : -1
     if (this.logHref !== '') {
       return html`<a
         part="number"
         href=${this.logHref.replaceAll('{n}', number)}
-        aria-label=${formatWords(this, 'lineLabel', { number: this.logNumber })}
+        aria-label=${name}
+        aria-current=${this.logSelected ? 'true' : nothing}
+        tabindex=${stop}
       >${number}</a>`
     }
+    if (this.logSelectable) {
+      return html`<button
+        part="number"
+        type="button"
+        aria-label=${name}
+        aria-pressed=${this.logSelected ? 'true' : 'false'}
+        tabindex=${stop}
+      >${number}</button>`
+    }
     return html`<span part="number" aria-hidden="true">${number}</span>`
+  }
+
+  /** @internal Called by the log: moves focus to the number, where it takes focus. */
+  focusNumber(): void {
+    this.renderRoot.querySelector<HTMLElement>('a[part="number"], button[part="number"]')?.focus()
   }
 
   /** The time, on the clock or into the run, where the log asked for one and the line has one. */
@@ -221,7 +250,7 @@ export class HelixHeadlessLogLine extends HelixElement {
     }
     const level = this.level
     return html`<div
-      part="line${level ? { debug: ' line-debug', error: ' line-error', info: '', warn: ' line-warn' }[level] : ''}${this.logMarked ? ' line-marked' : ''}"
+      part="line${level ? { debug: ' line-debug', error: ' line-error', info: '', warn: ' line-warn' }[level] : ''}${this.logMarked ? ' line-marked' : ''}${this.logSelected ? ' line-selected' : ''}"
     >${this.renderNumber()}${this.renderTime()}<span part="text">${this.renderText()}</span></div>`
   }
 }
