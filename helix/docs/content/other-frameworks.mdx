@@ -8,9 +8,9 @@ trailing: true
 
 # Other frameworks
 
-This page covers Solid, Qwik, Lit, Ember, Alpine, htmx, and any other framework
-that puts elements in a document. They all follow the same three rules and need
-nothing else.
+This page covers Preact, Solid, Qwik, Lit, Ember, Alpine, htmx, and any other
+framework that puts elements in a document. They all follow the same three
+rules and need nothing else.
 
 ## The three rules
 
@@ -44,11 +44,12 @@ in full.
 
 | Framework | Notes |
 |---|---|
-| Solid | Sets properties on custom elements by default. Use `prop:` to force one and `attr:` to force the other. `on:helix-before-change` binds the literal name |
-| Qwik | Works as JSX. Bind with `document:on…` or a ref, since a plain `on*` prop is normalized |
-| Lit | `.prop=`, `?bool=`, and `@helix-before-change=` work with no setup |
-| Ember | Angle-bracket invocation passes attributes only, so set properties from a modifier |
 | Alpine, htmx | Markup and attributes only, which work with every component. Refusing a change needs script |
+| Ember | Angle-bracket invocation passes attributes only, so set properties from a modifier |
+| Lit | `.prop=`, `?bool=`, and `@helix-before-change=` work with no setup |
+| Preact | Sets a property when the element has one, and an attribute otherwise. `onhelix-before-change` binds the literal name. [Typings](#typings) says how to type the tags |
+| Qwik | Works as JSX. Bind with `document:on…` or a ref, since a plain `on*` prop is normalized |
+| Solid | Sets properties on custom elements by default. Use `prop:` to force one and `attr:` to force the other. `on:helix-before-change` binds the literal name. [Typings](#typings) says how to type the tags |
 
 We do not test these frameworks, so they share one page. If your framework needs
 something the three rules do not cover, tell us. It is a gap in this page or in
@@ -56,11 +57,37 @@ the library.
 
 ## Typings
 
-`@fusion.dev/helix/jsx` is the base for typing any framework that uses JSX, and
-the Svelte typings are built from it. If your framework needs a different
-format, use the manifest at `@fusion.dev/helix/custom-elements.json`. It
-describes every tag, prop, event, and part, and we generate all our typings from
-it.
+`@fusion.dev/helix/jsx` types the tags for React, Preact, and Solid, and it is
+the base for typing any other framework that uses JSX. The Svelte typings read
+their props from it. It needs only the types of the framework you use, and it
+compiles with `skipLibCheck: false`.
+
+`ref` and `style` take the types of the framework the tag is written in:
+
+- React: React's `Ref` and `CSSProperties`.
+- Preact: Preact's `Ref`, and the `style` a `<div>` takes, which is a string or
+  an object.
+- Solid: the element or a callback that receives it, and the `style` a `<div>`
+  takes, which is a string or an object.
+- Any other framework: the element or a callback that receives it, and an
+  object of style properties.
+
+In Preact and Solid, import the typings once, anywhere TypeScript sees it:
+
+```ts
+import '@fusion.dev/helix/jsx'
+```
+
+Preact reads the tags with `jsxImportSource: "preact"` and with `h` as the JSX
+factory. If your `paths` alias `react` to `preact/compat`, the tags take `ref`
+and `style` as `preact/compat` types React's, so `style` takes an object.
+
+Solid reads the tags with `jsxImportSource: "solid-js"`, and each tag also
+takes `prop:`, `attr:`, and `on:` forms of its props and events.
+
+If your framework needs a different format, use the manifest at
+`@fusion.dev/helix/custom-elements.json`. It describes every tag, prop, event,
+and part, and we generate all our typings from it.
 
 ## Register the elements
 
