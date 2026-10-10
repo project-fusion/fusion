@@ -70,6 +70,10 @@ so React's strict mode and hot module replacement start nothing twice.
   npm CDN, one file for each tier. Offline, or on a locked-down network, pass it
   yourself:
   `tiers: [{ lint }]` with `import lint from '@fusion.dev/helix/lint.json'`.
+  An add-on package's lint data is passed the same way, and only that way:
+  `{ lint: sandbox }` with
+  `import sandbox from '@fusion.dev/helix-sandbox/lint.json'`. Without it,
+  each of the add-on's elements is an unknown tag.
 - **Runs itself**: after the page loads, after a navigation, and after the page
   changes, once changes stop for a second, in an idle moment, and never sooner
   than two seconds after the last run, nor sooner than twenty times its
@@ -164,7 +168,9 @@ The address is always on a local host.
 
 `helix scan` reads every stylesheet, template, and module in your repository,
 judges them against the lint data of the Helix packages you installed, and
-writes one run in the shape a page writes, with `source: "code"`:
+writes one run in the shape a page writes, with `source: "code"`. It reads the
+lint data of each installed `@fusion.dev` package that publishes `./lint.json`
+and is not private, an add-on such as `@fusion.dev/helix-sandbox` among them:
 
 ```sh
 npx helix scan
@@ -228,8 +234,9 @@ npx helix diagnostics --once http://localhost:5173/ --once http://localhost:5173
 ```
 
 It needs `@fusion.dev/helix-cli` and Playwright installed beside this package.
-It exits 1 on a finding at `error`, and 3 where a page could not be opened, or
-where this package or Helix is not installed.
+It judges each page against the lint data `helix scan` reads, add-on packages'
+included. It exits 1 on a finding at `error`, and 3 where a page could not be
+opened, or where this package or Helix is not installed.
 `--out` writes the runs to the CI file, and `--json` prints one document a
 page. An agent gets the same runs from the MCP tool `helix_check_page`.
 
@@ -250,7 +257,8 @@ report(diagnose({ tiers: [{ lint: styled }, { lint: headless }] }))
 every part name is unknown and every finding would be noise. It takes lint data
 or a full `custom-elements.json`. Pass both tiers when both are installed, since
 a part the headless tier publishes and the styled tier never forwarded is only
-visible with both. `report` is the console sink; the `Report` it returns is the
+visible with both. Pass an add-on package's lint data beside them, such as
+`@fusion.dev/helix-sandbox/lint.json`, for its elements. `report` is the console sink; the `Report` it returns is the
 same object, so you can send it somewhere else as well.
 
 None of these faults produces an error anywhere. They are detectable only against

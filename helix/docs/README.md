@@ -26,7 +26,9 @@ import { docSources, findPage, navigation, reference } from '@fusion.dev/helix-d
 
 The component catalog ships in each tier as `api.json` and `examples.json`,
 such as `@fusion.dev/helix/api.json`: every family with its elements, imports,
-and examples.
+and examples. An add-on package ships them too, listing the elements it adds
+to a family: `@fusion.dev/helix-sandbox/api.json` lists its editor under the
+Sandbox family.
 
 Published as a package rather than served only from a site so that the
 documentation carries the version of the library it documents. A docs package at
