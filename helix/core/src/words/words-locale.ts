@@ -1,5 +1,5 @@
-import { localeOf, runtimeLocale } from '../utils/locale-of/locale-of.js'
-import { held, watchLang } from './held.js'
+import { localeOf, nearestLang, runtimeLocale, usableLocale } from '../utils/locale-of/locale-of.js'
+import { held, type LocaleSource, watchLang } from './held.js'
 
 /** Tags already checked, with what each one is as a locale. */
 const checked = new Map<string, string>()
@@ -39,26 +39,54 @@ const tagOf = (written: string): string => {
  *
  * Always a tag `Intl` takes.
  */
-export const wordsLocale = (element: Element & { locale?: string | undefined }): string => {
+export const wordsLocale = (element: Element & { locale?: string | undefined }): string =>
+  localeFrom(sourceOf(element))
+
+/**
+ * What an element's locale is worked out from, read without working it out:
+ * its `locale`, then on a server and while it hydrates its own `lang` and the
+ * default, and otherwise the nearest `lang`, or `null` where none is written.
+ *
+ * **For an element that watches for its locale to change.** It records this
+ * as it connects and works the locale out only where this moves, so a page
+ * that never formats a word makes no `DateTimeFormat` for the runtime's own
+ * locale, the first of which costs 7.1 ms in Chromium (October 10, 2026). The
+ * runtime's locale is the one input left out: it does not change while the
+ * page runs.
+ */
+const sourceOf = (element: Element & { locale?: string | undefined }): LocaleSource => {
   watchLang()
-  const own = tagOf(element.locale || '')
-  if (own) {
-    return own
+  const own = element.locale || ''
+  if (tagOf(own)) {
+    return [own, null]
   }
   /* A server's element shim has no `closest`, which is how a server is told
      apart here: Lit's `isServer` is true in any test runner that resolves its
      `node` build. */
   if (typeof element.closest !== 'function' || (element as { hydrating?: boolean }).hydrating) {
-    return tagOf(element.getAttribute?.('lang') ?? '') || held.fallback
+    return [own, element.getAttribute?.('lang') ?? '', held.fallback]
   }
-  return localeOf(element) || runtimeLocale()
+  return [own, nearestLang(element) ?? null]
+}
+
+/** The locale what `sourceOf` read works out to. */
+const localeFrom = ([own, lang, fallback]: LocaleSource): string => {
+  const tag = tagOf(own)
+  if (tag) {
+    return tag
+  }
+  if (fallback !== undefined) {
+    return tagOf(lang ?? '') || fallback
+  }
+  return (lang === null ? '' : usableLocale(lang)) || runtimeLocale()
 }
 
 /* An element that reads its locale updates when the locale changes, so its
    numbers are written in the new one. Where this module is loaded, the words
    watcher reads the locale through `held`, and where it is not, no element
    reads one. */
-held.locale = wordsLocale
+held.source = sourceOf
+held.from = localeFrom
 
 /**
  * The locale an element hands a child that reads only its own `lang` or

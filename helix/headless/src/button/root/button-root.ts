@@ -669,9 +669,10 @@ export class HelixHeadlessButton extends HelixFormElementBase {
   }
 
   protected override render(): TemplateResult {
-    const label = html`<slot name="start"></slot><slot part="text"></slot><slot name="end"></slot>`
     const stop = this.focusable ? nothing : '-1'
 
+    /* The slots are written into the template, so each button clones one
+       template and holds no second one for its words. */
     return html`<button
       part="button"
       type="button"
@@ -687,7 +688,7 @@ export class HelixHeadlessButton extends HelixFormElementBase {
       @keydown=${this.notePress}
       @pointerdown=${this.notePress}
     >
-      ${label}${this.renderSpinner()}
+      <slot name="start"></slot><slot part="text"></slot><slot name="end"></slot>${this.renderSpinner()}
     </button>${this.renderLive()}`
   }
 

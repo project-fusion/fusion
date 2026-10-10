@@ -14,6 +14,7 @@ import {
   handedLocale,
   hostAria,
   inlineStep,
+  labelsOf,
   commaList as list,
   MIRROR_RULE,
   MixinControllerValue,
@@ -1326,10 +1327,10 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
        the host its labels, and the host is the group a reader is on. The
        attribute and not the words, which may be the ones registered for the
        page's language. */
-    const outside = this.hasAttribute('label') ? [] : [...(this.internals.labels ?? [])]
+    const outside = this.hasAttribute('label') ? [] : labelsOf(this)
     hostAria(this.internals, {
       label: this.label,
-      labelledBy: outside as HTMLElement[],
+      labelledBy: outside,
       role: 'group',
     })
     /* Announced as off, not merely inert. Removing it from the accessibility

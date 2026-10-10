@@ -1,5 +1,5 @@
 import type { ReactiveController, ReactiveElement } from 'lit'
-import { held, watchWords, wordsRegistered } from './held.js'
+import { held, type LocaleSource, watchWords, wordsRegistered } from './held.js'
 import { formatMessage, type MessageTable, type MessageValues } from './message.js'
 import { wordsLocale } from './words-locale.js'
 
@@ -86,21 +86,34 @@ const recheck = (host: Host): void => {
 }
 
 /**
+ * Whether an element's locale moved between two reads of what it is worked
+ * out from. The locale is worked out only where the reads differ, and two
+ * different reads can still work out to one locale: `lang="en"` and
+ * `lang="en-GB"` in a British browser.
+ */
+const localeMoved = (before?: LocaleSource, after?: LocaleSource): boolean =>
+  before !== undefined &&
+  after !== undefined &&
+  (before.length !== after.length || before.some((one, at) => one !== after[at])) &&
+  held.from?.(before) !== held.from?.(after)
+
+/**
  * Watches the registry while the element is connected, and looks again after
  * hydrating. An element whose locale changes with a `lang` updates even where
  * no word of its own changes, so its numbers are written in the new locale.
  */
 const watcher = (host: Host): ReactiveController => {
   let stop: (() => void) | undefined
-  let locale = ''
+  let source: LocaleSource | undefined
   return {
     hostConnected: () => {
-      locale = held.locale?.(host) ?? ''
+      source = held.source?.(host)
       stop = watchWords(() => {
         recheck(host)
-        const now = held.locale?.(host) ?? ''
-        if (now !== locale) {
-          locale = now
+        const now = held.source?.(host)
+        const moved = localeMoved(source, now)
+        source = now
+        if (moved) {
           host.requestUpdate()
         }
       })

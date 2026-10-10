@@ -14,6 +14,7 @@ import {
   hostWords,
   inlineStep,
   isRtl,
+  labelsOf,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -1002,7 +1003,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * them, so nothing is written here to fight it.
    */
   private get triggerNames(): string | typeof nothing {
-    const outside = (this.internals.labels?.length ?? 0) > 0 && !this.labeled
+    const outside = labelsOf(this).length > 0 && !this.labeled
     if (this.hasAttribute('aria-labelledby') || outside) {
       return nothing
     }

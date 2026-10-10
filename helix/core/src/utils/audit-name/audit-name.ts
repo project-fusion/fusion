@@ -1,3 +1,4 @@
+import { labelsOf } from '../labels-of/labels-of.js'
 import { nameText } from '../name-text/name-text.js'
 import { reportRuntime } from '../report-runtime/report-runtime.js'
 
@@ -60,8 +61,7 @@ export const hasName = (element: HTMLElement, shown?: Element | null): boolean =
   if ((referenced ?? []).some((one) => nameText(one, shown).trim() !== '')) {
     return true
   }
-  const labels = (element as HTMLElement & { labels?: NodeList | null }).labels
-  if ([...(labels ?? [])].some((label) => nameText(label).trim() !== '')) {
+  if (labelsOf(element).some((label) => nameText(label).trim() !== '')) {
     return true
   }
   const role = element.getAttribute('role') ?? implicitRole(element)
