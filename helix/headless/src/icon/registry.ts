@@ -1,3 +1,4 @@
+import { closestName } from '@fusion.dev/helix-core'
 import type { HelixIcon } from '@fusion.dev/helix-icons'
 
 /*
@@ -144,6 +145,30 @@ export const iconMutator = (name: string): ((svg: SVGSVGElement) => void) | unde
 
 /** The registered glyph of this name, or `undefined`. */
 export const registeredIcon = (name: string): HelixIcon | undefined => registry().glyphs.get(name)
+
+/** A name in kebab case: `caretDown` is `caret-down`. */
+const kebab = (name: string): string =>
+  name.replace(/[A-Z]/g, (letter, at: number) => `${at === 0 ? '' : '-'}${letter.toLowerCase()}`)
+
+/**
+ * The registered name closest to one that draws nothing, for its warning to
+ * offer, or `undefined` where none is close.
+ *
+ * **Compared in kebab case**, since a glyph is exported in camel case and
+ * registered in kebab case: `caretDown`, the name of the export, finds
+ * `caret-down`. Then a letter or two away, so `chekc` finds `check`.
+ */
+export const closestIcon = (name: string): string | undefined => {
+  const names = new Map<string, string>()
+  for (const registered of registry().glyphs.keys()) {
+    const key = kebab(registered)
+    if (!names.has(key)) {
+      names.set(key, registered)
+    }
+  }
+  const close = closestName(kebab(name), names.keys())
+  return close === undefined ? undefined : names.get(close)
+}
 
 /**
  * The glyph for a name: a registered one at once, or what the library its

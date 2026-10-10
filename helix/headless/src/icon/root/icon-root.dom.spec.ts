@@ -77,6 +77,30 @@ describe('icon rendering', () => {
     expect(warnings[0]).not.toContain('icon/all')
   })
 
+  /* `caretDown`, the name a glyph is imported by, and a slip of the keys each
+     drew nothing with no clue which name was meant. */
+  test('and names the closest registered icon, where one is close', async () => {
+    const warned = async (name: string): Promise<string> => {
+      const warnings: string[] = []
+      const original = console.warn
+      console.warn = (message: string) => warnings.push(message)
+      try {
+        const icon = (await mount(
+          `<helix-headless-icon name="${name}"></helix-headless-icon>`,
+        )) as HTMLElement & { updateComplete: Promise<unknown> }
+        icon.setAttribute('mirror', '')
+        await icon.updateComplete
+        await settled()
+      } finally {
+        console.warn = original
+      }
+      return warnings.join('\n')
+    }
+    expect(await warned('caretDown')).toContain('The closest registered icon is `caret-down`.')
+    expect(await warned('chekc')).toContain('The closest registered icon is `check`.')
+    expect(await warned('not-a-real-icon')).not.toContain('closest')
+  })
+
   /* `label` was the only way in, so an `aria-label` written on the element,
      the way a page names anything, left a generic element and a hidden glyph. */
   test('an `aria-label` on the element makes it an image with that name', async () => {
