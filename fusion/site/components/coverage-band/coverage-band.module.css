@@ -11,6 +11,18 @@
   }
 }
 
+/**
+ * **The words at the top and the size at the foot, level with the table's
+ * end.** The table is the taller half, so the introduction stretches to its
+ * height and the figure and the link settle to the bottom, which leaves no
+ * empty column under a short block of text.
+ */
+@media (min-width: 60rem) {
+  .added {
+    margin-block-start: auto;
+  }
+}
+
 /* ── The key and the size ──────────────────────────────────────────── */
 
 .legend {
