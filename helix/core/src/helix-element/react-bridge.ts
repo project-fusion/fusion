@@ -72,6 +72,174 @@ export const reactPropsOf = (node: EventTarget): Record<string, unknown> | undef
   return stash[found] as Record<string, unknown>
 }
 
+/**
+ * The prefixes of the marks React leaves on a document it has a root in.
+ *
+ * **React marks the document before it hands any node there its props.**
+ * `createRoot` and `hydrateRoot` call `listenToAllSupportedEvents` on their
+ * container before anything renders, and that marks the container's document
+ * as well, so React can listen for `selectionchange` there once. A portal into
+ * another document marks that one. A node's props are written as React
+ * renders into a root, so a document without either mark holds none, and an
+ * element in it has nothing to look for yet.
+ *
+ * React 18 and 19 write `REACT_LISTENING` and a random suffix: read from the
+ * source of 18.2.0, from react-dom 19.3.0, and from the build Next.js 16.3.8
+ * ships for the App Router. React 17 keeps that mark on the container alone
+ * and gives the document its set of listeners under `REACT_EVENTS`, read from
+ * the source of 17.0.2.
+ */
+const REACT_LISTENING = '_reactListening'
+const REACT_EVENTS = '__reactEvents$'
+
+/**
+ * Whether React has a root in the document a node is in.
+ *
+ * A scan of the document's own keys, which are `location` and little else:
+ * much cheaper than a scan of each element waiting to look.
+ */
+const reactOnPage = (node: Node): boolean =>
+  Object.keys(node.ownerDocument ?? node).some(
+    (key) => key.startsWith(REACT_LISTENING) || key.startsWith(REACT_EVENTS),
+  )
+
+/**
+ * How long an element keeps looking for React's props, and how often.
+ *
+ * **Two looks were one short of every Next.js App Router page.** React's props
+ * bag has no arrival event, so the only way to read it is to look, and until
+ * 16 Sep 2026 an element looked twice: once in `firstUpdated` and once a frame
+ * later. Measured on a project scaffolded by `helix new --template
+ * react-nextjs`, a data table whose `rows` is a prop, under `next dev` and under
+ * `next build && next start`, five runs each: the bag landed on the *second*
+ * frame after the first update, around 4.5 ms after the frame the second look
+ * ran on, so both looks missed every time and the table drew its empty state
+ * over data already sitting on the node.
+ * `helix/docs/content/react.mdx` documents that prop as working, and nothing had
+ * rendered a scaffolded project to find out.
+ *
+ * **The later looks are timers and never frames**, which is not a detail. A
+ * component that draws in a loop books its next frame from each one, and that is
+ * how a spec asks whether it is running: `framesBooked` counts every booking on
+ * the page, so an element still looking for React would be read as a loop that
+ * failed to stop. A commit is a task anyway, so a task is also the thing worth
+ * waiting for.
+ *
+ * `LOOK_FOR` is twenty times that gap, and it is stated as a window so these
+ * two constants stay the only place the arithmetic lives. The looking stops the
+ * moment the bag is found.
+ */
+const LOOK_EVERY = 16
+const LOOK_FOR = 96
+
+/** An element still looking. */
+interface Looking {
+  /** The tick it started after. */
+  after: number
+  /** The element. */
+  host: LitElement
+  /** When it started, from `performance.now()`. */
+  since: number
+}
+
+/**
+ * Every element still looking, oldest first, in one list for the page.
+ *
+ * **One timer for all of them.** Each element booked its own six before
+ * October 10, 2026, and 1,000 buttons booked 6,000 timers and scanned their own
+ * keys at each, 8.4 ms of main thread in Chromium. One timer looks at every
+ * element on each tick, and only while React has a root in the document: on a
+ * page without React a tick is one scan of the document's keys. An element
+ * leaves after its sixth tick, once `LOOK_FOR` has passed since it started, so
+ * it looks at least as often and as long as it did on a timer of its own.
+ */
+const looking: Looking[] = []
+
+/** The ticks run so far, so an element can count its own. */
+let ticks = 0
+
+/** Whether the next tick is booked. */
+let booked = false
+
+/**
+ * Reads the props React is holding for an element, assigns its properties
+ * where `applied` says the first update did not, and says whether it found
+ * any.
+ */
+const take = (host: LitElement, applied: boolean): boolean => {
+  const props = reactPropsOf(host)
+  if (props === undefined) {
+    return false
+  }
+  if (!applied) {
+    applyReactProperties(host)
+  }
+  auditReactProps(host, props)
+  return true
+}
+
+/**
+ * Looks at every element still looking, and lets go of those that are done.
+ *
+ * Whether React is on the page is asked once for each document in the list,
+ * which is one document on nearly every page.
+ */
+const tick = (): void => {
+  booked = false
+  ticks += 1
+  const now = performance.now()
+  let page: Node | undefined
+  let react = false
+  let kept = 0
+  for (const one of looking) {
+    const own = one.host.ownerDocument ?? one.host
+    if (own !== page) {
+      page = own
+      react = reactOnPage(one.host)
+    }
+    const done =
+      (react && take(one.host, false)) ||
+      (ticks - one.after >= LOOK_FOR / LOOK_EVERY && now - one.since >= LOOK_FOR)
+    if (!done) {
+      looking[kept] = one
+      kept += 1
+    }
+  }
+  looking.length = kept
+  book()
+}
+
+/** Books the next tick, where an element is still looking. */
+const book = (): void => {
+  if (!booked && looking.length > 0) {
+    booked = true
+    setTimeout(tick, LOOK_EVERY)
+  }
+}
+
+/**
+ * Looks for React's props a frame after an element's first update, and goes
+ * on looking for `LOOK_FOR` where they have not arrived.
+ *
+ * **The ordering this is for**: a definition evaluated with the client bundle
+ * upgrades before React hydrates, so `firstUpdated` found no bag to read and
+ * there may be none for a frame or two yet. `applied` says whether that first
+ * look assigned the properties already.
+ *
+ * **Audited here as well as at dispatch, in a development build, and this is
+ * the half that catches the real mistake.** From inside `dispatchEvent` alone,
+ * an element holding a handler prop and sending nothing is never looked at,
+ * and a prop on the wrong element is exactly the case where that element has
+ * no reason to dispatch. Once per element either way: the audit holds its own
+ * set.
+ */
+export const lookForReact = (host: LitElement, applied: boolean): void => {
+  if (!(reactOnPage(host) && take(host, applied))) {
+    looking.push({ after: ticks, host, since: performance.now() })
+    book()
+  }
+}
+
 /*
  * Binds the handler React is holding for this event, if it has not bound it.
  *

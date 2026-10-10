@@ -1842,14 +1842,17 @@ element branch and writes nothing into the HTML, and the client's hydrate path
 only diffs and warns. Two skips that match, so there is no mismatch to report and
 no warning anywhere, which is the worst shape a framework failure takes.
 
-`applyReactProperties` closes it, called from `firstUpdated` and again on the
-following frame if React had not committed by then. It assigns any *declared*
-reactive property whose value is an object or a function: only declared, or an
-arbitrary JSX prop lands on the element; only object or function, because a
-string already arrived as an attribute and re-applying it would reach into the
-one channel that is not broken. `null` is skipped and is the single divergence
-from a client mount, named at the call site. The server dropped it too, so the
-class default is standing, and assigning it would reproduce only a crash.
+`applyReactProperties` closes it, called from `firstUpdated`, and where React
+had not committed by then, from the following frame and for 96 ms after it, on
+one timer every waiting element shares. The later looks run only in a document
+React has a root in, which React marks before it writes any props. It assigns
+any *declared* reactive property whose value is an object or a function: only
+declared, or an arbitrary JSX prop lands on the element; only object or
+function, because a string already arrived as an attribute and re-applying it
+would reach into the one channel that is not broken. `null` is skipped and is
+the single divergence from a client mount, named at the call site. The server
+dropped it too, so the class default is standing, and assigning it would
+reproduce only a crash.
 
 **It was built when the first component needed one, which is exactly what the
 note it replaces asked for.** `helix-data-table` declares `rows` and
