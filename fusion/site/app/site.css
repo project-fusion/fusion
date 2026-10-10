@@ -673,3 +673,31 @@ helix-app-header {
     animation: none;
   }
 }
+
+/* The brand, for the one mark in each of the site's own pictures that takes
+   it: the tiles in the Helix band and the modules on the Cortex page, drawn in
+   `site-nav/tiles.tsx`. The gallery's palette has no accent, so these are the
+   site's own, and every value is a primary token: the fill, the text on it,
+   the two tints a ramp runs through, and the stroke a map draws its route in.
+   `muted` for the stroke and not the primary itself, a line of the full color
+   being the loudest thing in a row of quiet pictures. */
+.artBrand {
+  fill: var(--helix-color-primary);
+}
+
+.artOnBrand {
+  fill: var(--helix-color-foreground-on-primary);
+}
+
+.artBrandMuted {
+  fill: var(--helix-color-primary-muted);
+}
+
+.artBrandSubtle {
+  fill: var(--helix-color-primary-subtle);
+}
+
+.artBrandStroke {
+  fill: none;
+  stroke: var(--helix-color-primary-muted);
+}

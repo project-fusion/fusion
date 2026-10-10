@@ -1,0 +1,150 @@
+/*
+ * The Cortex page: the landing page's light, bands, and glass, with its own
+ * stops and its own close. The rules here are the subset of the landing
+ * page's sheet this page needs, and `services` keeps its own copy of the
+ * same shape, which is what a shape repeated in markup rather than named as a
+ * component costs.
+ */
+
+/* The page under the header, and the stacking context the strands sit in.
+   Isolated so the strands behind it show, and clipped because a layer taller
+   than the reel would push the footer off the end of the page. */
+.reel {
+  isolation: isolate;
+  overflow: clip;
+  padding-block-end: var(--site-band);
+  position: relative;
+}
+
+.reelStrands {
+  pointer-events: none;
+}
+
+/* Every band sits over the light, so every band is positioned, or it paints
+   under a fixed element instead of over it. */
+.reel > section {
+  position: relative;
+}
+
+/* A product page's hero is shorter than the landing page's screen: a reader
+   here chose the product already and wants the page, so the light and the
+   claim take most of a screen and the modules are visible under them. */
+.productHero {
+  min-block-size: min(100svh, 44rem);
+}
+
+/* The three modules, each with its picture over its name. */
+.modulePicture {
+  inline-size: 100%;
+  margin-inline: auto;
+  max-inline-size: 18rem;
+}
+
+.modulePicture :global(.componentArt) {
+  aspect-ratio: 16 / 9;
+  background: transparent;
+  inline-size: 100%;
+}
+
+/* The module's name and its stage on one line. */
+.moduleName {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-sm);
+}
+
+/* The closing call to action, as a card rather than a band: the one solid
+   object on the page, in the brand's own fill, with its words and button
+   inverted. The same recipe as the landing page's close. */
+.closingCard {
+  background: var(--helix-color-primary-surface);
+  border-radius: var(--helix-radii-lg);
+  box-shadow: 0 24px 60px -30px
+    color-mix(in oklab, var(--helix-color-primary-surface) 70%, transparent);
+  color: var(--helix-color-foreground-on-primary);
+  margin-block-start: var(--site-band);
+  margin-inline: auto;
+  max-inline-size: min(var(--site-band-measure), calc(100% - 2 * var(--site-inset)));
+}
+
+.closingCard :global([data-section-title]),
+.closingCard :global(helix-text),
+.closingCard :global(p) {
+  color: var(--helix-color-foreground-on-primary);
+}
+
+.closingCard :global([data-button][data-button]) {
+  background: var(--helix-color-foreground-on-primary);
+  border-color: var(--helix-color-foreground-on-primary);
+  color: var(--helix-color-primary-surface);
+}
+
+/* The quiet second door on the close keeps the inverted ink. */
+.closingCard :global([data-link]) {
+  color: var(--helix-color-foreground-on-primary);
+}
+
+@media (max-width: 40rem) {
+  .closingCard {
+    border-radius: 0;
+    max-inline-size: 100%;
+  }
+}
+
+/* Floating, with no strokes: the shared components carry their own edge, and
+   on the light the fill and the cast carry the grouping instead. The same
+   rules the landing page applies to its cards. */
+.noRules {
+  --site-glass: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+}
+
+.noRules :global([data-substrate]),
+.noRules :global(helix-card) {
+  --card-cast: rgb(0 0 0 / 0.55);
+
+  border-color: transparent;
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, var(--helix-color-foreground) 6%, transparent) inset,
+    0 18px 40px -24px var(--card-cast);
+}
+
+.noRules :global([data-substrate]),
+.noRules :global(helix-card:not([data-filled])) {
+  --card-background-color: var(--site-glass);
+
+  background: var(--site-glass);
+  backdrop-filter: var(--site-glass-backdrop);
+}
+
+@media (max-width: 40rem) {
+  .noRules :global([data-substrate]),
+  .noRules :global(helix-card) {
+    --card-cast: light-dark(transparent, rgb(0 0 0 / 0.55));
+  }
+}
+
+/* The cells arrive as the reader reaches them, each on its own timeline, so a
+   wrapped row starts later because it is later up the page. Behind both
+   guards: a browser without scroll-driven animation gets the content, and a
+   reader who asked for less motion is not asking to be persuaded. */
+@keyframes cortex-settle {
+  from {
+    opacity: 0;
+    transform: translateY(var(--helix-space-lg)) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .stagger > * {
+      animation: cortex-settle linear both;
+      animation-range: entry 5% entry 55%;
+      animation-timeline: view();
+    }
+  }
+}

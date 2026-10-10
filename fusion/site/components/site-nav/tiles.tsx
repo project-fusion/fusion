@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react'
+import { type CSSProperties, type ReactNode, useId } from 'react'
 
 /**
  * The pictures on the tiles in the Helix band: five scenes in one isometric
@@ -33,6 +33,25 @@ import type { CSSProperties, ReactNode } from 'react'
  * the ground is only implied, by shadows and by the projection itself.
  */
 const PLATES = false
+
+/**
+ * The ids of one picture's filters and gradients, unique to that picture.
+ *
+ * **Unique, because a reference by id finds the first element in the
+ * document that carries it, wherever that is.** The masthead's panel holds
+ * five of these pictures and is `display: none` while closed, and Chromium
+ * will not apply a filter defined inside a hidden subtree: the element that
+ * referenced it is dropped from the render. On the Cortex page every box
+ * with a shadow vanished for exactly that reason, since the panel's copies
+ * of `helixArtShadow` came first in the document. Each picture now refers
+ * only to its own defs.
+ */
+interface Ids {
+  glow: string
+  light: string
+  rim: string
+  shadow: string
+}
 
 /*
  * The camera. `yaw` turns the ground under it, in degrees, so that `x` runs
@@ -87,6 +106,7 @@ function Box({
   d,
   fillOpacity,
   h,
+  ids,
   shadow = false,
   w,
   x,
@@ -97,6 +117,8 @@ function Box({
   d: number
   fillOpacity?: number
   h: number
+  /** The picture's own filter ids, which the shadow refers to. */
+  ids: Ids
   /**
    * The gallery's drop shadow under it, for a solid object standing on the
    * ground the projection implies: with no plate to stand on, the shadow is
@@ -119,7 +141,7 @@ function Box({
   const left = points([a, dd, d0, a0])
   const right = points([dd, c, c0, d0])
   return (
-    <g filter={shadow ? 'url(#helixArtShadow)' : undefined}>
+    <g filter={shadow ? `url(#${ids.shadow})` : undefined}>
       <polygon className={className} fillOpacity={fillOpacity} points={left} />
       <polygon fill="#000" fillOpacity="0.12" points={left} />
       <polygon className={className} fillOpacity={fillOpacity} points={right} />
@@ -133,14 +155,14 @@ function Box({
  * The plate a scene stands on: 80 by 80, 6 thick, with the gallery's shadow
  * under it so it floats on the band. Nothing while `PLATES` is off.
  */
-function Plate() {
+function Plate({ ids }: { ids: Ids }) {
   if (!PLATES) {
     return null
   }
   const top = points([iso(-40, -40, 0), iso(40, -40, 0), iso(40, 40, 0), iso(-40, 40, 0)])
   return (
     <>
-      <g filter="url(#helixArtShadow)">
+      <g filter={`url(#${ids.shadow})`}>
         <polygon className="artSurface" points={top} />
       </g>
       <polygon
@@ -230,6 +252,7 @@ function Sphere({
   className,
   fillOpacity,
   glow,
+  ids,
   r: size,
   x,
   y,
@@ -238,6 +261,8 @@ function Sphere({
   className: string
   fillOpacity?: number
   glow?: boolean
+  /** The picture's own filter and gradient ids. */
+  ids: Ids
   r: number
   x: number
   y: number
@@ -275,13 +300,13 @@ function Sphere({
           cx={at.x}
           cy={at.y}
           fillOpacity="0.45"
-          filter="url(#helixGlow)"
+          filter={`url(#${ids.glow})`}
           r={r + 6}
         />
       )}
       <circle className={className} cx={at.x} cy={at.y} fillOpacity={fillOpacity} r={r} />
-      <circle cx={at.x} cy={at.y} fill="url(#helixSphereRim)" r={r} />
-      <circle cx={at.x} cy={at.y} fill="url(#helixSphereLight)" r={r} />
+      <circle cx={at.x} cy={at.y} fill={`url(#${ids.rim})`} r={r} />
+      <circle cx={at.x} cy={at.y} fill={`url(#${ids.light})`} r={r} />
     </g>
   )
 }
@@ -295,9 +320,12 @@ function Scene({
   children,
   dx = 0,
   dy = 0,
+  ids,
   scale = 1.2,
 }: {
   children: ReactNode
+  /** The picture's own ids, which its defs are given. */
+  ids: Ids
   /** Right by this much after scaling, to center the drawn bounds in the crop. */
   dx?: number
   /** Down by this much after scaling, to center the drawn bounds in the crop. */
@@ -308,15 +336,15 @@ function Scene({
   return (
     <>
       <defs>
-        <radialGradient cx="0.35" cy="0.3" id="helixSphereLight" r="0.65">
+        <radialGradient cx="0.35" cy="0.3" id={ids.light} r="0.65">
           <stop offset="0" stopColor="#fff" stopOpacity="0.6" />
           <stop offset="1" stopColor="#fff" stopOpacity="0" />
         </radialGradient>
-        <radialGradient cx="0.5" cy="0.5" id="helixSphereRim" r="0.5">
+        <radialGradient cx="0.5" cy="0.5" id={ids.rim} r="0.5">
           <stop offset="0.6" stopColor="#000" stopOpacity="0" />
           <stop offset="1" stopColor="#000" stopOpacity="0.35" />
         </radialGradient>
-        <filter height="300%" id="helixGlow" width="300%" x="-100%" y="-100%">
+        <filter height="300%" id={ids.glow} width="300%" x="-100%" y="-100%">
           <feGaussianBlur stdDeviation="5" />
         </filter>
       </defs>
@@ -334,9 +362,9 @@ function Scene({
  * primary button is the control that takes the color. The keys arrive in
  * reading order on hover, as the gallery's rows do.
  */
-const componentsArt: ReactNode = (
-  <Scene dy={-4} scale={1.25}>
-    <Plate />
+const componentsArt = (ids: Ids): ReactNode => (
+  <Scene dy={-4} ids={ids} scale={1.25}>
+    <Plate ids={ids} />
     {[
       /* A button: the key itself is the control. */
       { brand: true, mark: 'bar', x: -38, y: -36 },
@@ -356,6 +384,7 @@ const componentsArt: ReactNode = (
           className={key.brand ? 'artBrand' : 'artRaised'}
           d={22}
           h={7}
+          ids={ids}
           shadow
           w={20}
           x={key.x}
@@ -417,6 +446,7 @@ const componentsArt: ReactNode = (
             <Sphere
               className="artInk"
               fillOpacity={0.4}
+              ids={ids}
               r={3.5}
               x={key.x + 7}
               y={key.y + 11}
@@ -455,9 +485,9 @@ const CODE_LINES = [
   { from: -34, to: -10, z: 6 },
 ]
 
-const sandboxArt: ReactNode = (
-  <Scene dx={-15} dy={8} scale={1.41}>
-    <Box className="artSolid" d={72} h={36} shadow w={6} x={-16} y={-40} />
+const sandboxArt = (ids: Ids): ReactNode => (
+  <Scene dx={-15} dy={8} ids={ids} scale={1.41}>
+    <Box className="artSolid" d={72} h={36} ids={ids} shadow w={6} x={-16} y={-40} />
     {CODE_LINES.map((line) => (
       <Wall
         className="artOnSolid"
@@ -479,10 +509,10 @@ const sandboxArt: ReactNode = (
         rx="22"
         ry="11"
       />
-      <g className="artLiftShadow" filter="url(#helixArtShadow)">
-        <Box className="artRaised" d={18} h={6} w={26} x={10} y={14} />
+      <g className="artLiftShadow" filter={`url(#${ids.shadow})`}>
+        <Box className="artRaised" d={18} h={6} ids={ids} w={26} x={10} y={14} />
       </g>
-      <Box className="artRaised" d={18} h={6} w={26} x={10} y={14} />
+      <Box className="artRaised" d={18} h={6} ids={ids} w={26} x={10} y={14} />
       <Flat className="artSolid" d={4} w={12} x={17} y={21} z={6} />
     </g>
   </Scene>
@@ -507,8 +537,8 @@ const CHIPS = [
   { className: 'artSunken', tone: 'sunken' },
 ]
 
-const themeArt: ReactNode = (
-  <Scene dy={13} scale={1.26}>
+const themeArt = (ids: Ids): ReactNode => (
+  <Scene dy={13} ids={ids} scale={1.26}>
     {CHIPS.map((chip, index) => (
       <g className="artMotion artRow" key={chip.tone} style={{ '--art-i': index } as CSSProperties}>
         <Box
@@ -516,6 +546,7 @@ const themeArt: ReactNode = (
           d={34}
           fillOpacity={chip.fillOpacity}
           h={2.4}
+          ids={ids}
           shadow={index === 0}
           w={58}
           x={-14 + index * 1.5}
@@ -524,7 +555,7 @@ const themeArt: ReactNode = (
         />
       </g>
     ))}
-    <Box className="artBrand" d={20} h={20} shadow w={20} x={-44} y={-4} />
+    <Box className="artBrand" d={20} h={20} ids={ids} shadow w={20} x={-44} y={-4} />
   </Scene>
 )
 
@@ -549,8 +580,8 @@ const ROADS: { along: 'x' | 'y'; at: number; from: number; to: number }[] = [
   { along: 'x', at: -34, from: 12, to: 40 },
 ]
 
-const mapArt: ReactNode = (
-  <Scene dy={-4} scale={1.4}>
+const mapArt = (ids: Ids): ReactNode => (
+  <Scene dy={-4} ids={ids} scale={1.4}>
     {ROADS.map((road) => (
       <Flat
         className="artInk"
@@ -607,13 +638,13 @@ const mapArt: ReactNode = (
       <circle
         cx={iso(PIN.x, PIN.y, 20).x}
         cy={iso(PIN.x, PIN.y, 20).y}
-        fill="url(#helixSphereRim)"
+        fill={`url(#${ids.rim})`}
         r={6 * iso(PIN.x, PIN.y, 20).k}
       />
       <circle
         cx={iso(PIN.x, PIN.y, 20).x}
         cy={iso(PIN.x, PIN.y, 20).y}
-        fill="url(#helixSphereLight)"
+        fill={`url(#${ids.light})`}
         r={6 * iso(PIN.x, PIN.y, 20).k}
       />
     </g>
@@ -654,9 +685,9 @@ const BACK_TO_FRONT = (Object.keys(NOTES) as Note[]).sort(
 
 const at = (key: Note) => iso(NOTES[key].x, NOTES[key].y, NOTES[key].z)
 
-const graphArt: ReactNode = (
-  <Scene dy={4} scale={1.37}>
-    <Plate />
+const graphArt = (ids: Ids): ReactNode => (
+  <Scene dy={4} ids={ids} scale={1.37}>
+    <Plate ids={ids} />
     <g className="artStroke" strokeOpacity="0.28" strokeWidth="1.5">
       {QUIET_LINKS.map(([p, q]) => (
         <line key={p + q} x1={at(p).x} x2={at(q).x} y1={at(p).y} y2={at(q).y} />
@@ -680,6 +711,7 @@ const graphArt: ReactNode = (
           className={'selected' in note ? 'artBrand' : 'artInk'}
           fillOpacity={'selected' in note ? undefined : 0.4}
           glow={'selected' in note}
+          ids={ids}
           key={key}
           r={note.r}
           x={note.x}
@@ -691,12 +723,150 @@ const graphArt: ReactNode = (
   </Scene>
 )
 
-const pictures: Record<string, ReactNode> = {
+/**
+ * Engram: two stores of chips, what a system has seen on the left and what it
+ * has learned on the right, and one fact on its way from the first to the
+ * second, lifted between them in the brand. The learned store is the smaller,
+ * since not everything seen is kept. The moving chip lifts on hover.
+ */
+const engramArt = (ids: Ids): ReactNode => (
+  <Scene dy={-6} ids={ids} scale={1.54}>
+    {[0, 1, 2, 3, 4].map((index) => (
+      <Box
+        className="artInk"
+        d={26}
+        fillOpacity={0.28}
+        h={2.4}
+        ids={ids}
+        key={index}
+        shadow={index === 0}
+        w={30}
+        x={-38 + index * 1.2}
+        y={-8 - index * 1.2}
+        z={index * 2.9}
+      />
+    ))}
+    {[0, 1, 2].map((index) => (
+      <Box
+        className={index === 2 ? 'artBrandSubtle' : 'artBrandMuted'}
+        d={26}
+        h={2.4}
+        ids={ids}
+        key={index}
+        shadow={index === 0}
+        w={30}
+        x={8 + index * 1.2}
+        y={-8 - index * 1.2}
+        z={index * 2.9}
+      />
+    ))}
+    <g className="artMotion artLift">
+      <Box className="artBrand" d={26} h={2.4} ids={ids} shadow w={30} x={-14} y={-10} z={22} />
+    </g>
+  </Scene>
+)
+
+/**
+ * Trace: a chain from a source at the front left to an output at the back
+ * right, each step a note standing higher than the last, with one branch
+ * joining in. The output is the brand, and its links draw back toward the
+ * source on hover, which is what checking a claim does to the picture.
+ */
+const TRACE_STEPS = [
+  { x: -38, y: 0, z: 4 },
+  { x: -19, y: 0, z: 8 },
+  { x: 0, y: 0, z: 12 },
+  { x: 19, y: 0, z: 16 },
+  { x: 38, y: 0, z: 22 },
+]
+
+const TRACE_BRANCH = { x: 0, y: 28, z: 6 }
+
+const traceArt = (ids: Ids): ReactNode => (
+  <Scene dy={10} ids={ids} scale={1.53}>
+    <line
+      className="artStroke"
+      strokeOpacity="0.28"
+      strokeWidth="1.5"
+      x1={iso(TRACE_BRANCH.x, TRACE_BRANCH.y, TRACE_BRANCH.z).x}
+      x2={iso(TRACE_STEPS[3].x, TRACE_STEPS[3].y, TRACE_STEPS[3].z).x}
+      y1={iso(TRACE_BRANCH.x, TRACE_BRANCH.y, TRACE_BRANCH.z).y}
+      y2={iso(TRACE_STEPS[3].x, TRACE_STEPS[3].y, TRACE_STEPS[3].z).y}
+    />
+    {TRACE_STEPS.slice(1).map((step, i) => {
+      const from = TRACE_STEPS[i]
+      return (
+        <path
+          className="artBrandStroke artMotion artDraw"
+          d={`M${iso(step.x, step.y, step.z).x} ${iso(step.x, step.y, step.z).y}L${iso(from.x, from.y, from.z).x} ${iso(from.x, from.y, from.z).y}`}
+          key={step.x}
+          pathLength="1"
+          strokeLinecap="round"
+          strokeWidth="1.5"
+          style={{ '--art-i': TRACE_STEPS.length - 2 - i } as CSSProperties}
+        />
+      )
+    })}
+    <Sphere className="artInk" fillOpacity={0.4} ids={ids} r={4.5} {...TRACE_BRANCH} />
+    {TRACE_STEPS.map((step, i) => (
+      <Sphere
+        className={i === TRACE_STEPS.length - 1 ? 'artBrand' : 'artInk'}
+        fillOpacity={i === TRACE_STEPS.length - 1 ? undefined : 0.4}
+        glow={i === TRACE_STEPS.length - 1}
+        ids={ids}
+        key={step.x}
+        r={4.5 + i * 0.6}
+        x={step.x}
+        y={step.y}
+        z={step.z}
+      />
+    ))}
+  </Scene>
+)
+
+/**
+ * Recall: the facts a system knows, as chips lying on the ground, and the
+ * two chosen for the task at hand lifted out and gathered at the front in the
+ * brand. The chosen pair lifts on hover.
+ */
+const recallArt = (ids: Ids): ReactNode => (
+  <Scene dy={1} ids={ids} scale={1.19}>
+    {[
+      { x: -38, y: -34 },
+      { x: -6, y: -34 },
+      { x: 26, y: -34 },
+      { x: -38, y: -6 },
+      { x: 26, y: -6 },
+    ].map((chip) => (
+      <Box
+        className="artInk"
+        d={22}
+        fillOpacity={0.28}
+        h={2.4}
+        ids={ids}
+        key={`${chip.x}${chip.y}`}
+        shadow
+        w={26}
+        x={chip.x}
+        y={chip.y}
+      />
+    ))}
+    <g className="artMotion artLift">
+      <Box className="artBrandMuted" d={22} h={2.4} ids={ids} shadow w={26} x={-8} y={16} z={8} />
+      <Box className="artBrand" d={22} h={2.4} ids={ids} w={26} x={-6} y={14} z={13} />
+    </g>
+  </Scene>
+)
+
+const pictures: Record<string, (ids: Ids) => ReactNode> = {
   components: componentsArt,
+  engram: engramArt,
   graph: graphArt,
   map: mapArt,
+  recall: recallArt,
   sandbox: sandboxArt,
   theme: themeArt,
+  trace: traceArt,
 }
 
 /**
@@ -711,18 +881,11 @@ const pictures: Record<string, ReactNode> = {
  * fragment as the shape referencing it, so each tile carries its own, as
  * each gallery card does.
  */
-function Frame({ children }: { children: ReactNode }) {
+function Frame({ children, ids }: { children: ReactNode; ids: Ids }) {
   return (
     <svg aria-hidden="true" className="componentArt" viewBox="32 28 256 144">
       <defs>
-        <filter
-          className="artShadow"
-          height="200%"
-          id="helixArtShadow"
-          width="200%"
-          x="-50%"
-          y="-50%"
-        >
+        <filter className="artShadow" height="200%" id={ids.shadow} width="200%" x="-50%" y="-50%">
           <feDropShadow dx="0" dy="4" stdDeviation="5" />
         </filter>
       </defs>
@@ -737,6 +900,15 @@ function Frame({ children }: { children: ReactNode }) {
  * and looks deliberate until somebody draws it.
  */
 export function Picture({ name }: { name: string }) {
-  const body = pictures[name]
-  return body ? <Frame>{body}</Frame> : null
+  /* Letters and digits only: React's ids carry punctuation that a `url(#…)`
+     reference does not survive. */
+  const id = useId().replace(/[^a-zA-Z0-9]/g, '')
+  const ids: Ids = {
+    glow: `art${id}glow`,
+    light: `art${id}light`,
+    rim: `art${id}rim`,
+    shadow: `art${id}shadow`,
+  }
+  const body = pictures[name]?.(ids)
+  return body ? <Frame ids={ids}>{body}</Frame> : null
 }
