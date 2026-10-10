@@ -14,7 +14,7 @@ import { useMotion } from '@/hooks/use-motion/use-motion'
  */
 export function CortexAura({
   className,
-  variant = 'lattice',
+  variant = 'particles',
 }: {
   className: string
   variant?: 'lattice' | 'particles' | 'threads' | 'flow'
