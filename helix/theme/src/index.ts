@@ -52,9 +52,10 @@ export interface ThemeEngine {
    * block.
    *
    * @throws when the engine refuses the intent, which it does for anything that
-   * would produce a palette reporting itself clean without having been measured:
-   * an unreadable brand, accent or pinned status, a non-finite number, or one
-   * outside the range it is meaningful in.
+   * would produce a palette reporting itself clean without having been measured,
+   * or a block CSS cannot read: an unreadable brand, accent or pinned status, a
+   * non-finite number, one outside the range it is meaningful in, or a namespace
+   * that is not a token prefix.
    */
   derive(intent: ThemeIntent, selectors?: readonly string[]): DerivedTheme
   /**

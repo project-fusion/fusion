@@ -68,10 +68,10 @@ pub fn derive_theme(intent: &ThemeIntent) -> Result<Theme, IntentError> {
 #[cfg(test)]
 mod tests {
     use super::derive_theme;
-    use crate::derive::resolve::IntentError;
+    use crate::derive::resolve::{resolve, IntentError};
     use crate::intent::{
         Background, Brand, BrandPair, Color, Font, From, Material, Motion, Neutral, Relation,
-        Scheme, Seed, ThemeIntent,
+        Scheme, Seed, Status, StatusSeed, ThemeIntent, STATUS_BAND, STATUS_HUE,
     };
 
     fn hex(value: &str) -> Color {
@@ -370,5 +370,147 @@ mod tests {
             }),
             "material.opacity must be between 0 and 1"
         );
+    }
+
+    fn named(namespace: &str) -> ThemeIntent {
+        ThemeIntent {
+            namespace: Some(namespace.to_owned()),
+            ..ThemeIntent::ink()
+        }
+    }
+
+    #[test]
+    fn a_namespace_that_is_not_a_token_prefix_is_refused_with_what_was_given() {
+        let refused = |namespace: &str| {
+            derive_theme(&named(namespace))
+                .expect_err("the namespace is refused")
+                .to_string()
+        };
+        assert_eq!(
+            refused("--my"),
+            "namespace is not a token prefix of ASCII letters, digits, hyphens, and \
+             underscores with no hyphen at either end, received \"--my\""
+        );
+        /* Empty, a hyphen at either end, characters a custom property name
+        cannot hold, and a letter outside ASCII. The block carried each of these
+        as it was given. */
+        for namespace in ["", "-my", "my-", "a b;}", "my.brand", "café"] {
+            let message = refused(namespace);
+            assert!(
+                message.starts_with("namespace is not a token prefix")
+                    && message.ends_with(&format!("received {namespace:?}")),
+                "{namespace:?}: {message}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_namespace_of_name_characters_prefixes_every_token() {
+        for namespace in ["acme", "my-brand", "my_brand", "3m", "Acme2"] {
+            assert!(
+                resolve(&named(namespace)).is_ok(),
+                "{namespace:?} is refused"
+            );
+        }
+        let theme = derive_theme(&named("my-brand")).expect("a hyphenated namespace derives");
+        let css = crate::css::to_css(&theme, ":root");
+        assert!(
+            css.contains("\n  --my-brand-color-background: #ffffff;"),
+            "{css}"
+        );
+        assert!(!css.contains("--helix-"), "{css}");
+    }
+
+    /// Ink with one status given a hue.
+    fn hued(name: &str, hue: f64) -> ThemeIntent {
+        let seed = Some(StatusSeed::Hue(Some(hue)));
+        let mut status = Status::default();
+        match name {
+            "danger" => status.danger = seed,
+            "info" => status.info = seed,
+            "success" => status.success = seed,
+            _ => status.warning = seed,
+        }
+        ThemeIntent {
+            status: Some(status),
+            ..ThemeIntent::ink()
+        }
+    }
+
+    #[test]
+    fn each_status_band_holds_the_hue_that_ships_and_no_two_overlap() {
+        for (at, (from, to)) in STATUS_BAND.iter().enumerate() {
+            assert!((from..=to).contains(&&STATUS_HUE[at]), "{at}");
+            for (start, end) in STATUS_BAND.iter().skip(at + 1) {
+                assert!(to < start || end < from, "{from}-{to} and {start}-{end}");
+            }
+        }
+    }
+
+    #[test]
+    fn a_status_hue_outside_its_band_is_refused_with_the_band() {
+        let refused = |name: &str, hue: f64| {
+            derive_theme(&hued(name, hue))
+                .expect_err("the hue is refused")
+                .to_string()
+        };
+        assert_eq!(
+            refused("danger", 140.0),
+            "status.danger.hue must be between 15 and 40 degrees, the reds from crimson to \
+             red-orange, received 140"
+        );
+        /* A pink and an orange either side of danger, a purple read around the
+        circle, a yellow-green, a teal, and a violet. */
+        for (name, hue) in [
+            ("danger", 5.0),
+            ("danger", 42.0),
+            ("danger", 999.0),
+            ("warning", 120.0),
+            ("success", 190.0),
+            ("info", 300.0),
+        ] {
+            let message = refused(name, hue);
+            assert!(
+                message.starts_with(&format!("status.{name}.hue must be between"))
+                    && message.ends_with(&format!(", received {hue}")),
+                "{message}"
+            );
+        }
+        assert_eq!(
+            refused("info", f64::NAN),
+            "status.info.hue must be a finite number, received NaN"
+        );
+    }
+
+    #[test]
+    fn a_status_hue_inside_its_band_is_the_hue_it_takes() {
+        for (name, hue) in [
+            ("danger", 15.0),
+            ("danger", 40.0),
+            ("danger", 387.0),
+            ("danger", -340.0),
+            ("info", 204.0),
+            ("info", 277.0),
+            ("success", 126.0),
+            ("success", 170.0),
+            ("warning", 45.0),
+            ("warning", 102.0),
+        ] {
+            assert!(
+                resolve(&hued(name, hue)).is_ok(),
+                "{name} at {hue} is refused"
+            );
+        }
+        let crimson = derive_theme(&ThemeIntent {
+            status: Some(Status {
+                allowance: Some(0.0),
+                danger: Some(StatusSeed::Hue(Some(20.0))),
+                ..Status::default()
+            }),
+            ..ThemeIntent::ink()
+        })
+        .expect("a crimson danger derives");
+        let hue = token(&crimson, "color-danger").value.hue;
+        assert!((hue - 20.0).abs() < 1.0, "{hue}");
     }
 }

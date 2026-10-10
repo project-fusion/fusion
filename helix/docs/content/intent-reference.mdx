@@ -31,7 +31,7 @@ empty intent, `{}`, is a valid theme.
 | `accent` | The second emphasis color. Defaults to the brand color, or to ink with no brand. `{ from: 'brand', rotate: 180 }` gives the complementary color, and needs a brand |
 | `background` | The page's color, `{ light, dark }`, for a page that is not pure white or pure black. The surfaces keep their contrast with it, and the grays take its tint. A page no text color can reach the contrast target on is refused |
 | `neutral` | The gray ramp, which can be tinted toward the brand. With `background`, it takes the page's tint |
-| `status` | `info`, `success`, `warning`, and `danger`. A color pins one. An object adjusts its hue while it keeps its meaning |
+| `status` | `info`, `success`, `warning`, and `danger`. A color pins one. `{ hue }` moves its hue within the band that keeps its meaning |
 | `chroma` | How saturated the palette is, independent of hue |
 | `scheme` | `'light'` or `'dark'`, for a theme that has only one mode |
 | `tokens` | Literal overrides by token name, for values no other field sets |
@@ -45,6 +45,17 @@ lightness moves only as far as the target needs.
 `accent` can be defined relative to the brand. `status` colors cannot. If
 `danger` rotated with the brand, your users would have to learn a new warning
 color for each product.
+
+**A status hue stays in its band.** Each band, in OKLCH degrees, covers the
+colors that still read as that status. A hue outside its band is refused, and
+the error names the band.
+
+| Status | Hue band | Colors |
+|---|---|---|
+| `danger` | 15 to 40 | The reds, from crimson to red-orange |
+| `warning` | 45 to 105 | Orange and amber to yellow |
+| `success` | 125 to 180 | The greens, from yellow-green to teal-green |
+| `info` | 200 to 280 | Cyan and blue to indigo |
 
 `chroma` sets how saturated the theme feels. Monotone, muted, restrained, and
 vivid all describe chroma, and none of them describes a hue. `chroma` has two
@@ -126,8 +137,13 @@ you the trade-off that a theme with heavy material makes.
 
 | Field | What it controls |
 |---|---|
-| `namespace` | The token prefix. Defaults to `helix` |
+| `namespace` | The token prefix. Defaults to `helix`. `acme` emits `--acme-color-primary` |
 
 Use `namespace` when your product ships its own token layer built on the
 engine. The rest of the library still reads `--helix-*`, so a new namespace
 changes only your own tokens.
+
+**A namespace is ASCII letters, digits, hyphens, and underscores, with no
+hyphen at either end.** The engine writes the hyphens around it. Any other
+namespace is refused with the value it received, such as an empty one, `--acme`,
+or `acme tokens`.

@@ -86,7 +86,7 @@ pub enum Seed {
 }
 
 /// A status role. A color pins it outright; a hue nudges it within the meaning
-/// it already carries.
+/// it already carries, which is its band in [`STATUS_BAND`].
 ///
 /// **Never a [`Relation`]**, which is the asymmetry with `accent` and is
 /// deliberate: a `danger` that rotates with the brand is a warning a reader has
@@ -540,11 +540,49 @@ pub const STATUS_HUE: [f64; 4] = [27.0, 245.0, 155.0, 75.0];
 /// brand's to set.
 pub const STATUS_CHROMA: [f64; 4] = [0.21, 0.16, 0.15, 0.185];
 
+/// The hues a status may be moved to with `{ hue }`, in degrees, from and to.
+/// Indexed by [`STATUS_NAMES`].
+///
+/// **Each band is where the status still reads as itself**, measured on
+/// shipped palettes, and the gaps between bands are hues that read as neither:
+///
+/// - `danger`, 15 to 40: the reds, from Tailwind's rose-500 at 16.4 to
+///   Material's deep orange at 36.5. The pinks end at 10.2 and the oranges
+///   start at 41.1.
+/// - `info`, 200 to 280: from Polaris's cyan info at 204.2 to Tailwind's
+///   indigo-500 at 277.1. The violets start at 285.5.
+/// - `success`, 125 to 180: from CSS `yellowgreen` at 126.6 to Radix's jade at
+///   170.7. The teals start at 181.9.
+/// - `warning`, 45 to 105: from Radix's orange at 45 through the ambers to
+///   Material's yellow at 102.5.
+///
+/// The same in every locale. Danger is red and a warning amber wherever a
+/// status is read, and a market where red marks a rising price is a chart's
+/// concern.
+pub const STATUS_BAND: [(f64, f64); 4] =
+    [(15.0, 40.0), (200.0, 280.0), (125.0, 180.0), (45.0, 105.0)];
+
+/// What each band holds, for the refusal that names it. Indexed by
+/// [`STATUS_NAMES`].
+pub const STATUS_BAND_HOLDS: [&str; 4] = [
+    "the reds from crimson to red-orange",
+    "cyan and blue to indigo",
+    "the greens from yellow-green to teal-green",
+    "orange and amber to yellow",
+];
+
 /// The hue and chroma a status carries, by name.
 #[must_use]
 pub fn status_seed(name: &str) -> Option<(f64, f64)> {
     let at = STATUS_NAMES.iter().position(|status| *status == name)?;
     Some((STATUS_HUE[at], STATUS_CHROMA[at]))
+}
+
+/// The band a status's hue stays in, and what it holds, by name.
+#[must_use]
+pub fn status_band(name: &str) -> Option<((f64, f64), &'static str)> {
+    let at = STATUS_NAMES.iter().position(|status| *status == name)?;
+    Some((STATUS_BAND[at], STATUS_BAND_HOLDS[at]))
 }
 
 /// Accepts a hex string or an OKLCH triple and always returns the triple.

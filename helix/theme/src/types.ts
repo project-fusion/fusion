@@ -67,6 +67,14 @@ export type Seed = Color | Relation
  * A status role. A color pins it outright; an object nudges its hue within
  * the meaning it already carries.
  *
+ * **A hue stays in its status's band**, in OKLCH degrees, and one outside it
+ * is refused with the band it missed:
+ *
+ * - `danger`: 15 to 40, the reds from crimson to red-orange
+ * - `warning`: 45 to 105, orange and amber to yellow
+ * - `success`: 125 to 180, the greens from yellow-green to teal-green
+ * - `info`: 200 to 280, cyan and blue to indigo
+ *
  * **Never a `Relation`**, which is the asymmetry with `accent` and is
  * deliberate: a `danger` that rotates with the brand is a warning a reader has
  * to re-learn per product.
@@ -212,7 +220,13 @@ export interface ThemeIntent {
     weight?: 'light' | 'regular' | 'strong'
   }
   /**
-   * The token prefix, without dashes. `helix` by default.
+   * The token prefix. `helix` by default, and `acme` emits
+   * `--acme-color-primary`.
+   *
+   * ASCII letters, digits, hyphens, and underscores, with no hyphen at either
+   * end, since the engine writes the hyphens around it. Any other namespace is
+   * refused with the value it received, such as an empty one, `--acme`, or
+   * `acme tokens`.
    *
    * **What makes the engine useful to somebody who has never heard of Helix.**
    * With this and `pairings`, a team on their own tokens gets the solver and
