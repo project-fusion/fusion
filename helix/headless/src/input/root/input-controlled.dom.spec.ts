@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -48,6 +48,37 @@ describe('a control whose markup declared a value', () => {
     expect(host.requestValue('Hopper')).toBe(true)
     await host.updateComplete
     expect(host.value).toBe('Hopper')
+  })
+})
+
+/**
+ * Keys that arrive faster than anything renders.
+ *
+ * A key lands in the text the control shows, so a consumer who refuses each
+ * change and writes their own value has to write it before the next key. The
+ * element dispatches `helix-before-change` inside the native `input` and shows
+ * what it holds as soon as the dispatch returns, so a value assigned during the
+ * dispatch is the text the next key lands in. React assigns it during the
+ * dispatch only from inside `flushSync`: without it, Playwright typing `Ada L!`
+ * with no delay left the React template's handle empty.
+ */
+describe('a consumer who refuses each key and writes a cleaned value', () => {
+  test('keeps every key, typed with no update between them', async () => {
+    const host = await input()
+    host.addEventListener('helix-before-change', (event: Event) => {
+      event.preventDefault()
+      const { value } = (event as CustomEvent<{ value: string }>).detail
+      host.value = value.toLowerCase().replaceAll(/[^a-z0-9-]/g, '')
+    })
+    const field = part(host, 'control') as HTMLInputElement
+    for (const key of 'Ada L!') {
+      field.value += key
+      field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    }
+    expect(field.value).toBe('adal')
+    await host.updateComplete
+    expect(host.value).toBe('adal')
+    expect(field.value).toBe('adal')
   })
 })
 

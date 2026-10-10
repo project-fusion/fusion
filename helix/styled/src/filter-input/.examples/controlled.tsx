@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { flushSync } from 'react-dom'
 
 type Arrival = { carried: string; name: string }
 
@@ -11,11 +12,14 @@ export function Example() {
   const [value, setValue] = useState('')
 
   /* Refuse the change, then write the value. Writing `value` alone does not
-     take control, because the element keeps applying what you type. */
+     take control, because the element keeps applying what you type.
+     `flushSync` writes it before the next key arrives. React renders an update
+     made in a custom element's event in a later task, and a fast key lands in
+     the text from before it. */
   const changing = (event: CustomEvent<{ value: string }>) => {
     event.preventDefault()
     const next = event.detail.value.toUpperCase()
-    setValue(next)
+    flushSync(() => setValue(next))
     setHeard((before) => {
       const kept = before === RESTING ? [] : before
       return [

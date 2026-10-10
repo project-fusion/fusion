@@ -49,11 +49,17 @@ state yourself, cancel the change and assign your own value:
   label="Name"
   onhelix-before-change={(event) => {
     event.preventDefault()
-    setName(sanitize(event.detail.value))
+    flushSync(() => setName(sanitize(event.detail.value)))
   }}
   value={name}
 />
 ```
+
+Assign your value before the next key arrives, or that key lands in the text
+from before your value. Vue, Svelte, and Solid apply a bound value in time. In
+React, set the state inside `flushSync`, as [React](./react) explains. In
+Angular without zone.js, call `detectChanges()` after you set the signal, as
+[Angular](./angular) explains.
 
 The platform uses the same pattern. You call `preventDefault()` to cancel:
 

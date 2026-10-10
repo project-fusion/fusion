@@ -137,6 +137,8 @@ starts with that value and keeps applying its own changes, so the markup below
 works without a handler.
 
 ```tsx
+import { flushSync } from 'react-dom'
+
 // Seeded: the element owns it from there.
 <helix-input default-value="Ada" label="Name" />
 
@@ -148,7 +150,7 @@ works without a handler.
   label="Name"
   onhelix-before-change={(event) => {
     event.preventDefault()
-    setName(clean(event.detail.value))
+    flushSync(() => setName(clean(event.detail.value)))
   }}
   value={name}
 />
@@ -158,6 +160,18 @@ works without a handler.
 refuse it. React restores a native `<input>` whose state did not change, and it
 does not do this for a custom element. A handler that does not call `setState`
 leaves the element with the new value.
+
+**Set the state inside `flushSync` when you write your own value.** React sets
+the priority of a state update from the type of the event being handled.
+`helix-before-change` is not one of the types React lists, so the update gets
+the default priority and renders in a later task. A key that arrives before that
+task lands in the text from before the update, and the keys typed in between are
+lost. A barcode scanner, a password manager, and a test send keys that fast:
+Playwright typing `Ada L!` with no delay into a field that keeps lowercase
+letters left it empty. `flushSync` renders the update before your handler
+returns, so the element holds your value when the next key arrives. The same
+applies to every field you type into, such as `helix-textarea`,
+`helix-number-input`, and `helix-pin-input`.
 
 *Until August 26, 2026, this page described the opposite behavior, and the typings
 enforced it. Writing `value` made you the owner of the state. The element
