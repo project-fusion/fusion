@@ -19,6 +19,15 @@
 //! that cannot be seen from inside the package: it resolves here because the
 //! manager links it from disk, and 404s on install anywhere else.
 //!
+//! **Or importing one, which `dependencies` does not show.** A workspace links
+//! every member into `node_modules`, so a module resolves whichever field
+//! names it, or none. `@fusion.dev/helix-docs` re-exported its catalog from
+//! `@fusion.dev/helix-cem`, which is private and was a devDependency, and the
+//! published package failed at its first import for everyone. So the code a
+//! package ships is read for the packages it names: `src`, which its build
+//! compiles, and every code file under `files`, which is `dist` once built.
+//! A spec ships nowhere and is not read.
+//!
 //! **A path `exports` promises and `files` does not pack**, which fails the same
 //! way and is quieter still: the specifier resolves in this repository, where
 //! the package is a directory, and there is no such file in the tarball. Nothing
@@ -46,13 +55,22 @@
 
 use std::collections::BTreeSet;
 use std::fs;
+use std::path::Path;
 use std::sync::LazyLock;
 
+use fusion_rules::walk::{crawl, walk};
 use regex::Regex;
 use serde_json::Value;
 
 use crate::rules::{Context, Finding, Report};
 use crate::workspace::Manifest;
+
+/// A specifier a file imports, re-exports or requires: `from '…'`, a bare
+/// `import '…'`, `import('…')` and `require('…')`.
+static SPECIFIERS: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"\b(?:from|import|require)\s*\(?\s*['"]([^'"\n]+)['"]"#)
+        .expect("a literal pattern compiles")
+});
 
 static MEMBERS: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(?s)members\s*=\s*\[(.*?)\]").expect("a literal pattern compiles")
@@ -453,7 +471,7 @@ fn judge(
     }
 
     unpacked(manifest, findings);
-    let _ = context;
+    imports(manifest, context, known, shipping, findings);
 }
 
 /// A path `exports` promises that `files` does not pack.
@@ -496,6 +514,95 @@ fn unpacked(manifest: &Manifest, findings: &mut Vec<Finding>) {
             file: at.clone(),
             message: format!("`{name}` exports `{target}`, which `files` does not pack"),
         });
+    }
+}
+
+/// A code file a package's build or tarball carries, which a spec is not.
+fn shipped_code(path: &Path) -> bool {
+    let name = path.file_name().unwrap_or_default().to_string_lossy();
+    [".ts", ".tsx", ".mts", ".cts", ".js", ".mjs", ".cjs"]
+        .iter()
+        .any(|one| name.ends_with(one))
+        && !name.contains(".spec.")
+        && !name.contains(".test.")
+}
+
+/// The package a bare specifier names, without the subpath after it.
+fn package_of(specifier: &str) -> &str {
+    let mut slashes = specifier.match_indices('/').map(|(at, _)| at);
+    let cut = if specifier.starts_with('@') {
+        slashes.nth(1)
+    } else {
+        slashes.next()
+    };
+    cut.map_or(specifier, |at| &specifier[..at])
+}
+
+/// A workspace package that does not publish, named by a file that does.
+///
+/// **Once per package and dependency**, at the first file that names it:
+/// `src/index.ts`, then the `dist/index.js` and `dist/index.d.ts` compiled from
+/// it, are one fault. Not built is not a fault either, because `src` is read
+/// whether `dist` is there or not.
+fn imports(
+    manifest: &Manifest,
+    context: &Context,
+    known: &BTreeSet<&str>,
+    shipping: &BTreeSet<&str>,
+    findings: &mut Vec<Finding>,
+) {
+    let name = &manifest.name;
+    let directory = context.root.join(&manifest.directory);
+    let mut files = Vec::new();
+    crawl(&directory.join("src"), &shipped_code, &mut files);
+    for entry in manifest
+        .value
+        .get("files")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(Value::as_str)
+    {
+        let path = directory.join(entry.trim_start_matches("./"));
+        if path.is_file() && shipped_code(&path) {
+            files.push(path);
+        } else {
+            walk(&path, &shipped_code, &mut files);
+        }
+    }
+
+    let mut named: BTreeSet<String> = BTreeSet::new();
+    for file in files {
+        let Ok(text) = fs::read_to_string(&file) else {
+            continue;
+        };
+        for caught in SPECIFIERS.captures_iter(&text) {
+            /* **A line of a comment is prose, and an import written there is
+            an example.** Code Block's JSDoc shows the two lines that color a
+            block, and a reader copies them; nothing loads them. */
+            let start = caught.get(0).map_or(0, |one| one.start());
+            let line = text[..start].rsplit('\n').next().unwrap_or_default();
+            if ["*", "//", "/*"]
+                .iter()
+                .any(|one| line.trim_start().starts_with(one))
+            {
+                continue;
+            }
+            let dependency = package_of(&caught[1]);
+            if !known.contains(dependency)
+                || shipping.contains(dependency)
+                || !named.insert(dependency.to_owned())
+            {
+                continue;
+            }
+            findings.push(Finding {
+                detail: "Resolves here because the workspace links every member into \
+                         `node_modules`, and fails at the import for everyone who installs it."
+                    .to_owned(),
+                file: context.relative(&file),
+                message: format!("`{name}` is published and imports `{dependency}`, which is not"),
+            });
+        }
     }
 }
 
