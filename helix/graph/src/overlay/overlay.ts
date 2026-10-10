@@ -214,11 +214,11 @@ const nameGroups = (
   at: (id: string) => { x: number; y: number } | undefined,
   avoid: readonly Box[],
 ): void => {
-  /* **Named as a map names a region**: small capitals spread wide, lit in the
+  /* **Named as a map names a region**: a small sentence-case label, lit in the
      group's color, over a soft fall of the ground's color in place of a hard
      ring, so the name sits in the drawing and not on it. */
   context.font = `650 11px ${looks.font}`
-  context.letterSpacing = '0.14em'
+  context.letterSpacing = '0.02em'
   context.textAlign = 'center'
   context.textBaseline = 'middle'
   context.shadowColor = looks.ground
@@ -258,7 +258,7 @@ const nameGroups = (
     if (spread < 12) {
       continue
     }
-    const name = group.name.toLocaleUpperCase()
+    const name = group.name
     const half = context.measureText(name).width / 2 + 4
     const boxAt = (middle: number): Box => ({
       bottom: middle + 9,

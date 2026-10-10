@@ -340,7 +340,7 @@ export const graphSnapshot = (
       if (points.length < 2 || spread < 12) {
         continue
       }
-      const name = group.toLocaleUpperCase()
+      const name = group
       const half = (widthOf(name, 11) * 1.14) / 2 + 4
       const boxAt = (y: number): Box => ({
         bottom: y + 9,
@@ -359,7 +359,7 @@ export const graphSnapshot = (
       const color = mix(tinted ? own(tinted) : token('foreground-muted'), token('foreground'), 60)
       const fade = selected !== undefined && ownGroup !== group ? 0.3 : 0.92
       regions.push(
-        `<text dominant-baseline="middle" fill-opacity="${fade}" font-size="11" font-weight="650" letter-spacing="0.14em" style="fill:${color};stroke:${ground}" text-anchor="middle" x="${short(middle.x)}" y="${short(y)}">${escaped(name)}</text>`,
+        `<text dominant-baseline="middle" fill-opacity="${fade}" font-size="11" font-weight="650" letter-spacing="0.02em" style="fill:${color};stroke:${ground}" text-anchor="middle" x="${short(middle.x)}" y="${short(y)}">${escaped(name)}</text>`,
       )
     }
   }
