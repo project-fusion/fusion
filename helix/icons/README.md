@@ -53,9 +53,9 @@ import { peak } from './icons'
 <helix-icon icon={peak} />
 ```
 
-Any set, not only ours. A subset of Phosphor larger than the 120 here is the
-same command against the package it resolves from, and `--suffix` is for a set
-that spells a weight into the file name:
+The command reads any set of SVG files. More of Phosphor than this package
+carries is the same command against the package it resolves from, and
+`--suffix` is for a set that spells a weight into the file name:
 
 ```sh
 npx helix-icons build \
@@ -66,6 +66,40 @@ npx helix-icons build \
 `--index` also writes the record `<helix-icon name>` reads. It names every glyph,
 so nothing can drop any of it: ask for it when you want names in markup, and
 leave it off when you import.
+
+An `--out` path ending in `.js` or `.mjs` gets JavaScript, with the type in a
+JSDoc comment. Any other path gets TypeScript.
+
+### From a script
+
+The command is also a module, `@fusion.dev/helix-icons/build`, for a build
+script of your own:
+
+```js
+import { build } from '@fusion.dev/helix-icons/build'
+
+const written = build({
+  out: 'src/icons.ts',
+  sources: [{ directory: 'brand-icons' }],
+})
+```
+
+`build` writes the module and returns how many icons it holds. Its options are
+the command's flags:
+
+- `sources`: where the SVG files are, searched in order, each as
+  `{ directory, suffix }`;
+- `names`: the icons to build, and every icon in the sources when left out;
+- `out`: where to write the module;
+- `index`: whether to also write the record `<helix-icon name>` reads;
+- `typeImport`: where the module imports `HelixIcon` from.
+
+It throws where the command fails:
+
+- a source that is not a directory;
+- a name with no file, or with a file in two sources;
+- sources with no SVG files, when `names` is left out;
+- an `out` path ending in `.cjs`.
 
 Phosphor is MIT and its notice travels in `LICENSE` beside ours.
 

@@ -26,11 +26,13 @@ const USAGE = `helix-icons build --source <dir> [--suffix <text>] [--list <file>
                     before it: --source …/bold --suffix -bold reads caret-down-bold.svg.
   --list <file>     Names to build, one per line, # for a comment. Default: every
                     glyph the sources hold.
-  --out <file>      Where to write the module. Default: icons.generated.ts
+  --out <file>      Where to write the module: JavaScript for a .js or .mjs file,
+                    TypeScript otherwise. Default: icons.generated.ts
   --index           Also write the record \`<helix-icon name>\` reads. It names every
                     glyph, so nothing can drop any of it: for markup, not for imports.
   --type-import <s> Where the module imports \`HelixIcon\` from.
-                    Default: @fusion.dev/helix-icons`
+                    Default: @fusion.dev/helix-icons
+  -h, --help        Print this.`
 
 /** The argument after a flag, or nothing where the flag is last. */
 const after = (argv: string[], at: number): string | undefined => {
@@ -38,10 +40,22 @@ const after = (argv: string[], at: number): string | undefined => {
   return value === undefined || value.startsWith('--') ? undefined : value
 }
 
+/** Says what is wrong on stderr, and gives the exit code for it. */
+const refuse = (message: string, usage = false): number => {
+  console.error(`helix-icons: ${message}`)
+  if (usage) {
+    console.error(`\n${USAGE}`)
+  }
+  return 1
+}
+
 export function main(argv: string[]): number {
-  if (argv[0] !== 'build' || argv.includes('--help')) {
+  if (argv.includes('--help') || argv.includes('-h')) {
     console.log(USAGE)
-    return argv[0] === 'build' ? 0 : 1
+    return 0
+  }
+  if (argv[0] !== 'build') {
+    return refuse(argv[0] === undefined ? 'needs a command' : `${argv[0]} is not a command`, true)
   }
 
   const sources: IconSource[] = []
@@ -50,44 +64,53 @@ export function main(argv: string[]): number {
   let index = false
   let typeImport: string | undefined
 
-  for (const [at, flag] of argv.entries()) {
+  /* **Each value is stepped over once it is read**, so a value is never taken
+     for a flag: `--suffix -bold` is one option. Anything left over is a typo,
+     and a typo that is ignored builds something other than what was asked. */
+  for (let at = 1; at < argv.length; at += 1) {
+    const flag = argv[at] as string
+    if (flag === '--index') {
+      index = true
+      continue
+    }
+    const value = after(argv, at)
     switch (flag) {
-      case '--source': {
-        const directory = after(argv, at)
-        if (directory === undefined) {
-          console.error('helix-icons: --source needs a directory')
-          return 1
+      case '--source':
+        if (value === undefined) {
+          return refuse('--source needs a directory')
         }
-        sources.push({ directory: resolve(directory) })
+        sources.push({ directory: resolve(value) })
         break
-      }
       case '--suffix': {
-        const suffix = after(argv, at)
         const last = sources.at(-1)
-        if (suffix === undefined || last === undefined) {
-          console.error(
-            'helix-icons: --suffix names what a file carries, after the --source it is for',
-          )
-          return 1
+        if (value === undefined || last === undefined) {
+          return refuse('--suffix names what a file carries, after the --source it is for')
         }
-        last.suffix = suffix
+        last.suffix = value
         break
       }
       case '--list':
-        list = after(argv, at)
+        if (value === undefined) {
+          return refuse('--list needs a file')
+        }
+        list = value
         break
       case '--out':
-        out = after(argv, at) ?? out
-        break
-      case '--index':
-        index = true
+        if (value === undefined) {
+          return refuse('--out needs a file')
+        }
+        out = value
         break
       case '--type-import':
-        typeImport = after(argv, at)
+        if (value === undefined) {
+          return refuse('--type-import needs the module to import the type from')
+        }
+        typeImport = value
         break
       default:
-        break
+        return refuse(`${flag} is not an option of build`, true)
     }
+    at += 1
   }
 
   if (sources.length === 0) {
