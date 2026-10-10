@@ -52,8 +52,6 @@
 .rung {
   border-inline-start: 2px solid color-mix(in oklab, var(--helix-color-primary) 70%, transparent);
   display: grid;
-  gap: var(--helix-space-3xs);
-  padding-block: var(--helix-space-3xs);
   padding-inline-start: var(--helix-space-md);
 }
 

@@ -87,7 +87,6 @@
 .read {
   color: var(--helix-color-foreground);
   display: grid;
-  gap: var(--helix-space-3xs);
   text-decoration: none;
 }
 
