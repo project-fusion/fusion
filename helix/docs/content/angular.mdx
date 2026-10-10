@@ -73,3 +73,23 @@ The other frameworks check a misspelled name to different degrees:
 value you set and then applies its own changes. To refuse a change, listen for
 the `helix-before-*` event and call `preventDefault()`. See
 [State and control](./state-and-control).
+
+To write your own value into a field you type into, set your signal and then
+call `detectChanges()` on the component's `ChangeDetectorRef`:
+
+```ts
+private readonly view = inject(ChangeDetectorRef)
+
+protected takeHandle(event: Event): void {
+  event.preventDefault()
+  const { value } = (event as CustomEvent<{ value: string }>).detail
+  this.handle.set(clean(value))
+  this.view.detectChanges()
+}
+```
+
+Without zone.js, Angular renders a signal change in a later task. A key that
+arrives before that task lands in the text from before your value, and the keys
+typed in between are lost. A barcode scanner, a password manager, and a test
+send keys that fast. `detectChanges()` renders the change before your handler
+returns.

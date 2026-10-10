@@ -99,11 +99,14 @@ block a change, call `preventDefault()` on the matching `helix-before-*` event:
   label="Name"
   onhelix-before-change={(event) => {
     event.preventDefault()
-    setName(clean(event.detail.value))
+    flushSync(() => setName(clean(event.detail.value)))
   }}
   value={name}
 />
 ```
+
+Set the state inside `flushSync` from `react-dom`. Without it, React renders the
+update in a later task, and keys typed faster than that are lost.
 
 A form reset returns the element to `default-value` and the matching attributes
 for the other states. See [State and control](https://fusion.dev/helix/docs/state-and-control).

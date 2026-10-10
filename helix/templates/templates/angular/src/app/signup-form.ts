@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core'
+import { ChangeDetectorRef, Component, CUSTOM_ELEMENTS_SCHEMA, inject, signal } from '@angular/core'
 import { teams } from './data'
 import { DOCS } from './docs'
 
@@ -31,6 +31,7 @@ export class SignupForm {
   protected readonly teams = teams
   protected readonly handle = signal('')
   protected readonly messages = signal<readonly Message[]>([])
+  private readonly view = inject(ChangeDetectorRef)
 
   /**
    * The page takes the submit, so nothing navigates. Remove `preventDefault()`
@@ -51,12 +52,20 @@ export class SignupForm {
    * with `preventDefault()`, then setting the value you want. Leaving `handle`
    * as it was does not refuse anything.
    *
+   * **`detectChanges()` puts the cleaned value on the element before the next
+   * key arrives.** Without zone.js, Angular renders a signal change in a later
+   * task. Keys sent at machine speed, by a barcode scanner, a password manager,
+   * or a test, arrive before that task, and each one lands in the text from
+   * before the update. Typed by Playwright with no delay, `Ada L!` left the
+   * handle empty without `detectChanges()`, and `adal` with it.
+   *
    * No typings ship for Angular, so the event's detail is named here.
    */
   protected takeHandle(event: Event): void {
     event.preventDefault()
     const { value } = (event as CustomEvent<{ value: string }>).detail
     this.handle.set(value.toLowerCase().replaceAll(/[^a-z0-9-]/g, ''))
+    this.view.detectChanges()
   }
 
   protected dismiss(id: number): void {

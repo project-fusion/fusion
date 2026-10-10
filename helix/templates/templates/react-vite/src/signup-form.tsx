@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { teams } from './data.js'
 import { DOCS } from './docs.js'
 
@@ -74,14 +75,24 @@ export function SignupForm() {
             So taking the decision means refusing the change with
             `preventDefault()`, then setting the value you want. Leaving
             `setHandle` uncalled refuses nothing, and the element keeps the value
-            you meant to turn down. */}
+            you meant to turn down.
+
+            **`flushSync` puts the cleaned value on the element before the next
+            key arrives.** React renders a state update made in a custom
+            element's event in a later task. Keys sent at machine speed, by a
+            barcode scanner, a password manager, or a test, arrive before that
+            task, and each one lands in the text from before the update. Typed
+            by Playwright with no delay, `Ada L!` left the handle empty without
+            `flushSync`, and `adal` with it. */}
         <helix-input
           hint="Lowercase and hyphens, whatever you type."
           label="Handle"
           name="handle"
           onhelix-before-change={(event) => {
             event.preventDefault()
-            setHandle(event.detail.value.toLowerCase().replaceAll(/[^a-z0-9-]/g, ''))
+            flushSync(() => {
+              setHandle(event.detail.value.toLowerCase().replaceAll(/[^a-z0-9-]/g, ''))
+            })
           }}
           value={handle}
         />
