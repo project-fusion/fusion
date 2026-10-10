@@ -367,11 +367,10 @@ export const connectGraph = (
     current = looksOf({
       along: reached?.along,
       colors,
-      /* The theme's face, unquoted, which Sigma writes into a canvas font. */
-      font: getComputedStyle(frame)
-        .fontFamily.split(',')[0]
-        ?.trim()
-        .replace(/^["']|["']$/g, ''),
+      /* **The frame's whole stack**, which a canvas font takes as CSS does.
+         The first face alone was `ui-sans-serif`, which Chrome does not draw
+         in a canvas, so the names were drawn in Times. */
+      font: getComputedStyle(frame).fontFamily.trim(),
       groups: nodes.flatMap((node) => (node.group === undefined ? [] : [node.group])),
       keyed: graph.keyed?.id,
       links: links.length,

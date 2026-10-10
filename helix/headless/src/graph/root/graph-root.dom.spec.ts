@@ -3,9 +3,11 @@ import {
   hasLayout,
   hasState,
   mount,
+  notYetDefined,
   part,
   registerDom,
   settle,
+  slotted,
 } from '@fusion.dev/helix-testing/dom'
 import type { GraphLink, GraphNode } from './graph-model.js'
 
@@ -774,6 +776,27 @@ describe('a list with no notes', () => {
       'Alt+ArrowDown',
       'Alt+ArrowUp',
     ])
+  })
+})
+
+/* The guide's order: the frame is in the page, the import defines it, and the
+   page makes its renderer in the box on the next line, with no await between.
+   A renderer measures its box as it is made, and Sigma throws on one with no
+   width. */
+describe('a graph defined after its markup', () => {
+  test('slots the box for the renderer as it is defined, so the box has a size in the same turn', () => {
+    const late = notYetDefined('helix-headless-graph')
+    Object.assign(late.element, { label: 'Research notes' })
+    const box = document.createElement('div')
+    box.style.blockSize = '200px'
+    late.element.append(box)
+    document.body.replaceChildren(late.element)
+    late.define()
+    expect(slotted(late.element).includes(box)).toBe(true)
+    if (hasLayout()) {
+      expect(box.getBoundingClientRect().width).toBeGreaterThan(0)
+      expect(box.getBoundingClientRect().height).toBe(200)
+    }
   })
 })
 

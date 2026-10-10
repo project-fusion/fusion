@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import type { ViewportGestureMode } from '@fusion.dev/helix-core'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { DrawnLink, DrawnNode, GraphChanges, GraphDriver } from './connect-graph.js'
 import type { GraphPoint } from './seed.js'
 
@@ -560,5 +560,43 @@ describe('connectGraph', () => {
     press('ArrowRight', true)
     await settled(host)
     expect(asked.centered).toEqual(['a'])
+  })
+})
+
+/* Chrome draws no `ui-sans-serif` in a canvas, so names given the first face
+   of the theme's stack alone were drawn in Times. In a browser only: happy-dom
+   reports no inherited custom property, so the connector reads no colors there
+   and hands the driver no looks. */
+describe('the names in the drawing', () => {
+  if (!hasLayout()) {
+    return
+  }
+
+  test('are in the frame’s whole font stack, so a face the canvas lacks falls back along it', async () => {
+    const host = await frame()
+    for (const token of [
+      'accent',
+      'border',
+      'danger',
+      'foreground',
+      'foreground-muted',
+      'info',
+      'primary',
+      'success',
+      'surface-overlay',
+      'surface-sunken',
+      'warning',
+    ]) {
+      host.style.setProperty(`--helix-color-${token}`, 'rgb(20, 20, 20)')
+    }
+    host.style.fontFamily = '"Inter Variable", ui-sans-serif, system-ui, sans-serif'
+    const fonts: string[] = []
+    const connection = connectGraph(host, {
+      ...recording().driver,
+      look: (looks) => fonts.push(looks.font),
+    })
+    await settled(host)
+    connection.disconnect()
+    expect(fonts.at(-1)).toBe('"Inter Variable", ui-sans-serif, system-ui, sans-serif')
   })
 })

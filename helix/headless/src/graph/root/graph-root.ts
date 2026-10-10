@@ -655,6 +655,15 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
         this.stoppable = true
       }, LONG_LAYOUT)
     }
+    /* **The first render runs as the frame connects, and not a microtask
+       later.** The renderer's box is a child, and a child has no box until
+       the slot it goes in is rendered, so Sigma made in it on the line after
+       the import, as the guide writes it, threw "Container has no width". A
+       server's markup already holds the slot, and hydrates when Lit
+       schedules it. */
+    if (!this.hasUpdated && !this.serverRendered) {
+      this.performUpdate()
+    }
   }
 
   override disconnectedCallback(): void {

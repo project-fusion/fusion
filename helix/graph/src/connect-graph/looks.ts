@@ -181,7 +181,7 @@ export interface LinkLook {
 export interface GraphLooks {
   /** A note's own color, its tone's or its group's, whatever the selection fades. */
   colorOf(id: string): string
-  /** The typeface the labels are drawn in: the first of the frame's own. */
+  /** The typefaces the labels are drawn in: the frame's own font stack, as CSS writes it. */
   font: string
   /** What the drawing is laid on, which a name is ringed in so it reads over the links. */
   ground: string

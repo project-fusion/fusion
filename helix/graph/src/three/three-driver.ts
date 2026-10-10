@@ -1847,6 +1847,13 @@ export const threeDriver = (
           wake()
         })
         .catch((cause: unknown) => {
+          /* **A layout already ended says nothing.** A page that connects in
+             the turn it sets the notes starts a layout and a second that ends
+             the first, and the console said the package was missing twice:
+             the layout still running says it. */
+          if (done) {
+            return
+          }
           /* Without the layout the notes stay where they were started, and the frame is told so. */
           reportRuntime({
             detail: cause,
@@ -1855,7 +1862,7 @@ export const threeDriver = (
             message:
               'The three.js driver could not load d3-force-3d to lay out the notes. Install d3-force-3d alongside @fusion.dev/helix-graph.',
           })
-          if (!done && !stopped) {
+          if (!stopped) {
             done = true
             placed(new Map(nodes.map((node) => [node.id, { x: node.x, y: node.y, z: node.z }])))
           }
