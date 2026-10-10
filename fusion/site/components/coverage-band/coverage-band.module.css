@@ -179,15 +179,15 @@
   vertical-align: bottom;
 }
 
-/* A group's name opens its rows, in the eyebrow's voice. */
+/* A group's name opens its rows, in the eyebrow's voice: sentence case and
+   its tracking, since a name in capitals is read as a label being shouted. */
 .group th {
   color: var(--helix-color-foreground-subtle);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
-  letter-spacing: var(--helix-tracking-wider);
+  letter-spacing: 0.01em;
   padding: var(--helix-space-md) var(--helix-space-sm) var(--helix-space-2xs);
   text-align: start;
-  text-transform: uppercase;
 }
 
 .row > * {
