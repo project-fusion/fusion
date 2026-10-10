@@ -11,7 +11,7 @@ import { styles } from './map-contours.css.js'
  * contours on a printed map, so they read over a light or a dark map.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Contours, Topographic lines, Elevation lines, Isolines
  * @documentation https://fusion.dev/helix/components/map

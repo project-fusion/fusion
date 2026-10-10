@@ -12,7 +12,7 @@ import { styles } from './map-points.css.js'
  * primary color unless `tone` sets another.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Data layer, GeoJSON layer, Point cloud, Point layer
  * @documentation https://fusion.dev/helix/components/map

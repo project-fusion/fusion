@@ -172,7 +172,7 @@ const SETTLES = 400
  * frame as child elements.
  *
  * @since 0.100.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Map frame, Map container, Geo
  * @documentation https://fusion.dev/helix/components/map

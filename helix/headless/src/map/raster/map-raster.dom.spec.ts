@@ -78,4 +78,30 @@ describe('map raster', () => {
     )
     expect(names).toEqual(['3D buildings', 'Weather radar, Last 50 minutes'])
   })
+
+  test('each frame it moves to says so, which is how the connector shows it', async () => {
+    const host = await frame(
+      '<helix-headless-map-raster label="Radar" frames="a b c" interval="100"></helix-headless-map-raster>',
+    )
+    const raster = host.querySelector('helix-headless-map-raster') as Raster
+    const said: string[] = []
+    host.addEventListener('helix-map-part-change', (event) => said.push(event.detail.kind))
+    raster.frame = 1
+    await raster.updateComplete
+    expect(said).toEqual(['layer'])
+    expect(raster.hasAttribute('frame')).toBe(false)
+  })
+
+  test('taken away, it stops playing on the frame it shows', async () => {
+    const host = await frame(
+      '<helix-headless-map-raster label="Radar" frames="a b c" interval="100" playing></helix-headless-map-raster>',
+    )
+    const raster = host.querySelector('helix-headless-map-raster') as Raster
+    raster.remove()
+    const shown = raster.frame
+    await wait(250)
+    expect(raster.frame).toBe(shown)
+    await host.updateComplete
+    expect(part(host, 'layers')).toBeNull()
+  })
 })

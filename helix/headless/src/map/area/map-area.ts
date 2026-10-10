@@ -17,7 +17,7 @@ import { type MapPoint, pointsConverter } from '../route/map-route.js'
  * the area's `label` in the frame's list.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Map region, Polygon, Zone
  * @documentation https://fusion.dev/helix/components/map

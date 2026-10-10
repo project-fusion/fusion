@@ -12,7 +12,7 @@ import { styles } from './map-position.css.js'
  * edge, or in a `tone`. A position with a heading is drawn as an arrow.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Current location, Live position, Tracker, You are here
  * @documentation https://fusion.dev/helix/components/map

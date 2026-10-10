@@ -12,7 +12,7 @@ import { styles } from './map-marker.css.js'
  * primary color unless `tone` sets another.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Map pin, Place, Point of interest
  * @documentation https://fusion.dev/helix/components/map

@@ -11,7 +11,7 @@ import { styles } from './map-raster.css.js'
  * at `opacity` so the map shows through.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Weather radar, Tile overlay, Raster layer
  * @documentation https://fusion.dev/helix/components/map

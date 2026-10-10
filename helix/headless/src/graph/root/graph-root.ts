@@ -104,7 +104,7 @@ const LONG_LAYOUT = 5000
  * to set a block size on the list, or it grows to hold every row.
  *
  * @since 0.116.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Knowledge graph, Network, Note graph, Second brain
  * @documentation https://fusion.dev/helix/components/graph

@@ -18,7 +18,7 @@ import { styles } from './canvas-node.css.js'
  * reach 44 pixels across, so a finger can start a connection from one.
  *
  * @since 0.100.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases CanvasCard, BoardNode
  * @documentation https://fusion.dev/helix/components/canvas

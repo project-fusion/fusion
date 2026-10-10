@@ -38,7 +38,7 @@ export const pointsConverter = { fromAttribute: pointsOf }
  * each route by its `label` and `description` for screen readers.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Map line, Path, Polyline
  * @documentation https://fusion.dev/helix/components/map

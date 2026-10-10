@@ -21,7 +21,7 @@ import { styles } from './graph-root.css.js'
  * methods of a driver for another renderer.
  *
  * @since 0.116.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases Knowledge graph, Network, Note graph, Second brain
  * @documentation https://fusion.dev/helix/components/graph

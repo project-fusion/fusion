@@ -13,7 +13,7 @@ import { styles } from './map-buildings.css.js'
  * them by meaning.
  *
  * @since 0.105.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases 3D buildings, Extrusion
  * @documentation https://fusion.dev/helix/components/map

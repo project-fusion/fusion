@@ -11,7 +11,7 @@ import { type CSSResultGroup, css } from 'lit'
  * connector joins.
  *
  * @since 0.100.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases CanvasConnector, BoardEdge
  * @documentation https://fusion.dev/helix/components/canvas

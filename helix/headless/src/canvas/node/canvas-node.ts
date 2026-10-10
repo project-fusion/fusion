@@ -59,7 +59,7 @@ const DRAWN = [
  * between cards.
  *
  * @since 0.100.0
- * @status experimental
+ * @status stable
  * @category media
  * @aliases CanvasCard, BoardNode
  * @documentation https://fusion.dev/helix/components/canvas
