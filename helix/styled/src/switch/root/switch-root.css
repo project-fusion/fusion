@@ -113,7 +113,7 @@
    around something already distinct. */
 :host(:state(checked)) [part="thumb"] {
   border-color: transparent;
-  color: var(--switch-icon-color, var(--switch-on-color, var(--helix-color-primary)));
+  color: var(--switch-icon-color, var(--switch-on-color, var(--helix-color-primary-surface)));
 }
 
 /* An icon takes most of the thumb, and the thumb's own color. */
@@ -123,10 +123,15 @@
 
 /* Color, and this is the one control that needs it. A checkbox says "on" with
    a tick, which is legible without color; a switch has no mark at all, so the
-   fill is the whole difference between the two states. */
+   fill is the whole difference between the two states.
+
+   **`primary-surface`, not `primary`**, as Badge's fill is. The thumb is
+   `foreground-on-primary`, and the grounds that ink is solved against are the
+   fills: `primary` is the color primary *text* is set in, which in a dark
+   scheme is a light one, and a white thumb on it all but vanished. */
 :host(:state(checked)) [part="track"] {
-  background-color: var(--switch-on-color, var(--helix-color-primary));
-  border-color: var(--switch-on-color, var(--helix-color-primary));
+  background-color: var(--switch-on-color, var(--helix-color-primary-surface));
+  border-color: var(--switch-on-color, var(--helix-color-primary-surface));
 }
 
 /* The input is the track: stretched over it, invisible, and still the thing

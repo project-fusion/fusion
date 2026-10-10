@@ -81,7 +81,7 @@ slot[name="label"]::slotted(*) {
    composited: a bar updated many times a second is the ordinary case, and a
    width animation lays the track out again on every frame. */
 [part="indicator"] {
-  background-color: var(--progress-color, var(--helix-color-primary));
+  background-color: var(--progress-color, var(--helix-color-primary-surface));
   block-size: 100%;
   border-radius: inherit;
   inline-size: 100%;
@@ -277,7 +277,7 @@ slot[name="label"]::slotted(*) {
    circumference, the radius or pi. */
 :host([shape="ring"]) [part="indicator"] {
   scale: none;
-  stroke: var(--progress-color, var(--helix-color-primary));
+  stroke: var(--progress-color, var(--helix-color-primary-surface));
   stroke-dasharray: calc(var(--progress-fraction) * 100) 100;
   stroke-linecap: round;
   transition: stroke-dasharray var(--progress-transition-duration, var(--helix-duration-normal))
@@ -422,7 +422,7 @@ slot[name="label"]::slotted(*) {
 :host([emphasis="subtle"]) [part="indicator"] {
   background-color: color-mix(
     in oklab,
-    var(--progress-color, var(--helix-color-primary)) 30%,
+    var(--progress-color, var(--helix-color-primary-surface)) 30%,
     var(--progress-track-color, var(--helix-color-surface-sunken))
   );
 }
@@ -430,7 +430,7 @@ slot[name="label"]::slotted(*) {
 :host([emphasis="subtle"][shape="ring"]) [part="indicator"] {
   stroke: color-mix(
     in oklab,
-    var(--progress-color, var(--helix-color-primary)) 30%,
+    var(--progress-color, var(--helix-color-primary-surface)) 30%,
     var(--progress-track-color, var(--helix-color-surface-sunken))
   );
 }

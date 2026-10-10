@@ -84,7 +84,11 @@
   },
   "helix": {
     "accepted": {
-      "color-foreground-subtle on color-surface-sunken": "The engine does not emit `foreground-subtle` at all: the readable range supports one quiet step and not two, so the stylesheet keeps its own and the engine does not pretend to have solved it."
+      "color-foreground-subtle on color-background": "The engine does not emit `foreground-subtle` at all: the readable range supports one quiet step and not two, so the stylesheet keeps its own and the engine does not pretend to have solved it.",
+      "color-foreground-subtle on color-surface": "The engine does not emit `foreground-subtle` at all: the readable range supports one quiet step and not two, so the stylesheet keeps its own and the engine does not pretend to have solved it.",
+      "color-foreground-subtle on color-surface-sunken": "The engine does not emit `foreground-subtle` at all: the readable range supports one quiet step and not two, so the stylesheet keeps its own and the engine does not pretend to have solved it.",
+      "color-foreground-subtle on color-well": "The engine does not emit `foreground-subtle` at all: the readable range supports one quiet step and not two, so the stylesheet keeps its own and the engine does not pretend to have solved it.",
+      "color-surface-media on color-foreground-media": "A QR code paints the media pair the other way up: black modules on white paper in both schemes, from the token layer. The engine emits neither token, and the model holds the pair over a photograph, which no theme can measure."
     },
     "chrome": {
       "app-header": "The bar across the top of the page, which is page chrome by definition.",

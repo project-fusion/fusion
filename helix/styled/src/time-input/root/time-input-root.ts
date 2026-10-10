@@ -38,7 +38,7 @@ import { styles } from './time-input-root.css.js'
  *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless
  *   your theme sets a width.
  * @cssproperty --time-input-segment-focus-background-color - The fill behind the
- *   segment with focus, in `segmented`. It follows `--helix-color-primary`.
+ *   segment with focus, in `segmented`. It follows `--helix-color-primary-surface`.
  * @cssproperty --time-input-segment-focus-color - The text of the segment with
  *   focus, in `segmented`.
  * @cssproperty --time-input-segment-literal-color - The text the locale writes
