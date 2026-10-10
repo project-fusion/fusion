@@ -48,7 +48,7 @@
     - listitem: Every tag, property, and event in one manifest at a URL
     - listitem: Every page as Markdown, and every component family as JSON
   - paragraph: Theming
-  - heading "Every pair checked for contrast" [level=2]
+  - heading "Every pair Helix solves, checked for contrast" [level=2]
   - paragraph: You enter one brand color, and Helix computes every token from it.
   - figure:
     - img "How a palette is derived from one color A brand color, a saturation, a density and a radius feed a derivation engine, which emits 179 semantic tokens in both schemes with 67 foreground and ground pairs measured.": What you choose brand saturation density radius AA Aa 4.9:1 measured contrast What comes out 179 semantic tokens both schemes 67 pairs measured
@@ -222,9 +222,9 @@
         - cell "None"
         - cell "sp-coachmark sp-coachmark"
         - cell "None"
-      - row "Node diagrams helix-canvas, experimental helix-canvas None None None None":
+      - row "Node diagrams helix-canvas helix-canvas None None None None":
         - rowheader "Node diagrams"
-        - cell "helix-canvas, experimental helix-canvas"
+        - cell "helix-canvas helix-canvas"
         - cell "None"
         - cell "None"
         - cell "None"
@@ -232,9 +232,9 @@
     - rowgroup:
       - row "Media and places":
         - columnheader "Media and places"
-      - row "Maps helix-map, experimental helix-map None None None None":
+      - row "Maps helix-map helix-map None None None None":
         - rowheader "Maps"
-        - cell "helix-map, experimental helix-map"
+        - cell "helix-map helix-map"
         - cell "None"
         - cell "None"
         - cell "None"
@@ -305,7 +305,7 @@
   - slider "Corner radius": "50"
   - button "Switch to dark"
   - button "Reset to the shipped palette" [disabled]
-  - text: every pair clears
+  - text: every measured pair clears
   - button "Close the theme controls"
 - contentinfo:
   - img "Fusion"

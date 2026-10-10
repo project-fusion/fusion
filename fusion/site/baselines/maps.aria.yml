@@ -46,6 +46,13 @@
       - button "Zoom in": +
       - button "Zoom out": −
       - button "Face north"
+    - link "OpenFreeMap":
+      - /url: https://openfreemap.org
+    - link "© OpenMapTiles":
+      - /url: https://www.openmaptiles.org/
+    - text: Data from
+    - link "OpenStreetMap":
+      - /url: https://www.openstreetmap.org/copyright
     - status
   - group "Customize the map":
     - text: Customize the map
