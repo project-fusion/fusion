@@ -44,7 +44,7 @@ pub struct Theme {
 pub fn derive_theme(intent: &ThemeIntent) -> Result<Theme, IntentError> {
     let resolved = resolve(intent)?;
     let derived = derive_tokens(&resolved);
-    let pairings = pairings(&resolved.pairings, &derived.tokens);
+    let pairings = pairings(&resolved.pairings, &derived.tokens, resolved.scheme);
 
     Ok(Theme {
         collisions: collisions(
@@ -73,8 +73,8 @@ mod tests {
         Background, Brand, BrandPair, Color, Font, From, Material, Motion, Neutral, Relation,
         Scheme, Seed, Status, StatusSeed, ThemeIntent, STATUS_BAND, STATUS_HUE,
     };
-    use crate::model::{PAGE_SURFACES, WELL};
-    use crate::oklch::{laid_over, shipped_contrast_ratio};
+    use crate::model::{HOVER, PAGE_SURFACES, TINTS, WELL};
+    use crate::oklch::{laid_over, shipped_contrast_ratio, Oklch};
 
     fn hex(value: &str) -> Color {
         Color::Hex(value.to_owned())
@@ -132,7 +132,11 @@ mod tests {
             .expect("the page derives");
             let foreground = token(&theme, "color-foreground").value;
             for ground in PAGE_SURFACES {
-                let well = laid_over(foreground, WELL.percent, token(&theme, ground).value);
+                let well = laid_over(
+                    foreground,
+                    WELL.percent(scheme),
+                    token(&theme, ground).value,
+                );
                 for ink in ["color-foreground", "color-foreground-muted"] {
                     let ratio = shipped_contrast_ratio(token(&theme, ink).value, well);
                     assert!(
@@ -145,6 +149,119 @@ mod tests {
                 theme.violations.is_empty(),
                 "{page}: {:?}",
                 theme.violations
+            );
+        }
+    }
+
+    /// A brand on a page of the given color, or on white or black.
+    fn branded(brand: &str, scheme: Scheme, page: Option<&str>) -> ThemeIntent {
+        let background = page.map(|page| {
+            if scheme == Scheme::Dark {
+                Background {
+                    dark: Some(hex(page)),
+                    light: None,
+                }
+            } else {
+                Background {
+                    dark: None,
+                    light: Some(hex(page)),
+                }
+            }
+        });
+        ThemeIntent {
+            background,
+            scheme: Some(scheme),
+            ..ThemeIntent::new(hex(brand))
+        }
+    }
+
+    /// Both neutral inks clear the target on a lit row over every surface, on
+    /// each tint, and in a field on each tint, on the nine themes measured in
+    /// Chromium on October 10, 2026. Solved against the ladder and the well
+    /// alone, the quiet ink measured 3.65:1 on a lit row over a raised surface
+    /// in the default dark theme, 4.32:1 on `primary-subtle` on a #4a4a4a page,
+    /// and 3.81:1 on the well over a tint on a #0b2a33 one.
+    #[test]
+    fn a_quiet_line_reads_on_a_lit_row_and_on_a_tinted_one() {
+        for (brand, scheme, page) in [
+            ("#3b82f6", Scheme::Light, None),
+            ("#3b82f6", Scheme::Dark, None),
+            ("#FF6200", Scheme::Dark, Some("#333333")),
+            ("#FF6200", Scheme::Dark, Some("#4a4a4a")),
+            ("#2dd4bf", Scheme::Dark, Some("#0b2a33")),
+            ("#FF6200", Scheme::Light, Some("#f7f2eb")),
+            ("#FF6200", Scheme::Light, Some("#e8dcc4")),
+            ("#FF6200", Scheme::Light, Some("#d9d9d9")),
+            ("#FF6200", Scheme::Light, Some("#bfb39a")),
+        ] {
+            let label = page.unwrap_or("no page");
+            let theme = derive_theme(&branded(brand, scheme, page)).expect("the page derives");
+            let foreground = token(&theme, "color-foreground").value;
+            let mut grounds: Vec<(String, Oklch)> = PAGE_SURFACES
+                .iter()
+                .map(|ground| {
+                    (
+                        format!("a lit row over {ground}"),
+                        laid_over(
+                            foreground,
+                            HOVER.percent(scheme),
+                            token(&theme, ground).value,
+                        ),
+                    )
+                })
+                .collect();
+            for tint in TINTS {
+                let under = token(&theme, tint).value;
+                grounds.push((tint.to_owned(), under));
+                grounds.push((
+                    format!("the well over {tint}"),
+                    laid_over(foreground, WELL.percent(scheme), under),
+                ));
+            }
+            for ink in ["color-foreground", "color-foreground-muted"] {
+                for (name, ground) in &grounds {
+                    let ratio = shipped_contrast_ratio(token(&theme, ink).value, *ground);
+                    assert!(
+                        ratio >= 4.5,
+                        "{label} in {scheme:?}: {ink} on {name} is {ratio:.2}:1"
+                    );
+                }
+            }
+            assert!(
+                theme.violations.is_empty(),
+                "{label} in {scheme:?}: {:?}",
+                theme.violations
+            );
+        }
+    }
+
+    /// A lit row is measured at the strength its scheme paints, which is what
+    /// `tokens.ts` declares for `color-hover`: 8% of the foreground in light
+    /// and 12% in dark.
+    #[test]
+    fn a_lit_row_is_measured_at_the_strength_its_scheme_paints() {
+        for (scheme, percent) in [(Scheme::Light, 8), (Scheme::Dark, 12)] {
+            let theme = derive_theme(&branded("#3b82f6", scheme, None)).expect("the theme derives");
+            let pairing = theme
+                .pairings
+                .iter()
+                .find(|pairing| {
+                    pairing.foreground == "color-foreground-muted"
+                        && pairing.background == "color-hover over color-surface-sunken"
+                })
+                .expect("the quiet ink is measured on a lit row over a sunken surface");
+            let lit = laid_over(
+                token(&theme, "color-foreground").value,
+                percent,
+                token(&theme, "color-surface-sunken").value,
+            );
+            assert_eq!(
+                pairing.ratio,
+                Some(shipped_contrast_ratio(
+                    token(&theme, "color-foreground-muted").value,
+                    lit
+                )),
+                "{scheme:?}"
             );
         }
     }

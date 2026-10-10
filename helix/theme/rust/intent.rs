@@ -107,7 +107,9 @@ pub enum StatusSeed {
 pub struct PairingRequest {
     /// The ground. `color-well over color-surface` names a field's well over
     /// the surface it sits on: 5% of the theme's `color-foreground` laid over
-    /// that surface, as the stylesheet paints it.
+    /// that surface, as the stylesheet paints it. `color-hover over
+    /// color-surface` names a lit row over it: 8% of `color-foreground` in
+    /// light and 12% in dark.
     pub background: String,
     pub foreground: String,
     /// The ratio this pair has to reach. Carried per pair rather than taken from

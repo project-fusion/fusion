@@ -61,7 +61,7 @@ use crate::intent::{
     From, Material, Mechanism, Motion, Relation, Scheme, Seed, Separation, Status, StatusSeed,
     ThemeIntent, Weight, STATUS_CHROMA, STATUS_HUE, STATUS_NAMES,
 };
-use crate::model::{over, GROUNDS, INKS, PAGE_SURFACES, WELL};
+use crate::model::{over, washed, GROUNDS, HOVER, INKS, PAGE_SURFACES, TINTS, WASHES, WELL};
 use crate::oklch::{
     contrast_ratio, fit_to_gamut, hex_to_oklch, is_out_of_gamut, lightness_for_contrast,
     oklch_to_hex, relative_luminance, shipped_contrast_ratio, shipped_luminance, Oklch,
@@ -1142,7 +1142,14 @@ fn the_neutral_inks_land_where_the_typescript_lands() {
             neutral,
             ladder(resolved.separation.surface),
         );
-        let inks = neutral_inks(built, neutral, resolved.contrast_target);
+        let derived = derive_tokens(&resolved);
+        let inks = neutral_inks(
+            built,
+            neutral,
+            resolved.scheme,
+            [derived.primary.subtle, derived.accent.subtle],
+            resolved.contrast_target,
+        );
 
         for (name, raw) in [
             ("color-foreground", inks.foreground),
@@ -1187,7 +1194,14 @@ fn body_text_is_the_strongest_ink_and_stands_clear_of_the_muted_one() {
             neutral,
             ladder(resolved.separation.surface),
         );
-        let inks = neutral_inks(built, neutral, resolved.contrast_target);
+        let derived = derive_tokens(&resolved);
+        let inks = neutral_inks(
+            built,
+            neutral,
+            resolved.scheme,
+            [derived.primary.subtle, derived.accent.subtle],
+            resolved.contrast_target,
+        );
         let (strongest, gap) = if resolved.scheme == Scheme::Dark {
             (1.0, inks.foreground.lightness - inks.muted.lightness)
         } else {
@@ -1205,34 +1219,59 @@ fn body_text_is_the_strongest_ink_and_stands_clear_of_the_muted_one() {
     }
 }
 
-/// The two inks written in a field clear their target on the field's well over
-/// every surface of the ladder, in every theme the oracle records.
+/// The two neutral inks clear their target on a field's well and on a lit row
+/// over every surface of the ladder, on each tint, and on the well over each
+/// tint, in every theme the oracle records.
 ///
 /// **Read off the pairings, so it holds the model and the solver together.** A
-/// well left out of the model is a theme with no such pair, which fails here as
-/// surely as a quiet ink solved short of the target.
+/// ground left out of the model is a theme with no such pair, which fails here
+/// as surely as a quiet ink solved short of the target.
 #[test]
-fn the_inks_in_a_field_clear_its_well_on_every_surface() {
+fn the_neutral_inks_clear_every_wash_and_tint_they_are_written_on() {
+    let grounds: Vec<String> = PAGE_SURFACES
+        .iter()
+        .flat_map(|ground| [over(WELL, ground), over(HOVER, ground)])
+        .chain(
+            TINTS
+                .iter()
+                .flat_map(|tint| [(*tint).to_owned(), over(WELL, tint)]),
+        )
+        .collect();
     for label in labels() {
         let theme = derive_theme(&intent_for(label)).expect("the oracle's intents all derive");
         for ink in ["color-foreground", "color-foreground-muted"] {
-            for ground in PAGE_SURFACES {
-                let well = over(WELL, ground);
+            for ground in &grounds {
                 let pairing = theme
                     .pairings
                     .iter()
-                    .find(|pairing| pairing.foreground == ink && pairing.background == well)
-                    .unwrap_or_else(|| panic!("{label}: no pair of {ink} on {well}"));
+                    .find(|pairing| pairing.foreground == ink && pairing.background == *ground)
+                    .unwrap_or_else(|| panic!("{label}: no pair of {ink} on {ground}"));
                 assert_eq!(
                     pairing.status,
                     Outcome::Pass,
-                    "{label}: {ink} on {well} at {:?} against {}",
+                    "{label}: {ink} on {ground} at {:?} against {}",
                     pairing.ratio,
                     pairing.target
                 );
             }
         }
     }
+}
+
+/// Every wash the model names is read back from its own name, and a name the
+/// model does not have reads as one token.
+#[test]
+fn a_ground_laid_over_another_is_read_back_from_its_name() {
+    for wash in WASHES {
+        assert_eq!(
+            washed(&over(wash, "color-surface")),
+            Some((wash, "color-surface")),
+            "{}",
+            wash.name
+        );
+    }
+    assert_eq!(washed("color-surface"), None);
+    assert_eq!(washed("color-mist over color-surface"), None);
 }
 
 /// A floating surface separated by shadow alone keeps a hairline in the dark,

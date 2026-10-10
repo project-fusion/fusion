@@ -8,7 +8,7 @@
 use crate::derive::emphasis::Emphasis;
 use crate::derive::status::StatusColor;
 use crate::derive::{perceptual_distance, DerivedToken, COLLISION_DISTANCE};
-use crate::intent::PairingRequest;
+use crate::intent::{PairingRequest, Scheme};
 use crate::model::{washed, GROUNDS};
 use crate::oklch::{fit_to_gamut, laid_over, shipped_contrast_ratio, Oklch, GAMUT_STEPS};
 
@@ -55,9 +55,14 @@ pub struct Pairing {
 /// **A ground named `color-well over color-surface` is the well laid over that
 /// ground**, made from the tokens this theme emits as the stylesheet makes it:
 /// a pinned foreground moves the well, and a ground the theme does not emit
-/// leaves the pair unverifiable.
+/// leaves the pair unverifiable. Every wash the model names is read this way,
+/// `color-hover over color-surface` too, at the strength `scheme` paints.
 #[must_use]
-pub fn pairings(requests: &[PairingRequest], tokens: &[DerivedToken]) -> Vec<Pairing> {
+pub fn pairings(
+    requests: &[PairingRequest],
+    tokens: &[DerivedToken],
+    scheme: Scheme,
+) -> Vec<Pairing> {
     let emitted = |name: &str| {
         tokens
             .iter()
@@ -67,7 +72,7 @@ pub fn pairings(requests: &[PairingRequest], tokens: &[DerivedToken]) -> Vec<Pai
     let value = |name: &str| match washed(name) {
         Some((wash, ground)) => Some(laid_over(
             fit_to_gamut(emitted(wash.ink)?, GAMUT_STEPS),
-            wash.percent,
+            wash.percent(scheme),
             fit_to_gamut(emitted(ground)?, GAMUT_STEPS),
         )),
         None => emitted(name),

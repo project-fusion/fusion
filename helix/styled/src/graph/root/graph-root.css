@@ -444,13 +444,7 @@ slot[name="filter-icon"]::slotted(*) {
 [part~="note"]:hover,
 [part="list"]:focus-visible [part~="note-cursor"],
 [part="search"]:has([aria-activedescendant]) ~ [part="list"] [part~="note-cursor"] {
-  --_graph-wash: var(
-    --graph-note-hover-color,
-    light-dark(
-      color-mix(in oklab, var(--helix-color-foreground) 8%, transparent),
-      color-mix(in oklab, var(--helix-color-foreground) 12%, transparent)
-    )
-  );
+  --_graph-wash: var(--graph-note-hover-color, var(--helix-color-hover));
 
   background-image: linear-gradient(var(--_graph-wash), var(--_graph-wash));
 }

@@ -86,7 +86,8 @@ export interface PairingRequest {
   /**
    * The ground. `color-well over color-surface` names a field's well over the
    * surface it sits on: 5% of the theme's `color-foreground` laid over that
-   * surface, as the stylesheet paints it.
+   * surface, as the stylesheet paints it. `color-hover over color-surface`
+   * names a lit row over it: 8% of `color-foreground` in light and 12% in dark.
    */
   background: string
   foreground: string
@@ -407,7 +408,8 @@ export interface DerivedToken {
 export interface Pairing {
   /**
    * The ground, as the request names it. `color-well over color-surface` is a
-   * field's well over that surface.
+   * field's well over that surface, and `color-hover over color-surface` is a
+   * lit row over it.
    */
   background: string
   foreground: string
