@@ -97,7 +97,7 @@ const start = async (
       import('graphology-layout-forceatlas2/worker'),
       import('graphology-layout-forceatlas2'),
     ])
-    const sigma = new Sigma(new Graph(), box, { allowInvalidContainer: true })
+    const sigma = new Sigma(new Graph(), box)
     connection = connectGraph(
       frame,
       sigmaDriver(sigma, {

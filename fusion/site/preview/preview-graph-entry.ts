@@ -66,7 +66,7 @@ const start = (frame: HTMLElement): (() => void) => {
       connection.disconnect()
     }
   }
-  const sigma = new Sigma(new Graph(), box, { allowInvalidContainer: true })
+  const sigma = new Sigma(new Graph(), box)
   /* **The drawing the example asks for**, as `data-preview-graph-material`,
      `-shape` and `-emphasis`, which are `sigmaDriver`'s options written as
      attributes. */
