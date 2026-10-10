@@ -408,19 +408,18 @@ jobs:
   # the tarballs ship without files their own manifests promise. After `warm`,
   # so both are a restore rather than the 214 seconds they were.
   #
-  # **`next build` runs here, inside `smoke:template`.** `warm` leaves it out
-  # because no job after `warm` reads `.next` (see `build-for-checks.sh`), and
-  # `smoke:template` builds the whole workspace, the site included. So this is
-  # the job where `next build` and `check-highlight.mjs` run, and where either
-  # fails.
+  # **Without the site.** It is private, so nothing here packs it, and `site`
+  # runs `next build` and `check-highlight.mjs` already. `smoke:template` built
+  # the whole workspace, and the site's `catalog` and `next build` were 64 of
+  # this job's 70 seconds of building on run 38065672917, the same build `site`
+  # ran beside it, for a check that took 6.
   #
   # **`smoke:template` builds them itself, so the job does not build first.**
   # Turbo hashes a task's inputs when a run starts, and some of those inputs
-  # are files the build writes: `specs` reads the generated events module and
-  # `site#build` the generated faces. A second run in the same job hashed a
-  # tree the first had filled, missed `specs`, `themed-page`, `catalog` and
-  # `site#build`, and ran `next build` again: 37 of the step's 43 seconds on
-  # run 37566910950. One run is the same graph `warm` ran, so it restores.
+  # are files the build writes. A second run in the same job hashed a tree the
+  # first had filled and missed tasks the first had restored: 37 of the step's
+  # 43 seconds on run 37566910950. One run is the graph `warm` ran, so it
+  # restores.
   packaging:
     needs: warm
     runs-on: ubuntu-latest
