@@ -1,4 +1,10 @@
-import { customElement, focusTarget, HelixElement, wordsLocale } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  focusTarget,
+  HelixElement,
+  numberConverter,
+  wordsLocale,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { badgeBlank, badgeCapped, badgeText, badgeWords } from '../count.js'
@@ -100,7 +106,7 @@ export class HelixHeadlessBadge extends HelixElement {
    *
    * Past it the indicator reads `{max}+`.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('max', undefined) })
   max?: number
 
   /**

@@ -3,6 +3,7 @@ import {
   formatNumber,
   HelixElement,
   hostAria,
+  numberConverter,
   reportRuntime,
   slotFilled,
   slottedWords,
@@ -121,7 +122,7 @@ export class HelixHeadlessStat extends HelixElement {
    *
    * Absent leaves the figure to the slot.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('value', undefined) })
   value?: number
 
   /* Named by what is slotted as the label: by reference where the engine

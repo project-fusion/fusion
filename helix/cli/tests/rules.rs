@@ -2123,6 +2123,44 @@ fn reflected_defaults() {
     );
 }
 
+/// A `converter` built by a call puts parentheses inside the options, and the
+/// declaration is still read. One with its own `toAttribute` decides what its
+/// default writes, which may be nothing.
+#[test]
+fn reflected_defaults_through_a_converter() {
+    let card = |member: &str| {
+        format!(
+            "export class Card extends HTMLElement {{
+  @property({{ converter: numberConverter('lines', undefined), reflect: true }})
+  {member}
+
+  @property({{
+    converter: {{
+      fromAttribute: (value: string | null): string => value ?? '',
+      toAttribute: (value: string): string | null => (value === '' ? null : value),
+    }},
+    reflect: true,
+  }})
+  name = ''
+}}
+"
+        )
+    };
+    plant_in(
+        "reflected-defaults-converter",
+        "reflected-defaults",
+        &[
+            ("helix.json", TIERS),
+            ("src/card/card.ts", &card("lines?: number")),
+        ],
+        |tree| {
+            tree.write("src/card/card.ts", &card("lines?: number = 3"));
+        },
+        "`lines` reflects and defaults to `3`",
+        "src/card/card.ts:2",
+    );
+}
+
 /// Three tags in one rule, so the clean tree carries all three and each is
 /// planted in turn: a rule that counted parts and silently skipped slots would
 /// pass a test that only ever doubled a part.
@@ -2519,6 +2557,68 @@ fn selectors_on_the_host() {
             tree.write(
                 "src/button/button.css",
                 ":host([variant][size]) [part=\"step-2\"] {\n  color: red;\n}\n",
+            );
+        },
+        "`:host([size])` selects an attribute",
+        "src/button/button.css",
+    );
+}
+
+/// A class block's `@property` tag displaces a member whose `converter` is
+/// built by a call, which puts parentheses inside the decorator's options.
+#[test]
+fn displaced_through_a_converter() {
+    let card = |tag: &str| {
+        format!(
+            "/**
+ * A card.{tag}
+ */
+export class HelixCard extends HTMLElement {{
+  /** The most marks. */
+  @property({{ converter: numberConverter('max', 5) }})
+  max = 5
+}}
+"
+        )
+    };
+    plant_in(
+        "displaced-converter",
+        "displaced",
+        &[
+            ("helix.json", STYLED),
+            ("packages/styled/src/card/card.ts", &card("")),
+        ],
+        |tree| {
+            tree.write(
+                "packages/styled/src/card/card.ts",
+                &card("\n *\n * @property max - How many marks."),
+            );
+        },
+        "`@property max` in a class doc block displaces",
+        "packages/styled/src/card/card.ts",
+    );
+}
+
+/// A declaration whose `converter` is built by a call declares its attribute,
+/// so a reflected number a stylesheet selects on is not reported.
+#[test]
+fn selectors_through_a_converter() {
+    let button = "export class Button extends HTMLElement {\n  @property({ converter: numberConverter('columns', undefined), reflect: true })\n  columns?: number\n\n  render() {\n    return `<span part=\"label\"></span>`;\n  }\n}\n";
+    plant_in(
+        "selectors-converter",
+        "selectors",
+        &[
+            ("helix.json", TIERS),
+            ("src/button/button.ts", button),
+            (
+                "src/button/button.css",
+                ":host([columns=\"2\"]) [part=\"label\"] {\n  color: red;\n}\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "src/button/button.css",
+                ":host([columns][size]) [part=\"label\"] {\n  color: red;\n}\n",
             );
         },
         "`:host([size])` selects an attribute",

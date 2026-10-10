@@ -9,6 +9,7 @@ import {
   HelixRejectEvent,
   labelWith,
   MixinField,
+  numberConverter,
   requestChange,
   restoreValue,
   SlottedGlyph,
@@ -237,13 +238,16 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
    * The most files the field holds, under `multiple`. Files past it are
    * refused.
    */
-  @property({ attribute: 'max-files', type: Number })
+  @property({ attribute: 'max-files', converter: numberConverter('max-files', undefined) })
   maxFiles?: number
 
   /**
    * The most bytes one file may have. A larger one is refused.
    */
-  @property({ attribute: 'max-file-size', type: Number })
+  @property({
+    attribute: 'max-file-size',
+    converter: numberConverter('max-file-size', undefined, 'bytes'),
+  })
   maxFileSize?: number
 
   /**

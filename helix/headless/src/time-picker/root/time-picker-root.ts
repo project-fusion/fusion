@@ -14,6 +14,7 @@ import {
   MixinControllerValue,
   MixinPickerFeedback,
   nearestTime,
+  numberConverter,
   offeredTimes,
   type PickerFailure,
   reportValues,
@@ -781,7 +782,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    * reader scrolls rather than hunts, and few enough that the list is a list.
    * Anything under five is a thousand rows and wants a field instead.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('step', 15) })
   step = 15
 
   /**

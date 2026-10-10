@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, numberConverter } from '@fusion.dev/helix-core'
 import type { CSSResultGroup } from 'lit'
 import { nothing } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -37,7 +37,7 @@ export class HelixStrandsStop extends HelixElement {
    * apex or the ribbon's axis. A wave crosses the whole width and does not
    * read it. Unset, a bend's apex sits at `0.5` and a ribbon runs down the middle.
    */
-  @property({ reflect: true, type: Number })
+  @property({ converter: numberConverter('at', undefined), reflect: true })
   at?: number
 
   /** The id of the element the form is pinned to, in the same tree as the stop. */

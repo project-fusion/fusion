@@ -8,6 +8,7 @@ import {
   holdCaret,
   MixinControllerValue,
   MixinField,
+  numberConverter,
   type OwnRule,
   restoreValue,
   submitImplicitly,
@@ -165,7 +166,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   /**
    * Most characters the value may have.
    */
-  @property({ attribute: 'maxlength', type: Number })
+  @property({ attribute: 'maxlength', converter: numberConverter('maxlength', undefined) })
   maxLength?: number
 
   /**
@@ -177,7 +178,7 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
   /**
    * Fewest characters the value may have.
    */
-  @property({ attribute: 'minlength', type: Number })
+  @property({ attribute: 'minlength', converter: numberConverter('minlength', undefined) })
   minLength?: number
 
   /**

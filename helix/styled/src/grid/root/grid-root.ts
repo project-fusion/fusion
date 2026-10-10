@@ -1,4 +1,4 @@
-import { customElement, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, numberConverter, reportRuntime } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { html, unsafeStatic } from 'lit/static-html.js'
@@ -148,7 +148,7 @@ export class HelixGrid extends HelixElement {
    * Two to six are plain CSS. Any other count is written into the shadow
    * root's rule, which the server renders too.
    */
-  @property({ reflect: true, type: Number })
+  @property({ converter: numberConverter('columns', undefined), reflect: true })
   columns?: number
 
   /**

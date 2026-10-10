@@ -20,10 +20,12 @@ import {
   MIRROR_RULE,
   MixinControllerActive,
   MixinControllerOpen,
+  numberConverter,
   OpenPhaseController,
   resolveActiveItem,
   SwipeController,
   swipeStep,
+  timeConverter,
   unlockScroll,
   whenHydrated,
   words,
@@ -212,13 +214,13 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
 
   /**
    * How long the user can be idle before the header and footer hide, in
-   * milliseconds.
+   * milliseconds. The attribute also takes a CSS time, such as `3s`.
    *
    * Zero keeps it up, which is what a viewer with a caption worth reading
    * wants. The wait is only ever about idling: whether anything else should
    * keep the chrome up is the consumer's to decide with this.
    */
-  @property({ attribute: 'idle-delay', type: Number })
+  @property({ attribute: 'idle-delay', converter: timeConverter('idle-delay', 0) })
   idleDelay = 0
 
   /**
@@ -237,7 +239,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
    * How far a reader can zoom into the shown item, as a scale, such as `3`.
    * `1`, the default, turns zooming off.
    */
-  @property({ attribute: 'max-zoom', type: Number })
+  @property({ attribute: 'max-zoom', converter: numberConverter('max-zoom', 1) })
   maxZoom = 1
 
   /**

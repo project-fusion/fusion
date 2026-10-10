@@ -15,6 +15,7 @@ import {
   HelixFilteredEvent,
   inlineStep,
   MIRROR_RULE,
+  numberConverter,
   pageRows,
   requestChange,
   SCROLLER_RULE,
@@ -269,7 +270,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
    * root closed; a large number opens everything, which on a big value is the
    * wall of text this exists to avoid.
    */
-  @property({ attribute: 'default-depth', type: Number })
+  @property({ attribute: 'default-depth', converter: numberConverter('default-depth', 1) })
   defaultDepth = 1
 
   /**

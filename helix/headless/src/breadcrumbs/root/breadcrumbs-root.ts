@@ -3,6 +3,7 @@ import {
   formatWords,
   HelixElement,
   hostAria,
+  numberConverter,
   UpgradeController,
   whenHydrated,
   words,
@@ -123,7 +124,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
    * into one, counting the first and the last. Unset, it never folds. At least
    * 2, so the first crumb and the current page always show.
    */
-  @property({ attribute: 'max-items', type: Number })
+  @property({ attribute: 'max-items', converter: numberConverter('max-items', undefined) })
   maxItems?: number
 
   /** Whether a reader has asked to see the whole of a folded trail. */

@@ -4,6 +4,7 @@ import {
   HelixElement,
   headingIn,
   headingLevel,
+  numberConverter,
   slotFilled,
   slottedWords,
 } from '@fusion.dev/helix-core'
@@ -87,7 +88,7 @@ export class HelixHeadlessEmpty extends HelixElement {
    * Absent is 3, the level of a heading inside a page's section. Set it to fit
    * the outline the empty view sits in. A slotted heading keeps its own.
    */
-  @property({ attribute: 'heading-level', type: Number })
+  @property({ attribute: 'heading-level', converter: numberConverter('heading-level', undefined) })
   headingLevel?: number
 
   /**

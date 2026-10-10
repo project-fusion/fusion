@@ -1,4 +1,4 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { customElement, numberConverter } from '@fusion.dev/helix-core'
 import { HelixHeadlessStatGroup } from '@fusion.dev/helix-headless/stat'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -34,7 +34,7 @@ export class HelixStatGroup extends HelixHeadlessStatGroup {
    * with its rule; and a count is what a set of facts read across wants, where
    * figures compared one against another keep their own widths.
    */
-  @property({ reflect: true, type: Number })
+  @property({ converter: numberConverter('columns', undefined), reflect: true })
   columns?: number
 
   /**

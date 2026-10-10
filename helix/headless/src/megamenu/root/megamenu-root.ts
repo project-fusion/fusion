@@ -8,9 +8,11 @@ import {
   KeyboardNavigationController,
   MixinControllerOpen,
   type NavigableItem,
+  numberConverter,
   type Placement,
   PopoverController,
   tellDisclosure,
+  timeConverter,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -146,15 +148,15 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
    * become true long after hydration, and a viewport measured before the first
    * paint is the opposite case. See `MixinControllerOpen` on `open`.
    */
-  @property({ attribute: 'band-below', type: Number })
+  @property({ attribute: 'band-below', converter: numberConverter('band-below', 640, 'pixels') })
   bandBelow = 640
 
   /**
    * How long a pointer leaving the trigger and the panel waits before the panel
    * closes, in milliseconds. The pointer needs the time to cross from the
-   * trigger to the panel.
+   * trigger to the panel. The attribute also takes a CSS time, such as `0.2s`.
    */
-  @property({ attribute: 'close-delay', type: Number })
+  @property({ attribute: 'close-delay', converter: timeConverter('close-delay', 220) })
   closeDelay = 220
 
   /**
@@ -166,9 +168,10 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   /**
    * How long a pointer rests on the trigger before the panel opens, in
    * milliseconds, under `open-on="hover"`. A pointer crossing the bar on its
-   * way somewhere else opens nothing.
+   * way somewhere else opens nothing. The attribute also takes a CSS time, such
+   * as `0.1s`.
    */
-  @property({ attribute: 'open-delay', type: Number })
+  @property({ attribute: 'open-delay', converter: timeConverter('open-delay', 120) })
   openDelay = 120
 
   /**

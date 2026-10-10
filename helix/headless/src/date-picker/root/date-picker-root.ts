@@ -22,6 +22,7 @@ import {
   type MonthSystem,
   monthOut,
   monthSystem,
+  numberConverter,
   type PickerFailure,
   periodCells,
   periodKey,
@@ -268,7 +269,10 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * Absent follows `locale`, where the engine knows the week of that language
    * (Firefox does not), and is Sunday otherwise.
    */
-  @property({ attribute: 'first-day-of-week', type: Number })
+  @property({
+    attribute: 'first-day-of-week',
+    converter: numberConverter('first-day-of-week', undefined),
+  })
   firstDayOfWeek?: number
 
   /**
@@ -371,7 +375,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   /**
    * How many months to show, side by side.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('months', 1) })
   months = 1
 
   /**
@@ -1145,7 +1149,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * treated as one rather than as an error: a step of zero would block every
    * date including the one already chosen.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('step', 1, 'days') })
   step = 1
 
   /**

@@ -1,4 +1,4 @@
-import { customElement, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, numberConverter, reportRuntime } from '@fusion.dev/helix-core'
 import type { CSSResultGroup, PropertyValues } from 'lit'
 import { nothing } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -119,7 +119,7 @@ export class HelixText extends HelixElement {
    * single line. A count that is not a whole number above zero, such as `0`,
    * cuts nothing off.
    */
-  @property({ reflect: true, type: Number })
+  @property({ converter: numberConverter('lines', undefined), reflect: true })
   lines?: number
 
   /**

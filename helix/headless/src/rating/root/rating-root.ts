@@ -12,6 +12,7 @@ import {
   MixinField,
   type NavigableItem,
   nearest,
+  numberConverter,
   reportRuntime,
   SlottedGlyph,
   words,
@@ -117,7 +118,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   /**
    * How many marks there are.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('max', 5) })
   max = 5
 
   /**
@@ -162,7 +163,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    * leaving a rating with nothing to press. A property that silently accepts
    * nonsense is the fault this pays off, so neither case is quietly ignored.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('min', 0) })
   min = 0
 
   /**
@@ -206,7 +207,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    * `0.5` is the half star, and it is the reason the value is a number rather
    * than an index: with halves, five marks are ten answers.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('step', 1) })
   step = 1
 
   /**
@@ -291,9 +292,11 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
    * The floor the row actually uses, which is `min` where `min` is one.
    *
    * Between zero and `max`, and zero for anything that is not a number, per
-   * the note on `min`. Derived on read rather than corrected into the property,
-   * so `rating.min` still reports what the consumer set and the warning below
-   * can tell the two apart.
+   * the note on `min`: `numberConverter` keeps the attribute at 0 for one, and
+   * this keeps a script that sets the property to `NaN` at 0 too. Derived on
+   * read rather than corrected into the property, so `rating.min` still
+   * reports what the consumer set and the warning below can tell the two
+   * apart.
    */
   private get floor(): number {
     if (!Number.isFinite(this.min)) {

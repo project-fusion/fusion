@@ -13,6 +13,7 @@ import {
   onApple,
   reportRuntime,
   slottedWords,
+  timeConverter,
   words,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
@@ -105,12 +106,13 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
 
   /**
    * How long the announcement stays, in milliseconds, before it sends
-   * `helix-dismiss`. When it is not set, it stays until it is dismissed.
+   * `helix-dismiss`. When it is not set, it stays until it is dismissed. The
+   * attribute also takes a CSS time, such as `8s`.
    *
    * Read once when the announcement is first rendered, as `Toast` reads its
    * own. The clock stops while the pointer or focus is on the announcement.
    */
-  @property({ type: Number })
+  @property({ converter: timeConverter('duration', undefined) })
   duration?: number
 
   /**

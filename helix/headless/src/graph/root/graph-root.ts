@@ -16,6 +16,7 @@ import {
   KeyboardNavigationController,
   MixinControllerActive,
   MixinViewport,
+  numberConverter,
   SCROLLER_RULE,
   scrollRoom,
   scrollWithin,
@@ -227,7 +228,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
    * How many links from the selected note to show, for its local graph. Unset
    * shows every note. The list holds what the drawing shows.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('depth', undefined) })
   depth?: number
 
   /**

@@ -6,6 +6,8 @@ import {
   HelixTypingEvent,
   hostAria,
   markRegion,
+  numberConverter,
+  timeConverter,
   words,
 } from '@fusion.dev/helix-core'
 import { arrowElbowDownLeft } from '@fusion.dev/helix-icons'
@@ -103,14 +105,14 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
   /**
    * The most characters a draft can have. The field stops taking more.
    */
-  @property({ attribute: 'maxlength', type: Number })
+  @property({ attribute: 'maxlength', converter: numberConverter('maxlength', undefined) })
   maxLength?: number
 
   /**
    * The fewest characters a draft can have, once the reader has written in
    * the field, as on a `<textarea>`.
    */
-  @property({ attribute: 'minlength', type: Number })
+  @property({ attribute: 'minlength', converter: numberConverter('minlength', undefined) })
   minLength?: number
 
   /**
@@ -131,7 +133,7 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
    *
    * It grows from there.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('rows', 1) })
   rows = 1
 
   /**
@@ -154,9 +156,9 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
 
   /**
    * How long after the last keystroke the user still counts as typing, in
-   * milliseconds.
+   * milliseconds. The attribute also takes a CSS time, such as `3s`.
    */
-  @property({ attribute: 'typing-timeout', type: Number })
+  @property({ attribute: 'typing-timeout', converter: timeConverter('typing-timeout', 3000) })
   typingTimeout = 3000
 
   /**

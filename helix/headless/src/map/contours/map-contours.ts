@@ -1,4 +1,10 @@
-import { customElement, HelixElement, HelixMapPartChangeEvent, words } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  HelixMapPartChangeEvent,
+  numberConverter,
+  words,
+} from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { MapTerrainEncoding } from '../terrain/map-terrain.js'
@@ -67,7 +73,7 @@ export class HelixHeadlessMapContours extends HelixElement {
   label = 'Contour lines'
 
   /** The deepest zoom the provider has tiles for. */
-  @property({ attribute: 'max-zoom', type: Number })
+  @property({ attribute: 'max-zoom', converter: numberConverter('max-zoom', undefined) })
   maxZoom?: number
 
   /** One elevation tile URL with `{z}`, `{x}`, and `{y}` in it. */

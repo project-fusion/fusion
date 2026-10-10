@@ -37,6 +37,7 @@ import {
   MIRROR_RULE,
   MixinCollection,
   markRegion,
+  numberConverter,
   onAndroid,
   ordered,
   pageRows,
@@ -423,13 +424,13 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /**
    * The starting page, used until `page` is set.
    */
-  @property({ attribute: 'default-page', type: Number })
+  @property({ attribute: 'default-page', converter: numberConverter('default-page', 1) })
   defaultPage = 1
 
   /**
    * The starting page size, used until `pageSize` is set.
    */
-  @property({ attribute: 'default-page-size', type: Number })
+  @property({ attribute: 'default-page-size', converter: numberConverter('default-page-size', 0) })
   defaultPageSize = 0
 
   /**
@@ -482,7 +483,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * close, because it is what the scrollbar is built from before anything has
    * been measured.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('estimate', 32, 'pixels') })
   estimate = 32
 
   /**
@@ -618,7 +619,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * bookmarked link to page 99 of a result that has since shrunk reads back as
    * the last page rather than as 99.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('page', undefined) })
   get page(): number {
     const asked = this.pageState ?? this.defaultPage
     return Math.min(this.pages, Math.max(1, Math.floor(asked) || 1))
@@ -647,7 +648,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * themselves. Routing this through `requestChange` would announce an event
    * the element never has cause to fire.
    */
-  @property({ attribute: 'page-size', type: Number })
+  @property({ attribute: 'page-size', converter: numberConverter('page-size', undefined) })
   get pageSize(): number {
     return Math.max(0, Math.floor(this.pageSizeState ?? this.defaultPageSize) || 0)
   }
@@ -869,7 +870,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * because two sources for one count is the mistake, and here the array is the
    * one that cannot be stale.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('total', 0) })
   total = 0
 
   /** What screen readers hear when the table stops being sorted. */

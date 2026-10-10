@@ -2,6 +2,7 @@ import {
   customElement,
   formatWords,
   HelixElement,
+  numberConverter,
   reportRuntime,
   words,
   wordsLocale,
@@ -210,7 +211,7 @@ export class HelixHeadlessTrend extends HelixElement {
    * `format-options` and `locale`, in place of a slotted metric. Absent leaves
    * the movement to `movement` and the metric to the slot.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('value', undefined) })
   value?: number
 
   /**

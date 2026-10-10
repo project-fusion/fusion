@@ -4,6 +4,7 @@ import {
   HelixElement,
   KeyboardNavigationController,
   type NavigableItem,
+  numberConverter,
   onUnlessFalse,
   whenHydrated,
 } from '@fusion.dev/helix-core'
@@ -78,7 +79,7 @@ export class HelixHeadlessAccordion extends HelixElement {
    *
    * Unset is 3. An item's own `heading-level` wins over this.
    */
-  @property({ attribute: 'heading-level', type: Number })
+  @property({ attribute: 'heading-level', converter: numberConverter('heading-level', undefined) })
   headingLevel?: number
 
   /**

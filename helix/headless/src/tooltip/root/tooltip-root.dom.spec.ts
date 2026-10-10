@@ -114,6 +114,36 @@ describe('tooltip', () => {
     expect(tip.open).toBe(true)
   })
 
+  /* `delay="300ms"` was `NaN` to Lit's number converter, and a timer of `NaN`
+     fires at once, so every sweep across a toolbar flashed each tooltip. */
+  test('takes its delay as a CSS time, and waits it out', async () => {
+    const tip = await tooltip('content="x" delay="0.06s"')
+    expect(tip.delay).toBe(60)
+    tip.dispatchEvent(new Event('pointerenter'))
+    await new Promise((resolve) => setTimeout(resolve, 20))
+    expect(tip.open).toBe(false)
+    await new Promise((resolve) => setTimeout(resolve, 120))
+    expect(tip.open).toBe(true)
+  })
+
+  test('keeps its own delay for one that is not a time, and says so once', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    let tip: Tooltip
+    try {
+      tip = await tooltip('content="x" delay="soon"')
+      await tooltip('content="y" delay="soon"')
+    } finally {
+      console.warn = original
+    }
+    expect(tip.delay).toBe(400)
+    tip.dispatchEvent(new Event('pointerenter'))
+    await new Promise((resolve) => setTimeout(resolve, 40))
+    expect(tip.open).toBe(false)
+    expect(warnings.filter((one) => one.includes('delay="soon"'))).toHaveLength(1)
+  })
+
   test('it announces before it opens, and a refusal holds it shut', async () => {
     const tip = await tooltip()
     tip.addEventListener('helix-before-open', (event) => {

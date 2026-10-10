@@ -11,10 +11,12 @@ import {
   isRtl,
   MIRROR_RULE,
   motionPaused,
+  numberConverter,
   onMotionChange,
   reducedMotion,
   requestChange,
   SCROLLER_RULE,
+  timeConverter,
   words,
 } from '@fusion.dev/helix-core'
 import { caretLeft, caretRight, play, stop } from '@fusion.dev/helix-icons'
@@ -31,10 +33,6 @@ import { stepStop, stopFor, stopsOf } from '../stops.js'
  * be a plain one. A converter and not a bare string property, because every
  * other value this takes is a number and a consumer reading `perView` back
  * should get one.
- *
- * Out here rather than inside the decorator's options, where `helix component`
- * reads a property's declaration up to the first closing paren and an arrow
- * function's would be it.
  */
 const COUNT_OR_AUTO = {
   fromAttribute: (value: string | null): number | 'auto' | undefined => {
@@ -216,7 +214,7 @@ export class HelixHeadlessCarousel extends HelixElement {
   /**
    * The slide to start on, used until `index` is set.
    */
-  @property({ attribute: 'default-index', type: Number })
+  @property({ attribute: 'default-index', converter: numberConverter('default-index', 0) })
   defaultIndex = 0
 
   /**
@@ -233,7 +231,7 @@ export class HelixHeadlessCarousel extends HelixElement {
    * mixins is keyed by a name. One consumer is not a mixin: if a second numeric
    * state turns up, this is what it is extracted from.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('index', undefined) })
   get index(): number {
     return this.indexState ?? this.defaultIndex
   }
@@ -263,9 +261,10 @@ export class HelixHeadlessCarousel extends HelixElement {
   indicatorsLabel = '{label} slides'
 
   /**
-   * How long each slide is held, in milliseconds.
+   * How long each slide is held, in milliseconds. The attribute also takes a
+   * CSS time, such as `5s`.
    */
-  @property({ type: Number })
+  @property({ converter: timeConverter('interval', 5000) })
   interval = 5000
 
   /** The slide in view, whoever set it, and `undefined` until somebody has. */
@@ -434,7 +433,10 @@ export class HelixHeadlessCarousel extends HelixElement {
    * at a time. Unset moves one. The track stops at every `slides-per-move`th
    * position from the first, and at the last.
    */
-  @property({ attribute: 'slides-per-move', type: Number })
+  @property({
+    attribute: 'slides-per-move',
+    converter: numberConverter('slides-per-move', undefined),
+  })
   slidesPerMove?: number
 
   /**

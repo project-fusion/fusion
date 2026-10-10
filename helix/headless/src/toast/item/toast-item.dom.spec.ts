@@ -97,6 +97,35 @@ describe('one toast message', () => {
     expect(part(await message(), 'timer')).toBeNull()
   })
 
+  /* `duration="3s"` was `NaN` to Lit's number converter, and the countdown
+     never starts for `NaN`, so a message meant to go after three seconds
+     stayed for good and nothing said why. */
+  test('takes its duration as a CSS time, and leaves when it is up', async () => {
+    const timed = (await message('duration="3s"')) as Item & { duration?: number }
+    expect(timed.duration).toBe(3000)
+    expect(part(timed, 'timer')?.getAttribute('style')).toContain('--toast-duration: 3000ms')
+    const quick = await message('duration="0.04s"')
+    const until = Date.now() + 1200
+    while (Date.now() < until && quick.open) {
+      await new Promise((resolve) => setTimeout(resolve, 20))
+    }
+    expect(quick.open).toBe(false)
+  })
+
+  test('says once that a duration is not a time, and stays until it is dismissed', async () => {
+    const warnings: string[] = []
+    const warn = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    restore = () => {
+      console.warn = warn
+    }
+    const unread = (await message('duration="3 seconds"')) as Item & { duration?: number }
+    await message('duration="3 seconds"')
+    expect([unread.duration, part(unread, 'timer')]).toEqual([undefined, null])
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('duration="3 seconds" is not a time')
+  })
+
   /* A message that arrives in a background tab waits for the reader to come
      back, as React Aria's toast queue does: spent while hidden, it was gone
      before anyone could read it. */

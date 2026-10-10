@@ -21,6 +21,7 @@ import {
   restoreValue,
   StatusController,
   scrollItemIntoView,
+  timeConverter,
   words,
   wordsLocale,
 } from '@fusion.dev/helix-core'
@@ -326,9 +327,10 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
   /**
    * How long typing rests before `source` is asked, in milliseconds. A delay
    * sends one request for a word in place of one for each letter. The arrow
-   * keys and Enter ask at once. `0` asks on every keystroke.
+   * keys and Enter ask at once. `0` asks on every keystroke. The attribute also
+   * takes a CSS time, such as `300ms`.
    */
-  @property({ attribute: 'filter-delay', type: Number })
+  @property({ attribute: 'filter-delay', converter: timeConverter('filter-delay', 0) })
   filterDelay = 0
 
   /**

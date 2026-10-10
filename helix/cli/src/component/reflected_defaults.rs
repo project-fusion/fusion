@@ -34,10 +34,12 @@ use crate::component::{sources, Context, Finding, Report};
 /// The decorator, then the field or getter that follows it.
 ///
 /// A doc block between the two is consumed explicitly, because `\s*` does not
-/// cross one and the declaration would then read as unreflected.
+/// cross one and the declaration would then read as unreflected. The options
+/// may hold one level of parentheses, so a `converter` built by a call, such
+/// as `numberConverter('lines', undefined)`, is read rather than skipped.
 static REFLECTED: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(
-        r"(?m)@property\(([^)]*reflect:\s*true[^)]*)\)\s*(?:(?s:/\*.*?\*/)\s*)?(?:override\s+)?(get\s+)?(\w+)(?:\([^)]*\))?(?:\??:[^=\n]+)?(?:\s*=\s*([^\n]+?))?\s*$",
+        r"(?m)@property\(((?:[^()]|\([^()]*\))*reflect:\s*true(?:[^()]|\([^()]*\))*)\)\s*(?:(?s:/\*.*?\*/)\s*)?(?:override\s+)?(get\s+)?(\w+)(?:\([^)]*\))?(?:\??:[^=\n]+)?(?:\s*=\s*([^\n]+?))?\s*$",
     )
     .expect("a literal pattern compiles")
 });
@@ -76,10 +78,16 @@ pub fn run(context: &Context) -> Report {
                 let at = found.get(0).expect("group zero always matches").start();
                 let line = line_of(&text, at);
                 checked += 1;
+                /* A converter with its own `toAttribute` decides what
+                reflection writes, so a default may write nothing at all:
+                `HelixFormElementBase.name` writes no `name=""` for `''`. */
+                let writes_own = found
+                    .get(1)
+                    .is_some_and(|one| one.as_str().contains("toAttribute"));
 
                 if found.get(2).is_none() {
                     let initializer = found.get(4).map(|one| one.as_str());
-                    if silent(initializer) {
+                    if writes_own || silent(initializer) {
                         continue;
                     }
                     findings.push(Finding {
@@ -125,7 +133,7 @@ pub fn run(context: &Context) -> Report {
                 ))
                 .ok()
                 .and_then(|one| Some(one.captures(&text)?.get(1)?.as_str().to_owned()));
-                if silent(fallback.as_deref()) {
+                if writes_own || silent(fallback.as_deref()) {
                     continue;
                 }
                 findings.push(Finding {

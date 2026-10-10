@@ -11,6 +11,7 @@ import {
   headingIn,
   lockScroll,
   MixinControllerOpen,
+  numberConverter,
   OpenPhaseController,
   onUnlessFalse,
   type Placement,
@@ -164,14 +165,17 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
    * and shrinks to 8 pixels from an edge and moves to the other side only
    * once it would cross one.
    */
-  @property({ attribute: 'container-padding', type: Number })
+  @property({
+    attribute: 'container-padding',
+    converter: numberConverter('container-padding', undefined, 'pixels'),
+  })
   containerPadding?: number
 
   /**
    * How far to slide the panel along the side it is on, in pixels: to the
    * right on the top or the bottom, and down on the left or the right.
    */
-  @property({ attribute: 'cross-offset', type: Number })
+  @property({ attribute: 'cross-offset', converter: numberConverter('cross-offset', 0, 'pixels') })
   crossOffset = 0
 
   /**
@@ -214,7 +218,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   /**
    * Space between the trigger and the panel, in pixels.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('offset', 4, 'pixels') })
   offset = 4
 
   /**

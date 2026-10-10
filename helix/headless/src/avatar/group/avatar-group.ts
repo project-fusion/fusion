@@ -3,6 +3,7 @@ import {
   formatWords,
   HelixElement,
   hostAria,
+  numberConverter,
   whenHydrated,
   words,
   wordsLocale,
@@ -78,7 +79,7 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
    * takes no default**: `max = 0` would stamp `max="0"` onto every host that
    * never asked for a limit, including on the server.
    */
-  @property({ reflect: true, type: Number })
+  @property({ converter: numberConverter('max', undefined), reflect: true })
   max?: number
 
   /**

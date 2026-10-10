@@ -14,6 +14,7 @@ import {
   inlineStep,
   keyClaimed,
   MixinControllerOpen,
+  numberConverter,
   requestChange,
   whenHydrated,
   words,
@@ -153,7 +154,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
   /**
    * The stop to start on, when nothing else sets one.
    */
-  @property({ attribute: 'default-index', type: Number })
+  @property({ attribute: 'default-index', converter: numberConverter('default-index', 0) })
   defaultIndex = 0
 
   /**
@@ -177,7 +178,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
    * `default-index` for markup that only seeds and a held state that is
    * `undefined` until somebody sets one.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('index', undefined) })
   get index(): number {
     return this.indexState ?? this.defaultIndex
   }
@@ -231,7 +232,10 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
   /**
    * The space around the target inside the spotlight, in pixels.
    */
-  @property({ attribute: 'spotlight-padding', type: Number })
+  @property({
+    attribute: 'spotlight-padding',
+    converter: numberConverter('spotlight-padding', 8, 'pixels'),
+  })
   spotlightPadding = 8
 
   @queryAssignedElements({ flatten: true })

@@ -4,6 +4,7 @@ import {
   HelixCompleteEvent,
   HelixElement,
   hostAria,
+  numberConverter,
   readingText,
   StatusController,
   slotFilled,
@@ -143,7 +144,7 @@ export class HelixHeadlessProgress extends HelixElement {
   /**
    * The total the work is measured against.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('max', 100) })
   max = 100
 
   /**
@@ -152,7 +153,7 @@ export class HelixHeadlessProgress extends HelixElement {
    * For a measure that does not start at nothing, such as a migration from
    * version 12 to version 20, where 12 is the empty bar.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('min', 0) })
   min = 0
 
   /**
@@ -192,7 +193,7 @@ export class HelixHeadlessProgress extends HelixElement {
    * Clamped between `min` and `max` for both the fill and the announcement, so
    * the two can never disagree about what is on screen.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('value', 0) })
   value = 0
 
   /**

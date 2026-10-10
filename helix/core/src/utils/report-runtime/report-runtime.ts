@@ -64,6 +64,12 @@ export type RuntimeKind =
   | 'negative-value'
   /** A Graph connector was handed an element that is no Graph frame. */
   | 'not-a-graph'
+  /**
+   * A numeric attribute holds something that is not a number, such as `1O`, or an attribute in
+   * milliseconds something that is not a time, such as `soon`, so the property keeps its
+   * default. Development builds only.
+   */
+  | 'not-a-number'
   /** A plot connector was handed an element that is not the spatial chart it connects. */
   | 'not-a-plot'
   /** The browser refused picture in picture. */

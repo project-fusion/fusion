@@ -8,6 +8,7 @@ import {
   linkDescription,
   MixinControllerOpen,
   type NavigableItem,
+  numberConverter,
   type Placement,
   PopoverController,
   slottedWords,
@@ -144,7 +145,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   /**
    * Space between the trigger and the actions, in pixels.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('offset', 12, 'pixels') })
   offset = 12
 
   /**

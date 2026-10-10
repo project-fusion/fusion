@@ -33,6 +33,7 @@ import {
   scrollItemIntoView,
   selectsAll,
   Typeahead,
+  timeConverter,
   toggleEvery,
   typesCharacter,
   UpgradeController,
@@ -295,14 +296,15 @@ export class HelixHeadlessListbox extends MixinCollection(
 
   /**
    * How long typing in the filter field rests before the list is filtered, in
-   * milliseconds. `0` filters on every keystroke.
+   * milliseconds. `0` filters on every keystroke. The attribute also takes a
+   * CSS time, such as `300ms`.
    *
    * For a list filtered on a server, where `helix-filter` starts a request: a
    * reader typing a word sends one request for the word, not one for each
    * letter. Enter and the arrow keys filter at once on what is typed, so they
    * act on the list the reader expects.
    */
-  @property({ attribute: 'filter-delay', type: Number })
+  @property({ attribute: 'filter-delay', converter: timeConverter('filter-delay', 0) })
   filterDelay = 0
 
   /**

@@ -9,6 +9,7 @@ import {
   holdCaret,
   MixinControllerValue,
   MixinField,
+  numberConverter,
   parseNumber,
   restoreValue,
   submitImplicitly,
@@ -248,7 +249,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    * and a property because ten of a step of `0.01` is a hundredth and rarely
    * what a reader wants from a whole key.
    */
-  @property({ attribute: 'large-step', type: Number })
+  @property({ attribute: 'large-step', converter: numberConverter('large-step', undefined) })
   largeStep?: number
 
   /**
@@ -267,7 +268,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    *
    * Absent has no ceiling.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('max', undefined) })
   max?: number
 
   /**
@@ -275,7 +276,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
    *
    * Absent has no floor.
    */
-  @property({ type: Number })
+  @property({ converter: numberConverter('min', undefined) })
   min?: number
 
   /**

@@ -7,6 +7,7 @@ import {
   HelixScrolledEvent,
   hostAria,
   MixinControllerOpen,
+  numberConverter,
   words,
 } from '@fusion.dev/helix-core'
 import { list } from '@fusion.dev/helix-icons'
@@ -145,7 +146,10 @@ export class HelixHeadlessAppHeader extends MixinControllerOpen(HelixElement) {
    * The width of the bar, in pixels, below which the middle region folds behind
    * a toggle. Unset, it never folds.
    */
-  @property({ attribute: 'fold-below', type: Number })
+  @property({
+    attribute: 'fold-below',
+    converter: numberConverter('fold-below', undefined, 'pixels'),
+  })
   foldBelow?: number
 
   /**
