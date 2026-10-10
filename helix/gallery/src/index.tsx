@@ -54,6 +54,7 @@ import { lineChartArt } from './art/line-chart'
 import { listArt } from './art/list'
 import { listboxArt } from './art/listbox'
 import { loaderArt } from './art/loader'
+import { logArt } from './art/log'
 import { mapArt } from './art/map'
 import { megamenuArt } from './art/megamenu'
 import { menuArt } from './art/menu'
@@ -119,7 +120,7 @@ import { virtualListArt } from './art/virtual-list'
  * Every family has an entry, and every entry is a file under `art/` named for
  * the family it draws. The system they all obey is `system.md`.
  *
- * **One hundred and thirteen, not the one hundred and twelve folders in `helix/styled/src`.** The catalog is
+ * **One hundred and fourteen, not the one hundred and thirteen folders in `helix/styled/src`.** The catalog is
  * built from the manifests, so it also carries `editor` and `sandbox` from
  * `@fusion.dev/helix-sandbox`. The count that matters is whatever `getFamilies`
  * returns, never a directory listing.
@@ -210,6 +211,7 @@ const art: Record<string, ReactNode> = {
   list: listArt,
   listbox: listboxArt,
   loader: loaderArt,
+  log: logArt,
   map: mapArt,
   megamenu: megamenuArt,
   menu: menuArt,

@@ -1,0 +1,33 @@
+export function Example() {
+  return (
+    <helix-log
+      label="Test run"
+      line-href="#L{n}"
+      line-numbers
+      mark-lines="5-6"
+      timestamps="relative"
+      wrap
+    >
+      <helix-log-line at="2026-10-09T14:02:00Z">$ bun test --coverage</helix-log-line>
+      <helix-log-line at="2026-10-09T14:02:01Z">
+        Running 1,302 specs across 9 packages
+      </helix-log-line>
+      <helix-log-line at="2026-10-09T14:02:19Z">✓ core (412 specs)</helix-log-line>
+      <helix-log-line at="2026-10-09T14:02:47Z">✓ headless (634 specs)</helix-log-line>
+      <helix-log-line
+        at="2026-10-09T14:03:05Z"
+        level="error"
+      >
+        ✗ styled/button: expected the label "Save changes" to stay on one line in a 120px column,
+        and it wrapped onto two
+      </helix-log-line>
+      <helix-log-line
+        at="2026-10-09T14:03:05Z"
+        level="error"
+      >
+        {'  at button-root.dom.spec.ts:88:42'}
+      </helix-log-line>
+      <helix-log-line at="2026-10-09T14:03:31Z">1,301 passed, 1 failed in 1m 31s</helix-log-line>
+    </helix-log>
+  )
+}

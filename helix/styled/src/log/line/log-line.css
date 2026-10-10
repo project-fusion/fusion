@@ -1,0 +1,126 @@
+:host {
+  display: block;
+}
+
+/* Each line is as wide as its text, and at least as wide as the box, so a
+   row with a background reaches as far as the longest line. */
+[part~="line"] {
+  column-gap: var(--helix-space-md);
+  display: flex;
+  inline-size: var(--_log-line-size, max-content);
+  min-inline-size: 100%;
+  padding-inline: var(--log-padding-inline, var(--helix-space-md));
+}
+
+[part~="line"]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
+}
+
+/* The numbers are one column, right-aligned to the widest the log holds, and
+   are not copied with the text. */
+[part="number"] {
+  color: var(--helix-color-foreground-subtle);
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  min-inline-size: calc(var(--log-digits, 2) * 1ch);
+  text-align: end;
+  text-decoration: none;
+  user-select: none;
+}
+
+a[part="number"]:hover {
+  color: var(--helix-color-foreground);
+  text-decoration: underline;
+}
+
+a[part="number"]:focus-visible {
+  border-radius: var(--helix-radii-sm);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+[part="time"] {
+  color: var(--helix-color-foreground-muted);
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+[part="text"] {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  white-space: var(--_log-white-space, pre);
+}
+
+[part~="line-debug"] {
+  color: var(--helix-color-foreground-subtle);
+}
+
+[part~="line-warn"] {
+  background-color: color-mix(
+    in oklab,
+    var(--log-warn-color, var(--helix-color-warning)) 10%,
+    transparent
+  );
+  color: var(--log-warn-color, var(--helix-color-warning));
+}
+
+[part~="line-error"] {
+  background-color: color-mix(
+    in oklab,
+    var(--log-error-color, var(--helix-color-danger)) 10%,
+    transparent
+  );
+  color: var(--log-error-color, var(--helix-color-danger));
+}
+
+/* A marked line keeps the color of its level and takes the band `Code Block`
+   draws behind the lines it marks. */
+[part~="line-marked"] {
+  background-color: var(
+    --log-mark-background-color,
+    color-mix(in oklab, var(--helix-color-primary) 12%, transparent)
+  );
+}
+
+[part~="run"] {
+  background-color: var(--log-run-background-color, transparent);
+  color: var(--log-run-color, inherit);
+}
+
+[part~="run-bold"] {
+  font-weight: var(--helix-weight-semibold);
+}
+
+[part~="run-dim"] {
+  opacity: 0.7;
+}
+
+[part~="run-italic"] {
+  font-style: italic;
+}
+
+[part~="run-underline"] {
+  text-decoration-line: underline;
+}
+
+[part~="run-strike"] {
+  text-decoration-line: line-through;
+}
+
+[part~="run-underline"][part~="run-strike"] {
+  text-decoration-line: underline line-through;
+}
+
+[part="match"] {
+  background-color: var(--log-match-background-color, var(--helix-color-warning-surface));
+  border-radius: var(--helix-radii-sm);
+  color: inherit;
+}
+
+@media print {
+  [part~="line"] {
+    print-color-adjust: exact;
+  }
+}
