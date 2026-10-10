@@ -89,11 +89,22 @@
   flex: none;
   font-variant-numeric: tabular-nums;
   font-weight: var(--helix-weight-regular);
-  margin-inline-start: auto;
+  margin-inline-start: var(--_log-duration-start, auto);
 }
 
 [part="content"][hidden] {
   display: none;
+}
+
+/* A step inside a step stands one gutter in, so its caret sits under the
+   status of the step that holds it, as a tree's children sit under their
+   parent's name, and its lines move in with it. An agent's work is the case:
+   "Worked for 38s" holding "Read three files" and "Ran the tests". */
+::slotted(helix-log-group) {
+  margin-inline-start: calc(
+    max(var(--helix-size-icon-sm), calc(var(--log-digits, 2) * 1ch)) +
+    var(--helix-space-md)
+  );
 }
 
 @media print {

@@ -12,6 +12,18 @@
   padding-inline: var(--log-padding-inline, var(--helix-space-md));
 }
 
+/* **A line in a step with no number starts where the step's heading does**,
+   past the caret's gutter, as a numbered line's text does past its number.
+   Without it, a log with no numbers put each step's lines to the left of the
+   heading they belong to. */
+[part~="line-grouped"]:not(:has(> [part="number"])) {
+  padding-inline-start: calc(
+    var(--log-padding-inline, var(--helix-space-md)) +
+    max(var(--helix-size-icon-sm), calc(var(--log-digits, 2) * 1ch)) +
+    var(--helix-space-md)
+  );
+}
+
 [part~="line"]:hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
 }

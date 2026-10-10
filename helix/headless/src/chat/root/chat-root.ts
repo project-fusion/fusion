@@ -284,6 +284,7 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * @csspart message-sources - The sources of a turn from `turns`.
  * @csspart message-state - The state text of a turn from `turns`, when there is one to show.
  * @csspart message-time - The time of a turn from `turns`.
+ * @csspart message-work - The box around a turn's `work`, for a turn from `turns`, which has none.
  * @csspart resume - The control shown while the user is scrolled away from the bottom.
  * @csspart resume-button - The button the `resume` region shows when nothing is slotted into it.
  * @csspart resume-mark - The arrow on the default `resume-button`.
@@ -1491,7 +1492,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
               exportparts="actions: message-actions, avatar: message-avatar, body: message-body,
                 content: message-content, indicator: message-indicator, mark: message-mark, message,
                 meta: message-meta, retry: message-retry, sources: message-sources,
-                state: message-state, time: message-time${secondNames(SECOND_NAMES.author, turn.author)}${secondNames(SECOND_NAMES.state, turn.state)}"
+                state: message-state, time: message-time, work: message-work${secondNames(SECOND_NAMES.author, turn.author)}${secondNames(SECOND_NAMES.state, turn.state)}"
               author=${turn.author ?? nothing}
               author-label=${turn.authorLabel ?? nothing}
               at=${turn.at ?? nothing}

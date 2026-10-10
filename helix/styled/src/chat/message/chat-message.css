@@ -155,6 +155,19 @@
   display: none;
 }
 
+/* **An agent's work fills the turn's width**, above the answer, since a log of
+   commands and output is read across rather than hugged like a bubble, and it
+   is the quieter of the two, so it starts in the muted ink. */
+[part="work"] {
+  color: var(--helix-color-foreground-muted);
+  justify-self: stretch;
+  min-inline-size: 0;
+}
+
+[part="work"][hidden] {
+  display: none;
+}
+
 /* **A wash of the foreground, not a rung on the surface ladder**, which is the
    answer `Option` already wrote down: a rung is an absolute color, and a bubble
    has no idea what it is sitting on. Measured across six grounds, a rung ran
