@@ -147,22 +147,55 @@ of them.
 
 ### Typings for your tags
 
-Your typings come from a manifest of your package. `helix manifest build`, in
-`@fusion.dev/helix-cli`, writes one that includes every member your subclasses
-inherit from ours. Name each Helix package you extend and where its manifest is:
+Your typings come from a custom elements manifest of your package, written by
+`@custom-elements-manifest/analyzer`:
 
 ```sh
-helix manifest build . --tier styled \
-  --dependency @fusion.dev/helix=node_modules/@fusion.dev/helix/custom-elements.json \
-  --dependency @fusion.dev/helix-headless=node_modules/@fusion.dev/helix-headless/custom-elements.json \
-  --dependency @fusion.dev/helix-core=node_modules/@fusion.dev/helix-core/custom-elements.json \
-  > custom-elements.json
+npx @custom-elements-manifest/analyzer analyze --litelement --dependencies \
+  --globs "src/**/*.ts"
 ```
 
-Then run a typings generator over it. Our own typings start from
+Each flag does one job, and the manifest is incomplete without either:
+
+- `--dependencies` reads the `custom-elements.json` each Helix package ships
+  and names in its `package.json`, so `acme-combobox` gets the members,
+  attributes, events, slots and parts it inherits from ours.
+- `--litelement` reads Lit's decorators, so the properties you declare with
+  `@property` are attributes too.
+
+Then run a typings generator over the manifest. Our own typings start from
 `@wc-toolkit/jsx-types` and `@wc-toolkit/vuejs-types`. The typings for
-`acme-combobox` then include the hundred or so members it inherits, as well as
-the two you wrote.
+`acme-combobox` then include the members it inherits, as well as the ones you
+wrote.
+
+The generated file names Helix's event classes, such as
+`HelixBeforeChangeEvent`, without importing them. Add one line at its top that
+imports the names TypeScript reports as missing:
+
+```ts
+import type { HelixBeforeChangeEvent, HelixFilterEvent } from '@fusion.dev/helix-core'
+```
+
+Without that line, a project that sets `skipLibCheck` gets no error, and each
+of those event handlers is typed `any`.
+
+For a few tags in React, you can skip the generator. Each headless family
+publishes its props in `@fusion.dev/helix-headless/jsx`, and your tag takes
+them:
+
+```ts
+import type { HelixHeadlessComboboxProps } from '@fusion.dev/helix-headless/jsx'
+
+declare module 'react' {
+  namespace JSX {
+    interface IntrinsicElements {
+      'acme-combobox': HelixHeadlessComboboxProps
+    }
+  }
+}
+```
+
+A subclass that adds properties joins its own to them with `&`.
 
 `@fusion.dev/helix-cem`, the step that runs those generators for our packages
 and corrects what they write, is not published. It is build tooling for this
