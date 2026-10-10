@@ -2,9 +2,10 @@
 //!
 //! **Lookups that answer for the installed version, and the derivation.** The
 //! lookups read the `api.json`, `examples.json`, and `tokens.json` the
-//! project's Helix packages ship, so each answer is one decision an agent makes
-//! while writing a page, from the same catalog the site is written from, at
-//! the version the project builds with. The derivation answers what no file
+//! project's Helix packages ship, every one that documents its elements, so
+//! each answer is one decision an agent makes while writing a page, from the
+//! same catalog the site is written from, at the version the project builds
+//! with. The derivation answers what no file
 //! can hold: what a brand color derives to. `tools` has the list.
 //!
 //! **It runs on the reader's machine and Fusion operates nothing.** A server we
@@ -51,7 +52,7 @@ const SERVER_KEY: &str = "io.modelcontextprotocol/serverInfo";
 /// **Under 2,048 characters**, where one client cuts what it shows, and a test
 /// holds it there. The rules are repeated in the tool descriptions, which no
 /// client cuts.
-pub const INSTRUCTIONS: &str = "Helix is a library of web components. These tools answer from the Helix packages installed in this project, and each answer names the package and version it read.\n\n\
+pub const INSTRUCTIONS: &str = "Helix is a library of web components. These tools answer from the Helix packages installed in this project, and each answer names the packages and versions it read.\n\n\
 - Look up a family with helix_family before writing its tags. Write only the tags, attributes, values, slots, parts, events, and custom properties it lists. If it is not listed, it does not exist, so do not use it.\n\
 - Find a family by name or purpose with helix_find.\n\
 - Use a Helix element for everything Helix has a family for, and a native element only for page structure such as main, section, form, div, and a. helix_find answers a native tag, such as button or h1, with the family that replaces it.\n\

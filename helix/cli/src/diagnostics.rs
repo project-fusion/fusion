@@ -52,10 +52,6 @@ const PATIENCE: Duration = Duration::from_secs(5);
 /// page's console and overlay leave out the same ones.
 const AS_FINDINGS: [&str; 1] = ["duplicate-registration"];
 
-/// The packages a page's diagnostics are judged against, as `diagnose()`
-/// names its tiers.
-const TIERS: [&str; 2] = ["@fusion.dev/helix", "@fusion.dev/helix-headless"];
-
 /// A file in an installed package, from `from`'s `node_modules` up.
 fn installed(from: &Path, package: &str, file: &str) -> Option<PathBuf> {
     from.ancestors()
@@ -80,19 +76,21 @@ pub fn pages(from: &Path, urls: &[String], config: Option<&Path>) -> Outcome<Vec
             )
             .hint("npm install --save-dev @fusion.dev/helix-diagnostics")
         })?;
-    let tiers: Vec<Value> = TIERS
-        .iter()
-        .filter_map(|name| {
-            let path = installed(from, name, "custom-elements.json")?;
-            let manifest: Value =
-                serde_json::from_str(&std::fs::read_to_string(path).ok()?).ok()?;
-            Some(json!({ "manifest": manifest, "name": name }))
+    /* **The lint data of every package that publishes it**, as `diagnose()`
+    takes its tiers: the two tiers and an add-on such as
+    `@fusion.dev/helix-sandbox`, the same set `helix scan` judges against. */
+    let tiers: Vec<Value> = crate::api::documented(from, "lint.json")
+        .into_iter()
+        .filter_map(|one| {
+            let lint: Value =
+                serde_json::from_str(&std::fs::read_to_string(one.file).ok()?).ok()?;
+            Some(json!({ "lint": lint }))
         })
         .collect();
     if tiers.is_empty() {
         return Err(Failure::input(
             "no Helix package is installed",
-            "a page is judged against the manifests of the Helix packages in node_modules",
+            "a page is judged against the lint data of the Helix packages in node_modules",
         )
         .hint("npm install @fusion.dev/helix"));
     }

@@ -59,7 +59,7 @@ fn project(name: &str, files: &[(&str, &str)]) -> PathBuf {
     std::fs::write(installed.join("helix/lint.json"), lint().to_string()).expect("lint data");
     std::fs::write(
         installed.join("helix/package.json"),
-        r#"{ "name": "@fusion.dev/helix", "version": "1.2.3" }"#,
+        r#"{ "exports": { "./lint.json": "./lint.json" }, "name": "@fusion.dev/helix", "version": "1.2.3" }"#,
     )
     .expect("a manifest");
     std::fs::write(
@@ -422,5 +422,140 @@ fn a_setting_that_names_nothing_is_refused_with_the_closest() {
             .contains("The file sets `detial`, which is no setting. The closest is `detail`."),
         "{}",
         String::from_utf8_lossy(&output.stderr)
+    );
+}
+
+/// A package beside Helix in `node_modules`, with this `package.json` and
+/// these files.
+fn beside(directory: &Path, name: &str, manifest: &Value, files: &[(&str, Value)]) {
+    let at = directory.join("node_modules").join(name);
+    std::fs::create_dir_all(&at).expect("a folder");
+    std::fs::write(at.join("package.json"), manifest.to_string()).expect("a manifest");
+    for (file, body) in files {
+        std::fs::write(at.join(file), body.to_string()).expect("a file");
+    }
+}
+
+/// The kind and the tag of each finding a scan of `directory` reports.
+fn found(directory: &Path) -> Vec<(String, String)> {
+    let output = scan(directory, &["--json"]);
+    let run: Value = serde_json::from_slice(&output.stdout).expect("one JSON document");
+    run["findings"]
+        .as_array()
+        .expect("findings")
+        .iter()
+        .map(|one| {
+            (
+                one["kind"].as_str().unwrap_or_default().to_owned(),
+                one["tag"].as_str().unwrap_or_default().to_owned(),
+            )
+        })
+        .collect()
+}
+
+/// **An add-on's elements are judged from its own lint data**, found as the
+/// tiers' is, where its `exports` names `./lint.json` and it is not private.
+#[test]
+fn an_add_on_s_elements_are_judged_from_its_lint_data() {
+    let directory = project(
+        "add-on",
+        &[
+            ("src/main.ts", "import '@fusion.dev/helix-sandbox/editor'\n"),
+            (
+                "index.html",
+                "<helix-sandbox-editor language=\"cobol\"></helix-sandbox-editor>\n<helix-sandbox-specs></helix-sandbox-specs>\n",
+            ),
+        ],
+    );
+    let lint = |package: &str, tag: &str, attributes: Value| {
+        json!({
+            "package": package,
+            "tags": { tag: { "attributes": attributes, "family": "sandbox", "hooks": [], "parts": [], "written": [] } },
+            "version": "1.2.3",
+        })
+    };
+    let api = |package: &str, tag: &str, entry: &str| {
+        json!({
+            "families": [{
+                "contributes": true,
+                "elements": [{ "entry": entry, "events": [], "package": package, "properties": [], "specifier": format!("{package}/{entry}"), "tagName": tag, "tier": "styled" }],
+                "label": "Sandbox",
+                "slug": "sandbox",
+            }],
+            "package": package,
+        })
+    };
+    let exports = json!({ "./api.json": "./api.json", "./lint.json": "./lint.json" });
+    beside(
+        &directory,
+        "@fusion.dev/helix-sandbox",
+        &json!({ "exports": exports, "name": "@fusion.dev/helix-sandbox", "version": "1.2.3" }),
+        &[
+            (
+                "lint.json",
+                lint(
+                    "@fusion.dev/helix-sandbox",
+                    "helix-sandbox-editor",
+                    json!({ "language": ["css", "html", "ts"] }),
+                ),
+            ),
+            (
+                "api.json",
+                api(
+                    "@fusion.dev/helix-sandbox",
+                    "helix-sandbox-editor",
+                    "editor",
+                ),
+            ),
+        ],
+    );
+    /* Private, as `@fusion.dev/helix-workbench` is, so its tags are no one's. */
+    beside(
+        &directory,
+        "@fusion.dev/helix-workbench",
+        &json!({ "exports": exports, "name": "@fusion.dev/helix-workbench", "private": true, "version": "1.2.3" }),
+        &[
+            (
+                "lint.json",
+                lint(
+                    "@fusion.dev/helix-workbench",
+                    "helix-sandbox-specs",
+                    json!({}),
+                ),
+            ),
+            (
+                "api.json",
+                api(
+                    "@fusion.dev/helix-workbench",
+                    "helix-sandbox-specs",
+                    "specs",
+                ),
+            ),
+        ],
+    );
+    assert_eq!(
+        found(&directory),
+        [
+            (
+                "invalid-value".to_owned(),
+                "helix-sandbox-editor".to_owned()
+            ),
+            ("unknown-tag".to_owned(), "helix-sandbox-specs".to_owned()),
+        ]
+    );
+
+    /* Without the import, the entry the editor's package publishes is named. */
+    std::fs::write(directory.join("src/main.ts"), "export {}\n").expect("a module");
+    let output = scan(&directory, &["--json"]);
+    let run: Value = serde_json::from_slice(&output.stdout).expect("one JSON document");
+    let unimported = run["findings"]
+        .as_array()
+        .expect("findings")
+        .iter()
+        .find(|one| one["kind"] == "unimported-tag")
+        .expect("the editor is unimported");
+    assert_eq!(
+        unimported["expected"],
+        "import '@fusion.dev/helix-sandbox/editor'"
     );
 }
