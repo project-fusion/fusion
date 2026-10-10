@@ -264,7 +264,7 @@
    long the summary is. */
 [part="footer"] {
   align-items: baseline;
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   display: grid;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
@@ -297,7 +297,7 @@
    express. Out of the grid, neither tier needs a rule at all. */
 [part="empty"],
 [part="loading"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   margin: var(--helix-space-none);

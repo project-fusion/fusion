@@ -96,7 +96,7 @@
    number, which the chart writes, since a positioned tick gives no width, and
    a character more, since a sign or a percent is wider than a digit. */
 [part="axis"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
   font-variant-numeric: tabular-nums;
   inline-size: calc(var(--line-chart-axis, 3ch) + 1ch);

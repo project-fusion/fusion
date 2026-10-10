@@ -177,7 +177,7 @@ foreignObject > [part="mark"] {
 
 [part="empty"],
 [part="loading"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   margin: var(--helix-space-none);
