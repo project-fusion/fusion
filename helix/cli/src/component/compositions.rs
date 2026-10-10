@@ -355,11 +355,11 @@ fn resolve_docs(
 ///
 /// Prefixed with the role the parent gave the child, so two levels agreeing on a
 /// word cannot collide. **Except where the part already is the role**, which is
-/// the stutter the rule would otherwise produce: a `dialog` inside a
-/// `part="dialog"` is `dialog`, not `dialog-dialog`. **And so is a second name
-/// of it**, which is the role and one word more: a tooltip landed above its
-/// trigger names its bubble `tooltip-top` beside `tooltip`, and inside the
-/// `tooltip` role that stays `tooltip-top`, not `tooltip-tooltip-top`.
+/// the stutter the rule would otherwise produce: a log line's `line` inside the
+/// `line` role is `line`, not `line-line`. **And so is a second name of it**,
+/// which is the role and one word more: a line at the error level names its row
+/// `line-error` beside `line`, and inside the `line` role that stays
+/// `line-error`, not `line-line-error`.
 pub fn exposed_as(role: &str, part: &str) -> String {
     if part == role || second_name_of(part, role) {
         part.to_owned()
@@ -407,7 +407,7 @@ pub struct Site {
 /// **A tag handed to a shared helper is not followed.** `drawTooltip` opens
 /// `<${tag}>` for six charts, and the tag is the caller's argument: nothing in
 /// the helper's file says which element it is. It forwards by hand, under the
-/// `tooltip` its charts published before the prefix rule, beside the
+/// `tooltip` prefix its charts published before the prefix rule, beside the
 /// `tooltip-anchor` role that rule would take instead.
 pub fn compositions(context: &Context) -> Vec<Site> {
     let mut found = Vec::new();
@@ -517,9 +517,12 @@ html`<x exportparts="body: message-body${pick(NAMES, a)}${pick(NAMES, b)}${on ? 
     #[test]
     fn a_part_named_for_its_role_keeps_the_role_alone_and_so_does_its_second_name() {
         assert_eq!(exposed_as("tooltip", "arrow"), "tooltip-arrow");
-        assert_eq!(exposed_as("tooltip", "arrow-top"), "tooltip-arrow-top");
-        assert_eq!(exposed_as("tooltip", "tooltip"), "tooltip");
-        assert_eq!(exposed_as("tooltip", "tooltip-top"), "tooltip-top");
-        assert_eq!(exposed_as("copy", "tooltip-top"), "copy-tooltip-top");
+        assert_eq!(exposed_as("tooltip", "surface-top"), "tooltip-surface-top");
+        assert_eq!(exposed_as("line", "line"), "line");
+        assert_eq!(exposed_as("line", "line-error"), "line-error");
+        assert_eq!(
+            exposed_as("copy", "tooltip-surface-top"),
+            "copy-tooltip-surface-top"
+        );
     }
 }

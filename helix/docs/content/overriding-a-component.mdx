@@ -69,7 +69,7 @@ helix-select::part(trigger) {
   font-variant-numeric: tabular-nums;
 }
 
-helix-dialog::part(dialog) {
+helix-dialog::part(surface) {
   max-inline-size: 40rem;
 }
 ```
@@ -99,16 +99,17 @@ helix-video::part(overflow-header) { … }
 ```
 
 `<helix-date-input>` renders a date picker in the `picker` role, so the picker's
-`cell` part is `picker-cell`. When the child's part is the role itself, the
-forwarded name is the role alone. The tooltip inside `<helix-copy-button>` is
-`tooltip`, and its arrow is `tooltip-arrow`.
+`cell` part is `picker-cell`. The tooltip inside `<helix-copy-button>` is in the
+`tooltip` role, so its `surface` is `tooltip-surface` and its arrow is
+`tooltip-arrow`. When the child's part is the role itself, the forwarded name is
+the role alone: each line inside `<helix-log>` is `line`.
 
 A part that changes with a state has a second name while the state is active,
 and that name is forwarded too. A tooltip placed below its button is also
-`tooltip-bottom`, and its arrow is also `tooltip-arrow-bottom`. Your stylesheet
-can use these names to style each side, which it cannot detect any other way.
-The arrow already faces the button on every side. Use the names for styles you
-add on top.
+`tooltip-surface-bottom`, and its arrow is also `tooltip-arrow-bottom`. Your
+stylesheet can use these names to style each side, which it cannot detect any
+other way. The arrow already faces the button on every side. Use the names for
+styles you add on top.
 
 **The prefix keeps part names unique.** A component and its child can use the
 same word. This happened once: `Command` forwarded the listbox's `search-field`
@@ -138,8 +139,8 @@ so you learn each name once:
 | `container` | An element's own outer box. |
 | `content` | A region you fill. |
 | `panel` | A region switched between, or a sheet anchored to an edge. |
-| `surface` | A floating panel drawn over the page. |
-| `viewport` | A scrollport the component reads the position of. |
+| `surface` | A floating panel drawn over the page, such as a menu, a popover, a tooltip, or a dialog. |
+| `viewport` | The box that shows part of a larger area: a scrollport, or the frame a map or a graph is panned and zoomed in. |
 
 A part that names something specific to one component, such as `thumb`,
 `swatch`, or `weekday`, is listed on that component's page.
