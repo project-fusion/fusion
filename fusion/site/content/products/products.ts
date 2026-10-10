@@ -33,8 +33,8 @@ export interface Destination {
    * anywhere to go**, and the two are separate. A row named before it exists
    * has a stage and no `href`, and does not pretend to be a link: nothing is
    * followed and it leaves the tab order, rather than being focusable and
-   * inert. A row that is still being built and already has a page, as Maps
-   * does, is a link that carries its stage. Naming the modules before they exist is the point,
+   * inert. A row that is still being built and already has a page is a link
+   * that carries its stage. Naming the modules before they exist is the point,
    * since the division of the product is the argument; letting one be pressed
    * would be the part that lied.
    *
@@ -156,7 +156,7 @@ export interface Product {
  * Engram, Trace and Recall are rows carrying their stage rather than a link,
  * because the division of Cortex is the argument even before the modules are
  * built. A row gains an `href` on the day it has somewhere to go, and keeps its
- * stage until it is finished: Maps is both.
+ * stage until it is finished.
  */
 export const PRODUCTS: Product[] = [
   {
@@ -224,7 +224,6 @@ export const PRODUCTS: Product[] = [
       {
         href: '/helix/maps',
         picture: 'map',
-        stage: 'Building',
         summary: 'Maps in your brand’s colors.',
         title: 'Maps',
       },
@@ -234,7 +233,6 @@ export const PRODUCTS: Product[] = [
       {
         href: '/helix/graph',
         picture: 'graph',
-        stage: 'Building',
         summary: 'Graphs in 2D and 3D.',
         title: 'Graph',
       },

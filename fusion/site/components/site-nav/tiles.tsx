@@ -19,7 +19,7 @@ import type { CSSProperties, ReactNode } from 'react'
  * because color there only ever said "this one is emphasized". A product shot
  * of a design system themed from your brand color shows the color: on the one
  * control that takes it, the route on the map, the note that is selected, and
- * the ramp the theme builder computes. The marks are the primary tokens,
+ * the palette the theme builder computes. The marks are the primary tokens,
  * through the `artBrand*` classes in `site-nav.module.css`.
  *
  * **Shading is colorless.** A face turned away from the light is darkened by
@@ -28,16 +28,24 @@ import type { CSSProperties, ReactNode } from 'react'
  * only non-token fills in the file, and they carry no color of their own.
  */
 
+/**
+ * Whether a scene stands on a plate. Off, the objects float on the band and
+ * the map keeps its sheet, because the map is its ground.
+ */
+const PLATES = false
+
 /*
  * The projection. A point at `x, y, z` on a ground where `x` runs right and
- * down and `y` runs left and down lands at `(x - y) * 0.866, (x + y) * 0.5 - z`
- * from the scene's origin, which sits at 160, 110 of the gallery's 320 by 200
- * canvas. Every scene is drawn at round numbers on an 80 by 80 ground and
- * scaled up a quarter by `Scene` to fill the tile's crop.
+ * up, away from the viewer, and `y` runs right and down, toward the viewer,
+ * lands at `(x + y) * 0.866, (y - x) * 0.5 - z` from the scene's origin, which
+ * sits at 160, 110 of the gallery's 320 by 200 canvas. So a row of things
+ * along `x` reads left to right and recedes, the way a line of text on a desk
+ * does from a chair. Every scene is drawn at round numbers on an 80 by 80
+ * ground and scaled up a quarter by `Scene` to fill the tile's crop.
  */
 const iso = (x: number, y: number, z: number) => ({
-  x: 160 + (x - y) * 0.866,
-  y: 110 + (x + y) * 0.5 - z,
+  x: 160 + (x + y) * 0.866,
+  y: 110 + (y - x) * 0.5 - z,
 })
 
 const points = (list: { x: number; y: number }[]) => list.map((p) => `${p.x},${p.y}`).join(' ')
@@ -45,8 +53,9 @@ const points = (list: { x: number; y: number }[]) => list.map((p) => `${p.x},${p
 /**
  * A box on the ground: a rectangle `w` along `x` and `d` along `y` at `x, y`,
  * raised `h`. Its top wears the class given, and the two faces toward the
- * viewer are the same fill under a colorless shade, the left one lighter
- * because the light is at the top left.
+ * viewer, the one at the near end of `x` and the one at the far end of `y`,
+ * are the same fill under a colorless shade. The left one is lighter because
+ * the light is at the top left.
  */
 function Box({
   className,
@@ -69,11 +78,11 @@ function Box({
   const b = iso(x + w, y, h)
   const c = iso(x + w, y + d, h)
   const dd = iso(x, y + d, h)
+  const a0 = iso(x, y, 0)
   const c0 = iso(x + w, y + d, 0)
-  const b0 = iso(x + w, y, 0)
   const d0 = iso(x, y + d, 0)
-  const left = points([dd, c, c0, d0])
-  const right = points([c, b, b0, c0])
+  const left = points([a, dd, d0, a0])
+  const right = points([dd, c, c0, d0])
   return (
     <g>
       <polygon className={className} fillOpacity={fillOpacity} points={left} />
@@ -86,27 +95,31 @@ function Box({
 }
 
 /**
- * The plate every scene stands on: 80 by 80, 6 thick, with the gallery's
- * shadow under it so it floats on the band.
+ * The plate a scene stands on: 80 by 80, 6 thick, with the gallery's shadow
+ * under it so it floats on the band. Nothing while `PLATES` is off, unless
+ * the scene says it is its own ground.
  */
-function Plate({ className = 'artSurface' }: { className?: string }) {
+function Plate({ always = false }: { always?: boolean }) {
+  if (!PLATES && !always) {
+    return null
+  }
   const top = points([iso(-40, -40, 0), iso(40, -40, 0), iso(40, 40, 0), iso(-40, 40, 0)])
   return (
     <>
       <g filter="url(#helixArtShadow)">
-        <polygon className={className} points={top} />
+        <polygon className="artSurface" points={top} />
       </g>
       <polygon
         className="artInk"
         fillOpacity="0.12"
-        points={points([iso(-40, 40, 0), iso(40, 40, 0), iso(40, 40, -6), iso(-40, 40, -6)])}
+        points={points([iso(-40, -40, 0), iso(-40, 40, 0), iso(-40, 40, -6), iso(-40, -40, -6)])}
       />
       <polygon
         className="artInk"
         fillOpacity="0.28"
-        points={points([iso(40, 40, 0), iso(40, -40, 0), iso(40, -40, -6), iso(40, 40, -6)])}
+        points={points([iso(-40, 40, 0), iso(40, 40, 0), iso(40, 40, -6), iso(-40, 40, -6)])}
       />
-      <polygon className={className} points={top} />
+      <polygon className="artSurface" points={top} />
       <polygon className="artEdge" points={top} />
     </>
   )
@@ -145,8 +158,8 @@ function Flat({
 /**
  * A sphere: a circle under a white specular at the top left and a dark rim
  * at the edge, both colorless, so one pair shades ink and brand in either
- * mode. Its shadow is on the ground under it and it stands on a stem, which
- * is what makes its height read.
+ * mode. On a plate it casts a shadow on the ground and stands on a stem,
+ * which is what makes its height read. Floating, it has neither.
  */
 function Sphere({
   className,
@@ -169,22 +182,26 @@ function Sphere({
   const foot = iso(x, y, 0)
   return (
     <g>
-      <ellipse
-        className="artInk"
-        cx={foot.x}
-        cy={foot.y}
-        fillOpacity="0.12"
-        rx={r + 1}
-        ry={(r + 1) / 2}
-      />
-      <line
-        className="artStroke"
-        strokeOpacity="0.12"
-        x1={foot.x}
-        x2={at.x}
-        y1={foot.y}
-        y2={at.y + r}
-      />
+      {PLATES && (
+        <>
+          <ellipse
+            className="artInk"
+            cx={foot.x}
+            cy={foot.y}
+            fillOpacity="0.12"
+            rx={r + 1}
+            ry={(r + 1) / 2}
+          />
+          <line
+            className="artStroke"
+            strokeOpacity="0.12"
+            x1={foot.x}
+            x2={at.x}
+            y1={foot.y}
+            y2={at.y + r}
+          />
+        </>
+      )}
       {glow && (
         <circle
           className={className}
@@ -230,8 +247,9 @@ function Scene({ children }: { children: ReactNode }) {
 
 /**
  * The component catalog: six keys on a board, one control each, the way the
- * gallery lays its cards out in a grid. The button's key is the brand, since
- * the primary button is the control that takes the color. The keys arrive in
+ * gallery lays its cards out in a grid. Three along `x`, so a row reads left
+ * to right, and two rows along `y`. The button's key is the brand, since the
+ * primary button is the control that takes the color. The keys arrive in
  * reading order on hover, as the gallery's rows do.
  */
 const componentsArt: ReactNode = (
@@ -240,7 +258,7 @@ const componentsArt: ReactNode = (
     {[
       /* A button: the key itself is the control. */
       { brand: true, mark: 'bar', x: -34, y: -30 },
-      /* A switch, on: a short key with its knob at the end. */
+      /* A switch, on: a track with its knob at the end. */
       { mark: 'knob', x: -8, y: -30 },
       /* A checkbox, checked. */
       { mark: 'tick', x: 18, y: -30 },
@@ -338,23 +356,24 @@ const componentsArt: ReactNode = (
 )
 
 /**
- * The sandbox: source on one side, what it renders on the other. The gap
- * between the two panes is the divider and the whole idea. The rendered
- * control floats over the right pane and lifts on hover, as the gallery's
- * does, in ink: the sandbox is a tool, and the themed button one tile over
- * already says what a themed control looks like.
+ * The sandbox: source on one side, what it renders on the other. The two
+ * panes split the plate along `y`, so the code sits upper left and the
+ * preview lower right, and each line of code runs along `x`, left to right.
+ * The gap between the panes is the divider and the whole idea. The rendered
+ * control floats over the preview and lifts on hover, as the gallery's does,
+ * in ink: the sandbox is a tool, and the themed button one tile over already
+ * says what a themed control looks like.
  */
 const sandboxArt: ReactNode = (
   <Scene>
     <Plate />
-    <Box className="artSunken" d={80} h={2} w={36} x={-40} y={-40} />
+    <Box className="artSunken" d={36} h={2} w={80} x={-40} y={-40} />
     {[
-      { w: 22, x: -36, y: -30 },
-      { w: 16, x: -32, y: -20 },
-      { w: 20, x: -36, y: -10 },
-      { w: 12, x: -32, y: 0 },
-      { w: 18, x: -36, y: 10 },
-      { w: 14, x: -32, y: 20 },
+      { w: 26, x: -34, y: -35 },
+      { w: 18, x: -30, y: -29 },
+      { w: 30, x: -34, y: -23 },
+      { w: 14, x: -30, y: -17 },
+      { w: 22, x: -34, y: -11 },
     ].map((line) => (
       <Flat
         className="artInk"
@@ -369,54 +388,56 @@ const sandboxArt: ReactNode = (
     ))}
     {/* Raised and not the page's ground: in dark mode the ground is the one
         black in the frame, and a pane of it on the plate read as a hole. */}
-    <Box className="artRaised" d={80} h={2} w={36} x={4} y={-40} />
+    <Box className="artRaised" d={36} h={2} w={80} x={-40} y={4} />
     <g className="artMotion artLift">
       <ellipse
         className="artInk"
-        cx={iso(22, 0, 0).x}
-        cy={iso(22, 0, 2).y}
+        cx={iso(0, 22, 0).x}
+        cy={iso(0, 22, 2).y}
         fillOpacity="0.12"
         rx="22"
         ry="11"
       />
       <g className="artLiftShadow" filter="url(#helixArtShadow)">
-        <Box className="artSolid" d={16} h={5} w={24} x={10} y={-8} />
+        <Box className="artSolid" d={16} h={5} w={24} x={-12} y={14} />
       </g>
-      <Box className="artSolid" d={16} h={5} w={24} x={10} y={-8} />
-      <Flat className="artOnSolid" d={3} w={12} x={16} y={-1.5} z={5} />
+      <Box className="artSolid" d={16} h={5} w={24} x={-12} y={14} />
+      <Flat className="artOnSolid" d={3} w={12} x={-6} y={20.5} z={5} />
     </g>
   </Scene>
 )
 
 /**
- * The theme builder: the ramp it computes, as seven blocks rising from the
- * page's ground through the primary's subtle and muted tints to the primary
- * itself, then the two darks. Height carries tone, so the ramp reads as a
- * ramp in either mode, each block being the token that sits at that step in
- * its own mode. The blocks arrive in order on hover, the ramp being computed
+ * The theme builder: the brand color in, and the palette out. The input is a
+ * block of the brand standing at the back; the output is the row of swatches
+ * laid flat in front of it, from the page's sunken ground through the
+ * primary's subtle and muted tints to the primary, then the two darks. Flat
+ * and not stepped, because a palette is a row of swatches and a staircase is
+ * a chart. The swatches arrive in order on hover, the palette being computed
  * step by step.
  */
 const themeArt: ReactNode = (
   <Scene>
     <Plate />
+    <Box className="artBrand" d={16} h={16} w={16} x={16} y={-34} />
     {[
-      { className: 'artPage', tone: 'ground' },
       { className: 'artSunken', tone: 'sunken' },
       { className: 'artBrandSubtle', tone: 'subtle' },
       { className: 'artBrandMuted', tone: 'muted' },
       { className: 'artBrand', tone: 'primary' },
+      { className: 'artInk', fillOpacity: 0.28, tone: 'ink-light' },
       { className: 'artInk', fillOpacity: 0.55, tone: 'ink' },
       { className: 'artSolid', tone: 'inverse' },
     ].map((step, index) => (
       <g className="artMotion artRow" key={step.tone} style={{ '--art-i': index } as CSSProperties}>
         <Box
           className={step.className}
-          d={14}
+          d={18}
           fillOpacity={step.fillOpacity}
-          h={6 + index * 6}
-          w={14}
-          x={-36 + index * 10.5}
-          y={-7 + index * -1}
+          h={3}
+          w={9}
+          x={-38 + index * 11}
+          y={8}
         />
       </g>
     ))}
@@ -424,14 +445,17 @@ const themeArt: ReactNode = (
 )
 
 /**
- * Maps: a plate with roads at the lightest ink, the route drawn across it in
- * the brand, and a pin standing at the end of the route. The pin is the
- * place, and it is the one thing with height, so it is what lifts on hover.
+ * Maps: a sheet with roads at the lightest ink, the route drawn across it in
+ * the brand, and a pin standing at the end of the route. The sheet stays
+ * when the plates go, since the map is its own ground. The pin is the place,
+ * and it is the one thing with height, so it is what lifts on hover.
  */
+const PIN = { x: 30, y: -16 }
+
 const mapArt: ReactNode = (
   <Scene>
-    <Plate />
-    {/* Roads: two along `x` and two along `y`, which on the plate are the
+    <Plate always />
+    {/* Roads: two along `x` and two along `y`, which on the sheet are the
         two directions the rhombus runs in. */}
     {[-14, 18].map((y) => (
       <Flat className="artInk" d={4} fillOpacity={0.12} key={`x${y}`} w={80} x={-40} y={y} z={0} />
@@ -439,17 +463,18 @@ const mapArt: ReactNode = (
     {[-20, 12].map((x) => (
       <Flat className="artInk" d={80} fillOpacity={0.12} key={`y${x}`} w={4} x={x} y={-40} z={0} />
     ))}
-    {/* The route, as a polyline of ground points. */}
+    {/* The route, as a polyline of ground points from the near left corner
+        to the pin at the back right. */}
     <polyline
       className="artBrandStroke"
       fill="none"
       points={points([
-        iso(-40, 30, 0),
-        iso(-22, 20, 0),
-        iso(-8, 24, 0),
-        iso(6, 8, 0),
-        iso(14, -6, 0),
-        iso(26, -12, 0),
+        iso(-40, 10, 0),
+        iso(-22, 4, 0),
+        iso(-6, 14, 0),
+        iso(8, 2, 0),
+        iso(18, -10, 0),
+        iso(PIN.x, PIN.y, 0),
       ])}
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -458,8 +483,8 @@ const mapArt: ReactNode = (
     <g className="artMotion artLift">
       <ellipse
         className="artInk"
-        cx={iso(26, -12, 0).x}
-        cy={iso(26, -12, 0).y}
+        cx={iso(PIN.x, PIN.y, 0).x}
+        cy={iso(PIN.x, PIN.y, 0).y}
         fillOpacity="0.12"
         rx="6"
         ry="3"
@@ -468,14 +493,29 @@ const mapArt: ReactNode = (
         className="artStroke"
         strokeOpacity="0.28"
         strokeWidth="2"
-        x1={iso(26, -12, 0).x}
-        x2={iso(26, -12, 0).x}
-        y1={iso(26, -12, 0).y}
-        y2={iso(26, -12, 22).y}
+        x1={iso(PIN.x, PIN.y, 0).x}
+        x2={iso(PIN.x, PIN.y, 0).x}
+        y1={iso(PIN.x, PIN.y, 0).y}
+        y2={iso(PIN.x, PIN.y, 22).y}
       />
-      <circle className="artBrand" cx={iso(26, -12, 26).x} cy={iso(26, -12, 26).y} r="6" />
-      <circle cx={iso(26, -12, 26).x} cy={iso(26, -12, 26).y} fill="url(#helixSphereRim)" r="6" />
-      <circle cx={iso(26, -12, 26).x} cy={iso(26, -12, 26).y} fill="url(#helixSphereLight)" r="6" />
+      <circle
+        className="artBrand"
+        cx={iso(PIN.x, PIN.y, 26).x}
+        cy={iso(PIN.x, PIN.y, 26).y}
+        r="6"
+      />
+      <circle
+        cx={iso(PIN.x, PIN.y, 26).x}
+        cy={iso(PIN.x, PIN.y, 26).y}
+        fill="url(#helixSphereRim)"
+        r="6"
+      />
+      <circle
+        cx={iso(PIN.x, PIN.y, 26).x}
+        cy={iso(PIN.x, PIN.y, 26).y}
+        fill="url(#helixSphereLight)"
+        r="6"
+      />
     </g>
   </Scene>
 )
@@ -490,7 +530,7 @@ const mapArt: ReactNode = (
 const NOTES = {
   a: { r: 7, selected: true, x: 0, y: 0, z: 34 },
   b: { r: 4.5, x: -28, y: -10, z: 22 },
-  c: { r: 5.5, x: 22, y: -26, z: 46 },
+  c: { r: 5.5, x: 22, y: -26, z: 34 },
   d: { r: 4.5, x: 26, y: 18, z: 18 },
   e: { r: 5, x: -12, y: 30, z: 40 },
   f: { r: 4, x: -34, y: 24, z: 12 },
@@ -506,8 +546,10 @@ const QUIET_LINKS: [Note, Note][] = [
 
 const SELECTED_LINKS: Note[] = ['b', 'c', 'd', 'e']
 
+/* Farther back is smaller `y - x`, which is where the projection puts the
+   top of the picture. */
 const BACK_TO_FRONT = (Object.keys(NOTES) as Note[]).sort(
-  (p, q) => NOTES[p].x + NOTES[p].y - (NOTES[q].x + NOTES[q].y),
+  (p, q) => NOTES[p].y - NOTES[p].x - (NOTES[q].y - NOTES[q].x),
 )
 
 const at = (key: Note) => iso(NOTES[key].x, NOTES[key].y, NOTES[key].z)
