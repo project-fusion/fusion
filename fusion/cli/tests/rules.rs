@@ -506,6 +506,72 @@ fn publishable() {
     );
 }
 
+/// A published package's code imports nothing that stays behind, whatever its
+/// manifest declares. The private one is a devDependency, so `dependencies`
+/// says nothing; a spec importing it and a doc comment showing it are clean,
+/// and the build output is read beside the source.
+#[test]
+fn publishable_imports() {
+    let kit = r#"{
+  "name": "@acme/kit",
+  "description": "A kit.",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://example.com/acme.git",
+    "directory": "packages/kit"
+  },
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" }
+  },
+  "files": ["dist"],
+  "publishConfig": { "access": "public" },
+  "devDependencies": { "@acme/kit-tools": "workspace:*" }
+}"#;
+    plant_in(
+        "workspace-publishable-imports",
+        "workspace",
+        "publishable",
+        &[
+            (
+                "package.json",
+                r#"{
+  "name": "@acme/root",
+  "private": true,
+  "workspaces": ["packages/*"]
+}"#,
+            ),
+            (
+                "fusion.json",
+                r#"{ "scope": "@acme/", "domains": ["kit"] }"#,
+            ),
+            ("packages/kit/package.json", kit),
+            (
+                "packages/kit/src/index.ts",
+                "/**\n * ```js\n * import '@acme/kit-tools/extra'\n * ```\n */\nexport const one = 1\n",
+            ),
+            (
+                "packages/kit/src/index.spec.ts",
+                "import { catalog } from '@acme/kit-tools'\n",
+            ),
+            ("packages/kit/dist/index.js", "export const one = 1\n"),
+            (
+                "packages/kit-tools/package.json",
+                r#"{ "name": "@acme/kit-tools", "version": "0.1.0", "private": true }"#,
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "packages/kit/dist/index.js",
+                "export { catalog } from '@acme/kit-tools/catalog'\n",
+            );
+        },
+        "`@acme/kit` is published and imports `@acme/kit-tools`, which is not",
+        "packages/kit/dist/index.js",
+    );
+}
+
 /// A climb is a finding only when it lands inside another member.
 #[test]
 fn reaching() {
