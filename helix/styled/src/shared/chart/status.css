@@ -9,7 +9,7 @@
  */
 [part="empty"],
 [part="loading"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   display: grid;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);

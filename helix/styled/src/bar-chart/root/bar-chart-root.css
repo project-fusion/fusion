@@ -322,7 +322,7 @@
     var(--helix-color-foreground)
   );
 
-  color: var(--_bar-chart-axis-ink, var(--helix-color-foreground-subtle));
+  color: var(--_bar-chart-axis-ink, var(--helix-color-foreground-muted));
 }
 
 :host([secondary]) [part="axis"][data-axis="secondary"] {
@@ -393,7 +393,7 @@
 /* Relative, so a tick's percentage resolves against the axis, which the grid
    has already made exactly as long as the plot it sits beside. */
 [part="axis"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
   font-variant-numeric: tabular-nums;
   pointer-events: none;

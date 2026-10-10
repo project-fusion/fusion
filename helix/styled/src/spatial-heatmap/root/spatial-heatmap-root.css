@@ -230,7 +230,7 @@
    summary keeps the footer's line, and the footer keeps a line for the end
    label when there is none. */
 [part="footer"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   display: grid;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
@@ -274,7 +274,7 @@
 
 [part="empty"],
 [part="loading"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   margin: var(--helix-space-none);

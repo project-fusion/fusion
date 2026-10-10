@@ -11,7 +11,7 @@
 }
 
 .tone {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
   grid-column: 1 / -1;
@@ -20,7 +20,7 @@
 }
 
 .index {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
   font-variant-numeric: tabular-nums;
 }
