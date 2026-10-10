@@ -362,9 +362,11 @@ jobs:
       - name: The tree is unchanged by verifying it
         run: git diff --exit-code
 
-  # **Its own job because it runs every other check.** In the shard pool it made
-  # whichever shard drew it run the whole suite serially, so a six-way split had
-  # a single shard doing all of it and finished no sooner than that shard did.
+  # **Its own job because it reads the structure of `check`**, which no shard
+  # owns. The shards floor every command they run; this refuses a walk that
+  # reaches nothing or an exemption that matches nothing, and runs only what
+  # `check` reaches and no shard runs. It ran every check a second time until
+  # 10 Oct 2026, 216 seconds that ended last in a median run.
   #
   # Same prerequisites as a shard, for the same reason: the checks it runs read
   # what `build` writes. After `warm`, so the build is a restore: it built its

@@ -14,6 +14,12 @@
  * one failure and stops, and finding four stale artifacts costs four CI runs.
  * A shard runs every check it owns.
  *
+ * **Each check is run command by command, and floored.** A step is expanded
+ * into the commands it comes down to, which run in order and stop at the first
+ * failure, as `&&` does. A command the floor reads has its success line read
+ * for a zero, which is a check that passed while counting nothing. The rule and
+ * its reasons are in `lib/checks.mjs`.
+ *
  * **Prerequisites run in every shard, because `verify`'s order is partly
  * semantic.** `analyze` sits at step 7 and `catalog` at 17, both generators,
  * and the checks after them read what they wrote. A shard taking an arbitrary
@@ -24,70 +30,15 @@
  *   node fusion/scripts/run-checks.mjs --list
  *   node fusion/scripts/run-checks.mjs --shard 0 --of 6
  */
-import { spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { spawn } from 'node:child_process'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { argument } from '@fusion.dev/scripts/argv'
+import { expand, floored, PREREQUISITES, sharded, tally } from '@fusion.dev/scripts/checks'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
-/**
- * Steps that have their own CI job, so a shard must not also run them.
- * Duplicating `cargo test` across six shards would cost more than the split
- * saves, and `biome ci` reads every file regardless of who owns it.
- */
-const DEDICATED = new Set([
-  'biome ci .',
-  /* Runs every other check itself, so a shard drawing it runs the whole suite
-     serially and becomes the critical path for a workflow that split six ways
-     to avoid exactly that. */
-  'bun run check:spec:floors',
-  /* Needs a Rust toolchain, which a shard does not have and five of the six
-     would never use. It runs in `cli`, where the cargo cache is warm and the
-     binary it calls has just been built, and which waits for the workspace
-     build these read on top of. */
-  'bun run check:cli',
-  /* **The CLI's own subcommands, for the reason above.** `bin.mjs` resolves a
-     built binary or builds one, so a shard without the cargo cache compiles it,
-     and several shards compiling Rust at once exhaust the runner's memory:
-     `Killed` at exit 137, a SIGTERM, and the neighbors canceled behind them. */
-  'bun run check:css:seeds',
-  'bun run check:prose',
-  'bun run fusion x spec check',
-  'bun run rs:check',
-  'bun run rs:test',
-  'bun run test',
-  'bun run typecheck',
-])
-
-/**
- * What the checks read, built before any of them run, in `verify`'s order.
- *
- * **`build` is here because `catalog` does not reach everything.** `catalog` is
- * a `fusion/site` task and turbo builds what that package depends on, which is not
- * the whole workspace: `@fusion.dev/helix-headless` is not one of its dependencies, and
- * `check:gen:metrics` measures `helix/headless/dist`. A shard without a full
- * build measures a dist nobody produced, which passes on a machine where an
- * earlier build left one and fails on a runner.
- *
- * **The build is `build-for-checks.sh`, which is `bun run build` without
- * `next build`.** No check reads `.next`, and `warm` builds the same set, so a
- * shard restores every task of it. The script says how it finds the site's
- * other tasks.
- *
- * All three are cached tasks, so with a warm remote cache they cost a restore.
- * Without one every shard pays the build, which is why the remote cache is a
- * precondition for this split rather than a refinement of it.
- */
-const PREREQUISITES = [
-  'bash .github/scripts/build-for-checks.sh',
-  'bun run analyze',
-  'turbo run catalog',
-]
-
-const steps = readVerify()
-const checks = steps.filter((step) => !DEDICATED.has(step) && !PREREQUISITES.includes(step))
+const checks = sharded()
 
 /* **A generated-file check is a `turbo run` invocation, and it is still a
    check.** A test that does not recognize one refuses the whole listing, `plan`
@@ -115,8 +66,9 @@ for (const step of checks) {
     console.error(
       `run-checks: \`verify\` step ${JSON.stringify(step)} is neither a check\n` +
         'nor one of the steps with a dedicated job.\n\n' +
-        'Add it to DEDICATED if it gets its own job, or to PREREQUISITES if\n' +
-        'the checks after it read what it writes.',
+        'Add it to DEDICATED in fusion/scripts/lib/checks.mjs if it gets its\n' +
+        'own job, or to PREREQUISITES there if the checks after it read what\n' +
+        'it writes.',
     )
     process.exit(1)
   }
@@ -168,42 +120,77 @@ const mine = checks.filter((_, index) => index % of === shard)
    reason. */
 const PATH = `${join(ROOT, 'node_modules', '.bin')}:${process.env.PATH ?? ''}`
 
-const run = (step) => {
-  const [command, ...rest] = step.split(' ')
-  return (
-    spawnSync(command, rest, {
+/**
+ * Runs one command, printing what it prints, and resolves with whether it
+ * passed and what it wrote to stdout.
+ *
+ * **Echoed as it arrives rather than after.** A check that hangs has to show
+ * how far it got in the log the timeout leaves behind.
+ */
+const run = (command) =>
+  new Promise((done) => {
+    const [program, ...rest] = command.split(/\s+/)
+    const child = spawn(program, rest, {
       cwd: ROOT,
       env: { ...process.env, PATH },
-      stdio: 'inherit',
-    }).status === 0
-  )
-}
+      stdio: ['ignore', 'pipe', 'inherit'],
+    })
+    let output = ''
+    child.stdout.on('data', (chunk) => {
+      output += chunk
+      process.stdout.write(chunk)
+    })
+    child.on('error', (error) => done({ error, output, passed: false }))
+    child.on('close', (status) => done({ output, passed: status === 0 }))
+  })
 
 for (const step of PREREQUISITES) {
-  if (!run(step)) {
+  if (!(await run(step)).passed) {
     console.error(`\nrun-checks: prerequisite \`${step}\` failed, so nothing ran.`)
     process.exit(1)
   }
 }
 
 const failed = []
+const empty = []
+let counted = 0
 for (const step of mine) {
   console.log(`\n=== ${step}`)
-  if (!run(step)) {
-    failed.push(step)
+  for (const command of expand(step)) {
+    const { error, output, passed } = await run(command)
+    if (!passed) {
+      /* **A command that could not be started is reported as that.** It reads
+         as a failure either way, and the cause named here saves reading the
+         log for an error that never printed. */
+      failed.push(error ? `${step} (\`${command}\` could not be run: ${error.code})` : step)
+      break
+    }
+    if (!floored(command)) {
+      continue
+    }
+    const said = tally(output)
+    if (!said) {
+      continue
+    }
+    counted += 1
+    if (said.numbers.includes(0)) {
+      empty.push(`${command}: passed while counting nothing. It said "${said.line}".`)
+    }
   }
 }
 
+/* The number reported is the number floored, not the number listed, which is
+   the floor's own rule applied to this line. */
 console.log(
-  `\nrun-checks: shard ${shard} of ${of}, ${mine.length} checks, ` + `${failed.length} failed`,
+  `\nrun-checks: shard ${shard} of ${of}, ${mine.length} checks, ${failed.length} failed, ` +
+    `${counted} success lines floored, ${empty.length} counted nothing`,
 )
 if (failed.length > 0) {
   console.error(failed.map((step) => `  ${step}`).join('\n'))
-  process.exit(1)
 }
-
-/** The `verify` script, split into steps, as the single source of the list. */
-function readVerify() {
-  const manifest = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'))
-  return manifest.scripts.verify.split('&&').map((step) => step.trim())
+if (empty.length > 0) {
+  console.error(`Checks that passed on an empty scan:\n  ${empty.join('\n  ')}`)
+}
+if (failed.length > 0 || empty.length > 0) {
+  process.exit(1)
 }

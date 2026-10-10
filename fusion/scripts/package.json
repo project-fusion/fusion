@@ -12,6 +12,7 @@
   "type": "module",
   "exports": {
     "./argv": "./lib/argv.mjs",
+    "./checks": "./lib/checks.mjs",
     "./cost": "./lib/cost.mjs",
     "./dsd-fixtures": "./lib/dsd-fixtures.mjs",
     "./emit": "./lib/emit.mjs",
