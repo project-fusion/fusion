@@ -14,8 +14,14 @@ for the first paint, the keyboard, and writing a driver. The elements themselves
 [Map reference](https://fusion.dev/helix/components/map).
 
 ```js
+import '@fusion.dev/helix/map'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import { colorsReady, connectMap } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
+import * as maplibregl from 'maplibre-gl'
+
+// MapLibre 6 runs its worker from a file of its own. Point it there once.
+maplibregl.setWorkerUrl('/maplibre/maplibre-gl-worker.mjs')
 
 const frame = document.querySelector('helix-map')
 const style = (colors) => mapLibreStyle(colors)
@@ -26,19 +32,31 @@ const map = new maplibregl.Map({
 })
 
 const connection = connectMap(frame, mapLibreDriver(map))
+connection.fit({ animate: false })
 followTheme(map, frame, style)
 
 // Later, when the map goes away:
 connection.disconnect()
 ```
 
+MapLibre 6 runs its worker from two files, `maplibre-gl-worker.mjs` and
+`maplibre-gl-shared.mjs`. Serve both from one folder, and pass the worker's
+address to `setWorkerUrl` before you create a map, as the guide shows.
+
+**The map's tiles come from OpenFreeMap by default**, and so do its glyphs
+where you pass no `font`. OpenFreeMap needs no key. The requests go to its
+servers: from your reader's browser for the map, and from your server for
+`mapSnapshot`. Pass `tiles` and `glyphs` to `mapLibreStyle`, and `tiles` to
+`mapSnapshot`, to use your own servers.
+
 ## What it exports
 
 | Import | What |
 |---|---|
-| `@fusion.dev/helix-map` | `connectMap`, `colorsReady`, `mapColorsFrom`, `watchTheme`, `motionOf`, `distancesAlong`, `pointsFrom`, and the `MapDriver` type |
+| `@fusion.dev/helix-map` | `connectMap`, `colorsReady`, `mapColorsFrom`, `mapFontFrom`, `fontReady`, `watchTheme`, `motionOf`, `distancesAlong`, `pointsFrom`, and the `MapDriver` type |
 | `@fusion.dev/helix-map/maplibre` | `mapLibreDriver(map)`, `mapLibreStyle(colors, options)`, `followTheme(map, element, style)` |
 | `@fusion.dev/helix-map/leaflet` | `leafletDriver(map, L)` |
+| `@fusion.dev/helix-map/snapshot` | `mapSnapshot(view, options)`, an SVG of the map drawn on your server to paint before the renderer loads |
 
 **Neither renderer is a dependency.** A driver types the map it takes by the
 calls it makes on it, so a page brings whichever version it has. A spec holds
