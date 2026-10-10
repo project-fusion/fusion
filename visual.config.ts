@@ -82,6 +82,22 @@ export default defineConfig({
      renders each example in the sandbox frame and reports the modeled pairs
      no example paints. */
   checks: { clipped: true, overlap: true },
+  /* **Two pixels Chromium antialiases differently after a switch in place.**
+     The dark shot is taken on the wide page switched to dark, and there the
+     field's rounded corner loses the faint blue it has on a fresh load. No
+     style reaches it, so the shot is allowed those two and no more: should it
+     stop differing, the run fails and this goes. */
+  exceptions: [
+    {
+      entry: 'headless/combobox',
+      measured:
+        "two pixels just outside the field's lower-left corner, blue 7 and 23 on a fresh load and black after the switch, in each of 17 runs to October 10, 2026",
+      pixels: 2,
+      reason:
+        "The field's rounded border is antialiased at its corner differently once the page switches to dark in place.",
+      shot: 'dark',
+    },
+  ],
   inspect: {
     /* The CI sink over every example this shard pictured: the file the
        `telemetry` job sends, and the summary here. A dead part, a dead hook,

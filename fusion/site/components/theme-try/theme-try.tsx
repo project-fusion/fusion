@@ -1,5 +1,6 @@
 'use client'
 
+import { watchTheme } from '@fusion.dev/helix-core'
 import { type ReactNode, type Ref, useEffect, useState } from 'react'
 import type { SentTheme } from '@/utils/scope-theme/scope-theme'
 import { type Mode, YOURS } from '@/utils/scope-theme/use-scope-theme'
@@ -61,8 +62,12 @@ export function ThemeTry({
   sent?: SentTheme | undefined
 }) {
   const [home, setHome] = useState('')
+  /* **Read again whenever the theme changes**, since the brand is lighter in
+     dark mode: read once, the swatch kept the light mode's brand after a switch
+     to dark. */
   useEffect(() => {
     setHome(siteBrand())
+    return watchTheme(document.body, () => setHome(siteBrand()))
   }, [])
   return (
     <fieldset className={`${styles.tryBar} ${className ?? ''}`} ref={ref}>
