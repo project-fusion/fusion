@@ -62,6 +62,7 @@ import { join } from 'node:path'
 import { promisify } from 'node:util'
 import { brotliCompress, constants, gzip } from 'node:zlib'
 import { emit } from '@fusion.dev/scripts/emit'
+import { minifyJson } from '@fusion.dev/scripts/minify-json'
 import { ARTIFACT, root } from '@fusion.dev/scripts/workspace'
 
 const OUTPUT = 'helix/docs/content/metrics.mdx'
@@ -550,7 +551,13 @@ const footprint = (dir) => {
         maps += statSync(file).size
         continue
       }
-      bytes += statSync(file).size
+      /* **A JSON file `files` names is counted as it ships**, which is
+         without its whitespace: `publish.mjs` packs it minified. Counted from
+         disk, the manifest alone overstated `@fusion.dev/helix` by 4,298,393
+         bytes on October 10, 2026. */
+      bytes += entry.endsWith('.json')
+        ? Buffer.byteLength(minifyJson(readFileSync(file, 'utf8')))
+        : statSync(file).size
       count += 1
     }
   }
@@ -1109,7 +1116,8 @@ lines.push(
   'budget limits. Each row is the unpacked size of exactly what a package',
   'publishes, as listed in its `files` field. The sizes do not include source',
   'maps. We strip them from the tarball when we pack it, and the Source maps',
-  'stripped column shows the bytes we removed.',
+  'stripped column shows the bytes we removed. We also pack each JSON file',
+  'without its whitespace, and the sizes count each one that way.',
   '',
   '| Package | Unpacked | Files | Source maps stripped | Runtime dependencies |',
   '|---|---|---|---|---|',

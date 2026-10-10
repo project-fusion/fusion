@@ -621,6 +621,7 @@
         "timings.json",
         "$TURBO_ROOT$/bun.lock",
         "$TURBO_ROOT$/fusion/scripts/build-metrics.mjs",
+        "$TURBO_ROOT$/fusion/scripts/lib/minify-json.mjs",
         "$TURBO_ROOT$/helix/core/package.json",
         "$TURBO_ROOT$/helix/headless/package.json",
         "$TURBO_ROOT$/helix/icons/package.json",
