@@ -71,7 +71,28 @@ helix-headless-scatter-chart::part(gridline) {
   vector-effect: non-scaling-stroke;
 }
 
+helix-headless-scatter-chart::part(points) {
+  opacity: 0.8;
+}
+
+helix-headless-scatter-chart::part(point),
+helix-headless-scatter-chart::part(point-ring) {
+  fill: none;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
 helix-headless-scatter-chart::part(point) {
+  stroke: var(--chart-series);
+  stroke-width: 8px;
+}
+
+helix-headless-scatter-chart::part(point-ring) {
+  stroke: var(--_gray-surface);
+  stroke-width: 10px;
+}
+
+helix-headless-scatter-chart::part(point-active) {
   background-color: var(--chart-series);
   block-size: 8px;
   border-radius: 50%;
@@ -79,7 +100,6 @@ helix-headless-scatter-chart::part(point) {
   inline-size: 8px;
   inset-block-start: var(--chart-point-y);
   inset-inline-start: var(--chart-point-x);
-  opacity: 0.8;
   pointer-events: none;
   position: absolute;
   translate: -50% -50%;

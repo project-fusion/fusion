@@ -199,6 +199,15 @@ themselves are read again each time the table or the data changes.
   is drawn through the points those pixels can show: in each column of pixels,
   the first reading, the lowest, the highest, and the last.
 - **Markers.** `markers` marks every reading, with one path for each series.
+- **Columns.** `Bar Chart` draws each column as an element while every column
+  and the space between two categories are at least a pixel wide. Past that, it
+  draws each series' columns as one path, each column of pixels as tall as the
+  tallest column in it, and draws the category the tooltip describes again over
+  them, at least two pixels thick.
+- **Points.** `Scatter Chart` draws each series' points as paths. Points that
+  overlap are drawn in separate groups, up to four deep, so each keeps its edge
+  and a cluster reads darker. The point the keys rest on is drawn again over
+  them.
 - **The table drawn from `data`.** Past a few hundred readings, the hidden table
   holds one page of them at a time. Its markup gives a screen reader the number
   of rows in the whole table and the place of each row, and the words after it
@@ -209,9 +218,6 @@ themselves are read again each time the table or the data changes.
 - **A table on the page.** A chart reads the whole table that `for` names, and
   the table is part of your page, however many rows it has. Where the readings
   are too many to put in the document, draw the chart from `data`.
-
-Each bar of `Bar Chart` and each point of `Scatter Chart` is an element of its
-own, so those two charts build more as their readings grow.
 
 ## Series colors
 

@@ -86,14 +86,18 @@ const open = async (tag: string): Promise<Chart> => {
   await mount(`<div style="inline-size: 30rem">${TABLE}<${tag} for="readings"></${tag}></div>`)
   const host = document.querySelector(tag) as Chart
   await frames(host)
-  const point = host.shadowRoot?.querySelector('[part="point"]')
-  if (point) {
-    const box = point.getBoundingClientRect()
+  /* A scatter's points are strokes of no length in a path, so the pointer
+     goes to the first of them, read from the path. */
+  const point = /M([^,]+),([^h]+)h0/.exec(
+    host.shadowRoot?.querySelector('[part="point"]')?.getAttribute('d') ?? '',
+  )
+  const plot = host.shadowRoot?.querySelector('[part="plot"]')?.getBoundingClientRect()
+  if (point && plot) {
     host.dispatchEvent(
       new PointerEvent('pointermove', {
         bubbles: true,
-        clientX: box.left + box.width / 2,
-        clientY: box.top + box.height / 2,
+        clientX: plot.left + (Number(point[1]) / 100) * plot.width,
+        clientY: plot.top + (Number(point[2]) / 100) * plot.height,
         composed: true,
         pointerType: 'mouse',
       }),

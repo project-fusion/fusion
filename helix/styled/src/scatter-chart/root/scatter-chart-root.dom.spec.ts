@@ -48,6 +48,17 @@ const middle = (element: Element): { x: number; y: number } => {
   return { x: box.left + box.width / 2, y: box.top + box.height / 2 }
 }
 
+/** Where each point is drawn on the page, in the order drawn, from the strokes of no length in its paths. */
+const places = (host: HTMLElement): Array<{ x: number; y: number }> => {
+  const plot = (part(host, 'plot') as HTMLElement).getBoundingClientRect()
+  return all(host, 'point').flatMap((path) =>
+    [...(path.getAttribute('d') ?? '').matchAll(/M([^,]+),([^h]+)h0/g)].map((dot) => ({
+      x: plot.left + (Number(dot[1]) / 100) * plot.width,
+      y: plot.top + (Number(dot[2]) / 100) * plot.height,
+    })),
+  )
+}
+
 describe('the axes', () => {
   geometry('label each level up at the height of its rule', async () => {
     const host = await chart()
@@ -124,13 +135,14 @@ describe('a pointer', () => {
 
   geometry('near a point asks about its row, and marks it', async () => {
     const host = await chart()
-    const docs = all(host, 'point')[1] as HTMLElement
-    const { x, y } = middle(docs)
+    const { x, y } = places(host)[1] as { x: number; y: number }
     move(host, x + 6, y - 4)
     await frames(host)
-    expect(docs.hasAttribute('data-active')).toBe(true)
     expect(part(host, 'tooltip-label')?.textContent).toBe('Docs')
-    expect(all(host, 'point').filter((one) => one.hasAttribute('data-active'))).toHaveLength(1)
+    const marked = all(host, 'point-active')
+    expect(marked).toHaveLength(1)
+    const at = middle(marked[0] as HTMLElement)
+    expect(Math.hypot(at.x - x, at.y - y)).toBeLessThan(1)
   })
 
   geometry('far from every point asks about nothing', async () => {
@@ -138,8 +150,58 @@ describe('a pointer', () => {
     const plot = (part(host, 'plot') as HTMLElement).getBoundingClientRect()
     move(host, plot.left + 2, plot.top + 2)
     await frames(host)
-    expect(all(host, 'point').some((one) => one.hasAttribute('data-active'))).toBe(false)
+    expect(all(host, 'point-active')).toHaveLength(0)
     expect(part(host, 'tooltip-label')).toBeNull()
+  })
+
+  /* Every point was measured against the pointer on every move. Laid out on a
+     grid of 200 across and 100 up, the points stand a few pixels apart. */
+  geometry('finds the nearest of 20,000 points', async () => {
+    await mount(
+      '<div style="inline-size: 32rem"><helix-scatter-chart label="Grid"></helix-scatter-chart></div>',
+    )
+    const host = document.querySelector('helix-scatter-chart') as Chart & { data: unknown }
+    host.data = {
+      columns: ['Row', 'Across', 'Up'],
+      rows: Array.from({ length: 20_000 }, (_, at) => [`r${at}`, at % 200, Math.floor(at / 200)]),
+    }
+    await frames(host)
+    const plot = (part(host, 'plot') as HTMLElement).getBoundingClientRect()
+    /* Across runs 0 to 200 and up 0 to 100, the round numbers around them. */
+    for (const row of [0, 7_431, 19_999]) {
+      move(
+        host,
+        plot.left + ((row % 200) / 200) * plot.width,
+        plot.top + (1 - Math.floor(row / 200) / 100) * plot.height,
+      )
+      await frames(host)
+      expect(part(host, 'tooltip-label')?.textContent).toBe(`r${row}`)
+    }
+  })
+})
+
+/* A series' points were an element each, so two that overlapped darkened
+   where they met. In one path they would be one shape, so overlapping points
+   stand in separate groups, and the group takes the opacity. */
+describe('points that overlap', () => {
+  geometry('stand in separate groups, each at the opacity of a point', async () => {
+    await mount(
+      `<div style="inline-size: 32rem"><table id="twins" data-hidden-visually><tbody>
+        <tr><th>A</th><td>10</td><td>10</td></tr>
+        <tr><th>B</th><td>10.2</td><td>10</td></tr>
+        <tr><th>C</th><td>90</td><td>90</td></tr>
+      </tbody></table><helix-scatter-chart for="twins"></helix-scatter-chart></div>`,
+    )
+    const host = document.querySelector('helix-scatter-chart') as Chart
+    await frames(host)
+    const groups = all(host, 'points')
+    expect(groups).toHaveLength(2)
+    const counts = groups.map(
+      (group) =>
+        (group.querySelector('[part="point"]')?.getAttribute('d')?.match(/h0/g) ?? []).length,
+    )
+    expect(counts).toEqual([2, 1])
+    expect(groups.map((group) => getComputedStyle(group).opacity)).toEqual(['0.8', '0.8'])
   })
 })
 
@@ -190,7 +252,7 @@ describe('on a right-to-left page', () => {
       .map((tick) => Number(tick.textContent?.replaceAll(',', '')))
     expect(levels).toEqual([...levels].sort((a, b) => a - b))
     // Status is the lightest page and Blog the heaviest.
-    const across = all(host, 'point').map((one) => middle(one).x)
+    const across = places(host).map((one) => one.x)
     expect(Math.min(...across)).toBe(across[2] as number)
     expect(Math.max(...across)).toBe(across[3] as number)
   })
@@ -198,8 +260,7 @@ describe('on a right-to-left page', () => {
   geometry('a pointer near a point asks about its row, and is answered over it', async () => {
     document.documentElement.dir = 'rtl'
     const host = await chart()
-    const docs = all(host, 'point')[1] as HTMLElement
-    const { x, y } = middle(docs)
+    const { x, y } = places(host)[1] as { x: number; y: number }
     host.dispatchEvent(
       new PointerEvent('pointermove', {
         bubbles: true,
@@ -210,7 +271,7 @@ describe('on a right-to-left page', () => {
       }),
     )
     await frames(host)
-    expect(docs.hasAttribute('data-active')).toBe(true)
+    expect(all(host, 'point-active')).toHaveLength(1)
     expect(part(host, 'tooltip-label')?.textContent).toBe('Docs')
     const mark = (part(host, 'mark') as HTMLElement).getBoundingClientRect()
     expect(Math.abs(mark.left - x)).toBeLessThan(2)
@@ -221,7 +282,7 @@ describe('on a right-to-left page', () => {
   geometry('the bubble and the summary read the way the page does', async () => {
     document.documentElement.dir = 'rtl'
     const host = await chart()
-    const docs = middle(all(host, 'point')[1] as HTMLElement)
+    const docs = places(host)[1] as { x: number; y: number }
     host.dispatchEvent(
       new PointerEvent('pointermove', {
         bubbles: true,

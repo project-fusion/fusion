@@ -47,37 +47,81 @@ const all = (host: HTMLElement, name: string): HTMLElement[] => [
 const at = (point: HTMLElement, axis: 'x' | 'y'): number =>
   Number.parseFloat(point.style.getPropertyValue(`--chart-point-${axis}`))
 
+/**
+ * Every point drawn, in the order drawn: where it is, the series its group
+ * says, and the weight its path carries. A point is a stroke of no length in
+ * a `point` path.
+ */
+const dots = (host: HTMLElement): Array<{ series: string; weight: string; x: number; y: number }> =>
+  all(host, 'point').flatMap((path) =>
+    [...(path.getAttribute('d') ?? '').matchAll(/M([^,]+),([^h]+)h0/g)].map((dot) => ({
+      series: path.closest('[part="points"]')?.getAttribute('data-series') ?? '',
+      weight: path.style.getPropertyValue('--chart-point-weight').trim() || 'none',
+      x: Number(dot[1]),
+      y: Number(dot[2]),
+    })),
+  )
+
 describe('points', () => {
-  test('the points of the row a pointer is on are a part of their own, and only those', async () => {
+  test('the points of the row a pointer is on are drawn again, and only those', async () => {
     const host = (await chart(SPEND, 'for="spend"')) as Chart & {
       pointer: { set: (at: number) => void }
     }
-    const named = (): number[] =>
-      all(host, 'point')
-        .map((one, index) =>
-          (one.getAttribute('part') ?? '').includes('point-active') ? index : -1,
-        )
-        .filter((index) => index >= 0)
-    expect(named()).toEqual([])
+    expect(all(host, 'point-active')).toEqual([])
     host.pointer.set(2)
     await host.updateComplete
-    expect(named()).toEqual([2])
+    const [active, ...more] = all(host, 'point-active')
+    expect(more).toEqual([])
+    expect([at(active as HTMLElement, 'x'), at(active as HTMLElement, 'y')]).toEqual([50, 50])
+    expect(active?.getAttribute('data-series')).toBe('1')
   })
 
   test('one per row, measured across by the first numeric column and up by the next', async () => {
     const host = await chart(SPEND, 'for="spend"')
-    const points = all(host, 'point')
+    const points = dots(host)
     expect(points).toHaveLength(5)
-    expect(points.map((one) => at(one, 'x'))).toEqual([0, 25, 50, 75, 100])
-    expect(points.map((one) => at(one, 'y'))).toEqual([100, 75, 50, 25, 0])
+    expect(points.map((one) => one.x)).toEqual([0, 25, 50, 75, 100])
+    expect(points.map((one) => one.y)).toEqual([100, 75, 50, 25, 0])
   })
 
   test('every further numeric column is a series against the same across', async () => {
     const host = await chart(LOAD, 'for="load"')
-    const series = all(host, 'point').map((one) => one.getAttribute('data-series'))
     /* Three rows of p50 and two of p95: the second run has no p95, and a point
        with one coordinate has nowhere to be. */
-    expect(series).toEqual(['1', '1', '1', '2', '2'])
+    expect(dots(host).map((one) => one.series)).toEqual(['1', '1', '1', '2', '2'])
+  })
+
+  /* An element a point cost 10,832 nodes for 10,000 rows. */
+  test('draws a series in a path, under a path of its rings, in a group of its color', async () => {
+    const host = await chart(LOAD, 'for="load"')
+    const groups = all(host, 'points')
+    expect(groups.map((one) => one.getAttribute('data-series'))).toEqual(['1', '2'])
+    expect(groups[1]?.getAttribute('style')).toContain('--chart-series: var(--chart-series-2)')
+    expect([...(groups[0]?.children ?? [])].map((one) => one.getAttribute('part'))).toEqual([
+      'point-ring',
+      'point',
+    ])
+    const [ring, point] = [...(groups[0]?.children ?? [])]
+    expect(ring?.getAttribute('d')).toBe(point?.getAttribute('d'))
+  })
+
+  /* The scale guard: what a chart builds is bounded by what it can show, and
+     not by how many rows it was given. */
+  test('builds as many elements for 20,000 rows as for 2,000', async () => {
+    const count = async (rows: number): Promise<number> => {
+      const host = (await mount(
+        '<helix-headless-scatter-chart gridlines trend></helix-headless-scatter-chart>',
+      )) as HTMLElement & { data: unknown; updateComplete: Promise<boolean> }
+      host.data = {
+        columns: ['At', 'Rate', 'p50', 'p95'],
+        rows: Array.from({ length: rows }, (_, at) => [`r${at}`, at % 97, at % 13, (at * 7) % 31]),
+      }
+      await host.updateComplete
+      return host.shadowRoot?.querySelectorAll('*').length ?? 0
+    }
+    const few = await count(2000)
+    expect(few).toBeLessThan(2000)
+    expect(await count(20_000)).toBe(few)
   })
 
   test('the range is widened to round numbers, so the edges of the plot are ticks', async () => {
@@ -194,7 +238,7 @@ describe('the tooltip', () => {
       seriesOf: (cell: number) => number | undefined
     }
     expect([0, 1, 2].map((cell) => host.seriesOf(cell))).toEqual([undefined, 1, 2])
-    expect(all(host, 'point').map((one) => one.dataset.series)).toEqual(['1', '1', '1', '2', '2'])
+    expect(dots(host).map((one) => one.series)).toEqual(['1', '1', '1', '2', '2'])
   })
 
   test('the measure across gets no dot, being an axis rather than a series', async () => {
@@ -291,13 +335,15 @@ describe('trend', () => {
    one drew every point one size. */
 describe('size-by', () => {
   /* Rate across, p50 up, and p95 as the size, so p50 is the only series. */
+  /* A path draws its points at one size, so each size is a path, and a
+     size is drawn to the nearest thirty-second: sqrt(30 / 60) is 0.7071, and
+     23 / 32 is 0.71875. */
   test('takes the named column out of the series and sizes each point by area', async () => {
     const host = await chart(LOAD, 'for="load" size-by="p95"')
-    const points = all(host, 'point')
-    expect(points.map((one) => one.getAttribute('data-series'))).toEqual(['1', '1', '1'])
-    expect(
-      points.map((one) => one.style.getPropertyValue('--chart-point-weight') || 'none'),
-    ).toEqual([String(Math.sqrt(30 / 60)), 'none', '1'])
+    const points = dots(host)
+    expect(points.map((one) => one.series)).toEqual(['1', '1', '1'])
+    expect(points.map((one) => one.weight)).toEqual([String(23 / 32), 'none', '1'])
+    expect(all(host, 'point')).toHaveLength(3)
   })
 
   /* The size is a measure the picture draws, so the readout says it as the
@@ -328,9 +374,7 @@ describe('size-by', () => {
 
   test('draws every point one size where nothing names a size', async () => {
     const host = await chart(LOAD, 'for="load"')
-    expect(
-      all(host, 'point').every((one) => one.style.getPropertyValue('--chart-point-weight') === ''),
-    ).toBe(true)
+    expect(dots(host).every((one) => one.weight === 'none')).toBe(true)
   })
 })
 
