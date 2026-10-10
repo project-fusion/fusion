@@ -1,41 +1,106 @@
 # @fusion.dev/helix-sandbox
 
-Two elements the docs site needs and a consumer never does. **Private**: it is
-build tooling for this repository, so nothing here reaches npm.
+A source editor for the Helix sandbox, and a code highlighter for Code Block.
+The editor is CodeMirror in a custom element. The highlighter is Lezer's
+grammars with no editor, so it also runs on a server.
 
-| Element | What it is |
+```sh
+npm install @fusion.dev/helix @fusion.dev/helix-styles @fusion.dev/helix-sandbox
+```
+
+| Entry | What it does |
 |---|---|
-| `helix-sandbox-editor` | the editable source pane, CodeMirror behind it |
-| `helix-sandbox-specs` | the spec runner, which imports and runs this repository's own specs |
+| `@fusion.dev/helix-sandbox` | Exports what `/highlight` exports, and the editor's types. Registers nothing |
+| `@fusion.dev/helix-sandbox/code-block` | Colors every Code Block on the page |
+| `@fusion.dev/helix-sandbox/editor` | Registers `helix-sandbox-editor` |
+| `@fusion.dev/helix-sandbox/highlight` | Turns a snippet into highlighted HTML |
 
-The sandbox shell around them is not here. `Sandbox` is an ordinary `helix/styled`
-family with its panes, preview, toolbar and terminal, and it ships. Only these
-two stayed behind: the editor carries about 4 MB of CodeMirror, and a
-`dependencies` entry is paid at install time whatever anyone imports, which is
-the one cost a subpath export cannot solve. The spec runner reads this
-repository's spec files, so it is internal by definition rather than by weight.
+The editor and the highlighter color code from the `--helix-color-syntax-*`
+tokens, which `@fusion.dev/helix-styles` defines, so load its `helix.css` on
+the page.
+
+## The editor
+
+`helix-sandbox-editor` is a source pane for the sandbox in
+`@fusion.dev/helix/sandbox`. Put it in the sandbox's `source` slot and name the
+source it holds, `html` or `css`, as you would a `helix-sandbox-source`:
+
+```html
+<helix-sandbox>
+  <helix-sandbox-editor
+    language="html"
+    name="html"
+    slot="source"
+    value="<p>Hello</p>"
+  ></helix-sandbox-editor>
+  <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+</helix-sandbox>
+```
+
+```js
+import '@fusion.dev/helix/sandbox'
+import '@fusion.dev/helix-sandbox/editor'
+```
+
+- `language` is `css`, `html`, `js`, `jsx`, `mjs`, `sh`, `ts`, or `tsx`. A
+  name the editor does not read draws the source plain, and the console says
+  so once.
+- `value` is the source. Setting it replaces the source and sends no edit
+  event.
+- `readonly` stops typing. A reader can still select and scroll.
+- `field-label` names the editable region for a screen reader.
+
+Each edit is `helix-before-edit` first, which you can cancel to refuse it, and
+`helix-edit` once the editor holds it. `helix-caret` reports the line and
+column for the sandbox's status bar. The editor is `:state(modified)` while it
+holds an edit, and `reset()` puts back the source it was given.
+
+Tab indents by two spaces. Escape, then Tab, moves focus out of the editor.
+
+## The highlighter
+
+`highlight` turns a snippet into HTML with a span for each token. It runs
+anywhere, on a server included, so a static page can ship colored code with no
+script:
+
+```js
+import { highlight, syntaxHighlighter, syntaxRules } from '@fusion.dev/helix-sandbox/highlight'
+
+const markup = highlight('const total = 1', 'ts', syntaxHighlighter)
+```
+
+It reads `css`, `html`, `js`, `sh`, `ts`, and `tsx`, and `languageOf` reads the
+names a page writes for them, such as `TypeScript`, `jsx`, or `bash`. Each span
+carries Lezer's `tok-` classes unless you pass a highlighter of your own.
+`syntaxHighlighter` gives the editor's classes, and `syntaxRules` is the CSS
+that colors them.
+
+To color every Code Block on the page, import the `code-block` entry beside
+the block's:
+
+```js
+import '@fusion.dev/helix/code-block'
+import '@fusion.dev/helix-sandbox/code-block'
+```
+
+A block reads its `language` by any name `languageOf` reads, and a language it
+does not read is drawn plain. A block's own `highlight` wins.
+
+## With the sandbox
+
+The sandbox shell, its preview, and `helix-sandbox-source` are in
+`@fusion.dev/helix/sandbox`, and they work without this package. The preview
+runs each example in a frame of its own. The
+[sandbox guide](https://fusion.dev/helix/docs/sandbox) says how to give it a
+frame that loads your components.
 
 ## Working on it
 
 ```sh
-bun run --filter @fusion.dev/helix-sandbox build       # tsc
-bun run --filter @fusion.dev/helix-sandbox test        # dom then ssr
-bunx turbo run styles --filter @fusion.dev/helix-sandbox
+bunx turbo run build --filter @fusion.dev/helix-sandbox   # styles, analyze, tsc
+bun run --filter @fusion.dev/helix-sandbox test           # dom, then ssr
 ```
 
-Same conventions as the rest of Helix: `helix/CONVENTIONS.md` loads for
-`helix/**` and applies here too, and `helix component` holds these elements to
-it like any other. **Single tier**, because the headless and styled split exists
-so a consumer can bring their own presentation, and nobody reskins a dev tool.
-
-`fusion/site` is the only consumer. It renders `helix-sandbox-editor` on every
-component page and `helix-sandbox-specs` at `/helix/sandbox/specs`, and
-`next.config.ts` lists this package among the ones it transpiles.
-
-## The frame
-
-The preview runs in an iframe at `public/sandbox/frame.html`, built by
-`turbo run frame`, with `sandbox="allow-scripts allow-forms"` and no
-`allow-same-origin`. It executes whatever a reader types, against an opaque
-origin, which is the design rather than a defect: `.github/SECURITY.md` scopes
-what a report about it should say.
+`helix/CONVENTIONS.md` applies here, and `helix component` holds the editor to
+it. The spec runner and `jsxToHtml`, which the sandbox page on fusion.dev
+uses, are in `helix/workbench`.

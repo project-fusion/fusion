@@ -44,18 +44,19 @@ const OUT = join(root, 'fusion/site/content/catalog/catalog.generated.json')
 const PUBLIC = join(root, 'fusion/site/public')
 
 /**
- * The manifests the reference is built from: the two published packages.
+ * The manifests the reference is built from: the two component tiers.
  *
- * **`helix/sandbox` is not among them, and the omission is the point.**
- * `@fusion.dev/helix-sandbox` is `private: true`, the editor and spec runner that build
- * this repository, and reading its manifest puts elements nobody can install
- * into the reference and into the nav.
+ * **`helix/sandbox` and `helix/workbench` are not among them.**
+ * `@fusion.dev/helix-workbench` is private, the spec runner that runs this
+ * repository's specs, and reading its manifest puts an element nobody can
+ * install into the reference and into the nav. `@fusion.dev/helix-sandbox`
+ * publishes, and its editor is documented on the sandbox guide,
+ * `helix/docs/content/sandbox.mdx`, beside the shell it is slotted into.
  *
- * A reference documents what a reader can take. The line to draw is whether a
- * package publishes, and `fusion x workspace`'s `publishable` already holds that flag, so this
- * reads a list of publishing packages rather than filtering tag names
- * downstream: a name filter would have to be updated every time the private
- * package grew an element, and would be silent when it was not.
+ * A reference documents what a reader can take, so this reads a list of
+ * packages and filters no tag names downstream: a name filter would have to
+ * be updated every time a package grew an element, and would be silent when it
+ * was not.
  */
 const MANIFESTS = [ARTIFACT.styledManifest, ARTIFACT.headlessManifest]
 

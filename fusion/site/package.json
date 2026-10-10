@@ -39,6 +39,7 @@
     "@fusion.dev/helix-sandbox": "workspace:*",
     "@fusion.dev/helix-styles": "workspace:*",
     "@fusion.dev/helix-theme": "workspace:*",
+    "@fusion.dev/helix-workbench": "workspace:*",
     "@fusion.dev/insights": "workspace:*",
     "@luma.gl/core": "~9.3.6",
     "@luma.gl/webgl": "~9.3.6",

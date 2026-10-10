@@ -1375,6 +1375,52 @@ export function HelixElements() {{
     );
 }
 
+/// The spec runner's own entry, imported at module scope, runs on the specs
+/// route as the library would.
+#[test]
+fn isolated_spec_runner() {
+    let registrar = |head: &str| {
+        format!(
+            "{head}export function HelixElements() {{
+  if (window.location.pathname === '/specs') {{
+    return null;
+  }}
+  import('@acme/helix');
+  return null;
+}}
+"
+        )
+    };
+    plant_in(
+        "spec-isolated-runner",
+        "spec",
+        "isolated",
+        &[
+            (
+                "fusion.json",
+                r#"{ "scope": "@acme/", "spec": { "app": "site/app", "registrar": "site/registrar.tsx" } }"#,
+            ),
+            (
+                "site/app/layout.tsx",
+                "export default function Layout() {\n  return <HelixElements />;\n}\n",
+            ),
+            (
+                "site/app/(tools)/specs/spec-frame.tsx",
+                "export function SpecFrame() {\n  return <iframe />;\n}\n",
+            ),
+            ("site/registrar.tsx", &registrar("")),
+        ],
+        |tree| {
+            tree.write(
+                "site/registrar.tsx",
+                &registrar("import '@acme/helix-workbench/specs'\n"),
+            );
+        },
+        "the registrar imports the library at module scope",
+        "site/registrar.tsx",
+    );
+}
+
 /// The route is derived from where the frame sits, with the route group
 /// stripped, and compared to the literal the registrar guards on.
 #[test]

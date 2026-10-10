@@ -1,14 +1,24 @@
 /**
- * What is left once the sandbox itself is a design system component.
+ * The source editor and the code highlighter of the Helix sandbox.
  *
- * The shell, its panes and the preview ship from `@fusion.dev/helix` as the
- * `Sandbox` family, subpath exports and honest `sideEffects` meaning a consumer
- * importing `@fusion.dev/helix/card` never sees a sandbox.
+ * Each entry does one thing, and two of them register something:
  *
- * What could not move is here. The editor carries CodeMirror, about 4 MB
- * installed, and a `dependencies` entry is paid at install time no matter what
- * anyone imports, which is the one cost an export path cannot solve. The spec
- * runner imports and runs this repository's own spec files, so it is internal
- * by definition rather than by weight.
+ * - `./editor` registers `helix-sandbox-editor`, an editable pane of source
+ *   with CodeMirror behind it, for `@fusion.dev/helix/sandbox`.
+ * - `./code-block` gives every Code Block a highlighter, the grammars below in
+ *   the editor's colors.
+ * - `./highlight` turns a snippet into highlighted HTML, on a server or in a
+ *   page, and registers nothing.
+ *
+ * This entry registers nothing either. It exports what `./highlight` exports,
+ * and the editor's class and events as types, which the framework typings
+ * import from here. Importing it loads no editor.
  */
-export * from './jsx/jsx-to-html.js'
+export type {
+  CaretDetail,
+  HelixBeforeEditEvent,
+  HelixCaretEvent,
+  HelixEditEvent,
+} from '@fusion.dev/helix-core'
+export type { EditorLanguage, HelixSandboxEditor } from './editor/root/editor-root.js'
+export * from './highlight/index.js'

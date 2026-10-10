@@ -19,6 +19,7 @@ internal to the build.
 | `icons` | `helix-icons` | the icon set |
 | `map` | `helix-map` | connects the Map frame to a map renderer, such as MapLibre or Leaflet |
 | `plot` | `helix-plot` | draws the spatial charts in three dimensions with three.js |
+| `sandbox` | `helix-sandbox` | the sandbox's source editor, and a code highlighter for Code Block |
 | `styled` | `helix` | the headless tier with token-driven presentation |
 | `styles` | `helix-styles` | tokens and the base layer, pure CSS |
 | `templates` | `helix-templates` | the project templates `helix new` scaffolds from |
@@ -27,8 +28,8 @@ internal to the build.
 | `visual` | in `helix-cli` | the Rust crate behind `helix visual` |
 | `cem` | none | writes the framework typings from a Helix manifest |
 | `gallery` | none | rendered component images for the documentation |
-| `sandbox` | none | the live editor embedded in the docs |
 | `testing` | none | the spec harness the other packages share |
+| `workbench` | none | the spec runner and the JSX reader behind the sandbox page on fusion.dev |
 
 **The two tiers are the shape of the whole library.** `headless` owns everything
 that is hard to get right and invisible when it is wrong; `styled` owns

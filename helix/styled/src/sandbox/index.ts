@@ -1,12 +1,12 @@
 /**
  * The sandbox: a preview that runs what it is given, and the panes around it.
  *
- * The editor is deliberately absent and lives in `@fusion.dev/helix-sandbox`, which
- * is private, because it carries CodeMirror. That is roughly 4 MB installed against a design system
- * of about the same size, and a `dependencies` entry is paid at install time by
- * every consumer whether or not they import it, which is the one cost a subpath
- * export cannot avoid. Its pane takes an editor by slot, so bringing one is a
- * choice rather than a condition of using this.
+ * The editor is deliberately absent. It is `@fusion.dev/helix-sandbox`, a
+ * package of its own, because it carries CodeMirror: 6 MB installed with its
+ * grammars, measured October 10, 2026, and a `dependencies` entry is paid at
+ * install time by every consumer whether or not they import it, which is the
+ * one cost a subpath export cannot avoid. Its pane takes an editor by slot, so
+ * bringing one is a choice, and this works without one.
  *
  * What makes this a sandbox rather than a layout is here: `Sandbox.Preview`
  * hardcodes `sandbox="allow-scripts allow-forms"` on its frame and never

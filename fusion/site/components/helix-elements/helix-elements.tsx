@@ -42,13 +42,14 @@ export function HelixElements(): null {
 
   useEffect(() => {
     let live = true
-    void Promise.all([import('@fusion.dev/helix'), import('@fusion.dev/helix-sandbox/specs')]).then(
-      () => {
-        if (live) {
-          setRegistered(true)
-        }
-      },
-    )
+    void Promise.all([
+      import('@fusion.dev/helix'),
+      import('@fusion.dev/helix-workbench/specs'),
+    ]).then(() => {
+      if (live) {
+        setRegistered(true)
+      }
+    })
     return () => {
       live = false
     }

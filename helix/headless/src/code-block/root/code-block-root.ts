@@ -59,10 +59,9 @@ const blocksOnPage = (root: ParentNode = document): HelixHeadlessCodeBlock[] =>
  * **Opt-in, so a page that shows plain code carries no grammar.** Code Block
  * ships none: a grammar is the larger part of any highlighter, and a block
  * that registers one for every page makes every page pay for it. A page that
- * wants color imports one entry that calls this, such as
- * `@fusion.dev/helix-sandbox/code-block`, which reads `css`, `html`, `js`,
- * `jsx`, `sh`, `ts` and `tsx` with the sandbox's Lezer grammars and colors
- * them from the `--helix-color-syntax-*` tokens.
+ * wants color calls this once, or imports an entry that calls it. `sheet` is
+ * adopted into every block's shadow root, for a highlighter that writes
+ * classes, since a page's own stylesheet does not reach inside a block.
  *
  * A block's own `highlight` wins over this. Blocks already on the page draw
  * again with it, and every block built after has it. `undefined` takes it
@@ -147,19 +146,24 @@ const nameOf = (block: Element): string => {
  * the slot, so the copy button and the page's own text are the code as
  * written.
  *
- * **Code Block ships no grammar**, so plain code costs you no parser. To color
- * code without a highlighter of your own, import one more entry beside the
- * block's. It colors every block by its `language` (`css`, `html`, `js`,
- * `jsx`, `sh`, `ts`, or `tsx`) with the Lezer grammars of the sandbox's
- * editor, in the editor's colors:
+ * **Code Block ships no grammar**, so plain code costs you no parser. To give
+ * every block on the page one highlighter, call `registerHighlighter` once,
+ * with the function and, for a highlighter that writes classes, the
+ * stylesheet that colors them. A block's own `highlight` wins over it:
  *
  * ```js
- * import '@fusion.dev/helix/code-block'
- * import '@fusion.dev/helix-sandbox/code-block'
+ * import { registerHighlighter } from '@fusion.dev/helix-headless/code-block'
+ * import { createHighlighter } from 'shiki'
+ *
+ * const shiki = await createHighlighter({ langs: ['css', 'html', 'ts'], themes: ['github-light'] })
+ * registerHighlighter((code, lang) =>
+ *   shiki.getLoadedLanguages().includes(lang)
+ *     ? shiki.codeToHtml(code, { lang, theme: 'github-light' })
+ *     : undefined,
+ * )
  * ```
  *
- * That entry calls `registerHighlighter`, which you can also call yourself to
- * give every block one highlighter of your own.
+ * A language the function returns `undefined` for is drawn plain.
  *
  * Set `expandable` on a block whose height is capped, such as by
  * `--code-block-max-block-size`, and a button under it shows every line and
@@ -434,8 +438,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
    * read, nor for a diff.
    *
    * Absent, the block draws with the highlighter `registerHighlighter` gave
-   * every block, where an entry such as `@fusion.dev/helix-sandbox/code-block`
-   * registered one, and plain otherwise.
+   * every block, where a page registered one, and plain otherwise.
    */
   @property({ attribute: false })
   highlight?: (code: string, language: string) => string

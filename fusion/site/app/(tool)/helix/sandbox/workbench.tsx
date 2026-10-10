@@ -17,8 +17,8 @@ import type {
   HelixTreeItem,
 } from '@fusion.dev/helix'
 import { scrollItemIntoView } from '@fusion.dev/helix-core'
-import { jsxToHtml } from '@fusion.dev/helix-sandbox'
 import type { HelixSandboxEditor } from '@fusion.dev/helix-sandbox/editor'
+import { jsxToHtml } from '@fusion.dev/helix-workbench'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { PreferencesDrawer } from '@/components/preferences/preferences'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'

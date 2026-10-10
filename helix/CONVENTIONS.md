@@ -2041,14 +2041,14 @@ The naming, which was never about wrappers:
   **`CodeBlock` holds no parser, and that is the interesting half.** Syntax
   highlighting is `@fusion.dev/helix-sandbox/highlight`, a Lezer parse and a tree walk
   with no editor mounted and no DOM required, so it runs during a build and a
-  static page ships colored markup with no JavaScript spent on it. Those
-  grammars are already in that package for the editor, so nothing new is
-  installed; putting them in `helix/styled` would put CodeMirror in every
-  consumer's `dependencies`, which is about 4 MB paid at install time whatever
-  anyone imports. `CodeBlock` renders a `<slot>`, so highlighted markup drops
-  straight in and the component stays free of it. A snippet on a reference page
-  and the same snippet in the sandbox are then colored by one grammar rather
-  than two that agree by coincidence.
+  static page ships colored markup with no JavaScript spent on it. It imports
+  the Lezer parsers and nothing of CodeMirror's editor, whose view reads the DOM
+  as it loads. Those grammars are in that package for the editor too; putting
+  them in `helix/styled` would put them in every consumer's `dependencies`,
+  paid at install time whatever anyone imports. `CodeBlock` renders a
+  `<slot>`, so highlighted markup drops straight in and the component stays
+  free of it. A snippet on a reference page and the same snippet in the sandbox
+  are then colored by one grammar, where two would agree only by coincidence.
 - **A group is a part when it is the control, and a family when it arranges
   them.** The test is whether the group reports a form value.
 
@@ -2260,7 +2260,8 @@ is no hover to reveal it, answers for itself.
 ## The sandbox
 
 `@fusion.dev/helix` ships the sandbox shell and `@fusion.dev/helix-sandbox` the editor and
-the spec runner; `fusion/site` is the Next site that renders them. Both dev and
+the code highlighter; `@fusion.dev/helix-workbench` holds the spec runner, and
+`fusion/site` is the Next site that renders them. Both dev and
 production work the same way as the marketing site, with element registration in
 one client component.
 
@@ -2281,21 +2282,21 @@ one client component.
   `allow-same-origin`: the component *is* the boundary. Move the isolation out
   and the name has to go with it.
 
-- **`editor` and `specs` stayed in `@fusion.dev/helix-sandbox`.** The editor carries
-  CodeMirror, about 4 MB installed against a design system of roughly the same
-  size, and a `dependencies` entry is paid at install time by every consumer
-  whether or not they import it. **That is the one cost a subpath export cannot
-  solve**, and it is the whole reason the split falls where it does rather than
-  at the package boundary. The spec runner imports and runs this repository's
-  own spec files, so it is internal by definition rather than by weight.
+- **The editor is `@fusion.dev/helix-sandbox`, a package of its own.** It carries
+  CodeMirror, 6 MB installed with its grammars (measured October 10, 2026), and
+  a `dependencies` entry is paid at install time by every consumer whether or
+  not they import it. **That is the one cost a subpath export cannot solve**,
+  and it is the whole reason the split falls at the package boundary.
 
-  **And `@fusion.dev/helix-sandbox` is `private` while Helix is pre-release**, so today
-  the cost is not opt-in, it is unavailable: a consumer gets the published shell
-  from `@fusion.dev/helix` and brings their own source pane. The shell is slot-based
-  and the root hands its value to whatever is slotted in, so this degrades
-  rather than breaks. The scope still says Helix, because the package is Helix;
-  `private` is what says it does not ship, and flipping it is a one-line change
-  when there is a consumer outside this repository to flip it for.
+  **It publishes, so the cost is opt-in**: a consumer gets the shell from
+  `@fusion.dev/helix` and installs the editor beside it, or brings a source pane
+  of their own. The shell is slot-based and the root hands its value to
+  whatever is slotted in, so a sandbox without the editor still works.
+
+  **The spec runner is `@fusion.dev/helix-workbench`, which is private.** It
+  imports and runs this repository's own spec files through a route of
+  `fusion/site`, so it works nowhere else, and `jsxToHtml` beside it reads the
+  examples' own convention.
 
 - **Which pane leads is a property, not a slot order.** `lead="preview"` puts the
   preview first. Two consumers legitimately disagree: a workbench is a place to

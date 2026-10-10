@@ -1,4 +1,6 @@
 import { describe, expect, test } from 'bun:test'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterManifest, dependenciesOf } from './index.js'
 import type { Plugin } from './types.js'
@@ -26,17 +28,34 @@ describe('afterManifest', () => {
 describe('dependenciesOf', () => {
   const at = (name: string) => join(import.meta.dir, '..', '..', name)
 
-  // The analyzer followed imports through the dependencies' own files, so a
-  // package naming only the styled tier was given headless and core as well.
-  // In the order the package names them, each followed by what it reaches. The
-  // sandbox names headless itself since its code-block entry imports it, so
-  // headless comes second rather than after the styled tier that reaches it.
-  test('reaches the manifests beneath the ones a package names', () => {
+  // In the order the package names them. The sandbox names core, which its
+  // editor extends, and headless, which its code-block entry imports.
+  test('reads the manifests of the packages a package names, in that order', () => {
     expect([...dependenciesOf(at('sandbox')).keys()]).toEqual([
       '@fusion.dev/helix-core',
       '@fusion.dev/helix-headless',
-      '@fusion.dev/helix',
     ])
+  })
+
+  // The analyzer followed imports through the dependencies' own files, so a
+  // package naming only the styled tier was given headless and core as well,
+  // each after the package that reaches it.
+  test('reaches the manifests beneath the ones a package names', () => {
+    const root = mkdtempSync(join(tmpdir(), 'helix-cem-'))
+    const write = (directory: string, manifest: object): void => {
+      mkdirSync(join(root, directory), { recursive: true })
+      writeFileSync(join(root, directory, 'package.json'), JSON.stringify(manifest))
+    }
+    const manifest = 'custom-elements.json'
+    try {
+      write('.', { dependencies: { styled: '1' } })
+      write('node_modules/styled', { customElements: manifest, dependencies: { headless: '1' } })
+      write('node_modules/headless', { customElements: manifest, dependencies: { core: '1' } })
+      write('node_modules/core', { customElements: manifest })
+      expect([...dependenciesOf(root).keys()]).toEqual(['styled', 'headless', 'core'])
+    } finally {
+      rmSync(root, { force: true, recursive: true })
+    }
   })
 
   test('a package that depends on no manifest is built against none', () => {

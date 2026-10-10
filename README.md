@@ -177,8 +177,8 @@ bare leaf names recur across domains.
 | | the documentation, as content | [helix/docs](helix/docs/README.md) |
 | | project templates | [helix/templates](helix/templates/README.md) |
 | | `npm create @fusion.dev/helix-app` | [helix/create-app](helix/create-app/README.md) |
-| | the editor and spec runner | [helix/sandbox](helix/sandbox/README.md) |
-| | analyzer config, card art, spec helpers, the CLI | `cem` `gallery` `testing` `cli` |
+| | the sandbox's source editor, and a code highlighter | [helix/sandbox](helix/sandbox/README.md) |
+| | analyzer config, card art, spec helpers, the spec runner, the CLI | `cem` `gallery` `testing` `workbench` `cli` |
 | | the visual tests behind `helix visual` | [helix/visual](helix/visual/README.md) |
 | **[Cortex](cortex/README.md)** | memory, provenance, context | |
 | | the substrate | `cortex/core` |
@@ -193,8 +193,8 @@ bare leaf names recur across domains.
 Conventions, commands and the full layout are in [`AGENTS.md`](AGENTS.md).
 Contributing is [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md).
 
-Not everything here publishes. `helix-cem`, `helix-gallery`, `helix-sandbox` and
-`helix-testing` are build tooling for this repository, and the Cortex crates
+Not everything here publishes. `helix-cem`, `helix-gallery`, `helix-testing` and
+`helix-workbench` are build tooling for this repository, and the Cortex crates
 wait on a consumer worth standing up a registry for.
 
 Versions are **lockstep within a domain** and independent across domains, so

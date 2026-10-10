@@ -132,7 +132,7 @@ pub fn run(context: &Context) -> Report {
     which is how a formatter writes three of them, and never past a quote, so
     one import cannot run on into the next one's path. */
     let statically = Regex::new(&format!(
-        r#"(?m)^import\s(?:[^'"]*?\bfrom\s*)?['"]{}(?:helix-sandbox/specs|helix)['"]"#,
+        r#"(?m)^import\s(?:[^'"]*?\bfrom\s*)?['"]{}(?:helix-workbench/specs|helix)['"]"#,
         regex::escape(&context.settings.scope.clone().unwrap_or_default())
     ))
     .expect("a pattern built from an escaped scope compiles");
