@@ -52,10 +52,10 @@ describe('what the generator writes on every tag', () => {
     expect(next).toContain('onKeyUp?: (event: KeyboardEvent) => void;')
   })
 
-  /* `style={{ colr: 'red' }}` compiled, and the custom properties this file
-     adds to React's type never reached a Helix tag. */
-  test('style is React’s, which knows the custom properties', () => {
-    expect(scene(GENERATED)).toContain("  style?: import('react').CSSProperties;")
+  /* Each framework types it its own way, which `jsxFrameworkProps` writes. A
+     style typed from React here reached every framework's JSX. */
+  test('leaves style as the generator wrote it', () => {
+    expect(scene(GENERATED)).toContain('  style?: Record<string, string | number>;')
   })
 
   test('a custom property says nothing about a default it does not know', () => {

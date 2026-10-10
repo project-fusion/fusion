@@ -33,8 +33,8 @@ export interface JsxOptionalUndefinedOptions {
  *
  * The generator has no option for it, and `allowUnknownProps` would widen every
  * typo alongside it, which is the thing these types exist to catch. So this
- * rewrites what it wrote, the same way `jsxReactRef` rewrites the `ref` type
- * that rejects `useRef`.
+ * rewrites what it wrote, the same way `jsxFrameworkProps` rewrites the `ref`
+ * type that rejects `useRef`.
  *
  * **Parenthesized rather than appended**, because `| undefined` binds looser
  * than a function type: `onClick?: (e: Event) => void | undefined` is a handler

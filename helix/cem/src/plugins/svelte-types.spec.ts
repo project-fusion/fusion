@@ -5,21 +5,22 @@ import { join } from 'node:path'
 import { svelteTypes } from './svelte-types.js'
 
 /**
- * The plugin reads the tag map the JSX generator wrote, so the test writes one.
+ * The plugin reads the tag map the JSX generator wrote, so the test writes one,
+ * with the framework parameter `jsxFrameworkProps` gives it.
  *
  * A fixture, since the real `jsx.d.ts` is rebuilt by `analyze`: asserting
  * against it would test whether somebody had run the build.
  */
-const GENERATED = `export type CustomElements = {
+const GENERATED = `export type CustomElements<F extends Framework = "other"> = {
   "helix-callout": Partial<
     {
       tone?: {
         "danger": string;
         "success": string;
       };
-    } & BaseProps<HelixCallout>
+    } & BaseProps<HelixCallout, F>
   >;
-  "helix-input": Partial<HelixInputProps & BaseProps<HelixInput> & BaseEvents<HelixInput>>;
+  "helix-input": Partial<HelixInputProps & BaseProps<HelixInput, F> & BaseEvents<HelixInput>>;
 };
 `
 

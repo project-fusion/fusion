@@ -43,8 +43,9 @@ export interface JsxNativeEventsOptions {
  * `currentTarget` on any event dispatched at an element *is* that element,
  * whatever the event is called.
  *
- * The same reasoning as `helix-jsx-react-ref`, one prop over: these types exist
- * for consumers writing JSX, so they should describe what a consumer writes.
+ * The same reasoning as `helix-jsx-framework-props`, one prop over: these
+ * types exist for consumers writing JSX, so they should describe what a
+ * consumer writes.
  *
  * Runs after the generator, so list it after `jsxTypesPlugin`.
  */
