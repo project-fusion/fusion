@@ -828,6 +828,7 @@ describe('aura variance', () => {
     'aurora',
     'braid',
     'caustics',
+    'constellation',
     'flow',
     'fracture',
     'lattice',
@@ -838,8 +839,8 @@ describe('aura variance', () => {
     'waves',
   ]
 
-  /** The six the property names. Moving this means moving the other three. */
-  const VARIES = ['aurora', 'caustics', 'fracture', 'particles', 'rays', 'streaks']
+  /** The seven the property names. Moving this means moving the other three. */
+  const VARIES = ['aurora', 'caustics', 'constellation', 'fracture', 'particles', 'rays', 'streaks']
 
   /** One shape's body, brace matched from its own signature. */
   const bodyOf = (name: string): string => {
@@ -859,13 +860,13 @@ describe('aura variance', () => {
     return ''
   }
 
-  test('every shape the eleven names is in the shader under that name', () => {
+  test('every shape the twelve names is in the shader under that name', () => {
     for (const name of SHAPES) {
       expect(bodyOf(name).length).toBeGreaterThan(0)
     }
   })
 
-  test('and exactly the six the property names read it', () => {
+  test('and exactly the seven the property names read it', () => {
     expect(SHAPES.filter((name) => bodyOf(name).includes('uVariance'))).toEqual(VARIES)
   })
 })

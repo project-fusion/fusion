@@ -16,6 +16,7 @@ export const SHAPES = [
   'caustics',
   'lattice',
   'fracture',
+  'constellation',
 ] as const
 
 /** Which form the light takes. */
@@ -25,7 +26,7 @@ export type AuraShape = (typeof SHAPES)[number]
  * What the pointer does, in the order the shader branches on them.
  *
  * `native` is the shape's own, and is what absence means: braid leans, rays are
- * occluded, threads pinch. The rest are generic, deliberately few, opt-in and
+ * occluded, threads pinch, a constellation gathers. The rest are generic, deliberately few, opt-in and
  * never a default. A response made of the same material as the shape says
  * something about that shape; a lamp that follows the cursor says the same
  * nothing on every one of them. They are here because a consumer may want the
@@ -772,6 +773,81 @@ export const FRAGMENT = `#version 300 es
   }
 
   ${
+    /* Points adrift, and the lines between the ones near each other.
+     *
+     * The same coarse lattice of cells as particles, one star per cell
+     * jittered off center and drifting on its own small orbit, and nine cells
+     * visited for the same reason. What is new is the links: each star is
+     * joined to the stars of its neighboring cells where the two are close
+     * enough, and a link fades out as its ends drift apart, so the figure is
+     * always coming apart and reforming and no join ever snaps in or out.
+     * Only the four neighbors to one side are drawn from each cell, which
+     * draws every pair once.
+     *
+     * The pointer gathers. Stars near it are drawn toward it, so the figure
+     * crowds around the cursor and the links between the gathered stars
+     * brighten as they shorten: the reader pulls the constellation together,
+     * where particles lets them scatter it.
+     */ ''
+  }
+  vec2 star(vec2 c, float t, vec2 qp, float reach) {
+    float a = hash(c);
+    float b = hash(c + 17.3);
+    float v = clamp(uVariance, 0.0, 1.0);
+    vec2 at = (c + 0.5 + (vec2(a, b) - 0.5) * 0.8) / 2.2;
+    at += vec2(
+      sin(t * mix(0.7, 0.35 + a * 0.7, v) + b * 6.28),
+      cos(t * mix(0.7, 0.3 + b * 0.7, v) + a * 6.28)
+    ) * 0.06;
+    vec2 toward = qp - at;
+    float pull = falloff(dot(toward, toward), 1.6) * reach;
+    return at + toward * pull * 0.3;
+  }
+
+  ${
+    /* A link between two stars: a thin line that reaches at most a cell and a
+     half and fades over the last third of that, so a pair drifting apart lets
+     go gradually. */ ''
+  }
+  float link(vec2 q, vec2 a, vec2 b) {
+    vec2 ab = b - a;
+    float len2 = dot(ab, ab);
+    float reachable = smoothstep(0.62, 0.38, sqrt(len2));
+    if (reachable <= 0.0) {
+      return 0.0;
+    }
+    float h = clamp(dot(q - a, ab) / max(len2, 0.0001), 0.0, 1.0);
+    vec2 off = q - (a + ab * h);
+    return falloff(dot(off, off), 180.0) * reachable;
+  }
+
+  float constellation(vec2 q, float t, vec2 qp, float reach) {
+    float lit = 0.0;
+    float v = clamp(uVariance, 0.0, 1.0);
+    vec2 cell = floor(q * 2.2);
+    for (int j = -1; j <= 1; j++) {
+      for (int i = -1; i <= 1; i++) {
+        vec2 c = cell + vec2(float(i), float(j));
+        vec2 at = star(c, t, qp, reach);
+        vec2 off = q - at;
+        ${
+          /* A star is a mote with the same halo particles gives one, and the
+           same spread of size and brightness under variance. */ ''
+        }
+        float grade = mix(70.0, 70.0 * (0.7 + hash(c + 5.7) * 0.8), v);
+        lit += falloff(dot(off, off), grade) * mix(0.9, 0.5 + hash(c) * 0.8, v);
+        lit += falloff(dot(off, off), grade * 0.16) * 0.06;
+        ${/* To the right, below, and both diagonals below. */ ''}
+        lit += link(q, at, star(c + vec2(1.0, 0.0), t, qp, reach)) * 0.35;
+        lit += link(q, at, star(c + vec2(0.0, 1.0), t, qp, reach)) * 0.35;
+        lit += link(q, at, star(c + vec2(1.0, 1.0), t, qp, reach)) * 0.35;
+        lit += link(q, at, star(c + vec2(-1.0, 1.0), t, qp, reach)) * 0.35;
+      }
+    }
+    return lit * falloff(dot(q, q), 0.4);
+  }
+
+  ${
     /* Ink in a viscous medium, drawn through by where the pointer went.
      *
      * **The wake is one stroke, not eight marks.** A vortex per trail point,
@@ -1250,8 +1326,10 @@ export const FRAGMENT = `#version 300 es
       d = caustics(q, t, qp, own);
     } else if (uShape == 9) {
       d = lattice(q, t, qp, own);
-    } else {
+    } else if (uShape == 10) {
       d = fracture(q, t, qp, own);
+    } else {
+      d = constellation(q, t, qp, own);
     }
 
     ${

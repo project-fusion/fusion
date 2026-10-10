@@ -199,7 +199,8 @@ export class HelixAura extends HelixElement {
    * `variant`.
    *
    * Absent is `native`, which is each shape answering in the terms it is made
-   * of: braid leans, rays are occluded, threads pinch, particles scatter. The
+   * of: braid leans, rays are occluded, threads pinch, particles scatter, a
+   * constellation gathers. The
    * named options are generic, and are a deliberate step down in meaning. A
    * response made of the same material as the shape says something about that
    * shape; a lamp following the cursor says the same nothing on every one.
@@ -310,10 +311,11 @@ export class HelixAura extends HelixElement {
    * and a streak whose length passed through zero would be drawn as a bar
    * across the whole frame.
    *
-   * Read by six of the eleven shapes, the ones made of many similar things,
+   * Read by seven of the twelve shapes, the ones made of many similar things,
    * whether those are counted or continuous: `streaks`, whose lanes draw a
-   * speed, a length, a width, a spacing and a weight apiece; `particles`, whose
-   * motes draw a size, a brightness and a wander; `rays` and `aurora`, whose
+   * speed, a length, a width, a spacing and a weight apiece; `particles` and
+   * `constellation`, whose motes and stars draw a size, a brightness and a
+   * wander; `rays` and `aurora`, whose
    * fan, bundles and folds widen or even out; `caustics`, whose three depths of
    * fold close on one scale and one weight while the pool over them flattens to
    * an even wash; and `fracture`, whose sites come home to their own cell
@@ -340,7 +342,7 @@ export class HelixAura extends HelixElement {
    *
    * **`variant` and not `shape`.** `shape` is an axis about geometry, `circle`
    * against `square`, `arc` against `ring`, and it is registered as one.
-   * Aurora, braid and caustics are not geometries; they are eleven names for a
+   * Aurora, braid and caustics are not geometries; they are twelve names for a
    * look, which is what `variant` is for by the rule the registry already
    * states.
    */
@@ -349,6 +351,7 @@ export class HelixAura extends HelixElement {
     | 'aurora'
     | 'braid'
     | 'caustics'
+    | 'constellation'
     | 'flow'
     | 'fracture'
     | 'lattice'
