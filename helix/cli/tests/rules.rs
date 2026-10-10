@@ -1724,6 +1724,43 @@ fn pairings_through_a_hook() {
     );
 }
 
+/// A ground the model lays over another, the well over a surface, measures the
+/// pair a sheet paints on the translucent ground alone, since a sheet cannot
+/// say what is under it.
+#[test]
+fn pairings_over_a_ground_laid_on_another() {
+    let sheet = |ink: &str| {
+        format!(
+            "[part=\"field\"] {{
+  background-color: var(--input-background-color, var(--helix-color-well));
+  color: var(--helix-{ink});
+}}
+"
+        )
+    };
+    plant_in(
+        "pairings-over-a-ground",
+        "pairings",
+        &[
+            (
+                "helix.json",
+                r#"{ "tiers": ["src"], "oracle": "oracle.json" }"#,
+            ),
+            (
+                "oracle.json",
+                r#"{ "themes": [ { "label": "default", "pairings": [
+  { "foreground": "color-foreground-muted", "background": "color-well over color-surface" } ] } ] }"#,
+            ),
+            ("src/input/input.css", &sheet("color-foreground-muted")),
+        ],
+        |tree| {
+            tree.write("src/input/input.css", &sheet("color-primary"));
+        },
+        "paints `color-primary on color-well` and the engine does not measure it",
+        "src/input/input.css",
+    );
+}
+
 #[test]
 fn parts() {
     let card = |documented: &str| {
@@ -2467,6 +2504,52 @@ fn seeds() {
             );
         },
         "the stylesheet reads the seed `tint` and the engine never emits it",
+        "styles/tokens.css",
+    );
+}
+
+/// A ground the model lays over another is two names, and the stylesheet
+/// declares each of them.
+#[test]
+fn seeds_over_a_ground_laid_on_another() {
+    const TOKENS: &str = ":root {\n  --helix-seed-hue: 250;\n  --helix-color-foreground: #000;\n  --helix-color-background: #fff;\n  --helix-color-well: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);\n}\n";
+    plant_in(
+        "seeds-over-a-ground",
+        "seeds",
+        &[
+            (
+                "helix.json",
+                r#"{
+  "tiers": ["src"],
+  "oracle": "oracle.json",
+  "seeds": { "pinned": [], "planned": {}, "sheets": ["styles/tokens.css"] }
+}"#,
+            ),
+            (
+                "oracle.json",
+                r#"{ "themes": [ {
+  "label": "default",
+  "pairings": [ { "foreground": "color-foreground", "background": "color-well over color-background" } ],
+  "seeds": { "seed-hue": 250 },
+  "css": ":root {\n  --helix-seed-hue: 250;\n  --helix-color-foreground: #000;\n  --helix-color-background: #fff;\n}"
+} ] }"#,
+            ),
+            ("styles/tokens.css", TOKENS),
+            (
+                "src/card/card.ts",
+                "export class Card extends HTMLElement {}\n",
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "styles/tokens.css",
+                &TOKENS.replace(
+                    "\n  --helix-color-well: color-mix(in oklab, var(--helix-color-foreground) 5%, transparent);",
+                    "",
+                ),
+            );
+        },
+        "the surface model names `color-well` and no stylesheet declares it",
         "styles/tokens.css",
     );
 }

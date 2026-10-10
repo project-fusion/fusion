@@ -85,17 +85,27 @@ fn measured(context: &Context) -> Option<BTreeSet<String>> {
     let base = themes
         .iter()
         .find(|one| one.get("label").and_then(Value::as_str) == Some("default"))?;
+    /* **A ground laid over another is measured for the one a sheet paints.**
+    The model names the well over each surface, `color-well over
+    color-surface`, and a sheet paints `color-well` with no way to say what is
+    under it, so the model's pairs over the surfaces are the measurement of the
+    pair the sheet paints. */
     Some(
         base.get("pairings")?
             .as_array()?
             .iter()
             .filter_map(|one| {
-                Some(format!(
-                    "{} on {}",
-                    one.get("foreground")?.as_str()?,
-                    one.get("background")?.as_str()?
-                ))
+                let ink = one.get("foreground")?.as_str()?;
+                let ground = one.get("background")?.as_str()?;
+                Some(
+                    std::iter::once(format!("{ink} on {ground}")).chain(
+                        ground
+                            .split_once(" over ")
+                            .map(|(painted, _)| format!("{ink} on {painted}")),
+                    ),
+                )
             })
+            .flatten()
             .collect(),
     )
 }

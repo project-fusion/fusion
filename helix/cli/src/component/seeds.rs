@@ -96,7 +96,14 @@ fn engine(oracle: &Value, pinned: &BTreeSet<String>) -> Option<Engine> {
     let mut model = BTreeSet::new();
     for pairing in pairings {
         for side in ["foreground", "background"] {
-            if let Some(name) = pairing.get(side).and_then(Value::as_str) {
+            /* A ground laid over another, `color-well over color-surface`, is
+            two names, and the stylesheet declares each. */
+            for name in pairing
+                .get(side)
+                .and_then(Value::as_str)
+                .into_iter()
+                .flat_map(|name| name.split(" over "))
+            {
                 model.insert(name.to_owned());
             }
         }
