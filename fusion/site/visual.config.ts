@@ -48,8 +48,16 @@ export default defineConfig({
   /* The footer's Helix version, which every release changes on every page.
      Painted over, and held at one width while each picture is taken, because
      the tag's width follows its digits: 0.186.0 and 0.187.0 masked boxes
-     differed by 72 pixels at their edge. */
-  mask: ['[data-site-footer] helix-tag'],
+     differed by 72 pixels at their edge.
+
+     **And the home page's typical component size**, a median of every
+     family's compressed bytes rounded to a tenth of a kilobyte, which sits on
+     a rounding edge: it read 3.3, 3.2, 3.4 and 3.3 kB across four runs on
+     October 10, 2026, each time turning the site check red for a change that
+     had nothing to do with the page. The metrics page and its own check own
+     the number; this check owns how the page draws. Its box is a block, so
+     the mask keeps its width whatever the figure says. */
+  mask: ['[data-site-footer] helix-tag', '[data-site-measure]'],
   retake:
     'Comment `/retake` and the pages on the pull request, such as `/retake site/home`, or dispatch the `Visual baselines` workflow on your branch with the suite `site` to retake every one, and review the commit it makes on the branch.',
   /* Next.js writes `next-route-announcer` and never defines it, so only

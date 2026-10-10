@@ -83,7 +83,10 @@ export const CoverageBand = () => {
           )}
 
           <div className={styles.added}>
-            <helix-text as="p" class={styles.addedValue}>
+            {/* `data-site-measure` is what the site's visual check masks: the
+                figure is a rounded median measured from the build, and it
+                tips between tenths on changes the page has no part in. */}
+            <helix-text as="p" class={styles.addedValue} data-site-measure>
               {ADDED}
             </helix-text>
             <helix-text as="p" emphasis="muted" variant="caption">
