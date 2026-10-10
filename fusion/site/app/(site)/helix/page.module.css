@@ -1,0 +1,179 @@
+/*
+ * The Helix page: the landing page's light, bands, and glass, with its own
+ * stops and its own close. The rules here are the subset of the landing page's
+ * sheet this page needs, the same subset the Cortex page keeps, which is what
+ * a shape repeated in markup rather than named as a component costs.
+ */
+
+.reel {
+  isolation: isolate;
+  overflow: clip;
+  padding-block-end: var(--site-band);
+  position: relative;
+}
+
+.reelStrands {
+  pointer-events: none;
+}
+
+.reel > section {
+  position: relative;
+}
+
+/* A product page's hero is shorter than the landing page's screen: a reader
+   here chose the product already and wants the page. */
+.productHero {
+  min-block-size: min(100svh, 44rem);
+}
+
+/* The places a reader goes, as the tiles the masthead's band shows: the
+   picture, the name, and one line. As many to a row as fit at a readable
+   size, and the rest wrap. */
+.places {
+  --site-place-min: 11rem;
+
+  display: grid;
+  gap: var(--helix-space-xl);
+  grid-template-columns: repeat(auto-fit, minmax(var(--site-place-min), 1fr));
+  padding: var(--helix-space-xl);
+}
+
+.place {
+  align-content: start;
+  color: var(--helix-color-foreground);
+  display: grid;
+  gap: var(--helix-space-2xs);
+  justify-items: start;
+  text-decoration: none;
+}
+
+.place > :global(.componentArt) {
+  aspect-ratio: 16 / 9;
+  background: transparent;
+  inline-size: 100%;
+  margin-block-end: var(--helix-space-2xs);
+}
+
+.placeName {
+  font-size: var(--helix-text-md);
+  font-weight: var(--helix-weight-semibold);
+}
+
+.placeSummary {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+.place:hover .placeSummary {
+  color: var(--helix-color-foreground);
+}
+
+/* The pages you read, as rows under the tiles, past a rule. */
+.reads {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  padding: var(--helix-space-xl);
+}
+
+.read {
+  color: var(--helix-color-foreground);
+  display: grid;
+  gap: var(--helix-space-3xs);
+  text-decoration: none;
+}
+
+.read:hover .placeSummary {
+  color: var(--helix-color-foreground);
+}
+
+/* The closing call to action, as a card rather than a band, in the brand's
+   own fill. The same recipe as the landing page's close. */
+.closingCard {
+  background: var(--helix-color-primary-surface);
+  border-radius: var(--helix-radii-lg);
+  box-shadow: 0 24px 60px -30px
+    color-mix(in oklab, var(--helix-color-primary-surface) 70%, transparent);
+  color: var(--helix-color-foreground-on-primary);
+  margin-block-start: var(--site-band);
+  margin-inline: auto;
+  max-inline-size: min(var(--site-band-measure), calc(100% - 2 * var(--site-inset)));
+}
+
+.closingCard :global([data-section-title]),
+.closingCard :global(helix-text),
+.closingCard :global(p) {
+  color: var(--helix-color-foreground-on-primary);
+}
+
+.closingCard :global([data-button][data-button]) {
+  background: var(--helix-color-foreground-on-primary);
+  border-color: var(--helix-color-foreground-on-primary);
+  color: var(--helix-color-primary-surface);
+}
+
+@media (max-width: 40rem) {
+  .closingCard {
+    border-radius: 0;
+    max-inline-size: 100%;
+  }
+}
+
+/* Floating, with no strokes, on glass: the same rules the landing page
+   applies to its cards. */
+.noRules {
+  --site-glass: color-mix(in oklab, var(--helix-color-surface) 30%, transparent);
+}
+
+.noRules :global([data-substrate]),
+.noRules :global(helix-card) {
+  --card-cast: rgb(0 0 0 / 0.55);
+
+  border-color: transparent;
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, var(--helix-color-foreground) 6%, transparent) inset,
+    0 18px 40px -24px var(--card-cast);
+}
+
+.noRules :global([data-substrate]),
+.noRules :global(helix-card:not([data-filled])) {
+  --card-background-color: var(--site-glass);
+
+  background: var(--site-glass);
+  backdrop-filter: var(--site-glass-backdrop);
+}
+
+@media (max-width: 40rem) {
+  .noRules :global([data-substrate]),
+  .noRules :global(helix-card) {
+    --card-cast: light-dark(transparent, rgb(0 0 0 / 0.55));
+  }
+}
+
+/* The tiles arrive as the reader reaches them, each on its own timeline.
+   Behind both guards: a browser without scroll-driven animation gets the
+   content, and a reader who asked for less motion is not asking to be
+   persuaded. */
+@keyframes helix-settle {
+  from {
+    opacity: 0;
+    transform: translateY(var(--helix-space-lg)) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .stagger > * {
+      animation: helix-settle linear both;
+      animation-range: entry 5% entry 55%;
+      animation-timeline: view();
+    }
+  }
+}
