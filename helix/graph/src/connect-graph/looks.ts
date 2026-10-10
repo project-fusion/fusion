@@ -132,7 +132,7 @@ export interface NodeLook {
   /** How strongly it glows, from 0 to 1: the selected note's halo. */
   glow: number
   /** What it is drawn as made of, where the note says. */
-  material?: 'frosted' | 'glass' | undefined
+  material?: 'frosted' | 'glass' | 'mark' | undefined
   /**
    * The note the keys are on in the frame's list or search field, which a
    * renderer marks as it marks the note under the pointer, so a reader moving

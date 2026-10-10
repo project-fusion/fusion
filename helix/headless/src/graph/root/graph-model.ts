@@ -5,7 +5,7 @@ export type GraphNodeShape = 'circle' | 'diamond' | 'ring' | 'square'
 export type GraphNodeEmphasis = 'outlined' | 'solid' | 'subtle'
 
 /** What a note is drawn as made of, from the `material` axis. */
-export type GraphNodeMaterial = 'frosted' | 'glass'
+export type GraphNodeMaterial = 'frosted' | 'glass' | 'mark'
 
 /** What a note means, from the `tone` axis, which colors it over its group. */
 export type GraphNodeTone =
@@ -31,7 +31,7 @@ export interface GraphNode {
   emphasis?: GraphNodeEmphasis | undefined
   /** A kind the note belongs to, such as a tag, which a renderer colors it by. */
   group?: string | undefined
-  /** What it is drawn as made of: `glass` or `frosted`. Unset is the renderer's own. */
+  /** What it is drawn as made of: `glass`, `frosted`, or `mark`. Unset is the renderer's own. */
   material?: GraphNodeMaterial | undefined
   /**
    * Its shape, which says what kind of note it is at a glance: a person as a

@@ -9,7 +9,7 @@ export const SHAPES = { circle: 0, diamond: 2, ring: 3, square: 1 } as const
 export const EMPHASES = { outlined: 1, solid: 0, subtle: 2 } as const
 
 /** What a note is made of, numbered as the shader reads them. */
-export const MATERIALS = { flat: 0, frosted: 2, glass: 1 } as const
+export const MATERIALS = { flat: 0, frosted: 2, glass: 1, mark: 3 } as const
 
 /** What the node program reads off a note, beyond what Sigma gives every note. */
 export interface HelixNodeData {
@@ -132,6 +132,11 @@ void main(void) {
     color = mix(color, vec3(1.0), highlight * mix(0.25, 0.6, drawn));
     color = mix(color, vec3(1.0), rim * 0.22 * drawn);
     alpha = 0.94;
+  } else if (v_material > 2.5) {
+    /* Mark: a flat dot of its color, as a marker on a table is. No fall of
+       light and no highlight; what says it is a mark is the ring and the glow
+       drawn around it below. */
+    alpha = 1.0;
   } else if (v_material > 1.5) {
     /* Frosted: a milky body, a soft fall of light, and no sharp highlight. */
     color = mix(color * mix(0.86, 1.06, lit), vec3(1.0), 0.16);
@@ -156,6 +161,13 @@ void main(void) {
      aura gives the stars its pointer gathers. */
   float falloff = exp(-d * 1.7) * (1.0 - smoothstep(reach * 0.8, reach, d));
   float halo = v_glow * step(0.0, d) * clamp(ring * 0.8 + falloff * 0.85, 0.0, 1.0) * v_color.a;
+  /* A mark's own halo, selected or not: a band of its color at a fifth just
+     outside the dot, and a soft glow beyond, the way a marker on a table
+     carries a ring of its color and a light around it. */
+  float band = (1.0 - smoothstep(0.34, 0.42, d)) * 0.22;
+  float light = exp(-d * 2.0) * (1.0 - smoothstep(reach * 0.8, reach, d)) * 0.3;
+  float mark = v_material > 2.5 ? step(0.0, d) * (band + light) * v_color.a : 0.0;
+  halo = clamp(halo + mark, 0.0, 1.0);
   /* Premultiplied, as Sigma blends: the body over its glow. */
   gl_FragColor = vec4(color * body + v_color.rgb * halo * (1.0 - body), body + halo * (1.0 - body));
   #endif

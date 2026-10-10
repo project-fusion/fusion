@@ -152,8 +152,9 @@ export interface SigmaDriverOptions<G extends SigmaGraph = SigmaGraph> {
   emphasis?: NodeLook['emphasis']
   /**
    * What a note is drawn as made of where it does not say: `flat` by default,
-   * `glass`, a shaded sphere with a highlight and a lit rim, or `frosted`, a
-   * milky body with a soft fall of light.
+   * `glass`, a shaded sphere with a highlight and a lit rim; `frosted`, a
+   * milky body with a soft fall of light; or `mark`, a flat dot of its color
+   * with a faint ring and a soft glow around it, as a marker on a table is.
    */
   material?: NodeLook['material'] | 'flat'
   /** A note's shape where it does not say: `circle` by default, `square`, `diamond` or `ring`. */
