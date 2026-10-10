@@ -159,6 +159,27 @@ const DRIVER_ENV = {
   HELIX_VISUAL_RUNTIME: process.env.HELIX_VISUAL_RUNTIME ?? process.execPath,
 }
 
+/**
+ * What `helix new` reads: the `@fusion.dev/helix-templates` this package
+ * depends on, at this package's version, named in `HELIX_TEMPLATES` where the
+ * caller has not named another.
+ *
+ * **Resolved here, because node resolves a dependency the way it was
+ * installed.** The binary walks up from where it runs for a `node_modules`
+ * holding the templates, and `npx @fusion.dev/helix-cli new` runs from a
+ * directory with none: npm installed the command and its dependencies in its
+ * own cache. Under pnpm, or beside another version of the templates in a
+ * project, that walk misses this package's copy as well.
+ */
+try {
+  DRIVER_ENV.HELIX_TEMPLATES ??= dirname(
+    createRequire(import.meta.url).resolve('@fusion.dev/helix-templates/templates.json'),
+  )
+} catch {
+  /* Not installed, so the binary walks up for the templates and names the
+     package when nothing has it. */
+}
+
 const run = (binary) => {
   const { status, error } = spawnSync(binary, process.argv.slice(2), {
     env: DRIVER_ENV,

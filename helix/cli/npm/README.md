@@ -25,7 +25,7 @@ helix mcp init --client claude
 |---|---|
 | `component` | Checks the components you build on Helix's base classes: registration under your prefix, imports, slots, parts, states, hooks, words, reflection, attribute names, lifecycle, and listeners. Reads the folders named by `tiers` in `helix.json`. `--only <rule>` runs some of them |
 | `theme` | `init` a starter intent, `build` it to CSS, `audit` every contrast pair, `check` in CI |
-| `new` | Scaffolds a project from a Helix template |
+| `new` | Scaffolds a project from a Helix template: `helix new my-app --template react-vite`. The templates install with the CLI, in `@fusion.dev/helix-templates`, so `npx @fusion.dev/helix-cli new` works from an empty directory. Omit `--template` to list them |
 | `diagnostics` | Receives the runs `initDiagnostics()` sends from your app and prints each new finding. `--once <url>` opens a page headless instead, diagnoses it, and exits. `--out <path>` writes the CI file, `--port` picks the port, 7417 by default, and `--config <path>` names the settings served to the page |
 | `scan` | Reads your project's stylesheets, templates, and modules, and prints each finding with its file and line. `--build <dir>` weighs each Helix family in your bundle, `--out <path>` writes the run to the CI file, `--config <path>` names the settings, `--file <path>` reports one file's findings, and `--stdin <language>` checks a snippet |
 | `api` | Looks up the installed Helix packages: `find` a family, a `family`'s API, an `example` with its imports, the `imports` for a list of tags, and `tokens` |

@@ -36,13 +36,11 @@ that the page never requests.
 
 This is `helix new` from
 [`@fusion.dev/helix-cli`](https://www.npmjs.com/package/@fusion.dev/helix-cli),
-reached from somewhere with no project yet. In a project that has the CLI,
-`helix new` reads the same templates from `@fusion.dev/helix-templates` in
-`node_modules`. The CLI does not depend on that package, so install it beside
-the CLI first:
+reached from somewhere with no project yet. npm installs the same templates with
+the CLI, in `@fusion.dev/helix-templates`, so a project that has the CLI can run
+`helix new` directly:
 
 ```sh
-npm install --save-dev @fusion.dev/helix-templates
 npx helix new my-app --template react-vite
 ```
 

@@ -59,8 +59,10 @@ import { join, resolve } from 'node:path'
 import { argument } from '@fusion.dev/scripts/argv'
 import { manifests, root } from '@fusion.dev/scripts/workspace'
 
-/** The packages a page built with Helix installs, and the command line the
-    plugin's MCP server runs through `npx`. */
+/** The packages a page built with Helix installs, the command line the
+    plugin's MCP server runs through `npx`, and the templates that command
+    depends on. Each one is packed from this tree, so a sibling missing here is
+    asked of the registry instead. */
 const PACKAGES = [
   '@fusion.dev/helix',
   '@fusion.dev/helix-cli',
@@ -69,6 +71,7 @@ const PACKAGES = [
   '@fusion.dev/helix-headless',
   '@fusion.dev/helix-icons',
   '@fusion.dev/helix-styles',
+  '@fusion.dev/helix-templates',
 ]
 
 const ARMS = ['docs', 'web', 'skill', 'mcp', 'plugin']

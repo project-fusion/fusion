@@ -116,8 +116,9 @@ pub enum Noun {
     an omitted `--template` already prints. */
     /// Scaffold a project from a Helix template.
     ///
-    /// Reads `@fusion.dev/helix-templates` from `node_modules`. Omit
-    /// `--template` to be shown what there is.
+    /// Reads the templates in `@fusion.dev/helix-templates`, which npm installs
+    /// with `@fusion.dev/helix-cli`. Omit `--template` to be shown what there
+    /// is.
     New(New),
 
     /* **A noun with no verb, like `diagnostics`**: it does one thing to one
