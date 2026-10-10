@@ -139,13 +139,26 @@ export const TOKENS: Token[] = [
   /* Text and icons, by prominence. */
   /* The ends of the ramp, matching the page. */
   ['color-foreground', 'light-dark(var(--_helix-neutral-1000), var(--_helix-neutral-0))'],
-  ['color-foreground-muted', 'light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))'],
-  /* The quieter of the two secondary inks, and it is still an ink. It was
-     `neutral-500` in both modes and failed 4.5:1 on every ground in light and
-     on `surface-raised` in dark, while carrying inactive tab labels, the
-     pagination summary and the text an input paints. Measured before the
-     change: 3.53, 3.62, 3.78, 3.95 in light and 3.59 in dark. */
-  ['color-foreground-subtle', 'light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))'],
+  /* **The quiet ink for text that is read**: a placeholder, a hint, a caption,
+     an inactive tab. The engine solves it against every ground in its surface
+     model. */
+  [
+    'color-foreground-muted',
+    'light-dark(var(--_helix-neutral-600), var(--_helix-neutral-400))',
+    'Text that recedes and is still read, such as a placeholder, a hint, or a caption.',
+  ],
+  /* **The quieter ink, for marks that are not text**: a separator, a chevron, a
+     grip, and the text of a disabled control. The engine does not solve it,
+     because the readable range holds one quiet ink and `foreground-muted` is
+     that ink, so its contrast on a theme's grounds is not guaranteed. The half
+     steps 550 and 450 are where it cleared 4.5:1 on the shipped grounds:
+     `neutral-500` measured 3.53, 3.62, 3.78 and 3.95 in light and 3.59 in
+     dark. */
+  [
+    'color-foreground-subtle',
+    'light-dark(var(--_helix-neutral-550), var(--_helix-neutral-450))',
+    'A mark that is not text, such as a separator, a chevron, or a grip, and the text of a disabled control. Its contrast is not guaranteed.',
+  ],
   /* **The label on a fill, one per role.** A brand fill and a status fill are
      dark enough to carry white in both modes. An ink fill is the opposite of
      the page, light in the dark, so its label is the page's own color, and one
