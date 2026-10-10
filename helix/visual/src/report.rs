@@ -35,6 +35,9 @@ pub struct Row<'a> {
     pub diff: Picture<'a>,
     pub entry: &'a str,
     pub fate: &'a Fate,
+    /// The file the row's baseline or accessibility snapshot is kept in, which
+    /// `helix visual accept` writes. A pair's row keeps none.
+    pub keep: Option<PathBuf>,
     /// What the two pictures are called: `Baseline` and `Capture`, or a
     /// pair's two sides.
     pub labels: [&'a str; 2],
@@ -42,6 +45,8 @@ pub struct Row<'a> {
     /// other and with no baseline.
     pub pair: bool,
     pub shot: &'a str,
+    /// The accessibility snapshot taken, for an accessibility row.
+    pub snapshot: Option<&'a str>,
     pub source: &'a str,
 }
 
@@ -81,6 +86,10 @@ pub struct Run<'a> {
     pub fingerprint: Option<PathBuf>,
     pub inspected_failed: bool,
     pub retake: &'a str,
+    /// The repository the baselines are kept in, which each row's `keep` is
+    /// recorded relative to, so the record can be accepted from another
+    /// checkout of it.
+    pub root: Option<PathBuf>,
     pub rows: Vec<Row<'a>>,
     pub scope: &'a str,
     /// Each unstable shot left out, with its reason.
@@ -336,8 +345,32 @@ pub fn finish(run: &Run) -> Code {
     if run.update && !written.is_empty() {
         say!("helix: review each written picture before committing it. A baseline records whatever was on screen as correct.");
     }
-    /* A pair keeps no baseline, so a retake is no answer to its failure. */
-    if !run.update && baseline_failures > 0 {
+    /* A pair keeps no baseline, so a retake is no answer to its failure. A
+    failed shot with a capture can be accepted from this run's report, with
+    no second run. */
+    let acceptable = run
+        .rows
+        .iter()
+        .filter(|row| {
+            row.fate.fails()
+                && run.root.is_some()
+                && row.keep.is_some()
+                && (row.current.is_some() || row.snapshot.is_some())
+        })
+        .count();
+    if !run.update && acceptable > 0 {
+        let from = if run.origin.url.is_empty() {
+            relative(run.base, &run.dir)
+        } else {
+            format!("--run {}", run.origin.url)
+        };
+        say!(
+            "helix: if the change was meant, `helix visual accept {from}` writes {} from this run into the baselines. \
+             Review each one before you commit it.",
+            plural(acceptable, "capture", "captures")
+        );
+        say!("helix: or take them again. {}", run.retake);
+    } else if !run.update && baseline_failures > 0 {
         say!(
             "helix: if the change was meant, retake the baselines. {}",
             run.retake
@@ -426,6 +459,14 @@ fn record(run: &Run, verdict: &str, failed: bool) -> Value {
                 if row.diff.present() {
                     record["diff"] = json!(format!("shots/{at}-diff.png"));
                 }
+                if row.snapshot.is_some() {
+                    record["snapshot"] = json!(format!("shots/{at}-current.aria.yml"));
+                }
+                if let (Some(root), Some(keep)) = (&run.root, &row.keep) {
+                    if keep.starts_with(root) {
+                        record["keep"] = json!(relative(root, keep));
+                    }
+                }
             }
             record
         })
@@ -461,6 +502,9 @@ fn write(run: &Run, record: &Value) -> std::io::Result<()> {
             .copy(&pictures.join(format!("{at}-baseline.png")))?;
         if let Some(current) = row.current {
             fs::write(pictures.join(format!("{at}-current.png")), current)?;
+        }
+        if let Some(snapshot) = row.snapshot {
+            fs::write(pictures.join(format!("{at}-current.aria.yml")), snapshot)?;
         }
         row.diff.copy(&pictures.join(format!("{at}-diff.png")))?;
     }
@@ -710,6 +754,24 @@ pub fn markdown(record: &Value) -> String {
                 detail.replace('|', "\\|")
             );
         }
+    }
+    let acceptable = record["shots"]
+        .as_array()
+        .unwrap_or(&empty)
+        .iter()
+        .filter(|one| {
+            one["keep"].is_string() && (one["current"].is_string() || one["snapshot"].is_string())
+        })
+        .count();
+    if let (true, Some(url)) = (
+        acceptable > 0,
+        record["run"]["url"].as_str().filter(|url| !url.is_empty()),
+    ) {
+        let _ = writeln!(
+            out,
+            "\nTo make {} from this run the baselines, run `helix visual accept --run {url}` in a checkout of the branch, review them, and commit them.",
+            plural(acceptable, "capture", "captures")
+        );
     }
     if let Some(triaged) = record["triage"].as_str() {
         let _ = writeln!(out, "\n{triaged}");

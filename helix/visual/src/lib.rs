@@ -16,9 +16,10 @@
 //! from Rust changes the capture code and leaves the capture time the same.
 //!
 //! **The verbs land with the work that makes them true**, so the help text
-//! never lists one that does nothing. `compare` needs no browser and no Node;
-//! `test` and `update` start the driver once per run.
+//! never lists one that does nothing. `compare` and `accept` need no browser
+//! and no Node; `test` and `update` start the driver once per run.
 
+mod accept;
 mod boxes;
 mod config;
 mod diagnose;
@@ -165,6 +166,27 @@ pub enum Visual {
         #[arg(long)]
         boxes: bool,
     },
+    /// Write the captures a test run left in its report into the baselines
+    /// they failed against.
+    ///
+    /// Reads each report named: a report directory, its `run.json`, or a
+    /// folder holding any number, such as the downloaded artifacts of a CI
+    /// run. `.helix/visual` when none is named. Refuses a run of a commit
+    /// other than the one checked out, because its captures show other code.
+    /// Exits 1 when a failed shot has no capture and nothing was accepted.
+    Accept {
+        /// Accept captures taken at a commit other than the one checked out.
+        #[arg(long)]
+        any_commit: bool,
+        /// Reports to read, each a report directory, its `run.json`, or a
+        /// folder holding any number.
+        #[arg(value_name = "REPORT")]
+        reports: Vec<PathBuf>,
+        /// A GitHub Actions run, by its ID or the address of its page, whose
+        /// `visual-*` artifacts are downloaded with `gh` and read.
+        #[arg(long, value_name = "RUN")]
+        run: Option<String>,
+    },
     /// Compare two PNG files pixel by pixel, and fail when they differ.
     ///
     /// Exits 0 when no pixel differs, and 1 when a pixel differs or the two
@@ -309,10 +331,20 @@ fn verdict(baseline: &Path, current: &Path, differing: usize, written: Option<&P
 ///
 /// With `json`, stdout holds one JSON document and the sentences go to
 /// stderr: `test` and `update` print the run's record, which is `run.json`,
-/// `report` prints the last one, and `compare` prints its answer.
+/// `report` prints the last one, `accept` prints what it wrote and what it
+/// left, and `compare` prints its answer.
 pub fn run(verb: &Visual, json: bool) -> Outcome<Code> {
     out::claim(json);
     match verb {
+        Visual::Accept {
+            any_commit,
+            reports,
+            run,
+        } => accept::accept(&accept::Options {
+            any_commit: *any_commit,
+            reports,
+            run: run.as_deref(),
+        }),
         Visual::Compare {
             baseline,
             current,

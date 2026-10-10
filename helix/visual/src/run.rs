@@ -1401,9 +1401,11 @@ pub fn run(options: &Options) -> Outcome<Code> {
                     diff: report::Picture::Bytes(pictures.and_then(|(_, _, diff)| diff.as_deref())),
                     entry: &mine[at].id,
                     fate,
+                    keep: None,
                     labels: [pairs.labels[0].as_str(), pairs.labels[1].as_str()],
                     pair: true,
                     shot: &config.shots[shot].name,
+                    snapshot: None,
                     source: source.name(),
                 };
             }
@@ -1415,23 +1417,27 @@ pub fn run(options: &Options) -> Outcome<Code> {
                     diff: report::Picture::File(None),
                     entry: &mine[at].id,
                     fate,
+                    keep: Some(aria_path(mine[at])),
                     labels: ["Kept", "Taken"],
                     pair: false,
                     shot: "accessibility",
+                    snapshot: first.aria.get(&at).map(String::as_str),
                     source: source.name(),
                 };
             }
             let (baseline, marked) = paths(mine[at], &config.shots[shot]);
             report::Row {
                 attribution: attributions.get(&(at, shot)).map_or(&[], Vec::as_slice),
-                baseline: report::Picture::File(Some(baseline)),
+                baseline: report::Picture::File(Some(baseline.clone())),
                 current: currents.get(&(at, shot)).map(Vec::as_slice),
                 diff: report::Picture::File(matches!(fate, Fate::Differs { .. }).then_some(marked)),
                 entry: &mine[at].id,
                 fate,
+                keep: Some(baseline),
                 labels: ["Baseline", "Capture"],
                 pair: false,
                 shot: &config.shots[shot].name,
+                snapshot: None,
                 source: source.name(),
             }
         })
@@ -1444,6 +1450,7 @@ pub fn run(options: &Options) -> Outcome<Code> {
         fingerprint: write_fingerprint.then_some(fingerprint_path),
         inspected_failed,
         retake: &retake,
+        root: crate::accept::root(&base),
         rows,
         scope: &scope,
         skipped,

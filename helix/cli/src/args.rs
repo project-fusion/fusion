@@ -145,7 +145,8 @@ pub enum Noun {
     /// Picture each page and compare it with a baseline kept in git.
     ///
     /// Reads `visual.config.ts` beside where it runs. `test` compares, `update`
-    /// writes the baselines the comparison rejects, `report` opens the last
+    /// writes the baselines the comparison rejects, `accept` writes the
+    /// captures of a failed `test` into the baselines, `report` opens the last
     /// run, and `compare` holds two PNG files to each other. `test` and
     /// `update` need Playwright installed.
     #[command(subcommand_required = true, arg_required_else_help = true)]
