@@ -14,6 +14,14 @@ const count = (): number => {
 /** Waits `ms` milliseconds. */
 const pause = (ms: number) => new Promise((done) => setTimeout(done, ms))
 
+/** Waits until `done` holds, looking every 5 ms, for two seconds at most. */
+const until = async (done: () => boolean) => {
+  const end = performance.now() + 2000
+  while (!done() && performance.now() < end) {
+    await pause(5)
+  }
+}
+
 /** A pretend tab, hidden or shown on command. */
 const tab = () => {
   let hidden = false
@@ -70,6 +78,10 @@ describe('the schedule', () => {
     plan.stop()
   })
 
+  /* Here and in the next spec, the second change waits for the first run to
+     happen. A busy runner fired the quiet timer late enough that a second
+     change made after a set pause came before the first run, joined its
+     burst, and the two ran as one. */
   test('a change soon after a run waits out the gap', async () => {
     const times: number[] = []
     const plan = schedule(
@@ -81,9 +93,9 @@ describe('the schedule', () => {
       tab().on,
     )
     plan.poke()
-    await pause(40)
+    await until(() => times.length === 1)
     plan.poke()
-    await pause(120)
+    await until(() => times.length === 2)
     expect(times).toHaveLength(2)
     expect((times[1] ?? 0) - (times[0] ?? 0)).toBeGreaterThanOrEqual(timing.gap)
     plan.stop()
@@ -100,9 +112,9 @@ describe('the schedule', () => {
       tab().on,
     )
     plan.poke()
-    await pause(40)
+    await until(() => times.length === 1)
     plan.poke()
-    await pause(200)
+    await until(() => times.length === 2)
     expect(times).toHaveLength(2)
     expect((times[1] ?? 0) - (times[0] ?? 0)).toBeGreaterThanOrEqual(120)
     plan.stop()
