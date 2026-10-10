@@ -117,7 +117,7 @@ export function TraceGraph() {
       const trace = traceOf(now.current.deleted, now.current.layout)
       host.nodes = trace.nodes
       host.links = trace.links
-      const sigma = new Sigma(new Graph(), drawing, { allowInvalidContainer: true })
+      const sigma = new Sigma(new Graph(), drawing)
       sigma.setCustomBBox(boxFor(now.current.layout))
       renderer.current = sigma
       const connection = connectGraph(
