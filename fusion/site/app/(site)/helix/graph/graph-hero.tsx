@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { ThemeTry } from '@/components/theme-try/theme-try'
 import { GRAPH } from '@/content/graph/graph'
-import { stageAppearance } from '@/content/verticals/verticals'
 import { type Mode, useScopeTheme } from '@/utils/scope-theme/use-scope-theme'
 import styles from './graph.module.css'
 import { GraphDemo } from './graph-demo'
@@ -44,7 +43,6 @@ export function GraphHero() {
       <div className={styles.graphIntro}>
         <helix-flex align-items="center" data-density="sm" gap="xs">
           <helix-tag>Helix</helix-tag>
-          <helix-tag tone={stageAppearance('Building')}>Building</helix-tag>
         </helix-flex>
         <helix-text as="h1" class={styles.graphTitle}>
           {intro?.title}
