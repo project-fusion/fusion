@@ -253,6 +253,11 @@
       - text: Loader
       - link "Loader documentation":
         - /url: /helix/components/loader
+    - treeitem "Log Log documentation Experimental" [level=1]:
+      - text: Log
+      - link "Log documentation":
+        - /url: /helix/components/log
+      - img "Experimental"
     - treeitem "Map Map documentation Experimental" [level=1]:
       - text: Map
       - link "Map documentation":
