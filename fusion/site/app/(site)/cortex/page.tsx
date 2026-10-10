@@ -4,6 +4,7 @@ import { Claim } from '@/components/claim/claim'
 import { Eyebrow } from '@/components/eyebrow/eyebrow'
 import hero from '@/components/hero/hero.module.css'
 import { Lede } from '@/components/lede/lede'
+import { NewsKicker } from '@/components/news-kicker/news-kicker'
 import { SectionTitle } from '@/components/section-title/section-title'
 import { Picture } from '@/components/site-nav/tiles'
 import { ThemeScope } from '@/components/theme-context/theme-context'
@@ -69,14 +70,18 @@ export default function Page() {
             gap="lg"
             id="cortex-hero-words"
           >
-            <helix-flex align-items="center" data-density="sm" gap="xs">
-              <helix-tag>{vertical.name}</helix-tag>
-              <helix-tag tone={stageAppearance(product.stage)}>{product.stage}</helix-tag>
-            </helix-flex>
+            {/* The stage, as the kicker the landing page opens with: what is
+                coming, and a way to the page that says where the work stands.
+                It carries the stage, so nothing under the doors has to. */}
+            <NewsKicker
+              href="/company/thesis#where-the-work-stands"
+              label={product.stage}
+              text="Engram and Trace are underway"
+            />
 
             <h1 className={hero.tDisplay}>
-              Memory and provenance for AI systems,{' '}
-              <span className={hero.tDisplayAccent}>kept when you change the model.</span>
+              Memory for AI systems,{' '}
+              <span className={hero.tDisplayAccent}>kept across models.</span>
             </h1>
 
             <Lede>
@@ -100,11 +105,6 @@ export default function Page() {
                 </Link>
               </helix-flex>
             </helix-flex>
-
-            {/* The stage, in words, under the doors: a reader looks at the
-                buttons, asks "can I use this", and the answer is the next
-                thing down. */}
-            <p className={hero.heroWorks}>Engram and Trace are being built. Recall is planned.</p>
           </helix-flex>
         </section>
 
