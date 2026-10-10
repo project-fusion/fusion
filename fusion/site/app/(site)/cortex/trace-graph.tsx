@@ -235,7 +235,7 @@ export function TraceGraph() {
           the facts Engram kept from it, what was retrieved and looked up, the context the model was
           given, and the answer it gave. The chosen answer is lit back to where it came from. An
           example of four answers from a support assistant, built by Trace and Engram and drawn with
-          Helix Graph.
+          Helix Graph. Trace is still being built.
         </helix-text>
       </div>
       {/* **The answers, the derivation, and the deletion, in a row under the
