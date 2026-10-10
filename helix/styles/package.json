@@ -11,9 +11,14 @@
   },
   "type": "module",
   "exports": {
+    ".": {
+      "style": "./dist/helix.css",
+      "default": "./dist/helix.css"
+    },
     "./base.css": "./dist/base.css",
     "./elements.css": "./dist/elements.css",
     "./helix.css": "./dist/helix.css",
+    "./package.json": "./package.json",
     "./primitives.css": "./dist/primitives.css",
     "./tokens.css": "./dist/tokens.css",
     "./tokens.json": "./dist/tokens.json"

@@ -163,7 +163,7 @@ Register the words for a language once, and every element in that language
 speaks them:
 
 ```js
-import { registerWords } from '@fusion.dev/helix'
+import { registerWords } from '@fusion.dev/helix/words'
 
 registerWords('pl', {
   'helix-combobox': {
@@ -179,8 +179,12 @@ registerWords('pl', {
 ```
 
 Each family's words are keyed by its tag, such as `helix-combobox`, and then
-by the property name. The headless and styled tiers share one key. To type the
-keys, import the generated types once:
+by the property name. The headless and styled tiers share one key.
+`@fusion.dev/helix/words` holds `registerWords` without the elements, so a page
+can register its words before it loads any, and it types each key and property.
+A page that uses only the headless tier imports
+`@fusion.dev/helix-headless/words`. With `registerWords` imported from another
+entry, import the types once:
 
 ```ts
 import type {} from '@fusion.dev/helix/words'
