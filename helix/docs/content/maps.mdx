@@ -368,11 +368,14 @@ terrain, contours, and landcover take theirs from your theme.
 </helix-map-marker>
 ```
 
-A marker is a button placed at its latitude and longitude. Its `label` appears
-when you hover over or focus the marker. The `icon` slot holds a letter, a
-number, or an icon, and `shape` sets the marker's form: `ring`, `rounded`,
-`square`, `diamond`, or `pin`. Pressing a marker sends `helix-activate` from the
-frame with the marker's `name`, or its `label` if it has no name.
+A marker is a button placed at its latitude and longitude. Its point is as
+large as the map's landmarks, in your primary color, with a dot in the middle
+and a halo of the same color around it, so your places stand out from the
+landmarks. Its `label` appears when you hover over or focus the marker. The
+`icon` slot holds a letter, a number, or an icon in place of the dot, and
+`shape` sets the marker's form: `ring`, `rounded`, `square`, `diamond`, or
+`pin`. Pressing a marker sends `helix-activate` from the frame with the
+marker's `name`, or its `label` if it has no name.
 
 To show that a place has been visited, add `passed`. The marker is drawn in a
 muted color, and screen readers hear its name followed by "passed". Use
