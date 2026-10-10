@@ -18,6 +18,7 @@ import {
   nameStart,
   signalsOver,
 } from '../overlay/overlay.js'
+import { HelixEdgeProgram } from './edge-program.js'
 import { EMPHASES, HelixNodeProgram, MATERIALS, SHAPES } from './node-program.js'
 
 /**
@@ -85,6 +86,8 @@ export interface SigmaRenderer<G extends SigmaGraph = SigmaGraph> {
 type SigmaSetting =
   | 'defaultDrawNodeHover'
   | 'defaultDrawNodeLabel'
+  | 'defaultEdgeType'
+  | 'edgeProgramClasses'
   | 'edgeReducer'
   | 'enableCameraPanning'
   | 'enableCameraZooming'
@@ -101,6 +104,8 @@ type SigmaSetting =
 const SETTINGS: readonly SigmaSetting[] = [
   'defaultDrawNodeHover',
   'defaultDrawNodeLabel',
+  'defaultEdgeType',
+  'edgeProgramClasses',
   'edgeReducer',
   'enableCameraPanning',
   'enableCameraZooming',
@@ -341,6 +346,12 @@ export const sigmaDriver = <G extends SigmaGraph>(
      beside the page's programs and taken away again when the driver stops. */
   const programs = before.get('nodeProgramClasses') as Record<string, unknown> | undefined
   sigma.setSetting('nodeProgramClasses', { ...programs, helix: HelixNodeProgram })
+  /* And the links: a line that reads in its direction, glowing where the
+     selection lights it, with a head where it is strong. The page's own edge
+     programs stay registered beside it, under their own names. */
+  const edgePrograms = before.get('edgeProgramClasses') as Record<string, unknown> | undefined
+  sigma.setSetting('edgeProgramClasses', { ...edgePrograms, helix: HelixEdgeProgram })
+  sigma.setSetting('defaultEdgeType', 'helix')
 
   /* **Its own box, and not only the window.** Sigma measures its container
      when the window resizes, and a frame filling the screen, or settling its
@@ -596,12 +607,18 @@ export const sigmaDriver = <G extends SigmaGraph>(
            the note the keys are on where the pointer is on none. */
         const near = hovered ?? looks.keyed
         const lit = near !== undefined && (data.from === near || data.to === near)
+        /* A link the selection raises or the pointer lights is strong: heavier,
+           glowing, and headed at the note it arrives at. */
+        const strong = look.raised || lit
         return {
           ...data,
           color: lit ? looks.node(near as string).color : look.color,
+          glow: strong ? 1 : 0,
           hidden: look.hidden,
-          size: look.raised || lit ? 1.6 : 0.8,
-          zIndex: look.raised || lit ? 1 : 0,
+          size: strong ? 1.8 : 0.8,
+          strong,
+          type: 'helix',
+          zIndex: strong ? 1 : 0,
         }
       })
       sigma.refresh()

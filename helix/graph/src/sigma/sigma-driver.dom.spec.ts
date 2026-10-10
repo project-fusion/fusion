@@ -219,7 +219,13 @@ describe('sigmaDriver', () => {
     })
     expect(typeof settings.get('defaultDrawNodeHover')).toBe('function')
     expect(node('c', {}).hidden).toBe(true)
-    expect(edge('e', { from: 'a', to: 'b' })).toMatchObject({ color: 'rgb(9, 9, 9)', size: 1.6 })
+    expect(edge('e', { from: 'a', to: 'b' })).toMatchObject({
+      color: 'rgb(9, 9, 9)',
+      glow: 1,
+      size: 1.8,
+      strong: true,
+      type: 'helix',
+    })
     expect(settings.get('labelColor')).toEqual({ color: 'rgb(1, 2, 3)' })
     expect(settings.get('labelFont')).toBe('Inter')
   })
@@ -241,7 +247,13 @@ describe('sigmaDriver', () => {
     ) => Record<string, unknown>
     expect(node('d', {}).highlighted).toBe(true)
     expect(node('b', {}).highlighted).toBe(false)
-    expect(edge('e', { from: 'b', to: 'd' })).toMatchObject({ color: 'rgb(7, 7, 7)', size: 1.6 })
+    expect(edge('e', { from: 'b', to: 'd' })).toMatchObject({
+      color: 'rgb(7, 7, 7)',
+      glow: 1,
+      size: 1.8,
+      strong: true,
+      type: 'helix',
+    })
   })
 
   test('draws every note with its own program, in its shape and the driver’s material', () => {

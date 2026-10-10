@@ -27,7 +27,7 @@ export interface HelixNodeData {
  * How far past the note the triangle it is drawn in reaches, as a share of
  * its radius, which is the room its glow has.
  */
-const REACH = 2.6
+const REACH = 3.4
 
 // language=GLSL
 const VERTEX = /* glsl */ `
@@ -151,8 +151,11 @@ void main(void) {
      soft light falling away beyond it, both in the note's own color. */
   float reach = ${(REACH - 1).toFixed(2)};
   float ring = 1.0 - smoothstep(0.0, 0.07 + aa, abs(d - 0.32));
-  float falloff = exp(-d * 2.4) * (1.0 - smoothstep(reach * 0.8, reach, d));
-  float halo = v_glow * step(0.0, d) * clamp(ring * 0.95 + falloff * 0.55, 0.0, 1.0) * v_color.a;
+  /* The light falls away more slowly and further than it did, so the
+     selected note sits in a bloom rather than wearing a ring: the halo the
+     aura gives the stars its pointer gathers. */
+  float falloff = exp(-d * 1.7) * (1.0 - smoothstep(reach * 0.8, reach, d));
+  float halo = v_glow * step(0.0, d) * clamp(ring * 0.8 + falloff * 0.85, 0.0, 1.0) * v_color.a;
   /* Premultiplied, as Sigma blends: the body over its glow. */
   gl_FragColor = vec4(color * body + v_color.rgb * halo * (1.0 - body), body + halo * (1.0 - body));
   #endif
