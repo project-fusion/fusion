@@ -9,7 +9,9 @@ import { styles } from './map-marker.css.js'
  *
  * @description
  * A point in your theme's colors with the place's name beside it. Uses your
- * primary color unless `tone` sets another.
+ * primary color unless `tone` sets another. The point is as large as the
+ * map's landmarks, with a dot in its middle and a halo of its color around
+ * it, so your places stand out from the map's own.
  *
  * @since 0.105.0
  * @status stable
@@ -20,7 +22,7 @@ import { styles } from './map-marker.css.js'
  * @cssproperty --map-marker-cluster-color - A cluster's fill color.
  * @cssproperty --map-marker-cluster-size - A cluster's width.
  * @cssproperty --map-marker-color - The point's color when no tone is set.
- * @cssproperty --map-marker-ink - The color of a letter or icon in the point. Set it with `--map-marker-color` when white is hard to read on your color.
+ * @cssproperty --map-marker-ink - The color of the dot, letter, or icon in the point. Set it with `--map-marker-color` when white is hard to read on your color.
  * @cssproperty --map-marker-label-border-width - The width of the name's border.
  * @cssproperty --map-marker-label-shadow - The name's shadow.
  * @cssproperty --map-marker-size - The point's width.
@@ -36,9 +38,9 @@ export class HelixMapMarker extends HelixHeadlessMapMarker {
 
   /**
    * How the point stands out from the map. Leave unset for a surface-colored
-   * edge and a small shadow. `outlined` has the edge only, `elevated` a larger
-   * shadow, `filled` a soft halo in the marker's color, and `plain` no edge or
-   * shadow.
+   * edge, a halo in the marker's color, and a small shadow. `outlined` has the
+   * edge only, `elevated` a larger shadow, `filled` a wider, softer halo with
+   * no edge, and `plain` no edge, halo, or shadow.
    */
   @property({ reflect: true })
   separation?: 'elevated' | 'filled' | 'outlined' | 'plain'

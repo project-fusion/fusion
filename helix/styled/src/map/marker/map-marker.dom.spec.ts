@@ -123,3 +123,45 @@ describe('markers a renderer has placed', () => {
     })
   }
 })
+
+/* A bare point was a 14 pixel dot, which read weaker than the map's own
+   landmarks, each a 22 pixel disc that `drawMapImage` draws. A page's place
+   is as large, its face the fill with a dot of its ink, and haloed. */
+describe('a marker’s point', () => {
+  const pointOf = async (inside = '', attributes = ''): Promise<HTMLElement> => {
+    const host = (await mount(
+      `<helix-map label="Deliveries" style="--map-block-size: 18rem; inline-size: 24rem; display: block">
+        <div></div>
+        <helix-map-marker label="Depot" lat="37.77" lng="-122.41" ${attributes}>${inside}</helix-map-marker>
+      </helix-map>`,
+    )) as Frame
+    await host.updateComplete
+    stubRenderer(host)
+    const marker = markers(host)[0] as Marker
+    await marker.updateComplete
+    return part(marker, 'point') as HTMLElement
+  }
+
+  /** The shadows drawn around a point, each as written. */
+  const shadows = (point: HTMLElement): string[] =>
+    getComputedStyle(point)
+      .boxShadow.split(/,(?![^(]*\))/)
+      .map((one) => one.trim())
+
+  if (hasLayout()) {
+    test('is as large as a landmark, a dot of its ink on its fill, with a halo and a lift', async () => {
+      const point = await pointOf()
+      expect(point.getBoundingClientRect().width).toBe(22)
+      expect(getComputedStyle(point).backgroundImage).toContain('radial-gradient')
+      expect(shadows(point)).toHaveLength(2)
+      expect(shadows(point)[0]).toMatch(/0px 0px 0px [1-9][\d.]*px$/)
+    })
+
+    test('holds a letter on its plain fill, and drops its halo where separation says', async () => {
+      const lettered = await pointOf('<span slot="icon">2</span>')
+      expect(getComputedStyle(lettered).backgroundImage).toBe('none')
+      const outlined = await pointOf('', 'separation="outlined"')
+      expect(shadows(outlined).every((one) => one.startsWith('rgba(0, 0, 0, 0)'))).toBe(true)
+    })
+  }
+})
