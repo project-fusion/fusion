@@ -8,6 +8,11 @@
 //! **A braced value is skipped**, since the name is computed and this cannot
 //! know it. What is asked is only about the names somebody wrote down.
 //!
+//! **A glyph the same file registers is known there.** A page that passes its
+//! own glyphs to `registerIcons([peak])` and then writes `name="peak"` names
+//! an icon that resolves, so the set it is held to includes what that call
+//! registers, each identifier in the kebab case the element reads.
+//!
 //! **However the attribute is written.** An HTML example puts it on its own
 //! line, a template inlines it, and JSX may brace it, so the pattern reads the
 //! attribute rather than the shape of the file.
@@ -20,6 +25,47 @@ use fusion_rules::walk::crawl;
 use regex::Regex;
 
 use crate::rules::{Context, Finding, Report};
+
+/// The glyphs a `registerIcons([...])` call passes, as the text between the
+/// brackets.
+static REGISTERED: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"registerIcons\(\s*\[([^\]]*)\]").expect("a literal pattern compiles")
+});
+
+/// An identifier in the kebab case a glyph's `name` takes: `caretDown` is
+/// `caret-down`.
+fn kebab(identifier: &str) -> String {
+    let mut out = String::new();
+    for one in identifier.chars() {
+        if one.is_ascii_uppercase() {
+            if !out.is_empty() {
+                out.push('-');
+            }
+            out.push(one.to_ascii_lowercase());
+        } else {
+            out.push(one);
+        }
+    }
+    out
+}
+
+/// The names a file registers itself, which resolve on its page whatever the
+/// set holds.
+fn registered(text: &str) -> BTreeSet<String> {
+    REGISTERED
+        .captures_iter(text)
+        .filter_map(|found| found.get(1))
+        .flat_map(|list| list.as_str().split(','))
+        .map(str::trim)
+        .filter(|one| {
+            !one.is_empty()
+                && one
+                    .chars()
+                    .all(|letter| letter.is_ascii_alphanumeric() || letter == '_' || letter == '$')
+        })
+        .map(kebab)
+        .collect()
+}
 
 /// `name` on an icon element, in either quoting, unbraced.
 static NAMED: LazyLock<Regex> = LazyLock::new(|| {
@@ -70,6 +116,7 @@ pub fn run(context: &Context) -> Report {
             continue;
         };
         let where_ = context.relative(&file);
+        let own = registered(&text);
         for found in NAMED.captures_iter(&text) {
             let name = found
                 .get(1)
@@ -77,7 +124,7 @@ pub fn run(context: &Context) -> Report {
                 .map_or("", |one| one.as_str())
                 .to_owned();
             checked += 1;
-            if known.contains(&name) {
+            if known.contains(&name) || own.contains(&name) {
                 continue;
             }
             let at = found.get(0).expect("group zero always matches").start();
