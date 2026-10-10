@@ -1,4 +1,4 @@
-/* A place to put `inert`, and not a box. The hero, the filter bar and the grid
+/* A place to put `inert`, and not a box. The hero, the filter bar and the band
    have to stay direct children of the layout that lays them out. */
 .standIn {
   display: contents;
@@ -7,39 +7,126 @@
 /*
  *  The boxes the gallery's skeleton stands in.
  *
- * `helix-skeleton` is `inline-size: 100%` and takes its height from its
- * container unless `shape` says otherwise, so every rule here is a box and the
- * component fills it.
+ * Widths only, for every line of text: the heights are the type's own, from the
+ * `helix-text` around each line. The hero centers what it holds, so its widths
+ * are lengths rather than percentages, held inside the column by
+ * `max-inline-size`.
  */
 
+/* An opaque ground for every box on the lattice, for the reason the gallery
+   gives its own controls one: at 8 percent of the foreground over the page,
+   each box showed the dots through it. Mixed in sRGB, as the gallery mixes, so
+   the box is the color the translucent one composited to between the dots. */
+.hero [data-skeleton] {
+  background-color: color-mix(
+    in srgb,
+    var(--helix-color-foreground) 8%,
+    var(--helix-color-background)
+  );
+}
+
+/* `Helix` and the stage beside it, each a tag. */
+.heroEyebrow,
+.heroStage {
+  block-size: var(--helix-size-tag);
+}
+
+.heroEyebrow {
+  inline-size: 3rem;
+}
+
+.heroStage {
+  inline-size: 3.5rem;
+}
+
 .heroTitle {
-  block-size: var(--helix-text-3xl);
-  inline-size: min(22rem, 60%);
+  inline-size: 16rem;
+  max-inline-size: 100%;
+}
+
+.heroLede,
+.heroLedeWrap {
+  margin-inline: auto;
+  max-inline-size: 100%;
 }
 
 .heroLede {
-  block-size: var(--helix-text-lg);
-  inline-size: min(34rem, 80%);
+  inline-size: 34rem;
 }
 
+/* The lede runs to a second line on a phone, balanced, so both lines are about
+   half of it. */
+.heroLedeWrap {
+  display: none;
+}
+
+@media (width < 32rem) {
+  .heroLede {
+    inline-size: 15rem;
+  }
+
+  .heroLedeWrap {
+    display: block;
+    inline-size: 13rem;
+  }
+}
+
+/* The search field is `heroSearch` for its width, and a control for its
+   height. */
 .heroSearch {
   block-size: var(--helix-size-control);
-  inline-size: min(28rem, 100%);
 }
 
+/* The button pair: two halves at `--helix-size-button`, welded by the border
+   between them, which is the width `heroSearch` is held to as well. Below
+   48rem the halves size to their words, and the pair measures 207 pixels. */
+.heroActions {
+  block-size: var(--helix-size-control);
+  inline-size: calc(var(--helix-size-button) * 2 - var(--helix-border-thin));
+  max-inline-size: 100%;
+}
+
+@media (width < 48rem) {
+  .heroActions {
+    inline-size: 13rem;
+  }
+}
+
+/* The filter bar's own `filterControl` gives the width and how it shares a
+   phone's line; this gives the height of a small select. */
 .filterControl {
   block-size: var(--helix-size-control-sm);
-  inline-size: 7rem;
 }
 
-/* The drawing each card carries. A square, which is what `ComponentArt` renders
-   into, so the grid's row heights are the ones the catalog will produce. */
+/* The drawing, in the card's media slot at the ratio `ComponentArt` draws at,
+   so the grid's row heights are the ones the catalog will produce. No width:
+   the card bleeds its media to its edges, and a width here would overrule
+   that. Square, because the card clips its media to its own corners. */
 .cardArt {
-  aspect-ratio: 1 / 1;
-  inline-size: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 0;
 }
 
 .cardName {
-  margin-block-start: var(--helix-space-sm);
+  inline-size: 7rem;
+}
+
+/* No experimental mark beside the name: four families of 113 carry one.
+
+   **Three lines of summary from four across, two below.** A row is as tall as
+   its tallest card, and at four and five across a card is about 230 pixels wide,
+   where nearly every row holds a summary of three lines. At three across and
+   below a card is 270 or more, and two lines is what the first rows measure. */
+.cardSummaryMore {
+  display: none;
+}
+
+.cardSummaryEnd {
   inline-size: 60%;
+}
+
+@media (width >= 73rem) {
+  .cardSummaryMore {
+    display: block;
+  }
 }

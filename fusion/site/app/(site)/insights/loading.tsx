@@ -1,5 +1,8 @@
-import { FilterBar } from '@/components/filter-bar/filter-bar'
-import { PageHero } from '@/components/page-hero/page-hero'
+import { FilterBar, filterBar } from '@/components/filter-bar/filter-bar'
+import { GridBand } from '@/components/grid-band/grid-band'
+import card from '@/components/insight-card/insight-card.module.css'
+import { PageHero, pageHero } from '@/components/page-hero/page-hero'
+import { INSIGHTS } from '../../../content/insights'
 import browser from './insight-browser.module.css'
 import loading from './loading.module.css'
 import styles from './page.module.css'
@@ -12,36 +15,82 @@ import styles from './page.module.css'
  * quarter second rather than a guarantee: a cold process, a slow machine or a
  * long list all spend it, and what shows then should be this page rather than a
  * spinner.
+ *
+ * **Every box sits in the element the page puts its text in.** The hero, the
+ * filter bar, the band and each card are the page's own, with the same slots,
+ * classes and gaps, and each line is a `data-skeleton="text"` inside a
+ * `helix-text` of the variant it stands in for. What lands then lands where the
+ * boxes were, at every width, rather than at a height somebody measured once.
+ *
+ * **One card per post.** The registry is the list the page renders, and reading
+ * its length costs nothing, so the grid is as long as the grid it precedes.
  */
-const CARDS = Array.from({ length: 8 }, (_, index) => index)
-
 export default function Loading() {
   return (
     <>
       <div className={loading.standIn} inert>
         <PageHero className={browser.insightsHero}>
-          <div className={loading.heroTitle} data-skeleton />
-          <div className={loading.heroLede} data-skeleton />
-          <div className={loading.heroSearch} data-skeleton />
+          <helix-flex align-items="center" data-density="sm" direction="column" gap="sm">
+            <helix-text as="h1">
+              <span className={loading.heroTitle} data-skeleton="text" />
+            </helix-text>
+            <helix-text as="p" className={pageHero.pageHeroLede}>
+              <span className={loading.heroLede} data-skeleton="text" />
+              <span className={loading.heroLedeWrap} data-skeleton="text" />
+            </helix-text>
+          </helix-flex>
+          <div className={`${pageHero.heroSearch} ${loading.heroSearch}`} data-skeleton />
         </PageHero>
 
         <FilterBar>
-          {[0, 1, 2].map((slot) => (
-            <div className={loading.filterControl} data-skeleton key={slot} />
-          ))}
+          <helix-flex className={filterBar.filterGroup} gap="sm" wrap>
+            {[0, 1].map((slot) => (
+              <div
+                className={`${filterBar.filterControl} ${loading.filterControl}`}
+                data-skeleton
+                key={slot}
+              />
+            ))}
+          </helix-flex>
+          <helix-flex align-items="center" className={filterBar.filterSort} gap="sm">
+            <div className={`${filterBar.filterControl} ${loading.filterControl}`} data-skeleton />
+          </helix-flex>
         </FilterBar>
 
-        <helix-grid className={styles.insightGrid} columns={4} gap="xl">
-          {CARDS.map((card) => (
-            <helix-card key={card}>
-              <helix-flex direction="column" gap="sm">
-                <div className={loading.cardTitle} data-skeleton />
-                <div className={loading.cardLine} data-skeleton />
-                <div className={loading.cardByline} data-skeleton />
-              </helix-flex>
-            </helix-card>
-          ))}
-        </helix-grid>
+        <GridBand>
+          <helix-grid className={styles.insightGrid} columns={5} gap="xl">
+            {INSIGHTS.map((insight) => (
+              <div className={card.insightCard} key={insight.slug}>
+                <helix-card material="glass" separation="elevated">
+                  <helix-flex align-items="center" data-density="sm" gap="sm" slot="header" wrap>
+                    <div className={loading.cardTopic} data-skeleton />
+                    <div className={loading.cardKind} data-skeleton />
+                  </helix-flex>
+
+                  <helix-flex direction="column" gap="xs">
+                    <helix-text as="h3" variant="title">
+                      <span className={loading.cardTitle} data-skeleton="text" />
+                      <span className={loading.cardTitleWrap} data-skeleton="text" />
+                    </helix-text>
+                    <helix-text variant="caption">
+                      <span data-skeleton="text" />
+                      <span className={loading.cardSummaryEnd} data-skeleton="text" />
+                    </helix-text>
+                  </helix-flex>
+
+                  <helix-flex align-items="center" gap="sm" slot="footer">
+                    <helix-text variant="caption">
+                      <span className={loading.cardDate} data-skeleton="text" />
+                    </helix-text>
+                    <helix-text variant="caption">
+                      <span className={loading.cardMinutes} data-skeleton="text" />
+                    </helix-text>
+                  </helix-flex>
+                </helix-card>
+              </div>
+            ))}
+          </helix-grid>
+        </GridBand>
       </div>
 
       <p data-hidden-visually role="status">

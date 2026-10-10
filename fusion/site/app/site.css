@@ -620,6 +620,25 @@ helix-app-header {
   position: relative;
 }
 
+/* A line of text, as tall as one line of the type around it. The bar is drawn
+   at two thirds of the line and centered in it, so lines stacked one under
+   another read as lines rather than as one block, and the space they take is
+   the space the text will take. Set inside a `helix-text` of the variant it
+   stands in for, it takes that variant's line height at every width.
+
+   **A transparent border insets the bar, and a margin would not.** Two lines
+   one under the other collapse their margins into one, so a two-line summary
+   came out 4 pixels short of the summary it stood in for. The vertical
+   radius is widened by the border, so the bar inside it keeps the corner every
+   other box has. */
+[data-skeleton="text"] {
+  background-clip: padding-box;
+  block-size: 1lh;
+  border-block: 0.18lh solid transparent;
+  border-radius: var(--helix-radii-sm) / calc(var(--helix-radii-sm) + 0.18lh);
+  box-sizing: border-box;
+}
+
 [data-skeleton]::after {
   animation: siteSkeletonSweep calc(var(--helix-duration-slow) * 4) ease-in-out infinite;
   background-image: linear-gradient(

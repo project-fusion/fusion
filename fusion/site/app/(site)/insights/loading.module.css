@@ -1,43 +1,105 @@
-/* A place to put `inert`, and not a box, so the hero, the bar and the grid stay
+/* A place to put `inert`, and not a box, so the hero, the bar and the band stay
    direct children of the layout that lays them out. */
 .standIn {
   display: contents;
 }
 
-/* The hero and the bar are the shared chrome and take the shared measurements.
-   Only the card differs, an insight being text where a family is a drawing. */
+/* The widths of the words each line stands in for, and nothing else: the
+   heights are the type's own, from the `helix-text` around each line. The hero
+   centers what it holds, so these are lengths rather than percentages, held
+   inside the column by `max-inline-size`. */
 .heroTitle {
-  block-size: var(--helix-text-3xl);
-  inline-size: min(22rem, 60%);
+  inline-size: 10rem;
+  max-inline-size: 100%;
+}
+
+.heroLede,
+.heroLedeWrap {
+  margin-inline: auto;
+  max-inline-size: 100%;
 }
 
 .heroLede {
-  block-size: var(--helix-text-lg);
-  inline-size: min(34rem, 80%);
+  inline-size: 37rem;
 }
 
+/* The lede runs to a second line on a phone, balanced, so both lines are about
+   half of it. */
+.heroLedeWrap {
+  display: none;
+}
+
+@media (width < 32rem) {
+  .heroLede {
+    inline-size: 17rem;
+  }
+
+  .heroLedeWrap {
+    display: block;
+    inline-size: 14rem;
+  }
+}
+
+/* The search field is `heroSearch` for its width, and a control for its
+   height. */
 .heroSearch {
   block-size: var(--helix-size-control);
-  inline-size: min(28rem, 100%);
 }
 
+/* The filter bar's own `filterControl` gives the width and how it shares a
+   phone's line; this gives the height of a small select. */
 .filterControl {
   block-size: var(--helix-size-control-sm);
-  inline-size: 7rem;
 }
 
-/* A title that runs to two lines, then the byline under it. The second line is
-   short because a title that wrapped exactly is a title nobody wrote. */
+/* The two tags in the header: the topic, then the kind. */
+.cardTopic,
+.cardKind {
+  block-size: var(--helix-size-tag);
+}
+
+.cardTopic {
+  inline-size: 4rem;
+}
+
+.cardKind {
+  inline-size: 4.25rem;
+}
+
+/* **Two lines of title from three across, one below.** A row is as tall as its
+   tallest card, and at three columns and more a card is about 270 pixels wide,
+   where a row of posts nearly always holds a title that wraps. At two columns
+   and on a phone a title fits its line. */
 .cardTitle {
-  font-size: var(--helix-text-lg);
+  inline-size: 80%;
 }
 
-.cardLine {
-  font-size: var(--helix-text-lg);
+.cardTitleWrap {
+  display: none;
+  inline-size: 45%;
+}
+
+@media (width >= 70rem) {
+  .cardTitle {
+    inline-size: 90%;
+  }
+
+  .cardTitleWrap {
+    display: block;
+  }
+}
+
+/* The summary is clamped to two lines, and a second line rarely runs to the
+   edge. */
+.cardSummaryEnd {
   inline-size: 70%;
 }
 
-.cardByline {
-  font-size: var(--helix-text-sm);
-  inline-size: 45%;
+/* The date and the reading time, which the card sets on its end edge. */
+.cardDate {
+  inline-size: 6rem;
+}
+
+.cardMinutes {
+  inline-size: 2.25rem;
 }

@@ -23,15 +23,55 @@
 /* Each box is the height of what it replaces, so nothing moves when the real
    thing lands. `data-skeleton` in `site.css` paints them: a recipe rather than
    `helix-skeleton`, because a loading state may not depend on the JavaScript it
-   is waiting for and every Helix tag is hidden until it upgrades. */
-.title {
-  block-size: var(--helix-text-3xl);
-  inline-size: min(16rem, 55%);
+   is waiting for and every Helix tag is hidden until it upgrades. For the same
+   reason the type is restated here rather than taken from a `helix-text`: each
+   line's wrapper carries the size and leading of the variant the page sets that
+   line in, and `data-skeleton="text"` inside it is one line of that type. */
+.titleRow {
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-md);
+  justify-content: space-between;
 }
 
+/* `helix-text as="h1"`. */
+.title {
+  flex: 1;
+  font-size: var(--helix-text-3xl);
+  line-height: var(--helix-leading-heading);
+}
+
+.titleText {
+  inline-size: min(10rem, 55%);
+}
+
+/* View Source and the ellipsis beside it, small buttons at `sm` density. */
+.actions {
+  display: flex;
+  gap: var(--helix-space-xs);
+}
+
+.source,
+.menu {
+  block-size: var(--helix-size-control-sm);
+}
+
+.source {
+  inline-size: 6rem;
+}
+
+.menu {
+  aspect-ratio: 1;
+}
+
+/* `variant="caption"`. */
 .description {
-  block-size: var(--helix-text-md);
-  inline-size: min(38rem, 90%);
+  font-size: var(--helix-text-sm);
+  line-height: var(--helix-leading-normal);
+}
+
+.descriptionText {
+  inline-size: min(22rem, 90%);
 }
 
 .tags {
@@ -39,24 +79,37 @@
   gap: var(--helix-space-xs);
 }
 
+/* A tag, at the `sm` density the row sets as the page's own row does. */
 .tag {
-  block-size: var(--helix-size-control-sm);
-  inline-size: 5rem;
+  block-size: var(--helix-size-tag);
+  inline-size: 4rem;
 }
 
+/* `SectionHeading as="h2"`, which is `helix-text as="h2"`. */
 .heading {
-  block-size: var(--helix-text-xl);
-  inline-size: min(11rem, 40%);
+  font-size: var(--helix-text-2xl);
+  line-height: var(--helix-leading-heading);
 }
 
+.headingText {
+  inline-size: min(9rem, 40%);
+}
+
+/* The import, one line of code in a code block: the line, the block's inset of
+   `space-sm` above and below it, which is what centers the copy button on the
+   line, and its border. */
 .code {
-  block-size: var(--helix-size-control-lg);
+  block-size: calc(1lh + var(--helix-space-sm) * 2 + var(--helix-border-thin) * 2);
+  font-size: var(--helix-text-sm);
+  line-height: var(--helix-leading-normal);
 }
 
 /* The sandbox, which is the tallest thing on the page. Reserving its room is
-   most of what stops the article jumping when the manifest arrives. */
+   most of what stops the article jumping when the manifest arrives. 436 pixels
+   is where every preview starts, the pane's floor of 180 and the editor's 256
+   in `preview.tsx`, and a family whose example draws taller grows from it. */
 .preview {
-  block-size: 20rem;
+  block-size: 27.25rem;
 }
 
 .table {
@@ -69,19 +122,45 @@
   block-size: var(--helix-size-control);
 }
 
+/* `docsRailTitle`: a label, with the room the rail leaves under it. */
 .railHead {
-  block-size: var(--helix-text-sm);
-  inline-size: 7rem;
-  margin-block-end: var(--helix-space-sm);
+  font-size: var(--helix-text-xs);
+  line-height: var(--helix-leading-normal);
+  padding-block-end: var(--helix-space-xs);
+}
+
+.railHeadText {
+  inline-size: 5.5rem;
+}
+
+/* `helix-outline`: its rule down the start edge, and each link set in from it
+   by the rail and the link's own padding. */
+.rail {
+  background:
+    linear-gradient(var(--helix-color-border), var(--helix-color-border)) no-repeat
+    calc((var(--helix-border-thick) - var(--helix-border-thin)) / 2) 0 / var(--helix-border-thin)
+    100%;
 }
 
 .railRow {
-  block-size: var(--helix-text-sm);
-  inline-size: 9rem;
+  font-size: var(--helix-text-xs);
+  line-height: var(--helix-leading-normal);
+  margin-inline-start: var(--helix-border-thick);
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm);
 }
 
-.railRow + .railRow {
-  margin-block-start: var(--helix-space-xs);
+.railRowText {
+  inline-size: 4.5rem;
+}
+
+/* The element under API Reference, one level in. */
+.railRow:nth-child(4) {
+  padding-inline-start: calc(var(--helix-space-sm) * 2);
+}
+
+.railRow:nth-child(4) .railRowText {
+  inline-size: 2.5rem;
 }
 
 /* Said to a screen reader and drawn nowhere: the visual half is the boxes above
