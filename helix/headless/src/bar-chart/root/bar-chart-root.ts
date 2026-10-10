@@ -1,5 +1,6 @@
 import {
   byRow,
+  CategoryAxisController,
   CHART_PLOT,
   customElement,
   drawTooltip,
@@ -125,8 +126,8 @@ const toned = (tone: string | undefined): string | undefined =>
  * @csspart gridline - One gridline across the plot, drawn when `gridlines` is set.
  * @csspart group - One category's columns, together.
  * @csspart group-active - The group the tooltip describes. Set together with `group`.
- * @csspart label - One category's name.
- * @csspart labels - The row of category names.
+ * @csspart label - One category's name, placed along the row by `--chart-label-start` and `--chart-label-size`, or down the column under `orientation="horizontal"`, with its text centered. Only the names that fit are drawn, the first and the last always.
+ * @csspart labels - The row of category names, or the column of them under `orientation="horizontal"`, which the names share: lay it out as one grid cell they all stand in.
  * @csspart line - A series drawn as a line, named in `lines`.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
@@ -134,7 +135,8 @@ const toned = (tone: string | undefined): string | undefined =>
  * @csspart plot - The drawing, which takes focus to be read by key. With nothing to draw, a group named as the chart is, holding the `empty` or `loading` part.
  * @csspart summary - The chart's name and each series' highest reading, written as a sentence for screen readers. Hide it visually.
  * @csspart svg - The drawing surface the bars and lines sit on.
- * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
+ * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
  * @csspart tick - One number on an axis.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The tooltip's arrow, forwarded from `Tooltip`.
@@ -165,6 +167,8 @@ const toned = (tone: string | undefined): string | undefined =>
  * @cssproperty --chart-bar-wash - The gradient for a bar, named per bar so the styled
  *   tier can use it as the `fill`. It is always drawn, and used only when
  *   `wash="gradient"` is set.
+ * @cssproperty --chart-label-size - How much of the row a category's name has room for, as a percentage, or of the column under `orientation="horizontal"`. Written by the component on each `label`.
+ * @cssproperty --chart-label-start - Where a category name's room starts along the row, as a percentage from the inline start, or down the column from the top under `orientation="horizontal"`. Written by the component on each `label`.
  *
  * @cssstate active - While a reading is shown, under the pointer or the keys, with its tooltip open.
  * @cssstate empty - While the `empty` part stands in the plot.
@@ -201,7 +205,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
    *
    * Absent draws none. `value` rules the axis the columns are *measured* on,
    * `category` rules the axis they are *arranged* on with one through each
-   * group, and `both` draws both. Which of those is horizontal turns with
+   * group whose name is drawn, and `both` draws both. Which of those is horizontal turns with
    * `orientation`, because a rule belongs to an axis and not to a screen edge.
    *
    * **A bare `gridlines` means `value`**, and so does anything unrecognized: an
@@ -338,6 +342,16 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
    */
   @property({ attribute: 'value-axis', reflect: true, type: Boolean })
   valueAxis = false
+
+  /**
+   * Measures the axis the categories run along and says which of their names
+   * fit on it, which are the names drawn and the groups `category` gridlines
+   * rule. Down the side under `orientation="horizontal"`, where a name is one
+   * line tall.
+   */
+  private readonly names = new CategoryAxisController(this, () =>
+    this.orientation === 'horizontal' ? 'block' : 'inline',
+  )
 
   /** The series names on the second scale, lowercased and trimmed. */
   private get scaled(): Set<string> {
@@ -855,14 +869,19 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       return nothing
     }
     /* Through the middle of each group, which is where the column stands, and
-       not on the boundary between two of them. */
+       not on the boundary between two of them, and through the groups whose
+       names are drawn, which is every one where every name fits. */
     const slot = 100 / Math.max(count, 1)
     const categories = this.rulesCategory
-      ? Array.from({ length: count }, (_, index) => (index + 0.5) * slot).map((at) =>
-          sideways
-            ? svg`<line part="gridline" x1="0" x2="100" y1=${at} y2=${at} />`
-            : svg`<line part="gridline" x1=${at} x2=${at} y1="0" y2="100" />`,
-        )
+      ? this.names
+          .place(this.sourceRows)
+          .filter((one) => one.at < count)
+          .map((one) => (one.at + 0.5) * slot)
+          .map((at) =>
+            sideways
+              ? svg`<line part="gridline" x1="0" x2="100" y1=${at} y2=${at} />`
+              : svg`<line part="gridline" x1=${at} x2=${at} y1="0" y2="100" />`,
+          )
       : []
     const levels = this.rulesValue
       ? ticks(domain).map((level) =>
@@ -899,9 +918,21 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       : svg`<rect height="100" part="band" width=${slot} x=${at * slot} y="0" />`
   }
 
+  /**
+   * The category names, as HTML beside the drawing: the names that fit, each
+   * in the room `--chart-label-start` and `--chart-label-size` place along the
+   * axis, as `LineChart` draws them.
+   */
   protected renderLabels(categories: string[]): TemplateResult {
     return html`<div aria-hidden="true" part="labels">
-      ${categories.map((one) => html`<span part="label">${one}</span>`)}
+      ${this.names.place(this.sourceRows).map(
+        ({ at, size, start }) =>
+          html`<span
+              part="label"
+              style="--chart-label-start: ${start}%; --chart-label-size: ${size}%"
+              >${categories[at]}</span
+            >`,
+      )}
     </div>`
   }
 

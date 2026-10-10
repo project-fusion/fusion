@@ -160,7 +160,8 @@ export interface DonutShare {
  * @csspart segment-edge - One slice as a closed shape, used to draw its outline.
  * @csspart slice-label - One slice's share, written on the slice under `slice-labels`. Placed with `left` and `top`, or `inset-inline-start` and `top` on a half ring, and carries its series color as `--chart-series`.
  * @csspart summary - The chart's name and each slice's share, written as a sentence for screen readers. Hide it visually.
- * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
+ * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
  * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, on its top edge. Set alongside `tooltip-arrow`.

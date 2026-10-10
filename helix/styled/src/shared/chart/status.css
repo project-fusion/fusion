@@ -20,9 +20,11 @@
   text-align: center;
 }
 
-/* The readings as a table, drawn where they came from `data`: read by a
-   screen reader, and not shown, the chart being the picture of it. */
-[part="table"] {
+/* The readings as a table, drawn where they came from `data`, and the words
+   and buttons that turn its pages: read by a screen reader and hidden from
+   view, the chart being the picture of it. */
+[part="table"],
+[part="table-pages"] {
   block-size: 1px;
   clip-path: inset(50%);
   inline-size: 1px;

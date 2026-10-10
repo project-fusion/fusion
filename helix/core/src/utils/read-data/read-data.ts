@@ -1,3 +1,4 @@
+import { formatNumbers } from '../format-numbers/format-numbers.js'
 import type { Row, RowCell, Series } from '../read-series/read-series.js'
 
 /**
@@ -53,25 +54,46 @@ export const isChartData = (data: unknown): data is ChartData => {
   )
 }
 
-/** The number in a cell and the words it is shown as, written in `locale`. */
+/**
+ * The number in a cell and the words it is shown as, written in `locale`.
+ *
+ * Through `formatNumbers`, which keeps one formatter a locale: building an
+ * `Intl.NumberFormat` for each cell was 225 milliseconds of 10,000 readings,
+ * measured in Chromium on October 10, 2026, the most of what drawing them cost.
+ */
 const cellOf = (datum: ChartDatum, locale: string): { text: string; value?: number } => {
+  const value = numberIn(datum)
   if (datum === null || datum === undefined) {
     return { text: '' }
   }
   if (typeof datum === 'object') {
-    return Number.isFinite(datum.value)
-      ? { text: datum.text, value: datum.value }
-      : { text: datum.text }
+    return value === undefined ? { text: datum.text } : { text: datum.text, value }
   }
   if (typeof datum === 'number') {
-    return Number.isFinite(datum)
-      ? { text: new Intl.NumberFormat(locale || undefined).format(datum), value: datum }
-      : { text: '' }
+    return value === undefined ? { text: '' } : { text: formatNumbers(locale)(datum), value }
+  }
+  return value === undefined ? { text: datum } : { text: datum, value }
+}
+
+/**
+ * The number in a cell, where it holds one, without the words it is shown as,
+ * which a series has no use for: writing 400,000 numbers in a locale to throw
+ * the words away was most of what reading four series of 100,000 cost.
+ */
+const numberIn = (datum: ChartDatum): number | undefined => {
+  if (datum === null || datum === undefined) {
+    return undefined
+  }
+  if (typeof datum === 'object') {
+    return Number.isFinite(datum.value) ? datum.value : undefined
+  }
+  if (typeof datum === 'number') {
+    return Number.isFinite(datum) ? datum : undefined
   }
   /* Words are read as a table cell's text is: `Number()` and not
      `parseFloat`, so `12abc` is words and not 12. */
   const value = Number(datum.trim())
-  return Number.isFinite(value) && datum.trim() !== '' ? { text: datum, value } : { text: datum }
+  return Number.isFinite(value) && datum.trim() !== '' ? value : undefined
 }
 
 /**
@@ -79,13 +101,16 @@ const cellOf = (datum: ChartDatum, locale: string): { text: string; value?: numb
  * reads a table: a column with no numbers in it is not a series, and a blank
  * keeps its row's place.
  */
-export const seriesFromData = (data: ChartData, locale = ''): Series[] => {
+export const seriesFromData = (data: ChartData): Series[] => {
   const names = data.columns.slice(1)
-  const count = Math.max(0, ...data.rows.map((row) => row.length - 1))
+  let count = 0
+  for (const row of data.rows) {
+    count = Math.max(count, row.length - 1)
+  }
   return Array.from({ length: count }, (_, column) => ({
     name: names[column] ?? data.caption ?? '',
     points: data.rows.flatMap((row, at) => {
-      const value = cellOf(row[column + 1] as ChartDatum, locale).value
+      const value = numberIn(row[column + 1] as ChartDatum)
       return value === undefined ? [] : [{ at, label: String(row[0] ?? ''), value }]
     }),
   })).filter((one) => one.points.length > 0)

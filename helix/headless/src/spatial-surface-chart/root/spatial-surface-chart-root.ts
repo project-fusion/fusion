@@ -142,7 +142,8 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart plot - The box the drawing fills, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart ring - The ring around the reading the pointer or the keys rest on, drawn over the surface.
  * @csspart summary - The measures, the number of readings, and the range of heights, written as a sentence for screen readers, which describes the plot. Hide it visually.
- * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
+ * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
  * @csspart tick - A number at a tick, along its edge of the box, in the chart's own drawing.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.

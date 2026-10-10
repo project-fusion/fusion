@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { linePath, type Point } from './line-path.js'
+import { columnPoints, linePath, type Point } from './line-path.js'
 
 const points: Point[] = [
   [0, 20],
@@ -93,5 +93,31 @@ describe('a smoothed line', () => {
     )
     // Both control points either side of the peak sit at the peak's own height.
     expect(peak).toBe('M0,10C16.67,6.67 33.33,0 50,0C66.67,0 83.33,6.67 100,10')
+  })
+})
+
+/* A line of 100,000 readings across 900 pixels rasterized every one of its
+   segments on each frame a pointer moved over it. */
+describe('the points a line needs at a width', () => {
+  test('are every point where there are four or fewer to a column', () => {
+    expect(columnPoints(points, 2, 100)).toBe(points)
+  })
+
+  test('are the first, the lowest, the highest and the last in each column', () => {
+    const dense: Point[] = Array.from({ length: 10_000 }, (_, at) => [
+      at / 100,
+      Math.sin(at / 7) * 40 + 50,
+    ])
+    const kept = columnPoints(dense, 50, 100)
+    expect(kept.length).toBeLessThanOrEqual(4 * 50)
+    expect(kept[0]).toBe(dense[0] as Point)
+    expect(kept.at(-1)).toBe(dense.at(-1) as Point)
+    for (let column = 0; column < 50; column += 1) {
+      const all = dense.filter(([x]) => Math.floor((x / 100) * 50) === column).map(([, y]) => y)
+      const some = kept.filter(([x]) => Math.floor((x / 100) * 50) === column).map(([, y]) => y)
+      expect(Math.min(...some)).toBe(Math.min(...all))
+      expect(Math.max(...some)).toBe(Math.max(...all))
+    }
+    expect(kept.every((one, at) => at === 0 || one[0] >= (kept[at - 1] as Point)[0])).toBe(true)
   })
 })

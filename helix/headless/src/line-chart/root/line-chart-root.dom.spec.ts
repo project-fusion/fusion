@@ -453,6 +453,10 @@ describe('markers', () => {
     ...(host.shadowRoot?.querySelectorAll('[part~="marker"]') ?? []),
   ]
 
+  /** The points a marks path draws a dot at, each a stroke of no length. */
+  const dots = (one: Element | undefined): string[] =>
+    [...(one?.getAttribute('d') ?? '').matchAll(/M([^h]+)h0/g)].map((dot) => dot[1] ?? '')
+
   test('absent draws none on a line of readings', async () => {
     expect(marks(await chart(CHANNELS, 'for="channels"'))).toHaveLength(0)
   })
@@ -460,9 +464,26 @@ describe('markers', () => {
   test('`markers` draws one on every reading, in its series color, at its place', async () => {
     const host = await chart(CHANNELS, 'for="channels" markers')
     const all = marks(host)
-    expect(all).toHaveLength(4)
+    expect(all).toHaveLength(2)
     expect(all[0]?.getAttribute('style')).toContain('--chart-series: var(--chart-series-1)')
-    expect(all[0]?.getAttribute('style')).toContain('inset-inline-start: 25%')
+    expect(dots(all[0])).toEqual(['25,62.5', '75,0'])
+    expect(dots(all[1])).toHaveLength(2)
+  })
+
+  /* An element per mark cost an element per reading: 10,000 readings under
+     `markers` built 10,000 of them. */
+  test('draws every mark of a series in one path, however many readings there are', async () => {
+    const rows = Array.from(
+      { length: 1000 },
+      (_, at) => `<tr><th>${at}</th><td>${at % 7}</td><td>${at % 5}</td></tr>`,
+    ).join('')
+    const host = await chart(
+      `<table id="long"><thead><tr><th>At</th><th>A</th><th>B</th></tr></thead><tbody>${rows}</tbody></table>`,
+      'for="long" markers',
+    )
+    expect(marks(host)).toHaveLength(2)
+    expect(dots(marks(host)[0])).toHaveLength(1000)
+    expect(host.shadowRoot?.querySelectorAll('[part="marker-ring"]')).toHaveLength(2)
   })
 
   /* A reading with a blank on either side is a run of one, which no line can
@@ -477,7 +498,7 @@ describe('markers', () => {
     </table>`
     const host = await chart(table, 'for="lone"')
     expect(marks(host).map((one) => one.getAttribute('part'))).toEqual(['marker marker-lone'])
-    expect(marks(host)[0]?.getAttribute('style')).toContain('inset-inline-start: 70%')
+    expect(dots(marks(host)[0])).toEqual(['70,0'])
   })
 })
 
@@ -637,5 +658,103 @@ describe('from data', () => {
     await chart.updateComplete
     expect(chart.readings).toBe(1)
     expect(part(chart, 'plot')?.getAttribute('aria-label')).toBe('From the table')
+  })
+})
+
+/* A chart drawn from data built its hidden table whole: four elements a
+   reading, 40,000 for 10,000 readings, before the first frame, and a table a
+   screen reader would take an afternoon to read. */
+describe('the table drawn from data', () => {
+  const rows = (count: number): Array<[string, number]> =>
+    Array.from({ length: count }, (_, at): [string, number] => [`p${at}`, at % 9])
+
+  const drawn = async (
+    count: number,
+  ): Promise<HTMLElement & { updateComplete: Promise<boolean> }> => {
+    const host = (await mount(
+      '<helix-headless-line-chart></helix-headless-line-chart>',
+    )) as HTMLElement & {
+      data: unknown
+      updateComplete: Promise<boolean>
+    }
+    host.data = { caption: 'Load', columns: ['At', 'Load'], rows: rows(count) }
+    await host.updateComplete
+    return host
+  }
+
+  const shown = (host: HTMLElement): string[] =>
+    [...(part(host, 'table')?.querySelectorAll('tbody tr') ?? [])].map(
+      (row) => row.querySelector('th')?.textContent ?? '',
+    )
+
+  test('holds every reading where there are a page of them or fewer', async () => {
+    const host = await drawn(200)
+    expect(shown(host)).toHaveLength(200)
+    expect(part(host, 'table')?.hasAttribute('aria-rowcount')).toBe(false)
+    expect(part(host, 'table-pages')).toBeNull()
+  })
+
+  test('holds a page past that, and says how many rows there are and where each stands', async () => {
+    const host = await drawn(450)
+    const table = part(host, 'table')
+    expect(shown(host)).toHaveLength(200)
+    expect(table?.getAttribute('aria-rowcount')).toBe('451')
+    expect(table?.querySelector('thead tr')?.getAttribute('aria-rowindex')).toBe('1')
+    expect(table?.querySelector('tbody tr')?.getAttribute('aria-rowindex')).toBe('2')
+    const status = part(host, 'table-pages')?.querySelector('[role="status"]')
+    expect(status?.textContent?.trim()).toBe('Readings 1 to 200 of 450')
+    expect(table?.getAttribute('aria-describedby')).toBe(status?.id)
+  })
+
+  test('turns its pages by buttons a screen reader presses, out of the tab order', async () => {
+    const host = await drawn(450)
+    const [previous, next] = [...(part(host, 'table-pages')?.querySelectorAll('button') ?? [])]
+    expect([previous?.textContent, next?.textContent]).toEqual([
+      'Previous readings',
+      'Next readings',
+    ])
+    expect([previous?.getAttribute('tabindex'), next?.getAttribute('tabindex')]).toEqual([
+      '-1',
+      '-1',
+    ])
+    expect(previous?.getAttribute('aria-disabled')).toBe('true')
+    next?.click()
+    await host.updateComplete
+    expect(shown(host)[0]).toBe('p200')
+    expect(part(host, 'table')?.querySelector('tbody tr')?.getAttribute('aria-rowindex')).toBe(
+      '202',
+    )
+    expect(part(host, 'table-pages')?.querySelector('[role="status"]')?.textContent?.trim()).toBe(
+      'Readings 201 to 400 of 450',
+    )
+    next?.click()
+    await host.updateComplete
+    expect(shown(host)).toHaveLength(50)
+    expect(next?.getAttribute('aria-disabled')).toBe('true')
+    next?.click()
+    await host.updateComplete
+    expect(shown(host)[0]).toBe('p400')
+    previous?.click()
+    await host.updateComplete
+    expect(shown(host)[0]).toBe('p200')
+  })
+
+  /* The scale guard: what a chart builds is bounded by what it can show, and
+     not by how many readings it was given. */
+  test('builds as many elements for 20,000 readings as for 2,000', async () => {
+    const count = async (readings: number): Promise<number> => {
+      const host = (await mount(
+        '<helix-headless-line-chart markers gridlines="both"></helix-headless-line-chart>',
+      )) as HTMLElement & { data: unknown; updateComplete: Promise<boolean> }
+      host.data = {
+        columns: ['At', 'Load', 'Errors'],
+        rows: Array.from({ length: readings }, (_, at) => [`p${at}`, at % 9, at % 4]),
+      }
+      await host.updateComplete
+      return host.shadowRoot?.querySelectorAll('*').length ?? 0
+    }
+    const few = await count(2000)
+    expect(few).toBeLessThan(2000)
+    expect(await count(20_000)).toBe(few)
   })
 })

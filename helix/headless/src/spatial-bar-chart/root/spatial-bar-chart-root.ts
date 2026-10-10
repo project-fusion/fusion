@@ -132,7 +132,8 @@ const SERIES = 24
  * @csspart ring - The outline around the bar the pointer or the keys rest on, painted after it, so the bars in front of it cover it.
  * @csspart ring-behind - The same outline, faint and dashed, drawn over every bar, so the part of the bar the pointer or the keys rest on that others hide still shows.
  * @csspart summary - The number of bars, series, and categories, and the range of values, written as a sentence for screen readers, which describes the plot. Hide it visually.
- * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
+ * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
  * @csspart tick - A category's or a series' name, or a value at a tick, along its edge of the box, in the chart's own drawing.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.

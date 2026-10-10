@@ -140,3 +140,61 @@ export const linePath = (points: readonly Point[], curve: Curve): string => {
       .join('')
   )
 }
+
+/**
+ * The points a line needs to look the same drawn `columns` pixels across a
+ * box `width` wide: in each column of pixels, the first point, the lowest, the
+ * highest and the last, in the order they come.
+ *
+ * **A line of more points than its box has pixels draws most of them on top
+ * of one another.** 100,000 readings across 900 pixels are a hundred to a
+ * pixel, and a browser rasterizes every one of their segments on every frame
+ * the drawing repaints: measured in Chromium on October 10, 2026, four series
+ * of 100,000 cost 90 milliseconds a frame while a pointer moved over them. In
+ * one column the line covers everything between its lowest and its highest
+ * point and enters and leaves at its first and its last, so those four are the
+ * column's whole drawing, which is the reduction known as M4.
+ *
+ * The points as they are where there are no more than four to a column, so a
+ * chart of a few hundred readings draws every one of them.
+ */
+export const columnPoints = (
+  points: readonly Point[],
+  columns: number,
+  width: number,
+): readonly Point[] => {
+  if (!(columns > 0) || points.length <= 4 * columns) {
+    return points
+  }
+  const kept: Point[] = []
+  let column = Number.NaN
+  let first = 0
+  let low = 0
+  let high = 0
+  const flush = (last: number): void => {
+    for (const at of [...new Set([first, low, high, last])].sort((a, b) => a - b)) {
+      kept.push(points[at] as Point)
+    }
+  }
+  points.forEach(([x, y], at) => {
+    const here = Math.floor((x / width) * columns)
+    if (here !== column) {
+      if (at > 0) {
+        flush(at - 1)
+      }
+      column = here
+      first = at
+      low = at
+      high = at
+      return
+    }
+    if (y < (points[low] as Point)[1]) {
+      low = at
+    }
+    if (y > (points[high] as Point)[1]) {
+      high = at
+    }
+  })
+  flush(points.length - 1)
+  return kept
+}

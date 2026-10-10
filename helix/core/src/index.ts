@@ -19,6 +19,10 @@ export {
   type ArrivalOptions,
 } from './controllers/arrival-controller/arrival-controller.js'
 export {
+  CategoryAxisController,
+  type CategoryAxisHost,
+} from './controllers/category-axis-controller/category-axis-controller.js'
+export {
   ChartPointerController,
   type ChartPointerHost,
   type ReadingHeard,
@@ -327,6 +331,7 @@ export {
   PLOT_HEIGHT,
   PLOT_WIDTH,
   POSITION_LABEL,
+  READINGS_PAGE,
   seriesIndex,
   seriesNames,
 } from './mixins/mixin-chart-source/mixin-chart-source.js'
@@ -435,6 +440,13 @@ export {
   yearPageOf,
 } from './utils/calendar/calendar.js'
 export { capturePointer } from './utils/capture-pointer/capture-pointer.js'
+export {
+  type AxisLengths,
+  type Category,
+  type PlacedLabel,
+  placeLabels,
+  UNMEASURED_LABELS,
+} from './utils/category-labels/category-labels.js'
 export { centerInView } from './utils/center-in-view/center-in-view.js'
 export {
   ariaChord,
@@ -567,7 +579,7 @@ export { inlineStep } from './utils/inline-step/inline-step.js'
 export { isRtl } from './utils/is-rtl/is-rtl.js'
 export { keyClaimed } from './utils/key-claimed/key-claimed.js'
 export { labelsOf } from './utils/labels-of/labels-of.js'
-export { type Curve, linePath, type Point } from './utils/line-path/line-path.js'
+export { type Curve, columnPoints, linePath, type Point } from './utils/line-path/line-path.js'
 export { type EndInSight, endInSight } from './utils/load-more/load-more.js'
 export { localeOf, runtimeLocale } from './utils/locale-of/locale-of.js'
 export { markRegion, type RegionOptions } from './utils/mark-region/mark-region.js'

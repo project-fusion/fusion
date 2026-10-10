@@ -130,7 +130,8 @@ const SERIES = 24
  * @csspart ribbon - One ribbon, its faces in its series' color.
  * @csspart ring - The ring around the reading the pointer or the keys rest on, drawn over the ribbons.
  * @csspart summary - The number of readings, series, and places, and the range of values, written as a sentence for screen readers, which describes the plot. Hide it visually.
- * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
+ * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
+ * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
  * @csspart tick - A place's or a series' name, or a value at a tick, along its edge of the box, in the chart's own drawing.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.

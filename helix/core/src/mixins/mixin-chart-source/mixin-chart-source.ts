@@ -1,12 +1,12 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property } from 'lit/decorators.js'
+import { property, state } from 'lit/decorators.js'
 import { ChartPointerController } from '../../controllers/chart-pointer-controller/chart-pointer-controller.js'
 import { SourceController } from '../../controllers/source-controller/source-controller.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import type { ChartData } from '../../utils/read-data/read-data.js'
 import { type Row, type Series, seriesKey } from '../../utils/read-series/read-series.js'
 import { writtenList } from '../../utils/written-list/written-list.js'
-import { words } from '../../words/words.js'
+import { formatWords, words } from '../../words/words.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
 type Constructor<T> = new (...args: any[]) => T
@@ -156,6 +156,11 @@ export declare class MixinChartSourceInterface {
    */
   locale: string
   /**
+   * The name of the button that shows the next page of readings in the table
+   * drawn from `data`, which holds a page at a time past `READINGS_PAGE`.
+   */
+  nextReadingsLabel: string
+  /**
    * Where a reading the keys moved to stands among the readings, said after
    * it. `{position}` and `{count}` are replaced with the numbers, written in
    * `locale`.
@@ -164,6 +169,17 @@ export declare class MixinChartSourceInterface {
    * {count}`, or to nothing to say no position.
    */
   positionLabel: string
+  /**
+   * The name of the button that shows the previous page of readings in the
+   * table drawn from `data`.
+   */
+  previousReadingsLabel: string
+  /**
+   * Which readings the page of the table drawn from `data` holds, said beside
+   * its buttons and as each page arrives. `{first}`, `{last}` and `{count}`
+   * are replaced with the numbers, written in `locale`.
+   */
+  readingsLabel: string
   /**
    * Whether the readings have been looked for: false on the server and while
    * hydrating, where no table is resolved and no data is read.
@@ -221,6 +237,19 @@ export declare class MixinChartSourceInterface {
    */
   protected renderTable(): TemplateResult | typeof nothing
 }
+
+/**
+ * How many readings the table drawn from `data` holds at once.
+ *
+ * **A table of every reading cost four elements a reading**, so a chart of
+ * 10,000 readings built 40,000 nodes before its first frame and rebuilt them
+ * on every new set of data, and a screen reader was handed a table it would
+ * take an afternoon to read. Past this many the table holds a page of them,
+ * says which, and takes buttons to the next and the previous page, which a
+ * screen reader presses as it reads. The keys on the plot still walk every
+ * reading.
+ */
+export const READINGS_PAGE = 200
 
 /**
  * The words a chart says a reading's place in by default, such as "2 of 12":
@@ -328,6 +357,15 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     locale = ''
 
     /**
+     * The name of the button that shows the next page of readings in the
+     * table drawn from `data`, which holds a page at a time past
+     * `READINGS_PAGE`.
+     */
+    @words
+    @property({ attribute: 'next-readings-label' })
+    nextReadingsLabel = 'Next readings'
+
+    /**
      * Where a reading the keys moved to stands among the readings, said after
      * it. `{position}` and `{count}` are replaced with the numbers, written in
      * `locale`.
@@ -339,6 +377,27 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     @words
     @property({ attribute: 'position-label' })
     positionLabel = '{position} of {count}'
+
+    /**
+     * The name of the button that shows the previous page of readings in the
+     * table drawn from `data`.
+     */
+    @words
+    @property({ attribute: 'previous-readings-label' })
+    previousReadingsLabel = 'Previous readings'
+
+    /**
+     * Which readings the page of the table drawn from `data` holds, said
+     * beside its buttons and as each page arrives. `{first}`, `{last}` and
+     * `{count}` are replaced with the numbers, written in `locale`.
+     */
+    @words
+    @property({ attribute: 'readings-label' })
+    readingsLabel = 'Readings {first} to {last} of {count}'
+
+    /** The page of the table drawn from `data` that is shown, counting from zero. */
+    @state()
+    private tablePage = 0
 
     /**
      * @internal Hears an `aria-label` written on the chart, which no property mirrors,
@@ -459,11 +518,26 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      */
     get plottedColumns(): number[] {
       const rows = this.sourceRows
-      const width = Math.max(0, ...rows.map((row) => row.cells.length))
-      return Array.from({ length: width }, (_, column) => column).filter((column) =>
+      if (this.plotted?.rows === rows) {
+        return this.plotted.columns
+      }
+      let width = 0
+      for (const row of rows) {
+        width = Math.max(width, row.cells.length)
+      }
+      const columns = Array.from({ length: width }, (_, column) => column).filter((column) =>
         rows.some((row) => row.cells[column]?.value !== undefined),
       )
+      this.plotted = { columns, rows }
+      return columns
     }
+
+    /**
+     * The plotted columns, held against the rows they were read from: the
+     * tooltip asks once for each of its cells and the keys once a press, and
+     * each ask walked every row.
+     */
+    private plotted: { columns: number[]; rows: Row[] } | undefined
 
     /**
      * The palette slot for the cell at this position in a row.
@@ -532,22 +606,87 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      * the page was read, which is already the readable version.
      *
      * The `table` part, named by the chart, its cells as `data` writes them.
+     *
+     * **Past `READINGS_PAGE` readings it holds a page of them**, which is the
+     * window a virtualized grid gives a screen reader: `aria-rowcount` says how
+     * many rows there are and each row's `aria-rowindex` says where it stands,
+     * so a reader hears "row 4,021 of 10,001". A hidden table has no scroll to
+     * move its window, so the `table-pages` part after it says which readings
+     * the page holds and takes two buttons to turn it. They are left out of
+     * the tab order, the plot being the chart's one stop and the buttons
+     * having nothing to show a sighted reader, and a screen reader presses
+     * them where it reads them.
      */
     protected renderTable(): TemplateResult | typeof nothing {
       const rows = this.sourceRows
       if (this.source.element || rows.length === 0) {
         return nothing
       }
-      const width = Math.max(...rows.map((row) => row.cells.length))
+      let width = 0
+      for (const row of rows) {
+        width = Math.max(width, row.cells.length)
+      }
       const columns = Array.from({ length: width }, (_, cell) => this.columnName(cell))
-      return html`<table part="table">
+      const pages = Math.ceil(rows.length / READINGS_PAGE)
+      const page = Math.min(this.tablePage, pages - 1)
+      const first = page * READINGS_PAGE
+      const shown = rows.slice(first, first + READINGS_PAGE)
+      const paged = pages > 1
+      return html`<table
+        aria-describedby=${paged ? 'helix-chart-readings' : nothing}
+        aria-rowcount=${paged ? rows.length + 1 : nothing}
+        part="table"
+      >
         ${this.named ? html`<caption>${this.named}</caption>` : nothing}
-        <thead><tr><th scope="col">${this.data?.columns[0] ?? ''}</th>${columns.map((name) => html`<th scope="col">${name}</th>`)}</tr></thead>
-        <tbody>${rows.map(
-          (row) =>
-            html`<tr><th scope="row">${row.label}</th>${columns.map((_, cell) => html`<td>${row.cells[cell]?.text ?? ''}</td>`)}</tr>`,
+        <thead><tr aria-rowindex=${paged ? 1 : nothing}><th scope="col">${this.data?.columns[0] ?? ''}</th>${columns.map((name) => html`<th scope="col">${name}</th>`)}</tr></thead>
+        <tbody>${shown.map(
+          (row, place) =>
+            html`<tr aria-rowindex=${paged ? first + place + 2 : nothing}><th scope="row">${row.label}</th>${columns.map((_, cell) => html`<td>${row.cells[cell]?.text ?? ''}</td>`)}</tr>`,
         )}</tbody>
-      </table>`
+      </table>${paged ? this.renderTablePages(page, pages, first, shown.length, rows.length) : nothing}`
+    }
+
+    /**
+     * Which readings the table's page holds, and the buttons that turn it:
+     * the `table-pages` part, after the table, where a reader who reaches the
+     * end of a page finds the next.
+     *
+     * The words are a polite live region, so a reader who presses a button
+     * hears which readings arrived. A button at either end stays where it is
+     * and says it is unavailable, so the focus a press put on it is not lost.
+     */
+    private renderTablePages(
+      page: number,
+      pages: number,
+      first: number,
+      shown: number,
+      count: number,
+    ): TemplateResult {
+      const turn = (by: number) => (): void => {
+        const next = Math.min(Math.max(page + by, 0), pages - 1)
+        if (next !== page) {
+          this.tablePage = next
+        }
+      }
+      return html`<div part="table-pages">
+        <span id="helix-chart-readings" role="status">${formatWords(this, 'readingsLabel', {
+          count,
+          first: first + 1,
+          last: first + shown,
+        })}</span>
+        <button
+          aria-disabled=${page === 0 ? 'true' : 'false'}
+          tabindex="-1"
+          type="button"
+          @click=${turn(-1)}
+        >${this.previousReadingsLabel}</button>
+        <button
+          aria-disabled=${page === pages - 1 ? 'true' : 'false'}
+          tabindex="-1"
+          type="button"
+          @click=${turn(1)}
+        >${this.nextReadingsLabel}</button>
+      </div>`
     }
   }
 

@@ -180,6 +180,39 @@ formatted cell, write its number in `data-value`:
 The chart reads `data-value` when a cell has one, and the cell's text otherwise.
 The table and the tooltip still show `$1.2k`.
 
+## Charts with many readings
+
+A chart builds what it can show, and that is bounded by its size. The readings
+themselves are read again each time the table or the data changes.
+
+- **Names on the axis.** `Line Chart`, `Area Chart`, and `Bar Chart` draw every
+  reading's name where every name fits. Where they do not, the chart draws a
+  regular share of them, and always the first and the last. Where every row
+  header holds a `<time>`, the names drawn start a period, such as the first
+  reading of each month or each year. Where the names are numbers in order,
+  such as years, they are round numbers. Other names are drawn every so many
+  readings, counted from the first. The chart works out the share again when it
+  is resized. The tooltip and the keys still say each reading's own name.
+- **Gridlines.** `gridlines="category"` rules the readings whose names are
+  drawn.
+- **Lines.** Where a line has more readings than the plot has pixels across, it
+  is drawn through the points those pixels can show: in each column of pixels,
+  the first reading, the lowest, the highest, and the last.
+- **Markers.** `markers` marks every reading, with one path for each series.
+- **The table drawn from `data`.** Past a few hundred readings, the hidden table
+  holds one page of them at a time. Its markup gives a screen reader the number
+  of rows in the whole table and the place of each row, and the words after it
+  say which readings the page holds. Two buttons after it show the previous and
+  the next page. You press them with a screen reader as you read. They are left
+  out of the tab order, so the plot stays the chart's one tab stop. The keys on
+  the plot move through every reading.
+- **A table on the page.** A chart reads the whole table that `for` names, and
+  the table is part of your page, however many rows it has. Where the readings
+  are too many to put in the document, draw the chart from `data`.
+
+Each bar of `Bar Chart` and each point of `Scatter Chart` is an element of its
+own, so those two charts build more as their readings grow.
+
 ## Series colors
 
 Helix has twenty-four series color tokens, in order, from
