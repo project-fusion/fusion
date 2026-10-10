@@ -56,6 +56,7 @@ import {
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { argument, flag } from '@fusion.dev/scripts/argv'
+import { stripMapComment } from '@fusion.dev/scripts/strip-map-comment'
 import { DOMAINS, domainOf, manifests, publishes, root } from '@fusion.dev/scripts/workspace'
 
 const fail = (message) => {
@@ -427,7 +428,7 @@ const strip = (directory) => {
         maps.push(path)
       } else if (/\.(js|cjs|mjs|d\.ts|d\.cts|d\.mts)$/.test(path)) {
         const code = readFileSync(path, 'utf8')
-        const clean = code.replace(/\n?\/\/# sourceMappingURL=.*$/gm, '')
+        const clean = stripMapComment(code)
         if (clean !== code) {
           writeFileSync(path, clean.endsWith('\n') ? clean : `${clean}\n`)
         }

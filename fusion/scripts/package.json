@@ -27,6 +27,7 @@
     "./scope": "./lib/scope.mjs",
     "./settle": "./lib/settle.mjs",
     "./shard": "./lib/shard.mjs",
+    "./strip-map-comment": "./lib/strip-map-comment.mjs",
     "./theme-facts": "./lib/theme-facts.mjs",
     "./theme-intents": "./lib/theme-intents.mjs",
     "./tighten": "./lib/tighten.mjs",
