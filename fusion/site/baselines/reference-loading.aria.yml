@@ -139,8 +139,6 @@
           - treeitem "Virtual List" [level=2]
       - treeitem "Tooling" [level=1]
     - status
-  - article
-  - complementary
   - status: Loading the reference
 - contentinfo:
   - img "Fusion"
