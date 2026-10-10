@@ -105,8 +105,9 @@ pub struct Past {
     pub failed: bool,
     pub groups: Vec<Group>,
     pub origin: Origin,
-    /// Each shot as `entry, shot` with its one-word result.
-    pub shots: Vec<(String, String)>,
+    /// Each shot as `entry, shot` with its one-word result and what its
+    /// attribution says moved.
+    pub shots: Vec<(String, String, Vec<String>)>,
 }
 
 impl Past {
@@ -135,6 +136,13 @@ impl Past {
                     Some((
                         format!("{}, {}", shot["entry"].as_str()?, shot["shot"].as_str()?),
                         shot["result"].as_str()?.to_string(),
+                        shot["attribution"]
+                            .as_array()
+                            .into_iter()
+                            .flatten()
+                            .filter_map(Value::as_str)
+                            .map(str::to_string)
+                            .collect(),
                     ))
                 })
                 .collect(),
@@ -180,8 +188,9 @@ pub struct Summary {
     /// Each branch: how many runs, how many failed, and whether the last one did.
     pub branches: Vec<(String, usize, usize, bool)>,
     /// Shots that needed a second take in more than one run, or that differed
-    /// and matched on one commit, with the runs they did it in.
-    pub flaky: Vec<(String, usize, &'static str)>,
+    /// and matched on one commit: each with the runs it did it in, how, and
+    /// the element its first takes most often moved at, when one was traced.
+    pub flaky: Vec<(String, usize, &'static str, Option<String>)>,
     /// Changes that failed on more than one branch, with the branches.
     pub recurring: Vec<(String, BTreeSet<String>)>,
     pub runs: usize,
@@ -191,6 +200,7 @@ pub struct Summary {
 /// not make them, and each branch's runs.
 pub fn summarize(runs: &[Past]) -> Summary {
     let mut steadied: BTreeMap<&str, usize> = BTreeMap::new();
+    let mut moved: BTreeMap<&str, BTreeMap<String, usize>> = BTreeMap::new();
     let mut by_commit: BTreeMap<(&str, &str), BTreeSet<&str>> = BTreeMap::new();
     let mut branches: BTreeMap<&str, (usize, usize, bool)> = BTreeMap::new();
     let mut recurring: BTreeMap<&str, BTreeSet<String>> = BTreeMap::new();
@@ -199,9 +209,16 @@ pub fn summarize(runs: &[Past]) -> Summary {
         branch.0 += 1;
         branch.1 += usize::from(run.failed);
         branch.2 = run.failed;
-        for (member, result) in &run.shots {
+        for (member, result, attribution) in &run.shots {
             if result == "steadied" {
                 *steadied.entry(member).or_default() += 1;
+                for line in attribution {
+                    *moved
+                        .entry(member)
+                        .or_default()
+                        .entry(crate::triage::signature_of(line))
+                        .or_default() += 1;
+                }
             }
             if !run.origin.commit.is_empty() && matches!(result.as_str(), "matched" | "differs") {
                 by_commit
@@ -217,18 +234,35 @@ pub fn summarize(runs: &[Past]) -> Summary {
                 .insert(run.origin.reference.clone());
         }
     }
-    let mut flaky: Vec<(String, usize, &'static str)> = steadied
-        .into_iter()
-        .filter(|(_, count)| *count > 1)
-        .map(|(member, count)| (member.to_string(), count, "needed a second take"))
+    /* The element a shot's first takes moved at most often. */
+    let most = |member: &str| {
+        moved.get(member).and_then(|counts| {
+            counts
+                .iter()
+                .max_by(|a, b| a.1.cmp(b.1).then(b.0.cmp(a.0)))
+                .map(|(signature, _)| signature.clone())
+        })
+    };
+    let mut flaky: Vec<(String, usize, &'static str, Option<String>)> = steadied
+        .iter()
+        .filter(|(_, count)| **count > 1)
+        .map(|(member, count)| {
+            (
+                (*member).to_string(),
+                *count,
+                "needed a second take",
+                most(member),
+            )
+        })
         .collect();
-    let mut seen: BTreeSet<String> = flaky.iter().map(|(member, _, _)| member.clone()).collect();
+    let mut seen: BTreeSet<String> = flaky.iter().map(|(member, ..)| member.clone()).collect();
     for ((member, _), results) in &by_commit {
         if results.len() > 1 && seen.insert((*member).to_string()) {
             flaky.push((
                 (*member).to_string(),
                 1,
                 "differed and matched on one commit",
+                None,
             ));
         }
     }
@@ -276,13 +310,17 @@ impl Summary {
         if self.flaky.is_empty() {
             out.push("No shot needed a second take in more than one of them.".to_string());
         } else {
-            for (member, count, how) in &self.flaky {
+            for (member, count, how, at) in &self.flaky {
                 let times = if *count == 1 {
                     String::new()
                 } else {
                     format!(" in {count} runs")
                 };
-                out.push(format!("Not holding still: {member} {how}{times}."));
+                let place = at
+                    .as_ref()
+                    .map(|at| format!(", most often at {}", at.trim_end_matches('.')))
+                    .unwrap_or_default();
+                out.push(format!("Not holding still: {member} {how}{times}{place}."));
             }
         }
         for (signature, refs) in self.recurring.iter().take(10) {
@@ -290,7 +328,7 @@ impl Summary {
                 "On {} branches, {}: {}.",
                 refs.len(),
                 refs.iter().cloned().collect::<Vec<_>>().join(", "),
-                signature
+                signature.trim_end_matches('.')
             ));
         }
         out
@@ -300,7 +338,7 @@ impl Summary {
         json!({
             "branches": self.branches.iter().map(|(name, runs, failed, last)| json!({ "failed": failed, "lastFailed": last, "ref": name, "runs": runs })).collect::<Vec<_>>(),
             "lines": self.lines(),
-            "flaky": self.flaky.iter().map(|(member, count, how)| json!({ "how": how, "runs": count, "shot": member })).collect::<Vec<_>>(),
+            "flaky": self.flaky.iter().map(|(member, count, how, at)| json!({ "at": at, "how": how, "runs": count, "shot": member })).collect::<Vec<_>>(),
             "recurring": self.recurring.iter().map(|(signature, refs)| json!({ "refs": refs, "signature": signature })).collect::<Vec<_>>(),
             "runs": self.runs,
         })
@@ -335,7 +373,7 @@ mod tests {
             },
             shots: shots
                 .iter()
-                .map(|(member, result)| ((*member).to_string(), (*result).to_string()))
+                .map(|(member, result)| ((*member).to_string(), (*result).to_string(), Vec::new()))
                 .collect(),
         }
     }
@@ -350,9 +388,45 @@ mod tests {
         let summary = summarize(&runs);
         assert_eq!(
             summary.flaky,
-            [("styled/map, wide".to_string(), 2, "needed a second take")]
+            [(
+                "styled/map, wide".to_string(),
+                2,
+                "needed a second take",
+                None
+            )]
         );
         assert_eq!(summary.runs, 3);
+    }
+
+    #[test]
+    fn a_flaky_shot_names_the_element_it_moves_at() {
+        let line =
+            |at: &str| format!("{at}: `helix-map ::part(canvas)`, drawn differently where it was");
+        let steadied = |at: &str, when: u64| Past {
+            origin: Origin {
+                at: when,
+                commit: format!("c{when}"),
+                reference: "main".to_string(),
+                ..Origin::default()
+            },
+            shots: vec![(
+                "site/maps, dark".to_string(),
+                "steadied".to_string(),
+                vec![line(at)],
+            )],
+            ..Past::default()
+        };
+        let summary = summarize(&[
+            steadied("1440 by 640 px at 0, 64", 1),
+            steadied("1440 by 600 px at 0, 80", 2),
+        ]);
+        assert_eq!(
+            summary.flaky[0].3.as_deref(),
+            Some("`helix-map ::part(canvas)`, drawn differently where it was")
+        );
+        assert!(summary.lines()[1].ends_with(
+            "most often at `helix-map ::part(canvas)`, drawn differently where it was."
+        ));
     }
 
     #[test]
@@ -366,7 +440,8 @@ mod tests {
             [(
                 "styled/aura, dark".to_string(),
                 1,
-                "differed and matched on one commit"
+                "differed and matched on one commit",
+                None
             )]
         );
     }

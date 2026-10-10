@@ -207,6 +207,11 @@ fn files_of(line: &str) -> Option<String> {
     Some(line[at..end].to_string())
 }
 
+/// The signature of one attribution line: what a group of it would be called.
+pub fn signature_of(line: &str) -> String {
+    innermost(&kind(&plain(told(line))))
+}
+
 /// The signatures of one change, one a region: a shot whose button and badge
 /// both changed is in the button's group and in the badge's.
 fn signatures(entry: &str, change: &Change) -> Vec<(String, Vec<String>)> {
@@ -281,7 +286,7 @@ pub fn diff(base: &Path, reference: &str, files: &BTreeSet<String>) -> Option<St
         return None;
     }
     let output = Command::new("git")
-        .current_dir(base)
+        .current_dir(top(base))
         .args(["diff", "--no-color", reference, "--"])
         .args(files)
         .output()
@@ -300,12 +305,40 @@ pub fn diff(base: &Path, reference: &str, files: &BTreeSet<String>) -> Option<St
     ))
 }
 
+/// The repository's root above `base`, or `base` when it is in none.
+fn top(base: &Path) -> std::path::PathBuf {
+    Command::new("git")
+        .current_dir(base)
+        .args(["rev-parse", "--show-toplevel"])
+        .output()
+        .ok()
+        .filter(|output| output.status.success())
+        .map_or_else(
+            || base.to_path_buf(),
+            |output| std::path::PathBuf::from(String::from_utf8_lossy(&output.stdout).trim()),
+        )
+}
+
+/// A folder as the repository names it, from its root, with forward
+/// slashes: the way a diff and a reader both find it.
+pub fn from_top(base: &Path, folder: &Path) -> String {
+    let root = top(base);
+    let canonical =
+        |path: &Path| std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf());
+    let folder = canonical(folder);
+    folder
+        .strip_prefix(canonical(&root))
+        .unwrap_or(&folder)
+        .to_string_lossy()
+        .replace('\\', "/")
+}
+
 /// Every file changed since `reference`, read with git in `base`, so a model
 /// sees a shared file that moved, a token sheet, though no attributed element
 /// is defined in it. A request names the first [`NAMES`].
 pub fn changed(base: &Path, reference: &str) -> Option<Vec<String>> {
     let output = Command::new("git")
-        .current_dir(base)
+        .current_dir(top(base))
         .args(["diff", "--name-only", reference])
         .output()
         .ok()?;
