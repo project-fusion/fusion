@@ -188,16 +188,7 @@ fn at_origin(entry: &Value, link: &Link<'_>) -> Value {
                 .cloned()
         });
     if let Some(found) = nearest {
-        let mut copy = found;
-        if let Some(fields) = copy.as_object_mut() {
-            if let Some(said) = entry.as_object() {
-                for (key, value) in said {
-                    fields.entry(key.clone()).or_insert_with(|| value.clone());
-                }
-            }
-            fields.insert("inheritedFrom".to_owned(), stamp.clone());
-        }
-        return copy;
+        return filled(&found, entry, stamp);
     }
     let (Some(module), Some(name)) = (
         stamp.get("module").and_then(Value::as_str),
@@ -228,18 +219,33 @@ fn at_origin(entry: &Value, link: &Link<'_>) -> Value {
         bare name and a type, while the checkbox below it carries the sentence
         an `@event` tag wrote and the React prop. Replacing outright lost
         those; only what the origin does not say is taken from the parent. */
-        let mut copy = found.clone();
-        if let Some(fields) = copy.as_object_mut() {
-            if let Some(said) = entry.as_object() {
-                for (key, value) in said {
-                    fields.entry(key.clone()).or_insert_with(|| value.clone());
-                }
-            }
-            fields.insert("inheritedFrom".to_owned(), stamp.clone());
-        }
-        return copy;
+        return filled(found, entry, stamp);
     }
     entry.clone()
+}
+
+/// The origin's entry, filled in from the parent's, and stamped.
+///
+/// **The default is the parent's.** The origin says what an entry is, and the
+/// initializer nearest the child is the value its class holds: the headless
+/// combobox declares `static words = 'helix-combobox'` over `MixinTokens`'
+/// empty one, the styled combobox read the mixin's, and `words.d.ts` filed
+/// every such styled family under an empty key. A parent that only inherited
+/// the entry carries the origin's default anyway.
+fn filled(found: &Value, entry: &Value, stamp: &Value) -> Value {
+    let mut copy = found.clone();
+    if let Some(fields) = copy.as_object_mut() {
+        if let Some(said) = entry.as_object() {
+            for (key, value) in said {
+                fields.entry(key.clone()).or_insert_with(|| value.clone());
+            }
+            if let Some(value) = said.get("default") {
+                fields.insert("default".to_owned(), value.clone());
+            }
+        }
+        fields.insert("inheritedFrom".to_owned(), stamp.clone());
+    }
+    copy
 }
 
 /// The declaration of that name, wherever in the manifest it sits.

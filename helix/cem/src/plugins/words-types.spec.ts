@@ -52,4 +52,11 @@ describe('the words a manifest declares', () => {
     expect(written).toContain('      emptyText: Message')
     expect(written).not.toContain('autocomplete')
   })
+
+  // The headless file told you to import the styled package's.
+  test('tell you to import the package they are written for', () => {
+    const headless = renderWords(wordsOf(MANIFEST), '@fusion.dev/helix-headless')
+    expect(headless).toContain("// `import type {} from '@fusion.dev/helix-headless/words'`.")
+    expect(headless).not.toContain("'@fusion.dev/helix/words'")
+  })
 })

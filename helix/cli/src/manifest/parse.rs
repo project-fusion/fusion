@@ -507,8 +507,9 @@ fn blanked(source: &str, comments: &[oxc_ast::Comment]) -> String {
     String::from_utf8(plain).unwrap_or_else(|_| source.to_owned())
 }
 
-/// A tag registered by a call rather than by the decorator.
-fn defined(text: &str) -> Vec<Exported> {
+/// Every `customElements.define(tag, target)` call in a text, each argument
+/// as written.
+fn define_calls(text: &str) -> Vec<(&str, &str)> {
     const CALL: &str = "customElements.define(";
     let mut found = Vec::new();
     let mut rest = text;
@@ -519,14 +520,37 @@ fn defined(text: &str) -> Vec<Exported> {
             continue;
         };
         let target = target.split(')').next().unwrap_or(target);
-        found.push(Exported {
-            kind: "custom-element-definition",
-            name: tag.trim().to_owned(),
-            declaration: target.trim().to_owned(),
-            origin: Origin::Own,
-        });
+        found.push((tag.trim(), target.trim()));
     }
     found
+}
+
+/// A tag written as a string literal, without its quotes.
+///
+/// **A name stands for what it holds at run time, and is kept as written.**
+/// The decorator's own `customElements.define(tagName, target)` publishes
+/// `tagName`, which is what the analyzer does. `'acme-combobox'` is the tag
+/// itself, and the analyzer publishes it unquoted: the guide to building on the
+/// headless tier registers that way, and the quotes left a consumer's manifest
+/// with a tag no element has.
+fn literal(tag: &str) -> Option<&str> {
+    ['\'', '"', '`']
+        .iter()
+        .find_map(|quote| tag.strip_prefix(*quote)?.strip_suffix(*quote))
+        .filter(|inner| !inner.contains("${"))
+}
+
+/// A tag registered by a call rather than by the decorator.
+fn defined(text: &str) -> Vec<Exported> {
+    define_calls(text)
+        .into_iter()
+        .map(|(tag, target)| Exported {
+            kind: "custom-element-definition",
+            name: literal(tag).unwrap_or(tag).to_owned(),
+            declaration: target.to_owned(),
+            origin: Origin::Own,
+        })
+        .collect()
 }
 
 /// The events a class is seen to dispatch, in the order the calls are written.
@@ -1381,6 +1405,17 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
     span still lines up with the source it came from. */
     let plain = blanked(source, &parsed.program.comments);
 
+    /* **A class registered by a call is kept and is an element**, as one with
+    the decorator is. The call is an export naming the class, which is what
+    keeps a declaration, and a written tag is the class's `tagName`. */
+    let mut tags: BTreeMap<String, String> = BTreeMap::new();
+    for (tag, target) in define_calls(&plain) {
+        exported.insert(target.to_owned());
+        if let Some(tag) = literal(tag) {
+            tags.insert(target.to_owned(), tag.to_owned());
+        }
+    }
+
     let imported = imports(&parsed.program);
     let mut found = Vec::new();
     /* Declarations this module keeps to itself, read for their values alone. */
@@ -1417,6 +1452,15 @@ pub fn declarations(source: &str, path: &str) -> Vec<Declared> {
         }
     }
     resolve(&mut found, &beside);
+    for one in &mut found {
+        if one.kind != "class" || one.tag_name.is_some() {
+            continue;
+        }
+        if let Some(tag) = tags.get(&one.name) {
+            one.tag_name = Some(tag.clone());
+            one.is_element = true;
+        }
+    }
     found
 }
 
