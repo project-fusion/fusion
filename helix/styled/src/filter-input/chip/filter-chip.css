@@ -1,8 +1,8 @@
 /* A chip is a row of segments and a control, not a box with words in it. The
-   segments are the three parts a filter has, and each is drawn to say which of
-   the three it is: the field is the quietest, the operator quieter still, and
-   the values carry the weight, because the values are what a reader scans a bar
-   of these for. */
+   segments are the three parts a filter has: the field and the operator are
+   quiet, and the values carry the weight, because the values are what a reader
+   scans a bar of these for. The operator shares the field's muted ink, since
+   "is not" changes what the chip means and has to be read. */
 :host {
   align-items: center;
   background-color: var(--filter-input-chip-background-color, var(--helix-color-surface-sunken));
@@ -54,7 +54,7 @@
    the gap it leaves. */
 [part="operator"] {
   align-items: center;
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   display: inline-flex;
   padding-inline-end: var(--helix-space-2xs);
   white-space: nowrap;
@@ -79,7 +79,7 @@
   block-size: var(--helix-size-icon);
   border: 0;
   border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: grid;
   inline-size: var(--helix-size-icon);

@@ -185,7 +185,7 @@
    belong to marks that sit on the ends, and moving them in would put them
    under the wrong place on the track. */
 [part="marker-label"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-variant-numeric: tabular-nums;

@@ -129,7 +129,7 @@
 /* A line under the label, in the label's column. Only where there is one, so
    a row without it keeps a single row. */
 slot[name="description"] {
-  color: var(--menu-item-description-color, var(--helix-color-foreground-subtle));
+  color: var(--menu-item-description-color, var(--helix-color-foreground-muted));
   display: block;
   font-weight: var(--helix-weight-regular);
   grid-column: 2;
@@ -146,7 +146,7 @@ slot[name="description"][data-empty] {
    mark, which is no width on a row with neither. */
 [part="end"] {
   align-items: center;
-  color: var(--menu-item-detail-color, var(--helix-color-foreground-subtle));
+  color: var(--menu-item-detail-color, var(--helix-color-foreground-muted));
   display: flex;
   gap: var(--helix-space-2xs);
   grid-column: 3;

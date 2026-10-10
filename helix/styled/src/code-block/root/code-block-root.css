@@ -362,7 +362,7 @@
 }
 
 [part="gutter"] {
-  color: var(--code-block-gutter-color, var(--helix-color-foreground-subtle));
+  color: var(--code-block-gutter-color, var(--helix-color-foreground-muted));
   font-family: var(--_code-block-face);
   font-size: var(--_code-block-size);
   font-variant-numeric: tabular-nums;

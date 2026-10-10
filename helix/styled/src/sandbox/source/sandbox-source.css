@@ -100,7 +100,7 @@
 }
 
 [part="line"]::before {
-  color: var(--sandbox-source-line-number-color, var(--helix-color-foreground-subtle));
+  color: var(--sandbox-source-line-number-color, var(--helix-color-foreground-muted));
   content: counter(line);
   inset-inline-end: calc(100% + var(--helix-space-sm) * 2);
   position: absolute;

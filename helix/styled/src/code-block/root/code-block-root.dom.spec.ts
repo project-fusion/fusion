@@ -52,7 +52,7 @@ describe('wrap, height and line numbers', () => {
     expect(gutter).toContain('line-height: var(--_code-block-leading)')
     expect(gutter).toContain('user-select: none')
     expect(gutter).toContain(
-      'color: var(--code-block-gutter-color, var(--helix-color-foreground-subtle))',
+      'color: var(--code-block-gutter-color, var(--helix-color-foreground-muted))',
     )
   })
 })

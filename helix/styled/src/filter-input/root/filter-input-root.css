@@ -22,7 +22,7 @@
   border: var(--helix-border-thin) solid
     var(--filter-input-field-border-color, var(--helix-color-border));
   border-radius: var(--filter-input-radius, var(--helix-radii-sm));
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   display: flex;
   flex-wrap: wrap;
   gap: var(--helix-space-2xs);
@@ -114,16 +114,15 @@ slot[name="end"] {
    the field is narrow. */
 slot[name="start"]::slotted(*),
 slot[name="end"]::slotted(*) {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;
 }
 
 /* **The same X as the chips beside it**, which is `FilterChip`'s arithmetic:
-   `0.85em` of the same type, in the subtle ink. At `icon-tight` in the muted ink
-   it drew 16 pixels against their 12 and a step brighter, so the one control
-   in the row that clears only the text read as the loudest thing in it. The
-   target stays at `icon-loose`, since the glyph shrinking is not the button
-   shrinking. */
+   `0.85em` of the same type, in the same muted ink. At `icon-tight` it drew 16
+   pixels against their 12, so the one control in the row that clears only the
+   text read as the loudest thing in it. The target stays at `icon-loose`, since
+   the glyph shrinking is not the button shrinking. */
 [part="clear"] {
   --icon-size: 0.85em;
   all: unset;
@@ -132,7 +131,7 @@ slot[name="end"]::slotted(*) {
   align-self: center;
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;
-  color: var(--filter-input-clear-color, var(--helix-color-foreground-subtle));
+  color: var(--filter-input-clear-color, var(--helix-color-foreground-muted));
   cursor: pointer;
   display: flex;
   flex: 0 0 auto;

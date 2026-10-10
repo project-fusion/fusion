@@ -97,9 +97,8 @@ slot[name$="icon"]::slotted(*) {
 /*
  *  On the slot rather than on what was slotted.
  *
- * `foreground-muted` rather than the `foreground-subtle` a caption usually
- * takes: subtle is 3.78:1 on the light surface, which is under the 4.5:1 this
- * text needs, and muted is 5.76:1 and still visibly quieter than the metric.
+ * `foreground-muted`, the ink a caption takes: 5.76:1 on the light surface, over
+ * the 4.5:1 this text needs, and still visibly quieter than the metric.
  */
 slot[name="label"] {
   color: var(--trend-label-color, var(--helix-color-foreground-muted));

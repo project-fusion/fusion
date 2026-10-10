@@ -38,14 +38,15 @@
 
 /* Here the change is at the parent instead: a branch is the name of the list it
    holds, so it takes the heading and its children keep the size every other row
-   has. The recipe is not invented for the tree. It is `Text`'s `label` beside
-   `emphasis="subtle"`, which is what this repository already puts over a rail,
-   "On this page" over the page outline, so a section in a sidebar and a title
-   over an outline are the same thing drawn the same way. Handed down as the
-   three values rather than as the attribute, for the reason above it: only the
-   item sheet can tell a branch from a leaf. */
+   has. The recipe is not invented for the tree. It is `Text`'s `label`, which is
+   what this repository already puts over a rail, "On this page" over the page
+   outline, so a section in a sidebar and a title over an outline are the same
+   thing drawn the same way. Its ink is `foreground-muted`, because a heading is
+   read and the quieter `foreground-subtle` is not solved against a theme's
+   grounds. Handed down as the three values rather than as the attribute, for
+   the reason above it: only the item sheet can tell a branch from a leaf. */
 :host([nesting="heading"]) {
-  --_tree-heading-ink: var(--helix-color-foreground-subtle);
+  --_tree-heading-ink: var(--helix-color-foreground-muted);
   --_tree-heading-text: var(--helix-text-xs);
   --_tree-heading-tracking: var(--helix-tracking-wide);
 }

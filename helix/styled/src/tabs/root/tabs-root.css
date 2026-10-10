@@ -34,7 +34,7 @@
   align-items: center;
   background-color: var(--tabs-scroll-background-color, var(--helix-color-surface));
   border: none;
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
   flex: none;

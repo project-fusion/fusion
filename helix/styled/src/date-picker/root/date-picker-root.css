@@ -204,7 +204,7 @@
 [part="weekday"] {
   align-items: center;
   block-size: var(--_calendar-track);
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   display: inline-flex;
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);

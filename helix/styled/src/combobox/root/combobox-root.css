@@ -76,8 +76,8 @@
 }
 
 [part="control"]::placeholder {
-  color: var(--helix-color-foreground-subtle);
-  font-weight: var(--helix-weight-medium);
+  color: var(--helix-color-foreground-muted);
+  font-weight: var(--helix-weight-regular);
 }
 
 :host(:disabled) [part="field"] {

@@ -36,12 +36,12 @@
 }
 
 [part="empty"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   margin: var(--helix-space-none);
 }
 
 [part="suite"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
   margin: var(--helix-space-sm) var(--helix-space-none) var(--helix-space-2xs);

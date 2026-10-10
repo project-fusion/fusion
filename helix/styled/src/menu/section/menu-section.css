@@ -4,7 +4,7 @@
 
 /* The menu's small type, a step quieter than the rows, at the rows' inset. */
 [part="heading"] {
-  color: var(--menu-section-heading-color, var(--helix-color-foreground-subtle));
+  color: var(--menu-section-heading-color, var(--helix-color-foreground-muted));
   font-size: var(--helix-text-xs);
   font-weight: var(--helix-weight-medium);
   line-height: var(--helix-leading-normal);

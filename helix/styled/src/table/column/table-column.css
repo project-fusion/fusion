@@ -19,11 +19,11 @@
   border-block-end: var(--helix-border-thin) solid
     var(--_table-heading-rule-color, var(--helix-color-border));
   box-sizing: border-box;
-  /* Muted rather than subtle, and the same size as the cells under it. The
-     caption treatment, `text-xs` in `foreground-subtle`, is two steps quieter
-     and a step smaller than the column it names, which reads as a footnote to
-     its own data. A heading recedes, but it is still part of the table and is
-     read as often as anything in it: weight is what separates it, not size. */
+  /* Muted, and the same size as the cells under it. The caption treatment,
+     `text-xs`, is a step smaller than the column it names, which reads as a
+     footnote to its own data. A heading recedes, but it is still part of the
+     table and is read as often as anything in it: weight is what separates it,
+     not size. */
   color: var(--_table-heading-color, var(--helix-color-foreground-muted));
   display: flex;
   font-family: var(--helix-font-sans);

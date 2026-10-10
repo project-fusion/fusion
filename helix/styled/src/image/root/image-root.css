@@ -61,14 +61,14 @@
   inline-size: 100%;
 }
 
-/* The fallback's own hooks, resting on the placeholder's ground and the
-   subtle ink it always had, so a page can tell a failure from a wait. */
+/* The fallback's own hooks, resting on the placeholder's ground and the muted
+   ink, so a page can tell a failure from a wait. */
 [part="fallback"] {
   background-color: var(
     --image-fallback-background-color,
     var(--image-placeholder-color, var(--helix-color-surface-sunken))
   );
-  color: var(--image-fallback-color, var(--helix-color-foreground-subtle));
+  color: var(--image-fallback-color, var(--helix-color-foreground-muted));
 }
 
 /* Arriving rather than appearing. */

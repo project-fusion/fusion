@@ -57,7 +57,7 @@
  * count then changes as the field is typed into. */
 [part="rest"] {
   align-self: center;
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);

@@ -81,12 +81,12 @@
   /* **A hairline above it, the way `Command`'s footer and the sandbox status bar
      mark a chrome strip at the foot of a bounded region.** It earns one here
      twice over: the credit sits directly under tile imagery that can be any
-     color, and subtle text on a busy map reads as part of the map it is
+     color, and quiet text on a busy map reads as part of the map it is
      crediting. The header takes none, because what a consumer slots there is
      theirs and a rule we drew would fight their own. */
   border-block-start: var(--helix-border-thin) solid
     var(--map-attribution-border-color, var(--helix-color-border));
-  color: var(--map-attribution-color, var(--helix-color-foreground-subtle));
+  color: var(--map-attribution-color, var(--helix-color-foreground-muted));
   /* **A block, whatever was slotted**, so the hairline is the strip's width.
      A credit is written in a `helix-text` or a `<small>`, both inline, and
      an inline box's border ran under the words and stopped. */

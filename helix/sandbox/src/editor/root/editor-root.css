@@ -24,7 +24,7 @@
 [part="editor"] .cm-gutters {
   background-color: transparent;
   border: none;
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
 }
 
 [part="editor"] .cm-activeLineGutter,

@@ -73,7 +73,7 @@
 }
 
 [part="empty"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   margin: var(--helix-space-none);
 }
 
@@ -89,7 +89,7 @@
 }
 
 [part="level"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   text-transform: uppercase;
 }
 
@@ -104,7 +104,7 @@
 [part="count"] {
   background-color: var(--helix-color-surface-sunken);
   border-radius: var(--helix-radii-full);
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   padding-inline: var(--helix-space-2xs);
 }
 
