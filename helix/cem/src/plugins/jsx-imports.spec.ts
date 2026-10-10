@@ -51,4 +51,14 @@ describe('the imports of the JSX types', () => {
     )
     expect(importedBy(next)).toEqual(['HelixDialog'])
   })
+
+  /* The Vue generator imports `ToggleEvent` from the package, which exports
+     no such name: an error under `skipLibCheck: false`, and `any` without. */
+  test('imports no platform event class, which lib.dom declares', () => {
+    const next = scene(
+      "import type { HelixDialog, ToggleEvent } from 'pkg'\n\ntype A = { d: HelixDialog; t: ToggleEvent }\n",
+    )
+    expect(importedBy(next)).toEqual(['HelixDialog'])
+    expect(next).toContain('t: ToggleEvent')
+  })
 })

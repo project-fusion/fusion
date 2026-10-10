@@ -14,7 +14,7 @@ export interface JsxDeclaredEventsOptions {
 }
 
 /** A platform event class, which every consumer has from lib.dom and nobody imports. */
-const PLATFORM = /^(?!Helix)[A-Z][A-Za-z]*Event$/
+export const PLATFORM = /^(?!Helix)[A-Z][A-Za-z]*Event$/
 
 /**
  * The type a handler in the shared bag takes, from what the manifest declares.

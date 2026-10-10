@@ -315,11 +315,14 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
    * Written through to the control, and answering zero before there is one,
    * which is where an empty field's caret would be anyway.
    */
-  get selectionDirection(): SelectionDirection {
+  get selectionDirection(): 'backward' | 'forward' | 'none' {
+    /* The union is written out because the DOM types of TypeScript 5 have no
+       `SelectionDirection`, and svelte-check, vue-tsc, and Angular's compiler
+       read these declarations with TypeScript 5. */
     return this.control?.selectionDirection ?? 'none'
   }
 
-  set selectionDirection(direction: SelectionDirection) {
+  set selectionDirection(direction: 'backward' | 'forward' | 'none') {
     const control = this.control
     if (control) {
       control.selectionDirection = direction
@@ -359,7 +362,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
    * into the range they asked for. The platform has this method for that reason
    * and so does this.
    */
-  setSelectionRange(start: number, end: number, direction?: SelectionDirection): void {
+  setSelectionRange(start: number, end: number, direction?: 'backward' | 'forward' | 'none'): void {
     this.control?.setSelectionRange(start, end, direction)
   }
 

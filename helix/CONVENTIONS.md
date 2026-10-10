@@ -2036,7 +2036,7 @@ several commits. The assertion that means something is
 
 **There are no wrappers and there is no `helix/react`.** The typings are emitted
 by cem plugins during `bun run analyze`: `jsx.d.ts` by `@wc-toolkit/jsx-types`
-with `jsxReactRef` and `jsxImports` on top of it, and `vue.d.ts` and
+with `jsxFrameworkProps` and `jsxImports` on top of it, and `vue.d.ts` and
 `svelte.d.ts` beside them. Consumers write `<helix-card>` directly.
 
 The naming, which was never about wrappers:
@@ -2153,9 +2153,10 @@ The naming, which was never about wrappers:
   library's usual shape, a set's answer named on the set and mirrored onto the
   one that holds it.
 - **`ref` is typed to the element class**, not `HTMLElement`, or a component's
-  imperative methods are unreachable through it. That is the `jsxReactRef`
-  plugin's whole job, and it is the one thing `@wc-toolkit/jsx-types` does not do
-  on its own.
+  imperative methods are unreachable through it, and as the framework's own
+  type: React's `Ref` in React and Preact's in Preact. The `jsxFrameworkProps`
+  plugin writes it, reading each framework's types only in that framework's
+  JSX, so a project without React's types compiles the file.
 - **The generated props sit beside React's own**, so `onClick`, `className`,
   `style`, ARIA, `slot`, `part` and `data-*` typecheck on a Helix tag without
   being declared per component.

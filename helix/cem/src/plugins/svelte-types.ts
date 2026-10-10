@@ -62,7 +62,7 @@ export const svelteTypes = ({
     /* The tag map the generator wrote, read back rather than rebuilt from the
        manifest: it already carries the `Partial<>` and the base props, and
        reading it means the two files cannot disagree. */
-    const map = source.match(/export type CustomElements = \{([\s\S]*?)\n\};/)
+    const map = source.match(/export type CustomElements(?:<[^>]*>)? = \{([\s\S]*?)\n\};/)
     if (!map?.[1]) {
       return
     }

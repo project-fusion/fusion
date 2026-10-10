@@ -20,6 +20,14 @@ describe('afterManifest', () => {
     expect(steps.indexOf('helix-svelte-types')).toBeGreaterThan(
       steps.indexOf('helix-jsx-declared-events'),
     )
+    expect(steps.indexOf('helix-svelte-types')).toBeGreaterThan(
+      steps.indexOf('helix-jsx-framework-props'),
+    )
+    // Each tag entry's `BaseProps<T>` is read as the generator wrote it, then
+    // given the framework parameter.
+    expect(steps.indexOf('helix-jsx-framework-props')).toBeGreaterThan(
+      steps.indexOf('helix-jsx-native-events'),
+    )
     // Last of the generators, because it rewrites what two of them wrote.
     expect(steps.at(-1)).toBe('helix-jsx-optional-undefined')
   })

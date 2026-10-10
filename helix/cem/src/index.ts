@@ -16,11 +16,11 @@ import { generateVuejsTypes } from '@wc-toolkit/vuejs-types'
 import { catalog, type ExampleSource } from './catalog.js'
 import { jsxBaseProps } from './plugins/jsx-base-props.js'
 import { jsxDeclaredEvents } from './plugins/jsx-declared-events.js'
+import { jsxFrameworkProps } from './plugins/jsx-framework-props.js'
 import { jsxImports } from './plugins/jsx-imports.js'
 import { jsxNativeEvents } from './plugins/jsx-native-events.js'
 import { jsxNumericAttributes } from './plugins/jsx-numeric-attributes.js'
 import { jsxOptionalUndefined } from './plugins/jsx-optional-undefined.js'
-import { jsxReactRef } from './plugins/jsx-react-ref.js'
 import { jsxUnnamedAttributes } from './plugins/jsx-unnamed-attributes.js'
 import { svelteTypes } from './plugins/svelte-types.js'
 import { wordsTypes } from './plugins/words-types.js'
@@ -335,15 +335,17 @@ export const afterManifest = ({
         // Must follow the generator: it references event types it does not
         // import, and an unresolved name degrades to `any` under skipLibCheck.
         ...(packageName ? [jsxImports({ fileName: `${TYPES}/jsx.d.ts`, packageName })] : []),
-        // Also after the generator: its `ref` type is framework-agnostic and
-        // rejects the `useRef` every React consumer reaches for.
-        jsxReactRef({ fileName: `${TYPES}/jsx.d.ts` }),
         // Before `jsxNativeEvents`, which rewrites the handler lines it reads.
         jsxBaseProps({ fileName: `${TYPES}/jsx.d.ts` }),
         jsxNativeEvents({ fileName: `${TYPES}/jsx.d.ts` }),
         // After it, which is what makes `BaseEvents` generic, and before
         // `jsxOptionalUndefined` so these entries get the same `| undefined`.
         jsxDeclaredEvents({ fileName: `${TYPES}/jsx.d.ts` }),
+        /* After `jsxNativeEvents`, which reads each tag entry's `BaseProps<T>`
+             as the generator wrote it. The generator's `ref` rejects the
+             `useRef` every React and Preact consumer reaches for, and React's
+             and Preact's types reach only their own JSX. */
+        jsxFrameworkProps({ fileName: `${TYPES}/jsx.d.ts` }),
         /* Vue reads none of the above. Its templates are not JSX, so the
              types augment `GlobalComponents` rather than `IntrinsicElements`,
              and a handler is bound with `@helix-input` rather than a prop. Same
@@ -354,6 +356,8 @@ export const afterManifest = ({
           outdir: TYPES,
           stronglyTypedEvents: true,
         }),
+        // The same imports as the JSX file's, which the Vue generator writes alike.
+        ...(packageName ? [jsxImports({ fileName: `${TYPES}/vue.d.ts`, packageName })] : []),
         /* After both generators, which write `unknown` for an attribute that
              names no field, and before Svelte's, which reuses the JSX map. */
         jsxUnnamedAttributes({ fileNames: [`${TYPES}/jsx.d.ts`, `${TYPES}/vue.d.ts`] }),
@@ -561,11 +565,11 @@ export type {
 export {
   jsxBaseProps,
   jsxDeclaredEvents,
+  jsxFrameworkProps,
   jsxImports,
   jsxNativeEvents,
   jsxNumericAttributes,
   jsxOptionalUndefined,
-  jsxReactRef,
   jsxUnnamedAttributes,
   svelteTypes,
   wordsTypes,

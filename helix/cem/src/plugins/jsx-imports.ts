@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Plugin } from '../types.js'
+import { PLATFORM } from './jsx-declared-events.js'
 
 /** Type names the generator emits: `HelixOpenChangeEvent`, and friends. */
 const HELIX_TYPE = /\bHelix[A-Za-z0-9]*\b/g
@@ -19,7 +20,8 @@ export interface JsxImportsOptions {
 }
 
 /**
- * Adds imports the JSX types generator references but does not emit.
+ * Adds imports the JSX and Vue types generators reference but do not emit, and
+ * drops the ones the package does not export.
  *
  * `@wc-toolkit/jsx-types` imports the component classes, because it is told
  * where they live, but an event's type comes from `@event {HelixOpenChangeEvent}`
@@ -32,7 +34,8 @@ export interface JsxImportsOptions {
  * passes against a detail that has no such field. A type that silently promises
  * more than it delivers is worse than no type.
  *
- * Runs after the generator, so list it after `jsxTypesPlugin`.
+ * Runs after the generator, so list it after `jsxTypesPlugin`, and after
+ * `vuejsTypesPlugin` for the Vue file.
  */
 export const jsxImports = ({ fileName = 'jsx.d.ts', packageName }: JsxImportsOptions): Plugin => ({
   name: 'helix-jsx-imports',
@@ -72,14 +75,18 @@ export const jsxImports = ({ fileName = 'jsx.d.ts', packageName }: JsxImportsOpt
        of which the package exports: 159 errors for a consumer without
        `skipLibCheck`. The generator also imports every export of a module the
        file names, `FAILED_LABEL` and `pointsOf` among them, whether the file
-       uses it or not, so an import is kept only where the body uses it. */
+       uses it or not, so an import is kept only where the body uses it.
+
+       **A platform event class is never imported.** The Vue generator imports
+       every event type an element declares from the package, `ToggleEvent`
+       among them, which the package does not export and lib.dom declares. */
     const body = source.replace(importMatch[0], '').replace(COMMENTS, '')
     const used = new Set(body.match(IDENTIFIER) ?? [])
 
     const missing = [...new Set(body.match(HELIX_TYPE) ?? [])]
       .filter((name) => !imported.has(name) && !declared.has(name))
       .sort()
-    const kept = [...imported].filter((name) => used.has(name))
+    const kept = [...imported].filter((name) => used.has(name) && !PLATFORM.test(name))
 
     if (missing.length === 0 && kept.length === imported.size) {
       return
