@@ -39,8 +39,11 @@
   color: var(--_segment-focus-color, var(--helix-color-foreground-on-primary));
 }
 
+/* A segment not yet set is a placeholder, and is drawn as `field.css` draws
+   one: the muted ink at the regular weight. */
 [part~="segment-placeholder"] {
-  color: var(--_segment-placeholder-color, var(--helix-color-foreground-subtle));
+  color: var(--_segment-placeholder-color, var(--helix-color-foreground-muted));
+  font-weight: var(--helix-weight-regular);
 }
 
 [part~="literal"] {

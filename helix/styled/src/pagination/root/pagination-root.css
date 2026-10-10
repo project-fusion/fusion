@@ -160,7 +160,7 @@
    so aligning the em boxes is the whole of the job and the shared box does that
    already. */
 [part="gap"] {
-  color: var(--pagination-ellipsis-foreground-color, var(--helix-color-foreground-subtle));
+  color: var(--pagination-ellipsis-foreground-color, var(--helix-color-foreground-muted));
   user-select: none;
 }
 

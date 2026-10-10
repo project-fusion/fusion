@@ -938,7 +938,7 @@ helix-toggle[disabled]::part(item) {
    wrote, and this only says how it looks. */
 [data-megamenu-heading] {
   align-items: center;
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   display: flex;
   /* `xs` rather than `2xs`: at four the mark and the name read as one crowded
      lockup, and the name is a product's rather than a caption on the mark. */
@@ -1286,7 +1286,7 @@ helix-toast:not([data-color-mode]) {
 
 /* The heading row is weight and a rule, never a fill. */
 :where([data-prose] th) {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-weight: var(--helix-weight-medium);
 }
 

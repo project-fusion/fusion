@@ -1,14 +1,15 @@
 /* The sixteen ANSI colors from the theme, so a program's red is the theme's
    danger and its green the theme's success. A bright color is the same color:
    a theme has one red, and a second, lighter one beside it would be a color
-   nobody chose. The two ends of the gray ramp keep their order, white being
-   the ink a terminal writes in and bright black the quiet one. Cyan is mixed
-   from blue and green, there being no token for it. */
+   nobody chose. The quiet grays are one gray for the same reason: white and
+   bright black are both the muted ink, the one quiet ink a theme solves, since
+   text a program writes in either is read. Cyan is mixed from blue and green,
+   there being no token for it. */
 :host {
   --log-ansi-background: var(--log-background-color, var(--helix-color-background));
   --log-ansi-black: var(--helix-color-foreground);
   --log-ansi-blue: var(--helix-color-info);
-  --log-ansi-bright-black: var(--helix-color-foreground-subtle);
+  --log-ansi-bright-black: var(--helix-color-foreground-muted);
   --log-ansi-bright-blue: var(--helix-color-info);
   --log-ansi-bright-cyan: color-mix(in oklab, var(--helix-color-info), var(--helix-color-success));
   --log-ansi-bright-green: var(--helix-color-success);

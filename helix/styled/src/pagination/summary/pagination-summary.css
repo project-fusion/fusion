@@ -1,10 +1,10 @@
-/* Prose beside the controls rather than one of them: no box, no hover, and the
-   subtler of the two muted steps, because it is a fact about the result and not
-   a way to move through it. Tabular figures for the reason every other number
-   in this family has them, that a count changing under the pointer should not
-   shuffle the words around it. */
+/* Prose beside the controls rather than one of them: no box, no hover, and no
+   weight of its own where the pages are medium, because it is a fact about the
+   result and not a way to move through it. Tabular figures for the reason every
+   other number in this family has them, that a count changing under the pointer
+   should not shuffle the words around it. */
 :host {
-  color: var(--pagination-summary-foreground-color, var(--helix-color-foreground-subtle));
+  color: var(--pagination-summary-foreground-color, var(--helix-color-foreground-muted));
   display: inline-block;
   font-family: var(--helix-font-sans);
   font-size: var(--pagination-font-size, var(--helix-text-sm));

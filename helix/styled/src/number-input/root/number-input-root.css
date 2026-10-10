@@ -61,7 +61,7 @@
  */
 slot[name="start"]::slotted(*),
 slot[name="end"]::slotted(*) {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;
 }
 

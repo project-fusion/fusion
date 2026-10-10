@@ -38,7 +38,7 @@
 [part="count"] {
   background-color: var(--helix-color-surface-sunken);
   border-radius: var(--helix-radii-full);
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   font-variant-numeric: tabular-nums;

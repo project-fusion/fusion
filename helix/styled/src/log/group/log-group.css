@@ -61,7 +61,7 @@
 
 [part="status"] {
   block-size: var(--helix-size-icon-sm);
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   flex: none;
   inline-size: var(--helix-size-icon-sm);
 }

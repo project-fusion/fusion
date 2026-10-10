@@ -109,11 +109,11 @@
   font-size: var(--helix-text-lg);
 }
 
-/* Quieter than a typed character. Subtle rather than muted: this is a hint at
-   the shape of the field, sitting under nothing, where muted is for text
-   somebody is meant to read. */
+/* Quieter than a typed character, as every placeholder is: the muted ink at
+   the regular weight. */
 [part="placeholder"] {
-  color: var(--pin-input-placeholder-color, var(--helix-color-foreground-subtle));
+  color: var(--pin-input-placeholder-color, var(--helix-color-foreground-muted));
+  font-weight: var(--helix-weight-regular);
 }
 
 /* The caret the field would draw, drawn in the box it is in: the field itself

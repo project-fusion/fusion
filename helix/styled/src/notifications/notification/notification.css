@@ -195,7 +195,7 @@
 /* A bare slot and not a box, so a notification without a caption pays nothing
    for the one it does not have. */
 slot[name="description"]::slotted(*) {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   line-height: var(--helix-leading-normal);
@@ -347,12 +347,12 @@ slot[name="detail"]::slotted(*) {
 }
 
 /* The timestamp: the quietest thing in the row, and never the reason somebody
-   looked, so it takes the smallest size and the subtlest ink.
-   *`foreground-subtle` is lighter than `foreground-muted`**, 0.53 against 0.50
-   in oklch, so the two are easily swapped and the swap draws the quietest thing
-   in the row darker than the content it belongs to. */
+   looked, so it takes the smallest size. **The size is the step down, and the
+   ink is the muted one** the caption has: the quieter `foreground-subtle` is
+   not solved against a theme's grounds, and the readable range holds one quiet
+   ink, so a time somebody reads takes that one. */
 [part="trailing"] > :not([part="controls"]) {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   /* The label's own line box, so the two sit on one line rather than on two
      baselines that happen to be near each other. Inline, `align-items` cannot
      place it: an inline box is laid out on a baseline, and the time measured
@@ -472,7 +472,7 @@ slot[name="detail"]::slotted(*) {
   border: 0;
   border-radius: var(--helix-radii-sm);
   block-size: var(--helix-size-control);
-  color: var(--notifications-dismiss-color, var(--helix-color-foreground-subtle));
+  color: var(--notifications-dismiss-color, var(--helix-color-foreground-muted));
   cursor: pointer;
   display: grid;
   inline-size: var(--helix-size-control);

@@ -40,7 +40,7 @@
 }
 
 [part="item"] ::slotted([slot="description"]) {
-  color: var(--lightbox-item-description-color, var(--helix-color-foreground-subtle));
+  color: var(--lightbox-item-description-color, var(--helix-color-foreground-muted));
   font-size: var(--helix-text-sm);
   line-height: calc(var(--helix-text-sm) * var(--helix-leading-normal));
   text-align: center;

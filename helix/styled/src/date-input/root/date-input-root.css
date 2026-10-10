@@ -31,7 +31,7 @@
    never shrinking when the field is narrow, as `Input` draws them. */
 slot[name="start"]::slotted(*),
 slot[name="end"]::slotted(*) {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   flex: none;
 }
 
@@ -187,7 +187,7 @@ slot[name="end"]::slotted(*) {
   );
   --_segment-placeholder-color: var(
     --date-input-segment-placeholder-color,
-    var(--helix-color-foreground-subtle)
+    var(--helix-color-foreground-muted)
   );
 }
 

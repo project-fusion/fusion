@@ -25,7 +25,7 @@
      on there. The width is kept so the box is the same either way. */
   border-block-end: var(--helix-border-thick) solid transparent;
   border-radius: var(--tabs-tab-radius, var(--_tab-radius, var(--helix-radii-none)));
-  color: var(--tabs-tab-color, var(--helix-color-foreground-subtle));
+  color: var(--tabs-tab-color, var(--helix-color-foreground-muted));
   cursor: pointer;
   font: inherit;
   font-size: var(--tabs-tab-font-size, var(--helix-text-sm));

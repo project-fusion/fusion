@@ -327,7 +327,7 @@
 /* **A hidden group keeps its place and its ring**, so a reader finds it to
    turn back on, and its name steps back to say it is off. */
 [part~="legend-item-hidden"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
 }
 
 [part~="legend-item-hidden"] [part="legend-swatch"] {
@@ -376,7 +376,8 @@ slot[name="filter-icon"]::slotted(*) {
 }
 
 [part="search-field"]::placeholder {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
+  font-weight: var(--helix-weight-regular);
 }
 
 /* The bar is the field to the eye, so the bar takes the ring. */
@@ -535,7 +536,7 @@ slot[name="filter-icon"]::slotted(*) {
 }
 
 [part="settling"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
   inset-block-start: 50%;

@@ -222,7 +222,7 @@ const quietOf = (runs: readonly SandboxToken[], length: number): Uint8Array => {
  * @cssproperty --sandbox-source-constant-color - Color of a `constant` run, under `tokenize`. Defaults to `--helix-color-syntax-constant`.
  * @cssproperty --sandbox-source-invalid-color - Color of an `invalid` run, under `tokenize`. Defaults to `--helix-color-syntax-invalid`.
  * @cssproperty --sandbox-source-keyword-color - Color of a `keyword` run, under `tokenize`. Defaults to `--helix-color-syntax-keyword`.
- * @cssproperty --sandbox-source-line-number-color - Color of the line numbers, under `line-numbers`. Defaults to `--helix-color-foreground-subtle`.
+ * @cssproperty --sandbox-source-line-number-color - Color of the line numbers, under `line-numbers`. Defaults to `--helix-color-foreground-muted`.
  * @cssproperty --sandbox-source-min-block-size - Minimum height of the pane.
  * @cssproperty --sandbox-source-name-color - Color of a `name` run, under `tokenize`. Defaults to `--helix-color-syntax-name`.
  * @cssproperty --sandbox-source-string-color - Color of a `string` run, under `tokenize`. Defaults to `--helix-color-syntax-string`.

@@ -86,7 +86,7 @@
   flex: 0 0 auto;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
-  font-weight: var(--helix-weight-semibold);
+  font-weight: var(--_steps-marker-weight, var(--helix-weight-semibold));
   inline-size: var(--_steps-mark-box, var(--helix-size-icon));
   justify-content: center;
   position: relative;
@@ -133,10 +133,12 @@ slot[name="marker"]::slotted(*) {
  * so a consumer who wants a green 2 sets `--steps-complete-color` and gets one. */
 :host([complete]) [part="marker"] {
   color: var(--steps-complete-color, var(--_steps-ink-complete, var(--helix-color-success)));
+  font-weight: var(--helix-weight-semibold);
 }
 
 :host([current]) [part="marker"] {
   color: var(--steps-current-color, var(--_steps-ink-current, var(--helix-color-primary)));
+  font-weight: var(--helix-weight-semibold);
 }
 
 /* Complete wins where a step is both, because the check is the fact and the
@@ -188,7 +190,7 @@ slot[name="marker"]::slotted(*) {
 
 /* The same inset the name takes as padding, so the two start on one line. */
 [part="description"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-xs);
   padding-inline: var(--_step-inset);

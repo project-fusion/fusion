@@ -25,7 +25,7 @@ describe('image hooks', () => {
       /transition: opacity var\(--image-fade-duration, var\(--helix-duration-normal\)\)/,
     )
     expect(sheet()).toMatch(
-      /color: var\(--image-fallback-color, var\(--helix-color-foreground-subtle\)\)/,
+      /color: var\(--image-fallback-color, var\(--helix-color-foreground-muted\)\)/,
     )
     expect(sheet()).toMatch(
       /--image-fallback-background-color,\s*var\(--image-placeholder-color, var\(--helix-color-surface-sunken\)\)/,

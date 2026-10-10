@@ -40,7 +40,7 @@
 slot[name="start"]::slotted(*),
 slot[name="end"]::slotted(*) {
   align-self: flex-start;
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
   flex: 0 0 auto;
 }
 

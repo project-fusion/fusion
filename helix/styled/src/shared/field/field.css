@@ -3,10 +3,16 @@
    and the drift shows up as a stacked label's padding on a beside-label or a
    hint indented to the host's edge rather than to its label. */
 
-/* Every placeholder in every field, which is where this belongs. */
+/* Every placeholder in every field, which is where this belongs.
+
+   **Regular, where the value is medium.** The muted ink is solved to the
+   contrast target on each theme's grounds, and on a tinted page that puts it
+   close to the value's own ink: on a #bfb39a page it is #493e29 against the
+   value's #000000. The weight is what keeps a placeholder from reading as a
+   value somebody typed. */
 ::placeholder {
-  color: var(--helix-color-foreground-subtle);
-  font-weight: var(--helix-weight-medium);
+  color: var(--helix-color-foreground-muted);
+  font-weight: var(--helix-weight-regular);
 }
 
 [part="label"] {
@@ -49,7 +55,7 @@
 }
 
 [part="hint"] {
-  color: var(--helix-color-foreground-subtle);
+  color: var(--helix-color-foreground-muted);
 }
 
 /* Never beside the hint, always instead of it: the two are one line that changes
