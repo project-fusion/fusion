@@ -1,7 +1,10 @@
 - link "Fusion":
   - /url: /
 - navigation "Sections":
-  - button "Products"
+  - link "Helix":
+    - /url: /helix
+  - link "Cortex":
+    - /url: /cortex
   - link "Services":
     - /url: /company/services
   - link "Insights":

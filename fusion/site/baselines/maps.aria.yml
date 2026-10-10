@@ -1,7 +1,10 @@
 - link "Fusion":
   - /url: /
 - navigation "Sections":
-  - button "Products"
+  - link "Helix":
+    - /url: /helix
+  - link "Cortex":
+    - /url: /cortex
   - link "Services":
     - /url: /company/services
   - link "Insights":
@@ -11,7 +14,7 @@
   - /url: https://github.com/project-fusion
 - button "Preferences"
 - main:
-  - text: Helix Building
+  - text: Helix
   - heading "Interactive maps in your brand’s colors" [level=1]
   - paragraph: Add places, routes, and live positions to a map drawn by MapLibre or Leaflet, styled with your theme.
   - link "Get started":
@@ -208,7 +211,7 @@
     - listitem:
       - paragraph: Elements
       - paragraph: Layers
-      - text: Markers, routes, areas, live positions, and data layers, written as HTML elements inside the map. Building
+      - text: Markers, routes, areas, live positions, and data layers, written as HTML elements inside the map. Active
     - listitem:
       - paragraph: Interface
       - paragraph: The frame
@@ -216,7 +219,7 @@
     - listitem:
       - paragraph: Integration
       - paragraph: The connector
-      - text: Connects the frame to the renderer. It turns the frame’s buttons and keys into map movement, draws the layers you add, and moves the renderer’s credit into the frame. Building
+      - text: Connects the frame to the renderer. It turns the frame’s buttons and keys into map movement, draws the layers you add, and moves the renderer’s credit into the frame. Active
     - listitem:
       - paragraph: Rendering
       - paragraph: The renderer
@@ -224,7 +227,7 @@
     - listitem:
       - paragraph: Theme
       - paragraph: The style
-      - text: A MapLibre style made from your theme, with your brand color on the main roads and light and dark versions from the same settings. It draws landmarks, highway signs, and labels in your theme’s typeface. Building
+      - text: A MapLibre style made from your theme, with your brand color on the main roads and light and dark versions from the same settings. It draws landmarks, highway signs, and labels in your theme’s typeface. Active
     - listitem:
       - paragraph: Data
       - paragraph: Tiles
