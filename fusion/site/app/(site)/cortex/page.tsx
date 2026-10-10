@@ -79,7 +79,10 @@ export default function Page() {
               <span className={hero.tDisplayAccent}>kept when you change the model.</span>
             </h1>
 
-            <Lede>{product.body}</Lede>
+            <Lede>
+              Cortex records what a system knows, where each fact came from, and how far to trust
+              it.
+            </Lede>
 
             <helix-flex class={hero.heroActions} direction="column" gap="md">
               <helix-flex
@@ -101,9 +104,7 @@ export default function Page() {
             {/* The stage, in words, under the doors: a reader looks at the
                 buttons, asks "can I use this", and the answer is the next
                 thing down. */}
-            <p className={hero.heroWorks}>
-              Engram and Trace are being built. Recall is planned, and work has not started.
-            </p>
+            <p className={hero.heroWorks}>Engram and Trace are being built. Recall is planned.</p>
           </helix-flex>
         </section>
 
@@ -120,7 +121,7 @@ export default function Page() {
             {CORTEX_MODULES.map((module) => (
               <helix-flex class={band.bandCell} direction="column" gap="md" key={module.title}>
                 <div className={styles.modulePicture}>
-                  <Picture name={module.picture} />
+                  <Picture camera="isometric" name={module.picture} />
                 </div>
                 <div className={styles.moduleName}>
                   <Eyebrow>{module.title}</Eyebrow>
@@ -145,9 +146,8 @@ export default function Page() {
             <Eyebrow>Trace</Eyebrow>
             <SectionTitle>Every answer, traced to its inputs</SectionTitle>
             <Lede>
-              Trace links every output to what it was derived from: the sources it read, the facts
-              it used, the context it assembled, and the tools it called. Choose an answer, and the
-              drawing lights everything it came from. Trace is still being built.
+              Trace links every output to what it was derived from. Choose an answer, and the
+              drawing lights everything it came from.
             </Lede>
           </helix-flex>
           <div className={band.bandSection}>
@@ -188,19 +188,15 @@ export default function Page() {
             <Lede>
               We take on work that also improves Cortex, so each engagement adds to the foundation.
             </Lede>
-            <helix-flex align-items="center" data-density="lg" gap="md" wrap>
-              <a
-                className="siteActions"
-                data-button="solid"
-                data-button-tone="primary"
-                href="/contact"
-              >
-                Start a conversation
-              </a>
-              <Link data-link="quiet" href="/company/services">
-                Compare the services
-              </Link>
-            </helix-flex>
+            <a
+              className="siteActions"
+              data-button="solid"
+              data-button-tone="primary"
+              data-density="lg"
+              href="/contact"
+            >
+              Start a conversation
+            </a>
           </helix-flex>
         </section>
       </div>

@@ -53,6 +53,19 @@ interface Ids {
   shadow: string
 }
 
+/** A camera: see `CAMERAS`. */
+interface Camera {
+  focal: number
+  pitch: number
+  yaw: number
+}
+
+/** What one picture is drawn with: its own ids, and the camera it is seen through. */
+interface Pic {
+  camera: Camera
+  ids: Ids
+}
+
 /*
  * The camera. `yaw` turns the ground under it, in degrees, so that `x` runs
  * right and away from the viewer and `y` runs right and toward them; `pitch`
@@ -62,7 +75,15 @@ interface Ids {
  * perspective is the isometric projection, where a point at `x, y, z` lands at
  * `(x + y) * 0.866, (y - x) * 0.5 - z`.
  */
-const CAMERA = { focal: Number.POSITIVE_INFINITY, pitch: 42, yaw: 30 }
+const CAMERAS: Record<string, Camera> = {
+  /* Off the diagonal and from a little higher, for the tiles in the band:
+     rows run flatter and more of each top face shows. */
+  band: { focal: Number.POSITIVE_INFINITY, pitch: 42, yaw: 30 },
+  /* The classic projection, for the modules on the Cortex page, whose
+     subjects are stacks and chains: from lower and on the diagonal, more of
+     each side face shows, and a stack reads as a solid. */
+  isometric: { focal: Number.POSITIVE_INFINITY, pitch: 35.264, yaw: 45 },
+}
 
 /*
  * The projection. A point at `x, y, z` on the ground lands at a screen point
@@ -73,15 +94,15 @@ const CAMERA = { focal: Number.POSITIVE_INFINITY, pitch: 42, yaw: 30 }
  * scene is drawn at round numbers on an 80 by 80 ground and scaled up a fifth
  * by `Scene` to fill the tile's crop.
  */
-const iso = (x: number, y: number, z: number) => {
-  const yaw = (CAMERA.yaw * Math.PI) / 180
-  const pitch = (CAMERA.pitch * Math.PI) / 180
+const iso = (x: number, y: number, z: number, { camera }: Pic) => {
+  const yaw = (camera.yaw * Math.PI) / 180
+  const pitch = (camera.pitch * Math.PI) / 180
   /* Across the screen, and toward the viewer along the ground. */
   const u = x * Math.cos(yaw) + y * Math.sin(yaw)
   const v = -x * Math.sin(yaw) + y * Math.cos(yaw)
   /* How far toward the viewer, along the line of sight. */
   const depth = v * Math.cos(pitch) + z * Math.sin(pitch)
-  const k = Number.isFinite(CAMERA.focal) ? CAMERA.focal / (CAMERA.focal - depth) : 1
+  const k = Number.isFinite(camera.focal) ? camera.focal / (camera.focal - depth) : 1
   /* 1.2247 is what makes the isometric case the classic one, with a unit of
      height drawn as a unit on screen. */
   const scale = 1.2247 * k
@@ -106,7 +127,7 @@ function Box({
   d,
   fillOpacity,
   h,
-  ids,
+  pic,
   shadow = false,
   w,
   x,
@@ -117,8 +138,8 @@ function Box({
   d: number
   fillOpacity?: number
   h: number
-  /** The picture's own filter ids, which the shadow refers to. */
-  ids: Ids
+  /** The picture this is part of: its ids, and its camera. */
+  pic: Pic
   /**
    * The gallery's drop shadow under it, for a solid object standing on the
    * ground the projection implies: with no plate to stand on, the shadow is
@@ -131,17 +152,17 @@ function Box({
   /** The height of its base, where it stands on something other than the ground. */
   z?: number
 }) {
-  const a = iso(x, y, z + h)
-  const b = iso(x + w, y, z + h)
-  const c = iso(x + w, y + d, z + h)
-  const dd = iso(x, y + d, z + h)
-  const a0 = iso(x, y, z)
-  const c0 = iso(x + w, y + d, z)
-  const d0 = iso(x, y + d, z)
+  const a = iso(x, y, z + h, pic)
+  const b = iso(x + w, y, z + h, pic)
+  const c = iso(x + w, y + d, z + h, pic)
+  const dd = iso(x, y + d, z + h, pic)
+  const a0 = iso(x, y, z, pic)
+  const c0 = iso(x + w, y + d, z, pic)
+  const d0 = iso(x, y + d, z, pic)
   const left = points([a, dd, d0, a0])
   const right = points([dd, c, c0, d0])
   return (
-    <g filter={shadow ? `url(#${ids.shadow})` : undefined}>
+    <g filter={shadow ? `url(#${pic.ids.shadow})` : undefined}>
       <polygon className={className} fillOpacity={fillOpacity} points={left} />
       <polygon fill="#000" fillOpacity="0.12" points={left} />
       <polygon className={className} fillOpacity={fillOpacity} points={right} />
@@ -155,25 +176,40 @@ function Box({
  * The plate a scene stands on: 80 by 80, 6 thick, with the gallery's shadow
  * under it so it floats on the band. Nothing while `PLATES` is off.
  */
-function Plate({ ids }: { ids: Ids }) {
+function Plate({ pic }: { pic: Pic }) {
   if (!PLATES) {
     return null
   }
-  const top = points([iso(-40, -40, 0), iso(40, -40, 0), iso(40, 40, 0), iso(-40, 40, 0)])
+  const top = points([
+    iso(-40, -40, 0, pic),
+    iso(40, -40, 0, pic),
+    iso(40, 40, 0, pic),
+    iso(-40, 40, 0, pic),
+  ])
   return (
     <>
-      <g filter={`url(#${ids.shadow})`}>
+      <g filter={`url(#${pic.ids.shadow})`}>
         <polygon className="artSurface" points={top} />
       </g>
       <polygon
         className="artInk"
         fillOpacity="0.12"
-        points={points([iso(-40, -40, 0), iso(-40, 40, 0), iso(-40, 40, -6), iso(-40, -40, -6)])}
+        points={points([
+          iso(-40, -40, 0, pic),
+          iso(-40, 40, 0, pic),
+          iso(-40, 40, -6, pic),
+          iso(-40, -40, -6, pic),
+        ])}
       />
       <polygon
         className="artInk"
         fillOpacity="0.28"
-        points={points([iso(-40, 40, 0), iso(40, 40, 0), iso(40, 40, -6), iso(-40, 40, -6)])}
+        points={points([
+          iso(-40, 40, 0, pic),
+          iso(40, 40, 0, pic),
+          iso(40, 40, -6, pic),
+          iso(-40, 40, -6, pic),
+        ])}
       />
       <polygon className="artSurface" points={top} />
       <polygon className="artEdge" points={top} />
@@ -189,6 +225,7 @@ function Flat({
   className,
   d,
   fillOpacity,
+  pic,
   w,
   x,
   y,
@@ -197,6 +234,7 @@ function Flat({
   className: string
   d: number
   fillOpacity?: number
+  pic: Pic
   w: number
   x: number
   y: number
@@ -206,7 +244,12 @@ function Flat({
     <polygon
       className={className}
       fillOpacity={fillOpacity}
-      points={points([iso(x, y, z), iso(x + w, y, z), iso(x + w, y + d, z), iso(x, y + d, z)])}
+      points={points([
+        iso(x, y, z, pic),
+        iso(x + w, y, z, pic),
+        iso(x + w, y + d, z, pic),
+        iso(x, y + d, z, pic),
+      ])}
     />
   )
 }
@@ -221,6 +264,7 @@ function Wall({
   d,
   fillOpacity,
   h,
+  pic,
   x,
   y,
   z,
@@ -229,6 +273,7 @@ function Wall({
   d: number
   fillOpacity?: number
   h: number
+  pic: Pic
   x: number
   y: number
   z: number
@@ -237,7 +282,12 @@ function Wall({
     <polygon
       className={className}
       fillOpacity={fillOpacity}
-      points={points([iso(x, y, z), iso(x, y + d, z), iso(x, y + d, z + h), iso(x, y, z + h)])}
+      points={points([
+        iso(x, y, z, pic),
+        iso(x, y + d, z, pic),
+        iso(x, y + d, z + h, pic),
+        iso(x, y, z + h, pic),
+      ])}
     />
   )
 }
@@ -252,7 +302,7 @@ function Sphere({
   className,
   fillOpacity,
   glow,
-  ids,
+  pic,
   r: size,
   x,
   y,
@@ -261,15 +311,15 @@ function Sphere({
   className: string
   fillOpacity?: number
   glow?: boolean
-  /** The picture's own filter and gradient ids. */
-  ids: Ids
+  /** The picture this is part of: its ids, and its camera. */
+  pic: Pic
   r: number
   x: number
   y: number
   z: number
 }) {
-  const at = iso(x, y, z)
-  const foot = iso(x, y, 0)
+  const at = iso(x, y, z, pic)
+  const foot = iso(x, y, 0, pic)
   /* Nearer is larger, by the projection's own factor. */
   const r = size * at.k
   return (
@@ -300,13 +350,13 @@ function Sphere({
           cx={at.x}
           cy={at.y}
           fillOpacity="0.45"
-          filter={`url(#${ids.glow})`}
+          filter={`url(#${pic.ids.glow})`}
           r={r + 6}
         />
       )}
       <circle className={className} cx={at.x} cy={at.y} fillOpacity={fillOpacity} r={r} />
-      <circle cx={at.x} cy={at.y} fill={`url(#${ids.rim})`} r={r} />
-      <circle cx={at.x} cy={at.y} fill={`url(#${ids.light})`} r={r} />
+      <circle cx={at.x} cy={at.y} fill={`url(#${pic.ids.rim})`} r={r} />
+      <circle cx={at.x} cy={at.y} fill={`url(#${pic.ids.light})`} r={r} />
     </g>
   )
 }
@@ -320,12 +370,12 @@ function Scene({
   children,
   dx = 0,
   dy = 0,
-  ids,
+  pic,
   scale = 1.2,
 }: {
   children: ReactNode
-  /** The picture's own ids, which its defs are given. */
-  ids: Ids
+  /** The picture this is part of, whose ids its defs are given. */
+  pic: Pic
   /** Right by this much after scaling, to center the drawn bounds in the crop. */
   dx?: number
   /** Down by this much after scaling, to center the drawn bounds in the crop. */
@@ -336,15 +386,15 @@ function Scene({
   return (
     <>
       <defs>
-        <radialGradient cx="0.35" cy="0.3" id={ids.light} r="0.65">
+        <radialGradient cx="0.35" cy="0.3" id={pic.ids.light} r="0.65">
           <stop offset="0" stopColor="#fff" stopOpacity="0.6" />
           <stop offset="1" stopColor="#fff" stopOpacity="0" />
         </radialGradient>
-        <radialGradient cx="0.5" cy="0.5" id={ids.rim} r="0.5">
+        <radialGradient cx="0.5" cy="0.5" id={pic.ids.rim} r="0.5">
           <stop offset="0.6" stopColor="#000" stopOpacity="0" />
           <stop offset="1" stopColor="#000" stopOpacity="0.35" />
         </radialGradient>
-        <filter height="300%" id={ids.glow} width="300%" x="-100%" y="-100%">
+        <filter height="300%" id={pic.ids.glow} width="300%" x="-100%" y="-100%">
           <feGaussianBlur stdDeviation="5" />
         </filter>
       </defs>
@@ -362,9 +412,9 @@ function Scene({
  * primary button is the control that takes the color. The keys arrive in
  * reading order on hover, as the gallery's rows do.
  */
-const componentsArt = (ids: Ids): ReactNode => (
-  <Scene dy={-4} ids={ids} scale={1.25}>
-    <Plate ids={ids} />
+const componentsArt = (pic: Pic): ReactNode => (
+  <Scene dy={-4} pic={pic} scale={1.25}>
+    <Plate pic={pic} />
     {[
       /* A button: the key itself is the control. */
       { brand: true, mark: 'bar', x: -38, y: -36 },
@@ -384,34 +434,35 @@ const componentsArt = (ids: Ids): ReactNode => (
           className={key.brand ? 'artBrand' : 'artRaised'}
           d={22}
           h={7}
-          ids={ids}
+          pic={pic}
           shadow
           w={20}
           x={key.x}
           y={key.y}
         />
         {key.mark === 'bar' && (
-          <Flat className="artOnBrand" d={4} w={10} x={key.x + 5} y={key.y + 9} z={6} />
+          <Flat className="artOnBrand" d={4} pic={pic} w={10} x={key.x + 5} y={key.y + 9} z={6} />
         )}
         {key.mark === 'knob' && (
           <>
-            <Flat className="artSolid" d={8} w={14} x={key.x + 3} y={key.y + 7} z={6} />
-            <Flat className="artOnSolid" d={6} w={6} x={key.x + 10} y={key.y + 8} z={6} />
+            <Flat className="artSolid" d={8} pic={pic} w={14} x={key.x + 3} y={key.y + 7} z={6} />
+            <Flat className="artOnSolid" d={6} pic={pic} w={6} x={key.x + 10} y={key.y + 8} z={6} />
           </>
         )}
         {key.mark === 'tick' && (
           <>
-            <Flat className="artSolid" d={10} w={10} x={key.x + 5} y={key.y + 6} z={6} />
-            <Flat className="artOnSolid" d={2} w={6} x={key.x + 7} y={key.y + 10} z={6} />
+            <Flat className="artSolid" d={10} pic={pic} w={10} x={key.x + 5} y={key.y + 6} z={6} />
+            <Flat className="artOnSolid" d={2} pic={pic} w={6} x={key.x + 7} y={key.y + 10} z={6} />
           </>
         )}
         {key.mark === 'field' && (
           <>
-            <Flat className="artSurface" d={8} w={16} x={key.x + 2} y={key.y + 7} z={6} />
+            <Flat className="artSurface" d={8} pic={pic} w={16} x={key.x + 2} y={key.y + 7} z={6} />
             <Flat
               className="artInk"
               d={3}
               fillOpacity={0.28}
+              pic={pic}
               w={8}
               x={key.x + 4}
               y={key.y + 9.5}
@@ -425,6 +476,7 @@ const componentsArt = (ids: Ids): ReactNode => (
               className="artInk"
               d={8}
               fillOpacity={0.12}
+              pic={pic}
               w={14}
               x={key.x + 3}
               y={key.y + 7}
@@ -434,6 +486,7 @@ const componentsArt = (ids: Ids): ReactNode => (
               className="artInk"
               d={2.5}
               fillOpacity={0.55}
+              pic={pic}
               w={7}
               x={key.x + 6}
               y={key.y + 10}
@@ -446,7 +499,7 @@ const componentsArt = (ids: Ids): ReactNode => (
             <Sphere
               className="artInk"
               fillOpacity={0.4}
-              ids={ids}
+              pic={pic}
               r={3.5}
               x={key.x + 7}
               y={key.y + 11}
@@ -456,6 +509,7 @@ const componentsArt = (ids: Ids): ReactNode => (
               className="artInk"
               d={2.5}
               fillOpacity={0.55}
+              pic={pic}
               w={6}
               x={key.x + 12}
               y={key.y + 10}
@@ -485,9 +539,9 @@ const CODE_LINES = [
   { from: -34, to: -10, z: 6 },
 ]
 
-const sandboxArt = (ids: Ids): ReactNode => (
-  <Scene dx={-15} dy={8} ids={ids} scale={1.41}>
-    <Box className="artSolid" d={72} h={36} ids={ids} shadow w={6} x={-16} y={-40} />
+const sandboxArt = (pic: Pic): ReactNode => (
+  <Scene dx={-15} dy={8} pic={pic} scale={1.41}>
+    <Box className="artSolid" d={72} h={36} pic={pic} shadow w={6} x={-16} y={-40} />
     {CODE_LINES.map((line) => (
       <Wall
         className="artOnSolid"
@@ -495,6 +549,7 @@ const sandboxArt = (ids: Ids): ReactNode => (
         fillOpacity={0.55}
         h={3}
         key={line.z}
+        pic={pic}
         x={-16}
         y={line.from}
         z={line.z}
@@ -503,17 +558,17 @@ const sandboxArt = (ids: Ids): ReactNode => (
     <g className="artMotion artLift">
       <ellipse
         className="artInk"
-        cx={iso(24, 24, 0).x}
-        cy={iso(24, 24, 0).y}
+        cx={iso(24, 24, 0, pic).x}
+        cy={iso(24, 24, 0, pic).y}
         fillOpacity="0.12"
         rx="22"
         ry="11"
       />
-      <g className="artLiftShadow" filter={`url(#${ids.shadow})`}>
-        <Box className="artRaised" d={18} h={6} ids={ids} w={26} x={10} y={14} />
+      <g className="artLiftShadow" filter={`url(#${pic.ids.shadow})`}>
+        <Box className="artRaised" d={18} h={6} pic={pic} w={26} x={10} y={14} />
       </g>
-      <Box className="artRaised" d={18} h={6} ids={ids} w={26} x={10} y={14} />
-      <Flat className="artSolid" d={4} w={12} x={17} y={21} z={6} />
+      <Box className="artRaised" d={18} h={6} pic={pic} w={26} x={10} y={14} />
+      <Flat className="artSolid" d={4} pic={pic} w={12} x={17} y={21} z={6} />
     </g>
   </Scene>
 )
@@ -537,8 +592,8 @@ const CHIPS = [
   { className: 'artSunken', tone: 'sunken' },
 ]
 
-const themeArt = (ids: Ids): ReactNode => (
-  <Scene dy={13} ids={ids} scale={1.26}>
+const themeArt = (pic: Pic): ReactNode => (
+  <Scene dy={13} pic={pic} scale={1.26}>
     {CHIPS.map((chip, index) => (
       <g className="artMotion artRow" key={chip.tone} style={{ '--art-i': index } as CSSProperties}>
         <Box
@@ -546,7 +601,7 @@ const themeArt = (ids: Ids): ReactNode => (
           d={34}
           fillOpacity={chip.fillOpacity}
           h={2.4}
-          ids={ids}
+          pic={pic}
           shadow={index === 0}
           w={58}
           x={-14 + index * 1.5}
@@ -555,7 +610,7 @@ const themeArt = (ids: Ids): ReactNode => (
         />
       </g>
     ))}
-    <Box className="artBrand" d={20} h={20} ids={ids} shadow w={20} x={-44} y={-4} />
+    <Box className="artBrand" d={20} h={20} pic={pic} shadow w={20} x={-44} y={-4} />
   </Scene>
 )
 
@@ -580,14 +635,15 @@ const ROADS: { along: 'x' | 'y'; at: number; from: number; to: number }[] = [
   { along: 'x', at: -34, from: 12, to: 40 },
 ]
 
-const mapArt = (ids: Ids): ReactNode => (
-  <Scene dy={-4} ids={ids} scale={1.4}>
+const mapArt = (pic: Pic): ReactNode => (
+  <Scene dy={-4} pic={pic} scale={1.4}>
     {ROADS.map((road) => (
       <Flat
         className="artInk"
         d={road.along === 'x' ? 5 : road.to - road.from}
         fillOpacity={0.28}
         key={`${road.along}${road.at}`}
+        pic={pic}
         w={road.along === 'x' ? road.to - road.from : 5}
         x={road.along === 'x' ? road.from : road.at}
         y={road.along === 'x' ? road.at : road.from}
@@ -600,12 +656,12 @@ const mapArt = (ids: Ids): ReactNode => (
       className="artBrandStroke"
       fill="none"
       points={points([
-        iso(-40, 10, 0),
-        iso(-22, 4, 0),
-        iso(-6, 14, 0),
-        iso(8, 2, 0),
-        iso(18, -10, 0),
-        iso(PIN.x, PIN.y, 0),
+        iso(-40, 10, 0, pic),
+        iso(-22, 4, 0, pic),
+        iso(-6, 14, 0, pic),
+        iso(8, 2, 0, pic),
+        iso(18, -10, 0, pic),
+        iso(PIN.x, PIN.y, 0, pic),
       ])}
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -614,8 +670,8 @@ const mapArt = (ids: Ids): ReactNode => (
     <g className="artMotion artLift">
       <ellipse
         className="artInk"
-        cx={iso(PIN.x, PIN.y, 0).x}
-        cy={iso(PIN.x, PIN.y, 0).y}
+        cx={iso(PIN.x, PIN.y, 0, pic).x}
+        cy={iso(PIN.x, PIN.y, 0, pic).y}
         fillOpacity="0.12"
         rx="6"
         ry="3"
@@ -624,28 +680,28 @@ const mapArt = (ids: Ids): ReactNode => (
         className="artStroke"
         strokeOpacity="0.28"
         strokeWidth="2"
-        x1={iso(PIN.x, PIN.y, 0).x}
-        x2={iso(PIN.x, PIN.y, 0).x}
-        y1={iso(PIN.x, PIN.y, 0).y}
-        y2={iso(PIN.x, PIN.y, 16).y}
+        x1={iso(PIN.x, PIN.y, 0, pic).x}
+        x2={iso(PIN.x, PIN.y, 0, pic).x}
+        y1={iso(PIN.x, PIN.y, 0, pic).y}
+        y2={iso(PIN.x, PIN.y, 16, pic).y}
       />
       <circle
         className="artBrand"
-        cx={iso(PIN.x, PIN.y, 20).x}
-        cy={iso(PIN.x, PIN.y, 20).y}
-        r={6 * iso(PIN.x, PIN.y, 20).k}
+        cx={iso(PIN.x, PIN.y, 20, pic).x}
+        cy={iso(PIN.x, PIN.y, 20, pic).y}
+        r={6 * iso(PIN.x, PIN.y, 20, pic).k}
       />
       <circle
-        cx={iso(PIN.x, PIN.y, 20).x}
-        cy={iso(PIN.x, PIN.y, 20).y}
-        fill={`url(#${ids.rim})`}
-        r={6 * iso(PIN.x, PIN.y, 20).k}
+        cx={iso(PIN.x, PIN.y, 20, pic).x}
+        cy={iso(PIN.x, PIN.y, 20, pic).y}
+        fill={`url(#${pic.ids.rim})`}
+        r={6 * iso(PIN.x, PIN.y, 20, pic).k}
       />
       <circle
-        cx={iso(PIN.x, PIN.y, 20).x}
-        cy={iso(PIN.x, PIN.y, 20).y}
-        fill={`url(#${ids.light})`}
-        r={6 * iso(PIN.x, PIN.y, 20).k}
+        cx={iso(PIN.x, PIN.y, 20, pic).x}
+        cy={iso(PIN.x, PIN.y, 20, pic).y}
+        fill={`url(#${pic.ids.light})`}
+        r={6 * iso(PIN.x, PIN.y, 20, pic).k}
       />
     </g>
   </Scene>
@@ -683,20 +739,20 @@ const BACK_TO_FRONT = (Object.keys(NOTES) as Note[]).sort(
   (p, q) => NOTES[p].y - NOTES[p].x - (NOTES[q].y - NOTES[q].x),
 )
 
-const at = (key: Note) => iso(NOTES[key].x, NOTES[key].y, NOTES[key].z)
+const at = (key: Note, pic: Pic) => iso(NOTES[key].x, NOTES[key].y, NOTES[key].z, pic)
 
-const graphArt = (ids: Ids): ReactNode => (
-  <Scene dy={4} ids={ids} scale={1.37}>
-    <Plate ids={ids} />
+const graphArt = (pic: Pic): ReactNode => (
+  <Scene dy={4} pic={pic} scale={1.37}>
+    <Plate pic={pic} />
     <g className="artStroke" strokeOpacity="0.28" strokeWidth="1.5">
       {QUIET_LINKS.map(([p, q]) => (
-        <line key={p + q} x1={at(p).x} x2={at(q).x} y1={at(p).y} y2={at(q).y} />
+        <line key={p + q} x1={at(p, pic).x} x2={at(q, pic).x} y1={at(p, pic).y} y2={at(q, pic).y} />
       ))}
     </g>
     {SELECTED_LINKS.map((key, i) => (
       <path
         className="artBrandStroke artMotion artDraw"
-        d={`M${at('a').x} ${at('a').y}L${at(key).x} ${at(key).y}`}
+        d={`M${at('a', pic).x} ${at('a', pic).y}L${at(key, pic).x} ${at(key, pic).y}`}
         key={key}
         pathLength="1"
         strokeLinecap="round"
@@ -711,8 +767,8 @@ const graphArt = (ids: Ids): ReactNode => (
           className={'selected' in note ? 'artBrand' : 'artInk'}
           fillOpacity={'selected' in note ? undefined : 0.4}
           glow={'selected' in note}
-          ids={ids}
           key={key}
+          pic={pic}
           r={note.r}
           x={note.x}
           y={note.y}
@@ -729,39 +785,39 @@ const graphArt = (ids: Ids): ReactNode => (
  * second, lifted between them in the brand. The learned store is the smaller,
  * since not everything seen is kept. The moving chip lifts on hover.
  */
-const engramArt = (ids: Ids): ReactNode => (
-  <Scene dy={-6} ids={ids} scale={1.54}>
-    {[0, 1, 2, 3, 4].map((index) => (
+const engramArt = (pic: Pic): ReactNode => (
+  <Scene dy={3} pic={pic} scale={1.61}>
+    {[0, 1, 2, 3, 4, 5, 6].map((index) => (
       <Box
         className="artInk"
         d={26}
         fillOpacity={0.28}
-        h={2.4}
-        ids={ids}
+        h={3}
         key={index}
+        pic={pic}
         shadow={index === 0}
         w={30}
-        x={-38 + index * 1.2}
-        y={-8 - index * 1.2}
-        z={index * 2.9}
+        x={-38 + index * 0.8}
+        y={-8 - index * 0.8}
+        z={index * 3.6}
       />
     ))}
-    {[0, 1, 2].map((index) => (
+    {[0, 1, 2, 3].map((index) => (
       <Box
-        className={index === 2 ? 'artBrandSubtle' : 'artBrandMuted'}
+        className={index === 3 ? 'artBrandSubtle' : 'artBrandMuted'}
         d={26}
-        h={2.4}
-        ids={ids}
+        h={3}
         key={index}
+        pic={pic}
         shadow={index === 0}
         w={30}
-        x={8 + index * 1.2}
-        y={-8 - index * 1.2}
-        z={index * 2.9}
+        x={8 + index * 0.8}
+        y={-8 - index * 0.8}
+        z={index * 3.6}
       />
     ))}
     <g className="artMotion artLift">
-      <Box className="artBrand" d={26} h={2.4} ids={ids} shadow w={30} x={-14} y={-10} z={22} />
+      <Box className="artBrand" d={26} h={3} pic={pic} shadow w={30} x={-14} y={-10} z={32} />
     </g>
   </Scene>
 )
@@ -782,23 +838,23 @@ const TRACE_STEPS = [
 
 const TRACE_BRANCH = { x: 0, y: 28, z: 6 }
 
-const traceArt = (ids: Ids): ReactNode => (
-  <Scene dy={10} ids={ids} scale={1.53}>
+const traceArt = (pic: Pic): ReactNode => (
+  <Scene dy={14} pic={pic} scale={1.67}>
     <line
       className="artStroke"
       strokeOpacity="0.28"
       strokeWidth="1.5"
-      x1={iso(TRACE_BRANCH.x, TRACE_BRANCH.y, TRACE_BRANCH.z).x}
-      x2={iso(TRACE_STEPS[3].x, TRACE_STEPS[3].y, TRACE_STEPS[3].z).x}
-      y1={iso(TRACE_BRANCH.x, TRACE_BRANCH.y, TRACE_BRANCH.z).y}
-      y2={iso(TRACE_STEPS[3].x, TRACE_STEPS[3].y, TRACE_STEPS[3].z).y}
+      x1={iso(TRACE_BRANCH.x, TRACE_BRANCH.y, TRACE_BRANCH.z, pic).x}
+      x2={iso(TRACE_STEPS[3].x, TRACE_STEPS[3].y, TRACE_STEPS[3].z, pic).x}
+      y1={iso(TRACE_BRANCH.x, TRACE_BRANCH.y, TRACE_BRANCH.z, pic).y}
+      y2={iso(TRACE_STEPS[3].x, TRACE_STEPS[3].y, TRACE_STEPS[3].z, pic).y}
     />
     {TRACE_STEPS.slice(1).map((step, i) => {
       const from = TRACE_STEPS[i]
       return (
         <path
           className="artBrandStroke artMotion artDraw"
-          d={`M${iso(step.x, step.y, step.z).x} ${iso(step.x, step.y, step.z).y}L${iso(from.x, from.y, from.z).x} ${iso(from.x, from.y, from.z).y}`}
+          d={`M${iso(step.x, step.y, step.z, pic).x} ${iso(step.x, step.y, step.z, pic).y}L${iso(from.x, from.y, from.z, pic).x} ${iso(from.x, from.y, from.z, pic).y}`}
           key={step.x}
           pathLength="1"
           strokeLinecap="round"
@@ -807,14 +863,14 @@ const traceArt = (ids: Ids): ReactNode => (
         />
       )
     })}
-    <Sphere className="artInk" fillOpacity={0.4} ids={ids} r={4.5} {...TRACE_BRANCH} />
+    <Sphere className="artInk" fillOpacity={0.4} pic={pic} r={4.5} {...TRACE_BRANCH} />
     {TRACE_STEPS.map((step, i) => (
       <Sphere
         className={i === TRACE_STEPS.length - 1 ? 'artBrand' : 'artInk'}
         fillOpacity={i === TRACE_STEPS.length - 1 ? undefined : 0.4}
         glow={i === TRACE_STEPS.length - 1}
-        ids={ids}
         key={step.x}
+        pic={pic}
         r={4.5 + i * 0.6}
         x={step.x}
         y={step.y}
@@ -829,8 +885,8 @@ const traceArt = (ids: Ids): ReactNode => (
  * two chosen for the task at hand lifted out and gathered at the front in the
  * brand. The chosen pair lifts on hover.
  */
-const recallArt = (ids: Ids): ReactNode => (
-  <Scene dy={1} ids={ids} scale={1.19}>
+const recallArt = (pic: Pic): ReactNode => (
+  <Scene dy={0} pic={pic} scale={1.24}>
     {[
       { x: -38, y: -34 },
       { x: -6, y: -34 },
@@ -843,8 +899,8 @@ const recallArt = (ids: Ids): ReactNode => (
         d={22}
         fillOpacity={0.28}
         h={2.4}
-        ids={ids}
         key={`${chip.x}${chip.y}`}
+        pic={pic}
         shadow
         w={26}
         x={chip.x}
@@ -852,13 +908,13 @@ const recallArt = (ids: Ids): ReactNode => (
       />
     ))}
     <g className="artMotion artLift">
-      <Box className="artBrandMuted" d={22} h={2.4} ids={ids} shadow w={26} x={-8} y={16} z={8} />
-      <Box className="artBrand" d={22} h={2.4} ids={ids} w={26} x={-6} y={14} z={13} />
+      <Box className="artBrandMuted" d={22} h={3} pic={pic} shadow w={26} x={-8} y={16} z={12} />
+      <Box className="artBrand" d={22} h={3} pic={pic} w={26} x={-6} y={14} z={18} />
     </g>
   </Scene>
 )
 
-const pictures: Record<string, (ids: Ids) => ReactNode> = {
+const pictures: Record<string, (pic: Pic) => ReactNode> = {
   components: componentsArt,
   engram: engramArt,
   graph: graphArt,
@@ -881,11 +937,18 @@ const pictures: Record<string, (ids: Ids) => ReactNode> = {
  * fragment as the shape referencing it, so each tile carries its own, as
  * each gallery card does.
  */
-function Frame({ children, ids }: { children: ReactNode; ids: Ids }) {
+function Frame({ children, pic }: { children: ReactNode; pic: Pic }) {
   return (
     <svg aria-hidden="true" className="componentArt" viewBox="32 28 256 144">
       <defs>
-        <filter className="artShadow" height="200%" id={ids.shadow} width="200%" x="-50%" y="-50%">
+        <filter
+          className="artShadow"
+          height="200%"
+          id={pic.ids.shadow}
+          width="200%"
+          x="-50%"
+          y="-50%"
+        >
           <feDropShadow dx="0" dy="4" stdDeviation="5" />
         </filter>
       </defs>
@@ -899,16 +962,25 @@ function Frame({ children, ids }: { children: ReactNode; ids: Ids }) {
  * no drawing renders nothing, so a tile without one is a name and a sentence
  * and looks deliberate until somebody draws it.
  */
-export function Picture({ name }: { name: string }) {
+export function Picture({
+  camera = 'band',
+  name,
+}: {
+  camera?: keyof typeof CAMERAS
+  name: string
+}) {
   /* Letters and digits only: React's ids carry punctuation that a `url(#…)`
      reference does not survive. */
   const id = useId().replace(/[^a-zA-Z0-9]/g, '')
-  const ids: Ids = {
-    glow: `art${id}glow`,
-    light: `art${id}light`,
-    rim: `art${id}rim`,
-    shadow: `art${id}shadow`,
+  const pic: Pic = {
+    camera: CAMERAS[camera] ?? CAMERAS.band,
+    ids: {
+      glow: `art${id}glow`,
+      light: `art${id}light`,
+      rim: `art${id}rim`,
+      shadow: `art${id}shadow`,
+    },
   }
-  const body = pictures[name]?.(ids)
-  return body ? <Frame ids={ids}>{body}</Frame> : null
+  const body = pictures[name]?.(pic)
+  return body ? <Frame pic={pic}>{body}</Frame> : null
 }
