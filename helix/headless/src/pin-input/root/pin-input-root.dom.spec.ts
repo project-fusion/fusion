@@ -84,6 +84,24 @@ const type = async (host: Pin, key: string): Promise<void> => {
   await settle(host)
 }
 
+/** Focus leaving the field, which commits an edited code. */
+const leave = async (host: Pin): Promise<void> => {
+  control(host).dispatchEvent(new FocusEvent('blur'))
+  await settle(host)
+}
+
+/** Every `helix-complete` the host sends, by the code it carries. */
+const completions = (host: Pin): string[] => {
+  const seen: string[] = []
+  host.addEventListener('helix-complete', (event) => {
+    seen.push((event as CustomEvent<{ value: string }>).detail.value)
+  })
+  return seen
+}
+
+/** A later task, where a timer a listener set has run. */
+const task = (): Promise<void> => new Promise((resolve) => setTimeout(resolve))
+
 describe('input pin', () => {
   test('one box per character, drawn from one field', async () => {
     const host = await pin('length="4"')
@@ -371,11 +389,6 @@ describe('input pin commit', () => {
     return seen
   }
 
-  const leave = async (host: Pin): Promise<void> => {
-    control(host).dispatchEvent(new FocusEvent('blur'))
-    await settle(host)
-  }
-
   test('a value the consumer assigned is not announced as one the reader entered', async () => {
     /* Measured in Chromium against a native input: a script assigns while the
        field is unfocused, the reader visits and edits nothing, and native stays
@@ -544,6 +557,108 @@ describe('a code a consumer refuses and writes back', () => {
     await press(host, 'ArrowRight')
     await type(host, '9')
     expect([host.value, activeBox(host)]).toEqual(['1234', 1])
+  })
+
+  /**
+   * Refuses every edit and writes the code back in upper case: during the
+   * dispatch, as React's `flushSync` does, or in a later task, as React does
+   * without it.
+   */
+  const writeBack = (host: Pin, later: boolean): void => {
+    host.addEventListener('helix-before-change', (event) => {
+      event.preventDefault()
+      const value = (event as CustomEvent<{ value: string }>).detail.value.toUpperCase()
+      if (later) {
+        setTimeout(() => {
+          host.value = value
+        })
+      } else {
+        host.value = value
+      }
+    })
+  }
+
+  /** Types `keys` one at a time, each after the value written back for the one before. */
+  const typeEach = async (host: Pin, keys: string): Promise<void> => {
+    for (const key of keys) {
+      await type(host, key)
+      await task()
+      await settle(host)
+    }
+  }
+
+  /* Only a code the field took completed, so a controlled code filled every
+     box, `helix-complete` never came, and `autosubmit` sent nothing. */
+  test('completes the code written back, whether it is written during the dispatch or in a later task', async () => {
+    for (const later of [false, true]) {
+      const host = await pin('length="4" type="alphanumeric"')
+      writeBack(host, later)
+      const completed = completions(host)
+      await arrive(host)
+      await typeEach(host, 'ab1')
+      expect(completed).toEqual([])
+      await typeEach(host, 'c')
+      expect([host.value, completed]).toEqual(['AB1C', ['AB1C']])
+    }
+  })
+
+  test('and autosubmit submits it once', async () => {
+    for (const later of [false, true]) {
+      document.body.innerHTML =
+        '<form><helix-headless-pin-input label="Code" length="4" autosubmit></helix-headless-pin-input></form>'
+      const form = document.querySelector('form') as HTMLFormElement
+      const host = document.querySelector('helix-headless-pin-input') as Pin
+      await host.updateComplete
+      let submitted = 0
+      form.requestSubmit = () => {
+        submitted += 1
+      }
+      writeBack(host, later)
+      await arrive(host)
+      await typeEach(host, '123')
+      expect(submitted).toBe(0)
+      await typeEach(host, '4')
+      await leave(host)
+      expect([host.value, submitted]).toEqual(['1234', 1])
+    }
+  })
+
+  test('says so once, when the same code is written during the dispatch and again later', async () => {
+    const host = await pin('length="4"')
+    host.addEventListener('helix-before-change', (event) => {
+      event.preventDefault()
+      const { value } = (event as CustomEvent<{ value: string }>).detail
+      host.value = value
+      setTimeout(() => {
+        host.value = value
+      })
+    })
+    const heard: string[] = []
+    for (const name of ['helix-complete', 'change']) {
+      host.addEventListener(name, () => heard.push(name))
+    }
+    await arrive(host)
+    await paste(host, '1234')
+    await task()
+    await settle(host)
+    await leave(host)
+    expect(heard).toEqual(['helix-complete', 'change'])
+  })
+
+  /* A script's value is no edit the reader made, as `change` already holds. */
+  test('a code a script writes completes nothing, also after the reader left a refused edit', async () => {
+    const host = await pin('length="4"')
+    host.addEventListener('helix-before-change', (event) => event.preventDefault())
+    const completed = completions(host)
+    host.value = '1234'
+    await settle(host)
+    await arrive(host)
+    await press(host, 'Home')
+    await type(host, '9')
+    await leave(host)
+    host.value = '5678'
+    await settle(host)
+    expect([host.value, completed]).toEqual(['5678', []])
   })
 })
 

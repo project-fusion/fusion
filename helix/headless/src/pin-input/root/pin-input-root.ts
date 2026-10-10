@@ -91,6 +91,12 @@ const keepFocus = (event: Event): void => event.preventDefault()
  * a message shows and `aria-required` under `required`. `helix-complete` is a
  * `HelixCompleteEvent` sent once the last box is filled.
  *
+ * When you refuse an edit and write back a value that fills every box, the
+ * code is complete as well: `helix-complete` carries your value, and
+ * `autosubmit` submits it. The value counts whether you write it during the
+ * `helix-before-change` or later. A value written with no refused edit before
+ * it, or after focus has left the field, sends no `helix-complete`.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -149,8 +155,9 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
 
   /**
    * Whether the form is submitted once the last box is filled, as Web
-   * Awesome's `autosubmit` and Radix's `autoSubmit`. Only for a code the field
-   * took: a refused last character submits nothing.
+   * Awesome's `autosubmit` and Radix's `autoSubmit`. The boxes fill from a
+   * code the field takes, or from a value you write back after refusing the
+   * edit. A refused last character with nothing written back submits nothing.
    */
   @property({ type: Boolean })
   autosubmit = false
@@ -267,17 +274,26 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   private pressedAt: number | undefined = undefined
 
   /**
-   * A refused edit: the box the caret was in, and the box the edit would have
-   * moved it to.
+   * A refused edit nothing has been written back for yet: the box the caret
+   * was in, and the box the edit would have moved it to.
    *
    * A consumer who takes the decision refuses the edit and writes a value of
-   * their own, during the dispatch or after it, and the caret moves on with
-   * that value as it does with a value the element took. Measured in Chromium
-   * with React before this: the caret stayed where it was, so every key of a
-   * controlled code replaced the first, and typing `123` left `3`. With nothing
-   * written back, or with the caret moved since, it stays where it is.
+   * their own, during the dispatch as React's `flushSync` does, or later as
+   * React does without it. The caret moves on with that value as it does with
+   * a value the element took, and a value that fills every box completes the
+   * code. `take` reads a value written during the dispatch, and this record
+   * waits for one written later. Measured in Chromium with React before the
+   * caret moved: it stayed where it was, so every key of a controlled code
+   * replaced the first, and typing `123` left `3`. With nothing written back,
+   * or with the caret moved since, it stays where it is.
+   *
+   * Dropped when focus leaves, so a value a script writes after that answers
+   * no edit and completes nothing.
    */
   private refused: { readonly at: number; readonly caret: number } | undefined = undefined
+
+  /** Whether the update running now applies a value written back for a refused edit. */
+  private answered = false
 
   /** How many boxes there are, clamped once so every reader agrees. */
   private get count(): number {
@@ -306,33 +322,46 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * who owns the code can refuse it, and a refused edit puts the field back.
    */
   private take({ caret, code }: CodeEdit): void {
+    const before = this.value
     const applied = this.requestValue(code)
+    /* A value the consumer wrote during the dispatch of an edit they refused
+       is their answer to it, and the field moves on with it. */
+    const written = !applied && this.value !== before
     const control = this.control
     if (control) {
       restoreValue(control, this.value)
     }
-    if (this.active >= 0 && applied) {
+    if (this.active >= 0 && (applied || written)) {
       this.active = caret
     }
-    this.refused = applied ? undefined : { at: this.active, caret }
+    this.refused = applied || written ? undefined : { at: this.active, caret }
     this.placeCaret(true)
-    /* Only a code the element took. A refused last character left the shorter
+    /* Only a code the field holds: the one it took, or the consumer's answer.
+       A refused last character with nothing written back left the shorter
        code in place, and announcing the refused one sent an auto-submit a code
        the field does not hold. */
-    if (applied && this.value === code && code.length === this.count) {
-      /* The verdict for the whole code first, which the update reports.
-         Measured in Chromium before this: typing `1234` one key at a time
-         left the form holding the `tooShort` verdict for `123`, so
-         `autosubmit` and a `requestSubmit()` in `helix-complete` met
-         `invalid` and never submitted. */
-      this.runPendingUpdate()
-      this.dispatchEvent(new HelixCompleteEvent({ value: code }))
-      /* And a native `change`, because a filled code is this control's commit:
-         the field's own `change` waits for it to lose focus. */
-      this.commit()
-      if (this.autosubmit) {
-        submitImplicitly(this.form)
-      }
+    if (((applied && this.value === code) || written) && this.value.length === this.count) {
+      this.complete()
+    }
+  }
+
+  /**
+   * Announces a filled code: `helix-complete`, the commit, and the submit
+   * `autosubmit` asks for.
+   */
+  private complete(): void {
+    /* The verdict for the whole code first, which the update reports.
+       Measured in Chromium before this: typing `1234` one key at a time left
+       the form holding the `tooShort` verdict for `123`, so `autosubmit` and a
+       `requestSubmit()` in `helix-complete` met `invalid` and never
+       submitted. */
+    this.runPendingUpdate()
+    this.dispatchEvent(new HelixCompleteEvent({ value: this.value }))
+    /* And a native `change`, because a filled code is this control's commit:
+       the field's own `change` waits for it to lose focus. */
+    this.commit()
+    if (this.autosubmit) {
+      submitImplicitly(this.form)
     }
   }
 
@@ -488,6 +517,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    */
   private readonly handleBlur = (): void => {
     this.active = -1
+    this.refused = undefined
     this.commit()
   }
 
@@ -579,6 +609,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     const refused = this.refused
     if (changed.has('value') && refused !== undefined) {
       this.refused = undefined
+      this.answered = true
       if (this.active >= 0 && this.active === refused.at) {
         this.active = refused.caret
       }
@@ -590,6 +621,13 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     this.toggleState('complete', this.value.length >= this.count)
     this.sync()
     this.placeCaret()
+    /* After `sync`, so the form meets the verdict for the code it is handed. */
+    if (this.answered) {
+      this.answered = false
+      if (this.value.length === this.count) {
+        this.complete()
+      }
+    }
   }
 
   /**
