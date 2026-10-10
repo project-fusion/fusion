@@ -61,10 +61,14 @@
     - /url: /helix/sandbox
   - link "Build a theme":
     - /url: /helix/theme
+  - switch "Outline the Helix elements"
+  - text: Outline the Helix elements
+  - status
   - text: Helix
-  - heading "One brand color, a full palette" [level=3]
-  - text: Pick one brand color, and every surface, border, and text color on this page follows from it. Each text color is checked for contrast against its background.
-  - button "Read about theming"
+  - heading "Use the behavior with your own design" [level=3]
+  - text: Every component comes in two tiers. The headless tier holds its structure, state, and form behavior, and you write all of its styling.
+  - link "Read about the tiers":
+    - /url: /helix/docs/tiers
   - text: Showing
   - radio "Controls" [checked]
   - radio "Data"
@@ -251,7 +255,7 @@
         - cell "wa-carousel, experimental wa-carousel"
   - paragraph: Every system ships buttons, form controls, menus, and dialogs, so the table lists the rest. Read from each system's manifest on October 9, 2026. Hover a mark to see the element.
   - paragraph: Services
-  - heading "One to eight weeks" [level=2]
+  - heading "Hire our engineers" [level=2]
   - paragraph: Every service runs two days a week, alongside your team.
   - paragraph: AI capability audit
   - paragraph: Up to two weeks to find out which AI work is worth building. It fits around your roadmap and does not commit you to more.
@@ -259,18 +263,12 @@
   - paragraph: Helix, applied to your product. We build your components in your repository, as working code.
   - paragraph: Conversational build
   - paragraph: We build software with you while the specification is still changing, and agree the next step in each conversation.
+  - heading "You keep all of it" [level=3]
+  - paragraph: The work lands in your repository under your license. We hand it over as we go, so you do not need us on a retainer afterward.
+  - heading "We tell you what is not done" [level=3]
+  - paragraph: Every product shows its stage. Active means it ships to users. Building means work is underway and nothing has shipped. Declared means it is planned.
   - link "Compare the services":
     - /url: /company/services
-  - paragraph: Working with us
-  - heading "We build in your codebase" [level=2]
-  - paragraph: The system is already built
-  - paragraph: Helix already has its token layer, components, framework types, sandbox, and build checks. Your project starts from that.
-  - paragraph: The work takes weeks
-  - paragraph: A typical engagement is four weeks at two days a week. The same work started from nothing takes months.
-  - paragraph: You keep all of it
-  - paragraph: The work lands in your repository under your license. We hand it over as we go, so you do not need us on a retainer afterward.
-  - paragraph: We tell you what is not done
-  - paragraph: Every product shows its stage. Active means it ships to users. Building means work is underway and nothing has shipped. Declared means it is planned.
   - paragraph: Insights
   - heading "How we decide, and why" [level=2]
   - link "Read all articles":
