@@ -498,3 +498,12 @@
 .termsAction {
   align-self: center;
 }
+
+/* ── The links beside the showcase ─────────────────────────────────── */
+
+/* A quiet link with an arrow after it, so it reads as a place to go. */
+.onward {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--helix-space-2xs);
+}

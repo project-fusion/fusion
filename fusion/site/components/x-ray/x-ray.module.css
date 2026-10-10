@@ -1,21 +1,16 @@
 /**
- * The x-ray: a quiet toggle, a highlight and a name over the hovered element,
+ * The x-ray: a switch, a highlight and a name over the hovered element,
  * and a status bar while it is on.
  */
 
-/* A button set as the quiet links beside it, with the button's own chrome
-   taken away so it reads as one of them. */
-.toggle,
+/* The status bar's way out, set as a quiet link with the button's own chrome
+   taken away. */
 .close {
   background: none;
   border: var(--helix-space-none);
   cursor: pointer;
   font: inherit;
   padding: var(--helix-space-none);
-}
-
-.toggle[aria-pressed="true"] {
-  color: var(--helix-color-primary);
 }
 
 /* The hovered element, washed in the brand color over its outline. Fixed and
