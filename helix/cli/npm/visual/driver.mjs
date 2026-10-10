@@ -814,10 +814,19 @@ const handlers = {
         continue
       }
       try {
-        const answer =
-          provider === 'anthropic'
-            ? await askClaude(client, settings, group)
-            : await askOllama(settings, group)
+        const ask = () =>
+          provider === 'anthropic' ? askClaude(client, settings, group) : askOllama(settings, group)
+        let answer = await ask()
+        /* A verdict with no reason is asked once more, and the second answer
+           is kept with the tokens of both. */
+        if (!answer.error && String(answer.explanation ?? '').trim() === '') {
+          const again = await ask()
+          answer = {
+            ...again,
+            input: answer.input + again.input,
+            output: answer.output + again.output,
+          }
+        }
         answers.push(answer)
       } catch (caught) {
         /* The API's own sentence when it gave one, without the request id

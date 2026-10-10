@@ -207,7 +207,13 @@ pub fn finish(run: &Run) -> Code {
                 }
                 failures.push(failure);
             }
-            Fate::Steadied | Fate::Tolerated { .. } => notes.push(format!("{what}: {sentence}")),
+            Fate::Steadied | Fate::Tolerated { .. } => {
+                let mut note = format!("{what}: {sentence}");
+                for line in row.attribution {
+                    let _ = write!(note, "\n    {line}");
+                }
+                notes.push(note);
+            }
             Fate::Held => held += 1,
             Fate::Written(why) => written.push(format!("{what} ({why})")),
             _ => {}
@@ -694,6 +700,40 @@ const SCRIPT: &str = "for(const s of document.querySelectorAll('.swipe')){const 
 s.querySelector('input').addEventListener('input',e=>{o.style.clipPath=`inset(0 0 0 ${e.target.value}%)`})}";
 
 /// The summary a CI job prints, from a run's `run.json`: the verdict, then a
+/// One group as a line of the Markdown summary.
+fn markdown_group(one: &Value) -> String {
+    let mut out = String::new();
+    let _ = write!(
+        out,
+        "- **{}**: {}.",
+        plural(
+            one["members"].as_array().map_or(0, Vec::len),
+            "shot",
+            "shots"
+        ),
+        one["signature"]
+            .as_str()
+            .unwrap_or_default()
+            .trim_end_matches('.')
+    );
+    let elsewhere: Vec<&str> = one["elsewhere"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(Value::as_str)
+        .collect();
+    if !elsewhere.is_empty() {
+        let _ = write!(out, " Also failing lately on {}.", elsewhere.join(", "));
+    }
+    if let (Some(verdict), Some(explanation)) =
+        (one["verdict"].as_str(), one["explanation"].as_str())
+    {
+        let _ = write!(out, " *{verdict}*: {explanation}");
+    }
+    out.push('\n');
+    out
+}
+
 /// table of what did not pass.
 pub fn markdown(record: &Value) -> String {
     let mut out = String::from("### Visual tests\n\n");
@@ -706,31 +746,7 @@ pub fn markdown(record: &Value) -> String {
     {
         out.push_str("Changes, grouped:\n\n");
         for one in groups {
-            let _ = write!(
-                out,
-                "- **{}**: {}.",
-                plural(
-                    one["members"].as_array().map_or(0, Vec::len),
-                    "shot",
-                    "shots"
-                ),
-                one["signature"].as_str().unwrap_or_default()
-            );
-            let elsewhere: Vec<&str> = one["elsewhere"]
-                .as_array()
-                .into_iter()
-                .flatten()
-                .filter_map(Value::as_str)
-                .collect();
-            if !elsewhere.is_empty() {
-                let _ = write!(out, " Also failing lately on {}.", elsewhere.join(", "));
-            }
-            if let (Some(verdict), Some(explanation)) =
-                (one["verdict"].as_str(), one["explanation"].as_str())
-            {
-                let _ = write!(out, " *{verdict}*: {explanation}");
-            }
-            out.push('\n');
+            out.push_str(&markdown_group(one));
         }
         out.push('\n');
     }

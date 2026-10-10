@@ -401,9 +401,12 @@ fn manifests(config: &Config, base: &Path) -> BTreeMap<String, String> {
             .and_then(|text| serde_json::from_str::<Value>(&text).map_err(|error| error.to_string()))
         {
             Ok(manifest) => {
-                let folder = Path::new(name)
+                /* From the repository's root when there is one, so a site
+                in a subfolder names `helix/styled/src/…` and not `../../`,
+                and the triage's diff reads the same path. */
+                let folder = path
                     .parent()
-                    .map(|one| one.to_string_lossy().replace('\\', "/"))
+                    .map(|one| triage::from_top(base, one))
                     .unwrap_or_default();
                 found.extend(boxes::tags(&manifest, &folder));
             }
@@ -1108,8 +1111,8 @@ pub fn run(options: &Options) -> Outcome<Code> {
     let files = manifests(&config, &base);
     let mut again: Vec<(usize, usize)> = Vec::new();
     /* **The first take of a shot taken again**, kept so a shot that matches on
-       the second still shows what moved on the first: what makes it settle is
-       read off that picture, and nothing else records it. */
+    the second still shows what moved on the first: what makes it settle is
+    read off that picture, and nothing else records it. */
     let mut firsts: BTreeMap<(usize, usize), Vec<u8>> = BTreeMap::new();
     let mut first_diffs: BTreeMap<(usize, usize), Vec<u8>> = BTreeMap::new();
     for (at, entry) in mine
@@ -1265,16 +1268,33 @@ pub fn run(options: &Options) -> Outcome<Code> {
                         }
                         Ok(Verdict::Matched | Verdict::Within(_)) => {
                             /* The first take in the report, beside the baseline
-                               and marked where it differed, when the two are one
-                               size. */
+                            and marked where it differed, when the two are one
+                            size. */
                             if let (Some(kept), Some(taken)) =
                                 (existing.as_deref(), firsts.get(&(at, shot)))
                             {
                                 if let (Ok(before), Ok(after)) =
                                     (image::decode(kept), image::decode(taken))
                                 {
-                                    if (before.width, before.height) == (after.width, after.height) {
-                                        let (_, drawn) = diff::marked(&before, &after, diff.threshold);
+                                    if (before.width, before.height) == (after.width, after.height)
+                                    {
+                                        let (_, drawn) =
+                                            diff::marked(&before, &after, diff.threshold);
+                                        /* What moved on the first take, traced
+                                        through the second take's boxes, so a
+                                        shot that keeps needing two says what
+                                        will not hold still. */
+                                        if let Some(now) = boxes::read(bytes) {
+                                            attributions.insert(
+                                                (at, shot),
+                                                boxes::attribute(
+                                                    &boxes::regions(&drawn),
+                                                    &now,
+                                                    boxes::read(kept).as_deref(),
+                                                    &files,
+                                                ),
+                                            );
+                                        }
                                         if let Ok(encoded) = image::encode(&drawn) {
                                             first_diffs.insert((at, shot), encoded);
                                         }
