@@ -11,6 +11,10 @@
      seen at a slant is wider than it is tall. The hook sets one height. */
   aspect-ratio: 4 / 3;
   block-size: var(--spatial-bar-chart-block-size, auto);
+  /* The width the page gives it, always: a ratio given a height cap carries
+     the cap across, and a plot that reached it narrowed to a third less than
+     its box. */
+  inline-size: 100%;
   max-block-size: var(--spatial-bar-chart-block-size, 22em);
   border-radius: var(--helix-radii-md);
   overflow: hidden;
