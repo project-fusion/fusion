@@ -214,12 +214,13 @@ Run these after you write Helix code, and fix every finding at `error` and
 
 | Command | MCP tool | What it finds |
 |---|---|---|
-| `helix scan` | `helix_check` | Unknown tags, attributes, values, slots, parts, hooks, events, and tokens, a native element a Helix family replaces, a missing import, and the rest, each with its file and line |
+| `helix scan` | `helix_check` | Unknown tags, attributes, values, slots, parts, hooks, events, and tokens, a native element a Helix family replaces, a missing import, a button inside a button, `disabled="false"`, and the rest, each with its file and line |
 | `helix diagnostics --once <url>` | `helix_check_page` | The same on the running page, and what the library logged as it ran |
 | `helix theme audit` | `helix_audit_theme` | Every foreground and background pair in your theme that misses its contrast target |
 
 `helix scan --file <path>` reports one file's findings and still reads the whole
-project, so an import in another file counts.
+project, so an import in another file counts. [Diagnostics](https://fusion.dev/helix/docs/diagnostics)
+lists every kind of finding, and what the checks do not cover.
 
 ### What this guide does not cover
 

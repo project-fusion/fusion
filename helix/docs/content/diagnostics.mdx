@@ -1,0 +1,238 @@
+---
+description: Find the Helix mistakes the browser accepts without an error, on your running pages and in your code, with a setup for Vite, React, Next.js, and CI.
+section: Tooling
+title: Diagnostics
+---
+
+# Diagnostics
+
+Helix diagnostics finds the mistakes in your markup and styles that the browser
+accepts without an error. A `::part()` that names a part nothing publishes
+matches nothing, an attribute value outside the set a component takes falls
+back to the default, and `disabled="false"` turns `disabled` on. Each one is
+valid HTML or CSS, so nothing else reports it.
+
+Two tools check your project, in two places:
+
+- **`initDiagnostics()`**, from `@fusion.dev/helix-diagnostics`, checks each
+  page as it runs in development. It prints each finding in DevTools, and a
+  badge in the corner of the page lists them.
+- **`helix scan`**, from `@fusion.dev/helix-cli`, reads every stylesheet,
+  template, and module in your project, and prints each finding with its file
+  and line.
+
+Both judge your code against the lint data of the Helix version you installed.
+A fault that both find has the same kind and the same fingerprint in each, so a
+report can join a page's findings to the scan's.
+
+## Start diagnostics in your app
+
+```sh
+npm install --save-dev @fusion.dev/helix-diagnostics
+```
+
+Call `initDiagnostics()` once, before your app mounts. Put the call in a module
+of its own, so a production build can leave it out:
+
+```ts
+// src/diagnostics.ts
+import { initDiagnostics } from '@fusion.dev/helix-diagnostics'
+import lint from '@fusion.dev/helix/lint.json'
+
+initDiagnostics({ environment: 'development', tiers: [{ lint }] })
+```
+
+`tiers` passes the lint data from your own `node_modules`, so diagnostics loads
+nothing from the network. Without it, diagnostics loads the lint data for the
+version on the page from a public npm CDN.
+
+Load the module in development only. In Vite, with React or any other
+framework, import it from your entry:
+
+```tsx
+// src/main.tsx
+if (import.meta.env.DEV) {
+  void import('./diagnostics.js')
+}
+```
+
+`vite build` replaces `import.meta.env.DEV` with `false` and drops the import
+with it. In Next.js, import it from `instrumentation-client.ts`, which runs in
+the browser before your app hydrates:
+
+```ts
+// instrumentation-client.ts
+if (process.env.NODE_ENV === 'development') {
+  void import('./app/diagnostics')
+}
+```
+
+Every Helix template starts diagnostics this way. Angular, Svelte, Vue, Solid,
+and a page with no bundler call it the same way, and the package's README says
+where each one's entry is.
+
+From then on, diagnostics runs after the page loads, after a navigation, and
+after the page changes. It prints each finding once per page, and the badge
+shows only while the page has findings. Hover over a finding in the badge's
+list to outline the element it is about.
+
+## Print the findings in your terminal
+
+A page cannot write to your terminal, so the Helix command line receives each
+run beside your dev server. Install it, and turn the relay on where you call
+`initDiagnostics()`:
+
+```sh
+npm install --save-dev @fusion.dev/helix-cli
+```
+
+```ts
+initDiagnostics({
+  environment: 'development',
+  sinks: { relay: true },
+  tiers: [{ lint }],
+})
+```
+
+Then run the relay in your project's directory, beside the dev server:
+
+```sh
+npx helix diagnostics
+```
+
+Each Helix template has the script for it, so `npm run diagnostics` starts it
+there. The command prints each finding the first time a page has it. It listens
+on `127.0.0.1:7417`, takes runs only from pages on a local host, and serves the
+`helix-diagnostics.json` in the directory it runs in to the page.
+
+## Scan your code
+
+```sh
+npx helix scan
+```
+
+`helix scan` reads every file `.gitignore` leaves in, apart from tests and
+the folders a build writes. It reads CSS, Sass, and Less; HTML, Vue, Svelte,
+and Astro templates; MDX; and JSX, Lit's `html` and `css` templates, and
+Angular's inline templates in JavaScript and TypeScript. Each finding has its
+file and line:
+
+```
+helix scan: 1 error, 0 warnings, 0 info, and 0 unsettled, in 42 files
+  error nested-interactive <helix-button> <helix-icon-button>
+    `helix-icon-button` is inside `helix-button`, which draws its content inside a native button. …
+    in src/toolbar.tsx:12
+```
+
+- **It reads every route.** A page sees only the routes someone opened.
+- **What only a page can settle is listed as `unsettled`**, such as a hook set
+  on a tag that does not have it, which works where an element inside the tag
+  has it. An unsettled finding never fails the scan.
+- **It checks an attribute where your code writes it as one.**
+  `disabled="false"` is checked. `?disabled=${false}` in Lit, `:disabled="false"`
+  in Vue, and `disabled={false}` in JSX set the value at run time, and the page
+  judges what they write.
+- **`--file <path>` reports one file's findings**, and still reads the whole
+  project, so an import in another file counts. `--stdin <language>` checks a
+  snippet.
+
+It exits 1 on a finding at `error`, and 3 where it cannot run, such as where no
+installed Helix package has lint data.
+
+## Run the checks in CI
+
+`--out` writes a run to a CI file, and each command keeps the runs the others
+wrote there, so one file holds your code's run and your pages' runs:
+
+```sh
+npx helix scan --out reports/helix-diagnostics.json
+npx helix diagnostics --once http://localhost:4173/ --out reports/helix-diagnostics.json
+```
+
+`helix diagnostics --once <url>` opens a page headless, runs diagnostics on it
+once the page holds still, prints each finding, and exits. Repeat `--once` for
+each page. It needs Playwright installed beside `@fusion.dev/helix-cli`, and
+adds nothing to your app.
+
+Where your own end-to-end tests open the pages, gather their runs with
+`@fusion.dev/helix-diagnostics/ci`:
+
+```ts
+import { ciSink } from '@fusion.dev/helix-diagnostics/ci'
+
+// `runs` are the reports diagnostics returned in each page your job opened.
+const { code, summary } = ciSink(runs, { file: 'reports/helix-diagnostics.json' })
+console.log(summary)
+process.exitCode = code
+```
+
+A fault found on many pages is one line, with the pages it was on. A finding at
+`error` fails the job. `failOn: 'warn'` fails it on warnings too, and
+`failOn: 'never'` reports without failing. `ciSink` writes the whole file, so
+run `helix scan --out` after it to add your code's run.
+
+## What it finds
+
+| Kind | Severity | Found by | Means |
+| --- | --- | --- | --- |
+| `dead-hook` | error | both | A hook is set where nothing answers it, or a name close to a hook is set that nothing reads |
+| `dead-part` | error | both | A `::part()` names a part the element does not publish, or follows another `::part()` |
+| `disabled-attribute` | error | scan | A rule styles a form control's `[disabled]`, which a control a `<fieldset disabled>` disables does not carry. Write `:disabled` |
+| `duplicate-registration` | error | page | Two copies of Helix are on the page |
+| `false-boolean` | error | both | A boolean attribute is written `="false"`, which turns it on, as `disabled="false"` does. An attribute that `"false"` turns off, such as Drawer's `modal`, is not one |
+| `invalid-value` | error | both | An attribute with a closed set of values carries one outside it, so the element falls back to its default |
+| `manifest-skew` | error | page | The lint data is from another version than the page runs, so no other finding is reported |
+| `native-element` | warn | scan | A native element is written where an installed Helix family stands in for it, such as `<button>` for `helix-button` |
+| `nested-interactive` | error | both | An interactive element is inside a button or a link, which HTML forbids, such as `helix-icon-button` inside `helix-button` or `helix-button` inside an `<a>` |
+| `primitive-token` | error | scan | A rule reads a `--_helix-` primitive, which is internal to `@fusion.dev/helix-styles` |
+| `unforwarded-part` | warn | both | The headless tag publishes a part the styled tag does not forward, which is a gap in Helix |
+| `unimported-tag` | warn | scan | An element is written, and nothing in the project imports the entry that registers it |
+| `unknown-attribute` | error | both | A Helix element carries an attribute it does not take |
+| `unknown-event` | error | scan | A React `on` prop names an event the element does not dispatch |
+| `unknown-slot` | error | scan | A child names a slot its Helix element does not have, so it is not drawn |
+| `unknown-tag` | error | both | A rule or an element names a tag no installed package lists |
+| `unknown-token` | error | scan | A rule reads or sets a `--helix-` name the token set does not have |
+| `unreflected-attribute` | warn | both | A rule selects a Helix element by an attribute it never writes back, so it matches only markup a server wrote |
+
+**A button inside a button is judged where the markup settles it.** Button,
+Icon Button, Copy Button, Toggle, Motion Toggle, Radio, and Tab draw their
+content inside a native button, and Skip Link draws its content inside a link.
+A slot for actions, such as a card's `footer-actions`, is not inside anything
+pressable. A framework's component, such as a router's `<Link>`, places its
+children itself, so `helix scan` stops at it, and the page sees the `<a>` it
+renders.
+
+## Configure the checks
+
+Both tools read `helix-diagnostics.json` from your project. The page cannot read
+files, so import it and pass it as `file`, or let the relay serve it:
+
+```json
+{
+  "rules": {
+    "native-element": "off",
+    "unknown-tag": { "severity": "off", "tags": ["helix-mine"] }
+  }
+}
+```
+
+A kind takes `error`, `warn`, `info`, or `off`, for every tag or for the tags
+you name. A setting that names nothing is refused, with the closest one that
+exists. Every setting is in the README of `@fusion.dev/helix-diagnostics`.
+
+## Scope
+
+The checks cover what the lint data can settle. They do not check:
+
+- the value a token or a hook is set to, such as `--helix-radii-md: red`.
+  `helix scan` checks each `--helix-` name you write;
+- a selector that descends into a component, such as `helix-card .title` or
+  `helix-button span`. It matches only the elements you put inside the
+  component;
+- a `::part()` on a selector with no Helix tag in it, such as
+  `.cta::part(label)`, since the class names no element whose parts can be
+  read;
+- an attribute value an expression sets, such as `tone={tone}` in JSX, in
+  `helix scan`. The page judges the attribute it writes;
+- the contrast of a color you write yourself. `helix theme audit` checks the
+  contrast of your theme's tokens.
