@@ -25,6 +25,7 @@
       "types": "./dist/maplibre/index.d.ts",
       "default": "./dist/maplibre/index.js"
     },
+    "./package.json": "./package.json",
     "./snapshot": {
       "types": "./dist/snapshot/index.d.ts",
       "default": "./dist/snapshot/index.js"

@@ -17,6 +17,7 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./package.json": "./package.json",
     "./three": {
       "types": "./dist/three/index.d.ts",
       "default": "./dist/three/index.js"

@@ -26,10 +26,14 @@
     "./examples.json": "./examples.json",
     "./jsx": "./types/jsx.d.ts",
     "./lint.json": "./lint.json",
+    "./package.json": "./package.json",
     "./specs": null,
     "./svelte": "./types/svelte.d.ts",
     "./vue": "./types/vue.d.ts",
-    "./words": "./types/words.d.ts"
+    "./words": {
+      "types": "./types/words.d.ts",
+      "default": "./dist/words.js"
+    }
   },
   "files": [
     "api.json",

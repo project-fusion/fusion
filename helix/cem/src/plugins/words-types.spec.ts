@@ -56,7 +56,20 @@ describe('the words a manifest declares', () => {
   // The headless file told you to import the styled package's.
   test('tell you to import the package they are written for', () => {
     const headless = renderWords(wordsOf(MANIFEST), '@fusion.dev/helix-headless')
-    expect(headless).toContain("// `import type {} from '@fusion.dev/helix-headless/words'`.")
+    expect(headless).toContain(
+      "// `import { registerWords } from '@fusion.dev/helix-headless/words'`.",
+    )
+    expect(headless).toContain(
+      "// from elsewhere, `import type {} from '@fusion.dev/helix-headless/words'`",
+    )
     expect(headless).not.toContain("'@fusion.dev/helix/words'")
+  })
+
+  /* The entry was types alone, so `registerWords` came from the package's
+     index, which registers every element. */
+  test('carry the registry, so the entry they type is a module of its own', () => {
+    const written = renderWords(wordsOf(MANIFEST), '@fusion.dev/helix')
+    expect(written).toContain("\nexport * from '@fusion.dev/helix-core/words'\n")
+    expect(written.indexOf('export *')).toBeLessThan(written.indexOf('declare module'))
   })
 })

@@ -17,7 +17,8 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./content/*": "./content/*"
+    "./content/*": "./content/*",
+    "./package.json": "./package.json"
   },
   "files": [
     "content",

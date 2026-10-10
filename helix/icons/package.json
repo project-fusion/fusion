@@ -25,6 +25,7 @@
       "types": "./dist/build.d.ts",
       "default": "./dist/build.js"
     },
+    "./package.json": "./package.json",
     "./regular": {
       "types": "./dist/regular.d.ts",
       "default": "./dist/regular.js"

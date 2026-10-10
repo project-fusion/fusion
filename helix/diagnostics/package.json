@@ -20,7 +20,8 @@
     "./ci": {
       "types": "./dist/ci.d.ts",
       "default": "./dist/ci.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist"
