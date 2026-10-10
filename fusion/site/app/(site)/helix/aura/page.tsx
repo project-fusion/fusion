@@ -4,7 +4,7 @@ import { pageMetadata } from '@/utils/metadata/metadata'
 
 export const metadata = pageMetadata({
   description:
-    'Nine backgrounds drawn from the token layer, with the pointer response and every parameter live.',
+    'Twelve backgrounds drawn from the token layer, with the pointer response and every parameter live.',
   path: '/helix/aura',
   title: 'Aura',
 })
