@@ -290,9 +290,9 @@ jobs:
       # `bunx`, because `turbo` is a workspace binary and a `run:` step does not
       # get the PATH `bun run` arranges: bare `turbo` here is exit 127.
       #
-      # The three `PREREQUISITES` in `run-checks.mjs`. The site's tasks,
-      # `catalog` among them, come from the script, and `analyze` is named
-      # here. A task this job misses costs a later job a build of its own and
+      # The three `PREREQUISITES` in `fusion/scripts/lib/checks.mjs`. The
+      # site's tasks, `catalog` among them, come from the script, and
+      # `analyze` is named here. A task this job misses costs a later job a build of its own and
       # changes no answer.
       - name: Build, and write the manifests and the catalog
         run: .github/scripts/build-for-checks.sh analyze
