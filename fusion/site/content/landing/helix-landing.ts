@@ -158,12 +158,12 @@ export const MECHANISMS: readonly Capability[] = [
 export const DELIVERY = {
   lede: 'Every service runs two days a week, alongside your team.',
   /**
-   * **What you buy and how long it runs, in words a stranger can read.** "One
-   * to eight weeks" alone named a duration and left the reader to guess what
-   * lasted that long. The range stays, because it is the thing a reader weighs
-   * first: one to two weeks for the audit, and six to eight for the build.
+   * **What you buy, in words a stranger can read.** It said "One to eight
+   * weeks", strung together from the services' own durations, which read as a
+   * limit we do not have: an engagement runs as long as the work does. The lede
+   * keeps the one fixed term, two days a week.
    */
-  title: 'Hire our engineers for one to eight weeks',
+  title: 'Hire our engineers',
 } as const
 
 /**
