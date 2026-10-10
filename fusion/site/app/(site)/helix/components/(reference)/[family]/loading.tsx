@@ -12,12 +12,23 @@ export default function Loading() {
       <div className={loading.standIn} inert>
         <article className={docsShell.docsMain}>
           <div className={loading.stack}>
-            {/* The title block: the name, its description, and the three tags
-                every family carries. */}
+            {/* The title block: the name with its two actions on the same
+                line, its description, and the three tags every family
+                carries. */}
             <div className={loading.head}>
-              <div className={loading.title} data-skeleton />
-              <div className={loading.description} data-skeleton />
-              <div className={loading.tags}>
+              <div className={loading.titleRow}>
+                <div className={loading.title}>
+                  <div className={loading.titleText} data-skeleton="text" />
+                </div>
+                <div className={loading.actions} data-density="sm">
+                  <div className={loading.source} data-skeleton />
+                  <div className={loading.menu} data-skeleton />
+                </div>
+              </div>
+              <div className={loading.description}>
+                <div className={loading.descriptionText} data-skeleton="text" />
+              </div>
+              <div className={loading.tags} data-density="sm">
                 {[0, 1, 2].map((tag) => (
                   <div className={loading.tag} data-skeleton key={tag} />
                 ))}
@@ -26,21 +37,27 @@ export default function Loading() {
 
             {/* Usage: a heading and the install block under it. */}
             <div className={loading.section}>
-              <div className={loading.heading} data-skeleton />
+              <div className={loading.heading}>
+                <div className={loading.headingText} data-skeleton="text" />
+              </div>
               <div className={loading.code} data-skeleton />
             </div>
 
             {/* Preview: a heading and the sandbox, which is the tallest thing on
                 the page and the one worth reserving room for. */}
             <div className={loading.section}>
-              <div className={loading.heading} data-skeleton />
+              <div className={loading.heading}>
+                <div className={loading.headingText} data-skeleton="text" />
+              </div>
               <div className={loading.preview} data-skeleton />
             </div>
 
             {/* The API tables. One heading and a run of rows, because the count
                 is the manifest's and the shape is not. */}
             <div className={loading.section}>
-              <div className={loading.heading} data-skeleton />
+              <div className={loading.heading}>
+                <div className={loading.headingText} data-skeleton="text" />
+              </div>
               <div className={loading.table}>
                 {API_ROWS.map((row) => (
                   <div className={loading.row} data-skeleton key={row} />
@@ -50,12 +67,21 @@ export default function Loading() {
           </div>
         </article>
 
-        {/* The outline, which is a short column of links whatever the family. */}
+        {/* The outline: its label, then a short column of links whatever the
+            family. */}
         <aside className={docsShell.docsRail}>
-          <div className={loading.railHead} data-skeleton />
-          {[0, 1, 2].map((entry) => (
-            <div className={loading.railRow} data-skeleton key={entry} />
-          ))}
+          <div className={loading.railHead}>
+            <div className={loading.railHeadText} data-skeleton="text" />
+          </div>
+          {/* Usage, Preview, API Reference and Examples, which every family
+              has, and the element under API Reference that most have one of. */}
+          <div className={loading.rail}>
+            {[0, 1, 2, 3, 4].map((entry) => (
+              <div className={loading.railRow} key={entry}>
+                <div className={loading.railRowText} data-skeleton="text" />
+              </div>
+            ))}
+          </div>
         </aside>
       </div>
 
