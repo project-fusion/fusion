@@ -283,7 +283,8 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
      a fill of its own would cut a strip of flat background across the top of
      the light. `transparent` takes the fill back once anything scrolls under
      it, which is the state a hero is guaranteed not to still be in. */
-  const onHero = pathname === '/' || pathname === '/helix' || pathname === '/insights'
+  const onHero =
+    pathname === '/' || pathname === '/helix' || pathname === '/cortex' || pathname === '/insights'
 
   return (
     <>

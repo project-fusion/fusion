@@ -201,32 +201,8 @@
   margin-block-end: var(--helix-space-2xs);
 }
 
-/* The brand, for the one mark in each picture that takes it. The gallery's
-   palette has no accent, so these are the band's own, and every value is a
-   primary token: the fill, the text on it, the two tints the theme builder's
-   ramp runs through, and the stroke a map draws its route in. `muted` for
-   the stroke and not the primary itself, a line of the full color being the
-   loudest thing in a row of five quiet pictures. */
-.tile :global(.artBrand) {
-  fill: var(--helix-color-primary);
-}
-
-.tile :global(.artOnBrand) {
-  fill: var(--helix-color-foreground-on-primary);
-}
-
-.tile :global(.artBrandMuted) {
-  fill: var(--helix-color-primary-muted);
-}
-
-.tile :global(.artBrandSubtle) {
-  fill: var(--helix-color-primary-subtle);
-}
-
-.tile :global(.artBrandStroke) {
-  fill: none;
-  stroke: var(--helix-color-primary-muted);
-}
+/* The brand marks the pictures carry are `artBrand*` classes in `site.css`,
+   since the Cortex page draws in the same kit. */
 
 /* The name, with its stage beside it where it carries one. `1lh` for the
    reason `site.css` gives the rows: a tag is taller than the text, and a flex
