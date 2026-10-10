@@ -61,9 +61,22 @@ const internal = (link: HTMLAnchorElement | undefined): string | undefined => {
 const holds = (entry: NavEntry, path: string): boolean =>
   entry.href === path || (entry.children ?? []).some((child) => child.href === path)
 
-export function DocsNav({ sections }: { sections: readonly NavSection[] }) {
+export function DocsNav({
+  path,
+  sections,
+}: {
+  /**
+   * The page the rail marks current, where it is not the address. Only the
+   * reference page's loading stand-in passes one: it is drawn at
+   * `/stand-ins/reference`, which no section holds, and the rail a reader sees
+   * while that page loads is already marking the page on its way.
+   */
+  path?: string | undefined
+  sections: readonly NavSection[]
+}) {
   const router = useRouter()
-  const pathname = usePathname()
+  const address = usePathname()
+  const pathname = path ?? address
   const warmed = useRef(new Set<string>())
 
   const held = sections.findIndex((section) =>

@@ -6,10 +6,17 @@ import styles from './docs-shell.module.css'
 /**
  * The two-column shell the reference pages and the prose pages both sit in.
  */
-export function DocsShell({ children }: { children: ReactNode }) {
+export function DocsShell({
+  children,
+  path,
+}: {
+  children: ReactNode
+  /** The page the rail marks current, where it is not the address. */
+  path?: string | undefined
+}) {
   return (
     <div className={styles.docsShell}>
-      <DocsNav sections={helixNavigation()} />
+      <DocsNav path={path} sections={helixNavigation()} />
       {children}
     </div>
   )
