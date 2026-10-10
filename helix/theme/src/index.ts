@@ -93,20 +93,57 @@ export type Source = BufferSource | Response | URL | string
 let loading: Promise<ThemeEngine> | undefined
 
 /**
+ * Throws on the first number that is not finite, naming the field it is in.
+ *
+ * **`JSON.stringify` writes `NaN` and `Infinity` as `null`**, and the engine
+ * reads `null` as a field left unset, so a `NaN` density would derive the
+ * default spacing and report the theme clean. The engine refuses a non-finite
+ * number it is handed, and this is the one place such a number can still be
+ * seen.
+ */
+function finite(value: unknown, at: string): void {
+  if (typeof value === 'number' && !Number.isFinite(value)) {
+    throw new Error(`${at} must be a finite number, received ${value}`)
+  }
+  if (typeof value !== 'object' || value === null) {
+    return
+  }
+  const list = Array.isArray(value)
+  for (const [key, inner] of Object.entries(value)) {
+    finite(inner, list ? `${at}[${key}]` : at === '' ? key : `${at}.${key}`)
+  }
+}
+
+/** The intent as the engine reads it. */
+function written(intent: ThemeIntent): string {
+  finite(intent, '')
+  return JSON.stringify(intent)
+}
+
+/**
  * Loads the engine, once.
  *
  * **The promise is cached rather than the result**, so two callers racing at
  * startup get one instantiation and both wait on it. Caching the resolved value
  * instead would let the second call start a second download before the first
  * finished.
+ *
+ * **A load that fails is not kept.** Every caller already waiting on it gets
+ * the failure, and the next call loads again, so a retry with the right source
+ * can succeed.
  */
 export function initTheme(source: Source): Promise<ThemeEngine> {
-  loading ??= initWasm({ module_or_path: source }).then(() => ({
-    derive: (intent: ThemeIntent, selectors: readonly string[] = []): DerivedTheme =>
-      JSON.parse(derive(JSON.stringify(intent), JSON.stringify(selectors))) as DerivedTheme,
-    deriveModes: (intent: ThemeIntent, selectors: readonly string[] = []): DerivedModes =>
-      JSON.parse(deriveModes(JSON.stringify(intent), JSON.stringify(selectors))) as DerivedModes,
-    hexToOklch: (hex: string): Oklch => JSON.parse(readHex(hex)) as Oklch,
-  }))
+  loading ??= initWasm({ module_or_path: source })
+    .then(() => ({
+      derive: (intent: ThemeIntent, selectors: readonly string[] = []): DerivedTheme =>
+        JSON.parse(derive(written(intent), JSON.stringify(selectors))) as DerivedTheme,
+      deriveModes: (intent: ThemeIntent, selectors: readonly string[] = []): DerivedModes =>
+        JSON.parse(deriveModes(written(intent), JSON.stringify(selectors))) as DerivedModes,
+      hexToOklch: (hex: string): Oklch => JSON.parse(readHex(hex)) as Oklch,
+    }))
+    .catch((failure: unknown) => {
+      loading = undefined
+      throw failure
+    })
   return loading
 }

@@ -333,8 +333,57 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
             ));
         }
     }
+    if let Some(harmony) = resolved.status.harmony {
+        finite("status.harmony", harmony)?;
+        if !(0.0..=1.0).contains(&harmony) {
+            return Err(range("status.harmony", "must be between 0 and 1"));
+        }
+    }
+
+    written(&resolved)?;
 
     Ok(resolved)
+}
+
+/// Refuses a type, motion or material number outside its range.
+///
+/// **These are written into the block as they are**, so one outside its range
+/// is a broken declaration with nothing measuring it: a body size of 0 sets
+/// every step of the ramp to 0rem, a negative motion scale writes negative
+/// durations, and an opacity of 2 mixes the surface at 200%.
+fn written(resolved: &Resolved) -> Result<(), IntentError> {
+    if let Some(base) = resolved.font.base {
+        finite("font.base", base)?;
+        if base <= 0.0 {
+            return Err(range("font.base", "must be positive"));
+        }
+    }
+    if let Some(scale) = resolved.font.scale {
+        finite("font.scale", scale)?;
+        if scale <= 0.0 {
+            return Err(range("font.scale", "must be positive"));
+        }
+    }
+    if let Some(scale) = resolved.motion.scale {
+        finite("motion.scale", scale)?;
+        if scale < 0.0 {
+            return Err(range("motion.scale", "must not be negative"));
+        }
+    }
+    if let Some(blur) = resolved.material.blur {
+        finite("material.blur", blur)?;
+        if blur < 0.0 {
+            return Err(range("material.blur", "must not be negative"));
+        }
+    }
+    if let Some(opacity) = resolved.material.opacity {
+        finite("material.opacity", opacity)?;
+        if !(0.0..=1.0).contains(&opacity) {
+            return Err(range("material.opacity", "must be between 0 and 1"));
+        }
+    }
+
+    Ok(())
 }
 
 /// Refuses every brand color given that cannot be read, whichever scheme is
