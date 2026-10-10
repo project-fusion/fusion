@@ -57,8 +57,11 @@ export interface ReferenceDeclaration {
   cssStates?: ReferenceEntry[]
   description?: string
   events?: ReferenceEntry[]
-  /** The family the element joins from another package, from `@family`. */
-  helix?: { family?: string }
+  /**
+   * The family the element joins from another package, from `@family`, and
+   * its stability, from `@status`.
+   */
+  helix?: { family?: string; status?: string }
   members?: ReferenceMember[]
   slots?: ReferenceEntry[]
   summary?: string
@@ -229,8 +232,20 @@ export const referenceFamilies = (manifest: ReferenceManifest): ReferenceFamily[
     }))
 }
 
-/** The tables for one element, in the order they are printed. */
-const element = (depth: number, declaration: ReferenceDeclaration, part: string): string[] => {
+/**
+ * The tables for one element, in the order they are printed.
+ *
+ * **Its own status where it differs from its family's**, which is its root's:
+ * an add-on's element can join a family at another one, as
+ * `helix-sandbox-editor` is experimental in the stable Sandbox family, and a
+ * page that states the family's status said nothing else about it.
+ */
+const element = (
+  depth: number,
+  declaration: ReferenceDeclaration,
+  part: string,
+  family?: string,
+): string[] => {
   const {
     attributes = [],
     cssParts = [],
@@ -246,6 +261,10 @@ const element = (depth: number, declaration: ReferenceDeclaration, part: string)
   } = declaration
 
   const lines = [`${'#'.repeat(depth)} ${startCase(part)} (\`${tagName}\`)`, '']
+  const status = declaration.helix?.status
+  if (status && status !== family) {
+    lines.push(`**Status:** ${status}`, '')
+  }
   if (summary) {
     lines.push(summary, '')
   }
@@ -414,8 +433,9 @@ export const reference = (manifest: ReferenceManifest, options: ReferenceOptions
     if (usage.length > 0) {
       lines.push(`${'#'.repeat(depth)} Usage`, '', '```js', ...usage, '```', '')
     }
+    const status = parts.find((entry) => entry.part === 'root')?.declaration.helix?.status
     for (const { declaration, part } of parts) {
-      lines.push(...element(depth, declaration, part))
+      lines.push(...element(depth, declaration, part, status))
     }
     lines.push(...shown(depth, family, options.examples?.[family] ?? []))
   }
