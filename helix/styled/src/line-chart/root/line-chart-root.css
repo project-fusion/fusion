@@ -222,17 +222,30 @@
  * nothing, and leaves `stroke-dasharray="100"` as a hundred *user units* on a
  * path some three hundred long. Every line rendered as four dashes with gaps
  * between them, which looked like a chart with missing data.
+ *
+ * **The dash exists only while the line draws, and a line at rest has none.**
+ * The stroke is `non-scaling-stroke`, so a dash is measured in screen pixels,
+ * and a thousand of them cover a line only while the line is shorter than a
+ * thousand pixels on screen. Measured: twelve months alternating 10 and 90,
+ * 900 pixels wide, are 2,071 pixels of line, and a dash left at rest left July
+ * to November undrawn. The dash is set in the starting style alone, and the
+ * `step-end` transition holds it for exactly as long as the offset takes to
+ * reach zero. The gap is longer than any line, so a line longer than the dash
+ * draws its first thousand pixels and shows the rest as the dash goes. A gap
+ * as short as the dash showed a second stretch of the line sliding in from
+ * the far end.
  */
 [part~="line"] {
-  stroke-dasharray: 1000;
   transition:
     d var(--helix-duration-normal) var(--helix-easing-decelerate),
+    stroke-dasharray var(--helix-duration-slow) step-end allow-discrete,
     stroke-dashoffset var(--helix-duration-slow) var(--helix-easing-decelerate);
 }
 
 @starting-style {
   [part~="line"] {
-    stroke-dashoffset: 1000;
+    stroke-dasharray: 1000px 100000px;
+    stroke-dashoffset: 1000px;
   }
 }
 
@@ -244,6 +257,7 @@
 
 @starting-style {
   [part~="line-dashed"] {
+    stroke-dasharray: var(--line-chart-dash, 6 4);
     stroke-dashoffset: 0;
   }
 }
