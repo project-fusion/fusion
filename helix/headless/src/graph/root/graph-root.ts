@@ -151,7 +151,7 @@ const LONG_LAYOUT = 5000
  * @csspart legend-item-hidden - A group in the legend whose notes are hidden.
  * @csspart legend-swatch - The mark in a group's color, before its name.
  * @csspart list - The list of notes, which draws only the rows in view.
- * @csspart live - What screen readers hear: how many notes there are when a search or the legend changes it, and which way the drawing went after a key or a control moved it.
+ * @csspart live - What screen readers hear: how many notes there are when a search or the legend changes it, and which way the drawing went after a key or a control moved it. Visually hidden in the styled tier.
  * @csspart loading - The box in place of the list while `loading` is set and it holds no notes, holding the `loading` slot.
  * @csspart note - One note in the list.
  * @csspart note-cursor - The note the keyboard is on in the list.

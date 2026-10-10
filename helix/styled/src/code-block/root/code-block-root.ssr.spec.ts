@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import { fileURLToPath } from 'node:url'
 import { hasPart, rendered, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
@@ -39,5 +40,35 @@ describe('code-block diff server output', () => {
     expect(rendered(markup, 'helix-code-block')).toMatch(
       /<pre id="block" part="block" translate="no">(?:<!--[^>]*-->)*<code part="code">(?:<!--[^>]*-->)*<slot\s*><\/slot>(?:<!--[^>]*-->)*<\/code>(?:<!--[^>]*-->)*<\/pre>/,
     )
+  })
+})
+
+/**
+ * A highlighter registered under Lit's global DOM shim, which a server can opt
+ * into. Its `document` has no `querySelectorAll`, and registering walked the
+ * page and threw, at import for an entry that registers one. In a process of
+ * its own, because the shim's globals would reach every spec after this one.
+ */
+const importsUnderShim = (script: string): [number, string] => {
+  const run = Bun.spawnSync(
+    [
+      process.execPath,
+      '--conditions',
+      'helix-development',
+      '-e',
+      `await import('@lit-labs/ssr/lib/install-global-dom-shim.js'); ${script}`,
+    ],
+    { cwd: fileURLToPath(new URL('.', import.meta.url)) },
+  )
+  return [run.exitCode, run.stderr.toString()]
+}
+
+describe('a highlighter registered under Lit’s global DOM shim', () => {
+  test('registers', () => {
+    expect(
+      importsUnderShim(
+        "const { registerHighlighter } = await import('../index.js'); registerHighlighter(() => '')",
+      ),
+    ).toEqual([0, ''])
   })
 })

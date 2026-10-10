@@ -3,7 +3,7 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* A container does not register another family's children, so a page that
    writes an option inside a select and imports only the select is told which
-   entry to add. */
+   entry to add, or on a tier of its own which tag to define. */
 
 let auditChildren: typeof import('./audit-children.js').auditChildren
 
@@ -39,14 +39,18 @@ describe('the unregistered-child audit', () => {
   test('reports an undefined child once, with the import to add', async () => {
     const warnings: string[] = []
     console.warn = (message: string) => warnings.push(message)
-    const host = container('x-select', 'x-', '<x-option>One</x-option><x-option>Two</x-option>')
+    const host = container(
+      'x-select',
+      'helix-headless-',
+      '<helix-headless-option>One</helix-headless-option><helix-headless-option>Two</helix-headless-option>',
+    )
     auditChildren(host, 'option', 'option', 'it offers no choices')
     auditChildren(host, 'option', 'option', 'it offers no choices')
     await painted()
     auditChildren(host, 'option', 'option', 'it offers no choices')
     await painted()
     expect(warnings).toEqual([
-      "<x-option> in <x-select> is not registered, so it offers no choices. Import '@fusion.dev/helix-headless/option'.",
+      "<helix-headless-option> in <x-select> is not registered, so it offers no choices. Import '@fusion.dev/helix-headless/option'.",
     ])
   })
 
@@ -63,7 +67,7 @@ describe('the unregistered-child audit', () => {
     const warnings: string[] = []
     console.warn = (message: string) => warnings.push(message)
     auditChildren(
-      container('w-listbox', 'w-', ''),
+      container('w-listbox', 'helix-headless-', ''),
       'option',
       'option',
       'the items draw nothing',
@@ -71,7 +75,20 @@ describe('the unregistered-child audit', () => {
     )
     await painted()
     expect(warnings).toEqual([
-      "<w-option> in <w-listbox> is not registered, so the items draw nothing. Import '@fusion.dev/helix-headless/option'.",
+      "<helix-headless-option> in <w-listbox> is not registered, so the items draw nothing. Import '@fusion.dev/helix-headless/option'.",
+    ])
+  })
+
+  /* No entry of ours registers `acme-option`: the page that subclassed the
+     container defines its children too. */
+  test('names the tag to define on a tier of your own', async () => {
+    const warnings: string[] = []
+    console.warn = (message: string) => warnings.push(message)
+    const host = container('acme-select', 'acme-', '<acme-option>One</acme-option>')
+    auditChildren(host, 'option', 'option', 'it offers no choices')
+    await painted()
+    expect(warnings).toEqual([
+      '<acme-option> in <acme-select> is not registered, so it offers no choices. Define <acme-option> as you defined <acme-select>.',
     ])
   })
 

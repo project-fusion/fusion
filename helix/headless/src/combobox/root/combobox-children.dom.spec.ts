@@ -28,7 +28,7 @@ const told = async (markup: string): Promise<Report[]> => {
 describe('a combobox whose options were never imported', () => {
   /* A tier of its own, with the list the combobox draws, so its option is one no other spec in the
      process registered. */
-  test('is reported once, with the import to add', async () => {
+  test('is reported once, with the tag to define', async () => {
     const { HelixHeadlessCombobox } = await import('../index.js')
     customElements.define(
       'spec-combo-combobox',
@@ -47,7 +47,7 @@ describe('a combobox whose options were never imported', () => {
       <spec-combo-option value="ber">Berlin</spec-combo-option>
     </spec-combo-combobox>`
     expect((await told(markup)).map((one) => one.message)).toEqual([
-      "<spec-combo-option> in <spec-combo-combobox> is not registered, so it suggests nothing. Import '@fusion.dev/helix-headless/option'.",
+      '<spec-combo-option> in <spec-combo-combobox> is not registered, so it suggests nothing. Define <spec-combo-option> as you defined <spec-combo-combobox>.',
     ])
     expect(await told(markup)).toEqual([])
   })
@@ -61,5 +61,42 @@ describe('a combobox whose options were never imported', () => {
     expect(heard).toEqual([])
     const host = document.body.firstElementChild as HTMLElement
     expect((part(host, 'control') as HTMLInputElement).value).toBe('Paris')
+  })
+})
+
+/* A tier of your own registers the list the combobox draws, as it registers
+   the combobox. Left out, the list is an unknown element with none of the
+   list's methods: each keystroke threw calling one, and the report named an
+   import of ours, which cannot register a tag of yours. */
+describe('a combobox whose list was never registered', () => {
+  test('throws nothing as you type, and names the tag to define', async () => {
+    const { HelixHeadlessCombobox } = await import('../index.js')
+    customElements.define(
+      'spec-bare-combobox',
+      class extends HelixHeadlessCombobox {
+        static override tier = 'spec-bare-'
+      },
+    )
+    const thrown: unknown[] = []
+    const hear = (event: ErrorEvent): void => {
+      thrown.push(event.error ?? event.message)
+    }
+    window.addEventListener('error', hear)
+    try {
+      const heard = await told('<spec-bare-combobox label="City"></spec-bare-combobox>')
+      const host = document.body.firstElementChild as HTMLElement
+      const control = part(host, 'control') as HTMLInputElement
+      for (const typed of ['b', 'be']) {
+        control.value = typed
+        control.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+        await settle(host as Updatable)
+      }
+      expect(thrown).toEqual([])
+      expect(heard.map((one) => one.message)).toEqual([
+        '<spec-bare-listbox> in <spec-bare-combobox> is not registered, so its panel has no working list. Define <spec-bare-listbox> as you defined <spec-bare-combobox>.',
+      ])
+    } finally {
+      window.removeEventListener('error', hear)
+    }
   })
 })

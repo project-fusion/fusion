@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import { fileURLToPath } from 'node:url'
 import { hostAttributes, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
@@ -24,5 +25,31 @@ describe('a reorderable listbox on the server, with the reorder entry imported',
 
   test('the host carries only what the consumer wrote', () => {
     expect(hostAttributes(list(true), 'helix-headless-listbox')).toEqual(['label', 'reorderable'])
+  })
+})
+
+/**
+ * The entry under Lit's global DOM shim, which a server can opt into. Its
+ * `document` has no `querySelectorAll`, and the entry walked the page at
+ * import and threw. In a process of its own, because the shim's globals would
+ * reach every spec after this one.
+ */
+const importsUnderShim = (script: string): [number, string] => {
+  const run = Bun.spawnSync(
+    [
+      process.execPath,
+      '--conditions',
+      'helix-development',
+      '-e',
+      `await import('@lit-labs/ssr/lib/install-global-dom-shim.js'); ${script}`,
+    ],
+    { cwd: fileURLToPath(new URL('.', import.meta.url)) },
+  )
+  return [run.exitCode, run.stderr.toString()]
+}
+
+describe('the reorder entry under Lit’s global DOM shim', () => {
+  test('imports', () => {
+    expect(importsUnderShim("await import('./index.js')")).toEqual([0, ''])
   })
 })

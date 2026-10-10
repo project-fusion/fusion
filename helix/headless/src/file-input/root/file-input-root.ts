@@ -149,7 +149,7 @@ const kind = (file: File): string => {
  * @csspart kind-start - The category before the label.
  * @csspart label - The label above the field.
  * @csspart list - The chosen files.
- * @csspart live - The live region that says `added-text`, `rejected-text`, and `removed-text`. It is rendered from the first time it has something to say.
+ * @csspart live - The live region that says `added-text`, `rejected-text`, and `removed-text`. It is rendered from the first time it has something to say. Visually hidden in the styled tier.
  * @csspart meta - The row that holds a file's size and type.
  * @csspart name - A file's name.
  * @csspart progress - A file's upload bar, a `<progress>`, while `setFileStatus` gives it a measure or says it is under way.

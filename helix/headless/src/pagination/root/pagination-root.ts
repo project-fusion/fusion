@@ -117,7 +117,7 @@ const fill = (template: string, page: number, pages: number): string =>
  * @csspart item - One slot in the run, holding a page or a gap.
  * @csspart last - The control that jumps to the last page, under `ends`.
  * @csspart list - The run of pages.
- * @csspart live - The live region that announces a page change. It is clipped out of view and still read.
+ * @csspart live - The live region that announces a page change. Visually hidden in the styled tier.
  * @csspart mark - The glyph on a first, previous, next, or last control, where none is slotted.
  * @csspart next - The control that moves forward one page.
  * @csspart page - The control for one page.

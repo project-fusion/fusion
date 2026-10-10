@@ -140,7 +140,7 @@ const keyOf = (item: HelixHeadlessLightboxItem, index: number): string =>
  * @csspart dismiss-mark - The glyph on the close control, where none is slotted.
  * @csspart footer - The slot the footer is in. It draws no box until you give it one.
  * @csspart header - The slot the header is in. It draws no box until you give it one.
- * @csspart live - The live region that announces which item is shown, and the scale once a reader has zoomed.
+ * @csspart live - The live region that announces which item is shown, and the scale once a reader has zoomed. Visually hidden in the styled tier.
  * @csspart next - The control that shows the next item, drawn with `controls`.
  * @csspart next-mark - The glyph on the next control, where none is slotted.
  * @csspart previous - The control that shows the previous item, drawn with `controls`.

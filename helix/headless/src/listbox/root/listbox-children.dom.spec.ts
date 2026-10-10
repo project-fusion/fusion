@@ -28,7 +28,7 @@ const told = async (markup: string): Promise<Report[]> => {
 describe('a listbox whose options were never imported', () => {
   /* A tier of its own, so its option is one no other spec in the
      process registered. */
-  test('is reported once, with the import to add', async () => {
+  test('is reported once, with the tag to define', async () => {
     const { HelixHeadlessListbox } = await import('../index.js')
     customElements.define(
       'spec-list-listbox',
@@ -40,7 +40,7 @@ describe('a listbox whose options were never imported', () => {
       <spec-list-option value="a">Apple</spec-list-option>
     </spec-list-listbox>`
     expect((await told(markup)).map((one) => one.message)).toEqual([
-      "<spec-list-option> in <spec-list-listbox> is not registered, so the list offers no choices. Import '@fusion.dev/helix-headless/option'.",
+      '<spec-list-option> in <spec-list-listbox> is not registered, so the list offers no choices. Define <spec-list-option> as you defined <spec-list-listbox>.',
     ])
     expect(await told(markup)).toEqual([])
   })
@@ -61,7 +61,7 @@ describe('a listbox whose options were never imported', () => {
    them: registered by the list, they would be registered by every Select,
    Combobox and Command, which each draw one. */
 describe('a listbox drawing `items` whose option was never imported', () => {
-  test('is reported once, with the import to add', async () => {
+  test('is reported once, with the tag to define', async () => {
     const { HelixHeadlessListbox } = await import('../index.js')
     customElements.define(
       'spec-items-listbox',
@@ -84,7 +84,7 @@ describe('a listbox drawing `items` whose option was never imported', () => {
       (one) => one.kind === 'unregistered-part',
     )
     expect(heard.map((one) => one.message)).toEqual([
-      "<spec-items-option> in <spec-items-listbox> is not registered, so the items draw no choices. Import '@fusion.dev/helix-headless/option'.",
+      '<spec-items-option> in <spec-items-listbox> is not registered, so the items draw no choices. Define <spec-items-option> as you defined <spec-items-listbox>.',
     ])
   })
 })

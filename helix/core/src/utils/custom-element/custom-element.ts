@@ -23,12 +23,6 @@
 import { reportRuntime } from '../report-runtime/report-runtime.js'
 
 /**
- * Tags already reported, so a page holding duplicates says each one once rather
- * than once per module that tried.
- */
-const reported = new Set<string>()
-
-/**
  * The tags this page registered twice, for a reader that is not a person.
  *
  * **The warning below is the right thing and it is not a readable output.** It
@@ -38,11 +32,26 @@ const reported = new Set<string>()
  * forty lines in it will not. `@fusion.dev/helix-diagnostics` reads this instead, so the
  * same fault reaches a structured report without a second detector guessing at
  * it from the outside. Detect once, at the source; surface twice.
+ *
+ * **Kept on the page under one key, for every copy of core to find.** The copy
+ * that records a tag is the copy that lost it, and a set of its own left the
+ * copy that won, which is the one a reader is likely to import, answering
+ * `[]` on a page holding two copies. The same set is what makes a page say
+ * each tag once, however many copies tried.
  */
-const duplicates = new Set<string>()
+const DUPLICATES = Symbol.for('fusion.dev/helix/duplicates')
+
+/** The set under `DUPLICATES`, made by whichever copy of core asks first. */
+const duplicates = (): Set<string> => {
+  const store = globalThis as Record<symbol, unknown>
+  if (!(store[DUPLICATES] instanceof Set)) {
+    store[DUPLICATES] = new Set<string>()
+  }
+  return store[DUPLICATES] as Set<string>
+}
 
 /** Every tag registered twice by different classes, in registration order. */
-export const duplicateRegistrations = (): string[] => [...duplicates]
+export const duplicateRegistrations = (): string[] => [...duplicates()]
 
 /**
  * Every tag this decorator has defined, in definition order.
@@ -94,11 +103,10 @@ export const definedTags = (): string[] => [...defined]
  * down.
  */
 const warnDuplicate = (tagName: string): void => {
-  if (typeof window === 'undefined' || reported.has(tagName)) {
+  if (typeof window === 'undefined' || duplicates().has(tagName)) {
     return
   }
-  reported.add(tagName)
-  duplicates.add(tagName)
+  duplicates().add(tagName)
   reportRuntime({
     kind: 'duplicate-registration',
     message:

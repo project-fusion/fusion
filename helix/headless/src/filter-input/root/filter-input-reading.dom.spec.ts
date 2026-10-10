@@ -424,7 +424,8 @@ describe('a field that keeps its own chips', () => {
 })
 
 /* The picker has an entry of its own, so a page that imports only the field
-   and writes a picker gets an inert element, and is told which entry to add. */
+   and writes a picker gets an inert element, and is told which entry to add,
+   or on a tier of its own which tag to define. */
 describe('a picker whose entry was never imported', () => {
   const told = async (markup: string): Promise<{ kind: string; message: string }[]> => {
     const key = Symbol.for('fusion.dev/helix/runtime-log')
@@ -437,7 +438,7 @@ describe('a picker whose entry was never imported', () => {
     return (Array.isArray(after) ? after.slice(before) : []) as { kind: string; message: string }[]
   }
 
-  test('is reported with the entry to import', async () => {
+  test('is reported with the tag to define', async () => {
     const { HelixHeadlessFilterInput } = await import('../index.js')
     customElements.define(
       'spec-filter-input',
@@ -449,7 +450,9 @@ describe('a picker whose entry was never imported', () => {
       '<spec-filter-input label="Filter rows"><spec-filter-menu slot="start"></spec-filter-menu></spec-filter-input>',
     )
     const report = heard.find((one) => one.kind === 'unregistered-part')
-    expect(report?.message).toContain("'@fusion.dev/helix-headless/filter-input/menu'")
+    expect(report?.message).toBe(
+      '<spec-filter-menu> in <spec-filter-input> is not registered, so its trigger opens nothing. Define <spec-filter-menu> as you defined <spec-filter-input>.',
+    )
   })
 
   test('and a registered one is not', async () => {

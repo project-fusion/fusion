@@ -28,7 +28,7 @@ const told = async (markup: string): Promise<Report[]> => {
 describe('a palette whose commands were never imported', () => {
   /* A tier of its own, with the dialog and the list the palette draws, so its
      option is one no other spec in the process registered. */
-  test('is reported once, with the import to add', async () => {
+  test('is reported once, with the tag to define', async () => {
     const { HelixHeadlessCommand } = await import('../index.js')
     const { HelixHeadlessDialog } = await import('../../dialog/index.js')
     const { HelixHeadlessListbox } = await import('../../listbox/index.js')
@@ -48,7 +48,7 @@ describe('a palette whose commands were never imported', () => {
       <spec-cmd-option value="new">New file</spec-cmd-option>
     </spec-cmd-command>`
     expect((await told(markup)).map((one) => one.message)).toEqual([
-      "<spec-cmd-option> in <spec-cmd-command> is not registered, so the palette lists no commands. Import '@fusion.dev/helix-headless/option'.",
+      '<spec-cmd-option> in <spec-cmd-command> is not registered, so the palette lists no commands. Define <spec-cmd-option> as you defined <spec-cmd-command>.',
     ])
     expect(await told(markup)).toEqual([])
   })
@@ -63,5 +63,35 @@ describe('a palette whose commands were never imported', () => {
     const host = document.body.firstElementChild as HTMLElement
     const list = part(host, 'listbox') as HTMLElement & { options: unknown[] }
     expect(list.options).toHaveLength(2)
+  })
+})
+
+/* A tier of your own registers the list the palette draws, as it registers
+   the palette. Left out, the list is an unknown element with none of the
+   list's methods: opening and shutting the palette each threw calling one. */
+describe('a palette whose list was never registered', () => {
+  test('opens and shuts without throwing, and names the tag to define', async () => {
+    const { HelixHeadlessCommand } = await import('../index.js')
+    const { HelixHeadlessDialog } = await import('../../dialog/index.js')
+    for (const [tag, base] of [
+      ['spec-bare-cmd-command', HelixHeadlessCommand],
+      ['spec-bare-cmd-dialog', HelixHeadlessDialog],
+    ] as const) {
+      customElements.define(
+        tag,
+        class extends (base as unknown as typeof HelixHeadlessDialog) {
+          static override tier = 'spec-bare-cmd-'
+        },
+      )
+    }
+    const heard = await told('<spec-bare-cmd-command></spec-bare-cmd-command>')
+    const host = document.body.firstElementChild as Updatable & { open: boolean }
+    host.open = true
+    await settle(host)
+    host.open = false
+    await settle(host)
+    expect(heard.map((one) => one.message)).toEqual([
+      '<spec-bare-cmd-listbox> in <spec-bare-cmd-command> is not registered, so the palette has no working list. Define <spec-bare-cmd-listbox> as you defined <spec-bare-cmd-command>.',
+    ])
   })
 })

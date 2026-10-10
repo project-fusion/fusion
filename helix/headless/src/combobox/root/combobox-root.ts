@@ -543,8 +543,16 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     return this.multiple ? 'select-multiple' : 'select-one'
   }
 
+  /**
+   * The list, once it has upgraded. A tier of your own that never registered
+   * its listbox renders an unknown element here, with none of the list's
+   * methods, and calling one threw on every keystroke. Asked of a method,
+   * which happy-dom answers as a browser does, where it matches no element
+   * to `:defined`.
+   */
   private get listbox(): HelixHeadlessListbox | null {
-    return this.partNamed<HelixHeadlessListbox>('listbox')
+    const list = this.partNamed<HelixHeadlessListbox>('listbox')
+    return list && 'requestFilter' in list ? list : null
   }
 
   /**
@@ -1160,7 +1168,10 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       void this.listbox.updateComplete.then(() => this.linkActive())
       return
     }
-    if (this.told === undefined) {
+    /* Counted again until an option is said with it. A list opened before
+       the typing kept the count from the open: opened with a click, typing
+       "g" said "3 results. Go" over a list showing one option. */
+    if (this.told === undefined || this.counted !== '') {
       this.counted = this.countSaid(this.reachable.length)
     }
     this.told = active ?? null
@@ -1179,7 +1190,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     }
   }
 
-  /** How many options there are, said as the list opens, until an option is said with it. */
+  /** How many options there are, said as the list opens, and read again until an option is said with it. */
   private counted = ''
 
   /**
@@ -1363,6 +1374,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   override connectedCallback(): void {
     super.connectedCallback()
     auditChildren(this, 'option', 'option', 'it suggests nothing')
+    auditChildren(this, 'listbox', 'listbox', 'its panel has no working list', true)
     this.addEventListener('helix-select', this.handleLinkFollowed)
     this.watcher = new MutationObserver(() => this.requestUpdate())
     this.watcher.observe(this, {
