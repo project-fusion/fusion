@@ -341,23 +341,33 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
   })
 
   /**
-   * Down Arrow on the trigger of an open panel moves focus to the panel's first
-   * link or control, as Radix's navigation menu does.
+   * Down Arrow on the trigger moves focus to the panel's first link or
+   * control, opening the panel first where it is closed, as Radix's
+   * navigation menu does.
+   *
+   * **Opening is the half a trigger that is a link needs.** A page may slot
+   * an anchor as the trigger, so the word in the bar goes to its product's
+   * page on a press and the panel opens on hover. Enter on that anchor goes
+   * to the page, which leaves a keyboard the arrow as its way into the panel.
    */
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
-    if (event.key !== 'ArrowDown' || !this.open || event.defaultPrevented) {
+    if (event.key !== 'ArrowDown' || event.defaultPrevented) {
       return
     }
     const trigger = this.trigger
     if (!event.composedPath().includes(trigger)) {
       return
     }
-    const first = focusableElements(this).find(
-      (element) => element !== trigger && !element.closest('[slot="trigger"]'),
-    )
-    if (first) {
-      event.preventDefault()
-      first.focus()
+    event.preventDefault()
+    const enter = (): void => {
+      focusableElements(this)
+        .find((element) => element !== trigger && !element.closest('[slot="trigger"]'))
+        ?.focus()
+    }
+    if (this.open) {
+      enter()
+    } else if (this.requestOpen(true)) {
+      this.updateComplete.then(enter)
     }
   }
 

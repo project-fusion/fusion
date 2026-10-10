@@ -674,7 +674,7 @@ describe('a megamenu and keyboard focus', () => {
     after.remove()
   })
 
-  test('Down Arrow on the trigger of an open panel moves to its first link', async () => {
+  test('Down Arrow on the trigger opens the panel where it is closed, and moves to its first link', async () => {
     const host = await section()
     const down = (): KeyboardEvent => {
       const event = new KeyboardEvent('keydown', {
@@ -686,11 +686,14 @@ describe('a megamenu and keyboard focus', () => {
       trigger(host).dispatchEvent(event)
       return event
     }
-    /* Closed, it leaves the key to the page. */
-    expect(down().defaultPrevented).toBe(false)
-    host.open = true
-    await host.updateComplete
+    /* Closed, it opens the panel and moves in. */
     const link = host.querySelector('a') as HTMLElement
+    expect(down().defaultPrevented).toBe(true)
+    await host.updateComplete
+    expect(host.open).toBe(true)
+    expect(document.activeElement).toBe(link)
+    /* Open, it moves in. */
+    trigger(host).focus()
     expect(down().defaultPrevented).toBe(true)
     expect(document.activeElement).toBe(link)
   })
