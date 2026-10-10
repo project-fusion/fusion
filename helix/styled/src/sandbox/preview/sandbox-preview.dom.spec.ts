@@ -418,3 +418,95 @@ describe('the error, and the controls', () => {
     expect(host.open()).toBeNull()
   })
 })
+
+/**
+ * The relay, from the page's side: what a frame may ask this element to fetch
+ * for it, and that it asks nothing of the network on anyone else's behalf.
+ */
+describe('the relay', () => {
+  const original = globalThis.fetch
+
+  /** Stands a window of the page's own in for the frame's, and records what is sent to it and fetched. */
+  const harness = async (attributes: string) => {
+    const host = await preview(attributes)
+    const frame = part(host, 'frame') as HTMLIFrameElement
+    const stand = document.createElement('iframe')
+    document.body.append(stand)
+    const target = stand.contentWindow as Window
+    Object.defineProperty(frame, 'contentWindow', { configurable: true, value: target })
+    const answers: { body?: unknown; id: string; ok: boolean }[] = []
+    target.postMessage = ((message: { body?: unknown; id: string; ok: boolean; type: string }) => {
+      if (message.type === 'helix-preview-fetched') {
+        answers.push(message)
+      }
+    }) as Window['postMessage']
+    const fetched: string[] = []
+    globalThis.fetch = (async (url: URL) => {
+      fetched.push(String(url))
+      return new Response('console.log(1)', { headers: { 'content-type': 'text/javascript' } })
+    }) as unknown as typeof fetch
+    /* An address for the page, which happy-dom's blank document lacks, so the
+       frame's paths resolve against an origin as they do on a site. Set once
+       the frames exist, so neither tries to load from it. */
+    const dom = (window as unknown as { happyDOM?: { setURL: (url: string) => void } }).happyDOM
+    const was = location.href
+    dom?.setURL('https://site.test/helix/sandbox')
+    restore = () => {
+      globalThis.fetch = original
+      delete (frame as { contentWindow?: Window | null }).contentWindow
+      stand.remove()
+      dom?.setURL(was)
+    }
+    const ask = async (path: string, from: Window = target, origin = 'null'): Promise<void> => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { as: 'text', id: `r-${path}`, path, type: 'helix-preview-fetch' },
+          origin,
+          source: from,
+        }),
+      )
+      await new Promise((resolve) => setTimeout(resolve, 10))
+    }
+    return { answers, ask, fetched, target }
+  }
+
+  test('fetches a file under a named prefix and sends its body back to the frame', async () => {
+    const { answers, ask, fetched } = await harness('src="/sandbox/frame.html" relay="/sandbox/"')
+    await ask('./frame.js?v=1a2b3c4d')
+    expect(fetched).toEqual([new URL('/sandbox/frame.js?v=1a2b3c4d', location.href).href])
+    expect(answers).toEqual([
+      {
+        body: 'console.log(1)',
+        contentType: 'text/javascript',
+        id: 'r-./frame.js?v=1a2b3c4d',
+        ok: true,
+        type: 'helix-preview-fetched',
+      } as never,
+    ])
+  })
+
+  test('refuses a path outside the prefixes without fetching it', async () => {
+    const { answers, ask, fetched } = await harness('src="/sandbox/frame.html" relay="/sandbox/"')
+    await ask('/api/session')
+    await ask('/sandbox/../api/session')
+    expect(fetched).toEqual([])
+    expect(answers.map((answer) => answer.ok)).toEqual([false, false])
+  })
+
+  test('relays nothing where `relay` is empty, the default', async () => {
+    const { answers, ask, fetched } = await harness('src="/sandbox/frame.html"')
+    await ask('/sandbox/frame.js')
+    expect(fetched).toEqual([])
+    expect(answers.map((answer) => answer.ok)).toEqual([false])
+  })
+
+  test('answers only its own frame, and only while the frame’s origin is opaque', async () => {
+    const { answers, ask, fetched, target } = await harness(
+      'src="/sandbox/frame.html" relay="/sandbox/"',
+    )
+    await ask('/sandbox/frame.js', window)
+    await ask('/sandbox/frame.js', target, location.origin)
+    expect(fetched).toEqual([])
+    expect(answers).toEqual([])
+  })
+})

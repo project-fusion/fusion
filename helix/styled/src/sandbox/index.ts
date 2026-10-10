@@ -21,6 +21,7 @@ export {
   withoutStylesheets,
 } from './frame.js'
 export * from './preview/sandbox-preview.js'
+export type { PreviewFetch, PreviewFetched } from './relay.js'
 export * from './root/sandbox-root.js'
 export { type ManifestLike, manifestWords } from './source/editing.js'
 export * from './source/sandbox-source.js'

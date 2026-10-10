@@ -2376,6 +2376,23 @@ security boundary and everything about it follows from that.
   string naming an opaque origin, which costs nothing: what is sent is the
   example's own source, to the document about to render it.
 
+- **Behind a login, the page fetches the frame's own files for it.** The
+  frame's opaque origin makes every request it sends cross-site, so a login
+  cookie such as a Vercel preview's is never on it, and `frame.js` came back as
+  the login page: measured on a preview, the script failed in a sandboxed frame
+  and loaded in an ordinary one, and both loaded on the public site. The
+  frame's bootstrap loads each file directly and, where that fails, asks
+  `Sandbox.Preview` with `helix-preview-fetch`; the element fetches it with the
+  page's cookies when `relay` names its prefix. Three locks keep that from
+  becoming a way in. The page fetches only a `GET` on its own origin, under the
+  named prefixes, in plain characters, following no redirect, and passes on
+  only scripts, stylesheets, fonts, models and images, so an untrusted example
+  can read nothing the site does not serve to anyone. The bootstrap asks only
+  while `self.origin` is `"null"`, since it runs what comes back, and a page
+  that framed it without a sandbox would be the one answering on the site's own
+  origin. And the document carries `frame-ancestors 'self'`, so no page
+  elsewhere can frame it at all.
+
 What this prevents, measured before it was fixed: `innerHTML` refuses a
 `<script>` tag but not an `onerror` on an image that fails to load, and that
 handler read the site's `localStorage`, its cookies, and the editor's contents,

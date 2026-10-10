@@ -20,6 +20,7 @@ import { createHash } from 'node:crypto'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { bootstrap } from '../preview/preview-bootstrap.ts'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
 const out = join(root, 'fusion/site/public/sandbox')
@@ -284,7 +285,17 @@ const styles = [...css, ...fonts, families].join('\n')
 await writeFile(join(out, 'frame.css'), styles)
 
 /* `preview-root` carries the layout mode, and the example's markup replaces its
-   contents. The script is deferred so the element exists before it runs. */
+   contents. The bootstrap after it loads the stylesheet and the script, each
+   directly or, behind a login, through the page: `preview-bootstrap.ts` says
+   how and why. It runs after the root exists, and the script it inserts holds
+   the document's `load` until it has run, as `defer` did. `</` is escaped so no
+   text in it closes the element early. */
+const boot = `(${bootstrap})(${JSON.stringify({
+  fonts: faces,
+  patience: 15000,
+  script: `./frame.js?v=${stamp(script)}`,
+  styles: `./frame.css?v=${stamp(styles)}`,
+})})`.replaceAll('</', '<\\/')
 await writeFile(
   join(out, 'frame.html'),
   `<!doctype html>
@@ -293,11 +304,10 @@ await writeFile(
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sandbox preview</title>
-    <link rel="stylesheet" href="./frame.css?v=${stamp(styles)}" />
   </head>
   <body>
     <div id="preview-root" data-layout="padded"></div>
-    <script src="./frame.js?v=${stamp(script)}" defer></script>
+    <script>${boot}</script>
   </body>
 </html>
 `,

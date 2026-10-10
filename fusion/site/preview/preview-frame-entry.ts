@@ -66,10 +66,24 @@ const unmount = (): void => {
 /** Counts renders, so a map chunk that lands late mounts only on the latest. */
 let generation = 0
 
+/**
+ * Loads a classic script through the document's bootstrap, which asks the page
+ * for it where the frame cannot load it itself, as behind a login.
+ */
+declare global {
+  interface Window {
+    helixPreviewLoad?: (src: string) => Promise<void>
+  }
+}
+
 /** A classic script, once per URL: the one request an opaque origin may make freely. */
 const loaded = new Map<string, Promise<void>>()
 const load = (src: string): Promise<void> => {
   let pending = loaded.get(src)
+  if (!pending && window.helixPreviewLoad) {
+    pending = window.helixPreviewLoad(src)
+    loaded.set(src, pending)
+  }
   if (!pending) {
     pending = new Promise((resolve, reject) => {
       const script = document.createElement('script')
