@@ -84,6 +84,18 @@ console.log = console.error
 /** The seconds of work a shard is sized to, before setup. */
 const TARGET = 110
 
+/**
+ * **Two pages at once, on a runner of two cores.** Every check here takes
+ * every core but one when not told, which on these runners is one page at a
+ * time while the browser waits on settling and fonts as often as it computes.
+ * The site's suite went from 60 seconds to 41 on two, on run 38066396425, with
+ * every picture matching its baseline at the first take.
+ *
+ * `TARGET` is still seconds of one worker's work, because that is what the
+ * costs were measured as, so a shard sized to it now finishes sooner than it.
+ */
+const WORKERS = 2
+
 const TIERS = [
   { name: 'headless', source: join(root, SOURCE.headless) },
   { name: 'styled', source: join(root, SOURCE.styled) },
@@ -217,6 +229,7 @@ for (const check of CHECKS) {
            which event it is, rather than written into every entry here. */
         check.scoped ? '--changed "$BASE"' : '',
         of > 1 ? `--shard ${index} --of ${of}` : '',
+        `--workers ${WORKERS}`,
       ]
         .filter(Boolean)
         .join(' '),
