@@ -21,20 +21,78 @@
  * prose under a heading, and truncating that threw away everything `Date
  * Picker` says about its three modes.
  */
-import type {
-  Documented,
-  HelixCssProperty,
-  HelixDeclaration,
-  HelixManifest,
-  HelixMember,
-} from '@fusion.dev/helix-cem'
-import { place, startCase } from '@fusion.dev/helix-cem'
+
+/*
+ * **The manifest's shape and the two naming helpers are written here, and
+ * `@fusion.dev/helix-cem` has its own.** That package holds the manifest types
+ * and the catalog, and it is not published, so nothing this package ships may
+ * import it. It cannot import this package either: it runs in each tier's
+ * `analyze`, and this package builds after the tiers. The types are
+ * structural, so any `HelixManifest` satisfies them, and `reference.spec.ts`
+ * holds the helpers to cem's.
+ */
+
+/** An entry of one of a declaration's lists, as much as the reference prints. */
+export interface ReferenceEntry {
+  description?: string
+  /** The class it came from, where the element inherited it. */
+  inheritedFrom?: { name: string }
+  name: string
+  type?: { text?: string }
+}
+
+/** A field or a method. */
+export interface ReferenceMember extends ReferenceEntry {
+  default?: string
+  kind?: string
+  privacy?: string
+}
+
+/** An element, as much of one as the reference prints. */
+export interface ReferenceDeclaration {
+  /** `fieldName` pairs an attribute with the property it sets. */
+  attributes?: Array<{ fieldName?: string; name: string }>
+  cssParts?: ReferenceEntry[]
+  cssProperties?: ReferenceEntry[]
+  cssStates?: ReferenceEntry[]
+  description?: string
+  events?: ReferenceEntry[]
+  members?: ReferenceMember[]
+  slots?: ReferenceEntry[]
+  summary?: string
+  superclass?: { name: string }
+  tagName?: string
+}
+
+/** A `custom-elements.json`, as much of one as the reference reads. */
+export interface ReferenceManifest {
+  modules?: Array<{ declarations?: ReferenceDeclaration[]; path?: string }>
+}
+
+/** Words a slug spells in lower case that are read as letters. */
+const INITIALISMS = new Set(['api', 'css', 'html', 'id', 'qr', 'ui', 'url'])
+
+/** `app-header` becomes `App Header`, and `qr-code` becomes `QR Code`. */
+export const startCase = (slug: string): string =>
+  slug
+    .split('-')
+    .filter(Boolean)
+    .map((word) =>
+      INITIALISMS.has(word) ? word.toUpperCase() : word.charAt(0).toUpperCase() + word.slice(1),
+    )
+    .join(' ')
+
+/** The family and part a declaration belongs to, from where its file is. */
+export const place = (path: string | undefined): { family: string; part: string } => {
+  const [, family = '', part = ''] = /^src\/([^/]+)\/([^/]+)\//.exec(path ?? '') ?? []
+  return { family, part }
+}
 
 /**
  * An example, as much of one as a markdown reference prints.
  *
- * Structural rather than the catalog's `Example`, so this module does not
- * import from one that imports it. Anything the catalog returns satisfies it.
+ * Structural rather than the catalog's `Example`, which is
+ * `@fusion.dev/helix-cem`'s. Anything the catalog returns satisfies it.
  */
 export interface ReferenceExample {
   css: string
@@ -98,7 +156,7 @@ export interface ReferenceOptions {
  */
 const INFRASTRUCTURE = new Set(['HelixElement'])
 
-const isPublic = (member: HelixMember): boolean =>
+const isPublic = (member: ReferenceMember): boolean =>
   member.privacy !== 'private' &&
   member.privacy !== 'protected' &&
   !INFRASTRUCTURE.has(member.inheritedFrom?.name ?? '')
@@ -125,7 +183,7 @@ const table = (depth: number, heading: string, columns: string[], rows: string[]
 /** One family's declarations, in the order a reference prints them. */
 export interface ReferenceFamily {
   family: string
-  parts: Array<{ declaration: HelixDeclaration; part: string }>
+  parts: Array<{ declaration: ReferenceDeclaration; part: string }>
 }
 
 /**
@@ -135,7 +193,7 @@ export interface ReferenceFamily {
  * the thing that holds the others, and `item` before `root` is alphabetical
  * order telling you about the alphabet rather than about the component.
  */
-export const referenceFamilies = (manifest: HelixManifest): ReferenceFamily[] => {
+export const referenceFamilies = (manifest: ReferenceManifest): ReferenceFamily[] => {
   const families = new Map<string, ReferenceFamily['parts']>()
   for (const module of manifest.modules ?? []) {
     for (const declaration of module.declarations ?? []) {
@@ -160,7 +218,7 @@ export const referenceFamilies = (manifest: HelixManifest): ReferenceFamily[] =>
 }
 
 /** The tables for one element, in the order they are printed. */
-const element = (depth: number, declaration: HelixDeclaration, part: string): string[] => {
+const element = (depth: number, declaration: ReferenceDeclaration, part: string): string[] => {
   const {
     attributes = [],
     cssParts = [],
@@ -189,7 +247,7 @@ const element = (depth: number, declaration: HelixDeclaration, part: string): st
   const attributeOf = new Map(
     attributes.map((one) => [one.fieldName ?? one.name, one.name] as const),
   )
-  const named = (rows: HelixMember[], kind: string): HelixMember[] =>
+  const named = (rows: ReferenceMember[], kind: string): ReferenceMember[] =>
     rows
       .filter((row) => row.kind === kind && isPublic(row))
       .sort((a, b) => a.name.localeCompare(b.name))
@@ -228,7 +286,7 @@ const element = (depth: number, declaration: HelixDeclaration, part: string): st
       depth + 1,
       'Slots',
       ['Slot', 'Description'],
-      slots.map((slot: Documented) => [
+      slots.map((slot: ReferenceEntry) => [
         slot.name ? `\`${slot.name}\`` : '*(default)*',
         cell(slot.description),
       ]),
@@ -237,7 +295,7 @@ const element = (depth: number, declaration: HelixDeclaration, part: string): st
       depth + 1,
       'Parts',
       ['Part', 'Description'],
-      cssParts.map((one: Documented) => [`\`${one.name}\``, cell(one.description)]),
+      cssParts.map((one: ReferenceEntry) => [`\`${one.name}\``, cell(one.description)]),
     ).trimEnd(),
     /* A "From" column, because a hook can now arrive from a component this one
        borrowed a stylesheet from rather than be its own. Without it a borrowed
@@ -248,7 +306,7 @@ const element = (depth: number, declaration: HelixDeclaration, part: string): st
       depth + 1,
       'Custom properties',
       ['Property', 'From', 'Description'],
-      cssProperties.map((one: HelixCssProperty) => [
+      cssProperties.map((one: ReferenceEntry) => [
         `\`${one.name}\``,
         one.inheritedFrom?.name ? `\`${one.inheritedFrom.name}\`` : '-',
         cell(one.description),
@@ -264,7 +322,7 @@ const element = (depth: number, declaration: HelixDeclaration, part: string): st
       ['State', 'Description'],
       [...cssStates]
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map((one: Documented) => [`\`:state(${one.name})\``, cell(one.description)]),
+        .map((one: ReferenceEntry) => [`\`:state(${one.name})\``, cell(one.description)]),
     ).trimEnd(),
     '',
   )
@@ -317,7 +375,7 @@ const shown = (depth: number, family: string, examples: ReferenceExample[]): str
  * does: a document about the accordion should not say Accordion twice before
  * its first sentence. More than one and the headings are what separate them.
  */
-export const reference = (manifest: HelixManifest, options: ReferenceOptions = {}): string => {
+export const reference = (manifest: ReferenceManifest, options: ReferenceOptions = {}): string => {
   const front = options.frontmatter ?? []
   const lines = [
     ...(front.length > 0

@@ -1,12 +1,12 @@
-import type { Example, Family } from '@fusion.dev/helix-docs'
-import { findInCatalog } from '@fusion.dev/helix-docs'
+import type { Example, Family } from '@fusion.dev/helix-cem'
+import { findInCatalog } from '@fusion.dev/helix-cem'
 import generated from './catalog.generated.json'
 
 /**
  * The component catalog, imported rather than read.
  *
  * **Nothing about a component is written down in this app.** The shaping lives
- * in `@fusion.dev/helix-docs`, the sources are the manifests and the `.examples/*.html`
+ * in `@fusion.dev/helix-cem`, the sources are the manifests and the `.examples/*.html`
  * files beside each component, and `turbo run catalog` joins the two into the
  * file imported above. `fusion/site` runs it before `next build` and `next dev`,
  * the same way it already builds the frame and the specs.
@@ -24,7 +24,7 @@ export type {
   Example,
   Family,
   PropertyDoc,
-} from '@fusion.dev/helix-docs'
+} from '@fusion.dev/helix-cem'
 
 /** Every family, alphabetical, each with its elements and examples. */
 export const getFamilies = (): Family[] => generated as Family[]

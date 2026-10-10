@@ -1,24 +1,10 @@
-/* The catalog and its naming live in `@fusion.dev/helix-cem`, which writes each
-   tier's `api.json` from them, and are re-exported here for the site. */
-export type {
-  ApiMember,
-  Element,
-  EventDoc,
-  Example,
-  ExampleSource,
-  Family,
-  PropertyDoc,
-} from '@fusion.dev/helix-cem'
-export {
-  catalog,
-  displayName,
-  findInCatalog,
-  place,
-  startCase,
-  tierOf,
-} from '@fusion.dev/helix-cem'
+/* **The catalog and its naming are not here.** They live in
+   `@fusion.dev/helix-cem`, which writes each tier's `api.json` from them and is
+   not published, so this package cannot import them and the site imports them
+   from there. */
 export {
   type ReferenceFamily,
+  type ReferenceManifest,
   type ReferenceOptions,
   reference,
   referenceFamilies,
