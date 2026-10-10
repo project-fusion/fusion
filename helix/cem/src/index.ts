@@ -1,10 +1,18 @@
 import { spawnSync } from 'node:child_process'
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs'
 import { createRequire } from 'node:module'
+import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { lintOf, type ManifestSource } from '@fusion.dev/helix-diagnostics'
-import { jsxTypesPlugin } from '@wc-toolkit/jsx-types'
-import { vuejsTypesPlugin } from '@wc-toolkit/vuejs-types'
+import { generateJsxTypes } from '@wc-toolkit/jsx-types'
+import { generateVuejsTypes } from '@wc-toolkit/vuejs-types'
 import { catalog, type ExampleSource } from './catalog.js'
 import { jsxBaseProps } from './plugins/jsx-base-props.js'
 import { jsxDeclaredEvents } from './plugins/jsx-declared-events.js'
@@ -225,6 +233,76 @@ const examplesOnDisk = (cwd: string): ExampleSource[] => {
 }
 
 /**
+ * Biome's formatting of a typings file, in Prettier's style.
+ *
+ * **Biome, because the generators' own Prettier was most of every build.**
+ * `@wc-toolkit/jsx-types` and `@wc-toolkit/vuejs-types` format what they write
+ * through `@prettier/sync`, about six megabytes per tier, and in `analyze` that
+ * sat on the chain every build waits on: the headless tier's manifest, its
+ * build, the charts, then the styled tier's manifest. Measured on a laptop on
+ * 10 Oct 2026, the styled tier's typings took 21.7 seconds through Prettier and
+ * 0.56 through this. Every typings file came out byte for byte the same in all
+ * three tiers but one mapped type in `jsx.d.ts`, which Biome keeps on one line.
+ *
+ * **Every option is said here, and the repository's configuration is kept
+ * out.** These are what Prettier defaults to, and a configuration found by
+ * walking up from the package would format a published file by this
+ * repository's taste: single quotes, and semicolons where needed.
+ */
+type JsxTypesOptions = NonNullable<Parameters<typeof generateJsxTypes>[1]>
+type VuejsTypesOptions = NonNullable<Parameters<typeof generateVuejsTypes>[1]>
+
+const formatted = (text: string): string => {
+  const empty = mkdtempSync(join(tmpdir(), 'helix-cem-'))
+  writeFileSync(join(empty, 'biome.json'), '{}\n')
+  const out = spawnSync(
+    process.execPath,
+    [
+      createRequire(import.meta.url).resolve('@biomejs/biome/bin/biome'),
+      'format',
+      '--stdin-file-path=types.d.ts',
+      `--config-path=${empty}`,
+      '--indent-style=space',
+      '--indent-width=2',
+      '--line-width=80',
+      '--javascript-formatter-quote-style=double',
+      '--trailing-commas=all',
+      '--semicolons=always',
+      '--quote-properties=as-needed',
+      '--arrow-parentheses=always',
+      '--bracket-spacing=true',
+    ],
+    { encoding: 'utf8', input: text, maxBuffer: 1024 * 1024 * 256 },
+  )
+  if (out.status !== 0) {
+    throw new Error(`biome format exited ${out.status}: ${out.stderr}`)
+  }
+  return out.stdout
+}
+
+/**
+ * A generator run for its text, which is then formatted here and written.
+ *
+ * Named as the plugin it replaces, because that is what it does, and the order
+ * the passes after it depend on is read by name.
+ */
+const generated = <Options extends { fileName?: string; outdir?: string }>(
+  name: string,
+  generate: (manifest: never, options: Options) => string | undefined,
+  options: Options & { fileName: string; outdir: string },
+): Plugin => ({
+  name,
+  packageLinkPhase({ customElementsManifest }) {
+    const text = generate(customElementsManifest as never, { ...options, fileName: undefined })
+    if (text === undefined) {
+      throw new Error(`${name} wrote nothing for ${options.fileName}`)
+    }
+    mkdirSync(options.outdir, { recursive: true })
+    writeFileSync(join(options.outdir, options.fileName), formatted(text))
+  },
+})
+
+/**
  * What runs over the finished manifest, in the order it runs.
  *
  * **One job, where this package used to do three.** It held eighteen plugins
@@ -243,7 +321,7 @@ export const afterManifest = ({
 }: HelixCemOptions): Plugin[] => [
   ...(frameworkTypes
     ? [
-        jsxTypesPlugin({
+        generated<JsxTypesOptions>('@wc-toolkit/jsx-types', generateJsxTypes, {
           fileName: 'jsx.d.ts',
           ...(packageName ? { globalTypePath: packageName } : {}),
           // Standard React handlers and attributes, so `onClick` and
@@ -252,7 +330,7 @@ export const afterManifest = ({
           outdir: TYPES,
           // `event.target` typed as the element rather than EventTarget.
           stronglyTypedEvents: true,
-        }) as Plugin,
+        }),
         // Must follow the generator: it references event types it does not
         // import, and an unresolved name degrades to `any` under skipLibCheck.
         ...(packageName ? [jsxImports({ fileName: `${TYPES}/jsx.d.ts`, packageName })] : []),
@@ -269,12 +347,12 @@ export const afterManifest = ({
              types augment `GlobalComponents` rather than `IntrinsicElements`,
              and a handler is bound with `@helix-input` rather than a prop. Same
              manifest, same `stronglyTypedEvents`, separate file. */
-        vuejsTypesPlugin({
+        generated<VuejsTypesOptions>('@wc-toolkit/vuejs-types', generateVuejsTypes, {
           fileName: 'vue.d.ts',
           ...(packageName ? { globalTypePath: packageName } : {}),
           outdir: TYPES,
           stronglyTypedEvents: true,
-        }) as Plugin,
+        }),
         /* After everything that rewrites the JSX tag map, because it reuses
              the finished one. */
         ...(packageName

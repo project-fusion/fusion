@@ -36,6 +36,7 @@
     "@wc-toolkit/jsx-types": "^1.7.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
     "@wc-toolkit/vuejs-types": "^1.0.1"
   }
 }
