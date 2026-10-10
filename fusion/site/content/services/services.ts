@@ -43,7 +43,7 @@ export interface Service {
  * full-time reading.
  *
  * It is not a fact about the sprint alone. Every offer runs on the same
- * part-time commitment, so a buyer reading "six to eight weeks" beside a
+ * part-time commitment, so a buyer reading "six weeks or more" beside a
  * sprint that says "two days a week" has been told the build is something else,
  * which is the one reading that is worse than saying nothing at all.
  *
@@ -81,7 +81,7 @@ export const SERVICES: Service[] = [
       'Helix, applied to your product. We build your components in your repository, as working code.',
   },
   {
-    duration: 'Six to eight weeks, two days a week',
+    duration: 'Six weeks or more, two days a week',
     includes: [
       'We work in your team, in your codebase',
       'Interface and AI work built on Helix and Cortex',
