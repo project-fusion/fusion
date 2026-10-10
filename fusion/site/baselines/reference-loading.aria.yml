@@ -1,0 +1,69 @@
+- link "Fusion":
+  - /url: /
+- navigation "Sections":
+  - link "Helix":
+    - /url: /helix
+  - link "Cortex":
+    - /url: /cortex
+  - link "Services":
+    - /url: /company/services
+  - link "Insights":
+    - /url: /insights
+- button "Search Ctrl+K"
+- link "Fusion source on GitHub":
+  - /url: https://github.com/project-fusion
+- button "Preferences"
+- main:
+  - navigation "Helix documentation":
+    - tree "Helix documentation":
+      - treeitem "Getting started" [expanded] [level=1]:
+        - text: Getting started
+        - group:
+          - treeitem "Introduction" [level=2]
+          - treeitem "Tiers" [level=2]
+          - treeitem "Installation" [level=2]
+          - treeitem "Coding agents" [level=2]
+          - treeitem "Browser support" [level=2]
+          - treeitem "Versioning" [level=2]
+          - treeitem "Metrics" [level=2]
+      - treeitem "Foundations" [level=1]
+      - treeitem "Theming" [level=1]
+      - treeitem "Essentials" [level=1]
+      - treeitem "Components" [level=1]
+      - treeitem "Tooling" [level=1]
+    - status
+  - article
+  - complementary
+  - status: Loading the reference
+- contentinfo:
+  - img "Fusion"
+  - text: Fusion Development Group Interface and AI software.
+  - link "Fusion on GitHub":
+    - /url: https://github.com/project-fusion
+  - link "Fusion on LinkedIn":
+    - /url: https://www.linkedin.com/company/project-fusion
+  - link "Fusion on X":
+    - /url: https://x.com/fusiondotdev
+  - navigation "Footer":
+    - text: Products
+    - link "Helix":
+      - /url: /helix
+    - link "Cortex":
+      - /url: /cortex
+    - text: Company
+    - link "Services":
+      - /url: /company/services
+    - link "Insights":
+      - /url: /insights
+    - link "Thesis":
+      - /url: /company/thesis
+    - link "Contact":
+      - /url: /contact
+    - text: Legal
+    - link "Terms of use":
+      - /url: /legal/terms
+    - link "Privacy":
+      - /url: /legal/privacy
+    - link "Acceptable use":
+      - /url: /legal/acceptable-use
+- alert
