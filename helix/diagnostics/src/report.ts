@@ -235,8 +235,11 @@ export interface RuntimeEntry {
   tag?: string
 }
 
+/** Where a run can be declared to happen. */
+export const ENVIRONMENTS = ['ci', 'development', 'production'] as const
+
 /** Where a run was declared to happen. Undeclared is never sent. */
-export type Environment = 'ci' | 'development' | 'production'
+export type Environment = (typeof ENVIRONMENTS)[number]
 
 /**
  * A sheet the collector could not read, and the reason. For a scan, a file

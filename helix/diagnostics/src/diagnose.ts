@@ -4,7 +4,7 @@
  */
 import { analyze, markup, registrations, skew, versionSkew } from './analyze.js'
 import { collect } from './collect.js'
-import { type Config, pagePattern, resolveConfig } from './config.js'
+import { type Config, checkEnvironment, pagePattern, resolveConfig } from './config.js'
 import { identify } from './identity.js'
 import type { Tier } from './manifest.js'
 import { index, lintFor, versionsOf } from './manifest.js'
@@ -100,6 +100,7 @@ export const diagnose = (options: Options): Report => {
       'diagnose() needs at least one manifest. Without one every part name is unknown and every finding would be noise.',
     )
   }
+  checkEnvironment(environment)
   const resolved = resolveConfig(file, call)
   const { detail } = resolved.configuration
   const document_ = from ?? globalThis.document

@@ -359,6 +359,29 @@ const unreflected = (
   return found
 }
 
+/**
+ * The headless tag a styled tag is built on, `helix-headless-button` for
+ * `helix-button`, and `undefined` for a tag that is headless already.
+ */
+const headlessOf = (tag: string): string | undefined =>
+  tag.startsWith('helix-') && !tag.startsWith('helix-headless-')
+    ? `helix-headless-${tag.slice('helix-'.length)}`
+    : undefined
+
+/**
+ * Names in backticks, as a sentence lists them and as `helix scan` does: `a`,
+ * `a` and `b`, `a`, `b`, and `c`, and past three, `a`, `b`, `c`, and 2 more.
+ */
+const listed = (names: string[]): string => {
+  const quoted = names.slice(0, 3).map((name) => `\`${name}\``)
+  if (names.length > 3) {
+    return `${quoted.join(', ')}, and ${names.length - 3} more`
+  }
+  return quoted.length < 3
+    ? quoted.join(' and ')
+    : `${quoted.slice(0, 2).join(', ')}, and ${quoted[2]}`
+}
+
 const origin = (located: Located): Origin => ({
   cssText: located.rule.cssText,
   index: located.index,
@@ -445,13 +468,16 @@ export const analyze = (
         }
         /* A part the *other* tier publishes is not a typo, it is a part that
            was never forwarded, and the two need different sentences: one is
-           the author's mistake and the other is ours. */
-        const elsewhere = [...tags].find(([other, entry]) => other !== tag && entry.parts.has(part))
-        if (elsewhere) {
+           the author's mistake and the other is ours. **The other tier is
+           the same element's headless tag**, `helix-headless-button` for
+           `helix-button`: a part some unrelated tag publishes, such as
+           `helix-button::part(label)`, is the author's misspelling. */
+        const headless = headlessOf(tag)
+        if (headless !== undefined && tags.get(headless)?.parts.has(part)) {
           findings.push({
             expected: part,
             kind: 'unforwarded-part',
-            message: `\`${tag}\` does not publish \`${part}\`, though \`${elsewhere[0]}\` does. The rule matches nothing until the part is forwarded, which is a gap in Helix rather than in this CSS.`,
+            message: `\`${tag}\` does not publish \`${part}\`, though \`${headless}\` does. The rule matches nothing until the part is forwarded, which is a gap in Helix rather than in this CSS.`,
             origin: origin(located),
             subject: `${tag}::part(${part})`,
             tag,
@@ -551,7 +577,7 @@ export const analyze = (
         kind: 'dead-hook',
         message: suggestion
           ? `\`${tag}\` does not answer \`${property}\`. It answers \`${suggestion}\`, two edits or fewer away, which is almost certainly what was meant.`
-          : `\`${tag}\` does not answer \`${property}\`, and nothing under it that does was found in the page. ${[...answerers].sort().slice(0, 3).join(', ')} answer it, so this either targets the wrong element or expects a descendant that is not there.`,
+          : `\`${tag}\` does not answer \`${property}\`, and nothing under it that does was found in the page. ${listed([...answerers].sort())} ${answerers.size === 1 ? 'answers' : 'answer'} it, so this either targets the wrong element or expects a descendant that is not there.`,
         origin: origin(located),
         subject: `${selector} { ${property} }`,
         tag,

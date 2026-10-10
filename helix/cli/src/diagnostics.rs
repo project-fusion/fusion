@@ -172,6 +172,9 @@ pub fn run(args: &Diagnostics, from: &Path, json: bool, paint: Paint) -> Outcome
         .clone()
         .unwrap_or_else(|| from.join("helix-diagnostics.json"));
     let mut relay = Relay::new(args.out.clone(), json, paint);
+    /* Read once now, so a file that cannot be served is said before a page
+    asks for it. */
+    relay.settings(&settings);
     for stream in listener.incoming() {
         let Ok(stream) = stream else {
             continue;
@@ -260,6 +263,20 @@ fn read(stream: &TcpStream) -> std::io::Result<Request> {
     })
 }
 
+/// The settings file's text where it reads and parses, or why it does not.
+/// No file at all is `Ok(None)`, since a project need not have one.
+fn served(settings: &Path) -> Result<Option<String>, String> {
+    let text = match std::fs::read_to_string(settings) {
+        Ok(text) => text,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+        Err(error) => return Err(format!("could not read {} ({error})", settings.display())),
+    };
+    match serde_json::from_str::<Value>(&text) {
+        Ok(_) => Ok(Some(text)),
+        Err(error) => Err(format!("{} is not JSON ({error})", settings.display())),
+    }
+}
+
 /// Writes one response, with the CORS headers a local page reads it by.
 fn respond(
     mut stream: &TcpStream,
@@ -325,6 +342,8 @@ struct Relay {
     /// Each page's counts when last printed, so an unchanged page prints nothing:
     /// errors, warnings, info, and runtime events.
     said: HashMap<String, (usize, usize, usize, usize)>,
+    /// Why the settings file was last not served, so each reason is said once.
+    unserved: Option<String>,
 }
 
 impl Relay {
@@ -337,6 +356,29 @@ impl Relay {
             said: HashMap::new(),
             seen: HashSet::new(),
             shown: HashMap::new(),
+            unserved: None,
+        }
+    }
+
+    /// The settings file to serve. **One that does not read or parse is said
+    /// in the terminal**, once for each reason: the page asks for it on every
+    /// load, and a 404 alone would leave it running on the shipped settings
+    /// with nothing saying why.
+    fn settings(&mut self, settings: &Path) -> Option<String> {
+        match served(settings) {
+            Ok(text) => {
+                self.unserved = None;
+                text
+            }
+            Err(why) => {
+                if self.unserved.as_deref() != Some(why.as_str()) {
+                    eprintln!(
+                        "helix diagnostics: {why}, so pages run without these settings until the file is fixed."
+                    );
+                    self.unserved = Some(why);
+                }
+                None
+            }
         }
     }
 
@@ -362,17 +404,17 @@ impl Relay {
                     body.to_string().as_bytes(),
                 )
             }
-            ("GET", "/config") => match std::fs::read_to_string(settings) {
-                /* Only what parses: a page handed half a file would read it
-                as no settings at all. */
-                Ok(text) if serde_json::from_str::<Value>(&text).is_ok() => respond(
+            /* Only what parses: a page handed half a file would read it as no
+            settings at all. */
+            ("GET", "/config") => match self.settings(settings) {
+                Some(text) => respond(
                     stream,
                     "200 OK",
                     origin,
                     "application/json",
                     text.as_bytes(),
                 ),
-                _ => respond(stream, "404 Not Found", origin, "text/plain", b""),
+                None => respond(stream, "404 Not Found", origin, "text/plain", b""),
             },
             ("POST", "/runs") => {
                 let Ok(value) = serde_json::from_slice::<Value>(&request.body) else {

@@ -110,21 +110,41 @@ fn mappings(text: &str) -> Option<Vec<Line>> {
     Some(lines)
 }
 
-/// Where a bundle's map is: the data URL or the file its last
-/// `sourceMappingURL` comment names, or the `.map` beside it.
+/// The URL a bundle's `sourceMappingURL` comment names, where the comment is
+/// on the last line that holds anything, which is where a bundler writes it.
+///
+/// **Only the last line.** The same text further up is a string in the code,
+/// such as the one the sandbox's compiler appends to what it compiles, and a
+/// bundle with a hidden or external map ends in code.
+fn named_map(text: &str) -> Option<&str> {
+    let last = text
+        .lines()
+        .rev()
+        .map(str::trim)
+        .find(|line| !line.is_empty())?;
+    let comment = last
+        .strip_prefix("//")
+        .or_else(|| last.strip_prefix("/*"))?;
+    comment
+        .strip_prefix(['#', '@'])?
+        .trim_start()
+        .strip_prefix("sourceMappingURL=")?
+        .split_whitespace()
+        .next()
+        .map(|url| url.trim_end_matches("*/"))
+}
+
+/// Where a bundle's map is: the data URL or the file its trailing
+/// `sourceMappingURL` comment names, or the `.map` beside it, where there is
+/// no such comment or what it names does not read.
 fn map_of(bundle: &Path, text: &str) -> Option<Value> {
-    let named = text
-        .rfind("sourceMappingURL=")
-        .map(|at| &text[at + "sourceMappingURL=".len()..])
-        .and_then(|rest| rest.split_whitespace().next())
-        .map(|url| url.trim_end_matches("*/"));
     let read = |path: PathBuf| {
         std::fs::read_to_string(path)
             .ok()
             .and_then(|json| serde_json::from_str(&json).ok())
     };
-    match named {
-        Some(url) if url.starts_with("data:") => {
+    let named = named_map(text).and_then(|url| {
+        if url.starts_with("data:") {
             let (head, data) = url.split_once(',')?;
             let json = if head.ends_with(";base64") {
                 String::from_utf8(base64(data)?).ok()?
@@ -132,17 +152,16 @@ fn map_of(bundle: &Path, text: &str) -> Option<Value> {
                 data.to_owned()
             };
             serde_json::from_str(&json).ok()
-        }
-        Some(url) => {
+        } else {
             let file = url.split(['?', '#']).next().unwrap_or(url);
             read(bundle.parent()?.join(file))
         }
-        None => {
-            let mut sibling = bundle.as_os_str().to_owned();
-            sibling.push(".map");
-            read(PathBuf::from(sibling))
-        }
-    }
+    });
+    named.or_else(|| {
+        let mut sibling = bundle.as_os_str().to_owned();
+        sibling.push(".map");
+        read(PathBuf::from(sibling))
+    })
 }
 
 /// A path with `.` and `..` resolved by name, as a map's sources write them.
@@ -480,6 +499,45 @@ mod tests {
             json["files"],
             serde_json::json!({ "mapped": 1, "unmapped": 0 })
         );
+        std::fs::remove_dir_all(&folder).expect("removed");
+    }
+
+    #[test]
+    fn only_a_trailing_comment_names_the_map_and_the_one_beside_it_stands_in() {
+        let folder =
+            std::env::temp_dir().join(format!("helix-scan-weight-named-{}", std::process::id()));
+        let build = folder.join("dist");
+        std::fs::create_dir_all(&build).expect("a folder");
+        let map = serde_json::json!({
+            "version": 3,
+            "sources": [
+                "webpack://app/./node_modules/@fusion.dev/helix/dist/button/root/button-root.js",
+                "webpack://app/./src/main.js"
+            ],
+            "mappings": "AAAA,UCAA"
+        })
+        .to_string();
+        /* A bundle with a hidden map holding the comment as a string, as the
+        sandbox's compiler does, and one naming a map that is not there. */
+        std::fs::write(
+            build.join("hidden.js"),
+            "abcdefghijuvwxyz\nconst compiled = `\n//# sourceMappingURL=data:application/json;charset=utf-8,${map}`\nexport { compiled }\n",
+        )
+        .expect("written");
+        std::fs::write(build.join("hidden.js.map"), &map).expect("written");
+        std::fs::write(
+            build.join("moved.js"),
+            "abcdefghijuvwxyz\n//# sourceMappingURL=gone.js.map\n",
+        )
+        .expect("written");
+        std::fs::write(build.join("moved.js.map"), &map).expect("written");
+        let families = HashSet::from(["button".to_owned()]);
+        let json = Weight::measure(&build, &folder, &families).json();
+        assert_eq!(
+            json["files"],
+            serde_json::json!({ "mapped": 2, "unmapped": 0 })
+        );
+        assert_eq!(json["families"], serde_json::json!({ "button": 20 }));
         std::fs::remove_dir_all(&folder).expect("removed");
     }
 }

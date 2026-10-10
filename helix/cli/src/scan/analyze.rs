@@ -169,6 +169,11 @@ static PARTS: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(r"(helix-[a-z0-9-]+)((?:[^\s>+~,]*))::part\(\s*([^)]*?)\s*\)")
         .expect("a literal pattern")
 });
+/// A Helix tag with one `::part()` after another in the same compound.
+static CHAINED: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(helix-[a-z0-9-]+)[^\s>+~,]*?::part\([^)]*\)(?:[^\s>+~,]*?::part\([^)]*\))+")
+        .expect("a literal pattern")
+});
 
 /// Every `helix-*` type selector in a selector, in source order: never the
 /// `helix-hero` of a class or an id.
@@ -222,15 +227,34 @@ fn bare(selector: &str) -> String {
     out
 }
 
-/// Every `::part(a b)` in a selector, with the tag it hangs off.
+/// Every `::part(a b)` in a selector, with the tag it hangs off. A chain of
+/// them, which is not valid CSS, is left to [`chained`].
 pub fn parts(selector: &str) -> Vec<(String, Vec<String>)> {
+    let bare = bare(selector);
     PARTS
-        .captures_iter(&bare(selector))
+        .captures_iter(&CHAINED.replace_all(&bare, ""))
         .filter_map(|found| {
             let names: Vec<String> = found[3].split_whitespace().map(str::to_owned).collect();
             (!names.is_empty()).then(|| (found[1].to_owned(), names))
         })
         .collect()
+}
+
+/// Every chain of `::part()`s in a selector, with the tag it hangs off:
+/// `helix-card::part(body)::part(button)`.
+pub fn chained(selector: &str) -> Vec<(String, String)> {
+    CHAINED
+        .captures_iter(&bare(selector))
+        .map(|found| (found[1].to_owned(), found[0].to_owned()))
+        .collect()
+}
+
+/// The headless tag a styled tag is built on, `helix-headless-button` for
+/// `helix-button`, and `None` for a tag that is headless already.
+fn headless_of(tag: &str) -> Option<String> {
+    tag.strip_prefix("helix-")
+        .filter(|rest| !rest.starts_with("headless-"))
+        .map(|rest| format!("helix-headless-{rest}"))
 }
 
 /// Names in backticks, as a sentence lists them: `a`, `a` or `b`, and `a`,
@@ -360,8 +384,21 @@ impl<'a> Analyzer<'a> {
     }
 
     /// A rule's parts: on a tag no package publishes, unpublished, or
-    /// published by another tag and never forwarded.
+    /// published by the tag's headless tag and never forwarded.
     fn parts(&mut self, rule: &StyleRule, origin: &dyn Fn() -> Origin) {
+        /* **A `::part()` after another is not valid CSS**: the browser drops
+        the rule as it parses the sheet, so the page never sees one, and only
+        the text shows it. */
+        for (tag, text) in chained(&rule.selector) {
+            self.found.findings.push(Raw {
+                expected: None,
+                kind: "dead-part",
+                message: format!("`{text}` is not valid CSS: a `::part()` cannot follow another, so the browser drops the whole rule. Select the inner part by the name `{tag}` forwards it under, as `{tag}::part(name)`. `helix api family {tag}` lists its parts."),
+                origin: origin(),
+                subject: text,
+                tag,
+            });
+        }
         for (tag, names) in parts(&rule.selector) {
             let Some(element) = self.index.get(&tag) else {
                 self.found.findings.push(Raw {
@@ -378,16 +415,19 @@ impl<'a> Analyzer<'a> {
                 if element.has_part(&part) {
                     continue;
                 }
-                let elsewhere = self
-                    .index
-                    .tags
-                    .iter()
-                    .find(|(other, entry)| *other != tag && entry.has_part(&part));
-                if let Some((other, _)) = elsewhere {
+                /* **Only the same element's headless tag forwards to it**, as
+                the page judges it: a part an unrelated tag publishes, such as
+                `helix-button::part(label)`, is a misspelling. */
+                let forwarding = headless_of(&tag).filter(|headless| {
+                    self.index
+                        .get(headless)
+                        .is_some_and(|entry| entry.has_part(&part))
+                });
+                if let Some(headless) = forwarding {
                     self.found.findings.push(Raw {
                         expected: Some(part.clone()),
                         kind: "unforwarded-part",
-                        message: format!("`{tag}` does not publish `{part}`, though `{other}` does, so this rule matches nothing until the part is forwarded. The fix belongs in Helix."),
+                        message: format!("`{tag}` does not publish `{part}`, though `{headless}` does, so this rule matches nothing until the part is forwarded. The fix belongs in Helix."),
                         origin: origin(),
                         subject: format!("{tag}::part({part})"),
                         tag: tag.clone(),
@@ -1182,7 +1222,7 @@ fn unknown_attribute(tag: &str, name: &str, published: &Published, origin: Origi
 mod tests {
     use std::collections::HashSet;
 
-    use super::{listed, parts, targets, Analyzer};
+    use super::{chained, listed, parts, targets, Analyzer};
     use crate::scan::css;
     use crate::scan::lint::{Index, LintData};
     use crate::scan::markup;
@@ -1515,6 +1555,93 @@ mod tests {
             ),
             [("helix-table-column".to_owned(), vec!["column".to_owned()])]
         );
+    }
+
+    #[test]
+    fn a_chain_of_parts_is_read_apart_from_the_tag_s_parts() {
+        let selector = "helix-card::part(body)::part(button):hover, helix-tag::part(label)";
+        assert_eq!(
+            chained(selector),
+            [(
+                "helix-card".to_owned(),
+                "helix-card::part(body)::part(button)".to_owned()
+            )]
+        );
+        assert_eq!(
+            parts(selector),
+            [("helix-tag".to_owned(), vec!["label".to_owned()])]
+        );
+    }
+
+    #[test]
+    fn a_part_after_a_part_is_found_as_invalid_css() {
+        let index = index();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let mut analyzer = Analyzer::new(&index, &listing, &used);
+        let rules = css::read(
+            "helix-card::part(body)::part(control) { color: red; }\n",
+            1,
+            false,
+        );
+        analyzer.sheet("app.css", &rules, false);
+        assert_eq!(
+            kinds(&analyzer),
+            [(
+                "dead-part",
+                "helix-card::part(body)::part(control)".to_owned()
+            )]
+        );
+        assert_eq!(
+            analyzer.found.findings[0].message,
+            "`helix-card::part(body)::part(control)` is not valid CSS: a `::part()` cannot follow another, so the browser drops the whole rule. Select the inner part by the name `helix-card` forwards it under, as `helix-card::part(name)`. `helix api family helix-card` lists its parts."
+        );
+    }
+
+    #[test]
+    fn only_the_tag_s_own_headless_tag_makes_a_part_unforwarded() {
+        let tag = |parts: &[&str]| serde_json::json!({ "attributes": {}, "hooks": [], "parts": parts, "written": [] });
+        let index = Index::of(&[
+            LintData {
+                package: "@fusion.dev/helix".to_owned(),
+                tags: serde_json::json!({
+                    "helix-card": tag(&["body"]),
+                    "helix-dialog": tag(&["panel"]),
+                    "helix-drilldown": tag(&["title"]),
+                })
+                .as_object()
+                .expect("an object")
+                .clone(),
+                version: None,
+            },
+            LintData {
+                package: "@fusion.dev/helix-headless".to_owned(),
+                tags: serde_json::json!({ "helix-headless-card": tag(&["body", "inside"]) })
+                    .as_object()
+                    .expect("an object")
+                    .clone(),
+                version: None,
+            },
+        ]);
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let mut analyzer = Analyzer::new(&index, &listing, &used);
+        let rules = css::read(
+            "helix-card::part(inside) { color: red; }\nhelix-dialog::part(title) { color: red; }\n",
+            1,
+            false,
+        );
+        analyzer.sheet("app.css", &rules, false);
+        assert_eq!(
+            kinds(&analyzer),
+            [
+                ("unforwarded-part", "helix-card::part(inside)".to_owned()),
+                ("dead-part", "helix-dialog::part(title)".to_owned()),
+            ]
+        );
+        assert!(analyzer.found.findings[0]
+            .message
+            .contains("though `helix-headless-card` does"));
     }
 
     #[test]
