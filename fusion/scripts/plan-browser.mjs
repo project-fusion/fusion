@@ -93,6 +93,12 @@ const TARGET = 110
  *
  * `TARGET` is still seconds of one worker's work, because that is what the
  * costs were measured as, so a shard sized to it now finishes sooner than it.
+ *
+ * **The specs keep one**, `workers` on their entry below. They hold the
+ * harness's own timeouts of two seconds, and a graph spec drawing WebGL in
+ * software ran out of one beside a second worker on run 38084266625. Their
+ * shards finished a minute before the visual ones, so the second worker
+ * bought them no wall time.
  */
 const WORKERS = 2
 
@@ -196,6 +202,7 @@ const CHECKS = [
     script: 'specs:browser',
     task: 'specs',
     units: specced,
+    workers: 1,
   },
 ]
 
@@ -229,7 +236,7 @@ for (const check of CHECKS) {
            which event it is, rather than written into every entry here. */
         check.scoped ? '--changed "$BASE"' : '',
         of > 1 ? `--shard ${index} --of ${of}` : '',
-        `--workers ${WORKERS}`,
+        `--workers ${check.workers ?? WORKERS}`,
       ]
         .filter(Boolean)
         .join(' '),
