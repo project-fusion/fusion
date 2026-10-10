@@ -298,7 +298,7 @@
     opacity 120ms ease,
     transform 120ms ease;
   white-space: nowrap;
-  z-index: 2;
+  z-index: var(--helix-layer-raised);
 }
 
 /* The last column's name hangs left, or the card's edge would cut it. */
