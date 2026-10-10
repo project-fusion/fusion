@@ -16,10 +16,12 @@
  * having waited for one.
  *
  * ```ts
- * const engine = await initTheme('/helix/theme.wasm')
- * const theme = engine.derive({ brand: '#3b82f6' }, [':root'])
+ * // The URL you serve the package's `wasm/fusion_helix_theme_bg.wasm` from,
+ * // or the file's bytes in Node.
+ * const engine = await initTheme(wasmUrl)
+ * const { css } = engine.deriveModes({ brand: '#3b82f6' }, [':root'])
  * document.head.append(Object.assign(document.createElement('style'), {
- *   textContent: theme.css[':root'],
+ *   textContent: css[':root'],
  * }))
  * ```
  */
@@ -44,6 +46,10 @@ export type {
 export interface ThemeEngine {
   /**
    * Derives a theme, and renders it under each selector asked for.
+   *
+   * One mode, the intent's `scheme`, which is light when it names none. For a
+   * page with both modes, `deriveModes` derives each and renders them as one
+   * block.
    *
    * @throws when the engine refuses the intent, which it does for anything that
    * would produce a palette reporting itself clean without having been measured:

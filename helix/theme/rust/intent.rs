@@ -430,9 +430,10 @@ pub struct ThemeIntent {
     pub scheme: Option<Scheme>,
     pub separation: Option<Separation>,
     pub status: Option<Status>,
-    /// Values that replace what derivation would have produced. Verified like
-    /// anything else: a pinned value that misses its target is a violation, not
-    /// an exception.
+    /// Values that replace what derivation would have produced, set after it,
+    /// so nothing is solved against them. Every pairing naming one measures it.
+    /// A name the engine does not emit is appended, in no default pairing, and
+    /// an unreadable value is skipped.
     #[cfg_attr(
         feature = "serde",
         serde(default, deserialize_with = "crate::wire::tokens")

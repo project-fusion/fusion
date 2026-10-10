@@ -89,6 +89,17 @@ stylesheet:
 }
 ```
 
+The block holds one mode, the one the preview shows, under the scope
+`[data-theme="preview"]`. Put that attribute on the element to theme, or change
+the selector. Under any selector other than `:root`, also add
+`data-helix-theme` to the element. The block sets the seeds the stylesheet
+derives the chart colors, the spacing, and the corner radii from, and the
+stylesheet reads seeds only at `:root` or on an element with
+`data-helix-theme`. See [Two ways to theme](./theming#two-ways-to-theme).
+
+For a page with both modes, derive the intent with `deriveModes` or
+`helix theme build`, as [Derive both modes](./theming#derive-both-modes) shows.
+
 The page's link holds every input you changed, so a link is the theme. To derive
 the theme in your own build, write the same inputs as an intent object:
 

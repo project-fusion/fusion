@@ -335,8 +335,15 @@ export interface ThemeIntent {
   }
   /**
    * Values that replace what derivation would have produced, keyed by token
-   * name without the namespace prefix. Verified like anything else: a pinned
-   * value that misses its target is a violation, not an exception.
+   * name without the namespace prefix.
+   *
+   * A pinned value is set after the derivation, so no other color is solved
+   * against it. Every pairing that names the token measures it, and a value
+   * that misses its target is a violation. A name the engine does not emit is
+   * appended as a token of your own, which no default pairing names, so only a
+   * pairing you list in `pairings` measures it. A value the engine cannot read
+   * is skipped: a token the engine emits keeps its derived value, and a name it
+   * does not emit is left out.
    */
   tokens?: Record<string, Color>
 }
