@@ -151,6 +151,27 @@ if (process.platform !== 'win32') {
       rmSync(project, { force: true, recursive: true })
     })
 
+    test('and a cargo target outside a checkout does not outrank it', () => {
+      /* A consumer's own `target/`, or a shared `CARGO_TARGET_DIR`, can hold a
+         `helix` that is another program or an old build of this one. Only a
+         checkout of this repository has a build of ours to prefer. */
+      const { project, shim } = consumer('from the platform package')
+      const shared = scratch()
+      for (const target of [join(project, 'target'), shared]) {
+        mkdirSync(join(target, 'release'), { recursive: true })
+        writeFileSync(join(target, 'release', 'helix'), '#!/bin/sh\necho "from a cargo target"\n')
+        chmodSync(join(target, 'release', 'helix'), 0o755)
+      }
+
+      expect(run([], {}, shim).stdout).toContain('from the platform package')
+      expect(run([], { CARGO_TARGET_DIR: shared }, shim).stdout).toContain(
+        'from the platform package',
+      )
+
+      rmSync(project, { force: true, recursive: true })
+      rmSync(shared, { force: true, recursive: true })
+    })
+
     test('and without one names the package, rather than building a crate that is not there', () => {
       /* An install that skipped optional dependencies, or a machine there is no
          build for. What it must not do is reach for cargo, which in a

@@ -28,6 +28,25 @@ use crate::args::New;
 const PACKAGE: &str = "@fusion.dev/helix-templates";
 const REGISTER: &str = "templates.json";
 
+/// Files a template carries under another name, and the name each is written
+/// under.
+///
+/// **npm and bun leave a `.gitignore` out of a tarball**, so the templates
+/// package carries it as `gitignore` and this puts the dot back. Without it the
+/// first `git add .` in a new project took `node_modules` and the build with it.
+const RENAMED: &[(&str, &str)] = &[("gitignore", ".gitignore")];
+
+/// Where a template's file lands in the project, relative to it.
+fn written_as(relative: &Path) -> PathBuf {
+    relative
+        .file_name()
+        .and_then(|name| RENAMED.iter().find(|(from, _)| name == *from))
+        .map_or_else(
+            || relative.to_path_buf(),
+            |(_, to)| relative.with_file_name(to),
+        )
+}
+
 /// The register as that package generates it.
 #[derive(Debug, Deserialize)]
 struct Register {
@@ -313,7 +332,8 @@ fn offer(register: &Register, json: bool, paint: Paint, unknown: Option<&str>) -
 }
 
 /// Copies one template into `target`, substituting each placeholder with its
-/// value only where the register says.
+/// value only where the register says, and writing each file [`RENAMED`] lists
+/// under the name it gives.
 ///
 /// # Errors
 ///
@@ -328,7 +348,7 @@ fn lay_down(
     substitutions: &[(&str, &str)],
 ) -> Outcome<()> {
     for relative in files {
-        let to = target.join(relative);
+        let to = target.join(written_as(relative));
         if let Some(parent) = to.parent() {
             fs::create_dir_all(parent).map_err(|failure| {
                 Failure::new(

@@ -1,0 +1,10 @@
+# Installed by npm install
+node_modules
+
+# Written by next dev and next build
+.next
+next-env.d.ts
+*.tsbuildinfo
+
+# Environment files for this machine alone, such as .env.local
+.env*.local

@@ -9,9 +9,9 @@
  * **Checked against the Helix you installed**, from the lint data it ships, so
  * nothing is loaded from the network.
  *
- * To print the findings in your terminal as well, run `npx helix diagnostics`
- * from `@fusion.dev/helix-cli` beside the dev server, and add
- * `sinks: { relay: true }` below.
+ * To print the findings in your terminal as well, run `npm run diagnostics`
+ * beside the dev server, and add `sinks: { relay: true }` below. The script
+ * runs `helix diagnostics` from `@fusion.dev/helix-cli`.
  */
 import { initDiagnostics } from '@fusion.dev/helix-diagnostics'
 import lint from '@fusion.dev/helix/lint.json'
