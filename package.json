@@ -61,7 +61,7 @@
     "shot": "bun fusion/scripts/shot.mjs",
     "smoke:examples": "turbo run frame && bun fusion/scripts/run-example-smoke.mjs",
     "smoke:scaffold": "turbo run build analyze && bun fusion/scripts/run-template-build.mjs",
-    "smoke:template": "turbo run build analyze && bun fusion/scripts/run-template-test.mjs",
+    "smoke:template": "turbo run build analyze --filter=!@fusion.dev/site && bun fusion/scripts/run-template-test.mjs",
     "specs:browser": "turbo run specs frame && bun fusion/scripts/run-browser-specs.mjs",
     "test": "turbo run test",
     "trust": "bun fusion/scripts/trust.mjs",
