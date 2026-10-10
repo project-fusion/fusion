@@ -11,6 +11,60 @@ const HANDLER = /^(\s*)(on[A-Za-z]+)\?: \(event: ([A-Za-z]+)\) => void;$/gm
 /** A tag entry, which already names its element in `BaseProps`. */
 const TAG_ENTRY = /BaseProps<([A-Za-z0-9_]+)> &(\s*)BaseEvents/g
 
+/**
+ * **The input handlers the generator leaves out of its bag**, each with the
+ * DOM's own event type: pointer and touch, which React, Preact and Solid all
+ * type on their own elements. Without them `onPointerEnter` on a Helix
+ * element failed to typecheck in React, and the site's theme builder wrote
+ * `onMouseEnter` instead, which a pen never fires. Svelte's and Vue's
+ * typings read native events from the framework's own attributes, which
+ * have them.
+ */
+const ADDED: readonly (readonly [name: string, event: string, doc: string])[] = [
+  [
+    'onPointerDown',
+    'PointerEvent',
+    'Fired when a mouse button, a pen or a finger goes down on the element.',
+  ],
+  ['onPointerMove', 'PointerEvent', 'Fired when a pointer moves over the element.'],
+  ['onPointerUp', 'PointerEvent', 'Fired when a pointer is released over the element.'],
+  [
+    'onPointerCancel',
+    'PointerEvent',
+    'Fired when the browser takes a pointer over, such as to scroll, and the element hears no more from it.',
+  ],
+  [
+    'onPointerEnter',
+    'PointerEvent',
+    'Fired when a pointer enters the element. It does not bubble.',
+  ],
+  [
+    'onPointerLeave',
+    'PointerEvent',
+    'Fired when a pointer leaves the element. It does not bubble.',
+  ],
+  [
+    'onPointerOver',
+    'PointerEvent',
+    'Fired when a pointer moves onto the element or one of its children.',
+  ],
+  [
+    'onPointerOut',
+    'PointerEvent',
+    'Fired when a pointer moves off the element or one of its children.',
+  ],
+  ['onGotPointerCapture', 'PointerEvent', 'Fired when the element captures a pointer.'],
+  [
+    'onLostPointerCapture',
+    'PointerEvent',
+    'Fired when the element releases a pointer it had captured.',
+  ],
+  ['onTouchStart', 'TouchEvent', 'Fired when a finger touches the element.'],
+  ['onTouchMove', 'TouchEvent', 'Fired when a finger moves across the element.'],
+  ['onTouchEnd', 'TouchEvent', 'Fired when a finger lifts from the element.'],
+  ['onTouchCancel', 'TouchEvent', 'Fired when the browser interrupts a touch.'],
+]
+
 export interface JsxNativeEventsOptions {
   /** File the JSX generator wrote, relative to the package root. */
   fileName?: string
@@ -71,7 +125,18 @@ export const jsxNativeEvents = ({
 
     const head = source.indexOf('type BaseEvents = {')
     const tail = source.indexOf('\n};', head)
-    const bag = source.slice(head, tail)
+    /* The handlers it left out, in its own format and indent, so the rewrite
+       below types them as it types the rest. One it already wrote stays as
+       it wrote it. */
+    const indent = /^(\s*)on[A-Za-z]+\?:/m.exec(source.slice(head, tail))?.[1] ?? '  '
+    const bag =
+      source.slice(head, tail) +
+      ADDED.filter(([name]) => !new RegExp(`^\\s*${name}\\?:`, 'm').test(source.slice(head, tail)))
+        .map(
+          ([name, event, doc]) =>
+            `\n${indent}/** ${doc} */\n${indent}${name}?: (event: ${event}) => void;`,
+        )
+        .join('')
 
     /* `HTMLElement` by default, so anything the rewrite below misses keeps
        working rather than failing to resolve a parameter. */

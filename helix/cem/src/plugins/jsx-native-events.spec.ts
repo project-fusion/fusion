@@ -69,6 +69,32 @@ describe('typing a native handler to the element it is written on', () => {
     expect(scene(once)).toBe(once)
   })
 
+  /* The generator writes no pointer or touch handler, so `onPointerEnter` on
+     a Helix element failed to typecheck in React. */
+  test('adds the pointer and touch handlers the generator leaves out, typed to the element', () => {
+    const next = scene()
+    expect(next).toContain('onPointerEnter?: (event: PointerEvent & { currentTarget: T }) => void;')
+    expect(next).toContain(
+      'onLostPointerCapture?: (event: PointerEvent & { currentTarget: T }) => void;',
+    )
+    expect(next).toContain('onTouchStart?: (event: TouchEvent & { currentTarget: T }) => void;')
+    // Inside the bag, before it closes.
+    expect(next.indexOf('onTouchCancel?:')).toBeLessThan(
+      next.indexOf('};', next.indexOf('type BaseEvents')),
+    )
+  })
+
+  test('keeps a handler the generator already wrote, once and as it wrote it', () => {
+    const next = scene(
+      GENERATED.replace(
+        '  onChange?:',
+        '  /** Its own words. */\n  onPointerDown?: (event: PointerEvent) => void;\n  onChange?:',
+      ),
+    )
+    expect(next.match(/onPointerDown\?:/g)).toHaveLength(1)
+    expect(next).toContain('/** Its own words. */')
+  })
+
   test('says nothing about a package that ships no elements', () => {
     const dir = mkdtempSync(join(tmpdir(), 'jsx-native-'))
     const was = process.cwd()
