@@ -77,6 +77,12 @@ describe('servePreview', () => {
     document.documentElement.dir = ''
   })
 
+  test('says it drew each render, so the preview shows the frame', () => {
+    serve()
+    render({ source: '<p>Hi</p>' })
+    expect(posted.at(-1)).toEqual({ type: 'helix-preview-rendered' })
+  })
+
   test('renders nothing a window other than its parent sent', () => {
     const root = serve()
     render({ source: '<p>Hi</p>' }, null)

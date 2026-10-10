@@ -16,6 +16,13 @@ import {
  */
 const SETTLE = 120
 
+/**
+ * How long a frame that has been sent an example may stay `blank` before it is
+ * shown anyway, in milliseconds. For a document that never says it drew, such
+ * as one written before `helix-preview-rendered` existed.
+ */
+const PAINT_PATIENCE = 1000
+
 import type { CSSResultGroup } from 'lit'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -90,6 +97,11 @@ export interface PreviewPress {
   type: 'helix-preview-press'
 }
 
+/** The frame saying it has drawn the example it was sent. */
+export interface PreviewRendered {
+  type: 'helix-preview-rendered'
+}
+
 /** How tall the frame says its content is, in CSS pixels. */
 export interface PreviewSize {
   size: number
@@ -102,6 +114,7 @@ export type PreviewMessage =
   | PreviewPress
   | PreviewReady
   | PreviewRender
+  | PreviewRendered
   | PreviewSize
 
 /**
@@ -203,6 +216,7 @@ export type PreviewMessage =
  * @csspart open - The button that opens the example in a new tab, under `controls`.
  * @csspart reload - The button that reloads the frame's document, under `controls`.
  *
+ * @cssstate blank - From the moment the frame's document starts loading until it has drawn an example. The styled tier keeps the frame transparent meanwhile, so a document that has not yet drawn in the page's color mode does not show as a white flash.
  * @cssstate failed - Since the example threw an error it did not catch, until the next source is sent.
  * @cssstate loading - While the frame's document loads, until it can take the example.
  */
@@ -549,6 +563,11 @@ export class HelixSandboxPreview extends HelixElement {
       this.handleFrameLoad()
       return
     }
+    /* A height is measured from what was drawn, so a frame that only reports
+       its height has drawn too. */
+    if (data?.type === 'helix-preview-rendered' || data?.type === 'helix-preview-size') {
+      this.drawn()
+    }
     if (data?.type === 'helix-preview-console') {
       this.dispatchEvent(new HelixConsoleEvent({ level: data.level, text: data.text }))
       if (data.uncaught) {
@@ -612,6 +631,24 @@ export class HelixSandboxPreview extends HelixElement {
    */
   private readonly settle = new DelayController(this, { renders: false })
 
+  /** Shows a frame that was sent an example and never said it drew it. */
+  private readonly patience = new DelayController(this, { renders: false })
+
+  /** Whether the frame has drawn nothing since its document started loading. */
+  private blank = false
+
+  /** Marks the frame `blank`, or shown. */
+  private setBlank(on: boolean): void {
+    this.blank = on
+    this.toggleState('blank', on)
+  }
+
+  /** The frame has drawn an example, so it is shown. */
+  private drawn(): void {
+    this.patience.cancel()
+    this.setBlank(false)
+  }
+
   /**
    * Sends once the typing stops, replacing anything already waiting.
    *
@@ -656,6 +693,9 @@ export class HelixSandboxPreview extends HelixElement {
     }
     this.frame?.contentWindow?.postMessage(this.message, HelixSandboxPreview.target)
     this.sentSource = this.sending
+    if (this.blank) {
+      this.patience.start(PAINT_PATIENCE, () => this.drawn())
+    }
   }
 
   /**
@@ -764,7 +804,9 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
     this.sentSource = undefined
     this.failedSource = undefined
     this.fail()
+    this.patience.cancel()
     this.toggleState('loading', true)
+    this.setBlank(true)
   }
 
   protected override willUpdate(changed: PropertyValues): void {

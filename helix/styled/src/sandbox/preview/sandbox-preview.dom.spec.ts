@@ -241,6 +241,30 @@ describe('the preview states', () => {
     expect(hasState(host, 'loading')).toBe(false)
   })
 
+  test('is `blank` until the frame says it drew, and again on `reload`', async () => {
+    const host = (await preview()) as Preview & { reload: () => void }
+    const frame = part(host, 'frame') as HTMLIFrameElement
+    expect(hasState(host, 'blank')).toBe(true)
+    frame.dispatchEvent(new Event('load'))
+    // Listening is not drawing: the frame has not painted in the page's mode yet.
+    expect(hasState(host, 'blank')).toBe(true)
+    window.dispatchEvent(from(frame, { type: 'helix-preview-rendered' }))
+    expect(hasState(host, 'blank')).toBe(false)
+    host.reload()
+    expect(hasState(host, 'blank')).toBe(true)
+    window.dispatchEvent(from(frame, { size: 120, type: 'helix-preview-size' }))
+    expect(hasState(host, 'blank')).toBe(false)
+  })
+
+  test('shows a frame that never says it drew, a second after it is sent an example', async () => {
+    const host = await preview()
+    const frame = part(host, 'frame') as HTMLIFrameElement
+    frame.dispatchEvent(new Event('load'))
+    expect(hasState(host, 'blank')).toBe(true)
+    await new Promise((resolve) => setTimeout(resolve, 1050))
+    expect(hasState(host, 'blank')).toBe(false)
+  })
+
   test('is `failed` after an uncaught error, until the next source is sent', async () => {
     const host = (await preview()) as Preview & { source: string }
     const frame = part(host, 'frame') as HTMLIFrameElement
