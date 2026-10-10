@@ -154,12 +154,13 @@ Both install the floor `Cargo.toml` declares rather than stable, so
 prints. Each check is split into as many shards as its share of the corpus needs
 to finish in about three minutes. Parity and hydration are scoped to what a
 change reaches, so a change to one family plans a job apiece and a change to
-`helix/core` plans the whole corpus; contrast, visual, smoke and the specs read
-every example whatever changed.
+`helix/core` plans the whole corpus; visual, smoke and the specs read every
+example whatever changed. Contrast is read in the visual shards, on the page
+each example is pictured on.
 
 **What a family costs is measured, not counted.** It was derived from how many
 examples a family holds, and that model is false wherever an example is not a
-unit of work: contrast reads every pair of inks an example paints, and on run
+unit of work: contrast, then a job of its own, read every pair of inks an example paints, and on run
 35041878434 its four shards held 142, 142, 142 and 141 examples and took 118,
 43, 40 and 43 seconds. So `fusion/scripts/lib/browser-cost.json` holds what each
 family took each check, and a family the file does not know falls back to the
@@ -172,12 +173,12 @@ corpus divided, so a run's artifacts added together are the corpus once.
 `measure-browser.mjs --from` merges them, and its header spells out the two
 commands. The alternative is running the checks on a desk, which the same script
 does and which is the fallback rather than the first choice: a desk is several
-times a two-core runner and not uniformly. Aura is a sixth of contrast on an M2
+times a two-core runner and not uniformly. Aura was a sixth of contrast on an M2
 and a third of it here, a software rasterizer against a GPU, and shards packed
 from the M2's reading ran 127 and 84 seconds against 106 each as planned.
 
 **And never more shards than the heaviest family allows**, because a shard holds
-whole families: aura is 78 seconds of contrast's 215, so four shards of 54 would
+whole families: aura was 78 seconds of contrast's 215, so four shards of 54 would
 be three jobs billed to finish early while the fourth ran longer than any of
 them.
 

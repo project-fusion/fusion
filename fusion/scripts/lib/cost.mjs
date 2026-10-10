@@ -57,7 +57,6 @@ export const MEASURED = JSON.parse(
  * to finish, by six minutes. 1,258 seconds over 606 pictures is 2.08.
  */
 export const ESTIMATE = {
-  contrast: { per: 0.33 },
   dsd: { fixed: 15, per: 0.81 },
   parity: { per: 0.85 },
   smoke: { per: 0.14 },

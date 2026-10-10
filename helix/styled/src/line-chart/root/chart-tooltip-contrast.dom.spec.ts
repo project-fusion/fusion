@@ -4,7 +4,7 @@ import { hasLayout, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 /* The words in a chart's reading bubble, against the bubble they sit on, for
    every chart that takes `shared/chart/tooltip.css`.
 
-   Here because nothing else can see them. `check:css:contrast` photographs
+   Here because nothing else can see them. The visual shards' contrast check reads
    examples at rest and a tooltip is drawn only while a pointer rests on a
    reading, so when Line, Donut and the first Area and Scatter painted a column's
    name in `foreground-muted`, a page color, on the bubble's `surface-inverse`,

@@ -521,6 +521,8 @@ pub(crate) struct Captured {
     /// What the config's page checks found on each page, each as the
     /// check's name and its sentence.
     pub(crate) findings: BTreeMap<usize, Vec<(String, String)>>,
+    /// Every ink and ground pair contrast measured on each page.
+    pub(crate) painted: BTreeMap<usize, Vec<String>>,
     pub(crate) pictures: BTreeMap<(usize, usize), Vec<u8>>,
     /// What a pairs source's `check` found on each page.
     pub(crate) problems: BTreeMap<usize, Vec<String>>,
@@ -544,6 +546,7 @@ pub(crate) fn capture(
         broken: BTreeMap::new(),
         errors: BTreeMap::new(),
         findings: BTreeMap::new(),
+        painted: BTreeMap::new(),
         pictures: BTreeMap::new(),
         problems: BTreeMap::new(),
         seconds: BTreeMap::new(),
@@ -617,6 +620,7 @@ pub(crate) fn capture(
                     })
                     .unwrap_or_default();
                 captured.findings.insert(entry, found);
+                captured.painted.insert(entry, strings("painted"));
                 if let Some(snapshot) = line["aria"].as_str() {
                     captured.aria.insert(entry, snapshot.to_string());
                 }
@@ -1513,6 +1517,12 @@ pub fn run(options: &Options) -> Outcome<Code> {
         groups,
         triaged,
         origin: crate::history::Origin::here(&base),
+        painted: first
+            .painted
+            .iter()
+            .filter(|(_, pairs)| !pairs.is_empty())
+            .map(|(&at, pairs)| (mine[at].id.clone(), pairs.clone()))
+            .collect(),
         update: options.update,
     }))
 }

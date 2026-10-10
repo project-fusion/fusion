@@ -375,6 +375,7 @@ mod tests {
             broken: BTreeMap::new(),
             errors: BTreeMap::new(),
             findings: BTreeMap::new(),
+            painted: BTreeMap::new(),
             pictures: BTreeMap::new(),
             problems: BTreeMap::new(),
             seconds: BTreeMap::new(),

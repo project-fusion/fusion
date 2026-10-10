@@ -674,8 +674,8 @@ jobs:
     # that shell block that never writes `browser=`, and the expression reads
     # empty: `plan` succeeds, every browser job reports skipped, the gate below
     # counts skipped as neither failure nor cancellation, and a pull request
-    # touching `helix/styled/src` merges with contrast, specs, smoke, visual,
-    # parity and diagnostics never having run. Nothing in the run says so.
+    # touching `helix/styled/src` merges with specs, smoke, visual, parity and
+    # diagnostics never having run. Nothing in the run says so.
     #
     # A failed or skipped `plan` still skips this through `needs`, and `plan`'s
     # own failure is what the gate catches, so the safe case is unchanged.
@@ -718,7 +718,7 @@ jobs:
       - name: ${{ matrix.label }}
         # **What each family cost, recorded on the machine that packs these
         # shards.** `@fusion.dev/scripts/cost` weighs a family by a measurement
-        # and a desk is not a runner and not uniformly: aura is a sixth of
+        # and a desk is not a runner and not uniformly: aura was a sixth of
         # contrast on an M2 and a third of it here, which is most of the gap
         # between the shards this plans and the shards that finish together.
         # The file is a shard's own families, so a run's worth of them merged

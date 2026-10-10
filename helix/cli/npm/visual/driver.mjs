@@ -397,6 +397,8 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
   let error = null
   let problems = []
   let findings = []
+  /* Every ink and ground pair contrast measured on the page. */
+  let painted = []
   let aria = null
   /* The color schemes contrast has been read in. */
   const read = new Set()
@@ -488,13 +490,13 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
       if ((index === 0 && (item.checks?.clipped || item.checks?.overlap)) || contrast) {
         progress.stage = 'reading the page'
         read.add(shot.scheme)
-        findings = findings.concat(
-          await readPage(page, {
-            clipped: index === 0 ? (item.checks.clipped ?? null) : null,
-            contrast: contrast ? { ...item.checks.contrast, scheme: shot.scheme } : null,
-            overlap: index === 0 ? (item.checks.overlap ?? null) : null,
-          }),
-        )
+        const reading = await readPage(page, {
+          clipped: index === 0 ? (item.checks.clipped ?? null) : null,
+          contrast: contrast ? { ...item.checks.contrast, scheme: shot.scheme } : null,
+          overlap: index === 0 ? (item.checks.overlap ?? null) : null,
+        })
+        findings = findings.concat(reading.findings)
+        painted = painted.concat(reading.pairs)
       }
       if (index === 0 && item.aria) {
         progress.stage = 'taking its accessibility snapshot'
@@ -526,6 +528,7 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
     findings,
     key: item.key,
     op: 'item',
+    painted,
     problems,
     seconds,
   })

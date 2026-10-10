@@ -77,11 +77,18 @@ export default defineConfig({
   /* Each example's accessibility tree beside its pictures, so a lost name or
      role fails where no pixel moved. */
   aria: true,
-  /* Text a box cuts off, and text or controls that collide in the flow, on
-     each example as it was pictured. Contrast runs in its own job, which
-     renders each example in the sandbox frame and reports the modeled pairs
-     no example paints. */
-  checks: { clipped: true, overlap: true },
+  /* Text a box cuts off, text or controls that collide in the flow, and every
+     ink against the ground it is painted on, in light and in dark, on each
+     example as it was pictured. Contrast had a job of its own, which rendered
+     every example a second time to read it. `color-border` draws lines that
+     separate and answers to no target. Each record lists the pairs it
+     measured, and `bun run contrast:coverage` names the modeled pairs no
+     example paints. */
+  checks: {
+    clipped: true,
+    contrast: { rules: ['var(--helix-color-border)'] },
+    overlap: true,
+  },
   /* **Two pixels Chromium antialiases differently after a switch in place.**
      The dark shot is taken on the wide page switched to dark, and there the
      field's rounded corner loses the faint blue it has on a fresh load. No

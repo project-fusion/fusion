@@ -100,6 +100,8 @@ pub struct Run<'a> {
     pub triaged: Option<String>,
     /// Where the run happened: its commit, its ref and its time.
     pub origin: crate::history::Origin,
+    /// Every ink and ground pair contrast measured, by entry.
+    pub painted: BTreeMap<String, Vec<String>>,
     pub update: bool,
 }
 
@@ -488,6 +490,7 @@ fn record(run: &Run, verdict: &str, failed: bool) -> Value {
         "findings": run.findings,
         "groups": run.groups.iter().map(crate::triage::Group::record).collect::<Vec<_>>(),
         "mode": if run.update { "update" } else { "test" },
+        "painted": run.painted,
         "run": run.origin.record(),
         "shots": rows,
         "skipped": run.skipped,
