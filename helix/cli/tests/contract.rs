@@ -2292,6 +2292,58 @@ fn the_attribute_of_an_internal_field_names_no_field() {
     );
 }
 
+/// The attribute of a protected or private field names no field either, and
+/// keeps the field's description, which is what describes it. A public
+/// field's attribute still names its field.
+#[test]
+fn the_attribute_of_a_protected_field_names_no_field() {
+    let sandbox = Sandbox::new("manifest-protected-attribute", None);
+    let src = sandbox.0.join("src/field");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("field.ts"),
+        "@customElement('helix-field')\n\
+         export class HelixField extends HelixElement {\n\
+         \x20 /**\n\
+         \x20  * The name a screen reader says for the field.\n\
+         \x20  */\n\
+         \x20 @property({ attribute: 'aria-label' })\n\
+         \x20 protected namedBy: string | null = null\n\
+         \x20 /** Kept to the class. */\n\
+         \x20 @property({ attribute: 'hint-id' })\n\
+         \x20 private hintId = 'hint'\n\
+         \x20 /** The visible label. */\n\
+         \x20 @property()\n\
+         \x20 label = ''\n\
+         }\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let attributes = parsed["modules"][0]["declarations"][0]["attributes"]
+        .as_array()
+        .expect("the attributes")
+        .clone();
+    let of = |name: &str| {
+        attributes
+            .iter()
+            .find(|one| one["name"] == name)
+            .unwrap_or_else(|| panic!("{name} is published: {said}"))
+            .clone()
+    };
+    assert!(of("aria-label").get("fieldName").is_none(), "{said}");
+    assert_eq!(
+        of("aria-label")["description"],
+        "The name a screen reader says for the field.",
+        "{said}"
+    );
+    assert!(of("hint-id").get("fieldName").is_none(), "{said}");
+    assert_eq!(of("label")["fieldName"], "label", "{said}");
+}
+
 /// A field initialized from a constant beside it, and the attribute that
 /// mirrors it, which do not say the same thing.
 #[test]
@@ -2632,6 +2684,89 @@ fn an_inherited_entry_takes_the_words_of_the_nearest_link_that_wrote_them() {
     assert_eq!(copy["description"], "The parent's own.");
 }
 
+/// An inherited entry read where it started keeps the parent's default,
+/// which is the value the class holds. The headless combobox declares
+/// `static words = 'helix-combobox'` over the mixin's empty one, and the
+/// styled combobox published the mixin's, so `words.d.ts` filed it under an
+/// empty key. Found through the parent's mixins and through the stamp alone.
+#[test]
+fn an_inherited_entry_keeps_the_default_its_parent_declares() {
+    let sandbox = Sandbox::new("manifest-parent-default", None);
+    let src = sandbox.0.join("src");
+    std::fs::create_dir_all(src.join("combobox")).expect("a source tree");
+    std::fs::create_dir_all(src.join("listbox")).expect("a source tree");
+    std::fs::write(
+        src.join("combobox/combobox.ts"),
+        "import { HelixHeadlessCombobox } from '@fusion.dev/helix-headless/combobox'\n\
+         export class HelixCombobox extends HelixHeadlessCombobox {}\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        src.join("listbox/listbox.ts"),
+        "import { HelixHeadlessListbox } from '@fusion.dev/helix-headless/listbox'\n\
+         export class HelixListbox extends HelixHeadlessListbox {}\n",
+    )
+    .expect("a source");
+    std::fs::write(
+        sandbox.0.join("core.json"),
+        r#"{"modules":[
+          {"path":"src/mixins/tokens.ts","declarations":[
+            {"name":"MixinTokens","members":[
+              {"name":"words","static":true,"default":"''","description":"The mixin's."}]}]},
+          {"path":"src/mixins/collection.ts","declarations":[
+            {"name":"MixinCollection","members":[
+              {"name":"emptyText","default":"'Nothing to show'","description":"The mixin's."}]}]}]}"#,
+    )
+    .expect("a manifest");
+    std::fs::write(
+        sandbox.0.join("headless.json"),
+        r#"{"modules":[
+          {"path":"src/combobox/combobox.ts","declarations":[
+            {"name":"HelixHeadlessCombobox","mixins":[{"name":"MixinTokens"}],
+             "members":[{"name":"words","static":true,"default":"'helix-combobox'",
+               "inheritedFrom":{"name":"MixinTokens","module":"src/mixins/tokens.ts"}}]}]},
+          {"path":"src/listbox/listbox.ts","declarations":[
+            {"name":"HelixHeadlessListbox",
+             "members":[{"name":"emptyText","default":"'No matches'",
+               "inheritedFrom":{"name":"MixinCollection","module":"src/mixins/collection.ts"}}]}]}]}"#,
+    )
+    .expect("a manifest");
+
+    let output = run(
+        &sandbox.0,
+        &[
+            "manifest",
+            "build",
+            ".",
+            "--dependency",
+            "@fusion.dev/helix-core=core.json",
+            "--dependency",
+            "@fusion.dev/helix-headless=headless.json",
+        ],
+    );
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let member = |class: &str| {
+        parsed["modules"]
+            .as_array()
+            .expect("the modules")
+            .iter()
+            .flat_map(|one| one["declarations"].as_array().expect("the declarations"))
+            .find(|one| one["name"] == class)
+            .unwrap_or_else(|| panic!("{class} is declared: {said}"))["members"][0]
+            .clone()
+    };
+
+    let words = member("HelixCombobox");
+    assert_eq!(words["default"], "'helix-combobox'", "{said}");
+    assert_eq!(words["description"], "The mixin's.", "{said}");
+    assert_eq!(words["inheritedFrom"]["name"], "MixinTokens", "{said}");
+    let empty = member("HelixListbox");
+    assert_eq!(empty["default"], "'No matches'", "{said}");
+    assert_eq!(empty["description"], "The mixin's.", "{said}");
+}
+
 /// What the analyzer sees dispatched, and who keeps it.
 ///
 /// It records an event for every `dispatchEvent` it can see, and a call inside
@@ -2735,6 +2870,68 @@ fn a_tag_registered_by_a_call_is_a_definition() {
     assert_eq!(exports[1]["kind"], "custom-element-definition");
     assert_eq!(exports[1]["name"], "tagName");
     assert_eq!(exports[1]["declaration"]["name"], "target");
+}
+
+/// A tag written as a string is the tag, and the class it registers is an
+/// element with that `tagName`, exported or not. The guide to building on the
+/// headless tier registers this way, and the quotes left no typings.
+#[test]
+fn a_tag_registered_by_a_call_with_a_string_names_its_class() {
+    let sandbox = Sandbox::new("manifest-define-literal", None);
+    let src = sandbox.0.join("src/combobox");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("combobox.ts"),
+        "import { HelixHeadlessCombobox } from '@fusion.dev/helix-headless/combobox'\n\
+         export class AcmeCombobox extends HelixHeadlessCombobox {\n\
+         \x20 static override tier = 'acme-'\n\
+         }\n\
+         customElements.define('acme-combobox', AcmeCombobox)\n\
+         class AcmeOption extends HTMLElement {}\n\
+         customElements.define(\"acme-option\", AcmeOption)\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let said = out(&output);
+    let parsed: serde_json::Value = serde_json::from_str(&said).expect("a manifest");
+    let module = &parsed["modules"][0];
+    let definitions: Vec<(String, String)> = module["exports"]
+        .as_array()
+        .expect("the exports")
+        .iter()
+        .filter(|one| one["kind"] == "custom-element-definition")
+        .map(|one| {
+            (
+                one["name"].as_str().unwrap_or_default().to_owned(),
+                one["declaration"]["name"]
+                    .as_str()
+                    .unwrap_or_default()
+                    .to_owned(),
+            )
+        })
+        .collect();
+    assert_eq!(
+        definitions,
+        [
+            ("acme-combobox".to_owned(), "AcmeCombobox".to_owned()),
+            ("acme-option".to_owned(), "AcmeOption".to_owned()),
+        ],
+        "{said}"
+    );
+    let class = |name: &str| {
+        module["declarations"]
+            .as_array()
+            .expect("the declarations")
+            .iter()
+            .find(|one| one["name"] == name)
+            .unwrap_or_else(|| panic!("{name} is declared: {said}"))
+            .clone()
+    };
+    assert_eq!(class("AcmeCombobox")["tagName"], "acme-combobox", "{said}");
+    assert_eq!(class("AcmeCombobox")["customElement"], true, "{said}");
+    assert_eq!(class("AcmeOption")["tagName"], "acme-option", "{said}");
 }
 
 /// A manifest says which package and version it describes, from the

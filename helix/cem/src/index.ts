@@ -21,6 +21,7 @@ import { jsxNativeEvents } from './plugins/jsx-native-events.js'
 import { jsxNumericAttributes } from './plugins/jsx-numeric-attributes.js'
 import { jsxOptionalUndefined } from './plugins/jsx-optional-undefined.js'
 import { jsxReactRef } from './plugins/jsx-react-ref.js'
+import { jsxUnnamedAttributes } from './plugins/jsx-unnamed-attributes.js'
 import { svelteTypes } from './plugins/svelte-types.js'
 import { wordsTypes } from './plugins/words-types.js'
 import type { HelixContext, HelixManifest, HelixMetadata, Plugin } from './types.js'
@@ -353,6 +354,9 @@ export const afterManifest = ({
           outdir: TYPES,
           stronglyTypedEvents: true,
         }),
+        /* After both generators, which write `unknown` for an attribute that
+             names no field, and before Svelte's, which reuses the JSX map. */
+        jsxUnnamedAttributes({ fileNames: [`${TYPES}/jsx.d.ts`, `${TYPES}/vue.d.ts`] }),
         /* After everything that rewrites the JSX tag map, because it reuses
              the finished one. */
         ...(packageName
@@ -366,7 +370,7 @@ export const afterManifest = ({
           : []),
         /* What `registerWords` takes for each family, from the word
              properties the manifest marks. */
-        wordsTypes({ outFile: `${TYPES}/words.d.ts` }),
+        wordsTypes({ outFile: `${TYPES}/words.d.ts`, ...(packageName ? { packageName } : {}) }),
         /* After both generators, which type an attribute as its property,
              and before `jsxOptionalUndefined`, so the string form it admits
              is wrapped in the same `| undefined`. */
@@ -562,6 +566,7 @@ export {
   jsxNumericAttributes,
   jsxOptionalUndefined,
   jsxReactRef,
+  jsxUnnamedAttributes,
   svelteTypes,
   wordsTypes,
 }

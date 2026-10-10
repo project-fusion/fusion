@@ -1147,20 +1147,36 @@ fn attributes_of(members: &[Value], written: &[Option<Written>]) -> Vec<Value> {
         .collect()
 }
 
-/// Takes the field's name off an attribute whose field is `@internal`.
+/// Takes the field's name off an attribute whose field a consumer cannot
+/// reach: one that is `@internal`, `protected` or `private`.
 ///
 /// **The attribute stays, and names no field.** A consumer still writes it:
-/// `aria-label` is observed through `MixinField`'s `@internal` `namedBy`.
+/// `aria-label` is observed through `MixinField`'s protected `namedBy`.
 /// Naming the field sent the typings generator to it, which typed the
 /// attribute as a lookup into a protected member and offered `namedBy` as a
 /// prop, 152 errors across nineteen fields.
-fn unnamed(attributes: &mut [Value], hidden: &BTreeSet<String>) {
+///
+/// **By the field's privacy as well as by `@internal`.** `@internal` was
+/// the first answer, and its block is the field's description, so the
+/// attribute lost its description with it. The tag came off to describe the
+/// attribute, and the errors came back.
+fn unnamed(attributes: &mut [Value], members: &[Value], hidden: &BTreeSet<String>) {
+    let unreachable: BTreeSet<&str> = members
+        .iter()
+        .filter(|one| {
+            matches!(
+                one.get("privacy").and_then(Value::as_str),
+                Some("private" | "protected")
+            )
+        })
+        .filter_map(|one| one.get("name").and_then(Value::as_str))
+        .collect();
     for attribute in attributes {
         let field = attribute
             .get("fieldName")
             .and_then(Value::as_str)
             .unwrap_or_default();
-        if hidden.contains(field) {
+        if hidden.contains(field) || unreachable.contains(field) {
             if let Some(fields) = attribute.as_object_mut() {
                 fields.remove("fieldName");
             }
@@ -1307,7 +1323,7 @@ fn declaration_of(
             one.members.iter().map(|two| two.written.clone()).collect();
         let members: Vec<Value> = one.members.into_iter().map(member_of).collect();
         let mut attributes = attributes_of(&members, &written);
-        unnamed(&mut attributes, &hidden);
+        unnamed(&mut attributes, &members, &hidden);
         if !attributes.is_empty() {
             fields.insert("attributes".to_owned(), json!(attributes));
         }
