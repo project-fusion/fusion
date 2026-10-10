@@ -26,6 +26,7 @@
     "./examples.json": "./examples.json",
     "./jsx": "./types/jsx.d.ts",
     "./lint.json": "./lint.json",
+    "./specs": null,
     "./svelte": "./types/svelte.d.ts",
     "./vue": "./types/vue.d.ts",
     "./words": "./types/words.d.ts"
