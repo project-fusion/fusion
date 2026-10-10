@@ -74,7 +74,7 @@ describe('selection', () => {
     expect(seen).toEqual(['d'])
     element.sort = 'name:asc'
     await element.updateComplete
-    const rows = shadow(element, '[part="row"]')
+    const rows = shadow(element, '[part~="row"]')
     const chosen = rows.filter((row) => row.getAttribute('aria-selected') === 'true')
     expect(chosen.map((row) => row.querySelector('[part~="cell"]')?.textContent?.trim())).toEqual([
       'delta',
@@ -124,9 +124,9 @@ describe('selection', () => {
     const element = await table('selectable row-key="id" default-selected="b"')
     const internals = (element as unknown as { internals: ElementInternals }).internals
     expect(internals.ariaMultiSelectable).toBe('true')
-    expect(shadow(element, '[part="row"]').map((row) => row.getAttribute('aria-selected'))).toEqual(
-      ['false', 'false', 'false', 'true'],
-    )
+    expect(
+      shadow(element, '[part~="row"]').map((row) => row.getAttribute('aria-selected')),
+    ).toEqual(['false', 'false', 'false', 'true'])
   })
 
   test('and paints it by part name, on the cells, since the row takes no box', async () => {

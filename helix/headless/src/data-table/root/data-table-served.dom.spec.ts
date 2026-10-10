@@ -57,7 +57,7 @@ const shown = (element: Table): Element[] =>
     ?.assignedElements() ?? []
 
 const drawn = (element: Table): string[] =>
-  [...(element.shadowRoot?.querySelectorAll('[part="row"]') ?? [])].map((row) =>
+  [...(element.shadowRoot?.querySelectorAll('[part~="row"]') ?? [])].map((row) =>
     [...row.querySelectorAll('[part~="cell"]')].map((cell) => cell.textContent?.trim()).join(' '),
   )
 

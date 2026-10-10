@@ -124,8 +124,11 @@
  *    nothing however many columns it names. The alternative every consumer reaches
  *    for instead is dropping their own bottom border and letting this rule stand in
  *    for it, which is a different box's border doing this one's job.
+ *
+ *    The headless render names that row `row-last`. `:last-of-type` found it too,
+ *    and restyled every row whenever one came or went.
  */
-[part~="row"]:last-of-type [part~="cell"] {
+[part~="row-last"] [part~="cell"] {
   border-block-end-color: transparent;
 }
 
@@ -192,8 +195,8 @@
   inline-size: 1em;
 }
 
-[part~="row"]:last-of-type [part~="select"],
-[part~="row"]:last-of-type [part="row-grip"] {
+[part~="row-last"] [part~="select"],
+[part~="row-last"] [part="row-grip"] {
   border-block-end-color: transparent;
 }
 
