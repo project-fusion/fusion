@@ -1,6 +1,6 @@
 import { type CSSProperties, type ReactNode, useId } from 'react'
 
-/**
+/*
  * The pictures on the tiles in the Helix band: five scenes in one isometric
  * projection.
  *
