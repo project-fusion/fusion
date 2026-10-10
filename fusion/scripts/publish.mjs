@@ -56,6 +56,7 @@ import {
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { argument, flag } from '@fusion.dev/scripts/argv'
+import { minifyJson } from '@fusion.dev/scripts/minify-json'
 import { stripMapComment } from '@fusion.dev/scripts/strip-map-comment'
 import { DOMAINS, domainOf, manifests, publishes, root } from '@fusion.dev/scripts/workspace'
 
@@ -447,6 +448,62 @@ const strip = (directory) => {
 }
 
 /**
+ * Packs each JSON file `files` names without its whitespace, and hands back
+ * the bytes that saves and what writes the files back as they were.
+ *
+ * **Every reader parses them, so the whitespace is for a person reading the
+ * repository.** `helix api`, `helix component`, `helix diagnostics`, `helix
+ * manifest diff`, `helix mcp` and `helix scan` read them with a JSON parser,
+ * the diagnostics fetch `lint.json` from a CDN and parse the response, and
+ * editor tooling reads a custom elements manifest the same way. No reader
+ * compares their bytes or reports a line in them.
+ *
+ * **The manifests are what this is for.** `api.json`, `examples.json` and
+ * `lint.json` are written compact already. Measured October 10, 2026, on
+ * 0.205.2: `@fusion.dev/helix`'s manifest goes from 13,524,637 bytes to
+ * 9,226,244, headless's from 11,238,177 to 7,811,736 and core's from 1,439,085
+ * to 939,801. That is 8.2 MB off what an install of `@fusion.dev/helix`
+ * unpacks, and 0.8 MB off the three tarballs.
+ *
+ * **Written back after the pack**, as `--bootstrap` does with the version.
+ * `helix manifest build` writes the pretty form on purpose, for `manifest
+ * diff` and for a person reading what a layer produced, and a check that
+ * compares a generated file with its generator reads the working tree. Only a
+ * file that parses is touched, so the result parses to the same value.
+ */
+const squeeze = (directory, manifest) => {
+  const kept = []
+  let saved = 0
+  for (const entry of manifest.files ?? []) {
+    const path = join(root, directory, entry)
+    if (!entry.endsWith('.json') || !existsSync(path)) {
+      continue
+    }
+    const text = readFileSync(path, 'utf8')
+    try {
+      JSON.parse(text)
+    } catch {
+      continue
+    }
+    const small = minifyJson(text)
+    if (small === text) {
+      continue
+    }
+    kept.push([path, text])
+    saved += Buffer.byteLength(text) - Buffer.byteLength(small)
+    writeFileSync(path, small)
+  }
+  return {
+    restore: () => {
+      for (const [path, text] of kept) {
+        writeFileSync(path, text)
+      }
+    },
+    saved,
+  }
+}
+
+/**
  * Refuses a package whose `files` names something absent, before any of the
  * domain is published.
  *
@@ -526,7 +583,12 @@ for (const [name, { directory, manifest }] of packages) {
      correct and nothing touches the archive afterwards, which is what makes the
      file's own promise true: what is packed is what is published. */
   const dropped = strip(directory)
-  run('bun', ['pm', 'pack', '--destination', into], join(root, directory))
+  const squeezed = squeeze(directory, manifest)
+  try {
+    run('bun', ['pm', 'pack', '--destination', into], join(root, directory))
+  } finally {
+    squeezed.restore()
+  }
   const [file] = readdirSync(into)
   if (file === undefined) {
     fail(`${directory}: packed nothing.`)
@@ -548,7 +610,10 @@ for (const [name, { directory, manifest }] of packages) {
     }
   }
 
-  console.log(`  ${name}@${version} (${file}, ${dropped} source maps stripped)`)
+  console.log(
+    `  ${name}@${version} (${file}, ${dropped} source maps stripped, ` +
+      `${squeezed.saved.toLocaleString('en-US')} bytes of JSON whitespace removed)`,
+  )
   if (!dry) {
     npm(
       [

@@ -21,6 +21,7 @@
     "./frontmatter": "./lib/frontmatter.mjs",
     "./join-lines": "./lib/join-lines.mjs",
     "./literal": "./lib/literal.mjs",
+    "./minify-json": "./lib/minify-json.mjs",
     "./models": "./lib/models.mjs",
     "./paint": "./lib/paint.mjs",
     "./pool": "./lib/pool.mjs",
