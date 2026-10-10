@@ -35,18 +35,43 @@ import type { CSSProperties, ReactNode } from 'react'
 const PLATES = false
 
 /*
- * The projection. A point at `x, y, z` on a ground where `x` runs right and
- * up, away from the viewer, and `y` runs right and down, toward the viewer,
- * lands at `(x + y) * 0.866, (y - x) * 0.5 - z` from the scene's origin, which
- * sits at 160, 110 of the gallery's 320 by 200 canvas. So a row of things
- * along `x` reads left to right and recedes, the way a line of text on a desk
- * does from a chair. Every scene is drawn at round numbers on an 80 by 80
- * ground and scaled up a quarter by `Scene` to fill the tile's crop.
+ * The camera. `yaw` turns the ground under it, in degrees, so that `x` runs
+ * right and away from the viewer and `y` runs right and toward them; `pitch`
+ * is how far above the ground it looks, 90 being straight down; `focal` is
+ * the distance to the viewer, and `Infinity` is no perspective at all, every
+ * parallel line staying parallel. A yaw of 45 and a pitch of 35.264 with no
+ * perspective is the isometric projection, where a point at `x, y, z` lands at
+ * `(x + y) * 0.866, (y - x) * 0.5 - z`.
  */
-const iso = (x: number, y: number, z: number) => ({
-  x: 160 + (x + y) * 0.866,
-  y: 110 + (y - x) * 0.5 - z,
-})
+const CAMERA = { focal: 260, pitch: 38, yaw: 40 }
+
+/*
+ * The projection. A point at `x, y, z` on the ground lands at a screen point
+ * from the scene's origin, which sits at 160, 110 of the gallery's 320 by 200
+ * canvas, and carries `k`, how much nearer things are drawn larger by, which
+ * is 1 without perspective. So a row of things along `x` reads left to right
+ * and recedes, the way a line of text on a desk does from a chair. Every
+ * scene is drawn at round numbers on an 80 by 80 ground and scaled up a third
+ * by `Scene` to fill the tile's crop.
+ */
+const iso = (x: number, y: number, z: number) => {
+  const yaw = (CAMERA.yaw * Math.PI) / 180
+  const pitch = (CAMERA.pitch * Math.PI) / 180
+  /* Across the screen, and toward the viewer along the ground. */
+  const u = x * Math.cos(yaw) + y * Math.sin(yaw)
+  const v = -x * Math.sin(yaw) + y * Math.cos(yaw)
+  /* How far toward the viewer, along the line of sight. */
+  const depth = v * Math.cos(pitch) + z * Math.sin(pitch)
+  const k = Number.isFinite(CAMERA.focal) ? CAMERA.focal / (CAMERA.focal - depth) : 1
+  /* 1.2247 is what makes the isometric case the classic one, with a unit of
+     height drawn as a unit on screen. */
+  const scale = 1.2247 * k
+  return {
+    k,
+    x: 160 + u * scale,
+    y: 110 + (v * Math.sin(pitch) - z * Math.cos(pitch)) * scale,
+  }
+}
 
 const points = (list: { x: number; y: number }[]) => list.map((p) => `${p.x},${p.y}`).join(' ')
 
@@ -164,7 +189,7 @@ function Sphere({
   className,
   fillOpacity,
   glow,
-  r,
+  r: size,
   x,
   y,
   z,
@@ -179,6 +204,8 @@ function Sphere({
 }) {
   const at = iso(x, y, z)
   const foot = iso(x, y, 0)
+  /* Nearer is larger, by the projection's own factor. */
+  const r = size * at.k
   return (
     <g>
       {PLATES && (
@@ -470,7 +497,7 @@ const mapArt: ReactNode = (
       <Flat
         className="artInk"
         d={road.along === 'x' ? 5 : road.to - road.from}
-        fillOpacity={0.12}
+        fillOpacity={0.28}
         key={`${road.along}${road.at}`}
         w={road.along === 'x' ? road.to - road.from : 5}
         x={road.along === 'x' ? road.from : road.at}
@@ -517,19 +544,19 @@ const mapArt: ReactNode = (
         className="artBrand"
         cx={iso(PIN.x, PIN.y, 26).x}
         cy={iso(PIN.x, PIN.y, 26).y}
-        r="6"
+        r={6 * iso(PIN.x, PIN.y, 26).k}
       />
       <circle
         cx={iso(PIN.x, PIN.y, 26).x}
         cy={iso(PIN.x, PIN.y, 26).y}
         fill="url(#helixSphereRim)"
-        r="6"
+        r={6 * iso(PIN.x, PIN.y, 26).k}
       />
       <circle
         cx={iso(PIN.x, PIN.y, 26).x}
         cy={iso(PIN.x, PIN.y, 26).y}
         fill="url(#helixSphereLight)"
-        r="6"
+        r={6 * iso(PIN.x, PIN.y, 26).k}
       />
     </g>
   </Scene>
