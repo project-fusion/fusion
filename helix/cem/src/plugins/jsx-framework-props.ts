@@ -41,6 +41,46 @@ declare module "solid-js/jsx-runtime" {
 `
 
 /**
+ * Solid's JSX without its compiler, which `jsxImportSource: "solid-js/h"`
+ * reads, and the tag map it reads there.
+ *
+ * The comment above each type is the explanation a reader of the typings
+ * gets, so it says what `h` does with a function.
+ */
+const SOLID_H_BLOCK = `
+/**
+ * A prop as Solid's JSX takes it without the compiler, with
+ * \`jsxImportSource: "solid-js/h"\`. \`h\` calls a function given to a prop for
+ * the prop's value, and calls it again when a signal it read changes, so each
+ * prop takes its value or a function that returns it. \`ref\`, \`children\`, and
+ * the props named \`on…\` are taken as they are, as \`h\` takes them. A property
+ * whose value is a function takes only a function that returns it, because
+ * \`h\` calls any function it is given. A prop typed \`any\` stays \`any\`.
+ */
+type SolidHProp<K, V> = K extends "children" | "ref" | \`on\${string}\`
+  ? V
+  : 0 extends 1 & V
+    ? V
+    : [Exclude<V, undefined>] extends [(...args: never[]) => unknown]
+      ? (() => V) | undefined
+      : V | (() => V);
+
+/** One tag's props as Solid's JSX takes them without the compiler. */
+type SolidHProps<P> = { [K in keyof P]: SolidHProp<K, P[K]> };
+
+/** The tag map Solid's JSX reads without the compiler: \`CustomElementsSolidJs\`, each prop as \`SolidHProp\` takes it. */
+export type CustomElementsSolidH = {
+  [Tag in keyof CustomElementsSolidJs]: SolidHProps<CustomElementsSolidJs[Tag]>;
+};
+
+declare module "solid-js/h/jsx-runtime" {
+  namespace JSX {
+    interface IntrinsicElements extends CustomElementsSolidH {}
+  }
+}
+`
+
+/**
  * The type parameter that names the framework, and `ref` and `style` in each.
  *
  * The comment above each `import()` is the one this plugin exists to place,
@@ -123,6 +163,17 @@ export interface JsxFrameworkPropsOptions {
  * `jsxImportSource: "solid-js"` reads, and keeps the generator's for code that
  * reads `JSX` from `solid-js`.
  *
+ * **And Solid's JSX without the compiler.** `jsxImportSource: "solid-js/h"`
+ * reads the `JSX` of `solid-js/h/jsx-runtime`, a namespace of its own, so the
+ * augmentations above never reached it and every Helix tag there was unknown.
+ * `h` reads a function given to a prop as the prop's value, so its map,
+ * `CustomElementsSolidH`, is Solid's with each prop also taking a function
+ * that returns it. `ref`, `children`, and the props named `on…` are left as
+ * they are, which is the test `h` itself makes, and a property whose value is
+ * a function takes only a function that returns it: `h` calls whatever
+ * function it is given, so a bare `formatter={format}` would be called with
+ * no arguments and its result assigned.
+ *
  * **A type on each prop, so `BaseProps` stays one object type.** Error
  * messages name it, `BaseProps<HelixButton, "react">`, where an intersection
  * with the framework's props was flattened into every message.
@@ -201,7 +252,7 @@ export const jsxFrameworkProps = ({
         const framework = module === 'preact' ? 'preact' : 'react'
         return `${line}<"${framework}"> {}`
       })
-      .replace(SOLID_BLOCK, (block) => `${block}${SOLID_RUNTIME_BLOCK}`)
+      .replace(SOLID_BLOCK, (block) => `${block}${SOLID_RUNTIME_BLOCK}${SOLID_H_BLOCK}`)
 
     const next =
       source.slice(0, head) +

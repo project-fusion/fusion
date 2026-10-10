@@ -85,6 +85,19 @@ and `style` as `preact/compat` types React's, so `style` takes an object.
 Solid reads the tags with `jsxImportSource: "solid-js"`, and each tag also
 takes `prop:`, `attr:`, and `on:` forms of its props and events.
 
+With `jsxImportSource: "solid-js/h"`, Solid runs without its compiler, and the
+same import types the tags. Each prop also takes a function that returns its
+value, and `h` calls that function again when a signal it reads changes. A
+property whose value is a function, such as a slider's `formatter`, takes only a
+function that returns it, because `h` calls any function it is given:
+
+```tsx
+<helix-slider disabled={() => busy()} formatter={() => format} label="Volume" />
+```
+
+`ref`, `children`, and the handlers named `on…`, such as
+`on:helix-before-change`, take their values as they are.
+
 If your framework needs a different format, use the manifest at
 `@fusion.dev/helix/custom-elements.json`. It describes every tag, prop, event,
 and part, and we generate all our typings from it.

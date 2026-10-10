@@ -123,8 +123,34 @@ describe('ref and style in each framework', () => {
   test('Solid reads its map where its JSX is declared, and where it is re-exported', () => {
     const written = scene(GENERATED)
     expect(written).toContain(
-      'declare module "solid-js" {\n  namespace JSX {\n    interface IntrinsicElements extends CustomElementsSolidJs {}\n  }\n  export interface CSSProperties extends CustomCssProperties {}\n}\n\ndeclare module "solid-js/jsx-runtime" {\n  namespace JSX {\n    interface IntrinsicElements extends CustomElementsSolidJs {}\n  }\n}\n\ndeclare global {',
+      'declare module "solid-js" {\n  namespace JSX {\n    interface IntrinsicElements extends CustomElementsSolidJs {}\n  }\n  export interface CSSProperties extends CustomCssProperties {}\n}\n\ndeclare module "solid-js/jsx-runtime" {\n  namespace JSX {\n    interface IntrinsicElements extends CustomElementsSolidJs {}\n  }\n}\n',
     )
+  })
+
+  /* `jsxImportSource: "solid-js/h"` reads the namespace
+     `solid-js/h/jsx-runtime` declares, which none of the augmentations
+     reached, so every Helix tag was unknown there. Without the compiler, `h`
+     reads a function given to a prop as the prop's value. */
+  test('Solid without its compiler reads a map whose props also take a function that returns them', () => {
+    const written = scene(GENERATED)
+    expect(written).toContain(
+      'declare module "solid-js/h/jsx-runtime" {\n  namespace JSX {\n    interface IntrinsicElements extends CustomElementsSolidH {}\n  }\n}\n\ndeclare global {',
+    )
+    expect(written).toContain(
+      'export type CustomElementsSolidH = {\n  [Tag in keyof CustomElementsSolidJs]: SolidHProps<CustomElementsSolidJs[Tag]>;\n};',
+    )
+    expect(written).toContain('type SolidHProps<P> = { [K in keyof P]: SolidHProp<K, P[K]> };')
+    const prop = written.slice(
+      written.indexOf('type SolidHProp<'),
+      written.indexOf('type SolidHProps<'),
+    )
+    /* What `h` passes through as written, as `h` tests for it. */
+    expect(prop).toContain(`K extends "children" | "ref" | \`on\${string}\`\n  ? V`)
+    /* A function-valued property, which `h` would call with no arguments. */
+    expect(prop).toContain(
+      '[Exclude<V, undefined>] extends [(...args: never[]) => unknown]\n      ? (() => V) | undefined',
+    )
+    expect(prop).toContain('      : V | (() => V);')
   })
 
   test('every other framework reads the map with the generator’s shapes', () => {
