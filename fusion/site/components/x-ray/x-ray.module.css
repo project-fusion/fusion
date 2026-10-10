@@ -1,0 +1,86 @@
+/**
+ * The x-ray: a quiet toggle, a highlight and a name over the hovered element,
+ * and a status bar while it is on.
+ */
+
+/* A button set as the quiet links beside it, with the button's own chrome
+   taken away so it reads as one of them. */
+.toggle,
+.close {
+  background: none;
+  border: var(--helix-space-none);
+  cursor: pointer;
+  font: inherit;
+  padding: var(--helix-space-none);
+}
+
+.toggle[aria-pressed="true"] {
+  color: var(--helix-color-primary);
+}
+
+/* The hovered element, washed in the brand color over its outline. Fixed and
+   never hit, so the pointer keeps reaching the page under it. */
+.highlight {
+  background: color-mix(in oklab, var(--helix-color-primary) 14%, transparent);
+  border-radius: var(--helix-radii-sm);
+  outline: 2px solid var(--helix-color-primary);
+  outline-offset: -1px;
+  pointer-events: none;
+  position: fixed;
+  z-index: var(--helix-layer-toast);
+}
+
+/* The hovered element's tag, on its top edge, or under it when the top edge
+   is too close to the window's to hold a label. */
+.name {
+  background: var(--helix-color-primary-surface);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-on-primary);
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-xs);
+  line-height: var(--helix-leading-tight);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  pointer-events: none;
+  position: fixed;
+  transform: translateY(-100%);
+  white-space: nowrap;
+  z-index: var(--helix-layer-toast);
+}
+
+.name[data-below] {
+  transform: none;
+}
+
+/* While it is on: what it found, and the way out. */
+.status {
+  align-items: center;
+  background: var(--helix-color-surface-raised);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  box-shadow: 0 0.75rem 2rem -0.75rem rgb(0 0 0 / 0.45);
+  color: var(--helix-color-foreground);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-xs) var(--helix-space-md);
+  inset-block-start: calc(var(--helix-size-header) + var(--helix-space-md));
+  inset-inline: var(--helix-space-md);
+  justify-content: space-between;
+  margin-inline: auto;
+  max-inline-size: 40rem;
+  padding: var(--helix-space-sm) var(--helix-space-md);
+  position: fixed;
+  z-index: var(--helix-layer-toast);
+}
+
+.close {
+  color: var(--helix-color-primary);
+  font-weight: var(--helix-weight-medium);
+}
+
+/* A touch screen has no pointer to point with. */
+@media (hover: none) {
+  .hint {
+    display: none;
+  }
+}

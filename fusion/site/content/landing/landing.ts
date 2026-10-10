@@ -1,5 +1,5 @@
 import type { PageCopy } from '@/content/copy/copy'
-import { ENGAGEMENT, ENGAGEMENT_COPY } from '@/content/landing/helix-landing'
+import { DELIVERY, ENGAGEMENT } from '@/content/landing/helix-landing'
 
 /**
  * Everything the landing page says, as data.
@@ -22,23 +22,16 @@ export const LANDING: PageCopy = {
       from: 'products',
     },
     {
-      body: ['Most work starts with an audit of up to two weeks.'],
+      body: [DELIVERY.lede],
       from: 'services',
+      items: ENGAGEMENT,
       kicker: 'Services',
-      title: 'The part you can buy today',
+      title: DELIVERY.title,
     },
     {
       body: ['Each control in the panel is a custom element from the Helix package.'],
       kicker: 'Components',
       title: 'The panel runs in your browser',
-    },
-    {
-      /* The cards live in `helix-landing.ts`, because the page renders them
-         too. Holding them here alone makes this document describe a band the
-         page does not have. */
-      items: ENGAGEMENT,
-      kicker: 'Working with us',
-      title: ENGAGEMENT_COPY.title,
     },
     {
       from: 'insights',
