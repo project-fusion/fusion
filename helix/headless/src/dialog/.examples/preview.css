@@ -14,7 +14,7 @@
   --_radius-panel: 0.75rem;
 }
 
-helix-headless-dialog::part(dialog) {
+helix-headless-dialog::part(surface) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-edge);
   border-radius: var(--_radius-control);
@@ -29,12 +29,12 @@ helix-headless-dialog::part(dialog) {
   padding: 1.5rem;
 }
 
-helix-headless-dialog::part(dialog):modal {
+helix-headless-dialog::part(surface):modal {
   display: flex;
 }
 
 @media (width < 30rem) {
-  helix-headless-dialog::part(dialog) {
+  helix-headless-dialog::part(surface) {
     border-end-end-radius: 0;
     border-end-start-radius: 0;
     inline-size: 100vw;
@@ -44,7 +44,7 @@ helix-headless-dialog::part(dialog):modal {
   }
 }
 
-helix-headless-dialog::part(dialog)::backdrop {
+helix-headless-dialog::part(surface)::backdrop {
   background-color: rgb(0 0 0 / 0.4);
 }
 

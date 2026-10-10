@@ -30,7 +30,7 @@ describe('popover', () => {
        shadow root and is not part of the tree a consumer rendered. */
     const host = await popover()
     expect(host.hasAttribute('aria-label')).toBe(false)
-    const panel = part(host, 'popover')
+    const panel = part(host, 'surface')
     expect(panel?.getAttribute('role')).toBe('dialog')
     expect(panel?.getAttribute('aria-label')).toBe('Details')
   })
@@ -100,10 +100,10 @@ describe('popover', () => {
 
   test('the panel is hidden while closed and shown while open', async () => {
     const host = await popover()
-    expect((part(host, 'popover') as HTMLElement).hasAttribute('hidden')).toBe(true)
+    expect((part(host, 'surface') as HTMLElement).hasAttribute('hidden')).toBe(true)
     host.show()
     await host.updateComplete
-    expect((part(host, 'popover') as HTMLElement).hasAttribute('hidden')).toBe(false)
+    expect((part(host, 'surface') as HTMLElement).hasAttribute('hidden')).toBe(false)
   })
 
   test('open at mount serves open, without a click to get there', async () => {
@@ -151,7 +151,7 @@ describe('the popover’s name', () => {
     }
     await popoverHost.updateComplete
     /* happy-dom has no ARIA element reflection, so the accessor is stood in. */
-    const panel = part(popoverHost, 'popover') as HTMLElement & Record<string, unknown>
+    const panel = part(popoverHost, 'surface') as HTMLElement & Record<string, unknown>
     if (!('ariaLabelledByElements' in panel)) {
       Object.defineProperty(panel, 'ariaLabelledByElements', { value: null, writable: true })
     }
@@ -194,7 +194,7 @@ if (hasLayout()) {
       const host = await popover()
       host.show()
       await host.updateComplete
-      expect((part(host, 'popover') as HTMLElement).matches(':popover-open')).toBe(true)
+      expect((part(host, 'surface') as HTMLElement).matches(':popover-open')).toBe(true)
     })
   })
 
@@ -230,7 +230,7 @@ if (hasLayout()) {
         </helix-headless-popover>
         <style>
           #trigger { block-size: 2rem; inline-size: 8rem; inset-block-start: 4rem; position: fixed; ${at} }
-          helix-headless-popover::part(popover) { block-size: 4rem; box-sizing: border-box; inline-size: 12rem; padding: 0 }
+          helix-headless-popover::part(surface) { block-size: 4rem; box-sizing: border-box; inline-size: 12rem; padding: 0 }
         </style>`,
       )) as Popover
       host.show()
@@ -238,7 +238,7 @@ if (hasLayout()) {
       /* `computePosition` resolves after the update, and `autoUpdate` places
          once as it starts: two frames cover both. */
       await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
-      const panel = part(host, 'popover') as HTMLElement
+      const panel = part(host, 'surface') as HTMLElement
       return {
         panel: panel.getBoundingClientRect(),
         side: panel.getAttribute('data-placement'),
@@ -292,7 +292,7 @@ describe('focus on the way in', () => {
     const host = await popover()
     host.show()
     await host.updateComplete
-    expect(host.shadowRoot?.activeElement).toBe(part(host, 'popover'))
+    expect(host.shadowRoot?.activeElement).toBe(part(host, 'surface'))
   })
 
   test('stays where it is for a popover served open, which nobody opened', async () => {
@@ -360,7 +360,7 @@ describe('a modal popover', () => {
     )) as Popover
     host.show()
     await host.updateComplete
-    expect(part(host, 'popover')?.getAttribute('aria-modal')).toBe('true')
+    expect(part(host, 'surface')?.getAttribute('aria-modal')).toBe('true')
     ;(host.querySelector('#last') as HTMLElement).focus()
     const tab = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Tab' })
     host.querySelector('#last')?.dispatchEvent(tab)
@@ -372,7 +372,7 @@ describe('a modal popover', () => {
     const host = await popover()
     host.show()
     await host.updateComplete
-    expect(part(host, 'popover')?.hasAttribute('aria-modal')).toBe(false)
+    expect(part(host, 'surface')?.hasAttribute('aria-modal')).toBe(false)
   })
 })
 
@@ -384,7 +384,7 @@ describe('the panel’s name and its point', () => {
         <div><h3>Filters</h3></div>
       </helix-headless-popover>`,
     )) as Popover & { requestUpdate(): void }
-    const panel = part(host, 'popover') as HTMLElement & Record<string, unknown>
+    const panel = part(host, 'surface') as HTMLElement & Record<string, unknown>
     /* happy-dom has no element reflection, so the accessor is stood in. */
     Object.defineProperty(panel, 'ariaLabelledByElements', { value: null, writable: true })
     host.requestUpdate()

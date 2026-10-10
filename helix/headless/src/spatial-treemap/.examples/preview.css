@@ -104,7 +104,7 @@ helix-headless-spatial-treemap::part(mark) {
   translate: -50% -50%;
 }
 
-helix-headless-spatial-treemap::part(tooltip) {
+helix-headless-spatial-treemap::part(tooltip-surface) {
   background-color: var(--_gray-strong);
   border-radius: 0.375rem;
   color: var(--_gray-subtle);

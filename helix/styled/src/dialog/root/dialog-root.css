@@ -3,7 +3,7 @@
   display: contents;
 }
 
-[part="dialog"] {
+[part="surface"] {
   background-color: var(--dialog-background-color, var(--helix-color-surface-overlay));
   border: var(--dialog-border-width, var(--helix-border-floating)) solid
     var(--dialog-border-color, var(--helix-color-border));
@@ -26,21 +26,21 @@
 
 /* The UA hides a closed dialog with `dialog:not([open]) { display: none }`, and
    the `display: flex` above silently took that away. */
-[part="dialog"]:not([open]) {
+[part="surface"]:not([open]) {
   display: none;
 }
 
-:host([size="sm"]) [part="dialog"] {
+:host([size="sm"]) [part="surface"] {
   --dialog-inline-size: 22rem;
 }
 
 /* Said as well as defaulted, so a consumer can put a dialog back on the middle
    step from markup rather than by removing an attribute. */
-:host([size="md"]) [part="dialog"] {
+:host([size="md"]) [part="surface"] {
   --dialog-inline-size: 28rem;
 }
 
-:host([size="lg"]) [part="dialog"] {
+:host([size="lg"]) [part="surface"] {
   --dialog-inline-size: 44rem;
 }
 
@@ -53,13 +53,13 @@
    calc(100dvh - var(--helix-space-xl))` was already leaving room above and
    below, which is what makes this read as a panel over the page rather than as a
    second page. */
-:host([size="full"]) [part="dialog"] {
+:host([size="full"]) [part="surface"] {
   --dialog-inline-size: 100vw;
 }
 
 /* No ring on the panel itself. */
-[part="dialog"]:focus,
-[part="dialog"]:focus-visible {
+[part="surface"]:focus,
+[part="surface"]:focus-visible {
   outline: none;
 }
 
@@ -73,7 +73,7 @@
   --_dialog-scrim: var(--helix-color-overlay);
 }
 
-[part="dialog"]::backdrop {
+[part="surface"]::backdrop {
   background-color: var(--dialog-scrim, var(--_dialog-scrim));
 }
 
@@ -104,7 +104,7 @@
    *pace* of it cannot be read: measured, `snappy` settles at 159ms and `gentle`
    at 262ms, a difference of a hundred milliseconds that nobody can see across
    twelve pixels. */
-[part="dialog"] {
+[part="surface"] {
   opacity: 0;
   transition:
     opacity var(--helix-duration-normal) var(--helix-easing-standard),
@@ -114,19 +114,19 @@
   translate: 0 var(--dialog-rise, var(--helix-space-lg));
 }
 
-[part="dialog"][open] {
+[part="surface"][open] {
   opacity: 1;
   translate: 0 0;
 }
 
 @starting-style {
-  [part="dialog"][open] {
+  [part="surface"][open] {
     opacity: 0;
     translate: 0 var(--dialog-rise, var(--helix-space-lg));
   }
 }
 
-[part="dialog"]::backdrop {
+[part="surface"]::backdrop {
   opacity: 0;
   transition:
     opacity var(--helix-duration-normal) var(--helix-easing-standard),
@@ -134,12 +134,12 @@
     overlay var(--helix-duration-normal) allow-discrete;
 }
 
-[part="dialog"][open]::backdrop {
+[part="surface"][open]::backdrop {
   opacity: 1;
 }
 
 @starting-style {
-  [part="dialog"][open]::backdrop {
+  [part="surface"][open]::backdrop {
     opacity: 0;
   }
 }
@@ -154,7 +154,7 @@
    portrait (430px is the widest in wide use) and below any tablet, so nothing
    lands in it by accident. */
 @media (width < 30rem) {
-  [part="dialog"] {
+  [part="surface"] {
     /* Pinned rather than centered. A `<dialog>` is `position: fixed` with
        `inset: 0` and `margin: auto` from the UA, so taking the block-end margin
        to zero is the whole of what moves it down. */
@@ -175,14 +175,14 @@
   }
 
   @starting-style {
-    [part="dialog"][open] {
+    [part="surface"][open] {
       translate: 0 100%;
     }
   }
 }
 
 /* Saying no, by moving. */
-[part="dialog"][data-refused] {
+[part="surface"][data-refused] {
   animation: helix-dialog-refuse var(--helix-duration-normal) var(--helix-easing-emphasized);
 }
 
@@ -193,14 +193,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [part="dialog"],
-  [part="dialog"]::backdrop {
+  [part="surface"],
+  [part="surface"]::backdrop {
     transition: none;
   }
 
   /* The refusal is motion and nothing but, so with motion off it does not slow
      down, it goes. */
-  [part="dialog"][data-refused] {
+  [part="surface"][data-refused] {
     animation: none;
   }
 }
@@ -213,7 +213,7 @@
 }
 
 /* Centered, and it has to be on the panel rather than on each region. */
-:host([text-align="center"]) [part="dialog"] {
+:host([text-align="center"]) [part="surface"] {
   text-align: center;
 }
 

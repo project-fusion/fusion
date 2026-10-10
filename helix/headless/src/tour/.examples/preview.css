@@ -216,7 +216,7 @@ helix-headless-tour::part(spotlight) {
   z-index: 1000;
 }
 
-helix-headless-tour-stop::part(bubble) {
+helix-headless-tour-stop::part(surface) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-edge);
   border-radius: var(--_radius-control);
@@ -234,7 +234,7 @@ helix-headless-tour-stop::part(bubble) {
   position: fixed;
 }
 
-helix-headless-tour-stop::part(bubble):not(:popover-open) {
+helix-headless-tour-stop::part(surface):not(:popover-open) {
   display: none;
 }
 

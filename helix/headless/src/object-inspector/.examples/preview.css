@@ -132,7 +132,7 @@ helix-headless-object-inspector::part(copy-mark) {
   inline-size: 1rem;
 }
 
-helix-headless-object-inspector::part(copy-tooltip) {
+helix-headless-object-inspector::part(copy-tooltip-surface) {
   background-color: var(--_gray-strong);
   border: none;
   border-radius: var(--_radius-control);

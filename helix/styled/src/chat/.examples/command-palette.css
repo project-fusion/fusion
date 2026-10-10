@@ -2,7 +2,7 @@
    summoned over whatever the reader was looking at and centering it puts it on
    top of that. The dialog gives up its padding for the same reason the other
    containers here do: the conversation pads its own regions. */
-.command::part(dialog) {
+.command::part(dialog-surface) {
   --dialog-padding: var(--helix-space-none);
 
   gap: var(--helix-space-none);

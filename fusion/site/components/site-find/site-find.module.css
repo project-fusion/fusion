@@ -25,7 +25,7 @@
   --dialog-scrim: color-mix(in oklab, var(--helix-color-overlay) 45%, transparent);
 }
 
-.siteCommand::part(dialog) {
+.siteCommand::part(dialog-surface) {
   /* *Glass, which is what a palette is: the page is still there.** A palette
      does not replace the page the way a dialog does. **The panel's own alpha is
      only half of it.** What the blur samples is whatever the scrim leaves of the

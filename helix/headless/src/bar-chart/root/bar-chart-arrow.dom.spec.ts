@@ -54,7 +54,7 @@ describe('the preview’s reading bubble, flipped below the bar', () => {
       host.pointer.set(tallest)
       await idle()
       const tip = part(host, 'tooltip-anchor') as HTMLElement
-      const bubble = part(tip, 'tooltip') as HTMLElement
+      const bubble = part(tip, 'surface') as HTMLElement
       const arrow = part(tip, 'arrow') as HTMLElement
       const anchor = mark() as DOMRect
       expect(getComputedStyle(arrow).rotate).toBe('45deg')

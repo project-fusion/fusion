@@ -104,7 +104,7 @@ helix-headless-spatial-bar-chart::part(mark) {
   translate: -50% -50%;
 }
 
-helix-headless-spatial-bar-chart::part(tooltip) {
+helix-headless-spatial-bar-chart::part(tooltip-surface) {
   background-color: var(--_gray-strong);
   border-radius: 0.375rem;
   color: var(--_gray-subtle);

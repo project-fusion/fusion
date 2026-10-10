@@ -165,7 +165,7 @@ describe('donut chart tooltip', () => {
        three o'clock and nine o'clock, which are opposite sides of the ring. */
     const host = await chart(TRAFFIC, 'for="traffic"')
     await hover(host, 1)
-    /* Queried in the chart's own shadow root rather than through `part="tooltip"`.
+    /* Queried in the chart's own shadow root rather than through `part="surface"`.
        The bubble is `Tooltip`'s now and reaches a consumer through `exportparts`;
        what the chart still owns is the content it slots into it. */
     expect(host.shadowRoot?.querySelector('[part="tooltip-label"]')?.textContent).toBe('Search')

@@ -70,7 +70,7 @@ const assigned = (tip: Tooltip): Node[] => contentSlot(tip)?.assignedNodes() ?? 
 describe('tooltip', () => {
   test("the bubble is a tooltip, and the trigger stays the consumer's element", async () => {
     const tip = await tooltip()
-    expect(part(tip, 'tooltip')?.getAttribute('role')).toBe('tooltip')
+    expect(part(tip, 'surface')?.getAttribute('role')).toBe('tooltip')
     expect(tip.firstElementChild?.tagName).toBe('BUTTON')
   })
 
@@ -80,7 +80,7 @@ describe('tooltip', () => {
     // nothing at all.
     const tip = await tooltip()
     const linked = tip.internals?.ariaDescribedByElements
-    expect(Array.isArray(linked) ? linked[0] : null).toBe(part(tip, 'tooltip'))
+    expect(Array.isArray(linked) ? linked[0] : null).toBe(part(tip, 'surface'))
   })
 
   test('nothing is linked when there is nothing to say', async () => {
@@ -170,7 +170,7 @@ describe('tooltip', () => {
     const tip = await tooltip('content=""')
     tip.show()
     await tip.updateComplete
-    expect(part(tip, 'tooltip')?.matches(':popover-open') ?? false).toBe(false)
+    expect(part(tip, 'surface')?.matches(':popover-open') ?? false).toBe(false)
   })
 
   test('slotted content replaces the property rather than joining it', async () => {
@@ -195,7 +195,7 @@ describe('tooltip', () => {
     await tip.updateComplete
     expect(tip.open).toBe(true)
     const linked = tip.internals?.ariaDescribedByElements
-    expect(Array.isArray(linked) ? linked[0] : null).toBe(part(tip, 'tooltip'))
+    expect(Array.isArray(linked) ? linked[0] : null).toBe(part(tip, 'surface'))
   })
 
   test('an empty slot is as empty as an empty property', async () => {
@@ -218,7 +218,7 @@ describe('tooltip', () => {
     const tip = await tooltip('content="x" disabled')
     tip.show()
     await tip.updateComplete
-    expect(part(tip, 'tooltip')?.matches(':popover-open') ?? false).toBe(false)
+    expect(part(tip, 'surface')?.matches(':popover-open') ?? false).toBe(false)
   })
 
   test('a tooltip moved in the page still opens', async () => {
@@ -526,7 +526,7 @@ describe('moving onto the bubble', () => {
     await new Promise((resolve) => setTimeout(resolve, 5))
     await tip.updateComplete
     trigger.dispatchEvent(new Event('pointerleave'))
-    part(tip, 'tooltip')?.dispatchEvent(new Event('pointerenter'))
+    part(tip, 'surface')?.dispatchEvent(new Event('pointerenter'))
     await new Promise((resolve) => setTimeout(resolve, 20))
     await tip.updateComplete
     expect(tip.open).toBe(true)
@@ -544,7 +544,7 @@ describe('moving onto the bubble', () => {
     await new Promise((resolve) => setTimeout(resolve, 5))
     await tip.updateComplete
     trigger.dispatchEvent(new Event('pointerleave'))
-    part(tip, 'tooltip')?.dispatchEvent(new Event('pointerenter'))
+    part(tip, 'surface')?.dispatchEvent(new Event('pointerenter'))
     await new Promise((resolve) => setTimeout(resolve, 20))
     await tip.updateComplete
     expect(tip.open).toBe(false)
@@ -559,7 +559,7 @@ describe('moving onto the bubble', () => {
     await new Promise((resolve) => setTimeout(resolve, 5))
     await tip.updateComplete
     expect(tip.open).toBe(true)
-    part(tip, 'tooltip')?.dispatchEvent(new Event('pointerenter'))
+    part(tip, 'surface')?.dispatchEvent(new Event('pointerenter'))
     await new Promise((resolve) => setTimeout(resolve, 20))
     await tip.updateComplete
     expect(tip.open).toBe(false)

@@ -156,7 +156,7 @@ helix-headless-scatter-chart::part(mark) {
   position: absolute;
 }
 
-helix-headless-scatter-chart::part(tooltip) {
+helix-headless-scatter-chart::part(tooltip-surface) {
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-line);
   border-radius: var(--_radius-control);

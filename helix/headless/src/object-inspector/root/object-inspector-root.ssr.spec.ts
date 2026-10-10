@@ -50,7 +50,7 @@ describe('object inspector server output', () => {
       'copy',
       'frame',
       'mark',
-      'tooltip',
+      'surface',
       'tree',
     ])
   })
@@ -78,7 +78,7 @@ describe('object inspector server output', () => {
       'button',
       'copy',
       'mark',
-      'tooltip',
+      'surface',
     ])
   })
 

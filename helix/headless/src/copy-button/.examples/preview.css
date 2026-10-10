@@ -45,7 +45,7 @@ helix-headless-copy-button::part(mark) {
   inline-size: 1rem;
 }
 
-helix-headless-copy-button::part(tooltip) {
+helix-headless-copy-button::part(tooltip-surface) {
   align-items: center;
   background-color: var(--_gray-strong);
   border: 0;
@@ -61,7 +61,7 @@ helix-headless-copy-button::part(tooltip) {
   position: fixed;
 }
 
-helix-headless-copy-button::part(tooltip):not(:popover-open) {
+helix-headless-copy-button::part(tooltip-surface):not(:popover-open) {
   display: none;
 }
 

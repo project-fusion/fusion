@@ -2,7 +2,7 @@
    down, and not less.** At 12vh the panel opens 84 pixels from the top of a 700
    pixel laptop viewport, close enough to the edge that it reads as hanging off
    the browser chrome rather than floating over the page. */
-helix-dialog::part(dialog) {
+helix-dialog::part(surface) {
   align-self: start;
   inline-size: min(var(--command-size, 40rem), calc(100vw - var(--helix-space-xl) * 2));
   margin-block-start: 20vh;

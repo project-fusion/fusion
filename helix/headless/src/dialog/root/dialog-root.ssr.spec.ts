@@ -11,8 +11,8 @@ describe('dialog server output', () => {
     const markup = ssr(
       html`<helix-headless-dialog label="Delete">Cannot be undone.</helix-headless-dialog>`,
     )
-    expect(hasPart(markup, 'dialog')).toBe(true)
-    expect(partTag(markup, 'dialog')).toMatch(/<dialog/)
+    expect(hasPart(markup, 'surface')).toBe(true)
+    expect(partTag(markup, 'surface')).toMatch(/<dialog/)
     /* `toContain('Cannot be undone.')` read the host's own light-DOM child back
        out of the render, so it passed with the dialog rendering no slot at all.
        What puts the content inside the dialog is the slot inside the `<dialog>`,
@@ -27,7 +27,10 @@ describe('dialog server output', () => {
     // The attribute is the consumer's request; opening is something only a
     // browser can do, so the server serves it shut and the client opens it.
     expect(
-      partTag(ssr(html`<helix-headless-dialog label="D" open>x</helix-headless-dialog>`), 'dialog'),
+      partTag(
+        ssr(html`<helix-headless-dialog label="D" open>x</helix-headless-dialog>`),
+        'surface',
+      ),
     ).not.toContain('open')
   })
 
@@ -49,7 +52,7 @@ describe('dialog server output', () => {
     expect(
       partTag(
         ssr(html`<helix-headless-dialog closedby="any" label="Delete">x</helix-headless-dialog>`),
-        'dialog',
+        'surface',
       ),
     ).toContain('closedby="any"')
   })
@@ -59,7 +62,10 @@ describe('dialog server output', () => {
        Escape key, so a dialog that had merely not been told would trap a reader
        in it. */
     expect(
-      partTag(ssr(html`<helix-headless-dialog label="Delete">x</helix-headless-dialog>`), 'dialog'),
+      partTag(
+        ssr(html`<helix-headless-dialog label="Delete">x</helix-headless-dialog>`),
+        'surface',
+      ),
     ).not.toContain('closedby')
   })
 })

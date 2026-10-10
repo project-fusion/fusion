@@ -21,8 +21,8 @@ describe('popover server output', () => {
       </helix-headless-popover>`),
     )
     expect(rendered(markup, 'helix-headless-popover')).toContain('name="trigger"')
-    expect(hasPart(markup, 'popover')).toBe(true)
-    expect(partTag(markup, 'popover')).toContain('hidden')
+    expect(hasPart(markup, 'surface')).toBe(true)
+    expect(partTag(markup, 'surface')).toContain('hidden')
   })
 
   test('the panel is a manual popover in the served markup', () => {
@@ -30,7 +30,7 @@ describe('popover server output', () => {
        its siblings, which is close to what is wanted and would take dismissal
        away from the host that has to coordinate it. */
     expect(
-      partTag(ssr(html`<helix-headless-popover>Body</helix-headless-popover>`), 'popover'),
+      partTag(ssr(html`<helix-headless-popover>Body</helix-headless-popover>`), 'surface'),
     ).toContain('popover="manual"')
   })
 
@@ -66,13 +66,13 @@ describe('popover server output', () => {
         ><button slot="trigger">Go</button>Body</helix-headless-popover
       >`,
     )
-    expect(partTag(open, 'popover')).not.toMatch(/\shidden[\s=>]/)
+    expect(partTag(open, 'surface')).not.toMatch(/\shidden[\s=>]/)
 
     const shut = ssr(
       html`<helix-headless-popover label="Filters"
         ><button slot="trigger">Go</button>Body</helix-headless-popover
       >`,
     )
-    expect(partTag(shut, 'popover')).toMatch(/\shidden[\s=>]/)
+    expect(partTag(shut, 'surface')).toMatch(/\shidden[\s=>]/)
   })
 })

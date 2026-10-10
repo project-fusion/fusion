@@ -21,7 +21,7 @@ helix-headless-icon {
   inline-size: 1em;
 }
 
-helix-headless-command::part(dialog) {
+helix-headless-command::part(dialog-surface) {
   align-self: start;
   background-color: var(--_gray-surface);
   border: 1px solid var(--_gray-edge);
@@ -36,11 +36,11 @@ helix-headless-command::part(dialog) {
   padding: 0;
 }
 
-helix-headless-command::part(dialog):modal {
+helix-headless-command::part(dialog-surface):modal {
   display: flex;
 }
 
-helix-headless-command::part(dialog)::backdrop {
+helix-headless-command::part(dialog-surface)::backdrop {
   background-color: rgb(0 0 0 / 0.4);
 }
 

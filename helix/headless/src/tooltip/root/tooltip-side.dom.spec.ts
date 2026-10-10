@@ -27,7 +27,7 @@ const SIDES = ['bottom', 'left', 'right', 'top'] as const
 
 /** The side the bubble says it landed on, which the controller writes. */
 const landed = (tip: Tip): string =>
-  (part(tip, 'tooltip')?.getAttribute('data-placement') ?? '').split('-')[0] ?? ''
+  (part(tip, 'surface')?.getAttribute('data-placement') ?? '').split('-')[0] ?? ''
 
 /**
  * Which side each of the three names says, and they have to agree: the arrow's
@@ -35,10 +35,10 @@ const landed = (tip: Tip): string =>
  */
 const named = (tip: Tip): { arrow: string[]; bubble: string[]; state: string[] } => {
   const arrow = (part(tip, 'arrow')?.getAttribute('part') ?? '').split(' ')
-  const bubble = (part(tip, 'tooltip')?.getAttribute('part') ?? '').split(' ')
+  const bubble = (part(tip, 'surface')?.getAttribute('part') ?? '').split(' ')
   return {
     arrow: SIDES.filter((side) => arrow.includes(`arrow-${side}`)),
-    bubble: SIDES.filter((side) => bubble.includes(`tooltip-${side}`)),
+    bubble: SIDES.filter((side) => bubble.includes(`surface-${side}`)),
     state: SIDES.filter((side) => hasState(tip, `placed-${side}`)),
   }
 }
@@ -78,7 +78,7 @@ describe('the side a bubble landed on', () => {
     /* The plain names stay beside them, which is what every sheet that does
        not care about the side selects. */
     expect(part(tip, 'arrow')?.getAttribute('part')).toBe(`arrow arrow-${side}`)
-    expect(part(tip, 'tooltip')?.getAttribute('part')).toBe(`tooltip tooltip-${side}`)
+    expect(part(tip, 'surface')?.getAttribute('part')).toBe(`surface surface-${side}`)
   })
 
   test('and moves with it', async () => {
@@ -127,7 +127,7 @@ if (hasLayout()) {
         expect(trigger.getBoundingClientRect().top).toBeLessThan(24)
         tip.show()
         await idle()
-        const bubble = (part(tip, 'tooltip') as HTMLElement).getBoundingClientRect()
+        const bubble = (part(tip, 'surface') as HTMLElement).getBoundingClientRect()
         const arrow = (part(tip, 'arrow') as HTMLElement).getBoundingClientRect()
         const anchor = trigger.getBoundingClientRect()
         expect(landed(tip)).toBe('bottom')

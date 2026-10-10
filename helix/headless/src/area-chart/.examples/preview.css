@@ -121,7 +121,7 @@ helix-headless-area-chart::part(tooltip-anchor) {
   position: absolute;
 }
 
-helix-headless-area-chart::part(tooltip) {
+helix-headless-area-chart::part(tooltip-surface) {
   background-color: var(--_gray-strong);
   border: 0;
   border-radius: var(--_radius-control);

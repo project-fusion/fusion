@@ -136,21 +136,21 @@ const toned = (tone: string | undefined): string | undefined =>
  * @csspart svg - The drawing surface the bars and lines sit on.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
  * @csspart tick - One number on an axis.
- * @csspart tooltip - The tooltip bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The tooltip's arrow, forwarded from `Tooltip`.
  * @csspart tooltip-arrow-bottom - The arrow while the bubble is below the reading, on the bubble's top edge. Set together with `tooltip-arrow`.
  * @csspart tooltip-arrow-left - The arrow while the bubble is left of the reading, on the bubble's right edge. Set together with `tooltip-arrow`.
  * @csspart tooltip-arrow-right - The arrow while the bubble is right of the reading, on the bubble's left edge. Set together with `tooltip-arrow`.
  * @csspart tooltip-arrow-top - The arrow while the bubble is above the reading, on the bubble's bottom edge. Set together with `tooltip-arrow`.
- * @csspart tooltip-bottom - The bubble while it is below the reading. Set together with `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-cell-current - The cell the series keys rest on, while they rest there. Set alongside `tooltip-cell`.
  * @csspart tooltip-label - The reading's category name inside the tooltip.
- * @csspart tooltip-left - The bubble while it is left of the reading. Set together with `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
- * @csspart tooltip-right - The bubble while it is right of the reading. Set together with `tooltip`.
- * @csspart tooltip-top - The bubble while it is above the reading. Set together with `tooltip`.
+ * @csspart tooltip-surface - The tooltip bubble, forwarded from `Tooltip`.
+ * @csspart tooltip-surface-bottom - The bubble while it is below the reading. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-left - The bubble while it is left of the reading. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-right - The bubble while it is right of the reading. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-top - The bubble while it is above the reading. Set together with `tooltip-surface`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssproperty --bar-chart-axis - The width of an axis, in `ch`, set from the widest number on it. The chart sets it on the axis itself, and only when the categories run along the bottom. In a horizontal chart the axis is a row, one line high.

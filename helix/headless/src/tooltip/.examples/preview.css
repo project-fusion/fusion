@@ -60,7 +60,7 @@ helix-headless-button::part(button):focus-visible {
   outline-offset: 2px;
 }
 
-helix-headless-tooltip::part(tooltip) {
+helix-headless-tooltip::part(surface) {
   align-items: center;
   background-color: var(--_gray-strong);
   border: 0;
@@ -79,7 +79,7 @@ helix-headless-tooltip::part(tooltip) {
   position: fixed;
 }
 
-helix-headless-tooltip::part(tooltip):not(:popover-open) {
+helix-headless-tooltip::part(surface):not(:popover-open) {
   display: none;
 }
 

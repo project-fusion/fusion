@@ -90,7 +90,7 @@ helix-headless-code-block::part(copy-mark) {
   inline-size: 1rem;
 }
 
-helix-headless-code-block::part(copy-tooltip) {
+helix-headless-code-block::part(copy-tooltip-surface) {
   align-items: center;
   background-color: var(--_gray-strong);
   border: 0;
@@ -106,7 +106,7 @@ helix-headless-code-block::part(copy-tooltip) {
   position: fixed;
 }
 
-helix-headless-code-block::part(copy-tooltip):not(:popover-open) {
+helix-headless-code-block::part(copy-tooltip-surface):not(:popover-open) {
   display: none;
 }
 

@@ -111,7 +111,6 @@ export type TourStopEffect = (
  * @csspart back-live - The live region inside `back`.
  * @csspart back-spinner - The ring `back` turns while it is pending.
  * @csspart back-text - The words on that button, trimmed to their capitals and baseline.
- * @csspart bubble - The panel that points at the target.
  * @csspart content - The region holding the slotted content.
  * @csspart description - The slot the description is in. It draws no box until you give it one.
  * @csspart heading - The slot the title is in. It draws no box until you give it one.
@@ -126,6 +125,7 @@ export type TourStopEffect = (
  * @csspart skip-live - The live region inside `skip`.
  * @csspart skip-spinner - The ring `skip` turns while it is pending.
  * @csspart skip-text - The words on that button, trimmed to their capitals and baseline.
+ * @csspart surface - The panel that points at the target.
  *
  * @cssstate entering - From the moment the stop is shown until its entrance has finished.
  * @cssstate exiting - From the moment the stop is left until its exit has finished.
@@ -262,7 +262,7 @@ export class HelixHeadlessTourStop extends HelixElement {
       exiting: (on) => this.toggleState('exiting', on),
     },
     open: () => this.current && this.type !== 'wait',
-    surface: () => this.partNamed('bubble'),
+    surface: () => this.partNamed('surface'),
   })
 
   /** The element the stop points at, or `null` when no element has the `for` id. */
@@ -311,7 +311,7 @@ export class HelixHeadlessTourStop extends HelixElement {
        panel are placed by their stylesheet. */
     place: () => this.type === undefined,
     placement: () => this.placement,
-    surface: () => this.partNamed('bubble'),
+    surface: () => this.partNamed('surface'),
   })
 
   /**
@@ -322,7 +322,7 @@ export class HelixHeadlessTourStop extends HelixElement {
    * reads the group it is.
    */
   override focus(options?: FocusOptions): void {
-    const bubble = this.partNamed('bubble')
+    const bubble = this.partNamed('surface')
     if (this.current && bubble) {
       bubble.focus(options)
       return
@@ -336,7 +336,7 @@ export class HelixHeadlessTourStop extends HelixElement {
    * `stopNaming` decides which words.
    */
   private nameByHeading(): void {
-    const bubble = this.partNamed('bubble')
+    const bubble = this.partNamed('surface')
     const slotted = (name: string): Element[] =>
       this.renderRoot
         .querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
@@ -420,7 +420,7 @@ export class HelixHeadlessTourStop extends HelixElement {
        its own subject. On the panel rather than the host, so a stop that is not
        shown is in the tree as nothing at all. */
     return html`<div
-      part="bubble"
+      part="surface"
       popover="manual"
       role=${this.type === 'dialog' ? 'dialog' : 'group'}
       tabindex="-1"

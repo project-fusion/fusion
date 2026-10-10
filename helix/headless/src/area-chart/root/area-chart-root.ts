@@ -168,21 +168,21 @@ export interface AreaStack {
  * @csspart svg - The drawing surface the bands sit on.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
  * @csspart tick - One number on the axis, placed with `inset-block-start` at its level.
- * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
  * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, so on its top edge, beside `tooltip-arrow`.
  * @csspart tooltip-arrow-left - The point while the bubble is left of the reading, so on its right edge, beside `tooltip-arrow`.
  * @csspart tooltip-arrow-right - The point while the bubble is right of the reading, so on its left edge, beside `tooltip-arrow`.
  * @csspart tooltip-arrow-top - The point while the bubble is above the reading, so on its bottom edge, beside `tooltip-arrow`.
- * @csspart tooltip-bottom - The bubble while it is below the reading, beside `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-cell-current - The cell the up and down arrows rest on, while they rest there. Set alongside `tooltip-cell`.
  * @csspart tooltip-label - The reading's own name inside the tooltip.
- * @csspart tooltip-left - The bubble while it is left of the reading, beside `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
- * @csspart tooltip-right - The bubble while it is right of the reading, beside `tooltip`.
- * @csspart tooltip-top - The bubble while it is above the reading, beside `tooltip`.
+ * @csspart tooltip-surface - The bubble, forwarded from `Tooltip`.
+ * @csspart tooltip-surface-bottom - The bubble while it is below the reading, beside `tooltip-surface`.
+ * @csspart tooltip-surface-left - The bubble while it is left of the reading, beside `tooltip-surface`.
+ * @csspart tooltip-surface-right - The bubble while it is right of the reading, beside `tooltip-surface`.
+ * @csspart tooltip-surface-top - The bubble while it is above the reading, beside `tooltip-surface`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssproperty --area-chart-axis - The width of the axis, in `ch`, set from the widest number on it. Written by the component on the axis.

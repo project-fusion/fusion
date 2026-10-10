@@ -207,8 +207,9 @@ export const drawTooltip = (
       dir=${place.dir ?? nothing}
       exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom,
         arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right,
-        arrow-top: tooltip-arrow-top, tooltip, tooltip-bottom, tooltip-left, tooltip-right,
-        tooltip-top"
+        arrow-top: tooltip-arrow-top, surface: tooltip-surface,
+        surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left,
+        surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"
       for="helix-chart-mark"
       id=${CHART_TOOLTIP}
       open

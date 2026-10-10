@@ -126,21 +126,21 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart summary - The three measures and the number of points, written as a sentence for screen readers, which describes the plot. Hide it visually.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
  * @csspart tick - A number at a tick, along its edge of the box, in the chart's own drawing.
- * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
  * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, on its top edge. Set alongside `tooltip-arrow`.
  * @csspart tooltip-arrow-left - The point while the bubble is left of the reading, on its right edge. Set alongside `tooltip-arrow`.
  * @csspart tooltip-arrow-right - The point while the bubble is right of the reading, on its left edge. Set alongside `tooltip-arrow`.
  * @csspart tooltip-arrow-top - The point while the bubble is above the reading, on its bottom edge. Set alongside `tooltip-arrow`.
- * @csspart tooltip-bottom - The bubble while it is below the reading. Set alongside `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-cell-current - The cell a chart's series keys rest on, which every chart's tooltip can mark. This chart marks none, since its readout says the measure. Set alongside `tooltip-cell`.
  * @csspart tooltip-label - The row's own name inside the tooltip.
- * @csspart tooltip-left - The bubble while it is left of the reading. Set alongside `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
- * @csspart tooltip-right - The bubble while it is right of the reading. Set alongside `tooltip`.
- * @csspart tooltip-top - The bubble while it is above the reading. Set alongside `tooltip`.
+ * @csspart tooltip-surface - The bubble, forwarded from `Tooltip`.
+ * @csspart tooltip-surface-bottom - The bubble while it is below the reading. Set alongside `tooltip-surface`.
+ * @csspart tooltip-surface-left - The bubble while it is left of the reading. Set alongside `tooltip-surface`.
+ * @csspart tooltip-surface-right - The bubble while it is right of the reading. Set alongside `tooltip-surface`.
+ * @csspart tooltip-surface-top - The bubble while it is above the reading. Set alongside `tooltip-surface`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssstate active - While a point is shown, under the pointer or the keys.
