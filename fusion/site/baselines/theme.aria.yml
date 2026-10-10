@@ -90,7 +90,7 @@
 - paragraph: How opaque those surfaces are. Below 100 they stop being a known ground.
 - separator "Resize panes"
 - button "Hide controls"
-- button "107 pass"
+- button "123 pass"
 - button "2 unverifiable"
 - iframe
 - separator "Preview and artifact"
@@ -100,6 +100,6 @@
   - tab "Contrast" [selected]
   - tab "Collisions"
   - tab "Unverifiable (2)"
-- text: All 107 measured pairs clear their target. Each is a foreground against a ground the surface model says it lands on, rather than against the page alone.
+- text: All 123 measured pairs clear their target. Each is a foreground against a ground the surface model says it lands on, rather than against the page alone.
 - separator "Preview, artifact and audit"
 - alert
