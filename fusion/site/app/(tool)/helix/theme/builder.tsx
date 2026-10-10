@@ -30,6 +30,7 @@ import { THEME_ENGINE } from '../../../../utils/theme-engine/theme-engine'
 import { THEMED_PAGE_STYLES } from './themed-page-styles'
 import { FACE_SAMPLE, useFacePreviews } from './use-face-previews'
 import './builder.css'
+import { PREVIEW_RELAY } from '@/preview/preview-relay'
 import styles from '../tool-shell.module.css'
 
 /**
@@ -1426,6 +1427,7 @@ export function ThemeBuilder({
               label="The themed page"
               layout="fullscreen"
               ref={preview}
+              relay={PREVIEW_RELAY}
               slot="preview"
               src="/sandbox/frame.html"
             ></helix-sandbox-preview>

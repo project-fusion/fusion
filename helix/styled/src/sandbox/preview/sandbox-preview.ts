@@ -21,6 +21,15 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { COMPILED, compile } from '../compile.js'
 import { defaultFrame, withScript } from '../frame.js'
+import {
+  isFetch,
+  type PreviewFetch,
+  type PreviewFetched,
+  RELAY_OPEN,
+  relayAddress,
+  relayFetch,
+  relayPrefixes,
+} from '../relay.js'
 import { styles as sheet } from './sandbox-preview.css.js'
 
 /** What the frame is allowed, here and in a tab `open()` makes. */
@@ -89,6 +98,7 @@ export interface PreviewSize {
 
 export type PreviewMessage =
   | PreviewConsole
+  | PreviewFetch
   | PreviewPress
   | PreviewReady
   | PreviewRender
@@ -159,6 +169,21 @@ export type PreviewMessage =
  * announced, and it is the frame's description while it shows, so a screen
  * reader reads it with the frame. Hide it with `::part(error) { display: none }`
  * where the page draws its own.
+ *
+ * **`relay` lets a frame on a login-protected site load its own files.** The
+ * frame's opaque origin makes every request it sends cross-site, and a login
+ * cookie is not sent on one, so behind a login such as a Vercel preview the
+ * frame's script and stylesheet come back as the login page. With `relay` set
+ * to path prefixes, such as `/sandbox/ /fonts/`, the frame can ask this
+ * element for a file under them and gets the body back, fetched from this
+ * page with its cookies. The page fetches only a `GET` on its own origin,
+ * under those prefixes, in plain characters, following no redirect, and it
+ * passes on only a script, a stylesheet, a font, a model, or an image of up
+ * to 8 MB. Name only prefixes that hold files the site serves to anyone: an
+ * example in the frame is untrusted, and it can ask too. Empty, the default,
+ * relays nothing. A frame asks only while its own origin is opaque, so a page
+ * elsewhere that frames the same document without a sandbox cannot use the
+ * answer to run script on the site.
  *
  * **`controls` draws two buttons in the preview's corner**: one reloads the
  * frame's document, as `reload()` does, and one opens the example in a new
@@ -290,6 +315,14 @@ export class HelixSandboxPreview extends HelixElement {
   openLabel = 'Open preview in a new tab'
 
   /**
+   * Path prefixes the frame may ask this page to fetch for it, separated by
+   * spaces, each starting and ending with a slash, such as `/sandbox/ /fonts/`.
+   * Empty relays nothing.
+   */
+  @property()
+  relay = ''
+
+  /**
    * The name of the button that reloads the frame's document, under
    * `controls`.
    */
@@ -348,6 +381,39 @@ export class HelixSandboxPreview extends HelixElement {
    * imports.
    */
   private map: Record<string, string> = {}
+
+  /** How many files the frame has asked for that are still being fetched. */
+  private relaying = 0
+
+  /**
+   * Fetches a file the frame asked for and sends it back to the window that
+   * asked, or says it could not.
+   *
+   * The address is judged by `relayAddress` against this page's origin and the
+   * prefixes in `relay`, so a request this page would not make is answered
+   * with a refusal and never sent. The frame document's address is the base,
+   * so a relative path means what it meant there.
+   */
+  private async answer(request: PreviewFetch, to: Window): Promise<void> {
+    const reply = (fetched: Omit<PreviewFetched, 'id' | 'type'>): void => {
+      const message: PreviewFetched = { ...fetched, id: request.id, type: 'helix-preview-fetched' }
+      const transfer = fetched.body instanceof ArrayBuffer ? [fetched.body] : []
+      to.postMessage(message, { targetOrigin: HelixSandboxPreview.target, transfer })
+    }
+    const base = new URL(this.src || '/', location.href).href
+    const url = relayAddress(request.path, base, location.origin, relayPrefixes(this.relay))
+    if (!url || this.relaying >= RELAY_OPEN) {
+      reply({ ok: false })
+      return
+    }
+    this.relaying += 1
+    try {
+      const fetched = await relayFetch(url, request.as)
+      reply(fetched ? { ...fetched, ok: true } : { ok: false })
+    } finally {
+      this.relaying -= 1
+    }
+  }
 
   /** Says the preview failed with `text`, or, with none, that it has not. */
   private fail(text?: string): void {
@@ -473,6 +539,12 @@ export class HelixSandboxPreview extends HelixElement {
       return
     }
     const data = event.data
+    /* Behind both checks above, so only this element's own frame, still on
+       an opaque origin, can ask. */
+    if (isFetch(data)) {
+      void this.answer(data, event.source as Window)
+      return
+    }
     if (data?.type === 'helix-preview-ready') {
       this.handleFrameLoad()
       return
@@ -622,6 +694,20 @@ export class HelixSandboxPreview extends HelixElement {
     /* **Sent by a script of the tab's own.** A frame takes a render only from
        its parent window, and a message is from the window whose script posted
        it: posted from here it came from this page, and the frame refused it. */
+    /* **The tab's frame is relayed by this page**, which still holds the tab:
+       a listener added to the tab's window from here hears what its frame
+       posts there, under the checks this element's own frame is held to. */
+    if (relayPrefixes(this.relay).length > 0) {
+      tab.addEventListener('message', (event: MessageEvent) => {
+        if (
+          event.source === frame.contentWindow &&
+          event.origin === 'null' &&
+          isFetch(event.data)
+        ) {
+          void this.answer(event.data, event.source as Window)
+        }
+      })
+    }
     const send = tab.document.createElement('script')
     send.textContent = `const frame = document.currentScript.previousElementSibling
 frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.message)}, '*')`

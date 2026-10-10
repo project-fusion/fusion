@@ -24,6 +24,7 @@ import { PreferencesDrawer } from '@/components/preferences/preferences'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { SiteMenu } from '@/components/site-nav/site-nav'
 import { Wordmark } from '@/components/wordmark/wordmark'
+import { PREVIEW_RELAY } from '@/preview/preview-relay'
 import type { Family, FamilyListing } from '../../../../content/catalog/catalog'
 import { useApiTier } from '../../../../hooks/use-api-tier/use-api-tier'
 import { useElementRef } from '../../../../hooks/use-element-ref/use-element-ref'
@@ -1482,6 +1483,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
               direction={direction === 'rtl' ? 'rtl' : undefined}
               layout={layout === 'padded' ? undefined : layout}
               ref={preview}
+              relay={PREVIEW_RELAY}
               slot="preview"
               src="/sandbox/frame.html"
             ></helix-sandbox-preview>

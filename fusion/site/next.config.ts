@@ -40,11 +40,20 @@ const config: NextConfig = {
    * be cached is the static document carrying those two URLs: a browser holding
    * yesterday's `frame.html` asks for yesterday's bundle by name and keeps
    * getting it, which is the stamping accomplishing nothing.
+   *
+   * **And only this site may frame it.** Behind a login the document asks its
+   * parent for its own script and runs what comes back, which it does only
+   * while its origin is opaque. `frame-ancestors 'self'` is the second lock on
+   * the same door: a page elsewhere cannot frame the document at all, sandbox
+   * or none, so it can never be the parent that answers.
    */
   async headers() {
     return [
       {
-        headers: [{ key: 'Cache-Control', value: 'no-store, must-revalidate' }],
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, must-revalidate' },
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'self'" },
+        ],
         source: '/sandbox/frame.html',
       },
       /**

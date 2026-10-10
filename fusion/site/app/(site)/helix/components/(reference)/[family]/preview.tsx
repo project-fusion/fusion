@@ -8,6 +8,7 @@ import type {
 } from '@fusion.dev/helix'
 import { useEffect, useRef, useState } from 'react'
 import { useSandboxEditor } from '@/hooks/use-sandbox-editor/use-sandbox-editor'
+import { PREVIEW_RELAY } from '@/preview/preview-relay'
 import sheet from './preview.module.css'
 
 /**
@@ -210,6 +211,7 @@ export function ComponentPreview({
         layout={layout}
         onhelix-resize={measured}
         ref={preview}
+        relay={PREVIEW_RELAY}
         slot="preview"
         src="/sandbox/frame.html"
       ></helix-sandbox-preview>
