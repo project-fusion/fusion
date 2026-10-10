@@ -104,7 +104,7 @@
   - paragraph: Package size
   - heading "Measured on every release" [level=2]
   - paragraph: From the built packages, compressed with Brotli as a CDN serves them.
-  - paragraph: "112"
+  - paragraph: "113"
   - paragraph: Components
   - paragraph: Each has a headless tier with its behavior and a styled tier with its design.
   - paragraph: 2.3 kB
@@ -113,7 +113,7 @@
   - paragraph: 127.3 kB
   - paragraph: The derivation engine, compressed
   - paragraph: Most sites run it when they build and ship none of it. A theme switcher downloads all of it.
-  - paragraph: 78%
+  - paragraph: 77%
   - paragraph: Of the first component is shared
   - paragraph: Most of the first component is a runtime that every later component reuses.
   - heading "One button, five systems" [level=3]
