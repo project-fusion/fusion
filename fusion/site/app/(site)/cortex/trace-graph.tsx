@@ -123,7 +123,7 @@ export function TraceGraph() {
       const connection = connectGraph(
         host,
         /* Every note is placed in its column, so no layout runs. */
-        sigmaDriver(sigma, { labels: 'all', material: 'glass' }),
+        sigmaDriver(sigma, { labels: 'all', material: 'mark' }),
         /* A note's whole derivation lights, not only its neighbors. */
         { center: false, reach: 'upstream' },
       )
