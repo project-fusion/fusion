@@ -19,7 +19,7 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { wordsIn } from '../description.js'
-import { closeOnDialogSubmit } from '../form-method.js'
+import { closeOnDialogSubmit, commandValue } from '../form-method.js'
 
 /**
  * @summary A modal window built on the native `<dialog>` element.
@@ -192,7 +192,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
      for why this is the platform's invoker rather than a `data-` recipe. */
   protected readonly commands = new CommandController(this, {
     commands: {
-      '--close': () => this.close(),
+      '--close': (source) => this.close(commandValue(source)),
       '--show': () => this.show(),
       '--toggle': () => this.toggleOpen(),
     },
@@ -214,7 +214,9 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
   persistent = false
 
   /**
-   * What the dialog closed with, the way `<dialog>` reports it.
+   * What the dialog closed with, the way `<dialog>` reports it. A
+   * `command="--close"` button closes it with its `value`, as
+   * `command="close"` closes a native `<dialog>`.
    *
    * **The whole point of a `<dialog>` returning a value is lost behind a shadow
    * boundary**, which is where this one is: the platform's contract is

@@ -245,6 +245,19 @@ describe('a value the slider cannot show', () => {
     await host.updateComplete
     expect(host.value).toBe('0,100')
   })
+
+  /* `max="1OO"` parses to `NaN`, and the form received `NaN`. A native range
+     falls back to its default bound for one it cannot read. */
+  test('is held to the default bounds and step where those are not numbers', async () => {
+    const high = await slider('name="s" max="1OO" default-value="150"')
+    expect([high.value, formValue(high)]).toEqual(['100', '100'])
+    const low = await slider('min="zero" default-value="-5"')
+    expect(low.value).toBe('0')
+    const stepped = await slider('step="ten" default-value="33.4"')
+    expect(stepped.value).toBe('33')
+    const range = await slider('range max="1OO"')
+    expect(range.value).toBe('0,100')
+  })
 })
 
 describe('what a screen reader says for the value', () => {

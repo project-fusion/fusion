@@ -663,10 +663,36 @@ describe('the bounds of a date picker', () => {
     updateComplete: Promise<unknown>
   }
 
-  test('take Previous and Next out of use at the months they end in', async () => {
-    const cal = await calendar('default-month="2026-08" min="2026-08-03" max="2026-08-20"')
-    expect(cal.shadowRoot?.querySelector('[part="previous"]')?.hasAttribute('disabled')).toBe(true)
-    expect(cal.shadowRoot?.querySelector('[part="next"]')?.hasAttribute('disabled')).toBe(true)
+  /* `disabled` took Next out of the tab order under the reader's focus, and
+     focus fell to the page's body on the press that reached `max`. Lightbox
+     keeps its controls focusable at its ends the same way. */
+  test('take Previous and Next out of use at the months they end in, and keep them focusable', async () => {
+    const cal = (await calendar(
+      'default-month="2026-08" min="2026-08-03" max="2026-08-20"',
+    )) as Checked
+    for (const name of ['previous', 'next']) {
+      const control = cal.shadowRoot?.querySelector<HTMLButtonElement>(`[part="${name}"]`)
+      expect([name, control?.getAttribute('aria-disabled'), control?.disabled]).toEqual([
+        name,
+        'true',
+        false,
+      ])
+      control?.click()
+      await cal.updateComplete
+      expect(cal.month).toBe('2026-08')
+    }
+  })
+
+  test('and the press that reaches the last month keeps focus where it was', async () => {
+    const cal = (await calendar('default-month="2026-07" max="2026-08-20"')) as Checked
+    const forward = cal.shadowRoot?.querySelector<HTMLButtonElement>('[part="next"]')
+    forward?.focus()
+    forward?.click()
+    await cal.updateComplete
+    expect(cal.month).toBe('2026-08')
+    expect(forward?.disabled).toBe(false)
+    expect(forward?.getAttribute('aria-disabled')).toBe('true')
+    expect(cal.shadowRoot?.activeElement).toBe(forward ?? null)
   })
 
   test('stop the keys, so a reader cannot page into a month with nothing in it', async () => {
@@ -976,6 +1002,19 @@ describe('the months and the years', () => {
     expect((cal as unknown as { validity: ValidityState }).validity.valid).toBe(true)
   })
 
+  /* The year controls took the same `disabled` as the month ones and dropped
+     focus the same way. */
+  test('a year past the bounds leaves its control focusable and refuses a press', async () => {
+    const cal = (await calendar('default-month="2026-08" view="month" max="2026-12-31"')) as Viewing
+    const forward = root(cal).querySelector<HTMLButtonElement>('[part="next"]')
+    expect(forward?.getAttribute('aria-disabled')).toBe('true')
+    expect(forward?.disabled).toBe(false)
+    forward?.click()
+    await cal.updateComplete
+    expect(root(cal).querySelector('[part="periods"]')?.getAttribute('aria-label')).toBe('2026')
+    expect(root(cal).querySelector('[part="previous"]')?.hasAttribute('aria-disabled')).toBe(false)
+  })
+
   test('a month outside the bounds is offered as unavailable and refuses a press', async () => {
     const cal = (await calendar('default-month="2026-08" min="2026-04-10" view="month"')) as Viewing
     expect(periods(cal)[2]?.getAttribute('aria-disabled')).toBe('true')
@@ -1267,11 +1306,11 @@ describe('a date picker drawing a calendar with months of its own', () => {
     const cal = await calendar(
       'locale="en-US" calendar="persian" default-month="2026-09-23" min="2026-09-23"',
     )
-    expect((part(cal, 'previous') as HTMLButtonElement | null)?.disabled).toBe(true)
+    expect(part(cal, 'previous')?.getAttribute('aria-disabled')).toBe('true')
     const later = await calendar(
       'locale="en-US" calendar="persian" default-month="2026-09-23" min="2026-09-22"',
     )
-    expect((part(later, 'previous') as HTMLButtonElement | null)?.disabled).toBe(false)
+    expect(part(later, 'previous')?.hasAttribute('aria-disabled')).toBe(false)
   })
 })
 

@@ -188,3 +188,22 @@ describe('content in the label or hint slot', () => {
     expect(host.shadowRoot?.querySelector('[part="label"], [part="hint"]')).toBeNull()
   })
 })
+
+describe('the render after a verdict', () => {
+  /* `refreshFeedback` asks for one more update once the control has reported,
+     by design, and Lit's development build warned of it once for every kind of
+     field that turned invalid. Lit's production build, which this suite runs,
+     has no `disableWarning`, so a base that has one stands in for it. */
+  test('turns off Lit’s change-in-update warning for the class it builds', async () => {
+    const { HelixElement } = await import('../../helix-element/helix-element.js')
+    const { MixinField } = await import('./mixin-field.js')
+    const turnedOff: string[] = []
+    class Warned extends HelixElement {
+      static override disableWarning = (kind: string): void => {
+        turnedOff.push(kind)
+      }
+    }
+    MixinField(Warned)
+    expect(turnedOff).toEqual(['change-in-update'])
+  })
+})

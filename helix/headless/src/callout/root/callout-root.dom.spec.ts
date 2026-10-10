@@ -229,6 +229,26 @@ describe('a dismissible callout', () => {
   })
 })
 
+describe('whether a callout shows', () => {
+  type Note = HTMLElement & { open: boolean }
+
+  /* Lit's boolean converter reads an attribute that is present as true, so
+     `open="false"` left the callout showing. */
+  test('`open="false"` hides it, and `open` or no attribute shows it', async () => {
+    const shut = (await mount(
+      '<helix-headless-callout open="false">Text</helix-headless-callout>',
+    )) as Note
+    expect([shut.open, hasState(shut, 'closed')]).toEqual([false, true])
+    for (const markup of [
+      '<helix-headless-callout open>Text</helix-headless-callout>',
+      '<helix-headless-callout>Text</helix-headless-callout>',
+    ]) {
+      const shown = (await mount(markup)) as Note
+      expect([markup, shown.open, hasState(shown, 'closed')]).toEqual([markup, true, false])
+    }
+  })
+})
+
 describe('what a dismissal says and how the note lays out', () => {
   /* The button is named from the heading, so the event names the same note. */
   test('helix-dismiss carries the heading where there is one, the words the button is named by', async () => {

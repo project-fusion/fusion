@@ -62,6 +62,7 @@ export function Example() {
         rows={ROWS}
       >
         <helix-input
+          aria-label="Search objects"
           onhelix-before-change={searched}
           placeholder="Search"
           slot="toolbar"

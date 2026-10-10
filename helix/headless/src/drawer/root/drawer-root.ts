@@ -30,7 +30,7 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { wordsIn } from '../../dialog/description.js'
-import { closeOnDialogSubmit } from '../../dialog/form-method.js'
+import { closeOnDialogSubmit, commandValue } from '../../dialog/form-method.js'
 import { beyondWindow } from '../reveal.js'
 import { startsSwipe } from '../swipe-start.js'
 
@@ -156,7 +156,7 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
      differ in where they sit, not in what opening one means. */
   protected readonly commands = new CommandController(this, {
     commands: {
-      '--close': () => this.requestOpen(false),
+      '--close': (source) => this.close(commandValue(source)),
       '--show': () => this.requestOpen(true),
       '--toggle': () => this.toggleOpen(),
     },
@@ -284,9 +284,9 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
    * drawer asking which of its actions dismissed it is the ordinary case and had
    * no answer.
    *
-   * Written before `open` is set to false rather than passed to a `close(value)`
-   * call, because this component has no such method: it is driven by `open`
-   * alone, and `Dialog`'s `close()` is the one that takes the value directly.
+   * Set by `close(value)`, by the `value` of a `command="--close"` button, and
+   * by the value of a `<form method="dialog">` button, or written before
+   * `open` is set to false.
    *
    * Held here as well as on the element, so a value set before the first render
    * survives to it and a consumer reading one back gets what they wrote.

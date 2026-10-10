@@ -8,6 +8,7 @@ import {
   HelixElement,
   hostAria,
   MixinDismissible,
+  onUnlessFalse,
   slottedWords,
   TONE_MARKS,
   toneMark,
@@ -136,10 +137,11 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
   /**
    * Whether the callout is showing. A dismissal nobody canceled turns it
    * false and the callout hides itself, and setting it true shows the callout
-   * again. Not reflected: open is the resting state, so an `open` attribute
-   * would appear on markup a server sent without it.
+   * again. `open="false"` renders it hidden. Not reflected: open is the resting
+   * state, so an `open` attribute would appear on markup a server sent without
+   * it.
    */
-  @property({ type: Boolean })
+  @property({ converter: onUnlessFalse })
   open = true
 
   /**

@@ -19,6 +19,35 @@ import { property } from 'lit/decorators.js'
 import { submitAs } from '../submitter.js'
 
 /**
+ * Calls `then` once `click` has finished dispatching, where a native button
+ * acts: after the page's listeners, so a `preventDefault()` in one of them is
+ * read.
+ *
+ * **From a listener at the far end of the click's path.** It runs after the
+ * page's own listeners there, and inside the dispatch, so a script's `click()`
+ * has acted by the time it returns, as a native button's has. A microtask is
+ * too early: for a person's press, the browser runs microtasks between one
+ * listener and the next. A click stopped on its way never reaches the end of
+ * its path, and a native button still acts on it, so it is acted on a task
+ * later.
+ */
+const afterDispatch = (click: Event, then: () => void): void => {
+  const end = click.composedPath().at(-1)
+  const reached = (event: Event): void => {
+    if (event === click) {
+      finish()
+    }
+  }
+  const timer = setTimeout(() => finish())
+  const finish = (): void => {
+    clearTimeout(timer)
+    end?.removeEventListener(click.type, reached)
+    then()
+  }
+  end?.addEventListener(click.type, reached)
+}
+
+/**
  * @summary Triggers an action, submits a form, or navigates.
  *
  * @description
@@ -46,15 +75,19 @@ import { submitAs } from '../submitter.js'
  * As the first submit button in its form, it is the form's default button:
  * Enter in a text field of the form presses it, as it presses a native one.
  *
+ * A press acts once its `click` has reached your listeners, as a native
+ * button's does, so `preventDefault()` in a `click` listener cancels it: the
+ * form is not submitted or reset, and no command is sent.
+ *
  * Set `pending` while the action a press started is still running. The button
  * keeps focus and refuses presses, and a reader on it hears `pending-label`.
  *
  * Every press that acts sends `helix-press` with what pressed it in
  * `detail.pointerType`: `mouse`, `pen`, `touch`, `keyboard`, or `virtual` for
  * a screen reader's press or a script's `click()`, as React Aria's `onPress`
- * does. It is sent once the press has done its own work, before `click`
- * reaches listeners on the element, and never for a disabled or pending
- * button.
+ * does. It is sent once the press has done its own work, after `click` has
+ * reached your listeners, and never for a disabled or pending button or a
+ * canceled press.
  *
  * **Keyboard.** Enter and Space press the button, as on a native one.
  *
@@ -359,32 +392,6 @@ export class HelixHeadlessButton extends HelixFormElementBase {
       event.stopImmediatePropagation()
       return
     }
-    this.act()
-    this.announcePress(event)
-  }
-
-  /**
-   * Presses the button, as `click()` presses a native one: the command is sent,
-   * the form submits or resets, and `helix-press` says `virtual`.
-   *
-   * **Passed to the inner control, because a click on the host reaches nothing
-   * that acts.** The control in the shadow root is what answers a click, so
-   * `click()` from a script, an automation or a test, dispatched on the host,
-   * submitted nothing and sent no `helix-press`. The control's own click reaches
-   * the host's listeners once, retargeted, as one from a native button does. A
-   * disabled button does nothing, and a pending one refuses the press.
-   */
-  override click(): void {
-    const control = this.partNamed('button')
-    if (control) {
-      control.click()
-    } else {
-      super.click()
-    }
-  }
-
-  /** What a press does: sends the command, and submits or resets the form. */
-  private act(): void {
     /* **Re-linked here, and this is the line that makes a trigger reliable.**
      *
      * From `updated` alone the target resolves once, whenever the button last
@@ -411,7 +418,42 @@ export class HelixHeadlessButton extends HelixFormElementBase {
      * there all along and `commandForElement` should be readable before anybody
      * clicks anything. This is the guarantee, not the mechanism. */
     this.linkCommand()
+    /* **The rest waits for the click to reach the page, and a refusal there
+       stops it.** Acting here, at the control, submitted the form before a
+       listener on the host or the page heard the click, so `preventDefault()`
+       could not cancel a submit or a reset. A native button's command was
+       already canceled that way, since the browser sends it after the
+       dispatch. */
+    afterDispatch(event, () => {
+      if (!event.defaultPrevented) {
+        this.act()
+        this.announcePress(event)
+      }
+    })
+  }
 
+  /**
+   * Presses the button, as `click()` presses a native one: the command is sent,
+   * the form submits or resets, and `helix-press` says `virtual`.
+   *
+   * **Passed to the inner control, because a click on the host reaches nothing
+   * that acts.** The control in the shadow root is what answers a click, so
+   * `click()` from a script, an automation or a test, dispatched on the host,
+   * submitted nothing and sent no `helix-press`. The control's own click reaches
+   * the host's listeners once, retargeted, as one from a native button does. A
+   * disabled button does nothing, and a pending one refuses the press.
+   */
+  override click(): void {
+    const control = this.partNamed('button')
+    if (control) {
+      control.click()
+    } else {
+      super.click()
+    }
+  }
+
+  /** What a press does: sends the command, and submits or resets the form. */
+  private act(): void {
     // Before the type check, which returns for `button`, the default and the
     // type every invoker in this library uses.
     this.sendCommand()

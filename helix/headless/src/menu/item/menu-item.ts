@@ -10,6 +10,7 @@ import {
   hostAria,
   isRtl,
   MIRROR_RULE,
+  nameText,
   onApple,
   onUnlessFalse,
   PopoverController,
@@ -424,6 +425,9 @@ export class HelixHeadlessMenuItem extends HelixElement {
            when its page next shows. */
         () => this.partNamed('item') ?? undefined,
         'row',
+        /* In a filterable menu the role is the host's, through internals,
+           which no attribute shows, and the row is still named by its words. */
+        () => this.onHost && nameText(this.partNamed('item') ?? this).trim() !== '',
       )
     }
   }

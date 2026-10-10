@@ -269,6 +269,28 @@ describe('show() and close()', () => {
   })
 })
 
+describe('a --close button', () => {
+  /* A drawer's Apply and Discard both close it with `--close`, and the value
+     of the one pressed never reached `returnValue`. */
+  test('closes it with its value', async () => {
+    const trigger = (await mount(
+      `<helix-headless-button command="--close" commandfor="filters" value="apply">Apply</helix-headless-button>
+       <helix-headless-drawer id="filters" label="Filters">Body</helix-headless-drawer>`,
+    )) as HTMLElement & { updateComplete: Promise<unknown> }
+    const drawer = trigger.nextElementSibling as Drawer
+    await trigger.updateComplete
+    drawer.show()
+    await drawer.updateComplete
+    let returned = ''
+    drawer.addEventListener('helix-before-close', () => {
+      returned = drawer.returnValue
+    })
+    trigger.shadowRoot?.querySelector('button')?.click()
+    await drawer.updateComplete
+    expect([drawer.open, returned]).toEqual([false, 'apply'])
+  })
+})
+
 describe('a form in the drawer', () => {
   /* The platform closes the nearest `<dialog>` ancestor of a `method="dialog"`
      form, and a slotted form's ancestors are the light DOM, where there is
