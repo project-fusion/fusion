@@ -46,6 +46,21 @@ initDiagnostics({ environment: 'development', tiers: [{ lint }] })
 nothing from the network. Without it, diagnostics loads the lint data for the
 version on the page from a public npm CDN.
 
+An add-on package publishes the lint data for its own elements, and you pass it
+in `tiers` the same way. `@fusion.dev/helix-sandbox` publishes it for
+`helix-sandbox-editor`:
+
+```ts
+import lint from '@fusion.dev/helix/lint.json'
+import sandbox from '@fusion.dev/helix-sandbox/lint.json'
+
+initDiagnostics({ environment: 'development', tiers: [{ lint }, { lint: sandbox }] })
+```
+
+The CDN serves the two tiers' lint data alone, so an add-on's elements are
+checked only where its lint data is in `tiers`. Without it, each of them is an
+unknown tag.
+
 Load the module in development only. In Vite, with React or any other
 framework, import it from your entry:
 
@@ -111,8 +126,10 @@ on `127.0.0.1:7417`, takes runs only from pages on a local host, and serves the
 npx helix scan
 ```
 
-`helix scan` reads every file `.gitignore` leaves in, apart from tests and
-the folders a build writes. It reads CSS, Sass, and Less; HTML, Vue, Svelte,
+`helix scan` judges your code against the lint data of every Helix package you
+install that publishes `lint.json`, the two tiers and an add-on such as
+`@fusion.dev/helix-sandbox`. It reads every file `.gitignore` leaves in, apart
+from tests and the folders a build writes. It reads CSS, Sass, and Less; HTML, Vue, Svelte,
 and Astro templates; MDX; and JSX, Lit's `html` and `css` templates, and
 Angular's inline templates in JavaScript and TypeScript. Each finding has its
 file and line:

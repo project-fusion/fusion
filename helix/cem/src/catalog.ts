@@ -112,6 +112,13 @@ export interface Element {
   status: string
   summary: string
   tagName: string
+  /**
+   * The presentation tier, which the reference's Base and Styled views choose
+   * between: `styled` for an element drawn with the styled tier's tokens,
+   * whichever package publishes it. `helix-sandbox-editor` is `styled` and
+   * ships in `@fusion.dev/helix-sandbox`, so `package` and `specifier` say
+   * where it comes from.
+   */
   tier: 'headless' | 'styled'
   /**
    * The properties whose text a page translates with `registerWords`, under the

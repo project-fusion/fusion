@@ -58,7 +58,10 @@ holds an edit, and `reset()` puts back the source it was given.
 Tab indents by two spaces. Escape, then Tab, moves focus out of the editor.
 
 The [Sandbox reference](https://fusion.dev/helix/components/sandbox#helix-sandbox-editor)
-lists every property, event, method, and state of the editor.
+lists every property, event, method, and state of the editor. The package
+ships its own `api.json` and `lint.json`, so `helix api family sandbox` lists
+the editor beside the shell, and `helix scan` checks the attributes you write
+on it.
 
 ## The highlighter
 

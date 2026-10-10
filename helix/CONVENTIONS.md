@@ -1429,6 +1429,16 @@ for the tier and whether to publish typings, and finds everything else.
   the repository; what is not is which commit anyone wants to read.
   `fusion/site/utils/source/source.ts` is the only file a version selector has to touch.
 
+- **A package is documented when it says so**: its `exports` names
+  `./api.json` and it is not `private`. The site's reference reads the
+  workspace's documented packages, and `helix api`, `helix mcp`, and `helix
+  scan` read a project's, so an add-on's elements reach all of them, and
+  `@fusion.dev/helix-workbench` reaches none. A family is merged across them
+  by one rule in `catalog()` and in the command line: the package holding the
+  root, `helix-<slug>` or `helix-headless-<slug>`, supplies the family's facts,
+  and every package adds its elements and examples. A package's own
+  `api.json` lists a family it holds no root of with its own elements alone,
+  marked `contributes` and naming the package that holds the root.
 - **The manifest's types are this repository's own**, structural and loose, in
   `helix/cem/src/types.ts`. They were written that way because the analyzer
   bundled its own copy of `custom-elements-manifest/schema`, and two copies
@@ -2329,6 +2339,15 @@ one client component.
   `@fusion.dev/helix` and installs the editor beside it, or brings a source pane
   of their own. The shell is slot-based and the root hands its value to
   whatever is slotted in, so a sandbox without the editor still works.
+
+  **The editor is documented in the Sandbox family.** It carries `@family
+  sandbox`, so the reference prints it on the Sandbox page with its own import
+  line, `helix api` and `helix mcp` answer it in that family, and `helix scan`
+  judges it from the sandbox's own `lint.json`. The family's facts are
+  `@fusion.dev/helix`'s, which holds the root, and the sandbox's `api.json`
+  marks the family `contributes`. The sandbox peers `@fusion.dev/helix`,
+  optionally, so its `analyze` finds that root and the two install at one
+  version, and a page that only highlights code installs no shell.
 
   **The spec runner is `@fusion.dev/helix-workbench`, which is private.** It
   imports and runs this repository's own spec files through a route of

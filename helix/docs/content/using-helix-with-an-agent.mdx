@@ -43,8 +43,11 @@ writes where an installed family stands in for it, as `native-element`.
 
 Each family's API is in the packages you installed, and on this site:
 
-- `helix api family <family>`, or the MCP tool `helix_family`
-- `node_modules/@fusion.dev/helix/api.json`
+- `helix api family <family>`, or the MCP tool `helix_family`, which read every
+  Helix package you installed
+- `node_modules/@fusion.dev/helix/api.json`, and the `api.json` of each other
+  Helix package you installed, which lists the elements it adds to a family,
+  such as `helix-sandbox-editor` in `@fusion.dev/helix-sandbox`
 - `https://fusion.dev/helix/components/<family>.md` and `.json`
 
 Each lists the import lines, every tag, every property with its literal union,
