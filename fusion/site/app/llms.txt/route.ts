@@ -47,8 +47,8 @@ export async function GET() {
   lines.push(
     '## Machine-readable',
     '',
-    `- [Custom elements manifest](${SITE}/helix/custom-elements.json): Every tag, property with its literal union, event with its class, slot, part and custom property. The vocabulary: a tag not in it does not exist.`,
-    `- [Catalog](${SITE}/helix/api.json): Every family with its tags, properties, events and their React props, slots, parts, words, and the import lines to copy, in one file without the examples. The same file \`@fusion.dev/helix\` ships, which \`helix mcp\` reads from your project.`,
+    `- [Custom elements manifest](${SITE}/helix/custom-elements.json): Every tag \`@fusion.dev/helix\` ships, with each property and its literal union, event with its class, slot, part and custom property. An add-on package, such as \`@fusion.dev/helix-sandbox\`, ships a manifest of its own.`,
+    `- [Catalog](${SITE}/helix/api.json): Every family with its tags, properties, events and their React props, slots, parts, words, and the import lines to copy, in one file without the examples, from every documented Helix package. It is what \`helix mcp\` reads from a project that installs them all. The vocabulary: a tag not in it does not exist.`,
     `- [Token set](${SITE}/helix/tokens.json): Every semantic token with its value, category and description. The closed set: a name not in it resolves to nothing and the property silently falls back.`,
     `- [One family as data](${SITE}/helix/components/button.json): Any family's \`.md\` also answers as \`.json\`, the same content structured. Swap the slug.`,
     '',

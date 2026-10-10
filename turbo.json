@@ -389,6 +389,13 @@
     // `content/**` holds this task's own output, which is excluded so the task
     // does not change its own key. Both tiers' examples are read, not only
     // the styled ones.
+    //
+    // **Every documented package is read, and each says so in its
+    // `package.json`**: `documented()` in `workspace.mjs` takes the packages
+    // that publish `./api.json` and are not private, so those files and that
+    // module are inputs, and each package's manifest and examples beside the
+    // tiers'. `^build` and `^analyze` write the manifests first, the site
+    // reaching every documented package through its dependencies.
     "catalog": {
       "dependsOn": ["^build", "^analyze"],
       "inputs": [
@@ -402,9 +409,12 @@
         "$TURBO_ROOT$/helix/headless/custom-elements.json",
         "$TURBO_ROOT$/helix/sandbox/custom-elements.json",
         "$TURBO_ROOT$/helix/styled/custom-elements.json",
+        "$TURBO_ROOT$/helix/*/package.json",
         "$TURBO_ROOT$/helix/headless/src/*/.examples/**",
+        "$TURBO_ROOT$/helix/sandbox/src/*/.examples/**",
         "$TURBO_ROOT$/helix/styled/src/*/.examples/**",
         "$TURBO_ROOT$/fusion/docs/insights/**",
+        "$TURBO_ROOT$/fusion/scripts/lib/workspace.mjs",
         "$TURBO_ROOT$/fusion/site/scripts/build-catalog.mjs"
       ],
       // **`public/insights` is an output and was not declared**, which is the

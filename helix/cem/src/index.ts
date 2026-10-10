@@ -144,7 +144,7 @@ const skillOf = (pages: string[], cwd: string, version: string): string => {
  * such as `helix-dismiss` reaches an ancestor; a lifecycle event such as
  * `helix-before-open` stops at the element that sent it.
  */
-const bubblingOf = (cwd: string): Map<string, boolean> => {
+export const bubblingOf = (cwd: string): Map<string, boolean> => {
   const found = new Map<string, boolean>()
   let core: string
   try {

@@ -35,36 +35,39 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { catalog } from '@fusion.dev/helix-cem'
+import { bubblingOf, catalog, tierOf } from '@fusion.dev/helix-cem'
 import { pages as docPages, reference } from '@fusion.dev/helix-docs'
 import { findSitePage, sitePageSources } from '@fusion.dev/insights'
-import { ARTIFACT, root, SOURCE } from '@fusion.dev/scripts/workspace'
+import { documented, root } from '@fusion.dev/scripts/workspace'
 
 const OUT = join(root, 'fusion/site/content/catalog/catalog.generated.json')
 const PUBLIC = join(root, 'fusion/site/public')
 
 /**
- * The manifests the reference is built from: the two component tiers, and
- * `@fusion.dev/helix-sandbox`.
+ * The packages the reference is built from: every documented one, which is a
+ * package that publishes `./api.json` and is not private, styled first.
  *
- * **The sandbox package adds an element and no family.** Its editor's source
- * is in `src/sandbox/editor`, so the catalog places it on the Sandbox page as
- * that family's Editor, with its own package's import line. The nav lists
- * families, so it gains nothing.
+ * **An add-on package adds elements and no family.** `@fusion.dev/helix-sandbox`
+ * names the Sandbox family with `@family` on its editor, so the catalog puts
+ * the editor on the Sandbox page with its own package's import line, and the
+ * page's facts stay those of `@fusion.dev/helix`, which holds the root. The
+ * nav lists families, so it gains nothing.
  *
- * **`helix/workbench` is not among them.** `@fusion.dev/helix-workbench` is
- * private, the spec runner that runs this repository's specs, and reading its
- * manifest puts an element nobody can install into the reference.
+ * **`@fusion.dev/helix-workbench` is not among them**, being private: the spec
+ * runner that runs this repository's specs, whose element nobody can install.
  *
  * A reference documents what a reader can take, so this reads a list of
  * packages and filters no tag names downstream: a name filter would have to
  * be updated every time a package grew an element, and would be silent when it
- * was not.
+ * was not. `helix api`, `helix mcp`, and `helix scan` read the same list from
+ * a project's `node_modules`.
  */
-const MANIFESTS = [ARTIFACT.styledManifest, ARTIFACT.headlessManifest, ARTIFACT.sandboxManifest]
+const DOCUMENTED = documented()
+const MANIFESTS = DOCUMENTED.map((one) => one.manifest)
 
 /**
- * Where the example files sit, one folder per family, in both tiers.
+ * Where the example files sit, one folder per family, in every documented
+ * package.
  *
  * **Both tiers, or the tier switch lies.** Scanning `helix/styled/src` alone
  * makes every example reach the catalog as `styled`, and a reader choosing Base
@@ -76,7 +79,7 @@ const MANIFESTS = [ARTIFACT.styledManifest, ARTIFACT.headlessManifest, ARTIFACT.
  * headline and `catalog()` takes the first it is handed, so a reader with no
  * preference set sees the tier almost everyone consumes.
  */
-const EXAMPLES = [SOURCE.styled, SOURCE.headless].map((tier) => join(root, tier))
+const EXAMPLES = DOCUMENTED.map((one) => join(root, one.directory, 'src'))
 
 const manifests = MANIFESTS.map((path) => {
   const file = join(root, path)
@@ -137,7 +140,10 @@ for (const source of EXAMPLES) {
   }
 }
 
-const families = catalog(manifests, examples)
+/* Whether each event bubbles, read from the event classes as `analyze` reads
+   them, so a family's `.json` and `/helix/api.json` say what each package's
+   `api.json` says. */
+const families = catalog(manifests, examples, bubblingOf(join(root, 'fusion/site')))
 mkdirSync(dirname(OUT), { recursive: true })
 writeFileSync(OUT, `${JSON.stringify(families)}\n`)
 
@@ -190,10 +196,19 @@ for (const dir of [PUBLIC, join(PUBLIC, 'insights')]) {
   }
 }
 
-/* The `.md` prints what the page shows by default: the styled tier, and the
-   sandbox package's editor on the Sandbox page beside it. */
-const [styled, , sandbox] = manifests
-const printed = { modules: [...(styled?.modules ?? []), ...(sandbox?.modules ?? [])] }
+/* The `.md` prints what the page shows by default: the styled elements of
+   every documented package, so the Sandbox page prints the editor beside the
+   shell it is slotted into. */
+const printed = {
+  modules: manifests.flatMap((manifest) =>
+    (manifest.modules ?? []).map((module) => ({
+      ...module,
+      declarations: (module.declarations ?? []).filter(
+        (declaration) => declaration.tagName && tierOf(declaration.tagName) === 'styled',
+      ),
+    })),
+  ),
+}
 for (const family of families) {
   writeFileSync(join(COMPONENTS, `${family.slug}.json`), `${JSON.stringify(family, null, 2)}\n`)
 
@@ -209,14 +224,13 @@ for (const family of families) {
     ['Source', family.source],
   ].filter(([, value]) => value)
 
-  /* The manifests the page is printed from, which is the sandbox package's
-     too where the family holds its element. */
-  const from = [
-    MANIFESTS[0],
-    ...(family.elements.some((element) => element.package === sandbox?.helix?.package)
-      ? [MANIFESTS[2]]
-      : []),
-  ]
+  /* The manifests the page is printed from: the styled tier's, and each
+     other package's that adds a styled element to the family. */
+  const from = DOCUMENTED.filter(
+    (one, at) =>
+      at === 0 ||
+      family.elements.some((element) => element.package === one.name && element.tier === 'styled'),
+  ).map((one) => one.manifest)
   writeFileSync(
     join(COMPONENTS, `${family.slug}.md`),
     reference(printed, {
