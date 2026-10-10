@@ -58,9 +58,11 @@ export function MapsPoints() {
       ([entry]) => {
         if (entry?.isIntersecting) {
           near.disconnect()
+          /* A 504 from the route is a snapshot with no picture, which still
+             carries the credit. One from a gateway is not JSON, and is caught. */
           fetch(SNAPSHOT)
             .then((answer) =>
-              answer.ok
+              answer.ok || answer.status === 504
                 ? (answer.json() as Promise<Pick<MapSnapshot, 'credit' | 'picture'>>)
                 : undefined,
             )
@@ -157,18 +159,17 @@ export function MapsPoints() {
           </helix-text>
         ) : null}
         {/* The streets before the map has drawn them, and the tiles' credit
-            in the frame's credit strip; the points come with the map. */}
+            in the frame's credit strip, written whether or not the picture
+            was drawn; the points come with the map. */}
         {snapshot?.picture ? (
-          <>
-            <div
-              className={styles.mapsSnapshot}
-              // biome-ignore lint/security/noDangerouslySetInnerHtml: an SVG this site drew on its server from map tiles
-              dangerouslySetInnerHTML={{ __html: snapshot.picture }}
-              data-helix-map-snapshot=""
-            />
-            <MapCredit credit={snapshot.credit} />
-          </>
+          <div
+            className={styles.mapsSnapshot}
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: an SVG this site drew on its server from map tiles
+            dangerouslySetInnerHTML={{ __html: snapshot.picture }}
+            data-helix-map-snapshot=""
+          />
         ) : null}
+        <MapCredit credit={snapshot?.credit ?? []} />
         <helix-map-points
           cluster
           description={`${COUNTED} places from OpenStreetMap`}

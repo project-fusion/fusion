@@ -14,13 +14,17 @@ import { snapshotOf } from '@/utils/map-snapshot/map-snapshot'
  * from, to every reader whether they reached the map or not.
  *
  * **Cached for a day where it was drawn whole**, the day `snapshotOf` keeps
- * it for. A snapshot that could not be drawn is answered at once and
- * remembered by nobody, so the next reader asks again.
+ * it for. A snapshot that could not be drawn is answered at once as a 504
+ * and remembered by nobody, so the next reader asks again. It still carries
+ * the credit, which a tile that ran out of time does not cost.
  */
 export async function GET() {
   const { credit, picture } = await snapshotOf(POINTS_VIEW)
   if (picture === '') {
-    return new Response(null, { headers: { 'cache-control': 'no-store' }, status: 504 })
+    return Response.json(
+      { credit, picture },
+      { headers: { 'cache-control': 'no-store' }, status: 504 },
+    )
   }
   return Response.json(
     { credit, picture },

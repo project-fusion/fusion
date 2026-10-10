@@ -246,8 +246,9 @@ export interface MapSnapshot {
   credit: CreditPart[]
   /**
    * The picture, then the credit in the frame's `attribution` slot, as markup
-   * to write in the frame after the element the renderer draws in. An empty
-   * string where the snapshot could not be drawn.
+   * to write in the frame after the element the renderer draws in. The credit
+   * alone where the picture could not be drawn and the tiles' TileJSON was
+   * read, and an empty string where neither is known.
    */
   markup: string
   /** The picture alone, as markup. An empty string where it could not be drawn. */
@@ -292,12 +293,20 @@ const MARGIN = 16
  * `connectMap` hides it once the renderer's credit is written, or at once
  * where the page slotted its own.
  *
- * **Whole or nothing.** Holds empty strings where any tile the view needs
- * cannot be read in time, or the view is not numbers, which a page renders
- * as nothing and the renderer then draws. A snapshot with a tile missing
- * looks finished and is not, and one that waited on a slow server held the
- * page: each request is given `timeout` milliseconds. A tile the server says
- * it does not have, a 404, is drawn empty, as the sea is.
+ * **The picture is whole or nothing.** `picture` is an empty string where
+ * any tile the view needs cannot be read in time, or the view is not
+ * numbers, which a page renders as nothing and the renderer then draws. A
+ * snapshot with a tile missing looks finished and is not, and one that waited
+ * on a slow server held the page: each request is given `timeout`
+ * milliseconds. A tile the server says it does not have, a 404, is drawn
+ * empty, as the sea is.
+ *
+ * **The credit outlives a missing tile.** It is read from the TileJSON before
+ * any tile is asked for, so a tile that fails costs the picture and keeps
+ * the credit, and `markup` is then the credit alone. A page that wrote
+ * nothing for a failed picture showed the map with no credit until the
+ * renderer read its own, and a page that never loads one, never. Cache only a
+ * snapshot whose `picture` is not empty.
  */
 export const mapSnapshot = async (
   asked: MapView,
@@ -501,7 +510,7 @@ export const mapSnapshot = async (
   }
 
   if (!whole) {
-    return nothing()
+    return { credit, markup: creditMarkup(credit), picture: '' }
   }
   const body = shown
     .map((layer) => {

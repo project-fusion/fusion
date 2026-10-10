@@ -11,7 +11,7 @@ import {
   motionOf,
 } from '@fusion.dev/helix-map'
 import { followTheme, mapLibreDriver, mapLibreStyle } from '@fusion.dev/helix-map/maplibre'
-import type { MapSnapshot } from '@fusion.dev/helix-map/snapshot'
+import type { CreditPart, MapSnapshot } from '@fusion.dev/helix-map/snapshot'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { MapCredit } from '@/components/map-credit/map-credit'
@@ -88,10 +88,17 @@ const PITCH = 45
  * hears the site's own theme change: its ancestors' styles moved.
  */
 export function MapsHero({
+  credit = [],
   painted,
   sent,
   snapshots,
 }: {
+  /**
+   * The tiles' credit, read on the server, which the frame shows from the
+   * first paint. Kept apart from `snapshots`, since a tile that ran out of
+   * time costs the pictures and not the credit.
+   */
+  credit?: readonly CreditPart[]
   /** The sent theme as the server derived it, so it is in the first paint. */
   painted?: Record<string, string>
   /** A theme the builder sent, which the page opens in. */
@@ -428,7 +435,8 @@ export function MapsHero({
             over the canvas until MapLibre has drawn its tiles, since it
             paints its land before them. Before the markers, which stand on
             it. Its credit is the tiles', the same for both views, in the
-            frame's credit strip until MapLibre writes its own. */}
+            frame's credit strip until MapLibre writes its own, and written
+            whether or not the pictures were drawn. */}
         {snapshots ? (
           <>
             <div
@@ -443,9 +451,9 @@ export function MapsHero({
               dangerouslySetInnerHTML={{ __html: snapshots.narrow.picture }}
               data-helix-map-snapshot=""
             />
-            <MapCredit credit={snapshots.wide.credit} />
           </>
         ) : null}
+        <MapCredit credit={credit} />
         {/* **The page's ground run in over the map, inside its own box**, so
             it washes the map and not the credit under it, and the places
             drawn after it stand over it. */}
