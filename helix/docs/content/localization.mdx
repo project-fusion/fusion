@@ -1,5 +1,5 @@
 ---
-description: Set the locale of date, time, and number controls, translate the built-in words, and lay out pages right to left.
+description: Set the locale of date, time, and number controls, translate the built-in words, lay out pages right to left, and color a rise and a fall for your market.
 section: Essentials
 title: Localization and RTL
 ---
@@ -330,6 +330,81 @@ Aria's `@react-stately/color` translates, so you can reuse that table.
 Helix ships English words and no translations. Pass the words from your own
 translation system, either to `registerWords` or to the properties.
 
+## Rise and fall colors
+
+Markets draw a price movement in different colors:
+
+- Mainland China, Taiwan, and Japan draw a rise in red and a fall in green.
+- Hong Kong, like most other markets, draws a rise in green and a fall in red.
+
+Colors that show a status, such as an error or a warning, are the same in all
+of these markets. Only a color that shows which way a value moved changes.
+
+Two tokens hold these colors:
+
+| Token | Default |
+|---|---|
+| `--helix-color-rise` | `--helix-color-success`, which is green |
+| `--helix-color-fall` | `--helix-color-danger`, which is red |
+
+`Trend` uses them when you set `color-by="movement"`. Without it, the color of a
+trend follows `good`, which says whether the change is an improvement.
+
+For a page that shows one of the markets that draw a rise in red, swap the two
+tokens at the root of the page, and set `color-by` on each trend:
+
+```css
+:root,
+[data-helix-theme] {
+  --helix-color-fall: var(--helix-color-success);
+  --helix-color-rise: var(--helix-color-danger);
+}
+```
+
+```html
+<helix-trend
+  color-by="movement"
+  format-options='{"style":"percent","maximumFractionDigits":2}'
+  value="0.0124"
+>
+  <span slot="label">Shanghai Composite</span>
+</helix-trend>
+```
+
+An element with `data-helix-theme` declares every token again for the part of
+the page it themes, so the rule names `[data-helix-theme]` beside `:root`. To
+color one part of a page, such as a panel of Shanghai prices on a page about
+several markets, set the two tokens on that panel.
+
+The two tokens point at the status colors, so after the swap each one still
+measures at least 4.5:1 on the page and on every surface, in both modes. A
+theme that changes `success` and `danger` changes them too.
+
+**Helix does not set these from `lang`.** The language of a page does not name
+its market. A page in Chinese for Hong Kong draws a rise in green, a `zh-Hant`
+page with no region could be for Taiwan or for Hong Kong, and a page in English
+can show Shanghai prices. If the language of your page does decide its market,
+select on the language yourself:
+
+```css
+:is(:root, [data-helix-theme]):is(:lang(zh-CN), :lang(zh-TW), :lang(ja)) {
+  --helix-color-fall: var(--helix-color-success);
+  --helix-color-rise: var(--helix-color-danger);
+}
+```
+
+A page in `zh-HK` matches none of these, so it keeps green for a rise.
+
+Other components color a series by its place in the list, or by a tone you
+name. To draw one in the color of a rise or a fall, set its own color to the
+token, such as `--sparkline-color: var(--helix-color-rise)` on the sparkline of
+a price that went up.
+
+Sources:
+
+- [Benzinga, on the colors of stock prices in China, Japan, and Taiwan](https://www.benzinga.com/general/education/21/10/23258001/did-you-know-you-dont-want-to-be-in-the-green-if-youre-trading-in-china-japan-or-taiwan)
+- [Feng Jiang, Rui Zhang, and Su Lu, on red and green in the Chinese and Hong Kong markets](https://www.behavioraleconomics.com/when-red-means-go)
+
 ## What to check when you add a language
 
 - **Long strings.** Labels in German and Finnish are often long. A control sized
@@ -338,6 +413,9 @@ translation system, either to `registerWords` or to the properties.
   buttons may now fit four.
 - **The `lang` attribute.** Set it as well as translating the strings.
   Hyphenation, quotation marks, and font fallback all depend on it.
+- **A market's colors.** If the new language comes with a market that draws a
+  rise in red, swap the rise and fall tokens. See
+  [Rise and fall colors](#rise-and-fall-colors).
 - **Numerals.** `Intl` formats the digits. A `%` or a currency symbol hardcoded
   in your own markup does not move to the correct side.
 - **Icons that point.** A caret that a component draws turns by itself. An icon

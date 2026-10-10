@@ -1,0 +1,8 @@
+/* Mainland China, Taiwan, and Japan draw a rise in red and a fall in green,
+   so a page for one of those markets points the two tokens the other way. A
+   page for one market sets them on `:root`; this example sets them on its own
+   container, as a page showing several markets would. */
+.market {
+  --helix-color-fall: var(--helix-color-success);
+  --helix-color-rise: var(--helix-color-danger);
+}

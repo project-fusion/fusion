@@ -1,0 +1,36 @@
+<!-- @summary Prices colored by which way they moved, in a market that draws a rise in red and a fall in green. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-flex
+  class="market"
+  direction="column"
+  gap="md"
+>
+  <helix-trend
+    color-by="movement"
+    format-options='{"style":"percent","maximumFractionDigits":2}'
+    locale="en-US"
+    value="0.0124"
+  >
+    <span slot="label">Index</span>
+  </helix-trend>
+  <helix-trend
+    color-by="movement"
+    format-options='{"style":"percent","maximumFractionDigits":2}'
+    locale="en-US"
+    value="-0.0087"
+  >
+    <span slot="label">Share price</span>
+  </helix-trend>
+  <helix-trend
+    color-by="movement"
+    format-options='{"style":"percent","maximumFractionDigits":2}'
+    locale="en-US"
+    value="0"
+  >
+    <span slot="label">Bond yield</span>
+  </helix-trend>
+</helix-flex>

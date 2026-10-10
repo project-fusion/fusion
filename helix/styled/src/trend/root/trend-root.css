@@ -62,6 +62,23 @@ slot[name$="icon"]::slotted(*) {
   --_trend-color: var(--trend-worse-color, var(--helix-color-danger));
 }
 
+/* The movement, for a page whose colors follow its market's convention.
+ *
+ * After the judgment and one attribute heavier, so `color-by="movement"` wins
+ * on a trend that also sets `good`: the word and the states still judge, and
+ * the color says which way it moved. The two tokens are success and danger
+ * until the page swaps them. Served, the attribute pairs stand in for the
+ * states, as they do for the judgment. */
+:host([color-by="movement"]:state(up)),
+:host(:not(:defined)[color-by="movement"][movement="up"]) {
+  --_trend-color: var(--trend-up-color, var(--helix-color-rise));
+}
+
+:host([color-by="movement"]:state(down)),
+:host(:not(:defined)[color-by="movement"][movement="down"]) {
+  --_trend-color: var(--trend-down-color, var(--helix-color-fall));
+}
+
 /* Out of sight and still in the accessibility tree.
  *
  * The clip rather than `display: none` or `visibility: hidden`, both of which

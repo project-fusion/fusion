@@ -167,6 +167,23 @@ describe('movement', () => {
     expect(await states('movement="up"')).toEqual([])
     expect(await states('movement="sideways" good="up"')).toEqual([])
   })
+
+  /* A sheet that colors by direction reads these. A trend moved by `value`
+     writes no `movement` onto its host, so an attribute could not say it. */
+  test('records the movement as an up or down state, whichever property set it', async () => {
+    const states = (host: Trend): string[] =>
+      ['down', 'up'].filter((name) => host.internals.states.has(name))
+    expect(states((await trend('movement="up"')) as Trend)).toEqual(['up'])
+    expect(states((await trend('direction="down"')) as Trend)).toEqual(['down'])
+    expect(states((await trend('movement="neutral"')) as Trend)).toEqual([])
+    expect(states((await trend('movement="sideways"')) as Trend)).toEqual([])
+    expect(states((await trend('')) as Trend)).toEqual([])
+    const host = (await trend('value="-3"')) as Trend & { value?: number }
+    expect(states(host)).toEqual(['down'])
+    host.value = 2
+    await host.updateComplete
+    expect(states(host)).toEqual(['up'])
+  })
 })
 
 /* A slot per movement around the slot for all three, so a page slots its set
