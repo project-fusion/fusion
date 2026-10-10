@@ -143,8 +143,10 @@ toolchain install and the compile behind a build none of it reads. Measured on
 run 35041878434, `warm` ended at 155 seconds and the Rust job at 262.
 
 **`cli` is the checks that run a binary over the built tree**, `check:cli`,
-the seed tokens, the prose and the spec rules, so it waits for `warm` as the
-other consumers of the build do. The two jobs compile the same workspace twice
+the seed tokens, the prose and the spec rules. It starts with the run and
+compiles first, since cargo reads none of the build, and then restores what
+`warm` wrote, which `warm` has finished by then. Behind `warm` the compile ended
+the run. The two jobs compile the same workspace twice
 and each keeps a cache of its own, which is what leaving `rust-cache`'s key
 alone gives: clippy writes metadata where `cargo build` writes a binary, so one
 shared entry would be whichever job saved first and a recompile in the other.
