@@ -1,12 +1,11 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { dirname } from 'node:path'
-import type { HighlightStyle } from '@codemirror/language'
 import { registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
-import type { Tag } from '@lezer/highlight'
+import type { Highlighter, Tag } from '@lezer/highlight'
 
 /* Imported once the DOM is registered: CodeMirror and core read the globals
    they find as they are evaluated. */
-let highlightStyle: HighlightStyle
+let syntaxHighlighter: Highlighter
 let tags: typeof import('@lezer/highlight').tags
 let getStyleTags: typeof import('@lezer/highlight').getStyleTags
 let javascriptLanguage: typeof import('@codemirror/lang-javascript').javascriptLanguage
@@ -18,14 +17,14 @@ let EditorView: typeof import('@codemirror/view').EditorView
  *
  * Lezer matches a style to a token by the identity of the `Tag` object. When
  * two copies of `@lezer/highlight` are installed, the parsers tag their tokens
- * with one copy and `highlightStyle` is built from the other, so no rule ever
+ * with one copy and `syntaxHighlighter` is built from the other, so no rule ever
  * matches. The editor then renders every token as plain text, and nothing
  * throws or logs. That shipped on October 6, 2026, after a dependency bump left
  * a nested 1.2.3 copy under the parsers. These specs fail on that install.
  */
 beforeAll(async () => {
   registerDom()
-  ;({ highlightStyle } = await import('./highlight.js'))
+  ;({ syntaxHighlighter } = await import('../../highlight/syntax.js'))
   ;({ getStyleTags, tags } = await import('@lezer/highlight'))
   ;({ javascriptLanguage } = await import('@codemirror/lang-javascript'))
   ;({ forceParsing } = await import('@codemirror/language'))
@@ -59,11 +58,11 @@ const editor = async (language: string, value: string): Promise<Updatable> => {
   return host
 }
 
-/** The text of every token span drawn with the class `highlightStyle` gives `tag`. */
+/** The text of every token span drawn with the class `syntaxHighlighter` gives `tag`. */
 const painted = (host: Updatable, tag: Tag): string[] => {
-  const name = highlightStyle.style([tag])
+  const name = syntaxHighlighter.style([tag])
   if (!name) {
-    throw new Error('highlightStyle has no rule for this tag')
+    throw new Error('syntaxHighlighter has no rule for this tag')
   }
   const content = host.shadowRoot?.querySelector('.cm-content')
   const spans = content ? [...content.querySelectorAll('span')] : []
@@ -114,16 +113,23 @@ describe('one copy of @lezer/highlight', () => {
     const css = dirname(Bun.resolveSync('@codemirror/lang-css/package.json', import.meta.dir))
     expect({
       '@codemirror/language': resolvedFrom('@codemirror/language'),
-      '@codemirror/theme-one-dark': resolvedFrom('@codemirror/theme-one-dark'),
-      '@lezer/css': resolvedFrom('@lezer/css', css),
-      '@lezer/html': resolvedFrom('@lezer/html', html),
-      '@lezer/javascript': resolvedFrom('@lezer/javascript', javascript),
+      '@lezer/css': resolvedFrom('@lezer/css'),
+      '@lezer/css under @codemirror/lang-css': resolvedFrom('@lezer/css', css),
+      '@lezer/html': resolvedFrom('@lezer/html'),
+      '@lezer/html under @codemirror/lang-html': resolvedFrom('@lezer/html', html),
+      '@lezer/javascript': resolvedFrom('@lezer/javascript'),
+      '@lezer/javascript under @codemirror/lang-javascript': resolvedFrom(
+        '@lezer/javascript',
+        javascript,
+      ),
     }).toEqual({
       '@codemirror/language': ours,
-      '@codemirror/theme-one-dark': ours,
       '@lezer/css': ours,
+      '@lezer/css under @codemirror/lang-css': ours,
       '@lezer/html': ours,
+      '@lezer/html under @codemirror/lang-html': ours,
       '@lezer/javascript': ours,
+      '@lezer/javascript under @codemirror/lang-javascript': ours,
     })
   })
 

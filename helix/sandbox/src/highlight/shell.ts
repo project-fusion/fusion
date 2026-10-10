@@ -1,7 +1,6 @@
 import type { StreamParser } from '@codemirror/language'
-import { StreamLanguage } from '@codemirror/language'
 import { shell } from '@codemirror/legacy-modes/mode/shell'
-import { tags } from '@lezer/highlight'
+import { type Tag, tags } from '@lezer/highlight'
 
 /*
  * Shell, with the command named.
@@ -42,15 +41,16 @@ import { tags } from '@lezer/highlight'
  */
 const OPENS = /^[|&;({!]+$/
 
-interface Head {
+export interface ShellState {
   helixHead: boolean
 }
 
-const commandAware: StreamParser<Head> = {
-  ...(shell as StreamParser<Head>),
+/** The sh mode, with the command named. */
+export const shellMode: StreamParser<ShellState> = {
+  ...(shell as StreamParser<ShellState>),
 
   startState(indent) {
-    const state = (shell as StreamParser<Head>).startState?.(indent) ?? ({} as Head)
+    const state = (shell as StreamParser<ShellState>).startState?.(indent) ?? ({} as ShellState)
     state.helixHead = true
     return state
   },
@@ -61,7 +61,7 @@ const commandAware: StreamParser<Head> = {
     }
     const head = state.helixHead
     const from = stream.pos
-    const token = (shell as StreamParser<Head>).token(stream, state)
+    const token = (shell as StreamParser<ShellState>).token(stream, state)
     const text = stream.string.slice(from, stream.pos)
 
     /* Whitespace decides nothing: it neither is a command nor ends the position
@@ -78,8 +78,5 @@ const commandAware: StreamParser<Head> = {
   },
 }
 
-/** The shell grammar, with `command` mapped into the palette. */
-export const shellLanguage = StreamLanguage.define<Head>({
-  ...commandAware,
-  tokenTable: { command: tags.keyword },
-})
+/** What `shellMode`'s own token name is drawn as, for its `tokenTable`. */
+export const shellTokens: Record<string, Tag> = { command: tags.keyword }
