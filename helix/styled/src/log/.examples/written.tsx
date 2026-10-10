@@ -116,10 +116,11 @@ export function Example() {
       ref={log}
     >
       <helix-flex
-        data-density="sm"
-        justify-content="end"
+        align-items="center"
+        justify-content="between"
         slot="toolbar"
       >
+        <helix-text variant="body-strong">Test and build on main</helix-text>
         <helix-button onClick={again}>Run again</helix-button>
       </helix-flex>
     </helix-log>

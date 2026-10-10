@@ -10,9 +10,9 @@ export function Example() {
       query={query}
     >
       <helix-input
-        label="Search the log"
+        aria-label="Search the log"
         onhelix-before-change={(event) => setQuery(event.detail.value)}
-        placeholder="Search"
+        placeholder="Search the log"
         slot="toolbar"
         type="search"
       />
