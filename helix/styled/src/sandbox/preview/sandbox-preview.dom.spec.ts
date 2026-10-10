@@ -256,12 +256,23 @@ describe('the preview states', () => {
     expect(hasState(host, 'blank')).toBe(false)
   })
 
+  /* **A second from the last send, which is not always the `load` below.** The
+     source settles 120ms after mounting and sends again, and in a browser the
+     frame's own document loads and sends again whenever it arrives. Each send
+     restarts the wait, so a fixed 1,050ms check failed on a busy CI runner. The
+     frame is still blank at 900ms whatever sends came after, and it is shown
+     once the last wait ends. */
   test('shows a frame that never says it drew, a second after it is sent an example', async () => {
     const host = await preview()
     const frame = part(host, 'frame') as HTMLIFrameElement
     frame.dispatchEvent(new Event('load'))
     expect(hasState(host, 'blank')).toBe(true)
-    await new Promise((resolve) => setTimeout(resolve, 1050))
+    await new Promise((resolve) => setTimeout(resolve, 900))
+    expect(hasState(host, 'blank')).toBe(true)
+    const end = performance.now() + 3000
+    while (hasState(host, 'blank') && performance.now() < end) {
+      await new Promise((resolve) => setTimeout(resolve, 16))
+    }
     expect(hasState(host, 'blank')).toBe(false)
   })
 
