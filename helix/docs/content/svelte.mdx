@@ -12,10 +12,13 @@ import '@fusion.dev/helix/svelte'
 ```
 
 Add this types-only import once. It augments `SvelteHTMLElements`, so every
-Helix tag is typed in a component. The import re-exports the JSX types. Svelte
-binds a handler as `onhelix-before-change={…}`, which is the shape those types
-already describe. With one shared copy of the types, the Svelte and JSX typings
-cannot disagree.
+Helix tag is typed in a component. Svelte binds a handler as
+`onhelix-before-change={…}`, which is the shape the JSX typings already
+describe, so the Svelte typings read each tag's props from
+`@fusion.dev/helix/jsx`. The two cannot disagree.
+
+The typings need only Svelte's own types, and they compile with
+`skipLibCheck: false`.
 
 ## Pass props and bind events
 
@@ -43,6 +46,40 @@ Svelte passes objects and arrays as properties on its own:
 Svelte's own attributes are typed on every Helix tag as well, so `onclick`,
 `class`, and a `style` string check as they do on a `div`.
 
+## Hold the element
+
+`bind:this` holds the element, typed as its class:
+
+```svelte
+<script lang="ts">
+  import type { HelixInput } from '@fusion.dev/helix'
+
+  let input: HelixInput | undefined = $state()
+</script>
+
+<helix-input bind:this={input} label="Name"></helix-input>
+```
+
+## Type a handler in the script
+
+A handler written on the tag takes its event type from the tag. A handler
+written in the script names its event type, which `@fusion.dev/helix/jsx`
+exports for each element and event:
+
+```svelte
+<script lang="ts">
+  import type { HelixInputHelixBeforeChangeElementEvent } from '@fusion.dev/helix/jsx'
+
+  const refuseLong = (event: HelixInputHelixBeforeChangeElementEvent) => {
+    if (event.detail.value.length > 40) {
+      event.preventDefault()
+    }
+  }
+</script>
+
+<helix-input label="Handle" onhelix-before-change={refuseLong}></helix-input>
+```
+
 ## Ignore the click warnings on a control
 
 `svelte-check` warns about an `onclick` on any Helix element. Its accessibility
@@ -62,8 +99,10 @@ right. Use a control there.
 
 These two rules apply in every framework.
 
-`bind:` does not work on a Helix control, because custom elements have no
-two-way binding convention to opt into. Read the value from the event.
+Two-way bindings do not work on a Helix control, because custom elements have
+no two-way binding convention to opt into. Svelte accepts `bind:value` only on
+`<input>`, `<textarea>`, and `<select>`, and `bind:checked` only on `<input>`.
+Read the value from the event.
 
 A declared `value`, `open`, `checked`, or `active` is a seed. The element starts
 with that value and then applies its own changes. To refuse a change, cancel the
