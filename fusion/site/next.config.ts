@@ -106,6 +106,7 @@ const config: NextConfig = {
     '@fusion.dev/helix-headless',
     '@fusion.dev/helix-map',
     '@fusion.dev/helix-sandbox',
+    '@fusion.dev/helix-workbench',
     '@fusion.dev/helix',
   ],
 

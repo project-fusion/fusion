@@ -24,6 +24,18 @@ import '../../copy-button/index.js'
  * height of a long file, which then scrolls. A line `mark-lines` names takes a
  * band in the primary color, with an edge at its start.
  *
+ * **To color code with no highlighter of your own**, install
+ * `@fusion.dev/helix-sandbox` and import its `code-block` entry beside the
+ * block's. It registers a highlighter for every block, which reads `css`,
+ * `html`, `js`, `jsx`, `sh`, `ts` and `tsx`, and names such as `typescript`
+ * and `bash`, with Lezer's grammars. It colors them as the sandbox's editor
+ * does, from the `--helix-color-syntax-*` tokens:
+ *
+ * ```js
+ * import '@fusion.dev/helix/code-block'
+ * import '@fusion.dev/helix-sandbox/code-block'
+ * ```
+ *
  * @since 0.1.0
  * @status stable
  * @category typography

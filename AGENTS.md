@@ -171,7 +171,7 @@ Rust for backend and substrate cores. TypeScript for frontend.
 
 ```
 helix/     styles core headless styled icons theme cem docs diagnostics
-           gallery sandbox testing cli templates create-app visual
+           gallery sandbox testing workbench cli templates create-app visual
 cortex/    core trace engram docs
 fusion/    cli docs plugins rules scripts site: what belongs to the company
            rather than to a product. `docs/insights` is the published writing;
@@ -335,7 +335,7 @@ directions, so the day the flag changes is the day the workflow has to.
   the product prefix: `@fusion.dev/helix`, not `@fusion.dev/helix-helix-styled`.
 - **`private` decides what ships, and the scope does not.** A package can belong
   to Helix and still never leave: `@fusion.dev/helix-cem` is what runs over a
-  manifest once `helix` has written it and `@fusion.dev/helix-sandbox` the editor and spec runner, both
+  manifest once `helix` has written it and `@fusion.dev/helix-workbench` the spec runner, both
   Helix byproducts and both build tooling for this repository. Naming them
   `@fusion.dev/*` to say "does not publish" would claim they are general Fusion
   tooling, which is the one thing they are not. `fusion x workspace --only publishable`

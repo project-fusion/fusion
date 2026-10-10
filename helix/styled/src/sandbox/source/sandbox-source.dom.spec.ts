@@ -223,7 +223,7 @@ describe('the source pane', () => {
  * Worth its own block because this pane is the half of the readout that *ships*.
  * The root's listener and the status bar's `caret` part are both in
  * `@fusion.dev/helix`, so a pane here that reports nothing leaves a consumer with
- * a status bar that can never fill, whatever the private
+ * a status bar that can never fill, whatever the
  * `@fusion.dev/helix-sandbox` editor does.
  */
 describe('the source pane reporting its cursor', () => {

@@ -12,8 +12,10 @@ You can edit every example on a component's page. When you change the markup,
 the preview redraws. When you change the stylesheet beside it, the preview
 restyles.
 
-To build a playground of your own, you would use the same elements. The
-isolation described below makes it safe to run markup that someone else wrote.
+To build a playground of your own, use the same elements: the sandbox from
+`@fusion.dev/helix/sandbox`, and the editor from `@fusion.dev/helix-sandbox`.
+The isolation described below makes it safe to run markup that someone else
+wrote.
 
 ## How the preview is isolated
 
@@ -217,16 +219,18 @@ own message from `:state(failed)`.
 
 ## The frame document
 
-`helix-sandbox-preview` loads `src` into a sandboxed frame. You provide that
-document. It loads the styles and the elements your examples use, and it talks
-to the preview through `postMessage`.
+`helix-sandbox-preview` runs each example in a sandboxed frame. The frame
+document either comes with the preview or is one you host.
 
-Without `src`, the preview loads a built-in document. It runs the example's
-HTML, CSS, and scripts, and reports the console, uncaught errors, the height,
-and presses, so a sandbox renders with nothing to host. It defines no element,
-so set `src` to a document of your own when your examples use Helix
-components. Its script is inline, so a page whose Content Security Policy
-refuses inline scripts needs a `src` too.
+**Without `src`, the preview loads a built-in document**, so a sandbox needs
+nothing hosted. It runs the example's HTML, CSS, and scripts, and reports the
+console, uncaught errors, the height, and presses. It defines no element, so
+set `src` to a document of your own when your examples use Helix components.
+Its script is inline, so a page whose Content Security Policy refuses inline
+scripts needs a `src` too.
+
+**With `src`, the preview loads your document.** It loads the styles and the
+elements your examples use, and it talks to the preview through `postMessage`.
 
 The messages:
 
@@ -250,9 +254,18 @@ it was given. The types are exported from `@fusion.dev/helix/sandbox` as
 you. Call it once in the frame document, after your elements are defined. It
 writes each render into `#preview-root`, runs the example's scripts, relays
 its console, its uncaught errors, and its unhandled promise rejections,
-reports its height and its presses, and adds the rules for the four layouts. A frame follows. `/helix.css` is the stylesheet from
-`@fusion.dev/helix-styles`, and `/frame.js` is a classic script you bundle,
-for the reason under "How the preview is isolated":
+reports its height and its presses, and adds the rules for the four layouts.
+
+The frame's own script must be a classic script, bundled into one file. A
+module does not load there. The frame's origin is opaque, so a module import
+back to your site is a cross-origin request, which fails unless your server
+answers it with CORS headers. A stylesheet `<link>` is not checked, so the
+styles load as they are.
+
+A frame follows. `/frame.js` is the bundle. `/helix.css` is the stylesheet
+from `@fusion.dev/helix-styles`, and it imports `primitives.css`, `tokens.css`,
+`base.css`, and `elements.css` from beside it, so serve the five files from
+the package's `dist` folder together:
 
 ```html
 <!doctype html>
@@ -284,16 +297,57 @@ Logs from the example appear in the console panel. Logs from the page around it
 do not. We patch the console inside the frame on purpose, so the panel shows
 what the example logs and nothing else.
 
-## The package is private
+## The editor and the highlighter
 
-`@fusion.dev/helix-sandbox` is not published. It is the editor and spec runner
-for this repository, and it is Helix tooling. It depends on the repository:
+`@fusion.dev/helix-sandbox` is the editor the component pages use, and the
+highlighter that colors their code. Install it beside the library:
 
-- The elements depend on the frame.
-- The frame depends on the build.
-- The build depends on this repository's layout.
+```sh
+npm install @fusion.dev/helix @fusion.dev/helix-styles @fusion.dev/helix-sandbox
+```
 
-To add editable examples to your own documentation today, you would build the
-editor yourself, from the manifest and the `.examples` files. This is a gap we
-have not filled, and we have no policy against filling it. Tell us if you need
-it.
+Each entry does one thing:
+
+- `@fusion.dev/helix-sandbox/editor` registers `helix-sandbox-editor`, a
+  source pane with CodeMirror behind it.
+- `@fusion.dev/helix-sandbox/highlight` turns a snippet into highlighted HTML,
+  on a server or in a page, with no editor.
+- `@fusion.dev/helix-sandbox/code-block` colors every Code Block on the page.
+
+The editor is a source pane, so it goes in the `source` slot, with a `name`
+the sandbox reads:
+
+```html
+<helix-sandbox>
+  <helix-sandbox-editor
+    language="html"
+    name="html"
+    slot="source"
+    value="<p>Hello</p>"
+  ></helix-sandbox-editor>
+  <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
+</helix-sandbox>
+```
+
+```ts
+import '@fusion.dev/helix/sandbox'
+import '@fusion.dev/helix-sandbox/editor'
+```
+
+`language` takes the names a pane carries: `css`, `html`, `js`, `jsx`, `mjs`,
+`sh`, `ts`, and `tsx`. A name the editor does not read draws the source plain,
+and the console says so once. The editor sends `helix-before-edit` and
+`helix-edit` as `helix-sandbox-source` does, and `helix-caret` for the status
+bar. It is `:state(modified)` while it holds an edit, and `reset()` puts back
+the source it was given.
+
+`highlight` reads the same grammars as the editor. By default each token is a
+span with Lezer's `tok-` class, for a stylesheet of your own. Pass
+`syntaxHighlighter` for the editor's classes, and put `syntaxRules` in the
+stylesheet where the result is drawn for the editor's colors:
+
+```ts
+import { highlight, syntaxHighlighter } from '@fusion.dev/helix-sandbox/highlight'
+
+const markup = highlight('const total = 1', 'ts', syntaxHighlighter)
+```

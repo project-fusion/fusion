@@ -478,10 +478,9 @@ export class HelixSandboxSource extends HelixElement {
    * a `helix-caret` listener and writes `line` and `column` onto every slotted
    * status bar, and `SandboxStatusBar` renders a `caret` part as soon as it has
    * both; all of that ships from `@fusion.dev/helix`, while the editor is in
-   * `@fusion.dev/helix-sandbox` and is `private` while Helix is pre-release. A
-   * consumer taking the published shell and this pane would otherwise get a
-   * status bar that can never show a position, fixable only with a package they
-   * cannot install.
+   * `@fusion.dev/helix-sandbox`, a package a consumer may not install. A
+   * consumer taking the shell and this pane would otherwise get a status bar
+   * that can never show a position, fixable only with a second package.
    *
    * The textarea is the only thing that knows, so this is where it belongs.
    * One-based on both axes, which is what an editor shows and what the detail's

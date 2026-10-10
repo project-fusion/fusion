@@ -1,0 +1,58 @@
+{
+  "name": "@fusion.dev/helix-workbench",
+  "description": "The spec runner and the JSX reader behind the sandbox page on fusion.dev.",
+  "version": "0.206.0",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "directory": "helix/workbench",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./jsx": "./types/jsx.d.ts",
+    "./specs": {
+      "types": "./dist/specs/index.d.ts",
+      "default": "./dist/specs/index.js"
+    }
+  },
+  "files": [
+    "custom-elements.json",
+    "dist",
+    "types"
+  ],
+  "customElements": "custom-elements.json",
+  "sideEffects": [
+    "./dist/sandbox/specs/sandbox-specs.js",
+    "./dist/specs/index.js"
+  ],
+  "scripts": {
+    "analyze": "bun --bun helix-cem",
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
+    "styles": "build-styles .",
+    "test": "bun run test:dom",
+    "test:dom": "bun test dom.spec",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@fusion.dev/helix-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@fusion.dev/helix-cem": "workspace:*",
+    "@fusion.dev/helix-testing": "workspace:*",
+    "@fusion.dev/scripts": "workspace:*",
+    "@happy-dom/global-registrator": "^20.14.5",
+    "@types/bun": "^1.4.2",
+    "lit": "^3.2.1"
+  },
+  "peerDependencies": {
+    "lit": "^3.2.1"
+  }
+}

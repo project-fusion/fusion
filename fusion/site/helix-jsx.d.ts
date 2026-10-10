@@ -7,3 +7,4 @@
  */
 import '@fusion.dev/helix/jsx'
 import '@fusion.dev/helix-sandbox/jsx'
+import '@fusion.dev/helix-workbench/jsx'
