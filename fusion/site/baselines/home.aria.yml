@@ -65,6 +65,7 @@
   - text: Showing
   - radio "Controls" [checked]
   - radio "Data"
+  - radio "Depth"
   - radio "Surfaces"
   - text: Color mode
   - button "Color mode Dark": Dark
@@ -101,25 +102,152 @@
   - radio "Fine"
   - radio "Good" [checked]
   - radio "Great"
-  - paragraph: Package size
-  - heading "Measured on every release" [level=2]
-  - paragraph: From the built packages, compressed with Brotli as a CDN serves them.
-  - paragraph: "112"
-  - paragraph: Components
-  - paragraph: Each has a headless tier with its behavior and a styled tier with its design.
-  - paragraph: 2.3 kB
-  - paragraph: The token layer, compressed
-  - paragraph: 197 semantic tokens. Every Helix page loads this file.
-  - paragraph: 127.3 kB
-  - paragraph: The derivation engine, compressed
-  - paragraph: Most sites run it when they build and ship none of it. A theme switcher downloads all of it.
-  - paragraph: 78%
-  - paragraph: Of the first component is shared
-  - paragraph: Most of the first component is a runtime that every later component reuses.
-  - heading "One button, five systems" [level=3]
-  - paragraph: Brotli bytes for one button with its runtime, measured the same way on the same day.
-  - link "See how we measure":
-    - /url: /helix/docs/metrics
+  - paragraph: Coverage
+  - heading "112 components in one package" [level=2]
+  - paragraph: Charts, data tables, chat, and date pickers use the same tokens as your buttons.
+  - list "Key":
+    - listitem: Ships an element
+    - listitem: Ships it as experimental
+  - paragraph: 7 jobs only Helix covers
+  - text: Charts 3D charts Chat Command palette Node diagrams Maps Video player
+  - paragraph: 3.3 kB
+  - paragraph: A typical extra component, compressed.
+  - link "Compare the systems":
+    - /url: /helix/docs/metrics#what-each-system-ships
+  - table "Jobs each design system publishes an element for, from each system's manifest":
+    - caption: Jobs each design system publishes an element for, from each system's manifest
+    - rowgroup:
+      - row "16 of 16 jobs Helix 6 of 16 jobs Carbon 0 of 16 jobs Material Web 5 of 16 jobs Spectrum 3 of 16 jobs Web Awesome":
+        - columnheader "16 of 16 jobs Helix"
+        - columnheader "6 of 16 jobs Carbon"
+        - columnheader "0 of 16 jobs Material Web"
+        - columnheader "5 of 16 jobs Spectrum"
+        - columnheader "3 of 16 jobs Web Awesome"
+    - rowgroup:
+      - row "Data":
+        - columnheader "Data"
+      - row "Charts helix-area-chart helix-area-chart None None None None":
+        - rowheader "Charts"
+        - cell "helix-area-chart helix-area-chart"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+      - row "3D charts helix-spatial-bar-chart, experimental helix-spatial-bar-chart None None None None":
+        - rowheader "3D charts"
+        - cell "helix-spatial-bar-chart, experimental helix-spatial-bar-chart"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+      - row "Data table helix-data-table helix-data-table cds-table cds-table None sp-table sp-table None":
+        - rowheader "Data table"
+        - cell "helix-data-table helix-data-table"
+        - cell "cds-table cds-table"
+        - cell "None"
+        - cell "sp-table sp-table"
+        - cell "None"
+      - row "Tree helix-tree helix-tree cds-tree-view cds-tree-view None None wa-tree wa-tree":
+        - rowheader "Tree"
+        - cell "helix-tree helix-tree"
+        - cell "cds-tree-view cds-tree-view"
+        - cell "None"
+        - cell "None"
+        - cell "wa-tree wa-tree"
+    - rowgroup:
+      - row "Input":
+        - columnheader "Input"
+      - row "Combobox helix-combobox helix-combobox cds-combo-box cds-combo-box None sp-combobox sp-combobox None":
+        - rowheader "Combobox"
+        - cell "helix-combobox helix-combobox"
+        - cell "cds-combo-box cds-combo-box"
+        - cell "None"
+        - cell "sp-combobox sp-combobox"
+        - cell "None"
+      - row "Date picker helix-date-picker helix-date-picker cds-date-picker cds-date-picker None None None":
+        - rowheader "Date picker"
+        - cell "helix-date-picker helix-date-picker"
+        - cell "cds-date-picker cds-date-picker"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+      - row "Time picker helix-time-picker helix-time-picker cds-time-picker cds-time-picker None None None":
+        - rowheader "Time picker"
+        - cell "helix-time-picker helix-time-picker"
+        - cell "cds-time-picker cds-time-picker"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+      - row "Color picker helix-color-picker helix-color-picker None None sp-color-area sp-color-area wa-color-picker wa-color-picker":
+        - rowheader "Color picker"
+        - cell "helix-color-picker helix-color-picker"
+        - cell "None"
+        - cell "None"
+        - cell "sp-color-area sp-color-area"
+        - cell "wa-color-picker wa-color-picker"
+      - row "File upload helix-file-input helix-file-input cds-file-uploader cds-file-uploader None sp-dropzone sp-dropzone None":
+        - rowheader "File upload"
+        - cell "helix-file-input helix-file-input"
+        - cell "cds-file-uploader cds-file-uploader"
+        - cell "None"
+        - cell "sp-dropzone sp-dropzone"
+        - cell "None"
+    - rowgroup:
+      - row "Workflow":
+        - columnheader "Workflow"
+      - row "Chat helix-chat helix-chat None None None None":
+        - rowheader "Chat"
+        - cell "helix-chat helix-chat"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+      - row "Command palette helix-command helix-command None None None None":
+        - rowheader "Command palette"
+        - cell "helix-command helix-command"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+      - row "Product tour helix-tour helix-tour None None sp-coachmark sp-coachmark None":
+        - rowheader "Product tour"
+        - cell "helix-tour helix-tour"
+        - cell "None"
+        - cell "None"
+        - cell "sp-coachmark sp-coachmark"
+        - cell "None"
+      - row "Node diagrams helix-canvas, experimental helix-canvas None None None None":
+        - rowheader "Node diagrams"
+        - cell "helix-canvas, experimental helix-canvas"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+    - rowgroup:
+      - row "Media and places":
+        - columnheader "Media and places"
+      - row "Maps helix-map, experimental helix-map None None None None":
+        - rowheader "Maps"
+        - cell "helix-map, experimental helix-map"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+      - row "Video player helix-video helix-video None None None None":
+        - rowheader "Video player"
+        - cell "helix-video helix-video"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+      - row "Carousel helix-carousel helix-carousel None None None wa-carousel, experimental wa-carousel":
+        - rowheader "Carousel"
+        - cell "helix-carousel helix-carousel"
+        - cell "None"
+        - cell "None"
+        - cell "None"
+        - cell "wa-carousel, experimental wa-carousel"
+  - paragraph: Every system ships buttons, form controls, menus, and dialogs, so the table lists the rest. Read from each system's manifest on October 9, 2026. Hover a mark to see the element.
   - paragraph: Services
   - heading "One to eight weeks" [level=2]
   - paragraph: Every service runs two days a week, alongside your team.
