@@ -10,19 +10,19 @@ export const GRAPH_STACK: readonly MapLayer[] = [
   {
     body: 'The box around the drawing: a searchable list of notes, zoom and pan buttons, and keyboard controls.',
     role: 'Interface',
-    stage: 'Building',
+    stage: 'Active',
     title: 'The frame',
   },
   {
     body: 'Draws your notes and links with the renderer, colored by your theme. Redraws only what changed.',
     role: 'Integration',
-    stage: 'Building',
+    stage: 'Active',
     title: 'The connector',
   },
   {
     body: 'Places notes in a 3D model, an SVG, an image, or a solid.',
     role: 'Layout',
-    stage: 'Building',
+    stage: 'Active',
     title: 'Shapes',
   },
   {
