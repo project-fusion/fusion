@@ -266,6 +266,19 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   /** The box a press asked for, taken when the focus it starts arrives. */
   private pressedAt: number | undefined = undefined
 
+  /**
+   * A refused edit: the box the caret was in, and the box the edit would have
+   * moved it to.
+   *
+   * A consumer who takes the decision refuses the edit and writes a value of
+   * their own, during the dispatch or after it, and the caret moves on with
+   * that value as it does with a value the element took. Measured in Chromium
+   * with React before this: the caret stayed where it was, so every key of a
+   * controlled code replaced the first, and typing `123` left `3`. With nothing
+   * written back, or with the caret moved since, it stays where it is.
+   */
+  private refused: { readonly at: number; readonly caret: number } | undefined = undefined
+
   /** How many boxes there are, clamped once so every reader agrees. */
   private get count(): number {
     return Math.max(1, Math.floor(this.length) || 1)
@@ -301,6 +314,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
     if (this.active >= 0 && applied) {
       this.active = caret
     }
+    this.refused = applied ? undefined : { at: this.active, caret }
     this.placeCaret(true)
     /* Only a code the element took. A refused last character left the shorter
        code in place, and announcing the refused one sent an auto-submit a code
@@ -557,6 +571,18 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.committed = this.value
+  }
+
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    /* A value written after a refused edit is the consumer's answer to it. */
+    const refused = this.refused
+    if (changed.has('value') && refused !== undefined) {
+      this.refused = undefined
+      if (this.active >= 0 && this.active === refused.at) {
+        this.active = refused.caret
+      }
+    }
   }
 
   protected override updated(changed: PropertyValues): void {
