@@ -91,6 +91,7 @@ function Box({
   w,
   x,
   y,
+  z = 0,
 }: {
   className: string
   d: number
@@ -105,14 +106,16 @@ function Box({
   w: number
   x: number
   y: number
+  /** The height of its base, where it stands on something other than the ground. */
+  z?: number
 }) {
-  const a = iso(x, y, h)
-  const b = iso(x + w, y, h)
-  const c = iso(x + w, y + d, h)
-  const dd = iso(x, y + d, h)
-  const a0 = iso(x, y, 0)
-  const c0 = iso(x + w, y + d, 0)
-  const d0 = iso(x, y + d, 0)
+  const a = iso(x, y, z + h)
+  const b = iso(x + w, y, z + h)
+  const c = iso(x + w, y + d, z + h)
+  const dd = iso(x, y + d, z + h)
+  const a0 = iso(x, y, z)
+  const c0 = iso(x + w, y + d, z)
+  const d0 = iso(x, y + d, z)
   const left = points([a, dd, d0, a0])
   const right = points([dd, c, c0, d0])
   return (
@@ -182,6 +185,37 @@ function Flat({
       className={className}
       fillOpacity={fillOpacity}
       points={points([iso(x, y, z), iso(x + w, y, z), iso(x + w, y + d, z), iso(x, y + d, z)])}
+    />
+  )
+}
+
+/**
+ * A mark standing up: a rectangle in the plane across `x`, facing the
+ * viewer's left, from `y` to `y + d` along the ground and from `z` to
+ * `z + h` up. It is how a line of code reads on a slab stood on its edge.
+ */
+function Wall({
+  className,
+  d,
+  fillOpacity,
+  h,
+  x,
+  y,
+  z,
+}: {
+  className: string
+  d: number
+  fillOpacity?: number
+  h: number
+  x: number
+  y: number
+  z: number
+}) {
+  return (
+    <polygon
+      className={className}
+      fillOpacity={fillOpacity}
+      points={points([iso(x, y, z), iso(x, y + d, z), iso(x, y + d, z + h), iso(x, y, z + h)])}
     />
   )
 }
@@ -259,10 +293,13 @@ function Sphere({
  */
 function Scene({
   children,
+  dx = 0,
   dy = 0,
   scale = 1.2,
 }: {
   children: ReactNode
+  /** Right by this much after scaling, to center the drawn bounds in the crop. */
+  dx?: number
   /** Down by this much after scaling, to center the drawn bounds in the crop. */
   dy?: number
   /** The scale that brings the drawn bounds to the width the others have. */
@@ -283,7 +320,7 @@ function Scene({
           <feGaussianBlur stdDeviation="5" />
         </filter>
       </defs>
-      <g transform={`translate(160 ${105 + dy}) scale(${scale}) translate(-160 -105)`}>
+      <g transform={`translate(${160 + dx} ${105 + dy}) scale(${scale}) translate(-160 -105)`}>
         {children}
       </g>
     </>
@@ -402,92 +439,92 @@ const componentsArt: ReactNode = (
 )
 
 /**
- * The sandbox: source on one side, what it renders on the other. The two
- * panes split the plate along `y`, so the code sits upper left and the
- * preview lower right, and each line of code runs along `x`, left to right.
- * The gap between the panes is the divider and the whole idea. The rendered
- * control floats over the preview and lifts on hover, as the gallery's does,
- * in ink: the sandbox is a tool, and the themed button one tile over already
- * says what a themed control looks like.
+ * The sandbox: the source stood on its edge, and what it renders standing on
+ * the ground in front of it. The slab is a screen of code, in the inverse
+ * plate with the lines knocked out of it, so it is the one dark object in
+ * the light band and the one light object in the dark one. The rendered
+ * control is a raised key with a bar on it, in ink: the sandbox is a tool,
+ * and the themed button one tile over already says what a themed control
+ * looks like. The control lifts on hover, as the gallery's does.
  */
+const CODE_LINES = [
+  { from: -34, to: -6, z: 30 },
+  { from: -30, to: -14, z: 24 },
+  { from: -34, to: 0, z: 18 },
+  { from: -30, to: -18, z: 12 },
+  { from: -34, to: -10, z: 6 },
+]
+
 const sandboxArt: ReactNode = (
-  <Scene dy={-10} scale={1.12}>
-    <Plate />
-    <Box className="artSunken" d={36} h={2} shadow w={80} x={-40} y={-40} />
-    {[
-      { w: 26, x: -34, y: -35 },
-      { w: 18, x: -30, y: -29 },
-      { w: 30, x: -34, y: -23 },
-      { w: 14, x: -30, y: -17 },
-      { w: 22, x: -34, y: -11 },
-    ].map((line) => (
-      <Flat
-        className="artInk"
-        d={3}
-        fillOpacity={0.28}
-        key={line.y}
-        w={line.w}
-        x={line.x}
-        y={line.y}
-        z={2}
+  <Scene dx={-15} dy={8} scale={1.41}>
+    <Box className="artSolid" d={72} h={36} shadow w={6} x={-16} y={-40} />
+    {CODE_LINES.map((line) => (
+      <Wall
+        className="artOnSolid"
+        d={line.to - line.from}
+        fillOpacity={0.55}
+        h={3}
+        key={line.z}
+        x={-16}
+        y={line.from}
+        z={line.z}
       />
     ))}
-    {/* Raised and not the page's ground: in dark mode the ground is the one
-        black in the frame, and a pane of it on the plate read as a hole. */}
-    <Box className="artRaised" d={36} h={2} shadow w={80} x={-40} y={4} />
     <g className="artMotion artLift">
       <ellipse
         className="artInk"
-        cx={iso(0, 22, 0).x}
-        cy={iso(0, 22, 2).y}
+        cx={iso(24, 24, 0).x}
+        cy={iso(24, 24, 0).y}
         fillOpacity="0.12"
         rx="22"
         ry="11"
       />
       <g className="artLiftShadow" filter="url(#helixArtShadow)">
-        <Box className="artSolid" d={16} h={5} w={24} x={-12} y={14} />
+        <Box className="artRaised" d={18} h={6} w={26} x={10} y={14} />
       </g>
-      <Box className="artSolid" d={16} h={5} w={24} x={-12} y={14} />
-      <Flat className="artOnSolid" d={3} w={12} x={-6} y={20.5} z={5} />
+      <Box className="artRaised" d={18} h={6} w={26} x={10} y={14} />
+      <Flat className="artSolid" d={4} w={12} x={17} y={21} z={6} />
     </g>
   </Scene>
 )
 
 /**
- * The theme builder: the brand color in, and the palette out. The input is a
- * block of the brand standing at the back; the output is the row of swatches
- * laid flat in front of it, from the page's sunken ground through the
- * primary's subtle and muted tints to the primary, then the two darks. Flat
- * and not stepped, because a palette is a row of swatches and a staircase is
- * a chart. The swatches arrive in order on hover, the palette being computed
+ * The theme builder: the brand color in, and the palette out. The input is
+ * a block of the brand standing in front; the output is a stack of chips
+ * rising behind it, fanned a little as they go up, from the inverse plate at
+ * the bottom through the darks, the primary and its tints, to the sunken
+ * ground at the top. A palette is a stack of paint chips, and lighter is
+ * higher. The chips arrive in order on hover, the palette being computed
  * step by step.
  */
+const CHIPS = [
+  { className: 'artSolid', tone: 'inverse' },
+  { className: 'artInk', fillOpacity: 0.55, tone: 'ink' },
+  { className: 'artInk', fillOpacity: 0.28, tone: 'ink-light' },
+  { className: 'artBrand', tone: 'primary' },
+  { className: 'artBrandMuted', tone: 'muted' },
+  { className: 'artBrandSubtle', tone: 'subtle' },
+  { className: 'artSunken', tone: 'sunken' },
+]
+
 const themeArt: ReactNode = (
-  <Scene dy={-12} scale={1.31}>
-    <Plate />
-    <Box className="artBrand" d={18} h={22} shadow w={18} x={-38} y={-30} />
-    {[
-      { className: 'artSunken', tone: 'sunken' },
-      { className: 'artBrandSubtle', tone: 'subtle' },
-      { className: 'artBrandMuted', tone: 'muted' },
-      { className: 'artBrand', tone: 'primary' },
-      { className: 'artInk', fillOpacity: 0.28, tone: 'ink-light' },
-      { className: 'artInk', fillOpacity: 0.55, tone: 'ink' },
-      { className: 'artSolid', tone: 'inverse' },
-    ].map((step, index) => (
-      <g className="artMotion artRow" key={step.tone} style={{ '--art-i': index } as CSSProperties}>
+  <Scene dy={13} scale={1.26}>
+    {CHIPS.map((chip, index) => (
+      <g className="artMotion artRow" key={chip.tone} style={{ '--art-i': index } as CSSProperties}>
         <Box
-          className={step.className}
-          d={22}
-          fillOpacity={step.fillOpacity}
-          h={4}
-          shadow
-          w={9}
-          x={-38 + index * 11}
-          y={4}
+          className={chip.className}
+          d={34}
+          fillOpacity={chip.fillOpacity}
+          h={2.4}
+          shadow={index === 0}
+          w={58}
+          x={-14 + index * 1.5}
+          y={-30 - index * 1.5}
+          z={index * 2.9}
         />
       </g>
     ))}
+    <Box className="artBrand" d={20} h={20} shadow w={20} x={-44} y={-4} />
   </Scene>
 )
 
