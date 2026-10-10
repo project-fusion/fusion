@@ -3,6 +3,8 @@
 Finds the Helix mistakes that are valid CSS and therefore silent: a `::part()`
 naming a part nothing publishes, a custom property named for the wrong family, a
 part a composed component never forwarded, two copies of the library on one page.
+[Diagnostics](https://fusion.dev/helix/docs/diagnostics) in the Helix
+documentation walks through the setup.
 
 ```sh
 npm install --save-dev @fusion.dev/helix-diagnostics
