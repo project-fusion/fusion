@@ -381,11 +381,10 @@ export const THEMED_PAGE_STYLES = css`
     padding-inline: var(--helix-space-lg);
   }
 
-  /* **Mono, small, subtle, and set against the page rather than a card.** It is
+  /* **Mono, small, muted, and set against the page rather than a card.** It is
      the only mono on any preview, which is what gives the Mono face control
-     something to move, and the only place \`foreground-subtle\` carries text with
-     nothing else holding it up. */
-  /* The type is Helix Text's, mono and subtle; the rail sets only its side. */
+     something to move. */
+  /* The type is Helix Text's, mono and muted; the rail sets only its side. */
   .themedRailLabel {
     text-align: end;
   }

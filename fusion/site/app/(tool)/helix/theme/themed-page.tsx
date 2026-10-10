@@ -631,7 +631,7 @@ function EditorialPage(context: Context) {
             rail column rather than the measure so the destinations still start
             on the line every paragraph starts on, which is the arrangement the
             whole layout is for. Not the rail's own label styling, which is mono
-            and subtle and would set a masthead in the voice of a margin note. */}
+            and muted and would set a masthead in the voice of a margin note. */}
         <div className="themedWordmark">
           <Mark mark={context.mark} />
           <helix-text variant="label">{company}</helix-text>
@@ -658,7 +658,7 @@ function EditorialPage(context: Context) {
       <main className="themedEditorialMain">
         <div className="themedRail">
           <div className="themedRailLabel">
-            <helix-text emphasis="subtle" variant="code">
+            <helix-text emphasis="muted" variant="code">
               {editorial.place}
             </helix-text>
           </div>
@@ -672,7 +672,7 @@ function EditorialPage(context: Context) {
         {editorial.sections.map((section) => (
           <div className="themedRail" key={section.rail}>
             <div className="themedRailLabel">
-              <helix-text emphasis="subtle" variant="code">
+              <helix-text emphasis="muted" variant="code">
                 {section.rail}
               </helix-text>
             </div>
@@ -693,7 +693,7 @@ function EditorialPage(context: Context) {
             built here. */}
         <div className="themedRail">
           <div className="themedRailLabel">
-            <helix-text emphasis="subtle" variant="code">
+            <helix-text emphasis="muted" variant="code">
               Writing
             </helix-text>
           </div>

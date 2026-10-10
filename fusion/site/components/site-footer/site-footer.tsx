@@ -78,7 +78,7 @@ export function SiteFooter() {
               caption's 400 and one pixel smaller, so that pairing reads as the
               company being the caption of its own slogan. */}
           <helix-text variant="body-strong">Fusion Development Group</helix-text>
-          <helix-text emphasis="subtle" variant="caption">
+          <helix-text emphasis="muted" variant="caption">
             Interface and AI software.
           </helix-text>
           {/* **The Helix release the site runs on**, as a tag: a piece of

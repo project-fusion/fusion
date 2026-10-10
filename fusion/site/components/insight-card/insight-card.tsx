@@ -43,10 +43,10 @@ export function InsightCard({ insight, slug = false }: { insight: Insight; slug?
             place the date appears in a list, so this is where a crawler finds
             it. */}
         <helix-flex align-items="center" gap="sm" justify-content="between" slot="footer">
-          <helix-text emphasis="subtle" variant="caption">
+          <helix-text emphasis="muted" variant="caption">
             <time dateTime={insight.date}>{formatDate(insight.date)}</time>
           </helix-text>
-          <helix-text emphasis="subtle" variant="caption">
+          <helix-text emphasis="muted" variant="caption">
             {insight.minutes} min
           </helix-text>
         </helix-flex>

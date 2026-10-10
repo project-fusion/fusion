@@ -720,7 +720,7 @@ export default async function FamilyDocs({
          *             these anchors, so the rail says where you are and not only where you
          *             could go.
          */}
-        <helix-text class={docsShell.docsRailTitle} emphasis="subtle" variant="label">
+        <helix-text class={docsShell.docsRailTitle} emphasis="muted" variant="label">
           On this page
         </helix-text>
         <helix-outline label="On this page">

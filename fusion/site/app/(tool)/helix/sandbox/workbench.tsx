@@ -1039,7 +1039,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      effect in particular reads nothing this branch decides. */
   if (!listed) {
     return (
-      <helix-text as="p" emphasis="subtle">
+      <helix-text as="p" emphasis="muted">
         No examples are shipped yet.
       </helix-text>
     )
@@ -1124,7 +1124,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
 
       <div className={styles.examplesScroll} ref={scroller}>
         {shown.length === 0 ? (
-          <helix-text emphasis="subtle" variant="caption">
+          <helix-text emphasis="muted" variant="caption">
             Nothing matches {filter}.
           </helix-text>
         ) : (

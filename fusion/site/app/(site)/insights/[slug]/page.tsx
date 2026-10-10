@@ -115,7 +115,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
                   <helix-flex direction="column" gap="2xs">
                     <helix-flex align-items="center" data-density="sm" gap="xs">
                       <helix-tag>{other.topic}</helix-tag>
-                      <helix-text emphasis="subtle" variant="caption">
+                      <helix-text emphasis="muted" variant="caption">
                         {other.minutes} min
                       </helix-text>
                     </helix-flex>

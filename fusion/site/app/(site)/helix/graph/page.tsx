@@ -103,7 +103,7 @@ function Showcase({
         {/* The graph, and under it what to try, as each map on Maps has. */}
         <div className={`${band.bandSection} ${styles.graphShowcase}`}>
           <GraphDemo className={styles.graphDemo} kind={kind} legend={legend} noPanel={noPanel} />
-          <helix-text emphasis="subtle" variant="caption">
+          <helix-text emphasis="muted" variant="caption">
             {copy?.body?.[1]}
           </helix-text>
         </div>
