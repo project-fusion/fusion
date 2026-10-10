@@ -38,8 +38,9 @@ export default function Page() {
   }
   const families = getFamilies().length
   const places = product.destinations.filter((destination) => destination.picture)
+  /* The rows, less the one that is this page. */
   const reads = product.destinations.filter(
-    (destination) => !destination.picture && destination.href,
+    (destination) => !destination.picture && destination.href && destination.href !== product.href,
   )
 
   return (

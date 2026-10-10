@@ -37,11 +37,10 @@
   position: relative;
 }
 
-/* A product page's hero is shorter than the landing page's screen: a reader
-   here chose the product already and wants the page, so the light and the
-   claim take most of a screen and the modules are visible under them. */
+/* A product page's hero is the landing page's screen, so the claim sits at
+   the same height on every page a reader lands on. */
 .productHero {
-  min-block-size: min(100svh, 44rem);
+  min-block-size: 100svh;
 }
 
 /* The three modules, each with its picture over its name. */
