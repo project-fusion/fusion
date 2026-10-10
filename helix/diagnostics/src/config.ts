@@ -16,7 +16,14 @@
  * what a project withheld.
  */
 import { nearest } from './manifest.js'
-import { CATEGORIES, type Category, type Configuration, type Layer, type Report } from './report.js'
+import {
+  CATEGORIES,
+  type Category,
+  type Configuration,
+  ENVIRONMENTS,
+  type Layer,
+  type Report,
+} from './report.js'
 import { checkRules, type Rules } from './rules.js'
 
 /** Everything a project can set. Every field is optional; see `DEFAULTS`. */
@@ -193,6 +200,22 @@ export const checkConfig = (config: Config | undefined, layer: Exclude<Layer, 's
       }
     }
   }
+}
+
+/**
+ * Throws on an `environment` that names none, and names the closest. Taken as
+ * declared, `staging`, which a bundler's mode hands over as readily as
+ * `development`, would run on a deployed host with the console and the relay.
+ */
+export const checkEnvironment = (environment: unknown): void => {
+  if (environment === undefined || (ENVIRONMENTS as readonly unknown[]).includes(environment)) {
+    return
+  }
+  const close = typeof environment === 'string' ? nearest(environment, ENVIRONMENTS) : undefined
+  throw new Error(
+    `The argument sets \`environment\` to \`${JSON.stringify(environment)}\`. It takes ${ENVIRONMENTS.map(shown).join(', ')}.` +
+      (close ? ` The closest is \`${close}\`.` : ''),
+  )
 }
 
 /** The settings in effect, from the defaults, the file, and the call. */

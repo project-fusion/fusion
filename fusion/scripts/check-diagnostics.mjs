@@ -32,8 +32,10 @@ import { chromium } from 'playwright'
 
 const specs = join(root, 'fusion/site/public/specs')
 
-/* One real family, chosen because it publishes parts on both tiers and so
-   exercises the unforwarded-part finding as well as the dead-part one. */
+/* One real family, chosen because it publishes parts on both tiers. `control`
+   is a part other families publish and neither Button tag does, so
+   `helix-button::part(control)` is a dead part: only the headless Button's
+   own parts can be unforwarded. */
 const FAMILY = 'button'
 
 /**
@@ -458,9 +460,9 @@ try {
     'dead-hook:helix-button { --button-backgruond-color }',
     'dead-hook:helix-button { --icon-button-size }',
     'dead-part:helix-button::part(buton)',
+    'dead-part:helix-button::part(control)',
     'dead-part:helix-button::part(insidemedia)',
     'invalid-value:<helix-button emphasis="bold">',
-    'unforwarded-part:helix-button::part(control)',
     'unknown-attribute:<helix-button emphais>',
   ]
   const got = observed.findings.map((finding) => `${finding.kind}:${finding.subject}`).sort()

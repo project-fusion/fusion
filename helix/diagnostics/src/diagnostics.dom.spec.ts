@@ -135,6 +135,14 @@ describe('parts', () => {
     remove()
   })
 
+  test('a part only another family publishes is dead, since only the headless tag forwards to its own', () => {
+    const { remove, rules } = ruled('helix-button::part(separator)', ['color: red'])
+    const findings = analyze(rules, tags)
+    expect(findings.map((one) => one.kind)).toEqual(['dead-part'])
+    expect(findings[0]?.message).not.toContain('helix-breadcrumb')
+    remove()
+  })
+
   test('a published part is silent', () => {
     const { remove, rules } = ruled('helix-button::part(icon)', ['color: red'])
     expect(analyze(rules, tags)).toHaveLength(0)
@@ -222,6 +230,7 @@ describe('hooks', () => {
     const findings = analyze(rules, tags, document)
     expect(findings).toHaveLength(1)
     expect(findings[0]?.kind).toBe('dead-hook')
+    expect(findings[0]?.message).toContain('. `helix-bar-chart` answers it, so this')
     alone.remove()
     remove()
   })
@@ -901,6 +910,12 @@ describe('configuration', () => {
     expect(() =>
       checkConfig({ environments: { production: { sample: 0.1 } } }, 'file'),
     ).not.toThrow()
+  })
+
+  test('an environment that names none throws, and names the closest', () => {
+    expect(() => diagnose({ environment: 'prodution' as never, tiers })).toThrow(
+      /`environment` to `"prodution"`.*The closest is `production`/,
+    )
   })
 
   test('a path becomes a pattern, each record named by it standing for any', () => {

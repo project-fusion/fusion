@@ -10,13 +10,43 @@ npm install --save-dev @fusion.dev/helix-diagnostics
 
 ## Start it in your app
 
-Call `initDiagnostics()` once, at your app's entry, before the app mounts:
+Call `initDiagnostics()` once, at your app's entry, before the app mounts. To
+keep it out of what you ship, put the call in a module of its own and load that
+module in development only:
+
+```js
+// diagnostics.js
+import { initDiagnostics } from '@fusion.dev/helix-diagnostics'
+
+initDiagnostics({ environment: 'development' })
+```
+
+```js
+// main.js
+if (import.meta.env.DEV) {
+  void import('./diagnostics.js')
+}
+```
+
+`vite build` replaces `import.meta.env.DEV` with `false` and drops the import
+with it, so a production page never loads diagnostics. Next.js does the same
+with `process.env.NODE_ENV === 'development'`, and Angular with `isDevMode()`.
+Every Helix template starts diagnostics this way.
+
+To sample production pages as well, call it from the entry itself and declare
+where each build runs:
 
 ```js
 import { initDiagnostics } from '@fusion.dev/helix-diagnostics'
 
-initDiagnostics({ environment: import.meta.env.MODE })
+initDiagnostics({
+  environment: import.meta.env.MODE,
+  environments: { production: { sample: 0.1 } },
+})
 ```
+
+`environment` takes `development`, `ci`, or `production`. Any other value, such
+as a `staging` mode, is printed in the console, and nothing starts.
 
 It needs nothing from a framework, so the call is the same wherever Helix runs:
 
@@ -35,8 +65,8 @@ so React's strict mode and hot module replacement start nothing twice.
 - **Counts from the start**, every Helix element that renders, including ones
   that go, such as a closed dialog.
 - **Loads the lint data for the exact Helix version on the page**, from a public
-  npm CDN, about 18 KB compressed for each tier. Offline, or on a locked-down
-  network, pass it yourself:
+  npm CDN, one file for each tier. Offline, or on a locked-down network, pass it
+  yourself:
   `tiers: [{ lint }]` with `import lint from '@fusion.dev/helix/lint.json'`.
 - **Runs itself**: after the page loads, after a navigation, and after the page
   changes, once changes stop for a second, in an idle moment, and never sooner
@@ -72,7 +102,7 @@ throws stops neither the others nor the console.
 
 | Option | What it is |
 | --- | --- |
-| `environment` | `development`, `ci`, or `production`, as your build says it |
+| `environment` | `development`, `ci`, or `production`, as your build says it. Any other value is printed, and nothing starts |
 | `tiers` | Lint data or manifests to check against, where you pass them yourself |
 | `cdn` | Where lint data loads from; `false` loads nothing |
 | `page` | A function returning the page's path as your router names it, such as `/products/[id]` |
@@ -119,12 +149,14 @@ The address is always on a local host.
 - **It serves your settings.** Where you pass no `file`, the page loads
   `helix-diagnostics.json` from the directory the command runs in, so you do
   not need to import it. Pass `--config <path>` for a file elsewhere. A file
-  that does not parse is not served.
+  that does not parse is not served, and the command prints why.
 - **It writes the CI file.** With `--out reports/helix-diagnostics.json`, it
   keeps the latest run of every page there, in the shape `ciSink` writes.
 - **It takes runs from pages on a local host only**: `localhost`, `127.0.0.1`,
   `[::1]`, `*.localhost`, and `*.test`. It listens on `127.0.0.1`, so nothing
   else on your network reaches it, and production pages never send to it.
+- **It exits 3 where it cannot listen**, such as on a port another process
+  holds.
 
 ## Scan your code
 
@@ -164,15 +196,22 @@ npx helix scan --build dist --out reports/helix-diagnostics.json
 - **With `--build`, it weighs your bundle**: what each Helix family and
   package adds to it, from its source maps, as `performance.weight`. Turn
   source maps on in your bundler, and pass the folder it writes the browser's
-  files to, such as `dist` or `.next/static`.
+  files to, such as `dist` or `.next/static`. A bundle's map is the one the
+  comment on its last line names, or the `.map` file beside it, so a hidden
+  map is read too.
 - **With `--out`, it writes its run to the CI file**, and keeps the runs
   `helix diagnostics` wrote there. The relay keeps the scan's run the same
   way, so the two share one file, in either order.
 
 It reads `helix-diagnostics.json` from the project, then from the directory it
 runs in, or the file `--config <path>` names, and refuses a setting that names
-nothing, as the page does. It exits 1 on a finding at `error`, and 3 where the
-project installs no Helix lint data. `--json` prints the run.
+nothing, as the page does. `--json` prints the run. It exits 1 on a finding at
+`error`, and 3 where it cannot run, such as where:
+
+- no installed Helix package has lint data;
+- the settings file does not parse, or holds a setting or a value the page
+  refuses;
+- the project's folder, or the `--build` folder, does not exist.
 
 ## Run it on a page, from the command line
 
@@ -187,7 +226,8 @@ npx helix diagnostics --once http://localhost:5173/ --once http://localhost:5173
 ```
 
 It needs `@fusion.dev/helix-cli` and Playwright installed beside this package.
-It exits 1 on a finding at `error`, and 3 where a page could not be opened.
+It exits 1 on a finding at `error`, and 3 where a page could not be opened, or
+where this package or Helix is not installed.
 `--out` writes the runs to the CI file, and `--json` prints one document a
 page. An agent gets the same runs from the MCP tool `helix_check_page`.
 
@@ -252,7 +292,9 @@ A report is one run, in one shape for every sink, versioned by `schema`:
   watcher it counts every element that rendered since `watch()` began,
   including ones since removed, such as a closed dialog. Without one it counts
   the elements on the page at the moment of the run. Elements named `helix-*`
-  that no manifest lists, such as your own, are counted apart as `unlisted`.
+  that no manifest lists are counted apart as `unlisted`, and each is also an
+  `unknown-tag` finding. For a tag of your own, turn that kind off with
+  `rules: { 'unknown-tag': { severity: 'off', tags: ['helix-mine'] } }`.
 - **`configuration`**: the settings the run was made under, each override in
   effect, and how many findings each override turned off, by kind.
 - **`withheld`**: the categories your configuration turned off for sending,
@@ -280,12 +322,12 @@ works on it:
 
 | Kind | Severity | Means |
 | --- | --- | --- |
-| `dead-part` | error | A `::part()` names a part the element does not publish |
+| `dead-part` | error | A `::part()` names a part the element does not publish, or follows another `::part()`, which is not valid CSS. The browser drops a rule of the second kind before the page reads it, so `helix scan` finds it |
 | `dead-hook` | error | A hook is set where nothing answers it, or a name close to a hook is set that nothing reads |
 | `unknown-attribute` | error | A Helix element carries an attribute it does not take |
 | `unknown-slot` | error | A child names a slot its Helix element does not have, so it is not drawn. Found by `helix scan`, from the templates |
 | `invalid-value` | error | An attribute with a closed set of values carries one outside it, so the element falls back to its default |
-| `unforwarded-part` | warn | The headless tier publishes the part and the styled tier does not forward it, which is a gap in Helix |
+| `unforwarded-part` | warn | The element's headless tag, such as `helix-headless-button` for `helix-button`, publishes the part and the styled tag does not forward it, which is a gap in Helix |
 | `unknown-tag` | error | A rule or an element names a tag no manifest lists |
 | `unknown-event` | error | A React `on` prop on a Helix element names an event the element does not dispatch, so the handler never runs. Found by `helix scan`, from the templates |
 | `unimported-tag` | warn | An element is written and nothing in the project imports the entry that registers it, so the browser draws an unknown element. Found by `helix scan`, from the imports |
@@ -425,14 +467,16 @@ diagnose({
 | `detail.evidence` | `full`, `selector`, or `none` | `full` |
 | `detail.hookValues` | `true` or `false` | `true` |
 | `detail.pages` | `patterns`, `full` (the path, never the query), or `none` | `patterns` |
-| `environments.<name>` | `true` or `false`; `production` takes `{ sample }` from 0 to 1 | development and CI on |
+| `environments.<name>` | `true` or `false`, for sending runs from that environment. `production` takes `false` or `{ sample }` from 0 to 1, which is also the share of production page loads diagnostics runs on | development and CI on |
 | `project` | `key`, `name`, and `tags` | none |
 
 `send`, `detail`, and `environments` decide what the diagnostics service is
 sent, and the service is not built yet. They are recorded in every report, so a
-dashboard knows what a project withheld. The relay runs on your own machine and
-receives each run whole. A setting or a value that does not exist throws, and
-names the closest that does.
+dashboard knows what a project withheld. `environments.production` also
+decides whether diagnostics runs in production at all, and
+`environments.development` and `environments.ci` change nothing on the page.
+The relay runs on your own machine and receives each run whole. A setting or a
+value that does not exist throws, and names the closest that does.
 
 **What the page requests**: the lint data, from `cdn`, once per page load, and
 the relay, where `sinks.relay` is on. Nothing else leaves the page.

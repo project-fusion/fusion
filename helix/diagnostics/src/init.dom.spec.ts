@@ -118,6 +118,18 @@ describe('initDiagnostics', () => {
     expect(String(calls[0]?.[0])).toContain('The closest is `send`')
   })
 
+  test('an environment that names none is printed with the closest, and nothing starts', async () => {
+    const calls = await captured('error', () => {
+      expect(initDiagnostics({ environment: 'staging' as never, tiers }).active).toBe(false)
+      expect(initDiagnostics({ environment: 'developement' as never, tiers }).active).toBe(false)
+    })
+    expect(calls).toHaveLength(2)
+    expect(String(calls[0]?.[0])).toContain(
+      'The argument sets `environment` to `"staging"`. It takes `ci`, `development`, `production`.',
+    )
+    expect(String(calls[1]?.[0])).toContain('The closest is `development`.')
+  })
+
   test('a second call returns the first handle, and a call after stop starts afresh', async () => {
     await quietly(() => {
       const first = initDiagnostics({ environment: 'development', tiers })

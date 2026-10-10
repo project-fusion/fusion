@@ -16,12 +16,27 @@ fn binary() -> PathBuf {
     path.join("helix")
 }
 
-/// The relay, running, with its address and every line it prints.
+/// The relay, running, with its address and every line it prints, to its
+/// output and to its errors.
 struct Relay {
     address: String,
     child: Child,
     directory: PathBuf,
+    errors: Receiver<String>,
     lines: Receiver<String>,
+}
+
+/// Each line `from` writes, as it writes it.
+fn lines_of(from: impl Read + Send + 'static) -> Receiver<String> {
+    let (send, lines) = channel();
+    std::thread::spawn(move || {
+        for line in BufReader::new(from).lines().map_while(Result::ok) {
+            if send.send(line).is_err() {
+                break;
+            }
+        }
+    });
+    lines
 }
 
 impl Relay {
@@ -43,17 +58,11 @@ impl Relay {
             .current_dir(&directory)
             .env("NO_COLOR", "1")
             .stdout(Stdio::piped())
+            .stderr(Stdio::piped())
             .spawn()
             .expect("the relay starts");
-        let stdout = child.stdout.take().expect("its output");
-        let (send, lines) = channel();
-        std::thread::spawn(move || {
-            for line in BufReader::new(stdout).lines().map_while(Result::ok) {
-                if send.send(line).is_err() {
-                    break;
-                }
-            }
-        });
+        let lines = lines_of(child.stdout.take().expect("its output"));
+        let errors = lines_of(child.stderr.take().expect("its errors"));
         let first = lines
             .recv_timeout(Duration::from_secs(10))
             .expect("it says where it listens");
@@ -76,6 +85,7 @@ impl Relay {
             address,
             child,
             directory,
+            errors,
             lines,
         }
     }
@@ -99,8 +109,18 @@ impl Relay {
 
     /// The lines printed since the last call, waiting briefly for them.
     fn printed(&self) -> Vec<String> {
+        Self::since(&self.lines)
+    }
+
+    /// The lines written to its errors since the last call, waiting briefly
+    /// for them.
+    fn said(&self) -> Vec<String> {
+        Self::since(&self.errors)
+    }
+
+    fn since(lines: &Receiver<String>) -> Vec<String> {
         let mut out = Vec::new();
-        while let Ok(line) = self.lines.recv_timeout(Duration::from_millis(400)) {
+        while let Ok(line) = lines.recv_timeout(Duration::from_millis(400)) {
             out.push(line);
         }
         out
@@ -216,6 +236,26 @@ fn the_project_s_settings_are_served_to_the_page_and_only_whole() {
     let broken = Relay::start("broken-settings", Some("{ \"console\": "));
     let answer = broken.ask("GET", "/config", None, "");
     assert!(answer.starts_with("HTTP/1.1 404"), "{answer}");
+}
+
+#[test]
+fn settings_that_do_not_parse_are_said_in_the_terminal_once() {
+    let relay = Relay::start("unparsed-settings", Some("{ \"console\": "));
+    let said = relay.said();
+    assert_eq!(said.len(), 1, "{said:?}");
+    assert!(
+        said[0].contains("helix-diagnostics.json is not JSON (EOF while parsing"),
+        "{said:?}"
+    );
+    assert!(
+        said[0].ends_with("so pages run without these settings until the file is fixed."),
+        "{said:?}"
+    );
+    /* A page asking for them again is answered, and the reason is not said
+    twice. */
+    let answer = relay.ask("GET", "/config", Some("http://localhost:5173"), "");
+    assert!(answer.starts_with("HTTP/1.1 404"), "{answer}");
+    assert!(relay.said().is_empty());
 }
 
 #[test]

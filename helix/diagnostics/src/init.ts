@@ -25,7 +25,7 @@
  * rate.
  */
 
-import { type Config, checkConfig, LOCAL, resolveConfig } from './config.js'
+import { type Config, checkConfig, checkEnvironment, LOCAL, resolveConfig } from './config.js'
 import { report as print } from './console.js'
 import { diagnose } from './diagnose.js'
 import type { LintData, Tier } from './manifest.js'
@@ -175,6 +175,7 @@ const start = (options: InitOptions, page: Document): Diagnostics => {
   /* A setting that names nothing: said, and nothing started. */
   let resolved: ReturnType<typeof resolveConfig>
   try {
+    checkEnvironment(environment)
     resolved = resolveConfig(file, call)
   } catch (error) {
     once(`settings ${messageOf(error)}`, () =>
