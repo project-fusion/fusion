@@ -89,6 +89,20 @@ describe('a filterable menu', () => {
     ).toBeNull()
   })
 
+  /* The role moves onto the host through internals, which no attribute shows,
+     so the missing-name check read a row with words as one with no role and
+     warned about every row of the menu. */
+  test('warns only about a row with no words, though each says its role from its host', async () => {
+    const warnings: string[] = []
+    console.warn = (message: string) => warnings.push(message)
+    await opened(
+      `${ROWS}<helix-headless-menu-item value="bold"><svg slot="start"></svg></helix-headless-menu-item>`,
+    )
+    await new Promise((done) => setTimeout(done, 5))
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0]).toContain('<helix-headless-menu-item> has no accessible name')
+  })
+
   test('narrows the rows as the reader types, and highlights the first one kept', async () => {
     const host = await opened()
     await type(host, 'PA')

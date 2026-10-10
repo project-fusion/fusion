@@ -20,6 +20,7 @@ export function Example() {
       {/* The page keeps the query and passes it back as `filter`. Refuse the
           change to run the search on a server. */}
       <helix-input
+        aria-label="Search people"
         onhelix-before-change={(event) => setFilter(event.detail.value)}
         placeholder="Search"
         slot="toolbar"

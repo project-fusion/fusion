@@ -113,8 +113,9 @@ const firstOf = (year: number, month: number): Date =>
  * that bars dates, and what each day shows in place of its number.
  *
  * The month heading is a live region, so a screen reader hears the new month
- * when Previous or Next is pressed. Neither moves past `min` or `max`, and the
- * keys stop at them too. A value outside the bounds, on a barred day, or off
+ * when Previous or Next is pressed. Neither moves past `min` or `max`: at a
+ * bound the control keeps focus and carries `aria-disabled="true"`, and the
+ * keys stop there too. A value outside the bounds, on a barred day, or off
  * `step` reports `rangeUnderflow`, `rangeOverflow`, `badInput` or
  * `stepMismatch`, so a form does not submit it. A range set from a script
  * whose end is before its start reports `rangeUnderflow` as well.
@@ -678,6 +679,22 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   }
 
   /**
+   * Shows the month before or after the months shown, unless it is wholly
+   * outside `min` or `max`.
+   *
+   * **Previous and Next say that end with `aria-disabled` and stay
+   * focusable**, as Lightbox's controls do at the ends of a set. `disabled`
+   * dropped focus to the page's body the moment a reader paged into the last
+   * month.
+   */
+  private pageMonth(direction: -1 | 1): void {
+    if (direction < 0 ? this.atStart : this.atEnd) {
+      return
+    }
+    this.show(this.system.add(this.shown, direction))
+  }
+
+  /**
    * Moves the view, announcing it first.
    *
    * `helix-navigate` and not `helix-change`: paging chooses nothing, and a
@@ -914,8 +931,21 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
     this.zoom('day')
   }
 
-  /** Moves the months a year, or the years a page. */
+  /**
+   * Whether the year, or the page of years, before or after the one shown lies
+   * wholly outside `min` and `max`.
+   */
+  private lastPage(direction: number): boolean {
+    const years = this.view === 'year'
+    const page = years ? yearPageOf(this.periodYear) : this.periodYear
+    return this.yearOut(direction < 0 ? page - 1 : years ? page + YEARS_SHOWN : page + 1)
+  }
+
+  /** Moves the months a year, or the years a page, unless it is the last. */
   private turnPage(direction: number): void {
+    if (this.lastPage(direction)) {
+      return
+    }
     const by = this.view === 'year' ? YEARS_SHOWN : 1
     this.pageYear = this.periodYear + direction * by
     if (this.view === 'year') {
@@ -1479,8 +1509,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
                 part="previous"
                 type="button"
                 aria-label=${this.previousLabel}
-                ?disabled=${this.isDisabled || this.atStart}
-                @click=${() => this.show(this.system.add(this.shown, -1))}
+                aria-disabled=${this.atStart ? 'true' : nothing}
+                ?disabled=${this.isDisabled}
+                @click=${() => this.pageMonth(-1)}
               >
                 ${this.renderPreviousMark()}
               </button>`
@@ -1501,8 +1532,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
                 part="next"
                 type="button"
                 aria-label=${this.nextLabel}
-                ?disabled=${this.isDisabled || this.atEnd}
-                @click=${() => this.show(this.system.add(this.shown, 1))}
+                aria-disabled=${this.atEnd ? 'true' : nothing}
+                ?disabled=${this.isDisabled}
+                @click=${() => this.pageMonth(1)}
               >
                 ${this.renderNextMark()}
               </button>`
@@ -1666,7 +1698,8 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
           part="previous"
           type="button"
           aria-label=${years ? this.previousYearsLabel : this.previousYearLabel}
-          ?disabled=${this.isDisabled || this.yearOut(page - 1)}
+          aria-disabled=${this.lastPage(-1) ? 'true' : nothing}
+          ?disabled=${this.isDisabled}
           @click=${() => this.turnPage(-1)}
         >
           ${this.renderPreviousMark()}
@@ -1678,7 +1711,8 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
           part="next"
           type="button"
           aria-label=${years ? this.nextYearsLabel : this.nextYearLabel}
-          ?disabled=${this.isDisabled || this.yearOut(years ? page + YEARS_SHOWN : page + 1)}
+          aria-disabled=${this.lastPage(1) ? 'true' : nothing}
+          ?disabled=${this.isDisabled}
           @click=${() => this.turnPage(1)}
         >
           ${this.renderNextMark()}

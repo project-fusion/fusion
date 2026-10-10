@@ -203,7 +203,8 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   markers = 0
 
   /**
-   * The largest value that can be chosen.
+   * The largest value that can be chosen. Where it is not a number, such as
+   * `max="1OO"`, the slider stops at 100, as a native range does.
    */
   @property({ type: Number })
   max = 100
@@ -222,7 +223,8 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   maximumLabel = 'maximum'
 
   /**
-   * The smallest value that can be chosen.
+   * The smallest value that can be chosen. Where it is not a number, the
+   * slider starts at 0, as a native range does.
    */
   @property({ type: Number })
   min = 0
@@ -307,7 +309,10 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   @property({ attribute: 'show-value', reflect: true, type: Boolean })
   showValue = false
 
-  /** How far one press of an arrow key moves the thumb. */
+  /**
+   * How far one press of an arrow key moves the thumb. Where it is not a
+   * number, the thumb moves by 1, as on a native range.
+   */
   @property({ type: Number })
   step = 1
 
@@ -328,6 +333,29 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    */
   @property({ type: Boolean })
   tooltip = false
+
+  /**
+   * `min` as the slider works with it: 0 where it is not a number.
+   *
+   * **A bound that is not a number reached the form as `NaN`.** `max="1OO"`
+   * parses to `NaN`, and the value pulled into the bounds was `NaN` with it.
+   * A native range uses its default bound for an attribute it cannot read.
+   * Derived on read, as Rating's `floor` is, so `slider.min` still reports
+   * what you set.
+   */
+  private get lowest(): number {
+    return Number.isFinite(this.min) ? this.min : 0
+  }
+
+  /** `max` as the slider works with it: 100 where it is not a number. */
+  private get highest(): number {
+    return Number.isFinite(this.max) ? this.max : 100
+  }
+
+  /** `step` as the slider works with it: 1 where it is not a number. */
+  private get stride(): number {
+    return Number.isFinite(this.step) ? this.step : 1
+  }
 
   /**
    * How many characters the readout has to be able to hold, widest case.
@@ -351,7 +379,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * same way a different-length one shifted the box.
    */
   private get reserve(): number {
-    const widest = Math.max(this.said(this.min).length, this.said(this.max).length)
+    const widest = Math.max(this.said(this.lowest).length, this.said(this.highest).length)
     const count = this.points.length
     if (!this.range) {
       return widest
@@ -370,23 +398,23 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * the step's own precision is what the reader asked for when they wrote it.
    */
   private get precision(): number {
-    return String(this.step).split('.')[1]?.length ?? 0
+    return String(this.stride).split('.')[1]?.length ?? 0
   }
 
   /**
    * The values the marks stand at, evenly spaced, each snapped to a step.
    */
   private get markerValues(): number[] {
-    const span = this.max - this.min
+    const span = this.highest - this.lowest
     if (this.markers < 2 || span <= 0) {
       return []
     }
-    const step = this.step > 0 ? this.step : 1
+    const step = this.stride > 0 ? this.stride : 1
     const snapped = Array.from({ length: this.markers }, (_, at) => {
-      const raw = this.min + (at / (this.markers - 1)) * span
+      const raw = this.lowest + (at / (this.markers - 1)) * span
       const snappedAt = Math.min(
-        this.max,
-        Math.max(this.min, this.min + Math.round((raw - this.min) / step) * step),
+        this.highest,
+        Math.max(this.lowest, this.lowest + Math.round((raw - this.lowest) / step) * step),
       )
       // Back to the step's own precision, or a fractional step prints
       // `0.30000000000000004` on a marker label.
@@ -402,7 +430,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    */
   get valueAsNumber(): number {
     const parsed = Number.parseFloat(this.value)
-    return Number.isNaN(parsed) ? this.min : parsed
+    return Number.isNaN(parsed) ? this.lowest : parsed
   }
 
   /** Focus is delegated to the control, so the host is never the target. */
@@ -420,7 +448,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    */
   private get bounds(): [number, number] {
     const points = this.points
-    return [points[0] ?? this.min, points.at(-1) ?? this.max]
+    return [points[0] ?? this.lowest, points.at(-1) ?? this.highest]
   }
 
   /**
@@ -434,18 +462,18 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   private get points(): number[] {
     const parts = this.value.split(',').map((part) => Number.parseFloat(part))
     if (parts.length < 2 || parts.some((part) => !Number.isFinite(part))) {
-      return [this.min, this.max]
+      return [this.lowest, this.highest]
     }
     return parts.sort((left, right) => left - right)
   }
 
   /** Where one value sits along the track, as a fraction of it. */
   private along(at: number): number {
-    const span = this.max - this.min
+    const span = this.highest - this.lowest
     if (span === 0) {
       return 0
     }
-    return Math.min(1, Math.max(0, (at - this.min) / span))
+    return Math.min(1, Math.max(0, (at - this.lowest) / span))
   }
 
   private readonly handleInput = (event: Event): void => {
@@ -466,9 +494,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
          reason the class says: bounding shortens the input's own range and the
          thumbs stop sharing a track. */
       const gap = this.gap
-      const low = at > 0 ? (points[at - 1] ?? this.min) + gap : Number.NEGATIVE_INFINITY
+      const low = at > 0 ? (points[at - 1] ?? this.lowest) + gap : Number.NEGATIVE_INFINITY
       const high =
-        at < points.length - 1 ? (points[at + 1] ?? this.max) - gap : Number.POSITIVE_INFINITY
+        at < points.length - 1 ? (points[at + 1] ?? this.highest) - gap : Number.POSITIVE_INFINITY
       this.requestValue(
         points
           .map((one, index) => (index === at ? Math.min(high, Math.max(low, moved)) : one))
@@ -533,16 +561,16 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
         ? box.right - event.clientX
         : event.clientX - box.left
     const fraction = Math.min(1, Math.max(0, (from - inset) / Math.max(1, length - inset * 2)))
-    return this.settled(this.min + fraction * (this.max - this.min))
+    return this.settled(this.lowest + fraction * (this.highest - this.lowest))
   }
 
   /** Moves one of a range's thumbs, kept between its neighbors, and says whether it moved. */
   private moveThumb(at: number, wanted: number): boolean {
     const points = this.points
     const gap = this.gap
-    const low = at > 0 ? (points[at - 1] ?? this.min) + gap : Number.NEGATIVE_INFINITY
+    const low = at > 0 ? (points[at - 1] ?? this.lowest) + gap : Number.NEGATIVE_INFINITY
     const high =
-      at < points.length - 1 ? (points[at + 1] ?? this.max) - gap : Number.POSITIVE_INFINITY
+      at < points.length - 1 ? (points[at + 1] ?? this.highest) - gap : Number.POSITIVE_INFINITY
     const next = points
       .map((one, index) => (index === at ? Math.min(high, Math.max(low, wanted)) : one))
       .join(',')
@@ -638,7 +666,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     const sign = event.key === 'PageUp' ? 1 : -1
     if (this.range) {
       const at = Number((event.target as HTMLElement).dataset.index ?? 0)
-      if (!this.moveThumb(at, this.settled((this.points[at] ?? this.min) + sign * by))) {
+      if (!this.moveThumb(at, this.settled((this.points[at] ?? this.lowest) + sign * by))) {
         return
       }
     } else {
@@ -696,7 +724,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * there is no order for this to be on the wrong side of.
    */
   private get fraction(): number {
-    const span = this.max - this.min
+    const span = this.highest - this.lowest
     if (span === 0) {
       return 0
     }
@@ -737,11 +765,11 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    * same guard the marker labels already use.
    */
   private snapped(at: number): number {
-    if (!(this.step > 0)) {
+    if (!(this.stride > 0)) {
       return at
     }
-    const steps = Math.round((at - this.min) / this.step)
-    return Number((this.min + steps * this.step).toFixed(this.precision))
+    const steps = Math.round((at - this.lowest) / this.stride)
+    return Number((this.lowest + steps * this.stride).toFixed(this.precision))
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -759,8 +787,8 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
          is exactly a fact about the markup. Writing `value` would record the
          default as something the reader chose. */
       this.defaultValue = this.range
-        ? `${this.min},${this.max}`
-        : String(this.min + (this.max - this.min) / 2)
+        ? `${this.lowest},${this.highest}`
+        : String(this.lowest + (this.highest - this.lowest) / 2)
     }
     /* Sanitized as a native range sanitizes what it is given: into the bounds
        and onto the step. The thumb always showed the sanitized number, and the
@@ -773,8 +801,8 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
 
   /** One number pulled into the bounds and onto the step, as a range does. */
   private settled(at: number): number {
-    const low = Math.min(this.min, this.max)
-    const high = Math.max(this.min, this.max)
+    const low = Math.min(this.lowest, this.highest)
+    const high = Math.max(this.lowest, this.highest)
     return Math.min(high, Math.max(low, this.snapped(Math.min(high, Math.max(low, at)))))
   }
 
@@ -786,7 +814,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
     if (this.range) {
       const values = text.split(',').map((part) => Number.parseFloat(part))
       if (values.length < 2 || values.some((one) => !Number.isFinite(one))) {
-        return `${this.min},${this.max}`
+        return `${this.lowest},${this.highest}`
       }
       return values
         .map((one) => this.settled(one))
@@ -794,13 +822,13 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
         .join(',')
     }
     const parsed = Number.parseFloat(text)
-    const at = Number.isFinite(parsed) ? parsed : this.min + (this.max - this.min) / 2
+    const at = Number.isFinite(parsed) ? parsed : this.lowest + (this.highest - this.lowest) / 2
     return String(this.settled(at))
   }
 
   /** How far apart a range's thumbs stay, in the slider's own units. */
   private get gap(): number {
-    return Math.max(0, this.minStepsBetweenThumbs) * this.step
+    return Math.max(0, this.minStepsBetweenThumbs) * this.stride
   }
 
   /** Whether the value is written by `formatter` or `format-options`. */
@@ -978,9 +1006,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
         data-index=${index}
         type="range"
         style="--slider-from: ${this.along(start)}; --slider-to: ${this.along(end)}${this.axis}"
-        min=${this.min}
-        max=${this.max}
-        step=${this.step}
+        min=${this.lowest}
+        max=${this.highest}
+        step=${this.stride}
         .value=${String(at)}
         aria-labelledby=${this.labeled ? `${this.labelId} ${named}` : named}
         aria-valuemin=${before === undefined ? nothing : before + this.gap}
@@ -1050,9 +1078,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
               type="range"
               style=${this.fillStyle}
               data-origin=${this.origin ?? nothing}
-              min=${this.min}
-              max=${this.max}
-              step=${this.step}
+              min=${this.lowest}
+              max=${this.highest}
+              step=${this.stride}
               .value=${this.value}
               name=${this.name || nothing}
               aria-valuetext=${this.spoken(this.value)}
@@ -1072,7 +1100,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
                 (at) =>
                   html`<span
                     part="marker"
-                    style="--slider-marker-at: ${((at - this.min) / (this.max - this.min)) * 100}%"
+                    style="--slider-marker-at: ${((at - this.lowest) / (this.highest - this.lowest)) * 100}%"
                     >${
                       this.markerLabels
                         ? html`<span part="marker-label">${this.said(at)}</span>`

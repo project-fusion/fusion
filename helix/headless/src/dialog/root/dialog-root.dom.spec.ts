@@ -320,6 +320,36 @@ describe('dialog invokers', () => {
     expect(seen).toEqual(['--show'])
   })
 
+  /* An alert's Keep and Delete both close it with `--close`, and the page could
+     not tell which was pressed: the button's value never reached
+     `returnValue`. A native `command="close"` closes a `<dialog>` with it. */
+  test('a --close button closes it with its value, and one without leaves the value alone', async () => {
+    const trigger = (await mount(
+      `<helix-headless-button command="--close" commandfor="alert" value="delete">Delete</helix-headless-button>
+       <helix-headless-button command="--close" commandfor="alert">Cancel</helix-headless-button>
+       <helix-headless-dialog id="alert" label="Delete project">Body</helix-headless-dialog>`,
+    )) as HTMLElement & { updateComplete: Promise<boolean> }
+    const plain = trigger.nextElementSibling as HTMLElement & { updateComplete: Promise<boolean> }
+    const dialog = plain.nextElementSibling as Dialog & { returnValue: string }
+    await trigger.updateComplete
+    await plain.updateComplete
+    /* Read while the close is still a request: happy-dom's `close()` resets
+       `returnValue`, where a browser's keeps it. */
+    const returned: string[] = []
+    dialog.addEventListener('helix-before-close', () => {
+      returned.push(dialog.returnValue)
+    })
+    for (const button of [trigger, plain]) {
+      dialog.show()
+      await dialog.updateComplete
+      dialog.returnValue = 'before'
+      press(button)
+      await dialog.updateComplete
+      expect(hasState(dialog, 'open')).toBe(false)
+    }
+    expect(returned).toEqual(['delete', 'before'])
+  })
+
   test('a command naming nothing reaches nothing', async () => {
     /* Both halves, and they say different things. `not.toThrow` is that the
        press survived; the state after it is that it did nothing. */

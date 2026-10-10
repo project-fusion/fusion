@@ -750,6 +750,16 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       auditField(this)
     }
   }
+  /* **The render after a render is this mixin's design**: `refreshFeedback`
+     asks for one more update once the control has reported its verdict, which
+     the control does in its own `updated`. Lit's development build warns of an
+     update asked for after one completed, once for every kind of field that
+     changes its verdict, so the warning is turned off for each class this
+     builds, as `VirtualizeController` turns it off for its host. Lit's
+     production build has no warnings, and no `disableWarning`. */
+  ;(FieldElement as { disableWarning?: (kind: string) => void }).disableWarning?.(
+    'change-in-update',
+  )
 
   /* Through `unknown`, which the protected members make necessary: TypeScript
      treats two protected members as compatible only when they come from the

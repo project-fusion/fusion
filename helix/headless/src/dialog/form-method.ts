@@ -25,3 +25,20 @@ export const closeOnDialogSubmit = (
   event.preventDefault()
   close(submitter?.hasAttribute('value') ? submitter.value : undefined)
 }
+
+/**
+ * What a `--close` command closes a dialog with: the value of the button that
+ * sent it, as `command="close"` closes a native `<dialog>` with its invoker's.
+ *
+ * Read from the property, so a Helix button given its `value` by a framework
+ * counts, and the attribute decides only whether an empty one was written. A
+ * button with no value leaves `returnValue` as it was, as a submitter with
+ * none does in `closeOnDialogSubmit`.
+ */
+export const commandValue = (source: Element | null): string | undefined => {
+  const value = (source as { value?: unknown } | null)?.value
+  if (typeof value !== 'string') {
+    return undefined
+  }
+  return value !== '' || source?.hasAttribute('value') ? value : undefined
+}

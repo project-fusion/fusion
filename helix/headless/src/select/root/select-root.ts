@@ -52,7 +52,7 @@ import { over } from '../align.js'
  * Your options stay in your light DOM and are slotted through into the listbox,
  * so the listbox looks through slots to find them. Write them as `Option`,
  * group them in `Option.Group`, and divide them with `Option.Separator`.
- * Importing Select registers all three in the same tier. For a list too long to draw
+ * Importing the Option entry registers all three. For a list too long to draw
  * whole, set `items` instead: the list draws only the options in sight, as
  * Listbox's `items` does, and the trigger, its keys and the form read the
  * whole set.

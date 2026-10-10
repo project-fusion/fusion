@@ -142,6 +142,52 @@ describe('button form participation', () => {
     ;(control(button) as HTMLElement).click()
     expect(submitted).toBe(0)
   })
+
+  /* A native submit button acts once its click has reached the page, so a
+     listener that asks for a confirmation first can cancel it. This one
+     submitted from its own control, before a listener on the form heard the
+     click, and `preventDefault()` there changed nothing. */
+  test('a click listener that prevents the default cancels a submit or a reset', async () => {
+    for (const type of ['submit', 'reset']) {
+      document.body.innerHTML = `<form><helix-headless-button type="${type}">Go</helix-headless-button></form>`
+      const form = document.querySelector('form') as HTMLFormElement
+      const button = document.querySelector('helix-headless-button') as Updatable
+      await button.updateComplete
+
+      let acted = 0
+      form.requestSubmit = () => {
+        acted += 1
+      }
+      form.reset = () => {
+        acted += 1
+      }
+      let pressed = 0
+      button.addEventListener('helix-press', () => {
+        pressed += 1
+      })
+      form.addEventListener('click', (event) => event.preventDefault())
+      ;(control(button) as HTMLElement).click()
+      await new Promise((done) => setTimeout(done, 0))
+      expect([type, acted, pressed]).toEqual([type, 0, 0])
+    }
+  })
+
+  test('and a click stopped on its way still submits, as a native button’s does', async () => {
+    document.body.innerHTML =
+      '<form><helix-headless-button type="submit">Send</helix-headless-button></form>'
+    const form = document.querySelector('form') as HTMLFormElement
+    const button = document.querySelector('helix-headless-button') as Updatable
+    await button.updateComplete
+
+    let submitted = 0
+    form.requestSubmit = () => {
+      submitted += 1
+    }
+    button.addEventListener('click', (event) => event.stopPropagation())
+    ;(control(button) as HTMLElement).click()
+    await new Promise((done) => setTimeout(done, 0))
+    expect(submitted).toBe(1)
+  })
 })
 
 /* The five submission overrides, the name and the value, and the submitter.
@@ -296,6 +342,27 @@ describe('button invokers', () => {
 
     ;(control(button) as HTMLElement).click()
     expect<string | null>(received).toBe('--go')
+  })
+
+  /* The browser sends its own command after the click has finished
+     dispatching, and none for a canceled click, so the event sent where it
+     has no invokers waits and reads the click too. */
+  test('a click listener that prevents the default sends no command', async () => {
+    const button = await mount(
+      '<helix-headless-button command="--go" commandfor="refused">Go</helix-headless-button>',
+    )
+    const target = document.createElement('div')
+    target.id = 'refused'
+    document.body.append(target)
+
+    let received = 0
+    target.addEventListener('command', () => {
+      received += 1
+    })
+    button.addEventListener('click', (event) => event.preventDefault())
+    ;(control(button) as HTMLElement).click()
+    await new Promise((done) => setTimeout(done, 0))
+    expect(received).toBe(0)
   })
 })
 

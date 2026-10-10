@@ -78,8 +78,8 @@
   justify-content: center;
 }
 
-[part="previous"]:hover:not(:disabled),
-[part="next"]:hover:not(:disabled) {
+[part="previous"]:hover:not(:disabled, [aria-disabled="true"]),
+[part="next"]:hover:not(:disabled, [aria-disabled="true"]) {
   background-color: var(--helix-color-surface-sunken);
   color: var(--helix-color-foreground);
 }
@@ -166,9 +166,13 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* At `min` or `max` there is no month to move to, and the control says so. */
+/* At `min` or `max` there is no month to move to, and the control says so.
+   Still focusable there, so the press that reached the bound keeps the reader
+   on it. */
 [part="previous"]:disabled,
-[part="next"]:disabled {
+[part="previous"][aria-disabled="true"],
+[part="next"]:disabled,
+[part="next"][aria-disabled="true"] {
   cursor: default;
   opacity: 0.4;
 }
