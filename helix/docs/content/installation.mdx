@@ -16,6 +16,24 @@ use its semantic tokens and draw nothing without them. If the elements are
 installed and the tokens are missing, your page shows unstyled boxes. There is
 no fallback theme.
 
+## Start a new project
+
+If you do not have a project yet, the scaffolder writes one with Helix
+installed, the stylesheets imported, and every element registered:
+
+```sh
+npm create @fusion.dev/helix-app@latest my-app -- --template react-vite
+```
+
+Leave out `--template`, and the command lists the templates and writes nothing.
+Each template starts with the same three pages:
+
+- a landing page
+- a sorted, paged data table
+- a form that a `<form>` reads with `FormData`
+
+The rest of this page adds Helix to a project you already have.
+
 ## Import the stylesheets
 
 ```ts
@@ -49,18 +67,19 @@ import the two files you want and skip `helix.css`.
   `tokens.css` refers to the primitives throughout, so without
   `primitives.css` every semantic token resolves to nothing. We measured a page without it:
   `--helix-color-background` computes to `rgba(0, 0, 0, 0)`, and so does every
-  other color. [Theming](theming.mdx) also depends on this file, because without
+  other color. [Theming](./theming) also depends on this file, because without
   it, setting `--helix-seed-brand` changes nothing.
 - **`tokens.css`** declares the semantic layer, the custom properties grouped
   by category, plus `color-scheme: light dark` on `:root`. The files below read
   from it, and it reads from `primitives.css`.
 - **`base.css`** holds the element reset, the type scale on bare `h1` through
   `h6`, and the recipes for markup that Helix does not render. It reads tokens.
-- **`elements.css`** styles elements before they upgrade. It is the file most
-  often left out, because a page works without it until the page is
-  server-rendered. An element that has not upgraded has no shadow root and no
-  styles of its own, so the markup flashes unstyled and then jumps into place.
-  `elements.css` makes that interval look like the finished page.
+- **`elements.css`** hides each Helix element until its definition loads. It is
+  the file most often left out, because a page works without it until the page
+  is server-rendered. An element that has not upgraded has no shadow root and no
+  styles of its own, so without the file the markup flashes unstyled. With it,
+  the element stays hidden until it upgrades, and the layout settles when it
+  does.
 
 Import the files from a stylesheet you control, and keep them out of individual
 components. The order then stays visible in one place.
@@ -91,13 +110,14 @@ Render one element and check whether it upgraded:
 
 ```ts
 await customElements.whenDefined('helix-button')
-console.log(document.querySelector('helix-button')?.shadowRoot !== null)
+console.log(document.querySelector('helix-button')?.shadowRoot instanceof ShadowRoot)
 ```
 
 `true` means the definition loaded and the element built its shadow root.
-`false`, or a promise that never settles, means the registration import did not
-run. Usually the import is outside a `'use client'` boundary, or you imported
-the subpath of a component you did not end up using.
+`false` means the page has no `helix-button` to check. A promise that never
+settles means the registration import did not run. Usually the import is outside
+a `'use client'` boundary, or you imported the subpath of a component you did
+not end up using.
 
 If the element upgraded and the page still looks wrong, check the stylesheets
 in the order above. The symptom tells you which layer is missing:

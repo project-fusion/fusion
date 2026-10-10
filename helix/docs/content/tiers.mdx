@@ -21,8 +21,8 @@ depends only on the packages below it.
 Neither is a tier, and you do not need either one to render a component.
 
 There is no React package. We generate the framework typings into
-`@fusion.dev/helix`, and the bridge that repairs React's hydration of custom
-events is in `@fusion.dev/helix-core`. See [React](./react).
+`@fusion.dev/helix` and `@fusion.dev/helix-headless`, and the bridge that
+repairs React's hydration of custom events is in `@fusion.dev/helix-core`. See [React](./react).
 
 ## Why the tiers are separate packages
 
@@ -64,7 +64,7 @@ export class HelixHeadlessAccordionItem extends MixinControllerOpen(HelixElement
   }
 }
 
-// web/src/accordion/root/accordion-root.ts
+// styled/src/accordion/root/accordion-root.ts
 // extends the headless one, adds presentation only
 import { styles } from './accordion-root.css.js'
 
@@ -78,7 +78,7 @@ export class HelixAccordion extends HelixHeadlessAccordion {
 ```
 
 ```css
-/* web/src/accordion/item/accordion-item.css */
+/* styled/src/accordion/item/accordion-item.css */
 [part='trigger'] {
   min-block-size: var(--helix-size-control);
   padding: var(--helix-space-sm);
@@ -115,8 +115,8 @@ as unstyled text and then changes into a card. The delay is short. It is most
 visible on a server-rendered page, where the markup arrives long before the
 JavaScript.
 
-`@fusion.dev/helix` includes `elements.css`, which hides each of its tags until
-the tag's definition loads:
+`@fusion.dev/helix-styles` includes `elements.css`, which hides each tag of the
+styled tier until the tag's definition loads:
 
 ```css
 helix-card:not(:defined) {
@@ -124,7 +124,7 @@ helix-card:not(:defined) {
 }
 ```
 
-**The base tier ships no such file on purpose.** There are three reasons, and
+**The headless tier ships no such file on purpose.** There are three reasons, and
 the third one affects you most.
 
 First, hiding an element is a design choice. Below the styled tier, we ship only
@@ -138,20 +138,21 @@ inside, because there is no shadow root before the upgrade. The rule has to
 live in your stylesheet, so the choice is yours.
 
 Third, one file for every tag would not fit your project. You import only the
-base elements you use, so a generated list would include tags you never ship.
+headless elements you use, so a generated list would include tags you never ship.
 Write the rule for the elements you have:
 
 ```css
-helix-base-accordion:not(:defined),
-helix-base-dialog:not(:defined) {
+helix-headless-accordion:not(:defined),
+helix-headless-dialog:not(:defined) {
   visibility: hidden;
 }
 ```
 
-Use `visibility` so the element keeps its place in the layout and the page does
-not reflow when it upgrades. `display: none` collapses the box, and the content
-jumps in when the definition arrives. That replaces a flash of unstyled text
-with a shift of everything below it.
+Use `visibility`, so a hidden element keeps the size of its unstyled content.
+The layout still settles when the element upgrades and takes its own size.
+`display: none` collapses the box, so the element takes no space until the
+definition arrives, and then everything below it shifts by the element's full
+size.
 
 You may want to hide nothing. If your first paint matters more than the final
 layout, or your page has to be readable with JavaScript turned off, let the

@@ -85,8 +85,8 @@ Run your page's own scripts after the definitions load. Hydration expects that
 order. A property you set before hydration is one the server did not render
 with.
 
-`bun run check:spec:dsd` renders every example with Lit SSR, hydrates it in
-Chromium, and compares it with the same example rendered on a client.
+We render every component example in both tiers with Lit SSR, hydrate it in
+Chromium, and compare it with the same example rendered on a client.
 
 React server components do not use declarative shadow DOM. Their output is
 replayed through DOM APIs, and declarative shadow DOM does not activate for

@@ -16,6 +16,23 @@ Helix tag in an SFC template has typed props and events. The generated file
 declares the augmentation under both `vue` and `@vue/runtime-core`, because
 different tools read different ones.
 
+## Report a misspelled prop
+
+`vue-tsc` checks the value of each prop a Helix tag declares. By default, it
+does not report a prop name that the tag does not declare, so a misspelled prop
+compiles. To report one, turn on `checkUnknownProps` in `tsconfig.json`:
+
+```json
+{
+  "vueCompilerOptions": {
+    "checkUnknownProps": true
+  }
+}
+```
+
+`strictTemplates` turns it on with the rest of Vue's strict template checks.
+Either option also reports a `data-*` attribute on a Helix tag.
+
 ## Mark Helix tags as custom elements
 
 Without this setting, Vue treats `<helix-button>` as a component it cannot find
@@ -70,7 +87,7 @@ work. See [State and control](./state-and-control).
 <helix-input default-value="Ada" label="Name" />
 
 <!-- Mirrored: bind the notification and let the element apply. -->
-<helix-input label="Name" @change="name = $event.target.value" />
+<helix-input label="Name" @change="name = ($event.currentTarget as HelixInput).value" />
 
 <!-- Refused: you take the decision for this one change. -->
 <helix-input
@@ -78,4 +95,14 @@ work. See [State and control](./state-and-control).
   label="Name"
   @helix-before-change="$event.preventDefault(); name = clean($event.detail.value)"
 />
+```
+
+For a native event such as `change`, `vue-tsc` types `$event.currentTarget` as
+`EventTarget | null`, which has no `value`. The mirrored line casts it to the
+element's class, which you import as a type from the family's subpath:
+
+```vue
+<script setup lang="ts">
+import type { HelixInput } from '@fusion.dev/helix/input'
+</script>
 ```

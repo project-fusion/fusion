@@ -167,21 +167,39 @@ bundler can remove that record.
 an order of precedence, the glyph on the page would come from whichever
 directory ranked higher, and nothing would look wrong.
 
-## Add a glyph to the Helix set
+## Draw your own glyphs by name
 
-Add the name to `helix/icons/icons.txt` and run `turbo run icons`. Phosphor
-names resolve from `@phosphor-icons/core` at build time, so adding a glyph takes
-one line. You do not copy a path into a TypeScript object by hand.
+`registerIcons` makes your glyphs resolve by `name`, so plain HTML can draw
+them:
 
-For a mark Phosphor does not draw, add an SVG with the same name to
-`helix/icons/raw`. The build reads it from there when Phosphor has no match.
-Draw it with the same geometry, a 256 box at the bold weight. A glyph drawn at a
-different weight stands out next to the others.
+```ts
+import { registerIcons } from '@fusion.dev/helix/icon'
+import { peak } from './icons'
+
+registerIcons([peak])
+```
+
+```html
+<helix-icon name="peak"></helix-icon>
+```
+
+Each glyph registers under its own `name`. To register a whole set, build it
+with `--index` and pass the `icons` record the command writes to
+`registerIcons`.
+
+`registerIconLibrary` resolves names under a prefix through a function of your
+own, such as one that points into a sprite sheet or fetches from a server. After
+`registerIconLibrary('brand', resolve)`, `name="brand:peak"` draws the glyph that
+`resolve('peak')` returns.
+
+To sit beside the Helix set, draw a glyph with the same geometry, a 256 box at
+the bold weight. A glyph drawn at a different weight stands out next to the
+others.
 
 ## Product marks
 
-Helix and Cortex have product marks. They are in the icon package, and they are
-not part of the icon set. A mark identifies a product. An icon stands for an
-action. **A mark is one rounded body with material removed.** It is never a
-pictogram of a metaphor, because it stands beside the parent brand's mark, a
-geometric monogram. Do not use the icon set to draw a logo.
+The set includes the Fusion, Helix, and Cortex marks, and the React and HTML5
+logos, so `<helix-icon name="helix">` draws the Helix mark. A mark identifies a
+product. An icon stands for an action. **The Helix and Cortex marks are each one
+rounded body with material removed.** Neither is a pictogram of a metaphor,
+because each stands beside the Fusion mark, a geometric monogram.

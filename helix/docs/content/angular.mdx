@@ -31,13 +31,18 @@ typos, in your other components.
 
 ```html
 <helix-input
-  (change)="name = $event.target.value"
+  #field
+  (change)="name = field.value"
   [value]="name"
 />
 ```
 
 `[prop]` sets a property, which a value that is not a string needs. `(event)`
 binds with `addEventListener`, so use the event's own name.
+
+`#field` gives the template a reference to the element, typed as its class once
+you import its family. Under `strictTemplates`, `$event.target` is an
+`EventTarget | null`, which has no `value`.
 
 **Do not use `attr.` for a stateful property.** `[attr.value]="name"` writes the
 attribute. The attribute seeds the control and is out of date as soon as someone
@@ -50,9 +55,17 @@ checking that typings would feed, so Angular would not enforce a generated file.
 We publish the manifest as `@fusion.dev/helix/custom-elements.json`, so you can
 generate your own files from it.
 
-As a result, a misspelled property fails without an error in Angular. In React,
-Vue, and Svelte, the same mistake is a compile error. Check property names in
-code review.
+As a result, a misspelled property fails without an error in Angular. Check
+property names in code review.
+
+The other frameworks check a misspelled name to different degrees:
+
+- In React, TypeScript reports a misspelled prop unless its name has a hyphen.
+  See [React](./react).
+- In Vue, `vue-tsc` reports one only when `checkUnknownProps` is on. See
+  [Vue](./vue).
+- In Svelte, `svelte-check` reports an attribute that the Helix tag does not
+  declare.
 
 ## Refuse a change
 

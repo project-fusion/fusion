@@ -97,8 +97,14 @@ import '@fusion.dev/helix-styles/helix.css'
 base layer. If you import the layers one at a time, import `elements.css` last.
 
 `elements.css` hides each tag with `:not(:defined)` until the element upgrades.
-It uses `visibility`, so the page does not reflow. Without it, a card appears as
-unstyled text and then jumps into its card layout.
+It uses `visibility`, so a hidden element keeps the size of its unstyled
+content. The layout settles when the elements upgrade and take their own size.
+Without the file, a card appears as unstyled text and then jumps into its card
+layout.
+
+A data table that serves its first page as rows is the one element shown before
+it upgrades. `elements.css` lays out those rows as the table draws them. See
+[React](./react).
 
 We generate the file from the element sources, and it lists every tag by name.
 CSS has no selector for any custom element, and a bare `:not(:defined)` would
@@ -116,33 +122,28 @@ use a button.
 
 ## Turn off an attribute that is on by default
 
-A boolean attribute is off until you write it, with four exceptions. These are
-on until you write the string `"false"`:
-
-- `modal` on Drawer
-- `playsinline` on Video
-- `default-pinned` on Chat
-- `tab-indents` on Sandbox Source
+A boolean attribute is off until you write it, unless its default is `true`. The
+property table on each component's page shows the default. An attribute whose
+default is `true` stays on until you write the string `"false"`, such as `modal`
+on Drawer:
 
 ```html
 <helix-drawer modal="false"></helix-drawer>
 ```
 
-In JSX, `modal={false}` sets the property and does the same. Other features
-that are on by default turn off with an attribute named `no-`, such as
-`no-copy`.
+`"false"` is the only value that turns it off. An empty value, or any other
+string, leaves it on. In JSX, `modal={false}` sets the property and does the
+same. Other features that are on by default turn off with an attribute named
+`no-`, such as `no-copy`.
 
 ## Declarative shadow DOM is opt-in
 
-The site ships no declarative shadow DOM (DSD). The shadow styles load with the
-element definition. You do not need to configure anything. If you render with
-Lit SSR yourself, its declarative shadow DOM hydrates. See
-[Server rendering](./server-rendering).
+The elements need no declarative shadow DOM (DSD). Each element attaches its
+shadow root and loads its styles with its definition, so you do not need to
+configure anything. If you render with Lit SSR yourself, the DSD it writes
+hydrates. See [Server rendering](./server-rendering).
 
-The site ships no DSD for three reasons:
-
-- DSD cannot activate for nodes inserted by script.
-- React inserts a server component's output by replaying the flight payload
-  through DOM APIs, without running the component again.
-- The patch that made DSD work hooked into webpack, and Turbopack ignores that
-  hook without an error.
+DSD does not work in a React server component. React inserts a server
+component's output by replaying the flight payload through DOM APIs, without
+running the component again, and DSD does not activate for nodes that a script
+inserts.

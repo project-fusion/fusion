@@ -31,13 +31,13 @@ the same version were tested together.
 
 ## The version number comes from the Git tag
 
-Every manifest in the repository has the version `0.0.0-dev`. CI writes the real
-number into each manifest seconds before packing.
+CI computes each version from the Git tags and writes it into every package
+manifest seconds before packing. Once the release is promoted, CI commits the
+same number back to `main`. The `version` in each Helix `package.json` in the
+repository is therefore the last release, and the tag is the record it copies.
 
-If you read the source, you will see `0.0.0-dev` on every package, including
-released ones. We do not commit the real number back. That would need a bot
-with push access that overrides branch protection, and `git tag` already records
-the number.
+The Rust crates stay at `0.0.0-dev`. The `helix` binary reports the version of
+the npm package it was installed with.
 
 Releases use two kinds of tag:
 
@@ -69,8 +69,18 @@ one of:
 - `stable`
 - `deprecated`
 
-Most components are experimental today, and their status says so. We will not
-change a status to make the library look more finished than it is.
+Most components are stable. These families are experimental, and their status
+says so:
+
+- the spatial charts, which draw in three dimensions
+- Map and its layers
+- Graph
+- Canvas
+- Log
+- Strands
+- Motion Toggle
+
+We will not change a status to make the library look more finished than it is.
 
 ## Release notes
 
