@@ -19,7 +19,7 @@
 //! the caller has to inspect.** A derivation either produces a theme or refuses
 //! the intent, and a caller who forgets to check a returned discriminant gets a
 //! theme-shaped object full of nothing. An intent that cannot be read is
-//! refused by [`read`], which names the field and the value.
+//! refused by [`read`], which names the field.
 
 use wasm_bindgen::prelude::*;
 
@@ -47,8 +47,7 @@ use crate::shape::report;
 /// the intent.
 #[wasm_bindgen(js_name = derive)]
 pub fn derive(intent: &str, selectors: &str) -> Result<String, JsError> {
-    let intent: ThemeIntent =
-        read(intent, "the intent").map_err(|refusal| JsError::new(&refusal))?;
+    let intent: ThemeIntent = read(intent, "").map_err(|refusal| JsError::new(&refusal))?;
     let selectors: Vec<String> =
         read(selectors, "selectors").map_err(|refusal| JsError::new(&refusal))?;
     let theme = derive_theme(&intent)?;
@@ -78,8 +77,7 @@ pub fn derive(intent: &str, selectors: &str) -> Result<String, JsError> {
 /// the intent in either mode.
 #[wasm_bindgen(js_name = deriveModes)]
 pub fn derive_modes(intent: &str, selectors: &str) -> Result<String, JsError> {
-    let intent: ThemeIntent =
-        read(intent, "the intent").map_err(|refusal| JsError::new(&refusal))?;
+    let intent: ThemeIntent = read(intent, "").map_err(|refusal| JsError::new(&refusal))?;
     let selectors: Vec<String> =
         read(selectors, "selectors").map_err(|refusal| JsError::new(&refusal))?;
     let in_mode = |scheme| {

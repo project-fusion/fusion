@@ -18,10 +18,13 @@
 //! The rest are plain derives on the types themselves.
 //!
 //! **Each wire enum ends in [`Shape`], which reads anything**, so a value that
-//! is none of the union's kinds is refused by the conversion as a type error
-//! naming what the field takes. Without it, serde refuses it with `data did not
-//! match any variant of untagged enum BrandWire`, which names a type in this
-//! file and nothing a consumer wrote.
+//! is none of the union's kinds is refused by the conversion, by the field it
+//! is in and what that field takes: `brand is not a color this engine can read,
+//! or one for each scheme, received 255`. Without it, serde refuses it with
+//! `data did not match any variant of untagged enum BrandWire`, which names a
+//! type in this file and nothing a consumer wrote. A union read in more than
+//! one field, a status or a page, is read through a function per field that
+//! carries its name.
 //!
 //! **`deny_unknown_fields` everywhere, which is a departure from the
 //! TypeScript** and the right one: a mistyped key is silently ignored by
@@ -35,7 +38,7 @@
 //! unknown fields allowed, the second matches the first with two keys thrown
 //! away, and a pinned status color becomes a hue nudge without a word.
 
-use serde::de::{Deserializer, Error as _, IgnoredAny, MapAccess, SeqAccess, Unexpected, Visitor};
+use serde::de::{Deserializer, Error as _, IgnoredAny, MapAccess, SeqAccess, Visitor};
 use serde::Deserialize;
 
 use crate::intent::{Brand, BrandPair, Color, Relation, Seed, StatusSeed};
@@ -59,18 +62,52 @@ enum ColorWire {
     Other(Shape),
 }
 
+/// What a field holding a color takes, in a refusal.
+const A_COLOR: &str = "a color this engine can read";
+
+/// A color read, or refused by `label`, the field it was given in.
+fn color<E: serde::de::Error>(wire: ColorWire, label: &str) -> Result<Color, E> {
+    match wire {
+        ColorWire::Hex(hex) => Ok(Color::Hex(hex)),
+        ColorWire::Oklch(triple) => Ok(Color::Oklch(Oklch {
+            chroma: triple.chroma,
+            hue: triple.hue,
+            lightness: triple.lightness,
+        })),
+        ColorWire::Other(shape) => Err(shape.refused(label, A_COLOR)),
+    }
+}
+
+/// **Read without a name only inside a union**, whose refusal replaces this
+/// one. A field holding a color is read through [`page`] or [`tokens`].
 impl<'de> Deserialize<'de> for Color {
     fn deserialize<D: Deserializer<'de>>(reader: D) -> Result<Self, D::Error> {
-        Ok(match ColorWire::deserialize(reader)? {
-            ColorWire::Hex(hex) => Self::Hex(hex),
-            ColorWire::Oklch(triple) => Self::Oklch(Oklch {
-                chroma: triple.chroma,
-                hue: triple.hue,
-                lightness: triple.lightness,
-            }),
-            ColorWire::Other(shape) => return Err(shape.refused("a color this engine can read")),
-        })
+        color(ColorWire::deserialize(reader)?, "the value")
     }
+}
+
+/// `background.dark`, read by its name.
+///
+/// # Errors
+///
+/// Whatever the reader reports, and a value that is not a color.
+pub fn dark_page<'de, D: Deserializer<'de>>(reader: D) -> Result<Option<Color>, D::Error> {
+    page(reader, "background.dark")
+}
+
+/// `background.light`, read by its name.
+///
+/// # Errors
+///
+/// Whatever the reader reports, and a value that is not a color.
+pub fn light_page<'de, D: Deserializer<'de>>(reader: D) -> Result<Option<Color>, D::Error> {
+    page(reader, "background.light")
+}
+
+fn page<'de, D: Deserializer<'de>>(reader: D, label: &str) -> Result<Option<Color>, D::Error> {
+    Option::<ColorWire>::deserialize(reader)?
+        .map(|wire| color(wire, label))
+        .transpose()
 }
 
 #[derive(Deserialize)]
@@ -90,7 +127,10 @@ impl<'de> Deserialize<'de> for Brand {
             BrandWire::One(color) => Self::One(color),
             BrandWire::Each(pair) => Self::Each(pair),
             BrandWire::Other(shape) => {
-                return Err(shape.refused("a color this engine can read, or one for each scheme"))
+                return Err(shape.refused(
+                    "brand",
+                    "a color this engine can read, or one for each scheme",
+                ))
             }
         })
     }
@@ -110,9 +150,10 @@ impl<'de> Deserialize<'de> for Seed {
             SeedWire::Color(color) => Self::Color(color),
             SeedWire::Relation(relation) => Self::Relation(relation),
             SeedWire::Other(shape) => {
-                return Err(
-                    shape.refused("a color this engine can read, or a relation to the brand")
-                )
+                return Err(shape.refused(
+                    "accent",
+                    "a color this engine can read, or a relation to the brand",
+                ))
             }
         })
     }
@@ -137,16 +178,55 @@ enum StatusSeedWire {
     Other(Shape),
 }
 
-impl<'de> Deserialize<'de> for StatusSeed {
-    fn deserialize<D: Deserializer<'de>>(reader: D) -> Result<Self, D::Error> {
-        Ok(match StatusSeedWire::deserialize(reader)? {
-            StatusSeedWire::Color(color) => Self::Color(color),
-            StatusSeedWire::Hue(hue) => Self::Hue(hue.hue),
+/// `status.danger`, read by its name.
+///
+/// # Errors
+///
+/// Whatever the reader reports, and a value that is neither a color nor a hue.
+pub fn danger<'de, D: Deserializer<'de>>(reader: D) -> Result<Option<StatusSeed>, D::Error> {
+    status(reader, "status.danger")
+}
+
+/// `status.info`, read by its name.
+///
+/// # Errors
+///
+/// Whatever the reader reports, and a value that is neither a color nor a hue.
+pub fn info<'de, D: Deserializer<'de>>(reader: D) -> Result<Option<StatusSeed>, D::Error> {
+    status(reader, "status.info")
+}
+
+/// `status.success`, read by its name.
+///
+/// # Errors
+///
+/// Whatever the reader reports, and a value that is neither a color nor a hue.
+pub fn success<'de, D: Deserializer<'de>>(reader: D) -> Result<Option<StatusSeed>, D::Error> {
+    status(reader, "status.success")
+}
+
+/// `status.warning`, read by its name.
+///
+/// # Errors
+///
+/// Whatever the reader reports, and a value that is neither a color nor a hue.
+pub fn warning<'de, D: Deserializer<'de>>(reader: D) -> Result<Option<StatusSeed>, D::Error> {
+    status(reader, "status.warning")
+}
+
+fn status<'de, D: Deserializer<'de>>(
+    reader: D,
+    label: &str,
+) -> Result<Option<StatusSeed>, D::Error> {
+    Option::<StatusSeedWire>::deserialize(reader)?
+        .map(|wire| match wire {
+            StatusSeedWire::Color(color) => Ok(StatusSeed::Color(color)),
+            StatusSeedWire::Hue(hue) => Ok(StatusSeed::Hue(hue.hue)),
             StatusSeedWire::Other(shape) => {
-                return Err(shape.refused("a color this engine can read, or a hue"))
+                Err(shape.refused(label, "a color this engine can read, or a hue"))
             }
         })
-    }
+        .transpose()
 }
 
 /// A value that is none of a union's kinds, kept as far as its refusal needs.
@@ -165,19 +245,25 @@ enum Shape {
 }
 
 impl Shape {
-    /// The refusal of this value where `expected` is what the field takes.
-    fn refused<E: serde::de::Error>(&self, expected: &'static str) -> E {
-        let unexpected = match self {
-            Self::Bool(value) => Unexpected::Bool(*value),
-            Self::Float(value) => Unexpected::Float(*value),
-            Self::Map => Unexpected::Map,
-            Self::Null => Unexpected::Unit,
-            Self::Seq => Unexpected::Seq,
-            Self::Signed(value) => Unexpected::Signed(*value),
-            Self::Text(value) => Unexpected::Str(value),
-            Self::Unsigned(value) => Unexpected::Unsigned(*value),
-        };
-        E::invalid_type(unexpected, &expected)
+    /// The refusal of this value in the field `label`, which takes `expected`.
+    fn refused<E: serde::de::Error>(&self, label: &str, expected: &str) -> E {
+        E::custom(format_args!("{label} is not {expected}, received {self}"))
+    }
+}
+
+/// As JSON writes a value, and an object or an array by its kind.
+impl std::fmt::Display for Shape {
+    fn fmt(&self, out: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Bool(value) => write!(out, "{value}"),
+            Self::Float(value) => write!(out, "{value}"),
+            Self::Map => out.write_str("an object"),
+            Self::Null => out.write_str("null"),
+            Self::Seq => out.write_str("an array"),
+            Self::Signed(value) => write!(out, "{value}"),
+            Self::Text(value) => write!(out, "{value:?}"),
+            Self::Unsigned(value) => write!(out, "{value}"),
+        }
     }
 }
 
@@ -267,13 +353,14 @@ pub fn tokens<'de, D: Deserializer<'de>>(
 
         fn visit_map<M: MapAccess<'de>>(self, mut entries: M) -> Result<Self::Value, M::Error> {
             let mut pairs: Vec<(String, Color)> = Vec::new();
-            while let Some((name, color)) = entries.next_entry::<String, Color>()? {
+            while let Some((name, wire)) = entries.next_entry::<String, ColorWire>()? {
                 if pairs.iter().any(|(earlier, _)| *earlier == name) {
                     return Err(M::Error::custom(format!(
                         "`{name}` is given twice, and only one of the two can be what you meant"
                     )));
                 }
-                pairs.push((name, color));
+                let read = color(wire, &format!("tokens.{name}"))?;
+                pairs.push((name, read));
             }
             Ok(pairs)
         }
@@ -329,24 +416,27 @@ mod tests {
     }
 
     #[test]
-    fn a_union_that_reads_as_none_of_its_kinds_says_what_it_takes() {
+    fn a_union_that_reads_as_none_of_its_kinds_is_refused_by_its_field() {
         assert_eq!(
             refused(r#"{"brand": 255}"#),
-            "invalid type: integer `255`, expected a color this engine can read, or one for \
-             each scheme"
+            "brand is not a color this engine can read, or one for each scheme, received 255"
         );
         assert_eq!(
             refused(r#"{"background": {"light": true}}"#),
-            "invalid type: boolean `true`, expected a color this engine can read"
+            "background.light is not a color this engine can read, received true"
         );
         assert_eq!(
             refused(r#"{"accent": {"from": "brand"}}"#),
-            "invalid type: map, expected a color this engine can read, or a relation to the \
-             brand"
+            "accent is not a color this engine can read, or a relation to the brand, \
+             received an object"
         );
         assert_eq!(
-            refused(r#"{"status": {"danger": true}}"#),
-            "invalid type: boolean `true`, expected a color this engine can read, or a hue"
+            refused(r##"{"status": {"info": "#0075af", "danger": [27, 1]}}"##),
+            "status.danger is not a color this engine can read, or a hue, received an array"
+        );
+        assert_eq!(
+            refused(r#"{"tokens": {"color-primary": null}}"#),
+            "tokens.color-primary is not a color this engine can read, received null"
         );
     }
 

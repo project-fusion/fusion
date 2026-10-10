@@ -50,7 +50,7 @@ if (!existsSync(join(WASM, 'fusion_helix_theme.js'))) {
       'nothing to measure. Restore it, or rebuild it with `bun run gen:wasm`, which\n' +
       'needs the `wasm32-unknown-unknown` target and the `wasm-bindgen` CLI:\n' +
       '  rustup target add wasm32-unknown-unknown\n' +
-      '  cargo install wasm-bindgen-cli --version 0.2.126 --locked',
+      '  cargo install wasm-bindgen-cli --version 0.2.127 --locked',
   )
   process.exit(1)
 }
