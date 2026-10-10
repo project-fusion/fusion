@@ -111,14 +111,19 @@ export default function Home() {
                  *                         invitation.
                  */}
                 <helix-flex data-density="sm" gap="lg" wrap>
-                  <Link data-link="quiet" href="/helix/sandbox">
+                  <Link className={styles.onward} data-link="quiet" href="/helix/sandbox">
                     Open the sandbox
+                    <helix-icon name="arrow-right"></helix-icon>
                   </Link>
-                  <Link data-link="quiet" href="/helix/theme">
+                  <Link className={styles.onward} data-link="quiet" href="/helix/theme">
                     Build a theme
+                    <helix-icon name="arrow-right"></helix-icon>
                   </Link>
-                  <XRay />
                 </helix-flex>
+                {/* **A switch, apart from the links.** It turns something on
+                    and off on this page, and set among links as one more grey
+                    phrase it read as a third place to go. */}
+                <XRay />
               </helix-flex>
             </helix-flex>
 

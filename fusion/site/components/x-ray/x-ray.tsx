@@ -114,15 +114,11 @@ export function XRay(): React.ReactElement {
 
   return (
     <>
-      <button
-        aria-pressed={on}
-        className={styles.toggle}
-        data-link="quiet"
-        onClick={() => setOn((was) => !was)}
-        type="button"
-      >
-        {on ? 'Hide the outlines' : 'Outline the Helix elements'}
-      </button>
+      <helix-switch
+        checked={on}
+        label="Outline the Helix elements"
+        onChange={(event) => setOn(event.currentTarget.checked)}
+      ></helix-switch>
 
       {/* **The count, said once for a screen reader.** The region is in the
           page from the start, empty, so filling it is an announcement:
@@ -132,7 +128,7 @@ export function XRay(): React.ReactElement {
       </span>
 
       {/* **Portaled to the body, or every fixed box lands in the wrong place.**
-          The toggle sits in a glass card, and `backdrop-filter` makes that
+          The switch sits in a glass card, and `backdrop-filter` makes that
           card the containing block of anything fixed inside it: the highlight
           drew 87px right and 61px below the element it named. */}
       {on
