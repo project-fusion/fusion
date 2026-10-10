@@ -935,6 +935,33 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
+      # **Turbopack's own cache of what `next build` compiled**, which Next.js
+      # writes to `.next/cache` and finds only where something restores it:
+      # every run here began with "No build cache found". Measured on a laptop
+      # on 10 Oct 2026, `next build` took 10.2 seconds without it and 4.0 with
+      # it, the compile 0.6, where the compile was 24 to 29 seconds on a
+      # runner.
+      #
+      # **Keyed on the lockfile and saved on `main` alone**, as the bun cache
+      # was before it went: a cache a pull request saves is that pull
+      # request's, and the repository's 10 GB was full on 10 Oct 2026. One
+      # entry per set of dependencies, about 250 MB: what it compiled from
+      # them holds for every commit that shares them, and the site's own
+      # modules that changed since are compiled again. It is written by the
+      # first run on `main` that verifies a tree itself, since a push that a
+      # pull request verified runs none of this.
+      - name: Restore the site's build cache
+        if: github.ref != 'refs/heads/main'
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: next-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          path: fusion/site/.next/cache
+      - name: Cache the site's build
+        if: github.ref == 'refs/heads/main'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: next-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          path: fusion/site/.next/cache
       # Everything but `next build` is a restore of what `warm` built.
       - name: Build the site
         run: bunx turbo run build --filter=@fusion.dev/site
