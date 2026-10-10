@@ -137,6 +137,9 @@ export const EXEMPT = [
   /* The site suite, which `verify.yml` gives a job of its own beside them. */
   'helix/cli/npm/bin.mjs visual test --config fusion/site/visual.config.ts',
   'helix/cli/npm/bin.mjs visual test --config visual.parity.config.ts',
+  /* Reads the hexes a browser paints, so it runs in the diagnostics job, which
+     `plan-browser.mjs` names it beside. A job with no browser cannot start it. */
+  'fusion/scripts/check-token-hexes.mjs',
   /* The three that compare a committed file against a fresh derivation of the
      whole corpus. What guards a generator is that its output is committed and
      read; running these from the floor would measure every family a second
