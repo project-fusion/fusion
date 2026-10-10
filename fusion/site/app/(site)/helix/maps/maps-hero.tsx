@@ -16,7 +16,6 @@ import { useEffect, useRef, useState } from 'react'
 import { ThemeTry } from '@/components/theme-try/theme-try'
 import { MAP_FAILED, MAPS } from '@/content/maps/maps'
 import { WALK } from '@/content/maps/routes'
-import { stageAppearance } from '@/content/verticals/verticals'
 import { boundsOf, clearOf } from '@/utils/map-view/map-view'
 import { loadMapLibre } from '@/utils/maplibre/maplibre'
 import type { SentTheme } from '@/utils/scope-theme/scope-theme'
@@ -380,7 +379,6 @@ export function MapsHero({
       <div className={styles.mapsIntro} ref={panel}>
         <helix-flex align-items="center" data-density="sm" gap="xs">
           <helix-tag>Helix</helix-tag>
-          <helix-tag tone={stageAppearance('Building')}>Building</helix-tag>
         </helix-flex>
         <helix-text as="h1" class={styles.mapsTitle}>
           {intro?.title}
