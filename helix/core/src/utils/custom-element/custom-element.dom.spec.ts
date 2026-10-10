@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
-import { customElement } from './custom-element.js'
+import { customElement, duplicateRegistrations } from './custom-element.js'
 
 /**
  * Registering the same tag twice, which is what Next.js does.
@@ -103,6 +103,41 @@ describe('a second, different class asking for a taken tag', () => {
     customElement('probe-same')(one)
     const said = warnings(() => {
       customElement('probe-same')(one)
+    })
+    expect(said).toHaveLength(0)
+  })
+})
+
+/**
+ * The list a reader that is not a person takes, which diagnostics reports.
+ *
+ * The copy of core that records a tag is the copy that lost it. The copy that
+ * won is the one a page's diagnostics is likely to import, and it read a set of
+ * its own that nobody wrote to. One spec process holds one copy, so the other
+ * copy here is what one writes: the set under the key every copy shares.
+ */
+describe('the tags registered twice', () => {
+  const shared = (): Set<string> => {
+    const store = globalThis as Record<symbol, unknown>
+    store[Symbol.for('fusion.dev/helix/duplicates')] ??= new Set<string>()
+    return store[Symbol.for('fusion.dev/helix/duplicates')] as Set<string>
+  }
+
+  test('are listed by every copy of core on the page, whichever copy saw them', () => {
+    customElement('probe-listed')(element())
+    warnings(() => {
+      customElement('probe-listed')(element())
+    })
+    expect([...shared()]).toContain('probe-listed')
+    shared().add('probe-elsewhere')
+    expect(duplicateRegistrations()).toContain('probe-elsewhere')
+  })
+
+  test('and a tag another copy already said is not said again', () => {
+    shared().add('probe-said')
+    customElement('probe-said')(element())
+    const said = warnings(() => {
+      customElement('probe-said')(element())
     })
     expect(said).toHaveLength(0)
   })

@@ -170,6 +170,28 @@ describe('which box gets scrolled', () => {
     expect(asked).toHaveLength(1)
   })
 
+  /* An item slotted into a component is drawn in the component's shadow root,
+     and its parent is the host. Filter Input's suggestions are its children,
+     and its panel scrolls them: a walk by parent passed the panel. happy-dom
+     assigns the slot and leaves `assignedSlot` undefined, so the item is
+     handed the slot a browser would report. */
+  test('and into the shadow root an item is slotted into', () => {
+    document.body.innerHTML = '<div id="host"><span></span></div>'
+    const host = document.getElementById('host') as HTMLElement
+    const root = host.attachShadow({ mode: 'open' })
+    root.innerHTML = '<div style="overflow-y:auto"><slot></slot></div>'
+    const scroller = root.firstElementChild as HTMLElement
+    const item = host.firstElementChild as HTMLElement
+    Object.defineProperty(item, 'assignedSlot', { value: root.querySelector('slot') })
+    const asked: unknown[] = []
+    scroller.scrollBy = ((options: unknown) => asked.push(options)) as never
+    boxed(scroller, VIEW)
+    boxed(item, { bottom: 130, left: 0, right: 50, top: 110 })
+    expect(scrollingAncestor(item)).toBe(scroller)
+    scrollItemIntoView(item)
+    expect(asked).toHaveLength(1)
+  })
+
   /* Scrolling the page is the one thing this util exists not to do, so finding
      nothing inside the component and no-opping is the honest answer. */
   test('and nothing at all when there is no scroller short of the document', () => {

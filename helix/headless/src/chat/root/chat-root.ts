@@ -261,7 +261,7 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * @csspart header - The region above the transcript.
  * @csspart history - Shown at the top of the transcript while older turns load.
  * @csspart indicator - The three dots before the words that say who is typing, which the styled tier animates as a message's are. Hidden from screen readers.
- * @csspart live - The region where screen readers announce each turn once it has arrived.
+ * @csspart live - The region where screen readers announce each turn once it has arrived. Visually hidden in the styled tier.
  * @csspart loading - Shown while the history loads.
  * @csspart log - The transcript, which scrolls. On this tier, it needs only a block size.
  * @csspart message - The message drawn for a turn from `turns`, forwarded whole.

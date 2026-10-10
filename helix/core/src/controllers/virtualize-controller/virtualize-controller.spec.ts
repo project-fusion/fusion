@@ -206,12 +206,13 @@ describe('what it asks the host to do', () => {
  */
 const CYCLE = { at378: 11_842, at379: 11_831 }
 
-const unstable = () => {
+const unstable = ({ part, tag }: { part?: string; tag?: string } = {}) => {
   let updates = 0
-  let warnings = 0
+  const said: string[] = []
   const owner = {
     addController: () => {},
     addEventListener: () => {},
+    localName: tag,
     removeController: () => {},
     requestUpdate: () => {
       updates += 1
@@ -232,6 +233,7 @@ const unstable = () => {
         get clientHeight(): number {
           return made.window.last === 378 ? CYCLE.at378 : CYCLE.at379
         },
+        getAttribute: (name: string) => (name === 'part' ? (part ?? null) : null),
         removeEventListener: () => {},
         scrollTop: 0,
       }) as unknown as HTMLElement,
@@ -239,15 +241,15 @@ const unstable = () => {
     estimate: () => 32,
   })
   const real = console.warn
-  console.warn = (): void => {
-    warnings += 1
+  console.warn = (message: string): void => {
+    said.push(message)
   }
   try {
     made.measure()
   } finally {
     console.warn = real
   }
-  return { controller: made, updates: () => updates, warnings: () => warnings }
+  return { controller: made, said, updates: () => updates, warnings: () => said.length }
 }
 
 describe('a box whose height depends on what was drawn into it', () => {
@@ -273,6 +275,18 @@ describe('a box whose height depends on what was drawn into it', () => {
   test('and says so once, naming the thing the consumer can change', () => {
     const run = unstable()
     expect(run.warnings()).toBe(1)
+  })
+
+  /* The report prints only the message, so it names what a stylesheet can
+     select: the element, and the part it scrolls in. It named the controller
+     and "the container", and a data table windows only in its `table` part. */
+  test('naming the element and the part to give a block size', () => {
+    const run = unstable({ part: 'table', tag: 'helix-data-table' })
+    expect(run.said).toEqual([
+      'The number of rows that fit in the `table` part of <helix-data-table> did not settle, ' +
+        'which usually means the part has no block size of its own. ' +
+        'Give helix-data-table::part(table) a block size and an overflow.',
+    ])
   })
 })
 

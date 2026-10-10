@@ -44,6 +44,11 @@ export interface ScrollItemOptions {
  * almost always in one and `parentElement` is null at the root. Without that
  * step, a component whose scroller is its own `[part]` would find nothing.
  *
+ * **A slotted item climbs through its slot.** Its parent is the host, and the
+ * box it is drawn and scrolled in is inside the host's shadow root: Filter
+ * Input's suggestions are its children, and its panel scrolls them. Climbing
+ * by parent passed the panel and found nothing.
+ *
  * It stops before the document. Scrolling the page is the one thing this whole
  * util exists not to do, so finding nothing inside the component and returning
  * null is the honest answer: the caller no-ops rather than taking the address
@@ -119,10 +124,11 @@ const overflows = (node: HTMLElement, axis?: 'x' | 'y'): boolean => {
   return axis === 'x' ? wide : axis === 'y' ? tall : tall || wide
 }
 
-/** Up one, through a shadow root where that is what is above. */
+/** Up one, into the slot a node is assigned to, and through a shadow root where that is what is above. */
 const climb = (node: HTMLElement): HTMLElement | null => {
-  if (node.parentElement) {
-    return node.parentElement
+  const up = node.assignedSlot ?? node.parentElement
+  if (up) {
+    return up
   }
   const root = node.getRootNode()
   return root instanceof ShadowRoot ? (root.host as HTMLElement) : null

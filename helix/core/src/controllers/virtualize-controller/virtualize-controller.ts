@@ -1046,6 +1046,15 @@ export class VirtualizeController implements ReactiveController {
    *
    * Once per controller, because a warning per frame is one people filter out
    * and this one has to be believed the day it is right.
+   *
+   * **The usual cause is a scrolling box with no height of its own.** Its
+   * `clientHeight` is then a function of the rows just drawn, so measuring
+   * moves what is being measured and the two never agree. The other is rows
+   * that report no height, such as a row drawn with `display: contents`, which
+   * is a fault in the component that draws them. The message names the
+   * element and the part the box is, which is what a consumer's stylesheet
+   * reaches: the report prints only the message, and a class name or "the
+   * container" told a reader nothing they could select.
    */
   private report(): void {
     if (this.warned) {
@@ -1053,17 +1062,19 @@ export class VirtualizeController implements ReactiveController {
     }
     this.warned = true
     const host = this.host as unknown as { localName?: unknown }
+    const tag = typeof host.localName === 'string' ? host.localName : undefined
+    const part = this.options.container()?.getAttribute('part')?.split(' ')[0]
     reportRuntime({
       kind: 'unsettled-window',
       message:
-        `VirtualizeController: the window did not settle in ${UNSTABLE} passes, so it is holding ` +
-        'the last one. That happens when the scrolling box has no height of its own: its ' +
-        '`clientHeight` is then a function of the rows just drawn, so measuring moves what is ' +
-        'being measured and the two never agree. Give the container a block size and an ' +
-        'overflow, which is what the styled tier does and what a headless consumer has to. ' +
-        'It also happens when the rows report no height, such as a row drawn with ' +
-        '`display: contents`, which is a fault in the component that draws them.',
-      tag: typeof host.localName === 'string' ? host.localName : undefined,
+        tag && part
+          ? `The number of rows that fit in the \`${part}\` part of <${tag}> did not settle, which ` +
+            'usually means the part has no block size of its own. ' +
+            `Give ${tag}::part(${part}) a block size and an overflow.`
+          : `The number of rows that fit in ${tag ? `<${tag}>` : 'a windowed list'} did not settle, ` +
+            'which usually means the box they scroll in has no block size of its own. Give that ' +
+            'box a block size and an overflow.',
+      tag,
     })
   }
 }

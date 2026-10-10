@@ -289,7 +289,9 @@ export const reorderVirtualList = (
   sheet?: CSSResult,
 ): void => {
   element.addInitializer((host) => attach(host as HelixHeadlessVirtualList, sheet))
-  if (typeof document !== 'undefined') {
+  /* Asked of the method: under Lit's global DOM shim a server has a
+     `document` with no `querySelectorAll`, and the walk threw at import. */
+  if (typeof globalThis.document?.querySelectorAll === 'function') {
     for (const list of onPage(element)) {
       attach(list, sheet)
       list.requestUpdate()

@@ -210,7 +210,7 @@ interface Heard {
  * @csspart line-text - The text of a line drawn from data.
  * @csspart line-time - The time of a line drawn from data.
  * @csspart line-warn - The row of a line drawn from data at `warn`.
- * @csspart live - The region where screen readers hear errors, finished steps, and the end of the run.
+ * @csspart live - The region where screen readers hear errors, finished steps, and the end of the run. Visually hidden in the styled tier.
  * @csspart loading - Shown while `loading` is set.
  * @csspart log - The lines, which scroll. On this tier, it needs only a block size.
  * @csspart resume - The control shown while the reader is scrolled away from the newest line.

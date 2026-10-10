@@ -1284,6 +1284,21 @@ describe('a combobox heard through VoiceOver', () => {
     })
   })
 
+  test('counts what the typing left, when the list was open before it', async () => {
+    /* Measured before this: opened with a click, typing "g" said "3 results.
+       Go" over a list showing one option. The count waits for the first option
+       said, and it was the count from the open. */
+    await onPlatform('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', async () => {
+      const host = await combobox()
+      control(host).click()
+      await settled(host)
+      expect(await said(host)).toBe('3 results')
+      await type(host, 'g')
+      await settled(host)
+      expect(await said(host)).toBe('1 result. Go')
+    })
+  })
+
   test('and draws no region elsewhere, where screen readers follow the field', async () => {
     await onPlatform('Mozilla/5.0 (Windows NT 10.0; Win64; x64)', async () => {
       const host = await combobox()

@@ -550,6 +550,7 @@ export { headingIn, headingsIn } from './utils/heading-in/heading-in.js'
 export { headingLevel } from './utils/heading-level/heading-level.js'
 export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'
 export { hostWords } from './utils/host-words/host-words.js'
+export { howToRegister, type Unregistered } from './utils/how-to-register/how-to-register.js'
 export {
   defaultButton,
   submitImplicitly,

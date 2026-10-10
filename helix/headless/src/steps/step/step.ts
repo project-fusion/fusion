@@ -68,7 +68,7 @@ import '../../button/index.js'
  * @csspart label-live - The live region inside that button, rendered only from the first time the button is pending.
  * @csspart label-spinner - The ring that button turns while it is pending.
  * @csspart label-text - The words on that button, trimmed to their capitals and baseline.
- * @csspart live - The live region that says a stage was completed, rendered from the first time one is.
+ * @csspart live - The live region that says a stage was completed, rendered from the first time one is. Visually hidden in the styled tier.
  * @csspart mark - The glyph inside the marker: a tick, a dot, or an empty ring.
  * @csspart marker - The shape carrying the number or the check.
  * @csspart state - The words that describe a finished stage's button. Hidden.

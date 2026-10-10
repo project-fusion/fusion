@@ -1,3 +1,4 @@
+import { howToRegister } from '../how-to-register/how-to-register.js'
 import { reportRuntime } from '../report-runtime/report-runtime.js'
 
 /** The container and child tags already reported, so each pair is reported once a page. */
@@ -37,6 +38,7 @@ const afterPaint = (check: () => void): void => {
  *
  * `part` is the child's tag after the tier, such as `option`, and `entry` its
  * family's entry, such as `option`; the host's `tier` gives the rest of both.
+ * On a tier of your own the report names the tag to define.
  * `consequence` says what the missing child costs, after "so". `drawn` is for
  * children the host draws from data, such as the options of Listbox's `items`:
  * the page wrote none, so an undefined tag is reported without one in the
@@ -68,10 +70,9 @@ export const auditChildren = (
       return
     }
     reported.add(key)
-    const pkg = tier === 'helix-' ? '@fusion.dev/helix' : '@fusion.dev/helix-headless'
     reportRuntime({
       kind: 'unregistered-part',
-      message: `<${tag}> in <${host.localName}> is not registered, so ${consequence}. Import '${pkg}/${entry}'.`,
+      message: `<${tag}> in <${host.localName}> is not registered, so ${consequence}. ${howToRegister({ entry, host: host.localName, tag, tier })}`,
       tag: host.localName,
     })
   }

@@ -47,9 +47,10 @@ headless manifest carries the static, so you can find it there.
 **When a component renders another component, register both.**
 
 If you register `acme-combobox` without `acme-listbox`, the panel renders a tag
-that is not defined. The browser shows no error or warning. An unregistered
-custom element is an inert, unstyled inline box, so the combobox appears not to
-open.
+that is not defined. An unregistered custom element is an inert, unstyled inline
+box, so the panel shows every option with no list around them, and typing
+filters nothing. In development, the combobox says so once in the console and
+names the tag to define.
 
 [//]: # (renders)
 
@@ -89,7 +90,8 @@ everything those families render in turn. For example, `command` reaches
 **The elements you write inside a component are yours to register as well.**
 A select renders none of the options you write in it, so `acme-select` needs
 your `acme-option` registered beside it. In development, a component holding a
-child of its tier that nobody registered says so once, with the import to add.
+child of its tier that nobody registered says so once and names the tag to
+define.
 A listbox given `items` and a filter input given a `source` draw options of
 your tier from data, and those need `acme-option` registered too.
 
@@ -115,7 +117,33 @@ acme-listbox:not(:defined) {
 }
 ```
 
-Use `visibility` so the page does not reflow when the definitions arrive.
+The rule hides each element until its definition loads, and the layout
+settles when the elements upgrade.
+
+### A rule that hides the `live` parts
+
+A `live` part is a live region. It holds words only a screen reader should
+read, such as how many options a filter left, and the headless tier draws it
+as ordinary text. Hide each one visually with a clip, which keeps it in the
+accessibility tree:
+
+```css
+acme-combobox::part(live),
+acme-combobox::part(listbox-live) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+```
+
+`display: none` and `visibility: hidden` take a region out of the
+accessibility tree as well, and a screen reader then hears nothing. A
+component forwards the `live` part of a component it renders under a name of
+its own, such as `listbox-live` on Combobox. The styled tier hides every one
+of them.
 
 ### Typings for your tags
 
@@ -202,10 +230,12 @@ findings as data. The rules check what your components document and write:
 
 ### Tree-shaking
 
-`@fusion.dev/helix-headless` declares `sideEffects: ["./dist/**/*.js"]`. The
-declaration is accurate, because the modules register elements when you import
-them. A bundler that treated them as free of side effects would drop a
-registration, and a tag would never upgrade.
+`@fusion.dev/helix-headless` declares `"sideEffects": true`, because its
+modules register elements when you import them. A bundler that treated them as
+free of side effects would drop a registration, and a tag would never upgrade.
+Import each family from its own entry, such as
+`@fusion.dev/helix-headless/combobox`, so your bundle carries only the families
+you use.
 
 ### Documented parts
 

@@ -252,7 +252,9 @@ export const reorderListbox = (
   listSheet?: CSSResult,
 ): void => {
   element.addInitializer((host) => attach(host as HelixHeadlessListbox, sheet, listSheet))
-  if (typeof document !== 'undefined') {
+  /* Asked of the method: under Lit's global DOM shim a server has a
+     `document` with no `querySelectorAll`, and the walk threw at import. */
+  if (typeof globalThis.document?.querySelectorAll === 'function') {
     for (const list of onPage(element)) {
       attach(list, sheet, listSheet)
       list.requestUpdate()

@@ -129,7 +129,7 @@ type Player = HTMLElement & {
  *
  * @csspart empty - The box that holds the `empty` slot, drawn while there are no entries.
  * @csspart items - The list of entries.
- * @csspart live - A live region that says which entry plays after the playlist moves.
+ * @csspart live - A live region that says which entry plays after the playlist moves. Visually hidden in the styled tier.
  * @csspart player - The region that holds the player.
  *
  * @cssstate ended - The last entry finished and the playlist stopped there, until an entry plays again.

@@ -29,7 +29,7 @@ describe('a filter field whose suggestions were never imported', () => {
   /* A tier of its own, so its option is one no other spec in the process
      registered. Measured before this: the suggestions were inert, the field
      had no combobox role, and nothing was said. */
-  test('is reported once, with the import to add', async () => {
+  test('is reported once, with the tag to define', async () => {
     const { HelixHeadlessFilterInput } = await import('../index.js')
     customElements.define(
       'spec-sugg-filter-input',
@@ -41,7 +41,7 @@ describe('a filter field whose suggestions were never imported', () => {
       <spec-sugg-option slot="suggestions" value="status:">status:</spec-sugg-option>
     </spec-sugg-filter-input>`
     expect((await told(markup)).map((one) => one.message)).toEqual([
-      "<spec-sugg-option> in <spec-sugg-filter-input> is not registered, so the field suggests nothing. Import '@fusion.dev/helix-headless/option'.",
+      '<spec-sugg-option> in <spec-sugg-filter-input> is not registered, so the field suggests nothing. Define <spec-sugg-option> as you defined <spec-sugg-filter-input>.',
     ])
     expect(await told(markup)).toEqual([])
   })
@@ -54,5 +54,38 @@ describe('a filter field whose suggestions were never imported', () => {
     expect(heard).toEqual([])
     const host = document.body.firstElementChild as HTMLElement
     expect(part(host, 'control')?.getAttribute('role')).toBe('combobox')
+  })
+})
+
+/* The options `source` gives are the field's tier's Option, which the page
+   registers. On a tier of your own the report named an import of ours, which
+   cannot register `spec-src-option`. */
+describe('a filter field whose source draws options nobody registered', () => {
+  test('is reported with the tag to define', async () => {
+    const { HelixHeadlessFilterInput } = await import('../index.js')
+    customElements.define(
+      'spec-src-filter-input',
+      class extends HelixHeadlessFilterInput {
+        static override tier = 'spec-src-'
+      },
+    )
+    await told('<spec-src-filter-input label="Filter"></spec-src-filter-input>')
+    const host = document.body.firstElementChild as Updatable & {
+      source: () => readonly string[]
+    }
+    host.source = () => ['status:']
+    await settle(host)
+    const key = Symbol.for('fusion.dev/helix/runtime-log')
+    const before = ((globalThis as Record<symbol, unknown>)[key] as Report[]).length
+    const control = part(host as unknown as HTMLElement, 'control') as HTMLInputElement
+    control.focus()
+    control.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
+    await settle(host)
+    const heard = ((globalThis as Record<symbol, unknown>)[key] as Report[])
+      .slice(before)
+      .filter((one) => one.kind === 'unregistered-part')
+    expect(heard.map((one) => one.message)).toEqual([
+      '<spec-src-option> is not registered, so the suggestions `source` gave cannot be chosen. Define <spec-src-option> as you defined <spec-src-filter-input>.',
+    ])
   })
 })

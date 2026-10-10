@@ -347,8 +347,16 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   @state()
   private footed = false
 
+  /**
+   * The list, once it has upgraded. A tier of your own that never registered
+   * its listbox renders an unknown element here, with none of the list's
+   * methods, and calling one threw on every keystroke. Asked of a method,
+   * which happy-dom answers as a browser does, where it matches no element
+   * to `:defined`.
+   */
   private get listbox(): HelixHeadlessListbox | null {
-    return this.partNamed<HelixHeadlessListbox>('listbox')
+    const list = this.partNamed<HelixHeadlessListbox>('listbox')
+    return list && 'requestFilter' in list ? list : null
   }
 
   /**
@@ -557,6 +565,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   override connectedCallback(): void {
     super.connectedCallback()
     auditChildren(this, 'option', 'option', 'the palette lists no commands')
+    auditChildren(this, 'listbox', 'listbox', 'the palette has no working list', true)
     this.addEventListener('helix-select', this.swallowOptionSelect)
     /* Capture, so both reach this before the listbox and the row do. */
     this.addEventListener('keydown', this.handleAlternate, { capture: true })

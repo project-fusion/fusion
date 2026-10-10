@@ -11,6 +11,7 @@ import {
   HelixFacetEvent,
   HelixFormElement,
   holdCaret,
+  howToRegister,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -257,7 +258,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @csspart hint - The help text under the field, shown while there is no error.
  * @csspart label - The label above the field.
  * @csspart lead - The box before the text that holds the `start` slot.
- * @csspart live - The live region that says how many suggestions the open panel offers. It is rendered from the first time the panel opens with suggestions.
+ * @csspart live - The live region that says how many suggestions the open panel offers. It is rendered from the first time the panel opens with suggestions. Visually hidden in the styled tier.
  * @csspart loading - Shown in the panel while the suggestions load: while `loading` is set, or a request to `source` is out.
  * @csspart rest - The count of tokens that did not fit. It is a `<button>` with `expandable` and a `<span>` without it.
  * @csspart surface - The floating panel the suggestions sit in.
@@ -1049,14 +1050,12 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     for (const option of this.sourced) {
       option.remove()
     }
-    const tag = `${(this.constructor as typeof HelixFormElement).tier}option`
+    const { tier } = this.constructor as typeof HelixFormElement
+    const tag = `${tier}option`
     if (suggestions.length > 0 && !customElements.get(tag)) {
-      const entry = tag.startsWith('helix-headless-')
-        ? '@fusion.dev/helix-headless'
-        : '@fusion.dev/helix'
       reportRuntime({
         kind: 'unregistered-part',
-        message: `<${tag}> is not registered, so the suggestions \`source\` gave cannot be chosen. Import '${entry}/option'.`,
+        message: `<${tag}> is not registered, so the suggestions \`source\` gave cannot be chosen. ${howToRegister({ entry: 'option', host: this.localName, tag, tier })}`,
         tag: this.localName,
       })
     }
@@ -1432,10 +1431,9 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     const tag = `${tier}filter-menu`
     const check = (): void => {
       if (this.isConnected && this.querySelector(tag) && !customElements.get(tag)) {
-        const entry = tier === 'helix-' ? '@fusion.dev/helix' : '@fusion.dev/helix-headless'
         reportRuntime({
           kind: 'unregistered-part',
-          message: `<${tag}> in <${this.localName}> is not registered, so its trigger opens nothing. Import '${entry}/filter-input/menu'.`,
+          message: `<${tag}> in <${this.localName}> is not registered, so its trigger opens nothing. ${howToRegister({ entry: 'filter-input/menu', host: this.localName, tag, tier })}`,
           tag: this.localName,
         })
       }

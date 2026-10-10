@@ -28,7 +28,7 @@ const told = async (markup: string): Promise<Report[]> => {
 describe('a select whose options were never imported', () => {
   /* A tier of its own, with the list the select draws, so its option is one no
      other spec in the process registered. */
-  test('is reported once, with the import to add', async () => {
+  test('is reported once, with the tag to define', async () => {
     const { HelixHeadlessSelect } = await import('../index.js')
     const { HelixHeadlessListbox } = await import('../../listbox/index.js')
     customElements.define(
@@ -48,7 +48,7 @@ describe('a select whose options were never imported', () => {
       <spec-alone-option value="m">Medium</spec-alone-option>
     </spec-alone-select>`
     expect((await told(markup)).map((one) => one.message)).toEqual([
-      "<spec-alone-option> in <spec-alone-select> is not registered, so it offers no choices. Import '@fusion.dev/helix-headless/option'.",
+      '<spec-alone-option> in <spec-alone-select> is not registered, so it offers no choices. Define <spec-alone-option> as you defined <spec-alone-select>.',
     ])
     expect(await told(markup)).toEqual([])
   })
@@ -62,5 +62,40 @@ describe('a select whose options were never imported', () => {
     expect(heard).toEqual([])
     const host = document.body.firstElementChild as HTMLElement
     expect(part(host, 'value')?.textContent?.trim()).toBe('Medium')
+  })
+})
+
+/* A tier of your own registers the list the select draws, as it registers the
+   select. Left out, the list is an unknown element with none of the list's
+   methods: a letter on the trigger and the opening each threw calling one. */
+describe('a select whose list was never registered', () => {
+  test('throws nothing as you type and open it, and names the tag to define', async () => {
+    const { HelixHeadlessSelect } = await import('../index.js')
+    customElements.define(
+      'spec-bare-sel-select',
+      class extends HelixHeadlessSelect {
+        static override tier = 'spec-bare-sel-'
+      },
+    )
+    const thrown: unknown[] = []
+    const hear = (event: ErrorEvent): void => {
+      thrown.push(event.error ?? event.message)
+    }
+    window.addEventListener('error', hear)
+    try {
+      const heard = await told('<spec-bare-sel-select label="Size"></spec-bare-sel-select>')
+      const host = document.body.firstElementChild as Updatable & { open: boolean }
+      part(host as unknown as HTMLElement, 'trigger')?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key: 'm' }),
+      )
+      host.open = true
+      await settle(host)
+      expect(thrown).toEqual([])
+      expect(heard.map((one) => one.message)).toEqual([
+        '<spec-bare-sel-listbox> in <spec-bare-sel-select> is not registered, so its panel has no working list. Define <spec-bare-sel-listbox> as you defined <spec-bare-sel-select>.',
+      ])
+    } finally {
+      window.removeEventListener('error', hear)
+    }
   })
 })

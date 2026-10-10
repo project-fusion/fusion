@@ -73,7 +73,9 @@ export const registerHighlighter = (
   sheet?: CSSResult,
 ): void => {
   registered = highlighter ? { highlighter, sheet } : undefined
-  if (typeof document !== 'undefined') {
+  /* Asked of the method: under Lit's global DOM shim a server has a
+     `document` with no `querySelectorAll`, and the walk threw at import. */
+  if (typeof globalThis.document?.querySelectorAll === 'function') {
     for (const block of blocksOnPage()) {
       adoptRegistered(block)
       block.requestUpdate()

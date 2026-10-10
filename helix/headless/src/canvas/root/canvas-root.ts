@@ -378,7 +378,7 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @csspart header - The strip above the board.
  * @csspart label - The label on a connector.
  * @csspart label-editor - The field for editing a connection's label or a group's name, placed over that text.
- * @csspart live - A live region that screen readers announce while a connection is being made.
+ * @csspart live - A live region that screen readers announce while a connection is being made. Visually hidden in the styled tier.
  * @csspart marquee - The box a Shift-drag across the empty board draws, which selects the cards it touches.
  * @csspart minimap - The picture of the whole board, under `controls="minimap"`.
  * @csspart minimap-node - One card in the minimap.

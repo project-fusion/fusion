@@ -361,9 +361,16 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
    * The other reads of `renderRoot` here are inside callbacks the controllers
    * invoke, and a controller only runs on a connected element, so they cannot
    * be reached from the server and are left plain.
+   *
+   * Only once the list has upgraded. A tier of your own that never registered
+   * its listbox renders an unknown element here, with none of the list's
+   * methods, and calling one threw on each key. Asked of a method, which
+   * happy-dom answers as a browser does, where it matches no element to
+   * `:defined`.
    */
   private get listbox(): HelixHeadlessListbox | null {
-    return this.partNamed<HelixHeadlessListbox>('listbox')
+    const list = this.partNamed<HelixHeadlessListbox>('listbox')
+    return list && 'requestFilter' in list ? list : null
   }
 
   /**
@@ -558,6 +565,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   override connectedCallback(): void {
     super.connectedCallback()
     auditChildren(this, 'option', 'option', 'it offers no choices')
+    auditChildren(this, 'listbox', 'listbox', 'its panel has no working list', true)
     this.addEventListener('helix-select', this.handleLinkFollowed)
     const words = new MutationObserver(() => this.requestUpdate())
     words.observe(this, {

@@ -70,7 +70,7 @@ import '../../tooltip/index.js'
  * @event {HelixCopyErrorEvent} helix-copy-error - Fired when a press put nothing on the clipboard: the browser did not allow the write, or there was nothing to copy.
  *
  * @csspart button - The inner button.
- * @csspart live - The live region that says `copied-label` or `error-label` after a press, and `pending-label` when the button becomes pending under focus. It is rendered from the first time it says anything.
+ * @csspart live - The live region that says `copied-label` or `error-label` after a press, and `pending-label` when the button becomes pending under focus. It is rendered from the first time it says anything. Visually hidden in the styled tier.
  * @csspart mark - The clipboard icon, and the confirmation icon that replaces it.
  * @csspart spinner - The ring a pending button turns, an empty element the styled button draws over the icon. It is rendered only while the button is pending.
  * @csspart text - The words beside the icon, under `show-label`. It holds all three, `label`, `copied-label` and `error-label`, with all but the current one hidden.

@@ -28,7 +28,7 @@ const told = async (markup: string): Promise<Report[]> => {
 describe('a data table whose columns were never imported', () => {
   /* A tier of its own, so its column is one no other spec in the
      process registered. */
-  test('is reported once, with the import to add', async () => {
+  test('is reported once, with the tag to define', async () => {
     const { HelixHeadlessDataTable } = await import('../index.js')
     customElements.define(
       'spec-grid-data-table',
@@ -40,7 +40,7 @@ describe('a data table whose columns were never imported', () => {
       <spec-grid-table-column field="name">Name</spec-grid-table-column>
     </spec-grid-data-table>`
     expect((await told(markup)).map((one) => one.message)).toEqual([
-      "<spec-grid-table-column> in <spec-grid-data-table> is not registered, so the table draws no columns. Import '@fusion.dev/helix-headless/table'.",
+      '<spec-grid-table-column> in <spec-grid-data-table> is not registered, so the table draws no columns. Define <spec-grid-table-column> as you defined <spec-grid-data-table>.',
     ])
     expect(await told(markup)).toEqual([])
   })

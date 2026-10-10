@@ -329,7 +329,9 @@ export const filterMenu = (element: typeof HelixHeadlessMenu, sheet?: CSSResult)
     new MenuFilterController(menu, sheet)
   }
   element.addInitializer((host) => attach(host as HelixHeadlessMenu))
-  if (typeof document !== 'undefined') {
+  /* Asked of the method: under Lit's global DOM shim a server has a
+     `document` with no `querySelectorAll`, and the walk threw at import. */
+  if (typeof globalThis.document?.querySelectorAll === 'function') {
     for (const menu of onPage(element)) {
       attach(menu)
       menu.requestUpdate()
