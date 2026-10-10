@@ -138,6 +138,9 @@ if (problems.length > 0) {
 /* **The number reported is the number floored, not the number listed**, which
    is the rule this file exists to impose, applied to its own success line. They
    were the same figure until a command failed to spawn and was counted anyway. */
+const shards = checks.length - here.length
 console.log(
-  `floors: ${counted} checks run, every one of them counted something, and ${checks.length - here.length} left to the shards`,
+  here.length === 0
+    ? `floors: the shards floor all ${shards} commands \`check\` reaches that a floor reads`
+    : `floors: ${counted} checks run, every one of them counted something, and the shards floor ${shards}`,
 )
