@@ -126,10 +126,12 @@ helix-headless-date-picker::part(day):hover {
   background-color: var(--_gray-subtle);
 }
 
+/* The muted ink and not the mark's: a day outside the month is still a number
+   a reader reads, and the mark's gray measured 3.25:1 on white. */
 helix-headless-date-picker::part(day-outside),
 helix-headless-date-picker::part(day-outside):hover {
   background-color: transparent;
-  color: var(--_gray-mark);
+  color: var(--_gray-muted);
 }
 
 helix-headless-date-picker::part(day-disabled),

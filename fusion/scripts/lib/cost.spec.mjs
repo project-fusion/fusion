@@ -20,11 +20,11 @@ describe('the measured cost', () => {
      weighing nothing, which would land it wherever the tie broke and leave its
      shard short of the work it was sized for. */
   test('a family the measurement never saw is worth what it renders', () => {
-    expect(costOf('contrast', () => 4)('nothing-here')).toBeCloseTo(4 * ESTIMATE.contrast.per, 6)
+    expect(costOf('parity', () => 4)('nothing-here')).toBeCloseTo(4 * ESTIMATE.parity.per, 6)
   })
 
   test('what a check costs over no family is its fixed part', () => {
     expect(costOver('specs', () => 0, [])).toBe(ESTIMATE.specs.fixed)
-    expect(costOver('contrast', () => 0, [])).toBe(0)
+    expect(costOver('parity', () => 0, [])).toBe(0)
   })
 })
