@@ -25,10 +25,9 @@ export const metadata = pageMetadata({
 /**
  * How the grid may be ordered, and what each one compares.
  *
- * Every family reports `@since 0.1.0` today, so `newest` puts all sixty-five in
- * one tie and the name is what actually decides. It is here because it starts
- * working the day a second version exists, and because a tie-break by name is a
- * defined order rather than whatever the manifest happened to emit.
+ * `newest` compares each family's `@since`. Most families share the first
+ * version, so the name breaks the tie among them, which makes the order defined
+ * whatever order the manifest emits them in.
  */
 const SORTS: Record<string, (a: Family, b: Family) => number> = {
   category: (a, b) => a.category.localeCompare(b.category) || a.label.localeCompare(b.label),
@@ -111,20 +110,17 @@ export default async function Page({
                 <helix-text as="h3" variant="title">
                   {family.label}
                 </helix-text>
-                {/* A mark rather than a word. Every component in this list is
-                      experimental, so a tag on each of them is a column of
-                      identical yellow labels that says nothing by being
-                      everywhere, and it competes with the name it sits beside.
-                      The icon carries its own accessible name, so a reader who
-                      cannot see it is told the same thing a pointer user gets
-                      from the tooltip. Same mark and same words as the
+                {/* An icon for the stage, beside the name. A worded tag
+                      competes with the name for the reader's eye, and a small
+                      mark keeps the name first. The icon carries its own
+                      accessible name, so a screen reader announces the same
+                      thing the tooltip shows. Same mark and same words as the
                       sandbox's own tree. */}
                 {family.status === 'experimental' && (
                   <helix-tooltip content="Experimental. The API can change." placement="top">
-                    {/* Neutral. Warning read as a fault rather than a stage,
-                          and the tooltip is what says which stage it is. A card
-                          in a list of fifty-four experimental components is not
-                          reporting a problem. */}
+                    {/* Neutral. The warning tone read as a fault, and an
+                          experimental component is at a stage. The tooltip
+                          names the stage. */}
                     <helix-tag className={styles.statusMark}>
                       <helix-icon label="Experimental" name="flask"></helix-icon>
                     </helix-tag>
