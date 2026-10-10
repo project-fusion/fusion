@@ -134,7 +134,7 @@ interface Heard {
  * import '@fusion.dev/helix/log'
  * ```
  *
- * @since 0.199.0
+ * @since 0.200.0
  * @status experimental
  * @category feedback
  * @aliases Console, Terminal output, Build log, Deploy log, Log viewer, Output

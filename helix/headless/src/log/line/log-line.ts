@@ -47,7 +47,7 @@ const elapsed = (seconds: number): string => {
  * `error` lines apart. The text is the line's own content, so you can mark it
  * up yourself.
  *
- * @since 0.199.0
+ * @since 0.200.0
  * @status experimental
  * @documentation https://fusion.dev/helix/components/log
  *

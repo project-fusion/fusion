@@ -12,7 +12,7 @@ import { styles } from './log-group.css.js'
  * takes the success color, one that `failed` the danger color, and one that
  * is `running` the info color.
  *
- * @since 0.199.0
+ * @since 0.200.0
  * @status experimental
  * @documentation https://fusion.dev/helix/components/log
  */
