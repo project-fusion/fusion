@@ -21,7 +21,7 @@ export function CortexStrands({ className }: { className: string }) {
       travel
     >
       <helix-strands-stop at={0.9} for="cortex-modules" variant="sweep"></helix-strands-stop>
-      <helix-strands-stop for="trace" variant="waves"></helix-strands-stop>
+      <helix-strands-stop for="trace-card" variant="waves"></helix-strands-stop>
       <helix-strands-stop for="close" variant="waves"></helix-strands-stop>
     </helix-strands>
   )
