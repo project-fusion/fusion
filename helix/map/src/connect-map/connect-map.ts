@@ -11,7 +11,7 @@ import {
   type ViewportZoomDetail,
   watchTheme,
 } from '@fusion.dev/helix-core'
-import { creditParts } from '../credit/credit.js'
+import { CREDIT, creditParts } from '../credit/credit.js'
 import { type MapMotion, motionOf } from '../motion/motion.js'
 import { type MapPoints, pointsFrom } from '../points/points.js'
 import { colorsNow, settledColor } from '../style/map-colors.js'
@@ -649,7 +649,9 @@ const idOf = (element: Element): string => {
 export interface ConnectOptions {
   /**
    * Whether the renderer's credit fills the frame's `attribution` slot. On by
-   * default, and left alone either way where the page slotted its own.
+   * default, and left alone either way where the page slotted its own. A
+   * snapshot's credit stays until the renderer's is written, and stays for
+   * good with `false`.
    */
   credit?: boolean | undefined
   /**
@@ -685,9 +687,6 @@ export interface MapConnection {
   fit(options?: { animate?: boolean | undefined; padding?: MapPadding | undefined }): void
 }
 
-/** Where the connector writes the renderer's credit, so it can find its own. */
-const CREDIT = 'data-helix-map-credit'
-
 /** The box the map is drawn in, which a pan is a fraction of. */
 const viewportOf = (frame: HTMLElement): { width: number; height: number } => {
   const box = (
@@ -708,7 +707,8 @@ const viewportOf = (frame: HTMLElement): { width: number; height: number } => {
  * the frame draws its own; the frame's markers stood on their places as the
  * view moves, and brought into view as the keyboard reaches them; and the
  * renderer's credit written into the frame's
- * `attribution` slot as text and links, kept current as its sources change.
+ * `attribution` slot as text and links, kept current as its sources change,
+ * in place of a snapshot's.
  *
  * The frame is `helix-map` or `helix-headless-map`, and the driver is
  * `mapLibreDriver`, `leafletDriver` or one of the page's own.
@@ -864,6 +864,25 @@ export const connectMap = (
   const owned = [...frame.children].some(
     (child) => child.getAttribute('slot') === 'attribution' && !child.hasAttribute(CREDIT),
   )
+  /* **A snapshot's credit stands until the renderer's is written**, so the
+     frame credits the map from the first paint, and steps aside at once for
+     the page's own. Hidden rather than removed, as the snapshot is, since
+     the page's framework may own it. */
+  const served = [...frame.children].filter(
+    (child): child is HTMLElement =>
+      child instanceof HTMLElement &&
+      child.getAttribute('slot') === 'attribution' &&
+      child.hasAttribute(CREDIT),
+  )
+  const stepAside = (): void => {
+    for (const one of served) {
+      one.hidden = true
+      one.style.display = 'none'
+    }
+  }
+  if (owned) {
+    stepAside()
+  }
   let credit: HTMLElement | undefined
   let listening: { read(): string[]; stop(): void } | undefined
   /* **What the credit last said, so saying it again writes nothing.** A
@@ -918,8 +937,11 @@ export const connectMap = (
        over it, and `hidden` loses to the strip's own `display`. */
     if (nodes.length === 0) {
       credit.remove()
-    } else if (credit.parentNode !== frame) {
-      frame.append(credit)
+    } else {
+      stepAside()
+      if (credit.parentNode !== frame) {
+        frame.append(credit)
+      }
     }
   }
   if (options.credit !== false && !owned && driver.credits) {

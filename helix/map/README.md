@@ -56,7 +56,7 @@ servers: from your reader's browser for the map, and from your server for
 | `@fusion.dev/helix-map` | `connectMap`, `colorsReady`, `mapColorsFrom`, `mapFontFrom`, `fontReady`, `watchTheme`, `motionOf`, `distancesAlong`, `pointsFrom`, and the `MapDriver` type |
 | `@fusion.dev/helix-map/maplibre` | `mapLibreDriver(map)`, `mapLibreStyle(colors, options)`, `followTheme(map, element, style)` |
 | `@fusion.dev/helix-map/leaflet` | `leafletDriver(map, L)` |
-| `@fusion.dev/helix-map/snapshot` | `mapSnapshot(view, options)`, an SVG of the map drawn on your server to paint before the renderer loads |
+| `@fusion.dev/helix-map/snapshot` | `mapSnapshot(view, options)`, an SVG of the map drawn on your server to paint before the renderer loads, with the credit its tiles name |
 
 **Neither renderer is a dependency.** A driver types the map it takes by the
 calls it makes on it, so a page brings whichever version it has. A spec holds

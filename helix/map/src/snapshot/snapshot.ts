@@ -1,5 +1,6 @@
 import { VectorTile } from '@mapbox/vector-tile'
 import { PbfReader } from 'pbf'
+import { type CreditPart, creditMarkup, creditParts } from '../credit/credit.js'
 import { cameraOf, type MapView, type ScreenPoint } from './camera.js'
 
 /** The token a snapshot layer's color is the land moved toward. */
@@ -234,6 +235,28 @@ export interface SnapshotOptions {
   tiles?: string | undefined
 }
 
+/** A map drawn on the server, and the credit its tiles ask for. */
+export interface MapSnapshot {
+  /**
+   * The tiles' credit, read from their TileJSON's `attribution`, as runs of
+   * words and links: for a framework that writes `picture` in an element of
+   * its own, and the credit in a `<span slot="attribution">` with
+   * `data-helix-map-credit`. Empty where the tiles name none.
+   */
+  credit: CreditPart[]
+  /**
+   * The picture, then the credit in the frame's `attribution` slot, as markup
+   * to write in the frame after the element the renderer draws in. An empty
+   * string where the snapshot could not be drawn.
+   */
+  markup: string
+  /** The picture alone, as markup. An empty string where it could not be drawn. */
+  picture: string
+}
+
+/** What a snapshot that could not be drawn holds, made afresh so no caller shares it. */
+const nothing = (): MapSnapshot => ({ credit: [], markup: '', picture: '' })
+
 /** OpenFreeMap's TileJSON, which `mapLibreStyle` reads by default. */
 const OPENFREEMAP = 'https://tiles.openfreemap.org/planet'
 
@@ -261,17 +284,25 @@ const MARGIN = 16
  * toward a token in OKLab, so it is drawn in whichever theme the page is in,
  * light or dark, and changes with it.
  *
- * **Whole or nothing.** Resolves to an empty string where any tile the view
- * needs cannot be read in time, or the view is not numbers, which a page
- * renders as nothing and the renderer then draws. A snapshot with a tile
- * missing looks finished and is not, and one that waited on a slow server
- * held the page: each request is given `timeout` milliseconds. A tile the
- * server says it does not have, a 404, is drawn empty, as the sea is.
+ * **Credited from the first paint.** Most tile licenses require the credit
+ * wherever the map is shown, and a frame showing the snapshot while the
+ * renderer loads, or a page that never loads one, has no renderer's credit.
+ * So the snapshot carries the credit the tiles' TileJSON names, and `markup`
+ * writes it in the frame's `attribution` slot, marked as Helix's:
+ * `connectMap` hides it once the renderer's credit is written, or at once
+ * where the page slotted its own.
+ *
+ * **Whole or nothing.** Holds empty strings where any tile the view needs
+ * cannot be read in time, or the view is not numbers, which a page renders
+ * as nothing and the renderer then draws. A snapshot with a tile missing
+ * looks finished and is not, and one that waited on a slow server held the
+ * page: each request is given `timeout` milliseconds. A tile the server says
+ * it does not have, a 404, is drawn empty, as the sea is.
  */
 export const mapSnapshot = async (
   asked: MapView,
   options: SnapshotOptions = {},
-): Promise<string> => {
+): Promise<MapSnapshot> => {
   /* **Numbers, and only numbers, reach the markup.** A page building the view
      from a request's query would otherwise write whatever it was sent into
      the SVG's attributes. */
@@ -289,7 +320,7 @@ export const mapSnapshot = async (
     ) ||
     !(view.width > 0 && view.height > 0)
   ) {
-    return ''
+    return nothing()
   }
   const wait = options.timeout ?? 3000
   /* Raced against the clock as well as told to stop, so a fetch of the
@@ -312,8 +343,10 @@ export const mapSnapshot = async (
     .catch(() => undefined)
   const template = (tiles as { tiles?: string[] } | undefined)?.tiles?.[0]
   if (!template) {
-    return ''
+    return nothing()
   }
+  const attribution = (tiles as { attribution?: unknown }).attribution
+  const credit = typeof attribution === 'string' ? creditParts([attribution]) : []
   const deepest = (tiles as { maxzoom?: number }).maxzoom ?? 14
   const camera = cameraOf(view)
   const corners: ScreenPoint[] = [
@@ -468,7 +501,7 @@ export const mapSnapshot = async (
   }
 
   if (!whole) {
-    return ''
+    return nothing()
   }
   const body = shown
     .map((layer) => {
@@ -492,9 +525,9 @@ export const mapSnapshot = async (
           ).toFixed(2)}px;stroke-linecap:round;stroke-linejoin:round" d="${paths.join('')}"/>`
     })
     .join('')
-  return (
+  const picture =
     `<div aria-hidden="true" data-helix-map-snapshot style="inset:0;overflow:hidden;pointer-events:none;position:absolute">` +
     `<svg height="${view.height}" viewBox="0 0 ${view.width} ${view.height}" width="${view.width}" xmlns="http://www.w3.org/2000/svg" style="background:var(${TOKENS.surface});left:50%;position:absolute;top:50%;translate:-50% -50%">` +
     `${body}</svg></div>`
-  )
+  return { credit, markup: picture + creditMarkup(credit), picture }
 }
