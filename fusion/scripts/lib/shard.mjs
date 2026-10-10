@@ -33,8 +33,8 @@
  *
  * **Counted from 0 on the command line and from 1 in what a run prints.** The
  * argument counts as `run-checks.mjs --shard` does. The printed form never
- * carries a bare 0, because `check-floors.mjs` reads a zero in a success line as
- * a check that tested nothing, and "shard 0 of 4" would be read that way the day
+ * carries a bare 0, because the floor in `checks.mjs` reads a zero in a success
+ * line as a check that tested nothing, and "shard 0 of 4" would be read that way the day
  * a check here stopped being exempt from it.
  */
 import { argument } from './argv.mjs'

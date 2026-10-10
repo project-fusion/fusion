@@ -21,6 +21,13 @@ first time somebody edited one of them.
 it stops at the first failure; a shard runs every check it owns and reports them
 together.
 
+**A shard floors what it runs.** Each check runs command by command, and a
+command's success line with a zero in it fails the shard: a check that passed
+while counting nothing. The `floors` job keeps the structural half, a walk of
+`check` that reaches nothing and an exemption that matches nothing, and runs
+only what `check` reaches and no shard runs. It used to run every check a second
+time to read the same lines, and it was the last job to finish.
+
 `verify` never writes: `biome ci` rather than `biome check --write`, and every
 shard ends by asserting the tree is unchanged.
 
