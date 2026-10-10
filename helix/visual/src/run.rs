@@ -1107,6 +1107,11 @@ pub fn run(options: &Options) -> Outcome<Code> {
     let mut attributions: BTreeMap<(usize, usize), Vec<String>> = BTreeMap::new();
     let files = manifests(&config, &base);
     let mut again: Vec<(usize, usize)> = Vec::new();
+    /* **The first take of a shot taken again**, kept so a shot that matches on
+       the second still shows what moved on the first: what makes it settle is
+       read off that picture, and nothing else records it. */
+    let mut firsts: BTreeMap<(usize, usize), Vec<u8>> = BTreeMap::new();
+    let mut first_diffs: BTreeMap<(usize, usize), Vec<u8>> = BTreeMap::new();
     for (at, entry) in mine
         .iter()
         .enumerate()
@@ -1137,7 +1142,10 @@ pub fn run(options: &Options) -> Outcome<Code> {
                 Err(why) => {
                     results.insert((at, shot), Fate::Broken(why));
                 }
-                Ok(Verdict::Differs(_) | Verdict::Resized { .. }) => again.push((at, shot)),
+                Ok(Verdict::Differs(_) | Verdict::Resized { .. }) => {
+                    firsts.insert((at, shot), bytes.clone());
+                    again.push((at, shot));
+                }
                 Ok(verdict) => {
                     if verdict == Verdict::Missing && !options.update {
                         currents.insert((at, shot), bytes.clone());
@@ -1255,7 +1263,27 @@ pub fn run(options: &Options) -> Outcome<Code> {
                                 Fate::Held
                             }
                         }
-                        Ok(Verdict::Matched | Verdict::Within(_)) => Fate::Steadied,
+                        Ok(Verdict::Matched | Verdict::Within(_)) => {
+                            /* The first take in the report, beside the baseline
+                               and marked where it differed, when the two are one
+                               size. */
+                            if let (Some(kept), Some(taken)) =
+                                (existing.as_deref(), firsts.get(&(at, shot)))
+                            {
+                                if let (Ok(before), Ok(after)) =
+                                    (image::decode(kept), image::decode(taken))
+                                {
+                                    if (before.width, before.height) == (after.width, after.height) {
+                                        let (_, drawn) = diff::marked(&before, &after, diff.threshold);
+                                        if let Ok(encoded) = image::encode(&drawn) {
+                                            first_diffs.insert((at, shot), encoded);
+                                        }
+                                    }
+                                }
+                                currents.insert((at, shot), taken.clone());
+                            }
+                            Fate::Steadied
+                        }
                         Ok(_) if options.update => {
                             write(&baseline, bytes)?;
                             Fate::Written("it differs")
@@ -1430,11 +1458,19 @@ pub fn run(options: &Options) -> Outcome<Code> {
                 attribution: attributions.get(&(at, shot)).map_or(&[], Vec::as_slice),
                 baseline: report::Picture::File(Some(baseline.clone())),
                 current: currents.get(&(at, shot)).map(Vec::as_slice),
-                diff: report::Picture::File(matches!(fate, Fate::Differs { .. }).then_some(marked)),
+                diff: if matches!(fate, Fate::Steadied) {
+                    report::Picture::Bytes(first_diffs.get(&(at, shot)).map(Vec::as_slice))
+                } else {
+                    report::Picture::File(matches!(fate, Fate::Differs { .. }).then_some(marked))
+                },
                 entry: &mine[at].id,
                 fate,
                 keep: Some(baseline),
-                labels: ["Baseline", "Capture"],
+                labels: if matches!(fate, Fate::Steadied) {
+                    ["Baseline", "First take"]
+                } else {
+                    ["Baseline", "Capture"]
+                },
                 pair: false,
                 shot: &config.shots[shot].name,
                 snapshot: None,

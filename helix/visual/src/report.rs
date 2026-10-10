@@ -431,6 +431,12 @@ pub fn stopped(update: bool, failed: bool, verdict: &str) -> Code {
 
 /// What `run.json` holds, and what `--json` prints: each shot with its
 /// result, and the verdict.
+/// Whether a row's pictures go in the report: a shot that failed, and one that
+/// matched only on its second take, whose first take shows what moved.
+fn pictured(row: &Row) -> bool {
+    row.fate.fails() || matches!(row.fate, Fate::Steadied)
+}
+
 fn record(run: &Run, verdict: &str, failed: bool) -> Value {
     let rows: Vec<Value> = run
         .rows
@@ -449,7 +455,7 @@ fn record(run: &Run, verdict: &str, failed: bool) -> Value {
             if !row.attribution.is_empty() {
                 record["attribution"] = json!(row.attribution);
             }
-            if row.fate.fails() {
+            if pictured(row) {
                 if row.baseline.present() {
                     record["baseline"] = json!(format!("shots/{at}-baseline.png"));
                 }
@@ -495,7 +501,7 @@ fn write(run: &Run, record: &Value) -> std::io::Result<()> {
     let pictures = run.dir.join("shots");
     fs::create_dir_all(&pictures)?;
     for (at, row) in run.rows.iter().enumerate() {
-        if !row.fate.fails() {
+        if !pictured(row) {
             continue;
         }
         row.baseline
@@ -808,6 +814,26 @@ mod tests {
         assert!(text.contains("does not match its baseline"));
         assert!(text.contains("| pages/a | dark | 3 pixels differ \\| on two takes. |"));
         assert!(!text.contains("| wide |"));
+    }
+
+    #[test]
+    fn a_shot_steadied_on_its_second_take_keeps_its_first_take() {
+        let row = |fate| Row {
+            attribution: &[],
+            baseline: Picture::File(None),
+            current: None,
+            diff: Picture::Bytes(None),
+            entry: "pages/a",
+            fate,
+            keep: None,
+            labels: ["Baseline", "First take"],
+            pair: false,
+            shot: "dark",
+            snapshot: None,
+            source: "pages",
+        };
+        assert!(pictured(&row(&Fate::Steadied)));
+        assert!(!pictured(&row(&Fate::Held)));
     }
 
     #[test]

@@ -21,7 +21,7 @@ import '../../tooltip/index.js'
  * @groups charts
  * @documentation https://fusion.dev/helix/components/spatial-scatter-chart
  *
- * @cssproperty --spatial-scatter-chart-block-size - How tall the plot is.
+ * @cssproperty --spatial-scatter-chart-block-size - How tall the plot is. By default, three quarters of its width and 22em at most.
  */
 @customElement('helix-spatial-scatter-chart')
 export class HelixSpatialScatterChart extends HelixHeadlessSpatialScatterChart {

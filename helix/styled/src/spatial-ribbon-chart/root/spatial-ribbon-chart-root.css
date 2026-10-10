@@ -6,7 +6,12 @@
    then. The renderer's box is the page's own element, and it fills the plot. */
 [part="plot"] {
   background-color: var(--helix-color-surface-sunken);
-  block-size: var(--spatial-ribbon-chart-block-size, 22em);
+  /* **Three quarters as tall as it is wide, and 22em at most**, so a narrow
+     plot is not a tall gray field with a small drawing in its middle: a box
+     seen at a slant is wider than it is tall. The hook sets one height. */
+  aspect-ratio: 4 / 3;
+  block-size: var(--spatial-ribbon-chart-block-size, auto);
+  max-block-size: var(--spatial-ribbon-chart-block-size, 22em);
   border-radius: var(--helix-radii-md);
   overflow: hidden;
   position: relative;
