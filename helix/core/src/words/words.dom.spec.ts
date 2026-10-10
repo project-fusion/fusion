@@ -8,6 +8,7 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
  */
 type Probe = HTMLElement & {
   changed: string[]
+  requestUpdate: (name?: PropertyKey, before?: unknown) => void
   emptyText: string | null
   locale: string
   resultsLabel: string | null
@@ -318,6 +319,62 @@ describe('a page that changes its words', () => {
     expect(english?.rangeOverflowMessage).toBe('Too far.')
     expect(english?.label).toBe('')
     expect(german?.rangeOverflowMessage).toBe('Zu weit.')
+  })
+
+  /* **Nothing is worked out until something changes.** An element records
+     what its locale is worked out from as it connects, the `locale` it was
+     given and the `lang` written nearest it, and works the locale out only
+     where a change moves them. The first `DateTimeFormat` a page makes for the
+     runtime's own locale costs 7.1 ms in Chromium, and the first element of
+     any kind paid it. */
+  test('works out no locale as an element connects', async () => {
+    const made: string[] = []
+    const real = {
+      DateTimeFormat: Intl.DateTimeFormat,
+      Locale: Intl.Locale,
+      PluralRules: Intl.PluralRules,
+    }
+    for (const [name, Made] of Object.entries(real)) {
+      Object.assign(Intl, {
+        [name]: new Proxy(Made, {
+          construct: (target, args) => {
+            made.push(name)
+            return Reflect.construct(target, args)
+          },
+        }),
+      })
+    }
+    try {
+      document.body.innerHTML = '<div lang="de"><words-message></words-message></div>'
+      await (document.querySelector('words-message') as Probe).updateComplete
+    } finally {
+      Object.assign(Intl, real)
+    }
+    expect(made).toEqual([])
+  })
+
+  /* The reads differ and the locale does not: `en` in a runtime that speaks
+     English is the runtime's own locale, which is the one `en-US` names here. */
+  test('updates only where a new `lang` moves its locale', async () => {
+    const own = new Intl.DateTimeFormat().resolvedOptions().locale
+    const probe = await mount(
+      `<div lang="${new Intl.Locale(own).language}"><words-probe></words-probe></div>`,
+    )
+    let asked = 0
+    const request = probe.requestUpdate.bind(probe)
+    probe.requestUpdate = (...args: Parameters<typeof request>) => {
+      asked += 1
+      request(...args)
+    }
+    probe.parentElement?.setAttribute('lang', own)
+    registry.refreshWords()
+    await updated(probe)
+    expect(asked).toBe(0)
+    probe.parentElement?.setAttribute('lang', 'de')
+    registry.refreshWords()
+    await updated(probe)
+    expect(asked).toBe(1)
+    expect(drawn(probe)[1]).toBe('1.200 results')
   })
 
   test('stops reaching an element once it leaves the page', async () => {

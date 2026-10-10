@@ -19,6 +19,7 @@ import {
   hueName,
   isRtl,
   KeyboardNavigationController,
+  labelsOf,
   MixinControllerValue,
   MixinPickerFeedback,
   type PickerFailure,
@@ -1385,7 +1386,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
     /* A group only where a page's `<label for>` names the picker, so the
        name has somewhere to be read. Unlabeled, the host stays without a
        role, as it is inside Color Input. */
-    const outside = [...(this.internals.labels ?? [])] as HTMLElement[]
+    const outside = labelsOf(this)
     const named = this.named
     hostAria(this.internals, {
       label: outside.length > 0 ? '' : named,

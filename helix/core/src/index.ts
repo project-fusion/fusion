@@ -566,6 +566,7 @@ export {
 export { inlineStep } from './utils/inline-step/inline-step.js'
 export { isRtl } from './utils/is-rtl/is-rtl.js'
 export { keyClaimed } from './utils/key-claimed/key-claimed.js'
+export { labelsOf } from './utils/labels-of/labels-of.js'
 export { type Curve, linePath, type Point } from './utils/line-path/line-path.js'
 export { type EndInSight, endInSight } from './utils/load-more/load-more.js'
 export { localeOf, runtimeLocale } from './utils/locale-of/locale-of.js'

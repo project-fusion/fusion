@@ -2,10 +2,11 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
 
 let localeOf: typeof import('./locale-of.js').localeOf
+let runtimeLanguage: typeof import('./locale-of.js').runtimeLanguage
 
 beforeAll(async () => {
   registerDom()
-  ;({ localeOf } = await import('./locale-of.js'))
+  ;({ localeOf, runtimeLanguage } = await import('./locale-of.js'))
 })
 
 describe('the locale an element speaks', () => {
@@ -48,5 +49,16 @@ describe('the locale an element speaks', () => {
     expect(localeOf(document.querySelector('#at') as Element)).toBe('')
     document.body.innerHTML = '<div lang=""><span id="at"></span></div>'
     expect(localeOf(document.querySelector('#at') as Element)).toBe('')
+  })
+})
+
+/* `PluralRules` reads the runtime's default for a fraction of what
+   `DateTimeFormat` costs, and leaves out only a Unicode extension the default
+   may carry, which never changes the language. */
+describe('the runtime’s language', () => {
+  test('is the language of the locale `DateTimeFormat` resolves with none given', () => {
+    expect(runtimeLanguage()).toBe(
+      new Intl.Locale(new Intl.DateTimeFormat().resolvedOptions().locale).language,
+    )
   })
 })

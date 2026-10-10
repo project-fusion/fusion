@@ -330,7 +330,7 @@ describe('a name a consumer wrote on the host', () => {
 describe('a label the page wrote for the host', () => {
   /** A host the platform has given labels, as it gives a form-associated one. */
   const labeled = (control: HTMLElement): AriaForwardController => {
-    document.body.innerHTML = '<label id="outer">Email</label><span></span>'
+    document.body.innerHTML = '<label id="outer" for="email">Email</label><span id="email"></span>'
     const host = document.body.lastElementChild as HTMLElement
     const label = document.getElementById('outer')
     Object.assign(host, { addController: () => {} })
@@ -350,7 +350,8 @@ describe('a label the page wrote for the host', () => {
   /* A file input is labeled by its trigger, "Choose files", which is an
      action, so the component says whether the control is named. */
   test('and the component may say the control is unnamed whatever its labels', () => {
-    document.body.innerHTML = '<label id="outer">Resume</label><span></span>'
+    document.body.innerHTML =
+      '<label id="outer" for="resume">Resume</label><span id="resume"></span>'
     const host = document.body.lastElementChild as HTMLElement
     Object.assign(host, { addController: () => {} })
     Object.defineProperty(host, 'labels', { value: [document.getElementById('outer')] })
@@ -368,6 +369,33 @@ describe('a label the page wrote for the host', () => {
     const control = reflecting()
     control.setAttribute('aria-label', 'Own name')
     labeled(control).hostUpdated()
+    expect(held(control, 'ariaLabelledByElements')).toBeNull()
+  })
+
+  /* **A label names an element by its id or from around it, so one with
+     neither has none, and is never asked.** Reading `labels` leaves a live list
+     on the element, which the document updates on every change to any
+     element's children: 1,000 buttons asked once each made cloning a template
+     about thirty times slower, measured in Chromium. */
+  test('is not asked for where no label could name the host or the control', () => {
+    document.body.innerHTML = '<label>Elsewhere <input></label><span></span>'
+    const host = document.body.lastElementChild as HTMLElement
+    Object.assign(host, { addController: () => {} })
+    const control = reflecting()
+    host.attachShadow({ mode: 'open' }).append(control)
+    let asked = 0
+    for (const one of [host, control]) {
+      Object.defineProperty(one, 'labels', {
+        get: () => {
+          asked += 1
+          return []
+        },
+      })
+    }
+    const forward = new AriaForwardController(host as never, { target: () => control })
+    forward.hostUpdated()
+    forward.hostUpdated()
+    expect(asked).toBe(0)
     expect(held(control, 'ariaLabelledByElements')).toBeNull()
   })
 })

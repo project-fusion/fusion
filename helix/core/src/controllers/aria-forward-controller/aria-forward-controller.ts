@@ -1,6 +1,7 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import { auditName } from '#audit-name'
 import { elementById } from '../../utils/element-by-id/element-by-id.js'
+import { labelsOf } from '../../utils/labels-of/labels-of.js'
 import { nameText } from '../../utils/name-text/name-text.js'
 
 /** What the controller needs to know: which element inside is the control. */
@@ -202,8 +203,7 @@ export class AriaForwardController implements ReactiveController {
     if (!this.forwarded.has('aria-labelledby') && target.hasAttribute('aria-labelledby')) {
       return true
     }
-    const own = (target as HTMLElement & { labels?: NodeList | null }).labels
-    return [...(own ?? [])].some((label) => nameText(label).trim() !== '')
+    return labelsOf(target).some((label) => nameText(label).trim() !== '')
   }
 
   /**
@@ -211,12 +211,11 @@ export class AriaForwardController implements ReactiveController {
    * name of its own, and none otherwise.
    */
   private hostLabels(target: HTMLElement): HTMLElement[] {
-    const labels = (this.host as HTMLElement & { labels?: NodeList | null }).labels
-    const named = this.named ? this.named() : this.namedByItself(target)
-    if (!labels || labels.length === 0 || named) {
+    const labels = labelsOf(this.host)
+    if (labels.length === 0 || (this.named ? this.named() : this.namedByItself(target))) {
       return []
     }
-    return [...labels].filter((label): label is HTMLElement => label instanceof HTMLElement)
+    return labels.filter((label): label is HTMLElement => label instanceof HTMLElement)
   }
 
   /**

@@ -601,12 +601,16 @@ export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFor
         @keypress=${this.handleKeypress}
       />
       <slot name="end"></slot>
-      <!-- In the tab order, unlike the browser's own search clear, which is not
+      
+      ${
+        /* In the tab order, unlike the browser's own search clear, which is not
            reachable by keyboard at all: a control whose only affordance is an
            icon and that cannot be reached is one a keyboard reader is told
            about and cannot use. It only exists while there is a value, so the
-           extra stop appears exactly when there is something to do with it. -->
-      ${
+           extra stop appears exactly when there is something to do with it.
+
+           Written in script, because a comment in the markup is a node every
+           input clones. */
         this.showsClear
           ? html`<button
               part="clear"

@@ -6,6 +6,13 @@ export type Pack = Record<string, Record<string, Message | MessageTable>>
 /** An element that reads words, perhaps with a `locale`. */
 export type Speaker = Element & { locale?: string | undefined }
 
+/**
+ * What an element's locale is worked out from: its `locale`, then the `lang`
+ * read for it or `null` for none, and on a server or while hydrating, the
+ * default. See `sourceOf` in `words-locale.ts`.
+ */
+export type LocaleSource = readonly [own: string, lang: string | null, fallback?: string]
+
 /** What the page has registered, kept on `globalThis`. */
 interface Held {
   /** Each locale's words, under its lowercase tag. */
@@ -20,8 +27,10 @@ interface Held {
   observed?: boolean
   /** Finds a registered word for an element, set by the first `registerWords`. */
   find?: (host: Speaker, tag: string, name: string) => [Message | MessageTable, string] | undefined
-  /** Reads the locale an element speaks, set where `wordsLocale` is loaded. */
-  locale?: (host: Speaker) => string
+  /** Reads what an element's locale is worked out from, set where `wordsLocale` is loaded. */
+  source?: (host: Speaker) => LocaleSource
+  /** Works out the locale from what `source` read. */
+  from?: (source: LocaleSource) => string
 }
 
 /**
@@ -34,7 +43,7 @@ interface Held {
  * **What every element reads, and nothing more.** An element with a word
  * property reads its English until a page registers words, so the lookup and
  * the locale chain arrive with `registerWords`, which puts its lookup in
- * `find`, and the locale with `wordsLocale`, which puts itself in `locale`. A
+ * `find`, and the locale with `wordsLocale`, which puts its reads in `source` and `from`. A
  * page that registers no words and formats no numbers ships neither: measured
  * on Button, 474 bytes of its 13,437 compressed.
  */

@@ -1,4 +1,5 @@
 import { elementById } from '../element-by-id/element-by-id.js'
+import { labelsOf } from '../labels-of/labels-of.js'
 import { nameText } from '../name-text/name-text.js'
 
 /** The words of each element, as a name reads them, joined with one space. */
@@ -27,6 +28,6 @@ export const hostWords = (host: HTMLElement & { labels?: NodeList | null }, own 
     wordsOf(ids.map((id) => elementById(host, id))) ||
     host.getAttribute('aria-label')?.trim() ||
     own ||
-    wordsOf([...(host.labels ?? [])] as Element[])
+    wordsOf(labelsOf(host))
   )
 }
