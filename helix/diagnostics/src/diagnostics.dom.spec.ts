@@ -1361,12 +1361,178 @@ describe('unreflected attributes', () => {
   })
 })
 
+describe('what an element holds', () => {
+  /**
+   * A Helix of six tags, as `analyze` writes its lint data from the manifest:
+   * two drawn inside a native button, a form control, a drawer whose `modal`
+   * `"false"` turns off, and two that are neither.
+   */
+  const held = index([
+    {
+      lint: lintOf(
+        {
+          modules: [
+            {
+              declarations: [
+                {
+                  attributes: [{ name: 'disabled', type: { text: 'boolean' } }],
+                  helix: { interactive: 'button' },
+                  members: [
+                    {
+                      attribute: 'disabled',
+                      helix: { boolean: 'present' },
+                      kind: 'field',
+                      name: 'disabled',
+                    },
+                    { kind: 'field', name: 'form' },
+                  ],
+                  tagName: 'helix-button',
+                },
+                { helix: { interactive: 'button' }, tagName: 'helix-icon-button' },
+                { members: [{ kind: 'field', name: 'form' }], tagName: 'helix-checkbox' },
+                {
+                  attributes: [{ name: 'modal', type: { text: 'boolean' } }],
+                  members: [
+                    {
+                      attribute: 'modal',
+                      helix: { boolean: 'unless-false' },
+                      kind: 'field',
+                      name: 'modal',
+                    },
+                  ],
+                  tagName: 'helix-drawer',
+                },
+                { slots: [{ name: 'footer-actions' }], tagName: 'helix-card' },
+                { attributes: [{ name: 'name', type: { text: 'string' } }], tagName: 'helix-icon' },
+              ],
+            },
+          ],
+        },
+        '@fusion.dev/helix',
+      ),
+    },
+  ])
+  const found = (html: string): Array<[string, string, string]> => {
+    document.body.innerHTML = html
+    const findings = markup(held, document).map((one): [string, string, string] => [
+      one.kind,
+      one.tag,
+      one.subject,
+    ])
+    document.body.innerHTML = ''
+    return findings
+  }
+
+  test('lint data says what each tag is, from its manifest', () => {
+    expect(held.get('helix-button')?.interactive).toBe('button')
+    expect(held.get('helix-checkbox')?.interactive).toBe('control')
+    expect(held.get('helix-card')?.interactive).toBe(undefined)
+    expect([...(held.get('helix-button')?.booleans ?? [])]).toEqual(['disabled'])
+    expect([...(held.get('helix-drawer')?.booleans ?? [])]).toEqual([])
+  })
+
+  test('an interactive element inside a button or a link is a finding, named for the Helix element outside it', () => {
+    expect(
+      found('<helix-button>Go <helix-icon-button></helix-icon-button></helix-button>'),
+    ).toEqual([['nested-interactive', 'helix-button', '<helix-button> <helix-icon-button>']])
+    expect(found('<helix-button><span><a href="/terms">Terms</a></span></helix-button>')).toEqual([
+      ['nested-interactive', 'helix-button', '<helix-button> <a>'],
+    ])
+    expect(found('<button><helix-checkbox></helix-checkbox></button>')).toEqual([
+      ['nested-interactive', 'helix-checkbox', '<button> <helix-checkbox>'],
+    ])
+  })
+
+  test('a Helix button inside a link says how to draw the link as one', () => {
+    document.body.innerHTML = '<a href="/settings"><helix-button>Settings</helix-button></a>'
+    const [one, ...rest] = markup(held, document)
+    expect([one?.kind, one?.tag, one?.subject, rest.length]).toEqual([
+      'nested-interactive',
+      'helix-button',
+      '<a> <helix-button>',
+      0,
+    ])
+    /* Word for word what `helix scan` says, which holds the same sentence. */
+    expect(one?.message).toBe(
+      '`helix-button` is inside an `<a>`. HTML allows no interactive element inside a button or a link, and browsers and screen readers differ on what a press or a focus there does. Move `helix-button` out of the `<a>`. To draw the link as a button, write `data-button` on the `<a>`.',
+    )
+    document.body.innerHTML = ''
+  })
+
+  test('nothing interactive, a slot for actions, and markup only a page can place are not findings', () => {
+    expect(
+      found(
+        [
+          /* An icon and a card hold nothing anyone presses. */
+          '<helix-button><helix-icon name="save"></helix-icon>Save</helix-button>',
+          '<helix-card><helix-button slot="footer-actions">Buy</helix-button></helix-card>',
+          /* An `<a>` with no `href` is no link, and a hidden input is no control. */
+          '<a><helix-button>Go</helix-button></a>',
+          '<helix-button><input type="hidden" name="x"></helix-button>',
+          /* A label holds its control, and a group holds its own. */
+          '<label><helix-checkbox></helix-checkbox> Remember me</label>',
+          /* A custom element places its own children. */
+          '<helix-button><acme-menu><helix-icon-button></helix-icon-button></acme-menu></helix-button>',
+          /* No Helix element in it, which is the page's own markup. */
+          '<button><a href="/x">x</a></button>',
+        ].join(''),
+      ),
+    ).toEqual([])
+    /* And what Helix renders inside its own elements is Helix's. */
+    const host = document.createElement('helix-card')
+    host.attachShadow({ mode: 'open' }).innerHTML =
+      '<helix-button><helix-icon-button></helix-icon-button></helix-button>'
+    document.body.append(host)
+    expect(markup(held, document)).toEqual([])
+    document.body.innerHTML = ''
+  })
+
+  test('`"false"` on an attribute that is on wherever it is present is a finding', () => {
+    expect(found('<helix-button disabled="false">Go</helix-button>')).toEqual([
+      ['false-boolean', 'helix-button', '<helix-button disabled="false">'],
+    ])
+    document.body.innerHTML = '<helix-button disabled="false">Go</helix-button>'
+    expect(markup(held, document)[0]?.message).toContain('Remove the attribute to turn it off')
+    document.body.innerHTML = ''
+  })
+
+  test('and not where `"false"` turns it off, where it is absent, or empty', () => {
+    expect(
+      found(
+        '<helix-drawer modal="false"></helix-drawer><helix-button disabled>Go</helix-button><helix-button disabled="">Go</helix-button><helix-button>Go</helix-button>',
+      ),
+    ).toEqual([])
+  })
+
+  test('lint data from before booleans were listed says nothing either way', () => {
+    const old = index([
+      {
+        lint: {
+          package: '@fusion.dev/helix',
+          tags: {
+            'helix-button': {
+              attributes: { disabled: null },
+              hooks: [],
+              parts: [],
+              written: [],
+            },
+          },
+        },
+      },
+    ])
+    document.body.innerHTML = '<helix-button disabled="false">Go</helix-button>'
+    expect(markup(old, document)).toEqual([])
+    document.body.innerHTML = ''
+  })
+})
+
 describe('lint data', () => {
   test('lint data is the manifest less everything diagnostics never reads, and indexes the same', () => {
     const lints = tiers.map((tier) => ({ lint: lintOf(tier.manifest, tier.name) }))
     expect(index(lints)).toEqual(index(tiers))
     expect(lints[0]?.lint.tags['helix-button']).toEqual({
       attributes: { emphasis: ['ghost', 'solid'], label: null },
+      booleans: [],
       family: undefined,
       hooks: ['--button-background-color', '--button-radius'],
       parts: ['button', 'icon'],

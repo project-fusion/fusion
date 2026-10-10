@@ -42,6 +42,8 @@ import { property } from 'lit/decorators.js'
  *
  * @cssstate pressed - The item is pressed, on its own or in a group where several can be.
  * @cssstate selected - The item is chosen.
+ *
+ * @interactive button
  */
 @customElement('helix-headless-toggle')
 export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {

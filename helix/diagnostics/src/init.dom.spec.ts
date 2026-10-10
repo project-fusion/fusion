@@ -7,7 +7,11 @@ beforeAll(() => {
 
 const { INSTANCE, initDiagnostics } = await import('./init.js')
 
-/** Lint data for one tag, the shape a published `lint.json` has. */
+/**
+ * Lint data for one tag, the shape a published `lint.json` has. Written with
+ * no type, so TypeScript reads its strings as `string`, as it reads the
+ * `lint.json` a page imports, and `initDiagnostics` has to take it.
+ */
 const tiers = [
   {
     lint: {
@@ -16,6 +20,7 @@ const tiers = [
         'helix-button': {
           attributes: { emphasis: ['ghost', 'solid'], label: null },
           hooks: ['--button-radius'],
+          interactive: 'button',
           parts: ['button'],
           written: [],
         },

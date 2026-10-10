@@ -571,6 +571,24 @@ pub fn apply(
                 }
             }
         }
+        /* **A subclass of a button is a button.** `@interactive` is written on
+        the class whose render draws the native control, and an icon button,
+        a copy button and each styled tag reach it the way `tier` does. The
+        child's own tag, where it writes one, wins. */
+        if let Some(interactive) = above
+            .get("helix")
+            .and_then(|one| one.get("interactive"))
+            .and_then(Value::as_str)
+        {
+            if let Some(fields) = declaration.as_object_mut() {
+                let block = fields.entry("helix").or_insert_with(|| json!({}));
+                if let Some(inside) = block.as_object_mut() {
+                    inside
+                        .entry("interactive")
+                        .or_insert_with(|| json!(interactive));
+                }
+            }
+        }
         let from = json!({ "module": module, "name": name });
 
         let link = |list: &'static str| Link {

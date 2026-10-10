@@ -50,6 +50,8 @@ import { property } from 'lit/decorators.js'
  *
  * @cssstate has-indicator - An icon is slotted into `indicator`.
  * @cssstate selected - The radio is chosen.
+ *
+ * @interactive button
  */
 @customElement('helix-headless-radio')
 export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {

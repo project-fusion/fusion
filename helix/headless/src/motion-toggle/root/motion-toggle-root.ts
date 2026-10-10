@@ -55,6 +55,8 @@ import { property, state } from 'lit/decorators.js'
  * @csspart icon - The icon inside the button.
  *
  * @cssstate paused - The page's motion is paused.
+ *
+ * @interactive button
  */
 @customElement('helix-headless-motion-toggle')
 export class HelixHeadlessMotionToggle extends HelixElement {

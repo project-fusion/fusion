@@ -1306,6 +1306,78 @@ fn a_class_takes_what_its_base_has() {
     assert_eq!(members[0]["name"], "tone", "the child's own first: {said}");
 }
 
+/// What diagnostics reads to judge markup: the native control an element
+/// draws its content inside, and how each boolean attribute turns its
+/// property on.
+///
+/// `@interactive` reaches a subclass, as `tier` does, and a word other than
+/// `button` or `link` is dropped. A boolean is `present` for Lit's
+/// `type: Boolean`, where `disabled="false"` is on, and `unless-false` for
+/// `onUnlessFalse`; a property with no attribute, or another converter, says
+/// neither.
+#[test]
+fn a_class_says_what_it_draws_and_how_its_booleans_read() {
+    let sandbox = Sandbox::new("manifest-interactive", None);
+    let src = sandbox.0.join("src/thing/root");
+    std::fs::create_dir_all(&src).expect("a source tree");
+    std::fs::write(
+        src.join("thing-root.ts"),
+        "/**\n * @interactive button\n */\n\
+         export class HelixThing extends HelixElement {\n\
+         \x20 @property({ reflect: true, type: Boolean })\n\
+         \x20 disabled = false\n\
+         \x20 @property({ converter: onUnlessFalse })\n\
+         \x20 modal = true\n\
+         \x20 @property({ attribute: 'close-on-select', converter: onUnlessFalse })\n\
+         \x20 closeOnSelect?: boolean\n\
+         \x20 @property({ attribute: false, type: Boolean })\n\
+         \x20 busy = false\n\
+         \x20 @property({ attribute: 'tone-labels', converter: wordsConverter, type: Boolean })\n\
+         \x20 toneLabels = false\n\
+         }\n\
+         export class HelixIconThing extends HelixThing {}\n\
+         /**\n * @interactive menu\n */\n\
+         export class HelixOther extends HelixElement {}\n",
+    )
+    .expect("a source");
+
+    let output = run(&sandbox.0, &["manifest", "build", "."]);
+    assert_eq!(code(&output), 0);
+    let parsed: serde_json::Value = serde_json::from_str(&out(&output)).expect("a manifest");
+    let declarations = parsed["modules"][0]["declarations"]
+        .as_array()
+        .expect("the declarations");
+    let named = |name: &str| {
+        declarations
+            .iter()
+            .find(|one| one["name"] == name)
+            .unwrap_or_else(|| panic!("{name} is declared"))
+    };
+    assert_eq!(named("HelixThing")["helix"]["interactive"], "button");
+    assert_eq!(
+        named("HelixIconThing")["helix"]["interactive"],
+        "button",
+        "inherited: {}",
+        named("HelixIconThing")
+    );
+    assert!(named("HelixOther")["helix"]["interactive"].is_null());
+
+    let boolean = |field: &str| {
+        named("HelixThing")["members"]
+            .as_array()
+            .expect("the members")
+            .iter()
+            .find(|one| one["name"] == field)
+            .unwrap_or_else(|| panic!("{field} is declared"))["helix"]["boolean"]
+            .clone()
+    };
+    assert_eq!(boolean("disabled"), "present");
+    assert_eq!(boolean("modal"), "unless-false");
+    assert_eq!(boolean("closeOnSelect"), "unless-false");
+    assert!(boolean("busy").is_null(), "no attribute");
+    assert!(boolean("toneLabels").is_null(), "its own converter");
+}
+
 /// A mixin is a link in the chain, not a wrapper to see past.
 ///
 /// `MixinControllerChecked(MixinField(HelixFormElement))` gives Checkbox

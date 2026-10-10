@@ -99,6 +99,13 @@ export interface HelixMember extends Documented {
      */
     references?: { label: string; url: string }[]
     /**
+     * How the attribute turns a boolean property on: `present` for Lit's
+     * `type: Boolean`, which is on wherever the attribute is, `"false"`
+     * included, and `unless-false` for `onUnlessFalse`, which `"false"` turns
+     * off. Absent for any other property.
+     */
+    boolean?: 'present' | 'unless-false'
+    /**
      * Whether `@words` makes it a word property, one a page can register
      * words for by locale with `registerWords`.
      */
@@ -206,6 +213,14 @@ export interface HelixMetadata {
 
   /** The native elements the family stands in for, from `@replaces`. */
   replaces?: string[]
+
+  /**
+   * The native control the element draws its content inside, from
+   * `@interactive`, and inherited by a subclass. HTML allows no interactive
+   * element inside a button or a link, so diagnostics reports one written
+   * inside the element.
+   */
+  interactive?: 'button' | 'link'
 
   /**
    * What the component is for, and the one axis the catalog groups on.

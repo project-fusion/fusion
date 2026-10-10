@@ -29,10 +29,18 @@ pub struct Published {
     /// Each attribute in the order the data lists it, with the values it
     /// allows, or `None` where it takes any.
     pub attributes: Vec<(String, Option<Vec<String>>)>,
+    /// The attributes that are on wherever they are present, `"false"`
+    /// included, or `None` where the lint data predates them and so says
+    /// nothing either way.
+    pub booleans: Option<BTreeSet<String>>,
     /// The family, from the module's path.
     pub family: Option<String>,
     /// Each hook, with the packages that publish it, in the order first seen.
     pub hooks: Vec<(String, BTreeSet<String>)>,
+    /// What a person presses or types in, where the element is one: `button`
+    /// or `link` for an element drawn inside its own native button or link,
+    /// and `control` for any other form control.
+    pub interactive: Option<String>,
     /// Each part, with the packages that publish it, in the order first seen.
     pub parts: Vec<(String, BTreeSet<String>)>,
     /// The attributes a property writes back when set, or `None` where the
@@ -142,6 +150,18 @@ impl Index {
                         .slots
                         .get_or_insert_with(BTreeSet::new)
                         .extend(strings(entry.get("slots")));
+                }
+                if entry.get("booleans").is_some() {
+                    element
+                        .booleans
+                        .get_or_insert_with(BTreeSet::new)
+                        .extend(strings(entry.get("booleans")));
+                }
+                if element.interactive.is_none() {
+                    element.interactive = entry
+                        .get("interactive")
+                        .and_then(serde_json::Value::as_str)
+                        .map(str::to_owned);
                 }
                 if let Some(attributes) = entry.get("attributes").and_then(|one| one.as_object()) {
                     for (name, values) in attributes {
