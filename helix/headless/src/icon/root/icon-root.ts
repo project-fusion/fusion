@@ -11,7 +11,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { fetchIcon } from '../fetch.js'
-import { iconMutator, resolveIcon, watchIcons } from '../registry.js'
+import { closestIcon, iconMutator, resolveIcon, watchIcons } from '../registry.js'
 import { afterPageSettles } from '../settle.js'
 
 /**
@@ -50,7 +50,10 @@ import { afterPageSettles } from '../settle.js'
  *
  * A name with no match, or a `src` that is no SVG, renders nothing, and the
  * element fires `error`, so a typo in a name can be heard. It waits until the page has loaded and painted
- * first, so a library a later module registers is not taken for a typo.
+ * first, so a library a later module registers is not taken for a typo. The
+ * console warning names the closest registered icon where one is close:
+ * `caret-down` for `caretDown`, the name of its export, and `check` for
+ * `chekc`.
  *
  * An icon is decorative by default and hidden from assistive technology. Set
  * `label` only when the icon is the only carrier of meaning, such as in a
@@ -296,13 +299,15 @@ export class HelixHeadlessIcon extends HelixElement {
     }
     this.missed = asked
     this.dispatchEvent(new Event('error', { bubbles: false, cancelable: false, composed: false }))
+    const close = this.src === '' ? closestIcon(asked) : undefined
     reportRuntime({
       kind: 'unknown-icon',
       message:
         this.src === ''
           ? `<${this.localName} name="${asked}"> names no registered icon, so it draws ` +
-            'nothing. Check the name, register the glyph with `registerIcons`, or import it ' +
-            'and pass it as `icon`.'
+            `nothing.${close === undefined ? '' : ` The closest registered icon is \`${close}\`.`} ` +
+            'Check the name, register the glyph with `registerIcons`, or import it and pass ' +
+            'it as `icon`.'
           : `<${this.localName} src="${asked}"> could not be fetched as an SVG file, so it ` +
             'draws nothing. Check the URL, and that the file is an `<svg>`.',
       tag: this.localName,

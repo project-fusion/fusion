@@ -462,6 +462,7 @@ export {
   wholeHour,
 } from './utils/clock/clock.js'
 export { closestInstance } from './utils/closest-instance/closest-instance.js'
+export { closestName } from './utils/closest-name/closest-name.js'
 export { type ColorWords, colorName, hueName } from './utils/color-name/color-name.js'
 export { columnStep } from './utils/column-step/column-step.js'
 export {

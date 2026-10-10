@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
+  closestIcon,
   iconMutator,
   registeredIcon,
   registerIconLibrary,
@@ -70,6 +71,16 @@ describe('the icon registry', () => {
     registerIconLibrary('spec-rejects', () => Promise.reject(new Error('offline')))
     expect(resolveIcon('spec-throws:camera')).toBeUndefined()
     expect(await resolveIcon('spec-rejects:camera')).toBeUndefined()
+  })
+
+  /* The warning for a name that draws nothing offers this one. */
+  test('finds the closest registered name in kebab case, either way round', () => {
+    registerIcons([glyph('spec-arrow-left')])
+    registerIcons({ specCamelGlyph: glyph('camel') })
+    expect(closestIcon('specArrowLeft')).toBe('spec-arrow-left')
+    expect(closestIcon('spec-arow-left')).toBe('spec-arrow-left')
+    expect(closestIcon('spec-camel-glyph')).toBe('specCamelGlyph')
+    expect(closestIcon('spec-nothing-like-any-of-them')).toBeUndefined()
   })
 
   test('tells a watcher of every registration until it stops watching', () => {
