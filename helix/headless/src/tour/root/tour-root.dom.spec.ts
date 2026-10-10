@@ -207,14 +207,14 @@ if (hasLayout()) {
          with no size has no reach. */
       const sheet = document.createElement('style')
       sheet.textContent = `helix-headless-tour::part(spotlight) { position: fixed }
-        helix-headless-tour-stop::part(bubble) { margin: 0 }
+        helix-headless-tour-stop::part(surface) { margin: 0 }
         helix-headless-tour-stop::part(arrow) { block-size: 8px; inline-size: 8px; position: absolute }`
       document.head.append(sheet)
       try {
         const tour = await run()
         await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
         const light = (part(tour, 'spotlight') as HTMLElement).getBoundingClientRect()
-        const panel = (part(at(tour.stops, 0), 'bubble') as HTMLElement).getBoundingClientRect()
+        const panel = (part(at(tour.stops, 0), 'surface') as HTMLElement).getBoundingClientRect()
         /* The arrow's reach, `8 / sqrt(2)`, give or take the pixel the
            controller rounds its position to. */
         expect(panel.top - light.bottom).toBeGreaterThan(5)
@@ -477,7 +477,7 @@ describe('the open state', () => {
 
 describe('focus through the run', () => {
   const panelOf = (stop: HTMLElement | undefined): Element | null | undefined =>
-    stop?.shadowRoot?.querySelector('[part="bubble"]')
+    stop?.shadowRoot?.querySelector('[part="surface"]')
 
   const settled = async (tour: Tour): Promise<void> => {
     await tour.updateComplete
@@ -568,7 +568,7 @@ describe('stops with nothing to light', () => {
     )
     const [stop] = element.stops
     await (stop as unknown as { updateComplete: Promise<boolean> }).updateComplete
-    expect(part(stop as HTMLElement, 'bubble')?.getAttribute('role')).toBe('dialog')
+    expect(part(stop as HTMLElement, 'surface')?.getAttribute('role')).toBe('dialog')
     expect(part(element, 'backdrop')).not.toBeNull()
   })
 
@@ -592,7 +592,7 @@ describe('stops with nothing to light', () => {
     }
     await waiting.updateComplete
     expect(element.index).toBe(1)
-    expect((part(waiting, 'bubble') as HTMLElement | null)?.hidden).toBe(true)
+    expect((part(waiting, 'surface') as HTMLElement | null)?.hidden).toBe(true)
     expect(part(element, 'backdrop')).toBeNull()
     expect(hasState(element, 'waiting')).toBe(true)
     const menu = document.createElement('div')

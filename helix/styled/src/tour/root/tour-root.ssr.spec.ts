@@ -38,7 +38,7 @@ describe('tour server output', () => {
 
   test('and every panel is served hidden', () => {
     const markup = withoutStyles(ssr(tour))
-    const panels = markup.match(/<div\s+part="bubble"[^>]*>/g) ?? []
+    const panels = markup.match(/<div\s+part="surface"[^>]*>/g) ?? []
     expect(panels.length).toBe(2)
     expect(panels.every((panel) => panel.includes('hidden'))).toBe(true)
   })

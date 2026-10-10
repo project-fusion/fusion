@@ -92,7 +92,7 @@ helix-headless-donut-chart::part(segment-active) {
   stroke-width: calc(var(--donut-chart-stroke) * 1.18);
 }
 
-helix-headless-donut-chart::part(tooltip) {
+helix-headless-donut-chart::part(tooltip-surface) {
   background-color: var(--_gray-strong);
   border: 0;
   border-radius: var(--_radius-control);

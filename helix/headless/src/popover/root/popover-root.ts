@@ -94,7 +94,7 @@ import { hideOutside } from '../hide-outside.js'
  * `--floating-anchor-inline-size`, for a panel as wide as its trigger:
  *
  * ```css
- * helix-popover::part(popover) {
+ * helix-popover::part(surface) {
  *   min-inline-size: var(--floating-anchor-inline-size);
  * }
  * ```
@@ -118,7 +118,7 @@ import { hideOutside } from '../hide-outside.js'
  * @csspart arrow-right - Added to `arrow` while the panel is right of its trigger, with the point on the panel's left edge.
  * @csspart arrow-top - Added to `arrow` while the panel is above its trigger, with the point on the panel's bottom edge.
  * @csspart content - The scrolling region inside the panel.
- * @csspart popover - The panel.
+ * @csspart surface - The panel.
  *
  * @cssproperty --floating-anchor-inline-size - The trigger's width, written on the panel while it is open, as in `min-inline-size: var(--floating-anchor-inline-size)`. Read it; a value set here is written over.
  * @cssproperty --floating-available-block-size - The room between the panel and the edge of the screen it opens toward, written on the panel while it is open. Read it; a value set here is written over.
@@ -212,7 +212,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   /* `aria-labelledby` and `aria-describedby` written on the host, carried to
      the panel, which is the `dialog` a reader is on. */
   protected readonly aria = new AriaForwardController(this, {
-    target: () => this.partNamed('popover'),
+    target: () => this.partNamed('surface'),
   })
 
   /**
@@ -243,7 +243,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
       exiting: (on) => this.toggleState('exiting', on),
     },
     open: () => this.open,
-    surface: () => this.partNamed('popover'),
+    surface: () => this.partNamed('surface'),
   })
 
   private readonly panel = new PopoverController(this, {
@@ -279,7 +279,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     open: () => this.open,
     padding: () => this.containerPadding,
     placement: () => this.placement,
-    surface: () => this.partNamed('popover'),
+    surface: () => this.partNamed('surface'),
   })
 
   /**
@@ -295,7 +295,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   private readonly scope = new FocusScopeController(this, {
     contain: () => this.modal && this.open,
     contents: () => this.slotted,
-    surface: () => this.partNamed('popover'),
+    surface: () => this.partNamed('surface'),
   })
 
   /** What is assigned to the panel's slot. */
@@ -319,7 +319,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
     const asked = this.label !== '' || this.hasAttribute('aria-labelledby')
     const heading = asked ? null : headingIn(this.slotted)
     this.namedByHeading = reflectElements(
-      this.partNamed('popover'),
+      this.partNamed('surface'),
       'ariaLabelledByElements',
       heading ? [heading] : [],
       this.namedByHeading,
@@ -633,7 +633,7 @@ export class HelixHeadlessPopover extends MixinControllerOpen(HelixElement) {
   protected override render(): TemplateResult {
     return html`<slot name="trigger" @click=${this.handleTriggerClick}></slot>
       <div
-        part="popover"
+        part="surface"
         popover="manual"
         role="dialog"
         aria-label=${this.label || this.fallbackLabel}

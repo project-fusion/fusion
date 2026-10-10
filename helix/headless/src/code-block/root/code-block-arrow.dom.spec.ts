@@ -49,7 +49,7 @@ describe('the copy button’s point, flipped below it', () => {
         button.scrollIntoView({ block: 'start' })
         tip.show()
         await idle()
-        const bubble = part(tip, 'tooltip') as HTMLElement
+        const bubble = part(tip, 'surface') as HTMLElement
         const arrow = part(tip, 'arrow') as HTMLElement
         expect(getComputedStyle(arrow).rotate).toBe('45deg')
         expect(bubble.getAttribute('data-placement')).toBe('bottom')

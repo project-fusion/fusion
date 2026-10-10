@@ -7,7 +7,7 @@
 /* The UA's own `[popover]` rule sets `overflow: auto`, which makes the surface a
    scroll container, and anything positioned outside a scroll container is
    clipped. */
-[part="popover"] {
+[part="surface"] {
   overflow: visible;
   background-color: var(--helix-color-surface-overlay);
   /* No border, said rather than left out: the UA stylesheet gives `[popover]`
@@ -40,14 +40,14 @@
 /* The UA hides a closed popover with `[popover]:not(:popover-open)`, and the
    rules above are author declarations that outrank it whatever their
    specificity. */
-[part="popover"]:not(:popover-open) {
+[part="surface"]:not(:popover-open) {
   display: none;
 }
 
 /* It travels, a little, out of the edge it opened against. `2xs` is enough to
    read as motion and short enough that a fast reader who opens and picks in one
    gesture is not waiting on it. */
-[part="popover"] {
+[part="surface"] {
   --_travel: calc(var(--helix-space-2xs) * -1);
   /* Declared beside `--_travel` rather than read through a fallback nothing ever
      set. */
@@ -64,11 +64,11 @@
 }
 
 /* Opening upward, it comes up from the control rather than down onto it. */
-[part="popover"][data-placement^="top"] {
+[part="surface"][data-placement^="top"] {
   --_travel: var(--helix-space-2xs);
 }
 
-[part="popover"][data-placed] {
+[part="surface"][data-placed] {
   opacity: 1;
   scale: 1;
   transform: none;
@@ -78,26 +78,26 @@
    `--floating-arrow-x` and `--floating-arrow-y` are the pointer's center, which
    is the only thing that knows where it landed once `shift` has slid the panel
    along to keep it on screen. */
-[part="popover"][data-placement^="top"] {
+[part="surface"][data-placement^="top"] {
   transform-origin: var(--floating-arrow-x, 50%) 100%;
 }
 
-[part="popover"][data-placement^="bottom"] {
+[part="surface"][data-placement^="bottom"] {
   transform-origin: var(--floating-arrow-x, 50%) 0;
 }
 
-[part="popover"][data-placement^="left"] {
+[part="surface"][data-placement^="left"] {
   transform-origin: 100% var(--floating-arrow-y, 50%);
 }
 
-[part="popover"][data-placement^="right"] {
+[part="surface"][data-placement^="right"] {
   transform-origin: 0 var(--floating-arrow-y, 50%);
 }
 
 /* It arrives instantly rather than not at all. */
 @media (prefers-reduced-motion: reduce) {
-  [part="popover"],
-  [part="popover"][data-placed] {
+  [part="surface"],
+  [part="surface"][data-placed] {
     scale: 1;
     transform: none;
     transition: none;
@@ -126,8 +126,8 @@
 
 /* No ring on the panel itself, which takes focus only where it holds nothing
    that can: the same choice `Dialog` makes for its panel. */
-[part="popover"]:focus,
-[part="popover"]:focus-visible {
+[part="surface"]:focus,
+[part="surface"]:focus-visible {
   outline: none;
 }
 
@@ -142,22 +142,22 @@
   rotate: 45deg;
 }
 
-[part="popover"][data-placement^="bottom"] [part~="arrow"] {
+[part="surface"][data-placement^="bottom"] [part~="arrow"] {
   border-left: var(--_popover-edge);
   border-top: var(--_popover-edge);
 }
 
-[part="popover"][data-placement^="top"] [part~="arrow"] {
+[part="surface"][data-placement^="top"] [part~="arrow"] {
   border-bottom: var(--_popover-edge);
   border-right: var(--_popover-edge);
 }
 
-[part="popover"][data-placement^="right"] [part~="arrow"] {
+[part="surface"][data-placement^="right"] [part~="arrow"] {
   border-bottom: var(--_popover-edge);
   border-left: var(--_popover-edge);
 }
 
-[part="popover"][data-placement^="left"] [part~="arrow"] {
+[part="surface"][data-placement^="left"] [part~="arrow"] {
   border-right: var(--_popover-edge);
   border-top: var(--_popover-edge);
 }

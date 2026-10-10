@@ -32,17 +32,17 @@ describe('a dialog on a page in another language', () => {
     })
     const host = await dialog('lang="de"')
     expect(part(host, 'dismiss')?.getAttribute('aria-label')).toBe('Schließen')
-    expect(part(host, 'dialog')?.getAttribute('aria-label')).toBe('Dialogfenster')
+    expect(part(host, 'surface')?.getAttribute('aria-label')).toBe('Dialogfenster')
   })
 
   test('keeps the English where nothing is registered, and a page’s own words over the registry', async () => {
     registerWords('de', { 'helix-dialog': { dismissLabel: 'Schließen' } })
     const english = await dialog()
     expect(part(english, 'dismiss')?.getAttribute('aria-label')).toBe('Close')
-    expect(part(english, 'dialog')?.getAttribute('aria-label')).toBe('Dialog')
+    expect(part(english, 'surface')?.getAttribute('aria-label')).toBe('Dialog')
     const own = await dialog('lang="de"', 'dismiss-label="Zu" label="Einstellungen"')
     expect(part(own, 'dismiss')?.getAttribute('aria-label')).toBe('Zu')
-    expect(part(own, 'dialog')?.getAttribute('aria-label')).toBe('Einstellungen')
+    expect(part(own, 'surface')?.getAttribute('aria-label')).toBe('Einstellungen')
   })
 
   test('changes language when words are registered after it renders', async () => {

@@ -44,7 +44,7 @@ describe('the preview’s point, flipped below the button', () => {
         expect(button.getBoundingClientRect().top).toBeLessThan(24)
         tip.show()
         await idle()
-        const bubble = part(tip, 'tooltip') as HTMLElement
+        const bubble = part(tip, 'surface') as HTMLElement
         const arrow = part(tip, 'arrow') as HTMLElement
         expect(getComputedStyle(arrow).rotate).toBe('45deg')
         expect(bubble.getAttribute('data-placement')).toBe('bottom')
@@ -67,13 +67,13 @@ describe('the preview’s point, flipped below the button', () => {
     await example(preview, sheet)
     const side = document.createElement('style')
     side.textContent = `helix-headless-copy-button::part(tooltip-arrow-bottom) { outline: 1px solid rgb(1, 2, 3) }
-      helix-headless-copy-button::part(tooltip-bottom) { outline: 1px solid rgb(4, 5, 6) }`
+      helix-headless-copy-button::part(tooltip-surface-bottom) { outline: 1px solid rgb(4, 5, 6) }`
     document.body.append(side)
     const host = document.querySelector('helix-headless-copy-button') as HTMLElement
     const tip = host.shadowRoot?.querySelector('helix-headless-tooltip') as Tip
     tip.show()
     await idle()
     expect(getComputedStyle(part(tip, 'arrow') as Element).outlineColor).toBe('rgb(1, 2, 3)')
-    expect(getComputedStyle(part(tip, 'tooltip') as Element).outlineColor).toBe('rgb(4, 5, 6)')
+    expect(getComputedStyle(part(tip, 'surface') as Element).outlineColor).toBe('rgb(4, 5, 6)')
   })
 })

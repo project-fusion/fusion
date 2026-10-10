@@ -38,7 +38,7 @@ describe('the preview’s cell bubble, flipped below the strip', () => {
       )
       await idle()
       const tip = part(host, 'tooltip-anchor') as HTMLElement
-      const bubble = part(tip, 'tooltip') as HTMLElement
+      const bubble = part(tip, 'surface') as HTMLElement
       const arrow = part(tip, 'arrow') as HTMLElement
       const mark = host.shadowRoot?.querySelector('#helix-chart-mark') as HTMLElement
       const anchor = mark.getBoundingClientRect()

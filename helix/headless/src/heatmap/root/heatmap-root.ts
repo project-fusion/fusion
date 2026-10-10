@@ -154,21 +154,21 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @csspart strip - The grid of cells, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart summary - The middle slot's box.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
- * @csspart tooltip - The bubble, forwarded from `Tooltip`.
  * @csspart tooltip-anchor - The `Tooltip` element itself.
  * @csspart tooltip-arrow - The bubble's point, forwarded from `Tooltip`.
  * @csspart tooltip-arrow-bottom - The point while the bubble is below the reading, on its top edge. Set alongside `tooltip-arrow`.
  * @csspart tooltip-arrow-left - The point while the bubble is left of the reading, on its right edge. Set alongside `tooltip-arrow`.
  * @csspart tooltip-arrow-right - The point while the bubble is right of the reading, on its left edge. Set alongside `tooltip-arrow`.
  * @csspart tooltip-arrow-top - The point while the bubble is above the reading, on its bottom edge. Set alongside `tooltip-arrow`.
- * @csspart tooltip-bottom - The bubble while it is below the reading. Set alongside `tooltip`.
  * @csspart tooltip-cell - One column's name and value inside the tooltip.
  * @csspart tooltip-cell-current - The cell the series keys rest on, in the charts whose readings hold several series. A strip draws one, so it is never set here.
  * @csspart tooltip-label - The reading's own name inside the tooltip.
- * @csspart tooltip-left - The bubble while it is left of the reading. Set alongside `tooltip`.
  * @csspart tooltip-name - A column's name inside the tooltip.
- * @csspart tooltip-right - The bubble while it is right of the reading. Set alongside `tooltip`.
- * @csspart tooltip-top - The bubble while it is above the reading. Set alongside `tooltip`.
+ * @csspart tooltip-surface - The bubble, forwarded from `Tooltip`.
+ * @csspart tooltip-surface-bottom - The bubble while it is below the reading. Set alongside `tooltip-surface`.
+ * @csspart tooltip-surface-left - The bubble while it is left of the reading. Set alongside `tooltip-surface`.
+ * @csspart tooltip-surface-right - The bubble while it is right of the reading. Set alongside `tooltip-surface`.
+ * @csspart tooltip-surface-top - The bubble while it is above the reading. Set alongside `tooltip-surface`.
  * @csspart tooltip-value - A column's value inside the tooltip.
  *
  * @cssproperty --heatmap-rows - How many rows the strip lays out. The component writes it from the data, and the stylesheet that draws the strip reads it.

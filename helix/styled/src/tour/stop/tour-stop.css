@@ -7,7 +7,7 @@
  *    same shape: a tour bubble that looked like a different kind of surface would
  *    be a second answer to a question the library has already answered.
  */
-[part="bubble"] {
+[part="surface"] {
   background-color: var(--tour-surface-color, var(--helix-color-surface-raised));
   border: var(--tour-border-width, var(--helix-border-thin)) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
@@ -34,27 +34,27 @@
 
 /* No ring on the panel itself, which takes focus only so a reader lands on the
    stop: the same choice `Dialog` makes for its panel. Its controls keep theirs. */
-[part="bubble"]:focus,
-[part="bubble"]:focus-visible {
+[part="surface"]:focus,
+[part="surface"]:focus-visible {
   outline: none;
 }
 
 /* The guard: an author rule beats the user agent's `[hidden] { display: none }`
    at any specificity, so a panel given a `display` here keeps it while closed
    unless something outranks the rule that gave it one. */
-:host [part="bubble"][hidden] {
+:host [part="surface"][hidden] {
   display: none;
 }
 
 /* **A dialog stop sits in the middle of the window**, which the user agent's
    `inset: 0` already asks for and the `margin: 0` above took away. */
-:host([type="dialog"]) [part="bubble"] {
+:host([type="dialog"]) [part="surface"] {
   margin: auto;
 }
 
 /* **A floating stop sits in the corner at the end of the line**, clear of the
    window's edges by the same step a toast keeps. */
-:host([type="floating"]) [part="bubble"] {
+:host([type="floating"]) [part="surface"] {
   inset: auto;
   inset-block-end: var(--helix-space-lg);
   inset-inline-end: var(--helix-space-lg);
@@ -124,22 +124,22 @@
    turn with the text either: a turned square's top-left corner is its top
    point, and `border-inline-start` on a right-to-left page edged the top-right
    one, which is its right. */
-[part="bubble"][data-placement^="bottom"] [part~="arrow"] {
+[part="surface"][data-placement^="bottom"] [part~="arrow"] {
   border-left: var(--helix-border-thin) solid var(--helix-color-border);
   border-top: var(--helix-border-thin) solid var(--helix-color-border);
 }
 
-[part="bubble"][data-placement^="top"] [part~="arrow"] {
+[part="surface"][data-placement^="top"] [part~="arrow"] {
   border-bottom: var(--helix-border-thin) solid var(--helix-color-border);
   border-right: var(--helix-border-thin) solid var(--helix-color-border);
 }
 
-[part="bubble"][data-placement^="right"] [part~="arrow"] {
+[part="surface"][data-placement^="right"] [part~="arrow"] {
   border-bottom: var(--helix-border-thin) solid var(--helix-color-border);
   border-left: var(--helix-border-thin) solid var(--helix-color-border);
 }
 
-[part="bubble"][data-placement^="left"] [part~="arrow"] {
+[part="surface"][data-placement^="left"] [part~="arrow"] {
   border-right: var(--helix-border-thin) solid var(--helix-color-border);
   border-top: var(--helix-border-thin) solid var(--helix-color-border);
 }

@@ -15,12 +15,12 @@ describe('tooltip server output', () => {
        sits outside the bubble: inside, the thing a reader points at would be in
        a `popover` and so never on screen at all. */
     const shadow = rendered(ssr(tooltip), 'helix-headless-tooltip')
-    expect(shadow).toMatch(/<slot\s*><\/slot>[\s\S]*<div[^>]*part="tooltip"/)
+    expect(shadow).toMatch(/<slot\s*><\/slot>[\s\S]*<div[^>]*part="surface"/)
   })
 
   test('the bubble ships as a popover, so it needs no z-index', () => {
-    expect(partTag(ssr(tooltip), 'tooltip')).toContain('popover="manual"')
-    expect(partTag(ssr(tooltip), 'tooltip')).toContain('role="tooltip"')
+    expect(partTag(ssr(tooltip), 'surface')).toContain('popover="manual"')
+    expect(partTag(ssr(tooltip), 'surface')).toContain('role="tooltip"')
   })
 
   /* The arrow is drawn by the bubble rather than positioned by script, so it

@@ -51,7 +51,7 @@ helix-headless-heatmap::part(tooltip-anchor) {
   position: absolute;
 }
 
-helix-headless-heatmap::part(tooltip) {
+helix-headless-heatmap::part(tooltip-surface) {
   background-color: var(--_gray-strong);
   border: 0;
   border-radius: var(--_radius-control);

@@ -10,7 +10,7 @@
 /* The UA's own `[popover]` rule sets `overflow: auto`, which makes the surface a
    scroll container, and anything positioned outside a scroll container is
    clipped. */
-[part~="tooltip"] {
+[part~="surface"] {
   overflow: visible;
   align-items: center;
   display: flex;
@@ -42,7 +42,7 @@
     overlay var(--helix-duration-fast) allow-discrete;
 }
 
-[part~="tooltip"][data-placed] {
+[part~="surface"][data-placed] {
   opacity: 1;
   scale: 1;
 }
@@ -66,7 +66,7 @@
    `surface-inverse` with `foreground-inverse` on it, and
    `--helix-material-translucent` is the *page's* ground, `neutral-0` in light
    and `neutral-900` in dark. */
-:host([material="glass"]) [part~="tooltip"],
+:host([material="glass"]) [part~="surface"],
 :host([material="glass"]) [part~="arrow"] {
   backdrop-filter: var(--tooltip-backdrop, var(--helix-material-backdrop));
   background-color: var(--tooltip-background-color, var(--helix-material-translucent));
@@ -74,14 +74,14 @@
 
 /* `frosted` is the same pair turned up: `translucent-strong` admits less, and
    the heavier blur is what stops a ground that opaque reading as a smear. */
-:host([material="frosted"]) [part~="tooltip"],
+:host([material="frosted"]) [part~="surface"],
 :host([material="frosted"]) [part~="arrow"] {
   backdrop-filter: var(--tooltip-backdrop, blur(var(--helix-material-blur-lg)));
   background-color: var(--tooltip-background-color, var(--helix-material-translucent-strong));
 }
 
-:host([material="frosted"]) [part~="tooltip"],
-:host([material="glass"]) [part~="tooltip"] {
+:host([material="frosted"]) [part~="surface"],
+:host([material="glass"]) [part~="surface"] {
   border: var(--helix-border-thin) solid var(--tooltip-border-color, var(--helix-color-border));
   color: var(--tooltip-color, var(--helix-color-foreground));
 }
@@ -92,26 +92,26 @@
    `--floating-arrow-x` and `--floating-arrow-y` rather than `50%`: `top-start`
    puts it near one end and `shift` slides it anywhere along the edge to keep the
    bubble on screen. */
-[part~="tooltip"][data-placement^="top"] {
+[part~="surface"][data-placement^="top"] {
   transform-origin: var(--floating-arrow-x, 50%) 100%;
 }
 
-[part~="tooltip"][data-placement^="bottom"] {
+[part~="surface"][data-placement^="bottom"] {
   transform-origin: var(--floating-arrow-x, 50%) 0;
 }
 
-[part~="tooltip"][data-placement^="left"] {
+[part~="surface"][data-placement^="left"] {
   transform-origin: 100% var(--floating-arrow-y, 50%);
 }
 
-[part~="tooltip"][data-placement^="right"] {
+[part~="surface"][data-placement^="right"] {
   transform-origin: 0 var(--floating-arrow-y, 50%);
 }
 
 /* The UA hides a closed popover with `[popover]:not(:popover-open)`, and the
    rules above are author declarations that outrank it whatever their
    specificity. */
-[part~="tooltip"]:not(:popover-open) {
+[part~="surface"]:not(:popover-open) {
   display: none;
 }
 
@@ -119,12 +119,12 @@
    with a slower one: the tooltip simply appears, which is what it did before. */
 @media (prefers-reduced-motion: reduce) {
   /* The scale and the transition go; the opacity gate stays. */
-  [part~="tooltip"] {
+  [part~="surface"] {
     scale: 1;
     transition: none;
   }
 
-  [part~="tooltip"][data-placed] {
+  [part~="surface"][data-placed] {
     scale: 1;
   }
 }

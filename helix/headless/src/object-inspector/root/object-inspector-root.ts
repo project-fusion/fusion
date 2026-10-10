@@ -181,16 +181,16 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  * @csspart copy-mark - The clipboard icon, and the confirmation icon that replaces it.
  * @csspart copy-spinner - The ring the copy button turns while it is pending.
  * @csspart copy-text - The words on that button, trimmed to their capitals and baseline.
- * @csspart copy-tooltip - The tooltip, forwarded from the copy button's tooltip.
  * @csspart copy-tooltip-arrow - The tooltip's arrow, pointing at the copy button.
  * @csspart copy-tooltip-arrow-bottom - The arrow while the tooltip is below the copy button, on the tooltip's top edge. Set alongside `copy-tooltip-arrow`.
  * @csspart copy-tooltip-arrow-left - The arrow while the tooltip is left of the copy button, on the tooltip's right edge. Set alongside `copy-tooltip-arrow`.
  * @csspart copy-tooltip-arrow-right - The arrow while the tooltip is right of the copy button, on the tooltip's left edge. Set alongside `copy-tooltip-arrow`.
  * @csspart copy-tooltip-arrow-top - The arrow while the tooltip is above the copy button, on the tooltip's bottom edge. Set alongside `copy-tooltip-arrow`.
- * @csspart copy-tooltip-bottom - The tooltip while it is below the copy button. Set alongside `copy-tooltip`.
- * @csspart copy-tooltip-left - The tooltip while it is left of the copy button. Set alongside `copy-tooltip`.
- * @csspart copy-tooltip-right - The tooltip while it is right of the copy button. Set alongside `copy-tooltip`.
- * @csspart copy-tooltip-top - The tooltip while it is above the copy button. Set alongside `copy-tooltip`.
+ * @csspart copy-tooltip-surface - The tooltip, forwarded from the copy button's tooltip.
+ * @csspart copy-tooltip-surface-bottom - The tooltip while it is below the copy button. Set alongside `copy-tooltip-surface`.
+ * @csspart copy-tooltip-surface-left - The tooltip while it is left of the copy button. Set alongside `copy-tooltip-surface`.
+ * @csspart copy-tooltip-surface-right - The tooltip while it is right of the copy button. Set alongside `copy-tooltip-surface`.
+ * @csspart copy-tooltip-surface-top - The tooltip while it is above the copy button. Set alongside `copy-tooltip-surface`.
  * @csspart count - The number of entries a branch holds.
  * @csspart empty - The row shown in the tree while it has no entries to show: no value, or a filter that matched none. It holds the `empty` slot.
  * @csspart frame - The tree and the copy button beside it.
@@ -1111,11 +1111,12 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   protected renderCopyButton(row: Row | undefined): TemplateResult {
     return staticHtml`<${this.tag('copy-button')}
       part="copy"
-      exportparts="button: copy-button, live: copy-live, spinner: copy-spinner, text: copy-text, mark: copy-mark, tooltip: copy-tooltip,
+      exportparts="button: copy-button, live: copy-live, spinner: copy-spinner, text: copy-text, mark: copy-mark, tooltip-surface: copy-tooltip-surface,
         tooltip-arrow: copy-tooltip-arrow, tooltip-arrow-bottom: copy-tooltip-arrow-bottom,
         tooltip-arrow-left: copy-tooltip-arrow-left, tooltip-arrow-right: copy-tooltip-arrow-right,
-        tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-bottom: copy-tooltip-bottom,
-        tooltip-left: copy-tooltip-left, tooltip-right: copy-tooltip-right, tooltip-top: copy-tooltip-top"
+        tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-surface-bottom: copy-tooltip-surface-bottom,
+        tooltip-surface-left: copy-tooltip-surface-left, tooltip-surface-right: copy-tooltip-surface-right,
+        tooltip-surface-top: copy-tooltip-surface-top"
       label=${row?.key === undefined ? this.copyValueLabel : formatWords(this, 'copyLabel', { name: row.key })}
       .value=${this.copyable(row)}
     ></${this.tag('copy-button')}>`

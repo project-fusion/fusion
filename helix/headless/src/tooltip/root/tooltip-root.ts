@@ -111,11 +111,11 @@ const warmth = (): Warmth => {
  * @csspart arrow-left - Added to `arrow` while the bubble is left of its trigger, with the arrow on the bubble's right edge.
  * @csspart arrow-right - Added to `arrow` while the bubble is right of its trigger, with the arrow on the bubble's left edge.
  * @csspart arrow-top - Added to `arrow` while the bubble is above its trigger, with the arrow on the bubble's bottom edge.
- * @csspart tooltip - The bubble.
- * @csspart tooltip-bottom - Added to `tooltip` while the bubble is below its trigger.
- * @csspart tooltip-left - Added to `tooltip` while the bubble is left of its trigger.
- * @csspart tooltip-right - Added to `tooltip` while the bubble is right of its trigger.
- * @csspart tooltip-top - Added to `tooltip` while the bubble is above its trigger.
+ * @csspart surface - The bubble.
+ * @csspart surface-bottom - Added to `surface` while the bubble is below its trigger.
+ * @csspart surface-left - Added to `surface` while the bubble is left of its trigger.
+ * @csspart surface-right - Added to `surface` while the bubble is right of its trigger.
+ * @csspart surface-top - Added to `surface` while the bubble is above its trigger.
  *
  * @cssstate entering - From the moment the bubble shows until its entrance has finished.
  * @cssstate exiting - From the moment the bubble hides until its exit has finished.
@@ -400,7 +400,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
       this.side = side
     },
     placement: () => this.placement,
-    surface: () => this.partNamed('tooltip'),
+    surface: () => this.partNamed('surface'),
     within: () => this.enclosure,
   })
 
@@ -423,11 +423,11 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
       exiting: (on) => this.toggleState('exiting', on),
     },
     open: () => this.open,
-    surface: () => this.partNamed('tooltip'),
+    surface: () => this.partNamed('surface'),
   })
 
   private get bubble(): HTMLElement | null {
-    return this.partNamed('tooltip')
+    return this.partNamed('surface')
   }
 
   /**
@@ -1014,7 +1014,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     const side = this.side
     return html`<slot></slot>
       <div
-        part="tooltip${side ? { bottom: ' tooltip-bottom', left: ' tooltip-left', right: ' tooltip-right', top: ' tooltip-top' }[side] : ''}"
+        part="surface${side ? { bottom: ' surface-bottom', left: ' surface-left', right: ' surface-right', top: ' surface-top' }[side] : ''}"
         popover="manual"
         role="tooltip"
         @pointerenter=${this.holdOnBubble}

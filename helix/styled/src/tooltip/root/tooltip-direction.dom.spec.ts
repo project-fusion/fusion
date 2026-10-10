@@ -46,7 +46,7 @@ if (hasLayout()) {
     /* `computePosition` resolves after the update, and `autoUpdate` places once
        as it starts: two frames cover both. */
     await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
-    const bubble = part(tip, 'tooltip') as HTMLElement
+    const bubble = part(tip, 'surface') as HTMLElement
     await settled(bubble)
     return {
       arrow: (part(tip, 'arrow') as HTMLElement).getBoundingClientRect(),

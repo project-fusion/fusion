@@ -87,11 +87,11 @@ import { closeOnDialogSubmit, commandValue } from '../form-method.js'
  * @event {ToggleEvent} toggle - Sent when the dialog opens or closes, with `newState` and `oldState`.
  *
  * @csspart body - The slot the content is in. It draws no box until you give it one.
- * @csspart dialog - The native dialog element.
  * @csspart dismiss - The close control, drawn when the dialog is `dismissible`.
  * @csspart dismiss-mark - The glyph on the close control, where none is slotted.
  * @csspart footer - The slot the actions are in. It draws no box until you give it one.
  * @csspart header - The slot the title is in. It draws no box until you give it one.
+ * @csspart surface - The panel, which is the native dialog element.
  *
  * @cssstate entering - From the moment the dialog opens until its entrance has finished.
  * @cssstate exiting - From the moment the dialog closes until its exit has finished.
@@ -575,7 +575,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
        the slot a `display`. The close control comes last, so
        opening still focuses the first control in the content. */
     return html`<dialog
-      part="dialog"
+      part="surface"
       role=${this.alert ? 'alertdialog' : nothing}
       closedby=${this.closedBy ?? nothing}
       aria-label=${this.label || this.fallbackLabel}

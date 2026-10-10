@@ -139,7 +139,7 @@ helix-headless-bar-chart::part(tooltip-anchor) {
   position: absolute;
 }
 
-helix-headless-bar-chart::part(tooltip) {
+helix-headless-bar-chart::part(tooltip-surface) {
   background-color: var(--_gray-strong);
   border: 0;
   border-radius: var(--_radius-control);

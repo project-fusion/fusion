@@ -34,7 +34,7 @@ describe('dialog', () => {
        inert-behind are the platform's, and none of them are available to a div
        however it is labeled. */
     const host = await dialog()
-    expect((part(host, 'dialog') as HTMLElement).tagName.toLowerCase()).toBe('dialog')
+    expect((part(host, 'surface') as HTMLElement).tagName.toLowerCase()).toBe('dialog')
   })
 
   test('the name is on the host through internals, not as an attribute', async () => {
@@ -73,7 +73,7 @@ describe('dialog', () => {
     const host = await dialog()
     host.show()
     await host.updateComplete
-    const native = part(host, 'dialog') as HTMLDialogElement
+    const native = part(host, 'surface') as HTMLDialogElement
     native.dispatchEvent(new Event('close'))
     await host.updateComplete
     expect(hasState(host, 'open')).toBe(false)
@@ -98,7 +98,7 @@ describe('dialog', () => {
     host.addEventListener('close', (event) => {
       heard.push(`${(event.composedPath()[0] as Element).localName} bubbles=${event.bubbles}`)
     })
-    const native = part(host, 'dialog') as HTMLDialogElement
+    const native = part(host, 'surface') as HTMLDialogElement
     /* Shut first, then announced, which is the order the platform uses and the
        order this has to imitate: a `<form method="dialog">` submit sets `open`
        false and fires `close` afterwards. Dispatching the event alone leaves the
@@ -118,7 +118,7 @@ describe('dialog', () => {
     const host = await dialog('persistent')
     host.show()
     await host.updateComplete
-    const native = part(host, 'dialog') as HTMLDialogElement
+    const native = part(host, 'surface') as HTMLDialogElement
     const cancel = new Event('cancel', { cancelable: true })
     native.dispatchEvent(cancel)
     await host.updateComplete
@@ -130,7 +130,7 @@ describe('dialog', () => {
      its panel. The platform leaves a dialog open on that press under
      `closedby="none"` and `"closerequest"`, and so does this element. */
   const pressBackdrop = async (host: Dialog): Promise<void> => {
-    const native = part(host, 'dialog') as HTMLDialogElement
+    const native = part(host, 'surface') as HTMLDialogElement
     const box = native.getBoundingClientRect()
     native.dispatchEvent(
       new MouseEvent('click', { bubbles: true, clientX: box.right + 5, clientY: box.bottom + 5 }),
@@ -160,7 +160,7 @@ describe('dialog', () => {
     const host = await dialog('closedby="none"')
     host.show()
     await host.updateComplete
-    const native = part(host, 'dialog') as HTMLDialogElement
+    const native = part(host, 'surface') as HTMLDialogElement
     native.dispatchEvent(new Event('cancel', { cancelable: true }))
     await host.updateComplete
     expect(host.open).toBe(true)
@@ -217,7 +217,7 @@ describe('the dialog’s name', () => {
      the `<dialog>`, which is what an engine with reflection provides. */
   const reflecting = async (markup: string): Promise<{ host: Dialog; names: () => string[] }> => {
     const host = (await mount(markup)) as Dialog
-    const native = part(host, 'dialog') as HTMLDialogElement & Record<string, unknown>
+    const native = part(host, 'surface') as HTMLDialogElement & Record<string, unknown>
     if (!('ariaLabelledByElements' in native)) {
       Object.defineProperty(native, 'ariaLabelledByElements', { value: null, writable: true })
     }
@@ -376,7 +376,7 @@ if (hasLayout()) {
          stylesheet, so a closed dialog measures zero there whether or not the
          bug is present, and the check would pass on the broken build. */
       const host = await dialog()
-      expect((part(host, 'dialog') as HTMLElement).getBoundingClientRect().height).toBe(0)
+      expect((part(host, 'surface') as HTMLElement).getBoundingClientRect().height).toBe(0)
     })
 
     test('an open one does, and is in the top layer', async () => {
@@ -387,7 +387,7 @@ if (hasLayout()) {
       const host = await dialog()
       host.show()
       await host.updateComplete
-      const native = part(host, 'dialog') as HTMLDialogElement
+      const native = part(host, 'surface') as HTMLDialogElement
       expect(native.getBoundingClientRect().height).toBeGreaterThan(0)
       expect(native.matches(':modal')).toBe(true)
       host.close()
@@ -464,7 +464,7 @@ describe('a dialog opening on its own', () => {
          <helix-headless-button>Later</helix-headless-button>
        </helix-headless-dialog>`,
     )
-    const inner = part(host, 'dialog') as HTMLDialogElement
+    const inner = part(host, 'surface') as HTMLDialogElement
 
     /* The host has rendered, which is what `mount` waits for. The dialog has
        not opened yet, because the button inside it has not finished its own
@@ -490,7 +490,7 @@ describe('a dialog opening on its own', () => {
       `<helix-headless-dialog default-open label="Filters"><p>Plain</p></helix-headless-dialog>`,
     )
     await Promise.resolve()
-    expect((part(host, 'dialog') as HTMLDialogElement).open).toBe(true)
+    expect((part(host, 'surface') as HTMLDialogElement).open).toBe(true)
     host.remove()
   })
 })
@@ -498,9 +498,9 @@ describe('a dialog opening on its own', () => {
 describe('an alert dialog', () => {
   test('is an alertdialog when asked, and an ordinary dialog otherwise', async () => {
     const plain = await dialog()
-    expect(part(plain, 'dialog')?.hasAttribute('role')).toBe(false)
+    expect(part(plain, 'surface')?.hasAttribute('role')).toBe(false)
     const alert = await dialog('alert')
-    expect(part(alert, 'dialog')?.getAttribute('role')).toBe('alertdialog')
+    expect(part(alert, 'surface')?.getAttribute('role')).toBe('alertdialog')
   })
 })
 
@@ -508,7 +508,7 @@ describe('the dialog’s description', () => {
   /* The same stand-in the name uses: happy-dom has no element reflection. */
   const reflecting = async (markup: string): Promise<{ host: Dialog; said: () => string[] }> => {
     const host = (await mount(markup)) as Dialog
-    const native = part(host, 'dialog') as HTMLDialogElement & Record<string, unknown>
+    const native = part(host, 'surface') as HTMLDialogElement & Record<string, unknown>
     if (!('ariaDescribedByElements' in native)) {
       Object.defineProperty(native, 'ariaDescribedByElements', { value: null, writable: true })
     }
@@ -583,7 +583,7 @@ describe('the dialog’s regions and close control', () => {
 
   test('the close control is last, so opening still focuses the content first', async () => {
     const host = await dialog('dismissible')
-    const native = part(host, 'dialog') as HTMLDialogElement
+    const native = part(host, 'surface') as HTMLDialogElement
     expect(native.lastElementChild?.getAttribute('part')).toBe('dismiss')
   })
 })

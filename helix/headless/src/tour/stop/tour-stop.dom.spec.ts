@@ -68,10 +68,10 @@ describe('one tour stop', () => {
   /* The panel is `popover="manual"`, which is what keeps a press elsewhere from
      ending the tour: elsewhere is the thing being pointed at. */
   test('holds its panel open itself rather than letting a press elsewhere close it', async () => {
-    const bubble = part(await stop(), 'bubble')
+    const bubble = part(await stop(), 'surface')
     expect(bubble?.getAttribute('popover')).toBe('manual')
     expect(bubble?.hasAttribute('hidden')).toBe(false)
-    expect(part(await stop(''), 'bubble')?.hasAttribute('hidden')).toBe(true)
+    expect(part(await stop(''), 'surface')?.hasAttribute('hidden')).toBe(true)
   })
 })
 
@@ -90,7 +90,7 @@ if (hasLayout()) {
   const FIXTURE = `<style>
       #band { block-size: 3rem; inset-block-start: 4rem; inset-inline: 1rem; position: fixed }
       #post { block-size: 3rem; inline-size: 6rem; inset-block-start: 4rem; inset-inline-start: 1rem; position: fixed }
-      helix-headless-tour-stop::part(bubble) { box-sizing: border-box; inline-size: 16rem; margin: 0; overflow: visible; padding: 0 }
+      helix-headless-tour-stop::part(surface) { box-sizing: border-box; inline-size: 16rem; margin: 0; overflow: visible; padding: 0 }
     </style>
     <div id="band"></div>
     <div id="post"></div>`
@@ -112,7 +112,7 @@ if (hasLayout()) {
   }
 
   const boxes = (host: Stop): { bubble: DOMRect; target: DOMRect } => ({
-    bubble: (part(host, 'bubble') as HTMLElement).getBoundingClientRect(),
+    bubble: (part(host, 'surface') as HTMLElement).getBoundingClientRect(),
     target: (
       document.getElementById(host.getAttribute('for') ?? '') as HTMLElement
     ).getBoundingClientRect(),
@@ -129,7 +129,7 @@ if (hasLayout()) {
     test('stays beside it where there is room', async () => {
       const host = await placed(beside('post'))
       const { bubble, target } = boxes(host)
-      expect(part(host, 'bubble')?.getAttribute('data-placement')).toBe('right-start')
+      expect(part(host, 'surface')?.getAttribute('data-placement')).toBe('right-start')
       expect(bubble.left).toBeGreaterThanOrEqual(target.right)
       expect(hasState(host, 'placed-right')).toBe(true)
       expect(part(host, 'arrow')?.getAttribute('part')).toBe('arrow arrow-right')
@@ -139,7 +139,7 @@ if (hasLayout()) {
     test('moves below it, inside the window, where neither side has room', async () => {
       const host = await placed(beside('band'))
       const { bubble, target } = boxes(host)
-      expect(part(host, 'bubble')?.getAttribute('data-placement')).toBe('bottom-start')
+      expect(part(host, 'surface')?.getAttribute('data-placement')).toBe('bottom-start')
       expect(bubble.top).toBeGreaterThanOrEqual(target.bottom)
       expect(bubble.left).toBeGreaterThanOrEqual(0)
       expect(bubble.right).toBeLessThanOrEqual(window.innerWidth)
@@ -160,7 +160,7 @@ if (hasLayout()) {
       expect(Math.round(boxes(ltr).bubble.left)).toBe(Math.round(boxes(ltr).target.left))
 
       const rtl = await placed(beside('band'), 'rtl')
-      expect(part(rtl, 'bubble')?.getAttribute('data-placement')).toBe('bottom-start')
+      expect(part(rtl, 'surface')?.getAttribute('data-placement')).toBe('bottom-start')
       expect(Math.round(boxes(rtl).bubble.right)).toBe(Math.round(boxes(rtl).target.right))
     })
 
@@ -170,7 +170,7 @@ if (hasLayout()) {
     test('crosses to the other side of a target at the start of a right-to-left page', async () => {
       const host = await placed(beside('post'), 'rtl')
       const { bubble, target } = boxes(host)
-      expect(part(host, 'bubble')?.getAttribute('data-placement')).toBe('left-start')
+      expect(part(host, 'surface')?.getAttribute('data-placement')).toBe('left-start')
       expect(bubble.right).toBeLessThanOrEqual(target.left)
       expect(bubble.left).toBeGreaterThanOrEqual(0)
       expect(hasState(host, 'placed-left')).toBe(true)
@@ -188,12 +188,12 @@ describe('the stop’s title and description', () => {
 
   test('a label names the panel where nothing else does', async () => {
     const host = await stop('current label="Your projects"')
-    expect(part(host, 'bubble')?.getAttribute('aria-label')).toBe('Your projects')
+    expect(part(host, 'surface')?.getAttribute('aria-label')).toBe('Your projects')
   })
 
   test('a wait stop never shows its panel', async () => {
     const host = await stop('current type="wait"')
-    expect((part(host, 'bubble') as HTMLElement | null)?.hidden).toBe(true)
+    expect((part(host, 'surface') as HTMLElement | null)?.hidden).toBe(true)
   })
 })
 

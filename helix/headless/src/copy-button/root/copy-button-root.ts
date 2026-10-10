@@ -75,16 +75,16 @@ import '../../tooltip/index.js'
  * @csspart mark - The clipboard icon, and the confirmation icon that replaces it.
  * @csspart spinner - The ring a pending button turns, an empty element the styled button draws over the icon. It is rendered only while the button is pending.
  * @csspart text - The words beside the icon, under `show-label`. It holds all three, `label`, `copied-label` and `error-label`, with all but the current one hidden.
- * @csspart tooltip - The tooltip bubble, forwarded from the tooltip inside the button.
  * @csspart tooltip-arrow - The tooltip's arrow, which points at the button.
  * @csspart tooltip-arrow-bottom - The arrow while the bubble is below the button, on the bubble's top edge. Set together with `tooltip-arrow`.
  * @csspart tooltip-arrow-left - The arrow while the bubble is left of the button, on the bubble's right edge. Set together with `tooltip-arrow`.
  * @csspart tooltip-arrow-right - The arrow while the bubble is right of the button, on the bubble's left edge. Set together with `tooltip-arrow`.
  * @csspart tooltip-arrow-top - The arrow while the bubble is above the button, on the bubble's bottom edge. Set together with `tooltip-arrow`.
- * @csspart tooltip-bottom - The bubble while it is below the button. Set together with `tooltip`.
- * @csspart tooltip-left - The bubble while it is left of the button. Set together with `tooltip`.
- * @csspart tooltip-right - The bubble while it is right of the button. Set together with `tooltip`.
- * @csspart tooltip-top - The bubble while it is above the button. Set together with `tooltip`.
+ * @csspart tooltip-surface - The tooltip bubble, forwarded from the tooltip inside the button.
+ * @csspart tooltip-surface-bottom - The bubble while it is below the button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-left - The bubble while it is left of the button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-right - The bubble while it is right of the button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-top - The bubble while it is above the button. Set together with `tooltip-surface`.
  *
  * @cssstate copied - The moment after a successful copy, while `copied-label` names the button.
  * @cssstate failed - The moment after a press that put nothing on the clipboard, while `error-label` names the button.
@@ -462,8 +462,9 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
     data-copy-tooltip placement=${this.tooltipPlacement}
     exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom,
       arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right,
-      arrow-top: tooltip-arrow-top, tooltip, tooltip-bottom, tooltip-left, tooltip-right,
-      tooltip-top">
+      arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom,
+      surface-left: tooltip-surface-left, surface-right: tooltip-surface-right,
+      surface-top: tooltip-surface-top">
       ${control}
     </${this.tag('tooltip')}>`
   }
