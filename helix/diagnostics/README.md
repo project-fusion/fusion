@@ -422,6 +422,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `typed-marks` | A quote's text starts or ends with a typed quotation mark, which the browser's marks double |
 | `unknown-event` | A React `on` prop names an event that no element dispatches. Development builds only (the `development` export condition) |
 | `unknown-icon` | An icon's `name` is not in the Helix set, so it draws nothing |
+| `unknown-language` | A sandbox editor's `language` is not a language it reads, so its source is drawn plain |
 | `unlinked-trigger` | A tooltip's trigger does not name it in `aria-describedby` |
 | `unreachable-label` | A text is rendered as a label, a deprecated value that labels no control |
 | `unregistered-part` | A part with an entry of its own, such as a filter menu, is in the page and its entry was never imported |

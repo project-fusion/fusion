@@ -102,6 +102,8 @@ export type RuntimeKind =
   | 'unknown-event'
   /** An Icon's `name` is in no icon set it can read, so it draws nothing. */
   | 'unknown-icon'
+  /** A sandbox editor's `language` is no language it reads, so its source is drawn plain. */
+  | 'unknown-language'
   /** A tooltip's trigger does not name it in `aria-describedby`, so it is not read out. */
   | 'unlinked-trigger'
   /** A Text is rendered as a label, a deprecated value whose shadow root reaches no control. */
