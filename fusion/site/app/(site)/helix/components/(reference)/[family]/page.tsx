@@ -375,8 +375,16 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
   )
 }
 
-/** One element's whole surface, six tables deep. */
-function ElementApi({ element }: { element: Element }) {
+/**
+ * One element's whole surface, six tables deep.
+ *
+ * **Its own status where it differs from its family's.** The header states the
+ * family's status, read from its root, and an add-on's element can join a
+ * family at another one: `helix-sandbox-editor` is experimental in the stable
+ * Sandbox family, and the page called it nothing but stable. The tag is the
+ * one the header uses, so the two read as the same fact.
+ */
+function ElementApi({ element, familyStatus }: { element: Element; familyStatus: string }) {
   return (
     <helix-flex data-tier={element.tier} direction="column" gap="md" id={element.tagName}>
       {/*
@@ -390,6 +398,9 @@ function ElementApi({ element }: { element: Element }) {
         <helix-tag>
           <helix-text variant="code">{element.tagName}</helix-text>
         </helix-tag>
+        {element.status && element.status !== familyStatus && (
+          <helix-tag>{startCase(element.status)}</helix-tag>
+        )}
       </helix-flex>
 
       {element.summary && (
@@ -655,7 +666,7 @@ export default async function FamilyDocs({
               API Reference
             </SectionHeading>
             {family.elements.map((element) => (
-              <ElementApi element={element} key={element.tagName} />
+              <ElementApi element={element} familyStatus={family.status} key={element.tagName} />
             ))}
           </helix-flex>
 

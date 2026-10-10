@@ -212,6 +212,38 @@ describe('reference', () => {
     test('an unlisted family is not in it', () => {
       expect(reference(manifest, { families: ['nothing'] })).toBe('# Component reference\n')
     })
+
+    /* `helix-sandbox-editor` is experimental in the stable Sandbox family, and
+       the page stated the family's status alone. */
+    test('states an element’s own status where it differs from its family’s', () => {
+      const [first, ...others] = manifest.modules ?? []
+      const [root, ...rest] = first?.declarations ?? []
+      const mixed = reference(
+        {
+          modules: [
+            {
+              ...first,
+              declarations: [{ ...root, helix: { ...root?.helix, status: 'stable' } }, ...rest],
+              path: first?.path ?? '',
+            },
+            ...others,
+            {
+              declarations: [
+                {
+                  helix: { family: 'accordion', status: 'experimental' },
+                  name: 'HelixPanel',
+                  tagName: 'helix-panel',
+                },
+              ],
+              path: 'src/panels/panel/panel.ts',
+            },
+          ],
+        },
+        { families: ['accordion'] },
+      )
+      expect(mixed).toContain('## Panel (`helix-panel`)\n\n**Status:** experimental')
+      expect(mixed.match(/\*\*Status:\*\*/g)).toHaveLength(1)
+    })
   })
 
   // The reference `.md` carries the examples and the HTML page does not. An
