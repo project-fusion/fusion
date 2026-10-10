@@ -1,0 +1,110 @@
+---
+description: Picture every page and component in a real browser, compare each picture with a baseline kept in git, and fail the run when one changes.
+section: Tooling
+title: Visual testing
+---
+
+# Visual testing
+
+`helix visual` takes pictures of your pages and components in a real browser,
+compares each one to a baseline kept in your git repository, and fails the run
+when a picture changes. It ships in `@fusion.dev/helix-cli`, and it pictures
+any web project, with Helix or without it.
+
+It pictures HTML files, any server's pages, Storybook stories, and entries from
+a JSON catalog, and it has a GitHub Action.
+
+## Install
+
+```sh
+npm install --save-dev @fusion.dev/helix-cli playwright
+npx playwright install --with-deps chromium
+```
+
+Capture runs in Playwright, which you install beside the command line. The
+rest of `helix` needs no browser, so Playwright is an optional peer, and
+`helix visual test` names it when it is missing.
+
+## Commands
+
+```sh
+helix visual test                    compare every shot, and fail on a difference
+helix visual test button             only the entries named button
+helix visual update                  write only the baselines the comparison rejects
+helix visual test --shard 0 --of 4   the first of four shards, for CI
+helix visual report                  open the report of the last run
+helix visual compare a.png b.png     compare two PNG files, with no browser
+```
+
+- **`helix visual test`** pictures every entry and compares each shot with its
+  baseline. It exits 1 when a shot differs, changes size, has no baseline, or
+  cannot be taken, and writes an image of each difference beside its baseline,
+  named `<stem><suffix>.diff.png`. Add `*.diff.png` to your `.gitignore`.
+- **`helix visual update`** pictures every entry and writes a baseline only
+  where the comparison would fail. Review the files it writes before you
+  commit them.
+- **`helix visual report`** opens the report the last run wrote. `--markdown`
+  prints its summary as Markdown, for a CI job's summary page. `--merge` takes
+  the reports of a run's shards and prints their changes as one set of groups.
+- **`helix visual compare`** compares two PNG files. `--diff` writes the image
+  of the difference, and `--threshold` sets how far apart two colors may be
+  and still count as the same pixel.
+
+Each run ends with one line that says what it compared and what it skipped.
+`helix --json visual …` prints one JSON document on stdout and moves the
+sentences to stderr.
+
+## The config
+
+`visual.config.ts`, in the directory you run `helix visual` from:
+
+```ts
+import { defineConfig } from '@fusion.dev/helix-cli/visual'
+
+export default defineConfig({
+  serve: { '/theme.css': 'dist/theme.css' },
+  shots: [
+    { name: 'wide', scheme: 'light', width: 1280 },
+    { name: 'phone', scheme: 'light', width: 390 },
+    { name: 'dark', scheme: 'dark', width: 1280 },
+  ],
+  sources: [
+    {
+      glob: '{name}/example.html',
+      kind: 'html',
+      name: 'components',
+      root: 'src',
+      styles: ['/theme.css'],
+    },
+  ],
+})
+```
+
+- **`sources`** is where the entries come from. `html` reads every file its
+  `glob` matches under `root` and pictures each inside a document that links
+  `styles`. `server` pictures a server's `routes` and every route its
+  `sitemap` lists. `storybook` pictures every story in a running Storybook.
+  `catalog` pictures every `{ id, url }` in a JSON file. `pairs` compares two
+  renders of each entry with each other.
+- **`shots`** is the pictures taken of each entry: a wide width, a phone
+  width, and dark when you give none. Each baseline is written beside its
+  entry as `<stem>.<name>.png`.
+- **`serve`** is URL paths served from disk, relative to the config.
+- **`settle.readyProperty`** names a property your elements carry holding a
+  promise that resolves once they have rendered. The run awaits it before each
+  shot.
+- **`aria`** keeps each entry's accessibility snapshot beside its baselines
+  and compares it as text, so a lost label fails even when no pixel moved.
+- **`checks`** adds judgments that need no baseline: `code` fails a code block
+  drawn in one color, `clipped` fails a box that cuts off its own text, and
+  `overlap` fails two boxes of text or controls that draw over each other.
+
+The command's own reference, with every option, is the README of
+`@fusion.dev/helix-cli`.
+
+## How Fusion uses it
+
+Fusion runs `helix visual` on every Helix example and on the site's pages on
+every push, and keeps the baselines in git. A change to how a component draws
+fails the run with a picture of the difference, and a retake opens a pull
+request of new baselines for review.

@@ -116,8 +116,11 @@ export default function Page() {
         <Band cardId="helix-places">
           <helix-flex class={band.bandSection} direction="column" gap="md">
             <Eyebrow>Where to go</Eyebrow>
-            <SectionTitle>What you open, and what you read</SectionTitle>
-            <Lede>Five things to use, and the pages that explain them.</Lede>
+            <SectionTitle>What Helix ships, and how you work with it</SectionTitle>
+            <Lede>
+              The components and the two things built with them, the tools you build with, and the
+              pages that explain them.
+            </Lede>
           </helix-flex>
 
           <div className={`${styles.places} ${styles.stagger}`}>
@@ -131,11 +134,18 @@ export default function Page() {
           </div>
 
           <div className={styles.reads}>
-            {reads.map((read) => (
-              <Link className={styles.read} href={read.href ?? product.href} key={read.title}>
-                <span className={styles.placeName}>{read.title}</span>
-                <span className={styles.placeSummary}>{read.summary}</span>
-              </Link>
+            {[...new Set(reads.map((read) => read.column))].map((heading) => (
+              <div className={styles.readGroup} key={heading ?? ''}>
+                {heading && <Eyebrow>{heading}</Eyebrow>}
+                {reads
+                  .filter((read) => read.column === heading)
+                  .map((read) => (
+                    <Link className={styles.read} href={read.href ?? product.href} key={read.title}>
+                      <span className={styles.placeName}>{read.title}</span>
+                      <span className={styles.placeSummary}>{read.summary}</span>
+                    </Link>
+                  ))}
+              </div>
             ))}
           </div>
         </Band>

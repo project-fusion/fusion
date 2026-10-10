@@ -75,7 +75,7 @@ export const VERTICALS: Vertical[] = [
     icon: 'palette',
     label: 'Design',
     name: 'Fusion Design',
-    stage: 'Building',
+    stage: 'Active',
     summary: 'Home of Helix, our design system.',
   },
   {

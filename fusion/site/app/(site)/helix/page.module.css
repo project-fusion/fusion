@@ -78,6 +78,12 @@
   padding: var(--helix-space-xl);
 }
 
+/* One heading and its rows. */
+.readGroup {
+  display: grid;
+  gap: var(--helix-space-md);
+}
+
 .read {
   color: var(--helix-color-foreground);
   display: grid;

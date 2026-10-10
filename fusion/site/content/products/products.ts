@@ -23,6 +23,12 @@ export interface Destination {
    */
   picture?: string
   /**
+   * The heading its row sits under in the panel's text column, where it is a
+   * row: `Tools` for the things you open beside the tiles, `Docs` for the
+   * pages you read. A tile carries none.
+   */
+  column?: string
+  /**
    * The sentence under the name, which is what the panel is for.
    */
   summary: string
@@ -162,65 +168,21 @@ export const PRODUCTS: Product[] = [
   {
     body: 'A design system of web components. Helix computes a full color palette from your brand color, and every component uses the same tokens, so your interface stays consistent.',
     destinations: [
-      /* First, because the panel is where a reader arrives rather than returns.
-         What a new one needs is how to install it and the vocabulary the
-         component pages already assume.
-
-         **`/helix/docs`, not `/helix/docs/introduction`.** That route derives
-         the first page of the first section rather than naming one, so a deep
-         link here would hardcode the single thing it exists to compute, and the
-         masthead would be the last place still pointing at the old front page
-         the day the order changes.
-
-         **Components keeps a row of its own, beside Docs rather than inside
-         it.** The docs sidebar carries both, but that is a fact about the
-         sidebar and not about what a reader arrives wanting: an alphabetical
-         list of every family is the single most asked-for thing here, and
-         putting it one level down behind a word that does not say "components"
-         makes a reader hunt for the thing they came for. A panel is for the
-         destinations people want, not for a tidy model of the routes. */
-      {
-        href: '/helix/docs',
-        summary: 'How to install and use Helix.',
-        title: 'Docs',
-      },
-      /* The rest of the text column. Docs is the front door, and these two
-         are the pages a reader arrives wanting by name: how to install it,
-         and how the palette is computed, which is the idea the whole system
-         rests on. Named pages with their own slugs, so a link to each is a
-         link to a thing and never to a position in a list. */
-      {
-        href: '/helix/docs/installation',
-        summary: 'What to install, in what order.',
-        title: 'Installation',
-      },
-      {
-        href: '/helix/docs/theming',
-        summary: 'Tokens from your brand color.',
-        title: 'Deriving a theme',
-      },
+      /* **The tiles: what Helix ships.** The catalog of components, and the
+         two things built with it, Maps and Graph, each a picture in the band.
+         The tools and the pages are the column beside them: Sandbox and the
+         theme builder are how you work with the components, and are opened
+         as often as the catalog is, so they keep rows of their own beside
+         it, under a heading that says what they are. */
       {
         href: '/helix/components',
         picture: 'components',
         summary: 'Every component and its API.',
         title: 'Components',
       },
-      {
-        href: '/helix/sandbox',
-        picture: 'sandbox',
-        summary: 'Edit code, see the result.',
-        title: 'Sandbox',
-      },
-      {
-        href: '/helix/theme',
-        picture: 'theme',
-        summary: 'A palette from your brand.',
-        title: 'Theme builder',
-      },
       /* A part of Helix rather than a third product: its argument is Helix's,
          a map in the page's theme that a screen reader can find, and without
-         Helix it is MapLibre and somebody's tiles. Last, because the four
-         above are how Helix is used and this is a thing built with it. */
+         Helix it is MapLibre and somebody's tiles. */
       {
         href: '/helix/maps',
         picture: 'map',
@@ -236,6 +198,56 @@ export const PRODUCTS: Product[] = [
         summary: 'Graphs in 2D and 3D.',
         title: 'Graph',
       },
+      /* **The column, and Docs leads it**: the panel is where a reader
+         arrives, and the front door comes before the tools.
+
+         **`/helix/docs`, not `/helix/docs/introduction`.** That route derives
+         the first page of the first section rather than naming one, so a deep
+         link here would hardcode the single thing it exists to compute, and the
+         masthead would be the last place still pointing at the old front page
+         the day the order changes. The two after it are the pages a reader
+         arrives wanting by name: how to install it, and how the palette is
+         computed, which is the idea the whole system rests on. Named pages
+         with their own slugs, so a link to each is a link to a thing and
+         never to a position in a list. */
+      {
+        column: 'Docs',
+        href: '/helix/docs',
+        summary: 'How to install and use Helix.',
+        title: 'Introduction',
+      },
+      {
+        column: 'Docs',
+        href: '/helix/docs/installation',
+        summary: 'What to install, in what order.',
+        title: 'Installation',
+      },
+      {
+        column: 'Docs',
+        href: '/helix/docs/theming',
+        summary: 'Tokens from your brand color.',
+        title: 'Deriving a theme',
+      },
+      {
+        column: 'Tools',
+        href: '/helix/sandbox',
+        summary: 'Edit code, see the result.',
+        title: 'Sandbox',
+      },
+      {
+        column: 'Tools',
+        href: '/helix/theme',
+        summary: 'A palette from your brand.',
+        title: 'Theme builder',
+      },
+      /* A tool with no page of its own: `helix visual` is a command, and its
+         page is the one that documents it. */
+      {
+        column: 'Tools',
+        href: '/helix/docs/visual-testing',
+        summary: 'Picture every page, and compare it with its baseline.',
+        title: 'Visual testing',
+      },
     ],
     href: '/helix',
     install: 'bun add @fusion.dev/helix',
@@ -243,7 +255,7 @@ export const PRODUCTS: Product[] = [
     mark: 'helix',
     name: 'Helix',
     role: 'The DNA',
-    stage: 'Building',
+    stage: 'Active',
     summary: 'A design system of web components, themed from your brand color.',
   },
   {
