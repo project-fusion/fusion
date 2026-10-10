@@ -659,6 +659,9 @@ impl<'a> Analyzer<'a> {
                 if let Some(raw) = self.native(path, position, element, elements) {
                     keep(&mut grouped, &mut keys, raw);
                 }
+                if let Some(raw) = self.nested(path, position, element, elements) {
+                    keep(&mut grouped, &mut keys, raw);
+                }
                 let Some(published) = self.index.get(&element.tag) else {
                     if let Some(raw) = self.unknown_tag(path, position, element) {
                         keep(&mut grouped, &mut keys, raw);
@@ -682,6 +685,25 @@ impl<'a> Analyzer<'a> {
                         sheet: path.to_owned(),
                         text: element.text.clone(),
                     };
+                    /* **Only a value the template wrote.** Lit's
+                    `?disabled=${false}`, Vue's `:disabled="false"`, and an
+                    expression in JSX, Svelte, or Angular decide at run time,
+                    and the page judges what they write. */
+                    if let Value::Literal(value) = &attribute.value {
+                        if value.eq_ignore_ascii_case("false")
+                            && published
+                                .booleans
+                                .as_ref()
+                                .is_some_and(|booleans| booleans.contains(name))
+                        {
+                            keep(
+                                &mut grouped,
+                                &mut keys,
+                                false_boolean(tag, name, value, origin()),
+                            );
+                            continue;
+                        }
+                    }
                     let raw = match published.attribute(name) {
                         None => unknown_attribute(tag, name, published, origin()),
                         Some(Allows::OneOf(allows)) => match &attribute.value {
@@ -1014,6 +1036,109 @@ impl<'a> Analyzer<'a> {
         })
     }
 
+    /// An interactive element inside a button or a link, which HTML forbids:
+    /// a Helix element inside a native one, or anything interactive inside a
+    /// Helix element drawn inside one, such as `helix-icon-button` in
+    /// `helix-button`. Named for the outer element where it is Helix's, as a
+    /// slot is, and with the page's subject and message.
+    ///
+    /// **Only through elements whose place the template settles.** A
+    /// framework's component, a custom element that is not Helix's, and a
+    /// `<template>` put their children where they choose, so the walk up
+    /// stops at each of them, as the page's stops at a custom element.
+    fn nested(
+        &self,
+        path: &str,
+        position: usize,
+        element: &Element,
+        elements: &[Element],
+    ) -> Option<Raw> {
+        let inner = element.tag.as_str();
+        let kind = self
+            .index
+            .get(inner)
+            .and_then(|published| published.interactive.as_deref());
+        if kind.is_none() && !native_interactive(element) {
+            return None;
+        }
+        let mut parent = element.parent;
+        let (outer, noun) = loop {
+            let above = elements.get(parent?)?;
+            let published = self.index.get(&above.tag);
+            if let Some(noun @ ("button" | "link")) =
+                published.and_then(|one| one.interactive.as_deref())
+            {
+                break (above.tag.as_str(), noun);
+            }
+            if published.is_none() && placed_elsewhere(above) {
+                return None;
+            }
+            if above.tag == "button" {
+                break ("button", "button");
+            }
+            if above.tag == "a" && writes(above, "href") {
+                break ("a", "link");
+            }
+            parent = above.parent;
+        };
+        let helix = self.index.get(outer).is_some();
+        if !helix && kind.is_none() {
+            return None;
+        }
+        /* A Helix tag by its name, and a native one as `a <button>` the
+        first time and `the <button>` after, as the page names them. */
+        let named = |tag: &str, article: &str| {
+            if self.index.get(tag).is_some() {
+                format!("`{tag}`")
+            } else {
+                format!("{article} `<{tag}>`")
+            }
+        };
+        let some = |tag: &str| {
+            named(
+                tag,
+                if tag.starts_with(['a', 'e', 'i', 'o', 'u']) {
+                    "an"
+                } else {
+                    "a"
+                },
+            )
+        };
+        let opening = some(inner);
+        let opening = match opening.strip_prefix('a') {
+            Some(rest) => format!("A{rest}"),
+            None => opening,
+        };
+        let drawn = if helix {
+            format!(", which draws its content inside a native {noun}")
+        } else {
+            String::new()
+        };
+        let hint = if outer == "a" && kind == Some("button") {
+            " To draw the link as a button, write `data-button` on the `<a>`."
+        } else {
+            ""
+        };
+        Some(Raw {
+            expected: None,
+            kind: "nested-interactive",
+            message: format!(
+                "{opening} is inside {}{drawn}. HTML allows no interactive element inside a button or a link, and browsers and screen readers differ on what a press or a focus there does. Move {} out of {}.{hint}",
+                some(outer),
+                named(inner, "the"),
+                named(outer, "the"),
+            ),
+            origin: Origin {
+                index: position,
+                line: element.line,
+                sheet: path.to_owned(),
+                text: element.text.clone(),
+            },
+            subject: format!("<{outer}> <{inner}>"),
+            tag: if helix { outer } else { inner }.to_owned(),
+        })
+    }
+
     /// The React `on` props on an element that bind nothing: a name in Helix's
     /// camel case, which React reads as an event of that exact name, and a
     /// hyphenated name no element dispatches.
@@ -1178,6 +1303,84 @@ impl<'a> Analyzer<'a> {
             subject: format!("<{tag}> [slot=\"{name}\"]"),
             tag: tag.to_owned(),
         })
+    }
+}
+
+/// An attribute's name with its binding syntax taken off: `href` for
+/// `:href`, `v-bind:href`, `[href]`, `.href`, and `?href`.
+fn unbound(raw: &str) -> &str {
+    let raw = raw
+        .strip_prefix("v-bind:")
+        .or_else(|| raw.strip_prefix([':', '.', '?']))
+        .unwrap_or(raw);
+    raw.strip_prefix('[')
+        .and_then(|one| one.strip_suffix(']'))
+        .unwrap_or(raw)
+}
+
+/// Whether a template writes `name` on an element, as an attribute or bound
+/// in any syntax.
+fn writes(element: &Element, name: &str) -> bool {
+    element
+        .attributes
+        .iter()
+        .any(|attribute| unbound(&attribute.name) == name)
+}
+
+/// Whether an element that is not Helix's puts its children where it
+/// chooses: a framework's component, written with a capital or with no tag
+/// at all, a custom element, a namespaced or dotted name, and a `<template>`.
+fn placed_elsewhere(element: &Element) -> bool {
+    let written: String = element
+        .text
+        .strip_prefix('<')
+        .unwrap_or_default()
+        .chars()
+        .take_while(|one| one.is_ascii_alphanumeric() || *one == '-')
+        .collect();
+    element.tag.is_empty()
+        || element.tag == "template"
+        || element.tag.contains(['-', ':', '.'])
+        || written.chars().any(|one| one.is_ascii_uppercase())
+}
+
+/// Whether a native element is interactive content, which HTML allows no
+/// button or link to hold: an `<a>` with an `href`, an `<input>` with no
+/// `type` or a written one that is not `hidden`, and the rest by tag. A
+/// component written with a capital is not one, whatever its name.
+fn native_interactive(element: &Element) -> bool {
+    if placed_elsewhere(element) {
+        return false;
+    }
+    match element.tag.as_str() {
+        "a" => writes(element, "href"),
+        "audio" | "video" => writes(element, "controls"),
+        "img" => writes(element, "usemap"),
+        "input" => match element
+            .attributes
+            .iter()
+            .find(|one| unbound(&one.name) == "type")
+        {
+            None => true,
+            Some(one) => {
+                matches!(&one.value, Value::Literal(kind) if !kind.eq_ignore_ascii_case("hidden"))
+            }
+        },
+        "button" | "details" | "embed" | "iframe" | "label" | "select" | "textarea" => true,
+        _ => false,
+    }
+}
+
+/// `"false"` written on an attribute that is on wherever it is present, with
+/// the page's subject and message.
+fn false_boolean(tag: &str, name: &str, value: &str, origin: Origin) -> Raw {
+    Raw {
+        expected: None,
+        kind: "false-boolean",
+        message: format!("`{name}=\"{value}\"` turns `{name}` on. `{tag}` reads the attribute as on wherever it is present, whatever its value. Remove the attribute to turn it off. In a framework, bind it, such as `?{name}=${{false}}` in Lit or `:{name}=\"false\"` in Vue."),
+        origin,
+        subject: format!("<{tag} {name}=\"{value}\">"),
+        tag: tag.to_owned(),
     }
 }
 
@@ -1796,6 +1999,218 @@ mod tests {
                 ("invalid-value", "`tone` on `helix-card` takes `primary` or `neutral`, so `bold` falls back to the default. On 2 elements."),
                 ("unknown-attribute", "`helix-card` takes no attribute `tonee`, so it does nothing. The closest it takes is `tone`."),
             ]
+        );
+    }
+
+    /// Two tags drawn inside a native button, a form control, a drawer whose
+    /// `modal` `"false"` turns off, a card, and an icon.
+    fn held() -> Index {
+        Index::of(&[LintData {
+            package: "@fusion.dev/helix".to_owned(),
+            tags: serde_json::json!({
+                "helix-button": { "attributes": { "disabled": null }, "booleans": ["disabled"], "hooks": [], "interactive": "button", "parts": [], "written": [] },
+                "helix-icon-button": { "attributes": {}, "booleans": [], "hooks": [], "interactive": "button", "parts": [], "written": [] },
+                "helix-checkbox": { "attributes": {}, "booleans": [], "hooks": [], "interactive": "control", "parts": [], "written": [] },
+                "helix-drawer": { "attributes": { "modal": null }, "booleans": [], "hooks": [], "parts": [], "written": [] },
+                "helix-card": { "attributes": {}, "booleans": [], "hooks": [], "parts": [], "slots": ["", "footer-actions"], "written": [] },
+                "helix-icon": { "attributes": { "name": null }, "booleans": [], "hooks": [], "parts": [], "written": [] }
+            })
+            .as_object()
+            .expect("an object")
+            .clone(),
+            version: None,
+        }])
+    }
+
+    /// Each finding's kind, tag, subject, and line, from templates read as
+    /// the scan reads each file.
+    fn judged(files: &[(&str, &str)]) -> Vec<(&'static str, String, String, usize)> {
+        let index = held();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let mut analyzer = Analyzer::new(&index, &listing, &used);
+        let read: Vec<(String, markup::Template)> = files
+            .iter()
+            .map(|(path, text)| {
+                let template = match std::path::Path::new(path)
+                    .extension()
+                    .and_then(|one| one.to_str())
+                {
+                    Some(extension @ ("tsx" | "jsx" | "ts" | "js")) => crate::scan::jsx::read(
+                        text,
+                        oxc_span::SourceType::from_path(path)
+                            .expect("a module")
+                            .with_jsx(matches!(extension, "tsx" | "jsx")),
+                    )
+                    .expect("a module that parses"),
+                    _ => markup::read(text, 1),
+                };
+                ((*path).to_owned(), template)
+            })
+            .collect();
+        analyzer.markup(
+            read.iter()
+                .map(|(path, template)| (path.as_str(), template.elements.as_slice())),
+        );
+        analyzer
+            .found
+            .findings
+            .iter()
+            .map(|one| {
+                (
+                    one.kind,
+                    one.tag.clone(),
+                    one.subject.clone(),
+                    one.origin.line,
+                )
+            })
+            .collect()
+    }
+
+    #[test]
+    fn an_interactive_element_inside_a_button_or_a_link_is_found() {
+        assert_eq!(
+            judged(&[(
+                "a.html",
+                "<helix-button>Go\n  <helix-icon-button></helix-icon-button>\n</helix-button>\n<a href=\"/settings\"><helix-button>Settings</helix-button></a>\n<helix-button><span><a href=\"/terms\">Terms</a></span></helix-button>\n<button><helix-checkbox></helix-checkbox></button>\n",
+            )]),
+            [
+                (
+                    "nested-interactive",
+                    "helix-button".to_owned(),
+                    "<helix-button> <helix-icon-button>".to_owned(),
+                    2
+                ),
+                (
+                    "nested-interactive",
+                    "helix-button".to_owned(),
+                    "<a> <helix-button>".to_owned(),
+                    4
+                ),
+                (
+                    "nested-interactive",
+                    "helix-button".to_owned(),
+                    "<helix-button> <a>".to_owned(),
+                    5
+                ),
+                (
+                    "nested-interactive",
+                    "helix-checkbox".to_owned(),
+                    "<button> <helix-checkbox>".to_owned(),
+                    6
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_helix_button_inside_a_link_says_how_to_draw_the_link_as_one() {
+        let index = held();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let mut analyzer = Analyzer::new(&index, &listing, &used);
+        let page = markup::read(
+            "<a href=\"/settings\"><helix-button>Settings</helix-button></a>",
+            1,
+        );
+        analyzer.markup([("a.html", page.elements.as_slice())]);
+        /* Word for word what the page says, which holds the same sentence. */
+        assert_eq!(
+            analyzer
+                .found
+                .findings
+                .iter()
+                .map(|one| one.message.as_str())
+                .collect::<Vec<_>>(),
+            ["`helix-button` is inside an `<a>`. HTML allows no interactive element inside a button or a link, and browsers and screen readers differ on what a press or a focus there does. Move `helix-button` out of the `<a>`. To draw the link as a button, write `data-button` on the `<a>`."]
+        );
+    }
+
+    #[test]
+    fn nothing_interactive_a_slot_for_actions_or_a_component_is_not() {
+        assert_eq!(
+            judged(&[
+                (
+                    "a.html",
+                    "<helix-button><helix-icon name=\"save\"></helix-icon>Save</helix-button>\n<helix-card><helix-button slot=\"footer-actions\">Buy</helix-button></helix-card>\n<a><helix-button>Go</helix-button></a>\n<helix-button><input type=\"hidden\" name=\"x\"></helix-button>\n<label><helix-checkbox></helix-checkbox> Remember me</label>\n<helix-button><acme-menu><helix-icon-button></helix-icon-button></acme-menu></helix-button>\n<button><a href=\"/x\">x</a></button>\n",
+                ),
+                (
+                    "b.vue",
+                    "<template>\n  <Button><helix-icon-button /></Button>\n  <RouterLink to=\"/\"><helix-button>Home</helix-button></RouterLink>\n  <helix-button><template v-if=\"more\"><helix-icon-button /></template></helix-button>\n</template>\n",
+                ),
+                (
+                    "c.tsx",
+                    "export const C = () => (\n  <>\n    <Link href=\"/\"><helix-button>Home</helix-button></Link>\n    <Button><helix-icon-button /></Button>\n  </>\n)\n",
+                ),
+            ]),
+            []
+        );
+    }
+
+    #[test]
+    fn false_written_on_an_attribute_on_wherever_it_is_present_is_found() {
+        let found = judged(&[
+            ("a.html", "<helix-button disabled=\"false\">Go</helix-button>\n"),
+            (
+                "b.vue",
+                "<template>\n  <helix-button disabled=\"FALSE\">Go</helix-button>\n</template>\n",
+            ),
+            (
+                "c.tsx",
+                "export const C = () => (\n  <helix-button disabled=\"False\">Go</helix-button>\n)\n",
+            ),
+        ]);
+        assert_eq!(
+            found,
+            [
+                (
+                    "false-boolean",
+                    "helix-button".to_owned(),
+                    "<helix-button disabled=\"false\">".to_owned(),
+                    1
+                ),
+                (
+                    "false-boolean",
+                    "helix-button".to_owned(),
+                    "<helix-button disabled=\"FALSE\">".to_owned(),
+                    2
+                ),
+                (
+                    "false-boolean",
+                    "helix-button".to_owned(),
+                    "<helix-button disabled=\"False\">".to_owned(),
+                    2
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn a_framework_binding_false_and_an_attribute_false_turns_off_are_not() {
+        assert_eq!(
+            judged(&[
+                (
+                    "a.vue",
+                    "<template>\n  <helix-button :disabled=\"false\">Go</helix-button>\n  <helix-button v-bind:disabled=\"false\">Go</helix-button>\n</template>\n",
+                ),
+                (
+                    "b.ts",
+                    "html`<helix-button ?disabled=${false}>Go</helix-button><helix-button .disabled=${false}>Go</helix-button>`\n",
+                ),
+                (
+                    "c.tsx",
+                    "export const C = () => <helix-button disabled={false}>Go</helix-button>\n",
+                ),
+                (
+                    "d.svelte",
+                    "<helix-button disabled={false}>Go</helix-button>\n",
+                ),
+                (
+                    "e.html",
+                    "<helix-button [disabled]=\"false\">Go</helix-button>\n<helix-button [attr.disabled]=\"off\">Go</helix-button>\n<helix-drawer modal=\"false\"></helix-drawer>\n<helix-button disabled>Go</helix-button>\n<helix-button disabled=\"\">Go</helix-button>\n",
+                ),
+            ]),
+            []
         );
     }
 }

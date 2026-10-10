@@ -54,11 +54,13 @@ export const SHIPPED_RULES: Readonly<Record<Kind, Severity>> = {
   'dead-part': 'error',
   'disabled-attribute': 'error',
   'duplicate-registration': 'error',
+  'false-boolean': 'error',
   'invalid-value': 'error',
   'manifest-skew': 'error',
   /* A warning, because the native element works: it misses the tokens,
      states, and keyboard handling the Helix family stands in for it with. */
   'native-element': 'warn',
+  'nested-interactive': 'error',
   'primitive-token': 'error',
   'unforwarded-part': 'warn',
   /* A warning, because a read of the code cannot see every way a page

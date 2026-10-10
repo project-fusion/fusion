@@ -180,6 +180,10 @@ pub struct Member {
     pub attribute: Option<String>,
     /// Whether the property writes itself back onto the host.
     pub reflects: bool,
+    /// How the attribute turns a boolean property on, where `@property` says:
+    /// `present` for Lit's `type: Boolean`, and `unless-false` for the
+    /// `onUnlessFalse` converter.
+    pub boolean: Option<&'static str>,
     /// Whether `@words` makes it a word property, one a page can register
     /// words for by locale.
     pub words: bool,
@@ -737,7 +741,7 @@ fn field_of(
     documented: Documented,
     assigned: &BTreeMap<String, String>,
 ) -> Member {
-    let (attribute, reflects) = attribute_of(&property.decorators, &name);
+    let (attribute, reflects, boolean) = attribute_of(&property.decorators, &name);
     let words = has_words(&property.decorators);
     let written = property
         .value
@@ -769,6 +773,7 @@ fn field_of(
         constructor assigns after it, because the analyzer reads the body first
         and the constructor later. */
         assigned: written.is_none(),
+        boolean,
         documented,
         is_static: property.r#static,
         kind: "field",
@@ -834,16 +839,17 @@ fn method_of(
             one.type_annotation.span().end,
         )
     };
-    let (attribute, reflects) = if accessor {
+    let (attribute, reflects, boolean) = if accessor {
         attribute_of(&method.decorators, &name)
     } else {
-        (None, false)
+        (None, false, None)
     };
     Member {
         written: None,
         assigned: false,
         attribute,
         reflects,
+        boolean,
         words: accessor && has_words(&method.decorators),
         default: None,
         documented,
@@ -973,6 +979,7 @@ fn members_of(class: &Class<'_>, source: &str, docs: &Attached) -> Vec<Member> {
                         if already.attribute.is_none() {
                             already.attribute = read.attribute;
                             already.reflects = read.reflects;
+                            already.boolean = read.boolean;
                         }
                         continue;
                     }
@@ -1035,10 +1042,15 @@ fn has_words(decorators: &oxc_allocator::Vec<'_, Decorator<'_>>) -> bool {
 ///
 /// `attribute: false` is a field that is not an attribute at all: a property a
 /// consumer sets in JavaScript and cannot write in markup.
+///
+/// **How a boolean attribute is read, where the options say.** Lit's
+/// `type: Boolean` turns the property on wherever the attribute is present,
+/// `"false"` included, and `onUnlessFalse` turns it off for `"false"`. A
+/// converter of any other name is its own business and says neither.
 fn attribute_of(
     decorators: &oxc_allocator::Vec<'_, Decorator<'_>>,
     field: &str,
-) -> (Option<String>, bool) {
+) -> (Option<String>, bool, Option<&'static str>) {
     for decorator in decorators {
         let Expression::CallExpression(call) = &decorator.expression else {
             continue;
@@ -1051,6 +1063,8 @@ fn attribute_of(
         }
         let mut attribute = Some(field.to_owned());
         let mut reflects = false;
+        let mut typed = false;
+        let mut converter: Option<String> = None;
         if let Some(Expression::ObjectExpression(options)) =
             call.arguments.first().and_then(|one| one.as_expression())
         {
@@ -1067,13 +1081,23 @@ fn attribute_of(
                         attribute = None;
                     }
                     ("reflect", Expression::BooleanLiteral(said)) => reflects = said.value,
+                    ("type", Expression::Identifier(said)) => typed = said.name == "Boolean",
+                    ("converter", Expression::Identifier(said)) => {
+                        converter = Some(said.name.to_string());
+                    }
+                    ("converter", _) => converter = Some(String::new()),
                     _ => {}
                 }
             }
         }
-        return (attribute, reflects);
+        let boolean = match (&attribute, converter.as_deref()) {
+            (Some(_), Some("onUnlessFalse")) => Some("unless-false"),
+            (Some(_), None) if typed => Some("present"),
+            _ => None,
+        };
+        return (attribute, reflects, boolean);
     }
-    (None, false)
+    (None, false, None)
 }
 
 /// The class a mixin's body declares, where the arrow given is one.

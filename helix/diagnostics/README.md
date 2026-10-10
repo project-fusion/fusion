@@ -327,6 +327,8 @@ works on it:
 | `unknown-attribute` | error | A Helix element carries an attribute it does not take |
 | `unknown-slot` | error | A child names a slot its Helix element does not have, so it is not drawn. Found by `helix scan`, from the templates |
 | `invalid-value` | error | An attribute with a closed set of values carries one outside it, so the element falls back to its default |
+| `false-boolean` | error | A boolean attribute is written `="false"`, which turns it on: the element reads it as on wherever it is present, as `disabled` is. Remove the attribute to turn it off. An attribute that `"false"` turns off, such as Drawer's `modal`, is not one. `helix scan` leaves a framework's binding, such as Lit's `?disabled=${false}` or Vue's `:disabled="false"`, to the page, which judges what it writes |
+| `nested-interactive` | error | An interactive element is inside a button or a link, which HTML forbids: a Helix element inside a native `<button>` or an `<a>` with an `href`, or anything a person presses or types in inside a Helix element drawn inside one, such as `helix-icon-button` inside `helix-button` |
 | `unforwarded-part` | warn | The element's headless tag, such as `helix-headless-button` for `helix-button`, publishes the part and the styled tag does not forward it, which is a gap in Helix |
 | `unknown-tag` | error | A rule or an element names a tag no manifest lists |
 | `unknown-event` | error | A React `on` prop on a Helix element names an event the element does not dispatch, so the handler never runs. Found by `helix scan`, from the templates |
@@ -349,6 +351,32 @@ for another route.
 **Attributes are checked on the elements the page wrote.** The global HTML
 attributes, `aria-*`, `data-*`, and the prefixes frameworks write are never
 findings. The markup Helix renders inside its own components is Helix's.
+
+**Nesting is judged through elements whose place the markup settles.** The
+Helix elements drawn inside a native button are Button, Icon Button, Copy
+Button, Toggle, Motion Toggle, Radio, and Tab, and Skip Link is drawn inside a
+link. A slot for actions, such as a card's `footer-actions`, holds a button
+outside anything pressable, and is not a finding. A custom element of your own,
+or a framework's component such as a router's `<Link>`, places its children
+itself, so the check stops there: `helix scan` stops at the component, and the
+page sees the `<a>` it renders.
+
+## Scope
+
+The scan and the page check what the lint data can settle. They do not check:
+
+- the value a token or a hook is set to, such as `--helix-radii-md: red`.
+  `helix scan` checks each `--helix-` name you write;
+- a selector that descends into a component, such as `helix-card .title` or
+  `helix-button span`. It matches only the elements you put inside the
+  component;
+- a `::part()` on a selector with no Helix tag in it, such as
+  `.cta::part(label)`, since the class names no element whose parts can be
+  read;
+- an attribute value an expression sets, such as `tone={tone}` in JSX or
+  `:tone` in Vue, in `helix scan`. The page judges the attribute it writes;
+- the contrast of a color you write yourself. `helix theme audit` checks the
+  theme's tokens.
 
 ## Runtime events
 

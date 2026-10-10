@@ -798,9 +798,103 @@ const unknownTag = (tags: Map<string, Published>, tag: string): Raw | undefined 
 }
 
 /**
- * The attributes on the page's Helix elements that do nothing: a name the
- * element does not take, and a value outside the ones a closed set allows.
- * Both are valid HTML and silent, since the element falls back to its default.
+ * The native elements HTML counts as interactive content, each with what
+ * makes it one: an `<a>` with an `href`, an `<input>` that is not hidden.
+ */
+const NATIVE_INTERACTIVE: Readonly<Record<string, (element: Element) => boolean>> = {
+  a: (element) => element.hasAttribute('href'),
+  audio: (element) => element.hasAttribute('controls'),
+  button: () => true,
+  details: () => true,
+  embed: () => true,
+  iframe: () => true,
+  img: (element) => element.hasAttribute('usemap'),
+  input: (element) => (element.getAttribute('type') ?? '').toLowerCase() !== 'hidden',
+  label: () => true,
+  select: () => true,
+  textarea: () => true,
+  video: (element) => element.hasAttribute('controls'),
+}
+
+/**
+ * The element `inner` sits in that allows no interactive element inside it,
+ * and the kind of control it is: a native `<button>`, an `<a>` with an
+ * `href`, or a Helix element drawn inside one. `undefined` where there is
+ * none, or where an element between them places its children itself.
+ *
+ * **A custom element that is not Helix's stops the walk.** It puts its
+ * children in slots of its own, or nowhere, so whether `inner` is drawn
+ * inside the control above it is the page's to show and not the markup's.
+ * `helix scan` stops at the same place, at a framework's component too.
+ */
+const enclosing = (
+  inner: Element,
+  tags: Map<string, Published>,
+): { element: Element; noun: 'button' | 'link' } | undefined => {
+  for (let at = inner.parentElement; at; at = at.parentElement) {
+    const name = at.localName
+    const published = tags.get(name)
+    if (published?.interactive === 'button' || published?.interactive === 'link') {
+      return { element: at, noun: published.interactive }
+    }
+    if (name === 'button') {
+      return { element: at, noun: 'button' }
+    }
+    if (name === 'a' && at.hasAttribute('href')) {
+      return { element: at, noun: 'link' }
+    }
+    if (name.includes('-') && !published) {
+      return undefined
+    }
+  }
+  return undefined
+}
+
+/**
+ * An interactive element inside a button or a link, which HTML forbids: a
+ * Helix element inside a native one, or anything interactive inside a Helix
+ * element drawn inside one, such as `helix-icon-button` in `helix-button`.
+ * Named for the outer element where it is Helix's, as a slot is.
+ */
+const nested = (element: Element, tags: Map<string, Published>): Raw | undefined => {
+  const inner = element.localName
+  const kind = tags.get(inner)?.interactive
+  if (kind === undefined && !NATIVE_INTERACTIVE[inner]?.(element)) {
+    return undefined
+  }
+  const found = enclosing(element, tags)
+  if (!found) {
+    return undefined
+  }
+  const outer = found.element.localName
+  const helix = tags.has(outer)
+  if (!(helix || kind)) {
+    return undefined
+  }
+  /* A Helix tag by its name, and a native one as `a <button>` the first
+     time and `the <button>` after. */
+  const named = (tag: string, article: string): string =>
+    tags.has(tag) ? `\`${tag}\`` : `${article} \`<${tag}>\``
+  const some = (tag: string): string => named(tag, /^[aeiou]/.test(tag) ? 'an' : 'a')
+  const opening = some(inner)
+  const hint =
+    outer === 'a' && kind === 'button'
+      ? ' To draw the link as a button, write `data-button` on the `<a>`.'
+      : ''
+  return {
+    kind: 'nested-interactive',
+    message: `${opening.charAt(0).toUpperCase()}${opening.slice(1)} is inside ${some(outer)}${helix ? `, which draws its content inside a native ${found.noun}` : ''}. HTML allows no interactive element inside a button or a link, and browsers and screen readers differ on what a press or a focus there does. Move ${named(inner, 'the')} out of ${named(outer, 'the')}.${hint}`,
+    subject: `<${outer}> <${inner}>`,
+    tag: helix ? outer : inner,
+  }
+}
+
+/**
+ * The attributes on the page's Helix elements that do nothing, or the
+ * opposite of what they say: a name the element does not take, a value
+ * outside the ones a closed set allows, and `"false"` on an attribute that is
+ * on wherever it is present. And an interactive element inside a button or a
+ * link. Each is valid to the parser and silent.
  *
  * **Only what the page wrote.** An element Helix renders inside another is
  * Helix's own markup. One finding per tag, attribute, and value, however many
@@ -812,20 +906,29 @@ export const markup = (
   page: Page = pageOf(from),
 ): Raw[] => {
   const found = new Map<string, Raw & { count: number }>()
+  const keep = (raw: Raw): void => {
+    const key = `${raw.kind} ${raw.subject}`
+    const seen = found.get(key)
+    if (seen) {
+      seen.count += 1
+    } else {
+      found.set(key, { ...raw, count: 1 })
+    }
+  }
   for (const element of page.elements) {
     const host = element.getRootNode()
     const composed = host instanceof ShadowRoot && host.host.localName.startsWith('helix-')
     const published = composed ? undefined : tags.get(element.localName)
+    if (!composed) {
+      const raw = nested(element, tags)
+      if (raw) {
+        keep(raw)
+      }
+    }
     if (!(composed || published) && tags.size > 0) {
       const raw = unknownTag(tags, element.localName)
       if (raw) {
-        const key = `${raw.kind} ${raw.subject}`
-        const seen = found.get(key)
-        if (seen) {
-          seen.count += 1
-        } else {
-          found.set(key, { ...raw, count: 1 })
-        }
+        keep(raw)
       }
     }
     if (published) {
@@ -851,6 +954,13 @@ export const markup = (
             subject: `<${tag} ${name}>`,
             tag,
           }
+        } else if (published.booleans?.has(name) && value.toLowerCase() === 'false') {
+          raw = {
+            kind: 'false-boolean',
+            message: `\`${name}="${value}"\` turns \`${name}\` on. \`${tag}\` reads the attribute as on wherever it is present, whatever its value. Remove the attribute to turn it off. In a framework, bind it, such as \`?${name}=\${false}\` in Lit or \`:${name}="false"\` in Vue.`,
+            subject: `<${tag} ${name}="${value}">`,
+            tag,
+          }
         } else if (allows && value !== '' && !allows.has(value)) {
           const suggestion = nearest(value, allows)
           raw = {
@@ -862,13 +972,7 @@ export const markup = (
           }
         }
         if (raw) {
-          const key = `${raw.kind} ${raw.subject}`
-          const seen = found.get(key)
-          if (seen) {
-            seen.count += 1
-          } else {
-            found.set(key, { ...raw, count: 1 })
-          }
+          keep(raw)
         }
       }
     }

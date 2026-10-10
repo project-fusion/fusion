@@ -937,6 +937,14 @@ fn helix(one: &Declared, path: &str, tier: &str, package: &Path, given: &str) ->
     if !replaces.is_empty() {
         block.insert("replaces".to_owned(), json!(replaces));
     }
+    /* **The native control the element draws its content inside**, `button`
+    or `link`, from `@interactive`. HTML allows no interactive element inside
+    either, so diagnostics reports one written inside the element. A subclass
+    inherits it, and anything but the two words is dropped. */
+    if let Some(interactive) = single("interactive").filter(|one| one == "button" || one == "link")
+    {
+        block.insert("interactive".to_owned(), json!(interactive));
+    }
     /* **`@groups` is held to a list and a typo is dropped rather than kept.**
     The plugin's own reason: a misspelling lands a family in a group of one,
     which is invisible, where dropping it leaves the family ungrouped and the
@@ -1089,6 +1097,13 @@ fn member_of(member: crate::manifest::parse::Member) -> Value {
     English is the default above. */
     if member.words {
         helix.insert("words".to_owned(), json!(true));
+    }
+    /* **How the attribute turns the property on**, which its type cannot say:
+    `present` is on wherever the attribute is, `disabled="false"` included,
+    and `unless-false` is off for `"false"`. Diagnostics reads it to report a
+    `"false"` that turns an attribute on. */
+    if let Some(boolean) = member.boolean {
+        helix.insert("boolean".to_owned(), json!(boolean));
     }
     if !helix.is_empty() {
         at.insert("helix".to_owned(), Value::Object(helix));

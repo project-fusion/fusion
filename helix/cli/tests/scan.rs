@@ -22,8 +22,10 @@ fn lint() -> Value {
         "tags": {
             "helix-button": {
                 "attributes": { "disabled": null, "emphasis": ["solid", "soft", "ghost"] },
+                "booleans": ["disabled"],
                 "family": "button",
                 "hooks": ["--button-radius"],
+                "interactive": "button",
                 "parts": ["control", "label"],
                 "written": []
             },
@@ -39,6 +41,7 @@ fn lint() -> Value {
                 "attributes": {},
                 "family": "icon-button",
                 "hooks": ["--icon-button-size"],
+                "interactive": "button",
                 "parts": ["control"],
                 "written": []
             }
@@ -288,6 +291,88 @@ fn the_ci_file_keeps_the_pages_runs_and_replaces_the_last_scan() {
     assert_eq!(runs[1].0, "code");
     assert_ne!(runs[1].1, "old-scan");
     assert_eq!(file["schema"], 1);
+}
+
+/// A button inside a button and a `"false"` that turns an attribute on, each
+/// in its file and on its line, beside the bindings every framework writes
+/// for `false`, which are not findings.
+#[test]
+fn a_button_inside_a_button_and_a_false_boolean_are_found_and_bindings_are_not() {
+    let directory = project(
+        "nested",
+        &[
+            (
+                "src/menu.tsx",
+                "export const Menu = () => (\n  <helix-button>Save <helix-icon-button /></helix-button>\n)\nexport const Off = () => <helix-button disabled={false}>Go</helix-button>\nexport const Home = () => <Link href=\"/\"><helix-button>Home</helix-button></Link>\n",
+            ),
+            (
+                "src/view.vue",
+                "<template>\n  <helix-button :disabled=\"false\">Go</helix-button>\n  <helix-button disabled=\"false\">Stop</helix-button>\n</template>\n",
+            ),
+            (
+                "src/card.ts",
+                "import { html } from 'lit'\nexport const card = html`<helix-button ?disabled=${false}>Go</helix-button>\n<a href=\"/settings\"><helix-button>Settings</helix-button></a>`\n",
+            ),
+        ],
+    );
+    let output = scan(&directory, &["--json"]);
+    assert_eq!(output.status.code(), Some(1), "an error fails the scan");
+    let run: Value = serde_json::from_slice(&output.stdout).expect("one JSON document");
+    let mut found: Vec<(&str, &str, &str, &str, u64)> = run["findings"]
+        .as_array()
+        .expect("findings")
+        .iter()
+        .map(|one| {
+            (
+                one["kind"].as_str().unwrap_or(""),
+                one["tag"].as_str().unwrap_or(""),
+                one["subject"].as_str().unwrap_or(""),
+                one["origin"]["sheet"].as_str().unwrap_or(""),
+                one["origin"]["line"].as_u64().unwrap_or(0),
+            )
+        })
+        .collect();
+    found.sort_unstable();
+    assert_eq!(
+        found,
+        [
+            (
+                "false-boolean",
+                "helix-button",
+                "<helix-button disabled=\"false\">",
+                "src/view.vue",
+                3
+            ),
+            (
+                "nested-interactive",
+                "helix-button",
+                "<a> <helix-button>",
+                "src/card.ts",
+                3
+            ),
+            (
+                "nested-interactive",
+                "helix-button",
+                "<helix-button> <helix-icon-button>",
+                "src/menu.tsx",
+                2
+            ),
+        ]
+    );
+    let nested = run["findings"]
+        .as_array()
+        .expect("findings")
+        .iter()
+        .find(|one| one["subject"] == "<helix-button> <helix-icon-button>")
+        .expect("the nested button");
+    /* The page's fingerprint for the same fault, so the two join. */
+    assert_eq!(nested["fingerprint"], "1c5dfab2b89de5");
+    assert_eq!(nested["category"], "markup");
+    assert_eq!(nested["severity"], "error");
+    assert_eq!(
+        nested["message"],
+        "`helix-icon-button` is inside `helix-button`, which draws its content inside a native button. HTML allows no interactive element inside a button or a link, and browsers and screen readers differ on what a press or a focus there does. Move `helix-icon-button` out of `helix-button`."
+    );
 }
 
 #[test]

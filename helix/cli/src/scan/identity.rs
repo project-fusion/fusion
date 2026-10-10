@@ -12,14 +12,16 @@ use std::sync::LazyLock;
 use regex::Regex;
 
 /// Every fault class, stable across versions, as `report.ts` lists them.
-pub const KINDS: [&str; 16] = [
+pub const KINDS: [&str; 18] = [
     "dead-hook",
     "dead-part",
     "disabled-attribute",
     "duplicate-registration",
+    "false-boolean",
     "invalid-value",
     "manifest-skew",
     "native-element",
+    "nested-interactive",
     "primitive-token",
     "unforwarded-part",
     "unimported-tag",
@@ -32,7 +34,8 @@ pub const KINDS: [&str; 16] = [
 ];
 
 /// What a fault is about: `styling` for parts and hooks, `markup` for
-/// attributes, and `integrity` for the page and the library disagreeing.
+/// attributes, slots, and what an element holds, and `integrity` for the page
+/// and the library disagreeing.
 pub fn category(kind: &str) -> &'static str {
     match kind {
         "dead-hook"
@@ -42,7 +45,8 @@ pub fn category(kind: &str) -> &'static str {
         | "unforwarded-part"
         | "unknown-token"
         | "unreflected-attribute" => "styling",
-        "invalid-value" | "unknown-attribute" | "unknown-event" | "unknown-slot" => "markup",
+        "false-boolean" | "invalid-value" | "nested-interactive" | "unknown-attribute"
+        | "unknown-event" | "unknown-slot" => "markup",
         "native-element" => "guideline",
         _ => "integrity",
     }
@@ -208,6 +212,24 @@ mod tests {
                 "helix-card",
                 "é ünïcode ☃ 𝒳 helix-card::part(x)",
                 "1024656ef54ce6",
+            ),
+            (
+                "nested-interactive",
+                "helix-button",
+                "<helix-button> <helix-icon-button>",
+                "1c5dfab2b89de5",
+            ),
+            (
+                "nested-interactive",
+                "helix-button",
+                "<a> <helix-button>",
+                "0287db6fbc3a47",
+            ),
+            (
+                "false-boolean",
+                "helix-button",
+                "<helix-button disabled=\"false\">",
+                "0b03d881a6f47b",
             ),
         ] {
             assert_eq!(fingerprint(kind, tag, subject), expected, "{subject}");

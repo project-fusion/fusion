@@ -174,7 +174,7 @@ pub fn catalog() -> Vec<Value> {
         }),
         json!({
             "annotations": annotations("Check Helix code"),
-            "description": "Checks Helix code you wrote against the installed packages, as `helix scan` does: unknown tags, attributes, values, slots, parts, hooks, events, and tokens, a `--_helix-` primitive read, `[disabled]` on a form control, a tag whose entry nothing imports, and a native element a Helix family replaces. Pass `files`, paths in the project, or `code` with its `language`. The whole project is read, so imports elsewhere count. Fix every finding at `error`.",
+            "description": "Checks Helix code you wrote against the installed packages, as `helix scan` does: unknown tags, attributes, values, slots, parts, hooks, events, and tokens, a `--_helix-` primitive read, `[disabled]` on a form control, a tag whose entry nothing imports, a native element a Helix family replaces, an interactive element inside a button or a link, and `\"false\"` on an attribute that is on wherever it is present. Pass `files`, paths in the project, or `code` with its `language`. The whole project is read, so imports elsewhere count. Fix every finding at `error`.",
             "inputSchema": {
                 "properties": {
                     "code": { "description": "A snippet to check before you write it.", "type": "string" },

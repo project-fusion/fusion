@@ -42,6 +42,8 @@ import { property } from 'lit/decorators.js'
  * @slot - The link's text. Defaults to `label`.
  *
  * @csspart link - The anchor. It takes the focus.
+ *
+ * @interactive link
  */
 @customElement('helix-headless-skip-link')
 export class HelixHeadlessSkipLink extends HelixElement {

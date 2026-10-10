@@ -28,8 +28,15 @@ export interface ManifestSource {
     path?: string
     declarations?: Array<{
       attributes?: Array<{ name: string; type?: { text?: string } }>
+      /**
+       * Helix's own fields: `interactive`, the native control the element
+       * draws its content inside, from `@interactive`.
+       */
+      helix?: { interactive?: string }
       members?: Array<{
         attribute?: string
+        /** How the attribute turns a boolean property on, where it is one. */
+        helix?: { boolean?: string }
         kind?: string
         name: string
         readonly?: boolean
@@ -67,9 +74,26 @@ export interface LintData {
 export interface LintTag {
   /** Each attribute, with the values it allows, or `null` where it takes any. */
   attributes: Record<string, string[] | null>
+  /**
+   * The attributes that are on wherever they are present, `"false"`
+   * included: each turns on a boolean property Lit reads with
+   * `type: Boolean`. Absent from lint data written before this field, which a
+   * reader takes as unknown.
+   */
+  booleans?: string[]
   /** The family, from the module's path. */
   family?: string | undefined
   hooks: string[]
+  /**
+   * What a person presses or types in, where the element is one: `button` or
+   * `link` for an element that draws its content inside its own native button
+   * or link, and `control` for any other form control. Absent where the
+   * element is neither. **Typed as any `string`**: a page passes the
+   * `lint.json` it imports, and TypeScript reads every string in an imported
+   * JSON file as `string`, so the {@link Interactive} union here refused every
+   * page's `{ lint }`. `index` keeps only the kinds it knows.
+   */
+  interactive?: string
   parts: string[]
   /**
    * The slots the element has, by name, the default one as `""`. Absent from
@@ -85,6 +109,17 @@ export interface LintTag {
   /** The attributes the element writes on itself: one named for a read-only member. */
   written: string[]
 }
+
+/**
+ * What a person presses or types in: an element drawn inside a native
+ * `button` or `link`, which HTML allows no interactive element inside, or
+ * another form `control`.
+ */
+export type Interactive = 'button' | 'control' | 'link'
+
+/** Whether lint data names a kind this reader knows. */
+const isInteractive = (kind: string | undefined): kind is Interactive =>
+  kind === 'button' || kind === 'control' || kind === 'link'
 
 /**
  * One installed tier: its manifest, with the package name, or its lint data,
@@ -110,6 +145,7 @@ export const lintOf = (manifest: ManifestSource, name: string): LintData => {
       }
       const entry: LintTag = tags[tag] ?? {
         attributes: {},
+        booleans: [],
         family,
         hooks: [],
         parts: [],
@@ -118,9 +154,24 @@ export const lintOf = (manifest: ManifestSource, name: string): LintData => {
         written: [],
       }
       tags[tag] = entry
+      /* **A form control is told by the `form` every one carries**, as the
+         scan tells one from the catalog: `formAssociated` is static. */
+      const drawn = declaration.helix?.interactive
+      if (drawn === 'button' || drawn === 'link') {
+        entry.interactive = drawn
+      } else if (
+        (declaration.members ?? []).some(
+          (member) => member.name === 'form' && member.kind === 'field' && !member.static,
+        )
+      ) {
+        entry.interactive = 'control'
+      }
       for (const member of declaration.members ?? []) {
         if (member.reflects && member.attribute) {
           entry.reflected?.push(member.attribute)
+        }
+        if (member.attribute && member.helix?.boolean === 'present') {
+          entry.booleans?.push(member.attribute)
         }
         if (member.readonly && !member.static && member.kind === 'field') {
           entry.written.push(
@@ -144,6 +195,7 @@ export const lintOf = (manifest: ManifestSource, name: string): LintData => {
     entry.hooks = [...new Set(entry.hooks)]
     entry.slots = [...new Set(entry.slots)]
     entry.reflected = [...new Set(entry.reflected)]
+    entry.booleans = [...new Set(entry.booleans)]
   }
   return {
     package: manifest.helix?.package ?? name,
@@ -168,9 +220,17 @@ export interface Published {
    * is a union of string literals, and `null` where it takes any value.
    */
   attributes: Map<string, Set<string> | null>
+  /**
+   * The attributes that are on wherever they are present, `"false"`
+   * included. Absent where a tier's lint data predates the field, which says
+   * nothing either way.
+   */
+  booleans?: Set<string> | undefined
   /** The family, from the module's path: `button` for `src/button/root/button-root.ts`. */
   family?: string | undefined
   hooks: Map<string, Set<string>>
+  /** What a person presses or types in, where the element is one. */
+  interactive?: Interactive | undefined
   /**
    * The attributes a property writes back when it is set. Absent where a tier's
    * lint data predates the field, which says nothing either way.
@@ -210,6 +270,15 @@ export const index = (tiers: Tier[]): Map<string, Published> => {
       }
       for (const name of entry.written) {
         element.written.add(name)
+      }
+      if (isInteractive(entry.interactive)) {
+        element.interactive ??= entry.interactive
+      }
+      if (entry.booleans) {
+        element.booleans ??= new Set()
+        for (const name of entry.booleans) {
+          element.booleans.add(name)
+        }
       }
       if (entry.reflected) {
         element.reflected ??= new Set()

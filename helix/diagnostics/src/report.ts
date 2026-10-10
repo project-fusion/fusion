@@ -52,8 +52,9 @@ export interface Origin {
 export interface Finding {
   /**
    * What the fault is about: `styling` for parts and hooks, `markup` for
-   * attributes and slots, `integrity` for the page and the library
-   * disagreeing, `guideline` for advice. A dashboard groups by it.
+   * attributes, slots, and what an element holds, `integrity` for the page
+   * and the library disagreeing, `guideline` for advice. A dashboard groups
+   * by it.
    */
   category: FindingCategory
   /**
@@ -105,9 +106,11 @@ export const KINDS = [
   'dead-part',
   'disabled-attribute',
   'duplicate-registration',
+  'false-boolean',
   'invalid-value',
   'manifest-skew',
   'native-element',
+  'nested-interactive',
   'primitive-token',
   'unforwarded-part',
   'unimported-tag',

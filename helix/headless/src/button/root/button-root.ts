@@ -109,6 +109,8 @@ const afterDispatch = (click: Event, then: () => void): void => {
  *
  * @cssstate pending - The button is pending: `pending` is set.
  * @cssstate pressed - A Button Group in a selection mode has this button pressed.
+ *
+ * @interactive button
  */
 @customElement('helix-headless-button')
 export class HelixHeadlessButton extends HelixFormElementBase {

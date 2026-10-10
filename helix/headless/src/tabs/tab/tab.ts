@@ -48,6 +48,8 @@ import { property } from 'lit/decorators.js'
  * @csspart tab - The tab itself.
  *
  * @cssstate selected - While it is the tab selected.
+ *
+ * @interactive button
  */
 @customElement('helix-headless-tab')
 export class HelixHeadlessTab extends MixinDismissible(MixinSelectableItem(HelixElement)) {
