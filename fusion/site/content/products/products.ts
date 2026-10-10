@@ -210,15 +210,6 @@ export const PRODUCTS: Product[] = [
          computed, which is the idea the whole system rests on. Named pages
          with their own slugs, so a link to each is a link to a thing and
          never to a position in a list. */
-      /* The product's own page, first: the word in the bar opens the panel
-         and goes nowhere, so this row is how the panel reaches it, as the
-         drawer's Overview row does. */
-      {
-        column: 'Docs',
-        href: '/helix',
-        summary: 'What Helix is, where to go.',
-        title: 'Overview',
-      },
       {
         column: 'Docs',
         href: '/helix/docs',

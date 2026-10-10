@@ -363,21 +363,28 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                 suppressHydrationWarning
                 variant="band"
               >
-                {/* And it says it opens something, which only this markup can:
-                    the component has no shadow root of the button's to write
-                    `aria-expanded` into, and writing it onto the button after
-                    hydration would be a mismatch. `openPanel` is the panel's
-                    own state, heard from its events. */}
-                <button
+                {/* **The word is the product, so it goes to the product's
+                    page.** The panel opens on hover and the press goes
+                    through, as a masthead with product pages does; a
+                    keyboard opens the panel with Down Arrow, and a tap on a
+                    touch screen wide enough for the bar lands on the page,
+                    which lists everything the panel holds.
+
+                    And it says it opens something, which only this markup
+                    can: the component has no shadow root of the link's to
+                    write `aria-expanded` into, and writing it onto the link
+                    after hydration would be a mismatch. `openPanel` is the
+                    panel's own state, heard from its events. */}
+                <Link
                   aria-current={within(product.href) ? 'page' : undefined}
                   aria-expanded={openPanel?.getAttribute('label') === product.name}
                   data-navigation-item
+                  href={product.href}
                   slot="trigger"
                   suppressHydrationWarning
-                  type="button"
                 >
                   {product.name}
-                </button>
+                </Link>
 
                 {/* The tiles: the things you open and use, each with a picture
                     of itself. The anchor holds the drawing directly, because
