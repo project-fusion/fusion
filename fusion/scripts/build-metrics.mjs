@@ -312,8 +312,8 @@ const STYLESHEETS = [
  * The derivation engine itself, which its package's entry loads when it runs.
  *
  * **Measured as a file, beside the bundle.** The entry fetches this at run time,
- * so `Bun.build` never sees it, and the package row alone came to 1.4 kB for an
- * engine a theme switcher downloads at 126 kB.
+ * so `Bun.build` never sees it, and the package row alone counted the small
+ * entry and none of the engine a theme switcher downloads.
  */
 const ENGINE_WASM = {
   note: 'The derivation engine itself, in WebAssembly. The entry above loads it when the engine runs.',

@@ -6,8 +6,8 @@
 
 use crate::derive::Cast;
 use crate::intent::{
-    to_oklch, Background, Brand, Chroma, Color, Font, Material, Motion, Neutral, PairingRequest,
-    Scheme, Seed, Separation, Status, StatusSeed, ThemeIntent, STATUS_NAMES,
+    status_band, to_oklch, Background, Brand, Chroma, Color, Font, Material, Motion, Neutral,
+    PairingRequest, Scheme, Seed, Separation, Status, StatusSeed, ThemeIntent, STATUS_NAMES,
 };
 use crate::model::{Contrast, INKS};
 use crate::oklch::{fit_to_gamut, shipped_contrast_ratio, Oklch, GAMUT_STEPS};
@@ -27,7 +27,7 @@ use crate::oklch::{fit_to_gamut, shipped_contrast_ratio, Oklch, GAMUT_STEPS};
 pub enum IntentError {
     /// A number that is not a number, which is what fails open.
     NotFinite { label: String, value: String },
-    /// A number outside the range it is meaningful in.
+    /// A value outside the range it is meaningful in.
     OutOfRange { label: String, message: String },
     /// A color that is not one. The TypeScript carried `NaN` components here.
     Unreadable { label: String, value: String },
@@ -252,16 +252,7 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
     later.** Falling through and deriving the status instead is quieter and no
     better: a consumer who pinned a color and got a computed one back is never
     told. The brand is validated for the same reason two dozen lines up. */
-    for name in STATUS_NAMES {
-        if let Some(StatusSeed::Color(color)) = resolved.status.seed(name) {
-            if to_oklch(color).is_none() {
-                return Err(IntentError::Unreadable {
-                    label: format!("status.{name}"),
-                    value: color.to_string(),
-                });
-            }
-        }
-    }
+    readable_statuses(&resolved.status)?;
 
     /* And a pinned accent, for the same reason: an unreadable color carries a
     `NaN` triple that `violations` compares against, every comparison is false,
@@ -345,13 +336,24 @@ pub fn resolve(intent: &ThemeIntent) -> Result<Resolved, IntentError> {
     Ok(resolved)
 }
 
-/// Refuses a type, motion or material number outside its range.
+/// Refuses a namespace that is not a token prefix, and a type, motion or
+/// material number outside its range.
 ///
 /// **These are written into the block as they are**, so one outside its range
 /// is a broken declaration with nothing measuring it: a body size of 0 sets
 /// every step of the ramp to 0rem, a negative motion scale writes negative
-/// durations, and an opacity of 2 mixes the surface at 200%.
+/// durations, an opacity of 2 mixes the surface at 200%, and a namespace of
+/// `a b;}` closes the block in the middle of a property name.
 fn written(resolved: &Resolved) -> Result<(), IntentError> {
+    if !prefix(&resolved.namespace) {
+        return Err(range(
+            "namespace",
+            &format!(
+                "is not a token prefix of ASCII letters, digits, hyphens, and underscores with no hyphen at either end, received {:?}",
+                resolved.namespace
+            ),
+        ));
+    }
     if let Some(base) = resolved.font.base {
         finite("font.base", base)?;
         if base <= 0.0 {
@@ -384,6 +386,68 @@ fn written(resolved: &Resolved) -> Result<(), IntentError> {
     }
 
     Ok(())
+}
+
+/// Refuses a pinned status that cannot be read, and a status hue outside its
+/// band.
+///
+/// **A hue outside its band is refused for the reason an unreadable pin is.**
+/// Clamping a danger asked for at 140 to 40 hands back a hue the consumer did
+/// not choose, and nothing in the report says so. `allowance` bounds a repair,
+/// which is the engine's own move, and a hue given here is the consumer's.
+fn readable_statuses(status: &Status) -> Result<(), IntentError> {
+    for name in STATUS_NAMES {
+        match status.seed(name) {
+            Some(StatusSeed::Color(color)) => {
+                if to_oklch(color).is_none() {
+                    return Err(IntentError::Unreadable {
+                        label: format!("status.{name}"),
+                        value: color.to_string(),
+                    });
+                }
+            }
+            Some(StatusSeed::Hue(Some(hue))) => in_band(name, *hue)?,
+            Some(StatusSeed::Hue(None)) | None => {}
+        }
+    }
+    Ok(())
+}
+
+/// Refuses a status hue outside the band its meaning holds, named by the band.
+///
+/// Read around the circle, so 387 is the 27 it draws as and -340 is 20.
+fn in_band(name: &str, hue: f64) -> Result<(), IntentError> {
+    let label = format!("status.{name}.hue");
+    finite(&label, hue)?;
+    let ((from, to), holds) = status_band(name).expect("a declared status has a band");
+    if (from..=to).contains(&hue.rem_euclid(360.0)) {
+        return Ok(());
+    }
+    Err(range(
+        &label,
+        &format!("must be between {from} and {to} degrees, {holds}, received {hue}"),
+    ))
+}
+
+/// Whether `--{namespace}-{name}` is a custom property with the namespace as
+/// its prefix.
+///
+/// **ASCII letters, digits, hyphens, and underscores, with no hyphen at either
+/// end.** CSS reads a custom property's name as two hyphens and then name
+/// characters, so a space, a `;` or a `}` breaks the declaration or the block.
+/// The engine writes the hyphens on both sides of the namespace itself, so a
+/// hyphen at either end doubles one: `--my` emits `----my-color-background`, and
+/// an empty namespace emits `---color-background`. A leading digit is kept,
+/// since after the two hyphens a digit is a name character like any other.
+/// Characters outside ASCII are left out, which keeps the rule to the characters
+/// every CSS parser reads as part of a name.
+fn prefix(namespace: &str) -> bool {
+    !namespace.is_empty()
+        && !namespace.starts_with('-')
+        && !namespace.ends_with('-')
+        && namespace
+            .chars()
+            .all(|character| character.is_ascii_alphanumeric() || matches!(character, '-' | '_'))
 }
 
 /// Refuses every brand color given that cannot be read, whichever scheme is

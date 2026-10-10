@@ -260,6 +260,24 @@ fn build_refuses_a_failing_theme_and_force_overrides_it() {
     assert!(out(&forced).starts_with(":root {"), "{}", out(&forced));
 }
 
+/// A namespace that is not a token prefix is an input error, and `--force` does
+/// not write it: `--my` would emit `----my-color-background`.
+#[test]
+fn build_refuses_a_namespace_that_is_not_a_token_prefix() {
+    let sandbox = Sandbox::new("namespace", Some(r#"{ "namespace": "--my" }"#));
+    for args in [&["theme", "build"][..], &["theme", "build", "--force"]] {
+        let refused = run(&sandbox.0, args);
+        assert_eq!(code(&refused), 3, "{args:?}: {}", err(&refused));
+        assert_eq!(out(&refused), "", "{args:?} still wrote CSS to stdout");
+        assert!(
+            err(&refused).contains("namespace is not a token prefix")
+                && err(&refused).contains(r#"received "--my""#),
+            "{args:?}: {}",
+            err(&refused)
+        );
+    }
+}
+
 /// The artifact goes to stdout and everything else goes to stderr, so
 /// `helix theme build > theme.css` is a complete stylesheet and not a stylesheet
 /// with a progress note in it.

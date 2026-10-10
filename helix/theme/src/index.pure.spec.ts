@@ -62,3 +62,33 @@ test('the engine refuses a number outside its range, and a value it cannot read,
     'contrastTarget: invalid type: string "4.5", expected a number',
   )
 })
+
+test('the engine refuses a namespace that is not a token prefix, with the value it received', async () => {
+  const engine = await initTheme(module)
+  expect(refusal(() => engine.derive({ namespace: '--my' }))).toBe(
+    'namespace is not a token prefix of ASCII letters, digits, hyphens, and underscores ' +
+      'with no hyphen at either end, received "--my"',
+  )
+  expect(refusal(() => engine.deriveModes({ namespace: '' }))).toEndWith('received ""')
+  expect(refusal(() => engine.derive({ namespace: 'a b;}' }))).toEndWith('received "a b;}"')
+  expect(engine.derive({ namespace: 'my-brand' }, [':root']).css[':root']).toContain(
+    '\n  --my-brand-color-background: #ffffff;',
+  )
+})
+
+test('the engine refuses a status hue outside its band, and names the band', async () => {
+  const engine = await initTheme(module)
+  expect(refusal(() => engine.derive({ status: { danger: { hue: 140 } } }))).toBe(
+    'status.danger.hue must be between 15 and 40 degrees, the reds from crimson to red-orange, ' +
+      'received 140',
+  )
+  expect(refusal(() => engine.deriveModes({ status: { danger: { hue: 999 } } }))).toEndWith(
+    'received 999',
+  )
+  expect(refusal(() => engine.derive({ status: { info: { hue: 300 } } }))).toBe(
+    'status.info.hue must be between 200 and 280 degrees, cyan and blue to indigo, received 300',
+  )
+  const crimson = engine.derive({ status: { allowance: 0, danger: { hue: 20 } } })
+  const danger = crimson.tokens.find((token) => token.name === 'color-danger')
+  expect(Math.abs((danger?.value.hue ?? 0) - 20)).toBeLessThan(1)
+})

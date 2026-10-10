@@ -55,6 +55,19 @@ if (!existsSync(join(root, ARTIFACT))) {
 }
 
 mkdirSync(OUT, { recursive: true })
-run('wasm-bindgen', ['--target', 'web', '--out-dir', OUT, ARTIFACT])
+/* **The `name` section is left out.** It maps every function to its Rust path
+   and is about a fifth of the module. A browser reads it only to name the
+   frames of a stack trace or a profile. Nothing in this package or the site
+   reads it: the glue binds by export name, which is a section of its own, and
+   the crate installs no panic hook, so a panic reaches JavaScript as a bare
+   `unreachable` either way. Without the names, each frame of that trace is a
+   function index and a byte offset. The sections before the name section are
+   the same with or without it, so a build of the same commit without this flag
+   names that index and offset.
+
+   The `producers` section stays. It records the rustc and wasm-bindgen that
+   built the tracked file, which is how a module from an older toolchain is told
+   apart, and it is about a hundred bytes. */
+run('wasm-bindgen', ['--target', 'web', '--remove-name-section', '--out-dir', OUT, ARTIFACT])
 
 console.log(`wasm: fusion-helix-theme built for the browser into ${OUT.replace(`${root}/`, '')}`)
