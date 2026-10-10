@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-workbench",
   "description": "The spec runner and the JSX reader behind the sandbox page on fusion.dev.",
-  "version": "0.206.0",
+  "version": "0.207.0",
   "private": true,
   "license": "MIT",
   "repository": {
