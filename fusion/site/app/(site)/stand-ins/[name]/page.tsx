@@ -17,7 +17,12 @@ import InsightsLoading from '../../insights/loading'
  *
  * **Each is drawn inside the layout of the route it belongs to.** The gallery
  * and the insights index sit in the site layout as this route does; the
- * reference page sits in the docs shell as well, so this wraps it in one.
+ * reference page sits in the docs shell as well, so this wraps it in one. The
+ * shell is a layout and stays on screen while a reference page loads, with the
+ * address already changed, so its rail is told the page is Button's: it opens
+ * on Components with Button current, as it does on the way to that page,
+ * rather than on Getting started, which is what an address no section holds
+ * opens.
  *
  * **Absent from the deployed site.** A production server answers 404 unless
  * it was started with `SITE_STAND_INS=1`, which only the visual tests' `start`
@@ -32,7 +37,7 @@ const STAND_INS: Record<string, () => ReactNode> = {
   components: () => <GalleryLoading />,
   insights: () => <InsightsLoading />,
   reference: () => (
-    <DocsShell>
+    <DocsShell path="/helix/components/button">
       <ReferenceLoading />
     </DocsShell>
   ),
