@@ -127,7 +127,7 @@ export default function Home() {
                   </Link>
                 </helix-flex>
                 {/* **A switch, apart from the links.** It turns something on
-                    and off on this page, and set among links as one more grey
+                    and off on this page, and set among links as one more gray
                     phrase it read as a third place to go. */}
                 <XRay />
               </helix-flex>
