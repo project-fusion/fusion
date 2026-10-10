@@ -46,6 +46,10 @@ const SHAPES = [
     body: 'Territories, lit only where two of them meet. Nothing is drawn but the disagreements.',
     name: 'fracture',
   },
+  {
+    body: 'Stars adrift, joined to their neighbors while they are near. The pointer gathers them.',
+    name: 'constellation',
+  },
 ] as const
 
 /** What the pointer can be asked to do instead of the shape's own answer. */
@@ -81,7 +85,15 @@ const KNOBS = [
  * ones left out have a single subject, and `threads` and `lattice`, which are
  * even on purpose.
  */
-const VARIES = new Set(['aurora', 'caustics', 'fracture', 'particles', 'rays', 'streaks'])
+const VARIES = new Set([
+  'aurora',
+  'caustics',
+  'constellation',
+  'fracture',
+  'particles',
+  'rays',
+  'streaks',
+])
 
 type Knob = (typeof KNOBS)[number]['key']
 

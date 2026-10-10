@@ -4,8 +4,9 @@ import { useMotion } from '@/hooks/use-motion/use-motion'
 /**
  * The field behind the Cortex page: an aura, where the landing page runs a
  * strand. The strand is the DNA's light, one thread down the page; the mind
- * gets a field, a lattice of light that breathes behind the bands, in the
- * same element the services page and the Aura page draw with.
+ * gets a constellation, stars joined to their neighbors while they are near,
+ * in the same element the services page and the Aura page draw with. Facts,
+ * and what each is linked to.
  *
  * It holds still when the reader turns motion off in the preferences drawer,
  * through the element's own `paused`, which is what WCAG 2.2.2 asks of
@@ -14,20 +15,20 @@ import { useMotion } from '@/hooks/use-motion/use-motion'
  */
 export function CortexAura({
   className,
-  variant = 'particles',
+  variant = 'constellation',
 }: {
   className: string
-  variant?: 'lattice' | 'particles' | 'threads' | 'flow'
+  variant?: 'constellation' | 'lattice' | 'particles' | 'threads' | 'flow'
 }) {
   const motion = useMotion()
   return (
     <helix-aura
       class={className}
       data-layer
-      gain={0.9}
+      gain={0.8}
       paused={motion === 'off' || undefined}
-      scale={2.4}
-      speed={0.4}
+      scale={4.5}
+      speed={0.3}
       terminus={0.5625}
       variant={variant}
     ></helix-aura>
