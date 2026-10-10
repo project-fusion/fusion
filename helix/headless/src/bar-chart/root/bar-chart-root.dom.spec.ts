@@ -655,3 +655,122 @@ describe('from data', () => {
     expect(part(chart, 'plot')?.getAttribute('aria-label')).toBe('From the table')
   })
 })
+
+/* An element a column, and a group a category: 10,000 readings built 20,641
+   nodes, and every move of the pointer faded 9,999 groups. Past one column a
+   pixel the columns are paths. happy-dom lays nothing out, so the plot is
+   the window's width there. */
+describe('more columns than pixels', () => {
+  type Pointed = HTMLElement & {
+    pointer: { set: (at: number) => void }
+    updateComplete: Promise<unknown>
+  }
+
+  /* A reading a row: a wave around zero, the 31st toned. */
+  const many = (count: number, id = 'many'): string => `<table id="${id}">
+    <thead><tr><th>At</th><th>Load</th></tr></thead>
+    <tbody>${Array.from(
+      { length: count },
+      (_, at) =>
+        `<tr><th>p${at}</th><td${at === 30 ? ' data-tone="primary"' : ''}>${Math.round(Math.sin(at / 20) * 50)}</td></tr>`,
+    ).join('')}</tbody>
+  </table>`
+
+  const paths = (host: HTMLElement): Element[] => [
+    ...(host.shadowRoot?.querySelectorAll('path[part~="bar"]') ?? []),
+  ]
+
+  /** The plot's width in CSS pixels, as laid out, and the window's where nothing is. */
+  const across = (host: HTMLElement): number =>
+    (part(host, 'labels') as HTMLElement).getBoundingClientRect().width || globalThis.innerWidth
+
+  test('draws a path for each series, tone, and side of zero, in one group', async () => {
+    const host = await chart(many(1500), 'for="many"')
+    expect(host.shadowRoot?.querySelectorAll('rect[part~="bar"]')).toHaveLength(0)
+    expect(
+      paths(host).map((one) => [
+        one.getAttribute('part'),
+        one.getAttribute('data-series'),
+        one.getAttribute('data-tone'),
+      ]),
+    ).toEqual([
+      ['bar', '1', null],
+      ['bar', '1', 'primary'],
+      ['bar bar-negative', '1', null],
+    ])
+    expect(paths(host)[1]?.getAttribute('style')).toContain(
+      'var(--bar-chart-tone-primary, var(--chart-series-1))',
+    )
+    const groups = [...(host.shadowRoot?.querySelectorAll('[part~="group"]') ?? [])]
+    expect(groups.map((one) => one.getAttribute('part'))).toEqual(['group'])
+    expect(groups[0]?.children).toHaveLength(3)
+  })
+
+  test('draws each column of pixels once a path, as far as its columns reach', async () => {
+    const host = await chart(many(5000), 'for="many"')
+    /* A rectangle a column of pixels in each path, which the pixels bound. */
+    const pixels = Math.ceil(across(host) * (globalThis.devicePixelRatio || 1)) + 1
+    for (const path of paths(host)) {
+      expect((path.getAttribute('d')?.match(/M/g) ?? []).length).toBeLessThanOrEqual(pixels)
+    }
+  })
+
+  test('draws the reading shown again over the paths, two pixels thick, as columns', async () => {
+    const host = (await chart(many(1500), 'for="many"')) as Pointed
+    host.pointer.set(30)
+    await host.updateComplete
+    const shown = host.shadowRoot?.querySelector('[part~="group-active"]')
+    expect(shown?.getAttribute('part')).toBe('group group-active')
+    expect(shown?.hasAttribute('data-active')).toBe(true)
+    const [bar, ...more] = [...(shown?.children ?? [])]
+    expect(more).toHaveLength(0)
+    expect(bar?.getAttribute('part')).toBe('bar bar-end')
+    expect(bar?.getAttribute('data-tone')).toBe('primary')
+    /* Two pixels, in the drawing's 100 units across. */
+    expect(Number(bar?.getAttribute('width'))).toBeCloseTo((2 * 100) / across(host), 3)
+    /* Centered on the slot of the 31st of 1,500. */
+    const middle = Number(bar?.getAttribute('x')) + Number(bar?.getAttribute('width')) / 2
+    expect(middle).toBeCloseTo((30.5 * 100) / 1500, 3)
+  })
+
+  test('moves the reading shown by key, as a chart of a few columns does', async () => {
+    const host = (await chart(many(1500), 'for="many"')) as Pointed
+    const press = (key: string): void => {
+      part(host, 'plot')?.dispatchEvent(
+        new KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, key }),
+      )
+    }
+    press('Home')
+    press('ArrowRight')
+    await host.updateComplete
+    expect(part(host, 'live')?.textContent).toBe('p1: Load 2 (2 of 1,500)')
+    const bar = host.shadowRoot?.querySelector('[part~="group-active"] [part~="bar"]')
+    const middle = Number(bar?.getAttribute('x')) + Number(bar?.getAttribute('width')) / 2
+    expect(middle).toBeCloseTo((1.5 * 100) / 1500, 3)
+  })
+
+  test('keeps each column an element where every column has a pixel and a gap', async () => {
+    const host = await chart(many(200), 'for="many"')
+    expect(paths(host)).toHaveLength(0)
+    expect(host.shadowRoot?.querySelectorAll('rect[part~="bar"]')).toHaveLength(200)
+  })
+
+  /* The scale guard: what a chart builds is bounded by what it can show, and
+     not by how many readings it was given. */
+  test('builds as many elements for 20,000 readings as for 2,000', async () => {
+    const count = async (readings: number): Promise<number> => {
+      const host = (await mount(
+        '<helix-headless-bar-chart gridlines="both" lines="Margin" value-axis></helix-headless-bar-chart>',
+      )) as HTMLElement & { data: unknown; updateComplete: Promise<boolean> }
+      host.data = {
+        columns: ['At', 'Load', 'Errors', 'Margin'],
+        rows: Array.from({ length: readings }, (_, at) => [`p${at}`, at % 9, -(at % 4), at % 7]),
+      }
+      await host.updateComplete
+      return host.shadowRoot?.querySelectorAll('*').length ?? 0
+    }
+    const few = await count(2000)
+    expect(few).toBeLessThan(2000)
+    expect(await count(20_000)).toBe(few)
+  })
+})

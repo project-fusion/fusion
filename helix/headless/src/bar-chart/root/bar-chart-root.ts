@@ -2,6 +2,7 @@ import {
   byRow,
   CategoryAxisController,
   CHART_PLOT,
+  columnPoints,
   customElement,
   drawTooltip,
   extent,
@@ -17,6 +18,8 @@ import {
   MixinChartStatus,
   PLOT_HEIGHT,
   PLOT_WIDTH,
+  type Point,
+  type Row,
   type Series,
   type SeriesPoint,
   seriesIndex,
@@ -39,6 +42,51 @@ import '../../tooltip/index.js'
  */
 const toned = (tone: string | undefined): string | undefined =>
   tone && /^[a-z][a-z0-9-]*$/.test(tone) ? tone : undefined
+
+/** Four decimals, as a path of columns is written: a column a hundredth of a pixel thick keeps its width. */
+const round = (value: number): number => Math.round(value * 10_000) / 10_000
+
+/**
+ * How thick a column drawn again for the reading shown is at least, in CSS
+ * pixels, where the columns are thinner than that, so a reader sees which one
+ * the tooltip describes.
+ */
+const SHOWN_THICKNESS = 2
+
+/** Where a column stands, in the drawing's own units. */
+interface ColumnBox {
+  /** Where it starts across the categories. */
+  across: number
+  /** Where it starts along the measure. */
+  along: number
+  /** How long it is along the measure. */
+  size: number
+  /** How thick it is across the categories. */
+  thickness: number
+}
+
+/** One series drawn as columns: its place in the slot and its place in the palette. */
+interface ColumnSeries {
+  one: Series
+  slots: (SeriesPoint | undefined)[]
+  tone: number
+}
+
+/** What every render of one set of readings shares: the scales, and what is drawn from them. */
+interface BarFrame {
+  /** The domain of the primary scale, zero at both ends. */
+  domain: [number, number]
+  /** Where zero is on the primary scale. */
+  floor: number
+  /** The domain of the second scale, where `secondary` names a series. */
+  other: [number, number]
+  /** The scale the tooltip measures a category's far end on, over every series shown. */
+  reach: (value: number) => number
+  /** The widest number on either axis, in characters. */
+  widest: number
+  y: (value: number) => number
+  z: ((value: number) => number) | undefined
+}
 
 /**
  * @summary A chart that draws a table's categories as columns.
@@ -78,6 +126,15 @@ const toned = (tone: string | undefined): string | undefined =>
  * a bar out without a second column to color it. Without one, a bar takes
  * its series' color.
  *
+ * **A chart of more columns than its plot has pixels draws them as paths.**
+ * Each column is an element of its own, the `bar` part, while every column
+ * and the space between two categories are at least a pixel of the screen.
+ * Past that, the columns of each series are one path, with one more for each
+ * `data-tone` and one for the columns below zero, all in one `group`. The
+ * category the tooltip describes is drawn again over them as `group-active`,
+ * each of its columns at least two pixels thick, so a reader sees which one
+ * it is.
+ *
  * **`data` takes the readings as data** where the page has no table to point
  * `for` at, in a table's shape: the column headings, then one row per reading
  * with its label first. A table is still the better source where the page can
@@ -115,17 +172,17 @@ const toned = (tone: string | undefined): string | undefined =>
  *
  * @csspart axis - The numbers of one scale: the primary under `value-axis`, and both when `secondary` splits the chart into two scales.
  * @csspart band - The category band under the pointer.
- * @csspart bar - One column. Under `stacked`, one segment of a category's column.
- * @csspart bar-end - The bar at a column's far end, the end away from zero, which is the end to round. A column standing alone is its own far end. Under `stacked`, the last positive segment above zero and the last negative one below it. Its `data-end` is `positive` or `negative`. A blank or a zero is never the end. Set together with `bar`.
+ * @csspart bar - One column. Under `stacked`, one segment of a category's column. Past one column a pixel, a path of the columns of one series that share a `data-tone` and a side of zero, each a rectangle in it.
+ * @csspart bar-end - The bar at a column's far end, the end away from zero, which is the end to round. A column standing alone is its own far end. Under `stacked`, the last positive segment above zero and the last negative one below it. Its `data-end` is `positive` or `negative`. A blank or a zero is never the end. Set together with `bar`, and never on a path of columns.
  * @csspart bar-end-negative - A far end below zero, whose far end is its bottom, or its inline start when the bars run across. Set together with `bar-end`.
- * @csspart bar-negative - A bar below zero, standing alone or any segment of a stack below it, whose base is its top, or its inline end when the bars run across. Set together with `bar`.
+ * @csspart bar-negative - A bar below zero, standing alone or any segment of a stack below it, whose base is its top, or its inline end when the bars run across. On a path of columns, every column in it is below zero. Set together with `bar`.
  * @csspart bar-wash-end - The far stop of a bar's gradient, where one is used.
  * @csspart bar-wash-start - The stop of a bar's gradient at its base.
  * @csspart baseline - The line the columns stand on.
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
  * @csspart gridline - One gridline across the plot, drawn when `gridlines` is set.
- * @csspart group - One category's columns, together.
- * @csspart group-active - The group the tooltip describes. Set together with `group`.
+ * @csspart group - One category's columns, together. Past one column a pixel, every category's columns, together.
+ * @csspart group-active - The group the tooltip describes. Set together with `group`. Past one column a pixel, that category's columns drawn again over the rest, each at least two pixels thick.
  * @csspart label - One category's name, placed along the row by `--chart-label-start` and `--chart-label-size`, or down the column under `orientation="horizontal"`, with its text centered. Only the names that fit are drawn, the first and the last always.
  * @csspart labels - The row of category names, or the column of them under `orientation="horizontal"`, which the names share: lay it out as one grid cell they all stand in.
  * @csspart line - A series drawn as a line, named in `lines`.
@@ -390,14 +447,78 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
     this.pointer.axis = this.orientation === 'horizontal' ? 'block' : 'inline'
   }
 
+  /** The category names, held against the rows they were read from. */
+  private categorized: { categories: string[]; rows: Row[] } | undefined
+
+  /** The scales last worked out, held while the series and all that sizes them are the same. */
+  private framed: { frame: BarFrame; key: string; series: Series[] } | undefined
+
   protected override render(): TemplateResult {
     const series = this.series
     /* Every row is a category, whether or not each series has a reading in
        it. Taken from the first series' points, a blank in its column took the
        category off the axis and every other series slid one place left. */
-    const categories = series.length === 0 ? [] : this.sourceRows.map((row) => row.label)
+    const rows = this.sourceRows
+    if (this.categorized?.rows !== rows) {
+      this.categorized = { categories: rows.map((row) => row.label), rows }
+    }
+    const categories = series.length === 0 ? [] : this.categorized.categories
     if (categories.length === 0) {
       return this.renderEmpty()
+    }
+
+    const { domain, floor, other, widest, y, z } = this.frameOf(series, categories.length)
+    const sideways = this.orientation === 'horizontal'
+
+    /* The second axis wears its series' color when exactly one series is on it,
+       which is the case worth helping and the only one a single color can
+       describe honestly: with two sharing it, painting the axis either of their
+       colors says it belongs to that one.
+     *
+       **Written onto the axis and not onto the plot.** The axis is the plot's
+       sibling, being a column of the host grid, and a custom property inherits
+       down and never sideways: written onto the plot, both axes come out the
+       neutral. */
+    const scaled = this.scaled
+    const lone = series.filter((one) => scaled.has(seriesKey(one.name)))
+    const tint =
+      lone.length === 1 && lone[0] !== undefined
+        ? `--bar-chart-secondary: var(--chart-series-${seriesIndex(series.indexOf(lone[0]))})`
+        : undefined
+
+    return html`${
+      z === undefined && !this.valueAxis
+        ? nothing
+        : this.renderAxis(y, domain, 'primary', sideways, widest)
+    }${this.renderPlot(series, categories, y, domain, floor, z)}${
+      z === undefined ? nothing : this.renderAxis(z, other, 'secondary', sideways, widest, tint)
+    }${this.renderLabels(categories)}${this.renderSummary(series)}${this.renderTable()}`
+  }
+
+  /**
+   * The scales every series is drawn against, and what the plot reads from
+   * them, held while the readings and every property that sizes them are the
+   * same.
+   *
+   * **A render the pointer asks for works out nothing here.** Every move of the
+   * pointer across the plot is a render, and the extent of every reading
+   * walked again on each one was work a move does not change. A series is a
+   * new object whenever the table is read again, so an edit works it out
+   * afresh.
+   */
+  private frameOf(series: Series[], count: number): BarFrame {
+    const key = [
+      count,
+      this.stacked,
+      this.orientation,
+      this.lines,
+      this.secondary,
+      this.valueAxis,
+      wordsLocale(this),
+      series.map((one) => (this.showsSeries(one.name) ? 1 : 0)).join(''),
+    ].join(' ')
+    if (this.framed?.series === series && this.framed.key === key) {
+      return this.framed.frame
     }
 
     /* Zero at both ends, so a series that goes negative gets a baseline inside
@@ -421,7 +542,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
     const lined = this.lined
     const readingsOf = (group: Series[]): number[] =>
       this.stacked
-        ? stackedReadings(group, categories.length, (one) => lined.has(seriesKey(one.name)))
+        ? stackedReadings(group, count, (one) => lined.has(seriesKey(one.name)))
         : group.flatMap((one) => one.points.map((point) => point.value))
     const on = (which: (one: Series) => boolean): number[] => {
       const found = readingsOf(shown.filter(which))
@@ -443,7 +564,6 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
     const y = linear(domain, range)
     const floor = y(0)
 
-    const sideways = this.orientation === 'horizontal'
     const [second, top] = extent(scaled.size > 0 ? on(own) : [0])
     const other: [number, number] = [Math.min(0, second), Math.max(0, top)]
     const z = scaled.size > 0 ? linear(other, range) : undefined
@@ -463,28 +583,45 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
         ? 0
         : Math.max(1, ...levels.map((level) => format(level).length))
 
-    /* The second axis wears its series' color when exactly one series is on it,
-       which is the case worth helping and the only one a single color can
-       describe honestly: with two sharing it, painting the axis either of their
-       colors says it belongs to that one.
-     *
-       **Written onto the axis and not onto the plot.** The axis is the plot's
-       sibling, being a column of the host grid, and a custom property inherits
-       down and never sideways: written onto the plot, both axes come out the
-       neutral. */
-    const lone = series.filter(own)
-    const tint =
-      lone.length === 1 && lone[0] !== undefined
-        ? `--bar-chart-secondary: var(--chart-series-${seriesIndex(series.indexOf(lone[0]))})`
-        : undefined
+    /* The tooltip stands off the far end of a category's columns, measured
+       over every series shown, on whichever scale each is drawn. */
+    let reach = y
+    if (scaled.size > 0) {
+      const [near, far] = extent(readingsOf(shown).concat(0))
+      reach = linear([Math.min(0, near), Math.max(0, far)], range)
+    }
 
-    return html`${
-      z === undefined && !this.valueAxis
-        ? nothing
-        : this.renderAxis(y, domain, 'primary', sideways, widest)
-    }${this.renderPlot(series, categories, y, domain, floor, z)}${
-      z === undefined ? nothing : this.renderAxis(z, other, 'secondary', sideways, widest, tint)
-    }${this.renderLabels(categories)}${this.renderSummary(series)}${this.renderTable()}`
+    const frame = { domain, floor, other, reach, widest, y, z }
+    this.framed = { frame, key, series }
+    return frame
+  }
+
+  /** Each series' highest reading, held by series, which the summary says on every render. */
+  private highests = new WeakMap<Series, SeriesPoint | undefined>()
+
+  private highestOf(one: Series): SeriesPoint | undefined {
+    if (!this.highests.has(one)) {
+      let best: SeriesPoint | undefined
+      for (const point of one.points) {
+        if (best === undefined || point.value > best.value) {
+          best = point
+        }
+      }
+      this.highests.set(one, best)
+    }
+    return this.highests.get(one)
+  }
+
+  /** Each series laid out one slot per category, held by series. */
+  private slots = new WeakMap<Series, (SeriesPoint | undefined)[]>()
+
+  private slotsOf(one: Series, count: number): (SeriesPoint | undefined)[] {
+    let held = this.slots.get(one)
+    if (held === undefined || held.length !== count) {
+      held = byRow(one, count)
+      this.slots.set(one, held)
+    }
+    return held
   }
 
   /**
@@ -500,10 +637,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
     const rows = this.sourceRows
     const columns = this.plottedColumns
     const highest = series.flatMap((one, depth) => {
-      const top = one.points.reduce<(typeof one.points)[number] | undefined>(
-        (best, point) => (best === undefined || point.value > best.value ? point : best),
-        undefined,
-      )
+      const top = this.highestOf(one)
       if (top === undefined || !this.showsSeries(one.name)) {
         return []
       }
@@ -556,8 +690,8 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
        ordinary chart takes exactly the path it took before this existed. */
     const against = (one: Series): ((value: number) => number) =>
       z !== undefined && own(one) ? z : y
-    const columns = series
-      .map((one, index) => ({ one, slots: byRow(one, categories.length), tone: index }))
+    const columns: ColumnSeries[] = series
+      .map((one, index) => ({ one, slots: this.slotsOf(one, categories.length), tone: index }))
       /* A series a legend hid takes no room in the slot, and keeps its tone. */
       .filter(({ one }) => !lined.has(seriesKey(one.name)) && this.showsSeries(one.name))
     /* **The stride is what the columns share and the thickness is what they
@@ -573,9 +707,9 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
     /* Stacked, the columns of a category are one column, so it takes the
        whole stride and no gap. */
     const abreast = this.stacked ? 1 : columns.length
-    const stride = (slot * 0.72) / Math.max(abreast, 1)
-    const gap = abreast > 1 ? stride * 0.08 : 0
-    const thickness = stride - gap
+    /* The share of a category's room one column is thick, which the column
+       drawn again for the reading shown needs to widen the room it stands in. */
+    const share = (0.72 / Math.max(abreast, 1)) * (abreast > 1 ? 0.92 : 1)
 
     /* **The geometry is computed for the axis it is drawn on, not rotated onto
        it.** Turning the whole plot with `rotate: 90deg` is the shorter CSS and
@@ -586,7 +720,35 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
      *
      * Swapping the two axes here costs one branch and keeps every other fact
      * about the chart the same. `value` runs along x when the bars are
-     * sideways and along y otherwise; `category` takes the other one. */
+     * sideways and along y otherwise; `category` takes the other one.
+     *
+     * `room` is the share of the axis the category's columns stand in, its
+     * slot, and wider for a category drawn again for the reading shown,
+     * centered on the slot. */
+    const boxOf = (
+      value: number,
+      index: number,
+      depth: number,
+      scale: (value: number) => number,
+      from?: number,
+      room = slot,
+    ): ColumnBox => {
+      const stride = (room * 0.72) / Math.max(abreast, 1)
+      const gap = abreast > 1 ? stride * 0.08 : 0
+      const at = scale(value)
+      const base = from === undefined ? floor : scale(from)
+      /* `0.36` is half of the 0.72 of the room the group takes, and it is
+         what centers the group in its slot: where the room is the slot, the
+         group starts `0.14` of it in, half of what the group leaves over. The
+         numbers are one decision written twice: move the 0.72 alone and every
+         group slides off center with nothing on screen to say so. */
+      return {
+        across: (index + 0.5) * slot - room * 0.36 + depth * stride + gap / 2,
+        along: Math.min(base, at),
+        size: Math.abs(base - at),
+        thickness: stride - gap,
+      }
+    }
     const bar = (
       value: number,
       index: number,
@@ -596,20 +758,11 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
       from?: number,
       end?: StackEnd,
       named?: string,
+      room?: number,
     ): TemplateResult => {
-      const at = scale(value)
-      const base = from === undefined ? floor : scale(from)
-      const along = Math.min(base, at)
-      const size = Math.abs(base - at)
-      /* `0.14` is half of what the group leaves over, `(1 - 0.72) / 2` from the
-         stride above, and it is what centers the group in its slot. The two
-         numbers are one decision written twice: move the 0.72 alone and every
-         group slides off center with nothing on screen to say so. */
-      const across = index * slot + slot * 0.14 + depth * stride + gap / 2
+      const { across, along, size, thickness } = boxOf(value, index, depth, scale, from, room)
       const ink = toned(named)
-      const paint = ink
-        ? `--chart-series: var(--bar-chart-tone-${ink}, var(--chart-series-${seriesIndex(tone)})); --chart-bar-wash: url(#helix-bar-wash-tone-${ink})`
-        : `--chart-series: var(--chart-series-${seriesIndex(tone)}); --chart-bar-wash: url(#helix-bar-wash-${seriesIndex(tone)})`
+      const paint = this.paintOf(tone, ink)
       /* Compared out here, because every quoted word inside a part's
          interpolation is read as a name the element can carry. A segment
          grows down from where it starts, or from zero when it stands alone. */
@@ -639,6 +792,111 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
             y=${along}
           />`
     }
+
+    /* A category's columns, side by side or stacked, as `draw` makes each. */
+    const columnsAt = <T>(
+      index: number,
+      draw: (
+        value: number,
+        depth: number,
+        tone: number,
+        scale: (value: number) => number,
+        from: number | undefined,
+        end: StackEnd | undefined,
+        named: string | undefined,
+      ) => T,
+    ): T[] =>
+      this.stacked
+        ? this.renderStack(columns, index, against, draw)
+        : columns.flatMap(({ slots, one, tone }, depth) => {
+            const point = slots[index]
+            /* A blank cell is no column at all, which is what a blank says. A
+               column of no height would claim a zero. A column alone is a
+               stack of one, so it is its own far end, above zero or below
+               it. */
+            return point === undefined
+              ? []
+              : [
+                  draw(
+                    point.value,
+                    depth,
+                    tone,
+                    against(one),
+                    undefined,
+                    stackFarEnds([point.value])[0],
+                    point.tone,
+                  ),
+                ]
+          })
+
+    const thickness = boxOf(0, 0, 0, y).thickness
+    const dense = this.dense(slot, thickness)
+    /* The device pixels along the axis, which a path of more categories than
+       pixels is drawn to. */
+    const pixel = this.unitsPerPixel() / (globalThis.devicePixelRatio || 1)
+    const key = `${dense ? pixel : 'apart'} ${this.stacked} ${this.orientation} ${this.lines} ${this.secondary} ${columns.map(({ tone }) => tone).join(',')}`
+    const held = this.marked
+    const fresh =
+      held === undefined ||
+      held.series !== series ||
+      held.y !== y ||
+      held.z !== z ||
+      held.floor !== floor ||
+      held.count !== categories.length ||
+      held.key !== key
+    let marks: TemplateResult[][] | TemplateResult
+    if (!fresh) {
+      marks = held.marks
+    } else if (dense) {
+      marks = this.renderPaths(
+        { abreast, count: categories.length, pixel, sideways, slot },
+        (index, add) =>
+          columnsAt(index, (value, depth, tone, scale, from, _end, named) =>
+            add(boxOf(value, index, depth, scale, from), {
+              depth,
+              ink: toned(named),
+              sinks: value < (from ?? 0),
+              tone,
+            }),
+          ),
+      )
+    } else {
+      marks = categories.map((_, index) =>
+        columnsAt(index, (value, depth, tone, scale, from, end, named) =>
+          bar(value, index, depth, tone, scale, from, end, named),
+        ),
+      )
+    }
+    if (fresh) {
+      this.marked = { count: categories.length, floor, key, marks, series, y, z }
+    }
+
+    const at = this.pointer.at
+    /* The category the tooltip describes, drawn again over the paths, at
+       least `SHOWN_THICKNESS` pixels thick: thinner than a pixel, a column a
+       reader moved to by key could not be seen. */
+    const room = Math.max(slot, (SHOWN_THICKNESS * this.unitsPerPixel()) / share)
+    const groups = Array.isArray(marks)
+      ? marks.map(
+          (bars, index) =>
+            /* The group the tooltip is about says so, and the stylesheet fades
+               the rest. A tooltip over a chart of five categories otherwise
+               makes a reader match its heading against the row of names to find
+               out which columns it means. */
+            svg`<g
+              data-active=${at === index ? '' : nothing}
+              part="group${at === index ? ' group-active' : ''}"
+            >${bars}</g>`,
+        )
+      : svg`<g part="group">${marks}</g>${
+          at < 0 || at >= categories.length
+            ? nothing
+            : svg`<g data-active part="group group-active">${columnsAt(
+                at,
+                (value, depth, tone, scale, from, end, named) =>
+                  bar(value, at, depth, tone, scale, from, end, named, room),
+              )}</g>`
+        }`
 
     return html`<div
       aria-describedby=${this.named ? 'helix-chart-summary' : nothing}
@@ -681,10 +939,8 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
                 <stop offset="1" part="bar-wash-end" />
               </linearGradient>`,
             )}
-            ${[...new Set(series.flatMap((one) => one.points.map((point) => toned(point.tone))))]
-              .filter((ink): ink is string => ink !== undefined)
-              .map(
-                (ink) => svg`<linearGradient
+            ${this.tonesOf(series).map(
+              (ink) => svg`<linearGradient
                 id="helix-bar-wash-tone-${ink}"
                 style="--chart-series: var(--bar-chart-tone-${ink}, var(--chart-series-1))"
                 x1="0"
@@ -695,7 +951,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
                 <stop offset="0" part="bar-wash-start" />
                 <stop offset="1" part="bar-wash-end" />
               </linearGradient>`,
-              )}
+            )}
           </defs>`
         }
         ${this.renderGridlines(y, domain, sideways, categories.length)}
@@ -705,41 +961,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
             : svg`<line part="baseline" x1="0" x2="100" y1=${floor} y2=${floor} />`
         }
         ${this.renderBand(categories.length, sideways)}
-        ${categories.map(
-          (_, index) =>
-            /* The group the tooltip is about says so, and the stylesheet fades
-               the rest. A tooltip over a chart of five categories otherwise
-               makes a reader match its heading against the row of names to find
-               out which columns it means. */
-            svg`<g
-              data-active=${this.pointer.at === index ? '' : nothing}
-              part="group${this.pointer.at === index ? ' group-active' : ''}"
-            >
-              ${
-                this.stacked
-                  ? this.renderStack(columns, index, against, bar)
-                  : columns.map(({ slots, one, tone }, depth) => {
-                      const point = slots[index]
-                      /* A blank cell is no column at all, which is what a
-                         blank says. A column of no height would claim a zero.
-                         A column alone is a stack of one, so it is its own
-                         far end, above zero or below it. */
-                      return point === undefined
-                        ? nothing
-                        : bar(
-                            point.value,
-                            index,
-                            depth,
-                            tone,
-                            against(one),
-                            undefined,
-                            stackFarEnds([point.value])[0],
-                            point.tone,
-                          )
-                    })
-              }
-            </g>`,
-        )}
+        ${groups}
         ${
           /* After the groups, so a line is never drawn under the columns it is
              meant to be read against. Outside them too: a group is one
@@ -757,24 +979,195 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
   }
 
   /**
-   * One category's columns stacked into one, each on the ones before it on
-   * its own scale, through the pure `stackSpans`.
+   * The columns last drawn, held against what they were drawn from, so a
+   * render the pointer asks for draws none of them again: a group of each
+   * category's columns, or the paths of them all.
    */
-  private renderStack(
-    columns: { one: Series; slots: (SeriesPoint | undefined)[]; tone: number }[],
+  private marked:
+    | {
+        count: number
+        floor: number
+        key: string
+        marks: TemplateResult[][] | TemplateResult
+        series: Series[]
+        y: (value: number) => number
+        z: ((value: number) => number) | undefined
+      }
+    | undefined
+
+  /** The `data-tone` names the cells give, held by the series they were read from. */
+  private tones = new WeakMap<Series[], string[]>()
+
+  /** The `data-tone` names the cells give, each a gradient of its own. */
+  private tonesOf(series: Series[]): string[] {
+    let held = this.tones.get(series)
+    if (held === undefined) {
+      const found = new Set<string>()
+      for (const one of series) {
+        for (const point of one.points) {
+          const ink = toned(point.tone)
+          if (ink !== undefined) {
+            found.add(ink)
+          }
+        }
+      }
+      held = [...found]
+      this.tones.set(series, held)
+    }
+    return held
+  }
+
+  /**
+   * The paint a column takes: its tone's color and gradient where its cell
+   * names a tone, and its series' otherwise.
+   */
+  private paintOf(tone: number, ink: string | undefined): string {
+    return ink
+      ? `--chart-series: var(--bar-chart-tone-${ink}, var(--chart-series-${seriesIndex(tone)})); --chart-bar-wash: url(#helix-bar-wash-tone-${ink})`
+      : `--chart-series: var(--chart-series-${seriesIndex(tone)}); --chart-bar-wash: url(#helix-bar-wash-${seriesIndex(tone)})`
+  }
+
+  /**
+   * The axis the categories run along, in CSS pixels: as measured, and the
+   * window's before it is, which a render replaces before it is painted.
+   */
+  private axisPixels(): number {
+    const sideways = this.orientation === 'horizontal'
+    return this.names.measured || (sideways ? globalThis.innerHeight : globalThis.innerWidth) || 0
+  }
+
+  /** How many of the drawing's units a CSS pixel is along the categories, or 0 with no axis. */
+  private unitsPerPixel(): number {
+    const across = this.axisPixels()
+    return across > 0 ? (this.orientation === 'horizontal' ? PLOT_HEIGHT : PLOT_WIDTH) / across : 0
+  }
+
+  /**
+   * Whether the columns are drawn as paths: where a column, or the space
+   * between two categories, is less than a pixel of the screen, so no column
+   * is seen as one of its own.
+   *
+   * **An element a column cost an element a reading**, and two with its
+   * group: 10,000 readings built 20,641 nodes and took 741 milliseconds to a
+   * first frame, measured in Chromium on October 10, 2026, and every move of
+   * the pointer faded 9,999 groups at 655 milliseconds a move. Within the
+   * pixels a plot has, a column is an element, so the parts and the treatments
+   * a page gives one column still reach it.
+   */
+  private dense(slot: number, thickness: number): boolean {
+    const units = this.unitsPerPixel()
+    const pixel = units / (globalThis.devicePixelRatio || 1)
+    return units > 0 && Math.min(thickness, slot * 0.28) < pixel
+  }
+
+  /**
+   * Every column as a rectangle in a path, which `each` gives a category at
+   * a time: one path for the columns of each series that share a `data-tone`
+   * and a side of zero, so a tone and `bar-negative` still reach the columns
+   * they name.
+   *
+   * **A column of pixels is one rectangle a path**, from the nearest end any
+   * column in it reaches to the farthest, and the series that stand side by
+   * side share the pixel. A browser rasterizes every rectangle of a path each
+   * time the plot repaints, and the plot repaints on every move of the
+   * pointer: measured in Chromium on October 10, 2026, 10,000 columns in one
+   * path cost 136 milliseconds a move. In one column of pixels the columns
+   * cover what their farthest end reaches, so that rectangle is the pixels'
+   * whole drawing, which is how a line keeps the lowest and the highest point
+   * of each column of pixels. Columns a pixel apart or less drawn as
+   * themselves were a hatch of half-covered pixels, lighter than their color
+   * and striped where the hatch beat against the pixels.
+   */
+  private renderPaths(
+    plot: { abreast: number; count: number; pixel: number; sideways: boolean; slot: number },
+    each: (
+      index: number,
+      add: (
+        box: ColumnBox,
+        column: {
+          depth: number
+          ink: string | undefined
+          sinks: boolean
+          tone: number
+        },
+      ) => void,
+    ) => void,
+  ): TemplateResult {
+    const { abreast, count, pixel, sideways, slot } = plot
+    const paths = new Map<
+      string,
+      {
+        d: string[]
+        depth: number
+        ink: string | undefined
+        reaches: Map<number, [number, number]>
+        sinks: boolean
+        tone: number
+      }
+    >()
+    const rectangle = (across: number, along: number, thickness: number, size: number): string => {
+      const [x, y, width, height] = sideways
+        ? [along, across, size, thickness]
+        : [across, along, thickness, size]
+      return `M${round(x)},${round(y)}h${round(width)}v${round(height)}h${-round(width)}z`
+    }
+    for (let index = 0; index < count; index += 1) {
+      each(index, (box, { depth, ink, sinks, tone }) => {
+        const key = `${tone} ${ink ?? ''} ${sinks}`
+        let path = paths.get(key)
+        if (path === undefined) {
+          path = { d: [], depth, ink, reaches: new Map(), sinks, tone }
+          paths.set(key, path)
+        }
+        /* Every column of pixels the category's slot reaches into. */
+        const last = Math.ceil(((index + 1) * slot) / pixel) - 1
+        for (let at = Math.floor((index * slot) / pixel); at <= last; at += 1) {
+          const reach = path.reaches.get(at)
+          if (reach === undefined) {
+            path.reaches.set(at, [box.along, box.along + box.size])
+          } else {
+            reach[0] = Math.min(reach[0], box.along)
+            reach[1] = Math.max(reach[1], box.along + box.size)
+          }
+        }
+      })
+    }
+    const share = pixel / Math.max(abreast, 1)
+    for (const path of paths.values()) {
+      for (const [at, [near, far]] of path.reaches) {
+        path.d.push(rectangle(at * pixel + path.depth * share, near, share, far - near))
+      }
+    }
+    return svg`${[...paths.values()].map(
+      ({ d, ink, sinks, tone }) =>
+        svg`<path
+          d=${d.join('')}
+          data-series=${seriesIndex(tone)}
+          data-tone=${ink ?? nothing}
+          part="bar${sinks ? ' bar-negative' : ''}"
+          style=${this.paintOf(tone, ink)}
+        />`,
+    )}`
+  }
+
+  /**
+   * One category's columns stacked into one, each on the ones before it on
+   * its own scale, through the pure `stackSpans`, each as `draw` makes it.
+   */
+  private renderStack<T>(
+    columns: ColumnSeries[],
     index: number,
     against: (one: Series) => (value: number) => number,
-    bar: (
+    draw: (
       value: number,
-      index: number,
       depth: number,
       tone: number,
       scale: (value: number) => number,
-      from?: number,
-      end?: StackEnd,
-      named?: string,
-    ) => TemplateResult,
-  ): TemplateResult[] {
+      from: number | undefined,
+      end: StackEnd | undefined,
+      named: string | undefined,
+    ) => T,
+  ): T[] {
     const scales = [...new Set(columns.map(({ one }) => against(one)))]
     return scales.flatMap((scale) => {
       const mine = columns.filter(({ one }) => against(one) === scale)
@@ -788,7 +1181,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
         const span = spans[place]
         return span === undefined
           ? []
-          : [bar(span[1], index, 0, tone, scale, span[0], ends[place], slots[index]?.tone)]
+          : [draw(span[1], 0, tone, scale, span[0], ends[place], slots[index]?.tone)]
       })
     })
   }
@@ -936,6 +1329,18 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
     </div>`
   }
 
+  /** Each series drawn as a line, held against the scale and the axis it was drawn on. */
+  private drawnLines = new WeakMap<
+    Series,
+    {
+      columns: number
+      path: string
+      sideways: boolean
+      slot: number
+      y: (value: number) => number
+    }
+  >()
+
   /**
    * One series drawn as a line across the categories, behind a seam.
    *
@@ -957,19 +1362,33 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
     sideways: boolean,
   ): TemplateResult {
     /* Each reading at its own row's category, and the line broken where a row
-       has none, so a blank is a gap with no line across it. */
-    const path = unbroken(one)
-      .map((run) =>
-        linePath(
-          run.map((point): [number, number] => {
-            const across = point.at * slot + slot / 2
-            const along = y(point.value)
-            return sideways ? [along, across] : [across, along]
-          }),
-          'straight',
-        ),
-      )
-      .join('')
+       has none, so a blank is a gap with no line across it. Past four
+       readings to a pixel, through the points the pixels show, as a line
+       chart's line is. Held, so a render the pointer asks for draws it from
+       the path it already has. */
+    const columns = Math.round((this.axisPixels() || 0) * (globalThis.devicePixelRatio || 1))
+    const held = this.drawnLines.get(one)
+    const path =
+      held &&
+      held.y === y &&
+      held.slot === slot &&
+      held.sideways === sideways &&
+      held.columns === columns
+        ? held.path
+        : unbroken(one)
+            .map((run) => {
+              const points = columnPoints(
+                run.map((point): Point => [point.at * slot + slot / 2, y(point.value)]),
+                columns,
+                PLOT_WIDTH,
+              )
+              return linePath(
+                sideways ? points.map(([across, along]): Point => [along, across]) : points,
+                'straight',
+              )
+            })
+            .join('')
+    this.drawnLines.set(one, { columns, path, sideways, slot, y })
     /* Straight between the category centers, and no `curve` property to change
        it. A bar chart's other axis is categorical: there is nothing between
        Gateway and Billing, so a curve through them draws values at positions
@@ -1011,18 +1430,12 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
        physical. */
     const shown = series.filter((one) => this.showsSeries(one.name))
     const reached = shown
-      .map((one) => byRow(one, this.readings)[at]?.value)
+      .map((one) => this.slotsOf(one, this.readings)[at]?.value)
       .filter((one): one is number => one !== undefined)
     /* Stacked, the far end is the top of the stack. */
     const values = this.stacked ? stackEnds([reached]) : reached
-    const lined = this.lined
-    const all = this.stacked
-      ? stackedReadings(shown, this.readings, (one) => lined.has(seriesKey(one.name)))
-      : shown.flatMap((one) => one.points.map((point) => point.value))
-    const [low, high] = extent(all.length > 0 ? all : [0])
-    const domain: [number, number] = [Math.min(0, low), Math.max(0, high)]
     const sideways = this.orientation === 'horizontal'
-    const scale = sideways ? linear(domain, [0, PLOT_HEIGHT]) : linear(domain, [PLOT_HEIGHT, 0])
+    const { reach: scale } = this.frameOf(series, this.readings)
     const ends = (values.length > 0 ? values : [0]).map((one) => scale(one))
     const far = sideways ? Math.max(...ends) : Math.min(...ends)
     const slot = 100 / this.readings

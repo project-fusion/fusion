@@ -183,8 +183,8 @@ export class HelixBarChart extends HelixHeadlessBarChart {
    *
    * **Stamped after render rather than rendered, because the tier that draws
    * the columns is the one that must not know about treatments.** The headless
-   * tier already writes `data-series` on every rect so a stylesheet can color
-   * it; this reads the same mark, resolves the names against the series the
+   * tier already writes `data-series` on every column, a rect or a path of
+   * them, so a stylesheet can color it; this reads the same mark, resolves the names against the series the
    * table gave, and writes `data-emphasis` beside it. The stylesheet does the
    * rest, so nothing about painting crosses the tier boundary.
    *
@@ -203,7 +203,13 @@ export class HelixBarChart extends HelixHeadlessBarChart {
         }),
       )
 
-    const mark = (bar: SVGRectElement, name: string, value: string | undefined): void => {
+    /* Written only where it differs, because this runs on every move of the
+       pointer and a write of the same value still asks the browser to style
+       the column again. */
+    const mark = (bar: SVGElement, name: string, value: string | undefined): void => {
+      if (bar.getAttribute(`data-${name}`) === (value || null)) {
+        return
+      }
       if (value) {
         bar.setAttribute(`data-${name}`, value)
       } else {
@@ -214,7 +220,7 @@ export class HelixBarChart extends HelixHeadlessBarChart {
     const outlined = slots(this.outlined)
     const subtle = slots(this.subtle)
     const glass = slots(this.glass)
-    for (const bar of this.renderRoot.querySelectorAll<SVGRectElement>('[part~="bar"]')) {
+    for (const bar of this.renderRoot.querySelectorAll<SVGElement>('[part~="bar"]')) {
       const at = Number(bar.dataset.series)
       mark(bar, 'emphasis', outlined.has(at) ? 'outlined' : subtle.has(at) ? 'subtle' : undefined)
       mark(bar, 'material', glass.has(at) ? 'glass' : undefined)

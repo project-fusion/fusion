@@ -71,6 +71,18 @@
 }
 
 /*
+ *  A path of columns, drawn where they are too many for each to be its own.
+ *
+ * Each column in it is under a pixel thick, so it has no corner to round, and
+ * a clip rounds the corners of the whole path's box, which are the far ends
+ * of its first and its last column.
+ */
+path[part~="bar"],
+:host([orientation="horizontal"]) path[part~="bar"] {
+  --_bar-chart-corners: 0;
+}
+
+/*
  *  A bar below zero grows the other way, so its far end is the other end.
  *
  * Its round corners are the bottom ones, or the left ones when the bars run
@@ -238,6 +250,13 @@
     width var(--helix-duration-normal) var(--helix-easing-decelerate),
     x var(--helix-duration-normal) var(--helix-easing-decelerate),
     y var(--helix-duration-normal) var(--helix-easing-decelerate);
+}
+
+/* The columns drawn again over a path of them, for the reading shown, stand
+   where the reader moved them: sliding from the last reading, they would
+   cross every column between. */
+:where([part~="group"]:has(> path) ~ [part~="group-active"]) [part~="bar"] {
+  transition: none;
 }
 
 @starting-style {
