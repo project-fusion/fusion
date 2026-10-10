@@ -29,7 +29,7 @@ beforeAll(async () => {
   ;({ javascriptLanguage } = await import('@codemirror/lang-javascript'))
   ;({ forceParsing } = await import('@codemirror/language'))
   ;({ EditorView } = await import('@codemirror/view'))
-  await import('./editor-root.js')
+  await import('./sandbox-editor.js')
 })
 
 afterEach(() => {

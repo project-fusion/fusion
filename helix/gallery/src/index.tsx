@@ -34,7 +34,6 @@ import { dividerArt } from './art/divider'
 import { donutChartArt } from './art/donut-chart'
 import { drawerArt } from './art/drawer'
 import { drilldownArt } from './art/drilldown'
-import { editorArt } from './art/editor'
 import { emptyArt } from './art/empty'
 import { fileInputArt } from './art/file-input'
 import { filterInputArt } from './art/filter-input'
@@ -121,9 +120,8 @@ import { virtualListArt } from './art/virtual-list'
  * the family it draws. The system they all obey is `system.md`.
  *
  * **Keyed by the manifests' families, never by a directory listing.** The
- * catalog is built from the manifests, so it also carries `editor` from
- * `@fusion.dev/helix-sandbox`. The set that matters is whatever `getFamilies`
- * returns.
+ * catalog is built from the manifests, and the set that matters is whatever
+ * `getFamilies` returns.
  *
  * **This is `@fusion.dev/helix-gallery`.** Art is versioned content about
  * components rendered by a site, which is exactly what `@fusion.dev/helix-docs`
@@ -191,7 +189,6 @@ const art: Record<string, ReactNode> = {
   'donut-chart': donutChartArt,
   drawer: drawerArt,
   drilldown: drilldownArt,
-  editor: editorArt,
   empty: emptyArt,
   'file-input': fileInputArt,
   'filter-input': filterInputArt,

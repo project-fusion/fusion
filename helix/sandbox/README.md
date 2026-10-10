@@ -57,6 +57,9 @@ holds an edit, and `reset()` puts back the source it was given.
 
 Tab indents by two spaces. Escape, then Tab, moves focus out of the editor.
 
+The [Sandbox reference](https://fusion.dev/helix/components/sandbox#helix-sandbox-editor)
+lists every property, event, method, and state of the editor.
+
 ## The highlighter
 
 `highlight` turns a snippet into HTML with a span for each token. It runs

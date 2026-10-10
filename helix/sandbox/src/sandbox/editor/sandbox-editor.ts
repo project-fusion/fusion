@@ -21,7 +21,7 @@ import { property } from 'lit/decorators.js'
 import { type HighlightLanguage, languageOf } from '../../highlight/language.js'
 import { shellMode, shellTokens } from '../../highlight/shell.js'
 import { syntaxHighlighter, syntaxRules } from '../../highlight/syntax.js'
-import { styles } from './editor-root.css.js'
+import { styles } from './sandbox-editor.css.js'
 
 /**
  * A language the editor knows, by the name a file or a sandbox pane carries.
@@ -104,7 +104,7 @@ const given = Annotation.define<boolean>()
  * @status experimental
  * @category tooling
  * @aliases Code editor, Source pane
- * @documentation https://fusion.dev/helix/docs/sandbox
+ * @documentation https://fusion.dev/helix/components/sandbox
  *
  * @event {HelixBeforeEditEvent} helix-before-edit - Fired before the source is edited. Cancelable: refusing it takes the decision and nothing moves.
  * @event {HelixCaretEvent} helix-caret - Fired when the cursor moves, with its line and column.

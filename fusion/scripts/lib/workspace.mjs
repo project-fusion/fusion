@@ -108,6 +108,7 @@ const exported = (directory, subpath) => {
 export const ARTIFACT = {
   coreManifest: exported('helix/core', './custom-elements.json'),
   headlessManifest: exported('helix/headless', './custom-elements.json'),
+  sandboxManifest: exported('helix/sandbox', './custom-elements.json'),
   styledManifest: exported('helix/styled', './custom-elements.json'),
   tokens: exported('helix/styles', './tokens.json'),
 }

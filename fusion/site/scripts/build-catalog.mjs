@@ -44,21 +44,24 @@ const OUT = join(root, 'fusion/site/content/catalog/catalog.generated.json')
 const PUBLIC = join(root, 'fusion/site/public')
 
 /**
- * The manifests the reference is built from: the two component tiers.
+ * The manifests the reference is built from: the two component tiers, and
+ * `@fusion.dev/helix-sandbox`.
  *
- * **`helix/sandbox` and `helix/workbench` are not among them.**
- * `@fusion.dev/helix-workbench` is private, the spec runner that runs this
- * repository's specs, and reading its manifest puts an element nobody can
- * install into the reference and into the nav. `@fusion.dev/helix-sandbox`
- * publishes, and its editor is documented on the sandbox guide,
- * `helix/docs/content/sandbox.mdx`, beside the shell it is slotted into.
+ * **The sandbox package adds an element and no family.** Its editor's source
+ * is in `src/sandbox/editor`, so the catalog places it on the Sandbox page as
+ * that family's Editor, with its own package's import line. The nav lists
+ * families, so it gains nothing.
+ *
+ * **`helix/workbench` is not among them.** `@fusion.dev/helix-workbench` is
+ * private, the spec runner that runs this repository's specs, and reading its
+ * manifest puts an element nobody can install into the reference.
  *
  * A reference documents what a reader can take, so this reads a list of
  * packages and filters no tag names downstream: a name filter would have to
  * be updated every time a package grew an element, and would be silent when it
  * was not.
  */
-const MANIFESTS = [ARTIFACT.styledManifest, ARTIFACT.headlessManifest]
+const MANIFESTS = [ARTIFACT.styledManifest, ARTIFACT.headlessManifest, ARTIFACT.sandboxManifest]
 
 /**
  * Where the example files sit, one folder per family, in both tiers.
@@ -187,7 +190,10 @@ for (const dir of [PUBLIC, join(PUBLIC, 'insights')]) {
   }
 }
 
-const styled = manifests[0] ?? { modules: [] }
+/* The `.md` prints what the page shows by default: the styled tier, and the
+   sandbox package's editor on the Sandbox page beside it. */
+const [styled, , sandbox] = manifests
+const printed = { modules: [...(styled?.modules ?? []), ...(sandbox?.modules ?? [])] }
 for (const family of families) {
   writeFileSync(join(COMPONENTS, `${family.slug}.json`), `${JSON.stringify(family, null, 2)}\n`)
 
@@ -203,9 +209,17 @@ for (const family of families) {
     ['Source', family.source],
   ].filter(([, value]) => value)
 
+  /* The manifests the page is printed from, which is the sandbox package's
+     too where the family holds its element. */
+  const from = [
+    MANIFESTS[0],
+    ...(family.elements.some((element) => element.package === sandbox?.helix?.package)
+      ? [MANIFESTS[2]]
+      : []),
+  ]
   writeFileSync(
     join(COMPONENTS, `${family.slug}.md`),
-    reference(styled, {
+    reference(printed, {
       examples: { [family.slug]: family.examples },
       families: [family.slug],
       /* No timestamp. A generated file carrying the time it was written differs
@@ -216,12 +230,12 @@ for (const family of families) {
         ['title', family.label],
         ['description', family.summary || `The ${family.label} component family.`],
         ['path', `/helix/components/${family.slug}`],
-        ['source', `${MANIFESTS[0]}, and ${family.source}`],
+        ['source', `${from.join(', ')}, and ${family.source}`],
       ],
       lede: facts.length > 0 ? [...facts.map(([key, value]) => `- **${key}:** ${value}`), ''] : [],
       title: family.label,
       /* The styled block, as the page shows by default: the `.md` documents
-         the styled manifest, and the headless block is in the `.json`. */
+         the styled elements, and the headless block is in the `.json`. */
       usage: { [family.slug]: family.usage.styled },
     }),
   )

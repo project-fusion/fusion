@@ -20,5 +20,5 @@ export type {
   HelixCaretEvent,
   HelixEditEvent,
 } from '@fusion.dev/helix-core'
-export type { EditorLanguage, HelixSandboxEditor } from './editor/root/editor-root.js'
 export * from './highlight/index.js'
+export type { EditorLanguage, HelixSandboxEditor } from './sandbox/editor/sandbox-editor.js'

@@ -19,7 +19,7 @@ let registerWords: typeof RegisterWords
 beforeAll(async () => {
   registerDom()
   ;({ clearWords, registerWords } = await import('@fusion.dev/helix-core'))
-  await import('./editor-root.js')
+  await import('./sandbox-editor.js')
 })
 
 afterEach(() => {
