@@ -159,7 +159,9 @@ export default defineConfig({
   ground it is painted on, in each color scheme the shots picture. The ground
   is composited through every translucent layer, and a ground that is a
   picture or a video is not judged. Text hidden from the accessibility tree is
-  a glyph for the eye, and answers to the 3:1 of a graphic. `rules` names the colors of lines that
+  a glyph for the eye, and answers to the 3:1 of a graphic. The run record
+  lists every ink and ground pair it measured, passing or not, under
+  `painted`, so a project can say which of its colors its pages put together. `rules` names the colors of lines that
   separate, which answer to no target.
 - Each check takes `ignore`, selectors it leaves alone with everything inside
   them, and an exception's `checks` excuses one entry from the checks it names.

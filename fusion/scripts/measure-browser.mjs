@@ -50,7 +50,6 @@ import { root } from '@fusion.dev/scripts/workspace'
  * scale.
  */
 const CHECKS = [
-  { runner: 215, script: 'check:css:contrast', task: 'contrast' },
   { runner: 539, script: 'check:spec:dsd', task: 'dsd' },
   { runner: 566, script: 'check:spec:visual-parity', task: 'parity' },
   { runner: 91, script: 'smoke:examples', task: 'smoke' },

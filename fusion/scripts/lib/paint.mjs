@@ -11,8 +11,8 @@
  *
  * **It is a second implementation of color math, which this repository
  * otherwise refuses, so it is worth saying what keeps it honest.** The
- * alternative was to measure the tokens in Chromium, the way `check-contrast.mjs`
- * measures inks. The token reference is a *committed generated file*, held by
+ * alternative was to measure the tokens in Chromium, the way `checks.contrast`
+ * measures inks in the visual shards. The token reference is a *committed generated file*, held by
  * `verify` through `--check`, and `verify` runs in a job with no browser in it:
  * measuring would put a chromium download in the path of a documentation table.
  * No committed generator in this repository needs a browser and this is not the

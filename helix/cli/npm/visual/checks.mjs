@@ -12,11 +12,15 @@
 
 /**
  * Reads the page for the checks `options` turns on: `clipped`, `overlap` and
- * `contrast`, each with its own settings, or absent.
+ * `contrast`, each with its own settings, or absent. Returns the findings,
+ * and every ink and ground pair contrast measured, passing or not, as
+ * `<scheme> <ink> on <ground>` in hex, so a run can say which pairs its pages
+ * paint.
  */
 export const readPage = (page, options) =>
   page.evaluate((options) => {
     const findings = []
+    const pairs = new Set()
 
     /* **Every element, shadow roots included**, because the boxes a component
        lays out for itself are inside one, and the light tree alone holds only
@@ -696,6 +700,7 @@ export const readPage = (page, options) =>
         const wanted =
           !text || drawn || size >= large || (bold && size >= largeBold) ? component : target
         const flat = ink.a === 1 ? ink : over(ink, ground.color)
+        pairs.add(`${scheme} ${hex(flat)} on ${hex(ground.color)}`)
         const measured = ratio(flat, ground.color)
         if (measured < wanted) {
           const line = `${describe(painter)} is ${hex(flat)} on ${hex(ground.color)} in ${scheme}, ${measured.toFixed(2)}:1 against ${wanted}:1: "${sample(element.textContent ?? '')}"`
@@ -712,7 +717,7 @@ export const readPage = (page, options) =>
       window.scrollTo(pageAt[0], pageAt[1])
     }
 
-    return findings
+    return { findings, pairs: [...pairs] }
   }, options)
 
 /**

@@ -157,8 +157,8 @@ if (!Number.isInteger(shard) || !Number.isInteger(of) || of < 1) {
 }
 
 /* Striped rather than blocked, so a run of expensive neighbors cannot land in
-   one shard. `check:css:contrast` renders every example in a browser and
-   the node rule reads one file, and nothing here knows which is which. */
+   one shard. One check renders every example in a browser and another reads
+   one file, and nothing here knows which is which. */
 const mine = checks.filter((_, index) => index % of === shard)
 
 /* **`turbo` is a workspace binary and is not on a plain `PATH`.** `spawnSync`

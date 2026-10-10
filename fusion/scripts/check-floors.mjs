@@ -92,7 +92,7 @@ const bare = (command) => command.replace(/^(?:node|bun) /, '')
 const EXEMPT = [
   /* Itself. */
   'fusion/scripts/check-floors.mjs',
-  /* The five that `verify.yml` gives their own `browser` jobs. Running them
+  /* The four that `verify.yml` gives their own `browser` jobs. Running them
      here too makes one shard render the entire browser matrix a second time,
      single file, while the six jobs built for it sit idle, and that shard then
      sets the critical path for the whole workflow. Hydration is the costliest
@@ -103,7 +103,6 @@ const EXEMPT = [
      already fails loudly on an empty corpus, because rendering nothing and
      comparing nothing is what they are, whereas a static check that walks an
      empty directory reports a confident zero. */
-  'fusion/scripts/check-contrast.mjs',
   'fusion/scripts/check-diagnostics.mjs',
   'helix/cli/npm/bin.mjs visual test --config visual.dsd.config.ts',
   'helix/cli/npm/bin.mjs visual test',

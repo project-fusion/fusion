@@ -174,7 +174,6 @@ const CHECKS = [
     task: 'dsd',
     units: reach('dsd', markup),
   },
-  { script: 'check:css:contrast', task: 'contrast', units: styled },
   { script: 'check:spec:visual', task: 'visual', units: pictured },
   { script: 'smoke:examples', task: 'smoke', units: styled },
   /* **Hexes and diagnostics ride with the first shard of the specs**, because
