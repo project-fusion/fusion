@@ -13,6 +13,9 @@
      primary 2.80, warning 1.84. */
   --_button-fill: var(--_button-tone);
   --_button-fill-hover: var(--_button-tone-hover);
+  /* The label wherever it sits on a wash of its own tone, deepened toward the
+     foreground. The `subtle` emphasis below says why, with the measurements. */
+  --_button-ink: color-mix(in oklab, var(--_button-tone) 78%, var(--helix-color-foreground));
   --_button-on-tone: var(--helix-color-background);
   --_button-tone: var(--helix-color-foreground);
   /* `Loader`'s own turn and crawl, so two rings on one page agree. No rung of
@@ -78,7 +81,7 @@
   block-size: var(--button-size, var(--helix-size-control));
   border: var(--helix-border-thin) solid var(--button-border-color, var(--_button-edge));
   box-sizing: border-box;
-  color: var(--button-foreground-color, var(--_button-tone));
+  color: var(--button-foreground-color, var(--_button-ink));
   cursor: pointer;
   display: inline-flex;
   font-family: var(--helix-font-sans);
@@ -161,12 +164,19 @@
 /* A wash with no line, for a button that should read as colored without reading
    as the one thing to press.
  *
- * **The ink is deepened, and this is the one emphasis that needs it.** `subtle`
- * puts a wash of the tone *under* the same ink `outlined` and `ghost` set on the
- * bare page, so it spends the headroom from both sides at once. Measured in
- * light on `tone="primary"`, the label read `#1068da` on `#ddeafa`: 4.29:1,
- * under AA, where the same ink on the same tone reads 4.82 outlined and 5.23
- * ghost. `accent` came out at 4.24 for the same reason.
+ * **A label on a wash of its own tone is deepened**, here and wherever else one
+ * is: `--_button-ink`, 78% of the tone mixed toward the foreground, which the
+ * base rule sets for `outlined` and this emphasis, and the `ghost` hover sets
+ * for its wash. A theme the engine derives solves each tone to clear the target
+ * on the page ladder with nothing to spare, so any wash of the tone under it
+ * takes it below. Measured in Chromium on October 10, 2026, across the shipped
+ * theme and 34 the engine derives, the bare tone read as low as 4.04:1 on the
+ * resting `outlined` wash, 3.66:1 on its hover and 3.92:1 on a `ghost` hover.
+ * `subtle` was the first to need it, at 4.29:1 in the shipped light theme. At
+ * 78% every pair clears its target in every theme measured but a #4a4a4a dark
+ * page, where a button on a raised surface reads 4.10:1 on the `outlined` hover
+ * and 4.39:1 on the `ghost` hover. The `ghost` label at rest keeps the bare
+ * tone, which stands on the page alone and clears it there.
  *
  * Toward the foreground rather than to a darker step of the tone, because the
  * foreground turns over with the mode and a fixed step does not: the ink has to
@@ -180,10 +190,7 @@
     color-mix(in oklab, var(--_button-tone) 14%, transparent)
   );
   border-color: transparent;
-  color: var(
-    --button-foreground-color,
-    color-mix(in oklab, var(--_button-tone) 78%, var(--helix-color-foreground))
-  );
+  color: var(--button-foreground-color, var(--_button-ink));
 }
 
 :host(:not(:disabled)[emphasis="subtle"]) [part="button"]:hover {
@@ -210,6 +217,7 @@
     var(--button-background-color, color-mix(in oklab, var(--_button-tone) 8%, transparent))
   );
   border-color: transparent;
+  color: var(--button-foreground-color, var(--_button-ink));
 }
 
 /* Block-level, not the resting `inline-flex`. */

@@ -364,6 +364,9 @@ helix-text[tone="warning"][emphasis="muted"] {
      `helix-button` beside it measured 5.41. */
   --_button-fill: var(--_button-tone);
   --_button-fill-hover: var(--_button-tone-hover);
+  /* The label wherever it sits on a wash of its own tone, deepened toward the
+     foreground, as the element's is: see the `subtle` cell below. */
+  --_button-ink: color-mix(in oklab, var(--_button-tone) 78%, var(--helix-color-foreground));
   --_button-on-tone: var(--helix-color-background);
   --_button-tone: var(--helix-color-foreground);
   --_button-tone-hover: color-mix(
@@ -387,7 +390,7 @@ helix-text[tone="warning"][emphasis="muted"] {
   block-size: var(--button-size, var(--helix-size-control));
   border: var(--helix-border-thin) solid var(--_button-edge);
   border-radius: var(--button-radius, var(--helix-radii-sm));
-  color: var(--button-foreground-color, var(--_button-tone));
+  color: var(--button-foreground-color, var(--_button-ink));
   cursor: pointer;
   display: inline-flex;
   font-family: var(--helix-font-sans);
@@ -467,25 +470,25 @@ helix-text[tone="warning"][emphasis="muted"] {
   border-color: transparent;
 }
 
-/* A wash with no line, and the ink deepened, which is the one emphasis that
-   needs it: `subtle` puts a wash of the tone *under* the same ink `outlined`
-   and `ghost` set on the bare page, so it spends the headroom from both sides
-   at once. Measured on the element in light on `tone="primary"`, the label read
-   `#1068da` on `#ddeafa`: 4.29:1, under AA, where the same ink on the same tone
-   reads 4.82 outlined and 5.23 ghost. Toward the foreground rather than to a
-   darker step of the tone, because the foreground turns over with the mode and
-   a fixed step does not. `helix component`'s `recipes` holds this cell and the
-   others to the element's, which is where the line had landed alone. */
+/* A wash with no line. **A label on a wash of its own tone is deepened**, as
+   the element's is: `--_button-ink`, 78% of the tone mixed toward the
+   foreground, on the base rule for `outlined` and on this cell, and on the
+   `ghost` hover. A derived theme solves each tone to clear the target on the
+   page ladder with nothing to spare, so a wash of it under its own label
+   takes it below: measured on the element in Chromium on October 10, 2026,
+   the bare tone read as low as 4.04:1 on the resting `outlined` wash, 3.66:1
+   on its hover and 3.92:1 on a `ghost` hover. Toward the foreground rather
+   than to a darker step of the tone, because the foreground turns over with
+   the mode and a fixed step does not. `helix component`'s `recipes` holds this
+   cell and the others to the element's, which is where the line had landed
+   alone. */
 [data-button="subtle"] {
   background-color: var(
     --button-background-color,
     color-mix(in oklab, var(--_button-tone) 14%, transparent)
   );
   border-color: transparent;
-  color: var(
-    --button-foreground-color,
-    color-mix(in oklab, var(--_button-tone) 78%, var(--helix-color-foreground))
-  );
+  color: var(--button-foreground-color, var(--_button-ink));
 }
 
 [data-button="subtle"]:not(:disabled):hover {
@@ -580,6 +583,7 @@ helix-button-group[orientation="vertical"]:not([variant="spaced"]) > button:not(
     var(--button-background-color, color-mix(in oklab, var(--_button-tone) 8%, transparent))
   );
   border-color: transparent;
+  color: var(--button-foreground-color, var(--_button-ink));
 }
 
 /* *Do not restate type and inset per density stop here.** `[data-button]` above
