@@ -406,49 +406,64 @@ export function SiteNav({ findable = [] }: { findable?: Findable[] }) {
                   ))}
                 </div>
 
-                {/* The column: the things you read, as rows of text past a
-                    rule. The base layer's megamenu recipe draws these, so the
-                    rows are the ones the panel has always had. */}
-                <div className={styles.column} data-megamenu-group>
-                  {column.map((destination) =>
-                    /* A module named and not yet built is not a link, and is
-                       not a disabled link either. There is nowhere for it to
-                       go, so an anchor would be a promise the href cannot
-                       keep, and `aria-disabled` on a real link leaves it in
-                       the tab order announcing itself as somewhere you cannot
-                       follow. A row that is not interactive simply is not
-                       one. */
-                    destination.href === undefined ? (
-                      <div data-megamenu-item data-soon key={destination.title}>
-                        <strong>
-                          {destination.title}
-                          {destination.stage && (
-                            <helix-tag data-density="sm" tone={stageAppearance(destination.stage)}>
-                              {destination.stage}
-                            </helix-tag>
-                          )}
-                        </strong>
-                        <span>{destination.summary}</span>
-                      </div>
-                    ) : (
-                      <Link
-                        aria-current={pathname === destination.href ? 'page' : undefined}
-                        data-megamenu-item
-                        href={destination.href}
-                        key={destination.href}
-                      >
-                        <strong>
-                          {destination.title}
-                          {destination.stage && (
-                            <helix-tag data-density="sm" tone={stageAppearance(destination.stage)}>
-                              {destination.stage}
-                            </helix-tag>
-                          )}
-                        </strong>
-                        <span>{destination.summary}</span>
-                      </Link>
-                    ),
-                  )}
+                {/* The column: the tools and the pages, as rows of text past a
+                    rule, each group under the heading the product list gives
+                    it. The base layer's megamenu recipe draws the headings and
+                    the rows, so the rows are the ones the panel has always
+                    had. */}
+                <div className={styles.column}>
+                  {[...new Set(column.map((destination) => destination.column))].map((heading) => (
+                    <div data-megamenu-group key={heading ?? ''}>
+                      {heading && <h3 data-megamenu-heading>{heading}</h3>}
+                      {column
+                        .filter((destination) => destination.column === heading)
+                        .map((destination) =>
+                          /* A module named and not yet built is not a link,
+                               and is not a disabled link either. There is
+                               nowhere for it to go, so an anchor would be a
+                               promise the href cannot keep, and `aria-disabled`
+                               on a real link leaves it in the tab order
+                               announcing itself as somewhere you cannot follow.
+                               A row that is not interactive simply is not one. */
+                          destination.href === undefined ? (
+                            <div data-megamenu-item data-soon key={destination.title}>
+                              <strong>
+                                {destination.title}
+                                {destination.stage && (
+                                  <helix-tag
+                                    data-density="sm"
+                                    tone={stageAppearance(destination.stage)}
+                                  >
+                                    {destination.stage}
+                                  </helix-tag>
+                                )}
+                              </strong>
+                              <span>{destination.summary}</span>
+                            </div>
+                          ) : (
+                            <Link
+                              aria-current={pathname === destination.href ? 'page' : undefined}
+                              data-megamenu-item
+                              href={destination.href}
+                              key={destination.href}
+                            >
+                              <strong>
+                                {destination.title}
+                                {destination.stage && (
+                                  <helix-tag
+                                    data-density="sm"
+                                    tone={stageAppearance(destination.stage)}
+                                  >
+                                    {destination.stage}
+                                  </helix-tag>
+                                )}
+                              </strong>
+                              <span>{destination.summary}</span>
+                            </Link>
+                          ),
+                        )}
+                    </div>
+                  ))}
                 </div>
               </helix-megamenu>
             )

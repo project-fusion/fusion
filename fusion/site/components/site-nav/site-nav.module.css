@@ -122,7 +122,7 @@
    band needs where the panel of lists wanted 52: five tiles and a column of
    sentences do not fit in 832 pixels. */
 .navPanel::part(surface) {
-  --site-panel-column: 16rem;
+  --site-panel-column: 13rem;
   --site-panel-measure: 80rem;
 
   column-gap: var(--helix-space-2xl);
@@ -133,7 +133,7 @@
 
 @media (width >= 80rem) {
   .navPanel::part(surface) {
-    grid-template-columns: minmax(0, 1fr) var(--site-panel-column);
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
   /* Centered on the band's height, which the column sets: three rows of
@@ -144,16 +144,15 @@
   }
 }
 
-/* Five tiles to a row wherever the bar is shown, and never a row of four and
-   one alone under it: `auto-fit` collapses the tracks nothing fills, so the
-   five stretch to whatever is there. 7rem is the narrowest a tile goes, at
-   768, where "Graph" and its stage still fit on one line. */
+/* Three tiles to a row wherever the bar is shown: the three things Helix
+   ships, side by side, and never one alone under two. Three is the count the
+   product list gives, so the tracks say three; `auto-fit` sized them from a
+   minimum and at the width the column leaves put two in a row and one under
+   them. */
 .tiles {
-  --site-tile-min: 7rem;
-
   display: grid;
   gap: var(--helix-space-md);
-  grid-template-columns: repeat(auto-fit, minmax(var(--site-tile-min), 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 /* A picture, a name and a sentence, stacked. **These anchors sit inside the
@@ -233,56 +232,32 @@
   color: var(--helix-color-foreground);
 }
 
-/* The text links. Under the tiles they are a row past a rule across the top,
-   as many to a line as fit; beside them they are the column the panel has
-   always had, past a rule down the side. `div.column` and not `.column`,
-   because the base layer's group recipe is an attribute selector of the same
-   weight and the one written later would win. */
-div.column {
-  border-block-start: var(--helix-border-thin) solid var(--helix-color-border);
+/* The column: the tools and the pages, each group under its heading. Beside
+   the tiles where there is room, as one column past a rule down the side;
+   under them where there is not, as groups side by side past a rule across
+   the top. The base layer's group recipe lays each group out and gives the
+   heading and the rows their inset, so the column pulls back by that inset
+   and the headings start where the tiles do. */
+.column {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
   display: grid;
-  gap: var(--helix-space-md);
+  gap: var(--helix-space-xl);
   grid-template-columns: repeat(auto-fit, minmax(var(--site-panel-column), 1fr));
+  margin-inline-start: calc(var(--helix-space-sm) * -1);
   padding-block-start: var(--helix-space-md);
 }
 
-/* The rows no longer touch, so the pull that made two touching rows share
-   their band comes off, at a weight that beats the base layer's pair. And the
-   rows hang out by their own inset, the dot's cell and the gap after it, so
-   their names start where the tiles do: measured at 1024 with the pull
-   absent, the tiles at 48 and "Docs" at 80. */
-div.column > [data-megamenu-item] {
-  /* Every row in the line is as tall as the tallest, and a row's own tracks
-     must not share that height out: measured at 1024, a one-line sentence sat
-     ten pixels lower than its two-line neighbors because the name's track had
-     taken the slack. */
-  align-content: start;
-  margin-inline-start: calc(
-    (var(--helix-space-sm) + var(--helix-space-xs) + var(--helix-space-sm)) *
-    -1
-  );
-}
-
-div.column > [data-megamenu-item] + [data-megamenu-item] {
-  margin-block-start: var(--helix-space-none);
-}
-
 @media (width >= 80rem) {
-  div.column {
+  .column {
+    align-items: start;
     border-block-start: 0;
-    border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
-    display: flex;
-    flex-direction: column;
-    gap: var(--helix-space-xs);
-    padding-block-start: var(--helix-space-none);
-    padding-inline-start: var(--helix-space-xl);
-  }
-
-  div.column > [data-megamenu-item] {
+    border-inline-start: var(--helix-border-thin) solid var(--helix-material-border);
+    display: grid;
+    gap: var(--helix-space-xl);
+    grid-auto-columns: var(--site-panel-column);
+    grid-auto-flow: column;
     margin-inline-start: var(--helix-space-none);
-  }
-
-  div.column > [data-megamenu-item] + [data-megamenu-item] {
-    margin-block-start: calc(var(--helix-space-xs) * -1);
+    padding-block-start: var(--helix-space-none);
+    padding-inline-start: var(--helix-space-lg);
   }
 }
