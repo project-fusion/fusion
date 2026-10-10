@@ -1,0 +1,7 @@
+- log "Deployment":
+  - text: Cloning github.com/acme/storefront (branch main, commit 4f2a9c1)
+  - button "Install dependencies finished 38s"
+  - button "Build failed 1m 12s" [expanded]
+  - group "Build failed 1m 12s": "Creating an optimized production build Compiled 214 modules for the browser and 37 for the server Error: Cannot find module './checkout/summary' Build failed with 1 error"
+  - button "Deploy skipped"
+- status
