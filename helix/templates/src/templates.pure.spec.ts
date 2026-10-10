@@ -99,3 +99,45 @@ describe('the version placeholder', () => {
     })
   }
 })
+
+describe('the commands a template tells you to run', () => {
+  /* **`npx helix` in a project without `@fusion.dev/helix-cli` runs the
+     registry's `helix`**, an unrelated package. Every template said to run it,
+     and none installed the CLI. So a template names a script of its own, and a
+     script that runs `helix` comes with the CLI in the manifest. */
+  for (const one of templates) {
+    test(`${one.id} names only scripts it has, and never \`npx helix\``, () => {
+      const manifest = JSON.parse(readFileSync(join(directoryOf(one.id), 'package.json'), 'utf8'))
+      for (const file of walk(directoryOf(one.id))) {
+        const text = readFileSync(join(directoryOf(one.id), file), 'utf8')
+        expect(text).not.toMatch(/npx helix\s/)
+        for (const [, script] of text.matchAll(/npm run ([\w:-]+)/g)) {
+          expect(Object.keys(manifest.scripts)).toContain(script as string)
+        }
+      }
+    })
+
+    test(`${one.id} installs the Helix CLI its scripts run`, () => {
+      const manifest = JSON.parse(readFileSync(join(directoryOf(one.id), 'package.json'), 'utf8'))
+      const commands = Object.values(manifest.scripts as Record<string, string>)
+      if (commands.some((command) => /(^|&&\s*)helix\s/.test(command))) {
+        expect(Object.keys(manifest.devDependencies)).toContain('@fusion.dev/helix-cli')
+      }
+    })
+  }
+})
+
+describe('the ignore file', () => {
+  /* **Carried as `gitignore`, because npm and bun leave a `.gitignore` out of a
+     tarball**, and `helix new` writes it under its real name. Without one, the
+     first `git add .` in a new project committed `node_modules`. */
+  for (const one of templates) {
+    test(`${one.id} carries a gitignore that leaves out what an install writes`, () => {
+      const files = walk(directoryOf(one.id))
+      expect(files).toContain('gitignore')
+      expect(files.filter((file) => file.split('/').at(-1) === '.gitignore')).toEqual([])
+      const ignored = readFileSync(join(directoryOf(one.id), 'gitignore'), 'utf8').split('\n')
+      expect(ignored).toContain('node_modules')
+    })
+  }
+})

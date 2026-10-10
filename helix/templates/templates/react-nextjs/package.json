@@ -6,6 +6,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "diagnostics": "helix diagnostics",
     "start": "next start"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@fusion.dev/helix-cli": "^__HELIX_VERSION__",
     "@fusion.dev/helix-diagnostics": "^__HELIX_VERSION__",
     "@types/node": "^22.10.0",
     "@types/react": "^19.2.0",

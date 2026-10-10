@@ -34,7 +34,9 @@ smoke:scaffold` builds every template and holds what each renders to React on
 Vite's, in markup and in pictures, so a template that drifts fails CI.
 
 Each one starts Helix diagnostics in development, checked against the lint data
-of the Helix it installed, and a production build leaves it out.
+of the Helix it installed. A production build never loads them. Every build but
+Angular's leaves them out, and Angular's writes them to a file of their own that
+the page never requests.
 
 **There is no build-free HTML template**, and that is a fact about the packages
 rather than an omission. `@fusion.dev/helix`'s published entry re-exports bare
@@ -55,6 +57,10 @@ names the files a scaffolder substitutes in: `PROJECT_NAME` becomes the project'
 own name, and `HELIX_VERSION` becomes this package's version, which is the Helix
 the templates were published with. The payloads sit under `templates/<id>/` in
 this package.
+
+Each template carries its ignore file as `gitignore`, because npm leaves a file
+named `.gitignore` out of a published package. A scaffolder writes it into the
+project as `.gitignore`.
 
 **The named files are named rather than discovered.** Scanning every file for the
 placeholder would rewrite a template that merely mentions it in prose, and a

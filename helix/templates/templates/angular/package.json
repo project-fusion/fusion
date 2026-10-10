@@ -5,6 +5,7 @@
   "scripts": {
     "build": "ng build",
     "dev": "ng serve",
+    "diagnostics": "helix diagnostics",
     "ng": "ng",
     "start": "ng serve"
   },
@@ -22,6 +23,7 @@
     "@angular/build": "^22.2.1",
     "@angular/cli": "^22.2.1",
     "@angular/compiler-cli": "^22.2.1",
+    "@fusion.dev/helix-cli": "^__HELIX_VERSION__",
     "@fusion.dev/helix-diagnostics": "^__HELIX_VERSION__",
     "typescript": "~6.0.3"
   }

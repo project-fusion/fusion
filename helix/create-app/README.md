@@ -30,12 +30,21 @@ Every template lays down the same three pages:
 - a form a `<form>` reads with `FormData`.
 
 What differs between them is what each framework requires. Each one starts Helix
-diagnostics in development, and a production build leaves it out.
+diagnostics in development. A production build never loads them. Every build
+but Angular's leaves them out, and Angular's writes them to a file of their own
+that the page never requests.
 
 This is `helix new` from
 [`@fusion.dev/helix-cli`](https://www.npmjs.com/package/@fusion.dev/helix-cli),
-reached from somewhere with no project yet. A project that already has Helix
-installed can run `npx helix new` instead, and gets the same templates.
+reached from somewhere with no project yet. In a project that has the CLI,
+`helix new` reads the same templates from `@fusion.dev/helix-templates` in
+`node_modules`. The CLI does not depend on that package, so install it beside
+the CLI first:
+
+```sh
+npm install --save-dev @fusion.dev/helix-templates
+npx helix new my-app --template react-vite
+```
 
 **It says when a newer Helix is out.** Without `@latest`, npm can run a copy it
 cached earlier, so this asks npm for the newest version while it writes the

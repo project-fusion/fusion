@@ -767,6 +767,43 @@ fn it_writes_the_template_and_substitutes_only_the_named_files() {
     assert!(project.join("vite.config.ts").is_file());
 }
 
+/// **npm and bun leave a `.gitignore` out of a tarball**, so each template
+/// carries `gitignore`, and a project written without the dot committed
+/// `node_modules` on its first `git add .`.
+#[test]
+fn every_template_writes_its_gitignore_under_the_real_name() {
+    let at = scratch("gitignore");
+    let register: serde_json::Value = serde_json::from_str(
+        &std::fs::read_to_string(templates().join("templates.json")).expect("the register"),
+    )
+    .expect("a register that parses");
+    let ids: Vec<&str> = register["templates"]
+        .as_array()
+        .expect("a list of templates")
+        .iter()
+        .filter_map(|one| one["id"].as_str())
+        .collect();
+    assert!(!ids.is_empty(), "the register names templates");
+
+    for id in ids {
+        let name = format!("app-{id}");
+        let output = scaffold(&at, &["new", &name, "--template", id]);
+        assert_eq!(code(&output), 0, "{id}: {}", err(&output));
+
+        let project = at.join(&name);
+        let ignore = std::fs::read_to_string(project.join(".gitignore"))
+            .unwrap_or_else(|_| panic!("{id} wrote no .gitignore"));
+        assert!(
+            ignore.lines().any(|line| line == "node_modules"),
+            "{id} ignores node_modules: {ignore}"
+        );
+        assert!(
+            !project.join("gitignore").exists(),
+            "{id} left the name the package carries it under"
+        );
+    }
+}
+
 /// **The guard that matters**, there being no undo for a scaffolder that writes
 /// over somebody's work.
 #[test]

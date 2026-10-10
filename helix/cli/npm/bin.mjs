@@ -13,15 +13,17 @@
  * builds one if it can, and says exactly what is missing if it cannot.
  *
  * **Resolution order, and each step is there for a reason.** `HELIX_BIN` first,
- * because a caller that knows better should not have to argue. Then the cargo
- * target directory, release before debug, honoring `CARGO_TARGET_DIR` because a
- * shared target is common and guessing `./target` would miss it. Then the
- * binary npm installed beside this, which is what a consumer has: after the
- * target, so a checkout runs what it built rather than a binary a release once
- * placed. Then whatever is on `PATH`, named out loud in a checkout, because a
- * binary from somewhere else is about to answer questions about this tree. Only
- * then a build, and only in this repository, the one place there is a crate to
- * build.
+ * because a caller that knows better should not have to argue. Then, in a
+ * checkout, the cargo target directory, release before debug, honoring
+ * `CARGO_TARGET_DIR` because a shared target is common and guessing `./target`
+ * would miss it. Then the binary npm installed beside this, which is what a
+ * consumer has: after the target, so a checkout runs what it built rather than
+ * a binary a release once placed. A consumer's target is never read: a `helix`
+ * there is another program or an old build of ours, and the installed one is
+ * the release they asked for. Then whatever is on `PATH`, named out loud in a
+ * checkout, because a binary from somewhere else is about to answer questions
+ * about this tree. Only then a build, and only in this repository, the one
+ * place there is a crate to build.
  *
  * **A build is a fallback and not the plan.** It happens once, prints that it
  * is happening, and a CI pipeline that has already run `cargo build` never
@@ -199,7 +201,7 @@ if (process.env.HELIX_BIN === undefined && checkout && hasCargo()) {
   }
 }
 
-const found = process.env.HELIX_BIN ?? built() ?? packaged()
+const found = process.env.HELIX_BIN ?? (checkout ? built() : undefined) ?? packaged()
 if (found && existsSync(found)) {
   run(found)
 }
