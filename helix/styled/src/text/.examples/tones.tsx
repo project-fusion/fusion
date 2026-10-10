@@ -21,12 +21,6 @@ export function Example() {
         >
           Muted
         </helix-text>
-        <helix-text
-          as="p"
-          emphasis="subtle"
-        >
-          Subtle
-        </helix-text>
       </helix-flex>
       {TONES.map(([tone, loud, quiet]) => (
         <helix-flex

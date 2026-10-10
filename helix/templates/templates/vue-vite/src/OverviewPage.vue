@@ -64,7 +64,7 @@ import { DOCS } from './docs.ts'
 
         <!-- The footer is a row across the table: anything you slot goes at the
              start, and the table's own pagination sits at the end. -->
-        <helix-text emphasis="subtle" slot="footer" variant="caption">
+        <helix-text emphasis="muted" slot="footer" variant="caption">
           {{ members.length }} people
         </helix-text>
       </helix-data-table>

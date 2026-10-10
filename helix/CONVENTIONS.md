@@ -806,8 +806,10 @@ declared in `helix/cli/src/component/axes.rs`, which is the registry:
 
 **Weight is emphasis and meaning is tone**, and `Text` was the last to mix them:
 `muted` and `subtle` were tones there, which made a quiet danger unsayable. On
-text, `emphasis` picks the quiet ink, and a tone with an emphasis is that tone's
-own quiet ink, the one step the readable range holds.
+text, `emphasis="muted"` picks the quiet ink, and a tone with it is that tone's
+own quiet ink, the one step the readable range holds. **Text takes `muted` and
+no `subtle`**: `foreground-subtle` is the ink the engine does not solve, so text
+set in it had no contrast guarantee.
 
 `variant` is the escape hatch and takes no registry, being component-specific by
 definition: `segmented` against `underlined`, `list` against `wheels`, `grip`

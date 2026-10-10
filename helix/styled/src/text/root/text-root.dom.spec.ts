@@ -131,11 +131,33 @@ describe('tone and emphasis', () => {
     expect(getComputedStyle(hint).color).not.toBe(ink('color-danger'))
   })
 
-  /* One quiet step per tone, because the readable range holds one (#124). */
-  painted('and subtle on a tone is that same quiet ink, not a second one', async () => {
-    const subtle = await mount('<helix-text emphasis="subtle" tone="success">Saved</helix-text>')
-    expect(getComputedStyle(subtle).color).toBe(ink('color-success-muted'))
+  /* One quiet ink, because the readable range holds one (#124) and
+     `foreground-subtle` has no contrast guarantee. `subtle` was a second value
+     that painted text in it. */
+  test('muted is the one emphasis, and no rule selects subtle', () => {
+    const declared = (customElements.get('helix-text') as unknown as { styles: unknown }).styles
+    const sheet = (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n')
+    expect(sheet).toContain(':host([emphasis="muted"])')
+    expect(sheet).not.toContain('emphasis="subtle"')
+    expect(sheet).not.toContain('foreground-subtle')
   })
+
+  painted(
+    'subtle is a value it does not take, so the text keeps the full-strength ink',
+    async () => {
+      const wrapper = await mount(
+        '<div><helix-text>Saved</helix-text><helix-text emphasis="subtle">Saved</helix-text><helix-text emphasis="subtle" tone="success">Saved</helix-text></div>',
+      )
+      const [resting, subtle, toned] = [...wrapper.querySelectorAll('helix-text')] as HTMLElement[]
+      expect(getComputedStyle(subtle as HTMLElement).color).toBe(
+        getComputedStyle(resting as HTMLElement).color,
+      )
+      expect(getComputedStyle(toned as HTMLElement).color).toBe(ink('color-success'))
+    },
+  )
 })
 
 describe('tone and emphasis inside another shadow root', () => {

@@ -16,7 +16,7 @@ export function Example() {
           id="rail"
         >
           <helix-text
-            emphasis="subtle"
+            emphasis="muted"
             variant="label"
           >
             Project

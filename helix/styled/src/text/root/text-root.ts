@@ -91,23 +91,25 @@ export class HelixText extends HelixElement {
   as?: 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'strong' | 'em' | 'code'
 
   /**
-   * Makes the text quieter: `muted`, or the quieter `subtle`.
+   * Makes the text quieter. `muted` sets it in `foreground-muted`, the quiet
+   * ink the theme engine solves to the contrast target.
    *
-   * `muted` is the quiet ink that still has to be read, and `subtle` the
-   * quieter one below it. Two axes because the test says so: a line can be a
-   * danger *and* quiet at once, and a muted danger is what a validation hint
-   * under a field is.
+   * Two axes because the test says so: a line can be a danger *and* quiet at
+   * once, and a muted danger is what a validation hint under a field is.
    *
-   * **With a `tone`, both are that tone's one quiet ink**: the tone's hue at half
-   * its chroma, as readable as the tone. The readable range holds one quiet step
-   * and not two, measured in #124 for the neutral ink, and a tone has less room
-   * there rather than more, so `subtle` on a tone is the same ink as `muted`
-   * rather than a second one that could not be read.
+   * **With a `tone`, `muted` is that tone's quiet ink**: the tone's hue at half
+   * its chroma, as readable as the tone.
+   *
+   * **`muted` is the one value.** The readable range holds one quiet ink,
+   * measured in #124, and `foreground-subtle` below it is a fixed gray whose
+   * contrast is not guaranteed, so `subtle` is gone. Written anyway, it matches
+   * no rule and the text keeps the full-strength ink, and diagnostics report it
+   * as a value `emphasis` does not take.
    *
    * The resting case is the absent attribute, full strength.
    */
   @property({ reflect: true })
-  emphasis?: 'muted' | 'subtle'
+  emphasis?: 'muted'
 
   /**
    * The most lines to show. Text past the last one is cut off with an
@@ -152,7 +154,7 @@ export class HelixText extends HelixElement {
    * saying nothing. The resting case is the absent attribute.
    *
    * Weight is not a tone. How loud the text is belongs on `emphasis`, which is
-   * why `muted` and `subtle` moved there.
+   * why `muted` moved there.
    */
   @property({ reflect: true })
   tone?: 'accent' | 'danger' | 'info' | 'primary' | 'success' | 'warning'

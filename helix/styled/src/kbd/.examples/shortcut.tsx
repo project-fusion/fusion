@@ -28,7 +28,7 @@ export function Example() {
       </helix-input>
 
       <helix-text
-        emphasis="subtle"
+        emphasis="muted"
         variant="caption"
       >
         {said}
