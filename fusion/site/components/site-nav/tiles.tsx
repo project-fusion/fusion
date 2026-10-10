@@ -29,8 +29,8 @@ import type { CSSProperties, ReactNode } from 'react'
  */
 
 /**
- * Whether a scene stands on a plate. Off, the objects float on the band and
- * the map keeps its sheet, because the map is its ground.
+ * Whether a scene stands on a plate. Off, the objects float on the band, and
+ * the ground is only implied, by shadows and by the projection itself.
  */
 const PLATES = false
 
@@ -96,11 +96,10 @@ function Box({
 
 /**
  * The plate a scene stands on: 80 by 80, 6 thick, with the gallery's shadow
- * under it so it floats on the band. Nothing while `PLATES` is off, unless
- * the scene says it is its own ground.
+ * under it so it floats on the band. Nothing while `PLATES` is off.
  */
-function Plate({ always = false }: { always?: boolean }) {
-  if (!PLATES && !always) {
+function Plate() {
+  if (!PLATES) {
     return null
   }
   const top = points([iso(-40, -40, 0), iso(40, -40, 0), iso(40, 40, 0), iso(-40, 40, 0)])
@@ -240,7 +239,7 @@ function Scene({ children }: { children: ReactNode }) {
           <feGaussianBlur stdDeviation="5" />
         </filter>
       </defs>
-      <g transform="translate(160 105) scale(1.25) translate(-160 -105)">{children}</g>
+      <g transform="translate(160 105) scale(1.35) translate(-160 -105)">{children}</g>
     </>
   )
 }
@@ -257,17 +256,17 @@ const componentsArt: ReactNode = (
     <Plate />
     {[
       /* A button: the key itself is the control. */
-      { brand: true, mark: 'bar', x: -34, y: -30 },
+      { brand: true, mark: 'bar', x: -38, y: -32 },
       /* A switch, on: a track with its knob at the end. */
-      { mark: 'knob', x: -8, y: -30 },
+      { mark: 'knob', x: -10, y: -32 },
       /* A checkbox, checked. */
-      { mark: 'tick', x: 18, y: -30 },
+      { mark: 'tick', x: 18, y: -32 },
       /* A field. */
-      { mark: 'field', x: -34, y: 4 },
+      { mark: 'field', x: -38, y: 2 },
       /* A tag. */
-      { mark: 'tag', x: -8, y: 4 },
+      { mark: 'tag', x: -10, y: 2 },
       /* An avatar. */
-      { mark: 'dot', x: 18, y: 4 },
+      { mark: 'dot', x: 18, y: 2 },
     ].map((key, index) => (
       <g className="artMotion artRow" key={key.mark} style={{ '--art-i': index } as CSSProperties}>
         <Box
@@ -419,7 +418,7 @@ const sandboxArt: ReactNode = (
 const themeArt: ReactNode = (
   <Scene>
     <Plate />
-    <Box className="artBrand" d={16} h={16} w={16} x={16} y={-34} />
+    <Box className="artBrand" d={16} h={16} w={16} x={-36} y={-20} />
     {[
       { className: 'artSunken', tone: 'sunken' },
       { className: 'artBrandSubtle', tone: 'subtle' },
@@ -445,23 +444,39 @@ const themeArt: ReactNode = (
 )
 
 /**
- * Maps: a sheet with roads at the lightest ink, the route drawn across it in
- * the brand, and a pin standing at the end of the route. The sheet stays
- * when the plates go, since the map is its own ground. The pin is the place,
- * and it is the one thing with height, so it is what lifts on hover.
+ * Maps: a few roads at the lightest ink, the route drawn across them in the
+ * brand, and a pin standing at the end of the route. No sheet under them: the
+ * roads are a fragment of a network, lying on the ground the projection
+ * implies, and the route and the pin's shadow say where that ground is. The
+ * pin is the place, and it is the one thing with height, so it is what lifts
+ * on hover.
  */
 const PIN = { x: 30, y: -16 }
 
+/* Roads as flat strips on the ground: `along` is the axis each runs on, and
+   `from` to `to` is its extent on that axis. A main road the whole way along
+   `x`, two crossing it along `y`, and two shorter ones joining those. */
+const ROADS: { along: 'x' | 'y'; at: number; from: number; to: number }[] = [
+  { along: 'x', at: -14, from: -40, to: 40 },
+  { along: 'y', at: -20, from: -40, to: 30 },
+  { along: 'y', at: 12, from: -30, to: 40 },
+  { along: 'x', at: 18, from: -20, to: 40 },
+  { along: 'x', at: -34, from: 12, to: 40 },
+]
+
 const mapArt: ReactNode = (
   <Scene>
-    <Plate always />
-    {/* Roads: two along `x` and two along `y`, which on the sheet are the
-        two directions the rhombus runs in. */}
-    {[-14, 18].map((y) => (
-      <Flat className="artInk" d={4} fillOpacity={0.12} key={`x${y}`} w={80} x={-40} y={y} z={0} />
-    ))}
-    {[-20, 12].map((x) => (
-      <Flat className="artInk" d={80} fillOpacity={0.12} key={`y${x}`} w={4} x={x} y={-40} z={0} />
+    {ROADS.map((road) => (
+      <Flat
+        className="artInk"
+        d={road.along === 'x' ? 5 : road.to - road.from}
+        fillOpacity={0.12}
+        key={`${road.along}${road.at}`}
+        w={road.along === 'x' ? road.to - road.from : 5}
+        x={road.along === 'x' ? road.from : road.at}
+        y={road.along === 'x' ? road.at : road.from}
+        z={0}
+      />
     ))}
     {/* The route, as a polyline of ground points from the near left corner
         to the pin at the back right. */}
@@ -530,7 +545,7 @@ const mapArt: ReactNode = (
 const NOTES = {
   a: { r: 7, selected: true, x: 0, y: 0, z: 34 },
   b: { r: 4.5, x: -28, y: -10, z: 22 },
-  c: { r: 5.5, x: 22, y: -26, z: 34 },
+  c: { r: 5.5, x: 22, y: -26, z: 28 },
   d: { r: 4.5, x: 26, y: 18, z: 18 },
   e: { r: 5, x: -12, y: 30, z: 40 },
   f: { r: 4, x: -34, y: 24, z: 12 },
