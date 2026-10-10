@@ -61,7 +61,7 @@ use crate::intent::{
     From, Material, Mechanism, Motion, Relation, Scheme, Seed, Separation, Status, StatusSeed,
     ThemeIntent, Weight, STATUS_CHROMA, STATUS_HUE, STATUS_NAMES,
 };
-use crate::model::{GROUNDS, INKS};
+use crate::model::{over, GROUNDS, INKS, PAGE_SURFACES, WELL};
 use crate::oklch::{
     contrast_ratio, fit_to_gamut, hex_to_oklch, is_out_of_gamut, lightness_for_contrast,
     oklch_to_hex, relative_luminance, shipped_contrast_ratio, shipped_luminance, Oklch,
@@ -1202,6 +1202,36 @@ fn body_text_is_the_strongest_ink_and_stands_clear_of_the_muted_one() {
             gap > 0.25,
             "{label}: foreground only {gap} of lightness from the muted ink"
         );
+    }
+}
+
+/// The two inks written in a field clear their target on the field's well over
+/// every surface of the ladder, in every theme the oracle records.
+///
+/// **Read off the pairings, so it holds the model and the solver together.** A
+/// well left out of the model is a theme with no such pair, which fails here as
+/// surely as a quiet ink solved short of the target.
+#[test]
+fn the_inks_in_a_field_clear_its_well_on_every_surface() {
+    for label in labels() {
+        let theme = derive_theme(&intent_for(label)).expect("the oracle's intents all derive");
+        for ink in ["color-foreground", "color-foreground-muted"] {
+            for ground in PAGE_SURFACES {
+                let well = over(WELL, ground);
+                let pairing = theme
+                    .pairings
+                    .iter()
+                    .find(|pairing| pairing.foreground == ink && pairing.background == well)
+                    .unwrap_or_else(|| panic!("{label}: no pair of {ink} on {well}"));
+                assert_eq!(
+                    pairing.status,
+                    Outcome::Pass,
+                    "{label}: {ink} on {well} at {:?} against {}",
+                    pairing.ratio,
+                    pairing.target
+                );
+            }
+        }
     }
 }
 

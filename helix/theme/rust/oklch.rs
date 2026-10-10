@@ -74,20 +74,23 @@ fn linear_to_srgb(channel: f64) -> f64 {
     }
 }
 
+/// The three sRGB bytes a color ships as, clipped into gamut.
+fn to_bytes(color: Oklch) -> [u8; 3] {
+    let rgb = oklch_to_linear_rgb(color);
+    /* `round` rather than a cast, and the two differ: a cast truncates.
+    JavaScript's `Math.round` breaks ties upward and Rust's breaks them away
+    from zero, which are the same rule here because `linear_to_srgb` clamps to
+    0..1 and nothing reaching this is negative. */
+    #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+    let to_byte = |channel: f64| (linear_to_srgb(channel) * 255.0).round() as u8;
+    [to_byte(rgb.r), to_byte(rgb.g), to_byte(rgb.b)]
+}
+
 /// OKLCH to a `#rrggbb` string, clipped into gamut.
 #[must_use]
 pub fn oklch_to_hex(color: Oklch) -> String {
-    let rgb = oklch_to_linear_rgb(color);
-    let to_byte = |channel: f64| {
-        /* `round` rather than a cast, and the two differ: a cast truncates.
-        JavaScript's `Math.round` breaks ties upward and Rust's breaks them
-        away from zero, which are the same rule here because `linear_to_srgb`
-        clamps to 0..1 and nothing reaching this is negative. */
-        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-        let byte = (linear_to_srgb(channel) * 255.0).round() as u8;
-        format!("{byte:02x}")
-    };
-    format!("#{}{}{}", to_byte(rgb.r), to_byte(rgb.g), to_byte(rgb.b))
+    let [r, g, b] = to_bytes(color);
+    format!("#{r:02x}{g:02x}{b:02x}")
 }
 
 fn srgb_to_linear(channel: f64) -> f64 {
@@ -110,12 +113,6 @@ fn srgb_to_linear(channel: f64) -> f64 {
 /// Returns `None` for anything that is not three or six hex digits, where the
 /// TypeScript produced `NaN` components and carried them into the palette. A
 /// port is the moment to stop propagating that quietly.
-/* `l`, `m`, `s`, `a` and `b` are Oklab's own names for its axes and its LMS
-response, and the coefficients below are only checkable against Ottosson's
-published matrices by keeping them. Naming them `long`, `medium` and `short`
-would make a line-by-line comparison with the TypeScript, which is the thing
-this file is a port of, harder for every future reader. */
-#[allow(clippy::many_single_char_names)]
 #[must_use]
 pub fn hex_to_oklch(hex: &str) -> Option<Oklch> {
     /* One `#`, not any number of them. `trim_start_matches` strips every leading
@@ -129,15 +126,19 @@ pub fn hex_to_oklch(hex: &str) -> Option<Oklch> {
         6 => raw.to_owned(),
         _ => return None,
     };
-    let byte = |at: usize| {
-        u8::from_str_radix(full.get(at..at + 2)?, 16)
-            .ok()
-            .map(|value| f64::from(value) / 255.0)
-    };
+    let byte = |at: usize| u8::from_str_radix(full.get(at..at + 2)?, 16).ok();
+    Some(from_bytes([byte(0)?, byte(2)?, byte(4)?]))
+}
 
-    let r = srgb_to_linear(byte(0)?);
-    let g = srgb_to_linear(byte(2)?);
-    let b = srgb_to_linear(byte(4)?);
+/// Three sRGB bytes to OKLCH: [`hex_to_oklch`] once the string is read.
+/* `l`, `m`, `s`, `a` and `b` are Oklab's own names for its axes and its LMS
+response, and the coefficients below are only checkable against Ottosson's
+published matrices by keeping them. Naming them `long`, `medium` and `short`
+would make a line-by-line comparison with the TypeScript, which is the thing
+this file is a port of, harder for every future reader. */
+#[allow(clippy::many_single_char_names)]
+fn from_bytes(bytes: [u8; 3]) -> Oklch {
+    let [r, g, b] = bytes.map(|value| srgb_to_linear(f64::from(value) / 255.0));
 
     /* The cube roots of the LMS response, which is where Oklab starts.
     Coefficients are Ottosson's, and are the inverse of the matrix
@@ -151,11 +152,11 @@ pub fn hex_to_oklch(hex: &str) -> Option<Oklch> {
     let bb = 0.025_904_037_1 * l + 0.782_771_766_2 * m - 0.808_675_766 * s;
 
     let hue = bb.atan2(a) * 180.0 / std::f64::consts::PI;
-    Some(Oklch {
+    Oklch {
         chroma: a.hypot(bb),
         hue: if hue < 0.0 { hue + 360.0 } else { hue },
         lightness,
-    })
+    }
 }
 
 /// WCAG 2.1 relative luminance, from linear-light values.
@@ -199,6 +200,41 @@ pub fn shipped_luminance(color: Oklch) -> f64 {
 #[must_use]
 pub fn shipped_contrast_ratio(a: Oklch, b: Oklch) -> f64 {
     ratio(shipped_luminance(a), shipped_luminance(b))
+}
+
+/// What a browser paints for `color-mix(in oklab, <ink> <percent>%,
+/// transparent)` over an opaque `ground`, with `percent` from 0 to 100.
+///
+/// **The mix is the ink itself at that alpha.** CSS mixes with premultiplied
+/// alpha, so `transparent` adds no color: Chromium computes
+/// `color-mix(in oklab, #000 5%, transparent)` as `oklab(0 0 0 / 0.05)`. The
+/// browser then lays it over the ground one channel at a time, on the sRGB
+/// bytes.
+///
+/// **Renderers land a byte apart, so each channel takes the byte nearer the
+/// ink.** Measured over every gray on October 10, 2026: Chrome rounds
+/// `0.05 * ink + 0.95 * ground` to the nearest byte, and the software
+/// rasterizer of headless Chromium holds the alpha in a byte, 13 of 255, and
+/// drops the remainder. Here the alpha is that byte and the rounding goes
+/// toward the ink. For a black or a white ink, each renderer painted every gray
+/// at least as close to the ground as this, so an ink that clears its target
+/// against this clears it on both.
+#[must_use]
+pub fn laid_over(ink: Oklch, percent: u8, ground: Oklch) -> Oklch {
+    let alpha = (u32::from(percent.min(100)) * 255 + 50) / 100;
+    let ink = to_bytes(ink);
+    let ground = to_bytes(ground);
+    from_bytes(std::array::from_fn(|at| {
+        let (ink, ground) = (u32::from(ink[at]), u32::from(ground[at]));
+        let sum = ink * alpha + ground * (255 - alpha);
+        let channel = if ink < ground {
+            sum / 255
+        } else {
+            sum.div_ceil(255)
+        };
+        /* A blend of two bytes is a byte, so the fallback is never taken. */
+        u8::try_from(channel).unwrap_or(u8::MAX)
+    }))
 }
 
 /// How many halvings [`fit_to_gamut`] takes. The TypeScript's default.
@@ -355,5 +391,93 @@ pub fn lightness_for_contrast(
         dark
     } else {
         light
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{from_bytes, laid_over, to_bytes};
+
+    /// A 5% well of black and of white over grays, as two renderers painted it
+    /// on October 10, 2026: the gray, then Chrome's byte, then the byte of the
+    /// software rasterizer in headless Chromium.
+    const BLACK: [(u8, u8, u8); 16] = [
+        (255, 242, 242),
+        (250, 237, 237),
+        (245, 233, 232),
+        (242, 230, 229),
+        (240, 228, 227),
+        (230, 218, 218),
+        (217, 206, 205),
+        (210, 199, 199),
+        (150, 142, 142),
+        (51, 48, 48),
+        (40, 38, 37),
+        (24, 23, 22),
+        (20, 19, 18),
+        (18, 17, 17),
+        (11, 10, 10),
+        (0, 0, 0),
+    ];
+    const WHITE: [(u8, u8, u8); 16] = [
+        (255, 255, 255),
+        (250, 250, 250),
+        (245, 246, 246),
+        (242, 243, 243),
+        (240, 241, 241),
+        (230, 231, 231),
+        (217, 219, 219),
+        (210, 212, 212),
+        (150, 155, 155),
+        (51, 61, 61),
+        (40, 51, 51),
+        (24, 36, 36),
+        (20, 32, 32),
+        (18, 30, 30),
+        (11, 23, 23),
+        (0, 13, 13),
+    ];
+
+    fn well(ink: u8, ground: u8) -> u8 {
+        let gray = |value: u8| from_bytes([value; 3]);
+        let [red, green, blue] = to_bytes(laid_over(gray(ink), 5, gray(ground)));
+        assert!(red == green && green == blue, "a gray well is gray");
+        red
+    }
+
+    #[test]
+    fn a_well_is_never_further_from_its_ink_than_a_renderer_paints_it() {
+        for (ground, chrome, software) in BLACK {
+            let ours = well(0, ground);
+            assert!(
+                ours <= chrome.min(software),
+                "black over {ground}: {ours} against {chrome} and {software}"
+            );
+            assert!(chrome.min(software) - ours <= 1, "black over {ground}");
+        }
+        for (ground, chrome, software) in WHITE {
+            let ours = well(255, ground);
+            assert!(
+                ours >= chrome.max(software),
+                "white over {ground}: {ours} against {chrome} and {software}"
+            );
+            assert!(ours - chrome.max(software) <= 1, "white over {ground}");
+        }
+    }
+
+    #[test]
+    fn a_well_of_none_is_the_ground_and_of_all_is_the_ink() {
+        assert_eq!(well(0, 0), 0);
+        assert_eq!(well(255, 255), 255);
+        assert_eq!(well(128, 128), 128);
+        let teal = from_bytes([0x0b, 0x2a, 0x33]);
+        assert_eq!(
+            to_bytes(laid_over(teal, 0, from_bytes([0xff; 3]))),
+            [0xff; 3]
+        );
+        assert_eq!(
+            to_bytes(laid_over(teal, 100, from_bytes([0xff; 3]))),
+            [0x0b, 0x2a, 0x33]
+        );
     }
 }

@@ -9,8 +9,8 @@ use crate::derive::emphasis::Emphasis;
 use crate::derive::status::StatusColor;
 use crate::derive::{perceptual_distance, DerivedToken, COLLISION_DISTANCE};
 use crate::intent::PairingRequest;
-use crate::model::GROUNDS;
-use crate::oklch::{fit_to_gamut, shipped_contrast_ratio, Oklch, GAMUT_STEPS};
+use crate::model::{washed, GROUNDS};
+use crate::oklch::{fit_to_gamut, laid_over, shipped_contrast_ratio, Oklch, GAMUT_STEPS};
 
 /// How a pair came out.
 ///
@@ -51,13 +51,26 @@ pub struct Pairing {
 /// rather than dropped, which matters the moment a caller supplies pairings
 /// against their own token set: a pair silently missing from the results is how
 /// a guarantee becomes a claim about the pairs that happened to be easy.
+///
+/// **A ground named `color-well over color-surface` is the well laid over that
+/// ground**, made from the tokens this theme emits as the stylesheet makes it:
+/// a pinned foreground moves the well, and a ground the theme does not emit
+/// leaves the pair unverifiable.
 #[must_use]
 pub fn pairings(requests: &[PairingRequest], tokens: &[DerivedToken]) -> Vec<Pairing> {
-    let value = |name: &str| {
+    let emitted = |name: &str| {
         tokens
             .iter()
             .find(|token| token.name == name)
             .map(|token| token.value)
+    };
+    let value = |name: &str| match washed(name) {
+        Some((wash, ground)) => Some(laid_over(
+            fit_to_gamut(emitted(wash.ink)?, GAMUT_STEPS),
+            wash.percent,
+            fit_to_gamut(emitted(ground)?, GAMUT_STEPS),
+        )),
+        None => emitted(name),
     };
     /* A ground the model marks unbounded cannot be measured against, whatever
     the theme: what sits behind a media surface is the media. */

@@ -73,6 +73,8 @@ mod tests {
         Background, Brand, BrandPair, Color, Font, From, Material, Motion, Neutral, Relation,
         Scheme, Seed, Status, StatusSeed, ThemeIntent, STATUS_BAND, STATUS_HUE,
     };
+    use crate::model::{PAGE_SURFACES, WELL};
+    use crate::oklch::{laid_over, shipped_contrast_ratio};
 
     fn hex(value: &str) -> Color {
         Color::Hex(value.to_owned())
@@ -95,6 +97,56 @@ mod tests {
             .iter()
             .find(|token| token.name == name)
             .unwrap_or_else(|| panic!("{name} is emitted"))
+    }
+
+    /// A field's text clears the target on the field's well over every
+    /// surface of a page of its own color. Solved against the ladder alone,
+    /// the quiet ink measured 3.89:1 on the well in a dialog on a #333333 page,
+    /// and 4.02:1 to 4.06:1 on the well over the sunken surface of the four
+    /// light ones.
+    #[test]
+    fn a_field_reads_on_every_surface_of_a_page_of_its_own_color() {
+        for (scheme, page) in [
+            (Scheme::Dark, "#333333"),
+            (Scheme::Light, "#f7f2eb"),
+            (Scheme::Light, "#e8dcc4"),
+            (Scheme::Light, "#d9d9d9"),
+            (Scheme::Light, "#bfb39a"),
+        ] {
+            let background = if scheme == Scheme::Dark {
+                Background {
+                    dark: Some(hex(page)),
+                    light: None,
+                }
+            } else {
+                Background {
+                    dark: None,
+                    light: Some(hex(page)),
+                }
+            };
+            let theme = derive_theme(&ThemeIntent {
+                background: Some(background),
+                scheme: Some(scheme),
+                ..ThemeIntent::new(hex("#FF6200"))
+            })
+            .expect("the page derives");
+            let foreground = token(&theme, "color-foreground").value;
+            for ground in PAGE_SURFACES {
+                let well = laid_over(foreground, WELL.percent, token(&theme, ground).value);
+                for ink in ["color-foreground", "color-foreground-muted"] {
+                    let ratio = shipped_contrast_ratio(token(&theme, ink).value, well);
+                    assert!(
+                        ratio >= 4.5,
+                        "{page}: {ink} on the well over {ground} is {ratio:.2}:1"
+                    );
+                }
+            }
+            assert!(
+                theme.violations.is_empty(),
+                "{page}: {:?}",
+                theme.violations
+            );
+        }
     }
 
     #[test]

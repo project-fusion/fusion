@@ -60,10 +60,11 @@ export const pairs = new Set(
  *
  * Taken from the pairs rather than from a token list, deliberately: a ground the
  * model names and no theme emits still has to be declared by the stylesheet, and
- * it appears here as the background of an unverifiable pair.
+ * it appears here as the background of an unverifiable pair. A ground laid over
+ * another, `color-well over color-surface`, is both of its names.
  */
 export const modelNames = new Set(
-  base.pairings.flatMap((pairing) => [pairing.foreground, pairing.background]),
+  base.pairings.flatMap((pairing) => [pairing.foreground, ...pairing.background.split(' over ')]),
 )
 
 /** The seeds the engine writes. */
