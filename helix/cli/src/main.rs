@@ -47,7 +47,30 @@ fn shipped() -> &'static str {
     fusion_rules::version::shipped(PACKAGE, env!("CARGO_PKG_VERSION"))
 }
 
+/// What `helix --version --json` prints: the version as one JSON object that
+/// names the package. `--version` alone prints the line a release is checked
+/// against, `helix 0.205.2`.
+///
+/// **The npm shim reads it to tell this command line from another program
+/// named `helix` on `PATH`.** The name proves nothing: on Arch Linux `helix` is
+/// the Helix text editor, whose `--version` prints a line shaped like this
+/// one's. The editor exits with an error on `--json`, and a build of this
+/// command line from before this output prints its plain line, so neither
+/// names the package.
+fn version_json(args: &[String]) -> Option<String> {
+    let mut asked: Vec<&str> = args.iter().map(String::as_str).collect();
+    asked.sort_unstable();
+    matches!(asked.as_slice(), ["--json", "--version" | "-V"]).then(|| {
+        serde_json::json!({ "name": PRODUCT, "package": PACKAGE, "version": shipped() }).to_string()
+    })
+}
+
 fn main() {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    if let Some(said) = version_json(&args) {
+        fusion_rules::say!("{said}");
+        return;
+    }
     let cli: Cli = fusion_rules::args::parse(PRODUCT);
     let paint = if cli.json {
         Paint::never()

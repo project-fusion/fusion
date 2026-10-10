@@ -57,6 +57,23 @@ fn answer(reply: &serde_json::Value) -> (bool, String) {
     )
 }
 
+/// A client starts the server with a pipe on stdin, and stderr stays empty:
+/// the line that says what the server is goes only to a terminal.
+#[test]
+fn a_client_on_a_pipe_hears_nothing_on_stderr() {
+    let mut child = Command::new(binary())
+        .arg("mcp")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("the server starts");
+    writeln!(child.stdin.as_mut().expect("a pipe"), "{HELLO}").expect("the server is reading");
+    let Output { stderr, stdout, .. } = child.wait_with_output().expect("the server exits");
+    assert!(!stdout.is_empty(), "the server answered");
+    assert_eq!(String::from_utf8_lossy(&stderr), "");
+}
+
 #[test]
 fn it_negotiates_and_lists_its_tools() {
     let replies = talk(&[HELLO, r#"{"jsonrpc":"2.0","id":2,"method":"tools/list"}"#]);

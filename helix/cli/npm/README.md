@@ -10,9 +10,10 @@ npm install --save-dev @fusion.dev/helix-cli
 
 The command is a native binary, and npm installs the build for your machine
 beside this package: macOS and Linux on Arm and x86-64, and Windows on x86-64.
-An install that skips optional dependencies skips it too. `helix` then runs
-another `helix` on your `PATH` when there is one, and otherwise names the
-package that is missing. To start a new project with Helix, use
+An install that skips optional dependencies skips it too. `helix` then runs a
+`helix` on your `PATH` whose `helix --version --json` names this package, and
+otherwise names the package that is missing and each `helix` it did not run,
+such as the Helix text editor. To start a new project with Helix, use
 `npm create @fusion.dev/helix-app`.
 
 ```sh
@@ -42,6 +43,8 @@ Color is already off when stdout is not a terminal and when `NO_COLOR` is set.
 rather than compiled into the binary, so one build serves every release that
 changes no Rust. A binary built from a checkout of this repository has no such
 package beside it and says `0.0.0-dev`, which is what that build is.
+`helix --version --json` prints the same release as
+`{ "name": "helix", "package": "@fusion.dev/helix-cli", "version": … }`.
 
 [Documentation](https://fusion.dev/helix)
 

@@ -33,13 +33,37 @@ const shimOnPath = () => {
   return directory
 }
 
-/** An installed binary, which is the thing the `PATH` branch exists to find. */
+/**
+ * An installed binary, which is the thing the `PATH` branch exists to find. It
+ * answers `--version --json` as this command line does, naming its package.
+ */
 const installed = (says, code = 0) => {
   const directory = scratch()
   const file = join(directory, 'helix')
-  writeFileSync(file, `#!/bin/sh\necho "${says}"\nexit ${code}\n`)
+  writeFileSync(
+    file,
+    '#!/bin/sh\n' +
+      'if [ "$*" = "--version --json" ]; then\n' +
+      `  echo '{"name":"helix","package":"@fusion.dev/helix-cli","version":"1.2.3"}'\n` +
+      '  exit 0\n' +
+      'fi\n' +
+      `echo "${says}"\nexit ${code}\n`,
+  )
   chmodSync(file, 0o755)
   return directory
+}
+
+/**
+ * Another program called `helix`, which prints the same line whatever it is
+ * asked: the Helix text editor's version, or an old build of this command
+ * line's, from before it answered `--version --json`.
+ */
+const foreign = (says) => {
+  const directory = scratch()
+  const file = join(directory, 'helix')
+  writeFileSync(file, `#!/bin/sh\necho "${says}"\n`)
+  chmodSync(file, 0o755)
+  return { directory, file: realpathSync(file) }
 }
 
 /**
@@ -185,6 +209,55 @@ if (process.platform !== 'win32') {
       expect(ran.stderr).not.toContain('cargo build')
 
       rmSync(project, { force: true, recursive: true })
+    })
+
+    test('skips another program named helix on PATH, and names it', () => {
+      /* On Arch Linux `helix` is the Helix text editor, and running it from a
+         project's script opens an editor where a scan was asked for. */
+      const { project, shim } = consumer()
+      const editor = foreign('helix 25.07.1 (a05c151b)')
+      const ran = run([editor.directory], { CARGO_TARGET_DIR: join(project, 'target') }, shim)
+
+      expect(ran.status).toBe(69)
+      expect(ran.stdout).not.toContain('25.07.1')
+      expect(ran.stderr).toContain(`helix-cli-${process.platform}-${process.arch}`)
+      expect(ran.stderr).toContain(`Not run, from PATH: \`${editor.file}\``)
+
+      rmSync(project, { force: true, recursive: true })
+      rmSync(editor.directory, { force: true, recursive: true })
+    })
+
+    test('and takes this command line behind it, past an old build of its own', () => {
+      const editor = foreign('helix 25.07.1 (a05c151b)')
+      const old = foreign('helix 0.0.0-dev')
+      const real = installed('helix from PATH')
+      const target = scratch()
+      const ran = run([editor.directory, old.directory, real], { CARGO_TARGET_DIR: target })
+
+      expect(ran.stdout).toContain('helix from PATH')
+      expect(ran.stdout).not.toContain('0.0.0-dev')
+
+      for (const directory of [editor.directory, old.directory, real, target]) {
+        rmSync(directory, { force: true, recursive: true })
+      }
+    })
+
+    test('and a copy of this shim it runs to check does not search PATH in turn', () => {
+      /* Two consumers' copies with no binary between them, each on the
+         other's PATH: each would run the other without end. */
+      const one = consumer()
+      const two = consumer()
+      const linked = scratch()
+      symlinkSync(two.shim, join(linked, 'helix'))
+      const ran = run([linked], { CARGO_TARGET_DIR: join(one.project, 'target') }, one.shim)
+
+      expect(ran.signal).toBe(null)
+      expect(ran.status).toBe(69)
+      expect(ran.stderr).toContain(`Not run, from PATH: \`${realpathSync(two.shim)}\``)
+
+      for (const directory of [one.project, two.project, linked]) {
+        rmSync(directory, { force: true, recursive: true })
+      }
     })
 
     test('and `HELIX_BIN` outranks both', () => {
