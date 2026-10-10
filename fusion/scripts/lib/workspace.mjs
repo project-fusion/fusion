@@ -108,7 +108,6 @@ const exported = (directory, subpath) => {
 export const ARTIFACT = {
   coreManifest: exported('helix/core', './custom-elements.json'),
   headlessManifest: exported('helix/headless', './custom-elements.json'),
-  sandboxManifest: exported('helix/sandbox', './custom-elements.json'),
   styledManifest: exported('helix/styled', './custom-elements.json'),
   tokens: exported('helix/styles', './tokens.json'),
 }
@@ -204,3 +203,31 @@ export const domainOf = (name) => {
  * package in a domain may still be internal: a Helix byproduct is still Helix.
  */
 export const publishes = (manifest) => manifest.private !== true
+
+/**
+ * The packages the reference documents and the tools answer for, each with
+ * where its manifest and its `api.json` are, in the order a question is
+ * answered: `@fusion.dev/helix`, then `@fusion.dev/helix-headless`, then the
+ * rest by name.
+ *
+ * **A package says it is documented**, by publishing `./api.json` in its
+ * `exports` and not being `private`. `helix api`, `helix mcp`, and `helix
+ * scan` ask the same of the packages a project installs, so the site and the
+ * tools document one set and an add-on package's elements reach all of them:
+ * `@fusion.dev/helix-sandbox`'s editor is on the Sandbox page and in `helix
+ * api family sandbox` alike. `@fusion.dev/helix-workbench` writes an
+ * `api.json` and is private, so it is in neither.
+ */
+export function documented() {
+  const lead = ['@fusion.dev/helix', '@fusion.dev/helix-headless']
+  const rank = (name) => (lead.includes(name) ? lead.indexOf(name) : lead.length)
+  return [...manifests()]
+    .filter(([, { manifest }]) => publishes(manifest) && manifest.exports?.['./api.json'])
+    .sort(([a], [b]) => rank(a) - rank(b) || a.localeCompare(b))
+    .map(([name, { directory }]) => ({
+      api: exported(directory, './api.json'),
+      directory,
+      manifest: exported(directory, './custom-elements.json'),
+      name,
+    }))
+}
