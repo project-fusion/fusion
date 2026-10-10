@@ -1141,7 +1141,7 @@ export function ThemeBuilder({
               name="body-face"
               onChange={(event) => setBodyFace(event.currentTarget.value)}
               onFocus={() => reach('body')}
-              onMouseEnter={() => reach('body')}
+              onPointerEnter={() => reach('body')}
               placeholder="System default"
               value={bodyFace}
             >
@@ -1157,7 +1157,7 @@ export function ThemeBuilder({
               name="display-face"
               onChange={(event) => setDisplayFace(event.currentTarget.value)}
               onFocus={() => reach('display')}
-              onMouseEnter={() => reach('display')}
+              onPointerEnter={() => reach('display')}
               placeholder="Same as body"
               value={displayFace}
             >
@@ -1172,7 +1172,7 @@ export function ThemeBuilder({
               name="mono-face"
               onChange={(event) => setMonoFace(event.currentTarget.value)}
               onFocus={() => reach('mono')}
-              onMouseEnter={() => reach('mono')}
+              onPointerEnter={() => reach('mono')}
               placeholder="System mono"
               value={monoFace}
             >
