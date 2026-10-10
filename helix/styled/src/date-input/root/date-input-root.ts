@@ -42,7 +42,7 @@ import { styles } from './date-input-root.css.js'
  *   follows `--helix-border-floating`, which is `0`, so the panel stands out by its
  *   shadow unless a theme sets a border.
  * @cssproperty --date-input-segment-focus-background-color - The fill behind the
- *   segment with focus, in `segmented`. It follows `--helix-color-primary`.
+ *   segment with focus, in `segmented`. It follows `--helix-color-primary-surface`.
  * @cssproperty --date-input-segment-focus-color - The text of the segment with
  *   focus, in `segmented`.
  * @cssproperty --date-input-segment-literal-color - The text the locale writes

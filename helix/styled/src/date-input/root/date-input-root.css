@@ -175,7 +175,7 @@ slot[name="end"]::slotted(*) {
 [part="segments"] {
   --_segment-focus-background-color: var(
     --date-input-segment-focus-background-color,
-    var(--helix-color-primary)
+    var(--helix-color-primary-surface)
   );
   --_segment-focus-color: var(
     --date-input-segment-focus-color,

@@ -93,6 +93,15 @@ describe('words on the bar', () => {
     expect(words).toContain('var(--progress-content-color, var(--helix-color-foreground))')
     expect(words).toContain('calc(var(--progress-fraction, 0) * 100%)')
   })
+
+  /* The on-primary ink is solved against `primary-surface`. Over `primary`,
+     which is light in a dark theme, the words came to 3.42:1 in the derived
+     dark theme and 1.57:1 with two brands. */
+  test('sit on a fill of the ground their ink is solved against', () => {
+    expect(rule('[part="indicator"]')).toContain(
+      'background-color: var(--progress-color, var(--helix-color-primary-surface))',
+    )
+  })
 })
 
 /* Under reduced motion the base layer sets every duration token to 0.01ms, so a

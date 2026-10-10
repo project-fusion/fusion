@@ -36,14 +36,43 @@ static RULE: LazyLock<Regex> =
 
 /// An ink. Not `border-color` or any other `-color`, which is why the character
 /// before it is checked rather than trusted to the pattern.
+///
+/// **The token is read through the hooks in front of it.** A component paints
+/// through its own property first, `color: var(--badge-color, var(--helix-…))`,
+/// and the token in the innermost fallback is what paints when the page sets
+/// nothing. Reading only a bare `var(--helix-…)` missed every pair written that
+/// way.
 static INK: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"color:\s*var\(--helix-(color-[a-z0-9-]+)").expect("a literal pattern compiles")
-});
-
-static GROUND: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"background-color:\s*var\(--helix-(color-[a-z0-9-]+)")
+    Regex::new(r"color:\s*var\(\s*(?:--[a-z0-9_-]+\s*,\s*var\(\s*)*--helix-(color-[a-z0-9-]+)")
         .expect("a literal pattern compiles")
 });
+
+/// A ground, read through its hooks as an ink is, and held to the same
+/// boundary: `--_segment-focus-background-color:` sets a hook and paints
+/// nothing.
+static GROUND: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
+        r"background-color:\s*var\(\s*(?:--[a-z0-9_-]+\s*,\s*var\(\s*)*--helix-(color-[a-z0-9-]+)",
+    )
+    .expect("a literal pattern compiles")
+});
+
+/// The first match that starts a declaration, and not the tail of a longer
+/// property name.
+///
+/// **The *first accepted* match, not the first match.** Taking `captures` and
+/// filtering gives up at `background-color:`, which is the one every rule with
+/// a ground has, so every pair goes unseen and the rule reports a confident
+/// zero.
+fn declared<'a>(pattern: &Regex, body: &'a str) -> Option<regex::Captures<'a>> {
+    pattern.captures_iter(body).find(|found| {
+        let at = found.get(0).expect("group zero always matches").start();
+        body[..at]
+            .chars()
+            .next_back()
+            .is_none_or(|before| before != '-' && !before.is_alphanumeric())
+    })
+}
 
 /// Every `<ink> on <ground>` the model declares, whatever the pair measured.
 fn measured(context: &Context) -> Option<BTreeSet<String>> {
@@ -96,18 +125,8 @@ pub fn run(context: &Context) -> Report {
             let where_ = context.relative(&sheet);
             for rule in RULE.captures_iter(&source) {
                 let body = &rule[1];
-                /* The *first accepted* match, not the first match. Taking
-                `captures` and filtering gives up at `background-color:`, which
-                is the one every rule with a ground has, so every pair goes
-                unseen and the rule reports a confident zero. */
-                let ink = INK.captures_iter(body).find(|found| {
-                    let at = found.get(0).expect("group zero always matches").start();
-                    body[..at]
-                        .chars()
-                        .next_back()
-                        .is_none_or(|before| before != '-' && !before.is_alphanumeric())
-                });
-                let (Some(ink), Some(ground)) = (ink, GROUND.captures(body)) else {
+                let (Some(ink), Some(ground)) = (declared(&INK, body), declared(&GROUND, body))
+                else {
                     continue;
                 };
                 painted.insert(format!("{} on {}", &ink[1], &ground[1]), where_.clone());

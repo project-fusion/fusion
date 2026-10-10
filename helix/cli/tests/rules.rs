@@ -1678,6 +1678,52 @@ fn pairings() {
     );
 }
 
+/// A pair painted through the component's hooks is read from the token in the
+/// innermost fallback, which is what paints when the page sets no hook. A hook
+/// being set, such as `--_card-focus-background-color`, paints nothing and is
+/// not read as a ground.
+#[test]
+fn pairings_through_a_hook() {
+    let sheet = |ground: &str| {
+        format!(
+            ":host {{
+  --_card-focus-background-color: var(--helix-color-raised);
+  color: var(--card-color, var(--helix-color-foreground));
+}}
+
+[part=\"body\"] {{
+  background-color: var(
+    --card-background-color,
+    var(--_card-fill, var(--helix-{ground}))
+  );
+  color: var(--card-color, var(--helix-color-foreground));
+}}
+"
+        )
+    };
+    plant_in(
+        "pairings-through-a-hook",
+        "pairings",
+        &[
+            (
+                "helix.json",
+                r#"{ "tiers": ["src"], "oracle": "oracle.json" }"#,
+            ),
+            (
+                "oracle.json",
+                r#"{ "themes": [ { "label": "default", "pairings": [
+  { "foreground": "color-foreground", "background": "color-surface" } ] } ] }"#,
+            ),
+            ("src/card/card.css", &sheet("color-surface")),
+        ],
+        |tree| {
+            tree.write("src/card/card.css", &sheet("color-primary"));
+        },
+        "paints `color-foreground on color-primary` and the engine does not measure it",
+        "src/card/card.css",
+    );
+}
+
 #[test]
 fn parts() {
     let card = |documented: &str| {

@@ -30,8 +30,12 @@
   padding-inline: calc(var(--helix-space-2xs) / 2);
 }
 
+/* The fill is `primary-surface`, the ground `foreground-on-primary` is solved
+   against. `primary` is solved as text on the page, so in a dark theme it is
+   light: measured, the ink on it came to 3.42:1 in the derived dark theme and
+   1.57:1 with two brands. */
 [part~="segment"]:focus {
-  background-color: var(--_segment-focus-background-color, var(--helix-color-primary));
+  background-color: var(--_segment-focus-background-color, var(--helix-color-primary-surface));
   color: var(--_segment-focus-color, var(--helix-color-foreground-on-primary));
 }
 
