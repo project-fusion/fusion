@@ -135,6 +135,7 @@ const SERIES = 24
  * @csspart mark - The invisible point the tooltip is anchored to, where the renderer draws the reading.
  * @csspart plot - The box the drawing fills, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart ring - The outline around the block the pointer or the keys rest on, painted after it, so the blocks in front of it cover it.
+ * @csspart ring-behind - The same outline, faint and dashed, drawn over every block, so the part of the block the pointer or the keys rest on that others hide still shows.
  * @csspart summary - The number of items and groups and the range of their sizes, written as a sentence for screen readers, which describes the plot. Hide it visually.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`. Hide it visually.
  * @csspart tick - A height at a tick, along its edge of the box, in the chart's own drawing.
@@ -458,8 +459,10 @@ export class HelixHeadlessSpatialTreemap extends MixinChartStatus(MixinChartSour
              faces and read as theirs. */
           svg`${this.renderBlock(field, block, at)}${block === active ? svg`<path d=${active.drawn.outline} part="ring"></path>` : nothing}`,
       )}${
+        /* Over everything, faint and dashed, so a block the keys reach behind
+           others is still found: where it shows, the ring above covers it. */
         active
-          ? svg`<foreignObject height="0.001" overflow="visible" width="0.001" x=${active.drawn.peak.x} y=${active.drawn.peak.y}>${this.renderOwnTooltip(field.blocks[at]?.row)}</foreignObject>`
+          ? svg`<path d=${active.drawn.outline} part="ring-behind"></path><foreignObject height="0.001" overflow="visible" width="0.001" x=${active.drawn.peak.x} y=${active.drawn.peak.y}>${this.renderOwnTooltip(field.blocks[at]?.row)}</foreignObject>`
           : nothing
       }</svg>
     </div>`

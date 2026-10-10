@@ -93,6 +93,10 @@ describe('the frame', () => {
     expect(element.active).toBe(1)
     expect(part(element, 'live')?.textContent).toContain('Billing')
     expect(part(element, 'ring')?.previousElementSibling?.getAttribute('data-index')).toBe('1')
+    expect(part(element, 'ring-behind')?.getAttribute('d')).toBe(
+      part(element, 'ring')?.getAttribute('d') ?? '',
+    )
+    expect(part(element, 'ring-behind')?.nextElementSibling?.localName).toBe('foreignObject')
     key(element, 'End')
     await element.updateComplete
     expect(part(element, 'live')?.textContent).toContain('Refunds')
