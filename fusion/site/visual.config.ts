@@ -59,7 +59,7 @@ export default defineConfig({
      the longest bar sets its scale. */
   mask: ['[data-site-footer] helix-tag', 'helix-bar-chart[for="proof-button"]'],
   retake:
-    'Dispatch the `Visual baselines` workflow on your branch with the suite `site`, and review the pull request it opens.',
+    'Comment `/retake` and the pages on the pull request, such as `/retake site/home`, or dispatch the `Visual baselines` workflow on your branch with the suite `site` to retake every one, and review the commit it makes on the branch.',
   /* Next.js writes `next-route-announcer` and never defines it, so only
      Helix's own elements are awaited, and each of them is required. */
   settle: { elements: 'helix-', readyProperty: 'whenSettled' },

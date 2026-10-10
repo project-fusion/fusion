@@ -15,4 +15,4 @@ Leave the checklist below in place. Do not tick what you did not run.
 - [ ] `bun run verify` passes
 - [ ] `cargo test --workspace` passes (if Rust changed)
 - [ ] New or changed behavior has a spec
-- [ ] Visual baselines retaken with `bun run visual:update` on Linux (if pixels moved)
+- [ ] Visual baselines updated with `bun run visual:update` on Linux, or accepted from a failed run with `helix visual accept` or `/accept` (if pixels moved)

@@ -1,15 +1,21 @@
 # **`/retake` on a pull request retakes the entries it names on that branch.**
 # A reviewer who has looked at the pictures comments `/retake styled/badge
 # site/home`, and this dispatches `Visual baselines` on the pull request's
-# branch, the examples and the site's pages each in their own run. The retake
-# opens its own pull request into the branch, to be looked at like any other.
+# branch, the examples and the site's pages each in their own run. Each retake
+# commits onto the branch, and the pull request shows the pictures it changed.
+#
+# **`/accept` makes the captures of the branch's failed check the baselines.**
+# It finds the last finished `verify` run of the pull request's head commit and
+# dispatches `Visual baselines` with that run, which accepts every capture the
+# run's examples and site pages failed on, with no browser. A head that has no
+# finished run yet is said, and nothing is dispatched.
 #
 # **Only from someone who can push**, the repository's owner, members and
 # collaborators, and only for a branch of this repository: a fork's branch is
 # one this token cannot write to. The comment is read from the event's
 # environment and never pasted into a command, and an entry is kept only when
 # it reads as one.
-name: Retake on request
+name: Baselines on request
 
 on:
   issue_comment:
@@ -22,11 +28,11 @@ permissions:
 
 jobs:
   retake:
-    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/retake') && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) }}  # dialect:quoted, GitHub's own functions
+    if: ${{ github.event.issue.pull_request && (startsWith(github.event.comment.body, '/retake') || startsWith(github.event.comment.body, '/accept')) && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) }}  # dialect:quoted, GitHub's own functions
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Dispatch a retake of the entries named
+      - name: Dispatch a retake of the entries named, or an accept
         # `GH_REPO`, because nothing is checked out for `gh` to read the
         # repository from, and a comment's job has no need to check anything
         # out.
@@ -41,7 +47,18 @@ jobs:
           head=$(jq -r '.head.ref' <<<"$pr")
           from=$(jq -r '.head.repo.full_name' <<<"$pr")
           if [ "$from" != "$GITHUB_REPOSITORY" ]; then
-            gh pr comment "$NUMBER" --body "A branch from a fork cannot be retaken from here. Retake the baselines on the fork, or ask for them to be taken on a branch of this repository."
+            gh pr comment "$NUMBER" --body "A branch from a fork cannot be retaken or accepted from here. Retake the baselines on the fork, or ask for them to be taken on a branch of this repository."
+            exit 0
+          fi
+          if [ "$(head -n 1 <<<"$BODY" | awk '{ print $1 }')" = /accept ]; then
+            sha=$(jq -r '.head.sha' <<<"$pr")
+            run=$(gh run list --workflow verify.yml --commit "$sha" --status completed --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+            if [ -z "$run" ]; then
+              gh pr comment "$NUMBER" --body "No \`verify\` run of \`${sha:0:7}\` has finished, so there are no captures to accept yet. Comment \`/accept\` again when it has."
+              exit 0
+            fi
+            gh workflow run visual-baselines.yml --ref "$head" -f run="$run"
+            gh pr comment "$NUMBER" --body "Accepting the captures of $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$run on \`$head\`. The commit lands on the branch: look at every picture in it before merging."
             exit 0
           fi
           entries=$(head -n 1 <<<"$BODY" | sed 's#^/retake##' | tr -s ' \t' '\n' | grep -E '^[a-z0-9][a-z0-9-]*(/[a-z0-9][a-z0-9-]*)?$' || true)
@@ -60,4 +77,4 @@ jobs:
             gh workflow run visual-baselines.yml --ref "$head" -f suite=site -f family="$site"
             said="$said${said:+, and} the site's ${site% }"
           fi
-          gh pr comment "$NUMBER" --body "Retaking$said on \`$head\`. Each retake opens a pull request into the branch: look at every picture in it before merging it."
+          gh pr comment "$NUMBER" --body "Retaking$said on \`$head\`. Each retake commits onto the branch: look at every picture it changes before merging."
