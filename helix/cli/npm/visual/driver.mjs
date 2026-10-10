@@ -230,19 +230,34 @@ const respond = (request, response) => {
  *
  * **Bounded, because `whenDefined` on a tag nothing registers never settles.**
  * Unbounded, a page naming an element the bundle does not define hangs the
- * run with no output. This gives up after five seconds and names the tags.
+ * run with no output. This gives up after {@link UPGRADES} seconds and names
+ * the tags.
  */
 const upgrades = (page, prefix) =>
-  page.evaluate(async (prefix) => {
-    const pending = [
-      ...new Set([...document.querySelectorAll(':not(:defined)')].map((one) => one.localName)),
-    ].filter((tag) => tag.startsWith(prefix))
-    await Promise.race([
-      Promise.all(pending.map((tag) => customElements.whenDefined(tag))),
-      new Promise((done) => setTimeout(done, 5000)),
-    ])
-    return pending.filter((tag) => customElements.get(tag) === undefined)
-  }, prefix ?? '')
+  page.evaluate(
+    async ({ prefix, seconds }) => {
+      const pending = [
+        ...new Set([...document.querySelectorAll(':not(:defined)')].map((one) => one.localName)),
+      ].filter((tag) => tag.startsWith(prefix))
+      await Promise.race([
+        Promise.all(pending.map((tag) => customElements.whenDefined(tag))),
+        new Promise((done) => setTimeout(done, seconds * 1000)),
+      ])
+      return pending.filter((tag) => customElements.get(tag) === undefined)
+    },
+    { prefix: prefix ?? '', seconds: UPGRADES },
+  )
+
+/**
+ * **How long a page has to define its elements after it loads: twenty
+ * seconds**, a third of what one shot may take. The bound only stops a run
+ * hanging on a tag nothing registers, and a page that registers late is slow,
+ * which a picture does not judge. Five seconds failed the site's theme builder
+ * on two CI runs in a row on October 10, 2026: its first style pass over
+ * 15,638 elements and Helix's chunk took 1.7 seconds on an M-series Mac, and a
+ * shared runner takes several times that.
+ */
+const UPGRADES = 20
 
 /**
  * Waits for the page to hold still: three frames, the fonts, each element's
@@ -424,7 +439,7 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
         const missing = await upgrades(page, elements)
         if (missing.length > 0) {
           throw new Error(
-            `nothing defines ${missing.map((tag) => `<${tag}>`).join(', ')}, after five seconds of waiting`,
+            `nothing defines ${missing.map((tag) => `<${tag}>`).join(', ')}, after ${UPGRADES} seconds of waiting`,
           )
         }
       } else if (shot.harness !== null) {
