@@ -187,14 +187,19 @@ export function Showcase(): React.ReactElement {
         <helix-flex direction="column" gap="md">
           <helix-text variant="label">Helix</helix-text>
           <helix-text as="h3" class={styles.anchorTitle}>
-            One brand color, a full palette
+            Use the behavior with your own design
           </helix-text>
           <helix-text>
-            Pick one brand color, and every surface, border, and text color on this page follows
-            from it. Each text color is checked for contrast against its background.
+            Every component comes in two tiers. The headless tier holds its structure, state, and
+            form behavior, and you write all of its styling.
           </helix-text>
+          {/* **A link, because it goes somewhere.** It was a `helix-button`
+              reading "Read about theming" that did nothing when pressed, which
+              is the one control in the panel a reader would expect to work. */}
           <helix-flex>
-            <helix-button emphasis="solid">Read about theming</helix-button>
+            <a data-button="solid" href="/helix/docs/tiers">
+              Read about the tiers
+            </a>
           </helix-flex>
         </helix-flex>
       </helix-card>
