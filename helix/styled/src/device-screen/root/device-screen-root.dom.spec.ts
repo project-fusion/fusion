@@ -114,6 +114,27 @@ describe('styled device screen', () => {
       expect(screen.height).toBeCloseTo(bezel.height, 0)
     })
 
+    test('a phone on its side keeps its corners and bezel, with its chin at a side', async () => {
+      const device = (await mount(
+        `<div style="inline-size: 40rem">
+          <helix-device-screen label="iPhone" controls="none" screen-width="402" screen-height="874" rotation="90" style="--device-screen-block-size: 20rem; --device-screen-bezel-block: 0.25"></helix-device-screen>
+        </div>`,
+      ).then((host) => host.querySelector('helix-device-screen'))) as Device
+      await device.updateComplete
+      const screen = boxOf(device, 'screen')
+      const body = getComputedStyle(part(device, 'bezel') as HTMLElement)
+      /* The device's own width, which is the drawn screen's height on its side. */
+      const own = screen.height
+      expect(screen.width / screen.height).toBeCloseTo(874 / 402, 2)
+      expect(
+        Number.parseFloat(
+          getComputedStyle(part(device, 'screen') as HTMLElement).borderTopLeftRadius,
+        ),
+      ).toBeCloseTo(own * 0.13, 0)
+      expect(Number.parseFloat(body.paddingLeft)).toBeCloseTo(own * 0.25, 0)
+      expect(Number.parseFloat(body.paddingTop)).toBeCloseTo(own * 0.045, 0)
+    })
+
     test('a picture turned a quarter fills the screen across', async () => {
       const device = (await mount(
         `<div style="inline-size: 40rem">

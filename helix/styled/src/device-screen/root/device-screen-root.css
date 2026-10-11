@@ -61,18 +61,22 @@
 }
 
 /* **The body is measured in screens.** Every length here is a fraction of the
-   screen's width, so a device drawn small keeps the proportions it has drawn
-   large, and the screen's width is whichever fits: the box's width less the
-   two sides, or its height less the top and bottom, turned into a width by
-   the screen's shape. */
+   device's own width as drawn, so a device drawn small keeps the proportions
+   it has drawn large. The screen's width is whichever fits: the box's width
+   less the two sides, or its height less the top and bottom, turned into a
+   width by the screen's shape. */
 [part="bezel"] {
   --_ratio: var(--device-screen-ratio, 0.4615);
   --_side: var(--device-screen-bezel, 0.045);
   --_end: var(--device-screen-bezel-block, var(--_side));
   --_radius: var(--device-screen-radius, 0.13);
-  --_across: calc(1 + 2 * var(--_side));
-  --_down: calc(1 / var(--_ratio) + 2 * var(--_end));
+  --_inline: var(--_side);
+  --_block: var(--_end);
+  --_scale: 1;
+  --_across: calc(1 + 2 * var(--_inline) * var(--_scale));
+  --_down: calc(1 / var(--_ratio) + 2 * var(--_block) * var(--_scale));
   --_screen: min((100cqi - var(--_beside, 0px)) / var(--_across), 100cqb / var(--_down));
+  --_unit: calc(var(--_screen) * var(--_scale));
 
   background-color: var(
     --device-screen-bezel-color,
@@ -80,7 +84,7 @@
   );
   block-size: calc(var(--_screen) * var(--_down));
   border-radius: calc(
-    var(--_screen) *
+    var(--_unit) *
     var(--device-screen-bezel-radius, calc(var(--_radius) + var(--_side)))
   );
   box-shadow: var(--helix-shadow-md);
@@ -92,8 +96,17 @@
   outline: var(--helix-border-thin) solid
     color-mix(in oklab, var(--helix-color-surface-media) 72%, var(--helix-color-foreground-media));
   outline-offset: calc(var(--helix-border-thin) * -1);
-  padding: calc(var(--_screen) * var(--_end)) calc(var(--_screen) * var(--_side));
+  padding: calc(var(--_unit) * var(--_block)) calc(var(--_unit) * var(--_inline));
   position: relative;
+}
+
+/* **A device on its side keeps its body.** Turned a quarter, the drawn screen
+   is the device's height wide, so the body is measured in the screen's
+   height, and the top and bottom of the body are at its sides. */
+:host(:state(sideways)) [part="bezel"] {
+  --_inline: var(--_end);
+  --_block: var(--_side);
+  --_scale: calc(1 / var(--_ratio));
 }
 
 /* A column of buttons beside the device takes its width from the device's,
@@ -124,7 +137,7 @@
 [part="screen"] {
   background-color: var(--helix-color-surface-media);
   block-size: 100%;
-  border-radius: calc(var(--_screen) * var(--_radius));
+  border-radius: calc(var(--_unit) * var(--_radius));
   container-type: size;
   inline-size: 100%;
   overflow: hidden;
@@ -310,12 +323,12 @@
    and the screen's touches and keys never reach it. */
 [part="empty"] {
   align-items: center;
-  border-radius: calc(var(--_screen) * var(--_radius));
+  border-radius: calc(var(--_unit) * var(--_radius));
   color: var(--helix-color-foreground-media);
   display: grid;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
-  inset: calc(var(--_screen) * var(--_end)) calc(var(--_screen) * var(--_side));
+  inset: calc(var(--_unit) * var(--_block)) calc(var(--_unit) * var(--_inline));
   justify-items: center;
   overflow: hidden;
   padding: var(--helix-space-md);
