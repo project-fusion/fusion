@@ -3,7 +3,7 @@ import type {
   clearWords as ClearWords,
   registerWords as RegisterWords,
 } from '@fusion.dev/helix-core'
-import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { nextFrame, part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 /* Imported once the DOM is registered: core reads the globals it finds as
    it is evaluated, and a static import breaks the DOM when this file runs
@@ -45,7 +45,7 @@ const dropOn = async (host: Updatable, files: File[]): Promise<void> => {
   Object.defineProperty(event, 'dataTransfer', { value: carrier })
   part(host as HTMLElement, 'field')?.dispatchEvent(event)
   await settle(host)
-  await new Promise((done) => setTimeout(done, 40))
+  await nextFrame()
   await settle(host)
 }
 

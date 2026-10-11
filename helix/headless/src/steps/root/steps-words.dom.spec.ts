@@ -3,7 +3,14 @@ import type {
   clearWords as ClearWords,
   registerWords as RegisterWords,
 } from '@fusion.dev/helix-core'
-import { label, part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  label,
+  nextFrame,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 /* Imported once the DOM is registered: core reads the globals it finds as
    it is evaluated, and a static import breaks the DOM when this file runs
@@ -67,7 +74,7 @@ describe('steps on a page in another language', () => {
     expect(part(done as Step, 'state')?.textContent).toBe('Terminée')
     ;(review as Step).complete = true
     await settle(review as Step)
-    await new Promise((resolve) => setTimeout(resolve, 40))
+    await nextFrame()
     await settle(review as Step)
     expect(part(review as Step, 'live')?.textContent).toBe('Étape Review terminée')
   })

@@ -713,6 +713,25 @@ export const idle = async (): Promise<void> => {
 }
 
 /**
+ * Waits until the next animation frame has run, which is when a
+ * `StatusController` puts its words into the region it rendered a frame before.
+ *
+ * **A frame, never a fixed time.** The specs waited 40ms for that frame, two
+ * and a half of them at sixty a second, and WebKit on a two-core runner drew
+ * later: on October 11, 2026 a pending Button still said "Saving" and a File
+ * Input's refusal was still unsaid.
+ *
+ * **Resolved from the frame after it**, so a frame the page booked after this
+ * call, in the same task or a microtask of it, has run too: Toast books its
+ * words from a microtask after `add()`, and one frame would have resolved
+ * ahead of them.
+ */
+export const nextFrame = (): Promise<void> =>
+  new Promise((done) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => done()))
+  })
+
+/**
  * How many animation frames the page books while `count` frames pass.
  *
  * For a component that draws in a loop, which books its next frame from each

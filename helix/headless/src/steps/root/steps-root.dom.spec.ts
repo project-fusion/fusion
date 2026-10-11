@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { at, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { at, hasState, mount, nextFrame, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -515,7 +515,7 @@ describe('a finished stage', () => {
     expect(part(review as Step, 'label')?.hasAttribute('aria-describedby')).toBe(false)
     ;(review as Step).complete = true
     await (review as Step).updateComplete
-    await new Promise((resolve) => setTimeout(resolve, 40))
+    await nextFrame()
     await (review as Step).updateComplete
     expect(part(review as Step, 'live')?.textContent).toBe('Review, Complete')
   })
@@ -530,7 +530,7 @@ describe('a finished stage', () => {
     await step.updateComplete
     step.complete = true
     await step.updateComplete
-    await new Promise((resolve) => setTimeout(resolve, 40))
+    await nextFrame()
     await step.updateComplete
     expect(part(step, 'live')?.textContent).toBe('Review, Complete')
   })

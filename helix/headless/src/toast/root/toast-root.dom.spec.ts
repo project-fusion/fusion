@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { mount, nextFrame, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -94,7 +94,7 @@ describe('toast region', () => {
     const [polite, urgent] = [...(host.shadowRoot?.querySelectorAll('[part="live"]') ?? [])]
     expect(polite?.getAttribute('role')).toBe('status')
     expect(urgent?.getAttribute('role')).toBe('alert')
-    const frame = (): Promise<void> => new Promise((done) => setTimeout(done, 40))
+    const frame = nextFrame
     const words = (): string[] => [polite?.textContent ?? '', urgent?.textContent ?? '']
     const add = host as HTMLElement & {
       add(
@@ -134,7 +134,7 @@ describe('toast region', () => {
     const [polite] = [...(host.shadowRoot?.querySelectorAll('[part="live"]') ?? [])]
     host.add('Saved to drafts')
     host.add('Upload finished')
-    await new Promise((done) => setTimeout(done, 40))
+    await nextFrame()
     await host.updateComplete
     expect(polite?.textContent).toBe('Saved to drafts. Upload finished')
   })
@@ -502,7 +502,7 @@ describe('max-visible', () => {
     expect(polite?.textContent).not.toContain('Uploaded')
     first.dismiss()
     await settled(host)
-    await new Promise((done) => setTimeout(done, 40))
+    await nextFrame()
     expect(second.hidden).toBe(false)
     expect(second.isConnected).toBe(true)
     expect(polite?.textContent).toContain('Uploaded')

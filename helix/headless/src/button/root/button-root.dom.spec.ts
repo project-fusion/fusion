@@ -3,6 +3,7 @@ import {
   formValue,
   hasState,
   mount,
+  nextFrame,
   part,
   registerDom,
   type Updatable,
@@ -518,13 +519,13 @@ describe('a pending button', () => {
     ;(control(button) as HTMLElement).focus()
     button.pending = true
     await button.updateComplete
-    await new Promise((done) => setTimeout(done, 40))
+    await nextFrame()
     await button.updateComplete
     expect(part(button, 'live')?.textContent).toBe('Saving')
     expect(part(button, 'live')?.getAttribute('role')).toBe('status')
     button.pending = false
     await button.updateComplete
-    await new Promise((done) => setTimeout(done, 40))
+    await nextFrame()
     await button.updateComplete
     expect(part(button, 'live')?.textContent).toBe('')
   })

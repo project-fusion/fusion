@@ -1,6 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { trash } from '@fusion.dev/helix-icons'
-import { formValue, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  formValue,
+  hasState,
+  mount,
+  nextFrame,
+  part,
+  registerDom,
+} from '@fusion.dev/helix-testing/dom'
 
 /* Imported once the page exists, as the element is. */
 let HelixRejectEvent: typeof import('@fusion.dev/helix-core').HelixRejectEvent
@@ -482,7 +489,7 @@ describe('screening the files that arrive', () => {
   test('several refusals are said as the page lists them, with commas in English', async () => {
     const host = await field('multiple accept="image/*"')
     await dropOn(host, [sized('notes.txt', 10), sized('todo.txt', 10), sized('plan.md', 10)])
-    await new Promise((done) => setTimeout(done, 40))
+    await nextFrame()
     await host.updateComplete
     expect(part(host, 'live')?.textContent).toBe('Not added: notes.txt, todo.txt, plan.md')
   })
@@ -492,7 +499,7 @@ describe('screening the files that arrive', () => {
   test('a drop says what it added and what it left out, in one sentence each', async () => {
     const host = await field('multiple accept="text/*"')
     await dropOn(host, [sized('notes.txt', 10), sized('photo.png', 10, 'image/png')])
-    await new Promise((done) => setTimeout(done, 40))
+    await nextFrame()
     await host.updateComplete
     expect(part(host, 'live')?.textContent).toBe('Added: notes.txt Not added: photo.png')
   })
@@ -501,7 +508,7 @@ describe('screening the files that arrive', () => {
     const host = await field('multiple removed-text="{name} entfernt"')
     await dropOn(host, [sized('notes.txt', 10), sized('todo.txt', 10)])
     ;(part(host, 'remove') as HTMLButtonElement).click()
-    await new Promise((done) => setTimeout(done, 40))
+    await nextFrame()
     await host.updateComplete
     expect(part(host, 'live')?.textContent).toBe('notes.txt entfernt')
   })
@@ -510,7 +517,7 @@ describe('screening the files that arrive', () => {
     const host = await field('accept="image/*" rejected-text="{count} left out: {names}"')
     expect(part(host, 'live')).toBeNull()
     await dropOn(host, [sized('notes.txt', 10)])
-    await new Promise((done) => setTimeout(done, 40))
+    await nextFrame()
     await host.updateComplete
     expect(part(host, 'live')?.textContent).toBe('1 left out: notes.txt')
     expect(part(host, 'live')?.getAttribute('role')).toBe('status')
@@ -680,7 +687,7 @@ describe('how a file’s upload is going', () => {
     await host.updateComplete
     expect(part(host, 'live')).toBeNull()
     host.setFileStatus(file as File, { state: 'error', text: 'a.png is too large for the server' })
-    await new Promise((done) => setTimeout(done, 40))
+    await nextFrame()
     await host.updateComplete
     expect(part(host, 'live')?.textContent).toBe('a.png is too large for the server')
     expect(rows(host)[0]?.getAttribute('part')).toBe('file file-error')
