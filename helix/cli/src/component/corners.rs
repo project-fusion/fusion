@@ -34,8 +34,11 @@
 //! radius at all is a legitimate shape (a sheet that reaches the edge of the
 //! viewport has nothing to round against), and requiring one would fire on it.
 //! `radii-none` passes for the same reason: it is the vocabulary being used to
-//! say "square" out loud. What fails is a *different* rung, or a raw length,
-//! which is the drift actually observed.
+//! say "square" out loud. `radii-full` passes as the way to say "round": a
+//! control that floats, such as a round raised Icon Button, is a shape rather
+//! than a panel on a different rung, and no panel has drifted to it. What fails
+//! is a *different* rung, or a raw length, which is the drift actually
+//! observed.
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -52,6 +55,8 @@ const FLOATING: &str = "--helix-shadow-floating";
 /// The corner a floating panel takes, and the one way to say "square".
 const HOUSE: &str = "--helix-radii-sm";
 const SQUARE: &str = "--helix-radii-none";
+/// The one way to say "round", which a round control takes on purpose.
+const ROUND: &str = "--helix-radii-full";
 
 /// One rule: its selector, and the declarations inside it.
 static RULE: LazyLock<Regex> =
@@ -125,7 +130,7 @@ pub fn run(context: &Context) -> Report {
                     /* A hook wrapping the token is the token: `var(--drawer-radius,
                     var(--helix-radii-sm))` is a consumer's override defaulting to
                     the house corner, which is the shape the hooks rule asks for. */
-                    if value.contains(HOUSE) || value.contains(SQUARE) {
+                    if value.contains(HOUSE) || value.contains(SQUARE) || value.contains(ROUND) {
                         checked += 1;
                         continue;
                     }
@@ -135,7 +140,7 @@ pub fn run(context: &Context) -> Report {
                              the area behind it, so a panel that rounds differently reads as a \
                              second design language rather than as a larger panel. Neither its \
                              size nor what it holds is a reason. Use `{HOUSE}`, or `{SQUARE}` to \
-                             say square on purpose."
+                             say square or `{ROUND}` to say round on purpose."
                         ),
                         file: where_.clone(),
                         message: format!(

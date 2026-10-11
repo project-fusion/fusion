@@ -83,29 +83,55 @@ describe('icon button', () => {
     }
   })
 
-  test('four corners, so a group can flatten the two it needs to', () => {
+  test('four corners, so a group can flatten the two it needs to, or one', () => {
     /* One `border-radius` meant `ButtonGroup` could not reach this control: the
        group hands its hooks across as custom properties, which is the one thing
-       that crosses a shadow boundary. */
+       that crosses a shadow boundary. A corner of its own each, as Button reads
+       them, so a group stacking down joins it too. */
     const control = rule('[part="button"]')
-    expect(control).toMatch(/border-start-start-radius: var\(\s*--button-radius-start,/)
-    expect(control).toMatch(/border-end-end-radius: var\(\s*--button-radius-end,/)
+    expect(control).toMatch(
+      /border-start-start-radius: var\(\s*--button-radius-start-start,\s*var\(--button-radius-start,/,
+    )
+    expect(control).toMatch(
+      /border-end-end-radius: var\(\s*--button-radius-end-end,\s*var\(--button-radius-end,/,
+    )
     expect(control).not.toMatch(/\nborder-radius:/)
     expect(rule(':host([shape="circle"]) [part="button"]')).toContain(
       'border-radius: var(--helix-radii-full)',
     )
   })
 
-  test('raised is a shadow and not a line', () => {
-    // What is under a floating control is the page, and a border drawn on the
-    // page says the control is part of it.
-    expect(rule(':host([raised]) [part="button"]')).toContain(
-      'box-shadow: var(--icon-button-shadow, var(--helix-shadow-md))',
+  test('raised floats as the theme says what floats is drawn', () => {
+    /* The theme's floating edge and lift, as a popover's: a fixed shadow of its
+       own made a raised button the one floating thing on a page that ignored
+       it. */
+    const raised = rule(':host([raised]) [part="button"]')
+    expect(raised).toContain('box-shadow: var(--icon-button-shadow, var(--helix-shadow-floating))')
+    expect(raised).toContain(
+      'border-width: var(--icon-button-border-width, var(--helix-border-floating))',
+    )
+  })
+
+  test('material is the ground of every emphasis but solid', () => {
+    for (const material of ['frosted', 'glass', 'transparent']) {
+      expect(sheet()).toContain(
+        `:host([material="${material}"]:not([emphasis="solid"])) [part="button"]`,
+      )
+    }
+    expect(sheet()).toMatch(
+      /backdrop-filter: var\(--icon-button-backdrop, var\(--helix-material-backdrop\)\)/,
     )
   })
 
   test('the hooks the docs name are what the sheet reads', () => {
-    for (const hook of ['--icon-button-radius', '--icon-button-shadow', '--icon-button-size']) {
+    for (const hook of [
+      '--icon-button-backdrop',
+      '--icon-button-border-color',
+      '--icon-button-border-width',
+      '--icon-button-radius',
+      '--icon-button-shadow',
+      '--icon-button-size',
+    ]) {
       // A fallback written across lines keeps its line breaks in the sheet.
       expect(sheet()).toMatch(new RegExp(`var\\(\\s*${hook},`))
     }

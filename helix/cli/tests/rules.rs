@@ -611,6 +611,43 @@ fn corners() {
     );
 }
 
+/// A round control that floats says so with `radii-full`, as a square one
+/// says so with `radii-none`, and a different rung still fails.
+#[test]
+fn corners_round() {
+    plant_in(
+        "corners-round",
+        "corners",
+        &[
+            ("helix.json", TIERS),
+            (
+                "src/fab/fab.css",
+                r#"[part="button"] {
+  box-shadow: var(--helix-shadow-floating);
+}
+:host([shape="circle"]) [part="button"] {
+  border-radius: var(--helix-radii-full);
+}
+"#,
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "src/fab/fab.css",
+                r#"[part="button"] {
+  box-shadow: var(--helix-shadow-floating);
+}
+:host([shape="circle"]) [part="button"] {
+  border-radius: var(--helix-radii-md);
+}
+"#,
+            );
+        },
+        "`button` floats and sets `border-radius: var(--helix-radii-md)`, which is not the corner every other floating panel takes",
+        "src/fab/fab.css",
+    );
+}
+
 /// `layer` is mandatory: with it empty the rule reports nothing at all, and
 /// with it naming a sheet that derives nothing it reports that instead.
 #[test]
