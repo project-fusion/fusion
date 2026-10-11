@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -136,12 +136,12 @@ describe('a loader with a delay', () => {
     )) as Loader
     expect(part(loader, 'svg')?.hasAttribute('hidden')).toBe(true)
     expect(loader.internals.ariaHidden).toBe('true')
-    expect(loader.internals.states.has('waiting')).toBe(true)
+    expect(hasState(loader, 'waiting')).toBe(true)
     await new Promise((done) => setTimeout(done, 40))
     await loader.updateComplete
     expect(part(loader, 'svg')?.hasAttribute('hidden')).toBe(false)
     expect(loader.internals.ariaHidden ?? null).toBeNull()
-    expect(loader.internals.states.has('waiting')).toBe(false)
+    expect(hasState(loader, 'waiting')).toBe(false)
   })
 
   test('shows at once without one', async () => {

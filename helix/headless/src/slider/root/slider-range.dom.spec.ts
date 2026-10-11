@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { formValue, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -446,14 +446,14 @@ describe('a press on a range track', () => {
       press(host, 'pointerdown', 188)
       await host.updateComplete
       expect(host.value).toBe('20,90')
-      expect(host.internals.states.has('dragging')).toBe(true)
+      expect(hasState(host, 'dragging')).toBe(true)
       press(host, 'pointermove', 158)
       await host.updateComplete
       expect(host.value).toBe('20,75')
       press(host, 'pointerup', 158)
       window.dispatchEvent(new Event('pointerup'))
     })
-    expect(host.internals.states.has('dragging')).toBe(false)
+    expect(hasState(host, 'dragging')).toBe(false)
     expect(heard).toEqual(['20,75'])
     expect(host.shadowRoot?.activeElement?.getAttribute('data-thumb')).toBe('end')
   })

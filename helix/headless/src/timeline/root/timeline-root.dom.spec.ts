@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { at, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { at, hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -73,7 +73,7 @@ describe('a timeline', () => {
     expect(loading.textContent?.trim()).toBe('Loading more')
     const internals = (host as unknown as { internals: ElementInternals }).internals
     expect(internals.ariaBusy).toBe('true')
-    expect(internals.states.has('loading')).toBe(true)
+    expect(hasState(host, 'loading')).toBe(true)
     host.loading = false
     await host.updateComplete
     expect(part(host, 'loading')).toBeNull()

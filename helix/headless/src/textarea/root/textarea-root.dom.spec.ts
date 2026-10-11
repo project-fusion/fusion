@@ -1,5 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  formValue,
+  hasState,
+  mount,
+  part,
+  registerDom,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -166,11 +173,10 @@ describe('clearing, your own rule, and an empty field', () => {
     const host = (await mount(
       '<helix-headless-textarea label="Note"></helix-headless-textarea>',
     )) as Area
-    const states = (host as unknown as { internals: ElementInternals }).internals.states
-    expect(states.has('blank')).toBe(true)
+    expect(hasState(host, 'blank')).toBe(true)
     host.value = 'Hi'
     await host.updateComplete
-    expect(states.has('blank')).toBe(false)
+    expect(hasState(host, 'blank')).toBe(false)
   })
 })
 

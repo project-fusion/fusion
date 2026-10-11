@@ -161,21 +161,21 @@ describe('announcement', () => {
       '<helix-headless-announcement duration="40">Trial ends Friday</helix-headless-announcement>',
     )) as HTMLElement & { internals: ElementInternals }
     announcement.addEventListener('helix-dismiss', () => asked.push('dismiss'))
-    expect(announcement.internals.states.has('paused')).toBe(false)
+    expect(hasState(announcement, 'paused')).toBe(false)
     announcement.dispatchEvent(new Event('focusin'))
-    expect(announcement.internals.states.has('paused')).toBe(true)
+    expect(hasState(announcement, 'paused')).toBe(true)
     announcement.dispatchEvent(new Event('focusout'))
-    expect(announcement.internals.states.has('paused')).toBe(false)
+    expect(hasState(announcement, 'paused')).toBe(false)
 
     let away = true
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => away })
     document.dispatchEvent(new Event('visibilitychange'))
-    expect(announcement.internals.states.has('paused')).toBe(true)
+    expect(hasState(announcement, 'paused')).toBe(true)
     await new Promise((resolve) => setTimeout(resolve, 80))
     expect(asked).toEqual([])
     away = false
     document.dispatchEvent(new Event('visibilitychange'))
-    expect(announcement.internals.states.has('paused')).toBe(false)
+    expect(hasState(announcement, 'paused')).toBe(false)
     await new Promise((resolve) => setTimeout(resolve, 80))
     expect(asked).toEqual(['dismiss'])
   })

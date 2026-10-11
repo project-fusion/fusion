@@ -1,5 +1,12 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  formValue,
+  hasLayout,
+  hasState,
+  mount,
+  part,
+  registerDom,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -582,7 +589,7 @@ describe('a time picker says when its time is wrong', () => {
     const host = (await picker('max="12:00" value="13:00"')) as Checked
     expect(host.internals.validity.rangeOverflow).toBe(true)
     expect(list(host)?.getAttribute('aria-invalid')).toBe('true')
-    expect(host.internals.states.has('invalid')).toBe(true)
+    expect(hasState(host, 'invalid')).toBe(true)
     expect(host.internals.ariaInvalid).toBe('true')
   })
 
@@ -590,14 +597,14 @@ describe('a time picker says when its time is wrong', () => {
     const host = (await picker('required')) as Checked
     expect(host.internals.validity.valueMissing).toBe(true)
     expect(list(host)?.hasAttribute('aria-invalid')).toBe(false)
-    expect(host.internals.states.has('invalid')).toBe(false)
+    expect(hasState(host, 'invalid')).toBe(false)
     host.dispatchEvent(new Event('invalid'))
     await host.updateComplete
     expect(list(host)?.getAttribute('aria-invalid')).toBe('true')
-    expect(host.internals.states.has('invalid')).toBe(true)
+    expect(hasState(host, 'invalid')).toBe(true)
     host.formResetCallback()
     await host.updateComplete
-    expect(host.internals.states.has('invalid')).toBe(false)
+    expect(hasState(host, 'invalid')).toBe(false)
   })
 })
 
@@ -834,7 +841,7 @@ describe('a time picker’s own message', () => {
     }
     expect(part(host, 'feedback')?.textContent).toBe('Pick a time after lunch')
     expect(host.validationMessage).toBe('Pick a time after lunch')
-    expect(host.internals.states.has('invalid')).toBe(true)
+    expect(hasState(host, 'invalid')).toBe(true)
     expect(part(host, 'list')?.getAttribute('aria-invalid')).toBe('true')
   })
 

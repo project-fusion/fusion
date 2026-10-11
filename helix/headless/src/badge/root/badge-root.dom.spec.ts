@@ -331,7 +331,7 @@ describe('a badge with an icon', () => {
     expect(icon?.getAttribute('aria-hidden')).toBe('true')
     expect(indicator?.textContent).toBe('3')
     expect(indicator?.getAttribute('aria-label')).toBe('3 new')
-    expect(badge.internals.states.has('has-icon')).toBe(true)
+    expect(hasState(badge, 'has-icon')).toBe(true)
   })
 
   test('with no value, the icon is the whole mark, drawn where the dot would be', async () => {
@@ -341,7 +341,7 @@ describe('a badge with an icon', () => {
     await badge.updateComplete
     const indicator = part(badge, 'indicator')
     expect(indicator?.hasAttribute('data-dot')).toBe(true)
-    expect(badge.internals.states.has('dot')).toBe(false)
+    expect(hasState(badge, 'dot')).toBe(false)
     expect(indicator?.getAttribute('aria-label')).toBe('Verified')
   })
 
@@ -353,8 +353,8 @@ describe('a badge with an icon', () => {
     )) as Badge
     await bare.updateComplete
     expect(part(bare, 'indicator')?.hasAttribute('data-dot')).toBe(true)
-    expect(bare.internals.states.has('dot')).toBe(true)
-    expect(bare.internals.states.has('has-icon')).toBe(false)
+    expect(hasState(bare, 'dot')).toBe(true)
+    expect(hasState(bare, 'has-icon')).toBe(false)
     const counted = await mount(
       '<helix-headless-badge value="2"><span>x</span></helix-headless-badge>',
     )
@@ -371,12 +371,12 @@ describe('a badge with an icon', () => {
     badge.append(icon)
     await new Promise((resolve) => setTimeout(resolve, 0))
     await badge.updateComplete
-    expect(badge.internals.states.has('has-icon')).toBe(true)
-    expect(badge.internals.states.has('dot')).toBe(false)
+    expect(hasState(badge, 'has-icon')).toBe(true)
+    expect(hasState(badge, 'dot')).toBe(false)
     icon.remove()
     await new Promise((resolve) => setTimeout(resolve, 0))
     await badge.updateComplete
-    expect(badge.internals.states.has('has-icon')).toBe(false)
-    expect(badge.internals.states.has('dot')).toBe(true)
+    expect(hasState(badge, 'has-icon')).toBe(false)
+    expect(hasState(badge, 'dot')).toBe(true)
   })
 })
