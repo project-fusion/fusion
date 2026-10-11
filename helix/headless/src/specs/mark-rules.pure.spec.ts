@@ -33,6 +33,7 @@ const RULES: ReadonlyArray<readonly [string, RegExp]> = [
   ['VIRTUAL_RULE', /new (?:OptionWindow|Virtualize)Controller\b/],
   ['SPOKEN_RULE', /data-spoken/],
   ['MIRROR_RULE', /data-mirror/],
+  ['TOUCHES_RULE', /data-touches/],
 ]
 
 /** The rules a module's code calls for, in declaration order. */

@@ -16,6 +16,7 @@ import {
   hostAria,
   numberConverter,
   SPOKEN_RULE,
+  TOUCHES_RULE,
   words,
 } from '@fusion.dev/helix-core'
 import {
@@ -87,9 +88,15 @@ const RESTING_CONTROLS = 'home screenshot'
 const leaves = (event: KeyboardEvent): boolean =>
   event.key === 'Tab' && !event.ctrlKey && !event.metaKey && !event.altKey
 
-/** Whether a key press is the paste shortcut, which pastes in every mode. */
+/**
+ * Whether a key press is the paste shortcut, which pastes in every mode. By
+ * the physical key as well as the character, since a Russian layout's V types
+ * `м`.
+ */
 const pastes = (event: KeyboardEvent): boolean =>
-  (event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 'v'
+  (event.ctrlKey || event.metaKey) &&
+  !event.altKey &&
+  (event.code === 'KeyV' || event.key.toLowerCase() === 'v')
 
 /**
  * @summary A device's screen, drawn from a stream you supply, that sends taps, swipes, keys, and button presses back to the device.
@@ -159,7 +166,7 @@ const pastes = (event: KeyboardEvent): boolean =>
  * @slot fullscreen-icon - Replaces the glyph inside the fullscreen button.
  * @slot header - Content above the device, such as its name and state.
  * @slot home-icon - Replaces the glyph inside the Home button.
- * @slot loading - Content shown over the screen while `loading` is set. `loading-label` by default.
+ * @slot loading - Content shown over the screen while `loading` is set, such as a spinner. `loading-label` by default, which screen readers hear either way.
  * @slot power-icon - Replaces the glyph inside the Power button.
  * @slot recents-icon - Replaces the glyph inside the Recent apps button.
  * @slot rotate-left-icon - Replaces the glyph inside the Rotate left button.
@@ -185,8 +192,9 @@ const pastes = (event: KeyboardEvent): boolean =>
  * @csspart fullscreen - The button that makes the device fill the screen.
  * @csspart header - The strip above the device.
  * @csspart home - The Home button.
- * @csspart keys-hint - What a screen reader says about the keys when it reaches the screen. Read by screen readers only.
- * @csspart loading - The box over the screen that holds the `loading` slot while `loading` is set.
+ * @csspart keys-hint - What a screen reader says about the keys when it reaches the screen, as its description. Read by screen readers only.
+ * @csspart live - What screen readers hear while `loading` is set: `loading-label`. Read by screen readers only.
+ * @csspart loading - The box over the screen that holds the `loading` slot while `loading` is set. Screen readers hear `live` in its place.
  * @csspart picture - The box the stream is drawn in, turned by `rotation`.
  * @csspart power - The Power button.
  * @csspart recents - The Recent apps button.
@@ -223,7 +231,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
    */
   static words = 'helix-device-screen'
 
-  protected static override markRules = [SPOKEN_RULE]
+  protected static override markRules = [SPOKEN_RULE, TOUCHES_RULE]
 
   /** The Back button's label. */
   @words
@@ -246,12 +254,13 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
   controlsLabel = 'Device controls'
 
   /**
-   * Where the hardware buttons sit. Absent is a row above the device;
-   * `bottom` is a row below it, and `start` and `end` are a column beside it
-   * at that side, as the Android Emulator draws its toolbar.
+   * Which side of the device the hardware buttons sit on. Absent and `top`
+   * are a row above it, `bottom` is a row below it, and `start` and `end` are
+   * a column beside it, as the Android Emulator draws its toolbar. The words
+   * are sides, as Carousel's are, and not the corners a map's controls take.
    */
   @property({ attribute: 'controls-placement', reflect: true })
-  controlsPlacement?: 'bottom' | 'end' | 'start'
+  controlsPlacement?: 'bottom' | 'end' | 'start' | 'top'
 
   /** The screen's name where `label` is empty and the host has no `aria-label`. */
   @words
@@ -293,7 +302,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
 
   /**
    * Shows the `loading` slot over the screen, for a stream that is starting
-   * or has stopped. Screen readers hear it.
+   * or has stopped. Screen readers hear `loading-label`.
    */
   @property({ type: Boolean })
   loading = false
@@ -351,8 +360,9 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
 
   /**
    * The screen's height in the units your device takes input in: points for
-   * the iOS Simulator, pixels for an Android device. Absent is the stream's
-   * own height in pixels.
+   * the iOS Simulator, pixels for an Android device. Set with `screen-width`.
+   * Set alone, the width follows the stream's shape, and with neither, both
+   * are the stream's own size in pixels.
    */
   @property({ attribute: 'screen-height', converter: numberConverter('screen-height', undefined) })
   screenHeight?: number | undefined
@@ -364,7 +374,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
 
   /**
    * The screen's width in the units your device takes input in, as
-   * `screen-height` is. Absent is the stream's own width in pixels.
+   * `screen-height` is. Set alone, the height follows the stream's shape.
    */
   @property({ attribute: 'screen-width', converter: numberConverter('screen-width', undefined) })
   screenWidth?: number | undefined
@@ -441,13 +451,31 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
     return quarterTurns(this.rotation)
   }
 
-  /** The screen's size in the device's own way up, where the page or the stream has said it. */
+  /**
+   * The screen's size in the device's own way up, where the page or the stream
+   * has said it.
+   *
+   * **One side from the page is never mixed with the other from the stream**,
+   * which counts in pixels where the page may count in points: the missing
+   * side is the given one turned by the stream's shape.
+   */
   private get size(): ScreenSize | undefined {
-    const width = this.screenWidth ?? this.intrinsic?.width
-    const height = this.screenHeight ?? this.intrinsic?.height
-    return width !== undefined && height !== undefined && width > 0 && height > 0
-      ? { height, width }
-      : undefined
+    const given = (value: number | undefined): value is number =>
+      value !== undefined && Number.isFinite(value) && value > 0
+    const { intrinsic, screenHeight: height, screenWidth: width } = this
+    if (given(width) && given(height)) {
+      return { height, width }
+    }
+    if (!intrinsic) {
+      return undefined
+    }
+    if (given(width)) {
+      return { height: (width * intrinsic.height) / intrinsic.width, width }
+    }
+    if (given(height)) {
+      return { height, width: (height * intrinsic.width) / intrinsic.height }
+    }
+    return intrinsic
   }
 
   /**
@@ -470,11 +498,10 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
   }
 
   /**
-   * Reads the stream's own size off the element drawing it, by its tag: a
-   * server has no `HTMLVideoElement` to compare with.
+   * An element's own size in pixels, read by its tag: a server has no
+   * `HTMLVideoElement` to compare with.
    */
-  private measure(): void {
-    const element = this.watched
+  private sizeOf(element: Element | undefined): ScreenSize | undefined {
     const read =
       element?.localName === 'video'
         ? {
@@ -492,7 +519,12 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
                 width: (element as HTMLCanvasElement).width,
               }
             : undefined
-    const next = read && read.width > 0 && read.height > 0 ? read : undefined
+    return read && read.width > 0 && read.height > 0 ? read : undefined
+  }
+
+  /** Reads the stream's own size off the element drawing it. */
+  private measure(): void {
+    const next = this.sizeOf(this.watched)
     if (next?.width !== this.intrinsic?.width || next?.height !== this.intrinsic?.height) {
       this.intrinsic = next
     }
@@ -926,8 +958,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
         `<${this.localName}> has no stream to capture. Put a <video>, an <img>, or a <canvas> inside it.`,
       )
     }
-    this.measure()
-    const size = this.intrinsic
+    const size = this.sizeOf(source)
     if (!size) {
       throw new Error(`<${this.localName}> has no frame to capture yet.`)
     }
@@ -984,13 +1015,17 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
     }
   }
 
-  /** Where a point in the device's units is drawn, as a fraction of the drawn screen. */
+  /**
+   * Where a point in the device's units is drawn, as a fraction of the drawn
+   * screen, measured against the size the events carry, so a point an event
+   * sent is drawn where it came from.
+   */
   private drawnAt(x: number, y: number): Fraction | undefined {
-    const size = this.size
-    if (!(size && Number.isFinite(x) && Number.isFinite(y))) {
+    const { height, width } = this.sizeFor()
+    if (!(width > 0 && height > 0 && Number.isFinite(x) && Number.isFinite(y))) {
       return undefined
     }
-    return turn({ u: x / size.width, v: y / size.height }, this.turns)
+    return turn({ u: x / width, v: y / height }, this.turns)
   }
 
   /** Adds a ring, and takes it away once it has been seen. */
@@ -1014,6 +1049,11 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
     }
   }
 
+  /**
+   * Taken off the page mid-touch or with a key down, as a pane closing is:
+   * each finger is sent as canceled and each key as released, or the device
+   * would hold them down.
+   */
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.unwatch()
@@ -1021,9 +1061,13 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
       clearTimeout(timer)
     }
     this.timers.clear()
+    for (const finger of this.fingers.values()) {
+      this.sendTouch('cancel', finger)
+    }
     this.fingers.clear()
     this.crowd = 0
-    this.held.clear()
+    this.toggleState('touching', false)
+    this.handleBlur()
     this.marks = []
   }
 
@@ -1190,7 +1234,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
       <div part="header">
         <slot name="header"></slot>
       </div>
-      ${placement === undefined ? controls : nothing}
+      ${placement === undefined || placement === 'top' ? controls : nothing}
       <div part="device">
         ${placement === 'start' ? controls : nothing}
         <div part="bezel">
@@ -1201,6 +1245,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
             aria-roledescription=${this.roleLabel || nothing}
             aria-describedby=${interactive ? 'keys-hint' : nothing}
             tabindex=${interactive ? '0' : nothing}
+            ?data-touches=${interactive}
             @blur=${this.handleBlur}
             @keydown=${this.handleKeydown}
             @keyup=${this.handleKeyup}
@@ -1215,7 +1260,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               <slot @slotchange=${this.handleSlotChange}></slot>
             </div>
             ${this.renderMarks()}
-            <div part="loading" role="status">
+            <div part="loading" aria-hidden="true">
               ${this.loading ? html`<slot name="loading">${this.loadingLabel}</slot>` : nothing}
             </div>
           </div>
@@ -1227,7 +1272,8 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
       <div part="footer">
         <slot name="footer"></slot>
       </div>
-      <span part="keys-hint" id="keys-hint" data-spoken>${interactive ? this.keysHintLabel : ''}</span>
+      <span part="keys-hint" id="keys-hint" aria-hidden="true" data-spoken>${interactive ? this.keysHintLabel : ''}</span>
+      <span part="live" role="status" data-spoken>${this.loading ? this.loadingLabel : ''}</span>
     </div>`
   }
 }

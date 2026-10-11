@@ -25,6 +25,7 @@ describe('device screen server output', () => {
     expect(screen).toContain('aria-roledescription="screen"')
     expect(screen).toContain('tabindex="0"')
     expect(screen).toContain('aria-describedby="keys-hint"')
+    expect(screen).toContain('data-touches')
   })
 
   test('the description the screen points at is served beside it', () => {
@@ -52,6 +53,7 @@ describe('device screen server output', () => {
       'header',
       'home',
       'keys-hint',
+      'live',
       'loading',
       'picture',
       'region',
@@ -85,7 +87,18 @@ describe('device screen server output', () => {
     )
     expect(screen).toContain('role="img"')
     expect(screen).not.toContain('tabindex')
+    expect(screen).not.toContain('data-touches')
     expect(screen).not.toContain('aria-describedby')
+  })
+
+  test('`top` puts the buttons where they rest, before the device', () => {
+    const markup = rendered(
+      served(
+        html`<helix-headless-device-screen label="iPhone" controls-placement="top"></helix-headless-device-screen>`,
+      ),
+      'helix-headless-device-screen',
+    )
+    expect(markup.indexOf('part="controls"')).toBeLessThan(markup.indexOf('part="screen"'))
   })
 
   test('a frame that keeps no buttons ships none', () => {

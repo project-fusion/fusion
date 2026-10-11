@@ -137,3 +137,18 @@ export const SPOKEN_RULE =
  * whatever the script, and so is a picture of a key.
  */
 export const MIRROR_RULE = ':host(:dir(rtl)) [data-mirror]{scale:-1 1}'
+
+/**
+ * Hands every touch on an element to the component, which reads each one as
+ * input of its own.
+ *
+ * **Without it a one-finger drag is the page's.** The browser scrolls or zooms
+ * and sends the component `pointercancel`, so it never sees the finger move or
+ * lift. Device Screen turns touches into touches on a device and has that
+ * behavior only while `touch-action` is `none`, which makes the rule a
+ * mechanism, as the scroller's `overflow` is.
+ *
+ * Marked only while the component takes touches, so a read-only Device Screen
+ * leaves the page its scroll.
+ */
+export const TOUCHES_RULE = '[data-touches]{touch-action:none}'

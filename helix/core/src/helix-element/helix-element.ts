@@ -481,8 +481,8 @@ export class HelixElement extends LitElement {
 
   /**
    * The rules from `mark-rules.ts` for the marks this element writes in its
-   * own shadow root: `data-scroller`, `data-virtual`, `data-spoken` and
-   * `data-mirror`.
+   * own shadow root: `data-scroller`, `data-virtual`, `data-spoken`,
+   * `data-mirror` and `data-touches`.
    *
    * A component that writes a mark names its rule here, and a subclass
    * inherits the list. One that writes none takes only the three rules every

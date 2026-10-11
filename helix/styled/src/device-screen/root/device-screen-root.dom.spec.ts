@@ -55,6 +55,23 @@ describe('styled device screen', () => {
       expect(screen.width / screen.height).toBeCloseTo(1180 / 820, 2)
     })
 
+    test('a column of buttons too tall for the frame scrolls, and the device stays inside its box', async () => {
+      const device = (await mount(
+        `<div style="inline-size: 30rem">
+          <helix-device-screen label="Pixel" controls="back home recents power volume rotate screenshot" controls-placement="end" screen-width="412" screen-height="915" style="--device-screen-block-size: 16rem"></helix-device-screen>
+        </div>`,
+      ).then((host) => host.querySelector('helix-device-screen'))) as Device
+      await device.updateComplete
+      const area = boxOf(device, 'device')
+      const bezel = boxOf(device, 'bezel')
+      const column = part(device, 'controls') as HTMLElement
+      const columnBox = column.getBoundingClientRect()
+      expect(column.scrollHeight).toBeGreaterThan(column.clientHeight)
+      expect(columnBox.right).toBeLessThanOrEqual(area.right + 0.5)
+      expect(bezel.right).toBeLessThanOrEqual(columnBox.left + 0.5)
+      expect(bezel.left).toBeGreaterThanOrEqual(area.left - 0.5)
+    })
+
     test('a plain device is the screen alone', async () => {
       const device = (await mount(
         `<div style="inline-size: 30rem">
