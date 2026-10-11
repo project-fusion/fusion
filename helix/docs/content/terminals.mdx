@@ -171,6 +171,47 @@ frame.addEventListener('helix-terminal-restart', () => {
 Use `xtermDriver(terminal, addons)` for xterm.js 6. xterm.js is not bundled
 with Helix, so you can use the version you already have.
 
+## Use other xterm.js addons
+
+You create the xterm.js terminal, so you load any addon on it the way
+xterm.js describes, before or after you connect. This loads the WebGL renderer
+and the Unicode 11 character widths:
+
+```js
+import { Unicode11Addon } from '@xterm/addon-unicode11'
+import { WebglAddon } from '@xterm/addon-webgl'
+
+const terminal = new Terminal({
+  ...xtermOptions(await terminalThemeReady(frame)),
+  allowProposedApi: true,
+})
+terminal.open(document.getElementById('terminal'))
+terminal.loadAddon(new WebglAddon())
+terminal.loadAddon(new Unicode11Addon())
+terminal.unicode.activeVersion = '11'
+```
+
+The connector sets the theme, the face, and its options on the terminal
+itself, so an addon such as the WebGL renderer draws in your theme and keeps
+the contrast floor.
+
+- **Fit, search, and web links go to the driver.** Pass them to `xtermDriver`
+  unloaded, and the driver loads them: an addon loaded twice breaks. They are
+  also what draws the frame's find bar and sends `helix-terminal-link`. With a
+  search addon of your own, the frame draws no Find control, and with a web
+  links addon of your own, a link it finds skips the event.
+- **Some addons need xterm.js's proposed API.** xterm.js refuses its Unicode
+  handling, decorations, markers, and character joiners until
+  `allowProposedApi` is on, and the Unicode 11 addon uses the first of these.
+  The driver turns the option on while it holds a search addon and puts it
+  back as it was on disconnect, so set it when you create the terminal for any
+  other addon that needs it.
+- **The connection owns the link handler.** While connected, the driver sets
+  xterm.js's `linkHandler` so every link reaches `helix-terminal-link`, and it
+  puts yours back on disconnect. Listen for the event to handle a link.
+- **The key handler stays yours.** The frame takes its own keys before xterm.js
+  sees them, so `attachCustomKeyEventHandler` is free for keys of your own.
+
 ## Style the terminal with your theme
 
 The frame reads each color from a custom property, and the connector draws
