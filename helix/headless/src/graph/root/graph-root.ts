@@ -92,7 +92,9 @@ const LONG_LAYOUT = 5000
  * or hides its notes. `hiddenGroups` holds the groups turned off, and the
  * list holds only what the drawing shows. The legend is a toolbar and one tab
  * stop: the arrow keys, Home, End and a group's first letters move between
- * its buttons, and Space or Enter presses one.
+ * its buttons, and Space or Enter presses one. The pan and zoom buttons are
+ * a toolbar and one tab stop too, the arrow keys moving between them by where
+ * they sit on screen.
  *
  * `nodes` and `links` are properties, never markup: a graph of ten thousand
  * notes as ten thousand elements would cost what the renderer exists to save.
@@ -135,7 +137,7 @@ const LONG_LAYOUT = 5000
  * @csspart after - The room the notes after those drawn would take, so the list scrolls its whole length.
  * @csspart before - The room the notes before those drawn would take.
  * @csspart body - The drawing beside the list, or above it where the frame is narrow.
- * @csspart controls - The group the pan and zoom buttons sit in.
+ * @csspart controls - The toolbar the pan and zoom buttons sit in, one tab stop.
  * @csspart count - How many notes the list holds, which a search narrows, at the end of the search bar.
  * @csspart empty - The box in place of the list when it holds no notes, holding the `empty` slot.
  * @csspart filter-icon - The icon beside the search field.
