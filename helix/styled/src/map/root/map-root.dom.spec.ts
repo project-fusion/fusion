@@ -94,9 +94,8 @@ describe('map frame hooks', () => {
       /* An id copied into the Icon Button's shadow root named nothing there, so
        the menu travels as the element, where the engine reflects it. */
       if ('ariaControlsElements' in button) {
-        expect(button.ariaControlsElements?.[0]).toBe(
-          frame.shadowRoot?.getElementById('layers-menu'),
-        )
+        const menu = frame.shadowRoot?.getElementById('layers-menu')
+        expect(button.ariaControlsElements?.[0] === menu).toBe(true)
       }
     },
   )
