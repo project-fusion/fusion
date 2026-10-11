@@ -395,7 +395,7 @@
     },
     "helix/terminal": {
       "name": "@fusion.dev/helix-terminal",
-      "version": "0.208.0",
+      "version": "0.208.1",
       "dependencies": {
         "@fusion.dev/helix-core": "helix/core",
       },
