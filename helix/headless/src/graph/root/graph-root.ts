@@ -1,7 +1,6 @@
 import {
   auditName,
   customElement,
-  focusItemOf,
   formatWords,
   type GraphSignalDetail,
   HelixElement,
@@ -13,15 +12,14 @@ import {
   HelixGraphSignalEvent,
   HelixGraphZoomEvent,
   isRtl,
-  KeyboardNavigationController,
   MixinControllerActive,
   MixinViewport,
   numberConverter,
   SCROLLER_RULE,
   scrollRoom,
   scrollWithin,
+  ToolbarController,
   Typeahead,
-  typeaheadBy,
   VIRTUAL_RULE,
   type ViewportPanDetail,
   type ViewportZoomDetail,
@@ -527,24 +525,19 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
    */
   private selectionAsked: string | undefined
 
-  /** The legend's button that holds its one tab stop, by place: the one a reader was last on, or the first. */
-  @state()
-  private legendStop = 0
-
   /**
-   * The arrow keys, Home, End and typed letters among the legend's buttons,
-   * so a legend of twelve groups is one tab stop, as the `Legend` family's
-   * toolbar is. Only a press that starts on a legend button moves: the frame's
-   * own arrows pan the drawing, and the list's walk the notes.
+   * The legend's buttons as one tab stop: the arrow keys, Home, End and typed
+   * letters move among them, so a legend of twelve groups is one tab stop, as
+   * the `Legend` family's toolbar is. Only a press that starts on a legend
+   * button moves: the frame's own arrows pan the drawing, and the list's walk
+   * the notes. Both axes, the buttons wrapping onto more lines.
    */
-  protected readonly legendKeys = new KeyboardNavigationController(this, {
-    items: () =>
-      [
-        ...(this.renderRoot?.querySelectorAll?.<HTMLButtonElement>('[part~="legend-item"]') ?? []),
-      ].map((button) => focusItemOf(button, { words: button.textContent?.trim() ?? '' })),
-    origin: 'focus',
-    selects: () => false,
-    typeahead: typeaheadBy((item) => (item as { words?: string }).words ?? ''),
+  protected readonly legendKeys = new ToolbarController(this, {
+    arrows: () => 'both',
+    members: () => [...(this.partNamed('legend')?.children ?? [])],
+    own: true,
+    watch: () => this.renderRoot,
+    words: (button) => button.textContent?.trim() ?? '',
   })
 
   private readonly virtualize = new VirtualizeController(this, {
@@ -902,23 +895,18 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       return nothing
     }
     const hidden = new Set(this.hiddenGroups)
-    const stop = Math.min(this.legendStop, this.groups.length - 1)
     /* **A toolbar**, the role that says the arrows move among its buttons,
        and one tab stop: a group of twelve buttons was twelve stops between
        the controls and the list. */
     return html`<div part="legend" role="toolbar" aria-label=${this.legendLabel}>
-      ${this.groups.map(({ name, tone }, index) => {
+      ${this.groups.map(({ name, tone }) => {
         const shown = !hidden.has(name)
         return html`<button
           part="legend-item${shown ? '' : ' legend-item-hidden'}"
           type="button"
-          tabindex=${index === stop ? '0' : '-1'}
           aria-pressed=${shown ? 'true' : 'false'}
           data-tone=${tone ?? nothing}
           @click=${() => this.toggleGroup(name)}
-          @focus=${() => {
-            this.legendStop = index
-          }}
         >
           <span part="legend-swatch" aria-hidden="true"></span>${name}
         </button>`

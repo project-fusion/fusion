@@ -132,9 +132,9 @@ export class HelixHeadlessToolbar extends HelixElement {
    * the elements assigned to it.
    */
   protected readonly tabStop = new ToolbarController(this, {
+    arrows: () => this.axis,
     members: () => [...this.children],
     nested: () => this.nested,
-    orientation: () => this.axis,
     stopAtEnds: () => this.stopAtEnds,
   })
 

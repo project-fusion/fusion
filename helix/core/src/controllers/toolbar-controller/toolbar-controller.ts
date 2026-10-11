@@ -1,6 +1,7 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import { keyClaimed } from '../../utils/key-claimed/key-claimed.js'
+import { Typeahead, typesCharacter } from '../../utils/typeahead/typeahead.js'
 
 /** Keys a toolbar handles, per the APG toolbar pattern. */
 const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'])
@@ -134,8 +135,20 @@ export interface ToolbarControllerOptions {
   members: () => Element[]
   /** Whether another toolbar around this one owns the keys and the tab stop. Unset, none does. */
   nested?: () => boolean
-  /** The direction the arrow keys move in. Unset, horizontal. */
-  orientation?: () => 'horizontal' | 'vertical' | undefined
+  /**
+   * How the arrow keys move between the controls. Unset, horizontal.
+   *
+   * - `horizontal`: Left and Right, in order, the left moving forward on a
+   *   right-to-left page. Up and Down are left to the control.
+   * - `vertical`: Up and Down, in order. Left and Right are left to the control.
+   * - `both`: Right and Down forward, Left and Up back, in order, for a row
+   *   that wraps onto more lines, as a legend's does.
+   * - `position`: each arrow to the nearest control that way on screen, for
+   *   a cluster laid out in two dimensions, such as a pan pad. It stops at
+   *   the edge rather than wrapping, and where nothing is laid out it moves
+   *   in order, as `both` does.
+   */
+  arrows?: () => 'both' | 'horizontal' | 'position' | 'vertical' | undefined
   /**
    * Whether the controls are the host's own, drawn in its shadow root, rather
    * than markup a page wrote. Its own controls take the tab stop as soon as
@@ -146,6 +159,11 @@ export interface ToolbarControllerOptions {
   own?: boolean
   /** Whether the arrow keys stop at the first and the last control. Unset, they wrap. */
   stopAtEnds?: () => boolean
+  /**
+   * The words a control is found by when a reader types its first letters,
+   * the way a native `<select>` finds an option. Unset, typing moves nothing.
+   */
+  words?: (control: HTMLElement) => string
   /**
    * Where a change to `disabled` or `aria-hidden` is watched for, which is
    * what moves the stop off a control that leaves the set. The host by
@@ -173,7 +191,7 @@ export interface ToolbarControllerOptions {
  *
  *     protected readonly controlKeys = new ToolbarController(this, {
  *       members: () => [...(this.partNamed('controls')?.children ?? [])],
- *       orientation: () => 'vertical',
+ *       arrows: () => 'position',
  *       own: true,
  *       watch: () => this.renderRoot,
  *     })
@@ -227,9 +245,12 @@ export class ToolbarController implements ReactiveController {
     return this.options.nested?.() ?? false
   }
 
-  private get axis(): 'horizontal' | 'vertical' {
-    return this.options.orientation?.() ?? 'horizontal'
+  private get arrows(): 'both' | 'horizontal' | 'position' | 'vertical' {
+    return this.options.arrows?.() ?? 'horizontal'
   }
+
+  /** The letters a reader has typed toward a control, where `words` is set. */
+  private readonly search = new Typeahead()
 
   /**
    * The members that take part, in order, each with the elements in it that
@@ -468,38 +489,125 @@ export class ToolbarController implements ReactiveController {
     }
   }
 
-  private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (this.nested || !KEYS.has(event.key) || keyClaimed(event)) {
-      return
+  /**
+   * The control a typed letter moves to, by the words `words` reads, or
+   * undefined where nothing matches or the press is no letter. A Space typed
+   * before any letter is left to the control, which it presses.
+   */
+  private typed(event: KeyboardEvent, controls: Control[], current: number): number | undefined {
+    const words = this.options.words
+    if (!words || !typesCharacter(event) || (event.key === ' ' && !this.search.typing())) {
+      return undefined
     }
+    const found = this.search.match(
+      event.key,
+      controls.map((control) => words(control.child)),
+      current,
+    )
+    return found === -1 ? undefined : found
+  }
+
+  /**
+   * The nearest control in an arrow's direction on screen, from the centers of
+   * the boxes: the distance along the arrow, with twice the distance across it
+   * added, so a control in line wins over a nearer one off to the side. `-1`
+   * where nothing lies that way, and undefined where nothing is laid out.
+   */
+  private toward(key: string, controls: Control[], current: number): number | undefined {
+    const boxes = controls.map((control) => control.child.getBoundingClientRect())
+    if (boxes.every((box) => box.width === 0 && box.height === 0)) {
+      return undefined
+    }
+    const from = boxes[current] as DOMRect
+    const [x, y] = [from.left + from.width / 2, from.top + from.height / 2]
+    const [dx, dy] = {
+      ArrowDown: [0, 1],
+      ArrowLeft: [-1, 0],
+      ArrowRight: [1, 0],
+      ArrowUp: [0, -1],
+    }[key] as [number, number]
+    let best = -1
+    let score = Number.POSITIVE_INFINITY
+    boxes.forEach((box, index) => {
+      if (index === current) {
+        return
+      }
+      const along = (box.left + box.width / 2 - x) * dx + (box.top + box.height / 2 - y) * dy
+      const across = Math.abs(
+        (box.left + box.width / 2 - x) * dy + (box.top + box.height / 2 - y) * dx,
+      )
+      if (along <= 1) {
+        return
+      }
+      if (along + across * 2 < score) {
+        score = along + across * 2
+        best = index
+      }
+    })
+    return best
+  }
+
+  /** Where an arrow key moves in order, forward or back, or undefined for one this toolbar leaves alone. */
+  private stepped(event: KeyboardEvent, controls: Control[], current: number): number | undefined {
+    const arrows = this.arrows
     /* Along the line on a horizontal toolbar, so the forward key is the left on
        a right-to-left page, where the first control is on the right. */
     const along = inlineStep(this.host, event.key)
-    const forward = this.axis === 'horizontal' ? along === 1 : event.key === 'ArrowDown'
-    const back = this.axis === 'horizontal' ? along === -1 : event.key === 'ArrowUp'
+    const down = event.key === 'ArrowDown'
+    const up = event.key === 'ArrowUp'
+    const forward =
+      arrows === 'vertical' ? down : arrows === 'horizontal' ? along === 1 : along === 1 || down
+    const back =
+      arrows === 'vertical' ? up : arrows === 'horizontal' ? along === -1 : along === -1 || up
+    const last = controls.length - 1
+    const stopAtEnds = this.options.stopAtEnds?.() ?? false
+    if (forward) {
+      return stopAtEnds ? Math.min(current + 1, last) : (current + 1) % controls.length
+    }
+    if (back) {
+      return stopAtEnds
+        ? Math.max(current - 1, 0)
+        : (current - 1 + controls.length) % controls.length
+    }
+    return undefined
+  }
 
+  private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (this.nested || keyClaimed(event)) {
+      return
+    }
     const controls = this.controls
     const origin = this.origin(event)
     const current = origin ? controls.findIndex((control) => control.child === origin.child) : -1
     if (current === -1) {
       return
     }
-
-    let next = current
-    const last = controls.length - 1
-    const stopAtEnds = this.options.stopAtEnds?.() ?? false
-    if (forward) {
-      next = stopAtEnds ? Math.min(current + 1, last) : (current + 1) % controls.length
-    } else if (back) {
-      next = stopAtEnds
-        ? Math.max(current - 1, 0)
-        : (current - 1 + controls.length) % controls.length
+    /* An arrow with a modifier is someone else's shortcut: Shift with an arrow
+       rotates a map from its controls, and selects text in a field. */
+    if (KEYS.has(event.key) && (event.shiftKey || event.ctrlKey || event.metaKey || event.altKey)) {
+      return
+    }
+    let next: number | undefined
+    if (!KEYS.has(event.key)) {
+      next = this.typed(event, controls, current)
     } else if (event.key === 'Home') {
       next = 0
     } else if (event.key === 'End') {
       next = controls.length - 1
+    } else if (this.arrows === 'position') {
+      const toward = this.toward(event.key, controls, current)
+      next = toward === undefined ? this.stepped(event, controls, current) : toward
+      if (next === -1) {
+        /* Nothing lies that way: the arrow is still the toolbar's, and the
+           page does not scroll under it. */
+        event.preventDefault()
+        return
+      }
     } else {
       // An arrow along the other axis is not ours; leave it to the page.
+      next = this.stepped(event, controls, current)
+    }
+    if (next === undefined) {
       return
     }
 

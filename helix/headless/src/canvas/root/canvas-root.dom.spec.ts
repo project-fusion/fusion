@@ -360,6 +360,18 @@ describe('canvas', () => {
     expect((part(host, 'viewport') as HTMLElement).getAttribute('style')).not.toBe(before)
   })
 
+  test('the pad is one toolbar, a single tab stop on its first button', async () => {
+    const host = await canvas('controls="pan zoom fullscreen"')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    const controls = part(host, 'controls')
+    expect(controls?.getAttribute('role')).toBe('toolbar')
+    const stops = [...(controls?.querySelectorAll('button') ?? [])].map((button) =>
+      button.getAttribute('tabindex'),
+    )
+    expect(stops.filter((stop) => stop === '0')).toHaveLength(1)
+    expect(stops[0]).toBe('0')
+  })
+
   test('a press moves the board and says that it did, rather than asking', async () => {
     /* `Map` asks and this tells, the difference being who draws. */
     const host = await canvas('controls="pan zoom fullscreen"')

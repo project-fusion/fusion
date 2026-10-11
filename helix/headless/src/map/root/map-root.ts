@@ -1220,7 +1220,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     if (!pan && !zoom && !rotate && !tilt && !fullscreen && menu === nothing) {
       return nothing
     }
-    return html`<div part="controls" role="group" aria-label=${this.controlsLabel}>
+    return html`<div part="controls" role="toolbar" aria-label=${this.controlsLabel}>
       ${
         fullscreen
           ? html`<button

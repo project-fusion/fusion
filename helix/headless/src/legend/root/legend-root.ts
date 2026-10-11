@@ -1,17 +1,15 @@
 import {
   customElement,
-  focusItemOf,
   HelixElement,
-  KeyboardNavigationController,
   requestValue,
   type Series,
   SourceController,
   seriesIndex,
   seriesKey,
-  typeaheadBy,
+  ToolbarController,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 import { isHidden, namesIn, toggledNames } from '../hidden-series.js'
 
 /**
@@ -136,28 +134,17 @@ export class HelixHeadlessLegend extends HelixElement {
   protected readonly source = new SourceController(this)
 
   /**
-   * The toggle that holds the one tab stop, by place: the one a reader was
-   * last on, or the first.
+   * The toggles as one tab stop: the arrow keys, Home, End and typed letters
+   * move among them, so a legend of twelve series is one tab stop, as a
+   * toolbar of toggle buttons is. Both axes, the entries wrapping onto more
+   * lines. Nothing without `toggles`, where there is nothing to press.
    */
-  @state()
-  private stop = 0
-
-  /**
-   * The arrow keys, Home, End and typed letters among the toggles, so a
-   * legend of twelve series is one tab stop, as a toolbar of
-   * toggle buttons is. Nothing without `toggles`, where there is nothing to
-   * press.
-   */
-  protected readonly keys = new KeyboardNavigationController(this, {
-    items: () =>
-      this.toggles
-        ? [...this.renderRoot.querySelectorAll<HTMLButtonElement>('[part="toggle"]')].map(
-            (button) => focusItemOf(button, { words: button.textContent?.trim() ?? '' }),
-          )
-        : [],
-    origin: 'focus',
-    selects: () => false,
-    typeahead: typeaheadBy((item) => (item as { words?: string }).words ?? ''),
+  protected readonly keys = new ToolbarController(this, {
+    arrows: () => 'both',
+    members: () => (this.toggles ? [...(this.partNamed('list')?.children ?? [])] : []),
+    own: true,
+    watch: () => this.renderRoot,
+    words: (button) => button.textContent?.trim() ?? '',
   })
 
   /** The table this legend last wrote its `hidden-series` to, so leaving undoes it. */
@@ -289,7 +276,6 @@ export class HelixHeadlessLegend extends HelixElement {
      * was the sixth copy. */
     const named = this.label || this.source.element?.querySelector('caption')?.textContent?.trim()
     const names = this.names()
-    const stop = Math.min(this.stop, names.length - 1)
     /* **Toggles are a toolbar**, the role that says the arrows move among
        its buttons; a list of pressed buttons said nothing of the one tab
        stop. Its items then carry no role of their own. */
@@ -307,7 +293,7 @@ export class HelixHeadlessLegend extends HelixElement {
           style="--chart-series: var(--chart-series-${seriesIndex(index)})"
           role=${toolbar ? 'none' : 'listitem'}
         >
-          ${this.renderSwatch(name, index)}${toolbar ? this.renderToggle(name, off, index, index === stop) : this.renderName(name, index)}
+          ${this.renderSwatch(name, index)}${toolbar ? this.renderToggle(name, off, index) : this.renderName(name, index)}
         </li>`
       })}
     </ul>`
@@ -338,20 +324,15 @@ export class HelixHeadlessLegend extends HelixElement {
    * The button around a name under `toggles`, behind a seam a tier can move.
    *
    * Pressed while its series is shown, which is the state a reader changes by
-   * pressing it: a toggle button says whether its thing is on. `holds` says
-   * whether it is the one tab stop, which is the last toggle a reader was on,
-   * the toggle at `index`.
+   * pressing it: a toggle button says whether its thing is on. Which toggle
+   * holds the one tab stop is `keys`'s to say, so the button names none.
    */
-  protected renderToggle(name: string, off: boolean, index = 0, holds = true): TemplateResult {
+  protected renderToggle(name: string, off: boolean, index = 0): TemplateResult {
     return html`<button
       aria-pressed=${off ? 'false' : 'true'}
       part="toggle"
-      tabindex=${holds ? '0' : '-1'}
       type="button"
       @click=${() => this.toggle(name)}
-      @focus=${() => {
-        this.stop = index
-      }}
     >
       ${this.renderName(name, index)}
     </button>`

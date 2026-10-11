@@ -2,6 +2,7 @@ import { html, type LitElement, nothing, type PropertyValues, type TemplateResul
 import { property, state } from 'lit/decorators.js'
 import { FullscreenController } from '../../controllers/fullscreen-controller/fullscreen-controller.js'
 import { IdleController } from '../../controllers/idle-controller/idle-controller.js'
+import { ToolbarController } from '../../controllers/toolbar-controller/toolbar-controller.js'
 import type { ViewportPanDetail, ViewportZoomDetail } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
@@ -410,6 +411,20 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
       this.filled = full
     })
 
+    /**
+     * The controls as one tab stop, the arrow keys moving between them by
+     * where they sit: the pad is laid out in two dimensions, so Right from the
+     * up arrow is the zoom in button beside it rather than the next in the
+     * markup. A family that draws its own controls in their place gets the same,
+     * since it reads whatever `controlsElement` holds.
+     */
+    protected readonly controlKeys = new ToolbarController(this, {
+      arrows: () => 'position',
+      members: () => [...(this.controlsElement?.children ?? [])],
+      own: true,
+      watch: () => this.renderRoot,
+    })
+
     protected readonly idle = new IdleController(
       this,
       () => this.idleDelay,
@@ -781,6 +796,13 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
       if (target !== own && !own.matches('[part~="controls"]')) {
         return
       }
+      /* **The arrows on the controls move between them**, the controls being
+         one tab stop: panning by key is the surface's own, from the region.
+         Plus and minus still zoom from a button, which takes neither. */
+      const modified = event.shiftKey || event.ctrlKey || event.metaKey || event.altKey
+      if (own.matches('[part~="controls"]') && !modified && /^(Arrow|Home$|End$)/.test(event.key)) {
+        return
+      }
       /* **A modifier is someone else's shortcut.** Control or Command with Plus
          is the browser's page zoom, which a reader with low vision relies on,
          and Alt with an arrow is Back and Forward: taken here, a press on the
@@ -851,7 +873,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
       const [up, start, end, down] = (['up', 'start', 'end', 'down'] as const).map((way) =>
         this.panGlyph(way),
       )
-      return html`<div part="controls" role="group" aria-label=${this.controlsLabel}>
+      return html`<div part="controls" role="toolbar" aria-label=${this.controlsLabel}>
         ${
           pan
             ? html`<button part="pan-up" aria-label=${this.panLabel('up')} type="button" @click=${() => this.pan('up')}>
