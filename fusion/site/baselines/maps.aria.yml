@@ -39,7 +39,7 @@
       - listitem: Walk from UT Tower to the route
       - listitem: Walk from the route to Barton Springs Pool
       - listitem: 3D buildings
-    - group "Map controls":
+    - toolbar "Map controls":
       - button "Fill the screen": ⤢
       - button "Map layers"
       - button "Show in 3D" [pressed]: 3D
@@ -101,7 +101,7 @@
   - group "Food and drink in Austin, 3,252 places":
     - list "Map layers":
       - listitem: Food and drink, 3,252 places from OpenStreetMap
-    - group "Map controls":
+    - toolbar "Map controls":
       - button "Fill the screen": ⤢
       - button "Zoom in": +
       - button "Zoom out": −
@@ -135,7 +135,7 @@
       - listitem: Land cover
       - listitem: Terrain
       - listitem: Contour lines
-    - group "Map controls":
+    - toolbar "Map controls":
       - button "Fill the screen": ⤢
       - button "Map layers"
       - button "Show in 3D": 3D
@@ -175,7 +175,7 @@
   - group "Weather radar over the United States":
     - list "Map layers":
       - listitem: Weather radar, The last 50 minutes, in 10-minute steps
-    - group "Map controls":
+    - toolbar "Map controls":
       - button "Fill the screen": ⤢
       - button "Zoom in": +
       - button "Zoom out": −

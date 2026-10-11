@@ -5,7 +5,7 @@
   - article "Review the draft"
   - button "From Review the draft to Publish the draft"
   - article "Publish the draft"
-  - group "Board controls":
+  - toolbar "Board controls":
     - button "Zoom in": +
     - button "Zoom out": −
     - button "Fill the screen": ⤢

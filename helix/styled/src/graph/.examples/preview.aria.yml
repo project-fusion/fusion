@@ -1,6 +1,6 @@
 - group "Company notes":
   - text: Graph
-  - group "Graph controls":
+  - toolbar "Graph controls":
     - button "Zoom in": +
     - button "Zoom out": −
     - button "Fill the screen": ⤢
