@@ -110,7 +110,7 @@
   - radio "Good" [checked]
   - radio "Great"
   - paragraph: Coverage
-  - heading "114 components in one package" [level=2]
+  - heading "115 components in one package" [level=2]
   - paragraph: Charts, data tables, chat, and date pickers use the same tokens as your buttons.
   - list "Key":
     - listitem: Ships an element
