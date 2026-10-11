@@ -3,124 +3,12 @@ import {
   closestInstance,
   customElement,
   HelixElement,
-  inlineStep,
-  keyClaimed,
+  ToolbarController,
   toolbarAround,
   words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
-
-/** Keys the toolbar handles, per the APG toolbar pattern. */
-const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'])
-
-/**
- * A control that owns its tab stop rather than taking one on its host.
- *
- * Checked as a property rather than with `instanceof`, for the same reason the
- * control list is: a toolbar holds anything, so the contract has to be
- * something a foreign element can satisfy.
- */
-const ownsTabStop = (node: HTMLElement): node is HTMLElement & { focusable: boolean } =>
-  'focusable' in node
-
-/** Elements the browser focuses with no help. */
-const NATIVE =
-  'a[href], button, input, select, textarea, [tabindex], [contenteditable=""], [contenteditable="true"]'
-
-/**
- * The same, inside a child's shadow root, less what is out of the tab order.
- * A menu row renders `tabindex="-1"`, and a menu is reached at its trigger.
- */
-const TABBABLE = NATIVE.replace('[tabindex]', '[tabindex]:not([tabindex="-1"])')
-
-/**
- * The control inside a custom element that its tab stop was written on, by
- * host. Remembered, because `tabindex="-1"` takes an element that is focusable
- * only by its `tabindex` out of `TABBABLE`, and the host would then look like
- * no control at all.
- */
-const innerStops = new WeakMap<HTMLElement, HTMLElement>()
-
-/**
- * Whether an element takes focus itself: natively, by owning a tab stop, or
- * through a shadow root that holds something focusable.
- *
- * Disabled and hidden elements do not count, and neither does an element that
- * only holds focusable children in its light DOM. A divider takes none, and a
- * menu's host passes focus to nothing: its trigger is the control.
- */
-const takesFocus = (node: Element): boolean => {
-  if (
-    !(node instanceof HTMLElement) ||
-    node.hasAttribute('disabled') ||
-    node.getAttribute('aria-hidden') === 'true'
-  ) {
-    return false
-  }
-  return (
-    node.matches(NATIVE) ||
-    ownsTabStop(node) ||
-    node.shadowRoot?.delegatesFocus === true ||
-    node.shadowRoot?.querySelector(TABBABLE) != null ||
-    innerStops.get(node)?.isConnected === true
-  )
-}
-
-/**
- * Where the tab stop of a control that offers no `focusable` is written.
- *
- * A custom element's own control, inside its open shadow root, where one is
- * there to find: the host is markup the consumer rendered, and an attribute
- * written on it is one a React consumer's hydration reports and does not patch
- * up. A native element, a host that already has a `tabindex`, or a host whose
- * shadow root is closed or holds nothing the browser tabs to takes it on
- * itself.
- */
-const stopOf = (node: HTMLElement): HTMLElement => {
-  if (node.hasAttribute('tabindex')) {
-    return node
-  }
-  const held = innerStops.get(node)
-  if (held?.isConnected && held.getRootNode() === node.shadowRoot) {
-    return held
-  }
-  const inner = node.localName.includes('-')
-    ? node.shadowRoot?.querySelector<HTMLElement>(TABBABLE)
-    : null
-  if (!inner) {
-    return node
-  }
-  innerStops.set(node, inner)
-  return inner
-}
-
-/**
- * A composite whose members the toolbar walks one by one: a toggle group of
- * pressed buttons, whose stop follows focus. A radio group stays one stop,
- * its arrows choosing as they move.
- */
-const flattens = (node: HTMLElement): node is HTMLElement & { focusable: boolean } =>
-  ownsTabStop(node) &&
-  (node as HTMLElement & { selectionMode?: unknown }).selectionMode === 'multiple'
-
-/** What the toolbar moves to for one of its children. */
-interface Control {
-  /**
-   * The child itself, which is what the toolbar holds, or one member of a
-   * group the toolbar walks through.
-   */
-  child: HTMLElement
-  /** The group a walked-through member belongs to, which holds its stop. */
-  group?: HTMLElement & { focusable: boolean }
-  /**
-   * The elements inside the child that take focus. One for a control or for a
-   * wrapper such as a menu around its trigger, and more than one for a nested
-   * composite such as a toggle group, which keeps its own arrow keys across the
-   * toolbar's axis.
-   */
-  stops: HTMLElement[]
-}
 
 /**
  * @summary A group of controls that share one tab stop.
@@ -226,14 +114,6 @@ export class HelixHeadlessToolbar extends HelixElement {
   })
 
   /**
-   * Whether the stop has been written onto controls this package does not
-   * know, which happens on the first focus. From then on, every move of the
-   * stop has to write them too, or the one at `0` can be removed or disabled
-   * and leave every other one at `-1`.
-   */
-  private wroteForeign = false
-
-  /**
    * The direction the arrow keys move focus in.
    */
   @property({ reflect: true })
@@ -246,212 +126,17 @@ export class HelixHeadlessToolbar extends HelixElement {
   @property({ attribute: 'stop-at-ends', type: Boolean })
   stopAtEnds = false
 
-  private watcher: MutationObserver | undefined
-
   /**
-   * The children that take part in the toolbar, in document order, each with
-   * the elements in it that take focus.
-   *
-   * A test on the element rather than a list of tag names: a toolbar holds
-   * anything, including elements this package has never heard of. A child
-   * that takes no focus and holds nothing that does is skipped. Client only,
-   * there being no tree to walk on the server.
+   * The one tab stop and the arrow keys, shared with every toolbar a
+   * component draws: the controls are the children, a slot among them read as
+   * the elements assigned to it.
    */
-  private get controls(): Control[] {
-    const controls: Control[] = []
-    for (const child of this.members) {
-      if (
-        !(child instanceof HTMLElement) ||
-        child.hasAttribute('disabled') ||
-        child.getAttribute('aria-hidden') === 'true'
-      ) {
-        continue
-      }
-      if (takesFocus(child)) {
-        const stops = this.inside(child)
-        if (stops.length > 1 && flattens(child)) {
-          for (const stop of stops) {
-            controls.push({ child: stop, group: child, stops: [stop] })
-          }
-          continue
-        }
-        controls.push({ child, stops })
-        continue
-      }
-      /* A wrapper that takes no focus, a button group or a menu around its
-         trigger: each control in it is a stop of the toolbar's own. */
-      for (const stop of this.within(child)) {
-        controls.push({ child: stop, stops: [stop] })
-      }
-    }
-    return controls
-  }
-
-  /**
-   * The toolbar's children, a slot among them read as the elements assigned
-   * to it.
-   *
-   * **For a toolbar a component renders in its own shadow root** and passes a
-   * page's controls into through a slot, as Terminal's header does with its
-   * `actions`: read as a child, the slot holds only its fallback, and the
-   * page's controls kept tab stops of their own beside the toolbar's one.
-   */
-  private get members(): Element[] {
-    return [...this.children].flatMap((child) =>
-      child instanceof HTMLSlotElement ? child.assignedElements({ flatten: true }) : [child],
-    )
-  }
-
-  /** The elements in a child's light DOM that take focus. */
-  private within(child: HTMLElement): HTMLElement[] {
-    return [...child.querySelectorAll<HTMLElement>('*')].filter(takesFocus)
-  }
-
-  /**
-   * The stops of a child that takes focus itself: the child, or the members of
-   * a composite that owns its tab stop, such as a toggle group, which the
-   * toolbar enters at a member and moves the stop of through `focusable`.
-   */
-  private inside(child: HTMLElement): HTMLElement[] {
-    if (!ownsTabStop(child)) {
-      return [child]
-    }
-    const members = this.within(child)
-    return members.length > 1 ? members : [child]
-  }
-
-  /**
-   * Where focus lands on arriving at a control. A nested composite is entered
-   * at the stop it holds, which for a toggle group is the chosen toggle.
-   */
-  private entry(control: Control): HTMLElement | undefined {
-    const { stops } = control
-    if (stops.length === 1) {
-      return stops[0]
-    }
-    return (
-      stops.find(
-        (stop) =>
-          (ownsTabStop(stop) && stop.focusable) ||
-          (stop as HTMLElement & { selected?: boolean }).selected === true,
-      ) ?? stops[0]
-    )
-  }
-
-  /** The control a press or a focus came from, by its path. */
-  private origin(event: Event): Control | undefined {
-    const path = event.composedPath()
-    return this.controls.find((control) => control.stops.some((stop) => path.includes(stop)))
-  }
-
-  /**
-   * Moves the single tab stop to one control.
-   *
-   * Prefers the control's own `focusable` property to writing `tabindex` on it.
-   * The attribute is a change to markup the consumer rendered, which a React
-   * consumer's hydration reports and does not patch up; a control that offers
-   * the property moves the stop inside its own shadow root instead.
-   *
-   * `tabindex` stays as the fallback, because a toolbar has to hold controls
-   * this package has never heard of.
-   */
-  private setTabStop(active: Control | undefined, foreign = true): void {
-    if (foreign) {
-      this.wroteForeign = true
-    }
-    for (const control of this.controls) {
-      /* A walked-through group's own roving decides which member holds the
-         stop, following focus, so the toolbar only says whether it is the
-         group's. */
-      if (control.group) {
-        control.group.focusable = control.group === active?.group
-        continue
-      }
-      if (control.stops.length !== 1) {
-        /* A nested composite that owns its tab stop gives it up while the
-           toolbar's is elsewhere. One that does not keeps its own. */
-        if (ownsTabStop(control.child)) {
-          control.child.focusable = control.child === active?.child
-        }
-        continue
-      }
-      const element = control.stops[0] as HTMLElement
-      const stop = control.child === active?.child
-      if (ownsTabStop(element)) {
-        element.focusable = stop
-      } else if (foreign || this.wroteForeign) {
-        stopOf(element).tabIndex = stop ? 0 : -1
-      }
-    }
-  }
-
-  /**
-   * Sets the first tab stop once every custom control has upgraded.
-   *
-   * A custom element has no properties at all before it upgrades, so a pass
-   * that ran first would find no `focusable`, take the `tabindex` fallback, and
-   * write the very attribute this exists to avoid.
-   */
-  private async claimTabStop(): Promise<void> {
-    if (this.nested) {
-      return
-    }
-    const pending = [...new Set(this.members.map((child) => child.localName))].filter((name) =>
-      name.includes('-'),
-    )
-    await Promise.all(pending.map((name) => customElements.whenDefined(name)))
-    // Foreign controls are left alone until focus arrives. Writing `tabindex`
-    // on one before any interaction changes markup the consumer rendered while
-    // React is still hydrating it, which it reports and does not patch up.
-    // Until then they keep the tab order the document already gave them, and
-    // the first `focusin` takes over from there.
-    this.setTabStop(this.controls[0], false)
-  }
-
-  private readonly handleFocusIn = (event: FocusEvent): void => {
-    if (this.nested) {
-      return
-    }
-    const control = this.origin(event)
-    if (control) {
-      this.setTabStop(control)
-    }
-  }
-
-  /**
-   * Gives the tab stop back to a control that still exists.
-   *
-   * `controls` excludes anything disabled or hidden, so disabling the control
-   * holding the stop drops it out of the list while every other control is
-   * already at `-1`, leaving a toolbar the keyboard cannot reach at all. A Save
-   * button disabling itself once the form is clean is enough to do it.
-   *
-   * `foreign` stays false, the same as the first claim, until a focus has
-   * written `tabindex="-1"` onto foreign controls. From then on `setTabStop`
-   * writes them as well, so removing or disabling the native button that held
-   * the stop hands it to the first one left.
-   */
-  private readonly restoreTabStop = (): void => {
-    if (this.nested) {
-      return
-    }
-    const controls = this.controls
-    const held = controls.some((control) => {
-      if (control.group) {
-        return control.group.focusable
-      }
-      const composite = control.stops.length !== 1
-      const element = composite ? control.child : (control.stops[0] as HTMLElement)
-      if (ownsTabStop(element)) {
-        return element.focusable
-      }
-      /* A composite that cannot give up its stop always holds one. */
-      return composite || stopOf(element).tabIndex === 0
-    })
-    if (controls.length > 0 && !held) {
-      this.setTabStop(controls[0], false)
-    }
-  }
+  protected readonly tabStop = new ToolbarController(this, {
+    members: () => [...this.children],
+    nested: () => this.nested,
+    orientation: () => this.axis,
+    stopAtEnds: () => this.stopAtEnds,
+  })
 
   /**
    * Whether this toolbar sits inside another, which then owns the keys and the
@@ -477,106 +162,15 @@ export class HelixHeadlessToolbar extends HelixElement {
     return this.orientation ?? 'horizontal'
   }
 
-  /**
-   * The toolbar's own keys, from inside a nested composite.
-   *
-   * In capture, ahead of the composite, which answers every arrow itself and
-   * would otherwise hold the reader inside it. Only the keys along the
-   * toolbar's axis and Home and End are taken, so the arrows across it still
-   * move inside the composite.
-   */
-  private readonly handleCompositeKeydown = (event: KeyboardEvent): void => {
-    if (this.nested) {
-      return
-    }
-    const control = this.origin(event)
-    if (!control || (control.stops.length === 1 && !control.group)) {
-      return
-    }
-    this.handleKeydown(event)
-    if (event.defaultPrevented) {
-      event.stopPropagation()
-    }
-  }
-
-  private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (this.nested || !KEYS.has(event.key) || keyClaimed(event)) {
-      return
-    }
-    /* Along the line on a horizontal toolbar, so the forward key is the left on
-       a right-to-left page, where the first control is on the right. */
-    const along = inlineStep(this, event.key)
-    const forward = this.axis === 'horizontal' ? along === 1 : event.key === 'ArrowDown'
-    const back = this.axis === 'horizontal' ? along === -1 : event.key === 'ArrowUp'
-
-    const controls = this.controls
-    const origin = this.origin(event)
-    const current = origin ? controls.findIndex((control) => control.child === origin.child) : -1
-    if (current === -1) {
-      return
-    }
-
-    let next = current
-    const last = controls.length - 1
-    if (forward) {
-      next = this.stopAtEnds ? Math.min(current + 1, last) : (current + 1) % controls.length
-    } else if (back) {
-      next = this.stopAtEnds
-        ? Math.max(current - 1, 0)
-        : (current - 1 + controls.length) % controls.length
-    } else if (event.key === 'Home') {
-      next = 0
-    } else if (event.key === 'End') {
-      next = controls.length - 1
-    } else {
-      // An arrow along the other axis is not ours; leave it to the page.
-      return
-    }
-
-    event.preventDefault()
-    const target = controls[next]
-    this.setTabStop(target)
-    const element = target ? this.entry(target) : undefined
-    if (element && 'focusItem' in element && typeof element.focusItem === 'function') {
-      element.focusItem()
-    } else if (element) {
-      /* The element the stop was written on, which for a custom element is
-         its own control: its host takes no focus without a `tabindex`. */
-      ;(ownsTabStop(element) ? element : stopOf(element)).focus()
-    }
-  }
-
   override connectedCallback(): void {
     super.connectedCallback()
     /* Moved into or out of another toolbar, so the role is read again. */
     this.requestUpdate()
-    this.addEventListener('keydown', this.handleCompositeKeydown, true)
-    this.addEventListener('keydown', this.handleKeydown)
-    this.addEventListener('focusin', this.handleFocusIn)
-    /* `disabled` and `aria-hidden` are what `controls` filters on, so a change
-       to either is a change to the set the stop has to live in. Nothing else is
-       watched, which also keeps `setTabStop` writing `tabindex` from feeding
-       back into this. */
-    this.watcher = new MutationObserver(this.restoreTabStop)
-    this.watcher.observe(this, {
-      attributeFilter: ['disabled', 'aria-hidden'],
-      attributes: true,
-      subtree: true,
-    })
-  }
-
-  override disconnectedCallback(): void {
-    super.disconnectedCallback()
-    this.removeEventListener('keydown', this.handleCompositeKeydown, true)
-    this.removeEventListener('keydown', this.handleKeydown)
-    this.removeEventListener('focusin', this.handleFocusIn)
-    this.watcher?.disconnect()
-    this.watcher = undefined
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
-    void this.claimTabStop()
+    void this.tabStop.claim()
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -588,7 +182,7 @@ export class HelixHeadlessToolbar extends HelixElement {
        its children to read it again. After the first render only: a child's
        first render reads the toolbar for itself. */
     if (this.hasUpdated && changed.has('orientation')) {
-      for (const child of this.members) {
+      for (const child of this.tabStop.members) {
         ;(child as Partial<HelixElement>).requestUpdate?.()
       }
     }
@@ -602,7 +196,7 @@ export class HelixHeadlessToolbar extends HelixElement {
       aria-label=${this.label}
       aria-orientation=${nested ? nothing : this.axis}
     >
-      <slot @slotchange=${() => this.claimTabStop()}></slot>
+      <slot @slotchange=${() => this.tabStop.claim()}></slot>
     </div>`
   }
 }
