@@ -155,7 +155,9 @@
 }
 
 [part="actions"],
-[part="controls"] {
+[part="controls"],
+[part="exit-actions"],
+[part="find-actions"] {
   align-items: center;
   display: flex;
   flex: 0 0 auto;
@@ -184,13 +186,6 @@
     color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-/* **The find bar is a step denser than the header**, its field and buttons
-   at the tight step, so the bar under the header stays a thin strip. */
-[part="find-bar"] button {
-  block-size: var(--helix-size-control-tight);
-  inline-size: var(--helix-size-control-tight);
-}
-
 [part="controls"] button:hover:not(:disabled),
 [part="find-bar"] button:hover:not(:disabled) {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
@@ -215,7 +210,14 @@
   outline-offset: var(--helix-size-focus-offset);
 }
 
+/* **The find bar is a step denser than the header**, and says so as a density
+   region does, with the steps derived from it, so a control a page puts in
+   `find-actions` takes the size of the bar's own buttons. */
 [part="find-bar"] {
+  --helix-size-control: calc(var(--helix-size-control-sm) * 0.8);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+
   grid-row: find;
   border-block-end: var(--helix-border-thin) solid
     var(--terminal-border-color, var(--helix-color-border));
@@ -224,7 +226,7 @@
 [part="find-field"] {
   appearance: none;
   background-color: var(--terminal-background-color);
-  block-size: var(--helix-size-control-tight);
+  block-size: var(--helix-size-control);
   border: var(--helix-border-thin) solid var(--terminal-border-color, var(--helix-color-border));
   border-radius: var(--helix-radii-sm);
   box-sizing: border-box;

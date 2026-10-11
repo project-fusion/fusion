@@ -136,6 +136,9 @@ the frame stops sending input, and a Restart button appears. Restart sends
 `helix-terminal-restart`. Start a new process, clear `exitCode`, and write the
 new output:
 
+Put buttons of your own beside Restart in the `exit-actions` slot, such as one
+that opens the whole log. They show once the process exits.
+
 ```js
 pty.onExit((code) => {
   frame.exitCode = code
@@ -284,7 +287,8 @@ Set `fill` for a terminal that fills a pane, such as one side of a `Splitter`.
 The frame covers its container, which needs a position of its own, such as
 `position: relative`. Set `separation="plain"` where the pane already draws its
 edges. Put buttons of your own in the `actions` slot, before the built-in
-controls:
+controls, and in `find-actions` for the find bar. Each takes the size of the
+buttons beside it:
 
 ```html
 <div class="pane">

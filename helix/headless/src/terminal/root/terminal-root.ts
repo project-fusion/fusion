@@ -220,6 +220,8 @@ const opens = (href: string): boolean => /^https?:\/\//i.test(href)
  * @slot actions - Controls of your own in the header, before the built-in ones, such as a button that splits the pane.
  * @slot clear-icon - Replaces the glyph inside the clear button.
  * @slot copy-icon - Replaces the glyph inside the copy button.
+ * @slot exit-actions - Controls of your own beside Restart, shown once the process exits, such as a button that opens the whole log.
+ * @slot find-actions - Controls of your own in the find bar, between the count and the buttons that move between matches.
  * @slot find-close-icon - Replaces the glyph inside the button that closes the find bar.
  * @slot find-icon - Replaces the glyph inside the find button.
  * @slot find-next-icon - Replaces the glyph inside the next match button.
@@ -240,7 +242,9 @@ const opens = (href: string): boolean => /^https?:\/\//i.test(href)
  * @csspart clear - The button that clears the scrollback.
  * @csspart controls - The row of built-in buttons at the end of the header.
  * @csspart copy - The button that copies the selection. Disabled while nothing is selected.
+ * @csspart exit-actions - The box in the status line that holds the `exit-actions` slot.
  * @csspart find - The button that opens and closes the find bar. Pressed while it is open.
+ * @csspart find-actions - The box in the find bar that holds the `find-actions` slot.
  * @csspart find-bar - The bar under the header where the reader searches the output.
  * @csspart find-close - The button that closes the find bar.
  * @csspart find-count - Which match is current and how many there are, such as "3 of 12 matches".
@@ -1034,6 +1038,7 @@ export class HelixHeadlessTerminal extends HelixElement {
         @keydown=${this.handleFindKeys}
       />
       <span part="find-count" aria-hidden="true">${this.countText}</span>
+      <slot name="find-actions" part="find-actions"></slot>
       <button
         part="find-previous"
         aria-label=${this.findPreviousLabel}
@@ -1091,7 +1096,8 @@ export class HelixHeadlessTerminal extends HelixElement {
           ? html`<span>${formatWords(this, 'exitedLabel', { code: String(this.exitCode ?? 0) })}</span>
               <button part="restart" type="button" @click=${this.handleRestart}>
                 <slot name="restart-icon">${drawIcon(arrowClockwise)}</slot>${this.restartLabel}
-              </button>`
+              </button>
+              <slot name="exit-actions" part="exit-actions"></slot>`
           : nothing
       }
       ${this.tabMovesFocus ? html`<span>${formatWords(this, 'tabMovesFocusLabel', { key: this.tabKey })}</span>` : nothing}
