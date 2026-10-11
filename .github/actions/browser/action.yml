@@ -1,4 +1,5 @@
-# Chromium and the system packages it links against, restored when they can be.
+# Chromium and the system packages it links against, restored when they can be,
+# or WebKit and its packages when `browser` names it.
 #
 # **`helix visual`'s browser install, with Fusion's two facts.** The version is
 # read off `bun.lock`, which every job has before it installs anything, and
@@ -6,8 +7,13 @@
 # keys are the ones `seed` in `verify.yml` looks up, so `main` keeps filling
 # the caches every pull request reads. The reasoning for each step is in
 # `helix/visual/action/browser/action.yml`.
-name: Install Chromium
+name: Install the browser
 description: Restores the Playwright browser for the version the lockfile holds, and its system packages for the runner image, and installs both.
+
+inputs:
+  browser:
+    description: The browser to install, `chromium` or `webkit`.
+    default: chromium
 
 runs:
   using: composite
@@ -21,8 +27,9 @@ runs:
         [ -n "$version" ] || { echo "::error::bun.lock names no playwright-core"; exit 1; }
         echo "version=$version" >> "$GITHUB_OUTPUT"
 
-    - name: Install Chromium
+    - name: Install the browser
       uses: ./helix/visual/action/browser
       with:
+        browser: ${{ inputs.browser }}
         playwright: bunx playwright
         version: ${{ steps.version.outputs.version }}

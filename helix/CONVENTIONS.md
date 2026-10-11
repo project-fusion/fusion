@@ -743,7 +743,7 @@ HTML consumer would have no spelling for the controlled half at all, a prefixed
 event having no inline handler attribute.
 
 **Shared test scaffolding lives in `@fusion.dev/helix-testing`**, one module per
-environment: `dom` for happy-dom under bun, `browser` for Chromium, `ssr` for
+environment: `dom` for happy-dom under bun, `browser` for Chromium and WebKit, `ssr` for
 Lit's server shim. `registerDom()` is idempotent because bun runs every DOM spec
 in one process and `GlobalRegistrator.register()` throws on the second call. It
 also shims `attachInternals`, which happy-dom does not implement. Lit's server
@@ -786,6 +786,19 @@ implements no ARIA element reflection at all, and
 still counting as a mutation. Supply the input the double cannot produce, and
 say in the spec which half is being asserted. Two of those gaps produce a test
 that passes against code doing nothing.
+
+**The browser specs run in Chromium and in WebKit**, the engine of Safari and of
+a Tauri app on macOS and Linux. A spec that holds in one engine and fails in the
+other is a Helix bug or a spec that assumed Chromium, and finding out which is
+the work. A failure that is neither yet is listed with its cause in
+`fusion/scripts/lib/known-in-webkit.mjs`, and the run fails once it passes.
+
+**Read a state with `hasState`, never through `internals.states`.** WebKit
+hands back a `CustomStateSet` it has collected as empty: `has()` answers `false`
+and `size` answers `0` while `:state()` still matches, so a spec reading the set
+failed whenever a collection ran first. The browser harness's `hasState` reads
+`:state()`, which is what a stylesheet sees. A component writes its states and
+never reads them back, for the same reason.
 
 ## Visual axes are a registry, and `appearance` is refused
 

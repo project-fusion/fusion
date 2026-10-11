@@ -57,6 +57,10 @@ const CHECKS = [
   { runner: 566, script: 'check:spec:visual-parity', task: 'parity' },
   { runner: 91, script: 'smoke:examples', task: 'smoke' },
   { runner: 56, script: 'specs:browser', task: 'specs' },
+  /* No runner had run the specs in WebKit when this was added, so its figure
+     is Chromium's, which a desk measured the same on October 10, 2026. A run
+     read with `--from` replaces it with its own seconds. */
+  { args: ['--browser', 'webkit'], runner: 56, script: 'specs:browser', task: 'specs-webkit' },
   { runner: 189, script: 'check:spec:visual', task: 'visual' },
 ]
 
@@ -147,7 +151,7 @@ for (const check of wanted) {
     /* The exit code is not read: a check that finds something real still
        measured everything it rendered, and a finding on a desk is usually this
        machine rather than the tree. */
-    spawnSync('bun', ['run', check.script, '--workers', String(workers)], {
+    spawnSync('bun', ['run', check.script, ...(check.args ?? []), '--workers', String(workers)], {
       cwd: root,
       env: { ...process.env, BROWSER_COST: file },
       stdio: 'ignore',
