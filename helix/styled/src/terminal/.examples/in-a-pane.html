@@ -1,28 +1,42 @@
-<!-- @summary A terminal that fills a pane, flush with its edges, with a button of your own in the header. -->
+<!-- @summary A terminal that fills one pane of a Splitter, flush with its edges, under a session, with a button of your own in its header. -->
 <link
   href="styles.css"
   rel="stylesheet"
 />
 
-<div class="pane">
-  <!-- Preview frame: data-preview-terminal has the frame connect xterm.js; on your page, connectTerminal does. -->
-  <helix-terminal
-    controls="find clear fullscreen"
-    data-preview-terminal
-    fill
-    id="pane"
-    label="zsh"
+<helix-splitter
+  default-position="45"
+  orientation="vertical"
+>
+  <helix-card
     separation="plain"
+    slot="start"
   >
-    <helix-icon-button
-      label="New terminal"
-      slot="actions"
+    <helix-text>Session</helix-text>
+  </helix-card>
+  <div
+    class="pane"
+    slot="end"
+  >
+    <!-- Preview frame: data-preview-terminal has the frame connect xterm.js; on your page, connectTerminal does. -->
+    <helix-terminal
+      controls="find clear fullscreen"
+      data-preview-terminal
+      fill
+      id="pane"
+      label="zsh"
+      separation="plain"
     >
-      <helix-icon name="plus"></helix-icon>
-    </helix-icon-button>
-    <div data-preview-terminal-canvas></div>
-  </helix-terminal>
-</div>
+      <helix-icon-button
+        label="New terminal"
+        slot="actions"
+      >
+        <helix-icon name="plus"></helix-icon>
+      </helix-icon-button>
+      <div data-preview-terminal-canvas></div>
+    </helix-terminal>
+  </div>
+</helix-splitter>
 
 <script type="module">
   document

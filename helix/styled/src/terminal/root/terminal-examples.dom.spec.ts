@@ -16,8 +16,11 @@ import transcript from '../.examples/transcript.html' with { type: 'text' }
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  await import('../../card/index.js')
   await import('../../icon/index.js')
   await import('../../icon-button/index.js')
+  await import('../../splitter/index.js')
+  await import('../../text/index.js')
 })
 
 /* Browser only: happy-dom does not run a script inserted by script. */
@@ -61,6 +64,19 @@ describe('the preview example', () => {
     expect(written.at(-2)).toBe('l')
     expect(written.at(-1)).toContain('\r\n')
   })
+
+  run('takes away only what the reader typed, and never the prompt', async () => {
+    await example(preview)
+    const { sink, written } = await attached()
+    sink.input('ls')
+    sink.input('\x7f')
+    sink.input('\x7f')
+    const erased = written.length
+    sink.input('\x7f')
+    sink.input('\x1b[D')
+    expect(written.slice(-3)).toEqual(['ls', '\b \b', '\b \b'])
+    expect(written.length).toBe(erased)
+  })
 })
 
 describe('the transcript example', () => {
@@ -91,7 +107,7 @@ describe('the exited example', () => {
 })
 
 describe('the pane example', () => {
-  run('writes a prompt into a terminal that fills its pane', async () => {
+  run('writes a prompt into a terminal that fills the lower pane of a splitter', async () => {
     await example(inAPane)
     const { written } = await attached()
     expect(written.join('')).toContain('Development')
