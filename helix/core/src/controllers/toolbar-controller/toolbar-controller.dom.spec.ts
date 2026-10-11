@@ -7,9 +7,9 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
  * controls written in light DOM, claimed once they upgrade.
  */
 type Pad = HTMLElement & {
+  arrows: 'both' | 'horizontal' | 'position' | 'vertical'
   shown: string[]
   updateComplete: Promise<boolean>
-  vertical: boolean
 }
 
 beforeAll(async () => {
@@ -19,23 +19,24 @@ beforeAll(async () => {
   /* A pad of buttons beside a board, as Canvas's controls sit beside its cards. */
   class TestPad extends LitElement {
     static override properties = {
+      arrows: {},
       shown: { attribute: false },
-      vertical: { type: Boolean },
     }
     /* Declared, with the defaults set in the constructor: a class field would
        shadow the reactive accessor Lit defines, and a change would draw nothing. */
+    declare arrows: 'both' | 'horizontal' | 'position' | 'vertical'
     declare shown: string[]
-    declare vertical: boolean
     constructor() {
       super()
+      this.arrows = 'horizontal'
       this.shown = ['up', 'down', 'zoom']
-      this.vertical = false
     }
     controls = new ToolbarController(this, {
+      arrows: () => this.arrows,
       members: () => [...(this.renderRoot.querySelector('[part="controls"]')?.children ?? [])],
-      orientation: () => (this.vertical ? 'vertical' : 'horizontal'),
       own: true,
       watch: () => this.renderRoot,
+      words: (control) => control.textContent ?? '',
     })
     override render() {
       return html`<div part="controls" role="toolbar">
@@ -105,7 +106,7 @@ describe('a row of controls a component draws itself', () => {
   })
 
   test('leaves the arrows across its axis, and a press that starts elsewhere, to the host', async () => {
-    const host = await pad('vertical')
+    const host = await pad('arrows="vertical"')
     expect(press(button(host, 'up'), 'ArrowRight').defaultPrevented).toBe(false)
     expect(press(button(host, 'up'), 'ArrowDown').defaultPrevented).toBe(true)
     expect(stops(host)).toEqual(['down'])
@@ -137,5 +138,31 @@ describe('a row of controls a component draws itself', () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
     /* A disabled button takes no focus whatever its `tabindex` says. */
     expect(stops(host).filter((id) => !button(host, id).hasAttribute('disabled'))).toEqual(['up'])
+  })
+
+  test('moves forward on Right and Down and back on Left and Up, for a row that wraps', async () => {
+    const host = await pad('arrows="both"')
+    press(button(host, 'up'), 'ArrowDown')
+    expect(stops(host)).toEqual(['down'])
+    press(button(host, 'down'), 'ArrowRight')
+    expect(stops(host)).toEqual(['zoom'])
+    press(button(host, 'zoom'), 'ArrowUp')
+    expect(stops(host)).toEqual(['down'])
+  })
+
+  test('moves in order where nothing is laid out, by position', async () => {
+    const host = await pad('arrows="position"')
+    if (host.getBoundingClientRect().width > 0) {
+      return
+    }
+    press(button(host, 'up'), 'ArrowDown')
+    expect(stops(host)).toEqual(['down'])
+  })
+
+  test('finds a control by the letters a reader types', async () => {
+    const host = await pad()
+    expect(press(button(host, 'up'), 'z').defaultPrevented).toBe(true)
+    expect(stops(host)).toEqual(['zoom'])
+    expect(press(button(host, 'zoom'), ' ').defaultPrevented).toBe(false)
   })
 })
