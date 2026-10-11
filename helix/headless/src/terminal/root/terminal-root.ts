@@ -13,6 +13,7 @@ import {
   HelixTerminalTitleEvent,
   numberConverter,
   onApple,
+  stopPress,
   type TerminalResizeDetail,
   words,
 } from '@fusion.dev/helix-core'
@@ -162,13 +163,6 @@ export interface TerminalSink {
   /** The program set its title. */
   title(title: string): void
 }
-
-/**
- * Keeps a press on one of the frame's own buttons inside the frame: the page
- * hears what the button did, through the frame's events, and not that a
- * button inside it was pressed.
- */
-const stopPress = (event: Event): void => event.stopPropagation()
 
 /** How long the bell's flash holds, in milliseconds: one beat, long enough to see. */
 const BELL = 200

@@ -296,18 +296,27 @@
   flex: none;
 }
 
-/* What the screen says while no stream is inside, over its black. */
+/* **What the screen says while no stream is inside, over its black.** It
+   stands beside the screen and is placed over it, at the screen's own insets
+   and corners, so a button in it is pressed and typed into as a button is,
+   and the screen's touches and keys never reach it. */
 [part="empty"] {
   align-items: center;
+  border-radius: calc(var(--_screen) * var(--_radius));
   color: var(--helix-color-foreground-media);
   display: grid;
   font-family: var(--helix-font-sans);
   font-size: var(--helix-text-sm);
-  inset: 0;
+  inset: calc(var(--_screen) * var(--_end)) calc(var(--_screen) * var(--_side));
   justify-items: center;
+  overflow: hidden;
   padding: var(--helix-space-md);
   position: absolute;
   text-align: center;
+}
+
+:host([shape="circle"]) [part="empty"] {
+  border-radius: var(--helix-radii-full);
 }
 
 /* **Full screen is the whole screen**, and the device fits the screen's height. */

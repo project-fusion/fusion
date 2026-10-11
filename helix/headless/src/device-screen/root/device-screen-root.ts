@@ -17,6 +17,7 @@ import {
   hostAria,
   numberConverter,
   SPOKEN_RULE,
+  stopPress,
   TOUCHES_RULE,
   words,
 } from '@fusion.dev/helix-core'
@@ -52,6 +53,8 @@ interface ScreenSize {
 interface Finger {
   /** Where it is now, as a fraction of the screen in the device's own way up. */
   at: Fraction
+  /** The drawn screen's box as the finger landed, which a drag measures against. */
+  box: DOMRect
   /** Where it landed, the same way. */
   from: Fraction
   /** The furthest it has strayed from where it landed, in CSS pixels. */
@@ -88,13 +91,6 @@ const LINE = 16
 
 /** The controls drawn while `controls` is absent. */
 const RESTING_CONTROLS = 'home screenshot'
-
-/**
- * Keeps a press on one of the frame's own buttons inside the frame: the page
- * hears what the button did through `helix-device-button`, and not that a
- * button inside the frame was pressed.
- */
-const stopPress = (event: Event): void => event.stopPropagation()
 
 /** Whether a key press is the one that moves focus on, which the screen never keeps. */
 const leaves = (event: KeyboardEvent): boolean =>
@@ -176,7 +172,7 @@ const pastes = (event: KeyboardEvent): boolean =>
  * @slot back-icon - Replaces the glyph inside the Back button.
  * @slot bezel - A picture of the device drawn over the screen, such as a photograph of a phone with a clear screen. It takes no touches.
  * @slot controls - Buttons of your own, such as Shake or Record, in the row after the hardware buttons and before the fullscreen button.
- * @slot empty - Content shown on the screen while no element that draws the stream is inside, such as "No simulator is running".
+ * @slot empty - Content shown over the screen while no element that draws the stream is inside and `loading` is not set, such as "No simulator is running" and a button to start one.
  * @slot footer - Content below the device.
  * @slot fullscreen-icon - Replaces the glyph inside the fullscreen button.
  * @slot header - Content above the device, such as its name and state.
@@ -205,9 +201,9 @@ const pastes = (event: KeyboardEvent): boolean =>
  * @csspart back-spinner - The ring the Back button turns while it is pending.
  * @csspart back-text - The box the Back button's icon sits in.
  * @csspart bezel - The body of the device around the screen.
- * @csspart controls - The group of hardware buttons.
+ * @csspart controls - The row of buttons: the hardware buttons and any of yours in the `controls` slot.
  * @csspart device - The box the device is fitted into, which keeps its shape inside it.
- * @csspart empty - The box on the screen that holds the `empty` slot while no stream is inside.
+ * @csspart empty - The box over the screen that holds the `empty` slot while no stream is inside and `loading` is not set. It stands beside the screen, so what you put in it takes presses and keys of its own, and a read-only screen does not hide it from screen readers.
  * @csspart footer - The strip below the device.
  * @csspart fullscreen - The button that makes the device fill the screen.
  * @csspart fullscreen-button - The fullscreen button's inner button.
@@ -375,8 +371,9 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
 
   /**
    * Shows the screen and sends nothing: no touches, scrolls, keys, or button
-   * presses. The screen is then a picture, out of the tab order, and only
-   * the screenshot and fullscreen buttons work.
+   * presses. The screen is then a picture, out of the tab order, and the
+   * hardware buttons are off but for screenshot and fullscreen. Buttons of
+   * your own in the `controls` slot are yours to turn off.
    */
   @property({ type: Boolean })
   readonly = false
@@ -480,7 +477,10 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
   /** The most fingers that were down at once since the screen was last bare. */
   private crowd = 0
 
-  /** The keys sent down and not yet up, by their `code`. */
+  /**
+   * The keys sent down and not yet up, by their `code`, or by their `key`
+   * where a soft keyboard or an input method reports no code.
+   */
   private readonly held = new Map<string, KeyboardEvent>()
 
   /** When a hardware button was pressed, so its release can say how long it was held. */
@@ -639,8 +639,11 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
    * where it is off the screen's shape. `clamp` holds a finger that has left
    * the screen at its edge, as a finger on glass stops at the glass.
    */
-  private fractionAt(event: PointerEvent | WheelEvent, clamp: boolean): Fraction | undefined {
-    const box = this.screen?.getBoundingClientRect()
+  private fractionAt(
+    event: PointerEvent | WheelEvent,
+    clamp: boolean,
+    box: DOMRect | undefined = this.screen?.getBoundingClientRect(),
+  ): Fraction | undefined {
     if (!box || box.width === 0 || box.height === 0) {
       return undefined
     }
@@ -669,9 +672,19 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
       return known
     }
     const box = this.screen?.getBoundingClientRect()
-    const width = box?.width ?? 0
-    const height = box?.height ?? 0
-    return this.turns % 2 === 1 ? { height: width, width: height } : { height, width }
+    const sideways = this.turns % 2 === 1
+    const width = (sideways ? box?.height : box?.width) ?? 0
+    const height = (sideways ? box?.width : box?.height) ?? 0
+    /* A side the page gave is kept, and the other takes the drawn screen's
+       shape, until the stream says its own. */
+    const { screenHeight, screenWidth } = this
+    if (screenWidth !== undefined && screenWidth > 0 && width > 0) {
+      return { height: (screenWidth * height) / width, width: screenWidth }
+    }
+    if (screenHeight !== undefined && screenHeight > 0 && height > 0) {
+      return { height: screenHeight, width: (screenHeight * width) / height }
+    }
+    return { height, width }
   }
 
   /** Sends a touch for a finger, and for its mirror where it has one. */
@@ -715,13 +728,13 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
 
   /** The rings under the fingers, with `show-touches`, kept beside the rings that were shown. */
   private holdMarks(): void {
-    const shown = this.marks.filter((mark) => !mark.held)
     if (!this.showTouches) {
-      if (shown.length !== this.marks.length) {
-        this.marks = shown
+      if (this.marks.some((mark) => mark.held)) {
+        this.marks = this.marks.filter((mark) => !mark.held)
       }
       return
     }
+    const shown = this.marks.filter((mark) => !mark.held)
     const held: Mark[] = []
     for (const [pointer, finger] of this.fingers) {
       held.push({ at: turn(finger.at, this.turns), held: true, key: -1 - pointer * 2 })
@@ -746,9 +759,10 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
     if (this.readonly || (event.pointerType !== 'touch' && event.button !== 0)) {
       return
     }
-    const drawn = this.fractionAt(event, false)
     const screen = this.screen
-    if (!(drawn && screen)) {
+    const box = screen?.getBoundingClientRect()
+    const drawn = this.fractionAt(event, false, box)
+    if (!(drawn && screen && box)) {
       return
     }
     /* The press would select the page's text or start dragging the image the
@@ -765,6 +779,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
     const at = unturn(drawn, this.turns)
     const finger: Finger = {
       at,
+      box,
       from: at,
       furthest: 0,
       id: this.freeId(mirror),
@@ -782,7 +797,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
 
   private readonly handlePointerMove = (event: PointerEvent): void => {
     const finger = this.fingers.get(event.pointerId)
-    const drawn = finger ? this.fractionAt(event, true) : undefined
+    const drawn = finger ? this.fractionAt(event, true, finger.box) : undefined
     if (!(finger && drawn)) {
       return
     }
@@ -806,7 +821,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
       return
     }
     const canceled = event.type === 'pointercancel'
-    const drawn = canceled ? undefined : this.fractionAt(event, true)
+    const drawn = canceled ? undefined : this.fractionAt(event, true, finger.box)
     if (drawn) {
       finger.at = unturn(drawn, this.turns)
     }
@@ -868,11 +883,14 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
       return
     }
     event.preventDefault()
-    const step = event.deltaMode === 1 ? LINE : event.deltaMode === 2 ? box.height : 1
+    /* A wheel that counts in pages moves a page of the screen along each axis:
+       its width across and its height down. */
+    const across = event.deltaMode === 1 ? LINE : event.deltaMode === 2 ? box.width : 1
+    const down = event.deltaMode === 1 ? LINE : event.deltaMode === 2 ? box.height : 1
     const turns = this.turns
     const at = unturn(drawn, turns)
     const by = unturnDistance(
-      { u: (event.deltaX * step) / box.width, v: (event.deltaY * step) / box.height },
+      { u: (event.deltaX * across) / box.width, v: (event.deltaY * down) / box.height },
       turns,
     )
     const { height, width } = this.sizeFor()
@@ -924,16 +942,17 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
     if (shortcut && !this.forwardShortcuts) {
       return
     }
-    this.held.set(event.code, event)
+    this.held.set(event.code || event.key, event)
     this.sendKey(event, 'down')
   }
 
   /** A key coming up, sent only where its press was: a Tab into the screen lifts on it. */
   private readonly handleKeyup = (event: KeyboardEvent): void => {
-    if (!this.held.has(event.code)) {
+    const id = event.code || event.key
+    if (!this.held.has(id)) {
       return
     }
-    this.held.delete(event.code)
+    this.held.delete(id)
     this.sendKey(event, 'up')
   }
 
@@ -942,12 +961,12 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
    * the device: each is sent as released.
    */
   private readonly handleBlur = (): void => {
-    for (const [code, pressed] of this.held) {
-      this.held.delete(code)
+    for (const [id, pressed] of this.held) {
+      this.held.delete(id)
       this.dispatchEvent(
         new HelixDeviceKeyEvent({
           altKey: false,
-          code,
+          code: pressed.code,
           ctrlKey: false,
           key: pressed.key,
           metaKey: false,
@@ -1401,16 +1420,16 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
             <div part="picture">
               <slot @slotchange=${this.handleSlotChange}></slot>
             </div>
-            ${
-              this.childrenKnown && this.stream === undefined
-                ? html`<div part="empty"><slot name="empty"></slot></div>`
-                : nothing
-            }
             ${this.renderMarks()}
             <div part="loading" aria-hidden="true">
               ${this.loading ? html`<slot name="loading">${this.loadingLabel}</slot>` : nothing}
             </div>
           </div>
+          ${
+            this.childrenKnown && this.stream === undefined && !this.loading
+              ? html`<div part="empty"><slot name="empty"></slot></div>`
+              : nothing
+          }
           <slot name="bezel"></slot>
         </div>
         ${placement === 'end' ? controls : nothing}
