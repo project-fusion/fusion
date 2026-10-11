@@ -38,6 +38,13 @@ helix-headless-terminal::part(status) {
   padding: 0.25rem 0.25rem 0.25rem 0.5rem;
 }
 
+/* The find bar and the status line show only while the host says so: an
+   author `display` outranks the browser's own rule for `hidden`. */
+helix-headless-terminal:not(:state(find-open))::part(find-bar),
+helix-headless-terminal:not(:state(exited)):not(:state(tab-moves-focus))::part(status) {
+  display: none;
+}
+
 helix-headless-terminal::part(header) {
   grid-row: header;
   border-block-end: 1px solid var(--_gray-edge);
