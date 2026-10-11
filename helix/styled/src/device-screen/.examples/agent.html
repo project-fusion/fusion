@@ -1,0 +1,41 @@
+<!-- @summary A screen an agent is driving: it takes no input, and marks each touch the agent makes. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<div class="layout">
+  <helix-device-screen
+    id="phone"
+    label="iPhone 17 Pro"
+    readonly
+    screen-height="874"
+    screen-width="402"
+  >
+    <div class="stand-in">
+      <span class="date">Saturday, October 10</span>
+      <span class="time">9:41</span>
+    </div>
+  </helix-device-screen>
+
+  <helix-flex
+    align-items="start"
+    direction="column"
+    gap="sm"
+  >
+    <helix-button id="tap">Tap the middle</helix-button>
+    <helix-button id="swipe">Swipe up from the bottom</helix-button>
+  </helix-flex>
+</div>
+
+<script type="module">
+  /* Call these as your agent's touches arrive, in the device's units. */
+  const phone = document.getElementById('phone')
+
+  document.getElementById('tap').addEventListener('click', () => {
+    phone.showTap(201, 437)
+  })
+  document.getElementById('swipe').addEventListener('click', () => {
+    phone.showSwipe(201, 860, 201, 500, 400)
+  })
+</script>

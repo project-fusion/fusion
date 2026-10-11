@@ -99,6 +99,14 @@ import { HelixConsoleEvent } from './console.js'
 import { HelixCopyEvent } from './copy.js'
 import { HelixCopyErrorEvent } from './copy-error.js'
 import { HelixCreateEvent } from './create.js'
+import { HelixDeviceButtonEvent } from './device-button.js'
+import { HelixDeviceKeyEvent } from './device-key.js'
+import { HelixDeviceScreenshotEvent } from './device-screenshot.js'
+import { HelixDeviceScrollEvent } from './device-scroll.js'
+import { HelixDeviceSwipeEvent } from './device-swipe.js'
+import { HelixDeviceTapEvent } from './device-tap.js'
+import { HelixDeviceTextEvent } from './device-text.js'
+import { HelixDeviceTouchEvent } from './device-touch.js'
 import { HelixDismissEvent } from './dismiss.js'
 import { HelixEditEvent } from './edit.js'
 import { HelixEndEvent } from './end.js'
@@ -180,6 +188,14 @@ export type {
   ConsoleDetail,
   CopyDetail,
   CreateDetail,
+  DeviceButton,
+  DeviceButtonDetail,
+  DeviceKeyDetail,
+  DeviceScrollDetail,
+  DeviceSwipeDetail,
+  DeviceTapDetail,
+  DeviceTextDetail,
+  DeviceTouchDetail,
   DismissDetail,
   FacetDetail,
   FilterDetail,
@@ -265,6 +281,14 @@ export {
   HelixCopyErrorEvent,
   HelixCopyEvent,
   HelixCreateEvent,
+  HelixDeviceButtonEvent,
+  HelixDeviceKeyEvent,
+  HelixDeviceScreenshotEvent,
+  HelixDeviceScrollEvent,
+  HelixDeviceSwipeEvent,
+  HelixDeviceTapEvent,
+  HelixDeviceTextEvent,
+  HelixDeviceTouchEvent,
   HelixDismissEvent,
   HelixEditEvent,
   HelixEndEvent,
@@ -381,6 +405,14 @@ const registry = {
   HelixCopyErrorEvent,
   HelixCopyEvent,
   HelixCreateEvent,
+  HelixDeviceButtonEvent,
+  HelixDeviceKeyEvent,
+  HelixDeviceScreenshotEvent,
+  HelixDeviceScrollEvent,
+  HelixDeviceSwipeEvent,
+  HelixDeviceTapEvent,
+  HelixDeviceTextEvent,
+  HelixDeviceTouchEvent,
   HelixDismissEvent,
   HelixEditEvent,
   HelixEndEvent,

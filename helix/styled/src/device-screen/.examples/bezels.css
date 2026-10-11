@@ -1,0 +1,39 @@
+.row {
+  align-items: end;
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
+.home-button {
+  --device-screen-bezel: 0.06;
+  --device-screen-bezel-block: 0.32;
+  --device-screen-bezel-radius: 0.2;
+  --device-screen-block-size: 22rem;
+}
+
+.watch {
+  --device-screen-bezel: 0.08;
+  --device-screen-block-size: 10rem;
+}
+
+.tablet {
+  --device-screen-bezel: 0.035;
+  --device-screen-radius: 0.03;
+  --device-screen-block-size: 14rem;
+}
+
+.stand-in {
+  align-items: center;
+  background-image:
+    radial-gradient(circle at 20% 10%, #f472b6 0%, transparent 45%),
+    radial-gradient(circle at 85% 35%, #818cf8 0%, transparent 50%),
+    linear-gradient(170deg, #4338ca, #1e1b4b 70%);
+  color: var(--helix-color-foreground-media);
+  container-type: inline-size;
+  display: flex;
+  font-family: var(--helix-font-sans);
+  font-size: 18cqi;
+  font-weight: var(--helix-weight-semibold);
+  justify-content: center;
+}

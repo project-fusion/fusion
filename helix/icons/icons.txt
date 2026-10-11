@@ -24,6 +24,7 @@ broom
 building
 buildings
 calendar-blank
+camera
 caret-double-left
 caret-double-right
 caret-down
@@ -93,6 +94,7 @@ picture-in-picture
 play
 plus
 polygon
+power
 pulse
 push-pin
 push-pin-slash
@@ -108,7 +110,9 @@ skip-back
 skip-forward
 sliders-horizontal
 speaker-high
+speaker-low
 speaker-x
+square
 stack
 star
 stop
