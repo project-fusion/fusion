@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { GraphLooks, NodeLook } from '../connect-graph/looks.js'
 
 let isometricDriver: typeof import('./isometric-driver.js').isometricDriver
@@ -250,5 +250,33 @@ describe('isometricDriver', () => {
     const { box, driver } = drawn()
     driver.stop?.()
     expect(box.querySelector('svg')).toBeNull()
+  })
+})
+
+describe('a box with no height of its own', () => {
+  /* Browser only. The SVG takes its height from the viewBox there, rounded:
+     150 came back as 149.9 in WebKit, a new size, which wrote a new viewBox,
+     and a box resized five times raised a loop the browser reported as an
+     error on the page, in WebKit and in Chromium. */
+  test.skipIf(!hasLayout())('settles with no resize loop', async () => {
+    const loops: string[] = []
+    const heard = (event: ErrorEvent): void => {
+      if (String(event.message).includes('ResizeObserver')) {
+        loops.push(String(event.message))
+      }
+    }
+    window.addEventListener('error', heard)
+    try {
+      const { box } = drawn()
+      for (const width of [700, 513, 977, 640, 1201]) {
+        box.style.inlineSize = `${width}px`
+        for (let at = 0; at < 2; at += 1) {
+          await new Promise((resolve) => requestAnimationFrame(resolve))
+        }
+      }
+    } finally {
+      window.removeEventListener('error', heard)
+    }
+    expect(loops).toEqual([])
   })
 })
