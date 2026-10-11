@@ -78,6 +78,32 @@ describe('the transcript', () => {
     expect(log.getAttribute('tabindex')).toBe('0')
   })
 
+  /* Browser only, for a box that scrolls. Pinned, the log follows the bottom
+     on every update, and a smooth scroll sent again each time never arrived:
+     in WebKit, a log that had streamed for a second under
+     `scroll-behavior: smooth` rested 6 pixels short of the bottom. */
+  test.skipIf(!hasLayout())(
+    'follows the bottom at once, whatever scroll-behavior the page sets',
+    async () => {
+      const element = await chat('style="display: block; block-size: 160px"')
+      const log = part(element, 'log') as HTMLElement
+      log.style.blockSize = '100%'
+      log.style.overflow = 'auto'
+      log.style.scrollBehavior = 'smooth'
+      for (let at = 0; at < 30; at += 1) {
+        const turn = document.createElement('helix-headless-chat-message')
+        turn.setAttribute('author', 'them')
+        turn.setAttribute('state', 'sent')
+        turn.textContent = `Line ${at}`
+        element.append(turn)
+      }
+      await new Promise((resolve) => setTimeout(resolve, 50))
+      await element.updateComplete
+      expect(element.pinned).toBe(true)
+      expect(log.scrollHeight - log.clientHeight - log.scrollTop).toBeLessThan(1)
+    },
+  )
+
   /* A transcript that fits was no stop at all, so a conversation whose turns
      held no control had no way into them by keyboard. */
   test('the log is a tab stop while it holds a turn, so Page Down can enter them', async () => {
