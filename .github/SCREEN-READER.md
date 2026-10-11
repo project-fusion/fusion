@@ -12,6 +12,7 @@ VoiceOver, on the families whose purpose is to be operable without sight:
 - Input
 - Menu
 - Toast
+- Terminal
 
 Each step says what to do and what you should hear, as the code defines it. The
 pass is recorded as a document, the way the pixel baselines are recorded as
@@ -269,6 +270,60 @@ after what VoiceOver was already saying.
 
 **O3. Dismissing.** Tab to the first "Dismiss" and press Space.
 Expect the toast to go. Note where focus lands. The component does not move it.
+
+## Terminal
+
+The examples connect xterm.js with no process behind it, so what you type is
+written back and nothing runs. On a Mac, the key that switches Tab is
+Control-Shift-M and the key that opens the find bar is Command-F.
+
+**E1. The frame and its controls.** Open `/terminal/preview`. Press Tab three
+times, and expect these in order:
+
+1. "Find", a button, collapsed, inside a group named "Terminal controls"
+2. "Clear", a button
+3. "Terminal input", an edit text, then "Press Control+Shift+M to move focus
+   with Tab."
+
+Expect all three to be inside a group named "~/fusion".
+
+**E2. The grid, unread.** VO-Right through the terminal.
+Expect "Terminal input" and none of the output: with screen reader mode off,
+the grid is a picture of text and nothing in it is read.
+
+**E3. Tab stays in the terminal.** With focus on "Terminal input", press Tab.
+Expect focus to stay where it is: the terminal takes Tab, as a shell's
+completion needs.
+
+**E4. Letting Tab leave.** Press Control-Shift-M.
+Expect "Tab moves focus. Press Control+Shift+M to type Tab in the terminal." to
+be spoken, and the same line under the terminal. Press Shift-Tab and expect
+"Clear". Press Tab twice, and expect "Terminal input", then focus to leave the
+terminal. Press Shift-Tab to return to "Terminal input", press Control-Shift-M
+again, and expect "Tab types in the terminal."
+
+**E5. Finding.** With focus on "Terminal input", press Command-F.
+Expect "Find", a search field, inside a search landmark named "Find". Type
+`terminal` and expect "1 of 6 matches". Press Return and expect "2 of 6
+matches". Press Escape and expect focus back on "Terminal input", and the
+"Find" button collapsed again.
+
+**E6. Screen reader mode.** In Safari's console, run:
+
+```js
+const terminal = document.querySelector('helix-terminal')
+terminal.screenReaderMode = true
+terminal.write('\r\nBuild finished\r\n')
+```
+
+Expect "Build finished" to be spoken without focus moving. VO-Right through the
+terminal and expect its lines read one at a time, as a list, the first holding
+"git status --short".
+
+**E7. An exited process.** Open `/terminal/exited`. VO-Right past the terminal.
+Expect "The process exited with code 1.", then "Restart", a button. Press
+VO-Space on "Restart" and expect "The process exited with code 1." to be
+spoken again, since the example's process fails again.
 
 ## Recording a pass
 
