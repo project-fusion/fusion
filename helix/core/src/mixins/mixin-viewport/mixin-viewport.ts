@@ -9,6 +9,7 @@ import type { HelixElement } from '../../helix-element/helix-element.js'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import { isRtl } from '../../utils/is-rtl/is-rtl.js'
 import { numberConverter, timeConverter } from '../../utils/number-converter/number-converter.js'
+import { stopPress } from '../../utils/stop-press/stop-press.js'
 import { formatWords, words } from '../../words/words.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
@@ -29,13 +30,6 @@ export interface ViewportControlAxes {
   material?: 'frosted' | 'glass' | 'transparent' | undefined
   raised: boolean
 }
-
-/**
- * Keeps a press on one of the surface's own controls inside the surface: the
- * page hears what the control did, through the surface's own events, and not
- * that a button inside it was pressed.
- */
-const stopPress = (event: Event): void => event.stopPropagation()
 
 /** Which gestures a surface takes from the page. */
 export type ViewportGestures = 'activate' | 'always' | 'cooperative'

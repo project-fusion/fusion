@@ -18,6 +18,7 @@ import {
   SCROLLER_RULE,
   scrollRoom,
   scrollWithin,
+  stopPress,
   ToolbarController,
   Typeahead,
   VIRTUAL_RULE,
@@ -52,13 +53,6 @@ import {
 
 /** How long a layout runs before the frame offers to stop it, in milliseconds: WCAG 2.2.2's five seconds. */
 const LONG_LAYOUT = 5000
-
-/**
- * Keeps a press on one of the graph's own controls inside the graph: the page
- * hears what the control did, through the graph's events, and not that a
- * button inside it was pressed.
- */
-const stopPress = (event: Event): void => event.stopPropagation()
 
 /**
  * @summary A frame around a graph of notes drawn by another library, and the list that makes it readable.

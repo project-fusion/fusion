@@ -7,6 +7,7 @@ import {
   inlineStep,
   requestChange,
   requestValue,
+  stopPress,
   words,
 } from '@fusion.dev/helix-core'
 import { type CSSResult, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -81,12 +82,6 @@ export const registerHighlighter = (
     }
   }
 }
-
-/**
- * Keeps the copy button's press inside the block. What the press did reaches
- * the page as `helix-copy` or `helix-copy-error`, which the block declares.
- */
-const stopPress = (event: Event): void => event.stopPropagation()
 
 /** Whether an element is a Code Block, of either tier, by its tag. */
 const isBlock = (element: Element | null): element is HelixHeadlessCodeBlock =>

@@ -20,6 +20,7 @@ import {
   MixinViewport,
   numberConverter,
   requestChange,
+  stopPress,
   type ViewportControlsPlacement,
   type ViewportPanDetail,
   type ViewportZoomDetail,
@@ -123,13 +124,6 @@ const ASK_LAPSES = 3000
 
 /** How long the view must be still before what it did is said, in milliseconds. */
 const SETTLES = 400
-
-/**
- * Keeps a press on one of the map's own controls inside the map: the page
- * hears what the control did, through the map's events, and not that a button
- * inside it was pressed.
- */
-const stopPress = (event: Event): void => event.stopPropagation()
 
 /**
  * @summary A frame around a map drawn by another library.
