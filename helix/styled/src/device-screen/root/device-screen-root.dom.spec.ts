@@ -24,6 +24,19 @@ describe('styled device screen', () => {
     expect(heard).toEqual(['home'])
   })
 
+  test('the hardware buttons are raised, and the page’s own are left as it wrote them', async () => {
+    const device = (await mount(
+      `<helix-device-screen label="iPhone" controls="home screenshot fullscreen">
+        <helix-icon-button slot="controls" label="Record"></helix-icon-button>
+      </helix-device-screen>`,
+    )) as Device
+    const raised = [
+      ...(device.shadowRoot?.querySelectorAll('[part="controls"] > helix-icon-button') ?? []),
+    ].map((button) => button.hasAttribute('raised'))
+    expect(raised).toEqual([true, true, true])
+    expect(device.querySelector('[slot="controls"]')?.hasAttribute('raised')).toBe(false)
+  })
+
   if (hasLayout()) {
     test('a tall phone in a wide box takes the box’s height, and keeps its shape', async () => {
       const device = (await mount(

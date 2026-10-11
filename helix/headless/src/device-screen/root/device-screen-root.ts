@@ -523,6 +523,14 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
     this.filled = full
   })
 
+  /**
+   * Whether the buttons are drawn raised, which the styled tier says and the
+   * headless tier leaves unset, having nothing to paint.
+   */
+  protected get controlsRaised(): boolean {
+    return false
+  }
+
   /** Whether the buttons are a column beside the device rather than a row. */
   private get column(): boolean {
     return this.controlsPlacement === 'start' || this.controlsPlacement === 'end'
@@ -1229,6 +1237,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
     }
     const button = this.tag('icon-button')
     const off = this.readonly
+    const raised = this.controlsRaised
     return html`<div
       part="controls"
       role="toolbar"
@@ -1242,6 +1251,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               exportparts="button: back-button, live: back-live, spinner: back-spinner, text: back-text"
               ?disabled=${off}
               label=${this.backLabel}
+              ?raised=${raised}
               @click=${(event: MouseEvent) => this.pressed('back', event)}
               @helix-press=${stopPress}
               @pointerdown=${this.handleHoldStart}
@@ -1257,6 +1267,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               exportparts="button: home-button, live: home-live, spinner: home-spinner, text: home-text"
               ?disabled=${off}
               label=${this.homeLabel}
+              ?raised=${raised}
               @click=${(event: MouseEvent) => this.pressed('home', event)}
               @helix-press=${stopPress}
               @pointerdown=${this.handleHoldStart}
@@ -1272,6 +1283,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               exportparts="button: recents-button, live: recents-live, spinner: recents-spinner, text: recents-text"
               ?disabled=${off}
               label=${this.recentsLabel}
+              ?raised=${raised}
               @click=${(event: MouseEvent) => this.pressed('recents', event)}
               @helix-press=${stopPress}
               @pointerdown=${this.handleHoldStart}
@@ -1287,6 +1299,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               exportparts="button: power-button, live: power-live, spinner: power-spinner, text: power-text"
               ?disabled=${off}
               label=${this.powerLabel}
+              ?raised=${raised}
               @click=${(event: MouseEvent) => this.pressed('power', event)}
               @helix-press=${stopPress}
               @pointerdown=${this.handleHoldStart}
@@ -1302,6 +1315,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
                 exportparts="button: volume-up-button, live: volume-up-live, spinner: volume-up-spinner, text: volume-up-text"
                 ?disabled=${off}
                 label=${this.volumeUpLabel}
+                ?raised=${raised}
                 @click=${(event: MouseEvent) => this.pressed('volume-up', event)}
                 @helix-press=${stopPress}
                 @pointerdown=${this.handleHoldStart}
@@ -1313,6 +1327,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
                 exportparts="button: volume-down-button, live: volume-down-live, spinner: volume-down-spinner, text: volume-down-text"
                 ?disabled=${off}
                 label=${this.volumeDownLabel}
+                ?raised=${raised}
                 @click=${(event: MouseEvent) => this.pressed('volume-down', event)}
                 @helix-press=${stopPress}
                 @pointerdown=${this.handleHoldStart}
@@ -1328,6 +1343,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
                 exportparts="button: rotate-left-button, live: rotate-left-live, spinner: rotate-left-spinner, text: rotate-left-text"
                 ?disabled=${off}
                 label=${this.rotateLeftLabel}
+                ?raised=${raised}
                 @click=${(event: MouseEvent) => this.pressed('rotate-left', event)}
                 @helix-press=${stopPress}
                 @pointerdown=${this.handleHoldStart}
@@ -1339,6 +1355,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
                 exportparts="button: rotate-right-button, live: rotate-right-live, spinner: rotate-right-spinner, text: rotate-right-text"
                 ?disabled=${off}
                 label=${this.rotateRightLabel}
+                ?raised=${raised}
                 @click=${(event: MouseEvent) => this.pressed('rotate-right', event)}
                 @helix-press=${stopPress}
                 @pointerdown=${this.handleHoldStart}
@@ -1353,6 +1370,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               part="screenshot"
               exportparts="button: screenshot-button, live: screenshot-live, spinner: screenshot-spinner, text: screenshot-text"
               label=${this.screenshotLabel}
+              ?raised=${raised}
               @click=${() => this.screenshot()}
               @helix-press=${stopPress}
             >
@@ -1368,6 +1386,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               exportparts="button: fullscreen-button, live: fullscreen-live, spinner: fullscreen-spinner, text: fullscreen-text"
               aria-pressed=${this.filled ? 'true' : 'false'}
               label=${this.fullscreenLabel}
+              ?raised=${raised}
               @click=${() => void this.fullscreen.toggle()}
               @helix-press=${stopPress}
             >

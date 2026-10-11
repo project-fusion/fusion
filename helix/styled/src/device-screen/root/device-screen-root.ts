@@ -12,9 +12,9 @@ import { styles } from './device-screen-root.css.js'
  *
  * @description
  * The styled device: a dark body around a screen with rounded corners, fitted
- * to the space it is given, with its hardware buttons in a row above it. Give
- * it a height with `block-size` or `--device-screen-block-size`, such as
- * `100%` to fill a pane, and the device keeps its shape inside it.
+ * to the space it is given, with its hardware buttons raised in a row above
+ * it. Give it a height with `block-size` or `--device-screen-block-size`, such
+ * as `100%` to fill a pane, and the device keeps its shape inside it.
  *
  * The body is drawn in proportion to the screen, so it keeps its look at any
  * size. `--device-screen-bezel` sets how thick it is at the sides and
@@ -51,6 +51,11 @@ export class HelixDeviceScreen extends HelixHeadlessDeviceScreen {
   separation?: 'plain'
 
   static override tier = 'helix-'
+
+  /** The buttons stand apart from the page as the device does, so they are raised. */
+  protected override get controlsRaised(): boolean {
+    return true
+  }
 
   static override styles: CSSResultGroup = [glyphStyles, styles]
 }
