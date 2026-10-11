@@ -28,7 +28,11 @@
  *
  * **Requests stay on the site's own origin**, so the maps page draws without
  * the tiles another host would serve, and the sandbox without the compiler it
- * loads from a CDN for a TypeScript pane.
+ * loads from a CDN for a TypeScript pane. **The site's server still asks
+ * OpenFreeMap for the maps page's first paint.** It draws a picture of the
+ * map, which the map hides once it has drawn, so no baseline shows it. The
+ * tiles' credit is the same whether or not OpenFreeMap answered within the
+ * server's two seconds.
  */
 import { defineConfig } from '@fusion.dev/helix-cli/visual'
 

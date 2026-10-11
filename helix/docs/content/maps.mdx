@@ -241,7 +241,8 @@ name, in a `<span slot="attribution">` marked `data-helix-map-credit`, so the
 frame shows the credit from the first paint. `connectMap` hides that credit
 once it writes MapLibre's, which names the same tiles. When a tile cannot be
 read, the credit stays and `markup` is the credit alone, so write `markup`
-whether or not the picture was drawn.
+whether or not the picture was drawn. With OpenFreeMap's tiles, the default,
+the credit also stays when their TileJSON does not answer in time.
 
 A snapshot also holds the two apart: `picture`, the map alone, and `credit`,
 the credit as runs of words and links, each `{ text }` or `{ href, text }`.
