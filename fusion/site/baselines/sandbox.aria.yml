@@ -155,6 +155,11 @@
       - text: Description List
       - link "Description List documentation":
         - /url: /helix/components/description-list
+    - treeitem "Device Screen Device Screen documentation Experimental" [level=1]:
+      - text: Device Screen
+      - link "Device Screen documentation":
+        - /url: /helix/components/device-screen
+      - img "Experimental"
     - treeitem "Dialog Dialog documentation" [level=1]:
       - text: Dialog
       - link "Dialog documentation":
