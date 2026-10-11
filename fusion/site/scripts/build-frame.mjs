@@ -31,6 +31,7 @@ const threeEntry = join(root, 'fusion/site/preview/preview-graph-three-entry.ts'
 const plotThreeEntry = join(root, 'fusion/site/preview/preview-plot-three-entry.ts')
 const mapEntry = join(root, 'fusion/site/preview/preview-map-entry.ts')
 const maplibreEntry = join(root, 'fusion/site/preview/preview-maplibre-entry.ts')
+const terminalEntry = join(root, 'fusion/site/preview/preview-terminal-entry.ts')
 
 /* The layers, in the order a consumer is told to import them. `elements.css` is
    generated from the element sources and hides each tag until it upgrades.
@@ -203,6 +204,29 @@ if (!plotThreeBuilt.success) {
 const plotThreeScript = await plotThreeBuilt.outputs[0].text()
 await writeFile(join(out, 'plot-three.js'), plotThreeScript)
 
+/* **A live terminal, in one file the frame loads only when a render carries
+ * one**: the connector, xterm.js and its fit, search and web links addons,
+ * with xterm.js's stylesheet inside it. */
+const terminalBuilt = await Bun.build({
+  define: {
+    __XTERM_CSS__: JSON.stringify(
+      await readFile(fileURLToPath(import.meta.resolve('@xterm/xterm/css/xterm.css')), 'utf8'),
+    ),
+  },
+  entrypoints: [terminalEntry],
+  format: 'iife',
+  minify: true,
+  target: 'browser',
+})
+if (!terminalBuilt.success) {
+  for (const log of terminalBuilt.logs) {
+    console.error(log)
+  }
+  process.exit(1)
+}
+const terminalScript = await terminalBuilt.outputs[0].text()
+await writeFile(join(out, 'terminal.js'), terminalScript)
+
 const built = await Bun.build({
   define: {
     __PREVIEW_GRAPH_COSMOS_URL__: JSON.stringify(`./graph-cosmos.js?v=${stamp(cosmosScript)}`),
@@ -211,6 +235,7 @@ const built = await Bun.build({
     __PREVIEW_MAP_URL__: JSON.stringify(`./map.js?v=${stamp(mapScript)}`),
     __PREVIEW_MAPLIBRE_URL__: JSON.stringify(`./maplibre-gl.js?v=${stamp(maplibre)}`),
     __PREVIEW_PLOT_THREE_URL__: JSON.stringify(`./plot-three.js?v=${stamp(plotThreeScript)}`),
+    __PREVIEW_TERMINAL_URL__: JSON.stringify(`./terminal.js?v=${stamp(terminalScript)}`),
   },
   entrypoints: [entry],
   format: 'iife',
@@ -318,6 +343,7 @@ const mapSize = Math.round((maplibre.length + mapScript.length) / 1024)
 const graphSize = Math.round(graphScript.length / 1024)
 const cosmosSize = Math.round(cosmosScript.length / 1024)
 const threeSize = Math.round(threeScript.length / 1024)
+const terminalSize = Math.round(terminalScript.length / 1024)
 console.log(
-  `frame: ${size} KB, ${layers.length} style layers, one classic script, and ${mapSize} KB of map and ${graphSize} KB of graph, ${cosmosSize} KB drawn by cosmos.gl, or ${threeSize} KB drawn by three.js, loaded only when a render carries one`,
+  `frame: ${size} KB, ${layers.length} style layers, one classic script, and ${mapSize} KB of map, ${graphSize} KB of graph, ${cosmosSize} KB drawn by cosmos.gl, ${threeSize} KB drawn by three.js, or ${terminalSize} KB of terminal, loaded only when a render carries one`,
 )

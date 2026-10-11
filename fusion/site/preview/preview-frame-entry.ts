@@ -23,13 +23,14 @@
 import '@fusion.dev/helix'
 import { RESTYLED } from './preview-events'
 
-/** Where the map chunk, MapLibre and the graph chunk are, stamped at build time. */
+/** Where the map chunk, MapLibre, the graph chunks, and the terminal chunk are, stamped at build time. */
 declare const __PREVIEW_GRAPH_COSMOS_URL__: string
 declare const __PREVIEW_GRAPH_THREE_URL__: string
 declare const __PREVIEW_GRAPH_URL__: string
 declare const __PREVIEW_MAP_URL__: string
 declare const __PREVIEW_MAPLIBRE_URL__: string
 declare const __PREVIEW_PLOT_THREE_URL__: string
+declare const __PREVIEW_TERMINAL_URL__: string
 
 interface RenderMessage {
   colorMode?: 'dark' | 'light'
@@ -55,7 +56,7 @@ const host = document.getElementById('preview-root')
  */
 let rendered: string | undefined
 
-/** Takes down whatever the last markup mounted, before it is replaced: its maps and its graphs. */
+/** Takes down whatever the last markup mounted, before it is replaced: its maps, its graphs, and its terminals. */
 const mounted: (() => void)[] = []
 const unmount = (): void => {
   for (const one of mounted.splice(0)) {
@@ -170,6 +171,24 @@ const mountGraphs = (root: HTMLElement, at: number): void => {
 }
 
 /**
+ * A live terminal for any frame with `data-preview-terminal` the markup
+ * carries, with xterm.js and the connector loaded the first time one does and
+ * never before.
+ */
+const mountTerminals = (root: HTMLElement, at: number): void => {
+  if (!root.querySelector(':is(helix-terminal, helix-headless-terminal)[data-preview-terminal]')) {
+    return
+  }
+  void load(__PREVIEW_TERMINAL_URL__)
+    .then(() => {
+      if (at === generation && window.helixPreviewTerminal) {
+        mounted.push(window.helixPreviewTerminal.mount(root))
+      }
+    })
+    .catch((error: unknown) => console.error(String(error)))
+}
+
+/**
  * Answered at `*`, which is the only thing an opaque origin can do.
  *
  * A sandboxed document cannot name its parent's origin as a target: there is no
@@ -254,6 +273,7 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
   if (fresh) {
     mountMaps(host, generation)
     mountGraphs(host, generation)
+    mountTerminals(host, generation)
   }
   window.dispatchEvent(new Event(RESTYLED))
   measure()

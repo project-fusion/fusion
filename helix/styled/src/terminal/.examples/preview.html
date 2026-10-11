@@ -1,0 +1,37 @@
+<!-- @summary A terminal running a shell, with its name in the header and the find and clear controls. -->
+<!-- Preview frame: data-preview-terminal has the frame connect xterm.js; on your page, connectTerminal does. -->
+<helix-terminal
+  data-preview-terminal
+  id="shell"
+  label="~/fusion"
+>
+  <div data-preview-terminal-canvas></div>
+</helix-terminal>
+
+<script type="module">
+  const shell = document.getElementById('shell')
+  const prompt = '\x1b[36m~/fusion\x1b[0m \x1b[35mmain\x1b[0m \x1b[32m❯\x1b[0m '
+
+  shell.write(
+    [
+      `${prompt}git status --short`,
+      ' \x1b[31mM\x1b[0m helix/styled/src/terminal/root/terminal-root.css',
+      '\x1b[31m??\x1b[0m helix/terminal/',
+      `${prompt}bun test`,
+      '\x1b[1mbun test\x1b[0m \x1b[2mv1.3.0\x1b[0m',
+      '\x1b[32m✓\x1b[0m terminal output \x1b[2m> is held until a renderer is attached\x1b[0m',
+      '\x1b[32m✓\x1b[0m terminal input \x1b[2m> reaches the page as helix-terminal-input\x1b[0m',
+      '\x1b[31m✗\x1b[0m the find bar \x1b[2m> says the count\x1b[0m',
+      '',
+      ' \x1b[32m23 pass\x1b[0m',
+      ' \x1b[31m1 fail\x1b[0m',
+      prompt,
+    ].join('\r\n'),
+  )
+
+  // No process is connected here, so the example writes back what you type.
+  shell.addEventListener('helix-terminal-input', (event) => {
+    const { data } = event.detail
+    shell.write(data === '\r' ? `\r\n${prompt}` : data === '\x7f' ? '\b \b' : data)
+  })
+</script>

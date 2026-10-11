@@ -1,0 +1,34 @@
+<!-- @summary The sixteen ANSI colors as your theme draws them, as text and as grounds. -->
+<!-- Preview frame: data-preview-terminal has the frame connect xterm.js; on your page, connectTerminal does. -->
+<helix-terminal
+  controls="none"
+  data-preview-terminal
+  id="colors"
+  label="ANSI colors"
+  readonly
+>
+  <div data-preview-terminal-canvas></div>
+</helix-terminal>
+
+<script type="module">
+  const NAMES = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white']
+  const SETS = [
+    ['Text', 30],
+    ['Bright text', 90],
+    ['Grounds', 40],
+    ['Bright grounds', 100],
+  ]
+
+  const lines = []
+  for (const [heading, base] of SETS) {
+    lines.push(`\x1b[1m${heading}\x1b[0m`)
+    for (const half of [0, 4]) {
+      lines.push(
+        NAMES.slice(half, half + 4)
+          .map((name, at) => `\x1b[${base + half + at}m ${name.padEnd(8)}\x1b[0m`)
+          .join(' '),
+      )
+    }
+  }
+  document.getElementById('colors').write(lines.join('\r\n'))
+</script>

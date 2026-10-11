@@ -1,0 +1,31 @@
+<!-- @summary A terminal that fills a pane, flush with its edges, with a button of your own in the header. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<div class="pane">
+  <!-- Preview frame: data-preview-terminal has the frame connect xterm.js; on your page, connectTerminal does. -->
+  <helix-terminal
+    controls="find clear fullscreen"
+    data-preview-terminal
+    fill
+    id="pane"
+    label="zsh"
+    separation="plain"
+  >
+    <helix-icon-button
+      label="New terminal"
+      slot="actions"
+    >
+      <helix-icon name="plus"></helix-icon>
+    </helix-icon-button>
+    <div data-preview-terminal-canvas></div>
+  </helix-terminal>
+</div>
+
+<script type="module">
+  document
+    .getElementById('pane')
+    .write('\x1b[36m~\x1b[0m \x1b[32m❯\x1b[0m ls\r\nDesktop  Development  Documents  Downloads\r\n\x1b[36m~\x1b[0m \x1b[32m❯\x1b[0m ')
+</script>

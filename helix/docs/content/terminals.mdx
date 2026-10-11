@@ -1,0 +1,373 @@
+---
+description: Add a terminal that runs your own shell or process to your site, styled with your theme and drawn by xterm.js.
+section: Essentials
+title: Terminals
+---
+
+# Terminals
+
+Helix Terminal puts a frame around a terminal drawn by xterm.js or an emulator
+of your own. The frame adds a header with the terminal's name and controls, a
+find bar, and a status line for a process that exited. `@fusion.dev/helix-terminal`
+connects the frame to the emulator and themes it from your tokens. Helix does
+not start processes. You connect the frame to yours, such as a pseudo-terminal
+on your server or in a desktop app.
+
+## Add a terminal
+
+Install Helix, the terminal connector, xterm.js, and the xterm.js addons you
+want:
+
+```sh
+bun add @fusion.dev/helix @fusion.dev/helix-terminal @xterm/xterm @xterm/addon-fit @xterm/addon-search @xterm/addon-web-links
+```
+
+Add the frame and an element for xterm.js to draw in:
+
+```html
+<helix-terminal label="~/project">
+  <div id="terminal"></div>
+</helix-terminal>
+```
+
+Create the terminal in your theme, open it in the frame, then connect the two:
+
+```js
+import '@fusion.dev/helix/terminal'
+import '@xterm/xterm/css/xterm.css'
+import { connectTerminal, terminalThemeReady } from '@fusion.dev/helix-terminal'
+import { xtermDriver, xtermOptions } from '@fusion.dev/helix-terminal/xterm'
+import { FitAddon } from '@xterm/addon-fit'
+import { SearchAddon } from '@xterm/addon-search'
+import { WebLinksAddon } from '@xterm/addon-web-links'
+import { Terminal } from '@xterm/xterm'
+
+const frame = document.querySelector('helix-terminal')
+const terminal = new Terminal(xtermOptions(await terminalThemeReady(frame)))
+terminal.open(document.getElementById('terminal'))
+
+const connection = connectTerminal(
+  frame,
+  xtermDriver(terminal, {
+    fit: new FitAddon(),
+    search: new SearchAddon(),
+    webLinks: WebLinksAddon,
+  }),
+)
+
+// Later, when the terminal goes away:
+connection.disconnect()
+terminal.dispose()
+```
+
+`terminalThemeReady` waits until your tokens can be read and the monospaced
+face has loaded. xterm.js measures its cells in the face it opens with, so a
+terminal created before the face loads keeps the fallback face's cell size.
+
+Pass each addon new. The driver loads them, so do not load them yourself.
+
+## Connect a process
+
+The frame takes the process's output and sends what the reader types and the
+size of the grid. This example connects a pseudo-terminal on your server over
+a WebSocket:
+
+```js
+const socket = new WebSocket('wss://example.com/pty')
+socket.binaryType = 'arraybuffer'
+
+// The process's output, as the bytes it wrote.
+socket.addEventListener('message', (event) => frame.write(new Uint8Array(event.data)))
+
+// What the reader types and pastes, encoded for the program.
+frame.addEventListener('helix-terminal-input', (event) => {
+  socket.send(JSON.stringify({ input: event.detail.data }))
+})
+
+// The grid's size, which the pseudo-terminal takes as rows and columns.
+frame.addEventListener('helix-terminal-resize', (event) => {
+  const { columns, rows } = event.detail
+  socket.send(JSON.stringify({ columns, rows }))
+})
+```
+
+In a Tauri app, a command writes input to the pseudo-terminal and an event
+carries its output back. The frame takes the same three calls.
+
+- `write(data)` takes a string or a `Uint8Array` of UTF-8. Output written
+  before `connectTerminal` runs is held and written first, so the process can
+  start before xterm.js loads.
+- `helix-terminal-input` carries `data` and `binary`. `binary` is `true` for
+  some mouse reports, whose characters are each one byte: write them as bytes
+  with `Uint8Array.from(data, (character) => character.charCodeAt(0))`.
+- `helix-terminal-resize` carries `columns` and `rows`, and `width` and
+  `height` in CSS pixels, which a pseudo-terminal's size also takes. It is sent
+  once when the frame connects and again whenever the grid changes size.
+- `paste(text)` inputs text as a paste does. It arrives as
+  `helix-terminal-input`, wrapped in the bracketed paste codes when the program
+  asked for them.
+
+### Keep up with a fast process
+
+`write()` returns a promise that resolves once xterm.js has parsed the output.
+A process can write faster than a terminal draws, so pause it while too much
+is waiting:
+
+```js
+let waiting = 0
+
+pty.onData(async (chunk) => {
+  waiting += chunk.length
+  if (waiting > 1_000_000) {
+    pty.pause()
+  }
+  await frame.write(chunk)
+  waiting -= chunk.length
+  if (waiting < 100_000) {
+    pty.resume()
+  }
+})
+```
+
+### When the process exits
+
+Set `exit-code` when the process exits. The status line says how it exited,
+the frame stops sending input, and a Restart button appears. Restart sends
+`helix-terminal-restart`. Start a new process, clear `exitCode`, and write the
+new output:
+
+```js
+pty.onExit((code) => {
+  frame.exitCode = code
+})
+
+frame.addEventListener('helix-terminal-restart', () => {
+  frame.exitCode = undefined
+  frame.reset()
+  pty = start()
+})
+```
+
+## What the connector does
+
+`connectTerminal` links the frame to the emulator:
+
+- The frame's output reaches the emulator, and the reader's input reaches the
+  frame.
+- The grid fits the frame and fits again when the frame changes size. Set
+  `columns` and `rows` on the frame for a grid of a fixed size.
+- The emulator is themed from your tokens, and themed again when your theme or
+  color mode changes.
+- Every cell's text keeps a contrast of 4.5:1 against its ground, so a color a
+  program chose stays readable on your theme. Pass `{ contrast: 7 }` for a
+  higher floor, or `{ contrast: 1 }` to draw every color as the program wrote
+  it.
+- The cursor stops blinking and scrolling stops animating when a reader has
+  asked for reduced motion.
+- `connection.fit()` fits the grid again, for a page that resized the frame in
+  a way the connector cannot see.
+- `connection.disconnect()` puts back everything `connectTerminal` changed.
+
+Use `xtermDriver(terminal, addons)` for xterm.js 6. xterm.js is not bundled
+with Helix, so you can use the version you already have.
+
+## Style the terminal with your theme
+
+The frame reads each color from a custom property, and the connector draws
+the terminal in it. The styled frame sets every one from your tokens. Set one
+on the terminal to choose a color yourself:
+
+```css
+helix-terminal {
+  --terminal-ansi-blue: #3b82f6;
+  --terminal-cursor-color: var(--helix-color-accent);
+}
+```
+
+| Property | Default | Draws |
+|---|---|---|
+| `--terminal-active-match-background-color` | Warning, mixed with the ground | The current match of a search |
+| `--terminal-active-match-border-color` | `--helix-color-warning` | The edge of the current match |
+| `--terminal-ansi-black` | `--helix-color-foreground` in light, `--helix-color-border` in dark | ANSI black |
+| `--terminal-ansi-blue` | `--helix-color-info` | ANSI blue |
+| `--terminal-ansi-cyan` | Info mixed with success | ANSI cyan |
+| `--terminal-ansi-green` | `--helix-color-success` | ANSI green |
+| `--terminal-ansi-magenta` | `--helix-color-syntax-callable` | ANSI magenta |
+| `--terminal-ansi-red` | `--helix-color-danger` | ANSI red |
+| `--terminal-ansi-white` | `--helix-color-foreground-subtle` in light, between muted and the foreground in dark | ANSI white |
+| `--terminal-ansi-yellow` | `--helix-color-warning` | ANSI yellow |
+| `--terminal-background-color` | `--helix-color-background` | The ground |
+| `--terminal-color` | `--helix-color-foreground` | Text where the program sets no color |
+| `--terminal-cursor-color` | `--helix-color-primary` | The cursor |
+| `--terminal-match-background-color` | Warning, mixed more quietly with the ground | Every other match of a search |
+| `--terminal-scrollbar-thumb-color` | `--helix-scrollbar-thumb-color` | The scrollbar |
+| `--terminal-selection-background-color` | Primary at 30% | Selected text |
+
+Each bright color has a property of its own, such as `--terminal-ansi-bright-red`,
+and takes the same default as its color. The bright gray, `--terminal-ansi-bright-black`,
+defaults to `--helix-color-foreground-muted`, and bright white to
+`--helix-color-border` in light and `--helix-color-foreground` in dark.
+
+On the headless tier, `helix-headless-terminal` sets none of them. Set the
+ones you want, and xterm.js keeps its own color for the rest.
+
+The colors share Log's hues, so a program's output reads the same in a log and
+in a terminal side by side. The four grays keep their order from dark to light
+in each color mode: a program that fills a panel with black expects it to be
+dark. Text a program writes in a gray that is faint against your ground is
+lifted to the contrast floor.
+
+The grid is drawn in the viewport's face, which the styled frame sets from
+`--terminal-font-family`, the monospaced face by default, and
+`--terminal-font-size`, the small text step. It also takes
+`--terminal-block-size`, `--terminal-border-color`,
+`--terminal-header-background-color`, `--terminal-padding`, and
+`--terminal-radius`. The [Terminal reference](/helix/components/terminal) lists
+what each one draws.
+
+## Show a command's output
+
+Set `readonly` to show output that takes no input, such as a command an agent
+ran. The frame draws no cursor and sends no input. Set `columns` and `rows` to
+draw the output at the size the command ran at:
+
+```html
+<helix-terminal controls="find copy" label="bun run build" readonly columns="80" rows="12">
+  <div id="transcript"></div>
+</helix-terminal>
+```
+
+## Fill a pane
+
+Set `fill` for a terminal that fills a pane, such as one side of a `Splitter`.
+The frame covers its container, which needs a position of its own, such as
+`position: relative`. Set `separation="plain"` where the pane already draws its
+edges. Put buttons of your own in the `actions` slot, before the built-in
+controls:
+
+```html
+<div class="pane">
+  <helix-terminal fill label="zsh" separation="plain">
+    <helix-icon-button label="New terminal" slot="actions">
+      <helix-icon name="plus"></helix-icon>
+    </helix-icon-button>
+    <div id="terminal"></div>
+  </helix-terminal>
+</div>
+```
+
+The frame keeps its own `label` when a program sets its title.
+`helix-terminal-title` carries the new title, so you can show it where it
+belongs, such as on the tab the terminal sits under.
+
+## Links
+
+A link in the output sends `helix-terminal-link` with its `href` when a reader
+activates it. Left alone, the frame opens an `http` or `https` address in a new
+tab and opens nothing else, since a program can write any address. Cancel the
+event to open the link yourself, as a desktop app does through the system's
+browser:
+
+```js
+frame.addEventListener('helix-terminal-link', (event) => {
+  event.preventDefault()
+  openInBrowser(event.detail.href)
+})
+```
+
+Links a program writes as hyperlinks always work. Pass `WebLinksAddon` to
+`xtermDriver` to also make the addresses in plain text into links.
+
+## Keyboard and screen readers
+
+- Every key goes to the program, including Tab, Shift+Tab, and Escape, except
+  the keys below.
+- Control+Shift+F, or Command+F on a Mac, opens the find bar. Enter moves to
+  the next match and Shift+Enter to the previous one. Escape closes the bar and
+  returns focus to the terminal. Screen readers hear how many matches there are.
+- Control+Shift+C copies the selection. On a Mac, Command+C does.
+- Control+M, or Control+Shift+M on a Mac, switches Tab between typing in the
+  terminal and moving focus out of it. The status line says when Tab moves
+  focus, and screen readers hear each change. The terminal's input describes
+  this key to a screen reader. In a terminal, Control+M types the same
+  character as Enter.
+- The frame is a named group. Its controls come before the terminal in the
+  tab order, and the terminal's input is one tab stop. Name each terminal with
+  `label` so a reader can tell several apart.
+- A terminal draws its grid as a picture of text, which a screen reader cannot
+  read. Set `screen-reader-mode` to have xterm.js keep the grid as lines a
+  screen reader can move through, and announce new output as it arrives. It
+  costs time on every write, so it is off by default. A browser cannot tell
+  whether a screen reader is running, so connect it to a setting your reader
+  can turn on:
+
+  ```js
+  frame.screenReaderMode = settings.screenReader
+  ```
+
+- `text()` returns the lines on screen as plain text, and `text('all')`
+  returns every line the scrollback holds, which is how an assistant reads a
+  terminal it has been allowed to see.
+
+## Write a driver
+
+To use another emulator, write a driver: an object that draws the frame's
+output and tells the frame what the reader typed. `connectTerminal` calls it.
+`xtermDriver` is one, and the `TerminalDriver` type in
+`@fusion.dev/helix-terminal` describes every method.
+
+### Required methods
+
+- `write(data, done)` draws the program's output, a string or a `Uint8Array`,
+  and calls `done` once it has been parsed.
+- `onInput(input)` calls `input(data, binary)` with what the reader types or
+  pastes, encoded for the program, and returns a function that stops.
+
+### Optional methods
+
+Each optional method turns on a feature. Without it, the feature is off and
+nothing fails. A control in the header that a driver cannot answer is not
+drawn.
+
+| Method | What it must do | Turns on |
+|---|---|---|
+| `clear()` | Clear the scrollback, keeping the cursor's line | The clear button, and `clear()` |
+| `element()` | Return the element the emulator draws in | Refitting when it changes size |
+| `fit()` | Fit the grid to its element, and report the new size through `onResize` | A grid that fills the frame |
+| `focus()` | Focus the emulator's input | `focus()`, and focus returning from the find bar |
+| `input()` | Return the element that takes keys | Naming the input for screen readers |
+| `onBell(rang)` | Call `rang` on the bell, and return a function that stops | `helix-terminal-bell` and the flash |
+| `onLink(activated)` | Call `activated(href)` when a link is used, and return a function that stops | `helix-terminal-link` |
+| `onResize(resized)` | Call `resized({ columns, rows })` when the grid changes size | `helix-terminal-resize` after the first |
+| `onSelection(changed)` | Call `changed` when the selection changes | The copy button's state |
+| `onTitle(changed)` | Call `changed(title)` when the program sets its title | `helix-terminal-title` |
+| `options(options)` | Apply `contrast`, `cursor`, `input`, `motion`, and `screenReader` | Read-only output, the contrast floor, reduced motion, and screen reader mode |
+| `paste(text)` | Input text as a paste does | `paste()` |
+| `pixels()` | Return the grid's `width` and `height` in CSS pixels | The pixel size in `helix-terminal-resize` |
+| `release()` | Put back what the driver changed | A clean `disconnect()` |
+| `reset()` | Reset the emulator | `reset()` |
+| `resize(columns, rows)` | Set the grid's size in cells | `columns` and `rows` on the frame |
+| `search` | An object with `find(query, options, matches)`, `end()`, and `onResults(found)` | The find bar |
+| `selection()` | Return the selected text | The copy button and its key |
+| `size()` | Return the grid's `{ columns, rows }` | The first `helix-terminal-resize` |
+| `text(scope)` | Return the screen, or with `all` the scrollback, as text | `text()` |
+| `theme(theme)` | Draw in `theme.colors` and `theme.font` | Theming |
+
+`connection.disconnect()` calls every function a method returned, detaches the
+driver from the frame, and calls `release()`.
+
+### Draw your own terminal
+
+A page that draws a terminal without a driver hands the frame a renderer of
+its own with `frame.attach(renderer)`. It returns the calls that tell the frame
+what happened: `input`, `resized`, `title`, `bell`, `link`, `selected`, `found`,
+and `detach`. The `TerminalRenderer` and `TerminalSink` types in
+`@fusion.dev/helix-headless/terminal` describe both.
+
+### Test a driver
+
+Our specs test the xterm.js driver twice. A stand-in terminal records what the
+driver asks of it, which runs anywhere. Then the browser specs connect a frame
+to the real xterm.js, write output, type, search, and check what the frame
+said. Test your driver the same way: connect it to a frame, write to the frame,
+and read `text()` back.

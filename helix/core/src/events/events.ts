@@ -157,6 +157,12 @@ import { HelixSortEvent } from './sort.js'
 import { HelixSortedEvent } from './sorted.js'
 import { HelixSplitEvent } from './split.js'
 import { HelixStrandsFallbackEvent } from './strands-fallback.js'
+import { HelixTerminalBellEvent } from './terminal-bell.js'
+import { HelixTerminalInputEvent } from './terminal-input.js'
+import { HelixTerminalLinkEvent } from './terminal-link.js'
+import { HelixTerminalResizeEvent } from './terminal-resize.js'
+import { HelixTerminalRestartEvent } from './terminal-restart.js'
+import { HelixTerminalTitleEvent } from './terminal-title.js'
 import { HelixToggleEvent } from './toggle.js'
 import { HelixTourAskEvent } from './tour-ask.js'
 import { HelixTourStatusEvent } from './tour-status.js'
@@ -213,6 +219,10 @@ export type {
   SkipDetail,
   SortDetail,
   StrandsFallbackDetail,
+  TerminalInputDetail,
+  TerminalLinkDetail,
+  TerminalResizeDetail,
+  TerminalTitleDetail,
   ToggleDetail,
   TourAskDetail,
   TourStatusDetail,
@@ -313,6 +323,12 @@ export {
   HelixSortedEvent,
   HelixSplitEvent,
   HelixStrandsFallbackEvent,
+  HelixTerminalBellEvent,
+  HelixTerminalInputEvent,
+  HelixTerminalLinkEvent,
+  HelixTerminalResizeEvent,
+  HelixTerminalRestartEvent,
+  HelixTerminalTitleEvent,
   HelixToggleEvent,
   HelixTourAskEvent,
   HelixTourStatusEvent,
@@ -423,6 +439,12 @@ const registry = {
   HelixSortedEvent,
   HelixSplitEvent,
   HelixStrandsFallbackEvent,
+  HelixTerminalBellEvent,
+  HelixTerminalInputEvent,
+  HelixTerminalLinkEvent,
+  HelixTerminalResizeEvent,
+  HelixTerminalRestartEvent,
+  HelixTerminalTitleEvent,
   HelixToggleEvent,
   HelixTourAskEvent,
   HelixTourStatusEvent,
