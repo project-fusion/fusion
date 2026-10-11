@@ -436,6 +436,11 @@
       - text: Tag
       - link "Tag documentation":
         - /url: /helix/components/tag
+    - treeitem "Terminal Terminal documentation Experimental" [level=1]:
+      - text: Terminal
+      - link "Terminal documentation":
+        - /url: /helix/components/terminal
+      - img "Experimental"
     - treeitem "Text Text documentation" [level=1]:
       - text: Text
       - link "Text documentation":
