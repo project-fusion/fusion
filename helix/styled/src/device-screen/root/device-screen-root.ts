@@ -28,7 +28,7 @@ import { styles } from './device-screen-root.css.js'
  * set the two bezel properties to the picture's own margins around its screen,
  * each divided by the width of its screen.
  *
- * @since 0.209.0
+ * @since 0.211.0
  * @status experimental
  * @category media
  * @aliases Simulator, Emulator, Device mirror, Remote screen

@@ -511,11 +511,48 @@ describe('device screen, buttons', () => {
     expect(off).toContain('home')
   })
 
-  test('the group of buttons is named', async () => {
-    const host = await device()
-    const group = part(host, 'controls')
-    expect(group?.getAttribute('role')).toBe('group')
-    expect(group?.getAttribute('aria-label')).toBe('Device controls')
+  test('the buttons are one named toolbar, a single tab stop on the first', async () => {
+    const host = (await mount(
+      `<helix-headless-device-screen label="iPhone" controls="home screenshot">
+        <button slot="controls" id="record">Record</button>
+      </helix-headless-device-screen>`,
+    )) as Screen
+    /* The stop is kept once every button has upgraded, a task after the update. */
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    const row = part(host, 'controls')
+    expect(row?.getAttribute('role')).toBe('toolbar')
+    expect(row?.getAttribute('aria-label')).toBe('Device controls')
+    expect(row?.hasAttribute('aria-orientation')).toBe(false)
+    const stops = [
+      ...(row?.querySelectorAll<HTMLElement & { focusable: boolean }>(
+        'helix-headless-icon-button',
+      ) ?? []),
+    ].map((button) => button.focusable)
+    expect(stops).toEqual([true, false])
+    expect(host.querySelector('#record')?.getAttribute('tabindex')).toBe('-1')
+  })
+
+  test('the arrow keys move the stop along the row, and up and down a column', async () => {
+    const press = (from: Element, key: string): void => {
+      from.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, composed: true, key }))
+    }
+    const focusable = (host: Screen, name: string): boolean =>
+      (part(host, name) as HTMLElement & { focusable: boolean }).focusable
+    const row = await device()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    press(part(row, 'home') as Element, 'ArrowDown')
+    expect(focusable(row, 'home')).toBe(true)
+    press(part(row, 'home') as Element, 'ArrowRight')
+    expect(focusable(row, 'screenshot')).toBe(true)
+    expect(focusable(row, 'home')).toBe(false)
+
+    const column = await device('controls-placement="end"')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(part(column, 'controls')?.getAttribute('aria-orientation')).toBe('vertical')
+    press(part(column, 'home') as Element, 'ArrowRight')
+    expect(focusable(column, 'home')).toBe(true)
+    press(part(column, 'home') as Element, 'ArrowDown')
+    expect(focusable(column, 'screenshot')).toBe(true)
   })
 })
 

@@ -19,6 +19,7 @@ import {
   SPOKEN_RULE,
   stopPress,
   TOUCHES_RULE,
+  ToolbarController,
   words,
 } from '@fusion.dev/helix-core'
 import {
@@ -154,7 +155,8 @@ const pastes = (event: KeyboardEvent): boolean =>
  * `home screenshot` by default. Each sends `helix-device-button` with how long
  * it was held, and the screenshot button sends `helix-device-screenshot`.
  * `press()` and `screenshot()` do the same from a script. Put buttons of your
- * own in the `controls` slot, and they join the row.
+ * own in the `controls` slot, and they join the row. The row is one tab stop,
+ * and the arrow keys move along it, or Up and Down in a column.
  *
  * Set `rotation` where your source sends frames in the device's natural
  * orientation while the device is turned: the frame turns the picture, and
@@ -162,7 +164,7 @@ const pastes = (event: KeyboardEvent): boolean =>
  * such as while an agent drives the device. The screen is then a picture, and
  * `showTap()` and `showSwipe()` mark where the agent touched it.
  *
- * @since 0.209.0
+ * @since 0.211.0
  * @status experimental
  * @category media
  * @aliases Simulator, Emulator, Device mirror, Remote screen
@@ -300,7 +302,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
   @property()
   controls?: string
 
-  /** The name of the group of hardware buttons, read by screen readers. */
+  /** The name of the toolbar of hardware buttons, read by screen readers. */
   @words
   @property({ attribute: 'controls-label' })
   controlsLabel = 'Device controls'
@@ -505,9 +507,26 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
    */
   protected readonly childWatch = new ChildrenController(this)
 
+  /**
+   * The buttons as one tab stop, the arrow keys moving along the row, or up
+   * and down a column beside the device. The page's own buttons in the
+   * `controls` slot are among them.
+   */
+  protected readonly controlKeys = new ToolbarController(this, {
+    arrows: () => (this.column ? 'vertical' : 'horizontal'),
+    members: () => [...(this.partNamed('controls')?.children ?? [])],
+    own: true,
+    watch: () => this.renderRoot,
+  })
+
   private readonly fullscreen = new FullscreenController(this, (full) => {
     this.filled = full
   })
+
+  /** Whether the buttons are a column beside the device rather than a row. */
+  private get column(): boolean {
+    return this.controlsPlacement === 'start' || this.controlsPlacement === 'end'
+  }
 
   /** How many quarter turns `rotation` is. */
   private get turns(): 0 | 1 | 2 | 3 {
@@ -1210,7 +1229,12 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
     }
     const button = this.tag('icon-button')
     const off = this.readonly
-    return html`<div part="controls" role="group" aria-label=${this.controlsLabel}>
+    return html`<div
+      part="controls"
+      role="toolbar"
+      aria-label=${this.controlsLabel}
+      aria-orientation=${this.column ? 'vertical' : nothing}
+    >
       ${
         this.draws('back')
           ? html`<${button}
