@@ -30,9 +30,6 @@
   --icon-button-foreground-color: var(--helix-color-foreground);
   --icon-button-size: var(--helix-size-control-sm);
 
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-sm);
-
   display: grid;
   gap: var(--helix-space-2xs);
   /* **Three columns for the pad and a fourth for the rest.** Sharing a column
@@ -138,6 +135,14 @@
 }
 [part="fullscreen"] {
   grid-area: full;
+}
+
+/* **Each control's glyph in the house face at the small size**, on the
+   controls rather than on the cluster, so a panel a family opens among them,
+   a map's layers menu, keeps the words of the frame around it. */
+[part="controls"] > * {
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
 }
 
 /* **An icon a page slots in is sized like the glyph it replaces**, so an icon
