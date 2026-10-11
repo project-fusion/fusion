@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-terminal",
   "description": "Connects the Helix Terminal frame to a terminal emulator: xterm.js, or a driver of your own, themed with your tokens.",
-  "version": "0.211.1",
+  "version": "0.212.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
