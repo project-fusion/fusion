@@ -1005,10 +1005,24 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
     }
   }
 
-  /** Text pasted into the screen, sent as text. */
+  /**
+   * Text pasted while the screen has focus, sent as text.
+   *
+   * **Heard on the document, wherever the paste lands.** A browser sends a
+   * paste to the text selected on the page where there is any, and WebKit
+   * sends one with nothing selected to the host. A press on the screen keeps
+   * the selection it found, so copying from another pane, pressing the screen,
+   * and pasting would otherwise send the device nothing.
+   */
   private readonly handlePaste = (event: ClipboardEvent): void => {
+    const screen = this.screen
     const text = event.clipboardData?.getData('text/plain') ?? ''
-    if (this.readonly || text === '') {
+    if (
+      this.readonly ||
+      text === '' ||
+      screen === null ||
+      (this.renderRoot as ShadowRoot).activeElement !== screen
+    ) {
       return
     }
     event.preventDefault()
@@ -1150,9 +1164,10 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
     this.timers.add(timer)
   }
 
-  /** A screen put back on the page listens to its stream again. */
+  /** A screen put back on the page listens to its stream and for pastes again. */
   override connectedCallback(): void {
     super.connectedCallback()
+    this.ownerDocument.addEventListener('paste', this.handlePaste, true)
     if (this.hasUpdated) {
       this.requestUpdate()
     }
@@ -1165,6 +1180,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
    */
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.ownerDocument.removeEventListener('paste', this.handlePaste, true)
     this.unwatch()
     for (const timer of this.timers) {
       clearTimeout(timer)
@@ -1453,7 +1469,6 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
             @blur=${this.handleBlur}
             @keydown=${this.handleKeydown}
             @keyup=${this.handleKeyup}
-            @paste=${this.handlePaste}
             @pointercancel=${this.handlePointerUp}
             @pointerdown=${this.handlePointerDown}
             @pointermove=${this.handlePointerMove}

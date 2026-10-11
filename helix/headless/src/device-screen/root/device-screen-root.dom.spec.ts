@@ -37,6 +37,13 @@ const drawAt = (host: Screen, width = 200, height = 400): HTMLElement => {
   return screen
 }
 
+/** A paste carrying text, which crosses shadow roots as a browser's does. */
+const pasting = (text: string): ClipboardEvent => {
+  const paste = new Event('paste', { bubbles: true, cancelable: true, composed: true })
+  Object.defineProperty(paste, 'clipboardData', { value: { getData: () => text } })
+  return paste as ClipboardEvent
+}
+
 /** Every event of these names the host sends, in order, with its detail. */
 const heard = (host: Screen, ...names: string[]): Array<{ detail: unknown; type: string }> => {
   const all: Array<{ detail: unknown; type: string }> = []
@@ -363,11 +370,41 @@ describe('device screen, keys', () => {
     const keys = heard(host, 'helix-device-key', 'helix-device-text')
     const shortcut = key(screen, 'keydown', { code: 'KeyV', key: 'v', metaKey: true })
     expect(shortcut.defaultPrevented).toBe(false)
-    const paste = new Event('paste', { bubbles: true, cancelable: true }) as ClipboardEvent
-    Object.defineProperty(paste, 'clipboardData', { value: { getData: () => 'hello' } })
+    screen.focus()
+    const paste = pasting('hello')
     screen.dispatchEvent(paste)
     expect(paste.defaultPrevented).toBe(true)
     expect(keys).toEqual([{ detail: { text: 'hello' }, type: 'helix-device-text' }])
+  })
+
+  test('a paste is the screen’s wherever the browser sends it while the screen has focus', async () => {
+    /* WebKit sends it to the host, and either engine to text selected on the page. */
+    const host = await device()
+    const screen = screenOf(host)
+    const selected = document.createElement('p')
+    document.body.append(selected)
+    const texts = heard(host, 'helix-device-text')
+    screen.focus()
+    host.dispatchEvent(pasting('to the host'))
+    selected.dispatchEvent(pasting('to the selection'))
+    expect(texts.map((event) => event.detail)).toEqual([
+      { text: 'to the host' },
+      { text: 'to the selection' },
+    ])
+    selected.remove()
+  })
+
+  test('a paste while the screen does not have focus is left to the page', async () => {
+    const host = await device()
+    const field = document.createElement('textarea')
+    document.body.append(field)
+    const texts = heard(host, 'helix-device-text')
+    field.focus()
+    const paste = pasting('to the field')
+    field.dispatchEvent(paste)
+    expect(paste.defaultPrevented).toBe(false)
+    expect(texts).toHaveLength(0)
+    field.remove()
   })
 
   test('the paste shortcut is known by its key on any layout', async () => {
