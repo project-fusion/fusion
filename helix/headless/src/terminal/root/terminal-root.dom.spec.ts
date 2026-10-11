@@ -241,6 +241,15 @@ describe('the find bar', () => {
     expect(asked.calls.at(-1)).toBe('find error backward')
   })
 
+  test('holds the page’s own controls between the count and the buttons that move between matches', async () => {
+    const host = await frame()
+    const slot = part(host, 'find-actions')
+    expect(slot?.localName).toBe('slot')
+    expect(slot?.getAttribute('name')).toBe('find-actions')
+    expect(slot?.previousElementSibling?.getAttribute('part')).toBe('find-count')
+    expect(slot?.nextElementSibling?.getAttribute('part')).toBe('find-previous')
+  })
+
   test('says when nothing matched', async () => {
     const host = await frame()
     const sink = host.attach(standIn(host).renderer)
@@ -439,6 +448,16 @@ describe('the process exiting', () => {
     host.exitCode = 1
     expect(await host.updateComplete).toBe(true)
     expect(part(host, 'live')?.textContent?.trim()).toBe('The process exited with code 1.')
+  })
+
+  test('draws the page’s own controls beside Restart, and only once the process exits', async () => {
+    const host = await frame()
+    expect(part(host, 'exit-actions')).toBeNull()
+    host.exitCode = 1
+    await settle(host)
+    const slot = part(host, 'exit-actions')
+    expect(slot?.getAttribute('name')).toBe('exit-actions')
+    expect(slot?.previousElementSibling?.getAttribute('part')).toBe('restart')
   })
 
   test('an exit written in the markup is shown and not announced', async () => {

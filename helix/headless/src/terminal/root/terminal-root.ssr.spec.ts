@@ -47,11 +47,13 @@ describe('terminal server output', () => {
     expect(partTag(markup, 'status')).not.toContain('hidden')
     expect(rendered(markup, 'helix-headless-terminal')).toContain('The process exited with code 1.')
     expect(hasPart(markup, 'restart')).toBe(true)
+    expect(partTag(markup, 'exit-actions')).toContain('name="exit-actions"')
   })
 
   test('the slots a page fills are served', () => {
     const inside = rendered(served(), 'helix-headless-terminal')
     expect(inside).toContain('name="actions"')
+    expect(inside).toContain('name="find-actions"')
     expect(inside).toContain('name="label"')
     expect(hasPart(served(), 'viewport')).toBe(true)
   })
