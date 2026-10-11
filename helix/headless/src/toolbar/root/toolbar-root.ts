@@ -177,6 +177,10 @@ interface Control {
  * tab stop while the toolbar's is elsewhere, so Tab stops once in the
  * toolbar. A composite without one keeps its own tab stop.
  *
+ * A `<slot>` in the toolbar counts as the controls assigned to it, for a
+ * toolbar a component draws in its own shadow root with your controls passed
+ * into it: they share its tab stop and its arrows with the component's own.
+ *
  * A toolbar inside another toolbar, a Helix one or the page's own
  * `role="toolbar"`, is a `group` of the outer one, as React Aria's is: the
  * outer toolbar's arrows walk through its controls and on past them, and it
@@ -255,7 +259,7 @@ export class HelixHeadlessToolbar extends HelixElement {
    */
   private get controls(): Control[] {
     const controls: Control[] = []
-    for (const child of this.children) {
+    for (const child of this.members) {
       if (
         !(child instanceof HTMLElement) ||
         child.hasAttribute('disabled') ||
@@ -281,6 +285,21 @@ export class HelixHeadlessToolbar extends HelixElement {
       }
     }
     return controls
+  }
+
+  /**
+   * The toolbar's children, a slot among them read as the elements assigned
+   * to it.
+   *
+   * **For a toolbar a component renders in its own shadow root** and passes a
+   * page's controls into through a slot, as Terminal's header does with its
+   * `actions`: read as a child, the slot holds only its fallback, and the
+   * page's controls kept tab stops of their own beside the toolbar's one.
+   */
+  private get members(): Element[] {
+    return [...this.children].flatMap((child) =>
+      child instanceof HTMLSlotElement ? child.assignedElements({ flatten: true }) : [child],
+    )
   }
 
   /** The elements in a child's light DOM that take focus. */
@@ -377,8 +396,8 @@ export class HelixHeadlessToolbar extends HelixElement {
     if (this.nested) {
       return
     }
-    const pending = [...new Set([...this.children].map((child) => child.localName))].filter(
-      (name) => name.includes('-'),
+    const pending = [...new Set(this.members.map((child) => child.localName))].filter((name) =>
+      name.includes('-'),
     )
     await Promise.all(pending.map((name) => customElements.whenDefined(name)))
     // Foreign controls are left alone until focus arrives. Writing `tabindex`
@@ -569,7 +588,7 @@ export class HelixHeadlessToolbar extends HelixElement {
        its children to read it again. After the first render only: a child's
        first render reads the toolbar for itself. */
     if (this.hasUpdated && changed.has('orientation')) {
-      for (const child of this.children) {
+      for (const child of this.members) {
         ;(child as Partial<HelixElement>).requestUpdate?.()
       }
     }

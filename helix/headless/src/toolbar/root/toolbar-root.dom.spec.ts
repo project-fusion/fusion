@@ -1,5 +1,12 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  hasState,
+  mount,
+  part,
+  registerDom,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -477,6 +484,65 @@ describe('a custom control in a toolbar', () => {
     expect(tool.shadowRoot?.activeElement).toBe(inner)
     expect([tool.hasAttribute('tabindex'), inner.getAttribute('tabindex')]).toEqual([false, '0'])
   })
+})
+
+describe('a toolbar a component draws with the page’s controls slotted into it', () => {
+  const panel = async (): Promise<{
+    own: HTMLElement
+    page: HTMLElement
+    toolbar: HTMLElement
+  }> => {
+    if (!customElements.get('x-panel')) {
+      customElements.define(
+        'x-panel',
+        class extends HTMLElement {
+          constructor() {
+            super()
+            this.attachShadow({ mode: 'open' }).innerHTML = `
+              <helix-headless-toolbar label="Panel">
+                <slot name="actions"></slot>
+                <helix-headless-button id="own">Own</helix-headless-button>
+              </helix-headless-toolbar>`
+          }
+        },
+      )
+    }
+    const host = await mount(`
+      <x-panel>
+        <helix-headless-button slot="actions" id="page">Page</helix-headless-button>
+      </x-panel>`)
+    const toolbar = host.shadowRoot?.querySelector('helix-headless-toolbar') as HTMLElement
+    const page = host.querySelector('#page') as HTMLElement
+    await settle(toolbar)
+    await (page as Updatable).updateComplete
+    return { own: host.shadowRoot?.querySelector('#own') as HTMLElement, page, toolbar }
+  }
+  const stop = (control: HTMLElement) =>
+    part(control, 'button')?.getAttribute('tabindex') === '-1' ? 'out' : 'in'
+
+  test('counts the slotted controls among its own, and they share its one tab stop', async () => {
+    const { own, page } = await panel()
+    expect([stop(page), stop(own)]).toEqual(['in', 'out'])
+  })
+
+  /* Browser only: happy-dom does not route an event through the slot a node
+     is assigned to, so a key on the page's control never reaches the toolbar. */
+  ;(hasLayout() ? test : (): void => {})(
+    'walks from a slotted control to its own with the arrows',
+    async () => {
+      const { own, page, toolbar } = await panel()
+      page.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key: 'ArrowRight',
+        }),
+      )
+      await settle(toolbar)
+      expect([stop(page), stop(own)]).toEqual(['out', 'in'])
+    },
+  )
 })
 
 /* RAC writes `data-orientation`; the toolbar said its axis only through an

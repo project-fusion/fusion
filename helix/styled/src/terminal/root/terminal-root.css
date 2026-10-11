@@ -154,57 +154,38 @@
   white-space: nowrap;
 }
 
+/* The page's own controls stand among the built-in ones, as the toolbar's
+   own controls do: the slots draw no box, so their gap is the toolbar's. */
 [part="actions"],
-[part="controls"],
-[part="exit-actions"],
 [part="find-actions"] {
+  display: contents;
+}
+
+[part="controls"],
+[part="find-controls"] {
+  flex: 0 0 auto;
+}
+
+[part="exit-actions"] {
   align-items: center;
   display: flex;
   flex: 0 0 auto;
   gap: var(--helix-space-2xs);
 }
 
-/* **The controls are quiet until pointed at**, as Icon Button's ghost
-   emphasis is: muted ink, no fill, and a wash of the ink under a pointer,
-   which is a step away from the strip in either color mode. */
-[part="controls"] button,
-[part="find-bar"] button {
-  all: unset;
-  box-sizing: border-box;
-
-  align-items: center;
-  block-size: var(--helix-size-control);
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground-muted);
-  cursor: pointer;
-  display: inline-flex;
-  flex: 0 0 auto;
-  inline-size: var(--helix-size-control);
-  justify-content: center;
-  transition:
-    background-color var(--helix-duration-fast) var(--helix-easing-standard),
-    color var(--helix-duration-fast) var(--helix-easing-standard);
+/* **A control that is on says so with a wash of the ink**, a step past the
+   wash Icon Button lifts to under a pointer: Find while its bar is open, and
+   Fullscreen while the terminal fills the screen. */
+:host(:state(find-open)) [part="find"],
+:host(:state(fullscreen)) [part="fullscreen"] {
+  --icon-button-background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 12%,
+    transparent
+  );
+  --icon-button-foreground-color: var(--helix-color-foreground);
 }
 
-[part="controls"] button:hover:not(:disabled),
-[part="find-bar"] button:hover:not(:disabled) {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
-  color: var(--helix-color-foreground);
-}
-
-[part="controls"] button[aria-expanded="true"],
-[part="controls"] button[aria-pressed="true"] {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 12%, transparent);
-  color: var(--helix-color-foreground);
-}
-
-[part="controls"] button:disabled,
-[part="find-bar"] button:disabled {
-  cursor: default;
-  opacity: 0.4;
-}
-
-:is([part="controls"], [part="find-bar"], [part="status"]) button:focus-visible,
 [part="find-field"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
@@ -212,12 +193,17 @@
 
 /* **The find bar is a step denser than the header**, and says so as a density
    region does, with the steps derived from it, so a control a page puts in
-   `find-actions` takes the size of the bar's own buttons. */
-[part="find-bar"] {
+   `find-actions` takes the size of the bar's own buttons. Said again on the
+   bar's toolbar, which says the small step for its own controls, and a rule
+   here outranks the toolbar's own. */
+[part="find-bar"],
+[part="find-controls"] {
   --helix-size-control: calc(var(--helix-size-control-sm) * 0.8);
   --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
   --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+}
 
+[part="find-bar"] {
   grid-row: find;
   border-block-end: var(--helix-border-thin) solid
     var(--terminal-border-color, var(--helix-color-border));
@@ -318,32 +304,13 @@
   min-inline-size: 0;
 }
 
+/* Restart is outlined, as a button with words rests, in the frame's own edge. */
 [part="restart"] {
-  all: unset;
-  box-sizing: border-box;
-
-  align-items: center;
-  block-size: var(--helix-size-control);
-  border: var(--helix-border-thin) solid var(--terminal-border-color, var(--helix-color-border));
-  border-radius: var(--helix-radii-sm);
-  color: var(--helix-color-foreground);
-  cursor: pointer;
-  display: inline-flex;
-  flex: 0 0 auto;
-  font-weight: var(--helix-weight-medium);
-  gap: var(--helix-space-2xs);
-  padding-inline: var(--helix-space-xs) var(--helix-space-sm);
-  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
-}
-
-[part="restart"]:hover {
-  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  --button-border-color: var(--terminal-border-color, var(--helix-color-border));
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [part="viewport"]::after,
-  :is([part="controls"], [part="find-bar"]) button,
-  [part="restart"] {
+  [part="viewport"]::after {
     transition: none;
   }
 }
@@ -356,7 +323,8 @@
 @media print {
   [part="controls"],
   [part="find-bar"],
-  [part="restart"] {
+  [part="restart"],
+  [part="exit-actions"] {
     display: none;
   }
 }
