@@ -1,4 +1,5 @@
 import {
+  assignSlot,
   ChildrenController,
   capturePointer,
   customElement,
@@ -1468,9 +1469,10 @@ export class HelixHeadlessCarousel extends HelixElement {
     }
     /* The glyphs, which a manual root does not route by their `slot` either. */
     for (const name of ICON_SLOTS) {
-      this.renderRoot
-        ?.querySelector?.<HTMLSlotElement>(`slot[name="${name}"]`)
-        ?.assign?.(...this.iconsFor(name))
+      const slot = this.renderRoot?.querySelector?.<HTMLSlotElement>(`slot[name="${name}"]`)
+      if (slot) {
+        assignSlot(slot, ...this.iconsFor(name))
+      }
     }
     const panes = this.renderRoot?.querySelectorAll?.<HTMLSlotElement>('[part="slide"] slot')
     if (!panes) {
@@ -1479,9 +1481,17 @@ export class HelixHeadlessCarousel extends HelixElement {
     /* Paired by position, and short-circuited by whichever ran out: a render
        and a child list can disagree for one update when children arrive after
        the template was built, and the mutation observer schedules the update
-       that reconciles them. */
+       that reconciles them.
+
+       Through `assignSlot`, which leaves a pane already holding its slide
+       alone. This runs on every update, the one that starts a smooth scroll
+       included, and in WebKit an assignment that changed nothing stopped
+       that scroll where it began. */
     this.slides.forEach((slide, index) => {
-      panes[index]?.assign?.(slide)
+      const pane = panes[index]
+      if (pane) {
+        assignSlot(pane, slide)
+      }
     })
   }
 
