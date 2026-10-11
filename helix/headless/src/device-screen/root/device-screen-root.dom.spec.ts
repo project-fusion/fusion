@@ -266,6 +266,24 @@ describe('device screen, a wheel', () => {
     })
   })
 
+  test('a wheel that counts in pages moves a page across by the width and down by the height', async () => {
+    const host = await device()
+    const screen = drawAt(host)
+    const events = heard(host, 'helix-device-scroll')
+    const wheel = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      deltaMode: 2,
+      deltaX: 1,
+      deltaY: 1,
+    })
+    Object.defineProperty(wheel, 'clientX', { value: 50 })
+    Object.defineProperty(wheel, 'clientY', { value: 100 })
+    Object.defineProperty(wheel, 'deltaMode', { value: 2 })
+    screen.dispatchEvent(wheel)
+    expect(events[0]?.detail).toMatchObject({ deltaX: 400, deltaY: 800 })
+  })
+
   test('Control with the wheel is the page’s zoom, and stays the page’s', async () => {
     const host = await device()
     const screen = drawAt(host)
@@ -360,6 +378,22 @@ describe('device screen, keys', () => {
     const shortcut = key(screen, 'keydown', { code: 'KeyV', key: 'м', metaKey: true })
     expect(shortcut.defaultPrevented).toBe(false)
     expect(events).toHaveLength(0)
+  })
+
+  test('keys a soft keyboard reports with no code are each released', async () => {
+    const host = await device()
+    const screen = screenOf(host)
+    const events = heard(host, 'helix-device-key')
+    key(screen, 'keydown', { code: '', key: 'a' })
+    key(screen, 'keydown', { code: '', key: 'b' })
+    key(screen, 'keyup', { code: '', key: 'a' })
+    key(screen, 'keyup', { code: '', key: 'b' })
+    expect(
+      events.map(
+        (one) =>
+          `${(one.detail as { key: string }).key}:${(one.detail as { phase: string }).phase}`,
+      ),
+    ).toEqual(['a:down', 'b:down', 'a:up', 'b:up'])
   })
 
   test('a key that went down elsewhere is not sent as it comes up on the screen', async () => {
@@ -518,17 +552,45 @@ describe('device screen, names and states', () => {
     expect(hasState(host, 'empty')).toBe(false)
   })
 
-  test('the empty slot is on the screen only while no stream is inside', async () => {
+  test('the empty slot stands beside the screen while no stream is inside', async () => {
+    /* Beside, and placed over it: inside, the screen's touches and keys
+       swallowed a button, and a read-only screen, a picture, hid its words. */
     const bare = (await mount(
       `<helix-headless-device-screen label="iPhone">
         <span slot="empty">No simulator is running</span>
       </helix-headless-device-screen>`,
     )) as Screen
     const empty = part(bare, 'empty') as HTMLElement
-    expect(screenOf(bare).contains(empty)).toBe(true)
+    expect(screenOf(bare).contains(empty)).toBe(false)
     expect(empty.querySelector('slot[name="empty"]')).not.toBeNull()
     const host = await device()
     expect(part(host, 'empty')).toBeNull()
+  })
+
+  test('a button in the empty slot is pressed and typed into as a button is, and nothing is sent', async () => {
+    const bare = (await mount(
+      `<helix-headless-device-screen label="iPhone">
+        <button slot="empty" id="boot">Boot the simulator</button>
+      </helix-headless-device-screen>`,
+    )) as Screen
+    const events = heard(bare, 'helix-device-touch', 'helix-device-key')
+    const boot = bare.querySelector('#boot') as HTMLButtonElement
+    pointer(boot, 'pointerdown', 5, 5)
+    const enter = key(boot, 'keydown', { code: 'Enter', key: 'Enter' })
+    expect(events).toHaveLength(0)
+    expect(enter.defaultPrevented).toBe(false)
+  })
+
+  test('the empty slot waits while the stream is loading, so the two never overlap', async () => {
+    const bare = (await mount(
+      `<helix-headless-device-screen label="iPhone" loading>
+        <span slot="empty">No simulator is running</span>
+      </helix-headless-device-screen>`,
+    )) as Screen
+    expect(part(bare, 'empty')).toBeNull()
+    bare.removeAttribute('loading')
+    await bare.updateComplete
+    expect(part(bare, 'empty')).not.toBeNull()
   })
 
   test('loading shows its words over the screen and says them in a live region, and takes them away after', async () => {
@@ -569,6 +631,17 @@ describe('device screen, its size', () => {
     const host = await device('screen-width="400"')
     const screen = drawAt(host)
     const events = heard(host, 'helix-device-tap')
+    pointer(screen, 'pointerdown', 100, 200)
+    pointer(screen, 'pointerup', 100, 200)
+    expect(events[0]?.detail).toMatchObject({ height: 800, width: 400, x: 200, y: 400 })
+  })
+
+  test('a width alone, before the stream says its size, takes its height from the drawn screen', async () => {
+    const bare = (await mount(
+      '<helix-headless-device-screen label="iPhone" screen-width="400"></helix-headless-device-screen>',
+    )) as Screen
+    const screen = drawAt(bare)
+    const events = heard(bare, 'helix-device-tap')
     pointer(screen, 'pointerdown', 100, 200)
     pointer(screen, 'pointerup', 100, 200)
     expect(events[0]?.detail).toMatchObject({ height: 800, width: 400, x: 200, y: 400 })

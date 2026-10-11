@@ -766,6 +766,7 @@ export { slotFilled, slotNamed } from './utils/slot-filled/slot-filled.js'
 export { SlottedGlyph } from './utils/slotted-glyph/slotted-glyph.js'
 export { slottedWords } from './utils/slotted-words/slotted-words.js'
 export { splitValues } from './utils/split-values/split-values.js'
+export { stopPress } from './utils/stop-press/stop-press.js'
 export {
   edgeOffset,
   FLING,

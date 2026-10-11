@@ -72,6 +72,22 @@ describe('styled device screen', () => {
       expect(bezel.left).toBeGreaterThanOrEqual(area.left - 0.5)
     })
 
+    test('the empty box stands over the screen exactly, from beside it', async () => {
+      const device = (await mount(
+        `<div style="inline-size: 30rem">
+          <helix-device-screen label="iPhone" controls="none" screen-width="402" screen-height="874" style="--device-screen-block-size: 20rem">
+            <span slot="empty">No simulator is running</span>
+          </helix-device-screen>
+        </div>`,
+      ).then((host) => host.querySelector('helix-device-screen'))) as Device
+      await device.updateComplete
+      const screen = boxOf(device, 'screen')
+      const empty = boxOf(device, 'empty')
+      for (const side of ['left', 'top', 'right', 'bottom'] as const) {
+        expect(empty[side]).toBeCloseTo(screen[side], 0)
+      }
+    })
+
     test('a plain device is the screen alone', async () => {
       const device = (await mount(
         `<div style="inline-size: 30rem">
