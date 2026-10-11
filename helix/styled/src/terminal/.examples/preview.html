@@ -30,13 +30,38 @@
   )
 
   // No process is connected here, so the example keeps the line you type and
-  // writes it back: Backspace takes away only what you typed.
+  // writes it back: Backspace takes away only what you typed, and Up and Down
+  // bring back the lines you entered, as a shell's history does.
+  const history = []
+  let place = 0
+  let draft = ''
   let line = ''
+  const show = (next) => {
+    line = next
+    shell.write(`\x1b[2K\r${prompt}${next}`)
+  }
   shell.addEventListener('helix-terminal-input', (event) => {
     const { data } = event.detail
     if (data === '\r') {
+      if (line !== '') {
+        history.push(line)
+      }
+      place = history.length
       line = ''
       shell.write(`\r\n${prompt}`)
+    } else if (data === '\x1b[A' || data === '\x1bOA') {
+      if (place > 0) {
+        if (place === history.length) {
+          draft = line
+        }
+        place -= 1
+        show(history[place])
+      }
+    } else if (data === '\x1b[B' || data === '\x1bOB') {
+      if (place < history.length) {
+        place += 1
+        show(place === history.length ? draft : history[place])
+      }
     } else if (data === '\x7f') {
       if (line !== '') {
         line = [...line].slice(0, -1).join('')
