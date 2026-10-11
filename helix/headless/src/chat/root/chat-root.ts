@@ -1,4 +1,5 @@
 import {
+  assignSlot,
   ChildrenController,
   customElement,
   deepActiveElement,
@@ -771,9 +772,16 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
       }
       return
     }
-    log.assign(...(this.fed ? [] : this.messages))
+    /* Through `assignSlot`, which leaves a slot already holding its turns
+       alone. This runs on every update, every token of a streaming turn
+       included, and in WebKit an assignment that changed nothing stopped the
+       reader's arrow-key scroll through the log. */
+    assignSlot(log, ...(this.fed ? [] : this.messages))
     for (const name of REGIONS) {
-      root?.querySelector?.<HTMLSlotElement>(`slot[name="${name}"]`)?.assign?.(...this.given(name))
+      const slot = root?.querySelector?.<HTMLSlotElement>(`slot[name="${name}"]`)
+      if (slot) {
+        assignSlot(slot, ...this.given(name))
+      }
     }
   }
 

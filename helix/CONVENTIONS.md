@@ -421,7 +421,11 @@ styling**.
    shadow root reports its slots as it is parsed, before any listener exists.
    A component that assigns its slots by hand hydrates a root that can only
    assign by name, so on one (`this.assignsByName`) it writes `slot` onto its
-   children with `this.route()` instead, and nowhere else. A parent that writes
+   children with `this.route()` instead, and nowhere else. Everywhere else it
+   assigns through `assignSlot` or `assignSlots`, which leave a slot already
+   holding those nodes alone: in WebKit an assignment that changes nothing
+   stops a scroll running in the box around the slot, which cost Carousel its
+   next button and Chat a reader's arrow keys. A parent that writes
    state onto its children writes through `whenHydrated`, since a child's
    hydrating render has to be the server's too. The platform settles an image a
    server sent before anything listens, so a component asks it what happened

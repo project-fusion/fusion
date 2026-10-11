@@ -348,3 +348,28 @@ describe('the indicator slot', () => {
     expect(nav.shadowRoot?.querySelectorAll('[role="listitem"]').length).toBe(2)
   })
 })
+
+describe('an update that changes no link', () => {
+  /* Every slot keeps what it holds, as in every component that assigns by
+     hand: in WebKit an assignment that changed nothing stopped a scroll
+     running in the box around the slot. */
+  test('assigns no slot again', async () => {
+    const nav = (await mount(
+      '<helix-headless-outline label="On this page"><a href="#one">One</a><a href="#two">Two</a></helix-headless-outline>',
+    )) as HTMLElement & { requestUpdate: () => void; updateComplete: Promise<unknown> }
+    await nav.updateComplete
+    const assign = HTMLSlotElement.prototype.assign
+    let calls = 0
+    HTMLSlotElement.prototype.assign = function (this: HTMLSlotElement, ...nodes) {
+      calls += 1
+      assign.apply(this, nodes)
+    }
+    try {
+      nav.requestUpdate()
+      await nav.updateComplete
+    } finally {
+      HTMLSlotElement.prototype.assign = assign
+    }
+    expect(calls).toBe(0)
+  })
+})

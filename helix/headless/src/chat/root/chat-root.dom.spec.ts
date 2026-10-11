@@ -640,3 +640,26 @@ describe('a message whose definition loads after it was added', () => {
     expect(slotted(chat, 'messages').includes(late.element)).toBe(true)
   })
 })
+
+describe('an update that changes no turn', () => {
+  /* Every slot keeps what it holds. In WebKit an assignment that changed
+     nothing stopped a scroll running in the log, and the log updates on every
+     token of a streaming turn: the arrow keys moved it no distance at all while
+     one streamed. */
+  test('assigns no slot again', async () => {
+    const element = (await chat()) as Chat & { requestUpdate: () => void }
+    const assign = HTMLSlotElement.prototype.assign
+    let calls = 0
+    HTMLSlotElement.prototype.assign = function (this: HTMLSlotElement, ...nodes) {
+      calls += 1
+      assign.apply(this, nodes)
+    }
+    try {
+      element.requestUpdate()
+      await element.updateComplete
+    } finally {
+      HTMLSlotElement.prototype.assign = assign
+    }
+    expect(calls).toBe(0)
+  })
+})
