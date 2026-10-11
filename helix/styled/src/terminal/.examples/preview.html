@@ -29,9 +29,23 @@
     ].join('\r\n'),
   )
 
-  // No process is connected here, so the example writes back what you type.
+  // No process is connected here, so the example keeps the line you type and
+  // writes it back: Backspace takes away only what you typed.
+  let line = ''
   shell.addEventListener('helix-terminal-input', (event) => {
     const { data } = event.detail
-    shell.write(data === '\r' ? `\r\n${prompt}` : data === '\x7f' ? '\b \b' : data)
+    if (data === '\r') {
+      line = ''
+      shell.write(`\r\n${prompt}`)
+    } else if (data === '\x7f') {
+      if (line !== '') {
+        line = [...line].slice(0, -1).join('')
+        shell.write('\b \b')
+      }
+    } else if (!data.startsWith('\x1b')) {
+      const typed = [...data].filter((character) => character >= ' ' && character !== '\x7f').join('')
+      line += typed
+      shell.write(typed)
+    }
   })
 </script>

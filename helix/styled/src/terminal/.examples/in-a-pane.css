@@ -1,7 +1,11 @@
-.pane {
-  block-size: 16rem;
+helix-splitter {
+  block-size: 24rem;
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-lg);
   overflow: hidden;
+}
+
+.pane {
+  block-size: 100%;
   position: relative;
 }

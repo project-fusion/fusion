@@ -12,24 +12,38 @@ export function Example() {
   }, [])
 
   return (
-    <div className="pane">
-      {/* Preview frame: data-preview-terminal has the frame connect xterm.js; on your page, connectTerminal does. */}
-      <helix-terminal
-        controls="find clear fullscreen"
-        data-preview-terminal
-        fill
-        label="zsh"
-        ref={pane}
+    <helix-splitter
+      default-position="45"
+      orientation="vertical"
+    >
+      <helix-card
         separation="plain"
+        slot="start"
       >
-        <helix-icon-button
-          label="New terminal"
-          slot="actions"
+        <helix-text>Session</helix-text>
+      </helix-card>
+      <div
+        className="pane"
+        slot="end"
+      >
+        {/* Preview frame: data-preview-terminal has the frame connect xterm.js; on your page, connectTerminal does. */}
+        <helix-terminal
+          controls="find clear fullscreen"
+          data-preview-terminal
+          fill
+          label="zsh"
+          ref={pane}
+          separation="plain"
         >
-          <helix-icon name="plus" />
-        </helix-icon-button>
-        <div data-preview-terminal-canvas />
-      </helix-terminal>
-    </div>
+          <helix-icon-button
+            label="New terminal"
+            slot="actions"
+          >
+            <helix-icon name="plus" />
+          </helix-icon-button>
+          <div data-preview-terminal-canvas />
+        </helix-terminal>
+      </div>
+    </helix-splitter>
   )
 }

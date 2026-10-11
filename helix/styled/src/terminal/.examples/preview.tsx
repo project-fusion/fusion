@@ -20,6 +20,7 @@ const OUTPUT = [
 
 export function Example() {
   const shell = useRef<HelixTerminal>(null)
+  const line = useRef('')
 
   useEffect(() => {
     void shell.current?.write(OUTPUT.join('\r\n'))
@@ -32,11 +33,24 @@ export function Example() {
         data-preview-terminal
         label="~/fusion"
         onhelix-terminal-input={(event) => {
-          // No process is connected here, so the example writes back what you type.
+          // No process is connected here, so the example keeps the line you type and
+          // writes it back: Backspace takes away only what you typed.
           const { data } = event.detail
-          void shell.current?.write(
-            data === '\r' ? `\r\n${PROMPT}` : data === '\x7f' ? '\b \b' : data,
-          )
+          if (data === '\r') {
+            line.current = ''
+            void shell.current?.write(`\r\n${PROMPT}`)
+          } else if (data === '\x7f') {
+            if (line.current !== '') {
+              line.current = [...line.current].slice(0, -1).join('')
+              void shell.current?.write('\b \b')
+            }
+          } else if (!data.startsWith('\x1b')) {
+            const typed = [...data]
+              .filter((character) => character >= ' ' && character !== '\x7f')
+              .join('')
+            line.current += typed
+            void shell.current?.write(typed)
+          }
         }}
         ref={shell}
       >
