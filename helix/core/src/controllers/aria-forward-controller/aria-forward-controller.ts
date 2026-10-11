@@ -50,8 +50,16 @@ export interface AriaForwardOptions {
   unnamed?: string
 }
 
-/** The two relationships a consumer writes on a host and means for the control. */
+/**
+ * The relationships a consumer writes on a host and means for the control.
+ *
+ * `aria-controls` is one: it names ids as these do, and copied as a string onto
+ * a control inside a shadow root it named an element that is not there, as Map's
+ * layers button inside an Icon Button would, and as a Megamenu's trigger written
+ * on a slotted Button already did.
+ */
 const RELATIONSHIPS = [
+  ['aria-controls', 'ariaControlsElements'],
   ['aria-describedby', 'ariaDescribedByElements'],
   ['aria-labelledby', 'ariaLabelledByElements'],
 ] as const
@@ -99,7 +107,6 @@ const STATES = [
   'aria-current',
   'aria-expanded',
   'aria-haspopup',
-  'aria-controls',
   'aria-invalid',
   'aria-pressed',
   'aria-required',

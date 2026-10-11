@@ -5,6 +5,12 @@ import type {
 } from '@fusion.dev/helix-core'
 import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
+/** The native button inside a control, which is what a screen reader is on. */
+const inner = async (control: Element | null | undefined): Promise<HTMLButtonElement | null> => {
+  await (control as { updateComplete?: Promise<unknown> } | null | undefined)?.updateComplete
+  return control?.shadowRoot?.querySelector('button') ?? null
+}
+
 /* Imported once the DOM is registered: core reads the globals it finds as
    it is evaluated, and a static import breaks the DOM when this file runs
    first. */
@@ -98,7 +104,7 @@ describe('a map on a page in another language', () => {
     registerWords('pl', POLISH)
     const host = await frame('lang="pl"')
     expect(part(host, 'controls')?.getAttribute('aria-label')).toBe('Sterowanie mapą')
-    expect(part(host, 'zoom-in')?.getAttribute('aria-label')).toBe('Przybliż')
+    expect((await inner(part(host, 'zoom-in')))?.getAttribute('aria-label')).toBe('Przybliż')
   })
 
   test('keeps its own English where nothing is registered', async () => {

@@ -1,10 +1,11 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { customElement, type ViewportControlAxes } from '@fusion.dev/helix-core'
 import { HelixHeadlessMap } from '@fusion.dev/helix-headless/map'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
 import { styles } from './map-root.css.js'
+import '../../icon-button/index.js'
 
 /**
  * @summary A frame around a map drawn by another library.
@@ -46,6 +47,8 @@ import { styles } from './map-root.css.js'
  */
 @customElement('helix-map')
 export class HelixMap extends HelixHeadlessMap {
+  static override tier = 'helix-'
+
   /**
    * Where the map's credit is drawn. Unset, it is a strip under the map.
    * `bottom-end` or `bottom-start` draws it in that corner over the map, on
@@ -72,6 +75,11 @@ export class HelixMap extends HelixHeadlessMap {
    */
   @property({ reflect: true })
   material?: 'frosted' | 'glass' | 'transparent'
+
+  /** The controls float over the map, so they are raised in its `material`. */
+  protected override get controlAxes(): ViewportControlAxes {
+    return { material: this.material, raised: true }
+  }
 
   /* The surface's sheet first, this family's after, so a map's own rules win
      where the two speak about the same box. The live region's clip first of

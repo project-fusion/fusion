@@ -41,8 +41,12 @@ describe('graph server output', () => {
 
   test('the zoom and fullscreen controls ship with it, named', () => {
     const markup = served()
-    expect(partTag(markup, 'zoom-in')).toContain('aria-label="Zoom in"')
-    expect(partTag(markup, 'zoom-out')).toContain('aria-label="Zoom out"')
+    /* Each an Icon Button, named by `label`, and served with its own button
+       inside it named, so a reader has the name before anything hydrates. */
+    expect(partTag(markup, 'zoom-in')).toContain('label="Zoom in"')
+    expect(partTag(markup, 'zoom-out')).toContain('label="Zoom out"')
+    expect(rendered(markup, 'helix-headless-graph')).toContain('aria-label="Zoom in"')
+    expect(rendered(markup, 'helix-headless-graph')).toContain('aria-label="Zoom out"')
     expect(hasPart(markup, 'fullscreen')).toBe(true)
     expect(hasPart(markup, 'pan-up')).toBe(false)
   })
@@ -54,8 +58,9 @@ describe('graph server output', () => {
       ),
     )
     expect(partTag(markup, 'panel')).toContain('hidden')
-    expect(partTag(markup, 'notes-toggle')).toContain('aria-expanded="false"')
-    expect(partTag(markup, 'notes-toggle')).toContain('aria-label="Notes"')
+    expect(partTag(markup, 'notes-toggle')).toContain('label="Notes"')
+    expect(rendered(markup, 'helix-headless-graph')).toContain('aria-label="Notes"')
+    expect(rendered(markup, 'helix-headless-graph')).toContain('aria-expanded="false"')
   })
 
   test('the slots a consumer fills are served', () => {

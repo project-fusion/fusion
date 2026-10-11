@@ -30,6 +30,8 @@ import {
 import { list, magnifyingGlass } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { type StaticValue, html as staticHtml } from 'lit/static-html.js'
+import '../../icon-button/index.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import {
@@ -50,6 +52,13 @@ import {
 
 /** How long a layout runs before the frame offers to stop it, in milliseconds: WCAG 2.2.2's five seconds. */
 const LONG_LAYOUT = 5000
+
+/**
+ * Keeps a press on one of the graph's own controls inside the graph: the page
+ * hears what the control did, through the graph's events, and not that a
+ * button inside it was pressed.
+ */
+const stopPress = (event: Event): void => event.stopPropagation()
 
 /**
  * @summary A frame around a graph of notes drawn by another library, and the list that makes it readable.
@@ -144,6 +153,10 @@ const LONG_LAYOUT = 5000
  * @csspart filter-mark - The default icon beside the search field, shown when none is slotted.
  * @csspart footer - The strip below the graph.
  * @csspart fullscreen - The button that makes the graph fill the screen.
+ * @csspart fullscreen-button - `fullscreen`'s inner button.
+ * @csspart fullscreen-live - `fullscreen`'s live region, which speaks while it is pending.
+ * @csspart fullscreen-spinner - The ring `fullscreen` turns while it is pending.
+ * @csspart fullscreen-text - The box `fullscreen`'s glyph sits in.
  * @csspart gesture-hint - Words over the graph for a moment when it lets a gesture pass to the page, such as how to zoom it.
  * @csspart gesture-status - The line shown while a graph with `gestures="activate"` has the gestures.
  * @csspart header - The strip above the graph.
@@ -161,10 +174,30 @@ const LONG_LAYOUT = 5000
  * @csspart note-relation - How a note stands to the selected one, such as "Linked from Alpha".
  * @csspart note-selected - The selected note, first in the list.
  * @csspart notes-toggle - The button among the controls that opens the search and the list over the drawing, with `no-panel`.
+ * @csspart notes-toggle-button - `notes-toggle`'s inner button.
+ * @csspart notes-toggle-live - `notes-toggle`'s live region, which speaks while it is pending.
+ * @csspart notes-toggle-spinner - The ring `notes-toggle` turns while it is pending.
+ * @csspart notes-toggle-text - The box `notes-toggle`'s glyph sits in.
  * @csspart pan-down - The button that moves the graph down.
+ * @csspart pan-down-button - `pan-down`'s inner button.
+ * @csspart pan-down-live - `pan-down`'s live region, which speaks while it is pending.
+ * @csspart pan-down-spinner - The ring `pan-down` turns while it is pending.
+ * @csspart pan-down-text - The box `pan-down`'s glyph sits in.
  * @csspart pan-end - The button that moves the graph toward the end of a line of text: right in English.
+ * @csspart pan-end-button - `pan-end`'s inner button.
+ * @csspart pan-end-live - `pan-end`'s live region, which speaks while it is pending.
+ * @csspart pan-end-spinner - The ring `pan-end` turns while it is pending.
+ * @csspart pan-end-text - The box `pan-end`'s glyph sits in.
  * @csspart pan-start - The button that moves the graph toward the start of a line of text: left in English.
+ * @csspart pan-start-button - `pan-start`'s inner button.
+ * @csspart pan-start-live - `pan-start`'s live region, which speaks while it is pending.
+ * @csspart pan-start-spinner - The ring `pan-start` turns while it is pending.
+ * @csspart pan-start-text - The box `pan-start`'s glyph sits in.
  * @csspart pan-up - The button that moves the graph up.
+ * @csspart pan-up-button - `pan-up`'s inner button.
+ * @csspart pan-up-live - `pan-up`'s live region, which speaks while it is pending.
+ * @csspart pan-up-spinner - The ring `pan-up` turns while it is pending.
+ * @csspart pan-up-text - The box `pan-up`'s glyph sits in.
  * @csspart panel - The search field and the list, beside the drawing or below it, or over the drawing when opened with `no-panel`.
  * @csspart region - The frame: the drawing, its controls and the list.
  * @csspart search - The bar holding the icon, the search field and the count.
@@ -174,7 +207,15 @@ const LONG_LAYOUT = 5000
  * @csspart stop-layout - The button that stops a layout that has run past five seconds, where the notes stand.
  * @csspart viewport - The box the renderer draws in.
  * @csspart zoom-in - The zoom in button.
+ * @csspart zoom-in-button - `zoom-in`'s inner button.
+ * @csspart zoom-in-live - `zoom-in`'s live region, which speaks while it is pending.
+ * @csspart zoom-in-spinner - The ring `zoom-in` turns while it is pending.
+ * @csspart zoom-in-text - The box `zoom-in`'s glyph sits in.
  * @csspart zoom-out - The zoom out button.
+ * @csspart zoom-out-button - `zoom-out`'s inner button.
+ * @csspart zoom-out-live - `zoom-out`'s live region, which speaks while it is pending.
+ * @csspart zoom-out-spinner - The ring `zoom-out` turns while it is pending.
+ * @csspart zoom-out-text - The box `zoom-out`'s glyph sits in.
  *
  * @cssstate empty - The list holds no notes: the graph has none, or a search or the groups hid them all.
  * @cssstate fullscreen - The graph fills the screen.
@@ -832,6 +873,14 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     }
   }
 
+  /**
+   * The graph's controls, each an Icon Button: named here, where this family's
+   * imports register it, though the surface draws most of them.
+   */
+  protected override get controlTag(): StaticValue {
+    return this.tag('icon-button')
+  }
+
   /** The pan request, and the side it goes to, which `moved()` then says. */
   protected override panEvent(detail: ViewportPanDetail): Event {
     this.asked = this.sideOf(detail.to)
@@ -1278,18 +1327,23 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     if (!this.noPanel) {
       return nothing
     }
-    return html`<button
+    const button = this.controlTag
+    const { material, raised } = this.controlAxes
+    return staticHtml`<${button}
       part="notes-toggle"
+      exportparts="button: notes-toggle-button, live: notes-toggle-live, spinner: notes-toggle-spinner, text: notes-toggle-text"
       aria-controls="panel"
-      aria-expanded=${this.panelOpen ? 'true' : 'false'}
-      aria-label=${this.notesLabel}
-      type="button"
+      .expanded=${this.panelOpen}
+      label=${this.notesLabel}
+      material=${material ?? nothing}
+      ?raised=${raised}
       @click=${() => this.togglePanel()}
+      @helix-press=${stopPress}
     >
       <svg aria-hidden="true" fill="currentColor" viewBox=${list.viewBox}>
         ${unsafeSVG(list.content)}
       </svg>
-    </button>`
+    </${button}>`
   }
 
   /** Typing is a new search, read from its top, with no note under the keys until Down. */

@@ -365,11 +365,12 @@ describe('canvas', () => {
     await new Promise((resolve) => setTimeout(resolve, 0))
     const controls = part(host, 'controls')
     expect(controls?.getAttribute('role')).toBe('toolbar')
-    const stops = [...(controls?.querySelectorAll('button') ?? [])].map((button) =>
-      button.getAttribute('tabindex'),
+    /* Each an Icon Button, which holds the stop through its own `focusable`. */
+    const stops = [...(controls?.children ?? [])].map(
+      (button) => (button as Element & { focusable?: boolean }).focusable,
     )
-    expect(stops.filter((stop) => stop === '0')).toHaveLength(1)
-    expect(stops[0]).toBe('0')
+    expect(stops.filter(Boolean)).toHaveLength(1)
+    expect(stops[0]).toBe(true)
   })
 
   test('a press moves the board and says that it did, rather than asking', async () => {

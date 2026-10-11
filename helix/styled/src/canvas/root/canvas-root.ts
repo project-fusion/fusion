@@ -1,10 +1,11 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { customElement, type ViewportControlAxes } from '@fusion.dev/helix-core'
 import { HelixHeadlessCanvas } from '@fusion.dev/helix-headless/canvas'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
 import { styles } from './canvas-root.css.js'
+import '../../icon-button/index.js'
 
 /**
  * @summary A board of cards and the connections between them, which can be navigated, rearranged, and connected.
@@ -69,6 +70,11 @@ export class HelixCanvas extends HelixHeadlessCanvas {
    */
   @property({ reflect: true })
   grid?: 'lines' | 'dots'
+
+  /** The controls float over the board, so they are raised. */
+  protected override get controlAxes(): ViewportControlAxes {
+    return { raised: true }
+  }
 
   /**
    * How the board is set apart from the page. `plain` draws no frame.
