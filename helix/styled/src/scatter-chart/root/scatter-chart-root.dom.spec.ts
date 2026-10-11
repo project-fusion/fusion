@@ -155,29 +155,40 @@ describe('a pointer', () => {
   })
 
   /* Every point was measured against the pointer on every move. Laid out on a
-     grid of 200 across and 100 up, the points stand a few pixels apart. */
-  geometry('finds the nearest of 20,000 points', async () => {
-    await mount(
-      '<div style="inline-size: 32rem"><helix-scatter-chart label="Grid"></helix-scatter-chart></div>',
-    )
-    const host = document.querySelector('helix-scatter-chart') as Chart & { data: unknown }
-    host.data = {
-      columns: ['Row', 'Across', 'Up'],
-      rows: Array.from({ length: 20_000 }, (_, at) => [`r${at}`, at % 200, Math.floor(at / 200)]),
-    }
-    await frames(host)
-    const plot = (part(host, 'plot') as HTMLElement).getBoundingClientRect()
-    /* Across runs 0 to 200 and up 0 to 100, the round numbers around them. */
-    for (const row of [0, 7_431, 19_999]) {
-      move(
-        host,
-        plot.left + ((row % 200) / 200) * plot.width,
-        plot.top + (1 - Math.floor(row / 200) / 100) * plot.height,
+     grid of 200 across and 100 up, the points stand a few pixels apart.
+
+     **Eight seconds, where every other spec has the harness's two.** This one
+     waits on twelve frames with 20,000 points drawn. On a desk it takes about
+     240 milliseconds in Chromium and 290 in WebKit, measured October 11, 2026,
+     and in WebKit on a two-core runner it ran past two seconds on run
+     38117810000, where the whole family took 3.8 seconds against Chromium's
+     1.9. */
+  geometry(
+    'finds the nearest of 20,000 points',
+    async () => {
+      await mount(
+        '<div style="inline-size: 32rem"><helix-scatter-chart label="Grid"></helix-scatter-chart></div>',
       )
+      const host = document.querySelector('helix-scatter-chart') as Chart & { data: unknown }
+      host.data = {
+        columns: ['Row', 'Across', 'Up'],
+        rows: Array.from({ length: 20_000 }, (_, at) => [`r${at}`, at % 200, Math.floor(at / 200)]),
+      }
       await frames(host)
-      expect(part(host, 'tooltip-label')?.textContent).toBe(`r${row}`)
-    }
-  })
+      const plot = (part(host, 'plot') as HTMLElement).getBoundingClientRect()
+      /* Across runs 0 to 200 and up 0 to 100, the round numbers around them. */
+      for (const row of [0, 7_431, 19_999]) {
+        move(
+          host,
+          plot.left + ((row % 200) / 200) * plot.width,
+          plot.top + (1 - Math.floor(row / 200) / 100) * plot.height,
+        )
+        await frames(host)
+        expect(part(host, 'tooltip-label')?.textContent).toBe(`r${row}`)
+      }
+    },
+    8000,
+  )
 })
 
 /* A series' points were an element each, so two that overlapped darkened
