@@ -27,16 +27,12 @@ We do not run the tests in Firefox. The rest of this page lists the browser
 features Helix uses. If you ship Helix to Firefox or Safari and find something
 broken, please report it.
 
-### Known differences in WebKit
+### What differs in WebKit
 
-A few specs still fail in WebKit. We keep each one on a list until it is fixed.
-
-- Checkbox Group, Radio Group, Option, Toast, and Tooltip name or describe their
-  host through `ElementInternals`, pointing into their own shadow root. WebKit
-  reads those references back as empty. We have not yet checked whether
-  VoiceOver still reads the name.
-- In the sandbox's source pane, in WebKit on macOS, one undo after an indent
-  also removes the text typed before it.
+Checkbox Group, Radio Group, Option, Toast, and Tooltip name or describe their
+host through `ElementInternals`, pointing into their own shadow root. WebKit
+reads those references back as empty, so their specs for it fail there. We have
+not yet checked whether VoiceOver still reads the name.
 
 ## Browser features Helix uses
 

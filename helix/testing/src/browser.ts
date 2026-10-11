@@ -52,7 +52,15 @@ interface Case {
   body: () => unknown
   name: string
   suite: string[]
+  /** This test's own limit, where it asked for one. */
+  timeout?: number
 }
+
+/**
+ * What Bun's `test` takes after the body: a limit in milliseconds, or options
+ * holding one.
+ */
+type TestOptions = number | { timeout?: number }
 
 const cases: Case[] = []
 const hooks: { body: () => unknown; depth: number }[] = []
@@ -71,8 +79,16 @@ export const describe = (name: string, body: () => void): void => {
   suite = suite.slice(0, -1)
 }
 
-const register = (name: string, body: () => unknown): void => {
-  cases.push({ body, name, suite: [...suite] })
+/**
+ * Registers a test, with its own limit where it names one.
+ *
+ * **Bun's form, so a spec reads the same in both harnesses.** A test that
+ * draws much more than a component usually does names a longer limit, as Bun
+ * lets it, and every other test keeps `TIMEOUT`.
+ */
+const register = (name: string, body: () => unknown, options?: TestOptions): void => {
+  const timeout = typeof options === 'number' ? options : options?.timeout
+  cases.push({ body, name, suite: [...suite], ...(timeout === undefined ? {} : { timeout }) })
 }
 
 /**
@@ -96,11 +112,11 @@ const register = (name: string, body: () => unknown): void => {
  * would answer a spec author's question with a lie. Better it throws.
  */
 interface TestApi {
-  (name: string, body: () => unknown): void
+  (name: string, body: () => unknown, options?: TestOptions): void
   /** Registers nothing. */
-  skip(name: string, body: () => unknown): void
+  skip(name: string, body: () => unknown, options?: TestOptions): void
   /** Registers nothing when the condition holds, and normally when it does not. */
-  skipIf(condition: boolean): (name: string, body: () => unknown) => void
+  skipIf(condition: boolean): (name: string, body: () => unknown, options?: TestOptions) => void
 }
 
 /** Registers one test. */
@@ -108,11 +124,11 @@ export const test: TestApi = Object.assign(register, {
   skip: (): void => {},
   skipIf:
     (condition: boolean) =>
-    (name: string, body: () => unknown): void => {
+    (name: string, body: () => unknown, options?: TestOptions): void => {
       if (condition) {
         return
       }
-      register(name, body)
+      register(name, body, options)
     },
 })
 
@@ -509,11 +525,12 @@ const runThese = async (
   for (const entry of ownCases) {
     const started = performance.now()
     let failure: string | undefined
+    const limit = entry.timeout ?? TIMEOUT
     try {
       await Promise.race([
         entry.body(),
         new Promise((_, reject) => {
-          setTimeout(() => reject(new Error(`timed out after ${TIMEOUT}ms`)), TIMEOUT)
+          setTimeout(() => reject(new Error(`timed out after ${limit}ms`)), limit)
         }),
       ])
     } catch (error) {

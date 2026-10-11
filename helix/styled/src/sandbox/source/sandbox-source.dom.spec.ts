@@ -50,23 +50,44 @@ describe('the source pane', () => {
   /* Browser only: happy-dom keeps no undo history. Writing the field's value
      emptied the history, so undo after Tab took back nothing, neither the
      indent nor what was typed before it. The caret moves between the two edits,
-     which closes the first as a keystroke and a click would. */
-  test.skipIf(!hasLayout())('lets undo take back an indent, and only the indent', async () => {
-    const host = await source()
-    const field = part(host, 'source') as HTMLTextAreaElement
-    field.focus()
-    document.execCommand('insertText', false, 'Y')
-    field.setSelectionRange(0, 0)
-    field.setSelectionRange(1, 1)
+     which closes the first as a keystroke and a click would.
 
-    expect(press(field, 'Tab').defaultPrevented).toBe(true)
-    expect(field.value).toBe('Y  ')
-    expect(host.value).toBe('Y  ')
+     **Undone as a keystroke is, in whatever engine runs it.** Chromium takes
+     back a keystroke made after a caret move alone. WebKit on macOS takes back
+     the text typed before it as well, since typing across a caret move is one
+     step of undo there, measured with real keys on October 11, 2026. So a plain
+     field shows this engine's answer first, and the indent has to match it. */
+  test.skipIf(!hasLayout())(
+    'lets undo take back an indent, as it takes back a keystroke',
+    async () => {
+      const plain = document.createElement('textarea')
+      document.body.append(plain)
+      plain.focus()
+      document.execCommand('insertText', false, 'Y')
+      plain.setSelectionRange(0, 0)
+      plain.setSelectionRange(1, 1)
+      document.execCommand('insertText', false, '  ')
+      document.execCommand('undo')
+      const keystroke = plain.value
+      plain.remove()
 
-    document.execCommand('undo')
-    expect(field.value).toBe('Y')
-    expect(host.value).toBe('Y')
-  })
+      const host = await source()
+      const field = part(host, 'source') as HTMLTextAreaElement
+      field.focus()
+      document.execCommand('insertText', false, 'Y')
+      field.setSelectionRange(0, 0)
+      field.setSelectionRange(1, 1)
+
+      expect(press(field, 'Tab').defaultPrevented).toBe(true)
+      expect(field.value).toBe('Y  ')
+      expect(host.value).toBe('Y  ')
+
+      document.execCommand('undo')
+      expect(field.value).not.toBe('Y  ')
+      expect(field.value).toBe(keystroke)
+      expect(host.value).toBe(keystroke)
+    },
+  )
 
   /* Browser only, for the computed outline. The focused field showed only a
      change of fill, at 1.04:1 against the one before. */
