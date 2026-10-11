@@ -24,6 +24,37 @@ const pages = (host: HTMLElement): HTMLElement[] => [
   ...(host.shadowRoot?.querySelectorAll<HTMLElement>('[part~="page"]') ?? []),
 ]
 
+/**
+ * Sends a plain click to a link, stops the link last, and says whether the
+ * component left it to be followed.
+ *
+ * A plain `Event` runs the listeners, and in Chromium it does not follow the
+ * link: `click()` in a browser would navigate the page that runs the specs.
+ * WebKit follows the link for a plain `Event` too, where the DOM standard keeps
+ * that for a `MouseEvent`, and the spec page went to `/p/3` with the rest of
+ * the family unrun. So the link is stopped at the last node the click reaches,
+ * once every listener in the component has heard it: the window for a composed
+ * click, and the shadow root for one that is not.
+ */
+const click = (link: Element | null, composed = false): boolean => {
+  if (!link) {
+    return false
+  }
+  const last: EventTarget = composed ? window : link.getRootNode()
+  let followed = false
+  const stop = (event: Event): void => {
+    followed = !event.defaultPrevented
+    event.preventDefault()
+  }
+  last.addEventListener('click', stop)
+  try {
+    link.dispatchEvent(new Event('click', { bubbles: true, cancelable: true, composed }))
+  } finally {
+    last.removeEventListener('click', stop)
+  }
+  return followed
+}
+
 describe('pagination', () => {
   test('the host is the landmark, and carries a name it can be chosen by', async () => {
     const nav = await mount('<helix-headless-pagination pages="4"></helix-headless-pagination>')
@@ -322,18 +353,14 @@ describe('pagination links', () => {
       '<helix-headless-pagination default-page="2" href="/p/{page}" pages="6"></helix-headless-pagination>',
     )
     nav.addEventListener('helix-navigate', (event) => event.preventDefault())
-    const click = new Event('click', { bubbles: true, cancelable: true })
-    part(nav, 'next')?.dispatchEvent(click)
-    expect(click.defaultPrevented).toBe(true)
+    expect(click(part(nav, 'next'))).toBe(false)
   })
 
   test('a change nobody refused leaves the link to follow itself', async () => {
     const nav = await mount(
       '<helix-headless-pagination default-page="2" href="/p/{page}" pages="6"></helix-headless-pagination>',
     )
-    const click = new Event('click', { bubbles: true, cancelable: true })
-    part(nav, 'next')?.dispatchEvent(click)
-    expect(click.defaultPrevented).toBe(false)
+    expect(click(part(nav, 'next'))).toBe(true)
   })
 
   /* The page moves a task after the click, so the browser reads the link that
@@ -344,7 +371,7 @@ describe('pagination links', () => {
     )) as HTMLElement & { page: number }
     const heard: number[] = []
     nav.addEventListener('helix-activate', () => heard.push(nav.page))
-    part(nav, 'next')?.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }))
+    click(part(nav, 'next'))
     expect(heard).toEqual([])
     await new Promise((resolve) => setTimeout(resolve))
     expect(heard).toEqual([3])
@@ -679,15 +706,13 @@ describe('pagination links', () => {
 
   /* The browser reads the href of a clicked link after the click listeners
      and their microtasks, so the link has to point where it did when it was
-     pressed until a task has passed. The click is a plain `Event`, which runs
-     the listeners and does not follow the link: `click()` in a browser would
-     navigate the page that runs the specs. */
+     pressed until a task has passed. */
   test('keep their address until the browser has followed them', async () => {
     const nav = (await mount(
       '<helix-headless-pagination default-page="5" href="?p={page}" pages="20"></helix-headless-pagination>',
     )) as Nav
     const next = part(nav, 'next') as HTMLAnchorElement
-    next.dispatchEvent(new Event('click', { bubbles: true, cancelable: true, composed: true }))
+    click(next, true)
     await Promise.resolve()
     await nav.updateComplete
     expect(next.getAttribute('href')).toBe('?p=6')
