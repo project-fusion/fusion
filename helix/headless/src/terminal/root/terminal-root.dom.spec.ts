@@ -433,6 +433,14 @@ describe('the process exiting', () => {
     expect(part(host, 'status')?.textContent).toContain('The process exited.')
   })
 
+  test('says the exit in the update the exit caused, and schedules no other', async () => {
+    const host = await frame()
+    host.attach(standIn(host).renderer)
+    host.exitCode = 1
+    expect(await host.updateComplete).toBe(true)
+    expect(part(host, 'live')?.textContent?.trim()).toBe('The process exited with code 1.')
+  })
+
   test('an exit written in the markup is shown and not announced', async () => {
     const host = await frame('exit-code="2"')
     expect(part(host, 'status')?.textContent).toContain('The process exited with code 2.')
