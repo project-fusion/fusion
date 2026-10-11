@@ -152,6 +152,10 @@ export {
   TokenColorController,
 } from './controllers/token-color-controller/token-color-controller.js'
 export {
+  ToolbarController,
+  type ToolbarControllerOptions,
+} from './controllers/toolbar-controller/toolbar-controller.js'
+export {
   UpgradeController,
   type UpgradeOptions,
 } from './controllers/upgrade-controller/upgrade-controller.js'
