@@ -199,10 +199,14 @@
 }
 
 /* **A control that is on says so with a wash of the ink**, a step past the
-   wash Icon Button lifts to under a pointer: Find while its bar is open, and
-   Fullscreen while the terminal fills the screen. */
+   wash Icon Button lifts to under a pointer: Find while its bar is open,
+   Fullscreen while the terminal fills the screen, and each of the find bar's
+   options while it applies. */
 :host(:state(find-open)) [part="find"],
-:host(:state(fullscreen)) [part="fullscreen"] {
+:host(:state(fullscreen)) [part="fullscreen"],
+[part="find-match-case"][aria-pressed="true"],
+[part="find-whole-word"][aria-pressed="true"],
+[part="find-regex"][aria-pressed="true"] {
   --icon-button-background-color: color-mix(
     in oklab,
     var(--helix-color-foreground) 12%,

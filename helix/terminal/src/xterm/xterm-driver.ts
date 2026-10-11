@@ -84,8 +84,9 @@ export interface XtermSearch extends Addon {
   ): Disposable
 }
 
-/** The search options the driver passes, which are what turn on the result count. */
+/** The search options the driver passes: the reader's three, and the decorations that turn on the result count. */
 interface XtermSearchOptions {
+  caseSensitive?: boolean
   decorations?: {
     activeMatchBackground?: string
     activeMatchBorder?: string
@@ -94,6 +95,8 @@ interface XtermSearchOptions {
     matchOverviewRuler: string
   }
   incremental?: boolean
+  regex?: boolean
+  wholeWord?: boolean
 }
 
 /** `@xterm/addon-web-links`'s `WebLinksAddon` class, which the driver makes with its own handler. */
@@ -261,8 +264,9 @@ export const xtermDriver = (terminal: XtermTerminal, addons: XtermAddons = {}): 
   if (search) {
     driver.search = {
       end: () => search.clearDecorations(),
-      find: (query, { backward, incremental }, matches) => {
+      find: (query, { backward, caseSensitive, incremental, regex, wholeWord }, matches) => {
         const options: XtermSearchOptions = {
+          caseSensitive,
           decorations: {
             activeMatchBorder: matches.activeBorder,
             activeMatchColorOverviewRuler: matches.ruler,
@@ -273,6 +277,8 @@ export const xtermDriver = (terminal: XtermTerminal, addons: XtermAddons = {}): 
             ...(matches.background ? { matchBackground: matches.background } : {}),
           },
           incremental,
+          regex,
+          wholeWord,
         }
         if (backward) {
           search.findPrevious(query, options)

@@ -16,6 +16,7 @@ arrow-square-out
 arrow-up
 arrows-in-line-vertical
 arrows-out-line-vertical
+asterisk
 bed
 bell
 book-open-text
@@ -120,6 +121,8 @@ strategy
 sun
 tag-simple
 target
+text-a-underline
+text-aa
 text-b
 text-italic
 train

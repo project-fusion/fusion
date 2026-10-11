@@ -332,7 +332,13 @@ Links a program writes as hyperlinks always work. Pass `WebLinksAddon` to
 - Control+Shift+F, or Command+F on a Mac, opens the find bar. Enter moves to
   the next match and Shift+Enter to the previous one. Escape closes the bar and
   returns focus to the terminal. Screen readers hear how many matches there are.
+- The find bar's buttons match case, match whole words, and read the field as
+  a regular expression in JavaScript's syntax. Each says whether it is on. A
+  regular expression that cannot be read is said instead of a count. Set
+  `find-match-case`, `find-whole-word`, or `find-regex` to start with one on.
 - Control+Shift+C copies the selection. On a Mac, Command+C does.
+- Control+Shift+V pastes, as it does in the browser, and the program receives
+  the text as a paste. On a Mac, Command+V does.
 - Control+M, or Control+Shift+M on a Mac, switches Tab between typing in the
   terminal and moving focus out of it. The status line says when Tab moves
   focus, and screen readers hear each change. The terminal's input describes

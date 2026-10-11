@@ -71,6 +71,9 @@ helix-headless-terminal::part(fullscreen-button),
 helix-headless-terminal::part(find-previous-button),
 helix-headless-terminal::part(find-next-button),
 helix-headless-terminal::part(find-close-button),
+helix-headless-terminal::part(find-match-case-button),
+helix-headless-terminal::part(find-whole-word-button),
+helix-headless-terminal::part(find-regex-button),
 helix-headless-terminal::part(restart-button) {
   align-items: center;
   background-color: var(--_gray-surface);

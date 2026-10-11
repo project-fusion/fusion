@@ -227,13 +227,18 @@ describe('xtermDriver', () => {
     expect(terminal.options.allowProposedApi).toBe(true)
     const found: number[][] = []
     driver.search?.onResults((index, count) => found.push([index, count]))
-    driver.search?.find('error', { backward: true, incremental: false }, THEME.matches)
+    driver.search?.find(
+      'err(or)?',
+      { backward: true, caseSensitive: true, incremental: false, regex: true, wholeWord: false },
+      THEME.matches,
+    )
     results.emit({ resultCount: 4, resultIndex: 1 })
     driver.search?.end()
     expect(asked[0]).toEqual([
       'previous',
-      'error',
+      'err(or)?',
       {
+        caseSensitive: true,
         decorations: {
           activeMatchBackground: '#f0d080',
           activeMatchBorder: '#9a6700',
@@ -242,6 +247,8 @@ describe('xtermDriver', () => {
           matchOverviewRuler: '#9a6700',
         },
         incremental: false,
+        regex: true,
+        wholeWord: false,
       },
     ])
     expect(asked[1]).toEqual(['clear'])
