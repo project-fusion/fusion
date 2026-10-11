@@ -488,9 +488,6 @@ export class HelixHeadlessTerminal extends HelixElement {
   /** The wait before the bell's flash ends. */
   private ringing: ReturnType<typeof setTimeout> | undefined = undefined
 
-  /** Whether the first update has run, before which a change is the markup's rather than news. */
-  private updatedOnce = false
-
   private readonly copier = new CopyController(this)
 
   /** Whether the terminal fills the screen. */
@@ -916,6 +913,18 @@ export class HelixHeadlessTerminal extends HelixElement {
     this.dispatchEvent(new HelixTerminalRestartEvent())
   }
 
+  /**
+   * Says the process exited, where it exited after the first render: an exit
+   * written in the markup is shown and not news. Here and not in `updated`, so
+   * the words go out in the update the exit caused rather than in another one.
+   */
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    super.willUpdate(changed)
+    if (this.hasUpdated && changed.has('exitCode') && this.exitCode !== undefined) {
+      this.say(formatWords(this, 'exitedLabel', { code: String(this.exitCode) }))
+    }
+  }
+
   protected override updated(changed: PropertyValues<this>): void {
     super.updated(changed)
     const exited = this.exitCode !== undefined
@@ -935,10 +944,6 @@ export class HelixHeadlessTerminal extends HelixElement {
     if (this.renderer && (changed.has('inputLabel') || changed.has('tabHintLabel'))) {
       this.nameInput()
     }
-    if (this.updatedOnce && changed.has('exitCode') && exited) {
-      this.say(formatWords(this, 'exitedLabel', { code: String(this.exitCode ?? 0) }))
-    }
-    this.updatedOnce = true
   }
 
   override connectedCallback(): void {
