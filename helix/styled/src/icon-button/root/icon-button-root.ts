@@ -18,6 +18,10 @@ import { styles } from './icon-button-root.css.js'
  * as "button" and nothing else, which is the most common way a toolbar becomes
  * unusable without sight.
  *
+ * Set `raised` for a button that floats over the page, such as one over a map
+ * or a board, and `material` for the ground under it there. A raised button
+ * takes the theme's floating edge and shadow, as a popover does.
+ *
  * @since 0.1.0
  * @status stable
  * @category actions
@@ -30,13 +34,16 @@ import { styles } from './icon-button-root.css.js'
  * @csspart live - The live region that says `pending-label` when the button becomes pending under focus. It is clipped out of view and still read.
  * @csspart spinner - The ring a pending button turns over its icon, sized and colored by the `--icon-button-spinner-*` hooks.
  *
+ * @cssproperty --icon-button-backdrop - The filter behind a button with `material`, which a translucent ground needs to be read.
  * @cssproperty --icon-button-background-color - Fill behind the button, in every state.
  * @cssproperty --icon-button-background-color-active - Fill behind the button while it is pressed. Without it, a press shows the fill of the state under it.
  * @cssproperty --icon-button-background-color-hover - Fill behind the button under the pointer. Without it, `--icon-button-background-color` also applies on hover.
+ * @cssproperty --icon-button-border-color - Edge color of the control, where its emphasis or `raised` draws an edge.
+ * @cssproperty --icon-button-border-width - Edge width of the control. The theme's floating edge on a raised button, `--helix-border-floating`.
  * @cssproperty --icon-button-foreground-color - Icon color.
  * @cssproperty --icon-button-foreground-color-active - Icon color while the button is pressed. Without it, a press shows the color of the state under it.
- * @cssproperty --icon-button-radius - Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`.
- * @cssproperty --icon-button-shadow - Shadow of a raised icon button.
+ * @cssproperty --icon-button-radius - Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`, or a corner at a time through `--button-radius-start-start`, `--button-radius-start-end`, `--button-radius-end-start` and `--button-radius-end-end`, as Button reads them.
+ * @cssproperty --icon-button-shadow - Shadow of a raised icon button. The theme's floating shadow, `--helix-shadow-floating`.
  * @cssproperty --icon-button-size - Edge length of the control.
  * @cssproperty --icon-button-spinner-color - Color of the ring a pending button turns. It follows the icon's color.
  * @cssproperty --icon-button-spinner-duration - How long the ring takes to turn once.
@@ -48,12 +55,26 @@ import { styles } from './icon-button-root.css.js'
 @customElement('helix-icon-button')
 export class HelixIconButton extends MixinControlSurface(HelixHeadlessIconButton) {
   /**
-   * Raises the button off the page with a shadow.
+   * The ground under the button, for one that lies over a busy surface such as
+   * a map or a board. `glass` lets the surface through under a blur, `frosted`
+   * turns the pair up for a surface too busy for glass, and `transparent` draws
+   * no ground at all. Unset, the ground is the emphasis's own.
+   *
+   * A solid button keeps its fill, which is what it means: the material is the
+   * ground of the other emphases.
+   */
+  @property({ reflect: true })
+  material?: 'frosted' | 'glass' | 'transparent'
+
+  /**
+   * Floats the button over the page, with the theme's floating edge and shadow,
+   * as a popover floats. A ghost button that floats is drawn on the overlay a
+   * floating panel uses, so its glyph has a ground under it.
    *
    * Separate from `shape`, because they are separate facts: a docked control is
    * raised whatever its outline, and a circle inside a toolbar is not raised at
-   * all. Shadow rather than a border, since what is under a floating control is
-   * the page and a line drawn on the page is not the same as being above it.
+   * all. The theme says whether what floats is told apart by a shadow, a line,
+   * or both, and a raised button follows it as every floating panel does.
    */
   @property({ reflect: true, type: Boolean })
   raised = false

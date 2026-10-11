@@ -84,7 +84,8 @@
     var(--icon-button-background-color, transparent)
   );
   block-size: var(--_icon-button-size);
-  border: var(--helix-border-thin) solid transparent;
+  border: var(--icon-button-border-width, var(--helix-border-thin)) solid
+    var(--icon-button-border-color, transparent);
   /*
  * *Four corners, so a group can flatten the two it needs to.**
  *
@@ -95,20 +96,24 @@
  * not, so a copy button beside a button in a group kept all four corners and
  * the pair read as two controls that happen to touch rather than one split in
  * two. Measured on `/contact`: the anchor came out `4px 0 0 4px` and the copy
- * button `4px` all round.
+ * button `4px` all round. A corner of its own each, as `Button` reads them, so
+ * a group stacking down joins an icon button too.
  */
-  border-end-end-radius: var(--button-radius-end, var(--icon-button-radius, var(--helix-radii-sm)));
+  border-end-end-radius: var(
+    --button-radius-end-end,
+    var(--button-radius-end, var(--icon-button-radius, var(--helix-radii-sm)))
+  );
   border-end-start-radius: var(
-    --button-radius-start,
-    var(--icon-button-radius, var(--helix-radii-sm))
+    --button-radius-end-start,
+    var(--button-radius-start, var(--icon-button-radius, var(--helix-radii-sm)))
   );
   border-start-end-radius: var(
-    --button-radius-end,
-    var(--icon-button-radius, var(--helix-radii-sm))
+    --button-radius-start-end,
+    var(--button-radius-end, var(--icon-button-radius, var(--helix-radii-sm)))
   );
   border-start-start-radius: var(
-    --button-radius-start,
-    var(--icon-button-radius, var(--helix-radii-sm))
+    --button-radius-start-start,
+    var(--button-radius-start, var(--icon-button-radius, var(--helix-radii-sm)))
   );
   color: var(
     --_icon-button-pressed-ink,
@@ -167,24 +172,6 @@
   border-radius: var(--helix-radii-full);
 }
 
-/* Raised, which is a shadow and not a line: what is under a floating control is
-   the page, and a border drawn on the page says the control is part of it. */
-:host([raised]) [part="button"] {
-  box-shadow: var(--icon-button-shadow, var(--helix-shadow-md));
-}
-
-/* Lifted under the pointer and set back down on the press, which is the whole of
-   what a raised control has to say about being touched. The scale runs to `lg`,
-   so the lift is md to lg and the press is sm: three steps that exist rather
-   than a fourth invented for this. */
-:host([raised]:not(:disabled)) [part="button"]:hover {
-  box-shadow: var(--icon-button-shadow, var(--helix-shadow-lg));
-}
-
-:host([raised]:not(:disabled)) [part="button"]:active {
-  box-shadow: var(--icon-button-shadow, var(--helix-shadow-sm));
-}
-
 [part="button"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
@@ -199,7 +186,7 @@
     --_icon-button-pressed-fill,
     var(--icon-button-background-color, var(--_icon-button-fill))
   );
-  border-color: transparent;
+  border-color: var(--icon-button-border-color, transparent);
   color: var(
     --_icon-button-pressed-ink,
     var(--icon-button-foreground-color, var(--_icon-button-on-tone))
@@ -236,7 +223,7 @@
       color-mix(in oklab, var(--_icon-button-tone) 6%, transparent)
     )
   );
-  border-color: var(--_icon-button-edge);
+  border-color: var(--icon-button-border-color, var(--_icon-button-edge));
   color: var(
     --_icon-button-pressed-ink,
     var(--icon-button-foreground-color, var(--_icon-button-tone))
@@ -267,7 +254,7 @@
       color-mix(in oklab, var(--_icon-button-tone) 14%, transparent)
     )
   );
-  border-color: transparent;
+  border-color: var(--icon-button-border-color, transparent);
   color: var(
     --_icon-button-pressed-ink,
     var(--icon-button-foreground-color, var(--_icon-button-tone))
@@ -344,6 +331,94 @@
   [part="spinner"] {
     animation-duration: var(--_icon-button-crawl);
   }
+}
+
+/* **Raised is floating, so it answers to the theme's floating separation**, as
+   a popover over the page does: the theme's floating edge and lift, which a
+   theme sets to say whether what floats is told apart by a shadow, a line or
+   both. A fixed shadow of its own made a raised button the one floating thing
+   on a page that ignored it. Both behind hooks, so either half can be turned
+   off. The width only, so each emphasis keeps the edge color it draws.
+
+   Last in the sheet with the material, and in rising specificity: these say
+   more about a button than any rule above, and no two of them select the same
+   button in the same state. */
+:host([raised]) [part="button"] {
+  border-width: var(--icon-button-border-width, var(--helix-border-floating));
+  box-shadow: var(--icon-button-shadow, var(--helix-shadow-floating));
+}
+
+/* **A ghost that floats has an edge**, the border color a floating panel is
+   drawn with, under a material as well. */
+:host([raised]:not([emphasis])) [part="button"],
+:host([raised][emphasis="ghost"]) [part="button"] {
+  border-color: var(--icon-button-border-color, var(--helix-color-border));
+}
+
+/* **Material is the ground under a button that lies over a busy surface**, a
+   map or a board: glass lets it through under a blur, so a reader keeps their
+   place under the button, and frosted turns the pair up for a surface too busy
+   for glass to read. The filter and the translucent ground go together, for
+   the reason `Card` gives: either alone does nothing a reader can see. A solid
+   button keeps its fill, which is what it means. */
+:host([material="glass"]:not([emphasis="solid"])) [part="button"] {
+  backdrop-filter: var(--icon-button-backdrop, var(--helix-material-backdrop));
+  background-color: var(
+    --_icon-button-pressed-fill,
+    var(--icon-button-background-color, var(--helix-material-translucent))
+  );
+}
+
+:host([material="frosted"]:not([emphasis="solid"])) [part="button"] {
+  backdrop-filter: var(--icon-button-backdrop, blur(var(--helix-material-blur-lg)));
+  background-color: var(
+    --_icon-button-pressed-fill,
+    var(--icon-button-background-color, var(--helix-material-translucent-strong))
+  );
+}
+
+/* No ground at all: the glyph over the surface, for one quiet enough to hold it. */
+:host([material="transparent"]:not([emphasis="solid"])) [part="button"] {
+  backdrop-filter: none;
+  background-color: var(
+    --_icon-button-pressed-fill,
+    var(--icon-button-background-color, transparent)
+  );
+}
+
+/* **A ghost that floats with no material has a ground**, the overlay a
+   floating panel is drawn on: a glyph with a shadow and nothing under it reads
+   as a smudge over a map or a board. */
+:host([raised]:not([emphasis]):not([material])) [part="button"],
+:host([raised][emphasis="ghost"]:not([material])) [part="button"] {
+  background-color: var(
+    --_icon-button-pressed-fill,
+    var(--icon-button-background-color, var(--helix-color-surface-overlay))
+  );
+}
+
+/* Pointed at, over a material or the overlay: the overlay with a little of the
+   ink in it, so the button a reader is on reads as the one they are on over
+   glass as well as over nothing. */
+:host([material]:not([emphasis="solid"]):not(:disabled)) [part="button"]:hover {
+  background-color: var(
+    --_icon-button-pressed-fill,
+    var(
+      --icon-button-background-color-hover,
+      color-mix(in oklab, var(--helix-color-foreground) 10%, var(--helix-color-surface-overlay))
+    )
+  );
+}
+
+:host([raised]:not(:disabled):not([emphasis]):not([material])) [part="button"]:hover,
+:host([raised][emphasis="ghost"]:not(:disabled):not([material])) [part="button"]:hover {
+  background-color: var(
+    --_icon-button-pressed-fill,
+    var(
+      --icon-button-background-color-hover,
+      color-mix(in oklab, var(--helix-color-foreground) 10%, var(--helix-color-surface-overlay))
+    )
+  );
 }
 
 /*
