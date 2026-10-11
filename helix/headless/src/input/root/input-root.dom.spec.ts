@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -236,11 +236,10 @@ describe('your own rule, and an empty field', () => {
     const host = (await mount(
       '<helix-headless-input label="Name"></helix-headless-input>',
     )) as Input
-    const states = (host as unknown as { internals: ElementInternals }).internals.states
-    expect(states.has('blank')).toBe(true)
+    expect(hasState(host, 'blank')).toBe(true)
     host.value = 'Ada'
     await host.updateComplete
-    expect(states.has('blank')).toBe(false)
+    expect(hasState(host, 'blank')).toBe(false)
   })
 })
 

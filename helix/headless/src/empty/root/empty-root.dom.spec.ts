@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -106,14 +106,14 @@ describe('empty view', () => {
     for (const name of ['icon', 'message', 'actions']) {
       expect(part(empty, name)?.tagName).toBe('SLOT')
     }
-    expect(empty.internals.states.has('has-icon')).toBe(true)
-    expect(empty.internals.states.has('has-actions')).toBe(false)
+    expect(hasState(empty, 'has-icon')).toBe(true)
+    expect(hasState(empty, 'has-actions')).toBe(false)
     const action = document.createElement('button')
     action.slot = 'actions'
     empty.append(action)
     await new Promise((resolve) => setTimeout(resolve, 0))
     await empty.updateComplete
-    expect(empty.internals.states.has('has-actions')).toBe(true)
+    expect(hasState(empty, 'has-actions')).toBe(true)
   })
 
   /* A page rendering from data had to write a heading element to get one,

@@ -2,6 +2,7 @@ import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import {
   formValue,
   hasLayout,
+  hasState,
   mount,
   part,
   registerDom,
@@ -319,8 +320,7 @@ describe('color picker', () => {
     expect(said).toEqual(['#ff0000'])
     expect(sample.hasAttribute('data-copied')).toBe(true)
     expect(sample.getAttribute('aria-label')).toBe('Copied')
-    const internals = (host as unknown as { internals: ElementInternals }).internals
-    expect(internals.states.has('copied')).toBe(true)
+    expect(hasState(host, 'copied')).toBe(true)
   })
 
   test('and a refused clipboard falls through to the older route', async () => {
@@ -463,14 +463,13 @@ describe('color picker', () => {
         '<helix-headless-color-picker></helix-headless-color-picker>',
       )) as Color
       await host.updateComplete
-      const internals = (host as unknown as { internals: ElementInternals }).internals
       ;(part(host, 'eyedropper') as HTMLElement).click()
       await host.updateComplete
-      expect(internals.states.has('sampling')).toBe(true)
+      expect(hasState(host, 'sampling')).toBe(true)
       close({ sRGBHex: '#00ff00' })
       await new Promise((resolve) => setTimeout(resolve, 0))
       await host.updateComplete
-      expect(internals.states.has('sampling')).toBe(false)
+      expect(hasState(host, 'sampling')).toBe(false)
       expect(host.value).toBe('#00ff00')
     })
   })
@@ -574,11 +573,11 @@ describe('an answer the picker refuses', () => {
   test('text that is not a color is marked and said once the reader leaves the field', async () => {
     const host = await picker('name="brand" default-value="#3366ff"')
     await typeInto(host, 'nonsense', false)
-    expect(internals(host).states.has('invalid')).toBe(false)
+    expect(hasState(host, 'invalid')).toBe(false)
     expect(part(host, 'feedback')).toBeNull()
     await typeInto(host, 'nonsense', true)
     expect(internals(host).validity.badInput).toBe(true)
-    expect(internals(host).states.has('invalid')).toBe(true)
+    expect(hasState(host, 'invalid')).toBe(true)
     expect(internals(host).ariaInvalid).toBe('true')
     const field = part(host, 'value') as HTMLInputElement
     expect(field.getAttribute('aria-invalid')).toBe('true')
@@ -596,7 +595,7 @@ describe('an answer the picker refuses', () => {
     expect(host.value).toBe('#3366ff')
     expect(formValue(host)).toBe('#3366ff')
     await typeInto(host, '#00ff00', true)
-    expect(internals(host).states.has('invalid')).toBe(false)
+    expect(hasState(host, 'invalid')).toBe(false)
     expect(part(host, 'feedback')).toBeNull()
   })
 
@@ -607,21 +606,21 @@ describe('an answer the picker refuses', () => {
     await host.updateComplete
     expect((part(host, 'value') as HTMLInputElement).value).toBe('#3366ff')
     expect(internals(host).validity.valid).toBe(true)
-    expect(internals(host).states.has('invalid')).toBe(false)
+    expect(hasState(host, 'invalid')).toBe(false)
   })
 
   test('a value set to text that is not a color is marked at once', async () => {
     const host = await picker('value="nope"')
-    expect(internals(host).states.has('invalid')).toBe(true)
+    expect(hasState(host, 'invalid')).toBe(true)
     expect(part(host, 'grid-saturation')?.getAttribute('aria-invalid')).toBe('true')
   })
 
   test('a required picker with no color is marked once a form refuses it, and not before', async () => {
     const host = await picker('name="brand" required')
-    expect(internals(host).states.has('invalid')).toBe(false)
+    expect(hasState(host, 'invalid')).toBe(false)
     ;(host as unknown as { reportValidity(): boolean }).reportValidity()
     await host.updateComplete
-    expect(internals(host).states.has('invalid')).toBe(true)
+    expect(hasState(host, 'invalid')).toBe(true)
     expect(part(host, 'grid-saturation')?.getAttribute('aria-invalid')).toBe('true')
     expect((part(host, 'feedback') as HTMLElement).textContent?.trim()).toBe('Choose a color.')
   })
@@ -779,13 +778,12 @@ if (hasLayout()) {
       const grid = part(host, 'grid') as HTMLElement
       const box = grid.getBoundingClientRect()
       const at = { bubbles: true, clientX: box.left + 10, clientY: box.top + 10, pointerId: 1 }
-      const internals = (host as unknown as { internals: ElementInternals }).internals
       grid.dispatchEvent(new PointerEvent('pointerdown', at))
       await host.updateComplete
-      expect(internals.states.has('dragging')).toBe(true)
+      expect(hasState(host, 'dragging')).toBe(true)
       grid.dispatchEvent(new PointerEvent('pointerup', at))
       await host.updateComplete
-      expect(internals.states.has('dragging')).toBe(false)
+      expect(hasState(host, 'dragging')).toBe(false)
     })
   })
 }
@@ -1060,11 +1058,11 @@ describe('the message under a color picker', () => {
     expect(part(host, 'grid-brightness')?.getAttribute('aria-invalid')).toBe('true')
     expect(part(host, 'value')?.getAttribute('aria-invalid')).toBe('true')
     expect(internals.ariaInvalid).toBe('true')
-    expect(internals.states.has('invalid')).toBe(true)
+    expect(hasState(host, 'invalid')).toBe(true)
     ;(host as unknown as { feedback: string }).feedback = ''
     await host.updateComplete
     expect(part(host, 'grid-saturation')?.hasAttribute('aria-invalid')).toBe(false)
-    expect(internals.states.has('invalid')).toBe(false)
+    expect(hasState(host, 'invalid')).toBe(false)
   })
 
   test('is not drawn while there is none', async () => {

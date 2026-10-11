@@ -2,6 +2,7 @@ import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import {
   formValue,
   hasLayout,
+  hasState,
   mount,
   part,
   registerDom,
@@ -1063,7 +1064,7 @@ describe('a date picker’s own message', () => {
     expect(part(host, 'feedback')?.textContent).toBe('Pick a weekday')
     expect(host.validationMessage).toBe('Pick a weekday')
     expect(host.internals.ariaInvalid).toBe('true')
-    expect(host.internals.states.has('invalid')).toBe(true)
+    expect(hasState(host, 'invalid')).toBe(true)
   })
 })
 
@@ -1358,7 +1359,7 @@ describe('a calendar holding several dates', () => {
     const cal = (await calendar(
       'locale="en-US" mode="range" default-month="2026-08" default-value="2026-08-04"',
     )) as Live
-    expect(cal.internals.states.has('range-pending')).toBe(true)
+    expect(hasState(cal, 'range-pending')).toBe(true)
     expect(selection(cal)).toBe('Range starts August 4, 2026. Choose the day it ends.')
     cell(cal, 8).dispatchEvent(new Event('pointerenter'))
     await cal.updateComplete
@@ -1374,7 +1375,7 @@ describe('a calendar holding several dates', () => {
     cell(cal, 8).click()
     await cal.updateComplete
     expect(cal.value).toBe('2026-08-04,2026-08-08')
-    expect(cal.internals.states.has('range-pending')).toBe(false)
+    expect(hasState(cal, 'range-pending')).toBe(false)
     expect(days(cal).some((one) => one.hasAttribute('data-range-preview'))).toBe(false)
   })
 
@@ -1395,14 +1396,14 @@ describe('a calendar says which view it shows', () => {
       internals: ElementInternals
       updateComplete: Promise<unknown>
     }
-    expect(cal.internals.states.has('month-view')).toBe(false)
+    expect(hasState(cal, 'month-view')).toBe(false)
     cal.shadowRoot?.querySelector<HTMLElement>('[part="heading-button"]')?.click()
     await cal.updateComplete
-    expect(cal.internals.states.has('month-view')).toBe(true)
+    expect(hasState(cal, 'month-view')).toBe(true)
     cal.shadowRoot?.querySelector<HTMLElement>('[part="heading-button"]')?.click()
     await cal.updateComplete
-    expect(cal.internals.states.has('year-view')).toBe(true)
-    expect(cal.internals.states.has('month-view')).toBe(false)
+    expect(hasState(cal, 'year-view')).toBe(true)
+    expect(hasState(cal, 'month-view')).toBe(false)
   })
 })
 
@@ -1413,9 +1414,9 @@ describe('a calendar with no date chosen', () => {
       updateComplete: Promise<unknown>
       value: string
     }
-    expect(cal.internals.states.has('blank')).toBe(true)
+    expect(hasState(cal, 'blank')).toBe(true)
     cal.value = '2026-08-04'
     await cal.updateComplete
-    expect(cal.internals.states.has('blank')).toBe(false)
+    expect(hasState(cal, 'blank')).toBe(false)
   })
 })

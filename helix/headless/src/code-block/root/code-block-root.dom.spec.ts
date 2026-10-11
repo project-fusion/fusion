@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -351,11 +351,11 @@ describe('an expandable block', () => {
     await el.updateComplete
     expect(expand(el)?.getAttribute('aria-expanded')).toBe('true')
     expect(expand(el)?.textContent?.trim()).toBe('Less')
-    expect(el.internals.states.has('expanded')).toBe(true)
+    expect(hasState(el, 'expanded')).toBe(true)
     expand(el)?.click()
     await el.updateComplete
     expect(expand(el)?.textContent?.trim()).toBe('More')
-    expect(el.internals.states.has('expanded')).toBe(false)
+    expect(hasState(el, 'expanded')).toBe(false)
   })
 
   test('draws nothing without expandable, capped or not', async () => {

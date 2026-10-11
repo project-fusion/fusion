@@ -1,6 +1,13 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { arrowDown, arrowUp, minus } from '@fusion.dev/helix-icons'
-import { mount, part, registerDom, slotted, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  hasState,
+  mount,
+  part,
+  registerDom,
+  slotted,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -159,7 +166,7 @@ describe('movement', () => {
   test('records the judgment as a better or worse state, and neither for no move', async () => {
     const states = async (attributes: string): Promise<string[]> => {
       const host = (await trend(attributes)) as Trend
-      return ['better', 'worse'].filter((name) => host.internals.states.has(name))
+      return ['better', 'worse'].filter((name) => hasState(host, name))
     }
     expect(await states('movement="up" good="up"')).toEqual(['better'])
     expect(await states('direction="up" good="down"')).toEqual(['worse'])
@@ -171,8 +178,7 @@ describe('movement', () => {
   /* A sheet that colors by direction reads these. A trend moved by `value`
      writes no `movement` onto its host, so an attribute could not say it. */
   test('records the movement as an up or down state, whichever property set it', async () => {
-    const states = (host: Trend): string[] =>
-      ['down', 'up'].filter((name) => host.internals.states.has(name))
+    const states = (host: Trend): string[] => ['down', 'up'].filter((name) => hasState(host, name))
     expect(states((await trend('movement="up"')) as Trend)).toEqual(['up'])
     expect(states((await trend('direction="down"')) as Trend)).toEqual(['down'])
     expect(states((await trend('movement="neutral"')) as Trend)).toEqual([])
@@ -250,7 +256,7 @@ describe('value', () => {
     )
     expect(word(down)).toBe('Down, worse')
     expect(figure(down)).toBe('8')
-    expect((down as Trend).internals.states.has('worse')).toBe(true)
+    expect(hasState(down, 'worse')).toBe(true)
     const flat = await mount(
       '<helix-headless-trend value="0" locale="en-US"></helix-headless-trend>',
     )

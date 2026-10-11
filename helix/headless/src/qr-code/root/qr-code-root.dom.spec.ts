@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import { encode } from 'uqr'
 
 beforeAll(async () => {
@@ -240,15 +240,15 @@ describe('qr code', () => {
       value: string
     }
     expect(part(host, 'fallback')).toBeNull()
-    expect(host.internals.states.has('overflow')).toBe(false)
+    expect(hasState(host, 'overflow')).toBe(false)
     host.value = 'x'.repeat(3000)
     await host.updateComplete
     expect(part(host, 'fallback')?.querySelector('slot')?.getAttribute('name')).toBe('fallback')
-    expect(host.internals.states.has('overflow')).toBe(true)
+    expect(hasState(host, 'overflow')).toBe(true)
     host.value = 'two'
     await host.updateComplete
     expect(part(host, 'fallback')).toBeNull()
-    expect(host.internals.states.has('overflow')).toBe(false)
+    expect(hasState(host, 'overflow')).toBe(false)
   })
 
   test('a code that changes is re-encoded', async () => {

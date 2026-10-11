@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   hasLayout,
+  hasState,
   mount,
   part,
   registerDom,
@@ -45,16 +46,16 @@ describe('stat', () => {
     for (const name of ['label', 'value', 'unit', 'trend']) {
       expect(part(stat, name)?.tagName).toBe('SLOT')
     }
-    expect(stat.internals.states.has('has-label')).toBe(true)
-    expect(stat.internals.states.has('has-unit')).toBe(true)
-    expect(stat.internals.states.has('has-trend')).toBe(false)
+    expect(hasState(stat, 'has-label')).toBe(true)
+    expect(hasState(stat, 'has-unit')).toBe(true)
+    expect(hasState(stat, 'has-trend')).toBe(false)
     const trend = document.createElement('span')
     trend.slot = 'trend'
     trend.textContent = 'Up 8%'
     stat.append(trend)
     await new Promise((resolve) => setTimeout(resolve, 0))
     await stat.updateComplete
-    expect(stat.internals.states.has('has-trend')).toBe(true)
+    expect(hasState(stat, 'has-trend')).toBe(true)
   })
 })
 

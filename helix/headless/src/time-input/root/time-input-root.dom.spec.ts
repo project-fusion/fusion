@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { formValue, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -530,10 +530,10 @@ describe('a clearable time input', () => {
 describe('a time input holding nothing', () => {
   test('is blank, as a state', async () => {
     const host = (await field()) as InputTime & { internals: ElementInternals; value: string }
-    expect(host.internals.states.has('blank')).toBe(true)
+    expect(hasState(host, 'blank')).toBe(true)
     host.value = '09:30'
     await host.updateComplete
-    expect(host.internals.states.has('blank')).toBe(false)
+    expect(hasState(host, 'blank')).toBe(false)
   })
 })
 

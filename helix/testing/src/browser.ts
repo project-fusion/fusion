@@ -793,11 +793,17 @@ export const label = (host: HTMLElement): string | null =>
  * Written twice, here and in `dom.ts`, because the two harnesses share no code.
  * A real `CustomStateSet` in this one, so a spec here may also ask whether the
  * rule keyed on it matched, which is the question happy-dom cannot answer.
+ *
+ * **Read through `:state()`, which is what a stylesheet sees.** WebKit hands a
+ * set it has collected back empty: measured on WebKit 26.6 on October 10, 2026,
+ * 49 of 50 elements answered `false` to `states.has()` after a garbage
+ * collection while every one of them still matched `:state()`, and `add` and
+ * `delete` still changed what matched. No component reads its own states back,
+ * so a reader never sees it. A spec that asked the set failed whenever a
+ * collection ran first, which in WebKit was a different handful of specs each
+ * run.
  */
-export const hasState = (host: Element, name: string): boolean =>
-  (
-    host as unknown as { internals?: { states?: { has(value: string): boolean } } }
-  ).internals?.states?.has(name) ?? false
+export const hasState = (host: Element, name: string): boolean => host.matches(`:state(${name})`)
 
 /** Finds a shadow part by name, among the names an element carries. */
 export const part = (host: HTMLElement, name: string): Element | null =>

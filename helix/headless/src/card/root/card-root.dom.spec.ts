@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -235,7 +235,7 @@ describe('card region parts', () => {
 describe('card region states', () => {
   type Held = HTMLElement & { internals: ElementInternals; updateComplete: Promise<boolean> }
   const held = (card: Held): string[] =>
-    ['has-media', 'has-header', 'has-footer'].filter((name) => card.internals.states.has(name))
+    ['has-media', 'has-header', 'has-footer'].filter((name) => hasState(card, name))
 
   test('say which regions hold something', async () => {
     expect(held((await mount('<helix-headless-card>Body</helix-headless-card>')) as Held)).toEqual(

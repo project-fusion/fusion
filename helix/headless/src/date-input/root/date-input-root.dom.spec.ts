@@ -1400,10 +1400,10 @@ describe('a clearable date input', () => {
 describe('a date input holding nothing', () => {
   test('is blank, as a state', async () => {
     const host = (await field()) as InputDate & { internals: ElementInternals }
-    expect(host.internals.states.has('blank')).toBe(true)
+    expect(hasState(host, 'blank')).toBe(true)
     host.value = '2026-08-04'
     await host.updateComplete
-    expect(host.internals.states.has('blank')).toBe(false)
+    expect(hasState(host, 'blank')).toBe(false)
   })
 })
 

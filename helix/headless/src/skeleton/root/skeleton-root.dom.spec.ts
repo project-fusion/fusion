@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -114,15 +114,15 @@ describe('a skeleton around content', () => {
     const blank = (await mount(
       '<helix-headless-skeleton>\n  </helix-headless-skeleton>',
     )) as Skeleton
-    expect(blank.internals.states.has('wrapping')).toBe(false)
+    expect(hasState(blank, 'wrapping')).toBe(false)
     const words = (await mount(
       '<helix-headless-skeleton>Ada</helix-headless-skeleton>',
     )) as Skeleton
-    expect(words.internals.states.has('wrapping')).toBe(true)
+    expect(hasState(words, 'wrapping')).toBe(true)
     const element = (await mount(
       '<helix-headless-skeleton>\n  <a href="/profile">Ada</a>\n</helix-headless-skeleton>',
     )) as Skeleton
-    expect(element.internals.states.has('wrapping')).toBe(true)
+    expect(hasState(element, 'wrapping')).toBe(true)
   })
 
   test('content arriving later is read as content', async () => {
@@ -133,6 +133,6 @@ describe('a skeleton around content', () => {
     await new Promise((done) => setTimeout(done, 0))
     await skeleton.updateComplete
     expect(skeleton.internals.ariaHidden ?? null).toBeNull()
-    expect(skeleton.internals.states.has('wrapping')).toBe(true)
+    expect(hasState(skeleton, 'wrapping')).toBe(true)
   })
 })
