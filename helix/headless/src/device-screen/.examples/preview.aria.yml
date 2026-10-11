@@ -1,7 +1,5 @@
 - group "Device controls":
   - button "Home"
   - button "Take a screenshot"
-- application "iPhone 17 Pro":
-  - text: Saturday, October 10 9:41
-  - status
-- text: Keys you press go to the device. Press Tab to leave the screen.
+- application "iPhone 17 Pro": Saturday, October 10 9:41
+- status
