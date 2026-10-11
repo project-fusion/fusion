@@ -26,10 +26,23 @@ export const assignSlots = (
     named.set(name, [...(named.get(name) ?? []), child])
   }
   for (const slot of root?.querySelectorAll?.<HTMLSlotElement>('slot') ?? []) {
-    const wanted = named.get(slot.name) ?? []
-    const had = slot.assignedNodes()
-    if (had.length !== wanted.length || had.some((one, at) => one !== wanted[at])) {
-      slot.assign?.(...wanted)
-    }
+    assignSlot(slot, ...(named.get(slot.name) ?? []))
+  }
+}
+
+/**
+ * Assigns `nodes` to `slot` by hand, unless it already holds exactly them.
+ *
+ * **An assignment that changes nothing still costs something in WebKit.** It
+ * cancels a smooth scroll running in the scroller around the slot, and a track
+ * that snaps then returns to where the scroll began. Measured on WebKit 26.6 on
+ * October 10, 2026: Carousel assigned its slides on every update, so a press of
+ * next moved the dots and left the slides where they were. Chromium carries on
+ * scrolling.
+ */
+export const assignSlot = (slot: HTMLSlotElement, ...nodes: (Element | Text)[]): void => {
+  const had = slot.assignedNodes?.() ?? []
+  if (had.length !== nodes.length || had.some((one, at) => one !== nodes[at])) {
+    slot.assign?.(...nodes)
   }
 }

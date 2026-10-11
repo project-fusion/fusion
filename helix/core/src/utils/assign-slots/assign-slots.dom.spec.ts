@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { registerDom } from '@fusion.dev/helix-testing/dom'
-import { assignSlots } from './assign-slots.js'
+import { assignSlot, assignSlots } from './assign-slots.js'
 
 beforeAll(() => {
   registerDom()
@@ -70,5 +70,29 @@ describe('slots assigned by hand', () => {
 
   test('nothing to assign into is no error', () => {
     expect(() => assignSlots(null, [])).not.toThrow()
+  })
+})
+
+describe('one slot assigned by hand', () => {
+  /* The pane that holds a slide is assigned on every update, and in WebKit an
+     assignment that changed nothing stopped the smooth scroll that update had
+     started. */
+  test('is left alone when it already holds exactly those nodes, and assigned when they differ', () => {
+    const { host, slot } = manual('<slot></slot>', '<p id="a"></p><p id="b"></p>')
+    const target = slot('') as HTMLSlotElement
+    const [a, b] = [...host.children] as [Element, Element]
+    let calls = 0
+    const assign = target.assign.bind(target)
+    target.assign = (...nodes: (Element | Text)[]) => {
+      calls += 1
+      assign(...nodes)
+    }
+    assignSlot(target, a, b)
+    assignSlot(target, a, b)
+    expect(calls).toBe(1)
+    assignSlot(target, b, a)
+    expect(calls).toBe(2)
+    assignSlot(target, b)
+    expect(calls).toBe(3)
   })
 })

@@ -397,7 +397,7 @@ export {
 } from './mixins/mixin-viewport/mixin-viewport.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { arrowReach, sideOf } from './utils/arrow/arrow.js'
-export { assignSlots } from './utils/assign-slots/assign-slots.js'
+export { assignSlot, assignSlots } from './utils/assign-slots/assign-slots.js'
 export {
   type DrawAutofillOptions,
   drawAutofill,
