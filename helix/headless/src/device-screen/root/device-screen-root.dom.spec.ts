@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -352,6 +352,16 @@ describe('device screen, keys', () => {
     expect(keys).toEqual([{ detail: { text: 'hello' }, type: 'helix-device-text' }])
   })
 
+  test('the paste shortcut is known by its key on any layout', async () => {
+    /* A Russian layout's V types м, and the browser still pastes. */
+    const host = await device('screen-width="400" screen-height="800" forward-shortcuts')
+    const screen = screenOf(host)
+    const events = heard(host, 'helix-device-key')
+    const shortcut = key(screen, 'keydown', { code: 'KeyV', key: 'м', metaKey: true })
+    expect(shortcut.defaultPrevented).toBe(false)
+    expect(events).toHaveLength(0)
+  })
+
   test('a key that went down elsewhere is not sent as it comes up on the screen', async () => {
     const host = await device()
     const screen = screenOf(host)
@@ -446,6 +456,17 @@ describe('device screen, names and states', () => {
     expect(hint?.textContent).toBe(
       'Keys you press go to the device. Press Tab to leave the screen.',
     )
+    /* Hidden, so it is heard once, as the description, and not again as text
+       after the device. */
+    expect(hint?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  test('the screen takes every touch while it sends them, and leaves the page its scroll while read-only', async () => {
+    const host = await device()
+    expect(screenOf(host).hasAttribute('data-touches')).toBe(true)
+    host.readonly = true
+    await host.updateComplete
+    expect(screenOf(host).hasAttribute('data-touches')).toBe(false)
   })
 
   test('a frame with no stream inside says so, and one with a stream does not', async () => {
@@ -457,15 +478,28 @@ describe('device screen, names and states', () => {
     expect(hasState(host, 'empty')).toBe(false)
   })
 
-  test('loading shows its words in a live region, and takes them away after', async () => {
+  test('loading shows its words over the screen and says them in a live region, and takes them away after', async () => {
     const host = await device('screen-width="400" screen-height="800" loading')
     const loading = part(host, 'loading')
-    expect(loading?.getAttribute('role')).toBe('status')
+    const live = part(host, 'live')
     expect(loading?.textContent?.trim()).toBe('Connecting to the device')
+    expect(loading?.getAttribute('aria-hidden')).toBe('true')
+    expect(live?.getAttribute('role')).toBe('status')
+    expect(live?.textContent).toBe('Connecting to the device')
     expect(hasState(host, 'loading')).toBe(true)
     host.removeAttribute('loading')
     await host.updateComplete
     expect(loading?.textContent?.trim()).toBe('')
+    expect(live?.textContent).toBe('')
+  })
+
+  test('a read-only screen still says it is loading, from outside the picture', async () => {
+    /* A picture's children are hidden from a screen reader, so a live region
+       inside the read-only screen would say nothing. */
+    const host = await device('screen-width="400" screen-height="800" readonly loading')
+    const live = part(host, 'live') as HTMLElement
+    expect(screenOf(host).contains(live)).toBe(false)
+    expect(live.textContent).toBe('Connecting to the device')
   })
 
   test('a picture turned a quarter says it is sideways', async () => {
@@ -474,6 +508,43 @@ describe('device screen, names and states', () => {
     expect(part(host, 'region')?.getAttribute('style')).toContain(
       '--device-screen-rotation: 270deg',
     )
+  })
+})
+
+describe('device screen, its size', () => {
+  test('a width from the page alone takes its height from the stream’s shape, never its pixels', async () => {
+    const host = await device('screen-width="400"')
+    const screen = drawAt(host)
+    const events = heard(host, 'helix-device-tap')
+    pointer(screen, 'pointerdown', 100, 200)
+    pointer(screen, 'pointerup', 100, 200)
+    expect(events[0]?.detail).toMatchObject({ height: 800, width: 400, x: 200, y: 400 })
+  })
+
+  test('a height alone takes its width the same way', async () => {
+    const host = await device('screen-height="800"')
+    expect(part(host, 'region')?.getAttribute('style')).toContain('--device-screen-ratio: 0.5;')
+  })
+})
+
+describe('device screen, taken off the page', () => {
+  test('a finger down as it goes is sent as canceled, and a key down as released', async () => {
+    const host = await device()
+    const screen = drawAt(host)
+    const events = heard(host, 'helix-device-touch', 'helix-device-key')
+    pointer(screen, 'pointerdown', 50, 100)
+    key(screen, 'keydown', { code: 'ShiftLeft', key: 'Shift', shiftKey: true })
+    host.remove()
+    /* Once each, in either order: Chromium blurs a focused element it takes
+       away, which releases the key before the frame hears it is gone. */
+    expect(
+      events.map((one) => `${one.type}:${(one.detail as { phase: string }).phase}`).sort(),
+    ).toEqual([
+      'helix-device-key:down',
+      'helix-device-key:up',
+      'helix-device-touch:cancel',
+      'helix-device-touch:down',
+    ])
   })
 })
 
@@ -488,6 +559,18 @@ describe('device screen, marks and capture', () => {
     expect(ring.getAttribute('aria-hidden')).toBe('true')
   })
 
+  test('with no size from the page or the stream, a ring is placed in the drawn screen’s pixels, as events are', async () => {
+    const bare = (await mount(
+      '<helix-headless-device-screen label="iPhone"></helix-headless-device-screen>',
+    )) as Screen
+    drawAt(bare, 200, 400)
+    bare.showTap(100, 200)
+    await bare.updateComplete
+    const style = (part(bare, 'touch') as HTMLElement).getAttribute('style') ?? ''
+    expect(style).toContain('--device-screen-touch-x: 50.00%')
+    expect(style).toContain('--device-screen-touch-y: 50.00%')
+  })
+
   test('showSwipe draws a ring that travels for as long as the swipe took', async () => {
     const host = await device()
     host.showSwipe(200, 600, 200, 200, 400)
@@ -496,6 +579,19 @@ describe('device screen, marks and capture', () => {
     expect(style).toContain('--device-screen-touch-to-y: 25.00%')
     expect(style).toContain('--device-screen-touch-duration: 400ms')
   })
+
+  /* Browser only: happy-dom draws no canvas. */
+  if (hasLayout()) {
+    test('capture reads the size of the stream it draws, even one put in a moment ago', async () => {
+      const host = await device('')
+      const swapped = document.createElement('canvas')
+      swapped.width = 30
+      swapped.height = 60
+      host.querySelector('canvas')?.replaceWith(swapped)
+      const bitmap = await createImageBitmap(await host.capture())
+      expect([bitmap.width, bitmap.height]).toEqual([30, 60])
+    })
+  }
 
   test('capture fails with the reason where there is no stream', async () => {
     const bare = (await mount(

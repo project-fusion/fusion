@@ -115,8 +115,7 @@
 }
 
 /* **The screen is black until the stream draws on it**, as a screen is, in
-   either mode. It takes every touch, so the page neither scrolls nor zooms
-   under a finger dragging on it. */
+   either mode. */
 [part="screen"] {
   background-color: var(--helix-color-surface-media);
   block-size: 100%;
@@ -125,17 +124,12 @@
   inline-size: 100%;
   overflow: hidden;
   position: relative;
-  touch-action: none;
   user-select: none;
 }
 
 :host([shape="circle"]) [part="bezel"],
 :host([shape="circle"]) [part="screen"] {
   border-radius: var(--helix-radii-full);
-}
-
-:host(:state(readonly)) [part="screen"] {
-  touch-action: auto;
 }
 
 [part="screen"]:focus-visible {
@@ -281,9 +275,17 @@
   padding: var(--helix-space-xs);
 }
 
+/* **A column stays one column**, which is the width the device leaves it, and
+   scrolls where the frame is too short for every button. Focus scrolls a
+   button into view. */
 :host([controls-placement="end"]) [part="controls"],
 :host([controls-placement="start"]) [part="controls"] {
   flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  max-block-size: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 
 [part="controls"] button {
@@ -295,6 +297,7 @@
   color: var(--helix-color-foreground-muted);
   cursor: pointer;
   display: inline-flex;
+  flex: none;
   inline-size: var(--helix-size-control);
   justify-content: center;
 }

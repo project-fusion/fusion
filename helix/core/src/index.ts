@@ -350,6 +350,7 @@ export {
   MIRROR_RULE,
   SCROLLER_RULE,
   SPOKEN_RULE,
+  TOUCHES_RULE,
   VIRTUAL_RULE,
 } from './helix-element/mark-rules.js'
 export { HelixFormElement } from './helix-form-element/helix-form-element.js'
