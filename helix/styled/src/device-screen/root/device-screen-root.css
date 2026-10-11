@@ -96,9 +96,14 @@
   position: relative;
 }
 
-/* A column of buttons beside the device takes its width from the device's. */
+/* A column of buttons beside the device takes its width from the device's,
+   and stands against the bezel, its own padding being the gap. */
+[part="device"]:has(> [part="controls"]) {
+  gap: 0;
+}
+
 [part="device"]:has(> [part="controls"]) > [part="bezel"] {
-  --_beside: calc(var(--helix-size-control) + var(--helix-space-xs) * 3);
+  --_beside: calc(var(--helix-size-control) + var(--helix-space-lg) * 2);
 }
 
 :host([shape="square"]) [part="bezel"] {
@@ -262,8 +267,8 @@
   background-color: color-mix(in oklab, var(--helix-color-surface-media) 72%, transparent);
 }
 
-/* **The hardware buttons, quiet until pointed at**, so the device is what the
-   eye lands on. A row centered over it, or a column beside it. */
+/* **The hardware buttons, raised**, standing apart from the page as the
+   device does. A row centered over it, or a column beside it. */
 [part="controls"] {
   align-items: center;
   display: flex;
@@ -277,7 +282,9 @@
 
 /* **A column stays one column**, which is the width the device leaves it, and
    scrolls where the frame is too short for every button. Focus scrolls a
-   button into view. */
+   button into view. A box that scrolls clips what reaches past its padding,
+   so the padding is wide enough to hold a raised button's shadow, which
+   falls below the button more than it spreads to the sides. */
 :host([controls-placement="end"]) [part="controls"],
 :host([controls-placement="start"]) [part="controls"] {
   flex-direction: column;
@@ -285,6 +292,7 @@
   justify-content: flex-start;
   max-block-size: 100%;
   overflow-y: auto;
+  padding: var(--helix-space-xl) var(--helix-space-lg);
   scrollbar-width: none;
 }
 

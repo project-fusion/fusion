@@ -447,6 +447,15 @@ describe('device screen, buttons', () => {
     expect(part(host, 'recents')?.getAttribute('label')).toBe('Recent apps')
   })
 
+  test('no button is raised, there being nothing to paint', async () => {
+    const host = await device(every)
+    const raised = [
+      ...(host.shadowRoot?.querySelectorAll('[part="controls"] > helix-headless-icon-button') ??
+        []),
+    ].filter((button) => button.hasAttribute('raised'))
+    expect(raised).toEqual([])
+  })
+
   test('each button is an Icon Button whose press stays inside the frame', async () => {
     const host = await device()
     const presses: Event[] = []
