@@ -68,15 +68,16 @@ Arrow, then Plus. Expect the grid on screen to move and then grow, and nothing
 to be spoken: this page moves its own grid and does not call `moved()`, so the
 map is never told the move happened.
 
-**M3. The controls.** Press Tab four times, and expect these in order:
+**M3. The controls.** Press Tab once.
+Expect "Fill the screen", a button that says it is not pressed, inside a
+toolbar named "Map controls". Press Down Arrow three times, and expect these
+in order:
 
-1. "Fill the screen", a button that says it is not pressed
-2. "Zoom in", a button
-3. "Zoom out", a button
-4. "Face north", a button
+1. "Zoom in", a button
+2. "Zoom out", a button
+3. "Face north", a button
 
-Press Shift-Tab to return, and VO-Right over the controls. Expect them to be
-inside a group named "Map controls".
+Press Tab and expect focus to leave the controls: they are one tab stop.
 
 **M4. The places.** Open `/map/route-with-stops`, which needs a network
 connection for its tiles. Press Tab until focus reaches a place.

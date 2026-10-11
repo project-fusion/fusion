@@ -254,6 +254,9 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  *   board, where the arrow keys pan it.
  * - Plus and minus zoom the board, on the board and on a card or a
  *   connection.
+ * - The pan and zoom buttons are a toolbar and one tab stop. The arrow keys
+ *   move between them by where they sit, Right from the up arrow to zoom in,
+ *   and Enter or Space presses one.
  * - The arrow keys move through the cards in reading order. The card you land
  *   on scrolls into view, and its connections are announced with it.
  * - The card you land on is selected. Control or Command with an arrow key,
@@ -366,7 +369,7 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  *
  * @csspart arrow - The arrowhead at an end of a connection that has one.
  * @csspart board - The plane the cards are placed on, which pans and zooms.
- * @csspart controls - The group the pan and zoom buttons sit in.
+ * @csspart controls - The toolbar the pan and zoom buttons sit in, one tab stop.
  * @csspart draft - The connection being drawn, before `helix-connect` is sent.
  * @csspart edge - One connector between two cards.
  * @csspart edge-end - An end of a selected connection. Drag it, or click it to pick it up.

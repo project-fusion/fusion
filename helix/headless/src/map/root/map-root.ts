@@ -139,7 +139,9 @@ const SETTLES = 400
  * map. Dragging is otherwise the only way a pointer moves the map, so add them
  * where the map has to be usable without dragging, as WCAG 2.2 asks at level
  * AA. The arrow keys pan the map and Shift with Left or Right turns it either
- * way.
+ * way. The buttons are a toolbar and one tab stop: on them, the arrow keys
+ * move between the buttons by where they sit, and Shift with an arrow still
+ * turns or tilts the map.
  *
  * The pan and zoom buttons and the arrow keys send `helix-map-pan` and
  * `helix-map-zoom`. Move your map in response, or connect it with
@@ -210,7 +212,7 @@ const SETTLES = 400
  *
  * @csspart attribution - The strip under the map that holds the credit.
  * @csspart compass - The compass and the pan and rotate buttons around it.
- * @csspart controls - The column of buttons that move the map.
+ * @csspart controls - The column of buttons that move the map, a toolbar and one tab stop.
  * @csspart face-north - The compass: its needle points north as the map turns, and pressing it turns the map to face north.
  * @csspart footer - The strip below the map.
  * @csspart fullscreen - The button that makes the map fill the screen.
