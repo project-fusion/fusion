@@ -138,10 +138,10 @@ describe('a shortcut with nothing slotted', () => {
     const box = part(one, 'shortcut') as HTMLElement
     expect(box.hidden).toBe(false)
     expect(box.getAttribute('aria-hidden')).toBe('true')
-    // `⌘⇧S` on an Apple keyboard, `Ctrl+Shift+S` elsewhere, as Kbd draws it,
-    // and on the platform `aria-keyshortcuts` names.
+    // `⇧⌘S` on an Apple keyboard, in Apple's order, and `Ctrl+Shift+S`
+    // elsewhere, as Kbd draws it, on the platform `aria-keyshortcuts` names.
     const apple = part(one, 'item')?.getAttribute('aria-keyshortcuts')?.startsWith('Meta')
-    expect(drawn(one)).toBe(apple ? '⌘⇧S' : 'Ctrl+Shift+S')
+    expect(drawn(one)).toBe(apple ? '⇧⌘S' : 'Ctrl+Shift+S')
   })
 
   test('draws nothing and keeps the box hidden without one', async () => {
