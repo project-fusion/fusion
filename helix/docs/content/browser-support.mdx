@@ -1,5 +1,5 @@
 ---
-description: The browser features Helix uses, and the browser we test in.
+description: The browser features Helix uses, and the browsers we test in.
 order: 5
 section: Getting started
 title: Browser support
@@ -13,12 +13,32 @@ support in older browsers. Your browser needs every feature Helix uses.
 
 ## What we test
 
-We test in Chromium, through Playwright. The DOM specs run in it, and the pixel
-baselines are captured in it, on Linux, with the network blocked.
+We test in Chromium and WebKit, through Playwright, on Linux, with the network
+blocked.
 
-We do not run the tests in Firefox or Safari. The rest of this page lists the
-browser features Helix uses. If you ship Helix to Firefox or Safari and find
-something broken, please report it. Our tests would not have caught it.
+- The DOM specs run in both.
+- The pixel baselines are captured in Chromium only.
+
+WebKit is the engine in Safari, and the system webview a Tauri app draws with on
+macOS and Linux. Playwright builds its own WebKit from the same source as
+Safari, so a difference that only Safari shows can still get past our tests.
+
+We do not run the tests in Firefox. The rest of this page lists the browser
+features Helix uses. If you ship Helix to Firefox or Safari and find something
+broken, please report it.
+
+### Known differences in WebKit
+
+A few specs still fail in WebKit. We keep each one on a list until it is fixed.
+
+- Checkbox Group, Radio Group, Option, Toast, and Tooltip name or describe their
+  host through `ElementInternals`, pointing into their own shadow root. WebKit
+  reads those references back as empty. We have not yet checked whether
+  VoiceOver still reads the name.
+- In Virtual List, End can leave the last row below the viewport after `gap`
+  changes on a list that is already drawn.
+- In the sandbox's source pane, one undo after an indent also removes the text
+  typed before it.
 
 ## Browser features Helix uses
 
