@@ -269,6 +269,11 @@
    from the edge the column sits on, as close to it as the buttons are to
    each other. */
 [part="layers-menu"] {
+  /* The frame's words, as a panel holds them, rather than the face and size
+     the shared sheet gives each control's glyph. */
+  font-family: inherit;
+  font-size: inherit;
+
   background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
   border: var(--helix-border-floating) solid var(--helix-color-border);
   border-radius: var(--helix-radii-sm);
@@ -370,9 +375,12 @@
   grid-template-columns: repeat(3, 1fr);
 }
 
-/* The tile is the card's shape, and none of a control button's own ground. */
+/* The tile is the card's shape, and none of a control button's own ground.
+   A native button, so it says its face and its pointer for itself. */
 [part="layers-menu"] [part="layer-choice"] {
   align-content: start;
+  cursor: pointer;
+  font-family: var(--helix-font-sans);
   background-color: transparent;
   block-size: auto;
   border: 0;

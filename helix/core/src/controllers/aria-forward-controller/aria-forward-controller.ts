@@ -54,9 +54,9 @@ export interface AriaForwardOptions {
  * The relationships a consumer writes on a host and means for the control.
  *
  * `aria-controls` is one: it names ids as these do, and copied as a string onto
- * a control inside a shadow root it named an element that is not there, as Map's
- * layers button inside an Icon Button would, and as a Megamenu's trigger written
- * on a slotted Button already did.
+ * a control inside a shadow root it named an element that is not there. A
+ * page's `<helix-button aria-controls="menu">` named nothing, and Map's layers
+ * button inside an Icon Button would have named nothing either.
  */
 const RELATIONSHIPS = [
   ['aria-controls', 'ariaControlsElements'],
