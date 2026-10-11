@@ -3,6 +3,7 @@ import {
   type Axis,
   anchorAt,
   arranged,
+  assignSlot,
   auditChildren,
   auditServed,
   commaList,
@@ -2071,14 +2072,20 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       return
     }
     /* In the order on screen: a manual slot draws what it was given in the order
-       it was given, so this moves the headings without touching the markup. */
+       it was given, so this moves the headings without touching the markup.
+
+       Every slot goes through `assignSlot`, which leaves one already holding
+       what it is given alone. This runs on every update, and a windowed table
+       updates as it scrolls: in WebKit an assignment that changed nothing
+       stopped the reader's keyboard scroll through the table. */
     const columns = this.orderedColumns
-    head.assign(...columns)
+    assignSlot(head, ...columns)
     /* The rows the page served, while they are shown, into the slot that stands
        in for the drawn rows. Left unassigned after, so they draw nothing. */
-    root
-      .querySelector<HTMLSlotElement>('[part="table"] > slot:not([name])')
-      ?.assign(...(this.serving ? this.servedRows : []))
+    const served = root.querySelector<HTMLSlotElement>('[part="table"] > slot:not([name])')
+    if (served) {
+      assignSlot(served, ...(this.serving ? this.servedRows : []))
+    }
     const rest = [...this.children].filter((child) => !columns.includes(child as never))
     for (const [name, wanted] of [
       ['toolbar', true],
@@ -2088,8 +2095,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       ['loading', true],
     ] as const) {
       const slot = root.querySelector<HTMLSlotElement>(`slot[name="${name}"]`)
-      if (slot?.assign && wanted) {
-        slot.assign(...rest.filter((child) => child.getAttribute('slot') === name))
+      if (slot && wanted) {
+        assignSlot(slot, ...rest.filter((child) => child.getAttribute('slot') === name))
       }
     }
   }

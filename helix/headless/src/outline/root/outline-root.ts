@@ -1,4 +1,5 @@
 import {
+  assignSlot,
   customElement,
   elementById,
   HelixActivateEvent,
@@ -819,28 +820,37 @@ export class HelixHeadlessOutline extends HelixElement {
     if (this.assignsByName) {
       return
     }
+    /* Through `assignSlot`, which leaves a slot already holding its nodes
+       alone: in WebKit an assignment that changes nothing stops a scroll
+       running in the box around the slot. */
     const root = this.renderRoot as ShadowRoot | undefined
     const heading = root?.querySelector?.<HTMLSlotElement>('slot[name="heading"]')
-    heading?.assign?.(...this.knownChildren.filter((child) => child.slot === 'heading'))
-    root
-      ?.querySelector?.<HTMLSlotElement>('slot[name="indicator"]')
-      ?.assign?.(...this.knownChildren.filter((child) => child.slot === 'indicator'))
+    if (heading) {
+      assignSlot(heading, ...this.knownChildren.filter((child) => child.slot === 'heading'))
+    }
+    const indicator = root?.querySelector?.<HTMLSlotElement>('slot[name="indicator"]')
+    if (indicator) {
+      assignSlot(indicator, ...this.knownChildren.filter((child) => child.slot === 'indicator'))
+    }
     const run = this.run
     if (run) {
       for (const slot of root?.querySelectorAll?.<HTMLSlotElement>('slot[data-link]') ?? []) {
         const link = run[Number(slot.dataset.link)]
         if (link) {
-          slot.assign(link)
+          assignSlot(slot, link)
         }
       }
       return
     }
     const plain = root?.querySelector?.<HTMLSlotElement>('nav > slot:not([role])')
-    plain?.assign?.(
-      ...[...this.childNodes].filter((node): node is Element | Text =>
-        node instanceof Element ? !OWN_SLOTS.has(node.slot) : node instanceof Text,
-      ),
-    )
+    if (plain) {
+      assignSlot(
+        plain,
+        ...[...this.childNodes].filter((node): node is Element | Text =>
+          node instanceof Element ? !OWN_SLOTS.has(node.slot) : node instanceof Text,
+        ),
+      )
+    }
   }
 
   /** Whether the heading is what names the navigation. */

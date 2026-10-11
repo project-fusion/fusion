@@ -1658,3 +1658,26 @@ describe('rows that hold rows', () => {
     ])
   })
 })
+
+describe('an update that changes no column and no row', () => {
+  /* Every slot keeps what it holds. In WebKit an assignment that changed
+     nothing stopped a scroll running in the table, and a windowed table
+     updates as it scrolls: three presses of Page Down on the table moved it a
+     fifth of the way Chromium did. */
+  test('assigns no slot again', async () => {
+    const { element } = await mount(SCHEMA)
+    const assign = HTMLSlotElement.prototype.assign
+    let calls = 0
+    HTMLSlotElement.prototype.assign = function (this: HTMLSlotElement, ...nodes) {
+      calls += 1
+      assign.apply(this, nodes)
+    }
+    try {
+      ;(element as Table & { requestUpdate: () => void }).requestUpdate()
+      await element.updateComplete
+    } finally {
+      HTMLSlotElement.prototype.assign = assign
+    }
+    expect(calls).toBe(0)
+  })
+})

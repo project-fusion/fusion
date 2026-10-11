@@ -1178,3 +1178,26 @@ describe('several slides at a time', () => {
     expect(host.index).toBe(1)
   })
 })
+
+describe('an update that changes no slide', () => {
+  /* Every pane keeps the slide it holds. In WebKit an assignment that changed
+     nothing stopped the smooth scroll the same update had started, so next
+     moved the dots and left every slide where it was. */
+  test('assigns no slot again', async () => {
+    const cal = (await carousel()) as Carousel & { requestUpdate: () => void }
+    await cal.updateComplete
+    const assign = HTMLSlotElement.prototype.assign
+    let calls = 0
+    HTMLSlotElement.prototype.assign = function (this: HTMLSlotElement, ...nodes) {
+      calls += 1
+      assign.apply(this, nodes)
+    }
+    try {
+      cal.index = 1
+      await cal.updateComplete
+    } finally {
+      HTMLSlotElement.prototype.assign = assign
+    }
+    expect(calls).toBe(0)
+  })
+})
