@@ -295,14 +295,19 @@ describe('orb', () => {
       }))
 
     /* The same, given back while the orb is out of the page and nothing is
-       listening. What it missed is the transform and the loss being over. */
+       listening. What it missed is the transform and the loss being over.
+
+       Only where the context has `isContextLost()`, which is how the orb asks
+       on its return. WebKit's 2D context has no such method and never sends
+       `contextlost`, so an orb there never reaches the question, and the loss
+       sent by hand here made it ask anyway. */
     test('given back while it is away, it returns shown and at its own size', () =>
       atDensity(2, async () => {
         const host = (await mount('<helix-orb></helix-orb>')) as Upgraded
         const parent = host.parentElement
         const canvas = host.shadowRoot?.querySelector('canvas')
         const context = canvas?.getContext('2d')
-        if (!canvas || !context) {
+        if (!canvas || !context || !('isContextLost' in context)) {
           return
         }
         canvas.dispatchEvent(new Event('contextlost', { cancelable: true }))

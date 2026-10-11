@@ -151,7 +151,10 @@ describe('isometricDriver', () => {
     driver.panBy(48, 0, false)
     const after = svg.getAttribute('viewBox')?.split(' ').map(Number) ?? []
     expect((after[0] ?? 0) - (before[0] ?? 0)).toBeGreaterThan(0)
-    expect(after[1]).toBe(before[1] as number)
+    /* To two places. On this same pan WebKit moved the top by 0.0004 of a
+       unit, measured on WebKit 26.6 on October 10, 2026, which no reader can
+       see. */
+    expect(after[1]).toBeCloseTo(before[1] as number, 2)
   })
 
   test('a note with no place is put on a free cell, and every place is told', async () => {

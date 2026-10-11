@@ -597,6 +597,14 @@ describe('the names in the drawing', () => {
     })
     await settled(host)
     connection.disconnect()
-    expect(fonts.at(-1)).toBe('"Inter Variable", ui-sans-serif, system-ui, sans-serif')
+    /* Family by family. WebKit writes a computed family name that holds a
+       space without its quotes, `Inter Variable`, where Chromium keeps them,
+       and a canvas reads either as the same stack. */
+    expect(
+      fonts
+        .at(-1)
+        ?.split(',')
+        .map((family) => family.trim().replace(/^"|"$/g, '')),
+    ).toEqual(['Inter Variable', 'ui-sans-serif', 'system-ui', 'sans-serif'])
   })
 })
