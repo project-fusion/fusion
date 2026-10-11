@@ -77,6 +77,40 @@ describe('the preview example', () => {
     expect(written.slice(-3)).toEqual(['ls', '\b \b', '\b \b'])
     expect(written.length).toBe(erased)
   })
+
+  run(
+    'brings back the lines the reader entered with Up and Down, as a shell’s history does',
+    async () => {
+      await example(preview)
+      const { sink, written } = await attached()
+      const shown = (): string => written.at(-1) ?? ''
+      sink.input('ls')
+      sink.input('\r')
+      sink.input('pwd')
+      sink.input('\r')
+      sink.input('git')
+      sink.input('\x1b[A')
+      expect(shown().startsWith('\x1b[2K\r')).toBe(true)
+      expect(shown().endsWith('pwd')).toBe(true)
+      sink.input('\x1bOA')
+      expect(shown().endsWith('ls')).toBe(true)
+      const oldest = written.length
+      sink.input('\x1b[A')
+      expect(written.length).toBe(oldest)
+      sink.input('\x7f')
+      sink.input('\x7f')
+      const erased = written.length
+      sink.input('\x7f')
+      expect(written.length).toBe(erased)
+      sink.input('\x1b[B')
+      expect(shown().endsWith('pwd')).toBe(true)
+      sink.input('\x1b[B')
+      expect(shown().endsWith('git')).toBe(true)
+      const newest = written.length
+      sink.input('\x1b[B')
+      expect(written.length).toBe(newest)
+    },
+  )
 })
 
 describe('the transcript example', () => {

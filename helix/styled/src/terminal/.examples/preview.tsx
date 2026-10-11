@@ -21,6 +21,14 @@ const OUTPUT = [
 export function Example() {
   const shell = useRef<HelixTerminal>(null)
   const line = useRef('')
+  const history = useRef<string[]>([])
+  const place = useRef(0)
+  const draft = useRef('')
+
+  const show = (next: string) => {
+    line.current = next
+    void shell.current?.write(`\x1b[2K\r${PROMPT}${next}`)
+  }
 
   useEffect(() => {
     void shell.current?.write(OUTPUT.join('\r\n'))
@@ -34,11 +42,33 @@ export function Example() {
         label="~/fusion"
         onhelix-terminal-input={(event) => {
           // No process is connected here, so the example keeps the line you type and
-          // writes it back: Backspace takes away only what you typed.
+          // writes it back: Backspace takes away only what you typed, and Up and Down
+          // bring back the lines you entered, as a shell's history does.
           const { data } = event.detail
           if (data === '\r') {
+            if (line.current !== '') {
+              history.current.push(line.current)
+            }
+            place.current = history.current.length
             line.current = ''
             void shell.current?.write(`\r\n${PROMPT}`)
+          } else if (data === '\x1b[A' || data === '\x1bOA') {
+            if (place.current > 0) {
+              if (place.current === history.current.length) {
+                draft.current = line.current
+              }
+              place.current -= 1
+              show(history.current[place.current] ?? '')
+            }
+          } else if (data === '\x1b[B' || data === '\x1bOB') {
+            if (place.current < history.current.length) {
+              place.current += 1
+              show(
+                place.current === history.current.length
+                  ? draft.current
+                  : (history.current[place.current] ?? ''),
+              )
+            }
           } else if (data === '\x7f') {
             if (line.current !== '') {
               line.current = [...line.current].slice(0, -1).join('')
