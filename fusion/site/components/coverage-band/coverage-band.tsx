@@ -51,7 +51,11 @@ export const CoverageBand = () => {
       <div className={`${band.bandSplit} ${styles.split}`}>
         <helix-flex class={`${band.bandSection} ${styles.intro}`} direction="column" gap="md">
           <Eyebrow>Coverage</Eyebrow>
-          <SectionTitle>{COMPONENTS} components in one package</SectionTitle>
+          {/* `data-site-count` is what the site's visual check masks: the count
+              follows the catalog, and every new family changes it. */}
+          <SectionTitle>
+            <span data-site-count>{COMPONENTS}</span> components in one package
+          </SectionTitle>
           <Lede>
             Charts, data tables, chat, and date pickers use the same tokens as your buttons.
           </Lede>

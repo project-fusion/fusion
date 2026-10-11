@@ -71,8 +71,14 @@ export default defineConfig({
      October 10, 2026, each time turning the site check red for a change that
      had nothing to do with the page. The metrics page and its own check own
      the number; this check owns how the page draws. Its box is a block, so
-     the mask keeps its width whatever the figure says. */
-  mask: ['[data-site-footer] helix-tag', '[data-site-measure]'],
+     the mask keeps its width whatever the figure says.
+
+     **And the home page's component count**, which every new family changes,
+     so each one's pull request turned the home page red in four shots. The
+     catalog and the gallery's checks own the count. Held at four digits'
+     width while each picture is taken, so a count that gains a digit moves
+     nothing after it. */
+  mask: ['[data-site-footer] helix-tag', '[data-site-measure]', '[data-site-count]'],
   retake:
     'Comment `/retake` and the pages on the pull request, such as `/retake site/home`, or dispatch the `Visual baselines` workflow on your branch with the suite `site` to retake every one, and review the commit it makes on the branch.',
   /* Next.js writes `next-route-announcer` and never defines it, so only
@@ -105,5 +111,6 @@ export default defineConfig({
       url: 'http://127.0.0.1:3417',
     },
   ],
-  style: '[data-site-footer] helix-tag { inline-size: 7rem !important; }',
+  style:
+    '[data-site-footer] helix-tag { inline-size: 7rem !important; } [data-site-count] { display: inline-block !important; inline-size: 4ch !important; }',
 })
