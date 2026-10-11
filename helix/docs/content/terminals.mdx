@@ -248,7 +248,9 @@ helix-terminal {
 | `--terminal-selection-background-color` | Primary at 30% | Selected text |
 
 Each bright color has a property of its own, such as `--terminal-ansi-bright-red`,
-and takes the same default as its color. The bright gray, `--terminal-ansi-bright-black`,
+and defaults to its color mixed a quarter of the way to `--helix-color-foreground`,
+so it is lighter in dark mode and darker in light. Set a color alone and its
+bright form follows it. The bright gray, `--terminal-ansi-bright-black`,
 defaults to `--helix-color-foreground-muted`, and bright white to
 `--helix-color-border` in light and `--helix-color-foreground` in dark.
 

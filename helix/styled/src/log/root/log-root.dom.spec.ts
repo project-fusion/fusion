@@ -33,6 +33,17 @@ describe('the styled log', () => {
     expect(css).toContain('--log-max-block-size')
   })
 
+  test('draws each bright hue from its hue, a quarter of the way to the ink', () => {
+    const css = cssOf('helix-log')
+    for (const hue of ['blue', 'cyan', 'green', 'magenta', 'red', 'yellow']) {
+      expect(css).toMatch(
+        new RegExp(
+          `--log-ansi-bright-${hue}: color-mix\\(\\s*in oklab,\\s*var\\(--log-ansi-${hue}\\) 75%`,
+        ),
+      )
+    }
+  })
+
   test('draws a run in the color the log writes on it', () => {
     const css = cssOf('helix-log-line')
     expect(css).toContain('color: var(--log-run-color, inherit)')

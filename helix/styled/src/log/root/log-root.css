@@ -1,22 +1,48 @@
 /* The sixteen ANSI colors from the theme, so a program's red is the theme's
-   danger and its green the theme's success. A bright color is the same color:
-   a theme has one red, and a second, lighter one beside it would be a color
-   nobody chose. The quiet grays are one gray for the same reason: white and
-   bright black are both the muted ink, the one quiet ink a theme solves, since
-   text a program writes in either is read. Cyan is mixed from blue and green,
-   there being no token for it. */
+   danger and its green the theme's success. A bright color is its color mixed
+   a quarter of the way to the ink: a program that writes red and bright red
+   side by side means two things, and a theme has one red, so the second is
+   drawn from it rather than chosen, as cyan is mixed from blue and green,
+   there being no token for it. Toward the ink, so it is lighter in dark mode
+   and darker in light, and further from the ground in both. The quiet grays
+   are one gray: white and bright black are both the muted ink, the one quiet
+   ink a theme solves, since text a program writes in either is read. */
 :host {
   --log-ansi-background: var(--log-background-color, var(--helix-color-background));
   --log-ansi-black: var(--helix-color-foreground);
   --log-ansi-blue: var(--helix-color-info);
   --log-ansi-bright-black: var(--helix-color-foreground-muted);
-  --log-ansi-bright-blue: var(--helix-color-info);
-  --log-ansi-bright-cyan: color-mix(in oklab, var(--helix-color-info), var(--helix-color-success));
-  --log-ansi-bright-green: var(--helix-color-success);
-  --log-ansi-bright-magenta: var(--helix-color-syntax-callable);
-  --log-ansi-bright-red: var(--helix-color-danger);
+  --log-ansi-bright-blue: color-mix(
+    in oklab,
+    var(--log-ansi-blue) 75%,
+    var(--helix-color-foreground)
+  );
+  --log-ansi-bright-cyan: color-mix(
+    in oklab,
+    var(--log-ansi-cyan) 75%,
+    var(--helix-color-foreground)
+  );
+  --log-ansi-bright-green: color-mix(
+    in oklab,
+    var(--log-ansi-green) 75%,
+    var(--helix-color-foreground)
+  );
+  --log-ansi-bright-magenta: color-mix(
+    in oklab,
+    var(--log-ansi-magenta) 75%,
+    var(--helix-color-foreground)
+  );
+  --log-ansi-bright-red: color-mix(
+    in oklab,
+    var(--log-ansi-red) 75%,
+    var(--helix-color-foreground)
+  );
   --log-ansi-bright-white: var(--helix-color-foreground);
-  --log-ansi-bright-yellow: var(--helix-color-warning);
+  --log-ansi-bright-yellow: color-mix(
+    in oklab,
+    var(--log-ansi-yellow) 75%,
+    var(--helix-color-foreground)
+  );
   --log-ansi-cyan: color-mix(in oklab, var(--helix-color-info), var(--helix-color-success));
   --log-ansi-foreground: var(--log-color, var(--helix-color-foreground));
   --log-ansi-green: var(--helix-color-success);
