@@ -28,8 +28,8 @@ describe('terminal server output', () => {
   test('the header ships with the name and the resting controls, named', () => {
     const markup = served()
     expect(rendered(markup, 'helix-headless-terminal')).toContain('zsh')
-    expect(partTag(markup, 'find')).toContain('aria-label="Find"')
-    expect(partTag(markup, 'clear')).toContain('aria-label="Clear"')
+    expect(partTag(markup, 'find')).toContain('label="Find"')
+    expect(partTag(markup, 'clear')).toContain('label="Clear"')
     expect(hasPart(markup, 'copy')).toBe(false)
     expect(hasPart(markup, 'fullscreen')).toBe(false)
   })

@@ -337,8 +337,10 @@ Links a program writes as hyperlinks always work. Pass `WebLinksAddon` to
   this key to a screen reader. In a terminal, Control+M types the same
   character as Enter.
 - The frame is a named group. Its controls come before the terminal in the
-  tab order, and the terminal's input is one tab stop. Name each terminal with
-  `label` so a reader can tell several apart.
+  tab order, as one toolbar: Tab reaches it once, and the arrow keys move
+  between its buttons, including the ones you put in `actions`. The find bar's
+  buttons are a second toolbar after its field. The terminal's input is one tab
+  stop. Name each terminal with `label` so a reader can tell several apart.
 - A terminal draws its grid as a picture of text, which a screen reader cannot
   read. Set `screen-reader-mode` to have xterm.js keep the grid as lines a
   screen reader can move through, and announce new output as it arrives. It

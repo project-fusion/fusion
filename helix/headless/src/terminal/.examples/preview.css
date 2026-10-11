@@ -57,17 +57,22 @@ helix-headless-terminal::part(label) {
   font-weight: 600;
 }
 
-helix-headless-terminal::part(controls) {
+/* Each toolbar lays its buttons out in the box it draws inside it. */
+helix-headless-terminal::part(controls-toolbar),
+helix-headless-terminal::part(find-controls-toolbar) {
   display: flex;
   gap: 0.25rem;
 }
 
-helix-headless-terminal::part(find),
-helix-headless-terminal::part(clear),
-helix-headless-terminal::part(find-previous),
-helix-headless-terminal::part(find-next),
-helix-headless-terminal::part(find-close),
-helix-headless-terminal::part(restart) {
+helix-headless-terminal::part(find-button),
+helix-headless-terminal::part(copy-button),
+helix-headless-terminal::part(clear-button),
+helix-headless-terminal::part(fullscreen-button),
+helix-headless-terminal::part(find-previous-button),
+helix-headless-terminal::part(find-next-button),
+helix-headless-terminal::part(find-close-button),
+helix-headless-terminal::part(restart-button) {
+  align-items: center;
   background-color: var(--_gray-surface);
   block-size: 1.75rem;
   border: 1px solid var(--_gray-edge);
@@ -81,6 +86,14 @@ helix-headless-terminal::part(restart) {
   line-height: 1rem;
   min-inline-size: 1.75rem;
   padding: 0.3125rem;
+}
+
+/* Restart has words beside its glyph, and a glyph sized by nothing shrinks to
+   nothing beside them: a column of its own gives it the size of the text. */
+helix-headless-terminal::part(restart-button) {
+  display: inline-grid;
+  grid-template-columns: 1rem auto;
+  padding-inline: 0.375rem 0.5rem;
 }
 
 helix-headless-terminal::part(find-field) {

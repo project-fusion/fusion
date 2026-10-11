@@ -99,7 +99,7 @@ describe('the exited example', () => {
     const { frame, written } = await attached()
     expect(part(frame, 'status')?.textContent).toContain('exited with code 1')
     const before = written.length
-    ;(part(frame, 'restart') as HTMLButtonElement).click()
+    ;(part(frame, 'restart') as HTMLElement).click()
     await settle(frame)
     expect(written.length).toBeGreaterThan(before)
     expect(frame.exitCode).toBe(1)

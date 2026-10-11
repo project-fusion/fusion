@@ -7,6 +7,7 @@ import {
   registerDom,
   settle,
 } from '@fusion.dev/helix-testing/dom'
+import type { HelixHeadlessIconButton } from '../../icon-button/index.js'
 import type { HelixHeadlessTerminal, TerminalRenderer, TerminalSettings } from './terminal-root.js'
 
 let onApple: () => boolean
@@ -200,7 +201,20 @@ describe('terminal controls', () => {
     expect(part(host, 'clear')).not.toBeNull()
     expect(part(host, 'copy')).toBeNull()
     const bare = await frame('controls="none"')
-    expect(part(bare, 'controls')).toBeNull()
+    for (const control of ['find', 'copy', 'clear', 'fullscreen']) {
+      expect(part(bare, control)).toBeNull()
+    }
+  })
+
+  test('are one toolbar with the page’s actions, named, before the built-in buttons', async () => {
+    const host = await frame()
+    const toolbar = part(host, 'controls')
+    expect(toolbar?.localName).toBe('helix-headless-toolbar')
+    expect(toolbar?.getAttribute('label')).toBe('Terminal controls')
+    const slot = part(host, 'actions')
+    expect(slot?.parentElement === toolbar).toBe(true)
+    expect(slot?.nextElementSibling?.getAttribute('part')).toBe('find')
+    expect(part(host, 'find')?.localName).toBe('helix-headless-icon-button')
   })
 
   test('clear asks the renderer, and copy waits for a selection', async () => {
@@ -208,12 +222,12 @@ describe('terminal controls', () => {
     const { asked, renderer } = standIn(host)
     const sink = host.attach(renderer)
     await settle(host)
-    ;(part(host, 'clear') as HTMLButtonElement).click()
+    ;(part(host, 'clear') as HTMLElement).click()
     expect(asked.calls).toEqual(['clear'])
-    expect((part(host, 'copy') as HTMLButtonElement).disabled).toBe(true)
+    expect((part(host, 'copy') as HelixHeadlessIconButton).disabled).toBe(true)
     sink.selected(true)
     await settle(host)
-    expect((part(host, 'copy') as HTMLButtonElement).disabled).toBe(false)
+    expect((part(host, 'copy') as HelixHeadlessIconButton).disabled).toBe(false)
   })
 })
 
@@ -224,11 +238,15 @@ describe('the find bar', () => {
     const sink = host.attach(renderer)
     await settle(host)
     expect(part(host, 'find-bar')?.hasAttribute('hidden')).toBe(true)
-    ;(part(host, 'find') as HTMLButtonElement).click()
+    ;(part(host, 'find') as HTMLElement).click()
     await settle(host)
     expect(part(host, 'find-bar')?.hasAttribute('hidden')).toBe(false)
     expect(hasState(host, 'find-open')).toBe(true)
-    expect(part(host, 'find')?.getAttribute('aria-expanded')).toBe('true')
+    const find = part(host, 'find') as HelixHeadlessIconButton
+    await find.updateComplete
+    expect(find.shadowRoot?.querySelector('[part="button"]')?.getAttribute('aria-expanded')).toBe(
+      'true',
+    )
     const field = part(host, 'find-field') as HTMLInputElement
     field.value = 'error'
     field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
@@ -246,7 +264,8 @@ describe('the find bar', () => {
     const slot = part(host, 'find-actions')
     expect(slot?.localName).toBe('slot')
     expect(slot?.getAttribute('name')).toBe('find-actions')
-    expect(slot?.previousElementSibling?.getAttribute('part')).toBe('find-count')
+    expect(slot?.parentElement?.getAttribute('part')).toBe('find-controls')
+    expect(slot?.parentElement?.previousElementSibling?.getAttribute('part')).toBe('find-count')
     expect(slot?.nextElementSibling?.getAttribute('part')).toBe('find-previous')
   })
 
@@ -263,7 +282,7 @@ describe('the find bar', () => {
     const { asked, input, renderer } = standIn(host)
     host.attach(renderer)
     await settle(host)
-    ;(part(host, 'find') as HTMLButtonElement).click()
+    ;(part(host, 'find') as HTMLElement).click()
     await settle(host)
     press(part(host, 'find-field') as Element, 'Escape')
     await settle(host)
@@ -323,6 +342,18 @@ describe('the frame’s keys', () => {
     press(input, 'c', { ctrlKey: true })
     press(input, 'Tab', { shiftKey: true })
     expect(reached).toEqual(['Escape', 'c', 'Tab'])
+  })
+
+  test('a key pressed on a control of the page’s, in the header, is the control’s', async () => {
+    const host = await frame()
+    host.attach(standIn(host).renderer)
+    const action = document.createElement('button')
+    action.slot = 'actions'
+    host.append(action)
+    const event = press(action, ...tabChord())
+    await settle(host)
+    expect(event.defaultPrevented).toBe(false)
+    expect(hasState(host, 'tab-moves-focus')).toBe(false)
   })
 
   test('the keys are left alone until a renderer is attached', async () => {
@@ -435,7 +466,7 @@ describe('the process exiting', () => {
     host.addEventListener('helix-terminal-restart', () => {
       restarted += 1
     })
-    ;(part(host, 'restart') as HTMLButtonElement).click()
+    ;(part(host, 'restart') as HTMLElement).click()
     expect(restarted).toBe(1)
     host.exitCode = 0
     await settle(host)

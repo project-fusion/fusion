@@ -8,7 +8,7 @@ describe('styled terminal server output', () => {
 
   test('serves the frame as the headless tier does', () => {
     expect(partTag(markup, 'region')).toContain('aria-label="zsh"')
-    expect(partTag(markup, 'find')).toContain('aria-label="Find"')
+    expect(partTag(markup, 'find')).toContain('label="Find"')
   })
 
   test('the host carries only what the page wrote', () => {

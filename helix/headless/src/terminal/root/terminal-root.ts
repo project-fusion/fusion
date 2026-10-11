@@ -26,10 +26,14 @@ import {
   magnifyingGlass,
   x,
 } from '@fusion.dev/helix-icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { keyed } from 'lit/directives/keyed.js'
 import { live } from 'lit/directives/live.js'
+import { html } from 'lit/static-html.js'
+import '../../button/index.js'
+import '../../icon-button/index.js'
+import '../../toolbar/index.js'
 import { isTab, shortcutOf, spokenChord, type TerminalShortcut } from '../keys.js'
 
 /** How a search through a terminal's output moves. */
@@ -159,6 +163,13 @@ export interface TerminalSink {
   title(title: string): void
 }
 
+/**
+ * Keeps a press on one of the frame's own buttons inside the frame: the page
+ * hears what the button did, through the frame's events, and not that a
+ * button inside it was pressed.
+ */
+const stopPress = (event: Event): void => event.stopPropagation()
+
 /** How long the bell's flash holds, in milliseconds: one beat, long enough to see. */
 const BELL = 200
 
@@ -238,25 +249,60 @@ const opens = (href: string): boolean => /^https?:\/\//i.test(href)
  * @event {HelixTerminalRestartEvent} helix-terminal-restart - The Restart button was pressed after the process exited. Start a new process and clear `exit-code`.
  * @event {HelixTerminalTitleEvent} helix-terminal-title - The program set its title, with `title`. The frame keeps its own `label`.
  *
- * @csspart actions - The box in the header that holds the `actions` slot.
+ * @csspart actions - The `actions` slot, first in the header's toolbar.
  * @csspart clear - The button that clears the scrollback.
- * @csspart controls - The row of built-in buttons at the end of the header.
+ * @csspart clear-button - The clear button's inner button.
+ * @csspart clear-live - The clear button's live region, which speaks while the button is pending.
+ * @csspart clear-spinner - The ring the clear button turns while it is pending.
+ * @csspart clear-text - The box the clear button's icon sits in.
+ * @csspart controls - The toolbar at the end of the header: your actions, then the built-in buttons, one tab stop that the arrows move along.
+ * @csspart controls-toolbar - The box inside the header's toolbar that lays its buttons out.
  * @csspart copy - The button that copies the selection. Disabled while nothing is selected.
- * @csspart exit-actions - The box in the status line that holds the `exit-actions` slot.
- * @csspart find - The button that opens and closes the find bar. Pressed while it is open.
- * @csspart find-actions - The box in the find bar that holds the `find-actions` slot.
+ * @csspart copy-button - The copy button's inner button.
+ * @csspart copy-live - The copy button's live region, which speaks while the button is pending.
+ * @csspart copy-spinner - The ring the copy button turns while it is pending.
+ * @csspart copy-text - The box the copy button's icon sits in.
+ * @csspart exit-actions - The `exit-actions` slot, beside Restart in the status line.
+ * @csspart find - The button that opens and closes the find bar. Expanded while it is open.
+ * @csspart find-actions - The `find-actions` slot, first in the find bar's toolbar.
  * @csspart find-bar - The bar under the header where the reader searches the output.
+ * @csspart find-button - The find button's inner button.
  * @csspart find-close - The button that closes the find bar.
+ * @csspart find-close-button - The find bar's close button's inner button.
+ * @csspart find-close-live - The find bar's close button's live region, which speaks while the button is pending.
+ * @csspart find-close-spinner - The ring the find bar's close button turns while it is pending.
+ * @csspart find-close-text - The box the find bar's close button's icon sits in.
+ * @csspart find-controls - The toolbar at the end of the find bar: your find actions, then the buttons that move between matches and close the bar.
+ * @csspart find-controls-toolbar - The box inside the find bar's toolbar that lays its buttons out.
  * @csspart find-count - Which match is current and how many there are, such as "3 of 12 matches".
  * @csspart find-field - The search field in the find bar.
+ * @csspart find-live - The find button's live region, which speaks while the button is pending.
  * @csspart find-next - The button that moves to the next match.
+ * @csspart find-next-button - The next match button's inner button.
+ * @csspart find-next-live - The next match button's live region, which speaks while the button is pending.
+ * @csspart find-next-spinner - The ring the next match button turns while it is pending.
+ * @csspart find-next-text - The box the next match button's icon sits in.
  * @csspart find-previous - The button that moves to the previous match.
- * @csspart fullscreen - The button that makes the terminal fill the screen.
+ * @csspart find-previous-button - The previous match button's inner button.
+ * @csspart find-previous-live - The previous match button's live region, which speaks while the button is pending.
+ * @csspart find-previous-spinner - The ring the previous match button turns while it is pending.
+ * @csspart find-previous-text - The box the previous match button's icon sits in.
+ * @csspart find-spinner - The ring the find button turns while it is pending.
+ * @csspart find-text - The box the find button's icon sits in.
+ * @csspart fullscreen - The button that makes the terminal fill the screen. Pressed while it does.
+ * @csspart fullscreen-button - The fullscreen button's inner button.
+ * @csspart fullscreen-live - The fullscreen button's live region, which speaks while the button is pending.
+ * @csspart fullscreen-spinner - The ring the fullscreen button turns while it is pending.
+ * @csspart fullscreen-text - The box the fullscreen button's icon sits in.
  * @csspart header - The strip above the terminal, with its name, your actions, and the controls.
  * @csspart label - The terminal's name in the header.
  * @csspart live - What screen readers hear after the frame acts: a match count, a copy, or a change to what Tab does. Visually hidden in the styled tier.
  * @csspart region - The named group the terminal sits in.
  * @csspart restart - The button in the status line that asks for a new process after the last one exited.
+ * @csspart restart-button - The Restart button's inner button.
+ * @csspart restart-live - The Restart button's live region, which speaks while the button is pending.
+ * @csspart restart-spinner - The ring the Restart button turns while it is pending.
+ * @csspart restart-text - The Restart button's label.
  * @csspart status - The line under the terminal that says the process exited, or that Tab moves focus.
  * @csspart viewport - The box the terminal is drawn in.
  *
@@ -356,6 +402,11 @@ export class HelixHeadlessTerminal extends HelixElement {
   @words
   @property({ attribute: 'find-close-label' })
   findCloseLabel = 'Close find'
+
+  /** The name of the find bar's row of buttons, read by screen readers. */
+  @words
+  @property({ attribute: 'find-controls-label' })
+  findControlsLabel = 'Find controls'
 
   /** The find button's label, and the find field's name and placeholder. */
   @words
@@ -811,10 +862,14 @@ export class HelixHeadlessTerminal extends HelixElement {
     if (event.defaultPrevented || event.isComposing) {
       return
     }
+    /* A key pressed in the grid: in the page's child that fills the default
+       slot, which is the renderer's. One pressed in the header, the find bar,
+       or a control of the page's in a named slot is theirs, except the find
+       key, which puts focus back in the field. */
     const origin = event.composedPath()[0]
-    /* A key pressed in the find bar is the bar's, except the find key,
-       which puts focus back in the field. */
-    const inGrid = !(origin instanceof Node && this.renderRoot.contains(origin))
+    const inGrid =
+      origin instanceof Node &&
+      [...this.children].some((child) => !child.slot && child.contains(origin))
     const shortcut = shortcutOf(event, onApple())
     if (shortcut === 'find' && this.takes('find')) {
       event.preventDefault()
@@ -961,70 +1016,94 @@ export class HelixHeadlessTerminal extends HelixElement {
     clearTimeout(this.ringing)
   }
 
-  /** The built-in controls, or nothing where `controls` keeps none. */
-  protected renderControls(): TemplateResult | typeof nothing {
-    const find = this.draws('find')
-    const copied = this.draws('copy')
-    const clear = this.draws('clear')
-    const fullscreen = this.draws('fullscreen')
-    if (!find && !copied && !clear && !fullscreen) {
-      return nothing
-    }
-    return html`<div part="controls" role="group" aria-label=${this.controlsLabel}>
-      ${
-        find
-          ? html`<button
-              part="find"
-              aria-expanded=${this.findOpen ? 'true' : 'false'}
-              aria-label=${this.findLabel}
-              type="button"
-              @click=${() => (this.findOpen ? this.closeFind() : void this.openFind())}
-            >
-              <slot name="find-icon">${drawIcon(magnifyingGlass)}</slot>
-            </button>`
-          : nothing
-      }
-      ${
-        copied
-          ? html`<button
-              part="copy"
-              aria-label=${this.copyLabel}
-              ?disabled=${!this.anySelected}
-              type="button"
-              @click=${() => void this.copySelection()}
-            >
-              <slot name="copy-icon">${drawIcon(copy)}</slot>
-            </button>`
-          : nothing
-      }
-      ${
-        clear
-          ? html`<button part="clear" aria-label=${this.clearLabel} type="button" @click=${() => this.clear()}>
-              <slot name="clear-icon">${drawIcon(broom)}</slot>
-            </button>`
-          : nothing
-      }
-      ${
-        fullscreen
-          ? html`<button
-              part="fullscreen"
-              aria-label=${this.fullscreenLabel}
-              aria-pressed=${this.filled ? 'true' : 'false'}
-              type="button"
-              @click=${() => void this.fullscreen.toggle()}
-            >
-              <slot name="fullscreen-icon">${drawIcon(cornersOut)}</slot>
-            </button>`
-          : nothing
-      }
-    </div>`
+  /** Whether any built-in control is drawn. */
+  private get drawsAny(): boolean {
+    return (['find', 'copy', 'clear', 'fullscreen'] as const).some((control) => this.draws(control))
   }
 
-  /** The find bar, kept in the tree while closed so its field keeps what was typed. */
+  /**
+   * The header's toolbar: the page's `actions`, then the built-in controls,
+   * one tab stop between them, the arrows moving along it.
+   *
+   * **Always drawn**, empty where nothing is in it, because the `actions` slot
+   * is inside it and a slot drawn only once something is slotted is a slot
+   * nothing can be slotted into.
+   */
+  protected renderControls(): TemplateResult {
+    const toolbar = this.tag('toolbar')
+    const button = this.tag('icon-button')
+    return html`<${toolbar} part="controls" exportparts="toolbar: controls-toolbar" label=${this.controlsLabel}>
+      <slot name="actions" part="actions" @slotchange=${this.handleActions}></slot>
+      ${
+        this.draws('find')
+          ? html`<${button}
+              part="find"
+              exportparts="button: find-button, live: find-live, spinner: find-spinner, text: find-text"
+              .expanded=${this.findOpen}
+              label=${this.findLabel}
+              @click=${() => (this.findOpen ? this.closeFind() : void this.openFind())}
+              @helix-press=${stopPress}
+            >
+              <slot name="find-icon">${drawIcon(magnifyingGlass)}</slot>
+            </${button}>`
+          : nothing
+      }
+      ${
+        this.draws('copy')
+          ? html`<${button}
+              part="copy"
+              exportparts="button: copy-button, live: copy-live, spinner: copy-spinner, text: copy-text"
+              ?disabled=${!this.anySelected}
+              label=${this.copyLabel}
+              @click=${() => void this.copySelection()}
+              @helix-press=${stopPress}
+            >
+              <slot name="copy-icon">${drawIcon(copy)}</slot>
+            </${button}>`
+          : nothing
+      }
+      ${
+        this.draws('clear')
+          ? html`<${button}
+              part="clear"
+              exportparts="button: clear-button, live: clear-live, spinner: clear-spinner, text: clear-text"
+              label=${this.clearLabel}
+              @click=${() => this.clear()}
+              @helix-press=${stopPress}
+            >
+              <slot name="clear-icon">${drawIcon(broom)}</slot>
+            </${button}>`
+          : nothing
+      }
+      ${
+        this.draws('fullscreen')
+          ? html`<${button}
+              part="fullscreen"
+              exportparts="button: fullscreen-button, live: fullscreen-live, spinner: fullscreen-spinner, text: fullscreen-text"
+              aria-pressed=${this.filled ? 'true' : 'false'}
+              label=${this.fullscreenLabel}
+              @click=${() => void this.fullscreen.toggle()}
+              @helix-press=${stopPress}
+            >
+              <slot name="fullscreen-icon">${drawIcon(cornersOut)}</slot>
+            </${button}>`
+          : nothing
+      }
+    </${toolbar}>`
+  }
+
+  /**
+   * The find bar, kept in the tree while closed so its field keeps what was
+   * typed. The field stands before the toolbar and outside it, because a
+   * toolbar leaves the arrows to a text field, and the buttons in one with it
+   * would be out of their reach.
+   */
   protected renderFind(): TemplateResult | typeof nothing {
     if (!this.draws('find')) {
       return nothing
     }
+    const toolbar = this.tag('toolbar')
+    const button = this.tag('icon-button')
     return html`<div part="find-bar" role="search" aria-label=${this.findLabel} ?hidden=${!this.findOpen}>
       <input
         part="find-field"
@@ -1038,28 +1117,38 @@ export class HelixHeadlessTerminal extends HelixElement {
         @keydown=${this.handleFindKeys}
       />
       <span part="find-count" aria-hidden="true">${this.countText}</span>
-      <slot name="find-actions" part="find-actions"></slot>
-      <button
-        part="find-previous"
-        aria-label=${this.findPreviousLabel}
-        ?disabled=${!this.matchCount}
-        type="button"
-        @click=${() => this.search(true)}
-      >
-        <slot name="find-previous-icon">${drawIcon(caretUp)}</slot>
-      </button>
-      <button
-        part="find-next"
-        aria-label=${this.findNextLabel}
-        ?disabled=${!this.matchCount}
-        type="button"
-        @click=${() => this.search(false)}
-      >
-        <slot name="find-next-icon">${drawIcon(caretDown)}</slot>
-      </button>
-      <button part="find-close" aria-label=${this.findCloseLabel} type="button" @click=${() => this.closeFind()}>
-        <slot name="find-close-icon">${drawIcon(x)}</slot>
-      </button>
+      <${toolbar} part="find-controls" exportparts="toolbar: find-controls-toolbar" label=${this.findControlsLabel}>
+        <slot name="find-actions" part="find-actions"></slot>
+        <${button}
+          part="find-previous"
+          exportparts="button: find-previous-button, live: find-previous-live, spinner: find-previous-spinner, text: find-previous-text"
+          ?disabled=${!this.matchCount}
+          label=${this.findPreviousLabel}
+          @click=${() => this.search(true)}
+          @helix-press=${stopPress}
+        >
+          <slot name="find-previous-icon">${drawIcon(caretUp)}</slot>
+        </${button}>
+        <${button}
+          part="find-next"
+          exportparts="button: find-next-button, live: find-next-live, spinner: find-next-spinner, text: find-next-text"
+          ?disabled=${!this.matchCount}
+          label=${this.findNextLabel}
+          @click=${() => this.search(false)}
+          @helix-press=${stopPress}
+        >
+          <slot name="find-next-icon">${drawIcon(caretDown)}</slot>
+        </${button}>
+        <${button}
+          part="find-close"
+          exportparts="button: find-close-button, live: find-close-live, spinner: find-close-spinner, text: find-close-text"
+          label=${this.findCloseLabel}
+          @click=${() => this.closeFind()}
+          @helix-press=${stopPress}
+        >
+          <slot name="find-close-icon">${drawIcon(x)}</slot>
+        </${button}>
+      </${toolbar}>
     </div>`
   }
 
@@ -1090,13 +1179,20 @@ export class HelixHeadlessTerminal extends HelixElement {
   /** The status line: how the process exited and Restart, and what Tab does while it moves focus. */
   protected renderStatus(): TemplateResult {
     const exited = this.exitCode !== undefined
+    const button = this.tag('button')
     return html`<div part="status" ?hidden=${!exited && !this.tabMovesFocus}>
       ${
         exited
           ? html`<span>${formatWords(this, 'exitedLabel', { code: String(this.exitCode ?? 0) })}</span>
-              <button part="restart" type="button" @click=${this.handleRestart}>
-                <slot name="restart-icon">${drawIcon(arrowClockwise)}</slot>${this.restartLabel}
-              </button>
+              <${button}
+                part="restart"
+                exportparts="button: restart-button, live: restart-live, spinner: restart-spinner, text: restart-text"
+                @click=${this.handleRestart}
+                @helix-press=${stopPress}
+              >
+                <slot name="restart-icon" slot="start">${drawIcon(arrowClockwise)}</slot>
+                ${this.restartLabel}
+              </${button}>
               <slot name="exit-actions" part="exit-actions"></slot>`
           : nothing
       }
@@ -1105,8 +1201,7 @@ export class HelixHeadlessTerminal extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    const controls = this.renderControls()
-    const headed = this.label !== '' || this.hasLabel || this.hasActions || controls !== nothing
+    const headed = this.label !== '' || this.hasLabel || this.hasActions || this.drawsAny
     return html`<div
       part="region"
       role="group"
@@ -1114,8 +1209,7 @@ export class HelixHeadlessTerminal extends HelixElement {
     >
       <div part="header" ?hidden=${!headed}>
         <slot name="label" part="label" @slotchange=${this.handleLabel}>${this.label}</slot>
-        <slot name="actions" part="actions" @slotchange=${this.handleActions}></slot>
-        ${controls}
+        ${this.renderControls()}
       </div>
       ${this.renderFind()}
       <div part="viewport"><slot></slot></div>

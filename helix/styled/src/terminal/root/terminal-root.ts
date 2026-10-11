@@ -5,6 +5,9 @@ import { property } from 'lit/decorators.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './terminal-root.css.js'
+import '../../button/index.js'
+import '../../icon-button/index.js'
+import '../../toolbar/index.js'
 
 /**
  * @summary A frame around a terminal emulator that runs a shell you connect.
@@ -45,6 +48,8 @@ import { styles } from './terminal-root.css.js'
  */
 @customElement('helix-terminal')
 export class HelixTerminal extends HelixHeadlessTerminal {
+  static override tier = 'helix-'
+
   /**
    * Covers the container instead of taking a height of its own, for a
    * terminal that fills a pane. The container needs a position, such as

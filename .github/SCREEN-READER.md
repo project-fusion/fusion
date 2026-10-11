@@ -277,10 +277,10 @@ The examples connect xterm.js with no process behind it, so what you type is
 written back and nothing runs. On a Mac, the key that switches Tab is
 Control-Shift-M and the key that opens the find bar is Command-F.
 
-**E1. The frame and its controls.** Open `/terminal/preview`. Press Tab three
-times, and expect these in order:
+**E1. The frame and its controls.** Open `/terminal/preview`. Press Tab, then
+Right Arrow, then Tab, and expect these in order:
 
-1. "Find", a button, collapsed, inside a group named "Terminal controls"
+1. "Find", a button, collapsed, inside a toolbar named "Terminal controls"
 2. "Clear", a button
 3. "Terminal input", an edit text, then "Press Control+Shift+M to move focus
    with Tab."
@@ -305,8 +305,10 @@ again, and expect "Tab types in the terminal."
 **E5. Finding.** With focus on "Terminal input", press Command-F.
 Expect "Find", a search field, inside a search landmark named "Find". Type
 `terminal` and expect "1 of 6 matches". Press Return and expect "2 of 6
-matches". Press Escape and expect focus back on "Terminal input", and the
-"Find" button collapsed again.
+matches". Press Tab and expect "Previous match", a button, inside a toolbar
+named "Find controls", then press Right Arrow and expect "Next match". Press
+Shift-Tab to return to the field. Press Escape and expect focus back on
+"Terminal input", and the "Find" button collapsed again.
 
 **E6. Screen reader mode.** In Safari's console, run:
 
