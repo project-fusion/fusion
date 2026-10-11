@@ -56,9 +56,4 @@ export const KNOWN_IN_WEBKIT = {
     REFERENCE,
   'tooltip > tooltip > a tooltip with only slotted content shows, and is linked': REFERENCE,
   'tooltip > tooltip > the description is linked by element, not by id': REFERENCE,
-  'virtual-list > a gap > places each row a gap from the last, and End shows the last row':
-    'With `gap` changed on a drawn list, End brought the last row into view, and ' +
-    '100 milliseconds later the rows above it had grown by six gaps, 72 pixels, ' +
-    'which left the row below the viewport. Chromium keeps it in view. Not yet ' +
-    'diagnosed.',
 }
