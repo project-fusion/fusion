@@ -394,9 +394,10 @@ describe('device screen, buttons', () => {
 
   test('every button is drawn in one order, named', async () => {
     const host = await device(every)
-    const names = [...(host.shadowRoot?.querySelectorAll('[part="controls"] button') ?? [])].map(
-      (button) => button.getAttribute('part'),
-    )
+    const names = [
+      ...(host.shadowRoot?.querySelectorAll('[part="controls"] > helix-headless-icon-button') ??
+        []),
+    ].map((button) => button.getAttribute('part'))
     expect(names).toEqual([
       'back',
       'home',
@@ -409,7 +410,43 @@ describe('device screen, buttons', () => {
       'screenshot',
       'fullscreen',
     ])
-    expect(part(host, 'recents')?.getAttribute('aria-label')).toBe('Recent apps')
+    expect(part(host, 'recents')?.getAttribute('label')).toBe('Recent apps')
+  })
+
+  test('each button is an Icon Button whose press stays inside the frame', async () => {
+    const host = await device()
+    const presses: Event[] = []
+    host.addEventListener('helix-press', (event) => presses.push(event))
+    const home = part(host, 'home') as HTMLElement
+    expect(home.localName).toBe('helix-headless-icon-button')
+    home.dispatchEvent(new CustomEvent('helix-press', { bubbles: true, composed: true }))
+    expect(presses).toHaveLength(0)
+  })
+
+  test('buttons of the page’s own join the row before the fullscreen button', async () => {
+    const host = (await mount(
+      `<helix-headless-device-screen label="iPhone" controls="home fullscreen">
+        <button slot="controls" id="record">Record</button>
+      </helix-headless-device-screen>`,
+    )) as Screen
+    const row = part(host, 'controls') as HTMLElement
+    const slot = row.querySelector('slot[name="controls"]') as HTMLSlotElement
+    expect(slot.assignedElements()).toEqual([host.querySelector('#record') as Element])
+    expect(slot.nextElementSibling?.getAttribute('part')).toBe('fullscreen')
+  })
+
+  test('a row of none is drawn after all when the page puts a button in it, even later', async () => {
+    const host = (await mount(
+      '<helix-headless-device-screen label="iPhone" controls="none"></helix-headless-device-screen>',
+    )) as Screen
+    expect(part(host, 'controls')).toBeNull()
+    const record = document.createElement('button')
+    record.slot = 'controls'
+    host.append(record)
+    /* The child watch runs on a microtask, and the update after it. */
+    await Promise.resolve()
+    await host.updateComplete
+    expect(part(host, 'controls')).not.toBeNull()
   })
 
   test('a button sends the press, with no length from a key or a script', async () => {
@@ -429,8 +466,11 @@ describe('device screen, buttons', () => {
 
   test('a read-only screen keeps its screenshot and fullscreen buttons and turns off the rest', async () => {
     const host = await device(`${every} readonly`)
-    const off = [...(host.shadowRoot?.querySelectorAll('[part="controls"] button') ?? [])]
-      .filter((button) => (button as HTMLButtonElement).disabled)
+    const off = [
+      ...(host.shadowRoot?.querySelectorAll('[part="controls"] > helix-headless-icon-button') ??
+        []),
+    ]
+      .filter((button) => (button as HTMLElement & { disabled: boolean }).disabled)
       .map((button) => button.getAttribute('part'))
     expect(off).not.toContain('screenshot')
     expect(off).not.toContain('fullscreen')
@@ -476,6 +516,19 @@ describe('device screen, names and states', () => {
     expect(hasState(bare, 'empty')).toBe(true)
     const host = await device()
     expect(hasState(host, 'empty')).toBe(false)
+  })
+
+  test('the empty slot is on the screen only while no stream is inside', async () => {
+    const bare = (await mount(
+      `<helix-headless-device-screen label="iPhone">
+        <span slot="empty">No simulator is running</span>
+      </helix-headless-device-screen>`,
+    )) as Screen
+    const empty = part(bare, 'empty') as HTMLElement
+    expect(screenOf(bare).contains(empty)).toBe(true)
+    expect(empty.querySelector('slot[name="empty"]')).not.toBeNull()
+    const host = await device()
+    expect(part(host, 'empty')).toBeNull()
   })
 
   test('loading shows its words over the screen and says them in a live region, and takes them away after', async () => {

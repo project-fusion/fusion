@@ -19,8 +19,8 @@ helix-headless-device-screen::part(controls) {
   gap: 0.25rem;
 }
 
-helix-headless-device-screen::part(home),
-helix-headless-device-screen::part(screenshot) {
+helix-headless-device-screen::part(home-button),
+helix-headless-device-screen::part(screenshot-button) {
   align-items: center;
   background-color: var(--_gray-subtle);
   block-size: 2rem;

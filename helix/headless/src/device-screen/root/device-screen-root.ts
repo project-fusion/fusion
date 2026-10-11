@@ -1,5 +1,6 @@
 import {
   auditName,
+  ChildrenController,
   customElement,
   type DeviceButton,
   drawIcon,
@@ -31,9 +32,13 @@ import {
   speakerLow,
   square,
 } from '@fusion.dev/helix-icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'
+import { html } from 'lit/static-html.js'
+/* Side-effect, for the buttons this renders. Both tiers import it, because
+   this tier writes the template and the styled tier inherits it. */
+import '../../icon-button/index.js'
 import { gestureOf } from '../gesture.js'
 import { type Fraction, quarterTurns, turn, unturn, unturnDistance } from '../turn.js'
 
@@ -83,6 +88,13 @@ const LINE = 16
 
 /** The controls drawn while `controls` is absent. */
 const RESTING_CONTROLS = 'home screenshot'
+
+/**
+ * Keeps a press on one of the frame's own buttons inside the frame: the page
+ * hears what the button did through `helix-device-button`, and not that a
+ * button inside the frame was pressed.
+ */
+const stopPress = (event: Event): void => event.stopPropagation()
 
 /** Whether a key press is the one that moves focus on, which the screen never keeps. */
 const leaves = (event: KeyboardEvent): boolean =>
@@ -145,7 +157,8 @@ const pastes = (event: KeyboardEvent): boolean =>
  * `recents`, `power`, `volume`, `rotate`, `screenshot`, and `fullscreen`,
  * `home screenshot` by default. Each sends `helix-device-button` with how long
  * it was held, and the screenshot button sends `helix-device-screenshot`.
- * `press()` and `screenshot()` do the same from a script.
+ * `press()` and `screenshot()` do the same from a script. Put buttons of your
+ * own in the `controls` slot, and they join the row.
  *
  * Set `rotation` where your source sends frames in the device's natural
  * orientation while the device is turned: the frame turns the picture, and
@@ -162,6 +175,8 @@ const pastes = (event: KeyboardEvent): boolean =>
  * @slot - The element that draws the stream: a `<video>`, an `<img>`, or a `<canvas>`.
  * @slot back-icon - Replaces the glyph inside the Back button.
  * @slot bezel - A picture of the device drawn over the screen, such as a photograph of a phone with a clear screen. It takes no touches.
+ * @slot controls - Buttons of your own, such as Shake or Record, in the row after the hardware buttons and before the fullscreen button.
+ * @slot empty - Content shown on the screen while no element that draws the stream is inside, such as "No simulator is running".
  * @slot footer - Content below the device.
  * @slot fullscreen-icon - Replaces the glyph inside the fullscreen button.
  * @slot header - Content above the device, such as its name and state.
@@ -185,28 +200,69 @@ const pastes = (event: KeyboardEvent): boolean =>
  * @event {HelixDeviceTouchEvent} helix-device-touch - A finger landed, moved, lifted, or was taken away. Touch the device in response.
  *
  * @csspart back - The Back button.
+ * @csspart back-button - The Back button's inner button.
+ * @csspart back-live - The Back button's live region, which speaks while the button is pending.
+ * @csspart back-spinner - The ring the Back button turns while it is pending.
+ * @csspart back-text - The box the Back button's icon sits in.
  * @csspart bezel - The body of the device around the screen.
  * @csspart controls - The group of hardware buttons.
  * @csspart device - The box the device is fitted into, which keeps its shape inside it.
+ * @csspart empty - The box on the screen that holds the `empty` slot while no stream is inside.
  * @csspart footer - The strip below the device.
  * @csspart fullscreen - The button that makes the device fill the screen.
+ * @csspart fullscreen-button - The fullscreen button's inner button.
+ * @csspart fullscreen-live - The fullscreen button's live region, which speaks while the button is pending.
+ * @csspart fullscreen-spinner - The ring the fullscreen button turns while it is pending.
+ * @csspart fullscreen-text - The box the fullscreen button's icon sits in.
  * @csspart header - The strip above the device.
  * @csspart home - The Home button.
+ * @csspart home-button - The Home button's inner button.
+ * @csspart home-live - The Home button's live region, which speaks while the button is pending.
+ * @csspart home-spinner - The ring the Home button turns while it is pending.
+ * @csspart home-text - The box the Home button's icon sits in.
  * @csspart keys-hint - What a screen reader says about the keys when it reaches the screen, as its description. Read by screen readers only.
  * @csspart live - What screen readers hear while `loading` is set: `loading-label`. Read by screen readers only.
  * @csspart loading - The box over the screen that holds the `loading` slot while `loading` is set. Screen readers hear `live` in its place.
  * @csspart picture - The box the stream is drawn in, turned by `rotation`.
  * @csspart power - The Power button.
+ * @csspart power-button - The Power button's inner button.
+ * @csspart power-live - The Power button's live region, which speaks while the button is pending.
+ * @csspart power-spinner - The ring the Power button turns while it is pending.
+ * @csspart power-text - The box the Power button's icon sits in.
  * @csspart recents - The Recent apps button.
+ * @csspart recents-button - The Recent apps button's inner button.
+ * @csspart recents-live - The Recent apps button's live region, which speaks while the button is pending.
+ * @csspart recents-spinner - The ring the Recent apps button turns while it is pending.
+ * @csspart recents-text - The box the Recent apps button's icon sits in.
  * @csspart region - The box that holds the device, its buttons, the header, and the footer.
  * @csspart rotate-left - The Rotate left button.
+ * @csspart rotate-left-button - The Rotate left button's inner button.
+ * @csspart rotate-left-live - The Rotate left button's live region, which speaks while the button is pending.
+ * @csspart rotate-left-spinner - The ring the Rotate left button turns while it is pending.
+ * @csspart rotate-left-text - The box the Rotate left button's icon sits in.
  * @csspart rotate-right - The Rotate right button.
+ * @csspart rotate-right-button - The Rotate right button's inner button.
+ * @csspart rotate-right-live - The Rotate right button's live region, which speaks while the button is pending.
+ * @csspart rotate-right-spinner - The ring the Rotate right button turns while it is pending.
+ * @csspart rotate-right-text - The box the Rotate right button's icon sits in.
  * @csspart screen - The device's screen, which takes the touches and the keys.
  * @csspart screenshot - The button that asks for a screenshot.
+ * @csspart screenshot-button - The screenshot button's inner button.
+ * @csspart screenshot-live - The screenshot button's live region, which speaks while the button is pending.
+ * @csspart screenshot-spinner - The ring the screenshot button turns while it is pending.
+ * @csspart screenshot-text - The box the screenshot button's icon sits in.
  * @csspart touch - A ring where a touch is or was.
  * @csspart touch-held - A ring under a finger that is down, beside `touch`, with `show-touches`.
  * @csspart volume-down - The Volume down button.
+ * @csspart volume-down-button - The Volume down button's inner button.
+ * @csspart volume-down-live - The Volume down button's live region, which speaks while the button is pending.
+ * @csspart volume-down-spinner - The ring the Volume down button turns while it is pending.
+ * @csspart volume-down-text - The box the Volume down button's icon sits in.
  * @csspart volume-up - The Volume up button.
+ * @csspart volume-up-button - The Volume up button's inner button.
+ * @csspart volume-up-live - The Volume up button's live region, which speaks while the button is pending.
+ * @csspart volume-up-spinner - The ring the Volume up button turns while it is pending.
+ * @csspart volume-up-text - The box the Volume up button's icon sits in.
  *
  * @cssproperty --device-screen-ratio - The drawn screen's width divided by its height, turned by `rotation`, as a number. Written by the frame once the screen's size is known.
  * @cssproperty --device-screen-rotation - How far the picture is turned, as an angle. The frame writes it from `rotation`.
@@ -441,6 +497,13 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
 
   /** A canvas's own size, which changes with no event. */
   private resized: MutationObserver | undefined
+
+  /**
+   * Draws again as children arrive or leave. A button of the page's for the
+   * `controls` slot can arrive while no row is drawn, and then no slot exists
+   * to report it.
+   */
+  protected readonly childWatch = new ChildrenController(this)
 
   private readonly fullscreen = new FullscreenController(this, (full) => {
     this.filled = full
@@ -1102,9 +1165,14 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
   }
 
   /**
-   * The hardware buttons `controls` names, in one fixed order. Each is written
-   * out, because a part name behind an interpolation is a part the manifest
-   * cannot see.
+   * The hardware buttons `controls` names, in one fixed order, and the page's
+   * own in the `controls` slot before the fullscreen button. Each is an Icon
+   * Button written out, because a part name behind an interpolation is a part
+   * the manifest cannot see.
+   *
+   * **Drawn while there is a button to hold**, a hardware one or one of the
+   * page's, which the frame knows only once its children are known: a server
+   * draws the hardware buttons alone.
    */
   protected renderControls(): TemplateResult | typeof nothing {
     const names = [
@@ -1117,77 +1185,151 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
       'screenshot',
       'fullscreen',
     ]
-    if (!names.some((name) => this.draws(name))) {
+    const own = this.knownChildren.some((child) => child.getAttribute('slot') === 'controls')
+    if (!(own || names.some((name) => this.draws(name)))) {
       return nothing
     }
+    const button = this.tag('icon-button')
     const off = this.readonly
     return html`<div part="controls" role="group" aria-label=${this.controlsLabel}>
       ${
         this.draws('back')
-          ? html`<button part="back" aria-label=${this.backLabel} ?disabled=${off} type="button" @pointerdown=${this.handleHoldStart} @click=${(event: MouseEvent) => this.pressed('back', event)}>
+          ? html`<${button}
+              part="back"
+              exportparts="button: back-button, live: back-live, spinner: back-spinner, text: back-text"
+              ?disabled=${off}
+              label=${this.backLabel}
+              @click=${(event: MouseEvent) => this.pressed('back', event)}
+              @helix-press=${stopPress}
+              @pointerdown=${this.handleHoldStart}
+            >
               <slot name="back-icon">${drawIcon(caretLeft)}</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
       ${
         this.draws('home')
-          ? html`<button part="home" aria-label=${this.homeLabel} ?disabled=${off} type="button" @pointerdown=${this.handleHoldStart} @click=${(event: MouseEvent) => this.pressed('home', event)}>
+          ? html`<${button}
+              part="home"
+              exportparts="button: home-button, live: home-live, spinner: home-spinner, text: home-text"
+              ?disabled=${off}
+              label=${this.homeLabel}
+              @click=${(event: MouseEvent) => this.pressed('home', event)}
+              @helix-press=${stopPress}
+              @pointerdown=${this.handleHoldStart}
+            >
               <slot name="home-icon">${drawIcon(house)}</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
       ${
         this.draws('recents')
-          ? html`<button part="recents" aria-label=${this.recentsLabel} ?disabled=${off} type="button" @pointerdown=${this.handleHoldStart} @click=${(event: MouseEvent) => this.pressed('recents', event)}>
+          ? html`<${button}
+              part="recents"
+              exportparts="button: recents-button, live: recents-live, spinner: recents-spinner, text: recents-text"
+              ?disabled=${off}
+              label=${this.recentsLabel}
+              @click=${(event: MouseEvent) => this.pressed('recents', event)}
+              @helix-press=${stopPress}
+              @pointerdown=${this.handleHoldStart}
+            >
               <slot name="recents-icon">${drawIcon(square)}</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
       ${
         this.draws('power')
-          ? html`<button part="power" aria-label=${this.powerLabel} ?disabled=${off} type="button" @pointerdown=${this.handleHoldStart} @click=${(event: MouseEvent) => this.pressed('power', event)}>
+          ? html`<${button}
+              part="power"
+              exportparts="button: power-button, live: power-live, spinner: power-spinner, text: power-text"
+              ?disabled=${off}
+              label=${this.powerLabel}
+              @click=${(event: MouseEvent) => this.pressed('power', event)}
+              @helix-press=${stopPress}
+              @pointerdown=${this.handleHoldStart}
+            >
               <slot name="power-icon">${drawIcon(power)}</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
       ${
         this.draws('volume')
-          ? html`<button part="volume-up" aria-label=${this.volumeUpLabel} ?disabled=${off} type="button" @pointerdown=${this.handleHoldStart} @click=${(event: MouseEvent) => this.pressed('volume-up', event)}>
+          ? html`<${button}
+                part="volume-up"
+                exportparts="button: volume-up-button, live: volume-up-live, spinner: volume-up-spinner, text: volume-up-text"
+                ?disabled=${off}
+                label=${this.volumeUpLabel}
+                @click=${(event: MouseEvent) => this.pressed('volume-up', event)}
+                @helix-press=${stopPress}
+                @pointerdown=${this.handleHoldStart}
+              >
                 <slot name="volume-up-icon">${drawIcon(speakerHigh)}</slot>
-              </button>
-              <button part="volume-down" aria-label=${this.volumeDownLabel} ?disabled=${off} type="button" @pointerdown=${this.handleHoldStart} @click=${(event: MouseEvent) => this.pressed('volume-down', event)}>
+              </${button}>
+              <${button}
+                part="volume-down"
+                exportparts="button: volume-down-button, live: volume-down-live, spinner: volume-down-spinner, text: volume-down-text"
+                ?disabled=${off}
+                label=${this.volumeDownLabel}
+                @click=${(event: MouseEvent) => this.pressed('volume-down', event)}
+                @helix-press=${stopPress}
+                @pointerdown=${this.handleHoldStart}
+              >
                 <slot name="volume-down-icon">${drawIcon(speakerLow)}</slot>
-              </button>`
+              </${button}>`
           : nothing
       }
       ${
         this.draws('rotate')
-          ? html`<button part="rotate-left" aria-label=${this.rotateLeftLabel} ?disabled=${off} type="button" @pointerdown=${this.handleHoldStart} @click=${(event: MouseEvent) => this.pressed('rotate-left', event)}>
+          ? html`<${button}
+                part="rotate-left"
+                exportparts="button: rotate-left-button, live: rotate-left-live, spinner: rotate-left-spinner, text: rotate-left-text"
+                ?disabled=${off}
+                label=${this.rotateLeftLabel}
+                @click=${(event: MouseEvent) => this.pressed('rotate-left', event)}
+                @helix-press=${stopPress}
+                @pointerdown=${this.handleHoldStart}
+              >
                 <slot name="rotate-left-icon">${drawIcon(arrowCounterClockwise)}</slot>
-              </button>
-              <button part="rotate-right" aria-label=${this.rotateRightLabel} ?disabled=${off} type="button" @pointerdown=${this.handleHoldStart} @click=${(event: MouseEvent) => this.pressed('rotate-right', event)}>
+              </${button}>
+              <${button}
+                part="rotate-right"
+                exportparts="button: rotate-right-button, live: rotate-right-live, spinner: rotate-right-spinner, text: rotate-right-text"
+                ?disabled=${off}
+                label=${this.rotateRightLabel}
+                @click=${(event: MouseEvent) => this.pressed('rotate-right', event)}
+                @helix-press=${stopPress}
+                @pointerdown=${this.handleHoldStart}
+              >
                 <slot name="rotate-right-icon">${drawIcon(arrowClockwise)}</slot>
-              </button>`
+              </${button}>`
           : nothing
       }
       ${
         this.draws('screenshot')
-          ? html`<button part="screenshot" aria-label=${this.screenshotLabel} type="button" @click=${() => this.screenshot()}>
+          ? html`<${button}
+              part="screenshot"
+              exportparts="button: screenshot-button, live: screenshot-live, spinner: screenshot-spinner, text: screenshot-text"
+              label=${this.screenshotLabel}
+              @click=${() => this.screenshot()}
+              @helix-press=${stopPress}
+            >
               <slot name="screenshot-icon">${drawIcon(camera)}</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
+      <slot name="controls" @slotchange=${this.handleSlotChange}></slot>
       ${
         this.draws('fullscreen')
-          ? html`<button
+          ? html`<${button}
               part="fullscreen"
-              aria-label=${this.fullscreenLabel}
+              exportparts="button: fullscreen-button, live: fullscreen-live, spinner: fullscreen-spinner, text: fullscreen-text"
               aria-pressed=${this.filled ? 'true' : 'false'}
-              type="button"
+              label=${this.fullscreenLabel}
               @click=${() => void this.fullscreen.toggle()}
+              @helix-press=${stopPress}
             >
               <slot name="fullscreen-icon">${drawIcon(cornersOut)}</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
     </div>`
@@ -1259,6 +1401,11 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
             <div part="picture">
               <slot @slotchange=${this.handleSlotChange}></slot>
             </div>
+            ${
+              this.childrenKnown && this.stream === undefined
+                ? html`<div part="empty"><slot name="empty"></slot></div>`
+                : nothing
+            }
             ${this.renderMarks()}
             <div part="loading" aria-hidden="true">
               ${this.loading ? html`<slot name="loading">${this.loadingLabel}</slot>` : nothing}

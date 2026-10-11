@@ -1,0 +1,24 @@
+.stand-in {
+  align-items: center;
+  background-image:
+    radial-gradient(circle at 20% 10%, #f472b6 0%, transparent 45%),
+    radial-gradient(circle at 85% 35%, #818cf8 0%, transparent 50%),
+    linear-gradient(170deg, #4338ca, #1e1b4b 70%);
+  color: var(--helix-color-foreground-media);
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--helix-font-sans);
+  padding-block-start: 22%;
+}
+
+.date {
+  font-size: 5cqi;
+  font-weight: var(--helix-weight-medium);
+}
+
+.time {
+  font-size: 24cqi;
+  font-weight: var(--helix-weight-semibold);
+  line-height: 1;
+}

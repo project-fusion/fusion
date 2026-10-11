@@ -2,6 +2,8 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDeviceScreen } from '@fusion.dev/helix-headless/device-screen'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+/* Side-effect, for the buttons the inherited template renders. */
+import '../../icon-button/index.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './device-screen-root.css.js'
 
@@ -47,6 +49,8 @@ export class HelixDeviceScreen extends HelixHeadlessDeviceScreen {
    */
   @property({ reflect: true })
   separation?: 'plain'
+
+  static override tier = 'helix-'
 
   static override styles: CSSResultGroup = [glyphStyles, styles]
 }

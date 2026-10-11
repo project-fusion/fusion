@@ -288,40 +288,26 @@
   scrollbar-width: none;
 }
 
-[part="controls"] button {
-  all: unset;
-  align-items: center;
-  block-size: var(--helix-size-control);
-  border-radius: var(--helix-radii-sm);
-  box-sizing: border-box;
-  color: var(--helix-color-foreground-muted);
-  cursor: pointer;
-  display: inline-flex;
+/* The buttons keep their size in a column too short for them all, which then
+   scrolls. A page's own buttons arrive through a slot that draws no box, so
+   they are flex items here as well. */
+[part="controls"] > *,
+[part="controls"] ::slotted(*) {
   flex: none;
-  inline-size: var(--helix-size-control);
-  justify-content: center;
 }
 
-[part="controls"] button:hover:not(:disabled),
-[part="controls"] button[aria-pressed="true"] {
-  background-color: var(--helix-color-hover);
-  color: var(--helix-color-foreground);
-}
-
-[part="controls"] button:focus-visible {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
-}
-
-[part="controls"] button:disabled {
-  color: var(--helix-color-foreground-subtle);
-  cursor: default;
-}
-
-/* An icon a page slots in is sized like the glyph it replaces. */
-[part="controls"] button ::slotted(*) {
-  block-size: var(--helix-size-icon);
-  inline-size: var(--helix-size-icon);
+/* What the screen says while no stream is inside, over its black. */
+[part="empty"] {
+  align-items: center;
+  color: var(--helix-color-foreground-media);
+  display: grid;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  inset: 0;
+  justify-items: center;
+  padding: var(--helix-space-md);
+  position: absolute;
+  text-align: center;
 }
 
 /* **Full screen is the whole screen**, and the device fits the screen's height. */
