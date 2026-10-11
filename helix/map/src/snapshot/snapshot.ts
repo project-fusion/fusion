@@ -241,14 +241,16 @@ export interface MapSnapshot {
    * The tiles' credit, read from their TileJSON's `attribution`, as runs of
    * words and links: for a framework that writes `picture` in an element of
    * its own, and the credit in a `<span slot="attribution">` with
-   * `data-helix-map-credit`. Empty where the tiles name none.
+   * `data-helix-map-credit`. Empty where the tiles name none. For
+   * OpenFreeMap's tiles, the default, it is OpenFreeMap's credit even where
+   * their TileJSON does not answer in time.
    */
   credit: CreditPart[]
   /**
    * The picture, then the credit in the frame's `attribution` slot, as markup
    * to write in the frame after the element the renderer draws in. The credit
-   * alone where the picture could not be drawn and the tiles' TileJSON was
-   * read, and an empty string where neither is known.
+   * alone where the picture could not be drawn and the credit is known, and
+   * an empty string where neither is known.
    */
   markup: string
   /** The picture alone, as markup. An empty string where it could not be drawn. */
@@ -260,6 +262,17 @@ const nothing = (): MapSnapshot => ({ credit: [], markup: '', picture: '' })
 
 /** OpenFreeMap's TileJSON, which `mapLibreStyle` reads by default. */
 const OPENFREEMAP = 'https://tiles.openfreemap.org/planet'
+
+/**
+ * The credit OpenFreeMap's TileJSON names, as it writes it, read on October
+ * 11, 2026. **Written here for a TileJSON that does not answer in time**, so a
+ * snapshot of OpenFreeMap's tiles carries the same credit whether or not its
+ * TileJSON answered. A server that could not reach it within `timeout`
+ * rendered the map with no credit, which the renderer in the browser wrote
+ * only once it read the TileJSON itself.
+ */
+const OPENFREEMAP_CREDIT =
+  '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
 
 /** The most tiles one snapshot asks for, past which it asks at the zoom above. */
 const MOST_TILES = 40
@@ -307,6 +320,11 @@ const MARGIN = 16
  * nothing for a failed picture showed the map with no credit until the
  * renderer read its own, and a page that never loads one, never. Cache only a
  * snapshot whose `picture` is not empty.
+ *
+ * **OpenFreeMap's credit outlives its TileJSON.** Where the default tiles'
+ * TileJSON does not answer in time, the snapshot carries the credit
+ * OpenFreeMap names, the same credit the TileJSON gives. A snapshot of your
+ * own tiles whose TileJSON does not answer carries no credit.
  */
 export const mapSnapshot = async (
   asked: MapView,
@@ -347,12 +365,17 @@ export const mapSnapshot = async (
       }),
     ]).finally(() => clearTimeout(timer))
   }
-  const tiles = await get(options.tiles ?? OPENFREEMAP)
+  const tileJson = options.tiles ?? OPENFREEMAP
+  const tiles = await get(tileJson)
     .then((response) => (response.ok ? response.json() : undefined))
     .catch(() => undefined)
   const template = (tiles as { tiles?: string[] } | undefined)?.tiles?.[0]
   if (!template) {
-    return nothing()
+    if (tileJson !== OPENFREEMAP) {
+      return nothing()
+    }
+    const credit = creditParts([OPENFREEMAP_CREDIT])
+    return { credit, markup: creditMarkup(credit), picture: '' }
   }
   const attribution = (tiles as { attribution?: unknown }).attribution
   const credit = typeof attribution === 'string' ? creditParts([attribution]) : []

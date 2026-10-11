@@ -355,6 +355,35 @@ describe('mapSnapshot', () => {
     )
   })
 
+  /* The site's visual check lost the Maps page's credit on five runs on
+     October 11, 2026, each one a run where OpenFreeMap's TileJSON did not
+     answer the site's server in time, while the browser it pictures in
+     reaches no other host. */
+  test('carries OpenFreeMap’s credit where its TileJSON does not answer, the same credit the TileJSON names', async () => {
+    const attribution =
+      '<a href="https://openfreemap.org" target="_blank">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank">&copy; OpenMapTiles</a> Data from <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+    const answered = await mapSnapshot(view, {
+      fetch: (async (input: string | URL | Request) =>
+        String(input) === 'https://tiles.openfreemap.org/planet'
+          ? Response.json({
+              attribution,
+              maxzoom: 14,
+              tiles: ['https://tiles.test/{z}/{x}/{y}.pbf'],
+            })
+          : new Response(null, { status: 503 })) as typeof fetch,
+    })
+    const unanswered = await mapSnapshot(view, {
+      fetch: (async (_url: string | URL | Request) =>
+        new Promise<Response>(() => {})) as typeof fetch,
+      timeout: 50,
+    })
+    expect(unanswered.picture).toBe('')
+    expect(unanswered.credit.map((part) => part.text).join('')).toBe(
+      'OpenFreeMap © OpenMapTiles Data from OpenStreetMap',
+    )
+    expect(unanswered).toEqual(answered)
+  })
+
   test('writes numbers into its markup and nothing else', async () => {
     const { markup } = await mapSnapshot(
       { ...view, width: '400" onload="alert(1)' as unknown as number },
