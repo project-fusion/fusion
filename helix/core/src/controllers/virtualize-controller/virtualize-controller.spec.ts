@@ -1065,3 +1065,108 @@ describe('a set laid out as a waterfall', () => {
     expect(controller.offsetOf(300)).toBe(6000)
   })
 })
+
+/* Each item counts the gap after it as part of its own height, so the room an
+   item takes is its row and its gap. A gap changed after rows were read was
+   left out of both: the straight line kept the height it sampled with the old
+   gap, and every measured height kept the old gap inside it. The spacers then
+   disagreed with the rows drawn between them, so the set grew or shrank as the
+   window did, and in WebKit End on a list of 1,000 left the last row 72 pixels
+   below the box. */
+describe('a gap that changes after the rows were read', () => {
+  test('moves the straight line with it', () => {
+    const owner = host()
+    const box = scroller(0, 100)
+    let gap = 0
+    const controller = new VirtualizeController(owner, {
+      container: () => box,
+      count: () => 100,
+      estimate: () => 32,
+      gap: () => gap,
+      measured: () => false,
+      overscan: 0,
+      rows: () => drawn([32, 32, 32, 32]),
+    })
+    controller.measure()
+    controller.hostUpdated()
+    expect(controller.window.after).toBe((100 - controller.window.last) * 32)
+
+    gap = 12
+    controller.measure()
+    expect(controller.window.after).toBe((100 - controller.window.last) * 44)
+  })
+
+  test('moves every measured height with it, drawn or not', () => {
+    const owner = host()
+    const box = scroller(0, 100)
+    let gap = 0
+    let rows = drawn([32, 32, 32, 32])
+    const controller = new VirtualizeController(owner, {
+      container: () => box,
+      count: () => 100,
+      estimate: () => 32,
+      gap: () => gap,
+      overscan: 0,
+      rows: () => rows,
+    })
+    controller.measure()
+    controller.hostUpdated()
+    expect(controller.sizeOf(3)).toBe(32)
+
+    // Fewer rows fit once the gap grows, so the fourth is no longer drawn.
+    gap = 12
+    rows = drawn([32, 32, 32])
+    controller.measure()
+    controller.hostUpdated()
+    expect([controller.sizeOf(0), controller.sizeOf(3)]).toEqual([44, 44])
+  })
+
+  test('keeps the reader on the item they were on', () => {
+    const owner = host()
+    const box = scroller(640, 100)
+    let gap = 0
+    const controller = new VirtualizeController(owner, {
+      container: () => box,
+      count: () => 1000,
+      estimate: () => 32,
+      gap: () => gap,
+      measured: () => false,
+      overscan: 0,
+      rows: () => drawn([32, 32, 32, 32], 20),
+    })
+    controller.measure()
+    controller.hostUpdated()
+    // Item 20 at the top of the box, at 20 rows of 32.
+    expect(Math.floor(box.scrollTop / 32)).toBe(20)
+
+    gap = 12
+    controller.measure()
+    controller.hostUpdated()
+    expect(box.scrollTop).toBe(20 * 44)
+  })
+
+  test('keeps the reader on the item they were on when placed by measurement', () => {
+    /* The items above the reader that were never drawn move with the gap as
+       much as the measured ones do, so the reader's item is found where it
+       stood with the old gap and kept there with the new one. */
+    const owner = host()
+    const box = scroller(640, 100)
+    let gap = 0
+    const controller = new VirtualizeController(owner, {
+      container: () => box,
+      count: () => 1000,
+      estimate: () => 32,
+      gap: () => gap,
+      overscan: 0,
+      rows: () => drawn([32, 32, 32, 32], 20),
+    })
+    controller.measure()
+    controller.hostUpdated()
+    expect(box.scrollTop).toBe(640)
+
+    gap = 12
+    controller.measure()
+    controller.hostUpdated()
+    expect(box.scrollTop).toBe(20 * 44)
+  })
+})

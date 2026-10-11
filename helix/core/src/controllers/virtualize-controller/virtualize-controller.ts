@@ -216,12 +216,19 @@ export class VirtualizeController implements ReactiveController {
   private owed = 0
 
   /**
-   * The drawn rows' height on the straight line, read once per estimate.
+   * The drawn rows' own height on the straight line, read once per estimate,
+   * and without the gap, which `line` adds as it is now.
    *
    * Undefined until a host that offers `rows` has drawn some on the uniform
    * path, and again after `forget`.
    */
   private sample: { estimate: number; size: number } | undefined
+
+  /**
+   * The gap the heights and the line were last squared with, which `line`
+   * reads, so the gap the host has now is taken up in `respace` alone.
+   */
+  private spaced: number | undefined
 
   /** The length of the set when `endInSight` last answered true. */
   private askedAt = -1
@@ -536,6 +543,7 @@ export class VirtualizeController implements ReactiveController {
     this.watch()
     const box = this.options.container()
     const total = Math.max(0, this.options.count())
+    this.respace(box, total)
     const size = this.line()
     if (!box) {
       return
@@ -610,8 +618,56 @@ export class VirtualizeController implements ReactiveController {
    * Reading the drawn rows once corrects the slope, and it is still a line.
    */
   private line(): number {
+    return this.row() + (this.spaced ?? this.gap())
+  }
+
+  /** How tall one item's own row is on the straight line, without the gap. */
+  private row(): number {
     const estimate = Math.max(1, this.options.estimate())
-    return this.sample?.estimate === estimate ? this.sample.size : estimate + this.gap()
+    return this.sample?.estimate === estimate ? this.sample.size : estimate
+  }
+
+  /**
+   * Moves everything to a gap that changed, and keeps the reader on the item
+   * they were on.
+   *
+   * **Each item counts the gap after it as part of its own height**, so a gap
+   * that changes changes every item. The straight line reads the gap as it is
+   * now, and every height measured with the old one moves by the difference,
+   * drawn or not. Left alone, both kept the old gap while the rows drawn
+   * between the spacers took the new one, so the set grew or shrank as the
+   * window did: in WebKit, End on 1,000 rows whose gap went from 0 to 12 left
+   * the last row 72 pixels below the box once the window lost six rows.
+   *
+   * The reader's place is owed to the scroll offset and written after the
+   * render, as `shift` does, because a gap that grows has no room for it yet.
+   */
+  private respace(box: HTMLElement | null | undefined, total: number): void {
+    const gap = this.gap()
+    const was = this.spaced
+    if (was === undefined) {
+      this.spaced = gap
+      return
+    }
+    if (was === gap) {
+      return
+    }
+    /* Where the reader's item stood is read before `spaced` moves, with every
+       item at the old gap, the unmeasured ones included, and where it stands
+       now after. */
+    const top = box ? this.offset(box) : 0
+    const anchor = this.measuring() ? (this.target ?? this.indexAt(top, total)) : 0
+    const from = this.measuring() ? this.startOf(anchor, total) : this.line()
+    this.heights.pad(gap - was)
+    this.spaced = gap
+    const moved = this.measuring()
+      ? this.startOf(anchor, total) - from
+      : (top / from) * this.line() - top
+    this.settling = 0
+    if (box && top > 0 && moved !== 0 && (this.options.anchor?.() ?? true)) {
+      this.owed += moved
+      this.host.requestUpdate()
+    }
   }
 
   /** The space the host draws between two items, which each item counts. */
@@ -643,9 +699,11 @@ export class VirtualizeController implements ReactiveController {
     const uneven = Math.max(...seen) - Math.min(...seen) > 1
     if (this.sample?.estimate !== estimate) {
       const was = this.line()
-      const size =
-        Math.max(1, seen.reduce((sum, height) => sum + height, 0) / seen.length) + this.gap()
-      this.sample = { estimate, size }
+      this.sample = {
+        estimate,
+        size: Math.max(1, seen.reduce((sum, height) => sum + height, 0) / seen.length),
+      }
+      const size = this.line()
       if (Math.abs(size - was) >= 0.5) {
         const box = this.options.container()
         if (box && this.scrolled(box) > 0) {
@@ -878,6 +936,9 @@ export class VirtualizeController implements ReactiveController {
    * the reader were never counted.
    */
   settle(): void {
+    /* Before a row is recorded, so a row drawn with the new gap is not then
+       moved by it a second time. */
+    this.respace(this.options.container(), Math.max(0, this.options.count()))
     if (!this.measuring()) {
       this.sampleRows()
       return

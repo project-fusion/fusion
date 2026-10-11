@@ -131,3 +131,16 @@ describe('a set that grew at its start', () => {
     expect(h.total(10)).toBe(115)
   })
 })
+
+describe('a gap that changes', () => {
+  test('moves every measured item by the difference, and leaves the estimate to the caller', () => {
+    const h = heights(10)
+    h.record(1, 40)
+    h.record(3, 20)
+    expect(h.total(5)).toBe(90)
+    h.pad(4)
+    expect([h.at(1), h.at(3), h.at(0)]).toEqual([44, 24, 10])
+    // Items 0, 2 and 4 at the estimate, then 44 and 24.
+    expect(h.total(5)).toBe(98)
+  })
+})

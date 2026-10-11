@@ -146,6 +146,25 @@ export class Heights {
   }
 
   /**
+   * Adds `by` to every height that has been seen, for a gap that changed.
+   *
+   * Each item counts the gap after it as part of its own height, so a gap that
+   * grows by twelve pixels grows every measured item by twelve, the ones no
+   * longer drawn included. The unmeasured ones follow the estimate, which
+   * carries the gap already.
+   */
+  pad(by: number): void {
+    if (by === 0 || this.seen.size === 0) {
+      return
+    }
+    for (const [index, size] of this.seen) {
+      this.seen.set(index, Math.max(1, Math.round((size + by) * 64) / 64))
+    }
+    this.dirty = 0
+    this.changes += 1
+  }
+
+  /**
    * Drops everything, for a set that is no longer the same set.
    *
    * A host that swaps its data has heights recorded against indices that now

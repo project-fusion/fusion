@@ -35,8 +35,6 @@ A few specs still fail in WebKit. We keep each one on a list until it is fixed.
   host through `ElementInternals`, pointing into their own shadow root. WebKit
   reads those references back as empty. We have not yet checked whether
   VoiceOver still reads the name.
-- In Virtual List, End can leave the last row below the viewport after `gap`
-  changes on a list that is already drawn.
 - In the sandbox's source pane, in WebKit on macOS, one undo after an indent
   also removes the text typed before it.
 
