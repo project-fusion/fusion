@@ -549,6 +549,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   /** What `grower` is watching, so a render that changed nothing re-observes nothing. */
   private watched: readonly Element[] = []
 
+  /** The frame `watchSizes` will observe in, while one is booked. */
+  private watchFrame = 0
+
   /** The scroll offset this element last set, which the reader has not moved from. */
   private stuckAt = -1
 
@@ -723,11 +726,23 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     this.requestPinned(true)
   }
 
-  /** Scrolls to the bottom, and remembers where that was. */
+  /**
+   * Scrolls to the bottom, and remembers where that was.
+   *
+   * **At once, whatever `scroll-behavior` the page gives the log.** Pinned,
+   * this runs on every update, every token of a streaming turn included, and a
+   * smooth scroll sent again each time never arrives: in WebKit, a log that had
+   * streamed for a second under `scroll-behavior: smooth` rested 6 pixels short
+   * of the bottom, and `stuckAt` held where each scroll began.
+   */
   private stick(): void {
     const log = this.log
     if (log) {
-      log.scrollTop = log.scrollHeight
+      if (typeof log.scrollTo === 'function') {
+        log.scrollTo({ behavior: 'instant', top: log.scrollHeight })
+      } else {
+        log.scrollTop = log.scrollHeight
+      }
       this.stuckAt = log.scrollTop
     }
   }
@@ -966,11 +981,35 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
       : formatWords(this, 'arrivalLabel', { author: turn.by, text: turn.text })
   }
 
-  /** Watches what is drawn for size, re-observing only when that changed. */
+  /**
+   * Watches what is drawn for size, re-observing only when that changed.
+   *
+   * **In the next frame's animation callbacks, never in the update that asked.**
+   * A resize notice asks for an update, the update draws new turns while the
+   * browser is still delivering notices, and turns observed then are held to
+   * the next frame with "ResizeObserver loop completed with undelivered
+   * notifications": twice in WebKit's run of Chat's specs and once in
+   * Chromium's, on October 11, 2026. Observed from the next frame's callbacks,
+   * their first notice comes before that frame paints.
+   */
   private watchSizes(): void {
-    if (typeof ResizeObserver === 'undefined') {
+    if (typeof ResizeObserver === 'undefined' || this.watchFrame !== 0) {
       return
     }
+    if (typeof requestAnimationFrame !== 'function') {
+      this.observeSizes()
+      return
+    }
+    this.watchFrame = requestAnimationFrame(() => {
+      this.watchFrame = 0
+      if (this.isConnected) {
+        this.observeSizes()
+      }
+    })
+  }
+
+  /** Observes the log and the turns drawn now, where that changed. */
+  private observeSizes(): void {
     const log = this.log
     const targets = [...(log ? [log] : []), ...this.rendered().map((turn) => turn.element)]
     if (
@@ -1063,6 +1102,10 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     this.settling = undefined
     this.grower?.disconnect()
     this.watched = []
+    if (this.watchFrame !== 0) {
+      cancelAnimationFrame(this.watchFrame)
+      this.watchFrame = 0
+    }
   }
 
   protected override willUpdate(changed: PropertyValues): void {

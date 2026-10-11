@@ -233,6 +233,28 @@ describe('turns handed over as data', () => {
     ) ?? []),
   ]
 
+  /* Browser only. A resize notice asked for an update, the update drew turns
+     while the browser was still delivering notices, and observing them there
+     was a loop the browser reported as an error on the page. */
+  test.skipIf(!hasLayout())('are drawn a window at a time with no resize loop', async () => {
+    const loops: string[] = []
+    const heard = (event: ErrorEvent): void => {
+      if (String(event.message).includes('ResizeObserver')) {
+        loops.push(String(event.message))
+      }
+    }
+    window.addEventListener('error', heard)
+    try {
+      await fed(conversation(200))
+      for (let at = 0; at < 6; at += 1) {
+        await frame()
+      }
+    } finally {
+      window.removeEventListener('error', heard)
+    }
+    expect(loops).toEqual([])
+  })
+
   test('are drawn as messages of this tier, each with what it carries', async () => {
     const element = await fed(conversation(3))
     const messages = drawn(element)
