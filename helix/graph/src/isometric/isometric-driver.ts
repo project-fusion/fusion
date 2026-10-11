@@ -713,9 +713,17 @@ export const isometricDriver = (
      is the driver's own framing, and otherwise the same middle with the scale
      moved as the box's shorter side moved, as Sigma's camera does. Kept at
      one scale, a frame narrowed by its panel cut the diagram off at the edge. */
-  const resized = (): void => {
+  const reframe = (): void => {
     const next = sizeOfBox()
     const before = measured
+    /* Under a pixel is the drawing's own change, which `resized` explains. */
+    if (
+      before &&
+      Math.abs(next.width - before.width) < 1 &&
+      Math.abs(next.height - before.height) < 1
+    ) {
+      return
+    }
     measured = next
     if (framed) {
       fitAll(false)
@@ -726,6 +734,25 @@ export const isometricDriver = (
       view = { ...view, scale: Math.min(Math.max(view.scale * ratio, SMALLEST), LARGEST) }
     }
     show()
+  }
+  /* **Drawn again in the next frame, and never inside the resize notice.** In a
+     box with no height of its own the SVG takes its height from the viewBox
+     `show` writes, rounded: 150 came back as 149.9 in WebKit 26.6. Written
+     inside the notice, that was a new size while the browser was still
+     delivering, and it reported "ResizeObserver loop completed with
+     undelivered notifications": measured on October 11, 2026, a box resized
+     five times raised it twice in WebKit and three times in Chromium. Written
+     from the next frame's animation callbacks, the change is seen in that
+     frame's notices, where it is under a pixel and left alone. */
+  let resizing = 0
+  const resized = (): void => {
+    if (resizing !== 0) {
+      return
+    }
+    resizing = requestAnimationFrame(() => {
+      resizing = 0
+      reframe()
+    })
   }
   const sized = typeof ResizeObserver === 'function' ? new ResizeObserver(resized) : undefined
   sized?.observe(svg)
@@ -826,6 +853,7 @@ export const isometricDriver = (
     stop: () => {
       cancelAnimationFrame(gliding)
       cancelAnimationFrame(turning)
+      cancelAnimationFrame(resizing)
       sized?.disconnect()
       held.stop()
       svg.removeEventListener('pointerdown', onDown)
