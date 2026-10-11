@@ -161,6 +161,9 @@ if (families.length === 0) {
   process.exit(0)
 }
 
+/** The error event a page raises for a ResizeObserver loop. */
+const LOOP = 'ResizeObserver loop completed with undelivered notifications'
+
 /** How long one family may block the page before the run gives up on it. */
 const STUCK = 60_000
 
@@ -200,16 +203,26 @@ const browser = await engine.launch()
  */
 const ready = async (made, crashes) => {
   made.on('pageerror', (error) => {
-    /* **The notice of a ResizeObserver loop is left out, in both engines.**
-       Chromium never hands it to Playwright as a page error, and WebKit does.
-       Measured on October 10, 2026: Chat raised it once in Chromium, as an
-       error event on the window, and twice in WebKit, where Graph raised it
-       once more. The notifications it names are delivered in the next frame. */
-    if (String(error).includes('ResizeObserver loop completed with undelivered notifications')) {
+    /* Counted from the page itself, below, and not twice. */
+    if (String(error).includes(LOOP)) {
       return
     }
     crashes.push(String(error))
   })
+
+  /* **A ResizeObserver loop fails the family, in both engines.** A component
+     that changes a size it observes while the browser is still delivering
+     notices gets this error event on the window. Chromium never hands it to
+     Playwright as a page error and WebKit does, so it is heard on the page,
+     where both raise it. Chat and Graph raised it on October 10, 2026, and
+     once both were fixed no family did, in either engine. */
+  await made.addInitScript((loop) => {
+    window.addEventListener('error', (event) => {
+      if (String(event.message).includes(loop)) {
+        window.__helixResizeLoops = [...(window.__helixResizeLoops ?? []), String(event.message)]
+      }
+    })
+  }, LOOP)
 
   /* **A way to reproduce a runner's speed on a desk**, for the specs that fail
      only in CI. A GitHub runner is two slow cores; this machine is neither,
@@ -321,7 +334,19 @@ const byFamily = await pool(families, {
                 { error: 'the bundle exports no run()', name: 'load', passed: false, suite: '' },
               ]
             }
-            return await module.run()
+            const ran = await module.run()
+            const loops = window.__helixResizeLoops ?? []
+            return loops.length === 0
+              ? ran
+              : [
+                  ...ran,
+                  {
+                    error: `the page raised "${loops[0]}" ${loops.length === 1 ? 'once' : `${loops.length} times`}`,
+                    name: 'a resize loop',
+                    passed: false,
+                    suite: '',
+                  },
+                ]
           } catch (error) {
             return [{ error: String(error), name: 'load', passed: false, suite: '' }]
           }
