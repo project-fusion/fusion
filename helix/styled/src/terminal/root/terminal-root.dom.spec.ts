@@ -65,6 +65,21 @@ describe('the styled terminal', () => {
     expect(font?.size).toBeGreaterThan(0)
   })
 
+  run('draws each bright hue apart from its hue, and from the hue the page sets', async () => {
+    type Looking = HTMLElement & { look(): { colors: Record<string, string> } }
+    const element = (await mount('<helix-terminal></helix-terminal>')) as Looking
+    const { colors } = element.look()
+    for (const hue of ['blue', 'cyan', 'green', 'magenta', 'red', 'yellow']) {
+      const bright = colors[`bright${hue[0]?.toUpperCase()}${hue.slice(1)}`]
+      expect(bright).toBeTruthy()
+      expect(bright).not.toBe(colors[hue])
+    }
+    const reddened = (await mount(
+      '<helix-terminal style="--terminal-ansi-red: rgb(200, 0, 0)"></helix-terminal>',
+    )) as Looking
+    expect(reddened.look().colors.brightRed).not.toBe(colors.brightRed)
+  })
+
   run('takes a color the page sets on the terminal over the theme’s', async () => {
     const element = (await mount(
       '<helix-terminal style="--terminal-ansi-blue: rgb(1, 2, 3)"></helix-terminal>',

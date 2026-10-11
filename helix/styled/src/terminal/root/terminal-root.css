@@ -2,7 +2,12 @@
    it.** The hues are Log's, so a program's output reads the same in a log and
    in a terminal side by side: red is danger, green success, yellow warning,
    blue info, magenta the color for a call, and cyan blue mixed with green,
-   there being no token for it. A bright hue is the same hue, as Log has it.
+   there being no token for it. A bright hue is its hue mixed a quarter of the
+   way to the ink, as Log's is: a program that writes red and bright red side
+   by side means two things, and a theme has one red, so the second is drawn
+   from it, as cyan is drawn from blue and green, rather than chosen. Toward
+   the ink, so it is lighter in dark mode and darker in light, and further
+   from the ground in both.
 
    The four grays keep their order from dark to light in each mode, where
    Log's take the quiet ink in both: a terminal paints them as grounds too,
@@ -19,20 +24,40 @@
   --terminal-ansi-black: light-dark(var(--helix-color-foreground), var(--helix-color-border));
   --terminal-ansi-blue: var(--helix-color-info);
   --terminal-ansi-bright-black: var(--helix-color-foreground-muted);
-  --terminal-ansi-bright-blue: var(--helix-color-info);
+  --terminal-ansi-bright-blue: color-mix(
+    in oklab,
+    var(--terminal-ansi-blue) 75%,
+    var(--helix-color-foreground)
+  );
   --terminal-ansi-bright-cyan: color-mix(
     in oklab,
-    var(--helix-color-info),
-    var(--helix-color-success)
+    var(--terminal-ansi-cyan) 75%,
+    var(--helix-color-foreground)
   );
-  --terminal-ansi-bright-green: var(--helix-color-success);
-  --terminal-ansi-bright-magenta: var(--helix-color-syntax-callable);
-  --terminal-ansi-bright-red: var(--helix-color-danger);
+  --terminal-ansi-bright-green: color-mix(
+    in oklab,
+    var(--terminal-ansi-green) 75%,
+    var(--helix-color-foreground)
+  );
+  --terminal-ansi-bright-magenta: color-mix(
+    in oklab,
+    var(--terminal-ansi-magenta) 75%,
+    var(--helix-color-foreground)
+  );
+  --terminal-ansi-bright-red: color-mix(
+    in oklab,
+    var(--terminal-ansi-red) 75%,
+    var(--helix-color-foreground)
+  );
   --terminal-ansi-bright-white: light-dark(
     var(--helix-color-border),
     var(--helix-color-foreground)
   );
-  --terminal-ansi-bright-yellow: var(--helix-color-warning);
+  --terminal-ansi-bright-yellow: color-mix(
+    in oklab,
+    var(--terminal-ansi-yellow) 75%,
+    var(--helix-color-foreground)
+  );
   --terminal-ansi-cyan: color-mix(in oklab, var(--helix-color-info), var(--helix-color-success));
   --terminal-ansi-green: var(--helix-color-success);
   --terminal-ansi-magenta: var(--helix-color-syntax-callable);
