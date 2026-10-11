@@ -122,6 +122,7 @@
           - treeitem "Table" [level=2]
           - treeitem "Tabs" [level=2]
           - treeitem "Tag" [level=2]
+          - treeitem "Terminal" [level=2]
           - treeitem "Text" [level=2]
           - treeitem "Textarea" [level=2]
           - treeitem "Time Input" [level=2]

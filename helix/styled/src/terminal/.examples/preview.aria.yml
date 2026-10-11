@@ -1,0 +1,6 @@
+- group "~/fusion":
+  - text: ~/fusion
+  - group "Terminal controls":
+    - button "Find"
+    - button "Clear"
+  - status
