@@ -20,6 +20,7 @@ bed
 bell
 book-open-text
 briefcase
+broom
 building
 buildings
 calendar-blank

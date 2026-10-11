@@ -45,6 +45,7 @@
     "@fusion.dev/helix-map": "workspace:*",
     "@fusion.dev/helix-plot": "workspace:*",
     "@fusion.dev/helix-styles": "workspace:*",
+    "@fusion.dev/helix-terminal": "workspace:*",
     "@fusion.dev/helix-testing": "workspace:*",
     "@fusion.dev/helix-theme": "workspace:*",
     "@fusion.dev/scripts": "workspace:*",

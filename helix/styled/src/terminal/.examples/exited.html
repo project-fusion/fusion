@@ -1,0 +1,35 @@
+<!-- @summary A terminal whose process exited, with the status line saying how and a Restart button that starts another. -->
+<!-- Preview frame: data-preview-terminal has the frame connect xterm.js; on your page, connectTerminal does. -->
+<helix-terminal
+  data-preview-terminal
+  exit-code="1"
+  id="dev"
+  label="bun run dev"
+>
+  <div data-preview-terminal-canvas></div>
+</helix-terminal>
+
+<script type="module">
+  const dev = document.getElementById('dev')
+
+  const run = () =>
+    dev.write(
+      [
+        '\x1b[2m$\x1b[0m bun run dev',
+        '\x1b[36m▲ Next.js 16.2.0\x1b[0m',
+        '- Local: http://localhost:3000',
+        '\x1b[31m⨯\x1b[0m Port 3000 is in use, and \x1b[1mnext dev\x1b[0m could not start.',
+        '',
+      ].join('\r\n'),
+    )
+
+  run()
+
+  // Start your process again, clear the exit code, and write its output.
+  dev.addEventListener('helix-terminal-restart', () => {
+    dev.exitCode = undefined
+    dev.reset()
+    run()
+    dev.exitCode = 1
+  })
+</script>

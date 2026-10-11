@@ -1,7 +1,7 @@
 /**
  * What the frame tells what runs inside it, named once for both sides.
  *
- * A module of its own so `frame.js` and the map and graph chunks can share
+ * A module of its own so `frame.js` and the map, graph, and terminal chunks can share
  * the name without either bundling the other.
  */
 
@@ -22,5 +22,7 @@ declare global {
     /** What the three.js graph chunk leaves on the window, the same way. */
     helixPreviewGraphThree?: { mount(root: HTMLElement): () => void }
     helixPreviewPlotThree?: { mount(root: HTMLElement): () => void }
+    /** What the terminal chunk leaves on the window, the same way. */
+    helixPreviewTerminal?: { mount(root: HTMLElement): () => void }
   }
 }

@@ -1,0 +1,60 @@
+{
+  "name": "@fusion.dev/helix-terminal",
+  "description": "Connects the Helix Terminal frame to a terminal emulator: xterm.js, or a driver of your own, themed with your tokens.",
+  "version": "0.208.0",
+  "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
+  "repository": {
+    "directory": "helix/terminal",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json",
+    "./xterm": {
+      "types": "./dist/xterm/index.d.ts",
+      "default": "./dist/xterm/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
+    "test": "bun run test:pure && bun run test:dom",
+    "test:dom": "bun test dom.spec",
+    "test:pure": "bun test pure.spec",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "dependencies": {
+    "@fusion.dev/helix-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@fusion.dev/helix-headless": "workspace:*",
+    "@fusion.dev/helix-testing": "workspace:*",
+    "@types/bun": "^1.4.2",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/addon-search": "^0.16.0",
+    "@xterm/addon-web-links": "^0.12.0",
+    "@xterm/xterm": "^6.0.0"
+  },
+  "homepage": "https://fusion.dev",
+  "keywords": [
+    "terminal",
+    "xterm",
+    "pty",
+    "pseudo-terminal"
+  ],
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

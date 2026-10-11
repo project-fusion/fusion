@@ -29,7 +29,8 @@ export const helixEventNames: ReadonlySet<string> = new Set(
     'preview previous range-change read reading-change reading-press reconnect reject ' +
     'relabel remove reorder ' +
     'reordered resize resized sample-end sample-start scrolled select selected send ' +
-    'shortcut sort sorted split strands-fallback toggle tour-ask tour-status typing'
+    'shortcut sort sorted split strands-fallback terminal-bell terminal-input terminal-link ' +
+    'terminal-resize terminal-restart terminal-title toggle tour-ask tour-status typing'
   )
     .split(' ')
     .map((name) => `helix-${name}`),

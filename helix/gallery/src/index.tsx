@@ -97,6 +97,7 @@ import { switchArt } from './art/switch'
 import { tableArt } from './art/table'
 import { tabsArt } from './art/tabs'
 import { tagArt } from './art/tag'
+import { terminalArt } from './art/terminal'
 import { textArt } from './art/text'
 import { textareaArt } from './art/textarea'
 import { timeInputArt } from './art/time-input'
@@ -252,6 +253,7 @@ const art: Record<string, ReactNode> = {
   table: tableArt,
   tabs: tabsArt,
   tag: tagArt,
+  terminal: terminalArt,
   text: textArt,
   textarea: textareaArt,
   'time-input': timeInputArt,

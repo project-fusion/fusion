@@ -1,0 +1,120 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-surface: light-dark(#fafafa, #18181b);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+  --_radius-control: 0.25rem;
+  --_radius-surface: 0.5rem;
+}
+
+/* The ground and the ink the connector themes the terminal in, so the grid
+   and the frame around it are one surface. */
+helix-headless-terminal {
+  --terminal-background-color: var(--_gray-surface);
+  --terminal-color: var(--_gray-strong);
+}
+
+helix-headless-terminal::part(region) {
+  background-color: var(--_gray-surface);
+  block-size: 18rem;
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-surface);
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: [header] auto [find] auto [viewport] minmax(0, 1fr) [status] auto;
+  overflow: hidden;
+}
+
+helix-headless-terminal::part(header),
+helix-headless-terminal::part(find-bar),
+helix-headless-terminal::part(status) {
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+}
+
+helix-headless-terminal::part(header) {
+  grid-row: header;
+  border-block-end: 1px solid var(--_gray-edge);
+}
+
+helix-headless-terminal::part(label) {
+  display: block;
+  flex: 1 1 auto;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+helix-headless-terminal::part(controls) {
+  display: flex;
+  gap: 0.25rem;
+}
+
+helix-headless-terminal::part(find),
+helix-headless-terminal::part(clear),
+helix-headless-terminal::part(find-previous),
+helix-headless-terminal::part(find-next),
+helix-headless-terminal::part(find-close),
+helix-headless-terminal::part(restart) {
+  background-color: var(--_gray-surface);
+  block-size: 1.75rem;
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  cursor: pointer;
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+  line-height: 1rem;
+  min-inline-size: 1.75rem;
+  padding: 0.3125rem;
+}
+
+helix-headless-terminal::part(find-field) {
+  block-size: 1.75rem;
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  flex: 1 1 auto;
+}
+
+helix-headless-terminal::part(find-bar) {
+  grid-row: find;
+}
+
+helix-headless-terminal::part(find-count) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+}
+
+helix-headless-terminal::part(viewport) {
+  grid-row: viewport;
+  font-family: ui-monospace, monospace;
+  min-block-size: 0;
+  overflow: hidden;
+  padding: 0.25rem 0.5rem;
+}
+
+helix-headless-terminal::part(status) {
+  grid-row: status;
+  border-block-start: 1px solid var(--_gray-edge);
+  font-size: 0.875rem;
+}
+
+helix-headless-terminal::part(live) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
+[data-preview-terminal-canvas] {
+  block-size: 100%;
+}

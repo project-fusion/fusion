@@ -511,15 +511,17 @@
     // brings the core, the headless tier and the icons, and the stylesheets
     // are `@fusion.dev/helix-styles`' output. The map chunk beside it imports
     // `@fusion.dev/helix-map`, the connector and the style compiler, the
-    // graph chunk `@fusion.dev/helix-graph`, and the plot chunk
-    // `@fusion.dev/helix-plot`.
+    // graph chunk `@fusion.dev/helix-graph`, the plot chunk
+    // `@fusion.dev/helix-plot`, and the terminal chunk
+    // `@fusion.dev/helix-terminal`.
     "frame": {
       "dependsOn": [
         "@fusion.dev/helix#build",
         "@fusion.dev/helix-graph#build",
         "@fusion.dev/helix-map#build",
         "@fusion.dev/helix-plot#build",
-        "@fusion.dev/helix-styles#build"
+        "@fusion.dev/helix-styles#build",
+        "@fusion.dev/helix-terminal#build"
       ],
       "inputs": [
         "preview/preview-events.ts",
@@ -531,6 +533,7 @@
         "preview/preview-map-entry.ts",
         "preview/preview-maplibre-entry.ts",
         "preview/preview-plot-three-entry.ts",
+        "preview/preview-terminal-entry.ts",
         "utils/map-view/map-view.ts",
         "preview/preview-frame.css",
         "public/fonts/**",
@@ -540,7 +543,8 @@
         "$TURBO_ROOT$/node_modules/maplibre-gl/package.json",
         "$TURBO_ROOT$/node_modules/sigma/package.json",
         "$TURBO_ROOT$/node_modules/@cosmos.gl/graph/package.json",
-        "$TURBO_ROOT$/node_modules/three/package.json"
+        "$TURBO_ROOT$/node_modules/three/package.json",
+        "$TURBO_ROOT$/node_modules/@xterm/xterm/package.json"
       ],
       "outputs": ["public/sandbox/**"]
     },
@@ -694,6 +698,7 @@
         "$TURBO_ROOT$/helix/graph/src/**/*.ts",
         "$TURBO_ROOT$/helix/map/src/**/*.ts",
         "$TURBO_ROOT$/helix/plot/src/**/*.ts",
+        "$TURBO_ROOT$/helix/terminal/src/**/*.ts",
         "$TURBO_ROOT$/helix/testing/src/browser.ts",
         "$TURBO_ROOT$/fusion/scripts/lib/workspace.mjs",
         "$TURBO_ROOT$/fusion/site/scripts/build-specs.mjs"

@@ -1,0 +1,353 @@
+/* **The theme the terminal is drawn in, set where the headless frame reads
+   it.** The hues are Log's, so a program's output reads the same in a log and
+   in a terminal side by side: red is danger, green success, yellow warning,
+   blue info, magenta the color for a call, and cyan blue mixed with green,
+   there being no token for it. A bright hue is the same hue, as Log has it.
+
+   The four grays keep their order from dark to light in each mode, where
+   Log's take the quiet ink in both: a terminal paints them as grounds too,
+   and a full-screen program that fills a panel with black expects it dark.
+   Gray text that is faint against the ground is lifted by the contrast floor
+   `connectTerminal` sets. */
+:host {
+  --terminal-active-match-background-color: color-mix(
+    in oklab,
+    var(--helix-color-warning) 45%,
+    var(--terminal-background-color)
+  );
+  --terminal-active-match-border-color: var(--helix-color-warning);
+  --terminal-ansi-black: light-dark(var(--helix-color-foreground), var(--helix-color-border));
+  --terminal-ansi-blue: var(--helix-color-info);
+  --terminal-ansi-bright-black: var(--helix-color-foreground-muted);
+  --terminal-ansi-bright-blue: var(--helix-color-info);
+  --terminal-ansi-bright-cyan: color-mix(
+    in oklab,
+    var(--helix-color-info),
+    var(--helix-color-success)
+  );
+  --terminal-ansi-bright-green: var(--helix-color-success);
+  --terminal-ansi-bright-magenta: var(--helix-color-syntax-callable);
+  --terminal-ansi-bright-red: var(--helix-color-danger);
+  --terminal-ansi-bright-white: light-dark(
+    var(--helix-color-border),
+    var(--helix-color-foreground)
+  );
+  --terminal-ansi-bright-yellow: var(--helix-color-warning);
+  --terminal-ansi-cyan: color-mix(in oklab, var(--helix-color-info), var(--helix-color-success));
+  --terminal-ansi-green: var(--helix-color-success);
+  --terminal-ansi-magenta: var(--helix-color-syntax-callable);
+  --terminal-ansi-red: var(--helix-color-danger);
+  --terminal-ansi-white: light-dark(
+    var(--helix-color-foreground-subtle),
+    color-mix(in oklab, var(--helix-color-foreground-muted), var(--helix-color-foreground))
+  );
+  --terminal-ansi-yellow: var(--helix-color-warning);
+  /* The page's background, as Log's is. */
+  --terminal-background-color: var(--helix-color-background);
+  --terminal-color: var(--helix-color-foreground);
+  --terminal-cursor-color: var(--helix-color-primary);
+  --terminal-match-background-color: color-mix(
+    in oklab,
+    var(--helix-color-warning) 22%,
+    var(--terminal-background-color)
+  );
+  --terminal-scrollbar-thumb-color: var(--helix-scrollbar-thumb-color);
+  --terminal-selection-background-color: color-mix(
+    in oklab,
+    var(--helix-color-primary) 30%,
+    transparent
+  );
+
+  display: block;
+}
+
+/* **Covering the container, for a terminal that fills a pane.** A pane's
+   height is the layout's to decide, and a percentage resolves against a parent
+   with no height of its own, so the frame takes the container's box the way
+   Map's `fill` does. */
+:host([fill]) {
+  inset: 0;
+  position: absolute;
+}
+
+[part="region"] {
+  background-color: var(--terminal-background-color);
+  block-size: var(--terminal-block-size, 24rem);
+  border: var(--helix-border-thin) solid var(--terminal-border-color, var(--helix-color-border));
+  border-radius: var(--terminal-radius, var(--helix-radii-lg));
+  box-sizing: border-box;
+  display: grid;
+  /* Four rows, each named, because a hidden grid item leaves the grid: with
+     the find bar closed, the status line would take the grid's row, as Log
+     measured. */
+  grid-template-rows: [header] auto [find] auto [viewport] minmax(0, 1fr) [status] auto;
+  overflow: hidden;
+  position: relative;
+}
+
+:host([fill]) [part="region"],
+:host(:state(fullscreen)) [part="region"] {
+  block-size: 100%;
+}
+
+:host([separation="plain"]) [part="region"],
+:host(:state(fullscreen)) [part="region"] {
+  border: none;
+  border-radius: 0;
+}
+
+:host(:fullscreen) {
+  display: block;
+}
+
+/* The header, the find bar, and the status line are one strip each, on one
+   fill, so the grid reads as the thing they frame. **Dense by nature, and
+   they say so once**, as Toolbar does: a control a page puts in the header
+   takes the size the built-in ones have. */
+[part="header"],
+[part="find-bar"],
+[part="status"] {
+  --helix-size-checkbox: var(--helix-size-checkbox-sm);
+  --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
+  --helix-size-checkbox-tight: calc(var(--helix-size-checkbox) * 0.8);
+  --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+  --helix-size-tag: var(--helix-size-tag-sm);
+
+  align-items: center;
+  background-color: var(--terminal-header-background-color, var(--helix-color-surface-raised));
+  box-sizing: border-box;
+  display: flex;
+  gap: var(--helix-space-2xs);
+  min-inline-size: 0;
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm) var(--helix-space-2xs);
+}
+
+[part="header"] {
+  grid-row: header;
+  border-block-end: var(--helix-border-thin) solid
+    var(--terminal-border-color, var(--helix-color-border));
+  min-block-size: calc(var(--helix-size-control) + var(--helix-space-2xs) * 2);
+}
+
+[part="header"][hidden],
+[part="find-bar"][hidden],
+[part="status"][hidden] {
+  display: none;
+}
+
+[part="label"] {
+  color: var(--helix-color-foreground);
+  display: block;
+  flex: 1 1 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  font-weight: var(--helix-weight-medium);
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[part="actions"],
+[part="controls"] {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--helix-space-2xs);
+}
+
+/* **The controls are quiet until pointed at**, as Icon Button's ghost
+   emphasis is: muted ink, no fill, and a wash of the ink under a pointer,
+   which is a step away from the strip in either color mode. */
+[part="controls"] button,
+[part="find-bar"] button {
+  all: unset;
+  box-sizing: border-box;
+
+  align-items: center;
+  block-size: var(--helix-size-control);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  inline-size: var(--helix-size-control);
+  justify-content: center;
+  transition:
+    background-color var(--helix-duration-fast) var(--helix-easing-standard),
+    color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="controls"] button:hover:not(:disabled),
+[part="find-bar"] button:hover:not(:disabled) {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  color: var(--helix-color-foreground);
+}
+
+[part="controls"] button[aria-expanded="true"],
+[part="controls"] button[aria-pressed="true"] {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 12%, transparent);
+  color: var(--helix-color-foreground);
+}
+
+[part="controls"] button:disabled,
+[part="find-bar"] button:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+:is([part="controls"], [part="find-bar"], [part="status"]) button:focus-visible,
+[part="find-field"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="find-bar"] {
+  grid-row: find;
+  border-block-end: var(--helix-border-thin) solid
+    var(--terminal-border-color, var(--helix-color-border));
+}
+
+[part="find-field"] {
+  appearance: none;
+  background-color: var(--terminal-background-color);
+  block-size: var(--helix-size-control);
+  border: var(--helix-border-thin) solid var(--terminal-border-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  flex: 1 1 auto;
+  font-family: var(--helix-font-sans);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-sm));
+  inline-size: 100%;
+  max-inline-size: 20rem;
+  min-inline-size: 0;
+  padding-inline: var(--helix-space-xs);
+}
+
+/* The bar has a Close button of its own, so the field draws no clear button. */
+[part="find-field"]::-webkit-search-cancel-button,
+[part="find-field"]::-webkit-search-decoration {
+  appearance: none;
+}
+
+[part="find-field"]::placeholder {
+  color: var(--helix-color-foreground-muted);
+}
+
+/* **Wide enough for the count it is likely to say**, so the buttons beside it
+   do not move while a reader types and the count grows a digit. */
+[part="find-count"] {
+  color: var(--helix-color-foreground-muted);
+  flex: 1 0 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
+  min-inline-size: 7em;
+  padding-inline: var(--helix-space-xs);
+  white-space: nowrap;
+}
+
+/* **The grid's own box, in the grid's own face**, so the space around the
+   grid is the grid's ground, and a renderer measuring its cells from what it
+   inherits measures the face it draws in. */
+[part="viewport"] {
+  grid-row: viewport;
+  color: var(--terminal-color);
+  font-family: var(--terminal-font-family, var(--helix-font-mono));
+  font-size: var(--terminal-font-size, var(--helix-text-sm));
+  min-block-size: 0;
+  /* A grid fixed wider or taller than the frame, with `columns` and `rows`,
+     scrolls rather than being cut off. A fitted grid never overflows. */
+  overflow: auto;
+  padding: var(--terminal-padding, var(--helix-space-xs) var(--helix-space-sm));
+  position: relative;
+}
+
+[part="viewport"] ::slotted(*) {
+  block-size: 100%;
+  inline-size: 100%;
+}
+
+/* **The bell is one beat of the ink over the grid**, drawn over it rather than
+   under it, since the renderer paints its own ground over the box. */
+[part="viewport"]::after {
+  background-color: var(--helix-color-foreground);
+  content: "";
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host(:state(bell)) [part="viewport"]::after {
+  opacity: 0.08;
+  transition: none;
+}
+
+[part="status"] {
+  grid-row: status;
+  border-block-start: var(--helix-border-thin) solid
+    var(--terminal-border-color, var(--helix-color-border));
+  color: var(--helix-color-foreground-muted);
+  flex-wrap: wrap;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-xs) var(--helix-space-sm);
+  padding-inline: var(--helix-space-sm);
+}
+
+[part="status"] > span {
+  flex: 1 1 16rem;
+  min-inline-size: 0;
+}
+
+[part="restart"] {
+  all: unset;
+  box-sizing: border-box;
+
+  align-items: center;
+  block-size: var(--helix-size-control);
+  border: var(--helix-border-thin) solid var(--terminal-border-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-xs) var(--helix-space-sm);
+  transition: background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="restart"]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="viewport"]::after,
+  :is([part="controls"], [part="find-bar"]) button,
+  [part="restart"] {
+    transition: none;
+  }
+}
+
+/* Print: the grid prints as the renderer drew it, and the controls, the find
+ * bar, and Restart are hidden, a printed page having nothing to press.
+ *
+ * `@media print` does not cross a shadow boundary, so a page cannot answer this
+ * on a component's behalf and every family says it for itself. */
+@media print {
+  [part="controls"],
+  [part="find-bar"],
+  [part="restart"] {
+    display: none;
+  }
+}
