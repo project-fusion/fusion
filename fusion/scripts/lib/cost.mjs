@@ -61,12 +61,24 @@ export const ESTIMATE = {
   parity: { per: 0.85 },
   smoke: { per: 0.14 },
   specs: { fixed: 14, per: 1.08 },
+  'specs-webkit': { per: 1.08 },
   visual: { per: 2.08 },
 }
 
+/**
+ * A check with no measurement of its own, and the check whose measurement
+ * weighs its families until a run records one.
+ *
+ * **The specs in WebKit cost what the specs in Chromium cost.** On a desk on
+ * October 10, 2026, the whole suite on one worker took about 200 seconds in
+ * each engine, so Chromium's seconds size and pack the WebKit shards until the
+ * WebKit jobs' own readings are merged in.
+ */
+const BORROWS = { 'specs-webkit': 'specs' }
+
 /** Every family a check was measured over, scaled to seconds on a runner. */
 const scaled = (task) => {
-  const measured = MEASURED.checks[task]
+  const measured = MEASURED.checks[task] ?? MEASURED.checks[BORROWS[task]]
   if (measured === undefined) {
     return undefined
   }

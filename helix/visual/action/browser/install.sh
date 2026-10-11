@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Installs Chromium's system packages, from the cache when it hit and from the
-# mirror when it did not, then the headless shell. `action.yml` beside this
+# Installs a browser's system packages, from the cache when it hit and from the
+# mirror when it did not, then the browser: Chromium's headless shell, or
+# WebKit when `BROWSER` names it. `action.yml` beside this
 # and `helix/visual/action/action.yml` run it: a composite action resolves a local
 # `uses:` against the caller's repository, so the two share a script and not a
 # step. The reasoning is in `action.yml`.
@@ -8,8 +9,19 @@
 #   PLAYWRIGHT  the command that runs Playwright's command line
 #   IMAGE       the runner image, or empty off a GitHub-hosted runner
 #   HIT         `true` when the system packages came from the cache
+#   BROWSER     `chromium`, the default, or `webkit`
 set -euo pipefail
 shopt -s nullglob
+
+# What `playwright install` is told to fetch. Word splitting is wanted below.
+case "${BROWSER:-chromium}" in
+  chromium) WHAT='--only-shell chromium' ;;
+  webkit) WHAT='webkit' ;;
+  *)
+    echo "::error::BROWSER is chromium or webkit, and was ${BROWSER}."
+    exit 1
+    ;;
+esac
 
 from_cache() {
   local files=(~/.cache/playwright-deps/*.deb)
@@ -25,7 +37,7 @@ from_cache() {
 attempt() {
   # Word splitting is wanted: the command may be two words, `bunx playwright`.
   # shellcheck disable=SC2086
-  timeout 240 $PLAYWRIGHT install --with-deps --only-shell chromium && return 0
+  timeout 240 $PLAYWRIGHT install --with-deps $WHAT && return 0
   sudo pkill -x apt-get || true
   for _ in $(seq 20); do pgrep -x apt-get > /dev/null || break; sleep 1; done
   sudo pkill -9 -x apt-get || true
@@ -76,4 +88,4 @@ else
 fi
 
 # shellcheck disable=SC2086
-$PLAYWRIGHT install --only-shell chromium
+$PLAYWRIGHT install $WHAT

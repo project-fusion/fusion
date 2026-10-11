@@ -167,6 +167,14 @@ change reaches, so a change to one family plans a job apiece and a change to
 example whatever changed. Contrast is read in the visual shards, on the page
 each example is pictured on.
 
+**The specs run twice, in Chromium and in WebKit**, the engine of Safari and of
+a Tauri app on macOS and Linux. WebKit's are a check of their own, `specs-webkit`,
+because a job installs one browser and the cached system packages are what
+that browser added to the image. Its families are weighed by Chromium's seconds
+until a run records WebKit's: on a desk on October 10, 2026, the whole suite
+took about 200 seconds on one worker in each engine. What is known to fail there, and why, is listed
+in `fusion/scripts/lib/known-in-webkit.mjs`. The pictures are Chromium's alone.
+
 **What a family costs is measured, not counted.** It was derived from how many
 examples a family holds, and that model is false wherever an example is not a
 unit of work: contrast, then a job of its own, read every pair of inks an example paints, and on run

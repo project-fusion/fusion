@@ -1,5 +1,6 @@
 # Chromium and the system packages it links against, restored from the cache
-# when they can be: `helix visual`'s browser install, for any project.
+# when they can be: `helix visual`'s browser install, for any project. WebKit
+# instead, when `browser` names it.
 #
 # **The browser is keyed on the Playwright version and nothing else**, because
 # that is what decides which browser build `playwright install` fetches. Keyed
@@ -28,10 +29,18 @@
 # the runner's list. A miss caches what it fetched only when every package apt
 # installed or upgraded is there as a file, so a hit never installs part of the
 # set.
-name: Install Chromium for Helix visual tests
+#
+# **One browser to a job.** The cached set is what apt installed beyond the
+# image, so a second browser's set taken after the first leaves out every
+# package the two share, and a job restoring only the second would not have
+# them. Each browser has keys of its own, with Chromium's unchanged.
+name: Install the browser for Helix visual tests
 description: Restores the Playwright browser and its system packages from the cache, and installs both.
 
 inputs:
+  browser:
+    description: The browser to install, `chromium` for its headless shell or `webkit`.
+    default: chromium
   playwright:
     description: The command that runs Playwright's command line, such as `npx --no-install playwright` or `bunx playwright`.
     default: npx --no-install playwright
@@ -46,10 +55,16 @@ runs:
       id: version
       shell: bash
       env:
+        BROWSER: ${{ inputs.browser }}
         PLAYWRIGHT: ${{ inputs.playwright }}
         VERSION: ${{ inputs.version }}
       run: |
         set -euo pipefail
+        case "$BROWSER" in
+          chromium) echo "kind=" >> "$GITHUB_OUTPUT" ;;
+          webkit) echo "kind=-webkit" >> "$GITHUB_OUTPUT" ;;
+          *) echo "::error::\`browser\` is \`chromium\` or \`webkit\`, and was \`$BROWSER\`."; exit 1 ;;
+        esac
         version="$VERSION"
         if [ -z "$version" ]; then
           version=$($PLAYWRIGHT --version | awk '{ print $2 }')
@@ -66,7 +81,7 @@ runs:
     - name: Restore the browser
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
-        key: playwright-${{ runner.os }}-${{ steps.version.outputs.version }}
+        key: playwright${{ steps.version.outputs.kind }}-${{ runner.os }}-${{ steps.version.outputs.version }}
         path: ~/.cache/ms-playwright
 
     - name: Restore the system packages
@@ -74,12 +89,13 @@ runs:
       if: steps.version.outputs.image != ''
       uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
-        key: playwright-deps-${{ steps.version.outputs.image }}-${{ steps.version.outputs.version }}
+        key: playwright-deps${{ steps.version.outputs.kind }}-${{ steps.version.outputs.image }}-${{ steps.version.outputs.version }}
         path: ~/.cache/playwright-deps
 
-    - name: Install the system packages and Chromium
+    - name: Install the system packages and the browser
       shell: bash
       env:
+        BROWSER: ${{ inputs.browser }}
         HIT: ${{ steps.packages.outputs.cache-hit }}
         IMAGE: ${{ steps.version.outputs.image }}
         PLAYWRIGHT: ${{ inputs.playwright }}

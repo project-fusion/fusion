@@ -135,6 +135,50 @@ jobs:
       - name: Put the helix binary on disk
         uses: ./.github/actions/helix
 
+  # **WebKit's caches, in a job of their own**, for the specs that run in it.
+  # The system packages are cached as what apt installed beyond the image, so
+  # WebKit's set taken after Chromium's would leave out what the two share, and
+  # a WebKit job restoring it would lack them. Keyed as
+  # `helix/visual/action/browser` keys WebKit.
+  seed-webkit:
+    needs: proven
+    if: needs.proven.outputs.proven == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Read the Playwright version off the lockfile, and the runner image
+        id: version
+        run: |
+          echo "version=$(grep -oE '"playwright-core@[^"]+"' bun.lock | head -1 | tr -d '"' | cut -d@ -f2)" >> "$GITHUB_OUTPUT"
+          echo "image=$ImageOS-$ImageVersion" >> "$GITHUB_OUTPUT"
+      - name: Look up WebKit
+        id: browser
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: playwright-webkit-${{ runner.os }}-${{ steps.version.outputs.version }}
+          lookup-only: true
+          path: ~/.cache/ms-playwright
+      - name: Look up WebKit's system packages
+        id: packages
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: playwright-deps-webkit-${{ steps.version.outputs.image }}-${{ steps.version.outputs.version }}
+          lookup-only: true
+          path: ~/.cache/playwright-deps
+      - name: Set up bun and the dependencies
+        if: steps.browser.outputs.cache-hit != 'true' || steps.packages.outputs.cache-hit != 'true'
+        uses: ./.github/actions/setup
+        with:
+          helix: false
+      - name: Install WebKit
+        if: steps.browser.outputs.cache-hit != 'true' || steps.packages.outputs.cache-hit != 'true'
+        uses: ./.github/actions/browser
+        with:
+          browser: webkit
+
   # The shard counts live in one place each and the matrices are built from
   # them, so a matrix of six against `--of 8` cannot silently drop a third of
   # the checks.
@@ -756,8 +800,11 @@ jobs:
       - name: Set up bun and the dependencies
         uses: ./.github/actions/setup
 
-      - name: Install Chromium
+      # Chromium for every check but the specs in WebKit, which `plan` names.
+      - name: Install the browser
         uses: ./.github/actions/browser
+        with:
+          browser: ${{ matrix.browser }}
 
       # Each check builds what it reads, `turbo run frame` first, which after
       # `warm-browser` is a restore.

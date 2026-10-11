@@ -204,6 +204,18 @@ const CHECKS = [
     units: specced,
     workers: 1,
   },
+  /* **The same specs again in WebKit**, the engine of Safari and of a Tauri
+     app on macOS and Linux. Every family, whatever changed, as the specs in
+     Chromium run, and in shards of their own, because a job installs one
+     browser: `.github/actions/browser` says why. The pictures stay
+     Chromium's. */
+  {
+    browser: 'webkit',
+    script: 'specs:browser',
+    task: 'specs-webkit',
+    units: specced,
+    workers: 1,
+  },
 ]
 
 const matrix = []
@@ -232,6 +244,7 @@ for (const check of CHECKS) {
     const commands = [
       [
         `bun run ${check.script}`,
+        check.browser ? `--browser ${check.browser}` : '',
         /* The base is the job's own `$BASE`, set once where the workflow knows
            which event it is, rather than written into every entry here. */
         check.scoped ? '--changed "$BASE"' : '',
@@ -243,6 +256,9 @@ for (const check of CHECKS) {
       ...(index === 0 ? (check.also ?? []).map((one) => `bun run ${one}`) : []),
     ]
     matrix.push({
+      /* The browser the job installs, which is Chromium for every check but
+         one. */
+      browser: check.browser ?? 'chromium',
       id: of > 1 ? `${check.task}-${index + 1}-of-${of}` : check.task,
       label:
         (of > 1 ? `${check.task} ${index + 1}/${of}` : check.task) +

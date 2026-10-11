@@ -11,6 +11,7 @@ it is the workspace's own tooling.
 | `./format-open-tags` | The one-attribute-per-line shape examples are written in |
 | `./formatted` | Runs biome over generated text, so nothing lands unformatted |
 | `./frontmatter` | The `key: value` block at the top of an MDX file, as strings |
+| `./known-in-webkit` | The DOM specs known to fail in WebKit, each with its cause, which the spec runner reports and holds true |
 | `./literal` | Text as a quoted string or a template literal in a generated module |
 | `./paint`, `./theme-facts`, `./theme-intents` | The theme engine's shared vocabulary |
 | `./pool` | Running a browser check's families side by side, on a fresh page each or one per worker, reaching nothing but their own origin |

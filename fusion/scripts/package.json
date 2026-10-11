@@ -20,6 +20,7 @@
     "./formatted": "./lib/formatted.mjs",
     "./frontmatter": "./lib/frontmatter.mjs",
     "./join-lines": "./lib/join-lines.mjs",
+    "./known-in-webkit": "./lib/known-in-webkit.mjs",
     "./literal": "./lib/literal.mjs",
     "./minify-json": "./lib/minify-json.mjs",
     "./models": "./lib/models.mjs",

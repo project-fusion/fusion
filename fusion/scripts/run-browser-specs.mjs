@@ -12,13 +12,15 @@ import { readFile } from 'node:fs/promises'
  *
  * The same bundles the sandbox runs. `turbo run specs` emits one module per
  * family, each exporting `run()`, and this loads every one of them in headless
- * Chromium and collects the results. No second suite, no rewriting: a spec
- * deleted from the source stops being reported here the same day.
+ * Chromium, or in WebKit, and collects the results. No second suite, no
+ * rewriting: a spec deleted from the source stops being reported here the same
+ * day.
  *
  * Run with `bun run specs:browser`, after `turbo run specs`. A family name limits
  * it to that one: `bun run specs:browser carousel`. `--shard <i> --of <n>` runs
  * one of `n` shares of the families, as `@fusion.dev/scripts/shard` splits them
- * for CI.
+ * for CI. `--browser webkit` runs them in Playwright's WebKit, which is the
+ * engine Safari and a Tauri app on macOS or Linux draw with.
  *
  * **The whole suite is every family, which is not a thing anybody runs while
  * fixing one component**, so it takes a family filter. Without one somebody
@@ -44,11 +46,36 @@ import { readFile } from 'node:fs/promises'
  */
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
+import { argument } from '@fusion.dev/scripts/argv'
 import { costOf } from '@fusion.dev/scripts/cost'
+import { KNOWN_IN_WEBKIT } from '@fusion.dev/scripts/known-in-webkit'
 import { offline, pool, workers } from '@fusion.dev/scripts/pool'
 import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { root } from '@fusion.dev/scripts/workspace'
-import { chromium } from 'playwright'
+import { chromium, webkit } from 'playwright'
+
+/**
+ * The engines `--browser` takes, by the name it takes them under: how each
+ * launches, what it is called in a report, what it is known to fail, and the
+ * name its cost is measured under, since one family costs each engine its own.
+ */
+const ENGINES = {
+  chromium: { known: {}, launch: () => chromium.launch(), name: 'Chromium', task: 'specs' },
+  webkit: {
+    known: KNOWN_IN_WEBKIT,
+    launch: () => webkit.launch(),
+    name: 'WebKit',
+    task: 'specs-webkit',
+  },
+}
+const chosen = argument('browser') ?? 'chromium'
+const engine = ENGINES[chosen]
+if (engine === undefined) {
+  console.error(
+    `browser specs: --browser takes ${Object.keys(ENGINES).join(' or ')}, and was given \`${chosen}\``,
+  )
+  process.exit(1)
+}
 
 const specs = join(root, 'fusion/site/public/specs')
 /* The sandbox's stylesheet, which is the base layer and every token in it.
@@ -95,10 +122,13 @@ const origin = `http://127.0.0.1:${server.address().port}`
    skipped and its specs never run. Nothing reports it, because a suite covering
    87 of 88 families still says it passed. */
 /* Positional, so a flag must not be mistaken for a family name: passing
-   `--throttle 4` alone reported "no bundle for `--throttle`". */
+   `--throttle 4` alone reported "no bundle for `--throttle`". A number is never
+   a family, and neither is the engine after `--browser`. */
 const only = process.argv
   .slice(2)
-  .find((argument) => !argument.startsWith('--') && !/^\d+$/.test(argument))
+  .find(
+    (one, at, all) => !one.startsWith('--') && !/^\d+$/.test(one) && all[at - 1] !== '--browser',
+  )
 const listed = JSON.parse(await readFile(join(specs, 'families.json'), 'utf8'))
 const bundles = listed
   .map((name) => `${name}.js`)
@@ -120,7 +150,7 @@ if (bundles.length === 0) {
    argues that and `@fusion.dev/scripts/shard` the split. A shard with none
    passes before the browser starts, and says so in words. */
 const named = (bundle) => bundle.replace(/\.js$/, '')
-const seconds = costOf('specs', () => 1)
+const seconds = costOf(engine.task, () => 1)
 const asked = shard()
 const ours = owner(bundles, (bundle) => seconds(named(bundle)), asked)
 const families = bundles.filter(ours)
@@ -139,6 +169,13 @@ const THROTTLE = Number(
   process.argv[process.argv.indexOf('--throttle') + 1] ??
     (process.argv.includes('--throttle') ? 4 : 1),
 )
+/* Refused outright. The throttle goes through Chromium's DevTools protocol, and
+   a WebKit run that silently ran at full speed is not the reproduction you
+   asked for. */
+if (THROTTLE > 1 && chosen !== 'chromium') {
+  console.error('browser specs: --throttle runs in Chromium alone, through its DevTools protocol.')
+  process.exit(1)
+}
 
 /**
  * How many families run at once, which `pool` decides and argues: a core left
@@ -150,7 +187,7 @@ const THROTTLE = Number(
  */
 const WORKERS = workers()
 
-const browser = await chromium.launch()
+const browser = await engine.launch()
 
 /**
  * The fresh page `pool` hands a family, made a blank page at the origin and
@@ -162,7 +199,17 @@ const browser = await chromium.launch()
  * page that no longer exists.
  */
 const ready = async (made, crashes) => {
-  made.on('pageerror', (error) => crashes.push(String(error)))
+  made.on('pageerror', (error) => {
+    /* **The notice of a ResizeObserver loop is left out, in both engines.**
+       Chromium never hands it to Playwright as a page error, and WebKit does.
+       Measured on October 10, 2026: Chat raised it once in Chromium, as an
+       error event on the window, and twice in WebKit, where Graph raised it
+       once more. The notifications it names are delivered in the next frame. */
+    if (String(error).includes('ResizeObserver loop completed with undelivered notifications')) {
+      return
+    }
+    crashes.push(String(error))
+  })
 
   /* **A way to reproduce a runner's speed on a desk**, for the specs that fail
      only in CI. A GitHub runner is two slow cores; this machine is neither,
@@ -224,7 +271,25 @@ const byFamily = await pool(families, {
        defined both from one copy. A consumer installs one copy, so a spec is
        run the way a consumer's page would load it. */
     const crashes = []
-    const page = await ready(fresh, crashes)
+    /* A page that will not load is this family's failure, and the run goes on.
+       WebKit once could not connect to the server on a machine that had run
+       out of local ports, and the whole run ended there with no report. */
+    let page
+    try {
+      page = await ready(fresh, crashes)
+    } catch (error) {
+      return {
+        crashes,
+        results: [
+          {
+            error: `the page did not load: ${String(error).split('\n')[0]}`,
+            name: 'the page',
+            passed: false,
+            suite: '',
+          },
+        ],
+      }
+    }
     /* Each family in its own evaluation, so one that throws while loading is one
        family reported as broken rather than the run ending with no results at
        all. A bundle that cannot even be imported is the failure most worth
@@ -291,15 +356,45 @@ const byFamily = await pool(families, {
   },
 })
 
+/* **What this engine is known to fail is reported and not counted**, and a
+   listed spec that passes, or that this run's families no longer hold, fails
+   the run: the list says what is still wrong, so it is kept true both ways. */
+const known = engine.known
+const expected = []
+const met = new Set()
 for (const [at, { results }] of byFamily.entries()) {
-  const name = families[at].replace(/\.js$/, '')
+  const name = named(families[at])
   for (const result of results) {
-    if (result.passed) {
+    const line = `${name} > ${result.suite ? `${result.suite} > ` : ''}${result.name}`
+    if (line in known) {
+      met.add(line)
+      if (result.passed) {
+        failures.push(`${line}
+    passes in ${engine.name} now. Take it off the list in fusion/scripts/lib/known-in-webkit.mjs.`)
+      } else {
+        expected.push(line)
+      }
+    } else if (result.passed) {
       passed += 1
     } else {
-      failures.push(`${name} > ${result.suite ? `${result.suite} > ` : ''}${result.name}
+      failures.push(`${line}
     ${result.error ?? 'failed'}`)
     }
+  }
+}
+/* Only a family whose specs ran can be missing one. A family that failed to
+   load is already reported, and every entry for it would read as renamed. */
+const ran = new Set(
+  families
+    .filter((_, at) =>
+      byFamily[at].results.some((result) => result.name !== 'load' && result.name !== 'the page'),
+    )
+    .map(named),
+)
+for (const line of Object.keys(known)) {
+  if (ran.has(line.split(' > ')[0]) && !met.has(line)) {
+    failures.push(`${line}
+    is listed as known to fail in ${engine.name}, and no spec has that name now.`)
   }
 }
 
@@ -308,21 +403,31 @@ server.close()
 
 /* After every result, as before, and in family order rather than in the order
    the workers happened to hear them, so two runs list them alike. */
-for (const { crashes } of byFamily) {
+for (const [at, { crashes }] of byFamily.entries()) {
   for (const crash of crashes) {
-    failures.push(`uncaught in the page: ${crash}`)
+    failures.push(`${named(families[at])} > uncaught in the page: ${crash}`)
   }
 }
 
+/* Every run says what it is still known to fail, and why, so the list is read
+   where the result is. */
+const owed =
+  expected.length === 0
+    ? ''
+    : `\n\n${expected.length} known to fail in ${engine.name}, listed in fusion/scripts/lib/known-in-webkit.mjs:\n` +
+      expected.map((line) => `\n  ${line}\n    ${known[line]}\n`).join('')
+
 if (failures.length > 0) {
-  console.error(`browser specs: ${failures.length} failed, ${passed} passed\n`)
+  console.error(`browser specs: ${failures.length} failed, ${passed} passed, in ${engine.name}\n`)
   for (const failure of failures) {
     console.error(`  ${failure}\n`)
   }
+  console.error(owed)
   process.exit(1)
 }
 
 console.log(
-  `browser specs: ${passed} passed across ${families.length} families, in Chromium on ${Math.min(WORKERS, families.length)} worker(s)` +
-    (asked === undefined ? '' : `, in ${which(asked)}`),
+  `browser specs: ${passed} passed across ${families.length} families, in ${engine.name} on ${Math.min(WORKERS, families.length)} worker(s)` +
+    (asked === undefined ? '' : `, in ${which(asked)}`) +
+    owed,
 )
