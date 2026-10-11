@@ -38,15 +38,16 @@ describe('device screen server output', () => {
 
   test('the resting buttons are Home and the screenshot, named', () => {
     const markup = served()
-    expect(partTag(markup, 'home')).toContain('aria-label="Home"')
-    expect(partTag(markup, 'screenshot')).toContain('aria-label="Take a screenshot"')
+    expect(partTag(markup, 'home')).toContain('label="Home"')
+    expect(partTag(markup, 'screenshot')).toContain('label="Take a screenshot"')
     expect(hasPart(markup, 'back')).toBe(false)
     expect(hasPart(markup, 'volume-up')).toBe(false)
   })
 
-  test('the frame is served whole, and nothing drawn on the screen', () => {
+  test('the frame is served whole, its Icon Buttons with their own parts, and nothing drawn on the screen', () => {
     expect(servedParts(served())).toEqual([
       'bezel',
+      'button',
       'controls',
       'device',
       'footer',
@@ -59,6 +60,7 @@ describe('device screen server output', () => {
       'region',
       'screen',
       'screenshot',
+      'text',
     ])
   })
 
@@ -121,7 +123,7 @@ describe('device screen server output', () => {
 
   test('the slots a page fills are served', () => {
     const inside = rendered(served(), 'helix-headless-device-screen')
-    for (const name of ['header', 'footer', 'bezel', 'home-icon', 'screenshot-icon']) {
+    for (const name of ['header', 'footer', 'bezel', 'controls', 'home-icon', 'screenshot-icon']) {
       expect(inside).toContain(`name="${name}"`)
     }
   })
