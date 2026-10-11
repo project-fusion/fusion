@@ -141,4 +141,42 @@ describe('a frame on xterm.js', () => {
       ).toBe(true)
     })
   })
+
+  run(
+    'the find bar matches case, whole words, and a regular expression, as xterm.js searches',
+    async () => {
+      await onTerminal(async ({ host, terminal }) => {
+        await host.write('Error one\r\nfine\r\nerror two\r\nerrors three\r\n')
+        const input = terminal.textarea as HTMLTextAreaElement
+        input.dispatchEvent(
+          new KeyboardEvent('keydown', {
+            bubbles: true,
+            cancelable: true,
+            composed: true,
+            ...(onApple()
+              ? { key: 'f', metaKey: true }
+              : { ctrlKey: true, key: 'F', shiftKey: true }),
+          }),
+        )
+        await settle(host)
+        const count = (): string => part(host, 'find-count')?.textContent ?? ''
+        const field = part(host, 'find-field') as HTMLInputElement
+        const type = (query: string): void => {
+          field.value = query
+          field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+        }
+        type('error')
+        expect(await until(() => count().includes('of 3'))).toBe(true)
+        ;(part(host, 'find-match-case') as HTMLElement).click()
+        expect(await until(() => count().includes('of 2'))).toBe(true)
+        ;(part(host, 'find-whole-word') as HTMLElement).click()
+        expect(await until(() => count().includes('of 1'))).toBe(true)
+        ;(part(host, 'find-match-case') as HTMLElement).click()
+        ;(part(host, 'find-whole-word') as HTMLElement).click()
+        ;(part(host, 'find-regex') as HTMLElement).click()
+        type('(one|two)$')
+        expect(await until(() => count().includes('of 2'))).toBe(true)
+      })
+    },
+  )
 })

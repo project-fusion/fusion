@@ -28,12 +28,18 @@ export interface TerminalOptions {
   screenReader: boolean
 }
 
-/** How a search through the output moves. */
+/** How a search through the output moves, and what it matches. */
 export interface TerminalSearchOptions {
   /** Toward the top of the output, for the previous match. */
   backward: boolean
+  /** Whether case has to match, so "Error" does not find "error". */
+  caseSensitive: boolean
   /** Whether the reader is still typing, so the match in hand stays where it still matches. */
   incremental: boolean
+  /** Whether the query is a regular expression, in JavaScript's syntax, which the frame has checked reads. */
+  regex: boolean
+  /** Whether a match has to be a whole word. */
+  wholeWord: boolean
 }
 
 /**

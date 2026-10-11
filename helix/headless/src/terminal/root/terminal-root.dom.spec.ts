@@ -269,6 +269,50 @@ describe('the find bar', () => {
     expect(slot?.nextElementSibling?.getAttribute('part')).toBe('find-previous')
   })
 
+  test('matches case, whole words, and a regular expression, each a button that says whether it is on', async () => {
+    const host = await frame()
+    const { renderer } = standIn(host)
+    const asked: { query: string; caseSensitive: boolean; regex: boolean; wholeWord: boolean }[] =
+      []
+    renderer.find = (query, options) => asked.push({ query, ...options })
+    renderer.findEnd = () =>
+      asked.push({ caseSensitive: false, query: '', regex: false, wholeWord: false })
+    host.attach(renderer)
+    await settle(host)
+    const field = part(host, 'find-field') as HTMLInputElement
+    field.value = 'err(or)?'
+    field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    for (const name of ['find-match-case', 'find-whole-word', 'find-regex']) {
+      expect(part(host, name)?.getAttribute('aria-pressed')).toBe('false')
+    }
+    ;(part(host, 'find-match-case') as HTMLElement).click()
+    ;(part(host, 'find-regex') as HTMLElement).click()
+    await settle(host)
+    expect(part(host, 'find-match-case')?.getAttribute('aria-pressed')).toBe('true')
+    expect(asked.at(-1)).toMatchObject({
+      caseSensitive: true,
+      query: 'err(or)?',
+      regex: true,
+      wholeWord: false,
+    })
+    ;(part(host, 'find-whole-word') as HTMLElement).click()
+    expect(asked.at(-1)).toMatchObject({ wholeWord: true })
+  })
+
+  test('says a regular expression it cannot read, and searches nothing with it', async () => {
+    const host = await frame('find-regex')
+    const { asked, renderer } = standIn(host)
+    host.attach(renderer)
+    await settle(host)
+    const field = part(host, 'find-field') as HTMLInputElement
+    field.value = '(error'
+    field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    await settle(host)
+    expect(asked.calls.at(-1)).toBe('find end')
+    expect(part(host, 'find-count')?.textContent?.trim()).toBe('Not a valid regular expression')
+    expect(part(host, 'live')?.textContent?.trim()).toBe('Not a valid regular expression')
+  })
+
   test('says when nothing matched', async () => {
     const host = await frame()
     const sink = host.attach(standIn(host).renderer)
@@ -354,6 +398,17 @@ describe('the frame’s keys', () => {
     await settle(host)
     expect(event.defaultPrevented).toBe(false)
     expect(hasState(host, 'tab-moves-focus')).toBe(false)
+  })
+
+  test('Control+Shift+V is kept from the program and left to the browser, which pastes', async () => {
+    const host = await frame()
+    const { input, renderer } = standIn(host)
+    host.attach(renderer)
+    const reached: string[] = []
+    input.addEventListener('keydown', (event) => reached.push(event.key))
+    const event = press(input, 'V', { ctrlKey: true, shiftKey: true })
+    expect(event.defaultPrevented).toBe(false)
+    expect(reached).toEqual(onApple() ? ['V'] : [])
   })
 
   test('the keys are left alone until a renderer is attached', async () => {

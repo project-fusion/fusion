@@ -306,9 +306,11 @@ again, and expect "Tab types in the terminal."
 **E5. Finding.** With focus on "Terminal input", press Command-F.
 Expect "Find", a search field, inside a search landmark named "Find". Type
 `terminal` and expect "1 of 6 matches". Press Return and expect "2 of 6
-matches". Press Tab and expect "Previous match", a button, inside a toolbar
-named "Find controls", then press Right Arrow and expect "Next match". Press
-Shift-Tab to return to the field. Press Escape and expect focus back on
+matches". Press Tab and expect "Match case", a toggle button, not pressed,
+inside a toolbar named "Find controls". Press Space and expect it pressed, and
+a new count. Press Right Arrow three times, and expect "Match whole word",
+"Use regular expression", then "Previous match". Press Shift-Tab to return to
+the field. Press Escape and expect focus back on
 "Terminal input", and the "Find" button collapsed again.
 
 **E6. Screen reader mode.** In Safari's console, run:

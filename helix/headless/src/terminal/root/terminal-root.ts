@@ -19,12 +19,15 @@ import {
 } from '@fusion.dev/helix-core'
 import {
   arrowClockwise,
+  asterisk,
   broom,
   caretDown,
   caretUp,
   copy,
   cornersOut,
   magnifyingGlass,
+  textAa,
+  textAUnderline,
   x,
 } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -41,8 +44,24 @@ import { isTab, shortcutOf, spokenChord, type TerminalShortcut } from '../keys.j
 export interface TerminalFindOptions {
   /** Toward the top of the output, for the previous match. */
   backward: boolean
+  /** Whether case has to match, so "Error" does not find "error". */
+  caseSensitive: boolean
   /** Whether the search is the reader still typing, which stays on the match it has where it still matches. */
   incremental: boolean
+  /** Whether `query` is a regular expression, in JavaScript's syntax, which the frame has checked reads. */
+  regex: boolean
+  /** Whether a match has to be a whole word. */
+  wholeWord: boolean
+}
+
+/** Whether a regular expression reads, which a search has to before it runs. */
+const readable = (source: string): boolean => {
+  try {
+    new RegExp(source)
+    return true
+  } catch {
+    return false
+  }
 }
 
 /** What the frame asks of whatever draws the terminal, as the frame's settings stand. */
@@ -204,6 +223,8 @@ const opens = (href: string): boolean => /^https?:\/\//i.test(href)
  *   Shift+Enter move between the matches, and Escape closes the bar and
  *   returns focus to the terminal.
  * - Control+Shift+C copies the selection. On a Mac, Command+C does.
+ * - Control+Shift+V pastes, as it does in the browser, and the program reads
+ *   it as typed text. On a Mac, Command+V does.
  * - Control+M, or Control+Shift+M on a Mac, switches Tab between typing in the
  *   terminal and moving focus out of it. The status line says when Tab moves
  *   focus, and the terminal's input describes the key to a screen reader.
@@ -226,11 +247,14 @@ const opens = (href: string): boolean => /^https?:\/\//i.test(href)
  * @slot clear-icon - Replaces the glyph inside the clear button.
  * @slot copy-icon - Replaces the glyph inside the copy button.
  * @slot exit-actions - Controls of your own beside Restart, shown once the process exits, such as a button that opens the whole log.
- * @slot find-actions - Controls of your own in the find bar, between the count and the buttons that move between matches.
+ * @slot find-actions - Controls of your own in the find bar, between its options and the buttons that move between matches.
  * @slot find-close-icon - Replaces the glyph inside the button that closes the find bar.
  * @slot find-icon - Replaces the glyph inside the find button.
+ * @slot find-match-case-icon - Replaces the glyph inside the match case button.
  * @slot find-next-icon - Replaces the glyph inside the next match button.
  * @slot find-previous-icon - Replaces the glyph inside the previous match button.
+ * @slot find-regex-icon - Replaces the glyph inside the regular expression button.
+ * @slot find-whole-word-icon - Replaces the glyph inside the whole word button.
  * @slot fullscreen-icon - Replaces the glyph inside the fullscreen button.
  * @slot label - The terminal's name in the header, such as an icon beside the shell's name. Replaces `label` there.
  * @slot restart-icon - Replaces the glyph inside the Restart button.
@@ -271,6 +295,11 @@ const opens = (href: string): boolean => /^https?:\/\//i.test(href)
  * @csspart find-count - Which match is current and how many there are, such as "3 of 12 matches".
  * @csspart find-field - The search field in the find bar.
  * @csspart find-live - The find button's live region, which speaks while the button is pending.
+ * @csspart find-match-case - The button that matches case in the find bar. Pressed while it does.
+ * @csspart find-match-case-button - The match case button's inner button.
+ * @csspart find-match-case-live - The match case button's live region, which speaks while the button is pending.
+ * @csspart find-match-case-spinner - The ring the match case button turns while it is pending.
+ * @csspart find-match-case-text - The box the match case button's icon sits in.
  * @csspart find-next - The button that moves to the next match.
  * @csspart find-next-button - The next match button's inner button.
  * @csspart find-next-live - The next match button's live region, which speaks while the button is pending.
@@ -281,8 +310,18 @@ const opens = (href: string): boolean => /^https?:\/\//i.test(href)
  * @csspart find-previous-live - The previous match button's live region, which speaks while the button is pending.
  * @csspart find-previous-spinner - The ring the previous match button turns while it is pending.
  * @csspart find-previous-text - The box the previous match button's icon sits in.
+ * @csspart find-regex - The button that reads the find field as a regular expression. Pressed while it does.
+ * @csspart find-regex-button - The regular expression button's inner button.
+ * @csspart find-regex-live - The regular expression button's live region, which speaks while the button is pending.
+ * @csspart find-regex-spinner - The ring the regular expression button turns while it is pending.
+ * @csspart find-regex-text - The box the regular expression button's icon sits in.
  * @csspart find-spinner - The ring the find button turns while it is pending.
  * @csspart find-text - The box the find button's icon sits in.
+ * @csspart find-whole-word - The button that matches whole words only in the find bar. Pressed while it does.
+ * @csspart find-whole-word-button - The whole word button's inner button.
+ * @csspart find-whole-word-live - The whole word button's live region, which speaks while the button is pending.
+ * @csspart find-whole-word-spinner - The ring the whole word button turns while it is pending.
+ * @csspart find-whole-word-text - The box the whole word button's icon sits in.
  * @csspart fullscreen - The button that makes the terminal fill the screen. Pressed while it does.
  * @csspart fullscreen-button - The fullscreen button's inner button.
  * @csspart fullscreen-live - The fullscreen button's live region, which speaks while the button is pending.
@@ -402,10 +441,27 @@ export class HelixHeadlessTerminal extends HelixElement {
   @property({ attribute: 'find-controls-label' })
   findControlsLabel = 'Find controls'
 
+  /** What the find bar says when its regular expression cannot be read. */
+  @words
+  @property({ attribute: 'find-invalid-label' })
+  findInvalidLabel = 'Not a valid regular expression'
+
   /** The find button's label, and the find field's name and placeholder. */
   @words
   @property({ attribute: 'find-label' })
   findLabel = 'Find'
+
+  /**
+   * Whether the find bar matches case, so "Error" does not find "error". The
+   * reader turns it on and off from the bar.
+   */
+  @property({ attribute: 'find-match-case', type: Boolean })
+  findMatchCase = false
+
+  /** The match case button's label. */
+  @words
+  @property({ attribute: 'find-match-case-label' })
+  findMatchCaseLabel = 'Match case'
 
   /** The next match button's label. */
   @words
@@ -416,6 +472,27 @@ export class HelixHeadlessTerminal extends HelixElement {
   @words
   @property({ attribute: 'find-previous-label' })
   findPreviousLabel = 'Previous match'
+
+  /**
+   * Whether the find bar reads what the reader types as a regular expression,
+   * in JavaScript's syntax. The reader turns it on and off from the bar.
+   */
+  @property({ attribute: 'find-regex', type: Boolean })
+  findRegex = false
+
+  /** The regular expression button's label. */
+  @words
+  @property({ attribute: 'find-regex-label' })
+  findRegexLabel = 'Use regular expression'
+
+  /** Whether the find bar matches whole words only. The reader turns it on and off from the bar. */
+  @property({ attribute: 'find-whole-word', type: Boolean })
+  findWholeWord = false
+
+  /** The whole word button's label. */
+  @words
+  @property({ attribute: 'find-whole-word-label' })
+  findWholeWordLabel = 'Match whole word'
 
   /** The fullscreen button's label. */
   @words
@@ -499,6 +576,10 @@ export class HelixHeadlessTerminal extends HelixElement {
   /** How many matches the search found, or `undefined` before one ran. */
   @state()
   private matchCount: number | undefined = undefined
+
+  /** Whether the regular expression in the field cannot be read, which the count says instead. */
+  @state()
+  private invalid = false
 
   /** Whether Tab moves focus, after Control+M. */
   @state()
@@ -760,6 +841,9 @@ export class HelixHeadlessTerminal extends HelixElement {
 
   /** The find bar's count, as the reader reads it. */
   private get countText(): string {
+    if (this.invalid) {
+      return this.findInvalidLabel
+    }
     return this.matchCount === undefined
       ? ''
       : formatWords(this, 'matchesLabel', {
@@ -883,6 +967,12 @@ export class HelixHeadlessTerminal extends HelixElement {
       void this.copySelection()
       return
     }
+    if (shortcut === 'paste') {
+      /* Kept from the program, which would read Control+V, and left to the
+         browser, whose paste the renderer takes as typed input. */
+      event.stopPropagation()
+      return
+    }
     if (shortcut === 'tab-focus') {
       event.preventDefault()
       event.stopPropagation()
@@ -923,12 +1013,33 @@ export class HelixHeadlessTerminal extends HelixElement {
 
   /** Searches for what the field holds, toward the bottom or with `backward` toward the top. */
   private search(backward: boolean, incremental = false): void {
-    if (this.query === '') {
+    if (this.query === '' || (this.findRegex && !readable(this.query))) {
+      this.invalid = this.query !== ''
       this.matchCount = undefined
       this.renderer?.findEnd?.()
+      if (this.invalid) {
+        this.say(this.findInvalidLabel)
+      }
       return
     }
-    this.renderer?.find?.(this.query, { backward, incremental })
+    this.invalid = false
+    this.renderer?.find?.(this.query, {
+      backward,
+      caseSensitive: this.findMatchCase,
+      incremental,
+      regex: this.findRegex,
+      wholeWord: this.findWholeWord,
+    })
+  }
+
+  /** Turns one of the find bar's options on or off, and searches again with it, staying on a match that still matches. */
+  private toggleOption(option: 'findMatchCase' | 'findRegex' | 'findWholeWord'): void {
+    this[option] = !this[option]
+    /* The old search ended first: xterm.js keeps the matches it found for a
+       term, and the same term searched again with another option counted the
+       old ones. */
+    this.renderer?.findEnd?.()
+    this.search(false, true)
   }
 
   private readonly handleFindInput = (event: Event): void => {
@@ -1112,6 +1223,36 @@ export class HelixHeadlessTerminal extends HelixElement {
       />
       <span part="find-count" aria-hidden="true">${this.countText}</span>
       <${toolbar} part="find-controls" exportparts="toolbar: find-controls-toolbar" label=${this.findControlsLabel}>
+        <${button}
+          part="find-match-case"
+          exportparts="button: find-match-case-button, live: find-match-case-live, spinner: find-match-case-spinner, text: find-match-case-text"
+          aria-pressed=${this.findMatchCase ? 'true' : 'false'}
+          label=${this.findMatchCaseLabel}
+          @click=${() => this.toggleOption('findMatchCase')}
+          @helix-press=${stopPress}
+        >
+          <slot name="find-match-case-icon">${drawIcon(textAa)}</slot>
+        </${button}>
+        <${button}
+          part="find-whole-word"
+          exportparts="button: find-whole-word-button, live: find-whole-word-live, spinner: find-whole-word-spinner, text: find-whole-word-text"
+          aria-pressed=${this.findWholeWord ? 'true' : 'false'}
+          label=${this.findWholeWordLabel}
+          @click=${() => this.toggleOption('findWholeWord')}
+          @helix-press=${stopPress}
+        >
+          <slot name="find-whole-word-icon">${drawIcon(textAUnderline)}</slot>
+        </${button}>
+        <${button}
+          part="find-regex"
+          exportparts="button: find-regex-button, live: find-regex-live, spinner: find-regex-spinner, text: find-regex-text"
+          aria-pressed=${this.findRegex ? 'true' : 'false'}
+          label=${this.findRegexLabel}
+          @click=${() => this.toggleOption('findRegex')}
+          @helix-press=${stopPress}
+        >
+          <slot name="find-regex-icon">${drawIcon(asterisk)}</slot>
+        </${button}>
         <slot name="find-actions" part="find-actions"></slot>
         <${button}
           part="find-previous"

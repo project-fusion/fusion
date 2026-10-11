@@ -35,6 +35,13 @@ describe('the keys a terminal frame takes', () => {
     expect(shortcutOf(press('c', { meta: true }), true)).toBeNull()
   })
 
+  test('Control+Shift+V pastes elsewhere, and a Mac pastes with Command+V on its own', () => {
+    expect(shortcutOf(press('V', { ctrl: true, shift: true }), false)).toBe('paste')
+    expect(shortcutOf(press('v', { ctrl: true }), false)).toBeNull()
+    expect(chordOf('paste', true)).toBeUndefined()
+    expect(shortcutOf(press('v', { meta: true }), true)).toBeNull()
+  })
+
   test('copy is the browser’s own on a Mac', () => {
     expect(chordOf('copy', true)).toBeUndefined()
     expect(spokenChord('copy', true)).toBe('')
