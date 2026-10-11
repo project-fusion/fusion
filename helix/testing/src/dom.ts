@@ -238,6 +238,16 @@ export const example = (_file: unknown, _styles?: unknown): Promise<HTMLElement>
 export const idle = (): Promise<void> =>
   Promise.reject(new Error('An example runs only in the browser harness.'))
 
+/**
+ * Waits until the next animation frame has run, which is when a
+ * `StatusController` puts its words in, resolved from the frame after it as
+ * the browser harness's is. happy-dom runs a frame on a timer of its own.
+ */
+export const nextFrame = (): Promise<void> =>
+  new Promise((done) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => done()))
+  })
+
 /** The browser harness's count of booked frames, which happy-dom never runs. */
 export const framesBooked = (_count: number): Promise<number> =>
   Promise.reject(new Error('Frames run only in the browser harness.'))
