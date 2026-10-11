@@ -1,0 +1,82 @@
+<!-- @summary Answering taps, swipes, keys, and buttons, and marking each tap where it landed. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<div class="layout">
+  <helix-device-screen
+    controls="back home recents screenshot"
+    id="phone"
+    label="Pixel 9"
+    screen-height="915"
+    screen-width="412"
+  >
+    <div class="stand-in">
+      <span class="date">Saturday, October 10</span>
+      <span class="time">9:41</span>
+    </div>
+  </helix-device-screen>
+
+  <helix-list
+    divided
+    id="log"
+    label="Events"
+  >
+    <helix-list-item>
+      No events yet
+      <span slot="description">Tap, swipe, or type on the screen</span>
+    </helix-list-item>
+  </helix-list>
+</div>
+
+<script type="module">
+  /* The screen sends events and your code drives the device. Call your
+     simulator or emulator here. The preview writes each event in the log. */
+  const phone = document.getElementById('phone')
+  const log = document.getElementById('log')
+  let empty = true
+
+  // The log keeps this many of the most recent rows.
+  const KEEP = 6
+
+  const say = (name, carried) => {
+    if (empty) {
+      log.replaceChildren()
+      empty = false
+    }
+    const row = document.createElement('helix-list-item')
+    row.textContent = name
+    const under = document.createElement('span')
+    under.slot = 'description'
+    under.textContent = carried
+    row.append(under)
+    log.append(row)
+    while (log.children.length > KEEP) {
+      log.firstElementChild.remove()
+    }
+  }
+
+  const point = (x, y) => `${Math.round(x)}, ${Math.round(y)}`
+
+  phone.addEventListener('helix-device-tap', (event) => {
+    const { duration, x, y } = event.detail
+    phone.showTap(x, y)
+    say('helix-device-tap', `${point(x, y)} for ${duration} ms`)
+  })
+  phone.addEventListener('helix-device-swipe', (event) => {
+    const { fromX, fromY, toX, toY } = event.detail
+    say('helix-device-swipe', `${point(fromX, fromY)} to ${point(toX, toY)}`)
+  })
+  phone.addEventListener('helix-device-key', (event) => {
+    if (event.detail.phase === 'down') {
+      say('helix-device-key', event.detail.code)
+    }
+  })
+  phone.addEventListener('helix-device-button', (event) => {
+    say('helix-device-button', event.detail.button)
+  })
+  phone.addEventListener('helix-device-screenshot', () => {
+    say('helix-device-screenshot', 'take a screenshot')
+  })
+</script>

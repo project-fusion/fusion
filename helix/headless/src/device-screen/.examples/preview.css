@@ -1,0 +1,88 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_radius-control: 0.25rem;
+}
+
+helix-headless-device-screen::part(region) {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+}
+
+helix-headless-device-screen::part(controls) {
+  display: flex;
+  gap: 0.25rem;
+}
+
+helix-headless-device-screen::part(home),
+helix-headless-device-screen::part(screenshot) {
+  align-items: center;
+  background-color: var(--_gray-subtle);
+  block-size: 2rem;
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  color: var(--_gray-strong);
+  cursor: pointer;
+  display: inline-flex;
+  inline-size: 2rem;
+  justify-content: center;
+  padding: 0;
+}
+
+helix-headless-device-screen::part(bezel) {
+  background-color: #1c1c1e;
+  border-radius: 2.75rem;
+  padding: 0.75rem;
+}
+
+helix-headless-device-screen::part(screen) {
+  aspect-ratio: var(--device-screen-ratio);
+  background-color: #000;
+  border-radius: 2rem;
+  inline-size: 15rem;
+  overflow: hidden;
+  position: relative;
+  touch-action: none;
+}
+
+helix-headless-device-screen::part(picture) {
+  inset: 0;
+  position: absolute;
+}
+
+helix-headless-device-screen::part(touch) {
+  border: 2px solid #fff;
+  border-radius: 50%;
+  inline-size: 2rem;
+  aspect-ratio: 1;
+  left: var(--device-screen-touch-x);
+  position: absolute;
+  top: var(--device-screen-touch-y);
+  translate: -50% -50%;
+}
+
+.stand-in {
+  align-items: center;
+  background-image: linear-gradient(165deg, #2d3a8c, #6b2d6e);
+  block-size: 100%;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding-block-start: 22%;
+}
+
+.date {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.time {
+  font-size: 3.5rem;
+  font-weight: 600;
+  line-height: 1;
+}
