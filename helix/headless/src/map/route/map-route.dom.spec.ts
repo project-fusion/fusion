@@ -2,6 +2,12 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { MapPoint } from './map-route.js'
 
+/** The native button inside a control, which is what a screen reader is on. */
+const inner = async (control: Element | null | undefined): Promise<HTMLButtonElement | null> => {
+  await (control as { updateComplete?: Promise<unknown> } | null | undefined)?.updateComplete
+  return control?.shadowRoot?.querySelector('button') ?? null
+}
+
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
@@ -115,15 +121,15 @@ describe('map layers menu', () => {
     const host = await menuFrame()
     const toggle = part(host, 'layers-toggle') as HTMLButtonElement
     const menu = part(host, 'layers-menu') as HTMLElement
-    expect(toggle.getAttribute('aria-label')).toBe('Map layers')
-    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    expect((await inner(toggle))?.getAttribute('aria-label')).toBe('Map layers')
+    expect((await inner(toggle))?.getAttribute('aria-expanded')).toBe('false')
     expect(menu.hidden).toBe(true)
     const scope = toggle.getRootNode() as ShadowRoot
     expect(scope.getElementById(toggle.getAttribute('aria-controls') ?? '')).toBe(menu)
 
     toggle.click()
     await host.updateComplete
-    expect(toggle.getAttribute('aria-expanded')).toBe('true')
+    expect((await inner(toggle))?.getAttribute('aria-expanded')).toBe('true')
     expect(menu.hidden).toBe(false)
     const choices = [...menu.querySelectorAll('[part="layer-choice"]')].map((one) => [
       one.tagName,
@@ -270,7 +276,7 @@ describe('map layers menu', () => {
     leave(tile, part(host, 'zoom-in') as HTMLElement)
     await host.updateComplete
     expect(menu.hidden).toBe(true)
-    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    expect((await inner(toggle))?.getAttribute('aria-expanded')).toBe('false')
   })
 
   test('layers in one group are one tile, named by the first, that shows or hides them all', async () => {

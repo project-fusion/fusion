@@ -39,7 +39,7 @@ import { styles } from './icon-button-root.css.js'
  * @cssproperty --icon-button-background-color-active - Fill behind the button while it is pressed. Without it, a press shows the fill of the state under it.
  * @cssproperty --icon-button-background-color-hover - Fill behind the button under the pointer. Without it, `--icon-button-background-color` also applies on hover.
  * @cssproperty --icon-button-border-color - Edge color of the control, where its emphasis or `raised` draws an edge.
- * @cssproperty --icon-button-border-width - Edge width of the control. The theme's floating edge on a raised button, `--helix-border-floating`.
+ * @cssproperty --icon-button-border-width - Edge width of the control, one to four widths as `border-width` takes them. The theme's floating edge on a raised button, `--helix-border-floating`.
  * @cssproperty --icon-button-foreground-color - Icon color.
  * @cssproperty --icon-button-foreground-color-active - Icon color while the button is pressed. Without it, a press shows the color of the state under it.
  * @cssproperty --icon-button-radius - Corner radius of the control, which a group flattens through `--button-radius-start` and `--button-radius-end`, or a corner at a time through `--button-radius-start-start`, `--button-radius-start-end`, `--button-radius-end-start` and `--button-radius-end-end`, as Button reads them.

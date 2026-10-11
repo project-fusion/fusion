@@ -6,6 +6,12 @@ import type {
 import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 import type { GraphNode } from './graph-model.js'
 
+/** The native button inside a control, which is what a screen reader is on. */
+const inner = async (control: Element | null | undefined): Promise<HTMLButtonElement | null> => {
+  await (control as { updateComplete?: Promise<unknown> } | null | undefined)?.updateComplete
+  return control?.shadowRoot?.querySelector('button') ?? null
+}
+
 /* Imported once the DOM is registered: core reads the globals it finds as
    it is evaluated, and a static import breaks the DOM when this file runs
    first. */
@@ -88,7 +94,7 @@ describe('a graph on a page in another language', () => {
     registerWords('de', GERMAN)
     const host = await graph('lang="de"')
     expect(part(host, 'controls')?.getAttribute('aria-label')).toBe('Graph-Steuerung')
-    expect(part(host, 'zoom-in')?.getAttribute('aria-label')).toBe('Vergrößern')
+    expect((await inner(part(host, 'zoom-in')))?.getAttribute('aria-label')).toBe('Vergrößern')
   })
 
   test('keeps the English of its controls where nothing is registered', async () => {

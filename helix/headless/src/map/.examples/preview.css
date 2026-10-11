@@ -88,13 +88,13 @@ helix-headless-map::part(fullscreen) {
   grid-area: full;
 }
 
-helix-headless-map::part(pan-up),
-helix-headless-map::part(pan-start),
-helix-headless-map::part(pan-end),
-helix-headless-map::part(pan-down),
-helix-headless-map::part(zoom-in),
-helix-headless-map::part(zoom-out),
-helix-headless-map::part(fullscreen) {
+helix-headless-map::part(pan-up-button),
+helix-headless-map::part(pan-start-button),
+helix-headless-map::part(pan-end-button),
+helix-headless-map::part(pan-down-button),
+helix-headless-map::part(zoom-in-button),
+helix-headless-map::part(zoom-out-button),
+helix-headless-map::part(fullscreen-button) {
   background-color: var(--_gray-surface);
   block-size: 2rem;
   border: 1px solid var(--_gray-edge);

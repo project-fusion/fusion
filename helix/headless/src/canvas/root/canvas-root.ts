@@ -39,6 +39,8 @@ import {
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import type { StaticValue } from 'lit/static-html.js'
+import '../../icon-button/index.js'
 import { arrangement, type CanvasArrangeOptions } from '../arrange.js'
 import { descriptionOf } from '../describe.js'
 import { HelixHeadlessCanvasEdge } from '../edge/canvas-edge.js'
@@ -377,6 +379,10 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @csspart edges - A layer the connectors are drawn in: one holding the arrowhead, and one after each card holding the connections leaving it, so they are read in the order the arrows walk them. Give it `z-index: -1` to draw it under the cards.
  * @csspart footer - The strip below the board.
  * @csspart fullscreen - The button that makes the board fill the screen.
+ * @csspart fullscreen-button - `fullscreen`'s inner button.
+ * @csspart fullscreen-live - `fullscreen`'s live region, which speaks while it is pending.
+ * @csspart fullscreen-spinner - The ring `fullscreen` turns while it is pending.
+ * @csspart fullscreen-text - The box `fullscreen`'s glyph sits in.
  * @csspart gesture-hint - Words over the board for a moment when it lets a gesture pass to the page, such as how to zoom it.
  * @csspart gesture-status - The line shown while a board with `gestures="activate"` has the gestures.
  * @csspart header - The strip above the board.
@@ -388,13 +394,37 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @csspart minimap-node - One card in the minimap.
  * @csspart minimap-view - The frame in the minimap around what is on screen.
  * @csspart pan-down - The button that moves the board down.
+ * @csspart pan-down-button - `pan-down`'s inner button.
+ * @csspart pan-down-live - `pan-down`'s live region, which speaks while it is pending.
+ * @csspart pan-down-spinner - The ring `pan-down` turns while it is pending.
+ * @csspart pan-down-text - The box `pan-down`'s glyph sits in.
  * @csspart pan-end - The button that moves the board toward the end of a line of text: right in English.
+ * @csspart pan-end-button - `pan-end`'s inner button.
+ * @csspart pan-end-live - `pan-end`'s live region, which speaks while it is pending.
+ * @csspart pan-end-spinner - The ring `pan-end` turns while it is pending.
+ * @csspart pan-end-text - The box `pan-end`'s glyph sits in.
  * @csspart pan-start - The button that moves the board toward the start of a line of text: left in English.
+ * @csspart pan-start-button - `pan-start`'s inner button.
+ * @csspart pan-start-live - `pan-start`'s live region, which speaks while it is pending.
+ * @csspart pan-start-spinner - The ring `pan-start` turns while it is pending.
+ * @csspart pan-start-text - The box `pan-start`'s glyph sits in.
  * @csspart pan-up - The button that moves the board up.
+ * @csspart pan-up-button - `pan-up`'s inner button.
+ * @csspart pan-up-live - `pan-up`'s live region, which speaks while it is pending.
+ * @csspart pan-up-spinner - The ring `pan-up` turns while it is pending.
+ * @csspart pan-up-text - The box `pan-up`'s glyph sits in.
  * @csspart region - The named region the board is drawn in.
  * @csspart viewport - The box the board is drawn inside.
  * @csspart zoom-in - The button that zooms in.
+ * @csspart zoom-in-button - `zoom-in`'s inner button.
+ * @csspart zoom-in-live - `zoom-in`'s live region, which speaks while it is pending.
+ * @csspart zoom-in-spinner - The ring `zoom-in` turns while it is pending.
+ * @csspart zoom-in-text - The box `zoom-in`'s glyph sits in.
  * @csspart zoom-out - The button that zooms out.
+ * @csspart zoom-out-button - `zoom-out`'s inner button.
+ * @csspart zoom-out-live - `zoom-out`'s live region, which speaks while it is pending.
+ * @csspart zoom-out-spinner - The ring `zoom-out` turns while it is pending.
+ * @csspart zoom-out-text - The box `zoom-out`'s glyph sits in.
  *
  * @cssproperty --canvas-zoom - The board's zoom, which the board writes: 1 at the document's own size, 0.5 at half. The cards inherit it, so a card's stylesheet can draw less when the board is far out, such as a border that stays one pixel wide at `calc(1px / var(--canvas-zoom))`.
  *
@@ -1093,6 +1123,14 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
           toSide: edge.toSide ?? kept.to,
         })
       })
+  }
+
+  /**
+   * The board's controls, each an Icon Button: named here, where this family's
+   * imports register it, though the surface draws most of them.
+   */
+  protected override get controlTag(): StaticValue {
+    return this.tag('icon-button')
   }
 
   /** The events this family names for itself, the surface being shared. */

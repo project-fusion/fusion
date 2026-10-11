@@ -11,6 +11,12 @@ import {
 } from '@fusion.dev/helix-testing/dom'
 import type { GraphLink, GraphNode } from './graph-model.js'
 
+/** The native button inside a control, which is what a screen reader is on. */
+const inner = async (control: Element | null | undefined): Promise<HTMLButtonElement | null> => {
+  await (control as { updateComplete?: Promise<unknown> } | null | undefined)?.updateComplete
+  return control?.shadowRoot?.querySelector('button') ?? null
+}
+
 /**
  * The height the headless tier does not choose, and the list cannot draw only
  * what is in view without.
@@ -563,13 +569,13 @@ describe('graph frame', () => {
     const panel = part(host, 'panel') as HTMLElement
     const toggle = part(host, 'notes-toggle') as HTMLButtonElement
     expect(panel.hidden).toBe(true)
-    expect(toggle.getAttribute('aria-label')).toBe('Notes')
-    expect(toggle.getAttribute('aria-expanded')).toBe('false')
+    expect((await inner(toggle))?.getAttribute('aria-label')).toBe('Notes')
+    expect((await inner(toggle))?.getAttribute('aria-expanded')).toBe('false')
     expect(host.shadowRoot?.getElementById(toggle.getAttribute('aria-controls') ?? '')).toBe(panel)
     toggle.click()
     await settle(host)
     expect(panel.hidden).toBe(false)
-    expect(toggle.getAttribute('aria-expanded')).toBe('true')
+    expect((await inner(toggle))?.getAttribute('aria-expanded')).toBe('true')
     expect(hasState(host, 'panel-open')).toBe(true)
     expect(host.shadowRoot?.activeElement).toBe(part(host, 'search-field'))
     key(part(host, 'search-field') as HTMLElement, 'Escape')

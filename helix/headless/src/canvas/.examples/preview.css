@@ -111,9 +111,9 @@ helix-headless-canvas::part(controls) {
   position: absolute;
 }
 
-helix-headless-canvas::part(zoom-in),
-helix-headless-canvas::part(zoom-out),
-helix-headless-canvas::part(fullscreen) {
+helix-headless-canvas::part(zoom-in-button),
+helix-headless-canvas::part(zoom-out-button),
+helix-headless-canvas::part(fullscreen-button) {
   background-color: var(--_gray-surface);
   block-size: 2rem;
   border: 1px solid var(--_gray-edge);

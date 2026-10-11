@@ -74,6 +74,33 @@ describe('map frame hooks', () => {
   /* Browser only: happy-dom computes no styles from a shadow sheet. */
   const run = hasLayout() ? test : (): void => {}
 
+  run(
+    'the layers button names its menu as what it controls, from inside its Icon Button',
+    async () => {
+      const frame = (await mount(
+        `<helix-map label="A" controls="layers">
+        <canvas></canvas>
+        <helix-map-route label="Route"></helix-map-route>
+      </helix-map>`,
+      )) as Frame
+      await frame.updateComplete
+      const toggle = frame.shadowRoot?.querySelector('[part="layers-toggle"]') as Element & {
+        updateComplete: Promise<unknown>
+      }
+      await toggle.updateComplete
+      const button = toggle.shadowRoot?.querySelector('[part="button"]') as Element & {
+        ariaControlsElements?: Element[] | null
+      }
+      /* An id copied into the Icon Button's shadow root named nothing there, so
+       the menu travels as the element, where the engine reflects it. */
+      if ('ariaControlsElements' in button) {
+        expect(button.ariaControlsElements?.[0]).toBe(
+          frame.shadowRoot?.getElementById('layers-menu'),
+        )
+      }
+    },
+  )
+
   run('the frame, the credit, the needle and the layers menu take their hooks', async () => {
     const frame = (await mount(
       `<helix-map label="A" controls="zoom tilt compass layers" pitch="30" style="--map-radius: 3px; --map-attribution-color: rgb(1, 2, 3); --map-attribution-font-size: 17px; --map-needle-north-color: rgb(7, 8, 9); --map-layers-menu-padding: 5px; --map-chosen-color: rgb(13, 14, 15)">
@@ -88,7 +115,15 @@ describe('map frame hooks', () => {
     expect(style('[part="region"]').borderTopLeftRadius).toBe('3px')
     expect([credit.color, credit.fontSize]).toEqual(['rgb(1, 2, 3)', '17px'])
     expect(style('[part="needle"] [data-end="north"]').fill).toBe('rgb(7, 8, 9)')
-    expect(style('[part~="tilt"]').backgroundColor).toBe('rgb(13, 14, 15)')
+    /* 3D is an Icon Button: the chosen color is its button's ground. */
+    const tilt = frame.shadowRoot?.querySelector('[part~="tilt"]') as Element & {
+      updateComplete: Promise<unknown>
+    }
+    await tilt.updateComplete
+    expect(
+      getComputedStyle(tilt.shadowRoot?.querySelector('[part="button"]') as Element)
+        .backgroundColor,
+    ).toBe('rgb(13, 14, 15)')
     expect(style('[part="layers-menu"]').padding).toBe('5px')
   })
 })

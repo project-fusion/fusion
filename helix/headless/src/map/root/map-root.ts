@@ -39,6 +39,8 @@ import {
 } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { type StaticValue, html as staticHtml } from 'lit/static-html.js'
+import '../../icon-button/index.js'
 import { live } from 'lit/directives/live.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { HelixHeadlessMapMarker } from '../marker/map-marker.js'
@@ -121,6 +123,13 @@ const ASK_LAPSES = 3000
 
 /** How long the view must be still before what it did is said, in milliseconds. */
 const SETTLES = 400
+
+/**
+ * Keeps a press on one of the map's own controls inside the map: the page
+ * hears what the control did, through the map's events, and not that a button
+ * inside it was pressed.
+ */
+const stopPress = (event: Event): void => event.stopPropagation()
 
 /**
  * @summary A frame around a map drawn by another library.
@@ -214,8 +223,16 @@ const SETTLES = 400
  * @csspart compass - The compass and the pan and rotate buttons around it.
  * @csspart controls - The column of buttons that move the map, a toolbar and one tab stop.
  * @csspart face-north - The compass: its needle points north as the map turns, and pressing it turns the map to face north.
+ * @csspart face-north-button - `face-north`'s inner button.
+ * @csspart face-north-live - `face-north`'s live region, which speaks while it is pending.
+ * @csspart face-north-spinner - The ring `face-north` turns while it is pending.
+ * @csspart face-north-text - The box `face-north`'s glyph sits in.
  * @csspart footer - The strip below the map.
  * @csspart fullscreen - The button that makes the map fill the screen.
+ * @csspart fullscreen-button - `fullscreen`'s inner button.
+ * @csspart fullscreen-live - `fullscreen`'s live region, which speaks while it is pending.
+ * @csspart fullscreen-spinner - The ring `fullscreen` turns while it is pending.
+ * @csspart fullscreen-text - The box `fullscreen`'s glyph sits in.
  * @csspart gesture-hint - Words over the map for a moment when it lets a gesture pass to the page, such as how to zoom it.
  * @csspart gesture-status - The line shown while a map with `gestures="activate"` has the gestures.
  * @csspart header - The strip above the map.
@@ -227,6 +244,10 @@ const SETTLES = 400
  * @csspart layers - The list of the map's shown layers, such as routes, areas, and points, read by screen readers.
  * @csspart layers-menu - The menu of the map's layers, which the layers button opens.
  * @csspart layers-toggle - The button that opens and closes the layers menu.
+ * @csspart layers-toggle-button - `layers-toggle`'s inner button.
+ * @csspart layers-toggle-live - `layers-toggle`'s live region, which speaks while it is pending.
+ * @csspart layers-toggle-spinner - The ring `layers-toggle` turns while it is pending.
+ * @csspart layers-toggle-text - The box `layers-toggle`'s glyph sits in.
  * @csspart live - What screen readers hear after the map moves: the zoom level, the way it faces, its tilt, or the way it moved. Visually hidden in the styled tier.
  * @csspart map-type - One map type's card in the layers menu: a radio button, its picture, and its name.
  * @csspart map-type-name - The name on a map type's card.
@@ -234,16 +255,52 @@ const SETTLES = 400
  * @csspart map-types - The map-type cards at the top of the layers menu, where the map has imagery.
  * @csspart needle - The compass needle, turned to point north.
  * @csspart pan-down - The button that pans the map down.
+ * @csspart pan-down-button - `pan-down`'s inner button.
+ * @csspart pan-down-live - `pan-down`'s live region, which speaks while it is pending.
+ * @csspart pan-down-spinner - The ring `pan-down` turns while it is pending.
+ * @csspart pan-down-text - The box `pan-down`'s glyph sits in.
  * @csspart pan-end - The button that pans toward the end of a line of text: right in English.
+ * @csspart pan-end-button - `pan-end`'s inner button.
+ * @csspart pan-end-live - `pan-end`'s live region, which speaks while it is pending.
+ * @csspart pan-end-spinner - The ring `pan-end` turns while it is pending.
+ * @csspart pan-end-text - The box `pan-end`'s glyph sits in.
  * @csspart pan-start - The button that pans toward the start of a line of text: left in English.
+ * @csspart pan-start-button - `pan-start`'s inner button.
+ * @csspart pan-start-live - `pan-start`'s live region, which speaks while it is pending.
+ * @csspart pan-start-spinner - The ring `pan-start` turns while it is pending.
+ * @csspart pan-start-text - The box `pan-start`'s glyph sits in.
  * @csspart pan-up - The button that pans the map up.
+ * @csspart pan-up-button - `pan-up`'s inner button.
+ * @csspart pan-up-live - `pan-up`'s live region, which speaks while it is pending.
+ * @csspart pan-up-spinner - The ring `pan-up` turns while it is pending.
+ * @csspart pan-up-text - The box `pan-up`'s glyph sits in.
  * @csspart region - The named region the map sits in.
  * @csspart rotate-left - The button that turns the map counterclockwise.
+ * @csspart rotate-left-button - `rotate-left`'s inner button.
+ * @csspart rotate-left-live - `rotate-left`'s live region, which speaks while it is pending.
+ * @csspart rotate-left-spinner - The ring `rotate-left` turns while it is pending.
+ * @csspart rotate-left-text - The box `rotate-left`'s glyph sits in.
  * @csspart rotate-right - The button that turns the map clockwise.
+ * @csspart rotate-right-button - `rotate-right`'s inner button.
+ * @csspart rotate-right-live - `rotate-right`'s live region, which speaks while it is pending.
+ * @csspart rotate-right-spinner - The ring `rotate-right` turns while it is pending.
+ * @csspart rotate-right-text - The box `rotate-right`'s glyph sits in.
  * @csspart tilt - The 3D button, which tilts the map and makes it flat again. Pressed while the map is tilted.
+ * @csspart tilt-button - `tilt`'s inner button.
+ * @csspart tilt-live - `tilt`'s live region, which speaks while it is pending.
+ * @csspart tilt-spinner - The ring `tilt` turns while it is pending.
+ * @csspart tilt-text - The box `tilt`'s glyph sits in.
  * @csspart viewport - The box the map is drawn in.
  * @csspart zoom-in - The button that zooms in.
+ * @csspart zoom-in-button - `zoom-in`'s inner button.
+ * @csspart zoom-in-live - `zoom-in`'s live region, which speaks while it is pending.
+ * @csspart zoom-in-spinner - The ring `zoom-in` turns while it is pending.
+ * @csspart zoom-in-text - The box `zoom-in`'s glyph sits in.
  * @csspart zoom-out - The button that zooms out.
+ * @csspart zoom-out-button - `zoom-out`'s inner button.
+ * @csspart zoom-out-live - `zoom-out`'s live region, which speaks while it is pending.
+ * @csspart zoom-out-spinner - The ring `zoom-out` turns while it is pending.
+ * @csspart zoom-out-text - The box `zoom-out`'s glyph sits in.
  *
  * @cssproperty --map-needle-turn - How far the needle turns to point north, as an angle. The frame writes it from `bearing`.
  *
@@ -1052,12 +1109,16 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       return nothing
     }
     const entries = this.layerEntries
-    return html`<button
+    const button = this.controlTag
+    const { material, raised } = this.controlAxes
+    return staticHtml`<${button}
         part="layers-toggle"
+        exportparts="button: layers-toggle-button, live: layers-toggle-live, spinner: layers-toggle-spinner, text: layers-toggle-text"
         aria-controls="layers-menu"
-        aria-expanded=${this.layersOpen ? 'true' : 'false'}
-        aria-label=${this.layersLabel}
-        type="button"
+        .expanded=${this.layersOpen}
+        label=${this.layersLabel}
+        material=${material ?? nothing}
+        ?raised=${raised}
         @click=${() => {
           this.layersOpen = !this.layersOpen
           /* Opening asks the connector for fresh previews of the map types. */
@@ -1066,6 +1127,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
           }
         }}
         @focusout=${this.handleMenuFocusOut}
+        @helix-press=${stopPress}
         @keydown=${this.handleMenuKeydown}
       >
         <slot name="layers-icon">
@@ -1073,7 +1135,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
             ${unsafeSVG(stack.content)}
           </svg>
         </slot>
-      </button>
+      </${button}>
       <div
         part="layers-menu"
         id="layers-menu"
@@ -1149,55 +1211,110 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    */
   protected renderCompass(pan: boolean, rotate: boolean): TemplateResult {
     const { faceNorthLabel } = this
-    return html`<div part="compass">
+    const button = this.controlTag
+    const { material, raised } = this.controlAxes
+    const ground = material ?? nothing
+    /* The arrows are bare on the disc, so only the compass floats. */
+    return staticHtml`<div part="compass">
       ${
         rotate
-          ? html`<button part="rotate-left" aria-label=${this.rotateLeftLabel} type="button" @click=${() => this.rotate(-ROTATE_STEP)}>
+          ? staticHtml`<${button}
+              part="rotate-left"
+              exportparts="button: rotate-left-button, live: rotate-left-live, spinner: rotate-left-spinner, text: rotate-left-text"
+              label=${this.rotateLeftLabel}
+              material=${ground}
+              @click=${() => this.rotate(-ROTATE_STEP)}
+              @helix-press=${stopPress}
+            >
               <slot name="rotate-left-icon">↺</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
       ${
         pan
-          ? html`<button part="pan-up" aria-label=${this.panLabel('up')} type="button" @click=${() => this.pan('up')}>
+          ? staticHtml`<${button}
+              part="pan-up"
+              exportparts="button: pan-up-button, live: pan-up-live, spinner: pan-up-spinner, text: pan-up-text"
+              label=${this.panLabel('up')}
+              material=${ground}
+              @click=${() => this.pan('up')}
+              @helix-press=${stopPress}
+            >
               <slot name="pan-up-icon">${this.panGlyph('up')}</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
       ${
         rotate
-          ? html`<button part="rotate-right" aria-label=${this.rotateRightLabel} type="button" @click=${() => this.rotate(ROTATE_STEP)}>
+          ? staticHtml`<${button}
+              part="rotate-right"
+              exportparts="button: rotate-right-button, live: rotate-right-live, spinner: rotate-right-spinner, text: rotate-right-text"
+              label=${this.rotateRightLabel}
+              material=${ground}
+              @click=${() => this.rotate(ROTATE_STEP)}
+              @helix-press=${stopPress}
+            >
               <slot name="rotate-right-icon">↻</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
       ${
         pan
-          ? html`<button part="pan-start" aria-label=${this.panLabel('start')} type="button" @click=${() => this.pan('start')}>
+          ? staticHtml`<${button}
+              part="pan-start"
+              exportparts="button: pan-start-button, live: pan-start-live, spinner: pan-start-spinner, text: pan-start-text"
+              label=${this.panLabel('start')}
+              material=${ground}
+              @click=${() => this.pan('start')}
+              @helix-press=${stopPress}
+            >
               <slot name="pan-start-icon">${this.panGlyph('start')}</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
-      <button part="face-north" aria-label=${faceNorthLabel} type="button" style=${`--map-needle-turn: ${-this.bearing}deg`} @click=${() => this.faceNorth()}>
+      <${button}
+        part="face-north"
+        exportparts="button: face-north-button, live: face-north-live, spinner: face-north-spinner, text: face-north-text"
+        label=${faceNorthLabel}
+        material=${ground}
+        ?raised=${raised}
+        style=${`--map-needle-turn: ${-this.bearing}deg`}
+        @click=${() => this.faceNorth()}
+        @helix-press=${stopPress}
+      >
         <slot name="face-north-icon">
           <svg part="needle" aria-hidden="true" viewBox="0 0 16 16">
             <path data-end="north" d="M8 1.5 10.5 8h-5Z" />
             <path data-end="south" d="M8 14.5 5.5 8h5Z" />
           </svg>
         </slot>
-      </button>
+      </${button}>
       ${
         pan
-          ? html`<button part="pan-end" aria-label=${this.panLabel('end')} type="button" @click=${() => this.pan('end')}>
+          ? staticHtml`<${button}
+              part="pan-end"
+              exportparts="button: pan-end-button, live: pan-end-live, spinner: pan-end-spinner, text: pan-end-text"
+              label=${this.panLabel('end')}
+              material=${ground}
+              @click=${() => this.pan('end')}
+              @helix-press=${stopPress}
+            >
               <slot name="pan-end-icon">${this.panGlyph('end')}</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
       ${
         pan
-          ? html`<button part="pan-down" aria-label=${this.panLabel('down')} type="button" @click=${() => this.pan('down')}>
+          ? staticHtml`<${button}
+              part="pan-down"
+              exportparts="button: pan-down-button, live: pan-down-live, spinner: pan-down-spinner, text: pan-down-text"
+              label=${this.panLabel('down')}
+              material=${ground}
+              @click=${() => this.pan('down')}
+              @helix-press=${stopPress}
+            >
               <slot name="pan-down-icon">${this.panGlyph('down')}</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
     </div>`
@@ -1222,42 +1339,67 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     if (!pan && !zoom && !rotate && !tilt && !fullscreen && menu === nothing) {
       return nothing
     }
-    return html`<div part="controls" role="toolbar" aria-label=${this.controlsLabel}>
+    const button = this.controlTag
+    const { material, raised } = this.controlAxes
+    const ground = material ?? nothing
+    return staticHtml`<div part="controls" role="toolbar" aria-label=${this.controlsLabel}>
       ${
         fullscreen
-          ? html`<button
+          ? staticHtml`<${button}
               part="fullscreen"
-              aria-label=${this.fullscreenLabel}
+              exportparts="button: fullscreen-button, live: fullscreen-live, spinner: fullscreen-spinner, text: fullscreen-text"
               aria-pressed=${this.filled ? 'true' : 'false'}
-              type="button"
+              label=${this.fullscreenLabel}
+              material=${ground}
+              ?raised=${raised}
               @click=${this.toggleFullscreen}
+              @helix-press=${stopPress}
             >
               <slot name="fullscreen-icon">⤢</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
       ${menu}
       ${
         tilt
-          ? html`<button
+          ? staticHtml`<${button}
               part="tilt"
-              aria-label=${this.tiltLabel}
+              exportparts="button: tilt-button, live: tilt-live, spinner: tilt-spinner, text: tilt-text"
               aria-pressed=${this.pitch > 0 ? 'true' : 'false'}
-              type="button"
+              label=${this.tiltLabel}
+              material=${ground}
+              ?raised=${raised}
               @click=${() => this.tiltTo(this.pitch > 0 ? 0 : TILTED)}
+              @helix-press=${stopPress}
             >
               <slot name="tilt-icon">3D</slot>
-            </button>`
+            </${button}>`
           : nothing
       }
       ${
         zoom
-          ? html`<button part="zoom-in" aria-label=${this.zoomInLabel} type="button" @click=${() => this.zoom(1)}>
+          ? staticHtml`<${button}
+                part="zoom-in"
+                exportparts="button: zoom-in-button, live: zoom-in-live, spinner: zoom-in-spinner, text: zoom-in-text"
+                label=${this.zoomInLabel}
+                material=${ground}
+                ?raised=${raised}
+                @click=${() => this.zoom(1)}
+                @helix-press=${stopPress}
+              >
                 <slot name="zoom-in-icon">+</slot>
-              </button>
-              <button part="zoom-out" aria-label=${this.zoomOutLabel} type="button" @click=${() => this.zoom(-1)}>
+              </${button}>
+              <${button}
+                part="zoom-out"
+                exportparts="button: zoom-out-button, live: zoom-out-live, spinner: zoom-out-spinner, text: zoom-out-text"
+                label=${this.zoomOutLabel}
+                material=${ground}
+                ?raised=${raised}
+                @click=${() => this.zoom(-1)}
+                @helix-press=${stopPress}
+              >
                 <slot name="zoom-out-icon">−</slot>
-              </button>`
+              </${button}>`
           : nothing
       }
       ${this.drawsCompass ? this.renderCompass(pan, rotate) : nothing}
@@ -1300,6 +1442,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       return true
     }
     return false
+  }
+
+  /**
+   * The map's controls, each an Icon Button: named here, where this family's
+   * imports register it, though the surface draws most of them.
+   */
+  protected override get controlTag(): StaticValue {
+    return this.tag('icon-button')
   }
 
   /** The events this family names, the surface naming none of its own. */

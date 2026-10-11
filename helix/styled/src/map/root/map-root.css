@@ -136,39 +136,9 @@
 /* **Material is the controls' ground**, the one part of the frame that lies
    over the map: glass lets the map through under a blur, so a reader keeps
    their place under the buttons rather than losing a corner of it to nine
-   opaque squares. The filter and the translucent ground go together, for the
-   reason `Card` gives: either alone does nothing a reader can see. */
-:host([material="glass"]) [part="controls"] button {
-  backdrop-filter: var(--helix-material-backdrop);
-  background-color: var(--viewport-control-background-color, var(--helix-material-translucent));
-}
-
-/* The same pair turned up, for a map busy enough that glass is not legible. */
-:host([material="frosted"]) [part="controls"] button {
-  backdrop-filter: blur(var(--helix-material-blur-lg));
-  background-color: var(
-    --viewport-control-background-color,
-    var(--helix-material-translucent-strong)
-  );
-}
-
-/* No ground at all: the glyphs over the map, for a map quiet enough to hold
-   them. */
-:host([material="transparent"]) [part="controls"] button {
-  backdrop-filter: none;
-  background-color: var(--viewport-control-background-color, transparent);
-}
-
-/* Pointed at, whatever the ground: the overlay with a little of the ink in
-   it, so a button a reader is on reads as the one they are on over glass as
-   well as over nothing. */
-:host([material]) [part="controls"] button:hover {
-  background-color: color-mix(
-    in oklab,
-    var(--helix-color-foreground) 10%,
-    var(--helix-color-surface-overlay)
-  );
-}
+   opaque squares. The frame hands its `material` to each Icon Button, which
+   draws the pair, the filter and the translucent ground, and its pointed-at
+   wash. */
 
 /* **Printed as it stands rather than hidden.** A map is the content of the page
    it is on often enough that dropping it would be the surprising answer, and
@@ -196,17 +166,20 @@
   grid-row: 2 / 3;
 }
 
-/* **Zoom in and out are one piece**, square where they meet, and the edge
-   between them is zoom in's. Named under the controls, to outrank the
-   corner every button in them takes. */
+/* **Zoom in and out are one piece**, square where they meet, through the
+   corner hooks a group stacking down hands a button, and the edge between
+   them is zoom in's: zoom out takes the floating edge on its other three
+   sides, and the lift the pair shares. */
 [part="controls"] [part="zoom-in"] {
-  border-end-end-radius: 0;
-  border-end-start-radius: 0;
+  --button-radius-end-end: var(--helix-radii-none);
+  --button-radius-end-start: var(--helix-radii-none);
 }
 [part="controls"] [part="zoom-out"] {
-  border-block-start: 0;
-  border-start-end-radius: 0;
-  border-start-start-radius: 0;
+  --button-radius-start-end: var(--helix-radii-none);
+  --button-radius-start-start: var(--helix-radii-none);
+  --icon-button-border-width: 0 var(--helix-border-floating) var(--helix-border-floating);
+  --icon-button-shadow: var(--helix-shadow-floating);
+
   margin-block-start: calc(-1 * var(--helix-space-2xs));
 }
 
@@ -227,13 +200,10 @@
 /* **Pressed while the map is tilted**, in the brand's fill, so the one
    toggle among the buttons says which view is showing. */
 [part="tilt"][aria-pressed="true"] {
-  background-color: var(--map-chosen-color, var(--helix-color-primary-surface));
-  border-color: var(--map-chosen-color, var(--helix-color-primary-surface));
-  color: var(--helix-color-foreground-on-primary);
-}
-
-[part="tilt"][aria-pressed="true"]:hover {
-  background-color: var(--helix-color-primary-surface-hover);
+  --icon-button-background-color: var(--map-chosen-color, var(--helix-color-primary-surface));
+  --icon-button-background-color-hover: var(--helix-color-primary-surface-hover);
+  --icon-button-border-color: var(--map-chosen-color, var(--helix-color-primary-surface));
+  --icon-button-foreground-color: var(--helix-color-foreground-on-primary);
 }
 
 /* ========================================================= the compass === */
@@ -261,14 +231,13 @@
   grid-area: north;
 }
 
-/* The arrows are small and bare on the disc. */
+/* The arrows are small and bare on the disc: not raised, and no ground, even
+   one the page set for the rest of the controls. */
 [part="compass"] > :not([part="face-north"]) {
-  background-color: transparent;
-  block-size: calc(var(--helix-size-control-sm) * 0.75);
-  border-color: transparent;
-  box-shadow: none;
+  --icon-button-background-color: transparent;
+  --icon-button-size: calc(var(--helix-size-control-sm) * 0.75);
+
   font-size: var(--helix-text-xs);
-  inline-size: calc(var(--helix-size-control-sm) * 0.75);
 }
 
 /* **A panel behind the arrows**, where a page asks for them, so they read

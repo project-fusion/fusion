@@ -9,6 +9,12 @@ import {
   slotted,
 } from '@fusion.dev/helix-testing/dom'
 
+/** The native button inside a control, which is what a screen reader is on. */
+const inner = async (control: Element | null | undefined): Promise<HTMLButtonElement | null> => {
+  await (control as { updateComplete?: Promise<unknown> } | null | undefined)?.updateComplete
+  return control?.shadowRoot?.querySelector('button') ?? null
+}
+
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
@@ -192,8 +198,9 @@ describe('map frame', () => {
     const host = await map('controls="pan zoom fullscreen"')
     for (const name of ['pan-up', 'pan-down', 'pan-start', 'pan-end', 'zoom-in', 'zoom-out']) {
       const button = control(host, name)
-      expect(button?.tagName.toLowerCase()).toBe('button')
-      expect(button?.getAttribute('aria-label')).toBeTruthy()
+      const inside = await inner(button)
+      expect(inside?.localName).toBe('button')
+      expect(inside?.getAttribute('aria-label')).toBeTruthy()
     }
   })
 
@@ -417,10 +424,10 @@ describe('map controls on a right-to-left page', () => {
        start control is on the right: it said "left" and pointed left from there. */
     const host = await map('controls="pan" dir="rtl"')
     const start = control(host, 'pan-start')
-    expect(start?.getAttribute('aria-label')).toBe('Pan right')
+    expect((await inner(start))?.getAttribute('aria-label')).toBe('Pan right')
     expect(start?.textContent?.trim()).toBe('→')
     const ltr = await map('controls="pan"')
-    expect(control(ltr, 'pan-start')?.getAttribute('aria-label')).toBe('Pan left')
+    expect((await inner(control(ltr, 'pan-start')))?.getAttribute('aria-label')).toBe('Pan left')
   })
 
   test('rotate and tilt are drawn only where controls name them, and ask for a turn and a tilt', async () => {
@@ -454,7 +461,9 @@ describe('map controls on a right-to-left page', () => {
       'tilt {"to":50}',
       'tilt {"to":0}',
     ])
-    expect(control(host, 'face-north')?.getAttribute('aria-label')).toBe('Face north')
+    expect((await inner(control(host, 'face-north')))?.getAttribute('aria-label')).toBe(
+      'Face north',
+    )
   })
 
   test('the controls are one column in reading order, the arrows round a compass', async () => {
@@ -462,7 +471,9 @@ describe('map controls on a right-to-left page', () => {
     const inCompass = (host: Map): string[] =>
       [...(control(host, 'compass')?.children ?? [])].map((one) => one.getAttribute('part') ?? '')
     expect(inCompass(plain)).toEqual(['pan-up', 'pan-start', 'face-north', 'pan-end', 'pan-down'])
-    expect(control(plain, 'face-north')?.getAttribute('aria-label')).toBe('Face north')
+    expect((await inner(control(plain, 'face-north')))?.getAttribute('aria-label')).toBe(
+      'Face north',
+    )
 
     const host = await map('controls="pan zoom rotate tilt fullscreen"')
     const column = [...(control(host, 'controls')?.children ?? [])].map(

@@ -84,8 +84,11 @@
     var(--icon-button-background-color, transparent)
   );
   block-size: var(--_icon-button-size);
-  border: var(--icon-button-border-width, var(--helix-border-thin)) solid
-    var(--icon-button-border-color, transparent);
+  /* Longhands, so `--icon-button-border-width` can take one to four widths,
+     as `border-width` does, for a control whose edge one side of is another's. */
+  border-color: var(--icon-button-border-color, transparent);
+  border-style: solid;
+  border-width: var(--icon-button-border-width, var(--helix-border-thin));
   /*
  * *Four corners, so a group can flatten the two it needs to.**
  *

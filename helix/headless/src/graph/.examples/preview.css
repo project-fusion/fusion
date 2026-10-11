@@ -60,9 +60,9 @@ helix-headless-graph::part(controls) {
   position: absolute;
 }
 
-helix-headless-graph::part(zoom-in),
-helix-headless-graph::part(zoom-out),
-helix-headless-graph::part(fullscreen) {
+helix-headless-graph::part(zoom-in-button),
+helix-headless-graph::part(zoom-out-button),
+helix-headless-graph::part(fullscreen-button) {
   background-color: var(--_gray-surface);
   block-size: 2rem;
   border: 1px solid var(--_gray-edge);

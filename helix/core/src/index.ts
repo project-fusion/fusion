@@ -402,6 +402,7 @@ export {
 export { MixinTokens, type MixinTokensInterface } from './mixins/mixin-tokens/mixin-tokens.js'
 export {
   MixinViewport,
+  type ViewportControlAxes,
   type ViewportControlsPlacement,
   type ViewportElement,
   type ViewportGestureLabels,

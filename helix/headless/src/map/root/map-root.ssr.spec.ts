@@ -32,9 +32,16 @@ describe('map server output', () => {
 
   test('the controls ship with it, named', () => {
     const markup = served()
-    expect(partTag(markup, 'zoom-in')).toContain('aria-label="Zoom in"')
-    expect(partTag(markup, 'zoom-out')).toContain('aria-label="Zoom out"')
-    expect(partTag(markup, 'face-north')).toContain('aria-label="Face north"')
+    /* Each an Icon Button, named by `label`, and served with its own button
+       inside it named, so a reader has the name before anything hydrates. */
+    for (const [name, label] of [
+      ['zoom-in', 'Zoom in'],
+      ['zoom-out', 'Zoom out'],
+      ['face-north', 'Face north'],
+    ] as const) {
+      expect(partTag(markup, name)).toContain(`label="${label}"`)
+      expect(rendered(markup, 'helix-headless-map')).toContain(`aria-label="${label}"`)
+    }
   })
 
   test('the name is on the host through internals rather than as an attribute', () => {

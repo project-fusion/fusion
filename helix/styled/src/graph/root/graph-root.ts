@@ -1,9 +1,10 @@
-import { customElement } from '@fusion.dev/helix-core'
+import { customElement, type ViewportControlAxes } from '@fusion.dev/helix-core'
 import { HelixHeadlessGraph } from '@fusion.dev/helix-headless/graph'
 import type { CSSResultGroup } from 'lit'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
 import { styles } from './graph-root.css.js'
+import '../../icon-button/index.js'
 
 /**
  * @summary A frame around a graph of notes drawn by another library, and the list that makes it readable.
@@ -42,6 +43,13 @@ import { styles } from './graph-root.css.js'
  */
 @customElement('helix-graph')
 export class HelixGraph extends HelixHeadlessGraph {
+  static override tier = 'helix-'
+
+  /** The controls float over the drawing, so they are raised. */
+  protected override get controlAxes(): ViewportControlAxes {
+    return { raised: true }
+  }
+
   /* The live region's clip first, as that sheet asks, then the surface's,
      then this family's, so a graph's own rules win where they meet. */
   static override styles: CSSResultGroup = [liveStyles, viewportStyles, styles]

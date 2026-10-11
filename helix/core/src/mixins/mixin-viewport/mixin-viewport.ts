@@ -1,5 +1,6 @@
 import { html, type LitElement, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { type StaticValue, html as staticHtml } from 'lit/static-html.js'
 import { FullscreenController } from '../../controllers/fullscreen-controller/fullscreen-controller.js'
 import { IdleController } from '../../controllers/idle-controller/idle-controller.js'
 import { ToolbarController } from '../../controllers/toolbar-controller/toolbar-controller.js'
@@ -18,6 +19,23 @@ export type ViewportWay = 'up' | 'down' | 'start' | 'end'
 
 /** Where the controls sit, in the corner words the rest of the library uses. */
 export type ViewportControlsPlacement = 'top-start' | 'top-end' | 'bottom-start' | 'bottom-end'
+
+/**
+ * The styled axes a surface's controls are drawn with, which the styled tier
+ * says and the headless tier leaves unset, having nothing to paint: `raised`,
+ * since the controls float over the drawing, and the `material` under them.
+ */
+export interface ViewportControlAxes {
+  material?: 'frosted' | 'glass' | 'transparent' | undefined
+  raised: boolean
+}
+
+/**
+ * Keeps a press on one of the surface's own controls inside the surface: the
+ * page hears what the control did, through the surface's own events, and not
+ * that a button inside it was pressed.
+ */
+const stopPress = (event: Event): void => event.stopPropagation()
 
 /** Which gestures a surface takes from the page. */
 export type ViewportGestures = 'activate' | 'always' | 'cooperative'
@@ -166,6 +184,16 @@ export declare class ViewportElement {
 
   /** More buttons for the group of controls, after zoom, for a family that adds its own. */
   protected renderMoreControls(): TemplateResult | typeof nothing
+
+  /**
+   * The element each control is drawn as: the family's own Icon Button, which
+   * the family names with `this.tag('icon-button')` so its source says what it
+   * renders and its imports register it.
+   */
+  protected get controlTag(): StaticValue
+
+  /** The styled axes each control is drawn with, unset on the headless tier. */
+  protected get controlAxes(): ViewportControlAxes
 
   /** Answers a key the family adds, and says whether it did. */
   protected handleMoreKeys(event: KeyboardEvent): boolean
@@ -745,6 +773,14 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
     }
 
     /** The arrow drawn on a pan control, pointing the way it goes on screen. */
+    protected get controlTag(): StaticValue {
+      return this.tag('icon-button')
+    }
+
+    protected get controlAxes(): ViewportControlAxes {
+      return { raised: false }
+    }
+
     protected panGlyph(way: ViewportWay): string {
       return { down: '↓', left: '←', right: '→', up: '↑' }[this.sideOf(way)] ?? ''
     }
@@ -873,45 +909,99 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
       const [up, start, end, down] = (['up', 'start', 'end', 'down'] as const).map((way) =>
         this.panGlyph(way),
       )
-      return html`<div part="controls" role="toolbar" aria-label=${this.controlsLabel}>
+      const button = this.controlTag
+      const { material, raised } = this.controlAxes
+      const ground = material ?? nothing
+      return staticHtml`<div part="controls" role="toolbar" aria-label=${this.controlsLabel}>
         ${
           pan
-            ? html`<button part="pan-up" aria-label=${this.panLabel('up')} type="button" @click=${() => this.pan('up')}>
+            ? staticHtml`<${button}
+                  part="pan-up"
+                  exportparts="button: pan-up-button, live: pan-up-live, spinner: pan-up-spinner, text: pan-up-text"
+                  label=${this.panLabel('up')}
+                  material=${ground}
+                  ?raised=${raised}
+                  @click=${() => this.pan('up')}
+                  @helix-press=${stopPress}
+                >
                   <slot name="pan-up-icon">${up}</slot>
-                </button>
-                <button part="pan-start" aria-label=${this.panLabel('start')} type="button" @click=${() => this.pan('start')}>
+                </${button}>
+                <${button}
+                  part="pan-start"
+                  exportparts="button: pan-start-button, live: pan-start-live, spinner: pan-start-spinner, text: pan-start-text"
+                  label=${this.panLabel('start')}
+                  material=${ground}
+                  ?raised=${raised}
+                  @click=${() => this.pan('start')}
+                  @helix-press=${stopPress}
+                >
                   <slot name="pan-start-icon">${start}</slot>
-                </button>
-                <button part="pan-end" aria-label=${this.panLabel('end')} type="button" @click=${() => this.pan('end')}>
+                </${button}>
+                <${button}
+                  part="pan-end"
+                  exportparts="button: pan-end-button, live: pan-end-live, spinner: pan-end-spinner, text: pan-end-text"
+                  label=${this.panLabel('end')}
+                  material=${ground}
+                  ?raised=${raised}
+                  @click=${() => this.pan('end')}
+                  @helix-press=${stopPress}
+                >
                   <slot name="pan-end-icon">${end}</slot>
-                </button>
-                <button part="pan-down" aria-label=${this.panLabel('down')} type="button" @click=${() => this.pan('down')}>
+                </${button}>
+                <${button}
+                  part="pan-down"
+                  exportparts="button: pan-down-button, live: pan-down-live, spinner: pan-down-spinner, text: pan-down-text"
+                  label=${this.panLabel('down')}
+                  material=${ground}
+                  ?raised=${raised}
+                  @click=${() => this.pan('down')}
+                  @helix-press=${stopPress}
+                >
                   <slot name="pan-down-icon">${down}</slot>
-                </button>`
+                </${button}>`
             : nothing
         }
         ${
           zoom
-            ? html`<button part="zoom-in" aria-label=${this.zoomInLabel} type="button" @click=${() => this.zoom(1)}>
+            ? staticHtml`<${button}
+                  part="zoom-in"
+                  exportparts="button: zoom-in-button, live: zoom-in-live, spinner: zoom-in-spinner, text: zoom-in-text"
+                  label=${this.zoomInLabel}
+                  material=${ground}
+                  ?raised=${raised}
+                  @click=${() => this.zoom(1)}
+                  @helix-press=${stopPress}
+                >
                   <slot name="zoom-in-icon">+</slot>
-                </button>
-                <button part="zoom-out" aria-label=${this.zoomOutLabel} type="button" @click=${() => this.zoom(-1)}>
+                </${button}>
+                <${button}
+                  part="zoom-out"
+                  exportparts="button: zoom-out-button, live: zoom-out-live, spinner: zoom-out-spinner, text: zoom-out-text"
+                  label=${this.zoomOutLabel}
+                  material=${ground}
+                  ?raised=${raised}
+                  @click=${() => this.zoom(-1)}
+                  @helix-press=${stopPress}
+                >
                   <slot name="zoom-out-icon">−</slot>
-                </button>`
+                </${button}>`
             : nothing
         }
         ${more}
         ${
           fullscreen
-            ? html`<button
+            ? staticHtml`<${button}
                 part="fullscreen"
-                aria-label=${this.fullscreenLabel}
+                exportparts="button: fullscreen-button, live: fullscreen-live, spinner: fullscreen-spinner, text: fullscreen-text"
                 aria-pressed=${this.filled ? 'true' : 'false'}
-                type="button"
+                label=${this.fullscreenLabel}
+                material=${ground}
+                ?raised=${raised}
                 @click=${this.toggleFullscreen}
+                @helix-press=${stopPress}
               >
                 <slot name="fullscreen-icon">⤢</slot>
-              </button>`
+              </${button}>`
             : nothing
         }
       </div>`
