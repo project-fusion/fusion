@@ -359,7 +359,13 @@ const byFamily = await pool(families, {
 /* **What this engine is known to fail is reported and not counted**, and a
    listed spec that passes, or that this run's families no longer hold, fails
    the run: the list says what is still wrong, so it is kept true both ways. */
-const known = engine.known
+/* An entry is its cause, or the cause with `only` and `sometimes`, which
+   `known-in-webkit.mjs` explains. One for another platform is left out. */
+const known = Object.fromEntries(
+  Object.entries(engine.known)
+    .map(([line, entry]) => [line, typeof entry === 'string' ? { cause: entry } : entry])
+    .filter(([, entry]) => entry.only === undefined || entry.only === process.platform),
+)
 const expected = []
 const met = new Set()
 for (const [at, { results }] of byFamily.entries()) {
@@ -368,11 +374,11 @@ for (const [at, { results }] of byFamily.entries()) {
     const line = `${name} > ${result.suite ? `${result.suite} > ` : ''}${result.name}`
     if (line in known) {
       met.add(line)
-      if (result.passed) {
+      if (!result.passed) {
+        expected.push(line)
+      } else if (!known[line].sometimes) {
         failures.push(`${line}
     passes in ${engine.name} now. Take it off the list in fusion/scripts/lib/known-in-webkit.mjs.`)
-      } else {
-        expected.push(line)
       }
     } else if (result.passed) {
       passed += 1
@@ -415,7 +421,7 @@ const owed =
   expected.length === 0
     ? ''
     : `\n\n${expected.length} known to fail in ${engine.name}, listed in fusion/scripts/lib/known-in-webkit.mjs:\n` +
-      expected.map((line) => `\n  ${line}\n    ${known[line]}\n`).join('')
+      expected.map((line) => `\n  ${line}\n    ${known[line].cause}\n`).join('')
 
 if (failures.length > 0) {
   console.error(`browser specs: ${failures.length} failed, ${passed} passed, in ${engine.name}\n`)

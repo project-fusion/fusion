@@ -10,7 +10,12 @@
  *
  * Keyed by the line the runner prints for a failure: the family, the suite,
  * and the spec's own name. Measured on WebKit 26.6, through Playwright 1.63,
- * on October 10, 2026.
+ * on October 10 and 11, 2026.
+ *
+ * **An entry is its cause, or the cause with two qualifiers.** `only` names the
+ * one `process.platform` it fails on, because WebKit is a different build on
+ * macOS and on Linux, and CI runs Linux's. `sometimes` marks a failure that
+ * depends on how fast the machine is, so a pass is not news.
  */
 
 /**
@@ -32,10 +37,21 @@ export const KNOWN_IN_WEBKIT = {
     REFERENCE,
   'option > what an option is called > says its second destination beside a caption': REFERENCE,
   'radio > radio group as a field > the question is named and described on the host': REFERENCE,
-  'sandbox > the source pane > lets undo take back an indent, and only the indent':
-    'One `undo` after the indent took back the typed text as well, and left the ' +
-    'field empty. Chromium takes back the indent alone. Whether typing in Safari ' +
-    'does the same needs a check there.',
+  'sandbox > the source pane > lets undo take back an indent, and only the indent': {
+    cause:
+      "In macOS's WebKit, one `undo` after the indent took back the typed text as " +
+      "well, and left the field empty. Linux's WebKit and Chromium take back the " +
+      'indent alone. Whether typing in Safari does the same needs a check there.',
+    only: 'darwin',
+  },
+  'scatter-chart > a pointer > finds the nearest of 20,000 points': {
+    cause:
+      "Timed out at the harness's two seconds in WebKit on a two-core Linux " +
+      "runner, where the family took 3.8 seconds against Chromium's 1.9 on run " +
+      "38117810000. It passes in macOS's WebKit.",
+    only: 'linux',
+    sometimes: true,
+  },
   'toast > what a message is to a screen reader > named by its words, where it has no heading':
     REFERENCE,
   'tooltip > tooltip > a tooltip with only slotted content shows, and is linked': REFERENCE,
