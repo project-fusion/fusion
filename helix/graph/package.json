@@ -63,7 +63,7 @@
     "@fusion.dev/helix-core": "workspace:*"
   },
   "devDependencies": {
-    "@cosmos.gl/graph": "^3.4.2",
+    "@cosmos.gl/graph": "^3.5.1",
     "@fusion.dev/helix-headless": "workspace:*",
     "@fusion.dev/helix-testing": "workspace:*",
     "@types/bun": "^1.4.2",
