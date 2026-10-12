@@ -9,7 +9,7 @@
    clipped. */
 [part="surface"] {
   overflow: visible;
-  background-color: var(--helix-color-surface-overlay);
+  background-color: var(--popover-background-color, var(--helix-color-surface-overlay));
   /* No border, said rather than left out: the UA stylesheet gives `[popover]`
      `border: solid`, so dropping the declaration leaves a three-pixel medium
      border rather than none at all. */
@@ -135,7 +135,7 @@
    trigger. The floating pass places it; the panel's own edge is drawn on the
    two sides turned outward, which are physical because a placement is. */
 [part~="arrow"] {
-  background-color: var(--helix-color-surface-overlay);
+  background-color: var(--popover-background-color, var(--helix-color-surface-overlay));
   block-size: var(--popover-arrow-size, 0.5rem);
   inline-size: var(--popover-arrow-size, 0.5rem);
   position: absolute;
@@ -163,6 +163,24 @@
 }
 
 /* Not printed, being an overlay. */
+/* `glass` is the page's translucent ground over the theme's blur, and
+   `frosted` the same pair turned up. The point takes the same fill so it
+   reads as part of the panel. */
+:host([material="glass"]) [part="surface"],
+:host([material="glass"]) [part~="arrow"] {
+  backdrop-filter: var(--popover-backdrop, var(--helix-material-backdrop));
+  background-color: var(
+    --popover-background-color,
+    light-dark(var(--helix-material-translucent-strong), var(--helix-material-translucent))
+  );
+}
+
+:host([material="frosted"]) [part="surface"],
+:host([material="frosted"]) [part~="arrow"] {
+  backdrop-filter: var(--popover-backdrop, blur(var(--helix-material-blur-lg)));
+  background-color: var(--popover-background-color, var(--helix-material-translucent-strong));
+}
+
 @media print {
   :host {
     display: none;
