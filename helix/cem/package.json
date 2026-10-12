@@ -37,6 +37,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
-    "@wc-toolkit/vuejs-types": "^1.0.1"
+    "@wc-toolkit/vuejs-types": "^1.0.3"
   }
 }
