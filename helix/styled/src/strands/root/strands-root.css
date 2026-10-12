@@ -26,9 +26,14 @@
   pointer-events: none;
 }
 
-/* Clear, the band has no ground either, so what is behind shows through it as
-   it does through the ribbon. */
+/* Clear, the canvas is see-through, so the band would show under the ribbon
+   all the time: it shows only while the element falls back, and then with no
+   ground either, so what is behind shows through it as it does the ribbon. */
 :host([clear]) {
+  background-image: none;
+}
+
+:host([clear]:state(fallback)) {
   background-image: linear-gradient(
     115deg,
     transparent 20%,

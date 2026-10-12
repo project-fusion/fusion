@@ -161,8 +161,8 @@ export class HelixStrands extends HelixElement {
    * glass. The ground still says which way the page runs: light added on a
    * dark one, ink on a light one.
    *
-   * Reflected because the stylesheet selects on it: the fallback's band loses
-   * its ground too.
+   * Reflected because the stylesheet selects on it: the band under the canvas
+   * shows only while the element falls back, and loses its ground too.
    */
   @property({ reflect: true, type: Boolean })
   clear = false
