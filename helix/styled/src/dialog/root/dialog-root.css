@@ -279,6 +279,18 @@
 }
 
 /* Not printed, being an overlay. */
+/* Where `overlay` cannot be transitioned, as in WebKit, a closing surface
+   leaves the top layer at once while `display` holds it for the fade, and a
+   fixed surface out of the top layer is placed against the nearest ancestor
+   with a filter or a transform: on a frosted page, somewhere else entirely.
+   There it closes at once instead, and still fades in. */
+@supports not (overlay: auto) {
+  [part="surface"],
+  [part="surface"]::backdrop {
+    transition-behavior: normal;
+  }
+}
+
 @media print {
   :host {
     display: none;
