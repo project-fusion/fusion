@@ -179,18 +179,18 @@
     - text: helix-button
     - paragraph: Triggers an action, submits a form, or navigates.
     - table "Properties":
-      - row "Prop Type Default Description"
-      - text: command string "" What to send when the button is activated, and what to send it to.
+      - row "Prop Type Description"
+      - text: command string Default "" What to send when the button is activated, and what to send it to.
       - link "Open the Invoker Commands specification":
         - /url: https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-command
-      - text: commandFor string "" The id of the element the command is sent to.
+      - text: commandFor string Default "" The id of the element the command is sent to.
       - link "Open the Invoker Commands specification":
         - /url: https://html.spec.whatwg.org/multipage/form-elements.html#attr-button-commandfor
-      - text: "commandForElement Element|null The element this button's command is sent to, resolved. disabled boolean false Whether the control is disabled and cannot be used. emphasis \"ghost\"|\"outlined\"|\"solid\"|\"subtle\" How much fill the control is drawn with. expanded boolean Whether this button is a disclosure trigger, and whether its panel is open. focusable boolean true Whether the button holds its group's tab stop. formAction string \"\" Where this button's submission goes, overriding the form's own. formEnctype string \"\" How the submission is encoded, overriding the form's own. formMethod string \"\" Which HTTP method the submission uses, overriding the form's own. formNoValidate boolean false Whether this submission skips the form's validation. formTarget string \"\" Which browsing context the response lands in, overriding the form's own. label string The button's name, read by screen readers, for a button whose content is not text. name string \"\" The name the control's value is submitted under. pending boolean false Whether the action the button started is still running. pendingLabel string \"Loading\" What a reader hears when the button becomes pending while it has focus. popup \"dialog\"|\"grid\"|\"listbox\"|\"menu\"|\"tree\" What kind of panel this button opens, where it opens one:"
+      - text: "commandForElement Element|null The element this button's command is sent to, resolved. disabled boolean Default false Whether the control is disabled and cannot be used. emphasis \"ghost\"|\"outlined\"|\"solid\"|\"subtle\" How much fill the control is drawn with. expanded boolean Whether this button is a disclosure trigger, and whether its panel is open. focusable boolean Default true Whether the button holds its group's tab stop. formAction string Default \"\" Where this button's submission goes, overriding the form's own. formEnctype string Default \"\" How the submission is encoded, overriding the form's own. formMethod string Default \"\" Which HTTP method the submission uses, overriding the form's own. formNoValidate boolean Default false Whether this submission skips the form's validation. formTarget string Default \"\" Which browsing context the response lands in, overriding the form's own. label string The button's name, read by screen readers, for a button whose content is not text. name string Default \"\" The name the control's value is submitted under. pending boolean Default false Whether the action the button started is still running. pendingLabel string Default \"Loading\" What a reader hears when the button becomes pending while it has focus. popup \"dialog\"|\"grid\"|\"listbox\"|\"menu\"|\"tree\" What kind of panel this button opens, where it opens one:"
       - code: menu
       - text: for a
       - code: Menu
-      - text: . tone "accent"|"danger"|"neutral"|"primary" Which color the control is drawn in, by what it means. type "button"|"submit"|"reset" "button" What activating the button does to its form. value string "" The value this button submits under its own
+      - text: . tone "accent"|"danger"|"neutral"|"primary" Which color the control is drawn in, by what it means. type "button"|"submit"|"reset" Default "button" What activating the button does to its form. value string Default "" The value this button submits under its own
       - code: name
       - text: ", as a native submit button does. width \"auto\"|\"full\" How much of the available width the button takes."
     - status
