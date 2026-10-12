@@ -3,9 +3,100 @@
   flex-wrap: wrap;
 }
 
-/* The table scrolls sideways rather than colliding with itself. */
+/* The table scrolls sideways rather than colliding with itself, which the
+   share each column takes leaves for the narrowest phone. */
 .apiTable {
+  container-type: inline-size;
   overflow-x: auto;
+}
+
+/**
+ * **Under 46rem each description takes a line of its own, under its row.** The
+ * description takes half the table, and the widest name and type, on
+ * Notifications, need 363px of the other half, so a table narrower than 46rem
+ * has less room than that page needs. So the table keeps its first columns, as
+ * `--api-stacked` names them, and each description spans the table below them.
+ * The rule under the name and type goes, so a row and its description read as
+ * one.
+ */
+@container (width < 46rem) {
+  .apiTable helix-table {
+    --table-columns: var(--api-stacked);
+  }
+
+  /* Out of sight and still a column heading, so a screen reader reads each
+     description as the Description column's. */
+  .apiTable helix-table-column:last-of-type::part(column) {
+    block-size: 1px;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+  }
+
+  .apiTable helix-table-cell:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .apiTable helix-table-cell:not(:last-child) {
+    --table-rule-color: transparent;
+  }
+}
+
+/**
+ * **Under 24rem the name and the type take a line each as well.** The widest
+ * pair, on Notifications, is 363px, and a phone's table is 358px. Every heading
+ * goes out of sight with the description's, since a column of one track has
+ * nothing for them to stand over.
+ */
+@container (width < 24rem) {
+  .apiTable helix-table {
+    --table-columns: minmax(0, 1fr);
+  }
+
+  .apiTable helix-table-column::part(column) {
+    block-size: 1px;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+  }
+
+  /* A row's lines sit close, so the space and the rule fall between rows.
+     Through the cell's own hooks, since a rule here for a property the cell
+     sets on itself would replace the cell's declaration outright. */
+  .apiTable helix-table-cell {
+    --table-cell-min-block-size: auto;
+  }
+
+  .apiTable helix-table-cell:first-child {
+    --table-padding-block: var(--helix-space-xs) var(--helix-space-none);
+  }
+
+  .apiTable helix-table-cell:not(:first-child) {
+    --table-padding-block: var(--helix-space-2xs) var(--helix-space-xs);
+  }
+}
+
+/* A property's type, and its resting value under it. */
+.apiTypeStack {
+  display: grid;
+  gap: var(--helix-space-2xs);
+  justify-items: start;
+}
+
+.apiDefaultLine {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-none) var(--helix-space-xs);
+}
+
+.apiDefaultLabel {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-xs);
 }
 
 /* The mark beside a property built on a platform feature. `1em`, so it tracks
