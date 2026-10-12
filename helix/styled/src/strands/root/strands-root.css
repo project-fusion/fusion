@@ -26,6 +26,18 @@
   pointer-events: none;
 }
 
+/* Clear, the band has no ground either, so what is behind shows through it as
+   it does through the ribbon. */
+:host([clear]) {
+  background-image: linear-gradient(
+    115deg,
+    transparent 20%,
+    color-mix(in oklab, var(--_strands-glow) 22%, transparent) 48%,
+    color-mix(in oklab, var(--_strands-tint) 12%, transparent) 58%,
+    transparent 82%
+  );
+}
+
 /* **In `travel`, behind the page, fixed to the viewport.** On the layer
    beneath the page it paints over the page color, which a body background
    hands to the viewport, and under every block in the flow. A consumer moves

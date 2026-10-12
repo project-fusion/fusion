@@ -44,6 +44,8 @@ const GAIN = 1.615
 export interface StrandsFrame {
   /** How much the glow around the strands adds, as a multiplier. */
   bloom: number
+  /** Whether the light is drawn alone, with no ground under it, so what is behind shows. */
+  clear: boolean
   /** How far apart the brightest and dimmest strands are, from `0` to `1`. */
   contrast: number
   /** How many of the path's points are in use. */
@@ -256,6 +258,7 @@ export class StrandsRenderer {
     this.vec3(this.composite, 'uGround', palette.ground)
     this.vec3(this.composite, 'uInk', palette.peak)
     this.float(this.composite, 'uLight', palette.light ? 1 : 0)
+    this.float(this.composite, 'uClear', frame.clear ? 1 : 0)
     this.float(this.composite, 'uGain', (GAIN * frame.gain) / this.scale)
     this.float(this.composite, 'uBloom', BLOOM * frame.bloom)
     gl.bindVertexArray(this.empty)

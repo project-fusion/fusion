@@ -76,6 +76,10 @@ const PACE = 0.25
  * `at` is nearer, and crosses in one diagonal to the far side. `waves` is sharp
  * strands crossing the full width.
  *
+ * **Clear, over glass.** Set `clear` and the ribbon is drawn without its
+ * ground, so a translucent pane or a frosted window behind the element shows
+ * through, with the light over it.
+ *
  * **Quiet behind words.** `quiet` names elements, such as a hero's words, that
  * the light dims behind to a faint glow, so a bright ribbon can cross the page
  * under them and they stay crisp.
@@ -150,6 +154,18 @@ export class HelixStrands extends HelixElement {
    */
   @property({ converter: numberConverter('bloom', 1) })
   bloom = 1
+
+  /**
+   * Whether the light is drawn alone, without the ground under it, so what is
+   * behind the element shows through, such as a translucent pane or a window's
+   * glass. The ground still says which way the page runs: light added on a
+   * dark one, ink on a light one.
+   *
+   * Reflected because the stylesheet selects on it: the fallback's band loses
+   * its ground too.
+   */
+  @property({ reflect: true, type: Boolean })
+  clear = false
 
   /**
    * How far apart the brightest and dimmest strands are, from `0`, most of
@@ -721,6 +737,7 @@ export class HelixStrands extends HelixElement {
     renderer.render(
       {
         bloom: Math.max(0, this.bloom),
+        clear: this.clear,
         contrast: share(this.contrast),
         count: this.count,
         depth: share(this.depth),
