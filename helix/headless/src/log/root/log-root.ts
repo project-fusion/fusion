@@ -32,9 +32,11 @@ import { stripAnsi } from '../ansi.js'
 import {
   LogBuffer,
   type LogGroup,
+  type LogLevel,
   type LogLine,
   type LogParser,
   type LogStatus,
+  loudEnough,
   timeOf,
 } from '../buffer.js'
 import type { HelixHeadlessLogGroup } from '../group/log-group.js'
@@ -195,9 +197,12 @@ interface Heard {
  * @csspart group-summary-running - The button of a step drawn from `groups` that is `running`.
  * @csspart group-summary-skipped - The button of a step drawn from `groups` that was `skipped`.
  * @csspart line - The row of a line drawn from data.
+ * @csspart line-count - How many times a folded line was written, under `collapse`. Hidden from screen readers, which hear `line-count-label`.
+ * @csspart line-count-label - What a screen reader hears for a folded line's count, such as "3 times". Visually hidden in the styled tier.
  * @csspart line-debug - The row of a line drawn from data at `debug`.
  * @csspart line-error - The row of a line drawn from data at `error`.
  * @csspart line-grouped - The row of a line drawn from data that belongs to a step.
+ * @csspart line-level - What a screen reader hears before the text of a line drawn from data at `debug`, `warn` or `error`. Visually hidden in the styled tier.
  * @csspart line-marked - The row of a line drawn from data that `mark-lines` names.
  * @csspart line-match - Text in a line drawn from data that matches `query`.
  * @csspart line-number - The number of a line drawn from data.
@@ -242,7 +247,7 @@ interface Heard {
  *
  * @cssstate done - The run is over: `done` is set, or `source` ended.
  * @cssstate empty - The log has no lines.
- * @cssstate filtered - `query` is set, so only matching lines are shown.
+ * @cssstate filtered - `query` or `level` is set, so only the lines they keep are shown.
  * @cssstate pinned - The log follows its newest line.
  */
 @customElement('helix-headless-log')
@@ -257,6 +262,15 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
 
   /** How tall a row is assumed to be before one has been drawn, in pixels. */
   static readonly ESTIMATE = 20
+
+  /**
+   * Folds a line written again straight after itself into it, with a count,
+   * as a browser's console does, so a loop writing one warning a thousand
+   * times is one line. For lines written or given as data, read as they
+   * arrive; numbers, `line-href` and the selection count a folded line once.
+   */
+  @property({ type: Boolean })
+  collapse = false
 
   /**
    * Whether the log opens following its newest line, when `pinned` is not set.
@@ -310,6 +324,14 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
   @property({ attribute: 'fallback-label' })
   fallbackLabel = 'Log'
 
+  /* Handed to the buffer at once, for `parse`'s reason. */
+  set format(next: 'github-actions' | 'vercel' | undefined) {
+    const previous = this.formatValue
+    this.formatValue = next
+    this.buffer.parse = this.parseValue ?? this.formatParser
+    this.requestUpdate('format', previous)
+  }
+
   /**
    * The format written text is in, read with a parser Helix ships:
    * `github-actions` reads a GitHub Actions log's workflow commands into steps
@@ -319,14 +341,6 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
   @property()
   get format(): 'github-actions' | 'vercel' | undefined {
     return this.formatValue
-  }
-
-  /* Handed to the buffer at once, for `parse`'s reason. */
-  set format(next: 'github-actions' | 'vercel' | undefined) {
-    const previous = this.formatValue
-    this.formatValue = next
-    this.buffer.parse = this.parseValue ?? this.formatParser
-    this.requestUpdate('format', previous)
   }
 
   /**
@@ -350,6 +364,15 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
   /** The log's name, read by screen readers. */
   @property()
   label = ''
+
+  /**
+   * The quietest level shown: `info` hides `debug` and `log` lines, `warn`
+   * shows warnings and errors, and `error` errors only. Unset shows every line.
+   * Lines it hides are kept, so lowering it shows them again, and a step shows
+   * while it holds a line that shows.
+   */
+  @property()
+  level?: LogLevel
 
   /**
    * The most lines kept, or 0 to keep them all. Past it the oldest lines are
@@ -1073,7 +1096,9 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     const start = this.childLines.map((line) => timeOf(line.at)).find((time) => time !== undefined)
     const stop = this.interactive ? this.stopAmong(this.reachable()) : 0
     this.childLines.forEach((line, at) => {
-      const filtered = needle !== '' && !(line.textContent ?? '').toLowerCase().includes(needle)
+      const filtered =
+        (needle !== '' && !(line.textContent ?? '').toLowerCase().includes(needle)) ||
+        !loudEnough(line.level, this.level)
       whenHydrated(line, () => {
         line.logNumber = at + 1
         line.logNumbers = this.lineNumbers
@@ -1087,7 +1112,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
         line.logStop = at + 1 === stop
         line.logGrouped = this.childGroups.some((group) => group.contains(line))
       })
-      if (!filtered && needle !== '') {
+      if (!filtered && (needle !== '' || this.level !== undefined)) {
         for (const group of this.childGroups) {
           if (!group.open && group.contains(line)) {
             whenHydrated(group, () => {
@@ -1307,6 +1332,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     this.lastGroups = this.allGroups
     if (changed.has('limit')) {
       this.buffer.limit = Math.max(0, Math.floor(this.limit || 0))
+      this.buffer.collapse = this.collapse
       this.buffer.write('')
     }
     if (!this.fed) {
@@ -1329,6 +1355,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
       this.view = logRows({
         current: this.buffer.current(),
         groups: this.allGroups,
+        level: this.level,
         lines: this.buffer.lines,
         open: (id) => this.isOpen(id),
         query: this.query,
@@ -1339,7 +1366,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     }
     this.toggleState('pinned', this.pinned)
     this.toggleState('done', this.done)
-    this.toggleState('filtered', this.query.trim() !== '')
+    this.toggleState('filtered', this.query.trim() !== '' || this.level !== undefined)
     this.toggleState('empty', this.childrenKnown && !this.fed && this.childLines.length === 0)
   }
 
@@ -1427,7 +1454,8 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     const line = this.tag('log-line')
     const { at, level } = row.line
     return html`<${line}
-      exportparts="line, line-debug, line-error, line-grouped, line-marked, line-selected, line-warn, match: line-match,
+      exportparts="line, line-debug, line-error, line-grouped, line-marked, line-selected, line-warn, count: line-count,
+        count-label: line-count-label, level: line-level, match: line-match,
         number: line-number, run: line-run, run-bold: line-run-bold, run-dim: line-run-dim,
         run-italic: line-run-italic, run-strike: line-run-strike, run-underline: line-run-underline,
         text: line-text, time: line-time"
@@ -1442,6 +1470,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
       .logSelectable=${this.selectable}
       .logSelected=${this.selected(row.number)}
       .logStop=${row.number === stop}
+      .logCount=${row.line.count ?? 1}
       .logGrouped=${row.line.group !== undefined}
       .logStart=${start}
       .logTimes=${this.timestamps ?? ''}

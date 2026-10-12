@@ -104,3 +104,25 @@ describe('markMatches', () => {
     expect(markMatches([{ text: 'ok' }], 'nope')).toEqual([{ text: 'ok' }])
   })
 })
+
+describe('a level', () => {
+  test('narrows as a search does, a step showing while it holds a line that shows', () => {
+    const lines: LogLine[] = [
+      { level: 'log', text: 'starting' },
+      { group: 'install', level: 'debug', text: 'resolved' },
+      { group: 'test', level: 'warn', text: 'slow chunk' },
+    ]
+    const { matched, rows } = logRows({
+      groups,
+      level: 'info',
+      lines,
+      open: () => false,
+      query: '',
+      start: 0,
+    })
+    expect(matched).toBe(1)
+    expect(rows.map((row) => (row.kind === 'group' ? `[${row.group.id}]` : row.line.text))).toEqual(
+      ['[test]', 'slow chunk'],
+    )
+  })
+})

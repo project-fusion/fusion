@@ -1,7 +1,17 @@
 import { type LogRun, type LogStyle, parseAnsi } from './ansi.js'
 
 /** How much a line matters, which a stylesheet draws and a screen reader may hear. */
-export type LogLevel = 'debug' | 'error' | 'info' | 'warn'
+export type LogLevel = 'debug' | 'error' | 'info' | 'log' | 'warn'
+
+/**
+ * The levels from the quietest to the loudest, which `level` on a log counts
+ * up from: `log` is a plain line, a console's `console.log`, below `info`.
+ */
+export const LOG_LEVELS: readonly LogLevel[] = ['debug', 'log', 'info', 'warn', 'error']
+
+/** Whether a line at `level` shows under a log whose quietest level shown is `floor`. A line with no level is `info`. */
+export const loudEnough = (level: LogLevel | undefined, floor: LogLevel | undefined): boolean =>
+  floor === undefined || LOG_LEVELS.indexOf(level ?? 'info') >= LOG_LEVELS.indexOf(floor)
 
 /** Where a step of the run stands. */
 export type LogStatus = 'done' | 'failed' | 'pending' | 'running' | 'skipped'
@@ -12,11 +22,23 @@ export interface LogLine {
   at?: number | string
   /** The `id` of the group in `groups` the line belongs to. */
   group?: string
+  /**
+   * How many times it was written in a row, where the log folds repeats with
+   * `collapse`. Absent is once.
+   */
+  count?: number
   /** How much it matters. Absent is `info`. */
   level?: LogLevel
   /** What was written, with any ANSI escape codes still in it. */
   text: string
 }
+
+/** Whether two lines are the same line written twice: the same text, level and group. */
+const repeats = (line: LogLine, last: LogLine | undefined): boolean =>
+  last !== undefined &&
+  last.text === line.text &&
+  last.level === line.level &&
+  last.group === line.group
 
 /** One step of the run, which folds the lines that name its `id`. */
 export interface LogGroup {
@@ -121,6 +143,9 @@ export class LogBuffer {
   /** The most finished lines kept, or 0 to keep them all. */
   limit = 0
 
+  /** Whether a line written again straight after itself folds into it, with a count. */
+  collapse = false
+
   /** Reads each finished line of written text. */
   parse: LogParser | undefined = undefined
 
@@ -175,9 +200,12 @@ export class LogBuffer {
     return finished
   }
 
-  /** Replaces every line, starting a fresh buffer that keeps its `parse` and `limit`. */
+  /** Replaces every line, starting a fresh buffer that keeps its `parse`, `limit` and `collapse`. */
   replace(lines: readonly LogLine[]): void {
-    this.lines = [...lines]
+    this.lines = []
+    for (const line of lines) {
+      this.add(line)
+    }
     this.dropped = 0
     this.partial = ''
     this.returned = false
@@ -258,7 +286,7 @@ export class LogBuffer {
           line,
           line.text === raw ? flow.runs : parseAnsi(line.text, this.lineStyle).runs,
         )
-        this.lines.push(line)
+        this.add(line)
       }
     }
     this.lineStyle = flow.style
@@ -309,6 +337,25 @@ export class LogBuffer {
     }
     this.steps = this.steps.map((each, place) => (place === index ? closed : each))
     this.openStep = undefined
+  }
+
+  /**
+   * Keeps a finished line, or folds it into the line before it where it
+   * repeats that line and `collapse` is set. The fold is a new object, so a
+   * log comparing lines sees it change, drawn in the runs of the first.
+   */
+  private add(line: LogLine): void {
+    const last = this.lines.at(-1)
+    if (!this.collapse || !last || !repeats(line, last)) {
+      this.lines.push(line)
+      return
+    }
+    const folded: LogLine = { ...last, count: (last.count ?? 1) + (line.count ?? 1) }
+    const runs = this.runs.get(last)
+    if (runs) {
+      this.runs.set(folded, runs)
+    }
+    this.lines[this.lines.length - 1] = folded
   }
 
   /** Lets the oldest lines go past `limit`, all at once. */

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { LogBuffer } from './buffer.js'
+import { LogBuffer, loudEnough } from './buffer.js'
 
 const ESC = '\x1b'
 
@@ -88,5 +88,48 @@ describe('LogBuffer', () => {
     expect(buffer.lines).toEqual([])
     expect(buffer.dropped).toBe(0)
     expect(buffer.current()).toBeUndefined()
+  })
+})
+
+describe('repeats, with collapse', () => {
+  test('a line written again straight after itself folds into it, with a count', () => {
+    const buffer = new LogBuffer()
+    buffer.collapse = true
+    buffer.write('retrying\nretrying\nretrying\ndone\nretrying\n')
+    expect(buffer.lines.map((line) => [line.text, line.count ?? 1])).toEqual([
+      ['retrying', 3],
+      ['done', 1],
+      ['retrying', 1],
+    ])
+  })
+
+  test('lines handed over as data fold too, and a different level is a different line', () => {
+    const buffer = new LogBuffer()
+    buffer.collapse = true
+    buffer.replace([
+      { level: 'warn', text: 'slow' },
+      { level: 'warn', text: 'slow' },
+      { level: 'error', text: 'slow' },
+    ])
+    expect(buffer.lines.map((line) => [line.level, line.count ?? 1])).toEqual([
+      ['warn', 2],
+      ['error', 1],
+    ])
+  })
+
+  test('without collapse, every line is its own', () => {
+    const buffer = new LogBuffer()
+    buffer.write('a\na\n')
+    expect(texts(buffer)).toEqual(['a', 'a'])
+  })
+})
+
+describe('the quietest level shown', () => {
+  test('counts up from debug, through log and info, to error, a line with no level being info', () => {
+    expect(loudEnough('log', 'info')).toBe(false)
+    expect(loudEnough(undefined, 'info')).toBe(true)
+    expect(loudEnough('debug', 'log')).toBe(false)
+    expect(loudEnough('warn', 'warn')).toBe(true)
+    expect(loudEnough('debug', undefined)).toBe(true)
   })
 })
