@@ -7,7 +7,7 @@ import { highlight } from '@fusion.dev/helix-sandbox/highlight'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Fragment } from 'react'
+import { type CSSProperties, Fragment } from 'react'
 import { CodeText, plainText } from '@/components/code-text/code-text'
 import { docsShell } from '@/components/docs-shell/docs-shell'
 import { SectionHeading } from '@/components/section-heading/section-heading'
@@ -42,9 +42,20 @@ const SECTIONS = [
 ] as const
 
 /**
- * The description column, one width for every table on the page.
+ * **The description column: one share of the table, the same in every table.**
+ * Every table on the page is as wide as the column, so a share puts every
+ * description at the same place and gives it the same width, whatever the
+ * columns before it hold.
+ *
+ * A fixed `26rem` was the same width everywhere and started at a different
+ * place in each table, because the columns before it are as wide as their
+ * longest name, type, and default. On eleven pages those needed more than the
+ * column had left, up to 418px on Number Input and Slider, so the table
+ * scrolled sideways. With the default under the type, the widest pair of name
+ * and type is 363px, on Notifications, so half of the 743px column is the
+ * widest share that still fits every page.
  */
-const DESCRIPTION = '26rem'
+const DESCRIPTION = '50%'
 
 /**
  * The name column, which may never be narrower than the name in it.
@@ -67,6 +78,14 @@ const NAME = 'minmax(min-content, auto)'
  * there is nowhere for it to go.
  */
 const TYPE = 'minmax(min-content, 1fr)'
+
+/**
+ * The columns a table keeps once its descriptions move under their rows, which
+ * the stylesheet hands the table where it is too narrow for the share: the name
+ * and type as they were, or the name across the whole width.
+ */
+const stacked = (typed: boolean): CSSProperties =>
+  ({ '--api-stacked': typed ? `${NAME} ${TYPE}` : 'minmax(0, 1fr)' }) as CSSProperties
 
 const first = (text: string): string => text.split('\n\n')[0] ?? ''
 
@@ -267,7 +286,7 @@ function MemberTable({
     return null
   }
   return (
-    <div className={api.apiTable}>
+    <div className={api.apiTable} style={stacked(typed)}>
       <helix-table label={label}>
         <helix-table-column width={NAME}>
           {label}
@@ -344,17 +363,21 @@ function Described({
   )
 }
 
-/** The one table with a fourth column, because a property has a resting value. */
+/**
+ * Name, type, description, as the other tables are. A property's resting value
+ * sits under its type, which kept the default column out of the share every
+ * other table gives its first two: with a column of its own, Prop, Type and
+ * Default needed up to 418px of the 743px column on Number Input and Slider.
+ */
 function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
   if (rows.length === 0) {
     return null
   }
   return (
-    <div className={api.apiTable}>
+    <div className={api.apiTable} style={stacked(true)}>
       <helix-table label="Properties">
         <helix-table-column width={NAME}>Prop</helix-table-column>
         <helix-table-column width={TYPE}>Type</helix-table-column>
-        <helix-table-column>Default</helix-table-column>
         <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
         {byName(rows).map((row) => (
           <helix-table-row key={row.name}>
@@ -362,10 +385,15 @@ function PropertyTable({ rows }: { rows: PropertyDoc[] }) {
               <Code>{row.name}</Code>
             </helix-table-cell>
             <helix-table-cell>
-              <TypeText>{row.type}</TypeText>
-            </helix-table-cell>
-            <helix-table-cell>
-              {row.default && <DefaultText>{row.default}</DefaultText>}
+              <span className={api.apiTypeStack}>
+                <TypeText>{row.type}</TypeText>
+                {row.default && (
+                  <span className={api.apiDefaultLine}>
+                    <span className={api.apiDefaultLabel}>Default</span>
+                    <DefaultText>{row.default}</DefaultText>
+                  </span>
+                )}
+              </span>
             </helix-table-cell>
             <Described description={row.description} references={row.references} />
           </helix-table-row>
@@ -686,39 +714,44 @@ export default async function FamilyDocs({
               <SectionHeading as="h2" label="Examples" target="examples">
                 Examples
               </SectionHeading>
-              <helix-table label="Examples">
-                <helix-table-column>Name</helix-table-column>
-                <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
-                {/* Rows are keyed on the tier as well as the slug. Both tiers
+              <div className={api.apiTable} style={stacked(false)}>
+                <helix-table label="Examples">
+                  <helix-table-column width={NAME}>Name</helix-table-column>
+                  <helix-table-column width={DESCRIPTION}>Description</helix-table-column>
+                  {/* Rows are keyed on the tier as well as the slug. Both tiers
                     name their canonical example `preview.html`, so the slug
                     alone hands React two children called `preview`. */}
-                {byExample(family.examples).map((example) => (
-                  <helix-table-row data-tier={example.tier} key={`${example.tier}.${example.slug}`}>
-                    <helix-table-cell header>
-                      {/* `quiet`: a column where every row is a link does not
+                  {byExample(family.examples).map((example) => (
+                    <helix-table-row
+                      data-tier={example.tier}
+                      key={`${example.tier}.${example.slug}`}
+                    >
+                      <helix-table-cell header>
+                        {/* `quiet`: a column where every row is a link does not
                           need every row underlined and blue. The variant carries
                           the muted color, drops the rule, and moves to full
                           foreground on hover. */}
-                      <Link
-                        data-link="quiet"
-                        href={`/helix/sandbox?e=${family.slug}.${example.slug}${
-                          forced ? `&tier=${forced}` : ''
-                        }`}
-                      >
-                        {example.label}
-                      </Link>
-                    </helix-table-cell>
-                    {/* A dash where nobody has written one yet. An empty cell
+                        <Link
+                          data-link="quiet"
+                          href={`/helix/sandbox?e=${family.slug}.${example.slug}${
+                            forced ? `&tier=${forced}` : ''
+                          }`}
+                        >
+                          {example.label}
+                        </Link>
+                      </helix-table-cell>
+                      {/* A dash where nobody has written one yet. An empty cell
                         reads as data that failed to load; a dash reads as a
                         blank someone still has to fill. */}
-                    <helix-table-cell>
-                      <helix-text emphasis="muted" variant="caption">
-                        {example.description ? <CodeText>{example.description}</CodeText> : '-'}
-                      </helix-text>
-                    </helix-table-cell>
-                  </helix-table-row>
-                ))}
-              </helix-table>
+                      <helix-table-cell>
+                        <helix-text emphasis="muted" variant="caption">
+                          {example.description ? <CodeText>{example.description}</CodeText> : '-'}
+                        </helix-text>
+                      </helix-table-cell>
+                    </helix-table-row>
+                  ))}
+                </helix-table>
+              </div>
             </helix-flex>
           )}
         </helix-flex>
