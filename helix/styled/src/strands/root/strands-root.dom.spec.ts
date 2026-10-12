@@ -134,7 +134,7 @@ describe('strands', () => {
     expect(host.getAttribute('speed')).toBeNull()
   })
 
-  test('clear reflects, so the sheet can drop the ground under the fallback band', async () => {
+  test('clear reflects, so the sheet shows the band only in fallback, without its ground', async () => {
     const host = (await mount(undrawn())) as Strands & { clear: boolean }
     host.clear = true
     await host.updateComplete
@@ -142,6 +142,7 @@ describe('strands', () => {
     const { styles } = await import('./strands-root.css.js')
     const sheet = (styles as { cssText?: string }).cssText ?? String(styles)
     expect(sheet).toContain(':host([clear])')
+    expect(sheet).toContain(':host([clear]:state(fallback))')
   })
 
   test('the sheet keeps it out of the way: no pointer, and behind the page in travel', async () => {
