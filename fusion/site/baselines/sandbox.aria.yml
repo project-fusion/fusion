@@ -16,10 +16,12 @@
 - iframe
 - separator "Resize panel"
 - tablist "Panel":
-  - tab "Terminal" [selected]
+  - tab "Console" [selected]
   - tab "Specs"
 - log "Console output":
   - paragraph: Nothing written to the console yet.
+- status
+- log
 - separator "Resize panes and panel"
 - separator "Resize panes"
 - complementary:
