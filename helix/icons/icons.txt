@@ -61,12 +61,14 @@ eyedropper
 first-aid
 flag-banner-fold
 flask
+folder-dashed
 folder-open
 fork-knife
 funnel-simple
 fusion
 gauge
 gear
+git-branch
 github-logo
 globe
 graduation-cap
