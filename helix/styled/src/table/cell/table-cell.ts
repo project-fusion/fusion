@@ -17,6 +17,15 @@ import { styles } from './table-cell.css.js'
  * @documentation https://fusion.dev/helix/components/table
  *
  * @slot - The cell's content.
+ *
+ * @cssproperty --table-cell-min-block-size - The least height of a cell, and so of its
+ * row. Unset, every row is as tall as a control, whatever its cells hold.
+ * @cssproperty --table-padding-block - The space above and below a cell's content. Two
+ * values set the space above and the space below.
+ * @cssproperty --table-rule-color - The color of the line under a cell, which is the line
+ * between rows. It takes a color only, because it fills the color in a border shorthand,
+ * and a full border value makes the rule invalid. It is drawn on the cells, because the
+ * row is `display: contents`.
  */
 @customElement('helix-table-cell')
 export class HelixTableCell extends HelixHeadlessTableCell {

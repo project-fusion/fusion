@@ -17,7 +17,7 @@
 [part="column"] {
   align-items: center;
   border-block-end: var(--helix-border-thin) solid
-    var(--_table-heading-rule-color, var(--helix-color-border));
+    var(--_table-heading-rule-color, var(--table-rule-color, var(--helix-color-border)));
   box-sizing: border-box;
   /* Muted, and the same size as the cells under it. The caption treatment,
      `text-xs`, is a step smaller than the column it names, which reads as a
@@ -34,7 +34,10 @@
      first of the row separators rather than as the line the table starts at. */
   min-block-size: var(--helix-size-control-loose);
   min-inline-size: 0;
-  padding-block: var(--_table-heading-padding-block, var(--helix-space-none));
+  padding-block: var(
+    --_table-heading-padding-block,
+    var(--table-padding-block, var(--helix-space-none))
+  );
   padding-inline: var(
     --_table-heading-padding-inline,
     var(--helix-space-none) var(--helix-space-md)
