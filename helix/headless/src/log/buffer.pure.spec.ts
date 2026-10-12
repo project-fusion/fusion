@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { LogBuffer, loudEnough } from './buffer.js'
+import { LogBuffer, levelSaid, loudEnough } from './buffer.js'
 
 const ESC = '\x1b'
 
@@ -131,5 +131,24 @@ describe('the quietest level shown', () => {
     expect(loudEnough('debug', 'log')).toBe(false)
     expect(loudEnough('warn', 'warn')).toBe(true)
     expect(loudEnough('debug', undefined)).toBe(true)
+  })
+})
+
+describe('the level a line says', () => {
+  test('is its words, unless its text already starts with them', () => {
+    expect(levelSaid('Error:', 'Cannot find module')).toBe('Error:')
+    expect(levelSaid('Error:', 'Error: Cannot find module')).toBeUndefined()
+    expect(levelSaid('Error:', '  error - build failed')).toBeUndefined()
+    expect(levelSaid('Warning:', 'warning: glob is deprecated')).toBeUndefined()
+  })
+
+  test('a word that only starts the text’s first word is still said', () => {
+    expect(levelSaid('Error:', 'Errors: 2')).toBe('Error:')
+    expect(levelSaid('Error:', 'ErrorBoundary caught it')).toBe('Error:')
+  })
+
+  test('no words are none', () => {
+    expect(levelSaid(undefined, 'Error: x')).toBeUndefined()
+    expect(levelSaid('', 'x')).toBeUndefined()
   })
 })

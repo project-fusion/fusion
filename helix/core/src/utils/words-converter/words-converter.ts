@@ -1,6 +1,6 @@
 /**
  * Reads an attribute holding words keyed by name, written as a JSON object,
- * such as Orb's `state-labels`, Sandbox Terminal's `level-words` or Color
+ * such as Orb's `state-labels`, Sandbox Console's `level-words` or Color
  * Picker's `color-words`. A property declares it as its `converter`.
  *
  * **Anything else is no words, never `null`.** JSON that does not parse, an

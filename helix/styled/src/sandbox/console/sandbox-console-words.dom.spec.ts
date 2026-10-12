@@ -12,9 +12,9 @@ let clearWords: typeof ClearWords
 let registerWords: typeof RegisterWords
 
 /**
- * The sandbox's parts on the words registry: the terminal's words, the count
- * of a repeated line in plural forms, and the divider's name for the lead
- * pane.
+ * The sandbox's parts on the words registry: the console's words, the count
+ * of a repeated line, which its log says in plural forms, and the divider's
+ * name for the lead pane.
  */
 beforeAll(async () => {
   registerDom()
@@ -27,49 +27,65 @@ afterEach(() => {
   document.body.innerHTML = ''
 })
 
-type Terminal = Updatable & {
+type Console = Updatable & {
   write: (detail: { level: 'log' | 'info' | 'warn' | 'error'; text: string }) => void
 }
 
-const terminal = async (around: string): Promise<Terminal> => {
-  document.body.innerHTML = `<div ${around}><helix-sandbox-terminal controls></helix-sandbox-terminal></div>`
-  const host = document.querySelector('helix-sandbox-terminal') as Terminal
+const opened = async (around: string): Promise<Console> => {
+  document.body.innerHTML = `<div ${around}><helix-sandbox-console controls></helix-sandbox-console></div>`
+  const host = document.querySelector('helix-sandbox-console') as Console
   await settle(host)
   return host
 }
 
+/** The first line the console's log drew, once it and the log have settled. */
+const firstLine = async (host: Console): Promise<Updatable> => {
+  await settle(host)
+  const log = part(host, 'output') as Updatable
+  await settle(log)
+  await new Promise((resolve) => requestAnimationFrame(resolve))
+  await settle(log)
+  const line = log.shadowRoot?.querySelector('[part="row"]')?.firstElementChild as Updatable
+  await settle(line)
+  return line
+}
+
 const POLISH = {
-  'helix-sandbox-terminal': {
+  'helix-log': {
+    timesLabel: '{count, plural, one {# raz} few {# razy} many {# razy} other {# razy}}',
+  },
+  'helix-sandbox-console': {
     clearLabel: 'Wyczyść',
     levelWords: { error: 'Błędy' },
-    timesLabel: '{count, plural, one {# raz} few {# razy} many {# razy} other {# razy}}',
+    spokenWords: { warn: 'Ostrzeżenie:' },
   },
 }
 
 describe('sandbox words', () => {
-  test('the terminal’s words are the ones registered for the nearest lang', async () => {
+  test('the console’s words are the ones registered for the nearest lang', async () => {
     registerWords('pl', POLISH)
-    const host = await terminal('lang="pl"')
+    const host = await opened('lang="pl"')
     expect(part(host, 'clear')?.textContent).toBe('Wyczyść')
     const options = [...(host.shadowRoot?.querySelectorAll('option') ?? [])].map((one) =>
       one.textContent?.trim(),
     )
     expect(options).toEqual(['All levels', 'Info and above', 'Warnings and errors', 'Błędy'])
+    host.write({ level: 'warn', text: 'uwaga' })
+    await settle(host)
+    expect(part(host, 'live')?.textContent?.trim()).toBe('Ostrzeżenie: uwaga')
   })
 
-  test('a repeated line’s count is a plural message', async () => {
+  test('a repeated line’s count is a plural message, in the log’s words', async () => {
     registerWords('pl', POLISH)
-    const host = await terminal('lang="pl"')
+    const host = await opened('lang="pl"')
     for (let step = 0; step < 3; step++) {
       host.write({ level: 'log', text: 'same' })
     }
-    await settle(host)
-    expect(part(host, 'count')?.getAttribute('aria-label')).toBe('3 razy')
-    const english = await terminal('')
+    expect(part(await firstLine(host), 'count-label')?.textContent?.trim()).toBe('3 razy')
+    const english = await opened('')
     english.write({ level: 'log', text: 'same' })
     english.write({ level: 'log', text: 'same' })
-    await settle(english)
-    expect(part(english, 'count')?.getAttribute('aria-label')).toBe('2 times')
+    expect(part(await firstLine(english), 'count-label')?.textContent?.trim()).toBe('2 times')
   })
 
   test('the divider between the panes is named for the lead pane in the registered words', async () => {

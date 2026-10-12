@@ -21,9 +21,9 @@ import '../../splitter/index.js'
 import type { CSSResultGroup, PropertyValues, TemplateResult } from 'lit'
 import { html, nothing } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import type { HelixSandboxConsole } from '../console/sandbox-console.js'
 import type { HelixSandboxPreview } from '../preview/sandbox-preview.js'
 import type { HelixSandboxStatusBar } from '../status-bar/sandbox-status-bar.js'
-import type { HelixSandboxTerminal } from '../terminal/sandbox-terminal.js'
 import { styles } from './sandbox-root.css.js'
 
 /** Where the divider sits, and how tall the panel is, before anyone moves them.
@@ -156,7 +156,7 @@ const fileOf = (pane: Element): string => {
  * @aliases Playground, REPL, Editor
  * @documentation https://fusion.dev/helix/components/sandbox
  *
- * @slot panel - A panel under both panes, usually a terminal.
+ * @slot panel - A panel under both panes, usually a console.
  * @slot preview - The live preview. It comes second unless `lead` is `preview`.
  * @slot source - The editable source pane. It comes first unless `lead` is `preview`.
  * @slot status - A status bar, spanning both panes at the bottom.
@@ -738,7 +738,7 @@ export class HelixSandbox extends HelixElement {
    * The parts of this sandbox it drives, wherever they sit inside it.
    *
    * Descendants, not children. A preview and a status bar happen to be slotted
-   * directly, but a terminal lives inside the tab set that holds the panel, so
+   * directly, but a console lives inside the tab set that holds the panel, so
    * a search of `children` found none and the console went nowhere. Where a
    * consumer nests a pane is their arrangement to make.
    *
@@ -753,7 +753,7 @@ export class HelixSandbox extends HelixElement {
   }
 
   /**
-   * Hands a console line from the preview to any terminal slotted here.
+   * Hands a console line from the preview to any console slotted here.
    *
    * Every `helix-console` is forwarded, with no check on where it came from.
    * Unlike a change, which any form control in a sandbox emits, this event is
@@ -763,13 +763,13 @@ export class HelixSandbox extends HelixElement {
    */
   private readonly handleConsole = (event: Event): void => {
     const detail = (event as HelixConsoleEvent).detail
-    for (const terminal of this.terminals) {
-      terminal.write(detail)
+    for (const panel of this.consoles) {
+      panel.write(detail)
     }
   }
 
-  private get terminals(): HelixSandboxTerminal[] {
-    return this.parts<HelixSandboxTerminal>('helix-sandbox-terminal')
+  private get consoles(): HelixSandboxConsole[] {
+    return this.parts<HelixSandboxConsole>('helix-sandbox-console')
   }
 
   private get statusBars(): HelixSandboxStatusBar[] {

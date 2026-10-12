@@ -14,12 +14,21 @@ describe('log line server output', () => {
       ssr(html`<helix-headless-log-line></helix-headless-log-line>`),
       'helix-headless-log-line',
     ).replace(/<!--[^>]*-->/g, '')
-    expect(own).toMatch(/part="text"><slot>/)
+    expect(own).toMatch(/part="text"><slot\s*>/)
   })
 
   test('no number and no time are served, since only the log can say them', () => {
     expect(partTag(markup, 'number')).toBe('')
     expect(partTag(markup, 'time')).toBe('')
+  })
+
+  /* The server cannot read the text a page wrote, so the client's first
+     render says the level too, and lets it go from the next. */
+  test('the level in words is served, even where the line’s text starts with them', () => {
+    const said = ssr(html`<helix-headless-log-line level="error"
+      >Error: Cannot find module</helix-headless-log-line
+    >`)
+    expect(partTag(said, 'level')).not.toBe('')
   })
 
   test('the host carries only what the consumer wrote', () => {

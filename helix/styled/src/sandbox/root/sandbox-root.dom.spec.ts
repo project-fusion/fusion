@@ -17,7 +17,7 @@ const withPanel = `
   <helix-sandbox>
     <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
     <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
-    <helix-sandbox-terminal slot="panel"></helix-sandbox-terminal>
+    <helix-sandbox-console slot="panel"></helix-sandbox-console>
   </helix-sandbox>`
 
 const withCss = `
@@ -181,7 +181,7 @@ describe('sandbox coordination', () => {
   })
 
   test('a console call in the frame arrives as an event on the host', async () => {
-    // The terminal's whole source. A message from any other window is not this
+    // The console's whole source. A message from any other window is not this
     // preview's, and neither is one carrying a real origin: the frame is
     // sandboxed, so everything it genuinely sends arrives as `"null"`. A named
     // origin means the frame has navigated somewhere else and that somewhere is
@@ -584,7 +584,7 @@ describe('sandbox dividers', () => {
       <helix-sandbox panel-collapsed-size="36">
         <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
         <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
-        <helix-sandbox-terminal slot="panel"></helix-sandbox-terminal>
+        <helix-sandbox-console slot="panel"></helix-sandbox-console>
       </helix-sandbox>`)) as Updatable & { panelSize: number }
     const named = heard(sandbox)
 
@@ -636,7 +636,7 @@ describe('sandbox dividers', () => {
       <helix-sandbox panel-collapsed-size="36" panel-size="120">
         <helix-sandbox-source slot="source" name="html" value="<p>one</p>"></helix-sandbox-source>
         <helix-sandbox-preview slot="preview"></helix-sandbox-preview>
-        <helix-sandbox-terminal slot="panel"></helix-sandbox-terminal>
+        <helix-sandbox-console slot="panel"></helix-sandbox-console>
       </helix-sandbox>`)) as Updatable & { panelSize: number }
     const named = heard(sandbox)
 

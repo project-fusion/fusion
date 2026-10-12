@@ -25,6 +25,7 @@ interface Log extends HTMLElement {
   text: string
   updateComplete: Promise<unknown>
   write(chunk: string): void
+  writeLine(line: LogLine): void
 }
 
 type Drawn = HTMLElement & { updateComplete: Promise<unknown> }
@@ -280,5 +281,20 @@ describe('a level and collapse', () => {
     await settle(element)
     expect(shape(element)).toEqual(['2 slow'])
     expect(hasState(element, 'filtered')).toBe(true)
+  })
+
+  test('takes a line at a time as data, folding a repeat and letting the oldest go past the limit', async () => {
+    const element = await opened('collapse limit="2"')
+    element.writeLine({ level: 'warn', text: 'slow' })
+    element.writeLine({ level: 'warn', text: 'slow' })
+    element.writeLine({ level: 'log', text: 'idle' })
+    await settle(element)
+    await frame()
+    await settle(element)
+    expect(shape(element)).toEqual(['slow', 'idle'])
+    expect(element.lines[0]?.count).toBe(2)
+    element.writeLine({ level: 'error', text: 'Boom' })
+    await settle(element)
+    expect(element.lines.map((line) => line.text)).toEqual(['idle', 'Boom'])
   })
 })

@@ -7,8 +7,8 @@ import type {
   HelixInput,
   HelixMenu,
   HelixSandbox,
+  HelixSandboxConsole,
   HelixSandboxPreview,
-  HelixSandboxTerminal,
   HelixSelectEvent,
   HelixSplitter,
   HelixTabs,
@@ -152,7 +152,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   // Off. It reports the caret and the language, which is worth having while
   // typing and is noise the rest of the time.
   const [showStatus, setShowStatus] = useState(DEFAULTS.panes.includes('status'))
-  const terminal = useRef<HelixSandboxTerminal>(null)
+  const output = useRef<HelixSandboxConsole>(null)
   const editors = useRef<Record<string, HelixSandboxEditor | null>>({})
   const [familySlug, setFamilySlug] = useState<string | null>(null)
   const [exampleSlug, setExampleSlug] = useState<string | null>(null)
@@ -734,7 +734,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
         return // The dev server is restarting. Ask again on the next tick.
       }
       if (last !== null && text !== last) {
-        /* Guarded the same way and for the same reason as the terminal's
+        /* Guarded the same way and for the same reason as the console's
            `clear` below: a method on an element that has not upgraded is not
            there. This one is reached from a two second timer rather than from
            mount, so the window has almost always closed by the time it runs,
@@ -791,10 +791,10 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
          different question from whether what it points at has upgraded: the
          registration import moved into an effect when #121 stopped React
          reporting a hydration mismatch, so on a first paint there is a window
-         where `<helix-sandbox-terminal>` is an unknown element with no methods
+         where `<helix-sandbox-console>` is an unknown element with no methods
          on it at all. This effect runs inside that window and threw
          `clear is not a function`, which took the whole page down. */
-      terminal.current?.clear?.()
+      output.current?.clear?.()
     } else if (last.syntax !== syntax) {
       /* **The other syntax is the other file, not a translation of this one.**
          Both are authored, so switching shows what somebody wrote rather than
@@ -1496,15 +1496,15 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             {showPanel && (
               <helix-tabs
                 data-density="sm"
-                defaultActive="terminal"
+                defaultActive="console"
                 label="Panel"
                 ref={panelTabs}
                 slot="panel"
               >
-                <helix-tab value="terminal">Terminal</helix-tab>
+                <helix-tab value="console">Console</helix-tab>
                 <helix-tab value="specs">Specs</helix-tab>
-                <helix-tab-panel slot="panels" value="terminal">
-                  <helix-sandbox-terminal ref={terminal}></helix-sandbox-terminal>
+                <helix-tab-panel slot="panels" value="console">
+                  <helix-sandbox-console ref={output}></helix-sandbox-console>
                 </helix-tab-panel>
                 <helix-tab-panel slot="panels" value="specs">
                   {/* The family, not the example: specs belong to a component, and
