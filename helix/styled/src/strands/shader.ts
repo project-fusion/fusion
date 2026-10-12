@@ -363,6 +363,12 @@ void main() {
  * the peak rather than clipping. On a light page added light is invisible, so
  * the same energy darkens the ground toward the peak as ink. A step of noise
  * under a code value hides the banding a slow gradient shows on eight bits.
+ *
+ * **Clear, the light is drawn without the ground**, premultiplied, so the
+ * canvas composites over whatever is behind it. On a dark page it is the light
+ * over black, as much as its brightest channel covers; on a light page, the
+ * ink as much as it darkens. Over the ground it was meant for, it reads as the
+ * ground-drawn ribbon does.
  */
 export const COMPOSITE_FRAGMENT = `#version 300 es
 precision highp float;
@@ -373,6 +379,7 @@ uniform sampler2D uFar;
 uniform vec3 uGround;
 uniform vec3 uInk;
 uniform float uLight;
+uniform float uClear;
 uniform float uGain;
 uniform float uBloom;
 out vec4 outColor;
@@ -382,9 +389,16 @@ void main() {
   e *= uGain;
   vec3 dark = 1.0 - (1.0 - uGround) * exp(-e);
   float lum = dot(e, vec3(0.3, 0.55, 0.15));
-  vec3 light = mix(uGround, uInk, 1.0 - exp(-lum * 1.4));
+  float ink = 1.0 - exp(-lum * 1.4);
+  vec3 light = mix(uGround, uInk, ink);
   vec3 c = mix(dark, light, uLight);
-  c += (hash(gl_FragCoord.xy) - 0.5) / 255.0;
-  outColor = vec4(c, 1.0);
+  float a = 1.0;
+  if (uClear > 0.5) {
+    vec3 shine = 1.0 - exp(-e);
+    a = mix(max(max(shine.r, shine.g), shine.b), ink, uLight);
+    c = mix(shine, uInk * ink, uLight);
+  }
+  c = clamp(c + (hash(gl_FragCoord.xy) - 0.5) / 255.0 * a, 0.0, a);
+  outColor = vec4(c, a);
 }
 `
