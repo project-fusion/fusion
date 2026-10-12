@@ -166,6 +166,7 @@ import { HelixShortcutEvent } from './shortcut.js'
 import { HelixSortEvent } from './sort.js'
 import { HelixSortedEvent } from './sorted.js'
 import { HelixSplitEvent } from './split.js'
+import { HelixStopEvent } from './stop.js'
 import { HelixStrandsFallbackEvent } from './strands-fallback.js'
 import { HelixTerminalBellEvent } from './terminal-bell.js'
 import { HelixTerminalInputEvent } from './terminal-input.js'
@@ -351,6 +352,7 @@ export {
   HelixSortEvent,
   HelixSortedEvent,
   HelixSplitEvent,
+  HelixStopEvent,
   HelixStrandsFallbackEvent,
   HelixTerminalBellEvent,
   HelixTerminalInputEvent,
@@ -477,6 +479,7 @@ const registry = {
   HelixSortEvent,
   HelixSortedEvent,
   HelixSplitEvent,
+  HelixStopEvent,
   HelixStrandsFallbackEvent,
   HelixTerminalBellEvent,
   HelixTerminalInputEvent,

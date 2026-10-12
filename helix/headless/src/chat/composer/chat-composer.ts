@@ -3,6 +3,7 @@ import {
   DelayController,
   HelixFormElement,
   HelixSendEvent,
+  HelixStopEvent,
   HelixTypingEvent,
   hostAria,
   MixinVoice,
@@ -12,7 +13,7 @@ import {
   timeConverter,
   words,
 } from '@fusion.dev/helix-core'
-import { arrowElbowDownLeft } from '@fusion.dev/helix-icons'
+import { arrowElbowDownLeft, stop } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js'
@@ -64,6 +65,11 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * `typing-timeout` milliseconds. Pass it on to show "is typing" to the other
  * side.
  *
+ * **`busy` says a reply is on its way**, and turns the send button into a
+ * stop button, named by `stop-label`, that sends `helix-stop`. The field
+ * stays open so the reader can write the next turn, and Enter does not send
+ * it until `busy` is cleared.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -76,6 +82,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @event {HelixBeforeListenEvent} helix-before-listen - The dictation button was pressed. Cancelable: cancel it to keep the composer from listening.
  * @event {HelixListenEvent} helix-listen - Dictation settled on a phrase and put it in the draft, after the draft's own `input`.
  * @event {HelixSendEvent} helix-send - Fired when the user sends their turn, and cancelable.
+ * @event {HelixStopEvent} helix-stop - Fired when the user presses the stop button, shown in place of the send button while `busy` is set.
  * @event {HelixTypingEvent} helix-typing - The user started or stopped writing, with `typing` saying which, as the composer's `typing` does.
  * @event {Event} input - The user changed the text. Read it from `value`, for a typing indicator or a saved draft. Bubbles and is composed, as a native field's is.
  *
@@ -83,8 +90,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart end - The box around the `end` slot.
  * @csspart feedback - The `feedback` message, under the field while it is set.
  * @csspart field - The text field.
- * @csspart mark - The icon inside the send button.
- * @csspart send - The send button.
+ * @csspart mark - The icon inside the send button, a return key, or a square while `busy`.
+ * @csspart send - The send button, which is the stop button while `busy`.
  * @csspart start - The box around the `start` slot.
  * @csspart tools - The row under the field.
  * @csspart voice - The dictation button, under `voice`, before the send button.
@@ -103,6 +110,18 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
    * `registerWords('de', { 'helix-chat-composer': { sendLabel: 'Senden' } })`.
    */
   static words = 'helix-chat-composer'
+
+  /**
+   * Whether a reply is on its way. While set, the send button is a stop
+   * button that sends `helix-stop`, and the draft does not send.
+   *
+   * **The same button rather than one beside it**, because sending and
+   * stopping are never both possible: while a reply is on its way there is
+   * nothing to send to, and the place the reader's eye goes to act is the
+   * place that can act. The field stays open for the next turn.
+   */
+  @property({ reflect: true, type: Boolean })
+  busy = false
 
   /**
    * A message about the draft, shown under the field. While set, the composer
@@ -159,6 +178,13 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
   @words
   @property({ attribute: 'send-label' })
   sendLabel = 'Send'
+
+  /**
+   * Label for the stop button shown while `busy`.
+   */
+  @words
+  @property({ attribute: 'stop-label' })
+  stopLabel = 'Stop'
 
   /**
    * What sends the turn: `enter` for the Enter key, or `button` for the send
@@ -254,7 +280,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
     /* What was heard so far stays in the draft and goes with it. */
     this.stopListening()
     const value = this.value.trim()
-    if (this.isDisabled) {
+    if (this.isDisabled || this.busy) {
       return false
     }
     /* Nothing is sent, and a required composer says why, as a draft the form
@@ -398,20 +424,16 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
    * draws, and a picture of a key is not turned round with the text.
    */
   protected renderSend(): TemplateResult {
+    const mark = this.busy ? stop : arrowElbowDownLeft
     return html`<button
       part="send"
       type="button"
-      aria-label=${this.sendLabel}
+      aria-label=${this.busy ? this.stopLabel : this.sendLabel}
       ?disabled=${this.isDisabled}
-      @click=${this.handleSend}
+      @click=${this.busy ? this.handleStop : this.handleSend}
     >
-      <svg
-        part="mark"
-        fill="currentColor"
-        viewBox=${arrowElbowDownLeft.viewBox}
-        aria-hidden="true"
-      >
-        ${unsafeSVG(arrowElbowDownLeft.content)}
+      <svg part="mark" fill="currentColor" viewBox=${mark.viewBox} aria-hidden="true">
+        ${unsafeSVG(mark.content)}
       </svg>
     </button>`
   }
@@ -487,6 +509,10 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
 
   private readonly handleSend = (): void => {
     this.send()
+  }
+
+  private readonly handleStop = (): void => {
+    this.dispatchEvent(new HelixStopEvent())
   }
 
   /**

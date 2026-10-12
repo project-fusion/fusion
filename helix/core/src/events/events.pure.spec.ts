@@ -93,6 +93,18 @@ describe('the events that carried no class before', () => {
     expect(helixEventNames.has('helix-copy-error')).toBe(true)
   })
 
+  test('helix-stop bubbles out of the shadow root and cannot be canceled', async () => {
+    const { HelixStopEvent } = await import('./events.js')
+    const event = new HelixStopEvent()
+    expect([event.type, event.bubbles, event.composed, event.cancelable]).toEqual([
+      'helix-stop',
+      true,
+      true,
+      false,
+    ])
+    expect(helixEventNames.has('helix-stop')).toBe(true)
+  })
+
   test('helix-aura-fallback says why the gradient shows', async () => {
     const { HelixAuraFallbackEvent } = await import('./events.js')
     const event = new HelixAuraFallbackEvent({ reason: 'lost' })
