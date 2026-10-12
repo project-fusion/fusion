@@ -33,6 +33,7 @@ caret-left
 caret-right
 caret-up
 chart-line
+chat-circle
 check
 check-circle
 check-circle-fill
@@ -41,6 +42,7 @@ clock
 closed-captioning
 cloud
 cloud-rain
+command
 compass
 copy
 corners-in
