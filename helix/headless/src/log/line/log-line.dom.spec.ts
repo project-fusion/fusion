@@ -64,3 +64,34 @@ describe('Log Line', () => {
     expect(part(element, 'text')?.textContent).toBe('no match here')
   })
 })
+
+describe('what a line says beside its text', () => {
+  test('its level in words at debug, warn and error, and nothing at info or log', async () => {
+    for (const [level, words] of [
+      ['debug', 'Debug:'],
+      ['warn', 'Warning:'],
+      ['error', 'Error:'],
+    ]) {
+      const element = await line(
+        `<helix-headless-log-line level="${level}">ok</helix-headless-log-line>`,
+      )
+      expect(part(element, 'level')?.textContent?.trim()).toBe(words)
+    }
+    for (const level of ['info', 'log']) {
+      const element = await line(
+        `<helix-headless-log-line level="${level}">ok</helix-headless-log-line>`,
+      )
+      expect(part(element, 'level')).toBeNull()
+    }
+  })
+
+  test('how many times it was written, as a number and in words, once a log folds it', async () => {
+    const element = (await line()) as Line & { logCount: number }
+    expect(part(element, 'count')).toBeNull()
+    element.logCount = 3
+    await element.updateComplete
+    expect(part(element, 'count')?.textContent?.trim()).toBe('3')
+    expect(part(element, 'count')?.getAttribute('aria-hidden')).toBe('true')
+    expect(part(element, 'count-label')?.textContent?.trim()).toBe('3 times')
+  })
+})

@@ -18,6 +18,8 @@ interface Log extends HTMLElement {
   lineNumbers: boolean
   lines: readonly LogLine[]
   parse: LogParser | undefined
+  collapse: boolean
+  level: string | undefined
   query: string
   source: LogSource | null
   text: string
@@ -256,5 +258,27 @@ describe('a query', () => {
     const line = rows(element)[2]?.firstElementChild as Drawn
     expect(part(line, 'match')?.textContent).toBe('Package')
     expect(said(element)).toBe('2 lines match')
+  })
+})
+
+describe('a level and collapse', () => {
+  test('folds repeats into one numbered line with its count, and shows only the lines loud enough', async () => {
+    const element = await opened('collapse line-numbers')
+    element.lines = [
+      { level: 'log', text: 'render' },
+      { level: 'log', text: 'render' },
+      { level: 'warn', text: 'slow' },
+      { level: 'log', text: 'idle' },
+    ]
+    await settle(element)
+    await frame()
+    await settle(element)
+    expect(shape(element)).toEqual(['1 render', '2 slow', '3 idle'])
+    const first = rows(element)[0]?.firstElementChild as Drawn
+    expect(part(first, 'count-label')?.textContent?.trim()).toBe('2 times')
+    element.level = 'warn'
+    await settle(element)
+    expect(shape(element)).toEqual(['2 slow'])
+    expect(hasState(element, 'filtered')).toBe(true)
   })
 })

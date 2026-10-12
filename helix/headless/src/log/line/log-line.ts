@@ -3,6 +3,7 @@ import {
   formatWords,
   HelixElement,
   words,
+  wordsConverter,
   wordsLocale,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -35,8 +36,10 @@ const elapsed = (seconds: number): string => {
  * and tells it whether to show its number and its time.
  *
  * `level` says how much a line matters, and the styled tier draws `warn` and
- * `error` lines apart. The text is the line's own content, so you can mark it
- * up yourself.
+ * `error` lines apart. A line at `debug`, `warn` or `error` says its level in
+ * words before its text, so a reader moving through the log hears it as well
+ * as the color shows it. The text is the line's own content, so you can mark
+ * it up yourself.
  *
  * @since 0.200.0
  * @status experimental
@@ -51,6 +54,9 @@ const elapsed = (seconds: number): string => {
  * @csspart line-marked - The row of a line `mark-lines` names on the log.
  * @csspart line-selected - The row of a line in the log's selection.
  * @csspart line-warn - The row of a line at `warn`.
+ * @csspart count - How many times a line written again straight after itself was written, where the log's `collapse` folds repeats. Hidden from screen readers, which hear `count-label`.
+ * @csspart count-label - What a screen reader hears for the count, such as "3 times". Visually hidden in the styled tier.
+ * @csspart level - What a screen reader hears before the text for a line at `debug`, `warn` or `error`, such as "Warning:". Visually hidden in the styled tier.
  * @csspart match - Text that matches the log's `query`, in a line the log draws from data.
  * @csspart number - The line's number, shown with `line-numbers`: a link with `line-href`, and a button on a `selectable` log.
  * @csspart run - A stretch of text drawn in an ANSI style, in a line the log draws from data. Its color is `--log-run-color` and its background `--log-run-background-color`.
@@ -65,7 +71,7 @@ const elapsed = (seconds: number): string => {
  * @cssproperty --log-run-background-color - Written on a `run` with a background, in the same form as `--log-run-color`.
  * @cssproperty --log-run-color - Written on a `run` with a text color: one of the sixteen `--log-ansi-*` colors the log publishes, or the color itself.
  *
- * @cssstate filtered - The log's `query` does not match the line, so it draws nothing.
+ * @cssstate filtered - The log's `query` does not match the line, or its `level` is quieter than the log shows, so it draws nothing.
  */
 @customElement('helix-headless-log-line')
 export class HelixHeadlessLogLine extends HelixElement {
@@ -80,10 +86,28 @@ export class HelixHeadlessLogLine extends HelixElement {
   @property({ reflect: true })
   level?: LogLevel
 
+  /**
+   * What a screen reader hears before the text of a line at each level, for a
+   * page in another language, keyed by level, such as `{ warn: 'Warnung:' }`.
+   * A line at `info` or `log` hears nothing extra. As an attribute it is that
+   * object as JSON.
+   */
+  @words
+  @property({ attribute: 'level-words', converter: wordsConverter })
+  levelWords: Partial<Record<LogLevel, string>> = {
+    debug: 'Debug:',
+    error: 'Error:',
+    warn: 'Warning:',
+  }
+
   /** What a screen reader hears for the link on a line's number. `{number}` is the number. */
   @words
   @property({ attribute: 'line-label' })
   lineLabel = 'Line {number}'
+
+  /** @internal Set by the log: how many times the line was written in a row, where `collapse` folds repeats. */
+  @property({ attribute: false })
+  logCount = 1
 
   /** @internal Set by the log: whether the query hides the line. */
   @property({ attribute: false })
@@ -136,6 +160,14 @@ export class HelixHeadlessLogLine extends HelixElement {
   /** @internal Set by the log: the text as styled runs, for a line drawn from data. */
   @property({ attribute: false })
   runs: readonly LogRun[] | undefined = undefined
+
+  /**
+   * What a screen reader hears after a line written more than once in a row.
+   * `{count}` is how many times, in the locale.
+   */
+  @words
+  @property({ attribute: 'times-label' })
+  timesLabel = '{count} times'
 
   /**
    * @internal Read by the log to find its lines among its children and inside
@@ -249,14 +281,24 @@ export class HelixHeadlessLogLine extends HelixElement {
     })
   }
 
+  /** The count of a folded line, shown as a number and heard as words. */
+  private renderCount(): TemplateResult | typeof nothing {
+    if (this.logCount < 2) {
+      return nothing
+    }
+    return html` <span part="count" aria-hidden="true">${this.logCount}</span><span part="count-label"
+        >${formatWords(this, 'timesLabel', { count: this.logCount })}</span
+      >`
+  }
   protected override render(): TemplateResult | typeof nothing {
     if (this.logFiltered) {
       return nothing
     }
     const level = this.level
+    const said = level === undefined ? undefined : this.levelWords[level]
     return html`<div
-      part="line${level ? { debug: ' line-debug', error: ' line-error', info: '', warn: ' line-warn' }[level] : ''}${this.logMarked ? ' line-marked' : ''}${this.logSelected ? ' line-selected' : ''}${this.logGrouped ? ' line-grouped' : ''}"
-    >${this.renderNumber()}${this.renderTime()}<span part="text">${this.renderText()}</span></div>`
+      part="line${level ? { debug: ' line-debug', error: ' line-error', info: '', log: '', warn: ' line-warn' }[level] : ''}${this.logMarked ? ' line-marked' : ''}${this.logSelected ? ' line-selected' : ''}${this.logGrouped ? ' line-grouped' : ''}"
+    >${this.renderNumber()}${this.renderTime()}${said ? html`<span part="level">${said} </span>` : nothing}<span part="text">${this.renderText()}</span>${this.renderCount()}</div>`
   }
 }
 

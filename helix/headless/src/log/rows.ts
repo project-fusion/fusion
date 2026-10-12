@@ -1,5 +1,5 @@
 import { type LogRun, stripAnsi } from './ansi.js'
-import type { LogGroup, LogLine } from './buffer.js'
+import { type LogGroup, type LogLevel, type LogLine, loudEnough } from './buffer.js'
 
 /** One row of a log drawn from data: a line, or the heading of a group. */
 export type LogRow =
@@ -32,6 +32,8 @@ export interface LogRowsInput {
   groups: readonly LogGroup[]
   /** The finished lines, oldest first. */
   lines: readonly LogLine[]
+  /** The quietest level shown, or undefined for every level. */
+  level?: LogLevel | undefined
   /** Whether a group shows its lines. */
   open: (id: string) => boolean
   /** Text a line has to hold to be shown, ignoring case. Empty shows every line. */
@@ -76,12 +78,25 @@ const holds = (line: LogLine, needle: string): boolean => {
  * where it is rather than hidden by the fold. A group with no match is left
  * out, heading and all.
  */
-export const logRows = ({ current, groups, lines, open, query, start }: LogRowsInput): LogRows => {
+export const logRows = ({
+  current,
+  groups,
+  level,
+  lines,
+  open,
+  query,
+  start,
+}: LogRowsInput): LogRows => {
   const needle = query.trim().toLowerCase()
   const byId = new Map(groups.map((group) => [group.id, group]))
   const all = current ? [...lines, current] : lines
   const hits = new Set<string>()
-  const matches = needle === '' ? undefined : all.map((line) => holds(line, needle))
+  /* `level` narrows as a search does: what is left shows, and a group shows
+     while it holds some of it. */
+  const filtering = needle !== '' || level !== undefined
+  const matches = filtering
+    ? all.map((line) => holds(line, needle) && loudEnough(line.level, level))
+    : undefined
   let matched = 0
   if (matches) {
     all.forEach((line, index) => {
@@ -100,16 +115,16 @@ export const logRows = ({ current, groups, lines, open, query, start }: LogRowsI
     const group = line.group === undefined ? undefined : byId.get(line.group)
     if (group && !placed.has(group.id)) {
       placed.add(group.id)
-      if (needle === '' || hits.has(group.id)) {
-        rows.push({ group, kind: 'group', open: needle !== '' || open(group.id) })
+      if (!filtering || hits.has(group.id)) {
+        rows.push({ group, kind: 'group', open: filtering || open(group.id) })
       }
     }
-    const shown = group === undefined || needle !== '' || open(group.id)
+    const shown = group === undefined || filtering || open(group.id)
     if (shown && (matches?.[index] ?? true)) {
       rows.push({ kind: 'line', line, number: start + index + 1 })
     }
   }
-  if (needle === '') {
+  if (!filtering) {
     /* Only the groups after the last one with a line, which are the steps to
        come. One before it with no line left is a step whose lines were all
        let go, and standing it at the end would put it after its successors. */
@@ -118,7 +133,7 @@ export const logRows = ({ current, groups, lines, open, query, start }: LogRowsI
       rows.push({ group, kind: 'group', open: open(group.id) })
     }
   }
-  return { matched: needle === '' ? all.length : matched, rows }
+  return { matched: filtering ? matched : all.length, rows }
 }
 
 /** A run, and whether it is part of a match. */
