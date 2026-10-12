@@ -22,7 +22,10 @@ import { styles } from './popover-root.css.js'
  * @aliases Popper, Flyout, Overlay
  * @documentation https://fusion.dev/helix/components/popover
  *
+ * @cssproperty --popover-backdrop - Filter applied behind a `frosted` or `glass` panel.
+ *   Follows the theme's material policy.
  * @cssproperty --popover-arrow-size - Size of the point drawn with `arrow`. Tooltip's point is the same size.
+ * @cssproperty --popover-background-color - Fill of the surface.
  * @cssproperty --popover-border-color - Color of the panel's edge.
  * @cssproperty --popover-border-width - Width of the panel's edge. Defaults to
  *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless
@@ -47,6 +50,24 @@ export class HelixPopover extends HelixHeadlessPopover {
    * `plain` removes both, for a panel holding something that brings its own,
    * such as a list whose rows run to the edges.
    */
+  /**
+   * The panel's surface: `frosted` or `glass`.
+   *
+   * Absent is the opaque overlay surface. `glass` is the page's translucent
+   * ground over a blur, for a page whose surfaces are glass, so a panel opened
+   * over a glass window is not the one opaque slab on it. `frosted` is the same
+   * pair turned up, a ground that admits less and a heavier blur.
+   *
+   * The strength is the theme's: `--helix-material-translucent`,
+   * `--helix-material-translucent-strong` and `--helix-material-backdrop` are
+   * what the policy moves. `Drawer` and `Tooltip` carry the same attribute.
+   *
+   * **No `transparent`, deliberately.** A panel floating over arbitrary page
+   * content is only readable because it has a ground.
+   */
+  @property({ reflect: true })
+  material?: 'frosted' | 'glass'
+
   @property({ reflect: true })
   separation?: 'plain'
 

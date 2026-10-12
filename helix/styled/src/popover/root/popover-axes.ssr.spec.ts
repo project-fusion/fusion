@@ -31,13 +31,21 @@ describe('popover visual axes', () => {
     expect(styles(served)).toContain(':host([separation="plain"])')
   })
 
+  test('material reflects, which is the only channel the sheet has to it', () => {
+    // material: what the panel is made of.
+    const served = ssr(html`<helix-popover .material=${'frosted'}></helix-popover>`)
+    expect(hostTag(served, TAG)).toContain('material="frosted"')
+    expect(styles(served)).toContain(':host([material="frosted"])')
+  })
+
   test('and one that asked for no axis carries none', () => {
     /* Undefaulted, which is the rule a reflected property comes with: one
        with a default writes its attribute onto every host anybody renders,
        and the sheet then has to describe the resting arrangement as well as
        the departure.
-       The axes here are `separation`. */
+       The axes here are `material` and `separation`. */
     const bare = hostTag(ssr(html`<helix-popover></helix-popover>`), TAG)
+    expect(bare).not.toContain('material=')
     expect(bare).not.toContain('separation=')
   })
 })

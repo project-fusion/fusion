@@ -55,6 +55,21 @@
   padding-inline: var(--helix-space-none);
 }
 
+/* `glass` is the page's translucent ground over the theme's blur, and
+   `frosted` the same pair turned up, as on `Popover` and `Drawer`. */
+:host([material="glass"]) [part="surface"] {
+  --_floating-background-color: var(
+    --menu-background-color,
+    light-dark(var(--helix-material-translucent-strong), var(--helix-material-translucent))
+  );
+  backdrop-filter: var(--menu-backdrop, var(--helix-material-backdrop));
+}
+
+:host([material="frosted"]) [part="surface"] {
+  --_floating-background-color: var(--menu-background-color, var(--helix-material-translucent-strong));
+  backdrop-filter: var(--menu-backdrop, blur(var(--helix-material-blur-lg)));
+}
+
 /* Something on the page has a mark to put before its label, so every row on it
    holds the column open whether or not it has one of its own. */
 :host(:state(start)) [part="surface"] {
