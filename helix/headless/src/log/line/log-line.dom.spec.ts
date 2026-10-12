@@ -85,6 +85,30 @@ describe('what a line says beside its text', () => {
     }
   })
 
+  /* `console.error(error)` writes `Error: …`, which read `Error: Error: …`. */
+  test('no level where its text already starts with the words, written or drawn from data', async () => {
+    /* The first render is the server's, which has no text to read; the log
+       numbers its lines once it has hydrated, and the line reads it then. */
+    const written = await line(
+      '<helix-headless-log-line level="error">Error: Cannot find module</helix-headless-log-line>',
+    )
+    written.logNumber = 1
+    await written.updateComplete
+    expect(part(written, 'level')).toBeNull()
+    const plural = await line(
+      '<helix-headless-log-line level="error">Errors: 2</helix-headless-log-line>',
+    )
+    plural.logNumber = 1
+    await plural.updateComplete
+    expect(part(plural, 'level')?.textContent?.trim()).toBe('Error:')
+    const drawn = (await line(
+      '<helix-headless-log-line level="warn"></helix-headless-log-line>',
+    )) as Line
+    drawn.runs = [{ text: 'warning: glob@7.2.3 is deprecated' }]
+    await drawn.updateComplete
+    expect(part(drawn, 'level')).toBeNull()
+  })
+
   test('how many times it was written, as a number and in words, once a log folds it', async () => {
     const element = (await line()) as Line & { logCount: number }
     expect(part(element, 'count')).toBeNull()

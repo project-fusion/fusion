@@ -111,7 +111,7 @@ const compilerAt = (cdn: string): Transform => {
  * compiler said, such as `Error transforming app.tsx: Unexpected token (2:1)`.
  * The frame reports it as it reports any error an example does not catch, so
  * it shows over the example in the preview's `error` part and in the
- * terminal, and only where the example imports the file.
+ * console, and only where the example imports the file.
  */
 export const compile = async (cdn: string, path: string, source: string): Promise<string> => {
   try {

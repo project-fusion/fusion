@@ -57,6 +57,7 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['menu/section/menu-section.css', '[part="heading"]', 'color'],
   ['notifications/group/notification-group.css', '[part="count"]', 'color'],
   ['notifications/notification/notification.css', '[part="dismiss"]', 'color'],
+  ['log/line/log-line.css', '[part="count"]', 'color'],
   [
     'notifications/notification/notification.css',
     '[part="trailing"] > :not([part="controls"])',
@@ -70,9 +71,6 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['pin-input/root/pin-input-root.css', '[part="placeholder"]', 'color'],
   ['sandbox/source/sandbox-source.css', '[part="line"]::before', 'color'],
   ['sandbox/status-bar/sandbox-status-bar.css', ':host', 'color'],
-  ['sandbox/terminal/sandbox-terminal.css', '[part="count"]', 'color'],
-  ['sandbox/terminal/sandbox-terminal.css', '[part="empty"]', 'color'],
-  ['sandbox/terminal/sandbox-terminal.css', '[part="level"]', 'color'],
   ['slider/root/slider-root.css', '[part="marker-label"]', 'color'],
   ['steps/root/steps-root.css', ':host([variant="numeric"])', '--_steps-marker-color'],
   ['steps/step/step.css', '[part="description"]', 'color'],

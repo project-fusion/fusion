@@ -65,7 +65,7 @@ export function Example() {
           slot="preview"
           src="/sandbox/frame.html"
         />
-        <helix-sandbox-terminal slot="panel" />
+        <helix-sandbox-console slot="panel" />
       </helix-sandbox>
 
       <helix-list

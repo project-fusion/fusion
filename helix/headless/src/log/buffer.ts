@@ -13,6 +13,25 @@ export const LOG_LEVELS: readonly LogLevel[] = ['debug', 'log', 'info', 'warn', 
 export const loudEnough = (level: LogLevel | undefined, floor: LogLevel | undefined): boolean =>
   floor === undefined || LOG_LEVELS.indexOf(level ?? 'info') >= LOG_LEVELS.indexOf(floor)
 
+/**
+ * The words a screen reader hears before a line's text, or nothing where the
+ * text already starts with them: `console.error(error)` writes `Error: …`,
+ * which `Error:` before it would read twice. The words' closing colon is not
+ * needed, and a word that only starts the text's first word, such as `Error`
+ * before `Errors`, is still said.
+ */
+export const levelSaid = (words: string | undefined, text: string): string | undefined => {
+  const word = words?.trim().replace(/:$/, '').toLocaleLowerCase()
+  if (!word) {
+    return undefined
+  }
+  const start = text.trimStart()
+  const repeats =
+    start.slice(0, word.length).toLocaleLowerCase() === word &&
+    !/^[\p{L}\p{N}]/u.test(start.slice(word.length))
+  return repeats ? undefined : words
+}
+
 /** Where a step of the run stands. */
 export type LogStatus = 'done' | 'failed' | 'pending' | 'running' | 'skipped'
 
@@ -215,6 +234,15 @@ export class LogBuffer {
     this.openStep = undefined
     this.stepFailed = false
     this.stepStarted = undefined
+    this.trim()
+  }
+
+  /**
+   * Adds one finished line as data, after the lines held, folding it where
+   * `collapse` says, and lets the oldest go past `limit`.
+   */
+  push(line: LogLine): void {
+    this.add(line)
     this.trim()
   }
 

@@ -14,7 +14,7 @@
 }
 
 /* Over the example, which is stale while it fails, until the next source is
-   sent. The shape of what was thrown is kept, as the terminal keeps it. */
+   sent. The shape of what was thrown is kept, as the console keeps it. */
 [part="error"] {
   background-color: var(--helix-color-background);
   box-sizing: border-box;
@@ -31,7 +31,7 @@
   word-break: break-word;
 }
 
-/* In the corner, over the example, in the terminal's small type. */
+/* In the corner, over the example, in the console's small type. */
 [part="controls"] {
   display: flex;
   font-family: var(--helix-font-sans);

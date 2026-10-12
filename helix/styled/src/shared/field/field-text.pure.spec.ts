@@ -32,7 +32,7 @@ const FIELDS: [sheet: string, selector: string][] = [
   ['graph/root/graph-root.css', '[part="search-field"] {'],
   ['canvas/root/canvas-root.css', '[part="label-editor"] {'],
   ['sandbox/source/sandbox-source.css', '[part="source"] {'],
-  ['sandbox/terminal/sandbox-terminal.css', '[part="filter"] {'],
+  ['sandbox/console/sandbox-console.css', '[part="filter"] {'],
 ]
 
 /** The `font-size` the first rule opening with `selector` declares. */

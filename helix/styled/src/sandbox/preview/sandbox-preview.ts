@@ -178,7 +178,7 @@ export type PreviewMessage =
  * sibling shown by `helix-sandbox-preview:state(failed) + .message`.
  *
  * **A failed preview shows the error over the example**, in the `error` part,
- * until the next source is sent. The terminal says it too, so the part is not
+ * until the next source is sent. The console says it too, so the part is not
  * announced, and it is the frame's description while it shows, so a screen
  * reader reads it with the frame. Hide it with `::part(error) { display: none }`
  * where the page draws its own.
@@ -545,7 +545,7 @@ export class HelixSandboxPreview extends HelixElement {
    * sends arrives as `"null"`, measured. A real origin therefore means the
    * frame is no longer showing the document it was given: `allow-scripts` lets
    * an example navigate its own frame, and whatever it navigated to inherits
-   * `contentWindow` and could otherwise write lines into the terminal as though
+   * `contentWindow` and could otherwise write lines into the console as though
    * the example had logged them.
    */
   private readonly handleMessage = (event: MessageEvent<PreviewMessage>): void => {
@@ -857,7 +857,7 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
     if (!this.controls) {
       return nothing
     }
-    /* Read before the template, as the terminal reads its clear button's, so
+    /* Read before the template, as the console reads its clear button's, so
        the words audit does not take them for text joined in code. */
     const reload = this.reloadLabel
     const open = this.openLabel

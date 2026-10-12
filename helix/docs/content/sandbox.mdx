@@ -204,7 +204,7 @@ Each request has a notification once it is applied: `helix-edit` after
 `helix-panel-resize` after `helix-before-panel-resize`. Listen for these to
 store the arrangement or the source.
 
-Set `controls` on `helix-sandbox-terminal` for a clear button and a level
+Set `controls` on `helix-sandbox-console` for a clear button and a level
 filter above the log. Without them, `clear()` empties the log, and `level`
 hides the quieter lines.
 
@@ -296,6 +296,10 @@ replaces it, and `onRender` to act after each render, such as mounting a map.
 Logs from the example appear in the console panel. Logs from the page around it
 do not. We patch the console inside the frame on purpose, so the panel shows
 what the example logs and nothing else.
+
+The panel is a Log. It keeps the last 200 lines, and a line logged again
+straight after itself is one line with a count. A screen reader hears each new
+line with its level, and a repeat once.
 
 ## The editor and the highlighter
 

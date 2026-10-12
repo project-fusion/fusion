@@ -9,7 +9,7 @@ import {
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { LogRun } from '../ansi.js'
-import { type LogLevel, timeOf } from '../buffer.js'
+import { type LogLevel, levelSaid, timeOf } from '../buffer.js'
 import { markMatches } from '../rows.js'
 
 /** A color named for the stylesheet, such as `red`, where anything else is CSS. */
@@ -47,6 +47,9 @@ const elapsed = (seconds: number): string => {
  *
  * @slot - The text of the line.
  *
+ * @csspart count - How many times a line written again straight after itself was written, where the log's `collapse` folds repeats. Hidden from screen readers, which hear `count-label`.
+ * @csspart count-label - What a screen reader hears for the count, such as "3 times". Visually hidden in the styled tier.
+ * @csspart level - What a screen reader hears before the text for a line at `debug`, `warn` or `error`, such as "Warning:". Visually hidden in the styled tier.
  * @csspart line - The row the number, the time, and the text sit in.
  * @csspart line-debug - The row of a line at `debug`.
  * @csspart line-error - The row of a line at `error`.
@@ -54,9 +57,6 @@ const elapsed = (seconds: number): string => {
  * @csspart line-marked - The row of a line `mark-lines` names on the log.
  * @csspart line-selected - The row of a line in the log's selection.
  * @csspart line-warn - The row of a line at `warn`.
- * @csspart count - How many times a line written again straight after itself was written, where the log's `collapse` folds repeats. Hidden from screen readers, which hear `count-label`.
- * @csspart count-label - What a screen reader hears for the count, such as "3 times". Visually hidden in the styled tier.
- * @csspart level - What a screen reader hears before the text for a line at `debug`, `warn` or `error`, such as "Warning:". Visually hidden in the styled tier.
  * @csspart match - Text that matches the log's `query`, in a line the log draws from data.
  * @csspart number - The line's number, shown with `line-numbers`: a link with `line-href`, and a button on a `selectable` log.
  * @csspart run - A stretch of text drawn in an ANSI style, in a line the log draws from data. Its color is `--log-run-color` and its background `--log-run-background-color`.
@@ -89,8 +89,9 @@ export class HelixHeadlessLogLine extends HelixElement {
   /**
    * What a screen reader hears before the text of a line at each level, for a
    * page in another language, keyed by level, such as `{ warn: 'Warnung:' }`.
-   * A line at `info` or `log` hears nothing extra. As an attribute it is that
-   * object as JSON.
+   * A line at `info` or `log` hears nothing extra, and nor does a line whose
+   * text already starts with its words, such as `Error: Cannot find module`.
+   * As an attribute it is that object as JSON.
    */
   @words
   @property({ attribute: 'level-words', converter: wordsConverter })
@@ -175,9 +176,20 @@ export class HelixHeadlessLogLine extends HelixElement {
    */
   readonly isLogLine = true
 
+  /**
+   * How the text a page wrote starts, so a line whose text already says its
+   * level does not hear it twice. Read from the second update on, which a log
+   * asks for once it has hydrated, as the server has no children to read and
+   * the first render is the server's.
+   */
+  private written = ''
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('filtered', this.logFiltered)
+    if (this.hasUpdated && !this.runs) {
+      this.written = (this.textContent ?? '').trimStart().slice(0, 40)
+    }
   }
 
   /**
@@ -244,7 +256,7 @@ export class HelixHeadlessLogLine extends HelixElement {
    * The slot answers a page, and this answers the tier above.
    */
   protected renderText(): TemplateResult {
-    return html`<slot>${this.runs ? this.renderRuns() : nothing}</slot>`
+    return html`<slot @slotchange=${this.handleSlot}>${this.runs ? this.renderRuns() : nothing}</slot>`
   }
 
   /**
@@ -290,12 +302,22 @@ export class HelixHeadlessLogLine extends HelixElement {
         >${formatWords(this, 'timesLabel', { count: this.logCount })}</span
       >`
   }
+  /** Reads the new text where the line says a level, which it may already say. */
+  private readonly handleSlot = (): void => {
+    if (this.level !== undefined && this.levelWords[this.level]) {
+      this.requestUpdate()
+    }
+  }
+
   protected override render(): TemplateResult | typeof nothing {
     if (this.logFiltered) {
       return nothing
     }
     const level = this.level
-    const said = level === undefined ? undefined : this.levelWords[level]
+    const said = levelSaid(
+      level === undefined ? undefined : this.levelWords[level],
+      this.runs ? this.runs.map((run) => run.text).join('') : this.written,
+    )
     return html`<div
       part="line${level ? { debug: ' line-debug', error: ' line-error', info: '', log: '', warn: ' line-warn' }[level] : ''}${this.logMarked ? ' line-marked' : ''}${this.logSelected ? ' line-selected' : ''}${this.logGrouped ? ' line-grouped' : ''}"
     >${this.renderNumber()}${this.renderTime()}${said ? html`<span part="level">${said} </span>` : nothing}<span part="text">${this.renderText()}</span>${this.renderCount()}</div>`

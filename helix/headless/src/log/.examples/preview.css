@@ -77,6 +77,17 @@ helix-headless-log-line::part(line-error) {
   color: var(--_red);
 }
 
+/* A line's level and its count in words, heard and not drawn. */
+helix-headless-log-line::part(level),
+helix-headless-log-line::part(count-label) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}
+
 helix-headless-log-line::part(text) {
   white-space: pre;
 }

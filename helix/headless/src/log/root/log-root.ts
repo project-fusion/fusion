@@ -695,6 +695,17 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
   }
 
   /**
+   * Adds one line as data, after the lines the log holds: its text, and its
+   * level, time and group where it has them. For lines that arrive one at a
+   * time with a level of their own, such as a console's, where `write` takes
+   * text.
+   */
+  writeLine(line: LogLine): void {
+    this.buffer.push(line)
+    this.requestUpdate()
+  }
+
+  /**
    * Lets every line go, and forgets which groups the reader opened, keeping
    * `groups`, `parse`, and `limit`.
    */

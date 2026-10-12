@@ -1,0 +1,65 @@
+/* **Fills the box it is given, and scrolls inside it.** Auto height meant the
+   log grew to its content and spilled out of the panel holding it, which for
+   a component whose content is unbounded is the one thing it must not do.
+   `100%` of an auto-height parent is auto, so a console used somewhere with
+   no height still sizes to what it holds. */
+:host {
+  block-size: var(--sandbox-console-size, 100%);
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-block-size: 0;
+}
+
+:host([controls]) {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+/* **A row of small controls along the top edge**, in the log's own type, and
+   at the small step, so the clear button is the size of the filter beside it. */
+[part="controls"] {
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-xs);
+  justify-content: space-between;
+  padding: var(--helix-space-2xs) var(--helix-space-sm);
+}
+
+[part="filter"] {
+  background-color: transparent;
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  color: var(--helix-color-foreground);
+  font: inherit;
+  /* A select, which iOS Safari zooms into below 16px, so its type has the
+     field floor under it. */
+  font-size: max(var(--helix-text-field-min), var(--helix-text-xs));
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+[part="filter"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* **The lines are a Log's**, flush in the panel: no box of its own, the
+   panel's padding either side, and the row the panel gives it to scroll in. */
+[part="output"] {
+  --log-padding-inline: var(--helix-space-sm);
+
+  min-block-size: 0;
+}
+
+/* Print: the lines print, and the controls, which have nothing to do on paper,
+   do not. */
+@media print {
+  [part="controls"] {
+    display: none;
+  }
+}
