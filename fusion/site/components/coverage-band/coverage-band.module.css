@@ -244,6 +244,19 @@
   vertical-align: middle;
 }
 
+/* A mark in a cell grows a step under the pointer or with its card open: a
+   transform, because the entrance animates `scale` and holds its last frame. */
+.trigger > .mark {
+  transition: transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* A mark in a card stands beside the element's name and tag. */
+.cardItem > .mark {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  justify-self: center;
+}
+
 [data-state="experimental"] > .mark {
   background: transparent;
   border: 2px solid var(--helix-color-foreground-muted);
@@ -273,57 +286,195 @@
   inline-size: 0.75rem;
 }
 
+/* ── The cards ─────────────────────────────────────────────────────── */
+
 /**
- * **The element's name over its mark, on hover.** The name is the evidence: it
- * can be looked up in that system's documentation. A screen reader reads the
- * same name from the cell's hidden text.
+ * **Each mark is a button as large as its cell**, so the card opens wherever
+ * the pointer lands in the cell, and a tap or a key opens it too.
  */
-.row td[data-tag]::after {
-  background: var(--helix-color-surface-raised);
-  border: var(--helix-border-thin) solid var(--helix-color-border);
+.trigger {
+  align-items: center;
+  appearance: none;
+  background: none;
+  border: 0;
   border-radius: var(--helix-radii-sm);
-  box-shadow: 0 0.5rem 1.5rem -0.5rem rgb(0 0 0 / 0.4);
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  inset: 0;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+}
+
+.trigger:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(-1 * var(--helix-size-focus-ring));
+}
+
+.trigger:hover > .mark,
+.trigger[aria-expanded="true"] > .mark {
+  transform: scale(1.35);
+}
+
+/**
+ * **The card, in the search panel's blur over a denser fill.** The panel has a
+ * scrim under it and the card has the table, so at the panel's thirty percent
+ * the marks behind it read through the names. It sits in the top layer, so the
+ * band's `overflow: hidden` does not cut it, and the script places it in page
+ * coordinates. It fades in and out; the script glides it from one mark to the
+ * next.
+ */
+.card {
+  backdrop-filter: var(--site-glass-backdrop);
+  background-color: color-mix(in oklab, var(--helix-color-surface-overlay) 94%, transparent);
+  border: var(--helix-border-thin) solid var(--helix-material-border);
+  border-radius: var(--helix-radii-lg);
+  box-shadow: var(--helix-shadow-lg);
+  box-sizing: border-box;
   color: var(--helix-color-foreground);
-  content: attr(data-tag);
+  font-size: var(--helix-text-sm);
+  inline-size: 18rem;
+  inset: auto;
+  margin: 0;
+  max-inline-size: calc(100vw - 2rem);
+  opacity: 1;
+  overflow: visible;
+  padding: var(--helix-space-2xs);
+  position: absolute;
+  text-align: start;
+  transition:
+    opacity 140ms ease,
+    display 140ms allow-discrete,
+    overlay 140ms allow-discrete;
+}
+
+.card:not(:popover-open) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@starting-style {
+  .card:popover-open {
+    opacity: 0;
+  }
+}
+
+/* The job and the system, the job first because it is what the row said. */
+.cardHead {
+  align-items: baseline;
+  display: flex;
+  gap: var(--helix-space-sm);
+  justify-content: space-between;
+  padding: var(--helix-space-xs) var(--helix-space-sm) var(--helix-space-2xs);
+}
+
+.cardJob {
+  font-weight: var(--helix-weight-semibold);
+}
+
+.cardSystem {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-xs);
+}
+
+.cardList {
+  display: grid;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/**
+ * **One element: the key's mark, its name, and its tag under the name.** The
+ * tag is the evidence, and you can look it up in that system's documentation.
+ * Helix's rows are links, with an arrow at the end.
+ */
+.cardItem {
+  align-items: center;
+  border-radius: var(--helix-radii-md);
+  color: inherit;
+  column-gap: var(--helix-space-sm);
+  display: grid;
+  grid-template-columns: 0.75rem minmax(0, 1fr) auto;
+  padding: calc(var(--helix-space-2xs) * 1.5) var(--helix-space-sm);
+  text-decoration: none;
+}
+
+.cardName {
+  font-weight: var(--helix-weight-medium);
+  grid-column: 2;
+  line-height: var(--helix-leading-tight);
+}
+
+.cardTag {
+  color: var(--helix-color-foreground-muted);
   font-family: var(--helix-font-mono);
   font-size: var(--helix-text-xs);
-  inset-block-end: calc(100% - var(--helix-space-2xs));
-  inset-inline-start: 50%;
-  opacity: 0;
-  padding: var(--helix-space-2xs) var(--helix-space-xs);
-  pointer-events: none;
-  position: absolute;
-  transform: translate(-50%, 0.25rem);
+  grid-column: 2;
+  overflow-wrap: anywhere;
+}
+
+.cardGo {
+  color: var(--helix-color-foreground-subtle);
+  font-size: var(--helix-text-sm);
+  grid-column: 3;
+  grid-row: 1 / span 2;
   transition:
-    opacity 120ms ease,
-    transform 120ms ease;
-  white-space: nowrap;
-  z-index: var(--helix-layer-raised);
+    color 120ms ease,
+    transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* The last column's name hangs left, or the card's edge would cut it. */
-.row td[data-tag]:last-child::after {
-  inset-inline: auto 0;
-  transform: translate(0, 0.25rem);
+a.cardItem {
+  transition: background-color 120ms ease;
 }
 
-.row td[data-tag]:hover::after {
-  opacity: 1;
-  transform: translate(-50%, 0);
+a.cardItem:hover,
+a.cardItem:focus-visible {
+  background-color: var(--helix-color-primary-subtle);
 }
 
-.row td[data-tag]:last-child:hover::after {
-  transform: none;
+a.cardItem:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(-1 * var(--helix-size-focus-ring));
+}
+
+a.cardItem:hover .cardGo,
+a.cardItem:focus-visible .cardGo {
+  color: var(--helix-color-primary);
+  transform: translateX(0.125rem);
+}
+
+/* What a ring means, under the rows it marks. */
+.cardNote {
+  align-items: center;
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+  color: var(--helix-color-foreground-muted);
+  display: flex;
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-sm);
+  margin: var(--helix-space-2xs) 0 0;
+  padding: var(--helix-space-xs) var(--helix-space-sm) var(--helix-space-2xs);
 }
 
 .source {
   padding-inline: var(--helix-space-sm);
 }
 
-/* A touch screen has no hover, so the hint would point at nothing. */
+/* A touch screen has no hover, so it has its own hint. */
+.hintTouch {
+  display: none;
+}
+
 @media (hover: none) {
   .hint {
     display: none;
+  }
+
+  .hintTouch {
+    display: inline;
   }
 }
 
@@ -353,6 +504,14 @@
 }
 
 /* ── Motion ────────────────────────────────────────────────────────── */
+
+/* The mark's step and the arrow's nudge are motion too, and the fade stays. */
+@media (prefers-reduced-motion: reduce) {
+  .trigger > .mark,
+  .cardGo {
+    transition: none;
+  }
+}
 
 @keyframes coverage-fill {
   from {
@@ -391,13 +550,15 @@
       animation-timeline: view();
     }
 
-    .row td > .mark {
+    .row td > .mark,
+    .row td > .trigger > .mark {
       animation: coverage-mark linear both;
       animation-range: entry 20% entry 80%;
       animation-timeline: view();
     }
 
-    .row td:nth-child(n + 3) > .mark {
+    .row td:nth-child(n + 3) > .mark,
+    .row td:nth-child(n + 3) > .trigger > .mark {
       animation-range: entry 45% entry 100%;
     }
   }
