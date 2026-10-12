@@ -28,11 +28,16 @@
  *
  * **Requests stay on the site's own origin**, so the maps page draws without
  * the tiles another host would serve, and the sandbox without the compiler it
- * loads from a CDN for a TypeScript pane. **The site's server still asks
- * OpenFreeMap for the maps page's first paint.** It draws a picture of the
- * map, which the map hides once it has drawn, so no baseline shows it. The
- * tiles' credit is the same whether or not OpenFreeMap answered within the
- * server's two seconds.
+ * loads from a CDN for a TypeScript pane.
+ *
+ * **The server asks no tile server either.** `start` sets
+ * `SITE_OFFLINE_MAPS=1`, so the maps page's first paint has no street picture
+ * and carries Helix's copy of OpenFreeMap's credit. The credit the server read
+ * from OpenFreeMap failed this check on five runs on October 11, 2026, each
+ * time OpenFreeMap did not answer within two seconds, and a change to
+ * OpenFreeMap's wording would have failed every run after it. The credit is
+ * still pictured and read in the accessibility snapshot, so a page that loses
+ * it fails.
  */
 import { defineConfig } from '@fusion.dev/helix-cli/visual'
 
@@ -111,7 +116,8 @@ export default defineConfig({
         { name: 'reference-loading', path: '/stand-ins/reference' },
         { name: 'wordmark-loading', path: '/stand-ins/wordmark' },
       ],
-      start: 'exec env SITE_STAND_INS=1 bunx next start --hostname 127.0.0.1 --port 3417',
+      start:
+        'exec env SITE_STAND_INS=1 SITE_OFFLINE_MAPS=1 bunx next start --hostname 127.0.0.1 --port 3417',
       url: 'http://127.0.0.1:3417',
     },
   ],
