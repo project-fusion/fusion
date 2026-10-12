@@ -332,6 +332,8 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
    * and the send control drifts inward by one for every slot a consumer left
    * alone. No selector can ask this: a slot's assigned nodes are not its DOM
    * children, so `:empty` describes the fallback rather than the fill.
+   * Re-marked on `slotchange` as well as after a render, so a control a
+   * framework renders after the first render is shown.
    */
   private markEmpty(): void {
     for (const name of ['start', 'end'] as const) {
@@ -446,8 +448,8 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
         @keydown=${this.handleKey}
       ></textarea>
       <div part="tools">
-        <span part="start"><slot name="start"></slot></span>
-        <span part="end"><slot name="end"></slot></span>
+        <span part="start"><slot name="start" @slotchange=${() => this.markEmpty()}></slot></span>
+        <span part="end"><slot name="end" @slotchange=${() => this.markEmpty()}></slot></span>
         ${this.renderVoice()}${this.renderSend()}
       </div>
     </div>${
