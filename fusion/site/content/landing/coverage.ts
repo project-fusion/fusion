@@ -22,6 +22,7 @@ export {
   COVERAGE,
   type Coverage,
   type CoverageCell,
+  type CoverageElement,
   MEASURED,
 } from './claims.generated'
 
@@ -36,3 +37,15 @@ export const measuredOn = (iso: string): string =>
     timeZone: 'UTC',
     year: 'numeric',
   })
+
+/**
+ * An element's name in words, from its tag after the system's prefix:
+ * `cds-tree-view` is Tree View. The names the other systems publish are tags,
+ * so this is the only name the site has for them.
+ */
+export const elementName = (tag: string, prefix: string): string =>
+  tag
+    .slice(prefix.length)
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')

@@ -114,6 +114,7 @@ const CAPABILITIES = [
           'bar-chart',
           'chart',
           'donut-chart',
+          'heatmap',
           'line-chart',
           'pie-chart',
           'scatter-chart',
@@ -742,8 +743,12 @@ const helixElements = (() => {
 })()
 
 /**
- * Each system's element for each job, or nothing. Helix first, then the peers
+ * Each system's elements for each job, or nothing. Helix first, then the peers
  * in the order the size table uses.
+ *
+ * **Every element with one of the job's names, in the order of the names.** A
+ * job can take more than one: Helix draws 3D charts as several elements, and a
+ * cell that named only the first would say Helix has one.
  */
 const coverage = (() => {
   const systems = [
@@ -751,10 +756,12 @@ const coverage = (() => {
     ...(peers?.systems ?? []).filter((one) => Array.isArray(one.elements)),
   ]
   const find = (system, names) => {
-    const tag = names
+    const tags = names
       .map((name) => `${system.prefix}${name}`)
-      .find((one) => system.elements?.includes(one))
-    return tag ? { experimental: system.experimental.includes(tag), tag } : null
+      .filter((one) => system.elements?.includes(one))
+    return tags.length > 0
+      ? tags.map((tag) => ({ experimental: system.experimental.includes(tag), tag }))
+      : null
   }
   const groups = CAPABILITIES.map((group) => ({
     name: group.group,
@@ -773,6 +780,7 @@ const coverage = (() => {
     systems: systems.map((one, index) => ({
       name: one.name,
       ours: one.ours === true,
+      prefix: one.prefix,
       total: totals[index],
     })),
   }
@@ -917,11 +925,13 @@ const coverageSection = () => {
     return []
   }
   const cell = (one) =>
-    one === null ? '' : `\`${one.tag}\`${one.experimental ? ' (experimental)' : ''}`
+    (one ?? [])
+      .map((element) => `\`${element.tag}\`${element.experimental ? ' (experimental)' : ''}`)
+      .join('<br />')
   return [
     '## What each system ships',
     '',
-    `Every system in the size comparison ships buttons, form controls, menus, and dialogs. This table lists jobs beyond those, and the element each system ships for each job. Each name comes from the manifest the system publishes, read by \`turbo run peers\` on ${day(peers.measured)}. The Helix column reads \`@fusion.dev/helix\` on every run.`,
+    `Every system in the size comparison ships buttons, form controls, menus, and dialogs. This table lists jobs beyond those, and the elements each system ships for each job. Each name comes from the manifest the system publishes, read by \`turbo run peers\` on ${day(peers.measured)}. The Helix column reads \`@fusion.dev/helix\` on every run.`,
     '',
     'A system covers a job when its manifest defines an element with one of a fixed list of names, after its prefix. The list is the same for every system, and it is in `build-metrics.mjs`. An empty cell means no element has one of those names. A system can still do the job with a pattern, a separate library, or an element under another name.',
     '',
@@ -1168,12 +1178,15 @@ const claimsSource = [
   '/** The day `turbo run peers` read the other systems. */',
   `export const MEASURED = '${peers?.measured ?? ''}'`,
   '',
-  'export interface CoverageCell {',
+  'export interface CoverageElement {',
   '  /** Whether the system has not committed to the element. */',
   '  experimental: boolean',
   '  /** The element, as the system names it. */',
   '  tag: string',
   '}',
+  '',
+  "/** A system's elements for one job, in the order the job lists their names. */",
+  'export type CoverageCell = readonly CoverageElement[]',
   '',
   'export interface Coverage {',
   '  groups: readonly {',
@@ -1183,8 +1196,11 @@ const claimsSource = [
   '  }[]',
   '  /** How many jobs the table asks about. */',
   '  rows: number',
-  '  /** Helix first. `total` counts the jobs the system has an element for. */',
-  '  systems: readonly { name: string; ours: boolean; total: number }[]',
+  '  /**',
+  '   * Helix first. `total` counts the jobs the system has an element for, and',
+  '   * `prefix` starts every one of its tags.',
+  '   */',
+  '  systems: readonly { name: string; ours: boolean; prefix: string; total: number }[]',
   '}',
   '',
   `export const COVERAGE: Coverage = ${JSON.stringify(coverage, null, 2)}`,
