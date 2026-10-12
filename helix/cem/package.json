@@ -33,7 +33,7 @@
   "dependencies": {
     "@fusion.dev/helix-cli": "workspace:*",
     "@fusion.dev/helix-diagnostics": "workspace:*",
-    "@wc-toolkit/jsx-types": "^1.7.1"
+    "@wc-toolkit/jsx-types": "^1.8.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
