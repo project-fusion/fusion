@@ -267,6 +267,19 @@ describe('the shape of the composer', () => {
     await filled.updateComplete
     expect(part(filled, 'start')?.hasAttribute('data-empty')).toBe(false)
   })
+
+  /* The boxes were re-marked only after a render, so a hint a framework
+     rendered after the first render stayed hidden for good. */
+  test('a tool slotted after the first render is shown', async () => {
+    const element = await composer()
+    expect((part(element, 'end') as HTMLElement | null)?.hidden).toBe(true)
+    const hint = document.createElement('span')
+    hint.slot = 'end'
+    hint.textContent = 'Enter sends'
+    element.append(hint)
+    await new Promise((done) => setTimeout(done, 0))
+    expect((part(element, 'end') as HTMLElement | null)?.hidden).toBe(false)
+  })
 })
 
 describe('in a form', () => {
