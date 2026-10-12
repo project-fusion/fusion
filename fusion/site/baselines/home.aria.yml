@@ -132,99 +132,125 @@
     - rowgroup:
       - row "Data":
         - columnheader "Data"
-      - row "Charts helix-area-chart helix-area-chart None None None None":
+      - row "Charts helix-area-chart, helix-bar-chart, helix-donut-chart, helix-heatmap, helix-line-chart, helix-scatter-chart, helix-sparkline None None None None":
         - rowheader "Charts"
-        - cell "helix-area-chart helix-area-chart"
+        - cell "helix-area-chart, helix-bar-chart, helix-donut-chart, helix-heatmap, helix-line-chart, helix-scatter-chart, helix-sparkline":
+          - button "helix-area-chart, helix-bar-chart, helix-donut-chart, helix-heatmap, helix-line-chart, helix-scatter-chart, helix-sparkline"
         - cell "None"
         - cell "None"
         - cell "None"
         - cell "None"
-      - row "3D charts helix-spatial-bar-chart, experimental helix-spatial-bar-chart None None None None":
+      - row "3D charts helix-spatial-bar-chart (experimental), helix-spatial-heatmap (experimental), helix-spatial-ribbon-chart (experimental), helix-spatial-scatter-chart (experimental), helix-spatial-surface-chart (experimental), helix-spatial-treemap (experimental) None None None None":
         - rowheader "3D charts"
-        - cell "helix-spatial-bar-chart, experimental helix-spatial-bar-chart"
+        - cell "helix-spatial-bar-chart (experimental), helix-spatial-heatmap (experimental), helix-spatial-ribbon-chart (experimental), helix-spatial-scatter-chart (experimental), helix-spatial-surface-chart (experimental), helix-spatial-treemap (experimental)":
+          - button "helix-spatial-bar-chart (experimental), helix-spatial-heatmap (experimental), helix-spatial-ribbon-chart (experimental), helix-spatial-scatter-chart (experimental), helix-spatial-surface-chart (experimental), helix-spatial-treemap (experimental)"
         - cell "None"
         - cell "None"
         - cell "None"
         - cell "None"
-      - row "Data table helix-data-table helix-data-table cds-table cds-table None sp-table sp-table None":
+      - row "Data table helix-data-table, helix-table cds-table None sp-table None":
         - rowheader "Data table"
-        - cell "helix-data-table helix-data-table"
-        - cell "cds-table cds-table"
+        - cell "helix-data-table, helix-table":
+          - button "helix-data-table, helix-table"
+        - cell "cds-table":
+          - button "cds-table"
         - cell "None"
-        - cell "sp-table sp-table"
+        - cell "sp-table":
+          - button "sp-table"
         - cell "None"
-      - row "Tree helix-tree helix-tree cds-tree-view cds-tree-view None None wa-tree wa-tree":
+      - row "Tree helix-tree cds-tree-view None None wa-tree":
         - rowheader "Tree"
-        - cell "helix-tree helix-tree"
-        - cell "cds-tree-view cds-tree-view"
+        - cell "helix-tree":
+          - button "helix-tree"
+        - cell "cds-tree-view":
+          - button "cds-tree-view"
         - cell "None"
         - cell "None"
-        - cell "wa-tree wa-tree"
+        - cell "wa-tree":
+          - button "wa-tree"
     - rowgroup:
       - row "Input":
         - columnheader "Input"
-      - row "Combobox helix-combobox helix-combobox cds-combo-box cds-combo-box None sp-combobox sp-combobox None":
+      - row "Combobox helix-combobox cds-combo-box None sp-combobox None":
         - rowheader "Combobox"
-        - cell "helix-combobox helix-combobox"
-        - cell "cds-combo-box cds-combo-box"
+        - cell "helix-combobox":
+          - button "helix-combobox"
+        - cell "cds-combo-box":
+          - button "cds-combo-box"
         - cell "None"
-        - cell "sp-combobox sp-combobox"
+        - cell "sp-combobox":
+          - button "sp-combobox"
         - cell "None"
-      - row "Date picker helix-date-picker helix-date-picker cds-date-picker cds-date-picker None None None":
+      - row "Date picker helix-date-picker cds-date-picker None None None":
         - rowheader "Date picker"
-        - cell "helix-date-picker helix-date-picker"
-        - cell "cds-date-picker cds-date-picker"
+        - cell "helix-date-picker":
+          - button "helix-date-picker"
+        - cell "cds-date-picker":
+          - button "cds-date-picker"
         - cell "None"
         - cell "None"
         - cell "None"
-      - row "Time picker helix-time-picker helix-time-picker cds-time-picker cds-time-picker None None None":
+      - row "Time picker helix-time-picker cds-time-picker None None None":
         - rowheader "Time picker"
-        - cell "helix-time-picker helix-time-picker"
-        - cell "cds-time-picker cds-time-picker"
+        - cell "helix-time-picker":
+          - button "helix-time-picker"
+        - cell "cds-time-picker":
+          - button "cds-time-picker"
         - cell "None"
         - cell "None"
         - cell "None"
-      - row "Color picker helix-color-picker helix-color-picker None None sp-color-area sp-color-area wa-color-picker wa-color-picker":
+      - row "Color picker helix-color-picker None None sp-color-area, sp-color-wheel wa-color-picker":
         - rowheader "Color picker"
-        - cell "helix-color-picker helix-color-picker"
+        - cell "helix-color-picker":
+          - button "helix-color-picker"
         - cell "None"
         - cell "None"
-        - cell "sp-color-area sp-color-area"
-        - cell "wa-color-picker wa-color-picker"
-      - row "File upload helix-file-input helix-file-input cds-file-uploader cds-file-uploader None sp-dropzone sp-dropzone None":
+        - cell "sp-color-area, sp-color-wheel":
+          - button "sp-color-area, sp-color-wheel"
+        - cell "wa-color-picker":
+          - button "wa-color-picker"
+      - row "File upload helix-file-input cds-file-uploader None sp-dropzone None":
         - rowheader "File upload"
-        - cell "helix-file-input helix-file-input"
-        - cell "cds-file-uploader cds-file-uploader"
+        - cell "helix-file-input":
+          - button "helix-file-input"
+        - cell "cds-file-uploader":
+          - button "cds-file-uploader"
         - cell "None"
-        - cell "sp-dropzone sp-dropzone"
+        - cell "sp-dropzone":
+          - button "sp-dropzone"
         - cell "None"
     - rowgroup:
       - row "Workflow":
         - columnheader "Workflow"
-      - row "Chat helix-chat helix-chat None None None None":
+      - row "Chat helix-chat None None None None":
         - rowheader "Chat"
-        - cell "helix-chat helix-chat"
+        - cell "helix-chat":
+          - button "helix-chat"
         - cell "None"
         - cell "None"
         - cell "None"
         - cell "None"
-      - row "Command palette helix-command helix-command None None None None":
+      - row "Command palette helix-command None None None None":
         - rowheader "Command palette"
-        - cell "helix-command helix-command"
+        - cell "helix-command":
+          - button "helix-command"
         - cell "None"
         - cell "None"
         - cell "None"
         - cell "None"
-      - row "Product tour helix-tour helix-tour None None sp-coachmark sp-coachmark None":
+      - row "Product tour helix-tour None None sp-coachmark None":
         - rowheader "Product tour"
-        - cell "helix-tour helix-tour"
+        - cell "helix-tour":
+          - button "helix-tour"
         - cell "None"
         - cell "None"
-        - cell "sp-coachmark sp-coachmark"
+        - cell "sp-coachmark":
+          - button "sp-coachmark"
         - cell "None"
-      - row "Node diagrams helix-canvas helix-canvas None None None None":
+      - row "Node diagrams helix-canvas, helix-graph None None None None":
         - rowheader "Node diagrams"
-        - cell "helix-canvas helix-canvas"
+        - cell "helix-canvas, helix-graph":
+          - button "helix-canvas, helix-graph"
         - cell "None"
         - cell "None"
         - cell "None"
@@ -232,28 +258,32 @@
     - rowgroup:
       - row "Media and places":
         - columnheader "Media and places"
-      - row "Maps helix-map helix-map None None None None":
+      - row "Maps helix-map None None None None":
         - rowheader "Maps"
-        - cell "helix-map helix-map"
+        - cell "helix-map":
+          - button "helix-map"
         - cell "None"
         - cell "None"
         - cell "None"
         - cell "None"
-      - row "Video player helix-video helix-video None None None None":
+      - row "Video player helix-video None None None None":
         - rowheader "Video player"
-        - cell "helix-video helix-video"
+        - cell "helix-video":
+          - button "helix-video"
         - cell "None"
         - cell "None"
         - cell "None"
         - cell "None"
-      - row "Carousel helix-carousel helix-carousel None None None wa-carousel, experimental wa-carousel":
+      - row "Carousel helix-carousel None None None wa-carousel (experimental)":
         - rowheader "Carousel"
-        - cell "helix-carousel helix-carousel"
+        - cell "helix-carousel":
+          - button "helix-carousel"
         - cell "None"
         - cell "None"
         - cell "None"
-        - cell "wa-carousel, experimental wa-carousel"
-  - paragraph: Every system ships buttons, form controls, menus, and dialogs, so the table lists the rest. Read from each system's manifest on October 9, 2026. Hover a mark to see the element.
+        - cell "wa-carousel (experimental)":
+          - button "wa-carousel (experimental)"
+  - paragraph: Every system ships buttons, form controls, menus, and dialogs, so the table lists the rest. Read from each system's manifest on October 9, 2026. Hover a mark to see the elements.
   - paragraph: Services
   - heading "Hire our engineers" [level=2]
   - paragraph: Every service runs two days a week, alongside your team.
