@@ -116,7 +116,21 @@ export function Showcase(): React.ReactElement {
    * It cycles on its own, and stops the moment anybody arrives.
    */
   const [held, setHeld] = useState(false)
+  /* **And only while it is on screen.** A view that turns where nobody can see
+     it is work for nothing, and a reader who scrolls back finds the view they
+     left. */
+  const [seen, setSeen] = useState(false)
   const stage = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const node = stage.current
+    if (!node) {
+      return
+    }
+    const watching = new IntersectionObserver(([entry]) => setSeen(entry?.isIntersecting ?? false))
+    watching.observe(node)
+    return () => watching.disconnect()
+  }, [])
 
   /* **Listened for on the node rather than bound in the markup.** A panel that
      pauses when a pointer arrives is not an interactive element: it has no
@@ -148,7 +162,7 @@ export function Showcase(): React.ReactElement {
   }, [])
 
   useEffect(() => {
-    if (held) {
+    if (held || !seen) {
       return
     }
 
@@ -179,7 +193,7 @@ export function Showcase(): React.ReactElement {
       clearInterval(timer)
       still.removeEventListener('change', restart)
     }
-  }, [held])
+  }, [held, seen])
 
   return (
     <div className={styles.showcaseStage} ref={stage}>

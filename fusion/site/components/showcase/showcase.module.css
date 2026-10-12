@@ -216,7 +216,7 @@
   --donut-chart-size: 8rem;
 }
 
-/* The three views share one cell, and all but one is hidden.
+/* The views share one cell, and all but one is hidden.
  *
  * Stacked rather than swapped: nothing mounts when the switch is pressed, so
  * nothing has to upgrade and the grid never lays out around elements that do
@@ -231,14 +231,27 @@
      tallest in its row, and a stretched row never stretches its tallest
      member. */
   align-items: stretch;
+  /* Each view at its own height, at the top of a cell as tall as the tallest.
+     Stretched to the cell, a short view's rows grow to fill it, and its cards
+     stand twice their height with nothing in them. */
+  align-self: start;
   display: grid;
   gap: var(--helix-space-md);
   grid-area: 1 / 1;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+/**
+ * **Hidden by `visibility`, so a hidden view still holds its height.** With
+ * `display: none` the cell was as tall as the view showing, and each switch
+ * moved everything under the panel: on October 11, 2026 the next band moved
+ * 114px at 1440, 322px at 1024 and 441px at 390. The switch turns every few
+ * seconds on its own, so the page moved under a reader scrolled below it. A
+ * hidden view is out of the accessibility tree and takes no focus or pointer,
+ * as with `display: none`.
+ */
 .showcaseView[hidden] {
-  display: none;
+  visibility: hidden;
 }
 
 /* The mark carries the meaning here, so the faces are sized to the checkbox
