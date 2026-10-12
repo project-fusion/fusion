@@ -104,6 +104,39 @@ describe('the transcript', () => {
     },
   )
 
+  /* Browser only, for a box that scrolls. WebKit moves the log through an
+     arrow key's animation before its scroll event arrives, and an update in
+     between put the reader's turn back by writing the old offset over theirs:
+     four presses moved a log 40 pixels while a turn streamed, against 80 at
+     rest. The move here is made the same way, with no event yet. */
+  test.skipIf(!hasLayout())(
+    'leaves a scroll whose event has not arrived where the reader took it',
+    async () => {
+      const element = await chat('style="display: block; block-size: 160px"')
+      const log = part(element, 'log') as HTMLElement
+      log.style.blockSize = '100%'
+      log.style.overflow = 'auto'
+      for (let at = 0; at < 30; at += 1) {
+        const turn = document.createElement('helix-headless-chat-message')
+        turn.setAttribute('author', 'them')
+        turn.setAttribute('state', 'sent')
+        turn.textContent = `Line ${at}`
+        element.append(turn)
+      }
+      await new Promise((resolve) => setTimeout(resolve, 50))
+      await element.updateComplete
+      log.scrollTop = 200
+      log.dispatchEvent(new Event('scroll'))
+      await element.updateComplete
+      expect(element.pinned).toBe(false)
+
+      log.scrollTop = 260
+      ;(element as Chat & { requestUpdate: () => void }).requestUpdate()
+      await element.updateComplete
+      expect(log.scrollTop).toBe(260)
+    },
+  )
+
   /* A transcript that fits was no stop at all, so a conversation whose turns
      held no control had no way into them by keyboard. */
   test('the log is a tab stop while it holds a turn, so Page Down can enter them', async () => {

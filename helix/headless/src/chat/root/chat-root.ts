@@ -556,7 +556,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
   private stuckAt = -1
 
   /** The turn at the top of the reader's view, and how far below the top it sat. */
-  private anchor: { id: unknown; offset: number } | undefined = undefined
+  private anchor: { at: number; id: unknown; offset: number } | undefined = undefined
 
   /** Whether `helix-history` has been fired for this arrival at the top. */
   private asked = false
@@ -858,7 +858,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     }
     const found = turns[low]
     this.anchor = found
-      ? { id: found.id, offset: found.element.getBoundingClientRect().top - top }
+      ? { at: log.scrollTop, id: found.id, offset: found.element.getBoundingClientRect().top - top }
       : undefined
   }
 
@@ -883,6 +883,17 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     const log = this.log
     const anchor = this.anchor
     if (!log || !anchor || (this.fed && this.virtualize.scrolling())) {
+      return
+    }
+    /* **Turns that are children: a log that moved since the turn was noted is
+       the reader's own scroll, whose event has not arrived yet.** WebKit moves
+       the log through an arrow key's animation before it says so, and putting
+       the turn back then wrote the old offset over the reader's: four presses
+       moved a log 40 pixels while a turn streamed, against 80 at rest, on
+       October 11, 2026. The place is noted again and nothing is written. Fed
+       turns ask the controller above, which tells its own writes apart. */
+    if (!this.fed && Math.abs(log.scrollTop - anchor.at) >= 1) {
+      this.remember()
       return
     }
     const found = this.rendered().find((turn) => turn.id === anchor.id)
