@@ -7,7 +7,8 @@
  *      is a row a pointer can hit and a line of text can breathe in.
  */
   align-items: center;
-  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  border-block-end: var(--helix-border-thin) solid
+    var(--table-rule-color, var(--helix-color-border));
   box-sizing: border-box;
   /* Content, so full foreground and not `foreground-muted`: that is the color
      for chrome around something a reader is looking at, and a table's cells are
@@ -24,7 +25,7 @@
      sets no edge both declarations drop out, and the cell inherits whatever
      `text-align` its table has, as it did before. */
   justify-content: var(--table-cell-align);
-  min-block-size: var(--helix-size-control);
+  min-block-size: var(--table-cell-min-block-size, var(--helix-size-control));
   min-inline-size: 0;
   /* A long identifier breaks rather than running into the column beside it.
      `anywhere` and not `break-word`, because only `anywhere` lowers the
@@ -36,7 +37,7 @@
   /* Logical, as the heading's is, so the inset sits on the inline end in either
      direction. Written physically it stayed on the right, and in a right-to-left
      table a column set to the end ended its values 16px from its heading. */
-  padding-block: var(--helix-space-xs);
+  padding-block: var(--table-padding-block, var(--helix-space-xs));
   padding-inline: var(--helix-space-none) var(--helix-space-md);
   text-align: var(--table-cell-align);
 }
