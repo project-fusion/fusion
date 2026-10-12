@@ -537,3 +537,33 @@ describe('typing', () => {
     expect(heard).toBeGreaterThan(0)
   })
 })
+
+describe('a busy composer', () => {
+  test('turns its send button into a stop button that sends helix-stop', async () => {
+    const element = await composer('busy')
+    const button = part(element, 'send') as HTMLButtonElement
+    expect(button.getAttribute('aria-label')).toBe('Stop')
+    let stopped = 0
+    element.addEventListener('helix-stop', () => {
+      stopped += 1
+    })
+    button.click()
+    expect(stopped).toBe(1)
+  })
+
+  test('keeps the draft and sends nothing until it is not busy', async () => {
+    const element = await composer('busy')
+    let sent = 0
+    element.addEventListener('helix-send', () => {
+      sent += 1
+    })
+    await type(element, 'next turn')
+    press(element, 'Enter')
+    expect([sent, element.value, element.send()]).toEqual([0, 'next turn', false])
+    element.removeAttribute('busy')
+    await element.updateComplete
+    expect((part(element, 'send') as HTMLButtonElement).getAttribute('aria-label')).toBe('Send')
+    expect(element.send()).toBe(true)
+    expect(sent).toBe(1)
+  })
+})

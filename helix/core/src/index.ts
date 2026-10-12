@@ -295,6 +295,7 @@ export {
   HelixSortEvent,
   HelixSortedEvent,
   HelixSplitEvent,
+  HelixStopEvent,
   HelixStrandsFallbackEvent,
   HelixTerminalBellEvent,
   HelixTerminalInputEvent,
