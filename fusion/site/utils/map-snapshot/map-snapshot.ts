@@ -14,6 +14,11 @@ const DRAWN_BY = process.env.VERCEL_DEPLOYMENT_ID ?? process.env.VERCEL_GIT_COMM
  */
 const PATIENCE = 2000
 
+/** A fetch that refuses every request, for a server that asks no tile server. */
+const refused = (async (url: string | URL | Request) => {
+  throw new Error(`${String(url)} was not asked, because SITE_OFFLINE_MAPS is set`)
+}) as typeof fetch
+
 /**
  * A snapshot whose picture could not be drawn, holding the credit
  * `mapSnapshot` still read from the tiles' TileJSON.
@@ -60,6 +65,14 @@ const cached = unstable_cache(
  * with no first paint is otherwise silent about why.
  */
 export const snapshotOf = async (view: MapView): Promise<MapSnapshot> => {
+  /* **No tile server is asked where `SITE_OFFLINE_MAPS=1`**, which only the
+     visual tests' `start` command sets. The snapshot then has no picture and
+     carries Helix's copy of OpenFreeMap's credit, so the page draws the same
+     on every run, however OpenFreeMap answers or words its credit. Not
+     cached, so a server started without it draws the real snapshot. */
+  if (process.env.SITE_OFFLINE_MAPS === '1') {
+    return mapSnapshot(view, { fetch: refused })
+  }
   if (process.env.NODE_ENV === 'development') {
     return mapSnapshot(view, { timeout: PATIENCE })
   }
