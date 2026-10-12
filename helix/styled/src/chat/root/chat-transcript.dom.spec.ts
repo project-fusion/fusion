@@ -240,6 +240,28 @@ describe('a transcript fed as data', () => {
     expect(Math.abs(top(turnAt(element, key)) - before)).toBeLessThan(2)
   })
 
+  geometry('holds the turn under the reader before the next frame, too', async () => {
+    /* The turns drawn above the reader fill in after the render that draws
+       them, and a timer can run before the next frame. On a Linux runner the
+       controller's rest after a scroll did, read the reader's place before
+       those turns were measured, and left the turn 55.5 pixels away. Read
+       here in the first task after the history arrives. */
+    const element = await fed(300)
+    const box = log(element)
+    box.scrollTop = 120
+    box.dispatchEvent(new Event('scroll'))
+    await frames(element, 6)
+    const reading = drawn(element).find(
+      (turn) => turn.getBoundingClientRect().top > box.getBoundingClientRect().top,
+    )
+    const key = `t${reading?.textContent?.trim().split('.')[0]}`
+    const before = top(reading)
+
+    element.turns = [...turns(100, -100), ...element.turns]
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(Math.abs(top(turnAt(element, key)) - before)).toBeLessThan(2)
+  })
+
   geometry(
     'writes no scroll offset during a fling, and moves no turn under the reader',
     async () => {

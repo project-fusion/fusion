@@ -1001,7 +1001,8 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
    * the next frame with "ResizeObserver loop completed with undelivered
    * notifications": twice in WebKit's run of Chat's specs and once in
    * Chromium's, on October 11, 2026. Observed from the next frame's callbacks,
-   * their first notice comes before that frame paints.
+   * their first notice comes before that frame paints, and a turn drawn for the
+   * first time is answered sooner still, by `settleDrawn`.
    */
   private watchSizes(): void {
     if (typeof ResizeObserver === 'undefined' || this.watchFrame !== 0) {
@@ -1035,6 +1036,36 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
       this.grower.observe(target)
     }
     this.watched = targets
+  }
+
+  /**
+   * Answers the turns this render drew for the first time, once each has drawn
+   * what is in it: a microtask after this update, and before the frame.
+   *
+   * **Sooner than the resize observer, which `watchSizes` starts a frame
+   * later.** A turn is drawn empty and fills in after this update, and until
+   * it is measured the reader's turn sits where the estimates put it. A timer
+   * that ran before the next frame read that place as the reader's: on a Linux
+   * runner, the controller's rest after a scroll left a reader's turn 55.5
+   * pixels from where it was when history arrived above it, in WebKit, on
+   * October 11, 2026. Answered here, the history is held before any timer runs.
+   */
+  private settleDrawn(): void {
+    const waiting = this.drawn().filter((row) => !drawnInFull(row))
+    if (waiting.length === 0) {
+      return
+    }
+    void Promise.all(
+      waiting.map(
+        ({ element }) =>
+          (element.firstElementChild as { updateComplete?: Promise<unknown> } | null)
+            ?.updateComplete,
+      ),
+    ).then(() => {
+      if (this.isConnected && this.fed) {
+        this.handleResize()
+      }
+    })
   }
 
   /**
@@ -1199,6 +1230,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
     }
     if (this.fed) {
       this.virtualize.measure()
+      this.settleDrawn()
     }
     this.watchSizes()
     this.markScroller()
