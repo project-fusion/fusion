@@ -79,7 +79,7 @@ export interface BreadcrumbItem {
  * @csspart crumb-fold-separator - The chevron before that button.
  * @csspart crumb-link - The link, or the current page's words, of a crumb drawn from `items`.
  * @csspart crumb-separator - The separator before a crumb drawn from `items`.
- * @csspart crumb-separator-mark - The chevron before a crumb drawn from `items`.
+ * @csspart crumb-separator-mark - The chevron, or the slash under `separator="slash"`, before a crumb drawn from `items`.
  * @csspart expand - The button in the folded crumb that shows the whole trail.
  * @csspart list - The ordered list.
  */
@@ -126,6 +126,23 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
    */
   @property({ attribute: 'max-items', converter: numberConverter('max-items', undefined) })
   maxItems?: number
+
+  /**
+   * The mark between one crumb and the next, for the whole trail. Unset is a
+   * chevron; `slash` is a slash, as a path or a repository and its branch is
+   * written.
+   *
+   * **On the trail rather than on each crumb**, because the marks are one
+   * decision: a trail whose separators differ from crumb to crumb is a
+   * mistake, and a trail drawn from `items` has no crumb of yours to set it
+   * on. A crumb's own `separator` slot still replaces its mark, for the rare
+   * crumb that needs something else.
+   *
+   * Optional and reflected, per the rule that a reflected property takes no
+   * default, so a stylesheet can select on it.
+   */
+  @property({ reflect: true })
+  separator?: 'slash'
 
   /** Whether a reader has asked to see the whole of a folded trail. */
   @state()
@@ -205,6 +222,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
         crumb.fold = index === 0 ? fold : 0
         crumb.foldLabel = index === 0 ? label : ''
         crumb.onFold = index === 0 && fold > 0 ? this.unfold : undefined
+        crumb.mark = this.separator ?? 'chevron'
       })
     })
   }
@@ -236,6 +254,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
         : html`<${crumb}
             part="crumb crumb-collapsed"
             exportparts="expand: crumb-expand, fold-separator: crumb-fold-separator, link: crumb-link, separator: crumb-separator, separator-mark: crumb-separator-mark"
+            .mark=${this.separator ?? 'chevron'}
             ><button
               part="expand"
               type="button"
@@ -254,6 +273,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
         rel=${item.rel ?? nothing}
         target=${item.target ?? nothing}
         ?current=${index === last}
+        .mark=${this.separator ?? 'chevron'}
         >${item.label}</${crumb}
       >`
     return html`${repeat(first, ({ index }) => index, draw)}${fold}${repeat(
