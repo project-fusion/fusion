@@ -201,6 +201,11 @@ export class HelixHeadlessSplitter extends HelixElement {
        spoken, which is the seed's cue to answer, so clearing a collapse handed
        it straight back to `default-collapsed` and the pane would not open. */
     this.collapsedState = next ?? 'none'
+    /* The consumer has spoken, as a `position` does, so a drag stops standing
+       in for the divider. Left, `showing` kept drawing the pane where it was
+       dropped, and a pane collapsed after being resized stayed open on screen
+       while it reported shut. */
+    this.reached = undefined
     this.requestUpdate('collapsed', previous)
   }
 
