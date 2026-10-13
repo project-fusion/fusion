@@ -14,6 +14,11 @@ helix-dialog::part(surface) {
   --option-padding: var(--helix-space-sm);
 }
 
+/* The corners are the dialog's, unless a page sets the palette's. */
+:host {
+  --dialog-radius: var(--command-radius, var(--helix-radii-sm));
+}
+
 /* The list fills the panel, which is already the surface: a second border and a
    second fill inside one would draw the shape twice. */
 [part="listbox"] {
