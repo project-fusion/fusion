@@ -906,3 +906,30 @@ describe('the journey in and out', () => {
     expect(hasState(host, 'exiting')).toBe(false)
   })
 })
+
+describe('a lightbox with one item', () => {
+  const single = async (extra = ''): Promise<Lightbox> => {
+    const host = (await mount(
+      `<helix-headless-lightbox label="Photo" controls counter ${extra}>
+        <helix-headless-lightbox-item value="one" label="A harbour"></helix-headless-lightbox-item>
+      </helix-headless-lightbox>`,
+    )) as Lightbox
+    await host.updateComplete
+    return host
+  }
+
+  test('draws no previous, next or counter, which have nowhere to go', async () => {
+    const host = await single('loop')
+    expect(part(host, 'previous')).toBeNull()
+    expect(part(host, 'next')).toBeNull()
+    expect(part(host, 'counter')).toBeNull()
+    // The way out is still there.
+    expect(part(host, 'dismiss')).not.toBeNull()
+  })
+
+  test('draws them once there is a second', async () => {
+    const host = await lightbox('controls counter')
+    expect(part(host, 'previous')).not.toBeNull()
+    expect(part(host, 'next')).not.toBeNull()
+  })
+})

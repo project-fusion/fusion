@@ -67,7 +67,8 @@ const keyOf = (item: HelixHeadlessLightboxItem, index: number): string =>
  *
  * Set `controls` for the viewer's own previous, next and close controls, named
  * by `previous-label`, `next-label` and `dismiss-label`, whose glyphs you can
- * replace in the `previous-icon`, `next-icon` and `dismiss-icon` slots. Without
+ * replace in the `previous-icon`, `next-icon` and `dismiss-icon` slots. A set
+ * of one item has nothing to step to, so it draws no previous, next or counter. Without
  * it, compose the chrome yourself in the `header` and `footer` slots, with
  * buttons that send `--previous`, `--next` and `--close`.
  *
@@ -987,7 +988,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
       </div>
       <slot name="footer" part="footer"></slot>
       ${this.controls ? this.renderControls() : nothing}
-      ${this.counter ? html`<span part="counter" aria-hidden="true">${this.place()}</span>` : nothing}
+      ${this.counter && this.items.length > 1 ? html`<span part="counter" aria-hidden="true">${this.place()}</span>` : nothing}
       <span part="live" role="status" aria-live="polite">${this.announcement || nothing}</span>
     </dialog>`
   }
@@ -1000,6 +1001,19 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
    * control that has just shown the last picture keeps focus.
    */
   protected renderControls(): TemplateResult {
+    /* A set of one has nothing to step to, so it draws no previous or next:
+       with `loop` they were live and showed the same picture, and without it
+       they were drawn and disabled, which says a way on that is not there. */
+    const stepping = this.items.length > 1
+    return html`${stepping ? this.renderStepControls() : nothing}${this.maxZoom > 1 ? this.renderZoomControls() : nothing}${drawDismiss({
+      label: this.dismissLabel,
+      mark: html`<slot name="dismiss-icon">${drawDismissGlyph()}</slot>`,
+      onDismiss: () => this.close(),
+    })}`
+  }
+
+  /** Previous and next, for a set of more than one. */
+  protected renderStepControls(): TemplateResult {
     return html`<button
         part="previous"
         type="button"
@@ -1025,13 +1039,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
             ${unsafeSVG(caretRight.content)}
           </svg>
         </slot>
-      </button>
-      ${this.maxZoom > 1 ? this.renderZoomControls() : nothing}
-      ${drawDismiss({
-        label: this.dismissLabel,
-        mark: html`<slot name="dismiss-icon">${drawDismissGlyph()}</slot>`,
-        onDismiss: () => this.close(),
-      })}`
+      </button>`
   }
 
   /**
