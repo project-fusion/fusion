@@ -75,7 +75,10 @@
    the track moved. */
 [part="thumb"] {
   align-items: center;
-  color: var(--switch-icon-color, var(--helix-color-foreground-muted));
+  color: var(
+    --switch-icon-color,
+    light-dark(var(--helix-color-foreground-muted), var(--helix-color-surface-sunken))
+  );
   display: flex;
   justify-content: center;
   /*
@@ -86,7 +89,17 @@
  *      light and a step up from it in dark, which is what `overlay` does and what
  *      `raised` on a white page cannot.
  */
-  background-color: var(--switch-thumb-color, var(--helix-color-surface-overlay));
+  /*
+ *  **In dark, a light thumb instead.** There `overlay` is a single step above
+ *      `sunken`, and an off switch read as an empty groove: the thumb, the one
+ *      thing that says which way it is set, was the part that could not be seen.
+ *      A mid-light ink is what the platforms' own switches show in dark, and the
+ *      icon inside it turns to the groove's color so it still reads.
+ */
+  background-color: var(
+    --switch-thumb-color,
+    light-dark(var(--helix-color-surface-overlay), var(--helix-color-foreground-muted))
+  );
   block-size: calc(var(--_switch-height) - var(--_switch-inset) * 2);
   border: var(--helix-border-thin) solid var(--helix-color-border);
   border-radius: var(--helix-radii-full);
