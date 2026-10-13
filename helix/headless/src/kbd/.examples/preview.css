@@ -44,7 +44,7 @@ helix-headless-kbd::part(kbd) {
   justify-content: center;
   line-height: 1;
   min-inline-size: 1.5em;
-  padding-block-start: 1px;
+  padding-block-end: 1px;
   padding-inline: 0.4em;
   white-space: nowrap;
 }
