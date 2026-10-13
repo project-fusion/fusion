@@ -324,3 +324,43 @@ describe('a crumb whose definition loads after it was added', () => {
     expect(hasState(first, 'current')).toBe(false)
   })
 })
+
+describe('the trail separator', () => {
+  const marks = (crumbs: Element) =>
+    [...crumbs.querySelectorAll('helix-headless-breadcrumb')].map((crumb) => {
+      const mark = part(crumb as HTMLElement, 'separator-mark')
+      return mark?.getAttribute('data-mark') ?? mark?.tagName.toLowerCase()
+    })
+
+  test('is a chevron unset, and a slash on every crumb under `separator="slash"`', async () => {
+    const crumbs = (await mount(trail)) as HTMLElement & {
+      separator?: string
+      updateComplete: Promise<unknown>
+    }
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(marks(crumbs)).toEqual(['svg', 'svg', 'svg'])
+    crumbs.separator = 'slash'
+    await crumbs.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(crumbs.getAttribute('separator')).toBe('slash')
+    expect(marks(crumbs)).toEqual(['slash', 'slash', 'slash'])
+    const mark = part(
+      crumbs.querySelectorAll('helix-headless-breadcrumb')[1] as HTMLElement,
+      'separator-mark',
+    )
+    expect(mark?.textContent).toBe('/')
+  })
+
+  test('draws a slash before each crumb drawn from `items`', async () => {
+    const crumbs = (await mount(
+      '<helix-headless-breadcrumbs separator="slash"></helix-headless-breadcrumbs>',
+    )) as HTMLElement & { items: unknown[]; updateComplete: Promise<unknown> }
+    crumbs.items = [{ href: '/', label: 'Home' }, { label: 'Helix' }]
+    await crumbs.updateComplete
+    const drawn = [...(crumbs.shadowRoot?.querySelectorAll('[part~="crumb"]') ?? [])] as HTMLElement[]
+    for (const crumb of drawn) {
+      await (crumb as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    }
+    expect(drawn.map((crumb) => part(crumb, 'separator-mark')?.textContent)).toEqual(['/', '/'])
+  })
+})
