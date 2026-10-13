@@ -57,7 +57,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot end - Content after the label and outside the link, such as a switcher's
  * menu trigger, a count, or a mark. It can hold a control, and it is not read as
  * part of the link's accessible name.
- * @slot separator - Replaces the chevron shown before this item.
+ * @slot separator - Replaces the mark shown before this item, a chevron or the trail's `separator`.
  * @slot start - Content before the label, such as an icon.
  *
  * @event {HelixSelectEvent} helix-select - A plain press on the crumb's link, with its `href` as the value, before the browser follows it. Cancelable: cancel it to keep the browser from following, as a client-side router does.
@@ -66,7 +66,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart fold-separator - The chevron before that button.
  * @csspart link - The crumb itself, which is an `<a>` where `href` is set.
  * @csspart separator - The separator preceding the item.
- * @csspart separator-mark - The chevron between crumbs, shown when no separator is slotted.
+ * @csspart separator-mark - The chevron between crumbs, or the slash under the trail's `separator="slash"`, shown when no separator is slotted.
  *
  * @cssstate current - While the crumb is the current page, marked `current` or the last of a trail with none marked.
  * @cssstate end - While the `end` slot holds something, so a stylesheet can join
@@ -114,6 +114,13 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   /** @internal Set by the trail: the name of the button that shows the folded crumbs. */
   @property({ attribute: false })
   foldLabel = ''
+
+  /**
+   * @internal Set by the trail from its `separator`: the mark this crumb draws
+   * before itself and before its fold button.
+   */
+  @property({ attribute: false })
+  mark: 'chevron' | 'slash' = 'chevron'
 
   /**
    * The URL the crumb links to. The current page has none.
@@ -193,10 +200,7 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
     if (this.fold === 0) {
       return nothing
     }
-    return html`<span part="fold-separator" aria-hidden="true"
-        ><svg data-mirror fill="currentColor" viewBox=${caretRight.viewBox}>
-          ${unsafeSVG(caretRight.content)}
-        </svg></span
+    return html`<span part="fold-separator" aria-hidden="true">${this.renderMark()}</span
       ><button part="expand" type="button" aria-label=${this.foldLabel} @click=${() => this.onFold?.()}>
         …
       </button>`
@@ -235,11 +239,26 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
    * without reimplementing the crumb, its link and its current-page branch.
    */
   protected renderSeparator(): TemplateResult {
-    return html`<slot name="separator"
-      ><svg part="separator-mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox}>
-        ${unsafeSVG(caretRight.content)}
-      </svg></slot
-    >`
+    return html`<slot name="separator">${this.renderMark('separator-mark')}</slot>`
+  }
+
+  /**
+   * The trail's mark: a chevron, mirrored on a right-to-left page because it
+   * points the way the trail runs, or a slash, which is a character and is
+   * written the same way in either direction.
+   */
+  private renderMark(part?: string): TemplateResult {
+    if (this.mark === 'slash') {
+      return html`<span part=${part ?? nothing} data-mark="slash">/</span>`
+    }
+    return html`<svg
+      part=${part ?? nothing}
+      data-mirror
+      fill="currentColor"
+      viewBox=${caretRight.viewBox}
+    >
+      ${unsafeSVG(caretRight.content)}
+    </svg>`
   }
 
   protected override render(): TemplateResult {
