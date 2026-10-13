@@ -39,10 +39,14 @@
   /* The box has a fixed `block-size`, so a wrapped label overflows it. */
   white-space: nowrap;
   padding-inline: var(--_kbd-inset);
-  /* Down by the floor: the inset shadow takes a pixel off the bottom, so the
-     cap is not symmetrical and centering in the box centers in the wrong one.
+  /* Up by the floor: the inset shadow takes a pixel off the bottom of the face,
+     so the face is not symmetrical and centering in the box centers in the
+     wrong one. Padding at the *end* takes the pixel the shadow takes, so the
+     label sits in the middle of what is left; at the start, which this was,
+     it pushed every glyph a pixel lower still. Measured on a 13px key in
+     WebKit: 0.7px low for K and for the symbols alike, and 0.2px after.
      Padding rather than a translate, so the box still holds it. */
-  padding-block-start: var(--helix-border-thin);
+  padding-block-end: var(--helix-border-thin);
 }
 
 /* Under `caps` a chord is a key per key: the whole is a row of caps with a
@@ -66,7 +70,7 @@
   display: inline-flex;
   justify-content: center;
   min-inline-size: var(--_kbd-height);
-  padding-block-start: var(--helix-border-thin);
+  padding-block-end: var(--helix-border-thin);
   padding-inline: var(--_kbd-inset);
 }
 
