@@ -24,6 +24,84 @@
   outline-offset: 0;
 }
 
+/* **The glow, under `glow`.** A steady edge while the composer holds focus,
+   in place of the ring, and a light that runs once around the edge as focus
+   arrives. The light is a conic gradient cut to a ring by two masks, the box
+   and its padding box, so it follows whatever radius the box has. */
+:host([glow]) [part="composer"] {
+  position: relative;
+  transition: box-shadow var(--helix-duration-normal) var(--helix-easing-standard);
+}
+
+:host([glow]) [part="composer"]:focus-within {
+  box-shadow:
+    0 0 0 var(--helix-border-thin)
+      color-mix(in oklab, var(--chat-composer-glow-color, var(--helix-color-primary)) 60%, transparent),
+    0 0 1.25rem -0.25rem
+      color-mix(in oklab, var(--chat-composer-glow-color, var(--helix-color-primary)) 45%, transparent);
+  outline: none;
+}
+
+:host([glow]) [part="composer"]::before {
+  background: conic-gradient(
+    from var(--helix-chat-composer-sweep, 0deg),
+    transparent 0deg,
+    var(--chat-composer-glow-color, var(--helix-color-primary)) 50deg,
+    transparent 110deg
+  );
+  border-radius: inherit;
+  content: "";
+  /* Inside the edge rather than over it: the edge's width may be a bare
+     `0`, which no length can be computed from. */
+  inset: 0;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  opacity: 0;
+  padding: 1.5px;
+  pointer-events: none;
+  position: absolute;
+}
+
+:host([glow]) [part="composer"]:focus-within::before {
+  animation: chat-composer-sweep 1.4s var(--helix-easing-standard) 1;
+}
+
+@keyframes chat-composer-sweep {
+  0% {
+    --helix-chat-composer-sweep: 0deg;
+    opacity: 0;
+  }
+
+  15%,
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    --helix-chat-composer-sweep: 360deg;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host([glow]) [part="composer"]:focus-within::before {
+    animation: none;
+  }
+}
+
+/* Wrong, the glow takes the danger color, as the ring would. */
+:host([glow]:state(invalid)) {
+  --chat-composer-glow-color: var(--helix-color-danger);
+}
+
+/* Forced colors draw no shadow, so the ring comes back as the focus. */
+@media (forced-colors: active) {
+  :host([glow]) [part="composer"]:focus-within {
+    outline: var(--helix-size-focus-ring) solid CanvasText;
+  }
+}
+
 /* Wrong, once the reader has tried it: the edge and the ring take the danger
    color, as every field's do. */
 :host(:state(invalid)) [part="composer"],
