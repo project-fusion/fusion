@@ -26,6 +26,22 @@ const press = async (host: Splitter, key: string): Promise<KeyboardEvent> => {
   return event
 }
 
+describe('splitter collapsed after a resize', () => {
+  test('is drawn shut, though the divider was moved by the person first', async () => {
+    // The drag stands in for the divider until the consumer answers, and a
+    // collapse is an answer: the pane has to be drawn at its collapsed size.
+    const host = (await splitter('default-position="40" collapsible="start"')) as Splitter & {
+      collapsed?: string
+    }
+    await press(host, 'ArrowRight')
+    host.collapsed = 'start'
+    await host.updateComplete
+
+    const start = part(host, 'start') as HTMLElement
+    expect(start.getAttribute('style')).toContain('--splitter-position: 0%')
+  })
+})
+
 describe('splitter', () => {
   test('two panes and a divider between them', async () => {
     const host = await splitter()
