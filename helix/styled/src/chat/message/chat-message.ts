@@ -23,6 +23,7 @@ import { styles } from './chat-message.css.js'
  *
  * @slot - The turn's content.
  * @slot actions - Controls for the turn.
+ * @slot attachments - What the turn carries, such as images or files, above the bubble.
  * @slot avatar - The author's avatar.
  * @slot indicator - The indicator shown before the first token arrives. Replaces the three dots.
  *

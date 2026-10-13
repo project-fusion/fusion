@@ -153,6 +153,23 @@ describe('the states', () => {
   })
 })
 
+describe('what a turn carries', () => {
+  test('sits above the content and outside it', async () => {
+    const element = await turn('<img slot="attachments" alt="A chart" src="data:," />Look at this')
+    const carried = part(element, 'attachments') as HTMLElement
+    const content = part(element, 'content') as HTMLElement
+    expect(carried.hidden).toBe(false)
+    expect(content.contains(carried)).toBe(false)
+    // Before the content in the body, which is the order it is drawn and read in.
+    expect(carried.compareDocumentPosition(content) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  test('takes no room when nothing is carried', async () => {
+    const element = await turn('Just words')
+    expect((part(element, 'attachments') as HTMLElement).hidden).toBe(true)
+  })
+})
+
 describe('structure', () => {
   /**
    * `article` rather than `listitem`: the transcript is a `log`, and a log's
