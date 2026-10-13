@@ -32,6 +32,7 @@ caret-down
 caret-left
 caret-right
 caret-up
+caret-up-down
 chart-line
 chat-circle
 check
@@ -85,6 +86,7 @@ link
 linkedin-logo
 list
 magnifying-glass
+megaphone-simple
 microphone
 microscope
 minus

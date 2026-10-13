@@ -284,6 +284,21 @@
    fixed surface out of the top layer is placed against the nearest ancestor
    with a filter or a transform: on a frosted page, somewhere else entirely.
    There it closes at once instead, and still fades in. */
+/* `glass` is the page's translucent ground over the theme's blur, and
+   `frosted` the same pair turned up, as the other floating panels draw it. */
+:host([material="glass"]) [part="surface"] {
+  backdrop-filter: var(--dialog-backdrop, var(--helix-material-backdrop));
+  background-color: var(
+    --dialog-background-color,
+    light-dark(var(--helix-material-translucent-strong), var(--helix-material-translucent))
+  );
+}
+
+:host([material="frosted"]) [part="surface"] {
+  backdrop-filter: var(--dialog-backdrop, blur(var(--helix-material-blur-lg)));
+  background-color: var(--dialog-background-color, var(--helix-material-translucent-strong));
+}
+
 @supports not (overlay: auto) {
   [part="surface"],
   [part="surface"]::backdrop {
