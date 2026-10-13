@@ -792,6 +792,23 @@ describe('the columns either side of a label', () => {
     expect(hasState(el, 'start')).toBe(true)
   })
 
+  test('a section decides its own leading column, apart from the others', async () => {
+    const el = await menu(`
+      <helix-headless-menu-section label="Show">
+        <helix-headless-menu-item value="all"><span slot="start">A</span>All</helix-headless-menu-item>
+        <helix-headless-menu-item value="chats">Chats</helix-headless-menu-item>
+      </helix-headless-menu-section>
+      <helix-headless-menu-section label="Group by">
+        <helix-headless-menu-item value="date">Date</helix-headless-menu-item>
+      </helix-headless-menu-section>
+      <helix-headless-menu-item value="archived">Archived</helix-headless-menu-item>`)
+    const [show, group] = [...el.querySelectorAll('helix-headless-menu-section')]
+    await (show as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
+    expect(show && hasState(show as HTMLElement, 'start')).toBe(true)
+    expect(group && hasState(group as HTMLElement, 'start')).toBe(false)
+    expect(hasState(el, 'start')).toBe(false)
+  })
+
   /* Checkable and not checked, which is the case an empty box used to cover: a
      filter page whose labels step sideways as the reader ticks their way down it
      is the whole reason the column is reserved rather than drawn per row. */

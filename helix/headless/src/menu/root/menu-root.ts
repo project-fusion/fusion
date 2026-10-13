@@ -1493,15 +1493,39 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * the filters' column. `Notifications` answers the same question for its media
    * column the same way, and for the same reason.
    *
+   * **Per section on a page with sections**, for the same reason one level
+   * down: a section has its own heading, where the reader starts reading
+   * again, so its rows line up with each other and not with another
+   * section's. A section of icons over a section of plain choices indented
+   * the plain ones by a column nothing in them filled. The rows outside any
+   * section are decided together, as before, and the trailing column stays
+   * the page's, since ticks on one edge never set labels on two.
+   *
    * Read off the light DOM rather than off the rows, so it does not depend on
    * which children have upgraded by the time this runs.
    */
   private markColumns(): void {
     const rows = this.flies ? this.topRows : this.drilldown.rows
-    this.toggleState(
-      'start',
-      rows.some((row) => row.querySelector(':scope > [slot="start"]') !== null),
-    )
+    const sections = new Map<Element, boolean>()
+    for (const child of this.children) {
+      if ((child as { isMenuSection?: boolean }).isMenuSection) {
+        sections.set(child, false)
+      }
+    }
+    let loose = false
+    for (const row of rows) {
+      const marked = row.querySelector(':scope > [slot="start"]') !== null
+      const parent = row.parentElement
+      if (parent && sections.has(parent)) {
+        sections.set(parent, sections.get(parent) === true || marked)
+      } else {
+        loose ||= marked
+      }
+    }
+    this.toggleState('start', loose)
+    for (const [section, marked] of sections) {
+      ;(section as { startColumn?: boolean }).startColumn = marked
+    }
     /* Checkable and checked both, not just checked. A row that can be ticked
        holds the column open while it is not, or the labels on a filter page step
        sideways as the reader ticks their way down it. */
