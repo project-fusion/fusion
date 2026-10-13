@@ -25,6 +25,10 @@ import { property, state } from 'lit/decorators.js'
  *
  * @csspart heading - The words that name the section.
  * @csspart section - The group that holds the heading and the rows.
+ *
+ * @cssstate start - A row in the section has content before its label, so
+ * every row in it keeps the leading column. The menu decides it for each
+ * section, apart from the rows outside one.
  */
 @customElement('helix-headless-menu-section')
 export class HelixHeadlessMenuSection extends HelixElement {
@@ -42,6 +46,13 @@ export class HelixHeadlessMenuSection extends HelixElement {
   @property({ attribute: false })
   onPage = true
 
+  /**
+   * @internal Set by the menu: whether a row in the section has content
+   * before its label, so the section's rows keep the leading column.
+   */
+  @property({ attribute: false })
+  startColumn = false
+
   /** @internal What a menu reads to tell a section from a row. */
   readonly isMenuSection = true
 
@@ -57,6 +68,13 @@ export class HelixHeadlessMenuSection extends HelixElement {
     super.willUpdate(changed)
     if (this.childrenKnown) {
       this.heading = this.knownChildren.some((child) => child.slot === 'heading')
+    }
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (changed.has('startColumn')) {
+      this.toggleState('start', this.startColumn)
     }
   }
 
