@@ -7,7 +7,14 @@
  * when it is not.
  */
 
-import { type Drawn, type PagePoint, type Projection, solid, ticks } from '@fusion.dev/helix-core'
+import {
+  type Drawn,
+  depthOrder,
+  type PagePoint,
+  type Projection,
+  solid,
+  ticks,
+} from '@fusion.dev/helix-core'
 import { type FieldRow, niceRange, type PlotAxis } from '../spatial-scatter-chart/field.js'
 import { type BoxExtent, inBox } from '../spatial-scatter-chart/view.js'
 
@@ -20,10 +27,17 @@ export interface BarCell {
   across: number
   /** The column of the row the value was read from, which names its series. */
   column: number
-  /** Which series it stands in, counting from zero. */
+  /** Which series it stands in, counting from zero, which colors it. */
   depth: number
+  /**
+   * Where its block starts on the value axis: zero, or under `stacked` the
+   * readings of the series before it in its category, on its side of zero.
+   */
+  from: number
   /** The row's own label, which names its category. */
   label: string
+  /** Which row of the grid in depth it stands in: its series, or the one row of a stacked chart. */
+  lane: number
   /** The row it was read from, counting from zero. */
   row: number
   /** The value, where the cell holds a number. */
@@ -45,10 +59,14 @@ export interface BarField {
    * series `depth` is at `across * series.length + depth`.
    */
   cells: BarCell[]
+  /** How many rows of bars stand in depth: one a series, or one in all when stacked. */
+  lanes: number
   /** How many cells hold a value. */
   readings: number
   /** Every series, in the table's order: each numeric column's heading. */
   series: string[]
+  /** Whether a category's series stand in one column, each on the ones before it. */
+  stacked: boolean
 }
 
 /**
@@ -77,29 +95,55 @@ const named = (count: number, labels: string[], nearest = false): PlotAxis => {
  * **The value axis runs from zero**, whatever the values, so a bar's height
  * is its value: one twice as tall is twice as much. It widens to round
  * numbers past the highest value, and below zero where a value is negative.
+ *
+ * **`stacked` stands a category's series in one column**, each block on the
+ * ones before it, so the column is as tall as the category's total and the
+ * axis runs to the tallest total. A negative reading hangs below zero on the
+ * negatives before it, as a flat chart's stack does.
  */
-export const barsOf = (rows: readonly FieldRow[], columns: readonly number[]): BarField => {
+export const barsOf = (
+  rows: readonly FieldRow[],
+  columns: readonly number[],
+  stacked = false,
+): BarField => {
   const series = columns.map(
     (column) => rows.find((row) => row.cells[column])?.cells[column]?.name ?? '',
   )
   const cells: BarCell[] = []
   const values: number[] = []
+  // The ends the bars reach: each value, or under `stacked` each stack's.
+  const reached: number[] = []
   rows.forEach((row, at) => {
+    let [above, below] = [0, 0]
     columns.forEach((column, depth) => {
       const value = row.cells[column]?.value
       const read = Number.isFinite(value) ? (value as number) : undefined
+      // Where a block here would start: an empty cell starts where the
+      // stack has reached, so the cells of a column read in order.
+      let from = stacked ? above : 0
       if (read !== undefined) {
         values.push(read)
+        if (stacked) {
+          from = read < 0 ? below : above
+          if (read < 0) {
+            below += read
+          } else {
+            above += read
+          }
+        }
+        reached.push(from + read)
       }
-      cells.push({ across: at, column, depth, label: row.label, row: at, value: read })
+      const lane = stacked ? 0 : depth
+      cells.push({ across: at, column, depth, from, label: row.label, lane, row: at, value: read })
     })
   })
-  const [low, high] = [Math.min(0, ...values), Math.max(0, ...values)]
+  const lanes = stacked ? 1 : series.length
+  const [low, high] = [Math.min(0, ...reached), Math.max(0, ...reached)]
   const range: [number, number] = low === high ? [0, 1] : niceRange(low, high)
-  const longest = Math.max(rows.length, series.length, 1)
+  const longest = Math.max(rows.length, lanes, 1)
   return {
     axes: {
-      extent: [Math.max(rows.length, 1) / longest, HEIGHT, Math.max(series.length, 1) / longest],
+      extent: [Math.max(rows.length, 1) / longest, HEIGHT, Math.max(lanes, 1) / longest],
       x: named(
         rows.length,
         rows.map((row) => row.label),
@@ -109,12 +153,14 @@ export const barsOf = (rows: readonly FieldRow[], columns: readonly number[]): B
       y: { name: series.length === 1 ? (series[0] ?? '') : '', range, ticks: ticks(range) },
       /* **The first series in front**, so a later one, often the larger in a
          table read left to right, stands behind it rather than hiding it. */
-      z: named(series.length, series.length === 1 ? [] : series, true),
+      z: named(lanes, lanes === 1 ? [] : series, true),
     },
     categories: rows.map((row) => row.label),
     cells,
+    lanes,
     readings: values.length,
     series,
+    stacked,
   }
 }
 
@@ -123,6 +169,8 @@ const FOOTPRINT = 0.6
 
 /** A bar as the chart's own drawing paints it. */
 export interface DrawnBar {
+  /** Where the block starts on the floor's way up, in the box's units. */
+  base: number
   /** The block's eight corners on the page, which a drawing with no box is framed around. */
   corners: PagePoint[]
   drawn: Drawn
@@ -134,29 +182,33 @@ export interface DrawnBar {
 
 /**
  * Each bar with a value as a block, seen through `projection`: standing on
- * its place on the grid, from zero to its value, a little narrower than its
- * place so neighbors stand apart. A value below zero hangs from zero.
+ * its place on the grid, from where it starts to its value, a little
+ * narrower than its place so neighbors stand apart. A value below zero
+ * hangs from where it starts.
  */
 export const barsDrawn = (field: BarField, projection: Projection): DrawnBar[] => {
   const [ex, ey, ez] = field.axes.extent
   const spacing = Math.min(
     (2 * ex) / Math.max(field.categories.length, 1),
-    (2 * ez) / Math.max(field.series.length, 1),
+    (2 * ez) / Math.max(field.lanes, 1),
   )
-  const zero = inBox(field.axes.y, 0) * ey
   return field.cells.flatMap((cell, index): DrawnBar[] => {
-    if (cell.value === undefined) {
+    /* A zero in a stack adds nothing to its column, so it draws no block, as
+       a flat chart's stack draws none; standing alone, a zero is a plate on
+       the floor that says the reading is there. */
+    if (cell.value === undefined || (field.stacked && cell.value === 0)) {
       return []
     }
     const x = inBox(field.axes.x, cell.across) * ex
     /* The floor's way back is the box's depth turned round, as the box's own
        places are. */
-    const y = -inBox(field.axes.z, cell.depth) * ez
-    const top = inBox(field.axes.y, cell.value) * ey
-    const base = Math.min(zero, top)
-    const height = Math.abs(top - zero)
-    /* Lifted to the bar's foot, which is zero on the value axis rather than
-       the floor of the box where values run below zero. */
+    const y = -inBox(field.axes.z, cell.lane) * ez
+    const start = inBox(field.axes.y, cell.from) * ey
+    const top = inBox(field.axes.y, cell.from + cell.value) * ey
+    const base = Math.min(start, top)
+    const height = Math.abs(top - start)
+    /* Lifted to the bar's foot, which is where it starts on the value axis
+       rather than the floor of the box where values run below zero. */
     const lifted: Projection = {
       ...projection,
       at: (px, py, pz = 0) => projection.at(px, py, pz + base),
@@ -168,6 +220,23 @@ export const barsDrawn = (field: BarField, projection: Projection): DrawnBar[] =
         corners.push(lifted.at(cx, cy, 0), lifted.at(cx, cy, height))
       }
     }
-    return [{ corners, drawn: solid(lifted, 'block', x, y, width, height), height, index, x, y }]
+    return [
+      { base, corners, drawn: solid(lifted, 'block', x, y, width, height), height, index, x, y },
+    ]
   })
+}
+
+/**
+ * The bars in the order they are painted, back to front, and **a stacked
+ * column from the floor up**: its blocks share a place on the floor, which
+ * the order by depth cannot tell apart, and one painted under the block below
+ * it would show the lower block's top through the upper one.
+ */
+export const paintOrder = (projection: Projection, bars: readonly DrawnBar[]): DrawnBar[] => {
+  const columns = new Map<string, DrawnBar[]>()
+  for (const bar of depthOrder(projection, bars)) {
+    const place = `${bar.x},${bar.y}`
+    columns.set(place, [...(columns.get(place) ?? []), bar])
+  }
+  return [...columns.values()].flatMap((column) => column.sort((one, two) => one.base - two.base))
 }

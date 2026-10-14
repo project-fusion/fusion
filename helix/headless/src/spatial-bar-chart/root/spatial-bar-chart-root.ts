@@ -3,7 +3,6 @@ import {
   type Camera,
   CHART_PLOT,
   customElement,
-  depthOrder,
   drawTooltip,
   formatWords,
   HelixElement,
@@ -35,7 +34,7 @@ import {
   SPATIAL_VIEW,
   turned,
 } from '../../spatial-scatter-chart/view.js'
-import { type BarField, barsDrawn, barsOf, type DrawnBar } from '../bars.js'
+import { type BarField, barsDrawn, barsOf, type DrawnBar, paintOrder } from '../bars.js'
 
 /** The arrow keys that turn the view while Shift is held, and which way each turns it. */
 const TURNS: Record<string, { across: number; up: number }> = {
@@ -191,6 +190,19 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
   plotLabel = '3D bar chart'
 
   /**
+   * Stacks a category's series into one column, each block standing on the
+   * ones before it, so the column is as tall as the category's total, as a
+   * flat `Bar Chart` stacks them.
+   *
+   * Absent stands the series one behind another in depth. Stacked, every
+   * series stands in the front row, so none hides another, and the parts of
+   * one total read together. A negative reading hangs below zero on the
+   * negatives before it. The scale fits the stacks.
+   */
+  @property({ reflect: true, type: Boolean })
+  stacked = false
+
+  /**
    * The `summary` part's sentence. `{count}`, `{series}`, and `{categories}`
    * are the number of bars, series, and categories, written in the locale,
    * and `{low}` and `{high}` the lowest and the highest value.
@@ -238,14 +250,18 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
   get field(): BarField {
     const rows = this.sourceRows
     const columns = this.plottedColumns
-    if (this.memo?.rows !== rows || this.memo.columns !== columns) {
-      this.memo = { columns, field: barsOf(rows, columns), rows }
+    if (
+      this.memo?.rows !== rows ||
+      this.memo.columns !== columns ||
+      this.memo.stacked !== this.stacked
+    ) {
+      this.memo = { columns, field: barsOf(rows, columns, this.stacked), rows, stacked: this.stacked }
     }
     return this.memo.field
   }
 
   /** The field last read, and the rows and columns it was read from. */
-  private memo: { columns: unknown; field: BarField; rows: unknown } | undefined
+  private memo: { columns: unknown; field: BarField; rows: unknown; stacked: boolean } | undefined
 
   /** The bar the keys or the pointer rest on, as its place in `field.cells`, or `-1`. */
   get active(): number {
@@ -457,7 +473,7 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
-      >${this.noBox ? nothing : drawBox(view)}${depthOrder(view.projection, bars).map(
+      >${this.noBox ? nothing : drawBox(view)}${paintOrder(view.projection, bars).map(
         (bar) =>
           /* The ring straight after its bar, so the bars in front cover it as
              they cover the bar: drawn over them all, it traced their faces
