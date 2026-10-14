@@ -16,6 +16,16 @@ const KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home',
 const ownsTabStop = (node: HTMLElement): node is HTMLElement & { focusable: boolean } =>
   'focusable' in node
 
+/**
+ * Whether a control is out of the toolbar for being disabled. A disabled
+ * control that stays focusable, as a Button with `focusableWhenDisabled` does,
+ * stays in: its tooltip says why it is disabled, and the APG toolbar pattern
+ * keeps such a control reachable by the arrows.
+ */
+const disabledOut = (node: HTMLElement): boolean =>
+  node.hasAttribute('disabled') &&
+  (node as HTMLElement & { focusableWhenDisabled?: unknown }).focusableWhenDisabled !== true
+
 /** Elements the browser focuses with no help. */
 const NATIVE =
   'a[href], button, input, select, textarea, [tabindex], [contenteditable=""], [contenteditable="true"]'
@@ -45,7 +55,7 @@ const innerStops = new WeakMap<HTMLElement, HTMLElement>()
 const takesFocus = (node: Element): boolean => {
   if (
     !(node instanceof HTMLElement) ||
-    node.hasAttribute('disabled') ||
+    disabledOut(node) ||
     node.getAttribute('aria-hidden') === 'true'
   ) {
     return false
@@ -266,7 +276,7 @@ export class ToolbarController implements ReactiveController {
     for (const child of this.members) {
       if (
         !(child instanceof HTMLElement) ||
-        child.hasAttribute('disabled') ||
+        disabledOut(child) ||
         child.getAttribute('aria-hidden') === 'true'
       ) {
         continue
@@ -628,14 +638,14 @@ export class ToolbarController implements ReactiveController {
     this.host.addEventListener('keydown', this.handleCompositeKeydown, true)
     this.host.addEventListener('keydown', this.handleKeydown)
     this.host.addEventListener('focusin', this.handleFocusIn)
-    /* `disabled` and `aria-hidden` are what `controls` filters on, so a change
-       to either is a change to the set the stop has to live in. Nothing else is
-       watched, which also keeps `setTabStop` writing `tabindex` from feeding
-       back into this. */
+    /* `disabled`, `focusable-when-disabled` and `aria-hidden` are what
+       `controls` filters on, so a change to any of them is a change to the set
+       the stop has to live in. Nothing else is watched, which also keeps
+       `setTabStop` writing `tabindex` from feeding back into this. */
     const watched = this.options.watch?.() ?? this.host
     this.watcher = new MutationObserver(() => this.restore())
     this.watcher.observe(watched, {
-      attributeFilter: ['disabled', 'aria-hidden'],
+      attributeFilter: ['disabled', 'focusable-when-disabled', 'aria-hidden'],
       attributes: true,
       subtree: true,
     })

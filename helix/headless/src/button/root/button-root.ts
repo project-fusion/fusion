@@ -83,6 +83,10 @@ const afterDispatch = (click: Event, then: () => void): void => {
  * Set `pending` while the action a press started is still running. The button
  * keeps focus and refuses presses, and a reader on it hears `pending-label`.
  *
+ * Set `focusable-when-disabled` on a disabled button whose reason a Tooltip
+ * gives. It stays in the tab order and takes hover, so the tooltip opens, and
+ * it refuses every press.
+ *
  * Every press that acts sends `helix-press` with what pressed it in
  * `detail.pointerType`: `mouse`, `pen`, `touch`, `keyboard`, or `virtual` for
  * a screen reader's press or a script's `click()`, as React Aria's `onPress`
@@ -221,6 +225,43 @@ export class HelixHeadlessButton extends HelixFormElementBase {
    */
   @property({ attribute: false })
   focusable = true
+
+  /**
+   * Whether a disabled button stays in the tab order, so a tooltip around it
+   * can say why it is disabled.
+   *
+   * Set it on a button whose reason a Tooltip gives, such as a Save with no
+   * changes to save. While the button is disabled, it keeps focus and takes
+   * hover, and it refuses every press: a click, Enter and Space, and Enter in
+   * a field of its form. The click does not reach your listeners, and a submit
+   * button submits nothing. The inner control carries `aria-disabled` in place
+   * of the native `disabled`, so a screen reader still says it is unavailable.
+   * The styled button keeps the disabled look.
+   *
+   * Leave it unset on a button with no reason to give. A plain disabled button
+   * leaves the tab order, as a native one does, and a keyboard reader skips a
+   * stop that does nothing. Set `pending` for the wait after a press.
+   */
+  @property({ attribute: 'focusable-when-disabled', type: Boolean })
+  focusableWhenDisabled = false
+
+  /**
+   * @internal Whether the button is disabled and kept in the tab order by
+   * `focusableWhenDisabled`, so the inner control takes `aria-disabled` and
+   * refuses presses itself.
+   */
+  protected get heldDisabled(): boolean {
+    return this.isDisabled && this.focusableWhenDisabled
+  }
+
+  /**
+   * @internal Whether the inner control refuses a press it still receives:
+   * the button is pending, or disabled and kept in the tab order. A subclass
+   * that draws its own control, as `CopyButton` does, binds to it.
+   */
+  protected get refusesPress(): boolean {
+    return this.pending || this.heldDisabled
+  }
 
   /**
    * Where this button's submission goes, overriding the form's own.
@@ -393,11 +434,11 @@ export class HelixHeadlessButton extends HelixFormElementBase {
 
   private readonly handleClick = (event: Event): void => {
     /* **Refused before anything else, and kept from the page.** A native
-       disabled button sends no click at all. A pending one has to stay
-       focusable, so the click is stopped here, at the control, before it
-       reaches a listener on the host, and its default is prevented so an
-       invoker command does not run either. */
-    if (this.pending) {
+       disabled button sends no click at all. A pending one, and a disabled one
+       kept in the tab order, has to stay focusable, so the click is stopped
+       here, at the control, before it reaches a listener on the host, and its
+       default is prevented so an invoker command does not run either. */
+    if (this.refusesPress) {
       event.preventDefault()
       event.stopImmediatePropagation()
       return
@@ -687,11 +728,11 @@ export class HelixHeadlessButton extends HelixFormElementBase {
       aria-expanded=${this.expanded === undefined ? nothing : String(this.expanded)}
       aria-haspopup=${this.popup ?? nothing}
       aria-busy=${this.pending ? 'true' : nothing}
-      aria-disabled=${this.pending ? 'true' : nothing}
+      aria-disabled=${this.refusesPress ? 'true' : nothing}
       aria-label=${this.label || nothing}
       command=${this.command || nothing}
       tabindex=${stop}
-      ?disabled=${this.isDisabled}
+      ?disabled=${this.isDisabled && !this.heldDisabled}
       @click=${this.handleClick}
       @keydown=${this.notePress}
       @pointerdown=${this.notePress}

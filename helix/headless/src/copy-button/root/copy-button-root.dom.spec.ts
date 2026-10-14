@@ -437,3 +437,22 @@ describe('the tooltip and the words', () => {
     expect(el.shadowRoot?.querySelector('[part="text"]')).toBeNull()
   })
 })
+
+describe('a disabled copy button kept in the tab order', () => {
+  test('stays focusable, says it is disabled, and copies nothing', async () => {
+    const written = clipboard('accept')
+    const el = await mount(
+      '<helix-headless-copy-button disabled focusable-when-disabled value="bun add @fusion.dev/helix"></helix-headless-copy-button>',
+    )
+    const button = el.shadowRoot?.querySelector('[part="button"]') as HTMLButtonElement
+    expect(button.disabled).toBe(false)
+    expect(button.getAttribute('aria-disabled')).toBe('true')
+    let heard = 0
+    el.addEventListener('click', () => {
+      heard += 1
+    })
+    await press(el)
+    expect(written).toEqual([])
+    expect(heard).toBe(0)
+  })
+})
