@@ -5,6 +5,7 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
 import { styles } from './graph-root.css.js'
 import '../../icon-button/index.js'
+import '../../tooltip/index.js'
 
 /**
  * @summary A frame around a graph of notes drawn by another library, and the list that makes it readable.

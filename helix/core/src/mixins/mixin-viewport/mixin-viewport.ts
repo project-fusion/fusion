@@ -904,6 +904,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
         this.panGlyph(way),
       )
       const button = this.controlTag
+      const tip = this.tag('tooltip')
       const { material, raised } = this.controlAxes
       const ground = material ?? nothing
       return staticHtml`<div part="controls" role="toolbar" aria-label=${this.controlsLabel}>
@@ -911,6 +912,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
           pan
             ? staticHtml`<${button}
                   part="pan-up"
+                  id="pan-up"
                   exportparts="button: pan-up-button, live: pan-up-live, spinner: pan-up-spinner, text: pan-up-text"
                   label=${this.panLabel('up')}
                   material=${ground}
@@ -919,9 +921,10 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @helix-press=${stopPress}
                 >
                   <slot name="pan-up-icon">${up}</slot>
-                </${button}>
+                </${button}><${tip} for="pan-up" content=${this.panLabel('up')}></${tip}>
                 <${button}
                   part="pan-start"
+                  id="pan-start"
                   exportparts="button: pan-start-button, live: pan-start-live, spinner: pan-start-spinner, text: pan-start-text"
                   label=${this.panLabel('start')}
                   material=${ground}
@@ -930,9 +933,10 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @helix-press=${stopPress}
                 >
                   <slot name="pan-start-icon">${start}</slot>
-                </${button}>
+                </${button}><${tip} for="pan-start" content=${this.panLabel('start')}></${tip}>
                 <${button}
                   part="pan-end"
+                  id="pan-end"
                   exportparts="button: pan-end-button, live: pan-end-live, spinner: pan-end-spinner, text: pan-end-text"
                   label=${this.panLabel('end')}
                   material=${ground}
@@ -941,9 +945,10 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @helix-press=${stopPress}
                 >
                   <slot name="pan-end-icon">${end}</slot>
-                </${button}>
+                </${button}><${tip} for="pan-end" content=${this.panLabel('end')}></${tip}>
                 <${button}
                   part="pan-down"
+                  id="pan-down"
                   exportparts="button: pan-down-button, live: pan-down-live, spinner: pan-down-spinner, text: pan-down-text"
                   label=${this.panLabel('down')}
                   material=${ground}
@@ -952,13 +957,14 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @helix-press=${stopPress}
                 >
                   <slot name="pan-down-icon">${down}</slot>
-                </${button}>`
+                </${button}><${tip} for="pan-down" content=${this.panLabel('down')}></${tip}>`
             : nothing
         }
         ${
           zoom
             ? staticHtml`<${button}
                   part="zoom-in"
+                  id="zoom-in"
                   exportparts="button: zoom-in-button, live: zoom-in-live, spinner: zoom-in-spinner, text: zoom-in-text"
                   label=${this.zoomInLabel}
                   material=${ground}
@@ -967,9 +973,10 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @helix-press=${stopPress}
                 >
                   <slot name="zoom-in-icon">+</slot>
-                </${button}>
+                </${button}><${tip} for="zoom-in" content=${this.zoomInLabel}></${tip}>
                 <${button}
                   part="zoom-out"
+                  id="zoom-out"
                   exportparts="button: zoom-out-button, live: zoom-out-live, spinner: zoom-out-spinner, text: zoom-out-text"
                   label=${this.zoomOutLabel}
                   material=${ground}
@@ -978,7 +985,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @helix-press=${stopPress}
                 >
                   <slot name="zoom-out-icon">−</slot>
-                </${button}>`
+                </${button}><${tip} for="zoom-out" content=${this.zoomOutLabel}></${tip}>`
             : nothing
         }
         ${more}
@@ -986,6 +993,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
           fullscreen
             ? staticHtml`<${button}
                 part="fullscreen"
+                id="fullscreen"
                 exportparts="button: fullscreen-button, live: fullscreen-live, spinner: fullscreen-spinner, text: fullscreen-text"
                 aria-pressed=${this.filled ? 'true' : 'false'}
                 label=${this.fullscreenLabel}
@@ -995,7 +1003,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                 @helix-press=${stopPress}
               >
                 <slot name="fullscreen-icon">⤢</slot>
-              </${button}>`
+              </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel}></${tip}>`
             : nothing
         }
       </div>`
