@@ -2,6 +2,7 @@ import {
   CopyController,
   customElement,
   HelixCopyErrorEvent,
+  type Placement,
   timeConverter,
   words,
 } from '@fusion.dev/helix-core'
@@ -151,6 +152,23 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    */
   @property({ attribute: 'show-label', reflect: true, type: Boolean })
   showLabel = false
+
+  /**
+   * When the tooltip shows: `full` on hover and focus and after a press,
+   * `copy` only after a press, to show the result, and `none` never, for a
+   * button whose result shows another way, such as under `show-label`.
+   *
+   * Unset is `full`, and the attribute stays absent until you write it.
+   */
+  @property()
+  tooltip?: 'copy' | 'full' | 'none'
+
+  /**
+   * The side the tooltip prefers. It moves to another side where this one
+   * does not fit.
+   */
+  @property({ attribute: 'tooltip-placement' })
+  tooltipPlacement: Placement = 'top'
 
   /**
    * The text copied to the clipboard.
@@ -429,7 +447,7 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
    * how it is anchored, and every one of those is a normal thing to want.
    * Rendering the button here as well would make all three a rewrite.
    */
-  protected override renderTooltip(control: TemplateResult): TemplateResult {
+  protected renderTooltip(control: TemplateResult): TemplateResult {
     /* `persist`, because this bubble is the confirmation rather than a hint
        about it. Without it the tooltip hid on the same click that swapped its
        content to Copied, so the words this component takes such care over were
