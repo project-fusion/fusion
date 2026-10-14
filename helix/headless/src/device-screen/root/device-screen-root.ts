@@ -41,6 +41,7 @@ import { html } from 'lit/static-html.js'
 /* Side-effect, for the buttons this renders. Both tiers import it, because
    this tier writes the template and the styled tier inherits it. */
 import '../../icon-button/index.js'
+import '../../tooltip/index.js'
 import { gestureOf } from '../gesture.js'
 import { type Fraction, quarterTurns, turn, unturn, unturnDistance } from '../turn.js'
 
@@ -1252,6 +1253,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
       return nothing
     }
     const button = this.tag('icon-button')
+    const tip = this.tag('tooltip')
     const off = this.readonly
     const raised = this.controlsRaised
     return html`<div
@@ -1264,6 +1266,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
         this.draws('back')
           ? html`<${button}
               part="back"
+              id="back"
               exportparts="button: back-button, live: back-live, spinner: back-spinner, text: back-text"
               ?disabled=${off}
               label=${this.backLabel}
@@ -1273,13 +1276,14 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               @pointerdown=${this.handleHoldStart}
             >
               <slot name="back-icon">${drawIcon(caretLeft)}</slot>
-            </${button}>`
+            </${button}><${tip} for="back" content=${this.backLabel}></${tip}>`
           : nothing
       }
       ${
         this.draws('home')
           ? html`<${button}
               part="home"
+              id="home"
               exportparts="button: home-button, live: home-live, spinner: home-spinner, text: home-text"
               ?disabled=${off}
               label=${this.homeLabel}
@@ -1289,13 +1293,14 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               @pointerdown=${this.handleHoldStart}
             >
               <slot name="home-icon">${drawIcon(house)}</slot>
-            </${button}>`
+            </${button}><${tip} for="home" content=${this.homeLabel}></${tip}>`
           : nothing
       }
       ${
         this.draws('recents')
           ? html`<${button}
               part="recents"
+              id="recents"
               exportparts="button: recents-button, live: recents-live, spinner: recents-spinner, text: recents-text"
               ?disabled=${off}
               label=${this.recentsLabel}
@@ -1305,13 +1310,14 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               @pointerdown=${this.handleHoldStart}
             >
               <slot name="recents-icon">${drawIcon(square)}</slot>
-            </${button}>`
+            </${button}><${tip} for="recents" content=${this.recentsLabel}></${tip}>`
           : nothing
       }
       ${
         this.draws('power')
           ? html`<${button}
               part="power"
+              id="power"
               exportparts="button: power-button, live: power-live, spinner: power-spinner, text: power-text"
               ?disabled=${off}
               label=${this.powerLabel}
@@ -1321,13 +1327,14 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               @pointerdown=${this.handleHoldStart}
             >
               <slot name="power-icon">${drawIcon(power)}</slot>
-            </${button}>`
+            </${button}><${tip} for="power" content=${this.powerLabel}></${tip}>`
           : nothing
       }
       ${
         this.draws('volume')
           ? html`<${button}
                 part="volume-up"
+                id="volume-up"
                 exportparts="button: volume-up-button, live: volume-up-live, spinner: volume-up-spinner, text: volume-up-text"
                 ?disabled=${off}
                 label=${this.volumeUpLabel}
@@ -1337,9 +1344,10 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
                 @pointerdown=${this.handleHoldStart}
               >
                 <slot name="volume-up-icon">${drawIcon(speakerHigh)}</slot>
-              </${button}>
+              </${button}><${tip} for="volume-up" content=${this.volumeUpLabel}></${tip}>
               <${button}
                 part="volume-down"
+                id="volume-down"
                 exportparts="button: volume-down-button, live: volume-down-live, spinner: volume-down-spinner, text: volume-down-text"
                 ?disabled=${off}
                 label=${this.volumeDownLabel}
@@ -1349,13 +1357,14 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
                 @pointerdown=${this.handleHoldStart}
               >
                 <slot name="volume-down-icon">${drawIcon(speakerLow)}</slot>
-              </${button}>`
+              </${button}><${tip} for="volume-down" content=${this.volumeDownLabel}></${tip}>`
           : nothing
       }
       ${
         this.draws('rotate')
           ? html`<${button}
                 part="rotate-left"
+                id="rotate-left"
                 exportparts="button: rotate-left-button, live: rotate-left-live, spinner: rotate-left-spinner, text: rotate-left-text"
                 ?disabled=${off}
                 label=${this.rotateLeftLabel}
@@ -1365,9 +1374,10 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
                 @pointerdown=${this.handleHoldStart}
               >
                 <slot name="rotate-left-icon">${drawIcon(arrowCounterClockwise)}</slot>
-              </${button}>
+              </${button}><${tip} for="rotate-left" content=${this.rotateLeftLabel}></${tip}>
               <${button}
                 part="rotate-right"
+                id="rotate-right"
                 exportparts="button: rotate-right-button, live: rotate-right-live, spinner: rotate-right-spinner, text: rotate-right-text"
                 ?disabled=${off}
                 label=${this.rotateRightLabel}
@@ -1377,13 +1387,14 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
                 @pointerdown=${this.handleHoldStart}
               >
                 <slot name="rotate-right-icon">${drawIcon(arrowClockwise)}</slot>
-              </${button}>`
+              </${button}><${tip} for="rotate-right" content=${this.rotateRightLabel}></${tip}>`
           : nothing
       }
       ${
         this.draws('screenshot')
           ? html`<${button}
               part="screenshot"
+              id="screenshot"
               exportparts="button: screenshot-button, live: screenshot-live, spinner: screenshot-spinner, text: screenshot-text"
               label=${this.screenshotLabel}
               ?raised=${raised}
@@ -1391,7 +1402,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               @helix-press=${stopPress}
             >
               <slot name="screenshot-icon">${drawIcon(camera)}</slot>
-            </${button}>`
+            </${button}><${tip} for="screenshot" content=${this.screenshotLabel}></${tip}>`
           : nothing
       }
       <slot name="controls" @slotchange=${this.handleSlotChange}></slot>
@@ -1399,6 +1410,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
         this.draws('fullscreen')
           ? html`<${button}
               part="fullscreen"
+              id="fullscreen"
               exportparts="button: fullscreen-button, live: fullscreen-live, spinner: fullscreen-spinner, text: fullscreen-text"
               aria-pressed=${this.filled ? 'true' : 'false'}
               label=${this.fullscreenLabel}
@@ -1407,7 +1419,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               @helix-press=${stopPress}
             >
               <slot name="fullscreen-icon">${drawIcon(cornersOut)}</slot>
-            </${button}>`
+            </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel}></${tip}>`
           : nothing
       }
     </div>`

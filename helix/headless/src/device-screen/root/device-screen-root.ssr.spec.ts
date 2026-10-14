@@ -44,12 +44,16 @@ describe('device screen server output', () => {
     expect(hasPart(markup, 'volume-up')).toBe(false)
   })
 
+  /* `arrow`, `empty` and `surface` are the Tooltip's, one beside each button
+     to show its name. */
   test('the frame is served whole, its Icon Buttons with their own parts, and nothing drawn on the screen', () => {
     expect(servedParts(served())).toEqual([
+      'arrow',
       'bezel',
       'button',
       'controls',
       'device',
+      'empty',
       'footer',
       'header',
       'home',
@@ -60,6 +64,7 @@ describe('device screen server output', () => {
       'region',
       'screen',
       'screenshot',
+      'surface',
       'text',
     ])
   })

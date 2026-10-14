@@ -33,6 +33,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { type StaticValue, html as staticHtml } from 'lit/static-html.js'
 import '../../icon-button/index.js'
+import '../../tooltip/index.js'
 import { repeat } from 'lit/directives/repeat.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import {
@@ -1322,9 +1323,11 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       return nothing
     }
     const button = this.controlTag
+    const tip = this.tag('tooltip')
     const { material, raised } = this.controlAxes
     return staticHtml`<${button}
       part="notes-toggle"
+      id="notes-toggle"
       exportparts="button: notes-toggle-button, live: notes-toggle-live, spinner: notes-toggle-spinner, text: notes-toggle-text"
       aria-controls="panel"
       .expanded=${this.panelOpen}
@@ -1337,7 +1340,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       <svg aria-hidden="true" fill="currentColor" viewBox=${list.viewBox}>
         ${unsafeSVG(list.content)}
       </svg>
-    </${button}>`
+    </${button}><${tip} for="notes-toggle" content=${this.notesLabel}></${tip}>`
   }
 
   /** Typing is a new search, read from its top, with no note under the keys until Down. */

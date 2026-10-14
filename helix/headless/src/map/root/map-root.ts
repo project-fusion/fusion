@@ -42,6 +42,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { type StaticValue, html as staticHtml } from 'lit/static-html.js'
 import '../../icon-button/index.js'
+import '../../tooltip/index.js'
 import { live } from 'lit/directives/live.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { HelixHeadlessMapMarker } from '../marker/map-marker.js'
@@ -1125,9 +1126,11 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     }
     const entries = this.layerEntries
     const button = this.controlTag
+    const tip = this.tag('tooltip')
     const { material, raised } = this.controlAxes
     return staticHtml`<${button}
         part="layers-toggle"
+        id="layers-toggle"
         exportparts="button: layers-toggle-button, live: layers-toggle-live, spinner: layers-toggle-spinner, text: layers-toggle-text"
         aria-controls="layers-menu"
         .expanded=${this.layersOpen}
@@ -1150,7 +1153,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
             ${unsafeSVG(stack.content)}
           </svg>
         </slot>
-      </${button}>
+      </${button}><${tip} for="layers-toggle" content=${this.layersLabel}></${tip}>
       <div
         part="layers-menu"
         id="layers-menu"
@@ -1228,6 +1231,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   protected renderCompass(pan: boolean, rotate: boolean): TemplateResult {
     const { faceNorthLabel } = this
     const button = this.controlTag
+    const tip = this.tag('tooltip')
     const { material, raised } = this.controlAxes
     const ground = material ?? nothing
     /* The arrows are bare on the disc, so only the compass floats. */
@@ -1236,6 +1240,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         rotate
           ? staticHtml`<${button}
               part="rotate-left"
+              id="rotate-left"
               exportparts="button: rotate-left-button, live: rotate-left-live, spinner: rotate-left-spinner, text: rotate-left-text"
               label=${this.rotateLeftLabel}
               material=${ground}
@@ -1243,13 +1248,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="rotate-left-icon">↺</slot>
-            </${button}>`
+            </${button}><${tip} for="rotate-left" content=${this.rotateLeftLabel}></${tip}>`
           : nothing
       }
       ${
         pan
           ? staticHtml`<${button}
               part="pan-up"
+              id="pan-up"
               exportparts="button: pan-up-button, live: pan-up-live, spinner: pan-up-spinner, text: pan-up-text"
               label=${this.panLabel('up')}
               material=${ground}
@@ -1257,13 +1263,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="pan-up-icon">${this.panGlyph('up')}</slot>
-            </${button}>`
+            </${button}><${tip} for="pan-up" content=${this.panLabel('up')}></${tip}>`
           : nothing
       }
       ${
         rotate
           ? staticHtml`<${button}
               part="rotate-right"
+              id="rotate-right"
               exportparts="button: rotate-right-button, live: rotate-right-live, spinner: rotate-right-spinner, text: rotate-right-text"
               label=${this.rotateRightLabel}
               material=${ground}
@@ -1271,13 +1278,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="rotate-right-icon">↻</slot>
-            </${button}>`
+            </${button}><${tip} for="rotate-right" content=${this.rotateRightLabel}></${tip}>`
           : nothing
       }
       ${
         pan
           ? staticHtml`<${button}
               part="pan-start"
+              id="pan-start"
               exportparts="button: pan-start-button, live: pan-start-live, spinner: pan-start-spinner, text: pan-start-text"
               label=${this.panLabel('start')}
               material=${ground}
@@ -1285,11 +1293,12 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="pan-start-icon">${this.panGlyph('start')}</slot>
-            </${button}>`
+            </${button}><${tip} for="pan-start" content=${this.panLabel('start')}></${tip}>`
           : nothing
       }
       <${button}
         part="face-north"
+        id="face-north"
         exportparts="button: face-north-button, live: face-north-live, spinner: face-north-spinner, text: face-north-text"
         label=${faceNorthLabel}
         material=${ground}
@@ -1304,11 +1313,12 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
             <path data-end="south" d="M8 14.5 5.5 8h5Z" />
           </svg>
         </slot>
-      </${button}>
+      </${button}><${tip} for="face-north" content=${faceNorthLabel}></${tip}>
       ${
         pan
           ? staticHtml`<${button}
               part="pan-end"
+              id="pan-end"
               exportparts="button: pan-end-button, live: pan-end-live, spinner: pan-end-spinner, text: pan-end-text"
               label=${this.panLabel('end')}
               material=${ground}
@@ -1316,13 +1326,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="pan-end-icon">${this.panGlyph('end')}</slot>
-            </${button}>`
+            </${button}><${tip} for="pan-end" content=${this.panLabel('end')}></${tip}>`
           : nothing
       }
       ${
         pan
           ? staticHtml`<${button}
               part="pan-down"
+              id="pan-down"
               exportparts="button: pan-down-button, live: pan-down-live, spinner: pan-down-spinner, text: pan-down-text"
               label=${this.panLabel('down')}
               material=${ground}
@@ -1330,7 +1341,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="pan-down-icon">${this.panGlyph('down')}</slot>
-            </${button}>`
+            </${button}><${tip} for="pan-down" content=${this.panLabel('down')}></${tip}>`
           : nothing
       }
     </div>`
@@ -1356,6 +1367,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       return nothing
     }
     const button = this.controlTag
+    const tip = this.tag('tooltip')
     const { material, raised } = this.controlAxes
     const ground = material ?? nothing
     return staticHtml`<div part="controls" role="toolbar" aria-label=${this.controlsLabel}>
@@ -1363,6 +1375,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         fullscreen
           ? staticHtml`<${button}
               part="fullscreen"
+              id="fullscreen"
               exportparts="button: fullscreen-button, live: fullscreen-live, spinner: fullscreen-spinner, text: fullscreen-text"
               aria-pressed=${this.filled ? 'true' : 'false'}
               label=${this.fullscreenLabel}
@@ -1372,7 +1385,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="fullscreen-icon">⤢</slot>
-            </${button}>`
+            </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel}></${tip}>`
           : nothing
       }
       ${menu}
@@ -1380,6 +1393,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         tilt
           ? staticHtml`<${button}
               part="tilt"
+              id="tilt"
               exportparts="button: tilt-button, live: tilt-live, spinner: tilt-spinner, text: tilt-text"
               aria-pressed=${this.pitch > 0 ? 'true' : 'false'}
               label=${this.tiltLabel}
@@ -1389,13 +1403,14 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="tilt-icon">3D</slot>
-            </${button}>`
+            </${button}><${tip} for="tilt" content=${this.tiltLabel}></${tip}>`
           : nothing
       }
       ${
         zoom
           ? staticHtml`<${button}
                 part="zoom-in"
+                id="zoom-in"
                 exportparts="button: zoom-in-button, live: zoom-in-live, spinner: zoom-in-spinner, text: zoom-in-text"
                 label=${this.zoomInLabel}
                 material=${ground}
@@ -1404,9 +1419,10 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
                 @helix-press=${stopPress}
               >
                 <slot name="zoom-in-icon">+</slot>
-              </${button}>
+              </${button}><${tip} for="zoom-in" content=${this.zoomInLabel}></${tip}>
               <${button}
                 part="zoom-out"
+                id="zoom-out"
                 exportparts="button: zoom-out-button, live: zoom-out-live, spinner: zoom-out-spinner, text: zoom-out-text"
                 label=${this.zoomOutLabel}
                 material=${ground}
@@ -1415,7 +1431,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
                 @helix-press=${stopPress}
               >
                 <slot name="zoom-out-icon">−</slot>
-              </${button}>`
+              </${button}><${tip} for="zoom-out" content=${this.zoomOutLabel}></${tip}>`
           : nothing
       }
       ${this.drawsCompass ? this.renderCompass(pan, rotate) : nothing}

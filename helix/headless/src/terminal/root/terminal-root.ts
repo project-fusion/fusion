@@ -37,6 +37,7 @@ import { live } from 'lit/directives/live.js'
 import { html } from 'lit/static-html.js'
 import '../../button/index.js'
 import '../../icon-button/index.js'
+import '../../tooltip/index.js'
 import '../../toolbar/index.js'
 import { isTab, shortcutOf, spokenChord, type TerminalShortcut } from '../keys.js'
 
@@ -1137,12 +1138,14 @@ export class HelixHeadlessTerminal extends HelixElement {
   protected renderControls(): TemplateResult {
     const toolbar = this.tag('toolbar')
     const button = this.tag('icon-button')
+    const tip = this.tag('tooltip')
     return html`<${toolbar} part="controls" exportparts="toolbar: controls-toolbar" label=${this.controlsLabel}>
       <slot name="actions" part="actions" @slotchange=${this.handleActions}></slot>
       ${
         this.draws('find')
           ? html`<${button}
               part="find"
+              id="find"
               exportparts="button: find-button, live: find-live, spinner: find-spinner, text: find-text"
               .expanded=${this.findOpen}
               label=${this.findLabel}
@@ -1150,13 +1153,14 @@ export class HelixHeadlessTerminal extends HelixElement {
               @helix-press=${stopPress}
             >
               <slot name="find-icon">${drawIcon(magnifyingGlass)}</slot>
-            </${button}>`
+            </${button}><${tip} for="find" content=${this.findLabel}></${tip}>`
           : nothing
       }
       ${
         this.draws('copy')
           ? html`<${button}
               part="copy"
+              id="copy"
               exportparts="button: copy-button, live: copy-live, spinner: copy-spinner, text: copy-text"
               ?disabled=${!this.anySelected}
               label=${this.copyLabel}
@@ -1164,26 +1168,28 @@ export class HelixHeadlessTerminal extends HelixElement {
               @helix-press=${stopPress}
             >
               <slot name="copy-icon">${drawIcon(copy)}</slot>
-            </${button}>`
+            </${button}><${tip} for="copy" content=${this.copyLabel}></${tip}>`
           : nothing
       }
       ${
         this.draws('clear')
           ? html`<${button}
               part="clear"
+              id="clear"
               exportparts="button: clear-button, live: clear-live, spinner: clear-spinner, text: clear-text"
               label=${this.clearLabel}
               @click=${() => this.clear()}
               @helix-press=${stopPress}
             >
               <slot name="clear-icon">${drawIcon(broom)}</slot>
-            </${button}>`
+            </${button}><${tip} for="clear" content=${this.clearLabel}></${tip}>`
           : nothing
       }
       ${
         this.draws('fullscreen')
           ? html`<${button}
               part="fullscreen"
+              id="fullscreen"
               exportparts="button: fullscreen-button, live: fullscreen-live, spinner: fullscreen-spinner, text: fullscreen-text"
               aria-pressed=${this.filled ? 'true' : 'false'}
               label=${this.fullscreenLabel}
@@ -1191,7 +1197,7 @@ export class HelixHeadlessTerminal extends HelixElement {
               @helix-press=${stopPress}
             >
               <slot name="fullscreen-icon">${drawIcon(cornersOut)}</slot>
-            </${button}>`
+            </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel}></${tip}>`
           : nothing
       }
     </${toolbar}>`
@@ -1209,6 +1215,7 @@ export class HelixHeadlessTerminal extends HelixElement {
     }
     const toolbar = this.tag('toolbar')
     const button = this.tag('icon-button')
+    const tip = this.tag('tooltip')
     return html`<div part="find-bar" role="search" aria-label=${this.findLabel} ?hidden=${!this.findOpen}>
       <input
         part="find-field"
@@ -1225,6 +1232,7 @@ export class HelixHeadlessTerminal extends HelixElement {
       <${toolbar} part="find-controls" exportparts="toolbar: find-controls-toolbar" label=${this.findControlsLabel}>
         <${button}
           part="find-match-case"
+          id="find-match-case"
           exportparts="button: find-match-case-button, live: find-match-case-live, spinner: find-match-case-spinner, text: find-match-case-text"
           aria-pressed=${this.findMatchCase ? 'true' : 'false'}
           label=${this.findMatchCaseLabel}
@@ -1232,9 +1240,10 @@ export class HelixHeadlessTerminal extends HelixElement {
           @helix-press=${stopPress}
         >
           <slot name="find-match-case-icon">${drawIcon(textAa)}</slot>
-        </${button}>
+        </${button}><${tip} for="find-match-case" content=${this.findMatchCaseLabel}></${tip}>
         <${button}
           part="find-whole-word"
+          id="find-whole-word"
           exportparts="button: find-whole-word-button, live: find-whole-word-live, spinner: find-whole-word-spinner, text: find-whole-word-text"
           aria-pressed=${this.findWholeWord ? 'true' : 'false'}
           label=${this.findWholeWordLabel}
@@ -1242,9 +1251,10 @@ export class HelixHeadlessTerminal extends HelixElement {
           @helix-press=${stopPress}
         >
           <slot name="find-whole-word-icon">${drawIcon(textAUnderline)}</slot>
-        </${button}>
+        </${button}><${tip} for="find-whole-word" content=${this.findWholeWordLabel}></${tip}>
         <${button}
           part="find-regex"
+          id="find-regex"
           exportparts="button: find-regex-button, live: find-regex-live, spinner: find-regex-spinner, text: find-regex-text"
           aria-pressed=${this.findRegex ? 'true' : 'false'}
           label=${this.findRegexLabel}
@@ -1252,10 +1262,11 @@ export class HelixHeadlessTerminal extends HelixElement {
           @helix-press=${stopPress}
         >
           <slot name="find-regex-icon">${drawIcon(asterisk)}</slot>
-        </${button}>
+        </${button}><${tip} for="find-regex" content=${this.findRegexLabel}></${tip}>
         <slot name="find-actions" part="find-actions"></slot>
         <${button}
           part="find-previous"
+          id="find-previous"
           exportparts="button: find-previous-button, live: find-previous-live, spinner: find-previous-spinner, text: find-previous-text"
           ?disabled=${!this.matchCount}
           label=${this.findPreviousLabel}
@@ -1263,9 +1274,10 @@ export class HelixHeadlessTerminal extends HelixElement {
           @helix-press=${stopPress}
         >
           <slot name="find-previous-icon">${drawIcon(caretUp)}</slot>
-        </${button}>
+        </${button}><${tip} for="find-previous" content=${this.findPreviousLabel}></${tip}>
         <${button}
           part="find-next"
+          id="find-next"
           exportparts="button: find-next-button, live: find-next-live, spinner: find-next-spinner, text: find-next-text"
           ?disabled=${!this.matchCount}
           label=${this.findNextLabel}
@@ -1273,16 +1285,17 @@ export class HelixHeadlessTerminal extends HelixElement {
           @helix-press=${stopPress}
         >
           <slot name="find-next-icon">${drawIcon(caretDown)}</slot>
-        </${button}>
+        </${button}><${tip} for="find-next" content=${this.findNextLabel}></${tip}>
         <${button}
           part="find-close"
+          id="find-close"
           exportparts="button: find-close-button, live: find-close-live, spinner: find-close-spinner, text: find-close-text"
           label=${this.findCloseLabel}
           @click=${() => this.closeFind()}
           @helix-press=${stopPress}
         >
           <slot name="find-close-icon">${drawIcon(x)}</slot>
-        </${button}>
+        </${button}><${tip} for="find-close" content=${this.findCloseLabel}></${tip}>
       </${toolbar}>
     </div>`
   }

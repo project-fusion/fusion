@@ -6,6 +6,7 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
 import { styles } from './canvas-root.css.js'
 import '../../icon-button/index.js'
+import '../../tooltip/index.js'
 
 /**
  * @summary A board of cards and the connections between them, which can be navigated, rearranged, and connected.

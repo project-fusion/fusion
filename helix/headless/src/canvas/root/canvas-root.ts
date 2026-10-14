@@ -41,6 +41,7 @@ import { html, nothing, type PropertyValues, svg, type TemplateResult } from 'li
 import { property, state } from 'lit/decorators.js'
 import type { StaticValue } from 'lit/static-html.js'
 import '../../icon-button/index.js'
+import '../../tooltip/index.js'
 import { arrangement, type CanvasArrangeOptions } from '../arrange.js'
 import { descriptionOf } from '../describe.js'
 import { HelixHeadlessCanvasEdge } from '../edge/canvas-edge.js'
