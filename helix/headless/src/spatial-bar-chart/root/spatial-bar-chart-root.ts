@@ -212,6 +212,21 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
   summaryLabel =
     '{count, plural, one {# bar} other {# bars}} in {series, plural, one {# series} other {# series}} over {categories, plural, one {# category} other {# categories}}, from {low} to {high}.'
 
+  /**
+   * How the bars stand.
+   *
+   * Unset, they stand on a grid of categories across and series in depth,
+   * in a box the camera looks at from a corner, so the grid recedes at an
+   * angle. `row` lays the categories in a straight line across the page and
+   * turns each bar to the camera, showing its top and two sides, for one row
+   * of readings in a small space such as a pane: turning the view turns each
+   * bar where it stands, and the row stays level. A row draws no box. It is
+   * the chart's own drawing that lays the row: a renderer connected through
+   * `@fusion.dev/helix-plot` stands the bars on the grid.
+   */
+  @property({ reflect: true })
+  variant?: 'row'
+
   /** Whether a renderer has drawn the bars, which hides the chart's own drawing. */
   @state()
   private rendered = false
@@ -448,12 +463,14 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
    * drawing, until a renderer has drawn and where none is connected.
    */
   private renderFallback(field: BarField, at: number): TemplateResult {
-    const view = boxView(field.axes, this.camera, [], this.noBox)
-    const bars = barsDrawn(field, view.projection)
+    const row = this.variant === 'row'
+    const bare = this.noBox || row
+    const view = boxView(field.axes, this.camera, [], bare)
+    const bars = barsDrawn(field, view.projection, row)
     const active = bars.find((bar) => bar.index === at)
     const cell = field.cells[at]
     const bounds = this.drag.frame(
-      this.noBox
+      bare
         ? boundsOf(
             bars.flatMap((bar) => bar.corners),
             0.1,
@@ -473,7 +490,7 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
         @pointerleave=${this.onDrawingLeave}
         @pointermove=${this.onDrawingMove}
         @pointerup=${this.onDrawingTap}
-      >${this.noBox ? nothing : drawBox(view)}${paintOrder(view.projection, bars).map(
+      >${bare ? nothing : drawBox(view)}${paintOrder(view.projection, bars).map(
         (bar) =>
           /* The ring straight after its bar, so the bars in front cover it as
              they cover the bar: drawn over them all, it traced their faces
