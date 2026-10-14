@@ -478,6 +478,19 @@ export class HelixHeadlessListbox extends MixinVoice(
   private parked = false
 
   /**
+   * Whether the reader moved the highlight since the filter last changed, by
+   * an arrow key, Home or End, a press, or the control that owns this list.
+   * Until they do, the highlight follows the first option a filter leaves.
+   */
+  private steered = false
+
+  /**
+   * Watches the options' containers while a filter is set, so options a
+   * framework reorders or replaces after a keystroke are counted again.
+   */
+  private sources: MutationObserver | undefined = undefined
+
+  /**
    * The option last chosen, which Shift with Space or with a press extends
    * from.
    */
@@ -572,6 +585,7 @@ export class HelixHeadlessListbox extends MixinVoice(
     const shown = this.shown.filter((option) => !option.disabled)
     this.typeahead.reset()
     this.parked = where === 'none'
+    this.steered = true
     const values = where === 'selected' ? new Set(this.values) : undefined
     const chosen = values && shown.find((option) => values.has(option.value))
     this.activeValue =
@@ -820,6 +834,7 @@ export class HelixHeadlessListbox extends MixinVoice(
       return
     }
     const { value } = event.detail
+    this.steered = true
     this.activeValue = value
     if (this.multiple && this.shifted) {
       this.extend(value)
@@ -1013,6 +1028,7 @@ export class HelixHeadlessListbox extends MixinVoice(
    */
   private arrive(value: string): void {
     this.parked = false
+    this.steered = true
     this.activeValue = value
     /* Nor a link, which is followed by Enter or a press and never on the way
        past: moving onto a link must not leave the page. */
@@ -1109,6 +1125,7 @@ export class HelixHeadlessListbox extends MixinVoice(
     }
     this.typeahead.reset()
     this.parked = false
+    this.steered = true
     this.activeValue = value
     if (this.childrenKnown) {
       this.place()
@@ -1158,9 +1175,18 @@ export class HelixHeadlessListbox extends MixinVoice(
        parked the highlight on the first option while the panel was shut, so
        the reader's first Down arrived at the second. */
     const shown = this.shown
+    const first = shown.find((option) => !option.disabled)?.value ?? ''
     const rescue = !this.parked && (needle !== '' || this.activeValue !== '')
-    if (rescue && !shown.some((option) => option.value === this.activeValue)) {
-      this.activeValue = shown.find((option) => !option.disabled)?.value ?? ''
+    /* **While a filter is typed, the highlight follows the first option it
+       leaves**, until the reader moves it, so Enter takes the best result as
+       cmdk and Raycast do. Asked on every count, so options a framework
+       sorts or replaces a tick after the keystroke move it too. Before this
+       it moved only off an option the filter hid: typing "usage" after "u"
+       kept the highlight on an entry that was still showing, second. */
+    if (needle !== '' && !this.parked && !this.steered) {
+      this.activeValue = first
+    } else if (rescue && !shown.some((option) => option.value === this.activeValue)) {
+      this.activeValue = first
     }
     for (const option of this.entries) {
       option.active = option.value === this.activeValue
@@ -1168,6 +1194,37 @@ export class HelixHeadlessListbox extends MixinVoice(
 
     this.hasMatches = shown.length > 0
     this.counted = true
+    this.watchSources(needle !== '')
+  }
+
+  /**
+   * Counts the options again when an element that holds them gains or loses
+   * a child, while `on`: the list itself, and each element a slot in it
+   * brings in, such as a group of Command's commands.
+   *
+   * **A slot does not say when its elements' own children move**, so a
+   * framework sorting the options inside a group, after the filter that
+   * found them, left the highlight on the option that had been first.
+   */
+  private watchSources(on: boolean): void {
+    if (typeof MutationObserver === 'undefined') {
+      return
+    }
+    this.sources?.disconnect()
+    if (!on) {
+      return
+    }
+    this.sources ??= new MutationObserver(() => this.requestUpdate())
+    const watching = { childList: true, subtree: true }
+    this.sources.observe(this, watching)
+    for (const slot of this.among<HTMLSlotElement>(
+      (node) => node instanceof HTMLSlotElement,
+      this.children,
+    )) {
+      for (const element of slot.assignedElements({ flatten: true })) {
+        this.sources.observe(element, watching)
+      }
+    }
   }
 
   /**
@@ -1257,6 +1314,7 @@ export class HelixHeadlessListbox extends MixinVoice(
     this.removeEventListener('helix-select', this.handleSelection as EventListener)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('click', this.handleClick, true)
+    this.sources?.disconnect()
     /* Its marks go with it. The registry is the document's and outlives this
        element, so a list removed while filtered would leave ranges over text
        that is no longer on the page. */
@@ -1292,6 +1350,10 @@ export class HelixHeadlessListbox extends MixinVoice(
        every Select, Combobox and Command, which each draw a list. */
     if (changed.has('items') && this.items) {
       auditChildren(this, 'option', 'option', 'the items draw no choices', true)
+    }
+    /* A keystroke hands the highlight back to the filter's first match. */
+    if (changed.has('filter')) {
+      this.steered = false
     }
     /* Before the render, so the empty state and the matches it draws are this
        update's rather than the last one's. Not on the server, whose element
