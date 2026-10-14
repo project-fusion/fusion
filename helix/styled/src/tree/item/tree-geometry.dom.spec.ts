@@ -233,3 +233,35 @@ describe('a shut branch', () => {
     })
   }
 })
+
+/* The stylesheet the item adopts, as text. happy-dom resolves no cascade, so
+   what can be held here is that a rule exists rather than that it applied. */
+const sheet = (): string => {
+  const declared = (customElements.get('helix-tree-item') as unknown as { styles: unknown })
+    .styles
+  return (Array.isArray(declared) ? declared : [declared])
+    .flat(Number.POSITIVE_INFINITY)
+    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+    .join('\n')
+}
+
+/* A file tree in a `data-density="sm"` region kept 35px rows beside 26px
+   controls, because its padding and its text were spacing and type tokens that
+   density does not move. */
+describe('tree item density', () => {
+  test("the row's padding and text follow the region's density", () => {
+    const css = sheet()
+    expect(css).toContain('--_tree-pad: calc((var(--helix-size-control-tight) - 1rem) / 2)')
+    expect(css).toContain('padding-block: var(--_tree-pad)')
+    expect(css).toContain('calc(1lh + var(--_tree-pad) * 2)')
+    expect(css).toContain('font-size: var(--_tree-text, var(--helix-text-control))')
+  })
+
+  geometry('a row in a small region is shorter than one at rest', async () => {
+    const rest = await mount(mixed)
+    const small = await mount(`<div data-density="sm">${mixed}</div>`)
+    const height = (scope: HTMLElement) =>
+      (part(items(scope)[2] as HTMLElement, 'row') as HTMLElement).getBoundingClientRect().height
+    expect(height(small)).toBeLessThan(height(rest))
+  })
+})
