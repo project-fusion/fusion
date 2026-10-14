@@ -152,6 +152,16 @@
   outline: none;
 }
 
+/* The examples under `placeholders` fade into each other: out as one leaves,
+   and back in once the next is the placeholder. */
+[part="field"]::placeholder {
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host(:state(example-leaving)) [part="field"]::placeholder {
+  opacity: 0;
+}
+
 /*
  *  The tools, with whatever a consumer put before the field at the leading edge
  *    and the send control at the trailing one.

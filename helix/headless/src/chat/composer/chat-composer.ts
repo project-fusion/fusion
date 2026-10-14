@@ -8,7 +8,10 @@ import {
   hostAria,
   MixinVoice,
   markRegion,
+  motionPaused,
   numberConverter,
+  onMotionChange,
+  reducedMotion,
   SPOKEN_RULE,
   timeConverter,
   words,
@@ -18,6 +21,12 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+
+/** How long each example shows before the next, in milliseconds. */
+const EXAMPLE_TURN = 4000
+
+/** How long an example takes to fade out before the next replaces it. */
+const EXAMPLE_FADE = 200
 
 /**
  * @summary A field for writing a turn in a conversation.
@@ -100,6 +109,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart voice-listening - The dictation button while it listens. Set alongside `voice`.
  * @csspart voice-status - What a screen reader hears as dictation starts and stops, drawn for no one else.
  *
+ * @cssstate example-leaving - The example in the empty field is about to give way to the next one, for a fade between them. See `placeholders`.
  * @cssstate invalid - The draft fails `required`, `minlength`, `maxlength`, or a custom error, and the reader has tried to send or submit it, or edited the field and left it. Or `feedback` is set.
  * @cssstate listening - While the composer listens for dictation. The element sets `--dictation-level` on itself meanwhile, from 0 to 1, for a meter.
  */
@@ -170,6 +180,22 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
    */
   @property()
   placeholder = ''
+
+  /**
+   * Examples the empty field shows in turn, one every few seconds, in place
+   * of `placeholder`, such as tasks a reader might ask for.
+   *
+   * **Each is the field's placeholder in its turn**, so it sits wherever the
+   * field does in any layout, and a screen reader that reaches the field
+   * hears the one showing. The swap fades through `:state(example-leaving)`.
+   *
+   * **They move only while nobody is about to write.** An empty field without
+   * focus moves on; one with focus or with text keeps the example showing.
+   * Where the reader asked for less motion, or the page paused its motion,
+   * the first example stays.
+   */
+  @property({ attribute: false })
+  placeholders: readonly string[] = []
 
   /**
    * Whether the form needs a draft to submit. An empty draft never sends,
@@ -253,6 +279,22 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
   /** Whether the composer shows that its draft is wrong. */
   @state()
   private shownInvalid = false
+
+  /** Which of `placeholders` the empty field shows. */
+  @state()
+  private example = 0
+
+  /** Whether the field holds focus, which holds the examples still. */
+  private focused = false
+
+  /** The turn of the examples, while they move. */
+  private turning: ReturnType<typeof setInterval> | undefined
+
+  /** The fade between two examples, while it runs. */
+  private fading: ReturnType<typeof setTimeout> | undefined
+
+  /** Stops listening to the page's motion switch. */
+  private unmoved: (() => void) | undefined
 
   /** The pause after which the user has stopped writing. */
   private readonly pause = new DelayController(this, { renders: false })
@@ -381,8 +423,70 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
     }
   }
 
+  override connectedCallback(): void {
+    super.connectedCallback()
+    this.unmoved ??= onMotionChange(() => this.turnExamples())
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.unmoved?.()
+    this.unmoved = undefined
+    this.stopExamples()
+  }
+
+  /** Notes focus coming and going, which holds the examples or frees them. */
+  private readonly handleFocus = (event: FocusEvent): void => {
+    this.focused = event.type === 'focus'
+    this.turnExamples()
+  }
+
+  /**
+   * Starts the examples moving, or stops them, as the list, the field, and
+   * the page allow.
+   */
+  private turnExamples(): void {
+    const moving =
+      this.isConnected &&
+      this.placeholders.length > 1 &&
+      this.value === '' &&
+      !this.focused &&
+      !reducedMotion() &&
+      !motionPaused()
+    if (!moving) {
+      this.stopExamples()
+      return
+    }
+    this.turning ??= setInterval(() => this.nextExample(), EXAMPLE_TURN)
+  }
+
+  /** Fades the example out, then shows the next as the fade comes back. */
+  private nextExample(): void {
+    if (reducedMotion() || motionPaused()) {
+      this.stopExamples()
+      return
+    }
+    this.toggleState('example-leaving', true)
+    this.fading = setTimeout(() => {
+      this.fading = undefined
+      this.example = (this.example + 1) % Math.max(this.placeholders.length, 1)
+      this.toggleState('example-leaving', false)
+    }, EXAMPLE_FADE)
+  }
+
+  private stopExamples(): void {
+    clearInterval(this.turning)
+    clearTimeout(this.fading)
+    this.turning = undefined
+    this.fading = undefined
+    this.toggleState('example-leaving', false)
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    if (changed.has('placeholders') || changed.has('value')) {
+      this.turnExamples()
+    }
     this.markEmpty()
     /* An empty entry where nothing is written, as a native textarea submits
        `draft=`. The draft is the state too, so a browser restoring the form
@@ -471,7 +575,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
         part="field"
         .value=${live(this.value)}
         aria-label=${this.label}
-        placeholder=${this.placeholder}
+        placeholder=${this.placeholders.length > 0 ? (this.placeholders[this.example % this.placeholders.length] ?? '') : this.placeholder}
         rows=${this.rows}
         ?required=${this.required}
         minlength=${this.minLength ?? nothing}
@@ -479,7 +583,9 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
         aria-invalid=${this.shownInvalid ? 'true' : nothing}
         aria-describedby=${this.feedback === '' ? nothing : 'feedback'}
         ?disabled=${this.isDisabled}
+        @blur=${this.handleFocus}
         @change=${this.handleChange}
+        @focus=${this.handleFocus}
         @input=${this.handleInput}
         @keydown=${this.handleKey}
       ></textarea>
