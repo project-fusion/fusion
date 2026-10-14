@@ -369,7 +369,9 @@ writing options does, and the audit below reports the draw.
 core's `auditChildren` with the child's tag and entry; once the page has
 loaded and painted, a child of that tag that is still undefined is reported as
 `unregistered-part`, once for each container and child tag, naming the line to
-add. Listbox calls it with `drawn` when `items` is set, which reports the tag
+add. It waits until the page has loaded nothing and registered no Helix family
+for `QUIET` milliseconds, so an app that imports each family with `import()`
+is not told its children are missing while their chunks are in flight. Listbox calls it with `drawn` when `items` is set, which reports the tag
 without one in the light DOM. It is a development-only audit, `#audit-children`, as `missing-name` is.
 The same kind reports a Filter Menu written without `filter-input/menu`, which
 is the first rule's case: a part with an entry of its own.

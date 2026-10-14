@@ -7,10 +7,13 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
    entry to add, or on a tier of its own which tag to define. */
 
 let auditChildren: typeof import('./audit-children.js').auditChildren
+let QUIET: number
+let customElement: typeof import('../custom-element/custom-element.js').customElement
 
 beforeAll(async () => {
   registerDom()
-  ;({ auditChildren } = await import('./audit-children.js'))
+  ;({ auditChildren, QUIET } = await import('./audit-children.js'))
+  ;({ customElement } = await import('../custom-element/custom-element.js'))
 })
 
 const warn = console.warn
@@ -19,8 +22,16 @@ afterEach(() => {
   document.body.innerHTML = ''
 })
 
-const painted = (): Promise<void> =>
+const frames = (): Promise<void> =>
   new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+
+const wait = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms))
+
+/** Once the page has painted and Helix has registered nothing for the quiet period. */
+const painted = async (): Promise<void> => {
+  await frames()
+  await wait(QUIET + 50)
+}
 
 /** A container of `tier`, holding `markup`. */
 const container = (tag: string, tier: string, markup: string): HTMLElement => {
@@ -91,6 +102,36 @@ describe('the unregistered-child audit', () => {
     expect(warnings).toEqual([
       '<acme-option> in <acme-select> is not registered, so it offers no choices. Define <acme-option> as you defined <acme-select>.',
     ])
+  })
+
+  /* An app importing its families with `import()` registers each as its
+     chunk lands, after the page has painted: the child is defined late,
+     and is not missing. */
+  test('says nothing for a child defined after the page painted', async () => {
+    const warnings: string[] = []
+    console.warn = (message: string) => warnings.push(message)
+    auditChildren(container('l-select', 'l-', '<l-option>One</l-option>'), 'option', 'option', 'x')
+    await frames()
+    await wait(QUIET / 2)
+    customElements.define('l-option', class extends HTMLElement {})
+    await wait(QUIET + 50)
+    expect(warnings).toEqual([])
+  })
+
+  /* Each family Helix registers while the child is missing starts the quiet
+     period again, so a child whose chunk lands last is still not reported. */
+  test('waits while Helix is still registering families', async () => {
+    const warnings: string[] = []
+    console.warn = (message: string) => warnings.push(message)
+    auditChildren(container('m-select', 'm-', '<m-option>One</m-option>'), 'option', 'option', 'x')
+    await frames()
+    await wait(QUIET * 0.7)
+    customElement('m-other')(class extends HTMLElement {})
+    await wait(QUIET * 0.7)
+    expect(warnings).toEqual([])
+    customElements.define('m-option', class extends HTMLElement {})
+    await wait(QUIET + 50)
+    expect(warnings).toEqual([])
   })
 
   test('says nothing for a registered child, or for none', async () => {

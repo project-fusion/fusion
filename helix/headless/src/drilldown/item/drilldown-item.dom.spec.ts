@@ -266,4 +266,29 @@ describe('a drilldown row with no name', () => {
       ),
     ).toEqual([])
   })
+
+  /* A page's row draws itself until the stack says it is off the page
+     showing, and a stack defined after its rows, as an app importing each
+     family with `import()` defines it, says so between the draw and the
+     read. */
+  test('is not reported for a row with words that stopped drawing before the read', async () => {
+    const warnings: string[] = []
+    const original = console.warn
+    console.warn = (message: string) => warnings.push(message)
+    try {
+      const host = (await mount(
+        '<helix-headless-drilldown-item value="x">Opus</helix-headless-drilldown-item>',
+      )) as Row & { onPage: boolean }
+      host.onPage = false
+      await host.updateComplete
+      await new Promise((done) => setTimeout(done, 5))
+      expect(part(host, 'item')).toBeNull()
+      host.onPage = true
+      await host.updateComplete
+      await new Promise((done) => setTimeout(done, 5))
+    } finally {
+      console.warn = original
+    }
+    expect(warnings).toEqual([])
+  })
 })
