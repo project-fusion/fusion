@@ -523,6 +523,32 @@ export class HelixElement extends LitElement {
   }
 
   /**
+   * Whether the first update found React's props, where it looked before the
+   * render. See `willUpdate`.
+   */
+  private reactApplied: boolean | undefined
+
+  /**
+   * **The first look for React's props, and the one that costs nothing.** It
+   * succeeds whenever the definition landed after React hydrated, which is the
+   * ordering a deferred or lazily imported element has: the bag is already on
+   * the node, so the value is in the first render.
+   *
+   * **Before the render, because `firstUpdated` is too late.** A value
+   * assigned there schedules a second update as the first one finishes, which
+   * Lit's development build reports as `change-in-update`: Command's
+   * `filterMatch` did in the Hartley app until October 14, 2026. A hydrating
+   * render has to be the server's, so that element looks in `firstUpdated`,
+   * where `finishHydration` asks for the update after it anyway.
+   */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (!this.hasUpdated && !this.hydrating) {
+      this.reactApplied = applyReactProperties(this)
+    }
+  }
+
+  /**
    * Marks the component's first style resolution as done, so `SETTLED` stops
    * suppressing transitions.
    *
@@ -536,13 +562,9 @@ export class HelixElement extends LitElement {
     /* Counted where a page asked to count, and a null check where it did not:
        see `reportUsage`. */
     reportUsage(this)
-    /* **The first look, and the one that costs nothing.** It succeeds whenever
-       the definition landed after React hydrated, which is the ordering a
-       deferred or lazily imported element has: the bag is already on the node,
-       and the update this assignment schedules is a microtask, so the value is
-       rendered in the same task the upgrade happened in. See
-       `applyReactProperties`. */
-    const applied = applyReactProperties(this)
+    /* Made in `willUpdate`, unless the render was hydrating a server's or a
+       subclass skipped `super.willUpdate`. See `applyReactProperties`. */
+    const applied = this.reactApplied ?? applyReactProperties(this)
     requestAnimationFrame(() => {
       /* Through `toggleState`, which carries the feature test. A component that
          cannot record the state keeps its transitions suppressed, which is the
