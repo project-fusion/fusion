@@ -595,6 +595,40 @@ describe('a busy composer', () => {
   })
 })
 
+describe('send-disabled', () => {
+  test('keeps the draft, takes the send button away, and leaves the field open', async () => {
+    const element = await composer('send-disabled')
+    let sent = 0
+    element.addEventListener('helix-send', () => {
+      sent += 1
+    })
+    await type(element, 'with a photo')
+    press(element, 'Enter')
+    const button = part(element, 'send') as HTMLButtonElement
+    const field = part(element, 'field') as HTMLTextAreaElement
+    expect([sent, element.value, element.send()]).toEqual([0, 'with a photo', false])
+    expect([button.disabled, field.disabled]).toEqual([true, false])
+    element.removeAttribute('send-disabled')
+    await element.updateComplete
+    expect(button.disabled).toBe(false)
+    expect(element.send()).toBe(true)
+    expect(sent).toBe(1)
+  })
+
+  test('leaves the stop button working while busy', async () => {
+    const element = await composer('busy queue send-disabled')
+    const button = part(element, 'send') as HTMLButtonElement
+    let stopped = 0
+    element.addEventListener('helix-stop', () => {
+      stopped += 1
+    })
+    await type(element, 'queued')
+    expect(element.send()).toBe(false)
+    button.click()
+    expect([button.disabled, stopped]).toEqual([false, 1])
+  })
+})
+
 /* A start page's composer shows the kinds of thing to ask, one after another,
    as its placeholder, and keeps still while the reader is about to write. */
 describe('placeholders', () => {
