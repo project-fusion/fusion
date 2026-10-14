@@ -5,6 +5,7 @@ import { property } from 'lit/decorators.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { MixinControlSurface } from '../../shared/mixin-control-surface/mixin-control-surface.js'
 import { styles } from './icon-button-root.css.js'
+import '../../tooltip/index.js'
 
 /**
  * @summary A square button whose content is an icon.
@@ -54,6 +55,9 @@ import { styles } from './icon-button-root.css.js'
  */
 @customElement('helix-icon-button')
 export class HelixIconButton extends MixinControlSurface(HelixHeadlessIconButton) {
+  /** The tier its tooltip is drawn in, so the bubble is the styled one. */
+  static override tier = 'helix-'
+
   /**
    * The ground under the button, for one that lies over a busy surface such as
    * a map or a board. `glass` lets the surface through under a blur, `frosted`
