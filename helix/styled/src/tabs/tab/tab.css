@@ -1,5 +1,21 @@
 :host {
   display: inline-flex;
+  max-inline-size: var(--tabs-tab-max-inline-size, none);
+}
+
+/* A label longer than the tab may be ends in an ellipsis, as a tag's does.
+   Only once a page caps a tab: unset, a tab is its label's width, so a strip
+   with more than fits scrolls rather than squeezing every name. */
+[part="tab"] {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+[part="label"] {
+  display: block;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /*
