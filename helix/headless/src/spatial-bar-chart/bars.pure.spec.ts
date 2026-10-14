@@ -90,3 +90,17 @@ test('a zero in a stack draws no block, and a zero standing alone is still a pla
   const alone = barsOf([row('1', 0, 9, 4)], [0, 1, 2])
   expect(barsDrawn(alone, boxView(alone.axes, SPATIAL_VIEW).projection)).toHaveLength(3)
 })
+
+/* A pane's row of calls read as a line receding at an angle. In a row the
+   bars stand along the line the camera reads as level, so the row is level
+   on the page from any turn, and each block shows the turn. */
+test('a row stands level on the page whichever way the camera turns', () => {
+  const field = barsOf([row('1', 4), row('2', 6), row('3', 2), row('4', 5)], [0], true)
+  for (const turn of [0, 25, 42, 90, 140]) {
+    const { projection } = boxView(field.axes, { tilt: 25, turn }, [], true)
+    const feet = barsDrawn(field, projection, true).map((bar) => projection.at(bar.x, bar.y, 0).y)
+    for (const foot of feet) {
+      expect(foot).toBeCloseTo(feet[0] ?? 0, 6)
+    }
+  }
+})

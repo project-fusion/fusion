@@ -28,7 +28,8 @@
 
 /* With no box, the readings stand on the page itself, as a picture on a
    landing page does, with nothing drawn behind them. */
-:host([no-box]) [part="plot"] {
+:host([no-box]) [part="plot"],
+:host([variant="row"]) [part="plot"] {
   background-color: transparent;
 }
 

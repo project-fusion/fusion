@@ -185,13 +185,23 @@ export interface DrawnBar {
  * its place on the grid, from where it starts to its value, a little
  * narrower than its place so neighbors stand apart. A value below zero
  * hangs from where it starts.
+ *
+ * **`row` lays the categories in a straight line across the page**, along
+ * the way the camera reads as level, and the series straight back from it,
+ * so the row stays level whichever way the camera turns, and each block,
+ * which keeps to the floor's grid, shows the turn: its top and two sides.
+ * Turned, a block is wider on the page than its footprint, so the footprint
+ * narrows by as much, and neighbors still stand apart.
  */
-export const barsDrawn = (field: BarField, projection: Projection): DrawnBar[] => {
+export const barsDrawn = (field: BarField, projection: Projection, row = false): DrawnBar[] => {
   const [ex, ey, ez] = field.axes.extent
-  const spacing = Math.min(
-    (2 * ex) / Math.max(field.categories.length, 1),
-    (2 * ez) / Math.max(field.lanes, 1),
-  )
+  const [cos, sin] = projection.across
+  const spread = row ? Math.abs(cos) + Math.abs(sin) : 1
+  const spacing =
+    Math.min(
+      (2 * ex) / Math.max(field.categories.length, 1),
+      (2 * ez) / Math.max(field.lanes, 1),
+    ) / spread
   return field.cells.flatMap((cell, index): DrawnBar[] => {
     /* A zero in a stack adds nothing to its column, so it draws no block, as
        a flat chart's stack draws none; standing alone, a zero is a plate on
@@ -199,10 +209,14 @@ export const barsDrawn = (field: BarField, projection: Projection): DrawnBar[] =
     if (cell.value === undefined || (field.stacked && cell.value === 0)) {
       return []
     }
-    const x = inBox(field.axes.x, cell.across) * ex
+    const along = inBox(field.axes.x, cell.across) * ex
     /* The floor's way back is the box's depth turned round, as the box's own
        places are. */
-    const y = -inBox(field.axes.z, cell.lane) * ez
+    const back = -inBox(field.axes.z, cell.lane) * ez
+    /* In a row, along the camera's level line and straight back from it;
+       on the grid, along the grid's own axes. */
+    const x = row ? along * cos - back * sin : along
+    const y = row ? along * sin + back * cos : back
     const start = inBox(field.axes.y, cell.from) * ey
     const top = inBox(field.axes.y, cell.from + cell.value) * ey
     const base = Math.min(start, top)
