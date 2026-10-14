@@ -58,7 +58,7 @@ export function Example() {
         label="Tokens per call"
         no-box
         stacked
-      />
+      ></helix-spatial-bar-chart>
     </>
   )
 }
