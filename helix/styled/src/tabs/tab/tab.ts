@@ -21,6 +21,7 @@ import { styles } from './tab.css.js'
  *
  * @csspart dismiss - The mark a pointer presses to close a `dismissible` tab.
  * @csspart dismiss-mark - The glyph on that mark, where none is slotted.
+ * @csspart label - The slot the tab's label is in, which shortens with an ellipsis under `--tabs-tab-max-inline-size`.
  * @csspart tab - The tab itself.
  *
  * @cssproperty --tabs-tab-block-size - The height of a tab. `segmented` sizes its tabs to the track and does not read it.
@@ -31,6 +32,7 @@ import { styles } from './tab.css.js'
  * @cssproperty --tabs-tab-font-weight - The weight of a tab's label.
  * @cssproperty --tabs-tab-hover-background-color - The wash under the pointer.
  * @cssproperty --tabs-tab-hover-color - The label color under the pointer.
+ * @cssproperty --tabs-tab-max-inline-size - The widest a tab grows. A longer label ends in an ellipsis, as a tag's does. Unset, a tab is as wide as its label.
  * @cssproperty --tabs-tab-padding-inline - The space either side of the label.
  * @cssproperty --tabs-tab-radius - The corners of a tab, which the hover wash takes.
  * @cssproperty --tabs-tab-selected-background-color - The fill of the current tab itself, under the moving mark.

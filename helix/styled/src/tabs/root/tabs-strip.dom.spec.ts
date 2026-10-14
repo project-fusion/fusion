@@ -68,3 +68,27 @@ describe('a strip of tabs', () => {
     })
   }
 })
+
+/* A page's title can run long, and a tab with one pushed the strip's plus out
+   of a pane's header. */
+describe("a tab's label", () => {
+  test('is a part that shortens with an ellipsis once the tab is capped', () => {
+    const css = sheet('helix-tab')
+    expect(css).toContain('max-inline-size: var(--tabs-tab-max-inline-size, none)')
+    expect(css).toContain('text-overflow: ellipsis')
+  })
+
+  if (hasLayout()) {
+    test('a capped tab is no wider than its cap, however long its label', async () => {
+      const host = (await mount(`
+        <helix-tabs label="Pages" style="--tabs-tab-max-inline-size: 8rem">
+          <helix-tab value="one">A page whose title runs much longer than any tab should be</helix-tab>
+        </helix-tabs>`)) as Updatable
+      await host.updateComplete
+      const tab = host.querySelector('helix-tab') as HTMLElement
+      expect(tab.getBoundingClientRect().width).toBeLessThanOrEqual(128.5)
+      const label = part(tab, 'label') as HTMLElement
+      expect(label.scrollWidth).toBeGreaterThan(label.clientWidth)
+    })
+  }
+})

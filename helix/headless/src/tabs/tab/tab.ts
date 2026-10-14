@@ -46,6 +46,7 @@ import { property } from 'lit/decorators.js'
  *
  * @csspart dismiss - The mark a pointer presses to close a `dismissible` tab.
  * @csspart dismiss-mark - The glyph on that mark, where none is slotted.
+ * @csspart label - The slot the tab's label is in.
  * @csspart tab - The tab itself.
  *
  * @cssstate selected - While it is the tab selected.
@@ -247,7 +248,7 @@ export class HelixHeadlessTab extends MixinDismissible(MixinSelectableItem(Helix
         @click=${this.handleLinkClick}
         @keydown=${this.handleKeydown}
       >
-        <slot></slot>${this.renderDismiss()}
+        <slot part="label"></slot>${this.renderDismiss()}
       </a>`
     }
     return html`<button
@@ -261,7 +262,7 @@ export class HelixHeadlessTab extends MixinDismissible(MixinSelectableItem(Helix
       @click=${() => this.select()}
       @keydown=${this.handleKeydown}
     >
-      <slot></slot>${this.renderDismiss()}
+      <slot part="label"></slot>${this.renderDismiss()}
     </button>`
   }
 }
