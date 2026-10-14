@@ -135,11 +135,18 @@ slot[name="description"] {
   grid-column: 2;
   grid-row: 2;
   min-inline-size: 0;
-  padding-block-end: var(--helix-space-2xs);
 }
 
 slot[name="description"][data-empty] {
   display: none;
+}
+
+/* **A described row is padded above and below alike.** A one-line row is
+   centered by its least height and needs no padding; two lines outgrow that
+   height, and with none the label sat on the row's top edge, so the highlight
+   began at the cap height of its first word. */
+[part="item"]:has(> slot[name="description"]:not([data-empty])) {
+  padding-block: var(--helix-space-xs);
 }
 
 /* A shortcut and the words in `end` sit in a track of their own before the
