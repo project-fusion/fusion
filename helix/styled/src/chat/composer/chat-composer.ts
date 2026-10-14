@@ -5,30 +5,70 @@ import { property } from 'lit/decorators.js'
 import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
 import { styles } from './chat-composer.css.js'
 
-/** The angle the glow's sweep runs through, which the sheet animates. */
-const SWEEP = '--helix-chat-composer-sweep'
+/** Where the glow's light is on the edge, which the sweep moves along it. */
+const LIGHT_X = '--_chat-composer-light-x'
+const LIGHT_Y = '--_chat-composer-light-y'
 
 /**
- * Registers the sweep's angle, once, so the browser can animate it.
+ * How fast the light travels the edge, in pixels a millisecond, and the
+ * shortest and longest one lap takes.
+ */
+const PACE = 1.2
+const SHORTEST = 800
+const LONGEST = 1600
+
+/**
+ * Registers the light's position, once, so the browser can animate it.
  *
  * **From script, because a sheet cannot.** An `@property` rule inside a
- * shadow root is ignored, and a gradient's angle only interpolates once its
- * property is registered as an angle. A registration is the document's, so it
- * reaches every composer's shadow root. Where the browser has no
- * `registerProperty`, or on the server, the sweep shows and fades without
- * travelling, which is still the cue.
+ * shadow root is ignored, and a gradient's position only interpolates once
+ * its properties are registered as lengths. A registration is the
+ * document's, so it reaches every composer's shadow root. Where the browser
+ * has no `registerProperty`, or on the server, the edge still lights, without
+ * the light travelling.
  */
 let registered = false
-function registerSweep(): void {
+function registerLight(): void {
   if (registered || typeof CSS === 'undefined' || !('registerProperty' in CSS)) {
     return
   }
   registered = true
-  try {
-    CSS.registerProperty({ inherits: false, initialValue: '0deg', name: SWEEP, syntax: '<angle>' })
-  } catch {
-    // Registered already, by another copy of this module on the page.
+  for (const name of [LIGHT_X, LIGHT_Y]) {
+    try {
+      CSS.registerProperty({ inherits: false, initialValue: '0px', name, syntax: '<length>' })
+    } catch {
+      // Registered already, by another copy of this module on the page.
+    }
   }
+}
+
+/**
+ * The keyframes of one lap of the light around a box `w` wide and `h` tall,
+ * clockwise from its top-left corner, each side taking the share of the lap
+ * its length is of the edge, so the light moves at one speed. None for a box
+ * with no size.
+ */
+export function lapOf(w: number, h: number): Keyframe[] {
+  const edge = 2 * (w + h)
+  if (edge === 0) {
+    return []
+  }
+  const at = (x: number, y: number, offset: number): Keyframe => ({
+    [LIGHT_X]: `${x}px`,
+    [LIGHT_Y]: `${y}px`,
+    offset,
+  })
+  return [
+    { ...at(0, 0, 0), opacity: 0 },
+    at(w, 0, w / edge),
+    at(w, h, (w + h) / edge),
+    at(0, h, (2 * w + h) / edge),
+    { ...at(0, 0, 1), opacity: 0 },
+    // Up quickly, and down over the last stretch, so the lap fades out where
+    // it began rather than stopping there.
+    { offset: 0.08, opacity: 1 },
+    { offset: 0.82, opacity: 1 },
+  ].sort((one, two) => (one.offset ?? 0) - (two.offset ?? 0))
 }
 
 /**
@@ -79,9 +119,70 @@ export class HelixChatComposer extends HelixHeadlessChatComposer {
   @property({ reflect: true, type: Boolean })
   glow = false
 
+  /** The light's lap, and its bloom's, while they run. */
+  private laps: Animation[] = []
+
   override connectedCallback(): void {
     super.connectedCallback()
-    registerSweep()
+    registerLight()
+    this.addEventListener('focusin', this.arrive)
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback()
+    this.removeEventListener('focusin', this.arrive)
+    for (const lap of this.laps) {
+      lap.cancel()
+    }
+  }
+
+  /**
+   * Runs the light once as focus arrives. Focus moving between the
+   * composer's own controls, such as from the field to the send button, has
+   * not arrived, so the light stays down.
+   */
+  private readonly arrive = (event: FocusEvent): void => {
+    const from = event.relatedTarget
+    const within =
+      from instanceof Node &&
+      (from === this || this.contains(from) || this.renderRoot.contains(from))
+    if (!this.glow || within || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return
+    }
+    this.sweep()
+  }
+
+  /**
+   * One lap of the light around the edge, **at one speed all the way**.
+   *
+   * A conic gradient turned through a full circle moves its light by angle,
+   * so on a composer many times wider than it is tall the light crawls along
+   * the middle of each long side and races through the corners. Here the lap
+   * is measured: each side takes the share of the time its length is of the
+   * edge, and the whole lap takes as long as the edge is, within a range.
+   */
+  private sweep(): void {
+    const frame = this.renderRoot.querySelector<HTMLElement>('[part="composer"]')
+    if (!frame || typeof frame.animate !== 'function') {
+      return
+    }
+    const { height, width } = frame.getBoundingClientRect()
+    const keyframes = lapOf(width, height)
+    if (keyframes.length === 0) {
+      return
+    }
+    const edge = 2 * (width + height)
+    const timing = {
+      duration: Math.min(LONGEST, Math.max(SHORTEST, edge / PACE)),
+      easing: 'linear',
+    }
+    for (const lap of this.laps) {
+      lap.cancel()
+    }
+    // The light on the edge, and its bloom outside it, on one clock.
+    this.laps = ['::before', '::after'].map((pseudoElement) =>
+      frame.animate(keyframes, { ...timing, pseudoElement }),
+    )
   }
 
   static override styles: CSSResultGroup = [styles, dictationStyles]

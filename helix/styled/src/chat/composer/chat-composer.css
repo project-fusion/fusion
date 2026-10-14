@@ -26,8 +26,11 @@
 
 /* **The glow, under `glow`.** A steady edge while the composer holds focus,
    in place of the ring, and a light that runs once around the edge as focus
-   arrives. The light is a conic gradient cut to a ring by two masks, the box
-   and its padding box, so it follows whatever radius the box has. */
+   arrives. The light is a soft spot cut to a ring by two masks, the box and
+   its padding box, so it follows whatever radius the box has; the element's
+   script moves it along the edge at one speed. **The steady edge comes in
+   behind the light**, a beat later, so the light is seen travelling rather
+   than lost in an edge that lit at the same moment. */
 :host([glow]) [part="composer"] {
   position: relative;
   transition: box-shadow var(--helix-duration-normal) var(--helix-easing-standard);
@@ -36,18 +39,28 @@
 :host([glow]) [part="composer"]:focus-within {
   box-shadow:
     0 0 0 var(--helix-border-thin)
-      color-mix(in oklab, var(--chat-composer-glow-color, var(--helix-color-primary)) 60%, transparent),
+    color-mix(
+      in oklab,
+      var(--chat-composer-glow-color, var(--helix-color-primary)) 60%,
+      transparent
+    ),
     0 0 1.25rem -0.25rem
-      color-mix(in oklab, var(--chat-composer-glow-color, var(--helix-color-primary)) 45%, transparent);
+    color-mix(
+      in oklab,
+      var(--chat-composer-glow-color, var(--helix-color-primary)) 45%,
+      transparent
+    );
   outline: none;
+  transition: box-shadow var(--helix-duration-slow) var(--helix-easing-standard)
+    var(--helix-duration-normal);
 }
 
 :host([glow]) [part="composer"]::before {
-  background: conic-gradient(
-    from var(--helix-chat-composer-sweep, 0deg),
-    transparent 0deg,
-    var(--chat-composer-glow-color, var(--helix-color-primary)) 50deg,
-    transparent 110deg
+  background: radial-gradient(
+    5rem 2.5rem at var(--_chat-composer-light-x, 0px) var(--_chat-composer-light-y, 0px),
+    color-mix(in oklab, var(--chat-composer-glow-color, var(--helix-color-primary)) 60%, white),
+    var(--chat-composer-glow-color, var(--helix-color-primary)) 35%,
+    transparent 100%
   );
   border-radius: inherit;
   content: "";
@@ -58,35 +71,44 @@
     linear-gradient(#000 0 0) content-box exclude,
     linear-gradient(#000 0 0);
   opacity: 0;
-  padding: 1.5px;
+  padding: 2px;
   pointer-events: none;
   position: absolute;
 }
 
-:host([glow]) [part="composer"]:focus-within::before {
-  animation: chat-composer-sweep 1.4s var(--helix-easing-standard) 1;
-}
-
-@keyframes chat-composer-sweep {
-  0% {
-    --helix-chat-composer-sweep: 0deg;
-    opacity: 0;
-  }
-
-  15%,
-  70% {
-    opacity: 1;
-  }
-
-  100% {
-    --helix-chat-composer-sweep: 360deg;
-    opacity: 0;
-  }
+:host([glow]) [part="composer"]::after {
+  background: radial-gradient(
+    4rem 2rem at calc(var(--_chat-composer-light-x, 0px) + 1rem)
+      calc(var(--_chat-composer-light-y, 0px) + 1rem),
+    color-mix(
+      in oklab,
+      var(--chat-composer-glow-color, var(--helix-color-primary)) 55%,
+      transparent
+    ),
+    transparent 100%
+  );
+  border-radius: calc(var(--helix-radii-md) + 1rem);
+  content: "";
+  /* **The light's bloom, outside the edge**, where a ring two pixels wide
+     carries too little light to read on a frosted ground. Cut to the band
+     around the box by the same two masks as the light, so none of it shows
+     through a translucent fill onto the words inside. Offset by its own
+     inset, so it sits where the light does. */
+  filter: blur(6px);
+  inset: -1rem;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  opacity: 0;
+  padding: 1rem;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :host([glow]) [part="composer"]:focus-within::before {
-    animation: none;
+  :host([glow]) [part="composer"]:focus-within {
+    transition-delay: 0s;
   }
 }
 
