@@ -499,6 +499,24 @@ describe('a palette given a filter match', () => {
       .map((option) => option.getAttribute('value'))
     expect(shown).toEqual(['theme'])
   })
+
+  /* React hydrating a page drops a function prop, and core assigns it from the
+     props React holds. Assigned after the first render, it scheduled a second
+     update, which Lit's development build reported as `change-in-update` in
+     the Hartley app's palette. `updateComplete` resolves `false` while another
+     update is pending. */
+  test('takes the function React holds in its first render, with no update after it', async () => {
+    const filterMatch = (text: string, filter: string): boolean => text.startsWith(filter)
+    const host = document.createElement('helix-headless-command') as Palette & {
+      filterMatch?: unknown
+    }
+    host.innerHTML = '<helix-headless-option value="new">New file</helix-headless-option>'
+    Object.assign(host, { __reactProps$k9x2: { filterMatch } })
+    document.body.append(host)
+    expect(await host.updateComplete).toBe(true)
+    expect(host.filterMatch).toBe(filterMatch)
+    host.remove()
+  })
 })
 
 describe('a palette drawn in the page', () => {

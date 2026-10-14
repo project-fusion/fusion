@@ -356,8 +356,8 @@ describe('the settled mark', () => {
  *
  * A handler only has to exist by the time somebody interacts, so the element
  * binds it at dispatch. A property has to be right before the first paint, so
- * these assert *when* as much as *whether*, and the first test is the one that
- * fails if the assignment is ever moved later than `firstUpdated`.
+ * these assert *when* as much as *whether*, and the first two tests are the
+ * ones that fail if the assignment is ever moved later than the first render.
  */
 describe('the object property React is holding', () => {
   const frame = (): Promise<void> => new Promise((done) => requestAnimationFrame(() => done()))
@@ -413,6 +413,18 @@ describe('the object property React is holding', () => {
     const rows = [{ name: 'Ada Okonjo' }]
     const element = late({ rows })
     await element.updateComplete
+    expect(element.rows).toBe(rows)
+  })
+
+  /* **In the first render, and with no second update after it.** Assigned from
+     `firstUpdated`, the value scheduled an update as the first one finished,
+     which Lit's development build reports as `change-in-update`: Command's
+     `filterMatch` and Chat Composer's `placeholders` did in the Hartley app.
+     `updateComplete` resolves `false` while another update is pending. */
+  test('is rendered by the first update, with no update after it', async () => {
+    const rows = [{ name: 'Ines Duarte' }]
+    const element = late({ rows })
+    expect(await element.updateComplete).toBe(true)
     expect(element.rows).toBe(rows)
   })
 
