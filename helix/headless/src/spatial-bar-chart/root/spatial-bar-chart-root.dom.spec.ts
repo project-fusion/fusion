@@ -186,3 +186,98 @@ describe('the pointer', () => {
     expect(behind?.nextElementSibling?.localName).toBe('foreignObject')
   })
 })
+
+/* A week with today lit, as Switchyard's chart of runs draws it. */
+const week = `<table id="week" data-hidden-visually>
+  <caption>Runs per day</caption>
+  <thead><tr><th>Day</th><th>Runs</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Mon</th><td data-value="59800">59,800</td></tr>
+    <tr><th scope="row">Tue</th><td data-tone="primary" data-value="64200">64,200</td></tr>
+    <tr><th scope="row">Wed</th><td data-value="61900">61,900</td></tr>
+  </tbody>
+</table>`
+
+const days = async (attributes = '') => {
+  const host = (await mount(
+    `<div>${week}<helix-headless-spatial-bar-chart for="week" ${attributes}></helix-headless-spatial-bar-chart></div>`,
+  )) as HTMLElement
+  const element = host.querySelector('helix-headless-spatial-bar-chart') as Plot
+  await element.updateComplete
+  return element
+}
+
+const all = (element: HTMLElement, name: string): Element[] => [
+  ...(element.shadowRoot?.querySelectorAll(`[part="${name}"]`) ?? []),
+]
+
+describe('a toned bar', () => {
+  test('takes its tone, falling back to its series, and the others their series', async () => {
+    const element = await days()
+    const toned = bars(element).filter((bar) => bar.getAttribute('data-tone') === 'primary')
+    expect(toned).toHaveLength(1)
+    expect(toned[0]?.getAttribute('style')).toBe(
+      '--chart-series: var(--spatial-bar-chart-tone-primary, var(--chart-series-1))',
+    )
+    expect(bars(element).filter((bar) => bar.hasAttribute('data-tone'))).toHaveLength(1)
+  })
+
+  test('writes its value over it as the table writes it, and no other value', async () => {
+    const element = await days()
+    expect(all(element, 'value').map((value) => value.textContent)).toEqual(['64,200'])
+  })
+
+  test('refuses a tone that is not a name', async () => {
+    const host = (await mount(
+      `<div>${week.replace('data-tone="primary"', 'data-tone="red;fill:red"')}<helix-headless-spatial-bar-chart for="week"></helix-headless-spatial-bar-chart></div>`,
+    )) as HTMLElement
+    const element = host.querySelector('helix-headless-spatial-bar-chart') as Plot
+    await element.updateComplete
+    expect(bars(element).filter((bar) => bar.hasAttribute('data-tone'))).toHaveLength(0)
+    expect(all(element, 'value')).toHaveLength(0)
+  })
+})
+
+describe('a row', () => {
+  test('draws its floor, a plate for each day, and the days under it, the toned one in its tone', async () => {
+    const element = await days('variant="row"')
+    expect(all(element, 'floor')).toHaveLength(3)
+    const names = all(element, 'tick')
+    expect(names.map((name) => name.textContent)).toEqual(['Mon', 'Tue', 'Wed'])
+    expect(names[1]?.getAttribute('data-tone')).toBe('primary')
+    expect(part(element, 'grid')).toBeNull()
+  })
+
+  test('with no box, draws the bars and the lit value alone', async () => {
+    const element = await days('variant="row" no-box')
+    expect(all(element, 'floor')).toHaveLength(0)
+    expect(all(element, 'tick')).toHaveLength(0)
+    expect(all(element, 'value')).toHaveLength(1)
+  })
+})
+
+describe('growing in', () => {
+  const faces = (element: HTMLElement): number[] =>
+    bars(element).map((bar) => bar.querySelectorAll('[part="face"]').length)
+
+  test('waits flat on the floor until the chart is seen', async () => {
+    const element = await days('grow variant="row"')
+    /* No side is drawn on a bar with no height, only its top. */
+    expect(faces(element)).toEqual([1, 1, 1])
+  })
+
+  test('stands at its height at once where the page has paused its motion', async () => {
+    document.documentElement.setAttribute('data-helix-motion', 'paused')
+    try {
+      const element = await days('grow variant="row"')
+      expect(faces(element)).toEqual([3, 3, 3])
+    } finally {
+      document.documentElement.removeAttribute('data-helix-motion')
+    }
+  })
+
+  test('without grow, the bars stand at their height', async () => {
+    const element = await days('variant="row"')
+    expect(faces(element)).toEqual([3, 3, 3])
+  })
+})

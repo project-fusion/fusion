@@ -45,15 +45,15 @@ const recording = () => {
   return { driver, told }
 }
 
-const chart = async () => {
+const chart = async (last = '<td>355</td>') => {
   const host = (await mount(
-    `<div style="--helix-color-border: rgb(1, 2, 3); --helix-color-surface-sunken: rgb(4, 5, 6); --helix-color-foreground: rgb(7, 8, 9); --helix-color-foreground-muted: rgb(10, 11, 12); --chart-series-1: rgb(200, 0, 0); --chart-series-2: rgb(0, 200, 0)">
+    `<div style="--spatial-bar-chart-tone-primary: rgb(0, 0, 200); --helix-color-border: rgb(1, 2, 3); --helix-color-surface-sunken: rgb(4, 5, 6); --helix-color-foreground: rgb(7, 8, 9); --helix-color-foreground-muted: rgb(10, 11, 12); --chart-series-1: rgb(200, 0, 0); --chart-series-2: rgb(0, 200, 0)">
       <table id="signups" data-hidden-visually>
         <caption>Signups</caption>
         <thead><tr><th>Region</th><th>Q1</th><th>Q2</th></tr></thead>
         <tbody>
           <tr><th scope="row">North</th><td>420</td><td>465</td></tr>
-          <tr><th scope="row">South</th><td>310</td><td>355</td></tr>
+          <tr><th scope="row">South</th><td>310</td>${last}</tr>
         </tbody>
       </table>
       <helix-headless-spatial-bar-chart for="signups"><div></div></helix-headless-spatial-bar-chart>
@@ -82,6 +82,23 @@ describe('connectSpatialBarChart', () => {
     expect(told.colors?.groups).toEqual(['rgb(200, 0, 0)', 'rgb(0, 200, 0)'])
     expect(hasState(element, 'drawn')).toBe(true)
     expect(part(element, 'fallback')?.hasAttribute('hidden')).toBe(true)
+  })
+
+  test('a toned cell hands the driver its tone, and muted the neutral ink for the rest', async () => {
+    const element = await chart('<td data-tone="primary">355</td>')
+    element.setAttribute('emphasis', 'muted')
+    const { driver, told } = recording()
+    connectSpatialBarChart(element, driver)
+    await settle(element)
+    expect(told.drawn.at(-1)?.cells.map((cell) => cell.tone)).toEqual([
+      undefined,
+      undefined,
+      undefined,
+      'primary',
+    ])
+    expect(told.colors?.extra['tone-primary']).toBe('rgb(0, 0, 200)')
+    expect(told.colors?.look.muted).toBe(true)
+    expect(told.colors?.look.emphasis).toBe('solid')
   })
 
   test('a press in the drawing puts the reading on that bar', async () => {

@@ -2,6 +2,19 @@
   display: block;
 }
 
+/* The tones a cell can name with `data-tone`, from the tokens, as Bar
+   Chart's are. A bar whose tone has no property here takes its series'
+   color, which the headless tier writes as the fallback. */
+:host {
+  --spatial-bar-chart-tone-accent: var(--helix-color-accent);
+  --spatial-bar-chart-tone-danger: var(--helix-color-danger);
+  --spatial-bar-chart-tone-info: var(--helix-color-info);
+  --spatial-bar-chart-tone-muted: var(--helix-color-foreground-subtle);
+  --spatial-bar-chart-tone-primary: var(--helix-color-primary);
+  --spatial-bar-chart-tone-success: var(--helix-color-success);
+  --spatial-bar-chart-tone-warning: var(--helix-color-warning);
+}
+
 /* The box the 3D drawing is made in, and the chart's own drawing in it until
    then. The renderer's box is the page's own element, and it fills the plot. */
 [part="plot"] {
@@ -39,8 +52,10 @@
 }
 
 /* The chart's own drawing, inset from the box so the names along its edges
-   have room. It scales as a whole through its `viewBox`. */
+   have room. It scales as a whole through its `viewBox`. A row's names and
+   a toned bar's value are written at this size whatever the scale. */
 [part="fallback"] {
+  font-size: var(--helix-text-xs);
   inset: var(--helix-space-md);
   position: absolute;
 }
@@ -78,6 +93,27 @@
 
 [part="axis-name"] {
   fill: var(--helix-color-foreground);
+  font-weight: var(--helix-weight-semibold);
+}
+
+/* A row's floor: each place as a thin outline in the border's ink. */
+[part="floor"] {
+  fill: none;
+  stroke: var(--helix-color-border);
+  stroke-linejoin: round;
+  stroke-width: var(--helix-border-thin);
+  vector-effect: non-scaling-stroke;
+}
+
+/* A name under a toned bar takes the tone, and the value over the bar the
+   full ink. */
+[part="tick"][data-tone] {
+  fill: var(--chart-series, var(--helix-color-foreground-muted));
+}
+
+[part="value"] {
+  fill: var(--helix-color-foreground);
+  font-variant-numeric: tabular-nums;
   font-weight: var(--helix-weight-semibold);
 }
 
@@ -123,6 +159,37 @@
 :host([emphasis="subtle"]) [part="face"] {
   --_spatial-bar-chart-area: 0.2;
   --_spatial-bar-chart-line: var(--_spatial-bar-chart-color);
+}
+
+/*
+ * **`muted` draws every bar in the neutral ink**, the top with the most of
+ * it and each side less as it turns from the light, so a bar whose cell
+ * names a tone is the one in color. That bar's sides fade toward the surface
+ * by the same steps, and it glows in its tone. The steps are a third of the
+ * ink on a top, about a sixth on the side nearer the light, and a sixteenth
+ * on the far one.
+ */
+:host([emphasis="muted"]) [part="face"] {
+  --_spatial-bar-chart-fill: color-mix(
+    in oklab,
+    var(--helix-color-foreground) calc(30% - var(--spatial-bar-chart-shade, 0) * 66%),
+    var(--helix-color-surface)
+  );
+  --_spatial-bar-chart-line: color-mix(in oklab, var(--helix-color-foreground) 10%, transparent);
+}
+
+:host([emphasis="muted"]) [part~="bar"][data-tone] [part="face"] {
+  --_spatial-bar-chart-fill: color-mix(
+    in oklab,
+    var(--_spatial-bar-chart-color) calc(100% - var(--spatial-bar-chart-shade, 0) * 130%),
+    var(--helix-color-surface)
+  );
+}
+
+/* The glow under a toned bar, in its tone, shown only where it is the one
+   bar in color. */
+:host([emphasis="muted"]) [part="glow"] {
+  fill: color-mix(in oklab, var(--chart-series, var(--helix-color-primary)) 40%, transparent);
 }
 
 :host([material="glass"]) {
@@ -201,17 +268,23 @@ foreignObject > [part="mark"] {
     stroke: CanvasText;
   }
 
-  [part="grid"] {
+  [part="grid"],
+  [part="floor"] {
     stroke: CanvasText;
   }
 
   [part="tick"],
-  [part="axis-name"] {
+  [part="axis-name"],
+  [part="value"] {
     fill: CanvasText;
   }
 
   [part="ring"],
   [part="ring-behind"] {
     stroke: Highlight;
+  }
+
+  [part="glow"] {
+    display: none;
   }
 }

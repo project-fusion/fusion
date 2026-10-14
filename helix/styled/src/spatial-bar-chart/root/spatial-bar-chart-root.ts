@@ -40,12 +40,19 @@ export class HelixSpatialBarChart extends HelixHeadlessSpatialBarChart {
    * reflected property takes no default, and `solid` writes it out. A
    * renderer draws the bars the same way.
    *
+   * **`muted` draws every bar in the neutral ink**, so the one bar whose cell
+   * names a tone, such as `data-tone="primary"`, is the bar in color, with a
+   * soft glow in its tone: one reading lit among the others, such as today
+   * among a week. Each top takes the most ink and each side less, as a
+   * colored bar's faces do. A renderer draws the neutral bars and the toned
+   * one, without the glow.
+   *
    * It composes with `material`: emphasis decides what is drawn, and material
    * how much of it comes through. The outline on the bar the keys rest on
    * keeps its own ink.
    */
   @property({ reflect: true })
-  emphasis?: 'outlined' | 'solid' | 'subtle'
+  emphasis?: 'muted' | 'outlined' | 'solid' | 'subtle'
 
   /**
    * How much of each mark comes through, as on every chart: `glass` admits the
