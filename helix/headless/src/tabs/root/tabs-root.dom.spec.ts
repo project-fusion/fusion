@@ -743,3 +743,30 @@ describe('a strip with more tabs than fit', () => {
     expect(part(host, 'scroll-end')).toBeNull()
   })
 })
+
+/* A pane's pages and shells live outside the set, so its tabs are a strip with
+   no panels, and the set has to work the same without them. */
+describe('tabs with no panels', () => {
+  test('select, move with the keys, and say which tab is current', async () => {
+    const host = (await mount(`
+      <helix-headless-tabs default-active="one" label="Pages">
+        <helix-headless-tab value="one">One</helix-headless-tab>
+        <helix-headless-tab value="two">Two</helix-headless-tab>
+      </helix-headless-tabs>`)) as Updatable & { active: string }
+    await turn(host)
+    const heard: string[] = []
+    host.addEventListener('helix-activate', () => heard.push(host.active))
+    const first = tabs(host)[0] as HTMLElement
+    first.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowRight' }),
+    )
+    await turn(host)
+    expect(host.active).toBe('two')
+    expect(hasState(tabs(host)[1] as Element, 'selected')).toBe(true)
+    expect(heard).toEqual(['two'])
+    const control = part(tabs(host)[1] as HTMLElement, 'tab') as HTMLElement & {
+      ariaControlsElements?: Element[] | null
+    }
+    expect(control.ariaControlsElements ?? []).toEqual([])
+  })
+})

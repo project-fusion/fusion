@@ -28,7 +28,9 @@
   color: var(--tabs-tab-color, var(--helix-color-foreground-muted));
   cursor: pointer;
   font: inherit;
-  font-size: var(--tabs-tab-font-size, var(--helix-text-sm));
+  /* The control text, so a tab in a `data-density` region follows it as the
+     controls beside it do; it is `text-sm` at rest. */
+  font-size: var(--tabs-tab-font-size, var(--helix-text-control));
   font-weight: var(--tabs-tab-font-weight, var(--helix-weight-medium));
   display: inline-flex;
   /* A tab set in a column makes each tab as wide as the column, its words at
@@ -92,7 +94,17 @@
   color: var(--tabs-tab-dismiss-color, currentColor);
   display: inline-flex;
   margin-inline: var(--helix-space-2xs) calc(var(--helix-space-2xs) * -1);
+  /* Out of sight at rest only where the set asks, with `dismiss-marks`, and
+     still holding its room, so the label does not move as it comes and goes. */
+  opacity: var(--_tabs-dismiss-rest, 1);
   padding: var(--helix-space-none);
+  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host(:state(selected)) [part="dismiss"],
+:host(:hover) [part="dismiss"],
+:host(:focus-within) [part="dismiss"] {
+  opacity: 1;
 }
 
 [part="dismiss"] svg {

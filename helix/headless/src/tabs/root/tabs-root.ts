@@ -79,6 +79,10 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  *
  * A tab with `dismissible` can be closed: see `Tabs.Tab`.
  *
+ * **Panels are optional.** A set with none is a strip whose tabs stand for
+ * something the page shows elsewhere: the keys, the selection, `active` and
+ * `helix-activate` work the same, and no tab names a panel it controls.
+ *
  * The `indicator` part moves to the selected tab and carries its place and
  * size, so a mark of your own can be drawn there: style the part, or slot an
  * element into `indicator`, which sits inside the part and reads the same
