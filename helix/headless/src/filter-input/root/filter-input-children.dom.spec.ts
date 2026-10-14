@@ -1,5 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
+import { QUIET } from '@fusion.dev/helix-core/audits/children'
 import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 /* A suggestion is an option, the Option family's, and a page that writes one
@@ -20,6 +21,8 @@ const told = async (markup: string): Promise<Report[]> => {
   document.body.innerHTML = markup
   await settle(document.body.firstElementChild as Updatable)
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+  /* The audit reports once the page has gone quiet for `QUIET` milliseconds. */
+  await new Promise((resolve) => setTimeout(resolve, QUIET + 50))
   const after = (globalThis as Record<symbol, unknown>)[key]
   return ((Array.isArray(after) ? after.slice(before) : []) as Report[]).filter(
     (one) => one.kind === 'unregistered-part',

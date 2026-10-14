@@ -1,3 +1,4 @@
+import { definedTags } from '../custom-element/custom-element.js'
 import { howToRegister } from '../how-to-register/how-to-register.js'
 import { reportRuntime } from '../report-runtime/report-runtime.js'
 
@@ -17,6 +18,60 @@ const afterPaint = (check: () => void): void => {
 }
 
 /**
+ * How long, in milliseconds, the page goes without loading a resource or
+ * registering a Helix family before a child still undefined counts as missing.
+ *
+ * **An app that imports its families with `import()` registers them after
+ * the page has loaded**, each as its chunk arrives, so a container can be
+ * defined and painted while the chunk holding its children is still in
+ * flight. Measured in the Hartley desktop app on October 14, 2026: Command was
+ * defined 90 ms before Option, and its families arrived over 230 ms.
+ */
+export const QUIET = 500
+
+/**
+ * How much the page has loaded and registered so far. A chunk that lands
+ * adds a resource, and a family it registers adds a tag.
+ *
+ * **Both, because neither is enough alone.** A bundler can serve a page
+ * whose `#audit-children` is a second copy of core, whose `definedTags` then
+ * sees none of the page's families, and the resource log stops growing once
+ * its buffer is full.
+ */
+const activity = (): number =>
+  definedTags().length + (performance.getEntriesByType?.('resource').length ?? 0)
+
+/**
+ * Resolves once `tag` is defined, or once the page has loaded and registered
+ * nothing for `QUIET` milliseconds, whichever comes first.
+ *
+ * **Twenty periods at most.** A page that loads something more often than
+ * every `QUIET` milliseconds is never quiet, so its missing child is reported
+ * after twenty periods, ten seconds late.
+ */
+const settled = (tag: string): Promise<unknown> =>
+  Promise.race([
+    customElements.whenDefined(tag),
+    new Promise<void>((resolve) => {
+      let seen = activity()
+      let periods = 0
+      const wait = (): void => {
+        setTimeout(() => {
+          const now = activity()
+          periods += 1
+          if (now === seen || periods >= 20) {
+            resolve()
+          } else {
+            seen = now
+            wait()
+          }
+        }, QUIET)
+      }
+      wait()
+    }),
+  ])
+
+/**
  * Reports a child from another family that a container holds and nobody
  * registered, naming the entry to import.
  *
@@ -27,8 +82,10 @@ const afterPaint = (check: () => void): void => {
  * This says so, once for each container tag and child tag on the page, with
  * the line to add.
  *
- * Asked once the page has loaded and painted, so an entry a later module
- * imports is not taken for a missing one.
+ * Asked once the page has loaded and painted. A child still undefined then
+ * is reported once the page has loaded and registered nothing for `QUIET`
+ * milliseconds and the tag is still undefined, so an entry a later module or
+ * a later chunk imports is not taken for a missing one.
  *
  * **In a development build only**, as `missing-name` is: every container would
  * pay for a sentence meant for the person writing the page. Core imports it as
@@ -60,13 +117,18 @@ export const auditChildren = (
   if (reported.has(key)) {
     return
   }
-  const check = (): void => {
-    if (
-      reported.has(key) ||
-      !host.isConnected ||
-      customElements.get(tag) !== undefined ||
-      (!drawn && host.querySelector(tag) === null)
-    ) {
+  /** Whether there is nothing to report now. */
+  const fine = (): boolean =>
+    reported.has(key) ||
+    !host.isConnected ||
+    customElements.get(tag) !== undefined ||
+    (!drawn && host.querySelector(tag) === null)
+  const check = async (): Promise<void> => {
+    if (fine()) {
+      return
+    }
+    await settled(tag)
+    if (fine()) {
       return
     }
     reported.add(key)
@@ -76,7 +138,7 @@ export const auditChildren = (
       tag: host.localName,
     })
   }
-  afterPaint(check)
+  afterPaint(() => void check())
 }
 
 /**

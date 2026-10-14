@@ -10,5 +10,8 @@ import type { auditChildren as audit, auditEntry as entry } from './audit-childr
  */
 export const auditChildren: typeof audit = () => {}
 
+/** A production build has no audit, so nothing waits. See `QUIET`. */
+export const QUIET = 0
+
 /** The missing-entry warning in a production build: nothing. See `auditEntry`. */
 export const auditEntry: typeof entry = () => {}
