@@ -594,3 +594,34 @@ describe('a busy composer', () => {
     expect(sent).toBe(1)
   })
 })
+
+/* A start page's composer shows the kinds of thing to ask, one after another,
+   as its placeholder, and keeps still while the reader is about to write. */
+describe('placeholders', () => {
+  const field = (host: HTMLElement) => part(host, 'field') as HTMLTextAreaElement
+
+  test('the first example is the placeholder, and `placeholder` stands in for none', async () => {
+    const host = (await composer('placeholder="Write a message"')) as Composer & {
+      placeholders: string[]
+    }
+    expect(field(host).placeholder).toBe('Write a message')
+    host.placeholders = ['Fix the failing test', 'Explain the auth flow']
+    await host.updateComplete
+    expect(field(host).placeholder).toBe('Fix the failing test')
+  })
+
+  test('an empty field without focus moves on, and one with text keeps its example', async () => {
+    const host = (await composer()) as Composer & { placeholders: string[] }
+    host.placeholders = ['One', 'Two']
+    await host.updateComplete
+    await new Promise((done) => setTimeout(done, 4400))
+    await host.updateComplete
+    expect(field(host).placeholder).toBe('Two')
+    host.value = 'Draft'
+    await host.updateComplete
+    await new Promise((done) => setTimeout(done, 4400))
+    await host.updateComplete
+    expect(field(host).placeholder).toBe('Two')
+    host.remove()
+  }, 12000)
+})
