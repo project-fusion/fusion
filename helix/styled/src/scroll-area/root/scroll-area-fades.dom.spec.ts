@@ -11,7 +11,9 @@ type Area = HTMLElement & { updateComplete: Promise<unknown> }
 
 /* The fades at the edges, which are drawn here and opted out of by giving one no depth.
 
-   The behavior is the headless element's and is tested there. */
+   By default each fade is a mask on the viewport, read here as the depth each
+   edge's gradient stop computes to, and under `--scroll-area-fade-color` a
+   painted gradient. The behavior is the headless element's and is tested there. */
 if (hasLayout()) {
   describe('a scroll area with a page under it', () => {
     const sized = async (lines: number): Promise<Area> => {
@@ -29,6 +31,27 @@ if (hasLayout()) {
     }
 
     const box = (host: Area): HTMLElement => part(host, 'viewport') as HTMLElement
+
+    /* After the fade, not during it. The depths animate over `duration-fast`,
+       so reading the moment the state lands catches them partway and the
+       number is whatever the frame happened to be on. */
+    const settled = (): Promise<unknown> =>
+      new Promise((done) => {
+        setTimeout(done, 250)
+      })
+
+    const scrollTo = async (host: Area, top: number): Promise<void> => {
+      box(host).scrollTop = top
+      box(host).dispatchEvent(new Event('scroll'))
+      await host.updateComplete
+      await settled()
+    }
+
+    /* How far the mask fades in from one edge, in pixels. */
+    const depth = (host: Area, edge: string): number =>
+      Number.parseFloat(
+        globalThis.getComputedStyle(box(host)).getPropertyValue(`--_scroll-area-depth-${edge}`),
+      ) || 0
 
     /* Custom states rather than an attribute, which is what keeps this element
        hydratable: `states` is not in the DOM, so nothing a framework rendered
@@ -95,21 +118,16 @@ if (hasLayout()) {
       await host.updateComplete
       expect(more(host)).toEqual(['inline-start', 'inline-end'])
 
-      /* After the fade, not during it. These cross-fade over `duration-fast`,
-         so reading the moment the state lands catches them partway and the
-         number is whatever the frame happened to be on. */
-      await new Promise((settled) => {
-        setTimeout(settled, 250)
-      })
-      const edges = part(host, 'edges') as HTMLElement
-      expect(globalThis.getComputedStyle(edges, '::before').opacity).toBe('1')
-      expect(globalThis.getComputedStyle(edges, '::after').opacity).toBe('1')
+      await settled()
+      expect(depth(host, 'inline-start')).toBeGreaterThan(0)
+      expect(depth(host, 'inline-end')).toBeGreaterThan(0)
     })
 
     /* Each sideways fade is solid at the edge it sits on and clear toward the
        middle. On a right-to-left page inline-start is the right-hand edge, and
        a fade still running `to right` there was clear at the edge and solid
-       over the content. */
+       over the content. The mask runs from inline-start; the painted pair each
+       run from their own edge. */
     for (const [dir, start, end] of [
       ['ltr', 'to right', 'to left'],
       ['rtl', 'to left', 'to right'],
@@ -117,11 +135,22 @@ if (hasLayout()) {
       test(`fades each sideways edge away from itself, ${dir}`, async () => {
         document.documentElement.dir = dir
         try {
-          const host = (await mount(
-            `<helix-scroll-area label="Row" style="display:block;inline-size:120px"><div style="display:flex"><span style="flex:0 0 200px">a</span></div></helix-scroll-area>`,
-          )) as Area
-          await host.updateComplete
-          const edges = part(host, 'edges') as HTMLElement
+          const row = async (style = ''): Promise<Area> => {
+            const host = (await mount(
+              `<helix-scroll-area label="Row" style="display:block;inline-size:120px;${style}"><div style="display:flex"><span style="flex:0 0 200px">a</span></div></helix-scroll-area>`,
+            )) as Area
+            await host.updateComplete
+            await new Promise((frame) => {
+              requestAnimationFrame(frame)
+            })
+            return host
+          }
+          const masked = await row()
+          expect(globalThis.getComputedStyle(box(masked)).maskImage).toContain(
+            `linear-gradient(${start},`,
+          )
+          const painted = await row('--scroll-area-fade-color: rgb(255, 0, 0)')
+          const edges = part(painted, 'edges') as HTMLElement
           const runs = (which: '::after' | '::before'): string =>
             globalThis.getComputedStyle(edges, which).backgroundImage
           expect(runs('::before')).toMatch(new RegExp(`^linear-gradient\\(${start},`))
@@ -132,16 +161,88 @@ if (hasLayout()) {
       })
     }
 
+    test('masks the content toward each edge it can scroll to, following the scroll', async () => {
+      /* A mask, so the fade works on any surface: a card, a frosted pane, or a
+         translucent fill shows through it, which no painted color can match. */
+      const host = await sized(20)
+      await settled()
+      expect(globalThis.getComputedStyle(box(host)).maskImage).not.toBe('none')
+      expect(depth(host, 'block-start')).toBe(0)
+      expect(depth(host, 'block-end')).toBeGreaterThan(0)
+
+      await scrollTo(host, 40)
+      expect(depth(host, 'block-start')).toBeGreaterThan(0)
+      expect(depth(host, 'block-end')).toBeGreaterThan(0)
+
+      await scrollTo(host, box(host).scrollHeight)
+      expect(depth(host, 'block-start')).toBeGreaterThan(0)
+      expect(depth(host, 'block-end')).toBe(0)
+    })
+
+    test('a fade reaches as deep as the depth asked for', async () => {
+      const body = Array.from({ length: 20 }, (_, at) => `<p>Line ${at}</p>`).join('')
+      const host = (await mount(
+        `<helix-scroll-area label="Notes" style="display:block;block-size:80px;inline-size:200px;--scroll-area-fade:12px;--scroll-area-fade-block-end:20px">${body}</helix-scroll-area>`,
+      )) as Area
+      await host.updateComplete
+      await scrollTo(host, 40)
+      expect(depth(host, 'block-start')).toBe(12)
+      expect(depth(host, 'block-end')).toBe(20)
+    })
+
+    test('paints nothing over the content while it masks', async () => {
+      const host = await sized(20)
+      await scrollTo(host, 40)
+      const edges = part(host, 'edges') as HTMLElement
+      for (const [element, which] of [
+        [host, '::before'],
+        [host, '::after'],
+        [edges, '::before'],
+        [edges, '::after'],
+      ] as const) {
+        expect(globalThis.getComputedStyle(element, which).backgroundImage).toBe('none')
+      }
+    })
+
+    test('leaves the room the browser scrollbar takes out of the mask', async () => {
+      /* A mask on a scroller masks its scrollbar too. The headless tier writes
+         the room on the viewport, and the first layer keeps that strip opaque. */
+      const host = await sized(20)
+      box(host).style.setProperty('--scroll-area-gutter-inline-end', '14px')
+      const sizes = globalThis.getComputedStyle(box(host)).maskSize
+      expect(sizes.startsWith('14px 100%')).toBe(true)
+    })
+
+    test('a fade color paints the fades, and the mask is off', async () => {
+      /* For a box on a solid ground that wants the fade in a color. Set, the
+         color makes the mask's image list invalid, so `mask-image` computes to
+         `none`; unset, the painted gradients are invalid in the same way. */
+      const body = Array.from({ length: 20 }, (_, at) => `<p>Line ${at}</p>`).join('')
+      const host = (await mount(
+        `<helix-scroll-area label="Notes" style="display:block;block-size:80px;inline-size:200px;--scroll-area-fade-color:rgb(255, 0, 0)">${body}</helix-scroll-area>`,
+      )) as Area
+      await host.updateComplete
+      await settled()
+      expect(globalThis.getComputedStyle(box(host)).maskImage).toBe('none')
+      const bottom = globalThis.getComputedStyle(host, '::after')
+      expect(bottom.backgroundImage).toContain('rgb(255, 0, 0)')
+      expect(bottom.opacity).toBe('1')
+      expect(globalThis.getComputedStyle(host, '::before').opacity).toBe('0')
+    })
+
     test('an edge is opted out by giving its fade no depth', async () => {
       /* A size rather than a switch, because it is the same question at both
-         ends and a zero-depth fade has no box to be drawn in. A list scrolled
-         to the top has nothing above it worth saying so about, and a fade there
-         covers the first row for no reason. */
+         ends: a zero-depth fade masks nothing, and a painted one has no box to
+         be drawn in. A list scrolled to the top has nothing above it worth
+         saying so about, and a fade there covers the first row for no reason. */
       const body = Array.from({ length: 20 }, (_, at) => `<p>Line ${at}</p>`).join('')
       const host = (await mount(
         `<helix-scroll-area label="Notes" style="display:block;block-size:80px;inline-size:200px;--scroll-area-fade-block-start:0">${body}</helix-scroll-area>`,
       )) as Area
       await host.updateComplete
+      await scrollTo(host, 40)
+      expect(depth(host, 'block-start')).toBe(0)
+      expect(depth(host, 'block-end')).toBeGreaterThan(0)
       const top = globalThis.getComputedStyle(host, '::before')
       const bottom = globalThis.getComputedStyle(host, '::after')
       expect(Number.parseFloat(top.blockSize)).toBe(0)

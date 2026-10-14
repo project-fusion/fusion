@@ -82,6 +82,39 @@ describe('one axis', () => {
   })
 })
 
+describe('the room the browser scrollbars take', () => {
+  /* A mask on the viewport masks its scrollbar too, so a stylesheet that fades
+     the content has to know how much room the scrollbar takes to leave it
+     out. Measured here, because the room depends on the platform and on what
+     the user chose there. */
+  const measured = (view: HTMLElement, outer: number, inner: number): void => {
+    Object.defineProperty(view, 'offsetWidth', { configurable: true, value: outer })
+    Object.defineProperty(view, 'clientWidth', { configurable: true, value: inner })
+    Object.defineProperty(view, 'offsetHeight', { configurable: true, value: 100 })
+    Object.defineProperty(view, 'clientHeight', { configurable: true, value: 100 })
+    view.dispatchEvent(new Event('scroll'))
+  }
+
+  test('is written on the viewport while a scrollbar takes room', async () => {
+    const host = await area()
+    const view = part(host, 'viewport') as HTMLElement
+    measured(view, 214, 200)
+    await host.updateComplete
+    expect(view.style.getPropertyValue('--scroll-area-gutter-inline-end').trim()).toBe('14px')
+    expect(view.style.getPropertyValue('--scroll-area-gutter-block-end')).toBe('')
+  })
+
+  test('and taken off again once the scrollbar draws over the content', async () => {
+    const host = await area()
+    const view = part(host, 'viewport') as HTMLElement
+    measured(view, 214, 200)
+    await host.updateComplete
+    measured(view, 200, 200)
+    await host.updateComplete
+    expect(view.hasAttribute('style')).toBe(false)
+  })
+})
+
 describe('a thumb dragged across the content', () => {
   test('sends one scrollend from the host, once it is let go', async () => {
     const host = await area('scrollbars="always"')

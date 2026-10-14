@@ -39,6 +39,11 @@ const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as cons
  * scrollbar, the browser's or the component's, and clips what is past it.
  * Leave it unset to scroll both ways.
  *
+ * **A mask on the viewport also masks the browser's scrollbar.** While a
+ * scrollbar takes room beside the content, the viewport carries its size in
+ * `--scroll-area-gutter-inline-end` or `--scroll-area-gutter-block-end`, so a
+ * mask can leave that room opaque. The styled tier's fades use them.
+ *
  * The viewport's `scroll` and `scrollend` are sent again from the host, which
  * is the element you hold. A thumb dragged across the content sends one
  * `scrollend`, once it is let go. In React, bind them with `onScroll` and
@@ -60,7 +65,7 @@ const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as cons
  * @event {Event} scrollend - The content stopped scrolling. Sent from the host, as `scroll` is, and once for a thumb dragged across the content. Does not bubble.
  *
  * @csspart corner - The square where the two scrollbars meet, under `scrollbars`. Hidden unless both are drawn.
- * @csspart edges - The layer that draws the cues on the inline start and end edges.
+ * @csspart edges - The layer over the viewport. The styled tier draws the focus ring on it, and the painted fades at the inline start and end.
  * @csspart scrollbar - Each scrollbar, under `scrollbars`. Hidden on an axis that has none.
  * @csspart scrollbar-horizontal - The scrollbar along the inline axis, alongside `scrollbar`.
  * @csspart scrollbar-vertical - The scrollbar along the block axis, alongside `scrollbar`.
@@ -70,6 +75,8 @@ const EDGES = ['block-start', 'block-end', 'inline-start', 'inline-end'] as cons
  * @csspart thumb-vertical - The thumb of the vertical scrollbar, alongside `thumb`.
  * @csspart viewport - The scrolling box.
  *
+ * @cssproperty --scroll-area-gutter-block-end - The room the browser's horizontal scrollbar takes at the block end of the viewport, in pixels. Written on the `viewport` part while that scrollbar takes room, and absent while it draws over the content.
+ * @cssproperty --scroll-area-gutter-inline-end - The room the browser's vertical scrollbar takes at the inline end of the viewport, in pixels. Written on the `viewport` part while that scrollbar takes room, and absent while it draws over the content.
  * @cssproperty --scroll-area-scroll-fraction - How far along its axis the content is scrolled, from 0 at the start to 1 at the end. Written on each `scrollbar` part, so its thumb inherits it. Counted from the right on a right-to-left page.
  * @cssproperty --scroll-area-thumb-fraction - The share of the track the thumb covers, from 0 to 1, which is how much of the content is in view. Written on each `scrollbar` part.
  *
@@ -143,6 +150,14 @@ export class HelixHeadlessScrollArea extends HelixElement {
   @state()
   private scrolls = false
 
+  /**
+   * The room the browser's own scrollbars take, in pixels: the vertical one at
+   * the inline end, and the horizontal one at the block end. Zero where they are
+   * drawn over the content.
+   */
+  @state()
+  private gutter = { blockEnd: 0, inlineEnd: 0 }
+
   private watcher: ResizeObserver | undefined
 
   /**
@@ -203,6 +218,15 @@ export class HelixHeadlessScrollArea extends HelixElement {
     this.scrolls =
       (block && box.scrollHeight > box.clientHeight) ||
       (inline && box.scrollWidth > box.clientWidth)
+    /* The outer size less the inner one, which is the scrollbar and any border.
+       `clientLeft` cannot separate the two: WebKit reports 0 for a vertical
+       scrollbar it draws on the left of a right-to-left box. A new object only
+       when a number changed, so a scroll does not render again. */
+    const blockEnd = Math.max(0, box.offsetHeight - box.clientHeight)
+    const inlineEnd = Math.max(0, box.offsetWidth - box.clientWidth)
+    if (blockEnd !== this.gutter.blockEnd || inlineEnd !== this.gutter.inlineEnd) {
+      this.gutter = { blockEnd, inlineEnd }
+    }
     if (this.scrollbars) {
       this.bars.read(box)
     }
@@ -320,19 +344,32 @@ export class HelixHeadlessScrollArea extends HelixElement {
     this.measure()
   }
 
-  /** The axis `orientation` takes away, clipped where the content would overflow it. */
-  private get clipped(): string | typeof nothing {
+  /**
+   * The viewport's inline style: the axis `orientation` takes away, clipped
+   * where the content would overflow it, and the room each of the browser's
+   * scrollbars takes.
+   */
+  private get viewportStyle(): string | typeof nothing {
+    const rules: string[] = []
     if (this.orientation === 'vertical') {
-      return 'overflow-x: hidden'
+      rules.push('overflow-x: hidden')
+    } else if (this.orientation === 'horizontal') {
+      rules.push('overflow-y: hidden')
     }
-    return this.orientation === 'horizontal' ? 'overflow-y: hidden' : nothing
+    if (this.gutter.blockEnd > 0) {
+      rules.push(`--scroll-area-gutter-block-end: ${this.gutter.blockEnd}px`)
+    }
+    if (this.gutter.inlineEnd > 0) {
+      rules.push(`--scroll-area-gutter-inline-end: ${this.gutter.inlineEnd}px`)
+    }
+    return rules.length > 0 ? rules.join('; ') : nothing
   }
 
   protected override render(): TemplateResult {
     return html`<div
       data-scroller
       part="viewport"
-      style=${this.clipped}
+      style=${this.viewportStyle}
       role=${this.label ? 'region' : nothing}
       aria-label=${this.label || nothing}
       tabindex=${this.scrolls ? '0' : nothing}
