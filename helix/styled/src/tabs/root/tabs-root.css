@@ -287,3 +287,27 @@ slot[name="scroll-end-icon"]::slotted(*) {
     overflow: visible;
   }
 }
+
+/* `subtle`: the mark as a tint, with no edge and no shadow. The same wash the
+   tab under the pointer takes, a step stronger, so the current tab still reads
+   as current beside one being hovered. */
+:host([emphasis="subtle"]:not([variant])) [part="indicator"],
+:host([emphasis="subtle"][variant="segmented"]) [part="indicator"] {
+  --_indicator-border: 0;
+  --_indicator-color: var(
+    --tabs-indicator-color,
+    color-mix(in oklab, var(--helix-color-foreground) 8%, transparent)
+  );
+  --_indicator-shadow: none;
+}
+
+:host([emphasis="subtle"][variant="underlined"]) [part="indicator"] {
+  --_indicator-color: var(--tabs-indicator-color, var(--helix-color-foreground));
+}
+
+/* `dismiss-marks="hover"`: each tab reads this and shows its mark only while it
+   is current, hovered, or holds focus. A private property, inherited by the
+   tabs, because the set decides and each tab draws. */
+:host([dismiss-marks="hover"]) {
+  --_tabs-dismiss-rest: 0;
+}

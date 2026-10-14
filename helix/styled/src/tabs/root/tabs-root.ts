@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTabs } from '@fusion.dev/helix-headless/tabs'
 import type { CSSResultGroup } from 'lit'
+import { property } from 'lit/decorators.js'
 import { styles } from './tabs-root.css.js'
 
 /**
@@ -18,6 +19,19 @@ import { styles } from './tabs-root.css.js'
  *   row.
  * - `underlined` makes it a bar along the bottom of the strip, on a rule.
  * - `segmented` makes it the size of the tab's box, inside a sunken track.
+ *
+ * `emphasis="subtle"` makes the mark quieter, for tabs inside other chrome
+ * such as a pane's header: a tint with no edge or shadow, the same wash a
+ * subtle button takes.
+ *
+ * **Tabs with no panels are a strip.** Where what each tab stands for lives
+ * outside the set, such as a pane's pages or shells, leave the panels out: the
+ * tabs keep their keys and their selection, `active` and `helix-activate` say
+ * which is current, and the page shows the rest. Put a control that adds a tab,
+ * such as a plus, beside the set rather than in it, so the tab list holds tabs
+ * alone. With `dismissible` tabs, `dismiss-marks="hover"` keeps each close
+ * mark out of sight until the tab is current, under the pointer, or holds
+ * focus, as a browser's tabs do.
  *
  * @since 0.1.0
  * @status stable
@@ -49,6 +63,33 @@ import { styles } from './tabs-root.css.js'
 @customElement('helix-tabs')
 export class HelixTabs extends HelixHeadlessTabs {
   static override styles: CSSResultGroup = styles
+
+  /**
+   * When the close mark of each `dismissible` tab shows.
+   *
+   * Unset, or `always`, every mark shows. `hover` shows a tab's mark while it
+   * is current, under the pointer, or holds focus, and keeps its room on every
+   * tab, so the labels do not move as the marks come and go. For a strip of
+   * many dismissible tabs, where a mark on each reads as a row of crosses. A
+   * keyboard closes a tab with Delete whether its mark shows or not.
+   */
+  @property({ attribute: 'dismiss-marks', reflect: true })
+  dismissMarks?: 'always' | 'hover'
+
+  /**
+   * How loud the mark on the current tab is.
+   *
+   * Unset is the mark `variant` draws at rest. `subtle` is a tint with no
+   * edge or shadow: the raised pill becomes a wash, the `segmented` track's
+   * pill does the same inside it, and the `underlined` bar takes the
+   * foreground's ink in place of the primary color. For tabs inside other
+   * chrome, where a raised mark reads as a control laid on top of it.
+   *
+   * Independent of `variant`, since each of its marks has a quiet form: the two
+   * answer different questions, which is the test the axis registry applies.
+   */
+  @property({ reflect: true })
+  emphasis?: 'subtle'
 }
 
 declare global {
