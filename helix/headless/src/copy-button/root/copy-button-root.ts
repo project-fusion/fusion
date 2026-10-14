@@ -313,7 +313,7 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   }
 
   private readonly handleCopy = async (event: Event): Promise<void> => {
-    if (this.pending) {
+    if (this.refusesPress) {
       event.preventDefault()
       event.stopImmediatePropagation()
       return
@@ -368,12 +368,12 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
       part="button"
       type="button"
       aria-busy=${this.pending ? 'true' : nothing}
-      aria-disabled=${this.pending ? 'true' : nothing}
+      aria-disabled=${this.refusesPress ? 'true' : nothing}
       aria-label=${this.says}
       data-copied=${this.copied ? '' : nothing}
       data-failed=${this.failed ? '' : nothing}
       tabindex=${this.focusable ? nothing : '-1'}
-      ?disabled=${this.isDisabled}
+      ?disabled=${this.isDisabled && !this.heldDisabled}
       @click=${this.handleCopy}
       @keydown=${this.notePress}
       @pointerdown=${this.notePress}

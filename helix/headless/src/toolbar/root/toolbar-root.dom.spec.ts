@@ -146,6 +146,24 @@ describe('toolbar', () => {
     // Only one control participates, so the stop stays where it was.
     expect(stops(toolbar)[0]).toBe('in')
   })
+
+  /* It stays reachable so its tooltip can say why it is disabled. Left out of
+     the set, it kept its own stop, and Tab stopped in the toolbar twice. */
+  test('a disabled button kept in the tab order is one of its stops', async () => {
+    const toolbar = await mount(`
+      <helix-headless-toolbar label="Actions">
+        <helix-headless-button>One</helix-headless-button>
+        <helix-headless-button disabled focusable-when-disabled>Two</helix-headless-button>
+      </helix-headless-toolbar>`)
+    await settle(toolbar)
+    expect(stops(toolbar)).toEqual(['in', 'out'])
+    const controls = [...toolbar.children] as HTMLElement[]
+    controls[0]?.dispatchEvent(
+      new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'ArrowRight' }),
+    )
+    await settle(toolbar)
+    expect(stops(toolbar)).toEqual(['out', 'in'])
+  })
 })
 
 describe('what a toolbar moves between', () => {

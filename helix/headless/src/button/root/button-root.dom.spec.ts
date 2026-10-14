@@ -596,3 +596,134 @@ describe('what pressed the button', () => {
     expect(kinds).toEqual([])
   })
 })
+
+describe('a disabled button kept in the tab order', () => {
+  type Held = Updatable & {
+    disabled: boolean
+    focusableWhenDisabled: boolean
+    updateComplete: Promise<unknown>
+  }
+
+  /* Base UI's focusableWhenDisabled: the button stays a stop, so a tooltip
+     around it can say why it is disabled. */
+  test('stays focusable, and says it is disabled with aria-disabled', async () => {
+    const button = (await mount(
+      '<helix-headless-button disabled focusable-when-disabled>Save</helix-headless-button>',
+    )) as Held
+    const inner = control(button) as HTMLButtonElement
+    expect(inner.disabled).toBe(false)
+    expect(inner.getAttribute('aria-disabled')).toBe('true')
+    expect(inner.hasAttribute('tabindex')).toBe(false)
+    button.focus()
+    expect(button.shadowRoot?.activeElement).toBe(inner)
+  })
+
+  test('takes the native attribute again once the property is unset', async () => {
+    const button = (await mount(
+      '<helix-headless-button disabled focusable-when-disabled>Save</helix-headless-button>',
+    )) as Held
+    button.focusableWhenDisabled = false
+    await button.updateComplete
+    const inner = control(button) as HTMLButtonElement
+    expect(inner.disabled).toBe(true)
+    expect(inner.hasAttribute('aria-disabled')).toBe(false)
+  })
+
+  test('and so does an icon button', async () => {
+    const button = (await mount(
+      '<helix-headless-icon-button disabled focusable-when-disabled label="Back"></helix-headless-icon-button>',
+    )) as Held
+    const inner = control(button) as HTMLButtonElement
+    expect(inner.disabled).toBe(false)
+    expect(inner.getAttribute('aria-disabled')).toBe('true')
+  })
+
+  test('and an enabled one carries no aria-disabled', async () => {
+    const button = (await mount(
+      '<helix-headless-button focusable-when-disabled>Save</helix-headless-button>',
+    )) as Held
+    const inner = control(button) as HTMLButtonElement
+    expect(inner.hasAttribute('aria-disabled')).toBe(false)
+    expect(inner.disabled).toBe(false)
+  })
+
+  test('a press reaches no listener and sends no helix-press', async () => {
+    const button = (await mount(
+      '<helix-headless-button disabled focusable-when-disabled>Save</helix-headless-button>',
+    )) as Held
+    let heard = 0
+    let pressed = 0
+    button.addEventListener('click', () => {
+      heard += 1
+    })
+    button.addEventListener('helix-press', () => {
+      pressed += 1
+    })
+    const inner = control(button) as HTMLButtonElement
+    inner.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter' }))
+    inner.click()
+    button.click()
+    expect([heard, pressed]).toEqual([0, 0])
+  })
+
+  test('as a submit button, submits nothing, by a press or by Enter in a field', async () => {
+    document.body.innerHTML =
+      '<form><input name="a" /><input name="b" /><helix-headless-button type="submit" disabled focusable-when-disabled>Send</helix-headless-button></form>'
+    const form = document.querySelector('form') as HTMLFormElement
+    const button = document.querySelector('helix-headless-button') as Held
+    await button.updateComplete
+    Object.defineProperty(form, 'elements', { value: [...form.querySelectorAll('input'), button] })
+    let submitted = 0
+    form.requestSubmit = () => {
+      submitted += 1
+    }
+    form.addEventListener('submit', (event) => {
+      event.preventDefault()
+      submitted += 1
+    })
+    ;(control(button) as HTMLElement).click()
+    const enter = new KeyboardEvent('keypress', { bubbles: true, cancelable: true, key: 'Enter' })
+    form.querySelector('input')?.dispatchEvent(enter)
+    expect(submitted).toBe(0)
+    button.disabled = false
+    await button.updateComplete
+    ;(control(button) as HTMLElement).click()
+    expect(submitted).toBe(1)
+  })
+
+  test('so a tooltip around it opens on focus', async () => {
+    await import('../../tooltip/index.js')
+    const tip = (await mount(
+      '<helix-headless-tooltip content="No changes to save"><helix-headless-button disabled focusable-when-disabled>Save</helix-headless-button></helix-headless-tooltip>',
+    )) as Updatable & { open: boolean; updateComplete: Promise<unknown> }
+    const button = tip.querySelector('helix-headless-button') as Held
+    await button.updateComplete
+    const inner = control(button) as HTMLButtonElement
+    /* happy-dom never matches `:focus-visible` inside a shadow root, which a
+       browser does for keyboard focus there, so the match is supplied. What is
+       asserted is that the control takes focus and the tooltip hears it. */
+    const matches = inner.matches.bind(inner)
+    inner.matches = (selector: string) => selector === ':focus-visible' || matches(selector)
+    /* happy-dom has no element references, so the tooltip warns that it opened
+       with nothing linking it. That is the double's gap, and it is kept quiet. */
+    const warn = console.warn
+    console.warn = () => {}
+    try {
+      inner.focus()
+      expect(button.shadowRoot?.activeElement).toBe(inner)
+      inner.dispatchEvent(new Event('focusin', { bubbles: true, composed: true }))
+      await tip.updateComplete
+      expect(tip.open).toBe(true)
+      /* Enter on the button is refused, and the click it would raise does not
+         reach the tooltip, so the reason stays up. */
+      inner.click()
+      await tip.updateComplete
+      expect(tip.open).toBe(true)
+    } finally {
+      console.warn = warn
+      delete (globalThis as unknown as Record<symbol, unknown>)[
+        Symbol.for('fusion.helix.tooltip.warmth')
+      ]
+    }
+  })
+})
