@@ -20,7 +20,10 @@ import { property } from 'lit/decorators.js'
  * The toolbar is one tab stop, and the arrow keys move between its controls, so
  * three toolbars take three presses of Tab to pass. Any element the browser can
  * focus counts as a control, including your own elements. A child that takes no
- * focus, such as a divider, is skipped. A menu is reached at its trigger.
+ * focus, such as a divider, is skipped. A menu is reached at its trigger. A
+ * disabled control is skipped too, except a Button with
+ * `focusable-when-disabled`, which the arrows still reach so its tooltip can
+ * say why it is disabled.
  *
  * A Divider in the toolbar is a separator across the toolbar's axis, as React
  * Aria's is: vertical in a horizontal toolbar and horizontal in a vertical

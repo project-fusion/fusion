@@ -21,6 +21,23 @@ describe('button server output', () => {
     expect(rendered(markup, 'helix-button')).toMatch(/<button\s+part="button"/)
   })
 
+  /* Reachable by keyboard before any JavaScript, as a plain button is, so a
+     tooltip that says why it is disabled opens on the first Tab. */
+  test('a disabled button kept in the tab order is served without the native attribute', () => {
+    const served = rendered(
+      withoutStyles(ssr(html`<helix-button disabled focusable-when-disabled>Save</helix-button>`)),
+      'helix-button',
+    )
+    const control = served.match(/<button\s+part="button"[^>]*>/)?.[0] ?? ''
+    expect(control).toContain('aria-disabled="true"')
+    expect(control).not.toMatch(/\sdisabled[\s=>]/)
+    const plain = rendered(
+      withoutStyles(ssr(html`<helix-button disabled>Save</helix-button>`)),
+      'helix-button',
+    )
+    expect(plain.match(/<button\s+part="button"[^>]*>/)?.[0]).toMatch(/\sdisabled[\s=>]/)
+  })
+
   test('the served control is a button, with no anchor branch to choose', () => {
     const structure = withoutStyles(ssr(html`<helix-button>Go</helix-button>`))
     expect(rendered(structure, 'helix-button')).toMatch(/<button\s+part="button"/)
