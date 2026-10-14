@@ -6,6 +6,7 @@ import {
   drawDismiss,
   drawDismissGlyph,
   FocusScopeController,
+  focusableElements,
   HelixElement,
   headingsIn,
   hostAria,
@@ -461,6 +462,19 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     /* Re-checked, because both facts can have moved while that resolved. */
     if (this.open && !dialog.open && this.isConnected) {
       dialog.showModal()
+      /* **WebKit leaves focus on the dialog** where the first control is
+         inside a component's shadow root, as a text area's field is: its
+         focusing steps do not count a host that delegates focus, where
+         Chromium's do. Measured in both on the same page, Chromium's focus
+         was in the field and WebKit's on the dialog, so the first control is
+         focused here when the browser chose none, or put focus nowhere in the
+         dialog at all. */
+      const chose =
+        this.matches(':focus-within') &&
+        !(this.renderRoot instanceof ShadowRoot && this.renderRoot.activeElement === dialog)
+      if (!chose) {
+        focusableElements(this)[0]?.focus()
+      }
     }
   }
 

@@ -393,6 +393,37 @@ if (hasLayout()) {
       expect(native.matches(':modal')).toBe(true)
       host.close()
     })
+
+    /* WebKit's focusing steps pass over a host that delegates focus, so its
+       focus stayed on the dialog where the first control was a text area's
+       field, while Chromium's went into it. The dialog now finishes the job,
+       and this holds it in every engine the specs run in. */
+    test('opening focuses a first control inside a component, in every engine', async () => {
+      if (!customElements.get('spec-delegating-field')) {
+        customElements.define(
+          'spec-delegating-field',
+          class extends HTMLElement {
+            constructor() {
+              super()
+              this.attachShadow({ delegatesFocus: true, mode: 'open' }).innerHTML =
+                '<input aria-label="Note">'
+            }
+          },
+        )
+      }
+      const host = (await mount(
+        `<helix-headless-dialog label="Send feedback">
+          <h2 slot="header">Send feedback</h2>
+          <div><spec-delegating-field></spec-delegating-field></div>
+        </helix-headless-dialog>`,
+      )) as Dialog
+      host.show()
+      await host.updateComplete
+      await new Promise((resolve) => setTimeout(resolve, 50))
+      const field = host.querySelector('spec-delegating-field')?.shadowRoot?.querySelector('input')
+      expect(field?.matches(':focus')).toBe(true)
+      host.close()
+    })
   })
 }
 
