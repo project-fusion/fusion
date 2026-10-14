@@ -212,7 +212,15 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
     /* Once the row is first drawn, which for a page's row is when the page
        first shows: until then there is no row to name. */
     if (this.partNamed('item')) {
-      auditName(this, () => this.partNamed('item'), 'row')
+      auditName(
+        this,
+        /* A row that stopped drawing before the read, such as a page's row
+           drawn before the stack said it is off the page showing, is read
+           when it is next drawn. Null would say the host is the control,
+           and the host has no words of its own. */
+        () => this.partNamed('item') ?? undefined,
+        'row',
+      )
     }
   }
 

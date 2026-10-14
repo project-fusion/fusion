@@ -1,5 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
+import { QUIET } from '@fusion.dev/helix-core/audits/children'
 import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 /* A command is an option, the Option family's. The palette registers its own
@@ -20,6 +21,8 @@ const told = async (markup: string): Promise<Report[]> => {
   document.body.innerHTML = markup
   await settle(document.body.firstElementChild as Updatable)
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+  /* The audit reports once the page has gone quiet for `QUIET` milliseconds. */
+  await new Promise((resolve) => setTimeout(resolve, QUIET + 50))
   const after = (globalThis as Record<symbol, unknown>)[key]
   return ((Array.isArray(after) ? after.slice(before) : []) as Report[]).filter(
     (one) => one.kind === 'unregistered-part',
@@ -64,6 +67,48 @@ describe('a palette whose commands were never imported', () => {
     const host = document.body.firstElementChild as HTMLElement
     const list = part(host, 'listbox') as HTMLElement & { options: unknown[] }
     expect(list.options).toHaveLength(2)
+  })
+
+  /* An app importing each family with `import()` registers each as its chunk
+     lands: the palette can paint before its commands are defined. */
+  test('with the import landing after the palette painted, says nothing', async () => {
+    const { HelixHeadlessCommand } = await import('../index.js')
+    const { HelixHeadlessDialog } = await import('../../dialog/index.js')
+    const { HelixHeadlessListbox } = await import('../../listbox/index.js')
+    const { HelixHeadlessOption } = await import('../../option/index.js')
+    for (const [tag, base] of [
+      ['spec-late-cmd-command', HelixHeadlessCommand],
+      ['spec-late-cmd-dialog', HelixHeadlessDialog],
+      ['spec-late-cmd-listbox', HelixHeadlessListbox],
+    ] as const) {
+      customElements.define(
+        tag,
+        class extends (base as unknown as typeof HelixHeadlessListbox) {
+          static override tier = 'spec-late-cmd-'
+        },
+      )
+    }
+    const key = Symbol.for('fusion.dev/helix/runtime-log')
+    const log = (globalThis as Record<symbol, unknown>)[key]
+    const before = Array.isArray(log) ? log.length : 0
+    document.body.innerHTML = `<spec-late-cmd-command inline>
+      <spec-late-cmd-option value="new">New file</spec-late-cmd-option>
+    </spec-late-cmd-command>`
+    await settle(document.body.firstElementChild as Updatable)
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+    await new Promise((resolve) => setTimeout(resolve, QUIET / 2))
+    customElements.define(
+      'spec-late-cmd-option',
+      class extends (HelixHeadlessOption as unknown as typeof HelixHeadlessListbox) {
+        static override tier = 'spec-late-cmd-'
+      },
+    )
+    await new Promise((resolve) => setTimeout(resolve, QUIET + 50))
+    const after = (globalThis as Record<symbol, unknown>)[key]
+    const heard = ((Array.isArray(after) ? after.slice(before) : []) as Report[]).filter(
+      (one) => one.kind === 'unregistered-part',
+    )
+    expect(heard).toEqual([])
   })
 })
 
