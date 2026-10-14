@@ -375,8 +375,8 @@ is not told its children are missing while their chunks are in flight.
 `auditEntry`, which reports a property whose entry was never imported, such as
 Menu's `filterable` without `menu/filter`, waits the same way. Listbox calls `auditChildren` with `drawn` when `items` is set, which reports the tag
 without one in the light DOM. It is a development-only audit, `#audit-children`, as `missing-name` is.
-The same kind reports a Filter Menu written without `filter-input/menu`, which
-is the first rule's case: a part with an entry of its own.
+Filter Input reports a Filter Menu written without `filter-input/menu` through
+`auditChildren` too, which is the first rule's case: a part with an entry of its own.
 
 **A helper a container shares with the child's family lives in a module that
 registers nothing.** `optionsAmong` and `isOption` are in `option/among.ts` and
