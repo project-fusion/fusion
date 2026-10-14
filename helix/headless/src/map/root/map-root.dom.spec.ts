@@ -470,16 +470,19 @@ describe('map controls on a right-to-left page', () => {
   test('the controls are one column in reading order, the arrows round a compass', async () => {
     const plain = await map('controls="pan"')
     const inCompass = (host: Map): string[] =>
-      [...(control(host, 'compass')?.children ?? [])].map((one) => one.getAttribute('part') ?? '')
+      [...(control(host, 'compass')?.children ?? [])]
+        // Each button's tooltip sits beside it and has no part.
+        .filter((one) => one.hasAttribute('part'))
+        .map((one) => one.getAttribute('part') ?? '')
     expect(inCompass(plain)).toEqual(['pan-up', 'pan-start', 'face-north', 'pan-end', 'pan-down'])
     expect((await inner(control(plain, 'face-north')))?.getAttribute('aria-label')).toBe(
       'Face north',
     )
 
     const host = await map('controls="pan zoom rotate tilt fullscreen"')
-    const column = [...(control(host, 'controls')?.children ?? [])].map(
-      (one) => one.getAttribute('part') ?? '',
-    )
+    const column = [...(control(host, 'controls')?.children ?? [])]
+      .filter((one) => one.hasAttribute('part'))
+      .map((one) => one.getAttribute('part') ?? '')
     expect(column).toEqual(['fullscreen', 'tilt', 'zoom-in', 'zoom-out', 'compass'])
     expect(inCompass(host)).toEqual([
       'rotate-left',

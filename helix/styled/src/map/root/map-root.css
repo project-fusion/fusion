@@ -241,8 +241,10 @@
 }
 
 /* **A panel behind the arrows**, where a page asks for them, so they read
-   as one control with the compass. The compass alone is one round button. */
-[part="compass"]:has(> :not([part="face-north"])) {
+   as one control with the compass. The compass alone is one round button.
+   Only a child with a part counts: each button's tooltip beside it has none,
+   and draws nothing, so a compass alone stays one round button. */
+[part="compass"]:has(> [part]:not([part="face-north"])) {
   background-color: var(--viewport-control-background-color, var(--helix-color-surface-overlay));
   box-shadow:
     var(--helix-shadow-floating),

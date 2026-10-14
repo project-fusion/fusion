@@ -856,6 +856,12 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
       })
       return
     }
+    /* The same exception the wrapping form has: a trigger whose own name is
+       this text loses a reader nothing, which is every built-in control a
+       component names with a tooltip beside it. */
+    if (this.triggerSays(this.describedText)) {
+      return
+    }
     reportRuntime({
       kind: 'unlinked-trigger',
       message:

@@ -7,6 +7,7 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './terminal-root.css.js'
 import '../../button/index.js'
 import '../../icon-button/index.js'
+import '../../tooltip/index.js'
 import '../../toolbar/index.js'
 
 /**

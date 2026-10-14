@@ -6,6 +6,7 @@ import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as viewportStyles } from '../../shared/viewport/viewport.css.js'
 import { styles } from './map-root.css.js'
 import '../../icon-button/index.js'
+import '../../tooltip/index.js'
 
 /**
  * @summary A frame around a map drawn by another library.
