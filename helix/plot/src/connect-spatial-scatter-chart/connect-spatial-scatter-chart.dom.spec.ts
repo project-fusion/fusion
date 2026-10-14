@@ -100,6 +100,7 @@ describe('connectSpatialScatterChart', () => {
       contours: false,
       drops: false,
       emphasis: 'solid',
+      muted: false,
       through: 1,
     })
     const drawn = told.drawn.length

@@ -17,6 +17,8 @@ export interface BarCell {
   /** The row of the grid in depth it stands in: its series, or the one row of a stacked chart. */
   lane: number
   row: number
+  /** The tone its cell names, which colors its own bar. */
+  tone?: string | undefined
   value?: number | undefined
 }
 
@@ -52,14 +54,23 @@ export type SpatialBarChartConnection = PlotConnection
  * one of your own. The connection draws the chart's bars in the driver, each
  * series in a series color, marks the bar the keys rest on, turns the view
  * for Shift with an arrow, and puts a bar pressed in the drawing on the
- * chart's reading. Once the driver has drawn, the chart hides its own SVG
- * drawing; `disconnect()` shows it again.
+ * chart's reading. A bar whose cell names a tone takes the page's
+ * `--spatial-bar-chart-tone-*` color. Once the driver has drawn, the chart
+ * hides its own SVG drawing; `disconnect()` shows it again.
  */
 export const connectSpatialBarChart = (
   frame: HTMLElement,
   driver: SpatialBarChartDriver,
 ): SpatialBarChartConnection =>
   connectPlot(frame, driver, {
+    /* Each tone is the token the chart's own drawing paints it in. */
+    extraOf: (field) =>
+      Object.fromEntries(
+        [...new Set(field.cells.flatMap((cell) => (cell.tone ? [cell.tone] : [])))].map((tone) => [
+          `tone-${tone}`,
+          `var(--spatial-bar-chart-tone-${tone}, var(--helix-color-primary))`,
+        ]),
+      ),
     groupsOf: (field) => field.series.length,
     name: 'connectSpatialBarChart',
     readings: (field) => field.readings,

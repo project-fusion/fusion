@@ -49,7 +49,10 @@ const FOOTPRINT = 0.6
  *
  * **Each bar is a block from zero to its value**, or under `stacked` from
  * the blocks below it, on a grid of categories across and series in depth, in a box with a grid on its floor and two of
- * its walls, lit from above. Each series takes a series color from the theme.
+ * its walls, lit from above. Each series takes a series color from the theme,
+ * and a bar whose cell names a tone takes that tone's. Under the chart's
+ * `emphasis="muted"`, every other bar is the neutral ink. The chart's own
+ * drawing alone draws a row, the glow, a toned bar's value, and the growth.
  *
  * **Dragging turns the box, and the wheel and a pinch bring it nearer.**
  * Shift with an arrow on the chart turns it a step. It never turns by itself.
@@ -116,7 +119,7 @@ export const threeBarDriver = (
       )
       const width = spacing * FOOTPRINT
       const page = new Color(colors.page)
-      const { emphasis, through } = colors.look
+      const { emphasis, muted, through } = colors.look
       const solids: BufferGeometry[] = []
       const lines: BufferGeometry[] = []
       drawnCells = []
@@ -125,7 +128,15 @@ export const threeBarDriver = (
         if (cell.value === undefined || (next.stacked && cell.value === 0)) {
           return
         }
-        const tone = new Color(colors.groups[cell.depth % colors.groups.length] ?? colors.ink)
+        const toned = cell.tone ? colors.extra[`tone-${cell.tone}`] : undefined
+        /* Muted, a bar is the neutral ink a third of the way from the
+           ground, as the top of one in the chart's own drawing is, unless
+           its cell names a tone. */
+        const tone = toned
+          ? new Color(toned)
+          : muted
+            ? new Color(colors.ground).lerp(new Color(colors.ink), 0.3)
+            : new Color(colors.groups[cell.depth % colors.groups.length] ?? colors.ink)
         /* As the chart's own drawing paints them: `outlined` fades the faces
            toward the page and draws the edges in the series' color, and
            `subtle` is a faint wash under the same edges. */
@@ -133,7 +144,7 @@ export const threeBarDriver = (
         /* From where the block starts: zero, or the blocks below it in a
            stacked column. */
         const start = inBox(next.axes.y, cell.from) * ey
-        const top = inBox(next.axes.y, (cell.from) + cell.value) * ey
+        const top = inBox(next.axes.y, cell.from + cell.value) * ey
         const tall = Math.max(Math.abs(top - start), 1e-3)
         const x = inBox(next.axes.x, cell.across) * ex
         const z = inBox(next.axes.z, cell.lane) * ez
