@@ -1434,30 +1434,13 @@ export class HelixHeadlessFilterInput extends MixinVoice(
    * Says so when a picker is written in the field and never registered.
    *
    * The picker has an entry of its own, so a page that imports only the field
-   * gets an inert element there: a trigger that opens nothing. Asked once the
-   * page has loaded and painted, so an entry a later module imports is not
-   * taken for a missing one.
+   * gets an inert element there: a trigger that opens nothing. Core's
+   * `auditChildren` asks once the page has loaded and painted, and again once
+   * it has registered nothing for `QUIET` milliseconds, so an entry a later
+   * module or a later chunk imports is not taken for a missing one.
    */
   private auditPicker(): void {
-    const { tier } = this.constructor as typeof HelixFormElement
-    const tag = `${tier}filter-menu`
-    const check = (): void => {
-      if (this.isConnected && this.querySelector(tag) && !customElements.get(tag)) {
-        reportRuntime({
-          kind: 'unregistered-part',
-          message: `<${tag}> in <${this.localName}> is not registered, so its trigger opens nothing. ${howToRegister({ entry: 'filter-input/menu', host: this.localName, tag, tier })}`,
-          tag: this.localName,
-        })
-      }
-    }
-    const frame = (): void => {
-      requestAnimationFrame(check)
-    }
-    if (document.readyState === 'complete') {
-      frame()
-    } else {
-      window.addEventListener('load', frame, { once: true })
-    }
+    auditChildren(this, 'filter-menu', 'filter-input/menu', 'its trigger opens nothing')
   }
 
   protected override updated(changed: PropertyValues): void {

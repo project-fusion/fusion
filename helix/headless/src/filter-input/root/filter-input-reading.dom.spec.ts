@@ -1,5 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
+import { QUIET } from '@fusion.dev/helix-core/audits/children'
 import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -428,13 +429,20 @@ describe('a field that keeps its own chips', () => {
    and writes a picker gets an inert element, and is told which entry to add,
    or on a tier of its own which tag to define. */
 describe('a picker whose entry was never imported', () => {
-  const told = async (markup: string): Promise<{ kind: string; message: string }[]> => {
+  /** What the page was told about `markup`, with `late` run after it painted. */
+  const told = async (
+    markup: string,
+    late?: () => Promise<void>,
+  ): Promise<{ kind: string; message: string }[]> => {
     const key = Symbol.for('fusion.dev/helix/runtime-log')
     const log = (globalThis as Record<symbol, unknown>)[key]
     const before = Array.isArray(log) ? log.length : 0
     document.body.innerHTML = markup
     await settle(document.body.firstElementChild as Updatable)
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+    await late?.()
+    /* The audit reports once the page has gone quiet for `QUIET` milliseconds. */
+    await new Promise((resolve) => setTimeout(resolve, QUIET + 50))
     const after = (globalThis as Record<symbol, unknown>)[key]
     return (Array.isArray(after) ? after.slice(before) : []) as { kind: string; message: string }[]
   }
@@ -454,6 +462,33 @@ describe('a picker whose entry was never imported', () => {
     expect(report?.message).toBe(
       '<spec-filter-menu> in <spec-filter-input> is not registered, so its trigger opens nothing. Define <spec-filter-menu> as you defined <spec-filter-input>.',
     )
+  })
+
+  /* An app importing the picker's entry with `import()` registers it as its
+     chunk lands, after the field has painted: the picker is late, and is not
+     missing. */
+  test('and one registered after the field painted is not', async () => {
+    const { HelixHeadlessFilterInput } = await import('../index.js')
+    const { HelixHeadlessFilterMenu } = await import('../menu/index.js')
+    customElements.define(
+      'spec-late-filter-input',
+      class extends HelixHeadlessFilterInput {
+        static override tier = 'spec-late-'
+      },
+    )
+    const heard = await told(
+      '<spec-late-filter-input label="Filter rows"><spec-late-filter-menu slot="start"></spec-late-filter-menu></spec-late-filter-input>',
+      async () => {
+        await new Promise((resolve) => setTimeout(resolve, QUIET / 2))
+        customElements.define(
+          'spec-late-filter-menu',
+          class extends HelixHeadlessFilterMenu {
+            static override tier = 'spec-late-'
+          },
+        )
+      },
+    )
+    expect(heard.filter((one) => one.kind === 'unregistered-part')).toEqual([])
   })
 
   test('and a registered one is not', async () => {
