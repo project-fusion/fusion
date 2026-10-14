@@ -4,6 +4,13 @@
      current step it reads as the loudest thing in a row whose text is 14px, and
      a tree is a list of names with a hint of structure beside them. */
   --_tree-chevron: var(--tree-chevron-size, var(--helix-size-icon-tight));
+  /* The row's padding above and below its line, from the region's density.
+     *Derived from the target size, so `md` is exactly `space-xs`.** The tight
+     target there is 2rem, so a rem off it and halved is .5rem, which is what the
+     padding was before; `sm` gives about 5px and `lg` about 11. Spacing tokens
+     do not move with density, so a padding of `space-xs` kept every row 35px
+     tall in a `data-density="sm"` region whose controls were 26. */
+  --_tree-pad: calc((var(--helix-size-control-tight) - 1rem) / 2);
   display: block;
 }
 
@@ -35,7 +42,7 @@
      nested; at `subordinate` a nested row is handed the step below; at
      `heading` this is what every child keeps while the branch over it is handed
      the label size below. */
-  font-size: var(--_tree-text, var(--helix-text-sm));
+  font-size: var(--_tree-text, var(--helix-text-control));
   gap: var(--helix-space-2xs);
   /* A hair between rows, and on the row rather than the item. On the item it
      added up, a parent's under its last child's, so the gaps in one tree came
@@ -45,10 +52,10 @@
      rather than one sized to the height of its own text. */
   block-size: max(
     var(--tree-row-size, var(--helix-size-control-tight)),
-    calc(1lh + var(--helix-space-xs) * 2)
+    calc(1lh + var(--_tree-pad) * 2)
   );
   min-block-size: var(--tree-row-size, var(--helix-size-control-tight));
-  padding-block: var(--helix-space-xs);
+  padding-block: var(--_tree-pad);
   padding-inline: var(--helix-space-xs);
   /* One step per level, and the step is the gutter a chevron sits in. */
   padding-inline-start: calc(
@@ -108,7 +115,7 @@
     --_tree-row-ink,
     var(--_tree-heading-ink, var(--tree-row-color, var(--helix-color-foreground-muted)))
   );
-  font-size: var(--_tree-heading-text, var(--_tree-text, var(--helix-text-sm)));
+  font-size: var(--_tree-heading-text, var(--_tree-text, var(--helix-text-control)));
   font-weight: var(--helix-weight-medium);
   letter-spacing: var(--_tree-heading-tracking, var(--helix-tracking-normal));
 }
@@ -128,7 +135,7 @@
    row is under another one, which the indent already says; the step says that
    being under it means something. */
 slot[name="children"]::slotted(*) {
-  --_tree-text: var(--_tree-nested-text, var(--helix-text-sm));
+  --_tree-text: var(--_tree-nested-text, var(--helix-text-control));
 }
 
 [part="row"]:hover {
