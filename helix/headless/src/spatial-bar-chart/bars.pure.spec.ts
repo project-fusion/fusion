@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { barsOf } from './bars.js'
+import { boxView, SPATIAL_VIEW } from '../spatial-scatter-chart/view.js'
+import { barsDrawn, barsOf, paintOrder } from './bars.js'
 
 const row = (label: string, ...values: Array<number | undefined>) => ({
   cells: values.map((value, at) => ({
@@ -46,4 +47,46 @@ describe('the bars', () => {
     expect(across).toBe(1)
     expect(depth).toBeCloseTo(0.25)
   })
+})
+
+/* Tokens per call read as three series one behind another in depth: the
+   cached input, the tallest, hid the other two on every call. Stacked, each
+   call is one column of its parts. */
+describe('stacked bars', () => {
+  test('each block starts on the ones before it, in one row, and colors by its series', () => {
+    const field = barsOf([row('1', 4, 6, 2), row('2', 3, undefined, 5)], [0, 1, 2], true)
+    expect(field.lanes).toBe(1)
+    expect(field.cells.map((cell) => [cell.lane, cell.depth, cell.from, cell.value])).toEqual([
+      [0, 0, 0, 4],
+      [0, 1, 4, 6],
+      [0, 2, 10, 2],
+      [0, 0, 0, 3],
+      [0, 1, 3, undefined],
+      [0, 2, 3, 5],
+    ])
+    expect(field.axes.z.labels).toEqual([])
+  })
+
+  test('the value axis fits the tallest stack, and a negative hangs on the negatives before it', () => {
+    const tall = barsOf([row('1', 40, 50), row('2', 10, 5)], [0, 1], true)
+    expect(tall.axes.y.range[1]).toBeGreaterThanOrEqual(90)
+    const mixed = barsOf([row('1', 10, -4, -6)], [0, 1, 2], true)
+    expect(mixed.cells.map((cell) => cell.from)).toEqual([0, 0, -4])
+    expect(mixed.axes.y.range[0]).toBeLessThanOrEqual(-10)
+  })
+
+  test('a column is painted from the floor up, so a block below never shows through one above', () => {
+    const field = barsOf([row('1', 4, 6, 2)], [0, 1, 2], true)
+    const { projection } = boxView(field.axes, SPATIAL_VIEW)
+    const order = paintOrder(projection, barsDrawn(field, projection))
+    expect(order.map((bar) => field.cells[bar.index]?.depth)).toEqual([0, 1, 2])
+  })
+})
+
+test('a zero in a stack draws no block, and a zero standing alone is still a plate', () => {
+  const stacked = barsOf([row('1', 0, 9, 4)], [0, 1, 2], true)
+  const { projection } = boxView(stacked.axes, SPATIAL_VIEW)
+  expect(barsDrawn(stacked, projection).map((bar) => stacked.cells[bar.index]?.depth)).toEqual([1, 2])
+  const alone = barsOf([row('1', 0, 9, 4)], [0, 1, 2])
+  expect(barsDrawn(alone, boxView(alone.axes, SPATIAL_VIEW).projection)).toHaveLength(3)
 })
