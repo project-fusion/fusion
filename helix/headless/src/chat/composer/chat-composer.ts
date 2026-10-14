@@ -213,6 +213,14 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
   rows = 1
 
   /**
+   * Whether the draft waits to be sent, such as while an attachment is still
+   * read. The send button is unavailable and Enter does not send, while the
+   * field stays open. The stop button shown while `busy` still stops.
+   */
+  @property({ attribute: 'send-disabled', type: Boolean })
+  sendDisabled = false
+
+  /**
    * Label for the send button.
    */
   @words
@@ -336,7 +344,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
     /* What was heard so far stays in the draft and goes with it. */
     this.stopListening()
     const value = this.value.trim()
-    if (this.isDisabled || (this.busy && !this.queue)) {
+    if (this.isDisabled || this.sendDisabled || (this.busy && !this.queue)) {
       return false
     }
     /* Nothing is sent, and a required composer says why, as a draft the form
@@ -547,7 +555,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
       part="send"
       type="button"
       aria-label=${this.busy ? this.stopLabel : this.sendLabel}
-      ?disabled=${this.isDisabled}
+      ?disabled=${this.isDisabled || (this.sendDisabled && !this.busy)}
       @click=${this.busy ? this.handleStop : this.handleSend}
     >
       <svg part="mark" fill="currentColor" viewBox=${mark.viewBox} aria-hidden="true">
