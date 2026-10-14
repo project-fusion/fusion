@@ -120,6 +120,15 @@ describe('what the host passes to its input', () => {
     expect(input.getAttribute('autocapitalize')).toBe('off')
   })
 
+  test('whether the browser corrects words, which an address turns off', async () => {
+    const host = await mount(
+      '<helix-headless-input label="Address" autocorrect="off"></helix-headless-input>',
+    )
+    expect(control(host).getAttribute('autocorrect')).toBe('off')
+    const plain = await mount('<helix-headless-input label="Name"></helix-headless-input>')
+    expect(control(plain).hasAttribute('autocorrect')).toBe(false)
+  })
+
   /* `type="number"` was accepted with no bounds at all, so a `max` written on
      it was ignored and 9 passed for a field that allows 5. */
   test('the bounds of a number, which the platform then judges', async () => {
