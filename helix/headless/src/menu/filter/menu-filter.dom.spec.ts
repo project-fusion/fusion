@@ -1,5 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import { QUIET } from '@fusion.dev/helix-core/audits/children'
 import { hasState, mount, part, registerDom, role, settle } from '@fusion.dev/helix-testing/dom'
 
 /* happy-dom before the element, for the reason the root's own spec gives. The
@@ -240,8 +241,35 @@ describe('a filterable menu', () => {
     expect(part(host, 'search-field')).toBeNull()
     expect(part(host, 'surface')?.getAttribute('role')).toBe('menu')
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+    /* The audit reports once the page has gone quiet for `QUIET` milliseconds. */
+    await new Promise((resolve) => setTimeout(resolve, QUIET + 50))
     expect(warnings).toEqual([
       "<helix-headless-menu> has `filterable` and its entry is not imported, so it shows no filter field. Import '@fusion.dev/helix-headless/menu/filter'.",
     ])
+  })
+
+  /* An app importing the entry with `import()` gives the menu its filter as
+     the chunk lands, after the menu painted. `filterMenu` is what the entry
+     runs when it lands. */
+  test('with the entry landing after the menu painted, draws the field and says nothing', async () => {
+    const { filterMenu } = await import('./index.js')
+    const { HelixHeadlessMenu } = await import('../index.js')
+    /* A tag of its own, since the audit reports each tag once a page. */
+    customElements.define('spec-late-filter-menu', class extends HelixHeadlessMenu {})
+    const warnings: string[] = []
+    console.warn = (message: string) => warnings.push(message)
+    const host = (await mount(
+      `<spec-late-filter-menu filterable><button slot="trigger">Edit</button>${ROWS}</spec-late-filter-menu>`,
+    )) as Menu
+    ;(host as unknown as { filterer: unknown }).filterer = undefined
+    host.show()
+    await settle(host)
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+    await new Promise((resolve) => setTimeout(resolve, QUIET / 2))
+    filterMenu(HelixHeadlessMenu)
+    await settle(host)
+    expect(part(host, 'search-field')).not.toBeNull()
+    await new Promise((resolve) => setTimeout(resolve, QUIET + 50))
+    expect(warnings).toEqual([])
   })
 })

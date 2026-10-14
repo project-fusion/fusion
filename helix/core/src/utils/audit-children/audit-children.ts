@@ -42,34 +42,36 @@ const activity = (): number =>
   definedTags().length + (performance.getEntriesByType?.('resource').length ?? 0)
 
 /**
- * Resolves once `tag` is defined, or once the page has loaded and registered
- * nothing for `QUIET` milliseconds, whichever comes first.
+ * Resolves once the page has loaded and registered nothing for `QUIET`
+ * milliseconds. Both audits wait on it, so an entry a later chunk imports is
+ * not taken for a missing one.
  *
  * **Twenty periods at most.** A page that loads something more often than
- * every `QUIET` milliseconds is never quiet, so its missing child is reported
- * after twenty periods, ten seconds late.
+ * every `QUIET` milliseconds is never quiet, so what it is missing is
+ * reported after twenty periods, ten seconds late.
  */
+const whenQuiet = (): Promise<void> =>
+  new Promise<void>((resolve) => {
+    let seen = activity()
+    let periods = 0
+    const wait = (): void => {
+      setTimeout(() => {
+        const now = activity()
+        periods += 1
+        if (now === seen || periods >= 20) {
+          resolve()
+        } else {
+          seen = now
+          wait()
+        }
+      }, QUIET)
+    }
+    wait()
+  })
+
+/** Resolves once `tag` is defined, or once the page is quiet, whichever comes first. */
 const settled = (tag: string): Promise<unknown> =>
-  Promise.race([
-    customElements.whenDefined(tag),
-    new Promise<void>((resolve) => {
-      let seen = activity()
-      let periods = 0
-      const wait = (): void => {
-        setTimeout(() => {
-          const now = activity()
-          periods += 1
-          if (now === seen || periods >= 20) {
-            resolve()
-          } else {
-            seen = now
-            wait()
-          }
-        }, QUIET)
-      }
-      wait()
-    }),
-  ])
+  Promise.race([customElements.whenDefined(tag), whenQuiet()])
 
 /**
  * Reports a child from another family that a container holds and nobody
@@ -154,7 +156,9 @@ export const auditChildren = (
  * `attribute` is the one the page set, `entry` the entry after the tier's
  * package, such as `menu/filter`, and `consequence` what the missing entry
  * costs, after "so". `missing` is asked once the page has loaded and painted,
- * so an entry a later module imports is not taken for a missing one.
+ * and again once the page has loaded and registered nothing for `QUIET`
+ * milliseconds, so an entry a later module or a later chunk imports is not
+ * taken for a missing one.
  */
 export const auditEntry = (
   host: HTMLElement,
@@ -170,8 +174,14 @@ export const auditEntry = (
   if (reported.has(key)) {
     return
   }
-  afterPaint(() => {
-    if (reported.has(key) || !host.isConnected || !missing()) {
+  /** Whether there is nothing to report now. */
+  const fine = (): boolean => reported.has(key) || !host.isConnected || !missing()
+  const check = async (): Promise<void> => {
+    if (fine()) {
+      return
+    }
+    await whenQuiet()
+    if (fine()) {
       return
     }
     reported.add(key)
@@ -182,5 +192,6 @@ export const auditEntry = (
       message: `<${host.localName}> has \`${attribute}\` and its entry is not imported, so ${consequence}. Import '${pkg}/${entry}'.`,
       tag: host.localName,
     })
-  })
+  }
+  afterPaint(() => void check())
 }
