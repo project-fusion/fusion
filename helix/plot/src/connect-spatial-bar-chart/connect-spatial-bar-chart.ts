@@ -9,8 +9,13 @@ import {
 export interface BarCell {
   across: number
   column: number
+  /** Its series, which colors it. */
   depth: number
+  /** Where its block starts: zero, or under `stacked` the blocks below it. */
+  from: number
   label: string
+  /** The row of the grid in depth it stands in: its series, or the one row of a stacked chart. */
+  lane: number
   row: number
   value?: number | undefined
 }
@@ -25,8 +30,12 @@ export interface BarField {
   axes: Axes
   categories: readonly string[]
   cells: readonly BarCell[]
+  /** How many rows of bars stand in depth: one a series, or one in all when stacked. */
+  lanes: number
   readings: number
   series: readonly string[]
+  /** Whether a category's series stand in one column, each on the ones before it. */
+  stacked: boolean
 }
 
 /** A renderer for a Spatial Bar Chart: `focus` and `onPress` take a bar's index in `field.cells`. */
