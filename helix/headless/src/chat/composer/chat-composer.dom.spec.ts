@@ -159,6 +159,33 @@ describe('the value', () => {
 })
 
 describe('Enter', () => {
+  test('sends nothing while busy, and leaves the draft', async () => {
+    const element = await composer('busy')
+    await type(element, 'next')
+    let heard = 0
+    element.addEventListener('helix-send', () => {
+      heard += 1
+    })
+    press(element, 'Enter')
+    expect(heard).toBe(0)
+    expect(element.value).toBe('next')
+  })
+
+  /* A page that queues a turn, or hands it to the reply under way, takes
+     the send while busy, and the button is still the stop button. */
+  test('with queue it sends while busy, and the button still stops', async () => {
+    const element = await composer('busy queue')
+    await type(element, 'next')
+    let heard = ''
+    element.addEventListener('helix-send', (event) => {
+      heard = (event as CustomEvent<{ value: string }>).detail.value
+    })
+    press(element, 'Enter')
+    expect(heard).toBe('next')
+    expect(element.value).toBe('')
+    expect(part(element, 'send')?.getAttribute('aria-label')).toBe('Stop')
+  })
+
   test('sends, and takes the keystroke with it', async () => {
     const element = await composer()
     await type(element, 'hello')

@@ -68,7 +68,9 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * **`busy` says a reply is on its way**, and turns the send button into a
  * stop button, named by `stop-label`, that sends `helix-stop`. The field
  * stays open so the reader can write the next turn, and Enter does not send
- * it until `busy` is cleared.
+ * it until `busy` is cleared. With `queue`, Enter sends while `busy` too, for
+ * a page that holds a turn until the reply ends or hands it to the reply
+ * under way; the button stays the stop button.
  *
  * @since 0.1.0
  * @status stable
@@ -122,6 +124,18 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
    */
   @property({ reflect: true, type: Boolean })
   busy = false
+
+  /**
+   * Whether Enter sends while `busy`, for a page that queues the turn or
+   * hands it to the reply under way.
+   *
+   * Off by default, because a page that does neither would drop the turn: it
+   * has nowhere to put a message while a reply is coming. The button stays
+   * the stop button either way, since stopping is still the one thing it
+   * should do while a reply is on its way.
+   */
+  @property({ reflect: true, type: Boolean })
+  queue = false
 
   /**
    * A message about the draft, shown under the field. While set, the composer
@@ -280,7 +294,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
     /* What was heard so far stays in the draft and goes with it. */
     this.stopListening()
     const value = this.value.trim()
-    if (this.isDisabled || this.busy) {
+    if (this.isDisabled || (this.busy && !this.queue)) {
       return false
     }
     /* Nothing is sent, and a required composer says why, as a draft the form
