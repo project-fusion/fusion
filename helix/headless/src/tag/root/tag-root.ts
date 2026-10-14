@@ -53,7 +53,7 @@ import { property } from 'lit/decorators.js'
  *
  * @slot - The tag's label.
  * @slot dismiss-icon - Replaces the glyph on the remove button.
- * @slot start - The category the label belongs to, shown before it in a heavier weight.
+ * @slot start - The category the label belongs to, shown before it in a heavier weight, or an icon.
  *
  * @event {HelixDismissEvent} helix-dismiss - The remove button was pressed. The tag does not remove itself, so remove it in response. Cancelable.
  *
