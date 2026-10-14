@@ -7,12 +7,13 @@ import { registerDom } from '@fusion.dev/helix-testing/dom'
    entry to add, or on a tier of its own which tag to define. */
 
 let auditChildren: typeof import('./audit-children.js').auditChildren
+let auditEntry: typeof import('./audit-children.js').auditEntry
 let QUIET: number
 let customElement: typeof import('../custom-element/custom-element.js').customElement
 
 beforeAll(async () => {
   registerDom()
-  ;({ auditChildren, QUIET } = await import('./audit-children.js'))
+  ;({ auditChildren, auditEntry, QUIET } = await import('./audit-children.js'))
   ;({ customElement } = await import('../custom-element/custom-element.js'))
 })
 
@@ -142,6 +143,63 @@ describe('the unregistered-child audit', () => {
     await painted()
     auditChildren(container('z-select', 'z-', 'Empty'), 'option', 'option', 'x')
     await painted()
+    expect(warnings).toEqual([])
+  })
+})
+
+/* A part with an entry of its own, such as Menu's filter, which a page that
+   sets `filterable` imports beside the menu. */
+describe('the missing-entry audit', () => {
+  /** A host of `tag`, on the page. */
+  const host = (tag: string): HTMLElement => {
+    if (!customElements.get(tag)) {
+      customElements.define(tag, class extends HTMLElement {})
+    }
+    document.body.innerHTML = `<${tag}></${tag}>`
+    return document.body.firstElementChild as HTMLElement
+  }
+
+  test('reports an entry never imported once, with the import to add', async () => {
+    const warnings: string[] = []
+    console.warn = (message: string) => warnings.push(message)
+    const menu = host('p-menu')
+    auditEntry(menu, 'filterable', 'menu/filter', 'it shows no filter field', () => true)
+    auditEntry(menu, 'filterable', 'menu/filter', 'it shows no filter field', () => true)
+    await painted()
+    expect(warnings).toEqual([
+      "<p-menu> has `filterable` and its entry is not imported, so it shows no filter field. Import '@fusion.dev/helix-headless/menu/filter'.",
+    ])
+  })
+
+  /* An app importing the entry with `import()` gives the menu its filter as
+     the chunk lands, after the page has painted: the entry is late, and is
+     not missing. */
+  test('says nothing for an entry imported after the page painted', async () => {
+    const warnings: string[] = []
+    console.warn = (message: string) => warnings.push(message)
+    let imported = false
+    auditEntry(host('q-menu'), 'filterable', 'menu/filter', 'x', () => !imported)
+    await frames()
+    await wait(QUIET / 2)
+    imported = true
+    await wait(QUIET + 50)
+    expect(warnings).toEqual([])
+  })
+
+  /* Each family Helix registers while the entry is missing starts the quiet
+     period again, so an entry whose chunk lands last is still not reported. */
+  test('waits while Helix is still registering families', async () => {
+    const warnings: string[] = []
+    console.warn = (message: string) => warnings.push(message)
+    let imported = false
+    auditEntry(host('r-menu'), 'filterable', 'menu/filter', 'x', () => !imported)
+    await frames()
+    await wait(QUIET * 0.7)
+    customElement('r-other')(class extends HTMLElement {})
+    await wait(QUIET * 0.7)
+    expect(warnings).toEqual([])
+    imported = true
+    await wait(QUIET + 50)
     expect(warnings).toEqual([])
   })
 })
