@@ -655,6 +655,71 @@ describe('each opening of the palette', () => {
   })
 })
 
+/* An app that sorts its results puts the best one first a tick after the
+   keystroke, as React does when it renders the sorted list. The highlight
+   stayed on the option that had been first, so Enter ran the second result.
+   It follows the first option until the reader moves it. */
+describe('a palette whose results are sorted after the keystroke', () => {
+  const sorted = `<helix-headless-command label="Commands">
+    <helix-headless-option-group label="Settings">
+      <helix-headless-option value="privacy">Privacy: Send anonymous usage counts</helix-headless-option>
+      <helix-headless-option value="usage">Settings: Usage</helix-headless-option>
+      <helix-headless-option value="limit">Limits: Usage limit</helix-headless-option>
+    </helix-headless-option-group>
+  </helix-headless-command>`
+  const highlighted = (host: Palette): string | undefined =>
+    [...host.querySelectorAll('helix-headless-option')].find(
+      (option) => (option as HTMLElement & { active: boolean }).active,
+    )?.textContent ?? undefined
+  const toFront = (host: Palette, value: string): void => {
+    const option = host.querySelector(`helix-headless-option[value="${value}"]`) as HTMLElement
+    option.parentElement?.prepend(option)
+  }
+  const down = (host: Palette): void => {
+    listbox(host)
+      .shadowRoot?.querySelector('[part="search-field"]')
+      ?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          key: 'ArrowDown',
+        }),
+      )
+  }
+
+  test('moves the highlight to the new first result', async () => {
+    const host = await palette(sorted)
+    host.open = true
+    await settle(host)
+    listbox(host).requestFilter('usage')
+    await settle(host)
+    expect(highlighted(host)).toBe('Privacy: Send anonymous usage counts')
+    toFront(host, 'usage')
+    await settle(host)
+    await settle(host)
+    expect(highlighted(host)).toBe('Settings: Usage')
+  })
+
+  test('keeps where an arrow put it until the next keystroke', async () => {
+    const host = await palette(sorted)
+    host.open = true
+    await settle(host)
+    listbox(host).requestFilter('usage')
+    await settle(host)
+    down(host)
+    await settle(host)
+    expect(highlighted(host)).toBe('Settings: Usage')
+    toFront(host, 'limit')
+    await settle(host)
+    await settle(host)
+    expect(highlighted(host)).toBe('Settings: Usage')
+    listbox(host).requestFilter('usag')
+    await settle(host)
+    expect(highlighted(host)).toBe('Limits: Usage limit')
+  })
+})
+
 /* Home and End moved the caret in the filter, as APG's combobox has them,
    and React Aria's Autocomplete moves the highlight with them instead. */
 describe('a palette whose Home and End go to the list', () => {
