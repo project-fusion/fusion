@@ -56,13 +56,16 @@ export interface PlotColors {
    * and its numbers and names are drawn, which the chart's `no-box` turns off.
    * `contours` and `drops` are whether a surface's contour lines and a
    * scatter's lines down to the floor are drawn, as its `contours` and
-   * `drop-lines` ask.
+   * `drop-lines` ask. `muted` is whether the marks are drawn in the neutral
+   * ink, all but the ones a cell gives a tone, as a bar chart's
+   * `emphasis="muted"` asks; `emphasis` then reads `solid`.
    */
   look: {
     box: boolean
     contours: boolean
     drops: boolean
     emphasis: 'outlined' | 'solid' | 'subtle'
+    muted: boolean
     through: number
   }
   /** The page a faded fill moves toward: `background`. */
@@ -232,6 +235,7 @@ export const plotColorsFrom = (
       contours: chart.hasAttribute('contours'),
       drops: chart.hasAttribute('drop-lines'),
       emphasis: emphasis === 'outlined' || emphasis === 'subtle' ? emphasis : 'solid',
+      muted: emphasis === 'muted',
       through: material === 'glass' ? 0.62 * scale : material === 'frosted' ? 0.88 * scale : 1,
     }
     const colors: string[] = []

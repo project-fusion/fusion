@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { boxView, SPATIAL_VIEW } from '../spatial-scatter-chart/view.js'
-import { barsDrawn, barsOf, paintOrder } from './bars.js'
+import { barsDrawn, barsOf, floorOf, grownAt, growTime, namesOf, paintOrder } from './bars.js'
 
 const row = (label: string, ...values: Array<number | undefined>) => ({
   cells: values.map((value, at) => ({
@@ -86,7 +86,9 @@ describe('stacked bars', () => {
 test('a zero in a stack draws no block, and a zero standing alone is still a plate', () => {
   const stacked = barsOf([row('1', 0, 9, 4)], [0, 1, 2], true)
   const { projection } = boxView(stacked.axes, SPATIAL_VIEW)
-  expect(barsDrawn(stacked, projection).map((bar) => stacked.cells[bar.index]?.depth)).toEqual([1, 2])
+  expect(barsDrawn(stacked, projection).map((bar) => stacked.cells[bar.index]?.depth)).toEqual([
+    1, 2,
+  ])
   const alone = barsOf([row('1', 0, 9, 4)], [0, 1, 2])
   expect(barsDrawn(alone, boxView(alone.axes, SPATIAL_VIEW).projection)).toHaveLength(3)
 })
@@ -103,4 +105,91 @@ test('a row stands level on the page whichever way the camera turns', () => {
       expect(foot).toBeCloseTo(feet[0] ?? 0, 6)
     }
   }
+})
+
+/* A week of runs with today lit, read as Switchyard draws it: neutral bars,
+   one in the brand color, its value over it, the days under the row. */
+describe('a lit bar, and a row with its floor', () => {
+  const week = barsOf(
+    [row('Mon', 59), row('Tue', 64), row('Wed', 61), row('Thu', 63)],
+    [0],
+    false,
+    (at) => (at === 1 ? 'primary' : undefined),
+  )
+
+  test('a cell names its own tone, and the others name none', () => {
+    expect(week.cells.map((cell) => cell.tone)).toEqual([
+      undefined,
+      'primary',
+      undefined,
+      undefined,
+    ])
+  })
+
+  test('the floor has a plate for each place, wider than its bar, level across the row', () => {
+    const { projection } = boxView(week.axes, SPATIAL_VIEW, [], true)
+    const plates = floorOf(week, projection)
+    expect(plates.map((plate) => plate.across)).toEqual([0, 1, 2, 3])
+    const bars = barsDrawn(week, projection, true)
+    const wide = (points: { x: number }[]) =>
+      Math.max(...points.map((point) => point.x)) - Math.min(...points.map((point) => point.x))
+    expect(wide(plates[0]?.corners ?? [])).toBeGreaterThan(
+      wide((bars[0]?.corners ?? []).filter((_, at) => at % 2 === 0)),
+    )
+    for (const plate of plates) {
+      expect(plate.front.y).toBeCloseTo(plates[0]?.front.y ?? 0, 6)
+    }
+  })
+
+  test('each name stands under its plate, and the toned one carries its tone', () => {
+    const { projection } = boxView(week.axes, SPATIAL_VIEW, [], true)
+    const plates = floorOf(week, projection)
+    const names = namesOf(week, plates, 0.05)
+    expect(names.map((name) => name.text)).toEqual(['Mon', 'Tue', 'Wed', 'Thu'])
+    expect(names[1]?.tone).toBe('primary')
+    expect(names[0]?.y).toBeGreaterThan(plates[0]?.front.y ?? 0)
+  })
+
+  test('names that would touch are left out, the toned one kept first', () => {
+    const { projection } = boxView(week.axes, SPATIAL_VIEW, [], true)
+    const names = namesOf(week, floorOf(week, projection), 0.4)
+    expect(names.length).toBeLessThan(4)
+    expect(names.map((name) => name.text)).toContain('Tue')
+    for (const [at, name] of names.entries()) {
+      const next = names[at + 1]
+      if (next) {
+        expect(next.x - name.x).toBeGreaterThan(name.text.length * 0.4 * 0.58)
+      }
+    }
+  })
+})
+
+describe('growing in', () => {
+  test('each category starts a little after the one before, and every bar ends at its height', () => {
+    expect(grownAt(0, 7, 0)).toBe(0)
+    expect(grownAt(0, 7, 500)).toBeGreaterThan(grownAt(3, 7, 500))
+    expect(grownAt(6, 7, growTime(7))).toBe(1)
+    /* Fast at first, slow to rest, and never past the value. */
+    let last = 0
+    for (let at = 0; at <= growTime(7); at += 50) {
+      const now = grownAt(2, 7, at)
+      expect(now).toBeGreaterThanOrEqual(last)
+      expect(now).toBeLessThanOrEqual(1)
+      last = now
+    }
+  })
+
+  test('many categories share the same spread, so a long row takes no longer than a short one', () => {
+    expect(growTime(60)).toBe(growTime(7))
+    expect(growTime(1)).toBeLessThan(growTime(7))
+  })
+
+  test('a growing bar stands from the floor at its share of its height', () => {
+    const field = barsOf([row('1', 4, 6)], [0, 1], true)
+    const { projection } = boxView(field.axes, SPATIAL_VIEW, [], true)
+    const full = barsDrawn(field, projection, true)
+    const half = barsDrawn(field, projection, true, () => 0.5)
+    expect(half[1]?.height).toBeCloseTo((full[1]?.height ?? 0) / 2, 6)
+    expect(half[1]?.base).toBeCloseTo(((full[1]?.base ?? 0) + (full[0]?.base ?? 0)) / 2, 6)
+  })
 })

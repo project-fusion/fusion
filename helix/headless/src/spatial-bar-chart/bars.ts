@@ -12,6 +12,7 @@ import {
   depthOrder,
   type PagePoint,
   type Projection,
+  pathData,
   solid,
   ticks,
 } from '@fusion.dev/helix-core'
@@ -40,6 +41,8 @@ export interface BarCell {
   lane: number
   /** The row it was read from, counting from zero. */
   row: number
+  /** The tone the cell names with `data-tone`, which colors its own bar, where it names one. */
+  tone?: string | undefined
   /** The value, where the cell holds a number. */
   value?: number | undefined
 }
@@ -100,11 +103,14 @@ const named = (count: number, labels: string[], nearest = false): PlotAxis => {
  * ones before it, so the column is as tall as the category's total and the
  * axis runs to the tallest total. A negative reading hangs below zero on the
  * negatives before it, as a flat chart's stack does.
+ *
+ * `toneOf` gives the tone a cell names, by its row and its series.
  */
 export const barsOf = (
   rows: readonly FieldRow[],
   columns: readonly number[],
   stacked = false,
+  toneOf: (row: number, depth: number) => string | undefined = () => undefined,
 ): BarField => {
   const series = columns.map(
     (column) => rows.find((row) => row.cells[column])?.cells[column]?.name ?? '',
@@ -134,7 +140,18 @@ export const barsOf = (
         reached.push(from + read)
       }
       const lane = stacked ? 0 : depth
-      cells.push({ across: at, column, depth, from, label: row.label, lane, row: at, value: read })
+      const tone = toneOf(at, depth)
+      cells.push({
+        across: at,
+        column,
+        depth,
+        from,
+        label: row.label,
+        lane,
+        row: at,
+        ...(tone ? { tone } : {}),
+        value: read,
+      })
     })
   })
   const lanes = stacked ? 1 : series.length
@@ -167,6 +184,36 @@ export const barsOf = (
 /** How much of its place on the grid a bar covers along each edge, so neighbors stand apart. */
 const FOOTPRINT = 0.6
 
+/**
+ * Where each cell's bar stands on the floor, and how far apart places are:
+ * the grid's own axes, or in a row along the camera's level line and
+ * straight back from it.
+ */
+const placesOf = (
+  field: BarField,
+  projection: Projection,
+  row: boolean,
+): { place: (cell: BarCell) => { x: number; y: number }; spacing: number } => {
+  const [ex, , ez] = field.axes.extent
+  const [cos, sin] = projection.across
+  const spread = row ? Math.abs(cos) + Math.abs(sin) : 1
+  const spacing =
+    Math.min((2 * ex) / Math.max(field.categories.length, 1), (2 * ez) / Math.max(field.lanes, 1)) /
+    spread
+  return {
+    place: (cell) => {
+      const along = inBox(field.axes.x, cell.across) * ex
+      /* The floor's way back is the box's depth turned round, as the box's
+         own places are. */
+      const back = -inBox(field.axes.z, cell.lane) * ez
+      return row
+        ? { x: along * cos - back * sin, y: along * sin + back * cos }
+        : { x: along, y: back }
+    },
+    spacing,
+  }
+}
+
 /** A bar as the chart's own drawing paints it. */
 export interface DrawnBar {
   /** Where the block starts on the floor's way up, in the box's units. */
@@ -192,16 +239,18 @@ export interface DrawnBar {
  * which keeps to the floor's grid, shows the turn: its top and two sides.
  * Turned, a block is wider on the page than its footprint, so the footprint
  * narrows by as much, and neighbors still stand apart.
+ *
+ * `grown` says how much of its height each bar has reached, from 0 to 1, as
+ * the chart grows its bars in.
  */
-export const barsDrawn = (field: BarField, projection: Projection, row = false): DrawnBar[] => {
-  const [ex, ey, ez] = field.axes.extent
-  const [cos, sin] = projection.across
-  const spread = row ? Math.abs(cos) + Math.abs(sin) : 1
-  const spacing =
-    Math.min(
-      (2 * ex) / Math.max(field.categories.length, 1),
-      (2 * ez) / Math.max(field.lanes, 1),
-    ) / spread
+export const barsDrawn = (
+  field: BarField,
+  projection: Projection,
+  row = false,
+  grown: (cell: BarCell) => number = () => 1,
+): DrawnBar[] => {
+  const ey = field.axes.extent[1]
+  const { place, spacing } = placesOf(field, projection, row)
   return field.cells.flatMap((cell, index): DrawnBar[] => {
     /* A zero in a stack adds nothing to its column, so it draws no block, as
        a flat chart's stack draws none; standing alone, a zero is a plate on
@@ -209,16 +258,12 @@ export const barsDrawn = (field: BarField, projection: Projection, row = false):
     if (cell.value === undefined || (field.stacked && cell.value === 0)) {
       return []
     }
-    const along = inBox(field.axes.x, cell.across) * ex
-    /* The floor's way back is the box's depth turned round, as the box's own
-       places are. */
-    const back = -inBox(field.axes.z, cell.lane) * ez
-    /* In a row, along the camera's level line and straight back from it;
-       on the grid, along the grid's own axes. */
-    const x = row ? along * cos - back * sin : along
-    const y = row ? along * sin + back * cos : back
-    const start = inBox(field.axes.y, cell.from) * ey
-    const top = inBox(field.axes.y, cell.from + cell.value) * ey
+    const { x, y } = place(cell)
+    /* Growing, a stacked column rises as a whole, each block at its share
+       of where it starts and ends. */
+    const share = grown(cell)
+    const start = inBox(field.axes.y, cell.from * share) * ey
+    const top = inBox(field.axes.y, (cell.from + cell.value) * share) * ey
     const base = Math.min(start, top)
     const height = Math.abs(top - start)
     /* Lifted to the bar's foot, which is where it starts on the value axis
@@ -254,3 +299,162 @@ export const paintOrder = (projection: Projection, bars: readonly DrawnBar[]): D
   }
   return [...columns.values()].flatMap((column) => column.sort((one, two) => one.base - two.base))
 }
+
+/** How much of its place on the floor a row's plate covers along each edge: more than its bar, so the plate shows round the bar's foot. */
+const PLATE = 0.85
+
+/** One place on the floor of a row, under a bar or where a bar would stand. */
+export interface FloorPlate {
+  /** Which category it stands under, counting from zero. */
+  across: number
+  /** Its four corners on the page. */
+  corners: PagePoint[]
+  /** Its outline, as path data. */
+  d: string
+  /** Its corner lowest on the page, nearest the reader, which its name is written under. */
+  front: PagePoint
+}
+
+/**
+ * The places on the floor of a row, one for each category in each lane,
+ * whether a bar stands there or not: a square a little wider than a bar's
+ * footprint, turned as the bars are, where zero stands on the value axis.
+ */
+export const floorOf = (field: BarField, projection: Projection): FloorPlate[] => {
+  const { place, spacing } = placesOf(field, projection, true)
+  const floor = inBox(field.axes.y, 0) * field.axes.extent[1]
+  const half = (spacing * PLATE) / 2
+  const seen = new Set<string>()
+  return field.cells.flatMap((cell): FloorPlate[] => {
+    const key = `${cell.across} ${cell.lane}`
+    if (seen.has(key)) {
+      return []
+    }
+    seen.add(key)
+    const { x, y } = place(cell)
+    const corners = [
+      projection.at(x - half, y - half, floor),
+      projection.at(x + half, y - half, floor),
+      projection.at(x + half, y + half, floor),
+      projection.at(x - half, y + half, floor),
+    ]
+    const front = corners.reduce((low, one) => (one.y > low.y ? one : low))
+    return [{ across: cell.across, corners, d: pathData(corners), front }]
+  })
+}
+
+/** How wide a name is on the page, as a share of its size for each letter, near enough to keep names apart. */
+const NAME_WIDE = 0.58
+
+/** A category's name written under its place in a row. */
+export interface RowName {
+  across: number
+  text: string
+  /** Whether a bar of its category names a tone, which colors the name. */
+  tone?: string | undefined
+  x: number
+  /** The middle of the line of text. */
+  y: number
+}
+
+/**
+ * The names written under a row's plates, `size` tall: each category's name
+ * under its plate nearest the reader, **and only the names that fit**, so
+ * none overlaps another. A name whose bar names a tone is written first,
+ * then every other name, or every second, third, and so on, at the smallest
+ * even step that fits, leaving out a name the toned one covers.
+ */
+export const namesOf = (
+  field: BarField,
+  plates: readonly FloorPlate[],
+  size: number,
+): RowName[] => {
+  const fronts = new Map<number, PagePoint>()
+  for (const plate of plates) {
+    const kept = fronts.get(plate.across)
+    if (!kept || plate.front.y > kept.y) {
+      fronts.set(plate.across, plate.front)
+    }
+  }
+  const tones = new Map<number, string>()
+  for (const cell of field.cells) {
+    if (cell.tone && cell.value !== undefined && !tones.has(cell.across)) {
+      tones.set(cell.across, cell.tone)
+    }
+  }
+  const all: RowName[] = field.categories.flatMap((text, across): RowName[] => {
+    const front = fronts.get(across)
+    return front
+      ? [{ across, text, tone: tones.get(across), x: front.x, y: front.y + size * 1.1 }]
+      : []
+  })
+  const room = (name: RowName): [number, number] => {
+    const half = (name.text.length * size * NAME_WIDE) / 2 + size * 0.4
+    return [name.x - half, name.x + half]
+  }
+  const clear = (one: RowName, kept: readonly RowName[]): boolean => {
+    const [from, to] = room(one)
+    return kept.every((other) => {
+      const [left, right] = room(other)
+      return to <= left || from >= right
+    })
+  }
+  const toned = all.filter((name) => name.tone)
+  const rest = all.filter((name) => !name.tone)
+  /* Every name, or every second, third, and so on, the fewest left out that
+     keeps an even step. A name the toned one covers is left out alone. */
+  for (let step = 1; step <= Math.max(1, all.length); step++) {
+    const kept = toned.filter((name, at) => clear(name, toned.slice(0, at)))
+    let fits = true
+    for (const name of rest) {
+      if (name.across % step !== 0) {
+        continue
+      }
+      if (clear(name, kept)) {
+        kept.push(name)
+      } else if (
+        !clear(
+          name,
+          kept.filter((one) => one.tone),
+        )
+      ) {
+      } else {
+        fits = false
+        break
+      }
+    }
+    if (fits) {
+      return kept.sort((one, other) => one.across - other.across)
+    }
+  }
+  return []
+}
+
+/** How long one bar takes to grow in, in milliseconds. */
+const GROW = 1000
+
+/** How long each bar waits after the one before it, and the longest the last one waits. */
+const STAGGER = 110
+const SPREAD = 660
+
+/** The wait between one category's bars and the next one's, as they grow in. */
+const stepOf = (categories: number): number =>
+  categories > 1 ? Math.min(STAGGER, SPREAD / (categories - 1)) : 0
+
+/**
+ * How much of its height a bar of category `across` has reached `elapsed`
+ * milliseconds after the bars began to grow in, from 0 to 1. **In reading
+ * order**, each category a little after the one before it, and fast at first
+ * and slow to rest, never past its value.
+ */
+export const grownAt = (across: number, categories: number, elapsed: number): number => {
+  const t = (elapsed - across * stepOf(categories)) / GROW
+  if (t <= 0) {
+    return 0
+  }
+  return t >= 1 ? 1 : 1 - (1 - t) ** 3
+}
+
+/** How long the bars of `categories` take to grow in, the last one included, in milliseconds. */
+export const growTime = (categories: number): number =>
+  GROW + stepOf(categories) * Math.max(0, categories - 1)
