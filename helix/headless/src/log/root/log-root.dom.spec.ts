@@ -83,6 +83,20 @@ describe('the log', () => {
     expect(hasState(element, 'empty')).toBe(true)
     expect(part(element, 'empty')?.textContent?.trim()).toBe('No output yet')
   })
+
+  test('is not empty while it holds a step with no lines', async () => {
+    for (const body of [
+      '<helix-headless-log-group heading="Write" status="pending"></helix-headless-log-group>',
+      '<helix-headless-log-group heading="Note"><div>Leave out a model</div></helix-headless-log-group>',
+      `<helix-headless-log-group heading="Notes">
+        <helix-headless-log-group heading="Note"><div>Leave out a model</div></helix-headless-log-group>
+      </helix-headless-log-group>`,
+    ]) {
+      const element = await opened('', body)
+      expect(hasState(element, 'empty')).toBe(false)
+      expect(part(element, 'empty')).toBeNull()
+    }
+  })
 })
 
 describe('lines written as children', () => {
