@@ -27,18 +27,20 @@
 /* One cell, both children in it, so the dot is centered in the circle with no
    offsets to keep in step with the size. */
 [part="box"] {
-  /*
- *  The page's own color, so the box reads as a hole punched through to it
- *      rather than as a fill that happens to match.
- *
- *      Never `surface-sunken`, which stopped working when `sunken` was lightened
- *      to 0.96: a checkbox inside a well then had no interior at all, only its
- *      border. Measured, it separated from the page by 0.04, from a card by 0.025,
- *      and from the well it was for by nothing.
- */
-  background-color: var(--radio-background-color, var(--helix-color-background));
+  /* No fill of its own, so an unchosen circle is an empty ring on whatever it
+     sits on. The page's own color, punched through as a hole, read as a solid
+     dark disc on a card in dark mode, where the card is lighter than the page.
+     Never `surface-sunken` either: at 0.96 it gave a radio in a well no
+     interior at all. */
+  background-color: var(--radio-background-color, transparent);
   block-size: var(--_radio-size);
-  border: var(--helix-border-thin) solid var(--radio-border-color, var(--helix-color-border));
+  /* The edge in the mark ink, not the rule ink. The rule's color is a divider's
+     at about 1.1:1, and around a hole in a card in dark mode it drew no ring at
+     all: the circle read as a solid black disc, not as a choice. The mark ink
+     is the step a chevron or a grip is drawn in, so the circle reads as an
+     empty ring at rest, firms up under a pointer, and fills when chosen. */
+  border: var(--helix-border-thin) solid
+    var(--radio-border-color, var(--helix-color-foreground-subtle));
   /* The one thing that makes this a radio and not a checkbox. */
   border-radius: var(--helix-radii-full);
   display: grid;

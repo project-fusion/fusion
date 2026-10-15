@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import { readFileSync } from 'node:fs'
 import { hostAttributes, partTag, rendered, ssr } from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
@@ -34,5 +35,20 @@ describe('checkbox server output', () => {
     expect(
       hostAttributes(ssr(html`<helix-checkbox name="terms"></helix-checkbox>`), 'helix-checkbox'),
     ).toEqual(['name'])
+  })
+
+  /**
+   * **An empty checkbox reads as an empty mark.** Its edge is the mark ink. In
+   * the rule ink, a divider's 1.1:1, the edge vanished around the hole the box
+   * punches through to the page, so in a card in dark mode an unchosen checkbox
+   * drew as a solid dark shape.
+   */
+  test('at rest it is an empty outline in the mark ink', () => {
+    const sheet = readFileSync(new URL('./checkbox-root.css', import.meta.url), 'utf8')
+    const rule = sheet.slice(sheet.indexOf('[part="control"] {'))
+    const resting = rule.slice(0, rule.indexOf('}'))
+    expect(resting).toContain('--helix-color-foreground-subtle')
+    expect(resting).not.toContain('--helix-color-border)')
+    expect(resting).toContain('transparent)')
   })
 })
