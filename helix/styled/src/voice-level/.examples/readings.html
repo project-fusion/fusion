@@ -35,10 +35,25 @@
     return { bands, level }
   }
 
-  const started = performance.now()
-  setInterval(() => {
-    const { bands, level } = reading((performance.now() - started) / 1000)
+  const show = (time) => {
+    const { bands, level } = reading(time)
     spectrum.bands = bands
     waves.level = level
-  }, 1000 / 30)
+  }
+
+  /* With reduced motion on, both show one moment of the phrase and stop. */
+  const MOMENT = 0.1
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)')
+  let timer = 0
+  const run = () => {
+    clearInterval(timer)
+    if (still.matches) {
+      show(MOMENT)
+      return
+    }
+    const started = performance.now()
+    timer = setInterval(() => show((performance.now() - started) / 1000), 1000 / 30)
+  }
+  still.addEventListener('change', run)
+  run()
 </script>
