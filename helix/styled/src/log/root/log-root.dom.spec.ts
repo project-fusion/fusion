@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -54,4 +54,66 @@ describe('the styled log', () => {
   test('turns a group’s caret as it opens', () => {
     expect(cssOf('helix-log-group')).toContain(':host(:state(open)) [part="mark"]')
   })
+
+  test('sets a plain log’s steps as rows of an agent’s work', () => {
+    const root = cssOf('helix-log')
+    expect(root).toContain('--_log-caret-order: 1')
+    expect(root).toContain('--_log-step-max-block-size: var(--log-step-max-block-size, 20rem)')
+    const group = cssOf('helix-log-group')
+    expect(group).toContain('order: var(--_log-caret-order, 0)')
+    expect(group).toContain(':host(:not(:state(steps))) [part="content"]')
+    expect(group).toContain(':host(:state(steps)) [part="content"]')
+  })
+})
+
+/* Browser only: happy-dom lays nothing out. */
+const laid = hasLayout() ? test : (): void => {}
+
+describe('a plain log of an agent’s work', () => {
+  laid(
+    'puts the mark on the edge, the caret after the heading, and a long output on a surface that scrolls',
+    async () => {
+      const lines = Array.from(
+        { length: 80 },
+        (_, at) => `<helix-log-line>line ${at}</helix-log-line>`,
+      )
+      const host = (await mount(
+        `<div style="inline-size: 480px"><helix-log label="Work" separation="plain" wrap>
+          <helix-log-group heading="2 steps" status="done" default-open>
+            <helix-log-group heading="Shell" status="done" default-open>${lines.join('')}</helix-log-group>
+            <helix-log-group heading="Read" status="done"></helix-log-group>
+          </helix-log-group>
+        </helix-log></div>`,
+      )) as HTMLElement
+      const log = host.querySelector('helix-log') as Log
+      await settle(log)
+      const [outer, shell, read] = [...host.querySelectorAll('helix-log-group')] as HTMLElement[]
+      await Promise.all(
+        [outer, shell, read].map((element) => (element as unknown as Log).updateComplete),
+      )
+      const box = (element: Element | null | undefined) =>
+        (element as Element).getBoundingClientRect()
+      const left = box(log).left
+      // The outer step's mark is on the log's edge, and its caret after its heading.
+      expect(Math.round(box(part(outer as HTMLElement, 'status')).left)).toBe(Math.round(left))
+      expect(box(part(outer as HTMLElement, 'mark')).left).toBeGreaterThan(
+        box(part(outer as HTMLElement, 'heading')).right - 1,
+      )
+      // A step's mark sits under the heading of the step that holds it.
+      expect(Math.round(box(part(shell as HTMLElement, 'status')).left)).toBe(
+        Math.round(box(part(outer as HTMLElement, 'heading')).left),
+      )
+      // The output is held to its height and scrolls.
+      const content = part(shell as HTMLElement, 'content') as HTMLElement
+      expect(content.scrollHeight).toBeGreaterThan(content.clientHeight)
+      expect(getComputedStyle(content).overflowY).toBe('auto')
+      // A step with nothing in it draws no caret.
+      expect(getComputedStyle(part(read as HTMLElement, 'mark') as Element).visibility).toBe(
+        'hidden',
+      )
+      // Nothing scrolls sideways.
+      const scroller = part(log, 'log') as HTMLElement
+      expect(scroller.scrollWidth).toBe(scroller.clientWidth)
+    },
+  )
 })

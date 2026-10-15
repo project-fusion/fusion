@@ -80,6 +80,36 @@
      edge is a screen away from the step it times. */
   --_log-duration-start: var(--helix-space-xs);
 
+  /* **A step reads as a row of an agent's work**, as `log-group.css` draws it
+     from these: the status mark on the edge the text around the log starts
+     on, the heading after it in the regular weight, and the caret after the
+     heading, where a reader's eye already is. A step holding steps draws a
+     rule down from its status mark, with its steps one mark in. A step
+     holding lines draws them on a quiet surface that scrolls after
+     `--log-step-max-block-size`, so a long output never runs down the page. */
+  --_log-caret-end: var(--helix-space-none);
+  --_log-caret-order: 1;
+  --_log-caret-size: calc(var(--helix-size-icon-sm) * 0.75);
+  --_log-caret-start: calc(var(--helix-space-2xs) * -1);
+  --_log-heading-weight: var(--helix-weight-regular);
+  --_log-nest-indent: calc(var(--helix-size-icon-sm) / 2 + var(--helix-space-xs));
+  --_log-row-color: currentColor;
+  --_log-row-inset: var(--helix-space-2xs);
+  --_log-row-radius: var(--helix-radii-sm);
+  --_log-step-fade: log-step-fade;
+  --_log-step-line-inset: var(--helix-space-sm);
+  --_log-step-margin-block: var(--helix-space-2xs) var(--helix-space-xs);
+  --_log-step-max-block-size: var(--log-step-max-block-size, 20rem);
+  --_log-step-overflow: auto;
+  --_log-step-padding-block: var(--helix-space-xs);
+  --_log-step-radius: var(--helix-radii-md);
+  --_log-step-rule: var(--helix-border-thin) solid
+    var(--log-border-color, var(--helix-color-border));
+  --_log-step-rule-start: calc(var(--helix-size-icon-sm) / 2 - var(--helix-border-thin));
+  --_log-step-start: calc(var(--helix-size-icon-sm) + var(--helix-space-xs));
+  --_log-step-surface: color-mix(in oklab, var(--helix-color-foreground) 4%, transparent);
+  --_log-wrap-indent: 2ch;
+
   background-color: transparent;
   border: none;
   border-radius: var(--helix-radii-none);
@@ -154,6 +184,21 @@
 
 :host([separation="plain"]) [part="log"] {
   padding-block: var(--helix-space-none);
+}
+
+/* **The lines' box reaches a step past the log on either side**, the step a
+   row's wash reaches, so the scrollport clips no wash and a row as wide as
+   its wash overflows nothing: measured before, the 4px past the end made the
+   lines scroll sideways by that much once a row took focus, and the status
+   mark of the first row was cut. The log itself stays where the text around
+   it is, and lets the box past its edge. */
+:host([separation="plain"]) {
+  overflow: visible;
+}
+
+:host([separation="plain"]) [part="log"] {
+  margin-inline: calc(var(--_log-row-inset) * -1);
+  padding-inline: var(--_log-row-inset);
 }
 
 [part="log"]:focus-visible {

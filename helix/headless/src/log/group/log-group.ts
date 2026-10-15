@@ -14,7 +14,7 @@ import {
   minus,
   xCircleFill,
 } from '@fusion.dev/helix-icons'
-import { html, nothing, type TemplateResult } from 'lit'
+import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import type { LogStatus } from '../buffer.js'
@@ -61,7 +61,9 @@ const MARKS = {
  * @csspart status - The mark for the status, an `<svg>` you size.
  * @csspart summary - The button that opens and closes the group.
  *
+ * @cssstate empty - The group holds nothing to show, so opening it shows nothing.
  * @cssstate open - The group shows its lines.
+ * @cssstate steps - The group holds steps of its own, which a stylesheet draws as a tree rather than as output.
  */
 @customElement('helix-headless-log-group')
 export class HelixHeadlessLogGroup extends MixinControllerOpen(HelixElement) {
@@ -108,6 +110,26 @@ export class HelixHeadlessLogGroup extends MixinControllerOpen(HelixElement) {
     this.toggleOpen()
   }
 
+  /** Records whether the group holds anything, and whether a step is among it. */
+  private readonly handleSlotChange = (): void => {
+    const slot = this.renderRoot.querySelector<HTMLSlotElement>('[part="content"] > slot')
+    if (!slot) {
+      return
+    }
+    const held = slot.assignedElements()
+    this.toggleState('empty', held.length === 0)
+    this.toggleState(
+      'steps',
+      held.some((element) => 'isLogGroup' in element),
+    )
+  }
+
+  /** A slot that is never filled fires no `slotchange`, so the first render reads it once. */
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.handleSlotChange()
+  }
+
   /**
    * The words in the button are separated by spaces in the markup, since a
    * name is read off inline boxes with nothing between them: without them a
@@ -144,7 +166,7 @@ export class HelixHeadlessLogGroup extends MixinControllerOpen(HelixElement) {
               role="group"
               aria-labelledby="summary"
               ?hidden=${!this.open}
-            ><slot></slot></div>`
+            ><slot @slotchange=${this.handleSlotChange}></slot></div>`
       }`
   }
 }

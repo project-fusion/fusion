@@ -17,11 +17,20 @@
    Without it, a log with no numbers put each step's lines to the left of the
    heading they belong to. */
 [part~="line-grouped"]:not(:has(> [part="number"])) {
-  padding-inline-start: calc(
-    var(--log-padding-inline, var(--helix-space-md)) +
-    max(var(--helix-size-icon-sm), calc(var(--log-digits, 2) * 1ch)) +
-    var(--helix-space-md)
+  padding-inline-start: var(
+    --_log-line-inset,
+    calc(
+      var(--log-padding-inline, var(--helix-space-md)) +
+      max(var(--helix-size-icon-sm), calc(var(--log-digits, 2) * 1ch)) +
+      var(--helix-space-md)
+    )
   );
+}
+
+/* On a step's surface in a plain log, the lines keep a step from either edge
+   of it (`--_log-line-inset`, which `log-group.css` sets there). */
+[part~="line-grouped"] {
+  padding-inline-end: var(--_log-line-inset, var(--log-padding-inline, var(--helix-space-md)));
 }
 
 /* **Heard and not drawn**: a line's level in words, which its color already
@@ -109,6 +118,14 @@ button[part="number"]:focus-visible {
   min-inline-size: 0;
   overflow-wrap: anywhere;
   white-space: var(--_log-white-space, pre);
+}
+
+/* In a plain log a line that wraps hangs its rest two characters in
+   (`--_log-wrap-indent`), so on a narrow surface each line still reads as
+   one where the next begins. */
+[part="text"] {
+  padding-inline-start: var(--_log-wrap-indent, 0);
+  text-indent: calc(var(--_log-wrap-indent, 0) * -1);
 }
 
 [part~="line-debug"] {
