@@ -824,6 +824,13 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     this.sized = next
   }
 
+  /* A stop added or taken away while the tour runs changes every stop's
+     place, such as "2 of 5", and which one is last. Nothing else updates the
+     tour then: the stops are read from the slot, which is not a property. */
+  private readonly handleSlotChange = (): void => {
+    this.requestUpdate()
+  }
+
   protected override render(): TemplateResult {
     const spot = this.spot
     /* `left` and `top`, physical because the box is: it is the target's
@@ -840,7 +847,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
             style=${`left: ${spot.left}px; top: ${spot.top}px; block-size: ${spot.height}px; inline-size: ${spot.width}px; --tour-spotlight-x: ${spot.left}px; --tour-spotlight-y: ${spot.top}px; --tour-spotlight-width: ${spot.width}px; --tour-spotlight-height: ${spot.height}px`}
           ></div>`
     }
-      <slot></slot>`
+      <slot @slotchange=${this.handleSlotChange}></slot>`
   }
 }
 
