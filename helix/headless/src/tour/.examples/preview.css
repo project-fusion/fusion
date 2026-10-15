@@ -207,7 +207,7 @@ helix-headless-tour-stop {
 helix-headless-tour::part(spotlight) {
   block-size: var(--tour-spotlight-height);
   border-radius: var(--_radius-surface);
-  box-shadow: 0 0 0 100vmax light-dark(rgb(0 0 0 / 0.4), rgb(0 0 0 / 0.64));
+  box-shadow: 0 0 0 200vmax light-dark(rgb(0 0 0 / 0.4), rgb(0 0 0 / 0.64));
   inline-size: var(--tour-spotlight-width);
   left: var(--tour-spotlight-x);
   pointer-events: none;

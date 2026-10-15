@@ -6,10 +6,16 @@
 
 /*
  *  The spotlight, which paints the scrim rather than being cut out of one.
+ *
+ *  **The spread is 200vmax.** A spread shadow rounds its corners by the box's
+ *  radius plus the spread, so at 100vmax a target in one corner of the window
+ *  left the opposite corner undimmed: measured in a 1000 by 632 window with the
+ *  target at the top right, a curved wedge at the bottom left. The farthest
+ *  point of a window is at most 1.42vmax from any target, so 200vmax covers it.
  */
 [part="spotlight"] {
   border-radius: var(--tour-spotlight-radius, var(--helix-radii-md));
-  box-shadow: 0 0 0 100vmax var(--tour-scrim-color, var(--helix-color-overlay));
+  box-shadow: 0 0 0 200vmax var(--tour-scrim-color, var(--helix-color-overlay));
   pointer-events: none;
   position: fixed;
   /* `left` and `top`, which are what the root writes: the box is measured
