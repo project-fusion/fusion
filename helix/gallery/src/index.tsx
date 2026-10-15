@@ -118,6 +118,7 @@ import { trendArt } from './art/trend'
 import { videoArt } from './art/video'
 import { videoPlaylistArt } from './art/video-playlist'
 import { virtualListArt } from './art/virtual-list'
+import { voiceLevelArt } from './art/voice-level'
 
 /**
  * Abstract art for a family's gallery card, keyed by slug.
@@ -279,6 +280,7 @@ const art: Record<string, ReactNode> = {
   video: videoArt,
   'video-playlist': videoPlaylistArt,
   'virtual-list': virtualListArt,
+  'voice-level': voiceLevelArt,
 }
 
 /**

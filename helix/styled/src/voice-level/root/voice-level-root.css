@@ -1,0 +1,69 @@
+:host {
+  /* A spectrum is a row of bars on a line of text, at the height of an icon;
+     the waves are the height of a control. Each is wider than tall by its own
+     ratio, so a height set alone keeps the shape. */
+  --_voice-level-block-size: var(--voice-level-block-size, var(--helix-size-icon));
+  --_voice-level-ratio: 4;
+  --_voice-level-color: var(--voice-level-color, var(--helix-color-primary));
+
+  block-size: var(--_voice-level-block-size);
+  /* Inline, so a level beside text sits on the line with it, and
+     shrink-proof, so a flex row cannot squash the drawing. */
+  display: inline-block;
+  flex-shrink: 0;
+  inline-size: var(
+    --voice-level-inline-size,
+    calc(var(--_voice-level-block-size) * var(--_voice-level-ratio))
+  );
+  vertical-align: middle;
+}
+
+:host([variant="waves"]) {
+  --_voice-level-block-size: var(--voice-level-block-size, var(--helix-size-control));
+  --_voice-level-ratio: 3;
+}
+
+/* The canvas fills the host and is measured from it, so the hooks and a
+   consumer's own size work the same way. */
+[part="canvas"] {
+  /* The bar count rides on a property that does nothing without an
+     animation name, and the engine checks it for a number that is not
+     negative. */
+  animation-iteration-count: var(--voice-level-bars, 24);
+  block-size: 100%;
+  /* **Each color is carried on a property typed as a color**, because a
+     custom property is reported as the text it was written in, and a canvas
+     cannot draw `light-dark(...)`. `text-decoration-color` and
+     `column-rule-color` paint nothing here: a canvas draws no text and has no
+     columns. */
+  color: var(--_voice-level-color);
+  column-rule-color: var(--voice-level-accent-color, var(--helix-color-accent));
+  display: block;
+  inline-size: 100%;
+  text-decoration-color: var(
+    --voice-level-edge-color,
+    color-mix(in oklab, var(--_voice-level-color) 55%, transparent)
+  );
+
+  /* A change to any color ends a transition the script hears, so a level
+     drawn once, at rest or under reduced motion, is drawn again in the new
+     theme. On the fast duration, which the token layer shortens for a reader
+     who asked for no motion and never to nothing, so the end still fires. */
+  transition-duration: var(--helix-duration-fast);
+  transition-property: color, column-rule-color, text-decoration-color;
+}
+
+/* While the browser holds the context, because a lost canvas is not reliably
+   transparent. Restated because the UA's `[hidden]` loses to the `display`
+   above. */
+[part="canvas"][hidden] {
+  display: none;
+}
+
+/* Print: a live level has nothing to say on paper. `@media print` does not
+   cross a shadow boundary, so the component says it for itself. */
+@media print {
+  :host {
+    display: none;
+  }
+}

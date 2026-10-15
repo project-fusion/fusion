@@ -1,0 +1,13 @@
+/* Twelve bars, twice the default height, in the success color. The width
+   follows the height. */
+.fewer-bars {
+  --voice-level-bars: 12;
+  --voice-level-block-size: calc(var(--helix-size-icon) * 2);
+  --voice-level-color: var(--helix-color-success);
+}
+
+/* The main wave in the info color and the second in the warning color. */
+.two-colors {
+  --voice-level-accent-color: var(--helix-color-warning);
+  --voice-level-color: var(--helix-color-info);
+}
