@@ -543,6 +543,23 @@ describe('each stop’s place in the run', () => {
     expect(said.every((one) => one?.hidden)).toBe(true)
   })
 
+  test('is counted again when a stop is added while the tour runs', async () => {
+    const tour = await run()
+    const added = document.createElement('helix-headless-tour-stop')
+    added.setAttribute('for', 'three')
+    added.textContent = 'Fourth'
+    tour.append(added)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await tour.updateComplete
+    const stops = await settled(tour)
+    expect(stops.map((stop) => part(stop, 'progress')?.textContent)).toEqual([
+      '1 of 4',
+      '2 of 4',
+      '3 of 4',
+      '4 of 4',
+    ])
+  })
+
   test('is drawn as well with `progress`', async () => {
     const tour = await run()
     tour.toggleAttribute('progress', true)
