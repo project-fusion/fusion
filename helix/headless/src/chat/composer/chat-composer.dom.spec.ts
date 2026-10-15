@@ -686,3 +686,59 @@ describe('placeholders', () => {
     host.remove()
   }, 12000)
 })
+
+describe('the idle slot', () => {
+  const withIdle = async (attributes = '') => {
+    const element = (await mount(
+      `<helix-headless-chat-composer ${attributes}><button slot="idle">Start voice mode</button></helix-headless-chat-composer>`,
+    )) as Composer & { attached: boolean; busy: boolean }
+    await element.updateComplete
+    // The slot learns what it holds as its contents arrive.
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    await element.updateComplete
+    return element
+  }
+  const showing = (element: HTMLElement) => ({
+    idle: !part(element, 'idle')?.hasAttribute('hidden'),
+    send: part(element, 'send') !== null,
+  })
+
+  test('takes the send button’s place while the draft is empty', async () => {
+    const element = await withIdle()
+    expect(showing(element)).toEqual({ idle: true, send: false })
+
+    element.value = 'Hello'
+    await element.updateComplete
+    expect(showing(element)).toEqual({ idle: false, send: true })
+  })
+
+  test('gives way to the send button while a file is attached, and to stop while busy', async () => {
+    const element = await withIdle()
+    element.attached = true
+    await element.updateComplete
+    expect(showing(element)).toEqual({ idle: false, send: true })
+
+    element.attached = false
+    element.busy = true
+    await element.updateComplete
+    expect(showing(element)).toEqual({ idle: false, send: true })
+    expect(part(element, 'send')?.getAttribute('aria-label')).toBe('Stop')
+  })
+
+  test('a composer with nothing in the slot always shows the send button', async () => {
+    const element = await composer()
+    expect(part(element, 'send')).not.toBeNull()
+    expect(part(element, 'idle')?.hasAttribute('hidden')).toBe(true)
+  })
+
+  test('focus on the idle control moves to the send button when it comes', async () => {
+    const element = await withIdle()
+    const idle = element.querySelector('button') as HTMLButtonElement
+    idle.focus()
+
+    element.attached = true
+    await element.updateComplete
+
+    expect(element.shadowRoot?.activeElement).toBe(part(element, 'send'))
+  })
+})
