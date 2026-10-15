@@ -29,7 +29,7 @@
    arrives. The light is a soft spot cut to a ring by two masks, the box and
    its padding box, so it follows whatever radius the box has; the element's
    script moves it along the edge at one speed. **The steady edge comes in
-   behind the light**, a beat later, so the light is seen travelling rather
+   behind the light**, a beat later, so the light is seen traveling rather
    than lost in an edge that lit at the same moment. */
 :host([glow]) [part="composer"] {
   position: relative;

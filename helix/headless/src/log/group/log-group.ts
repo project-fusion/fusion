@@ -63,7 +63,7 @@ const MARKS = {
  *
  * @cssstate empty - The group holds nothing to show, so opening it shows nothing.
  * @cssstate open - The group shows its lines.
- * @cssstate steps - The group holds steps of its own, which a stylesheet draws as a tree rather than as output.
+ * @cssstate steps - The group holds steps of its own, which a stylesheet draws as a tree.
  */
 @customElement('helix-headless-log-group')
 export class HelixHeadlessLogGroup extends MixinControllerOpen(HelixElement) {
