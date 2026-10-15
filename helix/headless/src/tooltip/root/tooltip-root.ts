@@ -19,7 +19,7 @@ import {
   timeConverter,
   unlinkDescription,
 } from '@fusion.dev/helix-core'
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { type CSSResultGroup, css, html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
 /** Tags that exist to hold something, and say nothing when they hold nothing. */
@@ -127,6 +127,17 @@ const warmth = (): Warmth => {
  */
 @customElement('helix-headless-tooltip')
 export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
+  /* No box of its own, in this tier as in the styled one. A component names
+     each of its icon buttons with a tooltip beside it, and a tooltip with a
+     box took a cell of its own in a grid of controls: in the headless Graph's
+     example each one added a 4px gap, and a page cannot reach the tooltip to
+     take it out. The bubble is in the top layer and needs no box here. */
+  static override styles: CSSResultGroup = css`
+    :host {
+      display: contents;
+    }
+  `
+
   /**
    * The text shown in the bubble.
    *
