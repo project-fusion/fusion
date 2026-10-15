@@ -1,10 +1,5 @@
 :host {
   display: inline-flex;
-  /* The strip never squeezes a tab. The label below may be narrower than its
-     text, which let a strip with too little room shrink its tabs and cut their
-     labels short where it should scroll: on the theme page a tab came out 3 px
-     narrower than its label (October 15, 2026). */
-  flex-shrink: 0;
   max-inline-size: var(--tabs-tab-max-inline-size, none);
 }
 
