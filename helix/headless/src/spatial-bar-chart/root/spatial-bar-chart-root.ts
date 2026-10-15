@@ -53,6 +53,7 @@ import {
   namesOf,
   paintOrder,
   rowFits,
+  tallestTimes,
   widthOf,
 } from '../bars.js'
 
@@ -324,9 +325,11 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
    * **A `column-gap` on the `fallback` part gives a row's bars one width**,
    * which the styled tier sets from `--spatial-bar-chart-bar-size`: one bar
    * stands as wide as each of twenty, the row is as long as its bars and
-   * centered, the tallest bar stands as high as the plot has room for, and
-   * `fits` says how many bars the plot holds, so a page can give it the
-   * latest of a longer table. It is read when the plot's size changes.
+   * centered, the tallest bar stands as high as the plot has room for and
+   * no taller than the row is long and a quarter again, so one bar stands
+   * as a block, and `fits` says how many bars the plot holds, so a page
+   * can give it the latest of a longer table. It is read when the plot's
+   * size changes.
    */
   @property({ reflect: true })
   variant?: 'diagonal' | 'row'
@@ -570,7 +573,13 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
     const high = frameOf(field)
     const tall = (room.height - room.font * WORD_LINES) * unit
     const rises = high.height - low.height
-    const times = rises > 0 ? Math.max(0.05, (tall - low.height) / rises) : 1
+    const fills = rises > 0 ? Math.max(0.05, (tall - low.height) / rises) : 1
+    /* A row of one or two stands no taller than it is long and a quarter
+       again, so a lone bar stands as a block. */
+    const times = Math.min(
+      fills,
+      tallestTimes(field, projection, barsDrawn(field, projection, layout)),
+    )
     return { field: heightened(field, times), unit }
   }
 

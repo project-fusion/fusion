@@ -263,6 +263,36 @@ export const climbing = (field: BarField, rise: number, length: number): BarFiel
   climb: length > 0 ? Math.min(CLIMB, rise / length) : CLIMB,
 })
 
+/**
+ * How long a row stands tall at most, as a share of its length on the page:
+ * a place a bar stands on and its gap, once for each category. One bar
+ * stands about as tall as its place is wide and a quarter again, a block
+ * about half a pane's plot, and a row of a few already reaches the height
+ * the plot gives it.
+ */
+const ROW_TALL = 1.25
+
+/**
+ * The most times taller a row's value axis may stand than it is drawn in
+ * `bars`, so the tallest bar is no taller than `ROW_TALL` times the row's
+ * length: each of its places is a bar's width over `FOOTPRINT`, the width
+ * `widthOf` gives on the page.
+ */
+export const tallestTimes = (
+  field: BarField,
+  projection: Projection,
+  bars: readonly DrawnBar[],
+): number => {
+  const first = bars[0]
+  const fall = Math.abs(projection.at(0, 0, 1).y - projection.at(0, 0, 0).y)
+  const tallest = Math.max(0, ...bars.map((bar) => bar.height)) * fall
+  if (!first || tallest <= 0) {
+    return Number.POSITIVE_INFINITY
+  }
+  const length = (field.categories.length * widthOf(first)) / FOOTPRINT
+  return (ROW_TALL * length) / tallest
+}
+
 /** The field with its value axis `times` as tall, which stands every bar that much taller. */
 export const heightened = (field: BarField, times: number): BarField => {
   const [ex, ey, ez] = field.axes.extent
