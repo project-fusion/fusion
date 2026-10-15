@@ -464,13 +464,14 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
 
   /**
    * Whether the `idle` slot shows in the send button's place: a child is in
-   * it, the draft is empty, and no reply is on its way. Read off the children,
-   * so a server and the first render agree, and drawn again as the slot's
-   * contents change.
+   * it, the draft is empty, and no reply is on its way. Read off the children
+   * where they are known, and drawn again as the slot's contents change. A
+   * server cannot know them, so it serves the send button, which a hydrating
+   * render keeps until `finishHydration` reads them.
    */
   private get idling(): boolean {
     return (
-      this.querySelector(':scope > [slot="idle"]') !== null &&
+      this.knownChildren.some((child) => child.getAttribute('slot') === 'idle') &&
       !this.busy &&
       !this.attached &&
       this.value.trim() === ''
@@ -482,6 +483,12 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
 
   /** Reads which control holds focus, before an update swaps them. */
   private noteFocus(): void {
+    /* Before the first render no control of this composer exists to hold focus,
+       and on a server there is no document to ask, which a first update is too. */
+    if (!this.hasUpdated) {
+      this.focusedOn = 'elsewhere'
+      return
+    }
     const active = deepActiveElement()
     const send = this.partNamed('send')
     const idle = this.renderRoot
@@ -600,6 +607,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    this.finishHydration()
     this.addEventListener('invalid', () => {
       if (!this.checkingValidity) {
         this.touch()
