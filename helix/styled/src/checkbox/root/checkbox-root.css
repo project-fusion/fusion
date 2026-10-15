@@ -42,14 +42,16 @@
 
 [part="control"] {
   appearance: none;
-  /* The page's own color, so the box reads as a hole punched through to it
-     rather than as a fill that happens to match. Never `surface-sunken`: at 0.96
-     it is the same color as a sunken surface, so a checkbox inside a well has no
-     interior at all, only its border. Measured, it separated from the page by
-     0.04, from a card by 0.025, and in the one place it was for by nothing. */
-  background-color: var(--checkbox-background-color, var(--helix-color-background));
+  /* No fill of its own, as the radio's, so an unticked box is an empty square
+     on whatever it sits on. The page's own color read as a solid dark square
+     on a card in dark mode. Never `surface-sunken`: at 0.96 a checkbox in a
+     well had no interior at all. */
+  background-color: var(--checkbox-background-color, transparent);
   block-size: var(--_checkbox-size);
-  border: var(--helix-border-thin) solid var(--checkbox-border-color, var(--helix-color-border));
+  /* The edge in the mark ink, as the radio's: the rule's color drew no edge
+     around the box in a card in dark mode, so it read as a filled square. */
+  border: var(--helix-border-thin) solid
+    var(--checkbox-border-color, var(--helix-color-foreground-subtle));
   border-radius: var(--helix-radii-sm);
   cursor: inherit;
   inline-size: var(--_checkbox-size);
