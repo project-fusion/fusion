@@ -21,6 +21,8 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { live } from 'lit/directives/live.js'
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
+import { html as staticHtml } from 'lit/static-html.js'
+import '../../tooltip/index.js'
 
 /** How long each example shows before the next, in milliseconds. */
 const EXAMPLE_TURN = 4000
@@ -103,6 +105,7 @@ const EXAMPLE_FADE = 200
  * @csspart field - The text field.
  * @csspart mark - The icon inside the send button, a return key, or a square while `busy`.
  * @csspart send - The send button, which is the stop button while `busy`.
+ * @csspart send-reason - The bubble that says `send-reason` over the send button.
  * @csspart start - The box around the `start` slot.
  * @csspart tools - The row under the field.
  * @csspart voice - The dictation button, under `voice`, before the send button.
@@ -226,6 +229,16 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
   @words
   @property({ attribute: 'send-label' })
   sendLabel = 'Send'
+
+  /**
+   * Why the draft waits, such as "Reading photo.jpg", shown in a tooltip on
+   * the send button while `send-disabled` is set. The button then stays in
+   * the tab order and takes the pointer, with `aria-disabled` in place of
+   * `disabled`, so the reason can be reached by keyboard and by pointer, as
+   * Button's `focusable-when-disabled` does. A press still sends nothing.
+   */
+  @property({ attribute: 'send-reason' })
+  sendReason = ''
 
   /**
    * Label for the stop button shown while `busy`.
@@ -551,17 +564,27 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
    */
   protected renderSend(): TemplateResult {
     const mark = this.busy ? stop : arrowElbowDownLeft
-    return html`<button
+    const held = this.sendDisabled && !this.busy
+    // A reason keeps the held button reachable, so its tooltip can say it.
+    const reasoned = held && !this.isDisabled && this.sendReason !== ''
+    const control = html`<button
       part="send"
       type="button"
       aria-label=${this.busy ? this.stopLabel : this.sendLabel}
-      ?disabled=${this.isDisabled || (this.sendDisabled && !this.busy)}
+      aria-disabled=${reasoned ? 'true' : nothing}
+      aria-describedby=${reasoned ? 'send-reason' : nothing}
+      ?disabled=${this.isDisabled || (held && !reasoned)}
       @click=${this.busy ? this.handleStop : this.handleSend}
     >
       <svg part="mark" fill="currentColor" viewBox=${mark.viewBox} aria-hidden="true">
         ${unsafeSVG(mark.content)}
       </svg>
     </button>`
+    if (!reasoned) {
+      return control
+    }
+    return staticHtml`<${this.tag('tooltip')} id="send-reason" content=${this.sendReason}
+      exportparts="surface: send-reason">${control}</${this.tag('tooltip')}>`
   }
 
   /**

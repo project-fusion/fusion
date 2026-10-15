@@ -4,6 +4,7 @@ import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
 import { styles } from './chat-composer.css.js'
+import '../../tooltip/index.js'
 
 /** Where the glow's light is on the edge, which the sweep moves along it. */
 const LIGHT_X = '--_chat-composer-light-x'
