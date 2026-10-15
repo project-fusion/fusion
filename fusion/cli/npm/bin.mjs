@@ -120,6 +120,14 @@ const run = (binary) => {
   process.exit(status ?? 70)
 }
 
+/**
+ * What a build here asks cargo for: the selection `rs:build` and CI build,
+ * the workspace without the desktop app's shell. The shell links the system's
+ * webview, which a machine building only the command lines may not have: on
+ * CI's runner its `glib-sys` found no `glib-2.0` and every rule check failed.
+ */
+const SELECTION = ['--workspace', '--exclude', 'fusion-hartley-desktop']
+
 /* **In this repository, cargo is asked first, and asking is cheap.** A binary
    under `target/` is whatever the last build left, so after an edit to a rule,
    or a branch switch, this ran the old rules against the new tree: measured on
@@ -127,13 +135,13 @@ const run = (binary) => {
    where there is a crate and a cargo, the build comes first and the debug
    binary it leaves is the one that runs.
 
-   **`--workspace`, the selection `rs:build` and CI build.** Cargo unifies
-   features per selection, so alternating `-p fusion-cli` with `--workspace`
+   **`SELECTION`, the one `rs:build` and CI build.** Cargo unifies
+   features per selection, so alternating `-p fusion-cli` with the workspace
    recompiled on every switch, about a second each, where asking for the same
    selection twice is 0.14s. `FUSION_BIN` still outranks everything, and a checkout
    with no cargo falls through to whatever is already built. */
 if (process.env.FUSION_BIN === undefined && hasCargo()) {
-  const fresh = spawnSync('cargo', ['build', '--workspace', '--quiet'], {
+  const fresh = spawnSync('cargo', ['build', ...SELECTION, '--quiet'], {
     cwd: WORKSPACE,
     stdio: 'inherit',
   })
@@ -187,8 +195,8 @@ if (!hasCargo()) {
   process.exit(69)
 }
 
-console.error('fusion: no binary yet, building it once (cargo build --workspace)')
-const build = spawnSync('cargo', ['build', '--workspace'], {
+console.error(`fusion: no binary yet, building it once (cargo build ${SELECTION.join(' ')})`)
+const build = spawnSync('cargo', ['build', ...SELECTION], {
   cwd: WORKSPACE,
   stdio: 'inherit',
 })
