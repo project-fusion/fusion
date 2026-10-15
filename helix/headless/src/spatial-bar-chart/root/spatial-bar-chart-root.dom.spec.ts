@@ -254,6 +254,61 @@ describe('a row', () => {
     expect(all(element, 'tick')).toHaveLength(0)
     expect(all(element, 'value')).toHaveLength(1)
   })
+
+  test('a diagonal draws its floor and names climbing to the right', async () => {
+    const element = await days('variant="diagonal"')
+    expect(all(element, 'floor')).toHaveLength(3)
+    const names = all(element, 'tick')
+    expect(names.map((name) => name.textContent)).toEqual(['Mon', 'Tue', 'Wed'])
+    const at = names.map((name) => [Number(name.getAttribute('x')), Number(name.getAttribute('y'))])
+    expect(at[1]?.[0]).toBeGreaterThan(at[0]?.[0] ?? 0)
+    expect(at[1]?.[1]).toBeLessThan(at[0]?.[1] ?? 0)
+    expect(part(element, 'grid')).toBeNull()
+  })
+
+  test('says how many bars fit only where a row is measured with a bar size', async () => {
+    /* No layout here, so nothing is measured and the page shows every row. */
+    const element = (await days('variant="diagonal"')) as Plot & { fits?: number }
+    element.style.setProperty('--spatial-bar-chart-bar-size', '18px')
+    expect(element.fits).toBeUndefined()
+    const grid = (await days()) as Plot & { fits?: number }
+    expect(grid.fits).toBeUndefined()
+  })
+})
+
+/* The bubble over a 3D bar sits over the middle of its top and says what
+   the table says, "64,200" and not "64200". */
+describe('the tooltip', () => {
+  test('is centered on the bar and points at the top of its outline', async () => {
+    const element = await days('variant="diagonal"')
+    element.requestActive(1)
+    await element.updateComplete
+    const anchor = element.shadowRoot?.querySelector('foreignObject')
+    const ring = part(element, 'ring')?.getAttribute('d') ?? ''
+    const ys = [...ring.matchAll(/-?\d*\.?\d+(?:e-?\d+)?/g)]
+      .map((match) => Number(match[0]))
+      .filter((_, at) => at % 2 === 1)
+    expect(Number(anchor?.getAttribute('y'))).toBeCloseTo(Math.min(...ys), 3)
+    const top = bars(element)
+      .find((bar) => bar.getAttribute('data-index') === '1')
+      ?.querySelectorAll('[part="face"]')
+    const face = top?.[top.length - 1]?.getAttribute('d') ?? ''
+    const xs = [...face.matchAll(/-?\d*\.?\d+(?:e-?\d+)?/g)]
+      .map((match) => Number(match[0]))
+      .filter((_, at) => at % 2 === 0)
+    expect(Number(anchor?.getAttribute('x'))).toBeCloseTo(
+      xs.reduce((sum, x) => sum + x, 0) / xs.length,
+      3,
+    )
+  })
+
+  test("shows the cell's own text, as the page wrote it", async () => {
+    const element = await days('variant="diagonal"')
+    element.requestActive(1)
+    await element.updateComplete
+    const value = element.shadowRoot?.querySelector('[part="tooltip-value"]')
+    expect(value?.textContent).toBe('64,200')
+  })
 })
 
 describe('growing in', () => {
