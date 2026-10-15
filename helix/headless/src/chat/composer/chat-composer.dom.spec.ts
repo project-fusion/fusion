@@ -615,6 +615,33 @@ describe('send-disabled', () => {
     expect(sent).toBe(1)
   })
 
+  test('with a reason, the button stays reachable and its tooltip says why', async () => {
+    const element = await composer('send-disabled send-reason="Reading photo.jpg"')
+    let sent = 0
+    element.addEventListener('helix-send', () => {
+      sent += 1
+    })
+    await type(element, 'with a photo')
+    const button = part(element, 'send') as HTMLButtonElement
+    const tooltip = element.shadowRoot?.querySelector('#send-reason')
+    button.click()
+    expect([sent, element.value]).toEqual([0, 'with a photo'])
+    expect([button.disabled, button.getAttribute('aria-disabled')]).toEqual([false, 'true'])
+    expect(button.getAttribute('aria-describedby')).toBe('send-reason')
+    expect(tooltip?.getAttribute('content')).toBe('Reading photo.jpg')
+    button.focus()
+    expect(element.shadowRoot?.activeElement).toBe(button)
+  })
+
+  test('the reason goes once the draft is free to send', async () => {
+    const element = await composer('send-disabled send-reason="Reading photo.jpg"')
+    element.removeAttribute('send-disabled')
+    await element.updateComplete
+    const button = part(element, 'send') as HTMLButtonElement
+    expect(element.shadowRoot?.querySelector('#send-reason')).toBeNull()
+    expect([button.disabled, button.hasAttribute('aria-disabled')]).toEqual([false, false])
+  })
+
   test('leaves the stop button working while busy', async () => {
     const element = await composer('busy queue send-disabled')
     const button = part(element, 'send') as HTMLButtonElement
