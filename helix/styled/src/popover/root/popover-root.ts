@@ -22,9 +22,9 @@ import { styles } from './popover-root.css.js'
  * @aliases Popper, Flyout, Overlay
  * @documentation https://fusion.dev/helix/components/popover
  *
+ * @cssproperty --popover-arrow-size - Size of the point drawn with `arrow`. Tooltip's point is the same size.
  * @cssproperty --popover-backdrop - Filter applied behind a `frosted` or `glass` panel.
  *   Follows the theme's material policy.
- * @cssproperty --popover-arrow-size - Size of the point drawn with `arrow`. Tooltip's point is the same size.
  * @cssproperty --popover-background-color - Fill of the surface.
  * @cssproperty --popover-border-color - Color of the panel's edge.
  * @cssproperty --popover-border-width - Width of the panel's edge. Defaults to
@@ -38,18 +38,6 @@ import { styles } from './popover-root.css.js'
  */
 @customElement('helix-popover')
 export class HelixPopover extends HelixHeadlessPopover {
-  /**
-   * How the panel is set apart from the content under it.
-   *
-   * One of the axis's four values, which is all this surface has meaning for: a
-   * floating panel keeps its lift by default, `ThemeIntent.separation.floating`
-   * refusing `space` for the reason it refuses it everywhere, that a panel over
-   * content nobody can predict has to be readable.
-   *
-   * Unset is a surface with an inset, which is what a panel of content wants.
-   * `plain` removes both, for a panel holding something that brings its own,
-   * such as a list whose rows run to the edges.
-   */
   /**
    * The panel's surface: `frosted` or `glass`.
    *
@@ -68,6 +56,18 @@ export class HelixPopover extends HelixHeadlessPopover {
   @property({ reflect: true })
   material?: 'frosted' | 'glass'
 
+  /**
+   * How the panel is set apart from the content under it.
+   *
+   * One of the axis's four values, which is all this surface has meaning for: a
+   * floating panel keeps its lift by default, `ThemeIntent.separation.floating`
+   * refusing `space` for the reason it refuses it everywhere, that a panel over
+   * content nobody can predict has to be readable.
+   *
+   * Unset is a surface with an inset, which is what a panel of content wants.
+   * `plain` removes both, for a panel holding something that brings its own,
+   * such as a list whose rows run to the edges.
+   */
   @property({ reflect: true })
   separation?: 'plain'
 
