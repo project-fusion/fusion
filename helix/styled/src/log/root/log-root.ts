@@ -41,6 +41,7 @@ import '../line/log-line.js'
  * @cssproperty --log-radius - The corners of the log.
  * @cssproperty --log-scrollbar-thumb-color - The thumb of the scrollbar. Defaults to `--helix-scrollbar-thumb-color`.
  * @cssproperty --log-scrollbar-track-color - The track of the scrollbar. Defaults to `--helix-scrollbar-track-color`.
+ * @cssproperty --log-step-max-block-size - How tall a step's lines may get in a `plain` log before they scroll. Defaults to 20rem.
  */
 @customElement('helix-log')
 export class HelixLog extends HelixHeadlessLog {
@@ -54,7 +55,10 @@ export class HelixLog extends HelixHeadlessLog {
    * - `plain` has no edge, no fill, no inset and no height of its own: the
    *   lines start where the text around them does and the log grows with
    *   them. For a log inside something that already frames it, such as an
-   *   agent's work in a chat turn's `work` slot.
+   *   agent's work in a chat turn's `work` slot. Each step is a row with its
+   *   status mark on that edge and its caret after the heading. A step that
+   *   holds steps draws a rule beside them, and a step that holds lines draws
+   *   them on a quiet surface that scrolls after `--log-step-max-block-size`.
    *
    * Both are writable, so a page can say which it means rather than relying
    * on the absence of an attribute.
