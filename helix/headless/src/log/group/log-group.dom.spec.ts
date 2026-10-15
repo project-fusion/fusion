@@ -66,4 +66,32 @@ describe('Log Group', () => {
     const element = await group()
     expect(part(element, 'status')).toBeNull()
   })
+
+  test('says whether it holds steps of its own, and whether it holds anything', async () => {
+    const host = (await mount(
+      `<div><helix-headless-log-group heading="Worked">
+        <helix-headless-log-group heading="Read the log">
+          <helix-headless-log-line>ok</helix-headless-log-line>
+        </helix-headless-log-group>
+      </helix-headless-log-group><helix-headless-log-group heading="Waited"></helix-headless-log-group></div>`,
+    )) as HTMLElement
+    const [outer, inner, bare] = [...host.querySelectorAll('helix-headless-log-group')] as Group[]
+    await Promise.all([outer, inner, bare].map((element) => element?.updateComplete))
+    expect(hasState(outer as Group, 'steps')).toBe(true)
+    expect(hasState(inner as Group, 'steps')).toBe(false)
+    expect(hasState(inner as Group, 'empty')).toBe(false)
+    expect(hasState(bare as Group, 'empty')).toBe(true)
+  })
+
+  test('stops being empty when lines arrive', async () => {
+    const host = (await mount(
+      '<div><helix-headless-log-group heading="Run"></helix-headless-log-group></div>',
+    )) as HTMLElement
+    const element = host.querySelector('helix-headless-log-group') as Group
+    await element.updateComplete
+    expect(hasState(element, 'empty')).toBe(true)
+    element.append(document.createElement('helix-headless-log-line'))
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(hasState(element, 'empty')).toBe(false)
+  })
 })
