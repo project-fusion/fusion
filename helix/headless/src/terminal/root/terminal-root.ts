@@ -338,6 +338,16 @@ const opens = (href: string): boolean => /^https?:\/\//i.test(href)
  * @csspart restart-spinner - The ring the Restart button turns while it is pending.
  * @csspart restart-text - The Restart button's label.
  * @csspart status - The line under the terminal that says the process exited, or that Tab moves focus.
+ * @csspart tooltip-arrow - The arrow of the tooltip that names each button, forwarded from `Tooltip`.
+ * @csspart tooltip-arrow-bottom - The arrow while the bubble is below its button, on the bubble's top edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-left - The arrow while the bubble is left of its button, on the bubble's right edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-right - The arrow while the bubble is right of its button, on the bubble's left edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-top - The arrow while the bubble is above its button, on the bubble's bottom edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-surface - The bubble of the tooltip that names each button, forwarded from `Tooltip`.
+ * @csspart tooltip-surface-bottom - The bubble while it is below its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-left - The bubble while it is left of its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-right - The bubble while it is right of its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-top - The bubble while it is above its button. Set together with `tooltip-surface`.
  * @csspart viewport - The box the terminal is drawn in.
  *
  * @cssproperty --terminal-active-match-background-color - The ground of the current match of a search.
@@ -1153,7 +1163,7 @@ export class HelixHeadlessTerminal extends HelixElement {
               @helix-press=${stopPress}
             >
               <slot name="find-icon">${drawIcon(magnifyingGlass)}</slot>
-            </${button}><${tip} for="find" content=${this.findLabel}></${tip}>`
+            </${button}><${tip} for="find" content=${this.findLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1168,7 +1178,7 @@ export class HelixHeadlessTerminal extends HelixElement {
               @helix-press=${stopPress}
             >
               <slot name="copy-icon">${drawIcon(copy)}</slot>
-            </${button}><${tip} for="copy" content=${this.copyLabel}></${tip}>`
+            </${button}><${tip} for="copy" content=${this.copyLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1182,7 +1192,7 @@ export class HelixHeadlessTerminal extends HelixElement {
               @helix-press=${stopPress}
             >
               <slot name="clear-icon">${drawIcon(broom)}</slot>
-            </${button}><${tip} for="clear" content=${this.clearLabel}></${tip}>`
+            </${button}><${tip} for="clear" content=${this.clearLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1197,7 +1207,7 @@ export class HelixHeadlessTerminal extends HelixElement {
               @helix-press=${stopPress}
             >
               <slot name="fullscreen-icon">${drawIcon(cornersOut)}</slot>
-            </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel}></${tip}>`
+            </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
     </${toolbar}>`
@@ -1240,7 +1250,7 @@ export class HelixHeadlessTerminal extends HelixElement {
           @helix-press=${stopPress}
         >
           <slot name="find-match-case-icon">${drawIcon(textAa)}</slot>
-        </${button}><${tip} for="find-match-case" content=${this.findMatchCaseLabel}></${tip}>
+        </${button}><${tip} for="find-match-case" content=${this.findMatchCaseLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
         <${button}
           part="find-whole-word"
           id="find-whole-word"
@@ -1251,7 +1261,7 @@ export class HelixHeadlessTerminal extends HelixElement {
           @helix-press=${stopPress}
         >
           <slot name="find-whole-word-icon">${drawIcon(textAUnderline)}</slot>
-        </${button}><${tip} for="find-whole-word" content=${this.findWholeWordLabel}></${tip}>
+        </${button}><${tip} for="find-whole-word" content=${this.findWholeWordLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
         <${button}
           part="find-regex"
           id="find-regex"
@@ -1262,7 +1272,7 @@ export class HelixHeadlessTerminal extends HelixElement {
           @helix-press=${stopPress}
         >
           <slot name="find-regex-icon">${drawIcon(asterisk)}</slot>
-        </${button}><${tip} for="find-regex" content=${this.findRegexLabel}></${tip}>
+        </${button}><${tip} for="find-regex" content=${this.findRegexLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
         <slot name="find-actions" part="find-actions"></slot>
         <${button}
           part="find-previous"
@@ -1274,7 +1284,7 @@ export class HelixHeadlessTerminal extends HelixElement {
           @helix-press=${stopPress}
         >
           <slot name="find-previous-icon">${drawIcon(caretUp)}</slot>
-        </${button}><${tip} for="find-previous" content=${this.findPreviousLabel}></${tip}>
+        </${button}><${tip} for="find-previous" content=${this.findPreviousLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
         <${button}
           part="find-next"
           id="find-next"
@@ -1285,7 +1295,7 @@ export class HelixHeadlessTerminal extends HelixElement {
           @helix-press=${stopPress}
         >
           <slot name="find-next-icon">${drawIcon(caretDown)}</slot>
-        </${button}><${tip} for="find-next" content=${this.findNextLabel}></${tip}>
+        </${button}><${tip} for="find-next" content=${this.findNextLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
         <${button}
           part="find-close"
           id="find-close"
@@ -1295,7 +1305,7 @@ export class HelixHeadlessTerminal extends HelixElement {
           @helix-press=${stopPress}
         >
           <slot name="find-close-icon">${drawIcon(x)}</slot>
-        </${button}><${tip} for="find-close" content=${this.findCloseLabel}></${tip}>
+        </${button}><${tip} for="find-close" content=${this.findCloseLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
       </${toolbar}>
     </div>`
   }

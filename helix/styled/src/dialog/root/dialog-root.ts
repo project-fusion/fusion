@@ -40,6 +40,20 @@ import { styles } from './dialog-root.css.js'
 @customElement('helix-dialog')
 export class HelixDialog extends HelixHeadlessDialog {
   /**
+   * The panel's surface: `frosted` or `glass`.
+   *
+   * Absent is the opaque overlay surface. `glass` is the page's translucent
+   * ground over the theme's blur, and `frosted` the same pair turned up, as
+   * on `Popover`, `Menu`, `Drawer` and `Tooltip`, so a page whose panels are
+   * frosted has dialogs that match.
+   *
+   * **No `transparent`, deliberately.** A dialog over arbitrary page content
+   * is only readable because it has a ground.
+   */
+  @property({ reflect: true })
+  material?: 'frosted' | 'glass'
+
+  /**
    * How wide the panel is allowed to be.
    *
    * Steps rather than a number, because a dialog's width is a fact about what is
@@ -62,20 +76,6 @@ export class HelixDialog extends HelixHeadlessDialog {
    */
   @property({ reflect: true })
   size?: 'sm' | 'md' | 'lg' | 'full'
-
-  /**
-   * The panel's surface: `frosted` or `glass`.
-   *
-   * Absent is the opaque overlay surface. `glass` is the page's translucent
-   * ground over the theme's blur, and `frosted` the same pair turned up, as
-   * on `Popover`, `Menu`, `Drawer` and `Tooltip`, so a page whose panels are
-   * frosted has dialogs that match.
-   *
-   * **No `transparent`, deliberately.** A dialog over arbitrary page content
-   * is only readable because it has a ground.
-   */
-  @property({ reflect: true })
-  material?: 'frosted' | 'glass'
 
   /**
    * Which way the panel's contents read.

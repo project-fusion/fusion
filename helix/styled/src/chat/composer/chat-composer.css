@@ -62,6 +62,9 @@
     var(--chat-composer-glow-color, var(--helix-color-primary)) 35%,
     transparent 100%
   );
+  /* Where the light starts, at the corner. The element's script moves it. */
+  --_chat-composer-light-x: 0px;
+  --_chat-composer-light-y: 0px;
   border-radius: inherit;
   content: "";
   /* Inside the edge rather than over it: the edge's width may be a bare
@@ -71,15 +74,19 @@
     linear-gradient(#000 0 0) content-box exclude,
     linear-gradient(#000 0 0);
   opacity: 0;
-  padding: 2px;
+  padding: var(--helix-border-thick);
   pointer-events: none;
   position: absolute;
 }
 
 :host([glow]) [part="composer"]::after {
+  /* How far the bloom reaches past the edge. */
+  --_chat-composer-bloom: var(--helix-space-md);
+  --_chat-composer-light-x: 0px;
+  --_chat-composer-light-y: 0px;
   background: radial-gradient(
-    4rem 2rem at calc(var(--_chat-composer-light-x, 0px) + 1rem)
-      calc(var(--_chat-composer-light-y, 0px) + 1rem),
+    4rem 2rem at calc(var(--_chat-composer-light-x, 0px) + var(--_chat-composer-bloom))
+      calc(var(--_chat-composer-light-y, 0px) + var(--_chat-composer-bloom)),
     color-mix(
       in oklab,
       var(--chat-composer-glow-color, var(--helix-color-primary)) 55%,
@@ -87,7 +94,7 @@
     ),
     transparent 100%
   );
-  border-radius: calc(var(--helix-radii-md) + 1rem);
+  border-radius: calc(var(--helix-radii-md) + var(--_chat-composer-bloom));
   content: "";
   /* **The light's bloom, outside the edge**, where a ring two pixels wide
      carries too little light to read on a frosted ground. Cut to the band
@@ -95,15 +102,15 @@
      through a translucent fill onto the words inside. Offset by its own
      inset, so it sits where the light does. */
   filter: blur(6px);
-  inset: -1rem;
+  inset: calc(var(--_chat-composer-bloom) * -1);
   mask:
     linear-gradient(#000 0 0) content-box exclude,
     linear-gradient(#000 0 0);
   opacity: 0;
-  padding: 1rem;
+  padding: var(--_chat-composer-bloom);
   pointer-events: none;
   position: absolute;
-  z-index: -1;
+  z-index: var(--helix-layer-beneath);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -117,10 +124,12 @@
   --chat-composer-glow-color: var(--helix-color-danger);
 }
 
-/* Forced colors draw no shadow, so the ring comes back as the focus. */
+/* Forced colors draw no shadow, so the ring comes back as the focus, flush
+   as the composer's ring is, in the system color forced colors give it. */
 @media (forced-colors: active) {
   :host([glow]) [part="composer"]:focus-within {
-    outline: var(--helix-size-focus-ring) solid CanvasText;
+    outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+    outline-offset: 0;
   }
 }
 

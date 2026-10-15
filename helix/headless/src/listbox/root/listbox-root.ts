@@ -1307,6 +1307,11 @@ export class HelixHeadlessListbox extends MixinVoice(
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('click', this.handleClick, true)
     auditChildren(this, 'option', 'option', 'the list offers no choices')
+    /* Watched again where a filtered list is moved, since leaving stopped
+       its observer. */
+    if (this.hasUpdated) {
+      this.watchSources(this.filter.trim() !== '')
+    }
   }
 
   override disconnectedCallback(): void {

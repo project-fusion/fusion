@@ -921,7 +921,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @helix-press=${stopPress}
                 >
                   <slot name="pan-up-icon">${up}</slot>
-                </${button}><${tip} for="pan-up" content=${this.panLabel('up')}></${tip}>
+                </${button}><${tip} for="pan-up" content=${this.panLabel('up')} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
                 <${button}
                   part="pan-start"
                   id="pan-start"
@@ -933,7 +933,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @helix-press=${stopPress}
                 >
                   <slot name="pan-start-icon">${start}</slot>
-                </${button}><${tip} for="pan-start" content=${this.panLabel('start')}></${tip}>
+                </${button}><${tip} for="pan-start" content=${this.panLabel('start')} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
                 <${button}
                   part="pan-end"
                   id="pan-end"
@@ -945,7 +945,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @helix-press=${stopPress}
                 >
                   <slot name="pan-end-icon">${end}</slot>
-                </${button}><${tip} for="pan-end" content=${this.panLabel('end')}></${tip}>
+                </${button}><${tip} for="pan-end" content=${this.panLabel('end')} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
                 <${button}
                   part="pan-down"
                   id="pan-down"
@@ -957,7 +957,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @helix-press=${stopPress}
                 >
                   <slot name="pan-down-icon">${down}</slot>
-                </${button}><${tip} for="pan-down" content=${this.panLabel('down')}></${tip}>`
+                </${button}><${tip} for="pan-down" content=${this.panLabel('down')} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
             : nothing
         }
         ${
@@ -973,7 +973,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @helix-press=${stopPress}
                 >
                   <slot name="zoom-in-icon">+</slot>
-                </${button}><${tip} for="zoom-in" content=${this.zoomInLabel}></${tip}>
+                </${button}><${tip} for="zoom-in" content=${this.zoomInLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
                 <${button}
                   part="zoom-out"
                   id="zoom-out"
@@ -985,7 +985,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                   @helix-press=${stopPress}
                 >
                   <slot name="zoom-out-icon">−</slot>
-                </${button}><${tip} for="zoom-out" content=${this.zoomOutLabel}></${tip}>`
+                </${button}><${tip} for="zoom-out" content=${this.zoomOutLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
             : nothing
         }
         ${more}
@@ -1003,7 +1003,7 @@ export const MixinViewport = <T extends Constructor<HelixElement>>(Base: T) => {
                 @helix-press=${stopPress}
               >
                 <slot name="fullscreen-icon">⤢</slot>
-              </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel}></${tip}>`
+              </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
             : nothing
         }
       </div>`

@@ -415,6 +415,16 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @csspart pan-up-spinner - The ring `pan-up` turns while it is pending.
  * @csspart pan-up-text - The box `pan-up`'s glyph sits in.
  * @csspart region - The named region the board is drawn in.
+ * @csspart tooltip-arrow - The arrow of the tooltip that names each button, forwarded from `Tooltip`.
+ * @csspart tooltip-arrow-bottom - The arrow while the bubble is below its button, on the bubble's top edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-left - The arrow while the bubble is left of its button, on the bubble's right edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-right - The arrow while the bubble is right of its button, on the bubble's left edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-top - The arrow while the bubble is above its button, on the bubble's bottom edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-surface - The bubble of the tooltip that names each button, forwarded from `Tooltip`.
+ * @csspart tooltip-surface-bottom - The bubble while it is below its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-left - The bubble while it is left of its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-right - The bubble while it is right of its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-top - The bubble while it is above its button. Set together with `tooltip-surface`.
  * @csspart viewport - The box the board is drawn inside.
  * @csspart zoom-in - The button that zooms in.
  * @csspart zoom-in-button - `zoom-in`'s inner button.

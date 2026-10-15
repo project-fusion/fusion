@@ -268,6 +268,7 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * @csspart log - The transcript, which scrolls. On this tier, it needs only a block size.
  * @csspart message - The message drawn for a turn from `turns`, forwarded whole.
  * @csspart message-actions - The controls on a turn from `turns`, beside its time.
+ * @csspart message-attachments - The attachments above the bubble of a turn from `turns`.
  * @csspart message-avatar - The avatar box of a turn from `turns`.
  * @csspart message-avatar-mine - The avatar box of a turn from `turns` by `me`.
  * @csspart message-body - The content of a turn from `turns`, and the line under it.
@@ -1584,7 +1585,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         (turn, offset) =>
           html`<div part="turn" data-index=${first + offset}>
             <${message}
-              exportparts="actions: message-actions, avatar: message-avatar, body: message-body,
+              exportparts="actions: message-actions, attachments: message-attachments, avatar: message-avatar, body: message-body,
                 content: message-content, indicator: message-indicator, mark: message-mark, message,
                 meta: message-meta, retry: message-retry, sources: message-sources,
                 state: message-state, time: message-time, work: message-work${secondNames(SECOND_NAMES.author, turn.author)}${secondNames(SECOND_NAMES.state, turn.state)}"
