@@ -66,6 +66,12 @@ export interface BarField {
   lanes: number
   /** How many cells hold a value. */
   readings: number
+  /**
+   * How far a `diagonal` row climbs on the page for each step across, where
+   * it climbs less than Switchyard's 15 for every 72: a long row in a short
+   * plot, whose climb would leave its bars no height.
+   */
+  climb?: number
   /** Every series, in the table's order: each numeric column's heading. */
   series: string[]
   /** Whether a category's series stand in one column, each on the ones before it. */
@@ -185,33 +191,82 @@ export const barsOf = (
 const FOOTPRINT = 0.6
 
 /**
+ * How the bars stand: on the box's grid, in a row level across the page, or
+ * in a row that climbs to the right as it recedes.
+ */
+export type BarLayout = 'diagonal' | 'grid' | 'row'
+
+/**
+ * How far a `diagonal` row climbs on the page for each step across it: 15
+ * for every 72, the climb of the row of days on Switchyard's page.
+ */
+const CLIMB = 15 / 72
+
+/**
  * Where each cell's bar stands on the floor, and how far apart places are:
  * the grid's own axes, or in a row along the camera's level line and
- * straight back from it.
+ * straight back from it. A `diagonal` row steps back as it goes across, by
+ * as much as makes it climb `CLIMB` on the page.
  */
 const placesOf = (
   field: BarField,
   projection: Projection,
-  row: boolean,
+  layout: BarLayout,
 ): { place: (cell: BarCell) => { x: number; y: number }; spacing: number } => {
   const [ex, , ez] = field.axes.extent
   const [cos, sin] = projection.across
-  const spread = row ? Math.abs(cos) + Math.abs(sin) : 1
+  const lined = layout !== 'grid'
+  const spread = lined ? Math.abs(cos) + Math.abs(sin) : 1
   const spacing =
     Math.min((2 * ex) / Math.max(field.categories.length, 1), (2 * ez) / Math.max(field.lanes, 1)) /
     spread
+  /* A step straight back rises on the page by as much as the camera looks
+     down, and a step along the level line moves across it by its length. */
+  const origin = projection.at(0, 0, 0)
+  const rise = origin.y - projection.at(-sin, cos, 0).y
+  const across = projection.at(cos, sin, 0).x - origin.x
+  const climb = layout === 'diagonal' && rise > 0 ? ((field.climb ?? CLIMB) * across) / rise : 0
   return {
     place: (cell) => {
       const along = inBox(field.axes.x, cell.across) * ex
       /* The floor's way back is the box's depth turned round, as the box's
          own places are. */
-      const back = -inBox(field.axes.z, cell.lane) * ez
-      return row
+      const back = -inBox(field.axes.z, cell.lane) * ez + along * climb
+      return lined
         ? { x: along * cos - back * sin, y: along * sin + back * cos }
         : { x: along, y: back }
     },
     spacing,
   }
+}
+
+/**
+ * How many categories a row has room for across `width` pixels with each bar
+ * `size` pixels wide: a bar covers `FOOTPRINT` of its place, so a place is
+ * that much wider than its bar. At least one.
+ */
+export const rowFits = (width: number, size: number): number =>
+  size > 0 ? Math.max(1, Math.floor((width * FOOTPRINT) / size)) : 1
+
+/** How wide a bar is on the page, in the drawing's units. */
+export const widthOf = (bar: DrawnBar): number => {
+  const xs = bar.corners.map((corner) => corner.x)
+  return Math.max(...xs) - Math.min(...xs)
+}
+
+/**
+ * The field with its `diagonal` row climbing at most `rise` on the page over
+ * `length` across, so a long row keeps the height its bars need.
+ */
+export const climbing = (field: BarField, rise: number, length: number): BarField => ({
+  ...field,
+  climb: length > 0 ? Math.min(CLIMB, rise / length) : CLIMB,
+})
+
+/** The field with its value axis `times` as tall, which stands every bar that much taller. */
+export const heightened = (field: BarField, times: number): BarField => {
+  const [ex, ey, ez] = field.axes.extent
+  return { ...field, axes: { ...field.axes, extent: [ex, ey * times, ez] } }
 }
 
 /** A bar as the chart's own drawing paints it. */
@@ -238,7 +293,9 @@ export interface DrawnBar {
  * so the row stays level whichever way the camera turns, and each block,
  * which keeps to the floor's grid, shows the turn: its top and two sides.
  * Turned, a block is wider on the page than its footprint, so the footprint
- * narrows by as much, and neighbors still stand apart.
+ * narrows by as much, and neighbors still stand apart. **`diagonal` lays the
+ * same row climbing to the right**, each place a step further back than the
+ * one before, at the same climb on the page from any turn.
  *
  * `grown` says how much of its height each bar has reached, from 0 to 1, as
  * the chart grows its bars in.
@@ -246,11 +303,11 @@ export interface DrawnBar {
 export const barsDrawn = (
   field: BarField,
   projection: Projection,
-  row = false,
+  layout: BarLayout = 'grid',
   grown: (cell: BarCell) => number = () => 1,
 ): DrawnBar[] => {
   const ey = field.axes.extent[1]
-  const { place, spacing } = placesOf(field, projection, row)
+  const { place, spacing } = placesOf(field, projection, layout)
   return field.cells.flatMap((cell, index): DrawnBar[] => {
     /* A zero in a stack adds nothing to its column, so it draws no block, as
        a flat chart's stack draws none; standing alone, a zero is a plate on
@@ -318,10 +375,15 @@ export interface FloorPlate {
 /**
  * The places on the floor of a row, one for each category in each lane,
  * whether a bar stands there or not: a square a little wider than a bar's
- * footprint, turned as the bars are, where zero stands on the value axis.
+ * footprint, turned as the bars are, where zero stands on the value axis,
+ * along the row `layout` lays.
  */
-export const floorOf = (field: BarField, projection: Projection): FloorPlate[] => {
-  const { place, spacing } = placesOf(field, projection, true)
+export const floorOf = (
+  field: BarField,
+  projection: Projection,
+  layout: Exclude<BarLayout, 'grid'> = 'row',
+): FloorPlate[] => {
+  const { place, spacing } = placesOf(field, projection, layout)
   const floor = inBox(field.axes.y, 0) * field.axes.extent[1]
   const half = (spacing * PLATE) / 2
   const seen = new Set<string>()

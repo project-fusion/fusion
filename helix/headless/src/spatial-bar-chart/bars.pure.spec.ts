@@ -1,6 +1,19 @@
 import { describe, expect, test } from 'bun:test'
 import { boxView, SPATIAL_VIEW } from '../spatial-scatter-chart/view.js'
-import { barsDrawn, barsOf, floorOf, grownAt, growTime, namesOf, paintOrder } from './bars.js'
+import {
+  barsDrawn,
+  barsOf,
+  climbing,
+  type DrawnBar,
+  floorOf,
+  grownAt,
+  growTime,
+  heightened,
+  namesOf,
+  paintOrder,
+  rowFits,
+  widthOf,
+} from './bars.js'
 
 const row = (label: string, ...values: Array<number | undefined>) => ({
   cells: values.map((value, at) => ({
@@ -100,11 +113,116 @@ test('a row stands level on the page whichever way the camera turns', () => {
   const field = barsOf([row('1', 4), row('2', 6), row('3', 2), row('4', 5)], [0], true)
   for (const turn of [0, 25, 42, 90, 140]) {
     const { projection } = boxView(field.axes, { tilt: 25, turn }, [], true)
-    const feet = barsDrawn(field, projection, true).map((bar) => projection.at(bar.x, bar.y, 0).y)
+    const feet = barsDrawn(field, projection, 'row').map((bar) => projection.at(bar.x, bar.y, 0).y)
     for (const foot of feet) {
       expect(foot).toBeCloseTo(feet[0] ?? 0, 6)
     }
   }
+})
+
+/* Switchyard's row of days climbs to the right as it recedes, 15 up for
+   every 72 across. A diagonal row keeps that climb from any turn, and each
+   place stands further back than the one before. */
+describe('a diagonal row', () => {
+  const field = barsOf([row('1', 4), row('2', 6), row('3', 2), row('4', 5)], [0])
+
+  test('climbs to the right at the same rise from any turn, each place further back', () => {
+    for (const turn of [0, 25, 42, 90, 140]) {
+      const { projection } = boxView(field.axes, { tilt: 25, turn }, [], true)
+      const feet = barsDrawn(field, projection, 'diagonal').map((bar) =>
+        projection.at(bar.x, bar.y, 0),
+      )
+      for (const [at, foot] of feet.entries()) {
+        const next = feet[at + 1]
+        if (next) {
+          expect(next.x).toBeGreaterThan(foot.x)
+          expect((foot.y - next.y) / (next.x - foot.x)).toBeCloseTo(15 / 72, 6)
+        }
+      }
+      const depths = barsDrawn(field, projection, 'diagonal').map((bar) =>
+        projection.depth(bar.x, bar.y),
+      )
+      expect(depths).toEqual([...depths].sort((one, other) => other - one))
+    }
+  })
+
+  test('its plates and names climb with it, and names that would touch are left out', () => {
+    const { projection } = boxView(field.axes, SPATIAL_VIEW, [], true)
+    const plates = floorOf(field, projection, 'diagonal')
+    for (const [at, plate] of plates.entries()) {
+      const next = plates[at + 1]
+      if (next) {
+        expect(next.front.y).toBeLessThan(plate.front.y)
+      }
+    }
+    expect(namesOf(field, plates, 0.05).map((name) => name.text)).toEqual(['1', '2', '3', '4'])
+    expect(namesOf(field, plates, 0.8).length).toBeLessThan(4)
+  })
+
+  test('a long row climbs less, so it rises no more than it is given', () => {
+    const { projection } = boxView(field.axes, SPATIAL_VIEW, [], true)
+    const feet = (one: typeof field) =>
+      barsDrawn(one, projection, 'diagonal').map((bar) => projection.at(bar.x, bar.y, 0))
+    const steep = feet(field)
+    const length = (steep.at(-1)?.x ?? 0) - (steep[0]?.x ?? 0)
+    const shallow = feet(climbing(field, length * 0.1, length))
+    expect((shallow[0]?.y ?? 0) - (shallow.at(-1)?.y ?? 0)).toBeCloseTo(length * 0.1, 6)
+    /* Given more room than it climbs, it keeps its own climb. */
+    const kept = feet(climbing(field, length, length))
+    expect((kept[0]?.y ?? 0) - (kept.at(-1)?.y ?? 0)).toBeCloseTo((length * 15) / 72, 6)
+  })
+
+  test('stands its bars as far apart across the page as a level row does', () => {
+    const { projection } = boxView(field.axes, SPATIAL_VIEW, [], true)
+    const across = (layout: 'diagonal' | 'row') =>
+      barsDrawn(field, projection, layout).map((bar) => projection.at(bar.x, bar.y, 0).x)
+    const level = across('row')
+    for (const [at, x] of across('diagonal').entries()) {
+      expect(x).toBeCloseTo(level[at] ?? 0, 6)
+    }
+  })
+})
+
+/* One call's bar filled the Usage pane's card, and forty-two were slivers.
+   A row's bars keep one width: every bar is as wide on the page whatever the
+   count, so the drawing's scale follows the bar, and a plot holds a count of
+   them. */
+describe('a row of one width', () => {
+  test('every bar in a row is the same width on the page, as a share of its place', () => {
+    for (const count of [1, 8, 42]) {
+      const field = barsOf(
+        Array.from({ length: count }, (_, at) => row(String(at + 1), (at % 5) + 1)),
+        [0],
+      )
+      const { projection } = boxView(field.axes, SPATIAL_VIEW, [], true)
+      const bars = barsDrawn(field, projection, 'diagonal')
+      const width = widthOf(bars[0] as DrawnBar)
+      for (const bar of bars) {
+        expect(widthOf(bar)).toBeCloseTo(width, 9)
+      }
+      if (bars[1]) {
+        const step =
+          projection.at(bars[1].x, bars[1].y).x - projection.at(bars[0]?.x ?? 0, bars[0]?.y ?? 0).x
+        expect(width / step).toBeCloseTo(0.6, 6)
+      }
+    }
+  })
+
+  test('a plot holds as many places as its width over a bar and its gap, and at least one', () => {
+    /* A bar covers three fifths of its place: 18px bars take 30px each. */
+    expect(rowFits(540, 18)).toBe(18)
+    expect(rowFits(300, 18)).toBe(10)
+    expect(rowFits(20, 18)).toBe(1)
+  })
+
+  test('a taller value axis stands every bar taller by as much, on the same floor', () => {
+    const field = barsOf([row('1', 4), row('2', 6)], [0])
+    const { projection } = boxView(field.axes, SPATIAL_VIEW, [], true)
+    const once = barsDrawn(field, projection, 'diagonal')
+    const twice = barsDrawn(heightened(field, 2), projection, 'diagonal')
+    expect(twice[1]?.height).toBeCloseTo((once[1]?.height ?? 0) * 2, 9)
+    expect(widthOf(twice[1] as DrawnBar)).toBeCloseTo(widthOf(once[1] as DrawnBar), 9)
+  })
 })
 
 /* A week of runs with today lit, read as Switchyard draws it: neutral bars,
@@ -130,7 +248,7 @@ describe('a lit bar, and a row with its floor', () => {
     const { projection } = boxView(week.axes, SPATIAL_VIEW, [], true)
     const plates = floorOf(week, projection)
     expect(plates.map((plate) => plate.across)).toEqual([0, 1, 2, 3])
-    const bars = barsDrawn(week, projection, true)
+    const bars = barsDrawn(week, projection, 'row')
     const wide = (points: { x: number }[]) =>
       Math.max(...points.map((point) => point.x)) - Math.min(...points.map((point) => point.x))
     expect(wide(plates[0]?.corners ?? [])).toBeGreaterThan(
@@ -187,8 +305,8 @@ describe('growing in', () => {
   test('a growing bar stands from the floor at its share of its height', () => {
     const field = barsOf([row('1', 4, 6)], [0, 1], true)
     const { projection } = boxView(field.axes, SPATIAL_VIEW, [], true)
-    const full = barsDrawn(field, projection, true)
-    const half = barsDrawn(field, projection, true, () => 0.5)
+    const full = barsDrawn(field, projection, 'row')
+    const half = barsDrawn(field, projection, 'row', () => 0.5)
     expect(half[1]?.height).toBeCloseTo((full[1]?.height ?? 0) / 2, 6)
     expect(half[1]?.base).toBeCloseTo(((full[1]?.base ?? 0) + (full[0]?.base ?? 0)) / 2, 6)
   })

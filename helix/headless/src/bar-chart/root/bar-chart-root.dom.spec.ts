@@ -775,3 +775,51 @@ describe('more columns than pixels', () => {
     expect(await count(20_000)).toBe(few)
   })
 })
+
+/* Settings' Usage page wrote "0.000083" in a cell and the bubble said so.
+   The bubble says what the cell says, so a page that writes "$0.08" with the
+   number in `data-value` gets "$0.08", over the top of a column, centered on
+   it, and beside the end of a bar laid across. */
+describe('the tooltip', () => {
+  const SPEND = `<table id="spend">
+    <thead><tr><th scope="col">Model</th><th scope="col">Spend</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">opus</th><td data-value="0.083">$0.08</td></tr>
+      <tr><th scope="row">haiku</th><td data-value="0.000083">$0.000083</td></tr>
+    </tbody>
+  </table>`
+
+  const point = async (attributes: string) => {
+    const host = (await chart(SPEND, `for="spend" ${attributes}`)) as HTMLElement & {
+      pointer: { set: (at: number) => void }
+      updateComplete: Promise<unknown>
+    }
+    host.pointer.set(0)
+    await host.updateComplete
+    const mark = host.shadowRoot?.querySelector('[part="mark"]') as HTMLElement | null
+    const bubble = host.shadowRoot?.querySelector('[part="tooltip-anchor"]')
+    return {
+      bubble,
+      mark,
+      value: host.shadowRoot?.querySelector('[part="tooltip-value"]')?.textContent,
+    }
+  }
+
+  test("shows the cell's own text, not the number behind it", async () => {
+    const { value } = await point('')
+    expect(value).toBe('$0.08')
+  })
+
+  test('sits over the top of a column, centered on its category', async () => {
+    const { bubble, mark } = await point('')
+    expect(bubble?.getAttribute('placement')).toBe('top')
+    expect(mark?.style.insetInlineStart).toBe('25%')
+    expect(mark?.style.insetBlockStart).toMatch(/%$/)
+  })
+
+  test('sits beside the end of a bar laid across', async () => {
+    const { bubble, mark } = await point('orientation="horizontal"')
+    expect(bubble?.getAttribute('placement')).toBe('right')
+    expect(mark?.style.insetBlockStart).toBe('25%')
+  })
+})

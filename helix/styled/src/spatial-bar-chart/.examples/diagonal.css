@@ -1,0 +1,4 @@
+/* Each bar 28px wide, whatever the number of days, as a card of a week might draw them. */
+helix-spatial-bar-chart {
+  --spatial-bar-chart-bar-size: 28px;
+}

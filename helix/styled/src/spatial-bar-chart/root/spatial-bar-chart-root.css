@@ -42,7 +42,8 @@
 /* With no box, the readings stand on the page itself, as a picture on a
    landing page does, with nothing drawn behind them. */
 :host([no-box]) [part="plot"],
-:host([variant="row"]) [part="plot"] {
+:host([variant="row"]) [part="plot"],
+:host([variant="diagonal"]) [part="plot"] {
   background-color: transparent;
 }
 
@@ -58,6 +59,13 @@
   font-size: var(--helix-text-xs);
   inset: var(--helix-space-md);
   position: absolute;
+}
+
+/* **A row's bar size rides on the gap**, which a block box lays nothing out
+   with and the browser resolves to pixels from any length, `em` and `calc()`
+   included. The component reads it back and draws each bar that wide. */
+:host([variant]) [part="fallback"] {
+  column-gap: var(--spatial-bar-chart-bar-size, normal);
 }
 
 [part="fallback"][hidden] {
@@ -202,10 +210,14 @@
   --_spatial-bar-chart-through: calc(0.88 * var(--helix-material-opacity));
 }
 
-/* **Centered on the top of the bar**: inside the drawing, the mark's one
-   pixel is one of the `viewBox`'s units, many pixels on the page, and a
-   bubble pointed at its middle missed the bar by half of it. */
+/* **Centered on its point, and a fiftieth of a hairline across**: inside the
+   drawing a pixel is one of the `viewBox`'s units, which in a row of small
+   bars is a hundred pixels or more on the page, so a mark one unit tall put
+   the bubble half of that over the bar. A fiftieth stays a few pixels at any
+   scale and keeps a size to anchor to. */
 foreignObject > [part="mark"] {
+  block-size: calc(var(--helix-border-thin) / 50);
+  inline-size: calc(var(--helix-border-thin) / 50);
   translate: -50% -50%;
 }
 
