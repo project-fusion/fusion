@@ -15,15 +15,32 @@ const reading = (time: number): { bands: number[]; level: number } => {
   return { bands, level }
 }
 
+/* With reduced motion on, both show one moment of the phrase and stop. */
+const MOMENT = 0.1
+
 export function Example() {
   const [now, setNow] = useState(() => reading(0))
 
   useEffect(() => {
-    const started = performance.now()
-    const timer = setInterval(() => {
-      setNow(reading((performance.now() - started) / 1000))
-    }, 1000 / 30)
-    return () => clearInterval(timer)
+    const still = globalThis.matchMedia('(prefers-reduced-motion: reduce)')
+    let timer: ReturnType<typeof setInterval> | undefined
+    const run = () => {
+      clearInterval(timer)
+      if (still.matches) {
+        setNow(reading(MOMENT))
+        return
+      }
+      const started = performance.now()
+      timer = setInterval(() => {
+        setNow(reading((performance.now() - started) / 1000))
+      }, 1000 / 30)
+    }
+    still.addEventListener('change', run)
+    run()
+    return () => {
+      clearInterval(timer)
+      still.removeEventListener('change', run)
+    }
   }, [])
 
   return (
