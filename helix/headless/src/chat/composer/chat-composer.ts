@@ -1,6 +1,7 @@
 import {
   customElement,
   DelayController,
+  deepActiveElement,
   HelixFormElement,
   HelixSendEvent,
   HelixStopEvent,
@@ -83,6 +84,13 @@ const EXAMPLE_FADE = 200
  * a page that holds a turn until the reply ends or hands it to the reply
  * under way; the button stays the stop button.
  *
+ * **The `idle` slot takes the send button's place while there is nothing to
+ * send**: the field is empty, `attached` is not set, and no reply is on its
+ * way. Put the action an empty draft offers there, such as a button that
+ * starts a voice conversation. The send button comes back as soon as there
+ * is a draft. Where focus was on the one that goes, it moves to the one that
+ * comes, so a keyboard reader stays in the same place.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -90,6 +98,7 @@ const EXAMPLE_FADE = 200
  * @documentation https://fusion.dev/helix/components/chat
  *
  * @slot end - Content under the field, beside the send button.
+ * @slot idle - A control shown in place of the send button while the draft is empty and no reply is on its way, such as a button that starts a voice conversation.
  * @slot start - Content under the field at the leading edge, such as an attachment button or a model picker.
  *
  * @event {HelixBeforeListenEvent} helix-before-listen - The dictation button was pressed. Cancelable: cancel it to keep the composer from listening.
@@ -103,6 +112,7 @@ const EXAMPLE_FADE = 200
  * @csspart end - The box around the `end` slot.
  * @csspart feedback - The `feedback` message, under the field while it is set.
  * @csspart field - The text field.
+ * @csspart idle - The box around the `idle` slot, shown in the send button's place while the draft is empty.
  * @csspart mark - The icon inside the send button, a return key, or a square while `busy`.
  * @csspart send - The send button, which is the stop button while `busy`.
  * @csspart send-reason - The bubble that says `send-reason` over the send button.
@@ -137,6 +147,14 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
    */
   @property({ reflect: true, type: Boolean })
   busy = false
+
+  /**
+   * Whether the draft holds something besides its text, such as an attached
+   * file. The draft then counts as one though the field is empty, so the
+   * send button shows in place of the `idle` slot.
+   */
+  @property({ reflect: true, type: Boolean })
+  attached = false
 
   /**
    * Whether Enter sends while `busy`, for a page that queues the turn or
@@ -444,6 +462,52 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
     }
   }
 
+  /**
+   * Whether the `idle` slot shows in the send button's place: a child is in
+   * it, the draft is empty, and no reply is on its way. Read off the children,
+   * so a server and the first render agree, and drawn again as the slot's
+   * contents change.
+   */
+  private get idling(): boolean {
+    return (
+      this.querySelector(':scope > [slot="idle"]') !== null &&
+      !this.busy &&
+      !this.attached &&
+      this.value.trim() === ''
+    )
+  }
+
+  /** Where focus was as an update began: on the send button, in the idle control, or elsewhere. */
+  private focusedOn: 'elsewhere' | 'idle' | 'send' = 'elsewhere'
+
+  /** Reads which control holds focus, before an update swaps them. */
+  private noteFocus(): void {
+    const active = deepActiveElement()
+    const send = this.partNamed('send')
+    const idle = this.renderRoot
+      ?.querySelector<HTMLSlotElement>('slot[name="idle"]')
+      ?.assignedElements({ flatten: true })
+    this.focusedOn =
+      active !== null && active === send
+        ? 'send'
+        : active !== null && idle?.some((element) => element === active || element.contains(active))
+          ? 'idle'
+          : 'elsewhere'
+  }
+
+  /** Moves focus to the control that came, where it was on the one that went. */
+  private keepFocus(): void {
+    if (this.focusedOn === 'send' && this.idling) {
+      const idle = this.renderRoot
+        ?.querySelector<HTMLSlotElement>('slot[name="idle"]')
+        ?.assignedElements({ flatten: true })[0] as HTMLElement | undefined
+      idle?.focus()
+    } else if (this.focusedOn === 'idle' && !this.idling) {
+      this.partNamed<HTMLButtonElement>('send')?.focus()
+    }
+    this.focusedOn = 'elsewhere'
+  }
+
   override connectedCallback(): void {
     super.connectedCallback()
     this.unmoved ??= onMotionChange(() => this.turnExamples())
@@ -505,6 +569,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    this.keepFocus()
     if (changed.has('placeholders') || changed.has('value')) {
       this.turnExamples()
     }
@@ -545,6 +610,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label, role: 'group' })
+    this.noteFocus()
   }
 
   /**
@@ -623,7 +689,14 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
       <div part="tools">
         <span part="start"><slot name="start" @slotchange=${() => this.markEmpty()}></slot></span>
         <span part="end"><slot name="end" @slotchange=${() => this.markEmpty()}></slot></span>
-        ${this.renderVoice()}${this.renderSend()}
+        ${this.renderVoice()}
+        <span part="idle" ?hidden=${!this.idling}
+          ><slot
+            name="idle"
+            @slotchange=${() => this.requestUpdate()}
+          ></slot
+        ></span>
+        ${this.idling ? nothing : this.renderSend()}
       </div>
     </div>${
       this.feedback === ''

@@ -293,6 +293,36 @@
   opacity: 0.5;
 }
 
+/* The empty draft's own action, such as starting a voice conversation, in
+   the send button's place. Each fades in as it takes the place, so the swap
+   reads as one control changing rather than one vanishing. */
+[part="idle"] {
+  align-items: center;
+  animation: helix-composer-swap var(--helix-duration-fast) var(--helix-easing-standard);
+  display: inline-flex;
+}
+
+[part="idle"][hidden] {
+  display: none;
+}
+
+[part="send"] {
+  animation: helix-composer-swap var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+@keyframes helix-composer-swap {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="idle"],
+  [part="send"] {
+    animation: none;
+  }
+}
+
 [part="send"]:focus-visible,
 [part~="voice"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
