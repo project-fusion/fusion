@@ -31,6 +31,7 @@ describe('chat composer server output', () => {
       'composer',
       'end',
       'field',
+      'idle',
       'mark',
       'send',
       'start',
