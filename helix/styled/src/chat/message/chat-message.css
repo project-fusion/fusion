@@ -283,11 +283,18 @@
 
    `overflow-x: auto` is for what is left: content that cannot shrink to the
    measure, a long unbroken line or a wide image, scrolls inside the turn rather
-   than escaping it. */
+   than escaping it.
+
+   **A long word in the text wraps, with `break-word`.** A path or an address
+   with no space in it scrolled out of sight in a narrow turn. `anywhere` would
+   wrap it too, and it would also shrink every table cell's minimum to one
+   letter, so a table would squeeze where it scrolls now. Code that keeps its
+   spaces does not wrap at all. */
 [part="content"] {
   inline-size: fit-content;
   max-inline-size: 100%;
   min-inline-size: 0;
+  overflow-wrap: break-word;
   overflow-x: auto;
 }
 
