@@ -250,6 +250,16 @@ const pastes = (event: KeyboardEvent): boolean =>
  * @csspart screenshot-live - The screenshot button's live region, which speaks while the button is pending.
  * @csspart screenshot-spinner - The ring the screenshot button turns while it is pending.
  * @csspart screenshot-text - The box the screenshot button's icon sits in.
+ * @csspart tooltip-arrow - The arrow of the tooltip that names each button, forwarded from `Tooltip`.
+ * @csspart tooltip-arrow-bottom - The arrow while the bubble is below its button, on the bubble's top edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-left - The arrow while the bubble is left of its button, on the bubble's right edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-right - The arrow while the bubble is right of its button, on the bubble's left edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-top - The arrow while the bubble is above its button, on the bubble's bottom edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-surface - The bubble of the tooltip that names each button, forwarded from `Tooltip`.
+ * @csspart tooltip-surface-bottom - The bubble while it is below its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-left - The bubble while it is left of its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-right - The bubble while it is right of its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-top - The bubble while it is above its button. Set together with `tooltip-surface`.
  * @csspart touch - A ring where a touch is or was.
  * @csspart touch-held - A ring under a finger that is down, beside `touch`, with `show-touches`.
  * @csspart volume-down - The Volume down button.
@@ -1276,7 +1286,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               @pointerdown=${this.handleHoldStart}
             >
               <slot name="back-icon">${drawIcon(caretLeft)}</slot>
-            </${button}><${tip} for="back" content=${this.backLabel}></${tip}>`
+            </${button}><${tip} for="back" content=${this.backLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1293,7 +1303,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               @pointerdown=${this.handleHoldStart}
             >
               <slot name="home-icon">${drawIcon(house)}</slot>
-            </${button}><${tip} for="home" content=${this.homeLabel}></${tip}>`
+            </${button}><${tip} for="home" content=${this.homeLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1310,7 +1320,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               @pointerdown=${this.handleHoldStart}
             >
               <slot name="recents-icon">${drawIcon(square)}</slot>
-            </${button}><${tip} for="recents" content=${this.recentsLabel}></${tip}>`
+            </${button}><${tip} for="recents" content=${this.recentsLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1327,7 +1337,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               @pointerdown=${this.handleHoldStart}
             >
               <slot name="power-icon">${drawIcon(power)}</slot>
-            </${button}><${tip} for="power" content=${this.powerLabel}></${tip}>`
+            </${button}><${tip} for="power" content=${this.powerLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1344,7 +1354,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
                 @pointerdown=${this.handleHoldStart}
               >
                 <slot name="volume-up-icon">${drawIcon(speakerHigh)}</slot>
-              </${button}><${tip} for="volume-up" content=${this.volumeUpLabel}></${tip}>
+              </${button}><${tip} for="volume-up" content=${this.volumeUpLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
               <${button}
                 part="volume-down"
                 id="volume-down"
@@ -1357,7 +1367,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
                 @pointerdown=${this.handleHoldStart}
               >
                 <slot name="volume-down-icon">${drawIcon(speakerLow)}</slot>
-              </${button}><${tip} for="volume-down" content=${this.volumeDownLabel}></${tip}>`
+              </${button}><${tip} for="volume-down" content=${this.volumeDownLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1374,7 +1384,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
                 @pointerdown=${this.handleHoldStart}
               >
                 <slot name="rotate-left-icon">${drawIcon(arrowCounterClockwise)}</slot>
-              </${button}><${tip} for="rotate-left" content=${this.rotateLeftLabel}></${tip}>
+              </${button}><${tip} for="rotate-left" content=${this.rotateLeftLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
               <${button}
                 part="rotate-right"
                 id="rotate-right"
@@ -1387,7 +1397,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
                 @pointerdown=${this.handleHoldStart}
               >
                 <slot name="rotate-right-icon">${drawIcon(arrowClockwise)}</slot>
-              </${button}><${tip} for="rotate-right" content=${this.rotateRightLabel}></${tip}>`
+              </${button}><${tip} for="rotate-right" content=${this.rotateRightLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1402,7 +1412,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               @helix-press=${stopPress}
             >
               <slot name="screenshot-icon">${drawIcon(camera)}</slot>
-            </${button}><${tip} for="screenshot" content=${this.screenshotLabel}></${tip}>`
+            </${button}><${tip} for="screenshot" content=${this.screenshotLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       <slot name="controls" @slotchange=${this.handleSlotChange}></slot>
@@ -1419,7 +1429,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
               @helix-press=${stopPress}
             >
               <slot name="fullscreen-icon">${drawIcon(cornersOut)}</slot>
-            </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel}></${tip}>`
+            </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
     </div>`

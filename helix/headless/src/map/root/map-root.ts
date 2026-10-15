@@ -285,6 +285,16 @@ const SETTLES = 400
  * @csspart tilt-live - `tilt`'s live region, which speaks while it is pending.
  * @csspart tilt-spinner - The ring `tilt` turns while it is pending.
  * @csspart tilt-text - The box `tilt`'s glyph sits in.
+ * @csspart tooltip-arrow - The arrow of the tooltip that names each button, forwarded from `Tooltip`.
+ * @csspart tooltip-arrow-bottom - The arrow while the bubble is below its button, on the bubble's top edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-left - The arrow while the bubble is left of its button, on the bubble's right edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-right - The arrow while the bubble is right of its button, on the bubble's left edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-top - The arrow while the bubble is above its button, on the bubble's bottom edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-surface - The bubble of the tooltip that names each button, forwarded from `Tooltip`.
+ * @csspart tooltip-surface-bottom - The bubble while it is below its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-left - The bubble while it is left of its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-right - The bubble while it is right of its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-top - The bubble while it is above its button. Set together with `tooltip-surface`.
  * @csspart viewport - The box the map is drawn in.
  * @csspart zoom-in - The button that zooms in.
  * @csspart zoom-in-button - `zoom-in`'s inner button.
@@ -1153,7 +1163,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
             ${unsafeSVG(stack.content)}
           </svg>
         </slot>
-      </${button}><${tip} for="layers-toggle" content=${this.layersLabel}></${tip}>
+      </${button}><${tip} for="layers-toggle" content=${this.layersLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
       <div
         part="layers-menu"
         id="layers-menu"
@@ -1248,7 +1258,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="rotate-left-icon">↺</slot>
-            </${button}><${tip} for="rotate-left" content=${this.rotateLeftLabel}></${tip}>`
+            </${button}><${tip} for="rotate-left" content=${this.rotateLeftLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1263,7 +1273,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="pan-up-icon">${this.panGlyph('up')}</slot>
-            </${button}><${tip} for="pan-up" content=${this.panLabel('up')}></${tip}>`
+            </${button}><${tip} for="pan-up" content=${this.panLabel('up')} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1278,7 +1288,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="rotate-right-icon">↻</slot>
-            </${button}><${tip} for="rotate-right" content=${this.rotateRightLabel}></${tip}>`
+            </${button}><${tip} for="rotate-right" content=${this.rotateRightLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1293,7 +1303,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="pan-start-icon">${this.panGlyph('start')}</slot>
-            </${button}><${tip} for="pan-start" content=${this.panLabel('start')}></${tip}>`
+            </${button}><${tip} for="pan-start" content=${this.panLabel('start')} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       <${button}
@@ -1313,7 +1323,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
             <path data-end="south" d="M8 14.5 5.5 8h5Z" />
           </svg>
         </slot>
-      </${button}><${tip} for="face-north" content=${faceNorthLabel}></${tip}>
+      </${button}><${tip} for="face-north" content=${faceNorthLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
       ${
         pan
           ? staticHtml`<${button}
@@ -1326,7 +1336,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="pan-end-icon">${this.panGlyph('end')}</slot>
-            </${button}><${tip} for="pan-end" content=${this.panLabel('end')}></${tip}>`
+            </${button}><${tip} for="pan-end" content=${this.panLabel('end')} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1341,7 +1351,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="pan-down-icon">${this.panGlyph('down')}</slot>
-            </${button}><${tip} for="pan-down" content=${this.panLabel('down')}></${tip}>`
+            </${button}><${tip} for="pan-down" content=${this.panLabel('down')} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
     </div>`
@@ -1385,7 +1395,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="fullscreen-icon">⤢</slot>
-            </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel}></${tip}>`
+            </${button}><${tip} for="fullscreen" content=${this.fullscreenLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${menu}
@@ -1403,7 +1413,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
               @helix-press=${stopPress}
             >
               <slot name="tilt-icon">3D</slot>
-            </${button}><${tip} for="tilt" content=${this.tiltLabel}></${tip}>`
+            </${button}><${tip} for="tilt" content=${this.tiltLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${
@@ -1419,7 +1429,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
                 @helix-press=${stopPress}
               >
                 <slot name="zoom-in-icon">+</slot>
-              </${button}><${tip} for="zoom-in" content=${this.zoomInLabel}></${tip}>
+              </${button}><${tip} for="zoom-in" content=${this.zoomInLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>
               <${button}
                 part="zoom-out"
                 id="zoom-out"
@@ -1431,7 +1441,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
                 @helix-press=${stopPress}
               >
                 <slot name="zoom-out-icon">−</slot>
-              </${button}><${tip} for="zoom-out" content=${this.zoomOutLabel}></${tip}>`
+              </${button}><${tip} for="zoom-out" content=${this.zoomOutLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
           : nothing
       }
       ${this.drawsCompass ? this.renderCompass(pan, rotate) : nothing}

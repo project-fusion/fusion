@@ -200,6 +200,16 @@ const LONG_LAYOUT = 5000
  * @csspart settling - What is said while a layout runs unseen, where the reader asked for less motion or the page paused its motion, over the hidden drawing.
  * @csspart stage - The drawing and its controls.
  * @csspart stop-layout - The button that stops a layout that has run past five seconds, where the notes stand.
+ * @csspart tooltip-arrow - The arrow of the tooltip that names each button, forwarded from `Tooltip`.
+ * @csspart tooltip-arrow-bottom - The arrow while the bubble is below its button, on the bubble's top edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-left - The arrow while the bubble is left of its button, on the bubble's right edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-right - The arrow while the bubble is right of its button, on the bubble's left edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-arrow-top - The arrow while the bubble is above its button, on the bubble's bottom edge. Set together with `tooltip-arrow`.
+ * @csspart tooltip-surface - The bubble of the tooltip that names each button, forwarded from `Tooltip`.
+ * @csspart tooltip-surface-bottom - The bubble while it is below its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-left - The bubble while it is left of its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-right - The bubble while it is right of its button. Set together with `tooltip-surface`.
+ * @csspart tooltip-surface-top - The bubble while it is above its button. Set together with `tooltip-surface`.
  * @csspart viewport - The box the renderer draws in.
  * @csspart zoom-in - The zoom in button.
  * @csspart zoom-in-button - `zoom-in`'s inner button.
@@ -1340,7 +1350,7 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
       <svg aria-hidden="true" fill="currentColor" viewBox=${list.viewBox}>
         ${unsafeSVG(list.content)}
       </svg>
-    </${button}><${tip} for="notes-toggle" content=${this.notesLabel}></${tip}>`
+    </${button}><${tip} for="notes-toggle" content=${this.notesLabel} exportparts="arrow: tooltip-arrow, arrow-bottom: tooltip-arrow-bottom, arrow-left: tooltip-arrow-left, arrow-right: tooltip-arrow-right, arrow-top: tooltip-arrow-top, surface: tooltip-surface, surface-bottom: tooltip-surface-bottom, surface-left: tooltip-surface-left, surface-right: tooltip-surface-right, surface-top: tooltip-surface-top"></${tip}>`
   }
 
   /** Typing is a new search, read from its top, with no note under the keys until Down. */

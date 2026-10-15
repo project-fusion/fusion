@@ -190,6 +190,14 @@
   }
 }
 
+/* Off under reduced motion, as Data Table's scrolled edges are: the mask is
+   driven by the scroll, and the surface keeps its box without it. */
+@media (prefers-reduced-motion: reduce) {
+  :host(:not(:state(steps))) [part="content"] {
+    animation: none;
+  }
+}
+
 @keyframes log-step-fade {
   0% {
     mask-image: linear-gradient(to bottom, #000 calc(100% - var(--helix-space-lg)), transparent);

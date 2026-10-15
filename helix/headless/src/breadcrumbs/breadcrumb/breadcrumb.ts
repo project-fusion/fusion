@@ -116,13 +116,6 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   foldLabel = ''
 
   /**
-   * @internal Set by the trail from its `separator`: the mark this crumb draws
-   * before itself and before its fold button.
-   */
-  @property({ attribute: false })
-  mark: 'chevron' | 'slash' = 'chevron'
-
-  /**
    * The URL the crumb links to. The current page has none.
    *
    * **Optional and reflected, because a stylesheet does select on it.** A sheet
@@ -149,6 +142,13 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
    */
   @property({ attribute: false })
   implied = false
+
+  /**
+   * @internal Set by the trail from its `separator`: the mark this crumb draws
+   * before itself and before its fold button.
+   */
+  @property({ attribute: false })
+  mark: 'chevron' | 'slash' = 'chevron'
 
   /** @internal Set by the trail: what a press on the fold's button does. */
   onFold: (() => void) | undefined = undefined
@@ -239,7 +239,7 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
    * without reimplementing the crumb, its link and its current-page branch.
    */
   protected renderSeparator(): TemplateResult {
-    return html`<slot name="separator">${this.renderMark('separator-mark')}</slot>`
+    return html`<slot name="separator">${this.renderMark(true)}</slot>`
   }
 
   /**
@@ -247,18 +247,20 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
    * points the way the trail runs, or a slash, which is a character and is
    * written the same way in either direction.
    */
-  private renderMark(part?: string): TemplateResult {
+  private renderMark(named = false): TemplateResult {
+    /* The part written out rather than bound, so the parts check sees it
+       rendered. */
     if (this.mark === 'slash') {
-      return html`<span part=${part ?? nothing} data-mark="slash">/</span>`
+      return named
+        ? html`<span part="separator-mark" data-mark="slash">/</span>`
+        : html`<span data-mark="slash">/</span>`
     }
-    return html`<svg
-      part=${part ?? nothing}
-      data-mirror
-      fill="currentColor"
-      viewBox=${caretRight.viewBox}
-    >
-      ${unsafeSVG(caretRight.content)}
-    </svg>`
+    const chevron = unsafeSVG(caretRight.content)
+    return named
+      ? html`<svg part="separator-mark" data-mirror fill="currentColor" viewBox=${caretRight.viewBox}>
+          ${chevron}
+        </svg>`
+      : html`<svg data-mirror fill="currentColor" viewBox=${caretRight.viewBox}>${chevron}</svg>`
   }
 
   protected override render(): TemplateResult {

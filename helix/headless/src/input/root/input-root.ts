@@ -134,16 +134,6 @@ export class HelixHeadlessInput extends MixinVoice(
   override autocapitalize = ''
 
   /**
-   * Whether the browser corrects words as the reader types, as the platform's
-   * `autocorrect`. Turn it off, with `autocorrect="off"`, for text that is not
-   * prose, such as an address or a code, which corrections would change.
-   */
-  @property({
-    converter: { fromAttribute: (value: string | null) => value?.toLowerCase() !== 'off' },
-  })
-  override autocorrect = true
-
-  /**
    * What the browser may autofill in the field, as an HTML `autocomplete`
    * token.
    *
@@ -152,6 +142,16 @@ export class HelixHeadlessInput extends MixinVoice(
    */
   @property()
   autocomplete = ''
+
+  /**
+   * Whether the browser corrects words as the reader types, as the platform's
+   * `autocorrect`. Turn it off, with `autocorrect="off"`, for text that is not
+   * prose, such as an address or a code, which corrections would change.
+   */
+  @property({
+    converter: { fromAttribute: (value: string | null) => value?.toLowerCase() !== 'off' },
+  })
+  override autocorrect = true
 
   /**
    * Whether the field shows a button that empties it.

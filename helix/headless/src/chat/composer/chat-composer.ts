@@ -114,8 +114,17 @@ const EXAMPLE_FADE = 200
  * @csspart field - The text field.
  * @csspart idle - The box around the `idle` slot, shown in the send button's place while the draft is empty.
  * @csspart mark - The icon inside the send button, a return key, or a square while `busy`.
+ * @csspart reason-arrow - The arrow of the bubble that says `send-reason`, forwarded from `Tooltip`.
+ * @csspart reason-arrow-bottom - The arrow while the bubble is below the send button, on the bubble's top edge. Set together with `reason-arrow`.
+ * @csspart reason-arrow-left - The arrow while the bubble is left of the send button, on the bubble's right edge. Set together with `reason-arrow`.
+ * @csspart reason-arrow-right - The arrow while the bubble is right of the send button, on the bubble's left edge. Set together with `reason-arrow`.
+ * @csspart reason-arrow-top - The arrow while the bubble is above the send button, on the bubble's bottom edge. Set together with `reason-arrow`.
+ * @csspart reason-surface - The bubble that says `send-reason` over the send button, forwarded from `Tooltip`.
+ * @csspart reason-surface-bottom - The bubble while it is below the send button. Set together with `reason-surface`.
+ * @csspart reason-surface-left - The bubble while it is left of the send button. Set together with `reason-surface`.
+ * @csspart reason-surface-right - The bubble while it is right of the send button. Set together with `reason-surface`.
+ * @csspart reason-surface-top - The bubble while it is above the send button. Set together with `reason-surface`.
  * @csspart send - The send button, which is the stop button while `busy`.
- * @csspart send-reason - The bubble that says `send-reason` over the send button.
  * @csspart start - The box around the `start` slot.
  * @csspart tools - The row under the field.
  * @csspart voice - The dictation button, under `voice`, before the send button.
@@ -137,6 +146,14 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
   static words = 'helix-chat-composer'
 
   /**
+   * Whether the draft holds something besides its text, such as an attached
+   * file. The draft then counts as one though the field is empty, so the
+   * send button shows in place of the `idle` slot.
+   */
+  @property({ reflect: true, type: Boolean })
+  attached = false
+
+  /**
    * Whether a reply is on its way. While set, the send button is a stop
    * button that sends `helix-stop`, and the draft does not send.
    *
@@ -147,26 +164,6 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
    */
   @property({ reflect: true, type: Boolean })
   busy = false
-
-  /**
-   * Whether the draft holds something besides its text, such as an attached
-   * file. The draft then counts as one though the field is empty, so the
-   * send button shows in place of the `idle` slot.
-   */
-  @property({ reflect: true, type: Boolean })
-  attached = false
-
-  /**
-   * Whether Enter sends while `busy`, for a page that queues the turn or
-   * hands it to the reply under way.
-   *
-   * Off by default, because a page that does neither would drop the turn: it
-   * has nowhere to put a message while a reply is coming. The button stays
-   * the stop button either way, since stopping is still the one thing it
-   * should do while a reply is on its way.
-   */
-  @property({ reflect: true, type: Boolean })
-  queue = false
 
   /**
    * A message about the draft, shown under the field. While set, the composer
@@ -217,6 +214,18 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
    */
   @property({ attribute: false })
   placeholders: readonly string[] = []
+
+  /**
+   * Whether Enter sends while `busy`, for a page that queues the turn or
+   * hands it to the reply under way.
+   *
+   * Off by default, because a page that does neither would drop the turn: it
+   * has nowhere to put a message while a reply is coming. The button stays
+   * the stop button either way, since stopping is still the one thing it
+   * should do while a reply is on its way.
+   */
+  @property({ reflect: true, type: Boolean })
+  queue = false
 
   /**
    * Whether the form needs a draft to submit. An empty draft never sends,
@@ -658,7 +667,8 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
       return control
     }
     return staticHtml`<${this.tag('tooltip')} id="send-reason" content=${this.sendReason}
-      exportparts="surface: send-reason">${control}</${this.tag('tooltip')}>`
+      exportparts="arrow: reason-arrow, arrow-bottom: reason-arrow-bottom, arrow-left: reason-arrow-left, arrow-right: reason-arrow-right, arrow-top: reason-arrow-top, surface: reason-surface, surface-bottom: reason-surface-bottom, surface-left: reason-surface-left, surface-right: reason-surface-right, surface-top: reason-surface-top"
+      >${control}</${this.tag('tooltip')}>`
   }
 
   /**
