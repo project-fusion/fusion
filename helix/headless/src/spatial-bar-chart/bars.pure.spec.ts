@@ -12,6 +12,7 @@ import {
   namesOf,
   paintOrder,
   rowFits,
+  tallestTimes,
   widthOf,
 } from './bars.js'
 
@@ -213,6 +214,26 @@ describe('a row of one width', () => {
     expect(rowFits(540, 18)).toBe(18)
     expect(rowFits(300, 18)).toBe(10)
     expect(rowFits(20, 18)).toBe(1)
+  })
+
+  test('a row of one stands no taller than its place and a quarter again, and a long row is not held', () => {
+    const fall = (projection: ReturnType<typeof boxView>['projection']) =>
+      Math.abs(projection.at(0, 0, 1).y - projection.at(0, 0, 0).y)
+    const one = barsOf([row('1', 9)], [0])
+    const { projection } = boxView(one.axes, SPATIAL_VIEW, [], true)
+    const bars = barsDrawn(one, projection, 'diagonal')
+    const times = tallestTimes(one, projection, bars)
+    const place = widthOf(bars[0] as DrawnBar) / 0.6
+    expect((bars[0]?.height ?? 0) * times * fall(projection)).toBeCloseTo(place * 1.25, 6)
+    /* Eight places are ten times as long, so the same bar may stand far taller. */
+    const eight = barsOf(
+      Array.from({ length: 8 }, (_, at) => row(String(at + 1), at === 0 ? 9 : 3)),
+      [0],
+    )
+    const long = boxView(eight.axes, SPATIAL_VIEW, [], true).projection
+    const drawn = barsDrawn(eight, long, 'diagonal')
+    const allowed = (drawn[0]?.height ?? 0) * tallestTimes(eight, long, drawn) * fall(long)
+    expect(allowed).toBeCloseTo((8 * widthOf(drawn[0] as DrawnBar) * 1.25) / 0.6, 6)
   })
 
   test('a taller value axis stands every bar taller by as much, on the same floor', () => {
