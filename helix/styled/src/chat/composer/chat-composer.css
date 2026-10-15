@@ -278,13 +278,16 @@
   inline-size: var(--helix-size-icon-tight);
 }
 
-[part="send"]:hover:not(:disabled),
+[part="send"]:hover:not(:disabled, [aria-disabled="true"]),
 [part~="voice"]:hover:not(:disabled) {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   color: var(--helix-color-foreground);
 }
 
+/* A held button with a reason stays reachable for its tooltip and looks as
+   unavailable as a disabled one. */
 [part="send"]:disabled,
+[part="send"][aria-disabled="true"],
 [part~="voice"]:disabled {
   cursor: not-allowed;
   opacity: 0.5;
