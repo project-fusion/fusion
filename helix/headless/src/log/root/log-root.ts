@@ -184,7 +184,7 @@ interface Heard {
  * @csspart after - The space the rows below the drawn ones would take. Only for lines drawn from data.
  * @csspart before - The space the rows above the drawn ones would take. Only for lines drawn from data.
  * @csspart dropped - The line above the log that says how many earlier lines `limit` let go.
- * @csspart empty - Shown when the log has no lines.
+ * @csspart empty - Shown when the log has no lines and no steps.
  * @csspart group-content - Not drawn: a group drawn from data stands for its heading, and its lines are rows beside it.
  * @csspart group-duration - How long a step drawn from `groups` took.
  * @csspart group-heading - The heading of a step drawn from `groups`.
@@ -246,7 +246,7 @@ interface Heard {
  * @cssproperty --log-digits - Written on the `log`: how many digits the largest line number has, while `line-numbers` is set, so a stylesheet can size the column of numbers.
  *
  * @cssstate done - The run is over: `done` is set, or `source` ended.
- * @cssstate empty - The log has no lines.
+ * @cssstate empty - The log has no lines and no steps.
  * @cssstate filtered - `query` or `level` is set, so only the lines they keep are shown.
  * @cssstate pinned - The log follows its newest line.
  */
@@ -306,7 +306,11 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
   @property({ attribute: 'dropped-label' })
   droppedLabel = '{count, plural, one {# earlier line is} other {# earlier lines are}} not kept'
 
-  /** The text shown and announced when the log has no lines. */
+  /**
+   * The text shown and announced when the log has no lines and no steps. A
+   * step with nothing in it yet, such as one still `pending`, is its heading
+   * alone, so a log holding one says nothing.
+   */
   @words
   @property({ attribute: 'empty-text' })
   override emptyText = 'No output yet'
@@ -629,6 +633,15 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
       this.groups.length > 0 ||
       this.sourceValue !== null
     )
+  }
+
+  /**
+   * Whether lines or steps were written as children. A step counts with no
+   * line in it, since its heading is drawn: a step still waiting, or one
+   * holding a note in place of output.
+   */
+  private get holdsChildren(): boolean {
+    return this.childLines.length > 0 || this.childGroups.length > 0
   }
 
   /** The parser `format` names. */
@@ -1378,7 +1391,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     this.toggleState('pinned', this.pinned)
     this.toggleState('done', this.done)
     this.toggleState('filtered', this.query.trim() !== '' || this.level !== undefined)
-    this.toggleState('empty', this.childrenKnown && !this.fed && this.childLines.length === 0)
+    this.toggleState('empty', this.childrenKnown && !this.fed && !this.holdsChildren)
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -1555,7 +1568,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     const dropped = this.buffer.dropped
     const content =
       this.query.trim() !== '' ||
-      (fed ? this.view.rows.length > 0 : this.childLines.length > 0 || !this.childrenKnown)
+      (fed ? this.view.rows.length > 0 : this.holdsChildren || !this.childrenKnown)
     return html`<slot name="toolbar" part="toolbar"></slot>
       <p part="dropped" ?hidden=${dropped === 0}>${
         dropped === 0 ? nothing : formatWords(this, 'droppedLabel', { count: dropped })
