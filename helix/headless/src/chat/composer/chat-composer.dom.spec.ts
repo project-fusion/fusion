@@ -757,7 +757,7 @@ describe('the attachments slot', () => {
      part of the draft, the way a message's own attachments sit with it. */
   test('sits inside the box, above the field', async () => {
     const element = await carrying()
-    const box = part(element, 'composer')
+    const box = part(element, 'composer') as HTMLElement
     const region = part(element, 'attachments')
     expect(region?.parentElement).toBe(box)
     expect(region?.nextElementSibling).toBe(part(element, 'field'))
