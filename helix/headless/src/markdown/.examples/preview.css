@@ -1,0 +1,32 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+  --_radius-control: 0.25rem;
+}
+
+helix-headless-markdown {
+  color: var(--_gray-strong);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+helix-headless-markdown :is(h2, p, ol) {
+  margin: 0 0 0.75rem;
+}
+
+helix-headless-markdown h2 {
+  font-size: 1.125rem;
+}
+
+helix-headless-markdown code {
+  background-color: var(--_gray-subtle);
+  border-radius: var(--_radius-control);
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9286em;
+  padding: 0 0.125rem;
+}

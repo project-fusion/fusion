@@ -56,6 +56,7 @@ import { listboxArt } from './art/listbox'
 import { loaderArt } from './art/loader'
 import { logArt } from './art/log'
 import { mapArt } from './art/map'
+import { markdownArt } from './art/markdown'
 import { megamenuArt } from './art/megamenu'
 import { menuArt } from './art/menu'
 import { meterArt } from './art/meter'
@@ -213,6 +214,7 @@ const art: Record<string, ReactNode> = {
   loader: loaderArt,
   log: logArt,
   map: mapArt,
+  markdown: markdownArt,
   megamenu: megamenuArt,
   menu: menuArt,
   meter: meterArt,

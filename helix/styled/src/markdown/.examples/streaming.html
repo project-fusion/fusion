@@ -1,0 +1,102 @@
+<!-- @summary A reply that streams in as Markdown, a few characters at a time, without moving the text above it. -->
+<!-- @min 420 -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-chat
+    class="streaming"
+    label="Assistant"
+  >
+    <strong slot="header">Assistant</strong>
+    <helix-chat-message
+      author="me"
+      state="sent"
+    >How do I add a column without downtime?</helix-chat-message>
+    <helix-chat-message
+      author="them"
+      data-prose
+      id="answer"
+      separation="plain"
+      state="streaming"
+    >
+      <helix-markdown
+        id="reply"
+        streaming
+      ></helix-markdown>
+    </helix-chat-message>
+  </helix-chat>
+
+  <helix-button id="replay">Replay the reply</helix-button>
+</helix-flex>
+
+<script type="module">
+  const answer = document.getElementById('answer')
+  const reply = document.getElementById('reply')
+  const replay = document.getElementById('replay')
+
+  const REPLY = [
+    'Add it in **three steps**, so no query ever waits on a lock:',
+    '',
+    '1. Add the column as nullable.',
+    '2. Backfill it in batches.',
+    '3. Add the constraint once every row has a value.',
+    '',
+    '```sql',
+    'alter table users add column plan text;',
+    'update users set plan = \'free\' where id between 1 and 10000;',
+    'alter table users alter column plan set not null;',
+    '```',
+    '',
+    '| Step | Locks | Time on 10M rows |',
+    '| :-- | :-- | --: |',
+    '| Add column | Brief | Under 1 s |',
+    '| Backfill | Row locks, batch by batch | About 4 min |',
+    '| Constraint | A scan, no writes blocked | About 20 s |',
+    '',
+    '> [!TIP]',
+    '> Run the backfill during a quiet hour if you can.',
+  ].join('\n')
+
+  /* A few characters at a time, as a model's tokens arrive. */
+  const EACH = 24
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)')
+  let timer = 0
+
+  const finish = () => {
+    reply.text = REPLY
+    reply.streaming = false
+    answer.setAttribute('state', 'sent')
+  }
+
+  const run = () => {
+    clearTimeout(timer)
+    if (still.matches) {
+      finish()
+      return
+    }
+    reply.text = ''
+    reply.streaming = true
+    answer.setAttribute('state', 'streaming')
+    let at = 0
+    const next = () => {
+      at += 2 + Math.floor(Math.random() * 6)
+      if (at >= REPLY.length) {
+        finish()
+        return
+      }
+      reply.text = REPLY.slice(0, at)
+      timer = setTimeout(next, EACH)
+    }
+    timer = setTimeout(next, EACH)
+  }
+
+  replay.addEventListener('click', run)
+  still.addEventListener('change', run)
+  run()
+</script>
