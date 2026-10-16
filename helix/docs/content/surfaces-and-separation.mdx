@@ -34,10 +34,14 @@ Helix sets the choice with two pairs of policy tokens:
 | --- | --- | --- |
 | `--helix-border-surface` | `var(--helix-border-thin)` | The border of a surface in the page flow. Set it to zero to separate surfaces with shadows. |
 | `--helix-shadow-surface` | `var(--helix-shadow-none)` | The shadow of a surface in the page flow. Set it to none to separate surfaces with borders. |
-| `--helix-border-floating` | `0` | The border of a surface that floats over content. |
+| `--helix-border-floating` | `var(--helix-border-thin)` | The border of a surface that floats over content. Set it to zero to separate floating surfaces by their shadow alone. |
 | `--helix-shadow-floating` | `var(--helix-shadow-lg)` | The shadow of a surface that floats over content. |
 
 [//]: # (/tokens)
+
+A floating surface draws a hairline edge and a shadow by default. A shadow is
+ink darker than the ground it falls on, so over a dark page it does not show,
+and the edge keeps a menu or a popover apart from what it opened over.
 
 To make every component shadow-first, set the border pair to zero and give the
 shadow pair a value. Reverse them to go border-first. Every Helix surface reads
@@ -56,7 +60,7 @@ A surface's ground color token names where the surface sits:
 | `--helix-color-background` | <span data-token-swatch style={{ background: 'var(--helix-color-background)' }} /> | The page background. Every other surface sits on it. |
 | `--helix-color-surface` | <span data-token-swatch style={{ background: 'var(--helix-color-surface)' }} /> | A surface on the page, such as a card or a panel. The separation policy sets it apart with a fill, a border, or a shadow. |
 | `--helix-color-surface-raised` | <span data-token-swatch style={{ background: 'var(--helix-color-surface-raised)' }} /> | A raised surface on the page, such as a selected tab or a hovered row. Its fill is one step down the ramp. |
-| `--helix-color-surface-overlay` | <span data-token-swatch style={{ background: 'var(--helix-color-surface-overlay)' }} /> | A surface over the page, such as a menu, a popover, or a dialog. Its shadow sets it apart. |
+| `--helix-color-surface-overlay` | <span data-token-swatch style={{ background: 'var(--helix-color-surface-overlay)' }} /> | A surface over the page, such as a menu, a popover, or a dialog. Its edge and its shadow set it apart. |
 | `--helix-color-surface-sunken` | <span data-token-swatch style={{ background: 'var(--helix-color-surface-sunken)' }} /> | A recessed surface that holds a value, such as an input, a track, or a groove. Its fill sets it apart. |
 
 [//]: # (/tokens)
@@ -64,8 +68,8 @@ A surface's ground color token names where the surface sits:
 **`raised` goes one step down the ramp.** A selected tab's pill, a hovered row,
 and an option under the pointer all have the page on every side. Only their
 fill separates them, and on a white page a fill has to be a step darker to be
-seen. `overlay` works the other way. Its shadow and what it covers separate it,
-so on a white page it is white.
+seen. `overlay` works the other way. Its edge and its shadow separate it, so on
+a white page it is white.
 
 ## Using the page color inside a component
 

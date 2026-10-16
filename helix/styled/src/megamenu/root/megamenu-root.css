@@ -74,7 +74,7 @@
      behind it, and in the dark that is `oklch(0 0 0)` on `oklch(0 0 0)`.
      Written out in full, because the UA gives `[popover]` a border of its own
      and deleting this drew a three pixel black box. */
-  border: var(--megamenu-border-width, var(--helix-border-thin)) solid
+  border: var(--megamenu-border-width, var(--helix-border-floating)) solid
     light-dark(transparent, var(--helix-color-border));
   /* The house corner: a radius reads against the one beside it. */
   border-radius: var(--helix-radii-sm);

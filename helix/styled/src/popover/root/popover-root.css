@@ -10,9 +10,9 @@
 [part="surface"] {
   overflow: visible;
   background-color: var(--popover-background-color, var(--helix-color-surface-overlay));
-  /* No border, said rather than left out: the UA stylesheet gives `[popover]`
-     `border: solid`, so dropping the declaration leaves a three-pixel medium
-     border rather than none at all. */
+  /* The edge, said in full rather than left out: the UA stylesheet gives
+     `[popover]` `border: solid`, so dropping the declaration leaves a
+     three-pixel medium border. */
   border: var(--popover-border-width, var(--helix-border-floating)) solid
     var(--popover-border-color, var(--helix-color-border));
   /* The same edge, for the point to draw on its two outer sides. */

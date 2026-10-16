@@ -31,8 +31,7 @@ import { styles } from './combobox-root.css.js'
  * @cssproperty --combobox-background-color - Fill behind the field.
  * @cssproperty --combobox-border-color - Color of the panel's edge.
  * @cssproperty --combobox-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0` unless your theme sets it, so the panel's shadow
- *   sets it apart.
+ *   `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --combobox-control-size - Smallest the text field shrinks to once tags share its line.
  * @cssproperty --combobox-panel-size - Width of the panel. Follows the field by default.
  * @cssproperty --combobox-shadow - Shadow under the panel. Follows `--helix-shadow-floating`.

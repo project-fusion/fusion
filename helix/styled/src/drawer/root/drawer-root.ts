@@ -35,8 +35,7 @@ import { styles } from './drawer-root.css.js'
  * @cssproperty --drawer-background-color - Surface behind the panel.
  * @cssproperty --drawer-border-color - Color of the panel's edge.
  * @cssproperty --drawer-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless your
- *   theme sets a border.
+ *   `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --drawer-padding - Padding inside the panel.
  * @cssproperty --drawer-padding-block-start - Padding above the header. It is one step larger than
  *   the other three sides, so the first line clears the window's edge. Falls back to

@@ -32,8 +32,7 @@ import '../../listbox/index.js'
  *
  * @cssproperty --select-border-color - Color of the panel's edge.
  * @cssproperty --select-border-width - Width of the panel's edge. Defaults to
- *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless
- *   your theme sets a width.
+ *   `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --select-shadow - Shadow under the panel. Defaults to
  *   `--helix-shadow-floating`, because the panel can sit over any content.
  * @cssproperty --select-surface-max-block-size - Maximum height of the panel.

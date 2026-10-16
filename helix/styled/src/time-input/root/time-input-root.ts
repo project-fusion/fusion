@@ -35,8 +35,7 @@ import { styles } from './time-input-root.css.js'
  * @cssproperty --time-input-background-color - Fill behind the field.
  * @cssproperty --time-input-border-color - Color of the panel's edge.
  * @cssproperty --time-input-border-width - Width of the panel's edge. Defaults to
- *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless
- *   your theme sets a width.
+ *   `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --time-input-segment-focus-background-color - The fill behind the
  *   segment with focus, in `segmented`. It follows `--helix-color-primary-surface`.
  * @cssproperty --time-input-segment-focus-color - The text of the segment with

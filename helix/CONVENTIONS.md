@@ -1019,6 +1019,19 @@ shape", and Popover is `sm`. The convention was recorded, in the right file,
 directly above the declaration that broke it, and it held for exactly as long as
 nobody had to act on it.
 
+**Every panel that floats over the page draws a hairline edge as well as its
+shadow, decided by the owner on October 16, 2026.** `--helix-border-floating` is
+`var(--helix-border-thin)`. It was `0` from August 22, 2026, when floating
+surfaces were set apart by their shadow alone. A shadow is ink darker than the
+ground it falls on, and a near-black window has nothing darker, so in dark mode
+a menu, a popover, a select's list, or a dialog blended into whatever it opened
+over. Tooltip already drew an edge under its materials, and the theme engine
+already gave a shadow-led dark theme one. The policy token is still the one
+place to turn it off: a theme that sets it to `0` separates by shadow alone, and
+each family's `--*-border-width` hook takes `0` for one surface. Megamenu keeps
+the split its stylesheet records, an edge in dark mode only, and its width now
+follows the token.
+
 **`helix/styles` authors in `src` and ships `dist`, and the comment is the
 difference.** The package exported `./src/*.css` until August 24, 2026, so every
 consumer downloaded the reasoning: `tokens.css` is 71 percent comment,

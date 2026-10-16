@@ -92,7 +92,7 @@ export const TOKENS: Token[] = [
   [
     'color-surface-overlay',
     'light-dark(var(--_helix-neutral-0), var(--_helix-neutral-800))',
-    'A surface over the page, such as a menu, a popover, or a dialog. Its shadow sets it apart.',
+    'A surface over the page, such as a menu, a popover, or a dialog. Its edge and its shadow set it apart.',
   ],
   /* Down in light, up in dark, because "recessed" is a direction and only one
      of the two modes has room in it. At 0.91, the step where the ramp starts
@@ -694,7 +694,20 @@ export const TOKENS: Token[] = [
     'var(--helix-border-thin)',
     'The border of a surface in the page flow. Set it to zero to separate surfaces with shadows.',
   ],
-  ['border-floating', '0', 'The border of a surface that floats over content.'],
+  /* *A floating surface draws a hairline as well as its shadow, decided by the
+     owner on October 16, 2026.** It rested at 0 from August 22, 2026, so a
+     surface over content was told apart by its shadow alone. A shadow is ink
+     darker than the ground it falls on, and on a near-black window there is
+     nothing darker: a menu, a popover, or a dialog in dark mode blended into
+     whatever it opened over. Tooltip already drew an edge under its
+     materials, and the theme engine already gave a shadow-led dark theme one.
+     A theme still sets this to 0 to separate by shadow alone, and each
+     family's own `--*-border-width` hook still takes 0 for one surface. */
+  [
+    'border-floating',
+    'var(--helix-border-thin)',
+    'The border of a surface that floats over content. Set it to zero to separate floating surfaces by their shadow alone.',
+  ],
   /* ======================================================== shadow ====== */
   /* Used sparingly. */
   ['shadow-none', 'none'],
