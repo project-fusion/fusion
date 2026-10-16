@@ -8,7 +8,9 @@ import { join, relative } from 'node:path'
    page, with nothing failing. This holds every module that writes a mark, or
    starts the controller that writes one, to naming exactly the rules it needs,
    in the order `mark-rules.ts` declares them. A family that takes core's
-   `MixinVoice` writes `data-spoken` through it, in its dictation status. */
+   `MixinVoice` writes `data-spoken` through it, in its dictation status. A
+   class that extends another family's inherits both: what the parent writes,
+   and the parent's list where it names none of its own. */
 
 /** The tier's source, which this file sits one folder inside. */
 const SOURCE = join(import.meta.dir, '..')
@@ -32,6 +34,7 @@ const code = (path: string): string =>
 const RULES: ReadonlyArray<readonly [string, RegExp]> = [
   ['SCROLLER_RULE', /data-scroller/],
   ['VIRTUAL_RULE', /new (?:OptionWindow|Virtualize)Controller\b/],
+  ['LAYERS_RULE', /data-layers/],
   ['SPOKEN_RULE', /data-spoken|\bMixinVoice\(/],
   ['MIRROR_RULE', /data-mirror/],
   ['TOUCHES_RULE', /data-touches/],
@@ -49,14 +52,40 @@ const named = (text: string): string[] =>
     .map((name) => name.trim())
     .filter(Boolean) ?? []
 
+/** Whether a module overrides `markRules` at all, an empty list included. */
+const names = (text: string): boolean => /static override markRules = \[/.test(text)
+
+/** Each module's headless class, and the headless class it extends where it extends one. */
+const lineage = (text: string): { name: string | undefined; parent: string | undefined } => {
+  const found = /export class (HelixHeadless\w+) extends (HelixHeadless\w+)?/.exec(text)
+  return { name: found?.[1], parent: found?.[2] }
+}
+
+/** Every module's rules as its class has them, inherited from the class it extends. */
+const resolved = (): Array<{ named: string[]; needed: string[]; path: string }> => {
+  const all = modules().map((path) => {
+    const text = code(path)
+    return { own: names(text), path, ...lineage(text), named: named(text), needed: needed(text) }
+  })
+  const byName = new Map(all.flatMap((one) => (one.name ? [[one.name, one] as const] : [])))
+  const resolve = (one: (typeof all)[number]): { named: string[]; needed: string[] } => {
+    const parent = one.parent ? byName.get(one.parent) : undefined
+    if (!parent) {
+      return one
+    }
+    const from = resolve(parent)
+    const needs = new Set([...one.needed, ...from.needed])
+    return {
+      named: one.own ? one.named : from.named,
+      needed: RULES.map(([rule]) => rule).filter((rule) => needs.has(rule)),
+    }
+  }
+  return all.map((one) => ({ path: one.path, ...resolve(one) }))
+}
+
 describe('the rules for the marks an element writes', () => {
   test('are named by every module that writes a mark, and only those', () => {
-    const wrong = modules()
-      .map((path) => {
-        const text = code(path)
-        return { named: named(text), needed: needed(text), path }
-      })
-      .filter((one) => one.named.join() !== one.needed.join())
+    const wrong = resolved().filter((one) => one.named.join() !== one.needed.join())
     expect(wrong).toEqual([])
   })
 

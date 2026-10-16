@@ -351,6 +351,7 @@ export {
 } from './events/events.js'
 export { HelixElement, whenHydrated } from './helix-element/helix-element.js'
 export {
+  LAYERS_RULE,
   MIRROR_RULE,
   SCROLLER_RULE,
   SPOKEN_RULE,

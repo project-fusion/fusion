@@ -216,7 +216,8 @@ export class HelixHeadlessTextarea extends MixinVoice(
     delegatesFocus: true,
   }
 
-  private get control(): HTMLTextAreaElement | null {
+  /** The textarea, for a family built on this one to read. */
+  protected get control(): HTMLTextAreaElement | null {
     return this.partNamed<HTMLTextAreaElement>('control')
   }
 
@@ -258,7 +259,7 @@ export class HelixHeadlessTextarea extends MixinVoice(
    * Reset to `auto` first, because `scrollHeight` of an element already sized to
    * its content is that size, so without the reset the box can only ever grow.
    */
-  private grow(): void {
+  protected grow(): void {
     const control = this.control
     if (!this.autoGrow || !control) {
       return
@@ -557,6 +558,33 @@ export class HelixHeadlessTextarea extends MixinVoice(
     return html`<slot name="clear-icon">${drawIcon(x)}</slot>`
   }
 
+  /**
+   * The `<textarea>` itself, behind a seam a family built on this one wraps:
+   * Code Input draws its highlighted text under it.
+   */
+  protected renderControl(): TemplateResult {
+    return html`<textarea
+      part="control"
+      id=${this.controlId}
+      .value=${this.value}
+      rows=${this.rows}
+      cols=${this.cols ?? nothing}
+      wrap=${this.wrap}
+      name=${this.name || nothing}
+      placeholder=${this.placeholder || nothing}
+      autocomplete=${this.autocomplete || nothing}
+      minlength=${this.minLength ?? nothing}
+      maxlength=${this.maxLength ?? nothing}
+      aria-describedby=${this.describedBy ?? nothing}
+      aria-invalid=${this.invalidity ?? nothing}
+      ?disabled=${this.isDisabled}
+      ?readonly=${this.readOnly}
+      ?required=${this.required}
+      @input=${this.handleInput}
+      @change=${this.handleChange}
+    ></textarea>`
+  }
+
   protected override voiceField(): HTMLInputElement | HTMLTextAreaElement | null {
     return this.partNamed('control')
   }
@@ -565,26 +593,7 @@ export class HelixHeadlessTextarea extends MixinVoice(
     return html`${this.renderLabel()}
     <div part="field">
       <slot name="start"></slot>
-      <textarea
-        part="control"
-        id=${this.controlId}
-        .value=${this.value}
-        rows=${this.rows}
-        cols=${this.cols ?? nothing}
-        wrap=${this.wrap}
-        name=${this.name || nothing}
-        placeholder=${this.placeholder || nothing}
-        autocomplete=${this.autocomplete || nothing}
-        minlength=${this.minLength ?? nothing}
-        maxlength=${this.maxLength ?? nothing}
-        aria-describedby=${this.describedBy ?? nothing}
-        aria-invalid=${this.invalidity ?? nothing}
-        ?disabled=${this.isDisabled}
-        ?readonly=${this.readOnly}
-        ?required=${this.required}
-        @input=${this.handleInput}
-        @change=${this.handleChange}
-      ></textarea>
+      ${this.renderControl()}
       <slot name="end"></slot>
       ${
         this.clearable && this.value !== '' && !this.isDisabled && !this.readOnly

@@ -14,10 +14,13 @@
  * a fourth entry would be a distinction with no consequence. `languageOf`
  * reads `jsx` as `tsx`.
  *
+ * `json` is JSON alone, with no comments, so a setting a form reads as JSON is
+ * colored as the parser that reads it will read it.
+ *
  * `sh` is the one grammar here that is not shipped as it comes: see `shell.ts`
  * for why a mode that knows sh perfectly colors nothing in `bun add`.
  */
-export type HighlightLanguage = 'css' | 'html' | 'js' | 'sh' | 'ts' | 'tsx'
+export type HighlightLanguage = 'css' | 'html' | 'js' | 'json' | 'sh' | 'ts' | 'tsx'
 
 /**
  * The names a page or a file writes for each language, in lowercase.
@@ -33,6 +36,7 @@ const NAMES: Record<string, HighlightLanguage> = {
   html: 'html',
   javascript: 'js',
   js: 'js',
+  json: 'json',
   jsx: 'tsx',
   mjs: 'js',
   mts: 'ts',
