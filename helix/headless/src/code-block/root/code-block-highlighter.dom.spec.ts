@@ -85,3 +85,31 @@ describe('a highlighter registered for every block', () => {
     expect(plain(el)).toBe(true)
   })
 })
+
+describe('a highlighted block that grows', () => {
+  /* One token per word, so each line is markup of its own. */
+  const words = (code: string): string =>
+    code.replace(/\w+/g, (word) => `<span class="tok-keyword">${word}</span>`)
+
+  test('keeps the nodes of every line that did not change', async () => {
+    registerHighlighter(words)
+    const el = await block('language="ts"', 'let a\nlet b')
+    const first = el.shadowRoot?.querySelector('[part="code"] .tok-keyword')
+    const text = el.firstChild as Text
+    text.appendData('\nlet c')
+    await settle(el)
+    await el.updateComplete
+    const code = el.shadowRoot?.querySelector('[part="code"]')
+    expect(code?.querySelector('.tok-keyword')).toBe(first as Element)
+    expect(code?.textContent).toBe('let a\nlet b\nlet c')
+  })
+
+  test('draws a line that changed, and takes away lines that went', async () => {
+    registerHighlighter(words)
+    const el = await block('language="ts"', 'let a\nlet b\nlet c')
+    ;(el.firstChild as Text).data = 'let a\nvar b'
+    await settle(el)
+    await el.updateComplete
+    expect(el.shadowRoot?.querySelector('[part="code"]')?.textContent).toBe('let a\nvar b')
+  })
+})

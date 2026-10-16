@@ -12,10 +12,10 @@ import {
 } from '@fusion.dev/helix-core'
 import { type CSSResult, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 import { html } from 'lit/static-html.js'
 import '../../copy-button/index.js'
 import { highlightedLines } from '../highlight.js'
+import { keyedLines } from '../keyed-lines.js'
 import { gutterNumbers, lineCount, lineRuns, lineSpans } from '../lines.js'
 import {
   type DiffFile,
@@ -1031,7 +1031,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     const code =
       highlighted === undefined
         ? html`<code part="code">${marks}<slot @slotchange=${() => this.requestUpdate()}></slot></code>`
-        : html`<code part="code">${marks}${unsafeHTML(highlighted)}</code><slot
+        : html`<code part="code">${marks}${keyedLines(highlighted)}</code><slot
               hidden
               @slotchange=${() => this.requestUpdate()}
             ></slot>`
