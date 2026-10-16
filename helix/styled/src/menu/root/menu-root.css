@@ -56,21 +56,28 @@
 }
 
 /* `glass` is the page's translucent ground over the theme's blur, and
-   `frosted` the same pair turned up, as on `Popover` and `Drawer`. */
+   `frosted` the same pair turned up, as on `Popover` and `Drawer`.
+
+   **The material is said twice, once for this surface and once for a submenu's.**
+   A flyout is drawn in the row's own shadow root, which cannot see this host's
+   `material`, so it read the opaque overlay and no blur, and a frosted menu
+   opened a solid panel beside it. The two privates inherit through the slot the
+   rows are assigned to, and `menu-item.css` reads them. */
 :host([material="glass"]) [part="surface"] {
-  --_floating-background-color: var(
-    --menu-background-color,
-    light-dark(var(--helix-material-translucent-strong), var(--helix-material-translucent))
+  --_menu-material-fill: light-dark(
+    var(--helix-material-translucent-strong),
+    var(--helix-material-translucent)
   );
-  backdrop-filter: var(--menu-backdrop, var(--helix-material-backdrop));
+  --_menu-material-backdrop: var(--menu-backdrop, var(--helix-material-backdrop));
+  --_floating-background-color: var(--menu-background-color, var(--_menu-material-fill));
+  backdrop-filter: var(--_menu-material-backdrop);
 }
 
 :host([material="frosted"]) [part="surface"] {
-  --_floating-background-color: var(
-    --menu-background-color,
-    var(--helix-material-translucent-strong)
-  );
-  backdrop-filter: var(--menu-backdrop, blur(var(--helix-material-blur-lg)));
+  --_menu-material-fill: var(--helix-material-translucent-strong);
+  --_menu-material-backdrop: var(--menu-backdrop, blur(var(--helix-material-blur-lg)));
+  --_floating-background-color: var(--menu-background-color, var(--_menu-material-fill));
+  backdrop-filter: var(--_menu-material-backdrop);
 }
 
 /* Something on the page has a mark to put before its label, so every row on it

@@ -228,11 +228,16 @@ slot[name="submenu"]::slotted(helix-divider) {
 }
 
 /* The panel a submenu opens in beside its row, under `submenus="flyout"`. The
-   look is the menu's own surface. */
+   look is the menu's own surface, its material included: the menu publishes
+   that as two privates, which are unset on a menu without one. */
 [part="surface"] {
   --menu-item-start: 0px;
   --menu-item-end: 0px;
-  --_floating-background-color: var(--menu-background-color, var(--helix-color-surface-overlay));
+  --_floating-background-color: var(
+    --menu-background-color,
+    var(--_menu-material-fill, var(--helix-color-surface-overlay))
+  );
+  backdrop-filter: var(--_menu-material-backdrop, none);
   --_floating-border-color: var(--menu-border-color, var(--helix-color-border));
   --_floating-border-width: var(--menu-border-width, var(--helix-border-floating));
   --_floating-shadow: var(--menu-shadow, var(--helix-shadow-floating));
