@@ -13,7 +13,7 @@ import { styles } from './shortcut-overlay-root.css.js'
  * The sheet is a `Dialog` listing each shortcut's name with its keys at the
  * end of the row.
  *
- * @since 0.215.0
+ * @since 0.216.0
  * @status experimental
  * @category navigation
  * @aliases Keyboard shortcuts, Shortcut hints, Key tips, Cheat sheet

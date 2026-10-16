@@ -71,7 +71,7 @@ const typeText = (control: HTMLTextAreaElement, text: string): void => {
  * indent. Escape then Tab leaves the field, so it is never a trap for a reader
  * without a pointer.
  *
- * @since 0.215.0
+ * @since 0.216.0
  * @status experimental
  * @category forms
  * @aliases Code field, Code textarea, JSON input, Syntax highlighted input

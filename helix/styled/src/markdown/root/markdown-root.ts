@@ -18,7 +18,7 @@ import { styles } from './markdown-root.css.js'
  * way, never `pretty` or `balance`, since those move earlier line breaks as
  * each word arrives.
  *
- * @since 0.215.0
+ * @since 0.216.0
  * @status experimental
  * @category typography
  * @aliases Markdown renderer, Streaming text, Rich text

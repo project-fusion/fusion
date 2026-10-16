@@ -17,7 +17,7 @@ import { styles } from './code-input-root.css.js'
  * registered: `import '@fusion.dev/helix-sandbox/code-block'` colors every
  * Code Block and Code Input on the page.
  *
- * @since 0.215.0
+ * @since 0.216.0
  * @status experimental
  * @category forms
  * @aliases Code field, Code textarea, JSON input, Syntax highlighted input
