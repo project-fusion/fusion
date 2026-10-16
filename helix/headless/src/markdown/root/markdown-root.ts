@@ -45,7 +45,7 @@ import { MarkdownWriter } from '../writer.js'
  * picture, which loads nothing until a reader follows it. A link's address is
  * kept only where it is relative or on `http`, `https`, `mailto`, or `tel`.
  *
- * @since 0.215.0
+ * @since 0.216.0
  * @status experimental
  * @category typography
  * @aliases Markdown renderer, Streaming text, Rich text

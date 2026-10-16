@@ -23,7 +23,7 @@ import '../../toolbar/index.js'
  * Set `fill` for an editor that fills a pane, such as one side of a split
  * view.
  *
- * @since 0.215.0
+ * @since 0.216.0
  * @status experimental
  * @category inputs
  * @aliases Code editor, CodeMirror, File editor, IDE, Monaco

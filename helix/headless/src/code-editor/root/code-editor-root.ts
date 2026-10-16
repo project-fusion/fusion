@@ -211,7 +211,7 @@ const LANGUAGE_NAMES: Record<string, string> = {
  * Tab indents and Escape then Tab leaves the editor, so the editor is never a
  * trap for a reader without a pointer.
  *
- * @since 0.215.0
+ * @since 0.216.0
  * @status experimental
  * @category inputs
  * @aliases Code editor, CodeMirror, File editor, IDE, Monaco

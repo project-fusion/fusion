@@ -72,7 +72,7 @@ const printed = (keys: string, apple: boolean): string => {
  * The badges are a picture of what the controls already expose, so they are
  * hidden from assistive technology.
  *
- * @since 0.215.0
+ * @since 0.216.0
  * @status experimental
  * @category navigation
  * @aliases Keyboard shortcuts, Shortcut hints, Key tips, Cheat sheet
