@@ -125,6 +125,7 @@ square
 stack
 star
 stop
+storefront
 strategy
 sun
 tag-simple
