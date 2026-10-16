@@ -28,8 +28,8 @@ import { styles } from './megamenu-root.css.js'
  *   has no `material` property, so this and `--megamenu-background-color` set the panel's material.
  * @cssproperty --megamenu-background-color - The panel's fill.
  * @cssproperty --megamenu-border-width - The width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0` unless a theme changes it, so the panel stands out
- *   by its shadow.
+ *   `--helix-border-floating`, a hairline, which is drawn in dark mode only. Set it to `0` for
+ *   the shadow alone.
  * @cssproperty --megamenu-column-size - The minimum width of a column before the grid wraps.
  * @cssproperty --megamenu-duration - How long the panel takes to open and close.
  * @cssproperty --megamenu-full-size - The maximum width of the band's contents, which are centered in it.

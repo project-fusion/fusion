@@ -22,8 +22,7 @@ import { styles } from './dialog-root.css.js'
  * @cssproperty --dialog-background-color - The panel's fill. Follows `--helix-color-surface-overlay`.
  * @cssproperty --dialog-border-color - Color of the panel's edge.
  * @cssproperty --dialog-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless your
- *   theme sets a border.
+ *   `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --dialog-color - Color of the words in the panel. Follows `--helix-color-foreground`.
  * @cssproperty --dialog-icon-size - How big the mark above the title is.
  * @cssproperty --dialog-inline-size - Width of the panel.

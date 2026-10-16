@@ -191,10 +191,10 @@
 
      **What is left is one thing rather than a ramp.** `surface-overlay` in light
      is `neutral-0`, the page color exactly, so its separation is zero by all
-     four metrics rather than small by three. That is deliberate: floating leads
-     with shadow, which is why `border-floating` rests at 0. Closing it needs a
-     new primitive between 1.0 and 0.985 and buys about seven thousandths of
-     sRGB. */
+     four metrics rather than small by three. That is deliberate: a floating
+     surface is set apart by its hairline edge and its shadow, which is why
+     `border-floating` is a width. Closing it needs a new primitive between 1.0
+     and 0.985 and buys about seven thousandths of sRGB. */
   --_helix-neutral-700: oklch(0.33 var(--_helix-neutral-cast));
   --_helix-neutral-800: oklch(0.21 var(--_helix-neutral-cast));
   /* 0.182 and not 0.18, which is the same gray to read and not the same gray to

@@ -28,8 +28,7 @@ import { styles } from './popover-root.css.js'
  * @cssproperty --popover-background-color - Fill of the surface.
  * @cssproperty --popover-border-color - Color of the panel's edge.
  * @cssproperty --popover-border-width - Width of the panel's edge. Defaults to
- *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless
- *   your theme sets a width.
+ *   `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --popover-inline-size - Width of the panel.
  * @cssproperty --popover-max-block-size - Maximum height of the panel before it scrolls.
  * @cssproperty --popover-padding - Space between the panel's edge and its contents.

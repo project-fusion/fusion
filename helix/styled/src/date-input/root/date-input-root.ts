@@ -39,8 +39,7 @@ import { styles } from './date-input-root.css.js'
  * @cssproperty --date-input-background-color - The fill behind the field.
  * @cssproperty --date-input-border-color - The color of the panel's border.
  * @cssproperty --date-input-border-width - The width of the panel's border. It
- *   follows `--helix-border-floating`, which is `0`, so the panel stands out by its
- *   shadow unless a theme sets a border.
+ *   follows `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --date-input-segment-focus-background-color - The fill behind the
  *   segment with focus, in `segmented`. It follows `--helix-color-primary-surface`.
  * @cssproperty --date-input-segment-focus-color - The text of the segment with

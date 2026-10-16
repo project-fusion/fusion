@@ -18,8 +18,7 @@ import { styles } from './toast-item.css.js'
  * @cssproperty --toast-background-color - The panel's color. Follows `--helix-color-surface-overlay`.
  * @cssproperty --toast-border-color - Color of the panel's edge.
  * @cssproperty --toast-border-width - Width of the panel's edge. Follows
- *   `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless your
- *   theme sets a border.
+ *   `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --toast-color - Color of the message's text.
  * @cssproperty --toast-description-color - Color of the line in the `description` slot, under the heading.
  * @cssproperty --toast-dismiss-color - Color of the dismiss control's mark at rest.

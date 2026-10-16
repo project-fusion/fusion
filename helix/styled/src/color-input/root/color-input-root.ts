@@ -34,9 +34,7 @@ import { styles } from './color-input-root.css.js'
  *
  * @cssproperty --color-input-background-color - Fill behind the field.
  * @cssproperty --color-input-border-color - Color of the panel's edge.
- * @cssproperty --color-input-border-width - Width of the panel's edge. Defaults to `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless a theme sets a border.
- *   `--helix-border-floating`, which is `0`, so the panel is told apart by its lift unless a
- *   theme says otherwise.
+ * @cssproperty --color-input-border-width - Width of the panel's edge. Defaults to `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --color-input-panel-size - Width of the panel, and so of the square.
  * @cssproperty --color-input-shadow - Shadow under the panel. Defaults to `--helix-shadow-floating`, so the panel keeps a shadow over any content below it.
  *   `--helix-shadow-floating`: a floating surface sits over content nobody can predict, so it

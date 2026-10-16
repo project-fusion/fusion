@@ -19,8 +19,7 @@ import '../../button/index.js'
  *
  * @cssproperty --tour-arrow-size - The size of the arrow's box, before it is rotated.
  * @cssproperty --tour-border-width - The width of the panel's border. It follows
- *   `--helix-border-floating`, which is `0`, so the panel stands out by its
- *   shadow unless a theme sets a border.
+ *   `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --tour-bubble-size - The widest the panel can grow.
  * @cssproperty --tour-padding - The padding inside the panel.
  * @cssproperty --tour-shadow - The shadow under the panel. It follows

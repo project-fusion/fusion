@@ -28,8 +28,7 @@ import { styles } from './skip-link-root.css.js'
  * @cssproperty --skip-link-background-color - The background of the link while it is shown.
  * @cssproperty --skip-link-border-color - The border color of the link while it is shown.
  * @cssproperty --skip-link-border-width - The border width of the link while it is shown. Follows
- *   `--helix-border-floating`, which is `0`, so the link is set apart by its shadow unless a
- *   theme sets a border.
+ *   `--helix-border-floating`, a hairline. Set it to `0` for the shadow alone.
  * @cssproperty --skip-link-color - The text color of the link while it is shown.
  * @cssproperty --skip-link-font-size - The size of the link's text.
  * @cssproperty --skip-link-inset-block - How far the shown link sits from the top of the viewport.

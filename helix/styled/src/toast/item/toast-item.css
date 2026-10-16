@@ -249,9 +249,9 @@ slot[name="icon"]::slotted(*) {
   block-size: var(--toast-timer-size, var(--helix-space-2xs));
   /* **Along the top edge and edge to edge, so it reads as the message's own top
      edge rather than as a bar laid inside it.** Not as a border thickening,
-     which is what this said for a long time and is not available to it:
-     `border-floating` is `0` in both modes, so there is no border here to
-     thicken, and the tone spec asserts that. What makes it read as an edge is
+     which is what this said for a long time: the tone leaves the hairline
+     `border-floating` draws at one width on every side, and the tone spec
+     asserts that. What makes it read as an edge is
      that the surface is its containing block and clips it, so the bar takes the
      corner radius at both ends. Measured 16 Sep 2026: the bar is 4px and the
      radius is 4px, which is the whole of the corner, so the corner of a message

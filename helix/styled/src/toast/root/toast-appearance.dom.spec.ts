@@ -165,7 +165,8 @@ if (hasLayout()) {
       const glyph = (part(found, 'icon') as HTMLElement).querySelector('svg')
       expect(glyph?.getAttribute('role')).toBe('img')
       expect(glyph?.getAttribute('aria-label')).toBe('Error')
-      expect(getComputedStyle(part(found, 'item') as HTMLElement).borderLeftWidth).toBe('0px')
+      const edge = getComputedStyle(part(found, 'item') as HTMLElement)
+      expect(edge.borderLeftWidth).toBe(edge.borderTopWidth)
     })
 
     test('each tone names itself, in the same words `Callout` uses', async () => {

@@ -28,7 +28,7 @@ import { styles } from './menu-root.css.js'
  *   Follows the theme's material policy.
  * @cssproperty --menu-background-color - Fill of the surface.
  * @cssproperty --menu-border-color - Color of the panel's edge.
- * @cssproperty --menu-border-width - Width of the panel's edge. Defaults to `--helix-border-floating`, which is `0`, so the panel stands out by its shadow unless a theme sets a border.
+ * @cssproperty --menu-border-width - Width of the panel's edge. Defaults to `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --menu-max-block-size - The tallest the menu grows before it scrolls.
  * @cssproperty --menu-min-inline-size - The narrowest the menu gets.
  * @cssproperty --menu-shadow - Shadow under the panel. Defaults to `--helix-shadow-floating`, so the panel keeps a shadow over any content below it.
