@@ -742,3 +742,89 @@ describe('the idle slot', () => {
     expect(element.shadowRoot?.activeElement).toBe(part(element, 'send'))
   })
 })
+
+describe('the attachments slot', () => {
+  const carrying = async () => {
+    const element = (await mount(
+      `<helix-headless-chat-composer><span slot="attachments"><img alt="photo.jpg" src="data:," /><button type="button">Remove photo.jpg</button></span></helix-headless-chat-composer>`,
+    )) as Composer
+    await element.updateComplete
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    return element
+  }
+
+  /* Inside the box and before the field, so what the draft carries reads as
+     part of the draft, the way a message's own attachments sit with it. */
+  test('sits inside the box, above the field', async () => {
+    const element = await carrying()
+    const box = part(element, 'composer')
+    const region = part(element, 'attachments')
+    expect(region?.parentElement).toBe(box)
+    expect(region?.nextElementSibling).toBe(part(element, 'field'))
+    expect(region?.querySelector('slot[name="attachments"]')).not.toBeNull()
+  })
+
+  test('is shown while something is in it', async () => {
+    const element = await carrying()
+    const region = part(element, 'attachments') as HTMLElement
+    expect(region.hidden).toBe(false)
+    expect(region.hasAttribute('data-empty')).toBe(false)
+  })
+
+  /* An empty region is a grid row, and a row takes the gap above the field. */
+  test('takes no room while nothing is in it', async () => {
+    const element = await composer()
+    const region = part(element, 'attachments') as HTMLElement
+    expect(region.hidden).toBe(true)
+    expect(region.hasAttribute('data-empty')).toBe(true)
+  })
+
+  test('shows and hides as attachments come and go after the first render', async () => {
+    const element = await composer()
+    const region = part(element, 'attachments') as HTMLElement
+    const chip = document.createElement('span')
+    chip.slot = 'attachments'
+    chip.textContent = 'notes.md'
+    element.append(chip)
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(region.hidden).toBe(false)
+
+    chip.remove()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(region.hidden).toBe(true)
+
+    // A render after the attachments left keeps the region hidden.
+    element.value = 'Hello'
+    await element.updateComplete
+    expect(region.hidden).toBe(true)
+  })
+
+  /* A press between two thumbnails would otherwise take focus off the
+     field, and the next key the reader pressed would be typed nowhere. The
+     gap between them is the region itself. */
+  test('a press on its empty space keeps the reader in the field', async () => {
+    const element = await carrying()
+    const field = part(element, 'field') as HTMLTextAreaElement
+    const press = new MouseEvent('mousedown', { bubbles: true, cancelable: true, composed: true })
+    part(element, 'attachments')?.dispatchEvent(press)
+    expect(press.defaultPrevented).toBe(true)
+    expect(element.shadowRoot?.activeElement).toBe(field)
+  })
+
+  /* happy-dom routes no event from a slotted node through its slot, so the
+     press is sent to the region with the path a browser gives it: the
+     button, the chip around it, the slot, and the region. */
+  test('a press on a control in it is left to the control', async () => {
+    const element = await carrying()
+    const region = part(element, 'attachments') as HTMLElement
+    const remove = element.querySelector('button') as HTMLButtonElement
+    const chip = remove.parentElement as HTMLElement
+    const slot = region.querySelector('slot') as HTMLSlotElement
+    const press = new MouseEvent('mousedown', { bubbles: true, cancelable: true, composed: true })
+    Object.defineProperty(press, 'composedPath', {
+      value: () => [remove, chip, slot, region, part(element, 'composer'), element],
+    })
+    region.dispatchEvent(press)
+    expect(press.defaultPrevented).toBe(false)
+  })
+})

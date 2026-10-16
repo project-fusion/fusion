@@ -10,6 +10,8 @@ import {
   settle,
   type Updatable,
 } from '@fusion.dev/helix-testing/dom'
+import attachmentsSheet from '../.examples/attachments.css' with { type: 'text' }
+import attachments from '../.examples/attachments.html' with { type: 'text' }
 import eachAuthor from '../.examples/each-author.html' with { type: 'text' }
 import events from '../.examples/events.html' with { type: 'text' }
 import historySheet from '../.examples/history.css' with { type: 'text' }
@@ -27,6 +29,10 @@ beforeAll(async () => {
   await import('../../flex/index.js')
   await import('../../list/index.js')
   await import('../../button/index.js')
+  await import('../../icon/index.js')
+  await import('../../icon-button/index.js')
+  await import('../../image/index.js')
+  await import('../../tag/index.js')
 })
 
 /* Browser only: happy-dom does not run a script inserted by script. */
@@ -67,6 +73,24 @@ describe('the preview example', () => {
     expect(turns).toHaveLength(before + 1)
     expect(turns[turns.length - 1]?.textContent?.trim()).toBe('Is it the lock on the jobs table?')
     expect(turns[turns.length - 1]?.getAttribute('author')).toBe('me')
+  })
+})
+
+describe('the attachments example', () => {
+  run('each attachment leaves when it is removed, and the draft stops counting one', async () => {
+    await example(attachments, attachmentsSheet)
+    const draft = document.getElementById('draft') as Updatable & { attached: boolean }
+    const region = part(draft, 'attachments') as HTMLElement
+    expect(region.hidden).toBe(false)
+    ;(draft.querySelector('.remove') as HTMLElement).click()
+    expect(draft.querySelector('helix-image')).toBeNull()
+    expect(draft.attached).toBe(true)
+    ;(part(draft.querySelector('helix-tag') as HTMLElement, 'dismiss') as HTMLElement).click()
+    await settle(draft)
+    expect(draft.querySelector('[slot="attachments"]')).toBeNull()
+    expect(draft.attached).toBe(false)
+    await idle()
+    expect(region.hidden).toBe(true)
   })
 })
 

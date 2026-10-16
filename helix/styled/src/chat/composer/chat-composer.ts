@@ -76,19 +76,22 @@ export function lapOf(w: number, h: number): Keyframe[] {
  * @summary A field for writing a turn in a conversation.
  *
  * @description
- * The composer is one row, and the field takes the remaining width. The field
- * grows with its text up to a maximum height, through `field-sizing: content`.
- * Where that is not supported, the field keeps its rows and scrolls. The
- * maximum height keeps the composer from covering the transcript.
+ * The composer is one box. What the draft carries sits at its top, in a row
+ * that wraps, inset to the line the caret starts on. The field grows with its
+ * text up to a maximum height, through `field-sizing: content`. Where that is
+ * not supported, the field keeps its rows and scrolls. The maximum height
+ * keeps the composer from covering the transcript.
  *
  * @since 0.1.0
  * @status stable
  * @category forms
  * @documentation https://fusion.dev/helix/components/chat
  *
+ * @slot attachments - What the draft carries, such as images or files, inside the box and above the field.
  * @slot end - Content under the field, beside the send button.
  * @slot start - Content under the field at the leading edge, such as an attachment button or a model picker.
  *
+ * @csspart attachments - The row above the field that holds the `attachments` slot, inset to the field's text and hidden while the slot is empty.
  * @csspart field - The text field.
  * @csspart send - The send button.
  * @csspart tools - The row under the field.
