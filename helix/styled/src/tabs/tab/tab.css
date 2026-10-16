@@ -18,6 +18,17 @@
   text-overflow: ellipsis;
 }
 
+/* *The label is centered on its capitals.** Trimmed to its cap height and
+   given back half the leading at each end, the label box is one line tall as
+   before, with the capitals in its middle. Centering the line box put them
+   where the face's ascent and descent did: 0.25px high at 12px in Chromium. */
+@supports (text-box: trim-both cap alphabetic) {
+  [part="label"] {
+    padding-block: calc((1lh - 1cap) / 2);
+    text-box: trim-both cap alphabetic;
+  }
+}
+
 /*
  *  Every one of these comes from the tab set, which sets them all for its
  *    default and overrides what a variant changes. The fallbacks are what a tab
@@ -53,6 +64,12 @@
      the start. */
   inline-size: var(--_tab-inline-size, auto);
   justify-content: var(--_tab-justify, center);
+  /* The transparent edge at the bottom is matched at the top, so what the tab
+     centers is centered on the whole tab. A button's own padding goes with it:
+     1px at each end in Chromium, and 2px over 3px in WebKit, which put the
+     label half a pixel higher there. Before, "Contrast" sat 1.26px above the
+     middle of its tab in Chromium and 1.51px above it in WebKit. */
+  padding-block: var(--helix-border-thick) 0;
   padding-inline: var(--tabs-tab-padding-inline, var(--helix-space-sm));
   /* A tab with an `href` is an anchor, and reads as a tab all the same. */
   text-decoration: none;

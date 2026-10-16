@@ -93,3 +93,39 @@ describe("a tab's label", () => {
     })
   }
 })
+
+/* The owner asked whether "Contrast" was centered in its tab, October 15, 2026:
+   its capitals sat 1.26px above the middle in Chromium and 1.51px in WebKit,
+   from the transparent edge along the bottom, a button's own padding, and a
+   line box centered in place of the capitals. */
+describe("a tab's label, in the middle of its tab", () => {
+  const PROBE =
+    '<span data-probe style="block-size: 1cap; display: inline-block; inline-size: 0"></span>'
+
+  for (const density of ['sm', 'md', 'lg']) {
+    for (const variant of ['', 'segmented', 'underlined']) {
+      if (hasLayout()) {
+        test(`is centered on its capitals at ${density}${variant ? `, ${variant}` : ''}`, async () => {
+          const region = await mount(`
+            <div data-density="${density}">
+              <helix-tabs label="The audit"${variant ? ` variant="${variant}"` : ''}>
+                <helix-tab value="contrast">Contrast${PROBE}</helix-tab>
+                <helix-tab value="collisions">Collisions</helix-tab>
+              </helix-tabs>
+            </div>`)
+          const host = region.querySelector('helix-tabs') as Updatable
+          await host.updateComplete
+          const tab = host.querySelector('helix-tab') as Updatable
+          await tab.updateComplete
+          await document.fonts.ready
+          const box = (part(tab, 'tab') as HTMLElement).getBoundingClientRect()
+          const capitals = (
+            tab.querySelector('[data-probe]') as HTMLElement
+          ).getBoundingClientRect()
+          const middle = capitals.bottom - capitals.height / 2
+          expect(Math.abs(middle - (box.top + box.height / 2))).toBeLessThan(0.1)
+        })
+      }
+    }
+  }
+})
