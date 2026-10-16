@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { highlightedLines } from './highlight.js'
+import { highlightedLineList, highlightedLines } from './highlight.js'
 
 describe('highlightedLines', () => {
   /* What Shiki's `codeToHtml` returns: a block of its own, with a tab stop. */
@@ -28,5 +28,23 @@ describe('highlightedLines', () => {
       '<span>x</span><pre><code>a</code></pre>',
     )
     expect(highlightedLines(two)).toBe(two)
+  })
+})
+
+describe('highlightedLineList', () => {
+  test('cuts markup into its lines', () => {
+    expect(highlightedLineList('<b>a</b>\nc')).toEqual(['<b>a</b>', 'c'])
+  })
+
+  test('closes a token at a line break and opens it again on the next line', () => {
+    expect(highlightedLineList('<span class="c">/* a\nb */</span> x')).toEqual([
+      '<span class="c">/* a</span>',
+      '<span class="c">b */</span> x',
+    ])
+  })
+
+  test('keeps an empty last line, and nests what is open', () => {
+    expect(highlightedLineList('<i><b>a\n</b></i>')).toEqual(['<i><b>a</b></i>', '<i><b></b></i>'])
+    expect(highlightedLineList('a\n')).toEqual(['a', ''])
   })
 })
