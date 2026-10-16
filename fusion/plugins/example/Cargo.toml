@@ -4,7 +4,7 @@ description = "An example rule, built the way somebody outside this repository w
 edition = "2024"
 license = "MIT"
 publish = false
-rust-version = "1.96"
+rust-version = "1.97"
 version = "0.0.0-dev"
 
 # **Its own workspace, which is what detaches it from the one above.** Excluded

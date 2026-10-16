@@ -19,7 +19,7 @@
 # the path: the build step runs in a fresh shell, and the toolchain this puts
 # in `~/.cargo` is not on its path.
 #
-# `1.96` is the toolchain CI builds with, and the floor `rust-version` names.
+# `1.97` is the toolchain CI builds with, and the floor `rust-version` names.
 set -euo pipefail
 
 # **Every `node_modules` is removed before the install.** Vercel restores them
@@ -45,6 +45,6 @@ if ! command -v rustup >/dev/null 2>&1; then
 fi
 # shellcheck source=/dev/null
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
-rustup toolchain install 1.96 --profile minimal
+rustup toolchain install 1.97 --profile minimal
 
-cargo +1.96 build -p fusion-helix-cli --locked
+cargo +1.97 build -p fusion-helix-cli --locked
