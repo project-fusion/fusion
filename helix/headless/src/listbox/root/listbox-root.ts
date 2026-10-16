@@ -23,6 +23,7 @@ import {
   MixinCollection,
   MixinControllerValue,
   MixinField,
+  MixinVoice,
   markMatches,
   OptionWindowController,
   onApple,
@@ -30,6 +31,7 @@ import {
   rangeAdd,
   reportValues,
   requestChange,
+  SPOKEN_RULE,
   scrollItemIntoView,
   selectsAll,
   Typeahead,
@@ -174,8 +176,10 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  *
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the value is about to change, and cancelable.
+ * @event {HelixBeforeListenEvent} helix-before-listen - The dictation button was pressed. Cancelable: cancel it to keep the field from listening.
  * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when an option is dropped at a new place, in a `reorderable` list with `@fusion.dev/helix/listbox/reorder` imported, with every value in the new order. Cancelable: cancel it to keep the option where it is.
  * @event {HelixFilterEvent} helix-filter - Fired before the list is filtered, and cancelable.
+ * @event {HelixListenEvent} helix-listen - Dictation settled on a phrase and put it in the search field, after the field's own `input`.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired once the list is scrolled within a screen of its end, once for each number of options, and not while `loading` is set. Add the next page of options and set `loading` while you fetch it.
  * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your options, or your `items`, to the order in `keys`. Cancelable: cancel it to say the move did not happen.
  * @event {Event} input - Fired after the value changes.
@@ -192,18 +196,22 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * @csspart loading - The text shown while the options load.
  * @csspart search - The region that holds the filter field.
  * @csspart search-field - The filter field.
+ * @csspart voice - The dictation button, under `voice` on a `filterable` list, in the search field.
+ * @csspart voice-listening - The dictation button while it listens. Set alongside `voice`.
+ * @csspart voice-status - What a screen reader hears as dictation starts and stops, drawn for no one else.
  *
  * @cssstate empty - The list has no options to show: none were given, or the filter hid every one.
  * @cssstate error - While `load-error` is set.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
+ * @cssstate listening - While the field listens for dictation. The element sets `--dictation-level` on itself meanwhile, from 0 to 1, for a meter.
  * @cssstate loading - While `loading` is set.
  * @cssstate no-results - A filter hid every option of a list that has some.
  */
 @customElement('helix-headless-listbox')
-export class HelixHeadlessListbox extends MixinCollection(
-  MixinControllerValue(MixinField(HelixFormElement)),
+export class HelixHeadlessListbox extends MixinVoice(
+  MixinCollection(MixinControllerValue(MixinField(HelixFormElement))),
 ) {
-  protected static override markRules = [VIRTUAL_RULE]
+  protected static override markRules = [SPOKEN_RULE, VIRTUAL_RULE]
 
   /**
    * The key this family's words are registered under, its styled tag:
@@ -1648,6 +1656,10 @@ export class HelixHeadlessListbox extends MixinCollection(
      announces the highlight and forwards the arrows. A second stop on the
      list was one where the arrows chose as they moved, so in a command palette
      a Tab and an arrow ran a command. */
+  protected override voiceField(): HTMLInputElement | null {
+    return this.filterable ? this.partNamed<HTMLInputElement>('search-field') : null
+  }
+
   protected override render(): TemplateResult {
     const shown = this.showsOptions
     /* One tab stop for the whole list, which is what a listbox is in the tab
@@ -1673,7 +1685,7 @@ export class HelixHeadlessListbox extends MixinCollection(
                 ?disabled=${this.isDisabled}
                 @input=${this.handleFilter}
                 @keydown=${this.handleFilterKeydown}
-              />
+              />${this.renderVoice()}
             </div>`
           : ''
       }

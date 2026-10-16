@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessChatComposer } from '@fusion.dev/helix-headless/chat'
 import type { CSSResultGroup } from 'lit'
+import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
 import { styles } from './chat-composer.css.js'
 
 /**
@@ -27,12 +28,13 @@ import { styles } from './chat-composer.css.js'
  * @cssproperty --chat-composer-background-color - Fill behind the composer.
  * @cssproperty --chat-composer-border-width - Width of the composer's edge, so your theme can remove it.
  * @cssproperty --chat-composer-max-block-size - Maximum height the field grows to.
+ * @cssproperty --dictation-level - How loud the microphone is while the field listens for dictation, from 0 to 1, which the element sets; the ring around the dictation button grows with it.
  */
 @customElement('helix-chat-composer')
 export class HelixChatComposer extends HelixHeadlessChatComposer {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = styles
+  static override styles: CSSResultGroup = [styles, dictationStyles]
 }
 
 declare global {

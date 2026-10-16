@@ -46,7 +46,8 @@ slot[name="end"]::slotted(*) {
 
 /* The clear button, dressed as `Input` dresses its own, at the first line
    beside the text. */
-[part="clear"] {
+[part="clear"],
+[part~="voice"] {
   --icon-size: var(--helix-size-icon-tight);
   all: unset;
 
@@ -64,11 +65,13 @@ slot[name="end"]::slotted(*) {
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-[part="clear"]:hover {
+[part="clear"]:hover,
+[part~="voice"]:hover {
   color: var(--helix-color-foreground);
 }
 
-[part="clear"]:focus-visible {
+[part="clear"]:focus-visible,
+[part~="voice"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }

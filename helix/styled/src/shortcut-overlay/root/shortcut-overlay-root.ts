@@ -22,8 +22,8 @@ import { styles } from './shortcut-overlay-root.css.js'
  * @cssproperty --shortcut-overlay-badge-background-color - The badge's fill. Defaults to `surface-inverse`.
  * @cssproperty --shortcut-overlay-badge-border-width - The badge's edge. Defaults to `border-floating`, which a theme sets to zero where a shadow alone lifts a surface.
  * @cssproperty --shortcut-overlay-badge-color - The badge's text. Defaults to `foreground-inverse`.
- * @cssproperty --shortcut-overlay-badge-shadow - The badge's lift. Defaults to `shadow-floating`.
  * @cssproperty --shortcut-overlay-badge-max-inline-size - The widest a badge grows before its name ends in an ellipsis. Defaults to 16rem.
+ * @cssproperty --shortcut-overlay-badge-shadow - The badge's lift. Defaults to `shadow-floating`.
  */
 @customElement('helix-shortcut-overlay')
 export class HelixShortcutOverlay extends HelixHeadlessShortcutOverlay {

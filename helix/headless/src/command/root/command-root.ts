@@ -177,6 +177,9 @@ const CONTROL = 'helix-control:'
  * @csspart listbox-loading - The text shown while the commands are loading.
  * @csspart listbox-search - The region that holds the filter field.
  * @csspart listbox-search-field - The filter field.
+ * @csspart listbox-voice - The dictation button in the filter field, under `voice`.
+ * @csspart listbox-voice-listening - The dictation button while it listens.
+ * @csspart listbox-voice-status - What a screen reader hears as dictation starts and stops.
  * @csspart live - The region a screen reader announces the page shown from, by the words of the command that opens it, drawn once there is one to say. Visually hidden in the styled tier.
  *
  * @cssstate empty - The list shows no commands: there are none, or typing hid every one.
@@ -381,6 +384,13 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   @words
   @property({ attribute: 'results-label' })
   resultsLabel = '{count, plural, one {# command} other {# commands}}'
+
+  /**
+   * Draws a dictation button in the search field, which listens through the
+   * page's speech engine and types what it hears, as a field's `voice` does.
+   */
+  @property({ type: Boolean })
+  voice = false
 
   /**
    * Whether the consumer put anything under the list.
@@ -842,7 +852,8 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         exportparts="empty: listbox-empty, error: listbox-error, feedback: listbox-feedback,
           filter-icon: listbox-filter-icon, filter-mark: listbox-filter-mark, hint: listbox-hint,
           items: listbox-items, label: listbox-label, live: listbox-live, loading: listbox-loading,
-          search: listbox-search, search-field: listbox-search-field"
+          search: listbox-search, search-field: listbox-search-field,
+        voice: listbox-voice, voice-listening: listbox-voice-listening, voice-status: listbox-voice-status"
         aria-label=${this.listName}
         empty-text=${this.emptyText}
         filter-delay=${this.filterDelay}
@@ -857,6 +868,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         .items=${this.items}
         .fieldHomeEnd=${this.homeEnd === 'list'}
         layout=${this.layout ?? nothing}
+        ?voice=${this.voice}
         filterable
         @helix-before-change=${this.handleChange}
         @helix-filter=${this.handleFilter}

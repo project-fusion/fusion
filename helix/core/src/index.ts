@@ -204,6 +204,7 @@ export {
   HelixBeforeCloseEvent,
   HelixBeforeCollapseEvent,
   HelixBeforeEditEvent,
+  HelixBeforeListenEvent,
   HelixBeforeMoveEvent,
   HelixBeforeOpenEvent,
   HelixBeforePanelResizeEvent,
@@ -251,6 +252,7 @@ export {
   HelixGraphSignalEvent,
   HelixGraphZoomEvent,
   HelixHistoryEvent,
+  HelixListenEvent,
   HelixLoadEvent,
   HelixLoadMoreEvent,
   HelixMapClusterEvent,
@@ -304,6 +306,7 @@ export {
   HelixTourAskEvent,
   HelixTourStatusEvent,
   HelixTypingEvent,
+  type ListenDetail,
   type MapClusterDetail,
   type MapPanDetail,
   type MapPartChangeDetail,
@@ -428,6 +431,7 @@ export {
   type ViewportGestures,
   type ViewportWay,
 } from './mixins/mixin-viewport/mixin-viewport.js'
+export { MixinVoice, type VoiceElement } from './mixins/mixin-voice/mixin-voice.js'
 export { anchorElement } from './utils/anchor-element/anchor-element.js'
 export { arrowReach, sideOf } from './utils/arrow/arrow.js'
 export { assignSlot, assignSlots } from './utils/assign-slots/assign-slots.js'
@@ -781,6 +785,14 @@ export { lockScroll, scrollHolders, unlockScroll } from './utils/scroll-lock/scr
 export { slotFilled, slotNamed } from './utils/slot-filled/slot-filled.js'
 export { SlottedGlyph } from './utils/slotted-glyph/slotted-glyph.js'
 export { slottedWords } from './utils/slotted-words/slotted-words.js'
+export {
+  browserSpeech,
+  pageSpeechEngine,
+  registerSpeechEngine,
+  type SpeechEngine,
+  type SpeechListener,
+  type SpeechSession,
+} from './utils/speech/speech.js'
 export { splitValues } from './utils/split-values/split-values.js'
 export { stopPress } from './utils/stop-press/stop-press.js'
 export {

@@ -1,6 +1,6 @@
 import { nameText } from '../name-text/name-text.js'
 
-/**
+/*
  * Every labeled Helix control on the page, and every shortcut that belongs to
  * none, so a command palette can find a control by its name and a shortcut
  * overlay can show what each key does.

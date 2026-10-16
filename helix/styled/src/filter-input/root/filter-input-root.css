@@ -123,7 +123,8 @@ slot[name="end"]::slotted(*) {
    pixels against their 12, so the one control in the row that clears only the
    text read as the loudest thing in it. The target stays at `icon-loose`, since
    the glyph shrinking is not the button shrinking. */
-[part="clear"] {
+[part="clear"],
+[part~="voice"] {
   --icon-size: 0.85em;
   all: unset;
 
@@ -141,12 +142,14 @@ slot[name="end"]::slotted(*) {
   transition: color var(--helix-duration-fast) var(--helix-easing-standard);
 }
 
-[part="clear"]:hover {
+[part="clear"]:hover,
+[part~="voice"]:hover {
   background-color: color-mix(in oklab, currentcolor 12%, transparent);
   color: var(--filter-input-clear-color-hover, var(--helix-color-foreground));
 }
 
-[part="clear"]:focus-visible {
+[part="clear"]:focus-visible,
+[part~="voice"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }

@@ -81,6 +81,7 @@ link
 linkedin-logo
 list
 magnifying-glass
+microphone
 microscope
 minus
 monitor

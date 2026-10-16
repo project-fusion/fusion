@@ -150,6 +150,9 @@ import { over } from '../align.js'
  * @csspart listbox-loading - The text shown while the options load.
  * @csspart listbox-search - The region that holds the filter field.
  * @csspart listbox-search-field - The filter field.
+ * @csspart listbox-voice - The dictation button in the filter field.
+ * @csspart listbox-voice-listening - The dictation button while it listens.
+ * @csspart listbox-voice-status - What a screen reader hears as dictation starts and stops.
  * @csspart live - The region a screen reader announces a choice made on the closed trigger from, drawn once there is one to say. Visually hidden in the styled tier.
  * @csspart surface - The floating panel.
  * @csspart trigger - The closed control, which shows the chosen value.
@@ -945,7 +948,8 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
       exportparts="empty: listbox-empty, error: listbox-error, feedback: listbox-feedback,
         filter-icon: listbox-filter-icon, filter-mark: listbox-filter-mark, hint: listbox-hint,
         items: listbox-items, label: listbox-label, live: listbox-live, loading: listbox-loading,
-        search: listbox-search, search-field: listbox-search-field"
+        search: listbox-search, search-field: listbox-search-field,
+        voice: listbox-voice, voice-listening: listbox-voice-listening, voice-status: listbox-voice-status"
       .value=${this.value}
       ?multiple=${this.multiple}
       ?filterable=${this.filterable}

@@ -10,9 +10,11 @@ import {
   ListedController,
   MixinControllerValue,
   MixinField,
+  MixinVoice,
   numberConverter,
   type OwnRule,
   restoreValue,
+  SPOKEN_RULE,
   words,
 } from '@fusion.dev/helix-core'
 import { x } from '@fusion.dev/helix-icons'
@@ -65,7 +67,9 @@ import { grownHeight, lineMetrics } from '../grow.js'
  *
  * @event {Event} change - Sent from the textarea when the user finishes an edit.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes, and cancelable.
+ * @event {HelixBeforeListenEvent} helix-before-listen - The dictation button was pressed. Cancelable: cancel it to keep the field from listening.
  * @event {HelixClearEvent} helix-clear - Fired after the clear button has emptied the field, after `input` and `change`.
+ * @event {HelixListenEvent} helix-listen - Dictation settled on a phrase and put it in the value, after the field's own `input`.
  * @event {Event} input - Fired after the value changes.
  *
  * @csspart clear - The button that empties the field, under `clearable`.
@@ -74,12 +78,20 @@ import { grownHeight, lineMetrics } from '../grow.js'
  * @csspart field - The box that holds the textarea.
  * @csspart hint - Help under the field, while nothing is wrong.
  * @csspart label - The label above the field.
+ * @csspart voice - The dictation button, under `voice`.
+ * @csspart voice-listening - The dictation button while it listens. Set alongside `voice`.
+ * @csspart voice-status - What a screen reader hears as dictation starts and stops, drawn for no one else.
  *
  * @cssstate blank - The field holds no text.
  * @cssstate invalid - The control has an error to show, from the browser's validation, `validate`, or your `feedback`.
+ * @cssstate listening - While the field listens for dictation. The element sets `--dictation-level` on itself meanwhile, from 0 to 1, for a meter.
  */
 @customElement('helix-headless-textarea')
-export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(HelixFormElement)) {
+export class HelixHeadlessTextarea extends MixinVoice(
+  MixinControllerValue(MixinField(HelixFormElement)),
+) {
+  protected static override markRules = [SPOKEN_RULE]
+
   /** On the page's list of controls, where a command palette and a shortcut overlay find it. */
   protected readonly listed = new ListedController(
     this,
@@ -545,6 +557,10 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
     return html`<slot name="clear-icon">${drawIcon(x)}</slot>`
   }
 
+  protected override voiceField(): HTMLInputElement | HTMLTextAreaElement | null {
+    return this.partNamed('control')
+  }
+
   protected override render(): TemplateResult {
     return html`${this.renderLabel()}
     <div part="field">
@@ -581,7 +597,7 @@ export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(Helix
               ${this.renderClearIcon()}
             </button>`
           : nothing
-      }
+      }${this.renderVoice()}
     </div>
     ${this.renderHint()}${this.renderFeedback()}`
   }

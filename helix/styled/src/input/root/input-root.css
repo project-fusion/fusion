@@ -55,7 +55,8 @@ slot[name="end"]::slotted(*) {
 
 /* The two marks the field owns, dressed as one thing. */
 [part="clear"],
-[part~="reveal"] {
+[part~="reveal"],
+[part~="voice"] {
   --icon-size: var(--helix-size-icon-tight);
   all: unset;
 
@@ -73,12 +74,14 @@ slot[name="end"]::slotted(*) {
 }
 
 [part="clear"]:hover,
-[part~="reveal"]:hover {
+[part~="reveal"]:hover,
+[part~="voice"]:hover {
   color: var(--helix-color-foreground);
 }
 
 [part="clear"]:focus-visible,
-[part~="reveal"]:focus-visible {
+[part~="reveal"]:focus-visible,
+[part~="voice"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }

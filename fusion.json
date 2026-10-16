@@ -129,7 +129,7 @@
       "planned": {},
       "sheets": ["helix/styles/src/primitives.css", "helix/styles/src/tokens.css"]
     },
-    "shared": ["chart", "floating", "viewport"],
+    "shared": ["chart", "dictation", "floating", "viewport"],
     "tiers": [
       "helix/core/src",
       "helix/headless/src",

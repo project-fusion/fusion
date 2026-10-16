@@ -125,6 +125,9 @@ import '../../option/root/index.js'
  * @csspart column-loading - The text shown while the options load.
  * @csspart column-search - The region that holds the filter field.
  * @csspart column-search-field - The filter field.
+ * @csspart column-voice - The dictation button in the filter field.
+ * @csspart column-voice-listening - The dictation button while it listens.
+ * @csspart column-voice-status - What a screen reader hears as dictation starts and stops.
  * @csspart columns - The row of columns, in `wheels`.
  * @csspart feedback - The message under the times, while `feedback` is set.
  * @csspart hint - Help under the times, shown while there is no message in `feedback`.
@@ -142,6 +145,9 @@ import '../../option/root/index.js'
  * @csspart list-loading - The text shown while the options load.
  * @csspart list-search - The region that holds the filter field.
  * @csspart list-search-field - The filter field.
+ * @csspart list-voice - The dictation button in the filter field.
+ * @csspart list-voice-listening - The dictation button while it listens.
+ * @csspart list-voice-status - What a screen reader hears as dictation starts and stops.
  * @csspart now - The button that chooses the current time, drawn with `show-now`.
  * @csspart option - One time in the list. It carries `data-between` inside a range, and inside the run to the time under the pointer while a range waits for its second end.
  * @csspart option-between - A time inside a chosen range, excluding its ends, beside `option`.
@@ -1196,7 +1202,8 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
       aria-required=${this.required ? 'true' : nothing}
       exportparts="empty: column-empty, error: column-error, feedback: column-feedback, filter-icon: column-filter-icon,
         filter-mark: column-filter-mark, hint: column-hint, items: column-items, label: column-label,
-        live: column-live, loading: column-loading, search: column-search, search-field: column-search-field"
+        live: column-live, loading: column-loading, search: column-search, search-field: column-search-field,
+        voice: column-voice, voice-listening: column-voice-listening, voice-status: column-voice-status"
       aria-label=${label}
       ?disabled=${this.isDisabled}
       .value=${value}
@@ -1326,7 +1333,8 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
       aria-required=${this.required ? 'true' : nothing}
       exportparts="empty: list-empty, error: list-error, feedback: list-feedback, filter-icon: list-filter-icon,
         filter-mark: list-filter-mark, hint: list-hint, items: list-items, label: list-label,
-        live: list-live, loading: list-loading, search: list-search, search-field: list-search-field"
+        live: list-live, loading: list-loading, search: list-search, search-field: list-search-field,
+        voice: list-voice, voice-listening: list-voice-listening, voice-status: list-voice-status"
       aria-label=${this.listName}
       data-unset=${this.value === '' ? '' : nothing}
       ?disabled=${this.isDisabled}
