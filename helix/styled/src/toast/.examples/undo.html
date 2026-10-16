@@ -1,0 +1,54 @@
+<!-- @summary Archive a file at once, and undo it from the message, or with Command+Z, while it shows. -->
+<!-- @min 360 -->
+<helix-flex
+  direction="column"
+  gap="md"
+>
+  <helix-list
+    divided
+    id="files"
+    label="Files"
+  >
+    <helix-list-item>
+      Quarterly report.pdf
+      <helix-button
+        data-archive
+        slot="end"
+      >Archive</helix-button>
+    </helix-list-item>
+    <helix-list-item>
+      Roadmap.key
+      <helix-button
+        data-archive
+        slot="end"
+      >Archive</helix-button>
+    </helix-list-item>
+  </helix-list>
+
+  <helix-toast
+    id="stack"
+    label="Notifications"
+    placement="bottom-end"
+  ></helix-toast>
+</helix-flex>
+
+<script type="module">
+  const files = document.getElementById('files')
+  const stack = document.getElementById('stack')
+
+  /* The action happens at once. The message offers to take it back, which
+     replaces asking first. */
+  files.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-archive]')
+    if (!button) {
+      return
+    }
+    const row = button.closest('helix-list-item')
+    const next = row.nextElementSibling
+    const name = row.firstChild.textContent.trim()
+    row.remove()
+    stack.undoable(`Archived ${name}`, {
+      undo: () => files.insertBefore(row, next),
+    })
+  })
+</script>

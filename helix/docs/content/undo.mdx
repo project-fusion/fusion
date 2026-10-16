@@ -1,0 +1,62 @@
+---
+description: Do an action at once and offer to undo it from a toast, in place of asking first.
+section: Essentials
+title: Undo an action from a toast
+---
+
+# Undo an action from a toast
+
+An action a reader can take back does not need a confirmation dialog. Do the
+action at once, then show a toast that offers to undo it. The reader who meant
+it loses no time, and the reader who did not has a few seconds to take it back.
+
+## Show the toast after the action
+
+Call `undoable()` on a `Toast` region after the action, with what to do if the
+reader undoes it:
+
+```js
+const stack = document.querySelector('helix-toast')
+
+archive(file)
+stack.undoable(`Archived ${file.name}`, {
+  undo: () => restore(file),
+})
+```
+
+The message holds an Undo button and shows for 8 seconds. While it shows:
+
+- Command+Z, or Control+Z on Windows and Linux, undoes the newest one, unless
+  focus is in a text field, which keeps the key for its own undo.
+- A pointer or focus in the stack pauses its timer.
+- A screen reader hears the message and then which keys undo it.
+- The shortcut overlay and its sheet list the key.
+
+## Hold back what cannot be taken back
+
+Where the action cannot be reversed once it has happened, such as deleting a
+record on a server, do it when the message closes. Remove the item from the
+page at once, and pass `commit`:
+
+```js
+row.hidden = true
+const result = await stack.undoable('Deleted 3 files', {
+  commit: () => deleteOnServer(ids),
+  undo: () => (row.hidden = false),
+})
+```
+
+`undoable()` returns a promise that settles to `undone` or `kept`.
+
+## Keep a confirmation where an undo cannot help
+
+| Action | Use |
+|---|---|
+| Archive, move, rename, reorder, or change a setting | Undo toast |
+| Delete to a trash, or delete held back until the message closes | Undo toast |
+| Delete with no way back, such as emptying the trash | Confirmation dialog |
+| Send, publish, invite, or pay | Confirmation dialog |
+
+An action that reaches another person or leaves the app cannot be taken back
+from a toast, because it has already happened somewhere you do not control.
+Ask first with a `Dialog` with `alert`.
