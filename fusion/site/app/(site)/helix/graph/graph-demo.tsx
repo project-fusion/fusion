@@ -87,7 +87,7 @@ const start = async (
     const [
       { default: Graph },
       { default: Sigma },
-      { sigmaDriver },
+      { sigmaDriver, sigmaOptions },
       { default: FA2Layout },
       { default: forceAtlas2 },
     ] = await Promise.all([
@@ -97,7 +97,7 @@ const start = async (
       import('graphology-layout-forceatlas2/worker'),
       import('graphology-layout-forceatlas2'),
     ])
-    const sigma = new Sigma(new Graph(), box)
+    const sigma = new Sigma(new Graph(), box, sigmaOptions())
     connection = connectGraph(
       frame,
       sigmaDriver(sigma, {

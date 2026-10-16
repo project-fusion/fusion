@@ -518,6 +518,8 @@ export const nameStart = (
 /** A note to name over the drawing: its name, and whether it is the one the reader is on. */
 export interface Named {
   id: string
+  /** Whether the name is drawn even where it covers another. The strong ones by default. */
+  must?: boolean | undefined
   name: string
   strong: boolean
 }
@@ -525,8 +527,8 @@ export interface Named {
 /**
  * **Names on a canvas of their own**, for a renderer that draws none: each
  * note given, beside it, ringed in the ground's color so it reads over the
- * links. The strong ones always, and the rest where there is room, in the
- * order given.
+ * links. The ones that must be named always, and the rest where there is
+ * room, in the order given.
  */
 export const namesOver = (container: HTMLElement, onScreen: OnScreen) => {
   const canvas = layer(container, 'names')
@@ -544,7 +546,7 @@ export const namesOver = (container: HTMLElement, onScreen: OnScreen) => {
       taken = chromeOver(container)
       const rightToLeft = isRtl(container)
       context.textAlign = 'left'
-      for (const { id, name, strong } of named) {
+      for (const { id, must, name, strong } of named) {
         const at = onScreen(id)
         if (!at || looks.node(id).hidden) {
           continue
@@ -560,7 +562,7 @@ export const namesOver = (container: HTMLElement, onScreen: OnScreen) => {
         })
         const x = nameStart(at, width, boxAt, taken, container.clientWidth, rightToLeft)
         const box = boxAt(x)
-        if (!clearOf(box, taken) && !strong) {
+        if (!clearOf(box, taken) && !(must ?? strong)) {
           continue
         }
         taken.push(box)

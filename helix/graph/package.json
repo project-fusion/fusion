@@ -94,7 +94,7 @@
   "peerDependencies": {
     "@cosmos.gl/graph": "^3.4.0",
     "d3-force-3d": "^3.0.0",
-    "sigma": "^3.0.0",
+    "sigma": "^4.0.0",
     "three": ">=0.160.0 <0.200.0"
   },
   "peerDependenciesMeta": {

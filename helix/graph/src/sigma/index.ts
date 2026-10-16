@@ -1,4 +1,4 @@
-export { type HelixEdgeData, HelixEdgeProgram } from './edge-program.js'
+export type { HelixEdgeData } from './edge-program.js'
 export {
   type SigmaCamera,
   type SigmaDriverOptions,
@@ -7,3 +7,4 @@ export {
   type SigmaRenderer,
   sigmaDriver,
 } from './sigma-driver.js'
+export { type SigmaOptionsOverrides, sigmaOptions } from './sigma-options.js'

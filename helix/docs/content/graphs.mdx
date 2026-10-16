@@ -33,7 +33,7 @@ Give the frame its notes and links, make the renderer, and connect the two:
 ```js
 import '@fusion.dev/helix/graph'
 import { connectGraph } from '@fusion.dev/helix-graph'
-import { sigmaDriver } from '@fusion.dev/helix-graph/sigma'
+import { sigmaDriver, sigmaOptions } from '@fusion.dev/helix-graph/sigma'
 import Graph from 'graphology'
 import forceAtlas2 from 'graphology-layout-forceatlas2'
 import FA2Layout from 'graphology-layout-forceatlas2/worker'
@@ -46,7 +46,7 @@ frame.nodes = [
 ]
 frame.links = [{ source: 'pricing', target: 'roadmap' }]
 
-const sigma = new Sigma(new Graph(), frame.querySelector('div'))
+const sigma = new Sigma(new Graph(), frame.querySelector('div'), sigmaOptions())
 const connection = connectGraph(
   frame,
   sigmaDriver(sigma, {
