@@ -35,7 +35,7 @@
   "bugs": "https://github.com/project-fusion/fusion/issues",
   "devDependencies": {
     "@fusion.dev/helix-testing": "workspace:*",
-    "@types/bun": "^1.4.2"
+    "@types/bun": "^1.4.3"
   },
   "homepage": "https://fusion.dev",
   "keywords": [

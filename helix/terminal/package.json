@@ -41,7 +41,7 @@
   "devDependencies": {
     "@fusion.dev/helix-headless": "workspace:*",
     "@fusion.dev/helix-testing": "workspace:*",
-    "@types/bun": "^1.4.2",
+    "@types/bun": "^1.4.3",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/addon-search": "^0.16.0",
     "@xterm/addon-web-links": "^0.12.0",
