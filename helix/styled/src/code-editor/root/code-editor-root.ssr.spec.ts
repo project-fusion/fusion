@@ -4,13 +4,13 @@ import { html } from 'lit'
 import '../index.js'
 
 describe('editor server output', () => {
-  const served = ssr(html`<helix-editor label="Code"></helix-editor>`)
+  const served = ssr(html`<helix-code-editor label="Code"></helix-code-editor>`)
 
   test('serves the text field the editor is before an engine connects', () => {
     expect(partTag(withoutStyles(served), 'control')).toMatch(/^<textarea\s/)
   })
 
   test('the host carries nothing the consumer did not write', () => {
-    expect(hostAttributes(served, 'helix-editor')).toEqual(['label'])
+    expect(hostAttributes(served, 'helix-code-editor')).toEqual(['label'])
   })
 })

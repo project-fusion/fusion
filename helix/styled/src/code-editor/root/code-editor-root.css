@@ -1,0 +1,323 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+:host([fill]) {
+  inset: 0;
+  position: absolute;
+}
+
+/* One frame around the header, the find bar, the code, the problems and the
+   status line, as Terminal's and Code Block's are: the code on the page's
+   ground, each strip on the raised surface. Four rows that grow and one that
+   takes the rest, so the code is what gives way. */
+[part="field"] {
+  background-color: var(--code-editor-background-color, var(--helix-color-background));
+  block-size: var(--code-editor-block-size, 24rem);
+  border: var(--helix-border-thin) solid var(--code-editor-border-color, var(--helix-color-border));
+  border-radius: var(--code-editor-radius, var(--helix-radii-lg));
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+:host([fill]) [part="field"] {
+  block-size: 100%;
+}
+
+:host([separation="plain"]) [part="field"] {
+  border: none;
+  border-radius: 0;
+}
+
+/* The header, the find bar and the status line are one strip each, on one
+   fill, and dense by nature, as Terminal's are: a control a page puts in the
+   header takes the size the built-in ones have. */
+[part="header"],
+[part="find-bar"],
+[part="status"] {
+  --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+
+  align-items: center;
+  background-color: var(--code-editor-header-background-color, var(--helix-color-surface-raised));
+  box-sizing: border-box;
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--helix-space-2xs) var(--helix-space-xs);
+  min-inline-size: 0;
+  padding-block: var(--helix-space-2xs);
+  padding-inline: var(--helix-space-sm) var(--helix-space-2xs);
+}
+
+[part="header"] {
+  border-block-end: var(--helix-border-thin) solid
+    var(--code-editor-border-color, var(--helix-color-border));
+  min-block-size: calc(var(--helix-size-control) + var(--helix-space-2xs) * 2);
+}
+
+/* The name reads as a file's: in the header's face, cut short before it
+   pushes the controls off the strip. */
+[part="label"] {
+  display: block;
+  flex: 0 1 auto;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[part="language"] {
+  color: var(--helix-color-foreground-muted);
+  flex: 0 0 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+}
+
+[part="controls"] {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+}
+
+/* Find says it is on with a wash of the ink while its bar is open, and each
+   option while it applies, as Terminal's do. */
+:host(:state(find-open)) [part="find"],
+[part="find-match-case"][aria-pressed="true"],
+[part="find-whole-word"][aria-pressed="true"],
+[part="find-regex"][aria-pressed="true"] {
+  --icon-button-background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 12%,
+    transparent
+  );
+  --icon-button-foreground-color: var(--helix-color-foreground);
+}
+
+/* The find bar is a step denser than the header, and wraps the replace row
+   under the find row where the frame is narrow. */
+[part="find-bar"],
+[part="find-controls"] {
+  --helix-size-control: calc(var(--helix-size-control-sm) * 0.8);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+}
+
+[part="find-bar"] {
+  border-block-end: var(--helix-border-thin) solid
+    var(--code-editor-border-color, var(--helix-color-border));
+  flex-wrap: wrap;
+}
+
+[part="find-bar"][hidden] {
+  display: none;
+}
+
+[part="find-field"],
+[part="replace-field"] {
+  appearance: none;
+  background-color: var(--code-editor-background-color, var(--helix-color-background));
+  block-size: var(--helix-size-control);
+  border: var(--helix-border-thin) solid var(--code-editor-border-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  flex: 1 1 10rem;
+  font-family: var(--helix-font-sans);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-sm));
+  max-inline-size: 20rem;
+  min-inline-size: 0;
+  padding-inline: var(--helix-space-xs);
+}
+
+[part="find-field"]:focus-visible,
+[part="replace-field"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="find-field"][aria-invalid="true"] {
+  border-color: var(--helix-color-danger);
+}
+
+/* The bar has a Close button of its own, so the field draws no clear button. */
+[part="find-field"]::-webkit-search-cancel-button,
+[part="find-field"]::-webkit-search-decoration {
+  appearance: none;
+}
+
+/* Wide enough for the count it is likely to say, so the buttons beside it do
+   not move while a reader types and the count grows a digit. */
+[part="find-count"] {
+  color: var(--helix-color-foreground-muted);
+  flex: 0 0 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
+  min-inline-size: 7em;
+  white-space: nowrap;
+}
+
+[part="find-controls"] {
+  flex: 0 0 auto;
+}
+
+/* The replace row is a line of its own under the find row: a break of no
+   height between them, and the replace field and its buttons after it. */
+:host(:state(replace-open)) [part="find-bar"]::after {
+  content: "";
+  flex-basis: 100%;
+  order: 1;
+}
+
+[part="replace-field"],
+[part="replace"],
+[part="replace-all"] {
+  order: 2;
+}
+
+/* The replace field lines up under the find field, past the button that
+   shows it. */
+:host(:state(replace-open)) [part="replace-field"] {
+  margin-inline-start: calc(var(--helix-size-control) + var(--helix-space-xs));
+}
+
+[part="find-replace"] {
+  flex: 0 0 auto;
+}
+
+/* The code: the editor's own face, and the room the rest leaves. */
+[part="body"] {
+  color: var(--helix-color-foreground);
+  display: flex;
+  flex: 1 1 auto;
+  font-family: var(--helix-font-mono);
+  font-size: var(--code-editor-font-size, var(--helix-text-sm));
+  font-variant-ligatures: none;
+  min-block-size: 0;
+}
+
+[part="control"] {
+  all: unset;
+  box-sizing: border-box;
+  caret-color: var(--helix-color-foreground);
+  flex: 1 1 auto;
+  font: inherit;
+  line-height: var(--helix-leading-normal);
+  min-inline-size: 0;
+  overflow: auto;
+  padding: var(--helix-space-xs) var(--helix-space-sm);
+  tab-size: 2;
+  white-space: pre;
+}
+
+:host([wrap]) [part="control"] {
+  white-space: pre-wrap;
+}
+
+[part="view"] {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
+/* The unset control takes a display of its own, which outranks the `hidden`
+   the element sets once an engine draws; said here, so only one shows. */
+[part="control"][hidden],
+[part="view"][hidden] {
+  display: none;
+}
+
+/* The problems, under the code and over the status line: each a row in its
+   tone's ink that moves the caret to it, the list scrolling past five. */
+[part="diagnostics"] {
+  border-block-start: var(--helix-border-thin) solid
+    var(--code-editor-border-color, var(--helix-color-border));
+  flex: 0 0 auto;
+  list-style: none;
+  margin: var(--helix-space-none);
+  max-block-size: calc(
+    5 *
+    (var(--helix-text-xs) * var(--helix-leading-normal) + var(--helix-space-2xs) * 2)
+  );
+  overflow: auto;
+  padding: var(--helix-space-none);
+}
+
+[part~="diagnostic"] {
+  --icon-size: var(--helix-size-icon-tight);
+  all: unset;
+
+  align-items: center;
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  cursor: pointer;
+  display: flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  gap: var(--helix-space-xs);
+  inline-size: 100%;
+  line-height: var(--helix-leading-normal);
+  padding: var(--helix-space-2xs) var(--helix-space-sm);
+}
+
+[part~="diagnostic"]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 6%, transparent);
+}
+
+[part~="diagnostic"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: calc(var(--helix-size-focus-offset) * -1);
+}
+
+[part="diagnostic-icon"] {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+[part~="diagnostic-danger"] [part="diagnostic-icon"] {
+  color: var(--helix-color-danger);
+}
+
+[part~="diagnostic-warning"] [part="diagnostic-icon"] {
+  color: var(--helix-color-warning);
+}
+
+[part~="diagnostic-info"] [part="diagnostic-icon"] {
+  color: var(--helix-color-info);
+}
+
+[part="status"] {
+  border-block-start: var(--helix-border-thin) solid
+    var(--code-editor-border-color, var(--helix-color-border));
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-variant-numeric: tabular-nums;
+  gap: var(--helix-space-md);
+  justify-content: space-between;
+  padding-inline: var(--helix-space-sm);
+}
+
+:host(:disabled) [part="field"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Print: the code prints as it is drawn, and the controls, the find bar and
+   the status line are hidden, a printed page having nothing to press.
+
+   `@media print` does not cross a shadow boundary, so a page cannot answer
+   this on a component's behalf and every family says it for itself. */
+@media print {
+  [part="controls"],
+  [part="find-bar"],
+  [part="status"] {
+    display: none;
+  }
+}

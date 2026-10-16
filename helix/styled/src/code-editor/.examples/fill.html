@@ -1,0 +1,24 @@
+<!-- @summary An editor that fills one side of a split pane, under `fill`. -->
+<!-- @min 360 -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+>
+
+<div class="pane">
+  <helix-code-editor
+    data-preview-editor
+    fill
+    label="theme.css"
+    language="css"
+    line-numbers
+    value=":root {
+  --helix-color-primary: oklch(0.62 0.19 256);
+  --helix-radii-md: 0.5rem;
+}
+
+.banner {
+  padding: var(--helix-space-md);
+}"
+  ></helix-code-editor>
+</div>

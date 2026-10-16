@@ -4,18 +4,22 @@ import type {
   EditorEngine,
   EditorEngineListeners,
   EditorEngineState,
-  HelixHeadlessEditor,
-} from './editor-root.js'
+  HelixHeadlessCodeEditor,
+} from './code-editor-root.js'
+
+/* Read once the DOM is registered, as the element reads it. */
+let onApple: () => boolean
 
 beforeAll(async () => {
   registerDom()
   await import('../index.js')
+  ;({ onApple } = await import('@fusion.dev/helix-core'))
 })
 
-const editor = async (attributes = ''): Promise<HelixHeadlessEditor> => {
+const editor = async (attributes = ''): Promise<HelixHeadlessCodeEditor> => {
   const element = (await mount(
-    `<helix-headless-editor label="Query" ${attributes}></helix-headless-editor>`,
-  )) as HelixHeadlessEditor
+    `<helix-headless-code-editor label="Query" ${attributes}></helix-headless-code-editor>`,
+  )) as HelixHeadlessCodeEditor
   await element.updateComplete
   return element
 }
@@ -95,7 +99,7 @@ describe('an editor with no engine', () => {
     ]
     await element.updateComplete
     const items = [...(element.shadowRoot?.querySelectorAll('[part~="diagnostic"]') ?? [])]
-    expect(items.map((one) => one.textContent)).toEqual([
+    expect(items.map((one) => one.textContent?.trim())).toEqual([
       'Line 2: Unknown word',
       'Line 1: Missing semicolon',
     ])
@@ -144,5 +148,108 @@ describe('an editor with an engine', () => {
     expect(told.destroyed).toBe(1)
     expect(hasState(element, 'connected')).toBe(false)
     expect(part(element, 'control')?.hasAttribute('hidden')).toBe(false)
+  })
+})
+
+describe('the status line and the problems', () => {
+  test('says where the caret is and how many problems there are', async () => {
+    const element = await editor()
+    element.value = 'one\ntwo'
+    element.diagnostics = [{ from: 0, message: 'Missing semicolon', to: 3 }]
+    await element.updateComplete
+    expect(part(element, 'position')?.textContent).toBe('Line 1, column 1')
+    expect(part(element, 'problem-count')?.textContent).toBe('1 problem')
+    element.diagnostics = []
+    await element.updateComplete
+    expect(part(element, 'problem-count')?.textContent).toBe('No problems')
+  })
+
+  test('a press on a problem selects it in the code, and the status line follows', async () => {
+    const element = await editor()
+    element.value = 'one\ntwo'
+    element.diagnostics = [{ from: 4, message: 'Unknown word', to: 7 }]
+    await element.updateComplete
+    ;(part(element, 'diagnostic') as HTMLButtonElement).click()
+    await element.updateComplete
+    const control = part(element, 'control') as HTMLTextAreaElement
+    expect([control.selectionStart, control.selectionEnd]).toEqual([4, 7])
+    expect(part(element, 'position')?.textContent).toBe('Line 2, column 1')
+  })
+
+  test('names the language in the header as a reader knows it', async () => {
+    const element = await editor('language="ts"')
+    expect(part(element, 'language')?.textContent).toBe('TypeScript')
+  })
+})
+
+describe('the find bar, on the plain field', () => {
+  const findIn = async (value: string): Promise<HelixHeadlessCodeEditor> => {
+    const element = await editor()
+    element.value = value
+    await element.updateComplete
+    part(element, 'control')?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        ctrlKey: !onApple(),
+        key: 'f',
+        metaKey: onApple(),
+      }),
+    )
+    await element.updateComplete
+    return element
+  }
+
+  const type = async (element: HelixHeadlessCodeEditor, name: string, text: string) => {
+    const field = part(element, name) as HTMLInputElement
+    field.value = text
+    field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    await element.updateComplete
+  }
+
+  test('opens on the find key, finds as it is typed, and counts the matches', async () => {
+    const element = await findIn('total = sum + total')
+    expect(part(element, 'find-bar')?.hasAttribute('hidden')).toBe(false)
+    await type(element, 'find-field', 'total')
+    expect(part(element, 'find-count')?.textContent).toBe('1 of 2 matches')
+    const control = part(element, 'control') as HTMLTextAreaElement
+    expect([control.selectionStart, control.selectionEnd]).toEqual([0, 5])
+    ;(part(element, 'find-next') as HTMLElement).click()
+    await element.updateComplete
+    expect(part(element, 'find-count')?.textContent).toBe('2 of 2 matches')
+  })
+
+  test('says so where a regular expression cannot be read', async () => {
+    const element = await findIn('a')
+    ;(part(element, 'find-regex') as HTMLElement).click()
+    await type(element, 'find-field', '(')
+    expect(part(element, 'find-count')?.textContent).toBe('Not a valid regular expression')
+  })
+
+  test('replaces every match through the value, once the replace field shows', async () => {
+    const element = await findIn('total = sum + total')
+    expect(part(element, 'replace-field')).toBeNull()
+    ;(part(element, 'find-replace') as HTMLElement).click()
+    await element.updateComplete
+    await type(element, 'find-field', 'total')
+    await type(element, 'replace-field', 'amount')
+    ;(part(element, 'replace-all') as HTMLElement).click()
+    await element.updateComplete
+    expect(element.value).toBe('amount = sum + amount')
+  })
+
+  test('closes on Escape', async () => {
+    const element = await findIn('a')
+    part(element, 'find-field')?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        key: 'Escape',
+      }),
+    )
+    await element.updateComplete
+    expect(part(element, 'find-bar')?.hasAttribute('hidden')).toBe(true)
   })
 })

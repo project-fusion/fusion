@@ -14,7 +14,7 @@ window.helixPreviewEditor = {
   mount(root) {
     const stops = [
       ...root.querySelectorAll<HTMLElement & { engine: undefined }>(
-        ':is(helix-editor, helix-headless-editor)[data-preview-editor]',
+        ':is(helix-code-editor, helix-headless-code-editor)[data-preview-editor]',
       ),
     ].map((editor) => connectEditor(editor))
     return () => {

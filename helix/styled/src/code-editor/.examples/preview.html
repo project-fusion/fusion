@@ -1,0 +1,34 @@
+<!-- @summary A file of TypeScript drawn by CodeMirror, with its problems listed under it and a page action in the header. -->
+<!-- Preview frame: data-preview-editor has the frame connect CodeMirror; on your page, connectEditor does. -->
+<helix-code-editor
+  data-preview-editor
+  id="code-editor-preview"
+  label="orders.ts"
+  language="ts"
+  line-numbers
+  value="interface Order {
+  amount: number
+  paid: boolean
+}
+
+export function totalPaid(orders: Order[]): number {
+  const total = orders
+    .filter((order) =&gt; order.paid)
+    .reduce((sum, order) =&gt; sum + order.amount, 0)
+  console.log(total)
+  return totl
+}"
+>
+  <helix-button slot="actions">Format</helix-button>
+</helix-code-editor>
+
+<script type="module">
+  const editor = document.getElementById('code-editor-preview')
+  const at = (text) => editor.value.indexOf(text)
+
+  /* Problems, as a linter or a language server would report them. */
+  editor.diagnostics = [
+    { from: at('console'), message: 'Unexpected console statement.', to: at('console') + 11, tone: 'warning' },
+    { from: at('totl'), message: 'Cannot find name totl. Did you mean total?', to: at('totl') + 4 },
+  ]
+</script>

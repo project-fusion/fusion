@@ -5,7 +5,7 @@ import '../index.js'
 
 describe('editor server output', () => {
   const served = ssr(
-    html`<helix-headless-editor label="Query" value="select 1"></helix-headless-editor>`,
+    html`<helix-headless-code-editor label="Query" value="select 1"></helix-headless-code-editor>`,
   )
 
   test('serves a text field holding the value, so the editor reads before any script runs', () => {
@@ -13,6 +13,6 @@ describe('editor server output', () => {
   })
 
   test('the host carries nothing the consumer did not write', () => {
-    expect(hostAttributes(served, 'helix-headless-editor')).toEqual(['label', 'value'])
+    expect(hostAttributes(served, 'helix-headless-code-editor')).toEqual(['label', 'value'])
   })
 })
