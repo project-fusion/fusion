@@ -143,6 +143,7 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @csspart empty - The words under the strip when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration, there being no document to resolve `for` in.
  * @csspart end - The trailing slot's box.
  * @csspart footer - The three-slot row under the strip.
+ * @csspart listen - The button that plays the chart as sound, under `listen`.
  * @csspart live - The readout: a polite live region that says the cell the keys moved to. Hide it visually.
  * @csspart loading - The words under the strip while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -865,7 +866,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
         this.status.spoken
           ? html`<span part="selection" role="status">${this.status.said}</span>`
           : nothing
-      }${this.renderTable()}`
+      }${this.renderListen()}${this.renderTable()}`
   }
 
   /**

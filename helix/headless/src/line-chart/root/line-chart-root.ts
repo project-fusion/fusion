@@ -123,6 +123,7 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * @csspart labels - The row of reading names, which the names share: lay it out as one grid cell they all stand in.
  * @csspart line - The line for one series.
  * @csspart line-dashed - A `line` whose series `dashed` names. Set alongside `line`.
+ * @csspart listen - The button that plays the chart as sound, under `listen`.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -548,7 +549,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     const domain = this.range(series)
     const { x, y } = this.scalesOf(domain, readings.length)
 
-    return html`${this.valueAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}${this.renderSummary(series)}${this.renderTable()}`
+    return html`${this.valueAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}${this.renderSummary(series)}${this.renderListen()}${this.renderTable()}`
   }
 
   /**

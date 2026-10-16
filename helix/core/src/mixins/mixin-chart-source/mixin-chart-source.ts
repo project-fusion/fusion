@@ -1,10 +1,21 @@
+import { speakerHigh } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { ChartPointerController } from '../../controllers/chart-pointer-controller/chart-pointer-controller.js'
 import { SourceController } from '../../controllers/source-controller/source-controller.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
+import { drawIcon } from '../../utils/draw-icon/draw-icon.js'
+import { keyClaimed } from '../../utils/key-claimed/key-claimed.js'
+import { timeConverter } from '../../utils/number-converter/number-converter.js'
 import type { ChartData } from '../../utils/read-data/read-data.js'
 import { type Row, type Series, seriesKey } from '../../utils/read-series/read-series.js'
+import {
+  ChartSound,
+  panOf,
+  pitchOf,
+  type SoundSeries,
+  sweepPlan,
+} from '../../utils/sonify/sonify.js'
 import { writtenList } from '../../utils/written-list/written-list.js'
 import { formatWords, words } from '../../words/words.js'
 
@@ -236,6 +247,28 @@ export declare class MixinChartSourceInterface {
    * `data`: there is then no table on the page to read. Nothing otherwise.
    */
   protected renderTable(): TemplateResult | typeof nothing
+  /**
+   * Draws a Listen button that plays the chart as sound, and plays each
+   * reading's tone as the arrow keys step to it. L plays it too while the
+   * chart has focus, and Escape stops it.
+   */
+  listen: boolean
+  /** How long each series takes to play, in milliseconds or as `3s`. */
+  listenDuration: number
+  /** The Listen button's words. */
+  listenLabel: string
+  /** The Listen button's words while the chart plays. */
+  listenStopLabel: string
+  /** Whether the chart is playing as sound now. */
+  get sounding(): boolean
+  /** `visible` draws the chart's text summary under it, as one line. */
+  summary?: 'visible'
+  /** Plays every shown series as sound, one after another, and resolves when it ends or is stopped. */
+  playReadings(): Promise<void>
+  /** Stops the sound. */
+  stopReadings(): void
+  /** The Listen button, under `listen`, behind a seam a chart places. */
+  protected renderListen(): TemplateResult | typeof nothing
 }
 
 /**
@@ -297,6 +330,140 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
      */
     readonly pointer = new ChartPointerController(this)
 
+    @state()
+    private playingReadings = false
+
+    private readonly sound = new ChartSound()
+
+    /** The reading and series the last tone was played for. */
+    private toned = { at: -1, series: -1 }
+
+    /** Whether the chart is playing as sound now. */
+    get sounding(): boolean {
+      return this.playingReadings
+    }
+
+    /** Each shown series as sound: its name, and a value or nothing for each reading. */
+    private soundSeries(): SoundSeries[] {
+      const count = this.readings
+      return this.series
+        .filter((one) => this.showsSeries(one.name))
+        .map((one) => {
+          const values: Array<number | null> = Array.from({ length: count }, () => null)
+          for (const point of one.points) {
+            values[point.at] = point.value
+          }
+          return { name: one.name, values }
+        })
+    }
+
+    /** The lowest and highest shown value, which the pitches span. */
+    private soundRange(series: SoundSeries[]): { max: number; min: number } {
+      const values = series.flatMap((one) =>
+        one.values.filter((value): value is number => value !== null),
+      )
+      return { max: Math.max(...values, 0), min: Math.min(...values, 0) }
+    }
+
+    /** Plays every shown series as sound, one after another, and resolves when it ends or is stopped. */
+    async playReadings(): Promise<void> {
+      const series = this.soundSeries()
+      if (series.length === 0) {
+        return
+      }
+      this.playingReadings = true
+      await this.sound.play(
+        sweepPlan(series, { duration: this.listenDuration / 1000, ...this.soundRange(series) }),
+      )
+      this.playingReadings = false
+    }
+
+    /** Stops the sound. */
+    stopReadings(): void {
+      this.sound.stop()
+      this.playingReadings = false
+    }
+
+    private readonly handleListenKey = (event: KeyboardEvent): void => {
+      /* Escape stops the sound whatever else it does, the reading's own
+         Escape included, which has already put the bubble away. */
+      if (event.key === 'Escape' && this.playingReadings) {
+        this.stopReadings()
+        return
+      }
+      if (!this.listen || keyClaimed(event) || event.altKey || event.ctrlKey || event.metaKey) {
+        return
+      }
+      if (event.key === 'l' || event.key === 'L') {
+        event.preventDefault()
+        if (this.playingReadings) {
+          this.stopReadings()
+        } else {
+          void this.playReadings()
+        }
+      }
+    }
+
+    override connectedCallback(): void {
+      super.connectedCallback()
+      this.addEventListener('keydown', this.handleListenKey)
+    }
+
+    override disconnectedCallback(): void {
+      super.disconnectedCallback()
+      this.removeEventListener('keydown', this.handleListenKey)
+      this.stopReadings()
+    }
+
+    protected override updated(changed: PropertyValues<this>): void {
+      super.updated(changed)
+      const { at, keyed, series } = this.pointer
+      if (
+        !this.listen ||
+        !keyed ||
+        at < 0 ||
+        (at === this.toned.at && series === this.toned.series)
+      ) {
+        return
+      }
+      this.toned = { at, series }
+      const all = this.soundSeries()
+      const one = all[Math.max(0, series)]
+      const value = one?.values[at]
+      if (one === undefined || value === null || value === undefined) {
+        return
+      }
+      const range = this.soundRange(all)
+      void this.sound.play([
+        {
+          frequency: pitchOf(value, range.min, range.max),
+          kind: 'tone',
+          length: 0.18,
+          pan: panOf(at, this.readings),
+          series: Math.max(0, series),
+          time: 0,
+        },
+      ])
+    }
+
+    protected renderListen(): TemplateResult | typeof nothing {
+      if (!this.listen || !this.readingsKnown || !ChartSound.available) {
+        return nothing
+      }
+      return html`<button
+        part="listen"
+        type="button"
+        aria-pressed=${this.playingReadings ? 'true' : 'false'}
+        @click=${() => {
+          if (this.playingReadings) {
+            this.stopReadings()
+          } else {
+            void this.playReadings()
+          }
+        }}
+      >${drawIcon(speakerHigh)}<span>${this.playingReadings ? this.listenStopLabel : this.listenLabel}</span></button>`
+    }
+
     /**
      * The readings as data, in the shape of a table, where the page has no
      * table to point `for` at. `for` wins where both are set.
@@ -347,6 +514,32 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     label = ''
 
     /**
+     * Draws a Listen button that plays the chart as sound: each series in
+     * turn, its readings from left to right and from the left ear to the
+     * right, the value as pitch over two octaves, a soft tick at each
+     * gridline, and one timbre a series. With it, each reading the arrow keys
+     * step to plays its tone beside what the readout says, and L plays the
+     * whole chart while it has focus. Escape stops it. Nothing plays without a
+     * press, and the sound is made only then.
+     */
+    @property({ reflect: true, type: Boolean })
+    listen = false
+
+    /** How long each series takes to play, in milliseconds or as `3s`. */
+    @property({ attribute: 'listen-duration', converter: timeConverter('listen-duration', 3000) })
+    listenDuration = 3000
+
+    /** The Listen button's words. */
+    @words
+    @property({ attribute: 'listen-label' })
+    listenLabel = 'Listen'
+
+    /** The Listen button's words while the chart plays. */
+    @words
+    @property({ attribute: 'listen-stop-label' })
+    listenStopLabel = 'Stop'
+
+    /**
      * The locale the chart's own numbers are written in: its axis, its
      * percentages and its totals, such as `de` for `1.240` and `32 %`.
      *
@@ -394,6 +587,13 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     @words
     @property({ attribute: 'readings-label' })
     readingsLabel = 'Readings {first} to {last} of {count}'
+
+    /**
+     * `visible` draws the chart's text summary under it, as one line. Absent,
+     * the summary is said to a screen reader and drawn for no one else.
+     */
+    @property()
+    summary?: 'visible'
 
     /** The page of the table drawn from `data` that is shown, counting from zero. */
     @state()

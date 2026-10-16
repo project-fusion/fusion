@@ -192,6 +192,7 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  *
  * @csspart empty - The words in place of the drawing when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
  * @csspart gridline - One line across the plot, drawn when `gridlines` is set.
+ * @csspart listen - The button that plays the chart as sound, under `listen`.
  * @csspart live - The readout: a polite live region that says the row the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -643,7 +644,7 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
         <span aria-hidden="true" dir="auto" part="x-name">${field.xName}</span>
         <span aria-hidden="true" dir="auto" part="y-name">${field.yNames.join(', ')}</span>
       </div>
-      ${this.renderSummary(field)}${this.renderTable()}`
+      ${this.renderSummary(field)}${this.renderListen()}${this.renderTable()}`
   }
 
   /** The rules and the points, behind a seam the styled tier can move. */

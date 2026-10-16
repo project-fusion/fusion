@@ -151,6 +151,7 @@ export interface DonutShare {
  *
  * @csspart center - The middle of the ring, holding whatever is slotted.
  * @csspart empty - The words in place of the ring when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration.
+ * @csspart listen - The button that plays the chart as sound, under `listen`.
  * @csspart live - The readout: a polite live region that says the slice the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the ring while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -387,7 +388,7 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
     /* No middle where there is no hole. A `center` part over a pie would put
        slotted content on top of the slices, and a slot nobody can see is worse
        than one that is not there: a consumer fills it and nothing happens. */
-    return html`${this.renderPlot(shares)}${shares.length === 0 ? nothing : this.renderSummary(shares)}${this.renderTable()}`
+    return html`${this.renderPlot(shares)}${shares.length === 0 ? nothing : this.renderSummary(shares)}${this.renderListen()}${this.renderTable()}`
   }
 
   /**
