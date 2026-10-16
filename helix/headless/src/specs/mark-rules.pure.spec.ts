@@ -7,7 +7,8 @@ import { join, relative } from 'node:path'
    `MIRROR_RULE` out draws its carets the wrong way round on a right-to-left
    page, with nothing failing. This holds every module that writes a mark, or
    starts the controller that writes one, to naming exactly the rules it needs,
-   in the order `mark-rules.ts` declares them. */
+   in the order `mark-rules.ts` declares them. A family that takes core's
+   `MixinVoice` writes `data-spoken` through it, in its dictation status. */
 
 /** The tier's source, which this file sits one folder inside. */
 const SOURCE = join(import.meta.dir, '..')
@@ -31,7 +32,7 @@ const code = (path: string): string =>
 const RULES: ReadonlyArray<readonly [string, RegExp]> = [
   ['SCROLLER_RULE', /data-scroller/],
   ['VIRTUAL_RULE', /new (?:OptionWindow|Virtualize)Controller\b/],
-  ['SPOKEN_RULE', /data-spoken/],
+  ['SPOKEN_RULE', /data-spoken|\bMixinVoice\(/],
   ['MIRROR_RULE', /data-mirror/],
   ['TOUCHES_RULE', /data-touches/],
 ]
@@ -65,6 +66,7 @@ describe('the rules for the marks an element writes', () => {
     expect(writers('SCROLLER_RULE')).toContain('scroll-area/root/scroll-area-root.ts')
     expect(writers('VIRTUAL_RULE')).toContain('virtual-list/root/virtual-list-root.ts')
     expect(writers('SPOKEN_RULE')).toContain('kbd/root/kbd-root.ts')
+    expect(writers('SPOKEN_RULE')).toContain('textarea/root/textarea-root.ts')
     expect(writers('MIRROR_RULE')).toContain('icon/root/icon-root.ts')
   })
 })

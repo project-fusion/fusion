@@ -211,7 +211,7 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
 export class HelixHeadlessListbox extends MixinVoice(
   MixinCollection(MixinControllerValue(MixinField(HelixFormElement))),
 ) {
-  protected static override markRules = [SPOKEN_RULE, VIRTUAL_RULE]
+  protected static override markRules = [VIRTUAL_RULE, SPOKEN_RULE]
 
   /**
    * The key this family's words are registered under, its styled tag:
