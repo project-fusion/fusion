@@ -32,6 +32,7 @@ declare const __PREVIEW_MAPLIBRE_URL__: string
 declare const __PREVIEW_PLOT_THREE_URL__: string
 declare const __PREVIEW_TERMINAL_URL__: string
 declare const __PREVIEW_EDITOR_URL__: string
+declare const __PREVIEW_HIGHLIGHT_URL__: string
 
 interface RenderMessage {
   colorMode?: 'dark' | 'light'
@@ -190,6 +191,22 @@ const mountEditors = (root: HTMLElement, at: number): void => {
 }
 
 /**
+ * Colors for any Code Input the markup carries, with Helix's highlighter
+ * loaded the first time one does and never before. Registered once for the
+ * page, so it has nothing to unmount: every Code Input and Code Block after it
+ * draws in color.
+ */
+const highlightCode = (root: HTMLElement): void => {
+  if (
+    window.helixPreviewHighlight ||
+    !root.querySelector('helix-code-input, helix-headless-code-input')
+  ) {
+    return
+  }
+  void load(__PREVIEW_HIGHLIGHT_URL__).catch((error: unknown) => console.error(String(error)))
+}
+
+/**
  * A live terminal for any frame with `data-preview-terminal` the markup
  * carries, with xterm.js and the connector loaded the first time one does and
  * never before.
@@ -294,6 +311,7 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
     mountGraphs(host, generation)
     mountTerminals(host, generation)
     mountEditors(host, generation)
+    highlightCode(host)
   }
   window.dispatchEvent(new Event(RESTYLED))
   measure()

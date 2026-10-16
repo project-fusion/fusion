@@ -1,0 +1,73 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+  --_gray-subtle: light-dark(#f0f0f1, #232326);
+  --_gray-edge: light-dark(#e6e6e8, #313136);
+  --_gray-line: light-dark(#c9c9ce, #45454b);
+  --_gray-mark: light-dark(#8e8e96, #86868f);
+  --_gray-muted: light-dark(#63636b, #a1a1aa);
+  --_gray-strong: light-dark(#2a2a2e, #e9e9ec);
+  --_radius-control: 0.25rem;
+}
+
+helix-headless-code-input {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+helix-headless-code-input::part(field) {
+  background-color: var(--_gray-subtle);
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  display: flex;
+  padding: 0.5rem;
+}
+
+helix-headless-code-input::part(field):hover {
+  border-color: var(--_gray-line);
+}
+
+helix-headless-code-input::part(field):focus-within {
+  outline: 2px solid var(--_gray-mark);
+}
+
+/* The scroller fills the field. Both layers read the face and the line
+   height from here, so the caret stays on the letters. */
+helix-headless-code-input::part(scroller) {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+helix-headless-code-input::part(layers) {
+  color: var(--_gray-strong);
+  font-family: ui-monospace, monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+helix-headless-code-input::part(control) {
+  caret-color: var(--_gray-strong);
+  outline: none;
+}
+
+helix-headless-code-input::part(label) {
+  color: var(--_gray-strong);
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  padding-block-end: 0.25rem;
+}
+
+helix-headless-code-input::part(hint),
+helix-headless-code-input::part(feedback) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 0.25rem 0 0;
+}
+
+helix-headless-code-input::part(feedback) {
+  font-weight: 500;
+}

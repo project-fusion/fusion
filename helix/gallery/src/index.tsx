@@ -20,6 +20,7 @@ import { checkboxArt } from './art/checkbox'
 import { checkboxGroupArt } from './art/checkbox-group'
 import { codeArt } from './art/code'
 import { codeBlockArt } from './art/code-block'
+import { codeInputArt } from './art/code-input'
 import { colorInputArt } from './art/color-input'
 import { colorPickerArt } from './art/color-picker'
 import { comboboxArt } from './art/combobox'
@@ -180,6 +181,7 @@ const art: Record<string, ReactNode> = {
   'checkbox-group': checkboxGroupArt,
   code: codeArt,
   'code-block': codeBlockArt,
+  'code-input': codeInputArt,
   'color-input': colorInputArt,
   'color-picker': colorPickerArt,
   combobox: comboboxArt,

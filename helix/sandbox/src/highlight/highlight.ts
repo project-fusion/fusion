@@ -2,6 +2,7 @@ import { parser as cssParser } from '@lezer/css'
 import { classHighlighter, type Highlighter, highlightCode } from '@lezer/highlight'
 import { configureNesting, parser as htmlParser } from '@lezer/html'
 import { parser as jsParser } from '@lezer/javascript'
+import { parser as jsonParser } from '@lezer/json'
 import type { HighlightLanguage } from './language.js'
 import { shellMode, shellTokens } from './shell.js'
 import { highlightStream } from './stream.js'
@@ -98,6 +99,7 @@ const PARSERS = {
     ),
   }),
   js: jsParser,
+  json: jsonParser,
   ts: typescript,
   tsx,
 } as const

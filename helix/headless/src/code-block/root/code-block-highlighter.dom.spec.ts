@@ -2,7 +2,7 @@ import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 /* Code Block ships no grammar; an entry registers one for every block. */
-let registerHighlighter: typeof import('./code-block-root.js').registerHighlighter
+let registerHighlighter: typeof import('../highlighter.js').registerHighlighter
 beforeAll(async () => {
   registerDom()
   ;({ registerHighlighter } = await import('../index.js'))
