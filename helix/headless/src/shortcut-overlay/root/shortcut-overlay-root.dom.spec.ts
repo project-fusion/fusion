@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
+import { onApple } from '@fusion.dev/helix-core'
 import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { HelixHeadlessShortcutOverlay } from './shortcut-overlay-root.js'
 
@@ -36,7 +37,7 @@ describe('shortcut overlay', () => {
     press('keydown', 'Control')
     await wait(30)
     await overlay.updateComplete
-    expect(badges(overlay)).toEqual(['Ctrl+S Save'])
+    expect(badges(overlay)).toEqual([onApple() ? '⌃S Save' : 'Ctrl+S Save'])
     expect(overlay.shadowRoot?.querySelector('[part="badges"]')?.getAttribute('aria-hidden')).toBe(
       'true',
     )
@@ -64,10 +65,18 @@ describe('shortcut overlay', () => {
       row.querySelector('[part="name"]')?.textContent,
       row.querySelector('[part="keys"]')?.textContent,
     ])
-    expect(rows).toEqual([
-      ['Save', 'Ctrl+S'],
-      ['Open Commands', 'Ctrl+K'],
-    ])
+    /* Named as the keyboard in front of the reader names them: WebKit's agent says Apple. */
+    expect(rows).toEqual(
+      onApple()
+        ? [
+            ['Save', '⌃S'],
+            ['Open Commands', '⌘K'],
+          ]
+        : [
+            ['Save', 'Ctrl+S'],
+            ['Open Commands', 'Ctrl+K'],
+          ],
+    )
     command.remove()
   })
 
