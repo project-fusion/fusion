@@ -480,6 +480,76 @@ describe('Escape with more than one overlay open', () => {
   })
 })
 
+describe('a tooltip beside an open menu or popover', () => {
+  /* A tooltip outside an open panel sits over the panel the reader is using.
+     A panel opened from the keyboard, or from a control beside the trigger
+     while the pointer is still on it, comes with no `click` on the trigger and
+     no `pointerleave`, so the tooltip yields to the panel instead. */
+  type Popover = HTMLElement & { open: boolean; updateComplete: Promise<unknown> }
+
+  const page = async (): Promise<{ popover: Popover; tip: Tooltip }> => {
+    document.body.innerHTML = `<helix-headless-tooltip content="Regenerates the manifests" delay="0"><button>Analyze</button></helix-headless-tooltip>
+      <helix-headless-popover label="Details">
+        <button slot="trigger">Details</button>
+        <helix-headless-tooltip content="Opens the log" delay="0"><button>Log</button></helix-headless-tooltip>
+      </helix-headless-popover>`
+    const tip = document.querySelector('helix-headless-tooltip') as unknown as Tooltip
+    const popover = document.querySelector('helix-headless-popover') as Popover
+    await Promise.all([popover.updateComplete, tip.updateComplete])
+    return { popover, tip }
+  }
+
+  const open = async (popover: Popover): Promise<void> => {
+    popover.open = true
+    await popover.updateComplete
+  }
+
+  test('closes as the panel opens', async () => {
+    const { popover, tip } = await page()
+    await focusTrigger(tip)
+    expect(tip.open).toBe(true)
+
+    await open(popover)
+    await tip.updateComplete
+    expect([popover.open, tip.open]).toEqual([true, false])
+  })
+
+  test('and does not show for the pointer while the panel is open', async () => {
+    /* The pointer and not focus, since focus moving out of a popover closes it. */
+    const { popover, tip } = await page()
+    const point = async (): Promise<void> => {
+      tip.dispatchEvent(new Event('pointerleave'))
+      tip.dispatchEvent(new Event('pointerenter'))
+      await new Promise((done) => setTimeout(done, 10))
+      await tip.updateComplete
+    }
+    await open(popover)
+    await point()
+    expect(tip.open).toBe(false)
+
+    popover.open = false
+    await popover.updateComplete
+    await point()
+    expect(tip.open).toBe(true)
+  })
+
+  test('a tooltip inside the open panel still shows', async () => {
+    const { popover } = await page()
+    await open(popover)
+    const inner = popover.querySelector('helix-headless-tooltip') as unknown as Tooltip
+    await focusTrigger(inner)
+    expect(inner.open).toBe(true)
+  })
+
+  test("`show()` is the consumer's own, and is not refused", async () => {
+    const { popover, tip } = await page()
+    await open(popover)
+    tip.show()
+    await tip.updateComplete
+    expect([popover.open, tip.open]).toEqual([true, true])
+  })
+})
+
 describe('a tooltip that markup declared open', () => {
   /* `defaultOpen` is the uncontrolled half of `open`, and what the tooltip adds
      to the mixin's own contract is raising the bubble from it: a hint declared

@@ -5,11 +5,14 @@ import {
   elementById,
   focusTarget,
   HelixElement,
+  hintInside,
+  hintMayShow,
   hostAria,
   linkDescription,
   MixinControllerOpen,
   numberConverter,
   OpenPhaseController,
+  onPanelOpen,
   onUnlessFalse,
   type Placement,
   PopoverController,
@@ -361,6 +364,8 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
        `this`, whose own type depends on this controller, and TypeScript stops
        at the cycle. */
     boundary: (): readonly (Element | null)[] => [this, this.named],
+    /* A tooltip opening leaves the others to `warmth`, which closes them. */
+    hints: 'keep',
     /* The declared gap plus the arrow's own reach, so the gap is to the point.
      *
      * A square of side `n` rotated forty-five degrees about its own center
@@ -567,10 +572,21 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     const warm = warmth()
     const others = [...warm.showing].some((one) => one !== this)
     if (others || performance.now() - warm.hidAt < this.skipDelay) {
-      this.show()
+      this.showForReader()
       return
     }
-    this.timer = setTimeout(() => this.show(), this.delay)
+    this.timer = setTimeout(() => this.showForReader(), this.delay)
+  }
+
+  /**
+   * Shows for a pointer or for focus, unless a menu or popover is open that
+   * the tooltip is not inside. `show()` and `open` are the consumer's own and
+   * are not refused.
+   */
+  private showForReader(): void {
+    if (hintMayShow(this)) {
+      this.show()
+    }
   }
 
   /**
@@ -637,7 +653,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
       return
     }
     this.holds.add('focus')
-    this.show()
+    this.showForReader()
   }
 
   private readonly releaseFocus = (): void => {
@@ -899,8 +915,31 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
     return text !== '' && flat(name) === flat(text)
   }
 
+  /**
+   * A menu or popover opened outside the tooltip, so the tooltip yields to it.
+   *
+   * **A tooltip outside an open panel sits over the panel the reader is
+   * using.** A menu opened from the keyboard, or from a control beside the
+   * trigger while the pointer is still on it, is opened with no `click` on the
+   * trigger and no `pointerleave`, so neither takes the bubble down. Opening a
+   * menu by its keys from a trigger inside the tooltip also moves focus into
+   * the menu, and that `focusin` showed the bubble again. A pointer or focus
+   * does not show the bubble while such a panel is open, and this closes one
+   * they hold up as the panel opens. A bubble the consumer opened with `show()`
+   * or `open` holds nothing and stays.
+   */
+  private readonly yieldTo = (surface: HTMLElement): void => {
+    if (this.open && this.holds.size > 0 && !hintInside(surface, this)) {
+      this.holds.clear()
+      this.hide()
+    }
+  }
+
+  private stopYielding: (() => void) | undefined
+
   override connectedCallback(): void {
     super.connectedCallback()
+    this.stopYielding ??= onPanelOpen(this.yieldTo)
     /* Bound again on a move, since the disconnect unbinds and `firstUpdated`
        happens once: a tooltip in a list a framework reordered stopped opening.
        Only on a re-connect, the first waiting for `firstUpdated`. */
@@ -911,6 +950,8 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.stopYielding?.()
+    this.stopYielding = undefined
     this.unbind()
     this.holds.clear()
     clearTimeout(this.timer)

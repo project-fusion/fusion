@@ -24,6 +24,17 @@ export interface PopoverOptions {
    */
   boundary?: () => Element | readonly (Element | null | undefined)[] | null | undefined
 
+  /**
+   * What the open surface does to a tooltip outside it.
+   *
+   * `hide`, the default, closes a tooltip showing outside the surface as it
+   * opens, and keeps tooltips outside it closed until it closes. A tooltip
+   * inside it still shows. `keep` leaves them alone, for a surface that is a
+   * tooltip itself or that stays up while the reader goes on using the page,
+   * such as a tour's stop.
+   */
+  hints?: 'hide' | 'keep'
+
   /** Space between the anchor and the surface, in pixels. */
   offset?: number | (() => number)
 
@@ -110,6 +121,86 @@ export interface PopoverOptions {
 }
 
 /**
+ * The surfaces open on the page that tooltips outside them yield to, in the
+ * order they opened, and who to tell when one opens.
+ *
+ * On `globalThis` under a `Symbol.for` key, so two copies of this module on one
+ * page share it, for the reason `DismissController` gives about its own.
+ */
+interface OpenPanels {
+  open: Set<HTMLElement>
+  watchers: Set<(surface: HTMLElement) => void>
+}
+const PANELS = Symbol.for('fusion.helix.open-panels')
+const openPanels = (): OpenPanels => {
+  const globals = globalThis as unknown as Record<symbol, OpenPanels | undefined>
+  globals[PANELS] ??= { open: new Set(), watchers: new Set() }
+  return globals[PANELS]
+}
+
+/**
+ * The slot an element is drawn in, where its parent has a shadow root.
+ *
+ * Looked up by name where `assignedSlot` is missing, as it is in a test DOM, so
+ * the walk below takes the same path there as in a browser.
+ */
+const slotOf = (node: Node): Node | null => {
+  const element = node as Partial<Element>
+  if (element.assignedSlot) {
+    return element.assignedSlot
+  }
+  const root = (node.parentNode as Partial<Element> | null)?.shadowRoot
+  if (!root || typeof element.getAttribute !== 'function') {
+    return null
+  }
+  const name = element.getAttribute('slot')
+  return root.querySelector(
+    name ? `slot[name="${name.replaceAll('"', '\\"')}"]` : 'slot:not([name])',
+  )
+}
+
+/**
+ * Whether `node` is drawn inside `container`, following slots, so a row in a
+ * menu's light DOM is inside the surface in the menu's shadow root.
+ */
+const drawnInside = (container: Node, node: Node): boolean => {
+  let at: Node | null = node
+  while (at) {
+    if (at === container) {
+      return true
+    }
+    at = slotOf(at) ?? at.parentNode ?? (at as unknown as { host?: Node }).host ?? null
+  }
+  return false
+}
+
+/**
+ * Whether a tooltip at `element` may show: no surface is open, or the last one
+ * to open holds it. A tooltip outside an open menu or popover would sit over
+ * the panel the reader is using.
+ */
+export function hintMayShow(element: Element): boolean {
+  const open = [...openPanels().open]
+  const last = open.at(-1)
+  return last === undefined || drawnInside(last, element)
+}
+
+/**
+ * Calls `watcher` with each surface that opens and hides the tooltips outside
+ * it. Returns the call that stops it.
+ */
+export function onPanelOpen(watcher: (surface: HTMLElement) => void): () => void {
+  const { watchers } = openPanels()
+  watchers.add(watcher)
+  return () => watchers.delete(watcher)
+}
+
+/** Whether `element` is drawn inside `surface`, following slots. */
+export function hintInside(surface: HTMLElement, element: Element): boolean {
+  return drawnInside(surface, element)
+}
+
+/**
  * A surface that floats against something, in the top layer, until dismissed.
  *
  * Bundles the three things that always travel together: the popover API, a
@@ -147,6 +238,9 @@ export class PopoverController implements ReactiveController {
 
   /** Whether the surface is currently shown, so the calls can be idempotent. */
   private shown = false
+
+  /** The surface tooltips outside it yield to, while it is open. */
+  private held: HTMLElement | undefined
 
   private readonly host: ReactiveControllerHost & HTMLElement
 
@@ -239,6 +333,22 @@ export class PopoverController implements ReactiveController {
       this.floating.release()
     }
     this.dismisser.activate()
+    if (this.options.hints !== 'keep') {
+      const panels = openPanels()
+      this.held = surface
+      panels.open.add(surface)
+      for (const watcher of [...panels.watchers]) {
+        watcher(surface)
+      }
+    }
+  }
+
+  /** Takes the surface off the list of open ones, so tooltips may show again. */
+  private freeHints(): void {
+    if (this.held) {
+      openPanels().open.delete(this.held)
+      this.held = undefined
+    }
   }
 
   /** Hides the surface and stops everything watching it. */
@@ -248,6 +358,7 @@ export class PopoverController implements ReactiveController {
       return
     }
     this.shown = false
+    this.freeHints()
     this.dismisser.deactivate()
     this.floating.stop()
     surface?.hidePopover?.()
@@ -276,7 +387,7 @@ export class PopoverController implements ReactiveController {
   }
 
   /*
-   * Forgets that it was showing, and nothing more, which is the whole job.
+   * Forgets that it was showing, and lets tooltips outside it show again.
    *
    * An element removed while its popover is showing is taken out of the top
    * layer by the platform. The two controllers watching it stop themselves:
@@ -290,6 +401,7 @@ export class PopoverController implements ReactiveController {
    */
   hostDisconnected(): void {
     this.shown = false
+    this.freeHints()
   }
 
   /**
