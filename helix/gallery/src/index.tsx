@@ -35,6 +35,7 @@ import { dividerArt } from './art/divider'
 import { donutChartArt } from './art/donut-chart'
 import { drawerArt } from './art/drawer'
 import { drilldownArt } from './art/drilldown'
+import { editorArt } from './art/editor'
 import { emptyArt } from './art/empty'
 import { fileInputArt } from './art/file-input'
 import { filterInputArt } from './art/filter-input'
@@ -194,6 +195,7 @@ const art: Record<string, ReactNode> = {
   'donut-chart': donutChartArt,
   drawer: drawerArt,
   drilldown: drilldownArt,
+  editor: editorArt,
   empty: emptyArt,
   'file-input': fileInputArt,
   'filter-input': filterInputArt,

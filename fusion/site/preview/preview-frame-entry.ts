@@ -31,6 +31,7 @@ declare const __PREVIEW_MAP_URL__: string
 declare const __PREVIEW_MAPLIBRE_URL__: string
 declare const __PREVIEW_PLOT_THREE_URL__: string
 declare const __PREVIEW_TERMINAL_URL__: string
+declare const __PREVIEW_EDITOR_URL__: string
 
 interface RenderMessage {
   colorMode?: 'dark' | 'light'
@@ -171,6 +172,24 @@ const mountGraphs = (root: HTMLElement, at: number): void => {
 }
 
 /**
+ * A live code editor for any editor with `data-preview-editor` the markup
+ * carries, with CodeMirror and the connector loaded the first time one does
+ * and never before.
+ */
+const mountEditors = (root: HTMLElement, at: number): void => {
+  if (!root.querySelector(':is(helix-editor, helix-headless-editor)[data-preview-editor]')) {
+    return
+  }
+  void load(__PREVIEW_EDITOR_URL__)
+    .then(() => {
+      if (at === generation && window.helixPreviewEditor) {
+        mounted.push(window.helixPreviewEditor.mount(root))
+      }
+    })
+    .catch((error: unknown) => console.error(String(error)))
+}
+
+/**
  * A live terminal for any frame with `data-preview-terminal` the markup
  * carries, with xterm.js and the connector loaded the first time one does and
  * never before.
@@ -274,6 +293,7 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
     mountMaps(host, generation)
     mountGraphs(host, generation)
     mountTerminals(host, generation)
+    mountEditors(host, generation)
   }
   window.dispatchEvent(new Event(RESTYLED))
   measure()

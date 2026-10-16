@@ -1,0 +1,66 @@
+{
+  "name": "@fusion.dev/helix-editor",
+  "description": "Connects the Helix Editor frame to CodeMirror, themed with your tokens: highlighting, line numbers, folding, search, and diagnostics.",
+  "version": "0.215.0",
+  "license": "MIT",
+  "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
+  "repository": {
+    "directory": "helix/editor",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
+    "test": "bun run test:pure && bun run test:dom",
+    "test:dom": "bun test dom.spec",
+    "test:pure": "bun test pure.spec",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "bugs": "https://github.com/project-fusion/fusion/issues",
+  "dependencies": {
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-css": "^6.3.1",
+    "@codemirror/lang-html": "^6.4.12",
+    "@codemirror/lang-javascript": "^6.2.5",
+    "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/lang-markdown": "^6.3.4",
+    "@codemirror/lang-python": "^6.2.1",
+    "@codemirror/lang-rust": "^6.0.2",
+    "@codemirror/language": "^6.13.1",
+    "@codemirror/legacy-modes": "^6.5.5",
+    "@codemirror/lint": "^6.9.7",
+    "@codemirror/search": "^6.5.11",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.14",
+    "@fusion.dev/helix-headless": "workspace:*",
+    "@fusion.dev/helix-sandbox": "workspace:*"
+  },
+  "devDependencies": {
+    "@fusion.dev/helix-testing": "workspace:*",
+    "@types/bun": "^1.4.2"
+  },
+  "homepage": "https://fusion.dev",
+  "keywords": [
+    "editor",
+    "codemirror",
+    "code",
+    "syntax-highlighting"
+  ],
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

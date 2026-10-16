@@ -32,6 +32,7 @@ const plotThreeEntry = join(root, 'fusion/site/preview/preview-plot-three-entry.
 const mapEntry = join(root, 'fusion/site/preview/preview-map-entry.ts')
 const maplibreEntry = join(root, 'fusion/site/preview/preview-maplibre-entry.ts')
 const terminalEntry = join(root, 'fusion/site/preview/preview-terminal-entry.ts')
+const editorEntry = join(root, 'fusion/site/preview/preview-editor-entry.ts')
 
 /* The layers, in the order a consumer is told to import them. `elements.css` is
    generated from the element sources and hides each tag until it upgrades.
@@ -227,8 +228,26 @@ if (!terminalBuilt.success) {
 const terminalScript = await terminalBuilt.outputs[0].text()
 await writeFile(join(out, 'terminal.js'), terminalScript)
 
+/* **A live code editor, in one file the frame loads only when a render
+ * carries one**: the connector, CodeMirror, and every grammar it reads. */
+const editorBuilt = await Bun.build({
+  entrypoints: [editorEntry],
+  format: 'iife',
+  minify: true,
+  target: 'browser',
+})
+if (!editorBuilt.success) {
+  for (const log of editorBuilt.logs) {
+    console.error(log)
+  }
+  process.exit(1)
+}
+const editorScript = await editorBuilt.outputs[0].text()
+await writeFile(join(out, 'editor.js'), editorScript)
+
 const built = await Bun.build({
   define: {
+    __PREVIEW_EDITOR_URL__: JSON.stringify(`./editor.js?v=${stamp(editorScript)}`),
     __PREVIEW_GRAPH_COSMOS_URL__: JSON.stringify(`./graph-cosmos.js?v=${stamp(cosmosScript)}`),
     __PREVIEW_GRAPH_THREE_URL__: JSON.stringify(`./graph-three.js?v=${stamp(threeScript)}`),
     __PREVIEW_GRAPH_URL__: JSON.stringify(`./graph.js?v=${stamp(graphScript)}`),
@@ -344,6 +363,7 @@ const graphSize = Math.round(graphScript.length / 1024)
 const cosmosSize = Math.round(cosmosScript.length / 1024)
 const threeSize = Math.round(threeScript.length / 1024)
 const terminalSize = Math.round(terminalScript.length / 1024)
+const editorSize = Math.round(editorScript.length / 1024)
 console.log(
-  `frame: ${size} KB, ${layers.length} style layers, one classic script, and ${mapSize} KB of map, ${graphSize} KB of graph, ${cosmosSize} KB drawn by cosmos.gl, ${threeSize} KB drawn by three.js, or ${terminalSize} KB of terminal, loaded only when a render carries one`,
+  `frame: ${size} KB, ${layers.length} style layers, one classic script, and ${mapSize} KB of map, ${graphSize} KB of graph, ${cosmosSize} KB drawn by cosmos.gl, ${threeSize} KB drawn by three.js, ${terminalSize} KB of terminal, or ${editorSize} KB of editor, loaded only when a render carries one`,
 )

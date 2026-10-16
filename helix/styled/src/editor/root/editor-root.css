@@ -1,0 +1,72 @@
+/* The frame is a field's, as `Textarea`'s is, so a form holding both reads as
+   one set; the box is the field, so the focus ring is drawn once around the
+   text and whatever an engine draws in it. */
+[part="field"] {
+  background-color: var(--editor-background-color, var(--helix-color-well));
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  display: flex;
+  font-family: var(--helix-font-mono);
+  font-size: var(--editor-font-size, var(--helix-text-sm));
+  overflow: hidden;
+  transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Without an engine: the code face, a line height code reads at, and lines
+   that keep their length. */
+[part="control"] {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: var(--helix-leading-normal);
+  padding: var(--helix-space-xs);
+  resize: vertical;
+  tab-size: 2;
+  white-space: pre;
+}
+
+/* With one: a fixed height the engine scrolls inside, so a long file does not
+   push the page down as it loads. */
+[part="view"] {
+  block-size: var(--editor-block-size, 16rem);
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+/* The shared field sheet gives the control a display, which outranks the
+   `hidden` the element sets once an engine draws; said here, so only one of
+   the two shows. */
+[part="control"][hidden],
+[part="view"][hidden] {
+  display: none;
+}
+
+/* The problems, one line each in their tone's ink, under the frame. */
+[part="diagnostics"] {
+  display: grid;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  gap: calc(var(--helix-space-2xs) / 2);
+  list-style: none;
+  margin: var(--helix-space-2xs) var(--helix-space-none) var(--helix-space-none);
+  padding: var(--helix-space-none);
+}
+
+[part~="diagnostic-danger"] {
+  color: var(--helix-color-danger);
+}
+
+[part~="diagnostic-warning"] {
+  color: var(--helix-color-warning);
+}
+
+[part~="diagnostic-info"] {
+  color: var(--helix-color-foreground-muted);
+}
+
+/* Prints as it is: the code prints as text, and nothing here carries meaning
+   in a fill. */
+@media print {
+  :host {
+    print-color-adjust: economy;
+  }
+}
