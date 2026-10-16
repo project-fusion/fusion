@@ -98,6 +98,7 @@ const RUNTIME = {
   '@fusion.dev/helix-icons': 'helix-icons',
   lit: 'lit',
   'lit/decorators.js': 'lit-decorators',
+  'lit/directive.js': 'lit-directive',
   'lit/directives/keyed.js': 'lit-keyed',
   'lit/directives/live.js': 'lit-live',
   'lit/directives/repeat.js': 'lit-repeat',
