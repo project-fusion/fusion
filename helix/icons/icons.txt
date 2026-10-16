@@ -120,6 +120,7 @@ skip-forward
 sliders-horizontal
 speaker-high
 speaker-low
+speaker-slash
 speaker-x
 square
 stack
