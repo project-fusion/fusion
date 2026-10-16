@@ -73,13 +73,13 @@ fusion-rules = { path = "fusion/rules" }
 edition = "2021"
 license = "MIT"
 publish = false
-# **1.96, because the manifest generator's parser asks for it.** `oxc` 0.110
+# **1.97, because the manifest generator's parser asks for it.** `oxc` 0.110
 # was the last release building on 1.90, and the forty after it are where its
-# fixes are; 0.150 needs 1.96. Every crate here is `publish = false` and the
-# CLI ships as a binary, so this floor is for whoever builds from a checkout,
-# and 1.96 had been stable four months when it moved. CI builds at the floor
-# rather than at stable, so a crate reaching past it fails there first.
-rust-version = "1.96"
+# fixes are; 0.150 needs 1.96 and 0.153 needs 1.97. Every crate here is
+# `publish = false` and the CLI ships as a binary, so this floor is for whoever
+# builds from a checkout. CI builds at the floor rather than at stable, so a
+# crate reaching past it fails there first.
+rust-version = "1.97"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
