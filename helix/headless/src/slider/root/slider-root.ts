@@ -5,6 +5,7 @@ import {
   formatWords,
   HelixFormElement,
   isRtl,
+  ListedController,
   MixinControllerValue,
   MixinField,
   numberConverter,
@@ -134,6 +135,13 @@ const SLIDER_KEYS = new Set([
  */
 @customElement('helix-headless-slider')
 export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /** On the page's list of controls, where a command palette and a shortcut overlay find it. */
+  protected readonly listed = new ListedController(
+    this,
+    'focus',
+    () => this.internals?.ariaKeyShortcuts,
+  )
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-slider': { rangeText: '{start} bis {end}' } })`.

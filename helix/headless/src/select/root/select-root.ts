@@ -14,6 +14,7 @@ import {
   hostWords,
   inlineStep,
   isRtl,
+  ListedController,
   labelsOf,
   MixinControllerOpen,
   MixinControllerValue,
@@ -166,6 +167,13 @@ import { over } from '../align.js'
 export class HelixHeadlessSelect extends MixinControllerOpen(
   MixinControllerValue(MixinField(HelixFormElement)),
 ) {
+  /** On the page's list of controls, where a command palette and a shortcut overlay find it. */
+  protected readonly listed = new ListedController(
+    this,
+    'focus',
+    () => this.internals?.ariaKeyShortcuts,
+  )
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-select': { placeholder: 'Auswählen' } })`.

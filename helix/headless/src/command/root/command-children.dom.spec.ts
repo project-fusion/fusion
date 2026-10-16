@@ -1,9 +1,9 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
-/* A command is an option, the Option family's, and a page that writes one
-   imports `@fusion.dev/helix-headless/option` beside the palette. The palette
-   does not register it, and says so in development where it is missing. */
+/* A command is an option, the Option family's. The palette registers its own
+   tier's option, and says so in development where a tier of a page's own
+   holds one nobody registered. */
 beforeAll(async () => {
   registerDom()
   await import('../index.js')

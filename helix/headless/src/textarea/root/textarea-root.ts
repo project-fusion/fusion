@@ -7,6 +7,7 @@ import {
   HelixFormElement,
   holdCaret,
   isRtl,
+  ListedController,
   MixinControllerValue,
   MixinField,
   numberConverter,
@@ -79,6 +80,13 @@ import { grownHeight, lineMetrics } from '../grow.js'
  */
 @customElement('helix-headless-textarea')
 export class HelixHeadlessTextarea extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /** On the page's list of controls, where a command palette and a shortcut overlay find it. */
+  protected readonly listed = new ListedController(
+    this,
+    'focus',
+    () => this.internals?.ariaKeyShortcuts,
+  )
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-textarea': { clearLabel: 'Leeren' } })`.

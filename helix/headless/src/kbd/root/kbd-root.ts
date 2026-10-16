@@ -1,6 +1,7 @@
 import {
   ariaChord,
   chordParts,
+  controlName,
   customElement,
   elementById,
   HelixElement,
@@ -10,6 +11,7 @@ import {
   matchesChord,
   onApple,
   printableChord,
+  registerShortcut,
   SPOKEN_RULE,
   wordsConverter,
 } from '@fusion.dev/helix-core'
@@ -184,7 +186,7 @@ export class HelixHeadlessKbd extends HelixElement {
   private listening: EventTarget | undefined
 
   /** The control and the chord written onto it, so the same pair is taken back. */
-  private described: { chord: string; control: Element } | undefined
+  private described: { chord: string; control: Element; unregister: () => void } | undefined
 
   override connectedCallback(): void {
     super.connectedCallback()
@@ -211,13 +213,22 @@ export class HelixHeadlessKbd extends HelixElement {
     this.undescribe()
     if (control && chord !== '') {
       claimShortcut(control, chord)
-      this.described = { chord, control }
+      /* On the page's list too, for a control Helix did not draw, which no
+         registry knows; a list names a control it already has once. */
+      const unregister = registerShortcut({
+        keys: () => this.keys,
+        label: () => controlName(control as HTMLElement),
+        owner: this,
+        target: control,
+      })
+      this.described = { chord, control, unregister }
     }
   }
 
   private undescribe(): void {
     if (this.described) {
       releaseShortcut(this.described.control, this.described.chord)
+      this.described.unregister()
       this.described = undefined
     }
   }

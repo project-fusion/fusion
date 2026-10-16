@@ -7,6 +7,7 @@ import {
   HelixFallbackCommandEvent,
   HelixFormElementBase,
   HelixPressEvent,
+  ListedController,
   pressType,
   type RecentPress,
   StatusController,
@@ -114,6 +115,13 @@ const afterDispatch = (click: Event, then: () => void): void => {
  */
 @customElement('helix-headless-button')
 export class HelixHeadlessButton extends HelixFormElementBase {
+  /** On the page's list of controls, where a command palette and a shortcut overlay find it. */
+  protected readonly listed = new ListedController(
+    this,
+    'press',
+    () => this.internals?.ariaKeyShortcuts,
+  )
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-button': { pendingLabel: 'Wird geladen' } })`.

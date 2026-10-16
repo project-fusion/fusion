@@ -1,0 +1,39 @@
+<!-- @summary The shortcut overlay on the headless tier, with every style written by hand. -->
+<!-- @min 360 -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-headless-button id="base-overlay-bold">Bold</helix-headless-button>
+<helix-headless-button id="base-overlay-italic">Italic</helix-headless-button>
+<helix-headless-button id="base-overlay-link">Link</helix-headless-button>
+
+<helix-headless-kbd
+  activate="click"
+  for="base-overlay-bold"
+  hidden
+  keys="mod+b"
+  within="document"
+></helix-headless-kbd>
+<helix-headless-kbd
+  activate="click"
+  for="base-overlay-italic"
+  hidden
+  keys="mod+i"
+  within="document"
+></helix-headless-kbd>
+<helix-headless-kbd
+  activate="click"
+  for="base-overlay-link"
+  hidden
+  keys="mod+k"
+  within="document"
+></helix-headless-kbd>
+
+<helix-headless-shortcut-overlay id="base-overlay"></helix-headless-shortcut-overlay>
+
+<script type="module">
+  const overlay = document.getElementById('base-overlay')
+  requestAnimationFrame(() => requestAnimationFrame(() => overlay.show()))
+</script>

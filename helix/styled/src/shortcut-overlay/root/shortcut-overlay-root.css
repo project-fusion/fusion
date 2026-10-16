@@ -1,0 +1,95 @@
+/* A plate the color of a tooltip, since a badge is the same kind of thing: a
+   word about the control under it, over whatever is around it. */
+[part="badge"] {
+  align-items: center;
+  background-color: var(
+    --shortcut-overlay-badge-background-color,
+    var(--helix-color-surface-inverse)
+  );
+  border: var(--shortcut-overlay-badge-border-width, var(--helix-border-floating)) solid
+    var(--helix-color-border);
+  border-radius: var(--helix-radii-sm);
+  box-shadow: var(--shortcut-overlay-badge-shadow, var(--helix-shadow-floating));
+  color: var(--shortcut-overlay-badge-color, var(--helix-color-foreground-inverse));
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-regular);
+  gap: var(--helix-space-2xs);
+  line-height: var(--helix-leading-tight);
+  max-inline-size: var(--shortcut-overlay-badge-max-inline-size, 16rem);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+}
+
+[part="badge"] {
+  animation: shortcut-overlay-in var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* Shown at once: the fade is a nicety, and the badges are what was asked for. */
+@media (prefers-reduced-motion: reduce) {
+  [part="badge"] {
+    animation: none;
+  }
+}
+
+@keyframes shortcut-overlay-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The keys lead, set in the weight a key cap's legend has. */
+[part="badge-keys"],
+[part="keys"] kbd {
+  font-family: var(--helix-font-sans);
+  font-weight: var(--helix-weight-semibold);
+}
+
+[part="badge-name"] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[part="list"] {
+  display: grid;
+  gap: var(--helix-space-2xs);
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin: var(--helix-space-none);
+}
+
+/* Each row a line of the grid, the name at the start and the keys at the end. */
+[part="row"] {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
+  padding-block: var(--helix-space-xs);
+}
+
+[part="row"]:last-child {
+  border-block-end-color: transparent;
+}
+
+[part="name"],
+[part="keys"] {
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+}
+
+[part="keys"] {
+  color: var(--helix-color-foreground-muted);
+  text-align: end;
+}
+
+[part="empty"] {
+  color: var(--helix-color-foreground-muted);
+  font-size: var(--helix-text-sm);
+  margin: var(--helix-space-none);
+}
+
+/* Hides: a badge is a picture of a key held now, and paper has no keys. */
+@media print {
+  [part="badge"] {
+    display: none;
+  }
+}
