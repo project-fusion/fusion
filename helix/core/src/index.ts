@@ -117,6 +117,9 @@ export {
 } from './controllers/paint-gate-controller/paint-gate-controller.js'
 export { PlacementController } from './controllers/placement-controller/placement-controller.js'
 export {
+  hintInside,
+  hintMayShow,
+  onPanelOpen,
   PopoverController,
   type PopoverOptions,
 } from './controllers/popover-controller/popover-controller.js'

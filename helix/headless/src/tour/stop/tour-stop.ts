@@ -273,6 +273,9 @@ export class HelixHeadlessTourStop extends HelixElement {
   private readonly floating = new PopoverController(this, {
     anchor: () => this.target,
     arrow: () => this.partNamed('arrow'),
+    /* A stop stays up while the reader works through the page it points at,
+       so the tooltips on that page keep showing. */
+    hints: 'keep',
     /* Clear of the light, measured to the point of the arrow. The tour lights
        `spotlight-padding` around the target and the arrow reaches `n / sqrt(2)`
        past the panel's edge, and with no offset the panel sat on the target

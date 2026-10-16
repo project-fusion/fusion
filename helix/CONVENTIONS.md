@@ -1032,6 +1032,13 @@ each family's `--*-border-width` hook takes `0` for one surface. Megamenu keeps
 the split its stylesheet records, an edge in dark mode only, and its width now
 follows the token.
 
+**A tooltip yields to a menu or popover outside it.** A panel that opens
+through `PopoverController` closes a tooltip that a pointer or focus holds up
+outside it, and a pointer or focus does not show one while the panel is open. A
+tooltip inside the panel still shows. `hints: 'keep'` is for a surface the
+reader goes on using the page around, which is a tooltip's own bubble and a
+tour's stop.
+
 **`helix/styles` authors in `src` and ships `dist`, and the comment is the
 difference.** The package exported `./src/*.css` until August 24, 2026, so every
 consumer downloaded the reasoning: `tokens.css` is 71 percent comment,
