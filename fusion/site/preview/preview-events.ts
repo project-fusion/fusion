@@ -22,6 +22,8 @@ declare global {
     /** What the three.js graph chunk leaves on the window, the same way. */
     helixPreviewGraphThree?: { mount(root: HTMLElement): () => void }
     helixPreviewPlotThree?: { mount(root: HTMLElement): () => void }
+    /** What the editor chunk leaves on the window, the same way. */
+    helixPreviewEditor?: { mount(root: HTMLElement): () => void }
     /** What the terminal chunk leaves on the window, the same way. */
     helixPreviewTerminal?: { mount(root: HTMLElement): () => void }
   }
