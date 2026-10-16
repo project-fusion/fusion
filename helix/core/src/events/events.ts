@@ -75,6 +75,7 @@ import { HelixBeforeChangeEvent } from './before-change.js'
 import { HelixBeforeCloseEvent } from './before-close.js'
 import { HelixBeforeCollapseEvent } from './before-collapse.js'
 import { HelixBeforeEditEvent } from './before-edit.js'
+import { HelixBeforeListenEvent } from './before-listen.js'
 import { HelixBeforeMoveEvent } from './before-move.js'
 import { HelixBeforeOpenEvent } from './before-open.js'
 import { HelixBeforePanelResizeEvent } from './before-panel-resize.js'
@@ -122,6 +123,7 @@ import { HelixGraphReadyEvent } from './graph-ready.js'
 import { HelixGraphSignalEvent } from './graph-signal.js'
 import { HelixGraphZoomEvent } from './graph-zoom.js'
 import { HelixHistoryEvent } from './history.js'
+import { HelixListenEvent } from './listen.js'
 import { HelixLoadEvent } from './load.js'
 import { HelixLoadMoreEvent } from './load-more.js'
 import { HelixMapClusterEvent } from './map-cluster.js'
@@ -203,6 +205,7 @@ export type {
   GraphLayoutDetail,
   GraphPartChangeDetail,
   GraphSignalDetail,
+  ListenDetail,
   MapClusterDetail,
   MapPanDetail,
   MapPartChangeDetail,
@@ -257,6 +260,7 @@ export {
   HelixBeforeCloseEvent,
   HelixBeforeCollapseEvent,
   HelixBeforeEditEvent,
+  HelixBeforeListenEvent,
   HelixBeforeMoveEvent,
   HelixBeforeOpenEvent,
   HelixBeforePanelResizeEvent,
@@ -304,6 +308,7 @@ export {
   HelixGraphSignalEvent,
   HelixGraphZoomEvent,
   HelixHistoryEvent,
+  HelixListenEvent,
   HelixLoadEvent,
   HelixLoadMoreEvent,
   HelixMapClusterEvent,
@@ -381,6 +386,7 @@ const registry = {
   HelixBeforeCloseEvent,
   HelixBeforeCollapseEvent,
   HelixBeforeEditEvent,
+  HelixBeforeListenEvent,
   HelixBeforeMoveEvent,
   HelixBeforeOpenEvent,
   HelixBeforePanelResizeEvent,
@@ -428,6 +434,7 @@ const registry = {
   HelixGraphSignalEvent,
   HelixGraphZoomEvent,
   HelixHistoryEvent,
+  HelixListenEvent,
   HelixLoadEvent,
   HelixLoadMoreEvent,
   HelixMapClusterEvent,

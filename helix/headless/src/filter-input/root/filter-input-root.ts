@@ -16,9 +16,11 @@ import {
   MixinControllerValue,
   MixinField,
   MixinTokens,
+  MixinVoice,
   PopoverController,
   reportRuntime,
   restoreValue,
+  SPOKEN_RULE,
   StatusController,
   scrollItemIntoView,
   timeConverter,
@@ -244,9 +246,11 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @event {Event} change - Fired from the input when the user finishes editing the text.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes. Cancelable: call `preventDefault()` to keep the current text.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the suggestions close. Cancelable: call `preventDefault()` to keep them open.
+ * @event {HelixBeforeListenEvent} helix-before-listen - The dictation button was pressed. Cancelable: cancel it to keep the field from listening.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the suggestions open. Cancelable: call `preventDefault()` to keep them closed.
  * @event {HelixDismissEvent} helix-dismiss - Fired when the user removes a token with its remove button or with Backspace in an empty field. A `FilterChip` that names a declared field sends `helix-facet` instead. Cancelable: call `preventDefault()` to keep the token.
  * @event {HelixFacetEvent} helix-facet - Fired when a filter changes, whether it was typed, picked, or removed. Cancelable: call `preventDefault()` to leave the text and the chip as they were.
+ * @event {HelixListenEvent} helix-listen - Dictation settled on a phrase and put it in the field, after the field's own `input`.
  * @event {HelixSelectEvent} helix-select - Fired by an option in `suggestions` when it is chosen, and bubbles out of the field. Cancelable: call `preventDefault()` to stop other listeners acting on it. The field takes no action on an option you slotted, and you decide what it does. A suggestion from `source` is written over the term at the caret unless you cancel it.
  * @event {Event} input - Fired when the text changes.
  * @event {ToggleEvent} toggle - Fired when the suggestions panel opens or closes, with `newState` and `oldState`.
@@ -264,16 +268,22 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @csspart rest - The count of tokens that did not fit. It is a `<button>` with `expandable` and a `<span>` without it.
  * @csspart surface - The floating panel the suggestions sit in.
  * @csspart tags - The row the tokens sit in.
+ * @csspart voice - The dictation button, under `voice`.
+ * @csspart voice-listening - The dictation button while it listens. Set alongside `voice`.
+ * @csspart voice-status - What a screen reader hears as dictation starts and stops, drawn for no one else.
  *
  * @cssstate invalid - The field has an error to show, from the browser's validation or from your `feedback`.
+ * @cssstate listening - While the field listens for dictation. The element sets `--dictation-level` on itself meanwhile, from 0 to 1, for a meter.
  * @cssstate loading - While `loading` is set, or a request to `source` is out.
  * @cssstate no-results - `filter-suggestions` hid every suggestion, and `no-results-text` or the `no-results` slot says so.
  * @cssstate open - The suggestions are open.
  */
 @customElement('helix-headless-filter-input')
-export class HelixHeadlessFilterInput extends MixinControllerOpen(
-  MixinTokens(MixinControllerValue(MixinField(HelixFormElement))),
+export class HelixHeadlessFilterInput extends MixinVoice(
+  MixinControllerOpen(MixinTokens(MixinControllerValue(MixinField(HelixFormElement)))),
 ) {
+  protected static override markRules = [SPOKEN_RULE]
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-filter-input': { clearLabel: 'Leeren' } })`.
@@ -1528,6 +1538,10 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
     return html`<slot name="clear-icon">${drawIcon(x)}</slot>`
   }
 
+  protected override voiceField(): HTMLInputElement | null {
+    return this.partNamed<HTMLInputElement>('control')
+  }
+
   protected override render(): TemplateResult {
     /* The row is always rendered, unlike Combobox's, because a slot that is not
        in the tree assigns nothing: guarding it on a count would mean the count
@@ -1573,7 +1587,7 @@ export class HelixHeadlessFilterInput extends MixinControllerOpen(
               ${this.renderClearIcon()}
             </button>`
           : nothing
-      }
+      }${this.renderVoice()}
     </div>
     <!-- **Always rendered, and hidden rather than absent**, for the reason the
          token row is: a slot that is not in the tree assigns nothing, so a panel

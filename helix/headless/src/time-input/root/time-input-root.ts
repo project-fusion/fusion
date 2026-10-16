@@ -141,6 +141,9 @@ import '../../time-picker/index.js'
  * @csspart picker-column-loading - The text shown while the options load.
  * @csspart picker-column-search - The region that holds the filter field.
  * @csspart picker-column-search-field - The filter field.
+ * @csspart picker-column-voice - The dictation button in the filter field.
+ * @csspart picker-column-voice-listening - The dictation button while it listens.
+ * @csspart picker-column-voice-status - What a screen reader hears as dictation starts and stops.
  * @csspart picker-columns - The row of columns, in `wheels`.
  * @csspart picker-feedback - The picker's own message, under the times, while the picker's `feedback` is set.
  * @csspart picker-hint - The picker's hint, which Time Input never sets: help under the field is the field's own `hint`.
@@ -158,6 +161,9 @@ import '../../time-picker/index.js'
  * @csspart picker-list-loading - The text shown while the options load.
  * @csspart picker-list-search - The region that holds the filter field.
  * @csspart picker-list-search-field - The filter field.
+ * @csspart picker-list-voice - The dictation button in the filter field.
+ * @csspart picker-list-voice-listening - The dictation button while it listens.
+ * @csspart picker-list-voice-status - What a screen reader hears as dictation starts and stops.
  * @csspart picker-now - The picker's button that chooses the current time, which Time Input does not draw.
  * @csspart picker-option - One time in the picker. Carries `data-between` inside a range.
  * @csspart picker-option-between - A time inside a chosen range, between its two ends. Set together with `picker-option`.
@@ -731,13 +737,15 @@ export class HelixHeadlessTimeInput extends MixinSegmentedField(
         column-filter-mark: picker-column-filter-mark, column-hint: picker-column-hint,
         column-items: picker-column-items, column-label: picker-column-label,
         column-live: picker-column-live, column-loading: picker-column-loading, column-search: picker-column-search,
-        column-search-field: picker-column-search-field, columns: picker-columns, feedback: picker-feedback, hint: picker-hint,
+        column-search-field: picker-column-search-field, column-voice: picker-column-voice,
+        column-voice-listening: picker-column-voice-listening, column-voice-status: picker-column-voice-status, columns: picker-columns, feedback: picker-feedback, hint: picker-hint,
         label: picker-label, list: picker-list,
         list-empty: picker-list-empty, list-error: picker-list-error, list-feedback: picker-list-feedback,
         list-filter-icon: picker-list-filter-icon, list-filter-mark: picker-list-filter-mark,
         list-hint: picker-list-hint, list-items: picker-list-items, list-label: picker-list-label,
         list-live: picker-list-live, list-loading: picker-list-loading, list-search: picker-list-search,
-        list-search-field: picker-list-search-field, now: picker-now, option: picker-option,
+        list-search-field: picker-list-search-field, list-voice: picker-list-voice,
+        list-voice-listening: picker-list-voice-listening, list-voice-status: picker-list-voice-status, now: picker-now, option: picker-option,
         option-between: picker-option-between, option-item-active: picker-option-item-active,
         option-item-selected: picker-option-item-selected,
         option-description: picker-option-description, option-item: picker-option-item,

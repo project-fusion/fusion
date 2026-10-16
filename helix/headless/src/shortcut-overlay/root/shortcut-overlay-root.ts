@@ -79,10 +79,15 @@ const printed = (keys: string, apple: boolean): string => {
  * @aliases Keyboard shortcuts, Shortcut hints, Key tips, Cheat sheet
  * @documentation https://fusion.dev/helix/components/shortcut-overlay
  *
- * @csspart badges - The layer the badges are drawn in.
  * @csspart badge - One control's badge.
  * @csspart badge-keys - A badge's keys.
  * @csspart badge-name - A badge's name for the control.
+ * @csspart badges - The layer the badges are drawn in.
+ * @csspart empty - What the sheet says when the page has no shortcuts.
+ * @csspart keys - A row's keys.
+ * @csspart list - The sheet's list.
+ * @csspart name - A row's name for what the shortcut does.
+ * @csspart row - One shortcut in the sheet.
  * @csspart sheet - The dialog listing every shortcut.
  * @csspart sheet-body - The dialog's `body` part.
  * @csspart sheet-dismiss - The dialog's `dismiss` part.
@@ -90,11 +95,6 @@ const printed = (keys: string, apple: boolean): string => {
  * @csspart sheet-footer - The dialog's `footer` part.
  * @csspart sheet-header - The dialog's `header` part.
  * @csspart sheet-surface - The dialog's `surface` part.
- * @csspart list - The sheet's list.
- * @csspart row - One shortcut in the sheet.
- * @csspart keys - A row's keys.
- * @csspart name - A row's name for what the shortcut does.
- * @csspart empty - What the sheet says when the page has no shortcuts.
  *
  * @cssstate showing - While the badges are drawn.
  */

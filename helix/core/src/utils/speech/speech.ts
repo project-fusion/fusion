@@ -1,0 +1,202 @@
+/**
+ * What a field listens through when a reader dictates into it.
+ *
+ * **An engine is an interface, so the browser's recognizer is one engine of
+ * several.** Helix ships `browserSpeech`, on the Web Speech API, and an app
+ * with recognizers of its own, a desktop shell with a local model or a
+ * service with a streaming API, registers one with `registerSpeechEngine` for
+ * every field on the page, or gives one field its own through `speechEngine`.
+ */
+
+/** What an engine tells a field as it listens. */
+export interface SpeechListener {
+  /** Listening stopped, because it was asked to, because the engine ended, or because of an error. */
+  end(reason: 'ended' | 'error' | 'stopped', message?: string): void
+  /** A phrase the engine has settled on. The guess before it is replaced by it. */
+  final(text: string): void
+  /** How loud the microphone is, from 0 to 1, with the spectrum's bands where the engine has them. */
+  level?(level: number, bands?: readonly number[]): void
+  /** The engine's guess at the phrase being spoken, which the next guess or `final` replaces. */
+  partial(text: string): void
+}
+
+/** A listening an engine started, which the field stops. */
+export interface SpeechSession {
+  stop(): void
+}
+
+/** A speech recognizer a field can listen through. */
+export interface SpeechEngine {
+  /** Whether the engine can listen on this page now. A field draws no dictation button where it cannot. */
+  available(): boolean
+  /** Starts listening in a language, a BCP 47 tag such as `en-US`, telling `listener` what it hears. */
+  listen(options: { lang: string; listener: SpeechListener }): SpeechSession
+}
+
+/** The parts of the Web Speech API this reads, which TypeScript's DOM types do not carry. */
+interface RecognitionResult {
+  0?: { transcript: string }
+  isFinal: boolean
+}
+
+interface Recognition extends EventTarget {
+  continuous: boolean
+  interimResults: boolean
+  lang: string
+  onend: (() => void) | null
+  onerror: ((event: { error: string }) => void) | null
+  onresult: ((event: { resultIndex: number; results: ArrayLike<RecognitionResult> }) => void) | null
+  start(): void
+  stop(): void
+}
+
+type RecognitionConstructor = new () => Recognition
+
+const recognizer = (): RecognitionConstructor | undefined => {
+  const scope = globalThis as unknown as {
+    SpeechRecognition?: RecognitionConstructor
+    webkitSpeechRecognition?: RecognitionConstructor
+  }
+  return scope.SpeechRecognition ?? scope.webkitSpeechRecognition
+}
+
+/**
+ * Reads the microphone's loudness for a level meter, from a stream of its own
+ * the recognizer does not share, and returns what stops it. Nothing happens
+ * where the page has no microphone or the reader refuses it.
+ */
+const meter = (report: (level: number, bands: readonly number[]) => void): (() => void) => {
+  let stopped = false
+  let release = (): void => {}
+  const devices = (globalThis.navigator as Navigator | undefined)?.mediaDevices
+  const Context = (globalThis as unknown as { AudioContext?: typeof AudioContext }).AudioContext
+  if (!devices?.getUserMedia || !Context) {
+    return () => {}
+  }
+  void devices
+    .getUserMedia({ audio: true })
+    .then((stream) => {
+      if (stopped) {
+        for (const track of stream.getTracks()) {
+          track.stop()
+        }
+        return
+      }
+      const context = new Context()
+      const tap = context.createAnalyser()
+      tap.fftSize = 256
+      context.createMediaStreamSource(stream).connect(tap)
+      const samples = new Uint8Array(tap.fftSize)
+      const spectrum = new Uint8Array(tap.frequencyBinCount)
+      const timer = setInterval(() => {
+        tap.getByteTimeDomainData(samples)
+        tap.getByteFrequencyData(spectrum)
+        let sum = 0
+        for (const sample of samples) {
+          const centered = (sample - 128) / 128
+          sum += centered * centered
+        }
+        /* Square root of the mean square, scaled so a voice at speaking level reads near the top. */
+        const level = Math.min(1, Math.sqrt(sum / samples.length) * 4)
+        const bands = Array.from({ length: 8 }, (_, band) => {
+          const from = Math.floor((band / 8) * spectrum.length)
+          const to = Math.floor(((band + 1) / 8) * spectrum.length)
+          let peak = 0
+          for (let at = from; at < to; at += 1) {
+            peak = Math.max(peak, spectrum[at] ?? 0)
+          }
+          return peak / 255
+        })
+        report(level, bands)
+      }, 50)
+      release = () => {
+        clearInterval(timer)
+        for (const track of stream.getTracks()) {
+          track.stop()
+        }
+        void context.close()
+      }
+    })
+    .catch(() => {})
+  return () => {
+    stopped = true
+    release()
+  }
+}
+
+/**
+ * The browser's own recognizer, `SpeechRecognition`, or `webkitSpeechRecognition`
+ * in Safari. Not available in Firefox.
+ *
+ * **Chrome sends the audio to Google's servers to recognize it**, and Safari
+ * to Apple's unless the device recognizes on the device. A page that cannot
+ * send what is said registers an engine of its own.
+ */
+export const browserSpeech: SpeechEngine = {
+  available: () => recognizer() !== undefined,
+  listen: ({ lang, listener }) => {
+    const Constructor = recognizer()
+    if (!Constructor) {
+      listener.end('error', 'This browser has no speech recognition.')
+      return { stop: () => {} }
+    }
+    const recognition = new Constructor()
+    recognition.continuous = true
+    recognition.interimResults = true
+    recognition.lang = lang
+    let asked = false
+    let failed: string | undefined
+    const quiet = meter((level, bands) => listener.level?.(level, bands))
+    recognition.onresult = (event) => {
+      let guess = ''
+      for (let at = event.resultIndex; at < event.results.length; at += 1) {
+        const result = event.results[at] as RecognitionResult
+        const text = result[0]?.transcript ?? ''
+        if (result.isFinal) {
+          listener.final(text.trim())
+        } else {
+          guess += text
+        }
+      }
+      if (guess !== '') {
+        listener.partial(guess.trim())
+      }
+    }
+    recognition.onerror = (event) => {
+      failed = event.error
+    }
+    recognition.onend = () => {
+      quiet()
+      listener.end(failed && failed !== 'aborted' ? 'error' : asked ? 'stopped' : 'ended', failed)
+    }
+    recognition.start()
+    return {
+      stop: () => {
+        asked = true
+        recognition.stop()
+      },
+    }
+  },
+}
+
+const KEY = Symbol.for('fusion.helix.speech')
+const globals = globalThis as unknown as Record<
+  symbol,
+  { engine: SpeechEngine | undefined } | undefined
+>
+if (globals[KEY] === undefined) {
+  globals[KEY] = { engine: undefined }
+}
+const holder = globals[KEY]
+
+/**
+ * Gives every field on the page an engine to listen through, in place of the
+ * browser's own, or takes it away again with `undefined`. A field's own
+ * `speechEngine` wins over it.
+ */
+export const registerSpeechEngine = (engine: SpeechEngine | undefined): void => {
+  holder.engine = engine
+}
+
+/** The engine a field listens through where it was given none of its own. */
+export const pageSpeechEngine = (): SpeechEngine => holder.engine ?? browserSpeech

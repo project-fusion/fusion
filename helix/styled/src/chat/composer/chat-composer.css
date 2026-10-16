@@ -147,7 +147,8 @@
  *    24 and compared: 24 crowds the glyph and spends the whole target allowance,
  *    32 is the same size as a slotted tool and reads as one.
  */
-[part="send"] {
+[part="send"],
+[part~="voice"] {
   align-items: center;
   background-color: transparent;
   block-size: calc(var(--helix-size-control-tight) - var(--helix-space-2xs));
@@ -161,22 +162,26 @@
   padding: var(--helix-space-none);
 }
 
-[part="mark"] {
+[part="mark"],
+[part~="voice"] svg {
   block-size: var(--helix-size-icon-tight);
   inline-size: var(--helix-size-icon-tight);
 }
 
-[part="send"]:hover:not(:disabled) {
+[part="send"]:hover:not(:disabled),
+[part~="voice"]:hover:not(:disabled) {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   color: var(--helix-color-foreground);
 }
 
-[part="send"]:disabled {
+[part="send"]:disabled,
+[part~="voice"]:disabled {
   cursor: not-allowed;
   opacity: 0.5;
 }
 
-[part="send"]:focus-visible {
+[part="send"]:focus-visible,
+[part~="voice"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
