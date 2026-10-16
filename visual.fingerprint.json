@@ -1,5 +1,5 @@
 {
-  "browser": "chromium 153.0.8010.12",
+  "browser": "chromium 156.0.8078.4",
   "fonts": "90 fonts, d93ed8347ae01f6c",
   "os": "ubuntu 24.04",
   "platform": "linux"
