@@ -33,6 +33,7 @@ type Level = HTMLElement & {
   bands: string | readonly number[]
   label: string
   level: number
+  still: boolean
   updateComplete: Promise<boolean>
   variant?: 'spectrum' | 'waves'
 }
@@ -84,6 +85,15 @@ describe('voice level', () => {
     expect(written.bands).toEqual([0.2, 0.3])
   })
 
+  test('reads still from its attribute, and does not write it back', async () => {
+    expect((await level('<helix-voice-level still></helix-voice-level>')).still).toBe(true)
+    const host = await level('<helix-voice-level></helix-voice-level>')
+    expect(host.still).toBe(false)
+    host.still = true
+    await host.updateComplete
+    expect(host.hasAttribute('still')).toBe(false)
+  })
+
   test('reflects the variant, and writes nothing for the resting one', async () => {
     const host = await level('<helix-voice-level></helix-voice-level>')
     expect(host.hasAttribute('variant')).toBe(false)
@@ -127,6 +137,47 @@ describe('voice level', () => {
       host.bands = [0.3, 0.8, 0.5]
       await host.updateComplete
       expect(await framesBooked(10)).toBeGreaterThan(5)
+    })
+
+    test('a still level runs no frames, and clearing still starts them', async () => {
+      const host = await level('<helix-voice-level still variant="waves"></helix-voice-level>')
+      host.level = 0.8
+      await host.updateComplete
+      expect(await framesBooked(10)).toBe(0)
+      host.still = false
+      await host.updateComplete
+      expect(await framesBooked(10)).toBeGreaterThan(5)
+    })
+
+    test('a still spectrum draws each bar at its band at once', async () => {
+      const host = await level(
+        '<helix-voice-level still style="--voice-level-color: rgb(255 0 0); --voice-level-bars: 8; inline-size: 80px; block-size: 20px"></helix-voice-level>',
+      )
+      host.level = 1
+      await host.updateComplete
+      const canvas = host.shadowRoot?.querySelector('canvas') as HTMLCanvasElement
+      const context = canvas.getContext('2d') as CanvasRenderingContext2D
+      const ratio = canvas.width / 80
+      /* The fourth bar, a center one, near the top of the box with no frame
+         drawn: an eased bar would still stand at a dot. */
+      const pixel = context.getImageData(Math.round(35 * ratio), Math.round(2 * ratio), 1, 1).data
+      expect(pixel[0]).toBeGreaterThan(200)
+    })
+
+    test('still waves are the same picture on every load, and swing with the level', async () => {
+      const picture = async (loudness = 0.7): Promise<string> => {
+        const host = await level(
+          `<helix-voice-level still level="${loudness}" variant="waves" style="inline-size: 90px; block-size: 30px"></helix-voice-level>`,
+        )
+        const canvas = host.shadowRoot?.querySelector('canvas') as HTMLCanvasElement
+        const url = canvas.toDataURL()
+        host.remove()
+        return url
+      }
+      const first = await picture()
+      await framesBooked(5)
+      expect(await picture()).toBe(first)
+      expect(await picture(0)).not.toBe(first)
     })
 
     test('draws the center bars in the stronger color', async () => {

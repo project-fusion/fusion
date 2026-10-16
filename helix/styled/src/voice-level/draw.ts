@@ -146,6 +146,12 @@ export const WAVE_LINES: readonly WaveLine[] = [
 ]
 
 /**
+ * The moment the waves are drawn at when the element is `still`, in seconds.
+ * Fixed, so a still picture is the same on every load.
+ */
+export const STILL_TIME = 0
+
+/**
  * How far a wave may leave the center line at `across`, from `0` at the start
  * to `1` at the end: nothing at either end and all of it in the middle, so
  * every line is pinned to the center at both ends.

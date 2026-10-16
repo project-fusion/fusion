@@ -19,6 +19,7 @@ import {
   envelope,
   QUIET_STOP,
   SILENT,
+  STILL_TIME,
   stillLength,
   unit,
   type VoiceLevelVariant,
@@ -66,7 +67,8 @@ const ink = (value: string, alpha = 1): string => {
  * level has been zero for under a second, and starts again with the next
  * reading. With `prefers-reduced-motion`, it draws one bar from the middle
  * over a faint track, whose length is the level, and redraws it on each
- * reading.
+ * reading. With `still`, it draws either drawing as a still picture of its
+ * readings, whatever the motion preference.
  *
  * The level is an image named by `label`. A meter's value would be announced
  * on every change, and a level changes many times a second.
@@ -138,6 +140,19 @@ export class HelixVoiceLevel extends HelixElement {
   level = 0
 
   /**
+   * Draws the readings as a still picture: each bar at its band and the waves
+   * at one fixed moment, swung as far as `level`.
+   *
+   * For a level that holds, such as the loudness of a recorded clip or a
+   * picture of the drawing. No frame loop runs, and each new reading is drawn
+   * at once with no easing. Because nothing moves, the drawing is the same
+   * under `prefers-reduced-motion`. Clearing it starts the motion from the
+   * readings as they are.
+   */
+  @property({ type: Boolean })
+  still = false
+
+  /**
    * The drawing: a row of bars, one for each band, or three moving waves.
    *
    * Reflected because the stylesheet sizes each drawing differently. Absent
@@ -177,7 +192,7 @@ export class HelixVoiceLevel extends HelixElement {
   private resting = false
 
   private readonly gate = new PaintGateController(this, {
-    canRun: () => !!this.context && !this.lost && !this.resting,
+    canRun: () => !!this.context && !this.lost && !this.resting && !this.still,
     onFrame: (delta) => {
       this.step(delta)
       this.paint()
@@ -198,7 +213,12 @@ export class HelixVoiceLevel extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'img' })
-    if (changed.has('level') || changed.has('bands') || changed.has('variant')) {
+    if (
+      changed.has('level') ||
+      changed.has('bands') ||
+      changed.has('still') ||
+      changed.has('variant')
+    ) {
       this.wake()
     }
   }
@@ -246,6 +266,11 @@ export class HelixVoiceLevel extends HelixElement {
    */
   private wake(): void {
     if (!this.context) {
+      return
+    }
+    if (this.still) {
+      this.gate.stop()
+      this.paint()
       return
     }
     if (this.gate.reduced) {
@@ -368,6 +393,22 @@ export class HelixVoiceLevel extends HelixElement {
     this.quiet = top > SILENT ? 0 : this.quiet + delta
   }
 
+  /**
+   * Every bar and the waves set to their readings with no easing, and the
+   * clock to the still moment, which is what `still` draws. The moving drawing
+   * starts from here when it is cleared.
+   */
+  private settle(): void {
+    const count = this.bars
+    const readings = this.readings
+    this.shown = Array.from(
+      { length: count },
+      (_, at) => bandFor(readings, this.level, at, count) * envelope(at, count),
+    )
+    this.swing = unit(this.level)
+    this.time = STILL_TIME
+  }
+
   /** The bar count the hook asks for. */
   private get bars(): number {
     return this.canvas ? barCount(getComputedStyle(this.canvas).animationIterationCount) : 0
@@ -386,10 +427,13 @@ export class HelixVoiceLevel extends HelixElement {
     const painted = getComputedStyle(canvas)
     const main = ink(painted.color)
     ctx.clearRect(0, 0, this.width, this.height)
-    if (this.gate.reduced) {
+    if (this.still) {
+      this.settle()
+    }
+    if (this.gate.reduced && !this.still) {
       this.paintStill(ctx, main, ink(painted.color, TRACK))
     } else if (this.variant === 'waves') {
-      this.paintWaves(ctx, main, painted)
+      this.paintWaves(ctx, main, painted, this.still ? STILL_TIME : this.time)
     } else {
       this.paintSpectrum(ctx, main, ink(painted.textDecorationColor))
     }
@@ -417,11 +461,12 @@ export class HelixVoiceLevel extends HelixElement {
     ctx.fill(center)
   }
 
-  /** The three waves, the main one on top. */
+  /** The three waves at `time` seconds, the main one on top. */
   private paintWaves(
     ctx: CanvasRenderingContext2D,
     main: string,
     painted: CSSStyleDeclaration,
+    time: number,
   ): void {
     const middle = this.height / 2
     const colors = {
@@ -435,7 +480,7 @@ export class HelixVoiceLevel extends HelixElement {
       const reach = Math.max(0, middle - line.width) * this.swing
       ctx.beginPath()
       for (let x = 0; x <= this.width; x += WAVE_STEP) {
-        const y = middle - reach * waveAt(line, x / this.width, this.time)
+        const y = middle - reach * waveAt(line, x / this.width, time)
         if (x === 0) {
           ctx.moveTo(x, y)
         } else {
