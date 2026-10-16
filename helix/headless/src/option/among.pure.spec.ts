@@ -62,7 +62,7 @@ const STYLED_COLUMN = join(helix, 'styled/src/table/column/table-column.ts')
 
 describe('the containers of another family’s children', () => {
   for (const tier of ['headless', 'styled']) {
-    for (const family of ['combobox', 'command', 'filter-input', 'listbox', 'select']) {
+    for (const family of ['combobox', 'filter-input', 'listbox', 'select']) {
       test(`${tier} ${family} registers no option`, () => {
         const graph = reached(join(helix, tier, 'src', family, 'index.ts'))
         expect(graph.size).toBeGreaterThan(1)
@@ -75,8 +75,9 @@ describe('the containers of another family’s children', () => {
     })
   }
 
+  /* Command draws the controls on screen as options under `controls`. */
   test('a family that draws options in its own shadow root still registers them', () => {
-    for (const family of ['time-picker', 'pagination']) {
+    for (const family of ['command', 'time-picker', 'pagination']) {
       expect(reached(join(helix, 'headless/src', family, 'index.ts')).has(OPTION)).toBe(true)
     }
   })

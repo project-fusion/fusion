@@ -14,7 +14,6 @@ import {
 } from '@fusion.dev/helix-core'
 import { type CSSResultGroup, css, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { styleMap } from 'lit/directives/style-map.js'
 import { html } from 'lit/static-html.js'
 import '../../dialog/index.js'
 
@@ -116,9 +115,14 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
     }
 
     [part='badge'] {
+      left: 0;
       position: fixed;
-      translate: -50% -50%;
+      top: 0;
       white-space: nowrap;
+    }
+
+    [part='badge'][data-compact] [part='badge-name'] {
+      display: none;
     }
   `
 
@@ -308,6 +312,61 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
     ) {
       layer.showPopover()
     }
+    if (changed.has('badges')) {
+      this.arrange()
+    }
+  }
+
+  /**
+   * Places each badge centered on its control's bottom edge, on whole pixels
+   * and inside the viewport, where it overlaps no badge placed before it.
+   *
+   * **A badge that would overlap a neighbor drops its name**, keeping the
+   * keys, which is what a reader holding the key is looking for; one that
+   * still overlaps moves down a row. Controls side by side in a toolbar are
+   * narrower than a key and a name together, and badges drawn over each other
+   * read as neither.
+   */
+  private arrange(): void {
+    const placed: Array<{ bottom: number; left: number; right: number; top: number }> = []
+    const margin = 4
+    const width = window.innerWidth
+    const height = window.innerHeight
+    const drawn = [...(this.renderRoot.querySelectorAll<HTMLElement>('[part~="badge"]') ?? [])]
+    drawn.forEach((element, index) => {
+      const badge = this.badges[index]
+      if (!badge) {
+        return
+      }
+      const box = (compact: boolean, top: number) => {
+        element.toggleAttribute('data-compact', compact)
+        const { height: tall, width: wide } = element.getBoundingClientRect()
+        const left = Math.round(
+          Math.min(Math.max(badge.left - wide / 2, margin), width - wide - margin),
+        )
+        const at = Math.round(Math.min(Math.max(top - tall / 2, margin), height - tall - margin))
+        return { bottom: at + tall, left, right: left + wide, top: at }
+      }
+      const hits = (one: { bottom: number; left: number; right: number; top: number }) =>
+        placed.filter(
+          (other) =>
+            one.left < other.right &&
+            one.right > other.left &&
+            one.top < other.bottom &&
+            one.bottom > other.top,
+        )
+      let place = box(false, badge.top)
+      if (hits(place).length > 0) {
+        place = box(true, badge.top)
+      }
+      for (let tries = 0; tries < 4 && hits(place).length > 0; tries += 1) {
+        const below = Math.max(...hits(place).map((other) => other.bottom))
+        place = box(true, below + (place.bottom - place.top) / 2 + 2)
+      }
+      element.style.left = `${place.left}px`
+      element.style.top = `${place.top}px`
+      placed.push(place)
+    })
   }
 
   protected override render(): TemplateResult {
@@ -317,7 +376,7 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
         ? html`<div part="badges" popover="manual" aria-hidden="true">
             ${this.badges.map(
               (badge) =>
-                html`<span part="badge" style=${styleMap({ left: `${badge.left}px`, top: `${badge.top}px` })}
+                html`<span part="badge"
                   ><kbd part="badge-keys">${badge.keys}</kbd> <span part="badge-name">${badge.name}</span></span
                 >`,
             )}
