@@ -477,6 +477,25 @@ fn item(config: &Config, entry: &Entry, shots: &[&Shot], first: bool) -> Outcome
         "key": entry.id,
         "shots": shots.iter().map(|shot| shot_request(config, entry, shot)).collect::<Vec<_>>(),
     });
+    /* A screen's state beside its baselines, `<stem>.state.json`, which the
+    driver puts back once the page has upgraded: the menu open, the field
+    filled, the list scrolled, as `captureState` wrote them. */
+    let saved = entry.dir.join(format!("{}.state.json", entry.stem));
+    if saved.is_file() {
+        let text = fs::read_to_string(&saved).map_err(|error| {
+            Failure::input(
+                format!("cannot read {}", saved.display()),
+                error.to_string().to_lowercase(),
+            )
+        })?;
+        let state: Value = serde_json::from_str(&text).map_err(|error| {
+            Failure::input(
+                format!("{} is not JSON", saved.display()),
+                error.to_string(),
+            )
+        })?;
+        out["state"] = state;
+    }
     let (Source::Html(html), Some(file)) = (source, &entry.file) else {
         out["url"] = json!(entry.url);
         return Ok(out);
@@ -1697,6 +1716,43 @@ mod tests {
         let (read, groups, _, new) = read_reports(std::slice::from_ref(&folder)).unwrap();
         fs::remove_dir_all(&folder).ok();
         assert_eq!((read, groups.len(), new), (1, 0, 2));
+    }
+
+    #[test]
+    fn a_state_file_beside_an_entry_goes_to_the_driver() {
+        let dir = std::env::temp_dir().join(format!("helix-visual-state-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join("menu.html"), "<p>menu</p>").unwrap();
+        let config = Config::parse(json!({
+            "sources": [{ "kind": "html", "name": "pages", "root": ".", "glob": "{name}.html" }]
+        }))
+        .unwrap();
+        let entry = Entry {
+            dir: dir.clone(),
+            file: Some(dir.join("menu.html")),
+            group: "menu".into(),
+            id: "pages/menu".into(),
+            name: "menu".into(),
+            source: 0,
+            stem: "menu".into(),
+            sides: None,
+            url: None,
+        };
+        let shots: Vec<&Shot> = config.shots.iter().collect();
+        assert!(item(&config, &entry, &shots, true)
+            .unwrap()
+            .get("state")
+            .is_none());
+        fs::write(
+            dir.join("menu.state.json"),
+            r#"{ "version": 1, "entries": [] }"#,
+        )
+        .unwrap();
+        let carried = item(&config, &entry, &shots, true).unwrap();
+        assert_eq!(carried["state"], json!({ "version": 1, "entries": [] }));
+        fs::write(dir.join("menu.state.json"), "not json").unwrap();
+        assert!(item(&config, &entry, &shots, true).is_err());
+        fs::remove_dir_all(&dir).unwrap();
     }
 
     #[test]

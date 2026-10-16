@@ -405,6 +405,33 @@ const codeBlocks = (page, { minimum, selector }) =>
     { minimum, selector },
   )
 
+/**
+ * Puts back the screen an entry's `<stem>.state.json` saved, through the
+ * page's own Helix: `restoreState` from `@fusion.dev/helix-core`, which every
+ * copy of Helix puts on `globalThis` as it loads. An entry whose state names
+ * an element the page no longer draws, or one the page refused, fails, since
+ * its picture would not be of the screen the state describes.
+ */
+const restore = async (page, state) => {
+  const report = await page.evaluate(async (saved) => {
+    const tools = globalThis[Symbol.for('fusion.dev/helix/state')]
+    if (!tools) {
+      return { error: 'the page has no Helix to restore its state with' }
+    }
+    return tools.restoreState(saved)
+  }, state)
+  if (report.error) {
+    throw new Error(report.error)
+  }
+  const wrong = [
+    ...report.missed.map((path) => `${path} is not on the page`),
+    ...report.refused.map((path) => `${path} refused its state`),
+  ]
+  if (wrong.length > 0) {
+    throw new Error(`the saved state did not take: ${wrong.join('; ')}`)
+  }
+}
+
 /** One entry, every shot of it from one navigation. */
 const take = async (lane, item, { elements, readyProperty }, progress) => {
   const { page } = lane
@@ -441,6 +468,9 @@ const take = async (lane, item, { elements, readyProperty }, progress) => {
           throw new Error(
             `nothing defines ${missing.map((tag) => `<${tag}>`).join(', ')}, after ${UPGRADES} seconds of waiting`,
           )
+        }
+        if (item.state) {
+          await restore(page, item.state)
         }
       } else if (shot.harness !== null) {
         await page.evaluate(
