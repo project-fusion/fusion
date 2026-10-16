@@ -6,6 +6,7 @@ import {
   HelixClearEvent,
   HelixFormElement,
   holdCaret,
+  ListedController,
   MixinControllerValue,
   MixinField,
   numberConverter,
@@ -88,6 +89,13 @@ export type InputType = 'email' | 'number' | 'password' | 'search' | 'tel' | 'te
  */
 @customElement('helix-headless-input')
 export class HelixHeadlessInput extends MixinControllerValue(MixinField(HelixFormElement)) {
+  /** On the page's list of controls, where a command palette and a shortcut overlay find it. */
+  protected readonly listed = new ListedController(
+    this,
+    'focus',
+    () => this.internals?.ariaKeyShortcuts,
+  )
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-input': { clearLabel: 'Leeren' } })`.

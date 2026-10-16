@@ -3,6 +3,7 @@ import {
   customElement,
   HelixFormElement,
   HostClickController,
+  ListedController,
   MixinControllerChecked,
   MixinField,
   markRegion,
@@ -69,6 +70,13 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-switch')
 export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(HelixFormElement)) {
+  /** On the page's list of controls, where a command palette and a shortcut overlay find it. */
+  protected readonly listed = new ListedController(
+    this,
+    'press',
+    () => this.internals?.ariaKeyShortcuts,
+  )
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-switch': { valueMissingMessage: '...' } })`.

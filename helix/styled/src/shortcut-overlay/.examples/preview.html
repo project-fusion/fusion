@@ -1,0 +1,39 @@
+<!-- @summary Hold Command, or Control, to see each control's shortcut and what it does. -->
+<!-- @min 360 -->
+<helix-toolbar label="Text formatting">
+  <helix-button id="overlay-bold">Bold</helix-button>
+  <helix-button id="overlay-italic">Italic</helix-button>
+  <helix-button id="overlay-link">Link</helix-button>
+</helix-toolbar>
+
+<!-- Each Kbd gives its control the shortcut, which the overlay reads. -->
+<helix-kbd
+  activate="click"
+  for="overlay-bold"
+  hidden
+  keys="mod+b"
+  within="document"
+></helix-kbd>
+<helix-kbd
+  activate="click"
+  for="overlay-italic"
+  hidden
+  keys="mod+i"
+  within="document"
+></helix-kbd>
+<helix-kbd
+  activate="click"
+  for="overlay-link"
+  hidden
+  keys="mod+k"
+  within="document"
+></helix-kbd>
+
+<helix-shortcut-overlay id="overlay"></helix-shortcut-overlay>
+
+<script type="module">
+  /* Shown once at first, a frame after each Kbd has written its shortcut, so
+     the badges are in the picture. Holding the key shows them again. */
+  const overlay = document.getElementById('overlay')
+  requestAnimationFrame(() => requestAnimationFrame(() => overlay.show()))
+</script>

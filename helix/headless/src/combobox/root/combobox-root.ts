@@ -14,6 +14,7 @@ import {
   HelixFilterEvent,
   HelixFormElement,
   handedLocale,
+  ListedController,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -196,6 +197,13 @@ const isInsertion = (event: Event): boolean =>
 export class HelixHeadlessCombobox extends MixinControllerOpen(
   MixinTokens(MixinControllerValue(MixinField(HelixFormElement))),
 ) {
+  /** On the page's list of controls, where a command palette and a shortcut overlay find it. */
+  protected readonly listed = new ListedController(
+    this,
+    'focus',
+    () => this.internals?.ariaKeyShortcuts,
+  )
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-combobox': { emptyText: 'Keine Treffer' } })`.

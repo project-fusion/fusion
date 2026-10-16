@@ -93,6 +93,7 @@ export {
   type KeyboardOrigin,
   type NavigableItem,
 } from './controllers/keyboard-navigation-controller/keyboard-navigation-controller.js'
+export { ListedController } from './controllers/listed-controller/listed-controller.js'
 export {
   MediaSessionController,
   type SessionHandlers,
@@ -515,6 +516,21 @@ export {
   LIVE,
   pageBudget,
 } from './utils/context-budget/context-budget.js'
+export {
+  type ControlEntry,
+  type ControlKind,
+  chordOfAria,
+  controlName,
+  controlReachable,
+  type ListedControl,
+  listControls,
+  listShortcuts,
+  registerControl,
+  registerShortcut,
+  runControl,
+  type ShortcutEntry,
+  unregisterControl,
+} from './utils/controls/controls.js'
 export { countLabel } from './utils/count-label/count-label.js'
 export { createSheet } from './utils/create-sheet/create-sheet.js'
 export {

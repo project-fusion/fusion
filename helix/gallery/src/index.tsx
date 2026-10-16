@@ -80,6 +80,7 @@ import { sandboxArt } from './art/sandbox'
 import { scatterChartArt } from './art/scatter-chart'
 import { scrollAreaArt } from './art/scroll-area'
 import { selectArt } from './art/select'
+import { shortcutOverlayArt } from './art/shortcut-overlay'
 import { skeletonArt } from './art/skeleton'
 import { skipLinkArt } from './art/skip-link'
 import { sliderArt } from './art/slider'
@@ -238,6 +239,7 @@ const art: Record<string, ReactNode> = {
   'scatter-chart': scatterChartArt,
   'scroll-area': scrollAreaArt,
   select: selectArt,
+  'shortcut-overlay': shortcutOverlayArt,
   skeleton: skeletonArt,
   'skip-link': skipLinkArt,
   slider: sliderArt,

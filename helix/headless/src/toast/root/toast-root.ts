@@ -12,6 +12,7 @@ import {
   matchesChord,
   numberConverter,
   onApple,
+  registerShortcut,
   scrollHolders,
   words,
 } from '@fusion.dev/helix-core'
@@ -116,6 +117,11 @@ export class HelixHeadlessToast extends HelixElement {
    */
   @property()
   hotkey = 'F8'
+
+  /** What the hotkey does, as a list of the page's shortcuts says it. */
+  @words
+  @property({ attribute: 'hotkey-label' })
+  hotkeyLabel = 'Go to notifications'
 
   /**
    * Accessible name for the region, with `{hotkey}` filled in. Translate it with
@@ -634,6 +640,11 @@ export class HelixHeadlessToast extends HelixElement {
     this.addEventListener('pointerleave', this.handlePointerLeave)
     this.addEventListener('helix-dismiss', this.handleDismiss)
     document.addEventListener('keydown', this.handleHotkey)
+    this.unregister = registerShortcut({
+      keys: () => this.hotkey,
+      label: () => this.hotkeyLabel,
+      owner: this,
+    })
     this.watcher = new MutationObserver((records) => {
       const added = records.flatMap((record) => [...record.addedNodes])
       /* First, so a message past `max-visible` is held before it is shown or said. */
@@ -654,8 +665,12 @@ export class HelixHeadlessToast extends HelixElement {
     }
   }
 
+  /** Takes the hotkey off the page's list of shortcuts. */
+  private unregister: (() => void) | undefined
+
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.unregister?.()
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('focusout', this.handleFocusOut)
     this.removeEventListener('pointerenter', this.handlePointerEnter)
