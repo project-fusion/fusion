@@ -3,19 +3,30 @@
      key-sized in that heading. 0.85 rather than 0.75: three quarters of 13px is
      a 9.75px glyph, and an arrow that small in the mono face is a smudge. */
   --_kbd-size: var(--kbd-font-size, 0.85em);
-  --_kbd-height: var(--kbd-block-size, 1.5em);
+  /* Whole pixels, so the face is drawn at the height it is laid out at and
+     the label centered in it stays centered at 1x. Unrounded, a 17.85px face
+     drew 17px tall in Chromium and 18px in WebKit, and K sat 0.84px low in the
+     17px one. */
+  --_kbd-height: round(var(--kbd-block-size, 1.5em), 1px);
   --_kbd-inset: var(--kbd-padding-inline, 0.4em);
-  display: inline-flex;
+  /* *The key is centered on the capitals of the words beside it.** `middle`
+     on the face puts its middle half an x-height above this box's baseline.
+     This box goes up by the rest of the way to half the cap height, in the
+     words' own face, less half the pressed edge, so the inside of the face is
+     what lands on the capitals. The box places the key, so the label inside it
+     cannot move it. When the label's baseline placed the key, the inside of
+     the face sat 2.55px below the capitals of 14px text in Chromium, and a
+     pixel of padding moved inside the face moved the whole key with it. Laid
+     out this way it lands on them to a hundredth of a pixel in both engines. */
+  display: inline-block;
   font: inherit;
-  /* Measured, not chosen: `baseline` hangs the box a descender low and `middle`
-     aligns on half the x-height where the box wants half the line. Swept
-     against the glyph's own bounding box from 12px to 20px, `-0.05em` lands
-     within 0.39px everywhere and scales with the em-sized box. */
-  vertical-align: -0.05em;
+  /* No height of its own, so the box is the key's height wherever it is, in a
+     line or in a flex row. */
+  line-height: 0;
+  vertical-align: calc(0.5cap - 0.5ex - 0.5px);
 }
 
 [part="kbd"] {
-  align-items: center;
   background-color: var(--kbd-background-color, var(--helix-color-surface-sunken));
   block-size: var(--_kbd-height);
   border: var(--helix-border-thin) solid var(--kbd-border-color, var(--helix-color-border));
@@ -23,7 +34,7 @@
   /* One edge rather than a drop shadow: a key is pressed into the page. */
   box-shadow: inset 0 -1px 0 0 var(--kbd-border-color, var(--helix-color-border));
   color: var(--kbd-color, var(--helix-color-foreground-muted));
-  display: inline-flex;
+  display: inline-block;
   font-family: var(--kbd-font-family, var(--helix-font-mono));
   /* A key label is literal: `<-` and `=>` must not become arrows. */
   font-feature-settings:
@@ -32,21 +43,31 @@
   font-size: var(--_kbd-size);
   font-variant-ligatures: none;
   font-weight: var(--kbd-font-weight, var(--helix-weight-medium));
-  justify-content: center;
-  line-height: 1;
+  /* The label's line takes its height from the empty block below alone. */
+  line-height: 0;
   /* Square at minimum, so one character is not a narrow sliver. */
   min-inline-size: var(--_kbd-height);
+  padding-inline: var(--_kbd-inset);
+  text-align: center;
+  vertical-align: middle;
   /* The box has a fixed `block-size`, so a wrapped label overflows it. */
   white-space: nowrap;
-  padding-inline: var(--_kbd-inset);
-  /* Up by the floor: the inset shadow takes a pixel off the bottom of the face,
-     so the face is not symmetrical and centering in the box centers in the
-     wrong one. Padding at the *end* takes the pixel the shadow takes, so the
-     label sits in the middle of what is left; at the start, which this was,
-     it pushed every glyph a pixel lower still. Measured on a 13px key in
-     WebKit: 0.7px low for K and for the symbols alike, and 0.2px after.
-     Padding rather than a translate, so the box still holds it. */
-  padding-block-end: var(--helix-border-thin);
+}
+
+/* *The label is centered on its capitals inside the face's edges.** The
+   label's line has no height of its own, so this empty block is the tallest
+   thing on it, and it ends on the baseline. That puts the baseline this far
+   below the face's top border: half the inside of the face, which loses a
+   border at each end and the pressed pixel at the bottom, plus half the
+   label's cap height. Capitals and symbols are centered in any face, and a
+   lowercase label sits on the same baseline. A centered line box put the
+   capitals where the face's ascent and descent did: 0.66px high for K and
+   0.95px high for Cmd on a 14px line in Chromium. */
+[part="kbd"]::before,
+:host([caps]) [part="key"]::before {
+  block-size: calc((var(--_kbd-height) - 2 * var(--helix-border-thin) - 1px) / 2 + 0.5cap);
+  content: "";
+  display: inline-block;
 }
 
 /* Under `caps` a chord is a key per key: the whole is a row of caps with a
@@ -55,23 +76,29 @@
   background-color: transparent;
   border: 0;
   box-shadow: none;
+  display: inline-flex;
   gap: var(--kbd-gap, var(--helix-space-2xs));
+  /* The `+` between two keys keeps a line of its own, centered between them. */
+  line-height: 1;
   min-inline-size: 0;
   padding: 0;
 }
 
+:host([caps]) [part="kbd"]::before {
+  content: none;
+}
+
 :host([caps]) [part="key"] {
-  align-items: center;
   background-color: var(--kbd-background-color, var(--helix-color-surface-sunken));
   block-size: var(--_kbd-height);
   border: var(--helix-border-thin) solid var(--kbd-border-color, var(--helix-color-border));
   border-radius: var(--kbd-radius, var(--helix-radii-sm));
   box-shadow: inset 0 -1px 0 0 var(--kbd-border-color, var(--helix-color-border));
-  display: inline-flex;
-  justify-content: center;
+  display: inline-block;
+  line-height: 0;
   min-inline-size: var(--_kbd-height);
-  padding-block-end: var(--helix-border-thin);
   padding-inline: var(--_kbd-inset);
+  text-align: center;
 }
 
 /* The `+` between two caps, where the platform writes one. */
