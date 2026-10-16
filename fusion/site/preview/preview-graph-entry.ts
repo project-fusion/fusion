@@ -13,7 +13,7 @@
 
 import { connectGraph } from '@fusion.dev/helix-graph'
 import { isometricDriver } from '@fusion.dev/helix-graph/isometric'
-import { sigmaDriver } from '@fusion.dev/helix-graph/sigma'
+import { sigmaDriver, sigmaOptions } from '@fusion.dev/helix-graph/sigma'
 import Graph from 'graphology'
 import forceAtlas2 from 'graphology-layout-forceatlas2'
 import FA2Layout from 'graphology-layout-forceatlas2/worker'
@@ -66,7 +66,7 @@ const start = (frame: HTMLElement): (() => void) => {
       connection.disconnect()
     }
   }
-  const sigma = new Sigma(new Graph(), box)
+  const sigma = new Sigma(new Graph(), box, sigmaOptions())
   /* **The drawing the example asks for**, as `data-preview-graph-material`,
      `-shape` and `-emphasis`, which are `sigmaDriver`'s options written as
      attributes. */

@@ -1,9 +1,13 @@
-import { NodeProgram } from 'sigma/rendering'
-import type { NodeDisplayData, RenderParams } from 'sigma/types'
-import { floatColor } from 'sigma/utils'
+import type { NodePrimitives } from 'sigma/primitives'
+import type { FragmentLayer, SDFShape } from 'sigma/rendering'
 
-/** The shapes a note is drawn in, numbered as the shader reads them. */
-export const SHAPES = { circle: 0, diamond: 2, ring: 3, square: 1 } as const
+/** The shapes a note is drawn in, by the name each is registered under. A ring is a circle drawn outlined. */
+export const SHAPES = {
+  circle: 'helixCircle',
+  diamond: 'helixDiamond',
+  ring: 'helixCircle',
+  square: 'helixSquare',
+} as const
 
 /** How heavily a note is drawn, numbered as the shader reads them. */
 export const EMPHASES = { outlined: 1, solid: 0, subtle: 2 } as const
@@ -11,133 +15,106 @@ export const EMPHASES = { outlined: 1, solid: 0, subtle: 2 } as const
 /** What a note is made of, numbered as the shader reads them. */
 export const MATERIALS = { flat: 0, frosted: 2, glass: 1, mark: 3 } as const
 
-/** What the node program reads off a note, beyond what Sigma gives every note. */
+/**
+ * How much larger a diamond is drawn than its size says. **Sigma draws a note
+ * in a square as wide as the note**, and a diamond's tips are its widest
+ * points: one that reached past the square, as Helix's did at 1.22 radii, was
+ * cut off there. So the diamond is drawn to the square's edge and the note
+ * made larger by the reach it lost, and it covers what it covered before.
+ */
+export const DIAMOND = 0.86 / Math.SQRT1_2
+
+/** What the node layer reads off a note, beyond what Sigma gives every note. */
 export interface HelixNodeData {
   /** `EMPHASES`. */
   emphasisCode?: number
-  /** How strongly the note glows, from 0 to 1: the selected note's halo. */
-  glow?: number
   /** `MATERIALS`. */
   materialCode?: number
-  /** `SHAPES`. */
-  shapeCode?: number
 }
+
+/*
+ * Each shape's signed distance, in radii, as the one program drew them before
+ * Sigma 4: below zero inside. Sigma passes `size` a hair under 1, the room it
+ * keeps for the edge's smoothing.
+ */
+const circle: SDFShape = {
+  glsl: /* glsl */ `
+float sdf_helixCircle(vec2 uv, float size) {
+  return length(uv) - size;
+}
+`,
+  name: 'helixCircle',
+  uniforms: [],
+}
+
+const square: SDFShape = {
+  glsl: /* glsl */ `
+float sdf_helixSquare(vec2 uv, float size) {
+  vec2 q = abs(uv) - vec2(0.7 * size);
+  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - 0.18 * size;
+}
+`,
+  /* The middle of a side over the far point of a rounded corner. */
+  inradiusFactor: 0.88 / (0.7 * Math.SQRT2 + 0.18),
+  name: 'helixSquare',
+  uniforms: [],
+}
+
+const diamond: SDFShape = {
+  glsl: /* glsl */ `
+float sdf_helixDiamond(vec2 uv, float size) {
+  return (abs(uv.x) + abs(uv.y)) * 0.7071 - 0.7071 * size;
+}
+`,
+  inradiusFactor: Math.SQRT1_2,
+  name: 'helixDiamond',
+  uniforms: [],
+}
+
+const { FLOAT, UNSIGNED_BYTE } = WebGL2RenderingContext
 
 /**
- * How far past the note the triangle it is drawn in reaches, as a share of
- * its radius, which is the room its glow has.
+ * A note's emphasis and its material, in its color, inside the shape Sigma has
+ * already cut it to. The glow a selected note and a mark have is outside the
+ * shape, which Sigma does not draw for a note's own pass, so it is the
+ * backdrop's: see `sigma-options.ts`.
  */
-const REACH = 3.4
+const look: FragmentLayer = {
+  attributes: [
+    { name: 'helixColor', normalized: true, size: 4, source: 'color', type: UNSIGNED_BYTE },
+    { name: 'helixEmphasis', size: 1, source: 'emphasisCode', type: FLOAT },
+    { name: 'helixMaterial', size: 1, source: 'materialCode', type: FLOAT },
+  ],
+  glsl: /* glsl */ `
+vec4 layer_helix(vec4 v_helixColor, float v_helixEmphasis, float v_helixMaterial) {
+  vec2 p = context.uv;
+  float d = context.sdf;
+  float aa = context.aaWidth;
 
-// language=GLSL
-const VERTEX = /* glsl */ `
-attribute vec4 a_id;
-attribute vec4 a_color;
-attribute vec2 a_position;
-attribute float a_size;
-attribute float a_shape;
-attribute float a_emphasis;
-attribute float a_material;
-attribute float a_glow;
-attribute float a_angle;
-
-uniform mat3 u_matrix;
-uniform float u_sizeRatio;
-uniform float u_correctionRatio;
-
-varying vec4 v_color;
-varying vec2 v_diffVector;
-varying float v_radius;
-varying float v_shape;
-varying float v_emphasis;
-varying float v_material;
-varying float v_glow;
-
-const float bias = 255.0 / 254.0;
-
-void main() {
-  float size = a_size * u_correctionRatio / u_sizeRatio * 4.0;
-  vec2 diffVector = size * ${REACH.toFixed(2)} * vec2(cos(a_angle), sin(a_angle));
-  gl_Position = vec4((u_matrix * vec3(a_position + diffVector, 1)).xy, 0, 1);
-  v_diffVector = diffVector;
-  v_radius = size / 2.0;
-  v_shape = a_shape;
-  v_emphasis = a_emphasis;
-  v_material = a_material;
-  v_glow = a_glow;
-  #ifdef PICKING_MODE
-  v_color = a_id;
-  #else
-  v_color = a_color;
-  #endif
-  v_color.a *= bias;
-}
-`
-
-// language=GLSL
-const FRAGMENT = /* glsl */ `
-precision highp float;
-
-varying vec4 v_color;
-varying vec2 v_diffVector;
-varying float v_radius;
-varying float v_shape;
-varying float v_emphasis;
-varying float v_material;
-varying float v_glow;
-
-uniform float u_correctionRatio;
-
-/* How far a point is outside the note's shape, in radii: below zero inside. */
-float outside(vec2 p, float shape) {
-  if (shape > 0.5 && shape < 1.5) {
-    vec2 q = abs(p) - vec2(0.7);
-    return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - 0.18;
-  }
-  if (shape > 1.5 && shape < 2.5) {
-    return (abs(p.x) + abs(p.y)) * 0.7071 - 0.86;
-  }
-  return length(p) - 1.0;
-}
-
-void main(void) {
-  vec2 p = v_diffVector / v_radius;
-  float d = outside(p, v_shape);
-
-  #ifdef PICKING_MODE
-  if (d > 0.0) discard;
-  gl_FragColor = v_color;
-  #else
-  float aa = u_correctionRatio * 2.0 / v_radius;
-  float inside = 1.0 - smoothstep(-aa, 0.0, d);
-
-  /* A ring is a circle drawn outlined, whatever its emphasis says. */
-  float emphasis = v_shape > 2.5 ? 1.0 : v_emphasis;
   float edge = smoothstep(-0.32 - aa, -0.32, d);
-  float fill = emphasis > 1.5 ? mix(0.3, 1.0, edge) : emphasis > 0.5 ? edge : 1.0;
+  float fill = v_helixEmphasis > 1.5 ? mix(0.3, 1.0, edge) : v_helixEmphasis > 0.5 ? edge : 1.0;
 
-  vec3 color = v_color.rgb;
+  vec3 color = v_helixColor.rgb;
   float alpha = 1.0;
   /* How large the note is drawn, in pixels: a highlight that suits a hub is
      a speck of noise on a leaf, so the detail grows in with the size. */
-  float drawn = smoothstep(4.0, 14.0, v_radius / u_correctionRatio);
+  float drawn = smoothstep(4.0, 14.0, 1.0 / context.pixelToUV);
   /* Lit from above on the left, as every surface here is. */
   float lit = clamp(0.5 + 0.5 * dot(normalize(vec2(-0.45, 0.9)), p), 0.0, 1.0);
   /* A fine rim a shade darker, so notes that touch stay two. */
   float rim = smoothstep(-0.2 - aa, -0.2, d);
-  if (v_material > 0.5 && v_material < 1.5) {
+  if (v_helixMaterial > 0.5 && v_helixMaterial < 1.5) {
     /* Glass: shaded like a sphere, a highlight, and light at its rim. */
     color *= mix(0.72, 1.12, lit);
     float highlight = exp(-pow(length(p - vec2(-0.32, 0.38)) / 0.26, 2.0));
     color = mix(color, vec3(1.0), highlight * mix(0.25, 0.6, drawn));
     color = mix(color, vec3(1.0), rim * 0.22 * drawn);
     alpha = 0.94;
-  } else if (v_material > 2.5) {
-    /* Mark: a flat dot of its color, as a marker on a table is. No fall of
-       light and no highlight; what says it is a mark is the ring and the glow
-       drawn around it below. */
+  } else if (v_helixMaterial > 2.5) {
+    /* Mark: a flat dot of its color, as a marker on a table is. What says it
+       is a mark is the band and the light its backdrop draws around it. */
     alpha = 1.0;
-  } else if (v_material > 1.5) {
+  } else if (v_helixMaterial > 1.5) {
     /* Frosted: a milky body, a soft fall of light, and no sharp highlight. */
     color = mix(color * mix(0.86, 1.06, lit), vec3(1.0), 0.16);
     color = mix(color, vec3(1.0), rim * 0.14);
@@ -151,85 +128,21 @@ void main(void) {
     color = mix(color, color * 0.72, rim * 0.6);
   }
 
-  float body = inside * fill * alpha * v_color.a;
-  /* The glow, outside the shape: a crisp ring just clear of the edge and a
-     soft light falling away beyond it, both in the note's own color. */
-  float reach = ${(REACH - 1).toFixed(2)};
-  float ring = 1.0 - smoothstep(0.0, 0.07 + aa, abs(d - 0.32));
-  /* The light falls away more slowly and further than it did, so the
-     selected note sits in a bloom rather than wearing a ring: the halo the
-     aura gives the stars its pointer gathers. */
-  float falloff = exp(-d * 1.7) * (1.0 - smoothstep(reach * 0.8, reach, d));
-  float halo = v_glow * step(0.0, d) * clamp(ring * 0.8 + falloff * 0.85, 0.0, 1.0) * v_color.a;
-  /* A mark's own halo, selected or not: a band of its color at a fifth just
-     outside the dot, and a soft glow beyond, the way a marker on a table
-     carries a ring of its color and a light around it. */
-  float band = (1.0 - smoothstep(0.34, 0.42, d)) * 0.22;
-  float light = exp(-d * 2.0) * (1.0 - smoothstep(reach * 0.8, reach, d)) * 0.3;
-  float mark = v_material > 2.5 ? step(0.0, d) * (band + light) * v_color.a : 0.0;
-  halo = clamp(halo + mark, 0.0, 1.0);
-  /* Premultiplied, as Sigma blends: the body over its glow. */
-  gl_FragColor = vec4(color * body + v_color.rgb * halo * (1.0 - body), body + halo * (1.0 - body));
-  #endif
+  return vec4(color, fill * alpha * v_helixColor.a);
 }
-`
-
-const { FLOAT, UNSIGNED_BYTE } = WebGLRenderingContext
-
-const UNIFORMS = ['u_sizeRatio', 'u_correctionRatio', 'u_matrix'] as const
+`,
+  name: 'helix',
+  uniforms: [],
+}
 
 /**
- * Draws a note in its shape, its emphasis and its material, with a glow where
- * it is selected: one triangle a note, as Sigma's own circle is, cut to the
- * shape where it is drawn. Pressing reads the shape and not the glow, so a
- * press beside a note is not a press on it.
+ * The notes' primitives: Helix's shapes and the layer that draws a note's
+ * emphasis and material. Pressing reads the shape, so a press beside a note is
+ * not a press on it.
  */
-export class HelixNodeProgram extends NodeProgram<(typeof UNIFORMS)[number]> {
-  getDefinition() {
-    return {
-      ATTRIBUTES: [
-        { name: 'a_position', size: 2, type: FLOAT },
-        { name: 'a_size', size: 1, type: FLOAT },
-        { name: 'a_color', normalized: true, size: 4, type: UNSIGNED_BYTE },
-        { name: 'a_id', normalized: true, size: 4, type: UNSIGNED_BYTE },
-        { name: 'a_shape', size: 1, type: FLOAT },
-        { name: 'a_emphasis', size: 1, type: FLOAT },
-        { name: 'a_material', size: 1, type: FLOAT },
-        { name: 'a_glow', size: 1, type: FLOAT },
-      ],
-      CONSTANT_ATTRIBUTES: [{ name: 'a_angle', size: 1, type: FLOAT }],
-      CONSTANT_DATA: [[0], [(2 * Math.PI) / 3], [(4 * Math.PI) / 3]],
-      FRAGMENT_SHADER_SOURCE: FRAGMENT,
-      METHOD: WebGLRenderingContext.TRIANGLES,
-      UNIFORMS,
-      VERTEX_SHADER_SOURCE: VERTEX,
-      VERTICES: 3,
-    }
-  }
-
-  processVisibleItem(nodeIndex: number, startIndex: number, data: NodeDisplayData & HelixNodeData) {
-    const array = this.array
-    let at = startIndex
-    array[at++] = data.x
-    array[at++] = data.y
-    array[at++] = data.size
-    array[at++] = floatColor(data.color)
-    array[at++] = nodeIndex
-    array[at++] = data.shapeCode ?? SHAPES.circle
-    array[at++] = data.emphasisCode ?? EMPHASES.solid
-    array[at++] = data.materialCode ?? MATERIALS.flat
-    array[at] = data.glow ?? 0
-  }
-
-  setUniforms(
-    params: RenderParams,
-    {
-      gl,
-      uniformLocations,
-    }: { gl: WebGLRenderingContext; uniformLocations: Record<string, WebGLUniformLocation> },
-  ) {
-    gl.uniform1f(uniformLocations.u_correctionRatio as WebGLUniformLocation, params.correctionRatio)
-    gl.uniform1f(uniformLocations.u_sizeRatio as WebGLUniformLocation, params.sizeRatio)
-    gl.uniformMatrix3fv(uniformLocations.u_matrix as WebGLUniformLocation, false, params.matrix)
-  }
-}
+export const nodePrimitives = (): NodePrimitives => ({
+  /* The glow's pass, whose look each note's display data says. */
+  backdrop: {},
+  layers: [look],
+  shapes: [circle, square, diamond],
+})

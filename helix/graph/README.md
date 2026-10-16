@@ -13,7 +13,7 @@ The elements themselves are on the
 
 ```js
 import { connectGraph } from '@fusion.dev/helix-graph'
-import { sigmaDriver } from '@fusion.dev/helix-graph/sigma'
+import { sigmaDriver, sigmaOptions } from '@fusion.dev/helix-graph/sigma'
 import Graph from 'graphology'
 import forceAtlas2 from 'graphology-layout-forceatlas2'
 import FA2Layout from 'graphology-layout-forceatlas2/worker'
@@ -25,7 +25,7 @@ frame.links = links // [{ source, target, label }]
 
 // The box the drawing goes in: a <div> inside the frame, sized by it.
 const box = frame.querySelector('div')
-const sigma = new Sigma(new Graph(), box)
+const sigma = new Sigma(new Graph(), box, sigmaOptions())
 const connection = connectGraph(
   frame,
   sigmaDriver(sigma, {
@@ -408,7 +408,7 @@ connectGraph(frame, isometricDriver(frame.querySelector('div')))
 | Import | What |
 |---|---|
 | `@fusion.dev/helix-graph` | `communitiesOf`, `connectGraph`, `diffGraph`, `fitToStencil`, `graphColorsFrom`, `groupByCommunity`, `linkKey`, `seedPositions`, and the types `ConnectGraphOptions`, `DrawnLink`, `DrawnNode`, `GraphChanges`, `GraphColors`, `GraphConnection`, `GraphDriver`, `GraphGroup`, `GraphLooks`, `GraphPoint`, `GraphReach`, `GraphStencil`, `GraphTone`, `GroupByCommunityOptions`, `LinkLook`, `NodeLook`, `SeedLink`, `SeedNode`, `ShapeField` and `StencilFrame` |
-| `@fusion.dev/helix-graph/sigma` | `sigmaDriver(sigma, options)`, and the types `SigmaDriverOptions`, `SigmaGraph`, `SigmaLayout` and `SigmaRenderer` |
+| `@fusion.dev/helix-graph/sigma` | `sigmaDriver(sigma, options)`, `sigmaOptions(overrides)`, the options to make the renderer with, and the types `HelixEdgeData`, `SigmaDriverOptions`, `SigmaGraph`, `SigmaLayout`, `SigmaOptionsOverrides` and `SigmaRenderer` |
 | `@fusion.dev/helix-graph/cosmos` | `cosmosDriver(graph, box, options)`, and the types `CosmosDriverOptions` and `CosmosGraph` |
 | `@fusion.dev/helix-graph/three` | `threeDriver(box, options)`, and the type `ThreeDriverOptions` |
 | `@fusion.dev/helix-graph/isometric` | `isometricDriver(box, options)`, `ISOMETRIC`, the camera it starts from, and the types `Camera`, `IsometricDriver` and `IsometricDriverOptions` |
@@ -420,8 +420,15 @@ connectGraph(frame, isometricDriver(frame.querySelector('div')))
 driver types its renderer by the calls it makes on it, so a page brings
 whichever version it has, and a spec holds those shapes to the real classes,
 so a renamed method fails a typecheck here before it reaches a page. `@fusion.dev/helix-graph/sigma` imports
-Sigma's rendering module for the program that draws the notes, which is why
-Sigma 3 is a peer dependency.
+Sigma's rendering module for the line and arrowhead the links are drawn with,
+which is why Sigma 4 is a peer dependency.
+
+**Make the renderer with `sigmaOptions()`.** Sigma 4 takes the programs a
+note and a link are drawn with, and the reducers that draw them as the frame
+says, only when it is made, so `sigmaDriver` refuses a renderer made without
+them. `sigmaOptions({ settings })` sets Sigma's own settings over Helix's.
+Sigma draws no names: the driver names notes over the drawing, as it names
+groups.
 
 | `connectGraph` option | Default | What else it takes |
 |---|---|---|

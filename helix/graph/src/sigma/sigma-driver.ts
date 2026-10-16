@@ -1,25 +1,24 @@
-import { isRtl } from '@fusion.dev/helix-core'
 import type {
   DrawnLink,
   DrawnNode,
   GraphChanges,
   GraphDriver,
 } from '../connect-graph/connect-graph.js'
-import type { GraphLooks, NodeLook } from '../connect-graph/looks.js'
+import { type GraphLooks, type NodeLook, rgbOf } from '../connect-graph/looks.js'
 import type { GraphPoint } from '../connect-graph/seed.js'
 import { pixelsOf } from '../connect-graph/sizes.js'
 import {
-  type Box,
-  chromeOver,
-  clearOf,
   ease,
   gesturesHeld,
   groupsOver,
-  nameStart,
+  type Named,
+  namesOver,
+  type OnScreen,
   signalsOver,
 } from '../overlay/overlay.js'
-import { HelixEdgeProgram } from './edge-program.js'
-import { EMPHASES, HelixNodeProgram, MATERIALS, SHAPES } from './node-program.js'
+import { SPREAD } from './edge-program.js'
+import { DIAMOND, EMPHASES, MATERIALS, SHAPES } from './node-program.js'
+import { reducersOf } from './sigma-options.js'
 
 /**
  * A graphology graph, as far as the driver calls it. Each member is
@@ -48,6 +47,8 @@ export interface SigmaCamera {
     options?: { duration?: number },
   ): unknown
   getState(): { angle: number; ratio: number; x: number; y: number }
+  off(type: 'updated', listener: () => void): unknown
+  on(type: 'updated', listener: () => void): unknown
   setState(state: { ratio?: number; x?: number; y?: number }): unknown
 }
 
@@ -63,61 +64,32 @@ export interface SigmaRenderer<G extends SigmaGraph = SigmaGraph> {
   framedGraphToViewport(point: { x: number; y: number }): { x: number; y: number }
   getNodeDisplayData(
     node: string,
-  ): { hidden?: boolean; size: number; x: number; y: number } | undefined
+  ): { size: number; visibility?: string; x: number; y: number } | undefined
+  /** The primitives the renderer was made with, which say whether `sigmaOptions()` made it. */
+  getPrimitives(): { nodes?: object | undefined }
   off(
     type: 'clickNode' | 'enterNode' | 'leaveNode',
     listener: (payload: { node: string }) => void,
   ): unknown
-  off(type: 'afterRender' | 'beforeRender' | 'clickStage', listener: () => void): unknown
+  off(type: 'afterRender' | 'clickStage', listener: () => void): unknown
   on(
     type: 'clickNode' | 'enterNode' | 'leaveNode',
     listener: (payload: { node: string }) => void,
   ): unknown
-  on(type: 'afterRender' | 'beforeRender' | 'clickStage', listener: () => void): unknown
+  on(type: 'afterRender' | 'clickStage', listener: () => void): unknown
   getSetting(name: SigmaSetting): unknown
   refresh(options?: { partialGraph?: { edges?: string[]; nodes?: string[] } }): unknown
   resize(force?: boolean): unknown
   scaleSize(size?: number): number
-  setSetting(name: SigmaSetting, value: unknown): unknown
+  setSetting(name: SigmaSetting, value: boolean): unknown
   viewportToFramedGraph(point: { x: number; y: number }): { x: number; y: number }
 }
 
 /** The settings the driver sets, and puts back as they were when it stops. */
-type SigmaSetting =
-  | 'defaultDrawNodeHover'
-  | 'defaultDrawNodeLabel'
-  | 'defaultEdgeType'
-  | 'edgeProgramClasses'
-  | 'edgeReducer'
-  | 'enableCameraPanning'
-  | 'enableCameraZooming'
-  | 'labelColor'
-  | 'labelFont'
-  | 'labelGridCellSize'
-  | 'labelRenderedSizeThreshold'
-  | 'labelSize'
-  | 'minEdgeThickness'
-  | 'nodeProgramClasses'
-  | 'nodeReducer'
+type SigmaSetting = 'enableCameraPanning' | 'enableCameraZooming'
 
 /** Every setting the driver sets, to be read before it does and put back when it stops. */
-const SETTINGS: readonly SigmaSetting[] = [
-  'defaultDrawNodeHover',
-  'defaultDrawNodeLabel',
-  'defaultEdgeType',
-  'edgeProgramClasses',
-  'edgeReducer',
-  'enableCameraPanning',
-  'enableCameraZooming',
-  'labelColor',
-  'labelFont',
-  'labelGridCellSize',
-  'labelRenderedSizeThreshold',
-  'labelSize',
-  'minEdgeThickness',
-  'nodeProgramClasses',
-  'nodeReducer',
-]
+const SETTINGS: readonly SigmaSetting[] = ['enableCameraPanning', 'enableCameraZooming']
 
 /** A layout that runs over a graphology graph until it is stopped, as ForceAtlas2's worker does. */
 export interface SigmaLayout {
@@ -203,107 +175,33 @@ const HELD = 2
 /** How long a layout may go without moving anything before it counts as having nothing to do, in milliseconds. */
 const IDLE = 2000
 
-/** What Sigma hands a hover drawing: where the note is drawn, its size and its name. */
-interface HoverData {
-  label?: string | null | undefined
-  size: number
-  x: number
-  y: number
-}
-
-/**
- * The name of the note the pointer is over, on the theme's overlay in the
- * theme's ink.
- *
- * **Sigma's own is a white box**, which in a dark theme held white letters on
- * white. This draws the box the way a tooltip is drawn here: the overlay
- * surface, a soft shadow, a small radius.
- */
-const hoverOf =
-  (looks: GraphLooks, rightToLeft: () => boolean) =>
-  (
-    context: CanvasRenderingContext2D,
-    data: HoverData,
-    settings: { labelFont: string; labelSize: number; labelWeight: string },
-  ): void => {
-    if (!data.label) {
-      return
-    }
-    const size = settings.labelSize
-    context.font = `${settings.labelWeight} ${size}px ${settings.labelFont}`
-    const width = context.measureText(data.label).width
-    /* After the note in reading order: to its left on a right-to-left page. */
-    const x = rightToLeft() ? data.x - data.size - 2 - width : data.x + data.size + 2
-    const height = size + 8
-    context.save()
-    context.shadowBlur = 8
-    context.shadowColor = 'rgba(0, 0, 0, 0.25)'
-    context.fillStyle = looks.overlay
-    context.beginPath()
-    context.roundRect(x - 4, data.y - height / 2, width + 8, height, 4)
-    context.fill()
-    context.restore()
-    context.fillStyle = looks.ink
-    /* From its left edge, whichever way the page reads: see `nameStart`. */
-    context.textAlign = 'left'
-    context.fillText(data.label, x, data.y + size / 3)
-  }
-
 /** How long a new note takes to grow to its size, and a moved one to glide to its place, in milliseconds. */
 const GROW = 300
 
+/** A color the looks give, `rgb()`, at an opacity from 0 to 1. */
+const faded = (color: string, opacity: number): string => {
+  const [red, green, blue] = rgbOf(color)
+  return `rgba(${red}, ${green}, ${blue}, ${opacity})`
+}
+
 /**
- * A note's name, ringed in the ground's color so it reads over the links it
- * crosses, and heavier on a larger note, so a hub's name leads.
+ * The screen's device pixels a CSS pixel, which a backdrop's padding and blur
+ * are given in. **Sigma 4.0.3's backdrop adds them to a radius it measures in
+ * device pixels**, unscaled, so on a screen of two device pixels a CSS pixel
+ * a ring sat at half its distance and a glow spread half as far. Its quad is
+ * sized from the same values scaled, so scaled here it is only larger.
  */
-const labelOf =
-  (
-    looks: GraphLooks,
-    claim: (box: Box, must: boolean) => boolean,
-    start: (at: { radius: number; x: number }, width: number, box: (from: number) => Box) => number,
-  ) =>
-  (
-    context: CanvasRenderingContext2D,
-    data: HoverData & { forceLabel?: boolean; strong?: boolean },
-    settings: { labelFont: string; labelSize: number },
-  ): void => {
-    if (!data.label) {
-      return
-    }
-    /* **Quiet at rest and full where the reader is looking**: a name the
-       graph shows unasked is the muted ink, a step smaller, and the selected
-       note's and its neighbors' are the ink itself. */
-    const strong = data.strong === true
-    const size = strong ? settings.labelSize : settings.labelSize - 1
-    context.font = `${strong ? 600 : 500} ${size}px ${settings.labelFont}`
-    const width = context.measureText(data.label).width
-    const y = data.y + size / 3
-    const boxAt = (from: number): Box => ({
-      bottom: y + 4,
-      left: from - 2,
-      right: from + width + 2,
-      top: y - size,
-    })
-    /* After the note, or before it where after it would run under the
-       frame's controls or off the drawing. */
-    const x = start({ radius: data.size, x: data.x }, width, boxAt)
-    /* **A name that would cover one already drawn is left out**, the
-       selected note's excepted, which is always drawn: Sigma's grid keeps
-       one name a cell, and two notes either side of a cell's edge drew their
-       names over each other. */
-    const box = boxAt(x)
-    if (!claim(box, data.forceLabel === true)) {
-      return
-    }
-    context.lineJoin = 'round'
-    context.lineWidth = 3
-    context.strokeStyle = looks.ground
-    /* From its left edge, whichever way the page reads: see `nameStart`. */
-    context.textAlign = 'left'
-    context.strokeText(data.label, x, y)
-    context.fillStyle = strong ? looks.ink : looks.quiet
-    context.fillText(data.label, x, y)
-  }
+const devicePixels = (): number =>
+  typeof devicePixelRatio === 'number' && devicePixelRatio > 0 ? devicePixelRatio : 1
+
+/**
+ * **Sigma 3's name grid, kept**: the width of the cell a name holds, one name
+ * a cell, the larger note's. Wide enough for a name where a graph names its
+ * notes on hover and at its hubs, so two names never share a line, and fine
+ * where it names every note it can, since the overlay keeps names off each
+ * other itself, and a grid as wide as a name left one name in each cell.
+ */
+const cellOf = (labels: 'all' | 'hover' | 'hubs'): number => (labels === 'all' ? 8 : 130)
 
 /** How large a note is drawn, in pixels, for `labels: 'hubs'` to name it at rest. */
 const HUB = 6.5
@@ -318,13 +216,69 @@ const positionsOf = (graph: SigmaGraph): Map<string, GraphPoint> => {
 }
 
 /**
+ * The notes to name this frame, in the order the overlay makes room for them:
+ * the ones that must be named first, the selected note, the one under the
+ * pointer and the one the keys are on, then the larger notes, as Sigma's grid
+ * kept the larger note's name. Named as `labels` says: the selected note's
+ * neighbors where there is room, and the rest only as the page asked.
+ */
+export const namedOf = (
+  graph: SigmaGraph,
+  looks: GraphLooks,
+  labels: 'all' | 'hover' | 'hubs',
+  hovered: string | undefined,
+  onScreen: OnScreen,
+): Named[] => {
+  const asked: (Named & { size: number; x: number; y: number })[] = []
+  graph.forEachNode((id, attributes) => {
+    const look = looks.node(id)
+    const size = Number(attributes.size)
+    /* The note the keys are on in the frame's list named as the note under
+       the pointer is, so a reader moving by the keys sees it. */
+    const must = look.label === 'always' || id === hovered || look.keyed === true
+    const named =
+      must ||
+      (look.label === 'room' &&
+        (look.raised || labels === 'all' || (labels === 'hubs' && size >= HUB)))
+    const name = attributes.label
+    if (!named || typeof name !== 'string' || name === '') {
+      return
+    }
+    const at = onScreen(id)
+    if (at) {
+      asked.push({ id, must, name, size, strong: must || look.raised, x: at.x, y: at.y })
+    }
+  })
+  asked.sort((one, other) => Number(other.must) - Number(one.must) || other.size - one.size)
+  /* One name a cell, the first, beside every name that must be drawn, which
+     holds no cell: Sigma's grid drew those apart from the rest. */
+  const cell = cellOf(labels)
+  const cells = new Set<string>()
+  return asked.flatMap(({ id, must, name, strong, x, y }) => {
+    const at = `${Math.floor(x / cell)}:${Math.floor(y / cell)}`
+    if (!must) {
+      if (cells.has(at)) {
+        return []
+      }
+      cells.add(at)
+    }
+    return [{ id, must, name, strong }]
+  })
+}
+
+/**
  * Drives Sigma.js for a Graph frame. Make the renderer with an empty
- * graphology graph and pass it here, and `connectGraph` fills it:
+ * graphology graph and `sigmaOptions()`, pass it here, and `connectGraph`
+ * fills it:
  *
  * ```js
- * const sigma = new Sigma(new Graph(), container)
+ * const sigma = new Sigma(new Graph(), container, sigmaOptions())
  * connectGraph(frame, sigmaDriver(sigma, { layout }))
  * ```
+ *
+ * **`sigmaOptions()` is what draws the notes and links as Helix draws them.**
+ * Sigma 4 takes its programs and reducers only when it is made, so the driver
+ * cannot add them to a renderer made without them, and refuses one.
  *
  * **Neither Sigma nor graphology is a dependency.** The driver types the
  * renderer by the calls it makes on it, so a page brings whichever version it
@@ -335,24 +289,18 @@ export const sigmaDriver = <G extends SigmaGraph>(
   sigma: SigmaRenderer<G>,
   options: SigmaDriverOptions<G> = {},
 ): GraphDriver => {
+  const reducers = reducersOf(sigma)
+  if (!reducers) {
+    throw new TypeError(
+      'sigmaDriver: make the renderer with sigmaOptions(), as new Sigma(graph, box, sigmaOptions()). Sigma 4 takes its programs only when it is made.',
+    )
+  }
   const graph = sigma.getGraph()
   const container = sigma.getContainer()
   const camera = sigma.getCamera()
 
   /* Every setting the driver changes, as the page left it, put back when it stops. */
   const before = new Map(SETTINGS.map((name) => [name, sigma.getSetting(name)]))
-
-  /* **The notes are drawn by Helix's own program**, which cuts each to its
-     shape, draws its emphasis and its material, and lights its glow: added
-     beside the page's programs and taken away again when the driver stops. */
-  const programs = before.get('nodeProgramClasses') as Record<string, unknown> | undefined
-  sigma.setSetting('nodeProgramClasses', { ...programs, helix: HelixNodeProgram })
-  /* And the links: a line that reads in its direction, glowing where the
-     selection lights it, with a head where it is strong. The page's own edge
-     programs stay registered beside it, under their own names. */
-  const edgePrograms = before.get('edgeProgramClasses') as Record<string, unknown> | undefined
-  sigma.setSetting('edgeProgramClasses', { ...edgePrograms, helix: HelixEdgeProgram })
-  sigma.setSetting('defaultEdgeType', 'helix')
 
   /* **Its own box, and not only the window.** Sigma measures its container
      when the window resizes, and a frame filling the screen, or settling its
@@ -395,40 +343,47 @@ export const sigmaDriver = <G extends SigmaGraph>(
   sigma.on('leaveNode', leave)
 
   const naming = options.labels ?? 'hover'
-  /* The boxes the names drawn this frame take, cleared as each frame starts. */
-  let taken: Box[] = []
-  /** Takes a name's box where it is free, or where the name must be drawn anyway, and says whether it did. */
-  const claim = (box: Box, must: boolean): boolean => {
-    const free = clearOf(box, taken)
-    if (free || must) {
-      taken.push(box)
-    }
-    return free || must
-  }
-  /* Whether the page reads right to left, read once a frame for every name drawn in it. */
-  let rightToLeft = false
-  const clear = (): void => {
-    /* The frame's controls first, so no name is drawn under them. */
-    taken = chromeOver(container)
-    rightToLeft = isRtl(container)
-  }
-  sigma.on('beforeRender', clear)
   const held = gesturesHeld(container)
 
   /** Where a note is on screen, and how large, or nothing where it is not drawn. */
   const onScreen = (id: string): { radius: number; x: number; y: number } | undefined => {
     const data = sigma.getNodeDisplayData(id)
-    if (!data || data.hidden) {
+    if (!data || data.visibility === 'hidden') {
       return undefined
     }
     const at = sigma.framedGraphToViewport(data)
     return { radius: sigma.scaleSize(data.size), x: at.x, y: at.y }
   }
   const signals = signalsOver(container, onScreen)
-  /* Group names keep clear of the notes' names Sigma drew this frame. */
-  const groups = groupsOver(container, onScreen, () => taken)
-  /* Group names follow the view: drawn again after every frame Sigma draws. */
-  sigma.on('afterRender', groups.draw)
+
+  /* **Names over the drawing**, which Sigma 4 draws in WebGL with no say in
+     where a name goes: the selected note's always, the note under the
+     pointer's, and the rest as `labels` asks, where there is room. */
+  const names = namesOver(container, onScreen)
+  let looks: GraphLooks | undefined
+  const drawNames = (): void => {
+    if (looks) {
+      names.draw(looks, namedOf(graph, looks, naming, hovered, onScreen))
+    }
+  }
+  /* Group names keep clear of the notes' names, drawn first. */
+  const groups = groupsOver(container, onScreen, () => names.boxes())
+  /* Names follow the view: drawn again after every frame Sigma draws. */
+  const redraw = (): void => {
+    drawNames()
+    groups.draw()
+  }
+  sigma.on('afterRender', redraw)
+
+  /* The notes drawn with a ring or a glow, which are measured in their radius
+     on screen, and so drawn again for their own when the view zooms. */
+  const ringed = new Set<string>()
+  const rezoomed = (): void => {
+    if (ringed.size > 0) {
+      sigma.refresh({ partialGraph: { nodes: [...ringed].filter((id) => graph.hasNode(id)) } })
+    }
+  }
+  camera.on('updated', rezoomed)
 
   /* The frame a glide or a growth waits on, canceled when the driver stops. */
   let gliding = 0
@@ -540,88 +495,113 @@ export const sigmaDriver = <G extends SigmaGraph>(
         groups.set(next)
       }
     },
-    look: (looks: GraphLooks) => {
-      signals.look(looks)
-      groups.look(looks)
-      sigma.setSetting('labelColor', { color: looks.ink })
-      sigma.setSetting('labelSize', 13)
-      /* Fine lines, which a graph of thousands needs: Sigma's floor drew every
-         link nearly two pixels wide. */
-      sigma.setSetting('minEdgeThickness', 0.8)
-      sigma.setSetting('labelFont', looks.font)
-      /* **Which notes are named is the reducer's**, by `labels`, and Sigma's
-         grid keeps the names it is given apart, the larger note's first. */
-      sigma.setSetting('labelRenderedSizeThreshold', 0)
-      /* **Cells wide enough for a name**, so two names never share a line, for
-         a graph that names its notes on hover and at its hubs. Fine where it
-         names every note it can: the driver keeps names off each other
-         itself, and a grid as wide as a name left one name in each cell. */
-      sigma.setSetting('labelGridCellSize', naming === 'all' ? 8 : 130)
-      sigma.setSetting(
-        'defaultDrawNodeLabel',
-        labelOf(looks, claim, (at, width, box) =>
-          nameStart(at, width, box, taken, container.clientWidth, rightToLeft),
-        ),
-      )
-      sigma.setSetting(
-        'defaultDrawNodeHover',
-        hoverOf(looks, () => rightToLeft),
-      )
-      sigma.setSetting('nodeReducer', (node: string, data: Record<string, unknown>) => {
-        const look = looks.node(node)
+    look: (next: GraphLooks) => {
+      looks = next
+      signals.look(next)
+      groups.look(next)
+      reducers.node = (node, attributes) => {
+        const look = next.node(node)
+        const density = devicePixels()
+        const shape = look.shape ?? options.shape ?? 'circle'
+        const material = look.material ?? options.material ?? 'flat'
         /* The selected note half again its size, so it reads as the one, and
-           its neighbors a quarter, so where two names would collide Sigma,
-           which keeps the larger note's, keeps theirs. */
+           its neighbors a quarter, so where two names would collide the
+           larger note's, which is theirs, is kept. */
         const grown = look.selected ? 1.5 : look.raised ? 1.25 : 1
-        /* Named as `labels` says: always the selected note, its neighbors
-           where there is room, and the rest only as the page asked. */
-        const named =
-          look.label === 'always' ||
-          (look.label === 'room' &&
-            (look.raised ||
-              naming === 'all' ||
-              (naming === 'hubs' && typeof data.size === 'number' && data.size >= HUB)))
+        const size = Number(attributes.size) * grown
+        /* The note's radius on screen now, which the ring and the glow are
+           measured in, so they keep their place around it at any zoom. */
+        const radius = sigma.scaleSize(size) * density
+        /* **The glow is the backdrop's**, outside the note, where Sigma draws
+           nothing of a note's own pass: a crisp ring clear of the edge, with
+           the ground showing between, and a soft light falling away beyond it
+           where the note is selected, and a mark's band of its color and faint
+           light at rest, both in the note's own color. In pixels, from the
+           note's size. */
+        const glow =
+          look.glow > 0
+            ? {
+                backdropBorderColor: faded(look.color, 0.8 * look.glow),
+                /* As wide as Sigma 3's ring, a seventh of the radius, its
+                   middle a third of the radius clear of the edge. */
+                backdropBorderWidth: Math.max(radius * 0.14, 1.5 * density),
+                backdropColor: next.ground,
+                backdropPadding: radius * 0.32 + Math.max(radius * 0.07, 0.75 * density),
+                backdropShadowBlur: radius * 2,
+                backdropShadowColor: faded(look.color, 0.6 * look.glow),
+                backdropVisibility: 'visible',
+              }
+            : material === 'mark'
+              ? {
+                  backdropBorderWidth: 0,
+                  backdropColor: faded(look.color, 0.22),
+                  backdropPadding: radius * 0.4,
+                  backdropShadowBlur: radius * 0.9,
+                  backdropShadowColor: faded(look.color, 0.3),
+                  backdropVisibility: 'visible',
+                }
+              : { backdropVisibility: 'hidden' }
+        /* **The note the keys are on in the frame's list is ringed in the
+           ink**, as the note under the pointer is named, so a reader moving by
+           the keys sees where they are. */
+        const keyed =
+          look.keyed === true
+            ? {
+                backdropBorderColor: next.ink,
+                backdropBorderWidth: 2 * density,
+                backdropColor: next.ground,
+                backdropPadding: Math.max(radius * 0.32, 3 * density),
+                backdropVisibility: 'visible',
+              }
+            : {}
+        if (glow.backdropVisibility === 'visible' || look.keyed === true) {
+          ringed.add(node)
+        } else {
+          ringed.delete(node)
+        }
         return {
-          ...data,
+          ...glow,
+          ...keyed,
+          backdropArea: 'node',
           color: look.color,
-          emphasisCode: EMPHASES[look.emphasis ?? options.emphasis ?? 'solid'],
-          forceLabel: look.label === 'always',
+          /* A ring is a circle drawn outlined, whatever its emphasis says. */
+          emphasisCode:
+            shape === 'ring'
+              ? EMPHASES.outlined
+              : EMPHASES[look.emphasis ?? options.emphasis ?? 'solid'],
+          /* How strongly the note glows, which its backdrop draws: said on its
+             display data as well, for whoever reads the drawing. */
           glow: look.glow,
-          hidden: look.hidden,
-          /* The note the keys are on in the frame's list, boxed as the note
-             under the pointer is, so a reader moving by the keys sees it. */
-          highlighted: look.keyed === true,
-          label: named ? data.label : null,
-          materialCode: MATERIALS[look.material ?? options.material ?? 'flat'],
-          shapeCode: SHAPES[look.shape ?? options.shape ?? 'circle'],
-          size: typeof data.size === 'number' ? data.size * grown : data.size,
-          strong: look.selected || look.raised,
-          type: 'helix',
+          materialCode: MATERIALS[material],
+          shape: SHAPES[shape],
+          size: shape === 'diamond' ? size * DIAMOND : size,
+          visibility: look.hidden ? 'hidden' : 'visible',
           zIndex: look.selected ? 2 : look.raised ? 1 : 0,
         }
-      })
+      }
       /* Sigma hands an edge reducer the edge's key and attributes and not its
          ends, so `draw` writes the ends onto it as `from` and `to`. */
-      sigma.setSetting('edgeReducer', (_edge: string, data: Record<string, unknown>) => {
-        const look = looks.link(String(data.from), String(data.to))
+      reducers.edge = (_edge, attributes) => {
+        const look = next.link(String(attributes.from), String(attributes.to))
         /* The note under the pointer lights its links in its own color, and
            the note the keys are on where the pointer is on none. */
-        const near = hovered ?? looks.keyed
-        const lit = near !== undefined && (data.from === near || data.to === near)
+        const near = hovered ?? next.keyed
+        const lit = near !== undefined && (attributes.from === near || attributes.to === near)
         /* A link the selection raises or the pointer lights is strong: heavier,
-           glowing, and headed at the note it arrives at. */
+           glowing, and headed at the note it arrives at. Drawn as wide as its
+           glow, which the layer draws the line in the middle of. */
         const strong = look.raised || lit
         return {
-          ...data,
-          color: lit ? looks.node(near as string).color : look.color,
+          color: lit ? next.node(near as string).color : look.color,
+          depth: strong ? 'topEdges' : 'edges',
           glow: strong ? 1 : 0,
-          hidden: look.hidden,
-          size: strong ? 1.3 : 0.8,
-          strong,
-          type: 'helix',
+          /* No head into a glowing note, whose glow covers where it would be. */
+          head: strong && next.node(String(attributes.to)).glow === 0 ? 'arrow' : 'none',
+          size: strong ? 2.6 * SPREAD : 1.6,
+          visibility: look.hidden ? 'hidden' : 'visible',
           zIndex: strong ? 1 : 0,
         }
-      })
+      }
       sigma.refresh()
     },
     onPress: (press) => {
@@ -647,20 +627,25 @@ export const sigmaDriver = <G extends SigmaGraph>(
       signals.signal(from, to, colors, animate)
     },
     stop: () => {
-      sigma.off('afterRender', groups.draw)
-      sigma.off('beforeRender', clear)
+      sigma.off('afterRender', redraw)
+      camera.off('updated', rezoomed)
+      names.stop()
       groups.stop()
       signals.stop()
       sigma.off('enterNode', enter)
       sigma.off('leaveNode', leave)
       cancelAnimationFrame(gliding)
       container.style.cursor = cursor
-      /* The renderer as the page made it: its programs, reducers and settings. */
+      /* The renderer as the page made it: Sigma's own drawing, through no
+         reducer, and its settings. */
+      reducers.edge = undefined
+      reducers.node = undefined
       for (const [name, value] of before) {
-        sigma.setSetting(name, value)
+        sigma.setSetting(name, value !== false)
       }
       sized?.disconnect()
       held.stop()
+      sigma.refresh()
     },
     update: (changes: GraphChanges, animate: boolean) => {
       for (const id of changes.removeNodes) {

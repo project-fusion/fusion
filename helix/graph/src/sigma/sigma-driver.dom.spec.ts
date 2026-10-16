@@ -4,6 +4,8 @@ import type { GraphLooks } from '../connect-graph/looks.js'
 import type { SigmaGraph, SigmaLayout, SigmaRenderer } from './sigma-driver.js'
 
 let sigmaDriver: typeof import('./sigma-driver.js').sigmaDriver
+let namedOf: typeof import('./sigma-driver.js').namedOf
+let sigmaOptions: typeof import('./sigma-options.js').sigmaOptions
 
 beforeAll(async () => {
   registerDom()
@@ -20,7 +22,8 @@ beforeAll(async () => {
       WebGLRenderingContext: constants,
     })
   }
-  ;({ sigmaDriver } = await import('./sigma-driver.js'))
+  ;({ namedOf, sigmaDriver } = await import('./sigma-driver.js'))
+  ;({ sigmaOptions } = await import('./sigma-options.js'))
 })
 
 /** A graphology graph's few calls, over two maps. */
@@ -75,9 +78,10 @@ const graphOf = (): SigmaGraph & {
   }
 }
 
-/** A renderer that records what the driver set on it. */
+/** A renderer made with `sigmaOptions()`, which records what the driver set on it. */
 const rendererOf = () => {
   const graph = graphOf()
+  const options = sigmaOptions()
   const container = document.createElement('div')
   document.body.append(container)
   const settings = new Map<string, unknown>()
@@ -96,6 +100,8 @@ const rendererOf = () => {
         state = { ...state, ...next }
       },
       getState: () => state,
+      off: () => {},
+      on: () => {},
       setState: (next) => {
         state = { ...state, ...next }
       },
@@ -109,12 +115,8 @@ const rendererOf = () => {
         : node === 'b'
           ? { size: 4, x: 0.6, y: 0.2 }
           : undefined,
-    getSetting: (name) =>
-      settings.has(name)
-        ? settings.get(name)
-        : name === 'nodeProgramClasses'
-          ? { circle: 'Circle' }
-          : undefined,
+    getPrimitives: () => options.primitives,
+    getSetting: (name) => settings.get(name),
     off: (type, listener) => of(type).delete(listener),
     on: (type, listener) => of(type).add(listener),
     refresh: () => {},
@@ -137,6 +139,9 @@ const rendererOf = () => {
       }
     },
     container,
+    /** A link's display data, as the renderer's reducer gives it, from its attributes. */
+    edge: (id: string, attributes: Record<string, unknown> = {}) =>
+      options.edgeReducer(id, {}, attributes) as Record<string, unknown>,
     /** Sends a renderer event with no payload, as Sigma sends `beforeRender`. */
     emit: (type: string) => {
       for (const listener of of(type)) {
@@ -144,10 +149,16 @@ const rendererOf = () => {
       }
     },
     graph,
+    /** A note's display data, as the renderer's reducer gives it, from its attributes. */
+    node: (id: string, attributes: Record<string, unknown> = {}) =>
+      options.nodeReducer(id, {}, attributes) as Record<string, unknown>,
     settings,
     sigma,
   }
 }
+
+/** The canvas the group names are drawn on. */
+const GROUPS = 'canvas[data-helix-graph-layer="groups"]'
 
 const looks: GraphLooks = {
   colorOf: (id) => (id === 'a' ? 'rgb(0, 0, 255)' : 'rgb(7, 7, 7)'),
@@ -188,163 +199,112 @@ describe('sigmaDriver', () => {
   })
 
   test('draws each note and link as the looks say', () => {
-    const { settings, sigma } = rendererOf()
+    const { edge, node, sigma } = rendererOf()
     sigmaDriver(sigma).look(looks)
-    const node = settings.get('nodeReducer') as (
-      id: string,
-      data: object,
-    ) => Record<string, unknown>
-    const edge = settings.get('edgeReducer') as (
-      id: string,
-      data: object,
-    ) => Record<string, unknown>
+    /* `a` is selected, half again its size, and a diamond, drawn larger by its lost reach. */
+    expect(node('a', { size: 4 }).size).toBeCloseTo(6 * (0.86 / Math.SQRT1_2))
     expect(node('a', { size: 4 })).toMatchObject({
-      size: 6,
+      backdropShadowColor: 'rgba(0, 0, 255, 0.6)',
+      backdropVisibility: 'visible',
+      color: 'rgb(0, 0, 255)',
+      visibility: 'visible',
       zIndex: 2,
     })
-    expect(node('a', {})).toMatchObject({
-      color: 'rgb(0, 0, 255)',
-      forceLabel: true,
-      hidden: false,
-    })
-    expect(node('b', { label: 'Bravo', size: 4 })).toMatchObject({
-      label: null,
+    expect(node('b', { size: 4 })).toMatchObject({
+      backdropVisibility: 'hidden',
       size: 4,
       zIndex: 0,
     })
-    expect(node('d', { label: 'Delta' })).toMatchObject({
-      forceLabel: false,
-      label: null,
-      strong: false,
-    })
-    expect(typeof settings.get('defaultDrawNodeHover')).toBe('function')
-    expect(node('c', {}).hidden).toBe(true)
+    expect(node('c').visibility).toBe('hidden')
+    /* A strong link is drawn as wide as its glow, and headed. */
     expect(edge('e', { from: 'a', to: 'b' })).toMatchObject({
       color: 'rgb(9, 9, 9)',
       glow: 1,
-      size: 1.3,
-      strong: true,
-      type: 'helix',
+      head: 'arrow',
+      size: 2.6 * 5,
     })
-    expect(settings.get('labelColor')).toEqual({ color: 'rgb(1, 2, 3)' })
-    expect(settings.get('labelFont')).toBe('Inter')
+    expect(edge('e', { from: 'b', to: 'a' })).toMatchObject({ glow: 0, head: 'none', size: 1.6 })
   })
 
-  test('boxes the note the keys are on as the note under the pointer, and lights its links', () => {
-    const { settings, sigma } = rendererOf()
-    sigmaDriver(sigma).look({
+  test('refuses a renderer made without sigmaOptions(), which cannot draw Helix’s notes', () => {
+    const { sigma } = rendererOf()
+    expect(() => sigmaDriver({ ...sigma, getPrimitives: () => ({ nodes: {} }) })).toThrow(
+      'sigmaOptions()',
+    )
+  })
+
+  test('names and rings the note the keys are on, and lights its links', () => {
+    const { edge, graph, node, sigma } = rendererOf()
+    const keyed: GraphLooks = {
       ...looks,
       keyed: 'd',
       node: (id) => ({ ...looks.node(id), keyed: id === 'd' }),
+    }
+    sigmaDriver(sigma).look(keyed)
+    graph.addNode('d', { label: 'Delta', size: 4 })
+    const at = () => ({ radius: 4, x: 10, y: 10 })
+    expect(namedOf(graph, keyed, 'hover', undefined, at)).toEqual([
+      { id: 'd', must: true, name: 'Delta', strong: true },
+    ])
+    /* Ringed in the ink, so a reader moving by the keys sees where they are. */
+    expect(node('d', { size: 4 })).toMatchObject({
+      backdropBorderColor: 'rgb(1, 2, 3)',
+      backdropVisibility: 'visible',
     })
-    const node = settings.get('nodeReducer') as (
-      id: string,
-      data: object,
-    ) => Record<string, unknown>
-    const edge = settings.get('edgeReducer') as (
-      id: string,
-      data: object,
-    ) => Record<string, unknown>
-    expect(node('d', {}).highlighted).toBe(true)
-    expect(node('b', {}).highlighted).toBe(false)
     expect(edge('e', { from: 'b', to: 'd' })).toMatchObject({
       color: 'rgb(7, 7, 7)',
       glow: 1,
-      size: 1.3,
-      strong: true,
-      type: 'helix',
+      head: 'arrow',
     })
   })
 
-  test('draws every note with its own program, in its shape and the driver’s material', () => {
-    const { settings, sigma } = rendererOf()
+  test('draws every note in its shape, its emphasis and the driver’s material', () => {
+    const { node, sigma } = rendererOf()
     const driver = sigmaDriver(sigma, { emphasis: 'subtle', material: 'glass' })
-    expect(Object.keys(settings.get('nodeProgramClasses') as object).sort()).toEqual([
-      'circle',
-      'helix',
-    ])
     driver.look(looks)
-    const node = settings.get('nodeReducer') as (
-      id: string,
-      data: object,
-    ) => Record<string, unknown>
-    expect(node('a', {})).toMatchObject({
-      emphasisCode: 2,
-      glow: 1,
-      materialCode: 1,
-      shapeCode: 2,
-      type: 'helix',
-    })
-    expect(node('d', {})).toMatchObject({ glow: 0, shapeCode: 0 })
+    expect(node('a')).toMatchObject({ emphasisCode: 2, materialCode: 1, shape: 'helixDiamond' })
+    expect(node('d')).toMatchObject({ backdropVisibility: 'hidden', shape: 'helixCircle' })
     driver.stop?.()
-    expect(Object.keys(settings.get('nodeProgramClasses') as object)).toEqual(['circle'])
+    /* Stopped, the renderer draws as Sigma would, through no reducer of the driver’s. */
+    expect(node('a')).toEqual({})
+  })
+
+  test('draws a ring outlined, a mark with its band and light, and either way in its color', () => {
+    const { node, sigma } = rendererOf()
+    sigmaDriver(sigma, { material: 'mark', shape: 'ring' }).look(looks)
+    expect(node('d', { size: 4 })).toMatchObject({
+      backdropColor: 'rgba(7, 7, 7, 0.22)',
+      backdropVisibility: 'visible',
+      emphasisCode: 1,
+      materialCode: 3,
+      shape: 'helixCircle',
+    })
   })
 
   test('names only the selected note and its neighbors by default, and the hubs or every note where asked', () => {
-    const named = (labels?: 'all' | 'hover' | 'hubs') => {
-      const { settings, sigma } = rendererOf()
-      sigmaDriver(sigma, labels ? { labels } : {}).look(looks)
-      const node = settings.get('nodeReducer') as (
-        id: string,
-        data: object,
-      ) => Record<string, unknown>
-      return ['a', 'd', 'e'].map((id) => node(id, { label: id, size: id === 'e' ? 9 : 4 }).label)
+    const named = (labels: 'all' | 'hover' | 'hubs') => {
+      const graph = graphOf()
+      graph.addNode('a', { label: 'a', size: 4 })
+      graph.addNode('d', { label: 'd', size: 4 })
+      graph.addNode('e', { label: 'e', size: 9 })
+      /* Far enough apart that each has a cell of its own. */
+      const at = (id: string) => ({ radius: 4, x: { a: 0, d: 300, e: 600 }[id] ?? 0, y: 0 })
+      return namedOf(graph, looks, labels, undefined, at).map(({ id }) => id)
     }
     /* `a` is selected; `d` and `e` are notes at rest, `e` a hub. */
-    expect(named()).toEqual(['a', null, null])
-    expect(named('hubs')).toEqual(['a', null, 'e'])
-    expect(named('all')).toEqual(['a', 'd', 'e'])
+    expect(named('hover')).toEqual(['a'])
+    expect(named('hubs')).toEqual(['a', 'e'])
+    expect(named('all')).toEqual(['a', 'e', 'd'])
   })
 
-  test('draws a name from its left edge, after its note in reading order, on either page', () => {
-    /* Where each name and its hover box were drawn, and how they were aligned. */
-    const drawn = (direction: 'ltr' | 'rtl') => {
-      const renderer = rendererOf()
-      renderer.container.style.direction = direction
-      sigmaDriver(renderer.sigma).look(looks)
-      renderer.emit('beforeRender')
-      const calls: [string, number, string][] = []
-      const context = {
-        beginPath: () => {},
-        fill: () => {},
-        fillStyle: '',
-        fillText(_text: string, x: number) {
-          calls.push(['fill', x, this.textAlign])
-        },
-        font: '',
-        lineJoin: '',
-        lineWidth: 0,
-        measureText: () => ({ width: 40 }),
-        restore: () => {},
-        roundRect: () => {},
-        save: () => {},
-        shadowBlur: 0,
-        shadowColor: '',
-        strokeStyle: '',
-        strokeText(_text: string, x: number) {
-          calls.push(['stroke', x, this.textAlign])
-        },
-        textAlign: 'start',
-      }
-      const data = { forceLabel: true, label: 'Alpha', size: 4, strong: true, x: 100, y: 100 }
-      const settings = { labelFont: 'Inter', labelSize: 13, labelWeight: '500' }
-      const label = renderer.settings.get('defaultDrawNodeLabel') as (...args: unknown[]) => void
-      const hover = renderer.settings.get('defaultDrawNodeHover') as (...args: unknown[]) => void
-      label(context, data, settings)
-      hover(context, data, settings)
-      renderer.container.remove()
-      return calls
-    }
-    expect(drawn('ltr')).toEqual([
-      ['stroke', 108, 'left'],
-      ['fill', 108, 'left'],
-      ['fill', 106, 'left'],
-    ])
-    expect(drawn('rtl')).toEqual([
-      ['stroke', 52, 'left'],
-      ['fill', 52, 'left'],
-      ['fill', 54, 'left'],
-    ])
+  test('keeps one name a cell, the larger note’s, but never leaves out one that must be named', () => {
+    const graph = graphOf()
+    graph.addNode('a', { label: 'a', size: 2 })
+    graph.addNode('d', { label: 'd', size: 4 })
+    graph.addNode('e', { label: 'e', size: 9 })
+    /* All three in one cell: `a` must be named, and of the rest the hub is kept. */
+    const at = () => ({ radius: 4, x: 10, y: 10 })
+    expect(namedOf(graph, looks, 'all', undefined, at).map(({ id }) => id)).toEqual(['a', 'e'])
   })
 
   test('names each group over its notes on a canvas of its own, unless asked not to', () => {
@@ -352,14 +312,15 @@ describe('sigmaDriver', () => {
     const driver = sigmaDriver(renderer.sigma)
     driver.look(looks)
     driver.groups?.([{ color: 'rgb(0, 0, 255)', faded: false, ids: ['a', 'b'], name: 'Sales' }])
-    expect(renderer.container.querySelectorAll('canvas')).toHaveLength(1)
+    expect(renderer.container.querySelectorAll(GROUPS)).toHaveLength(1)
     driver.stop?.()
+    /* Every canvas the driver drew on goes with it, the notes' names among them. */
     expect(renderer.container.querySelectorAll('canvas')).toHaveLength(0)
     const quiet = rendererOf()
     sigmaDriver(quiet.sigma, { groupLabels: false }).groups?.([
       { color: 'rgb(0, 0, 255)', faded: false, ids: ['a', 'b'], name: 'Sales' },
     ])
-    expect(quiet.container.querySelectorAll('canvas')).toHaveLength(0)
+    expect(quiet.container.querySelectorAll(GROUPS)).toHaveLength(0)
   })
 
   test('pans by pixels, zooms by a step, and centers a note', () => {
@@ -490,23 +451,25 @@ describe('sigmaDriver', () => {
 
   test('off turns the camera’s own gestures off, and stopping puts every setting back', () => {
     const { settings, sigma } = rendererOf()
-    settings.set('nodeReducer', 'the page’s')
+    settings.set('enableCameraZooming', true)
+    settings.set('enableCameraPanning', true)
     const driver = sigmaDriver(sigma)
     driver.look(looks)
     driver.gestures?.('off')
     expect(settings.get('enableCameraZooming')).toBe(false)
     expect(settings.get('enableCameraPanning')).toBe(false)
     driver.stop?.()
-    expect(settings.get('nodeReducer')).toBe('the page’s')
-    expect(settings.get('enableCameraZooming')).toBeUndefined()
-    expect(settings.get('nodeProgramClasses')).toEqual({ circle: 'Circle' })
+    expect(settings.get('enableCameraZooming')).toBe(true)
+    expect(settings.get('enableCameraPanning')).toBe(true)
   })
 
   test('a signal is drawn on a canvas of its own, which stopping takes away', () => {
     const renderer = rendererOf()
     const driver = sigmaDriver(renderer.sigma)
     driver.signal?.('a', 'b', { from: 'rgb(0, 0, 255)', to: 'rgb(255, 0, 0)' }, true)
-    const overlay = renderer.container.querySelector('canvas')
+    const overlay = renderer.container.querySelector<HTMLCanvasElement>(
+      'canvas[data-helix-graph-layer="signals"]',
+    )
     expect(overlay).not.toBeNull()
     expect(overlay?.getAttribute('aria-hidden')).toBe('true')
     expect(overlay?.style.pointerEvents).toBe('none')

@@ -67,13 +67,19 @@ const key = (target: Element, name: string): void => {
 
 /** A frame drawn by Sigma, with five placed notes so no layout runs, once it is ready. */
 const drawn = async () => {
-  const [{ default: Sigma }, { default: Graph }, { connectGraph }, { sigmaDriver }] =
-    await Promise.all([
-      import('sigma'),
-      import('graphology'),
-      import('../connect-graph/connect-graph.js'),
-      import('./sigma-driver.js'),
-    ])
+  const [
+    { default: Sigma },
+    { default: Graph },
+    { connectGraph },
+    { sigmaDriver },
+    { sigmaOptions },
+  ] = await Promise.all([
+    import('sigma'),
+    import('graphology'),
+    import('../connect-graph/connect-graph.js'),
+    import('./sigma-driver.js'),
+    import('./sigma-options.js'),
+  ])
   const host = (await mount(
     `<helix-headless-graph label="Notes" style="display: block; inline-size: 640px; ${TOKENS}"><div style="block-size: 360px"></div></helix-headless-graph>`,
   )) as Frame
@@ -90,7 +96,7 @@ const drawn = async () => {
     { source: 'd', target: 'e' },
   ]
   const box = host.querySelector('div') as HTMLElement
-  const sigma = new Sigma(new Graph(), box)
+  const sigma = new Sigma(new Graph(), box, sigmaOptions())
   const connection = connectGraph(host, sigmaDriver(sigma))
   made.push(() => {
     connection.disconnect()
@@ -162,13 +168,19 @@ describe('a Sigma drawing in WebGL', () => {
      them. Sigma measures the box as it is made and throws on one with no
      width. */
   scene('draws in a box Sigma is given in the same turn the frame is defined', async () => {
-    const [{ default: Sigma }, { default: Graph }, { connectGraph }, { sigmaDriver }] =
-      await Promise.all([
-        import('sigma'),
-        import('graphology'),
-        import('../connect-graph/connect-graph.js'),
-        import('./sigma-driver.js'),
-      ])
+    const [
+      { default: Sigma },
+      { default: Graph },
+      { connectGraph },
+      { sigmaDriver },
+      { sigmaOptions },
+    ] = await Promise.all([
+      import('sigma'),
+      import('graphology'),
+      import('../connect-graph/connect-graph.js'),
+      import('./sigma-driver.js'),
+      import('./sigma-options.js'),
+    ])
     const late = notYetDefined('helix-headless-graph')
     const host = late.element as Frame
     host.setAttribute('label', 'Notes')
@@ -181,7 +193,7 @@ describe('a Sigma drawing in WebGL', () => {
       { id: 'b', label: 'Bravo', x: 30, y: 4 },
     ]
     host.links = [{ source: 'a', target: 'b' }]
-    const sigma = new Sigma(new Graph(), host.querySelector('div') as HTMLElement)
+    const sigma = new Sigma(new Graph(), host.querySelector('div') as HTMLElement, sigmaOptions())
     const connection = connectGraph(host, sigmaDriver(sigma))
     made.push(() => {
       connection.disconnect()

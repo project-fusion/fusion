@@ -25,7 +25,7 @@ const LIVE_CODE = `const frame = document.querySelector('helix-graph')
 frame.nodes = notes
 frame.links = links
 
-const sigma = new Sigma(new Graph(), box)
+const sigma = new Sigma(new Graph(), box, sigmaOptions())
 connectGraph(frame, sigmaDriver(sigma, { layout }))
 
 // A note arrives, and is drawn beside its neighbors.

@@ -104,20 +104,24 @@ export function TraceGraph() {
     let stop = (): void => undefined
     const start = async (): Promise<void> => {
       await customElements.whenDefined('helix-graph')
-      const [{ connectGraph }, { sigmaDriver }, { default: Graph }, { default: Sigma }] =
-        await Promise.all([
-          import('@fusion.dev/helix-graph'),
-          import('@fusion.dev/helix-graph/sigma'),
-          import('graphology'),
-          import('sigma'),
-        ])
+      const [
+        { connectGraph },
+        { sigmaDriver, sigmaOptions },
+        { default: Graph },
+        { default: Sigma },
+      ] = await Promise.all([
+        import('@fusion.dev/helix-graph'),
+        import('@fusion.dev/helix-graph/sigma'),
+        import('graphology'),
+        import('sigma'),
+      ])
       if (!live) {
         return
       }
       const trace = traceOf(now.current.deleted, now.current.layout)
       host.nodes = trace.nodes
       host.links = trace.links
-      const sigma = new Sigma(new Graph(), drawing)
+      const sigma = new Sigma(new Graph(), drawing, sigmaOptions())
       sigma.setCustomBBox(boxFor(now.current.layout))
       renderer.current = sigma
       const connection = connectGraph(
