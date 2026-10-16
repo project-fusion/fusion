@@ -286,6 +286,28 @@ picture is committed.
   that differs stops and names what differs, because every picture would
   differ for that reason alone.
 
+## Picture a screen in a state
+
+A page pictured as it loads shows every menu closed and every field empty. To
+picture it with a menu open, a field filled, or a list scrolled, save the screen
+and keep the file beside the entry's baselines as `<stem>.state.json`, where
+`<stem>` is what the entry's baseline files start with. The run puts it back
+once the page has upgraded and before it waits for the page to hold still.
+
+Save a screen from the page itself, in the browser's console or from a test,
+with the capture every copy of Helix puts on the page:
+
+```js
+const { captureState } = globalThis[Symbol.for('fusion.dev/helix/state')]
+copy(JSON.stringify(captureState(), null, 2))
+```
+
+The state is put back through each element's own requests, so a page that
+controls a component hears the same events it hears from a reader. An entry
+whose state names an element the page no longer draws, or one the page refuses,
+fails rather than picturing a different screen. A password field and anything
+under `snapshot="off"` are never saved.
+
 ## The report
 
 Every `helix visual test` and `helix visual update` writes a report into the config's

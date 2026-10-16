@@ -794,6 +794,19 @@ export {
   type SpeechSession,
 } from './utils/speech/speech.js'
 export { splitValues } from './utils/split-values/split-values.js'
+export {
+  captureState,
+  type ElementState,
+  elementAt,
+  exposeState,
+  type PageState,
+  pathOf,
+  type RestoreReport,
+  restoreOn,
+  restoreState,
+  STATE_SLOT,
+  snapshotOf,
+} from './utils/state/state.js'
 export { stopPress } from './utils/stop-press/stop-press.js'
 export {
   edgeOffset,
