@@ -178,7 +178,9 @@ const mountGraphs = (root: HTMLElement, at: number): void => {
  * and never before.
  */
 const mountEditors = (root: HTMLElement, at: number): void => {
-  if (!root.querySelector(':is(helix-editor, helix-headless-editor)[data-preview-editor]')) {
+  if (
+    !root.querySelector(':is(helix-code-editor, helix-headless-code-editor)[data-preview-editor]')
+  ) {
     return
   }
   void load(__PREVIEW_EDITOR_URL__)

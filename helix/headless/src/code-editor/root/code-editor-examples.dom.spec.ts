@@ -11,14 +11,14 @@ beforeAll(async () => {
 const run = hasLayout() ? test : (): void => {}
 
 describe('the preview example', () => {
-  run('lists the problem the page gives it, by its line', async () => {
+  run('lists the problems the page gives it, by their lines', async () => {
     await example(preview)
     const editor = document.getElementById('base-editor-preview') as HTMLElement & {
       updateComplete: Promise<unknown>
     }
     await editor.updateComplete
-    expect(part(editor, 'diagnostic')?.textContent).toBe(
-      'Line 2: Cannot find name totl. Did you mean total?',
+    expect(part(editor, 'diagnostic')?.textContent?.trim()).toBe(
+      'Line 10: Unexpected console statement.',
     )
   })
 })

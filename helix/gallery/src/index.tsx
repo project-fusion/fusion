@@ -20,6 +20,7 @@ import { checkboxArt } from './art/checkbox'
 import { checkboxGroupArt } from './art/checkbox-group'
 import { codeArt } from './art/code'
 import { codeBlockArt } from './art/code-block'
+import { codeEditorArt } from './art/code-editor'
 import { codeInputArt } from './art/code-input'
 import { colorInputArt } from './art/color-input'
 import { colorPickerArt } from './art/color-picker'
@@ -36,7 +37,6 @@ import { dividerArt } from './art/divider'
 import { donutChartArt } from './art/donut-chart'
 import { drawerArt } from './art/drawer'
 import { drilldownArt } from './art/drilldown'
-import { editorArt } from './art/editor'
 import { emptyArt } from './art/empty'
 import { fileInputArt } from './art/file-input'
 import { filterInputArt } from './art/filter-input'
@@ -181,6 +181,7 @@ const art: Record<string, ReactNode> = {
   'checkbox-group': checkboxGroupArt,
   code: codeArt,
   'code-block': codeBlockArt,
+  'code-editor': codeEditorArt,
   'code-input': codeInputArt,
   'color-input': colorInputArt,
   'color-picker': colorPickerArt,
@@ -197,7 +198,6 @@ const art: Record<string, ReactNode> = {
   'donut-chart': donutChartArt,
   drawer: drawerArt,
   drilldown: drilldownArt,
-  editor: editorArt,
   empty: emptyArt,
   'file-input': fileInputArt,
   'filter-input': filterInputArt,

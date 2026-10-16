@@ -10,12 +10,24 @@ import {
   StreamLanguage,
   syntaxHighlighting,
 } from '@codemirror/language'
-import { type Diagnostic, lintGutter, setDiagnostics } from '@codemirror/lint'
-import { highlightSelectionMatches, search, searchKeymap } from '@codemirror/search'
-import { Annotation, Compartment, EditorState, type Extension } from '@codemirror/state'
+import { type Diagnostic, setDiagnostics } from '@codemirror/lint'
+import {
+  closeSearchPanel,
+  highlightSelectionMatches,
+  openSearchPanel,
+  replaceAll,
+  replaceNext,
+  SearchQuery,
+  search,
+  searchPanelOpen,
+  setSearchQuery,
+} from '@codemirror/search'
+import { Annotation, Compartment, EditorState, type Extension, RangeSet } from '@codemirror/state'
 import {
   drawSelection,
   EditorView,
+  GutterMarker,
+  gutterLineClass,
   highlightActiveLine,
   highlightActiveLineGutter,
   keymap,
@@ -23,11 +35,14 @@ import {
   placeholder,
 } from '@codemirror/view'
 import type {
+  EditorDiagnostic,
   EditorEngine,
   EditorEngineListeners,
   EditorEngineState,
   EditorEngineView,
-} from '@fusion.dev/helix-headless/editor'
+  EditorFindQuery,
+  EditorFindResult,
+} from '@fusion.dev/helix-headless/code-editor'
 import { syntaxHighlighter, syntaxRules } from '@fusion.dev/helix-sandbox/highlight'
 
 /** A language's grammar, loaded when an editor first asks for it. */
@@ -89,21 +104,37 @@ const given = Annotation.define<boolean>()
  * surface, search and the fold markers as Helix draws its own controls.
  */
 const helixTheme = EditorView.theme({
-  '.cm-activeLine, .cm-activeLineGutter': { backgroundColor: 'var(--helix-color-surface-sunken)' },
+  '.cm-activeLine, .cm-activeLineGutter': {
+    backgroundColor: 'color-mix(in oklab, var(--helix-color-foreground) 5%, transparent)',
+  },
   '.cm-content': {
     caretColor: 'var(--helix-color-primary)',
     paddingBlock: 'var(--helix-space-xs)',
   },
   '.cm-cursor': { borderLeftColor: 'var(--helix-color-primary)' },
+  '.cm-foldGutter .cm-gutterElement': { paddingInline: 'var(--helix-space-2xs)' },
   '.cm-foldPlaceholder': {
     backgroundColor: 'var(--helix-color-surface-sunken)',
     border: 'none',
     color: 'var(--helix-color-foreground-muted)',
   },
+  '.cm-gutterElement.cm-helix-problem-danger': {
+    color: 'var(--helix-color-danger)',
+    fontWeight: 'var(--helix-weight-semibold)',
+  },
+  '.cm-gutterElement.cm-helix-problem-info': { color: 'var(--helix-color-info)' },
+  '.cm-gutterElement.cm-helix-problem-warning': {
+    color: 'var(--helix-color-warning)',
+    fontWeight: 'var(--helix-weight-semibold)',
+  },
   '.cm-gutters': {
     backgroundColor: 'transparent',
     border: 'none',
     color: 'var(--helix-color-foreground-muted)',
+  },
+  '.cm-lineNumbers .cm-gutterElement': {
+    minInlineSize: '3ch',
+    paddingInline: 'var(--helix-space-sm) var(--helix-space-2xs)',
   },
   '.cm-lintRange-error': {
     backgroundImage: 'none',
@@ -117,15 +148,23 @@ const helixTheme = EditorView.theme({
     backgroundImage: 'none',
     textDecoration: 'underline wavy var(--helix-color-warning)',
   },
-  '.cm-panels': {
-    backgroundColor: 'var(--helix-color-surface)',
-    color: 'var(--helix-color-foreground)',
-  },
-  '.cm-panels-bottom': { borderTop: 'var(--helix-border-thin) solid var(--helix-color-border)' },
+  /* The find bar is the element's, so the panel CodeMirror's search draws its
+     marks under is empty, and its strip is never drawn. */
+  '.cm-panels:has(> .cm-helix-find:only-child)': { display: 'none' },
   '.cm-placeholder': { color: 'var(--helix-color-foreground-muted)' },
-  '.cm-scroller': { fontFamily: 'inherit', lineHeight: 'var(--helix-leading-normal)' },
+  '.cm-scroller': {
+    fontFamily: 'inherit',
+    fontVariantLigatures: 'none',
+    lineHeight: 'var(--helix-leading-normal)',
+    scrollbarColor: 'var(--helix-scrollbar-thumb-color) transparent',
+    scrollbarWidth: 'thin',
+  },
   '.cm-searchMatch': {
     backgroundColor: 'color-mix(in oklab, var(--helix-color-warning) 25%, transparent)',
+  },
+  '.cm-searchMatch-selected': {
+    backgroundColor: 'color-mix(in oklab, var(--helix-color-warning) 50%, transparent)',
+    outline: 'var(--helix-border-thin) solid var(--helix-color-warning)',
   },
   '.cm-selectionBackground, &.cm-focused .cm-selectionBackground': {
     backgroundColor: 'var(--helix-color-primary-subtle)',
@@ -136,6 +175,9 @@ const helixTheme = EditorView.theme({
     borderRadius: 'var(--helix-radii-sm)',
   },
   '&': { blockSize: '100%', color: 'var(--helix-color-foreground)', fontSize: 'inherit' },
+  '&:not(.cm-focused) .cm-activeLine, &:not(.cm-focused) .cm-activeLineGutter': {
+    backgroundColor: 'transparent',
+  },
   '&.cm-focused': { outline: 'none' },
 })
 
@@ -150,6 +192,74 @@ const lintOf = (state: EditorEngineState, length: number): Diagnostic[] =>
     severity: SEVERITY[one.tone ?? 'danger'],
     to: Math.min(Math.max(one.from, one.to), length),
   }))
+
+/** A line number drawn in a problem's tone. */
+class ProblemLine extends GutterMarker {
+  constructor(readonly tone: 'danger' | 'info' | 'warning') {
+    super()
+    this.elementClass = `cm-helix-problem-${tone}`
+  }
+
+  override eq(other: ProblemLine): boolean {
+    return other.tone === this.tone
+  }
+}
+
+/** How bad each tone is, so a line with two problems takes the worse one's. */
+const RANK = { danger: 2, info: 0, warning: 1 } as const
+
+/** Each line with a problem, its number marked in the worst problem's tone. */
+const problemLines = (state: EditorState, diagnostics: readonly EditorDiagnostic[]): Extension => {
+  const worst = new Map<number, 'danger' | 'info' | 'warning'>()
+  for (const one of diagnostics) {
+    const line = state.doc.lineAt(Math.min(Math.max(0, one.from), state.doc.length)).from
+    const tone = one.tone ?? 'danger'
+    const held = worst.get(line)
+    if (!held || RANK[tone] > RANK[held]) {
+      worst.set(line, tone)
+    }
+  }
+  const marks = [...worst]
+    .sort(([a], [b]) => a - b)
+    .map(([from, tone]) => new ProblemLine(tone).range(from))
+  return gutterLineClass.of(RangeSet.of(marks))
+}
+
+/** The query as CodeMirror's: literal unless it is a regular expression. */
+const queryOf = (query: EditorFindQuery): SearchQuery =>
+  new SearchQuery({
+    caseSensitive: query.caseSensitive,
+    literal: !query.regex,
+    regexp: query.regex,
+    replace: query.replace,
+    search: query.search,
+    wholeWord: query.wholeWord,
+  })
+
+/** The most matches a search counts, so a search for one letter in a large file stays quick. */
+const COUNTED = 10_000
+
+/** Every match of a query, as `[from, to]`, up to `COUNTED`. */
+const matchesOf = (state: EditorState, query: SearchQuery): Array<[number, number]> => {
+  const found: Array<[number, number]> = []
+  const cursor = query.getCursor(state)
+  for (let next = cursor.next(); !next.done && found.length < COUNTED; next = cursor.next()) {
+    if (next.value.to > next.value.from) {
+      found.push([next.value.from, next.value.to])
+    }
+  }
+  return found
+}
+
+/** Where the selection stands among the matches. */
+const standing = (state: EditorState, query: SearchQuery): EditorFindResult => {
+  const matches = matchesOf(state, query)
+  const { from, to } = state.selection.main
+  return {
+    count: matches.length,
+    index: matches.findIndex(([start, end]) => start === from && end === to),
+  }
+}
 
 /** Puts the syntax colors' classes in the root the editor draws in, once each root. */
 const adoptSyntax = (root: Document | ShadowRoot): void => {
@@ -192,6 +302,7 @@ export const codeMirrorEngine = (options: CodeMirrorOptions = {}): EditorEngine 
     const wrapping = new Compartment()
     const words = new Compartment()
     const hint = new Compartment()
+    const problems = new Compartment()
     let current = state
     /* The grammar a name asks for, loaded and then put in, unless the name
        changed while it loaded. */
@@ -225,17 +336,19 @@ export const codeMirrorEngine = (options: CodeMirrorOptions = {}): EditorEngine 
           codeFolding(),
           highlightActiveLine(),
           highlightSelectionMatches(),
-          search({ top: false }),
-          lintGutter(),
+          /* The find bar is the element's: CodeMirror's search keeps the query
+             and marks the matches, under a panel with nothing in it. */
+          search({
+            createPanel: () => {
+              const dom = document.createElement('div')
+              dom.className = 'cm-helix-find'
+              return { dom, top: true }
+            },
+          }),
+          problems.of(problemLines(EditorState.create({ doc: state.value }), state.diagnostics)),
           indentUnit.of('  '),
           EditorState.tabSize.of(2),
-          keymap.of([
-            ...defaultKeymap,
-            ...historyKeymap,
-            ...searchKeymap,
-            ...foldKeymap,
-            indentWithTab,
-          ]),
+          keymap.of([...defaultKeymap, ...historyKeymap, ...foldKeymap, indentWithTab]),
           syntaxHighlighting(syntaxHighlighter, { fallback: true }),
           helixTheme,
           language.of([]),
@@ -268,9 +381,63 @@ export const codeMirrorEngine = (options: CodeMirrorOptions = {}): EditorEngine 
     })
     load(state.language, view)
     view.dispatch(setDiagnostics(view.state, lintOf(state, view.state.doc.length)))
+    /* The search CodeMirror keeps, opened first so its marks show, since
+       opening sets a query of its own from the selection. */
+    const ask = (query: EditorFindQuery): SearchQuery => {
+      const asked = queryOf(query)
+      if (!searchPanelOpen(view.state)) {
+        openSearchPanel(view)
+      }
+      view.dispatch({ effects: setSearchQuery.of(asked) })
+      return asked
+    }
     return {
       destroy: () => view.destroy(),
+      find: (query, direction) => {
+        const asked = ask(query)
+        if (!asked.valid) {
+          return { count: 0, index: -1 }
+        }
+        const matches = matchesOf(view.state, asked)
+        if (matches.length === 0) {
+          return { count: 0, index: -1 }
+        }
+        const { from, to } = view.state.selection.main
+        let index =
+          direction === 'previous'
+            ? matches.findLastIndex(([start]) => start < from)
+            : matches.findIndex(([start]) => (direction === 'first' ? start >= from : start >= to))
+        if (index === -1) {
+          index = direction === 'previous' ? matches.length - 1 : 0
+        }
+        const [anchor, head] = matches[index] ?? [0, 0]
+        view.dispatch({ scrollIntoView: true, selection: { anchor, head } })
+        return { count: matches.length, index }
+      },
+      findEnd: () => {
+        closeSearchPanel(view)
+      },
       focus: () => view.focus(),
+      replace: (query, all) => {
+        const asked = ask(query)
+        if (!asked.valid) {
+          return { count: 0, index: -1 }
+        }
+        if (all) {
+          replaceAll(view)
+        } else {
+          replaceNext(view)
+        }
+        return standing(view.state, asked)
+      },
+      select: (from, to) => {
+        const length = view.state.doc.length
+        view.dispatch({
+          scrollIntoView: true,
+          selection: { anchor: Math.min(from, length), head: Math.min(to, length) },
+        })
+        view.focus()
+      },
       update: (next) => {
         const effects = []
         if (next.lineNumbers !== current.lineNumbers) {
@@ -309,6 +476,9 @@ export const codeMirrorEngine = (options: CodeMirrorOptions = {}): EditorEngine 
         })
         if (next.diagnostics !== current.diagnostics || next.value !== doc) {
           view.dispatch(setDiagnostics(view.state, lintOf(next, view.state.doc.length)))
+          view.dispatch({
+            effects: problems.reconfigure(problemLines(view.state, next.diagnostics)),
+          })
         }
         if (next.language !== current.language) {
           load(next.language, view)

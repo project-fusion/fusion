@@ -1,21 +1,24 @@
 # @fusion.dev/helix-editor
 
-Connects the Helix `Editor` frame to CodeMirror 6, themed from your tokens:
+Connects Helix's `Code Editor` to CodeMirror 6, themed from your tokens:
 highlighting in your theme's syntax colors, line numbers, folding, bracket
-matching, search, history, and diagnostics underlined in their tone.
+matching and history, diagnostics underlined in their tone with their line
+numbers drawn in it, and the editor's own find bar finding and replacing in
+CodeMirror.
 
 ```sh
 bun add @fusion.dev/helix @fusion.dev/helix-editor
 ```
 
-The element is on the [Editor reference](https://fusion.dev/helix/components/editor).
+The element is on the [Code Editor reference](https://fusion.dev/helix/components/code-editor).
 On its own it is a text field in the code face; connected, CodeMirror draws it.
+For a few lines of code in a form, `Code Input` needs no engine.
 
 ```js
-import '@fusion.dev/helix/editor'
+import '@fusion.dev/helix/code-editor'
 import { connectEditor } from '@fusion.dev/helix-editor'
 
-const editor = document.querySelector('helix-editor')
+const editor = document.querySelector('helix-code-editor')
 const disconnect = connectEditor(editor)
 
 editor.language = 'ts'
@@ -44,4 +47,4 @@ CodeMirror under your own control, set the element's `engine` to
 ## Keyboard
 
 Tab indents, and Escape then Tab leaves the editor. Command+F, or Control+F on
-Windows and Linux, opens search, and Command+Z undoes.
+Windows and Linux, opens the editor's find bar, and Command+Z undoes.
