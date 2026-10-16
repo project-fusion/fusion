@@ -40,6 +40,29 @@ describe('the toolbar around an element', () => {
     expect(toolbarAround(probe('<div role="toolbar" id="probe"></div>'))).toBeNull()
   })
 
+  test('nothing inside a panel opened from one', () => {
+    expect(
+      toolbarAround(
+        probe('<helix-toolbar><helix-menu><b id="probe"></b></helix-menu></helix-toolbar>'),
+      ),
+    ).toBeNull()
+    expect(
+      toolbarAround(
+        probe('<div role="toolbar"><helix-popover><b id="probe"></b></helix-popover></div>'),
+      ),
+    ).toBeNull()
+    expect(
+      toolbarAround(probe('<helix-toolbar><div popover><b id="probe"></b></div></helix-toolbar>')),
+    ).toBeNull()
+  })
+
+  test('a menu itself is still one of the toolbar items', () => {
+    expect(
+      toolbarAround(probe('<helix-toolbar><helix-menu id="probe"></helix-menu></helix-toolbar>'))
+        ?.localName,
+    ).toBe('helix-toolbar')
+  })
+
   test('nothing outside one', () => {
     expect(toolbarAround(probe('<div role="group"><b id="probe"></b></div>'))).toBeNull()
   })
