@@ -34,6 +34,18 @@
 # ignore never reached them, each being its own entry, and the same bump came
 # through one of them on 1 Sep 2026 as #101.
 #
+# **luma.gl stays on 9.3 while cosmos.gl asks for it.** cosmos.gl 3.5.1 takes
+# luma.gl as a peer at `~9.3.0`, and the production group of 12 Oct 2026
+# proposed 9.4 beside it. Lift the ignore when cosmos.gl's range moves.
+#
+# **`@wc-toolkit/jsx-types` 1.8 and `@wc-toolkit/vuejs-types` 1.0.2 are
+# ignored, because they take the workspace's `tsc`.** Both depend on
+# `@wc-toolkit/cem-generator`, which installs TypeScript 6 under the alias
+# `@typescript/old`. Its `tsc` replaced TypeScript 7's in `node_modules/.bin`,
+# and `helix-headless` failed to build under 6 on 16 Oct 2026. The two are
+# pinned exactly in `package.json` and `helix/cem/package.json` for the same
+# reason.
+#
 # **The root is `bun`, the ecosystem that reads `bun.lock`.** Under `npm`, every
 # weekly run from 22 Sep 2026 on stopped at the lockfile: the `npm` updater
 # cannot write `bun.lock`, and Dependabot's own error named `bun` as the fix.
@@ -56,6 +68,12 @@ updates:
     ignore:
       - dependency-name: '@types/node'
         update-types: [version-update:semver-major]
+      - dependency-name: '@luma.gl/*'
+        versions: ['>=9.4.0']
+      - dependency-name: '@wc-toolkit/jsx-types'
+        versions: ['>=1.8.0']
+      - dependency-name: '@wc-toolkit/vuejs-types'
+        versions: ['>=1.0.2']
     open-pull-requests-limit: 5
     package-ecosystem: bun
     schedule:
