@@ -1,0 +1,7 @@
+/* A conversation has to be given a height and a ground by whatever holds it. */
+.streaming {
+  --chat-max-block-size: 24rem;
+  background-color: var(--helix-color-surface);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-lg);
+}
