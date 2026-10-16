@@ -42,8 +42,10 @@
     "@fusion.dev/helix-theme": "workspace:*",
     "@fusion.dev/helix-workbench": "workspace:*",
     "@fusion.dev/insights": "workspace:*",
-    "@luma.gl/core": "~9.4.2",
-    "@luma.gl/webgl": "~9.4.2",
+    "@luma.gl/core": "~9.3.6",
+    "@luma.gl/engine": "~9.3.6",
+    "@luma.gl/shadertools": "~9.3.6",
+    "@luma.gl/webgl": "~9.3.6",
     "@xterm/addon-fit": "^0.11.0",
     "@xterm/addon-search": "^0.16.0",
     "@xterm/addon-web-links": "^0.12.0",
@@ -56,7 +58,7 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "sharp": "^0.35.3",
-    "sigma": "^3.0.3",
+    "sigma": "^4.0.0",
     "three": "^0.186.1"
   },
   "devDependencies": {

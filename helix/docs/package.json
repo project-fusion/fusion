@@ -50,7 +50,7 @@
     "@fusion.dev/helix-theme": "workspace:*",
     "@fusion.dev/scripts": "workspace:*",
     "lit": "^3.2.1",
-    "playwright": "^1.63.0"
+    "playwright": "^1.64.0"
   },
   "homepage": "https://fusion.dev",
   "keywords": [
