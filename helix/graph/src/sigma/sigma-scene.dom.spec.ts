@@ -141,27 +141,34 @@ describe('a Sigma drawing in WebGL', () => {
     expect(Math.abs(middle.y)).toBeLessThan(2)
   })
 
-  scene('moves under the frame’s keys with the ring on its note, and says which way', async () => {
-    const { at, box, glow, host } = await drawn()
-    host.active = 'c'
-    await wait(800)
-    const region = part(host, 'region') as HTMLElement
-    const live = () => part(host, 'live')?.textContent
-    const before = at('c')
-    key(region, 'ArrowRight')
-    await wait(500)
-    /* A quarter of the box to the right, so the note is drawn a quarter to the left. */
-    expect(Math.round(before.x - at('c').x)).toBe(Math.round(box.clientWidth / 4))
-    expect(Math.round(at('c').y - before.y)).toBe(0)
-    expect(live()).toBe('Moved right')
-    expect(glow()).toEqual({ a: 0, b: 0, c: 1, d: 0, e: 0 })
-    const spread = Math.hypot(at('a').x - at('c').x, at('a').y - at('c').y)
-    key(region, '=')
-    await wait(500)
-    expect(live()).toBe('Zoomed in')
-    expect(Math.hypot(at('a').x - at('c').x, at('a').y - at('c').y)).toBeGreaterThan(spread * 1.4)
-    expect(glow()).toEqual({ a: 0, b: 0, c: 1, d: 0, e: 0 })
-  })
+  scene(
+    'moves under the frame’s keys with the ring on its note, and says which way',
+    async () => {
+      const { at, box, glow, host } = await drawn()
+      host.active = 'c'
+      await wait(800)
+      const region = part(host, 'region') as HTMLElement
+      const live = () => part(host, 'live')?.textContent
+      const before = at('c')
+      key(region, 'ArrowRight')
+      await wait(500)
+      /* A quarter of the box to the right, so the note is drawn a quarter to the left. */
+      expect(Math.round(before.x - at('c').x)).toBe(Math.round(box.clientWidth / 4))
+      expect(Math.round(at('c').y - before.y)).toBe(0)
+      expect(live()).toBe('Moved right')
+      expect(glow()).toEqual({ a: 0, b: 0, c: 1, d: 0, e: 0 })
+      const spread = Math.hypot(at('a').x - at('c').x, at('a').y - at('c').y)
+      key(region, '=')
+      await wait(500)
+      expect(live()).toBe('Zoomed in')
+      expect(Math.hypot(at('a').x - at('c').x, at('a').y - at('c').y)).toBeGreaterThan(spread * 1.4)
+      expect(glow()).toEqual({ a: 0, b: 0, c: 1, d: 0, e: 0 })
+      /* **Four seconds, not the runner's two**: the three moves wait 1.8 seconds
+       for their animations, and Sigma 4 compiles the shaders it generates as
+       it is made, which in CI's software WebGL took the rest. */
+    },
+    4000,
+  )
 
   /* **As the guide writes it**: the frame is in the page, the import defines
      it, and Sigma is made in its box on the next line, with no await between
