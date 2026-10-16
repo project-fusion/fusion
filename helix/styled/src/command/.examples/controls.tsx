@@ -1,6 +1,9 @@
 export function Example() {
   return (
-    <>
+    <helix-flex
+      direction="column"
+      gap="md"
+    >
       <helix-toolbar label="Report">
         <helix-button>Export report</helix-button>
         <helix-button>Share report</helix-button>
@@ -16,6 +19,6 @@ export function Example() {
         <helix-option value="new">New report</helix-option>
         <helix-option value="open">Open recent</helix-option>
       </helix-command>
-    </>
+    </helix-flex>
   )
 }
