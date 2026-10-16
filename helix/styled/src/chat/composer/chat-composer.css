@@ -32,6 +32,10 @@
    behind the light**, a beat later, so the light is seen traveling rather
    than lost in an edge that lit at the same moment. */
 :host([glow]) [part="composer"] {
+  /* Half the box's width and height, which cap the light's size. The
+     element's script sets them on the box as it starts the light. */
+  --_chat-composer-reach-x: 5rem;
+  --_chat-composer-reach-y: 2.5rem;
   position: relative;
   transition: box-shadow var(--helix-duration-normal) var(--helix-easing-standard);
 }
@@ -56,8 +60,13 @@
 }
 
 :host([glow]) [part="composer"]::before {
+  /* **The light reaches half way across the box at most**, so on a box one
+     line tall the light on one edge leaves the edge across from it dark.
+     At a fixed 2.5rem it lit a short streak on the top edge while it ran
+     along the bottom. */
   background: radial-gradient(
-    5rem 2.5rem at var(--_chat-composer-light-x, 0px) var(--_chat-composer-light-y, 0px),
+    min(5rem, var(--_chat-composer-reach-x)) min(2.5rem, var(--_chat-composer-reach-y)) at
+      var(--_chat-composer-light-x, 0px) var(--_chat-composer-light-y, 0px),
     color-mix(in oklab, var(--chat-composer-glow-color, var(--helix-color-primary)) 60%, white),
     var(--chat-composer-glow-color, var(--helix-color-primary)) 35%,
     transparent 100%
@@ -80,37 +89,66 @@
 }
 
 :host([glow]) [part="composer"]::after {
-  /* How far the bloom reaches past the edge: past the gradient's own 2rem
-     and the blur around it, so the band's outer edge, where the mask cuts,
-     falls where nothing is left to cut. At `md` the mask cut the bloom off
-     in a hard line half way out. */
-  --_chat-composer-bloom: var(--helix-space-2xl);
+  /* How far the bloom reaches past the edge, and into the box. Past the edge
+     it reaches as far as the chat pads its composer, `sm`, so a chat in a
+     box that clips, as a pane does, never cuts it. At `2xl` the pane cut it
+     off at the window's foot, and a gallery frame cut it beside the box.
+     Into the box it stops short of the field's text. */
+  --_chat-composer-bloom: var(--helix-space-sm);
+  --_chat-composer-bloom-in: var(--helix-space-xs);
+  /* How the bloom fades across the edge: out of the box to nothing at the
+     bloom's reach, and into it to nothing at its inner reach. The steps
+     ease the fade, so the edge is the brightest line and no line is left
+     where a fade ends. */
+  --_chat-composer-bloom-out:
+    transparent,
+    rgb(0 0 0 / 0.25) calc(var(--_chat-composer-bloom) / 3),
+    rgb(0 0 0 / 0.6) calc(var(--_chat-composer-bloom) * 2 / 3),
+    #000 var(--_chat-composer-bloom),
+    #000 calc(100% - var(--_chat-composer-bloom)),
+    rgb(0 0 0 / 0.6) calc(100% - var(--_chat-composer-bloom) * 2 / 3),
+    rgb(0 0 0 / 0.25) calc(100% - var(--_chat-composer-bloom) / 3),
+    transparent;
+  --_chat-composer-bloom-into:
+    #000 var(--_chat-composer-bloom),
+    rgb(0 0 0 / 0.45) calc(var(--_chat-composer-bloom) + var(--_chat-composer-bloom-in) / 3),
+    transparent calc(var(--_chat-composer-bloom) + var(--_chat-composer-bloom-in)),
+    transparent calc(100% - var(--_chat-composer-bloom) - var(--_chat-composer-bloom-in)),
+    rgb(0 0 0 / 0.45) calc(100% - var(--_chat-composer-bloom) - var(--_chat-composer-bloom-in) / 3),
+    #000 calc(100% - var(--_chat-composer-bloom));
   --_chat-composer-light-x: 0px;
   --_chat-composer-light-y: 0px;
+  /* The light's own spot, offset by the bloom's inset so it sits where the
+     light does, and reaching half way across the box at most, as the light
+     does. Its fade along the edge is the gradient's, and its fade across
+     the edge is the mask's. */
   background: radial-gradient(
-    4rem 2rem at calc(var(--_chat-composer-light-x, 0px) + var(--_chat-composer-bloom))
+    min(5rem, var(--_chat-composer-reach-x)) min(2.5rem, var(--_chat-composer-reach-y)) at
+      calc(var(--_chat-composer-light-x, 0px) + var(--_chat-composer-bloom))
       calc(var(--_chat-composer-light-y, 0px) + var(--_chat-composer-bloom)),
     color-mix(
       in oklab,
-      var(--chat-composer-glow-color, var(--helix-color-primary)) 55%,
+      var(--chat-composer-glow-color, var(--helix-color-primary)) 70%,
       transparent
     ),
     transparent 100%
   );
-  border-radius: calc(var(--helix-radii-md) + var(--_chat-composer-bloom));
   content: "";
-  /* **The light's bloom, outside the edge**, where a ring two pixels wide
-     carries too little light to read on a frosted ground. Cut to the band
-     around the box by the same two masks as the light, so none of it shows
-     through a translucent fill onto the words inside. Offset by its own
-     inset, so it sits where the light does. */
-  filter: blur(6px);
+  /* **The light's bloom, across the edge**, where a ring two pixels wide
+     carries too little light to read on a frosted ground. **Faded at both
+     sides.** The mask is the fade out of the box on each axis,
+     intersected with the union of the fades into it, so the bloom is
+     brightest on the edge and falls to nothing a short way to either side.
+     A mask that cut the bloom at the edge left it hanging off the box with
+     a flat top. */
   inset: calc(var(--_chat-composer-bloom) * -1);
   mask:
-    linear-gradient(#000 0 0) content-box exclude,
-    linear-gradient(#000 0 0);
+    linear-gradient(to right, var(--_chat-composer-bloom-out)),
+    linear-gradient(to bottom, var(--_chat-composer-bloom-out)),
+    linear-gradient(to right, var(--_chat-composer-bloom-into)),
+    linear-gradient(to bottom, var(--_chat-composer-bloom-into));
+  mask-composite: intersect, intersect, add, add;
   opacity: 0;
-  padding: var(--_chat-composer-bloom);
   pointer-events: none;
   position: absolute;
   z-index: var(--helix-layer-beneath);

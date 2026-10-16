@@ -10,6 +10,10 @@ import '../../tooltip/index.js'
 const LIGHT_X = '--_chat-composer-light-x'
 const LIGHT_Y = '--_chat-composer-light-y'
 
+/** How far the light may reach across the box: half its width, and half its height. */
+const REACH_X = '--_chat-composer-reach-x'
+const REACH_Y = '--_chat-composer-reach-y'
+
 /**
  * How fast the light travels the edge, in pixels a millisecond, and the
  * shortest and longest one lap takes.
@@ -183,7 +187,13 @@ export class HelixChatComposer extends HelixHeadlessChatComposer {
     for (const lap of this.laps) {
       lap.cancel()
     }
-    // The light on the edge, and its bloom outside it, on one clock.
+    // The sheet caps the light's size with these. Chromium refuses a
+    // gradient size that mixes a percentage with a length, in `calc()` or
+    // `min()`, so the box's size comes from here. Measured October 16, 2026
+    // in Chromium 153.
+    frame.style.setProperty(REACH_X, `${width / 2}px`)
+    frame.style.setProperty(REACH_Y, `${height / 2}px`)
+    // The light on the edge, and its bloom across it, on one clock.
     this.laps = ['::before', '::after'].map((pseudoElement) =>
       frame.animate(keyframes, { ...timing, pseudoElement }),
     )
