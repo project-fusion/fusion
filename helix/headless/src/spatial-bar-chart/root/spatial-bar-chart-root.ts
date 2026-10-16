@@ -125,6 +125,7 @@ const SERIES = 24
  * @csspart face - One face of a bar the view shows, shaded by which way it faces.
  * @csspart fallback - The box the chart's own drawing fills, shown until a renderer has drawn and where none is connected. Hidden from screen readers.
  * @csspart grid - The box's edges and its grid, in the chart's own drawing.
+ * @csspart listen - The button that plays the chart as sound, under `listen`.
  * @csspart live - The readout: a polite live region that says the bar the keys moved to. Hide it visually.
  * @csspart loading - The words while `loading` is set and there are no readings.
  * @csspart mark - The invisible point the tooltip is anchored to, where the renderer draws the reading.
@@ -421,7 +422,7 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
         ${readable ? this.renderLive(field, at) : nothing}
         ${this.renderTooltip(cell?.value === undefined ? undefined : cell.row)}
       </div>
-      ${readable ? this.renderSummary(field) : this.renderStatus()}${this.renderTable()}`
+      ${readable ? this.renderSummary(field) : this.renderStatus()}${this.renderListen()}${this.renderTable()}`
   }
 
   /**

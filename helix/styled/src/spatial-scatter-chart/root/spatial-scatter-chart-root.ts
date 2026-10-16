@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSpatialScatterChart } from '@fusion.dev/helix-headless/spatial-scatter-chart'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as listenStyles } from '../../shared/chart/listen.css.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './spatial-scatter-chart-root.css.js'
@@ -27,7 +28,7 @@ import '../../tooltip/index.js'
 export class HelixSpatialScatterChart extends HelixHeadlessSpatialScatterChart {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [seriesStyles, tooltipStyles, styles]
+  static override styles: CSSResultGroup = [seriesStyles, tooltipStyles, styles, listenStyles]
 
   /**
    * How strongly the points are drawn, as on every chart.

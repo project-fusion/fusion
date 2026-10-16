@@ -786,6 +786,17 @@ export { slotFilled, slotNamed } from './utils/slot-filled/slot-filled.js'
 export { SlottedGlyph } from './utils/slotted-glyph/slotted-glyph.js'
 export { slottedWords } from './utils/slotted-words/slotted-words.js'
 export {
+  ChartSound,
+  HIGH,
+  LOW,
+  panOf,
+  pitchOf,
+  type Sound,
+  type SoundSeries,
+  sweepPlan,
+  TIMBRES,
+} from './utils/sonify/sonify.js'
+export {
   browserSpeech,
   pageSpeechEngine,
   registerSpeechEngine,

@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDonutChart } from '@fusion.dev/helix-headless/donut-chart'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as listenStyles } from '../../shared/chart/listen.css.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
 import { styles as statusStyles } from '../../shared/chart/status.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
@@ -110,7 +111,13 @@ export class HelixDonutChart extends HelixHeadlessDonutChart {
   @property({ reflect: true })
   material?: 'frosted' | 'glass'
 
-  static override styles: CSSResultGroup = [seriesStyles, statusStyles, tooltipStyles, styles]
+  static override styles: CSSResultGroup = [
+    seriesStyles,
+    statusStyles,
+    tooltipStyles,
+    styles,
+    listenStyles,
+  ]
 }
 
 declare global {

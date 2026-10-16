@@ -136,6 +136,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart face - One square of the surface between four readings, or a triangle where one is missing, shaded by its height and by which way it faces.
  * @csspart fallback - The box the chart's own drawing fills, shown until a renderer has drawn and where none is connected. Hidden from screen readers.
  * @csspart grid - The box's edges and its grid at the ticks, in the chart's own drawing.
+ * @csspart listen - The button that plays the chart as sound, under `listen`.
  * @csspart live - The readout: a polite live region that says the place the keys moved to. Hide it visually.
  * @csspart loading - The words while `loading` is set and there are no readings.
  * @csspart mark - The invisible point the tooltip is anchored to, where the renderer draws the reading.
@@ -461,7 +462,7 @@ export class HelixHeadlessSpatialSurfaceChart extends MixinChartStatus(
         ${readable ? this.renderLive(field, at) : nothing}
         ${this.renderTooltip(field.cells[at]?.row)}
       </div>
-      ${readable ? this.renderSummary(field) : this.renderStatus()}${this.renderTable()}`
+      ${readable ? this.renderSummary(field) : this.renderStatus()}${this.renderListen()}${this.renderTable()}`
   }
 
   /**

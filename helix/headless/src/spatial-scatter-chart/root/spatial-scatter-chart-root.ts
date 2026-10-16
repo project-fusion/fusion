@@ -116,6 +116,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart empty - The words when the table has no points: the `empty` slot, falling back to `empty-text`.
  * @csspart fallback - The box the chart's own drawing fills, shown until a renderer has drawn and where none is connected. Hidden from screen readers.
  * @csspart grid - The box's edges and its grid at the ticks, in the chart's own drawing.
+ * @csspart listen - The button that plays the chart as sound, under `listen`.
  * @csspart live - The readout: a polite live region that says the point the keys moved to. Hide it visually.
  * @csspart loading - The words while `loading` is set and there are no points.
  * @csspart mark - The invisible point the tooltip is anchored to, where the renderer draws the reading.
@@ -418,7 +419,7 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
         ${this.renderLive(points, at)}
         ${this.renderTooltip(points[at]?.row)}
       </div>
-      ${readable ? this.renderSummary(field) : this.renderStatus()}${this.renderTable()}`
+      ${readable ? this.renderSummary(field) : this.renderStatus()}${this.renderListen()}${this.renderTable()}`
   }
 
   /**

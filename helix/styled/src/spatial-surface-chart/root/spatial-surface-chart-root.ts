@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessSpatialSurfaceChart } from '@fusion.dev/helix-headless/spatial-surface-chart'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
+import { styles as listenStyles } from '../../shared/chart/listen.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './spatial-surface-chart-root.css.js'
 import '../../tooltip/index.js'
@@ -29,7 +30,7 @@ import '../../tooltip/index.js'
 export class HelixSpatialSurfaceChart extends HelixHeadlessSpatialSurfaceChart {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [tooltipStyles, styles]
+  static override styles: CSSResultGroup = [tooltipStyles, styles, listenStyles]
 
   /**
    * How strongly the surface is drawn, as on every chart.

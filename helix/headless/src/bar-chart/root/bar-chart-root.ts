@@ -186,6 +186,7 @@ interface BarFrame {
  * @csspart label - One category's name, placed along the row by `--chart-label-start` and `--chart-label-size`, or down the column under `orientation="horizontal"`, with its text centered. Only the names that fit are drawn, the first and the last always.
  * @csspart labels - The row of category names, or the column of them under `orientation="horizontal"`, which the names share: lay it out as one grid cell they all stand in.
  * @csspart line - A series drawn as a line, named in `lines`.
+ * @csspart listen - The button that plays the chart as sound, under `listen`.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -492,7 +493,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
         : this.renderAxis(y, domain, 'primary', sideways, widest)
     }${this.renderPlot(series, categories, y, domain, floor, z)}${
       z === undefined ? nothing : this.renderAxis(z, other, 'secondary', sideways, widest, tint)
-    }${this.renderLabels(categories)}${this.renderSummary(series)}${this.renderTable()}`
+    }${this.renderLabels(categories)}${this.renderSummary(series)}${this.renderListen()}${this.renderTable()}`
   }
 
   /**
