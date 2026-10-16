@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessToast } from '@fusion.dev/helix-headless/toast'
 import type { CSSResultGroup } from 'lit'
+import '../../button/index.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './toast-root.css.js'
 
