@@ -80,8 +80,11 @@
 }
 
 :host([glow]) [part="composer"]::after {
-  /* How far the bloom reaches past the edge. */
-  --_chat-composer-bloom: var(--helix-space-md);
+  /* How far the bloom reaches past the edge: past the gradient's own 2rem
+     and the blur around it, so the band's outer edge, where the mask cuts,
+     falls where nothing is left to cut. At `md` the mask cut the bloom off
+     in a hard line half way out. */
+  --_chat-composer-bloom: var(--helix-space-2xl);
   --_chat-composer-light-x: 0px;
   --_chat-composer-light-y: 0px;
   background: radial-gradient(
