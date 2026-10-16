@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { hostAttributes, partTag, servedParts, ssr } from '@fusion.dev/helix-testing/ssr'
+import {
+  hostAttributes,
+  partTag,
+  servedParts,
+  ssr,
+  withoutStyles,
+} from '@fusion.dev/helix-testing/ssr'
 import { html } from 'lit'
 import '../index.js'
 
@@ -28,6 +34,7 @@ const markup = ssr(
 describe('chat composer server output', () => {
   test('serves the field, the tool row and the control that sends', () => {
     expect(servedParts(markup)).toEqual([
+      'attachments',
       'composer',
       'end',
       'field',
@@ -37,6 +44,19 @@ describe('chat composer server output', () => {
       'start',
       'tools',
     ])
+  })
+
+  /**
+   * A server has no children to read, so it cannot know whether anything is
+   * attached. It serves the region hidden, so an empty draft, the common
+   * case, shows no gap above the field before the page runs.
+   */
+  test('serves the attachments region inside the box, before the field, and hidden', () => {
+    const served = withoutStyles(markup)
+    expect(partTag(markup, 'attachments')).toContain('hidden')
+    expect(served.indexOf('part="attachments"')).toBeLessThan(served.indexOf('part="field"'))
+    expect(served.indexOf('part="composer"')).toBeLessThan(served.indexOf('part="attachments"'))
+    expect(served).toContain('<slot name="attachments"')
   })
 
   test('the field carries its own name, since an IDREF could not cross the boundary', () => {

@@ -1,0 +1,27 @@
+/* A thumbnail of the photo, square and cropped to fill, with its remove
+   button over the top corner. Its size follows the composer's small control
+   step, which the attachments row declares. */
+.thumbnail {
+  --image-aspect: 1;
+  block-size: calc(var(--helix-size-control) * 1.75);
+  display: inline-block;
+  inline-size: calc(var(--helix-size-control) * 1.75);
+  position: relative;
+}
+
+.thumbnail helix-image {
+  block-size: 100%;
+  border-radius: var(--helix-radii-md);
+  display: block;
+  inline-size: 100%;
+  overflow: hidden;
+}
+
+.remove {
+  --icon-button-background-color: var(--helix-color-surface-media);
+  --icon-button-foreground-color: var(--helix-color-foreground-media);
+  --icon-button-size: var(--helix-size-icon);
+  inset-block-start: var(--helix-space-2xs);
+  inset-inline-end: var(--helix-space-2xs);
+  position: absolute;
+}

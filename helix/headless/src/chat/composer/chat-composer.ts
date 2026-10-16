@@ -12,6 +12,7 @@ import {
   motionPaused,
   numberConverter,
   onMotionChange,
+  pressedOwnControl,
   reducedMotion,
   SPOKEN_RULE,
   timeConverter,
@@ -36,8 +37,8 @@ const EXAMPLE_FADE = 200
  *
  * @description
  * The composer is a separate element so you can replace it. If you need
- * attachments, slash commands, or a model picker, replace the composer and keep
- * the transcript.
+ * slash commands or a layout of your own, replace the composer and keep the
+ * transcript.
  *
  * By default, Enter sends and Shift+Enter starts a new line, the convention in
  * messaging apps. Document editors mostly use the opposite, so `submit-on`
@@ -91,12 +92,20 @@ const EXAMPLE_FADE = 200
  * is a draft. Where focus was on the one that goes, it moves to the one that
  * comes, so a keyboard reader stays in the same place.
  *
+ * **What the draft carries goes in `attachments`**, inside the box and above
+ * the field, such as thumbnails of attached images and cards for attached
+ * files. The region takes no room while nothing is in it. A press on its
+ * empty space keeps the reader in the field, and a press on a control in it,
+ * such as a button that removes an attachment, goes to that control. Set
+ * `attached` as well, so the send button shows for a draft with no text.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
  * @aliases Message box, Prompt input
  * @documentation https://fusion.dev/helix/components/chat
  *
+ * @slot attachments - What the draft carries, such as images or files, inside the box and above the field.
  * @slot end - Content under the field, beside the send button.
  * @slot idle - A control shown in place of the send button while the draft is empty and no reply is on its way, such as a button that starts a voice conversation.
  * @slot start - Content under the field at the leading edge, such as an attachment button or a model picker.
@@ -108,6 +117,7 @@ const EXAMPLE_FADE = 200
  * @event {HelixTypingEvent} helix-typing - The user started or stopped writing, with `typing` saying which, as the composer's `typing` does.
  * @event {Event} input - The user changed the text. Read it from `value`, for a typing indicator or a saved draft. Bubbles and is composed, as a native field's is.
  *
+ * @csspart attachments - The box around the `attachments` slot, above the field. It is hidden while the slot is empty.
  * @csspart composer - The whole composer.
  * @csspart end - The box around the `end` slot.
  * @csspart feedback - The `feedback` message, under the field while it is set.
@@ -466,7 +476,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
    * framework renders after the first render is shown.
    */
   private markEmpty(): void {
-    for (const name of ['start', 'end'] as const) {
+    for (const name of ['attachments', 'start', 'end'] as const) {
       markRegion(this.renderRoot, name, [name])
     }
   }
@@ -485,6 +495,31 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
       !this.attached &&
       this.value.trim() === ''
     )
+  }
+
+  /**
+   * Whether anything is slotted in `attachments`, where the children are
+   * known. A server cannot know them, so it serves the region hidden and
+   * takes no gap above the field for an empty draft, the common case.
+   * `markEmpty` keeps it right after every render and on `slotchange`.
+   */
+  private get carrying(): boolean {
+    return this.knownChildren.some((child) => child.getAttribute('slot') === 'attachments')
+  }
+
+  /**
+   * A press on the attachments' empty space, such as the gap between two
+   * thumbnails, keeps the reader in the field, so the next key they press is
+   * typed. A press on a control of their own, such as a button that removes
+   * an attachment, is left to that control.
+   */
+  private readonly handleAttachmentsDown = (event: MouseEvent): void => {
+    const region = event.currentTarget as HTMLElement
+    if (event.button !== 0 || pressedOwnControl(event, region) || this.isDisabled) {
+      return
+    }
+    event.preventDefault()
+    this.partNamed<HTMLTextAreaElement>('field')?.focus()
   }
 
   /** Where focus was as an update began: on the send button, in the idle control, or elsewhere. */
@@ -672,7 +707,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
   }
 
   /**
-   * The field, and a row of tools under it.
+   * What the draft carries, the field, and a row of tools under it.
    *
    * **The tools take a line of their own rather than sharing the field's.** On
    * one line every tool a consumer adds takes width away from the thing being
@@ -686,6 +721,9 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
    */
   protected override render(): TemplateResult {
     return html`<div part="composer">
+      <div part="attachments" ?hidden=${!this.carrying} @mousedown=${this.handleAttachmentsDown}
+        ><slot name="attachments" @slotchange=${() => this.markEmpty()}></slot
+      ></div>
       <textarea
         part="field"
         .value=${live(this.value)}

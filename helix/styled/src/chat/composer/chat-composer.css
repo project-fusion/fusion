@@ -182,6 +182,31 @@
   resize: none;
 }
 
+/* What the draft carries, inside the box and above the field: a row that
+   wraps, so several thumbnails sit side by side before they stack. **Its
+   inset is the field's**, so the first thumbnail starts on the line the
+   caret does, and stands as far from the top edge as from the leading one.
+   The box's gap and the field's own block padding keep it off the text. */
+[part="attachments"] {
+  --_chat-composer-inset: calc(
+    var(--helix-space-sm) -
+    var(--helix-space-xs) -
+    var(--helix-border-thin)
+  );
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--helix-space-xs);
+  min-inline-size: 0;
+  padding-block-start: var(--_chat-composer-inset);
+  padding-inline: var(--_chat-composer-inset);
+}
+
+/* Nothing attached, no box and no gap above the field. See `markEmpty`. */
+[part="attachments"][hidden] {
+  display: none;
+}
+
 [part="field"]:focus-visible {
   outline: none;
 }
@@ -210,7 +235,9 @@
 /* A dense row declares the size once, so nothing slotted has to be told. The
    tools are chrome beside the thing being written, not controls in their own
    right, and at the full step two of them are taller than the line of text
-   above them. */
+   above them. What the draft carries takes the same step, so a file's card
+   or a tag slotted there stands at a tool's height. */
+[part="attachments"],
 [part="start"],
 [part="end"] {
   --helix-size-control: var(--helix-size-control-sm);
@@ -219,7 +246,10 @@
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
   --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+}
 
+[part="start"],
+[part="end"] {
   align-items: center;
   display: flex;
   gap: var(--helix-space-2xs);
