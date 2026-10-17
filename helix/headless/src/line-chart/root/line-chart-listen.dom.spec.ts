@@ -1,4 +1,4 @@
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -86,28 +86,24 @@ const key = (host: HTMLElement, name: string): void => {
   )
 }
 
-/* A browser has a real `AudioContext`, which would play: held aside for
-   every test here, each starting with none, and put back after. */
+/* A browser has a real `AudioContext`, which would play: a test that wants
+   none takes it away, one that listens puts a fake in, and each puts the
+   browser's own back after. Only the hooks the browser runner also has. */
 const audio = globalThis as { AudioContext?: unknown }
 const real = audio.AudioContext
 
-beforeEach(() => {
-  delete audio.AudioContext
-})
-
 afterEach(() => {
-  delete audio.AudioContext
-  started = []
-})
-
-afterAll(() => {
-  if (real !== undefined) {
+  if (real === undefined) {
+    delete audio.AudioContext
+  } else {
     audio.AudioContext = real
   }
+  started = []
 })
 
 describe('a chart that listens', () => {
   test('draws no Listen button where the browser has no audio, or without listen', async () => {
+    delete audio.AudioContext
     expect(part(await chart(), 'listen')).toBeNull()
     ;(globalThis as { AudioContext?: unknown }).AudioContext = FakeContext
     expect(part(await chart(''), 'listen')).toBeNull()
