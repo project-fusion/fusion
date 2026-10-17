@@ -255,11 +255,11 @@ describe('a filterable menu', () => {
     const { filterMenu } = await import('./index.js')
     const { HelixHeadlessMenu } = await import('../index.js')
     /* A tag of its own, since the audit reports each tag once a page. */
-    customElements.define('spec-late-filter-menu', class extends HelixHeadlessMenu {})
+    customElements.define('spec-late-entry-menu', class extends HelixHeadlessMenu {})
     const warnings: string[] = []
     console.warn = (message: string) => warnings.push(message)
     const host = (await mount(
-      `<spec-late-filter-menu filterable><button slot="trigger">Edit</button>${ROWS}</spec-late-filter-menu>`,
+      `<spec-late-entry-menu filterable><button slot="trigger">Edit</button>${ROWS}</spec-late-entry-menu>`,
     )) as Menu
     ;(host as unknown as { filterer: unknown }).filterer = undefined
     host.show()
