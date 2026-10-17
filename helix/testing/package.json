@@ -32,9 +32,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
-    "@happy-dom/global-registrator": "^20.14.6",
+    "@happy-dom/global-registrator": "^21.0.1",
     "@lit-labs/ssr": "^4.1.0",
-    "@types/bun": "^1.4.2",
+    "@types/bun": "^1.4.3",
     "lit": "^3.2.1"
   }
 }
