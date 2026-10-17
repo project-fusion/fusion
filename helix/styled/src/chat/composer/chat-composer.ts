@@ -11,9 +11,6 @@ import '../../tooltip/index.js'
 const LIGHT_X = '--_chat-composer-light-x'
 const LIGHT_Y = '--_chat-composer-light-y'
 
-/** The entrance of an example, whose end is where the field may take its new height. */
-const ENTRANCE = 'helix-composer-example-in'
-
 /** How far the light may reach across the box: half its width, and half its height. */
 const REACH_X = '--_chat-composer-reach-x'
 const REACH_Y = '--_chat-composer-reach-y'
@@ -254,8 +251,6 @@ export class HelixChatComposer extends HelixHeadlessChatComposer {
         tabindex="-1"
         placeholder=${one.text}
         ?disabled=${this.isDisabled}
-        @animationcancel=${this.landed}
-        @animationend=${this.landed}
       ></textarea>`,
     )}`
   }
@@ -279,20 +274,20 @@ export class HelixChatComposer extends HelixHeadlessChatComposer {
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
     if (this.placeholders.length < 2) {
-      this.release()
+      this.exampleLanded()
     }
   }
 
-  /** Lets the field take the height of the example showing. */
-  private readonly release = (): void => {
+  /**
+   * Lets the field take the height of the example showing.
+   *
+   * **On the element's clock, never on an animation event.** WebKit sends no
+   * `animationcancel`, so a hold released by one stayed on whenever the
+   * entrance was cut short, and the field kept the leaving example's height
+   * until the next turn. Measured in Linux WebKit on October 17, 2026.
+   */
+  protected override exampleLanded(): void {
     this.partNamed<HTMLElement>('field')?.style.removeProperty('--_chat-composer-held')
-  }
-
-  /** The entrance ended, or stopped, so the example has landed. */
-  private readonly landed = (event: AnimationEvent): void => {
-    if (event.animationName === ENTRANCE) {
-      this.release()
-    }
   }
 
   static override styles: CSSResultGroup = [styles, dictationStyles]
