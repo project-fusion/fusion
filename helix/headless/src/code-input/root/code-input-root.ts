@@ -125,7 +125,7 @@ export class HelixHeadlessCodeInput extends HelixHeadlessTextarea {
    * given, so it escapes the code, as every highlighter does.
    */
   @property({ attribute: false })
-  highlight?: CodeBlockHighlighter
+  highlight?: CodeBlockHighlighter | undefined
 
   /** The grammar to highlight, such as `json`, `css`, `ts`, `html` or `sh`. Empty is plain text. */
   @property()
