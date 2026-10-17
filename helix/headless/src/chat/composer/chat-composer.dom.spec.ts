@@ -666,19 +666,72 @@ describe('send-disabled', () => {
 /* A start page's composer shows the kinds of thing to ask, one after another,
    as its placeholder, and keeps still while the reader is about to write. */
 describe('placeholders', () => {
+  /** A composer with `placeholders`, which `Composer` leaves out. */
+  type Examples = Composer & { placeholders: readonly string[] }
+
   const field = (host: HTMLElement) => part(host, 'field') as HTMLTextAreaElement
 
   test('the first example is the placeholder, and `placeholder` stands in for none', async () => {
-    const host = (await composer('placeholder="Write a message"')) as Composer & {
-      placeholders: string[]
-    }
+    const host = (await composer('placeholder="Write a message"')) as Examples
     expect(field(host).placeholder).toBe('Write a message')
     host.placeholders = ['Fix the failing test', 'Explain the auth flow']
     await host.updateComplete
     expect(field(host).placeholder).toBe('Fix the failing test')
   })
 
-  const wait = (milliseconds: number) => new Promise((done) => setTimeout(done, milliseconds))
+  /**
+   * Stands in for the page's timers, so a spec moves time on by exactly the
+   * milliseconds it names. On real time a slow runner spent long enough
+   * mounting five composers that the first had started its exit before the
+   * spec looked, measured on a two-core CI runner on October 17, 2026. Each
+   * timer that comes due runs in order, and the updates it asks for finish
+   * before the next.
+   */
+  const fakeClock = () => {
+    let now = 0
+    let last = 0
+    const due = new Map<number, { at: number; run: () => void }>()
+    const real = { clear: globalThis.clearTimeout, set: globalThis.setTimeout }
+    globalThis.setTimeout = ((run: () => void, delay = 0) => {
+      last += 1
+      due.set(last, { at: now + Math.max(0, delay), run })
+      return last
+    }) as unknown as typeof setTimeout
+    globalThis.clearTimeout = ((key?: number) => {
+      if (key !== undefined) {
+        due.delete(key)
+      }
+    }) as unknown as typeof clearTimeout
+    const settle = async () => {
+      for (let turn = 0; turn < 5; turn += 1) {
+        await Promise.resolve()
+      }
+    }
+    return {
+      advance: async (milliseconds: number) => {
+        const end = now + milliseconds
+        for (;;) {
+          const next = [...due.entries()]
+            .filter(([, timer]) => timer.at <= end)
+            .sort(([one, a], [two, b]) => a.at - b.at || one - two)[0]
+          if (next === undefined) {
+            break
+          }
+          const [key, timer] = next
+          due.delete(key)
+          now = timer.at
+          timer.run()
+          await settle()
+        }
+        now = end
+        await settle()
+      },
+      restore: () => {
+        globalThis.setTimeout = real.set
+        globalThis.clearTimeout = real.clear
+      },
+    }
+  }
 
   /* Stands in for the platform's observer, so a spec can say when each
      composer comes into view and goes out of it. */
@@ -709,10 +762,10 @@ describe('placeholders', () => {
     }
   }
 
-  /* **The turns wait real time, about 17 seconds between them, so they run
-     under happy-dom alone.** The timing is the element's logic and reads the
-     same in any engine, and the browser run of a family has 60 seconds in
-     all. The styled spec waits out one real turn in each browser. */
+  /* **Under happy-dom alone**, because the stand-in clock replaces the
+     page's timers, and the browser harness races each spec against one of
+     them. The timing is the element's logic and reads the same in any
+     engine. The styled spec waits out one real turn in each browser. */
   const timed = hasLayout() ? (..._skipped: unknown[]): void => {} : test
 
   const statesOf = (host: Composer) => [
@@ -730,6 +783,7 @@ describe('placeholders', () => {
     'an empty field in view and without focus rolls to the next example, and focus, text, or being out of view holds it',
     async () => {
       const sight = watchSight()
+      const clock = fakeClock()
       try {
         const names = ['moving', 'focused', 'written', 'hidden', 'returned']
         await mount(
@@ -737,55 +791,55 @@ describe('placeholders', () => {
             .map((id) => `<helix-headless-chat-composer id="${id}"></helix-headless-chat-composer>`)
             .join(''),
         )
-        const [moving, focused, written, hidden, returned] = [
-          ...document.querySelectorAll('helix-headless-chat-composer'),
-        ] as (Composer & {
-          placeholders: string[]
-        })[]
-        for (const host of [moving, focused, written, hidden, returned]) {
-          await host.updateComplete
-          host.placeholders = ['One', 'Two']
-          await host.updateComplete
-        }
+        const [moving, focused, written, hidden, returned] = names.map(
+          (id) => document.getElementById(id) as unknown as Examples,
+        ) as [Examples, Examples, Examples, Examples, Examples]
         field(focused).dispatchEvent(new FocusEvent('focus'))
         await type(written, 'Draft')
         sight.see(hidden, false)
         sight.see(returned, false)
-        await wait(3000)
+        for (const host of [moving, focused, written, hidden, returned]) {
+          host.placeholders = ['One', 'Two']
+          await host.updateComplete
+        }
+        await clock.advance(3000)
         sight.see(returned, true)
-        await wait(3400)
+        await clock.advance(3499)
         expect(statesOf(moving)).toEqual(['One', false, false])
-        await wait(150)
+        await clock.advance(1)
         expect(statesOf(moving)).toEqual(['One', true, false])
-        await wait(100)
+        await clock.advance(100)
         await moving.updateComplete
         // The two cross: the next is the placeholder while the first still leaves.
         expect(statesOf(moving)).toEqual(['Two', true, true])
-        await wait(200)
+        await clock.advance(150)
         expect(statesOf(moving)).toEqual(['Two', false, true])
-        await wait(250)
+        await clock.advance(200)
         expect(statesOf(moving)).toEqual(['Two', false, false])
         for (const host of [focused, written, hidden, returned]) {
           expect(statesOf(host)).toEqual(['One', false, false])
         }
-        await wait(2700)
+        // Back in view at 3 seconds, so its exit starts at 9.5.
+        await clock.advance(2549)
+        expect(statesOf(returned)).toEqual(['One', false, false])
+        await clock.advance(101)
         await returned.updateComplete
-        expect(field(returned).placeholder).toBe('Two')
+        expect(statesOf(returned)).toEqual(['Two', true, true])
         expect(statesOf(hidden)).toEqual(['One', false, false])
         for (const host of [moving, focused, written, hidden, returned]) {
           host.remove()
         }
       } finally {
+        clock.restore()
         sight.restore()
       }
     },
-    15000,
   )
 
   /* The field's placeholder is the example showing, so the field is what a
      screen reader reaches and the empty-field semantics are the field's. */
   test('the field keeps the example showing as its placeholder', async () => {
-    const host = (await composer('label="Ask anything"')) as Composer & { placeholders: string[] }
+    const host = (await composer('label="Ask anything"')) as Examples
     host.placeholders = ['One', 'Two']
     await host.updateComplete
     expect(field(host).placeholder).toBe('One')
@@ -794,7 +848,7 @@ describe('placeholders', () => {
   })
 
   test('the headless tier draws no example over the field', async () => {
-    const host = (await composer()) as Composer & { placeholders: string[] }
+    const host = (await composer()) as Examples
     host.placeholders = ['One', 'Two']
     await host.updateComplete
     expect(part(host, 'example')).toBeNull()
@@ -804,28 +858,22 @@ describe('placeholders', () => {
 
   /* A paused page holds every motion that starts by itself, as reduced motion
      does, which happy-dom cannot ask for. */
-  timed(
-    'a page that paused its motion keeps the first example',
-    async () => {
-      document.documentElement.setAttribute('data-helix-motion', 'paused')
-      try {
-        const host = (await composer()) as Composer & { placeholders: string[] }
-        host.placeholders = ['One', 'Two']
-        await host.updateComplete
-        await wait(6900)
-        await host.updateComplete
-        expect([
-          field(host).placeholder,
-          hasState(host, 'example-leaving'),
-          hasState(host, 'example-entering'),
-        ]).toEqual(['One', false, false])
-        host.remove()
-      } finally {
-        document.documentElement.removeAttribute('data-helix-motion')
-      }
-    },
-    12000,
-  )
+  timed('a page that paused its motion keeps the first example', async () => {
+    document.documentElement.setAttribute('data-helix-motion', 'paused')
+    const clock = fakeClock()
+    try {
+      const host = (await composer()) as Examples
+      host.placeholders = ['One', 'Two']
+      await host.updateComplete
+      await clock.advance(20000)
+      await host.updateComplete
+      expect(statesOf(host)).toEqual(['One', false, false])
+      host.remove()
+    } finally {
+      clock.restore()
+      document.documentElement.removeAttribute('data-helix-motion')
+    }
+  })
 })
 
 describe('the idle slot', () => {

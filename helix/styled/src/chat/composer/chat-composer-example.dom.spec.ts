@@ -12,7 +12,7 @@ beforeAll(async () => {
 
 type Composer = HTMLElement & {
   placeholder: string
-  placeholders: string[]
+  placeholders: readonly string[]
   updateComplete: Promise<unknown>
   value: string
 }

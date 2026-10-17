@@ -733,6 +733,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
     this.entering = setTimeout(() => {
       this.entering = undefined
       this.toggleState('example-entering', false)
+      this.exampleLanded()
     }, EXAMPLE_ENTER)
     this.turnExamples()
   }
@@ -749,7 +750,15 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
     this.leavingExample = undefined
     this.toggleState('example-leaving', false)
     this.toggleState('example-entering', false)
+    this.exampleLanded()
   }
+
+  /**
+   * Called as the example showing has landed: its entrance ended, or the
+   * examples stopped. A tier that holds anything for the swap lets it go
+   * here. The headless tier holds nothing.
+   */
+  protected exampleLanded(): void {}
 
   /**
    * What the tier above draws over the empty field while `placeholders` holds
