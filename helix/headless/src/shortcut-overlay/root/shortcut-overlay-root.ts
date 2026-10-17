@@ -315,6 +315,20 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
     if (changed.has('badges')) {
       this.arrange()
     }
+    /* Drawn while the page's fonts load, the controls and the badges are
+       measured in the fallback face, and each badge lands a few pixels off
+       its control once the font arrives: drawn again then. */
+    if (
+      changed.has('badges') &&
+      this.badges.length > 0 &&
+      globalThis.document?.fonts?.status === 'loading'
+    ) {
+      void document.fonts.ready.then(() => {
+        if (this.badges.length > 0) {
+          this.show()
+        }
+      })
+    }
   }
 
   /**

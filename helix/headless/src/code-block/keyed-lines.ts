@@ -34,12 +34,26 @@ class KeyedLines extends Directive {
     const parent = part.parentNode
     const document = parent.ownerDocument ?? (parent as Document)
     const end = part.endNode
+    /* **Hydrating**: the part opens on a server's `lit-part` marker, it has
+       no end yet, and the server drew the markup whole. Answered with the
+       same, so Lit finds what it drew; the lines are keyed on the next
+       update, below. A part with no end in a browser's own drawing is the
+       last child of its element, and is drawn line by line at once. */
+    const start = part.startNode
+    if (
+      end === null &&
+      this.lines.length === 0 &&
+      start?.nodeType === 8 &&
+      (start as Comment).data.startsWith('lit-part')
+    ) {
+      return this.render(markup)
+    }
     const next = highlightedLineList(markup)
-    /* Nothing drawn yet, so whatever stands between the part's markers is a
-       server's drawing, hydrating: taken away, or the lines would be drawn
-       twice, the server's and then these. */
+    /* Nothing keyed yet, so whatever stands between the part's markers was
+       drawn whole, by a server or by the hydration above: taken away, or the
+       lines would be drawn twice. */
     if (this.lines.length === 0) {
-      for (let node = part.startNode?.nextSibling; node && node !== end; ) {
+      for (let node = start?.nextSibling; node && node !== end; ) {
         const following: ChildNode | null = node.nextSibling
         node.parentNode?.removeChild(node)
         node = following
