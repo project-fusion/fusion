@@ -249,14 +249,105 @@
   outline: none;
 }
 
-/* The examples under `placeholders` fade into each other: out as one leaves,
-   and back in once the next is the placeholder. */
-[part="field"]::placeholder {
-  transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+/*
+ *  The examples under `placeholders` roll into each other. The one showing
+ *    rises a little as it fades and blurs, and the next rises into its place
+ *    from below as it fades in.
+ *
+ * *A second field draws them**, `example`, placed on the field's own box by
+ *    anchor positioning, so it follows the field wherever a layout puts it,
+ *    as the chat app's one-line composer does through `::part(field)`. It takes
+ *    the field's padding and type, and its placeholder is drawn by the same
+ *    rules as the field's, so the two wrap and clip alike. The field's own
+ *    placeholder turns transparent behind it and stays the one a screen reader
+ *    hears. The second field hides as soon as the field holds text, in the same
+ *    frame as the field's own placeholder.
+ *
+ *    The exit takes 250 milliseconds, which is `EXAMPLE_LEAVE`, and the
+ *    entrance fits inside the 350 of `EXAMPLE_ENTER`.
+ */
+@supports (anchor-name: --a) {
+  [part="composer"] {
+    position: relative;
+  }
+
+  [part="field"] {
+    anchor-name: --_chat-composer-field;
+  }
+
+  [part="field"]:has(+ [part="example"])::placeholder {
+    color: transparent;
+  }
+
+  [part="example"] {
+    background-color: transparent;
+    block-size: anchor-size(--_chat-composer-field block);
+    border: 0;
+    color: var(--helix-color-foreground);
+    field-sizing: fixed;
+    font-family: var(--helix-font-sans);
+    font-size: max(var(--helix-text-field-min), var(--helix-text-sm));
+    inline-size: anchor-size(--_chat-composer-field inline);
+    inset-block-start: anchor(--_chat-composer-field start);
+    inset-inline-start: anchor(--_chat-composer-field start);
+    line-height: var(--helix-leading-normal);
+    margin: var(--helix-space-none);
+    overflow: hidden;
+    padding-block: var(--helix-space-2xs);
+    padding-inline: calc(var(--helix-space-sm) - var(--helix-space-xs) - var(--helix-border-thin));
+    pointer-events: none;
+    position: absolute;
+    resize: none;
+  }
+
+  [part="field"]:not(:placeholder-shown) + [part="example"] {
+    visibility: hidden;
+  }
+
+  /* Out, with no transition back: focus or text ends a turn without the
+     example sliding back into place. */
+  :host(:state(example-leaving)) [part="example"] {
+    filter: blur(0.125em);
+    opacity: 0;
+    transition:
+      filter calc(var(--helix-duration-normal) * 1.25) var(--helix-easing-standard),
+      opacity calc(var(--helix-duration-normal) * 1.25) var(--helix-easing-standard),
+      translate calc(var(--helix-duration-normal) * 1.25) var(--helix-easing-standard);
+    translate: 0 -0.35em;
+  }
+
+  :host(:state(example-entering)) [part="example"] {
+    animation: helix-composer-example-in var(--helix-duration-slow) var(--helix-easing-standard);
+  }
+
+  @keyframes helix-composer-example-in {
+    from {
+      opacity: 0;
+      translate: 0 0.35em;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :host(:state(example-entering)) [part="example"] {
+      animation: none;
+    }
+  }
 }
 
-:host(:state(example-leaving)) [part="field"]::placeholder {
-  opacity: 0;
+/* Without anchor positioning there is nothing to place the second field on,
+   so the field's own placeholder fades from one example to the next. */
+@supports not (anchor-name: --a) {
+  [part="example"] {
+    display: none;
+  }
+
+  [part="field"]::placeholder {
+    transition: opacity var(--helix-duration-fast) var(--helix-easing-standard);
+  }
+
+  :host(:state(example-leaving)) [part="field"]::placeholder {
+    opacity: 0;
+  }
 }
 
 /*

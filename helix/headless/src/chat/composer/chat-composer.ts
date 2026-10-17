@@ -26,11 +26,45 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html as staticHtml } from 'lit/static-html.js'
 import '../../tooltip/index.js'
 
-/** How long each example shows before the next, in milliseconds. */
-const EXAMPLE_TURN = 4000
+/**
+ * How long an example shows before the next one replaces it, in milliseconds,
+ * counted from the moment its text appears. An example up to
+ * `EXAMPLE_SHORT` characters long shows this long.
+ */
+const EXAMPLE_SHOWN = 6500
 
-/** How long an example takes to fade out before the next replaces it. */
-const EXAMPLE_FADE = 200
+/** The most characters an example can have and still show for `EXAMPLE_SHOWN`. */
+const EXAMPLE_SHORT = 40
+
+/** How much longer an example shows for each character past `EXAMPLE_SHORT`, in milliseconds. */
+const EXAMPLE_PER_CHARACTER = 60
+
+/** The longest an example shows, however long it is, in milliseconds. */
+const EXAMPLE_LONGEST = 10000
+
+/**
+ * How long an example takes to leave before the next replaces it, in
+ * milliseconds, while `:state(example-leaving)` holds. The styled tier's
+ * leaving transition takes as long.
+ */
+const EXAMPLE_LEAVE = 250
+
+/**
+ * How long `:state(example-entering)` holds after the next example appears,
+ * in milliseconds. The styled tier's entrance ends within it.
+ */
+const EXAMPLE_ENTER = 350
+
+/**
+ * How long `example` shows before the next one replaces it, in milliseconds:
+ * `EXAMPLE_SHOWN`, and `EXAMPLE_PER_CHARACTER` more for each character past
+ * `EXAMPLE_SHORT`, up to `EXAMPLE_LONGEST`. A longer example takes longer to
+ * read.
+ */
+export function exampleShown(example: string): number {
+  const extra = Math.max(0, Array.from(example).length - EXAMPLE_SHORT)
+  return Math.min(EXAMPLE_LONGEST, EXAMPLE_SHOWN + extra * EXAMPLE_PER_CHARACTER)
+}
 
 /**
  * @summary A field for writing a turn in a conversation.
@@ -141,7 +175,8 @@ const EXAMPLE_FADE = 200
  * @csspart voice-listening - The dictation button while it listens. Set alongside `voice`.
  * @csspart voice-status - What a screen reader hears as dictation starts and stops, drawn for no one else.
  *
- * @cssstate example-leaving - The example in the empty field is about to give way to the next one, for a fade between them. See `placeholders`.
+ * @cssstate example-entering - The example in the empty field has just replaced the one before it, for an entrance. It holds for 350 milliseconds. See `placeholders`.
+ * @cssstate example-leaving - The example in the empty field is about to give way to the next one, for an exit. It holds for 250 milliseconds, and then the next example shows. See `placeholders`.
  * @cssstate invalid - The draft fails `required`, `minlength`, `maxlength`, or a custom error, and the reader has tried to send or submit it, or edited the field and left it. Or `feedback` is set.
  * @cssstate listening - While the composer listens for dictation. The element sets `--dictation-level` on itself meanwhile, from 0 to 1, for a meter.
  */
@@ -210,17 +245,19 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
   placeholder = ''
 
   /**
-   * Examples the empty field shows in turn, one every few seconds, in place
-   * of `placeholder`, such as tasks a reader might ask for.
+   * Examples the empty field shows in turn, in place of `placeholder`, such
+   * as tasks a reader might ask for. Each shows for 6.5 seconds, and a longer
+   * one shows longer, up to 10 seconds.
    *
-   * **Each is the field's placeholder in its turn**, so it sits wherever the
-   * field does in any layout, and a screen reader that reaches the field
-   * hears the one showing. The swap fades through `:state(example-leaving)`.
+   * **Each is the field's placeholder in its turn**, so a screen reader that
+   * reaches the field hears the one showing. The swap runs through
+   * `:state(example-leaving)`, as one example leaves, and
+   * `:state(example-entering)`, as the next arrives.
    *
    * **They move only while nobody is about to write.** An empty field without
-   * focus moves on; one with focus or with text keeps the example showing.
-   * Where the reader asked for less motion, or the page paused its motion,
-   * the first example stays.
+   * focus moves on. Focus or text holds the example showing, and an example
+   * already leaving finishes its turn. Where the reader asked for less
+   * motion, or the page paused its motion, the first example stays.
    */
   @property({ attribute: false })
   placeholders: readonly string[] = []
@@ -345,11 +382,14 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
   /** Whether the field holds focus, which holds the examples still. */
   private focused = false
 
-  /** The turn of the examples, while they move. */
-  private turning: ReturnType<typeof setInterval> | undefined
+  /** The wait before the example showing leaves, while the examples move. */
+  private turning: ReturnType<typeof setTimeout> | undefined
 
-  /** The fade between two examples, while it runs. */
-  private fading: ReturnType<typeof setTimeout> | undefined
+  /** The exit of the example leaving, while it runs. */
+  private leaving: ReturnType<typeof setTimeout> | undefined
+
+  /** The entrance of the example arriving, while it runs. */
+  private entering: ReturnType<typeof setTimeout> | undefined
 
   /** Stops listening to the page's motion switch. */
   private unmoved: (() => void) | undefined
@@ -577,45 +617,91 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
     this.turnExamples()
   }
 
+  /** The example the empty field shows, or `placeholder` where there are none. */
+  private get shownPlaceholder(): string {
+    const { length } = this.placeholders
+    return length > 0 ? (this.placeholders[this.example % length] ?? '') : this.placeholder
+  }
+
   /**
    * Starts the examples moving, or stops them, as the list, the field, and
    * the page allow.
+   *
+   * **Each turn is timed by the example showing**, so a long one stays up
+   * longer. **Focus holds the examples and leaves a turn under way to
+   * finish**, so the field never shows half an exit. Text, reduced motion, a
+   * paused page, and leaving the document stop them at once.
    */
   private turnExamples(): void {
-    const moving =
+    const free =
       this.isConnected &&
       this.placeholders.length > 1 &&
       this.value === '' &&
-      !this.focused &&
       !reducedMotion() &&
       !motionPaused()
-    if (!moving) {
+    if (!free) {
       this.stopExamples()
       return
     }
-    this.turning ??= setInterval(() => this.nextExample(), EXAMPLE_TURN)
+    if (this.focused) {
+      clearTimeout(this.turning)
+      this.turning = undefined
+      return
+    }
+    if (this.turning === undefined && this.leaving === undefined) {
+      this.turning = setTimeout(() => this.leaveExample(), exampleShown(this.shownPlaceholder))
+    }
   }
 
-  /** Fades the example out, then shows the next as the fade comes back. */
-  private nextExample(): void {
+  /** Starts the example showing on its way out, and shows the next once it is gone. */
+  private leaveExample(): void {
+    this.turning = undefined
     if (reducedMotion() || motionPaused()) {
       this.stopExamples()
       return
     }
+    clearTimeout(this.entering)
+    this.entering = undefined
+    this.toggleState('example-entering', false)
     this.toggleState('example-leaving', true)
-    this.fading = setTimeout(() => {
-      this.fading = undefined
-      this.example = (this.example + 1) % Math.max(this.placeholders.length, 1)
-      this.toggleState('example-leaving', false)
-    }, EXAMPLE_FADE)
+    this.leaving = setTimeout(() => this.arriveExample(), EXAMPLE_LEAVE)
+  }
+
+  /** Shows the next example, on its way in, and times the turn after it. */
+  private arriveExample(): void {
+    this.leaving = undefined
+    this.example = (this.example + 1) % Math.max(this.placeholders.length, 1)
+    this.toggleState('example-leaving', false)
+    this.toggleState('example-entering', true)
+    this.entering = setTimeout(() => {
+      this.entering = undefined
+      this.toggleState('example-entering', false)
+    }, EXAMPLE_ENTER)
+    this.turnExamples()
   }
 
   private stopExamples(): void {
-    clearInterval(this.turning)
-    clearTimeout(this.fading)
+    clearTimeout(this.turning)
+    clearTimeout(this.leaving)
+    clearTimeout(this.entering)
     this.turning = undefined
-    this.fading = undefined
+    this.leaving = undefined
+    this.entering = undefined
     this.toggleState('example-leaving', false)
+    this.toggleState('example-entering', false)
+  }
+
+  /**
+   * What the tier above draws over the empty field while `placeholders` holds
+   * two examples or more, behind a seam so a tier can draw the swap the
+   * field's own placeholder cannot. The headless tier draws nothing, and its
+   * field shows each example as its placeholder.
+   *
+   * **The field keeps its placeholder either way**, so whatever is drawn
+   * here is decoration, and the field is what a screen reader reaches.
+   */
+  protected renderExample(_example: string): TemplateResult | typeof nothing {
+    return nothing
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -728,7 +814,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
         part="field"
         .value=${live(this.value)}
         aria-label=${this.label}
-        placeholder=${this.placeholders.length > 0 ? (this.placeholders[this.example % this.placeholders.length] ?? '') : this.placeholder}
+        placeholder=${this.shownPlaceholder}
         rows=${this.rows}
         ?required=${this.required}
         minlength=${this.minLength ?? nothing}
@@ -742,6 +828,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
         @input=${this.handleInput}
         @keydown=${this.handleKey}
       ></textarea>
+      ${this.placeholders.length > 1 ? this.renderExample(this.shownPlaceholder) : nothing}
       <div part="tools">
         <span part="start"><slot name="start" @slotchange=${() => this.markEmpty()}></slot></span>
         <span part="end"><slot name="end" @slotchange=${() => this.markEmpty()}></slot></span>

@@ -1,6 +1,6 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessChatComposer } from '@fusion.dev/helix-headless/chat'
-import type { CSSResultGroup } from 'lit'
+import { type CSSResultGroup, html, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
 import { styles } from './chat-composer.css.js'
@@ -86,6 +86,12 @@ export function lapOf(w: number, h: number): Keyframe[] {
  * not supported, the field keeps its rows and scrolls. The maximum height
  * keeps the composer from covering the transcript.
  *
+ * With two `placeholders` or more, each example rolls into the next: the one
+ * showing rises a little as it fades and blurs, and the next rises into its
+ * place from below as it fades in. Where the browser has no CSS anchor
+ * positioning, the examples fade into each other in the field's own
+ * placeholder.
+ *
  * @since 0.1.0
  * @status stable
  * @category forms
@@ -96,6 +102,7 @@ export function lapOf(w: number, h: number): Keyframe[] {
  * @slot start - Content under the field at the leading edge, such as an attachment button or a model picker.
  *
  * @csspart attachments - The row above the field that holds the `attachments` slot, inset to the field's text and hidden while the slot is empty.
+ * @csspart example - The example drawn over the empty field while `placeholders` holds two or more, in the field's box. It is a second field that shows only its placeholder, hidden from screen readers. Style its `::placeholder` where you style the field's.
  * @csspart field - The text field.
  * @csspart send - The send button.
  * @csspart tools - The row under the field.
@@ -197,6 +204,30 @@ export class HelixChatComposer extends HelixHeadlessChatComposer {
     this.laps = ['::before', '::after'].map((pseudoElement) =>
       frame.animate(keyframes, { ...timing, pseudoElement }),
     )
+  }
+
+  /**
+   * The example the empty field shows, drawn over the field so it can move.
+   *
+   * **A second field showing only its placeholder**, so the example is drawn
+   * by the same rules as the field's own: the browser's placeholder color,
+   * and the same wrapping and clipping at every width and in either
+   * direction. A field's `::placeholder` cannot move, blur, or take a
+   * transform, and this whole box can. The sheet places it on the field's box
+   * and makes the field's own placeholder transparent, which stays the
+   * example a screen reader hears. This one is `inert` and `aria-hidden`, and
+   * takes no pointer.
+   */
+  protected override renderExample(example: string): TemplateResult {
+    return html`<textarea
+      part="example"
+      aria-hidden="true"
+      inert
+      readonly
+      tabindex="-1"
+      placeholder=${example}
+      ?disabled=${this.isDisabled}
+    ></textarea>`
   }
 
   static override styles: CSSResultGroup = [styles, dictationStyles]
