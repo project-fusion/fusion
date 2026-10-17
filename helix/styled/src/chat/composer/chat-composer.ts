@@ -1,7 +1,8 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessChatComposer } from '@fusion.dev/helix-headless/chat'
-import { type CSSResultGroup, html, type TemplateResult } from 'lit'
+import { type CSSResultGroup, html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
+import { repeat } from 'lit/directives/repeat.js'
 import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
 import { styles } from './chat-composer.css.js'
 import '../../tooltip/index.js'
@@ -9,6 +10,9 @@ import '../../tooltip/index.js'
 /** Where the glow's light is on the edge, which the sweep moves along it. */
 const LIGHT_X = '--_chat-composer-light-x'
 const LIGHT_Y = '--_chat-composer-light-y'
+
+/** The entrance of an example, whose end is where the field may take its new height. */
+const ENTRANCE = 'helix-composer-example-in'
 
 /** How far the light may reach across the box: half its width, and half its height. */
 const REACH_X = '--_chat-composer-reach-x'
@@ -88,7 +92,9 @@ export function lapOf(w: number, h: number): Keyframe[] {
  *
  * With two `placeholders` or more, each example rolls into the next: the one
  * showing rises a little as it fades and blurs, and the next rises into its
- * place from below as it fades in. Where the browser has no CSS anchor
+ * place from below as it fades in, the two crossing so the field is never
+ * empty. A box that changes height for the next example changes as it
+ * lands. Where the browser has no CSS anchor
  * positioning, the examples fade into each other in the field's own
  * placeholder.
  *
@@ -103,6 +109,7 @@ export function lapOf(w: number, h: number): Keyframe[] {
  *
  * @csspart attachments - The row above the field that holds the `attachments` slot, inset to the field's text and hidden while the slot is empty.
  * @csspart example - The example drawn over the empty field while `placeholders` holds two or more, in the field's box. It is a second field that shows only its placeholder, hidden from screen readers. Style its `::placeholder` where you style the field's.
+ * @csspart example-leaving - The example on its way out while the next comes in, for its first 250 milliseconds. Set together with `example`.
  * @csspart field - The text field.
  * @csspart send - The send button.
  * @csspart tools - The row under the field.
@@ -207,27 +214,85 @@ export class HelixChatComposer extends HelixHeadlessChatComposer {
   }
 
   /**
-   * The example the empty field shows, drawn over the field so it can move.
+   * The examples the empty field shows, drawn over the field so they can
+   * move: the one showing, and while two cross, the one leaving.
    *
-   * **A second field showing only its placeholder**, so the example is drawn
+   * **Each is a field showing only its placeholder**, so the example is drawn
    * by the same rules as the field's own: the browser's placeholder color,
    * and the same wrapping and clipping at every width and in either
    * direction. A field's `::placeholder` cannot move, blur, or take a
-   * transform, and this whole box can. The sheet places it on the field's box
-   * and makes the field's own placeholder transparent, which stays the
-   * example a screen reader hears. This one is `inert` and `aria-hidden`, and
-   * takes no pointer.
+   * transform, and this whole box can. The sheet places each on the field's
+   * box and makes the field's own placeholder transparent, which stays the
+   * example a screen reader hears. These are `inert` and `aria-hidden`, and
+   * take no pointer.
+   *
+   * **Keyed by the example's place in the list**, so the example showing is
+   * the same element as it starts to leave, and its exit starts from where it
+   * rests.
    */
-  protected override renderExample(example: string): TemplateResult {
-    return html`<textarea
-      part="example"
-      aria-hidden="true"
-      inert
-      readonly
-      tabindex="-1"
-      placeholder=${example}
-      ?disabled=${this.isDisabled}
-    ></textarea>`
+  protected override renderExample(
+    example: { index: number; text: string },
+    leaving?: { index: number; text: string },
+  ): TemplateResult {
+    const drawn =
+      leaving === undefined
+        ? [{ ...example, out: false }]
+        : leaving.index === example.index
+          ? [{ ...leaving, out: true }]
+          : [
+              { ...leaving, out: true },
+              { ...example, out: false },
+            ]
+    return html`${repeat(
+      drawn,
+      (one) => one.index,
+      (one) => html`<textarea
+        part="example${one.out ? ' example-leaving' : ''}"
+        aria-hidden="true"
+        inert
+        readonly
+        tabindex="-1"
+        placeholder=${one.text}
+        ?disabled=${this.isDisabled}
+        @animationcancel=${this.landed}
+        @animationend=${this.landed}
+      ></textarea>`,
+    )}`
+  }
+
+  /**
+   * Holds the field at the height it has as the next example appears, so a
+   * box that grows for it grows at once and one that shrinks waits for the
+   * example to land. Only where the sheet draws the examples.
+   */
+  protected override willUpdate(changed: PropertyValues): void {
+    super.willUpdate(changed)
+    if (!changed.has('example') || !this.hasUpdated || !this.matches(':state(example-leaving)')) {
+      return
+    }
+    const field = this.partNamed<HTMLTextAreaElement>('field')
+    if (field && typeof CSS !== 'undefined' && CSS.supports('anchor-name: --a')) {
+      field.style.setProperty('--_chat-composer-held', `${field.getBoundingClientRect().height}px`)
+    }
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    if (this.placeholders.length < 2) {
+      this.release()
+    }
+  }
+
+  /** Lets the field take the height of the example showing. */
+  private readonly release = (): void => {
+    this.partNamed<HTMLElement>('field')?.style.removeProperty('--_chat-composer-held')
+  }
+
+  /** The entrance ended, or stopped, so the example has landed. */
+  private readonly landed = (event: AnimationEvent): void => {
+    if (event.animationName === ENTRANCE) {
+      this.release()
+    }
   }
 
   static override styles: CSSResultGroup = [styles, dictationStyles]

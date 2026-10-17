@@ -137,6 +137,43 @@ describe('the example in a browser', () => {
     },
   )
 
+  /* A real turn, so this waits out the 6.5 seconds a short example shows. A
+     two-line example gives way to a one-line one: the two cross with the
+     field at its two-line height, and the box takes the new height as the
+     next example lands. */
+  run(
+    'crosses the leaving and the next example, and changes height as the next lands',
+    async () => {
+      const [host] = await composers(
+        '<div style="inline-size: 358px"><helix-chat-composer></helix-chat-composer></div>',
+      )
+      await withExamples(host as Composer, [LONG, 'Two'])
+      const tall = field(host as Composer).getBoundingClientRect().height
+      const until = async (ready: () => boolean) => {
+        while (!ready()) {
+          await new Promise((done) => setTimeout(done, 5))
+        }
+      }
+      await until(() => (host as Composer).matches(':state(example-entering)'))
+      await (host as Composer).updateComplete
+      const drawn = [
+        ...((host as Composer).shadowRoot?.querySelectorAll('[part~="example"]') ?? []),
+      ]
+      expect(
+        drawn.map((one) => [one.getAttribute('part'), (one as HTMLTextAreaElement).placeholder]),
+      ).toEqual([
+        ['example example-leaving', LONG],
+        ['example', 'Two'],
+      ])
+      expect(field(host as Composer).getBoundingClientRect().height).toBe(tall)
+      await until(() => !(host as Composer).matches(':state(example-entering)'))
+      await new Promise((done) => setTimeout(done, 50))
+      expect(field(host as Composer).getBoundingClientRect().height).toBeLessThan(tall)
+      expect((host as Composer).shadowRoot?.querySelectorAll('[part~="example"]')).toHaveLength(1)
+    },
+    12000,
+  )
+
   run('hides once the field holds text, and takes no pointer', async () => {
     const [host] = await composers('<helix-chat-composer></helix-chat-composer>')
     await withExamples(host as Composer, ['One', 'Two'])

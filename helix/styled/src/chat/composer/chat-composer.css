@@ -251,8 +251,9 @@
 
 /*
  *  The examples under `placeholders` roll into each other. The one showing
- *    rises a little as it fades and blurs, and the next rises into its place
- *    from below as it fades in.
+ *    rises a little as it fades and blurs, and 100 milliseconds in, the next
+ *    rises into its place from below as it fades in, so the two cross and the
+ *    field is never empty.
  *
  * *A second field draws them**, `example`, placed on the field's own box by
  *    anchor positioning, so it follows the field wherever a layout puts it,
@@ -260,26 +261,33 @@
  *    the field's padding and type, and its placeholder is drawn by the same
  *    rules as the field's, so the two wrap and clip alike. The field's own
  *    placeholder turns transparent behind it and stays the one a screen reader
- *    hears. The second field hides as soon as the field holds text, in the same
- *    frame as the field's own placeholder.
+ *    hears. While two cross, the one leaving is a third field,
+ *    `example-leaving`. Each hides as soon as the field holds text, in the
+ *    same frame as the field's own placeholder.
  *
  *    The exit takes 250 milliseconds, which is `EXAMPLE_LEAVE`, and the
- *    entrance fits inside the 350 of `EXAMPLE_ENTER`.
+ *    entrance fits inside the 350 of `EXAMPLE_ENTER`. While they cross, the
+ *    field keeps the height it had, `--_chat-composer-held`, so a shorter
+ *    example takes the box in as it lands.
  */
 @supports (anchor-name: --a) {
   [part="composer"] {
     position: relative;
   }
 
+  /* `auto` until two examples cross. The element writes the held height on
+     the field then, and removes it as the next lands. */
   [part="field"] {
+    --_chat-composer-held: auto;
     anchor-name: --_chat-composer-field;
+    min-block-size: var(--_chat-composer-held);
   }
 
-  [part="field"]:has(+ [part="example"])::placeholder {
+  [part="field"]:has(+ [part~="example"])::placeholder {
     color: transparent;
   }
 
-  [part="example"] {
+  [part~="example"] {
     background-color: transparent;
     block-size: anchor-size(--_chat-composer-field block);
     border: 0;
@@ -300,24 +308,25 @@
     resize: none;
   }
 
-  [part="field"]:not(:placeholder-shown) + [part="example"] {
+  [part="field"]:not(:placeholder-shown) ~ [part~="example"] {
     visibility: hidden;
   }
 
-  /* Out, with no transition back: focus or text ends a turn without the
-     example sliding back into place. */
-  :host(:state(example-leaving)) [part="example"] {
-    filter: blur(0.125em);
-    opacity: 0;
-    transition:
-      filter calc(var(--helix-duration-normal) * 1.25) var(--helix-easing-standard),
-      opacity calc(var(--helix-duration-normal) * 1.25) var(--helix-easing-standard),
-      translate calc(var(--helix-duration-normal) * 1.25) var(--helix-easing-standard);
-    translate: 0 -0.35em;
+  [part~="example-leaving"] {
+    animation: helix-composer-example-out calc(var(--helix-duration-normal) * 1.25)
+      var(--helix-easing-standard) forwards;
   }
 
-  :host(:state(example-entering)) [part="example"] {
+  :host(:state(example-entering)) [part~="example"]:not([part~="example-leaving"]) {
     animation: helix-composer-example-in var(--helix-duration-slow) var(--helix-easing-standard);
+  }
+
+  @keyframes helix-composer-example-out {
+    to {
+      filter: blur(0.125em);
+      opacity: 0;
+      translate: 0 -0.35em;
+    }
   }
 
   @keyframes helix-composer-example-in {
@@ -328,7 +337,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :host(:state(example-entering)) [part="example"] {
+    [part~="example-leaving"],
+    :host(:state(example-entering)) [part~="example"]:not([part~="example-leaving"]) {
       animation: none;
     }
   }
@@ -337,7 +347,7 @@
 /* Without anchor positioning there is nothing to place the second field on,
    so the field's own placeholder fades from one example to the next. */
 @supports not (anchor-name: --a) {
-  [part="example"] {
+  [part~="example"] {
     display: none;
   }
 
