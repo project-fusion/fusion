@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  formValue,
+  hasLayout,
+  hasState,
+  mount,
+  part,
+  registerDom,
+} from '@fusion.dev/helix-testing/dom'
 
 /* The composer, which is one field and one rule about Enter. */
 
@@ -673,51 +680,107 @@ describe('placeholders', () => {
 
   const wait = (milliseconds: number) => new Promise((done) => setTimeout(done, milliseconds))
 
+  /* Stands in for the platform's observer, so a spec can say when each
+     composer comes into view and goes out of it. */
+  const watchSight = () => {
+    const sights = new Map<Element, (seen: boolean) => void>()
+    const real = globalThis.IntersectionObserver
+    globalThis.IntersectionObserver = class {
+      constructor(private readonly heard: IntersectionObserverCallback) {}
+      disconnect(): void {}
+      observe(target: Element): void {
+        sights.set(target, (seen) =>
+          this.heard(
+            [{ isIntersecting: seen, target } as unknown as IntersectionObserverEntry],
+            this as unknown as IntersectionObserver,
+          ),
+        )
+      }
+      takeRecords(): IntersectionObserverEntry[] {
+        return []
+      }
+      unobserve(): void {}
+    } as unknown as typeof IntersectionObserver
+    return {
+      restore: () => {
+        globalThis.IntersectionObserver = real
+      },
+      see: (target: Element, seen: boolean) => sights.get(target)?.(seen),
+    }
+  }
+
+  /* **The turns wait real time, about 17 seconds between them, so they run
+     under happy-dom alone.** The timing is the element's logic and reads the
+     same in any engine, and the browser run of a family has 60 seconds in
+     all. The styled spec waits out one real turn in each browser. */
+  const timed = hasLayout() ? (..._skipped: unknown[]): void => {} : test
+
+  const statesOf = (host: Composer) => [
+    field(host).placeholder,
+    hasState(host, 'example-leaving'),
+    hasState(host, 'example-entering'),
+  ]
+
   /* One turn is the example's time, 6.5 seconds for a short one, then a
-     250 millisecond exit, then a 350 millisecond entrance. The composers
-     held by focus and by text wait out the same turn beside it. */
-  test('an empty field without focus rolls to the next example, and focus or text holds it', async () => {
-    await mount(
-      ['moving', 'focused', 'written']
-        .map((id) => `<helix-headless-chat-composer id="${id}"></helix-headless-chat-composer>`)
-        .join(''),
-    )
-    const [moving, focused, written] = [
-      ...document.querySelectorAll('helix-headless-chat-composer'),
-    ] as (Composer & {
-      placeholders: string[]
-    })[]
-    for (const host of [moving, focused, written]) {
-      await host.updateComplete
-      host.placeholders = ['One', 'Two']
-      await host.updateComplete
-    }
-    field(focused).dispatchEvent(new FocusEvent('focus'))
-    await type(written, 'Draft')
-    await wait(6400)
-    expect([field(moving).placeholder, hasState(moving, 'example-leaving')]).toEqual(['One', false])
-    await wait(200)
-    expect([field(moving).placeholder, hasState(moving, 'example-leaving')]).toEqual(['One', true])
-    await wait(250)
-    await moving.updateComplete
-    expect([
-      field(moving).placeholder,
-      hasState(moving, 'example-leaving'),
-      hasState(moving, 'example-entering'),
-    ]).toEqual(['Two', false, true])
-    await wait(400)
-    expect(hasState(moving, 'example-entering')).toBe(false)
-    for (const host of [focused, written]) {
-      expect([
-        field(host).placeholder,
-        hasState(host, 'example-leaving'),
-        hasState(host, 'example-entering'),
-      ]).toEqual(['One', false, false])
-    }
-    for (const host of [moving, focused, written]) {
-      host.remove()
-    }
-  }, 12000)
+     250 millisecond exit, with the next example arriving 100 milliseconds
+     in and entering for 350. The composers held by focus, by text and by
+     being out of view wait out the same turn beside it, and the one that
+     comes back into view at 3 seconds gets its full time from there. */
+  timed(
+    'an empty field in view and without focus rolls to the next example, and focus, text, or being out of view holds it',
+    async () => {
+      const sight = watchSight()
+      try {
+        const names = ['moving', 'focused', 'written', 'hidden', 'returned']
+        await mount(
+          names
+            .map((id) => `<helix-headless-chat-composer id="${id}"></helix-headless-chat-composer>`)
+            .join(''),
+        )
+        const [moving, focused, written, hidden, returned] = [
+          ...document.querySelectorAll('helix-headless-chat-composer'),
+        ] as (Composer & {
+          placeholders: string[]
+        })[]
+        for (const host of [moving, focused, written, hidden, returned]) {
+          await host.updateComplete
+          host.placeholders = ['One', 'Two']
+          await host.updateComplete
+        }
+        field(focused).dispatchEvent(new FocusEvent('focus'))
+        await type(written, 'Draft')
+        sight.see(hidden, false)
+        sight.see(returned, false)
+        await wait(3000)
+        sight.see(returned, true)
+        await wait(3400)
+        expect(statesOf(moving)).toEqual(['One', false, false])
+        await wait(150)
+        expect(statesOf(moving)).toEqual(['One', true, false])
+        await wait(100)
+        await moving.updateComplete
+        // The two cross: the next is the placeholder while the first still leaves.
+        expect(statesOf(moving)).toEqual(['Two', true, true])
+        await wait(200)
+        expect(statesOf(moving)).toEqual(['Two', false, true])
+        await wait(250)
+        expect(statesOf(moving)).toEqual(['Two', false, false])
+        for (const host of [focused, written, hidden, returned]) {
+          expect(statesOf(host)).toEqual(['One', false, false])
+        }
+        await wait(2700)
+        await returned.updateComplete
+        expect(field(returned).placeholder).toBe('Two')
+        expect(statesOf(hidden)).toEqual(['One', false, false])
+        for (const host of [moving, focused, written, hidden, returned]) {
+          host.remove()
+        }
+      } finally {
+        sight.restore()
+      }
+    },
+    15000,
+  )
 
   /* The field's placeholder is the example showing, so the field is what a
      screen reader reaches and the empty-field semantics are the field's. */
@@ -741,24 +804,28 @@ describe('placeholders', () => {
 
   /* A paused page holds every motion that starts by itself, as reduced motion
      does, which happy-dom cannot ask for. */
-  test('a page that paused its motion keeps the first example', async () => {
-    document.documentElement.setAttribute('data-helix-motion', 'paused')
-    try {
-      const host = (await composer()) as Composer & { placeholders: string[] }
-      host.placeholders = ['One', 'Two']
-      await host.updateComplete
-      await wait(6900)
-      await host.updateComplete
-      expect([
-        field(host).placeholder,
-        hasState(host, 'example-leaving'),
-        hasState(host, 'example-entering'),
-      ]).toEqual(['One', false, false])
-      host.remove()
-    } finally {
-      document.documentElement.removeAttribute('data-helix-motion')
-    }
-  }, 12000)
+  timed(
+    'a page that paused its motion keeps the first example',
+    async () => {
+      document.documentElement.setAttribute('data-helix-motion', 'paused')
+      try {
+        const host = (await composer()) as Composer & { placeholders: string[] }
+        host.placeholders = ['One', 'Two']
+        await host.updateComplete
+        await wait(6900)
+        await host.updateComplete
+        expect([
+          field(host).placeholder,
+          hasState(host, 'example-leaving'),
+          hasState(host, 'example-entering'),
+        ]).toEqual(['One', false, false])
+        host.remove()
+      } finally {
+        document.documentElement.removeAttribute('data-helix-motion')
+      }
+    },
+    12000,
+  )
 })
 
 describe('the idle slot', () => {
