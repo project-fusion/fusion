@@ -1,4 +1,4 @@
-import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -86,9 +86,24 @@ const key = (host: HTMLElement, name: string): void => {
   )
 }
 
+/* A browser has a real `AudioContext`, which would play: held aside for
+   every test here, each starting with none, and put back after. */
+const audio = globalThis as { AudioContext?: unknown }
+const real = audio.AudioContext
+
+beforeEach(() => {
+  delete audio.AudioContext
+})
+
 afterEach(() => {
-  delete (globalThis as { AudioContext?: unknown }).AudioContext
+  delete audio.AudioContext
   started = []
+})
+
+afterAll(() => {
+  if (real !== undefined) {
+    audio.AudioContext = real
+  }
 })
 
 describe('a chart that listens', () => {

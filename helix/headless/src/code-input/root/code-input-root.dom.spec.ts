@@ -92,6 +92,10 @@ describe('code input', () => {
       await element.updateComplete
       expect(part(element, 'highlight')?.textContent).toBe('x')
       expect(reported).toHaveLength(1)
+      /* Taken off before the page's own report comes back, or the next draw,
+         such as the one a registration asks for, throws outside the test. */
+      element.highlight = undefined
+      await element.updateComplete
     } finally {
       globalThis.reportError = report
     }

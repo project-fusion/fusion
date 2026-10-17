@@ -591,8 +591,10 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     /**
      * `visible` draws the chart's text summary under it, as one line. Absent,
      * the summary is said to a screen reader and drawn for no one else.
+     * Reflected, because the stylesheet draws it by the attribute, and a page
+     * that sets the property, as React does, writes none.
      */
-    @property()
+    @property({ reflect: true })
     summary?: 'visible'
 
     /** The page of the table drawn from `data` that is shown, counting from zero. */

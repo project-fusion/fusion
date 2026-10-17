@@ -136,6 +136,14 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
       )
     }
 
+    /** The button waits for the render after a hydration, which a field may not ask for itself. */
+    protected override firstUpdated(changed: PropertyValues): void {
+      super.firstUpdated(changed)
+      if (this.voice) {
+        this.finishHydration()
+      }
+    }
+
     protected override updated(changed: PropertyValues): void {
       super.updated(changed)
       if (changed.has('voice') && !this.voice) {

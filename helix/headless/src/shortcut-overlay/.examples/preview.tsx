@@ -10,9 +10,11 @@ export function Example() {
 
   return (
     <>
-      <helix-headless-button id="base-overlay-bold">Bold</helix-headless-button>
-      <helix-headless-button id="base-overlay-italic">Italic</helix-headless-button>
-      <helix-headless-button id="base-overlay-link">Link</helix-headless-button>
+      <div className="formatting">
+        <helix-headless-button id="base-overlay-bold">Bold</helix-headless-button>
+        <helix-headless-button id="base-overlay-italic">Italic</helix-headless-button>
+        <helix-headless-button id="base-overlay-link">Link</helix-headless-button>
+      </div>
       {(['bold', 'italic', 'link'] as const).map((name, index) => (
         <helix-headless-kbd
           activate="click"

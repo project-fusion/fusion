@@ -35,6 +35,16 @@ class KeyedLines extends Directive {
     const document = parent.ownerDocument ?? (parent as Document)
     const end = part.endNode
     const next = highlightedLineList(markup)
+    /* Nothing drawn yet, so whatever stands between the part's markers is a
+       server's drawing, hydrating: taken away, or the lines would be drawn
+       twice, the server's and then these. */
+    if (this.lines.length === 0) {
+      for (let node = part.startNode?.nextSibling; node && node !== end; ) {
+        const following: ChildNode | null = node.nextSibling
+        node.parentNode?.removeChild(node)
+        node = following
+      }
+    }
     const parse = (line: string): Node[] => {
       const template = document.createElement('template')
       template.innerHTML = line
