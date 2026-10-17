@@ -78,6 +78,10 @@ taken on Linux, because a baseline taken on macOS or Windows fails in CI.
   carries the pictures it took. Run `bun run helix visual accept --run` with
   the address of the run to write them into your checkout, then review and
   commit them.
+- On a branch of this repository, the failed run also pushes its pictures to
+  `visual-preview/<number>` and links GitHub's comparison of them in the
+  pull request's visual comment, where each one is drawn. The branch goes when
+  the pictures pass or the pull request closes.
 - A maintainer can also comment `/accept` on the pull request, which commits
   the run's pictures onto a branch of this repository, or `/retake` and the
   entries to take them again.

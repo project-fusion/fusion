@@ -1003,6 +1003,71 @@ jobs:
             gh pr comment "$NUMBER" --body-file "$RUNNER_TEMP/comment.md"
           fi
 
+  # **The pictures a failed check took, to look at before `/accept`.** The
+  # captures of this run's examples and site pages, written as the baselines
+  # they failed against onto `visual-preview/<number>`, and GitHub's
+  # comparison of that branch with the head linked in the visual comment, which
+  # draws each new picture and shows a changed one in its image diff. The
+  # pictures were otherwise only in the run's artifacts, which a reviewer
+  # downloaded to see.
+  #
+  # **After the triage**, which rewrites the comment this adds its link to.
+  # A run whose pictures all pass removes the branch and the link, so an
+  # accepted set and a closed pull request, which `visual-preview-cleanup.yml`
+  # answers, leave nothing behind.
+  #
+  # **Only for a branch of this repository**, whose token can push, and
+  # **never a failure of the build**: not in the gate's `needs`, and
+  # `continue-on-error`.
+  visual-preview:
+    needs: [browser, site, visual-triage]
+    if: ${{ always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && needs.browser.result != 'cancelled' && needs.site.result != 'cancelled' }}  # dialect:quoted, GitHub's own job result spelled its way
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    permissions:
+      actions: read
+      contents: write
+      pull-requests: write
+    env:
+      FAILED: ${{ needs.browser.result == 'failure' || needs.site.result == 'failure' }}
+      GH_REPO: ${{ github.repository }}
+      GH_TOKEN: ${{ github.token }}
+      NUMBER: ${{ github.event.pull_request.number }}
+    steps:
+      # The head the pictures were taken of, which `helix visual accept`
+      # checks each capture against, and never the merge commit a pull request
+      # run checks out by default.
+      - name: Check out the head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Set up bun and the helix binary
+        if: env.FAILED == 'true'
+        uses: ./.github/actions/setup
+        with:
+          dependencies: 'false'
+
+      - name: Fetch the reports of the visual checks
+        if: env.FAILED == 'true'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: ${{ runner.temp }}/reports
+          pattern: visual-*
+
+      - name: Push the pictures to look at
+        if: env.FAILED == 'true'
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPORTS: ${{ runner.temp }}/reports
+          RUN: ${{ github.run_id }}
+        run: .github/scripts/visual-preview.sh publish
+
+      - name: Remove the pictures, which passed
+        if: env.FAILED != 'true'
+        run: .github/scripts/visual-preview.sh remove
+
   # **The site's pages, pictured by `helix visual`'s own GitHub Action.** Five
   # pages at 1440 and 390 light and 1440 dark, from `next start` over the build
   # `warm` made, compared with the baselines under `fusion/site/baselines`.
