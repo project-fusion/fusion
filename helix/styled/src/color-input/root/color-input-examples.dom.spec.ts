@@ -26,16 +26,28 @@ const commit = (control: HTMLElement): void => {
 }
 
 describe('the events example', () => {
-  run('the swatch opens the picker and closes it, asking each time', async () => {
-    await example(events)
-    const trigger = part(document.getElementById('brand') as HTMLElement, 'trigger') as HTMLElement
-    trigger.click()
-    await idle()
-    expect(logged()).toEqual(['helix-before-open', 'toggle'])
-    trigger.click()
-    await idle()
-    expect(logged()).toEqual(['helix-before-open', 'toggle', 'helix-before-close', 'toggle'])
-  })
+  run(
+    'the swatch opens the picker and closes it, asking each time',
+    async () => {
+      await example(events)
+      const trigger = part(
+        document.getElementById('brand') as HTMLElement,
+        'trigger',
+      ) as HTMLElement
+      trigger.click()
+      await idle()
+      expect(logged()).toEqual(['helix-before-open', 'toggle'])
+      trigger.click()
+      await idle()
+      expect(logged()).toEqual(['helix-before-open', 'toggle', 'helix-before-close', 'toggle'])
+      /* The first frame after the panel opens is the first time the browser
+       paints the picker's gradients. Linux WebKit painted it in 1.3 to 2
+       seconds on a two-core x86 machine, measured October 16, 2026, while the
+       page had no script running. The events arrive at once, so the default
+       two seconds timed out on paint speed alone. */
+    },
+    8000,
+  )
 
   run('a color typed in proposes it, announces it, and commits on leaving', async () => {
     await example(events)
