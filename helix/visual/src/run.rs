@@ -695,12 +695,14 @@ pub fn open_report(config: Option<&Path>, markdown: bool) -> Outcome<Code> {
     Ok(Code::Ok)
 }
 
-/// What a merge reads from each report: how many it read, their groups, and
-/// the baseline and capture each failed shot left, by `entry, shot`.
+/// What a merge reads from each report: how many it read, their groups, the
+/// baseline and capture each failed shot left, by `entry, shot`, and how many
+/// shots had no baseline.
 type Read = (
     usize,
     Vec<triage::Group>,
     BTreeMap<String, (Vec<u8>, Vec<u8>)>,
+    usize,
 );
 
 /// Each report's groups and pictures. A path with no report is said and left
@@ -709,6 +711,7 @@ fn read_reports(runs: &[PathBuf]) -> Outcome<Read> {
     let mut groups = Vec::new();
     let mut pictures = BTreeMap::new();
     let mut read = 0;
+    let mut new = 0;
     for run in runs {
         let record = if run.is_dir() {
             run.join("run.json")
@@ -740,6 +743,11 @@ fn read_reports(runs: &[PathBuf]) -> Outcome<Read> {
         /* The baseline and capture each failed shot left in its report, for a
         triage that may send pictures. */
         for shot in value["shots"].as_array().into_iter().flatten() {
+            /* A shot with no baseline is in no group, because nothing changed:
+            counted, so a run that failed only on new entries says so. */
+            if shot["result"].as_str() == Some("missing") {
+                new += 1;
+            }
             let (Some(entry), Some(name)) = (shot["entry"].as_str(), shot["shot"].as_str()) else {
                 continue;
             };
@@ -753,7 +761,7 @@ fn read_reports(runs: &[PathBuf]) -> Outcome<Read> {
             }
         }
     }
-    Ok((read, groups, pictures))
+    Ok((read, groups, pictures, new))
 }
 
 /// `helix visual report --merge`: the groups of several runs' reports as one,
@@ -769,7 +777,7 @@ pub fn merge_reports(
     let (_, base, mut driver, config) = load(config)?;
     let history =
         (!earlier.is_empty()).then(|| crate::history::summarize(&crate::history::gather(earlier)));
-    let (read, groups, pictures) = read_reports(runs)?;
+    let (read, groups, pictures, new) = read_reports(runs)?;
     let mut groups = triage::merge(groups);
     if let Some(history) = &history {
         let own = crate::history::Origin::here(&base).reference;
@@ -794,7 +802,7 @@ pub fn merge_reports(
         "helix: the history of earlier runs.".to_string()
     } else {
         format!(
-            "helix: {} {} hold {} that changed, in {}.",
+            "helix: {} {} hold {} that changed, in {}{}.",
             read,
             if read == 1 { "report" } else { "reports" },
             if shots.len() == 1 {
@@ -806,6 +814,11 @@ pub fn merge_reports(
                 "1 group".to_string()
             } else {
                 format!("{} groups", groups.len())
+            },
+            match new {
+                0 => String::new(),
+                1 => ", and 1 new shot with no baseline".to_string(),
+                count => format!(", and {count} new shots with no baseline"),
             },
         )
     };
@@ -1665,6 +1678,25 @@ mod tests {
             "the accessibility snapshot differs from the one kept; 1 gone: - button \"Save\"; 1 new: - button \"Saved\"."
         );
         assert!(aria_difference("- a\n- b\n", "- b\n- a\n").ends_with("in the order of its lines."));
+    }
+
+    #[test]
+    fn a_merge_counts_the_shots_with_no_baseline() {
+        let folder =
+            std::env::temp_dir().join(format!("helix-visual-merge-new-{}", std::process::id()));
+        fs::create_dir_all(&folder).unwrap();
+        fs::write(
+            folder.join("run.json"),
+            r#"{"groups": [], "shots": [
+                {"entry": "styled/a", "result": "missing", "shot": "wide"},
+                {"entry": "styled/a", "result": "missing", "shot": "dark"},
+                {"entry": "styled/b", "result": "matched", "shot": "wide"}
+            ]}"#,
+        )
+        .unwrap();
+        let (read, groups, _, new) = read_reports(std::slice::from_ref(&folder)).unwrap();
+        fs::remove_dir_all(&folder).ok();
+        assert_eq!((read, groups.len(), new), (1, 0, 2));
     }
 
     #[test]
