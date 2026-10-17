@@ -671,19 +671,93 @@ describe('placeholders', () => {
     expect(field(host).placeholder).toBe('Fix the failing test')
   })
 
-  test('an empty field without focus moves on, and one with text keeps its example', async () => {
+  const wait = (milliseconds: number) => new Promise((done) => setTimeout(done, milliseconds))
+
+  /* One turn is the example's time, 6.5 seconds for a short one, then a
+     250 millisecond exit, then a 350 millisecond entrance. The composers
+     held by focus and by text wait out the same turn beside it. */
+  test('an empty field without focus rolls to the next example, and focus or text holds it', async () => {
+    await mount(
+      ['moving', 'focused', 'written']
+        .map((id) => `<helix-headless-chat-composer id="${id}"></helix-headless-chat-composer>`)
+        .join(''),
+    )
+    const [moving, focused, written] = [
+      ...document.querySelectorAll('helix-headless-chat-composer'),
+    ] as (Composer & {
+      placeholders: string[]
+    })[]
+    for (const host of [moving, focused, written]) {
+      await host.updateComplete
+      host.placeholders = ['One', 'Two']
+      await host.updateComplete
+    }
+    field(focused).dispatchEvent(new FocusEvent('focus'))
+    await type(written, 'Draft')
+    await wait(6400)
+    expect([field(moving).placeholder, hasState(moving, 'example-leaving')]).toEqual(['One', false])
+    await wait(200)
+    expect([field(moving).placeholder, hasState(moving, 'example-leaving')]).toEqual(['One', true])
+    await wait(250)
+    await moving.updateComplete
+    expect([
+      field(moving).placeholder,
+      hasState(moving, 'example-leaving'),
+      hasState(moving, 'example-entering'),
+    ]).toEqual(['Two', false, true])
+    await wait(400)
+    expect(hasState(moving, 'example-entering')).toBe(false)
+    for (const host of [focused, written]) {
+      expect([
+        field(host).placeholder,
+        hasState(host, 'example-leaving'),
+        hasState(host, 'example-entering'),
+      ]).toEqual(['One', false, false])
+    }
+    for (const host of [moving, focused, written]) {
+      host.remove()
+    }
+  }, 12000)
+
+  /* The field's placeholder is the example showing, so the field is what a
+     screen reader reaches and the empty-field semantics are the field's. */
+  test('the field keeps the example showing as its placeholder', async () => {
+    const host = (await composer('label="Ask anything"')) as Composer & { placeholders: string[] }
+    host.placeholders = ['One', 'Two']
+    await host.updateComplete
+    expect(field(host).placeholder).toBe('One')
+    expect(field(host).getAttribute('aria-label')).toBe('Ask anything')
+    host.remove()
+  })
+
+  test('the headless tier draws no example over the field', async () => {
     const host = (await composer()) as Composer & { placeholders: string[] }
     host.placeholders = ['One', 'Two']
     await host.updateComplete
-    await new Promise((done) => setTimeout(done, 4400))
-    await host.updateComplete
-    expect(field(host).placeholder).toBe('Two')
-    host.value = 'Draft'
-    await host.updateComplete
-    await new Promise((done) => setTimeout(done, 4400))
-    await host.updateComplete
-    expect(field(host).placeholder).toBe('Two')
+    expect(part(host, 'example')).toBeNull()
+    expect(host.shadowRoot?.querySelectorAll('textarea')).toHaveLength(1)
     host.remove()
+  })
+
+  /* A paused page holds every motion that starts by itself, as reduced motion
+     does, which happy-dom cannot ask for. */
+  test('a page that paused its motion keeps the first example', async () => {
+    document.documentElement.setAttribute('data-helix-motion', 'paused')
+    try {
+      const host = (await composer()) as Composer & { placeholders: string[] }
+      host.placeholders = ['One', 'Two']
+      await host.updateComplete
+      await wait(6900)
+      await host.updateComplete
+      expect([
+        field(host).placeholder,
+        hasState(host, 'example-leaving'),
+        hasState(host, 'example-entering'),
+      ]).toEqual(['One', false, false])
+      host.remove()
+    } finally {
+      document.documentElement.removeAttribute('data-helix-motion')
+    }
   }, 12000)
 })
 
