@@ -9,7 +9,7 @@ import { styles } from './shortcut-overlay-root.css.js'
  *
  * @description
  * Each badge is a small inverse plate, as a tooltip is, with the keys first
- * and the control's name after them, centered on the control's bottom edge.
+ * and the control's name after them, centered under the control.
  * The sheet is a `Dialog` listing each shortcut's name with its keys at the
  * end of the row.
  *
