@@ -88,6 +88,15 @@ const LEAD = '[selectable], [reorderable-rows]:not([child-field])'
 const BOTH = '[selectable][reorderable-rows]:not([child-field])'
 /* The attributes that draw a pagination under the rows. */
 const PAGED = ':is([page-size]:not([page-size="0"]), [paginated])'
+/* **The page sizes a stylesheet can compare a served page with.** CSS cannot
+   read `page-size` as a number, so each size is its own selector: a table that
+   serves fewer rows than the size has served its whole result, which the table
+   draws on one page and so with no pagination. Outside `server` mode, where
+   `total` could promise more. A size not listed keeps the row. */
+const SIZES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30, 40, 50, 100]
+const SHORT = `:not([mode="server"]):is(${SIZES.map(
+  (size) => `[page-size="${size}"]:not(:has(> helix-table-row:nth-of-type(${size})))`,
+).join(', ')})`
 const tracks = Array.from(
   { length: COUNTED },
   (_, at) =>
@@ -445,6 +454,19 @@ ${SERVED}${PAGED}:not(:has(> [slot="footer"]))::after {
 ${SERVED}${PAGED} > [slot="footer"] {
   align-content: center;
   min-block-size: var(--pagination-size, var(--helix-size-control-tight));
+}
+
+/* **Not for a page shorter than its size**, which is the whole result: the
+ * table draws it with no pagination, so a row held for one would close up at
+ * the upgrade and move everything under the table. The footer's gap stays,
+ * since the table keeps it above the empty pagination.
+ */
+${SERVED}${SHORT}::after {
+  block-size: 0;
+}
+
+${SERVED}${SHORT} > [slot="footer"] {
+  min-block-size: auto;
 }
 
 ${SERVED} > :is([slot="empty"], [slot="error"], [slot="loading"]) {

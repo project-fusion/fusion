@@ -662,6 +662,9 @@ impl<'a> Analyzer<'a> {
                 if let Some(raw) = self.nested(path, position, element, elements) {
                     keep(&mut grouped, &mut keys, raw);
                 }
+                if let Some(raw) = served_width(path, position, element, elements) {
+                    keep(&mut grouped, &mut keys, raw);
+                }
                 let Some(published) = self.index.get(&element.tag) else {
                     if let Some(raw) = self.unknown_tag(path, position, element) {
                         keep(&mut grouped, &mut keys, raw);
@@ -1306,6 +1309,59 @@ impl<'a> Analyzer<'a> {
     }
 }
 
+/// A column `width` in a table that serves its rows and has no `columns`.
+///
+/// **A stylesheet lays a served table out before it upgrades**, from
+/// `elements.css`, and it can read the table's `columns` into its tracks but no
+/// column's `width`: an attribute of a child is not the parent's to read. So the
+/// first paint gives every column the same share, and the columns move to their
+/// widths when the table upgrades. Written as `columns` on the table, the widths
+/// hold from the first paint. A table that serves no rows has nothing to move.
+fn served_width(
+    path: &str,
+    position: usize,
+    element: &Element,
+    elements: &[Element],
+) -> Option<Raw> {
+    if element.tag != "helix-table-column" {
+        return None;
+    }
+    let named = |one: &Element, name: &str| {
+        one.attributes
+            .iter()
+            .any(|attribute| unbound(&attribute.name) == name)
+    };
+    if !named(element, "width") {
+        return None;
+    }
+    let at = element.parent?;
+    let table = elements.get(at)?;
+    if !matches!(table.tag.as_str(), "helix-data-table" | "helix-table") || named(table, "columns")
+    {
+        return None;
+    }
+    let serves = elements
+        .iter()
+        .any(|one| one.parent == Some(at) && one.tag == "helix-table-row");
+    if !serves {
+        return None;
+    }
+    let tag = table.tag.as_str();
+    Some(Raw {
+        expected: Some(format!("<{tag} columns=\"…\">")),
+        kind: "served-column-width",
+        message: format!("`<helix-table-column width>` in a `{tag}` that serves its rows is not read until the table upgrades, so the first paint gives each column the same share and the columns move to their widths when the script runs. Write the widths as `columns` on `{tag}`, which a stylesheet reads from the first paint."),
+        origin: Origin {
+            index: position,
+            line: element.line,
+            sheet: path.to_owned(),
+            text: element.text.clone(),
+        },
+        subject: format!("<{tag}> <helix-table-column width>"),
+        tag: tag.to_owned(),
+    })
+}
+
 /// An attribute's name with its binding syntax taken off: `href` for
 /// `:href`, `v-bind:href`, `[href]`, `.href`, and `?href`.
 fn unbound(raw: &str) -> &str {
@@ -1595,6 +1651,37 @@ mod tests {
             kinds(&analyzer),
             [("dead-hook", "helix-card { --card-glow }".to_owned())]
         );
+    }
+
+    #[test]
+    fn a_column_width_in_a_served_table_without_columns_is_found() {
+        let index = index();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let served = |markup: &str| {
+            let page = markup::read(markup, 1);
+            let mut analyzer = Analyzer::new(&index, &listing, &used);
+            analyzer.markup([("a.html", page.elements.as_slice())]);
+            kinds(&analyzer)
+                .into_iter()
+                .filter(|(kind, _)| *kind == "served-column-width")
+                .collect::<Vec<_>>()
+        };
+        let row = "<helix-table-row><helix-table-cell>Ada</helix-table-cell><helix-table-cell>3</helix-table-cell></helix-table-row>";
+        assert_eq!(
+            served(&format!("<helix-data-table><helix-table-column width=\"12rem\">Name</helix-table-column><helix-table-column width=\"4rem\">Count</helix-table-column>{row}</helix-data-table>")),
+            [(
+                "served-column-width",
+                "<helix-data-table> <helix-table-column width>".to_owned()
+            )]
+        );
+        /* `columns` on the table, no rows served, or no `width`: nothing moves. */
+        assert!(served(&format!("<helix-data-table columns=\"12rem 4rem\"><helix-table-column width=\"12rem\">Name</helix-table-column>{row}</helix-data-table>")).is_empty());
+        assert!(served("<helix-data-table><helix-table-column width=\"12rem\">Name</helix-table-column></helix-data-table>").is_empty());
+        assert!(served(&format!(
+            "<helix-table><helix-table-column>Name</helix-table-column>{row}</helix-table>"
+        ))
+        .is_empty());
     }
 
     #[test]

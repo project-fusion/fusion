@@ -31,6 +31,7 @@
       "types": "./dist/rehype/rehype.d.ts",
       "default": "./dist/rehype/rehype.js"
     },
+    "./sandbox/compile-worker.js": "./dist/sandbox/compile-worker.js",
     "./shared": null,
     "./shared/*": null,
     "./skills/*": "./skills/*",

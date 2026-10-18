@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, test } from 'bun:test'
-import { COMPILED, COMPILER, compile, compilers } from './compile.js'
+import { mkdtempSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
+import { COMPILED, COMPILER, compile, compilers, WORKER } from './compile.js'
 
 /** What the stand-in compiler was asked, by path. */
 const asked = new Map<string, Record<string, unknown>>()
@@ -72,5 +76,55 @@ describe('a module in TypeScript or JSX', () => {
     expect(await compile(nowhere, 'app.ts', 'export {}')).toStartWith(
       `throw new SyntaxError("app.ts needs ${nowhere}${COMPILER}, which did not load:`,
     )
+  })
+})
+
+/* The worker a page serves as a file runs the program the `blob:` one does, so
+   a page that switches to it compiles the same. Each is sent a module that
+   compiles, one whose compiler throws, and an address that does not load. */
+describe('the compiler worker served as a file', () => {
+  const answers = async (worker: Worker, address: string): Promise<unknown[]> => {
+    const asks: [number, string, string, { filePath: string }][] = [
+      [1, address, 'abc', { filePath: 'a.ts' }],
+      [2, address, 'a << b', { filePath: 'b.ts' }],
+      [3, `${address}.missing`, 'abc', { filePath: 'c.ts' }],
+    ]
+    const got = new Map<number, unknown>()
+    await new Promise<void>((done) => {
+      worker.onmessage = ({ data }: MessageEvent<[number]>) => {
+        got.set(data[0], data)
+        if (got.size === asks.length) {
+          done()
+        }
+      }
+      for (const ask of asks) {
+        worker.postMessage(ask)
+      }
+    })
+    worker.terminate()
+    /* The engine's own words after the colon name the importing script, which
+       is the one thing the two ways differ in. */
+    return asks.map(([id]) => {
+      const answer = got.get(id) as unknown[]
+      const error = answer[2]
+      return typeof error === 'string' ? [...answer.slice(0, 2), error.split(': ')[0]] : answer
+    })
+  }
+
+  test('answers as the blob worker does', async () => {
+    const folder = mkdtempSync(join(tmpdir(), 'helix-compile-worker-'))
+    const module = join(folder, 'transform.mjs')
+    writeFileSync(
+      module,
+      "export const transform = (source) => { if (source.includes('<<')) throw new Error('Unexpected token'); return { code: source.toUpperCase() } }",
+    )
+    const address = pathToFileURL(module).href
+    const blob = new Worker(URL.createObjectURL(new Blob([WORKER], { type: 'text/javascript' })), {
+      type: 'module',
+    })
+    const file = new Worker(new URL('./compile-worker.ts', import.meta.url), { type: 'module' })
+    const [fromBlob, fromFile] = [await answers(blob, address), await answers(file, address)]
+    expect(fromFile).toEqual(fromBlob)
+    expect(fromFile[0]).toEqual([1, { code: 'ABC' }])
   })
 })

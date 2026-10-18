@@ -13,6 +13,7 @@
  * `allow-same-origin`, which is the pairing that would undo it.
  */
 
+export { registerCompilerWorker } from './compile.js'
 export * from './console/sandbox-console.js'
 export {
   isRender,

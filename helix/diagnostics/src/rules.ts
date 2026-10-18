@@ -62,6 +62,9 @@ export const SHIPPED_RULES: Readonly<Record<Kind, Severity>> = {
   'native-element': 'warn',
   'nested-interactive': 'error',
   'primitive-token': 'error',
+  /* A warning, because the table works: its columns take their widths once it
+     upgrades, and only the first paint is laid out without them. */
+  'served-column-width': 'warn',
   'unforwarded-part': 'warn',
   /* A warning, because a read of the code cannot see every way a page
      registers elements: a dynamic import of a computed path, or a bundle

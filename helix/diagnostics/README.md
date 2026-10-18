@@ -343,6 +343,7 @@ works on it:
 | `unknown-tag` | error | A rule or an element names a tag no manifest lists |
 | `unknown-event` | error | A React `on` prop on a Helix element names an event the element does not dispatch, so the handler never runs. Found by `helix scan`, from the templates |
 | `unimported-tag` | warn | An element is written and nothing in the project imports the entry that registers it, so the browser draws an unknown element. Found by `helix scan`, from the imports |
+| `served-column-width` | warn | A column in a table that serves its rows sets `width` and the table sets no `columns`, so the columns move to their widths when the table upgrades. Write the widths as `columns` on the table. Found by `helix scan` |
 | `disabled-attribute` | error | A rule styles a form control's `[disabled]`, which a control disabled by a `<fieldset disabled>` does not carry. Write `:disabled`. Found by `helix scan` |
 | `primitive-token` | error | A rule reads a `--_helix-` primitive, which is internal to `@fusion.dev/helix-styles`. Found by `helix scan` |
 | `unknown-token` | error | A rule reads or sets a `--helix-` name the token set does not have, so it falls back silently. Found by `helix scan` |

@@ -667,7 +667,11 @@ export const catalog = (
               a.tagName.localeCompare(b.tagName),
           ),
         examples: examplesOf(slug, root?.helix, examples),
-        imports: importsOf(slug, entries),
+        imports: importsOf(
+          slug,
+          entries,
+          new Set(entries.map((entry) => entryOf.get(entry) ?? slug)),
+        ),
         label: startCase(slug),
         package: root ? published(root) : '',
         replaces: [...new Set(roots.flatMap((entry) => entry.helix?.replaces ?? []))],
@@ -758,23 +762,43 @@ export const usageOf = (
         .filter((element) => !own(element))
         .map((element) => `import '${element.specifier}' // ${element.label}`),
     ]),
-    ...family.imports.map((entry) => `import '${PACKAGE[tier]}/${entry}' // ${startCase(entry)}`),
+    ...family.imports.map((entry) =>
+      entry.startsWith('@')
+        ? `import '${entry}' // ${startCase(entry.slice(entry.indexOf('/helix-') + 7).replaceAll('/', '-'))}`
+        : `import '${PACKAGE[tier]}/${entry}' // ${startCase(entry.replaceAll('/', '-'))}`,
+    ),
   ]
 }
 
 /**
- * The entries of other families a family's descriptions import beside its own:
- * an `import '@fusion.dev/helix/option'` line in Select's names `option`. An
- * entry of the family's own, such as `filter-input/menu`, is a part's and is
- * listed with the part.
+ * The entries a family's descriptions import beside its own: an
+ * `import '@fusion.dev/helix/option'` line in Select's names `option`. An
+ * entry of the family's own that only adds behavior, such as `menu/filter`,
+ * is listed too, since no element carries it. One a part has, such as
+ * `filter-input/menu`, is listed with the part, so `owned` leaves it out.
+ *
+ * **An entry of another package is kept whole**, such as
+ * `@fusion.dev/helix-sandbox/code-block`, which colors every Code Block: the
+ * line is that package's in both tiers, and only a Helix tier's entry is
+ * written again under the other tier's package.
  */
-const importsOf = (slug: string, declarations: readonly HelixDeclaration[]): string[] =>
+const importsOf = (
+  slug: string,
+  declarations: readonly HelixDeclaration[],
+  owned: ReadonlySet<string>,
+): string[] =>
   [
     ...new Set(
       declarations.flatMap((declaration) =>
-        [...(declaration.description ?? '').matchAll(/import '@fusion\.dev\/helix\/([a-z-]+)'/g)]
-          .map((match) => match[1] ?? '')
-          .filter((entry) => entry !== '' && entry !== slug),
+        [
+          ...(declaration.description ?? '').matchAll(
+            /import '(@fusion\.dev\/helix(?:-[a-z]+)?)\/([a-z-]+(?:\/[a-z-]+)*)'/g,
+          ),
+        ]
+          .map(([, pack = '', entry = '']) =>
+            pack === PACKAGE.styled || pack === PACKAGE.headless ? entry : `${pack}/${entry}`,
+          )
+          .filter((entry) => entry !== '' && entry !== slug && !owned.has(entry)),
       ),
     ),
   ].sort()
