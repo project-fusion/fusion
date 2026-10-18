@@ -75,12 +75,26 @@ slot[name="label"]::slotted(*) {
  *  The house radius, not the pill `Progress` wears, and the ticks are why.
  */
   border-radius: var(--helix-radii-sm);
+  /* A row, so the segments written inside it sit one after another from the
+     inline start. The fill and the ticks are positioned and take no part in it. */
   inline-size: 100%;
   /* The fill has a radius of its own, and at low values its trailing corners
      would otherwise round outside the track. The ticks are clipped by it too,
      which is what keeps one at the very end from spilling past the corner. */
   overflow: hidden;
   position: relative;
+}
+
+:host(:not([shape])) [part="track"] {
+  display: flex;
+}
+
+/* Over the whole track, as it was when the track was a block, so a row of
+   segments beside it moves nothing. A circle in `ring` and `arc` is not a box and
+   takes no position. */
+:host(:not([shape])) [part~="indicator"] {
+  inset: 0;
+  position: absolute;
 }
 
 /* `scale` on the inline axis rather than a width, because a transform is

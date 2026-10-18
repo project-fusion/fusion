@@ -1,0 +1,23 @@
+export function Example() {
+  return (
+    <helix-meter
+      label="Context window"
+      max={1000}
+      show-value
+      value-text="620 of 1,000 tokens"
+    >
+      <helix-meter-segment
+        label="Messages"
+        value={310}
+      ></helix-meter-segment>
+      <helix-meter-segment
+        label="Tools"
+        value={200}
+      ></helix-meter-segment>
+      <helix-meter-segment
+        label="Instructions"
+        value={110}
+      ></helix-meter-segment>
+    </helix-meter>
+  )
+}

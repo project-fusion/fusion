@@ -1,0 +1,107 @@
+/* The host takes no box, so the slice it draws is a flex item of the track the
+   meter lays out, which is what lets a segment be written inside a meter as one
+   element and still sit in its row. */
+:host {
+  display: contents;
+}
+
+/* As wide as its value is of the range. `--meter-span` is the meter's own, written
+   on the track and inherited down the slot. It never shrinks, so segments that add
+   up to more than the range keep their widths and the track clips the last at its
+   end, where a shrinking one would change what each is a share of. */
+[part="fill"] {
+  background-color: var(
+    --meter-segment-color,
+    var(--_meter-segment-hue, var(--helix-color-series-1))
+  );
+  block-size: 100%;
+  box-sizing: border-box;
+  flex: 0 0 calc(var(--meter-segment-value, 0) / var(--meter-span, 1) * 100%);
+  transition: flex-basis var(--meter-transition-duration, var(--helix-duration-normal))
+    var(--helix-easing-decelerate);
+}
+
+/* The next color in the series for each segment, in the order written, so two
+   segments are told apart without being given a color. A tone is what a segment
+   means and takes the place of its turn. */
+:host(:nth-of-type(1)) {
+  --_meter-segment-hue: var(--helix-color-series-1);
+}
+:host(:nth-of-type(2)) {
+  --_meter-segment-hue: var(--helix-color-series-2);
+}
+:host(:nth-of-type(3)) {
+  --_meter-segment-hue: var(--helix-color-series-3);
+}
+:host(:nth-of-type(4)) {
+  --_meter-segment-hue: var(--helix-color-series-4);
+}
+:host(:nth-of-type(5)) {
+  --_meter-segment-hue: var(--helix-color-series-5);
+}
+:host(:nth-of-type(6)) {
+  --_meter-segment-hue: var(--helix-color-series-6);
+}
+:host(:nth-of-type(7)) {
+  --_meter-segment-hue: var(--helix-color-series-7);
+}
+:host(:nth-of-type(8)) {
+  --_meter-segment-hue: var(--helix-color-series-8);
+}
+:host(:nth-of-type(9)) {
+  --_meter-segment-hue: var(--helix-color-series-9);
+}
+:host(:nth-of-type(10)) {
+  --_meter-segment-hue: var(--helix-color-series-10);
+}
+:host(:nth-of-type(11)) {
+  --_meter-segment-hue: var(--helix-color-series-11);
+}
+
+:host([tone="accent"]) {
+  --_meter-segment-hue: var(--helix-color-accent);
+}
+:host([tone="danger"]) {
+  --_meter-segment-hue: var(--helix-color-danger);
+}
+:host([tone="info"]) {
+  --_meter-segment-hue: var(--helix-color-info);
+}
+:host([tone="neutral"]) {
+  --_meter-segment-hue: var(--helix-color-foreground-subtle);
+}
+:host([tone="primary"]) {
+  --_meter-segment-hue: var(--helix-color-primary);
+}
+:host([tone="success"]) {
+  --_meter-segment-hue: var(--helix-color-success);
+}
+:host([tone="warning"]) {
+  --_meter-segment-hue: var(--helix-color-warning);
+}
+
+/* A hairline between neighbors, in the track's own ground, so the boundary is
+   there for a reader who cannot tell two of the colors apart. It is drawn inside
+   the slice, so it takes no width from it, and a slice of any size above nothing
+   keeps three pixels, so a small one is a color and never only its hairline. */
+:host(:not(:first-of-type)) [part="fill"] {
+  box-shadow: inset var(--helix-border-thin) 0 0
+    var(--meter-segment-gap-color, var(--helix-color-background));
+}
+
+[part="fill"] {
+  min-inline-size: min(3px, calc(var(--meter-segment-value, 0) * 1000px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [part="fill"] {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  [part="fill"] {
+    background-color: CanvasText;
+    box-shadow: inset var(--helix-border-thin) 0 0 Canvas;
+  }
+}
