@@ -120,7 +120,7 @@ export class HelixHeadlessIcon extends HelixElement {
    *
    * **A lookup, and the reason both this and `icon` exist.** A name is a string,
    * so it is what markup can carry, and resolving one means an index of the
-   * whole set that no bundler can shake: 15 kB for a consumer who renders one
+   * whole set that no bundler can shake: 17 kB for a consumer who renders one
    * mark. An attribute is the only thing an HTML author can write, and that is
    * worth the index; a consumer who would rather not pay it imports the
    * element from `icon/root` and registers the glyphs it names, or hands over

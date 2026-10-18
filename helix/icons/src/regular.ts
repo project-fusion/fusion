@@ -8,7 +8,7 @@
  * took on their behalf.
  *
  * **No `icons` record here.** That record is what `<helix-icon name>` reads and
- * what no bundler can shake, so a copy per weight would be 15 kB of index for
+ * what no bundler can shake, so a copy per weight would be 17 kB of index for
  * every subpath. A consumer naming an icon in markup gets the default weight; a
  * consumer who wants this one imports the value and hands it over.
  */

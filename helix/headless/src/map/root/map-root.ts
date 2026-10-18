@@ -651,14 +651,35 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     }
   }
 
+  /* Whether a press that began inside the menu is still down. */
+  private pressingMenu = false
+
+  /**
+   * Notes a press inside the menu. A map type's picture and name take no focus,
+   * so the browser moves focus to the nearest focusable ancestor, the region,
+   * on `pointerdown`. That is not the focus moving on, and closing the menu for
+   * it hides the type before the release can click it.
+   */
+  private readonly handleMenuPress = (): void => {
+    this.pressingMenu = true
+    const release = (): void => {
+      this.pressingMenu = false
+      window.removeEventListener('pointerup', release, true)
+      window.removeEventListener('pointercancel', release, true)
+    }
+    window.addEventListener('pointerup', release, true)
+    window.addEventListener('pointercancel', release, true)
+  }
+
   /**
    * Closes the layers menu when focus moves on from its button and the menu,
    * as a Tab past the last tile does. Focus leaving the page, with nothing
-   * focused in its place, leaves the menu as it is.
+   * focused in its place, leaves the menu as it is, and so does focus moved by
+   * a press inside the menu.
    */
   private readonly handleMenuFocusOut = (event: FocusEvent): void => {
     const to = event.relatedTarget as Node | null
-    if (!(this.layersOpen && to)) {
+    if (!(this.layersOpen && to) || this.pressingMenu) {
       return
     }
     const owners = this.renderRoot.querySelectorAll('[part="layers-toggle"], [part="layers-menu"]')
@@ -1137,6 +1158,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         aria-label=${this.layersLabel}
         ?hidden=${!this.layersOpen}
         @focusout=${this.handleMenuFocusOut}
+        @pointerdown=${this.handleMenuPress}
         @keydown=${this.handleMenuKeydown}
       >
         ${this.imagery.length > 0 ? this.renderMapTypes() : nothing}

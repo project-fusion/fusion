@@ -76,7 +76,7 @@
   padding: var(--helix-space-xl);
 }
 
-@media (width < 64rem) {
+@media (width < 80rem) {
   /* Stacked where a split would be two narrow strips. Measured at 390: the
      stage was squeezed to 64px and pushed past the edge, `.showcaseStage` at
      x=384 running to 448, which is a page that scrolls sideways on a phone. */

@@ -121,26 +121,3 @@
   display: block;
   padding-block-end: var(--helix-space-xs);
 }
-
-/* The rail is about this page, so it is the first thing to go when there is no
-   room for a margin note. */
-@media (max-width: 72rem) {
-  .docsShell {
-    grid-template-columns: 15rem minmax(0, 1fr);
-  }
-
-  .docsRail {
-    display: none;
-  }
-}
-
-@media (max-width: 56rem) {
-  .docsShell {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .docsNav {
-    max-block-size: none;
-    position: static;
-  }
-}

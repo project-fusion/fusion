@@ -507,3 +507,13 @@
   display: inline-flex;
   gap: var(--helix-space-2xs);
 }
+
+/* The showcase stacks until its stage has room for the views' two columns.
+   Split at 60rem the stage had about 245px, and the cards clipped what they
+   held. Doubled so it outranks the band's own split whichever sheet loads
+   last. */
+@media (min-width: 60rem) and (width < 80rem) {
+  .showcaseSplit.showcaseSplit {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

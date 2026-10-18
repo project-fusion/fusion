@@ -22,9 +22,12 @@
 //! against each of the family's parts, which it cannot reach. A part's tag is
 //! its file's folder, which is how the tree is read everywhere else.
 //!
-//! **Two shapes are exempt.** A `::part()` is the published door and is meant to
-//! win. And a selector list naming a `data-` recipe beside the component is one
-//! decision written for a plain element and for the component alike.
+//! **Three shapes are exempt.** A `::part()` is the published door and is meant
+//! to win. A selector list naming a `data-` recipe beside the component is one
+//! decision written for a plain element and for the component alike. And a rule
+//! of the component's own that applies only before it upgrades, written with
+//! `:not(:defined)`, is the component answering the document on purpose, by
+//! being important where the document's rule is not: it is not dead.
 
 use std::collections::BTreeSet;
 use std::fs;
@@ -138,6 +141,11 @@ fn past_compound(after: &str) -> String {
         .map_or_else(String::new, |at| after[at..].trim().to_owned())
 }
 
+/// Whether a selector of the component's own applies only before it upgrades.
+fn before_upgrade(selector: &str) -> bool {
+    selector.contains(":not(:defined)")
+}
+
 /// A document rule that reaches a component.
 struct Document {
     path: String,
@@ -222,6 +230,9 @@ pub fn run(context: &Context) -> Report {
         let mut host = BTreeSet::new();
         let mut slotted = BTreeSet::new();
         for rule in rules(&css) {
+            if before_upgrade(&rule.selector) {
+                continue;
+            }
             let into = if rule.selector.contains("::slotted(") {
                 &mut slotted
             } else if rule.selector.contains(":host") {
@@ -276,7 +287,15 @@ pub fn run(context: &Context) -> Report {
 
 #[cfg(test)]
 mod tests {
-    use super::{below_children, past_compound, reaches};
+    use super::{before_upgrade, below_children, past_compound, reaches};
+
+    #[test]
+    fn a_rule_for_before_the_upgrade_is_the_components_answer() {
+        assert!(before_upgrade(":host(:not(:defined))"));
+        assert!(before_upgrade(":host(:not(:defined))::before"));
+        assert!(!before_upgrade(":host"));
+        assert!(!before_upgrade(":host([hidden])"));
+    }
 
     #[test]
     fn an_element_inside_a_child_is_below_the_slots() {

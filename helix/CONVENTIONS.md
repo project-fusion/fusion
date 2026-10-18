@@ -2019,7 +2019,7 @@ page `'use client'` to use a button would not be a design system.
 from the element sources by `fusion/scripts/build-elements-css.mjs` and hides
 each tag with `:not(:defined)` until it upgrades, using `visibility`. It reserves
 no space, so an element whose upgraded box is larger than its light DOM still
-moves what follows it when it upgrades; only the data table below holds its box
+moves what follows it when it upgrades; only the tables below hold their box
 across the upgrade. Without it a card arrives as a run of unstyled text and then
 snaps into a card. CSS cannot select "any custom element", and a bare
 `:not(:defined)` would also catch Next's own dev overlay, so the tags are
