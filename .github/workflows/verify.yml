@@ -1023,7 +1023,7 @@ jobs:
     needs: [browser, site, visual-triage]
     if: ${{ always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && needs.browser.result != 'cancelled' && needs.site.result != 'cancelled' }}  # dialect:quoted, GitHub's own job result spelled its way
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     continue-on-error: true
     permissions:
       actions: read
@@ -1043,11 +1043,14 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Set up bun and the helix binary
+      # **With the dependencies, which is what puts the `helix` binary on
+      # disk.** The setup action restores the binary only beside an install, and
+      # without it `bin.mjs` finds cargo and builds the whole workspace in this
+      # step, which outran the job's ten minutes. `visual-triage` takes the
+      # same default.
+      - name: Set up bun and the dependencies
         if: env.FAILED == 'true'
         uses: ./.github/actions/setup
-        with:
-          dependencies: 'false'
 
       - name: Fetch the reports of the visual checks
         if: env.FAILED == 'true'
