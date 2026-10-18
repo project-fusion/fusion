@@ -199,7 +199,7 @@ describe('a fling', () => {
       // Once it is still, the window moves to where the box is, and there is no gap.
       const rows = [...host.querySelectorAll<HTMLElement>(':scope > [data-index]')]
       const frame = box.getBoundingClientRect()
-      expect(rows[0].getBoundingClientRect().top).toBeLessThanOrEqual(frame.top)
+      expect(rows[0]?.getBoundingClientRect().top).toBeLessThanOrEqual(frame.top)
       expect(rows.at(-1)?.getBoundingClientRect().bottom ?? 0).toBeGreaterThanOrEqual(frame.bottom)
     },
   )
