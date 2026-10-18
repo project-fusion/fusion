@@ -28,16 +28,14 @@ const PROBLEMS = [
 
 export function Example() {
   return (
-    <>
-      <helix-headless-code-editor
-        diagnostics={PROBLEMS}
-        label="orders.ts"
-        language="ts"
-        line-numbers
-        value={CODE}
-      >
-        <helix-headless-button slot="actions">Format</helix-headless-button>
-      </helix-headless-code-editor>
-    </>
+    <helix-headless-code-editor
+      diagnostics={PROBLEMS}
+      label="orders.ts"
+      language="ts"
+      line-numbers
+      value={CODE}
+    >
+      <helix-headless-button slot="actions">Format</helix-headless-button>
+    </helix-headless-code-editor>
   )
 }

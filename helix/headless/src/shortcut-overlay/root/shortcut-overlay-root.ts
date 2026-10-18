@@ -332,7 +332,8 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
   }
 
   /**
-   * Places each badge centered on its control's bottom edge, on whole pixels
+   * Places each badge centered under its control, a few pixels below its
+   * bottom edge so it hides none of the control's words, on whole pixels
    * and inside the viewport, where it overlaps no badge placed before it.
    *
    * **A badge that would overlap a neighbor drops its name**, keeping the
@@ -352,13 +353,14 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
       if (!badge) {
         return
       }
+      /* `top` is where the badge's own top edge goes. */
       const box = (compact: boolean, top: number) => {
         element.toggleAttribute('data-compact', compact)
         const { height: tall, width: wide } = element.getBoundingClientRect()
         const left = Math.round(
           Math.min(Math.max(badge.left - wide / 2, margin), width - wide - margin),
         )
-        const at = Math.round(Math.min(Math.max(top - tall / 2, margin), height - tall - margin))
+        const at = Math.round(Math.min(Math.max(top, margin), height - tall - margin))
         return { bottom: at + tall, left, right: left + wide, top: at }
       }
       const hits = (one: { bottom: number; left: number; right: number; top: number }) =>
@@ -369,13 +371,14 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
             one.top < other.bottom &&
             one.bottom > other.top,
         )
-      let place = box(false, badge.top)
+      const under = badge.top + margin
+      let place = box(false, under)
       if (hits(place).length > 0) {
-        place = box(true, badge.top)
+        place = box(true, under)
       }
       for (let tries = 0; tries < 4 && hits(place).length > 0; tries += 1) {
         const below = Math.max(...hits(place).map((other) => other.bottom))
-        place = box(true, below + (place.bottom - place.top) / 2 + 2)
+        place = box(true, below + 2)
       }
       element.style.left = `${place.left}px`
       element.style.top = `${place.top}px`
