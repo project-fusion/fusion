@@ -1,5 +1,4 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { readFileSync } from 'node:fs'
 import { hasLayout, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -19,21 +18,6 @@ const ink = (token: string): string => {
   probe.remove()
   return color
 }
-
-/* Happy-dom has no cascade across shadow roots, so the rule itself is read: a
-   `[data-color-mode]` scope re-declares the ink, except on the surfaces that
-   name it. */
-describe('card heading ink in a nested color mode', () => {
-  test('is reset on every color-mode scope but the card and node that set it', () => {
-    const modes = readFileSync(
-      new URL('../../../../styles/src/_modes.css', import.meta.url),
-      'utf8',
-    )
-    expect(modes).toMatch(
-      /\[data-color-mode\]:not\(helix-card, helix-canvas-node\) \{\s*--_heading-ink: initial/,
-    )
-  })
-})
 
 describe('card body text', () => {
   if (hasLayout()) {

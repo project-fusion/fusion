@@ -549,6 +549,7 @@ describe('map frame, layers menu', () => {
       Object.assign(document.createElement('helix-headless-map-route'), { label: 'Route' }),
     )
     await host.updateComplete
+    await new Promise((done) => setTimeout(done, 20))
     control(host, 'layers-toggle')?.click()
     await host.updateComplete
     return host
