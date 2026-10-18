@@ -23,7 +23,9 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @summary A measurement in a known range, with optional bands that mark it good, fair, or poor.
  *
  * @description
- * A meter shows a level within a range. Use `Progress` to show how far along a
+ * A meter shows a level within a range, or how the level divides: write
+ * `Meter.Segment` inside it for each part of the whole, and the meter measures
+ * their sum. Use `Progress` to show how far along a
  * task is. A progress bar starts empty and ends full, and full is always the
  * good end. For a meter, which end is good depends on what is measured. There
  * is no `indeterminate`, because a meter always has a value.
@@ -48,6 +50,7 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @aliases Gauge, Level, Capacity
  * @documentation https://fusion.dev/helix/components/meter
  *
+ * @slot - `Meter.Segment` elements, one for each share of the whole, drawn in the bar.
  * @slot label - A visible label. Its words name the meter in place of `label`.
  *
  * @event {HelixBandEvent} helix-band - Fired when the reading moves into another band, with the band it is in now, or `''` where it is in none. Not sent on the first render, since a meter that arrives in a band has not moved.
@@ -64,6 +67,7 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @csspart track - The whole range, or the drawing in `ring` and `arc`.
  * @csspart value - The reading as text, shown when `show-value` is set.
  *
+ * @cssproperty --meter-span - How much the range holds, `max` less `min`, which a segment divides its own value by to find its width.
  * @cssproperty --meter-along - Where a bound sits on the arc, as a length along it.
  * @cssproperty --meter-at - Where a bound sits on a linear track, as a percentage.
  * @cssproperty --meter-fraction - The value as a fraction of the range, 0 to 1.
@@ -281,6 +285,30 @@ export class HelixHeadlessMeter extends HelixElement {
    */
   private lastBand: MeterBand | '' | undefined
 
+  /**
+   * The segments written inside, where they can be known: none on a server or
+   * while hydrating what one sent, so the first render is the server's, and
+   * every one once the page has them.
+   */
+  private get segments(): (Element & { value?: number })[] {
+    return this.knownChildren.filter((child) => child.localName.endsWith('meter-segment'))
+  }
+
+  /**
+   * What the meter measures: the sum of its segments where it has any, and its
+   * own `value` where it has none, so the two can never disagree.
+   */
+  private get amount(): number {
+    const segments = this.segments
+    if (segments.length === 0) {
+      return this.value
+    }
+    return segments.reduce((sum, segment) => {
+      const share = Number(segment.value ?? segment.getAttribute('value'))
+      return Number.isFinite(share) && share > 0 ? sum + share : sum
+    }, 0)
+  }
+
   /** The range, clamped so `max` is never at or below `min`. */
   private get span(): { max: number; min: number } {
     const min = Number.isFinite(this.min) ? this.min : 0
@@ -291,7 +319,7 @@ export class HelixHeadlessMeter extends HelixElement {
   /** The reading, pulled into the range. */
   private get reading(): number {
     const { max, min } = this.span
-    return Math.min(max, Math.max(min, Number.isFinite(this.value) ? this.value : min))
+    return Math.min(max, Math.max(min, Number.isFinite(this.amount) ? this.amount : min))
   }
 
   /**
@@ -319,14 +347,14 @@ export class HelixHeadlessMeter extends HelixElement {
    */
   private get ratio(): number {
     const { max, min } = this.span
-    const raw = Number.isFinite(this.value) ? this.value : min
+    const raw = Number.isFinite(this.amount) ? this.amount : min
     return (raw - min) / (max - min)
   }
 
   /** Whether the value is past an end, which the bar itself cannot show. */
   private get beyond(): 'over' | 'under' | undefined {
     const { max, min } = this.span
-    const raw = Number.isFinite(this.value) ? this.value : min
+    const raw = Number.isFinite(this.amount) ? this.amount : min
     return raw > max ? 'over' : raw < min ? 'under' : undefined
   }
 
@@ -379,7 +407,7 @@ export class HelixHeadlessMeter extends HelixElement {
     return (
       this.valueText ||
       readingText(
-        Number.isFinite(this.value) ? this.value : this.span.min,
+        Number.isFinite(this.amount) ? this.amount : this.span.min,
         this.ratio,
         wordsLocale(this),
         this.formatOptions,
@@ -505,19 +533,28 @@ export class HelixHeadlessMeter extends HelixElement {
     return html`<slot name="label" @slotchange=${this.renamed}></slot>${
       this.shape
         ? this.renderRound()
-        : html`<div part="track">
+        : html`<div part="track" style="--meter-span: ${max - min}">
+            <slot @slotchange=${this.renamed}></slot>
             ${
               bounds
                 ? html`<span part="tick" style="--meter-at: ${at(bounds.low)}"></span>
                     <span part="tick" style="--meter-at: ${at(bounds.high)}"></span>`
                 : nothing
             }
-            <div
-              part="indicator${band ? { fair: ' indicator-fair', good: ' indicator-good', poor: ' indicator-poor' }[band] : ''}${beyond ? { over: ' indicator-over', under: ' indicator-under' }[beyond] : ''}"
-              data-band=${band ?? nothing}
-              data-beyond=${beyond ?? nothing}
-              style="--meter-fraction: ${this.fraction}"
-            ></div>
+            ${
+              /* The segments are the fill, so a meter that has them draws no
+                 fill of its own over them. A server cannot know them and draws
+                 the fill from `value`, which a meter with segments leaves at
+                 zero. */
+              this.segments.length > 0
+                ? nothing
+                : html`<div
+                    part="indicator${band ? { fair: ' indicator-fair', good: ' indicator-good', poor: ' indicator-poor' }[band] : ''}${beyond ? { over: ' indicator-over', under: ' indicator-under' }[beyond] : ''}"
+                    data-band=${band ?? nothing}
+                    data-beyond=${beyond ?? nothing}
+                    style="--meter-fraction: ${this.fraction}"
+                  ></div>`
+            }
           </div>`
     }
       ${this.showValue ? html`<span part="value">${this.text}</span>` : nothing}${drawStatus(this.status)}`
