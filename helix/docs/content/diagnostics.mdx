@@ -204,6 +204,7 @@ run `helix scan --out` after it to add your code's run.
 | `primitive-token` | error | scan | A rule reads a `--_helix-` primitive, which is internal to `@fusion.dev/helix-styles` |
 | `unforwarded-part` | warn | both | The headless tag publishes a part the styled tag does not forward, which is a gap in Helix |
 | `unimported-tag` | warn | scan | An element is written, and nothing in the project imports the entry that registers it |
+| `served-column-width` | warn | scan | A column in a table that serves its rows sets `width`, and the table sets no `columns`, so the columns move when it upgrades |
 | `unknown-attribute` | error | both | A Helix element carries an attribute it does not take |
 | `unknown-event` | error | scan | A React `on` prop names an event the element does not dispatch |
 | `unknown-slot` | error | scan | A child names a slot its Helix element does not have, so it is not drawn |

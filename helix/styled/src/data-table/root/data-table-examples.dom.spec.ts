@@ -337,4 +337,22 @@ describe('a data table that serves its first page, before it upgrades', () => {
     await idle()
     expect(layout(roster)).toEqual(upgraded)
   })
+
+  /* Two rows served under a size of four are the whole result, which the table
+     draws with no pagination, so no row is held for one before it upgrades. */
+  const short = `<helix-data-table id="short" label="Releases" page-size="4" row-key="name">
+    <helix-table-column field="name">Name</helix-table-column>
+    <helix-table-column field="date">Date</helix-table-column>
+    <helix-table-row><helix-table-cell header>0.215.2</helix-table-cell><helix-table-cell>October 17</helix-table-cell></helix-table-row>
+    <helix-table-row><helix-table-cell header>0.215.3</helix-table-cell><helix-table-cell>October 18</helix-table-cell></helix-table-row>
+  </helix-data-table>`
+
+  run('a served page shorter than its size holds no pagination row', async () => {
+    await example(short)
+    await idle()
+    const releases = document.getElementById('short') as HTMLElement
+    const upgraded = layout(releases)
+    const before = layout(await unupgraded(short, releases.getBoundingClientRect().width))
+    expect(before).toEqual(upgraded)
+  })
 })

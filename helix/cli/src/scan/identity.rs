@@ -12,7 +12,7 @@ use std::sync::LazyLock;
 use regex::Regex;
 
 /// Every fault class, stable across versions, as `report.ts` lists them.
-pub const KINDS: [&str; 18] = [
+pub const KINDS: [&str; 19] = [
     "dead-hook",
     "dead-part",
     "disabled-attribute",
@@ -23,6 +23,7 @@ pub const KINDS: [&str; 18] = [
     "native-element",
     "nested-interactive",
     "primitive-token",
+    "served-column-width",
     "unforwarded-part",
     "unimported-tag",
     "unknown-attribute",
@@ -45,8 +46,13 @@ pub fn category(kind: &str) -> &'static str {
         | "unforwarded-part"
         | "unknown-token"
         | "unreflected-attribute" => "styling",
-        "false-boolean" | "invalid-value" | "nested-interactive" | "unknown-attribute"
-        | "unknown-event" | "unknown-slot" => "markup",
+        "false-boolean"
+        | "invalid-value"
+        | "nested-interactive"
+        | "served-column-width"
+        | "unknown-attribute"
+        | "unknown-event"
+        | "unknown-slot" => "markup",
         "native-element" => "guideline",
         _ => "integrity",
     }
@@ -67,9 +73,11 @@ pub fn owner(kind: &str) -> &'static str {
 /// written.
 pub fn shipped(kind: &str) -> &'static str {
     match kind {
-        "native-element" | "unforwarded-part" | "unimported-tag" | "unreflected-attribute" => {
-            "warn"
-        }
+        "native-element"
+        | "served-column-width"
+        | "unforwarded-part"
+        | "unimported-tag"
+        | "unreflected-attribute" => "warn",
         _ => "error",
     }
 }

@@ -120,6 +120,22 @@ over a package of the same name. The preview loads its document again when one
 of them changes, because a browser reads an import map only as a document
 starts. A `src` document declares its own import map.
 
+A module pane in TypeScript or JSX is compiled before the frame loads it. The
+compiler runs in a worker, which the preview starts from a `blob:` address, and
+loads from the `cdn`. A page whose Content Security Policy refuses `blob:`
+workers, as `worker-src 'self'` does, serves the worker as a file instead. Copy
+`@fusion.dev/helix/sandbox/compile-worker.js` to the page's own origin, and
+give its address to `registerCompilerWorker` before the first preview compiles:
+
+```js
+import { registerCompilerWorker } from '@fusion.dev/helix/sandbox'
+
+registerCompilerWorker('/sandbox/compile-worker.js')
+```
+
+In both cases the policy's `script-src` names the `cdn`'s host, which the
+compiler and the packages load from.
+
 ## Editing keys
 
 In a source pane, Tab inserts two spaces. Shift+Tab moves focus back, and

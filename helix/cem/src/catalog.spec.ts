@@ -277,9 +277,51 @@ describe('imports', () => {
     expect(findInCatalog(catalog([written]), 'select')?.imports).toEqual(['option'])
   })
 
-  test('and never the family itself or an entry of its own', () => {
-    expect(findInCatalog(catalog([written]), 'filter-input')?.imports).toEqual([])
+  test('and never the family itself', () => {
     expect(catalog([manifest])[0]?.imports).toEqual([])
+  })
+
+  /* `menu/filter` adds behavior and no element, so nothing else lists it, and
+     the sandbox's `code-block` entry colors every Code Block from another
+     package. Each was only in a description. */
+  test('an entry of its own that no part carries is listed, and another package’s is kept whole', () => {
+    expect(findInCatalog(catalog([written]), 'filter-input')?.imports).toEqual([
+      'filter-input/menu',
+    ])
+    const extras: HelixManifest = {
+      modules: [
+        {
+          declarations: [
+            {
+              description:
+                "```js\nimport '@fusion.dev/helix/menu'\nimport '@fusion.dev/helix/menu/filter'\n```",
+              name: 'HelixMenu',
+              tagName: 'helix-menu',
+            },
+          ],
+          path: 'src/menu/root/menu-root.ts',
+        },
+        {
+          declarations: [
+            {
+              description:
+                "```js\nimport '@fusion.dev/helix/code-block'\nimport '@fusion.dev/helix-sandbox/code-block'\n```",
+              name: 'HelixCodeBlock',
+              tagName: 'helix-code-block',
+            },
+          ],
+          path: 'src/code-block/root/code-block-root.ts',
+        },
+      ],
+    }
+    const [codeBlock, menu] = catalog([extras])
+    expect([menu?.usage.styled, codeBlock?.usage.styled]).toEqual([
+      ["import '@fusion.dev/helix/menu'", "import '@fusion.dev/helix/menu/filter' // Menu Filter"],
+      [
+        "import '@fusion.dev/helix/code-block'",
+        "import '@fusion.dev/helix-sandbox/code-block' // Sandbox Code Block",
+      ],
+    ])
   })
 })
 

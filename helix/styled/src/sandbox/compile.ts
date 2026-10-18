@@ -49,11 +49,38 @@ type Transform = (
  * failed, and answers with the number and what `transform` returned, or the
  * number and what went wrong.
  */
-const WORKER =
+export const WORKER =
   'const l={};onmessage=async({data:[i,a,s,o]})=>{let c;try{c=await(l[a]??=import(a))}catch(e){delete l[a];return postMessage([i,,o.filePath+" needs "+a+", which did not load: "+e])}try{postMessage([i,c.transform(s,o)])}catch(e){postMessage([i,,String(e?.message)])}}'
 
 /** The one worker every preview on the page compiles in, started on the first compile. */
 let worker: Worker | undefined
+
+/** The address the worker starts from, where a page has served it as a file. */
+let workerAddress: string | URL | undefined
+
+/**
+ * Starts the compiler's worker from a file the page serves, rather than from
+ * a `blob:` address.
+ *
+ * **For a page whose Content Security Policy refuses `blob:` workers**, which
+ * `worker-src 'self'` does, and which leaves TypeScript and JSX panes
+ * uncompiled. Copy `@fusion.dev/helix/sandbox/compile-worker.js` to where the
+ * page serves its own scripts, and call this before the first preview
+ * compiles:
+ *
+ * ```js
+ * import { registerCompilerWorker } from '@fusion.dev/helix/sandbox'
+ *
+ * registerCompilerWorker('/sandbox/compile-worker.js')
+ * ```
+ *
+ * The compiler itself still loads from the preview's `cdn`, so the policy's
+ * `script-src` names that host either way. A worker already started keeps
+ * running, and the address applies to the next page that starts one.
+ */
+export const registerCompilerWorker = (address: string | URL): void => {
+  workerAddress = address
+}
 
 /** How many messages the worker has been sent, which numbers each. */
 let sent = 0
@@ -66,9 +93,10 @@ const inWorker =
   (address: string): Transform =>
   (source, options) => {
     if (!worker) {
-      worker = new Worker(URL.createObjectURL(new Blob([WORKER], { type: 'text/javascript' })), {
-        type: 'module',
-      })
+      worker = new Worker(
+        workerAddress ?? URL.createObjectURL(new Blob([WORKER], { type: 'text/javascript' })),
+        { type: 'module' },
+      )
       worker.onmessage = ({ data }: MessageEvent<[number]>) => {
         owed.get(data[0])?.(data)
         owed.delete(data[0])

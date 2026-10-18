@@ -112,6 +112,7 @@ export const KINDS = [
   'native-element',
   'nested-interactive',
   'primitive-token',
+  'served-column-width',
   'unforwarded-part',
   'unimported-tag',
   'unknown-attribute',
