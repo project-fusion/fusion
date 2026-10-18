@@ -67,10 +67,10 @@ export type MeterBand = 'fair' | 'good' | 'poor'
  * @csspart track - The whole range, or the drawing in `ring` and `arc`.
  * @csspart value - The reading as text, shown when `show-value` is set.
  *
- * @cssproperty --meter-span - How much the range holds, `max` less `min`, which a segment divides its own value by to find its width.
  * @cssproperty --meter-along - Where a bound sits on the arc, as a length along it.
  * @cssproperty --meter-at - Where a bound sits on a linear track, as a percentage.
  * @cssproperty --meter-fraction - The value as a fraction of the range, 0 to 1.
+ * @cssproperty --meter-span - How much the range holds, `max` less `min`, which a segment divides its own value by to find its width.
  * @cssproperty --meter-sweep - How much of the circle the arc covers, as a path length.
  *
  * @cssstate fair - The reading is in a band next to the good band.
