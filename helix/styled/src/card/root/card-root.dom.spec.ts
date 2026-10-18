@@ -1,4 +1,5 @@
 import { beforeAll, describe, expect, test } from 'bun:test'
+import { readFileSync } from 'node:fs'
 import { hasLayout, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -19,6 +20,21 @@ const ink = (token: string): string => {
   return color
 }
 
+/* Happy-dom has no cascade across shadow roots, so the rule itself is read: a
+   `[data-color-mode]` scope re-declares the ink, except on the surfaces that
+   name it. */
+describe('card heading ink in a nested color mode', () => {
+  test('is reset on every color-mode scope but the card and node that set it', () => {
+    const modes = readFileSync(
+      new URL('../../../../styles/src/_modes.css', import.meta.url),
+      'utf8',
+    )
+    expect(modes).toMatch(
+      /\[data-color-mode\]:not\(helix-card, helix-canvas-node\) \{\s*--_heading-ink: initial/,
+    )
+  })
+})
+
 describe('card body text', () => {
   if (hasLayout()) {
     test('a heading anywhere in the body keeps the heading ink, and the copy around it is muted', async () => {
@@ -29,6 +45,16 @@ describe('card body text', () => {
       await heading?.updateComplete
       expect(getComputedStyle(heading as Element).color).toBe(ink('--helix-color-foreground'))
       expect(getComputedStyle(copy as Element).color).toBe(ink('--helix-color-foreground-muted'))
+    })
+
+    test('a heading in a dark scope inside a light card takes the scope’s ink, not the card’s', async () => {
+      const host = await mount(
+        `<helix-card data-color-mode="light"><div data-color-mode="dark" style="color: var(--helix-color-foreground)"><helix-text as="h2">Contact</helix-text></div></helix-card>`,
+      )
+      const scope = host.querySelector('[data-color-mode="dark"]') as HTMLElement
+      const heading = host.querySelector('helix-text') as Updatable
+      await heading.updateComplete
+      expect(getComputedStyle(heading).color).toBe(getComputedStyle(scope).color)
     })
 
     test('outside a card a heading still takes the color around it', async () => {

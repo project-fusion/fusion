@@ -7,6 +7,6 @@ import { registerIcons } from './registry.js'
  * The family's entry imports this, so `<helix-icon name="check">` draws with
  * nothing else written, as it always has. The element's own entry,
  * `icon/root`, leaves it out, so a page that registers the glyphs it names
- * ships those and not the 15 kB of the set.
+ * ships those and not the 17 kB of the set.
  */
 registerIcons(icons)

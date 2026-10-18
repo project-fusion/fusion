@@ -45,6 +45,17 @@
    `--seed` still painted the root's color, because the derived token had already
    been resolved at the root. */
 
+/* **A scope of its own mode drops the heading ink a surface above it named.** A
+   card works out `--_heading-ink` where it stands, in its own mode, and the
+   resolved color inherits past a nested scope: a dark panel inside a light card
+   drew its headings in the light card's ink. Reset here, a heading in the scope
+   falls back to the color around it. The surfaces that name the ink are left
+   out, since a rule of the page outranks their `:host` rule and would strip the
+   ink from the card that carries the mode itself. */
+[data-color-mode]:not(helix-card, helix-canvas-node) {
+  --_heading-ink: initial;
+}
+
 /* The color mode, and the only thing that decides it. */
 [data-color-mode="light"] {
   --_helix-mode: light;

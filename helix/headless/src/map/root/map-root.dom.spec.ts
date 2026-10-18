@@ -542,6 +542,47 @@ describe('map frame, states', () => {
   })
 })
 
+describe('map frame, layers menu', () => {
+  const opened = async (): Promise<Map> => {
+    const host = await map('controls="layers"')
+    host.append(
+      Object.assign(document.createElement('helix-headless-map-route'), { label: 'Route' }),
+    )
+    await host.updateComplete
+    control(host, 'layers-toggle')?.click()
+    await host.updateComplete
+    return host
+  }
+  const hiddenMenu = (host: Map): boolean => control(host, 'layers-menu')?.hidden === true
+  const focusMoves = (from: Element | null, to: Element): void => {
+    from?.dispatchEvent(
+      new FocusEvent('focusout', { bubbles: true, composed: true, relatedTarget: to }),
+    )
+  }
+
+  test('stays open while a press inside it moves focus to the region', async () => {
+    const host = await opened()
+    expect(hiddenMenu(host)).toBe(false)
+    const choice = control(host, 'layer-choice')
+    const region = control(host, 'region') ?? host
+    control(host, 'layers-menu')?.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, composed: true, pointerType: 'mouse' }),
+    )
+    focusMoves(choice, region)
+    await host.updateComplete
+    expect(hiddenMenu(host)).toBe(false)
+    window.dispatchEvent(new PointerEvent('pointerup', { pointerType: 'mouse' }))
+  })
+
+  test('closes when focus moves on with no press, as a Tab past the last tile does', async () => {
+    const host = await opened()
+    const region = control(host, 'region') ?? host
+    focusMoves(control(host, 'layer-choice'), region)
+    await host.updateComplete
+    expect(hiddenMenu(host)).toBe(true)
+  })
+})
+
 /**
  * What the console was warned while `markup` mounted and settled. The
  * warning is in development builds only: `test:dom` passes

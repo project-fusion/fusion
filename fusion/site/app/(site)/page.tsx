@@ -89,7 +89,7 @@ export default function Home() {
           the card is the surface and the field runs behind it like everywhere
           else. */}
         <Band shell="plain" wide>
-          <div className={band.bandSplit}>
+          <div className={`${band.bandSplit} ${styles.showcaseSplit}`}>
             <helix-flex class={band.bandSection} direction="column" gap="md">
               {/* Named after the card above that this band explains, like the
                   Theming band. */}

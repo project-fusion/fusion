@@ -4,6 +4,22 @@
   overflow-x: auto;
 }
 
+/* **A box of its own before it upgrades, with declarative shadow DOM too.**
+   Without it, `helix.css` lays the table out as a grid of its headings and
+   cells, and draws the checkbox heading on the host's own pseudo-element, since
+   there is nothing else to draw them on. With it, this root holds the grid, and
+   a rule from outside beats this sheet's `:host` unless this one is
+   important. */
+:host(:not(:defined)) {
+  /* biome-ignore lint/complexity/noImportantStyles: a document rule beats a shadow root's normal one, and only an important one here wins it back, before upgrade alone. */
+  display: block !important;
+}
+
+:host(:not(:defined))::before {
+  /* biome-ignore lint/complexity/noImportantStyles: as above. */
+  content: none !important;
+}
+
 [part="table"] {
   display: grid;
   /* One grid for the whole table, which is what aligns every column across every

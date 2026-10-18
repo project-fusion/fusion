@@ -228,6 +228,104 @@ helix-table:not(:defined)[reorderable][selectable] > helix-table-row:not([hidden
   grid-column: 1 / span 2;
 }
 
+/* **A table served without declarative shadow DOM** keeps its place too. It
+ * stays hidden, as every element does until it upgrades, and is laid out as it
+ * lays itself out, so nothing below it moves when it does: the grid, each
+ * heading and cell at the box its own shadow root gives it, and a box in each
+ * row where the grip and checkbox cells go. Under declarative shadow DOM the
+ * table keeps its own box, and each heading is drawn once, by the column.
+ */
+helix-table:not(:defined) {
+  display: grid;
+  grid-template-columns: var(--table-columns, var(--table-template, minmax(0, 1fr)));
+  overflow-x: auto;
+}
+
+@supports (grid-template-columns: attr(columns type(*))) {
+  helix-table:not(:defined)[columns] {
+    --table-template: var(--_table-lead,) attr(columns type(*));
+  }
+}
+
+helix-table:not(:defined) > [slot="heading"] {
+  grid-column: 1 / -1;
+  order: -1;
+}
+
+/* **The heading's own look, in a layer of its own.** Once the table upgrades
+ * it comes from the table's \`::slotted()\`, which every rule the page writes
+ * for the heading beats, \`helix.css\`'s own heading reset included, whatever
+ * its weight. A rule in a layer is beaten by every rule outside one, so these
+ * lose to the same rules, and the heading takes the same box either way.
+ */
+@layer {
+  helix-table:not(:defined) > [slot="heading"] {
+    display: block;
+    font-family: var(--helix-font-sans);
+    font-size: var(--table-title-text, var(--helix-text-md));
+    font-weight: var(--helix-weight-semibold);
+    margin-block: var(--helix-space-none) var(--table-title-gap, var(--helix-space-sm));
+  }
+}
+
+helix-table:not(:defined) > helix-table-column,
+helix-table:not(:defined) > helix-table-row > helix-table-cell {
+  align-items: center;
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  box-sizing: border-box;
+  display: flex;
+  font-size: var(--helix-text-sm);
+  min-inline-size: 0;
+  padding-inline: var(--helix-space-none) var(--helix-space-md);
+}
+
+helix-table:not(:defined) > helix-table-column {
+  font-family: var(--helix-font-sans);
+  font-weight: var(--helix-weight-semibold);
+  min-block-size: var(--helix-size-control-loose);
+}
+
+helix-table:not(:defined) > helix-table-column::part(column) {
+  border: none;
+  min-block-size: 0;
+  padding: 0;
+}
+
+helix-table:not(:defined) > helix-table-row > helix-table-cell {
+  min-block-size: var(--helix-size-control);
+  overflow-wrap: anywhere;
+  padding-block: var(--helix-space-xs);
+}
+
+helix-table:not(:defined) > helix-table-row > helix-table-cell[header] {
+  font-weight: var(--helix-weight-medium);
+}
+
+helix-table:not(:defined) > helix-table-row:not([hidden]) {
+  display: contents;
+}
+
+helix-table:not(:defined):is([reorderable], [selectable])::before {
+  border-block-end: var(--helix-border-thin) solid var(--helix-color-border);
+  content: '';
+  grid-column: 1;
+}
+
+helix-table:not(:defined)[reorderable][selectable]::before {
+  grid-column: 1 / span 2;
+}
+
+helix-table:not(:defined) > :is([slot="empty"], [slot="error"], [slot="loading"]) {
+  display: none;
+}
+
+/* A windowed table scrolls a box of its own height, so its rows take no more
+ * room than that before it upgrades. */
+helix-table:not(:defined)[windowed] {
+  block-size: var(--table-block-size, 24em);
+  overflow-y: auto;
+}
+
 /* A heading, as the column draws it in its own shadow root once it upgrades:
  * the same rule, height, inset and weight. Under declarative shadow DOM the
  * column's own box is emptied, so the heading is drawn once.
