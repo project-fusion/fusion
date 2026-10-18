@@ -15,7 +15,9 @@ export const registerDom = (): void => {
     return
   }
   registered = true
-  GlobalRegistrator.register()
+  // happy-dom 21 refuses to load an iframe's page, `about:blank` included,
+  // unless this is on, and `contentDocument` stays null without it.
+  GlobalRegistrator.register({ settings: { enableIframePageLoading: true } })
   shimDirection()
   shimElementInternals()
   shimTableSections()
