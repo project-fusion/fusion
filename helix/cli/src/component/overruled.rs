@@ -24,10 +24,11 @@
 //!
 //! **Three shapes are exempt.** A `::part()` is the published door and is meant
 //! to win. A selector list naming a `data-` recipe beside the component is one
-//! decision written for a plain element and for the component alike. And a rule
-//! of the component's own that applies only before it upgrades, written with
-//! `:not(:defined)`, is the component answering the document on purpose, by
-//! being important where the document's rule is not: it is not dead.
+//! decision written for a plain element and for the component alike. And a
+//! document rule written with `:not(:defined)` applies only before the
+//! component upgrades, so it cannot kill a declaration the component makes once
+//! it has: `elements.css` lays a table out as it will draw itself for exactly
+//! that window.
 
 use std::collections::BTreeSet;
 use std::fs;
@@ -141,7 +142,7 @@ fn past_compound(after: &str) -> String {
         .map_or_else(String::new, |at| after[at..].trim().to_owned())
 }
 
-/// Whether a selector of the component's own applies only before it upgrades.
+/// Whether a document selector applies only before the component upgrades.
 fn before_upgrade(selector: &str) -> bool {
     selector.contains(":not(:defined)")
 }
@@ -230,9 +231,6 @@ pub fn run(context: &Context) -> Report {
         let mut host = BTreeSet::new();
         let mut slotted = BTreeSet::new();
         for rule in rules(&css) {
-            if before_upgrade(&rule.selector) {
-                continue;
-            }
             let into = if rule.selector.contains("::slotted(") {
                 &mut slotted
             } else if rule.selector.contains(":host") {
@@ -244,10 +242,9 @@ pub fn run(context: &Context) -> Report {
         }
 
         let where_ = context.relative(&sheet);
-        for rule in documents
-            .iter()
-            .filter(|one| one.tag == tag && !below_children(&one.rest))
-        {
+        for rule in documents.iter().filter(|one| {
+            one.tag == tag && !below_children(&one.rest) && !before_upgrade(&one.selector)
+        }) {
             let owned = if rule.rest.is_empty() {
                 &host
             } else {
@@ -290,11 +287,13 @@ mod tests {
     use super::{before_upgrade, below_children, past_compound, reaches};
 
     #[test]
-    fn a_rule_for_before_the_upgrade_is_the_components_answer() {
-        assert!(before_upgrade(":host(:not(:defined))"));
-        assert!(before_upgrade(":host(:not(:defined))::before"));
-        assert!(!before_upgrade(":host"));
-        assert!(!before_upgrade(":host([hidden])"));
+    fn a_document_rule_for_before_the_upgrade_overrules_nothing_after_it() {
+        assert!(before_upgrade("helix-table:not(:defined)"));
+        assert!(before_upgrade(
+            "helix-table:not(:defined) > [slot=\"heading\"]"
+        ));
+        assert!(!before_upgrade("helix-table"));
+        assert!(!before_upgrade("helix-table[hidden]"));
     }
 
     #[test]
