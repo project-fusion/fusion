@@ -166,6 +166,44 @@ describe('a fling', () => {
     expect(last - box.getBoundingClientRect().bottom).toBeGreaterThanOrEqual(box.clientHeight)
   })
 
+  /* **A row drawn or taken out while a finger moves the box ends the touch on
+     iOS**, which reads a change to what the slot holds as a change to the box:
+     on the Simulator a drag of 130 points moved the list 10 and the rest of it
+     did nothing. A browser here cannot feel that, so this holds the cause: with
+     a finger on the box, rows already drawn cover the drag, and none comes or
+     goes until it stops. */
+  inBrowser(
+    'draws and takes out no row while a finger moves the box within the rows drawn',
+    async () => {
+      const host = await list(5000, '')
+      const box = part(host, 'viewport') as HTMLElement
+      box.dispatchEvent(new Event('touchstart', { bubbles: true }))
+      // A move past the rows drawn draws the screens either side of the finger, once.
+      const room = box.clientHeight
+      box.scrollTop = room * 3
+      await new Promise((done) => requestAnimationFrame(done))
+      await host.updateComplete
+      const changes: MutationRecord[] = []
+      const watch = new MutationObserver((records) => changes.push(...records))
+      watch.observe(host, { childList: true })
+      for (let step = 1; step <= 6; step++) {
+        box.scrollTop = room * 3 + (room * step) / 4
+        await new Promise((done) => requestAnimationFrame(done))
+        await host.updateComplete
+      }
+      watch.disconnect()
+      expect(changes).toHaveLength(0)
+      box.dispatchEvent(new Event('touchend', { bubbles: true }))
+      await new Promise((done) => setTimeout(done, 250))
+      await host.updateComplete
+      // Once it is still, the window moves to where the box is, and there is no gap.
+      const rows = [...host.querySelectorAll<HTMLElement>(':scope > [data-index]')]
+      const frame = box.getBoundingClientRect()
+      expect(rows[0].getBoundingClientRect().top).toBeLessThanOrEqual(frame.top)
+      expect(rows.at(-1)?.getBoundingClientRect().bottom ?? 0).toBeGreaterThanOrEqual(frame.bottom)
+    },
+  )
+
   inBrowser('keeps no node of a row it has taken out', async () => {
     const host = await list(5000, '')
     const box = part(host, 'viewport') as HTMLElement
