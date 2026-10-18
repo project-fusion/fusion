@@ -77,3 +77,14 @@
     print-color-adjust: economy;
   }
 }
+
+/* Against the branch's name: after the label's order of 0 and ahead of the `end`
+   slot's 1, where the toggle's place in the row puts it first of the two. A
+   branch's label stops taking the free space, which the `end` slot's auto margin
+   then takes instead. */
+:host([chevron-placement="label"]) {
+  --tree-chevron-order: 1;
+  --tree-chevron-gap: var(--helix-space-none);
+  --_tree-label-flex: 0 1 auto;
+  --_tree-reserve: var(--helix-space-none);
+}
