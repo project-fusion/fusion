@@ -1,5 +1,5 @@
 import '@fusion.dev/helix-testing/dom/register'
-import { beforeAll, describe, expect, test } from 'bun:test'
+import { afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* The frame, after hydration. The table's reading is held by
@@ -334,5 +334,107 @@ describe('growing in', () => {
   test('without grow, the bars stand at their height', async () => {
     const element = await days('variant="row"')
     expect(faces(element)).toEqual([3, 3, 3])
+  })
+})
+
+/* The chart grows when it is seen, and each frame is a step of the clock, so a
+ * growth can be watched from the floor to its height: a watcher the test
+ * decides for, and a clock it moves. */
+describe('growing in again', () => {
+  type Seen = { callback: IntersectionObserverCallback }
+  let watchers: Seen[] = []
+  let frames: (() => void)[] = []
+  let clock = 0
+  const real = {
+    frame: globalThis.requestAnimationFrame,
+    now: performance.now.bind(performance),
+    watcher: globalThis.IntersectionObserver,
+  }
+
+  beforeEach(() => {
+    watchers = []
+    frames = []
+    clock = 1000
+    performance.now = () => clock
+    globalThis.requestAnimationFrame = ((run: () => void) => frames.push(run)) as never
+    globalThis.IntersectionObserver = class {
+      readonly seen: Seen
+      constructor(callback: IntersectionObserverCallback) {
+        this.seen = { callback }
+        watchers.push(this.seen)
+      }
+      observe(): void {}
+      unobserve(): void {}
+      takeRecords(): IntersectionObserverEntry[] {
+        return []
+      }
+      disconnect(): void {
+        watchers = watchers.filter((one) => one !== this.seen)
+      }
+    } as never
+  })
+
+  afterEach(() => {
+    performance.now = real.now
+    globalThis.requestAnimationFrame = real.frame
+    globalThis.IntersectionObserver = real.watcher
+  })
+
+  const sees = (on: boolean): void => {
+    for (const one of [...watchers]) {
+      one.callback([{ isIntersecting: on } as IntersectionObserverEntry], {} as never)
+    }
+  }
+
+  /* Frames until the bars stand: well past the longest growth. */
+  const settle = async (element: Plot): Promise<void> => {
+    for (let step = 0; step < 12; step += 1) {
+      clock += 400
+      for (const run of frames.splice(0)) {
+        run()
+      }
+      await element.updateComplete
+    }
+  }
+
+  const faces = (element: HTMLElement): number[] =>
+    bars(element).map((bar) => bar.querySelectorAll('[part="face"]').length)
+
+  test('stand at the floor again once the chart has left the view, and grow when it returns', async () => {
+    const element = await days('grow grow-again variant="row"')
+    sees(true)
+    await settle(element)
+    expect(faces(element)).toEqual([3, 3, 3])
+    sees(false)
+    await element.updateComplete
+    expect(faces(element)).toEqual([1, 1, 1])
+    sees(true)
+    await element.updateComplete
+    await settle(element)
+    expect(faces(element)).toEqual([3, 3, 3])
+  })
+
+  test('stand where they are, without grow-again, when the chart leaves the view', async () => {
+    const element = await days('grow variant="row"')
+    sees(true)
+    await settle(element)
+    sees(false)
+    await element.updateComplete
+    expect(faces(element)).toEqual([3, 3, 3])
+  })
+
+  test('a bar a later table adds grows from the floor while the others stand', async () => {
+    const element = await days('grow variant="row"')
+    sees(true)
+    await settle(element)
+    const row = document.createElement('tr')
+    row.innerHTML = '<th scope="row">Thu</th><td data-value="70000">70,000</td>'
+    document.querySelector('#week tbody')?.append(row)
+    await element.updateComplete
+    await Promise.resolve()
+    await element.updateComplete
+    expect(faces(element)).toEqual([3, 3, 3, 1])
+    await settle(element)
+    expect(faces(element)).toEqual([3, 3, 3, 3])
   })
 })

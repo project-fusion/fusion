@@ -247,10 +247,24 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
    *
    * Under `prefers-reduced-motion`, or where the page has paused its motion
    * through `pauseMotion` or `Motion Toggle`, the bars stand at their height
-   * from the start. A later table draws its bars at their height at once.
+   * from the start. A later table draws the bars it already had at their
+   * height, and grows the bars it adds, each from the floor, so a reading that
+   * arrives while the chart is in view arrives the same way.
    */
   @property({ reflect: true, type: Boolean })
   grow = false
+
+  /**
+   * Grows the bars again each time the chart comes back into view after it
+   * left it, as a pane does when it is opened again, where `grow` alone grows
+   * them the first time only. Only a chart that grows takes it.
+   *
+   * While it is out of view the bars stand at the floor, so the first frame
+   * after it returns is the start of the growth and never a flash at full
+   * height.
+   */
+  @property({ attribute: 'grow-again', reflect: true, type: Boolean })
+  growAgain = false
 
   /**
    * Draws no box: no edges, grid, numbers, or names, and in a `row` no
@@ -381,6 +395,20 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
 
   private grew = false
 
+  /**
+   * The bars a later table added, by category label, each growing from the
+   * floor: when it started, and its place among the bars that came with it, so
+   * several arriving together follow one another as the first table's do. A
+   * bar leaves the map once it stands.
+   */
+  private readonly fresh = new Map<string, { count: number; index: number; since: number }>()
+
+  /** The categories of the table drawn last, so a later table's new ones are known. */
+  private drawnLabels: Set<string> | undefined
+
+  /** Watches for the chart to leave the view, after which `grow-again` has it grow in once more. */
+  private gone: IntersectionObserver | undefined
+
   /** Watches for the chart to come into view, which starts the bars growing. */
   private seen: IntersectionObserver | undefined
 
@@ -473,15 +501,48 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
     this.pointer.grid = Math.max(1, field.series.length)
     /* The first table with readings is the one grown in. Decided before it
        is drawn, so its bars never show at their height first. */
+    const labels = new Set(field.categories)
+    const moves =
+      typeof IntersectionObserver === 'function' &&
+      typeof requestAnimationFrame === 'function' &&
+      !reducedMotion() &&
+      !motionPaused()
     if (this.grow && !this.grew && field.readings > 0) {
       this.grew = true
-      const moves =
-        typeof IntersectionObserver === 'function' &&
-        typeof requestAnimationFrame === 'function' &&
-        !reducedMotion() &&
-        !motionPaused()
       this.growth = moves ? {} : undefined
+    } else if (this.grow && this.grew && field.readings > 0 && this.drawnLabels && moves) {
+      /* A later table keeps the bars it had standing and grows the ones it
+         adds. Still waiting to be seen, or growing every bar, there is nothing
+         to add: the bars about to grow include them. */
+      const added = [...labels].filter((label) => !this.drawnLabels?.has(label))
+      if (added.length > 0 && !this.growth) {
+        const since = performance.now()
+        added.forEach((label, index) => {
+          this.fresh.set(label, { count: added.length, index, since })
+        })
+        this.followFresh()
+      }
     }
+    if (field.readings > 0) {
+      this.drawnLabels = labels
+    }
+  }
+
+  /** Draws each frame until the bars a later table added stand. */
+  private followFresh(): void {
+    const frame = (): void => {
+      const now = performance.now()
+      for (const [label, one] of this.fresh) {
+        if (now - one.since >= growTime(one.count)) {
+          this.fresh.delete(label)
+        }
+      }
+      this.requestUpdate()
+      if (this.fresh.size > 0) {
+        requestAnimationFrame(frame)
+      }
+    }
+    requestAnimationFrame(frame)
   }
 
   override disconnectedCallback(): void {
@@ -491,6 +552,8 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
     this.measured = undefined
     this.seen?.disconnect()
     this.seen = undefined
+    this.gone?.disconnect()
+    this.gone = undefined
   }
 
   /** The element the size observer watches, so a drawing drawn again is watched again. */
@@ -604,6 +667,7 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
           }
           if (performance.now() - since >= length) {
             this.growth = undefined
+            this.watchExit()
             return
           }
           this.requestUpdate()
@@ -614,6 +678,27 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
       { threshold: 0.4 },
     )
     this.seen.observe(this)
+  }
+
+  /**
+   * Under `grow-again`, waits for the chart to leave the view, then puts the
+   * bars back at the floor and waits to be seen, so growing again starts from
+   * the same place the first time did.
+   */
+  private watchExit(): void {
+    if (!this.growAgain || this.gone) {
+      return
+    }
+    this.gone = new IntersectionObserver(([entry]) => {
+      if (!entry || entry.isIntersecting) {
+        return
+      }
+      this.gone?.disconnect()
+      this.gone = undefined
+      this.fresh.clear()
+      this.growth = {}
+    })
+    this.gone.observe(this)
   }
 
   override connectedCallback(): void {
@@ -772,9 +857,15 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
     const since = growth?.since
     const elapsed = since === undefined ? 0 : performance.now() - since
     const categories = field.categories.length
+    const now = performance.now()
     const bars = growth
       ? barsDrawn(field, view.projection, layout, (one) => grownAt(one.across, categories, elapsed))
-      : full
+      : this.fresh.size > 0
+        ? barsDrawn(field, view.projection, layout, (one) => {
+            const added = this.fresh.get(one.label)
+            return added ? grownAt(added.index, added.count, now - added.since) : 1
+          })
+        : full
     const floor = lined && !this.noBox ? floorOf(field, view.projection, lined) : []
     const active = bars.find((bar) => bar.index === at)
     const cell = field.cells[at]
