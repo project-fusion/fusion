@@ -978,6 +978,40 @@ describe('a reader in the middle of a fling', () => {
     controller.hostDisconnected()
   })
 
+  test('holds the rows it has while the box moves under a finger, and draws the next window once it is still', async () => {
+    /* A row drawn or taken out while the box moves ends the touch on iOS, so a
+       touched list draws two boxes past each edge, keeps those rows while the
+       rows cover the box, and moves the window once the box is still. */
+    const { box, fire } = touchable(500, 100)
+    const controller = connected(box, () => [])
+    fire('touchstart')
+    box.scrollTop = 520
+    fire('scroll')
+    // Two boxes of 100 pixels past each edge, which is 20 rows at 10.
+    expect([controller.window.first, controller.window.last]).toEqual([32, 82])
+    for (const top of [600, 700]) {
+      box.scrollTop = top
+      fire('scroll')
+      expect([controller.window.first, controller.window.last]).toEqual([32, 82])
+      // The spacers still carry the room of the rows that are not drawn.
+      expect(controller.window.before).toBe(320)
+      expect(controller.window.after).toBe(9180)
+    }
+    // Past the rows drawn, it draws again.
+    box.scrollTop = 900
+    fire('scroll')
+    expect([controller.window.first, controller.window.last]).toEqual([70, 120])
+    box.scrollTop = 880
+    fire('scroll')
+    box.scrollTop = 800
+    fire('scroll')
+    expect([controller.window.first, controller.window.last]).toEqual([70, 120])
+    fire('touchend')
+    await still()
+    expect([controller.window.first, controller.window.last]).toEqual([60, 110])
+    controller.hostDisconnected()
+  })
+
   test('leaves the reader to a host whose anchor answers false', () => {
     const { box } = touchable(500, 100)
     let rows: ReturnType<typeof drawn> = []

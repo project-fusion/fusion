@@ -153,6 +153,22 @@ const UNSTABLE = 10
 const REST = 150
 
 /**
+ * How many boxes the window draws past each edge of the box on a screen that
+ * is touched, so that a finger or a fling stays inside rows already drawn.
+ *
+ * **A row drawn or taken out while the box is moving ends the touch on iOS.**
+ * Safari reads a change to what a slot holds, which is what a row coming or
+ * going in the host's light DOM is, as a change to the box itself, and the
+ * scroll that was under the finger stops. Measured on the iOS Simulator: with a
+ * row added on the first scroll event, the box moved 10 points under a drag of
+ * 130 and the rest of the drag did nothing, and the same rows added to a
+ * wrapper inside the slot, or to the page with no slot, left the box tracking
+ * the finger. So a touched list draws this much beyond the box, holds the rows
+ * it has while the box moves, and draws the next window once it is still.
+ */
+const BUFFER = 2
+
+/**
  * Works out which slice of a long set is worth rendering.
  *
  * **A controller and not an element, which is the whole reason it is here.**
@@ -266,6 +282,13 @@ export class VirtualizeController implements ReactiveController {
 
   /** Whether a finger is on the box. iOS keeps scrolling after it lifts. */
   private touching = false
+
+  /**
+   * Whether the reader uses a touch screen: the device says its pointer is
+   * coarse, or a finger has been on the box. Rows are held while the box moves
+   * on such a screen only, since a mouse wheel does not end on a row change.
+   */
+  private touched = typeof matchMedia === 'function' && matchMedia('(any-pointer: coarse)').matches
 
   /** The timer that ends a scroll, set again on every scroll event. */
   private resting: ReturnType<typeof setTimeout> | undefined
@@ -423,6 +446,7 @@ export class VirtualizeController implements ReactiveController {
 
   private readonly handleTouchStart = (): void => {
     this.touching = true
+    this.touched = true
   }
 
   private readonly handleTouchEnd = (): void => {
@@ -480,7 +504,14 @@ export class VirtualizeController implements ReactiveController {
   /** Squares the spacer and the scroll offset once the box is still. */
   private readonly rest = (): void => {
     this.resting = undefined
-    if (this.touching || this.drift === 0) {
+    if (this.touching) {
+      return
+    }
+    if (this.drift === 0) {
+      /* The window held while the box moved is drawn now it is still. */
+      if (this.touched) {
+        this.measure()
+      }
       return
     }
     this.square()
@@ -527,9 +558,20 @@ export class VirtualizeController implements ReactiveController {
     return this.scrolled(box) + this.owed - this.drift
   }
 
-  /** How far past the screen to draw toward the side the box is scrolling to. */
+  /**
+   * How far past the screen to draw toward the side the box is scrolling to,
+   * and on a touched screen on both sides, `BUFFER` boxes of it.
+   */
   private lead(box: HTMLElement): number {
+    if (this.touched) {
+      return this.span(box) * BUFFER
+    }
     return this.heading === 0 ? 0 : this.span(box)
+  }
+
+  /** Whether the rows beyond the box are drawn on the side the box is not scrolling to. */
+  private both(): boolean {
+    return this.touched
   }
 
   /**
@@ -563,9 +605,15 @@ export class VirtualizeController implements ReactiveController {
     }
     /* The host's own numbers changing is an outside cause, the same as a scroll
        or a resize: a set that grew is not this controller chasing itself. */
-    if (this.last?.count !== total || this.last.estimate !== size) {
+    const moved = this.last?.count !== total || this.last.estimate !== size
+    if (moved) {
       this.last = { count: total, estimate: size }
       this.settling = 0
+    }
+    /* **Rows are not drawn or taken out while the box moves under a touch, so
+       long as the rows drawn cover it.** See `BUFFER`. Only the spacers follow. */
+    if (!moved && this.holds(box, total)) {
+      next = this.frame(this.window.first, this.window.last, total, size)
     }
 
     const same =
@@ -593,6 +641,41 @@ export class VirtualizeController implements ReactiveController {
     this.host.requestUpdate()
   }
 
+  /**
+   * Whether the rows already drawn are kept for now: the screen is touched, the
+   * box is moving, and the rows drawn cover all of it.
+   *
+   * Not in a waterfall, where an item measured moves the items under it and
+   * the host draws them again.
+   */
+  private holds(box: HTMLElement, total: number): boolean {
+    if (!this.touched || !this.scrolling() || this.laned(total)) {
+      return false
+    }
+    const { first, last, before } = this.window
+    if (last <= first || last > total) {
+      return false
+    }
+    const size = this.line()
+    const drawn = this.measuring()
+      ? this.startOf(last, total) - this.startOf(first, total)
+      : (last - first) * size
+    const top = this.scrolled(box)
+    return top >= before && top + this.span(box) <= before + drawn
+  }
+
+  /** The window with the rows `first` to `last`, and the spacers that stand in for the rest. */
+  private frame(first: number, last: number, total: number, size: number): Window {
+    return this.measuring()
+      ? {
+          after: Math.max(0, this.startOf(total, total) - this.startOf(last, total)),
+          before: this.startOf(first, total) + this.drift,
+          first,
+          last,
+        }
+      : { after: Math.max(0, (total - last) * size), before: first * size, first, last }
+  }
+
   /** The straight line: one estimate, so offset and index convert by division. */
   private uniform(box: HTMLElement, total: number, size: number, overscan: number): Window {
     /* Held to the set, for an offset left past the end of a set that shrank:
@@ -600,8 +683,11 @@ export class VirtualizeController implements ReactiveController {
        last item until then moved on every pass. */
     const extra = Math.ceil(this.lead(box) / size)
     const at = Math.min(Math.floor(this.offset(box) / size), total)
-    const first = Math.max(0, at - overscan - (this.heading < 0 ? extra : 0))
-    const fits = Math.ceil(this.span(box) / size) + overscan * 2 + (this.heading === 0 ? 0 : extra)
+    const first = Math.max(0, at - overscan - (this.heading < 0 || this.both() ? extra : 0))
+    const fits =
+      Math.ceil(this.span(box) / size) +
+      overscan * 2 +
+      (this.both() ? extra * 2 : this.heading === 0 ? 0 : extra)
     const last = Math.min(total, first + fits)
     return { after: Math.max(0, (total - last) * size), before: first * size, first, last }
   }
@@ -770,11 +856,11 @@ export class VirtualizeController implements ReactiveController {
   private placed(box: HTMLElement, total: number, overscan: number): Window {
     const top = this.offset(box)
     const lead = this.lead(box)
-    const from = this.heading < 0 ? top - lead : top
+    const from = this.heading < 0 || this.both() ? top - lead : top
     /* A line of a waterfall's columns at a time. */
     const more = overscan * (this.laned(total)?.lanes ?? 1)
     const first = Math.max(0, this.indexAt(from, total) - more)
-    const bottom = top + this.span(box) + (this.heading > 0 ? lead : 0)
+    const bottom = top + this.span(box) + (this.heading > 0 || this.both() ? lead : 0)
     let last = this.indexAt(top, total)
     while (last < total && this.startOf(last, total) < bottom) {
       last += 1
