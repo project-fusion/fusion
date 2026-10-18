@@ -211,6 +211,12 @@ a[part="row"] {
   white-space: nowrap;
 }
 
+/* A branch's label under `chevron-placement="label"` is its content's width, so
+   the chevron follows it. A leaf keeps the room, being what the row presses on. */
+[part="row"]:has([part="toggle"]) [part="label"] {
+  flex: var(--_tree-label-flex, 1);
+}
+
 /* And a link fills the label rather than sitting inside it. */
 [part="label"] slot::slotted(a) {
   display: block;

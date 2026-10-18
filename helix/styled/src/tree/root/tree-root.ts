@@ -59,6 +59,10 @@ export class HelixTree extends HelixHeadlessTree {
    * the same fault `href` and `target` had on `Button`. The resting arrangement
    * is the absence of the attribute, and the stylesheet only asks about `end`.
    *
+   * `label` sets the chevron against the end of a branch's name, where the name
+   * takes only its own width, and leaves the `end` slot at the row's far side.
+   * A leaf is unchanged, since it has no chevron.
+   *
    * It is worth owning rather than leaving to `::part(toggle)`, which a
    * consumer could reach for: the naive version is `order` plus an auto margin,
    * and the row's `end` slot already carries an auto margin of its own, so the
@@ -66,7 +70,7 @@ export class HelixTree extends HelixHeadlessTree {
    * 70px short. That is the kind of thing a component should absorb once.
    */
   @property({ attribute: 'chevron-placement', reflect: true })
-  chevronPlacement?: 'start' | 'end'
+  chevronPlacement?: 'start' | 'end' | 'label'
 
   static override styles: CSSResultGroup = [liveStyles, collectionStateStyles, styles]
 }

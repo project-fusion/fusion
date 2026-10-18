@@ -48,6 +48,29 @@ export function Example() {
           </helix-tree-item>
         </helix-tree-item>
       </helix-tree>
+      <helix-tree
+        chevron-placement="label"
+        label="Folders"
+      >
+        <helix-tree-item
+          default-open
+          value="one"
+        >
+          Reports
+          <helix-tree-item
+            slot="children"
+            value="two"
+          >
+            Budget 2026
+          </helix-tree-item>
+          <helix-tree-item
+            slot="children"
+            value="three"
+          >
+            Quarterly sales
+          </helix-tree-item>
+        </helix-tree-item>
+      </helix-tree>
     </helix-flex>
   )
 }
