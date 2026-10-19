@@ -1555,7 +1555,7 @@ cheaper version of the same protection, on the grounds that every native name is
 lowercase; it is not wrong, and it was given up for the reason below.
 
 **A name may carry any number of hyphens.** Measured in Chromium against React
-19.3.0: `ona-b-c-d` binds exactly as `onhelix-before-open` does, `react-dom`
+19.3.1: `ona-b-c-d` binds exactly as `onhelix-before-open` does, `react-dom`
 slicing `on` off the prop and handing the remainder to `addEventListener`
 without inspecting it.
 
@@ -1863,11 +1863,11 @@ The handler is on the node the whole time, under a key React stashes there, so
 announcing. It binds the **raw prop function**, which is what makes the handover
 safe: React adding the same handler again is a no-op by specification, and React
 removing it on its next commit matches ours exactly. Measured in Chromium
-against React 19.3.0 on a real hydrated page, four events produced four calls
+against React 19.3.1 on a real hydrated page, four events produced four calls
 across a commit. See `bindReactHandler` for the whole argument.
 
 The bug underneath is React's, [facebook/react#35446](https://github.com/facebook/react/issues/35446),
-open since January 2026 with a proposed fix unmerged. React 19.3.0 still has it:
+open since January 2026 with a proposed fix unmerged. React 19.3.1 still has it:
 on a hydrated page, no event prop on a custom element without the bridge fired
 until React committed an update. When the fix lands this becomes dead weight
 and should go.
