@@ -172,14 +172,20 @@ describe('virtual list', () => {
      iOS, so a row that leaves gives its element to a row that arrives. */
   test("gives a leaving row's element to a row that arrives", async () => {
     const host = await list(500)
-    const before = new Set(host.querySelectorAll('[data-index]'))
     const viewport = part(host, 'viewport') as HTMLElement
     viewport.scrollTop = 192
     viewport.dispatchEvent(new Event('scroll'))
     await settle(host)
-    const after = [...host.querySelectorAll('[data-index]')]
-    expect(after.length).toBeGreaterThan(0)
-    expect(after.every((row) => before.has(row))).toBe(true)
+    const before = new Set(host.querySelectorAll('[data-index]'))
+    const old = new Set([...before].map((row) => (row as HTMLElement).dataset.index))
+    viewport.scrollTop = 384
+    viewport.dispatchEvent(new Event('scroll'))
+    await settle(host)
+    const arrived = [...host.querySelectorAll('[data-index]')].filter(
+      (row) => !old.has((row as HTMLElement).dataset.index),
+    )
+    expect(arrived.length).toBeGreaterThan(0)
+    expect(arrived.every((row) => before.has(row))).toBe(true)
   })
 
   test('keeps the row holding focus drawn when it scrolls out of the window', async () => {
