@@ -3,7 +3,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { COMPILED, COMPILER, compile, compilers, WORKER } from './compile.js'
+import { COMPILED, COMPILER, compile, compilers, PROTOCOL, WORKER } from './compile.js'
 
 /** What the stand-in compiler was asked, by path. */
 const asked = new Map<string, Record<string, unknown>>()
@@ -107,7 +107,9 @@ describe('the compiler worker served as a file', () => {
     return asks.map(([id]) => {
       const answer = got.get(id) as unknown[]
       const error = answer[2]
-      return typeof error === 'string' ? [...answer.slice(0, 2), error.split(': ')[0]] : answer
+      return typeof error === 'string'
+        ? [...answer.slice(0, 2), error.split(': ')[0], ...answer.slice(3)]
+        : answer
     })
   }
 
@@ -125,6 +127,11 @@ describe('the compiler worker served as a file', () => {
     const file = new Worker(new URL('./compile-worker.ts', import.meta.url), { type: 'module' })
     const [fromBlob, fromFile] = [await answers(blob, address), await answers(file, address)]
     expect(fromFile).toEqual(fromBlob)
-    expect(fromFile[0]).toEqual([1, { code: 'ABC' }])
+    expect(fromFile[0]).toEqual([1, { code: 'ABC' }, undefined, PROTOCOL])
+    expect(fromFile.map((answer) => (answer as unknown[])[3])).toEqual([
+      PROTOCOL,
+      PROTOCOL,
+      PROTOCOL,
+    ])
   })
 })

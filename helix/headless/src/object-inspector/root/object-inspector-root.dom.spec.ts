@@ -1,8 +1,11 @@
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasLayout, hasState, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
+/* A `describe` below reads a DOM global while the file is collected, which is
+   before any `beforeAll`. */
+registerDom()
+
 beforeAll(async () => {
-  registerDom()
   await import('../index.js')
 })
 
@@ -747,5 +750,8 @@ describe('focusing the inspector', () => {
     const active = host.shadowRoot?.activeElement as HTMLElement | null
     expect(active?.getAttribute('role')).toBe('row')
     expect(active?.tabIndex).toBe(0)
+    /* happy-dom's `activeElement` throws once a focused row's host leaves the
+       page, where a browser answers null, and the host updates after it left. */
+    active?.blur()
   })
 })
