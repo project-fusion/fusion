@@ -187,4 +187,15 @@ export class ChartSound {
     this.playing = []
     finish?.()
   }
+
+  /**
+   * Stops, and lets the audio context go, as a chart leaves the page: a
+   * browser allows a page a few contexts, and each holds the audio device.
+   * The next play makes another.
+   */
+  close(): void {
+    this.stop()
+    void this.context?.close().catch(() => {})
+    this.context = undefined
+  }
 }

@@ -252,23 +252,23 @@ export declare class MixinChartSourceInterface {
    * reading's tone as the arrow keys step to it. L plays it too while the
    * chart has focus, and Escape stops it.
    */
-  listen: boolean
+  sonify: boolean
   /** How long each series takes to play, in milliseconds or as `3s`. */
-  listenDuration: number
+  sonifyDuration: number
   /** The Listen button's words. */
-  listenLabel: string
+  sonifyLabel: string
   /** The Listen button's words while the chart plays. */
-  listenStopLabel: string
+  sonifyStopLabel: string
   /** Whether the chart is playing as sound now. */
   get sounding(): boolean
-  /** `visible` draws the chart's text summary under it, as one line. */
-  summary?: 'visible'
+  /** `visible` draws the chart's text summary under it, as one line, and `hidden`, as absent does, gives it to a screen reader alone. */
+  summary?: 'hidden' | 'visible'
   /** Plays every shown series as sound, one after another, and resolves when it ends or is stopped. */
   playReadings(): Promise<void>
   /** Stops the sound. */
   stopReadings(): void
-  /** The Listen button, under `listen`, behind a seam a chart places. */
-  protected renderListen(): TemplateResult | typeof nothing
+  /** The Listen button, under `sonify`, behind a seam a chart places. */
+  protected renderSonify(): TemplateResult | typeof nothing
 }
 
 /**
@@ -373,7 +373,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
       }
       this.playingReadings = true
       await this.sound.play(
-        sweepPlan(series, { duration: this.listenDuration / 1000, ...this.soundRange(series) }),
+        sweepPlan(series, { duration: this.sonifyDuration / 1000, ...this.soundRange(series) }),
       )
       this.playingReadings = false
     }
@@ -384,14 +384,21 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
       this.playingReadings = false
     }
 
-    private readonly handleListenKey = (event: KeyboardEvent): void => {
+    private readonly handleSonifyKey = (event: KeyboardEvent): void => {
       /* Escape stops the sound whatever else it does, the reading's own
          Escape included, which has already put the bubble away. */
       if (event.key === 'Escape' && this.playingReadings) {
         this.stopReadings()
         return
       }
-      if (!this.listen || keyClaimed(event) || event.altKey || event.ctrlKey || event.metaKey) {
+      if (
+        !this.sonify ||
+        event.defaultPrevented ||
+        keyClaimed(event) ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey
+      ) {
         return
       }
       if (event.key === 'l' || event.key === 'L') {
@@ -406,20 +413,21 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
 
     override connectedCallback(): void {
       super.connectedCallback()
-      this.addEventListener('keydown', this.handleListenKey)
+      this.addEventListener('keydown', this.handleSonifyKey)
     }
 
     override disconnectedCallback(): void {
       super.disconnectedCallback()
-      this.removeEventListener('keydown', this.handleListenKey)
+      this.removeEventListener('keydown', this.handleSonifyKey)
       this.stopReadings()
+      this.sound.close()
     }
 
     protected override updated(changed: PropertyValues<this>): void {
       super.updated(changed)
       const { at, keyed, series } = this.pointer
       if (
-        !this.listen ||
+        !this.sonify ||
         !keyed ||
         at < 0 ||
         (at === this.toned.at && series === this.toned.series)
@@ -446,12 +454,12 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
       ])
     }
 
-    protected renderListen(): TemplateResult | typeof nothing {
-      if (!this.listen || !this.readingsKnown || !ChartSound.available) {
+    protected renderSonify(): TemplateResult | typeof nothing {
+      if (!this.sonify || !this.readingsKnown || !ChartSound.available) {
         return nothing
       }
       return html`<button
-        part="listen"
+        part="sonify"
         type="button"
         aria-pressed=${this.playingReadings ? 'true' : 'false'}
         @click=${() => {
@@ -461,7 +469,7 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
             void this.playReadings()
           }
         }}
-      >${drawIcon(speakerHigh)}<span>${this.playingReadings ? this.listenStopLabel : this.listenLabel}</span></button>`
+      >${drawIcon(speakerHigh)}<span>${this.playingReadings ? this.sonifyStopLabel : this.sonifyLabel}</span></button>`
     }
 
     /**
@@ -514,32 +522,6 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     label = ''
 
     /**
-     * Draws a Listen button that plays the chart as sound: each series in
-     * turn, its readings from left to right and from the left ear to the
-     * right, the value as pitch over two octaves, a soft tick at each
-     * gridline, and one timbre a series. With it, each reading the arrow keys
-     * step to plays its tone beside what the readout says, and L plays the
-     * whole chart while it has focus. Escape stops it. Nothing plays without a
-     * press, and the sound is made only then.
-     */
-    @property({ reflect: true, type: Boolean })
-    listen = false
-
-    /** How long each series takes to play, in milliseconds or as `3s`. */
-    @property({ attribute: 'listen-duration', converter: timeConverter('listen-duration', 3000) })
-    listenDuration = 3000
-
-    /** The Listen button's words. */
-    @words
-    @property({ attribute: 'listen-label' })
-    listenLabel = 'Listen'
-
-    /** The Listen button's words while the chart plays. */
-    @words
-    @property({ attribute: 'listen-stop-label' })
-    listenStopLabel = 'Stop'
-
-    /**
      * The locale the chart's own numbers are written in: its axis, its
      * percentages and its totals, such as `de` for `1.240` and `32 %`.
      *
@@ -589,13 +571,39 @@ export const MixinChartSource = <T extends Constructor<HelixElement>>(
     readingsLabel = 'Readings {first} to {last} of {count}'
 
     /**
-     * `visible` draws the chart's text summary under it, as one line. Absent,
-     * the summary is said to a screen reader and drawn for no one else.
-     * Reflected, because the stylesheet draws it by the attribute, and a page
-     * that sets the property, as React does, writes none.
+     * Draws a Listen button that plays the chart as sound: each series in
+     * turn, its readings from left to right and from the left ear to the
+     * right, the value as pitch over two octaves, a soft tick at each
+     * gridline, and one timbre a series. With it, each reading the arrow keys
+     * step to plays its tone beside what the readout says, and L plays the
+     * whole chart while it has focus. Escape stops it. Nothing plays without a
+     * press, and the sound is made only then.
+     */
+    @property({ reflect: true, type: Boolean })
+    sonify = false
+
+    /** How long each series takes to play, in milliseconds or as `3s`. */
+    @property({ attribute: 'sonify-duration', converter: timeConverter('sonify-duration', 3000) })
+    sonifyDuration = 3000
+
+    /** The Listen button's words. */
+    @words
+    @property({ attribute: 'sonify-label' })
+    sonifyLabel = 'Listen'
+
+    /** The Listen button's words while the chart plays. */
+    @words
+    @property({ attribute: 'sonify-stop-label' })
+    sonifyStopLabel = 'Stop'
+
+    /**
+     * `visible` draws the chart's text summary under it, as one line.
+     * `hidden`, or absent, says the summary to a screen reader and draws it
+     * for no one else. Reflected, because the stylesheet draws it by the
+     * attribute, and a page that sets the property, as React does, writes none.
      */
     @property({ reflect: true })
-    summary?: 'visible'
+    summary?: 'hidden' | 'visible'
 
     /** The page of the table drawn from `data` that is shown, counting from zero. */
     @state()

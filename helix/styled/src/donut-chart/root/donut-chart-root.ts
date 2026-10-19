@@ -2,8 +2,8 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessDonutChart } from '@fusion.dev/helix-headless/donut-chart'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as listenStyles } from '../../shared/chart/listen.css.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
+import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusStyles } from '../../shared/chart/status.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './donut-chart-root.css.js'
@@ -116,7 +116,7 @@ export class HelixDonutChart extends HelixHeadlessDonutChart {
     statusStyles,
     tooltipStyles,
     styles,
-    listenStyles,
+    sonifyStyles,
   ]
 }
 

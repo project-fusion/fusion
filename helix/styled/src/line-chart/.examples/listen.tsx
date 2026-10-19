@@ -45,7 +45,7 @@ export function Example() {
 
       <helix-line-chart
         for="sessions-heard"
-        listen
+        sonify
         summary="visible"
       />
     </helix-flex>

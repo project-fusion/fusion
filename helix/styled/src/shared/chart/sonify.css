@@ -1,7 +1,7 @@
 /* **The Listen button, on a row of its own under the drawing.** Across every
    column the chart lays out, so it never lands in an axis's narrow track, and
    at the start of the row, where the eye leaves the drawing. */
-[part="listen"] {
+[part="sonify"] {
   all: unset;
   align-items: center;
   border-radius: var(--helix-radii-sm);
@@ -19,23 +19,23 @@
   padding-inline: var(--helix-space-2xs);
 }
 
-[part="listen"] svg {
+[part="sonify"] svg {
   block-size: var(--helix-size-icon-tight);
   inline-size: var(--helix-size-icon-tight);
 }
 
-[part="listen"]:hover {
+[part="sonify"]:hover {
   background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
   color: var(--helix-color-foreground);
 }
 
-[part="listen"]:focus-visible {
+[part="sonify"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
 }
 
 /* Playing: the mark takes the accent, as a pressed toggle does. */
-[part="listen"][aria-pressed="true"] {
+[part="sonify"][aria-pressed="true"] {
   color: var(--helix-color-accent);
 }
 
@@ -58,7 +58,7 @@
 
 /* Hides: a printed chart cannot play, and its summary prints where shown. */
 @media print {
-  [part="listen"] {
+  [part="sonify"] {
     display: none;
   }
 }

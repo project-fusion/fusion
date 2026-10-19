@@ -116,7 +116,6 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart empty - The words when the table has no points: the `empty` slot, falling back to `empty-text`.
  * @csspart fallback - The box the chart's own drawing fills, shown until a renderer has drawn and where none is connected. Hidden from screen readers.
  * @csspart grid - The box's edges and its grid at the ticks, in the chart's own drawing.
- * @csspart listen - The button that plays the chart as sound, under `listen`.
  * @csspart live - The readout: a polite live region that says the point the keys moved to. Hide it visually.
  * @csspart loading - The words while `loading` is set and there are no points.
  * @csspart mark - The invisible point the tooltip is anchored to, where the renderer draws the reading.
@@ -124,6 +123,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart point - One point of the chart's own drawing.
  * @csspart point-active - The point the pointer or the keys rest on, in the chart's own drawing. Set alongside `point`.
  * @csspart ring - The ring around the point the pointer or the keys rest on, drawn over every point.
+ * @csspart sonify - The button that plays the chart as sound, under `sonify`.
  * @csspart summary - The three measures and the number of points, written as a sentence for screen readers, which describes the plot. Hide it visually.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
  * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
@@ -419,7 +419,7 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
         ${this.renderLive(points, at)}
         ${this.renderTooltip(points[at]?.row)}
       </div>
-      ${readable ? this.renderSummary(field) : this.renderStatus()}${this.renderListen()}${this.renderTable()}`
+      ${readable ? this.renderSummary(field) : this.renderStatus()}${this.renderSonify()}${this.renderTable()}`
   }
 
   /**

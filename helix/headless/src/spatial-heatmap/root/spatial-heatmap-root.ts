@@ -151,9 +151,9 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart cell - One reading drawn as a prism: a group holding the faces the view shows. Under `selection-mode` it is the picture of a grid cell, hidden from screen readers.
  * @csspart drawing - The SVG every prism is drawn in. It is mirrored on a right-to-left page.
  * @csspart left-face - The side of a prism facing the light more: from the isometric view, the side toward the next row, drawn at its lower left. Left out where the view shows no side.
- * @csspart listen - The button that plays the chart as sound, under `listen`.
  * @csspart right-face - The side of a prism facing the light less: from the isometric view, the side toward the next column, drawn at its lower right. Left out where the view shows one side or none.
  * @csspart row - A column of the strip, which a grid reads as a row, under `selection-mode`. It holds the column's grid cells, which draw nothing: the prisms are painted apart, in the order the view needs.
+ * @csspart sonify - The button that plays the chart as sound, under `sonify`.
  * @csspart strip - The box the drawing fills, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart top-face - The top of a prism, which carries the reading's tone.
  *
@@ -517,7 +517,7 @@ export class HelixHeadlessSpatialHeatmap extends HelixHeadlessHeatmap {
         this.status.spoken
           ? html`<span part="selection" role="status">${this.status.said}</span>`
           : nothing
-      }${this.renderListen()}${this.renderTable()}`
+      }${this.renderSonify()}${this.renderTable()}`
   }
 
   /**

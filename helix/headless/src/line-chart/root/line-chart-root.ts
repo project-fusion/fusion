@@ -123,7 +123,6 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * @csspart labels - The row of reading names, which the names share: lay it out as one grid cell they all stand in.
  * @csspart line - The line for one series.
  * @csspart line-dashed - A `line` whose series `dashed` names. Set alongside `line`.
- * @csspart listen - The button that plays the chart as sound, under `listen`.
  * @csspart live - The readout: a polite live region that says the reading the keys moved to. Hide it visually.
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -131,6 +130,7 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * @csspart marker-lone - The `marker` path of one series' readings with a blank on either side, which no line reaches and which are marked without `markers`. Set alongside `marker`.
  * @csspart marker-ring - The same marks again under each series' `marker` paths, to stroke a little wider in the page's color, so a mark reads over the line it sits on.
  * @csspart plot - The drawing, which takes focus to be read by key. With nothing to draw, a group named as the chart is, holding the `empty` or `loading` part.
+ * @csspart sonify - The button that plays the chart as sound, under `sonify`.
  * @csspart summary - The chart's name and each series' latest reading, written as a sentence for screen readers. Hide it visually.
  * @csspart svg - The drawing surface the lines and areas sit on.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
@@ -549,7 +549,7 @@ export class HelixHeadlessLineChart extends MixinChartStatus(MixinChartSource(He
     const domain = this.range(series)
     const { x, y } = this.scalesOf(domain, readings.length)
 
-    return html`${this.valueAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}${this.renderSummary(series)}${this.renderListen()}${this.renderTable()}`
+    return html`${this.valueAxis ? this.renderAxis(y, domain) : nothing}${this.renderPlot(series, x, y, domain)} ${this.renderLabels(readings)}${this.renderSummary(series)}${this.renderSonify()}${this.renderTable()}`
   }
 
   /**

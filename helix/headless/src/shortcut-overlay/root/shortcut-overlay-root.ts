@@ -69,6 +69,11 @@ const printed = (keys: string, apple: boolean): string => {
  * or screen reader user gets the same list. Set `sheet-keys` to another chord,
  * or to nothing to leave `?` to the page.
  *
+ * Many apps, GitHub and Gmail among them, already give `?` to their own help,
+ * so a page that answers `?` itself opens both on one press. Such a page sets
+ * `sheet-keys` to another chord, or to nothing and calls `showSheet()` from
+ * its own handler.
+ *
  * The badges are a picture of what the controls already expose, so they are
  * hidden from assistive technology.
  *
@@ -155,7 +160,8 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
 
   /**
    * The chord that opens the sheet, `?` by default, which a press in a text
-   * field never answers. Empty leaves the key to the page.
+   * field never answers. Empty leaves the key to the page, which wants it
+   * where the page already answers `?` itself.
    */
   @property({ attribute: 'sheet-keys' })
   sheetKeys = '?'
