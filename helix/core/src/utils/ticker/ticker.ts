@@ -31,12 +31,7 @@ interface Waiting {
  * on the machine: a spec that subscribes at 1000ms and waits 1400 is measuring
  * how loaded the runner is, and a loaded runner eats 400ms. One did, on a green
  * branch, and blocked a merge that had nothing wrong with it. A bigger margin is
- * the same bug at a lower rate.
- *
- * Bun 1.1.43 is what this workspace pins, and it has `jest.useFakeTimers()`
- * without `jest.advanceTimersByTime`, so there is nothing to advance a faked
- * timer with. Measured rather than assumed: a spec asserting that function
- * exists throws.
+ * the same bug at a lower rate. A spec passes its own `now` and `setTimer`.
  */
 export interface Clock {
   clearTimer: (timer: ReturnType<typeof setTimeout>) => void

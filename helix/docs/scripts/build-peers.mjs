@@ -188,6 +188,9 @@ const measure = async (name, specifier) => {
   const entry = join(SCRATCH, `${name}.js`)
   writeFileSync(entry, `import '${specifier}'\n`)
   const built = await Bun.build({
+    /* Production, as a reader's build is. Since Bun 1.4 a bundle takes the
+       `development` export condition unless `NODE_ENV` says production. */
+    define: { 'process.env.NODE_ENV': JSON.stringify('production') },
     entrypoints: [entry],
     format: 'esm',
     minify: true,

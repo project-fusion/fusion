@@ -2,7 +2,7 @@
 //!
 //! **A manifest reaches its own scripts and no others.** A `catalog` call inside
 //! a package runs the `catalog` that package declares, and a root script of the
-//! same name is not a fallback: measured with bun 1.1.43, `bun run` from a
+//! same name is not a fallback: measured with bun 1.4.3, `bun run` from a
 //! package directory answers `Script not found` for a name only the root has.
 //!
 //! **The fault this exists for is a rename that is uniformly wrong.** Moving a
