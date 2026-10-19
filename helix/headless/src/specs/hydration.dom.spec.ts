@@ -176,7 +176,10 @@ test('no element writes to its own host when a consumer asks for a state', async
      it was written. */
   expect(asked).toBeGreaterThan(250)
   expect(offenders).toEqual([])
-})
+  /* Thirty seconds, where a spec gets five: this mounts every element once for
+     each attribute it declares, and on a two-core Linux runner under Bun 1.4 the
+     sweep took six. */
+}, 30_000)
 
 test('every named entry still offends, so the list cannot outlive the work', async () => {
   /* The other half of a named list, and the half usually missing: a component

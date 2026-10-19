@@ -149,4 +149,8 @@ console.log(
   `\nsplit-tests: ${found.length} files matching ${filter} in ${count} processes, ${total} tests, ` +
     results.map((result) => `${result.seconds}s`).join(' and '),
 )
-process.exit(failed ? 1 : 0)
+/* **An exit code, and no `process.exit()`.** Since Bun 1.4 a write to a pipe
+   finishes after the call that makes it, and exiting at once dropped the end of
+   each group's output, the failure included: CI showed a group stopping
+   mid-line with no reason. The process ends once its writes are done. */
+process.exitCode = failed ? 1 : 0
