@@ -88,7 +88,7 @@ describe('input time', () => {
     const host = await field('locale="en-US"')
     await type(host, '25:00')
     expect(internals(host).validationMessage).toBe('Enter a time such as 2:30 PM.')
-    const german = await field('locale="de-DE" seconds')
+    const german = await field('locale="de-DE" seconds step="900"')
     await type(german, 'bald')
     expect(internals(german).validationMessage).toBe('Enter a time such as 14:30:15.')
   })
@@ -290,9 +290,13 @@ describe('the panel of a time input', () => {
   })
 })
 
+/* The fields with seconds take a step of 900 seconds, so the list each one
+   carries holds 96 rows. At the default, a day to the 15 seconds is 5,760 rows
+   to draw, which ran past the specs' time limit in CI, and the list is not the
+   subject of any of them. */
 describe('a time input with seconds and a clock of its own', () => {
   test('takes a typed time to the second, and writes it so when idle', async () => {
-    const host = await field('seconds locale="en-US"')
+    const host = await field('seconds step="900" locale="en-US"')
     await type(host, '14:05:09')
     expect(host.value).toBe('14:05:09')
     expect(internals(host).validity.valid).toBe(true)
@@ -342,7 +346,7 @@ describe('segmented', () => {
 
   test('the field is a segment for each part of the time, on the clock asked for', async () => {
     const host = await field(
-      'segmented locale="en-US" hour-cycle="h23" seconds default-value="14:05:09"',
+      'segmented locale="en-US" hour-cycle="h23" seconds step="900" default-value="14:05:09"',
     )
     expect(part(host, 'control')).toBeNull()
     expect(segments(host).map((one) => one.dataset.segment)).toEqual(['hour', 'minute', 'second'])
