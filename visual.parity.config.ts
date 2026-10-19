@@ -130,6 +130,9 @@ const prepare = async ({ changed }: { changed?: string }) => {
        a scoped run builds a different set and a shared chunk it never fetched
        left React rendering nothing. */
     const built = await Bun.build({
+      /* Production, as the HTML half's frame.js is built: since Bun 1.4 a
+         bundle takes the `development` condition unless told otherwise. */
+      define: { 'process.env.NODE_ENV': JSON.stringify('production') },
       entrypoints: entries.map((one) => one.file),
       minify: false,
       outdir: join(BUILT, 'out'),

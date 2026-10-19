@@ -234,11 +234,15 @@ await Promise.all(
    resolves `#audit-name` to the audit under it and to a function that does
    nothing otherwise, as a production build does; the specs that assert the
    warning run in the development build. The alias rather than `development`
-   itself, which would switch Lit to its development build too. */
+   itself, which would switch Lit to its development build too, and `NODE_ENV`
+   defined as production, because since Bun 1.4 a bundle takes `development`
+   unless `NODE_ENV` says otherwise. */
 const conditions = ['helix-development']
+const define = { 'process.env.NODE_ENV': JSON.stringify('production') }
 
 const runtime = await Bun.build({
   conditions,
+  define,
   entrypoints: Object.values(RUNTIME).map((name) => join(runtimeEntries, `${name}.ts`)),
   minify: true,
   naming: { chunk: '[name]-[hash].[ext]', entry: '[name].[ext]' },
@@ -277,6 +281,7 @@ for (const [family, specs] of found) {
 
 const result = await Bun.build({
   conditions,
+  define,
   entrypoints: written,
   minify: true,
   // No [dir]: the entries are generated in a scratch directory, and that path

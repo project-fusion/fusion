@@ -27,10 +27,17 @@ const resolved = (...conditions: string[]): string => {
   return run.stdout.toString().trim().split('/helix/core/')[1] ?? run.stderr.toString()
 }
 
-/** The bridge, bundled for a browser under these conditions. */
+/**
+ * The bridge, bundled for a browser under these conditions. With no
+ * `development` among them, `NODE_ENV` is production, as a reader's production
+ * build sets it: since Bun 1.4 a bundle takes the `development` condition
+ * unless `NODE_ENV` says otherwise.
+ */
 const bundled = async (...conditions: string[]): Promise<string> => {
+  const mode = conditions.includes('development') ? 'development' : 'production'
   const built = await Bun.build({
     conditions,
+    define: { 'process.env.NODE_ENV': JSON.stringify(mode) },
     entrypoints: [fileURLToPath(new URL('./react-bridge.ts', import.meta.url))],
     external: ['lit'],
     format: 'esm',

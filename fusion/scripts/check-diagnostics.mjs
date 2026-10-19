@@ -66,6 +66,9 @@ await Bun.write(
   ].join('\n'),
 )
 const bundle = await Bun.build({
+  /* Production, as a page ships it: since Bun 1.4 a bundle takes the
+     `development` condition, and with it the audits, unless told otherwise. */
+  define: { 'process.env.NODE_ENV': JSON.stringify('production') },
   entrypoints: [entry],
   minify: false,
   target: 'browser',
