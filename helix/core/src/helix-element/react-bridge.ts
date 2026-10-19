@@ -84,7 +84,7 @@ export const reactPropsOf = (node: EventTarget): Record<string, unknown> | undef
  * element in it has nothing to look for yet.
  *
  * React 18 and 19 write `REACT_LISTENING` and a random suffix: read from the
- * source of 18.2.0, from react-dom 19.3.0, and from the build Next.js 16.3.8
+ * source of 18.2.0, from react-dom 19.3.1, and from the build Next.js 16.3.8
  * ships for the App Router. React 17 keeps that mark on the container alone
  * and gives the document its set of listeners under `REACT_EVENTS`, read from
  * the source of 17.0.2.
