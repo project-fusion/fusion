@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasLayout, mount, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 import type { TerminalTheme } from '../theme/terminal-theme.js'

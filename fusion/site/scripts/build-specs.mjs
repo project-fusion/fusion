@@ -198,9 +198,12 @@ const headlessFromSource = {
 const useBrowserHarness = {
   name: 'browser-spec-harness',
   setup(build) {
-    build.onResolve({ filter: /^(bun:test|@fusion\.dev\/helix-testing\/dom)$/ }, () => ({
-      path: harness,
-    }))
+    build.onResolve(
+      { filter: /^(bun:test|@fusion\.dev\/helix-testing\/dom(\/register)?)$/ },
+      () => ({
+        path: harness,
+      }),
+    )
   },
 }
 

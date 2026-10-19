@@ -19,6 +19,10 @@
       "types": "./dist/dom.d.ts",
       "default": "./dist/dom.js"
     },
+    "./dom/register": {
+      "types": "./dist/register.d.ts",
+      "default": "./dist/register.js"
+    },
     "./ssr": {
       "types": "./dist/ssr.d.ts",
       "default": "./dist/ssr.js"

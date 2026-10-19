@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 import arity from '../.examples/arity.html' with { type: 'text' }

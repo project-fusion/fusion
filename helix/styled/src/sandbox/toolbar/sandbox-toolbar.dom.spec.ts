@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { mount, registerDom, slotted } from '@fusion.dev/helix-testing/dom'
 
