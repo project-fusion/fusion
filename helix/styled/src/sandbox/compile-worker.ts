@@ -9,13 +9,21 @@
  * from `@fusion.dev/helix/sandbox`, and the worker is a script of the page's
  * origin instead.
  *
- * **The same program as `WORKER` in `compile.ts`**, which a spec runs both
- * ways and compares. It is never imported, so no bundler reads its `import()`
- * of an address known only at run time.
+ * **The one copy of the program.** `bun run compile-worker` minifies it into
+ * the text the preview starts from a `blob:` address by default, so the two
+ * cannot drift. It is never imported, so no bundler reads its `import()` of an
+ * address known only at run time, and it imports nothing, so a copied file
+ * runs alone.
  */
 
-/** `PROTOCOL` in `compile.ts`, which this file cannot import, being served alone. */
-const PROTOCOL = 1
+/**
+ * The version of the messages the worker and the page exchange, which every
+ * answer ends with. A page that copied this file from an older release answers
+ * with another, or none, and is told to copy it again. Raise it whenever the
+ * messages change, and only then, so an upgrade that leaves them alone asks
+ * nobody to copy anything.
+ */
+export const PROTOCOL = 1
 
 /** The worker's own scope, which the DOM library this package builds with does not name. */
 const scope = globalThis as unknown as {
@@ -47,5 +55,3 @@ scope.onmessage = async ({ data: [id, address, source, options] }) => {
     scope.postMessage([id, undefined, String((error as Error | undefined)?.message), PROTOCOL])
   }
 }
-
-export {}

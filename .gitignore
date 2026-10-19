@@ -36,6 +36,7 @@ npm-debug.log*
 helix/icons/src/generated.ts
 helix/icons/src/*.generated.ts
 helix/*/src/element-events.generated.ts
+helix/styled/src/sandbox/compile-worker.generated.ts
 helix/*/.tsbuild
 helix/styles/src/elements.css
 helix/styles/src/tokens.css
