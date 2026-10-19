@@ -88,6 +88,8 @@ export type RuntimeKind =
    * Development builds only.
    */
   | 'solid-handler-syntax'
+  /** A page's copy of the sandbox's compiler worker file is from another release. */
+  | 'stale-worker'
   /** A stencil's regions went unused: no named parts, or parts too small. */
   | 'stencil-regions-unused'
   /** A stencil has no inside to place the notes in. */

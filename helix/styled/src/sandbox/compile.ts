@@ -1,3 +1,5 @@
+import { reportRuntime } from '@fusion.dev/helix-core'
+
 /**
  * The compiler a module file in TypeScript or JSX runs through before the
  * frame loads it, by its npm name and its pinned version.
@@ -115,9 +117,10 @@ const inWorker =
       worker.onmessage = ({ data }: MessageEvent<Answer>) => {
         if (data[3] !== PROTOCOL && !warned) {
           warned = true
-          console.warn(
-            `The compiler worker at ${String(workerAddress)} is from another release of @fusion.dev/helix. Copy @fusion.dev/helix/sandbox/compile-worker.js to that address again.`,
-          )
+          reportRuntime({
+            kind: 'stale-worker',
+            message: `The compiler worker at ${String(workerAddress)} is from another release of @fusion.dev/helix. Copy @fusion.dev/helix/sandbox/compile-worker.js to that address again.`,
+          })
         }
         owed.get(data[0])?.(data)
         owed.delete(data[0])
