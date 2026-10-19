@@ -55,6 +55,19 @@ describe('the preview pane', () => {
     expect(granted).toEqual(['allow-forms', 'allow-scripts'])
   })
 
+  /* Dictation asks for the microphone from inside the frame. The frame's
+     origin is opaque, so the grant has to be named here. */
+  test('grants the microphone, so dictation in an example can ask for it', async () => {
+    const frame = part(await preview(), 'frame') as HTMLIFrameElement
+    const granted = (frame.getAttribute('allow') ?? '')
+      .split(';')
+      .map((token) => token.trim())
+      .filter(Boolean)
+      .sort()
+
+    expect(granted).toEqual(['clipboard-write *', 'fullscreen *', 'microphone *'])
+  })
+
   /* A frame with no accessible name is a region a reader reaches and cannot
      identify, and the name is the pane's rather than the sandbox's because the
      sandbox does not render the frame. */
@@ -415,7 +428,8 @@ describe('the error, and the controls', () => {
   })
 
   /* The tab is a page of this origin, so the example must not run in it: it
-     runs in a frame inside, with the same sandbox as the preview's own. */
+     runs in a frame inside, with the same sandbox and the same feature grants
+     as the preview's own. */
   test('opens the example in a new tab, in a frame sandboxed as its own, cut off from the page', async () => {
     const host = (await preview('src="/frame.html" controls label="Card"')) as Preview & {
       open: () => Window | null
@@ -443,6 +457,9 @@ describe('the error, and the controls', () => {
       'allow-forms',
       'allow-scripts',
     ])
+    expect(frame.getAttribute('allow')).toBe(
+      (part(host, 'frame') as HTMLIFrameElement).getAttribute('allow'),
+    )
     expect(frame.title).toBe('Card')
     expect(frame.getAttribute('src')).toBe((part(host, 'frame') as HTMLIFrameElement).src)
     // The tab's own script sends the example, since the frame takes one only from its parent.

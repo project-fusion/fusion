@@ -10,7 +10,8 @@
  *
  * What makes this a sandbox rather than a layout is here: `Sandbox.Preview`
  * hardcodes `sandbox="allow-scripts allow-forms"` on its frame and never
- * `allow-same-origin`, which is the pairing that would undo it.
+ * `allow-same-origin`, which is the pairing that would undo it. The frame is
+ * granted clipboard write, fullscreen, and the microphone.
  */
 
 export { registerCompilerWorker } from './compile.js'

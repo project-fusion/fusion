@@ -204,17 +204,35 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
       )
       field.addEventListener('keydown', this.handleVoiceKey)
       field.addEventListener('pointerdown', this.handleVoicePointer)
-      this.session = this.engine.listen({
-        lang: wordsLocale(this),
-        listener: {
-          end: () => this.ended(),
-          final: (text) => this.place(text, true),
-          level: (level) => {
-            this.style.setProperty('--dictation-level', level.toFixed(3))
+      let session: SpeechSession
+      try {
+        session = this.engine.listen({
+          lang: wordsLocale(this),
+          listener: {
+            end: () => this.ended(),
+            final: (text) => this.place(text, true),
+            level: (level) => {
+              this.style.setProperty('--dictation-level', level.toFixed(3))
+            },
+            partial: (text) => this.place(text, false),
           },
-          partial: (text) => this.place(text, false),
-        },
-      })
+        })
+      } catch {
+        this.ended()
+        return false
+      }
+      /* The engine can end before it returns, when the browser refuses to
+         start. The field is already quiet. Drop the session so a later press
+         starts clean. */
+      if (!this.heard) {
+        try {
+          session.stop()
+        } catch {
+          /* The session already ended. */
+        }
+        return false
+      }
+      this.session = session
       return true
     }
 

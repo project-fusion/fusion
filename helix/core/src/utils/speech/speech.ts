@@ -169,7 +169,14 @@ export const browserSpeech: SpeechEngine = {
       quiet()
       listener.end(failed && failed !== 'aborted' ? 'error' : asked ? 'stopped' : 'ended', failed)
     }
-    recognition.start()
+    try {
+      recognition.start()
+    } catch (error) {
+      quiet()
+      const message = error instanceof Error ? error.message : 'not-allowed'
+      listener.end('error', message)
+      return { stop: () => {} }
+    }
     return {
       stop: () => {
         asked = true

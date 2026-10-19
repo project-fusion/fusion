@@ -9,6 +9,7 @@
   display: flex;
   gap: var(--helix-space-2xs);
   padding: var(--textarea-padding, var(--helix-space-xs));
+  position: relative;
   transition:
     border-color var(--helix-duration-fast) var(--helix-easing-standard),
     background-color var(--helix-duration-fast) var(--helix-easing-standard);
@@ -74,6 +75,25 @@ slot[name="end"]::slotted(*) {
 [part~="voice"]:focus-visible {
   outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
   outline-offset: var(--helix-size-focus-offset);
+}
+
+/* The dictation button sits in the corner, on the first line. A fixed size
+   keeps the glyph with that line. The text keeps a gap beside the button. */
+[part~="voice"] {
+  background-color: transparent;
+  block-size: calc(var(--helix-size-control-tight) - var(--helix-space-2xs));
+  inline-size: calc(var(--helix-size-control-tight) - var(--helix-space-2xs));
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  position: absolute;
+}
+
+[part="field"]:has([part~="voice"]) [part="control"] {
+  padding-inline-end: var(--helix-size-control-tight);
+}
+
+[part~="voice"]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
 }
 
 /* Nothing to drag when the box is following the content itself. */
