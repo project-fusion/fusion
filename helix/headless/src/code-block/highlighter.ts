@@ -1,4 +1,4 @@
-import type { CSSResult } from 'lit'
+import type { CSSResult, ReactiveController, ReactiveControllerHost } from 'lit'
 
 /**
  * Turns code into highlighted markup for a `language`, or returns `undefined`
@@ -20,6 +20,13 @@ interface Registered {
   sheet: CSSResult | undefined
 }
 
+/** The page's registration, the consumers on it, and every sheet a registration has given them. */
+interface Registry {
+  consumers: Set<HighlighterConsumer>
+  registered: Registered | undefined
+  sheets: Set<CSSStyleSheet>
+}
+
 /**
  * Where the registration is kept: on `globalThis`, so every copy of this
  * module on a page reads the one a page made. A chunk loaded later, such as
@@ -28,30 +35,49 @@ interface Registered {
  */
 const SLOT = Symbol.for('fusion.dev/helix/highlighter')
 
-const store = globalThis as { [SLOT]?: Registered | undefined }
+const store = globalThis as { [SLOT]?: Registry }
+store[SLOT] ??= { consumers: new Set(), registered: undefined, sheets: new Set() }
+const registry = store[SLOT]
 
 /** The highlighter a page registered, or nothing where it registered none. */
 export const registeredHighlighter = (): CodeBlockHighlighter | undefined =>
-  store[SLOT]?.highlighter
+  registry.registered?.highlighter
 
-/** Gives a shadow root the registered sheet, once. */
-export const adoptHighlighterSheet = (root: ShadowRoot | null | undefined): void => {
-  const sheet = store[SLOT]?.sheet?.styleSheet
-  if (root && sheet && !root.adoptedStyleSheets.includes(sheet)) {
-    root.adoptedStyleSheets = [...root.adoptedStyleSheets, sheet]
+/** Gives a shadow root the registered sheet, in place of any an earlier registration gave it. */
+const adoptSheet = (root: ShadowRoot | null | undefined): void => {
+  if (!root) {
+    return
+  }
+  const sheet = registry.registered?.sheet?.styleSheet
+  const kept = root.adoptedStyleSheets.filter((one) => one === sheet || !registry.sheets.has(one))
+  const next = sheet && !kept.includes(sheet) ? [...kept, sheet] : kept
+  if (
+    next.length !== root.adoptedStyleSheets.length ||
+    next.some((one, at) => one !== root.adoptedStyleSheets[at])
+  ) {
+    root.adoptedStyleSheets = next
   }
 }
 
-/** Whether an element draws with the registered highlighter. */
-const isConsumer = (node: Element): node is HighlighterConsumer =>
-  typeof (node as Partial<HighlighterConsumer>).highlighterChanged === 'function'
+/**
+ * Keeps an element that draws with the registered highlighter on the page's
+ * list while it is connected, with the registered sheet in its shadow root,
+ * so a registration reaches it without searching the page.
+ */
+export class HighlighterController implements ReactiveController {
+  constructor(private readonly host: ReactiveControllerHost & HighlighterConsumer) {
+    host.addController(this)
+  }
 
-/** The consumers already on the page, in the document and in every open shadow root in it. */
-const consumersOnPage = (root: ParentNode = document): HighlighterConsumer[] =>
-  [...root.querySelectorAll('*')].flatMap((node) => [
-    ...(isConsumer(node) ? [node] : []),
-    ...(node.shadowRoot ? consumersOnPage(node.shadowRoot) : []),
-  ])
+  hostConnected(): void {
+    registry.consumers.add(this.host)
+    adoptSheet(this.host.shadowRoot)
+  }
+
+  hostDisconnected(): void {
+    registry.consumers.delete(this.host)
+  }
+}
 
 /**
  * Gives every Code Block and Code Input of both tiers a highlighter, for the
@@ -74,13 +100,16 @@ export const registerHighlighter = (
   highlighter: CodeBlockHighlighter | undefined,
   sheet?: CSSResult,
 ): void => {
-  store[SLOT] = highlighter ? { highlighter, sheet } : undefined
-  /* Asked of the method: under Lit's global DOM shim a server has a
-     `document` with no `querySelectorAll`, and the walk threw at import. */
-  if (typeof globalThis.document?.querySelectorAll === 'function') {
-    for (const consumer of consumersOnPage()) {
-      adoptHighlighterSheet(consumer.shadowRoot)
-      consumer.highlighterChanged()
+  registry.registered = highlighter ? { highlighter, sheet } : undefined
+  if (sheet?.styleSheet) {
+    registry.sheets.add(sheet.styleSheet)
+  }
+  for (const consumer of registry.consumers) {
+    if (!consumer.isConnected) {
+      registry.consumers.delete(consumer)
+      continue
     }
+    adoptSheet(consumer.shadowRoot)
+    consumer.highlighterChanged()
   }
 }

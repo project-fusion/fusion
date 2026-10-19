@@ -117,11 +117,52 @@ export interface EditorEngine {
   ): EditorEngineView
 }
 
-/** Each diagnostic's line, counted from 1, by its start. */
+/** Each diagnostic's line, counted from 1, by its start, from one pass over the value. */
 export const diagnosticLines = (
   value: string,
   diagnostics: readonly EditorDiagnostic[],
-): number[] => diagnostics.map((one) => value.slice(0, Math.max(0, one.from)).split('\n').length)
+): number[] => {
+  const starts = [0]
+  for (let at = value.indexOf('\n'); at !== -1; at = value.indexOf('\n', at + 1)) {
+    starts.push(at + 1)
+  }
+  return diagnostics.map((one) => {
+    const from = Math.max(0, one.from)
+    let low = 0
+    let high = starts.length - 1
+    while (low < high) {
+      const middle = (low + high + 1) >> 1
+      if ((starts[middle] ?? 0) <= from) {
+        low = middle
+      } else {
+        high = middle - 1
+      }
+    }
+    return low + 1
+  })
+}
+
+/** The editor's properties an engine draws, which are what `update` is handed. */
+const ENGINE_KEYS = [
+  'diagnostics',
+  'label',
+  'language',
+  'lineNumbers',
+  'placeholder',
+  'readOnly',
+  'value',
+  'wrap',
+] as const
+
+/** Text typed by the Tab key, through the browser's own editing so its undo keeps it. */
+const typeText = (control: HTMLTextAreaElement, text: string): void => {
+  const typed =
+    typeof document.execCommand === 'function' && document.execCommand('insertText', false, text)
+  if (!typed) {
+    control.setRangeText(text, control.selectionStart, control.selectionEnd, 'end')
+    control.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+  }
+}
 
 /** The line and column an offset is at, each counted from 1. */
 export const positionOf = (value: string, at: number): { column: number; line: number } => {
@@ -221,6 +262,7 @@ const LANGUAGE_NAMES: Record<string, string> = {
  * @slot hint - Help under the editor, in place of `hint`.
  * @slot label - The editor's name in the header, such as a file name, in place of `label`.
  *
+ * @event {Event} change - The reader finished an edit and focus left the code, in the engine or the plain field.
  * @event {HelixBeforeChangeEvent} helix-before-change - The text is about to change. Cancelable: cancel it to keep the current text.
  * @event {Event} input - Fired after the text changes.
  *
@@ -494,6 +536,12 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
   /** Whether Escape came just before, which lets Tab leave the plain field. */
   private escaped = false
 
+  /** The value the engine last reported, which it need not be handed back. */
+  private engineValue: string | undefined
+
+  /** Whether the engine took an edit since focus last left it, which `change` reports. */
+  private engineEdited = false
+
   /** The textarea, which the form's validity is read from either way. */
   private get control(): HTMLTextAreaElement | null {
     return this.partNamed<HTMLTextAreaElement>('control')
@@ -541,6 +589,11 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('keydown', this.handleKeys)
+    /* Leaving the page took the engine's view away, so one moved in the page
+       mounts it again. */
+    if (this.hasUpdated && this.engine && !this.view) {
+      this.requestUpdate()
+    }
   }
 
   override disconnectedCallback(): void {
@@ -561,6 +614,14 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
     const control = this.control
     if (control) {
       this.copyValidity(control)
+      /* The textarea is hidden under an engine, so a report points at the
+         engine's own editable text. */
+      const anchor = this.view
+        ? this.partNamed('view')?.querySelector<HTMLElement>('[contenteditable]')
+        : undefined
+      if (anchor && !control.validity.valid) {
+        this.internals.setValidity(control.validity, this.internals.validationMessage, anchor)
+      }
       this.refreshFeedback()
     }
     this.toggleState('find-open', this.findOpen)
@@ -577,10 +638,21 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
           change: (next) => this.engineChanged(next),
         })
       }
+      this.engineValue = this.view ? this.value : undefined
       this.toggleState('connected', this.view !== undefined)
       return
     }
-    this.view?.update(this.engineState)
+    /* The caret and the find bar redraw the editor and change nothing the
+       engine draws, and a value the engine reported is one it already holds. */
+    const drawn = ENGINE_KEYS.filter((key) => changed.has(key))
+    if (
+      this.view &&
+      drawn.length > 0 &&
+      !(drawn.length === 1 && drawn[0] === 'value' && this.value === this.engineValue)
+    ) {
+      this.engineValue = this.value
+      this.view.update(this.engineState)
+    }
   }
 
   /** An edit in the engine: through `requestValue`, and announced where it stands. */
@@ -588,8 +660,19 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
     if (!this.requestValue(next)) {
       return false
     }
+    this.engineValue = next
+    this.engineEdited = true
     this.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
     return true
+  }
+
+  /** Focus left the engine after an edit, which is when a field says `change`. */
+  private readonly handleViewFocusOut = (event: FocusEvent): void => {
+    const view = event.currentTarget as HTMLElement
+    if (this.engineEdited && !view.contains(event.relatedTarget as Node | null)) {
+      this.engineEdited = false
+      this.announceChange()
+    }
   }
 
   /** Opens the find bar, with the selection as the search where one is selected, and puts focus in its field. */
@@ -755,9 +838,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
     }
     if (event.key === 'Tab' && !event.shiftKey && !this.escaped && !this.readOnly) {
       event.preventDefault()
-      const control = event.target as HTMLTextAreaElement
-      control.setRangeText('  ', control.selectionStart, control.selectionEnd, 'end')
-      control.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+      typeText(event.target as HTMLTextAreaElement, '  ')
     }
     this.escaped = false
   }
@@ -1006,7 +1087,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
             @pointerup=${this.handleCaret}
             @select=${this.handleCaret}
           ></textarea>
-          <div part="view" ?hidden=${!this.engine}></div>
+          <div part="view" ?hidden=${!this.engine} @focusout=${this.handleViewFocusOut}></div>
         </div>
         ${this.renderDiagnostics()}${this.renderStatus()}
       </div>
