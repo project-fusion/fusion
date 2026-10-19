@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { hasState, mount, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
 

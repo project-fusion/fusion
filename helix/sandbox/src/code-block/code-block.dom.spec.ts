@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 import type { CSSResult } from 'lit'

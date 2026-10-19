@@ -1,11 +1,9 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
-/* A `describe` below reads a DOM global while the file is collected, which is
-   before any `beforeAll`. */
-registerDom()
-
 beforeAll(async () => {
+  registerDom()
   await import('../index.js')
 })
 

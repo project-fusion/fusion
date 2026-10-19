@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, idle, logged, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import controlled_month from '../.examples/controlled-month.html' with { type: 'text' }

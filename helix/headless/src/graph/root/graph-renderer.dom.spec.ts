@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { mount, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 import type { GraphLink, GraphNode } from './graph-model.js'

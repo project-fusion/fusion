@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { at, example, hasLayout, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import sheet from '../.examples/several-across.css' with { type: 'text' }

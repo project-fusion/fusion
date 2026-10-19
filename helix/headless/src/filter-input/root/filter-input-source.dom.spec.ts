@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 import type { FilterSource, FilterSourceRequest, FilterSuggestion } from '../suggest.js'

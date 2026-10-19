@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import { hasState, mount, part, registerDom, role, settle } from '@fusion.dev/helix-testing/dom'
 

@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import pending from '../.examples/pending.html' with { type: 'text' }
