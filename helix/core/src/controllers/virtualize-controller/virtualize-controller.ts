@@ -645,23 +645,30 @@ export class VirtualizeController implements ReactiveController {
    * Whether the rows already drawn are kept for now: the screen is touched, the
    * box is moving, and the rows drawn cover all of it.
    *
-   * Not in a waterfall, where an item measured moves the items under it and
-   * the host draws them again.
+   * A waterfall uses the same hold. Coverage is how far the drawn items reach
+   * down the set, the furthest of their ends, because an item yet to be drawn
+   * can start in a short column above the bottom of a tall one. Adding or
+   * taking a slotted row is what ends the touch.
    */
   private holds(box: HTMLElement, total: number): boolean {
-    if (!this.touched || !this.scrolling() || this.laned(total)) {
+    if (!this.touched || !this.scrolling()) {
       return false
     }
     const { first, last, before } = this.window
     if (last <= first || last > total) {
       return false
     }
+    const top = this.scrolled(box)
+    const bottom = top + this.span(box)
+    const lanes = this.laned(total)
+    if (lanes) {
+      return top >= this.startOf(first, total) && bottom <= lanes.reachThrough(last - 1)
+    }
     const size = this.line()
     const drawn = this.measuring()
       ? this.startOf(last, total) - this.startOf(first, total)
       : (last - first) * size
-    const top = this.scrolled(box)
-    return top >= before && top + this.span(box) <= before + drawn
+    return top >= before && bottom <= before + drawn
   }
 
   /** The window with the rows `first` to `last`, and the spacers that stand in for the rest. */
