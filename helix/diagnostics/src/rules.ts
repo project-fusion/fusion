@@ -77,6 +77,9 @@ export const SHIPPED_RULES: Readonly<Record<Kind, Severity>> = {
   'unknown-token': 'error',
   /* A warning, because a page whose markup always carries the attribute, as
      a static page or a server render with no client navigation does, works. */
+  /* A warning, because the trigger is described once a reader points at it or
+     focuses it, and only the page at rest is without the description. */
+  'unlinked-trigger': 'warn',
   'unreflected-attribute': 'warn',
 }
 

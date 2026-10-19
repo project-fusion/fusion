@@ -29,6 +29,7 @@ const CATEGORY: Readonly<Record<Kind, FindingCategory>> = {
   'unknown-slot': 'markup',
   'unknown-tag': 'integrity',
   'unknown-token': 'styling',
+  'unlinked-trigger': 'markup',
   'unreflected-attribute': 'styling',
 }
 
@@ -56,6 +57,7 @@ const OWNER: Readonly<Record<Kind, Owner>> = {
   'unknown-slot': 'consumer',
   'unknown-tag': 'consumer',
   'unknown-token': 'consumer',
+  'unlinked-trigger': 'consumer',
   'unreflected-attribute': 'consumer',
 }
 
