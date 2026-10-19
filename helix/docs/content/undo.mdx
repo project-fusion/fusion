@@ -27,10 +27,15 @@ stack.undoable(`Archived ${file.name}`, {
 The message holds an Undo button and shows for 8 seconds. While it shows:
 
 - Command+Z, or Control+Z on Windows and Linux, undoes the newest one, unless
-  focus is in a text field, which keeps the key for its own undo.
+  focus is in a text field, which keeps the key for its own undo, or the app
+  handled the key first and called `preventDefault()`.
 - A pointer or focus in the stack pauses its timer.
 - A screen reader hears the message and then which keys undo it.
 - The shortcut overlay and its sheet list the key.
+
+An app with an undo of its own on those keys, such as a canvas or an editor,
+sets `undo-keys=""` on the region. The Undo button stays, and the keys stay
+the app's.
 
 ## Hold back what cannot be taken back
 
@@ -47,6 +52,11 @@ const result = await stack.undoable('Deleted 3 files', {
 ```
 
 `undoable()` returns a promise that settles to `undone` or `kept`.
+
+A message that never closes is kept as well: `commit` runs when the region
+leaves the page, such as on a route change, and when the page is hidden to be
+closed or reloaded. A browser can end a page without telling it, so a server
+that holds a deletion back should also finish it on a timeout of its own.
 
 ## Keep a confirmation where an undo cannot help
 

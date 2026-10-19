@@ -12,7 +12,8 @@ import { deepActiveElement } from '../focusable-elements/focusable-elements.js'
  * keeps the state it chose. `restoreState` says which entries did not take.
  *
  * **What a reader typed is in a snapshot**, except a password field, a field
- * with `autocomplete="one-time-code"`, and anything under `snapshot="off"`.
+ * whose `autocomplete` names a password, a one-time code or a payment card,
+ * and anything under `snapshot="off"`.
  */
 
 /** What one element holds, as a snapshot keeps it. */
@@ -85,12 +86,22 @@ const fieldOf = (element: HTMLElement): HTMLInputElement | HTMLTextAreaElement |
     'input:not([type="hidden"]), textarea',
   ) ?? null
 
+/** The `autocomplete` tokens that name a secret: a password, a one-time code, or any `cc-` field of a payment card. */
+const SECRET_TOKEN = /^(?:cc-.+|current-password|new-password|one-time-code)$/
+
 /** Whether a field holds something a snapshot must never keep. */
 const secret = (element: HTMLElement): boolean => {
   const field = fieldOf(element)
   const type = (element as { type?: unknown }).type ?? field?.type
-  const autocomplete = element.getAttribute('autocomplete') ?? field?.getAttribute('autocomplete')
-  return type === 'password' || autocomplete === 'one-time-code'
+  const autocomplete =
+    element.getAttribute('autocomplete') ?? field?.getAttribute('autocomplete') ?? ''
+  return (
+    type === 'password' ||
+    autocomplete
+      .toLowerCase()
+      .split(/\s+/)
+      .some((token) => SECRET_TOKEN.test(token))
+  )
 }
 
 /** What one Helix element holds that a snapshot keeps, or nothing where it holds none. */
@@ -257,6 +268,13 @@ export const restoreState = async (
  * such as by `helix visual`'s driver, which reaches a page only through its
  * globals: `globalThis[Symbol.for('fusion.dev/helix/state')]`.
  *
+ * **Empty unless asked for.** A page that exposed it by default would hand
+ * every script on it the text in every field and a way to drive each element.
+ * The page asks by calling `exposeState()`. A tool that drives a page it did
+ * not write, such as `helix visual` or an agent's browser, asks before the
+ * page loads by setting the slot to `true`, and the first copy of Helix to
+ * load fills it.
+ *
  * **On `globalThis` and not on the element classes**, for the reason
  * `noteVersion` gives: a static would be listed on every reference page. The
  * first copy of Helix on a page keeps the slot.
@@ -266,5 +284,14 @@ export const STATE_SLOT = Symbol.for('fusion.dev/helix/state')
 /** Puts `captureState` and `restoreState` where a page's tools find them, once. */
 export const exposeState = (): void => {
   const store = globalThis as Record<symbol, unknown>
-  store[STATE_SLOT] ??= { captureState, restoreState }
+  if (typeof store[STATE_SLOT] !== 'object') {
+    store[STATE_SLOT] = { captureState, restoreState }
+  }
+}
+
+/** Exposes the state tools where a tool set the slot to `true` before the page loaded. */
+export const exposeStateIfAsked = (): void => {
+  if ((globalThis as Record<symbol, unknown>)[STATE_SLOT] === true) {
+    exposeState()
+  }
 }

@@ -98,4 +98,43 @@ describe('an undoable message', () => {
     await settled
     expect(listShortcuts().some((one) => one.keys === 'mod+z')).toBe(false)
   })
+
+  test('commits what is still showing as the region leaves, and as the page is hidden', async () => {
+    const host = await region()
+    const committed: string[] = []
+    const left = host.undoable('Archived one', {
+      commit: () => committed.push('left'),
+      undo: () => {},
+    })
+    host.remove()
+    expect(await left).toBe('kept')
+    const again = await region()
+    const hidden = again.undoable('Archived two', {
+      commit: () => committed.push('hidden'),
+      undo: () => {},
+    })
+    window.dispatchEvent(new Event('pagehide'))
+    expect(await hidden).toBe('kept')
+    expect(committed).toEqual(['left', 'hidden'])
+  })
+
+  test('leaves the keys to the app with an empty undo-keys, or where the app handled them', async () => {
+    const host = await region()
+    let undone = 0
+    void host.undoable('Archived one', { undo: () => (undone += 1) })
+    document.addEventListener('keydown', (event) => event.preventDefault(), {
+      capture: true,
+      once: true,
+    })
+    pressUndo()
+    expect(undone).toBe(0)
+    host.setAttribute('undo-keys', '')
+    await host.updateComplete
+    void host.undoable('Archived two', { undo: () => (undone += 1) })
+    const item = newest(host)
+    await item.updateComplete
+    expect(item.querySelector('[slot="actions"]')?.hasAttribute('aria-keyshortcuts')).toBe(false)
+    pressUndo()
+    expect(undone).toBe(0)
+  })
 })

@@ -406,9 +406,19 @@ const codeBlocks = (page, { minimum, selector }) =>
   )
 
 /**
+ * Asks every page in `context` for its state tools before the page loads,
+ * since Helix puts them on `globalThis` only where something asked for them.
+ */
+const askForState = (context) =>
+  context.addInitScript(() => {
+    globalThis[Symbol.for('fusion.dev/helix/state')] ??= true
+  })
+
+/**
  * Puts back the screen an entry's `<stem>.state.json` saved, through the
- * page's own Helix: `restoreState` from `@fusion.dev/helix-core`, which every
- * copy of Helix puts on `globalThis` as it loads. An entry whose state names
+ * page's own Helix: `restoreState` from `@fusion.dev/helix-core`, which the
+ * first copy of Helix to load puts on `globalThis`, since `askForState`
+ * asked for it. An entry whose state names
  * an element the page no longer draws, or one the page refused, fails, since
  * its picture would not be of the screen the state describes.
  */
@@ -652,6 +662,7 @@ const lanes = async (count) => {
       reducedMotion: 'reduce',
       viewport: { height: 800, width: 1280 },
     })
+    await askForState(context)
     if (state.network === 'origin') {
       await context.route('**/*', (route) => {
         let origin

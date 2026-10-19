@@ -16,6 +16,7 @@ const PAGE = `<div>
   <helix-headless-input id="title" label="Title"></helix-headless-input>
   <helix-headless-input label="Password" type="password"></helix-headless-input>
   <helix-headless-input label="Unsaved" snapshot="off"></helix-headless-input>
+  <helix-headless-input label="Card" autocomplete="billing cc-number"></helix-headless-input>
   <helix-headless-checkbox label="Done"></helix-headless-checkbox>
   <helix-headless-popover label="More"><button slot="trigger">More</button>Details</helix-headless-popover>
 </div>`
@@ -42,14 +43,15 @@ const settle = async (holder: HTMLElement): Promise<void> => {
 }
 
 describe('captureState', () => {
-  test('keeps each element’s value, check and open state, and never a password', async () => {
+  test('keeps each element’s value, check and open state, and never a password or a card', async () => {
     const holder = await page()
-    const [title, password, unsaved] = [
+    const [title, password, unsaved, card] = [
       ...holder.querySelectorAll('helix-headless-input'),
     ] as unknown as Field[]
     title?.requestValue('Launch plan')
     password?.requestValue('hunter2')
     unsaved?.requestValue('scratch')
+    card?.requestValue('4242424242424242')
     ;(holder.querySelector('helix-headless-checkbox') as unknown as Field).requestChecked(true)
     await settle(holder)
     const snapshot = core.captureState()
@@ -57,6 +59,7 @@ describe('captureState', () => {
     expect(entries['#title']).toEqual({ value: 'Launch plan' })
     expect(JSON.stringify(snapshot)).not.toContain('hunter2')
     expect(JSON.stringify(snapshot)).not.toContain('scratch')
+    expect(JSON.stringify(snapshot)).not.toContain('4242')
     expect(Object.values(entries)).toContainEqual({ checked: true })
     expect(Object.values(entries)).toContainEqual({ open: false })
     expect(snapshot.version).toBe(1)
@@ -103,13 +106,15 @@ describe('restoreState', () => {
     expect(report.missed).toEqual(['helix-headless-input:9'])
   })
 
-  test('is on the page for tools that reach it only through its globals', () => {
-    const slot = (globalThis as Record<symbol, unknown>)[Symbol.for('fusion.dev/helix/state')] as {
-      captureState: unknown
-      restoreState: unknown
-    }
+  test('is on the page only once something asks for it', () => {
+    const store = globalThis as Record<symbol, unknown>
+    const at = Symbol.for('fusion.dev/helix/state')
+    expect(store[at]).toBeUndefined()
+    core.exposeState()
+    const slot = store[at] as { captureState: unknown; restoreState: unknown }
     expect(typeof slot.captureState).toBe('function')
     expect(typeof slot.restoreState).toBe('function')
+    delete store[at]
   })
 })
 

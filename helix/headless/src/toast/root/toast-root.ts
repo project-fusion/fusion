@@ -25,9 +25,6 @@ import { property, state } from 'lit/decorators.js'
 import '../../button/index.js'
 import { joinSaid, messageWords } from '../words.js'
 
-/** The chord that undoes the newest undoable message. */
-const UNDO = 'mod+z'
-
 /**
  * @summary The region that holds toast messages, and the only element that announces them.
  *
@@ -98,7 +95,7 @@ const UNDO = 'mod+z'
  *
  * | Key | What it does |
  * |---|---|
- * | Command+Z, or Control+Z elsewhere | Undoes the newest message `undoable()` made, while it shows and while focus is not in a text field. |
+ * | Command+Z, or Control+Z elsewhere, or your `undo-keys` | Undoes the newest message `undoable()` made, while it shows, while focus is not in a text field, and where the app has not handled the key. |
  * | F8, or your `hotkey` | Moves focus to the first control in the stack, and back to where it was when pressed in the stack. |
  * | Tab, Shift+Tab | Moves between the controls of the messages. |
  * | Escape | Dismisses the message holding focus. Focus moves to the next message, then the one before it, then back to where it was. |
@@ -337,6 +334,15 @@ export class HelixHeadlessToast extends HelixElement {
   @property({ attribute: 'undo-hint' })
   undoHint = 'Press {keys} to undo.'
 
+  /**
+   * The keys that undo the newest message `undoable()` made, as `hotkey`
+   * reads them. Empty turns them off, for an app whose own undo holds them,
+   * and leaves the Undo button. A key the app already handled, by calling
+   * `preventDefault()`, is left to it.
+   */
+  @property({ attribute: 'undo-keys' })
+  undoKeys = 'mod+z'
+
   /** The words on the Undo button of a message `undoable()` made. */
   @words
   @property({ attribute: 'undo-label' })
@@ -345,8 +351,8 @@ export class HelixHeadlessToast extends HelixElement {
   /** The words said after each message `undoable()` made: the key that undoes it. */
   private readonly hints = new WeakMap<Element, string>()
 
-  /** The undoable messages showing, oldest first, each with what undoes it. */
-  private readonly undoables: Array<{ item: Element; undo: () => void }> = []
+  /** The undoable messages showing, oldest first, each with what undoes it and what keeps it. */
+  private readonly undoables: Array<{ item: Element; keep: () => void; undo: () => void }> = []
 
   /**
    * Shows that an action happened and offers to undo it, which is the pattern
@@ -354,13 +360,18 @@ export class HelixHeadlessToast extends HelixElement {
    *
    * Do the action first, then call this. The message holds an Undo button,
    * shows for `duration` (8 seconds by default, and paused while a pointer or
-   * focus is in the stack), and Command+Z, or Control+Z elsewhere, does what
-   * the button does while it shows, unless a text field has focus. A screen
-   * reader hears the message and then which keys undo it.
+   * focus is in the stack), and `undo-keys`, Command+Z or Control+Z by
+   * default, does what the button does while it shows, unless a text field
+   * has focus. A screen reader hears the message and then which keys undo it.
    *
    * `undo` runs if the reader undoes, and `commit` runs if the message closes
    * any other way, for an app that holds the real deletion back until then.
    * The promise settles to `undone` or `kept` accordingly.
+   *
+   * **A message that is never closed is kept.** `commit` runs as the region
+   * leaves the page, as on a route change, and as the page itself is hidden
+   * to be closed or reloaded. A browser can end a page without either, so a
+   * server holding a deletion back finishes it on a timeout of its own too.
    */
   undoable(
     message: string,
@@ -374,27 +385,35 @@ export class HelixHeadlessToast extends HelixElement {
   ): Promise<'kept' | 'undone'> {
     const tier = (this.constructor as typeof HelixElement).tier
     const apple = onApple()
+    const keys = this.undoKeys
     const button = document.createElement(`${tier}button`)
     button.textContent = this.undoLabel
-    button.setAttribute('aria-keyshortcuts', ariaChord(UNDO, apple))
+    if (keys !== '') {
+      button.setAttribute('aria-keyshortcuts', ariaChord(keys, apple))
+    }
     const item = this.add(message, {
       action: button,
       duration: options.duration ?? 8000,
       ...(options.heading === undefined ? {} : { heading: options.heading }),
       ...(options.tone === undefined ? {} : { tone: options.tone }),
     })
-    const names = keyNames(chordParts(UNDO), apple)
-    this.hints.set(
-      item,
-      formatWords(this, 'undoHint', { keys: names.spoken || names.keys.join(names.separator) }),
-    )
+    if (keys !== '') {
+      const names = keyNames(chordParts(keys), apple)
+      this.hints.set(
+        item,
+        formatWords(this, 'undoHint', { keys: names.spoken || names.keys.join(names.separator) }),
+      )
+    }
     return new Promise((resolve) => {
       let settled = false
-      const unregister = registerShortcut({
-        keys: () => UNDO,
-        label: () => this.undoLabel,
-        owner: item,
-      })
+      const unregister =
+        keys === ''
+          ? () => {}
+          : registerShortcut({
+              keys: () => keys,
+              label: () => this.undoLabel,
+              owner: item,
+            })
       const finish = (how: 'kept' | 'undone'): void => {
         settled = true
         unregister()
@@ -416,27 +435,49 @@ export class HelixHeadlessToast extends HelixElement {
       }
       /* Closed by its timer, its own dismiss control, a swipe or Escape: what
          was done stands. A canceled dismissal leaves the message showing. */
+      const keep = (): void => {
+        if (!settled) {
+          options.commit?.()
+          finish('kept')
+        }
+      }
       const closed = (event: Event): void => {
         if (event.defaultPrevented) {
           return
         }
         queueMicrotask(() => {
-          if (!settled && !event.defaultPrevented) {
-            options.commit?.()
-            finish('kept')
+          if (!event.defaultPrevented) {
+            keep()
           }
         })
       }
       button.addEventListener('click', undo)
       item.addEventListener('helix-dismiss', closed)
-      this.undoables.push({ item, undo })
+      this.undoables.push({ item, keep, undo })
     })
   }
 
-  /** Undoes the newest undoable message on Command+Z, unless a field has the keystroke. */
+  /** Keeps every undoable message still showing, as the region or the page goes. */
+  private keepAll(): void {
+    for (const one of [...this.undoables]) {
+      one.keep()
+    }
+  }
+
+  private readonly handlePageHide = (): void => {
+    this.keepAll()
+  }
+
+  /** Undoes the newest undoable message on `undo-keys`, unless a field or the app has the keystroke. */
   private readonly handleUndo = (event: KeyboardEvent): void => {
     const newest = this.undoables.at(-1)
-    if (!newest || keyClaimed(event) || !matchesChord(event, UNDO, onApple())) {
+    if (
+      !newest ||
+      this.undoKeys === '' ||
+      event.defaultPrevented ||
+      keyClaimed(event) ||
+      !matchesChord(event, this.undoKeys, onApple())
+    ) {
       return
     }
     event.preventDefault()
@@ -777,6 +818,7 @@ export class HelixHeadlessToast extends HelixElement {
     this.addEventListener('helix-dismiss', this.handleDismiss)
     document.addEventListener('keydown', this.handleHotkey)
     document.addEventListener('keydown', this.handleUndo)
+    window.addEventListener('pagehide', this.handlePageHide)
     this.unregister = registerShortcut({
       keys: () => this.hotkey,
       label: () => this.hotkeyLabel,
@@ -808,7 +850,9 @@ export class HelixHeadlessToast extends HelixElement {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.unregister?.()
+    this.keepAll()
     document.removeEventListener('keydown', this.handleUndo)
+    window.removeEventListener('pagehide', this.handlePageHide)
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('focusout', this.handleFocusOut)
     this.removeEventListener('pointerenter', this.handlePointerEnter)

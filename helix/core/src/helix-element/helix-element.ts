@@ -2,7 +2,7 @@ import { type CSSResultOrNative, LitElement, type PropertyValues, unsafeCSS } fr
 import type { StaticValue } from 'lit/static-html.js'
 import { measuring, reportRender } from '../utils/report-render/report-render.js'
 import { noteVersion, reportUsage } from '../utils/report-usage/report-usage.js'
-import { exposeState } from '../utils/state/state.js'
+import { exposeStateIfAsked } from '../utils/state/state.js'
 import { applyReactProperties, bindReactHandler, lookForReact } from './react-bridge.js'
 
 /**
@@ -577,7 +577,7 @@ export const whenHydrated = (element: Element, write: () => void): void => {
 }
 
 /* This copy of Helix says which release it is, once, as it loads: see
-   `noteVersion`. And it puts its state capture where tools find it: see
-   `exposeState`. */
+   `noteVersion`. And where a tool asked before the page loaded, it puts its
+   state capture where that tool finds it: see `STATE_SLOT`. */
 noteVersion()
-exposeState()
+exposeStateIfAsked()

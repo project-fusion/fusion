@@ -294,10 +294,16 @@ and keep the file beside the entry's baselines as `<stem>.state.json`, where
 `<stem>` is what the entry's baseline files start with. The run puts it back
 once the page has upgraded and before it waits for the page to hold still.
 
-Save a screen from the page itself, in the browser's console or from a test,
-with the capture every copy of Helix puts on the page:
+Save a screen from the page itself, in the browser's console or from a test.
+Helix puts its capture on the page only when asked, so a page in production
+hands no script the text in its fields. Ask with `exposeState` from
+`@fusion.dev/helix-core`, or, from a tool that drives a page it did not write,
+set the slot to `true` before the page loads, as the run does:
 
 ```js
+import { exposeState } from '@fusion.dev/helix-core'
+
+exposeState()
 const { captureState } = globalThis[Symbol.for('fusion.dev/helix/state')]
 copy(JSON.stringify(captureState(), null, 2))
 ```
@@ -305,7 +311,8 @@ copy(JSON.stringify(captureState(), null, 2))
 The state is put back through each element's own requests, so a page that
 controls a component hears the same events it hears from a reader. An entry
 whose state names an element the page no longer draws, or one the page refuses,
-fails rather than picturing a different screen. A password field and anything
+fails rather than picturing a different screen. A password field, a field whose
+`autocomplete` names a password, a one-time code or a payment card, and anything
 under `snapshot="off"` are never saved.
 
 ## The report
