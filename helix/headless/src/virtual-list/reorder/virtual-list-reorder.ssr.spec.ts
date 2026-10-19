@@ -32,6 +32,11 @@ describe('a reorderable virtual list on the server, with the reorder entry impor
  * `document` has no `querySelectorAll`, and the entry walked the page at
  * import and threw. In a process of its own, because the shim's globals would
  * reach every spec after this one.
+ *
+ * **The process starts in the package's folder**, because Bun 1.4 reads the
+ * tsconfig where a process starts and not beside each file: started beside
+ * this spec, it found none with `experimentalDecorators`, and Lit refused the
+ * standard decorators it compiled instead.
  */
 const importsUnderShim = (script: string): [number, string] => {
   const run = Bun.spawnSync(
@@ -42,13 +47,15 @@ const importsUnderShim = (script: string): [number, string] => {
       '-e',
       `await import('@lit-labs/ssr/lib/install-global-dom-shim.js'); ${script}`,
     ],
-    { cwd: fileURLToPath(new URL('.', import.meta.url)) },
+    { cwd: fileURLToPath(new URL('../../..', import.meta.url)) },
   )
   return [run.exitCode, run.stderr.toString()]
 }
 
 describe('the reorder entry under Lit’s global DOM shim', () => {
   test('imports', () => {
-    expect(importsUnderShim("await import('./index.js')")).toEqual([0, ''])
+    expect(
+      importsUnderShim(`await import('${new URL('./index.js', import.meta.url).href}')`),
+    ).toEqual([0, ''])
   })
 })
