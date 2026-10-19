@@ -1417,14 +1417,14 @@ export class HelixHeadlessVirtualList extends HelixElement {
        holds, so the cell is the row's to a reader and still this list's
        child to a stylesheet. */
     const across = this.across
-    const moving = lined && this.virtualize.scrolling()
+    const keepSlot = lined && this.virtualize.holdsSlot()
     for (const [name, value] of [
       ['aria-colindex', lined ? (at % across) + 1 : undefined],
       ['aria-posinset', lined ? undefined : at + 1],
       ['aria-setsize', lined ? undefined : this.data.length],
-      ['slot', lined && !moving ? `${LINE}${Math.floor(at / across)}` : undefined],
+      ['slot', lined && !keepSlot ? `${LINE}${Math.floor(at / across)}` : undefined],
     ] as const) {
-      if (name === 'slot' && moving) {
+      if (name === 'slot' && keepSlot) {
         continue
       }
       if (value === undefined) {
@@ -1625,7 +1625,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
           this.fill(group, at)
           fresh.add(at)
         }
-        if (!this.waterfall) {
+        if (!this.waterfall && this.virtualize.holdsSlot()) {
           for (const element of group) {
             ;(element as HTMLElement).style.order = String(at)
           }
@@ -1646,12 +1646,12 @@ export class HelixHeadlessVirtualList extends HelixElement {
         this.watchSize(recycled)
         drawn.set(at, recycled)
         fresh.add(at)
-        if (!this.waterfall) {
+        if (!this.waterfall && this.virtualize.holdsSlot()) {
           for (const element of recycled) {
             element.style.order = String(at)
           }
         }
-        if (recycled[0]?.parentElement !== parent || !this.virtualize.scrolling()) {
+        if (recycled[0]?.parentElement !== parent || !this.virtualize.holdsSlot()) {
           for (const element of recycled) {
             parent.insertBefore(element, anchors.get(parent) ?? null)
           }
@@ -1661,21 +1661,21 @@ export class HelixHeadlessVirtualList extends HelixElement {
       }
       /* A new node assigned to the slot ends the touch on iOS. The spacer
          stands in until the box is still. */
-      if (this.virtualize.scrolling()) {
+      if (this.virtualize.holdsSlot()) {
         continue
       }
       const fragment = this.draw(template, at)
       drawn.set(at, [...fragment.children])
       this.watchSize([...fragment.children])
       fresh.add(at)
-      if (!this.waterfall) {
+      if (!this.waterfall && this.virtualize.holdsSlot()) {
         for (const element of fragment.children) {
           ;(element as HTMLElement).style.order = String(at)
         }
       }
       parent.insertBefore(fragment, anchors.get(parent) ?? null)
     }
-    if (this.virtualize.scrolling()) {
+    if (this.virtualize.holdsSlot()) {
       for (const group of reusable) {
         this.parkRows(group)
         this.pooled.push(group)
@@ -1696,7 +1696,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     const lines = this.lined ? [...new Set(plan.wanted.map((at) => this.lineOf(at)))] : []
     /* Named line slots stay put while the box moves. A slot added or taken
        out is a change to what the slot holds, which ends the touch on iOS. */
-    if (lines.join() !== this.drawnLines.join() && !this.virtualize.scrolling()) {
+    if (lines.join() !== this.drawnLines.join() && !this.virtualize.holdsSlot()) {
       /* The render draws a `row` for each, and in `willUpdate` it is the
          render about to run. */
       this.drawnLines = lines
@@ -1708,7 +1708,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
       for (const element of group) {
         this.mark(element, at, chosen, off)
         const style = (element as HTMLElement).style
-        if (!this.waterfall && !this.virtualize.scrolling()) {
+        if (!this.waterfall && !this.virtualize.holdsSlot()) {
           style.removeProperty('order')
         }
         if (this.waterfall) {

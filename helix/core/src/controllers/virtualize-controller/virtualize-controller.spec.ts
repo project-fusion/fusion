@@ -978,6 +978,16 @@ describe('a reader in the middle of a fling', () => {
     controller.hostDisconnected()
   })
 
+  test('does not hold the slot for a scroll that is not a touch', () => {
+    const { box, fire } = touchable(500, 100)
+    const controller = connected(box, () => [])
+    box.scrollTop = 520
+    fire('scroll')
+    expect(controller.scrolling()).toBe(true)
+    expect(controller.holdsSlot()).toBe(false)
+    controller.hostDisconnected()
+  })
+
   test('holds the rows it has while the box moves under a finger, and draws the next window once it is still', async () => {
     /* A row drawn or taken out while the box moves ends the touch on iOS, so a
        touched list draws two boxes past each edge, keeps those rows while the
@@ -987,6 +997,7 @@ describe('a reader in the middle of a fling', () => {
     fire('touchstart')
     box.scrollTop = 520
     fire('scroll')
+    expect(controller.holdsSlot()).toBe(true)
     // Two boxes of 100 pixels past each edge, which is 20 rows at 10.
     expect([controller.window.first, controller.window.last]).toEqual([32, 82])
     for (const top of [600, 700]) {
