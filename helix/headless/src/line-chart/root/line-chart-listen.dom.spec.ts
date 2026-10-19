@@ -9,6 +9,9 @@ beforeAll(async () => {
 /** The tones each fake context started, as their frequencies in hertz. */
 let started: number[] = []
 
+/** How many fake contexts were closed. */
+let closed = 0
+
 /** A Web Audio context that plays nothing and says what it was asked to play. */
 class FakeContext {
   currentTime = 0
@@ -18,6 +21,7 @@ class FakeContext {
     return { connect: (next: unknown) => next, ...extra }
   }
   close() {
+    closed += 1
     return Promise.resolve()
   }
   createBiquadFilter() {
@@ -62,14 +66,14 @@ const TABLE = `<table id="sales">
 </table>`
 
 type Chart = HTMLElement & {
-  listenDuration: number
+  sonifyDuration: number
   playReadings(): Promise<void>
   sounding: boolean
   stopReadings(): void
   updateComplete: Promise<unknown>
 }
 
-const chart = async (attributes = 'listen'): Promise<Chart> => {
+const chart = async (attributes = 'sonify'): Promise<Chart> => {
   await mount(
     `<div>${TABLE}<helix-headless-line-chart for="sales" ${attributes}></helix-headless-line-chart></div>`,
   )
@@ -99,21 +103,22 @@ afterEach(() => {
     audio.AudioContext = real
   }
   started = []
+  closed = 0
 })
 
 describe('a chart that listens', () => {
-  test('draws no Listen button where the browser has no audio, or without listen', async () => {
+  test('draws no Listen button where the browser has no audio, or without sonify', async () => {
     delete audio.AudioContext
-    expect(part(await chart(), 'listen')).toBeNull()
+    expect(part(await chart(), 'sonify')).toBeNull()
     ;(globalThis as { AudioContext?: unknown }).AudioContext = FakeContext
-    expect(part(await chart(''), 'listen')).toBeNull()
+    expect(part(await chart(''), 'sonify')).toBeNull()
   })
 
   test('plays every reading as a pitch from the lowest value to the highest, and stops', async () => {
     ;(globalThis as { AudioContext?: unknown }).AudioContext = FakeContext
     const host = await chart()
-    host.listenDuration = 30
-    const button = part(host, 'listen') as HTMLElement
+    host.sonifyDuration = 30
+    const button = part(host, 'sonify') as HTMLElement
     expect(button.textContent?.trim()).toBe('Listen')
     button.click()
     await host.updateComplete
@@ -140,5 +145,25 @@ describe('a chart that listens', () => {
     key(host, 'Escape')
     await host.updateComplete
     expect(host.sounding).toBe(false)
+  })
+
+  test('leaves L to a page that handled it first', async () => {
+    ;(globalThis as { AudioContext?: unknown }).AudioContext = FakeContext
+    const host = await chart()
+    host.addEventListener('keydown', (event) => event.preventDefault(), { capture: true })
+    key(host, 'l')
+    await host.updateComplete
+    expect(host.sounding).toBe(false)
+  })
+
+  test('closes its audio context when it leaves the page', async () => {
+    ;(globalThis as { AudioContext?: unknown }).AudioContext = FakeContext
+    const host = await chart()
+    host.sonifyDuration = 30
+    ;(part(host, 'sonify') as HTMLElement).click()
+    await host.updateComplete
+    host.remove()
+    expect(host.sounding).toBe(false)
+    expect(closed).toBe(1)
   })
 })

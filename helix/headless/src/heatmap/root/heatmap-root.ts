@@ -143,7 +143,6 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @csspart empty - The words under the strip when the table has no readings: the `empty` slot, falling back to `empty-text`. Not drawn while the table cannot be read yet, on the server and during hydration, there being no document to resolve `for` in.
  * @csspart end - The trailing slot's box.
  * @csspart footer - The three-slot row under the strip.
- * @csspart listen - The button that plays the chart as sound, under `listen`.
  * @csspart live - The readout: a polite live region that says the cell the keys moved to. Hide it visually.
  * @csspart loading - The words under the strip while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
@@ -151,6 +150,7 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @csspart plot - The same element as `strip`, under the name every chart gives the drawing that takes focus.
  * @csspart row - A column of cells, which a grid reads as a row, under `selection-mode`. It draws no box.
  * @csspart selection - A polite region that says how many cells are selected after a change, rendered from the first change. Hide it visually.
+ * @csspart sonify - The button that plays the chart as sound, under `sonify`.
  * @csspart start - The leading slot's box.
  * @csspart strip - The grid of cells, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart summary - The middle slot's box.
@@ -866,7 +866,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
         this.status.spoken
           ? html`<span part="selection" role="status">${this.status.said}</span>`
           : nothing
-      }${this.renderListen()}${this.renderTable()}`
+      }${this.renderSonify()}${this.renderTable()}`
   }
 
   /**

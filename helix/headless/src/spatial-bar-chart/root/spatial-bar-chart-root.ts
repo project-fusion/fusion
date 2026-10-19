@@ -125,13 +125,13 @@ const SERIES = 24
  * @csspart face - One face of a bar the view shows, shaded by which way it faces.
  * @csspart fallback - The box the chart's own drawing fills, shown until a renderer has drawn and where none is connected. Hidden from screen readers.
  * @csspart grid - The box's edges and its grid, in the chart's own drawing.
- * @csspart listen - The button that plays the chart as sound, under `listen`.
  * @csspart live - The readout: a polite live region that says the bar the keys moved to. Hide it visually.
  * @csspart loading - The words while `loading` is set and there are no readings.
  * @csspart mark - The invisible point the tooltip is anchored to, where the renderer draws the reading.
  * @csspart plot - The box the drawing fills, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart ring - The outline around the bar the pointer or the keys rest on, painted after it, so the bars in front of it cover it.
  * @csspart ring-behind - The same outline, faint and dashed, drawn over every bar, so the part of the bar the pointer or the keys rest on that others hide still shows.
+ * @csspart sonify - The button that plays the chart as sound, under `sonify`.
  * @csspart summary - The number of bars, series, and categories, and the range of values, written as a sentence for screen readers, which describes the plot. Hide it visually.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
  * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
@@ -422,7 +422,7 @@ export class HelixHeadlessSpatialBarChart extends MixinChartStatus(MixinChartSou
         ${readable ? this.renderLive(field, at) : nothing}
         ${this.renderTooltip(cell?.value === undefined ? undefined : cell.row)}
       </div>
-      ${readable ? this.renderSummary(field) : this.renderStatus()}${this.renderListen()}${this.renderTable()}`
+      ${readable ? this.renderSummary(field) : this.renderStatus()}${this.renderSonify()}${this.renderTable()}`
   }
 
   /**
