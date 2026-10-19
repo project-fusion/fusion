@@ -42,6 +42,14 @@ import { styles as sheet } from './sandbox-preview.css.js'
 /** What the frame is allowed, here and in a tab `open()` makes. */
 const SANDBOX = 'allow-scripts allow-forms'
 
+/**
+ * Features the frame may use, here and in a tab `open()` makes. Clipboard
+ * write and fullscreen are the preview's own controls. The microphone is
+ * dictation: the frame has an opaque origin, so a field in it can ask for the
+ * microphone only when this frame is granted it.
+ */
+const ALLOW = 'clipboard-write *; fullscreen *; microphone *'
+
 /** A relative module specifier in an `import` or an `export ... from`. */
 const RELATIVE = /(\bfrom\s*|\bimport\s*\(?\s*)(["'])(\.{1,2}\/[^"']+)\2/g
 
@@ -703,13 +711,13 @@ export class HelixSandboxPreview extends HelixElement {
    * where the browser refused to open one.
    *
    * **The tab runs the example as this preview does**: in a frame that fills
-   * it, with this frame's `sandbox`, loading `src` or the built-in document,
-   * and sent the example once it loads. The example stays on an opaque origin,
-   * and the tab's `opener` is cleared, so it cannot reach this page. The tab
-   * shows the example as it was when it opened, and edits after that do not
-   * reach it. A short inline script in the tab sends the example, so on a page
-   * whose Content Security Policy refuses inline scripts the tab opens empty,
-   * as the built-in document does there.
+   * it, with this frame's `sandbox` and `allow`, loading `src` or the built-in
+   * document, and sent the example once it loads. The example stays on an
+   * opaque origin, and the tab's `opener` is cleared, so it cannot reach this
+   * page. The tab shows the example as it was when it opened, and edits after
+   * that do not reach it. A short inline script in the tab sends the example,
+   * so on a page whose Content Security Policy refuses inline scripts the tab
+   * opens empty, as the built-in document does there.
    */
   open(): Window | null {
     const tab = window.open('', '_blank')
@@ -721,6 +729,7 @@ export class HelixSandboxPreview extends HelixElement {
     tab.document.title = this.label
     body.style.margin = '0'
     const frame = tab.document.createElement('iframe')
+    frame.setAttribute('allow', ALLOW)
     frame.setAttribute('sandbox', SANDBOX)
     frame.title = this.label
     frame.style.cssText = 'block-size: 100vh; border: none; display: block; inline-size: 100vw'
@@ -875,7 +884,7 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
       srcdoc=${this.src === '' ? defaultFrame(this.map) : nothing}
       title=${this.label}
       aria-describedby=${this.failure === undefined ? nothing : 'error'}
-      allow="clipboard-write *; fullscreen *"
+      allow=${ALLOW}
       sandbox=${SANDBOX}
     ></iframe>${
       this.failure === undefined

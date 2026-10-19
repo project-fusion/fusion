@@ -113,6 +113,24 @@ describe('a textarea with voice', () => {
     expect(engine.stopped).toBe(2)
   })
 
+  test('an engine that ends as it starts leaves the field quiet', async () => {
+    const engine = fakeEngine()
+    const listen = engine.listen
+    engine.listen = (request) => {
+      const session = listen(request)
+      request.listener.end('error', 'not-allowed')
+      return session
+    }
+    const element = await field(
+      '<helix-headless-textarea voice label="Note"></helix-headless-textarea>',
+      engine,
+    )
+    expect((element as unknown as { startListening(): boolean }).startListening()).toBe(false)
+    await element.updateComplete
+    expect(element.listening).toBe(false)
+    expect(part(element, 'voice-status')?.textContent).toBe('Stopped listening')
+  })
+
   test('listens to nothing when a listener refuses, and draws no button without an engine', async () => {
     const element = await field(
       '<helix-headless-textarea voice label="Note"></helix-headless-textarea>',
