@@ -210,6 +210,7 @@ run `helix scan --out` after it to add your code's run.
 | `unknown-slot` | error | scan | A child names a slot its Helix element does not have, so it is not drawn |
 | `unknown-tag` | error | both | A rule or an element names a tag no installed package lists |
 | `unknown-token` | error | scan | A rule reads or sets a `--helix-` name the token set does not have |
+| `unlinked-trigger` | warn | scan | A tooltip's `for` names a plain element that does not name the tooltip in `aria-describedby`, so the page at rest meets the trigger undescribed |
 | `unreflected-attribute` | warn | both | A rule selects a Helix element by an attribute it never writes back, so it matches only markup a server wrote |
 
 **A button inside a button is judged where the markup settles it.** Button,

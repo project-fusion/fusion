@@ -120,6 +120,7 @@ export const KINDS = [
   'unknown-slot',
   'unknown-tag',
   'unknown-token',
+  'unlinked-trigger',
   'unreflected-attribute',
 ] as const
 

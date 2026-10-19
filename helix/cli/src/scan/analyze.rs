@@ -653,16 +653,11 @@ impl<'a> Analyzer<'a> {
                         also.extend(self.events(path, position, element));
                     }
                 }
+                also.extend(self.native(path, position, element, elements));
+                also.extend(self.nested(path, position, element, elements));
+                also.extend(served_width(path, position, element, elements));
+                also.extend(unlinked_trigger(path, position, element, elements));
                 for raw in also {
-                    keep(&mut grouped, &mut keys, raw);
-                }
-                if let Some(raw) = self.native(path, position, element, elements) {
-                    keep(&mut grouped, &mut keys, raw);
-                }
-                if let Some(raw) = self.nested(path, position, element, elements) {
-                    keep(&mut grouped, &mut keys, raw);
-                }
-                if let Some(raw) = served_width(path, position, element, elements) {
                     keep(&mut grouped, &mut keys, raw);
                 }
                 let Some(published) = self.index.get(&element.tag) else {
@@ -1362,6 +1357,71 @@ fn served_width(
     })
 }
 
+/// A tooltip's `for` naming a plain element in the same file that names no
+/// description of its own.
+///
+/// **The link has to be written in the page's markup.** A tooltip links a
+/// plain trigger by element reference once a reader points at it or focuses
+/// it, and never writes into the page's markup before that, so the server's
+/// HTML and a screen reader in reading mode meet the trigger undescribed.
+/// The runtime reports the same fault as `unlinked-trigger` on first open;
+/// this finds it before anything runs. A Helix trigger describes itself in its
+/// own shadow root, and an `aria-describedby` or `aria-labelledby` already
+/// written, or bound, is the page's to decide. A `for` naming an id this file
+/// does not hold could be anywhere, so it is left alone.
+fn unlinked_trigger(
+    path: &str,
+    position: usize,
+    element: &Element,
+    elements: &[Element],
+) -> Option<Raw> {
+    if !matches!(
+        element.tag.as_str(),
+        "helix-tooltip" | "helix-headless-tooltip"
+    ) {
+        return None;
+    }
+    let literal = |one: &Element, name: &str| {
+        one.attributes
+            .iter()
+            .find(|attribute| attribute.name == name)
+            .and_then(|attribute| match &attribute.value {
+                Value::Literal(value) if !value.is_empty() => Some(value.clone()),
+                _ => None,
+            })
+    };
+    let named = literal(element, "for")?;
+    let trigger = elements
+        .iter()
+        .find(|one| literal(one, "id").as_deref() == Some(named.as_str()))?;
+    if trigger.tag.starts_with("helix-")
+        || writes(trigger, "aria-describedby")
+        || writes(trigger, "aria-labelledby")
+    {
+        return None;
+    }
+    let tag = element.tag.as_str();
+    let id = literal(element, "id");
+    let expected = format!(
+        "aria-describedby=\"{}\" on <{} id=\"{named}\">",
+        id.as_deref().unwrap_or("<the tooltip's id>"),
+        trigger.tag
+    );
+    Some(Raw {
+        expected: Some(expected),
+        kind: "unlinked-trigger",
+        message: format!("`<{tag} for=\"{named}\">` describes `<{}>`, which does not name the tooltip in `aria-describedby`, so the server's HTML and a screen reader reading the page meet it without the tooltip's text until someone points at it or focuses it. Give the tooltip an `id` and add `aria-describedby=\"<that id>\"` to the trigger.", trigger.tag),
+        origin: Origin {
+            index: position,
+            line: element.line,
+            sheet: path.to_owned(),
+            text: element.text.clone(),
+        },
+        subject: format!("<{tag} for> <{}>", trigger.tag),
+        tag: tag.to_owned(),
+    })
+}
+
 /// An attribute's name with its binding syntax taken off: `href` for
 /// `:href`, `v-bind:href`, `[href]`, `.href`, and `?href`.
 fn unbound(raw: &str) -> &str {
@@ -1682,6 +1742,44 @@ mod tests {
             "<helix-table><helix-table-column>Name</helix-table-column>{row}</helix-table>"
         ))
         .is_empty());
+    }
+
+    #[test]
+    fn a_tooltip_trigger_that_does_not_name_it_is_found() {
+        let index = index();
+        let listing = index.hooks();
+        let used = HashSet::new();
+        let unlinked = |markup: &str| {
+            let page = markup::read(markup, 1);
+            let mut analyzer = Analyzer::new(&index, &listing, &used);
+            analyzer.markup([("a.html", page.elements.as_slice())]);
+            kinds(&analyzer)
+                .into_iter()
+                .filter(|(kind, _)| *kind == "unlinked-trigger")
+                .collect::<Vec<_>>()
+        };
+        let tip = "<helix-tooltip content=\"Save your work\" for=\"save\" id=\"save-tip\"></helix-tooltip>";
+        assert_eq!(
+            unlinked(&format!("<button id=\"save\">Save</button>{tip}")),
+            [(
+                "unlinked-trigger",
+                "<helix-tooltip for> <button>".to_owned()
+            )]
+        );
+        /* Named, bound, a Helix trigger, or an id this file does not hold. */
+        assert!(unlinked(&format!(
+            "<button aria-describedby=\"save-tip\" id=\"save\">Save</button>{tip}"
+        ))
+        .is_empty());
+        assert!(unlinked(&format!(
+            "<button :aria-describedby=\"tip\" id=\"save\">Save</button>{tip}"
+        ))
+        .is_empty());
+        assert!(unlinked(&format!(
+            "<helix-button id=\"save\">Save</helix-button>{tip}"
+        ))
+        .is_empty());
+        assert!(unlinked(tip).is_empty());
     }
 
     #[test]
