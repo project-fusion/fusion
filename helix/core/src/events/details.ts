@@ -738,6 +738,12 @@ export interface CompleteDetail {
   value: string
 }
 
+/** Detail carried by `helix-listen`. */
+export interface ListenDetail {
+  /** The phrase the field settled on, as it went into the value. */
+  text: string
+}
+
 /** What a shortcut reports when its chord is pressed. */
 export interface ShortcutDetail {
   /**

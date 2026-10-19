@@ -10,12 +10,13 @@ import {
   stopPress,
   words,
 } from '@fusion.dev/helix-core'
-import { type CSSResult, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 import { html } from 'lit/static-html.js'
 import '../../copy-button/index.js'
 import { highlightedLines } from '../highlight.js'
+import { HighlighterController, registeredHighlighter } from '../highlighter.js'
+import { keyedLines } from '../keyed-lines.js'
 import { gutterNumbers, lineCount, lineRuns, lineSpans } from '../lines.js'
 import {
   type DiffFile,
@@ -26,62 +27,6 @@ import {
   pairLines,
   parsePatch,
 } from '../patch.js'
-
-/**
- * Turns code into highlighted markup for a block's `language`, or returns
- * `undefined` for a language it does not read, which the block then draws
- * plain.
- */
-export type CodeBlockHighlighter = (code: string, language: string) => string | undefined
-
-/** The highlighter `registerHighlighter` gave every block, and its sheet. */
-let registered: { highlighter: CodeBlockHighlighter; sheet: CSSResult | undefined } | undefined
-
-/** Gives a block the registered sheet, once, where it has a shadow root to hold it. */
-const adoptRegistered = (block: HelixHeadlessCodeBlock): void => {
-  const root = block.shadowRoot
-  const sheet = registered?.sheet?.styleSheet
-  if (root && sheet && !root.adoptedStyleSheets.includes(sheet)) {
-    root.adoptedStyleSheets = [...root.adoptedStyleSheets, sheet]
-  }
-}
-
-/** The blocks already on the page, in the document and in every open shadow root in it. */
-const blocksOnPage = (root: ParentNode = document): HelixHeadlessCodeBlock[] =>
-  [...root.querySelectorAll('*')].flatMap((node) => [
-    ...(node instanceof HelixHeadlessCodeBlock ? [node] : []),
-    ...(node.shadowRoot ? blocksOnPage(node.shadowRoot) : []),
-  ])
-
-/**
- * Gives every Code Block of both tiers a highlighter, for the blocks that set
- * no `highlight` of their own, and the sheet that colors what it returns.
- *
- * **Opt-in, so a page that shows plain code carries no grammar.** Code Block
- * ships none: a grammar is the larger part of any highlighter, and a block
- * that registers one for every page makes every page pay for it. A page that
- * wants color calls this once, or imports an entry that calls it. `sheet` is
- * adopted into every block's shadow root, for a highlighter that writes
- * classes, since a page's own stylesheet does not reach inside a block.
- *
- * A block's own `highlight` wins over this. Blocks already on the page draw
- * again with it, and every block built after has it. `undefined` takes it
- * away again.
- */
-export const registerHighlighter = (
-  highlighter: CodeBlockHighlighter | undefined,
-  sheet?: CSSResult,
-): void => {
-  registered = highlighter ? { highlighter, sheet } : undefined
-  /* Asked of the method: under Lit's global DOM shim a server has a
-     `document` with no `querySelectorAll`, and the walk threw at import. */
-  if (typeof globalThis.document?.querySelectorAll === 'function') {
-    for (const block of blocksOnPage()) {
-      adoptRegistered(block)
-      block.requestUpdate()
-    }
-  }
-}
 
 /** Whether an element is a Code Block, of either tier, by its tag. */
 const isBlock = (element: Element | null): element is HelixHeadlessCodeBlock =>
@@ -982,7 +927,14 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
-    adoptRegistered(this)
+  }
+
+  /** On the page's list of elements a highlighter registration reaches. */
+  protected readonly highlighting = new HighlighterController(this)
+
+  /** The page registered another highlighter: draws again with it. */
+  highlighterChanged(): void {
+    this.requestUpdate()
   }
 
   protected override render(): TemplateResult {
@@ -999,7 +951,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
        is reported as uncaught and the code is drawn plain, as Sandbox Source
        draws its source. */
     let highlighted: string | undefined
-    const highlight = this.highlight ?? registered?.highlighter
+    const highlight = this.highlight ?? registeredHighlighter()
     try {
       const markup = highlight && text !== '' ? highlight(text, this.language) : undefined
       highlighted = markup === undefined ? undefined : highlightedLines(markup)
@@ -1031,7 +983,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
     const code =
       highlighted === undefined
         ? html`<code part="code">${marks}<slot @slotchange=${() => this.requestUpdate()}></slot></code>`
-        : html`<code part="code">${marks}${unsafeHTML(highlighted)}</code><slot
+        : html`<code part="code">${marks}${keyedLines(highlighted)}</code><slot
               hidden
               @slotchange=${() => this.requestUpdate()}
             ></slot>`

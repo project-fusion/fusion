@@ -516,24 +516,30 @@
     // are `@fusion.dev/helix-styles`' output. The map chunk beside it imports
     // `@fusion.dev/helix-map`, the connector and the style compiler, the
     // graph chunk `@fusion.dev/helix-graph`, the plot chunk
-    // `@fusion.dev/helix-plot`, and the terminal chunk
-    // `@fusion.dev/helix-terminal`.
+    // `@fusion.dev/helix-plot`, the terminal chunk
+    // `@fusion.dev/helix-terminal`, the editor chunk
+    // `@fusion.dev/helix-editor`, and the highlight chunk
+    // `@fusion.dev/helix-sandbox`.
     "frame": {
       "dependsOn": [
         "@fusion.dev/helix#build",
+        "@fusion.dev/helix-editor#build",
         "@fusion.dev/helix-graph#build",
         "@fusion.dev/helix-map#build",
         "@fusion.dev/helix-plot#build",
+        "@fusion.dev/helix-sandbox#build",
         "@fusion.dev/helix-styles#build",
         "@fusion.dev/helix-terminal#build"
       ],
       "inputs": [
+        "preview/preview-editor-entry.ts",
         "preview/preview-events.ts",
         "preview/preview-frame-entry.ts",
         "preview/preview-graph-cosmos-entry.ts",
         "preview/preview-graph-entry.ts",
         "preview/preview-graph-stencil.ts",
         "preview/preview-graph-three-entry.ts",
+        "preview/preview-highlight-entry.ts",
         "preview/preview-map-entry.ts",
         "preview/preview-maplibre-entry.ts",
         "preview/preview-plot-three-entry.ts",

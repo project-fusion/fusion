@@ -159,6 +159,34 @@ slot[name="filter-icon"]::slotted(*) {
   outline: none;
 }
 
+/* The dictation button at the end of the search field, a muted mark that a
+   pointer darkens, as the field's own icon is drawn. */
+[part~="voice"] {
+  --icon-size: var(--helix-size-icon-tight);
+  all: unset;
+
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  min-block-size: var(--helix-size-icon-loose);
+  min-inline-size: var(--helix-size-icon-loose);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part~="voice"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+[part~="voice"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
 /* Options already showing stay and dim while a new set arrives. Removing them
    would collapse the panel and move everything under the reader for as long as
    the request takes. */

@@ -1244,9 +1244,24 @@ helix-toast:not([data-color-mode]) {
 }
 
 /* And nothing hanging off either end, so the surface's own padding is the only
-   space at the edges of the passage. */
-:where([data-prose] > :last-child) {
+   space at the edges of the passage, or of a quote, a callout, an item or a
+   cell inside it: a paragraph a Markdown renderer put in a callout left the
+   rhythm's gap under its last line, inside the callout's own padding. */
+:where([data-prose] > :last-child),
+:where([data-prose] :is(blockquote, helix-callout, li, td, th) > :last-child) {
   margin-block-end: var(--helix-space-none);
+}
+
+/* **A heading in a Markdown document has room above it and sits close to what
+   it heads.** Scoped to `helix-markdown`, since the recipe's other pages set
+   their own heading spacing. */
+:where(helix-markdown[data-prose], [data-prose] helix-markdown) > :where(h1, h2, h3, h4, h5, h6) {
+  margin-block: var(--helix-space-md) var(--helix-space-xs);
+}
+
+:where(helix-markdown[data-prose], [data-prose] helix-markdown)
+  > :where(h1, h2, h3, h4, h5, h6):where(:first-child) {
+  margin-block-start: var(--helix-space-none);
 }
 
 /* The markers go back inside. `padding-inline-start` rather than
@@ -1293,6 +1308,79 @@ helix-toast:not([data-color-mode]) {
 :where([data-prose] tbody tr:last-child th),
 :where([data-prose] tbody tr:last-child td) {
   border-block-end-color: transparent;
+}
+
+/* **A table `Markdown` draws, whose columns never move as its rows arrive.**
+   Each column takes the share its `col` gives it, fixed from the header row,
+   so a long cell arriving wraps inside its column and widens nothing. Fixed
+   layout needs a table box, so the scrolling is the box around it:
+   `data-table`, spaced as a table is. Each column keeps 7rem at least, three
+   columns fitting a 375 screen, and a wider table scrolls inside its box. */
+:where([data-prose] [data-table]) {
+  margin-block: var(--helix-space-none) var(--helix-space-sm);
+  max-inline-size: 100%;
+  overflow-x: auto;
+}
+
+:where([data-prose] [data-table] > table) {
+  display: table;
+  inline-size: 100%;
+  margin-block: var(--helix-space-none);
+  min-inline-size: 56rem;
+  table-layout: fixed;
+}
+
+:where([data-prose] [data-table] > table[data-columns="1"]) {
+  min-inline-size: 7rem;
+}
+
+:where([data-prose] [data-table] > table[data-columns="2"]) {
+  min-inline-size: 14rem;
+}
+
+:where([data-prose] [data-table] > table[data-columns="3"]) {
+  min-inline-size: 21rem;
+}
+
+:where([data-prose] [data-table] > table[data-columns="4"]) {
+  min-inline-size: 28rem;
+}
+
+:where([data-prose] [data-table] > table[data-columns="5"]) {
+  min-inline-size: 35rem;
+}
+
+:where([data-prose] [data-table] > table[data-columns="6"]) {
+  min-inline-size: 42rem;
+}
+
+:where([data-prose] [data-table] > table[data-columns="7"]) {
+  min-inline-size: 49rem;
+}
+
+:where([data-prose] [data-table] th, [data-prose] [data-table] td) {
+  overflow-wrap: anywhere;
+}
+
+/* A cell's alignment as its column was written, at the edge the text starts
+   from, so a right-to-left page aligns to its own start. */
+:where([data-prose] [data-align="center"]) {
+  text-align: center;
+}
+
+:where([data-prose] [data-align="end"]) {
+  text-align: end;
+}
+
+/* A task item's box stands where its bullet would. */
+:where([data-prose] li[data-task]) {
+  list-style: none;
+}
+
+:where([data-prose] li[data-task] > input[type="checkbox"]) {
+  margin-block: var(--helix-space-none);
+  margin-inline: calc(var(--helix-space-md) * -1) var(--helix-space-2xs);
+  vertical-align: middle;
 }
 
 /* A ground for a block of code, which the font alone does not give it. Inline

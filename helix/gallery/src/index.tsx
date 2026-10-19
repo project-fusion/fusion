@@ -20,6 +20,8 @@ import { checkboxArt } from './art/checkbox'
 import { checkboxGroupArt } from './art/checkbox-group'
 import { codeArt } from './art/code'
 import { codeBlockArt } from './art/code-block'
+import { codeEditorArt } from './art/code-editor'
+import { codeInputArt } from './art/code-input'
 import { colorInputArt } from './art/color-input'
 import { colorPickerArt } from './art/color-picker'
 import { comboboxArt } from './art/combobox'
@@ -56,6 +58,7 @@ import { listboxArt } from './art/listbox'
 import { loaderArt } from './art/loader'
 import { logArt } from './art/log'
 import { mapArt } from './art/map'
+import { markdownArt } from './art/markdown'
 import { megamenuArt } from './art/megamenu'
 import { menuArt } from './art/menu'
 import { meterArt } from './art/meter'
@@ -79,6 +82,7 @@ import { sandboxArt } from './art/sandbox'
 import { scatterChartArt } from './art/scatter-chart'
 import { scrollAreaArt } from './art/scroll-area'
 import { selectArt } from './art/select'
+import { shortcutOverlayArt } from './art/shortcut-overlay'
 import { skeletonArt } from './art/skeleton'
 import { skipLinkArt } from './art/skip-link'
 import { sliderArt } from './art/slider'
@@ -177,6 +181,8 @@ const art: Record<string, ReactNode> = {
   'checkbox-group': checkboxGroupArt,
   code: codeArt,
   'code-block': codeBlockArt,
+  'code-editor': codeEditorArt,
+  'code-input': codeInputArt,
   'color-input': colorInputArt,
   'color-picker': colorPickerArt,
   combobox: comboboxArt,
@@ -213,6 +219,7 @@ const art: Record<string, ReactNode> = {
   loader: loaderArt,
   log: logArt,
   map: mapArt,
+  markdown: markdownArt,
   megamenu: megamenuArt,
   menu: menuArt,
   meter: meterArt,
@@ -236,6 +243,7 @@ const art: Record<string, ReactNode> = {
   'scatter-chart': scatterChartArt,
   'scroll-area': scrollAreaArt,
   select: selectArt,
+  'shortcut-overlay': shortcutOverlayArt,
   skeleton: skeletonArt,
   'skip-link': skipLinkArt,
   slider: sliderArt,

@@ -190,6 +190,7 @@ interface BarFrame {
  * @csspart loading - The words in place of the drawing while `loading` is set and there are no readings: the `loading` slot, falling back to `loading-text`.
  * @csspart mark - The invisible point the tooltip is anchored to.
  * @csspart plot - The drawing, which takes focus to be read by key. With nothing to draw, a group named as the chart is, holding the `empty` or `loading` part.
+ * @csspart sonify - The button that plays the chart as sound, under `sonify`.
  * @csspart summary - The chart's name and each series' highest reading, written as a sentence for screen readers. Hide it visually.
  * @csspart svg - The drawing surface the bars and lines sit on.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
@@ -492,7 +493,7 @@ export class HelixHeadlessBarChart extends MixinChartStatus(MixinChartSource(Hel
         : this.renderAxis(y, domain, 'primary', sideways, widest)
     }${this.renderPlot(series, categories, y, domain, floor, z)}${
       z === undefined ? nothing : this.renderAxis(z, other, 'secondary', sideways, widest, tint)
-    }${this.renderLabels(categories)}${this.renderSummary(series)}${this.renderTable()}`
+    }${this.renderLabels(categories)}${this.renderSummary(series)}${this.renderSonify()}${this.renderTable()}`
   }
 
   /**

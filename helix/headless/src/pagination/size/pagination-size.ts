@@ -80,6 +80,9 @@ import '../../select/index.js'
  * @csspart control-listbox-loading - The text shown while the options load.
  * @csspart control-listbox-search - The region that holds the filter field.
  * @csspart control-listbox-search-field - The filter field.
+ * @csspart control-listbox-voice - The dictation button in the filter field.
+ * @csspart control-listbox-voice-listening - The dictation button while it listens.
+ * @csspart control-listbox-voice-status - What a screen reader hears as dictation starts and stops.
  * @csspart control-live - The select's `live` part, the region a screen reader hears a choice made on the closed trigger from.
  * @csspart control-surface - The floating panel.
  * @csspart control-trigger - The closed control, which shows the chosen size.
@@ -277,7 +280,8 @@ export class HelixHeadlessPaginationSize extends HelixFormElement {
         listbox-filter-mark: control-listbox-filter-mark, listbox-hint: control-listbox-hint,
         listbox-items: control-listbox-items, listbox-label: control-listbox-label,
         listbox-live: control-listbox-live, listbox-loading: control-listbox-loading, listbox-search: control-listbox-search,
-        listbox-search-field: control-listbox-search-field, live: control-live, surface: control-surface,
+        listbox-search-field: control-listbox-search-field, listbox-voice: control-listbox-voice,
+        listbox-voice-listening: control-listbox-voice-listening, listbox-voice-status: control-listbox-voice-status, live: control-live, surface: control-surface,
         trigger: control-trigger, value: control-value"
       label=${named ? '' : this.label}
       aria-label=${named || nothing}

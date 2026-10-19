@@ -1,5 +1,7 @@
 import {
   animationsFinished,
+  ariaChord,
+  chordParts,
   customElement,
   DelayController,
   deepActiveElement,
@@ -9,14 +11,18 @@ import {
   formatWords,
   HelixElement,
   hostAria,
+  keyClaimed,
+  keyNames,
   matchesChord,
   numberConverter,
   onApple,
+  registerShortcut,
   scrollHolders,
   words,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import '../../button/index.js'
 import { joinSaid, messageWords } from '../words.js'
 
 /**
@@ -56,6 +62,13 @@ import { joinSaid, messageWords } from '../words.js'
  * or a pen swipes a message away toward the end of the line, or toward the
  * edge `swipe-direction` names.
  *
+ * **`undoable()` offers to take an action back**, which replaces a
+ * confirmation dialog for an action that can be undone: do the action, then
+ * call it. The message holds an Undo button and shows for 8 seconds, Command+Z
+ * (Control+Z elsewhere) undoes it while it shows, and a screen reader hears
+ * which keys do. Keep a confirmation for an action that cannot be taken back or
+ * that reaches someone else, such as sending or paying.
+ *
  * **Every message's timer waits while a pointer or focus is in the stack**, as
  * React Aria's and Radix's regions do, so a reader moving from one message to
  * the next does not lose the one behind them.
@@ -82,6 +95,7 @@ import { joinSaid, messageWords } from '../words.js'
  *
  * | Key | What it does |
  * |---|---|
+ * | Command+Z, or Control+Z elsewhere, or your `undo-keys` | Undoes the newest message `undoable()` made, while it shows, while focus is not in a text field, and where the app has not handled the key. |
  * | F8, or your `hotkey` | Moves focus to the first control in the stack, and back to where it was when pressed in the stack. |
  * | Tab, Shift+Tab | Moves between the controls of the messages. |
  * | Escape | Dismisses the message holding focus. Focus moves to the next message, then the one before it, then back to where it was. |
@@ -116,6 +130,11 @@ export class HelixHeadlessToast extends HelixElement {
    */
   @property()
   hotkey = 'F8'
+
+  /** What the hotkey does, as a list of the page's shortcuts says it. */
+  @words
+  @property({ attribute: 'hotkey-label' })
+  hotkeyLabel = 'Go to notifications'
 
   /**
    * Accessible name for the region, with `{hotkey}` filled in. Translate it with
@@ -227,7 +246,7 @@ export class HelixHeadlessToast extends HelixElement {
    */
   private announce(arrived: readonly HTMLElement[]): void {
     for (const one of arrived) {
-      const words = messageWords(one)
+      const words = this.wordsOf(one)
       if (words !== '') {
         ;(isDanger(one) ? this.pending.urgent : this.pending.said).push(words)
       }
@@ -305,6 +324,170 @@ export class HelixHeadlessToast extends HelixElement {
       event.preventDefault()
       this.scope.enter()
     }
+  }
+
+  /**
+   * What a message `undoable()` made says after its own words, with `{keys}`
+   * for the chord that undoes it, spoken as words.
+   */
+  @words
+  @property({ attribute: 'undo-hint' })
+  undoHint = 'Press {keys} to undo.'
+
+  /**
+   * The keys that undo the newest message `undoable()` made, as `hotkey`
+   * reads them. Empty turns them off, for an app whose own undo holds them,
+   * and leaves the Undo button. A key the app already handled, by calling
+   * `preventDefault()`, is left to it.
+   */
+  @property({ attribute: 'undo-keys' })
+  undoKeys = 'mod+z'
+
+  /** The words on the Undo button of a message `undoable()` made. */
+  @words
+  @property({ attribute: 'undo-label' })
+  undoLabel = 'Undo'
+
+  /** The words said after each message `undoable()` made: the key that undoes it. */
+  private readonly hints = new WeakMap<Element, string>()
+
+  /** The undoable messages showing, oldest first, each with what undoes it and what keeps it. */
+  private readonly undoables: Array<{ item: Element; keep: () => void; undo: () => void }> = []
+
+  /**
+   * Shows that an action happened and offers to undo it, which is the pattern
+   * that replaces a confirmation dialog for an action that can be taken back.
+   *
+   * Do the action first, then call this. The message holds an Undo button,
+   * shows for `duration` (8 seconds by default, and paused while a pointer or
+   * focus is in the stack), and `undo-keys`, Command+Z or Control+Z by
+   * default, does what the button does while it shows, unless a text field
+   * has focus. A screen reader hears the message and then which keys undo it.
+   *
+   * `undo` runs if the reader undoes, and `commit` runs if the message closes
+   * any other way, for an app that holds the real deletion back until then.
+   * The promise settles to `undone` or `kept` accordingly.
+   *
+   * **A message that is never closed is kept.** `commit` runs as the region
+   * leaves the page, as on a route change, and as the page itself is hidden
+   * to be closed or reloaded. A browser can end a page without either, so a
+   * server holding a deletion back finishes it on a timeout of its own too.
+   */
+  undoable(
+    message: string,
+    options: {
+      commit?: () => void
+      duration?: number
+      heading?: string
+      tone?: 'danger' | 'info' | 'success' | 'warning'
+      undo: () => void
+    },
+  ): Promise<'kept' | 'undone'> {
+    const tier = (this.constructor as typeof HelixElement).tier
+    const apple = onApple()
+    const keys = this.undoKeys
+    const button = document.createElement(`${tier}button`)
+    button.textContent = this.undoLabel
+    if (keys !== '') {
+      button.setAttribute('aria-keyshortcuts', ariaChord(keys, apple))
+    }
+    const item = this.add(message, {
+      action: button,
+      duration: options.duration ?? 8000,
+      ...(options.heading === undefined ? {} : { heading: options.heading }),
+      ...(options.tone === undefined ? {} : { tone: options.tone }),
+    })
+    if (keys !== '') {
+      const names = keyNames(chordParts(keys), apple)
+      this.hints.set(
+        item,
+        formatWords(this, 'undoHint', { keys: names.spoken || names.keys.join(names.separator) }),
+      )
+    }
+    return new Promise((resolve) => {
+      let settled = false
+      const unregister =
+        keys === ''
+          ? () => {}
+          : registerShortcut({
+              keys: () => keys,
+              label: () => this.undoLabel,
+              owner: item,
+            })
+      const finish = (how: 'kept' | 'undone'): void => {
+        settled = true
+        unregister()
+        button.removeEventListener('click', undo)
+        item.removeEventListener('helix-dismiss', closed)
+        const at = this.undoables.findIndex((one) => one.item === item)
+        if (at >= 0) {
+          this.undoables.splice(at, 1)
+        }
+        resolve(how)
+      }
+      const undo = (): void => {
+        if (settled) {
+          return
+        }
+        options.undo()
+        finish('undone')
+        ;(item as Element & { dismiss?: () => boolean }).dismiss?.()
+      }
+      /* Closed by its timer, its own dismiss control, a swipe or Escape: what
+         was done stands. A canceled dismissal leaves the message showing. */
+      const keep = (): void => {
+        if (!settled) {
+          options.commit?.()
+          finish('kept')
+        }
+      }
+      const closed = (event: Event): void => {
+        if (event.defaultPrevented) {
+          return
+        }
+        queueMicrotask(() => {
+          if (!event.defaultPrevented) {
+            keep()
+          }
+        })
+      }
+      button.addEventListener('click', undo)
+      item.addEventListener('helix-dismiss', closed)
+      this.undoables.push({ item, keep, undo })
+    })
+  }
+
+  /** Keeps every undoable message still showing, as the region or the page goes. */
+  private keepAll(): void {
+    for (const one of [...this.undoables]) {
+      one.keep()
+    }
+  }
+
+  private readonly handlePageHide = (): void => {
+    this.keepAll()
+  }
+
+  /** Undoes the newest undoable message on `undo-keys`, unless a field or the app has the keystroke. */
+  private readonly handleUndo = (event: KeyboardEvent): void => {
+    const newest = this.undoables.at(-1)
+    if (
+      !newest ||
+      this.undoKeys === '' ||
+      event.defaultPrevented ||
+      keyClaimed(event) ||
+      !matchesChord(event, this.undoKeys, onApple())
+    ) {
+      return
+    }
+    event.preventDefault()
+    newest.undo()
+  }
+
+  /** What a message says as it arrives, with the key that undoes it where it has one. */
+  private wordsOf(item: Element): string {
+    const hint = this.hints.get(item)
+    return hint ? joinSaid([messageWords(item), hint]) : messageWords(item)
   }
 
   /** Messages `add()` made, which are the region's to remove. */
@@ -559,7 +742,7 @@ export class HelixHeadlessToast extends HelixElement {
       return
     }
     for (const one of arrived) {
-      const words = messageWords(one)
+      const words = this.wordsOf(one)
       if (words !== '') {
         speaker.ariaNotify(words, { priority: isDanger(one) ? 'high' : 'normal' })
       }
@@ -634,6 +817,13 @@ export class HelixHeadlessToast extends HelixElement {
     this.addEventListener('pointerleave', this.handlePointerLeave)
     this.addEventListener('helix-dismiss', this.handleDismiss)
     document.addEventListener('keydown', this.handleHotkey)
+    document.addEventListener('keydown', this.handleUndo)
+    window.addEventListener('pagehide', this.handlePageHide)
+    this.unregister = registerShortcut({
+      keys: () => this.hotkey,
+      label: () => this.hotkeyLabel,
+      owner: this,
+    })
     this.watcher = new MutationObserver((records) => {
       const added = records.flatMap((record) => [...record.addedNodes])
       /* First, so a message past `max-visible` is held before it is shown or said. */
@@ -654,8 +844,15 @@ export class HelixHeadlessToast extends HelixElement {
     }
   }
 
+  /** Takes the hotkey off the page's list of shortcuts. */
+  private unregister: (() => void) | undefined
+
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.unregister?.()
+    this.keepAll()
+    document.removeEventListener('keydown', this.handleUndo)
+    window.removeEventListener('pagehide', this.handlePageHide)
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('focusout', this.handleFocusOut)
     this.removeEventListener('pointerenter', this.handlePointerEnter)

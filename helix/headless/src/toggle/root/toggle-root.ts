@@ -3,6 +3,7 @@ import {
   customElement,
   HelixElement,
   HostClickController,
+  ListedController,
   MixinSelectableItem,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -47,6 +48,13 @@ import { property } from 'lit/decorators.js'
  */
 @customElement('helix-headless-toggle')
 export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
+  /** On the page's list of controls, where a command palette and a shortcut overlay find it. */
+  protected readonly listed = new ListedController(
+    this,
+    'press',
+    () => this.internals?.ariaKeyShortcuts,
+  )
+
   /** A click on the element itself, `click()` included, chooses it, as on `Radio`. */
   protected readonly clicks = new HostClickController(this, () => this.partNamed('item'))
 

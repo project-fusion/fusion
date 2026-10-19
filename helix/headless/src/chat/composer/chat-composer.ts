@@ -5,8 +5,10 @@ import {
   HelixSendEvent,
   HelixTypingEvent,
   hostAria,
+  MixinVoice,
   markRegion,
   numberConverter,
+  SPOKEN_RULE,
   timeConverter,
   words,
 } from '@fusion.dev/helix-core'
@@ -30,6 +32,13 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  *
  * The composer clears only when no listener cancels the send, so the text is
  * kept when you cancel a send that failed.
+ *
+ * **Set `voice` for dictation.** A microphone button before send listens
+ * through the page's speech engine, the browser's own unless
+ * `registerSpeechEngine` gave the page another, and types what it hears at the
+ * caret as the reader speaks, each guess replaced by the next. Press it again,
+ * press Escape, or send, and it stops. Where the browser has no engine, as in
+ * Firefox, no button is drawn.
  *
  * **In a form, the draft is the composer's value**, submitted under `name`,
  * and an empty draft submits an empty entry, as a native textarea does. A
@@ -64,6 +73,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot end - Content under the field, beside the send button.
  * @slot start - Content under the field at the leading edge, such as an attachment button or a model picker.
  *
+ * @event {HelixBeforeListenEvent} helix-before-listen - The dictation button was pressed. Cancelable: cancel it to keep the composer from listening.
+ * @event {HelixListenEvent} helix-listen - Dictation settled on a phrase and put it in the draft, after the draft's own `input`.
  * @event {HelixSendEvent} helix-send - Fired when the user sends their turn, and cancelable.
  * @event {HelixTypingEvent} helix-typing - The user started or stopped writing, with `typing` saying which, as the composer's `typing` does.
  * @event {Event} input - The user changed the text. Read it from `value`, for a typing indicator or a saved draft. Bubbles and is composed, as a native field's is.
@@ -76,11 +87,17 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @csspart send - The send button.
  * @csspart start - The box around the `start` slot.
  * @csspart tools - The row under the field.
+ * @csspart voice - The dictation button, under `voice`, before the send button.
+ * @csspart voice-listening - The dictation button while it listens. Set alongside `voice`.
+ * @csspart voice-status - What a screen reader hears as dictation starts and stops, drawn for no one else.
  *
  * @cssstate invalid - The draft fails `required`, `minlength`, `maxlength`, or a custom error, and the reader has tried to send or submit it, or edited the field and left it. Or `feedback` is set.
+ * @cssstate listening - While the composer listens for dictation. The element sets `--dictation-level` on itself meanwhile, from 0 to 1, for a meter.
  */
 @customElement('helix-headless-chat-composer')
-export class HelixHeadlessChatComposer extends HelixFormElement {
+export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
+  protected static override markRules = [SPOKEN_RULE]
+
   /**
    * The key this part's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-chat-composer': { sendLabel: 'Senden' } })`.
@@ -222,6 +239,10 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
     this.dispatchEvent(new HelixTypingEvent({ typing }))
   }
 
+  protected override voiceField(): HTMLTextAreaElement | null {
+    return this.partNamed<HTMLTextAreaElement>('field')
+  }
+
   /**
    * Sends what is written, and returns whether the send went through.
    *
@@ -230,6 +251,8 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
    * a reasonable way to send.
    */
   send(): boolean {
+    /* What was heard so far stays in the draft and goes with it. */
+    this.stopListening()
     const value = this.value.trim()
     if (this.isDisabled) {
       return false
@@ -425,7 +448,7 @@ export class HelixHeadlessChatComposer extends HelixFormElement {
       <div part="tools">
         <span part="start"><slot name="start"></slot></span>
         <span part="end"><slot name="end"></slot></span>
-        ${this.renderSend()}
+        ${this.renderVoice()}${this.renderSend()}
       </div>
     </div>${
       this.feedback === ''

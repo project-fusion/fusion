@@ -1,13 +1,22 @@
 import {
   auditChildren,
+  chordParts,
   customElement,
   type DataOptionItem,
   drawStatus,
+  formatWords,
   type HelixBeforeChangeEvent,
   HelixElement,
+  type HelixFilterEvent,
   HelixSelectEvent,
+  keyNames,
+  type ListedControl,
+  listControls,
   MixinControllerOpen,
   matchesChord,
+  onApple,
+  registerShortcut,
+  runControl,
   StatusController,
   timeConverter,
   words,
@@ -21,6 +30,7 @@ import { optionsAmong } from '../../option/among.js'
    imports register the styled pair. `tier` picks which the template asks for. */
 import '../../dialog/index.js'
 import '../../listbox/index.js'
+import '../../option/index.js'
 
 /** Whether an element is in a custom state, where the engine can say. */
 const says = (element: Element | null, state: string): boolean => {
@@ -30,6 +40,9 @@ const says = (element: Element | null, state: string): boolean => {
     return false
   }
 }
+
+/** The value a control on screen is listed under, followed by its place in the list. */
+const CONTROL = 'helix-control:'
 
 /**
  * @summary A command palette: a list of commands that opens from anywhere on the page and filters as you type.
@@ -100,17 +113,17 @@ const says = (element: Element | null, state: string): boolean => {
  * Aria's `Autocomplete` is. The commands are a `listbox` of `option`s. How many commands typing left, the empty text and
  * the loading text are said in a polite live region.
  *
- * **The commands are an import of their own.** A command is an option, the
- * Option family's, which the palette does not register, so a page that writes
- * one imports it beside the palette:
+ * **The palette registers Option**, since it draws the controls on screen as
+ * options itself with `controls`, so a page that writes commands imports the
+ * palette alone. A tier of your own registers its own option, and in
+ * development a palette holding one nobody registered says so.
  *
- * ```js
- * import '@fusion.dev/helix/command'
- * import '@fusion.dev/helix/option'
- * ```
- *
- * In development, a palette holding an option nobody registered says so once
- * the page has loaded, with the line to add.
+ * **Set `controls` to find anything on screen.** Every labeled Helix control
+ * puts itself on the page's list while it is connected, and the palette lists
+ * the ones a reader can reach under its own commands once they type, with
+ * each one's shortcut. Choosing one closes the palette and presses it, or
+ * moves focus into a field. `unlisted` on a control, or on a region around it,
+ * leaves it out.
  *
  * @since 0.1.0
  * @status stable
@@ -134,6 +147,16 @@ const says = (element: Element | null, state: string): boolean => {
  * @event {HelixSelectEvent} helix-select - A command was chosen, with its `href` where the option is a link. Cancelable: cancel it to keep the palette open, and to keep the browser from following the link.
  * @event {ToggleEvent} toggle - The palette opened or closed. The event carries `newState` and `oldState`.
  *
+ * @csspart control - A control on screen, listed with `controls`.
+ * @csspart control-description - Its region's name.
+ * @csspart control-item - Its row.
+ * @csspart control-item-active - Its row while the keyboard is on it.
+ * @csspart control-item-selected - Its row while selected.
+ * @csspart control-label - Its name.
+ * @csspart control-text - Its name and region, as one column.
+ * @csspart controls - The group of controls on screen.
+ * @csspart controls-items - What holds the group's controls.
+ * @csspart controls-label - The group's heading.
  * @csspart dialog-body - The dialog's slot for its content, which holds the list. It draws no box until you give it one.
  * @csspart dialog-dismiss - The dialog's close control, drawn when the dialog is `dismissible`.
  * @csspart dialog-dismiss-mark - The glyph on the dialog's close control, where none is slotted.
@@ -154,6 +177,9 @@ const says = (element: Element | null, state: string): boolean => {
  * @csspart listbox-loading - The text shown while the commands are loading.
  * @csspart listbox-search - The region that holds the filter field.
  * @csspart listbox-search-field - The filter field.
+ * @csspart listbox-voice - The dictation button in the filter field, under `voice`.
+ * @csspart listbox-voice-listening - The dictation button while it listens.
+ * @csspart listbox-voice-status - What a screen reader hears as dictation starts and stops.
  * @csspart live - The region a screen reader announces the page shown from, by the words of the command that opens it, drawn once there is one to say. Visually hidden in the styled tier.
  *
  * @cssstate empty - The list shows no commands: there are none, or typing hid every one.
@@ -169,6 +195,24 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    * `registerWords('de', { 'helix-command': { placeholder: 'Befehle suchen' } })`.
    */
   static words = 'helix-command'
+
+  /**
+   * Lists the controls on screen below the palette's own commands, once the
+   * reader types: every labeled Helix button, field, tab, switch and the
+   * rest, by its name, with its shortcut. Choosing one closes the palette and
+   * presses the control, or moves focus into a field.
+   *
+   * A control that is disabled, inert, hidden or under `unlisted` is left out,
+   * and so is anything inside the palette. Off by default, so a palette used
+   * as a search box lists only what it holds.
+   */
+  @property({ type: Boolean })
+  controls = false
+
+  /** The heading over the controls on screen. */
+  @words
+  @property({ attribute: 'controls-label' })
+  controlsLabel = 'On this screen'
 
   /**
    * The text shown when the filter matches no commands.
@@ -218,6 +262,14 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   @property()
   hotkey = 'mod+k'
+
+  /**
+   * What the hotkey does, as a list of the page's shortcuts says it, with
+   * `{label}` for the palette's `label`.
+   */
+  @words
+  @property({ attribute: 'hotkey-label' })
+  hotkeyLabel = 'Open {label}'
 
   /**
    * Draws the palette in the page, where it stands, with no dialog: a search
@@ -334,6 +386,13 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   resultsLabel = '{count, plural, one {# command} other {# commands}}'
 
   /**
+   * Draws a dictation button in the search field, which listens through the
+   * page's speech engine and types what it hears, as a field's `voice` does.
+   */
+  @property({ type: Boolean })
+  voice = false
+
+  /**
    * Whether the consumer put anything under the list.
    *
    * Asked of the slot rather than of CSS. A wrapper holding a slot always has a
@@ -411,6 +470,15 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     event.stopPropagation()
     event.preventDefault()
     const { value } = (event as HelixBeforeChangeEvent).detail
+    const control = value.startsWith(CONTROL)
+      ? this.onScreen[Number(value.slice(CONTROL.length))]
+      : undefined
+    if (control) {
+      /* Closed first, so focus is back on the page before the control takes it. */
+      this.requestOpen(false)
+      void this.updateComplete.then(() => runControl(control))
+      return
+    }
     if (!this.dispatchEvent(new HelixSelectEvent({ value }))) {
       return
     }
@@ -574,10 +642,27 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     this.addEventListener('keydown', this.handleBack)
     this.addEventListener('click', this.handleAlternate, { capture: true })
     document.addEventListener('keydown', this.handleHotkey)
+    this.unregister = registerShortcut({
+      keys: () => (this.inline ? '' : this.hotkey),
+      label: () => formatWords(this, 'hotkeyLabel', { label: this.label }),
+      owner: this,
+    })
   }
+
+  /** Takes the hotkey off the page's list of shortcuts. */
+  private unregister: (() => void) | undefined
+
+  /** The controls on screen, read as the palette opens. */
+  @state()
+  private onScreen: ListedControl[] = []
+
+  /** What the reader has typed, since the controls are listed only once they type. */
+  @state()
+  private typed = ''
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
+    this.unregister?.()
     this.removeEventListener('helix-select', this.swallowOptionSelect)
     this.removeEventListener('keydown', this.handleAlternate, { capture: true })
     this.removeEventListener('keydown', this.handleBack)
@@ -630,7 +715,14 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    * After the list has filtered on what was typed. The event comes before the
    * filter is applied, so the list's update is waited for a turn later.
    */
-  private readonly handleFilter = (): void => {
+  private readonly handleFilter = (event: Event): void => {
+    const typed = (event as HelixFilterEvent).detail?.value ?? ''
+    /* Read as typing starts, which is when they are first shown, so a palette
+       drawn `inline`, which never opens, reads them too. */
+    if (this.typed.trim() === '' && typed.trim() !== '') {
+      this.readControls()
+    }
+    this.typed = typed
     void Promise.resolve()
       .then(() => this.listbox?.updateComplete)
       .then(() => this.markStatus())
@@ -653,6 +745,11 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
       return
     }
     if (this.open) {
+      this.onScreen = this.controls
+        ? listControls().filter(
+            (control) => control.element !== this && !this.contains(control.element),
+          )
+        : []
       /* Each opening starts with no command highlighted, as React Aria's
          Autocomplete does, so Enter runs nothing until a reader types or moves.
          The highlight a reader left on closing stayed, and a filter emptied on
@@ -702,6 +799,49 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     </${this.tag('dialog')}>`
   }
 
+  /** Reads the controls a reader can reach now, leaving out the palette and anything in it. */
+  private readControls(): void {
+    this.onScreen = this.controls
+      ? listControls().filter(
+          (control) => control.element !== this && !this.contains(control.element),
+        )
+      : []
+  }
+
+  /**
+   * The controls on screen as a group of options, once the reader types, on
+   * the first page and only where the commands are children.
+   */
+  protected renderControls(): TemplateResult | typeof nothing {
+    if (
+      !this.controls ||
+      this.typed.trim() === '' ||
+      this.page !== '' ||
+      this.items !== undefined
+    ) {
+      return nothing
+    }
+    const apple = onApple()
+    const group = this.tag('option-group')
+    const option = this.tag('option')
+    return html`<${group}
+      part="controls"
+      exportparts="items: controls-items, label: controls-label"
+      label=${this.controlsLabel}
+    >${this.onScreen.map((control, index) => {
+      const [keys] = control.keys
+      const names = keys ? keyNames(chordParts(keys), apple) : undefined
+      return html`<${option}
+        part="control"
+        exportparts="description: control-description, item: control-item, item-active: control-item-active,
+          item-selected: control-item-selected, label: control-label, text: control-text"
+        value=${`${CONTROL}${index}`}
+        text-value=${control.name}
+        description=${control.group || nothing}
+      >${control.name}${names ? html`<span slot="end" aria-hidden="true">${names.keys.join(names.separator)}</span>` : nothing}</${option}>`
+    })}</${group}>`
+  }
+
   /**
    * The filterable list of commands, which the dialog holds, or the page with
    * `inline`, behind a seam the styled tier can move.
@@ -712,7 +852,8 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         exportparts="empty: listbox-empty, error: listbox-error, feedback: listbox-feedback,
           filter-icon: listbox-filter-icon, filter-mark: listbox-filter-mark, hint: listbox-hint,
           items: listbox-items, label: listbox-label, live: listbox-live, loading: listbox-loading,
-          search: listbox-search, search-field: listbox-search-field"
+          search: listbox-search, search-field: listbox-search-field,
+        voice: listbox-voice, voice-listening: listbox-voice-listening, voice-status: listbox-voice-status"
         aria-label=${this.listName}
         empty-text=${this.emptyText}
         filter-delay=${this.filterDelay}
@@ -727,6 +868,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         .items=${this.items}
         .fieldHomeEnd=${this.homeEnd === 'list'}
         layout=${this.layout ?? nothing}
+        ?voice=${this.voice}
         filterable
         @helix-before-change=${this.handleChange}
         @helix-filter=${this.handleFilter}
@@ -734,6 +876,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         @input=${this.stopInner}
       >
         ${this.page === '' ? html`<slot></slot>` : html`<slot name=${`page:${this.page}`}></slot>`}
+        ${this.renderControls()}
         <!-- Handed on with the text as the fallback, for the reason Combobox
              gives: the list's own fallback never shows behind a passed slot. -->
         <slot name="empty" slot="empty">${this.emptyText}</slot>

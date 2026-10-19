@@ -2,6 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessAreaChart } from '@fusion.dev/helix-headless/area-chart'
 import type { CSSResultGroup } from 'lit'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
+import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as statusStyles } from '../../shared/chart/status.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './area-chart-root.css.js'
@@ -54,7 +55,13 @@ export class HelixAreaChart extends HelixHeadlessAreaChart {
    */
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [seriesStyles, statusStyles, tooltipStyles, styles]
+  static override styles: CSSResultGroup = [
+    seriesStyles,
+    statusStyles,
+    tooltipStyles,
+    styles,
+    sonifyStyles,
+  ]
 }
 
 declare global {

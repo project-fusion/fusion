@@ -1,0 +1,64 @@
+/* **The Listen button, on a row of its own under the drawing.** Across every
+   column the chart lays out, so it never lands in an axis's narrow track, and
+   at the start of the row, where the eye leaves the drawing. */
+[part="sonify"] {
+  all: unset;
+  align-items: center;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+  font-weight: var(--helix-weight-medium);
+  gap: var(--helix-space-2xs);
+  grid-column: 1 / -1;
+  justify-self: start;
+  min-block-size: var(--helix-size-icon-loose);
+  padding-inline: var(--helix-space-2xs);
+}
+
+[part="sonify"] svg {
+  block-size: var(--helix-size-icon-tight);
+  inline-size: var(--helix-size-icon-tight);
+}
+
+[part="sonify"]:hover {
+  background-color: color-mix(in oklab, var(--helix-color-foreground) 8%, transparent);
+  color: var(--helix-color-foreground);
+}
+
+[part="sonify"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+/* Playing: the mark takes the accent, as a pressed toggle does. */
+[part="sonify"][aria-pressed="true"] {
+  color: var(--helix-color-accent);
+}
+
+/* **`summary="visible"` draws the summary a screen reader hears**, as one line
+   under the drawing, in the muted ink a caption takes. Composed after each
+   chart's own sheet, which keeps it for screen readers alone. */
+:host([summary="visible"]) [part="summary"] {
+  block-size: auto;
+  clip-path: none;
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-sm);
+  grid-column: 1 / -1;
+  inline-size: auto;
+  line-height: var(--helix-leading-normal);
+  overflow: visible;
+  position: static;
+  white-space: normal;
+}
+
+/* Hides: a printed chart cannot play, and its summary prints where shown. */
+@media print {
+  [part="sonify"] {
+    display: none;
+  }
+}

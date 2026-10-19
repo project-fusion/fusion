@@ -14,6 +14,7 @@ import {
   HelixFilterEvent,
   HelixFormElement,
   handedLocale,
+  ListedController,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -173,6 +174,9 @@ const isInsertion = (event: Event): boolean =>
  * @csspart listbox-loading - Shown while the options are loading.
  * @csspart listbox-search - The region holding the field that narrows the list.
  * @csspart listbox-search-field - The filter field inside that region.
+ * @csspart listbox-voice - The dictation button in the filter field.
+ * @csspart listbox-voice-listening - The dictation button while it listens.
+ * @csspart listbox-voice-status - What a screen reader hears as dictation starts and stops.
  * @csspart live - The region VoiceOver hears the highlight, the count and a choice from on Apple devices, drawn once there is one to say. Visually hidden in the styled tier.
  * @csspart rest - The count of choices held beyond `max-tags`. A `<button>` with `expandable`, a `<span>` without it.
  * @csspart surface - The floating panel.
@@ -196,6 +200,13 @@ const isInsertion = (event: Event): boolean =>
 export class HelixHeadlessCombobox extends MixinControllerOpen(
   MixinTokens(MixinControllerValue(MixinField(HelixFormElement))),
 ) {
+  /** On the page's list of controls, where a command palette and a shortcut overlay find it. */
+  protected readonly listed = new ListedController(
+    this,
+    'focus',
+    () => this.internals?.ariaKeyShortcuts,
+  )
+
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-combobox': { emptyText: 'Keine Treffer' } })`.
@@ -1538,7 +1549,8 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       exportparts="empty: listbox-empty, error: listbox-error, feedback: listbox-feedback,
         filter-icon: listbox-filter-icon, filter-mark: listbox-filter-mark, hint: listbox-hint,
         items: listbox-items, label: listbox-label, live: listbox-live, loading: listbox-loading,
-        search: listbox-search, search-field: listbox-search-field"
+        search: listbox-search, search-field: listbox-search-field,
+        voice: listbox-voice, voice-listening: listbox-voice-listening, voice-status: listbox-voice-status"
       aria-label=${this.listLabel}
       empty-text=${this.emptyText}
       load-error=${this.loadError}

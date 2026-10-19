@@ -123,6 +123,7 @@ const TURNS: Record<string, { across: number; up: number }> = {
  * @csspart point - One point of the chart's own drawing.
  * @csspart point-active - The point the pointer or the keys rest on, in the chart's own drawing. Set alongside `point`.
  * @csspart ring - The ring around the point the pointer or the keys rest on, drawn over every point.
+ * @csspart sonify - The button that plays the chart as sound, under `sonify`.
  * @csspart summary - The three measures and the number of points, written as a sentence for screen readers, which describes the plot. Hide it visually.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
  * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
@@ -418,7 +419,7 @@ export class HelixHeadlessSpatialScatterChart extends MixinChartStatus(
         ${this.renderLive(points, at)}
         ${this.renderTooltip(points[at]?.row)}
       </div>
-      ${readable ? this.renderSummary(field) : this.renderStatus()}${this.renderTable()}`
+      ${readable ? this.renderSummary(field) : this.renderStatus()}${this.renderSonify()}${this.renderTable()}`
   }
 
   /**

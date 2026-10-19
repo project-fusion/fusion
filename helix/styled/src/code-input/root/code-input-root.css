@@ -1,0 +1,97 @@
+/* The frame is Textarea's, so a form holding both reads as one set: the box
+   is the field, and the focus ring is drawn once around the code. The stack,
+   the hover edge, the focus ring and the invalid state are
+   `shared/field/field-frame`'s. */
+[part="field"] {
+  background-color: var(--code-input-background-color, var(--helix-color-well));
+  border: var(--helix-border-thin) solid var(--code-input-border-color, var(--helix-color-border));
+  border-radius: var(--code-input-radius, var(--helix-radii-sm));
+  display: flex;
+  gap: var(--helix-space-2xs);
+  padding: var(--code-input-padding, var(--helix-space-xs));
+  transition:
+    border-color var(--helix-duration-fast) var(--helix-easing-standard),
+    background-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+/* The box that scrolls fills the field, and shrinks under a narrow host, so a
+   long line scrolls inside the frame and never widens the form. */
+[part="scroller"] {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  scrollbar-width: thin;
+}
+
+/* The code face, at the size Code Block draws code, and never under the size
+   at which iOS Safari zooms into a focused field. Both layers take their
+   metrics from here, so the caret stays between the letters it is drawn
+   between. */
+[part="layers"] {
+  color: var(--helix-color-foreground);
+  font-family: var(--helix-font-mono);
+  font-size: var(--code-input-font-size, max(var(--helix-text-field-min), var(--helix-text-sm)));
+  font-variant-ligatures: none;
+  line-height: var(--helix-leading-normal);
+  tab-size: 2;
+}
+
+[part="control"] {
+  caret-color: var(--helix-color-foreground);
+}
+
+/* Whatever is at either end keeps its size and sits at the first line, as in
+   Textarea. */
+slot[name="start"]::slotted(*),
+slot[name="end"]::slotted(*) {
+  align-self: flex-start;
+  color: var(--helix-color-foreground-muted);
+  flex: 0 0 auto;
+}
+
+/* The clear and dictation buttons, dressed as Textarea dresses its own. */
+[part="clear"],
+[part~="voice"] {
+  --icon-size: var(--helix-size-icon-tight);
+  all: unset;
+
+  align-items: center;
+  align-self: flex-start;
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground-muted);
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  min-block-size: var(--helix-size-icon-loose);
+  min-inline-size: var(--helix-size-icon-loose);
+  transition: color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+[part="clear"]:hover,
+[part~="voice"]:hover {
+  color: var(--helix-color-foreground);
+}
+
+[part="clear"]:focus-visible,
+[part~="voice"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+:host(:disabled) [part="field"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Flush with its ground, as a read-only Textarea is. */
+:host([readonly]) [part="field"] {
+  background-color: transparent;
+}
+
+/* Prints the code in its colors, in the field's fill, as the reader saw it. */
+@media print {
+  :host {
+    print-color-adjust: exact;
+  }
+}

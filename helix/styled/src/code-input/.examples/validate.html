@@ -1,0 +1,21 @@
+<!-- @summary A field that checks its JSON with `validate` and says what is wrong. -->
+<helix-code-input
+  id="settings-json"
+  label="Settings"
+  language="json"
+  required
+  value='{ "theme": "dark", "density": "compact", }'
+></helix-code-input>
+
+<script type="module">
+  const field = document.getElementById('settings-json')
+
+  field.validate = (value) => {
+    try {
+      JSON.parse(value)
+      return true
+    } catch {
+      return 'Settings must be valid JSON. Check for a comma after the last entry.'
+    }
+  }
+</script>

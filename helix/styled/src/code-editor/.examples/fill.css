@@ -1,0 +1,6 @@
+/* A pane of a fixed height, as one side of a split view is, holding the
+   editor that `fill` stretches over it. */
+.pane {
+  block-size: 18rem;
+  position: relative;
+}

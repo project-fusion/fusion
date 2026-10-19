@@ -1,0 +1,24 @@
+<!-- @summary A Markdown document with a list, a code block, an alert, and a table. -->
+<!-- @min 360 -->
+<helix-markdown
+  data-prose
+  text="## Roll back the migration
+
+Run the down step, then check that the table is gone:
+
+1. Stop the workers.
+2. Run `bun run migrate:down`.
+3. Start the workers again.
+
+```sh
+bun run migrate:down --to 0041
+```
+
+&gt; [!WARNING]
+&gt; Back up the database before you start.
+
+| Step | What happens |
+| :-- | :-- |
+| Down | The `plans` table is dropped |
+| Check | The schema matches release 0041 |"
+></helix-markdown>

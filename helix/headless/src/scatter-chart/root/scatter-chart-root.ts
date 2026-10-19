@@ -201,6 +201,7 @@ const nice = ([low, high]: [number, number]): [number, number] => {
  * @csspart point-active - The point of the row the reading rests on, one for each series with a point in that row, drawn over the others as an element of its own and placed by `--chart-point-x` and `--chart-point-y`. Under `size-by`, it carries its size as `--chart-point-weight`.
  * @csspart point-ring - The points of a `point` path again, under it, to stroke a little wider in the page's color, so each point keeps its edge where it overlaps another.
  * @csspart points - The points of one series that do not overlap one another, as a group of their `point-ring` and `point` paths. Its opacity is each point's, so where points overlap they darken. Carries its series color as `--chart-series`.
+ * @csspart sonify - The button that plays the chart as sound, under `sonify`.
  * @csspart summary - The text that says how strongly the measures relate, for people who cannot see the points.
  * @csspart svg - The drawing surface the gridlines and the trend lines sit on.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
@@ -643,7 +644,7 @@ export class HelixHeadlessScatterChart extends MixinChartStatus(MixinChartSource
         <span aria-hidden="true" dir="auto" part="x-name">${field.xName}</span>
         <span aria-hidden="true" dir="auto" part="y-name">${field.yNames.join(', ')}</span>
       </div>
-      ${this.renderSummary(field)}${this.renderTable()}`
+      ${this.renderSummary(field)}${this.renderSonify()}${this.renderTable()}`
   }
 
   /** The rules and the points, behind a seam the styled tier can move. */

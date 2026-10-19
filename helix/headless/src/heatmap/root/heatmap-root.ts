@@ -150,6 +150,7 @@ import { fits, monthPage, overviewOf, type Reading, toneOf } from './buckets.js'
  * @csspart plot - The same element as `strip`, under the name every chart gives the drawing that takes focus.
  * @csspart row - A column of cells, which a grid reads as a row, under `selection-mode`. It draws no box.
  * @csspart selection - A polite region that says how many cells are selected after a change, rendered from the first change. Hide it visually.
+ * @csspart sonify - The button that plays the chart as sound, under `sonify`.
  * @csspart start - The leading slot's box.
  * @csspart strip - The grid of cells, which takes focus to be read by key. It is named by the host's `aria-labelledby` or `aria-label`, then by `label`, then by the caption of the table.
  * @csspart summary - The middle slot's box.
@@ -865,7 +866,7 @@ export class HelixHeadlessHeatmap extends MixinChartStatus(MixinChartSource(Heli
         this.status.spoken
           ? html`<span part="selection" role="status">${this.status.said}</span>`
           : nothing
-      }${this.renderTable()}`
+      }${this.renderSonify()}${this.renderTable()}`
   }
 
   /**

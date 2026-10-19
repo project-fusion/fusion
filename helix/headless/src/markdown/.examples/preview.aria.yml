@@ -1,0 +1,8 @@
+- heading "Roll back the migration" [level=2]
+- list:
+  - listitem: Stop the workers.
+  - listitem:
+    - text: Run
+    - code: bun run migrate:down
+    - text: .
+  - listitem: Start the workers again.

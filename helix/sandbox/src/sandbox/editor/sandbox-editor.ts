@@ -2,6 +2,7 @@ import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirro
 import { css } from '@codemirror/lang-css'
 import { html as htmlLanguage } from '@codemirror/lang-html'
 import { javascript } from '@codemirror/lang-javascript'
+import { json } from '@codemirror/lang-json'
 import { indentUnit, StreamLanguage, syntaxHighlighting } from '@codemirror/language'
 import { Annotation, Compartment, EditorState, type Extension } from '@codemirror/state'
 import { EditorView, keymap, lineNumbers } from '@codemirror/view'
@@ -33,7 +34,7 @@ import { styles } from './sandbox-editor.css.js'
  * sources without a type system, the `axes` rule included.
  *
  * The names are the panes': `js`, `jsx`, `mjs`, `ts` and `tsx` beside `css`,
- * `html` and `sh`, and `javascript`. The editor reads every name `languageOf`
+ * `html`, `json` and `sh`, and `javascript`. The editor reads every name `languageOf`
  * from `@fusion.dev/helix-sandbox/highlight` reads, such as `TypeScript` or
  * `bash`, and `jsx` as `tsx`.
  */
@@ -42,6 +43,7 @@ export type EditorLanguage =
   | 'html'
   | 'javascript'
   | 'js'
+  | 'json'
   | 'jsx'
   | 'mjs'
   | 'sh'
@@ -61,6 +63,7 @@ const LANGUAGES = {
   css: () => css(),
   html: () => htmlLanguage(),
   js: () => javascript(),
+  json: () => json(),
   sh: () => shellLanguage,
   ts: () => javascript({ typescript: true }),
   tsx: () => javascript({ jsx: true, typescript: true }),

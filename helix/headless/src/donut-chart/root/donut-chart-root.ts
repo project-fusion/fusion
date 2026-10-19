@@ -159,6 +159,7 @@ export interface DonutShare {
  * @csspart segment-active - The slice under the pointer. Set alongside `segment`.
  * @csspart segment-edge - One slice as a closed shape, used to draw its outline.
  * @csspart slice-label - One slice's share, written on the slice under `slice-labels`. Placed with `left` and `top`, or `inset-inline-start` and `top` on a half ring, and carries its series color as `--chart-series`.
+ * @csspart sonify - The button that plays the chart as sound, under `sonify`.
  * @csspart summary - The chart's name and each slice's share, written as a sentence for screen readers. Hide it visually.
  * @csspart table - The readings as a table, for a screen reader, rendered only where they were drawn from `data`, a page of them at a time past a few hundred. Hide it visually.
  * @csspart table-pages - Which readings a page of the `table` holds, and the buttons that show the previous and the next page, rendered only while it holds a page. Hide it visually.
@@ -387,7 +388,7 @@ export class HelixHeadlessDonutChart extends MixinChartStatus(MixinChartSource(H
     /* No middle where there is no hole. A `center` part over a pie would put
        slotted content on top of the slices, and a slot nobody can see is worse
        than one that is not there: a consumer fills it and nothing happens. */
-    return html`${this.renderPlot(shares)}${shares.length === 0 ? nothing : this.renderSummary(shares)}${this.renderTable()}`
+    return html`${this.renderPlot(shares)}${shares.length === 0 ? nothing : this.renderSummary(shares)}${this.renderSonify()}${this.renderTable()}`
   }
 
   /**

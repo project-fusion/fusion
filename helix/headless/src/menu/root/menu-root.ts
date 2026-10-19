@@ -6,6 +6,7 @@ import {
   DrilldownController,
   deepActiveElement,
   deepContains,
+  elementById,
   focusTarget,
   HelixElement,
   inlineStep,
@@ -130,6 +131,15 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * menu does. A press on the area does not open it, and closing it returns focus
  * to where it was. A touch or a pen held still on the area opens it too, on
  * every browser, since iOS sends no `contextmenu` for one.
+ *
+ * **One menu for many things.** `for` names an area outside the menu, such as
+ * a table, and `targets` says which things in it the menu is about, such as
+ * `tr`. A request over one of them opens the menu with it as
+ * `contextTarget`, which a `helix-before-open` listener reads to change the
+ * rows for it; a request over none of them is left to the page. `showAt()`
+ * opens the menu at a point, for an area that finds what was pressed itself,
+ * such as a canvas. Shift with a right-click leaves the browser's own menu to
+ * the reader.
  *
  * **A trigger with its own action.** With `open-on="long-press"`, a press on
  * the trigger is the trigger's own, and a press held for half a second opens
@@ -279,6 +289,16 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    */
   @property({ attribute: false })
   filterMatch?: ((text: string, filter: string) => boolean) | undefined
+
+  /**
+   * With `context`, the id of an area outside the menu whose context menu
+   * this is, for one menu that serves a region the page draws elsewhere, such
+   * as a table. A right-click, a long press, Shift+F10 or the menu key there
+   * opens it, as on the `trigger` slot's area. Names an element in the same
+   * tree, the way `Tooltip.for` does.
+   */
+  @property()
+  for = ''
 
   /**
    * Accessible name for the surface.
@@ -431,6 +451,14 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   submenus: 'drill' | 'flyout' = 'drill'
 
   /**
+   * With `context`, a selector for the things in the area a menu is about,
+   * such as `tr` for a table's rows. A request over one opens the menu with it
+   * as `contextTarget`, and a request over none of them is left to the page.
+   */
+  @property()
+  targets = ''
+
+  /**
    * Which page is showing, and what is on it.
    *
    * A controller rather than fields here, because none of this is about menus:
@@ -501,9 +529,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
 
   private readonly panel = new PopoverController(this, {
     anchor: () =>
-      this.context && this.point
-        ? this.renderRoot?.querySelector<HTMLElement>('#point')
-        : this.trigger,
+      this.point ? this.renderRoot?.querySelector<HTMLElement>('#point') : this.trigger,
     // The host is `display: contents`, so it has no box a press can land in.
     // What counts as inside is the surface, plus the trigger, whose own click
     // handler decides what a press there means.
@@ -723,10 +749,52 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        that component's host, which this element does not contain, so focus was
        dropped to the page on Escape. */
     if (deepContains(this, deepActiveElement())) {
-      ;(this.context ? (this.returnTo ?? this.trigger) : this.trigger).focus()
+      ;(this.returnTo ?? this.trigger).focus()
     }
     this.point = undefined
     this.returnTo = undefined
+  }
+
+  /**
+   * The thing the open context menu is about: the element of `targets` the
+   * reader asked over, the area where there are no `targets`, or what
+   * `showAt` was given. Set before `helix-before-open`, so a listener can
+   * change the rows for it, and kept until the menu next opens.
+   */
+  contextTarget: Element | undefined = undefined
+
+  /**
+   * Opens the menu at a point in the viewport, as a context menu opens, for
+   * an area that finds what was pressed itself, such as a canvas or a map.
+   * `target` becomes `contextTarget`. An open menu moves there.
+   */
+  showAt(point: { x: number; y: number }, target?: Element): void {
+    this.contextTarget = target
+    this.openContextAt(point)
+  }
+
+  /** The areas a context menu answers in: the `trigger` slot's, and the one `for` names. */
+  private get contextAreas(): Element[] {
+    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
+    const named = this.isConnected && this.for !== '' ? elementById(this, this.for) : null
+    return [...(slot?.assignedElements({ flatten: true }) ?? []), ...(named ? [named] : [])]
+  }
+
+  /**
+   * The element of `targets` a request came from, the area where there are
+   * no `targets`, or nothing where a request over the area missed every one.
+   */
+  private targetOf(event: Event): Element | undefined {
+    const path = event.composedPath().filter((node): node is Element => node instanceof Element)
+    const areas = this.contextAreas
+    const area = path.find((node) => areas.includes(node))
+    if (!area) {
+      return undefined
+    }
+    if (this.targets === '') {
+      return area
+    }
+    return path.slice(0, path.indexOf(area) + 1).find((node) => node.matches(this.targets))
   }
 
   /**
@@ -737,9 +805,14 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     if (!this.context) {
       return
     }
-    const slot = this.renderRoot?.querySelector<HTMLSlotElement>('slot[name="trigger"]')
-    const areas = slot?.assignedElements({ flatten: true }) ?? []
-    if (!event.composedPath().some((node) => areas.includes(node as Element))) {
+    const keyed = event.clientX === 0 && event.clientY === 0
+    /* Shift with a right-click leaves the browser's own menu to the reader,
+       as in Google Docs and Figma, for a spelling fix or Inspect. */
+    if (event.shiftKey && !keyed) {
+      return
+    }
+    const target = this.targetOf(event)
+    if (!target) {
       return
     }
     event.preventDefault()
@@ -748,8 +821,8 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     if (this.open && this.longPress.takeClick()) {
       return
     }
-    const box = this.trigger.getBoundingClientRect()
-    const keyed = event.clientX === 0 && event.clientY === 0
+    this.contextTarget = target
+    const box = target.getBoundingClientRect()
     this.openContextAt(keyed ? { x: box.left, y: box.top } : { x: event.clientX, y: event.clientY })
   }
 
@@ -975,9 +1048,12 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   private handleClosedKeydown(event: KeyboardEvent): void {
     /* Shift+F10 on a context menu's area, bound here as well as left to the
        browser's `contextmenu`, which not every platform sends for it. */
-    if (this.context && event.shiftKey && event.key === 'F10' && this.fromTrigger(event)) {
+    const asked =
+      this.context && event.shiftKey && event.key === 'F10' ? this.targetOf(event) : undefined
+    if (asked) {
       event.preventDefault()
-      const box = this.trigger.getBoundingClientRect()
+      this.contextTarget = asked
+      const box = asked.getBoundingClientRect()
       this.openContextAt({ x: box.left, y: box.top })
       return
     }
@@ -1016,10 +1092,14 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
    * `open-on="long-press"`, or a touch or a pen held on a context menu's area.
    */
   private readonly handlePointerDown = (event: PointerEvent): void => {
-    if (this.open || !this.fromTrigger(event)) {
+    if (this.open) {
       return
     }
-    if (this.pressHeld || (this.context && event.pointerType !== 'mouse')) {
+    const held = this.context && event.pointerType !== 'mouse' ? this.targetOf(event) : undefined
+    if (held) {
+      this.contextTarget = held
+    }
+    if ((this.pressHeld && this.fromTrigger(event)) || held) {
       this.heldAt = { x: event.clientX, y: event.clientY }
       this.longPress.down(event)
     }
@@ -1206,6 +1286,9 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        menu is closed. Not in the first render: a framework that rendered the
        trigger on a server may still be hydrating it then. */
     void this.whenSettled.then(() => {
+      /* The area `for` names, once the page has drawn it, and again on a
+         menu moved and connected anew. */
+      this.watchArea()
       this.settledOnce = true
       if (!this.context) {
         this.tellTrigger()
@@ -1228,6 +1311,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.removeEventListener('pointercancel', this.handlePointerCancel)
     this.removeEventListener('click', this.handleHeldClick, true)
     this.removeEventListener('focusin', this.handleTriggerFocusIn)
+    this.unwatchArea()
     this.rowWatch?.disconnect()
     this.rowWatch = undefined
     if (this.described) {
@@ -1236,8 +1320,55 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     }
   }
 
+  /** The area `for` named, which carries this menu's listeners while it is the context area. */
+  private watched: Element | undefined
+
+  /** The keys an area outside the menu passes on: only Shift+F10 and the menu key, while it is closed. */
+  private readonly handleAreaKeydown = (event: Event): void => {
+    if (!this.open) {
+      this.handleClosedKeydown(event as KeyboardEvent)
+    }
+  }
+
+  /** Moves the menu's listeners onto the area `for` names, and off the one it named before. */
+  private watchArea(): void {
+    const area =
+      this.context && this.isConnected && this.for !== '' ? elementById(this, this.for) : null
+    if (area === this.watched) {
+      return
+    }
+    this.unwatchArea()
+    if (!area) {
+      return
+    }
+    area.addEventListener('contextmenu', this.handleContextMenu as EventListener)
+    area.addEventListener('pointerdown', this.handlePointerDown as EventListener)
+    area.addEventListener('pointermove', this.handlePointerMove as EventListener)
+    area.addEventListener('pointerup', this.handlePointerUp)
+    area.addEventListener('pointercancel', this.handlePointerCancel)
+    area.addEventListener('keydown', this.handleAreaKeydown)
+    this.watched = area
+  }
+
+  private unwatchArea(): void {
+    const area = this.watched
+    if (!area) {
+      return
+    }
+    area.removeEventListener('contextmenu', this.handleContextMenu as EventListener)
+    area.removeEventListener('pointerdown', this.handlePointerDown as EventListener)
+    area.removeEventListener('pointermove', this.handlePointerMove as EventListener)
+    area.removeEventListener('pointerup', this.handlePointerUp)
+    area.removeEventListener('pointercancel', this.handlePointerCancel)
+    area.removeEventListener('keydown', this.handleAreaKeydown)
+    this.watched = undefined
+  }
+
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
+    if (changed.has('for') || changed.has('context')) {
+      this.watchArea()
+    }
     /* What is checked as the menu opens, so the first choice after it is
        compared with the rows as the reader found them. */
     if (changed.has('open') && this.open) {
@@ -1429,7 +1560,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   protected override render(): TemplateResult {
     /* The point a context menu opens against: a box of no size where the
        reader asked, fixed to the viewport. Drawn only while there is one. */
-    const point = this.context && this.point
+    const point = this.point
     const filters = this.filters
     /* What a filter that keeps no rows shows, which also sets what the live
        region says. */

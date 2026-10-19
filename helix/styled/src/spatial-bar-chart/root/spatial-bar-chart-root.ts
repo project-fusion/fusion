@@ -3,6 +3,7 @@ import { HelixHeadlessSpatialBarChart } from '@fusion.dev/helix-headless/spatial
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as seriesStyles } from '../../shared/chart/series.css.js'
+import { styles as sonifyStyles } from '../../shared/chart/sonify.css.js'
 import { styles as tooltipStyles } from '../../shared/chart/tooltip.css.js'
 import { styles } from './spatial-bar-chart-root.css.js'
 import '../../tooltip/index.js'
@@ -28,7 +29,7 @@ import '../../tooltip/index.js'
 export class HelixSpatialBarChart extends HelixHeadlessSpatialBarChart {
   static override tier = 'helix-'
 
-  static override styles: CSSResultGroup = [seriesStyles, tooltipStyles, styles]
+  static override styles: CSSResultGroup = [seriesStyles, tooltipStyles, styles, sonifyStyles]
 
   /**
    * How strongly the bars are drawn, as on every chart.

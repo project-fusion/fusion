@@ -79,6 +79,39 @@ export const SCROLLER_RULE = '[data-scroller]{overflow:auto}'
 export const VIRTUAL_RULE = '[data-virtual]{overflow-anchor:none}'
 
 /**
+ * Two layers drawn in one place, one exactly over the other, which a
+ * component marks `data-layers`: Code Input draws its highlighted text under a
+ * `<textarea>` whose own text is transparent, so the reader types in the
+ * platform's field and sees the colors.
+ *
+ * **Every layer takes the same box and the same text metrics**, or the caret
+ * drifts off the letters it sits between: one grid cell, no margin, border or
+ * padding of a layer's own, and the font, spacing and tab stops of the box
+ * around them. Lines keep their length, or wrap the way a soft-wrapped
+ * `<textarea>` does where the box is marked `data-wrap`. The box grows with
+ * the layer under the text, and the field fills it and never scrolls by
+ * itself: whatever holds the box scrolls both.
+ *
+ * **Named by the layer under the text, `aria-hidden`, and the `<textarea>`**,
+ * which outranks the `[part]` rule a field's sheet resets its control with:
+ * its `all: unset` took the textarea out of the cell and gave it the field's
+ * face, a row below the text and in another font.
+ *
+ * The placeholder keeps its own color, which a transparent fill would take.
+ * The caret takes the page's text color here, at no specificity, so a sheet
+ * names its own. Everything else is the mechanism, and a sheet that unsets
+ * the field's styles does not undo it.
+ */
+export const LAYERS_RULE =
+  '[data-layers]{display:grid}' +
+  '[data-layers]>[aria-hidden],[data-layers]>textarea{grid-area:1/1;box-sizing:border-box;margin:0;border:0;padding:0;min-inline-size:0;font:inherit;letter-spacing:inherit;line-height:inherit;tab-size:inherit;white-space:pre;overflow-wrap:normal}' +
+  '[data-layers][data-wrap]>[aria-hidden],[data-layers][data-wrap]>textarea{white-space:pre-wrap;overflow-wrap:break-word}' +
+  '[data-layers]>[aria-hidden]{pointer-events:none;user-select:none}' +
+  '[data-layers]>textarea{inline-size:100%;block-size:100%;overflow:hidden;resize:none;background:none;color:transparent;-webkit-text-fill-color:transparent}' +
+  '[data-layers]>textarea::placeholder{-webkit-text-fill-color:currentColor}' +
+  ':where([data-layers])>textarea{caret-color:CanvasText}'
+
+/**
  * Words a screen reader reads where the eye reads something else, which a
  * component marks `data-spoken`: `⇧⌘P` in Kbd is read as `Shift Command P`.
  *

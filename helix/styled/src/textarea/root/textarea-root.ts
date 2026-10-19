@@ -1,6 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessTextarea } from '@fusion.dev/helix-headless/textarea'
 import type { CSSResultGroup } from 'lit'
+import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
@@ -20,6 +21,7 @@ import { styles } from './textarea-root.css.js'
  * @aliases Multiline, TextArea
  * @documentation https://fusion.dev/helix/components/textarea
  *
+ * @cssproperty --dictation-level - How loud the microphone is while the field listens for dictation, from 0 to 1, which the element sets; the ring around the dictation button grows with it.
  * @cssproperty --textarea-background-color - Fill behind the text.
  * @cssproperty --textarea-border-color - Edge of the field at rest. Hover, focus and an error still draw their own.
  * @cssproperty --textarea-padding - Space between the edge of the field and the text.
@@ -35,6 +37,7 @@ export class HelixTextarea extends HelixHeadlessTextarea {
     fieldFrameStyles,
     fieldStackedStyles,
     styles,
+    dictationStyles,
   ]
 }
 
