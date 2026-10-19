@@ -121,6 +121,16 @@
       - text: Code Block
       - link "Code Block documentation":
         - /url: /helix/components/code-block
+    - treeitem "Code Editor Code Editor documentation Experimental" [level=1]:
+      - text: Code Editor
+      - link "Code Editor documentation":
+        - /url: /helix/components/code-editor
+      - img "Experimental"
+    - treeitem "Code Input Code Input documentation Experimental" [level=1]:
+      - text: Code Input
+      - link "Code Input documentation":
+        - /url: /helix/components/code-input
+      - img "Experimental"
     - treeitem "Color Input Color Input documentation" [level=1]:
       - text: Color Input
       - link "Color Input documentation":
@@ -267,6 +277,11 @@
       - text: Map
       - link "Map documentation":
         - /url: /helix/components/map
+    - treeitem "Markdown Markdown documentation Experimental" [level=1]:
+      - text: Markdown
+      - link "Markdown documentation":
+        - /url: /helix/components/markdown
+      - img "Experimental"
     - treeitem "Megamenu Megamenu documentation" [level=1]:
       - text: Megamenu
       - link "Megamenu documentation":
@@ -360,6 +375,11 @@
       - text: Select
       - link "Select documentation":
         - /url: /helix/components/select
+    - treeitem "Shortcut Overlay Shortcut Overlay documentation Experimental" [level=1]:
+      - text: Shortcut Overlay
+      - link "Shortcut Overlay documentation":
+        - /url: /helix/components/shortcut-overlay
+      - img "Experimental"
     - treeitem "Skeleton Skeleton documentation" [level=1]:
       - text: Skeleton
       - link "Skeleton documentation":
