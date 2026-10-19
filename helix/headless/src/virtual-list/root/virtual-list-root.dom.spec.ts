@@ -67,7 +67,9 @@ const list = async (count: number, extra = ''): Promise<Updatable> => {
 
 /** The cloned rows, which are light DOM and are not the template. */
 const drawn = (host: Updatable): Element[] =>
-  [...host.children].filter((child) => child.tagName !== 'TEMPLATE')
+  [...host.querySelectorAll('[data-index]')].sort(
+    (a, b) => Number((a as HTMLElement).dataset.index) - Number((b as HTMLElement).dataset.index),
+  )
 
 describe('virtual list', () => {
   test('reads its rows from JSON, which is what survives hydration', async () => {
@@ -164,6 +166,20 @@ describe('virtual list', () => {
     expect(drawn(host).map((one) => one.getAttribute('data-index'))).toEqual(
       drawn(host).map((_, at) => String(Number(drawn(host)[0]?.getAttribute('data-index')) + at)),
     )
+  })
+
+  /* A slotted row added or taken out while the box moves ends the touch on
+     iOS, so a row that leaves gives its element to a row that arrives. */
+  test("gives a leaving row's element to a row that arrives", async () => {
+    const host = await list(500)
+    const before = new Set(host.querySelectorAll('[data-index]'))
+    const viewport = part(host, 'viewport') as HTMLElement
+    viewport.scrollTop = 192
+    viewport.dispatchEvent(new Event('scroll'))
+    await settle(host)
+    const after = [...host.querySelectorAll('[data-index]')]
+    expect(after.length).toBeGreaterThan(0)
+    expect(after.every((row) => before.has(row))).toBe(true)
   })
 
   test('keeps the row holding focus drawn when it scrolls out of the window', async () => {
@@ -524,9 +540,10 @@ describe('items drawn by a function', () => {
 
   test('wins over a row template', async () => {
     const host = await fed(named(2))
+    expect(drawn(host).map((row) => row.textContent?.trim())).toEqual(['Row 1', 'Row 2'])
     host.renderItem = () => 'drawn'
     await settle(host)
-    expect(drawn(host).map((row) => row.textContent)).toEqual(['drawn', 'drawn'])
+    expect(drawn(host).map((row) => row.textContent?.trim())).toEqual(['drawn', 'drawn'])
   })
 })
 

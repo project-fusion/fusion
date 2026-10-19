@@ -1012,6 +1012,69 @@ describe('a reader in the middle of a fling', () => {
     controller.hostDisconnected()
   })
 
+  test('holds the rows of a waterfall while the box moves under a finger', async () => {
+    const { box, fire } = touchable(200, 100)
+    const waterfall = new Waterfall()
+    waterfall.lanes = 3
+    globalThis.ResizeObserver = class {
+      disconnect(): void {}
+      observe(): void {}
+    } as unknown as typeof ResizeObserver
+    const controller = new VirtualizeController(host(), {
+      container: () => box,
+      count: () => 300,
+      estimate: () => 20,
+      overscan: 0,
+      rows: () => [],
+      waterfall: () => waterfall,
+    })
+    controller.hostConnected()
+    controller.measure()
+    fire('touchstart')
+    box.scrollTop = 220
+    fire('scroll')
+    const held = [controller.window.first, controller.window.last]
+    for (const top of [250, 280]) {
+      box.scrollTop = top
+      fire('scroll')
+      expect([controller.window.first, controller.window.last]).toEqual(held)
+    }
+    controller.hostDisconnected()
+  })
+
+  test('holds a waterfall whose columns are different heights', async () => {
+    /* Item 0 is tall, the rest short. The next item starts in a short column
+       above the bottom of the tall one, so the hold reads how far the drawn
+       items reach, the furthest of their ends. */
+    const { box, fire } = touchable(0, 100)
+    const waterfall = new Waterfall()
+    waterfall.lanes = 3
+    globalThis.ResizeObserver = class {
+      disconnect(): void {}
+      observe(): void {}
+    } as unknown as typeof ResizeObserver
+    const rows = drawn([400, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20])
+    const controller = new VirtualizeController(host(), {
+      container: () => box,
+      count: () => 300,
+      estimate: () => 20,
+      overscan: 0,
+      rows: () => rows,
+      waterfall: () => waterfall,
+    })
+    controller.hostConnected()
+    controller.measure()
+    controller.hostUpdated()
+    fire('touchstart')
+    box.scrollTop = 10
+    fire('scroll')
+    const held = [controller.window.first, controller.window.last]
+    box.scrollTop = 40
+    fire('scroll')
+    expect([controller.window.first, controller.window.last]).toEqual(held)
+    controller.hostDisconnected()
+  })
+
   test('leaves the reader to a host whose anchor answers false', () => {
     const { box } = touchable(500, 100)
     let rows: ReturnType<typeof drawn> = []

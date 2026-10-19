@@ -91,6 +91,14 @@ export class Waterfall {
     return this.extent
   }
 
+  /**
+   * How far down the set the items from the start through `index` reach: the
+   * furthest of their ends, which is the bottom of the columns they occupy.
+   */
+  reachThrough(index: number): number {
+    return index < 0 ? 0 : (this.reach[index] ?? this.extent)
+  }
+
   /** The first item that reaches past `offset`, or the count where none does. */
   from(offset: number): number {
     return this.search(this.reach, offset)

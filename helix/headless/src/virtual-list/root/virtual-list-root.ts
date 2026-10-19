@@ -521,6 +521,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
   // biome-ignore lint/suspicious/noExplicitAny: whatever renderer `renderItem` held
   private filledBy: VirtualListRenderer<any> | undefined
 
+  /** Whether the drawn rows were cloned from the template or drawn for `renderItem`. */
+  private drawnBy: 'function' | 'template' | undefined
+
   /** The script the rows were read from, which the watcher follows. */
   private source: Element | null = null
 
@@ -1414,12 +1417,16 @@ export class HelixHeadlessVirtualList extends HelixElement {
        holds, so the cell is the row's to a reader and still this list's
        child to a stylesheet. */
     const across = this.across
+    const moving = lined && this.virtualize.scrolling()
     for (const [name, value] of [
       ['aria-colindex', lined ? (at % across) + 1 : undefined],
       ['aria-posinset', lined ? undefined : at + 1],
       ['aria-setsize', lined ? undefined : this.data.length],
-      ['slot', lined ? `${LINE}${Math.floor(at / across)}` : undefined],
+      ['slot', lined && !moving ? `${LINE}${Math.floor(at / across)}` : undefined],
     ] as const) {
+      if (name === 'slot' && moving) {
+        continue
+      }
       if (value === undefined) {
         element.removeAttribute(name)
       } else {
@@ -1493,8 +1500,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
    * **A row that stays in the window keeps its element.** Clearing and
    * cloning every row on every move replaced the node a reader had focused,
    * so a link in a row lost focus to the body on any scroll, even with its row
-   * still on screen. Rows are keyed by item: the ones leaving go, the ones
-   * arriving are drawn in their place, and the ones staying are not moved.
+   * still on screen. Rows are keyed by item: a row that stays keeps its
+   * element, and a row that leaves gives its element to a row that arrives.
+   *
+   * **A slotted row added or taken out while the box is moving ends the
+   * touch on iOS.** Safari reads a change to what a slot holds as a change to
+   * the box. The same nodes, filled with the arriving items, leave the slot
+   * as it was. Extra nodes stay in the tree hidden until the box is still.
    *
    * **The row holding focus is drawn outside the window too**, beside it on the
    * side it belongs, and the spacer on that side gives up its room.
@@ -1545,11 +1557,18 @@ export class HelixHeadlessVirtualList extends HelixElement {
         (child): child is HTMLElement =>
           child !== template &&
           child instanceof HTMLElement &&
+          child.dataset.virtualPool === undefined &&
           (child.dataset.index !== undefined || !child.hasAttribute('slot')) &&
           !child.hasAttribute('data-section'),
       ),
       ...this.querySelectorAll<HTMLElement>(':scope > [data-section] > [data-index]'),
     ]
+    /* Rows cloned from the template are a different tree than rows drawn for
+       `renderItem`. A pass that switches starts them from nothing, because
+       filling one tree with the other appends. */
+    const redraw =
+      regroup ||
+      (this.drawnBy !== undefined && this.drawnBy !== (this.renderItem ? 'function' : 'template'))
     const plan = drawPlan({
       across: this.across,
       count,
@@ -1557,19 +1576,29 @@ export class HelixHeadlessVirtualList extends HelixElement {
       first,
       kept: this.keptIndex(),
       last,
-      /* A row drawn the other way, by the template or by the function, is
-         drawn again from nothing: its markup is not the other's to fill. */
-      redraw: regroup || (this.filledBy === undefined) !== (this.renderItem === undefined),
+      redraw,
     })
     const drawn = new Map<number, Element[]>()
+    const reusable: HTMLElement[][] = [...this.pooled]
+    this.pooled = []
+    const leaving = new Map<number, HTMLElement[]>()
     for (const child of children) {
       const index = Number(child.dataset.index)
       if (plan.remove.has(index)) {
         this.sizes?.unobserve(child)
-        child.remove()
+        leaving.set(index, [...(leaving.get(index) ?? []), child])
         continue
       }
       drawn.set(index, [...(drawn.get(index) ?? []), child])
+    }
+    if (redraw) {
+      for (const group of [...reusable, ...leaving.values()]) {
+        this.dropRows(group)
+      }
+      reusable.length = 0
+      leaving.clear()
+    } else {
+      reusable.push(...leaving.values())
     }
     const refill =
       this.filledFrom !== this.data ||
@@ -1578,6 +1607,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
     this.filledFrom = this.data
     this.filledBy = this.renderItem
     this.headedBy = this.renderSection
+    this.drawnBy = this.renderItem ? 'function' : 'template'
     const groups = this.groups(sections, plan.wanted, regroup, refill)
     /* Rows drawn or filled on this pass, whose controls are new to the tab order. */
     const fresh = new Set<number>()
@@ -1595,14 +1625,65 @@ export class HelixHeadlessVirtualList extends HelixElement {
           this.fill(group, at)
           fresh.add(at)
         }
+        if (!this.waterfall) {
+          for (const element of group) {
+            ;(element as HTMLElement).style.order = String(at)
+          }
+        }
         anchors.set(parent, (group.at(-1) as Element).nextElementSibling)
+        continue
+      }
+      const width = this.renderItem ? 1 : (template?.content.childElementCount ?? 1)
+      const recycledAt = reusable.findIndex((one) => one.length === width)
+      const recycled = recycledAt === -1 ? undefined : reusable.splice(recycledAt, 1)[0]
+      if (recycled) {
+        for (const element of recycled) {
+          element.hidden = false
+          element.removeAttribute('aria-hidden')
+          element.removeAttribute('data-virtual-pool')
+        }
+        this.fill(recycled, at)
+        this.watchSize(recycled)
+        drawn.set(at, recycled)
+        fresh.add(at)
+        if (!this.waterfall) {
+          for (const element of recycled) {
+            element.style.order = String(at)
+          }
+        }
+        if (recycled[0]?.parentElement !== parent || !this.virtualize.scrolling()) {
+          for (const element of recycled) {
+            parent.insertBefore(element, anchors.get(parent) ?? null)
+          }
+        }
+        anchors.set(parent, (recycled.at(-1) as Element).nextElementSibling)
+        continue
+      }
+      /* A new node assigned to the slot ends the touch on iOS. The spacer
+         stands in until the box is still. */
+      if (this.virtualize.scrolling()) {
         continue
       }
       const fragment = this.draw(template, at)
       drawn.set(at, [...fragment.children])
       this.watchSize([...fragment.children])
       fresh.add(at)
+      if (!this.waterfall) {
+        for (const element of fragment.children) {
+          ;(element as HTMLElement).style.order = String(at)
+        }
+      }
       parent.insertBefore(fragment, anchors.get(parent) ?? null)
+    }
+    if (this.virtualize.scrolling()) {
+      for (const group of reusable) {
+        this.parkRows(group)
+        this.pooled.push(group)
+      }
+    } else {
+      for (const group of reusable) {
+        this.dropRows(group)
+      }
     }
     this.active = stopAfter(this.active, plan.wanted, {
       count,
@@ -1613,7 +1694,9 @@ export class HelixHeadlessVirtualList extends HelixElement {
     const chosen = this.chosen
     const off = this.disabled
     const lines = this.lined ? [...new Set(plan.wanted.map((at) => this.lineOf(at)))] : []
-    if (lines.join() !== this.drawnLines.join()) {
+    /* Named line slots stay put while the box moves. A slot added or taken
+       out is a change to what the slot holds, which ends the touch on iOS. */
+    if (lines.join() !== this.drawnLines.join() && !this.virtualize.scrolling()) {
       /* The render draws a `row` for each, and in `willUpdate` it is the
          render about to run. */
       this.drawnLines = lines
@@ -1624,10 +1707,13 @@ export class HelixHeadlessVirtualList extends HelixElement {
     for (const [at, group] of drawn) {
       for (const element of group) {
         this.mark(element, at, chosen, off)
+        const style = (element as HTMLElement).style
+        if (!this.waterfall && !this.virtualize.scrolling()) {
+          style.removeProperty('order')
+        }
         if (this.waterfall) {
           /* At its column and as far down as the columns place it, the
              width of a column, from the inline start of the set. */
-          const style = (element as HTMLElement).style
           style.setProperty('position', 'absolute')
           style.setProperty('inset-block-start', `${this.virtualize.offsetOf(at)}px`)
           style.setProperty(
@@ -1635,6 +1721,11 @@ export class HelixHeadlessVirtualList extends HelixElement {
             `calc((100% + ${gap}px) * ${this.lanes.lane(at)} / ${columns})`,
           )
           style.setProperty('inline-size', `calc((100% - ${gap * (columns - 1)}px) / ${columns})`)
+        } else {
+          style.removeProperty('position')
+          style.removeProperty('inset-block-start')
+          style.removeProperty('inset-inline-start')
+          style.removeProperty('inline-size')
         }
       }
       const stop = at === this.active
@@ -1668,6 +1759,31 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   /** Whether the rows were last placed in a waterfall. */
   private placedWaterfall = false
+
+  /**
+   * Row elements taken out of the window while the box is still moving, so
+   * the slot keeps the same nodes. Filled again when a row arrives.
+   */
+  private pooled: HTMLElement[][] = []
+
+  /** Hides a row group that has left the window, and leaves it in the tree. */
+  private parkRows(group: HTMLElement[]): void {
+    for (const element of group) {
+      element.hidden = true
+      element.setAttribute('aria-hidden', 'true')
+      element.setAttribute('data-virtual-pool', '')
+      element.removeAttribute('data-index')
+      element.style.removeProperty('order')
+    }
+  }
+
+  /** Takes a row group out of the tree. */
+  private dropRows(group: HTMLElement[]): void {
+    for (const element of group) {
+      this.sizes?.unobserve(element)
+      element.remove()
+    }
+  }
 
   /** The lines of a grid drawn on the last pass, each a `row` the render draws a slot in. */
   private drawnLines: number[] = []
