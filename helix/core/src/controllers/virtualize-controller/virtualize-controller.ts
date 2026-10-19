@@ -476,6 +476,14 @@ export class VirtualizeController implements ReactiveController {
   }
 
   /**
+   * Whether a slotted row must stay assigned: the box is moving under a
+   * touch. Adding or taking a slotted row ends the touch on iOS.
+   */
+  holdsSlot(): boolean {
+    return this.touched && this.scrolling()
+  }
+
+  /**
    * Takes the offset as the box's own where the box moved it up only because
    * the set below it got shorter, which the browser does to keep the offset
    * inside the content, and answers where it was before.
