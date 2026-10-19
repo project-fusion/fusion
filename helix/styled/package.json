@@ -56,14 +56,15 @@
   "sideEffects": true,
   "scripts": {
     "analyze": "bun --bun helix-cem",
-    "build": "bun run element-events && tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
+    "build": "bun run element-events && bun run compile-worker && tsc -p tsconfig.build.json && tsc -p tsconfig.types.json",
+    "compile-worker": "bun scripts/build-compile-worker.mjs",
     "element-events": "build-element-events --package styled",
     "styles": "build-styles .",
-    "test": "bun run element-events && bun run test:pure && bun run test:dom && bun run test:ssr",
+    "test": "bun run element-events && bun run compile-worker && bun run test:pure && bun run test:dom && bun run test:ssr",
     "test:dom": "bun test --conditions helix-development dom.spec",
     "test:pure": "bun test --conditions helix-development pure.spec",
     "test:ssr": "bun test --conditions helix-development ssr.spec",
-    "typecheck": "bun run element-events && tsc -p tsconfig.json --noEmit && bun run typecheck:examples",
+    "typecheck": "bun run element-events && bun run compile-worker && tsc -p tsconfig.json --noEmit && bun run typecheck:examples",
     "typecheck:examples": "tsc -p tsconfig.examples.json"
   },
   "bugs": "https://github.com/project-fusion/fusion/issues",

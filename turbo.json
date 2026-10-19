@@ -189,7 +189,11 @@
     },
     "@fusion.dev/helix#build": {
       "dependsOn": ["^build", "^analyze", "analyze", "icons", "styles"],
-      "outputs": ["dist/**", "src/element-events.generated.ts"]
+      "outputs": [
+        "dist/**",
+        "src/element-events.generated.ts",
+        "src/sandbox/compile-worker.generated.ts"
+      ]
     },
     // The same wait as the headless tier's, above, for the same examples.
     "@fusion.dev/helix#typecheck": {

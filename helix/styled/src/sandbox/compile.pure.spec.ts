@@ -79,9 +79,10 @@ describe('a module in TypeScript or JSX', () => {
   })
 })
 
-/* The worker a page serves as a file runs the program the `blob:` one does, so
-   a page that switches to it compiles the same. Each is sent a module that
-   compiles, one whose compiler throws, and an address that does not load. */
+/* The `blob:` worker is the file minified, so this holds the minifier to the
+   program: a page that switches to the file compiles the same. Each is sent a
+   module that compiles, one whose compiler throws, and an address that does
+   not load. */
 describe('the compiler worker served as a file', () => {
   const answers = async (worker: Worker, address: string): Promise<unknown[]> => {
     const asks: [number, string, string, { filePath: string }][] = [

@@ -1,4 +1,5 @@
 import { reportRuntime } from '@fusion.dev/helix-core'
+import { PROTOCOL, WORKER } from './compile-worker.generated.js'
 
 /**
  * The compiler a module file in TypeScript or JSX runs through before the
@@ -44,24 +45,7 @@ type Transform = (
   options: Record<string, unknown>,
 ) => Promise<{ code: string; sourceMap?: Record<string, unknown> }>
 
-/**
- * The worker's script, written short since it ships as a string no minifier
- * reads. Each message is a number, the compiler's address, the source and the
- * options. The worker loads the address once, and again after a load that
- * failed, and answers with the number and what `transform` returned, or the
- * number and what went wrong, then `PROTOCOL`.
- */
-export const WORKER =
-  'const l={};onmessage=async({data:[i,a,s,o]})=>{let c;try{c=await(l[a]??=import(a))}catch(e){delete l[a];return postMessage([i,,o.filePath+" needs "+a+", which did not load: "+e,1])}try{postMessage([i,c.transform(s,o),,1])}catch(e){postMessage([i,,String(e?.message),1])}}'
-
-/**
- * The version of the messages the worker and the page exchange, which every
- * answer ends with. A page that copied `compile-worker.js` from an older
- * release answers with another, or none, and is told to copy it again. Raise
- * it in both workers whenever the messages change, and only then, so an
- * upgrade that leaves them alone asks nobody to copy anything.
- */
-export const PROTOCOL = 1
+export { PROTOCOL, WORKER }
 
 /** Whether the page has been told its worker file is stale, which it is once. */
 let warned = false
