@@ -55,6 +55,9 @@ let built: Promise<{ manifests: Record<string, unknown>; source: string }> | und
 const diagnostics = () => {
   built ??= (async () => {
     const bundled = await Bun.build({
+      /* Production, as a page loads it: since Bun 1.4 a bundle takes the
+         `development` condition unless told otherwise. */
+      define: { 'process.env.NODE_ENV': JSON.stringify('production') },
       entrypoints: [join(root, 'helix/diagnostics/src/index.ts')],
       target: 'browser',
     })

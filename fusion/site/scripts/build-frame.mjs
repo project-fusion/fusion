@@ -23,6 +23,12 @@ import { fileURLToPath } from 'node:url'
 import { bootstrap } from '../preview/preview-bootstrap.ts'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..')
+
+/* **Production, which a bundler since Bun 1.4 has to be told.** Bun 1.4 adds
+   the `development` export condition to a bundle unless `NODE_ENV` is
+   production, and the frame took the components' default entries under Bun
+   1.1.43, as a reader's production build does. */
+const PRODUCTION = { 'process.env.NODE_ENV': JSON.stringify('production') }
 const out = join(root, 'fusion/site/public/sandbox')
 const entry = join(root, 'fusion/site/preview/preview-frame-entry.ts')
 const graphEntry = join(root, 'fusion/site/preview/preview-graph-entry.ts')
@@ -84,7 +90,7 @@ const stamp = (contents) => createHash('sha256').update(contents).digest('hex').
    which the entry carries and the frame starts from a `blob:` URL: an opaque
    origin can start no worker from the site, nor one that imports. */
 const workerBuilt = await Bun.build({
-  define: { 'import.meta.url': 'globalThis.location.href' },
+  define: { ...PRODUCTION, 'import.meta.url': 'globalThis.location.href' },
   entrypoints: [fileURLToPath(import.meta.resolve('maplibre-gl/dist/maplibre-gl-worker.mjs'))],
   format: 'iife',
   minify: true,
@@ -101,6 +107,7 @@ const maplibreBuilt = await Bun.build({
      no way to name, `import.meta` being a syntax error there. MapLibre reads
      it to find its worker when none is set, and the entry sets one. */
   define: {
+    ...PRODUCTION,
     __MAPLIBRE_WORKER__: JSON.stringify(await workerBuilt.outputs[0].text()),
     'import.meta.url': 'globalThis.location.href',
   },
@@ -119,6 +126,7 @@ const maplibre = await maplibreBuilt.outputs[0].text()
 await writeFile(join(out, 'maplibre-gl.js'), maplibre)
 const mapBuilt = await Bun.build({
   define: {
+    ...PRODUCTION,
     __MAPLIBRE_CSS__: JSON.stringify(
       await readFile(
         fileURLToPath(import.meta.resolve('maplibre-gl/dist/maplibre-gl.css')),
@@ -144,6 +152,7 @@ await writeFile(join(out, 'map.js'), mapScript)
  * one**: the connector, Sigma, graphology and ForceAtlas2, whose layout
  * starts its own worker from a `blob:` URL. */
 const graphBuilt = await Bun.build({
+  define: PRODUCTION,
   entrypoints: [graphEntry],
   format: 'iife',
   minify: true,
@@ -160,6 +169,7 @@ await writeFile(join(out, 'graph.js'), graphScript)
 
 /* The same for a graph cosmos.gl draws, which lays out and draws on the GPU. */
 const cosmosBuilt = await Bun.build({
+  define: PRODUCTION,
   entrypoints: [cosmosEntry],
   format: 'iife',
   minify: true,
@@ -176,6 +186,7 @@ await writeFile(join(out, 'graph-cosmos.js'), cosmosScript)
 
 /* The same for a graph three.js draws, in three dimensions. */
 const threeBuilt = await Bun.build({
+  define: PRODUCTION,
   entrypoints: [threeEntry],
   format: 'iife',
   minify: true,
@@ -192,6 +203,7 @@ await writeFile(join(out, 'graph-three.js'), threeScript)
 
 /* The same for a spatial chart three.js draws, scatter or surface. */
 const plotThreeBuilt = await Bun.build({
+  define: PRODUCTION,
   entrypoints: [plotThreeEntry],
   format: 'iife',
   minify: true,
@@ -211,6 +223,7 @@ await writeFile(join(out, 'plot-three.js'), plotThreeScript)
  * with xterm.js's stylesheet inside it. */
 const terminalBuilt = await Bun.build({
   define: {
+    ...PRODUCTION,
     __XTERM_CSS__: JSON.stringify(
       await readFile(fileURLToPath(import.meta.resolve('@xterm/xterm/css/xterm.css')), 'utf8'),
     ),
@@ -232,6 +245,7 @@ await writeFile(join(out, 'terminal.js'), terminalScript)
 /* **A live code editor, in one file the frame loads only when a render
  * carries one**: the connector, CodeMirror, and every grammar it reads. */
 const editorBuilt = await Bun.build({
+  define: PRODUCTION,
   entrypoints: [editorEntry],
   format: 'iife',
   minify: true,
@@ -249,6 +263,7 @@ await writeFile(join(out, 'editor.js'), editorScript)
 /* **Helix's highlighter, in one file the frame loads only when a render
  * carries a Code Input**: the sandbox's grammars, registered for the page. */
 const highlightBuilt = await Bun.build({
+  define: PRODUCTION,
   entrypoints: [highlightEntry],
   format: 'iife',
   minify: true,
@@ -265,6 +280,7 @@ await writeFile(join(out, 'highlight.js'), highlightScript)
 
 const built = await Bun.build({
   define: {
+    ...PRODUCTION,
     __PREVIEW_EDITOR_URL__: JSON.stringify(`./editor.js?v=${stamp(editorScript)}`),
     __PREVIEW_GRAPH_COSMOS_URL__: JSON.stringify(`./graph-cosmos.js?v=${stamp(cosmosScript)}`),
     __PREVIEW_GRAPH_THREE_URL__: JSON.stringify(`./graph-three.js?v=${stamp(threeScript)}`),
