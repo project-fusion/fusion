@@ -3,8 +3,8 @@ import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { highlightedLines } from '../../code-block/highlight.js'
 import {
-  adoptHighlighterSheet,
   type CodeBlockHighlighter,
+  HighlighterController,
   registeredHighlighter,
 } from '../../code-block/highlighter.js'
 import { keyedLines } from '../../code-block/keyed-lines.js'
@@ -141,6 +141,9 @@ export class HelixHeadlessCodeInput extends HelixHeadlessTextarea {
   /** Whether Escape came just before, which lets Tab leave the field. */
   private escaped = false
 
+  /** On the page's list of elements a highlighter registration reaches. */
+  protected readonly highlighting = new HighlighterController(this)
+
   /** The page registered another highlighter: draws again with it. */
   highlighterChanged(): void {
     this.requestUpdate()
@@ -151,7 +154,6 @@ export class HelixHeadlessCodeInput extends HelixHeadlessTextarea {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
-    adoptHighlighterSheet(this.shadowRoot)
     /* Read from the field itself and not from an ancestor, so set on it. */
     const control = this.control
     control?.setAttribute('autocapitalize', 'off')

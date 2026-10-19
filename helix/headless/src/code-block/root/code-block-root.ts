@@ -15,7 +15,7 @@ import { property, state } from 'lit/decorators.js'
 import { html } from 'lit/static-html.js'
 import '../../copy-button/index.js'
 import { highlightedLines } from '../highlight.js'
-import { adoptHighlighterSheet, registeredHighlighter } from '../highlighter.js'
+import { HighlighterController, registeredHighlighter } from '../highlighter.js'
 import { keyedLines } from '../keyed-lines.js'
 import { gutterNumbers, lineCount, lineRuns, lineSpans } from '../lines.js'
 import {
@@ -927,8 +927,10 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
-    adoptHighlighterSheet(this.shadowRoot)
   }
+
+  /** On the page's list of elements a highlighter registration reaches. */
+  protected readonly highlighting = new HighlighterController(this)
 
   /** The page registered another highlighter: draws again with it. */
   highlighterChanged(): void {

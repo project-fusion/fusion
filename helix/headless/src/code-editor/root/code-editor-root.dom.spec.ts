@@ -149,6 +149,66 @@ describe('an editor with an engine', () => {
     expect(hasState(element, 'connected')).toBe(false)
     expect(part(element, 'control')?.hasAttribute('hidden')).toBe(false)
   })
+
+  test('hands back nothing the engine already holds, and nothing a caret move changed', async () => {
+    const element = await editor('value="a"')
+    const { engine, told } = fakeEngine()
+    element.engine = engine
+    await element.updateComplete
+    told.listeners?.change('ab')
+    await element.updateComplete
+    told.listeners?.caret?.(1, 1)
+    await element.updateComplete
+    expect(told.updates).toEqual([])
+    element.language = 'json'
+    await element.updateComplete
+    expect(told.updates.at(-1)).toMatchObject({ language: 'json', value: 'ab' })
+  })
+
+  test('mounts the engine again when it is moved in the page', async () => {
+    const element = await editor()
+    const { engine, told } = fakeEngine()
+    element.engine = engine
+    await element.updateComplete
+    const holder = document.createElement('div')
+    document.body.append(holder)
+    holder.append(element)
+    await element.updateComplete
+    expect(told.destroyed).toBe(1)
+    expect(told.mounted).toHaveLength(2)
+    expect(hasState(element, 'connected')).toBe(true)
+    holder.remove()
+  })
+
+  test('says change as focus leaves the engine after an edit', async () => {
+    const element = await editor()
+    const { engine, told } = fakeEngine()
+    element.engine = engine
+    await element.updateComplete
+    let changes = 0
+    element.addEventListener('change', () => (changes += 1))
+    const view = part(element, 'view') as HTMLElement
+    view.dispatchEvent(new FocusEvent('focusout', { bubbles: true, composed: true }))
+    expect(changes).toBe(0)
+    told.listeners?.change('edited')
+    view.dispatchEvent(new FocusEvent('focusout', { bubbles: true, composed: true }))
+    view.dispatchEvent(new FocusEvent('focusout', { bubbles: true, composed: true }))
+    expect(changes).toBe(1)
+  })
+})
+
+describe('diagnosticLines', () => {
+  test('finds each diagnostic’s line, counted from 1', async () => {
+    const { diagnosticLines } = await import('./code-editor-root.js')
+    expect(
+      diagnosticLines('one\ntwo\n\nfour', [
+        { from: 0, message: 'a', to: 1 },
+        { from: 4, message: 'b', to: 5 },
+        { from: 3, message: 'c', to: 4 },
+        { from: 9, message: 'd', to: 10 },
+      ]),
+    ).toEqual([1, 2, 1, 4])
+  })
 })
 
 describe('the status line and the problems', () => {
