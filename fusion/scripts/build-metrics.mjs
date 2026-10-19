@@ -20,7 +20,7 @@
  * and says so when the build has not happened.
  *
  * **The bundler is part of the number and is named in the output.** Bun's
- * bundler is pinned at 1.1.43 by `packageManager` and by
+ * bundler is pinned at 1.4.3 by `packageManager` and by
  * `.github/workflows/verify.yml`, so the same source measures the same on a
  * contributor's machine and in CI. A different Bun produces different bytes,
  * which `--check` reports as a version difference rather than as a stale file,
@@ -490,6 +490,9 @@ const measure = async (name, source) => {
   const entry = join(SCRATCH, `${name}.js`)
   writeFileSync(entry, source)
   const built = await Bun.build({
+    /* Production, as a reader's build is. Since Bun 1.4 a bundle takes the
+       `development` export condition unless `NODE_ENV` says production. */
+    define: { 'process.env.NODE_ENV': JSON.stringify('production') },
     entrypoints: [entry],
     format: 'esm',
     minify: true,

@@ -46,17 +46,17 @@ serde = { workspace = true }
 # that read the printed text passed in `cargo test --workspace` and failed in
 # `cargo test -p fusion-helix-cli`.
 serde_json = { workspace = true, features = ["float_roundtrip", "preserve_order"] }
-oxc_parser = "0.153.0"
-oxc_allocator = "0.153.0"
-oxc_span = "0.153.0"
-oxc_ast = "0.153.0"
-oxc_ast_visit = "0.153.0"
+oxc_parser = "0.154.0"
+oxc_allocator = "0.154.0"
+oxc_span = "0.154.0"
+oxc_ast = "0.154.0"
+oxc_ast_visit = "0.154.0"
 
 [dev-dependencies]
 # Encodes the example plugin into a component, which is what a plugin author's
 # toolchain does for them: the end-to-end test takes the path an author takes
 # rather than reading an artifact somebody committed.
-wit-component = "0.261"
+wit-component = "0.262"
 # `helix visual compare`'s tests write their own pictures rather than reading
 # committed ones.
 png = "0.18"

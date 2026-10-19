@@ -231,7 +231,7 @@ fn created<'c>(call: &'c CallExpression<'_>) -> Option<&'c str> {
         "_jsx",
         "_jsxs",
     ]
-    .iter()
+    .into_iter()
     .any(|name| call.callee.is_specific_id(name))
         || call
             .callee

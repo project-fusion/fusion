@@ -56,14 +56,15 @@ const STYLE_ID = 'helix-visual-harness'
 const DIAGNOSTICS = '__helix-diagnostics'
 
 /* **Read and written synchronously, on the descriptors themselves.** Bun
-   1.1.43, the runtime Fusion's CI pins, hands a script nothing from a piped
-   standard input until the pipe closes, so a stream reader would wait for a
-   request the binary is waiting to have answered. `readSync` on descriptor 0
-   returns each line as it arrives, in Bun and in Node. A request is read only
-   when the last one is answered, which is the one time this has nothing else
-   to do. Answers are written with `writeSync` for the same reason: the next
-   thing after an answer is that blocking read, and an answer still queued
-   behind it would never reach the binary. */
+   1.1.43, the runtime Fusion's CI pinned when this was written, hands a
+   script nothing from a piped standard input until the pipe closes, so a
+   stream reader would wait for a request the binary is waiting to have
+   answered. `readSync` on descriptor 0 returns each line as it arrives, in
+   Bun and in Node. A request is read only when the last one is answered,
+   which is the one time this has nothing else to do. Answers are written
+   with `writeSync` for the same reason: the next thing after an answer is
+   that blocking read, and an answer still queued behind it would never
+   reach the binary. */
 for (const name of ['debug', 'info', 'log']) {
   console[name] = console.error
 }
