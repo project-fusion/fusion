@@ -128,6 +128,32 @@ describe('a textarea with voice', () => {
     await none.updateComplete
     expect(part(none, 'voice')).toBeNull()
   })
+
+  test('stops when the reader types or presses in the field, keeping what was heard', async () => {
+    const engine = fakeEngine()
+    const element = await field(
+      '<helix-headless-textarea voice label="Note"></helix-headless-textarea>',
+      engine,
+    )
+    const control = part(element, 'control') as HTMLElement
+    const press = (key: string): KeyboardEvent => {
+      const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key })
+      control.dispatchEvent(event)
+      return event
+    }
+    ;(part(element, 'voice') as HTMLElement).click()
+    engine.heard[0]?.partial('draft')
+    press('Shift')
+    expect(element.listening).toBe(true)
+    expect(press('a').defaultPrevented).toBe(false)
+    expect(element.listening).toBe(false)
+    engine.heard[0]?.partial('lost')
+    await element.updateComplete
+    expect(element.value).toBe('draft')
+    ;(part(element, 'voice') as HTMLElement).click()
+    control.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }))
+    expect(element.listening).toBe(false)
+  })
 })
 
 describe('an input with voice', () => {
@@ -141,6 +167,16 @@ describe('an input with voice', () => {
     engine.heard[0]?.final('blue shoes')
     await element.updateComplete
     expect(element.value).toBe('blue shoes')
+  })
+
+  test('draws no button on a password, an email or a number', async () => {
+    for (const type of ['password', 'email', 'number']) {
+      const element = await field(
+        `<helix-headless-input voice type="${type}" label="Field"></helix-headless-input>`,
+      )
+      expect(part(element, 'voice')).toBeNull()
+      expect((element as unknown as { startListening(): boolean }).startListening()).toBe(false)
+    }
   })
 })
 

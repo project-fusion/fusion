@@ -267,6 +267,11 @@ export class HelixHeadlessInput extends MixinVoice(
     return this.revealed && this.type === 'password' ? 'text' : this.type
   }
 
+  /** The type asked for, so a revealed password is still never dictated. */
+  protected override get voiceType(): string {
+    return this.type
+  }
+
   /** Whether there is a clear button on screen right now. */
   private get showsClear(): boolean {
     return this.clearable && this.value !== '' && !this.isDisabled && !this.readOnly

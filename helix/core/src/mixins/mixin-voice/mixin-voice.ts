@@ -42,10 +42,24 @@ export declare class VoiceElement {
 
   /** The native field dictation types into. */
   protected voiceField(): HTMLInputElement | HTMLTextAreaElement | null
+
+  /** The type of the field dictation types into. Dictation listens only in `text`, `search`, `tel` and `url`. */
+  protected get voiceType(): string
 }
 
 /** A phrase that starts with punctuation joins the word before it with no space. */
 const JOINS = /^[\s.,!?;:)\]}]/
+
+/**
+ * The input types dictation types into. A password is never dictated, since
+ * the browser's recognizer sends what is said to a server and the guesses
+ * would show in clear text, and `email` and `number` have no caret a script
+ * can read or write.
+ */
+const DICTATED = new Set(['search', 'tel', 'text', 'url'])
+
+/** Keys that change nothing in the field, so pressing one leaves dictation running. */
+const HELD = new Set(['Alt', 'CapsLock', 'Control', 'Meta', 'Shift'])
 
 /**
  * Adds dictation to a field: `voice` draws a button that listens through the
@@ -85,7 +99,8 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
     /**
      * Draws a button that listens for dictation and types what it hears at
      * the caret. Nothing listens until the button is pressed, and the
-     * microphone is let go as listening stops.
+     * microphone is let go as listening stops. An input of type `password`,
+     * `email` or `number` draws no button.
      */
     @property({ type: Boolean })
     voice = false
@@ -125,14 +140,21 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
       return this.speechEngine ?? pageSpeechEngine()
     }
 
+    /** The type of the field dictation types into, which Input reads from its own `type`. */
+    protected get voiceType(): string {
+      return 'text'
+    }
+
     /**
      * Whether the engine can listen here: never on a server or while hydrating
      * what one sent, which cannot ask the browser, so the button arrives with
-     * the render that follows.
+     * the render that follows, and never in a field whose type it cannot type into.
      */
     private get voiceReady(): boolean {
       return (
-        (this as unknown as { childrenKnown: boolean }).childrenKnown && this.engine.available()
+        DICTATED.has(this.voiceType) &&
+        (this as unknown as { childrenKnown: boolean }).childrenKnown &&
+        this.engine.available()
       )
     }
 
@@ -146,7 +168,7 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
 
     protected override updated(changed: PropertyValues): void {
       super.updated(changed)
-      if (changed.has('voice') && !this.voice) {
+      if ((changed.has('voice') && !this.voice) || (this.heard && !this.voiceReady)) {
         this.stopListening()
       }
     }
@@ -181,6 +203,7 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
         true,
       )
       field.addEventListener('keydown', this.handleVoiceKey)
+      field.addEventListener('pointerdown', this.handleVoicePointer)
       this.session = this.engine.listen({
         lang: wordsLocale(this),
         listener: {
@@ -214,6 +237,7 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
         false,
       )
       this.voiceField()?.removeEventListener('keydown', this.handleVoiceKey)
+      this.voiceField()?.removeEventListener('pointerdown', this.handleVoicePointer)
     }
 
     /** Writes a guess, or the phrase it settled on, over the last guess. */
@@ -243,12 +267,26 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
       }
     }
 
+    /**
+     * Escape stops listening and is spent on it. Any other key that writes
+     * or moves the caret stops listening too, and does what it does, since
+     * the next guess would be written over the place the reader left.
+     */
     private readonly handleVoiceKey = (event: Event): void => {
-      if ((event as KeyboardEvent).key === 'Escape' && this.heard) {
+      const { key } = event as KeyboardEvent
+      if (!this.heard || HELD.has(key)) {
+        return
+      }
+      if (key === 'Escape') {
         event.preventDefault()
         event.stopPropagation()
-        this.stopListening()
       }
+      this.stopListening()
+    }
+
+    /** A press in the field moves the caret, so it stops listening as a key does. */
+    private readonly handleVoicePointer = (): void => {
+      this.stopListening()
     }
 
     protected renderVoice(): TemplateResult | typeof nothing {
