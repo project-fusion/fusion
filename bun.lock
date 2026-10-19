@@ -205,7 +205,7 @@
     },
     "helix/editor": {
       "name": "@fusion.dev/helix-editor",
-      "version": "0.215.2",
+      "version": "0.215.3",
       "dependencies": {
         "@codemirror/commands": "^6.11.1",
         "@codemirror/lang-css": "^6.3.1",
