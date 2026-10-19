@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { listShortcuts, onApple } from '@fusion.dev/helix-core'
 import { mount, nextFrame, registerDom } from '@fusion.dev/helix-testing/dom'

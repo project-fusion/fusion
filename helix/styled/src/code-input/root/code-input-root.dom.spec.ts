@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import validate from '../.examples/validate.html' with { type: 'text' }
