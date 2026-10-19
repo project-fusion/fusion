@@ -20,7 +20,45 @@ export const registerDom = (): void => {
   GlobalRegistrator.register({ settings: { enableIframePageLoading: true } })
   shimDirection()
   shimElementInternals()
+  shimShadowFocus()
   shimTableSections()
+}
+
+/**
+ * Makes `ShadowRoot.activeElement` answer `null` where focus is in no tree the
+ * page holds, as a browser's does.
+ *
+ * Measured rather than assumed: happy-dom keeps an element it removed as the
+ * one with focus, and its getter walks from that element's root to a host it
+ * never finds and throws. A component that reads focus before it renders, as
+ * Object Inspector does, then throws from an update that runs once its spec
+ * has ended. Bun 1.4 reports such an error against the next test, where Bun
+ * 1.1 dropped it. A browser moves focus to the body as the element goes, so
+ * no shadow root holds it.
+ */
+const shimShadowFocus = (): void => {
+  const read = Object.getOwnPropertyDescriptor(ShadowRoot.prototype, 'activeElement')?.get
+  if (!read) {
+    return
+  }
+  Object.defineProperty(ShadowRoot.prototype, 'activeElement', {
+    configurable: true,
+    get(this: ShadowRoot): Element | null {
+      return safely(() => read.call(this) as Element | null)
+    },
+  })
+}
+
+/** What `read` answers, or `null` where happy-dom throws on focus it lost track of. */
+const safely = (read: () => Element | null): Element | null => {
+  try {
+    return read()
+  } catch (error) {
+    if (error instanceof TypeError) {
+      return null
+    }
+    throw error
+  }
 }
 
 /**

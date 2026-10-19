@@ -48,6 +48,11 @@ describe('code-block diff server output', () => {
  * into. Its `document` has no `querySelectorAll`, and registering walked the
  * page and threw, at import for an entry that registers one. In a process of
  * its own, because the shim's globals would reach every spec after this one.
+ *
+ * **The process starts in the package's folder**, because Bun 1.4 reads the
+ * tsconfig where a process starts and not beside each file: started beside
+ * this spec, it found none with `experimentalDecorators`, compiled
+ * `@property()` as a standard decorator, and Lit refused one on a plain field.
  */
 const importsUnderShim = (script: string): [number, string] => {
   const run = Bun.spawnSync(
@@ -58,7 +63,7 @@ const importsUnderShim = (script: string): [number, string] => {
       '-e',
       `await import('@lit-labs/ssr/lib/install-global-dom-shim.js'); ${script}`,
     ],
-    { cwd: fileURLToPath(new URL('.', import.meta.url)) },
+    { cwd: fileURLToPath(new URL('../../..', import.meta.url)) },
   )
   return [run.exitCode, run.stderr.toString()]
 }
@@ -67,7 +72,7 @@ describe('a highlighter registered under Lit’s global DOM shim', () => {
   test('registers', () => {
     expect(
       importsUnderShim(
-        "const { registerHighlighter } = await import('../index.js'); registerHighlighter(() => '')",
+        `const { registerHighlighter } = await import('${new URL('../index.js', import.meta.url).href}'); registerHighlighter(() => '')`,
       ),
     ).toEqual([0, ''])
   })
