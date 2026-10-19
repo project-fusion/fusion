@@ -742,6 +742,10 @@ const importLines = (html: string, slug: string, specifiers: Map<string, string>
  * because Select does not register Option: copied without it, the options
  * were unknown elements and the select offered nothing.
  *
+ * **An entry of its own that only adds behavior names the attribute it turns
+ * on**, `// Menu Filter, for filterable`, so a reader does not take it for an
+ * import every menu needs.
+ *
  * **Each line is an element's own specifier**, its package and its entry, so a
  * part another package publishes is imported from that package: the Sandbox
  * family's Editor is `@fusion.dev/helix-sandbox/editor`.
@@ -755,6 +759,14 @@ export const usageOf = (
     return []
   }
   const own = (element: Element): boolean => element.entry === family.slug
+  const label = (entry: string): string => {
+    const name = startCase(entry.replaceAll('/', '-'))
+    const turnedOn = shown
+      .filter(own)
+      .flatMap((element) => element.attributes)
+      .find((attribute) => attribute.description.includes(`/${entry}\``))
+    return turnedOn ? `${name}, for ${turnedOn.name}` : name
+  }
   return [
     ...new Set([
       ...shown.filter(own).map((element) => `import '${element.specifier}'`),
@@ -765,7 +777,7 @@ export const usageOf = (
     ...family.imports.map((entry) =>
       entry.startsWith('@')
         ? `import '${entry}' // ${startCase(entry.slice(entry.indexOf('/helix-') + 7).replaceAll('/', '-'))}`
-        : `import '${PACKAGE[tier]}/${entry}' // ${startCase(entry.replaceAll('/', '-'))}`,
+        : `import '${PACKAGE[tier]}/${entry}' // ${label(entry)}`,
     ),
   ]
 }

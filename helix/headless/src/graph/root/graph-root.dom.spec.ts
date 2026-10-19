@@ -25,8 +25,11 @@ const LIST = `helix-headless-graph::part(list) {
   block-size: 12rem;
 }`
 
+/* A `describe` below reads a DOM global while the file is collected, which is
+   before any `beforeAll`. */
+registerDom()
+
 beforeAll(async () => {
-  registerDom()
   await import('../index.js')
   const sheet = document.createElement('style')
   sheet.textContent = LIST

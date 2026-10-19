@@ -14,6 +14,9 @@
  * of an address known only at run time.
  */
 
+/** `PROTOCOL` in `compile.ts`, which this file cannot import, being served alone. */
+const PROTOCOL = 1
+
 /** The worker's own scope, which the DOM library this package builds with does not name. */
 const scope = globalThis as unknown as {
   onmessage: ((event: MessageEvent<[number, string, string, { filePath: string }]>) => void) | null
@@ -34,13 +37,14 @@ scope.onmessage = async ({ data: [id, address, source, options] }) => {
       id,
       undefined,
       `${options.filePath} needs ${address}, which did not load: ${error}`,
+      PROTOCOL,
     ])
     return
   }
   try {
-    scope.postMessage([id, compiler.transform(source, options)])
+    scope.postMessage([id, compiler.transform(source, options), undefined, PROTOCOL])
   } catch (error) {
-    scope.postMessage([id, undefined, String((error as Error | undefined)?.message)])
+    scope.postMessage([id, undefined, String((error as Error | undefined)?.message), PROTOCOL])
   }
 }
 

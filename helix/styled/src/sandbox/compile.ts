@@ -47,10 +47,22 @@ type Transform = (
  * reads. Each message is a number, the compiler's address, the source and the
  * options. The worker loads the address once, and again after a load that
  * failed, and answers with the number and what `transform` returned, or the
- * number and what went wrong.
+ * number and what went wrong, then `PROTOCOL`.
  */
 export const WORKER =
-  'const l={};onmessage=async({data:[i,a,s,o]})=>{let c;try{c=await(l[a]??=import(a))}catch(e){delete l[a];return postMessage([i,,o.filePath+" needs "+a+", which did not load: "+e])}try{postMessage([i,c.transform(s,o)])}catch(e){postMessage([i,,String(e?.message)])}}'
+  'const l={};onmessage=async({data:[i,a,s,o]})=>{let c;try{c=await(l[a]??=import(a))}catch(e){delete l[a];return postMessage([i,,o.filePath+" needs "+a+", which did not load: "+e,1])}try{postMessage([i,c.transform(s,o),,1])}catch(e){postMessage([i,,String(e?.message),1])}}'
+
+/**
+ * The version of the messages the worker and the page exchange, which every
+ * answer ends with. A page that copied `compile-worker.js` from an older
+ * release answers with another, or none, and is told to copy it again. Raise
+ * it in both workers whenever the messages change, and only then, so an
+ * upgrade that leaves them alone asks nobody to copy anything.
+ */
+export const PROTOCOL = 1
+
+/** Whether the page has been told its worker file is stale, which it is once. */
+let warned = false
 
 /** The one worker every preview on the page compiles in, started on the first compile. */
 let worker: Worker | undefined
@@ -85,8 +97,11 @@ export const registerCompilerWorker = (address: string | URL): void => {
 /** How many messages the worker has been sent, which numbers each. */
 let sent = 0
 
+/** What the worker answers: the message's number, the result or the error, and `PROTOCOL`. */
+type Answer = [number, Awaited<ReturnType<Transform>>?, string?, number?]
+
 /** The answers the worker owes, by the number of the message they answer. */
-const owed = new Map<number, (answer: [number, Awaited<ReturnType<Transform>>?, string?]) => void>()
+const owed = new Map<number, (answer: Answer) => void>()
 
 /** The compiler at an address, in the worker. */
 const inWorker =
@@ -97,7 +112,13 @@ const inWorker =
         workerAddress ?? URL.createObjectURL(new Blob([WORKER], { type: 'text/javascript' })),
         { type: 'module' },
       )
-      worker.onmessage = ({ data }: MessageEvent<[number]>) => {
+      worker.onmessage = ({ data }: MessageEvent<Answer>) => {
+        if (data[3] !== PROTOCOL && !warned) {
+          warned = true
+          console.warn(
+            `The compiler worker at ${String(workerAddress)} is from another release of @fusion.dev/helix. Copy @fusion.dev/helix/sandbox/compile-worker.js to that address again.`,
+          )
+        }
         owed.get(data[0])?.(data)
         owed.delete(data[0])
       }

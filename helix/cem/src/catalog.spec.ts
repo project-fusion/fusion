@@ -323,6 +323,36 @@ describe('imports', () => {
       ],
     ])
   })
+
+  /* A reader of the bare `// Menu Filter` took it for an import every menu
+     needs. The attribute whose description names the entry is the one it
+     turns on. */
+  test('an entry of its own names the attribute it turns on', () => {
+    const filtered: HelixManifest = {
+      modules: [
+        {
+          declarations: [
+            {
+              attributes: [
+                {
+                  description: 'Does nothing until `@fusion.dev/helix/menu/filter` is imported.',
+                  name: 'filterable',
+                },
+              ],
+              description: "```js\nimport '@fusion.dev/helix/menu/filter'\n```",
+              name: 'HelixMenu',
+              tagName: 'helix-menu',
+            },
+          ],
+          path: 'src/menu/root/menu-root.ts',
+        },
+      ],
+    }
+    expect(catalog([filtered])[0]?.usage.styled).toEqual([
+      "import '@fusion.dev/helix/menu'",
+      "import '@fusion.dev/helix/menu/filter' // Menu Filter, for filterable",
+    ])
+  })
 })
 
 /* An agent reading a family's `.md` or `.json` gets the lines to import, for

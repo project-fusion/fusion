@@ -133,6 +133,10 @@ import { registerCompilerWorker } from '@fusion.dev/helix/sandbox'
 registerCompilerWorker('/sandbox/compile-worker.js')
 ```
 
+A copied file does not update with the package. Where a release changes the
+messages the worker and the page exchange, the console warns that the file is
+from another release and names the address to copy it to again.
+
 In both cases the policy's `script-src` names the `cdn`'s host, which the
 compiler and the packages load from.
 
