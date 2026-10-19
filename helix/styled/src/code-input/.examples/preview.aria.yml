@@ -1,0 +1,3 @@
+- text: Webhook payload
+- textbox "Webhook payload": "{ \"event\": \"order.paid\", \"retries\": 3, \"notify\": true }"
+- paragraph: Sent as the body of every request.

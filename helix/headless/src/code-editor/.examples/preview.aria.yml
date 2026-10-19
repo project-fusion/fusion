@@ -1,0 +1,11 @@
+- text: orders.ts TypeScript
+- toolbar "Editor controls":
+  - button "Format"
+  - button "Find"
+- textbox "orders.ts": "interface Order { amount: number paid: boolean } export function totalPaid(orders: Order[]): number { const total = orders .filter((order) => order.paid) .reduce((sum, order) => sum + order.amount, 0) console.log(total) return totl }"
+- list "Problems":
+  - listitem:
+    - 'button "Line 10: Unexpected console statement."'
+  - listitem:
+    - 'button "Line 11: Cannot find name totl. Did you mean total?"'
+- text: Line 1, column 1 2 problems

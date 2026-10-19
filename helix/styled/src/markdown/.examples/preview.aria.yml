@@ -1,0 +1,30 @@
+- heading "Roll back the migration" [level=2]
+- paragraph: "Run the down step, then check that the table is gone:"
+- list:
+  - listitem: Stop the workers.
+  - listitem:
+    - text: Run
+    - code: bun run migrate:down
+    - text: .
+  - listitem: Start the workers again.
+- text: sh
+- button "Copy code, sh"
+- code: bun run migrate:down --to 0041
+- img "Warning"
+- text: Warning
+- paragraph: Back up the database before you start.
+- table:
+  - rowgroup:
+    - row "Step What happens":
+      - columnheader "Step"
+      - columnheader "What happens"
+  - rowgroup:
+    - row "Down The plans table is dropped":
+      - cell "Down"
+      - cell "The plans table is dropped":
+        - text: The
+        - code: plans
+        - text: table is dropped
+    - row "Check The schema matches release 0041":
+      - cell "Check"
+      - cell "The schema matches release 0041"
