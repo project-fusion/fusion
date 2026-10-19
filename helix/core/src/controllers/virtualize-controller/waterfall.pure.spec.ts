@@ -14,7 +14,9 @@ describe('a waterfall', () => {
     const waterfall = wall()
     expect([0, 1, 2, 3, 4].map((at) => waterfall.lane(at))).toEqual([0, 1, 1, 0, 0])
     expect([0, 1, 2, 3, 4].map((at) => waterfall.start(at))).toEqual([0, 0, 50, 100, 130])
-    expect([0, 1, 2, 3, 4].map((at) => waterfall.reachThrough(at))).toEqual([100, 100, 130, 130, 190])
+    expect([0, 1, 2, 3, 4].map((at) => waterfall.reachThrough(at))).toEqual([
+      100, 100, 130, 130, 190,
+    ])
     expect(waterfall.length()).toBe(190)
   })
 
