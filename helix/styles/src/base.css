@@ -1680,6 +1680,25 @@ helix-toast:not([data-color-mode]) {
   );
 }
 
+/* What Find marks: every match in a pale wash of the warning hue, and the
+   current one in the hue itself, with dark ink on it in both modes, as a
+   browser's own find draws its current match. Derived from the token, so a
+   theme's warning hue carries through. Painted by the Custom Highlight API,
+   so the same Turbopack warning applies as above. **A highlight is styled from
+   the tree its text lives in**, so these reach the page's own content, and a
+   shadow root of the page's own needs them too. */
+::highlight(helix-find-match) {
+  background-color: light-dark(
+    oklch(from var(--helix-color-warning) 0.93 0.07 h),
+    color-mix(in oklab, var(--helix-color-warning) 32%, transparent)
+  );
+}
+
+::highlight(helix-find-current) {
+  background-color: oklch(from var(--helix-color-warning) 0.8 0.16 h);
+  color: oklch(from var(--helix-color-warning) 0.25 0.04 h);
+}
+
 /* ====================================================== visually hidden === */
 
 /* Present to a screen reader, absent to an eye. The `1px` box with `overflow:

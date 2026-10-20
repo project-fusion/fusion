@@ -40,6 +40,7 @@ import { drilldownArt } from './art/drilldown'
 import { emptyArt } from './art/empty'
 import { fileInputArt } from './art/file-input'
 import { filterInputArt } from './art/filter-input'
+import { findArt } from './art/find'
 import { flexArt } from './art/flex'
 import { formatDateArt } from './art/format-date'
 import { graphArt } from './art/graph'
@@ -202,6 +203,7 @@ const art: Record<string, ReactNode> = {
   empty: emptyArt,
   'file-input': fileInputArt,
   'filter-input': filterInputArt,
+  find: findArt,
   flex: flexArt,
   'format-date': formatDateArt,
   graph: graphArt,

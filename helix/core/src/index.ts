@@ -194,6 +194,7 @@ export {
   type DismissDetail,
   type FacetDetail,
   type FilterDetail,
+  type FoundDetail,
   type GraphFilterDetail,
   type GraphLayoutDetail,
   type GraphPartChangeDetail,
@@ -247,6 +248,7 @@ export {
   HelixFacetEvent,
   HelixFilterEvent,
   HelixFilteredEvent,
+  HelixFoundEvent,
   HelixGraphFilterEvent,
   HelixGraphLayoutEvent,
   HelixGraphPanEvent,
@@ -593,6 +595,19 @@ export {
   markMatches,
   rangeOf,
 } from './utils/filter-marks/filter-marks.js'
+export {
+  FIND_CURRENT,
+  FIND_MATCH,
+  type FindDirection,
+  type Finder,
+  type FindQuery,
+  type FindResult,
+  findPattern,
+  findRanges,
+  findTextRanges,
+  type TextFinderOptions,
+  textFinder,
+} from './utils/find-text/find-text.js'
 export { focusTarget } from './utils/focus-target/focus-target.js'
 export {
   deepActiveElement,

@@ -115,6 +115,7 @@ import { HelixExpandEvent } from './expand.js'
 import { HelixFacetEvent } from './facet.js'
 import { HelixFilterEvent } from './filter.js'
 import { HelixFilteredEvent } from './filtered.js'
+import { HelixFoundEvent } from './found.js'
 import { HelixGraphFilterEvent } from './graph-filter.js'
 import { HelixGraphLayoutEvent } from './graph-layout.js'
 import { HelixGraphPanEvent } from './graph-pan.js'
@@ -202,6 +203,7 @@ export type {
   DismissDetail,
   FacetDetail,
   FilterDetail,
+  FoundDetail,
   GraphFilterDetail,
   GraphLayoutDetail,
   GraphPartChangeDetail,
@@ -301,6 +303,7 @@ export {
   HelixFacetEvent,
   HelixFilterEvent,
   HelixFilteredEvent,
+  HelixFoundEvent,
   HelixGraphFilterEvent,
   HelixGraphLayoutEvent,
   HelixGraphPanEvent,
@@ -428,6 +431,7 @@ const registry = {
   HelixFacetEvent,
   HelixFilterEvent,
   HelixFilteredEvent,
+  HelixFoundEvent,
   HelixGraphFilterEvent,
   HelixGraphLayoutEvent,
   HelixGraphPanEvent,
