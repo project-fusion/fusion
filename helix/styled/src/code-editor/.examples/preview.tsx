@@ -27,9 +27,9 @@ const PROBLEMS = [
 export function Example() {
   return (
     <>
-      {/* Preview frame: data-preview-editor has the frame connect CodeMirror; on your page, connectEditor does. */}
+      {/* Preview frame: data-preview-code-editor has the frame connect CodeMirror; on your page, connectCodeEditor does. */}
       <helix-code-editor
-        data-preview-editor
+        data-preview-code-editor
         diagnostics={PROBLEMS}
         label="orders.ts"
         language="ts"

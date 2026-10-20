@@ -3,9 +3,9 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { HelixHeadlessFind } from '../../find/index.js'
 import type {
-  EditorEngine,
-  EditorEngineListeners,
-  EditorEngineState,
+  CodeEditorEngine,
+  CodeEditorEngineListeners,
+  CodeEditorEngineState,
   HelixHeadlessCodeEditor,
 } from './code-editor-root.js'
 
@@ -35,15 +35,15 @@ const type = (control: HTMLTextAreaElement, value: string): void => {
 const fakeEngine = () => {
   const told: {
     destroyed: number
-    listeners?: EditorEngineListeners
-    mounted: EditorEngineState[]
-    updates: EditorEngineState[]
+    listeners?: CodeEditorEngineListeners
+    mounted: CodeEditorEngineState[]
+    updates: CodeEditorEngineState[]
   } = {
     destroyed: 0,
     mounted: [],
     updates: [],
   }
-  const engine: EditorEngine = {
+  const engine: CodeEditorEngine = {
     mount: (_parent, state, listeners) => {
       told.mounted.push(state)
       told.listeners = listeners

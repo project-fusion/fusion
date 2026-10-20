@@ -35,13 +35,13 @@ import {
   placeholder,
 } from '@codemirror/view'
 import type {
-  EditorDiagnostic,
-  EditorEngine,
-  EditorEngineListeners,
-  EditorEngineState,
-  EditorEngineView,
-  EditorFindQuery,
-  EditorFindResult,
+  CodeEditorDiagnostic,
+  CodeEditorEngine,
+  CodeEditorEngineListeners,
+  CodeEditorEngineState,
+  CodeEditorEngineView,
+  CodeEditorFindQuery,
+  CodeEditorFindResult,
 } from '@fusion.dev/helix-headless/code-editor'
 import { syntaxHighlighter, syntaxRules } from '@fusion.dev/helix-sandbox/highlight'
 
@@ -185,7 +185,7 @@ const helixTheme = EditorView.theme({
 const SEVERITY = { danger: 'error', info: 'info', warning: 'warning' } as const
 
 /** The editor's diagnostics as CodeMirror's, kept inside the document. */
-const lintOf = (state: EditorEngineState, length: number): Diagnostic[] =>
+const lintOf = (state: CodeEditorEngineState, length: number): Diagnostic[] =>
   state.diagnostics.map((one) => ({
     from: Math.min(Math.max(0, one.from), length),
     message: one.message,
@@ -209,7 +209,10 @@ class ProblemLine extends GutterMarker {
 const RANK = { danger: 2, info: 0, warning: 1 } as const
 
 /** Each line with a problem, its number marked in the worst problem's tone. */
-const problemLines = (state: EditorState, diagnostics: readonly EditorDiagnostic[]): Extension => {
+const problemLines = (
+  state: EditorState,
+  diagnostics: readonly CodeEditorDiagnostic[],
+): Extension => {
   const worst = new Map<number, 'danger' | 'info' | 'warning'>()
   for (const one of diagnostics) {
     const line = state.doc.lineAt(Math.min(Math.max(0, one.from), state.doc.length)).from
@@ -226,7 +229,7 @@ const problemLines = (state: EditorState, diagnostics: readonly EditorDiagnostic
 }
 
 /** The query as CodeMirror's: literal unless it is a regular expression. */
-const queryOf = (query: EditorFindQuery): SearchQuery =>
+const queryOf = (query: CodeEditorFindQuery): SearchQuery =>
   new SearchQuery({
     caseSensitive: query.caseSensitive,
     literal: !query.regex,
@@ -252,7 +255,7 @@ const matchesOf = (state: EditorState, query: SearchQuery): Array<[number, numbe
 }
 
 /** Where the selection stands among the matches. */
-const standing = (state: EditorState, query: SearchQuery): EditorFindResult => {
+const standing = (state: EditorState, query: SearchQuery): CodeEditorFindResult => {
   const matches = matchesOf(state, query)
   const { from, to } = state.selection.main
   return {
@@ -288,12 +291,12 @@ export interface CodeMirrorOptions {
  * Control+F elsewhere), history, and diagnostics underlined in their tone.
  * Tab indents, and Escape then Tab leaves the editor.
  */
-export const codeMirrorEngine = (options: CodeMirrorOptions = {}): EditorEngine => ({
+export const codeMirrorEngine = (options: CodeMirrorOptions = {}): CodeEditorEngine => ({
   mount(
     parent: HTMLElement,
-    state: EditorEngineState,
-    listeners: EditorEngineListeners,
-  ): EditorEngineView {
+    state: CodeEditorEngineState,
+    listeners: CodeEditorEngineListeners,
+  ): CodeEditorEngineView {
     const root = parent.getRootNode() as Document | ShadowRoot
     adoptSyntax(root)
     const language = new Compartment()
@@ -383,7 +386,7 @@ export const codeMirrorEngine = (options: CodeMirrorOptions = {}): EditorEngine 
     view.dispatch(setDiagnostics(view.state, lintOf(state, view.state.doc.length)))
     /* The search CodeMirror keeps, opened first so its marks show, since
        opening sets a query of its own from the selection. */
-    const ask = (query: EditorFindQuery): SearchQuery => {
+    const ask = (query: CodeEditorFindQuery): SearchQuery => {
       const asked = queryOf(query)
       if (!searchPanelOpen(view.state)) {
         openSearchPanel(view)
@@ -493,8 +496,8 @@ export const codeMirrorEngine = (options: CodeMirrorOptions = {}): EditorEngine 
  * Connects CodeMirror to an editor, with `codeMirrorEngine(options)`, and
  * returns what takes it away again, leaving the editor a plain text field.
  */
-export const connectEditor = (
-  editor: { engine: EditorEngine | undefined },
+export const connectCodeEditor = (
+  editor: { engine: CodeEditorEngine | undefined },
   options: CodeMirrorOptions = {},
 ): (() => void) => {
   editor.engine = codeMirrorEngine(options)

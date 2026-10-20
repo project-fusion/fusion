@@ -1,11 +1,11 @@
 {
-  "name": "@fusion.dev/helix-editor",
-  "description": "Connects the Helix Editor frame to CodeMirror, themed with your tokens: highlighting, line numbers, folding, search, and diagnostics.",
+  "name": "@fusion.dev/helix-code-editor",
+  "description": "Connects the Helix Code Editor to CodeMirror, themed with your tokens: highlighting, line numbers, folding, search, and diagnostics.",
   "version": "0.220.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
-    "directory": "helix/editor",
+    "directory": "helix/code-editor",
     "type": "git",
     "url": "git+https://github.com/project-fusion/fusion.git"
   },

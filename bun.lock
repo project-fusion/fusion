@@ -62,8 +62,8 @@
         "@cosmos.gl/graph": "^3.5.1",
         "@fusion.dev/helix": "workspace:*",
         "@fusion.dev/helix-cem": "workspace:*",
+        "@fusion.dev/helix-code-editor": "workspace:*",
         "@fusion.dev/helix-docs": "workspace:*",
-        "@fusion.dev/helix-editor": "workspace:*",
         "@fusion.dev/helix-gallery": "workspace:*",
         "@fusion.dev/helix-graph": "workspace:*",
         "@fusion.dev/helix-icons": "workspace:*",
@@ -166,6 +166,32 @@
       "name": "@fusion.dev/helix-cli-win32-x64",
       "version": "0.220.0",
     },
+    "helix/code-editor": {
+      "name": "@fusion.dev/helix-code-editor",
+      "version": "0.220.0",
+      "dependencies": {
+        "@codemirror/commands": "^6.11.1",
+        "@codemirror/lang-css": "^6.3.1",
+        "@codemirror/lang-html": "^6.4.12",
+        "@codemirror/lang-javascript": "^6.2.5",
+        "@codemirror/lang-json": "^6.0.2",
+        "@codemirror/lang-markdown": "^6.3.4",
+        "@codemirror/lang-python": "^6.2.1",
+        "@codemirror/lang-rust": "^6.0.2",
+        "@codemirror/language": "^6.13.1",
+        "@codemirror/legacy-modes": "^6.5.5",
+        "@codemirror/lint": "^6.9.7",
+        "@codemirror/search": "^6.5.11",
+        "@codemirror/state": "^6.7.6",
+        "@codemirror/view": "^6.43.14",
+        "@fusion.dev/helix-headless": "workspace:*",
+        "@fusion.dev/helix-sandbox": "workspace:*",
+      },
+      "devDependencies": {
+        "@fusion.dev/helix-testing": "workspace:*",
+        "@types/bun": "^1.4.2",
+      },
+    },
     "helix/core": {
       "name": "@fusion.dev/helix-core",
       "version": "0.220.0",
@@ -221,32 +247,6 @@
         "@fusion.dev/scripts": "workspace:*",
         "lit": "^3.2.1",
         "playwright": "^1.64.0",
-      },
-    },
-    "helix/editor": {
-      "name": "@fusion.dev/helix-editor",
-      "version": "0.220.0",
-      "dependencies": {
-        "@codemirror/commands": "^6.11.1",
-        "@codemirror/lang-css": "^6.3.1",
-        "@codemirror/lang-html": "^6.4.12",
-        "@codemirror/lang-javascript": "^6.2.5",
-        "@codemirror/lang-json": "^6.0.2",
-        "@codemirror/lang-markdown": "^6.3.4",
-        "@codemirror/lang-python": "^6.2.1",
-        "@codemirror/lang-rust": "^6.0.2",
-        "@codemirror/language": "^6.13.1",
-        "@codemirror/legacy-modes": "^6.5.5",
-        "@codemirror/lint": "^6.9.7",
-        "@codemirror/search": "^6.5.11",
-        "@codemirror/state": "^6.7.6",
-        "@codemirror/view": "^6.43.14",
-        "@fusion.dev/helix-headless": "workspace:*",
-        "@fusion.dev/helix-sandbox": "workspace:*",
-      },
-      "devDependencies": {
-        "@fusion.dev/helix-testing": "workspace:*",
-        "@types/bun": "^1.4.2",
       },
     },
     "helix/gallery": {
@@ -595,13 +595,13 @@
 
     "@fusion.dev/helix-cli-win32-x64": ["@fusion.dev/helix-cli-win32-x64@workspace:helix/cli/platforms/win32-x64"],
 
+    "@fusion.dev/helix-code-editor": ["@fusion.dev/helix-code-editor@workspace:helix/code-editor"],
+
     "@fusion.dev/helix-core": ["@fusion.dev/helix-core@workspace:helix/core"],
 
     "@fusion.dev/helix-diagnostics": ["@fusion.dev/helix-diagnostics@workspace:helix/diagnostics"],
 
     "@fusion.dev/helix-docs": ["@fusion.dev/helix-docs@workspace:helix/docs"],
-
-    "@fusion.dev/helix-editor": ["@fusion.dev/helix-editor@workspace:helix/editor"],
 
     "@fusion.dev/helix-gallery": ["@fusion.dev/helix-gallery@workspace:helix/gallery"],
 
