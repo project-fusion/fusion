@@ -241,12 +241,18 @@ describe('a filterable menu', () => {
     expect(part(host, 'search-field')).toBeNull()
     expect(part(host, 'surface')?.getAttribute('role')).toBe('menu')
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
-    /* The audit reports once the page has gone quiet for `QUIET` milliseconds. */
-    await new Promise((resolve) => setTimeout(resolve, QUIET + 50))
+    /* The audit reports once the page has gone quiet for `QUIET` milliseconds,
+       which a page still loading chunks reaches later: waited for until it
+       arrives, up to twenty periods. */
+    const deadline = Date.now() + QUIET * 21
+    while (warnings.length === 0 && Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
     expect(warnings).toEqual([
       "<helix-headless-menu> has `filterable` and its entry is not imported, so it shows no filter field. Import '@fusion.dev/helix-headless/menu/filter'.",
     ])
-  })
+    /* Up to twenty quiet periods in a page that is still loading. */
+  }, 15_000)
 
   /* An app importing the entry with `import()` gives the menu its filter as
      the chunk lands, after the menu painted. `filterMenu` is what the entry
