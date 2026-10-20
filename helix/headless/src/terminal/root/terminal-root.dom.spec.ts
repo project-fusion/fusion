@@ -8,6 +8,7 @@ import {
   registerDom,
   settle,
 } from '@fusion.dev/helix-testing/dom'
+import type { HelixHeadlessFind } from '../../find/index.js'
 import type { HelixHeadlessIconButton } from '../../icon-button/index.js'
 import type { HelixHeadlessTerminal, TerminalRenderer, TerminalSettings } from './terminal-root.js'
 
@@ -84,6 +85,29 @@ const frame = async (attributes = ''): Promise<HelixHeadlessTerminal> =>
   (await mount(
     `<helix-headless-terminal label="zsh" ${attributes}><div></div></helix-headless-terminal>`,
   )) as HelixHeadlessTerminal
+
+/** The find bar, a Find of the frame's own. */
+const findOf = (host: HTMLElement): HelixHeadlessFind => part(host, 'find') as HelixHeadlessFind
+
+/** A part of the find bar, inside the Find. */
+const inFind = (host: HTMLElement, name: string): Element | null => part(findOf(host), name)
+
+/** Settles the frame, the find bar, and the search the bar runs once its update is over. */
+const searched = async (host: HelixHeadlessTerminal): Promise<void> => {
+  await settle(host)
+  await settle(findOf(host))
+  await Promise.resolve()
+  await settle(findOf(host))
+  await settle(host)
+}
+
+/** Types into the find field. */
+const typeFind = async (host: HelixHeadlessTerminal, text: string): Promise<void> => {
+  const field = inFind(host, 'field') as HTMLInputElement
+  field.value = text
+  field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+  await searched(host)
+}
 
 /** A key pressed where the reader types, as the renderer's input receives it. */
 const press = (target: Element, key: string, held: Held = {}): KeyboardEvent => {
@@ -214,8 +238,8 @@ describe('terminal controls', () => {
     expect(toolbar?.getAttribute('label')).toBe('Terminal controls')
     const slot = part(host, 'actions')
     expect(slot?.parentElement === toolbar).toBe(true)
-    expect(slot?.nextElementSibling?.getAttribute('part')).toBe('find')
-    expect(part(host, 'find')?.localName).toBe('helix-headless-icon-button')
+    expect(slot?.nextElementSibling?.getAttribute('part')).toBe('find-toggle')
+    expect(part(host, 'find-toggle')?.localName).toBe('helix-headless-icon-button')
   })
 
   test('clear asks the renderer, and copy waits for a selection', async () => {
@@ -233,41 +257,42 @@ describe('terminal controls', () => {
 })
 
 describe('the find bar', () => {
-  test('opens from its button, searches as the reader types, and says the count', async () => {
+  test('is a Find of its own, which opens from the find button, searches as the reader types, and says the count', async () => {
     const host = await frame()
     const { asked, renderer } = standIn(host)
     const sink = host.attach(renderer)
-    await settle(host)
-    expect(part(host, 'find-bar')?.hasAttribute('hidden')).toBe(true)
-    ;(part(host, 'find') as HTMLElement).click()
-    await settle(host)
-    expect(part(host, 'find-bar')?.hasAttribute('hidden')).toBe(false)
+    await searched(host)
+    expect(findOf(host).localName).toBe('helix-headless-find')
+    expect(findOf(host).shortcut).toBe('')
+    expect(inFind(host, 'bar')?.hasAttribute('hidden')).toBe(true)
+    ;(part(host, 'find-toggle') as HTMLElement).click()
+    await searched(host)
+    expect(inFind(host, 'bar')?.hasAttribute('hidden')).toBe(false)
     expect(hasState(host, 'find-open')).toBe(true)
-    const find = part(host, 'find') as HelixHeadlessIconButton
-    await find.updateComplete
-    expect(find.shadowRoot?.querySelector('[part="button"]')?.getAttribute('aria-expanded')).toBe(
+    const toggle = part(host, 'find-toggle') as HelixHeadlessIconButton
+    await toggle.updateComplete
+    expect(toggle.shadowRoot?.querySelector('[part="button"]')?.getAttribute('aria-expanded')).toBe(
       'true',
     )
-    const field = part(host, 'find-field') as HTMLInputElement
-    field.value = 'error'
-    field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    await typeFind(host, 'error')
     expect(asked.calls).toEqual(['find error'])
     sink.found(2, 12)
-    await settle(host)
-    expect(part(host, 'find-count')?.textContent?.trim()).toBe('3 of 12 matches')
-    expect(part(host, 'live')?.textContent?.trim()).toBe('3 of 12 matches')
-    press(field, 'Enter', { shiftKey: true })
+    await searched(host)
+    expect(inFind(host, 'count')?.textContent?.trim()).toBe('3 of 12 matches')
+    expect(inFind(host, 'live')?.textContent?.trim()).toBe('3 of 12 matches')
+    press(inFind(host, 'field') as Element, 'Enter', { shiftKey: true })
     expect(asked.calls.at(-1)).toBe('find error backward')
   })
 
-  test('holds the page’s own controls between the count and the buttons that move between matches', async () => {
+  test('forwards the page’s own controls and glyphs into the bar', async () => {
     const host = await frame()
-    const slot = part(host, 'find-actions')
-    expect(slot?.localName).toBe('slot')
-    expect(slot?.getAttribute('name')).toBe('find-actions')
-    expect(slot?.parentElement?.getAttribute('part')).toBe('find-controls')
-    expect(slot?.parentElement?.previousElementSibling?.getAttribute('part')).toBe('find-count')
-    expect(slot?.nextElementSibling?.getAttribute('part')).toBe('find-previous')
+    host.attach(standIn(host).renderer)
+    await searched(host)
+    const forwarded = findOf(host).querySelector('slot[name="find-actions"]')
+    expect(forwarded?.getAttribute('slot')).toBe('actions')
+    const icon = findOf(host).querySelector('slot[name="find-next-icon"]')
+    expect(icon?.getAttribute('slot')).toBe('next-icon')
+    expect(icon?.querySelector('svg')).not.toBeNull()
   })
 
   test('matches case, whole words, and a regular expression, each a button that says whether it is on', async () => {
@@ -279,60 +304,78 @@ describe('the find bar', () => {
     renderer.findEnd = () =>
       asked.push({ caseSensitive: false, query: '', regex: false, wholeWord: false })
     host.attach(renderer)
-    await settle(host)
-    const field = part(host, 'find-field') as HTMLInputElement
-    field.value = 'err(or)?'
-    field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
-    for (const name of ['find-match-case', 'find-whole-word', 'find-regex']) {
-      expect(part(host, name)?.getAttribute('aria-pressed')).toBe('false')
+    await searched(host)
+    findOf(host).open = true
+    await typeFind(host, 'err(or)?')
+    for (const name of ['match-case', 'whole-word', 'regex']) {
+      expect(inFind(host, name)?.getAttribute('aria-pressed')).toBe('false')
     }
-    ;(part(host, 'find-match-case') as HTMLElement).click()
-    ;(part(host, 'find-regex') as HTMLElement).click()
-    await settle(host)
-    expect(part(host, 'find-match-case')?.getAttribute('aria-pressed')).toBe('true')
+    ;(inFind(host, 'match-case') as HTMLElement).click()
+    ;(inFind(host, 'regex') as HTMLElement).click()
+    await searched(host)
+    expect(inFind(host, 'match-case')?.getAttribute('aria-pressed')).toBe('true')
     expect(asked.at(-1)).toMatchObject({
       caseSensitive: true,
       query: 'err(or)?',
       regex: true,
       wholeWord: false,
     })
-    ;(part(host, 'find-whole-word') as HTMLElement).click()
+    expect(host.findMatchCase).toBe(true)
+    ;(inFind(host, 'whole-word') as HTMLElement).click()
+    await searched(host)
     expect(asked.at(-1)).toMatchObject({ wholeWord: true })
+  })
+
+  test('a search with other options ends the old one first, which xterm.js would count again', async () => {
+    const host = await frame()
+    const { asked, renderer } = standIn(host)
+    host.attach(renderer)
+    await searched(host)
+    findOf(host).open = true
+    await typeFind(host, 'error')
+    ;(inFind(host, 'match-case') as HTMLElement).click()
+    await searched(host)
+    expect(asked.calls.slice(-2)).toEqual(['find end', 'find error'])
   })
 
   test('says a regular expression it cannot read, and searches nothing with it', async () => {
     const host = await frame('find-regex')
     const { asked, renderer } = standIn(host)
     host.attach(renderer)
-    await settle(host)
-    const field = part(host, 'find-field') as HTMLInputElement
-    field.value = '(error'
-    field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
-    await settle(host)
+    await searched(host)
+    findOf(host).open = true
+    await typeFind(host, 'error')
+    await typeFind(host, '(error')
     expect(asked.calls.at(-1)).toBe('find end')
-    expect(part(host, 'find-count')?.textContent?.trim()).toBe('Not a valid regular expression')
-    expect(part(host, 'live')?.textContent?.trim()).toBe('Not a valid regular expression')
+    expect(inFind(host, 'count')?.textContent?.trim()).toBe('Not a valid regular expression')
+    expect(inFind(host, 'live')?.textContent?.trim()).toBe('Not a valid regular expression')
   })
 
   test('says when nothing matched', async () => {
     const host = await frame()
     const sink = host.attach(standIn(host).renderer)
+    await searched(host)
+    findOf(host).open = true
+    await searched(host)
     sink.found(-1, 0)
-    await settle(host)
-    expect(part(host, 'find-count')?.textContent?.trim()).toBe('No matches')
+    await searched(host)
+    expect(inFind(host, 'count')?.textContent?.trim()).toBe('No matches')
   })
 
-  test('Escape closes it, takes the highlights off, and returns focus to the terminal', async () => {
+  test('Escape closes it, takes the highlights off, and returns focus to the terminal it was opened from', async () => {
     const host = await frame()
     const { asked, input, renderer } = standIn(host)
     host.attach(renderer)
-    await settle(host)
-    ;(part(host, 'find') as HTMLElement).click()
-    await settle(host)
-    press(part(host, 'find-field') as Element, 'Escape')
-    await settle(host)
-    expect(part(host, 'find-bar')?.hasAttribute('hidden')).toBe(true)
-    expect(asked.calls).toEqual(['find end'])
+    await searched(host)
+    input.focus()
+    press(input, ...findChord())
+    await searched(host)
+    await typeFind(host, 'error')
+    press(inFind(host, 'field') as Element, 'Escape')
+    await searched(host)
+    expect(inFind(host, 'bar')?.hasAttribute('hidden')).toBe(true)
+    expect(hasState(host, 'find-open')).toBe(false)
+    expect(asked.calls).toEqual(['find error', 'find end'])
     expect(document.activeElement).toBe(input)
   })
 })

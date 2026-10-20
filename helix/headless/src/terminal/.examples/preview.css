@@ -64,7 +64,7 @@ helix-headless-terminal::part(find-controls-toolbar) {
   gap: 0.25rem;
 }
 
-helix-headless-terminal::part(find-button),
+helix-headless-terminal::part(find-toggle-button),
 helix-headless-terminal::part(copy-button),
 helix-headless-terminal::part(clear-button),
 helix-headless-terminal::part(fullscreen-button),
@@ -106,7 +106,8 @@ helix-headless-terminal::part(find-field) {
   flex: 1 1 auto;
 }
 
-helix-headless-terminal::part(find-bar) {
+/* The find bar is a Find of the terminal's own, in the grid's find row. */
+helix-headless-terminal::part(find) {
   grid-row: find;
 }
 

@@ -28,7 +28,7 @@ describe('terminal server output', () => {
   test('the header ships with the name and the resting controls, named', () => {
     const markup = served()
     expect(rendered(markup, 'helix-headless-terminal')).toContain('zsh')
-    expect(partTag(markup, 'find')).toContain('label="Find"')
+    expect(partTag(markup, 'find-toggle')).toContain('label="Find"')
     expect(partTag(markup, 'clear')).toContain('label="Clear"')
     expect(hasPart(markup, 'copy')).toBe(false)
     expect(hasPart(markup, 'fullscreen')).toBe(false)
@@ -36,7 +36,8 @@ describe('terminal server output', () => {
 
   test('the find bar and the status line are served hidden', () => {
     const markup = served()
-    expect(partTag(markup, 'find-bar')).toContain('hidden')
+    /* The bar is the find bar's own part, inside the Find the frame serves. */
+    expect(partTag(markup, 'bar')).toContain('hidden')
     expect(partTag(markup, 'status')).toContain('hidden')
   })
 
