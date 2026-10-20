@@ -5,12 +5,12 @@ import { EditorView } from '@codemirror/view'
 import type { HelixHeadlessCodeEditor } from '@fusion.dev/helix-headless/code-editor'
 import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
-let connectEditor: typeof import('./codemirror-engine.js').connectEditor
+let connectCodeEditor: typeof import('./codemirror-engine.js').connectCodeEditor
 
 beforeAll(async () => {
   registerDom()
   await import('@fusion.dev/helix-headless/code-editor')
-  ;({ connectEditor } = await import('./codemirror-engine.js'))
+  ;({ connectCodeEditor } = await import('./codemirror-engine.js'))
 })
 
 /** An editor with CodeMirror connected, and the view CodeMirror drew. */
@@ -20,7 +20,7 @@ const connected = async (
   const element = (await mount(
     `<helix-headless-code-editor label="Code" ${attributes}></helix-headless-code-editor>`,
   )) as HelixHeadlessCodeEditor
-  connectEditor(element)
+  connectCodeEditor(element)
   await element.updateComplete
   const drawn = part(element, 'view')?.querySelector('.cm-editor') as HTMLElement
   const view = EditorView.findFromDOM(drawn) as EditorView

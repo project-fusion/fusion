@@ -31,7 +31,7 @@ declare const __PREVIEW_MAP_URL__: string
 declare const __PREVIEW_MAPLIBRE_URL__: string
 declare const __PREVIEW_PLOT_THREE_URL__: string
 declare const __PREVIEW_TERMINAL_URL__: string
-declare const __PREVIEW_EDITOR_URL__: string
+declare const __PREVIEW_CODE_EDITOR_URL__: string
 declare const __PREVIEW_HIGHLIGHT_URL__: string
 
 interface RenderMessage {
@@ -173,20 +173,22 @@ const mountGraphs = (root: HTMLElement, at: number): void => {
 }
 
 /**
- * A live code editor for any editor with `data-preview-editor` the markup
+ * A live code editor for any editor with `data-preview-code-editor` the markup
  * carries, with CodeMirror and the connector loaded the first time one does
  * and never before.
  */
-const mountEditors = (root: HTMLElement, at: number): void => {
+const mountCodeEditors = (root: HTMLElement, at: number): void => {
   if (
-    !root.querySelector(':is(helix-code-editor, helix-headless-code-editor)[data-preview-editor]')
+    !root.querySelector(
+      ':is(helix-code-editor, helix-headless-code-editor)[data-preview-code-editor]',
+    )
   ) {
     return
   }
-  void load(__PREVIEW_EDITOR_URL__)
+  void load(__PREVIEW_CODE_EDITOR_URL__)
     .then(() => {
-      if (at === generation && window.helixPreviewEditor) {
-        mounted.push(window.helixPreviewEditor.mount(root))
+      if (at === generation && window.helixPreviewCodeEditor) {
+        mounted.push(window.helixPreviewCodeEditor.mount(root))
       }
     })
     .catch((error: unknown) => console.error(String(error)))
@@ -312,7 +314,7 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
     mountMaps(host, generation)
     mountGraphs(host, generation)
     mountTerminals(host, generation)
-    mountEditors(host, generation)
+    mountCodeEditors(host, generation)
     highlightCode(host)
   }
   window.dispatchEvent(new Event(RESTYLED))

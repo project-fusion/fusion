@@ -33,7 +33,7 @@ import '../../icon-button/index.js'
 import '../../toolbar/index.js'
 
 /** A problem in the text, from a linter or a language server, by where it is. */
-export interface EditorDiagnostic {
+export interface CodeEditorDiagnostic {
   /** Where it starts and ends, as offsets into the value. */
   from: number
   message: string
@@ -43,8 +43,8 @@ export interface EditorDiagnostic {
 }
 
 /** What an editor shows, which an engine draws. */
-export interface EditorEngineState {
-  diagnostics: readonly EditorDiagnostic[]
+export interface CodeEditorEngineState {
+  diagnostics: readonly CodeEditorDiagnostic[]
   /** The editor's name, for the engine's text area. */
   label: string
   /** The language to highlight, such as `ts`, `css`, `md` or `rust`. Empty is plain text. */
@@ -57,7 +57,7 @@ export interface EditorEngineState {
 }
 
 /** What the editor tells the engine, which the engine calls as the reader works. */
-export interface EditorEngineListeners {
+export interface CodeEditorEngineListeners {
   /** The caret or selection moved, as offsets into the value. */
   caret?(from: number, to: number): void
   /** The reader changed the text. Returns whether the change stands, so the engine can refuse one the page refused. */
@@ -65,7 +65,7 @@ export interface EditorEngineListeners {
 }
 
 /** What the find bar asks an engine to look for. */
-export interface EditorFindQuery {
+export interface CodeEditorFindQuery {
   caseSensitive: boolean
   regex: boolean
   /** What Replace puts in place of a match. */
@@ -75,13 +75,13 @@ export interface EditorFindQuery {
 }
 
 /** Where a search stands: how many matches, and which is selected, counting from 0, or -1 for none. */
-export interface EditorFindResult {
+export interface CodeEditorFindResult {
   count: number
   index: number
 }
 
 /** An engine drawing one editor, which the editor drives. */
-export interface EditorEngineView {
+export interface CodeEditorEngineView {
   /** Takes the engine out of the page. */
   destroy(): void
   /**
@@ -89,35 +89,35 @@ export interface EditorEngineView {
    * or previous from the selected one. Marks every match while the find bar
    * is open.
    */
-  find?(query: EditorFindQuery, direction: 'first' | 'next' | 'previous'): EditorFindResult
+  find?(query: CodeEditorFindQuery, direction: 'first' | 'next' | 'previous'): CodeEditorFindResult
   /** Takes the marks a search drew away, as the find bar closes. */
   findEnd?(): void
   /** Puts the caret in the engine's text area. */
   focus?(): void
   /** Replaces the selected match, or every match, and returns where the search stands after. */
-  replace?(query: EditorFindQuery, all: boolean): EditorFindResult
+  replace?(query: CodeEditorFindQuery, all: boolean): CodeEditorFindResult
   /** Selects a range, scrolls it into view and puts the caret there. */
   select?(from: number, to: number): void
   /** Shows a new state: a value set from outside, a language, diagnostics. */
-  update(state: EditorEngineState): void
+  update(state: CodeEditorEngineState): void
 }
 
 /**
  * Something that draws a code editor, such as CodeMirror through
- * `@fusion.dev/helix-editor`. The editor hands it an element to draw in.
+ * `@fusion.dev/helix-code-editor`. The editor hands it an element to draw in.
  */
-export interface EditorEngine {
+export interface CodeEditorEngine {
   mount(
     parent: HTMLElement,
-    state: EditorEngineState,
-    listeners: EditorEngineListeners,
-  ): EditorEngineView
+    state: CodeEditorEngineState,
+    listeners: CodeEditorEngineListeners,
+  ): CodeEditorEngineView
 }
 
 /** Each diagnostic's line, counted from 1, by its start, from one pass over the value. */
 export const diagnosticLines = (
   value: string,
-  diagnostics: readonly EditorDiagnostic[],
+  diagnostics: readonly CodeEditorDiagnostic[],
 ): number[] => {
   const starts = [0]
   for (let at = value.indexOf('\n'); at !== -1; at = value.indexOf('\n', at + 1)) {
@@ -203,8 +203,8 @@ const LANGUAGE_NAMES: Record<string, string> = {
  * A pane for working on a file: a header with its name, its language and the
  * page's own actions, the code, the problems in it, and a status line that
  * says where the caret is. On its own the code is a `<textarea>` in the code
- * face. Connect an engine and it draws the code instead: `connectEditor` from
- * `@fusion.dev/helix-editor` connects CodeMirror, with highlighting in your
+ * face. Connect an engine and it draws the code instead: `connectCodeEditor` from
+ * `@fusion.dev/helix-code-editor` connects CodeMirror, with highlighting in your
  * theme's syntax colors, line numbers, folding, bracket matching and history.
  * The value, the form, validation and the events stay the editor's, so a page
  * reads and writes it the same either way.
@@ -364,7 +364,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
 
   /** The problems in the text, each underlined and listed under the editor. */
   @property({ attribute: false })
-  diagnostics: readonly EditorDiagnostic[] = []
+  diagnostics: readonly CodeEditorDiagnostic[] = []
 
   /** The list of problems' name. */
   @words
@@ -373,10 +373,10 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
 
   /**
    * What draws the editor, such as `codeMirrorEngine()` from
-   * `@fusion.dev/helix-editor`. Absent, the editor is a plain text field.
+   * `@fusion.dev/helix-code-editor`. Absent, the editor is a plain text field.
    */
   @property({ attribute: false })
-  engine: EditorEngine | undefined = undefined
+  engine: CodeEditorEngine | undefined = undefined
 
   /** The name of the find bar's Close button. */
   @words
@@ -497,7 +497,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
   /** The find bar drawn now, and how a search is reported to it. */
   private find: { element: HelixHeadlessFind; sink: FindSink } | undefined
 
-  private view: EditorEngineView | undefined
+  private view: CodeEditorEngineView | undefined
 
   /** Whether Escape came just before, which lets Tab leave the plain field. */
   private escaped = false
@@ -513,7 +513,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
     return this.partNamed<HTMLTextAreaElement>('control')
   }
 
-  private get engineState(): EditorEngineState {
+  private get engineState(): CodeEditorEngineState {
     return {
       diagnostics: this.diagnostics,
       label: this.label,

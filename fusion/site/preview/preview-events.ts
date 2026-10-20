@@ -25,7 +25,7 @@ declare global {
     /** Set by the highlight chunk once it has registered its highlighter. */
     helixPreviewHighlight?: true
     /** What the editor chunk leaves on the window, the same way. */
-    helixPreviewEditor?: { mount(root: HTMLElement): () => void }
+    helixPreviewCodeEditor?: { mount(root: HTMLElement): () => void }
     /** What the terminal chunk leaves on the window, the same way. */
     helixPreviewTerminal?: { mount(root: HTMLElement): () => void }
   }

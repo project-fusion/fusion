@@ -18,7 +18,7 @@ import '../../toolbar/index.js'
  * header, a find bar and a status line each a strip on the raised surface,
  * one frame around them. It is 24rem tall unless `fill` is set or
  * `--code-editor-block-size` says otherwise. An engine draws inside it:
- * `@fusion.dev/helix-editor` themes CodeMirror's gutter, caret, selection and
+ * `@fusion.dev/helix-code-editor` themes CodeMirror's gutter, caret, selection and
  * syntax from your tokens, and draws a problem's line number in its tone.
  *
  * Set `fill` for an editor that fills a pane, such as one side of a split

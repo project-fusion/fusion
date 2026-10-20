@@ -1,7 +1,7 @@
 export {
   type CodeMirrorOptions,
   codeMirrorEngine,
-  connectEditor,
+  connectCodeEditor,
   languageName,
   languageNames,
 } from './codemirror/index.js'

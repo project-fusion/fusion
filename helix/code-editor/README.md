@@ -1,4 +1,4 @@
-# @fusion.dev/helix-editor
+# @fusion.dev/helix-code-editor
 
 Connects Helix's `Code Editor` to CodeMirror 6, themed from your tokens:
 highlighting in your theme's syntax colors, line numbers, folding, bracket
@@ -7,7 +7,7 @@ numbers drawn in it, and the editor's own find bar finding and replacing in
 CodeMirror.
 
 ```sh
-bun add @fusion.dev/helix @fusion.dev/helix-editor
+bun add @fusion.dev/helix @fusion.dev/helix-code-editor
 ```
 
 The element is on the [Code Editor reference](https://fusion.dev/helix/components/code-editor).
@@ -16,10 +16,10 @@ For a few lines of code in a form, `Code Input` needs no engine.
 
 ```js
 import '@fusion.dev/helix/code-editor'
-import { connectEditor } from '@fusion.dev/helix-editor'
+import { connectCodeEditor } from '@fusion.dev/helix-code-editor'
 
 const editor = document.querySelector('helix-code-editor')
-const disconnect = connectEditor(editor)
+const disconnect = connectCodeEditor(editor)
 
 editor.language = 'ts'
 editor.diagnostics = [{ from: 79, to: 83, message: 'Cannot find name totl.' }]
@@ -39,7 +39,7 @@ Any other name is plain text.
 
 ## More of CodeMirror
 
-`connectEditor(editor, { extensions })` adds CodeMirror extensions after
+`connectCodeEditor(editor, { extensions })` adds CodeMirror extensions after
 Helix's own, such as completions or a language server client. To connect
 CodeMirror under your own control, set the element's `engine` to
 `codeMirrorEngine(options)`, or to an engine of your own that answers `mount`.
