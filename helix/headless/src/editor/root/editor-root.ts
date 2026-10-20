@@ -216,7 +216,7 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * - Alt+F10 moves focus to the toolbar. The arrow keys move between its
  *   tools, and Escape returns to the document.
  *
- * @since 0.218.0
+ * @since 0.221.0
  * @status experimental
  * @category editors
  * @aliases Rich text editor, WYSIWYG, Document editor, ProseMirror, Block editor

@@ -26,7 +26,7 @@ import '../../toolbar/index.js'
  * renderer connects, and `connectEditor` writes it too. Its lines keep to a
  * readable length, `--editor-measure`, centered in a wide frame.
  *
- * @since 0.218.0
+ * @since 0.221.0
  * @status experimental
  * @category editors
  * @aliases Rich text editor, WYSIWYG, Document editor, ProseMirror, Block editor
