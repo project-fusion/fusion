@@ -64,12 +64,14 @@ type TestOptions = number | { timeout?: number }
 
 const cases: Case[] = []
 const hooks: { body: () => unknown; depth: number }[] = []
+const setups: { body: () => unknown; depth: number }[] = []
 const teardowns: { body: () => unknown; depth: number }[] = []
 let suite: string[] = []
 
 /** How much of the above a previous bundle has already claimed. */
 let claimedCases = 0
 let claimedHooks = 0
+let claimedSetups = 0
 let claimedTeardowns = 0
 
 /** Groups tests. Nests, and the names join for reporting. */
@@ -138,6 +140,14 @@ export const it = test
 /** Runs once before the tests in the block it was declared in. */
 export const beforeAll = (body: () => unknown): void => {
   hooks.push({ body, depth: suite.length })
+}
+
+/**
+ * Runs before every test in the block it was declared in. One that throws
+ * fails that test, which then does not run.
+ */
+export const beforeEach = (body: () => unknown): void => {
+  setups.push({ body, depth: suite.length })
 }
 
 /**
@@ -492,11 +502,13 @@ export const expect = Object.assign(
 export const claim = (): (() => Promise<SpecResult[]>) => {
   const mine = cases.slice(claimedCases)
   const myHooks = hooks.slice(claimedHooks)
+  const mySetups = setups.slice(claimedSetups)
   const myTeardowns = teardowns.slice(claimedTeardowns)
   claimedCases = cases.length
   claimedHooks = hooks.length
+  claimedSetups = setups.length
   claimedTeardowns = teardowns.length
-  return () => runThese(myHooks, myTeardowns, mine)
+  return () => runThese(myHooks, mySetups, myTeardowns, mine)
 }
 
 /**
@@ -507,6 +519,7 @@ export const claim = (): (() => Promise<SpecResult[]>) => {
  */
 const runThese = async (
   ownHooks: { body: () => unknown; depth: number }[],
+  ownSetups: { body: () => unknown; depth: number }[],
   ownTeardowns: { body: () => unknown; depth: number }[],
   ownCases: Case[],
 ): Promise<SpecResult[]> => {
@@ -527,6 +540,9 @@ const runThese = async (
     let failure: string | undefined
     const limit = entry.timeout ?? TIMEOUT
     try {
+      for (const setup of ownSetups) {
+        await setup.body()
+      }
       await Promise.race([
         entry.body(),
         new Promise((_, reject) => {
