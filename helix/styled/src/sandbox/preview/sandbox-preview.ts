@@ -593,7 +593,7 @@ export class HelixSandboxPreview extends HelixElement {
        once. The press is reported here, and `postMessage` carries the
        activation with it, which is what lets this page start listening. */
     if (data?.type === 'helix-speech-start') {
-      this.hear(data, event.source as Window)
+      this.hear(data, event.source as Window, event.ports[0])
       return
     }
     if (data?.type === 'helix-speech-stop') {
@@ -821,7 +821,7 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
    * Listens on this page for a frame that cannot listen for itself, and sends
    * each guess back to that frame.
    */
-  private hear(ask: PreviewSpeechStart, source: Window): void {
+  private hear(ask: PreviewSpeechStart, source: Window, port?: MessagePort): void {
     this.speech?.stop()
     this.speechId = ask.id
     const tell = (
@@ -829,7 +829,12 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
       text?: string,
       error?: string,
     ): void => {
-      source.postMessage({ error, id: ask.id, kind, text, type: 'helix-speech-heard' }, '*')
+      const message = { error, id: ask.id, kind, text, type: 'helix-speech-heard' }
+      if (port) {
+        port.postMessage(message)
+      } else {
+        source.postMessage(message, '*')
+      }
     }
     this.speech = recognizeSpeech(
       ask.lang,
