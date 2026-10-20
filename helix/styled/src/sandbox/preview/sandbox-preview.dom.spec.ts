@@ -115,7 +115,9 @@ describe('the preview pane', () => {
         heard.push(message)
       }
     }) as Window['postMessage']
-    const scope = window as unknown as { SpeechRecognition?: new () => FakeRecognition }
+    const scope = window as unknown as {
+      SpeechRecognition: (new () => FakeRecognition) | undefined
+    }
     const original = scope.SpeechRecognition
     scope.SpeechRecognition = FakeRecognition
     restore = () => {
