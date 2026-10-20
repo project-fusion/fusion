@@ -237,8 +237,7 @@ describe('a shut branch', () => {
 /* The stylesheet the item adopts, as text. happy-dom resolves no cascade, so
    what can be held here is that a rule exists rather than that it applied. */
 const sheet = (): string => {
-  const declared = (customElements.get('helix-tree-item') as unknown as { styles: unknown })
-    .styles
+  const declared = (customElements.get('helix-tree-item') as unknown as { styles: unknown }).styles
   return (Array.isArray(declared) ? declared : [declared])
     .flat(Number.POSITIVE_INFINITY)
     .map((one) => String((one as { cssText?: string }).cssText ?? ''))
