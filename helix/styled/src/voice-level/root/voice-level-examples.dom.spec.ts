@@ -1,3 +1,4 @@
+import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { example, framesBooked, hasLayout, registerDom } from '@fusion.dev/helix-testing/dom'
 import readings from '../.examples/readings.html' with { type: 'text' }
