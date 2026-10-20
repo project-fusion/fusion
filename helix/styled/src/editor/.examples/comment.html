@@ -1,0 +1,20 @@
+<!-- @summary A comment box with a short toolbar and a Post button of the page's own. -->
+<!-- Preview frame: data-preview-editor has the frame connect ProseMirror; on your page, connectEditor does. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<helix-editor
+  data-preview-editor
+  label="Comment"
+  placeholder="Add a comment"
+  tools="marks link lists"
+>
+  <div></div>
+  <helix-button
+    emphasis="solid"
+    slot="actions"
+    tone="primary"
+  >Post</helix-button>
+</helix-editor>

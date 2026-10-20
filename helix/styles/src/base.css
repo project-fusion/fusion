@@ -1255,13 +1255,24 @@ helix-toast:not([data-color-mode]) {
 }
 
 /* **A heading in a Markdown document has room above it and sits close to what
-   it heads.** Scoped to `helix-markdown`, since the recipe's other pages set
-   their own heading spacing. */
-:where(helix-markdown[data-prose], [data-prose] helix-markdown) > :where(h1, h2, h3, h4, h5, h6) {
+   it heads**, and so does one in an Editor's document, which is the same
+   document being written. Scoped to the two, since the recipe's other pages
+   set their own heading spacing. */
+:where(
+  helix-markdown[data-prose],
+  [data-prose] helix-markdown,
+  helix-editor > [data-prose],
+  helix-headless-editor > [data-prose]
+) > :where(h1, h2, h3, h4, h5, h6) {
   margin-block: var(--helix-space-md) var(--helix-space-xs);
 }
 
-:where(helix-markdown[data-prose], [data-prose] helix-markdown)
+:where(
+    helix-markdown[data-prose],
+    [data-prose] helix-markdown,
+    helix-editor > [data-prose],
+    helix-headless-editor > [data-prose]
+  )
   > :where(h1, h2, h3, h4, h5, h6):where(:first-child) {
   margin-block-start: var(--helix-space-none);
 }
