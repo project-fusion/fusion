@@ -528,5 +528,10 @@
       - text: Virtual List
       - link "Virtual List documentation":
         - /url: /helix/components/virtual-list
+    - treeitem "Voice Level Voice Level documentation Experimental" [level=1]:
+      - text: Voice Level
+      - link "Voice Level documentation":
+        - /url: /helix/components/voice-level
+      - img "Experimental"
   - status
 - alert
