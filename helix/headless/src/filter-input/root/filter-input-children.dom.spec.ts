@@ -13,20 +13,34 @@ beforeAll(async () => {
 
 type Report = { kind: string; message: string }
 
-/** What the runtime log heard while `markup` mounted and the page painted. */
-const told = async (markup: string): Promise<Report[]> => {
+/**
+ * What the runtime log heard while `markup` mounted and the page painted,
+ * waiting for `expected` reports where a report is expected.
+ */
+const told = async (markup: string, expected = 0): Promise<Report[]> => {
   const key = Symbol.for('fusion.dev/helix/runtime-log')
   const log = (globalThis as Record<symbol, unknown>)[key]
   const before = Array.isArray(log) ? log.length : 0
   document.body.innerHTML = markup
   await settle(document.body.firstElementChild as Updatable)
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
-  /* The audit reports once the page has gone quiet for `QUIET` milliseconds. */
+  const heard = (): Report[] => {
+    const after = (globalThis as Record<symbol, unknown>)[key]
+    return ((Array.isArray(after) ? after.slice(before) : []) as Report[]).filter(
+      (one) => one.kind === 'unregistered-part',
+    )
+  }
+  /* The audit reports once the page has gone quiet for `QUIET` milliseconds.
+     A page still loading, as the browser spec runner's is while it fetches
+     each family's chunk, goes quiet later, after up to twenty periods: a report
+     that is expected is waited for until it arrives, and only its absence is
+     timed. */
+  const deadline = Date.now() + QUIET * 21
   await new Promise((resolve) => setTimeout(resolve, QUIET + 50))
-  const after = (globalThis as Record<symbol, unknown>)[key]
-  return ((Array.isArray(after) ? after.slice(before) : []) as Report[]).filter(
-    (one) => one.kind === 'unregistered-part',
-  )
+  while (heard().length < expected && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  }
+  return heard()
 }
 
 describe('a filter field whose suggestions were never imported', () => {
@@ -44,11 +58,12 @@ describe('a filter field whose suggestions were never imported', () => {
     const markup = `<spec-sugg-filter-input label="Filter">
       <spec-sugg-option slot="suggestions" value="status:">status:</spec-sugg-option>
     </spec-sugg-filter-input>`
-    expect((await told(markup)).map((one) => one.message)).toEqual([
+    expect((await told(markup, 1)).map((one) => one.message)).toEqual([
       '<spec-sugg-option> in <spec-sugg-filter-input> is not registered, so the field suggests nothing. Define <spec-sugg-option> as you defined <spec-sugg-filter-input>.',
     ])
     expect(await told(markup)).toEqual([])
-  })
+    /* Up to twenty quiet periods in a page that is still loading. */
+  }, 15_000)
 
   test('and with the import, says nothing and offers them', async () => {
     await import('../../option/index.js')
