@@ -43,6 +43,7 @@ clock
 closed-captioning
 cloud
 cloud-rain
+code
 command
 compass
 copy
@@ -84,8 +85,11 @@ layout
 leaf
 lightbulb
 link
+link-break
 linkedin-logo
 list
+list-bullets
+list-numbers
 magnifying-glass
 megaphone-simple
 microphone
@@ -108,6 +112,7 @@ pulse
 push-pin
 push-pin-slash
 question
+quotes
 react
 receipt
 record
@@ -136,6 +141,7 @@ text-a-underline
 text-aa
 text-b
 text-italic
+text-strikethrough
 train
 trash
 tree
