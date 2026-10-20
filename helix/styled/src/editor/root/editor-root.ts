@@ -21,8 +21,9 @@ import '../../toolbar/index.js'
  * that fills a pane, where the document scrolls inside the frame.
  *
  * The document's headings, lists, quotes, code, and tables are drawn by the
- * base layer's `data-prose` rules, which `connectEditor` writes onto the
- * document, so it reads as your docs and chat replies do. Its lines keep to a
+ * base layer's `data-prose` rules, so it reads as your docs and chat replies
+ * do. Write `data-prose` on the document so the base layer draws it before a
+ * renderer connects, and `connectEditor` writes it too. Its lines keep to a
  * readable length, `--editor-measure`, centered in a wide frame.
  *
  * @since 0.218.0

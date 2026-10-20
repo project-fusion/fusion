@@ -100,11 +100,16 @@ helix-headless-editor::part(quote-pressed) {
   border-radius: var(--_radius-control);
 }
 
+/* The address bar is shut until the reader opens it, which the element says. */
 helix-headless-editor::part(link-bar) {
   align-items: center;
-  display: flex;
+  display: none;
   gap: 0.25rem;
   padding-block-start: 0.25rem;
+}
+
+helix-headless-editor:state(link-open)::part(link-bar) {
+  display: flex;
 }
 
 helix-headless-editor::part(link-field) {

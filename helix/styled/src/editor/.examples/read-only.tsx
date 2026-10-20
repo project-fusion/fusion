@@ -7,7 +7,7 @@ export function Example() {
         label="Meeting notes"
         readonly
       >
-        <div>
+        <div data-prose="">
           <h2>Design review</h2>
           <p>
             The team agreed on the <strong>two-column layout</strong> for the settings page.

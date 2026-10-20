@@ -11,7 +11,7 @@ export function Example() {
           label="Launch plan"
           separation="plain"
         >
-          <div>
+          <div data-prose="">
             <h1>Launch plan</h1>
             <p>
               The launch moves to <strong>October 14</strong>, after the beta closes.
