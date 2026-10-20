@@ -22,7 +22,9 @@ describe('command material', () => {
   })
 
   test('follows a change', async () => {
-    const host = (await mount('<helix-command label="Commands"></helix-command>')) as HTMLElement & {
+    const host = (await mount(
+      '<helix-command label="Commands"></helix-command>',
+    )) as HTMLElement & {
       material?: string
       updateComplete: Promise<boolean>
     }

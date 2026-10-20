@@ -357,7 +357,9 @@ describe('the trail separator', () => {
     )) as HTMLElement & { items: unknown[]; updateComplete: Promise<unknown> }
     crumbs.items = [{ href: '/', label: 'Home' }, { label: 'Helix' }]
     await crumbs.updateComplete
-    const drawn = [...(crumbs.shadowRoot?.querySelectorAll('[part~="crumb"]') ?? [])] as HTMLElement[]
+    const drawn = [
+      ...(crumbs.shadowRoot?.querySelectorAll('[part~="crumb"]') ?? []),
+    ] as HTMLElement[]
     for (const crumb of drawn) {
       await (crumb as HTMLElement & { updateComplete: Promise<unknown> }).updateComplete
     }
