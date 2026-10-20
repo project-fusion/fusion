@@ -127,8 +127,16 @@ const meter = (report: (level: number, bands: readonly number[]) => void): (() =
 /**
  * Listens with the browser's recognizer in this page. A field in a sandboxed
  * frame cannot: its origin is opaque, and the recognizer refuses it.
+ *
+ * `meter` reads loudness for the ring. Leave it off where this page is
+ * listening for a frame. A second capture of the microphone ends the
+ * recognizer, and the prompt the reader sees belongs to that capture.
  */
-export const recognizeSpeech = (lang: string, listener: SpeechListener): SpeechSession => {
+export const recognizeSpeech = (
+  lang: string,
+  listener: SpeechListener,
+  options?: { meter?: boolean },
+): SpeechSession => {
   const Constructor = recognizer()
   if (!Constructor) {
     listener.end('error', 'This browser has no speech recognition.')
@@ -140,7 +148,10 @@ export const recognizeSpeech = (lang: string, listener: SpeechListener): SpeechS
   recognition.lang = lang
   let asked = false
   let failed: string | undefined
-  const quiet = meter((level, bands) => listener.level?.(level, bands))
+  const quiet =
+    options?.meter === false
+      ? (): void => {}
+      : meter((level, bands) => listener.level?.(level, bands))
   recognition.onresult = (event) => {
     let guess = ''
     for (let at = event.resultIndex; at < event.results.length; at += 1) {
@@ -195,7 +206,12 @@ const relaySpeech = (lang: string, listener: SpeechListener): SpeechSession => {
     const data = event.data as
       | { error?: string; id?: number; kind?: string; text?: string; type?: string }
       | undefined
-    if (event.source !== parent || data?.type !== 'helix-speech-heard' || data.id !== id) {
+    if (data?.type !== 'helix-speech-heard' || data.id !== id) {
+      return
+    }
+    /* A sandboxed frame often receives `source` as null. The parent is the
+       only window that can reach this one and that has an origin. */
+    if (event.source !== parent && event.origin === 'null') {
       return
     }
     if (data.kind === 'partial' && data.text) {

@@ -831,21 +831,25 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
     ): void => {
       source.postMessage({ error, id: ask.id, kind, text, type: 'helix-speech-heard' }, '*')
     }
-    this.speech = recognizeSpeech(ask.lang, {
-      end: (reason, message) => {
-        tell(
-          reason === 'error' ? 'error' : reason === 'stopped' ? 'stopped' : 'end',
-          undefined,
-          message,
-        )
-        if (this.speechId === ask.id) {
-          this.speech = undefined
-          this.speechId = undefined
-        }
+    this.speech = recognizeSpeech(
+      ask.lang,
+      {
+        end: (reason, message) => {
+          tell(
+            reason === 'error' ? 'error' : reason === 'stopped' ? 'stopped' : 'end',
+            undefined,
+            message,
+          )
+          if (this.speechId === ask.id) {
+            this.speech = undefined
+            this.speechId = undefined
+          }
+        },
+        final: (text) => tell('final', text),
+        partial: (text) => tell('partial', text),
       },
-      final: (text) => tell('final', text),
-      partial: (text) => tell('partial', text),
-    })
+      { meter: false },
+    )
   }
 
   /**
