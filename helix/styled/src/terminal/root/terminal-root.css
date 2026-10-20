@@ -128,9 +128,9 @@
 /* The header, the find bar, and the status line are one strip each, on one
    fill, so the grid reads as the thing they frame. **Dense by nature, and
    they say so once**, as Toolbar does: a control a page puts in the header
-   takes the size the built-in ones have. */
+   takes the size the built-in ones have. The find bar is a Find, which draws
+   its own strip, a step denser, from the colors set on it below. */
 [part="header"],
-[part="find-bar"],
 [part="status"] {
   --helix-size-checkbox: var(--helix-size-checkbox-sm);
   --helix-size-checkbox-loose: calc(var(--helix-size-checkbox) * 1.2);
@@ -161,7 +161,6 @@
 }
 
 [part="header"][hidden],
-[part="find-bar"][hidden],
 [part="status"][hidden] {
   display: none;
 }
@@ -181,13 +180,11 @@
 
 /* The page's own controls stand among the built-in ones, as the toolbar's
    own controls do: the slots draw no box, so their gap is the toolbar's. */
-[part="actions"],
-[part="find-actions"] {
+[part="actions"] {
   display: contents;
 }
 
-[part="controls"],
-[part="find-controls"] {
+[part="controls"] {
   flex: 0 0 auto;
 }
 
@@ -199,14 +196,11 @@
 }
 
 /* **A control that is on says so with a wash of the ink**, a step past the
-   wash Icon Button lifts to under a pointer: Find while its bar is open,
-   Fullscreen while the terminal fills the screen, and each of the find bar's
-   options while it applies. */
-:host(:state(find-open)) [part="find"],
-:host(:state(fullscreen)) [part="fullscreen"],
-[part="find-match-case"][aria-pressed="true"],
-[part="find-whole-word"][aria-pressed="true"],
-[part="find-regex"][aria-pressed="true"] {
+   wash Icon Button lifts to under a pointer: Find while its bar is open, and
+   Fullscreen while the terminal fills the screen. The find bar's options say
+   it in the bar. */
+:host(:state(find-open)) [part="find-toggle"],
+:host(:state(fullscreen)) [part="fullscreen"] {
   --icon-button-background-color: color-mix(
     in oklab,
     var(--helix-color-foreground) 12%,
@@ -215,67 +209,17 @@
   --icon-button-foreground-color: var(--helix-color-foreground);
 }
 
-[part="find-field"]:focus-visible {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
-}
+/* The find bar sits under the header on the header's fill, its field on the
+   grid's ground. */
+[part="find"] {
+  --find-background-color: var(
+    --terminal-header-background-color,
+    var(--helix-color-surface-raised)
+  );
+  --find-border-color: var(--terminal-border-color, var(--helix-color-border));
+  --find-field-background-color: var(--terminal-background-color);
 
-/* **The find bar is a step denser than the header**, and says so as a density
-   region does, with the steps derived from it, so a control a page puts in
-   `find-actions` takes the size of the bar's own buttons. Said again on the
-   bar's toolbar, which says the small step for its own controls, and a rule
-   here outranks the toolbar's own. */
-[part="find-bar"],
-[part="find-controls"] {
-  --helix-size-control: calc(var(--helix-size-control-sm) * 0.8);
-  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
-  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
-}
-
-[part="find-bar"] {
   grid-row: find;
-  border-block-end: var(--helix-border-thin) solid
-    var(--terminal-border-color, var(--helix-color-border));
-}
-
-[part="find-field"] {
-  appearance: none;
-  background-color: var(--terminal-background-color);
-  block-size: var(--helix-size-control);
-  border: var(--helix-border-thin) solid var(--terminal-border-color, var(--helix-color-border));
-  border-radius: var(--helix-radii-sm);
-  box-sizing: border-box;
-  color: var(--helix-color-foreground);
-  flex: 1 1 auto;
-  font-family: var(--helix-font-sans);
-  font-size: max(var(--helix-text-field-min), var(--helix-text-sm));
-  inline-size: 100%;
-  max-inline-size: 20rem;
-  min-inline-size: 0;
-  padding-inline: var(--helix-space-xs);
-}
-
-/* The bar has a Close button of its own, so the field draws no clear button. */
-[part="find-field"]::-webkit-search-cancel-button,
-[part="find-field"]::-webkit-search-decoration {
-  appearance: none;
-}
-
-[part="find-field"]::placeholder {
-  color: var(--helix-color-foreground-muted);
-}
-
-/* **Wide enough for the count it is likely to say**, so the buttons beside it
-   do not move while a reader types and the count grows a digit. */
-[part="find-count"] {
-  color: var(--helix-color-foreground-muted);
-  flex: 1 0 auto;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
-  font-variant-numeric: tabular-nums;
-  min-inline-size: 7em;
-  padding-inline: var(--helix-space-xs);
-  white-space: nowrap;
 }
 
 /* **The grid's own box, in the grid's own face**, so the space around the
@@ -351,7 +295,7 @@
  * on a component's behalf and every family says it for itself. */
 @media print {
   [part="controls"],
-  [part="find-bar"],
+  [part="find"],
   [part="restart"],
   [part="exit-actions"] {
     display: none;

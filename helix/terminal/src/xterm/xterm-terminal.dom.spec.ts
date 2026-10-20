@@ -10,6 +10,10 @@ let connectTerminal: typeof import('../connect-terminal/connect-terminal.js').co
 let onApple: () => boolean
 let xtermDriver: typeof import('./xterm-driver.js').xtermDriver
 
+/** A part of the terminal's find bar, inside the Find it draws. */
+const inFind = (host: HTMLElement, name: string): Element | null =>
+  part(part(host, 'find') as HTMLElement, name)
+
 beforeAll(async () => {
   registerDom()
   ;({ onApple } = await import('@fusion.dev/helix-core'))
@@ -134,12 +138,12 @@ describe('a frame on xterm.js', () => {
         }),
       )
       await settle(host)
-      const field = part(host, 'find-field') as HTMLInputElement
+      const field = inFind(host, 'field') as HTMLInputElement
       field.value = 'error'
       field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
-      expect(
-        await until(() => (part(host, 'find-count')?.textContent ?? '').includes('of 2')),
-      ).toBe(true)
+      expect(await until(() => (inFind(host, 'count')?.textContent ?? '').includes('of 2'))).toBe(
+        true,
+      )
     })
   })
 
@@ -160,21 +164,21 @@ describe('a frame on xterm.js', () => {
           }),
         )
         await settle(host)
-        const count = (): string => part(host, 'find-count')?.textContent ?? ''
-        const field = part(host, 'find-field') as HTMLInputElement
+        const count = (): string => inFind(host, 'count')?.textContent ?? ''
+        const field = inFind(host, 'field') as HTMLInputElement
         const type = (query: string): void => {
           field.value = query
           field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
         }
         type('error')
         expect(await until(() => count().includes('of 3'))).toBe(true)
-        ;(part(host, 'find-match-case') as HTMLElement).click()
+        ;(inFind(host, 'match-case') as HTMLElement).click()
         expect(await until(() => count().includes('of 2'))).toBe(true)
-        ;(part(host, 'find-whole-word') as HTMLElement).click()
+        ;(inFind(host, 'whole-word') as HTMLElement).click()
         expect(await until(() => count().includes('of 1'))).toBe(true)
-        ;(part(host, 'find-match-case') as HTMLElement).click()
-        ;(part(host, 'find-whole-word') as HTMLElement).click()
-        ;(part(host, 'find-regex') as HTMLElement).click()
+        ;(inFind(host, 'match-case') as HTMLElement).click()
+        ;(inFind(host, 'whole-word') as HTMLElement).click()
+        ;(inFind(host, 'regex') as HTMLElement).click()
         type('(one|two)$')
         expect(await until(() => count().includes('of 2'))).toBe(true)
       })
