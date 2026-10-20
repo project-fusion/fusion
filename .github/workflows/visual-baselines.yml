@@ -86,17 +86,14 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: Set up bun and the dependencies
-        if: inputs.run == ''
+      # **With the dependencies for an accept too, which is what puts the `helix`
+      # binary on disk.** An accept reads reports and writes files and needs
+      # nothing the build makes, but the setup action restores the binary only
+      # beside an install. Set up without one, `bin.mjs` found cargo and built
+      # the whole workspace in the accept step, and every accept took 15 to 20
+      # minutes. `verify`'s `visual-preview` job had the same fault.
+      - name: Set up bun, the dependencies and the helix binary
         uses: ./.github/actions/setup
-
-      # An accept reads reports and writes files, so it needs the `helix`
-      # binary and nothing the build makes.
-      - name: Set up bun and the helix binary
-        if: inputs.run != ''
-        uses: ./.github/actions/setup
-        with:
-          dependencies: 'false'
 
       # Built first: `specs` bundles from source, which imports the generated
       # `.css.ts` files and the other packages' `dist`, and neither is tracked.
