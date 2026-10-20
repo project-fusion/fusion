@@ -149,11 +149,7 @@ export const recognizeSpeech = (
   let asked = false
   let failed: string | undefined
   let heardWords = false
-  let attempts = 0
-  const local = 'processLocally' in recognition
-  if (local) {
-    ;(recognition as Recognition & { processLocally?: boolean }).processLocally = true
-  }
+  let resumed = false
   const quiet =
     options?.meter === false
       ? (): void => {}
@@ -163,19 +159,51 @@ export const recognizeSpeech = (
     listener.end(failed && failed !== 'aborted' ? 'error' : asked ? 'stopped' : 'ended', failed)
   }
   /* The permission prompt ends the first session before anyone has spoken.
-     Starting again is what keeps the field listening. On-device recognition
-     is preferred: the cloud service reports `network` and returns no words. */
-  const again = (): boolean => {
-    if (asked || failed || heardWords || attempts > 2) {
-      return false
+     Once the microphone is allowed, start again. That second start is what
+     hears the words. */
+  const resume = (): void => {
+    if (asked || failed || heardWords || resumed) {
+      finish()
+      return
     }
-    attempts += 1
-    try {
-      recognition.start()
-      return true
-    } catch {
-      return false
+    resumed = true
+    const start = (): void => {
+      if (asked || heardWords) {
+        return
+      }
+      try {
+        recognition.start()
+      } catch {
+        finish()
+      }
     }
+    const permissions = navigator.permissions
+    if (!permissions?.query) {
+      start()
+      return
+    }
+    void permissions
+      .query({ name: 'microphone' })
+      .then((status) => {
+        if (status.state === 'granted') {
+          start()
+          return
+        }
+        if (status.state === 'denied') {
+          failed = 'not-allowed'
+          finish()
+          return
+        }
+        status.onchange = () => {
+          if (status.state === 'granted') {
+            start()
+          } else if (status.state === 'denied') {
+            failed = 'not-allowed'
+            finish()
+          }
+        }
+      })
+      .catch(() => finish())
   }
   recognition.onresult = (event) => {
     let guess = ''
@@ -199,19 +227,10 @@ export const recognizeSpeech = (
     if (event.error === 'no-speech' || event.error === 'aborted') {
       return
     }
-    const onDevice =
-      (recognition as Recognition & { processLocally?: boolean }).processLocally === true
-    if (onDevice && (event.error === 'language-not-supported' || event.error === 'network')) {
-      ;(recognition as Recognition & { processLocally?: boolean }).processLocally = false
-      return
-    }
     failed = event.error
   }
   recognition.onend = () => {
-    if (again()) {
-      return
-    }
-    finish()
+    resume()
   }
   try {
     recognition.start()
