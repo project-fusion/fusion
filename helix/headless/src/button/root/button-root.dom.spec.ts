@@ -703,7 +703,8 @@ describe('a disabled button kept in the tab order', () => {
        browser does for keyboard focus there, so the match is supplied. What is
        asserted is that the control takes focus and the tooltip hears it. */
     const matches = inner.matches.bind(inner)
-    inner.matches = (selector: string) => selector === ':focus-visible' || matches(selector)
+    inner.matches = ((selector: string) =>
+      selector === ':focus-visible' || matches(selector)) as typeof inner.matches
     /* happy-dom has no element references, so the tooltip warns that it opened
        with nothing linking it. That is the double's gap, and it is kept quiet. */
     const warn = console.warn

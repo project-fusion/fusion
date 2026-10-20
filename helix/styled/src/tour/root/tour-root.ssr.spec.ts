@@ -29,7 +29,7 @@ describe('tour server output', () => {
        slot rather than collecting them, and each stop renders the content
        region whose slot carries its text. */
     const bare = ssr(html`<helix-tour label="Getting started"></helix-tour>`)
-    expect(rendered(bare, 'helix-tour')).toContain('<slot></slot>')
+    expect(rendered(bare, 'helix-tour')).toMatch(/<slot ?><\/slot>/)
     const markup = withoutStyles(ssr(tour))
     expect(
       markup.match(/<div part="content">(<!--[^>]*-->)?<slot ?><\/slot><\/div>/g),
