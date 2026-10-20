@@ -148,15 +148,43 @@ export const recognizeSpeech = (
   recognition.lang = lang
   let asked = false
   let failed: string | undefined
+  let heardWords = false
+  let attempts = 0
+  const local = 'processLocally' in recognition
+  if (local) {
+    ;(recognition as Recognition & { processLocally?: boolean }).processLocally = true
+  }
   const quiet =
     options?.meter === false
       ? (): void => {}
       : meter((level, bands) => listener.level?.(level, bands))
+  const finish = (): void => {
+    quiet()
+    listener.end(failed && failed !== 'aborted' ? 'error' : asked ? 'stopped' : 'ended', failed)
+  }
+  /* The permission prompt ends the first session before anyone has spoken.
+     Starting again is what keeps the field listening. On-device recognition
+     is preferred: the cloud service reports `network` and returns no words. */
+  const again = (): boolean => {
+    if (asked || failed || heardWords || attempts > 2) {
+      return false
+    }
+    attempts += 1
+    try {
+      recognition.start()
+      return true
+    } catch {
+      return false
+    }
+  }
   recognition.onresult = (event) => {
     let guess = ''
     for (let at = event.resultIndex; at < event.results.length; at += 1) {
       const result = event.results[at] as RecognitionResult
       const text = result[0]?.transcript ?? ''
+      if (text.trim() !== '') {
+        heardWords = true
+      }
       if (result.isFinal) {
         listener.final(text.trim())
       } else {
@@ -168,11 +196,22 @@ export const recognizeSpeech = (
     }
   }
   recognition.onerror = (event) => {
+    if (event.error === 'no-speech' || event.error === 'aborted') {
+      return
+    }
+    const onDevice =
+      (recognition as Recognition & { processLocally?: boolean }).processLocally === true
+    if (onDevice && (event.error === 'language-not-supported' || event.error === 'network')) {
+      ;(recognition as Recognition & { processLocally?: boolean }).processLocally = false
+      return
+    }
     failed = event.error
   }
   recognition.onend = () => {
-    quiet()
-    listener.end(failed && failed !== 'aborted' ? 'error' : asked ? 'stopped' : 'ended', failed)
+    if (again()) {
+      return
+    }
+    finish()
   }
   try {
     recognition.start()
