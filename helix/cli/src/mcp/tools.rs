@@ -343,6 +343,7 @@ fn check(arguments: &Value, from: &Path) -> Result<Answer, String> {
         config: None,
         dir: None,
         file: files,
+        fix: false,
         out: None,
         stdin: code.map(|_| arguments["language"].as_str().unwrap_or("tsx").to_owned()),
     };

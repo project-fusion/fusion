@@ -218,6 +218,12 @@ pub struct Scan {
     /// and report only its findings, judged against the project.
     #[arg(long, value_name = "LANGUAGE")]
     pub stdin: Option<String>,
+
+    /// Write the fixes a scan can make into the source, then report what is
+    /// left. Today that is `unlinked-trigger`: `aria-describedby` on a
+    /// tooltip's plain trigger, and an `id` on the tooltip where it has none.
+    #[arg(long, conflicts_with = "stdin")]
+    pub fix: bool,
 }
 
 #[derive(Debug, Subcommand)]
