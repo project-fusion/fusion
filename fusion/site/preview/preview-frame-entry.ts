@@ -32,6 +32,7 @@ declare const __PREVIEW_MAPLIBRE_URL__: string
 declare const __PREVIEW_PLOT_THREE_URL__: string
 declare const __PREVIEW_TERMINAL_URL__: string
 declare const __PREVIEW_CODE_EDITOR_URL__: string
+declare const __PREVIEW_EDITOR_URL__: string
 declare const __PREVIEW_HIGHLIGHT_URL__: string
 
 interface RenderMessage {
@@ -195,6 +196,24 @@ const mountCodeEditors = (root: HTMLElement, at: number): void => {
 }
 
 /**
+ * A live document for any Editor with `data-preview-editor` the markup
+ * carries, with ProseMirror and the connector loaded the first time one does
+ * and never before.
+ */
+const mountEditors = (root: HTMLElement, at: number): void => {
+  if (!root.querySelector(':is(helix-editor, helix-headless-editor)[data-preview-editor]')) {
+    return
+  }
+  void load(__PREVIEW_EDITOR_URL__)
+    .then(() => {
+      if (at === generation && window.helixPreviewEditor) {
+        mounted.push(window.helixPreviewEditor.mount(root))
+      }
+    })
+    .catch((error: unknown) => console.error(String(error)))
+}
+
+/**
  * Colors for any Code Input the markup carries, with Helix's highlighter
  * loaded the first time one does and never before. Registered once for the
  * page, so it has nothing to unmount: every Code Input and Code Block after it
@@ -315,6 +334,7 @@ window.addEventListener('message', (event: MessageEvent<RenderMessage>) => {
     mountGraphs(host, generation)
     mountTerminals(host, generation)
     mountCodeEditors(host, generation)
+    mountEditors(host, generation)
     highlightCode(host)
   }
   window.dispatchEvent(new Event(RESTYLED))

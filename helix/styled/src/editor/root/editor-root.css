@@ -1,0 +1,254 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+:host([fill]) {
+  inset: 0;
+  position: absolute;
+}
+
+/* One frame around the toolbar and the document, as Code Editor's is: the
+   document on the page's ground, the toolbar a strip on the raised surface.
+   `clip` rounds the strip's corners without making the frame a scroll
+   container, so the strip still sticks to the top of the page while a long
+   document scrolls under it. */
+[part="region"] {
+  background-color: var(--editor-background-color, var(--helix-color-background));
+  border: var(--helix-border-thin) solid var(--editor-border-color, var(--helix-color-border));
+  border-radius: var(--editor-radius, var(--helix-radii-lg));
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-block-size: var(--editor-min-block-size, 12rem);
+  overflow: clip;
+  transition: border-color var(--helix-duration-fast) var(--helix-easing-standard);
+}
+
+:host([fill]) [part="region"] {
+  block-size: 100%;
+  min-block-size: 0;
+}
+
+:host([separation="plain"]) [part="region"] {
+  border: none;
+  border-radius: 0;
+}
+
+/* Typing in the document rings the frame, as a field is ringed while it has
+   focus: the edge thickens rather than drawing a second one. Focus on a tool
+   draws that tool's own ring and not this one. */
+:host(:state(document-focused):not([separation="plain"])) [part="region"] {
+  border-color: var(--helix-color-primary);
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: 0;
+}
+
+/* The toolbar and the address bar are one strip, dense by nature as Code
+   Editor's header is: a control a page puts in `actions` takes the size the
+   built-in ones have. It stays at the top of the page while the document
+   scrolls under it. */
+[part="header"] {
+  --helix-size-icon: var(--helix-size-icon-sm);
+  --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
+  --helix-size-icon-tight: calc(var(--helix-size-icon) * 0.8);
+  --helix-size-control: var(--helix-size-control-sm);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+
+  background-color: var(--editor-header-background-color, var(--helix-color-surface-raised));
+  border-block-end: var(--helix-border-thin) solid
+    var(--editor-border-color, var(--helix-color-border));
+  box-sizing: border-box;
+  container-type: inline-size;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: var(--helix-space-2xs);
+  inset-block-start: var(--editor-header-offset, 0);
+  padding: var(--helix-space-2xs) var(--helix-space-xs);
+  position: sticky;
+  z-index: 1;
+}
+
+[part="header"][hidden] {
+  display: none;
+}
+
+/* A narrow frame wraps the tools onto more rows rather than hiding any, a
+   group at a time, so Bold never ends one row with Italic starting the next.
+   The groups are parted by a line, and by a wider gap where the strip may be
+   too narrow for every group on one row, so no line ends a row. */
+[part="controls"] {
+  --toolbar-separator-gap: var(--helix-space-2xs);
+
+  display: flex;
+}
+
+/* As wide as the strip, so your actions stand at its end. */
+[part="controls"]::part(toolbar) {
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  row-gap: var(--helix-space-2xs);
+}
+
+[part="tools"] {
+  display: flex;
+  gap: var(--helix-space-2xs);
+}
+
+[part="divider"] {
+  align-self: center;
+  block-size: calc(var(--helix-size-control) * 0.6);
+}
+
+/* Every group on one row takes about 36rem, measured October 20, 2026 with
+   the dividers: 40rem leaves room for a longer block name in another
+   language. */
+@container (inline-size < 40rem) {
+  [part="controls"] {
+    --toolbar-gap: var(--helix-space-sm);
+  }
+
+  [part="divider"] {
+    display: none;
+  }
+}
+
+/* A tool says it is on with a wash of the ink while its format holds, as
+   Code Editor's find options do. */
+[aria-pressed="true"] {
+  --icon-button-background-color: color-mix(
+    in oklab,
+    var(--helix-color-foreground) 12%,
+    transparent
+  );
+  --icon-button-foreground-color: var(--helix-color-foreground);
+}
+
+/* The block menu's button holds every block type's name, one shown and the
+   rest kept in the same cell unseen, so it is as wide as the longest name and
+   the tools after it stay put as the selection moves. */
+[part="block-name"] {
+  display: inline-grid;
+  justify-items: start;
+}
+
+[part="block-name"] > span {
+  grid-area: 1 / 1;
+}
+
+[part="block-name"] > [hidden] {
+  display: block;
+  visibility: hidden;
+}
+
+/* Your controls stand at the end of the toolbar. */
+[part="actions"] {
+  display: flex;
+  gap: var(--helix-space-2xs);
+  margin-inline-start: auto;
+}
+
+[part="actions"][hidden] {
+  display: none;
+}
+
+/* The address bar: a row under the tools, its field as wide as an address
+   needs and no wider, and its buttons after it. */
+[part="link-bar"] {
+  --helix-size-control: calc(var(--helix-size-control-sm) * 0.8);
+  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
+  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
+
+  align-items: center;
+  display: flex;
+  gap: var(--helix-space-2xs);
+  min-inline-size: 0;
+  padding-inline-start: var(--helix-space-2xs);
+}
+
+[part="link-bar"][hidden] {
+  display: none;
+}
+
+[part="link-field"] {
+  appearance: none;
+  background-color: var(--editor-background-color, var(--helix-color-background));
+  block-size: var(--helix-size-control);
+  border: var(--helix-border-thin) solid var(--editor-border-color, var(--helix-color-border));
+  border-radius: var(--helix-radii-sm);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  flex: 1 1 12rem;
+  font-family: var(--helix-font-sans);
+  font-size: max(var(--helix-text-field-min), var(--helix-text-sm));
+  max-inline-size: 28rem;
+  min-inline-size: 0;
+  padding-inline: var(--helix-space-xs);
+}
+
+[part="link-field"]:focus-visible {
+  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
+  outline-offset: var(--helix-size-focus-offset);
+}
+
+[part="link-controls"] {
+  flex: 0 0 auto;
+}
+
+/* The document fills the frame below the strip. With `fill`, it scrolls
+   inside the frame. */
+[part="viewport"] {
+  color: var(--helix-color-foreground);
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-block-size: 0;
+}
+
+:host([fill]) [part="viewport"] {
+  overflow: auto;
+}
+
+/* The element the renderer draws the document in. It spans the frame, so a
+   press anywhere in it lands in the document, and its lines keep to the
+   measure: the padding takes up whatever width the measure leaves. The frame
+   draws focus, so the document draws none of its own. */
+[part="viewport"] ::slotted(*) {
+  box-sizing: border-box;
+  caret-color: var(--helix-color-foreground);
+  flex: 1 1 auto;
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-md);
+  line-height: var(--helix-leading-normal);
+  outline: none;
+  padding-block: var(--editor-padding, var(--helix-space-lg));
+  padding-inline: max(
+    var(--editor-padding, var(--helix-space-lg)),
+    calc((100% - var(--editor-measure, 72ch)) / 2)
+  );
+}
+
+[part="footer"] {
+  color: var(--helix-color-foreground-muted);
+  font-family: var(--helix-font-sans);
+  font-size: var(--helix-text-xs);
+}
+
+/* Print: the document prints whole, and the toolbar is hidden, a printed page
+   having nothing to press.
+
+   `@media print` does not cross a shadow boundary, so a page cannot answer
+   this on a component's behalf and every family says it for itself. */
+@media print {
+  [part="header"] {
+    display: none;
+  }
+
+  [part="region"],
+  :host([fill]) [part="viewport"] {
+    overflow: visible;
+  }
+}

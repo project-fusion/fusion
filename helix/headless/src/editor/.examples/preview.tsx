@@ -1,0 +1,33 @@
+import './preview.css'
+
+export function Example() {
+  return (
+    <>
+      {/* Preview frame: data-preview-editor has the frame connect ProseMirror; on your page, connectEditor does. */}
+      <helix-headless-editor
+        data-preview-editor
+        label="Planning notes"
+        placeholder="Write the plan"
+      >
+        <div>
+          <h2>Q3 planning</h2>
+          <p>
+            We ship the <strong>new onboarding</strong> by <em>September 30</em>. The details are in
+            the <a href="https://fusion.dev">project brief</a>.
+          </p>
+          <ul>
+            <li>
+              <p>Draft the welcome email</p>
+            </li>
+            <li>
+              <p>Record the product tour</p>
+            </li>
+          </ul>
+          <blockquote>
+            <p>Keep the first run under two minutes.</p>
+          </blockquote>
+        </div>
+      </helix-headless-editor>
+    </>
+  )
+}
