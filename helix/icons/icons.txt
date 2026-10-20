@@ -59,6 +59,7 @@ envelope
 eye
 eye-slash
 eyedropper
+file-text
 first-aid
 flag-banner-fold
 flask
