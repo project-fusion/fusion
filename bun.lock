@@ -255,7 +255,7 @@
     },
     "helix/editor": {
       "name": "@fusion.dev/helix-editor",
-      "version": "0.217.0",
+      "version": "0.220.0",
       "dependencies": {
         "prosemirror-commands": "^1.7.2",
         "prosemirror-dropcursor": "^1.8.4",
