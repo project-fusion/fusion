@@ -819,6 +819,7 @@ export {
 export {
   browserSpeech,
   pageSpeechEngine,
+  recognizeSpeech,
   registerSpeechEngine,
   type SpeechEngine,
   type SpeechListener,

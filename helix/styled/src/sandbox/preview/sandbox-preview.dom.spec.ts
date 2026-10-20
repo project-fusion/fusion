@@ -21,6 +21,38 @@ afterEach(() => {
 const preview = async (attributes = 'src="/frame.html"'): Promise<Preview> =>
   (await mount(`<helix-sandbox-preview ${attributes}></helix-sandbox-preview>`)) as Preview
 
+/** A recognizer that settles on one phrase the moment it starts. */
+class FakeRecognition {
+  continuous = false
+
+  interimResults = false
+
+  lang = ''
+
+  onend: (() => void) | null = null
+
+  onerror: ((event: { error: string }) => void) | null = null
+
+  onresult:
+    | ((event: {
+        resultIndex: number
+        results: ArrayLike<{ 0?: { transcript: string }; isFinal: boolean }>
+      }) => void)
+    | null = null
+
+  start(): void {
+    this.onresult?.({
+      resultIndex: 0,
+      results: [{ 0: { transcript: 'hello' }, isFinal: true }],
+    })
+    this.onend?.()
+  }
+
+  stop(): void {
+    this.onend?.()
+  }
+}
+
 /**
  * The preview pane, and the contract that is the pane's rather than the
  * sandbox's.
@@ -66,6 +98,42 @@ describe('the preview pane', () => {
       .sort()
 
     expect(granted).toEqual(['clipboard-write *', 'fullscreen *', 'microphone *'])
+  })
+
+  /* The frame's origin is opaque, so the recognizer there never starts. The
+     page listens and sends the phrase back. */
+  test('listens on this page when the frame asks, and sends the phrase back', async () => {
+    const host = await preview()
+    const frame = part(host, 'frame') as HTMLIFrameElement
+    const stand = document.createElement('iframe')
+    document.body.append(stand)
+    const target = stand.contentWindow as Window
+    Object.defineProperty(frame, 'contentWindow', { configurable: true, value: target })
+    const heard: { kind?: string; text?: string }[] = []
+    target.postMessage = ((message: { kind?: string; text?: string; type?: string }) => {
+      if (message.type === 'helix-speech-heard') {
+        heard.push(message)
+      }
+    }) as Window['postMessage']
+    const scope = window as unknown as { SpeechRecognition?: new () => FakeRecognition }
+    const original = scope.SpeechRecognition
+    scope.SpeechRecognition = FakeRecognition
+    restore = () => {
+      scope.SpeechRecognition = original
+      delete (frame as { contentWindow?: Window | null }).contentWindow
+      stand.remove()
+    }
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        data: { id: 7, lang: 'en-US', type: 'helix-speech-start' },
+        origin: 'null',
+        source: target,
+      }),
+    )
+    expect(heard.map((one) => [one.kind, one.text])).toEqual([
+      ['final', 'hello'],
+      ['end', undefined],
+    ])
   })
 
   /* A frame with no accessible name is a region a reader reaches and cannot
