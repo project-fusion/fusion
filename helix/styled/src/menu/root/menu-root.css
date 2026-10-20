@@ -66,7 +66,10 @@
 }
 
 :host([material="frosted"]) [part="surface"] {
-  --_floating-background-color: var(--menu-background-color, var(--helix-material-translucent-strong));
+  --_floating-background-color: var(
+    --menu-background-color,
+    var(--helix-material-translucent-strong)
+  );
   backdrop-filter: var(--menu-backdrop, blur(var(--helix-material-blur-lg)));
 }
 
