@@ -9,7 +9,7 @@ export function Example() {
         label="Planning notes"
         placeholder="Write the plan"
       >
-        <div>
+        <div data-prose="">
           <h2>Q3 planning</h2>
           <p>
             We ship the <strong>new onboarding</strong> by <em>September 30</em>. The details are in

@@ -13,7 +13,7 @@ export function Example() {
           label="ملاحظات الاجتماع"
           paragraph-label="فقرة"
         >
-          <div>
+          <div data-prose="">
             <h2>ملاحظات الاجتماع</h2>
             <p>
               نطلق <strong>الإصدار الجديد</strong> يوم الخميس.

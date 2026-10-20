@@ -187,7 +187,8 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * The document is the element you write inside the frame, so it stays in the
  * page: the browser's input methods, spellcheck, and right-to-left text work in
  * it as they do in any field. A server can send the document's HTML there, and
- * it reads before any script loads.
+ * it reads before any script loads. Mark it `data-prose`, so the base layer
+ * draws its headings, lists, and quotes before a renderer connects.
  *
  * The toolbar's groups are named by `tools`, in this order: `history` (Undo
  * and Redo), `block` (a menu of Paragraph, three headings, and Code block),

@@ -12,7 +12,7 @@ with its toolbar, its keys, and its parts.
 
 ```html
 <helix-editor label="Release notes" placeholder="Write the release notes">
-  <div><h2>0.217</h2><p>Write documents in your theme.</p></div>
+  <div data-prose><h2>Release notes</h2><p>Write documents in your theme.</p></div>
 </helix-editor>
 ```
 
@@ -24,7 +24,7 @@ import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 
 const frame = document.querySelector('helix-editor')
-const content = frame.querySelector('div')
+const content = frame.querySelector('[data-prose]')
 const schema = editorSchema()
 
 const view = new EditorView(
@@ -46,7 +46,8 @@ view.destroy()
 **The document is your element, inside the frame.** ProseMirror draws in it,
 so the browser's input methods, spellcheck, and right-to-left text work as they
 do in any field, and a server can send the document's HTML there to be read
-before any script loads. `connectEditor` adds the rules ProseMirror needs to
+before any script loads. `data-prose` on it has the base layer draw its blocks
+from the first paint. `connectEditor` adds the rules ProseMirror needs to
 the page, so you load no stylesheet of ProseMirror's.
 
 **ProseMirror is a peer dependency.** ProseMirror's packages check each

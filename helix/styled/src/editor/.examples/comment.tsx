@@ -10,7 +10,7 @@ export function Example() {
         placeholder="Add a comment"
         tools="marks link lists"
       >
-        <div />
+        <div data-prose="" />
         <helix-button
           emphasis="solid"
           slot="actions"
