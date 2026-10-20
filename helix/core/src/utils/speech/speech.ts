@@ -125,65 +125,115 @@ const meter = (report: (level: number, bands: readonly number[]) => void): (() =
 }
 
 /**
+ * Listens with the browser's recognizer in this page. A field in a sandboxed
+ * frame cannot: its origin is opaque, and the recognizer refuses it.
+ */
+export const recognizeSpeech = (lang: string, listener: SpeechListener): SpeechSession => {
+  const Constructor = recognizer()
+  if (!Constructor) {
+    listener.end('error', 'This browser has no speech recognition.')
+    return { stop: () => {} }
+  }
+  const recognition = new Constructor()
+  recognition.continuous = true
+  recognition.interimResults = true
+  recognition.lang = lang
+  let asked = false
+  let failed: string | undefined
+  const quiet = meter((level, bands) => listener.level?.(level, bands))
+  recognition.onresult = (event) => {
+    let guess = ''
+    for (let at = event.resultIndex; at < event.results.length; at += 1) {
+      const result = event.results[at] as RecognitionResult
+      const text = result[0]?.transcript ?? ''
+      if (result.isFinal) {
+        listener.final(text.trim())
+      } else {
+        guess += text
+      }
+    }
+    if (guess !== '') {
+      listener.partial(guess.trim())
+    }
+  }
+  recognition.onerror = (event) => {
+    failed = event.error
+  }
+  recognition.onend = () => {
+    quiet()
+    listener.end(failed && failed !== 'aborted' ? 'error' : asked ? 'stopped' : 'ended', failed)
+  }
+  try {
+    recognition.start()
+  } catch (error) {
+    quiet()
+    const message = error instanceof Error ? error.message : 'not-allowed'
+    listener.end('error', message)
+    return { stop: () => {} }
+  }
+  return {
+    stop: () => {
+      asked = true
+      recognition.stop()
+    },
+  }
+}
+
+const opaqueFrame = (): boolean => {
+  const here = globalThis as { origin?: string; parent?: Window }
+  return here.origin === 'null' && here.parent !== undefined && here.parent !== (here as Window)
+}
+
+let relayId = 0
+
+/** Asks the page that framed this one to listen, and reports what it hears. */
+const relaySpeech = (lang: string, listener: SpeechListener): SpeechSession => {
+  relayId += 1
+  const id = relayId
+  const parent = (globalThis as unknown as Window).parent
+  const onMessage = (event: MessageEvent): void => {
+    const data = event.data as
+      | { error?: string; id?: number; kind?: string; text?: string; type?: string }
+      | undefined
+    if (event.source !== parent || data?.type !== 'helix-speech-heard' || data.id !== id) {
+      return
+    }
+    if (data.kind === 'partial' && data.text) {
+      listener.partial(data.text)
+    } else if (data.kind === 'final' && data.text) {
+      listener.final(data.text)
+    } else if (data.kind === 'error' || data.kind === 'end' || data.kind === 'stopped') {
+      window.removeEventListener('message', onMessage)
+      listener.end(
+        data.kind === 'error' ? 'error' : data.kind === 'stopped' ? 'stopped' : 'ended',
+        data.error,
+      )
+    }
+  }
+  window.addEventListener('message', onMessage)
+  parent.postMessage({ id, lang, type: 'helix-speech-start' }, '*')
+  return {
+    stop: () => {
+      parent.postMessage({ id, type: 'helix-speech-stop' }, '*')
+    },
+  }
+}
+
+/**
  * The browser's own recognizer, `SpeechRecognition`, or `webkitSpeechRecognition`
  * in Safari. Not available in Firefox.
  *
  * **Chrome sends the audio to Google's servers to recognize it**, and Safari
  * to Apple's unless the device recognizes on the device. A page that cannot
  * send what is said registers an engine of its own.
+ *
+ * **A sandboxed frame has an opaque origin, and the recognizer refuses that.**
+ * The field asks the page that framed it to listen, and that page has an origin.
  */
 export const browserSpeech: SpeechEngine = {
   available: () => recognizer() !== undefined,
-  listen: ({ lang, listener }) => {
-    const Constructor = recognizer()
-    if (!Constructor) {
-      listener.end('error', 'This browser has no speech recognition.')
-      return { stop: () => {} }
-    }
-    const recognition = new Constructor()
-    recognition.continuous = true
-    recognition.interimResults = true
-    recognition.lang = lang
-    let asked = false
-    let failed: string | undefined
-    const quiet = meter((level, bands) => listener.level?.(level, bands))
-    recognition.onresult = (event) => {
-      let guess = ''
-      for (let at = event.resultIndex; at < event.results.length; at += 1) {
-        const result = event.results[at] as RecognitionResult
-        const text = result[0]?.transcript ?? ''
-        if (result.isFinal) {
-          listener.final(text.trim())
-        } else {
-          guess += text
-        }
-      }
-      if (guess !== '') {
-        listener.partial(guess.trim())
-      }
-    }
-    recognition.onerror = (event) => {
-      failed = event.error
-    }
-    recognition.onend = () => {
-      quiet()
-      listener.end(failed && failed !== 'aborted' ? 'error' : asked ? 'stopped' : 'ended', failed)
-    }
-    try {
-      recognition.start()
-    } catch (error) {
-      quiet()
-      const message = error instanceof Error ? error.message : 'not-allowed'
-      listener.end('error', message)
-      return { stop: () => {} }
-    }
-    return {
-      stop: () => {
-        asked = true
-        recognition.stop()
-      },
-    }
-  },
+  listen: ({ lang, listener }) =>
+    opaqueFrame() ? relaySpeech(lang, listener) : recognizeSpeech(lang, listener),
 }
 
 const KEY = Symbol.for('fusion.helix.speech')

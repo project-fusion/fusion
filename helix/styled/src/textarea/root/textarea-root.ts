@@ -5,6 +5,7 @@ import { styles as dictationStyles } from '../../shared/dictation/dictation.css.
 import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
+import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './textarea-root.css.js'
 
 /**
@@ -32,7 +33,11 @@ import { styles } from './textarea-root.css.js'
  */
 @customElement('helix-textarea')
 export class HelixTextarea extends HelixHeadlessTextarea {
+  /* `glyphStyles` first, and it is not optional. `drawIcon` renders a bare
+     `<svg data-glyph>` with no size of its own, and the only rule that sizes
+     one lives in that sheet. Without it the glyph fills the button. */
   static override styles: CSSResultGroup = [
+    glyphStyles,
     fieldStyles,
     fieldFrameStyles,
     fieldStackedStyles,

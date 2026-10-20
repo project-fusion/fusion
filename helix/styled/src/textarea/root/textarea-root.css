@@ -77,19 +77,20 @@ slot[name="end"]::slotted(*) {
   outline-offset: var(--helix-size-focus-offset);
 }
 
-/* The dictation button sits in the corner, on the first line. A fixed size
-   keeps the glyph with that line. The text keeps a gap beside the button. */
+/* The dictation button sits in the corner, on the first line, at the icon
+   size. The text keeps a gap beside the button. */
 [part~="voice"] {
   background-color: transparent;
-  block-size: calc(var(--helix-size-control-tight) - var(--helix-space-2xs));
-  inline-size: calc(var(--helix-size-control-tight) - var(--helix-space-2xs));
+  block-size: var(--helix-size-icon-loose);
+  inline-size: var(--helix-size-icon-loose);
   inset-block-start: 0;
   inset-inline-end: 0;
+  overflow: hidden;
   position: absolute;
 }
 
 [part="field"]:has([part~="voice"]) [part="control"] {
-  padding-inline-end: var(--helix-size-control-tight);
+  padding-inline-end: calc(var(--helix-size-icon-loose) + var(--helix-space-2xs));
 }
 
 [part~="voice"]:hover {

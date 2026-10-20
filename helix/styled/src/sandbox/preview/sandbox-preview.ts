@@ -4,6 +4,8 @@ import {
   HelixConsoleEvent,
   HelixElement,
   HelixResizeEvent,
+  recognizeSpeech,
+  type SpeechSession,
   words,
 } from '@fusion.dev/helix-core'
 
@@ -116,6 +118,24 @@ export interface PreviewSize {
   type: 'helix-preview-size'
 }
 
+/**
+ * The frame asking this page to listen. Its own origin is opaque, so the
+ * recognizer there refuses to start.
+ */
+export interface PreviewSpeechStart {
+  /** Which listening this is, so a late reply cannot land in the next one. */
+  id: number
+  /** A BCP 47 tag, such as `en-US`. */
+  lang: string
+  type: 'helix-speech-start'
+}
+
+/** The frame asking this page to stop the listening `id` names. */
+export interface PreviewSpeechStop {
+  id: number
+  type: 'helix-speech-stop'
+}
+
 export type PreviewMessage =
   | PreviewConsole
   | PreviewFetch
@@ -124,6 +144,8 @@ export type PreviewMessage =
   | PreviewRender
   | PreviewRendered
   | PreviewSize
+  | PreviewSpeechStart
+  | PreviewSpeechStop
 
 /**
  * @summary A frame that renders sandbox source in a separate document.
@@ -381,6 +403,12 @@ export class HelixSandboxPreview extends HelixElement {
   /** Whether the frame has said it is listening. */
   private ready = false
 
+  /** The recognizer running for the frame, on this page. */
+  private speech: SpeechSession | undefined
+
+  /** Which ask `speech` belongs to. */
+  private speechId: number | undefined
+
   /** The source the frame was last sent, which it holds and does not run again. */
   private sentSource: string | undefined
 
@@ -561,6 +589,19 @@ export class HelixSandboxPreview extends HelixElement {
       return
     }
     const data = event.data
+    /* The frame's origin is opaque, so a recognizer started there ends at
+       once. The press is reported here, and `postMessage` carries the
+       activation with it, which is what lets this page start listening. */
+    if (data?.type === 'helix-speech-start') {
+      this.hear(data, event.source as Window)
+      return
+    }
+    if (data?.type === 'helix-speech-stop') {
+      if (this.speechId === data.id) {
+        this.speech?.stop()
+      }
+      return
+    }
     /* Behind both checks above, so only this element's own frame, still on
        an opaque origin, can ask. */
     if (isFetch(data)) {
@@ -772,6 +813,39 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     window.removeEventListener('message', this.handleMessage)
+    this.speech?.stop()
+    this.speech = undefined
+  }
+
+  /**
+   * Listens on this page for a frame that cannot listen for itself, and sends
+   * each guess back to that frame.
+   */
+  private hear(ask: PreviewSpeechStart, source: Window): void {
+    this.speech?.stop()
+    this.speechId = ask.id
+    const tell = (
+      kind: 'end' | 'error' | 'final' | 'partial' | 'stopped',
+      text?: string,
+      error?: string,
+    ): void => {
+      source.postMessage({ error, id: ask.id, kind, text, type: 'helix-speech-heard' }, '*')
+    }
+    this.speech = recognizeSpeech(ask.lang, {
+      end: (reason, message) => {
+        tell(
+          reason === 'error' ? 'error' : reason === 'stopped' ? 'stopped' : 'end',
+          undefined,
+          message,
+        )
+        if (this.speechId === ask.id) {
+          this.speech = undefined
+          this.speechId = undefined
+        }
+      },
+      final: (text) => tell('final', text),
+      partial: (text) => tell('partial', text),
+    })
   }
 
   /**
