@@ -12,9 +12,10 @@
 //!    after hydration and a server spec proves the server output carries the
 //!    right state. The second is the one that catches a promise broken at first
 //!    paint, and it is the one that goes missing.
-//! 2. **Both layers agree.** A base class marked stable whose subclass above is
-//!    experimental is two answers to one question, and a reference page picks by
-//!    layer, so a reader sees whichever one their import gave them.
+//! 2. **Both layers agree, part by part.** A base class marked stable whose
+//!    subclass above is experimental is two answers to one question, and a
+//!    reference page picks by layer, so a reader sees whichever one their
+//!    import gave them.
 //! 3. **It has at least one example.** A component nobody has written a usage
 //!    for is one whose API has been read and not used, which is not the same as
 //!    settled.
@@ -101,14 +102,21 @@ pub fn run(context: &Context) -> Report {
         }
         checked += 1;
 
-        if declares(&above, "experimental") || declares(&below, "experimental") {
-            findings.push(Finding {
-                detail: "A reference page picks by layer, so a reader sees whichever their \
-                         import gave them."
-                    .to_owned(),
-                file: family.clone(),
-                message: "one layer says stable and the other says experimental".to_owned(),
-            });
+        /* Part by part, because the promise is per element: a stable family
+        can grow a new part that starts experimental in both layers. */
+        for part in parts(&above) {
+            let (upper, lower) = (above.join(&part), below.join(&part));
+            if (declares(&upper, "stable") && declares(&lower, "experimental"))
+                || (declares(&upper, "experimental") && declares(&lower, "stable"))
+            {
+                findings.push(Finding {
+                    detail: "A reference page picks by layer, so a reader sees whichever \
+                             their import gave them."
+                        .to_owned(),
+                    file: format!("{family}/{part}"),
+                    message: "one layer says stable and the other says experimental".to_owned(),
+                });
+            }
         }
 
         for part in parts(&above) {
