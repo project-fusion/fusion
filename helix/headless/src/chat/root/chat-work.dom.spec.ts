@@ -39,7 +39,9 @@ describe('a turn’s work', () => {
     await without?.updateComplete
     const work = part(withWork as Message, 'work') as HTMLElement
     expect(work.hasAttribute('hidden')).toBe(false)
-    expect(work.nextElementSibling?.getAttribute('part')).toBe('content')
+    /* Above the content, with the attachments between them. */
+    const content = part(withWork as Message, 'content') as HTMLElement
+    expect(work.compareDocumentPosition(content) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(part(without as Message, 'work')?.hasAttribute('hidden')).toBe(true)
   })
 

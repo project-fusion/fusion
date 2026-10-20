@@ -258,10 +258,13 @@ describe('tree item density', () => {
   })
 
   geometry('a row in a small region is shorter than one at rest', async () => {
-    const rest = await mount(mixed)
-    const small = await mount(`<div data-density="sm">${mixed}</div>`)
     const height = (scope: HTMLElement) =>
       (part(items(scope)[2] as HTMLElement, 'row') as HTMLElement).getBoundingClientRect().height
-    expect(height(small)).toBeLessThan(height(rest))
+    /* Measured before the next mount, which replaces the page and leaves this
+       tree with no box. */
+    const rest = height(await mount(mixed))
+    const small = height(await mount(`<div data-density="sm">${mixed}</div>`))
+    expect(small).toBeGreaterThan(0)
+    expect(small).toBeLessThan(rest)
   })
 })
