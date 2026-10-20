@@ -230,7 +230,7 @@ const LANGUAGE_NAMES: Record<string, string> = {
  *
  * @since 0.216.0
  * @status experimental
- * @category inputs
+ * @category editors
  * @aliases Code editor, CodeMirror, File editor, IDE, Monaco
  * @documentation https://fusion.dev/helix/components/code-editor
  *
