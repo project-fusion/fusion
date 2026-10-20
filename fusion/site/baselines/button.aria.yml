@@ -143,6 +143,7 @@
           - treeitem "Video" [level=2]
           - treeitem "Video Playlist" [level=2]
           - treeitem "Virtual List" [level=2]
+          - treeitem "Voice Level" [level=2]
       - treeitem "Tooling" [level=1]
     - status
   - article:
