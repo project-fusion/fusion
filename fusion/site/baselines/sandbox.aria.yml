@@ -192,6 +192,11 @@
       - text: Drilldown
       - link "Drilldown documentation":
         - /url: /helix/components/drilldown
+    - treeitem "Editor Editor documentation Experimental" [level=1]:
+      - text: Editor
+      - link "Editor documentation":
+        - /url: /helix/components/editor
+      - img "Experimental"
     - treeitem "Empty Empty documentation" [level=1]:
       - text: Empty
       - link "Empty documentation":
