@@ -159,6 +159,7 @@ export const CATEGORIES = [
   'actions',
   'charts',
   'data',
+  'editors',
   'feedback',
   'forms',
   'layout',
