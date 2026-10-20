@@ -202,16 +202,11 @@ const relaySpeech = (lang: string, listener: SpeechListener): SpeechSession => {
   relayId += 1
   const id = relayId
   const parent = (globalThis as unknown as Window).parent
-  const onMessage = (event: MessageEvent): void => {
-    const data = event.data as
-      | { error?: string; id?: number; kind?: string; text?: string; type?: string }
-      | undefined
+  const channel = new MessageChannel()
+  const take = (
+    data: { error?: string; id?: number; kind?: string; text?: string; type?: string } | undefined,
+  ): void => {
     if (data?.type !== 'helix-speech-heard' || data.id !== id) {
-      return
-    }
-    /* A sandboxed frame often receives `source` as null. The parent is the
-       only window that can reach this one and that has an origin. */
-    if (event.source !== parent && event.origin === 'null') {
       return
     }
     if (data.kind === 'partial' && data.text) {
@@ -219,6 +214,7 @@ const relaySpeech = (lang: string, listener: SpeechListener): SpeechSession => {
     } else if (data.kind === 'final' && data.text) {
       listener.final(data.text)
     } else if (data.kind === 'error' || data.kind === 'end' || data.kind === 'stopped') {
+      channel.port1.onmessage = null
       window.removeEventListener('message', onMessage)
       listener.end(
         data.kind === 'error' ? 'error' : data.kind === 'stopped' ? 'stopped' : 'ended',
@@ -226,8 +222,25 @@ const relaySpeech = (lang: string, listener: SpeechListener): SpeechSession => {
       )
     }
   }
+  const onMessage = (event: MessageEvent): void => {
+    const data = event.data as
+      | { error?: string; id?: number; kind?: string; text?: string; type?: string }
+      | undefined
+    if (data?.type !== 'helix-speech-heard' || data.id !== id) {
+      return
+    }
+    /* A reply on the window is accepted from the parent. A sandboxed frame
+       often receives `source` as null, and another opaque frame is not the parent. */
+    if (event.source !== parent && event.origin === 'null') {
+      return
+    }
+    take(data)
+  }
+  channel.port1.onmessage = (event: MessageEvent) => {
+    take(event.data as { error?: string; id?: number; kind?: string; text?: string; type?: string })
+  }
   window.addEventListener('message', onMessage)
-  parent.postMessage({ id, lang, type: 'helix-speech-start' }, '*')
+  parent.postMessage({ id, lang, type: 'helix-speech-start' }, '*', [channel.port2])
   return {
     stop: () => {
       parent.postMessage({ id, type: 'helix-speech-stop' }, '*')
