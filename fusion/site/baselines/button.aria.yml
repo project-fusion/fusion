@@ -62,6 +62,7 @@
           - treeitem "Donut Chart" [level=2]
           - treeitem "Drawer" [level=2]
           - treeitem "Drilldown" [level=2]
+          - treeitem "Editor" [level=2]
           - treeitem "Empty" [level=2]
           - treeitem "File Input" [level=2]
           - treeitem "Filter Input" [level=2]

@@ -1,0 +1,35 @@
+- group "Planning notes":
+  - toolbar "Formatting":
+    - button "Undo" [disabled]
+    - button "Redo" [disabled]
+    - separator
+    - 'button "Text style: Paragraph" [disabled]': Paragraph
+    - status
+    - separator
+    - button "Bold" [disabled]
+    - button "Italic" [disabled]
+    - button "Strikethrough" [disabled]
+    - button "Code" [disabled]
+    - separator
+    - button "Link" [disabled]
+    - separator
+    - button "Bulleted list" [disabled]
+    - button "Numbered list" [disabled]
+    - button "Quote" [disabled]
+  - heading "Q3 planning" [level=2]
+  - paragraph:
+    - text: We ship the
+    - strong: new onboarding
+    - text: by
+    - emphasis: September 30
+    - text: . The details are in the
+    - link "project brief":
+      - /url: https://fusion.dev
+    - text: .
+  - list:
+    - listitem:
+      - paragraph: Draft the welcome email
+    - listitem:
+      - paragraph: Record the product tour
+  - blockquote:
+    - paragraph: Keep the first run under two minutes.
