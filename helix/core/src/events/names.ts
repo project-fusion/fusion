@@ -23,7 +23,7 @@ export const helixEventNames: ReadonlySet<string> = new Set(
     'canvas-edit canvas-pan canvas-view canvas-zoom caret clear collapse complete ' +
     'connect console copy copy-error create device-button device-key device-screenshot ' +
     'device-scroll device-swipe device-tap device-text device-touch dismiss edit end expand facet filter ' +
-    'filtered graph-filter graph-layout graph-pan graph-part-change graph-ready ' +
+    'filtered found graph-filter graph-layout graph-pan graph-part-change graph-ready ' +
     'graph-signal graph-zoom history listen load load-more map-cluster map-pan map-part-change ' +
     'map-ready map-rotate map-tilt map-zoom move navigate next panel-resize pasted pin plot-change ' +
     'plot-turn press ' +

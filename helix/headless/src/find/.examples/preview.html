@@ -1,0 +1,32 @@
+<!-- @summary A find bar above an article, open on a search, with every match marked and the first one current. -->
+<link
+  href="styles.css"
+  rel="stylesheet"
+/>
+
+<div class="find-pane">
+  <helix-headless-find
+    for="find-guide"
+    open
+    query="token"
+  ></helix-headless-find>
+  <article
+    data-prose
+    id="find-guide"
+  >
+    <h2>Theming with tokens</h2>
+    <p>
+      A token names one decision, such as the color of a border or the space between two controls.
+      Components read tokens, so a theme changes every component at once.
+    </p>
+    <p>
+      Set a token on the page to change it everywhere, or on one element to change it there. A token
+      set on an element reaches everything inside it.
+    </p>
+    <h3>Choosing colors</h3>
+    <p>
+      Start from the primary color. The other color tokens are mixed from it and from the page's
+      foreground and background.
+    </p>
+  </article>
+</div>

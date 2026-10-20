@@ -209,6 +209,15 @@ export interface FilterDetail {
   value: string
 }
 
+/** Detail carried by `helix-found`. */
+export interface FoundDetail {
+  /** How many matches the search found. */
+  count: number
+
+  /** Which match is current, counting from 0, or -1 for none. */
+  index: number
+}
+
 /**
  * Detail carried by `helix-facet`.
  *

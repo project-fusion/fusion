@@ -2,6 +2,8 @@ import {
   AriaForwardController,
   customElement,
   drawIcon,
+  findPattern,
+  findRanges,
   formatWords,
   HelixFormElement,
   ListedController,
@@ -173,29 +175,8 @@ export const positionOf = (value: string, at: number): { column: number; line: n
   }
 }
 
-/** The pattern a query reads as, or nothing where its regular expression cannot be read. */
-const patternOf = (query: EditorFindQuery): RegExp | undefined => {
-  const source = query.regex ? query.search : query.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  try {
-    return new RegExp(
-      query.wholeWord ? `\\b(?:${source})\\b` : source,
-      query.caseSensitive ? 'gu' : 'giu',
-    )
-  } catch {
-    return undefined
-  }
-}
-
-/** Where a query matches in a text, as `[from, to]` offsets, with no empty match. */
-export const findRanges = (text: string, query: EditorFindQuery): Array<[number, number]> => {
-  const pattern = query.search === '' ? undefined : patternOf(query)
-  if (!pattern) {
-    return []
-  }
-  return [...text.matchAll(pattern)]
-    .filter((match) => match[0] !== '')
-    .map((match) => [match.index, match.index + match[0].length])
-}
+/** Where a query matches in a text, as `[from, to]` offsets, with no empty match. Find's own, from core. */
+export { findRanges }
 
 /** Each language's name as a reader knows it, by the names `language` takes. */
 const LANGUAGE_NAMES: Record<string, string> = {
@@ -562,7 +543,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
 
   /** Whether the search can be read, which a regular expression may not be. */
   private get readable(): boolean {
-    return this.query.search === '' || patternOf(this.query) !== undefined
+    return this.query.search === '' || findPattern(this.query) !== undefined
   }
 
   /** Puts the caret in the editor, as a label pointing at it would. */
@@ -743,7 +724,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
       return
     }
     const control = this.control
-    const pattern = patternOf(this.query)
+    const pattern = findPattern(this.query)
     if (!control || !pattern) {
       return
     }

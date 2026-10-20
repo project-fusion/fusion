@@ -1,0 +1,32 @@
+import './closed-sections.css'
+
+export function Example() {
+  return (
+    <div className="find-pane">
+      <helix-find
+        for="find-help"
+        open
+        query="refund"
+      ></helix-find>
+      <helix-accordion
+        id="find-help"
+        separation="plain"
+      >
+        <helix-accordion-item>
+          <span slot="summary">Shipping</span>
+          Orders ship within two business days. You receive a tracking number by email.
+        </helix-accordion-item>
+        <helix-accordion-item>
+          <span slot="summary">Returns</span>
+          You can return an item within 30 days. The refund reaches your card within a week of our
+          receiving it.
+        </helix-accordion-item>
+        <helix-accordion-item>
+          <span slot="summary">Exchanges</span>
+          An exchange is a return and a new order. The second delivery is free, and no refund is
+          made.
+        </helix-accordion-item>
+      </helix-accordion>
+    </div>
+  )
+}

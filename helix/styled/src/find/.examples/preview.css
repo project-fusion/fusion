@@ -1,0 +1,10 @@
+/* A pane with the bar across its top, over the content it searches. */
+.find-pane {
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-lg);
+  overflow: clip;
+}
+
+.find-pane > :not(helix-find) {
+  padding: var(--helix-space-sm) var(--helix-space-lg) var(--helix-space-md);
+}
