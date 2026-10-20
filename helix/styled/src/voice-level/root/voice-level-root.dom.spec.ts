@@ -117,7 +117,8 @@ describe('voice level', () => {
          rests, and the loop ends. */
       await framesBooked(120)
       expect(await framesBooked(10)).toBe(0)
-    })
+      /* About 140 frames, over two seconds, which is past the default limit. */
+    }, 5000)
 
     test('starts again with the next reading', async () => {
       const host = await level('<helix-voice-level></helix-voice-level>')
