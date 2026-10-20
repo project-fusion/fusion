@@ -152,6 +152,10 @@ helix scan: 1 error, 0 warnings, 0 info, and 0 unsettled, in 42 files
 - **`--file <path>` reports one file's findings**, and still reads the whole
   project, so an import in another file counts. `--stdin <language>` checks a
   snippet.
+- **`--fix` writes the fixes it can into your source**, then reports what is
+  left. For `unlinked-trigger` it adds `aria-describedby` to the trigger, and
+  an `id` to the tooltip where it has none. A tag it cannot find exactly once,
+  such as an `id` set in an expression, is left for you.
 
 It exits 1 on a finding at `error`, and 3 where it cannot run, such as where no
 installed Helix package has lint data.
@@ -210,7 +214,7 @@ run `helix scan --out` after it to add your code's run.
 | `unknown-slot` | error | scan | A child names a slot its Helix element does not have, so it is not drawn |
 | `unknown-tag` | error | both | A rule or an element names a tag no installed package lists |
 | `unknown-token` | error | scan | A rule reads or sets a `--helix-` name the token set does not have |
-| `unlinked-trigger` | warn | scan | A tooltip's `for` names a plain element that does not name the tooltip in `aria-describedby`, so the page at rest meets the trigger undescribed |
+| `unlinked-trigger` | warn | scan | A tooltip's `for` names a plain element that does not name the tooltip in `aria-describedby`, so the page at rest meets the trigger undescribed. `helix scan --fix` writes the link |
 | `unreflected-attribute` | warn | both | A rule selects a Helix element by an attribute it never writes back, so it matches only markup a server wrote |
 
 **A button inside a button is judged where the markup settles it.** Button,

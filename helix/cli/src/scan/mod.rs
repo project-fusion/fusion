@@ -24,6 +24,7 @@ mod analyze;
 mod config;
 mod css;
 mod files;
+mod fix;
 mod identity;
 mod installed;
 mod jsx;
@@ -485,7 +486,22 @@ pub fn run(args: &Scan, from: &Path, json: bool, paint: Paint) -> Outcome<Code> 
         }
         None => None,
     };
-    let (run, notes) = scanned(args, from, snippet.as_deref())?;
+    let fixed = if args.fix {
+        fix_files(args, from)?
+    } else {
+        None
+    };
+    let (run, mut notes) = scanned(args, from, snippet.as_deref())?;
+    if let Some((linked, files)) = fixed {
+        notes.insert(
+            0,
+            format!(
+                "Linked {} in {}.",
+                counted(linked, "tooltip trigger"),
+                counted(files, "file")
+            ),
+        );
+    }
     if json {
         fusion_rules::say!("{run}");
     } else {
@@ -500,6 +516,46 @@ pub fn run(args: &Scan, from: &Path, json: bool, paint: Paint) -> Outcome<Code> 
             .any(|finding| finding["severity"] == "error")
     });
     Ok(if failed { Code::Failed } else { Code::Ok })
+}
+
+/// Writes the fixes into the files a scan finds `unlinked-trigger` in, and
+/// says how many triggers it linked in how many files.
+fn fix_files(args: &Scan, from: &Path) -> Outcome<Option<(usize, usize)>> {
+    let (run, _) = scanned(args, from, None)?;
+    let given = args
+        .dir
+        .as_ref()
+        .map_or_else(|| from.to_owned(), |dir| from.join(dir));
+    let root = folder(&given, &format!("Could not read {}", given.display()))?;
+    let mut sheets: Vec<String> = run["findings"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|finding| finding["kind"] == "unlinked-trigger")
+        .filter_map(|finding| finding["origin"]["sheet"].as_str().map(str::to_owned))
+        .collect();
+    sheets.sort();
+    sheets.dedup();
+    let (mut linked, mut files) = (0, 0);
+    for sheet in sheets {
+        let path = root.join(&sheet);
+        let (Some(kind), Ok(text)) = (files::kind(&path), std::fs::read_to_string(&path)) else {
+            continue;
+        };
+        let Some(template) = fix::template(&path, kind, &text) else {
+            continue;
+        };
+        let (out, count) = fix::link_tooltips(&text, &template);
+        if count == 0 {
+            continue;
+        }
+        std::fs::write(&path, out).map_err(|error| {
+            Failure::input(format!("Could not write {sheet}"), error.to_string())
+        })?;
+        linked += count;
+        files += 1;
+    }
+    Ok(Some((linked, files)))
 }
 
 /// The name a snippet given on stdin is judged under, by its language.
