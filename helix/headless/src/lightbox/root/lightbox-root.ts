@@ -1005,11 +1005,13 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
        with `loop` they were live and showed the same picture, and without it
        they were drawn and disabled, which says a way on that is not there. */
     const stepping = this.items.length > 1
-    return html`${stepping ? this.renderStepControls() : nothing}${this.maxZoom > 1 ? this.renderZoomControls() : nothing}${drawDismiss({
-      label: this.dismissLabel,
-      mark: html`<slot name="dismiss-icon">${drawDismissGlyph()}</slot>`,
-      onDismiss: () => this.close(),
-    })}`
+    return html`${stepping ? this.renderStepControls() : nothing}${this.maxZoom > 1 ? this.renderZoomControls() : nothing}${drawDismiss(
+      {
+        label: this.dismissLabel,
+        mark: html`<slot name="dismiss-icon">${drawDismissGlyph()}</slot>`,
+        onDismiss: () => this.close(),
+      },
+    )}`
   }
 
   /** Previous and next, for a set of more than one. */
