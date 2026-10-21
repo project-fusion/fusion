@@ -16,24 +16,20 @@ import {
   stopPress,
   words,
 } from '@fusion.dev/helix-core'
-import {
-  asterisk,
-  caretDown,
-  caretRight,
-  caretUp,
-  info,
-  magnifyingGlass,
-  textAa,
-  textAUnderline,
-  warning,
-  x,
-  xCircleFill,
-} from '@fusion.dev/helix-icons'
+import { info, magnifyingGlass, warning, xCircleFill } from '@fusion.dev/helix-icons'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { live } from 'lit/directives/live.js'
 import { html } from 'lit/static-html.js'
 import '../../button/index.js'
+import '../../find/index.js'
+import type {
+  FindDirection,
+  Finder,
+  FindQuery,
+  FindResult,
+  FindSink,
+  HelixHeadlessFind,
+} from '../../find/index.js'
 import '../../icon-button/index.js'
 import '../../toolbar/index.js'
 
@@ -245,6 +241,7 @@ const LANGUAGE_NAMES: Record<string, string> = {
  *
  * @event {Event} change - The reader finished an edit and focus left the code, in the engine or the plain field.
  * @event {HelixBeforeChangeEvent} helix-before-change - The text is about to change. Cancelable: cancel it to keep the current text.
+ * @event {HelixFoundEvent} helix-found - The find bar searched or moved among the matches, with `count` and the selected match's `index`, counting from 0, or -1 for none.
  * @event {Event} input - Fired after the text changes.
  *
  * @csspart body - The box the code is drawn in, between the header and the problems.
@@ -259,9 +256,9 @@ const LANGUAGE_NAMES: Record<string, string> = {
  * @csspart diagnostics - The list of problems under the code, while there are any.
  * @csspart feedback - The message that says what is wrong.
  * @csspart field - The frame around the header, the code, the problems and the status line.
- * @csspart find - The button in the header that opens the find bar.
- * @csspart find-bar - The find bar under the header, while it is open.
- * @csspart find-button - The Find button's inner button.
+ * @csspart find - The find bar under the header, where the reader searches the code: a Find of its own.
+ * @csspart find-actions - The find bar's `actions` slot, which the editor fills with nothing.
+ * @csspart find-bar - The find bar's strip: the replace toggle, the field, the count, the toolbar, and the replace row while it shows.
  * @csspart find-close - The button that closes the find bar.
  * @csspart find-close-button - The close button's inner button.
  * @csspart find-close-live - The close button's live region, which speaks while the button is pending.
@@ -271,10 +268,11 @@ const LANGUAGE_NAMES: Record<string, string> = {
  * @csspart find-controls-toolbar - The box inside the find bar's toolbar that lays its buttons out.
  * @csspart find-count - Which match is selected, of how many.
  * @csspart find-field - The field the search is typed in.
- * @csspart find-live - The Find button's live region, which speaks while the button is pending.
+ * @csspart find-live - The find bar's live region, which says the count as it changes.
  * @csspart find-match-case - The option that finds only the same case. Pressed while it applies.
  * @csspart find-match-case-button - The match case button's inner button.
  * @csspart find-match-case-live - The match case button's live region, which speaks while the button is pending.
+ * @csspart find-match-case-pressed - The match case option while it applies, beside `find-match-case`.
  * @csspart find-match-case-spinner - The ring the match case button turns while it is pending.
  * @csspart find-match-case-text - The box the match case button's icon sits in.
  * @csspart find-next - The button that selects the next match.
@@ -290,18 +288,34 @@ const LANGUAGE_NAMES: Record<string, string> = {
  * @csspart find-regex - The option that reads the search as a regular expression. Pressed while it applies.
  * @csspart find-regex-button - The regular expression button's inner button.
  * @csspart find-regex-live - The regular expression button's live region, which speaks while the button is pending.
+ * @csspart find-regex-pressed - The regular expression option while it applies, beside `find-regex`.
  * @csspart find-regex-spinner - The ring the regular expression button turns while it is pending.
  * @csspart find-regex-text - The box the regular expression button's icon sits in.
- * @csspart find-replace - The button that shows the replace field under the find field. Expanded while it shows.
- * @csspart find-replace-button - The find and replace button's inner button.
- * @csspart find-replace-live - The find and replace button's live region, which speaks while the button is pending.
- * @csspart find-replace-spinner - The ring the find and replace button turns while it is pending.
- * @csspart find-replace-text - The box the find and replace button's icon sits in.
- * @csspart find-spinner - The ring the Find button turns while it is pending.
- * @csspart find-text - The box the Find button's icon sits in.
+ * @csspart find-replace - The button that replaces the selected match.
+ * @csspart find-replace-all - The button that replaces every match.
+ * @csspart find-replace-all-button - The Replace all button's inner button.
+ * @csspart find-replace-all-live - The Replace all button's live region, which speaks while the button is pending.
+ * @csspart find-replace-all-spinner - The ring the Replace all button turns while it is pending.
+ * @csspart find-replace-all-text - The box the Replace all button's words sits in.
+ * @csspart find-replace-button - The Replace button's inner button.
+ * @csspart find-replace-field - The field the replacement is typed in.
+ * @csspart find-replace-live - The Replace button's live region, which speaks while the button is pending.
+ * @csspart find-replace-spinner - The ring the Replace button turns while it is pending.
+ * @csspart find-replace-text - The box the Replace button's words sits in.
+ * @csspart find-replace-toggle - The button that shows the replace field under the find field. Expanded while it shows. Not drawn while `readonly`.
+ * @csspart find-replace-toggle-button - The find and replace button's inner button.
+ * @csspart find-replace-toggle-live - The find and replace button's live region, which speaks while the button is pending.
+ * @csspart find-replace-toggle-spinner - The ring the find and replace button turns while it is pending.
+ * @csspart find-replace-toggle-text - The box the find and replace button's icon sits in.
+ * @csspart find-toggle - The button in the header that opens and closes the find bar. Expanded while it is open.
+ * @csspart find-toggle-button - The Find button's inner button.
+ * @csspart find-toggle-live - The Find button's live region, which speaks while the button is pending.
+ * @csspart find-toggle-spinner - The ring the Find button turns while it is pending.
+ * @csspart find-toggle-text - The box the Find button's icon sits in.
  * @csspart find-whole-word - The option that finds only whole words. Pressed while it applies.
  * @csspart find-whole-word-button - The whole word button's inner button.
  * @csspart find-whole-word-live - The whole word button's live region, which speaks while the button is pending.
+ * @csspart find-whole-word-pressed - The whole word option while it applies, beside `find-whole-word`.
  * @csspart find-whole-word-spinner - The ring the whole word button turns while it is pending.
  * @csspart find-whole-word-text - The box the whole word button's icon sits in.
  * @csspart header - The strip above the code: the name, the language, and the controls.
@@ -310,24 +324,12 @@ const LANGUAGE_NAMES: Record<string, string> = {
  * @csspart language - The language's name in the header.
  * @csspart position - The caret's line and column, in the status line.
  * @csspart problem-count - How many problems there are, in the status line.
- * @csspart replace - The button that replaces the selected match.
- * @csspart replace-all - The button that replaces every match.
- * @csspart replace-all-button - The Replace all button's inner button.
- * @csspart replace-all-live - The Replace all button's live region, which speaks while the button is pending.
- * @csspart replace-all-spinner - The ring the Replace all button turns while it is pending.
- * @csspart replace-all-text - The box the Replace all button's words sit in.
- * @csspart replace-button - The Replace button's inner button.
- * @csspart replace-field - The field the replacement is typed in.
- * @csspart replace-live - The Replace button's live region, which speaks while the button is pending.
- * @csspart replace-spinner - The ring the Replace button turns while it is pending.
- * @csspart replace-text - The box the Replace button's words sit in.
  * @csspart status - The strip under the code.
  * @csspart view - Where an engine draws, while one is connected.
  *
  * @cssstate connected - An engine draws the editor.
  * @cssstate find-open - The find bar is open.
  * @cssstate invalid - The editor has an error to show, from `required` or your `feedback`.
- * @cssstate replace-open - The replace field shows under the find field.
  */
 @customElement('helix-headless-code-editor')
 export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(HelixFormElement)) {
@@ -491,26 +493,12 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
   @state()
   private caret = 0
 
-  /** Whether the find bar is open. */
+  /** Whether the find bar is open, as it last said. */
   @state()
   private findOpen = false
 
-  /** Where the search stands, or nothing before one. */
-  @state()
-  private found: EditorFindResult | undefined = undefined
-
-  /** Whether the replace field shows under the find field. */
-  @state()
-  private replaceOpen = false
-
-  @state()
-  private query: EditorFindQuery = {
-    caseSensitive: false,
-    regex: false,
-    replace: '',
-    search: '',
-    wholeWord: false,
-  }
+  /** The find bar drawn now, and how a search is reported to it. */
+  private find: { element: HelixHeadlessFind; sink: FindSink } | undefined
 
   private view: EditorEngineView | undefined
 
@@ -539,11 +527,6 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
       value: this.value,
       wrap: this.wrap,
     }
-  }
-
-  /** Whether the search can be read, which a regular expression may not be. */
-  private get readable(): boolean {
-    return this.query.search === '' || findPattern(this.query) !== undefined
   }
 
   /** Puts the caret in the editor, as a label pointing at it would. */
@@ -606,7 +589,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
       this.refreshFeedback()
     }
     this.toggleState('find-open', this.findOpen)
-    this.toggleState('replace-open', this.findOpen && this.replaceOpen && !this.readOnly)
+    this.attachFind()
     const mount = this.partNamed('view')
     if (changed.has('engine') || (this.engine && !this.view && mount)) {
       this.view?.destroy()
@@ -658,47 +641,46 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
 
   /** Opens the find bar, with the selection as the search where one is selected, and puts focus in its field. */
   private async openFind(): Promise<void> {
+    const find = this.find?.element
+    if (!find) {
+      return
+    }
     const control = this.control
     if (!this.view && control && control.selectionEnd > control.selectionStart) {
       const selected = control.value.slice(control.selectionStart, control.selectionEnd)
       if (!selected.includes('\n')) {
-        this.query = { ...this.query, search: selected }
+        find.query = selected
       }
     }
-    this.findOpen = true
-    await this.updateComplete
-    const field = this.partNamed<HTMLInputElement>('find-field')
-    field?.focus()
-    field?.select()
-    if (this.query.search !== '') {
-      this.search('first')
-    }
+    await find.show()
   }
 
-  /** Closes the find bar, takes the marks away, and puts focus back in the code. */
-  private closeFind(): void {
-    this.findOpen = false
-    this.found = undefined
-    this.view?.findEnd?.()
-    this.focus()
+  /** Hands the find bar drawn now the editor to search through, once per bar. */
+  private attachFind(): void {
+    const element = this.partNamed<HelixHeadlessFind>('find') ?? undefined
+    if (element === this.find?.element) {
+      return
+    }
+    this.find?.sink.detach()
+    this.find = element ? { element, sink: element.attach(this.finder) } : undefined
+  }
+
+  /** The editor, as the find bar searches through it: the engine, or the plain field. */
+  private readonly finder: Finder = {
+    end: () => this.view?.findEnd?.(),
+    find: (query, direction) => this.findIn(query, direction),
+    replace: (query, all) => this.replaceIn(query, all),
   }
 
   /** Finds the search and selects a match, in the engine or the plain field. */
-  private search(direction: 'first' | 'next' | 'previous'): void {
-    if (this.query.search === '' || !this.readable) {
-      this.found = undefined
-      this.view?.findEnd?.()
-      return
-    }
+  private findIn(query: FindQuery, direction: FindDirection): FindResult {
     if (this.view?.find) {
-      this.found = this.view.find(this.query, direction)
-      return
+      return this.view.find(query, direction)
     }
     const control = this.control
-    const ranges = findRanges(this.value, this.query)
+    const ranges = findRanges(this.value, query)
     if (!control || ranges.length === 0) {
-      this.found = { count: ranges.length, index: -1 }
-      return
+      return { count: ranges.length, index: -1 }
     }
     const at = direction === 'first' ? control.selectionStart : control.selectionEnd
     let index =
@@ -711,48 +693,45 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
     const [from, to] = ranges[index] ?? [0, 0]
     control.setSelectionRange(from, to)
     this.caret = from
-    this.found = { count: ranges.length, index }
+    return { count: ranges.length, index }
   }
 
-  /** Replaces the selected match, or every match, through `requestValue`. */
-  private replace(all: boolean): void {
-    if (this.readOnly || this.query.search === '' || !this.readable) {
-      return
+  /** Replaces the selected match, or every match, through `requestValue`, and finds the next. */
+  private replaceIn(query: FindQuery, all: boolean): FindResult | undefined {
+    if (this.readOnly) {
+      return undefined
     }
     if (this.view?.replace) {
-      this.found = this.view.replace(this.query, all)
-      return
+      return this.view.replace(query, all)
     }
     const control = this.control
-    const pattern = findPattern(this.query)
+    const pattern = findPattern(query)
     if (!control || !pattern) {
-      return
+      return undefined
     }
     if (all) {
-      this.requestValue(this.value.replace(pattern, this.query.replace))
+      this.requestValue(this.value.replace(pattern, query.replace))
     } else {
-      const selected = findRanges(this.value, this.query).find(
+      const selected = findRanges(this.value, query).find(
         ([from, to]) => from === control.selectionStart && to === control.selectionEnd,
       )
       if (!selected) {
-        this.search('next')
-        return
+        return this.findIn(query, 'next')
       }
       const [from, to] = selected
       const one = new RegExp(pattern.source, pattern.flags.replace('g', ''))
-      const replaced = this.value.slice(from, to).replace(one, this.query.replace)
+      const replaced = this.value.slice(from, to).replace(one, query.replace)
       this.requestValue(this.value.slice(0, from) + replaced + this.value.slice(to))
       restoreValue(control, this.value)
       control.setSelectionRange(from + replaced.length, from + replaced.length)
     }
     restoreValue(control, this.value)
-    this.search('next')
+    return this.findIn(query, 'next')
   }
 
-  /** Turns one of the find bar's options on or off, and searches again with it. */
-  private toggleOption(option: 'caseSensitive' | 'regex' | 'wholeWord'): void {
-    this.query = { ...this.query, [option]: !this.query[option] }
-    this.search('first')
+  /** The find bar opened or closed, which the Find button shows. */
+  private readonly handleFindToggle = (event: Event): void => {
+    this.findOpen = (event as ToggleEvent).newState === 'open'
   }
 
   /** The find key opens the find bar from anywhere in the editor, ahead of the browser's own. */
@@ -762,29 +741,6 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
       event.preventDefault()
       event.stopPropagation()
       void this.openFind()
-    }
-  }
-
-  private readonly handleFindInput = (event: Event): void => {
-    this.query = { ...this.query, search: (event.target as HTMLInputElement).value }
-    this.search('first')
-  }
-
-  private readonly handleReplaceInput = (event: Event): void => {
-    this.query = { ...this.query, replace: (event.target as HTMLInputElement).value }
-  }
-
-  private readonly handleFindKeys = (event: KeyboardEvent): void => {
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      this.closeFind()
-    } else if (event.key === 'Enter') {
-      event.preventDefault()
-      if ((event.target as HTMLElement).getAttribute('part') === 'replace-field') {
-        this.replace(event.metaKey || event.ctrlKey)
-      } else {
-        this.search(event.shiftKey ? 'previous' : 'next')
-      }
     }
   }
 
@@ -824,19 +780,6 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
     this.escaped = false
   }
 
-  /** The words the find bar's count says, or its regular expression's fault. */
-  private get countText(): string {
-    if (!this.readable) {
-      return this.findInvalidLabel
-    }
-    return this.found === undefined
-      ? ''
-      : formatWords(this, 'matchesLabel', {
-          count: this.found.count,
-          index: Math.max(this.found.index, 0) + 1,
-        })
-  }
-
   /** The header: the name, the language, and the toolbar of the page's actions and Find. */
   protected renderHeader(): TemplateResult {
     const toolbar = this.tag('toolbar')
@@ -845,14 +788,14 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
     return html`<div part="header">
       ${this.renderLabel()}
       ${language ? html`<span part="language">${language}</span>` : nothing}
-      <${toolbar} part="controls" exportparts="toolbar: controls-toolbar" exportparts="toolbar: controls-toolbar" label=${this.controlsLabel}>
+      <${toolbar} part="controls" exportparts="toolbar: controls-toolbar" label=${this.controlsLabel}>
         <slot name="actions"></slot>
         <${button}
-          part="find"
-          exportparts="button: find-button, live: find-live, spinner: find-spinner, text: find-text"
+          part="find-toggle"
+          exportparts="button: find-toggle-button, live: find-toggle-live, spinner: find-toggle-spinner, text: find-toggle-text"
           .expanded=${this.findOpen}
           label=${this.findLabel}
-          @click=${() => (this.findOpen ? this.closeFind() : void this.openFind())}
+          @click=${() => (this.findOpen ? this.find?.element.hide() : void this.openFind())}
           @helix-press=${stopPress}
         >
           ${drawIcon(magnifyingGlass)}
@@ -862,141 +805,33 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
   }
 
   /**
-   * The find bar, kept in the tree while closed so its fields keep what was
-   * typed. The fields stand outside the toolbar, which leaves the arrows to a
-   * text field.
+   * The find bar, a Find of the editor's own that searches the engine or the
+   * plain field, kept in the tree while closed so its fields keep what was
+   * typed. The editor takes the find key itself, so the bar takes none.
    */
   protected renderFind(): TemplateResult {
-    const toolbar = this.tag('toolbar')
-    const button = this.tag('icon-button')
-    const textButton = this.tag('button')
-    const searchable = this.readable && (this.found?.count ?? 0) > 0
-    const replacing = this.replaceOpen && !this.readOnly
-    return html`<div part="find-bar" role="search" aria-label=${this.findLabel} ?hidden=${!this.findOpen}>
-      ${
-        this.readOnly
-          ? nothing
-          : html`<${button}
-              part="find-replace"
-              exportparts="button: find-replace-button, live: find-replace-live, spinner: find-replace-spinner, text: find-replace-text"
-              .expanded=${replacing}
-              label=${this.findReplaceLabel}
-              @click=${() => {
-                this.replaceOpen = !this.replaceOpen
-              }}
-              @helix-press=${stopPress}
-            >
-              ${replacing ? drawIcon(caretDown) : html`<span data-mirror>${drawIcon(caretRight)}</span>`}
-            </${button}>`
-      }
-      <input
-        part="find-field"
-        aria-label=${this.findLabel}
-        aria-invalid=${this.readable ? nothing : 'true'}
-        autocomplete="off"
-        placeholder=${this.findLabel}
-        spellcheck="false"
-        type="search"
-        .value=${live(this.query.search)}
-        @input=${this.handleFindInput}
-        @keydown=${this.handleFindKeys}
-      />
-      <span part="find-count" role="status">${this.countText}</span>
-      <${toolbar} part="find-controls" exportparts="toolbar: find-controls-toolbar" exportparts="toolbar: find-controls-toolbar" label=${this.findControlsLabel}>
-        <${button}
-          part="find-match-case"
-          exportparts="button: find-match-case-button, live: find-match-case-live, spinner: find-match-case-spinner, text: find-match-case-text"
-          aria-pressed=${this.query.caseSensitive ? 'true' : 'false'}
-          label=${this.findMatchCaseLabel}
-          @click=${() => this.toggleOption('caseSensitive')}
-          @helix-press=${stopPress}
-        >
-          ${drawIcon(textAa)}
-        </${button}>
-        <${button}
-          part="find-whole-word"
-          exportparts="button: find-whole-word-button, live: find-whole-word-live, spinner: find-whole-word-spinner, text: find-whole-word-text"
-          aria-pressed=${this.query.wholeWord ? 'true' : 'false'}
-          label=${this.findWholeWordLabel}
-          @click=${() => this.toggleOption('wholeWord')}
-          @helix-press=${stopPress}
-        >
-          ${drawIcon(textAUnderline)}
-        </${button}>
-        <${button}
-          part="find-regex"
-          exportparts="button: find-regex-button, live: find-regex-live, spinner: find-regex-spinner, text: find-regex-text"
-          aria-pressed=${this.query.regex ? 'true' : 'false'}
-          label=${this.findRegexLabel}
-          @click=${() => this.toggleOption('regex')}
-          @helix-press=${stopPress}
-        >
-          ${drawIcon(asterisk)}
-        </${button}>
-        <${button}
-          part="find-previous"
-          exportparts="button: find-previous-button, live: find-previous-live, spinner: find-previous-spinner, text: find-previous-text"
-          ?disabled=${!searchable}
-          label=${this.findPreviousLabel}
-          @click=${() => this.search('previous')}
-          @helix-press=${stopPress}
-        >
-          ${drawIcon(caretUp)}
-        </${button}>
-        <${button}
-          part="find-next"
-          exportparts="button: find-next-button, live: find-next-live, spinner: find-next-spinner, text: find-next-text"
-          ?disabled=${!searchable}
-          label=${this.findNextLabel}
-          @click=${() => this.search('next')}
-          @helix-press=${stopPress}
-        >
-          ${drawIcon(caretDown)}
-        </${button}>
-        <${button}
-          part="find-close"
-          exportparts="button: find-close-button, live: find-close-live, spinner: find-close-spinner, text: find-close-text"
-          label=${this.findCloseLabel}
-          @click=${() => this.closeFind()}
-          @helix-press=${stopPress}
-        >
-          ${drawIcon(x)}
-        </${button}>
-      </${toolbar}>
-      ${
-        !replacing
-          ? nothing
-          : html`<input
-              part="replace-field"
-              aria-label=${this.replaceWithLabel}
-              autocomplete="off"
-              placeholder=${this.replaceWithLabel}
-              spellcheck="false"
-              type="text"
-              .value=${live(this.query.replace)}
-              @input=${this.handleReplaceInput}
-              @keydown=${this.handleFindKeys}
-            />
-            <${textButton}
-              part="replace"
-              exportparts="button: replace-button, live: replace-live, spinner: replace-spinner, text: replace-text"
-              ?disabled=${!searchable}
-              @click=${() => this.replace(false)}
-              @helix-press=${stopPress}
-            >
-              ${this.replaceLabel}
-            </${textButton}>
-            <${textButton}
-              part="replace-all"
-              exportparts="button: replace-all-button, live: replace-all-live, spinner: replace-all-spinner, text: replace-all-text"
-              ?disabled=${!searchable}
-              @click=${() => this.replace(true)}
-              @helix-press=${stopPress}
-            >
-              ${this.replaceAllLabel}
-            </${textButton}>`
-      }
-    </div>`
+    const find = this.tag('find')
+    return html`<${find}
+      part="find"
+      exportparts="actions: find-actions, bar: find-bar, close: find-close, close-button: find-close-button, close-live: find-close-live, close-spinner: find-close-spinner, close-text: find-close-text, controls: find-controls, controls-toolbar: find-controls-toolbar, count: find-count, field: find-field, live: find-live, match-case: find-match-case, match-case-button: find-match-case-button, match-case-live: find-match-case-live, match-case-pressed: find-match-case-pressed, match-case-spinner: find-match-case-spinner, match-case-text: find-match-case-text, next: find-next, next-button: find-next-button, next-live: find-next-live, next-spinner: find-next-spinner, next-text: find-next-text, previous: find-previous, previous-button: find-previous-button, previous-live: find-previous-live, previous-spinner: find-previous-spinner, previous-text: find-previous-text, regex: find-regex, regex-button: find-regex-button, regex-live: find-regex-live, regex-pressed: find-regex-pressed, regex-spinner: find-regex-spinner, regex-text: find-regex-text, replace: find-replace, replace-all: find-replace-all, replace-all-button: find-replace-all-button, replace-all-live: find-replace-all-live, replace-all-spinner: find-replace-all-spinner, replace-all-text: find-replace-all-text, replace-button: find-replace-button, replace-field: find-replace-field, replace-live: find-replace-live, replace-spinner: find-replace-spinner, replace-text: find-replace-text, replace-toggle: find-replace-toggle, replace-toggle-button: find-replace-toggle-button, replace-toggle-live: find-replace-toggle-live, replace-toggle-spinner: find-replace-toggle-spinner, replace-toggle-text: find-replace-toggle-text, whole-word: find-whole-word, whole-word-button: find-whole-word-button, whole-word-live: find-whole-word-live, whole-word-pressed: find-whole-word-pressed, whole-word-spinner: find-whole-word-spinner, whole-word-text: find-whole-word-text"
+      close-label=${this.findCloseLabel}
+      controls-label=${this.findControlsLabel}
+      invalid-label=${this.findInvalidLabel}
+      label=${this.findLabel}
+      match-case-label=${this.findMatchCaseLabel}
+      matches-label=${this.matchesLabel}
+      next-label=${this.findNextLabel}
+      previous-label=${this.findPreviousLabel}
+      ?readonly=${this.readOnly}
+      regex-label=${this.findRegexLabel}
+      replace-all-label=${this.replaceAllLabel}
+      replace-field-label=${this.replaceWithLabel}
+      replace-label=${this.replaceLabel}
+      replace-toggle-label=${this.findReplaceLabel}
+      shortcut=""
+      whole-word-label=${this.findWholeWordLabel}
+      @toggle=${this.handleFindToggle}
+    ></${find}>`
   }
 
   /** The problems, each a button that moves the caret to it, in its tone. */

@@ -22,7 +22,8 @@ describe('code editor', () => {
 
   test('draws its controls in the styled tier’s own elements', async () => {
     const element = await mount('<helix-code-editor label="orders.ts"></helix-code-editor>')
-    expect(part(element, 'find')?.localName).toBe('helix-icon-button')
+    expect(part(element, 'find-toggle')?.localName).toBe('helix-icon-button')
+    expect(part(element, 'find')?.localName).toBe('helix-find')
     expect(part(element, 'controls')?.localName).toBe('helix-toolbar')
   })
 })
