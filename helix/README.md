@@ -20,6 +20,7 @@ internal to the build.
 | `map` | `helix-map` | connects the Map frame to a map renderer, such as MapLibre or Leaflet |
 | `plot` | `helix-plot` | draws the spatial charts in three dimensions with three.js |
 | `sandbox` | `helix-sandbox` | the sandbox's source editor, and a code highlighter for Code Block |
+| `speech` | `helix-speech` | recognizes dictation in the page, on the device, with Moonshine |
 | `styled` | `helix` | the headless tier with token-driven presentation |
 | `styles` | `helix-styles` | tokens and the base layer, pure CSS |
 | `templates` | `helix-templates` | the project templates `helix new` scaffolds from |

@@ -1,0 +1,8 @@
+{
+  "files": {
+    "moonshine.mjs": "d89780b7c341256a2eec4c2c99c8626855e932609b92d90eb723a318dc9371aa",
+    "moonshine.wasm": "cc072034b5d2e859dae2e0d18d848b72c684cf999d353aefa79c6531180c312b"
+  },
+  "moonshine": "0.1.5",
+  "onnxruntime": "1.23.2"
+}
