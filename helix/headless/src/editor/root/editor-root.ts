@@ -87,11 +87,11 @@ const GROUPS = [
   ['quote', ['quote']],
 ] as const satisfies ReadonlyArray<readonly [string, readonly EditorTool[]]>
 
-/** A group of tools that `tools` names: the groups above, and `find`, the button that opens the find bar. */
+/** A group of tools that `tools` names: the groups above, and `find`, the button that opens the find bar, which is drawn only where `tools` names it. */
 export type EditorToolGroup = (typeof GROUPS)[number][0] | 'find'
 
 /** The groups the toolbar draws while `tools` is absent. */
-const RESTING_TOOLS = 'history block marks link lists quote find'
+const RESTING_TOOLS = 'history block marks link lists quote'
 
 /**
  * Each tool's key, as `Kbd` writes a chord, where it has one. The renderer
@@ -220,16 +220,15 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * The toolbar's groups are named by `tools`, in this order: `history` (Undo
  * and Redo), `block` (a menu of Paragraph, three headings, and Code block),
  * `marks` (Bold, Italic, Strikethrough, and Code), `link`, `lists` (Bulleted
- * and Numbered), `quote`, and `find`. All seven are drawn by default. A tool
- * the renderer cannot run is left out once it is connected, and a tool that
- * cannot apply at the selection is disabled. A tool returns focus to the
- * document once it has run. With `readonly`, the document cannot be edited and
- * the toolbar is not drawn.
+ * and Numbered), and `quote`, which are drawn by default, and `find`, the Find
+ * button, which is drawn where `tools` names it. A tool the renderer cannot run
+ * is left out once it is connected, and a tool that cannot apply at the
+ * selection is disabled. A tool returns focus to the document once it has run.
+ * With `readonly`, the document cannot be edited and the toolbar is not drawn.
  *
- * `find` draws the Find button and a find bar under the toolbar, a Find that
- * searches the document through the renderer, marks every match, and selects
- * one. It replaces unless the document is `readonly`, where the bar still
- * opens from its key.
+ * Command+F opens a find bar under the toolbar, a Find that searches the
+ * document through the renderer, marks every match, and selects one. It
+ * replaces unless the document is `readonly`, which it searches too.
  *
  * **Keyboard.** In the document:
  *
@@ -374,7 +373,7 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @csspart find-replace-toggle-live - The find and replace button's live region, which speaks while the button is pending.
  * @csspart find-replace-toggle-spinner - The ring the find and replace button turns while it is pending.
  * @csspart find-replace-toggle-text - The box the find and replace button's icon sits in.
- * @csspart find-toggle - The Find button in the toolbar, which opens and closes the find bar. Expanded while it is open.
+ * @csspart find-toggle - The Find button in the toolbar, drawn where `tools` names `find`, which opens and closes the find bar. Expanded while it is open.
  * @csspart find-toggle-button - The Find button's inner button.
  * @csspart find-toggle-live - The Find button's live region, which speaks while the button is pending.
  * @csspart find-toggle-spinner - The ring the Find button turns while it is pending.
@@ -932,7 +931,7 @@ export class HelixHeadlessEditor extends HelixElement {
       return
     }
     this.escaped = event.key === 'Escape'
-    if (commandWith(event, 'f') && this.drawsFind && this.find) {
+    if (commandWith(event, 'f') && this.searches && this.find) {
       event.preventDefault()
       event.stopPropagation()
       void this.openFind()
@@ -1372,10 +1371,11 @@ export class HelixHeadlessEditor extends HelixElement {
    * The find bar, a Find of the frame's own that searches through the
    * renderer, kept in the tree while closed so its field keeps what was typed.
    * The frame takes the find key from the document itself, so the bar takes
-   * none.
+   * none. Drawn for any document that can be searched, with or without the
+   * Find button.
    */
   protected renderFind(): TemplateResult | typeof nothing {
-    if (!this.drawsFind) {
+    if (!this.searches) {
       return nothing
     }
     const find = this.tag('find')
