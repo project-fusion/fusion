@@ -36,7 +36,7 @@ export interface MoonshineSpeech extends SpeechEngine {
 }
 
 /** Seconds of audio the page collects before it sends them to the worker. */
-const CHUNK = 0.1
+const CHUNK = 0.05
 
 /** Milliseconds between level reports, which the worklet would otherwise send every few. */
 const LEVEL_INTERVAL = 50
@@ -164,19 +164,22 @@ export const moonshineSpeech = (options: MoonshineSpeechOptions = {}): Moonshine
       }
     }
 
+    /* The microphone opens while the model loads. The worker handles its
+       messages in order, so what is said during a download waits for the
+       model, and nothing said after the press is lost. */
+    preload().catch(fail)
+    send({ id, type: 'start' })
     void (async () => {
-      const capture = navigator.mediaDevices.getUserMedia({
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
       })
-      await preload()
-      const stream = await capture
-      if (stopped) {
+      /* Stopped, or failed while the microphone was asked for. */
+      if (stopped || !listeners.has(id)) {
         for (const track of stream.getTracks()) {
           track.stop()
         }
         return
       }
-      send({ id, type: 'start' })
       const context = new AudioContext()
       if (context.state === 'suspended') {
         await context.resume()
@@ -232,7 +235,7 @@ export const moonshineSpeech = (options: MoonshineSpeechOptions = {}): Moonshine
           filled = 0
         }
       }
-      if (stopped) {
+      if (stopped || !listeners.has(id)) {
         release()
       }
     })().catch(fail)
