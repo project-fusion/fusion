@@ -16,6 +16,7 @@
     - button "Bulleted list" [disabled]
     - button "Numbered list" [disabled]
     - button "Quote" [disabled]
+  - status
   - heading "Q3 planning" [level=2]
   - paragraph:
     - text: We ship the
