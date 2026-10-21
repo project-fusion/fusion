@@ -40,7 +40,12 @@
   // on run 37559800038, the first `analyze` took 153 seconds and the binary
   // sat on disk unused. Passed through and kept out of the hash, because the
   // binary is a function of the Rust sources `analyze` already hashes.
-  "globalPassThroughEnv": ["GITHUB_OUTPUT", "HELIX_BIN"],
+  //
+  // **`GH_TOKEN` is how `@fusion.dev/helix-speech`'s build downloads its
+  // single-thread Moonshine build**, a release asset, which needs a token
+  // while the repository is private. Kept out of the hash: the digests in
+  // `single-thread.json` decide what the build produces.
+  "globalPassThroughEnv": ["GH_TOKEN", "GITHUB_OUTPUT", "HELIX_BIN"],
   "tasks": {
     // **The specs read packages this one does not depend on, so their files are
     // inputs here.** `dependenciesOf` walks the `dependencies` of
