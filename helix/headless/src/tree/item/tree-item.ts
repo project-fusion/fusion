@@ -41,6 +41,10 @@ export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
  * A `disabled` item is reached by the arrow keys and announced as unavailable,
  * and a press, Enter or Space on it does nothing.
  *
+ * A closed branch's children are hidden until found: the browser's find and
+ * Find search them, and the branch opens on the one that holds the match,
+ * unless `helix-before-open` is canceled.
+ *
  * A `lazy` item is a branch whose children you load when it opens: opening it
  * sends `helix-load`, the row says it is busy, and the children you add appear
  * in it. Remove `lazy` once they are in.
@@ -384,6 +388,26 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
     }
   }
 
+  /**
+   * A search found a match among the closed branch's children, and shows it
+   * next: the browser's find or Find. The branch opens, and where the page
+   * refuses, its children are hidden again once the search has shown them, as
+   * Accordion's section is.
+   */
+  private readonly handleBeforeMatch = (event: Event): void => {
+    if (this.open || this.requestOpen(true)) {
+      return
+    }
+    const group = event.currentTarget as HTMLElement
+    const observer = new MutationObserver(() => {
+      observer.disconnect()
+      if (!this.open && !group.hasAttribute('hidden')) {
+        group.setAttribute('hidden', 'until-found')
+      }
+    })
+    observer.observe(group, { attributeFilter: ['hidden'] })
+  }
+
   /** A press on the check mark checks the item and leaves a branch as it is. */
   private readonly handleCheckClick = (event: MouseEvent): void => {
     event.preventDefault()
@@ -626,7 +650,12 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
              branch reports children it has no relationship to. The pattern is
              \`treeitem\` containing \`group\`, which is also what an \`<li>\`
              holding a \`<ul>\` is. -->
-        <div part="group" role="group" ?hidden=${!this.open}>
+        <div
+          part="group"
+          role=${this.open ? 'group' : nothing}
+          hidden=${this.open ? nothing : 'until-found'}
+          @beforematch=${this.handleBeforeMatch}
+        >
           <slot name="children"></slot>
         </div>
       </div>`

@@ -64,6 +64,27 @@ describe('tree item structure', () => {
     expect(row?.querySelector('[part="group"]')).not.toBeNull()
   })
 
+  test('a closed branch hides its children until found, and opens on a match among them', async () => {
+    const tree = await mount(`
+      <helix-headless-tree label="Files">
+        <helix-headless-tree-item value="branch">Branch
+          <helix-headless-tree-item slot="children" value="child">Child</helix-headless-tree-item>
+        </helix-headless-tree-item>
+      </helix-headless-tree>`)
+    const [branch] = items(tree) as Array<
+      HTMLElement & { open: boolean; updateComplete: Promise<unknown> }
+    >
+    await branch?.updateComplete
+    const group = part(branch as HTMLElement, 'group') as HTMLElement
+    expect(group.getAttribute('hidden')).toBe('until-found')
+    expect(group.hasAttribute('role')).toBe(false)
+    group.dispatchEvent(new Event('beforematch', { bubbles: true }))
+    await branch?.updateComplete
+    expect(branch?.open).toBe(true)
+    expect(group.hasAttribute('hidden')).toBe(false)
+    expect(group.getAttribute('role')).toBe('group')
+  })
+
   /* `href` hands the row to an anchor and the wrapper drops to `none`: an anchor
      cannot contain the group, because the group holds more anchors and nesting
      them is markup no assistive technology reads the way it looks. */

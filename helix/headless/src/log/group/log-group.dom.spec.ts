@@ -21,7 +21,7 @@ const group = async (attributes = ''): Promise<Group> => {
 }
 
 describe('Log Group', () => {
-  test('is a disclosure whose button names the region it opens', async () => {
+  test('is a disclosure whose button names the group it opens', async () => {
     const element = await group()
     const summary = part(element, 'summary') as HTMLButtonElement
     const content = part(element, 'content') as HTMLElement
@@ -29,8 +29,29 @@ describe('Log Group', () => {
     expect(summary.getAttribute('aria-expanded')).toBe('false')
     const scope = element.shadowRoot as ShadowRoot
     expect(scope.getElementById(summary.getAttribute('aria-controls') ?? '')).toBe(content)
+    /* Shut, the lines are hidden until found, and the empty group is not named. */
+    expect(content.getAttribute('hidden')).toBe('until-found')
+    expect(content.hasAttribute('role')).toBe(false)
+    summary.click()
+    await element.updateComplete
+    expect(content.getAttribute('role')).toBe('group')
     expect(scope.getElementById(content.getAttribute('aria-labelledby') ?? '')).toBe(summary)
-    expect(content.hasAttribute('hidden')).toBe(true)
+  })
+
+  test('opens when a search finds a match in its lines, unless the page refuses', async () => {
+    const element = await group()
+    const content = part(element, 'content') as HTMLElement
+    content.dispatchEvent(new Event('beforematch', { bubbles: true }))
+    await element.updateComplete
+    expect(element.open).toBe(true)
+    element.open = false
+    await element.updateComplete
+    element.addEventListener('helix-before-open', (event) => event.preventDefault())
+    content.dispatchEvent(new Event('beforematch', { bubbles: true }))
+    content.removeAttribute('hidden')
+    await new Promise((resolve) => setTimeout(resolve))
+    expect(element.open).toBe(false)
+    expect(content.getAttribute('hidden')).toBe('until-found')
   })
 
   test('opens when pressed, asking first and saying so after', async () => {

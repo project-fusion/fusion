@@ -119,10 +119,6 @@
   margin-inline-start: var(--_log-duration-start, auto);
 }
 
-[part="content"][hidden] {
-  display: none;
-}
-
 /* A step with nothing in it has nothing to open, so it draws no caret and no
    surface, while its heading keeps its place. */
 :host(:state(empty)) [part="mark"] {
@@ -228,4 +224,18 @@
     max-block-size: none;
     overflow: visible;
   }
+}
+
+/* **A shut group's lines are hidden until a search finds them.**
+   `hidden="until-found"` hides them through `content-visibility` and keeps
+   the box, so the browser's find and Find still reach them and open the
+   group. The box draws nothing while the group is shut. Last, so it outranks
+   the surface's rules above, which select as strongly. */
+:host [part="content"][hidden] {
+  animation: none;
+  background-color: transparent;
+  border: none;
+  margin: 0;
+  max-block-size: none;
+  padding: 0;
 }
