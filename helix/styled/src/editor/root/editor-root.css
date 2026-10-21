@@ -117,8 +117,9 @@
 }
 
 /* A tool says it is on with a wash of the ink while its format holds, as
-   Code Editor's find options do. */
-[aria-pressed="true"] {
+   Code Editor's find options do, and Find while its bar is open. */
+[aria-pressed="true"],
+:host(:state(find-open)) [part="find-toggle"] {
   --icon-button-background-color: color-mix(
     in oklab,
     var(--helix-color-foreground) 12%,
@@ -196,6 +197,26 @@
 
 [part="link-controls"] {
   flex: 0 0 auto;
+}
+
+/* **The find bar is a row under the tools**, as the address bar is, on the
+   header's fill: a Find, which draws its own strip, here without a fill or a
+   line of its own, its fields on the document's ground. Closed, it takes no
+   room, so the header's gap does not open under the tools. */
+[part="find"] {
+  --find-background-color: transparent;
+  --find-border-color: var(--editor-border-color, var(--helix-color-border));
+  --find-field-background-color: var(--editor-background-color, var(--helix-color-background));
+}
+
+[part="find"]:not(:state(open)) {
+  display: none;
+}
+
+[part="find"]::part(bar) {
+  border-block-end: none;
+  padding-block: 0;
+  padding-inline: var(--helix-space-2xs) 0;
 }
 
 /* The document fills the frame below the strip. With `fill`, it scrolls

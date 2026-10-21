@@ -61,7 +61,7 @@ package uses yours.
 |---|---|
 | `connectEditor(frame, view, options)` | Connects a frame to a view, and returns a connection with `disconnect()` |
 | `editorSchema(options)` | The schema: Helix's blocks and marks, with your own added through `nodes` and `marks` |
-| `editorPlugins(schema, options)` | The keys, Markdown typed at the start of a line, history, the drop and gap cursors, `blockIds`, and `editorFrame` |
+| `editorPlugins(schema, options)` | The keys, Markdown typed at the start of a line, history, the drop and gap cursors, `blockIds`, `editorFind`, and `editorFrame` |
 | `blockIds(options)` | Keeps every block's id its own |
 | `findBlock(doc, id)` | Where a block stands, by its id |
 | `withBlockId(spec)` | A block of your own that keeps an id as Helix's do |
@@ -70,6 +70,9 @@ package uses yours.
 | `setLink(schema, href)` | Links the selection, or with an empty address takes its link off |
 | `safeHref(href)` | The address a link may have, or an empty string for one that could run something |
 | `editorFrame()` | The plugin the frame speaks to the view through, which `editorPlugins` includes |
+| `editorFind()` | The find bar's search in the document, which `editorPlugins` includes |
+| `findIn(view, query, direction)`, `replaceIn(view, query, all)`, `endFind(view)` | What the frame's find bar runs: find and select a match, replace, and take the marks away |
+| `matchesIn(doc, query)`, `findResultOf(state)` | Where a query matches in a document, and where an open search stands |
 | `editorNodes`, `editorMarks` | Helix's node and mark specs |
 | `EDITOR_CSS`, `adoptEditorSheet(root)` | The rules `connectEditor` adds to the page |
 
@@ -96,6 +99,15 @@ block again, for a comment anchored to it or an edit an agent makes to it.
 
 A paragraph and a heading are drawn with `dir="auto"`, so each runs in the
 direction of its own first letters, and a code block left to right.
+
+## Find
+
+The frame's find bar searches the document through `connectEditor`: every
+match is marked, the selected one is scrolled into view, and Replace and
+Replace all change the document in one step of the undo history. A match never
+runs from one block into the next. While the bar is open, a change to the
+document finds again, and the bar says the new count. A read-only document is
+searched, and nothing in it is replaced.
 
 ## Collaboration
 

@@ -68,6 +68,7 @@ helix-headless-editor::part(link-button),
 helix-headless-editor::part(bullet-list-button),
 helix-headless-editor::part(ordered-list-button),
 helix-headless-editor::part(quote-button),
+helix-headless-editor::part(find-toggle-button),
 helix-headless-editor::part(link-apply-button),
 helix-headless-editor::part(link-remove-button),
 helix-headless-editor::part(link-close-button) {
@@ -122,6 +123,48 @@ helix-headless-editor::part(link-field) {
   flex: 1 1 12rem;
   min-inline-size: 0;
   padding-inline: 0.5rem;
+}
+
+/* The find bar is a row under the tools while it is open, as the address bar is. */
+helix-headless-editor::part(find-bar) {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  padding-block-start: 0.25rem;
+}
+
+helix-headless-editor::part(find-field) {
+  background-color: var(--_gray-surface);
+  block-size: 1.75rem;
+  border: 1px solid var(--_gray-edge);
+  border-radius: var(--_radius-control);
+  box-sizing: border-box;
+  color: var(--_gray-strong);
+  flex: 1 1 12rem;
+  min-inline-size: 0;
+  padding-inline: 0.5rem;
+}
+
+helix-headless-editor::part(find-count) {
+  color: var(--_gray-muted);
+  font-size: 0.75rem;
+}
+
+helix-headless-editor::part(find-controls-toolbar) {
+  align-items: center;
+  display: flex;
+  gap: 0.25rem;
+}
+
+/* The find bar's live region is heard and not seen. */
+helix-headless-editor::part(find-live) {
+  block-size: 1px;
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
 }
 
 /* The document, and the blocks in it. */

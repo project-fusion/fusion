@@ -4,7 +4,9 @@ import type {
   EditorTool as FrameTool,
   HelixHeadlessEditor,
 } from '@fusion.dev/helix-headless/editor'
+import type { FindQuery, FindResult } from '@fusion.dev/helix-headless/find'
 import type { EditorView } from 'prosemirror-view'
+import type { EditorFindQuery, EditorFindResult } from './find/find.js'
 import type { EditorFormats, EditorTool } from './tools/tools.js'
 
 /** The connector, by type only: loading it here would evaluate ProseMirror's view before a spec registers the DOM. */
@@ -20,10 +22,26 @@ const formats = (one: EditorFormats, other: FrameFormats): [FrameFormats, Editor
   other,
 ]
 
+/* The find bar's query and result, which the connector names for itself too. */
+const queries = (one: EditorFindQuery, other: FindQuery): [FindQuery, EditorFindQuery] => [
+  one,
+  other,
+]
+const results = (one: EditorFindResult, other: FindResult): [FindResult, EditorFindResult] => [
+  one,
+  other,
+]
+
 /* And the frame itself is what `connectEditor` takes. */
 const fits = (connector: Connector) => (frame: HelixHeadlessEditor, view: EditorView) =>
   connector.connectEditor(frame, view)
 
-test('the connector and the frame name the same tools and formats', () => {
-  expect([typeof tools, typeof formats, typeof fits]).toEqual(['function', 'function', 'function'])
+test('the connector and the frame name the same tools, formats, and searches', () => {
+  expect([typeof tools, typeof formats, typeof queries, typeof results, typeof fits]).toEqual([
+    'function',
+    'function',
+    'function',
+    'function',
+    'function',
+  ])
 })
