@@ -132,6 +132,8 @@ describe('the preview pane', () => {
         source: target,
       }),
     )
+    /* The recognizer starts once the page has asked whether the device can listen. */
+    await new Promise((settle) => setTimeout(settle, 0))
     expect(heard.map((one) => [one.kind, one.text])).toEqual([
       ['final', 'hello'],
       ['end', undefined],
@@ -508,7 +510,10 @@ describe('the error, and the controls', () => {
     host.source = '<p>Hello</p>'
     await host.updateComplete
     const tabDocument = document.implementation.createHTMLDocument('')
-    const tab = { document: tabDocument, opener: window } as unknown as Window
+    const tab = Object.assign(new EventTarget(), {
+      document: tabDocument,
+      opener: window,
+    }) as unknown as Window
     const original = window.open
     const asked: unknown[][] = []
     window.open = ((...args: unknown[]) => {
@@ -539,6 +544,50 @@ describe('the error, and the controls', () => {
 
     window.open = (() => null) as typeof window.open
     expect(host.open()).toBeNull()
+  })
+
+  /* The frame in the tab is as opaque as the preview's own, so dictation in
+     it is listened for by the tab's recognizer, where the press was made. */
+  test("listens for dictation in the tab with the tab's own recognizer", async () => {
+    const host = (await preview('src="/frame.html" controls')) as Preview & {
+      open: () => Window | null
+    }
+    const tabDocument = document.implementation.createHTMLDocument('')
+    const tab = Object.assign(new EventTarget(), {
+      document: tabDocument,
+      opener: window,
+      SpeechRecognition: FakeRecognition,
+    }) as unknown as Window
+    const original = window.open
+    window.open = (() => tab) as unknown as typeof window.open
+    const stand = document.createElement('iframe')
+    document.body.append(stand)
+    const target = stand.contentWindow as Window
+    const heard: { kind?: string; text?: string }[] = []
+    target.postMessage = ((message: { kind?: string; text?: string; type?: string }) => {
+      if (message.type === 'helix-speech-heard') {
+        heard.push(message)
+      }
+    }) as Window['postMessage']
+    restore = () => {
+      window.open = original
+      stand.remove()
+    }
+    host.open()
+    const frame = tabDocument.querySelector('iframe') as HTMLIFrameElement
+    Object.defineProperty(frame, 'contentWindow', { configurable: true, value: target })
+    tab.dispatchEvent(
+      new MessageEvent('message', {
+        data: { id: 3, lang: 'en-US', type: 'helix-speech-start' },
+        origin: 'null',
+        source: target,
+      }),
+    )
+    await new Promise((settle) => setTimeout(settle, 0))
+    expect(heard.map((one) => [one.kind, one.text])).toEqual([
+      ['final', 'hello'],
+      ['end', undefined],
+    ])
   })
 })
 

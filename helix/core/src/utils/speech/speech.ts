@@ -18,6 +18,8 @@ export interface SpeechListener {
   level?(level: number, bands?: readonly number[]): void
   /** The engine's guess at the phrase being spoken, which the next guess or `final` replaces. */
   partial(text: string): void
+  /** The engine is fetching what it needs to listen, such as a language to recognize on the device. */
+  preparing?(): void
 }
 
 /** A listening an engine started, which the field stops. */
@@ -52,12 +54,12 @@ interface Recognition extends EventTarget {
 
 type RecognitionConstructor = new () => Recognition
 
-const recognizer = (): RecognitionConstructor | undefined => {
-  const scope = globalThis as unknown as {
+const recognizer = (scope: object = globalThis): RecognitionConstructor | undefined => {
+  const here = scope as {
     SpeechRecognition?: RecognitionConstructor
     webkitSpeechRecognition?: RecognitionConstructor
   }
-  return scope.SpeechRecognition ?? scope.webkitSpeechRecognition
+  return here.SpeechRecognition ?? here.webkitSpeechRecognition
 }
 
 /**
@@ -125,8 +127,59 @@ const meter = (report: (level: number, bands: readonly number[]) => void): (() =
 }
 
 /**
- * Listens with the browser's recognizer in this page. A field in a sandboxed
- * frame cannot: its origin is opaque, and the recognizer refuses it.
+ * Whether the browser can recognize a language on the device, from Chrome's
+ * `SpeechRecognition.available`. `downloadable` and `downloading` need
+ * `install` first.
+ */
+type LocalAvailability = 'available' | 'downloadable' | 'downloading' | 'unavailable'
+
+interface LocalRecognizer {
+  available?(options: { langs: string[]; processLocally: boolean }): Promise<LocalAvailability>
+  install?(options: { langs: string[]; processLocally: boolean }): Promise<boolean>
+}
+
+/**
+ * Whether `Constructor` can listen to `lang` on the device, installing the
+ * language first where the browser offers it. `preparing` is told as the
+ * install starts. Anything that fails answers `false`, and the recognizer
+ * listens through the browser's service instead.
+ */
+const listenLocally = async (
+  Constructor: RecognitionConstructor,
+  lang: string,
+  preparing: () => void,
+): Promise<boolean> => {
+  const local = Constructor as unknown as LocalRecognizer
+  if (!local.available || !local.install) {
+    return false
+  }
+  const options = { langs: [lang], processLocally: true }
+  try {
+    const state = await local.available(options)
+    if (state === 'available') {
+      return true
+    }
+    if (state === 'unavailable') {
+      return false
+    }
+    preparing()
+    /* The install needs a recent press. The press on the dictation button
+       counts here, and in the page that holds the frame it was made in. */
+    return await local.install(options)
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Listens with the browser's recognizer in this page, or in `scope`, a window
+ * of the same origin. A field in a sandboxed frame cannot: its origin is
+ * opaque, and the recognizer refuses it.
+ *
+ * **It recognizes on the device where the browser can**, installing the
+ * language first if it has to, and through the browser's service where it
+ * cannot. Chrome's service is Google's, and Chromium browsers without Google's
+ * keys, such as Brave, reach no service at all and end with `network`.
  *
  * `meter` reads loudness for the ring. Leave it off where this page is
  * listening for a frame. A second capture of the microphone ends the
@@ -135,115 +188,92 @@ const meter = (report: (level: number, bands: readonly number[]) => void): (() =
 export const recognizeSpeech = (
   lang: string,
   listener: SpeechListener,
-  options?: { meter?: boolean },
+  options?: { meter?: boolean; scope?: Window },
 ): SpeechSession => {
-  const Constructor = recognizer()
+  const Constructor = recognizer(options?.scope ?? globalThis)
   if (!Constructor) {
     listener.end('error', 'This browser has no speech recognition.')
     return { stop: () => {} }
   }
-  const recognition = new Constructor()
-  recognition.continuous = true
-  recognition.interimResults = true
-  recognition.lang = lang
   let asked = false
-  let failed: string | undefined
-  let heardWords = false
-  let resumed = false
+  let ended = false
+  let recognition: Recognition | undefined
   const quiet =
     options?.meter === false
       ? (): void => {}
       : meter((level, bands) => listener.level?.(level, bands))
-  const finish = (): void => {
-    quiet()
-    listener.end(failed && failed !== 'aborted' ? 'error' : asked ? 'stopped' : 'ended', failed)
-  }
-  /* The permission prompt ends the first session before anyone has spoken.
-     Once the microphone is allowed, start again. That second start is what
-     hears the words. */
-  const resume = (): void => {
-    if (asked || failed || heardWords || resumed) {
-      finish()
+  const end = (reason: 'ended' | 'error' | 'stopped', message?: string): void => {
+    if (ended) {
       return
     }
-    resumed = true
-    const start = (): void => {
-      if (asked || heardWords) {
+    ended = true
+    quiet()
+    listener.end(reason, message)
+  }
+  /* `processLocally` is set only where the language is installed. Set where
+     it is not, the recognizer ends with `language-not-supported` before it
+     asks for the microphone. */
+  const listen = (locally: boolean): void => {
+    const current = new Constructor()
+    recognition = current
+    current.continuous = true
+    current.interimResults = true
+    current.lang = lang
+    if (locally) {
+      ;(current as Recognition & { processLocally?: boolean }).processLocally = true
+    }
+    let failed: string | undefined
+    let heard = false
+    current.onresult = (event) => {
+      heard = true
+      let guess = ''
+      for (let at = event.resultIndex; at < event.results.length; at += 1) {
+        const result = event.results[at] as RecognitionResult
+        const text = result[0]?.transcript ?? ''
+        if (result.isFinal) {
+          listener.final(text.trim())
+        } else {
+          guess += text
+        }
+      }
+      if (guess !== '') {
+        listener.partial(guess.trim())
+      }
+    }
+    /* `no-speech` is a silence long enough that the recognizer gave up, and
+       `aborted` is a stop. Neither is a failure the reader needs told. */
+    current.onerror = (event) => {
+      if (event.error !== 'no-speech' && event.error !== 'aborted') {
+        failed = event.error
+      }
+    }
+    current.onend = () => {
+      /* The device refused a language it said it had. The service may still take it. */
+      if (locally && !asked && !heard && failed === 'language-not-supported') {
+        listen(false)
         return
       }
-      try {
-        recognition.start()
-      } catch {
-        finish()
-      }
+      end(failed ? 'error' : asked ? 'stopped' : 'ended', failed)
     }
-    const permissions = navigator.permissions
-    if (!permissions?.query) {
-      start()
+    try {
+      current.start()
+    } catch (error) {
+      end('error', error instanceof Error ? error.message : 'not-allowed')
+    }
+  }
+  void listenLocally(Constructor, lang, () => listener.preparing?.()).then((locally) => {
+    if (asked) {
+      end('stopped')
       return
     }
-    void permissions
-      .query({ name: 'microphone' })
-      .then((status) => {
-        if (status.state === 'granted') {
-          start()
-          return
-        }
-        if (status.state === 'denied') {
-          failed = 'not-allowed'
-          finish()
-          return
-        }
-        status.onchange = () => {
-          if (status.state === 'granted') {
-            start()
-          } else if (status.state === 'denied') {
-            failed = 'not-allowed'
-            finish()
-          }
-        }
-      })
-      .catch(() => finish())
-  }
-  recognition.onresult = (event) => {
-    let guess = ''
-    for (let at = event.resultIndex; at < event.results.length; at += 1) {
-      const result = event.results[at] as RecognitionResult
-      const text = result[0]?.transcript ?? ''
-      if (text.trim() !== '') {
-        heardWords = true
-      }
-      if (result.isFinal) {
-        listener.final(text.trim())
-      } else {
-        guess += text
-      }
-    }
-    if (guess !== '') {
-      listener.partial(guess.trim())
-    }
-  }
-  recognition.onerror = (event) => {
-    if (event.error === 'no-speech' || event.error === 'aborted') {
-      return
-    }
-    failed = event.error
-  }
-  recognition.onend = () => {
-    resume()
-  }
-  try {
-    recognition.start()
-  } catch (error) {
-    quiet()
-    const message = error instanceof Error ? error.message : 'not-allowed'
-    listener.end('error', message)
-    return { stop: () => {} }
-  }
+    listen(locally)
+  })
   return {
     stop: () => {
       asked = true
-      recognition.stop()
+      if (recognition) {
+        recognition.stop()
+      }
     },
   }
 }
@@ -267,7 +297,9 @@ const relaySpeech = (lang: string, listener: SpeechListener): SpeechSession => {
     if (data?.type !== 'helix-speech-heard' || data.id !== id) {
       return
     }
-    if (data.kind === 'partial' && data.text) {
+    if (data.kind === 'preparing') {
+      listener.preparing?.()
+    } else if (data.kind === 'partial' && data.text) {
       listener.partial(data.text)
     } else if (data.kind === 'final' && data.text) {
       listener.final(data.text)
@@ -310,9 +342,10 @@ const relaySpeech = (lang: string, listener: SpeechListener): SpeechSession => {
  * The browser's own recognizer, `SpeechRecognition`, or `webkitSpeechRecognition`
  * in Safari. Not available in Firefox.
  *
- * **Chrome sends the audio to Google's servers to recognize it**, and Safari
- * to Apple's unless the device recognizes on the device. A page that cannot
- * send what is said registers an engine of its own.
+ * **It recognizes on the device where the browser can**, and Chrome downloads
+ * the language on the first press. Where it cannot, Chrome sends the audio to
+ * Google's servers, and Safari to Apple's. A page that cannot send what is
+ * said registers an engine of its own.
  *
  * **A sandboxed frame has an opaque origin, and the recognizer refuses that.**
  * The field asks the page that framed it to listen, and that page has an origin.
