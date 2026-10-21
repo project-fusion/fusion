@@ -29,7 +29,22 @@ import { useEffect, useState } from 'react'
  */
 
 /**
- * Registers every Helix element the site uses, after React has hydrated.
+ * Gives dictation an engine for browsers whose own recognizer cannot listen,
+ * Brave and Firefox among them. The browser's recognizer listens first, and
+ * Moonshine, on the device, where it fails. The preview's examples listen
+ * through the same engine. Moonshine's model downloads on the first press
+ * that needs it, and never in a browser whose recognizer works. The worker is
+ * served from `public/helix-speech`, which `speech-copy` writes.
+ */
+const listenWhereTheBrowserCannot = async (): Promise<void> => {
+  const [{ browserSpeech, registerSpeechEngine }, { fallbackSpeech, moonshineSpeech }] =
+    await Promise.all([import('@fusion.dev/helix-core'), import('@fusion.dev/helix-speech')])
+  registerSpeechEngine(fallbackSpeech(browserSpeech, moonshineSpeech({ worker: '/helix-speech/' })))
+}
+
+/**
+ * Registers every Helix element the site uses, and the dictation engine,
+ * after React has hydrated.
  *
  * **The effect buys load order, not hydration safety.** The definitions leave
  * the critical path and arrive after the page does, measured at 169ms against a
@@ -45,6 +60,7 @@ export function HelixElements(): null {
     void Promise.all([
       import('@fusion.dev/helix'),
       import('@fusion.dev/helix-workbench/specs'),
+      listenWhereTheBrowserCannot(),
     ]).then(() => {
       if (live) {
         setRegistered(true)

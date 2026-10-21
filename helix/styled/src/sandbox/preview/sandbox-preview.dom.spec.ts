@@ -140,6 +140,62 @@ describe('the preview pane', () => {
     ])
   })
 
+  /* A page that registered an engine for its own fields listens through it for
+     its examples too, which is how a browser with no working recognizer
+     dictates in the preview. */
+  test('listens through the engine this page registered, and sends the level back', async () => {
+    const { registerSpeechEngine } = await import('@fusion.dev/helix-core')
+    const host = await preview()
+    const frame = part(host, 'frame') as HTMLIFrameElement
+    const stand = document.createElement('iframe')
+    document.body.append(stand)
+    const target = stand.contentWindow as Window
+    Object.defineProperty(frame, 'contentWindow', { configurable: true, value: target })
+    const heard: { kind?: string; level?: number; text?: string }[] = []
+    target.postMessage = ((message: { kind?: string; level?: number; type?: string }) => {
+      if (message.type === 'helix-speech-heard') {
+        heard.push(message)
+      }
+    }) as Window['postMessage']
+    const langs: string[] = []
+    registerSpeechEngine({
+      available: () => true,
+      listen: ({ lang, listener }) => {
+        langs.push(lang)
+        listener.level?.(0.5)
+        listener.partial('hel')
+        listener.final('hello')
+        return { stop: () => listener.end('stopped') }
+      },
+    })
+    restore = () => {
+      registerSpeechEngine(undefined)
+      delete (frame as { contentWindow?: Window | null }).contentWindow
+      stand.remove()
+    }
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        data: { id: 8, lang: 'en-GB', type: 'helix-speech-start' },
+        origin: 'null',
+        source: target,
+      }),
+    )
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        data: { id: 8, type: 'helix-speech-stop' },
+        origin: 'null',
+        source: target,
+      }),
+    )
+    expect(langs).toEqual(['en-GB'])
+    expect(heard.map((one) => [one.kind, one.text ?? one.level])).toEqual([
+      ['level', 0.5],
+      ['partial', 'hel'],
+      ['final', 'hello'],
+      ['stopped', undefined],
+    ])
+  })
+
   /* A frame with no accessible name is a region a reader reaches and cannot
      identify, and the name is the pane's rather than the sandbox's because the
      sandbox does not render the frame. */

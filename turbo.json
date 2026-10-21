@@ -258,6 +258,7 @@
         "frame",
         "specs",
         "maplibre-copy",
+        "speech-copy",
         "wasm-copy"
       ],
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "content/faces/faces.generated.ts"],
@@ -276,6 +277,7 @@
         "frame",
         "specs",
         "maplibre-copy",
+        "speech-copy",
         "wasm-copy"
       ],
       "persistent": true
@@ -722,6 +724,13 @@
         "$TURBO_ROOT$/fusion/site/scripts/build-specs.mjs"
       ],
       "outputs": ["public/specs/**"]
+    },
+    // The dictation engine's worker folder, served from `public/` for the
+    // same reason as MapLibre's worker. Its `dist` is the package's build.
+    "speech-copy": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_ROOT$/fusion/site/scripts/copy-speech.mjs"],
+      "outputs": ["public/helix-speech/**"]
     },
     // Two generators, two outputs. `build-styles.mjs` writes the `.css.ts`
     // mirrors and `build-elements-css.mjs` writes `elements.css` at the package
