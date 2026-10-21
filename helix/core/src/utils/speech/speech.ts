@@ -18,8 +18,6 @@ export interface SpeechListener {
   level?(level: number, bands?: readonly number[]): void
   /** The engine's guess at the phrase being spoken, which the next guess or `final` replaces. */
   partial(text: string): void
-  /** The engine is fetching what it needs to listen, such as a language to recognize on the device. */
-  preparing?(): void
 }
 
 /** A listening an engine started, which the field stops. */
@@ -138,16 +136,19 @@ interface LocalRecognizer {
   install?(options: { langs: string[]; processLocally: boolean }): Promise<boolean>
 }
 
+/** The languages an install was started for on this page, which are not asked for twice. */
+const installing = new Set<string>()
+
 /**
- * Whether `Constructor` can listen to `lang` on the device, installing the
- * language first where the browser offers it. `preparing` is told as the
- * install starts. Anything that fails answers `false`, and the recognizer
- * listens through the browser's service instead.
+ * Whether `Constructor` can listen to `lang` on the device now. Where the
+ * browser offers to install the language, the install starts and this
+ * answers `false`, so this press listens through the browser's service and a
+ * later one on the device. An install can stay `downloading` for good: Brave
+ * offers one and never finishes it. Anything that fails answers `false`.
  */
 const listenLocally = async (
   Constructor: RecognitionConstructor,
   lang: string,
-  preparing: () => void,
 ): Promise<boolean> => {
   const local = Constructor as unknown as LocalRecognizer
   if (!local.available || !local.install) {
@@ -162,10 +163,16 @@ const listenLocally = async (
     if (state === 'unavailable') {
       return false
     }
-    preparing()
     /* The install needs a recent press. The press on the dictation button
        counts here, and in the page that holds the frame it was made in. */
-    return await local.install(options)
+    if (!installing.has(lang)) {
+      installing.add(lang)
+      void local
+        .install(options)
+        .catch(() => false)
+        .then(() => installing.delete(lang))
+    }
+    return false
   } catch {
     return false
   }
@@ -176,9 +183,9 @@ const listenLocally = async (
  * of the same origin. A field in a sandboxed frame cannot: its origin is
  * opaque, and the recognizer refuses it.
  *
- * **It recognizes on the device where the browser can**, installing the
- * language first if it has to, and through the browser's service where it
- * cannot. Chrome's service is Google's, and Chromium browsers without Google's
+ * **It recognizes on the device where the language is installed**, and
+ * through the browser's service where it is not. A press starts the install
+ * where the browser offers one. Chrome's service is Google's, and Chromium browsers without Google's
  * keys, such as Brave, reach no service at all and end with `network`.
  *
  * `meter` reads loudness for the ring. Leave it off where this page is
@@ -261,7 +268,7 @@ export const recognizeSpeech = (
       end('error', error instanceof Error ? error.message : 'not-allowed')
     }
   }
-  void listenLocally(Constructor, lang, () => listener.preparing?.()).then((locally) => {
+  void listenLocally(Constructor, lang).then((locally) => {
     if (asked) {
       end('stopped')
       return
@@ -297,9 +304,7 @@ const relaySpeech = (lang: string, listener: SpeechListener): SpeechSession => {
     if (data?.type !== 'helix-speech-heard' || data.id !== id) {
       return
     }
-    if (data.kind === 'preparing') {
-      listener.preparing?.()
-    } else if (data.kind === 'partial' && data.text) {
+    if (data.kind === 'partial' && data.text) {
       listener.partial(data.text)
     } else if (data.kind === 'final' && data.text) {
       listener.final(data.text)
@@ -343,7 +348,7 @@ const relaySpeech = (lang: string, listener: SpeechListener): SpeechSession => {
  * in Safari. Not available in Firefox.
  *
  * **It recognizes on the device where the browser can**, and Chrome downloads
- * the language on the first press. Where it cannot, Chrome sends the audio to
+ * the language from the first press, which listens through the service. Where it cannot, Chrome sends the audio to
  * Google's servers, and Safari to Apple's. A page that cannot send what is
  * said registers an engine of its own.
  *
