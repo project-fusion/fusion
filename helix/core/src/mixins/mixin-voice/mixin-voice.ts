@@ -16,6 +16,14 @@ import { wordsLocale } from '../../words/words-locale.js'
 type Constructor<T> = new (...args: any[]) => T
 
 export declare class VoiceElement {
+  dictationDeniedLabel: string
+
+  dictationFailedLabel: string
+
+  dictationUnreachableLabel: string
+
+  downloadingSpeechLabel: string
+
   /** Whether the field is listening now. */
   readonly listening: boolean
 
@@ -78,6 +86,26 @@ const HELD = new Set(['Alt', 'CapsLock', 'Control', 'Meta', 'Shift'])
 export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
   class Voice extends Base {
     static words = ''
+
+    /** What a screen reader hears when the browser or the reader refuses the microphone. */
+    @words
+    @property({ attribute: 'dictation-denied-label' })
+    dictationDeniedLabel = 'Dictation needs the microphone'
+
+    /** What a screen reader hears when listening ends with an error that has no label of its own. */
+    @words
+    @property({ attribute: 'dictation-failed-label' })
+    dictationFailedLabel = 'Dictation stopped with an error'
+
+    /** What a screen reader hears when the recognizer cannot reach its speech service. */
+    @words
+    @property({ attribute: 'dictation-unreachable-label' })
+    dictationUnreachableLabel = 'Dictation could not reach the speech service'
+
+    /** What a screen reader hears while the browser downloads a language to recognize on the device. */
+    @words
+    @property({ attribute: 'downloading-speech-label' })
+    downloadingSpeechLabel = 'Downloading speech recognition'
 
     /** What a screen reader hears as listening starts. */
     @words
@@ -209,12 +237,17 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
         session = this.engine.listen({
           lang: wordsLocale(this),
           listener: {
-            end: () => this.ended(),
+            end: (reason, message) => this.ended(reason, message),
             final: (text) => this.place(text, true),
             level: (level) => {
               this.style.setProperty('--dictation-level', level.toFixed(3))
             },
             partial: (text) => this.place(text, false),
+            preparing: () => {
+              if (this.heard) {
+                this.said = this.downloadingSpeechLabel
+              }
+            },
           },
         })
       } catch {
@@ -242,13 +275,13 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
       this.ended()
     }
 
-    private ended(): void {
+    private ended(reason?: 'ended' | 'error' | 'stopped', message?: string): void {
       if (!this.heard) {
         return
       }
       this.session = undefined
       this.heard = false
-      this.said = this.stoppedListeningLabel
+      this.said = reason === 'error' ? this.failure(message) : this.stoppedListeningLabel
       this.style.removeProperty('--dictation-level')
       ;(this as unknown as { toggleState(name: string, on: boolean): void }).toggleState(
         'listening',
@@ -256,6 +289,21 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
       )
       this.voiceField()?.removeEventListener('keydown', this.handleVoiceKey)
       this.voiceField()?.removeEventListener('pointerdown', this.handleVoicePointer)
+    }
+
+    /** What the status region says for an error, by the Web Speech API's code where it has one. */
+    private failure(message: string | undefined): string {
+      if (message === 'network') {
+        return this.dictationUnreachableLabel
+      }
+      if (
+        message === 'not-allowed' ||
+        message === 'service-not-allowed' ||
+        message === 'audio-capture'
+      ) {
+        return this.dictationDeniedLabel
+      }
+      return this.dictationFailedLabel
     }
 
     /** Writes a guess, or the phrase it settled on, over the last guess. */

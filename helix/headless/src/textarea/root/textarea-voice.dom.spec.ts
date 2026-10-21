@@ -128,7 +128,31 @@ describe('a textarea with voice', () => {
     expect((element as unknown as { startListening(): boolean }).startListening()).toBe(false)
     await element.updateComplete
     expect(element.listening).toBe(false)
-    expect(part(element, 'voice-status')?.textContent).toBe('Stopped listening')
+    expect(part(element, 'voice-status')?.textContent).toBe('Dictation needs the microphone')
+  })
+
+  test('says it is downloading a language, and why listening failed', async () => {
+    const engine = fakeEngine()
+    const element = await field(
+      '<helix-headless-textarea voice label="Note"></helix-headless-textarea>',
+      engine,
+    )
+    const status = () => part(element, 'voice-status')?.textContent
+    ;(element as unknown as { startListening(): boolean }).startListening()
+    engine.heard[0]?.preparing?.()
+    await element.updateComplete
+    expect(status()).toBe('Downloading speech recognition')
+    expect(element.listening).toBe(true)
+
+    engine.heard[0]?.end('error', 'network')
+    await element.updateComplete
+    expect(element.listening).toBe(false)
+    expect(status()).toBe('Dictation could not reach the speech service')
+
+    ;(element as unknown as { startListening(): boolean }).startListening()
+    engine.heard[1]?.end('error', 'bad-grammar')
+    await element.updateComplete
+    expect(status()).toBe('Dictation stopped with an error')
   })
 
   test('listens to nothing when a listener refuses, and draws no button without an engine', async () => {

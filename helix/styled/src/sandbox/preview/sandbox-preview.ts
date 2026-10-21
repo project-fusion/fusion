@@ -590,16 +590,9 @@ export class HelixSandboxPreview extends HelixElement {
     }
     const data = event.data
     /* The frame's origin is opaque, so a recognizer started there ends at
-       once. The press is reported here, and `postMessage` carries the
-       activation with it, which is what lets this page start listening. */
-    if (data?.type === 'helix-speech-start') {
-      this.hear(data, event.source as Window, event.ports[0])
-      return
-    }
-    if (data?.type === 'helix-speech-stop') {
-      if (this.speechId === data.id) {
-        this.speech?.stop()
-      }
+       once. This page listens for it. A press in the frame counts as a press
+       in this page too, which is what lets this page install a language. */
+    if (this.speak(event, window)) {
       return
     }
     /* Behind both checks above, so only this element's own frame, still on
@@ -758,7 +751,8 @@ export class HelixSandboxPreview extends HelixElement {
    * page. The tab shows the example as it was when it opened, and edits after
    * that do not reach it. A short inline script in the tab sends the example,
    * so on a page whose Content Security Policy refuses inline scripts the tab
-   * opens empty, as the built-in document does there.
+   * opens empty, as the built-in document does there. Dictation in the tab
+   * listens through the tab's own recognizer, asked from this page.
    */
   open(): Window | null {
     const tab = window.open('', '_blank')
@@ -787,17 +781,20 @@ export class HelixSandboxPreview extends HelixElement {
     /* **The tab's frame is relayed by this page**, which still holds the tab:
        a listener added to the tab's window from here hears what its frame
        posts there, under the checks this element's own frame is held to. */
-    if (relayPrefixes(this.relay).length > 0) {
-      tab.addEventListener('message', (event: MessageEvent) => {
-        if (
-          event.source === frame.contentWindow &&
-          event.origin === 'null' &&
-          isFetch(event.data)
-        ) {
-          void this.answer(event.data, event.source as Window)
-        }
-      })
-    }
+    /* Dictation is listened for the same way, with the tab's own recognizer,
+       since the press that may install a language was made in the tab. */
+    const relays = relayPrefixes(this.relay).length > 0
+    tab.addEventListener('message', (event: MessageEvent) => {
+      if (event.source !== frame.contentWindow || event.origin !== 'null') {
+        return
+      }
+      if (this.speak(event, tab)) {
+        return
+      }
+      if (relays && isFetch(event.data)) {
+        void this.answer(event.data, event.source as Window)
+      }
+    })
     const send = tab.document.createElement('script')
     send.textContent = `const frame = document.currentScript.previousElementSibling
 frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.message)}, '*')`
@@ -818,14 +815,34 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
   }
 
   /**
-   * Listens on this page for a frame that cannot listen for itself, and sends
+   * Takes a frame's ask to start or stop listening, and returns whether the
+   * message was one. `scope` is the window that holds the frame, whose
+   * recognizer listens.
+   */
+  private speak(event: MessageEvent, scope: Window): boolean {
+    const data = event.data as PreviewMessage | undefined
+    if (data?.type === 'helix-speech-start') {
+      this.hear(data, event.source as Window, scope, event.ports[0])
+      return true
+    }
+    if (data?.type === 'helix-speech-stop') {
+      if (this.speechId === data.id) {
+        this.speech?.stop()
+      }
+      return true
+    }
+    return false
+  }
+
+  /**
+   * Listens in `scope` for a frame that cannot listen for itself, and sends
    * each guess back to that frame.
    */
-  private hear(ask: PreviewSpeechStart, source: Window, port?: MessagePort): void {
+  private hear(ask: PreviewSpeechStart, source: Window, scope: Window, port?: MessagePort): void {
     this.speech?.stop()
     this.speechId = ask.id
     const tell = (
-      kind: 'end' | 'error' | 'final' | 'partial' | 'stopped',
+      kind: 'end' | 'error' | 'final' | 'partial' | 'preparing' | 'stopped',
       text?: string,
       error?: string,
     ): void => {
@@ -852,8 +869,9 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
         },
         final: (text) => tell('final', text),
         partial: (text) => tell('partial', text),
+        preparing: () => tell('preparing'),
       },
-      { meter: false },
+      { meter: false, scope },
     )
   }
 
