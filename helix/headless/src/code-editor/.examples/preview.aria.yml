@@ -2,6 +2,7 @@
 - toolbar "Editor controls":
   - button "Format"
   - button "Find"
+- status
 - textbox "orders.ts": "interface Order { amount: number paid: boolean } export function totalPaid(orders: Order[]): number { const total = orders .filter((order) => order.paid) .reduce((sum, order) => sum + order.amount, 0) console.log(total) return totl }"
 - list "Problems":
   - listitem:
