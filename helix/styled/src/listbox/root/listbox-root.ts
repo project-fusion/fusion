@@ -7,6 +7,7 @@ import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles } from './listbox-root.css.js'
+import '../../voice-level/index.js'
 
 /**
  * @summary A list of options, from which you choose one or several.
@@ -25,7 +26,6 @@ import { styles } from './listbox-root.css.js'
  * @aliases Options, Select list
  * @documentation https://fusion.dev/helix/components/listbox
  *
- * @cssproperty --dictation-level - How loud the microphone is while the field listens for dictation, from 0 to 1, which the element sets; the ring around the dictation button grows with it.
  * @cssproperty --listbox-background-color - The panel's fill. Set it to `transparent` when the list is already inside a panel.
  * @cssproperty --listbox-border - The panel's border, as a shorthand. Set it to `none` when the list is already inside a panel.
  * @cssproperty --listbox-column-min-inline-size - How narrow a column may be with `layout="grid"`. As many columns as fit are drawn. Defaults to `8rem`.

@@ -6,6 +6,7 @@ import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.js'
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles } from './code-input-root.css.js'
+import '../../voice-level/index.js'
 
 /**
  * @summary A field for a short piece of code, highlighted as it is typed.
@@ -28,10 +29,12 @@ import { styles } from './code-input-root.css.js'
  * @cssproperty --code-input-font-size - The code's size. Defaults to `text-sm`, and never under 16px on a touch screen.
  * @cssproperty --code-input-padding - Space between the edge of the field and the code.
  * @cssproperty --code-input-radius - Corner radius of the field.
- * @cssproperty --dictation-level - How loud the microphone is while the field listens for dictation, from 0 to 1, which the element sets; the ring around the dictation button grows with it.
  */
 @customElement('helix-code-input')
 export class HelixCodeInput extends HelixHeadlessCodeInput {
+  /** The tier its dictation button draws Voice Level from. */
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [
     fieldStyles,
     fieldFrameStyles,

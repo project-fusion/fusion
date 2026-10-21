@@ -1,6 +1,7 @@
 import { microphone } from '@fusion.dev/helix-icons'
-import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
+import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { html } from 'lit/static-html.js'
 import { HelixBeforeListenEvent, HelixListenEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { drawIcon } from '../../utils/draw-icon/draw-icon.js'
@@ -45,6 +46,9 @@ export declare class VoiceElement {
 
   /** The dictation button and its status, behind a seam a tier can move. */
   protected renderVoice(): TemplateResult | typeof nothing
+
+  /** What the dictation button draws: the microphone, or a level meter while listening. */
+  protected renderVoiceGlyph(): TemplateResult
 
   /** The native field dictation types into. */
   protected voiceField(): HTMLInputElement | HTMLTextAreaElement | null
@@ -234,6 +238,10 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
             final: (text) => this.place(text, true),
             level: (level) => {
               this.style.setProperty('--dictation-level', level.toFixed(3))
+              const meter = this.partNamed<HTMLElement & { level: number }>('voice-level')
+              if (meter) {
+                meter.level = level
+              }
             },
             partial: (text) => this.place(text, false),
           },
@@ -343,6 +351,24 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
       this.stopListening()
     }
 
+    /**
+     * The microphone, or while the field listens, the tier's Voice Level
+     * drawing the microphone's level as a few bars in its place.
+     *
+     * **Only where the tier defines one.** Voice Level is styled only, so a
+     * headless field keeps the microphone while it listens, and its button
+     * says so in `aria-pressed` and its name. The level is set on the meter
+     * from each reading, with no render, about thirty times a second.
+     */
+    protected renderVoiceGlyph(): TemplateResult {
+      const tier = (this.constructor as typeof HelixElement & { tier: string }).tier
+      if (this.heard && customElements.get(`${tier}voice-level`)) {
+        const meter = this.tag('voice-level')
+        return html`<${meter} part="voice-level" exportparts="canvas: voice-level-canvas" aria-hidden="true" variant="spectrum"></${meter}>`
+      }
+      return drawIcon(microphone)
+    }
+
     protected renderVoice(): TemplateResult | typeof nothing {
       if (!this.voice || !this.voiceReady) {
         return nothing
@@ -363,7 +389,7 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
             }
           }}
         >
-          ${drawIcon(microphone)}
+          ${this.renderVoiceGlyph()}
         </button
         ><span part="voice-status" data-spoken role="status">${this.said}</span>`
     }

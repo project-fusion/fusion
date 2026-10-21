@@ -178,6 +178,8 @@ const CONTROL = 'helix-control:'
  * @csspart listbox-search - The region that holds the filter field.
  * @csspart listbox-search-field - The filter field.
  * @csspart listbox-voice - The dictation button in the filter field, under `voice`.
+ * @csspart listbox-voice-level - The meter that draws the microphone's level in place of its glyph while the field listens, where the tier defines Voice Level.
+ * @csspart listbox-voice-level-canvas - The canvas the dictation meter draws on.
  * @csspart listbox-voice-listening - The dictation button while it listens.
  * @csspart listbox-voice-status - What a screen reader hears as dictation starts and stops.
  * @csspart live - The region a screen reader announces the page shown from, by the words of the command that opens it, drawn once there is one to say. Visually hidden in the styled tier.
@@ -853,7 +855,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
           filter-icon: listbox-filter-icon, filter-mark: listbox-filter-mark, hint: listbox-hint,
           items: listbox-items, label: listbox-label, live: listbox-live, loading: listbox-loading,
           search: listbox-search, search-field: listbox-search-field,
-        voice: listbox-voice, voice-listening: listbox-voice-listening, voice-status: listbox-voice-status"
+        voice: listbox-voice, voice-level: listbox-voice-level, voice-level-canvas: listbox-voice-level-canvas, voice-listening: listbox-voice-listening, voice-status: listbox-voice-status"
         aria-label=${this.listName}
         empty-text=${this.emptyText}
         filter-delay=${this.filterDelay}
