@@ -842,7 +842,7 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
     this.speech?.stop()
     this.speechId = ask.id
     const tell = (
-      kind: 'end' | 'error' | 'final' | 'partial' | 'preparing' | 'stopped',
+      kind: 'end' | 'error' | 'final' | 'partial' | 'stopped',
       text?: string,
       error?: string,
     ): void => {
@@ -869,7 +869,6 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
         },
         final: (text) => tell('final', text),
         partial: (text) => tell('partial', text),
-        preparing: () => tell('preparing'),
       },
       { meter: false, scope },
     )

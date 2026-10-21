@@ -22,8 +22,6 @@ export declare class VoiceElement {
 
   dictationUnreachableLabel: string
 
-  downloadingSpeechLabel: string
-
   /** Whether the field is listening now. */
   readonly listening: boolean
 
@@ -101,11 +99,6 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
     @words
     @property({ attribute: 'dictation-unreachable-label' })
     dictationUnreachableLabel = 'Dictation could not reach the speech service'
-
-    /** What a screen reader hears while the browser downloads a language to recognize on the device. */
-    @words
-    @property({ attribute: 'downloading-speech-label' })
-    downloadingSpeechLabel = 'Downloading speech recognition'
 
     /** What a screen reader hears as listening starts. */
     @words
@@ -243,11 +236,6 @@ export const MixinVoice = <T extends Constructor<HelixElement>>(Base: T) => {
               this.style.setProperty('--dictation-level', level.toFixed(3))
             },
             partial: (text) => this.place(text, false),
-            preparing: () => {
-              if (this.heard) {
-                this.said = this.downloadingSpeechLabel
-              }
-            },
           },
         })
       } catch {

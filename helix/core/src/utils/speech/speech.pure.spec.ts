@@ -10,7 +10,10 @@ type Script = { error: string } | { heard: string }
  * A window whose recognizer plays one script per start, in order, and
  * records whether each start was on the device.
  */
-const browser = (scripts: Script[], local?: { availability: Availability; installs?: boolean }) => {
+const browser = (
+  scripts: Script[],
+  local?: { availability: Availability; installs?: boolean | 'never' },
+) => {
   const starts: boolean[] = []
   const installs: string[][] = []
   class Recognition {
@@ -38,7 +41,10 @@ const browser = (scripts: Script[], local?: { availability: Availability; instal
     static install = local
       ? async (options: { langs: string[] }) => {
           installs.push(options.langs)
-          return local.installs ?? true
+          if (local.installs === 'never') {
+            await new Promise(() => {})
+          }
+          return local.installs !== false
         }
       : undefined
 
@@ -63,8 +69,12 @@ const browser = (scripts: Script[], local?: { availability: Availability; instal
   return { installs, scope: { SpeechRecognition: Recognition } as unknown as Window, starts }
 }
 
-/** Listens until the recognizer ends, and returns what the listener was told. */
-const listen = (scope: Window) =>
+/**
+ * Listens until the recognizer ends, and returns what the listener was told.
+ * Each case listens in a language of its own, since an install that never
+ * finishes holds its language for the rest of the file.
+ */
+const listen = (scope: Window, lang = 'en-US') =>
   new Promise<string[]>((done) => {
     const told: string[] = []
     const listener: SpeechListener = {
@@ -74,9 +84,8 @@ const listen = (scope: Window) =>
       },
       final: (text) => told.push(`final ${text}`),
       partial: (text) => told.push(`partial ${text}`),
-      preparing: () => told.push('preparing'),
     }
-    recognizeSpeech('en-US', listener, { meter: false, scope })
+    recognizeSpeech(lang, listener, { meter: false, scope })
   })
 
 describe('recognizeSpeech', () => {
@@ -87,18 +96,28 @@ describe('recognizeSpeech', () => {
     expect(page.installs).toEqual([])
   })
 
-  test('installs a downloadable language, saying so, and then listens on the device', async () => {
+  /* The press that starts the install listens through the service, so the
+     reader is not kept waiting on a download. */
+  test('starts installing a downloadable language, and listens through the service meanwhile', async () => {
     const page = browser([{ heard: 'hello' }], { availability: 'downloadable' })
-    expect(await listen(page.scope)).toEqual(['preparing', 'final hello', 'ended'])
-    expect(page.installs).toEqual([['en-US']])
-    expect(page.starts).toEqual([true])
+    expect(await listen(page.scope, 'en-GB')).toEqual(['final hello', 'ended'])
+    expect(page.installs).toEqual([['en-GB']])
+    expect(page.starts).toEqual([false])
   })
 
-  test('listens through the service where the install fails or the device has no language', async () => {
-    const refused = browser([{ heard: 'hello' }], { availability: 'downloadable', installs: false })
-    expect(await listen(refused.scope)).toEqual(['preparing', 'final hello', 'ended'])
-    expect(refused.starts).toEqual([false])
+  /* Brave offers the install and never finishes it. */
+  test('listens through the service while an install never finishes, and asks for it once', async () => {
+    const page = browser([{ heard: 'hello' }, { error: 'network' }], {
+      availability: 'downloading',
+      installs: 'never',
+    })
+    expect(await listen(page.scope, 'en-AU')).toEqual(['final hello', 'ended'])
+    expect(await listen(page.scope, 'en-AU')).toEqual(['error network'])
+    expect(page.installs).toEqual([['en-AU']])
+    expect(page.starts).toEqual([false, false])
+  })
 
+  test('listens through the service where the device has no language', async () => {
     const none = browser([{ heard: 'hello' }], { availability: 'unavailable' })
     expect(await listen(none.scope)).toEqual(['final hello', 'ended'])
     expect(none.starts).toEqual([false])

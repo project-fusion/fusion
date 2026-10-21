@@ -131,7 +131,7 @@ describe('a textarea with voice', () => {
     expect(part(element, 'voice-status')?.textContent).toBe('Dictation needs the microphone')
   })
 
-  test('says it is downloading a language, and why listening failed', async () => {
+  test('says why listening failed', async () => {
     const engine = fakeEngine()
     const element = await field(
       '<helix-headless-textarea voice label="Note"></helix-headless-textarea>',
@@ -139,11 +139,6 @@ describe('a textarea with voice', () => {
     )
     const status = () => part(element, 'voice-status')?.textContent
     ;(element as unknown as { startListening(): boolean }).startListening()
-    engine.heard[0]?.preparing?.()
-    await element.updateComplete
-    expect(status()).toBe('Downloading speech recognition')
-    expect(element.listening).toBe(true)
-
     engine.heard[0]?.end('error', 'network')
     await element.updateComplete
     expect(element.listening).toBe(false)
