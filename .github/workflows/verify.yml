@@ -29,6 +29,9 @@ permissions:
 # reports "Insufficient permissions to write to remote cache", which reads like a
 # token problem and is not one.
 env:
+  # Read-only. `@fusion.dev/helix-speech`'s build downloads a release asset
+  # with it, which a private repository refuses without one.
+  GH_TOKEN: ${{ github.token }}
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
   TURBO_TEAMID: ${{ vars.TURBO_TEAMID }}
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}

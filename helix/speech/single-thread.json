@@ -4,5 +4,6 @@
     "moonshine.wasm": "cc072034b5d2e859dae2e0d18d848b72c684cf999d353aefa79c6531180c312b"
   },
   "moonshine": "0.1.5",
-  "onnxruntime": "1.23.2"
+  "onnxruntime": "1.23.2",
+  "release": "moonshine-wasm-v0.1.5-st"
 }
