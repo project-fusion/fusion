@@ -189,11 +189,12 @@ describe('connectEditor', () => {
     expect(frame.shadowRoot?.querySelector('[part="block-option"][value="code-block"]')).toBeNull()
   })
 
-  test('connects a view whose plugins were chosen without the frame, and takes its plugin off again', async () => {
+  test('connects a view whose plugins were chosen without the frame, and takes its plugins off again', async () => {
     const { frame, view } = await editor('<p>Hi</p>', 'label="Notes"', () => [])
     const before = view.state.plugins.length
     const connection = connectEditor(frame, view)
-    expect(view.state.plugins.length).toBe(before + 1)
+    /* The frame's plugin and the find bar's search, added in one step. */
+    expect(view.state.plugins.length).toBe(before + 2)
     connection.disconnect()
     expect(view.state.plugins.length).toBe(before)
     expect(hasState(frame, 'connected')).toBe(false)

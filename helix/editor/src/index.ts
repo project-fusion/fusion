@@ -2,6 +2,16 @@ export type { BlockIdsOptions } from './block-ids/block-ids.js'
 export { blockIds, blockIdsKey, findBlock, newBlockId } from './block-ids/block-ids.js'
 export type { ConnectEditorOptions, EditorConnection } from './connect-editor/connect-editor.js'
 export { connectEditor, editorFrame, editorFrameKey } from './connect-editor/connect-editor.js'
+export type { EditorFindDirection, EditorFindQuery, EditorFindResult } from './find/find.js'
+export {
+  editorFind,
+  editorFindKey,
+  endFind,
+  findIn,
+  findResultOf,
+  matchesIn,
+  replaceIn,
+} from './find/find.js'
 export type { EditorPluginsOptions } from './plugins/plugins.js'
 export { editorPlugins } from './plugins/plugins.js'
 export type { EditorSchemaOptions } from './schema/schema.js'

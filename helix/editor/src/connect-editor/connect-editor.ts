@@ -1,5 +1,16 @@
 import { type Command, type EditorState, Plugin, PluginKey } from 'prosemirror-state'
 import { Decoration, DecorationSet, type EditorView } from 'prosemirror-view'
+import {
+  type EditorFindDirection,
+  type EditorFindQuery,
+  type EditorFindResult,
+  editorFind,
+  editorFindKey,
+  endFind,
+  findIn,
+  findResultOf,
+  replaceIn,
+} from '../find/find.js'
 import { adoptEditorSheet } from '../sheet/editor-sheet.js'
 import {
   EDITOR_TOOLS,
@@ -19,7 +30,10 @@ interface Settings {
 
 /** What the frame asks of a renderer. The headless tier's `EditorRenderer`, held to this by a spec. */
 interface Renderer {
+  find?(query: EditorFindQuery, direction: EditorFindDirection): EditorFindResult
+  findEnd?(): void
   focus?(): void
+  replace?(query: EditorFindQuery, all: boolean): EditorFindResult
   run(tool: EditorTool, value?: string): boolean
   settings?(settings: Settings): void
   tools?(): readonly EditorTool[]
@@ -29,6 +43,7 @@ interface Renderer {
 interface Sink {
   detach(): void
   formats(formats: EditorFormats): void
+  found(result: EditorFindResult): void
 }
 
 /**
@@ -144,9 +159,10 @@ export interface EditorConnection {
  * Connects an Editor frame to a ProseMirror view.
  *
  * The frame's toolbar runs its tools in the view and shows what holds at the
- * selection; the frame's `label`, `placeholder`, and `readonly` reach the
- * document; and the editor's rules are added to the page, so the document is
- * drawn in your tokens.
+ * selection; the frame's find bar searches the document, and replaces in it
+ * unless it is read-only; the frame's `label`, `placeholder`, and `readonly`
+ * reach the document; and the editor's rules are added to the page, so the
+ * document is drawn in your tokens.
  *
  * The frame is `helix-editor` or `helix-headless-editor`, and the view's
  * schema is `editorSchema()` or one of your own: a tool whose node or mark
@@ -167,14 +183,23 @@ export const connectEditor = (
   const runs = EDITOR_TOOLS.filter((tool) =>
     tool === 'link' ? schema.marks.link !== undefined : commands[tool] !== undefined,
   )
-  const added = editorFrameKey.get(view.state) ? undefined : editorFrame()
-  if (added) {
-    view.updateState(view.state.reconfigure({ plugins: [...view.state.plugins, added] }))
+  /* Added in one step where they are missing, since adding a plugin remakes
+     every plugin's view. */
+  const added = [
+    ...(editorFrameKey.get(view.state) ? [] : [editorFrame()]),
+    ...(editorFindKey.get(view.state) ? [] : [editorFind()]),
+  ]
+  if (added.length > 0) {
+    view.updateState(view.state.reconfigure({ plugins: [...view.state.plugins, ...added] }))
   }
   adoptEditorSheet(view.root)
 
   let sink: Sink | undefined
   let told = ''
+  let toldFound = ''
+  /* Set while the frame's own search runs, which reports where it stands
+     itself. Only a search the document moved under is reported here. */
+  let answering = false
   const tell = (state: EditorState): void => {
     const formats = formatsOf(state, commands)
     const said = JSON.stringify(formats)
@@ -182,11 +207,32 @@ export const connectEditor = (
       told = said
       sink.formats(formats)
     }
+    const found = findResultOf(state)
+    const where = found ? `${found.count} ${found.index}` : ''
+    if (sink && found && where !== toldFound && !answering) {
+      sink.found(found)
+    }
+    toldFound = where
+  }
+  const answer = <T>(search: () => T): T => {
+    answering = true
+    try {
+      return search()
+    } finally {
+      answering = false
+    }
   }
   listeners.set(view, tell)
 
   sink = frame.attach({
+    find: (query, direction) => answer(() => findIn(view, query, direction)),
+    findEnd: () => {
+      if (!view.isDestroyed) {
+        endFind(view)
+      }
+    },
     focus: () => view.focus(),
+    replace: (query, all) => answer(() => replaceIn(view, query, all)),
     run: (tool, value) => {
       if (view.isDestroyed) {
         return false
@@ -215,13 +261,15 @@ export const connectEditor = (
       if (view.isDestroyed) {
         return
       }
-      if (added) {
+      endFind(view)
+      if (added.length > 0) {
         view.updateState(
           view.state.reconfigure({
-            plugins: view.state.plugins.filter((plugin) => plugin !== added),
+            plugins: view.state.plugins.filter((plugin) => !added.includes(plugin)),
           }),
         )
-      } else {
+      }
+      if (editorFrameKey.get(view.state)) {
         view.dispatch(
           view.state.tr.setMeta(editorFrameKey, UNCONNECTED).setMeta('addToHistory', false),
         )

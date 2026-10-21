@@ -20,6 +20,7 @@ import {
   linkBreak,
   listBullets,
   listNumbers,
+  magnifyingGlass,
   quotes,
   textB,
   textItalic,
@@ -33,6 +34,15 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 import { html } from 'lit/static-html.js'
 import '../../button/index.js'
 import '../../divider/index.js'
+import '../../find/index.js'
+import type {
+  FindDirection,
+  Finder,
+  FindQuery,
+  FindResult,
+  FindSink,
+  HelixHeadlessFind,
+} from '../../find/index.js'
 import '../../icon-button/index.js'
 import '../../menu/index.js'
 import '../../toolbar/index.js'
@@ -77,11 +87,11 @@ const GROUPS = [
   ['quote', ['quote']],
 ] as const satisfies ReadonlyArray<readonly [string, readonly EditorTool[]]>
 
-/** A group of tools that `tools` names. */
-export type EditorToolGroup = (typeof GROUPS)[number][0]
+/** A group of tools that `tools` names: the groups above, and `find`, the button that opens the find bar. */
+export type EditorToolGroup = (typeof GROUPS)[number][0] | 'find'
 
 /** The groups the toolbar draws while `tools` is absent. */
-const RESTING_TOOLS = 'history block marks link lists quote'
+const RESTING_TOOLS = 'history block marks link lists quote find'
 
 /**
  * Each tool's key, as `Kbd` writes a chord, where it has one. The renderer
@@ -108,6 +118,7 @@ const TOOL_PARTS = [
   'bullet-list',
   'ordered-list',
   'quote',
+  'find-toggle',
 ]
   .map((name) => `[part~="${name}"]`)
   .join(', ')
@@ -146,8 +157,22 @@ const NO_FORMATS: EditorFormats = { applied: [], block: '', link: '', unavailabl
  * `tools` is left off the toolbar.
  */
 export interface EditorRenderer {
+  /**
+   * Finds `query` in the document, marks every match, and selects one by
+   * `direction`, for the find bar, and returns where the search stands. The
+   * find bar is drawn only for a renderer that has this.
+   */
+  find?(query: FindQuery, direction: FindDirection): FindResult
+  /** Takes the marks a search drew away, as the find bar closes. */
+  findEnd?(): void
   /** Puts focus in the document, with the selection where it was. */
   focus?(): void
+  /**
+   * Replaces the selected match, or every match with `all`, and returns where
+   * the search stands after. The find bar offers replacing only to a renderer
+   * that has this, and never while `readonly`.
+   */
+  replace?(query: FindQuery, all: boolean): FindResult
   /**
    * Runs a tool at the selection, and says whether it ran. `value` is a
    * link's address for `link`, where empty takes the link off.
@@ -165,6 +190,8 @@ export interface EditorSink {
   detach(): void
   /** The selection moved or the document changed what the toolbar shows. */
   formats(formats: EditorFormats): void
+  /** The document changed under an open search, which now stands here. */
+  found(result: FindResult): void
 }
 
 /** Whether a key press is the platform's command chord with a letter, ⌘ on Apple and Control elsewhere. */
@@ -193,11 +220,16 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * The toolbar's groups are named by `tools`, in this order: `history` (Undo
  * and Redo), `block` (a menu of Paragraph, three headings, and Code block),
  * `marks` (Bold, Italic, Strikethrough, and Code), `link`, `lists` (Bulleted
- * and Numbered), and `quote`. All six are drawn by default. A tool the renderer
- * cannot run is left out once it is connected, and a tool that cannot apply at
- * the selection is disabled. A tool returns focus to the document once it has
- * run. With `readonly`, the document cannot be edited and the toolbar is not
- * drawn.
+ * and Numbered), `quote`, and `find`. All seven are drawn by default. A tool
+ * the renderer cannot run is left out once it is connected, and a tool that
+ * cannot apply at the selection is disabled. A tool returns focus to the
+ * document once it has run. With `readonly`, the document cannot be edited and
+ * the toolbar is not drawn.
+ *
+ * `find` draws the Find button and a find bar under the toolbar, a Find that
+ * searches the document through the renderer, marks every match, and selects
+ * one. It replaces unless the document is `readonly`, where the bar still
+ * opens from its key.
  *
  * **Keyboard.** In the document:
  *
@@ -215,6 +247,8 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  *   leaves the document from anywhere, so a list never keeps focus.
  * - Alt+F10 moves focus to the toolbar. The arrow keys move between its
  *   tools, and Escape returns to the document.
+ * - Command+F opens the find bar. Enter and Shift+Enter move between the
+ *   matches, and Escape closes the bar and returns to the document.
  *
  * @since 0.221.0
  * @status experimental
@@ -227,6 +261,7 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @slot bold-icon - Replaces the glyph inside the Bold button.
  * @slot bullet-list-icon - Replaces the glyph inside the Bulleted list button.
  * @slot code-icon - Replaces the glyph inside the Code button.
+ * @slot find-icon - Replaces the glyph inside the Find button.
  * @slot footer - Content under the document, such as a word count or whether it is saved.
  * @slot italic-icon - Replaces the glyph inside the Italic button.
  * @slot link-icon - Replaces the glyph inside the Link button.
@@ -235,6 +270,8 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @slot redo-icon - Replaces the glyph inside the Redo button.
  * @slot strike-icon - Replaces the glyph inside the Strikethrough button.
  * @slot undo-icon - Replaces the glyph inside the Undo button.
+ *
+ * @event {HelixFoundEvent} helix-found - The find bar searched or moved among the matches, with `count` and the selected match's `index`, counting from 0, or -1 for none.
  *
  * @csspart actions - The `actions` slot, last in the toolbar.
  * @csspart block - The button that opens the block menu, which names the block type at the selection.
@@ -286,6 +323,68 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  * @csspart divider - The line between two groups of tools.
  * @csspart divider-content - The content set into a divider, which the editor sets none into.
  * @csspart divider-line - The line itself.
+ * @csspart find - The find bar under the toolbar, where the reader searches the document: a Find of its own.
+ * @csspart find-actions - The find bar's `actions` slot, which the editor fills with nothing.
+ * @csspart find-bar - The find bar's strip: the field, the count, the toolbar, and the replace row while it shows.
+ * @csspart find-close - The button that closes the find bar.
+ * @csspart find-close-button - The find bar's close button's inner button.
+ * @csspart find-close-live - The find bar's close button's live region, which speaks while the button is pending.
+ * @csspart find-close-spinner - The ring the find bar's close button turns while it is pending.
+ * @csspart find-close-text - The box the find bar's close button's icon sits in.
+ * @csspart find-controls - The find bar's toolbar of options and moves.
+ * @csspart find-controls-toolbar - The box inside the find bar's toolbar that lays its buttons out.
+ * @csspart find-count - Which match is selected, of how many.
+ * @csspart find-field - The field the search is typed in.
+ * @csspart find-live - The find bar's live region, which says the count as it changes.
+ * @csspart find-match-case - The option that finds only the same case. Pressed while it applies.
+ * @csspart find-match-case-button - The match case button's inner button.
+ * @csspart find-match-case-live - The match case button's live region, which speaks while the button is pending.
+ * @csspart find-match-case-pressed - The match case option while it applies, beside `find-match-case`.
+ * @csspart find-match-case-spinner - The ring the match case button turns while it is pending.
+ * @csspart find-match-case-text - The box the match case button's icon sits in.
+ * @csspart find-next - The button that selects the next match.
+ * @csspart find-next-button - The next match button's inner button.
+ * @csspart find-next-live - The next match button's live region, which speaks while the button is pending.
+ * @csspart find-next-spinner - The ring the next match button turns while it is pending.
+ * @csspart find-next-text - The box the next match button's icon sits in.
+ * @csspart find-previous - The button that selects the previous match.
+ * @csspart find-previous-button - The previous match button's inner button.
+ * @csspart find-previous-live - The previous match button's live region, which speaks while the button is pending.
+ * @csspart find-previous-spinner - The ring the previous match button turns while it is pending.
+ * @csspart find-previous-text - The box the previous match button's icon sits in.
+ * @csspart find-regex - The option that reads the search as a regular expression. Pressed while it applies.
+ * @csspart find-regex-button - The regular expression button's inner button.
+ * @csspart find-regex-live - The regular expression button's live region, which speaks while the button is pending.
+ * @csspart find-regex-pressed - The regular expression option while it applies, beside `find-regex`.
+ * @csspart find-regex-spinner - The ring the regular expression button turns while it is pending.
+ * @csspart find-regex-text - The box the regular expression button's icon sits in.
+ * @csspart find-replace - The button that replaces the selected match.
+ * @csspart find-replace-all - The button that replaces every match.
+ * @csspart find-replace-all-button - The Replace all button's inner button.
+ * @csspart find-replace-all-live - The Replace all button's live region, which speaks while the button is pending.
+ * @csspart find-replace-all-spinner - The ring the Replace all button turns while it is pending.
+ * @csspart find-replace-all-text - The box the Replace all button's words sits in.
+ * @csspart find-replace-button - The Replace button's inner button.
+ * @csspart find-replace-field - The field the replacement is typed in.
+ * @csspart find-replace-live - The Replace button's live region, which speaks while the button is pending.
+ * @csspart find-replace-spinner - The ring the Replace button turns while it is pending.
+ * @csspart find-replace-text - The box the Replace button's words sits in.
+ * @csspart find-replace-toggle - The button that shows the replace field under the find field. Expanded while it shows. Not drawn while `readonly`.
+ * @csspart find-replace-toggle-button - The find and replace button's inner button.
+ * @csspart find-replace-toggle-live - The find and replace button's live region, which speaks while the button is pending.
+ * @csspart find-replace-toggle-spinner - The ring the find and replace button turns while it is pending.
+ * @csspart find-replace-toggle-text - The box the find and replace button's icon sits in.
+ * @csspart find-toggle - The Find button in the toolbar, which opens and closes the find bar. Expanded while it is open.
+ * @csspart find-toggle-button - The Find button's inner button.
+ * @csspart find-toggle-live - The Find button's live region, which speaks while the button is pending.
+ * @csspart find-toggle-spinner - The ring the Find button turns while it is pending.
+ * @csspart find-toggle-text - The box the Find button's icon sits in.
+ * @csspart find-whole-word - The option that finds only whole words. Pressed while it applies.
+ * @csspart find-whole-word-button - The whole word button's inner button.
+ * @csspart find-whole-word-live - The whole word button's live region, which speaks while the button is pending.
+ * @csspart find-whole-word-pressed - The whole word option while it applies, beside `find-whole-word`.
+ * @csspart find-whole-word-spinner - The ring the whole word button turns while it is pending.
+ * @csspart find-whole-word-text - The box the whole word button's icon sits in.
  * @csspart footer - The `footer` slot, under the document.
  * @csspart header - The strip above the document that holds the toolbar, and the address bar under it while it is open.
  * @csspart italic - The Italic button. Pressed while the selection is italic.
@@ -353,6 +452,7 @@ const commandWith = (event: KeyboardEvent, key: string): boolean =>
  *
  * @cssstate connected - A renderer draws the document.
  * @cssstate document-focused - Focus is in the document, where the reader types.
+ * @cssstate find-open - The find bar is open.
  * @cssstate link-open - The address bar is open.
  */
 @customElement('helix-headless-editor')
@@ -404,6 +504,11 @@ export class HelixHeadlessEditor extends HelixElement {
   @words
   @property({ attribute: 'fallback-label' })
   fallbackLabel = 'Editor'
+
+  /** The Find button's label, and the find bar's name. */
+  @words
+  @property({ attribute: 'find-label' })
+  findLabel = 'Find'
 
   /** A heading's name in the block menu. `{level}` is its level, 1 to 3. */
   @words
@@ -519,6 +624,13 @@ export class HelixHeadlessEditor extends HelixElement {
   @state()
   private draft = ''
 
+  /** Whether the find bar is open, as it last said. */
+  @state()
+  private findOpen = false
+
+  /** The find bar drawn now, the renderer it searches, and how a search is reported to it. */
+  private find: { element: HelixHeadlessFind; renderer: EditorRenderer; sink: FindSink } | undefined
+
   /** Whether anything is slotted into `actions`, read before each render. */
   private hasActions = false
 
@@ -552,6 +664,11 @@ export class HelixHeadlessEditor extends HelixElement {
       formats: (formats) => {
         if (current()) {
           this.formats = formats
+        }
+      },
+      found: (result) => {
+        if (current()) {
+          this.find?.sink.found(result)
         }
       },
     }
@@ -609,7 +726,24 @@ export class HelixHeadlessEditor extends HelixElement {
 
   /** Whether the toolbar draws any tool. */
   private get drawsAny(): boolean {
-    return !this.readOnly && GROUPS.some(([, tools]) => tools.some((tool) => this.draws(tool)))
+    return (
+      !this.readOnly &&
+      (this.drawsFind || GROUPS.some(([, tools]) => tools.some((tool) => this.draws(tool))))
+    )
+  }
+
+  /**
+   * Whether the document can be searched: always, until a renderer is
+   * attached, and then where it can find. Read-only documents too, with
+   * no replacing.
+   */
+  private get searches(): boolean {
+    return this.renderer === undefined || this.renderer.find !== undefined
+  }
+
+  /** Whether the toolbar draws the Find button: `find` named by `tools`, and a document that can be searched. */
+  private get drawsFind(): boolean {
+    return this.groups.has('find') && this.searches
   }
 
   /** Whether a tool's button cannot be pressed now. */
@@ -735,6 +869,51 @@ export class HelixHeadlessEditor extends HelixElement {
   }
 
   /**
+   * Opens the find bar, with its field focused. The header is drawn first,
+   * since a read-only frame draws it only while the bar is open.
+   */
+  private async openFind(): Promise<void> {
+    const find = this.find?.element
+    if (!find) {
+      return
+    }
+    this.findOpen = true
+    await this.updateComplete
+    await find.show()
+    this.findOpen = find.open
+  }
+
+  /** Hands the find bar drawn now the renderer to search through, again whenever either changes. */
+  private attachFind(): void {
+    const element = this.partNamed<HelixHeadlessFind>('find') ?? undefined
+    const renderer = this.renderer
+    if (element === this.find?.element && renderer === this.find?.renderer) {
+      return
+    }
+    this.find?.sink.detach()
+    this.find =
+      element && renderer
+        ? { element, renderer, sink: element.attach(this.finderFor(renderer)) }
+        : undefined
+  }
+
+  /** A renderer, as the find bar searches through it: replacing where the renderer can. */
+  private finderFor(renderer: EditorRenderer): Finder {
+    return {
+      end: () => renderer.findEnd?.(),
+      find: (query, direction) => renderer.find?.(query, direction),
+      ...(renderer.replace
+        ? { replace: (query: FindQuery, all: boolean) => renderer.replace?.(query, all) }
+        : {}),
+    }
+  }
+
+  /** The find bar opened or closed, which the Find button shows. */
+  private readonly handleFindToggle = (event: Event): void => {
+    this.findOpen = (event as ToggleEvent).newState === 'open'
+  }
+
+  /**
    * Keys pressed in the document, heard on their way to the renderer.
    *
    * **Escape then Tab leaves the document**, because Tab in a list nests the
@@ -753,7 +932,11 @@ export class HelixHeadlessEditor extends HelixElement {
       return
     }
     this.escaped = event.key === 'Escape'
-    if (commandWith(event, 'k') && this.drawsAny && this.draws('link')) {
+    if (commandWith(event, 'f') && this.drawsFind && this.find) {
+      event.preventDefault()
+      event.stopPropagation()
+      void this.openFind()
+    } else if (commandWith(event, 'k') && this.drawsAny && this.draws('link')) {
       event.preventDefault()
       event.stopPropagation()
       this.openLink()
@@ -865,6 +1048,7 @@ export class HelixHeadlessEditor extends HelixElement {
     if (changed.has('readOnly') && this.readOnly) {
       this.linkOpen = false
     }
+    this.attachFind()
   }
 
   protected override willUpdate(changed: PropertyValues): void {
@@ -874,6 +1058,7 @@ export class HelixHeadlessEditor extends HelixElement {
        `slotchange` alone left a served page's actions hidden. */
     this.hasActions = this.knownChildren.some((child) => child.getAttribute('slot') === 'actions')
     this.toggleState('link-open', this.linkOpen)
+    this.toggleState('find-open', this.findOpen)
   }
 
   /**
@@ -1164,6 +1349,46 @@ export class HelixHeadlessEditor extends HelixElement {
     ></${divider}>`
   }
 
+  /** The Find button, which opens and closes the find bar: expanded while it is open. */
+  protected renderFindTool(): TemplateResult | typeof nothing {
+    if (!this.drawsFind) {
+      return nothing
+    }
+    const button = this.tag('icon-button')
+    return html`<${button}
+      part="find-toggle"
+      exportparts="button: find-toggle-button, live: find-toggle-live, spinner: find-toggle-spinner, text: find-toggle-text"
+      .expanded=${this.findOpen}
+      ?disabled=${!this.renderer}
+      label=${this.findLabel}
+      @click=${() => (this.findOpen ? this.find?.element.hide() : void this.openFind())}
+      @helix-press=${stopPress}
+    >
+      <slot name="find-icon">${drawIcon(magnifyingGlass)}</slot>
+    </${button}>`
+  }
+
+  /**
+   * The find bar, a Find of the frame's own that searches through the
+   * renderer, kept in the tree while closed so its field keeps what was typed.
+   * The frame takes the find key from the document itself, so the bar takes
+   * none.
+   */
+  protected renderFind(): TemplateResult | typeof nothing {
+    if (!this.drawsFind) {
+      return nothing
+    }
+    const find = this.tag('find')
+    return html`<${find}
+      part="find"
+      exportparts="actions: find-actions, bar: find-bar, close: find-close, close-button: find-close-button, close-live: find-close-live, close-spinner: find-close-spinner, close-text: find-close-text, controls: find-controls, controls-toolbar: find-controls-toolbar, count: find-count, field: find-field, live: find-live, match-case: find-match-case, match-case-button: find-match-case-button, match-case-live: find-match-case-live, match-case-pressed: find-match-case-pressed, match-case-spinner: find-match-case-spinner, match-case-text: find-match-case-text, next: find-next, next-button: find-next-button, next-live: find-next-live, next-spinner: find-next-spinner, next-text: find-next-text, previous: find-previous, previous-button: find-previous-button, previous-live: find-previous-live, previous-spinner: find-previous-spinner, previous-text: find-previous-text, regex: find-regex, regex-button: find-regex-button, regex-live: find-regex-live, regex-pressed: find-regex-pressed, regex-spinner: find-regex-spinner, regex-text: find-regex-text, replace: find-replace, replace-all: find-replace-all, replace-all-button: find-replace-all-button, replace-all-live: find-replace-all-live, replace-all-spinner: find-replace-all-spinner, replace-all-text: find-replace-all-text, replace-button: find-replace-button, replace-field: find-replace-field, replace-live: find-replace-live, replace-spinner: find-replace-spinner, replace-text: find-replace-text, replace-toggle: find-replace-toggle, replace-toggle-button: find-replace-toggle-button, replace-toggle-live: find-replace-toggle-live, replace-toggle-spinner: find-replace-toggle-spinner, replace-toggle-text: find-replace-toggle-text, whole-word: find-whole-word, whole-word-button: find-whole-word-button, whole-word-live: find-whole-word-live, whole-word-pressed: find-whole-word-pressed, whole-word-spinner: find-whole-word-spinner, whole-word-text: find-whole-word-text"
+      label=${this.findLabel}
+      ?readonly=${this.readOnly}
+      shortcut=""
+      @toggle=${this.handleFindToggle}
+    ></${find}>`
+  }
+
   /**
    * The toolbar: each group of tools `tools` names, a line between two, and
    * then the page's `actions`, one tab stop between them.
@@ -1182,6 +1407,7 @@ export class HelixHeadlessEditor extends HelixElement {
           this.renderMarks(),
           this.renderLinkTool(),
           this.renderBlocks(),
+          this.renderFindTool(),
         ].filter((group) => group !== nothing)
     return html`<${toolbar} part="controls" exportparts="toolbar: controls-toolbar" label=${this.controlsLabel} @keydown=${this.handleToolbarKeys}>
       ${groups.map((group, at) => (at === 0 ? group : html`${this.renderDivider()}${group}`))}
@@ -1254,8 +1480,8 @@ export class HelixHeadlessEditor extends HelixElement {
       role="group"
       aria-label=${this.label || this.getAttribute('aria-label') || this.fallbackLabel}
     >
-      <div part="header" ?hidden=${!this.drawsAny && !this.hasActions}>
-        ${this.renderControls()} ${this.renderLink()}
+      <div part="header" ?hidden=${!this.drawsAny && !this.hasActions && !this.findOpen}>
+        ${this.renderControls()} ${this.renderLink()} ${this.renderFind()}
       </div>
       <div part="viewport"><slot></slot></div>
       <slot name="footer" part="footer"></slot>

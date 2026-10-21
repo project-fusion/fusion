@@ -15,6 +15,7 @@ import { liftListItem, sinkListItem, splitListItem } from 'prosemirror-schema-li
 import type { Command, EditorState, Plugin } from 'prosemirror-state'
 import { blockIds } from '../block-ids/block-ids.js'
 import { editorFrame } from '../connect-editor/connect-editor.js'
+import { editorFind } from '../find/find.js'
 import { type EditorTool, toolCommands } from '../tools/tools.js'
 
 /** What `editorPlugins` takes. */
@@ -114,8 +115,8 @@ const markdownRules = (schema: Schema): InputRule[] => {
  * The plugins a document Helix's toolbar edits takes: the keys for every
  * tool, Enter, Tab, and Shift+Tab in a list, Shift+Enter for a line break,
  * Markdown typed at the start of a line, undo history, the cursors drawn while
- * something is dragged and where no text can stand, `blockIds`, and the
- * plugin `connectEditor` speaks to the frame through.
+ * something is dragged and where no text can stand, `blockIds`, the find
+ * bar's search, and the plugin `connectEditor` speaks to the frame through.
  *
  * **Tab moves in a list only.** Anywhere else it is the browser's, and leaves
  * the document, so the document is never a place the keyboard cannot leave.
@@ -162,6 +163,7 @@ export const editorPlugins = (schema: Schema, options: EditorPluginsOptions = {}
     gapCursor(),
     ...(options.history === false ? [] : [history()]),
     blockIds(),
+    editorFind(),
     editorFrame(),
   ]
 }

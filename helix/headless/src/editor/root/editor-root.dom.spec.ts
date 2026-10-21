@@ -370,6 +370,103 @@ describe('the address bar', () => {
   })
 })
 
+describe('the find bar', () => {
+  const command = (): KeyboardEventInit => (onApple() ? { metaKey: true } : { ctrlKey: true })
+
+  type Bar = HTMLElement & {
+    open: boolean
+    updateComplete: Promise<unknown>
+  }
+
+  /** A renderer that also finds, and writes down what it was asked to find. */
+  const finding = (host: HelixHeadlessEditor, replaces = true) => {
+    const stand = standIn(host)
+    const searched: string[] = []
+    stand.renderer.find = (query, direction) => {
+      searched.push(`${query.search} ${direction}`)
+      return { count: 2, index: 0 }
+    }
+    stand.renderer.findEnd = () => {
+      searched.push('end')
+    }
+    if (replaces) {
+      stand.renderer.replace = (query, all) => {
+        searched.push(`replace ${query.search} ${all ? 'all' : 'one'}`)
+        return { count: 1, index: 0 }
+      }
+    }
+    const sink = host.attach(stand.renderer)
+    return { ...stand, searched, sink }
+  }
+
+  /** Settles the frame, its bar, and the search the bar runs once its update is over. */
+  const searched = async (host: HelixHeadlessEditor): Promise<void> => {
+    await settle(host)
+    const bar = part(host, 'find') as Bar | null
+    if (bar) {
+      await settle(bar)
+      await Promise.resolve()
+      await settle(bar)
+    }
+    await settle(host)
+  }
+
+  test('is a Find of its own, which the Find button and Command+F open, searching through the renderer', async () => {
+    const host = await editor()
+    const { document, searched: asked } = finding(host)
+    await searched(host)
+    const bar = part(host, 'find') as Bar
+    expect(bar.localName).toBe('helix-headless-find')
+    expect(part(host, 'find-toggle')).not.toBeNull()
+    const event = keyIn(document, 'f', command())
+    await searched(host)
+    expect(event.defaultPrevented).toBe(true)
+    expect(bar.open).toBe(true)
+    expect(hasState(host, 'find-open')).toBe(true)
+    const field = part(bar, 'field') as HTMLInputElement
+    field.value = 'total'
+    field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
+    await searched(host)
+    expect(asked).toContain('total first')
+    expect(part(bar, 'count')?.textContent).toBe('1 of 2 matches')
+  })
+
+  test('says the count the renderer reports when the document changes under the search', async () => {
+    const host = await editor()
+    const { sink } = finding(host)
+    await searched(host)
+    const bar = part(host, 'find') as Bar
+    bar.open = true
+    await searched(host)
+    sink.found({ count: 5, index: 3 })
+    await searched(host)
+    expect(part(bar, 'count')?.textContent).toBe('4 of 5 matches')
+  })
+
+  test('opens from its key in a read-only document, with no replacing', async () => {
+    const host = await editor('label="Notes" readonly')
+    const { document } = finding(host)
+    await searched(host)
+    expect(part(host, 'find-toggle')).toBeNull()
+    expect(part(host, 'header')?.hasAttribute('hidden')).toBe(true)
+    keyIn(document, 'f', command())
+    await searched(host)
+    expect(part(host, 'header')?.hasAttribute('hidden')).toBe(false)
+    expect(part(part(host, 'find') as Bar, 'replace-toggle')).toBeNull()
+  })
+
+  test('is left out for a renderer that cannot find, and where `tools` does not name it', async () => {
+    const plain = await editor()
+    await attached(plain, {})
+    expect(part(plain, 'find')).toBeNull()
+    expect(part(plain, 'find-toggle')).toBeNull()
+    const named = await editor('label="Notes" tools="marks"')
+    finding(named)
+    await searched(named)
+    expect(part(named, 'find')).toBeNull()
+  })
+})
+
 describe('keys in the document', () => {
   const command = (): KeyboardEventInit => (onApple() ? { metaKey: true } : { ctrlKey: true })
 

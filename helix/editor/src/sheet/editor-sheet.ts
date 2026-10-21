@@ -2,7 +2,7 @@
  * What ProseMirror needs from a stylesheet to edit correctly, and what it
  * draws beside the text, in your tokens: the node a reader selected, the
  * cursor between two blocks where no text can stand, the line where a drop
- * lands, and the words in an empty document.
+ * lands, the words in an empty document, and the find bar's matches.
  *
  * **In the page and not in the frame's shadow root**, because the document
  * is the page's own element, which the frame's sheet reaches only at its
@@ -97,6 +97,18 @@ img.ProseMirror-separator {
 
 :where(.helix-editor-drop-cursor) {
   background-color: var(--helix-color-primary, Highlight);
+}
+
+:where(.helix-find-match) {
+  background-color: light-dark(
+    oklch(from var(--helix-color-warning, oklch(0.52 0.11 75)) 0.93 0.07 h),
+    color-mix(in oklab, var(--helix-color-warning, oklch(0.82 0.185 75)) 32%, transparent)
+  );
+}
+
+:where(.helix-find-current) {
+  background-color: oklch(from var(--helix-color-warning, oklch(0.52 0.11 75)) 0.8 0.16 h);
+  color: oklch(from var(--helix-color-warning, oklch(0.52 0.11 75)) 0.25 0.04 h);
 }
 
 :where(.helix-editor-placeholder)::before {
