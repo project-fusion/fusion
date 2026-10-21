@@ -411,13 +411,13 @@ describe('the find bar', () => {
     await settle(host)
   }
 
-  test('is a Find of its own, which the Find button and Command+F open, searching through the renderer', async () => {
+  test('is a Find of its own, which Command+F opens, searching through the renderer', async () => {
     const host = await editor()
     const { document, searched: asked } = finding(host)
     await searched(host)
     const bar = part(host, 'find') as Bar
     expect(bar.localName).toBe('helix-headless-find')
-    expect(part(host, 'find-toggle')).not.toBeNull()
+    expect(part(host, 'find-toggle')).toBeNull()
     const event = keyIn(document, 'f', command())
     await searched(host)
     expect(event.defaultPrevented).toBe(true)
@@ -455,15 +455,24 @@ describe('the find bar', () => {
     expect(part(part(host, 'find') as Bar, 'replace-toggle')).toBeNull()
   })
 
-  test('is left out for a renderer that cannot find, and where `tools` does not name it', async () => {
-    const plain = await editor()
-    await attached(plain, {})
-    expect(part(plain, 'find')).toBeNull()
-    expect(part(plain, 'find-toggle')).toBeNull()
-    const named = await editor('label="Notes" tools="marks"')
-    finding(named)
-    await searched(named)
-    expect(part(named, 'find')).toBeNull()
+  test('draws the Find button where `tools` names `find`, which opens and closes the bar', async () => {
+    const host = await editor('label="Notes" tools="marks find"')
+    finding(host)
+    await searched(host)
+    expect(part(host, 'find-toggle')).not.toBeNull()
+    await press(host, 'find-toggle')
+    await searched(host)
+    expect((part(host, 'find') as Bar).open).toBe(true)
+    await press(host, 'find-toggle')
+    await searched(host)
+    expect((part(host, 'find') as Bar).open).toBe(false)
+  })
+
+  test('is left out for a renderer that cannot find', async () => {
+    const host = await editor('label="Notes" tools="marks find"')
+    await attached(host, {})
+    expect(part(host, 'find')).toBeNull()
+    expect(part(host, 'find-toggle')).toBeNull()
   })
 })
 

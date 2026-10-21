@@ -125,13 +125,18 @@ helix-headless-editor::part(link-field) {
   padding-inline: 0.5rem;
 }
 
-/* The find bar is a row under the tools while it is open, as the address bar is. */
+/* The find bar is shut until the reader opens it, which the element says,
+   and then a row under the tools, as the address bar is. */
 helix-headless-editor::part(find-bar) {
   align-items: center;
-  display: flex;
+  display: none;
   flex-wrap: wrap;
   gap: 0.25rem 0.5rem;
   padding-block-start: 0.25rem;
+}
+
+helix-headless-editor:state(find-open)::part(find-bar) {
+  display: flex;
 }
 
 helix-headless-editor::part(find-field) {
