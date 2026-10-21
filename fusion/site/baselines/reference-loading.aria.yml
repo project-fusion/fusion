@@ -65,6 +65,7 @@
           - treeitem "Empty" [level=2]
           - treeitem "File Input" [level=2]
           - treeitem "Filter Input" [level=2]
+          - treeitem "Find" [level=2]
           - treeitem "Flex" [level=2]
           - treeitem "Format Date" [level=2]
           - treeitem "Graph" [level=2]

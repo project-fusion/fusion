@@ -1,0 +1,16 @@
+- search "Find":
+  - searchbox "Find": token
+  - toolbar "Find controls":
+    - button "Match case"
+    - button "Match whole word"
+    - button "Use regular expression"
+    - button "Previous match"
+    - button "Next match"
+    - button "Close find"
+- status: 1 of 6 matches
+- article:
+  - heading "Theming with tokens" [level=2]
+  - paragraph: A token names one decision, such as the color of a border or the space between two controls. Components read tokens, so a theme changes every component at once.
+  - paragraph: Set a token on the page to change it everywhere, or on one element to change it there. A token set on an element reaches everything inside it.
+  - heading "Choosing colors" [level=3]
+  - paragraph: Start from the primary color. The other color tokens are mixed from it and from the page's foreground and background.

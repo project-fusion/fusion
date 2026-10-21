@@ -204,6 +204,11 @@
       - text: Filter Input
       - link "Filter Input documentation":
         - /url: /helix/components/filter-input
+    - treeitem "Find Find documentation Experimental" [level=1]:
+      - text: Find
+      - link "Find documentation":
+        - /url: /helix/components/find
+      - img "Experimental"
     - treeitem "Flex Flex documentation" [level=1]:
       - text: Flex
       - link "Flex documentation":
