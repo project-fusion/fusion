@@ -1,3 +1,4 @@
+export { fallbackSpeech } from './fallback-speech.js'
 export {
   type MoonshineSpeech,
   type MoonshineSpeechOptions,
