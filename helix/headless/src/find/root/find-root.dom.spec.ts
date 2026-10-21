@@ -13,7 +13,11 @@ beforeAll(async () => {
   await import('../index.js')
 })
 
+/* The selection is cleared too: a spec here selects text, and happy-dom keeps
+   a selection over nodes the page has dropped, which a later spec in the same
+   process reads as text the reader selected. */
 afterEach(() => {
+  document.getSelection()?.removeAllRanges()
   document.body.innerHTML = ''
 })
 
