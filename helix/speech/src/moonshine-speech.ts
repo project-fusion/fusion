@@ -16,6 +16,13 @@ export interface MoonshineSpeechOptions {
   models?: string
   /** Called as the model downloads, from 0 to 1 across all its files. */
   progress?(fraction: number): void
+  /**
+   * The URL of the folder this package's `dist/worker` is served from. The
+   * engine uses the copy beside it without one, which works where the
+   * package's files are served as they are. A bundled app copies the folder
+   * to its static files and names it here.
+   */
+  worker?: string | URL
 }
 
 /** A speech engine that recognizes English on the device with Moonshine. */
@@ -30,6 +37,9 @@ export interface MoonshineSpeech extends SpeechEngine {
 
 /** Seconds of audio the page collects before it sends them to the worker. */
 const CHUNK = 0.1
+
+/** Milliseconds between level reports, which the worklet would otherwise send every few. */
+const LEVEL_INTERVAL = 50
 
 /** The subtags Moonshine's streaming models recognize. */
 const ENGLISH = /^en(-|$)/i
@@ -60,9 +70,15 @@ export const moonshineSpeech = (options: MoonshineSpeechOptions = {}): Moonshine
     if (worker) {
       return worker
     }
-    const spawned = new Worker(new URL('./moonshine-worker.js', import.meta.url), {
-      type: 'module',
-    })
+    /* Built from a string, so a bundler does not take the worker into its
+       graph: Turbopack resolves `new URL(path, import.meta.url)` even through
+       a variable. */
+    const here = import.meta.url
+    const folder = new URL(
+      options.worker ?? `${here.slice(0, here.lastIndexOf('/') + 1)}worker/`,
+      location.href,
+    )
+    const spawned = new Worker(new URL('moonshine-worker.js', folder), { type: 'module' })
     spawned.onmessage = (event: MessageEvent<FromWorker>) => {
       const message = event.data
       switch (message.type) {
@@ -176,12 +192,19 @@ export const moonshineSpeech = (options: MoonshineSpeechOptions = {}): Moonshine
       const size = Math.round(CHUNK * MODEL_RATE)
       let chunk = new Float32Array(size)
       let filled = 0
+      let loudest = 0
+      let reported = 0
       node.port.onmessage = (event: MessageEvent<Float32Array>) => {
         if (stopped) {
           return
         }
         const block = resample(event.data, context.sampleRate)
-        listener.level?.(loudness(block))
+        loudest = Math.max(loudest, loudness(block))
+        if (event.timeStamp - reported >= LEVEL_INTERVAL) {
+          listener.level?.(loudest)
+          loudest = 0
+          reported = event.timeStamp
+        }
         let from = 0
         while (from < block.length) {
           const taken = Math.min(size - filled, block.length - from)

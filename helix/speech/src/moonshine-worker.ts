@@ -6,6 +6,10 @@
  * `@moonshine-ai/moonshine-wasm` publishes. Anywhere else it takes the
  * single-thread build this package carries, which needs no
  * `SharedArrayBuffer`. Both run the same JavaScript layer.
+ *
+ * **The build bundles this file into `dist/worker`, with both modules beside
+ * it**, so the folder runs as it is served and no app's bundler has to follow
+ * a worker, an Emscripten module, or its Node branches.
  */
 import {
   AssetDownloader,
@@ -33,15 +37,15 @@ const ARCHES: Record<MoonshineModel, ModelArch> = {
 /** Seconds between transcription passes. Moonshine's default is half a second, which reads as lag in a field. */
 const UPDATE_INTERVAL = 0.25
 
+/* The two builds sit beside this file in `dist/worker`. The URLs are built
+   from a variable so that a bundler leaves the folder as it is served. */
+const here = import.meta.url
+
 const loadModule = async (): Promise<void> => {
-  if (scope.crossOriginIsolated) {
-    await loadMoonshineModule()
-    return
-  }
-  /* Both URLs are written out whole so a bundler copies the two files. */
-  const script = new URL('./single-thread/moonshine.mjs', import.meta.url).href
-  const binary = new URL('./single-thread/moonshine.wasm', import.meta.url).href
-  const imported = (await import(/* @vite-ignore */ script)) as {
+  const build = scope.crossOriginIsolated ? 'threaded' : 'single-thread'
+  const script = new URL(`./${build}/moonshine.mjs`, here).href
+  const binary = new URL(`./${build}/moonshine.wasm`, here).href
+  const imported = (await import(/* @vite-ignore */ /* webpackIgnore: true */ script)) as {
     default: NonNullable<NonNullable<Parameters<typeof loadMoonshineModule>[0]>['factory']>
   }
   await loadMoonshineModule({ factory: imported.default, locateFile: () => binary })

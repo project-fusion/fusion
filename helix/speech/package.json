@@ -17,14 +17,15 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./worker/*": "./dist/worker/*"
   },
   "files": [
     "dist"
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json && bun scripts/single-thread.ts",
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.types.json && bun scripts/worker.ts && bun scripts/single-thread.ts",
     "test": "bun run test:pure",
     "test:pure": "bun test pure.spec",
     "typecheck": "tsc -p tsconfig.json --noEmit"

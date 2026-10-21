@@ -1,5 +1,5 @@
 /**
- * Places the single-thread Moonshine build in `dist/single-thread`, after
+ * Places the single-thread Moonshine build in `dist/worker/single-thread`, after
  * checking each file against the digest `single-thread.json` pins.
  *
  * The files are assets of the GitHub release `single-thread.json` names, and
@@ -22,7 +22,7 @@ const pins = JSON.parse(readFileSync(join(root, 'single-thread.json'), 'utf8')) 
   release: string
 }
 const from = join(root, 'vendor', 'single-thread')
-const to = join(root, 'dist', 'single-thread')
+const to = join(root, 'dist', 'worker', 'single-thread')
 
 const digest = (bytes: Uint8Array): string => createHash('sha256').update(bytes).digest('hex')
 
