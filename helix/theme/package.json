@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-theme",
   "description": "Theme derivation engine. Computes a complete token set from intent inputs, and measures every text and background pair it solves against its contrast target.",
-  "version": "0.222.0",
+  "version": "0.223.0",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
