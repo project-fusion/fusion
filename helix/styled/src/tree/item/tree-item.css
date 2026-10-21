@@ -248,13 +248,15 @@ slot[name="start"]::slotted(*) {
   color: var(--helix-color-foreground-subtle);
 }
 
-/* Opening a branch is a movement. */
+/* Opening a branch is a movement. A closed branch's children are hidden
+   until found, through `content-visibility`, which holds while the rows
+   close, so the children fold away with them. */
 [part="group"] {
   display: grid;
   grid-template-rows: 1fr;
   transition:
     grid-template-rows var(--helix-duration-fast) var(--helix-easing-standard),
-    display var(--helix-duration-fast) allow-discrete;
+    content-visibility var(--helix-duration-fast) allow-discrete;
 }
 
 [part="group"] > slot {
@@ -263,8 +265,8 @@ slot[name="start"]::slotted(*) {
   overflow: hidden;
 }
 
+/* No `display: none`, which the browser's find does not search. */
 [part="group"][hidden] {
-  display: none;
   grid-template-rows: 0fr;
 }
 

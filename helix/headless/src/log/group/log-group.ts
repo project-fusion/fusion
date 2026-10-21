@@ -41,7 +41,9 @@ const MARKS = {
  * the heading, as you write it, such as `12s`.
  *
  * A group starts shut. Write `default-open` on the step a reader should see,
- * such as the one that failed.
+ * such as the one that failed. A shut group's lines are hidden until found:
+ * the browser's find and Find search them, and the group opens on the one
+ * that holds the match, unless `helix-before-open` is canceled.
  *
  * @since 0.200.0
  * @status experimental
@@ -54,7 +56,7 @@ const MARKS = {
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the group opens. Cancelable.
  * @event {ToggleEvent} toggle - Fired after the group opens or closes, with `newState` and `oldState`.
  *
- * @csspart content - The lines, hidden while the group is shut.
+ * @csspart content - The lines, hidden until found while the group is shut.
  * @csspart duration - How long the step took.
  * @csspart heading - The heading.
  * @csspart mark - The caret that turns as the group opens, an `<svg>` you size.
@@ -110,6 +112,26 @@ export class HelixHeadlessLogGroup extends MixinControllerOpen(HelixElement) {
     this.toggleOpen()
   }
 
+  /**
+   * A search found a match in the shut group, and shows it next: the
+   * browser's find or Find. The group opens, and where the page refuses, its
+   * lines are hidden again once the search has shown them, as Accordion's
+   * section is.
+   */
+  private readonly handleBeforeMatch = (event: Event): void => {
+    if (this.open || this.requestOpen(true)) {
+      return
+    }
+    const content = event.currentTarget as HTMLElement
+    const observer = new MutationObserver(() => {
+      observer.disconnect()
+      if (!this.open && !content.hasAttribute('hidden')) {
+        content.setAttribute('hidden', 'until-found')
+      }
+    })
+    observer.observe(content, { attributeFilter: ['hidden'] })
+  }
+
   /** Records whether the group holds anything, and whether a step is among it. */
   private readonly handleSlotChange = (): void => {
     const slot = this.renderRoot.querySelector<HTMLSlotElement>('[part="content"] > slot')
@@ -163,9 +185,10 @@ export class HelixHeadlessLogGroup extends MixinControllerOpen(HelixElement) {
           : html`<div
               part="content"
               id="content"
-              role="group"
-              aria-labelledby="summary"
-              ?hidden=${!this.open}
+              role=${this.open ? 'group' : nothing}
+              aria-labelledby=${this.open ? 'summary' : nothing}
+              hidden=${this.open ? nothing : 'until-found'}
+              @beforematch=${this.handleBeforeMatch}
             ><slot @slotchange=${this.handleSlotChange}></slot></div>`
       }`
   }

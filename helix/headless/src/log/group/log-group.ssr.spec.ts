@@ -8,12 +8,11 @@ describe('log group server output', () => {
     ><helix-headless-log-line>npm ERR!</helix-headless-log-line></helix-headless-log-group
   >`)
 
-  test('the heading is a shut disclosure that names its region', () => {
+  test('the heading is a shut disclosure, its lines hidden until found', () => {
     const summary = partTag(markup, 'summary')
     expect(summary).toContain('aria-expanded="false"')
     expect(summary).toContain('aria-controls="content"')
-    expect(partTag(markup, 'content')).toContain('aria-labelledby="summary"')
-    expect(partTag(markup, 'content')).toContain('hidden')
+    expect(partTag(markup, 'content')).toContain('hidden="until-found"')
   })
 
   test('the status, the heading, and the duration are served', () => {
