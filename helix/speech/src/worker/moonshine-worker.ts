@@ -18,8 +18,8 @@ import {
   type Stream,
   Transcriber,
 } from '@moonshine-ai/moonshine-wasm'
-import { MODEL_RATE } from './audio.js'
-import type { FromWorker, MoonshineModel, ToWorker } from './protocol.js'
+import { MODEL_RATE } from '../audio.js'
+import type { FromWorker, MoonshineModel, ToWorker } from '../protocol.js'
 
 /** The worker's global scope, which the DOM library this package compiles against does not describe. */
 const scope = globalThis as unknown as {
