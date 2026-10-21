@@ -7,7 +7,6 @@ import {
   formatWords,
   HelixFormElement,
   ListedController,
-  MIRROR_RULE,
   MixinControllerValue,
   MixinField,
   numberConverter,
@@ -333,8 +332,6 @@ const LANGUAGE_NAMES: Record<string, string> = {
  */
 @customElement('helix-headless-code-editor')
 export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(HelixFormElement)) {
-  protected static override markRules = [MIRROR_RULE]
-
   /**
    * The key this family's words are registered under, its styled tag:
    * `registerWords('de', { 'helix-code-editor': { findLabel: 'Suchen' } })`.

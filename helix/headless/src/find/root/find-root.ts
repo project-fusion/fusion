@@ -436,6 +436,11 @@ export class HelixHeadlessFind extends MixinControllerOpen(HelixElement) {
     this.endSearch()
   }
 
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    this.finishHydration()
+  }
+
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.toggleState('replace-open', this.replacing)
@@ -497,9 +502,13 @@ export class HelixHeadlessFind extends MixinControllerOpen(HelixElement) {
     return this.query === '' || findPattern(this.findQuery) !== undefined
   }
 
-  /** Whether the finder can replace and the content can be changed. */
+  /**
+   * Whether the finder can replace and the content can be changed. Never
+   * while hydrating, since a server has no finder: the update after hydration
+   * draws the replace toggle.
+   */
   private get replaceable(): boolean {
-    return !this.readOnly && this.attached?.replace !== undefined
+    return !this.hydrating && !this.readOnly && this.attached?.replace !== undefined
   }
 
   /** Whether the replace row shows. */
@@ -507,7 +516,12 @@ export class HelixHeadlessFind extends MixinControllerOpen(HelixElement) {
     return this.replaceOpen && this.replaceable
   }
 
-  /** The count, as the reader reads it. */
+  /**
+   * The count, as the reader reads it, and empty before a search. The
+   * template writes `nothing` for empty: Lit hydrating a server's empty string
+   * has no text node to change, and writes the next count into the part's
+   * closing marker, where nothing shows.
+   */
   private get countText(): string {
     if (!this.readable) {
       return this.invalidLabel
@@ -836,7 +850,7 @@ export class HelixHeadlessFind extends MixinControllerOpen(HelixElement) {
           .value=${live(this.query)}
           @input=${this.handleInput}
         />
-        <span part="count" aria-hidden="true">${this.countText}</span>
+        <span part="count" aria-hidden="true">${this.countText || nothing}</span>
         ${this.renderControls()}
         ${this.renderReplace()}
       </div>
