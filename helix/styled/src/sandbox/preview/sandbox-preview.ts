@@ -1,10 +1,13 @@
 import {
+  browserSpeech,
   customElement,
   DelayController,
   HelixConsoleEvent,
   HelixElement,
   HelixResizeEvent,
+  pageSpeechEngine,
   recognizeSpeech,
+  type SpeechListener,
   type SpeechSession,
   words,
 } from '@fusion.dev/helix-core'
@@ -835,43 +838,52 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
   }
 
   /**
-   * Listens in `scope` for a frame that cannot listen for itself, and sends
-   * each guess back to that frame.
+   * Listens for a frame that cannot listen for itself, and sends each guess
+   * back to that frame.
+   *
+   * **An engine this page registered listens in its place**, so a page that
+   * gives its own fields another engine gives it to its examples too. The
+   * browser's recognizer listens in `scope`, the window that holds the frame:
+   * a tab `open()` makes holds its own. A registered engine runs in this page,
+   * so it listens only for the frame this page holds.
    */
   private hear(ask: PreviewSpeechStart, source: Window, scope: Window, port?: MessagePort): void {
     this.speech?.stop()
     this.speechId = ask.id
     const tell = (
-      kind: 'end' | 'error' | 'final' | 'partial' | 'stopped',
+      kind: 'end' | 'error' | 'final' | 'level' | 'partial' | 'stopped',
       text?: string,
       error?: string,
+      level?: number,
     ): void => {
-      const message = { error, id: ask.id, kind, text, type: 'helix-speech-heard' }
+      const message = { error, id: ask.id, kind, level, text, type: 'helix-speech-heard' }
       if (port) {
         port.postMessage(message)
       } else {
         source.postMessage(message, '*')
       }
     }
-    this.speech = recognizeSpeech(
-      ask.lang,
-      {
-        end: (reason, message) => {
-          tell(
-            reason === 'error' ? 'error' : reason === 'stopped' ? 'stopped' : 'end',
-            undefined,
-            message,
-          )
-          if (this.speechId === ask.id) {
-            this.speech = undefined
-            this.speechId = undefined
-          }
-        },
-        final: (text) => tell('final', text),
-        partial: (text) => tell('partial', text),
+    const listener: SpeechListener = {
+      end: (reason, message) => {
+        tell(
+          reason === 'error' ? 'error' : reason === 'stopped' ? 'stopped' : 'end',
+          undefined,
+          message,
+        )
+        if (this.speechId === ask.id) {
+          this.speech = undefined
+          this.speechId = undefined
+        }
       },
-      { meter: false, scope },
-    )
+      final: (text) => tell('final', text),
+      level: (level) => tell('level', undefined, undefined, level),
+      partial: (text) => tell('partial', text),
+    }
+    const engine = pageSpeechEngine()
+    this.speech =
+      engine !== browserSpeech && scope === window
+        ? engine.listen({ lang: ask.lang, listener })
+        : recognizeSpeech(ask.lang, listener, { meter: false, scope })
   }
 
   /**

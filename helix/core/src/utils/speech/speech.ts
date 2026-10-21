@@ -292,20 +292,30 @@ const opaqueFrame = (): boolean => {
 
 let relayId = 0
 
+/** What the page that listens for a frame sends back to it. */
+interface Heard {
+  error?: string
+  id?: number
+  kind?: string
+  level?: number
+  text?: string
+  type?: string
+}
+
 /** Asks the page that framed this one to listen, and reports what it hears. */
 const relaySpeech = (lang: string, listener: SpeechListener): SpeechSession => {
   relayId += 1
   const id = relayId
   const parent = (globalThis as unknown as Window).parent
   const channel = new MessageChannel()
-  const take = (
-    data: { error?: string; id?: number; kind?: string; text?: string; type?: string } | undefined,
-  ): void => {
+  const take = (data: Heard | undefined): void => {
     if (data?.type !== 'helix-speech-heard' || data.id !== id) {
       return
     }
     if (data.kind === 'partial' && data.text) {
       listener.partial(data.text)
+    } else if (data.kind === 'level' && typeof data.level === 'number') {
+      listener.level?.(data.level)
     } else if (data.kind === 'final' && data.text) {
       listener.final(data.text)
     } else if (data.kind === 'error' || data.kind === 'end' || data.kind === 'stopped') {
@@ -318,9 +328,7 @@ const relaySpeech = (lang: string, listener: SpeechListener): SpeechSession => {
     }
   }
   const onMessage = (event: MessageEvent): void => {
-    const data = event.data as
-      | { error?: string; id?: number; kind?: string; text?: string; type?: string }
-      | undefined
+    const data = event.data as Heard | undefined
     if (data?.type !== 'helix-speech-heard' || data.id !== id) {
       return
     }
@@ -332,7 +340,7 @@ const relaySpeech = (lang: string, listener: SpeechListener): SpeechSession => {
     take(data)
   }
   channel.port1.onmessage = (event: MessageEvent) => {
-    take(event.data as { error?: string; id?: number; kind?: string; text?: string; type?: string })
+    take(event.data as Heard)
   }
   window.addEventListener('message', onMessage)
   parent.postMessage({ id, lang, type: 'helix-speech-start' }, '*', [channel.port2])
