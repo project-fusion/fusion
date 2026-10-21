@@ -883,7 +883,7 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
     this.speech =
       engine !== browserSpeech && scope === window
         ? engine.listen({ lang: ask.lang, listener })
-        : recognizeSpeech(ask.lang, listener, { meter: false, scope })
+        : recognizeSpeech(ask.lang, listener, { scope })
   }
 
   /**

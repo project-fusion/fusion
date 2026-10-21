@@ -146,3 +146,91 @@ describe('recognizeSpeech', () => {
     expect(await listen(page.scope)).toEqual(['ended'])
   })
 })
+
+/* A second capture opened beside the recognizer's start ended recognition
+   after the permission prompt, so the meter waits for `audiostart`. */
+describe('the meter', () => {
+  const captures = () => {
+    const opened: string[] = []
+    const was = Object.getOwnPropertyDescriptor(globalThis, 'navigator')
+    const context = (globalThis as { AudioContext?: unknown }).AudioContext
+    Object.defineProperty(globalThis, 'navigator', {
+      configurable: true,
+      value: {
+        mediaDevices: {
+          getUserMedia: () => {
+            opened.push('capture')
+            return new Promise(() => {})
+          },
+        },
+      },
+    })
+    ;(globalThis as { AudioContext?: unknown }).AudioContext = class {}
+    const restore = (): void => {
+      if (was) {
+        Object.defineProperty(globalThis, 'navigator', was)
+      } else {
+        Reflect.deleteProperty(globalThis, 'navigator')
+      }
+      ;(globalThis as { AudioContext?: unknown }).AudioContext = context
+    }
+    return { opened, restore }
+  }
+
+  /** A recognizer that records the captures open at its start and after its `audiostart`. */
+  const recognizer = (opened: string[], seen: number[]) => ({
+    SpeechRecognition: class {
+      continuous = false
+      interimResults = false
+      lang = ''
+      onaudiostart: (() => void) | null = null
+      onend: (() => void) | null = null
+      onerror: ((event: { error: string }) => void) | null = null
+      onresult: unknown = null
+      start(): void {
+        seen.push(opened.length)
+        this.onaudiostart?.()
+        this.onaudiostart?.()
+        seen.push(opened.length)
+        this.onend?.()
+      }
+      stop(): void {
+        this.onend?.()
+      }
+    },
+  })
+
+  const run = (scope: unknown, meter = true) =>
+    new Promise<void>((done) => {
+      recognizeSpeech(
+        'en-US',
+        { end: () => done(), final: () => {}, partial: () => {} },
+        {
+          meter,
+          scope: scope as Window,
+        },
+      )
+    })
+
+  test('opens its capture once the recognizer has the microphone, and only once', async () => {
+    const { opened, restore } = captures()
+    const seen: number[] = []
+    try {
+      await run(recognizer(opened, seen))
+    } finally {
+      restore()
+    }
+    expect(seen).toEqual([0, 1])
+  })
+
+  test('opens no capture with `meter: false`', async () => {
+    const { opened, restore } = captures()
+    const seen: number[] = []
+    try {
+      await run(recognizer(opened, seen), false)
+    } finally {
+      restore()
+    }
+    expect(seen).toEqual([0, 0])
+  })
+})

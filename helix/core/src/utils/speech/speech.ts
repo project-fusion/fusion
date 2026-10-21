@@ -43,6 +43,7 @@ interface Recognition extends EventTarget {
   continuous: boolean
   interimResults: boolean
   lang: string
+  onaudiostart: (() => void) | null
   onend: (() => void) | null
   onerror: ((event: { error: string }) => void) | null
   onresult: ((event: { resultIndex: number; results: ArrayLike<RecognitionResult> }) => void) | null
@@ -188,9 +189,10 @@ const listenLocally = async (
  * where the browser offers one. Chrome's service is Google's, and Chromium browsers without Google's
  * keys, such as Brave, reach no service at all and end with `network`.
  *
- * `meter` reads loudness for the ring. Leave it off where this page is
- * listening for a frame. A second capture of the microphone ends the
- * recognizer, and the prompt the reader sees belongs to that capture.
+ * `meter` reads loudness for the dictation button's level from a second
+ * capture of the microphone, opened on the recognizer's `audiostart`. Opened
+ * at the same time as the recognizer, that capture ended recognition after the
+ * permission prompt. Turn it off with `meter: false`.
  */
 export const recognizeSpeech = (
   lang: string,
@@ -205,10 +207,15 @@ export const recognizeSpeech = (
   let asked = false
   let ended = false
   let recognition: Recognition | undefined
-  const quiet =
-    options?.meter === false
-      ? (): void => {}
-      : meter((level, bands) => listener.level?.(level, bands))
+  let quiet = (): void => {}
+  let metering = false
+  const startMeter = (): void => {
+    if (options?.meter === false || metering || ended) {
+      return
+    }
+    metering = true
+    quiet = meter((level, bands) => listener.level?.(level, bands))
+  }
   const end = (reason: 'ended' | 'error' | 'stopped', message?: string): void => {
     if (ended) {
       return
@@ -231,6 +238,7 @@ export const recognizeSpeech = (
     }
     let failed: string | undefined
     let heard = false
+    current.onaudiostart = startMeter
     current.onresult = (event) => {
       heard = true
       let guess = ''
