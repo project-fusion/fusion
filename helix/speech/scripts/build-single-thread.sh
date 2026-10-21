@@ -6,8 +6,8 @@
 # that: ONNX Runtime as a minimal SIMD static library, then Moonshine's
 # Emscripten module linked against it. Neither project publishes the result.
 #
-# The versions come from single-thread.json. After a build, update the digests
-# there to the ones this prints.
+# The versions come from single-thread.json. After a build, publish the two
+# files as a new release, and put its tag and the digests this prints there.
 #
 # Needs Python 3.10 or later, git, and about 4 GB free. ONNX Runtime installs
 # its own emsdk. Takes about 15 minutes on an M-series Mac. The work happens in

@@ -48,8 +48,9 @@ phrase.
 the worker threads, and the worker takes the threaded build that
 `@moonshine-ai/moonshine-wasm` publishes. Any other page gets the
 single-thread build this package carries in `dist/single-thread`. Moonshine
-does not publish that build, so `scripts/build-single-thread.sh` builds it
-from Moonshine's and ONNX Runtime's sources, and `single-thread.json` pins the
+does not publish that build. `scripts/build-single-thread.sh` builds it from
+Moonshine's and ONNX Runtime's sources, and the files are assets of a release
+of this repository. `single-thread.json` names the release and pins the
 versions and the digest of each file.
 
 **A bundler has to follow the worker.** The engine starts it with
@@ -60,12 +61,17 @@ that.
 ## Working on it
 
 ```sh
-scripts/build-single-thread.sh
 bun run --filter @fusion.dev/helix-speech build
 bun run --filter @fusion.dev/helix-speech test
 ```
 
-The build checks each file in `vendor/single-thread` against its digest in
-`single-thread.json` and copies it into `dist`.
+The build downloads the single-thread files from the release into
+`vendor/single-thread`, checks each against its digest, and copies it into
+`dist`. While the repository is private, the download needs a token: the build
+reads `GH_TOKEN`, or asks `gh` for yours.
+
+To change the build, run `scripts/build-single-thread.sh`, publish its two
+files as a new release, and put the release's tag and the digests the script
+prints in `single-thread.json`.
 
 MIT
