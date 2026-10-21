@@ -6,6 +6,7 @@ import { styles as fieldStyles } from '../../shared/field/field.css.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './code-editor-root.css.js'
 import '../../button/index.js'
+import '../../find/index.js'
 import '../../icon-button/index.js'
 import '../../toolbar/index.js'
 

@@ -32,11 +32,10 @@
   border-radius: 0;
 }
 
-/* The header, the find bar and the status line are one strip each, on one
-   fill, and dense by nature, as Terminal's are: a control a page puts in the
-   header takes the size the built-in ones have. */
+/* The header and the status line are one strip each, on one fill, and dense
+   by nature, as Terminal's are: a control a page puts in the header takes the
+   size the built-in ones have. The find bar is a strip of its own, below. */
 [part="header"],
-[part="find-bar"],
 [part="status"] {
   --helix-size-icon: var(--helix-size-icon-sm);
   --helix-size-icon-loose: calc(var(--helix-size-icon) * 1.2);
@@ -85,12 +84,9 @@
   margin-inline-start: auto;
 }
 
-/* Find says it is on with a wash of the ink while its bar is open, and each
-   option while it applies, as Terminal's do. */
-:host(:state(find-open)) [part="find"],
-[part="find-match-case"][aria-pressed="true"],
-[part="find-whole-word"][aria-pressed="true"],
-[part="find-regex"][aria-pressed="true"] {
+/* Find says it is on with a wash of the ink while its bar is open, as
+   Terminal's does. The bar's options say it in the bar. */
+:host(:state(find-open)) [part="find-toggle"] {
   --icon-button-background-color: color-mix(
     in oklab,
     var(--helix-color-foreground) 12%,
@@ -99,95 +95,17 @@
   --icon-button-foreground-color: var(--helix-color-foreground);
 }
 
-/* The find bar is a step denser than the header, and wraps the replace row
-   under the find row where the frame is narrow. */
-[part="find-bar"],
-[part="find-controls"] {
-  --helix-size-control: calc(var(--helix-size-control-sm) * 0.8);
-  --helix-size-control-loose: calc(var(--helix-size-control) * 1.2);
-  --helix-size-control-tight: calc(var(--helix-size-control) * 0.8);
-}
+/* The find bar is a Find, which draws its own strip a step denser than the
+   header, and wraps its replace row under the find row where the frame is
+   narrow. It takes the header's fill, and its fields the code's ground. */
+[part="find"] {
+  --find-background-color: var(
+    --code-editor-header-background-color,
+    var(--helix-color-surface-raised)
+  );
+  --find-border-color: var(--code-editor-border-color, var(--helix-color-border));
+  --find-field-background-color: var(--code-editor-background-color, var(--helix-color-background));
 
-[part="find-bar"] {
-  border-block-end: var(--helix-border-thin) solid
-    var(--code-editor-border-color, var(--helix-color-border));
-  flex-wrap: wrap;
-}
-
-[part="find-bar"][hidden] {
-  display: none;
-}
-
-[part="find-field"],
-[part="replace-field"] {
-  appearance: none;
-  background-color: var(--code-editor-background-color, var(--helix-color-background));
-  block-size: var(--helix-size-control);
-  border: var(--helix-border-thin) solid var(--code-editor-border-color, var(--helix-color-border));
-  border-radius: var(--helix-radii-sm);
-  box-sizing: border-box;
-  color: var(--helix-color-foreground);
-  flex: 1 1 10rem;
-  font-family: var(--helix-font-sans);
-  font-size: max(var(--helix-text-field-min), var(--helix-text-sm));
-  max-inline-size: 20rem;
-  min-inline-size: 0;
-  padding-inline: var(--helix-space-xs);
-}
-
-[part="find-field"]:focus-visible,
-[part="replace-field"]:focus-visible {
-  outline: var(--helix-size-focus-ring) solid var(--helix-color-focus-ring);
-  outline-offset: var(--helix-size-focus-offset);
-}
-
-[part="find-field"][aria-invalid="true"] {
-  border-color: var(--helix-color-danger);
-}
-
-/* The bar has a Close button of its own, so the field draws no clear button. */
-[part="find-field"]::-webkit-search-cancel-button,
-[part="find-field"]::-webkit-search-decoration {
-  appearance: none;
-}
-
-/* Wide enough for the count it is likely to say, so the buttons beside it do
-   not move while a reader types and the count grows a digit. */
-[part="find-count"] {
-  color: var(--helix-color-foreground-muted);
-  flex: 0 0 auto;
-  font-family: var(--helix-font-sans);
-  font-size: var(--helix-text-xs);
-  font-variant-numeric: tabular-nums;
-  min-inline-size: 7em;
-  white-space: nowrap;
-}
-
-[part="find-controls"] {
-  flex: 0 0 auto;
-}
-
-/* The replace row is a line of its own under the find row: a break of no
-   height between them, and the replace field and its buttons after it. */
-:host(:state(replace-open)) [part="find-bar"]::after {
-  content: "";
-  flex-basis: 100%;
-  order: 1;
-}
-
-[part="replace-field"],
-[part="replace"],
-[part="replace-all"] {
-  order: 2;
-}
-
-/* The replace field lines up under the find field, past the button that
-   shows it. */
-:host(:state(replace-open)) [part="replace-field"] {
-  margin-inline-start: calc(var(--helix-size-control) + var(--helix-space-xs));
-}
-
-[part="find-replace"] {
   flex: 0 0 auto;
 }
 
@@ -316,7 +234,7 @@
    this on a component's behalf and every family says it for itself. */
 @media print {
   [part="controls"],
-  [part="find-bar"],
+  [part="find"],
   [part="status"] {
     display: none;
   }

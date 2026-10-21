@@ -83,8 +83,8 @@ helix-headless-code-editor::part(find-controls-toolbar) {
   gap: 0.25rem;
 }
 
-helix-headless-code-editor::part(find-button),
-helix-headless-code-editor::part(find-replace-button),
+helix-headless-code-editor::part(find-toggle-button),
+helix-headless-code-editor::part(find-replace-toggle-button),
 helix-headless-code-editor::part(find-match-case-button),
 helix-headless-code-editor::part(find-whole-word-button),
 helix-headless-code-editor::part(find-regex-button),
@@ -107,7 +107,7 @@ helix-headless-code-editor::part(find-close-button) {
 }
 
 helix-headless-code-editor::part(find-field),
-helix-headless-code-editor::part(replace-field) {
+helix-headless-code-editor::part(find-replace-field) {
   background-color: var(--_gray-surface);
   block-size: 1.75rem;
   border: 1px solid var(--_gray-edge);

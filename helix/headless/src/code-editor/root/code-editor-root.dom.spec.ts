@@ -1,6 +1,7 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import type { HelixHeadlessFind } from '../../find/index.js'
 import type {
   EditorEngine,
   EditorEngineListeners,
@@ -244,6 +245,21 @@ describe('the status line and the problems', () => {
 })
 
 describe('the find bar, on the plain field', () => {
+  /** The find bar, a Find of the editor's own, and a part inside it. */
+  const findOf = (element: HelixHeadlessCodeEditor): HelixHeadlessFind =>
+    part(element, 'find') as HelixHeadlessFind
+  const inFind = (element: HelixHeadlessCodeEditor, name: string): Element | null =>
+    part(findOf(element), name)
+
+  /** Settles the editor, the bar, and the search the bar runs once its update is over. */
+  const searched = async (element: HelixHeadlessCodeEditor): Promise<void> => {
+    await element.updateComplete
+    await findOf(element).updateComplete
+    await Promise.resolve()
+    await findOf(element).updateComplete
+    await element.updateComplete
+  }
+
   const findIn = async (value: string): Promise<HelixHeadlessCodeEditor> => {
     const element = await editor()
     element.value = value
@@ -258,51 +274,63 @@ describe('the find bar, on the plain field', () => {
         metaKey: onApple(),
       }),
     )
-    await element.updateComplete
+    await searched(element)
     return element
   }
 
   const type = async (element: HelixHeadlessCodeEditor, name: string, text: string) => {
-    const field = part(element, name) as HTMLInputElement
+    const field = inFind(element, name) as HTMLInputElement
     field.value = text
     field.dispatchEvent(new Event('input', { bubbles: true, composed: true }))
-    await element.updateComplete
+    await searched(element)
   }
 
   test('opens on the find key, finds as it is typed, and counts the matches', async () => {
     const element = await findIn('total = sum + total')
-    expect(part(element, 'find-bar')?.hasAttribute('hidden')).toBe(false)
-    await type(element, 'find-field', 'total')
-    expect(part(element, 'find-count')?.textContent).toBe('1 of 2 matches')
+    expect(findOf(element).localName).toBe('helix-headless-find')
+    expect(inFind(element, 'bar')?.hasAttribute('hidden')).toBe(false)
+    expect(hasState(element, 'find-open')).toBe(true)
+    await type(element, 'field', 'total')
+    expect(inFind(element, 'count')?.textContent).toBe('1 of 2 matches')
     const control = part(element, 'control') as HTMLTextAreaElement
     expect([control.selectionStart, control.selectionEnd]).toEqual([0, 5])
-    ;(part(element, 'find-next') as HTMLElement).click()
-    await element.updateComplete
-    expect(part(element, 'find-count')?.textContent).toBe('2 of 2 matches')
+    ;(inFind(element, 'next') as HTMLElement).click()
+    await searched(element)
+    expect(inFind(element, 'count')?.textContent).toBe('2 of 2 matches')
   })
 
   test('says so where a regular expression cannot be read', async () => {
     const element = await findIn('a')
-    ;(part(element, 'find-regex') as HTMLElement).click()
-    await type(element, 'find-field', '(')
-    expect(part(element, 'find-count')?.textContent).toBe('Not a valid regular expression')
+    ;(inFind(element, 'regex') as HTMLElement).click()
+    await type(element, 'field', '(')
+    expect(inFind(element, 'count')?.textContent).toBe('Not a valid regular expression')
   })
 
   test('replaces every match through the value, once the replace field shows', async () => {
     const element = await findIn('total = sum + total')
-    expect(part(element, 'replace-field')).toBeNull()
-    ;(part(element, 'find-replace') as HTMLElement).click()
-    await element.updateComplete
-    await type(element, 'find-field', 'total')
+    expect(inFind(element, 'replace-field')).toBeNull()
+    ;(inFind(element, 'replace-toggle') as HTMLElement).click()
+    await searched(element)
+    await type(element, 'field', 'total')
     await type(element, 'replace-field', 'amount')
-    ;(part(element, 'replace-all') as HTMLElement).click()
-    await element.updateComplete
+    ;(inFind(element, 'replace-all') as HTMLElement).click()
+    await searched(element)
     expect(element.value).toBe('amount = sum + amount')
   })
 
-  test('closes on Escape', async () => {
+  test('offers no replacing while read only', async () => {
+    const element = await findIn('total')
+    element.readOnly = true
+    await searched(element)
+    expect(inFind(element, 'replace-toggle')).toBeNull()
+  })
+
+  test('closes on Escape, and returns focus to the code', async () => {
     const element = await findIn('a')
-    part(element, 'find-field')?.dispatchEvent(
+    const control = part(element, 'control') as HTMLTextAreaElement
+    control.focus()
+    await findOf(element).show()
+    inFind(element, 'field')?.dispatchEvent(
       new KeyboardEvent('keydown', {
         bubbles: true,
         cancelable: true,
@@ -310,7 +338,9 @@ describe('the find bar, on the plain field', () => {
         key: 'Escape',
       }),
     )
-    await element.updateComplete
-    expect(part(element, 'find-bar')?.hasAttribute('hidden')).toBe(true)
+    await searched(element)
+    expect(inFind(element, 'bar')?.hasAttribute('hidden')).toBe(true)
+    expect(hasState(element, 'find-open')).toBe(false)
+    expect(element.shadowRoot?.activeElement).toBe(control)
   })
 })
