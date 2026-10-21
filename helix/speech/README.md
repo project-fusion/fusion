@@ -44,7 +44,7 @@ its examples dictate the same way.
 | Import | What |
 |---|---|
 | `@fusion.dev/helix-speech` | `fallbackSpeech(first, second)`, `moonshineSpeech(options)`, and the types `MoonshineModel`, `MoonshineSpeech`, and `MoonshineSpeechOptions` |
-| `@fusion.dev/helix-speech/worker/*` | The worker folder, for an app that serves it itself |
+| `@fusion.dev/helix-speech/worker/moonshine-worker.js` | The worker, whose folder an app serves itself |
 
 | `moonshineSpeech` option | Default | What else it takes |
 |---|---|---|
