@@ -1,31 +1,12 @@
-/* **Listening shows in the dictation button**, which fills with the theme's
-   success green and draws in the ink that reads on it, the pair a status
-   button uses: a microphone that is on. Every field with `voice` composes this
-   sheet, last, so its fill wins over the field's own button. The accent looks
-   like the answer and is wrong: in a theme whose accent is ink, the button
-   moved from gray to black and read as nothing.
-
-   **The hover state is named here too**, because the pointer is still on the
-   button after the press that started listening, and a field's own hover rule
-   would otherwise draw the button idle. */
-[part~="voice-listening"]:not(:disabled),
-[part~="voice-listening"]:hover:not(:disabled) {
-  background-color: var(--helix-color-success-surface);
-  color: var(--helix-color-foreground-on-status);
-}
-
-[part~="voice-listening"]:hover:not(:disabled) {
-  background-color: var(--helix-color-success-surface-hover);
-}
-
-/* **While it listens the microphone becomes Voice Level**, five bars the size
-   of the glyph it replaces, in the button's ink, so the button keeps its size
-   and the level is drawn where the reader pressed. With reduced motion Voice
-   Level draws one still bar, its length the level. */
+/* **Listening shows in the dictation button's glyph and nothing else.** The
+   button keeps its own look, and the microphone becomes Voice Level: five
+   bars the size of the glyph, in Voice Level's own colors, the primary in the
+   middle and faded at the ends, so the level is drawn where the reader
+   pressed and the button keeps its size. With reduced motion Voice Level
+   draws one still bar, its length the level. */
 [part="voice-level"] {
   --voice-level-bars: 5;
   --voice-level-block-size: var(--icon-size, var(--helix-size-icon));
-  --voice-level-color: currentColor;
   --voice-level-inline-size: var(--icon-size, var(--helix-size-icon));
 
   display: block;
