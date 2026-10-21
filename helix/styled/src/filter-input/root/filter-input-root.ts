@@ -12,6 +12,7 @@ import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as tagRowStyles } from '../../shared/tags/tags.css.js'
 import { styles } from './filter-input-root.css.js'
+import '../../voice-level/index.js'
 
 /**
  * @summary A text field for filters, with the active filters shown in it as tokens.
@@ -39,7 +40,6 @@ import { styles } from './filter-input-root.css.js'
  * @aliases SearchField, FacetInput, TokenInput
  * @documentation https://fusion.dev/helix/components/filter-input
  *
- * @cssproperty --dictation-level - How loud the microphone is while the field listens for dictation, from 0 to 1, which the element sets; the ring around the dictation button grows with it.
  * @cssproperty --filter-input-action-padding-inline - The space on either side of a slotted control's label. It follows `--helix-space-xs`, the space a token uses.
  * @cssproperty --filter-input-action-size - The height of a control slotted at either end. It follows `--helix-size-tag`, so it matches the height of the tokens beside it.
  * @cssproperty --filter-input-background-color - The fill behind the field.

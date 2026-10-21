@@ -175,6 +175,8 @@ const isInsertion = (event: Event): boolean =>
  * @csspart listbox-search - The region holding the field that narrows the list.
  * @csspart listbox-search-field - The filter field inside that region.
  * @csspart listbox-voice - The dictation button in the filter field.
+ * @csspart listbox-voice-level - The meter that draws the microphone's level in place of its glyph while the field listens, where the tier defines Voice Level.
+ * @csspart listbox-voice-level-canvas - The canvas the dictation meter draws on.
  * @csspart listbox-voice-listening - The dictation button while it listens.
  * @csspart listbox-voice-status - What a screen reader hears as dictation starts and stops.
  * @csspart live - The region VoiceOver hears the highlight, the count and a choice from on Apple devices, drawn once there is one to say. Visually hidden in the styled tier.
@@ -1550,7 +1552,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
         filter-icon: listbox-filter-icon, filter-mark: listbox-filter-mark, hint: listbox-hint,
         items: listbox-items, label: listbox-label, live: listbox-live, loading: listbox-loading,
         search: listbox-search, search-field: listbox-search-field,
-        voice: listbox-voice, voice-listening: listbox-voice-listening, voice-status: listbox-voice-status"
+        voice: listbox-voice, voice-level: listbox-voice-level, voice-level-canvas: listbox-voice-level-canvas, voice-listening: listbox-voice-listening, voice-status: listbox-voice-status"
       aria-label=${this.listLabel}
       empty-text=${this.emptyText}
       load-error=${this.loadError}

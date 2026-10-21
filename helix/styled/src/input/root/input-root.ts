@@ -7,6 +7,7 @@ import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.j
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './input-root.css.js'
+import '../../voice-level/index.js'
 
 /**
  * @summary A field for a single line of text.
@@ -30,7 +31,6 @@ import { styles } from './input-root.css.js'
  * @aliases TextField, Field, TextInput
  * @documentation https://fusion.dev/helix/components/input
  *
- * @cssproperty --dictation-level - How loud the microphone is while the field listens for dictation, from 0 to 1, which the element sets; the ring around the dictation button grows with it.
  * @cssproperty --input-background-color - Fill behind the text.
  * @cssproperty --input-border-color - Edge of the field at rest. Hover, focus and an error still draw their own.
  * @cssproperty --input-padding-inline - Space between the edge of the field and what is inside it.
@@ -41,6 +41,9 @@ import { styles } from './input-root.css.js'
  */
 @customElement('helix-input')
 export class HelixInput extends HelixHeadlessInput {
+  /** The tier its dictation button draws Voice Level from. */
+  static override tier = 'helix-'
+
   static override styles: CSSResultGroup = [
     glyphStyles,
     fieldStyles,

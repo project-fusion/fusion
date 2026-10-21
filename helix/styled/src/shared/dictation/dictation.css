@@ -1,37 +1,34 @@
-/* **Listening shows in the dictation button and in a ring that follows the
-   voice.** Every field with `voice` composes this sheet, last, so the ring is
-   one rule and its fill wins over the field's own button. The button fills
-   with the theme's success green and draws the microphone in the ink that
-   reads on it, the pair a status button uses: a microphone that is on. The
-   accent looks like the answer and is wrong: in a theme whose accent is ink,
-   the button moved from gray to black and read as nothing.
+/* **Listening shows in the dictation button**, which fills with the theme's
+   success green and draws in the ink that reads on it, the pair a status
+   button uses: a microphone that is on. Every field with `voice` composes this
+   sheet, last, so its fill wins over the field's own button. The accent looks
+   like the answer and is wrong: in a theme whose accent is ink, the button
+   moved from gray to black and read as nothing.
 
    **The hover state is named here too**, because the pointer is still on the
    button after the press that started listening, and a field's own hover rule
-   would otherwise draw the button idle. The ring grows with
-   `--dictation-level`, which the element sets from the microphone while it
-   listens, from 0 to 1. With reduced motion the ring holds still at a middle
-   width. */
+   would otherwise draw the button idle. */
 [part~="voice-listening"]:not(:disabled),
 [part~="voice-listening"]:hover:not(:disabled) {
   background-color: var(--helix-color-success-surface);
-  box-shadow: 0 0 0 calc(var(--dictation-level, 0.4) * var(--helix-space-2xs) * 1.5)
-    color-mix(in oklab, var(--helix-color-success) 35%, transparent);
   color: var(--helix-color-foreground-on-status);
-  transition: box-shadow var(--helix-duration-fast) linear;
 }
 
 [part~="voice-listening"]:hover:not(:disabled) {
   background-color: var(--helix-color-success-surface-hover);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  [part~="voice-listening"]:not(:disabled),
-  [part~="voice-listening"]:hover:not(:disabled) {
-    box-shadow: 0 0 0 calc(var(--helix-space-2xs) * 0.6)
-      color-mix(in oklab, var(--helix-color-success) 35%, transparent);
-    transition: none;
-  }
+/* **While it listens the microphone becomes Voice Level**, five bars the size
+   of the glyph it replaces, in the button's ink, so the button keeps its size
+   and the level is drawn where the reader pressed. With reduced motion Voice
+   Level draws one still bar, its length the level. */
+[part="voice-level"] {
+  --voice-level-bars: 5;
+  --voice-level-block-size: var(--icon-size, var(--helix-size-icon));
+  --voice-level-color: currentColor;
+  --voice-level-inline-size: var(--icon-size, var(--helix-size-icon));
+
+  display: block;
 }
 
 /* Hides: dictation is a microphone, and paper has none. */

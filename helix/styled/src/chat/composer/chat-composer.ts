@@ -6,6 +6,7 @@ import { repeat } from 'lit/directives/repeat.js'
 import { styles as dictationStyles } from '../../shared/dictation/dictation.css.js'
 import { styles } from './chat-composer.css.js'
 import '../../tooltip/index.js'
+import '../../voice-level/index.js'
 
 /** Where the glow's light is on the edge, which the sweep moves along it. */
 const LIGHT_X = '--_chat-composer-light-x'
@@ -115,7 +116,6 @@ export function lapOf(w: number, h: number): Keyframe[] {
  * @cssproperty --chat-composer-border-width - Width of the composer's edge, so your theme can remove it.
  * @cssproperty --chat-composer-glow-color - Color of the focus glow under `glow`. Defaults to the primary color.
  * @cssproperty --chat-composer-max-block-size - Maximum height the field grows to.
- * @cssproperty --dictation-level - How loud the microphone is while the field listens for dictation, from 0 to 1, which the element sets; the ring around the dictation button grows with it.
  */
 @customElement('helix-chat-composer')
 export class HelixChatComposer extends HelixHeadlessChatComposer {

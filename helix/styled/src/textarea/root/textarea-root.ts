@@ -7,6 +7,7 @@ import { styles as fieldFrameStyles } from '../../shared/field/field-frame.css.j
 import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
 import { styles as glyphStyles } from '../../shared/glyph/glyph.css.js'
 import { styles } from './textarea-root.css.js'
+import '../../voice-level/index.js'
 
 /**
  * @summary A multi-line text field.
@@ -22,7 +23,6 @@ import { styles } from './textarea-root.css.js'
  * @aliases Multiline, TextArea
  * @documentation https://fusion.dev/helix/components/textarea
  *
- * @cssproperty --dictation-level - How loud the microphone is while the field listens for dictation, from 0 to 1, which the element sets; the ring around the dictation button grows with it.
  * @cssproperty --textarea-background-color - Fill behind the text.
  * @cssproperty --textarea-border-color - Edge of the field at rest. Hover, focus and an error still draw their own.
  * @cssproperty --textarea-padding - Space between the edge of the field and the text.
@@ -33,6 +33,9 @@ import { styles } from './textarea-root.css.js'
  */
 @customElement('helix-textarea')
 export class HelixTextarea extends HelixHeadlessTextarea {
+  /** The tier its dictation button draws Voice Level from. */
+  static override tier = 'helix-'
+
   /* `glyphStyles` first, and it is not optional. `drawIcon` renders a bare
      `<svg data-glyph>` with no size of its own, and the only rule that sizes
      one lives in that sheet. Without it the glyph fills the button. */

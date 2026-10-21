@@ -101,6 +101,8 @@ const typeText = (control: HTMLTextAreaElement, text: string): void => {
  * @csspart layers - The highlighted text and the textarea, one over the other.
  * @csspart scroller - The box that scrolls past `max-rows`, and sideways past a long line.
  * @csspart voice - The dictation button, under `voice`.
+ * @csspart voice-level - The meter that draws the microphone's level in place of its glyph while the field listens, where the tier defines Voice Level.
+ * @csspart voice-level-canvas - The canvas the dictation meter draws on.
  * @csspart voice-listening - The dictation button while it listens. Set alongside `voice`.
  * @csspart voice-status - What a screen reader hears as dictation starts and stops, drawn for no one else.
  *
