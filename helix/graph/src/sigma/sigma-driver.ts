@@ -302,13 +302,27 @@ export const sigmaDriver = <G extends SigmaGraph>(
   /* Every setting the driver changes, as the page left it, put back when it stops. */
   const before = new Map(SETTINGS.map((name) => [name, sigma.getSetting(name)]))
 
+  /* **Drawn only into a box that is there.** Sigma measures its container
+     before every render and throws when it has no width or no height, which
+     is what a container taken off the page measures. A page that leaves
+     while its graph is drawn removes the box first and disconnects after, so
+     a draw made then threw out of the page's teardown: on fusion.dev, leaving
+     /cortex once its trace had drawn replaced the whole site with its error
+     page. When the box is back, the observer below draws it again. */
+  const boxed = (): boolean =>
+    container.isConnected && container.offsetWidth > 0 && container.offsetHeight > 0
+
   /* **Its own box, and not only the window.** Sigma measures its container
      when the window resizes, and a frame filling the screen, or settling its
      height, changes the box with the window as it was: the drawing stretched
-     to the old size until something else made Sigma look. */
+     to the old size until something else made Sigma look. A box that shrinks
+     to nothing, as it does leaving the page, is not drawn into. */
   const sized =
     typeof ResizeObserver === 'function'
       ? new ResizeObserver(() => {
+          if (!boxed()) {
+            return
+          }
           sigma.resize(true)
           sigma.refresh()
         })
@@ -627,6 +641,7 @@ export const sigmaDriver = <G extends SigmaGraph>(
       signals.signal(from, to, colors, animate)
     },
     stop: () => {
+      sized?.disconnect()
       sigma.off('afterRender', redraw)
       camera.off('updated', rezoomed)
       names.stop()
@@ -643,9 +658,13 @@ export const sigmaDriver = <G extends SigmaGraph>(
       for (const [name, value] of before) {
         sigma.setSetting(name, value !== false)
       }
-      sized?.disconnect()
       held.stop()
-      sigma.refresh()
+      /* Drawn as the page made it where the renderer is still on the page.
+         Off it, the settings put back above have asked Sigma for a frame,
+         and the `kill()` a page makes after `disconnect()` cancels it. */
+      if (boxed()) {
+        sigma.refresh()
+      }
     },
     update: (changes: GraphChanges, animate: boolean) => {
       for (const id of changes.removeNodes) {
