@@ -21,15 +21,28 @@ const type = (control: HTMLInputElement | HTMLTextAreaElement, text: string): vo
 }
 
 describe('the events example', () => {
-  run('moving across the square proposes the color, announces it and commits it', async () => {
-    await example(events)
-    const swatch = document.getElementById('swatch') as HTMLElement & { value: string }
-    const before = swatch.value
-    const saturation = part(swatch, 'grid-saturation') as HTMLInputElement
-    type(saturation, String(Number(saturation.value || 50) - 20))
-    saturation.dispatchEvent(new Event('change', { bubbles: true }))
-    await idle()
-    expect(logged()).toEqual(['helix-before-change', 'input', 'change'])
-    expect(swatch.value).not.toBe(before)
-  })
+  /* **The first color picker this page paints, inside this test's time.** The
+     direction specs before it mount pickers and read their layout, and never
+     wait for a frame, so `idle()` here waits on the page's first paint of the
+     picker. In WebKit on x86 with no GPU that frame took 1.3 to 2.4 seconds,
+     measured in the Playwright image under emulation on October 22, 2026,
+     and every frame after it took about 40ms: a second mount of the same
+     example painted in 25ms. On CI's two-core runners it ran past the
+     2000ms default: 3 of the 6 WebKit spec failures in the 80 runs before
+     this change were this test. */
+  run(
+    'moving across the square proposes the color, announces it and commits it',
+    async () => {
+      await example(events)
+      const swatch = document.getElementById('swatch') as HTMLElement & { value: string }
+      const before = swatch.value
+      const saturation = part(swatch, 'grid-saturation') as HTMLInputElement
+      type(saturation, String(Number(saturation.value || 50) - 20))
+      saturation.dispatchEvent(new Event('change', { bubbles: true }))
+      await idle()
+      expect(logged()).toEqual(['helix-before-change', 'input', 'change'])
+      expect(swatch.value).not.toBe(before)
+    },
+    5000,
+  )
 })
