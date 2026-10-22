@@ -57,11 +57,31 @@ export function HelixElements(): null {
 
   useEffect(() => {
     let live = true
-    void Promise.all([
+    const elements = Promise.allSettled([
       import('@fusion.dev/helix'),
       import('@fusion.dev/helix-workbench/specs'),
-      listenWhereTheBrowserCannot(),
-    ]).then(() => {
+    ])
+    /* **A mark on the document once the elements are in and drawn**, for an
+       entrance that has to wait for them. The first frame after the
+       definitions styles and lays out every element that just upgraded: 200ms
+       on a cold load and about 900ms at a quarter of the CPU, measured on
+       fusion.dev on October 22, 2026. An animation running through that frame
+       holds and then jumps ahead, which is how the landing page's hero
+       stuttered in. Set when the imports have settled, even where one failed,
+       so nothing waits on it forever, and two frames later. The first
+       callback runs before that frame is drawn and the second after it, so an
+       animation started by the mark begins after the expensive frame. A tab
+       opened in the background draws no frames, so its hero rises once the
+       tab is shown. Kept on the document across navigations, as the elements
+       are. */
+    void elements.then(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          document.documentElement.dataset.helixElements = ''
+        })
+      })
+    })
+    void Promise.all([elements, listenWhereTheBrowserCannot()]).then(() => {
       if (live) {
         setRegistered(true)
       }
