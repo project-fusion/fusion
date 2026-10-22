@@ -158,6 +158,36 @@ const rendererOf = () => {
   }
 }
 
+/**
+ * Gives the renderer's box a size while it is on the page and none off it,
+ * and makes its draws measure the box as Sigma's do, throwing where it has no
+ * width. Returns what was drawn, in order.
+ */
+const measured = (renderer: ReturnType<typeof rendererOf>): string[] => {
+  const drawn: string[] = []
+  const { container, sigma } = renderer
+  for (const side of ['offsetHeight', 'offsetWidth']) {
+    Object.defineProperty(container, side, {
+      configurable: true,
+      get: () => (container.isConnected ? 400 : 0),
+    })
+  }
+  const measure = (): void => {
+    if (container.offsetWidth === 0) {
+      throw new Error('Sigma: Container has no width.')
+    }
+  }
+  sigma.refresh = () => {
+    measure()
+    drawn.push('refresh')
+  }
+  sigma.resize = () => {
+    measure()
+    drawn.push('resize')
+  }
+  return drawn
+}
+
 /** The canvas the group names are drawn on. */
 const GROUPS = 'canvas[data-helix-graph-layer="groups"]'
 
@@ -462,6 +492,60 @@ describe('sigmaDriver', () => {
     driver.stop?.()
     expect(settings.get('enableCameraZooming')).toBe(true)
     expect(settings.get('enableCameraPanning')).toBe(true)
+  })
+
+  test('stopping draws into a box on the page, and nothing into one taken off it', () => {
+    const onPage = rendererOf()
+    const drawnOnPage = measured(onPage)
+    sigmaDriver(onPage.sigma).stop?.()
+    expect(drawnOnPage).toEqual(['refresh'])
+
+    /* What a page leaving does: the box goes first, and the page disconnects
+       the graph after it. Sigma's own draw threw here. */
+    const offPage = rendererOf()
+    const drawnOffPage = measured(offPage)
+    const driver = sigmaDriver(offPage.sigma)
+    offPage.container.remove()
+    expect(() => driver.stop?.()).not.toThrow()
+    expect(drawnOffPage).toEqual([])
+  })
+
+  test('a box that shrinks to nothing is not drawn into, and is drawn again with a size', () => {
+    const real = globalThis.ResizeObserver
+    /* The observer the driver makes on its box, and each box it watches. */
+    const heard: { boxes: Element[]; callback: () => void }[] = []
+    globalThis.ResizeObserver = class {
+      readonly boxes: Element[] = []
+      constructor(callback: () => void) {
+        heard.push({ boxes: this.boxes, callback })
+      }
+      disconnect(): void {}
+      observe(element: Element): void {
+        this.boxes.push(element)
+      }
+      unobserve(): void {}
+    } as unknown as typeof ResizeObserver
+    try {
+      const renderer = rendererOf()
+      const drawn = measured(renderer)
+      const driver = sigmaDriver(renderer.sigma)
+      const notice = (): void => {
+        for (const observer of heard) {
+          if (observer.boxes.includes(renderer.container)) {
+            observer.callback()
+          }
+        }
+      }
+      renderer.container.remove()
+      expect(notice).not.toThrow()
+      expect(drawn).toEqual([])
+      document.body.append(renderer.container)
+      notice()
+      expect(drawn).toEqual(['resize', 'refresh'])
+      driver.stop?.()
+    } finally {
+      globalThis.ResizeObserver = real
+    }
   })
 
   test('a signal is drawn on a canvas of its own, which stopping takes away', () => {
