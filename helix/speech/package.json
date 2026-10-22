@@ -1,7 +1,7 @@
 {
   "name": "@fusion.dev/helix-speech",
   "description": "Speech engines for Helix dictation that recognize in the page, on the device: Moonshine, in WebAssembly.",
-  "version": "0.223.0",
+  "version": "0.223.1",
   "license": "MIT",
   "author": "Ross Sheppard <ross.sheppard@fusion.dev>",
   "repository": {
