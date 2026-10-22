@@ -421,9 +421,20 @@
    they were scoped to that sheet: `getAnimations()` returned nothing and the
    animation never ran. */
 
+/* **Its delay counts from the Helix elements being in and drawn**, as the
+   hero's rise does, so it still arrives after the column. Counted from the
+   first paint, a slow machine drew the expensive frame after the definitions
+   across the end of the delay, and the pill appeared already part grown: 917ms
+   held at a quarter of the CPU. `data-helix-elements` is set by
+   `HelixElements`. */
 @media (prefers-reduced-motion: no-preference) {
   .fab {
     animation: site-fab-arrive calc(var(--helix-duration-slow) * 2) var(--helix-easing-spring)
       calc(var(--helix-duration-slow) * 5) backwards;
+    animation-play-state: paused;
+  }
+
+  :root[data-helix-elements] .fab {
+    animation-play-state: running;
   }
 }

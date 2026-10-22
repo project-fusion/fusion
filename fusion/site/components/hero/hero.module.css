@@ -162,9 +162,23 @@
    animation never ran. */
 
 @media (prefers-reduced-motion: no-preference) {
+  /* **Held on its first frame until the Helix elements are in and drawn.**
+     The column is a `helix-flex`, hidden until it is defined. Running from
+     the first paint, the rise played unseen, started again from nothing when
+     the column's shadow root arrived, and then held through the expensive
+     frame that follows the definitions before jumping a quarter of the way
+     in: 200ms held on a cold load, and 133ms on a warm one. Paused,
+     `backwards` keeps the `from` frame on screen, the delays included, and
+     the rise starts after that frame. `data-helix-elements` is set by
+     `HelixElements`. */
   .heroShell > * {
     animation: site-hero-arrive calc(var(--helix-duration-slow) * 3) var(--helix-easing-decelerate)
       backwards;
+    animation-play-state: paused;
+  }
+
+  :root[data-helix-elements] .heroShell > * {
+    animation-play-state: running;
   }
 
   /* Each element waits a beat longer than the one above it. `fast` is the step
