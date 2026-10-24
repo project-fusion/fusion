@@ -261,8 +261,9 @@ const upgrades = (page, prefix) =>
 const UPGRADES = 20
 
 /**
- * Waits for the page to hold still: three frames, the fonts, each element's
- * own ready signal, then boxes and scroll offsets unchanged for three frames.
+ * Waits for the page to hold still: three frames, the fonts, every image,
+ * each element's own ready signal, then boxes and scroll offsets unchanged for
+ * three frames.
  *
  * **Three frames, because a framework may render in a task of its own** and
  * an example that sets state in an effect needs the render after it.
@@ -272,6 +273,13 @@ const UPGRADES = 20
  * than any frame count. Without it, Fusion's `pagination/footer` differed by
  * 419 pixels on one run and 842 on the next from the same two files.
  * Bounded, so an element that never resolves cannot hang the run.
+ *
+ * **Every picture loaded, lazy ones included.** A whole-page picture is taken
+ * without scrolling, so an image marked `loading="lazy"` below the first
+ * screen was never asked for, and the site's home page was baselined with an
+ * empty app window for as long as it had one. Each is switched to eager, and
+ * the wait is for every image to load and decode, or fail, bounded at ten
+ * seconds so an image that never answers cannot hang the run.
  *
  * **Then geometry and scroll held for three frames**, which `animations:
  * 'disabled'` does not cover. A programmatic smooth scroll is no animation:
@@ -286,6 +294,16 @@ const still = (page, readyProperty) =>
       requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(done))),
     )
     await Promise.race([document.fonts.ready, new Promise((done) => setTimeout(done, 10000))])
+    const images = [...document.images]
+    for (const image of images) {
+      if (image.loading === 'lazy') {
+        image.loading = 'eager'
+      }
+    }
+    await Promise.race([
+      Promise.all(images.map((image) => image.decode().catch(() => {}))),
+      new Promise((done) => setTimeout(done, 10000)),
+    ])
     if (readyProperty) {
       await Promise.race([
         Promise.all(
