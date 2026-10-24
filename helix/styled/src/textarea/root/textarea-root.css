@@ -18,9 +18,12 @@
 /* What the control adds to the shared reset.
 
    The shared `all: unset` takes the wrapping the UA gives every `<textarea>`
-   with it. Without `overflow-wrap`, an unbreakable string, a URL or a token,
-   runs past the frame instead of wrapping, and under `auto-grow` it is clipped
-   by the `overflow: hidden` the growing depends on with no way to scroll to it.
+   with it. Without `white-space: pre-wrap`, the line breaks a reader types
+   show as spaces and runs of spaces collapse to one, so a multi-line message
+   reads as one line. Without `overflow-wrap`, an unbreakable string, a URL or
+   a token, runs past the frame instead of wrapping, and under `auto-grow` it
+   is clipped by the `overflow: hidden` the growing depends on with no way to
+   scroll to it.
 
    No width of its own: the frame's `flex: 1 1 auto` fills the field and its
    `min-inline-size: 0` lets the box shrink under a narrow host, where a
@@ -30,6 +33,7 @@
 [part="control"] {
   line-height: var(--helix-leading-normal);
   overflow-wrap: break-word;
+  white-space: pre-wrap;
   /* Down only. A field the reader can drag wider than the form holding it is a
      field that breaks the layout, and the block axis is the one they actually
      want: more room for what they are writing. */

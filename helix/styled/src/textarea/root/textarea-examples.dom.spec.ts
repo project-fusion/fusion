@@ -39,4 +39,23 @@ describe('the events example', () => {
     await idle()
     expect(logged()).toEqual(['helix-before-change', 'input', 'change'])
   })
+
+  /* The shared reset unsets the wrapping a `<textarea>` has by default, and
+     with it went the line breaks: two typed lines drew as one. */
+  run('a line break the reader types starts a new line', async () => {
+    await example(events)
+    const control = part(
+      document.getElementById('notes') as HTMLElement,
+      'control',
+    ) as HTMLTextAreaElement
+    control.style.blockSize = 'auto'
+    control.rows = 1
+    type(control, 'Ship')
+    await idle()
+    const one = control.scrollHeight
+    type(control, 'Ship\non Friday')
+    await idle()
+    expect(getComputedStyle(control).whiteSpace).toBe('pre-wrap')
+    expect(control.scrollHeight).toBeGreaterThan(one)
+  })
 })
