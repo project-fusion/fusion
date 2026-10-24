@@ -66,6 +66,13 @@
   grid-template-columns: 1fr auto;
 }
 
+/* With no readout there is no second column, and no gap before one: a column
+   for a value that is not drawn still took the row's gap, so the track stopped
+   short of the end and the slider sat off center in whatever held it. */
+:host(:not([show-value])) [part="field"][data-markers] {
+  grid-template-columns: 1fr;
+}
+
 /* Above the marks, so the thumb is never crossed by one. */
 [part="control"] {
   /* The raised step rather than a bare 1, for the reason `ButtonGroup`
