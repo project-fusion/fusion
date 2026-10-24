@@ -8,6 +8,7 @@ import { Eyebrow } from '@/components/eyebrow/eyebrow'
 import { Hero } from '@/components/hero/hero'
 import { Lede } from '@/components/lede/lede'
 import { PageStrands } from '@/components/page-strands/page-strands'
+import { ProofBands } from '@/components/proof-bands/proof-bands'
 import { SectionTitle } from '@/components/section-title/section-title'
 import { Showcase } from '@/components/showcase/showcase'
 import { ThemeScope } from '@/components/theme-context/theme-context'
@@ -17,6 +18,7 @@ import { INSIGHTS } from '@/content/insights'
 import { DELIVERY, ENGAGEMENT, HERO, MECHANISMS, PROBLEM } from '@/content/landing/helix-landing'
 import { SERVICES } from '@/content/services/services'
 import { pageMetadata } from '@/utils/metadata/metadata'
+import { serverTheme } from '@/utils/theme-engine/theme-engine.server'
 import styles from './page.module.css'
 
 export const metadata = pageMetadata({
@@ -29,7 +31,7 @@ export const metadata = pageMetadata({
  * Draft C: the design system is the product, and the engagements are how it
  * arrives.
  */
-export default function Home() {
+export default async function Home() {
   /* The pill's words are the page's own title, so the two cannot disagree about
      what is being announced. */
   const announcements = findSitePage('/announcements')
@@ -146,6 +148,8 @@ export default function Home() {
          *           absolutely positioned child does not take part in flow, so it lights
          *           the three bands below it without lengthening any of them.
          */}
+        <ProofBands engine={await serverTheme()} />
+
         <CoverageBand />
 
         {/* Delivery, last, because it is what a convinced reader wants and a

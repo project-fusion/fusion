@@ -16,6 +16,7 @@
  */
 
 import type { CopyItem } from '@/content/copy/copy'
+import { countWord, GENERATOR_CHECKS } from '@/content/landing/checks'
 
 /** One capability, stated the way the feature blocks state them. */
 export interface Capability {
@@ -135,7 +136,7 @@ export const MECHANISMS: readonly Capability[] = [
   {
     bullets: [
       'Contrast is measured on every release',
-      'Twelve generators check the code and fail the build when it drifts',
+      `${countWord(GENERATOR_CHECKS.length)} generators check the code and fail the build when it drifts`,
     ],
     claim: 'Find problems before an audit does',
     name: 'Checks',
