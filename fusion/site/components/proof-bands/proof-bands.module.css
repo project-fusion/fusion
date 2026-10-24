@@ -1,0 +1,46 @@
+/* The proof under a card: a finding, a list of checks, an exchange. */
+
+.proof {
+  border-block-start: var(--helix-border-thin) solid var(--helix-material-border);
+}
+
+.kicker {
+  font-weight: var(--helix-weight-medium);
+}
+
+.finding {
+  overflow-wrap: anywhere;
+}
+
+/* The failing pair, in its own colors. A hairline keeps the page's background
+   from swallowing the sample's edge, since the two are nearly the same. */
+.sample {
+  border: var(--helix-border-thin) solid var(--helix-material-border);
+  border-radius: var(--helix-radii-md);
+  font-size: var(--helix-text-lg);
+  margin: 0;
+  padding: var(--helix-space-md) var(--helix-space-lg);
+}
+
+.steps {
+  max-inline-size: 36rem;
+}
+
+.exchange {
+  --list-gap: var(--helix-space-lg);
+}
+
+.exchange helix-list-item::part(row) {
+  display: grid;
+  gap: var(--helix-space-xs);
+}
+
+.surfaces {
+  margin-block-start: var(--helix-space-lg);
+}
+
+.surface {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--helix-space-2xs);
+}
