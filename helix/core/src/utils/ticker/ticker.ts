@@ -32,6 +32,11 @@ interface Waiting {
  * how loaded the runner is, and a loaded runner eats 400ms. One did, on a green
  * branch, and blocked a merge that had nothing wrong with it. A bigger margin is
  * the same bug at a lower rate. A spec passes its own `now` and `setTimer`.
+ *
+ * Bun 1.1.43, which this workspace pinned when this was written, has
+ * `jest.useFakeTimers()` without `jest.advanceTimersByTime`, so there was
+ * nothing to advance a faked timer with. Bun 1.4.3 has it, and the clock stays
+ * a value anyway: it costs nothing and needs no global faked.
  */
 export interface Clock {
   clearTimer: (timer: ReturnType<typeof setTimeout>) => void
