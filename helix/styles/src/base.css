@@ -489,8 +489,10 @@ helix-text[tone="warning"][emphasis="muted"] {
   );
 }
 
-/* Hover deepens the wash rather than drawing a line that was not there. */
-[data-button]:not(:disabled):hover {
+/* Hover deepens the wash rather than drawing a line that was not there. A press
+   looks as a hover does, as on the element, so a tap on a touch screen shows a
+   step. */
+[data-button]:not(:disabled):is(:hover, :active) {
   background-color: var(
     --button-background-color-hover,
     var(--button-background-color, color-mix(in oklab, var(--_button-tone) 12%, transparent))
@@ -517,7 +519,7 @@ helix-text[tone="warning"][emphasis="muted"] {
   border-color: transparent;
   color: var(--button-foreground-color, var(--_button-on-tone));
 }
-[data-button="solid"]:not(:disabled):hover {
+[data-button="solid"]:not(:disabled):is(:hover, :active) {
   background-color: var(
     --button-background-color-hover,
     var(--button-background-color, var(--_button-fill-hover))
@@ -546,7 +548,7 @@ helix-text[tone="warning"][emphasis="muted"] {
   color: var(--button-foreground-color, var(--_button-ink));
 }
 
-[data-button="subtle"]:not(:disabled):hover {
+[data-button="subtle"]:not(:disabled):is(:hover, :active) {
   background-color: var(
     --button-background-color-hover,
     var(--button-background-color, color-mix(in oklab, var(--_button-tone) 22%, transparent))
@@ -629,7 +631,7 @@ helix-button-group[orientation="vertical"]:not([layout="spaced"]) > button:not(:
    on, which on a raised panel reads as a hole rather than as a press. On the
    page, where the same token was chosen, the step is 1.11 and correct. 8%
    wherever the resting state is transparent. */
-[data-button="ghost"]:not(:disabled):hover {
+[data-button="ghost"]:not(:disabled):is(:hover, :active) {
   background-color: var(
     --button-background-color-hover,
     var(--button-background-color, color-mix(in oklab, var(--_button-tone) 8%, transparent))

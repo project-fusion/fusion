@@ -119,6 +119,8 @@ export interface KeyNames {
    * is a word already.
    */
   spoken: string
+  /** Each key in words, in the order of `keys`, such as `Command` where `keys` holds `⌘`. */
+  words: string[]
 }
 
 /**
@@ -183,5 +185,6 @@ export const keyNames = (
     keys,
     separator: apple ? (worded ? '-' : '') : '+',
     spoken: glyphs ? words.join(' ') : '',
+    words,
   }
 }

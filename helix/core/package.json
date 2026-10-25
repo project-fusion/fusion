@@ -23,6 +23,12 @@
       "helix-development": "./dist/utils/audit-children/audit-children.js",
       "default": "./dist/utils/audit-children/audit-children-off.js"
     },
+    "./audits/description": {
+      "types": "./dist/utils/audit-description/audit-description.d.ts",
+      "development": "./dist/utils/audit-description/audit-description.js",
+      "helix-development": "./dist/utils/audit-description/audit-description.js",
+      "default": "./dist/utils/audit-description/audit-description-off.js"
+    },
     "./audits/name": {
       "types": "./dist/utils/audit-name/audit-name.d.ts",
       "development": "./dist/utils/audit-name/audit-name.js",
@@ -59,8 +65,56 @@
       "helix-development": "./dist/utils/audit-source/audit-source.js",
       "default": "./dist/utils/audit-source/audit-source-off.js"
     },
+    "./capabilities/*": {
+      "types": "./dist/capabilities/*/index.d.ts",
+      "default": "./dist/capabilities/*/index.js"
+    },
+    "./capabilities/*/fake": {
+      "types": "./dist/capabilities/*/fake.d.ts",
+      "default": "./dist/capabilities/*/fake.js"
+    },
+    "./capabilities/types": {
+      "types": "./dist/capabilities/types.generated.d.ts",
+      "default": "./dist/capabilities/types.generated.js"
+    },
     "./custom-elements.json": "./custom-elements.json",
+    "./derivations": {
+      "types": "./dist/utils/derivations/derivations.d.ts",
+      "default": "./dist/utils/derivations/derivations.js"
+    },
+    "./layers": {
+      "types": "./dist/utils/layers/layers.d.ts",
+      "default": "./dist/utils/layers/layers.js"
+    },
+    "./machines/*": {
+      "types": "./dist/machines/*.d.ts",
+      "default": "./dist/machines/*.js"
+    },
+    "./menu-items": {
+      "types": "./dist/utils/menu-items/menu-items.d.ts",
+      "default": "./dist/utils/menu-items/menu-items.js"
+    },
+    "./numbers": {
+      "types": "./dist/utils/number-format/number-format.d.ts",
+      "default": "./dist/utils/number-format/number-format.js"
+    },
     "./package.json": "./package.json",
+    "./reorder": {
+      "types": "./dist/utils/reorder/reorder.d.ts",
+      "default": "./dist/utils/reorder/reorder.js"
+    },
+    "./select-all": {
+      "types": "./dist/utils/select-all/select-all.d.ts",
+      "default": "./dist/utils/select-all/select-all.js"
+    },
+    "./stack": {
+      "types": "./dist/utils/stack/stack.d.ts",
+      "default": "./dist/utils/stack/stack.js"
+    },
+    "./swipe": {
+      "types": "./dist/utils/swipe/swipe.d.ts",
+      "default": "./dist/utils/swipe/swipe.js"
+    },
     "./words": {
       "types": "./dist/words/index.d.ts",
       "default": "./dist/words/index.js"
@@ -82,7 +136,8 @@
   "dependencies": {
     "@floating-ui/dom": "^1.8.0",
     "@fusion.dev/helix-icons": "workspace:*",
-    "tslib": "^2.8.1"
+    "tslib": "^2.8.1",
+    "uqr": "^0.1.3"
   },
   "devDependencies": {
     "@fusion.dev/helix-cem": "workspace:*",
@@ -96,6 +151,11 @@
       "development": "./src/utils/audit-children/audit-children.ts",
       "helix-development": "./src/utils/audit-children/audit-children.ts",
       "default": "./src/utils/audit-children/audit-children-off.ts"
+    },
+    "#audit-description": {
+      "development": "./src/utils/audit-description/audit-description.ts",
+      "helix-development": "./src/utils/audit-description/audit-description.ts",
+      "default": "./src/utils/audit-description/audit-description-off.ts"
     },
     "#audit-name": {
       "development": "./src/utils/audit-name/audit-name.ts",

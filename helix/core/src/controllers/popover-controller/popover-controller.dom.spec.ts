@@ -32,25 +32,36 @@ afterEach(() => {
 interface Scene {
   anchor: HTMLElement
   asked: string[]
+  /** What the host was given to drive, in the order it was given them. */
+  controllers: { hostDisconnected?: () => void }[]
   dismissed: number
   popover: PopoverController
   surface: HTMLElement
 }
 
 const scene = (
-  options: { api?: boolean; attribute?: boolean; place?: boolean | (() => boolean) } = {},
+  options: {
+    api?: boolean
+    attribute?: boolean
+    place?: boolean | (() => boolean)
+    presented?: (sheet: boolean) => void
+  } = {},
 ): Scene => {
-  const { api = true, attribute = true, place } = options
+  const { api = true, attribute = true, place, presented } = options
   document.body.innerHTML =
     '<div id="host"><button id="anchor">open</button><div id="surface"></div></div>'
   const host = document.getElementById('host') as HTMLElement
-  Object.assign(host, { addController: () => {}, requestUpdate: () => {} })
+  const controllers: (Scene['controllers'][number] & { hostConnected?: () => void })[] = []
+  Object.assign(host, {
+    addController: (one: Scene['controllers'][number]) => controllers.push(one),
+    requestUpdate: () => {},
+  })
   const anchor = document.getElementById('anchor') as HTMLElement
   const surface = document.getElementById('surface') as HTMLElement
   if (attribute) {
     surface.setAttribute('popover', 'manual')
   }
-  const made = { anchor, asked: [] as string[], dismissed: 0, surface } as Scene
+  const made = { anchor, asked: [] as string[], controllers, dismissed: 0, surface } as Scene
   if (api) {
     Object.assign(surface, {
       hidePopover: () => made.asked.push('hide'),
@@ -69,6 +80,7 @@ const scene = (
       made.dismissed += 1
     },
     ...(place === undefined ? {} : { place }),
+    ...(presented === undefined ? {} : { onPresent: presented, presentation: () => 'auto' }),
     surface: () => surface,
   })
   live.push(made.popover)
@@ -231,6 +243,71 @@ describe('a surface whose position is a fact about the page', () => {
   })
 })
 
+describe('a surface that may be a sheet', () => {
+  const real = window.matchMedia
+  afterEach(() => {
+    window.matchMedia = real
+  })
+
+  /** A window narrower than 30rem while `narrow` holds, which the spec moves. */
+  const windowOf = (narrow: { matches: boolean }) => {
+    const heard = new Set<() => void>()
+    window.matchMedia = (() => ({
+      addEventListener: (_: string, listener: () => void) => heard.add(listener),
+      get matches() {
+        return narrow.matches
+      },
+      removeEventListener: (_: string, listener: () => void) => heard.delete(listener),
+    })) as never
+    return () => {
+      for (const listener of [...heard]) {
+        listener()
+      }
+    }
+  }
+
+  /* A sheet stands on the window's bottom edge by its own stylesheet, so
+     nothing measures it, and its entrance runs from the frame after it shows. */
+  test('is a sheet in a narrow window: told so, never measured, and placed a frame later', async () => {
+    const narrow = { matches: true }
+    windowOf(narrow)
+    const told: boolean[] = []
+    const one = scene({ presented: (sheet) => told.push(sheet) })
+    for (const controller of one.controllers) {
+      ;(controller as { hostConnected?: () => void }).hostConnected?.()
+    }
+    one.popover.show()
+    expect([told, one.asked.includes('measure')]).toEqual([[true], false])
+    expect(one.surface.hasAttribute('data-placed')).toBe(false)
+    await new Promise((done) => setTimeout(done, 40))
+    expect(one.surface.hasAttribute('data-placed')).toBe(true)
+  })
+
+  /* A turned phone or a resized window moves it between the two while it shows. */
+  test('is placed against its anchor once the window widens, and let go of as it narrows', async () => {
+    const narrow = { matches: true }
+    const move = windowOf(narrow)
+    const told: boolean[] = []
+    const one = scene({ presented: (sheet) => told.push(sheet) })
+    for (const controller of one.controllers) {
+      ;(controller as { hostConnected?: () => void }).hostConnected?.()
+    }
+    one.popover.show()
+    narrow.matches = false
+    move()
+    one.popover.hostUpdated()
+    expect(one.asked).toContain('measure')
+    await new Promise((done) => setTimeout(done, 0))
+    expect(one.surface.style.getPropertyValue('left')).toBe('0px')
+    narrow.matches = true
+    move()
+    one.popover.hostUpdated()
+    expect(told).toEqual([true, false, true])
+    expect(one.surface.style.getPropertyValue('left')).toBe('')
+    expect(one.surface.hasAttribute('data-placed')).toBe(true)
+  })
+})
+
 describe('hiding', () => {
   test('takes it out of the top layer and stops everything watching', () => {
     const one = scene()
@@ -278,10 +355,19 @@ describe('what closing means', () => {
 })
 
 describe('a host that has left the page', () => {
+  /* Every controller the host was given hears it go, as a Lit host tells
+     them, so the dismisser stops listening on the document. Disconnecting the
+     popover alone left an Escape listener there that canceled the key in every
+     spec after this one, which failed `webKeys` on CI on October 11, 2026. */
   test('is no longer showing anything', () => {
     const one = scene()
     one.popover.show()
-    one.popover.hostDisconnected()
+    for (const controller of one.controllers) {
+      controller.hostDisconnected?.()
+    }
     expect(one.popover.open).toBe(false)
+    const press = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' })
+    document.dispatchEvent(press)
+    expect([one.dismissed, press.defaultPrevented]).toEqual([0, false])
   })
 })

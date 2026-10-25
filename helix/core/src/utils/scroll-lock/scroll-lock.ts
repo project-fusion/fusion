@@ -58,3 +58,36 @@ export const unlockScroll = (holder: Element): void => {
 
 /** The surfaces holding the page still, in the order they took it. */
 export const scrollHolders = (): Element[] => [...(record()?.holders ?? [])]
+
+/** Who hears a modal surface open, kept on `globalThis` beside the lock. */
+const MODAL_HEARD = Symbol.for('fusion.helix.modal-heard')
+
+/** The listeners, made the first time one is added. */
+const heard = (): Set<() => void> => {
+  const globals = globalThis as unknown as Record<symbol, Set<() => void> | undefined>
+  globals[MODAL_HEARD] ??= new Set()
+  return globals[MODAL_HEARD]
+}
+
+/**
+ * Opens `dialog` with `showModal()` and tells each listener `onModalOpen`
+ * added, once it stands open.
+ *
+ * Dialog, Drawer and Lightbox open through it, so a toast's stack can move
+ * into the modal that opened: the browser makes everything outside an open
+ * modal inert, the top layer included.
+ */
+export const openModal = (dialog: HTMLDialogElement): void => {
+  dialog.showModal()
+  for (const hear of [...heard()]) {
+    hear()
+  }
+}
+
+/** Hears each modal surface `openModal` opens, until the returned function is called. */
+export const onModalOpen = (hear: () => void): (() => void) => {
+  heard().add(hear)
+  return () => {
+    heard().delete(hear)
+  }
+}

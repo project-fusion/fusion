@@ -1,6 +1,9 @@
 /* The unregistered-child warning, which a production build resolves to a
    function that does nothing. See `utils/audit-children`. */
 export { auditChildren, auditEntry } from '#audit-children'
+/* The static-description warning, which a production build resolves to a
+   function that does nothing. See `utils/audit-description`. */
+export { auditDescription } from '#audit-description'
 /* The missing-name warning, which a production build resolves to a function
    that does nothing. See `utils/audit-name`. */
 export { auditIconControl, auditName } from '#audit-name'
@@ -123,6 +126,10 @@ export {
   PopoverController,
   type PopoverOptions,
 } from './controllers/popover-controller/popover-controller.js'
+export {
+  PresentationController,
+  type PresentationOptions,
+} from './controllers/presentation-controller/presentation-controller.js'
 export {
   RelativeClockController,
   type RelativeClockOptions,
@@ -324,6 +331,8 @@ export {
   type DrawAutofillOptions,
   drawAutofill,
 } from './utils/autofill-select/autofill-select.js'
+export { initialsOf } from './utils/avatar/avatar.js'
+export { badgeBlank, badgeCapped, badgeText, badgeWords } from './utils/badge-count/badge-count.js'
 export {
   type BoxAxisText,
   type BoxLabel,
@@ -500,6 +509,20 @@ export {
   type LinkModifiers,
   type LinkTarget,
 } from './utils/follow-link/follow-link.js'
+export {
+  type DateDrawn,
+  type DateProps,
+  type DateReading,
+  dateExpires,
+  dateSource,
+  isReading,
+  readDate,
+} from './utils/format-date/format-date.js'
+export {
+  type Asked,
+  DATE_FIELDS,
+  formatOptions,
+} from './utils/format-date/format-date-options.js'
 export { formatNumbers } from './utils/format-numbers/format-numbers.js'
 export { glyphPath } from './utils/glyph-path/glyph-path.js'
 export {
@@ -509,6 +532,7 @@ export {
   gridMove,
   pageRows,
 } from './utils/grid-move/grid-move.js'
+export { gridLength, gridTracks } from './utils/grid-template/grid-template.js'
 export { headingIn, headingsIn } from './utils/heading-in/heading-in.js'
 export { headingLevel } from './utils/heading-level/heading-level.js'
 export { type HostAria, hostAria } from './utils/host-aria/host-aria.js'
@@ -529,6 +553,7 @@ export { inlineStep } from './utils/inline-step/inline-step.js'
 export { isRtl } from './utils/is-rtl/is-rtl.js'
 export { keyClaimed } from './utils/key-claimed/key-claimed.js'
 export { labelsOf } from './utils/labels-of/labels-of.js'
+export { placedStates } from './utils/layers/layers.js'
 export { type Curve, columnPoints, linePath, type Point } from './utils/line-path/line-path.js'
 export { type EndInSight, endInSight } from './utils/load-more/load-more.js'
 export { localeOf, runtimeLocale } from './utils/locale-of/locale-of.js'
@@ -575,7 +600,15 @@ export {
   shortNumber,
   solid,
 } from './utils/projection/projection.js'
+export {
+  QR_QUIET,
+  type QrCorrection,
+  type QrStyle,
+  qrModules,
+  qrPath,
+} from './utils/qr-code/qr-code.js'
 export { rangeAdd } from './utils/range-add/range-add.js'
+export { type RangeExtension, rangeExtend } from './utils/range-extend/range-extend.js'
 export {
   type ColorBytes,
   type ColorBytesAlpha,
@@ -679,7 +712,13 @@ export {
   scrollRoom,
   scrollWithin,
 } from './utils/scroll-item-into-view/scroll-item-into-view.js'
-export { lockScroll, scrollHolders, unlockScroll } from './utils/scroll-lock/scroll-lock.js'
+export {
+  lockScroll,
+  onModalOpen,
+  openModal,
+  scrollHolders,
+  unlockScroll,
+} from './utils/scroll-lock/scroll-lock.js'
 export { slotFilled, slotNamed } from './utils/slot-filled/slot-filled.js'
 export { SlottedGlyph } from './utils/slotted-glyph/slotted-glyph.js'
 export { slottedWords } from './utils/slotted-words/slotted-words.js'
@@ -721,10 +760,15 @@ export { stopPress } from './utils/stop-press/stop-press.js'
 export {
   edgeOffset,
   FLING,
+  type HandOver,
+  handsOver,
   parseSnapPoints,
+  roomToward,
+  SCROLL_LOCK,
   type SwipeAxis,
   type SwipeEdge,
   type SwipeRelease,
+  scrollsToStart,
   settleSwipe,
   snapTravel,
   swipeAxis,
@@ -734,6 +778,8 @@ export {
 } from './utils/swipe/swipe.js'
 export { tellDisclosure } from './utils/tell-disclosure/tell-disclosure.js'
 export { subscribe } from './utils/ticker/ticker.js'
+export { joinSaid } from './utils/toast/toast-derivations.js'
+export { type ToggleState, toggled } from './utils/toggled/toggled.js'
 export {
   type HelixStatusTone,
   TONE_MARKS,
@@ -742,6 +788,7 @@ export {
 } from './utils/tone-marks/tone-marks.js'
 export { toolbarAround, toolbarAxis } from './utils/toolbar-around/toolbar-around.js'
 export { type TreeArrow, type TreeArrowRow, treeArrow } from './utils/tree-arrow/tree-arrow.js'
+export { figureOf, movementOf } from './utils/trend-figure/trend-figure.js'
 export {
   Typeahead,
   type TypeaheadBy,

@@ -10,8 +10,10 @@ import {
   size,
 } from '@floating-ui/dom'
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
+import { arrowCenter, arrowEdges, matchedInlineSize } from '../../utils/layers/layers.js'
 
 export type { Side }
+export { matchedInlineSize }
 
 /**
  * Where a panel lands against its anchor: a side, optionally aligned to an end
@@ -46,9 +48,6 @@ export type Placement =
   | 'top'
   | 'top-end'
   | 'top-start'
-
-/** The panel's edge facing its anchor, for each side of it the panel can land on. */
-const FACING: Record<Side, Side> = { bottom: 'top', left: 'right', right: 'left', top: 'bottom' }
 
 /**
  * The panel's largest corner radius, which is how far its arrow has to stay
@@ -197,19 +196,6 @@ export interface FloatingOptions {
    */
   within?: () => Element | null | undefined
 }
-
-/**
- * How wide a panel that matches its anchor is drawn: the anchor's width, no
- * wider than the room the panel has inside the window's margins.
- *
- * **A trigger as wide as the window gave a list as wide as the window**, and
- * `shift` keeps a margin it then cannot keep: a Select spanning a phone with no
- * gutter opened its list 8 pixels past the end edge, on both sides of the
- * window at once. The room is Floating UI's `availableWidth` after the shift,
- * so a panel that fits is the anchor's width exactly, as before.
- */
-export const matchedInlineSize = (anchor: number, room: number): number =>
-  Math.round(Math.max(0, Math.min(anchor, room)))
 
 /**
  * Places one element against another, and keeps it there.
@@ -581,18 +567,11 @@ export class FloatingController implements ReactiveController {
            outrank inline ones, so an edge pinned there still won, and two
            opposite edges both set leave the writing direction to decide which
            one counts. */
-        const facing = FACING[placement.split('-')[0] as Side]
-        const reach =
-          (facing === 'left' || facing === 'right' ? pointer.offsetWidth : pointer.offsetHeight) / 2
-        const edges: Record<Side, string> = {
-          bottom: 'auto',
-          left: point.x === undefined ? 'auto' : `${point.x}px`,
-          right: 'auto',
-          top: point.y === undefined ? 'auto' : `${point.y}px`,
-        }
-        edges[facing] = `${-reach}px`
-        for (const [edge, value] of Object.entries(edges)) {
-          pointer.style.setProperty(edge, value, 'important')
+        const box = { height: pointer.offsetHeight, width: pointer.offsetWidth }
+        const edges = arrowEdges(placement, point, box)
+        for (const edge of ['bottom', 'left', 'right', 'top'] as const) {
+          const at = edges[edge]
+          pointer.style.setProperty(edge, at === undefined ? 'auto' : `${at}px`, 'important')
         }
         /* Where the pointer ended up, as the center of it, published for
            anything that has to grow out of the thing it points at.
@@ -609,13 +588,14 @@ export class FloatingController implements ReactiveController {
          * edge, so `--floating-arrow-y` is left unset and a consumer's fallback
          * stands. Cleared rather than zeroed when absent, so the fallback in
          * `var()` is what applies. */
+        const center = arrowCenter(point, box)
         floating.style.setProperty(
           '--floating-arrow-x',
-          point.x === undefined ? '' : `${Math.round(point.x + pointer.offsetWidth / 2)}px`,
+          center.x === undefined ? '' : `${center.x}px`,
         )
         floating.style.setProperty(
           '--floating-arrow-y',
-          point.y === undefined ? '' : `${Math.round(point.y + pointer.offsetHeight / 2)}px`,
+          center.y === undefined ? '' : `${center.y}px`,
         )
       }
     })

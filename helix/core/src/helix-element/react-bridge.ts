@@ -505,6 +505,43 @@ export const bindReactHandler = (host: EventTarget, event: Event): void => {
       host.addEventListener(event.type, handler as EventListener)
     }
   }
+  bindAbove(host, event)
+}
+
+/**
+ * Binds the handlers React is holding for a bubbling event of ours on the
+ * elements it reaches above the host.
+ *
+ * **A handler is very often on an ancestor**: `onhelix-action` on a list
+ * hears the event each of its items sends, and the list itself never sends
+ * it, so binding at the sender alone left a server-drawn list deaf after
+ * hydration. The walk goes up through shadow roots only for a composed
+ * event, the path the event itself takes. Adding a listener to an ancestor
+ * before dispatch reaches it in this same dispatch, and the same callback
+ * React binds later is a no-op, as above.
+ */
+const bindAbove = (host: EventTarget, event: Event): void => {
+  if (!(event.bubbles && event.type.includes('-'))) {
+    return
+  }
+  const key = `on${event.type}`
+  let node = parentOf(host as Node, event.composed)
+  while (node !== null) {
+    const handler = reactPropsOf(node)?.[key]
+    if (typeof handler === 'function') {
+      node.addEventListener(event.type, handler as EventListener)
+    }
+    node = parentOf(node, event.composed)
+  }
+}
+
+/** The node an event goes to after `node`: its parent, or a shadow root's host. */
+const parentOf = (node: Node, composed: boolean): Node | null => {
+  if (node.parentNode !== null) {
+    return node.parentNode
+  }
+  const root = node as Node & { host?: Node }
+  return composed && root.host !== undefined ? root.host : null
 }
 
 /**

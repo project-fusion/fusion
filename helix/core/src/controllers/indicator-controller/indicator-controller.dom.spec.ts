@@ -54,18 +54,28 @@ interface Scene {
 }
 
 const scene = (
-  options: { active?: Box | null; border?: number; own?: Box; rtl?: boolean } = {},
+  options: {
+    active?: Box | null
+    border?: number
+    own?: Box
+    rtl?: boolean
+    settles?: Promise<void>
+  } = {},
 ): Scene => {
   const {
     active: activeBox = box(40, 0, 60, 30),
     border = 0,
     own = box(0, 0, 300, 30),
     rtl,
+    settles,
   } = options
   document.body.innerHTML =
     '<div id="host"><div id="surface"><span id="active"></span><i id="indicator"></i></div></div>'
   const host = document.getElementById('host') as HTMLElement
   Object.assign(host, { addController: () => {}, requestUpdate: () => {} })
+  if (settles) {
+    Object.assign(host, { whenSettled: settles })
+  }
   const surface = document.getElementById('surface') as HTMLElement
   const active = document.getElementById('active') as HTMLElement
   const indicator = document.getElementById('indicator') as HTMLElement
@@ -249,6 +259,22 @@ describe('a mark on its way somewhere', () => {
     const one = scene()
     one.place()
     expect(one.indicator.hasAttribute('data-moving')).toBe(false)
+  })
+
+  /* A Helix host has its transitions off until it settles, so nothing would
+     end a move made before then and the marker would stay until the timer. */
+  test('nor on a move made before the host has settled', async () => {
+    let settle = (): void => {}
+    const one = scene({ settles: new Promise<void>((resolve) => (settle = resolve)) })
+    one.place()
+    one.active.getBoundingClientRect = (() => box(140, 0, 60, 30)) as never
+    one.place()
+    expect(one.indicator.hasAttribute('data-moving')).toBe(false)
+    settle()
+    await Promise.resolve()
+    one.active.getBoundingClientRect = (() => box(40, 0, 60, 30)) as never
+    one.place()
+    expect(one.indicator.hasAttribute('data-moving')).toBe(true)
   })
 
   test('nor on a placement that put it back where it was', () => {
