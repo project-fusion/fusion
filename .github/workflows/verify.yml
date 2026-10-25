@@ -1092,6 +1092,11 @@ jobs:
   # **Every run, the skippable diffs included.** `touched.sh` lets the browser
   # jobs skip a change under `fusion/docs/`, which no example reads; the site
   # renders that writing.
+  #
+  # **And the site hydrated, before the pictures.** `check-hydration.mjs`
+  # makes each page's first interaction one only an `onhelix-*` handler
+  # answers, so a React bump, the dependency bot's included, that breaks
+  # Helix's React bridge fails here. The pictures never press anything.
   site:
     needs: [proven, warm]
     if: ${{ !cancelled() && needs.proven.outputs.proven != 'true' && needs.warm.result == 'success' }}  # dialect:quoted, GitHub's function
@@ -1131,6 +1136,7 @@ jobs:
           path: fusion/site/.next/cache
       # Everything but `next build` is a restore of what `warm` built.
       - name: Build the site
+        id: build
         run: bunx turbo run build --filter=@fusion.dev/site
       - name: Look for what the build compiled
         id: compiled
@@ -1142,10 +1148,19 @@ jobs:
         with:
           key: ${{ steps.next.outputs.cache-primary-key }}
           path: fusion/site/.next/cache
+      # Installed here rather than by the visual action, since the hydration
+      # check runs in it first.
+      - name: Install Chromium
+        uses: ./.github/actions/browser
+      - name: Press the site's controls after hydration
+        run: bun run --cwd fusion/site hydration
+      # Pictured whether the hydration check passed or not, so a run reports both.
       - name: Picture the site
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}  # dialect:quoted, GitHub's function
         uses: ./helix/visual/action
         with:
           args: --config fusion/site/visual.config.ts --workers 2
+          browser: 'false'
           helix: bun helix/cli/npm/bin.mjs
           mode: check
           playwright: bunx playwright
