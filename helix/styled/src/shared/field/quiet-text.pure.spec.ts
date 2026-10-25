@@ -35,7 +35,7 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['date-input/root/date-input-root.css', '[part="segments"]', '--_segment-placeholder-color'],
   ['date-input/root/date-input-root.css', 'slot[name="start"]::slotted(*)', 'color'],
   ['date-picker/root/date-picker-root.css', '[part="weekday"]', 'color'],
-  ['drilldown/item/drilldown-item.css', 'slot[name="description"]', 'color'],
+  ['drilldown/item/drilldown-item.generated.css', 'slot[name="description"]', 'color'],
   ['filter-input/chip/filter-chip.css', '[part="dismiss"]', 'color'],
   ['filter-input/chip/filter-chip.css', '[part="operator"]', 'color'],
   ['filter-input/root/filter-input-root.css', '[part="clear"]', 'color'],
@@ -44,7 +44,7 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['graph/root/graph-root.css', '[part~="legend-item-hidden"]', 'color'],
   ['graph/root/graph-root.css', '[part="search-field"]::placeholder', 'color'],
   ['graph/root/graph-root.css', '[part="settling"]', 'color'],
-  ['image/root/image-root.css', '[part="fallback"]', 'color'],
+  ['image/root/image-root.generated.css', '[part="fallback"]', 'color'],
   ['input/root/input-root.css', '[part="field"]', 'color'],
   ['input/root/input-root.css', 'slot[name="start"]::slotted(*)', 'color'],
   ['lightbox/item/lightbox-item.css', '[part="item"] ::slotted([slot="description"])', 'color'],
@@ -52,9 +52,9 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['log/line/log-line.css', '[part~="line-debug"]', 'color'],
   ['log/root/log-root.css', ':host', '--log-ansi-bright-black'],
   ['map/root/map-root.css', '::slotted([slot="attribution"])', 'color'],
-  ['menu/item/menu-item.css', '[part="end"]', 'color'],
-  ['menu/item/menu-item.css', 'slot[name="description"]', 'color'],
-  ['menu/section/menu-section.css', '[part="heading"]', 'color'],
+  ['menu/item/menu-item.generated.css', '[part="end"]', 'color'],
+  ['menu/item/menu-item.generated.css', 'slot[name="description"]', 'color'],
+  ['menu/section/menu-section.generated.css', '[part="heading"]', 'color'],
   ['notifications/group/notification-group.css', '[part="count"]', 'color'],
   ['notifications/notification/notification.css', '[part="dismiss"]', 'color'],
   ['log/line/log-line.css', '[part="count"]', 'color'],
@@ -72,10 +72,10 @@ const QUIET: [sheet: string, selector: string, property: string][] = [
   ['sandbox/source/sandbox-source.css', '[part="line"]::before', 'color'],
   ['sandbox/status-bar/sandbox-status-bar.css', ':host', 'color'],
   ['slider/root/slider-root.css', '[part="marker-label"]', 'color'],
-  ['steps/root/steps-root.css', ':host([marker="numeric"])', '--_steps-marker-color'],
-  ['steps/step/step.css', '[part="description"]', 'color'],
-  ['tabs/root/tabs-root.css', '[part="scroll-start"]', 'color'],
-  ['tabs/tab/tab.css', '[part="tab"]', 'color'],
+  ['steps/root/steps-root.generated.css', ':host([variant="numeric"])', '--_steps-marker-color'],
+  ['steps/step/step.generated.css', '[part="description"]', 'color'],
+  ['tabs/root/tabs-root.generated.css', '[part="scroll-start"]', 'color'],
+  ['tabs/tab/tab.generated.css', '[part="tab"]', 'color'],
   ['textarea/root/textarea-root.css', 'slot[name="start"]::slotted(*)', 'color'],
   ['time-input/root/time-input-root.css', '[part="segments"]', '--_segment-placeholder-color'],
   ['time-input/root/time-input-root.css', 'slot[name="start"]::slotted(*)', 'color'],
@@ -149,8 +149,8 @@ describe('quiet text', () => {
   /* A step ahead sat one ink below a finished one, and the range holds one
      quiet ink, so the step between them is a weight. */
   test('a numeric step ahead is set lighter than a finished one', () => {
-    const root = readFileSync(join(SRC, 'steps/root/steps-root.css'), 'utf8')
-    const step = readFileSync(join(SRC, 'steps/step/step.css'), 'utf8')
+    const root = readFileSync(join(SRC, 'steps/root/steps-root.generated.css'), 'utf8')
+    const step = readFileSync(join(SRC, 'steps/step/step.generated.css'), 'utf8')
     expect(root).toMatch(
       /:host\(\[marker="numeric"\]\) \{[^}]*--_steps-marker-weight: var\(--helix-weight-regular\);/,
     )

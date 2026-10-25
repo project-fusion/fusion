@@ -24,15 +24,15 @@ export function Example() {
 
       <helix-list
         kind="description"
-        label="Account details"
+        label="Account settings"
       >
-        <helix-list-item>
+        <helix-list-item href="#plan">
           Plan
-          <span slot="description">Team, billed yearly.</span>
+          <helix-text slot="description">Team, billed yearly.</helix-text>
         </helix-list-item>
-        <helix-list-item>
+        <helix-list-item href="#storage">
           Storage
-          <span slot="description">4.2 GB of 10 GB used.</span>
+          <helix-text slot="description">4.2 GB of 10 GB used.</helix-text>
         </helix-list-item>
       </helix-list>
     </helix-flex>

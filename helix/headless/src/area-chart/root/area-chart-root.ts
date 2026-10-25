@@ -84,9 +84,10 @@ export interface AreaStack {
  * parts add up to the total at each reading, and the top edge is that total.
  * The thickness of a band is that part's amount.
  *
- * Use `LineChart` with `area` to show how each series moved: it fills each
- * series from the floor separately, so the fills overlap. Use this chart to
- * show the composition: it stacks the series.
+ * Use this chart to show the composition: it measures from zero and stacks
+ * the series. Use `LineChart` with `area` to show how each series moved: it
+ * measures from the data's own range and fills each series down to the floor
+ * of that range, so the fills overlap and a small change still shows.
  *
  * **The value axis always starts at zero**, as in `BarChart`, because a band's
  * thickness is its value. For the same reason there is no streamgraph mode,
@@ -107,8 +108,7 @@ export interface AreaStack {
  *
  * `overlap` draws every band from zero, one in front of another, so each
  * part's own amount is its height: the first column is in front. Use it to
- * compare the parts with each other; the scale then fits the largest part
- * rather than the total.
+ * compare the parts with each other. The scale then fits the largest part.
  *
  * `value-axis` draws the scale's numbers beside the plot, at the levels
  * `gridlines` rules: amounts in `locale`, or percentages under `share`.

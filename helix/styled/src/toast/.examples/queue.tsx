@@ -1,7 +1,6 @@
 export function Example() {
   return (
     <helix-toast
-      label="Notifications"
       max-visible="2"
       placement="bottom-end"
     >

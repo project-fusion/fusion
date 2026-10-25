@@ -3,7 +3,13 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { lintOf, type ManifestSource } from '@fusion.dev/helix-diagnostics'
-import { catalog, type ExampleSource, publishedBy } from './catalog.js'
+import {
+  catalog,
+  type ExampleSource,
+  type NativeRecord,
+  publishedBy,
+  withPlatforms,
+} from './catalog.js'
 import type { HelixManifest, HelixMetadata } from './types.js'
 import { renderJsx } from './typings/jsx.js'
 import { renderSvelte } from './typings/svelte.js'
@@ -20,6 +26,15 @@ export interface HelixCemOptions {
    * for Vue templates, which are not JSX and augment a different interface.
    */
   frameworkTypes?: boolean
+
+  /**
+   * The package holding the platform-neutral sources of the families this
+   * package also draws on React Native, relative to this one, such as
+   * `../neutral`. `analyze` asks `helix family platforms` there what each
+   * element is called on a phone, and `api.json` says so. Absent, every
+   * family is the web's alone.
+   */
+  native?: string
 
   /**
    * Package the element classes are imported from in the typings, which
@@ -338,6 +353,27 @@ export const peersOf = (cwd: string): Map<string, string> => {
 const helix = (): string => createRequire(import.meta.url).resolve('@fusion.dev/helix-cli/bin.mjs')
 
 /**
+ * What each element is called on React Native, from `helix family platforms`
+ * over the neutral sources at `native`, which reads the manifest `analyze`
+ * has just written. Empty where the package draws nothing natively.
+ */
+const nativeOf = (native: string | undefined, cwd: string): NativeRecord => {
+  if (native === undefined) {
+    return {}
+  }
+  const named = spawnSync(process.execPath, [helix(), 'family', 'platforms', native], {
+    cwd,
+    encoding: 'utf8',
+    maxBuffer: 1024 * 1024 * 16,
+    stdio: ['ignore', 'pipe', 'inherit'],
+  })
+  if (named.status !== 0) {
+    throw new Error(`helix family platforms exited ${named.status} in ${cwd}`)
+  }
+  return JSON.parse(named.stdout) as NativeRecord
+}
+
+/**
  * Writes a package's manifest, then its typings.
  *
  * The manifest is `helix manifest build`'s, which is byte for byte what
@@ -374,9 +410,12 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
     const below = [...new Map([...dependencies, ...peersOf(cwd)])]
       .filter(([dependency]) => dependency.startsWith('@fusion.dev/helix'))
       .map(([, at]) => JSON.parse(readFileSync(at, 'utf8')) as HelixManifest)
-    const families = publishedBy(
-      catalog([customElementsManifest, ...below], examplesOnDisk(cwd), bubblingOf(cwd)),
-      name,
+    const families = withPlatforms(
+      publishedBy(
+        catalog([customElementsManifest, ...below], examplesOnDisk(cwd), bubblingOf(cwd)),
+        name,
+      ),
+      nativeOf(options.native, cwd),
     )
     writeFileSync(
       join(cwd, API),
@@ -410,10 +449,14 @@ export {
   type ExampleSource,
   type Family,
   findInCatalog,
+  type NativeElement,
+  type NativeRecord,
+  type Platforms,
   type PropertyDoc,
   publishedBy,
   type Render,
   rendersOf,
+  withPlatforms,
 } from './catalog.js'
 export { displayName, familyOf, place, startCase, tierOf } from './naming.js'
 export type {

@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessCard } from '@fusion.dev/helix-headless/card'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './card-root.css.js'
+import { styles } from './card-root.generated.css.js'
 
 /**
  * @summary Groups related content and actions into a single surface.

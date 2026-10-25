@@ -2,7 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessBadge } from '@fusion.dev/helix-headless/badge'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles } from './badge-root.css.js'
+import { styles } from './badge-root.generated.css.js'
 
 /**
  * @summary A count or a dot pinned to the corner of another element.

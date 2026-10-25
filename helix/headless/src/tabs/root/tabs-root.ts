@@ -12,6 +12,8 @@ import {
   MIRROR_RULE,
   MixinControllerActive,
   scrollWithin,
+  slottedWords,
+  typeaheadBy,
   whenHydrated,
 } from '@fusion.dev/helix-core'
 import { caretDown, caretLeft, caretRight, caretUp } from '@fusion.dev/helix-icons'
@@ -39,12 +41,15 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * tab list says `aria-orientation="vertical"`. The arrow keys of both axes move
  * between tabs either way.
  *
- * A tab with an `href` is a link, for tabs that are pages of a site. Pressing
- * it follows the link. Where any tab is a link, the arrow keys move focus
- * without choosing on every tab of the list, as under `manual`, so arrowing
- * past a tab never leaves the page and the list answers the keys one way.
- * Mark the tab of the page you are on with `selected`, or set `active` to its
- * value.
+ * **A tab with an `href` is a link that still controls a panel**, for tabs a
+ * router drives: each tab links to a route, and your router renders that
+ * route's content in the tab's panel. Pressing it chooses the tab and follows
+ * the link. Where any tab is a link, the arrow keys move focus without
+ * choosing on every tab of the list, as under `manual`, so arrowing past a tab
+ * never leaves the page and the list answers the keys one way. Mark the tab of
+ * the route you are on with `selected`, or set `active` to its value. Links
+ * with no panels, such as the sections of a site, belong in Navigation, whose
+ * `variant="underlined"` draws the same bar.
  *
  * Each tab says which panel it controls through `aria-controls`, set as an
  * element reference to the panel's host, where the engine has reflection.
@@ -52,8 +57,11 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * Keys, on the tab list: Left and Right Arrow move between tabs, and so do Up
  * and Down; Home and End go to the first and the last. The horizontal arrows
  * follow the reading direction, so on a right-to-left page Left moves on.
- * Disabled tabs are passed over. Tab leaves the list for the selected panel,
- * which is a tab stop only while it holds nothing focusable.
+ * Typing a letter moves to the next tab whose words start with it. Letters
+ * typed less than half a second apart make one word, and a Space typed among
+ * them is part of the word. Disabled tabs are passed over. Tab leaves the list
+ * for the selected panel, which is a tab stop only while it holds nothing
+ * focusable.
  *
  * **Keyboard.**
  *
@@ -62,6 +70,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * | Right, Down | Moves to the next tab, from the last round to the first. Selects it, unless `manual` is set or a tab is a link. |
  * | Left, Up | Moves to the tab before, from the first round to the last. |
  * | Home, End | Moves to the first or the last tab. |
+ * | A letter or a word | Moves to the next tab whose words start with what you typed, from the last round to the first. Selects it, unless `manual` is set or a tab is a link. |
  * | Enter, Space | Selects the tab with focus, or follows its link. |
  * | Tab | Leaves the list for the selected panel. |
  *
@@ -91,7 +100,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  * @since 0.1.0
  * @status stable
  * @category navigation
- * @aliases TabList, Segmented control
+ * @aliases TabList
  * @documentation https://fusion.dev/helix/components/tabs
  *
  * @slot - The tabs, as direct children of this element.
@@ -125,13 +134,16 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
    */
   static words = 'helix-tabs'
 
-  /* Arrow keys, Home and End. Same controller as the radio group and the toggle
-     group: `origin: 'focus'` because `manual` lets focus and selection diverge,
-     and `selects` because `manual` is what decides whether arriving chooses. */
+  /* Arrow keys, Home, End and typed letters. Same controller as the radio group
+     and the toggle group: `origin: 'focus'` because `manual` lets focus and
+     selection diverge, and `selects` because `manual` is what decides whether
+     arriving chooses, for a letter as for an arrow. A tab's words are what its
+     default slot holds, which leaves out anything slotted into `dismiss-icon`. */
   protected readonly keys = new KeyboardNavigationController(this, {
     items: () => this.tabs,
     origin: 'focus',
     selects: () => !this.manual && !this.linked,
+    typeahead: typeaheadBy((tab) => slottedWords(tab as HelixHeadlessTab, [''])),
   })
 
   /* The mark. Same controller as the nav bar, the toggle group and the page nav.

@@ -5,6 +5,10 @@ type Arrival = { carried: string; name: string }
 // The log keeps this many of the most recent rows.
 const KEEP = 6
 
+// Each tag hears its own remove button, which a phone needs: an event there
+// reaches the element that sent it, and no element around it.
+const TAGS = ['design', 'billing', 'urgent']
+
 const RESTING: Arrival[] = [
   { carried: 'Press the tag\u2019s close control', name: 'No events yet' },
 ]
@@ -28,13 +32,16 @@ export function Example() {
       direction="column"
       gap="md"
     >
-      <helix-flex
-        gap="xs"
-        onhelix-dismiss={dismissed}
-      >
-        <helix-tag dismissible>design</helix-tag>
-        <helix-tag dismissible>billing</helix-tag>
-        <helix-tag dismissible>urgent</helix-tag>
+      <helix-flex gap="xs">
+        {TAGS.map((one) => (
+          <helix-tag
+            dismissible
+            key={one}
+            onhelix-dismiss={dismissed}
+          >
+            {one}
+          </helix-tag>
+        ))}
       </helix-flex>
 
       <helix-list
@@ -44,7 +51,7 @@ export function Example() {
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}
-            <span slot="description">{one.carried}</span>
+            <helix-text slot="description">{one.carried}</helix-text>
           </helix-list-item>
         ))}
       </helix-list>

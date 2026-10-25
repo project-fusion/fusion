@@ -187,6 +187,7 @@ const nameOf = (block: Element): string => {
  * @csspart copy-mark - The clipboard icon, and the check mark that replaces it after a copy.
  * @csspart copy-spinner - The ring the copy button turns while it is pending.
  * @csspart copy-text - The words on that button, trimmed to their capitals and baseline.
+ * @csspart copy-tooltip - The tooltip around the copy button, forwarded from it.
  * @csspart copy-tooltip-arrow - The tooltip's arrow, which points at the copy button.
  * @csspart copy-tooltip-arrow-bottom - The arrow while the tooltip is below the copy button, on the tooltip's top edge. Applied with `copy-tooltip-arrow`.
  * @csspart copy-tooltip-arrow-left - The arrow while the tooltip is left of the copy button, on the tooltip's right edge. Applied with `copy-tooltip-arrow`.
@@ -1140,7 +1141,7 @@ export class HelixHeadlessCodeBlock extends HelixElement {
   ): TemplateResult {
     return html`<${this.tag('copy-button')}
       part="copy"
-      exportparts="button: copy-button, text: copy-text, mark: copy-mark, live: copy-live, spinner: copy-spinner, tooltip-surface: copy-tooltip-surface,
+      exportparts="button: copy-button, text: copy-text, mark: copy-mark, live: copy-live, spinner: copy-spinner, tooltip: copy-tooltip, tooltip-surface: copy-tooltip-surface,
         tooltip-arrow: copy-tooltip-arrow, tooltip-arrow-bottom: copy-tooltip-arrow-bottom,
         tooltip-arrow-left: copy-tooltip-arrow-left, tooltip-arrow-right: copy-tooltip-arrow-right,
         tooltip-arrow-top: copy-tooltip-arrow-top, tooltip-surface-bottom: copy-tooltip-surface-bottom,

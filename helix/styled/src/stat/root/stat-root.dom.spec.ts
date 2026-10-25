@@ -79,7 +79,7 @@ describe('stat', () => {
     expect(group.hasAttribute('divided')).toBe(true)
     expect(rule('helix-stat-group', ':host')).toContain('flex-wrap: wrap')
     expect(rule('helix-stat-group', ':host([divided])')).toContain('overflow-x: clip')
-    const divided = rule('helix-stat-group', ':host([divided]) ::slotted(*)')
+    const divided = rule('helix-stat-group', ':host([divided]) slot::slotted(*)')
     expect(divided).toContain('border-inline-start: var(--helix-border-thin) solid')
     expect(divided).toContain('margin-inline-start: calc(var(--_stat-group-gap) * -1')
     expect(divided).toContain('padding-inline-start: var(--_stat-group-gap)')

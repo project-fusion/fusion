@@ -26,7 +26,8 @@ export function Example() {
   }
 
   const moved = (event: Event & { newState?: string; oldState?: string }) => {
-    say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
+    const { newState, oldState } = event
+    say('toggle', `${oldState} to ${newState}, after the state moved`)
   }
 
   return (
@@ -34,20 +35,14 @@ export function Example() {
       direction="column"
       gap="md"
     >
-      <helix-button
-        aria-describedby="events-deploy-tip"
-        id="events-deploy"
-      >
-        Publish page
-      </helix-button>
       <helix-tooltip
         content="Make the page visible to everyone"
-        for="events-deploy"
-        id="events-deploy-tip"
         onhelix-before-close={closing}
         onhelix-before-open={opening}
         onToggle={moved}
-      ></helix-tooltip>
+      >
+        <helix-button>Publish page</helix-button>
+      </helix-tooltip>
 
       <helix-list
         divided

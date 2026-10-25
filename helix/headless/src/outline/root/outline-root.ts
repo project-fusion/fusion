@@ -15,6 +15,7 @@ import {
 import { render as drawInto, html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { type Branch, levelOf, nest } from '../levels.js'
+import { drawSectionLinks, watchSections } from '../section/placed.js'
 
 /** The named slots a child goes to, which make it no part of the links. */
 const OWN_SLOTS = new Set(['heading', 'indicator'])
@@ -41,6 +42,12 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
  * `data-level` is at the top level.
  *
  * A heading slotted into `heading` names the navigation, in place of `label`.
+ *
+ * **Code shared with a phone marks its sections with `helix-outline-section`.**
+ * An outline that holds no links of yours draws a link for each Outline
+ * Section on its page, in the order they stand, with the section's `label`
+ * and `level`. The outline writes these anchors itself, and they take the
+ * same styles as yours.
  *
  * In a contents rail with a scrollbar of its own, `follow` keeps the link of
  * the section in view showing as the reader scrolls the page.
@@ -265,6 +272,9 @@ export class HelixHeadlessOutline extends HelixElement {
    * arriving, leaving or changing its level changes the lists drawn for them.
    */
   private childWatch: MutationObserver | undefined
+
+  /** Stops hearing the Outline Sections on the page, whose links it draws where it holds none. */
+  private sectionWatch: (() => void) | undefined
 
   /**
    * The links, in document order. Empty on the server, which has no tree.
@@ -899,6 +909,8 @@ export class HelixHeadlessOutline extends HelixElement {
     super.disconnectedCallback()
     this.childWatch?.disconnect()
     this.childWatch = undefined
+    this.sectionWatch?.()
+    this.sectionWatch = undefined
     this.removeEventListener('click', this.handleClick)
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('focusout', this.handleFocusOut)
@@ -946,6 +958,8 @@ export class HelixHeadlessOutline extends HelixElement {
       childList: true,
       subtree: true,
     })
+    this.sectionWatch = watchSections(() => drawSectionLinks(this))
+    drawSectionLinks(this)
     this.addEventListener('click', this.handleClick)
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('focusout', this.handleFocusOut)

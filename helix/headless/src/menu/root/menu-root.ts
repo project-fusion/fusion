@@ -117,6 +117,11 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * right-to-left page. Left Arrow on the top page does nothing. Escape closes
  * the menu and returns focus to the trigger. Tab closes it and moves on.
  *
+ * **In a window narrower than 30rem the panel is a sheet** along the
+ * window's bottom edge, clear of the home indicator, as it is on a phone, and
+ * in a wider one a popover against its trigger. `presentation` draws either
+ * one at any width.
+ *
  * While it is open, the surface carries the trigger's width as
  * `--floating-anchor-inline-size` and the room left below it as
  * `--floating-available-block-size`, as Radix's dropdown menu publishes its
@@ -208,6 +213,8 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @cssproperty --floating-anchor-inline-size - The trigger's width, written on the panel while it is open, as in `min-inline-size: var(--floating-anchor-inline-size)`. Read it; a value set here is written over.
  * @cssproperty --floating-available-block-size - The room between the panel and the edge of the screen it opens toward, written on the panel while it is open. Read it; a value set here is written over.
  *
+ * @cssstate aligned-end - While the open panel is aligned to the end of the side it sits on.
+ * @cssstate aligned-start - While the open panel is aligned to the start of the side it sits on.
  * @cssstate drilled - A submenu's page is showing, so content that is not a row can hide with the top page.
  * @cssstate entering - From the moment the panel shows until its entrance has finished.
  * @cssstate exiting - From the moment the panel hides until its exit has finished.
@@ -217,6 +224,7 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * @cssstate placed-left - While the open panel sits to the left of its trigger.
  * @cssstate placed-right - While the open panel sits to the right of its trigger.
  * @cssstate placed-top - While the open panel sits above its trigger.
+ * @cssstate sheet - While the panel is a sheet along the window's bottom edge, as `presentation` says.
  * @cssstate start - A row on the current page has content in its leading column, so every row keeps that column.
  */
 @customElement('helix-headless-menu')
@@ -440,6 +448,15 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
   placement: Placement = 'bottom-start'
 
   /**
+   * How the panel is drawn: `auto`, a sheet along the window's bottom edge in
+   * a window narrower than 30rem and a popover against the trigger in any
+   * other; `popover` or `sheet`, that one at any width. The menu is in the
+   * state `sheet` while it is one, and in no `placed-` or `aligned-` state.
+   */
+  @property()
+  presentation: 'auto' | 'popover' | 'sheet' = 'auto'
+
+  /**
    * What a screen reader hears when the filter narrows the rows. `{count}` is
    * how many rows are left, written in the locale, and each language writes
    * the forms it has, as Listbox's `results-label` does.
@@ -545,13 +562,28 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        as Popover says it. */
     onPlace: (placement) => {
       const side = sideOf(placement)
+      this.toggleState('aligned-end', placement.endsWith('-end'))
+      this.toggleState('aligned-start', placement.endsWith('-start'))
       this.toggleState('placed-bottom', side === 'bottom')
       this.toggleState('placed-left', side === 'left')
       this.toggleState('placed-right', side === 'right')
       this.toggleState('placed-top', side === 'top')
     },
+    /* A sheet stands on no side of its trigger. */
+    onPresent: (sheet) => {
+      this.toggleState('sheet', sheet)
+      if (sheet) {
+        this.toggleState('aligned-end', false)
+        this.toggleState('aligned-start', false)
+        this.toggleState('placed-bottom', false)
+        this.toggleState('placed-left', false)
+        this.toggleState('placed-right', false)
+        this.toggleState('placed-top', false)
+      }
+    },
     open: () => this.open,
     placement: () => this.placement,
+    presentation: () => this.presentation,
     surface: () => this.partNamed('surface'),
   })
 

@@ -309,11 +309,9 @@ export const connectPlot = <F extends object>(
       chart.rendererDrawn?.(false)
       return
     }
-    const font =
-      getComputedStyle(frame)
-        .fontFamily.split(',')[0]
-        ?.trim()
-        .replace(/^["']|["']$/g, '') ?? ''
+    /* The whole stack, as the labels' `font-family`: its first family alone was
+       `ui-sans-serif`, which Chrome does not draw, so the labels fell to its serif. */
+    const font = getComputedStyle(frame).fontFamily.trim()
     driver.draw(field, colors, font || 'sans-serif')
     driver.focus(chart.active ?? -1)
     chart.rendererDrawn?.(true)

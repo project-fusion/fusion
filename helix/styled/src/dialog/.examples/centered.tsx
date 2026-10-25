@@ -1,20 +1,23 @@
+import { useState } from 'react'
 import './centered.css'
 
 export function Example() {
+  const [open, setOpen] = useState(false)
+
   return (
     <>
       <helix-button
-        command="--show"
-        commandfor="discard"
         emphasis="solid"
+        onClick={() => setOpen(true)}
         tone="danger"
       >
         Discard changes
       </helix-button>
 
       <helix-dialog
-        id="discard"
         label="Discard changes"
+        onClose={() => setOpen(false)}
+        open={open}
         size="sm"
         text-align="center"
       >
@@ -40,12 +43,7 @@ export function Example() {
           >
             Discard changes
           </helix-button>
-          <helix-button
-            command="--close"
-            commandfor="discard"
-          >
-            Keep editing
-          </helix-button>
+          <helix-button onClick={() => setOpen(false)}>Keep editing</helix-button>
         </helix-button-group>
       </helix-dialog>
     </>

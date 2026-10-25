@@ -3,7 +3,7 @@ import { HelixHeadlessToolbar } from '@fusion.dev/helix-headless/toolbar'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as densityStyles } from '../../shared/density/density-sm.css.js'
-import { styles } from './toolbar-root.css.js'
+import { styles } from './toolbar-root.generated.css.js'
 
 /**
  * @summary A group of controls that share one tab stop.

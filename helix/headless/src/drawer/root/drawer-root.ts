@@ -7,6 +7,7 @@ import {
   drawDismissGlyph,
   edgeOffset,
   FocusScopeController,
+  focusableElements,
   HelixElement,
   headingsIn,
   isRtl,
@@ -15,6 +16,7 @@ import {
   nearest,
   OpenPhaseController,
   onUnlessFalse,
+  openModal,
   parseSnapPoints,
   reflectElements,
   SwipeController,
@@ -31,8 +33,9 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { wordsIn } from '../../dialog/description.js'
 import { closeOnDialogSubmit, commandValue } from '../../dialog/form-method.js'
+import { DrawerHandOff } from '../hand-off.js'
 import { beyondWindow } from '../reveal.js'
-import { startsSwipe } from '../swipe-start.js'
+import { onScrim, startsSwipe } from '../swipe-start.js'
 
 /**
  * @summary A panel that slides in from an edge.
@@ -65,6 +68,15 @@ import { startsSwipe } from '../swipe-start.js'
  * sheet that rests half open: it opens at the smallest, and a swipe settles at
  * the nearest. While a swipe moves the panel, the distance is written on it as
  * `--drawer-swipe-x` and `--drawer-swipe-y`. `swipe="false"` turns swiping off.
+ *
+ * **A list inside the panel hands its drag to the panel** once the list can
+ * scroll no further that way, its top for a drawer at the bottom, and has
+ * stood still for half a second, as iOS's sheets and Vaul's drawer do: the
+ * momentum of a list flung to its top then carries no drawer with it. While
+ * the panel rests short of the whole, a drag away from its edge opens it
+ * further before the list scrolls. The browser owns a touch once it has
+ * started to scroll the list, so a list that reaches its top during a drag
+ * hands over on the next touch.
  *
  * `snap` is the snap point the panel rests at, and `:state(snapped)` is on the
  * host while that is less than the whole panel. `snapTo()` moves it to
@@ -333,14 +345,34 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
     return (swipeAxis(this.edge) === 'x' ? box?.width : box?.height) ?? 0
   }
 
+  /* A list inside the panel, whose drag the panel takes once it hands it over. */
+  protected readonly handOff = new DrawerHandOff(this, {
+    edge: () => this.edge,
+    rest: () => this.rest,
+    scroller: () => this.partNamed('content'),
+    surface: () => this.panel,
+  })
+
   /* Swipe to dismiss. The controller says where the pointer is; what it means
-     here, a snap point or a close, is settled by `settleSwipe`. */
+     here, a snap point or a close, is settled by `settleSwipe`. A drag a list
+     keeps leaves the panel where it rests. */
   protected readonly swipes = new SwipeController(this, {
     axis: () => (this.open && this.swipe ? swipeAxis(this.edge) : undefined),
-    end: (dx, dy, vx, vy) => this.settle(dx, dy, vx, vy),
-    move: (dx, dy) => this.place(Math.max(0, this.rest + towardEdge(this.edge, dx, dy))),
-    start: (target, event) =>
-      startsSwipe(target, event.pointerType, swipeAxis(this.edge), this.partNamed('content')),
+    end: (dx, dy, vx, vy) =>
+      this.handOff.kept ? this.place(this.rest) : this.settle(dx, dy, vx, vy),
+    move: (dx, dy) => {
+      if (this.handOff.takes(dx, dy)) {
+        this.place(Math.max(0, this.rest + towardEdge(this.edge, dx, dy)))
+      }
+    },
+    /* Never on the scrim, which a press dismisses the drawer from. */
+    start: (target, event) => {
+      if (onScrim(target, this.panel, event)) {
+        return false
+      }
+      this.handOff.begin(event)
+      return startsSwipe(target, event.pointerType)
+    },
     surface: () => this.panel,
   })
 
@@ -671,9 +703,19 @@ export class HelixHeadlessDrawer extends MixinControllerOpen(HelixElement) {
           ).length > 0,
       )
       if (this.modal) {
-        panel.showModal()
+        openModal(panel)
       } else {
         panel.show()
+      }
+      /* **WebKit leaves focus on the panel** where the first control is inside
+         a component's shadow root, as a Helix button's is, and Chromium moves
+         it to the control: `Dialog` measured the same. The first control is
+         focused here when the browser chose none in the panel. */
+      const chose =
+        this.matches(':focus-within') &&
+        !(this.renderRoot instanceof ShadowRoot && this.renderRoot.activeElement === panel)
+      if (!chose) {
+        focusableElements(this)[0]?.focus()
       }
       /* At the smallest snap point, once the panel has a size to measure. */
       this.restAt(parseSnapPoints(this.snapPoints)[0] ?? 1)

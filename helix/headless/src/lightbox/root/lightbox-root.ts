@@ -23,6 +23,7 @@ import {
   MixinControllerOpen,
   numberConverter,
   OpenPhaseController,
+  openModal,
   resolveActiveItem,
   SwipeController,
   swipeStep,
@@ -875,7 +876,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
         'lightbox',
         () => this.label !== '',
       )
-      dialog.showModal()
+      openModal(dialog)
       /* Said as well as marked, because `autofocus` on a dialog was honored
          when the markup opened it and not when a framework set `open` after
          it rendered: the first control took focus instead, ringed. */

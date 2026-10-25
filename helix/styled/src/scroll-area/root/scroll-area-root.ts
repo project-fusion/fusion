@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessScrollArea } from '@fusion.dev/helix-headless/scroll-area'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './scroll-area-root.css.js'
+import { styles } from './scroll-area-root.generated.css.js'
 
 /** How far each edge's fade reaches into the viewport, which the mask reads. */
 const DEPTHS = [
@@ -58,6 +58,8 @@ function registerDepths(): void {
  * **Set `--scroll-area-fade-color` to paint the fades.** Each fade is then a
  * gradient from that color over the content, and there is no mask. Use it for
  * a scroll area on a solid ground, in the ground's color or one of your own.
+ * React Native has no mask, so a phone paints the fades in
+ * `--helix-color-background` until you set one.
  *
  * Under `scrollbars`, the browser's scrollbar is hidden and the component's own
  * are drawn over the content at the edge, in the same colors.

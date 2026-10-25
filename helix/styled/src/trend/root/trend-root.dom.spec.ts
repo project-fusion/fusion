@@ -114,8 +114,8 @@ describe('color by movement', () => {
   })
 
   test('draws a move up and a move down from the rise and fall tokens, through a hook each', () => {
-    expect(rule(':host([color-by="movement"]:state(up))')).toContain(up)
-    expect(rule(':host([color-by="movement"]:state(down))')).toContain(down)
+    expect(rule(':host(:state(up)[color-by="movement"])')).toContain(up)
+    expect(rule(':host(:state(down)[color-by="movement"])')).toContain(down)
   })
 
   /* At equal weight the judgment's color would hold on a trend that sets
@@ -123,7 +123,7 @@ describe('color by movement', () => {
   test('follows the judgment in the sheet, so it wins on a trend that sets good', () => {
     const at = (selector: string): number => sheet().indexOf(selector)
     expect(at(':host(:state(worse))')).toBeGreaterThan(-1)
-    expect(at(':host([color-by="movement"]:state(up))')).toBeGreaterThan(at(':host(:state(worse))'))
+    expect(at(':host(:state(up)[color-by="movement"])')).toBeGreaterThan(at(':host(:state(worse))'))
     expect(at(':host(:not(:defined)[color-by="movement"][movement="down"])')).toBeGreaterThan(
       at(':host(:not(:defined)[good="down"][movement="up"])'),
     )
@@ -151,7 +151,7 @@ describe('trend hooks', () => {
     expect(rule('slot[name="label"]')).toContain(
       'color: var(--trend-label-color, var(--helix-color-foreground-muted))',
     )
-    expect(rule('slot[name$="icon"]::slotted(*)')).toContain(
+    expect(rule('slot[name="icon"]::slotted(*)')).toContain(
       'block-size: var(--trend-icon-size, 1em)',
     )
   })

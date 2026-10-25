@@ -1,15 +1,3 @@
-/* Lines longer than the box, which `orientation="vertical"` cuts at the edge
-   rather than scroll sideways. */
-helix-scroll-area {
-  block-size: 9rem;
-  inline-size: 20rem;
-}
-
-/* One entry a line, as the log's lines are blocks, whatever whitespace stands
-   between them in the markup. */
-helix-scroll-area helix-text {
-  --text-font-size: var(--helix-text-xs);
-  display: block;
-  margin: 0 0 var(--helix-space-xs);
-  padding-inline-end: var(--helix-space-md);
+helix-grid {
+  --grid-columns: minmax(0, 20rem);
 }

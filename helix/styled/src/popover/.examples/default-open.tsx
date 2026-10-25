@@ -1,12 +1,15 @@
-import './default-open.css'
+import { useState } from 'react'
 
 export function Example() {
+  const [open, setOpen] = useState(true)
+
   return (
     <helix-popover
-      className="hint"
-      default-open
-      id="whats-new"
       label="What is new"
+      onhelix-before-close={() => setOpen(false)}
+      onhelix-before-open={() => setOpen(true)}
+      open={open}
+      style={{ '--popover-inline-size': '20rem' }}
     >
       <helix-button slot="trigger">What is new</helix-button>
       <helix-flex
@@ -18,9 +21,8 @@ export function Example() {
         </helix-text>
         <helix-flex justify-content="end">
           <helix-button
-            command="--close"
-            commandfor="whats-new"
             emphasis="outlined"
+            onClick={() => setOpen(false)}
           >
             Got it
           </helix-button>

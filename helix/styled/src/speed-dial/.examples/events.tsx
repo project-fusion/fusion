@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import './events.css'
 
 type Arrival = { carried: string; name: string }
 
@@ -41,10 +40,8 @@ export function Example() {
       direction="column"
       gap="md"
     >
-      <div className="stage">
+      <helix-flex justify-content="end">
         <helix-speed-dial
-          data-dock="bottom-end"
-          data-dock-within
           label="Actions"
           onhelix-before-close={closing}
           onhelix-before-open={opening}
@@ -66,7 +63,7 @@ export function Example() {
             />
           </helix-speed-dial-item>
         </helix-speed-dial>
-      </div>
+      </helix-flex>
 
       <helix-list
         divided
@@ -75,7 +72,7 @@ export function Example() {
         {heard.map((one, at) => (
           <helix-list-item key={`${one.name}-${at}`}>
             {one.name}
-            <span slot="description">{one.carried}</span>
+            <helix-text slot="description">{one.carried}</helix-text>
           </helix-list-item>
         ))}
       </helix-list>

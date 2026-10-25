@@ -6,7 +6,7 @@ import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.j
 import { styles as rowStyles } from '../../shared/row/row.css.js'
 /* Inherited from the base along with the template: the shortcut's key. */
 import '../../kbd/index.js'
-import { styles } from './menu-item.css.js'
+import { styles } from './menu-item.generated.css.js'
 
 /**
  * @summary One row in a menu: a command, a choice, or a way into a submenu.

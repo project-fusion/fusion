@@ -8,6 +8,7 @@ import {
   MixinControllerChecked,
   MixinField,
   markRegion,
+  toggled,
   words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -115,7 +116,15 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation()
     const control = event.target as HTMLInputElement
-    const taken = this.requestChecked(control.checked)
+    /* The input has already flipped itself, to the state `toggled` proposes,
+       since the input holds what the element holds between presses. */
+    const next = toggled({
+      checked: this.checked,
+      disabled: this.isDisabled,
+      mixed: false,
+      readOnly: this.readOnly,
+    })
+    const taken = next !== null && this.requestChecked(next.checked)
     /* The input follows the element, always, not only where the change was
        refused.
      *

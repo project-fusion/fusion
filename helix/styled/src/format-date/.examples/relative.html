@@ -1,0 +1,52 @@
+<!-- @summary How long ago a moment was, in words at each style, and a day still to come. The readings move on as they go stale. -->
+
+<helix-flex
+  direction="column"
+  gap="sm"
+>
+  <helix-text>
+    Long:
+    <helix-format-date
+      class="ago"
+      relative="long"
+    ></helix-format-date>
+  </helix-text>
+
+  <helix-text>
+    Short:
+    <helix-format-date
+      class="ago"
+      relative="short"
+    ></helix-format-date>
+  </helix-text>
+
+  <helix-text>
+    Narrow:
+    <helix-format-date
+      class="ago"
+      relative="narrow"
+    ></helix-format-date>
+  </helix-text>
+
+  <helix-text>
+    Due:
+    <helix-format-date
+      class="due"
+      numeric="always"
+      relative="long"
+    ></helix-format-date>
+  </helix-text>
+</helix-flex>
+
+<script>
+  /* Set from script, so the readings always say three hours ago and in two
+     days. */
+  const ago = new Date(Date.now() - 3 * 3_600_000).toISOString()
+  const due = new Date(Date.now() + 2 * 86_400_000).toISOString()
+  for (const stamp of document.querySelectorAll('.ago')) {
+    stamp.date = ago
+  }
+  for (const stamp of document.querySelectorAll('.due')) {
+    stamp.date = due
+  }
+</script>

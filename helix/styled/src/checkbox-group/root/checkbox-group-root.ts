@@ -2,9 +2,7 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessCheckboxGroup } from '@fusion.dev/helix-headless/checkbox-group'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as fieldStyles } from '../../shared/field/field.css.js'
-import { styles as fieldStackedStyles } from '../../shared/field/field-stacked.css.js'
-import { styles } from './checkbox-group-root.css.js'
+import { styles } from './checkbox-group-root.generated.css.js'
 import '../../checkbox/index.js'
 
 /**
@@ -33,7 +31,7 @@ export class HelixCheckboxGroup extends HelixHeadlessCheckboxGroup {
   @property({ reflect: true })
   orientation?: 'horizontal'
 
-  static override styles: CSSResultGroup = [fieldStyles, fieldStackedStyles, styles]
+  static override styles: CSSResultGroup = styles
 }
 
 declare global {

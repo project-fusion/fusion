@@ -66,7 +66,7 @@ describe('callout', () => {
   })
 
   test('a slotted icon is sized like the default one, so swapping it moves nothing', () => {
-    expect(rule('[part="icon"] svg')).toContain('block-size: var(--helix-size-icon)')
+    expect(rule('[part="icon-mark"]')).toContain('block-size: var(--helix-size-icon)')
     expect(rule('slot[name="icon"]::slotted(*)')).toContain('--icon-size: var(--helix-size-icon)')
   })
 

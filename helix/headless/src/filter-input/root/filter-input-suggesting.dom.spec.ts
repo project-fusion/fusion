@@ -1,12 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import {
-  internalsOf,
-  part,
-  registerDom,
-  settle,
-  type Updatable,
-} from '@fusion.dev/helix-testing/dom'
+import { hasState, internalsOf, part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -402,8 +396,9 @@ describe('the highlighted suggestion', () => {
 /* WA's combobox and this library's Combobox give their panel a loading line and
    a no-results line, each with a slot; the suggestions panel had neither. */
 describe('a panel that is loading or finds nothing', () => {
-  const states = (host: Updatable): Set<string> =>
-    internalsOf(host).states as unknown as Set<string>
+  const states = (host: Updatable) => ({
+    has: (name: string) => hasState(host as unknown as Element, name),
+  })
 
   test('opens on the loading line, says it, and shows the suggestions once they come', async () => {
     const host = await mount([], 'loading')

@@ -2,11 +2,8 @@ import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessMenu } from '@fusion.dev/helix-headless/menu'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
-import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
-import { styles as floatingEntranceStyles } from '../../shared/floating/entrance.css.js'
-import { styles as floatingPanelStyles } from '../../shared/floating/panel.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
-import { styles } from './menu-root.css.js'
+import { styles } from './menu-root.generated.css.js'
 
 /**
  * @summary A menu of commands that opens from a trigger.
@@ -16,7 +13,8 @@ import { styles } from './menu-root.css.js'
  * cannot clip it.
  *
  * A submenu replaces the current page, so the menu stays one panel and works
- * the same on a phone as on a desktop.
+ * the same on a phone as on a desktop. In a window narrower than 30rem the
+ * panel is a sheet along the window's bottom edge, over a scrim.
  *
  * @since 0.1.0
  * @status stable
@@ -31,6 +29,7 @@ import { styles } from './menu-root.css.js'
  * @cssproperty --menu-border-width - Width of the panel's edge. Defaults to `--helix-border-floating`, a hairline, so the panel has an edge as well as its shadow over a dark page. Set it to `0` for the shadow alone.
  * @cssproperty --menu-max-block-size - The tallest the menu grows before it scrolls.
  * @cssproperty --menu-min-inline-size - The narrowest the menu gets.
+ * @cssproperty --menu-scrim - Color of the scrim behind the panel while it is a sheet.
  * @cssproperty --menu-shadow - Shadow under the panel. Defaults to `--helix-shadow-floating`, so the panel keeps a shadow over any content below it.
  */
 @customElement('helix-menu')
@@ -53,13 +52,7 @@ export class HelixMenu extends HelixHeadlessMenu {
   @property({ reflect: true })
   material?: 'frosted' | 'glass'
 
-  static override styles: CSSResultGroup = [
-    liveStyles,
-    collectionStateStyles,
-    floatingPanelStyles,
-    floatingEntranceStyles,
-    styles,
-  ]
+  static override styles: CSSResultGroup = [liveStyles, styles]
 }
 
 declare global {

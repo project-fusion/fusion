@@ -2,7 +2,6 @@ export function Example() {
   return (
     <helix-toast
       data-color-mode="light"
-      label="Notifications"
       placement="bottom-end"
     >
       <helix-toast-item

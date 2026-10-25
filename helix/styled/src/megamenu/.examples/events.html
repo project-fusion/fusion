@@ -6,25 +6,16 @@
   gap="md"
 >
   <helix-navigation label="Main">
-    <a href="#overview">Overview</a>
+    <helix-navigation-item href="#overview">Overview</helix-navigation-item>
     <helix-megamenu
       id="products"
       label="Products"
     >
-      <div data-megamenu-group>
-        <helix-text
-          as="h3"
-          data-megamenu-heading
-          scale="title"
-        >Work</helix-text>
-        <a
-          data-megamenu-item
-          href="#helix"
-        >Projects</a>
-      </div>
+      <helix-megamenu-group label="Work">
+        <helix-megamenu-item href="#helix">Projects</helix-megamenu-item>
+      </helix-megamenu-group>
     </helix-megamenu>
   </helix-navigation>
-
 
   <helix-list
     divided
@@ -33,7 +24,7 @@
   >
     <helix-list-item>
       No events yet
-      <span slot="description">Open the panel, then close it</span>
+      <helix-text slot="description">Open the panel, then close it</helix-text>
     </helix-list-item>
   </helix-list>
 </helix-flex>
@@ -53,7 +44,7 @@
     }
     const row = document.createElement('helix-list-item')
     row.textContent = name
-    const under = document.createElement('span')
+    const under = document.createElement('helix-text')
     under.slot = 'description'
     under.textContent = carried
     row.append(under)

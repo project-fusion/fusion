@@ -14,6 +14,7 @@ import {
   lockScroll,
   MixinControllerOpen,
   OpenPhaseController,
+  openModal,
   reflectElements,
   unlockScroll,
   words,
@@ -462,7 +463,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
     )
     /* Re-checked, because both facts can have moved while that resolved. */
     if (this.open && !dialog.open && this.isConnected) {
-      dialog.showModal()
+      openModal(dialog)
       /* **WebKit leaves focus on the dialog** where the first control is
          inside a component's shadow root, as a text area's field is: its
          focusing steps do not count a host that delegates focus, where

@@ -173,8 +173,8 @@ describe('a paragraph of lines', () => {
       'block-size: auto',
     )
     expect(rule('[part="lines"]')).toContain('gap: calc((var(--helix-leading-normal) - 1) * 1em)')
-    expect(rule('[part~="line"]')).toContain('block-size: 1em')
-    expect(rule('[part~="line"]:last-child:not(:first-child)')).toContain(
+    expect(rule('[part~="skeleton"][part~="line"]')).toContain('block-size: 1em')
+    expect(rule('[part~="skeleton"][part~="line"]:last-child:not(:first-child)')).toContain(
       'inline-size: var(--skeleton-last-line-size, 60%)',
     )
   })

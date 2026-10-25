@@ -69,11 +69,15 @@ export type ListItemMove = 'dragging' | 'drop-after' | 'drop-before'
  *
  * @event {HelixActionEvent} helix-action - The reader pressed Enter on the row, or pressed the row in a list that selects nothing, in a list with `selection-mode`. Read the row from `target`. A row with `href` follows its link instead.
  *
+ * @csspart description - The slot that holds the description.
+ * @csspart end - The slot that holds the trailing content.
  * @csspart grip - The button that moves the row, in a `reorderable` list.
  * @csspart grip-mark - The icon on the grip.
+ * @csspart label - The slot that holds the label.
  * @csspart link - The link, when the row has `href`. It holds every region except `end`.
  * @csspart row - The row's layout. It sits inside the host so the host can carry a list marker. In a list with `selection-mode` it is the grid cell that takes focus.
  * @csspart row-current - Added to `row` while the row is `current`.
+ * @csspart start - The slot that holds the leading content.
  *
  * @cssstate dragging - The row is being moved, in a `reorderable` list.
  * @cssstate drop-after - The row being moved goes after this one when it is dropped.
@@ -320,6 +324,17 @@ export class HelixHeadlessListItem extends HelixElement {
     return nothing
   }
 
+  /**
+   * The label and the description, bare in this tier, which renders no box a
+   * consumer's own layout has to account for: a row styled as a flex line keeps
+   * them as two items. The tier above holds them in a box of their own.
+   *
+   * Each slot is a part, so a stylesheet reaches a region by name.
+   */
+  protected renderBody(): TemplateResult {
+    return html`<slot id="label" part="label"></slot><slot name="description" id="description" part="description"></slot>`
+  }
+
   protected override render(): TemplateResult {
     /* One wrapper, and it earns its place rather than breaking the bare-slot
        rule. That rule is about optional *regions*, which generate an empty box
@@ -333,9 +348,7 @@ export class HelixHeadlessListItem extends HelixElement {
        grid lost it the moment the list asked for a marker. Measured before this
        wrapper: a row with a leading icon put the icon 32px in instead of 16 and
        its supporting text beside the label instead of under it. */
-    const content = html`${this.renderRail()}<slot name="start"></slot>
-      <slot id="label"></slot>
-      <slot name="description" id="description"></slot>`
+    const content = html`${this.renderRail()}<slot name="start" part="start"></slot>${this.renderBody()}`
     /* A grid cell only in a list with `selection-mode`, so a row in a plain
        list renders exactly what it did. */
     const role = this.grouped ? 'gridcell' : nothing
@@ -366,7 +379,7 @@ export class HelixHeadlessListItem extends HelixElement {
           aria-describedby=${describedby}
           @focus=${this.handleCellFocus}
           @blur=${this.handleCellFocus}
-        >${content}<slot name="end"></slot>${this.renderGrip()}</div>`
+        >${content}<slot name="end" part="end"></slot>${this.renderGrip()}</div>`
       : html`<div
           part="row${this.current === undefined ? '' : ' row-current'}"
           role=${role}
@@ -383,7 +396,7 @@ export class HelixHeadlessListItem extends HelixElement {
           aria-current=${this.current ?? nothing}
           tabindex=${this.grouped ? '-1' : nothing}
           >${content}</a
-        ><slot name="end"></slot>${this.renderGrip()}</div>`
+        ><slot name="end" part="end"></slot>${this.renderGrip()}</div>`
   }
 }
 

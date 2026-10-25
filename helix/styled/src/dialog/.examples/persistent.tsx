@@ -1,9 +1,13 @@
+import { useState } from 'react'
+
 export function Example() {
+  const [open, setOpen] = useState(true)
+
   return (
     <helix-dialog
-      default-open
-      id="unsaved"
       label="Unsaved changes"
+      onClose={() => setOpen(false)}
+      open={open}
       persistent
     >
       <helix-text as="p">
@@ -14,16 +18,10 @@ export function Example() {
         layout="spaced"
         slot="footer"
       >
+        <helix-button onClick={() => setOpen(false)}>Discard changes</helix-button>
         <helix-button
-          command="--close"
-          commandfor="unsaved"
-        >
-          Discard changes
-        </helix-button>
-        <helix-button
-          command="--close"
-          commandfor="unsaved"
           emphasis="solid"
+          onClick={() => setOpen(false)}
           tone="primary"
         >
           Save changes

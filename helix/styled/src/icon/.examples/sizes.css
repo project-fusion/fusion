@@ -1,7 +1,3 @@
-/* Four sizes, set the way a consumer sets them: the custom property, from a
-   stylesheet, on whatever selector the page already has. Written here as four
-   classes because there are four icons in a row and nothing else to tell them
-   apart. */
 .sm {
   --icon-size: 1rem;
 }

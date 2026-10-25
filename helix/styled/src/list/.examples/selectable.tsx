@@ -11,7 +11,7 @@ export function Example() {
           slot="start"
         ></helix-icon>
         Quarterly report
-        <span slot="description">Edited today</span>
+        <helix-text slot="description">Edited today</helix-text>
       </helix-list-item>
       <helix-list-item value="budget">
         <helix-icon
@@ -19,7 +19,7 @@ export function Example() {
           slot="start"
         ></helix-icon>
         Budget
-        <span slot="description">Edited yesterday</span>
+        <helix-text slot="description">Edited yesterday</helix-text>
       </helix-list-item>
       <helix-list-item
         disabled
@@ -30,7 +30,7 @@ export function Example() {
           slot="start"
         ></helix-icon>
         Archive
-        <span slot="description">Locked</span>
+        <helix-text slot="description">Locked</helix-text>
       </helix-list-item>
     </helix-list>
   )

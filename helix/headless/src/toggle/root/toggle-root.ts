@@ -1,11 +1,13 @@
 import {
   auditName,
   customElement,
+  HelixBeforeCheckEvent,
   HelixElement,
   HostClickController,
   internalsOf,
   ListedController,
   MixinSelectableItem,
+  toggled,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -19,9 +21,14 @@ import { property } from 'lit/decorators.js'
  * pressed with `aria-pressed`.
  *
  * **On its own, outside a `Toggle.Group`, it is a toggle button**, as React
- * Aria's `ToggleButton`: a `<button>` with `aria-pressed`. A press, Enter or
- * Space sends `helix-before-select`, which you can cancel, then flips `selected` and
- * sends `change`. Write `selected` in the markup to start it pressed.
+ * Aria's `ToggleButton`: a `<button>` with `aria-pressed`. A press, Enter, or
+ * Space sends `helix-before-check` with the state it turns to in
+ * `detail.checked`, which you can cancel, then flips `selected` and sends
+ * `change`. Checkbox and Switch send the same `helix-before-check`. Write
+ * `selected` in the markup to start it pressed.
+ *
+ * In a group, a press chooses the item, and it sends `helix-before-select`, which
+ * you can cancel.
  *
  * Do not use it for navigation. For navigation, use links marked with
  * `aria-current` and styled by the `data-navigation-item` recipe in the base
@@ -30,7 +37,7 @@ import { property } from 'lit/decorators.js'
  * @since 0.1.0
  * @status stable
  * @category actions
- * @aliases Segment, NavItem, Option
+ * @aliases Option, Segment, Toggle button
  * @documentation https://fusion.dev/helix/components/toggle
  *
  * @slot - The item's label.
@@ -38,7 +45,8 @@ import { property } from 'lit/decorators.js'
  * @slot start - Content before the label, such as an icon.
  *
  * @event {Event} change - Fired after a toggle button on its own is pressed or released.
- * @event {HelixBeforeSelectEvent} helix-before-select - Fired when the item is chosen. Cancelable: call `preventDefault()` to keep the current choice.
+ * @event {HelixBeforeCheckEvent} helix-before-check - Fired before a toggle button on its own is pressed or released, with the state it turns to in `detail.checked`. Cancelable: call `preventDefault()` to keep its state.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when the item is chosen in its group. Cancelable: call `preventDefault()` to keep the current choice.
  *
  * @csspart item - The button: a radio in a group where one is chosen, and a button with `aria-pressed` on its own or in a group where several can be.
  *
@@ -130,16 +138,27 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
 
   /**
    * Chooses the item in its group, or, on its own, flips `selected` once
-   * `helix-before-select` stands and sends `change`.
+   * `helix-before-check` stands and sends `change`.
    */
   override select(): boolean {
     if (!this.alone) {
       return super.select()
     }
-    if (!super.select()) {
+    const next = toggled({
+      checked: this.selected,
+      disabled: this.disabled,
+      mixed: false,
+      readOnly: false,
+    })
+    if (next === null) {
       return false
     }
-    this.selected = !this.selected
+    const request = new HelixBeforeCheckEvent({ checked: next.checked })
+    this.dispatchEvent(request)
+    if (request.defaultPrevented) {
+      return false
+    }
+    this.selected = next.checked
     this.dispatchEvent(new Event('change', { bubbles: true }))
     return true
   }

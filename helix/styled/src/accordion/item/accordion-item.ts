@@ -1,7 +1,7 @@
 import { customElement } from '@fusion.dev/helix-core'
 import { HelixHeadlessAccordionItem } from '@fusion.dev/helix-headless/accordion'
 import type { CSSResultGroup } from 'lit'
-import { styles } from './accordion-item.css.js'
+import { styles } from './accordion-item.generated.css.js'
 
 /**
  * @summary One collapsible section of an accordion.
