@@ -2,6 +2,7 @@ import { HelixElements } from '@/components/helix-elements/helix-elements'
 import { pageMetadata } from '@/utils/metadata/metadata'
 import { listFamilies } from '../../../../content/catalog/catalog'
 import { INSIGHTS } from '../../../../content/insights'
+import { getNativeFamilies } from '../../../../content/native/native'
 import { SandboxWorkbench } from './workbench'
 
 export const metadata = pageMetadata({
@@ -58,6 +59,7 @@ export default function SandboxPage() {
             })),
           },
         ]}
+        native={getNativeFamilies().map((one) => one.slug)}
       />
     </>
   )
