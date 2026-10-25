@@ -1,0 +1,214 @@
+import { useMemo, useRef } from 'react'
+import type { MachineUse } from '../ir.generated'
+import {
+  type Behavior,
+  merged,
+  type PartBinding,
+  type Props,
+  type UseBehavior,
+} from '../render/behavior'
+import type { Pager } from '../render/scroll'
+import type { Family } from '../style/form'
+import { aroundToolbar } from './axis'
+import type { Around, Binder } from './binder'
+import { type Copied, useCopy } from './copy'
+import { standsOpen, useReportOpen } from './disclosed'
+import { HOOKS, leaving } from './hosted'
+import { useJoin } from './join'
+import { layering } from './layer'
+import { mixedItem } from './mixed-item'
+import { mixingSet } from './mixed-set'
+import { heardBy, useNotice, useNoticeStack, useNotices } from './notices'
+import { usePage } from './page'
+import { pressing } from './pressing'
+import { boundTo } from './props'
+import { useReorderItem } from './reorder-item'
+import { scrollersOf } from './scrolling'
+import { setting } from './setting'
+import { stacking } from './stack'
+import { stackRow } from './stack-row'
+import { useTour } from './tour'
+import { useTourStop } from './tour-stop'
+import { settingTurns, turning, turnsAlone } from './turns'
+import { type Judged, useValidation } from './validation'
+
+export { scrollingOf } from './scrolling'
+
+/** The machines that hold a set's choice, one of which a set binds. */
+const SELECTIONS: ReadonlySet<string> = new Set([
+  'marked-set',
+  'multiple-selection',
+  'single-selection',
+])
+
+/**
+ * Hosts the verdict on a form control's answer, where its form binds one: an
+ * answer is missing while its toggle is not checked, or while its set has
+ * nothing chosen.
+ */
+const validating = (
+  family: Family,
+  uses: readonly MachineUse[],
+): ((props: Props, around: Around) => Judged | undefined) => {
+  const use = uses.find((each) => each.machine === 'validation')
+  if (use === undefined) {
+    return () => undefined
+  }
+  const toggles = boundTo(use, 'checked', 'prop') !== undefined
+  return (props, around) =>
+    useValidation(family, props, use, {
+      empty: toggles ? around.toggled?.checked !== true : (around.chosen.current ?? '') === '',
+    })
+}
+
+/** Draws an item by the grip its form names, as its set moves it. */
+const gripping =
+  (family: Family): Binder =>
+  (_props, around) =>
+    useReorderItem(family, around.joined)
+
+/**
+ * The hook that hosts the machines `family` binds, which `element` draws
+ * with. **The machines are read once, as the element is made**, so each
+ * render runs the same hooks in the same order: the item's join, the
+ * element's toggle, the set's selection, moves, and keys, a press for each
+ * part that takes one, the page it follows, the moves of an item whose form names a grip, the
+ * verdict on a form control's answer, and the direction of an element that
+ * runs across a toolbar. Last, whether it stands open, which it tells the
+ * element around that names a `disclosed` state.
+ *
+ * A machine with no native binder yet binds nothing.
+ */
+export const behaviorFor = (family: Family): UseBehavior => {
+  const uses = family.machines ?? []
+  const select = uses.find((use) => SELECTIONS.has(use.machine))
+  const set = uses.find((use) => use.machine === 'toggle-set')
+  const mixed = uses.find((use) => use.machine === 'mixed-set')
+  const binders: Binder[] = [
+    ...(select === undefined ? [] : [setting(family, uses, select)]),
+    ...(set === undefined ? [] : [settingTurns(family, set)]),
+    ...(mixed === undefined ? [] : [mixingSet(family, uses, mixed)]),
+    ...uses.filter((use) => use.machine === 'mixed-item').map((use) => mixedItem(family, use)),
+    ...uses.filter((use) => use.machine === 'stack').map((use) => stacking(family, use)),
+    ...uses.filter((use) => use.machine === 'stack-row').map((use) => stackRow(family, use)),
+    /* A stack of messages before its layer, which opens while it holds one. */
+    ...uses
+      .filter((use) => use.machine === 'notices')
+      .map(
+        (use): Binder =>
+          (props) =>
+            useNotices(family, props, use),
+      ),
+    /* A tour and its stops before their layers, which open as they stand. */
+    ...uses
+      .filter((use) => use.machine === 'tour')
+      .map(
+        (use): Binder =>
+          (props, around) =>
+            useTour(family, props, use, around.toggled),
+      ),
+    ...uses
+      .filter((use) => use.machine === 'tour-stop')
+      .map(
+        (use): Binder =>
+          (props, around) =>
+            useTourStop(family, props, use, around),
+      ),
+    /* The layer before the presses, which read what it gives its anchor. */
+    ...uses.filter((use) => use.machine === 'layer').map((use) => layering(family, use)),
+    ...uses.filter((use) => use.machine === 'press').map((use) => pressing(family, use)),
+    /* A message's place in its stack before its countdown, which waits while it does. */
+    ...uses
+      .filter((use) => use.machine === 'notice')
+      .map(
+        (use): Binder =>
+          (_props, around) =>
+            useNotice(use, around.toggled),
+      ),
+    /* The machines a hook hosts on its own, each in the order the form binds it. */
+    ...uses.flatMap((use): Binder[] => {
+      const host = HOOKS[use.machine]
+      return host === undefined
+        ? []
+        : [(props, around) => host(family, props, use, around.bound, around.toggled)]
+    }),
+    /* The page it follows, which an open folded region keeps it in view over. */
+    ...uses
+      .filter((use) => use.machine === 'page')
+      .map(
+        (use): Binder =>
+          (props, around) =>
+            usePage(family, props, use, around.toggled?.checked === true),
+      ),
+    ...(family.api?.item?.grip === undefined ? [] : [gripping(family)]),
+    ...(leaving(family, uses) ?? []),
+  ]
+  const scrollers = scrollersOf(family, uses)
+  const turns = turning(family, uses)
+  const judges = validating(family, uses)
+  const axisOf = aroundToolbar(family)
+  const copying = uses.find((use) => use.machine === 'copy')
+  const copier =
+    copying === undefined
+      ? (): Copied | undefined => undefined
+      : (props: Props): Copied | undefined => useCopy(family, props, copying)
+  return (_family, passed) => {
+    /* A message hears what the stack around it hears of it, after its own handler. */
+    const props = heardBy(useNoticeStack(family), passed)
+    const joined = useJoin(family, props)
+    /* A turn touches the verdict, which is hosted after the toggle. */
+    const touched = useRef<() => void>(() => undefined)
+    const toggled = turns(props, () => touched.current(), joined)
+    const axis = axisOf(props)
+    const pagers = useRef(new Map<string, Pager>()).current
+    const paged = useMemo(() => {
+      const parts: Record<string, PartBinding> = {}
+      for (const name of scrollers) {
+        const pager = (handed: Pager | null) => {
+          if (handed === null) {
+            pagers.delete(name)
+          } else {
+            pagers.set(name, handed)
+          }
+        }
+        parts[name] = { view: { pager } }
+      }
+      return { marks: [], parts }
+    }, [pagers])
+    const chosen = useRef<string | undefined>(undefined)
+    const copied = copier(props)
+    const bound: Behavior[] = []
+    const touch = () => touched.current()
+    const around: Around = {
+      anchored: {},
+      bound,
+      chosen,
+      copied,
+      joined,
+      layering: {},
+      pagers,
+      stacked: {},
+      toggled,
+      touch,
+    }
+    for (const bind of binders) {
+      bound.push(bind(props, around))
+    }
+    const judged = judges(props, around)
+    touched.current = judged?.touch ?? (() => undefined)
+    const behavior = merged(
+      ...(joined === undefined ? [] : [joined.behavior]),
+      paged,
+      /* A set says whether its item is chosen, in place of the item's toggle. */
+      ...(toggled === undefined || !turnsAlone(joined) ? [] : [toggled.behavior]),
+      ...bound,
+      ...(copied === undefined ? [] : [copied.behavior]),
+      ...(judged === undefined ? [] : [judged.behavior]),
+      axis,
+    )
+    /* An element that stands open tells the element around it, as a
+       navigation is open while a megamenu among its destinations is. */
+    useReportOpen(standsOpen(family, behavior, toggled))
+    return behavior
+  }
+}
