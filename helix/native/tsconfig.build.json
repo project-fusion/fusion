@@ -1,0 +1,6 @@
+{
+  // What ships: the runtime, without its specs, their fixtures, or the
+  // components written for them.
+  "exclude": ["src/**/*.spec.ts", "src/**/*.jest.tsx", "src/**/*.fixtures.ts", "src/families/**"],
+  "extends": "./tsconfig.json"
+}
