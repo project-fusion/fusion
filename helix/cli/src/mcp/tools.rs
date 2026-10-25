@@ -122,7 +122,7 @@ pub fn catalog() -> Vec<Value> {
     vec![
         json!({
             "annotations": annotations("Find a Helix family"),
-            "description": "Finds the Helix families that answer a name, an alias, a tag, a native element such as `button` or `h1`, or a purpose, such as `dropdown` or `date picker`, best first. Use it before writing a component you have not looked up. Each match has its slug, which helix_family takes.",
+            "description": "Finds the Helix families that answer a name, an alias, a tag, a native element such as `button` or `h1`, or a purpose, such as `dropdown` or `date picker`, best first. Use it before writing a component you have not looked up. Each match has its slug, which helix_family takes, and `platforms`, its status on the web and, where Helix draws it there, on React Native.",
             "inputSchema": {
                 "properties": {
                     "limit": { "description": "How many families to list. Defaults to 10.", "type": "integer" },
@@ -137,7 +137,7 @@ pub fn catalog() -> Vec<Value> {
         }),
         json!({
             "annotations": annotations("Read a Helix family"),
-            "description": "Returns one Helix family's API from the installed packages: each tag with its properties and their literal unions, attributes, events with the exact React prop, slots, parts, custom properties, custom states, the properties registerWords translates, and `usage`, the import lines to copy. A tag another installed package adds to the family, such as helix-sandbox-editor from @fusion.dev/helix-sandbox, is listed with its own import line. Write only what it lists. Lists the family's examples by slug for helix_example. `versions` names each package read, and `missing` says where the family's root is when its package is not installed.",
+            "description": "Returns one Helix family's API from the installed packages: each tag with its properties and their literal unions, attributes, events with the exact React prop, slots, parts, custom properties, custom states, the properties registerWords translates, and `usage`, the import lines to copy. A tag another installed package adds to the family, such as helix-sandbox-editor from @fusion.dev/helix-sandbox, is listed with its own import line. Write only what it lists. Lists the family's examples by slug for helix_example. The family's `platforms` gives its status on the web and on React Native. On React Native a tag is a component imported from the same entry, and the tag's `platforms` names it: `component`, the web properties it takes under the same names, the prop each slot and event becomes, and the properties it leaves out. Write only those on a phone. `versions` names each package read, and `missing` says where the family's root is when its package is not installed.",
             "inputSchema": strings(&[("family", "The family's slug, label, alias, or one of its tags, such as `select` or `helix-option`."), TIER], &["family"]),
             "name": "helix_family",
             "outputSchema": output(&[("examples", "array"), ("family", "object"), ("package", "string"), ("version", "string"), ("versions", "object")]),

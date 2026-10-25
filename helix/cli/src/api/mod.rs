@@ -526,6 +526,7 @@ pub fn find(from: &Path, query: &str, limit: usize) -> Outcome<Value> {
                 "replaces": family["replaces"],
                 "label": family["label"],
                 "package": family["package"],
+                "platforms": family["platforms"],
                 "slug": family["slug"],
                 "status": family["status"],
                 "summary": family["summary"],
@@ -666,11 +667,17 @@ pub fn family(from: &Path, name: &str, tier: Option<&str>) -> Outcome<Value> {
     let examples: Vec<Value> = every_example(&library, one)?
         .iter()
         .map(|(_, example)| {
-            json!({
+            let mut listed = json!({
                 "description": example["description"],
                 "label": example["label"],
                 "slug": example["slug"],
-            })
+            });
+            /* What an example shows on another platform, where it differs, so
+            an agent writing for React Native reads the words that hold there. */
+            if !example["platforms"].is_null() {
+                listed["platforms"] = example["platforms"].clone();
+            }
+            listed
         })
         .collect();
     let first = &library.packages[one.from[0]];

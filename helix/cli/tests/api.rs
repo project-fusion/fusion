@@ -765,3 +765,66 @@ fn only_a_package_that_publishes_api_json_and_is_not_private_is_read() {
     );
     assert_eq!(answer["versions"], json!({ "@fusion.dev/helix": "1.2.3" }));
 }
+
+/// **A family Helix draws on React Native says so, and names what each tag is
+/// called there**, in the answer `--json` prints and in the text a person
+/// reads.
+#[test]
+fn a_family_drawn_on_react_native_says_its_status_and_names_its_props_there() {
+    let project = Project::new("platforms");
+    project.package(
+        "@fusion.dev/helix",
+        "1.2.3",
+        &[(
+            "api.json",
+            json!({
+                "families": [{
+                    "aliases": [],
+                    "elements": [{
+                        "events": [{ "name": "helix-activate", "reactProp": "onhelix-activate" }],
+                        "platforms": { "react-native": {
+                            "component": "HelixTabs",
+                            "events": [{ "name": "helix-activate", "prop": "onActivate" }],
+                            "omitted": ["form"],
+                            "properties": ["active"],
+                            "slots": [{ "name": "", "prop": "children" }, { "name": "panels", "prop": "panels" }],
+                        } },
+                        "properties": [{ "name": "active", "type": "string" }],
+                        "specifier": "@fusion.dev/helix/tabs",
+                        "tagName": "helix-tabs",
+                        "tier": "styled",
+                    }],
+                    "label": "Tabs",
+                    "platforms": { "react-native": { "status": "experimental" }, "web": { "status": "stable" } },
+                    "slug": "tabs",
+                    "status": "stable",
+                    "summary": "A row of tabs.",
+                    "usage": { "headless": [], "styled": ["import '@fusion.dev/helix/tabs'"] },
+                }],
+                "package": "@fusion.dev/helix",
+            }),
+        )],
+    );
+    let found = project.json(&["api", "find", "tabs"]);
+    assert_eq!(
+        found["matches"][0]["platforms"]["react-native"]["status"],
+        "experimental"
+    );
+    let answer = project.json(&["api", "family", "tabs"]);
+    assert_eq!(
+        answer["family"]["elements"][0]["platforms"]["react-native"]["component"],
+        "HelixTabs"
+    );
+    let output = project.run(&["api", "family", "tabs"]);
+    let printed = String::from_utf8_lossy(&output.stdout);
+    for line in [
+        "platforms: react-native experimental, web stable",
+        "  on React Native: <HelixTabs>",
+        "    children (the default slot)",
+        "    panels (slot panels)",
+        "    onActivate (helix-activate)",
+        "    leaves out form",
+    ] {
+        assert!(printed.contains(line), "{line}\n---\n{printed}");
+    }
+}

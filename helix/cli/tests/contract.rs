@@ -351,21 +351,25 @@ fn an_incomplete_command_is_a_usage_error() {
 #[test]
 fn a_usage_error_under_json_is_a_json_error_with_the_choices() {
     let sandbox = Sandbox::new("usage-json", Some(CLEAN));
+    /* `family` is a command of the internal build only, which a published
+    build omits. */
+    let mut commands = vec![
+        "mcp",
+        "api",
+        "component",
+        "diagnostics",
+        "manifest",
+        "new",
+        "scan",
+        "shared",
+        "theme",
+        "visual",
+    ];
+    if cfg!(feature = "internal") {
+        commands.insert(4, "family");
+    }
     for (args, choices) in [
-        (
-            vec!["--json", "frobnicate"],
-            vec![
-                "mcp",
-                "api",
-                "component",
-                "diagnostics",
-                "manifest",
-                "new",
-                "scan",
-                "theme",
-                "visual",
-            ],
-        ),
+        (vec!["--json", "frobnicate"], commands),
         (
             vec!["--json", "theme"],
             vec!["init", "build", "audit", "check"],
@@ -1854,6 +1858,7 @@ fn an_example_opens_with_what_it_needs_said() {
          \x20    that wrapped. -->\n\
          <!-- @min 300 -->\n\
          <!-- @layout fullscreen -->\n\
+         <!-- @react-native-summary A month of visits, on a phone. -->\n\
          <helix-chart></helix-chart>\n\
          <!-- @min 999 -->\n",
     )
@@ -1872,6 +1877,15 @@ fn an_example_opens_with_what_it_needs_said() {
     /* A height is a number in the manifest and a word in the markup. */
     assert!(said.contains("\"min\": 300"), "read as a number: {said}");
     assert!(said.contains("\"layout\": \"fullscreen\""), "{said}");
+    /* What it shows in React Native, keyed by the platform. */
+    assert!(
+        said.contains("\"react-native\": {"),
+        "keyed by the platform: {said}"
+    );
+    assert!(
+        said.contains("\"description\": \"A month of visits, on a phone.\""),
+        "{said}"
+    );
     /* A directive is read wherever it sits, because two of the slider's
     examples open with the stylesheet they need and write theirs under it. The
     first of a name wins, so a second `@min` further down is markup a consumer
