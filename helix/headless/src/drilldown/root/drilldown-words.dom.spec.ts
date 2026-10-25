@@ -33,7 +33,7 @@ const mounted = async (around: string, extra = ''): Promise<Host> => {
   return host
 }
 
-const WORDS = { 'helix-drilldown': { backLabel: 'Zurück', label: 'Menüführung' } }
+const WORDS = { 'helix-drilldown': { backLabel: 'Zurück', fallbackLabel: 'Menüführung' } }
 
 describe('on a page in another language', () => {
   test('names its top page and its way back in the registered words', async () => {
