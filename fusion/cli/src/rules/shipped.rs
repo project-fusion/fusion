@@ -17,6 +17,11 @@
 //!
 //! **A generated stylesheet module counts as its own origin.** A `.css.ts` is
 //! written beside its stylesheet and compiles like any other source.
+//!
+//! **So does a module under `native`, beside `src`.** The styled package's
+//! build writes each family's React Native components into
+//! `native/<family>/index.native.ts` and compiles them into the same `dist`,
+//! outside `src`, where every check that reads a family would find them.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -59,7 +64,8 @@ pub fn run(context: &Context) -> Report {
             continue;
         }
         let package = context.root.join(&manifest.directory);
-        let (dist, source) = (package.join("dist"), package.join("src"));
+        let dist = package.join("dist");
+        let sources = [package.join("src"), package.join("native")];
         if !dist.is_dir() {
             continue;
         }
@@ -77,7 +83,10 @@ pub fn run(context: &Context) -> Report {
                 format!("{stem}.tsx"),
                 format!("{stem}.css.ts"),
             ];
-            if origins.iter().any(|one| source.join(one).is_file()) {
+            if origins
+                .iter()
+                .any(|one| sources.iter().any(|source| source.join(one).is_file()))
+            {
                 continue;
             }
             findings.push(Finding {

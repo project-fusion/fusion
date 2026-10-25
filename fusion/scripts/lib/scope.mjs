@@ -47,7 +47,9 @@ export const OWN = {
   parity: ['visual.parity.config.ts'],
 }
 
-const FAMILY_PATH = /^helix\/(?:headless|styled)\/src\/([^/]+)\//
+/* A family's folder in each tier, and its platform-neutral source, whose
+   generated stylesheet lands in the styled tier's folder for the same family. */
+const FAMILY_PATH = /^helix\/(?:headless\/src|styled\/src|neutral\/src\/families)\/([^/]+)\//
 
 /**
  * The families a change reaches, or `null` for all of them.

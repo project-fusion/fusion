@@ -321,6 +321,17 @@ function exported(installed, exports) {
     }
     if (!key.includes('*')) {
       found.push({ file: pattern, subpath: key })
+      /* **A condition set of its own names files too**, as a family's
+         `react-native` set names its native entry, and each has to ship. */
+      for (const [condition, nested] of Object.entries(
+        typeof target === 'object' && target !== null ? target : {},
+      )) {
+        if (typeof nested === 'object' && nested !== null) {
+          for (const file of Object.values(nested).filter((one) => typeof one === 'string')) {
+            found.push({ condition, file, subpath: key })
+          }
+        }
+      }
       continue
     }
 
@@ -347,6 +358,9 @@ function exported(installed, exports) {
 }
 
 const imports = []
+/* The subpaths with a `react-native` set of their own, which a React Native
+   project's TypeScript resolves under that condition. */
+const native = []
 /* Platform packages packed from a tree the release has not placed binaries in,
    which is every tree but a release's. Named in the result rather than passed
    over, and refused by `publish.mjs` if they ever reach it like this. */
@@ -443,12 +457,21 @@ for (const name of packed) {
     continue
   }
 
-  for (const { file, subpath } of exported(installed, manifest.exports)) {
+  for (const { condition, file, subpath } of exported(installed, manifest.exports)) {
     if (file !== undefined && !existsSync(join(installed, file))) {
       problems.push(
-        `${name}: exports \`${subpath}\` as \`${file}\`, which did not ship. Declared in ` +
-          '`exports` and missing from `files`, most likely.',
+        `${name}: exports \`${subpath}\`${condition ? ` under \`${condition}\`` : ''} as ` +
+          `\`${file}\`, which did not ship. Declared in \`exports\` and missing from \`files\`, ` +
+          'most likely.',
       )
+      continue
+    }
+    /* Resolved under its own condition by the probe below, once per subpath. */
+    if (condition !== undefined) {
+      const specifier = `${name}/${subpath.slice(2)}`
+      if (condition === 'react-native' && !native.includes(specifier)) {
+        native.push(specifier)
+      }
       continue
     }
     /* Only what TypeScript can be asked about. Content and stylesheets are
@@ -577,6 +600,45 @@ for (const [label, command, args] of [
   }
 }
 
+/* **The same subpaths as a React Native project asks for them**, under the
+   `react-native` condition Expo's `tsconfig.base` sets, so each resolves to its
+   native declarations rather than to the web's. */
+if (native.length > 0) {
+  writeFileSync(
+    join(project, 'probe-native.ts'),
+    `${native.map((specifier, index) => `import * as n${index} from '${specifier}'`).join('\n')}\n` +
+      `export const loaded = [${native.map((_, index) => `n${index}`).join(', ')}]\n`,
+  )
+  writeFileSync(
+    join(project, 'tsconfig.native.json'),
+    `${JSON.stringify(
+      {
+        compilerOptions: {
+          customConditions: ['react-native'],
+          module: 'esnext',
+          moduleResolution: 'bundler',
+          noEmit: true,
+          skipLibCheck: true,
+          strict: true,
+          target: 'es2022',
+          types: [],
+        },
+        include: ['probe-native.ts'],
+      },
+      null,
+      2,
+    )}\n`,
+  )
+  try {
+    run('bunx', ['--bun', 'tsc', '-p', 'tsconfig.native.json'], project)
+  } catch (error) {
+    problems.push(
+      'TypeScript cannot resolve the native entries the way a React Native project would:\n' +
+        `${(error.stdout ?? error.message).trim().split('\n').join('\n    ')}`,
+    )
+  }
+}
+
 if (problems.length > 0) {
   console.error(`The published packages do not work when installed (${problems.length}):\n`)
   for (const problem of problems) {
@@ -589,6 +651,7 @@ console.log(
   `template: ${packed.length} packages installed from ` +
     (registryTag === undefined ? 'freshly packed tarballs' : `the registry at \`${registryTag}\``) +
     `, outside the workspace, ${imports.length} exported subpaths resolve with types` +
+    (native.length === 0 ? '' : `, ${native.length} of them under \`react-native\` too`) +
     `, and ${strict.length} type-check with \`skipLibCheck\` off on TypeScript ${typeTools.typescript} and 5.9.3` +
     (unplaced.length === 0
       ? ''

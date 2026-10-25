@@ -85,7 +85,7 @@ fn regex(index: usize) -> &'static Regex {
 enum Scope {
     /// A docs page: every line outside frontmatter keys, fences, and markers.
     Page,
-    /// An example: its `@summary` line.
+    /// An example: its `@summary` line, and its `@react-native-summary` line.
     Example,
     /// Component source: tag descriptions, and each property's first paragraph.
     Source,
@@ -154,8 +154,10 @@ fn lines(scope: &Scope, text: &str) -> Vec<(usize, String)> {
         }
         Scope::Example => {
             for (index, line) in all.iter().enumerate() {
-                if let Some(at) = line.find("@summary ") {
-                    out.push((index, line[at + 9..].replace("-->", "")));
+                for directive in ["@summary ", "@react-native-summary "] {
+                    if let Some(at) = line.find(directive) {
+                        out.push((index, line[at + directive.len()..].replace("-->", "")));
+                    }
                 }
             }
         }
