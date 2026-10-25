@@ -17,7 +17,7 @@ use std::collections::BTreeMap;
 use std::path::{Component, Path, PathBuf};
 use std::sync::{Arc, Mutex, OnceLock};
 
-use fusion_plugins::{Host, Loaded};
+use fusion_plugin_rules::{Host, Loaded, Told};
 use fusion_rules::error::Failure;
 use fusion_rules::walk::crawl;
 use serde_json::{json, Value};
@@ -137,6 +137,19 @@ fn payload(context: &Context, noun: &str, reads: &[String]) -> String {
     let said: Arc<str> = Arc::from(Value::Object(fields).to_string());
     held.insert(wanted, Arc::clone(&said));
     said.to_string()
+}
+
+/// A plugin's finding as this command line's own.
+///
+/// **Field by field, because the host knows no rule type.** The rules world is
+/// a crate every product can take, so the finding it carries is its own, and
+/// each command line says what one becomes.
+fn finding(told: Told) -> Finding {
+    Finding {
+        detail: told.detail,
+        file: told.file,
+        message: told.message,
+    }
 }
 
 /// What a plugin's refusal reads as, which is a finding against the plugin.
@@ -268,7 +281,7 @@ pub fn rules(host: &Arc<Host>, noun: &'static str) -> Result<(Vec<Rule>, Vec<Str
                     match host.check(name, &payload(context, noun, &reads)) {
                         Ok(judged) => Report {
                             checked: judged.checked,
-                            findings: judged.findings.into_iter().map(Into::into).collect(),
+                            findings: judged.findings.into_iter().map(finding).collect(),
                             notes: judged.notes,
                             unit,
                         },

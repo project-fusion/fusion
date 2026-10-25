@@ -1,17 +1,40 @@
-//! The rules host: `.wasm` modules in a plugin directory, each asked for
-//! the rules it provides and handed the payload parts each one reads.
+//! The `fusion:rules` world: `.wasm` modules in a plugin directory, each
+//! asked for the rules it provides and handed the payload parts each one
+//! reads.
+//!
+//! **A host, and nothing about what a rule reads.** What a plugin is handed is
+//! a string and what it hands back is a string, so this crate knows what a
+//! module is, what version of the world it speaks and what a finding looks
+//! like, and never what a component or a workspace is. `helix component check`
+//! is the first verb to take plugins and `fusion x prose check` is the same
+//! shape over different input: a type here that named a manifest would have to
+//! be widened or copied on the day the second one arrives.
+//!
+//! **Nothing is imported into a plugin**: no filesystem, no clock, no network.
+//! A module that asks for one fails to start and is refused by name. What it
+//! may read is what the host passes in the payload, which is a request to
+//! widen the world rather than an escape hatch nobody can audit.
 
-use std::fmt::Write as _;
-use std::fs;
 use std::path::{Path, PathBuf};
 
-use fusion_rules::Finding;
+use fusion_plugin_host::wasmtime::component::Linker;
+use fusion_plugin_host::wasmtime::Store;
+use fusion_plugin_host::{modules_in, Bounded, Limits, Loader, Module, World};
 use serde::Deserialize;
-use sha2::{Digest, Sha256};
-use wasmtime::component::{Component, Linker};
-use wasmtime::{Config, Engine, Store};
 
-wasmtime::component::bindgen!({ path: "wit/rules.wit", world: "plugin" });
+pub use fusion_plugin_host::{digest_of, Refused};
+
+fusion_plugin_host::wasmtime::component::bindgen!({
+    path: "../wit/rules.wit",
+    world: "plugin",
+    wasmtime_crate: fusion_plugin_host::wasmtime,
+});
+
+/// The rules world, as a refusal names it.
+const RULES: World = World {
+    package: "fusion:rules",
+    noun: "plugin",
+};
 
 /// The world this host speaks, which a module declares back.
 ///
@@ -80,7 +103,9 @@ pub struct Edit {
     pub text: String,
 }
 
-/// One finding as a plugin words it, which is a finding as anything else does.
+/// One finding as a plugin words it, which each command line turns into a
+/// finding of its own type: this crate knows no rule type, so a finding reads
+/// the same from a plugin as from a rule compiled in.
 #[derive(Debug, Deserialize)]
 pub struct Told {
     pub detail: String,
@@ -88,47 +113,10 @@ pub struct Told {
     pub message: String,
 }
 
-impl From<Told> for Finding {
-    fn from(told: Told) -> Self {
-        Self {
-            detail: told.detail,
-            file: told.file,
-            message: told.message,
-        }
-    }
-}
-
-/// Why a module was not loaded, or why a call did not answer.
-#[derive(Debug)]
-pub struct Refused {
-    /// The file it happened to, as a person would name it.
-    pub file: PathBuf,
-    pub why: String,
-}
-
-impl std::fmt::Display for Refused {
-    fn fmt(&self, into: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(into, "{}: {}", self.file.display(), self.why)
-    }
-}
-
-/// The sha256 of a module, as the register prints it.
-///
-/// **A hash from a crate rather than by hand.** What the register is for is a
-/// reader comparing two digests, and thirty lines of round constants in this
-/// file would be a primitive nobody reviews sitting next to the sandbox.
-pub(crate) fn digest_of(bytes: &[u8]) -> String {
-    let mut said = String::from("sha256:");
-    for one in Sha256::digest(bytes) {
-        let _ = write!(said, "{one:02x}");
-    }
-    said
-}
-
 /// The plugins found in a directory, each ready to be asked.
 pub struct Host {
-    engine: Engine,
-    modules: Vec<(Loaded, Component)>,
+    loader: Loader,
+    modules: Vec<(Loaded, Module)>,
 }
 
 impl Host {
@@ -150,49 +138,27 @@ impl Host {
     /// component, one that asks for an import this host does not provide, or one
     /// built against a world this host does not speak.
     pub fn read(at: &Path) -> Result<Self, Refused> {
-        let mut config = Config::new();
-        config.wasm_component_model(true);
-        let engine = Engine::new(&config).map_err(|why| Refused {
+        let loader = Loader::new().map_err(|why| Refused {
             file: at.to_path_buf(),
-            why: format!("the runtime would not start: {why}"),
+            why,
         })?;
 
-        let mut found: Vec<PathBuf> = match fs::read_dir(at) {
-            Ok(entries) => entries
-                .flatten()
-                .map(|one| one.path())
-                .filter(|one| one.extension().is_some_and(|kind| kind == "wasm"))
-                .collect(),
-            Err(_) => Vec::new(),
-        };
-        found.sort();
-
-        let mut modules = Vec::new();
-        for file in found {
-            let bytes = fs::read(&file).map_err(|why| Refused {
-                file: file.clone(),
-                why: format!("it could not be read: {why}"),
-            })?;
-            let component = Component::from_binary(&engine, &bytes).map_err(|why| Refused {
-                file: file.clone(),
-                why: format!(
-                    "it is not a component this host can run: {why}. A plugin is a WebAssembly \
-                     component built against the `fusion:rules` world"
-                ),
-            })?;
-            let loaded = Self::introduce(&engine, &component, &file, &bytes)?;
+        let mut modules: Vec<(Loaded, Module)> = Vec::new();
+        for file in modules_in(at) {
+            let module = loader.read(&file, RULES)?;
+            let introduced = Self::introduce(&loader, &module)?;
             /* **Two modules claiming one rule name is a refusal, not a
             winner.** Last one wins makes which rule ran depend on how a
             directory sorts, and a run whose meaning turns on a file name is the
             thing the register exists to stop. Both modules are named, because
             the person reading has to decide which of them to remove. */
-            for provided in &loaded.provides {
-                let taken = modules.iter().find(|(one, _): &&(Loaded, Component)| {
-                    one.provides.iter().any(|two| two.name == provided.name)
-                });
+            for provided in &introduced.provides {
+                let taken = modules
+                    .iter()
+                    .find(|(one, _)| one.provides.iter().any(|two| two.name == provided.name));
                 if let Some((first, _)) = taken {
                     return Err(Refused {
-                        file: loaded.file.clone(),
+                        file: introduced.file.clone(),
                         why: format!(
                             "it provides `{}`, which `{}` already provides. Two plugins claiming \
                              one rule name would make the run depend on how the directory sorts, \
@@ -203,41 +169,48 @@ impl Host {
                     });
                 }
             }
-            modules.push((loaded, component));
+            modules.push((introduced, module));
         }
-        Ok(Self { engine, modules })
+        Ok(Self { loader, modules })
+    }
+
+    /// A module started in a fresh store, with nothing lent to it.
+    ///
+    /// **Nothing is added to the linker, and that is the sandbox.** A module
+    /// importing a filesystem or a clock fails here, by name, rather than being
+    /// given one. A rule runs unbounded, as it did before the loader could
+    /// bound it: the limits a tool is held to would refuse a rule handed every
+    /// manifest in a workspace.
+    fn start(loader: &Loader, module: &Module) -> Result<(Store<Bounded<()>>, Plugin), String> {
+        let mut store = loader
+            .store((), Limits::UNBOUNDED)
+            .map_err(|why| format!("{why}"))?;
+        let linker = Linker::new(loader.engine());
+        let plugin = Plugin::instantiate(&mut store, &module.component, &linker)
+            .map_err(|why| format!("{why}"))?;
+        Ok((store, plugin))
     }
 
     /// What a module says it is, which is the only thing asked of it at load.
-    fn introduce(
-        engine: &Engine,
-        component: &Component,
-        file: &Path,
-        bytes: &[u8],
-    ) -> Result<Loaded, Refused> {
-        let mut store = Store::new(engine, ());
-        /* **Nothing is added to the linker, and that is the sandbox.** A module
-        importing a filesystem or a clock fails here, by name, rather than being
-        given one. */
-        let linker = Linker::new(engine);
-        let plugin =
-            Plugin::instantiate(&mut store, component, &linker).map_err(|why| Refused {
-                file: file.to_path_buf(),
-                why: format!(
+    fn introduce(loader: &Loader, module: &Module) -> Result<Loaded, Refused> {
+        let file = &module.file;
+        let (mut store, plugin) = Self::start(loader, module).map_err(|why| Refused {
+            file: file.clone(),
+            why: format!(
                 "it could not be started: {why}. A plugin is given a payload and nothing else, so \
                  a module importing a filesystem, a clock or a network is refused here"
             ),
-            })?;
+        })?;
 
         let spoken = plugin
             .call_world_version(&mut store)
             .map_err(|why| Refused {
-                file: file.to_path_buf(),
+                file: file.clone(),
                 why: format!("it would not say which world it speaks: {why}"),
             })?;
         if spoken != WORLD {
             return Err(Refused {
-                file: file.to_path_buf(),
+                file: file.clone(),
                 why: format!(
                     "it was built against world {spoken} and this host speaks world {WORLD}. \
                      Rebuild it against `fusion:rules` world {WORLD}, or run a version of this \
@@ -249,7 +222,7 @@ impl Host {
         let provides = plugin
             .call_rules(&mut store)
             .map_err(|why| Refused {
-                file: file.to_path_buf(),
+                file: file.clone(),
                 why: format!("it would not say what rules it provides: {why}"),
             })?
             .into_iter()
@@ -261,16 +234,11 @@ impl Host {
             })
             .collect();
 
-        let digest = digest_of(bytes);
         Ok(Loaded {
-            name: file
-                .file_stem()
-                .unwrap_or_default()
-                .to_string_lossy()
-                .into_owned(),
-            digest,
+            name: module.name(),
+            digest: module.digest.clone(),
             provides,
-            file: file.to_path_buf(),
+            file: file.clone(),
         })
     }
 
@@ -292,7 +260,7 @@ impl Host {
     /// [`Refused`] where no module provides the rule, where the call traps, or
     /// where what came back is not a judgment.
     pub fn check(&self, rule: &str, payload: &str) -> Result<Judged, Refused> {
-        let Some((loaded, component)) = self
+        let Some((loaded, module)) = self
             .modules
             .iter()
             .find(|(one, _)| one.provides.iter().any(|two| two.name == rule))
@@ -303,13 +271,10 @@ impl Host {
             });
         };
 
-        let mut store = Store::new(&self.engine, ());
-        let linker = Linker::new(&self.engine);
-        let plugin =
-            Plugin::instantiate(&mut store, component, &linker).map_err(|why| Refused {
-                file: loaded.file.clone(),
-                why: format!("it could not be started: {why}"),
-            })?;
+        let (mut store, plugin) = Self::start(&self.loader, module).map_err(|why| Refused {
+            file: loaded.file.clone(),
+            why: format!("it could not be started: {why}"),
+        })?;
         let said = plugin
             .call_check(&mut store, rule, payload)
             .map_err(|why| Refused {
@@ -324,33 +289,5 @@ impl Host {
             file: loaded.file.clone(),
             why: format!("`{rule}` answered with something that is not a judgment: {why}"),
         })
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::digest_of;
-
-    /// The empty digest, which is the one value every implementation prints.
-    #[test]
-    fn a_digest_is_the_one_everybody_else_computes() {
-        assert_eq!(
-            digest_of(b""),
-            "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-        );
-        assert_eq!(
-            digest_of(b"abc"),
-            "sha256:ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
-        );
-    }
-
-    /// A block boundary, which is where a hand-written round loop goes wrong.
-    #[test]
-    fn a_digest_crosses_the_blocks_a_message_is_split_into() {
-        let long = "a".repeat(1000);
-        assert_eq!(
-            digest_of(long.as_bytes()),
-            "sha256:41edece42d63e8d9bf515a9ba6932e1c20cbc9f5a5d134645adb5db1b9737ea3"
-        );
     }
 }

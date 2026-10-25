@@ -1,0 +1,50 @@
+package awp:tracker@1.0.0;
+
+/// Writing back to the service that holds the items.
+///
+/// The host holds every lease in its own store and decides each item's
+/// status. A tracker shows what the host decided, in the service's own terms,
+/// and every word it writes comes from the host's templates, never from a
+/// model.
+interface tracker {
+  use awp:sources/types@1.0.0.{error, item, status};
+
+  /// What `update` writes.
+  record change {
+    status: status,
+    /// Who or what the item waits on, and why, while its status is waiting.
+    waiting-on: option<string>,
+  }
+
+  /// A new item, as `create` files it.
+  record draft {
+    title: string,
+    body: string,
+    labels: list<string>,
+  }
+
+  /// Shows the host's claim on an item, such as an assignee or a label, or
+  /// clears it where `holder` is none. The lease itself stays in the host's
+  /// store: a service that cannot claim atomically only shows one.
+  claim: func(id: string, holder: option<string>) -> result<_, error>;
+
+  /// Writes a change, and returns the item's new version. `version` is the
+  /// one the host read, and a tracker whose service checks versions refuses
+  /// a stale one with `conflict`, writing nothing.
+  update: func(id: string, version: string, change: change) -> result<string, error>;
+
+  /// Attaches an address to the item, such as a pull request or a run. An
+  /// address already attached stays attached once.
+  link: func(id: string, address: string) -> result<_, error>;
+
+  /// Files a new item, which lands as proposed. A tracker that files nothing
+  /// returns `unsupported`.
+  create: func(draft: draft) -> result<item, error>;
+}
+
+/// A component that reads items and writes back to the service that holds
+/// them.
+world writer {
+  include awp:sources/reader@1.0.0;
+  export tracker;
+}

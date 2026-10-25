@@ -15,10 +15,11 @@ name = "fusion"
 path = "src/main.rs"
 
 [dependencies]
+# **The host that runs a rule somebody else wrote**, through the rules world.
+fusion-plugin-rules = { workspace = true }
 # **What a rule is, and the runner that measures a set of them.** Shared with
 # `fusion-helix-cli` and owned by neither product, so `helix` taking it is not a
 # dependency on this domain: the crate's `lib.rs` carries the argument.
-fusion-plugins = { workspace = true, features = ["wasm"] }
 fusion-rules = { workspace = true }
 clap = { version = "4", features = ["derive"] }
 regex = { workspace = true }
@@ -32,8 +33,8 @@ serde_json = { workspace = true, features = ["preserve_order"] }
 [dev-dependencies]
 # Encodes the example plugin into a component, the way a plugin author's
 # toolchain does: the end-to-end test takes the path an author takes. At the
-# version `fusion-plugins` tests with, for the reason given there.
-wit-component = "0.258"
+# version the workspace pins, for the reason given there.
+wit-component = { workspace = true }
 
 # **On in every build here, and off in the binaries `binaries.yml` publishes**,
 # which build with `--no-default-features`. It holds `fusion x`, this repository's own checks:

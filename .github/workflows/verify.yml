@@ -635,6 +635,7 @@ jobs:
             fusion/plugins/example/target
             fusion/plugins/example/target-past
             fusion/plugins/example/target-escape
+            fusion/plugins/tracker-example/target
           key: example-plugin
           prefix-key: v0-rust-1.97
       - name: Rust tests

@@ -1,0 +1,24 @@
+[package]
+name = "fusion-plugin-tools"
+description = "The fusion:tools world: a tool written outside the application that offers it to a model, reaching only what its grant names."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+# Its own, never `workspace = true`: a version is a fact about a domain and this
+# workspace holds two. A crate that inherits one fails the build.
+version = "0.0.0-dev"
+
+[dependencies]
+fusion-plugin-host = { workspace = true, features = ["loader"] }
+# **The URL parser the HTTP client uses**, so the host a tool's fetch is
+# checked against is the host it reaches.
+url = { version = "2" }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+# Encodes a core module into a component, as the rules world's tests do.
+wit-component = { workspace = true }
+
+[lints]
+workspace = true

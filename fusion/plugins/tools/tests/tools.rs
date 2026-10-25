@@ -10,13 +10,14 @@ use std::process::Command;
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
 
-use fusion_plugins::tools::{Allowance, Fetch, Grant, Limits, NoFetch, Toolbox};
+use fusion_plugin_host::Loader;
+use fusion_plugin_tools::{Allowance, Fetch, Grant, Limits, NoFetch, Toolbox};
 
 /// The workspace root, from this crate's own manifest.
 fn root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .and_then(Path::parent)
+        .ancestors()
+        .nth(3)
         .expect("the workspace above this crate")
         .to_path_buf()
 }
@@ -110,7 +111,12 @@ fn input(key: &str, value: &str) -> String {
 
 #[test]
 fn a_tool_module_says_what_it_provides_and_is_named_by_its_digest() {
-    let toolbox = Toolbox::load(example(), Limits::default()).expect("it loads");
+    let toolbox = Toolbox::load(
+        &Loader::new().expect("a loader"),
+        example(),
+        Limits::default(),
+    )
+    .expect("it loads");
 
     let names: Vec<&str> = toolbox
         .tools
@@ -127,7 +133,12 @@ fn a_tool_module_says_what_it_provides_and_is_named_by_its_digest() {
 
 #[test]
 fn a_tool_reads_only_inside_the_folders_its_grant_names() {
-    let toolbox = Toolbox::load(example(), Limits::default()).expect("it loads");
+    let toolbox = Toolbox::load(
+        &Loader::new().expect("a loader"),
+        example(),
+        Limits::default(),
+    )
+    .expect("it loads");
     let granted = Folder::new("granted");
     let outside = Folder::new("outside");
     std::fs::write(granted.0.join("notes.txt"), "one\ntwo\nthree\n").unwrap();
@@ -182,7 +193,12 @@ fn a_tool_reads_only_inside_the_folders_its_grant_names() {
 
 #[test]
 fn a_tool_reaches_only_the_hosts_its_grant_names() {
-    let toolbox = Toolbox::load(example(), Limits::default()).expect("it loads");
+    let toolbox = Toolbox::load(
+        &Loader::new().expect("a loader"),
+        example(),
+        Limits::default(),
+    )
+    .expect("it loads");
     let recorded = Arc::new(Recorded::default());
     let grant = Grant {
         hosts: vec!["example.com".to_owned()],
@@ -222,7 +238,12 @@ fn a_tool_reaches_only_the_hosts_its_grant_names() {
 
 #[test]
 fn a_tool_reads_only_the_variables_its_grant_names() {
-    let toolbox = Toolbox::load(example(), Limits::default()).expect("it loads");
+    let toolbox = Toolbox::load(
+        &Loader::new().expect("a loader"),
+        example(),
+        Limits::default(),
+    )
+    .expect("it loads");
     let grant = Grant {
         secrets: vec!["HOME".to_owned()],
         ..Grant::default()
@@ -251,7 +272,12 @@ fn a_tool_reads_only_the_variables_its_grant_names() {
 
 #[test]
 fn a_call_stops_at_its_fuel_its_deadline_and_its_memory() {
-    let toolbox = Toolbox::load(unruly(), Limits::default()).expect("it loads");
+    let toolbox = Toolbox::load(
+        &Loader::new().expect("a loader"),
+        unruly(),
+        Limits::default(),
+    )
+    .expect("it loads");
     let run = |tool: &str, limits: Limits| {
         toolbox
             .call(
@@ -300,7 +326,12 @@ fn a_call_stops_at_its_fuel_its_deadline_and_its_memory() {
 
 #[test]
 fn a_call_stops_fetching_at_its_count_and_its_bytes() {
-    let toolbox = Toolbox::load(unruly(), Limits::default()).expect("it loads");
+    let toolbox = Toolbox::load(
+        &Loader::new().expect("a loader"),
+        unruly(),
+        Limits::default(),
+    )
+    .expect("it loads");
     let grant = Grant {
         hosts: vec!["example.com".to_owned()],
         ..Grant::default()
@@ -352,7 +383,12 @@ impl Fetch for Allowed {
 
 #[test]
 fn a_fetch_is_given_only_the_time_the_call_has_left() {
-    let toolbox = Toolbox::load(unruly(), Limits::default()).expect("it loads");
+    let toolbox = Toolbox::load(
+        &Loader::new().expect("a loader"),
+        unruly(),
+        Limits::default(),
+    )
+    .expect("it loads");
     let grant = Grant {
         hosts: vec!["example.com".to_owned()],
         ..Grant::default()
@@ -385,7 +421,8 @@ fn a_file_that_is_not_a_component_is_refused_by_name() {
     let file = folder.0.join("tool.wasm");
     std::fs::write(&file, b"not wasm").unwrap();
 
-    let refused = Toolbox::load(&file, Limits::default()).unwrap_err();
+    let refused =
+        Toolbox::load(&Loader::new().expect("a loader"), &file, Limits::default()).unwrap_err();
 
     assert!(refused.to_string().contains("tool.wasm"), "{refused}");
     assert!(refused.why.contains("fusion:tools"), "{}", refused.why);

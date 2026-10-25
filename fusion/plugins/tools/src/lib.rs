@@ -1,5 +1,5 @@
-//! The host that runs a tool written outside the application: a WebAssembly
-//! component built against the `fusion:tools` world in `wit/tools.wit`.
+//! The `fusion:tools` world: a WebAssembly component that offers tools to a
+//! model, built against `wit/tools.wit`.
 //!
 //! **A tool reaches only what its grant names.** The world imports three
 //! functions, which read a file, fetch a URL, and read a secret, and the host
@@ -20,17 +20,23 @@
 use std::fs;
 use std::io::Read as _;
 use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-use wasmtime::component::{Component, HasSelf, Linker};
-use wasmtime::{Config, Engine, Store, StoreLimits, StoreLimitsBuilder, Trap};
+use fusion_plugin_host::wasmtime::component::{HasSelf, Linker};
+use fusion_plugin_host::wasmtime::Store;
+use fusion_plugin_host::{stopped, Bounded, Loader, Module, Refused, World};
 
-use crate::rules::{digest_of, Refused};
+mod naming;
+
+pub use naming::Naming;
 
 mod bindings {
-    wasmtime::component::bindgen!({ path: "wit/tools.wit", world: "tool" });
+    fusion_plugin_host::wasmtime::component::bindgen!({
+        path: "../wit/tools.wit",
+        world: "tool",
+        wasmtime_crate: fusion_plugin_host::wasmtime,
+    });
 }
 
 use bindings::fusion::tools::host;
@@ -38,11 +44,14 @@ use bindings::fusion::tools::host;
 /// The version of the `fusion:tools` world this host speaks.
 pub const TOOL_WORLD: u32 = 1;
 
+/// The tools world, as a refusal names it.
+const TOOLS: World = World {
+    package: "fusion:tools",
+    noun: "tool",
+};
+
 /// The most a tool may read from one file, in bytes.
 const MOST_READ: u64 = 1024 * 1024;
-
-/// How often the deadline is checked.
-const TICK: Duration = Duration::from_millis(10);
 
 /// One tool a module provides, as the model is offered it.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -84,12 +93,23 @@ pub struct Limits {
 
 impl Default for Limits {
     fn default() -> Self {
+        let run = fusion_plugin_host::Limits::default();
         Self {
-            fuel: 2_000_000_000,
-            time: Duration::from_secs(30),
-            memory: 64 * 1024 * 1024,
+            fuel: run.fuel,
+            time: run.time,
+            memory: run.memory,
             fetches: 16,
             fetched: 8 * 1024 * 1024,
+        }
+    }
+}
+
+impl From<Limits> for fusion_plugin_host::Limits {
+    fn from(limits: Limits) -> Self {
+        Self {
+            fuel: limits.fuel,
+            time: limits.time,
+            memory: limits.memory,
         }
     }
 }
@@ -128,8 +148,8 @@ impl Fetch for NoFetch {
     }
 }
 
-/// What a call's store holds: its grant, its way out, its memory cap, and
-/// what its fetches have spent.
+/// What a call's store holds: its grant, its way out, and what its fetches
+/// have spent. The loader holds its memory cap.
 struct State {
     /// When the call's time runs out.
     deadline: Instant,
@@ -139,7 +159,6 @@ struct State {
     /// How many fetches the call has made.
     fetches: u32,
     grant: Grant,
-    limits: StoreLimits,
     most: Limits,
 }
 
@@ -267,42 +286,14 @@ fn cut(mut text: String, bytes: usize) -> String {
     text
 }
 
-/// Moves the engine's epoch on every [`TICK`] until the module it serves is
-/// dropped, which is how a call's deadline passes.
-struct Ticker {
-    stop: Arc<AtomicBool>,
-}
-
-impl Ticker {
-    fn start(engine: &Engine) -> Self {
-        let stop = Arc::new(AtomicBool::new(false));
-        let stopped = Arc::clone(&stop);
-        let engine = engine.clone();
-        std::thread::spawn(move || {
-            while !stopped.load(Ordering::Relaxed) {
-                std::thread::sleep(TICK);
-                engine.increment_epoch();
-            }
-        });
-        Self { stop }
-    }
-}
-
-impl Drop for Ticker {
-    fn drop(&mut self) {
-        self.stop.store(true, Ordering::Relaxed);
-    }
-}
-
 /// One module of tools, loaded and ready to call.
 pub struct Toolbox {
-    component: Component,
     /// The SHA-256 of the module's bytes.
     pub digest: String,
-    engine: Engine,
     pub file: PathBuf,
-    linker: Linker<State>,
-    _ticker: Ticker,
+    linker: Linker<Bounded<State>>,
+    loader: Loader,
+    module: Module,
     /// The tools it provides, in its own order.
     pub tools: Vec<Spec>,
 }
@@ -317,21 +308,6 @@ impl std::fmt::Debug for Toolbox {
     }
 }
 
-/// Why a call stopped, in a sentence, naming a limit where one was reached.
-fn stopped(why: &wasmtime::Error, limits: Limits) -> String {
-    match why.downcast_ref::<Trap>() {
-        Some(Trap::OutOfFuel) => format!(
-            "the tool stopped: it used all {} units of its fuel",
-            limits.fuel
-        ),
-        Some(Trap::Interrupt) => format!(
-            "the tool stopped: it ran past its limit of {} seconds",
-            limits.time.as_secs_f64()
-        ),
-        _ => format!("the tool stopped: {why}"),
-    }
-}
-
 impl Toolbox {
     /// Loads the module at `file` and asks it what it provides.
     ///
@@ -340,38 +316,23 @@ impl Toolbox {
     /// [`Refused`] for a file that is not a component, one that imports what
     /// this host does not lend, one built against another version of the
     /// world, or one that fails to say what it provides within the limits.
-    pub fn load(file: &Path, limits: Limits) -> Result<Self, Refused> {
+    pub fn load(loader: &Loader, file: &Path, limits: Limits) -> Result<Self, Refused> {
         let refused = |why: String| Refused {
             file: file.to_path_buf(),
             why,
         };
-        let mut config = Config::new();
-        config
-            .wasm_component_model(true)
-            .consume_fuel(true)
-            .epoch_interruption(true)
-            // One memory to a module, so the memory cap is the module's whole.
-            .wasm_multi_memory(false);
-        let engine = Engine::new(&config)
-            .map_err(|why| refused(format!("the runtime would not start: {why}")))?;
-        let bytes =
-            fs::read(file).map_err(|why| refused(format!("it could not be read: {why}")))?;
-        let component = Component::from_binary(&engine, &bytes).map_err(|why| {
-            refused(format!(
-                "it is not a component this host can run: {why}. A tool is a WebAssembly \
-                 component built against the `fusion:tools` world"
-            ))
-        })?;
-        let mut linker = Linker::new(&engine);
-        bindings::Tool::add_to_linker::<State, HasSelf<State>>(&mut linker, |state| state)
-            .map_err(|why| refused(format!("the host functions would not link: {why}")))?;
+        let module = loader.read(file, TOOLS)?;
+        let mut linker = Linker::new(loader.engine());
+        bindings::Tool::add_to_linker::<Bounded<State>, HasSelf<State>>(&mut linker, |held| {
+            &mut held.state
+        })
+        .map_err(|why| refused(format!("the host functions would not link: {why}")))?;
         let mut toolbox = Self {
-            component,
-            digest: digest_of(&bytes),
-            _ticker: Ticker::start(&engine),
-            engine,
+            digest: module.digest.clone(),
             file: file.to_path_buf(),
             linker,
+            loader: loader.clone(),
+            module,
             tools: Vec::new(),
         };
         let (mut store, tool) = toolbox
@@ -386,7 +347,7 @@ impl Toolbox {
         let spoken = tool.call_world_version(&mut store).map_err(|why| {
             refused(format!(
                 "it would not say which world it speaks: {}",
-                stopped(&why, limits)
+                stopped(&why, limits.into(), "tool")
             ))
         })?;
         if spoken != TOOL_WORLD {
@@ -400,7 +361,7 @@ impl Toolbox {
             .map_err(|why| {
                 refused(format!(
                     "it would not say what tools it provides: {}",
-                    stopped(&why, limits)
+                    stopped(&why, limits.into(), "tool")
                 ))
             })?
             .into_iter()
@@ -420,27 +381,19 @@ impl Toolbox {
         grant: &Grant,
         limits: Limits,
         fetch: Arc<dyn Fetch>,
-    ) -> Result<(Store<State>, bindings::Tool), wasmtime::Error> {
-        let mut store = Store::new(
-            &self.engine,
+    ) -> fusion_plugin_host::wasmtime::Result<(Store<Bounded<State>>, bindings::Tool)> {
+        let mut store = self.loader.store(
             State {
                 deadline: Instant::now() + limits.time,
                 fetch,
                 fetched: 0,
                 fetches: 0,
                 grant: grant.clone(),
-                limits: StoreLimitsBuilder::new()
-                    .memory_size(limits.memory)
-                    .trap_on_grow_failure(true)
-                    .build(),
                 most: limits,
             },
-        );
-        store.limiter(|state| &mut state.limits);
-        store.set_fuel(limits.fuel)?;
-        let ticks = u64::try_from(limits.time.as_millis() / TICK.as_millis()).unwrap_or(u64::MAX);
-        store.set_epoch_deadline(ticks.max(1));
-        let tool = bindings::Tool::instantiate(&mut store, &self.component, &self.linker)?;
+            limits.into(),
+        )?;
+        let tool = bindings::Tool::instantiate(&mut store, &self.module.component, &self.linker)?;
         Ok((store, tool))
     }
 
@@ -460,9 +413,9 @@ impl Toolbox {
     ) -> Result<String, String> {
         let (mut store, tool) = self
             .start(grant, limits, fetch)
-            .map_err(|why| stopped(&why, limits))?;
+            .map_err(|why| stopped(&why, limits.into(), "tool"))?;
         tool.call_call(&mut store, name, input)
-            .map_err(|why| stopped(&why, limits))?
+            .map_err(|why| stopped(&why, limits.into(), "tool"))?
     }
 }
 

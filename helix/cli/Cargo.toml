@@ -24,10 +24,10 @@ fusion-helix-theme = { path = "../theme", features = ["serde"] }
 # crate so the config, the codecs, the diff and the report keep the boundary
 # they had as a command of their own, and `helix visual` is one noun here.
 fusion-helix-visual = { path = "../visual" }
-# **The host that runs a rule somebody else wrote.** It knows what a module is
-# and not what a component is, so the payload a plugin receives is composed here
-# and the sandbox is enforced there.
-fusion-plugins = { workspace = true, features = ["wasm"] }
+# **The host that runs a rule somebody else wrote**, through the rules world.
+# It knows what a module is and not what a component is, so the payload a
+# plugin receives is composed here and the sandbox is enforced there.
+fusion-plugin-rules = { workspace = true }
 # **What a rule is, and the runner that measures a set of them.** Shared with
 # `fusion-cli` and owned by neither product, so this is not a dependency on the
 # fusion domain: the crate's `lib.rs` carries the argument.
@@ -55,9 +55,9 @@ oxc_ast_visit = "0.154.0"
 [dev-dependencies]
 # Encodes the example plugin into a component, which is what a plugin author's
 # toolchain does for them: the end-to-end test takes the path an author takes
-# rather than reading an artifact somebody committed. At the version
-# `fusion-plugins` tests with, for the reason given there.
-wit-component = "0.258"
+# rather than reading an artifact somebody committed. At the version the
+# workspace pins, for the reason given there.
+wit-component = { workspace = true }
 # `helix visual compare`'s tests write their own pictures rather than reading
 # committed ones.
 png = "0.18"
