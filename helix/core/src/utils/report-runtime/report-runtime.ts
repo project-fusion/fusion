@@ -74,6 +74,11 @@ export type RuntimeKind =
   | 'not-a-plot'
   /** The browser refused picture in picture. */
   | 'picture-in-picture-refused'
+  /**
+   * React has a root on the page and no element found the props it holds, so React's handlers
+   * and object properties never arrive. Development builds only.
+   */
+  | 'react-props-missing'
   /** A Grid's `min` is no length it can write, so the grid lays out by its column count. */
   | 'refused-length'
   /** A React handler prop is a removed callback, which never ran from JSX. Development builds only. */
