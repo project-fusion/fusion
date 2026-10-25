@@ -24,11 +24,11 @@
  * trust the column; this file on its own is only an argument.
  *
  * **Gamut mapping is the part that had to be exact.** The series ramp and the
- * loud statuses ask for chroma sRGB cannot hold, and a naive clamp paints a
- * different color from the one CSS Color 4 specifies: the spec reduces chroma in
- * OKLCH by binary search with a just-noticeable-difference clip, and the
- * difference between that and clamping is visible on eight of the twenty-four
- * series. What is implemented below is §13.2 rather than an approximation of it.
+ * loud statuses ask for chroma sRGB cannot hold. CSS Color 4 §13.2 reduces
+ * chroma in OKLCH until the color fits, and Chromium clips each channel
+ * instead, so what is implemented below is the clip, as `mapToGamut` says.
+ * The Rust token evaluation in `helix/theme/rust/tokens/paint.rs` is this
+ * module ported, and `paint.spec.mjs` holds the two to the same hexes.
  */
 
 const cbrt = (x) => Math.cbrt(x)
