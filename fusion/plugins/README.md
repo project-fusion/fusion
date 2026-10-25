@@ -1,6 +1,6 @@
 # fusion-plugins
 
-The host that runs a rule somebody wrote outside this repository.
+The host that runs a rule or a tool somebody wrote outside this repository.
 
 A plugin is a WebAssembly component built against the `fusion:rules` world in
 [`wit/rules.wit`](wit/rules.wit). It exports three functions: the version of the
@@ -66,3 +66,40 @@ world, reviewed once, rather than an escape hatch nobody can audit.
 - **Naming a rule nothing else claims.** Two modules providing one rule name are
   refused with both named: last one wins would make which rule ran depend on how
   the directory sorts.
+
+## Tools
+
+A tool is a WebAssembly component built against the `fusion:tools` world in
+[`wit/tools.wit`](wit/tools.wit), which a host application runs for an extension. It
+exports the version of the world it speaks, the tools it provides, each with
+its input's JSON Schema, and one function that runs a call. The input is the
+model's JSON, and the answer is text.
+
+A tool may do more than a rule, so it is lent three host functions: read a
+file, fetch a URL, and read an environment variable. Each call to one is
+checked against the grant the person gave, and fails with a sentence where the
+grant does not cover it:
+
+| Function | The grant names | Checked against |
+|---|---|---|
+| `read-file` | Folders | The path, resolved through every link |
+| `fetch` | Hosts, each with its subdomains | The URL's host. A URL that carries a user name is refused |
+| `secret` | Variables | The name |
+
+An empty grant reaches nothing. The host carries no HTTP client: the embedder
+sends the request, follows no redirect to a host the grant does not name, and
+connects to no address on this machine or a private network the grant does not
+name. The embedder resolves each name once and connects to the address it
+checked.
+
+Every call runs in a store of its own under these limits:
+
+- fuel, about one unit for each instruction;
+- a deadline of 30 seconds, which a fetch counts against too, since the
+  embedder is handed the time the call has left;
+- a memory cap;
+- 16 fetches;
+- 8 MiB brought back by all of its fetches together.
+
+A call that reaches one stops, and its error names the limit. [`tool-example/`](tool-example) is a whole tool module, built the
+same way as the rule example.
