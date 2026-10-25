@@ -6,15 +6,15 @@ title: Routing and navigation
 
 # Routing and navigation
 
-Some components navigate, such as a tree used as a sidebar, a button that opens
-another page, or a tab that is a page. Each of these should be a link. A
+Some components navigate, such as a tree used as a sidebar, a menu item that
+opens another page, or a tab that is a page. Each of these should be a link. A
 framework router does not handle a link inside a shadow root the way it handles
 its own links.
 
 ## A component that navigates renders its own anchor
 
-`Tree.Item` and `Button` both take an `href`. With an `href`, the element you
-press *is* an `<a>`:
+`Tree.Item`, `Tab`, and `Menu.Item` take an `href`. With an `href`, the element
+you press *is* an `<a>`:
 
 ```html
 <helix-tree-item
@@ -103,9 +103,11 @@ changes the structure of the markup as well as adding an attribute. Without an
 `href`, nothing moves. The wrapper stays the `treeitem` and contains its group,
 the same way an `<li>` contains a `<ul>`.
 
-Tabs have no equivalent published pattern. Web Awesome has the same problem. Its
-answer is to drop the anchor and navigate in JavaScript. That works, and you
-lose every item in the list above.
+A tab with an `href` renders `role="tab"` on the `<a>` itself, so a press,
+Enter, and the browser's own link gestures follow it. It sends `helix-select`
+first, and canceling that keeps the browser from following, so a client-side
+router can follow it instead. Web Awesome drops the anchor and navigates in
+JavaScript, which loses every item in the list above.
 
 ## Use client-side routing with real anchors
 
@@ -166,9 +168,14 @@ That is expected.
 
 | Component | Notes |
 |---|---|
-| `Button` | Renders an `<a>` styled as a button. |
 | `Tree.Item` | Changes the ARIA shape, as above. A linked branch navigates from its row and opens from its chevron. |
 | `Menu.Item` | The row becomes the anchor and carries `menuitem`. Takes `target`, `rel` and `download`. |
+| `Tab` | The tab becomes the anchor and carries `tab`. Takes `target` and `rel`. `helix-select` comes first, and canceling it keeps the browser from following. |
+
+`Button` never renders an anchor, because a router renders its own `<a>` and
+cannot render one inside the button's shadow root. For a link that looks like a
+button, put the `data-button` recipe on your own anchor, such as
+`<Link data-button="solid" href="/pricing">`, which draws the same control.
 
 Other components that should navigate do not take an `href` yet. To make one
 navigate, slot a link into it. `Tree.Item` follows a slotted anchor when you

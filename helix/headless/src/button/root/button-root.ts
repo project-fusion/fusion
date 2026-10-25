@@ -49,7 +49,7 @@ const afterDispatch = (click: Event, then: () => void): void => {
 }
 
 /**
- * @summary Triggers an action, submits a form, or navigates.
+ * @summary Triggers an action or submits a form.
  *
  * @description
  * Renders a real `<button>`, so activation, focus, and other browser behavior

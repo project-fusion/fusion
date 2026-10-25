@@ -244,7 +244,8 @@ export const lookForReact = (host: LitElement, applied: boolean): void => {
  * Binds the handler React is holding for this event, if it has not bound it.
  *
  * **React attaches no custom element listener while hydrating.** Measured in
- * Chrome against 19.2.8: on a server-rendered page every `onhelix-*` prop is
+ * Chrome against 19.2.8, and reported against 19.3 in facebook/react#35446,
+ * still open on October 25, 2026: on a server-rendered page every `onhelix-*` prop is
  * dead, whatever it is called, until React commits an update for some other
  * reason, at which point it silently starts working. That is why it looks fine
  * while developing and fails on a page somebody actually loaded. It is React's
@@ -286,7 +287,8 @@ const REACT_WIRES = new Set(['scroll', 'scrollend'])
  * The prop React would be holding for this event, if it is holding one.
  *
  * **A relayed native event needs a different answer from one of ours, and
- * getting it wrong doubles every call.** Measured against React 19.2.8:
+ * getting it wrong doubles every call.** Measured against React 19.2.8, and
+ * not measured since:
  *
  * ```
  * onhelix-before-change <- helix-before-change  REACHED (React binds it with addEventListener)

@@ -95,8 +95,10 @@ dialog.addEventListener('helix-before-close', (event) => {
 })
 ```
 
-Every dispatched event is checked against a declaration, and every declaration
-against a dispatch, so every event you can listen for is documented.
+Every dispatched event is checked against a declaration, so every event you can
+listen for is documented. A declaration needs no dispatch of its own, because a
+parent declares the events its children send and a form control declares the
+native event it relays.
 
 ## Helix events
 
