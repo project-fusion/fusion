@@ -517,6 +517,19 @@ describe('a drilldown with navigation', () => {
     expect(opener?.hasAttribute('aria-haspopup')).toBe(false)
   })
 
+  /* The APG's landmark guidance: a screen reader says the role after the name,
+     so a landmark named "Navigation" is read "Navigation navigation". */
+  test('is an unnamed landmark without a label, never one named for its role', async () => {
+    const host = (await mount(
+      `<helix-headless-drilldown navigation>
+        <helix-headless-drilldown-item value="blog" href="/blog">Blog</helix-headless-drilldown-item>
+      </helix-headless-drilldown>`,
+    )) as Stack
+    expect(internalRole(host)).toBe('navigation')
+    expect((host as unknown as { internals: ElementInternals }).internals.ariaLabel).toBeNull()
+    expect(part(host, 'page')?.hasAttribute('aria-label')).toBe(false)
+  })
+
   test('the rows of a page below are the list, and the rows above take no place in it', async () => {
     const host = await site()
     await press(host, host.querySelector('[value="docs"]') as Element)

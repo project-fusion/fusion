@@ -63,12 +63,14 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * | Right Arrow | Opens the row's page. Left Arrow on a right-to-left page. |
  * | Left Arrow, Escape | Goes back one page, with focus on the row that opened it. Right Arrow on a right-to-left page. |
  *
- * The rows of the page showing are a `menu`, named by `label` on the top page
- * and by the page's title below it.
+ * The rows of the page showing are a `menu`, named by `label` on the top page,
+ * or by `fallbackLabel` where nothing names it, and by the page's title below
+ * it.
  *
  * **`navigation` makes it a site's navigation.** The host is a `navigation`
- * landmark named by `label`, each page is a list, and each row is a list item
- * holding a link or a button, as the APG's disclosure navigation is built,
+ * landmark named by `label`, and unnamed without one. Each page is a list,
+ * and each row is a list item holding a link or a button, as the APG's
+ * disclosure navigation is built,
  * so a reader meets places to go in place of a menu of commands. The keys stay
  * the same. The back button and the title sit above
  * the menu. Disabled rows stay reachable with the arrow keys, and typing a
@@ -110,25 +112,36 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
   static words = 'helix-drilldown'
 
   /**
-   * The name of the top page's menu, read by screen readers. A page below it is
-   * named by its title.
-   *
-   * An `aria-label` or `aria-labelledby` on the host names the top page too,
-   * and wins over this.
-   */
-  @words
-  @property()
-  /* Not "Menu". This component's own description is built around not being one,
-     and a default accessible name is the one place that claim reaches a
-     reader. */
-  label = 'Navigation'
-
-  /**
    * The text of the back button.
    */
   @words
   @property({ attribute: 'back-label' })
   backLabel = 'Back'
+
+  /**
+   * The top page's name where nothing names it: no `label`, no `aria-label`,
+   * and no `aria-labelledby` on the host. A `navigation` landmark never takes
+   * it, because a screen reader says the role after the name, and "Navigation
+   * navigation" is the doubled name the APG's landmark guidance warns against.
+   * A page with one navigation landmark needs no name for it.
+   */
+  @words
+  @property({ attribute: 'fallback-label' })
+  /* Not "Menu". This component's own description is built around not being one,
+     and a default accessible name is the one place that claim reaches a
+     reader. */
+  fallbackLabel = 'Navigation'
+
+  /**
+   * The name of the top page's menu, read by screen readers, and with
+   * `navigation` the name of the landmark. A page below it is named by its
+   * title.
+   *
+   * An `aria-label` or `aria-labelledby` on the host names the top page too,
+   * and wins over this.
+   */
+  @property()
+  label = ''
 
   /**
    * Whether the drilldown is a site's navigation: a `navigation` landmark
@@ -528,7 +541,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     }
       <div
         aria-busy=${this.loading ? 'true' : nothing}
-        aria-label=${this.drilldown.atRoot && !this.navigation ? this.label || nothing : nothing}
+        aria-label=${this.drilldown.atRoot && !this.navigation ? this.label || this.fallbackLabel : nothing}
         aria-labelledby=${this.drilldown.atRoot ? nothing : 'title'}
         part="page"
         role=${this.navigation ? 'list' : 'menu'}
