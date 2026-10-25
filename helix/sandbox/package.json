@@ -87,7 +87,7 @@
     "@fusion.dev/helix-cem": "workspace:*",
     "@fusion.dev/helix-testing": "workspace:*",
     "@fusion.dev/scripts": "workspace:*",
-    "@happy-dom/global-registrator": "^21.0.1",
+    "@happy-dom/global-registrator": "^21.0.4",
     "@lit-labs/ssr": "^4.1.0",
     "@types/bun": "^1.4.3",
     "lit": "^3.2.1"
