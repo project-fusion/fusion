@@ -92,8 +92,21 @@ export class IndicatorController implements ReactiveController {
   constructor(host: ReactiveControllerHost & HTMLElement, options: IndicatorOptions) {
     this.host = host
     this.options = options
+    /* A Helix host suppresses transitions until it settles, a frame after
+       its first update, so a move made before then has no transition and no
+       `transitionend`, and `data-moving` would stay until the timer. Moves
+       before then are placements, not travel. A host without `whenSettled`
+       has no such suppression and is treated as settled from the start. */
+    const settling = (host as { whenSettled?: Promise<void> }).whenSettled
+    this.settled = settling === undefined
+    void settling?.then(() => {
+      this.settled = true
+    })
     host.addController(this)
   }
+
+  /** Whether the host's transitions are on, so a move can travel. */
+  private settled: boolean
 
   hostConnected(): void {
     /* The host's own size is not enough: a strip that keeps its width while its
@@ -211,7 +224,7 @@ export class IndicatorController implements ReactiveController {
     indicator.style.setProperty('--indicator-block-size', `${box.height}px`)
     indicator.toggleAttribute('data-placed', true)
 
-    if (!moved) {
+    if (!moved || !this.settled) {
       return
     }
     indicator.toggleAttribute('data-moving', true)

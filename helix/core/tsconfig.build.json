@@ -1,9 +1,21 @@
 {
   // One `__decorate`, imported from tslib by every module with a decorator, in
   // place of a copy of it written into each of them.
+  //
+  // The format's fixtures, the reference interpreter, the conformance check,
+  // and each machine's test vectors are what the machine specs hold modules
+  // to, and they ship nowhere: `./machines/*` exports every module the build
+  // writes there.
   "compilerOptions": {
     "importHelpers": true
   },
-  "exclude": ["src/**/*.spec.ts", "src/*/.examples/**"],
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/*/.examples/**",
+    "src/machines/conformance.ts",
+    "src/machines/fixtures/**",
+    "src/machines/reference.ts",
+    "src/machines/*/vectors.ts"
+  ],
   "extends": "./tsconfig.json"
 }

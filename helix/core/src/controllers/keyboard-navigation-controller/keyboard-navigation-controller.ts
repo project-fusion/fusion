@@ -1,6 +1,7 @@
 import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import { inlineStep } from '../../utils/inline-step/inline-step.js'
 import { keyClaimed } from '../../utils/key-claimed/key-claimed.js'
+import { rove } from '../../utils/rove/rove.js'
 import { type TypeaheadBy, typesCharacter } from '../../utils/typeahead/typeahead.js'
 
 /** What a controller needs of an item to move to it and choose it. */
@@ -304,50 +305,24 @@ export class KeyboardNavigationController implements ReactiveController {
       return
     }
 
-    /* `-1` means two different things and only one of them is a starting point.
-     *
-       Starting from the selection, `-1` is "nothing is chosen and no item has
-       focus", and the arithmetic below relies on it: a forward step lands on
-       the first item and a backward step on the last, both of which are where a
-       reader entering an unanswered set expects to arrive.
-
-       Starting from focus, `-1` is "the press did not come from the set", and
-       there is nothing to move. The listener is on the host, not on the items,
-       and a host can hold more than the set: a tab panel is `tabindex="0"`, so
-       an arrow pressed while reading a panel used to move the tabs out from
-       under the reader. */
-    const current = this.current(items, event)
-    if (this.origin === 'focus' && current === -1) {
-      return
-    }
-    const last = items.length - 1
-
+    /* The keys move along the line of text: on a right-to-left page, Left is
+       forward. `rove` says why a press from outside the set moves nothing. */
     const along = inlineStep(this.host, event.key)
-    let next = current
-    if (along === 1 || event.key === 'ArrowDown') {
-      next = this.wrap ? (current + 1) % items.length : Math.min(current + 1, last)
-    } else if (along === -1 || event.key === 'ArrowUp') {
-      /* From nothing, backwards is the last, which the arithmetic did not give.
-       *
-       * `(-1 - 1 + length) % length` is `length - 2`: the *second* to last, so
-       * a reader arrowing backwards into an unanswered group lands one short of
-       * the end. The wrapping form is right for every real index and wrong for
-       * the one that is not an index.
-       *
-       * And the clamp is `Math.max` against the forward branch's `Math.min`.
-       * Unclamped this is `-1` on the first item, and `items[-1]` is undefined,
-       * so nothing is focused and nothing chosen on a press that
-       * `preventDefault` has already swallowed. */
-      next =
-        current < 0
-          ? last
-          : this.wrap
-            ? (current - 1 + items.length) % items.length
-            : Math.max(current - 1, 0)
-    } else if (event.key === 'Home') {
-      next = 0
-    } else {
-      next = last
+    const next = rove(
+      this.current(items, event),
+      items.length,
+      along === 1 || event.key === 'ArrowDown'
+        ? 'next'
+        : along === -1 || event.key === 'ArrowUp'
+          ? 'previous'
+          : event.key === 'Home'
+            ? 'first'
+            : 'last',
+      this.wrap,
+      this.origin === 'focus',
+    )
+    if (next === undefined) {
+      return
     }
 
     event.preventDefault()

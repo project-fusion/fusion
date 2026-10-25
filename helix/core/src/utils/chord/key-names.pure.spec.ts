@@ -14,6 +14,7 @@ describe('keyNames', () => {
       keys: ['Ctrl', 'K'],
       separator: '+',
       spoken: '',
+      words: ['Ctrl', 'K'],
     })
   })
 
@@ -27,6 +28,7 @@ describe('keyNames', () => {
       keys: ['Command', 'K key'],
       separator: '-',
       spoken: '',
+      words: ['Command', 'K key'],
     })
     expect(keyNames(['mod', 'enter'], true, { enter: 'Return', mod: 'Command' }).separator).toBe(
       '-',
@@ -45,7 +47,12 @@ describe('keyNames', () => {
       keys: ['Shift', 'PageUp'],
       separator: '+',
       spoken: '',
+      words: ['Shift', 'PageUp'],
     })
+  })
+
+  test('says each key in words where it is drawn in a glyph', () => {
+    expect(keyNames(['shift', 'mod', 'p'], true).words).toEqual(['Shift', 'Command', 'P'])
   })
 
   /* `mod+shift+p` drew ⌘⇧P on a Mac, where every menu writes ⇧⌘P, and the

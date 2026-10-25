@@ -13,10 +13,15 @@ import type { CheckDetail } from './details.js'
  * `toggle` says a popover or a `<details>` opened or closed, and Helix relays
  * it for its overlays, so a checked state takes a verb of its own.
  *
- * The notification on a form control is native, as it is for a value: the
- * control relays `change` from the inner input and announces `input` beside
+ * Every family that turns on and off sends it: Checkbox, Switch, a Toggle on
+ * its own, and Motion Toggle. A Toggle in a group sends `helix-before-select`,
+ * since a press there chooses among the group's items.
+ *
+ * The notification on a form control is native, as it is for a value: Checkbox
+ * and Switch relay `change` from the inner input and announce `input` beside
  * it, so `onChange` reads `currentTarget.checked` and gets a boolean from the
- * platform. A checked state that is not a form control's, such as a map layer
+ * platform. Toggle and Motion Toggle are buttons, and send `change` alone. A
+ * checked state that is not a form control's, such as a map layer
  * or a code block's wrapping, sends `helix-check` once it has moved.
  *
  * It also ends a collision: Checkbox Group listened for its boxes' change and
