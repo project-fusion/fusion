@@ -1,0 +1,35 @@
+# Opens the gallery from stopped at one link, for the flows that start with
+# it: `LINK` is the link, and `SHOWS` is text its screen draws. It has no tag,
+# so `maestro test helix/app/.maestro` runs it only from a flow.
+#
+# **The gallery starts first, and the link goes to it once it draws.** The
+# iOS simulator can time out opening a link that has to start the gallery:
+# in the Tabs flow on October 14, 2026, and in the Checkbox Group flow in run
+# 38982565245, where the screen was still black after 11 seconds. Maestro
+# 2.11.0 retries only its own errors, and the timeout is the simulator's, so
+# a `retry` around that link never tried it again. The launch went on all the
+# same and opened the link late, over the next flow's link: Tabs found Checkbox
+# Group's screen in place of its own. A link to a gallery that is running and
+# drawn opened in about a second each time in that run.
+#
+# The gallery's first screen draws after it listens for links, so a link
+# sent once that screen shows is heard. The `retry` opens the link again when
+# its screen does not show, as when a late link from the flow before takes
+# its place.
+appId: dev.fusion.helix.app
+name: Open the gallery at a link
+---
+- launchApp:
+    stopApp: true
+# A link that started the gallery took 48 seconds to open in the Readings
+# flow of run 38982565245, so the first screen has twice the usual wait.
+- extendedWaitUntil:
+    visible: Helix components drawn by the native renderer.*
+    timeout: 60000
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: ${LINK}
+      - extendedWaitUntil:
+          visible: ${SHOWS}
+          timeout: 30000

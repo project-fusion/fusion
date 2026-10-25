@@ -1,0 +1,24 @@
+# Flings the list of 1,000 rows down ten times and back up five, each fling
+# gliding to a stop before the next, then waits for the line at the top of the
+# screen to give the frame rate the screen counted.
+appId: dev.fusion.helix.app
+name: Scroll the rows
+---
+- repeat:
+    times: 10
+    commands:
+      - swipe:
+          direction: UP
+          duration: 300
+- repeat:
+    times: 5
+    commands:
+      - swipe:
+          direction: DOWN
+          duration: 300
+- extendedWaitUntil:
+    visible:
+      id: rows-frame-rate
+      text: '[0-9,]+ frames in .*'
+    timeout: 10000
+- takeScreenshot: rows

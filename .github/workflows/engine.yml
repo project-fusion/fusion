@@ -1,0 +1,71 @@
+# The theme engine `@fusion.dev/helix-native` carries, built for phones from
+# `fusion-helix-native` by `helix/native/scripts/engine.mjs`.
+#
+# Called by `release.yml` and `release-experimental.yml` before they pack. Each
+# platform lands as an artifact, `helix-native-engine-ios` and
+# `helix-native-engine-android`, and `.github/scripts/place-engine.sh` puts it
+# where the package's `files` says, refusing a release without either. Nothing
+# here is committed: the package is the one place the libraries are kept.
+#
+# Pull requests that change the engine run `native.yml`, which builds the
+# Android half and compiles the module around it.
+
+name: engine
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build (${{ matrix.platform }})
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # An XCFramework of the static library for devices and for both
+          # simulators, which needs Xcode.
+          - platform: ios
+            runner: macos-14
+            targets: aarch64-apple-ios,aarch64-apple-ios-sim,x86_64-apple-ios
+            out: helix/native/ios/theme/engine
+          # A shared library for each ABI, linked by the runner's NDK.
+          - platform: android
+            runner: ubuntu-latest
+            targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+            out: helix/native/android/src/engine
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The script imports only what Node ships, so no install.
+      - name: Set up bun
+        uses: ./.github/actions/setup
+        with:
+          dependencies: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
+        with:
+          targets: ${{ matrix.targets }}
+
+      # Saved by the release on `main`, as `binaries.yml` saves its own.
+      - name: Restore the Cargo cache
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          key: engine-${{ matrix.platform }}
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build the engine
+        run: bun helix/native/scripts/engine.mjs ${{ matrix.platform }}
+
+      - name: Keep the engine for the release
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: helix-native-engine-${{ matrix.platform }}
+          path: ${{ matrix.out }}
+          if-no-files-found: error

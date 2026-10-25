@@ -1,0 +1,73 @@
+# Motion: Icon's spin, Badge's pulse, Progress that does not know its value,
+# and Skeleton's sheen and pulse, on the gallery's own check,
+# `helix://checks/motion`, under the app's Motion Toggle. A press on the
+# toggle pauses all of them, and a second press starts them again. Recorded.
+#
+# Maestro compares no pictures, so the screenshots come in pairs: while the
+# motion runs the second comes a second after the first and the two differ,
+# and while it is paused they match. The video shows the same.
+#
+# The toggle is a toggle button, and Android gives its checked state while
+# motion is paused, which the flow requires. On iOS React Native gives it the
+# value "checked", which Maestro reads as the element's text: that step is
+# optional until a night shows what iOS gives. The pause lasts as long as the
+# gallery runs, so the flow stops the gallery at its end, passed or failed.
+appId: dev.fusion.helix.app
+name: Motion
+tags:
+  - interactions
+onFlowComplete:
+  - stopApp
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://checks/motion
+      SHOWS: .*Pause motion.*
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says. The screen keeps moving, so no press waits for it to
+# stand still.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+    waitToSettleTimeoutMs: 200
+- startRecording: motion
+- takeScreenshot: motion-running-1
+# On a screen that keeps moving, this waits the whole second.
+- waitForAnimationToEnd:
+    timeout: 1000
+- takeScreenshot: motion-running-2
+- tapOn:
+    text: .*Pause motion.*
+    waitToSettleTimeoutMs: 200
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: true
+          text: .*Pause motion.*
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          optional: true
+          text: checked
+- takeScreenshot: motion-paused-1
+# Paused, the screen stands still, and this returns at once.
+- waitForAnimationToEnd:
+    timeout: 1000
+- takeScreenshot: motion-paused-2
+- tapOn:
+    text: .*Pause motion.*
+    waitToSettleTimeoutMs: 200
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: false
+          text: .*Pause motion.*
+- takeScreenshot: motion-resumed
+- stopRecording

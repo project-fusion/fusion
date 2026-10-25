@@ -1,0 +1,29 @@
+# Accordion, each example drawn alone: sections with seams, framed
+# sections, one open at a time, and the chevron at the start. One screenshot
+# of each, named by the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Accordion"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://accordion/preview/preview
+- extendedWaitUntil:
+    visible: '.*Shipping.*'
+    timeout: 30000
+- takeScreenshot: accordion-preview-${MODE}-${SIZE}
+- openLink: helix://accordion/outlined/preview
+- extendedWaitUntil:
+    visible: '.*Shipping.*'
+    timeout: 15000
+- takeScreenshot: accordion-outlined-${MODE}-${SIZE}
+- openLink: helix://accordion/single/preview
+- extendedWaitUntil:
+    visible: '.*Orders ship within two business days.*'
+    timeout: 15000
+- takeScreenshot: accordion-single-${MODE}-${SIZE}
+- openLink: helix://accordion/chevron-at-the-start/preview
+- extendedWaitUntil:
+    visible: '.*Delivery.*'
+    timeout: 15000
+- takeScreenshot: accordion-chevron-at-the-start-${MODE}-${SIZE}

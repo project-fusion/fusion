@@ -1,0 +1,34 @@
+# Card, each example drawn alone: an outlined card, the shadow of an elevated
+# one, the translucent materials, and media beside the words. One screenshot
+# of each, named by the example, `MODE`, and `SIZE`.
+#
+# The media beside the words keeps its width at the largest text size, and
+# leaves the words a column a letter or two wide, so the flow waits for the
+# title of that example's screen: an emulator found no "Quarterly review"
+# there in run 38957410938.
+appId: dev.fusion.helix.app
+name: "Screens: Card"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://card/preview/preview
+- extendedWaitUntil:
+    visible: '.*Storage.*'
+    timeout: 30000
+- takeScreenshot: card-preview-${MODE}-${SIZE}
+- openLink: helix://card/elevated/preview
+- extendedWaitUntil:
+    visible: '.*Team plan.*'
+    timeout: 15000
+- takeScreenshot: card-elevated-${MODE}-${SIZE}
+- openLink: helix://card/material/preview
+- extendedWaitUntil:
+    visible: '.*Team members.*'
+    timeout: 15000
+- takeScreenshot: card-material-${MODE}-${SIZE}
+- openLink: helix://card/horizontal/preview
+- extendedWaitUntil:
+    visible: 'Horizontal'
+    timeout: 15000
+- takeScreenshot: card-horizontal-${MODE}-${SIZE}

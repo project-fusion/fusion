@@ -1,0 +1,24 @@
+# Progress, each example drawn alone: a bar with its value, two bars that do
+# not know their value, and the rings. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Progress"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://progress/preview/preview
+- extendedWaitUntil:
+    visible: '.*Uploading.*'
+    timeout: 30000
+- takeScreenshot: progress-preview-${MODE}-${SIZE}
+- openLink: helix://progress/indeterminate/preview
+- extendedWaitUntil:
+    visible: '.*Restoring backup.*'
+    timeout: 15000
+- takeScreenshot: progress-indeterminate-${MODE}-${SIZE}
+- openLink: helix://progress/ring/preview
+- extendedWaitUntil:
+    visible: '.*Syncing.*'
+    timeout: 15000
+- takeScreenshot: progress-ring-${MODE}-${SIZE}

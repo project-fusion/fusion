@@ -1,0 +1,19 @@
+# Quote, each example drawn alone: an inline quote, and quotes in German and
+# French with their own marks. One screenshot of each, named by the example,
+# `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Quote"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://quote/preview/preview
+- extendedWaitUntil:
+    visible: '.*during the call.*'
+    timeout: 30000
+- takeScreenshot: quote-preview-${MODE}-${SIZE}
+- openLink: helix://quote/languages/preview
+- extendedWaitUntil:
+    visible: '.*in German.*'
+    timeout: 15000
+- takeScreenshot: quote-languages-${MODE}-${SIZE}

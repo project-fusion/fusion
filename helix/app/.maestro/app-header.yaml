@@ -1,0 +1,42 @@
+# App Header: a press on a destination in the bar, which the example takes as
+# a router does, marks it the current page, and on a page that scrolls the
+# transparent bar takes the glass once the page has moved from its top.
+# Recorded.
+#
+# The bar is drawn inside the gallery's scroll view, so a short drag moves
+# the page far enough to lift the bar and leaves it on screen.
+appId: dev.fusion.helix.app
+name: App Header
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://app-header/preview/preview
+      SHOWS: Projects
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: app-header
+- tapOn: Projects
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-preview-projects
+- openLink: helix://app-header/transparent/preview
+- extendedWaitUntil:
+    visible: Your projects
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-transparent-top
+- swipe:
+    start: 50%, 70%
+    end: 50%, 62%
+    duration: 400
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-transparent-scrolled
+- stopRecording

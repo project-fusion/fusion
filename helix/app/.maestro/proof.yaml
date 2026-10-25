@@ -1,0 +1,43 @@
+# The proof page, a project dashboard written once for the web and a phone:
+# a row opens its project, each tab shows its panel, the archive button
+# archives, the outline goes to a section, and the first crumb goes back
+# to the list, recorded.
+appId: dev.fusion.helix.app
+name: Proof page
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://proof
+      SHOWS: 3 active, 1 at risk
+# The first touch on a screen that has just opened is lost on the iOS
+# simulator, as `tabs.yaml` says. A tap on the page's title takes it.
+- tapOn:
+    text: 3 active, 1 at risk
+    retryTapIfNoChange: false
+- startRecording: proof
+# A row says its avatar, its words, and its status as one label.
+- tapOn: .*Website redesign.*
+- assertVisible: Progress
+- assertVisible: Ada Okonjo
+- tapOn: Activity
+- assertVisible: Merged the pricing page
+- tapOn: Settings
+- assertVisible: Email when a task is overdue
+# The outline's link goes to the archive section.
+- tapOn: Archive
+- scrollUntilVisible:
+    element: Archive project
+    direction: DOWN
+- tapOn: Archive project
+- extendedWaitUntil:
+    visible: Website redesign is archived
+    timeout: 10000
+- scrollUntilVisible:
+    element: Projects
+    direction: UP
+- tapOn: Projects
+- assertVisible: 3 active, 1 at risk
+- stopRecording

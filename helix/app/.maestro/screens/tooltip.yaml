@@ -1,0 +1,65 @@
+# Tooltip, each example drawn alone with one bubble shown by a long press on
+# its trigger, after the touch the iOS simulator loses on a new screen. One
+# screenshot of each, named by the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Tooltip"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://tooltip/preview/preview
+      - extendedWaitUntil:
+          visible: Save changes
+          timeout: 30000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- longPressOn: Save changes
+- extendedWaitUntil:
+    visible: Save your changes to the file
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: tooltip-preview-${MODE}-${SIZE}
+- openLink: helix://tooltip/placements/preview
+- extendedWaitUntil:
+    visible: Bottom
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- longPressOn: Bottom
+- extendedWaitUntil:
+    visible: Below
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: tooltip-placements-${MODE}-${SIZE}
+- openLink: helix://tooltip/material/preview
+- extendedWaitUntil:
+    visible: Download file
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- longPressOn: Download file
+- extendedWaitUntil:
+    visible: Save a PDF copy of the file
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: tooltip-material-${MODE}-${SIZE}
+- openLink: helix://tooltip/rich-content/preview
+- extendedWaitUntil:
+    visible: Save changes
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- longPressOn: Save changes
+- extendedWaitUntil:
+    visible: Cmd
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: tooltip-rich-content-${MODE}-${SIZE}

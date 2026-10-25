@@ -1,0 +1,82 @@
+# Drawer, each example drawn alone: the glass drawer and the list's sheet
+# open from the start, and the preview, the sheet, and the drawer from each
+# edge open from their button. One screenshot of each, named by the example,
+# `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Drawer"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://drawer/material/preview
+      - extendedWaitUntil:
+          visible: .*no new notifications.*
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: drawer-material-${MODE}-${SIZE}
+- openLink: helix://drawer/list/preview
+- extendedWaitUntil:
+    visible: .*Quarterly report.*
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: drawer-list-${MODE}-${SIZE}
+# The rest open from their button, one tap each, after the touch the iOS
+# simulator loses on a new screen.
+- openLink: helix://drawer/preview/preview
+- extendedWaitUntil:
+    visible: Open drawer
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Open drawer
+- extendedWaitUntil:
+    visible: .*who owns the project.*
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: drawer-preview-${MODE}-${SIZE}
+- openLink: helix://drawer/sheet/preview
+- extendedWaitUntil:
+    visible: Open filters
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Open filters
+- extendedWaitUntil:
+    visible: .*Show projects by owner.*
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: drawer-sheet-${MODE}-${SIZE}
+- openLink: helix://drawer/placements/preview
+- extendedWaitUntil:
+    visible: Start
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Start
+- extendedWaitUntil:
+    visible: .*Browse your projects.*
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: drawer-start-${MODE}-${SIZE}
+- openLink: helix://drawer/placements/preview
+- extendedWaitUntil:
+    visible: Top
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Top
+- extendedWaitUntil:
+    visible: .*Search projects, files.*
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: drawer-top-${MODE}-${SIZE}

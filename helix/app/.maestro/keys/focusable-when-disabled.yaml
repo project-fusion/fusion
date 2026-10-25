@@ -1,0 +1,43 @@
+# A disabled button that keeps its focus, from a hardware keyboard, on
+# Android: the arrow keys move focus to it, a screen reader hears its words
+# and that it is disabled, and Enter presses nothing. Maestro sends each key
+# with `adb shell input keyevent`, as `button.yaml` in this folder says.
+#
+# **The flow moves focus with the arrow keys, not Tab.** Maestro 2.11.0 sends
+# Tab as key code 62, the space bar, which moves no focus; its fix (#3679) is
+# in no release yet. A hardware keyboard's arrow keys are the same Dpad keys.
+#
+# The first Down takes the screen out of touch mode and focuses its first
+# view that takes focus, and each Down after it moves on down to the row,
+# where it lands on the Back icon button. The example's buttons stand in one
+# row, so Right moves from Back to Save changes.
+#
+# A kept button says its words, then "Disabled", in its content description,
+# which is what Maestro matches.
+appId: dev.fusion.helix.app
+name: Disabled buttons that keep their focus
+---
+- stopApp
+- openLink: helix://button/focusable-when-disabled/preview
+- extendedWaitUntil:
+    visible: Save changes
+    timeout: 30000
+- repeat:
+    times: 8
+    while:
+      notVisible:
+        text: Back, Disabled.*
+        focused: true
+    commands:
+      - pressKey: Remote Dpad Down
+- assertVisible:
+    focused: true
+    text: Back, Disabled.*
+- pressKey: Remote Dpad Right
+- assertVisible:
+    focused: true
+    text: Save changes, Disabled.*
+- pressKey: Enter
+- assertVisible:
+    focused: true
+    text: Save changes, Disabled.*

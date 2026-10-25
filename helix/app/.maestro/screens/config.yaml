@@ -1,0 +1,19 @@
+# What `maestro test screens` runs: a screenshot of each example below, drawn
+# in the appearance and at the text size `scripts/devices.sh` sets on the
+# device before each pass, and named by the family, the example, `MODE`, and
+# `SIZE`:
+#
+#   maestro test -e MODE=dark -e SIZE=largest helix/app/.maestro/screens
+#
+# **The script sets the appearance, and Maestro does not.** Maestro's
+# `setDarkMode: enabled` left an iOS 27 simulator light (run 38196585542).
+#
+# Button's flow runs first and stops the gallery, so each pass starts it at
+# the text size just set. Each flow after it opens its examples with links
+# into the running gallery. A wave 1 family's example opens alone, at
+# `/preview`, so it starts at the top of the screen at the largest text size
+# too, and its screenshot shows that top.
+executionOrder:
+  continueOnFailure: true
+  flowsOrder:
+    - "Screens: Button"

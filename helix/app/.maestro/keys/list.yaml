@@ -1,0 +1,33 @@
+# List from a hardware keyboard, on Android, on the selectable example. Down
+# moves focus to the next row and Up to the one before. Up on the first row
+# keeps focus there. The example opens alone, at `/preview`, so the gallery's
+# Preview and Code tabs, which take the arrow keys of both axes as every set of
+# tabs does, are not above it.
+appId: dev.fusion.helix.app
+name: List from a keyboard
+---
+- stopApp
+- openLink: helix://list/selectable/preview
+- extendedWaitUntil:
+    visible: Budget.*
+    timeout: 30000
+- repeat:
+    times: 8
+    while:
+      notVisible:
+        text: Quarterly report.*
+        focused: true
+    commands:
+      - pressKey: Remote Dpad Down
+- pressKey: Remote Dpad Down
+- assertVisible:
+    text: Budget.*
+    focused: true
+- pressKey: Remote Dpad Up
+- assertVisible:
+    text: Quarterly report.*
+    focused: true
+- pressKey: Remote Dpad Up
+- assertVisible:
+    text: Quarterly report.*
+    focused: true

@@ -1,0 +1,38 @@
+# Radio Group from a hardware keyboard, on Android, on the preview example,
+# where Free starts chosen. Down moves focus to the next radio and chooses it,
+# Up comes back, and Up on the first radio wraps to the last. The example
+# opens alone, at `/preview`, as `list.yaml` here says.
+appId: dev.fusion.helix.app
+name: Radio Group from a keyboard
+---
+- stopApp
+- openLink: helix://radio/preview/preview
+- extendedWaitUntil:
+    visible: Free
+    timeout: 30000
+- repeat:
+    times: 8
+    while:
+      notVisible:
+        focused: true
+        text: Free
+    commands:
+      - pressKey: Remote Dpad Down
+- pressKey: Remote Dpad Down
+- assertVisible:
+    checked: true
+    focused: true
+    text: Pro
+- assertVisible:
+    checked: false
+    text: Free
+- pressKey: Remote Dpad Up
+- assertVisible:
+    checked: true
+    focused: true
+    text: Free
+- pressKey: Remote Dpad Up
+- assertVisible:
+    checked: true
+    focused: true
+    text: Team

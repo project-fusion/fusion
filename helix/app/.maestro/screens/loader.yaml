@@ -1,0 +1,47 @@
+# Loader, each example drawn alone: a loader with its label, the three
+# sizes, an icon at the center, the pulse, a loader standing in for a button
+# beside an idle one, and a loader above a region. One screenshot of each,
+# named by the example, `MODE`, and `SIZE`.
+#
+# A loader's words are its label, which a screen reader reaches. `preview`
+# comes first, and the flow waits for each label after it. Android adds the
+# busy state to a label, as in "Loading projects, busy", so each label is
+# matched with the words around it. At the largest text the idle loader of
+# `content` is past the edge of the screen, so that screen waits for the busy
+# loader's label.
+appId: dev.fusion.helix.app
+name: "Screens: Loader"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://loader/preview/preview
+- extendedWaitUntil:
+    visible: '.*Loading projects.*'
+    timeout: 30000
+- takeScreenshot: loader-preview-${MODE}-${SIZE}
+- openLink: helix://loader/sizes/preview
+- extendedWaitUntil:
+    visible: 'Sizes'
+    timeout: 15000
+- takeScreenshot: loader-sizes-${MODE}-${SIZE}
+- openLink: helix://loader/with-icon/preview
+- extendedWaitUntil:
+    visible: '.*Uploading file.*'
+    timeout: 15000
+- takeScreenshot: loader-with-icon-${MODE}-${SIZE}
+- openLink: helix://loader/pulse/preview
+- extendedWaitUntil:
+    visible: 'Pulse'
+    timeout: 15000
+- takeScreenshot: loader-pulse-${MODE}-${SIZE}
+- openLink: helix://loader/content/preview
+- extendedWaitUntil:
+    visible: '.*Saving.*'
+    timeout: 15000
+- takeScreenshot: loader-content-${MODE}-${SIZE}
+- openLink: helix://loader/region/preview
+- extendedWaitUntil:
+    visible: 'Orders appear here once they load.'
+    timeout: 15000
+- takeScreenshot: loader-region-${MODE}-${SIZE}

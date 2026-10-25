@@ -1,0 +1,23 @@
+# Outline: the outline draws a link for each section the example registers,
+# and a press on the last link scrolls the gallery's page to that section,
+# whose link the outline then marks. Recorded.
+appId: dev.fusion.helix.app
+name: Outline
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://outline/preview/preview
+      SHOWS: .*Requirements.*
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: outline
+- tapOn: API
+- assertVisible: .*Each method returns a promise.*
+- takeScreenshot: outline-api
+- stopRecording

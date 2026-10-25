@@ -1,0 +1,24 @@
+# Badge, each example drawn alone: a count on an icon button, a capped count,
+# and the three emphases. One screenshot of each, named by the example,
+# `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Badge"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://badge/preview/preview
+- extendedWaitUntil:
+    visible: '.*Notifications.*'
+    timeout: 30000
+- takeScreenshot: badge-preview-${MODE}-${SIZE}
+- openLink: helix://badge/capped/preview
+- extendedWaitUntil:
+    visible: '.*Inbox.*'
+    timeout: 15000
+- takeScreenshot: badge-capped-${MODE}-${SIZE}
+- openLink: helix://badge/emphasis/preview
+- extendedWaitUntil:
+    visible: '.*Drafts.*'
+    timeout: 15000
+- takeScreenshot: badge-emphasis-${MODE}-${SIZE}

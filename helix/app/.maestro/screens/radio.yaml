@@ -1,0 +1,24 @@
+# Radio, each example drawn alone: a group with one chosen, radios drawn as
+# cards, and chips with icons. One screenshot of each, named by the example,
+# `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Radio"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://radio/preview/preview
+- extendedWaitUntil:
+    visible: '.*Free.*'
+    timeout: 30000
+- takeScreenshot: radio-preview-${MODE}-${SIZE}
+- openLink: helix://radio/cards/preview
+- extendedWaitUntil:
+    visible: '.*Personal.*'
+    timeout: 15000
+- takeScreenshot: radio-cards-${MODE}-${SIZE}
+- openLink: helix://radio/chips/preview
+- extendedWaitUntil:
+    visible: '.*Very dissatisfied.*'
+    timeout: 15000
+- takeScreenshot: radio-chips-${MODE}-${SIZE}

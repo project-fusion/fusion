@@ -1,0 +1,89 @@
+# Toast, its examples drawn alone, each with its messages showing, and the
+# preview again once a message is dismissed and the queue once the next
+# message shows. One screenshot of each, named by the example, `MODE`, and
+# `SIZE`. The stack stands at an edge of the window, so the touch the iOS
+# simulator loses on a new screen lands in its middle.
+appId: dev.fusion.helix.app
+name: "Screens: Toast"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://toast/preview/preview
+      - extendedWaitUntil:
+          visible: Project saved.
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: toast-preview-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 40%
+    retryTapIfNoChange: false
+- tapOn:
+    text: Dismiss
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: toast-preview-dismissed-${MODE}-${SIZE}
+- openLink: helix://toast/arriving/preview
+- extendedWaitUntil:
+    visible: Two files were skipped.
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: toast-arriving-${MODE}-${SIZE}
+- openLink: helix://toast/auto-dismiss/preview
+- extendedWaitUntil:
+    visible: Your export is ready to download.
+    timeout: 15000
+- takeScreenshot: toast-auto-dismiss-${MODE}-${SIZE}
+- openLink: helix://toast/color-mode/preview
+- extendedWaitUntil:
+    visible: Project saved.
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: toast-color-mode-${MODE}-${SIZE}
+- openLink: helix://toast/events/preview
+- extendedWaitUntil:
+    visible: No events yet
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: toast-events-${MODE}-${SIZE}
+- openLink: helix://toast/queue/preview
+- extendedWaitUntil:
+    visible: Two files were uploaded.
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: toast-queue-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 40%
+    retryTapIfNoChange: false
+- tapOn:
+    text: Dismiss
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: toast-queue-next-${MODE}-${SIZE}
+- openLink: helix://toast/tones/preview
+- extendedWaitUntil:
+    visible: Export started.
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: toast-tones-${MODE}-${SIZE}
+- openLink: helix://toast/undo/preview
+- extendedWaitUntil:
+    visible: Quarterly report.pdf
+    timeout: 15000
+- tapOn:
+    point: 50%, 40%
+    retryTapIfNoChange: false
+- tapOn:
+    text: Archive
+    index: 0
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: toast-undo-${MODE}-${SIZE}

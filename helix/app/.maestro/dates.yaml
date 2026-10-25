@@ -1,0 +1,31 @@
+# Dates: which options Hermes's `Intl.DateTimeFormat` writes, on the
+# gallery's own check, `helix://checks/dates`. Format Date, Timeline and every
+# date family need `formatToParts`, another calendar, a time zone's name, and
+# a day period. The FormatJS polyfill for `DateTimeFormat` carries time-zone
+# data and is large, so it is added only for what a device is missing.
+#
+# Each line is optional until the first device run says what each platform
+# writes; the screenshot is the record.
+appId: dev.fusion.helix.app
+name: Dates
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://checks/dates
+      SHOWS: .*formatToParts.*
+- takeScreenshot: dates
+- assertVisible:
+    optional: true
+    text: 'formatToParts: writes'
+- assertVisible:
+    optional: true
+    text: 'calendar: writes'
+- assertVisible:
+    optional: true
+    text: 'timeZoneName: writes'
+- assertVisible:
+    optional: true
+    text: 'dayPeriod: writes'

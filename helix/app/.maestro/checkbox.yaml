@@ -1,0 +1,71 @@
+# Checkbox: a press checks the box and a second press clears it, on the events
+# example, whose log lists what each press sent, recorded. Then the mixed box
+# of the indeterminate example.
+#
+# **What a screen reader hears, as far as Maestro reads it.** Android gives
+# each box's checked state, which the flow requires. iOS gives React Native's
+# value, such as "checkbox, checked", which Maestro reads as the element's
+# text. The steps that read it, and focus after a press, are optional until a
+# night shows what each platform gives.
+appId: dev.fusion.helix.app
+name: Checkbox
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://checkbox/events/preview
+      SHOWS: Send me release notes.*
+# The first touch on a screen that has just opened is lost on the iOS
+# simulator, as `button.yaml` says. A tap on the empty space below the
+# example takes it.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: checkbox
+- tapOn: Send me release notes.*
+- assertVisible: .*checked is now true.*
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: true
+          text: Send me release notes.*
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          optional: true
+          text: checkbox, checked
+- assertVisible:
+    focused: true
+    optional: true
+    text: Send me release notes.*
+- takeScreenshot: checkbox-events-checked
+- tapOn: Send me release notes.*
+- assertVisible: .*checked is now false.*
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: false
+          text: Send me release notes.*
+- takeScreenshot: checkbox-events-cleared
+# The dash of a mixed box, through react-native-svg, and its state.
+- openLink: helix://checkbox/indeterminate/preview
+- extendedWaitUntil:
+    visible: Select all.*
+    timeout: 15000
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          optional: true
+          text: checkbox, mixed
+- takeScreenshot: checkbox-indeterminate
+- stopRecording

@@ -1,0 +1,24 @@
+# Description List, each example drawn alone: terms in one shared column,
+# terms above their values, and a term with two values. One screenshot of
+# each, named by the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Description List"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://description-list/preview/preview
+- extendedWaitUntil:
+    visible: '.*Owner.*'
+    timeout: 30000
+- takeScreenshot: description-list-preview-${MODE}-${SIZE}
+- openLink: helix://description-list/stacked/preview
+- extendedWaitUntil:
+    visible: '.*Plan.*'
+    timeout: 15000
+- takeScreenshot: description-list-stacked-${MODE}-${SIZE}
+- openLink: helix://description-list/several-values/preview
+- extendedWaitUntil:
+    visible: '.*Analytical Engine.*'
+    timeout: 15000
+- takeScreenshot: description-list-several-values-${MODE}-${SIZE}

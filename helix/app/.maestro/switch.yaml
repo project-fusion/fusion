@@ -1,0 +1,56 @@
+# Switch: a press turns it on and a second press turns it off, on the events
+# example, whose log lists what each press sent, recorded.
+#
+# Android gives the switch's checked state, which the flow requires. On iOS
+# React Native gives a switch the value "1" or "0", which Maestro reads as
+# checked or not: that step, and focus after a press, are optional until a
+# night shows what each platform gives.
+appId: dev.fusion.helix.app
+name: Switch
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://switch/events/preview
+      SHOWS: Automatic updates.*
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: switch
+- tapOn: Automatic updates.*
+- assertVisible: .*true, sent when the change is committed.*
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: true
+          text: Automatic updates.*
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          checked: true
+          optional: true
+          text: Automatic updates.*
+- assertVisible:
+    focused: true
+    optional: true
+    text: Automatic updates.*
+- takeScreenshot: switch-events-on
+- tapOn: Automatic updates.*
+- assertVisible: .*false, sent when the change is committed.*
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: false
+          text: Automatic updates.*
+- takeScreenshot: switch-events-off
+- stopRecording

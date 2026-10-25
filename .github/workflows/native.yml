@@ -1,0 +1,288 @@
+# Compiles the Android half of `@fusion.dev/helix-native`, the keys and theme
+# modules in `helix/native/android`, inside an Expo app, the way an app that
+# installs the package builds it. The theme module compiles twice: first
+# without the engine, as in a checkout that has not built it, then with the
+# engine cross-compiled for each Android ABI from `fusion-helix-native`, as the
+# package on npm carries it.
+#
+# **Only on the pull requests that change the module, and by hand**, outside
+# `verify`, because an Android build is minutes that a change elsewhere cannot
+# fail. It is not a required check. A required check that a path filter never
+# starts holds the merge open, so `verify` stays the one context to require.
+
+name: native
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/native.yml
+      - Cargo.lock
+      - Cargo.toml
+      - helix/native/Cargo.toml
+      - helix/native/android/**
+      - helix/native/expo-module.config.json
+      - helix/native/package.json
+      - helix/native/rust/**
+      - helix/native/scripts/engine.mjs
+      - helix/native/uniffi.toml
+      - helix/theme/Cargo.toml
+      - helix/theme/rust/**
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      EXPO_NO_TELEMETRY: 1
+    steps:
+      # **The whole tree**, because Cargo reads every member of the workspace
+      # before it builds one.
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # Bun installs the app's three dependencies. The workspace stays
+      # uninstalled, since Gradle reads none of it.
+      - name: Set up bun
+        uses: ./.github/actions/setup
+        with:
+          dependencies: false
+
+      # **Node, because the build runs it.** The app's settings find the React
+      # Native and Expo Gradle plugins with `node --print`, and Expo's
+      # autolinking runs under Node. React Native 0.88 accepts Node 22 from
+      # 22.13.
+      - name: Install Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      # Gradle 9 and the Android Gradle plugin 9 run on JDK 17 and later.
+      - name: Install a JDK
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # The engine's four Android targets. The NDK that links them is the
+      # runner's, at `ANDROID_NDK_HOME`.
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@6bed0761d98439e5a578e2877258200ad565ba87 # stable, 14 Sep 2026
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      # **Saved by a run by hand, and restored on a pull request**, for the
+      # reason `binaries.yml` gives: a cache a pull request saves serves that
+      # pull request alone, and four targets of it crowd out the caches
+      # `verify` builds from.
+      - name: Restore the Cargo cache
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          key: android
+          save-if: ${{ github.event_name == 'workflow_dispatch' }}
+
+      # **The versions the module develops against, read from its manifest**,
+      # so a bump there is the version this job compiles against.
+      - name: Read the Expo and React Native versions
+        id: versions
+        run: |
+          set -euo pipefail
+          echo "expo=$(jq -r '.devDependencies.expo' helix/native/package.json)" >> "$GITHUB_OUTPUT"
+          echo "rn=$(jq -r '.devDependencies["react-native"]' helix/native/package.json)" >> "$GITHUB_OUTPUT"
+
+      # **Gradle's downloads and its build cache, keyed on those two versions**,
+      # which decide what Gradle fetches. An edit to the module's Kotlin keeps
+      # the key, and the restore holds everything else the compile needs. A
+      # bump restores the nearest entry and saves a new one. An entry a pull
+      # request saves serves that pull request's later runs, and one a run by
+      # hand on `main` saves serves every pull request.
+      - name: Restore the Gradle cache
+        id: gradle-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: gradle-native-${{ runner.os }}-expo-${{ steps.versions.outputs.expo }}-rn-${{ steps.versions.outputs.rn }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          restore-keys: gradle-native-${{ runner.os }}-
+
+      # **The app reaches the module through a symlink in its `node_modules`.**
+      # The module's manifest depends on `@fusion.dev/helix-core` as
+      # `workspace:*`, which an install outside the workspace cannot resolve.
+      # Expo's autolinking follows the link to the checkout, so Gradle compiles
+      # the files in the pull request and Kotlin's errors name them.
+      - name: Make an app that depends on the module
+        run: |
+          set -euo pipefail
+          app="$RUNNER_TEMP/app"
+          mkdir -p "$app"
+          jq --slurpfile native helix/native/package.json -n '{
+            name: "keys-app",
+            version: "1.0.0",
+            private: true,
+            dependencies: {
+              expo: $native[0].devDependencies.expo,
+              react: $native[0].devDependencies.react,
+              "react-native": $native[0].devDependencies["react-native"]
+            }
+          }' > "$app/package.json"
+          jq -n '{expo: {name: "keys-app", slug: "keys-app", android: {package: "dev.fusion.helix.keysapp"}}}' > "$app/app.json"
+          cd "$app"
+          bun install
+          mkdir -p node_modules/@fusion.dev
+          ln -s "$GITHUB_WORKSPACE/helix/native" node_modules/@fusion.dev/helix-native
+          jq '.dependencies["@fusion.dev/helix-native"] = "*"' package.json > package.next.json
+          mv package.next.json package.json
+
+      - name: Write the app's Android project
+        working-directory: ${{ runner.temp }}/app
+        run: bunx expo prebuild --platform android --no-install
+
+      # **The Gradle project's name comes from Expo's autolinking**, the same
+      # resolution the app's settings run, so a module autolinking cannot find
+      # fails here and says so.
+      - name: Find the module's Gradle project
+        id: project
+        working-directory: ${{ runner.temp }}/app
+        run: |
+          set -euo pipefail
+          autolinking=$(dirname "$(node --print "require.resolve('expo-modules-autolinking/package.json', { paths: [require.resolve('expo/package.json')] })")")
+          node "$autolinking/bin/expo-modules-autolinking.js" resolve --platform android --json > "$RUNNER_TEMP/autolinking.json"
+          name=$(jq -r '.modules[] | select(.packageName == "@fusion.dev/helix-native") | .projects[0].name' "$RUNNER_TEMP/autolinking.json")
+          if [ -z "$name" ]; then
+            echo "::error::Expo autolinking did not find @fusion.dev/helix-native. It found these packages:"
+            jq -r '.modules[].packageName' "$RUNNER_TEMP/autolinking.json"
+            exit 1
+          fi
+          echo "Expo autolinking links @fusion.dev/helix-native as the Gradle project :$name."
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+      # The modules' Kotlin, and `expo-modules-core`, which it compiles
+      # against. No engine is built yet, so the theme module compiles
+      # `src/withoutEngine`.
+      - name: Compile the keys and theme modules without the engine
+        id: module
+        working-directory: ${{ runner.temp }}/app/android
+        env:
+          PROJECT: ${{ steps.project.outputs.name }}
+        run: |
+          set -euo pipefail
+          ./gradlew --build-cache --console=plain ":$PROJECT:compileDebugKotlin" 2>&1 | tee -a "$RUNNER_TEMP/gradle.log"
+
+      # A shared library for each ABI, linked by the NDK's clang at API 24, and
+      # the Kotlin UniFFI writes for it, into `helix/native/android/src/engine`.
+      - name: Build the theme engine for Android
+        run: bun helix/native/scripts/engine.mjs android
+
+      # **With the engine, as the package on npm builds**: the Kotlin UniFFI
+      # wrote, `src/withEngine`, which calls it, and JNA. The libraries go
+      # into the module's merged JNI folders, which is where the app takes
+      # them from, so each ABI is looked for there.
+      - name: Compile the theme module with the engine
+        working-directory: ${{ runner.temp }}/app/android
+        env:
+          PROJECT: ${{ steps.project.outputs.name }}
+        run: |
+          set -euo pipefail
+          ./gradlew --build-cache --console=plain ":$PROJECT:compileDebugKotlin" ":$PROJECT:mergeDebugJniLibFolders" 2>&1 | tee -a "$RUNNER_TEMP/gradle.log"
+          missing=()
+          for abi in arm64-v8a armeabi-v7a x86 x86_64; do
+            found=$(find "$GITHUB_WORKSPACE/helix/native/android/build/intermediates" -path "*merged_jni_libs*/$abi/libfusion_helix_native.so" | head -n 1)
+            if [ -z "$found" ]; then
+              missing+=("$abi")
+            else
+              echo "$abi: $(stat --format=%s "$found") bytes, ${found#"$GITHUB_WORKSPACE/"}"
+            fi
+          done
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::The module's merged JNI folders have no libfusion_helix_native.so for ${missing[*]}."
+            exit 1
+          fi
+
+      # **The list of modules Expo writes into the app, which names the class in
+      # `expo-module.config.json`.** A class name there that matches nothing in
+      # the module passes the step above and fails here, as it would fail the
+      # first build of an app that installs the package.
+      - name: Compile the module list Expo generates
+        working-directory: ${{ runner.temp }}/app/android
+        run: |
+          set -euo pipefail
+          ./gradlew --build-cache --console=plain :expo:compileDebugKotlin 2>&1 | tee -a "$RUNNER_TEMP/gradle.log"
+
+      # **Each Kotlin error as an annotation on its line**, and a warning only
+      # in the module's own files. The errors go to the run's summary too. The
+      # compile steps already failed the job, so this one passes.
+      - name: List what Kotlin reported
+        if: always() && steps.module.outcome != 'skipped'
+        run: |
+          set -euo pipefail
+          pattern='^([ew]): (file://)?(/[^:]+):([0-9]+):([0-9]+) (.*)$'
+          errors=()
+          while IFS= read -r line; do
+            file='' where=''
+            if [[ $line =~ $pattern ]]; then
+              kind=${BASH_REMATCH[1]}
+              path=${BASH_REMATCH[3]}
+              row=${BASH_REMATCH[4]}
+              column=${BASH_REMATCH[5]}
+              message=${BASH_REMATCH[6]}
+              if [[ $path == "$GITHUB_WORKSPACE/"* ]]; then
+                file=${path#"$GITHUB_WORKSPACE/"}
+              fi
+              where="${file:-${path#"$RUNNER_TEMP/"}}:$row:$column"
+            elif [[ $line == "e: "* ]]; then
+              kind=e
+              message=${line#e: }
+            else
+              continue
+            fi
+            if [[ $kind == e ]]; then
+              errors+=("- ${where:+\`$where\` }$message")
+              if [[ -n $file ]]; then
+                echo "::error file=$file,line=$row,col=$column::${message//%/%25}"
+              else
+                echo "::error::${where:+$where }${message//%/%25}"
+              fi
+            elif [[ -n $file ]]; then
+              echo "::warning file=$file,line=$row,col=$column::${message//%/%25}"
+            fi
+          done < "$RUNNER_TEMP/gradle.log"
+          if [[ ${#errors[@]} -gt 0 ]]; then
+            {
+              echo "### Kotlin errors"
+              echo
+              printf '%s\n' "${errors[@]}"
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # **The daemon stops before the save**, so no Gradle process writes to
+      # the cache while it is archived. A run that reached the module's compile
+      # has downloaded what the compile needs, so it saves, a failed compile
+      # included: the re-run after a Kotlin error is the one that wants it.
+      - name: Stop Gradle
+        id: stop
+        if: always() && steps.module.outcome != 'skipped'
+        working-directory: ${{ runner.temp }}/app/android
+        env:
+          PROJECT: ${{ steps.project.outputs.name }}
+        run: |
+          ./gradlew --stop
+          if grep -q -F "> Task :$PROJECT:compileDebugKotlin" "$RUNNER_TEMP/gradle.log"; then
+            echo "reached=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Save the Gradle cache
+        if: always() && steps.gradle-cache.outputs.cache-hit != 'true' && steps.stop.outputs.reached == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          key: ${{ steps.gradle-cache.outputs.cache-primary-key }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper

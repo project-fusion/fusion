@@ -1,0 +1,55 @@
+# Numbers: Trend's change, written by Hermes's `Intl.NumberFormat`, on the
+# gallery's own check, `helix://checks/numbers`, since every example writes
+# English. In German a compact million is "1,5 Mio." and a signed percent is
+# "+8,4 %", and beside them the same compact number in English is "1.5M".
+#
+# Each pattern takes any one character for the space, since the formatter
+# writes a space that does not break, and the platforms differ in which one.
+#
+# **Hermes on iOS writes neither a compact number nor a sign**: "1.500.000",
+# "8,4 %", and "1,500,000" on an iOS 27 simulator in run 38957410938, where
+# Android wrote all three as the web does. Its `Intl.NumberFormat` drops
+# `notation` and `signDisplay`, and writes 42 minutes as "2,520 sec". The
+# native runtime installs FormatJS's `NumberFormat` for those options, with
+# English data, so on iOS the English compact number and the elapsed time
+# are the web's, and each option reads "writes". The gallery loads no German
+# number data, so the two German lines stay the engine's on iOS and are
+# optional there. The elapsed time is optional on Android until a device run
+# records it.
+appId: dev.fusion.helix.app
+name: Numbers
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://checks/numbers
+      SHOWS: .*Users.*
+- takeScreenshot: numbers
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          optional: true
+          text: 'Elapsed: 42m'
+      - assertVisible: .*1\.5M.*
+      - assertVisible: .*1,5.Mio\..*
+      - assertVisible: .*\+8,4.%.*
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible: .*8,4.%.*
+      - assertVisible: .*1\.5M.*
+      - assertVisible: 'Elapsed: 42m'
+      - assertVisible: 'notation: writes'
+      - assertVisible: 'signDisplay: writes'
+      - assertVisible: 'units: writes'
+      - assertVisible:
+          optional: true
+          text: .*1,5.Mio\..*
+      - assertVisible:
+          optional: true
+          text: .*\+8,4.%.*
