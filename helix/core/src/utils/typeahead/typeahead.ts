@@ -4,6 +4,12 @@
  * One character with no Control, Command or Alt held, so a shortcut such as
  * Control+A is never taken for the letter A. Shift is allowed, because a
  * capital is still a letter.
+ *
+ * **One character is one UTF-16 unit here.** The typeahead machine leaves
+ * what counts as one character to each platform. An emoji outside the Basic
+ * Multilingual Plane, such as U+1F600, is two units, so the web leaves it to
+ * the page. React Native counts code points in `helix/native`'s typeahead
+ * host, and types that emoji as one character.
  */
 export const typesCharacter = (event: KeyboardEvent): boolean =>
   event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey
@@ -12,10 +18,11 @@ export const typesCharacter = (event: KeyboardEvent): boolean =>
  * Finds an item by the letters a reader types at a set, the way a native
  * `<select>` does.
  *
- * Letters typed within `timeout` milliseconds of each other build one search,
- * so typing "ca" moves to "Canada" past "Cambodia". The same letter typed again
+ * Letters typed less than `timeout` milliseconds apart build one search, so
+ * typing "ca" moves to "Canada" past "Cambodia". The same letter typed again
  * moves to the next item that starts with it, so pressing "c" three times visits
- * the first three. A pause starts a new search.
+ * the first three. A pause of `timeout` milliseconds or more starts a new
+ * search.
  *
  * Matching ignores case and leading spaces, and searches from the reader's
  * position, wrapping at the end. A search that matches nothing moves nothing.
@@ -39,9 +46,14 @@ export class Typeahead {
    *
    * A set that chooses on Space asks this first, because a Space typed in the
    * middle of a search is part of the words, as in "New York".
+   *
+   * **A letter exactly `timeout` after the last starts a new search.** The
+   * typeahead machine ends the search at that moment, and
+   * `typeahead-presses.pure.spec.ts` holds this to it at 499, 500, and 501
+   * milliseconds.
    */
   typing(now = Date.now()): boolean {
-    return this.letters !== '' && now - this.last <= this.timeout
+    return this.letters !== '' && now - this.last < this.timeout
   }
 
   /**
@@ -85,7 +97,7 @@ export class Typeahead {
  *
  * What `KeyboardNavigationController` takes as its `typeahead` option. A set
  * builds one with `typeaheadBy`, so the search's code ships only with the sets
- * that type ahead, and Rating, Tabs or Radio, which never do, carry none of it.
+ * that type ahead, and Rating or Radio, which never do, carry none of it.
  */
 export interface TypeaheadBy<Item> {
   /** The letters typed so far, matched against the words. */
