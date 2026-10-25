@@ -266,7 +266,7 @@ describe('a long slotted trail', () => {
 describe('a crumb a reader presses', () => {
   /* React Aria's onAction, for a router: the press is heard first, and a
      refusal keeps the browser where it is. */
-  test('sends helix-select with its href, and a refusal keeps the browser from following', async () => {
+  test('sends helix-before-select with its href, and a refusal keeps the browser from following', async () => {
     const host = await mount(`<helix-headless-breadcrumbs>
       <helix-headless-breadcrumb href="/docs">Docs</helix-headless-breadcrumb>
       <helix-headless-breadcrumb current>Forms</helix-headless-breadcrumb>
@@ -274,7 +274,7 @@ describe('a crumb a reader presses', () => {
     const crumb = host.firstElementChild as HTMLElement & { updateComplete: Promise<unknown> }
     await crumb.updateComplete
     const heard: string[] = []
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
       event.preventDefault()
     })

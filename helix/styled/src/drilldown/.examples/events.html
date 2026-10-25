@@ -1,4 +1,4 @@
-<!-- @summary The `helix-select` event, sent when you choose a row at any level of the menu. -->
+<!-- @summary The `helix-before-select` event, sent when you choose a row at any level of the menu. -->
 <helix-flex
   direction="column"
   gap="md"
@@ -59,7 +59,7 @@
     }
   }
 
-  settings.addEventListener('helix-select', (event) => {
-    say('helix-select', `Chose "${event.detail.value}"`)
+  settings.addEventListener('helix-before-select', (event) => {
+    say('helix-before-select', `Chose "${event.detail.value}"`)
   })
 </script>

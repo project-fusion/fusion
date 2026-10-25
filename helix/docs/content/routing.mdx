@@ -104,7 +104,7 @@ changes the structure of the markup as well as adding an attribute. Without an
 the same way an `<li>` contains a `<ul>`.
 
 A tab with an `href` renders `role="tab"` on the `<a>` itself, so a press,
-Enter, and the browser's own link gestures follow it. It sends `helix-select`
+Enter, and the browser's own link gestures follow it. It sends `helix-before-select`
 first, and canceling that keeps the browser from following, so a client-side
 router can follow it instead. Web Awesome drops the anchor and navigates in
 JavaScript, which loses every item in the list above.
@@ -170,7 +170,7 @@ That is expected.
 |---|---|
 | `Tree.Item` | Changes the ARIA shape, as above. A linked branch navigates from its row and opens from its chevron. |
 | `Menu.Item` | The row becomes the anchor and carries `menuitem`. Takes `target`, `rel` and `download`. |
-| `Tab` | The tab becomes the anchor and carries `tab`. Takes `target` and `rel`. `helix-select` comes first, and canceling it keeps the browser from following. |
+| `Tab` | The tab becomes the anchor and carries `tab`. Takes `target` and `rel`. `helix-before-select` comes first, and canceling it keeps the browser from following. |
 
 `Button` never renders an anchor, because a router renders its own `<a>` and
 cannot render one inside the button's shadow root. For a link that looks like a
@@ -211,8 +211,8 @@ it cannot work here.
 
 No arrangement of the markup meets both of these constraints.
 
-**In a command palette, navigate from the `helix-select` event.** Listen for
-`helix-select` on `helix-command` and call your router. A palette entry is a
+**In a command palette, navigate from the `helix-before-select` event.** Listen for
+`helix-before-select` on `helix-command` and call your router. A palette entry is a
 command, and "go to Settings" is a command that navigates. Command palettes in
 other applications work the same way. You lose the gestures that only a real
 anchor has:

@@ -70,7 +70,7 @@
     }
     say('helix-before-activate', `moving to "${event.detail.value}"`)
   })
-  strip.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" was chosen, and the event bubbles`)
+  strip.addEventListener('helix-before-select', (event) => {
+    say('helix-before-select', `"${event.detail.value}" was chosen, and the event bubbles`)
   })
 </script>

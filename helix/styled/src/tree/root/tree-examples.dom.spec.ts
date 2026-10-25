@@ -21,7 +21,7 @@ describe('the events example', () => {
     const cortex = document.querySelector('helix-tree-item[value="cortex"]') as HTMLElement
     ;(part(cortex, 'row') as HTMLElement).click()
     await idle()
-    expect(logged()).toEqual(['helix-before-activate', 'helix-select'])
+    expect(logged()).toEqual(['helix-before-activate', 'helix-before-select'])
   })
 
   /* A branch with a value is chosen as well as folded, as a file explorer's
@@ -36,7 +36,7 @@ describe('the events example', () => {
     await idle()
     expect(logged()).toEqual([
       'helix-before-activate',
-      'helix-select',
+      'helix-before-select',
       was ? 'helix-before-close' : 'helix-before-open',
       'toggle',
     ])

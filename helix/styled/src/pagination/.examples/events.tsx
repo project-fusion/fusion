@@ -17,9 +17,13 @@ export function Example() {
     })
   }
 
-  /* `helix-navigate` is the only event. Cancel it to stay on the current page. */
+  /* `helix-before-navigate` asks first. Cancel it to stay on the current page. */
+  const asked = (event: CustomEvent<{ value: string }>) => {
+    say('helix-before-navigate', `Go to page ${event.detail.value}`)
+  }
+
   const moved = (event: CustomEvent<{ value: string }>) => {
-    say('helix-navigate', `Go to page ${event.detail.value}`)
+    say('helix-navigate', `On page ${event.detail.value}`)
   }
 
   return (
@@ -29,6 +33,7 @@ export function Example() {
     >
       <helix-pagination
         default-page="4"
+        onhelix-before-navigate={asked}
         onhelix-navigate={moved}
         pages={12}
       />

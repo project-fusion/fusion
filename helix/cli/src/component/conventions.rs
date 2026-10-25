@@ -20,6 +20,11 @@
 //! writes to no em dash, doc comments included, which is where a description comes
 //! from. An en dash is the half nobody else checks, so it is the half kept.
 //!
+//! **The event grammar is held here too**, in [`grammar`]: an event is
+//! cancelable exactly when it is named `helix-before-*`, apart from a short
+//! list of commands, every request names its follow-up, and the events page
+//! tables every name the library sends.
+//!
 //! **A component is a class carrying a tier**, which the generator writes on
 //! every class descending from `HelixElement` by the same walk the plugin made
 //! through `eachComponent`: the two pick out the same 271 classes across the four
@@ -30,7 +35,7 @@ use std::path::Path;
 
 use serde_json::Value;
 
-use crate::component::{Context, Finding, Report};
+use crate::component::{grammar, Context, Finding, Report};
 
 /// Words that describe how a component looks rather than what it is for.
 const APPEARANCE: [&str; 4] = ["themed", "a styled", "styled", "a themed"];
@@ -375,6 +380,12 @@ pub fn run(context: &Context) -> Report {
             }
         }
     }
+
+    /* The event grammar reads the classes and the docs page as well as the
+    manifests, and is part of this rule because it is a convention about what
+    a component publishes. */
+    let (_, grammar) = grammar::run(context);
+    findings.extend(grammar);
 
     Report {
         checked,

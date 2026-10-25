@@ -17,20 +17,20 @@ import {
   format,
   formatWords,
   gridMove,
-  HelixActivateEvent,
-  type HelixBeforeToggleEvent,
+  type HelixBeforeCheckEvent,
+  HelixBeforeFilterEvent,
+  HelixBeforeNavigateEvent,
+  HelixBeforeReorderEvent,
+  HelixBeforeSelectEvent,
+  HelixBeforeSortEvent,
   HelixElement,
   HelixExpandEvent,
   HelixFilterEvent,
-  HelixFilteredEvent,
   HelixLoadMoreEvent,
   HelixNavigateEvent,
   HelixReorderEvent,
-  HelixReorderedEvent,
   HelixSelectEvent,
-  HelixSelectedEvent,
   HelixSortEvent,
-  HelixSortedEvent,
   handedLocale,
   hostAria,
   inlineStep,
@@ -172,7 +172,7 @@ const isControl = (element: HTMLElement): boolean =>
  * | A letter or a word | Moves to the next row whose row header starts with what you typed. |
  *
  * `selected` and `expanded` hold their keys in the order of the rows, as do
- * `helix-select`, `helix-selected` and `helix-expand`.
+ * `helix-before-select`, `helix-select` and `helix-expand`.
  *
  * Each row is named by its row header, the column marked `row-header`, or the
  * first column with a `field` where none is. A screen reader says it as a reader
@@ -254,19 +254,18 @@ const isControl = (element: HTMLElement): boolean =>
  * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  * @slot toolbar - Content above the grid, such as a search field or actions.
  *
- * @event {HelixActivateEvent} helix-activate - Fired after the page changes, with the new page as a string in `detail.value`.
- * @event {HelixBeforeReorderEvent} helix-before-reorder - A row is about to move, with `reorderable-rows`. The event carries every row's key in the new order. Cancelable: cancel it to keep the row where it is.
+ * @event {HelixBeforeFilterEvent} helix-before-filter - The search query is about to change. Cancelable: cancel it to keep the current query.
+ * @event {HelixBeforeNavigateEvent} helix-before-navigate - Another page was requested. Cancelable: cancel it to stay on the current page.
+ * @event {HelixBeforeReorderEvent} helix-before-reorder - A row or a column is about to move. For a row, with `reorderable-rows`, the event carries every row's key in the new order; for a column, `kind` is `column` and `value` holds every field in the new order. Cancelable: cancel it to keep the row or the column where it is.
+ * @event {HelixBeforeSelectEvent} helix-before-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
+ * @event {HelixBeforeSortEvent} helix-before-sort - A different sort order was requested. Cancelable: cancel it to keep the current order.
  * @event {HelixExpandEvent} helix-expand - Fired after a row opens or closes, with every open row's key, separated by commas, which `expanded` also holds.
- * @event {HelixFilterEvent} helix-filter - The search query is about to change. Cancelable: cancel it to keep the current query.
- * @event {HelixFilteredEvent} helix-filtered - Fired after the search query changes, with the new query.
+ * @event {HelixFilterEvent} helix-filter - Fired after the search query changes, with the new query.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader asks for more rows, by the `load-more` row's button or by scrolling a `windowed` table near its end.
- * @event {HelixNavigateEvent} helix-navigate - Another page was requested. Cancelable: cancel it to stay on the current page.
- * @event {HelixReorderEvent} helix-reorder - The columns are about to move, with `kind` set to `column` and every field in the new order. Cancelable: cancel it to keep the current order. For a row, with `kind` set to `row`, it follows `helix-before-reorder`, and you set `rows` to the order in `keys`.
- * @event {HelixReorderedEvent} helix-reordered - Fired after the columns move, with every field in the new order.
- * @event {HelixSelectEvent} helix-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
- * @event {HelixSelectedEvent} helix-selected - Fired after the selection changes, with every selected key, separated by commas.
- * @event {HelixSortEvent} helix-sort - A different sort order was requested. Cancelable: cancel it to keep the current order.
- * @event {HelixSortedEvent} helix-sorted - Fired after the sort order changes, with the new order.
+ * @event {HelixNavigateEvent} helix-navigate - Fired after the page changes, with the new page in `detail.page` and as a string in `detail.value`.
+ * @event {HelixReorderEvent} helix-reorder - Fired after the columns move, with `kind` set to `column` and every field in the new order. For a row, with `kind` set to `row`, it follows `helix-before-reorder`, and you set `rows` to the order in `keys`.
+ * @event {HelixSelectEvent} helix-select - Fired after the selection changes, with every selected key, separated by commas.
+ * @event {HelixSortEvent} helix-sort - Fired after the sort order changes, with the new order.
  *
  * @csspart after - The space that stands in for the rows below the window. Only while `windowed`.
  * @csspart before - The space that stands in for the rows above the window. Only while `windowed`.
@@ -597,7 +596,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /**
    * The column order, as field names separated by spaces.
    *
-   * A reader's move fires `helix-reorder` first, and refusing it leaves the
+   * A reader's move fires `helix-before-reorder` first, and refusing it leaves the
    * columns where they were, which is how a consumer who stores the order takes
    * the decision. `default-order` seeds an order this element then owns. A field not named
    * keeps its place after the named ones, and a column with no field never
@@ -790,7 +789,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * A string rather than an array, so it is an attribute a server writes and a
    * framework's hydration keeps, and the shape a multiple Listbox already uses.
    * A key holding a comma cannot be told apart from two keys, which is the
-   * price of the shape. A reader's choice fires `helix-select` first, and
+   * price of the shape. A reader's choice fires `helix-before-select` first, and
    * refusing it leaves the selection as it was.
    */
   @property()
@@ -836,7 +835,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /**
    * The sort order, as `field:direction`.
    *
-   * A reader's click on a sortable heading fires `helix-sort` first, and
+   * A reader's click on a sortable heading fires `helix-before-sort` first, and
    * refusing it leaves the order as it was. To own the order yourself, refuse
    * the event and set this to the order you chose. `default-sort` seeds an
    * order this element then owns.
@@ -1669,9 +1668,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         const previous = this.sort
         this.sortState = value
         this.requestUpdate('sort', previous)
-        this.dispatchEvent(new HelixSortedEvent({ value }))
+        this.dispatchEvent(new HelixSortEvent({ value }))
       },
-      event: (value) => new HelixSortEvent({ value }),
+      event: (value) => new HelixBeforeSortEvent({ value }),
       host: this,
       next,
     })
@@ -1699,9 +1698,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         const previous = this.order
         this.orderState = value
         this.requestUpdate('order', previous)
-        this.dispatchEvent(new HelixReorderedEvent(moved))
+        this.dispatchEvent(new HelixReorderEvent(moved))
       },
-      event: (value) => new HelixReorderEvent(detail(value)),
+      event: (value) => new HelixBeforeReorderEvent(detail(value)),
       host: this,
       next: fields.join(' '),
     })
@@ -1714,9 +1713,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         const previous = this.selected
         this.selectedState = value
         this.requestUpdate('selected', previous)
-        this.dispatchEvent(new HelixSelectedEvent({ value }))
+        this.dispatchEvent(new HelixSelectEvent({ value }))
       },
-      event: (value) => new HelixSelectEvent({ value }),
+      event: (value) => new HelixBeforeSelectEvent({ value }),
       host: this,
       next: inRowOrder(keys, this.everyKey).join(','),
     })
@@ -1766,7 +1765,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * Ticks or clears one row, which the checkbox asked for and was refused. With
    * Shift held it selects every row from the one last chosen.
    */
-  private readonly toggleRow = (key: string, event: HelixBeforeToggleEvent): void => {
+  private readonly toggleRow = (key: string, event: HelixBeforeCheckEvent): void => {
     event.preventDefault()
     const to = this.pageKeys.indexOf(key)
     if (this.shiftPressed && this.anchorKey !== undefined && to >= 0) {
@@ -1926,7 +1925,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   }
 
   /** Selects every row, or clears them all where every one already was. */
-  private readonly toggleAll = (event: HelixBeforeToggleEvent): void => {
+  private readonly toggleAll = (event: HelixBeforeCheckEvent): void => {
     event.preventDefault()
     this.chooseAll()
   }
@@ -1998,9 +1997,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         const previous = this.filter
         this.filterState = value
         this.requestUpdate('filter', previous)
-        this.dispatchEvent(new HelixFilteredEvent({ value }))
+        this.dispatchEvent(new HelixFilterEvent({ value }))
       },
-      event: (value) => new HelixFilterEvent({ value }),
+      event: (value) => new HelixBeforeFilterEvent({ value }),
       host: this,
       next,
     })
@@ -2016,9 +2015,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
         const previous = this.page
         this.pageState = value
         this.requestUpdate('page', previous)
-        this.dispatchEvent(new HelixActivateEvent({ value: String(value) }))
+        this.dispatchEvent(new HelixNavigateEvent({ page: value, value: String(value) }))
       },
-      event: (value) => new HelixNavigateEvent({ value: String(value) }),
+      event: (value) => new HelixBeforeNavigateEvent({ value: String(value) }),
       host: this,
       next,
     })
@@ -2129,7 +2128,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
    * heading, and a reader on the heading's button is not told its column's
    * state changed; a chosen row ticked one box, and nothing gave the count. So
    * each is said in the collection's live region, once, after it has happened.
-   * Whoever set it, a reader or a consumer answering `helix-sort`, since either
+   * Whoever set it, a reader or a consumer answering `helix-before-sort`, since either
    * way the rows under the reader have moved. Not on the first render, which
    * is the table arriving rather than anything changing.
    */
@@ -2383,7 +2382,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     name: string,
     checked: boolean,
     indeterminate: boolean,
-    toggle: (event: HelixBeforeToggleEvent) => void,
+    toggle: (event: HelixBeforeCheckEvent) => void,
   ): TemplateResult {
     const checkbox = this.tag('checkbox')
     return html`<${checkbox}
@@ -2396,7 +2395,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
       tabindex="-1"
       .checked=${checked}
       .indeterminate=${indeterminate}
-      @helix-before-toggle=${toggle}
+      @helix-before-check=${toggle}
     ></${checkbox}>`
   }
 
@@ -2749,8 +2748,8 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
               next-label=${this.nextLabel}
               page-label=${this.pageLabel}
               previous-label=${this.previousLabel}
-              @helix-navigate=${this.handleNavigate}
-              @helix-activate=${this.stopPageNotification}
+              @helix-before-navigate=${this.handleNavigate}
+              @helix-navigate=${this.stopPageNotification}
             ></${pagination}>`
             : nothing
         }
@@ -3323,7 +3322,7 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   /**
    * The composed pagination's notification, stopped for the reason its
-   * request is: this element sends its own `helix-activate` once its own page
+   * request is: this element sends its own `helix-navigate` once its own page
    * has moved, and one move is one event.
    */
   private readonly stopPageNotification = (event: Event): void => {
@@ -3333,12 +3332,12 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
   /**
    * The composed pagination's request, relayed as this element's own.
    *
-   * Stopped rather than allowed to bubble, because two `helix-navigate` events
-   * for one click would reach a consumer's handler twice: the pagination's, and
+   * Stopped rather than allowed to bubble, because two `helix-before-navigate`
+   * events for one click would reach a consumer's handler twice: the pagination's, and
    * this element's after it. The one that leaves carries this element's page
    * bounds rather than the inner component's.
    */
-  private readonly handleNavigate = (event: HelixNavigateEvent): void => {
+  private readonly handleNavigate = (event: HelixBeforeNavigateEvent): void => {
     event.stopPropagation()
     const wanted = Number(event.detail.value)
     if (!Number.isFinite(wanted) || !this.requestPage(wanted)) {

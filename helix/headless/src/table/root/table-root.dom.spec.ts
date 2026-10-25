@@ -452,7 +452,7 @@ describe('a table sorted by a column', () => {
     await settle(host)
     expect(drawn(host)).toEqual(['web', 'billing'])
     const asked: string[] = []
-    host.addEventListener('helix-sort', (event) => {
+    host.addEventListener('helix-before-sort', (event) => {
       asked.push((event as CustomEvent<{ value: string }>).detail.value)
     })
 
@@ -478,7 +478,7 @@ describe('a table sorted by a column', () => {
   test('keeps the order when the request is refused', async () => {
     const host = (await mount(sortable)) as Sorting
     await settle(host)
-    host.addEventListener('helix-sort', (event) => event.preventDefault())
+    host.addEventListener('helix-before-sort', (event) => event.preventDefault())
     press(host)
     await settle(host)
     expect(host.sort).toBe('')
@@ -552,18 +552,18 @@ describe('an empty table', () => {
 })
 
 describe('a table sort, told after it stood', () => {
-  test('sends helix-sorted with the order, and nothing for a refused one', async () => {
+  test('sends helix-sort with the order, and nothing for a refused one', async () => {
     const host = (await mount(sortable)) as Sorting
     await settle(host)
     const heard: string[] = []
-    host.addEventListener('helix-sorted', (event) => {
+    host.addEventListener('helix-sort', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     const column = host.querySelector('[field="count"]') as HTMLElement
     ;(part(column, 'sort') as HTMLElement).click()
     await settle(host)
     expect(heard).toEqual(['count:asc'])
-    host.addEventListener('helix-sort', (event) => event.preventDefault())
+    host.addEventListener('helix-before-sort', (event) => event.preventDefault())
     ;(part(column, 'sort') as HTMLElement).click()
     await settle(host)
     expect(heard).toEqual(['count:asc'])
@@ -602,7 +602,7 @@ describe('a selectable table', () => {
 
   const ask = (checkbox: Element | null | undefined, checked: boolean): void => {
     checkbox?.dispatchEvent(
-      new CustomEvent('helix-before-toggle', {
+      new CustomEvent('helix-before-check', {
         bubbles: true,
         cancelable: true,
         composed: true,
@@ -634,7 +634,7 @@ describe('a selectable table', () => {
     const host = (await mount(selectable)) as Selecting
     await settle(host)
     const heard: string[] = []
-    host.addEventListener('helix-selected', (event) => {
+    host.addEventListener('helix-select', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     ask(rows(host)[0]?.shadowRoot?.querySelector('[part="checkbox"]'), true)
@@ -643,7 +643,7 @@ describe('a selectable table', () => {
     expect(host.selected).toBe('web,billing')
     expect(heard).toEqual(['web,billing'])
     expect((part(host, 'live') as HTMLElement).textContent).toBe('2 selected')
-    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.addEventListener('helix-before-select', (event) => event.preventDefault())
     ask(rows(host)[0]?.shadowRoot?.querySelector('[part="checkbox"]'), false)
     await settle(host)
     expect(host.selected).toBe('web,billing')
@@ -699,7 +699,7 @@ describe('a selectable table', () => {
     const own = document.createElement('input')
     own.setAttribute('part', 'checkbox')
     rows(host)[0]?.querySelector('helix-headless-table-cell')?.append(own)
-    const event = new CustomEvent('helix-before-toggle', {
+    const event = new CustomEvent('helix-before-check', {
       bubbles: true,
       cancelable: true,
       composed: true,
@@ -764,19 +764,19 @@ describe('a table whose rows nest', () => {
     await settle(host)
     await row(host, 'src').updateComplete
     const said: string[] = []
-    row(host, 'src').addEventListener('helix-before-toggle', (event) =>
-      said.push(`ask ${(event as CustomEvent<{ checked: boolean }>).detail.checked}`),
+    row(host, 'src').addEventListener('helix-before-expand', (event) =>
+      said.push(`ask ${(event as CustomEvent<{ value: string }>).detail.value}`),
     )
-    host.addEventListener('helix-toggle', (event) =>
-      said.push(`told ${(event as CustomEvent<{ checked: boolean }>).detail.checked}`),
+    host.addEventListener('helix-expand', (event) =>
+      said.push(`told ${(event as CustomEvent<{ value: string }>).detail.value}`),
     )
-    host.addEventListener('helix-before-toggle', (event) => event.preventDefault(), { once: true })
+    host.addEventListener('helix-before-expand', (event) => event.preventDefault(), { once: true })
     button(host, 'src')?.click()
     await settle(host)
     expect(host.expanded).toBe('')
     button(host, 'src')?.click()
     await settle(host)
-    expect(said).toEqual(['ask true', 'ask true', 'told true'])
+    expect(said).toEqual(['ask src', 'ask src', 'told src'])
     expect(host.expanded).toBe('src')
   })
 

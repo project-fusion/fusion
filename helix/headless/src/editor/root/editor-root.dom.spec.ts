@@ -247,7 +247,7 @@ describe('the toolbar', () => {
     const option = host.shadowRoot?.querySelector(
       '[part="block-option"][value="heading-1"]',
     ) as HTMLElement
-    option.dispatchEvent(new CustomEvent('helix-select', { bubbles: true, composed: true }))
+    option.dispatchEvent(new CustomEvent('helix-before-select', { bubbles: true, composed: true }))
     expect(asked.ran).toEqual([['heading-1', undefined]])
   })
 

@@ -4,7 +4,7 @@ import {
   fillTemplate,
   formatNumbers,
   formatWords,
-  HelixActivateEvent,
+  HelixBeforeNavigateEvent,
   HelixElement,
   HelixNavigateEvent,
   hostAria,
@@ -91,10 +91,11 @@ const fill = (template: string, page: number, pages: number): string =>
  * Set `href` to render every page as an `<a>`, with `{page}` replaced by the
  * page number. The links can be crawled, a middle click opens a tab, and the
  * address bar holds the state. Without `href` the pages are buttons, for a
- * table that pages in place. Either way, a click dispatches `helix-navigate`
- * first. Call `preventDefault()` to stop both the navigation and the page
- * change, for example to hand navigation to a router. There is no
- * `helix-change`, because moving to another page selects nothing.
+ * table that pages in place. Either way, a click dispatches
+ * `helix-before-navigate` first. Call `preventDefault()` to stop both the
+ * navigation and the page change, for example to hand navigation to a router.
+ * `helix-navigate` follows once the page has moved. There is no `change`,
+ * because moving to another page selects nothing.
  *
  * `Pagination.Summary` and `Pagination.Size` are separate elements that you
  * place beside this one, so you choose where they go and in what order.
@@ -110,8 +111,8 @@ const fill = (template: string, page: number, pages: number): string =>
  * @slot next-icon - The glyph on the forward-one-page control, usually a caret.
  * @slot previous-icon - The glyph on the back-one-page control, usually a caret.
  *
- * @event {HelixActivateEvent} helix-activate - Fired after the page changes, with the new page as a string in `detail.value`. In `href` mode it comes a task after the click, once the page has moved.
- * @event {HelixNavigateEvent} helix-navigate - Fired before the page changes, and cancelable. Canceling it is the only way to stop a page change. `detail.page` is the page asked for, as a number, and `detail.value` is the same page as a string.
+ * @event {HelixBeforeNavigateEvent} helix-before-navigate - Fired before the page changes, and cancelable. Canceling it is the only way to stop a page change. `detail.page` is the page asked for, as a number, and `detail.value` is the same page as a string.
+ * @event {HelixNavigateEvent} helix-navigate - Fired after the page changes, with the new page in `detail.page` and as a string in `detail.value`. In `href` mode it comes a task after the click, once the page has moved.
  *
  * @csspart first - The control that jumps to the first page, under `ends`.
  * @csspart gap - The control in place of hidden pages, which jumps into them.
@@ -486,7 +487,7 @@ export class HelixHeadlessPagination extends HelixElement {
         }
         this.applyPage(page)
       },
-      event: (page) => new HelixNavigateEvent({ page, value: String(page) }),
+      event: (page) => new HelixBeforeNavigateEvent({ page, value: String(page) }),
       host: this,
       next,
     })
@@ -515,10 +516,10 @@ export class HelixHeadlessPagination extends HelixElement {
     const previous = this.page
     this.pageState = page
     this.requestUpdate('page', previous)
-    /* The notification after the request, the one a set sends once a
-       different member is current: `helix-navigate` is a proposal another
-       listener may refuse, so it cannot tell a consumer where the reader is. */
-    this.dispatchEvent(new HelixActivateEvent({ value: String(page) }))
+    /* The notification after the request: `helix-before-navigate` is a
+       proposal another listener may refuse, so it cannot tell a consumer
+       where the reader is. */
+    this.dispatchEvent(new HelixNavigateEvent({ page, value: String(page) }))
   }
 
   /**

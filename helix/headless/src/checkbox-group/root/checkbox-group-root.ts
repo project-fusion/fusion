@@ -3,7 +3,7 @@ import {
   customElement,
   DisabledCascadeController,
   HelixBeforeChangeEvent,
-  type HelixBeforeToggleEvent,
+  type HelixBeforeCheckEvent,
   HelixFormElement,
   hostAria,
   MixinField,
@@ -304,7 +304,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
    * group answers itself until the stack gives out.
    *
    * The requested state comes from the event rather than from the box.
-   * `helix-before-toggle` is dispatched before the box applies, so reading
+   * `helix-before-check` is dispatched before the box applies, so reading
    * `checked` here would read the state it still holds and nothing would ever
    * change.
    */
@@ -314,7 +314,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     if (!changed) {
       return
     }
-    /* A box's `helix-before-toggle` bubbles, and the group is the single voice
+    /* A box's `helix-before-check` bubbles, and the group is the single voice
        for the set: a consumer listening here wants the whole answer, not one
        box's half of it. */
     event.stopImmediatePropagation()
@@ -328,7 +328,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
       return
     }
 
-    const wanted = (event as HelixBeforeToggleEvent).detail.checked
+    const wanted = (event as HelixBeforeCheckEvent).detail.checked
     /* Announced before it is written, never after: dispatching once the group's
        value has moved leaves `preventDefault()` refusing a set that has already
        changed.
@@ -388,7 +388,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('helix-before-toggle', this.handleToggle)
+    this.addEventListener('helix-before-check', this.handleToggle)
     this.addEventListener('change', this.handleMemberNative)
     this.addEventListener('input', this.handleMemberNative)
     this.observer = new MutationObserver(() => this.requestUpdate())
@@ -397,7 +397,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-before-toggle', this.handleToggle)
+    this.removeEventListener('helix-before-check', this.handleToggle)
     this.removeEventListener('change', this.handleMemberNative)
     this.removeEventListener('input', this.handleMemberNative)
     this.observer?.disconnect()
@@ -527,7 +527,7 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
       .indeterminate=${indeterminate}
       ?disabled=${this.isDisabled}
       label=${this.selectAllLabel}
-      @helix-before-toggle=${this.handleSelectAll}
+      @helix-before-check=${this.handleSelectAll}
       @input=${(event: Event) => event.stopPropagation()}
     ></${box}>`
   }

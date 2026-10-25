@@ -33,7 +33,7 @@ export function Example() {
   }
 
   const chosen = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `"${event.detail.value}" was chosen, and the event bubbles`)
+    say('helix-before-select', `"${event.detail.value}" was chosen, and the event bubbles`)
   }
 
   return (
@@ -48,7 +48,7 @@ export function Example() {
           label="Actions"
           onhelix-before-close={closing}
           onhelix-before-open={opening}
-          onhelix-select={chosen}
+          onhelix-before-select={chosen}
           onToggle={moved}
         >
           <helix-speed-dial-item value="new">

@@ -1618,7 +1618,7 @@ analyzer.
 **Every state change is announced twice, and the two are for different
 people.**
 
-The request is `helix-before-change`, or `helix-before-toggle` where the state
+The request is `helix-before-change`, or `helix-before-check` where the state
 is a boolean, or `helix-before-open` and `helix-before-close` where it is an
 overlay. Cancelable, carrying what is being proposed, fired before anything
 moves. Refusing one is how a consumer takes the decision, which is the whole of
@@ -1778,18 +1778,52 @@ is under [JSDoc contract](#jsdoc-contract).
 **Where there is no platform word, the notification is the request's verb
 without `before`**, carrying the state now in force: `helix-pin` after
 `helix-before-pin`, `helix-collapse` after `helix-before-collapse`, and
-`helix-activate` after any request that makes a different member of a set
-current, which is how Pagination and Carousel answer theirs. Some requests had
-the plain verb before this rule did, `helix-sort`, `helix-filter`,
-`helix-select` and `helix-reorder` on Data Table among them, and consumers bind
-them by those names, so the notification takes the past tense:
-`helix-sorted`, `helix-filtered`, `helix-selected`, `helix-reordered`. So does
-`helix-resized`, `helix-resize` being a measurement already. A request that is
-refused sends no notification.
+`helix-activate` after `helix-before-activate`. Data Table sends
+`helix-before-sort` and then `helix-sort`, and the same pair for `filter`,
+`select`, `reorder` and `navigate`. Two notifications take the past tense
+because the plain verb is taken: `helix-resized`, `helix-resize` being a
+measurement, and `helix-pasted`, `paste` being the clipboard's. A request that
+is refused sends no notification.
 
-**The rule is `helix component`'s `decided`.** It reads every dispatch of a class
-whose constructor passes `cancelable: true`, and passes when the answer is used
-at the dispatch, read off the event afterwards, or read by a file in the family
+**A checked state is `helix-before-check`, and `toggle` is open and closed.**
+The platform's `toggle` says a popover or a `<details>` opened or closed, and
+Helix relays it for every overlay, so a checked state has its own verb. A form
+control follows the request with the native `change`; a checked state that is
+no form control's, a map layer or a code block's wrapping, follows it with
+`helix-check`. A row of Table that opens is a disclosure, so it asks with
+`helix-before-expand` and says `helix-expand`, as Data Table and Log do.
+
+**Cancelable exactly when the name is `helix-before-*`**, apart from five
+commands. Each is something the reader handed over rather than a state about to
+change, refusing it stops what the library would do with it, and nothing is in
+force afterwards for a notification to report:
+
+- `helix-create`, a value the list does not hold, which Combobox would add
+- `helix-dismiss`, an element asking to be taken away
+- `helix-send`, what a reader wrote in a chat composer
+- `helix-shortcut`, a chord pressed, whose key event is consumed only where it
+  stands
+- `helix-terminal-link`, an address the terminal would open
+
+This is the grammar as of October 25, 2026. Until then thirteen requests had
+plain names, `helix-sort` and `helix-select` among them, under the argument
+that consumers already bound them; the owner's call of October 10 that a
+public name may break before the first external publish ended that argument,
+and `helix-sort` is a notification now.
+
+**Every request names its follow-up**, under `@followedBy` in its class's doc
+block, with every name that can follow it: `helix-before-select` is followed
+by `helix-select` on a set that holds a selection, `helix-activate` on one
+that makes the chosen child current, and `change` on one that holds a value. A
+family that declares a request declares one of those names too.
+
+**The rules are `helix component`'s `conventions` and `decided`.**
+`conventions` holds the grammar: the name against the flag, the five commands,
+`@followedBy` against the notifications that exist, each family's requests
+against its notifications, and the table in `helix/docs/content/events.mdx`
+against `names.ts`. `decided` reads every dispatch of a class whose
+constructor passes `cancelable: true`, and passes when the answer is used at
+the dispatch, read off the event afterwards, or read by a file in the family
 that dispatched it or in a family that composes that one.
 
 ### What a form-associated component owes

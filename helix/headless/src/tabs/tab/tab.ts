@@ -20,7 +20,7 @@ import { property } from 'lit/decorators.js'
  * A tab is an element, because it manages selection and its own tab stop.
  *
  * With an `href`, the tab is a link: `role="tab"` on an `<a>`, which a press,
- * Enter and the browser's own link gestures follow. `helix-select` is sent
+ * Enter and the browser's own link gestures follow. `helix-before-select` is sent
  * first, and canceling it keeps the browser from following, so a client-side
  * router follows it instead.
  *
@@ -41,8 +41,8 @@ import { property } from 'lit/decorators.js'
  * @slot - The tab's label.
  * @slot dismiss-icon - Replaces the glyph on the mark that closes a `dismissible` tab.
  *
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when the tab is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
  * @event {HelixDismissEvent} helix-dismiss - A `dismissible` tab was asked to close. The tab does not remove itself, so remove it and its panel in response. Cancelable.
- * @event {HelixSelectEvent} helix-select - Fired when the tab is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
  *
  * @csspart dismiss - The mark a pointer presses to close a `dismissible` tab.
  * @csspart dismiss-mark - The glyph on that mark, where none is slotted.

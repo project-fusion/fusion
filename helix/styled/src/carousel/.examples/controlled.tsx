@@ -7,7 +7,7 @@ export function Example() {
     <helix-carousel
       index={index}
       label="Setup steps"
-      onhelix-select={(event) => setIndex(Number(event.detail.value))}
+      onhelix-before-activate={(event) => setIndex(Number(event.detail.value))}
     >
       <div>Create an account</div>
       <div>Invite your team</div>

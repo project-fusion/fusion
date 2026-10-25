@@ -31,7 +31,7 @@ export function Example() {
   }
 
   const pressed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `Pressed "${event.detail.value}"`)
+    say('helix-before-select', `Pressed "${event.detail.value}"`)
   }
 
   return (
@@ -44,7 +44,7 @@ export function Example() {
         name="plan"
         onChange={settled}
         onhelix-before-change={proposed}
-        onhelix-select={pressed}
+        onhelix-before-select={pressed}
         onInput={moved}
       >
         <helix-radio value="free">Free</helix-radio>

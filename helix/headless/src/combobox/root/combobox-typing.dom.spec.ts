@@ -30,7 +30,7 @@ describe('combobox typing, as a consumer sees it', () => {
   test('announces what the list is being narrowed to', async () => {
     const combobox = await mount(OPTIONS)
     const heard: string[] = []
-    combobox.addEventListener('helix-filter', (event) => {
+    combobox.addEventListener('helix-before-filter', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
     })
 
@@ -42,11 +42,11 @@ describe('combobox typing, as a consumer sees it', () => {
 
   test('under this element’s name, not the listbox inside it', async () => {
     /* The whole of the fix. The narrowing always reached consumers, because the
-       listbox's own `helix-filter` is composed and nothing stopped it here;
+       listbox's own `helix-before-filter` is composed and nothing stopped it here;
        what a consumer got was an event from an element they do not hold. */
     const combobox = await mount(OPTIONS)
     const targets: EventTarget[] = []
-    combobox.addEventListener('helix-filter', (event) => {
+    combobox.addEventListener('helix-before-filter', (event) => {
       if (event.target) {
         targets.push(event.target)
       }
@@ -66,7 +66,7 @@ describe('combobox typing, as a consumer sees it', () => {
     // The regression the fix could introduce: two events for one narrowing.
     const combobox = await mount(OPTIONS)
     let count = 0
-    combobox.addEventListener('helix-filter', () => {
+    combobox.addEventListener('helix-before-filter', () => {
       count += 1
     })
 
@@ -77,7 +77,7 @@ describe('combobox typing, as a consumer sees it', () => {
 
   test('refusing it leaves the list whole', async () => {
     const combobox = await mount(OPTIONS)
-    combobox.addEventListener('helix-filter', (event) => {
+    combobox.addEventListener('helix-before-filter', (event) => {
       event.preventDefault()
     })
 
@@ -89,7 +89,7 @@ describe('combobox typing, as a consumer sees it', () => {
   test('refusing the narrowing is not refusing to open', async () => {
     // What refusing the listbox's own event already did, kept.
     const combobox = await mount(OPTIONS)
-    combobox.addEventListener('helix-filter', (event) => {
+    combobox.addEventListener('helix-before-filter', (event) => {
       event.preventDefault()
     })
 
@@ -109,7 +109,7 @@ describe('combobox typing, as a consumer sees it', () => {
   test('typing before anything is open still reports', async () => {
     const combobox = await mount(OPTIONS)
     const heard: string[] = []
-    combobox.addEventListener('helix-filter', (event) => {
+    combobox.addEventListener('helix-before-filter', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
     })
 

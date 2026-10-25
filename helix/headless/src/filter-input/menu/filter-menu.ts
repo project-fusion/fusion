@@ -1,4 +1,11 @@
-import { customElement, HelixElement, HelixFacetEvent, words } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  type FacetDetail,
+  HelixBeforeFacetEvent,
+  HelixElement,
+  HelixFacetEvent,
+  words,
+} from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 /* `lit/static-html.js`, because this template interpolates tag names: it renders
@@ -32,11 +39,12 @@ import '../../menu/index.js'
  * operators on the field when you need them.
  *
  * Ticking a value applies the filter immediately. There is no Apply button.
- * Each tick fires `helix-facet` with the field's whole set of values, so
- * results narrow as the user works. Unticking the last value fires an empty
- * set, which is your cue to remove the chip.
+ * Each tick fires `helix-before-facet` with the field's whole set of values,
+ * and `helix-facet` once the tick stands, so results narrow as the user works.
+ * Unticking the last value fires an empty set, which is your cue to remove the
+ * chip.
  *
- * The operator is chosen in the menu. `helix-facet` carries an empty
+ * The operator is chosen in the menu. `helix-before-facet` carries an empty
  * `operatorLabel` when the operator is the field's default, which is the value
  * a chip's `operator-label` expects, so the operator segment appears only for a
  * non-default choice. The menu decides this because it is the only element that
@@ -49,13 +57,13 @@ import '../../menu/index.js'
  * - `arity="one"` offers the values as a single choice. Pressing another value
  *   replaces the choice, and pressing the chosen value clears it.
  *
- * `helix-facet` includes `arity`, so you can tell an empty filter from no
+ * Both events include `arity`, so you can tell an empty filter from no
  * filter.
  *
  * The menu applies nothing. The chips are your markup and the rows are your
  * data, so the menu fires the event and leaves the change to you, as
- * `Notification` does for a read. Call `preventDefault()` on `helix-facet` to
- * cancel the change.
+ * `Notification` does for a read. Call `preventDefault()` on
+ * `helix-before-facet` to cancel the change.
  *
  * Imported from its own entry, `@fusion.dev/helix-headless/filter-input/menu`, which registers
  * it with the `Menu` it draws its pages with. The family's entry leaves it out,
@@ -70,7 +78,8 @@ import '../../menu/index.js'
  * @slot - The fields the menu can filter by, as `FilterField`s. The menu reads them and does not render them.
  * @slot trigger - The control that opens the menu, usually a `Button`.
  *
- * @event {HelixFacetEvent} helix-facet - Fired when a field's values change. Cancelable: call `preventDefault()` to keep the previous values.
+ * @event {HelixBeforeFacetEvent} helix-before-facet - Fired when a field's values are about to change, with the field's whole set. Cancelable: call `preventDefault()` to keep the previous values.
+ * @event {HelixFacetEvent} helix-facet - Fired after a field's values change, with the field's whole set now in force. Draw the chip from it.
  *
  * @csspart divider - The line between a field's comparisons and its values.
  * @csspart divider-content - The content set into the line.
@@ -178,7 +187,8 @@ export class HelixHeadlessFilterMenu extends HelixElement {
   }
 
   /**
-   * Announces a field's set as it now stands, and reports whether it stood.
+   * Asks for a field's set as it now stands, says so where it stood, and
+   * reports whether it did.
    *
    * The whole set rather than the one value that moved, because a filter is the
    * set: a consumer redrawing a chip from a single tick would have to keep their
@@ -187,27 +197,30 @@ export class HelixHeadlessFilterMenu extends HelixElement {
    */
   private announce(field: HelixHeadlessFilterField): boolean {
     const operator = this.operatorFor(field)
-    return this.dispatchEvent(
-      new HelixFacetEvent({
-        /* What tells a consumer an empty filter from no filter: `is empty` is a
-           filter with no values and never will have any, and every other
-           comparison with none is a field nobody is narrowing by. */
-        arity: operator?.arity ?? 'many',
-        field: field.name ?? '',
-        label: field.label,
-        operator: operator?.name ?? '',
-        /* Empty where it is the field's usual comparison, which is what makes a
-           chip drawn from this read as a field and its values and nothing
-           between them. The grammar decides it the same way. */
-        operatorLabel: operator?.default ? '' : (operator?.label ?? ''),
-        values: this.valuesFor(field.name ?? ''),
-      }),
-    )
+    const facet: FacetDetail = {
+      /* What tells a consumer an empty filter from no filter: `is empty` is a
+         filter with no values and never will have any, and every other
+         comparison with none is a field nobody is narrowing by. */
+      arity: operator?.arity ?? 'many',
+      field: field.name ?? '',
+      label: field.label,
+      operator: operator?.name ?? '',
+      /* Empty where it is the field's usual comparison, which is what makes a
+         chip drawn from this read as a field and its values and nothing
+         between them. The grammar decides it the same way. */
+      operatorLabel: operator?.default ? '' : (operator?.label ?? ''),
+      values: this.valuesFor(field.name ?? ''),
+    }
+    if (!this.dispatchEvent(new HelixBeforeFacetEvent(facet))) {
+      return false
+    }
+    this.dispatchEvent(new HelixFacetEvent(facet))
+    return true
   }
 
   /**
-   * Filters a field by the given values and sends `helix-facet`, as checking a
-   * value does.
+   * Filters a field by the given values and sends `helix-before-facet`, then
+   * `helix-facet`, as checking a value does.
    *
    * **The one way this element's state changes**, whether the move came from a
    * row here, from a filter typed into the field around it, or from a chip
@@ -216,8 +229,8 @@ export class HelixHeadlessFilterMenu extends HelixElement {
    * ticked, and the reader's next press on that value read as *unticking* it:
    * they pressed `Refunded`, an empty set was announced, and nothing appeared.
    *
-   * Refusing the `helix-facet` puts everything back, so a consumer who declines
-   * a filter is never left looking at a menu that says it took.
+   * Refusing the `helix-before-facet` puts everything back, so a consumer who
+   * declines a filter is never left looking at a menu that says it took.
    */
   apply(field: string, values: readonly string[], operator?: string): boolean {
     const declared = this.fields.find((one) => (one.name ?? '') === field)
@@ -261,7 +274,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
   /**
    * Keeps each choice row's tick where this element puts it.
    *
-   * A choice row checks itself after `helix-before-toggle`, and this element
+   * A choice row checks itself after `helix-before-check`, and this element
    * already sets `checked` on every row from its own state. The request is
    * refused, so a tick moves only when the choice is applied, and stopped, so
    * it does not reach a page that never placed the row.
@@ -285,7 +298,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
    * nothing and there is nothing to parse.
    *
    * Stopped here rather than let past, because a consumer listening for
-   * `helix-select` on their own page should not receive one for a row inside a
+   * `helix-before-select` on their own page should not receive one for a row inside a
    * control they did not write. Only the two rows that choose something need it:
    * a row that opens a page is stopped by `Menu` itself, in a capture-phase
    * handler, on the ground that looking into a submenu is not a choice. Measured
@@ -335,7 +348,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
       exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header,
         live: menu-live, loading: menu-loading, search-field: menu-search-field, surface: menu-surface, title: menu-title"
       label=${this.label}
-      @helix-select=${this.handleSelect}
+      @helix-before-select=${this.handleSelect}
     >
       <slot name="trigger" slot="trigger"></slot>
       ${this.fields.map((field) => {
@@ -389,7 +402,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
                       checkable
                       exclusive
                       ?checked=${operator.name === using?.name}
-                      @helix-before-toggle=${this.keepTick}
+                      @helix-before-check=${this.keepTick}
                       data-facet="operator"
                       data-field=${name}
                       data-value=${operator.name}
@@ -424,7 +437,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
               checkable
               ?exclusive=${using?.arity === 'one'}
               ?checked=${ticked.has(option.value)}
-              @helix-before-toggle=${this.keepTick}
+              @helix-before-check=${this.keepTick}
               data-facet="value"
               data-field=${name}
               data-value=${option.value}

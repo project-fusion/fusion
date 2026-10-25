@@ -65,6 +65,7 @@ pub mod floors;
 pub mod focus_ring;
 pub mod glyphs;
 pub mod grafted;
+pub mod grammar;
 pub mod grounds;
 pub mod hook_names;
 pub mod hooks;

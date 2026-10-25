@@ -11,6 +11,8 @@ import type { OpenDetail } from './details.js'
  * Neither bubbles nor composed. A dialog inside a drawer inside a popover is
  * three overlays, and an inner one opening must not read as the outer one
  * opening.
+ *
+ * @followedBy toggle
  */
 export class HelixBeforeOpenEvent extends CustomEvent<OpenDetail> {
   static readonly eventName = 'helix-before-open'

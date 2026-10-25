@@ -17,21 +17,22 @@
  */
 export const helixEventNames: ReadonlySet<string> = new Set(
   (
-    'action activate aura-fallback band before-activate before-change before-close ' +
-    'before-collapse before-edit before-listen before-move before-open before-panel-resize before-paste before-pin ' +
-    'before-reconnect before-relabel before-reorder before-resize before-split before-toggle ' +
-    'canvas-edit canvas-pan canvas-view canvas-zoom caret clear collapse complete ' +
-    'connect console copy copy-error create device-button device-key device-screenshot ' +
-    'device-scroll device-swipe device-tap device-text device-touch dismiss edit end expand facet filter ' +
-    'filtered found graph-filter graph-layout graph-pan graph-part-change graph-ready ' +
-    'graph-signal graph-zoom history listen load load-more map-cluster map-pan map-part-change ' +
-    'map-ready map-rotate map-tilt map-zoom move navigate next panel-resize pasted pin plot-change ' +
-    'plot-turn press ' +
-    'preview previous range-change read reading-change reading-press reconnect reject ' +
-    'relabel remove reorder ' +
-    'reordered resize resized sample-end sample-start scrolled select selected send ' +
-    'shortcut sort sorted split stop strands-fallback terminal-bell terminal-input terminal-link ' +
-    'terminal-resize terminal-restart terminal-title toggle tour-ask tour-status typing'
+    'action activate aura-fallback band before-activate before-change before-check ' +
+    'before-close before-collapse before-edit before-expand before-facet before-filter ' +
+    'before-graph-filter before-listen before-move before-navigate before-open ' +
+    'before-panel-resize before-paste before-pin before-read before-reconnect before-relabel ' +
+    'before-reorder before-resize before-select before-sort before-split canvas-edit ' +
+    'canvas-pan canvas-view canvas-zoom caret check clear collapse complete connect console ' +
+    'copy copy-error create device-button device-key device-screenshot device-scroll ' +
+    'device-swipe device-tap device-text device-touch dismiss edit end expand facet filter ' +
+    'found graph-filter graph-layout graph-pan graph-part-change graph-ready graph-signal ' +
+    'graph-zoom history listen load load-more map-cluster map-pan map-part-change map-ready ' +
+    'map-rotate map-tilt map-zoom move navigate next panel-resize pasted pin plot-change ' +
+    'plot-turn press preview previous range-change read reading-change reading-press ' +
+    'reconnect reject relabel remove reorder resize resized sample-end sample-start scrolled ' +
+    'select send shortcut sort split stop strands-fallback terminal-bell terminal-input ' +
+    'terminal-link terminal-resize terminal-restart terminal-title tour-ask tour-status ' +
+    'typing'
   )
     .split(' ')
     .map((name) => `helix-${name}`),

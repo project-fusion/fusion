@@ -1,11 +1,10 @@
 import type { FilterDetail } from './details.js'
 
 /**
- * Fired when a component narrows what it is showing.
+ * A component is showing a narrower or a wider set.
  *
- * Filtering hides rather than removes, so nothing about the value changes and
- * `helix-change` would be a lie. What a consumer wants to know is that the list
- * in front of the reader is no longer the whole list.
+ * The notification after `helix-before-filter`, sent once the query has moved,
+ * with the query now in force. Not cancelable: the decision was the request's.
  */
 export class HelixFilterEvent extends CustomEvent<FilterDetail> {
   static readonly eventName = 'helix-filter'
@@ -13,7 +12,7 @@ export class HelixFilterEvent extends CustomEvent<FilterDetail> {
   constructor(detail: FilterDetail) {
     super(HelixFilterEvent.eventName, {
       bubbles: true,
-      cancelable: true,
+      cancelable: false,
       composed: true,
       detail,
     })

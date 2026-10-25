@@ -1,6 +1,6 @@
 import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixBeforeToggleEvent } from '../../events/events.js'
+import { HelixBeforeCheckEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 import { requestChange } from '../../utils/request-change/request-change.js'
 
@@ -20,7 +20,7 @@ export declare class MixinControllerCheckedInterface {
    *
    * Reading gives the real state. Writing always applies, and is a seed and a
    * correction rather than a claim of ownership: a consumer who wants the
-   * decision refuses the `helix-before-toggle`.
+   * decision refuses the `helix-before-check`.
    */
   checked: boolean
 
@@ -47,7 +47,7 @@ export declare class MixinControllerCheckedInterface {
    * Requests a change to `checked`, and returns whether it was applied.
    *
    * Announces before it acts: a listener calling `preventDefault()` on the
-   * `helix-before-toggle` refuses the change, and nothing moves.
+   * `helix-before-check` refuses the change, and nothing moves.
    */
   requestChecked(next: boolean): boolean
 
@@ -71,7 +71,7 @@ export declare class MixinControllerCheckedInterface {
  * `checked` is a seed and a correction rather than a claim: the element applies
  * its own changes from wherever markup started it, `defaultChecked` is what a
  * reset returns to, and a consumer takes the decision by refusing the
- * `helix-before-toggle`.
+ * `helix-before-check`.
  *
  * Records `:state(checked)` whenever the element is checked. Styled tiers
  * select on that rather than on `[checked]`, which is absent until somebody
@@ -168,7 +168,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
      * Requests a change to `checked`, and returns whether it was applied.
      *
      * Announces before it acts, so `preventDefault()` on the
-     * `helix-before-toggle` is a refusal and nothing moves. Nobody refusing
+     * `helix-before-check` is a refusal and nothing moves. Nobody refusing
      * means the element updates itself, whether or not a consumer declared the
      * property: a declared property is a seed and a correction, the way
      * `<input value>` is, and a consumer who wants the change for themselves
@@ -184,7 +184,7 @@ export const MixinControllerChecked = <T extends Constructor<HelixElement>>(Base
           this.checkedState = checked
           this.requestUpdate('checked', previous)
         },
-        event: (checked) => new HelixBeforeToggleEvent({ checked }),
+        event: (checked) => new HelixBeforeCheckEvent({ checked }),
         host: this,
         next,
       })

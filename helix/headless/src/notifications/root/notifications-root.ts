@@ -6,6 +6,7 @@ import {
   deepContains,
   focusableElements,
   formatWords,
+  HelixBeforeReadEvent,
   HelixElement,
   HelixLoadMoreEvent,
   HelixReadEvent,
@@ -37,8 +38,9 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * use a data table with a custom cell.
  *
  * Read state is reported to you. Marking read goes from the root to the item
- * and from the item to you, so a canceled `helix-read` changes nothing, and if
- * you own `read`, nothing changes until you set it. `unread` is derived from
+ * and from the item to you, so a canceled `helix-before-read` changes nothing,
+ * and if you own `read`, nothing changes until you set it. `helix-read` follows
+ * each change that stood. `unread` is derived from
  * the items and written to an attribute, so a stylesheet and a badge can both
  * use it without counting.
  *
@@ -91,9 +93,10 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @slot header - Above the list, for a title and the mark-all control.
  * @slot loading - Replaces the words of `loading-text` in the `loading` part, such as a loader. The live region still says `loading-text`.
  *
+ * @event {HelixBeforeReadEvent} helix-before-read - Fired by an item when it is about to be marked read or unread, and by the feed before everything is marked read. Cancelable.
  * @event {HelixDismissEvent} helix-dismiss - Fired when the user dismisses a row. The row dispatches it, and you can listen for it on the feed. Cancelable: cancel it to keep the row.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader presses the `load-more` button, asking for the next page of the feed.
- * @event {HelixReadEvent} helix-read - Fired by an item when it is marked read or unread, and by the feed when everything is marked read. Cancelable.
+ * @event {HelixReadEvent} helix-read - Fired by an item after it is marked read or unread, and by the feed after everything is marked read.
  *
  * @csspart empty - Shown when there is nothing in the feed.
  * @csspart error - Shown while `load-error` is set, under any rows there are, in place of the empty and loading lines.
@@ -288,8 +291,8 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * same route for the same reason.
    *
    * **And unlike that one, this announces nothing of its own.** Marking read is
-   * usually a round trip, so a feed-level `helix-read` lets a consumer refuse the
-   * whole operation before any of it starts. Folding is not: it is where the
+   * usually a round trip, so a feed-level `helix-before-read` lets a consumer
+   * refuse the whole operation before any of it starts. Folding is not: it is where the
    * reader is looking, it reaches no server, and an event nobody can meaningfully
    * refuse is a channel that exists to be ignored.
    *
@@ -318,7 +321,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * rejects one does not silently mark the rest.
    */
   markEveryoneRead(): number {
-    if (!this.dispatchEvent(new HelixReadEvent({ read: true }))) {
+    if (!this.dispatchEvent(new HelixBeforeReadEvent({ read: true }))) {
       return 0
     }
     let moved = 0
@@ -328,6 +331,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
       }
     }
     this.requestUpdate()
+    this.dispatchEvent(new HelixReadEvent({ read: true }))
     return moved
   }
 
@@ -358,11 +362,10 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    * Lit to look again. Not stopped: the event is the consumer's to hear, and
    * this element is a bystander that happens to need to redraw.
    */
+  /* The notification rather than the request, so the count is read after
+     the item has applied the change and the badge never trails by one. */
   private readonly handleRead = (): void => {
-    /* After the item has applied it, not before: read synchronously the count
-       would be the one from before the change and the badge would trail by one
-       every time. */
-    queueMicrotask(() => this.requestUpdate())
+    this.requestUpdate()
   }
 
   private assign(): void {

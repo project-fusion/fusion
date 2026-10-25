@@ -186,9 +186,8 @@ export const requestReorder = (host: HTMLElement, detail: ReorderDetail): boolea
   if (asked.defaultPrevented) {
     return false
   }
-  const told = new HelixReorderEvent({ ...detail, keys: [...detail.keys] })
-  host.dispatchEvent(told)
-  return !told.defaultPrevented
+  host.dispatchEvent(new HelixReorderEvent({ ...detail, keys: [...detail.keys] }))
+  return true
 }
 
 /**

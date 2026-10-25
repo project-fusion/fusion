@@ -8,6 +8,8 @@ import type { ReconnectDetail } from './details.js'
  * The connection is already an element on the page, so the board rewrites its
  * ends itself, the way it writes a card's position onto the card; a page that
  * holds its connections in state refuses this and writes them there.
+ *
+ * @followedBy helix-reconnect
  */
 export class HelixBeforeReconnectEvent extends CustomEvent<ReconnectDetail> {
   static readonly eventName = 'helix-before-reconnect'

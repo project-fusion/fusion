@@ -39,7 +39,7 @@ import { property } from 'lit/decorators.js'
  * @slot indicator - An icon drawn inside the circle in place of the dot, such
  * as a check mark.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the radio is chosen. Cancelable: call `preventDefault()` to keep the current choice.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when the radio is chosen. Cancelable: call `preventDefault()` to keep the current choice.
  *
  * @csspart box - The circle. Draw the dot inside it with `::part(box)::after` in
  * your stylesheet, or slot an icon into `indicator`. This tier ships no CSS, so

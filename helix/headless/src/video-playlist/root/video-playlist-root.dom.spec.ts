@@ -115,7 +115,7 @@ describe('a video playlist', () => {
   })
 
   test('and refusing the entry`s own event leaves the player where it was', async () => {
-    /* `helix-select` is documented as cancelable on the entry and on the menu,
+    /* `helix-before-select` is documented as cancelable on the entry and on the menu,
        and the menu's own comment says re-announcing it from the host is what
        makes `preventDefault()` refuse the selection in one place. The playlist
        is the one thing that reads it, so a refusal it ignored was a veto that
@@ -125,7 +125,7 @@ describe('a video playlist', () => {
     const host = await list()
     await host.updateComplete
     const second = entries(host)[1] as Entry
-    second.addEventListener('helix-select', (event) => event.preventDefault())
+    second.addEventListener('helix-before-select', (event) => event.preventDefault())
     ;(part(second, 'item') as HTMLElement).click()
     await host.updateComplete
     expect(host.active).toBe('one')
@@ -212,7 +212,7 @@ describe('a video playlist', () => {
     const host = await list()
     await host.updateComplete
     let heard = 0
-    host.addEventListener('helix-select', () => {
+    host.addEventListener('helix-before-select', () => {
       heard += 1
     })
     ;(part(entries(host)[1] as HTMLElement, 'item') as HTMLElement).click()

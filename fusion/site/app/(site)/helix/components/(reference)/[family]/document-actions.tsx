@@ -19,7 +19,7 @@ import { absolute } from '@/utils/site/site'
  * still server-renders: the markup is in the HTML before hydration either way.
  *
  * Copy is the exception and cannot be a link. It listens for `helix-select`,
- * which bubbles and is composed, so one listener on the menu answers whichever
+ * which a row sends once its choice stands, and which bubbles and is composed, so one listener on the menu answers whichever
  * row was chosen by pointer or by keyboard. A click handler on the row would
  * catch the first and miss the second.
  */

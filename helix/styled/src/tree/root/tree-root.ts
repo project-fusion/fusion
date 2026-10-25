@@ -21,7 +21,7 @@ import { styles } from './tree-root.css.js'
  *
  * @slot - The tree's items.
  *
- * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. The item sends it, and you can listen for it on the tree. Cancelable: canceling it changes nothing.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when an item is chosen. The item sends it, and you can listen for it on the tree. Cancelable: canceling it changes nothing.
  *
  * @csspart drag-preview - A copy of the row a pointer drags by its grip, which follows the pointer in the top layer until the item is let go, in a `reorderable` tree. Hidden from assistive technology.
  * @csspart live - A copy of the empty and loading messages, and each step of a move in a `reorderable` tree, in a live region that announces them when they change. Visually hidden in the styled tier.

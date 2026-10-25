@@ -130,7 +130,7 @@ describe('a filterable menu', () => {
   test('Enter chooses the highlighted row and closes the menu', async () => {
     const host = await opened()
     const chosen: string[] = []
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       chosen.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     await type(host, 'copy')
@@ -190,10 +190,10 @@ describe('a filterable menu', () => {
     expect(highlighted(host)).toEqual(['share'])
   })
 
-  test('a canceled helix-filter keeps every row, for a page that narrows them itself', async () => {
+  test('a canceled helix-before-filter keeps every row, for a page that narrows them itself', async () => {
     const host = await opened()
     const heard: string[] = []
-    host.addEventListener('helix-filter', (event) => {
+    host.addEventListener('helix-before-filter', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
       event.preventDefault()
     })

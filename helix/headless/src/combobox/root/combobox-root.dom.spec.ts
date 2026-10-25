@@ -894,7 +894,7 @@ describe('a combobox with an option that is a link', () => {
   test('stays open and follows nothing where the page cancels it', async () => {
     catchLinks()
     const host = await linked()
-    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.addEventListener('helix-before-select', (event) => event.preventDefault())
     ;(host.children[1] as HTMLElement & { select(): void }).select()
     await settle(host)
     expect(followed).toEqual([])
@@ -906,7 +906,7 @@ describe('a combobox that waits for typing to rest', () => {
   test('narrows once, after `filter-delay`, and an arrow narrows at once', async () => {
     const host = await combobox('filter-delay="40"')
     const sent: string[] = []
-    ;(host as HTMLElement).addEventListener('helix-filter', (event) =>
+    ;(host as HTMLElement).addEventListener('helix-before-filter', (event) =>
       sent.push((event as CustomEvent<{ value: string }>).detail.value),
     )
     await type(host, 'r')
@@ -1188,7 +1188,7 @@ describe('a list opened with focus elsewhere', () => {
 })
 
 /* Measured before this in Chromium: a combobox filtering on a server, which
-   cancels `helix-filter`, sets `loading` and replaces the options, left the
+   cancels `helix-before-filter`, sets `loading` and replaces the options, left the
    list's live region empty once the options arrived. */
 describe('a combobox that loads its options', () => {
   test('says how many arrived when the load ends', async () => {
@@ -1198,7 +1198,7 @@ describe('a combobox that loads its options', () => {
       (listbox as unknown as HTMLElement).shadowRoot
         ?.querySelector('[part="live"]')
         ?.textContent?.trim()
-    host.addEventListener('helix-filter', (event) => event.preventDefault())
+    host.addEventListener('helix-before-filter', (event) => event.preventDefault())
     await type(host, 'q')
     host.loading = true
     await settle(host)

@@ -61,7 +61,7 @@
  * - **Lifecycle** (`helix-before-open`, `helix-before-close`) does not bubble and is not
  *   composed. Overlays nest, and an inner one's lifecycle must never reach the
  *   outer one that contains it.
- * - **Coordination** (`helix-select`, `helix-dismiss`, `helix-before-change`)
+ * - **Coordination** (`helix-before-select`, `helix-dismiss`, `helix-before-change`)
  *   bubbles and is composed, so a parent or a router can intercept it across a
  *   shadow boundary.
  */
@@ -72,26 +72,35 @@ import { HelixAuraFallbackEvent } from './aura-fallback.js'
 import { HelixBandEvent } from './band.js'
 import { HelixBeforeActivateEvent } from './before-activate.js'
 import { HelixBeforeChangeEvent } from './before-change.js'
+import { HelixBeforeCheckEvent } from './before-check.js'
 import { HelixBeforeCloseEvent } from './before-close.js'
 import { HelixBeforeCollapseEvent } from './before-collapse.js'
 import { HelixBeforeEditEvent } from './before-edit.js'
+import { HelixBeforeExpandEvent } from './before-expand.js'
+import { HelixBeforeFacetEvent } from './before-facet.js'
+import { HelixBeforeFilterEvent } from './before-filter.js'
+import { HelixBeforeGraphFilterEvent } from './before-graph-filter.js'
 import { HelixBeforeListenEvent } from './before-listen.js'
 import { HelixBeforeMoveEvent } from './before-move.js'
+import { HelixBeforeNavigateEvent } from './before-navigate.js'
 import { HelixBeforeOpenEvent } from './before-open.js'
 import { HelixBeforePanelResizeEvent } from './before-panel-resize.js'
 import { HelixBeforePasteEvent } from './before-paste.js'
 import { HelixBeforePinEvent } from './before-pin.js'
+import { HelixBeforeReadEvent } from './before-read.js'
 import { HelixBeforeReconnectEvent } from './before-reconnect.js'
 import { HelixBeforeRelabelEvent } from './before-relabel.js'
 import { HelixBeforeReorderEvent } from './before-reorder.js'
 import { HelixBeforeResizeEvent } from './before-resize.js'
+import { HelixBeforeSelectEvent } from './before-select.js'
+import { HelixBeforeSortEvent } from './before-sort.js'
 import { HelixBeforeSplitEvent } from './before-split.js'
-import { HelixBeforeToggleEvent } from './before-toggle.js'
 import { HelixCanvasEditEvent } from './canvas-edit.js'
 import { HelixCanvasPanEvent } from './canvas-pan.js'
 import { HelixCanvasViewEvent } from './canvas-view.js'
 import { HelixCanvasZoomEvent } from './canvas-zoom.js'
 import { HelixCaretEvent } from './caret.js'
+import { HelixCheckEvent } from './check.js'
 import { HelixClearEvent } from './clear.js'
 import { HelixCollapseEvent } from './collapse.js'
 import { HelixCompleteEvent } from './complete.js'
@@ -114,7 +123,6 @@ import { HelixEndEvent } from './end.js'
 import { HelixExpandEvent } from './expand.js'
 import { HelixFacetEvent } from './facet.js'
 import { HelixFilterEvent } from './filter.js'
-import { HelixFilteredEvent } from './filtered.js'
 import { HelixFoundEvent } from './found.js'
 import { HelixGraphFilterEvent } from './graph-filter.js'
 import { HelixGraphLayoutEvent } from './graph-layout.js'
@@ -154,18 +162,15 @@ import { HelixRejectEvent } from './reject.js'
 import { HelixRelabelEvent } from './relabel.js'
 import { HelixRemoveEvent } from './remove.js'
 import { HelixReorderEvent } from './reorder.js'
-import { HelixReorderedEvent } from './reordered.js'
 import { HelixResizeEvent } from './resize.js'
 import { HelixResizedEvent } from './resized.js'
 import { HelixSampleEndEvent } from './sample-end.js'
 import { HelixSampleStartEvent } from './sample-start.js'
 import { HelixScrolledEvent } from './scrolled.js'
 import { HelixSelectEvent } from './select.js'
-import { HelixSelectedEvent } from './selected.js'
 import { HelixSendEvent } from './send.js'
 import { HelixShortcutEvent } from './shortcut.js'
 import { HelixSortEvent } from './sort.js'
-import { HelixSortedEvent } from './sorted.js'
 import { HelixSplitEvent } from './split.js'
 import { HelixStopEvent } from './stop.js'
 import { HelixStrandsFallbackEvent } from './strands-fallback.js'
@@ -175,7 +180,6 @@ import { HelixTerminalLinkEvent } from './terminal-link.js'
 import { HelixTerminalResizeEvent } from './terminal-resize.js'
 import { HelixTerminalRestartEvent } from './terminal-restart.js'
 import { HelixTerminalTitleEvent } from './terminal-title.js'
-import { HelixToggleEvent } from './toggle.js'
 import { HelixTourAskEvent } from './tour-ask.js'
 import { HelixTourStatusEvent } from './tour-status.js'
 import { HelixTypingEvent } from './typing.js'
@@ -187,6 +191,7 @@ export type {
   CanvasView,
   CaretDetail,
   ChangeDetail,
+  CheckDetail,
   CompleteDetail,
   ConnectDetail,
   ConsoleDetail,
@@ -245,7 +250,6 @@ export type {
   TerminalLinkDetail,
   TerminalResizeDetail,
   TerminalTitleDetail,
-  ToggleDetail,
   TourAskDetail,
   TourStatusDetail,
   TypingDetail,
@@ -260,26 +264,35 @@ export {
   HelixBandEvent,
   HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
+  HelixBeforeCheckEvent,
   HelixBeforeCloseEvent,
   HelixBeforeCollapseEvent,
   HelixBeforeEditEvent,
+  HelixBeforeExpandEvent,
+  HelixBeforeFacetEvent,
+  HelixBeforeFilterEvent,
+  HelixBeforeGraphFilterEvent,
   HelixBeforeListenEvent,
   HelixBeforeMoveEvent,
+  HelixBeforeNavigateEvent,
   HelixBeforeOpenEvent,
   HelixBeforePanelResizeEvent,
   HelixBeforePasteEvent,
   HelixBeforePinEvent,
+  HelixBeforeReadEvent,
   HelixBeforeReconnectEvent,
   HelixBeforeRelabelEvent,
   HelixBeforeReorderEvent,
   HelixBeforeResizeEvent,
+  HelixBeforeSelectEvent,
+  HelixBeforeSortEvent,
   HelixBeforeSplitEvent,
-  HelixBeforeToggleEvent,
   HelixCanvasEditEvent,
   HelixCanvasPanEvent,
   HelixCanvasViewEvent,
   HelixCanvasZoomEvent,
   HelixCaretEvent,
+  HelixCheckEvent,
   HelixClearEvent,
   HelixCollapseEvent,
   HelixCompleteEvent,
@@ -302,7 +315,6 @@ export {
   HelixExpandEvent,
   HelixFacetEvent,
   HelixFilterEvent,
-  HelixFilteredEvent,
   HelixFoundEvent,
   HelixGraphFilterEvent,
   HelixGraphLayoutEvent,
@@ -342,18 +354,15 @@ export {
   HelixRelabelEvent,
   HelixRemoveEvent,
   HelixReorderEvent,
-  HelixReorderedEvent,
   HelixResizedEvent,
   HelixResizeEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   HelixScrolledEvent,
   HelixSelectEvent,
-  HelixSelectedEvent,
   HelixSendEvent,
   HelixShortcutEvent,
   HelixSortEvent,
-  HelixSortedEvent,
   HelixSplitEvent,
   HelixStopEvent,
   HelixStrandsFallbackEvent,
@@ -363,7 +372,6 @@ export {
   HelixTerminalResizeEvent,
   HelixTerminalRestartEvent,
   HelixTerminalTitleEvent,
-  HelixToggleEvent,
   HelixTourAskEvent,
   HelixTourStatusEvent,
   HelixTypingEvent,
@@ -388,26 +396,35 @@ const registry = {
   HelixBandEvent,
   HelixBeforeActivateEvent,
   HelixBeforeChangeEvent,
+  HelixBeforeCheckEvent,
   HelixBeforeCloseEvent,
   HelixBeforeCollapseEvent,
   HelixBeforeEditEvent,
+  HelixBeforeExpandEvent,
+  HelixBeforeFacetEvent,
+  HelixBeforeFilterEvent,
+  HelixBeforeGraphFilterEvent,
   HelixBeforeListenEvent,
   HelixBeforeMoveEvent,
+  HelixBeforeNavigateEvent,
   HelixBeforeOpenEvent,
   HelixBeforePanelResizeEvent,
   HelixBeforePasteEvent,
   HelixBeforePinEvent,
+  HelixBeforeReadEvent,
   HelixBeforeReconnectEvent,
   HelixBeforeRelabelEvent,
   HelixBeforeReorderEvent,
   HelixBeforeResizeEvent,
+  HelixBeforeSelectEvent,
+  HelixBeforeSortEvent,
   HelixBeforeSplitEvent,
-  HelixBeforeToggleEvent,
   HelixCanvasEditEvent,
   HelixCanvasPanEvent,
   HelixCanvasViewEvent,
   HelixCanvasZoomEvent,
   HelixCaretEvent,
+  HelixCheckEvent,
   HelixClearEvent,
   HelixCollapseEvent,
   HelixCompleteEvent,
@@ -430,7 +447,6 @@ const registry = {
   HelixExpandEvent,
   HelixFacetEvent,
   HelixFilterEvent,
-  HelixFilteredEvent,
   HelixFoundEvent,
   HelixGraphFilterEvent,
   HelixGraphLayoutEvent,
@@ -470,18 +486,15 @@ const registry = {
   HelixRelabelEvent,
   HelixRemoveEvent,
   HelixReorderEvent,
-  HelixReorderedEvent,
   HelixResizedEvent,
   HelixResizeEvent,
   HelixSampleEndEvent,
   HelixSampleStartEvent,
   HelixScrolledEvent,
   HelixSelectEvent,
-  HelixSelectedEvent,
   HelixSendEvent,
   HelixShortcutEvent,
   HelixSortEvent,
-  HelixSortedEvent,
   HelixSplitEvent,
   HelixStopEvent,
   HelixStrandsFallbackEvent,
@@ -491,7 +504,6 @@ const registry = {
   HelixTerminalResizeEvent,
   HelixTerminalRestartEvent,
   HelixTerminalTitleEvent,
-  HelixToggleEvent,
   HelixTourAskEvent,
   HelixTourStatusEvent,
   HelixTypingEvent,

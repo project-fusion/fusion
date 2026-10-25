@@ -31,7 +31,7 @@ type Carousel = Updatable & { index: number }
    frames on top measured nothing and cost six a press, which a busy run could
    not always find inside the two seconds a test gets. */
 describe('the events example', () => {
-  run('moving to the next slide and back selects each', async () => {
+  run('moving to the next slide and back makes each current', async () => {
     await example(events)
     const slides = document.getElementById('slides') as Carousel
     ;(part(slides, 'next') as HTMLElement).click()
@@ -39,7 +39,7 @@ describe('the events example', () => {
     expect(slides.index).toBe(1)
     ;(part(slides, 'previous') as HTMLElement).click()
     await settle(slides)
-    expect(logged()).toEqual(['helix-select', 'helix-select'])
+    expect(logged()).toEqual(['helix-activate', 'helix-activate'])
     expect(slides.index).toBe(0)
   })
 })

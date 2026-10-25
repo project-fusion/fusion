@@ -20,7 +20,7 @@ describe('the events example', () => {
     const calendar = document.getElementById('calendar') as HTMLElement & { value: string }
     ;(part(calendar, 'next') as HTMLElement).click()
     await idle()
-    expect(logged()).toEqual(['helix-navigate'])
+    expect(logged()).toEqual(['helix-before-navigate'])
     const cells = [
       ...(calendar.shadowRoot?.querySelectorAll<HTMLElement>(
         '[part~="cell"]:not([data-outside])',
@@ -28,7 +28,7 @@ describe('the events example', () => {
     ]
     cells[14]?.click()
     await idle()
-    expect(logged()).toEqual(['helix-navigate', 'helix-before-change', 'input', 'change'])
+    expect(logged()).toEqual(['helix-before-navigate', 'helix-before-change', 'input', 'change'])
     expect(calendar.value).not.toBe('')
   })
 })

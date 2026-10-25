@@ -700,10 +700,10 @@ describe('an object inspector with a filter field', () => {
     const host = await inspector('filterable filter-label="Find"')
     expect(field(host).getAttribute('aria-label')).toBe('Find')
     const heard: string[] = []
-    host.addEventListener('helix-filter', (event) =>
+    host.addEventListener('helix-before-filter', (event) =>
       heard.push(`filter ${(event as CustomEvent<{ value: string }>).detail.value}`),
     )
-    host.addEventListener('helix-filtered', (event) =>
+    host.addEventListener('helix-filter', (event) =>
       heard.push(`filtered ${(event as CustomEvent<{ value: string }>).detail.value}`),
     )
     field(host).value = 'dpl'
@@ -715,7 +715,7 @@ describe('an object inspector with a filter field', () => {
 
   test('keeps the filter it had when the request is refused', async () => {
     const host = await inspector('filterable')
-    host.addEventListener('helix-filter', (event) => event.preventDefault())
+    host.addEventListener('helix-before-filter', (event) => event.preventDefault())
     field(host).value = 'dpl'
     field(host).dispatchEvent(new Event('input', { bubbles: true }))
     await host.updateComplete

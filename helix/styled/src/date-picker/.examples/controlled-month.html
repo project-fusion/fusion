@@ -8,7 +8,7 @@
 <script>
   const calendar = document.getElementById('calendar')
 
-  calendar.addEventListener('helix-navigate', (event) => {
+  calendar.addEventListener('helix-before-navigate', (event) => {
     calendar.month = event.detail.value
   })
 </script>

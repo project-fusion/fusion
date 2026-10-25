@@ -168,7 +168,7 @@ describe('the events phase two sent as plain events', () => {
       HelixExpandEvent,
       HelixLoadEvent,
       HelixRangeChangeEvent,
-      HelixToggleEvent,
+      HelixCheckEvent,
       HelixTypingEvent,
     } = await import('./events.js')
     const sent = [
@@ -177,7 +177,7 @@ describe('the events phase two sent as plain events', () => {
       new HelixExpandEvent({ value: 'a,b' }),
       new HelixLoadEvent(),
       new HelixRangeChangeEvent({ first: 2, last: 9 }),
-      new HelixToggleEvent({ checked: true }),
+      new HelixCheckEvent({ checked: true }),
       new HelixTypingEvent({ typing: false }),
     ]
     expect(sent.map((event) => event.type)).toEqual([
@@ -186,7 +186,7 @@ describe('the events phase two sent as plain events', () => {
       'helix-expand',
       'helix-load',
       'helix-range-change',
-      'helix-toggle',
+      'helix-check',
       'helix-typing',
     ])
     for (const event of sent) {
@@ -198,11 +198,11 @@ describe('the events phase two sent as plain events', () => {
   })
 
   test('carry the state they report, where there is one', async () => {
-    const { HelixExpandEvent, HelixRangeChangeEvent, HelixToggleEvent, HelixTypingEvent } =
+    const { HelixExpandEvent, HelixRangeChangeEvent, HelixCheckEvent, HelixTypingEvent } =
       await import('./events.js')
     expect(new HelixExpandEvent({ value: 'a,b' }).detail.value).toBe('a,b')
     expect(new HelixRangeChangeEvent({ first: 2, last: 9 }).detail).toEqual({ first: 2, last: 9 })
-    expect(new HelixToggleEvent({ checked: false }).detail.checked).toBe(false)
+    expect(new HelixCheckEvent({ checked: false }).detail.checked).toBe(false)
     expect(new HelixTypingEvent({ typing: true }).detail.typing).toBe(true)
   })
 })

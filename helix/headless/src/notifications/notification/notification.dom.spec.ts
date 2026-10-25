@@ -54,11 +54,23 @@ describe('read state', () => {
    * state and then hears the request failed has told the reader something
    * untrue.
    */
-  test('refusing `helix-read` leaves the item unread', async () => {
+  test('refusing `helix-before-read` leaves the item unread', async () => {
     const element = await item()
-    element.addEventListener('helix-read', (event) => event.preventDefault())
+    element.addEventListener('helix-before-read', (event) => event.preventDefault())
     expect(element.markRead(true)).toBe(false)
     expect(element.read).toBe(false)
+  })
+
+  test('`helix-read` follows a change that stood, and not a refused one', async () => {
+    const element = await item()
+    const told: string[] = []
+    element.addEventListener('helix-read', (event) => {
+      told.push(`${(event as CustomEvent<{ read: boolean }>).detail.read}@${element.read}`)
+    })
+    element.markRead(true)
+    element.addEventListener('helix-before-read', (event) => event.preventDefault())
+    element.markRead(false)
+    expect(told).toEqual(['true@true'])
   })
 
   test('a declared `read` is a seed, and the element still marks itself', async () => {
@@ -72,7 +84,7 @@ describe('read state', () => {
 
   test('and refusing is what keeps it read', async () => {
     const element = await item('read')
-    element.addEventListener('helix-read', (event: Event) => {
+    element.addEventListener('helix-before-read', (event: Event) => {
       event.preventDefault()
     })
     element.markRead(false)
@@ -82,7 +94,7 @@ describe('read state', () => {
   test('asking for the state it already has is not a request', async () => {
     const element = await item()
     let heard = 0
-    element.addEventListener('helix-read', () => {
+    element.addEventListener('helix-before-read', () => {
       heard += 1
     })
     expect(element.markRead(false)).toBe(false)

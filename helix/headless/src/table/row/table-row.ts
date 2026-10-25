@@ -367,7 +367,7 @@ export class HelixHeadlessTableRow extends HelixElement {
    * The checkbox cell, in a `selectable` table.
    *
    * A cell of the row's own, before the consumer's cells, so the table's grid
-   * gives it the first track. The table hears its `helix-before-toggle`,
+   * gives it the first track. The table hears its `helix-before-check`,
    * refuses it and asks for the new selection, so the box shows only what the
    * table's `selected` says.
    */

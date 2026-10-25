@@ -26,7 +26,8 @@ import '../../menu/index.js'
  * @aliases FacetPicker, FilterBuilder
  * @documentation https://fusion.dev/helix/components/filter-input
  *
- * @event {HelixFacetEvent} helix-facet - Fired when a field's values change. Cancelable: call `preventDefault()` to keep the previous values.
+ * @event {HelixBeforeFacetEvent} helix-before-facet - Fired when a field's values are about to change, with the field's whole set. Cancelable: call `preventDefault()` to keep the previous values.
+ * @event {HelixFacetEvent} helix-facet - Fired after a field's values change, with the field's whole set now in force. Draw the chip from it.
  */
 @customElement('helix-filter-menu')
 export class HelixFilterMenu extends HelixHeadlessFilterMenu {

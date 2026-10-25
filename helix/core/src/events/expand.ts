@@ -1,7 +1,8 @@
 import type { ChangeDetail } from './details.js'
 
 /**
- * Rows opened or closed in place: a data table's tree of rows. Carries every
+ * Rows opened or closed in place: a data table's or a table's tree of rows, or
+ * a log's steps. Carries every
  * open row's key, separated by commas, which the table's `expanded` also
  * holds. Not cancelable: the rows have already moved.
  */

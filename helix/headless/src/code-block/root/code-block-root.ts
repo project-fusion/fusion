@@ -1,9 +1,9 @@
 import {
   customElement,
   formatWords,
-  HelixBeforeToggleEvent,
+  HelixBeforeCheckEvent,
+  HelixCheckEvent,
   HelixElement,
-  HelixToggleEvent,
   inlineStep,
   requestChange,
   requestValue,
@@ -170,10 +170,10 @@ const nameOf = (block: Element): string => {
  *
  * @event {Event} change - A file tab showed its file, whose name `file` now holds.
  * @event {HelixBeforeChangeEvent} helix-before-change - A file tab is about to show its file, with the file's name in `detail.value`. Cancelable: cancel it to keep the file shown.
- * @event {HelixBeforeToggleEvent} helix-before-toggle - The wrap button was pressed, with the `wrap` it asks for in `detail.checked`. Cancelable: cancel it to keep the lines as they are.
+ * @event {HelixBeforeCheckEvent} helix-before-check - The wrap button was pressed, with the `wrap` it asks for in `detail.checked`. Cancelable: cancel it to keep the lines as they are.
+ * @event {HelixCheckEvent} helix-check - Fired after the wrap button changed `wrap`, with the new value in `detail.checked`.
  * @event {HelixCopyEvent} helix-copy - The copy button put the code on the clipboard, with the text in `detail.value`.
  * @event {HelixCopyErrorEvent} helix-copy-error - A press on the copy button put nothing on the clipboard: the browser did not allow the write, or there was no code.
- * @event {HelixToggleEvent} helix-toggle - Fired after the wrap button changed `wrap`, with the new value in `detail.checked`.
  *
  * @csspart actions - The box in the header that holds the `actions` slot, drawn while something is slotted there.
  * @csspart added - In a diff, a line only the new version has, an `<ins>`.
@@ -504,12 +504,12 @@ export class HelixHeadlessCodeBlock extends HelixElement {
       apply: (checked) => {
         this.wrap = checked
       },
-      event: (checked) => new HelixBeforeToggleEvent({ checked }),
+      event: (checked) => new HelixBeforeCheckEvent({ checked }),
       host: this,
       next,
     })
     if (applied) {
-      this.dispatchEvent(new HelixToggleEvent({ checked: next }))
+      this.dispatchEvent(new HelixCheckEvent({ checked: next }))
     }
   }
 

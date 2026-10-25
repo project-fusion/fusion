@@ -38,7 +38,7 @@ describe('one drilldown row', () => {
   test('is chosen by its own click(), once, as by a press on its control', async () => {
     const host = await row()
     const heard: string[] = []
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     let clicks = 0
@@ -67,7 +67,7 @@ describe('one drilldown row', () => {
     expect(item?.hasAttribute('disabled')).toBe(false)
 
     let heard = 0
-    host.addEventListener('helix-select', () => {
+    host.addEventListener('helix-before-select', () => {
       heard += 1
     })
     host.select()
@@ -200,7 +200,7 @@ describe('a drilldown row with an href', () => {
   test('chooses the row on a press, and a refused choice does not follow the link', async () => {
     const found = await row('value="docs" href="#docs"')
     const heard: string[] = []
-    found.addEventListener('helix-select', (event) => {
+    found.addEventListener('helix-before-select', (event) => {
       heard.push((event as Event & { detail: { value: string } }).detail.value)
     })
     const link = part(found, 'item') as HTMLAnchorElement
@@ -209,7 +209,7 @@ describe('a drilldown row with an href', () => {
     expect(heard).toEqual(['docs'])
     expect(press.defaultPrevented).toBe(false)
 
-    found.addEventListener('helix-select', (event) => event.preventDefault())
+    found.addEventListener('helix-before-select', (event) => event.preventDefault())
     const refused = new MouseEvent('click', { bubbles: true, cancelable: true })
     link.dispatchEvent(refused)
     expect(refused.defaultPrevented).toBe(true)

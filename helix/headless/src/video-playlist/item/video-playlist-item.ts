@@ -1,4 +1,4 @@
-import { customElement, HelixElement, HelixSelectEvent } from '@fusion.dev/helix-core'
+import { customElement, HelixBeforeSelectEvent, HelixElement } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -29,7 +29,7 @@ import { property } from 'lit/decorators.js'
  * @slot media - A thumbnail. Defaults to an image of `poster`.
  * @slot meta - Content after the name, such as a duration or a date.
  *
- * @event {HelixSelectEvent} helix-select - The entry was chosen. Cancelable: cancel it to keep the current entry.
+ * @event {HelixBeforeSelectEvent} helix-before-select - The entry was chosen. Cancelable: cancel it to keep the current entry.
  *
  * @csspart container - The list item that holds the button.
  * @csspart indicator - The `indicator` slot, at the end of the row, rendered only while the entry is playing. It draws no box until you give it one.
@@ -135,7 +135,7 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
     if (this.disabled) {
       return
     }
-    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    this.dispatchEvent(new HelixBeforeSelectEvent({ value: this.value }))
   }
 
   /**

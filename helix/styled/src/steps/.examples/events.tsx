@@ -22,7 +22,7 @@ export function Example() {
   }
 
   const pressed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `"${event.detail.value}" was pressed`)
+    say('helix-before-select', `"${event.detail.value}" was pressed`)
   }
 
   return (
@@ -33,7 +33,7 @@ export function Example() {
       <helix-steps
         label="Checkout"
         onhelix-before-activate={proposed}
-        onhelix-select={pressed}
+        onhelix-before-select={pressed}
       >
         <helix-step value="details">Details</helix-step>
         <helix-step value="payment">Payment</helix-step>

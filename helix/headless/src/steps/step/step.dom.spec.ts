@@ -60,7 +60,7 @@ describe('one step', () => {
   test('announces itself when selected, and stays silent when it is refusing', async () => {
     const host = await step()
     let heard = 0
-    host.addEventListener('helix-select', () => {
+    host.addEventListener('helix-before-select', () => {
       heard += 1
     })
     host.select()
@@ -68,7 +68,7 @@ describe('one step', () => {
 
     const refusing = await step('disabled')
     let ignored = 0
-    refusing.addEventListener('helix-select', () => {
+    refusing.addEventListener('helix-before-select', () => {
       ignored += 1
     })
     refusing.select()

@@ -19,7 +19,7 @@ export function Example() {
   }
 
   const proposed = (event: CustomEvent<{ checked: boolean }>) => {
-    say('helix-before-toggle', `about to change to ${event.detail.checked}`)
+    say('helix-before-check', `about to change to ${event.detail.checked}`)
   }
 
   const moved = (event: Event & { currentTarget: HelixCheckbox }) => {
@@ -39,7 +39,7 @@ export function Example() {
         label="Send me release notes"
         name="notes"
         onChange={settled}
-        onhelix-before-toggle={proposed}
+        onhelix-before-check={proposed}
         onInput={moved}
         value="yes"
       />

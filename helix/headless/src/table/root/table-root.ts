@@ -11,14 +11,15 @@ import {
   followLink,
   format,
   formatWords,
-  HelixBeforeToggleEvent,
+  type HelixBeforeCheckEvent,
+  HelixBeforeExpandEvent,
+  HelixBeforeSelectEvent,
+  HelixBeforeSortEvent,
   HelixElement,
+  HelixExpandEvent,
   HelixLoadMoreEvent,
   HelixSelectEvent,
-  HelixSelectedEvent,
   HelixSortEvent,
-  HelixSortedEvent,
-  HelixToggleEvent,
   inRowOrder,
   MixinCollection,
   onAndroid,
@@ -114,10 +115,10 @@ const ESTIMATE = 40
  * 1. Each press cycles the column through ascending, descending, and the
  *    order the rows were written in, which keeps a server's own ranking
  *    reachable.
- * 2. `helix-sort` asks first, with `field:direction`, or empty for the written
+ * 2. `helix-before-sort` asks first, with `field:direction`, or empty for the written
  *    order. Refuse it to keep the order, or to sort the rows yourself and set
  *    `sort`.
- * 3. `helix-sorted` follows once the order stands, and `sort` holds it.
+ * 3. `helix-sort` follows once the order stands, and `sort` holds it.
  * 4. The heading carries `aria-sort`, and a screen reader hears `sorted-label`
  *    ("Sorted by Name, ascending") or `unsorted-label` from a polite region.
  *
@@ -136,8 +137,8 @@ const ESTIMATE = 40
  * 2. A row's checkbox is named by `select-row-label` ("Select {row}") with the
  *    words of the row's first cell. The checkbox in the heading selects every
  *    row, and shows a dash while only some are chosen.
- * 3. `helix-select` asks first, with every key the change would leave.
- *    Refuse it to keep the selection. `helix-selected` follows once it stands.
+ * 3. `helix-before-select` asks first, with every key the change would leave.
+ *    Refuse it to keep the selection. `helix-select` follows once it stands.
  * 4. A chosen row takes `:state(selected)`, and a screen reader hears
  *    `selected-label` ("2 selected") from a polite region.
  *
@@ -160,7 +161,7 @@ const ESTIMATE = 40
  * says with `aria-expanded` whether it is open, and the rows under a shut row
  * are not drawn. `expanded` holds the open rows' keys, comma separated, and
  * `default-expanded` is where it starts. A press asks with
- * `helix-before-toggle` and tells with `helix-toggle`, both from the row, so
+ * `helix-before-expand` and tells with `helix-expand`, both from the row, so
  * you can refuse it or load the rows on the way. A sort orders the rows
  * under each row among themselves, and in a `grid` table the table is a
  * `treegrid` whose rows say their depth.
@@ -248,15 +249,15 @@ const ESTIMATE = 40
  * @slot heading - Words that name the table, shown above it, such as a heading.
  * @slot loading - Content shown while the rows load, such as a spinner. Falls back to `loading-text`, which the live region still says.
  *
+ * @event {HelixBeforeExpandEvent} helix-before-expand - Fired from a row when its disclosure button is pressed, with every key that would be open in `detail.value`, separated by commas. Cancelable: cancel it to keep the row as it is.
  * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when a row is dropped at a new place, in a `reorderable` table, with every row's key in the new order. Cancelable: cancel it to keep the row where it is.
- * @event {HelixBeforeToggleEvent} helix-before-toggle - Fired from a row when its disclosure button is pressed, with whether it would be open in `detail.checked`. Cancelable: cancel it to keep the row as it is.
+ * @event {HelixBeforeSelectEvent} helix-before-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
+ * @event {HelixBeforeSortEvent} helix-before-sort - A different sort order was requested, as `field:direction`, or empty for the order the rows were written in. Cancelable: cancel it to keep the current order.
+ * @event {HelixExpandEvent} helix-expand - Fired from a row once the rows under it are shown or hidden, with every open key in `detail.value`, separated by commas, which `expanded` also holds.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired, in a table with `load-more`, when the end of the table comes within a screen of view, once for each number of rows.
- * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your rows to the order in `keys`. Cancelable: cancel it to say the move did not happen.
- * @event {HelixSelectEvent} helix-select - The selection is about to change. The event carries every selected key, separated by commas. Cancelable: cancel it to keep the current selection.
- * @event {HelixSelectedEvent} helix-selected - Fired after the selection changes, with every selected key, separated by commas.
- * @event {HelixSortEvent} helix-sort - A different sort order was requested, as `field:direction`, or empty for the order the rows were written in. Cancelable: cancel it to keep the current order.
- * @event {HelixSortedEvent} helix-sorted - Fired after the sort order changes, with the new order.
- * @event {HelixToggleEvent} helix-toggle - Fired from a row once the rows under it are shown or hidden, with whether it is open in `detail.checked`.
+ * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your rows to the order in `keys`.
+ * @event {HelixSelectEvent} helix-select - Fired after the selection changes, with every selected key, separated by commas.
+ * @event {HelixSortEvent} helix-sort - Fired after the sort order changes, with the new order.
  *
  * @csspart after - The space that stands in for the rows below the window. Only while `windowed`.
  * @csspart before - The space that stands in for the rows above the window. Only while `windowed`.
@@ -523,7 +524,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
   /**
    * The keys of the selected rows, separated by commas.
    *
-   * A reader's press fires `helix-select` first, and refusing it leaves the
+   * A reader's press fires `helix-before-select` first, and refusing it leaves the
    * selection as it was. `default-selected` seeds a selection this element
    * then owns.
    */
@@ -576,7 +577,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * `field`.
    *
    * The rows are compared by the text of their cells in that column, numbers by
-   * their value. A reader's click on a sortable heading fires `helix-sort`
+   * their value. A reader's click on a sortable heading fires `helix-before-sort`
    * first, and refusing it leaves the order as it was. `default-sort` seeds an
    * order this element then owns.
    */
@@ -681,33 +682,31 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
 
   /**
    * Shows or hides the rows under the row of `key`, asking first from the row,
-   * and saying so from it once it stands.
+   * and saying so from it once it stands. Both carry every key that is open,
+   * or would be, which is what `expanded` holds.
    */
   private toggleRow(key: string): void {
     const row = this.rowFor(key)
     if (!row) {
       return
     }
-    const next = !this.open.has(key)
-    const applied = requestChange({
-      apply: (checked) => {
-        const keys = this.open
-        if (checked) {
-          keys.add(key)
-        } else {
-          keys.delete(key)
-        }
-        const previous = this.expanded
-        this.expandedState = inRowOrder(keys, this.everyKey).join(',')
-        this.requestUpdate('expanded', previous)
-      },
-      event: (checked) => new HelixBeforeToggleEvent({ checked }),
-      host: row,
-      next,
-    })
-    if (applied) {
-      row.dispatchEvent(new HelixToggleEvent({ checked: next }))
+    const keys = this.open
+    if (keys.has(key)) {
+      keys.delete(key)
+    } else {
+      keys.add(key)
     }
+    requestChange({
+      apply: (value) => {
+        const previous = this.expanded
+        this.expandedState = value
+        this.requestUpdate('expanded', previous)
+        row.dispatchEvent(new HelixExpandEvent({ value }))
+      },
+      event: (value) => new HelixBeforeExpandEvent({ value }),
+      host: row,
+      next: inRowOrder(keys, this.everyKey).join(','),
+    })
   }
 
   /** Whether the heading names the table, so taking it away clears only this element's own name. */
@@ -890,9 +889,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
         const previous = this.sort
         this.sortState = value
         this.requestUpdate('sort', previous)
-        this.dispatchEvent(new HelixSortedEvent({ value }))
+        this.dispatchEvent(new HelixSortEvent({ value }))
       },
-      event: (value) => new HelixSortEvent({ value }),
+      event: (value) => new HelixBeforeSortEvent({ value }),
       host: this,
       next,
     })
@@ -1080,9 +1079,9 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
         const previous = this.selected
         this.selectedState = value
         this.requestUpdate('selected', previous)
-        this.dispatchEvent(new HelixSelectedEvent({ value }))
+        this.dispatchEvent(new HelixSelectEvent({ value }))
       },
-      event: (value) => new HelixSelectEvent({ value }),
+      event: (value) => new HelixBeforeSelectEvent({ value }),
       host: this,
       /* In row order, as Data Table writes it, whatever order the rows were
          pressed in. */
@@ -1099,7 +1098,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
    * what `selected` says. A checkbox a consumer put in a cell is theirs and is
    * left alone.
    */
-  private readonly handleToggle = (event: HelixBeforeToggleEvent): void => {
+  private readonly handleToggle = (event: HelixBeforeCheckEvent): void => {
     const origin = event.composedPath()[0]
     if (!(origin instanceof Element) || origin.getAttribute('part') !== 'checkbox') {
       return
@@ -1601,7 +1600,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     }
     this.addEventListener('click', this.handleHeadClick)
     this.addEventListener('click', this.handleRowClick)
-    this.addEventListener('helix-before-toggle', this.handleToggle)
+    this.addEventListener('helix-before-check', this.handleToggle)
   }
 
   override disconnectedCallback(): void {
@@ -1613,7 +1612,7 @@ export class HelixHeadlessTable extends MixinCollection(HelixElement) {
     this.watcher = undefined
     this.removeEventListener('click', this.handleHeadClick)
     this.removeEventListener('click', this.handleRowClick)
-    this.removeEventListener('helix-before-toggle', this.handleToggle)
+    this.removeEventListener('helix-before-check', this.handleToggle)
   }
 
   /**

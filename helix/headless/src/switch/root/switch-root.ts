@@ -50,7 +50,7 @@ import { property } from 'lit/decorators.js'
  * @slot hint - Help under the control, for content richer than the `hint` text.
  *
  * @event {Event} change - Sent from the input after the state changes.
- * @event {HelixBeforeToggleEvent} helix-before-toggle - Fired before the state changes, and cancelable.
+ * @event {HelixBeforeCheckEvent} helix-before-check - Fired before the state changes, and cancelable.
  * @event {Event} input - Sent after the state changes.
  *
  * @csspart control - The input.

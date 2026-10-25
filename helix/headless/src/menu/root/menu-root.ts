@@ -169,7 +169,7 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * menu. A screen reader hears how many rows the filter keeps
  * (`results-label`). Home, End and the other keys move the caret and type. The field names
  * the highlighted row with `aria-activedescendant`, and the rows are a `menu`
- * after the field. Cancel `helix-filter` to keep every row
+ * after the field. Cancel `helix-before-filter` to keep every row
  * showing and narrow the rows yourself, such as by replacing them with rows
  * from a server.
  *
@@ -187,9 +187,11 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  *
  * @event {Event} change - A reader's choice checked or unchecked rows. Read `checkedValues` for the rows that are checked now.
  * @event {HelixBeforeCloseEvent} helix-before-close - The menu is about to close. Cancelable: cancel it to keep it open.
+ * @event {HelixBeforeFilterEvent} helix-before-filter - The text in the filter field changed, with the new text in `detail.value`. Cancelable: cancel it to keep every row showing and narrow the rows yourself.
  * @event {HelixBeforeOpenEvent} helix-before-open - The menu is about to open. Cancelable: cancel it to keep it closed.
- * @event {HelixFilterEvent} helix-filter - The text in the filter field changed, with the new text in `detail.value`. Cancelable: cancel it to keep every row showing and narrow the rows yourself.
- * @event {HelixSelectEvent} helix-select - An item was chosen. Cancelable: cancel it to keep the menu open.
+ * @event {HelixBeforeSelectEvent} helix-before-select - An item was chosen. Cancelable: cancel it to keep the menu open.
+ * @event {HelixFilterEvent} helix-filter - Fired after the rows are narrowed to the text in the filter field, with the text in `detail.value`.
+ * @event {HelixSelectEvent} helix-select - Fired after an item is chosen, once the choice stands. Act on the choice from it.
  * @event {ToggleEvent} toggle - The menu opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart back - The control that returns from a submenu.
@@ -950,7 +952,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     /* **Closed once the choice has been heard, and only if it stood.** This
        listener runs in capture, ahead of the consumer's on this same host, and
        closing here closed the menu before anybody could refuse the choice: a
-       `helix-select` documented as cancelable, whose refusal left the menu shut
+       `helix-before-select` documented as cancelable, whose refusal left the menu shut
        anyway, and a page that heard `helix-before-close` and `toggle` before
        the choice that caused them. Found running the events example. The
        dispatch is synchronous, so a microtask is after all of it. */
@@ -1272,7 +1274,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
        opens a submenu is navigation rather than a choice, and stopping it in the
        bubble phase stops it for ancestors and not for the siblings registered
        here. `Drilldown` learned this already. */
-    this.addEventListener('helix-select', this.handleSelect, true)
+    this.addEventListener('helix-before-select', this.handleSelect, true)
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('focusin', this.handleFocusIn)
     this.addEventListener('contextmenu', this.handleContextMenu)
@@ -1309,7 +1311,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     this.removeEventListener('pointermove', this.handleHover)
     this.removeEventListener('pointerout', this.handleRowOut)
     this.stopHover()
-    this.removeEventListener('helix-select', this.handleSelect, true)
+    this.removeEventListener('helix-before-select', this.handleSelect, true)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('focusin', this.handleFocusIn)
     this.removeEventListener('contextmenu', this.handleContextMenu)

@@ -14,10 +14,11 @@ import {
   endInSight,
   filterKeeps,
   formatWords,
+  HelixBeforeFilterEvent,
+  type HelixBeforeSelectEvent,
   HelixFilterEvent,
   HelixFormElement,
   HelixLoadMoreEvent,
-  type HelixSelectEvent,
   hostAria,
   inlineStep,
   MixinCollection,
@@ -176,12 +177,13 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  *
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the value is about to change, and cancelable.
+ * @event {HelixBeforeFilterEvent} helix-before-filter - Fired before the list is filtered, and cancelable.
  * @event {HelixBeforeListenEvent} helix-before-listen - The dictation button was pressed. Cancelable: cancel it to keep the field from listening.
  * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when an option is dropped at a new place, in a `reorderable` list with `@fusion.dev/helix/listbox/reorder` imported, with every value in the new order. Cancelable: cancel it to keep the option where it is.
- * @event {HelixFilterEvent} helix-filter - Fired before the list is filtered, and cancelable.
+ * @event {HelixFilterEvent} helix-filter - Fired after the list is filtered, with the text it is filtered by, which `filter` also holds.
  * @event {HelixListenEvent} helix-listen - Dictation settled on a phrase and put it in the search field, after the field's own `input`.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired once the list is scrolled within a screen of its end, once for each number of options, and not while `loading` is set. Add the next page of options and set `loading` while you fetch it.
- * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your options, or your `items`, to the order in `keys`. Cancelable: cancel it to say the move did not happen.
+ * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your options, or your `items`, to the order in `keys`.
  * @event {Event} input - Fired after the value changes.
  *
  * @csspart empty - The text shown when the list has no options to show, or the filter hides every one. `:state(no-results)` is set for the second.
@@ -309,7 +311,7 @@ export class HelixHeadlessListbox extends MixinVoice(
    * milliseconds. `0` filters on every keystroke. The attribute also takes a
    * CSS time, such as `300ms`.
    *
-   * For a list filtered on a server, where `helix-filter` starts a request: a
+   * For a list filtered on a server, where `helix-before-filter` starts a request: a
    * reader typing a word sends one request for the word, not one for each
    * letter. Enter and the arrow keys filter at once on what is typed, so they
    * act on the list the reader expects.
@@ -616,7 +618,7 @@ export class HelixHeadlessListbox extends MixinVoice(
       return
     }
     /* **A load that ends says what it brought.** A combobox filtering on a
-       server cancels `helix-filter`, sets `loading` and replaces the options,
+       server cancels `helix-before-filter`, sets `loading` and replaces the options,
        so the filter here never moves: the region said "Loading" and then
        nothing, and the new count was never heard. */
     const loaded = changed.get('loading') === true && !this.loading
@@ -819,13 +821,13 @@ export class HelixHeadlessListbox extends MixinVoice(
     this.requestValue(joined)
   }
 
-  /* **And only if the option's own choice stood.** `helix-select` is cancelable
+  /* **And only if the option's own choice stood.** `helix-before-select` is cancelable
      and `Option` documents it as refusable; this element is the only thing that
      acts on it, so a refusal nothing read was a veto that did nothing. The
      event is still stopped either way, the list being the single voice for the
      set, and a consumer on this element refuses with `helix-before-change`,
      which `choose` dispatches through the mixin. */
-  private readonly handleSelection = (event: HelixSelectEvent): void => {
+  private readonly handleSelection = (event: HelixBeforeSelectEvent): void => {
     /* A link is followed, not chosen: its event goes on to the page, which may
        cancel it and route there itself, and the selection stays as it was. */
     if (event.detail.href !== undefined) {
@@ -1305,7 +1307,7 @@ export class HelixHeadlessListbox extends MixinVoice(
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('helix-select', this.handleSelection as EventListener)
+    this.addEventListener('helix-before-select', this.handleSelection as EventListener)
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('click', this.handleClick, true)
     auditChildren(this, 'option', 'option', 'the list offers no choices')
@@ -1318,7 +1320,7 @@ export class HelixHeadlessListbox extends MixinVoice(
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-select', this.handleSelection as EventListener)
+    this.removeEventListener('helix-before-select', this.handleSelection as EventListener)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('click', this.handleClick, true)
     this.sources?.disconnect()
@@ -1474,7 +1476,7 @@ export class HelixHeadlessListbox extends MixinVoice(
   /**
    * Narrows the list as the reader types, announcing it first.
    *
-   * `helix-filter` and not `helix-change`, because nothing about the value
+   * `helix-before-filter` and not `helix-change`, because nothing about the value
    * changes: the options are hidden rather than removed, and telling a consumer
    * their answer moved when it did not is worse than telling them nothing.
    */
@@ -1546,8 +1548,9 @@ export class HelixHeadlessListbox extends MixinVoice(
         this.filterState = value
         this.parked = false
         this.requestUpdate('filter', previous)
+        this.dispatchEvent(new HelixFilterEvent({ value }))
       },
-      event: (value) => new HelixFilterEvent({ value }),
+      event: (value) => new HelixBeforeFilterEvent({ value }),
       host: this,
       next,
     })

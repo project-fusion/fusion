@@ -14,12 +14,12 @@ beforeAll(async () => {
 const run = hasLayout() ? test : (): void => {}
 
 describe('the events example', () => {
-  run('moving a page is one request, and it moves the page', async () => {
+  run('moving a page is a request and then a notification, and it moves the page', async () => {
     await example(events)
     const pages = document.getElementById('pages') as HTMLElement & { page: number }
     ;(part(pages, 'next') as HTMLElement).click()
     await idle()
-    expect(logged()).toEqual(['helix-navigate'])
+    expect(logged()).toEqual(['helix-before-navigate', 'helix-navigate'])
     expect(pages.page).toBe(5)
   })
 })

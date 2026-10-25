@@ -10,6 +10,7 @@ import {
   drawStatus,
   formatWords,
   type HelixBeforeChangeEvent,
+  HelixBeforeFilterEvent,
   HelixCreateEvent,
   HelixFilterEvent,
   HelixFormElement,
@@ -146,9 +147,10 @@ const isInsertion = (event: Event): boolean =>
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the chosen option changes. Cancelable: cancel it to keep the current option.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the panel closes. Cancelable: cancel it to keep the panel open.
+ * @event {HelixBeforeFilterEvent} helix-before-filter - Fired as the user types, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and do the filtering yourself.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the panel opens. Cancelable: cancel it to keep the panel closed.
  * @event {HelixCreateEvent} helix-create - Fired when the user adds a value that is not in the list. Cancelable.
- * @event {HelixFilterEvent} helix-filter - Fired as the user types, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and do the filtering yourself.
+ * @event {HelixFilterEvent} helix-filter - Fired after the list is filtered, with the text it is filtered by.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired once the list is scrolled within a screen of its end, once for each number of options, and not while `loading` is set. Add the next page and set `loading` while you fetch it.
  * @event {Event} input - Fired after the value changes.
  * @event {ToggleEvent} toggle - Fired when the panel opens or closes, with `newState` and `oldState`.
@@ -294,11 +296,11 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   emptyText = 'No matches'
 
   /**
-   * How long typing rests before the list is narrowed and `helix-filter` is
+   * How long typing rests before the list is narrowed and `helix-before-filter` is
    * sent, in milliseconds. The attribute also takes a CSS time, such as
    * `300ms`.
    *
-   * For options filtered on a server, where `helix-filter` starts a request: a
+   * For options filtered on a server, where `helix-before-filter` starts a request: a
    * delay sends one request for a word instead of one per letter. The arrow
    * keys, Enter and Escape narrow at once on what was typed. `0` narrows on
    * every keystroke. See Listbox's `filter-delay`.
@@ -899,7 +901,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     this.emptied = typed.trim() === ''
     /* **Announced from here rather than left to escape from the listbox
        inside.** The narrowing was always reaching consumers, because
-       `requestFilter` dispatches a composed `helix-filter` and nothing stopped
+       `requestFilter` dispatches a composed `helix-before-filter` and nothing stopped
        it at this boundary the way `change` and `input` are stopped. It worked,
        and it was wrong in the two ways an accident is: the element that fired
        it was an implementation detail rather than the one the consumer holds,
@@ -946,12 +948,14 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   /** Narrows the list to what was typed, and finds the completion in what is left. */
   private narrow(typed: string, inserted: boolean): void {
     this.narrowing.cancel()
-    const narrowing = new HelixFilterEvent({ value: typed })
+    const narrowing = new HelixBeforeFilterEvent({ value: typed })
     /* The list is narrowed before the completion is looked for, because the
        completion is the first thing still showing and that is not known until
        the filter has run. */
     if (this.dispatchEvent(narrowing)) {
-      this.listbox?.requestFilter(typed)
+      if (this.listbox?.requestFilter(typed)) {
+        this.dispatchEvent(new HelixFilterEvent({ value: typed }))
+      }
       void this.listbox?.updateComplete.then(() => {
         this.linkActive()
         this.markStatus()
@@ -1390,7 +1394,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     super.connectedCallback()
     auditChildren(this, 'option', 'option', 'it suggests nothing')
     auditChildren(this, 'listbox', 'listbox', 'its panel has no working list', true)
-    this.addEventListener('helix-select', this.handleLinkFollowed)
+    this.addEventListener('helix-before-select', this.handleLinkFollowed)
     this.watcher = new MutationObserver(() => this.requestUpdate())
     this.watcher.observe(this, {
       attributeFilter: ['label', 'value'],
@@ -1402,7 +1406,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-select', this.handleLinkFollowed)
+    this.removeEventListener('helix-before-select', this.handleLinkFollowed)
     this.watcher?.disconnect()
     this.watcher = undefined
   }
@@ -1573,6 +1577,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       .chosenAgain=${() => this.close()}
       @helix-before-change=${this.handleChange}
       @change=${this.stopInner}
+      @helix-before-filter=${this.stopInner}
       @helix-filter=${this.stopInner}
       @input=${this.stopInner}
     >

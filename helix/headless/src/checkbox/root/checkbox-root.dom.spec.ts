@@ -112,7 +112,7 @@ describe('checkbox', () => {
 
   test('changing announces before it acts, and a refusal holds the state', async () => {
     const box = await checkbox()
-    box.addEventListener('helix-before-toggle', (event) => {
+    box.addEventListener('helix-before-check', (event) => {
       event.preventDefault()
     })
     control(box).click()
@@ -129,7 +129,7 @@ describe('checkbox', () => {
   test('announces a boolean, and not a word that reads like one', async () => {
     const box = await checkbox()
     let seen: unknown = 'unset'
-    box.addEventListener('helix-before-toggle', (event) => {
+    box.addEventListener('helix-before-check', (event) => {
       seen = event.detail.checked
     })
 
@@ -151,7 +151,7 @@ describe('checkbox', () => {
 
   test('and refusing the toggle is what holds it, whoever declared it', async () => {
     const box = await checkbox('checked')
-    box.addEventListener('helix-before-toggle', (event: Event) => {
+    box.addEventListener('helix-before-check', (event: Event) => {
       event.preventDefault()
     })
     control(box).click()
@@ -340,7 +340,7 @@ describe('a refused toggle', () => {
   /* Nothing changed, and the box still sent `change`, which Switch does not. */
   test('sends no change', async () => {
     const box = await checkbox('checked')
-    box.addEventListener('helix-before-toggle', (event) => event.preventDefault())
+    box.addEventListener('helix-before-check', (event) => event.preventDefault())
     let changes = 0
     box.addEventListener('change', () => {
       changes += 1

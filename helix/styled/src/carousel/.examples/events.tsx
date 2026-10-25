@@ -18,7 +18,7 @@ export function Example() {
   }
 
   const moved = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `Slide ${event.detail.value} is in view`)
+    say('helix-activate', `Slide ${event.detail.value} is in view`)
   }
 
   return (
@@ -28,7 +28,7 @@ export function Example() {
     >
       <helix-carousel
         label="Dashboard pages"
-        onhelix-select={moved}
+        onhelix-activate={moved}
       >
         <helix-card separation="outlined">Overview</helix-card>
         <helix-card separation="outlined">Usage</helix-card>

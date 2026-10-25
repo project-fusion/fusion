@@ -39,10 +39,10 @@ describe('the events example', () => {
     ) as HTMLInputElement
     type(search, 'fr')
     await idle()
-    expect(logged()).toEqual(['helix-filter'])
+    expect(logged()).toEqual(['helix-before-filter'])
     choose(document.querySelector('helix-option[value="fra"]'))
     await idle()
-    expect(logged()).toEqual(['helix-filter', 'helix-before-change', 'input', 'change'])
+    expect(logged()).toEqual(['helix-before-filter', 'helix-before-change', 'input', 'change'])
   })
 })
 

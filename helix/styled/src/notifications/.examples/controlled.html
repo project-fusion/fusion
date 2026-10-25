@@ -24,9 +24,9 @@
   const owned = document.getElementById('owned')
 
   /* `read` is a boolean attribute, so markup cannot set it to false. To control
-     read state, cancel `helix-read`, save the change on your server, and then
-     set `read`. */
-  owned.addEventListener('helix-read', async (event) => {
+     read state, cancel `helix-before-read`, save the change on your server,
+     and then set `read`. */
+  owned.addEventListener('helix-before-read', async (event) => {
     if (event.target === owned) {
       return
     }

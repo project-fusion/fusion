@@ -20,6 +20,8 @@ import type { ChangeDetail } from './details.js'
  * **`announcesInput` picks which native notification fires, not which name this
  * carries.** Granularity is the platform's own distinction, `input` against
  * `change`; the request is always this one event.
+ *
+ * @followedBy input change
  */
 export class HelixBeforeChangeEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-before-change'

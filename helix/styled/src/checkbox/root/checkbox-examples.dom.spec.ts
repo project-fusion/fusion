@@ -33,7 +33,7 @@ describe('the events example', () => {
     const box = document.getElementById('box') as Updatable
     ;(part(box, 'control') as HTMLElement).click()
     await settle(box)
-    expect(logged()).toEqual(['helix-before-toggle', 'input', 'change'])
+    expect(logged()).toEqual(['helix-before-check', 'input', 'change'])
   })
 })
 

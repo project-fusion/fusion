@@ -1,6 +1,10 @@
 import type { ChangeDetail } from './details.js'
 
-/** A message is about to be pinned or unpinned, and can be refused. */
+/**
+ * A message is about to be pinned or unpinned, and can be refused.
+ *
+ * @followedBy helix-pin
+ */
 export class HelixBeforePinEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-before-pin'
 

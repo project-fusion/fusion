@@ -2,8 +2,8 @@ import {
   customElement,
   drawStatus,
   formatWords,
+  HelixBeforeSelectEvent,
   HelixElement,
-  HelixSelectEvent,
   hostAria,
   StatusController,
   slottedWords,
@@ -26,7 +26,7 @@ import '../../button/index.js'
  * it is outside the button. The name uses `Button`, so the hover wash, the
  * focus ring, and the disabled style come from `Button`.
  *
- * Every step can be pressed and fires `helix-select`. To stop the user from
+ * Every step can be pressed and fires `helix-before-select`. To stop the user from
  * moving to a step, set `disabled` on it.
  *
  * The marker is a slot, and its fallback shows the step's state: a check for a
@@ -58,7 +58,7 @@ import '../../button/index.js'
  * @slot description - A line under the name that describes the stage.
  * @slot marker - Replaces the number, or the check a complete step shows.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the step is pressed. Cancelable: cancel it to keep the current step.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when the step is pressed. Cancelable: cancel it to keep the current step.
  *
  * @csspart body - The name and its description.
  * @csspart content - What the stage holds, while it is open.
@@ -151,7 +151,7 @@ export class HelixHeadlessStep extends HelixElement {
   stop = true
 
   /**
-   * The value the step sends in `helix-select`, and what names the step in its
+   * The value the step sends in `helix-before-select`, and what names the step in its
    * sequence's `active`. Without one, the sequence names the step by its place,
    * counted from 1.
    */
@@ -189,14 +189,14 @@ export class HelixHeadlessStep extends HelixElement {
   }
 
   /**
-   * Fires `helix-select` for the step, unless the step is `disabled` or a
+   * Fires `helix-before-select` for the step, unless the step is `disabled` or a
    * linear sequence has it out of reach.
    */
   select(): void {
     if (this.disabled || this.locked) {
       return
     }
-    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    this.dispatchEvent(new HelixBeforeSelectEvent({ value: this.value }))
   }
 
   /**

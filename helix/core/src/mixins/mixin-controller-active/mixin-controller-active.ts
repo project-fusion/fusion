@@ -153,7 +153,7 @@ export const MixinControllerActive = <T extends Constructor<HelixElement>>(Base:
      * A consumer who only wants to know which child is current cannot use
      * `helix-before-activate` for it, that one firing *before* `apply`, so
      * `currentTarget.active` is the previous value inside the handler and
-     * `detail.value` is a proposal another listener may refuse. `helix-select`
+     * `detail.value` is a proposal another listener may refuse. `helix-before-select`
      * is no substitute either: it fires when an item is *chosen* and not when
      * `active` is assigned.
      *

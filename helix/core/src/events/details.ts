@@ -190,7 +190,7 @@ export type MapPanDetail = ViewportPanDetail
 /** What `ViewportZoomDetail` was called when only Map had one. */
 export type MapZoomDetail = ViewportZoomDetail
 
-/** Detail carried by `helix-navigate`. */
+/** Detail carried by `helix-before-navigate` and `helix-navigate`. */
 export interface NavigateDetail {
   /**
    * The page asked for, as a number, where the component pages by number.
@@ -203,7 +203,7 @@ export interface NavigateDetail {
   value: string
 }
 
-/** Detail carried by `helix-filter`. */
+/** Detail carried by `helix-before-filter` and `helix-filter`. */
 export interface FilterDetail {
   /** What the list is being narrowed to. */
   value: string
@@ -219,7 +219,7 @@ export interface FoundDetail {
 }
 
 /**
- * Detail carried by `helix-facet`.
+ * Detail carried by `helix-before-facet` and `helix-facet`.
  *
  * **Everything needed to draw the chip, so nothing has to be looked up again.**
  * A consumer hearing this renders a `FilterChip` from it and stops: the labels
@@ -256,11 +256,11 @@ export interface FacetDetail {
   values: readonly string[]
 }
 
-/** Detail carried by `helix-read`. */
+/** Detail carried by `helix-before-read` and `helix-read`. */
 export interface ReadDetail {
   /**
    * The state being asked for, as a boolean rather than a word that reads like
-   * one, which is `helix-before-toggle`'s rule and for the same reason: `"false"` is
+   * one, which is `helix-before-check`'s rule and for the same reason: `"false"` is
    * truthy and a consumer who forgets that marks everything read.
    */
   read: boolean
@@ -272,7 +272,7 @@ export interface SendDetail {
   value: string
 }
 
-/** Detail carried by `helix-sort`. */
+/** Detail carried by `helix-before-sort` and `helix-sort`. */
 export interface SortDetail {
   /**
    * The order being asked for, as `field:direction`.
@@ -435,7 +435,7 @@ export interface TourAskDetail {
  *
  * A boolean is the case where it *is* lost, because `"false"` is truthy, so a
  * consumer who forgets to compare against the word gets the opposite answer and
- * no error. That is why checkedness has `helix-before-toggle` and its own boolean, and
+ * no error. That is why checkedness has `helix-before-check` and its own boolean, and
  * it is the line to hold: **stringify a value, never a fact.** A new control
  * whose state is a boolean wants an event with a typed detail, not a `String()`
  * call here.
@@ -457,15 +457,16 @@ export interface ChangeDetail {
 }
 
 /**
- * Detail carried by `helix-before-reorder`, `helix-reorder`, and
- * `helix-reordered`: one row, item, or column moved to a new place.
+ * Detail carried by `helix-before-reorder` and `helix-reorder`: one row,
+ * item, or column moved to a new place.
  *
  * `from` and `to` count from 0 in the old order and in `keys`. Where your
  * array holds every key in the same order, `rows.splice(to, 0,
  * ...rows.splice(from, 1))` makes the same move.
  *
  * **`kind` is a field because one element sends both.** A data table moves its
- * rows and its columns, and both are `helix-reorder` from the same host.
+ * rows and its columns, and both are `helix-before-reorder` and `helix-reorder`
+ * from the same host.
  */
 export interface ReorderDetail extends ChangeDetail {
   /** Where the key was before the move, counting from 0 in the old order. */
@@ -546,7 +547,7 @@ export interface GraphSignalDetail {
   to: string
 }
 
-/** Detail carried by `helix-graph-filter`. */
+/** Detail carried by `helix-before-graph-filter` and `helix-graph-filter`. */
 export interface GraphFilterDetail {
   /** The groups the graph would hide, by name: every group the reader has turned off, after this press. */
   hidden: readonly string[]
@@ -595,7 +596,7 @@ export interface MapClusterDetail {
 export interface ScrolledDetail {
   /**
    * Whether the page is scrolled away from the top, as a boolean and not a word
-   * that reads like one. Follows `helix-before-toggle`'s rule for the same reason.
+   * that reads like one. Follows `helix-before-check`'s rule for the same reason.
    */
   scrolled: boolean
 }
@@ -642,8 +643,8 @@ export interface TourStatusDetail {
   status: 'completed' | 'skipped' | 'waiting'
 }
 
-/** Detail carried by `helix-before-toggle`. */
-export interface ToggleDetail {
+/** Detail carried by `helix-before-check` and `helix-check`. */
+export interface CheckDetail {
   /** The state being asked for, as a boolean and not a word that reads like one. */
   checked: boolean
 }
@@ -720,7 +721,7 @@ export interface CaretDetail {
   line: number
 }
 
-/** Detail carried by `helix-select`. */
+/** Detail carried by `helix-before-select` and `helix-select`. */
 export interface SelectDetail {
   /**
    * Whether the reader took the row's second destination rather than its first.

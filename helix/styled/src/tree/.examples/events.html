@@ -1,4 +1,4 @@
-<!-- @summary `helix-select` bubbles to the tree and the open and close events do not, so each has its own listener. -->
+<!-- @summary `helix-before-select` bubbles to the tree and the open and close events do not, so each has its own listener. -->
 <helix-flex
   direction="column"
   gap="md"
@@ -60,14 +60,14 @@
     }
   }
 
-  /* `helix-select` and `helix-before-activate` bubble, so one listener on the
+  /* `helix-before-select` and `helix-before-activate` bubble, so one listener on the
      tree hears them. The open and close events do not bubble, so each node has
      its own listeners. */
   files.addEventListener('helix-before-activate', (event) => {
     say('helix-before-activate', `about to change to "${event.detail.value}", can be canceled`)
   })
-  files.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" was chosen, and the event bubbles`)
+  files.addEventListener('helix-before-select', (event) => {
+    say('helix-before-select', `"${event.detail.value}" was chosen, and the event bubbles`)
   })
 
   for (const node of files.querySelectorAll('helix-tree-item')) {

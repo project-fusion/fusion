@@ -81,7 +81,7 @@ const mount = async (inner = FIELDS): Promise<Updatable> => {
 /** Every facet the field announced, in order. */
 const watch = (host: Updatable, refuse = false): Facet[] => {
   const heard: Facet[] = []
-  host.addEventListener('helix-facet', (event) => {
+  host.addEventListener('helix-before-facet', (event) => {
     heard.push((event as CustomEvent<Facet>).detail)
     if (refuse) {
       event.preventDefault()
@@ -145,7 +145,7 @@ describe('reading the box', () => {
   test('one refused beside one taken puts back only the refused one', async () => {
     const host = await mount()
     const heard: Facet[] = []
-    host.addEventListener('helix-facet', (event) => {
+    host.addEventListener('helix-before-facet', (event) => {
       const facet = (event as CustomEvent<Facet>).detail
       heard.push(facet)
       if (facet.field === 'created') {
@@ -224,11 +224,11 @@ describe('a chip asking to go', () => {
     expect(menu.valuesFor('disposition')).toEqual([])
   })
 
-  /* The field's documented contract: such a chip sends `helix-facet` instead
+  /* The field's documented contract: such a chip sends `helix-before-facet` instead
      of `helix-dismiss`. A listener on the field, added after it connected,
      heard both, because the field took the request on its own host, where
      `stopPropagation` keeps nothing from the host's other listeners. */
-  test('sends helix-facet and no helix-dismiss to a listener on the field', async () => {
+  test('sends helix-before-facet and no helix-dismiss to a listener on the field', async () => {
     const host = await mount()
     const menu = (host as HTMLElement).querySelector('helix-headless-filter-menu') as unknown as {
       apply: (field: string, values: readonly string[]) => boolean
@@ -286,8 +286,8 @@ describe('a chip asking to go', () => {
 
   /* A field whose values cannot be listed is declared outside the menu, and
      its chip sent `helix-dismiss` where a chip for a field in the menu sent
-     `helix-facet`, which the field's contract says of any declared field. */
-  test('sends helix-facet for a field declared outside the menu as well', async () => {
+     `helix-before-facet`, which the field's contract says of any declared field. */
+  test('sends helix-before-facet for a field declared outside the menu as well', async () => {
     const host = await mount(
       `${FIELDS}<helix-headless-filter-field name="assignee" label="Assignee"></helix-headless-filter-field>`,
     )
@@ -369,7 +369,7 @@ describe('the rest of the reading', () => {
   })
 })
 
-/* Every example built its chips from `helix-facet` with the same dozen lines;
+/* Every example built its chips from `helix-before-facet` with the same dozen lines;
    `chips` is those lines, kept by the field. */
 describe('a field that keeps its own chips', () => {
   const chipsOf = (host: Updatable): (HTMLElement & { operatorLabel: string })[] =>

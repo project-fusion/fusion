@@ -1,4 +1,4 @@
-<!-- @summary Paging the month sends `helix-navigate`, and choosing a day sends `helix-before-change`, `input`, and `change`. -->
+<!-- @summary Paging the month sends `helix-before-navigate`, and choosing a day sends `helix-before-change`, `input`, and `change`. -->
 <helix-flex
   direction="column"
   gap="md"
@@ -56,7 +56,7 @@
   calendar.addEventListener('change', (event) => {
     say('change', `Chose "${event.currentTarget.value}"`)
   })
-  calendar.addEventListener('helix-navigate', (event) => {
-    say('helix-navigate', `Showing ${event.detail.value}`)
+  calendar.addEventListener('helix-before-navigate', (event) => {
+    say('helix-before-navigate', `Showing ${event.detail.value}`)
   })
 </script>

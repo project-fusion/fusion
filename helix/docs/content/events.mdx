@@ -75,9 +75,10 @@ from an unprefixed name, and you would.
   `helix-before-open` and `helix-before-close`. Overlays nest, and an inner
   overlay's lifecycle must never reach the outer overlay that contains it. A
   menu that closes inside a dialog does not close the dialog.
-- **Coordination events** bubble and are composed. These are `helix-select`,
-  `helix-dismiss`, and `helix-before-change`. A parent or a router can intercept
-  them across a shadow boundary, so you can use a `Tree` as navigation.
+- **Coordination events** bubble and are composed. These are
+  `helix-before-select`, `helix-dismiss`, and `helix-before-change`. A parent or
+  a router can intercept them across a shadow boundary, so you can use a `Tree`
+  as navigation.
 
 If you listen on a container and receive nothing, the event is probably a
 lifecycle event. Add the listener to the element itself.
@@ -100,28 +101,151 @@ listen for is documented. A declaration needs no dispatch of its own, because a
 parent declares the events its children send and a form control declares the
 native event it relays.
 
+## Names
+
+Every Helix event follows one grammar:
+
+- A request is named `helix-before-<verb>`. It is cancelable, carries what is
+  being proposed, and is sent before anything moves.
+- Its notification is the native event where the platform has one, such as
+  `change` or `toggle`. Otherwise it is `helix-<verb>`, the same verb without
+  `before`. It is not cancelable, carries the state now in force, and is sent
+  once the change stands. A request that is refused sends no notification.
+- `toggle` means open and closed, as it does on `<details>`. A checked state
+  uses `helix-before-check`, followed by `change` on a form control or by
+  `helix-check` elsewhere.
+
+Two notifications use the past tense, because the plain verb is taken:
+`helix-resized`, since `helix-resize` reports a measurement, and
+`helix-pasted`, since `paste` is the clipboard event.
+
+### Commands
+
+Five events are cancelable and have no `before` in their name. Each one is a
+command you can refuse, and no notification follows, because nothing is in
+force afterwards to report:
+
+- `helix-create`, a value a combobox list does not hold
+- `helix-dismiss`, an element asking to be taken away
+- `helix-send`, what a reader wrote in a chat composer
+- `helix-shortcut`, a chord that was pressed
+- `helix-terminal-link`, an address a terminal would open
+
+### Changed in October 2026
+
+Requests that had plain names now carry `before`, and the plain name is the
+notification:
+
+- `helix-sort`, `helix-filter`, `helix-select`, and `helix-reorder` were the
+  requests on Data Table. They are `helix-before-sort`, `helix-before-filter`,
+  `helix-before-select`, and `helix-before-reorder` now. The plain names are
+  the notifications that were `helix-sorted`, `helix-filtered`,
+  `helix-selected`, and `helix-reordered`. **A page that bound `helix-sort` to
+  refuse a sort binds `helix-before-sort` now**, because `helix-sort` arrives
+  after the order has moved and cannot be refused.
+- `helix-navigate` is `helix-before-navigate`, and `helix-navigate` follows it
+  on Pagination, Data Table, Date Picker, and Drilldown. Pagination and Data
+  Table sent `helix-activate` after a page moved, and send `helix-navigate`
+  now.
+- `helix-select` on Carousel is `helix-before-activate`, and `helix-activate`
+  still follows it.
+- `helix-facet`, `helix-graph-filter`, and `helix-read` are
+  `helix-before-facet`, `helix-before-graph-filter`, and `helix-before-read`,
+  and each plain name is the notification after it.
+- `helix-before-toggle` is `helix-before-check`, and `helix-toggle` is
+  `helix-check`. A row of Table that opens sends `helix-before-expand` and
+  `helix-expand`.
+- `helix-reorder` on a list, a tree, or a table is no longer cancelable. Refuse
+  `helix-before-reorder` to keep an item where it is.
+
 ## Helix events
+
+Each component's page lists the events it sends, with the class and the detail.
+
+### Requests and notifications
 
 | Event | Meaning |
 |---|---|
-| `helix-before-change` | A value is about to change, cancelable |
-| `helix-before-toggle` | A checked state is about to flip, cancelable |
-| `helix-before-open`, `helix-before-close` | An open state is about to change, cancelable |
-| `helix-before-activate`, `helix-activate` | A set is about to make a different child current, cancelable, and then did |
-| `helix-before-pin`, `helix-pin` | A chat transcript is about to be pinned to the bottom or let go of it, cancelable, and then was |
-| `helix-before-resize`, `helix-resized` | A splitter's divider is about to settle, cancelable, and then did |
-| `helix-before-collapse`, `helix-collapse` | A splitter's pane is about to shut or reopen, cancelable, and then did |
-| `helix-select` | An item was chosen from a set |
-| `helix-dismiss` | A user asked for something to close |
-| `helix-next`, `helix-previous` | Movement through a sequence |
-| `helix-filter` | A query changed in a filtering control |
-| `helix-navigate` | A component is about to navigate |
-| `helix-copy` | Something was copied |
-| `helix-caret` | The cursor moved in a text control |
+| `helix-before-activate`, `helix-activate` | A set is about to make a different child current, and then did |
+| `helix-before-change` | A value is about to change. `input` and `change` follow |
+| `helix-before-check`, `helix-check` | A checked state is about to change, and then did. A form control sends `change` in place of `helix-check` |
+| `helix-before-collapse`, `helix-collapse` | A splitter's pane is about to shut or reopen, and then did |
+| `helix-before-edit`, `helix-edit` | A sandbox's source is about to be edited, and then was |
+| `helix-before-expand`, `helix-expand` | Rows of a table are about to open or close in place, and then did |
+| `helix-before-facet`, `helix-facet` | A filter input's field is about to be filtered by other values, and then was |
+| `helix-before-filter`, `helix-filter` | A list or a table is about to narrow what it shows, and then did |
+| `helix-before-graph-filter`, `helix-graph-filter` | A graph is about to show or hide a group's notes, and then did |
+| `helix-before-listen`, `helix-listen` | A field is about to listen for dictation, and then put a phrase in its text |
+| `helix-before-move`, `helix-move` | Cards on a canvas are about to move, and then did |
+| `helix-before-navigate`, `helix-navigate` | A component is about to move the view it shows, such as a page or a month, and then did |
+| `helix-before-open`, `helix-before-close` | An open state is about to change. `toggle` follows |
+| `helix-before-panel-resize`, `helix-panel-resize` | A sandbox's panel is about to change height, and then did |
+| `helix-before-paste`, `helix-pasted` | Cards are about to be pasted onto a canvas, and then were |
+| `helix-before-pin`, `helix-pin` | A transcript is about to be pinned to the bottom or let go of it, and then was |
+| `helix-before-read`, `helix-read` | A notification is about to be marked read or unread, and then was |
+| `helix-before-reconnect`, `helix-reconnect` | A connection's end on a canvas is about to move, and then did |
+| `helix-before-relabel`, `helix-relabel` | A label a canvas draws is about to change, and then did |
+| `helix-before-reorder`, `helix-reorder` | A row, an item, or a column is about to move to a new place, and then did |
+| `helix-before-resize`, `helix-resized` | A splitter's divider is about to settle, and then did |
+| `helix-before-select`, `helix-select` | An item in a set is about to be chosen, and then a selection changed |
+| `helix-before-sort`, `helix-sort` | A table is about to change its order, and then did |
+| `helix-before-split`, `helix-split` | The divider between a sandbox's panes is about to move, and then did |
+
+### Command events
+
+| Event | Meaning |
+|---|---|
+| `helix-create` | A combobox was asked for a value its list does not hold |
+| `helix-dismiss` | An element asks to be taken away |
+| `helix-send` | A chat composer is handing over what the reader wrote |
+| `helix-shortcut` | A shortcut's chord was pressed |
+| `helix-terminal-link` | A link in a terminal's output was activated |
+
+### Other notifications
+
+| Event | Meaning |
+|---|---|
+| `helix-action` | A reader acted on a list row |
+| `helix-aura-fallback` | An aura stopped drawing its shader and shows its gradient |
+| `helix-band` | A meter's reading moved into another band |
+| `helix-canvas-edit` | A reader asked to edit a card |
+| `helix-canvas-pan`, `helix-canvas-zoom`, `helix-canvas-view` | A canvas moved, zoomed, or changed its view |
+| `helix-caret` | The cursor moved in a text editor |
+| `helix-clear` | A reader cleared a value |
 | `helix-complete` | A control that fills up has filled |
-| `helix-create` | A new item was made from a query |
+| `helix-connect` | A reader asked for two cards to be joined |
 | `helix-console` | The sandbox passes on a log message |
-| `helix-tour-ask`, `helix-sample-start`, `helix-sample-end` | Tour and color sampling |
+| `helix-copy`, `helix-copy-error` | Something was copied, or nothing could be |
+| `helix-device-button`, `helix-device-key`, `helix-device-screenshot` | A device screen's button, key, or screenshot was asked for |
+| `helix-device-scroll`, `helix-device-swipe`, `helix-device-tap`, `helix-device-text`, `helix-device-touch` | A reader scrolled, swiped, tapped, pasted, or touched a device screen |
+| `helix-end` | A video playlist reached its last entry and stopped |
+| `helix-found` | A search found its matches, or moved among them |
+| `helix-graph-layout`, `helix-graph-ready` | A graph's layout settled, or the graph was drawn whole |
+| `helix-graph-pan`, `helix-graph-zoom` | A reader asked a graph to move or to zoom |
+| `helix-graph-part-change`, `helix-graph-signal` | What a graph's connector draws changed, or something passed between two notes |
+| `helix-history` | A transcript reached its oldest turn, and older ones can be fetched |
+| `helix-load` | A lazy tree branch opened and asks for its children |
+| `helix-load-more` | A reader asked for more items |
+| `helix-map-cluster` | A reader pressed a cluster of map markers |
+| `helix-map-pan`, `helix-map-rotate`, `helix-map-tilt`, `helix-map-zoom` | A reader asked a map to move, rotate, tilt, or zoom |
+| `helix-map-part-change`, `helix-map-ready` | What a map's connector draws changed, or the map was drawn whole |
+| `helix-next`, `helix-previous` | A reader asked for the next or the previous item in a sequence |
+| `helix-plot-change`, `helix-plot-turn` | What a plot's connector draws changed, or a reader turned a 3D plot by key |
+| `helix-press` | A control was pressed and acted |
+| `helix-preview` | A control shows what a press would choose |
+| `helix-range-change` | The items a virtual list shows changed |
+| `helix-reading-change`, `helix-reading-press` | A chart moved to a reading, or a reading was pressed |
+| `helix-reject` | A file field refused some of the files it was given |
+| `helix-remove` | A reader asked for cards or connections to be taken away |
+| `helix-resize` | A preview reports how much room its content needs |
+| `helix-sample-start`, `helix-sample-end` | The eyedropper opened, or closed |
+| `helix-scrolled` | A header started or stopped floating over the page |
+| `helix-stop` | A reader asked for what is under way to stop |
+| `helix-strands-fallback` | A strands element stopped drawing its ribbon and shows its gradient |
+| `helix-terminal-bell`, `helix-terminal-title` | A terminal's program rang the bell or set its title |
+| `helix-terminal-input`, `helix-terminal-resize`, `helix-terminal-restart` | A terminal has input for the process, changed size, or was asked to restart |
+| `helix-tour-ask`, `helix-tour-status` | A tour stop asked the tour to move, or the tour's progress changed |
+| `helix-typing` | A reader started or stopped writing in a chat composer |
 
 Every stateful component also sends native events once the change is applied:
 
@@ -131,32 +255,6 @@ Every stateful component also sends native events once the change is applied:
   sent whether the change came from a reader or from assigning `open`
 - `close` on a dialog
 - `load` and `error` on an image
-
-Each component's page lists the events it dispatches, with the class and the
-detail. The table above lists the common ones.
-
-## Requests under a plain name
-
-A few events with no `before` in their name are also cancelable requests. Each
-is sent before the change, and you refuse the change with `preventDefault()`:
-
-- `helix-navigate` on Pagination, Data Table, and Date Picker
-- `helix-sort`, `helix-filter`, `helix-select`, and `helix-reorder` on Data Table
-- `helix-select` on Carousel
-
-Each of these requests had its name before the library had a word for the
-notification, so the notification has its own name. It is sent after the
-change, is not cancelable, and carries the new state:
-
-- `helix-activate` after the page moves on Pagination and Data Table, and after
-  the slide moves on Carousel
-- `helix-sorted`, `helix-filtered`, `helix-selected`, and `helix-reordered` on
-  Data Table
-- `input` and `change` together on Pagination Size, as a native `<select>`
-  sends them
-
-A request that is refused sends no notification. Date Picker's `helix-navigate`
-moves the month on show, and the month sends no notification.
 
 ## Events in a framework
 

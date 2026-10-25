@@ -265,12 +265,13 @@ list:
 ```
 
 `hiddenGroups` holds the names of the groups turned off. Set it to start with
-some hidden. A press sends `helix-graph-filter` first, with every group that
-would be hidden. Cancel it to keep the groups as they were, or to keep them in
-your own state and set `hiddenGroups` yourself:
+some hidden. A press sends `helix-before-graph-filter` first, with every group
+that would be hidden. Cancel it to keep the groups as they were, or to keep them
+in your own state and set `hiddenGroups` yourself. `helix-graph-filter` follows
+once the groups have changed, with every group now hidden:
 
 ```ts
-frame.addEventListener('helix-graph-filter', (event) => {
+frame.addEventListener('helix-before-graph-filter', (event) => {
   event.preventDefault()
   frame.hiddenGroups = event.detail.hidden
 })
@@ -562,7 +563,8 @@ The frame sends these events. Their names follow Map's: `helix-graph-pan`,
 |---|---|---|---|
 | `helix-before-activate` | A note is about to be selected | Yes | You, to keep the selection in your own state |
 | `helix-activate` | A note was selected, in the list or the drawing | No | You |
-| `helix-graph-filter` | A group in the legend was pressed, before its notes are shown or hidden | Yes | You, to set `hiddenGroups` yourself |
+| `helix-before-graph-filter` | A group in the legend was pressed, before its notes are shown or hidden | Yes | You, to set `hiddenGroups` yourself |
+| `helix-graph-filter` | A group's notes were shown or hidden | No | You |
 | `helix-graph-layout` | A layout settled, with where it put each note | No | You, to keep the positions |
 | `helix-graph-ready` | The graph has been drawn whole | No | You, to show the graph once it is finished |
 | `helix-graph-pan` | An arrow key or a pan button asked the drawing to move | No | `connectGraph`, or your own renderer |

@@ -76,7 +76,7 @@ import { HelixHeadlessToggle } from '../root/toggle-root.js'
  *
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the choice changes. Cancelable: call `preventDefault()` to keep the current choice.
- * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. The item sends it, and you listen for it on the group. Cancelable: call `preventDefault()` to keep the current choice.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when an item is chosen. The item sends it, and you listen for it on the group. Cancelable: call `preventDefault()` to keep the current choice.
  * @event {Event} input - Fired after the value changes.
  *
  * @csspart feedback - The error message under the row.
@@ -363,7 +363,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
      `helix-before-change`.
 
      **And only if the item's own choice stood, read a microtask later.**
-     `helix-select` is cancelable and the docblock tells you to listen for it on
+     `helix-before-select` is cancelable and the docblock tells you to listen for it on
      the group, where this listener was added first, when the group connected:
      read inline, a consumer's refusal on the group came too late. The dispatch
      is synchronous, so a microtask is after every listener. */
@@ -415,7 +415,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('helix-select', this.handleSelection)
+    this.addEventListener('helix-before-select', this.handleSelection)
     this.addEventListener('focusin', this.noteFocus)
     this.observer = new MutationObserver(this.handleItems)
     this.observer.observe(this, { childList: true, subtree: true })
@@ -423,7 +423,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-select', this.handleSelection)
+    this.removeEventListener('helix-before-select', this.handleSelection)
     this.removeEventListener('focusin', this.noteFocus)
     this.observer?.disconnect()
     this.observer = undefined

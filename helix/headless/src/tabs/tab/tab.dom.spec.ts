@@ -27,7 +27,7 @@ describe('one tab', () => {
   test('announces its value when selected, and stays silent when it is refusing', async () => {
     const host = await tab()
     const heard: string[] = []
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     host.select()
@@ -35,7 +35,7 @@ describe('one tab', () => {
 
     const refusing = await tab('disabled')
     let ignored = 0
-    refusing.addEventListener('helix-select', () => {
+    refusing.addEventListener('helix-before-select', () => {
       ignored += 1
     })
     refusing.select()
@@ -47,7 +47,7 @@ describe('one tab', () => {
   test('is chosen by its own click(), once, as by a press on its control', async () => {
     const host = await tab()
     const heard: string[] = []
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     let clicks = 0
@@ -112,7 +112,7 @@ describe('a dismissible tab', () => {
     host.addEventListener('helix-dismiss', (event) => {
       heard.push((event as CustomEvent<{ label: string }>).detail.label)
     })
-    host.addEventListener('helix-select', () => heard.push('select'))
+    host.addEventListener('helix-before-select', () => heard.push('select'))
     ;(part(host, 'dismiss') as HTMLElement).click()
     expect(heard).toEqual(['One'])
     expect(part(host, 'dismiss')?.getAttribute('aria-hidden')).toBe('true')

@@ -488,7 +488,11 @@ describe('graph frame', () => {
       shown?: ReadonlySet<string>
     }
     const told: (readonly string[])[] = []
-    host.addEventListener('helix-graph-filter', (event) => told.push(event.detail.hidden))
+    host.addEventListener('helix-before-graph-filter', (event) => told.push(event.detail.hidden))
+    const after: string[] = []
+    host.addEventListener('helix-graph-filter', (event) =>
+      after.push(`${event.detail.hidden.join(',')}@${host.hiddenGroups.join(',')}`),
+    )
     const work = () =>
       [...(part(host, 'legend')?.querySelectorAll('button') ?? [])].find(
         (item) => item.textContent?.trim() === 'work',
@@ -496,6 +500,7 @@ describe('graph frame', () => {
     work()?.click()
     await settle(host)
     expect(told).toEqual([['work']])
+    expect(after).toEqual(['work@work'])
     expect(host.hiddenGroups).toEqual(['work'])
     expect(names(host)).toEqual(['Bravo', 'Delta'])
     expect([...(host.shown ?? [])].sort()).toEqual(['b', 'd'])
@@ -548,7 +553,7 @@ describe('graph frame', () => {
       { group: 'home', id: 'b' },
     ]
     const host = (await graph('legend', grouped)) as Graph & { hiddenGroups: readonly string[] }
-    host.addEventListener('helix-graph-filter', (event) => event.preventDefault())
+    host.addEventListener('helix-before-graph-filter', (event) => event.preventDefault())
     part(host, 'legend')?.querySelector('button')?.click()
     await settle(host)
     expect(host.hiddenGroups).toEqual([])
@@ -706,7 +711,7 @@ describe('the events a graph sends', () => {
     }
     const sent: [string, boolean, boolean, boolean][] = []
     const kinds = [
-      'helix-graph-filter',
+      'helix-before-graph-filter',
       'helix-graph-layout',
       'helix-graph-pan',
       'helix-graph-part-change',
@@ -729,7 +734,7 @@ describe('the events a graph sends', () => {
     host.signal('a', 'b')
     ;(part(host, 'zoom-in') as HTMLElement).click()
     expect(sent).toEqual([
-      ['helix-graph-filter', true, true, true],
+      ['helix-before-graph-filter', true, true, true],
       ['helix-graph-layout', true, true, false],
       ['helix-graph-pan', true, true, false],
       ['helix-graph-part-change', false, false, false],

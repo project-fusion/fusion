@@ -1,4 +1,4 @@
-<!-- @summary Filtering sends `helix-filter`, and choosing an option sends `helix-before-change`, `input`, and `change`. -->
+<!-- @summary Filtering sends `helix-before-filter`, and choosing an option sends `helix-before-change`, `input`, and `change`. -->
 <!-- @min 300 -->
 <helix-flex
   direction="column"
@@ -62,7 +62,7 @@
   regions.addEventListener('change', (event) => {
     say('change', `Chose "${event.currentTarget.value}"`)
   })
-  regions.addEventListener('helix-filter', (event) => {
-    say('helix-filter', `Filter text is "${event.detail.value}"`)
+  regions.addEventListener('helix-before-filter', (event) => {
+    say('helix-before-filter', `Filter text is "${event.detail.value}"`)
   })
 </script>

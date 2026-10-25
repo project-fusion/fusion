@@ -19,7 +19,7 @@ export function Example() {
 
   const chosen = (event: CustomEvent<{ value: string }>) => {
     const from = (event.composedPath()[0] as Element).localName
-    say('helix-select', `"${event.detail.value}" from <${from}>`)
+    say('helix-before-select', `"${event.detail.value}" from <${from}>`)
   }
 
   return (
@@ -29,7 +29,7 @@ export function Example() {
     >
       <helix-listbox
         label="Assignee"
-        onhelix-select={chosen}
+        onhelix-before-select={chosen}
       >
         <helix-option value="ada">Ada Okonjo</helix-option>
         <helix-option value="grace">Sam Patel</helix-option>

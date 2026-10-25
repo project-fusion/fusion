@@ -216,7 +216,9 @@ describe('a filter field with a source', () => {
       '<helix-headless-filter-field name="status" label="Status"></helix-headless-filter-field>',
     )
     const facets: unknown[] = []
-    host.addEventListener('helix-facet', (event) => facets.push((event as CustomEvent).detail))
+    host.addEventListener('helix-before-facet', (event) =>
+      facets.push((event as CustomEvent).detail),
+    )
     host.source = () => ['open']
     await enter(host)
     await type(host, 'refund status:op')
@@ -230,7 +232,7 @@ describe('a filter field with a source', () => {
   test('leaves the text to a page that cancels the choice', async () => {
     const host = await mount()
     host.source = () => ['open']
-    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.addEventListener('helix-before-select', (event) => event.preventDefault())
     await enter(host)
     await type(host, 'status:op')
     await press(host, 'ArrowDown')

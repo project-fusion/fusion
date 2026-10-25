@@ -1,11 +1,11 @@
 import type { SelectDetail } from './details.js'
 
 /**
- * Fired when the reader selects an item in a set.
+ * A set holds a different selection.
  *
- * Bubbles and is composed, because this is how a set coordinates: a tree, a
- * tab list and a toggle group all learn which of their children was chosen by
- * hearing it arrive.
+ * The notification after a `helix-before-select` that asked to change what is
+ * selected, sent once the selection has moved, with the selection now in
+ * force. Not cancelable: the decision was the request's.
  */
 export class HelixSelectEvent extends CustomEvent<SelectDetail> {
   static readonly eventName = 'helix-select'
@@ -13,7 +13,7 @@ export class HelixSelectEvent extends CustomEvent<SelectDetail> {
   constructor(detail: SelectDetail) {
     super(HelixSelectEvent.eventName, {
       bubbles: true,
-      cancelable: true,
+      cancelable: false,
       composed: true,
       detail,
     })

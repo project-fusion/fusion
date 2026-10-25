@@ -523,10 +523,10 @@ describe('wrapping', () => {
     )) as Updatable & { wrap: boolean }
     const asked: boolean[] = []
     const told: boolean[] = []
-    el.addEventListener('helix-before-toggle', (event) =>
+    el.addEventListener('helix-before-check', (event) =>
       asked.push((event as CustomEvent<{ checked: boolean }>).detail.checked),
     )
-    el.addEventListener('helix-toggle', (event) =>
+    el.addEventListener('helix-check', (event) =>
       told.push((event as CustomEvent<{ checked: boolean }>).detail.checked),
     )
     const button = part(el as HTMLElement, 'wrap-toggle') as HTMLButtonElement
@@ -538,7 +538,7 @@ describe('wrapping', () => {
     expect(el.wrap).toBe(true)
     expect(el.hasAttribute('wrap')).toBe(true)
     expect(button.getAttribute('aria-pressed')).toBe('true')
-    el.addEventListener('helix-before-toggle', (event) => event.preventDefault(), { once: true })
+    el.addEventListener('helix-before-check', (event) => event.preventDefault(), { once: true })
     button.click()
     await el.updateComplete
     expect(el.wrap).toBe(true)

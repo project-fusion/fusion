@@ -1,6 +1,7 @@
 import {
   filterKeeps,
   formatWords,
+  HelixBeforeFilterEvent,
   HelixFilterEvent,
   markMatches,
   slottedWords,
@@ -67,8 +68,8 @@ export const drawFilter = (
  * - which rows the filter keeps, and the words each matched, marked
  * - the keys the field answers: Up and Down move the highlight, Enter presses
  *   the highlighted row, and Escape clears the filter before it closes
- * - `helix-filter`, sent as the text changes, which a listener cancels to
- *   keep every row showing
+ * - `helix-before-filter`, sent as the text changes, which a listener cancels
+ *   to keep every row showing, and `helix-filter` once the rows are narrowed
  * - how many rows are kept, or `no-results-text`, said in the live region
  *
  * The styled tier's entry hands in the sheet that draws the field, which the
@@ -149,8 +150,11 @@ export class MenuFilterController implements ReactiveController {
       return
     }
     this.page = inside.flies ? inside.keyPage : inside.drilldown.page
-    this.refused = host.dispatchEvent(new HelixFilterEvent({ value })) ? undefined : value
+    this.refused = host.dispatchEvent(new HelixBeforeFilterEvent({ value })) ? undefined : value
     host.filter = value
+    if (this.refused === undefined) {
+      host.dispatchEvent(new HelixFilterEvent({ value }))
+    }
   }
 
   /** Filters by what the reader typed, and highlights the first row kept. */

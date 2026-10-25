@@ -7,6 +7,8 @@ import type { ChangeDetail } from './details.js'
  * the axis because a reader binding one of the two is choosing which divider they
  * care about. `value` is pixels here and a percentage there, which is what each
  * property already publishes.
+ *
+ * @followedBy helix-panel-resize
  */
 export class HelixBeforePanelResizeEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-before-panel-resize'

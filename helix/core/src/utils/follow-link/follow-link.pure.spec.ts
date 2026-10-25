@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import { afterLinkFollowed } from './follow-link.js'
 
 const said = (detail: object): Event => {
-  const event = new Event('helix-select', { cancelable: true })
+  const event = new Event('helix-before-select', { cancelable: true })
   Object.defineProperty(event, 'detail', { value: detail })
   return event
 }

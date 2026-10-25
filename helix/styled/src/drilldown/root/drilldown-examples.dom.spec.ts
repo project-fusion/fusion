@@ -19,7 +19,7 @@ describe('the events example', () => {
     const account = document.querySelector('helix-drilldown-item[value="account"]') as HTMLElement
     ;(part(account, 'item') as HTMLElement).click()
     await idle()
-    expect(logged()).toEqual(['helix-select'])
+    expect(logged()).toEqual(['helix-before-select'])
   })
 
   run('and a row with one is a way in, not a choice', async () => {
@@ -33,6 +33,6 @@ describe('the events example', () => {
     const theme = document.querySelector('helix-drilldown-item[value="theme"]') as HTMLElement
     ;(part(theme, 'item') as HTMLElement).click()
     await idle()
-    expect(logged()).toEqual(['helix-select'])
+    expect(logged()).toEqual(['helix-before-select'])
   })
 })

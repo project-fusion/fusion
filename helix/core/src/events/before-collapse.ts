@@ -1,6 +1,10 @@
 import type { ChangeDetail } from './details.js'
 
-/** A pane is about to collapse or reopen, and can be refused. */
+/**
+ * A pane is about to collapse or reopen, and can be refused.
+ *
+ * @followedBy helix-collapse
+ */
 export class HelixBeforeCollapseEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-before-collapse'
 

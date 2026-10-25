@@ -33,7 +33,7 @@ export function Example() {
   }
 
   const narrowing = (event: CustomEvent<{ value: string }>) => {
-    say('helix-filter', `Filter text is "${event.detail.value}"`)
+    say('helix-before-filter', `Filter text is "${event.detail.value}"`)
   }
 
   const proposed = (event: CustomEvent<{ value: string }>) => {
@@ -64,9 +64,9 @@ export function Example() {
         onChange={settled}
         onhelix-before-change={proposed}
         onhelix-before-close={hiding}
+        onhelix-before-filter={narrowing}
         onhelix-before-open={showing}
         onhelix-create={made}
-        onhelix-filter={narrowing}
         onInput={moved}
         onToggle={panelMoved}
         placeholder="Search languages"

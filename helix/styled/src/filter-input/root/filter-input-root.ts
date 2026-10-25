@@ -27,7 +27,7 @@ import '../../voice-level/index.js'
  * like a token.
  *
  * The suggestion panel is this element's own box with `role="listbox"`, and the
- * options pass their own `helix-select` through it. Combobox puts a
+ * options pass their own `helix-before-select` through it. Combobox puts a
  * `helix-listbox` in its panel, which scrolls, because Combobox owns the
  * selection. This panel has no list inside it, so the panel itself scrolls.
  *

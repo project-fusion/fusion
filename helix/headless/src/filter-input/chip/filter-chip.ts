@@ -123,7 +123,7 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
    * **A chip built in script should be given the attribute, not the property**,
    * if the next thing to happen might select on it. Reflection is written on
    * this element's next update rather than during the assignment, so a second
-   * `helix-facet` for the same field arriving in the same frame selects nothing,
+   * `helix-before-facet` for the same field arriving in the same frame selects nothing,
    * builds a second chip, and leaves the row holding two of one filter. The
    * lookup then finds whichever came first, so dismissing one chip takes the
    * other away. `setAttribute('name', field)` is true immediately and costs

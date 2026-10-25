@@ -20,7 +20,7 @@ export function Example() {
   }
 
   const chosen = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `Chose "${event.detail.value}"`)
+    say('helix-before-select', `Chose "${event.detail.value}"`)
   }
 
   return (
@@ -30,7 +30,7 @@ export function Example() {
     >
       <helix-drilldown
         label="Settings"
-        onhelix-select={chosen}
+        onhelix-before-select={chosen}
       >
         <helix-drilldown-item value="appearance">
           Appearance

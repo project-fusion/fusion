@@ -73,6 +73,6 @@
     count.label = `${unread} unread`
   }
 
-  feed.addEventListener('helix-read', () => queueMicrotask(recount))
+  feed.addEventListener('helix-read', recount)
   feed.addEventListener('helix-dismiss', () => queueMicrotask(recount))
 </script>

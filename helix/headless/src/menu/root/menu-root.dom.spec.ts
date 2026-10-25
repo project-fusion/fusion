@@ -209,7 +209,7 @@ describe('moving through a menu with the keyboard', () => {
        for Delete. */
     const { host } = await opened()
     const chosen: string[] = []
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       chosen.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     press(host, 'ArrowDown')
@@ -507,7 +507,7 @@ describe('menu', () => {
       <helix-headless-menu-item value="copy">Copy</helix-headless-menu-item>
       <helix-headless-menu-item value="keep">Keep</helix-headless-menu-item>`)
     const heard: string[] = []
-    el.addEventListener('helix-select', (event) => {
+    el.addEventListener('helix-before-select', (event) => {
       heard.push(`select ${(event as CustomEvent<{ value: string }>).detail.value}`)
       if ((event as CustomEvent<{ value: string }>).detail.value === 'keep') {
         event.preventDefault()
@@ -538,7 +538,7 @@ describe('menu', () => {
     const el = await menu()
     const item = el.querySelector('helix-headless-menu-item') as Item
     let chosen = ''
-    el.addEventListener('helix-select', (event) => {
+    el.addEventListener('helix-before-select', (event) => {
       chosen = (event as CustomEvent<{ value: string }>).detail.value
     })
     // The row inside the shadow root, because that is what carries the handler.
@@ -553,7 +553,7 @@ describe('menu', () => {
     )
     const item = el.querySelector('helix-headless-menu-item') as Item
     let heard = false
-    el.addEventListener('helix-select', () => {
+    el.addEventListener('helix-before-select', () => {
       heard = true
     })
     item.shadowRoot?.querySelector<HTMLElement>('[part="item"]')?.click()
@@ -1267,7 +1267,7 @@ describe('a menu with flyout submenus', () => {
     key(host, 'ArrowRight')
     await settled(host)
     const chosen: string[] = []
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       chosen.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     ;(part(rowOf(host, 'sms'), 'item') as HTMLElement).click()

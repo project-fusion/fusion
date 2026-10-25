@@ -1,4 +1,4 @@
-<!-- @summary Paging sends `helix-navigate` with the page it is going to, because it changes the view and chooses nothing. -->
+<!-- @summary Paging sends `helix-before-navigate` with the page it is going to, and `helix-navigate` once it is there. Neither is `change`, because paging chooses nothing. -->
 <!-- @layout hug -->
 <helix-flex
   direction="column"
@@ -48,8 +48,11 @@
     }
   }
 
-  /* `helix-navigate` is the only event. Cancel it to stay on the current page. */
+  /* `helix-before-navigate` asks first. Cancel it to stay on the current page. */
+  pages.addEventListener('helix-before-navigate', (event) => {
+    say('helix-before-navigate', `Go to page ${event.detail.value}`)
+  })
   pages.addEventListener('helix-navigate', (event) => {
-    say('helix-navigate', `Go to page ${event.detail.value}`)
+    say('helix-navigate', `On page ${event.detail.value}`)
   })
 </script>

@@ -106,7 +106,8 @@ const navigable = (item: HelixHeadlessSpeedDialItem): NavigableItem => ({
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - The actions are about to close. Cancelable: cancel it to keep them open.
  * @event {HelixBeforeOpenEvent} helix-before-open - The actions are about to open. Cancelable: cancel it to keep them closed.
- * @event {HelixSelectEvent} helix-select - An action was chosen. The action sends the event, and the dial closes after it. Cancelable: cancel it to keep the dial open.
+ * @event {HelixBeforeSelectEvent} helix-before-select - An action was chosen. The action sends the event, and the dial closes after it. Cancelable: cancel it to keep the dial open.
+ * @event {HelixSelectEvent} helix-select - Fired after an action is chosen, once the choice stands. Act on the choice from it.
  * @event {ToggleEvent} toggle - The dial opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart actions - The region the actions are drawn in.
@@ -411,7 +412,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('helix-select', this.handleSelect)
+    this.addEventListener('helix-before-select', this.handleSelect)
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('click', this.handleHeldClick, true)
     this.addEventListener('pointerenter', this.handlePointerEnter)
@@ -427,7 +428,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
       this.described = undefined
       this.internals.ariaLabel = null
     }
-    this.removeEventListener('helix-select', this.handleSelect)
+    this.removeEventListener('helix-before-select', this.handleSelect)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('click', this.handleHeldClick, true)
     this.removeEventListener('pointerenter', this.handlePointerEnter)

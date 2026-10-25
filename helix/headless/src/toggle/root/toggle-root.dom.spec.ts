@@ -51,7 +51,7 @@ describe('one toggle', () => {
   test('refuses from the platform and from the method the group calls', async () => {
     const host = await toggle('value="a" disabled')
     let heard = 0
-    host.addEventListener('helix-select', () => {
+    host.addEventListener('helix-before-select', () => {
       heard += 1
     })
 
@@ -91,7 +91,7 @@ describe('one toggle', () => {
   test('announces what it stands for when it is chosen', async () => {
     const host = await toggle()
     let value: string | undefined
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       value = (event as CustomEvent<{ value: string }>).detail.value
     })
     ;(part(host, 'item') as HTMLElement).click()
@@ -121,7 +121,9 @@ describe('a toggle on its own', () => {
     expect(toggle.selected).toBe(true)
     expect(button.getAttribute('aria-pressed')).toBe('true')
     expect(changes).toBe(1)
-    toggle.addEventListener('helix-select', (event) => event.preventDefault(), { once: true })
+    toggle.addEventListener('helix-before-select', (event) => event.preventDefault(), {
+      once: true,
+    })
     button.click()
     await toggle.updateComplete
     expect(toggle.selected).toBe(true)

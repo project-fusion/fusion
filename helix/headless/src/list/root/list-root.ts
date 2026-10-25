@@ -144,7 +144,7 @@ import {
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press changes which rows are selected, with the `value` it would leave. Cancelable.
  * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when a row is dropped at a new place, in a `reorderable` list, with every row's value in the new order. Cancelable: cancel it to keep the row where it is.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired, in a list with `load-more`, when the end of the list comes within a screen of view, once for each number of rows.
- * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your rows to the order in `keys`. Cancelable: cancel it to say the move did not happen.
+ * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your rows to the order in `keys`.
  *
  * @csspart drag-preview - A copy of the row a pointer drags, which follows the pointer in the top layer until the row is let go, in a `reorderable` list. Hidden from assistive technology.
  * @csspart empty - The row shown while the list has no rows and none are loading, where `empty-label` or the `empty` slot gives it content. A grid row with one cell in a list that selects.

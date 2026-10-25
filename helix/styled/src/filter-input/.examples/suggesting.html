@@ -65,9 +65,9 @@
 
   filter.addEventListener('input', offer)
 
-  /* The option sends `helix-select` when it is pressed or chosen with Enter, so
+  /* The option sends `helix-before-select` when it is pressed or chosen with Enter, so
      one handler covers both. */
-  filter.addEventListener('helix-select', async (event) => {
+  filter.addEventListener('helix-before-select', async (event) => {
     const term = termAt(filter.value)
     /* A key completes to `owner:` and the panel shows its values. A value
        completes to `owner:ada ` and the panel closes. */

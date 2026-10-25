@@ -7,7 +7,7 @@ export function Example() {
     <helix-checkbox
       checked={checked}
       label="I accept the terms of service"
-      onhelix-before-toggle={(event) => setChecked(event.detail.checked)}
+      onhelix-before-check={(event) => setChecked(event.detail.checked)}
     />
   )
 }

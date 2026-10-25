@@ -9,7 +9,7 @@ beforeAll(async () => {
 
 type Steps = HTMLElement & { updateComplete: Promise<unknown> }
 
-/* A press is applied a microtask after its `helix-select`, once every
+/* A press is applied a microtask after its `helix-before-select`, once every
    listener has had the chance to refuse it, so the update to wait for is
    requested after that. */
 const turn = async (host: Steps): Promise<void> => {
@@ -155,7 +155,7 @@ describe('a step is pressable, and only its name is', () => {
   test('pressing it announces the step by name', async () => {
     const step = await one('value="pay"')
     const said: string[] = []
-    step.addEventListener('helix-select', (event) => {
+    step.addEventListener('helix-before-select', (event) => {
       said.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     ;(part(step, 'label') as HTMLElement).click()
@@ -167,7 +167,7 @@ describe('a step is pressable, and only its name is', () => {
     // lets you skip to the end and one that does not are both real.
     const step = await one('disabled value="pay"')
     const said: string[] = []
-    step.addEventListener('helix-select', () => said.push('x'))
+    step.addEventListener('helix-before-select', () => said.push('x'))
     ;(part(step, 'label') as HTMLElement).click()
     expect(said).toEqual([])
   })
@@ -239,7 +239,7 @@ describe('the list can hold which step is current', () => {
   })
 
   test('and refusing the step`s own event leaves the sequence where it was', async () => {
-    /* `helix-select` is cancelable and the step documents it as refusable. This
+    /* `helix-before-select` is cancelable and the step documents it as refusable. This
        element is the one thing that acts on it, so a refusal it ignored was a
        veto that did nothing anywhere: valid code, no error, and the move
        happening regardless. Bound on the step, which is the position that can
@@ -247,7 +247,7 @@ describe('the list can hold which step is current', () => {
     const host = await seq('default-active="one"')
     const third = host.querySelectorAll('helix-headless-step')[2] as HTMLElement
     await (third as unknown as Steps).updateComplete
-    third.addEventListener('helix-select', (event) => event.preventDefault())
+    third.addEventListener('helix-before-select', (event) => event.preventDefault())
     ;(part(third, 'label') as HTMLElement).click()
     await turn(host)
     expect((host as unknown as { active: string }).active).toBe('one')
@@ -259,7 +259,7 @@ describe('the list can hold which step is current', () => {
        added first, so it applied the move before a listener on the same
        element could refuse it. */
     const host = await seq('default-active="one"')
-    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.addEventListener('helix-before-select', (event) => event.preventDefault())
     const third = host.querySelectorAll('helix-headless-step')[2] as HTMLElement
     await (third as unknown as Steps).updateComplete
     ;(part(third, 'label') as HTMLElement).click()
@@ -287,7 +287,7 @@ describe('the list can hold which step is current', () => {
 
 describe('steps and what is inside a step', () => {
   /* A step's `content` holds the stage, so a tab set or a menu there is the
-     expected use, and its `helix-select` bubbles out of the step. */
+     expected use, and its `helix-before-select` bubbles out of the step. */
   test('a choice from inside a step leaves the sequence where it is', async () => {
     const host = (await mount(`<helix-headless-steps active="s1">
       <helix-headless-step value="s1">Cart<div slot="content"><span id="inside"></span></div></helix-headless-step>
@@ -295,7 +295,7 @@ describe('steps and what is inside a step', () => {
     </helix-headless-steps>`)) as Steps & { active: string }
     await turn(host)
     host.querySelector('#inside')?.dispatchEvent(
-      new CustomEvent('helix-select', {
+      new CustomEvent('helix-before-select', {
         bubbles: true,
         cancelable: true,
         composed: true,

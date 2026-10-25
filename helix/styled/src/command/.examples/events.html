@@ -60,7 +60,7 @@
   palette.addEventListener('toggle', (event) => {
     say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   })
-  palette.addEventListener('helix-select', (event) => {
-    say('helix-select', `Ran "${event.detail.value}"`)
+  palette.addEventListener('helix-before-select', (event) => {
+    say('helix-before-select', `Ran "${event.detail.value}"`)
   })
 </script>

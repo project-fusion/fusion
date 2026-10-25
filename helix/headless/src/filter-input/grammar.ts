@@ -7,7 +7,7 @@
  * disagrees about. So the shape is here: a key, a colon, a comma separated list,
  * and a leading `-` for the negation. What a key or a value *means* is still
  * never asked, which is the line `FilterField` draws and this does not cross:
- * nothing here compares anything, and what comes out is the same `helix-facet`
+ * nothing here compares anything, and what comes out is the same `helix-before-facet`
  * the picker announces, for the consumer to answer however they answer it.
  *
  * **It reads only what was declared.** A key is a field's `name` or its `label`;
@@ -241,7 +241,7 @@ interface Held {
 /**
  * Reads a line of text as filters and whatever was not one.
  *
- * **One comparison per field, and a second is left as text.** `helix-facet`
+ * **One comparison per field, and a second is left as text.** `helix-before-facet`
  * carries a field's whole set, so `disposition:a -disposition:b` has no event
  * shape to arrive in and the picker cannot build it either. Announcing the
  * second over the first would drop a filter the reader wrote and spelled

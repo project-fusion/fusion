@@ -90,7 +90,7 @@ describe('a filter field that suggests', () => {
   })
 
   test('the panel is a listbox region of its own', async () => {
-    /* Not a `Listbox`, which would hear the option's `helix-select` and
+    /* Not a `Listbox`, which would hear the option's `helix-before-select` and
        write `selected` back onto it. A suggestion is not a persistent choice. */
     const host = await mount(['absent'])
 
@@ -182,11 +182,11 @@ describe('a filter field that suggests', () => {
   })
 
   test('Enter presses the highlighted option rather than announcing for it', async () => {
-    /* The option fires its own `helix-select`, so a consumer hears the same
+    /* The option fires its own `helix-before-select`, so a consumer hears the same
        event from the keyboard as from a pointer. */
     const host = await mount(['absent', 'stale'])
     const heard: string[] = []
-    ;(host as HTMLElement).addEventListener('helix-select', (event) => {
+    ;(host as HTMLElement).addEventListener('helix-before-select', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
     })
 
@@ -364,7 +364,7 @@ describe('Enter while an input method composes', () => {
     await type(host, 'st')
     await press(host, 'ArrowDown')
     const chosen: string[] = []
-    ;(host as HTMLElement).addEventListener('helix-select', (event) =>
+    ;(host as HTMLElement).addEventListener('helix-before-select', (event) =>
       chosen.push((event as CustomEvent<{ value: string }>).detail.value),
     )
     const event = new KeyboardEvent('keydown', {

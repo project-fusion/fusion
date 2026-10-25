@@ -403,7 +403,7 @@ describe('date picker as a form control', () => {
 
   test('paging is announced, and refusing it leaves the month where it was', async () => {
     const cal = await calendar()
-    cal.addEventListener('helix-navigate', (event) => event.preventDefault())
+    cal.addEventListener('helix-before-navigate', (event) => event.preventDefault())
     next(cal)
     await (cal as DatePicker & { updateComplete: Promise<boolean> }).updateComplete
     expect(cal.month).toBe('2026-08')
@@ -412,11 +412,25 @@ describe('date picker as a form control', () => {
   test('the event names the month it would move to, not the one it is on', async () => {
     const cal = await calendar()
     let announced = ''
-    cal.addEventListener('helix-navigate', (event) => {
+    cal.addEventListener('helix-before-navigate', (event) => {
       announced = (event as CustomEvent<{ value: string }>).detail.value
     })
     next(cal)
     expect(announced).toBe('2026-09')
+  })
+
+  test('helix-navigate follows once the month has moved, and not for a refused one', async () => {
+    const cal = await calendar()
+    const heard: string[] = []
+    cal.addEventListener('helix-navigate', (event) => {
+      heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${cal.month}`)
+    })
+    next(cal)
+    await (cal as DatePicker & { updateComplete: Promise<boolean> }).updateComplete
+    cal.addEventListener('helix-before-navigate', (event) => event.preventDefault())
+    next(cal)
+    await (cal as DatePicker & { updateComplete: Promise<boolean> }).updateComplete
+    expect(heard).toEqual(['2026-09@2026-09'])
   })
 
   test('a declared month is a seed, and the arrows still move it', async () => {
@@ -425,7 +439,7 @@ describe('date picker as a form control', () => {
        them which way to put it back. */
     const cal = await calendar('month="2026-08" default-value="2026-08-14"')
     let announced = ''
-    cal.addEventListener('helix-navigate', (event) => {
+    cal.addEventListener('helix-before-navigate', (event) => {
       announced = (event as CustomEvent<{ value: string }>).detail.value
     })
     next(cal)
@@ -918,7 +932,7 @@ describe('the months and the years', () => {
   test('the heading shows the months, and a month shows its days', async () => {
     const cal = (await calendar('default-month="2026-08" max-view="month"')) as Viewing
     const moved: string[] = []
-    cal.addEventListener('helix-navigate', (event) => {
+    cal.addEventListener('helix-before-navigate', (event) => {
       moved.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     root(cal).querySelector<HTMLElement>('[part="heading-button"]')?.click()
@@ -1213,7 +1227,7 @@ describe('a date picker drawing a calendar with months of its own', () => {
       'locale="en-US" calendar="persian" default-value="2026-10-06"',
     )) as DatePicker & { updateComplete: Promise<unknown> }
     const heard: string[] = []
-    cal.addEventListener('helix-navigate', (event) =>
+    cal.addEventListener('helix-before-navigate', (event) =>
       heard.push((event as CustomEvent<{ value: string }>).detail.value),
     )
     next(cal)

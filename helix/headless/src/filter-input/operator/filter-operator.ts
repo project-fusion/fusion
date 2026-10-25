@@ -47,7 +47,7 @@ export class HelixHeadlessFilterOperator extends HelixElement {
    * reads it too, refusing a list where a scalar was declared and never writing
    * a comparison that takes nothing.
    *
-   * The arity reaches a consumer in `helix-facet`, which is what tells an empty
+   * The arity reaches a consumer in `helix-before-facet`, which is what tells an empty
    * filter from no filter: `values` empty means the field is no longer narrowing
    * anything, unless the comparison is one that never had values to give.
    *

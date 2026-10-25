@@ -19,7 +19,7 @@ import { property } from 'lit/decorators.js'
  *
  * **On its own, outside a `Toggle.Group`, it is a toggle button**, as React
  * Aria's `ToggleButton`: a `<button>` with `aria-pressed`. A press, Enter or
- * Space sends `helix-select`, which you can cancel, then flips `selected` and
+ * Space sends `helix-before-select`, which you can cancel, then flips `selected` and
  * sends `change`. Write `selected` in the markup to start it pressed.
  *
  * Do not use it for navigation. For navigation, use links marked with
@@ -37,7 +37,7 @@ import { property } from 'lit/decorators.js'
  * @slot start - Content before the label, such as an icon.
  *
  * @event {Event} change - Fired after a toggle button on its own is pressed or released.
- * @event {HelixSelectEvent} helix-select - Fired when the item is chosen. Cancelable: call `preventDefault()` to keep the current choice.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when the item is chosen. Cancelable: call `preventDefault()` to keep the current choice.
  *
  * @csspart item - The button: a radio in a group where one is chosen, and a button with `aria-pressed` on its own or in a group where several can be.
  *
@@ -128,7 +128,7 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
 
   /**
    * Chooses the item in its group, or, on its own, flips `selected` once
-   * `helix-select` stands and sends `change`.
+   * `helix-before-select` stands and sends `change`.
    */
   override select(): boolean {
     if (!this.alone) {

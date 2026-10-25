@@ -452,7 +452,7 @@ post({ type: 'helix-preview-ready' })
  * event:
  *
  * ```
- * inline custom    did not run     <helix-checkbox onhelix-toggle="…">
+ * inline custom    did not run     <helix-checkbox onhelix-check="…">
  * inline native    RAN             <helix-button onclick="…">
  * inline onerror   RAN             <img onerror="…">
  * script tag       did not run     <script>…</script>
@@ -460,7 +460,7 @@ post({ type: 'helix-preview-ready' })
  *
  * The inline attribute is inert for a reason nothing here can change: HTML's
  * event handler content attributes are a fixed list and a custom element cannot
- * add to it, so `onhelix-toggle` is an ordinary attribute and always will be. A
+ * add to it, so `onhelix-check` is an ordinary attribute and always will be. A
  * script tag is the only route left.
  *
  * **This grants the example no capability it did not have.** Rows two and three

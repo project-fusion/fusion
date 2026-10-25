@@ -9,6 +9,7 @@ import {
   type DateCalendar,
   formatWords,
   dateAsValue as fromDate,
+  HelixBeforeNavigateEvent,
   HelixFormElement,
   HelixNavigateEvent,
   handedLocale,
@@ -135,7 +136,8 @@ const firstOf = (year: number, month: number): Date =>
  *
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before the dates change, and cancelable.
- * @event {HelixNavigateEvent} helix-navigate - Fired before the month on show changes, and cancelable.
+ * @event {HelixBeforeNavigateEvent} helix-before-navigate - Fired before the month on show changes, and cancelable.
+ * @event {HelixNavigateEvent} helix-navigate - Fired after the month on show changes, with the month now on show in `detail.value`, which `month` also holds.
  * @event {Event} input - Fired after the value changes.
  *
  * @csspart cell - One column of a week row. A range is painted on the cells.
@@ -224,7 +226,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    * month included, and Previous, Next and the page keys move by those
    * months. With `max-view`, the months view shows that calendar's year, of
    * twelve or thirteen months, and the years view its years. `month` and
-   * `helix-navigate` then name a month by its first day, `YYYY-MM-DD`. The
+   * `helix-before-navigate` then name a month by its first day, `YYYY-MM-DD`. The
    * value is `YYYY-MM-DD` in every calendar.
    */
   @property()
@@ -700,12 +702,13 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   }
 
   /**
-   * Moves the view, announcing it first.
+   * Moves the view, asking first and saying so once it has moved.
    *
-   * `helix-navigate` and not `helix-change`: paging chooses nothing, and a
-   * consumer driving the view has to hear that it moved without being told the
-   * answer did. Refusing the event is how they take the decision, and nothing
-   * moves.
+   * `helix-before-navigate` and not `helix-before-change`: paging chooses
+   * nothing, and a consumer driving the view has to hear that it moved without
+   * being told the answer did. Refusing the event is how they take the
+   * decision, and nothing moves. `helix-navigate` follows with the month now on
+   * show.
    */
   private show(date: Date): void {
     if (this.isDisabled) {
@@ -721,8 +724,9 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
         this.browsed = true
         this.monthState = month
         this.requestUpdate('month', previous)
+        this.dispatchEvent(new HelixNavigateEvent({ value: month }))
       },
-      event: (month) => new HelixNavigateEvent({ value: month }),
+      event: (month) => new HelixBeforeNavigateEvent({ value: month }),
       host: this,
       next,
     })
@@ -830,7 +834,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    *
    * Its own state rather than `month`, because looking through the months of
    * another year chooses nothing and moves nothing on show: the month changes,
-   * and `helix-navigate` is sent, only once a month is chosen.
+   * and `helix-before-navigate` is sent, only once a month is chosen.
    */
   @state()
   private pageYear: number | undefined = undefined
@@ -895,7 +899,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
 
   /**
    * Takes a month or a year: a year shows its months, and a month shows its
-   * days, moving the calendar there with `helix-navigate` first.
+   * days, moving the calendar there with `helix-before-navigate` first.
    */
   private choosePeriod(at: number): void {
     if (this.isDisabled) {

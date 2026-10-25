@@ -25,7 +25,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  *
  * @description
  * Selection works through an event, the same as in the accordion and the tree.
- * A tab dispatches `helix-select`, and the root pairs it with the panel of the
+ * A tab dispatches `helix-before-select`, and the root pairs it with the panel of the
  * same value. Nothing registers with anything, so tabs added later work with no
  * extra setup.
  *
@@ -102,7 +102,7 @@ import { HelixHeadlessTab } from '../tab/tab.js'
  *
  * @event {HelixActivateEvent} helix-activate - Fired after the active tab changes, so the element already holds the new value.
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the active tab changes, and cancelable. Canceling it is the only way to block a change.
- * @event {HelixSelectEvent} helix-select - Fired when a tab is chosen. The tab sends it and the root handles it, so you can listen on the root. Cancelable: canceling it stops the change and leaves the decision to you.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when a tab is chosen. The tab sends it and the root handles it, so you can listen on the root. Cancelable: canceling it stops the change and leaves the decision to you.
  *
  * @csspart indicator - The marker that moves to the selected tab. It carries the selected tab's
  *   place and size as `--indicator-x`, `--indicator-y`, `--indicator-inline-size` and
@@ -237,7 +237,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
      nobody can answer.
 
      **And only if the tab's own choice stood, read a microtask later.**
-     `helix-select` is cancelable, and the docblock tells you to listen for it
+     `helix-before-select` is cancelable, and the docblock tells you to listen for it
      on this element. This listener is on this element too, added when it
      connected, so it runs ahead of a listener you add afterwards, and read
      inline the flag was not set yet: a refusal on the root changed nothing.
@@ -245,7 +245,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
      tab's and the root's. `Radio.Group` holds the same pair for the same
      event. */
   private readonly handleSelection = (event: Event): void => {
-    /* Only a choice made by one of this set's own tabs. `helix-select` bubbles
+    /* Only a choice made by one of this set's own tabs. `helix-before-select` bubbles
        and is composed, and a tree, a menu or another tab set inside a panel
        sends it too: acted on, it set `active` to a value no tab has, and the
        set fell back to its first tab under the reader. */
@@ -412,7 +412,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('helix-select', this.handleSelection)
+    this.addEventListener('helix-before-select', this.handleSelection)
     this.addEventListener('focusin', this.handleFocusIn)
     /* Watched again on reconnection, since disconnection let the strip go. */
     if (this.hasUpdated) {
@@ -422,7 +422,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-select', this.handleSelection)
+    this.removeEventListener('helix-before-select', this.handleSelection)
     this.removeEventListener('focusin', this.handleFocusIn)
     this.resizing?.disconnect()
     this.resizing = undefined

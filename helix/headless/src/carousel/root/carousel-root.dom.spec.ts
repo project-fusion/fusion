@@ -108,7 +108,7 @@ describe('carousel', () => {
   test('moving reports the slide now in view', async () => {
     const cal = await carousel()
     let seen = ''
-    cal.addEventListener('helix-select', (event) => {
+    cal.addEventListener('helix-before-activate', (event) => {
       seen = (event as CustomEvent<{ value: string }>).detail.value
     })
     ;(part(cal, 'next') as HTMLElement).click()
@@ -254,7 +254,7 @@ describe('carousel selection can be refused', () => {
 
   test('a listener that refuses leaves the carousel where it was', async () => {
     const host = await carousel()
-    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.addEventListener('helix-before-activate', (event) => event.preventDefault())
     host.goTo(2)
     await host.updateComplete
     expect(host.index).toBe(0)
@@ -264,7 +264,7 @@ describe('carousel selection can be refused', () => {
     // The other half. A refusal that refused everything would pass the first.
     const host = await carousel()
     let announced = ''
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-activate', (event) => {
       announced = (event as CustomEvent<{ value: string }>).detail.value
     })
     host.goTo(2)
@@ -276,7 +276,7 @@ describe('carousel selection can be refused', () => {
   test('the announcement carries the slide being proposed, not the one left behind', async () => {
     const host = await carousel()
     let seen = ''
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-activate', (event) => {
       seen = (event as CustomEvent<{ value: string }>).detail.value
       event.preventDefault()
     })
@@ -286,7 +286,7 @@ describe('carousel selection can be refused', () => {
     expect(host.index).toBe(0)
   })
 
-  /* `helix-select` is the request, so a consumer following the slide in view
+  /* `helix-before-activate` is the request, so a consumer following the slide in view
      needs the notification after it, sent once the index is on the element. */
   test('a move that stood is announced again once it has happened', async () => {
     const host = await carousel()
@@ -302,7 +302,7 @@ describe('carousel selection can be refused', () => {
 
   test('and a refused one is not', async () => {
     const host = await carousel()
-    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.addEventListener('helix-before-activate', (event) => event.preventDefault())
     let heard = false
     host.addEventListener('helix-activate', () => {
       heard = true
@@ -343,7 +343,7 @@ describe('carousel, controlled and uncontrolled', () => {
 
   test('and refusing is what holds it where the markup put it', async () => {
     const host = await carousel('index="1"')
-    host.addEventListener('helix-select', (event: Event) => {
+    host.addEventListener('helix-before-activate', (event: Event) => {
       event.preventDefault()
     })
     host.goTo(2)
@@ -354,7 +354,7 @@ describe('carousel, controlled and uncontrolled', () => {
   test('and it is still told where the carousel would have gone', async () => {
     const host = await carousel('index="1"')
     let asked = ''
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-activate', (event) => {
       asked = (event as CustomEvent<{ value: string }>).detail.value
     })
     host.goTo(2)
@@ -513,13 +513,13 @@ describe('carousel settling', () => {
 
   test('a settled drag can be refused, and the track goes back where it was', async () => {
     /* This was the one dispatch in the library of a cancelable event whose
-       answer nothing read: `helix-select` announced after `index` had already
+       answer nothing read: `helix-before-activate` announced after `index` had already
        moved, on the argument that a reader has already dragged the track and
        `preventDefault()` could not un-drag it. The track is ours to scroll, so
        it can: the index stays where it was and the scroller is put back on the
        slide that index names. */
     const { host, track } = await scrolling('default-index="0"')
-    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.addEventListener('helix-before-activate', (event) => event.preventDefault())
     settle(track, 200)
     await host.updateComplete
     expect(host.index).toBe(0)
@@ -584,7 +584,7 @@ describe('carousel settling', () => {
        the decision by refusing. */
     const { host, track } = await scrolling('index="0"')
     let asked = ''
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-activate', (event) => {
       asked = (event as CustomEvent<{ value: string }>).detail.value
     })
     track.dispatchEvent(new Event('pointerdown'))
@@ -839,7 +839,7 @@ describe('carousel across several slides at once', () => {
   })
 
   /* Nobody asked for that move, so it is no request: it went out as a
-     cancelable `helix-select`, and refusing it left the index past the last
+     cancelable `helix-before-activate`, and refusing it left the index past the last
      place and asked again on every update. */
   test('and the correction is written, with no request anybody could refuse', async () => {
     const host = (await mount(`<helix-headless-carousel label="Reel">
@@ -848,7 +848,7 @@ describe('carousel across several slides at once', () => {
     host.index = 2
     await host.updateComplete
     let asked = 0
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-activate', (event) => {
       asked += 1
       event.preventDefault()
     })
@@ -1124,7 +1124,7 @@ describe('several slides at a time', () => {
   test('Next and Previous move by slides-per-move, ending on the last position', async () => {
     const host = await reel('slides-per-move="3"')
     const heard: string[] = []
-    host.addEventListener('helix-select', (event) =>
+    host.addEventListener('helix-before-activate', (event) =>
       heard.push((event as CustomEvent<{ value: string }>).detail.value),
     )
     await press(host, 'next')

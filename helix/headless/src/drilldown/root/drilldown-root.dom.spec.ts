@@ -60,7 +60,7 @@ describe('drilldown', () => {
        drills stops its own event. */
     const host = await stack()
     let heard = ''
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       heard = (event as CustomEvent<{ value: string }>).detail.value
     })
     await press(host, host.querySelector('helix-headless-drilldown-item') as Element)
@@ -69,7 +69,7 @@ describe('drilldown', () => {
   })
 
   test('and refusing that choice leaves the stack on its page', async () => {
-    /* `helix-select` is cancelable and the row documents it as refusable. The
+    /* `helix-before-select` is cancelable and the row documents it as refusable. The
        drill is the one thing in the library that acts on it, so a refusal
        nothing read left the stack moving anyway: valid code, no error, and the
        navigation happening regardless.
@@ -80,16 +80,16 @@ describe('drilldown', () => {
        alike, so a listener nearer the event never runs at all. */
     const host = await stack()
     const refuse = (event: Event): void => event.preventDefault()
-    document.addEventListener('helix-select', refuse, true)
+    document.addEventListener('helix-before-select', refuse, true)
     await press(host, host.querySelector('helix-headless-drilldown-item') as Element)
-    document.removeEventListener('helix-select', refuse, true)
+    document.removeEventListener('helix-before-select', refuse, true)
     expect(showing(host)).toEqual(['appearance', 'about'])
   })
 
   test('a row with no page announces instead of drilling', async () => {
     const host = await stack()
     let heard = ''
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       heard = (event as CustomEvent<{ value: string }>).detail.value
     })
     /* By value, not by index. `querySelectorAll` finds nested rows too, so
@@ -278,7 +278,7 @@ describe('moving within a page', () => {
   browser('arriving at a row does not follow it', async () => {
     const host = await onAppearance()
     let heard = ''
-    host.addEventListener('helix-select', (event: Event) => {
+    host.addEventListener('helix-before-select', (event: Event) => {
       heard = (event as CustomEvent<{ value: string }>).detail.value
     })
     await key(host, 'ArrowDown')
@@ -451,7 +451,7 @@ describe('moving through a page by key', () => {
     key(appearance, 'ArrowDown')
     expect(locked.ownerDocument.activeElement).toBe(locked)
     let chosen = false
-    locked.addEventListener('helix-select', () => {
+    locked.addEventListener('helix-before-select', () => {
       chosen = true
     })
     ;(locked as HTMLElement & { select(): void }).select()
@@ -556,10 +556,10 @@ describe('a drilldown with navigation', () => {
 describe('the page showing', () => {
   type Paged = Stack & { page: string }
 
-  test('`page` follows a reader, and helix-navigate comes first with where they go', async () => {
+  test('`page` follows a reader, and helix-before-navigate comes first with where they go', async () => {
     const host = (await stack()) as Paged
     const heard: string[] = []
-    host.addEventListener('helix-navigate', (event) => {
+    host.addEventListener('helix-before-navigate', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     expect(host.page).toBe('')
@@ -573,11 +573,30 @@ describe('the page showing', () => {
     expect(heard).toEqual(['appearance', ''])
   })
 
-  test('a refused helix-navigate keeps the page showing', async () => {
+  test('helix-navigate follows a move that stood, with the page now showing', async () => {
     const host = (await stack()) as Paged
-    host.addEventListener('helix-navigate', (event) => event.preventDefault())
+    const heard: string[] = []
+    host.addEventListener('helix-navigate', (event) => {
+      heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${host.page}`)
+      expect(event.cancelable).toBe(false)
+    })
     await press(host, host.querySelector('[value="appearance"]') as Element)
     await host.updateComplete
+    host.back()
+    await host.updateComplete
+    expect(heard).toEqual(['appearance@appearance', '@'])
+  })
+
+  test('a refused helix-before-navigate keeps the page showing, and sends no helix-navigate', async () => {
+    const host = (await stack()) as Paged
+    host.addEventListener('helix-before-navigate', (event) => event.preventDefault())
+    let told = false
+    host.addEventListener('helix-navigate', () => {
+      told = true
+    })
+    await press(host, host.querySelector('[value="appearance"]') as Element)
+    await host.updateComplete
+    expect(told).toBe(false)
     expect(host.page).toBe('')
     expect(showing(host)).toEqual(['appearance', 'about'])
   })

@@ -86,8 +86,8 @@ export function Example() {
               at={ago(one.minutes)}
               dismissible
               key={one.id}
+              onhelix-before-read={readAt(one.id)}
               onhelix-dismiss={dismissed(one.id)}
-              onhelix-read={readAt(one.id)}
               read={one.read}
             >
               {body[one.id]}

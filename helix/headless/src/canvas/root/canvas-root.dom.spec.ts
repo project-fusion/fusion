@@ -1457,7 +1457,9 @@ describe('canvas selection and editing', () => {
   test('landing on a card or a connection selects it, and says so', async () => {
     const host = (await canvas()) as Selectable
     const told: string[] = []
-    host.addEventListener('helix-select', (event) => told.push((event as CustomEvent).detail.value))
+    host.addEventListener('helix-before-select', (event) =>
+      told.push((event as CustomEvent).detail.value),
+    )
     card(host, 'b').focus()
     await host.updateComplete
     await host.updateComplete

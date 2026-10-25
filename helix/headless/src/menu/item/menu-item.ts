@@ -4,7 +4,8 @@ import {
   customElement,
   deepActiveElement,
   followLink,
-  HelixBeforeToggleEvent,
+  HelixBeforeCheckEvent,
+  HelixBeforeSelectEvent,
   HelixElement,
   HelixSelectEvent,
   hostAria,
@@ -40,9 +41,9 @@ import '../../kbd/index.js'
  * `menuitemradio`, for a set where only one can be on. A row that opens a page
  * keeps `menuitem` and sets `aria-haspopup`.
  *
- * Choosing a choice row checks or unchecks it before `helix-select` is sent,
+ * Choosing a choice row checks or unchecks it before `helix-before-select` is sent,
  * so a listener reads the new `checked`. An `exclusive` row turns on and turns
- * off the `exclusive` rows next to it. Cancel `helix-before-toggle` to keep a
+ * off the `exclusive` rows next to it. Cancel `helix-before-check` to keep a
  * row as it is and set `checked` yourself.
  *
  * Space on a choice row changes it and leaves the menu open, so a reader can
@@ -91,8 +92,9 @@ import '../../kbd/index.js'
  * @slot start - Content before the label, such as an icon.
  * @slot submenu - The rows of a submenu that this row opens.
  *
- * @event {HelixBeforeToggleEvent} helix-before-toggle - A choice row is about to be checked or unchecked, carrying the state asked for. Cancelable: cancel it to keep the row as it is.
- * @event {HelixSelectEvent} helix-select - The row was chosen. Cancelable: cancel it to keep the menu open.
+ * @event {HelixBeforeCheckEvent} helix-before-check - A choice row is about to be checked or unchecked, carrying the state asked for. Cancelable: cancel it to keep the row as it is.
+ * @event {HelixBeforeSelectEvent} helix-before-select - The row was chosen. Cancelable: cancel it to keep the menu open.
+ * @event {HelixSelectEvent} helix-select - Fired after the row is chosen, once the choice stands.
  *
  * @csspart end - The trailing column that holds the shortcut and the `end` slot. It is always rendered.
  * @csspart item - The row, which is an `<a>` where `href` is set.
@@ -128,7 +130,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
    * `checked` and `exclusive` imply it, so a row that is on, or one of a set,
    * never has to say both.
    *
-   * Choosing the row checks or unchecks it, after a `helix-before-toggle` that
+   * Choosing the row checks or unchecks it, after a `helix-before-check` that
    * you can cancel.
    */
   @property({ reflect: true, type: Boolean })
@@ -269,7 +271,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
   target = ''
 
   /**
-   * The row's value, sent in `helix-select` when the row is chosen.
+   * The row's value, sent in `helix-before-select` when the row is chosen.
    */
   @property()
   value = ''
@@ -292,7 +294,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
   /**
    * @internal Whether the last choice of this row asked the menu to stay open:
    * a Space on a choice row, or `close-on-select="false"`. Read by the menu
-   * while it hears the row's `helix-select`.
+   * while it hears the row's `helix-before-select`.
    */
   keepsOpen = false
 
@@ -618,7 +620,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
       apply: (checked) => {
         this.checked = checked
       },
-      event: (checked) => new HelixBeforeToggleEvent({ checked }),
+      event: (checked) => new HelixBeforeCheckEvent({ checked }),
       host: this,
       next,
     })
@@ -660,11 +662,11 @@ export class HelixHeadlessMenuItem extends HelixElement {
     this.tick()
     /* A link drawn without an anchor, in a menu that keeps focus in its
        filter field, is followed here unless a listener refused the choice. */
-    if (
-      this.dispatchEvent(new HelixSelectEvent({ value: this.value })) &&
-      this.virtual &&
-      this.href !== ''
-    ) {
+    if (!this.dispatchEvent(new HelixBeforeSelectEvent({ value: this.value }))) {
+      return
+    }
+    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    if (this.virtual && this.href !== '') {
       followLink(this.ownerDocument, this)
     }
   }

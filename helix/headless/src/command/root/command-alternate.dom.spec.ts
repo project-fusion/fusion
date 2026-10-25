@@ -37,7 +37,7 @@ describe('a command row with two destinations', () => {
     const host = await palette()
     activate(host, '/components/card')
     let heard: { alternate?: boolean; value: string } | undefined
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       heard = (event as CustomEvent<{ alternate?: boolean; value: string }>).detail
     })
 
@@ -65,7 +65,7 @@ describe('a command row with two destinations', () => {
     const host = await palette()
     activate(host, '/components/button')
     let heard = 0
-    host.addEventListener('helix-select', () => {
+    host.addEventListener('helix-before-select', () => {
       heard += 1
     })
     const event = new KeyboardEvent('keydown', {

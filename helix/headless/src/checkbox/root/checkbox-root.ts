@@ -55,7 +55,7 @@ import { property } from 'lit/decorators.js'
  * @slot hint - Help under the control, for content richer than the `hint` text.
  *
  * @event {Event} change - The box was checked or unchecked. Relayed from the native input.
- * @event {HelixBeforeToggleEvent} helix-before-toggle - The box is about to be checked or unchecked. Cancelable: cancel it to keep its state.
+ * @event {HelixBeforeCheckEvent} helix-before-check - The box is about to be checked or unchecked. Cancelable: cancel it to keep its state.
  * @event {Event} input - The box was checked or unchecked.
  *
  * @csspart box - The box drawn for the input, under the mark.

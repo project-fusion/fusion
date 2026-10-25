@@ -28,7 +28,7 @@ describe('the events example', () => {
     expect(logged()).toEqual([
       'helix-before-open',
       'toggle',
-      'helix-select',
+      'helix-before-select',
       'helix-before-close',
       'toggle',
     ])

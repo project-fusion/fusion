@@ -1,6 +1,6 @@
 import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
-import { HelixSelectEvent } from '../../events/events.js'
+import { HelixBeforeSelectEvent } from '../../events/events.js'
 import type { HelixElement } from '../../helix-element/helix-element.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
@@ -30,7 +30,7 @@ export declare class MixinSelectableItemInterface {
   protected itemPart: string
 
   /**
-   * Selects the item and fires `helix-select`. Returns `false` if the item is
+   * Selects the item and fires `helix-before-select`. Returns `false` if the item is
    * disabled or a listener cancels the event.
    *
    * `MixinDismissible.dismiss` next door has the same shape and for the same
@@ -121,14 +121,14 @@ export const MixinSelectableItem = <T extends Constructor<HelixElement>>(Base: T
     }
 
     /**
-     * Selects the item and fires `helix-select`. Returns `false` if the item is
+     * Selects the item and fires `helix-before-select`. Returns `false` if the item is
      * disabled or a listener cancels the event.
      */
     select(): boolean {
       if (this.disabled) {
         return false
       }
-      const event = new HelixSelectEvent({ value: this.value })
+      const event = new HelixBeforeSelectEvent({ value: this.value })
       this.dispatchEvent(event)
       return !event.defaultPrevented
     }

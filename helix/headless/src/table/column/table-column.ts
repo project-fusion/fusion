@@ -432,7 +432,7 @@ export class HelixHeadlessTableColumn extends HelixElement {
     /* And the same fact as a custom state, because ARIA is not a style hook.
        Whoever draws this column draws the caret, and had nothing to draw it
        from: no state and no part told the sorted column from the rest, so the
-       only way to it was listening for `helix-sort` and reading the order back a
+       only way to it was listening for `helix-before-sort` and reading the order back a
        microtask later, which is a lot of machinery for one glyph. */
     /* Through `toggleState`, which carries the feature test, the way
        `pagination-root.ts` does in this same hook. Safari below 17.4 and

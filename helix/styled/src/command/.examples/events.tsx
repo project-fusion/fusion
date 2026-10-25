@@ -32,7 +32,7 @@ export function Example() {
   }
 
   const ran = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `Ran "${event.detail.value}"`)
+    say('helix-before-select', `Ran "${event.detail.value}"`)
   }
 
   return (
@@ -44,7 +44,7 @@ export function Example() {
         label="Commands"
         onhelix-before-close={closing}
         onhelix-before-open={opening}
-        onhelix-select={ran}
+        onhelix-before-select={ran}
         onToggle={moved}
       >
         <helix-option value="new">New file</helix-option>

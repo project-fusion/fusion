@@ -58,7 +58,7 @@ const press = (element: Menu, kind: string, field: string, value = ''): void => 
 
 const heard = (element: Menu): Facet[] => {
   const seen: Facet[] = []
-  element.addEventListener('helix-facet', (event) => {
+  element.addEventListener('helix-before-facet', (event) => {
     seen.push((event as CustomEvent<Facet>).detail)
   })
   return seen
@@ -321,7 +321,7 @@ describe('a comparison that takes one value', () => {
   test('one row is ticked, and the request to tick it stays inside the picker', async () => {
     const element = await picker(SCALAR)
     const asked: string[] = []
-    element.addEventListener('helix-before-toggle', (event) => asked.push(event.type))
+    element.addEventListener('helix-before-check', (event) => asked.push(event.type))
     press(element, 'value', 'created', 'today')
     await element.updateComplete
     press(element, 'value', 'created', 'week')
@@ -372,7 +372,7 @@ describe('applying a filter from somewhere else', () => {
   test('refused, and everything goes back rather than the menu saying it took', async () => {
     const element = await picker()
     element.apply('disposition', ['refunded'])
-    element.addEventListener('helix-facet', (event) => {
+    element.addEventListener('helix-before-facet', (event) => {
       event.preventDefault()
     })
     expect(element.apply('disposition', ['settled'], 'none')).toBe(false)
@@ -412,23 +412,47 @@ describe('applying a filter from somewhere else', () => {
   })
 })
 
+describe('the notification', () => {
+  test('helix-facet follows a tick that stood, with the set now in force', async () => {
+    const element = await picker()
+    const told: string[][] = []
+    element.addEventListener('helix-facet', (event) => {
+      told.push([...event.detail.values])
+      expect(event.cancelable).toBe(false)
+    })
+    press(element, 'value', 'disposition', 'refunded')
+    expect(told).toEqual([['refunded']])
+  })
+
+  test('and nothing follows a refused one', async () => {
+    const element = await picker()
+    element.addEventListener('helix-before-facet', (event) => event.preventDefault())
+    let told = false
+    element.addEventListener('helix-facet', () => {
+      told = true
+    })
+    press(element, 'value', 'disposition', 'refunded')
+    expect(told).toBe(false)
+  })
+})
+
 describe('refusing', () => {
   /* Control is an action rather than a mode: a consumer takes the decision for
      one interaction by refusing, and the picker must not be left holding a tick
      nobody accepted. */
   test('a refused tick is put back, so the menu keeps showing the truth', async () => {
     const element = await picker()
-    element.addEventListener('helix-facet', (event) => event.preventDefault())
+    element.addEventListener('helix-before-facet', (event) => event.preventDefault())
     press(element, 'value', 'disposition', 'refunded')
     expect(element.valuesFor('disposition')).toEqual([])
   })
 
-  /* A row checks itself after `helix-before-toggle`, and the picker already
+  /* A row checks itself after `helix-before-check`, and the picker already
      sets every tick from what is in force. A refused tick stayed drawn on the
      row, because the picker's own value for it had not changed. */
   test('a refused tick is not drawn on the row either', async () => {
     const element = await picker()
-    element.addEventListener('helix-facet', (event) => event.preventDefault())
+    element.addEventListener('helix-before-facet', (event) => event.preventDefault())
     press(element, 'value', 'disposition', 'refunded')
     await element.updateComplete
     const row = element.shadowRoot?.querySelector(
@@ -439,7 +463,7 @@ describe('refusing', () => {
 
   test('and a refused comparison goes back to the default', async () => {
     const element = await picker()
-    element.addEventListener('helix-facet', (event) => event.preventDefault())
+    element.addEventListener('helix-before-facet', (event) => event.preventDefault())
     press(element, 'operator', 'disposition', 'none')
     const seen = heard(element)
     press(element, 'value', 'disposition', 'refunded')

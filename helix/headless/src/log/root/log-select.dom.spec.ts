@@ -65,10 +65,10 @@ describe('a selectable log', () => {
   test('selects a line on a press, asking first and saying so after', async () => {
     const element = await opened('selectable')
     const heard: string[] = []
-    element.addEventListener('helix-select', (event) =>
+    element.addEventListener('helix-before-select', (event) =>
       heard.push(`select ${(event as CustomEvent).detail.value}`),
     )
-    element.addEventListener('helix-selected', (event) =>
+    element.addEventListener('helix-select', (event) =>
       heard.push(`selected ${(event as CustomEvent).detail.value}`),
     )
     number(lines(element)[2] as Line).click()
@@ -97,7 +97,7 @@ describe('a selectable log', () => {
 
   test('keeps the selection where the request is refused', async () => {
     const element = await opened('selectable')
-    element.addEventListener('helix-select', (event) => event.preventDefault())
+    element.addEventListener('helix-before-select', (event) => event.preventDefault())
     number(lines(element)[0] as Line).click()
     await settle(element)
     expect(element.selectedLines).toBe('')
