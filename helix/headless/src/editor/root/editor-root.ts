@@ -1044,9 +1044,6 @@ export class HelixHeadlessEditor extends HelixElement {
     ) {
       this.renderer.settings?.(this.settings)
     }
-    if (changed.has('readOnly') && this.readOnly) {
-      this.linkOpen = false
-    }
     this.attachFind()
   }
 
@@ -1056,6 +1053,11 @@ export class HelixHeadlessEditor extends HelixElement {
        server's root reports its slots before anything listens, so a
        `slotchange` alone left a served page's actions hidden. */
     this.hasActions = this.knownChildren.some((child) => child.getAttribute('slot') === 'actions')
+    /* A field that turns read-only shuts its link bar in the same render, before
+       the state below reads it, rather than in a second one. */
+    if (changed.has('readOnly') && this.readOnly) {
+      this.linkOpen = false
+    }
     this.toggleState('link-open', this.linkOpen)
     this.toggleState('find-open', this.findOpen)
   }

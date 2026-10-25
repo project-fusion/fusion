@@ -682,6 +682,12 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     if (this.childrenKnown) {
       this.footed = this.knownChildren.some((child) => child.slot === 'footer')
     }
+    /* The controls on screen are read as the palette opens, here rather than
+       in `updated`, so the opening renders them in its own pass instead of a
+       second one. */
+    if (changed.has('open') && this.open) {
+      this.readControls()
+    }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -747,11 +753,6 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
       return
     }
     if (this.open) {
-      this.onScreen = this.controls
-        ? listControls().filter(
-            (control) => control.element !== this && !this.contains(control.element),
-          )
-        : []
       /* Each opening starts with no command highlighted, as React Aria's
          Autocomplete does, so Enter runs nothing until a reader types or moves.
          The highlight a reader left on closing stayed, and a filter emptied on

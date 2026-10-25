@@ -632,6 +632,22 @@ describe('pagination announcements', () => {
     expect(live(nav)?.textContent?.trim()).toBe('Page 9')
   })
 
+  test('says it in the render that moved the page, with no second one after', async () => {
+    // Written in `updated`, the sentence cost a second render on every move.
+    type Host = HTMLElement & {
+      isUpdatePending: boolean
+      page: number
+      updateComplete: Promise<unknown>
+    }
+    const nav = (await mount(
+      '<helix-headless-pagination page="4" pages="12"></helix-headless-pagination>',
+    )) as Host
+    nav.page = 9
+    await nav.updateComplete
+    expect(live(nav)?.textContent?.trim()).toBe('Page 9')
+    expect(nav.isUpdatePending).toBe(false)
+  })
+
   describe('the marks on the ends', () => {
     /* Four names rather than one. A single `<slot name="icon">` is assigned
        once, so three of a consumer's four marks would go quietly missing. */
