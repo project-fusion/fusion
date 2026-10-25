@@ -37,11 +37,37 @@ helix/icons/src/generated.ts
 helix/icons/src/*.generated.ts
 helix/*/src/element-events.generated.ts
 helix/styled/src/sandbox/compile-worker.generated.ts
+# The native components `helix family components` writes, each carrying its
+# family's intermediate forms, which change with every style rule: the ones
+# the styled package compiles, and the ones the native package's specs draw.
+helix/styled/native/*
+# The JSX runtime beside them is written by hand.
+!helix/styled/native/jsx-runtime/
+!helix/styled/native/jsx-dev-runtime/
+helix/native/src/families/*/
+# What `helix family types` and `helix family tokens` write into the runtime:
+# the intermediate form's types, and a token module per mode. The package's
+# `generate` writes them before it builds, checks, or tests.
+helix/native/src/ir.generated.ts
+helix/native/src/theme/*.generated.ts
+helix/styled/src/**/*.generated.css
+# The gallery app's catalog of examples, and what Expo writes beside an app:
+# its own folder, and the native projects `expo prebuild` writes for a build.
+helix/app/src/examples.generated.ts
+helix/app/.expo/
+helix/app/android/
+helix/app/ios/
+# The theme engine `helix/native/scripts/engine.mjs` builds for phones: the
+# libraries and the Swift and Kotlin UniFFI writes for them. The release builds
+# them and the package carries them.
+helix/native/android/src/engine/
+helix/native/ios/theme/engine/
 helix/*/.tsbuild
 helix/speech/vendor/
 helix/styles/src/elements.css
 helix/styles/src/tokens.css
 fusion/site/content/catalog/catalog.generated.json
+fusion/site/content/native/native.generated.json
 fusion/docs/insights/src/pages.generated.ts
 fusion/docs/insights/src/sources.generated.ts
 fusion/site/app/*/helix/theme/themed-page-markup.generated.ts
@@ -51,6 +77,10 @@ helix/docs/content/metrics.mdx
 fusion/site/content/faces/faces.generated.ts
 fusion/site/content/landing/claims.generated.ts
 fusion/scripts/eval/questions.json
+# The conformance record the web half wrote here until October 12, 2026. Each
+# half now writes its own under `.local/conformance`, and a copy left in a
+# checkout from before stays out of a commit.
+helix/testing/src/conformance/record.json
 
 # What `analyze` writes: nine megabytes nobody reads in a diff. Untracked,
 # it cannot go stale, because every consumer builds it. See d350fe53f.
@@ -89,6 +119,9 @@ fusion/site/public/specs
 # `turbo run wasm-copy`. The tracked binary is the one in the package.
 fusion/site/public/helix/theme.wasm
 fusion/site/public/helix-speech/
+# The Helix gallery Expo Go opens, copied from `helix/app/dist` with manifests
+# for the deploy's own address by `scripts/copy-helix-app.mjs`.
+fusion/site/public/helix/app/
 # MapLibre's worker and its shared module, copied from the installed package by
 # `scripts/copy-maplibre.mjs`.
 fusion/site/public/maplibre/
