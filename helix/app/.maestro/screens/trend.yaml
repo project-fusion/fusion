@@ -1,0 +1,24 @@
+# Trend, each example drawn alone: trends judged good and bad, and numbers
+# Hermes formats as percents and currency. One screenshot of each, named by
+# the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Trend"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://trend/preview/preview
+- extendedWaitUntil:
+    visible: '.*Revenue.*'
+    timeout: 30000
+- takeScreenshot: trend-preview-${MODE}-${SIZE}
+- openLink: helix://trend/value/preview
+- extendedWaitUntil:
+    visible: '.*Average order.*'
+    timeout: 15000
+- takeScreenshot: trend-value-${MODE}-${SIZE}
+- openLink: helix://trend/market/preview
+- extendedWaitUntil:
+    visible: '.*Share price.*'
+    timeout: 15000
+- takeScreenshot: trend-market-${MODE}-${SIZE}

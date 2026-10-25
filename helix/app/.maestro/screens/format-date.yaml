@@ -1,0 +1,19 @@
+# Format Date, each example drawn alone: an elapsed reading and one date in
+# three formats, and how long ago in words at each style. One screenshot of
+# each, named by the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Format Date"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://format-date/preview/preview
+- extendedWaitUntil:
+    visible: '.*Mar 14, 2026.*'
+    timeout: 30000
+- takeScreenshot: format-date-preview-${MODE}-${SIZE}
+- openLink: helix://format-date/relative/preview
+- extendedWaitUntil:
+    visible: '.*3 hours ago.*'
+    timeout: 15000
+- takeScreenshot: format-date-relative-${MODE}-${SIZE}

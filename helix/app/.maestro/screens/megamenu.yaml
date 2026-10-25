@@ -1,0 +1,94 @@
+# Megamenu, its examples drawn alone, closed and then open, after the touch
+# the iOS simulator loses on a new screen. One screenshot of each, named by
+# the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Megamenu"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://megamenu/preview/preview
+      - extendedWaitUntil:
+          visible: Products
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: megamenu-preview-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Products
+- extendedWaitUntil:
+    visible: Plan and track work across teams.
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: megamenu-preview-open-${MODE}-${SIZE}
+- openLink: helix://megamenu/open-on-click/preview
+- extendedWaitUntil:
+    visible: Products
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: megamenu-open-on-click-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Products
+- extendedWaitUntil:
+    visible: Reports
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: megamenu-open-on-click-open-${MODE}-${SIZE}
+- openLink: helix://megamenu/several/preview
+- extendedWaitUntil:
+    visible: Solutions
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: megamenu-several-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Solutions
+- extendedWaitUntil:
+    visible: Engineering
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: megamenu-several-open-${MODE}-${SIZE}
+- openLink: helix://megamenu/events/preview
+- extendedWaitUntil:
+    visible: No events yet
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: megamenu-events-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Products
+- extendedWaitUntil:
+    visible: helix-before-open
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: megamenu-events-open-${MODE}-${SIZE}
+- openLink: helix://megamenu/band/preview
+- extendedWaitUntil:
+    visible: Pricing
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: megamenu-band-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Products
+- extendedWaitUntil:
+    visible: Connect the tools your team uses.
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: megamenu-band-open-${MODE}-${SIZE}

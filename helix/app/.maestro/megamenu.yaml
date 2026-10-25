@@ -1,0 +1,53 @@
+# Megamenu: a press on the trigger opens the band of destinations under it,
+# a touch outside closes it, and choosing a destination closes it. The events
+# example logs what the megamenu sends as it opens and as it closes. Recorded.
+appId: dev.fusion.helix.app
+name: Megamenu
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://megamenu/preview/preview
+      SHOWS: Products
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: megamenu
+- tapOn: Products
+- extendedWaitUntil:
+    visible: Plan and track work across teams.
+    timeout: 5000
+- tapOn:
+    point: 50%, 95%
+- extendedWaitUntil:
+    notVisible: Plan and track work across teams.
+    timeout: 5000
+- tapOn: Products
+- extendedWaitUntil:
+    visible: Dashboards
+    timeout: 5000
+- tapOn: Dashboards
+- extendedWaitUntil:
+    notVisible: Track the numbers you care about.
+    timeout: 5000
+- openLink: helix://megamenu/events/preview
+- extendedWaitUntil:
+    visible: No events yet
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Products
+- extendedWaitUntil:
+    visible: helix-before-open
+    timeout: 5000
+- tapOn: Products
+- extendedWaitUntil:
+    visible: helix-before-close
+    timeout: 5000
+- assertVisible: Changed from open to closed
+- stopRecording

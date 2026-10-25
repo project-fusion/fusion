@@ -1,0 +1,19 @@
+# Breadcrumbs, each example drawn alone: a trail of links ending at the
+# current page, and a trail with an icon. One screenshot of each, named by
+# the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Breadcrumbs"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://breadcrumbs/preview/preview
+- extendedWaitUntil:
+    visible: '.*Projects.*'
+    timeout: 30000
+- takeScreenshot: breadcrumbs-preview-${MODE}-${SIZE}
+- openLink: helix://breadcrumbs/links/preview
+- extendedWaitUntil:
+    visible: '.*Settings.*'
+    timeout: 15000
+- takeScreenshot: breadcrumbs-links-${MODE}-${SIZE}

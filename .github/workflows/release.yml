@@ -135,13 +135,20 @@ jobs:
       domain: cortex
       version: ${{ needs.cortex-version.outputs.version }}
 
-  # **Not held back by another domain's binaries**: a Cortex release goes
-  # ahead whatever Helix's did, and a domain whose binaries did not build
-  # refuses in its first step. So the condition is written out rather than left
-  # to the default, which skips a job whose dependency was skipped, and on one
-  # line so it can carry the marker a folded block cannot.
+  # The theme engine for phones, built the same way whatever the version, for
+  # `@fusion.dev/helix-native` to carry: [engine.yml](engine.yml).
+  helix-engine:
+    needs: helix-version
+    uses: ./.github/workflows/engine.yml
+
+  # **Not held back by another domain's binaries or Helix's engine**: a Cortex
+  # release goes ahead whatever Helix's did, and a domain whose binaries or
+  # engine did not build refuses in its first steps. So the condition is
+  # written out rather than left to the default, which skips a job whose
+  # dependency was skipped, and on one line so it can carry the marker a
+  # folded block cannot.
   release:
-    needs: [intent, cortex-binaries, helix-binaries]
+    needs: [intent, cortex-binaries, helix-binaries, helix-engine]
     if: ${{ !cancelled() && needs.intent.result == 'success' && needs.intent.outputs.domains != '[]' && contains(fromJSON('["experimental", "on"]'), vars.PUBLISHING) }}  # dialect:quoted, GitHub's function
     runs-on: ubuntu-latest
     timeout-minutes: 40
@@ -179,6 +186,12 @@ jobs:
         if: matrix.target.domain == 'cortex' && needs.cortex-binaries.result != 'success'
         run: |
           echo "::error::The binaries did not build (${{ needs.cortex-binaries.result }}), and every platform package ships one."
+          exit 1
+
+      - name: Refuse Helix without its theme engine
+        if: matrix.target.domain == 'helix' && needs.helix-engine.result != 'success'
+        run: |
+          echo "::error::The theme engine did not build (${{ needs.helix-engine.result }}), and @fusion.dev/helix-native ships it."
           exit 1
 
       - name: Check out
@@ -286,6 +299,19 @@ jobs:
       # says a version other than this one.
       - name: Put each binary in its platform package
         run: .github/scripts/place-binaries.sh "${{ matrix.target.domain }}" "$RUNNER_TEMP/binaries"
+
+      # The theme engine `@fusion.dev/helix-native` carries, which
+      # `place-engine.sh` refuses to publish without.
+      - name: Fetch the theme engine
+        if: matrix.target.domain == 'helix'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: helix-native-engine-*
+          path: ${{ runner.temp }}/engine
+
+      - name: Put the theme engine in @fusion.dev/helix-native
+        if: matrix.target.domain == 'helix'
+        run: .github/scripts/place-engine.sh "$RUNNER_TEMP/engine"
 
       - name: Publish to staging
         run: bun fusion/scripts/publish.mjs --domain "${{ matrix.target.domain }}" --tag next

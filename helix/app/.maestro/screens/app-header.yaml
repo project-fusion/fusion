@@ -1,0 +1,59 @@
+# App Header, its examples drawn alone, after the touch the iOS simulator
+# loses on a new screen. One screenshot of each, named by the example,
+# `MODE`, and `SIZE`, and one of the preview with another destination
+# current. No example folds the bar at a phone's width, so none opens.
+appId: dev.fusion.helix.app
+name: "Screens: App Header"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://app-header/preview/preview
+      - extendedWaitUntil:
+          visible: Projects
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-preview-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Projects
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-preview-moved-${MODE}-${SIZE}
+- openLink: helix://app-header/navigation-at-the-start/preview
+- extendedWaitUntil:
+    visible: Insights
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-navigation-at-the-start-${MODE}-${SIZE}
+- openLink: helix://app-header/opaque/preview
+- extendedWaitUntil:
+    visible: Your projects
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-opaque-${MODE}-${SIZE}
+- openLink: helix://app-header/glass/preview
+- extendedWaitUntil:
+    visible: Your projects
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-glass-${MODE}-${SIZE}
+- openLink: helix://app-header/transparent/preview
+- extendedWaitUntil:
+    visible: Your projects
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-transparent-${MODE}-${SIZE}
+- openLink: helix://app-header/sticky/preview
+- extendedWaitUntil:
+    visible: Recent activity
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: app-header-sticky-${MODE}-${SIZE}

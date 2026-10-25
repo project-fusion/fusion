@@ -1,0 +1,25 @@
+# Outline, each example drawn alone: links to the sections of a page, nested
+# by level, the same with a smooth scroll and a reading line, and the
+# section being read reported as it changes. One screenshot of each, named
+# by the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Outline"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://outline/preview/preview
+- extendedWaitUntil:
+    visible: '.*Requirements.*'
+    timeout: 30000
+- takeScreenshot: outline-preview-${MODE}-${SIZE}
+- openLink: helix://outline/smooth-with-offset/preview
+- extendedWaitUntil:
+    visible: '.*'
+    timeout: 15000
+- takeScreenshot: outline-smooth-with-offset-${MODE}-${SIZE}
+- openLink: helix://outline/events/preview
+- extendedWaitUntil:
+    visible: '.*'
+    timeout: 15000
+- takeScreenshot: outline-events-${MODE}-${SIZE}

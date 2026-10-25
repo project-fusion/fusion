@@ -1,0 +1,53 @@
+# Popover: the preview's trigger opens the panel and its Close button closes
+# it; a press on the trigger again opens it, and a press outside closes it.
+# The events example logs what the panel sends as its trigger opens and
+# closes it. Recorded.
+appId: dev.fusion.helix.app
+name: Popover
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://popover/preview/preview
+      SHOWS: Project details
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: popover
+- tapOn: Project details
+- extendedWaitUntil:
+    visible: .*12 members and 48 files.*
+    timeout: 5000
+- tapOn: Close
+- extendedWaitUntil:
+    notVisible: .*12 members and 48 files.*
+    timeout: 5000
+- tapOn: Project details
+- extendedWaitUntil:
+    visible: .*12 members and 48 files.*
+    timeout: 5000
+# Outside the panel and its trigger, on the page.
+- tapOn:
+    point: 50%, 90%
+- extendedWaitUntil:
+    notVisible: .*12 members and 48 files.*
+    timeout: 5000
+- openLink: helix://popover/events/preview
+- extendedWaitUntil:
+    visible: Details
+    timeout: 15000
+- tapOn: Details
+- extendedWaitUntil:
+    visible: .*Last edited by Alex Kim.*
+    timeout: 5000
+- assertVisible: helix-before-open
+- tapOn: Details
+- extendedWaitUntil:
+    notVisible: .*Last edited by Alex Kim.*
+    timeout: 5000
+- assertVisible: helix-before-close
+- stopRecording

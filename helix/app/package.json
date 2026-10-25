@@ -1,0 +1,99 @@
+{
+  "name": "@fusion.dev/helix-app",
+  "description": "The Helix gallery on a phone: each component with a native version, and its examples drawn by the native renderer in Expo Go.",
+  "version": "0.223.1",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "directory": "helix/app",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "bundle": "bun run examples && expo export --platform ios --platform android --no-bytecode --output-dir dist",
+    "examples": "bun scripts/examples.ts",
+    "export": "bun run bundle && bun scripts/manifests.ts",
+    "serve": "bun scripts/serve.ts",
+    "start": "bun run examples && expo start",
+    "test": "bun run --filter @fusion.dev/helix-native components && bunx --bun jest",
+    "typecheck": "bun run examples && tsc -p tsconfig.json --noEmit && tsc -p tsconfig.proof.json --noEmit && tsc -p tsconfig.scripts.json --noEmit"
+  },
+  "dependencies": {
+    "@floating-ui/react-native": "0.10.10",
+    "@fusion.dev/helix": "workspace:*",
+    "@fusion.dev/helix-core": "workspace:*",
+    "@fusion.dev/helix-icons": "workspace:*",
+    "@fusion.dev/helix-native": "workspace:*",
+    "@react-navigation/native": "^7.5.0",
+    "@react-navigation/native-stack": "^7.20.0",
+    "expo": "58.0.7",
+    "expo-blur": "~58.0.5",
+    "expo-clipboard": "~58.0.4",
+    "expo-haptics": "~58.0.5",
+    "expo-status-bar": "~58.0.3",
+    "react": "19.3.1",
+    "react-native": "0.88.0-rc.4",
+    "react-native-gesture-handler": "~3.2.1",
+    "react-native-reanimated": "4.7.0",
+    "react-native-safe-area-context": "~5.9.1",
+    "react-native-screens": "~4.28.0",
+    "react-native-svg": "15.15.5",
+    "react-native-worklets": "0.13.0"
+  },
+  "devDependencies": {
+    "@fusion.dev/helix-sandbox": "workspace:*",
+    "@testing-library/react-native": "^14.1.0",
+    "@types/bun": "^1.4.2",
+    "@types/react": "^19.3.0",
+    "jest-expo": "~58.0.9",
+    "react-test-renderer": "19.3.1"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1",
+      "^@fusion\\.dev/helix-core/machines/(.+)/vectors$": "<rootDir>/../core/src/machines/$1/vectors.ts",
+      "^@fusion\\.dev/helix-core/machines/reference$": "<rootDir>/../core/src/machines/reference.ts",
+      "^@fusion\\.dev/helix-native$": "<rootDir>/../native/src/index.ts",
+      "^@fusion\\.dev/helix/(.+)$": "<rootDir>/../native/src/families/$1/index.native.ts",
+      "^helix-proof$": "<rootDir>/proof/index.tsx",
+      "^helix-shared/jsx-(dev-)?runtime$": "<rootDir>/../styled/native/jsx-runtime/index.native.ts"
+    },
+    "preset": "jest-expo",
+    "setupFiles": [
+      "<rootDir>/../native/tests/native.setup.cjs"
+    ],
+    "testMatch": [
+      "<rootDir>/tests/**/*.jest.tsx"
+    ],
+    "transform": {
+      "\\.[jt]sx?$": [
+        "babel-jest",
+        {
+          "overrides": [
+            {
+              "presets": [
+                [
+                  "babel-preset-expo",
+                  {
+                    "jsxImportSource": "helix-shared"
+                  }
+                ]
+              ],
+              "test": "./proof"
+            }
+          ],
+          "presets": [
+            "babel-preset-expo"
+          ]
+        }
+      ]
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|react-navigation|@react-navigation|@formatjs))",
+      "/node_modules/react-native-reanimated/plugin/",
+      "/node_modules/@react-native/babel-preset/"
+    ]
+  }
+}

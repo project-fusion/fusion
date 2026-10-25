@@ -1,0 +1,86 @@
+# Toast: a press on a message's dismiss button closes it, a stack that
+# holds two at a time shows the next one, the page hears each dismissal, a
+# message that offers to undo puts the file back, and a swipe toward the end
+# of the line dismisses a message. Recorded.
+#
+# Each message's dismiss button is named "Dismiss", so a step names the one
+# it presses by its place. The stack stands at the bottom of the window, so
+# the touch the iOS simulator loses on a new screen lands in its middle.
+appId: dev.fusion.helix.app
+name: Toast
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://toast/preview/preview
+      SHOWS: Project saved.
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 40%
+    retryTapIfNoChange: false
+- startRecording: toast
+- tapOn:
+    text: Dismiss
+    index: 0
+- extendedWaitUntil:
+    notVisible: Project saved.
+    timeout: 5000
+- assertVisible: Could not reach the server.
+- takeScreenshot: toast-preview-dismissed
+- swipe:
+    from: Could not reach the server.
+    direction: RIGHT
+- extendedWaitUntil:
+    notVisible: Could not reach the server.
+    timeout: 5000
+- openLink: helix://toast/queue/preview
+- extendedWaitUntil:
+    visible: Project saved.
+    timeout: 15000
+- tapOn:
+    point: 50%, 40%
+    retryTapIfNoChange: false
+- assertNotVisible: A comment was added to Roadmap.
+- tapOn:
+    text: Dismiss
+    index: 0
+- extendedWaitUntil:
+    visible: A comment was added to Roadmap.
+    timeout: 5000
+- takeScreenshot: toast-queue-next
+- openLink: helix://toast/events/preview
+- extendedWaitUntil:
+    visible: No events yet
+    timeout: 15000
+- tapOn:
+    point: 50%, 40%
+    retryTapIfNoChange: false
+- tapOn:
+    text: Dismiss
+    index: 1
+- extendedWaitUntil:
+    visible: helix-dismiss
+    timeout: 5000
+- takeScreenshot: toast-events-heard
+- openLink: helix://toast/undo/preview
+- extendedWaitUntil:
+    visible: Quarterly report.pdf
+    timeout: 15000
+- tapOn:
+    point: 50%, 40%
+    retryTapIfNoChange: false
+- tapOn:
+    text: Archive
+    index: 0
+- extendedWaitUntil:
+    visible: Archived Quarterly report.pdf
+    timeout: 5000
+- takeScreenshot: toast-undo-offered
+- tapOn: Undo
+- extendedWaitUntil:
+    visible: Quarterly report.pdf
+    timeout: 5000
+- stopRecording

@@ -1,0 +1,81 @@
+# The proof page, a project dashboard written once for the web and a phone:
+# the list of projects, and one project's overview, activity, and settings.
+# One screenshot of each, named by the screen, `MODE`, and `SIZE`.
+#
+# **Each screen opens by its own link, and its screenshot waits for a sign at
+# its top.** The flow tapped a row, then scrolled to each tab and to text in
+# each panel, and run 39856024038 failed four ways. On Android at the largest
+# text size the swipes went past the Progress heading to the end of the
+# overview. On iOS at the largest size the swipes up went past the tabs to the
+# project's title. On Android at the default size the page fit on the screen,
+# so the swipes scrolled the Activity panel's own Scroll Area instead, and hid
+# its first change at the top. A link names the project and the tab, as
+# `helix://proof/website/activity`, so no screen needs a tap or a
+# scroll. The interactions flow, `proof.yaml`, taps the rows and tabs.
+#
+# **The list opens before each project link.** The project's title shows at
+# the top of each of its tabs, but a row on the list and the project before
+# show it too. The list's count goes when the project link takes its place,
+# and then the title is the project's own.
+appId: dev.fusion.helix.app
+name: "Screens: Proof page"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://proof
+      - extendedWaitUntil:
+          visible: 3 active, 1 at risk
+          timeout: 30000
+- takeScreenshot: proof-projects-${MODE}-${SIZE}
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://proof
+      - extendedWaitUntil:
+          visible: 3 active, 1 at risk
+          timeout: 30000
+      - openLink: helix://proof/website/overview
+      - extendedWaitUntil:
+          notVisible: 3 active, 1 at risk
+          timeout: 30000
+      - extendedWaitUntil:
+          visible: Website redesign
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: proof-overview-${MODE}-${SIZE}
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://proof
+      - extendedWaitUntil:
+          visible: 3 active, 1 at risk
+          timeout: 30000
+      - openLink: helix://proof/website/activity
+      - extendedWaitUntil:
+          notVisible: 3 active, 1 at risk
+          timeout: 30000
+      - extendedWaitUntil:
+          visible: Website redesign
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: proof-activity-${MODE}-${SIZE}
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://proof
+      - extendedWaitUntil:
+          visible: 3 active, 1 at risk
+          timeout: 30000
+      - openLink: helix://proof/website/settings
+      - extendedWaitUntil:
+          notVisible: 3 active, 1 at risk
+          timeout: 30000
+      - extendedWaitUntil:
+          visible: Website redesign
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: proof-settings-${MODE}-${SIZE}

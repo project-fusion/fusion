@@ -729,6 +729,19 @@ jobs:
         uses: ./.github/actions/setup
       - name: Run the specs
         run: bunx turbo run test --filter=!@fusion.dev/helix-docs --filter=!@fusion.dev/site
+      # **What React Native did in the conformance scenarios**, which the
+      # native specs write and the `conformance` job compares with the web's.
+      # A run whose specs failed keeps it too, so the comparison still says what
+      # differs.
+      - name: Keep the React Native conformance record
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          if-no-files-found: ignore
+          include-hidden-files: true
+          name: conformance-react-native
+          path: .local/conformance/react-native.json
+          retention-days: 7
 
   # **Cargo, from the first second of the run.** It was one job holding every
   # step that touches Rust, and `needs: warm` put the toolchain install, the
@@ -1281,6 +1294,20 @@ jobs:
           path: .local/diagnostics/examples.json
           retention-days: 14
 
+      # **What the web elements did in the conformance scenarios**, which
+      # `specs:browser` writes for the families a shard holds, in the browser it
+      # ran. Only the shards holding a conformance family write one, which
+      # `ignore` covers, and the `conformance` job reads them all.
+      - name: Keep the web conformance record
+        if: always() && startsWith(matrix.task, 'specs')
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          if-no-files-found: ignore
+          include-hidden-files: true
+          name: conformance-${{ matrix.id }}
+          path: .local/conformance
+          retention-days: 7
+
       # **Every visual shard keeps its run record, passing or not**, for the
       # history a later run reads: which shots keep needing a second take, and
       # which changes fail on branches that did not make them. A record is the
@@ -1319,6 +1346,44 @@ jobs:
             .helix/visual
             .helix/dsd
             .local/diagnostics/*.json
+
+  # **The web against React Native, once both halves have written their
+  # records.** The specs shards record what the web elements did in the
+  # conformance scenarios, in Chromium and in WebKit, and `tests` records what
+  # React Native did, each as an artifact of a few tens of kilobytes. This holds
+  # WebKit to Chromium exactly, and React Native to the web through the events
+  # its neutral form declares, with the differences in
+  # `helix/native/tests/conformance/known.ts` reported:
+  # [helix/testing](../../helix/testing/README.md#conformance).
+  #
+  # **A job of its own, because it is the one step that needs both.** Its cost
+  # is a checkout, the install, and a cached build of `helix-testing`, and the
+  # comparison itself takes under a second. Skipped with the browser matrix,
+  # for a diff that reaches no component, and run beside a failure in either
+  # job it needs, so a difference shows in the same run as an unrelated
+  # failure.
+  conformance:
+    needs: [browser, tests]
+    if: ${{ !cancelled() && needs.browser.result != 'skipped' && needs.tests.result != 'skipped' }}  # dialect:quoted, GitHub's function
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+        with:
+          helix: false
+      - name: Build the scenarios and the comparison
+        run: bunx turbo run build --filter=@fusion.dev/helix-testing
+      # A folder per artifact, so the shards of one browser keep a file each.
+      - name: Fetch the records
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: ${{ runner.temp }}/conformance
+          pattern: conformance-*
+      - name: Compare the web and React Native
+        run: bun fusion/scripts/compare-conformance.mjs --from "$RUNNER_TEMP/conformance"
 
   # **The examples' changes as one summary, when a visual shard failed.** Each
   # shard groups only the shots it pictured, so one change across the corpus
@@ -1641,7 +1706,7 @@ jobs:
   verify:
     if: always()
     needs:
-      [proven, plan, warm, warm-browser, checks, cli, floors, packaging, typings, lint, types, tests, rust, clippy, browser, site]
+      [proven, plan, warm, warm-browser, checks, cli, floors, packaging, typings, lint, types, tests, rust, clippy, browser, conformance, site]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

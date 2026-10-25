@@ -1,0 +1,65 @@
+# Drawer: the sheet opens from its button and a swipe down on its title
+# takes it out; the list example's sheet, resting half open, opens further
+# under a drag up on its list, scrolls its list once whole, and hands its
+# drag back to the sheet only once the list stands at its top and has stood
+# still. Recorded.
+appId: dev.fusion.helix.app
+name: Drawer
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://drawer/sheet/preview
+      SHOWS: Open filters
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: drawer
+- tapOn: Open filters
+- extendedWaitUntil:
+    visible: .*Show projects by owner.*
+    timeout: 5000
+- swipe:
+    from: Filters
+    direction: DOWN
+    duration: 300
+- extendedWaitUntil:
+    notVisible: .*Show projects by owner.*
+    timeout: 5000
+- openLink: helix://drawer/list/preview
+- extendedWaitUntil:
+    visible: .*Quarterly report.*
+    timeout: 15000
+# Half open, a drag up on the list opens the sheet to the whole.
+- swipe:
+    from: .*Launch plan.*
+    direction: UP
+    duration: 400
+- waitForAnimationToEnd:
+    timeout: 3000
+# Whole, a drag up scrolls the list to its last file.
+- scrollUntilVisible:
+    element: .*Onboarding checklist.*
+    direction: DOWN
+    timeout: 15000
+- assertVisible: .*Recent files.*
+- takeScreenshot: drawer-list-scrolled
+# Back at its top, and still for half a second, a drag down takes the sheet.
+- scrollUntilVisible:
+    element: .*Quarterly report.*
+    direction: UP
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 3000
+- swipe:
+    from: .*Hiring tracker.*
+    direction: DOWN
+    duration: 300
+- extendedWaitUntil:
+    notVisible: .*Quarterly report.*
+    timeout: 5000
+- stopRecording

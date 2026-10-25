@@ -1,0 +1,42 @@
+# Tooltip: a long press on the preview's button shows its bubble, and a
+# touch elsewhere takes it down; a quick press on the button presses it and
+# shows nothing. The events example logs what the bubble sends as a long
+# press shows it. Recorded.
+appId: dev.fusion.helix.app
+name: Tooltip
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://tooltip/preview/preview
+      SHOWS: Save changes
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: tooltip
+- longPressOn: Save changes
+- extendedWaitUntil:
+    visible: Save your changes to the file
+    timeout: 5000
+- takeScreenshot: tooltip-shown
+- tapOn:
+    point: 50%, 90%
+- extendedWaitUntil:
+    notVisible: Save your changes to the file
+    timeout: 5000
+- tapOn: Save changes
+- assertNotVisible: Save your changes to the file
+- openLink: helix://tooltip/events/preview
+- extendedWaitUntil:
+    visible: Publish page
+    timeout: 15000
+- longPressOn: Publish page
+- extendedWaitUntil:
+    visible: Make the page visible to everyone
+    timeout: 5000
+- assertVisible: helix-before-open
+- stopRecording

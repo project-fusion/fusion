@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "android": {
+      "package": "dev.fusion.helix.app"
+    },
+    "ios": {
+      "bundleIdentifier": "dev.fusion.helix.app"
+    },
+    "name": "Helix",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "scheme": "helix",
+    "slug": "helix-app",
+    "userInterfaceStyle": "automatic"
+  }
+}
