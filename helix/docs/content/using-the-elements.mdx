@@ -37,8 +37,9 @@ and it is still open. The elements work around it for you.
 
 Every Helix element binds the handler itself, just before it dispatches any
 event, using the function React already holds for it. We measured this in
-Chrome against React 19.2.8. On a hydrated page, the first event reaches the
-handler. After React binds its own listener, no event is delivered twice.
+Chrome against React 19.2.8, and the React bug is still open in 19.3. On a
+hydrated page, the first event reaches the handler. After React binds its own
+listener, no event is delivered twice.
 
 You do not need to do anything, and nothing changes when React fixes the bug.
 
