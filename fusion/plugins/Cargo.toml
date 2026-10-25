@@ -46,7 +46,7 @@ url = { version = "2", optional = true }
 # without generating native code, which is the trade a check wants: a rule runs
 # for milliseconds, so compiling to native buys nothing a portable interpreter
 # does not already give, and the artifact stays the same on every platform.
-wasmtime = { version = "49", default-features = false, optional = true, features = [
+wasmtime = { version = "50", default-features = false, optional = true, features = [
   "component-model",
   "cranelift",
   "pulley",
