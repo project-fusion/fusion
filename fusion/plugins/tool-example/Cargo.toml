@@ -1,0 +1,30 @@
+[package]
+name = "fusion-tool-example"
+description = "An example tool, built the way somebody outside this repository would build one."
+edition = "2024"
+license = "MIT"
+publish = false
+rust-version = "1.96"
+version = "0.0.0-dev"
+
+# **Its own workspace, which is what detaches it from the one above**, as the
+# rule example's is: it compiles for `wasm32-unknown-unknown` and for nothing
+# else.
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[features]
+# **Two tools that never stop, for the tests that stop them.** A limit cannot
+# be measured without a module that reaches it, and the example an author
+# copies should not carry either.
+unruly = []
+
+[dependencies]
+serde_json = "1"
+wit-bindgen = "0.57"
+
+[profile.release]
+opt-level = "s"
+strip = true

@@ -5,7 +5,7 @@
 //! two calls. What it judges is deliberately small and real, a description
 //! nobody finished, so the example is about the boundary rather than the rule.
 
-wit_bindgen::generate!({ path: "../wit", world: "plugin" });
+wit_bindgen::generate!({ path: "../wit/rules.wit", world: "plugin" });
 
 use serde::Deserialize;
 

@@ -146,10 +146,16 @@ updates:
     package-ecosystem: npm
     schedule:
       interval: weekly
+  # **`wit-component` moves with `wasmtime`, so it is ignored here.** The tests
+  # take it at the wasm-tools release `wasmtime` is built on, and a newer one
+  # compiles a second `wasmparser` and `wasm-encoder`: 0.258 beside 0.260 until
+  # October 16, 2026. `fusion/plugins/Cargo.toml` says so where it is pinned.
   - directory: /
     groups:
       cargo:
         patterns: ['*']
+    ignore:
+      - dependency-name: 'wit-component'
     open-pull-requests-limit: 3
     package-ecosystem: cargo
     schedule:

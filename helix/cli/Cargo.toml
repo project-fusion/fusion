@@ -27,7 +27,7 @@ fusion-helix-visual = { path = "../visual" }
 # **The host that runs a rule somebody else wrote.** It knows what a module is
 # and not what a component is, so the payload a plugin receives is composed here
 # and the sandbox is enforced there.
-fusion-plugins = { workspace = true }
+fusion-plugins = { workspace = true, features = ["wasm"] }
 # **What a rule is, and the runner that measures a set of them.** Shared with
 # `fusion-cli` and owned by neither product, so this is not a dependency on the
 # fusion domain: the crate's `lib.rs` carries the argument.
@@ -55,8 +55,9 @@ oxc_ast_visit = "0.154.0"
 [dev-dependencies]
 # Encodes the example plugin into a component, which is what a plugin author's
 # toolchain does for them: the end-to-end test takes the path an author takes
-# rather than reading an artifact somebody committed.
-wit-component = "0.262"
+# rather than reading an artifact somebody committed. At the version
+# `fusion-plugins` tests with, for the reason given there.
+wit-component = "0.258"
 # `helix visual compare`'s tests write their own pictures rather than reading
 # committed ones.
 png = "0.18"

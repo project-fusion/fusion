@@ -1,0 +1,50 @@
+package fusion:tools@1.0.0;
+
+/// What the host lends a tool. Each function is checked against the grant the
+/// person gave the extension the tool came from, and a call the grant does not
+/// cover fails with a sentence saying so, before anything is read or sent.
+interface host {
+  /// The text of a file. The grant names the folders a tool may read, and
+  /// the path is resolved through every link before it is checked.
+  read-file: func(path: string) -> result<string, string>;
+
+  /// The text a URL answers with. The grant names the hosts a tool may
+  /// reach, each with its subdomains.
+  fetch: func(url: string) -> result<string, string>;
+
+  /// The value of an environment variable. The grant names the variables a
+  /// tool may read, such as a token its service needs.
+  secret: func(name: string) -> result<string, string>;
+}
+
+/// What a tool written outside the host application exports.
+///
+/// The version of this world it was built against, the tools it provides, and
+/// one function that runs a call. A call's input and answer are JSON strings,
+/// as a model's tool call is, so the host passes the model's input through
+/// unchanged.
+world tool {
+  import host;
+
+  /// One tool, as the model is offered it.
+  record spec {
+    /// Unique across the tools the module provides.
+    name: string,
+    /// What the tool does, in the words the model reads.
+    description: string,
+    /// The JSON Schema of the input, as a string.
+    input-schema: string,
+    /// Whether a call only reads. A call that does more is held until the
+    /// person approves the tool.
+    read-only: bool,
+  }
+
+  /// The version of this world the module was built against.
+  export world-version: func() -> u32;
+
+  /// Every tool this module provides.
+  export tools: func() -> list<spec>;
+
+  /// Run one call. JSON in, text out.
+  export call: func(name: string, input: string) -> result<string, string>;
+}
