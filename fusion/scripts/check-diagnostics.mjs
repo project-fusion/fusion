@@ -27,6 +27,7 @@
 import { readFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
+import { leave } from '@fusion.dev/scripts/leave'
 import { ARTIFACT, root, SOURCE } from '@fusion.dev/scripts/workspace'
 import { chromium } from 'playwright'
 
@@ -500,5 +501,5 @@ if (problems.length > 0) {
   for (const problem of problems) {
     console.error(`diagnostics: ${problem}`)
   }
-  process.exit(1)
+  await leave(1)
 }
