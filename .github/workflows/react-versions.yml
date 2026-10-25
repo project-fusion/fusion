@@ -1,0 +1,41 @@
+# **Helix's React bridge on every React a consumer might install, once a
+# week.** Renders a page on the server and hydrates it in Chromium on React
+# 18.3, 19.0, 19.2, `latest` and `canary`, and writes to its summary page, for
+# each, whether the bridge was needed and whether it worked:
+# [check-react-versions.mjs](../../fusion/scripts/check-react-versions.mjs)
+# says how it tells.
+#
+# **Weekly rather than in `verify`**, because what changes here is npm's
+# `latest` and `canary`, which no commit of ours moves; the React the site
+# installs is `verify`'s, in the `site` job. Red only where the bridge fails on
+# a version Helix supports. The week a version no longer needs it, the run
+# says so in a notice.
+name: React versions
+
+on:
+  schedule:
+    - cron: '0 14 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+
+      - name: Build the elements
+        run: bunx turbo run build --filter=@fusion.dev/helix
+
+      - name: Install Chromium
+        uses: ./.github/actions/browser
+
+      - name: Hydrate on each React
+        run: bun fusion/scripts/check-react-versions.mjs
