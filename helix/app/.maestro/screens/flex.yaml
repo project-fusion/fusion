@@ -1,0 +1,27 @@
+# Flex, each example drawn alone: a row, the split, cluster, and flank
+# layouts, and a flex inside a sentence. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+#
+# The tags above the sentence with a flex in it can fill the screen at the
+# largest text size, so the flow waits for the title of its screen.
+appId: dev.fusion.helix.app
+name: "Screens: Flex"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://flex/preview/preview
+- extendedWaitUntil:
+    visible: '.*Jane Doe.*'
+    timeout: 30000
+- takeScreenshot: flex-preview-${MODE}-${SIZE}
+- openLink: helix://flex/layouts/preview
+- extendedWaitUntil:
+    visible: '.*Invoices.*'
+    timeout: 15000
+- takeScreenshot: flex-layouts-${MODE}-${SIZE}
+- openLink: helix://flex/wrap-and-inline/preview
+- extendedWaitUntil:
+    visible: 'Wrap And Inline'
+    timeout: 15000
+- takeScreenshot: flex-wrap-and-inline-${MODE}-${SIZE}

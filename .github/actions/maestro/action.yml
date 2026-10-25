@@ -1,0 +1,30 @@
+# Maestro, which runs the gallery's flows on a simulator or an emulator, at the
+# version and digest held here and nowhere else.
+#
+# **The release's zip, checked against its SHA-256 before anything in it
+# runs.** Maestro's own install script pipes a download into a shell and takes
+# whatever version is newest. The digest is the one GitHub lists for the
+# release's `maestro.zip`, and its `checksums_sha256.txt` says the same. A bump
+# changes both lines below.
+#
+# Maestro runs on Java 17 or later, which every runner image here carries.
+name: Install Maestro
+description: Downloads Maestro's release, checks its digest, and puts `maestro` on the path.
+
+runs:
+  using: composite
+  steps:
+    - name: Download Maestro and check its digest
+      shell: bash
+      env:
+        DIGEST: 5384593cb4e7a106489e75a821d157dd43f4e438df6bc308b72e82c685e1283a
+        VERSION: 2.11.0
+      run: |
+        set -euo pipefail
+        curl --fail --location --retry 3 --show-error --silent \
+          --output "$RUNNER_TEMP/maestro.zip" \
+          "https://github.com/mobile-dev-inc/maestro/releases/download/cli-$VERSION/maestro.zip"
+        echo "$DIGEST  $RUNNER_TEMP/maestro.zip" | shasum --algorithm 256 --check --strict
+        unzip -o -q "$RUNNER_TEMP/maestro.zip" -d "$RUNNER_TEMP"
+        echo "$RUNNER_TEMP/maestro/bin" >> "$GITHUB_PATH"
+        "$RUNNER_TEMP/maestro/bin/maestro" --version

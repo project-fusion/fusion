@@ -1,0 +1,89 @@
+# Right to left: the gallery's own check, `helix://checks/rtl`, sets React
+# Native's direction, which it reads once as the app starts, so the flow
+# stops the gallery and opens it again. Then a screenshot of each example
+# whose offsets follow the direction: a badge's corner, the shared term
+# column, crumbs and stages in a row, the ends of a bar, and a flex row.
+#
+# The term column check finds a value to the left of its term, and is
+# optional until a night shows how iOS groups a row's words. The flow sets
+# left to right again at its end, passed or failed, and stops the gallery so
+# the next flow starts left to right.
+appId: dev.fusion.helix.app
+name: Right to left
+tags:
+  - interactions
+onFlowComplete:
+  - retry:
+      maxRetries: 1
+      commands:
+        - openLink: helix://checks/ltr
+  - extendedWaitUntil:
+      optional: true
+      visible: .*left to right from its next launch.*
+      timeout: 15000
+  - stopApp
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://checks/rtl
+      SHOWS: .*right to left from its next launch.*
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://checks/rtl
+      SHOWS: 'Now: right to left'
+- openLink: helix://badge/preview/preview
+- extendedWaitUntil:
+    visible: .*Notifications.*
+    timeout: 15000
+- takeScreenshot: rtl-badge
+- openLink: helix://description-list/preview/preview
+- extendedWaitUntil:
+    visible: .*Owner.*
+    timeout: 15000
+- assertVisible:
+    leftOf: Owner
+    optional: true
+    text: Ada Okonjo
+- takeScreenshot: rtl-description-list
+- openLink: helix://breadcrumbs/links/preview
+- extendedWaitUntil:
+    visible: .*Projects.*
+    timeout: 15000
+- takeScreenshot: rtl-breadcrumbs
+- openLink: helix://steps/preview/preview
+- extendedWaitUntil:
+    visible: .*Payment.*
+    timeout: 15000
+- takeScreenshot: rtl-steps
+- openLink: helix://meter/low-high-optimum/preview
+- extendedWaitUntil:
+    visible: .*Disk used.*
+    timeout: 15000
+- takeScreenshot: rtl-meter
+- openLink: helix://progress/preview/preview
+- extendedWaitUntil:
+    visible: .*Uploading.*
+    timeout: 15000
+- takeScreenshot: rtl-progress
+- openLink: helix://switch/preview/preview
+- extendedWaitUntil:
+    visible: .*Email notifications.*
+    timeout: 15000
+- takeScreenshot: rtl-switch
+- openLink: helix://stat/trend/preview
+- extendedWaitUntil:
+    visible: .*Response time.*
+    timeout: 15000
+- takeScreenshot: rtl-stat
+- openLink: helix://flex/layouts/preview
+- extendedWaitUntil:
+    visible: .*Invoices.*
+    timeout: 15000
+- takeScreenshot: rtl-flex
+- openLink: helix://grid/spans/preview
+- extendedWaitUntil:
+    visible: .*Revenue.*
+    timeout: 15000
+- takeScreenshot: rtl-grid

@@ -1,0 +1,68 @@
+# Navigation, its examples drawn alone, with the first destination current
+# and then with another, after the touch the iOS simulator loses on a new
+# screen. One screenshot of each, named by the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Navigation"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://navigation/preview/preview
+      - extendedWaitUntil:
+          visible: Activity
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-preview-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Settings
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-preview-moved-${MODE}-${SIZE}
+- openLink: helix://navigation/underlined/preview
+- extendedWaitUntil:
+    visible: Activity
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-underlined-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Activity
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-underlined-moved-${MODE}-${SIZE}
+- openLink: helix://navigation/segmented/preview
+- extendedWaitUntil:
+    visible: Activity
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-segmented-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Activity
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-segmented-moved-${MODE}-${SIZE}
+- openLink: helix://navigation/vertical/preview
+- extendedWaitUntil:
+    visible: Who can see and change this workspace.
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-vertical-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Security
+- extendedWaitUntil:
+    visible: Sign-in rules and the devices signed in.
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-vertical-moved-${MODE}-${SIZE}

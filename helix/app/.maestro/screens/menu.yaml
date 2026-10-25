@@ -1,0 +1,54 @@
+# Menu, its examples drawn alone, closed and then open, after the touch the
+# iOS simulator loses on a new screen. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Menu"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://menu/preview/preview
+      - extendedWaitUntil:
+          visible: View options
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: menu-preview-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: View options
+- extendedWaitUntil:
+    visible: Sort by
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: menu-preview-open-${MODE}-${SIZE}
+- tapOn: Sort by
+- extendedWaitUntil:
+    visible: Date modified
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: menu-preview-page-${MODE}-${SIZE}
+- openLink: helix://menu/sections/preview
+- extendedWaitUntil:
+    visible: Edit
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Edit
+- extendedWaitUntil:
+    visible: Clipboard
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: menu-sections-${MODE}-${SIZE}
+- openLink: helix://menu/long-press/preview
+- extendedWaitUntil:
+    visible: Undo
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: menu-long-press-${MODE}-${SIZE}

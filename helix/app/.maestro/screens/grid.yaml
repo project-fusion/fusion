@@ -1,0 +1,30 @@
+# Grid, each example drawn alone: the native grid engine: tracks from a
+# minimum width, aligned cells, and spans. One screenshot of each, named by
+# the example, `MODE`, and `SIZE`.
+#
+# At the largest text size the aligned cells are a few letters wide, and the
+# middle one, whose words are longest, is taller than the screen, so the
+# cells centered beside it start below the bottom: the flow waits for the
+# title of that example's screen. A simulator found no "Starter" there in run
+# 38957410938.
+appId: dev.fusion.helix.app
+name: "Screens: Grid"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://grid/preview/preview
+- extendedWaitUntil:
+    visible: '.*Orders.*'
+    timeout: 30000
+- takeScreenshot: grid-preview-${MODE}-${SIZE}
+- openLink: helix://grid/aligned/preview
+- extendedWaitUntil:
+    visible: 'Aligned'
+    timeout: 15000
+- takeScreenshot: grid-aligned-${MODE}-${SIZE}
+- openLink: helix://grid/spans/preview
+- extendedWaitUntil:
+    visible: '.*Reports.*'
+    timeout: 15000
+- takeScreenshot: grid-spans-${MODE}-${SIZE}

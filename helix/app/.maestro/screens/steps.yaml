@@ -1,0 +1,24 @@
+# Steps, each example drawn alone: steps with the current one marked,
+# numbered steps, and vertical steps with descriptions. One screenshot of
+# each, named by the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Steps"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://steps/preview/preview
+- extendedWaitUntil:
+    visible: '.*Payment.*'
+    timeout: 30000
+- takeScreenshot: steps-preview-${MODE}-${SIZE}
+- openLink: helix://steps/numeric/preview
+- extendedWaitUntil:
+    visible: '.*Shipping.*'
+    timeout: 15000
+- takeScreenshot: steps-numeric-${MODE}-${SIZE}
+- openLink: helix://steps/vertical/preview
+- extendedWaitUntil:
+    visible: '.*Create account.*'
+    timeout: 15000
+- takeScreenshot: steps-vertical-${MODE}-${SIZE}

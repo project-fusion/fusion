@@ -1,0 +1,41 @@
+# Drilldown, each example drawn alone: the top page of each, and the
+# preview's Appearance page, opened with one tap after the touch the iOS
+# simulator loses on a new screen. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Drilldown"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://drilldown/preview/preview
+      - extendedWaitUntil:
+          visible: Appearance
+          timeout: 30000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: drilldown-preview-${MODE}-${SIZE}
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Appearance
+- extendedWaitUntil:
+    visible: Density
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: drilldown-preview-page-${MODE}-${SIZE}
+- openLink: helix://drilldown/navigation/preview
+- extendedWaitUntil:
+    visible: Documentation
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: drilldown-navigation-${MODE}-${SIZE}
+- openLink: helix://drilldown/events/preview
+- extendedWaitUntil:
+    visible: Account
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: drilldown-events-${MODE}-${SIZE}

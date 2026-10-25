@@ -1,0 +1,58 @@
+# Navigation: a press on a destination, which the example takes as a router
+# does, marks it the current page and moves the mark to it, along a row and
+# down the sidebar's column, whose words change with it. Recorded.
+#
+# React Native has no state for the current destination, so Helix gives it
+# the value "Current page", which iOS reads after its name and Maestro reads
+# as the element's text. Android keeps the value where Maestro does not read
+# it. The steps that read it are optional until a night shows what iOS gives.
+appId: dev.fusion.helix.app
+name: Navigation
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://navigation/preview/preview
+      SHOWS: Activity
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: navigation
+- tapOn: Activity
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-preview-activity
+- tapOn: Settings
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-preview-settings
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          optional: true
+          text: Current page
+- openLink: helix://navigation/vertical/preview
+- extendedWaitUntil:
+    visible: Who can see and change this workspace.
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- tapOn: Billing
+- extendedWaitUntil:
+    visible: Your plan, invoices, and payment method.
+    timeout: 5000
+- tapOn: Security
+- extendedWaitUntil:
+    visible: Sign-in rules and the devices signed in.
+    timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 5000
+- takeScreenshot: navigation-vertical-security
+- stopRecording

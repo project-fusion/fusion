@@ -1,0 +1,19 @@
+# Empty, each example drawn alone: an empty state with an icon and an action,
+# and one with a heading of its own. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Empty"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://empty/preview/preview
+- extendedWaitUntil:
+    visible: '.*No projects yet.*'
+    timeout: 30000
+- takeScreenshot: empty-preview-${MODE}-${SIZE}
+- openLink: helix://empty/heading/preview
+- extendedWaitUntil:
+    visible: '.*No matching invoices.*'
+    timeout: 15000
+- takeScreenshot: empty-heading-${MODE}-${SIZE}

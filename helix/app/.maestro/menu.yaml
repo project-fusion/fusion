@@ -1,0 +1,50 @@
+# Menu: a press on the trigger opens the menu, a row with a page shows it
+# under the way back, which returns to the top page, and choosing a row
+# closes the menu. The events example logs what the menu sends as it opens,
+# as a row is chosen, and as it closes. Recorded.
+appId: dev.fusion.helix.app
+name: Menu
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://menu/preview/preview
+      SHOWS: View options
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: menu
+- tapOn: View options
+- extendedWaitUntil:
+    visible: Sort by
+    timeout: 5000
+- tapOn: Sort by
+- extendedWaitUntil:
+    visible: Date modified
+    timeout: 5000
+- tapOn: Back
+- extendedWaitUntil:
+    visible: Show hidden files
+    timeout: 5000
+- tapOn: Show file extensions
+- extendedWaitUntil:
+    notVisible: Show hidden files
+    timeout: 5000
+- openLink: helix://menu/events/preview
+- extendedWaitUntil:
+    visible: Actions
+    timeout: 15000
+- tapOn: Actions
+- extendedWaitUntil:
+    visible: Rename
+    timeout: 5000
+- tapOn: Rename
+- extendedWaitUntil:
+    visible: .*"rename".*
+    timeout: 5000
+- assertVisible: helix-before-close
+- stopRecording

@@ -1,0 +1,48 @@
+# Avatar, each example drawn alone: initials from a name, the three sizes,
+# the two shapes, photographs, a picture that fails with the initials in its
+# place, and a group folded into a count. One screenshot of each, named by
+# the example, `MODE`, and `SIZE`.
+#
+# An avatar is a picture named by its name, which a screen reader reaches. A
+# photograph from the network can take a moment, so a screen of them waits
+# two seconds after its title.
+appId: dev.fusion.helix.app
+name: "Screens: Avatar"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://avatar/preview/preview
+- extendedWaitUntil:
+    visible: 'Preview'
+    timeout: 30000
+- takeScreenshot: avatar-preview-${MODE}-${SIZE}
+- openLink: helix://avatar/sizes/preview
+- extendedWaitUntil:
+    visible: 'Sizes'
+    timeout: 15000
+- takeScreenshot: avatar-sizes-${MODE}-${SIZE}
+- openLink: helix://avatar/shapes/preview
+- extendedWaitUntil:
+    visible: 'Shapes'
+    timeout: 15000
+- takeScreenshot: avatar-shapes-${MODE}-${SIZE}
+- openLink: helix://avatar/image/preview
+- extendedWaitUntil:
+    visible: 'Image'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: avatar-image-${MODE}-${SIZE}
+- openLink: helix://avatar/broken-image/preview
+- extendedWaitUntil:
+    visible: 'Broken image'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 2000
+- takeScreenshot: avatar-broken-image-${MODE}-${SIZE}
+- openLink: helix://avatar/group/preview
+- extendedWaitUntil:
+    visible: 'Group'
+    timeout: 15000
+- takeScreenshot: avatar-group-${MODE}-${SIZE}

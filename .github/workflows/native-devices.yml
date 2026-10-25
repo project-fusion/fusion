@@ -1,0 +1,462 @@
+# **The native gallery on an iOS simulator and an Android emulator, once a
+# night.** A release build of `helix/app` runs the Maestro flows in
+# `helix/app/.maestro`. They press, drag, and select each family the gallery
+# draws natively, read what a screen reader hears of it, and on Android move
+# through it with a keyboard's arrow keys. Each family's examples get a
+# screenshot in light and dark at the default and the largest text size, and
+# each family with a behavior gets a video. The list of 1,000 rows gives a
+# frame rate. `helix/app/scripts/devices.sh` runs the passes, and its header
+# says what each one does. What they make stays in the run's artifacts for
+# seven days, and the run's summary says what passed.
+#
+# **Each platform builds the gallery once and runs it on two devices at
+# once**: one for the flows and the frame rate, one for the screenshots, each
+# with a timeout of its own. On October 16, 2026, before wave 1's families
+# joined, one iOS job built and ran everything in 29 of its 60 minutes (run
+# 38940363277). Wave 1's screenshots and flows add an estimated 35 minutes of
+# device time on each platform, more than one job's timeout leaves room for.
+#
+# **A night with nothing new for the devices runs nothing.** `changed`
+# compares the night's commit with the last run that passed on `main`, over
+# the paths the gallery draws from, and the jobs after it wait on its answer.
+# The paths include the headless and styled source of each family a flow
+# opens a link to. macOS minutes cost ten times Linux minutes while the
+# repository is private. A run by hand always runs.
+#
+# **On a pull request, only for the files that run the devices**: this
+# workflow, the Maestro action, the flows, and the script. The filter stays,
+# so a pull request that changes a component waits for the night. It is not a
+# required check: a required check that a path filter never starts holds the
+# merge open, so `verify` stays the one context to require.
+
+name: native-devices
+
+on:
+  pull_request:
+    paths:
+      - .github/actions/maestro/**
+      - .github/workflows/native-devices.yml
+      - helix/app/.maestro/**
+      - helix/app/scripts/devices.sh
+  # Off the hour: GitHub delays scheduled runs most at the start of an hour.
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # Whether the night has anything to run. A pull request and a run by hand
+  # always do.
+  changed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # `contents` as well, because a job's block replaces the workflow's.
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      run: ${{ steps.look.outputs.run }}
+    steps:
+      # The commit's trees, and the flows, which name the families they open:
+      # `git diff-tree` compares two commits by the names of their trees.
+      - name: Check out
+        if: github.event_name == 'schedule'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          filter: blob:none
+          sparse-checkout: |
+            .github/workflows
+            helix/app/.maestro
+
+      - name: Look for a change since the last run that passed
+        id: look
+        env:
+          EVENT: ${{ github.event_name }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          if [[ $EVENT != schedule ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          last=$(gh api "repos/$REPOSITORY/actions/workflows/native-devices.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].head_sha // ""')
+          if [[ -z $last ]]; then
+            echo "No run on \`main\` has passed yet, so the devices run tonight." >> "$GITHUB_STEP_SUMMARY"
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if ! git fetch --quiet --no-tags --depth=1 --filter=blob:none origin "$last"; then
+            echo "The last run that passed, on $last, has a commit this checkout cannot fetch, so the devices run tonight." >> "$GITHUB_STEP_SUMMARY"
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Each family a flow opens a link to, such as `helix://checkbox/…`,
+          # less the gallery's own screens.
+          paths=(
+            .github/actions/maestro
+            .github/workflows/native-devices.yml
+            helix/app
+            helix/core/src/machines
+            helix/native
+            helix/neutral
+          )
+          while read -r family; do
+            paths+=("helix/headless/src/$family" "helix/styled/src/$family")
+          done < <(grep -rhoE 'helix://[a-z0-9-]+' helix/app/.maestro | cut -c9- | sort -u | grep -vxE 'checks|rows')
+          if git diff-tree --quiet -r "$last" HEAD -- "${paths[@]}"; then
+            echo "Nothing the devices draw from changed since $last, the last run that passed, so they run nothing tonight." >> "$GITHUB_STEP_SUMMARY"
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  # **What the gallery bundles, built once on Linux for both platforms**: the
+  # workspace packages it reaches, and its catalog of examples. The macOS job
+  # then compiles no Rust and no TypeScript, and installs the workspace only
+  # for what Metro, CocoaPods, and Gradle read from it.
+  packages:
+    needs: changed
+    if: needs.changed.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # The remote cache `verify` fills, for the reason `verify.yml` gives.
+    env:
+      TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+      TURBO_TEAMID: ${{ vars.TURBO_TEAMID }}
+      TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+
+      - name: Build the packages the gallery bundles
+        run: bunx turbo run build --filter='@fusion.dev/helix-app^...'
+
+      - name: Write the gallery's catalog of examples
+        working-directory: helix/app
+        run: bun run examples
+
+      - name: Pack them
+        run: tar -czf "$RUNNER_TEMP/gallery-packages.tgz" helix/*/dist helix/app/src/examples.generated.ts
+
+      - name: Hand them to the builds
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: gallery-packages
+          path: ${{ runner.temp }}/gallery-packages.tgz
+          retention-days: 1
+
+  # **The image with Xcode 27, which builds React Native 0.88 and carries the
+  # iOS 27 simulators.** `macos-26` and `macos-latest` carry Xcode 26. The
+  # standard size: `xcode-27-xlarge` is a larger runner, billed apart.
+  ios-build:
+    needs: [changed, packages]
+    if: needs.changed.outputs.run == 'true'
+    runs-on: xcode-27
+    timeout-minutes: 30
+    env:
+      EXPO_NO_TELEMETRY: 1
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+        with:
+          helix: false
+
+      - name: Fetch the packages the gallery bundles
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: gallery-packages
+          path: ${{ runner.temp }}
+
+      - name: Unpack them
+        run: tar -xzf "$RUNNER_TEMP/gallery-packages.tgz"
+
+      - name: Write the gallery's iOS project
+        working-directory: helix/app
+        run: bunx expo prebuild --platform ios --no-install
+
+      - name: Install its pods
+        working-directory: helix/app/ios
+        run: pod install
+
+      # **For the simulator on this Mac's processor alone.** A Release build
+      # for the simulator otherwise compiles every file twice, for arm64 and
+      # x86_64. No signing: a simulator runs an unsigned app.
+      - name: Build it in Release
+        working-directory: helix/app/ios
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -workspace Helix.xcworkspace \
+            -scheme Helix \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/derived" \
+            -quiet \
+            ARCHS=arm64 \
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=YES \
+            build
+
+      # **Packed with `tar`, which keeps the app's executable bit**: an
+      # artifact's own zip drops each file's mode.
+      - name: Pack the app
+        run: tar -czf "$RUNNER_TEMP/gallery-ios.tgz" -C "$RUNNER_TEMP/derived/Build/Products/Release-iphonesimulator" Helix.app
+
+      - name: Hand it to the simulators
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: gallery-ios
+          path: ${{ runner.temp }}/gallery-ios.tgz
+          retention-days: 1
+
+  # **Two simulators, one for each part `devices.sh` runs**: `flows`, with the
+  # frame rate, estimated at 20 minutes, and `screens`, four passes of every
+  # family's screenshots, estimated at 40.
+  ios:
+    needs: [changed, ios-build]
+    if: needs.changed.outputs.run == 'true'
+    runs-on: xcode-27
+    timeout-minutes: ${{ matrix.part == 'screens' && 60 || 45 }}
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [flows, screens]
+    env:
+      MAESTRO_CLI_NO_ANALYTICS: 1
+      # Maestro's driver starts slowly on a simulator's first boot.
+      MAESTRO_DRIVER_STARTUP_TIMEOUT: 240000
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: |
+            .github/actions/maestro
+            helix/app/.maestro
+            helix/app/scripts
+
+      - name: Fetch the gallery
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: gallery-ios
+          path: ${{ runner.temp }}
+
+      - name: Unpack it
+        run: tar -xzf "$RUNNER_TEMP/gallery-ios.tgz" -C "$RUNNER_TEMP"
+
+      - name: Install Maestro
+        uses: ./.github/actions/maestro
+
+      # A new iPhone 17 on the newest iOS runtime the image has that runs one.
+      # The newest runtime alone failed to create it with "Incompatible
+      # device" when the image gained a runtime without the iPhone 17 (run
+      # 39814436052).
+      #
+      # **It opens the gallery's `helix://` links without asking first.** iOS
+      # asks "Open in Helix?" before the first link on a new simulator, and a
+      # press on Open left the gallery closed until the next link, in run
+      # 38957410938. The answer iOS keeps is written before the simulator
+      # starts, as a simulator that once pressed Open keeps it, which ended
+      # the prompt on an iOS 27 simulator on October 16, 2026.
+      - name: Start a simulator
+        id: simulator
+        run: |
+          set -euo pipefail
+          runtime=$(xcrun simctl list runtimes --json | jq -r '[.runtimes[] | select(.platform == "iOS" and .isAvailable and any(.supportedDeviceTypes[]?; .identifier == "com.apple.CoreSimulator.SimDeviceType.iPhone-17"))] | last | .identifier')
+          [[ -n $runtime && $runtime != null ]] || { echo "::error::No iOS runtime on this image runs an iPhone 17."; exit 1; }
+          udid=$(xcrun simctl create Helix com.apple.CoreSimulator.SimDeviceType.iPhone-17 "$runtime")
+          preferences="$HOME/Library/Developer/CoreSimulator/Devices/$udid/data/Library/Preferences"
+          mkdir -p "$preferences"
+          plutil -create xml1 "$preferences/com.apple.launchservices.schemeapproval.plist"
+          plutil -insert 'com\.apple\.CoreSimulator\.CoreSimulatorBridge-->helix' -string dev.fusion.helix.app "$preferences/com.apple.launchservices.schemeapproval.plist"
+          xcrun simctl boot "$udid"
+          xcrun simctl bootstatus "$udid" -b
+          echo "Started an iPhone 17 on $runtime."
+          echo "udid=$udid" >> "$GITHUB_OUTPUT"
+
+      - name: Run the ${{ matrix.part }}
+        env:
+          PART: ${{ matrix.part }}
+          UDID: ${{ steps.simulator.outputs.udid }}
+        run: helix/app/scripts/devices.sh ios "$UDID" "$RUNNER_TEMP/Helix.app" "$RUNNER_TEMP/devices" "$PART"
+
+      - name: Write the summary
+        if: always() && steps.simulator.outcome == 'success'
+        run: |
+          if [[ -f $RUNNER_TEMP/devices/summary.md ]]; then
+            cat "$RUNNER_TEMP/devices/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Keep the screenshots, videos, and frame rate
+        if: always() && steps.simulator.outcome == 'success'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          if-no-files-found: ignore
+          # Maestro writes a failed flow's screenshots and hierarchy under a
+          # `.maestro` folder, which the upload leaves out unless asked.
+          include-hidden-files: true
+          name: native-devices-ios-${{ matrix.part }}
+          path: ${{ runner.temp }}/devices
+          retention-days: 7
+
+  # **Linux, where the build needs room more than speed.** Gradle's caches are
+  # left uncached: a React Native build's run to several gigabytes, which would
+  # push the Cargo caches out of the repository's ten.
+  android-build:
+    needs: [changed, packages]
+    if: needs.changed.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      EXPO_NO_TELEMETRY: 1
+    steps:
+      # **Room for the build.** The runner starts with about 14 GB free, and
+      # the workspace's dependencies and a Release build came close to it on
+      # October 12, 2026. These are toolchains the job never runs.
+      - name: Make room on the runner
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/share/swift /usr/local/.ghcup /opt/ghc \
+            /usr/local/share/boost /opt/hostedtoolcache/CodeQL
+          docker image prune --all --force > /dev/null
+          df -h /
+
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+        with:
+          helix: false
+
+      - name: Fetch the packages the gallery bundles
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: gallery-packages
+          path: ${{ runner.temp }}
+
+      - name: Unpack them
+        run: tar -xzf "$RUNNER_TEMP/gallery-packages.tgz"
+
+      # **Node, because the build runs it**: Gradle finds React Native's and
+      # Expo's plugins with `node --print`, and Metro bundles the JavaScript
+      # under Node, reading `metro.config.ts` with Node's own type stripping.
+      - name: Install Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      # Gradle 9 and the Android Gradle plugin 9 run on JDK 17 and later.
+      - name: Install a JDK
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Write the gallery's Android project
+        working-directory: helix/app
+        run: bunx expo prebuild --platform android --no-install
+
+      # **For the emulator's processor alone**, x86_64, where a Release build
+      # otherwise compiles the native code for four.
+      - name: Build it in Release
+        working-directory: helix/app/android
+        run: ./gradlew --console=plain assembleRelease -PreactNativeArchitectures=x86_64
+
+      - name: Hand the APK to the emulators
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: gallery-android
+          path: helix/app/android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 1
+
+  # **Two emulators, one for each part `devices.sh` runs**, as on iOS, on
+  # Linux with KVM, which an emulator needs to run at a usable speed.
+  android:
+    needs: [changed, android-build]
+    if: needs.changed.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ matrix.part == 'screens' && 60 || 45 }}
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [flows, screens]
+    env:
+      MAESTRO_CLI_NO_ANALYTICS: 1
+    steps:
+      - name: Let the emulator use KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: |
+            .github/actions/maestro
+            helix/app/.maestro
+            helix/app/scripts
+
+      - name: Fetch the gallery
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: gallery-android
+          path: ${{ runner.temp }}
+
+      # Maestro runs on JDK 17 and later.
+      - name: Install a JDK
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install Maestro
+        uses: ./.github/actions/maestro
+
+      # **Android 15 on a Pixel 6's screen, with a hardware keyboard.**
+      # Animations stay on: with them off, Android reports reduced motion, and
+      # the videos would show none.
+      - name: Run the ${{ matrix.part }} on an emulator
+        id: emulator
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: 35
+          arch: x86_64
+          disable-animations: false
+          emulator-boot-timeout: 600
+          enable-hw-keyboard: true
+          profile: pixel_6
+          script: helix/app/scripts/devices.sh android emulator-5554 "$RUNNER_TEMP/app-release.apk" "$RUNNER_TEMP/devices" ${{ matrix.part }}
+          target: google_apis
+
+      - name: Write the summary
+        if: always() && steps.emulator.outcome != 'skipped'
+        run: |
+          if [[ -f $RUNNER_TEMP/devices/summary.md ]]; then
+            cat "$RUNNER_TEMP/devices/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Keep the screenshots, videos, and frame rate
+        if: always() && steps.emulator.outcome != 'skipped'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          if-no-files-found: ignore
+          # Maestro writes a failed flow's screenshots and hierarchy under a
+          # `.maestro` folder, which the upload leaves out unless asked.
+          include-hidden-files: true
+          name: native-devices-android-${{ matrix.part }}
+          path: ${{ runner.temp }}/devices
+          retention-days: 7

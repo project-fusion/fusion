@@ -1,0 +1,70 @@
+import { PROJECTS, STATUS } from './data'
+
+const open = PROJECTS.filter((project) => project.status !== 'done')
+const late = PROJECTS.filter((project) => project.status === 'at-risk')
+
+/** The first screen: the week in numbers, the projects, and what needs a look. */
+export function ProjectList({ onOpen }: { readonly onOpen: (id: string) => void }) {
+  return (
+    <helix-flex direction="column" gap="lg">
+      <helix-flex direction="column" gap="2xs">
+        <helix-text as="h1" variant="heading">
+          Projects
+        </helix-text>
+        <helix-text emphasis="muted">{`${open.length} active, ${late.length} at risk`}</helix-text>
+      </helix-flex>
+      <helix-stat-group columns={3} divided label="This week">
+        <helix-stat value={42}>
+          <helix-text slot="label">Open</helix-text>
+          <helix-trend good="down" movement="down" slot="trend">
+            12%
+          </helix-trend>
+        </helix-stat>
+        <helix-stat value={9}>
+          <helix-text slot="label">Due soon</helix-text>
+        </helix-stat>
+        <helix-stat value={31}>
+          <helix-text slot="label">Done</helix-text>
+          <helix-trend good="up" movement="up" slot="trend">
+            18%
+          </helix-trend>
+        </helix-stat>
+      </helix-stat-group>
+      {late.map((project) => (
+        <helix-callout key={project.id} tone="warning">
+          <helix-text slot="heading">{project.name} is behind schedule</helix-text>
+          {`${project.activity[0]?.detail ?? ''} Open the project to see its activity.`}
+        </helix-callout>
+      ))}
+      <helix-card label="Projects">
+        <helix-text as="h2" slot="header" variant="title">
+          All projects
+        </helix-text>
+        <helix-list
+          divided
+          label="Projects"
+          onhelix-action={(event) => onOpen((event.target as { value: string }).value)}
+          selection-mode="none"
+        >
+          {PROJECTS.map((project) => (
+            <helix-list-item key={project.id} value={project.id}>
+              <helix-avatar
+                initials={project.owner.initials}
+                name={project.owner.name}
+                size="sm"
+                slot="start"
+              ></helix-avatar>
+              {project.name}
+              <helix-text slot="description">
+                {`${project.done} of ${project.tasks} tasks done`}
+              </helix-text>
+              <helix-tag emphasis="subtle" slot="end" tone={STATUS[project.status].tone}>
+                {STATUS[project.status].label}
+              </helix-tag>
+            </helix-list-item>
+          ))}
+        </helix-list>
+      </helix-card>
+    </helix-flex>
+  )
+}
