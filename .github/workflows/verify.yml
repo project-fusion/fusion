@@ -629,7 +629,7 @@ jobs:
       - name: Keep the pinned toolchain alone
         run: rustup toolchain list | awk '!/^1\.97-/ { print $1 }' | xargs -r -n1 rustup toolchain uninstall
       - name: Restore the Cargo cache
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           cache-directories: |
             fusion/plugins/example/target
@@ -668,7 +668,7 @@ jobs:
       # Keyed on the job name, which is this job's own entry, and on the
       # toolchain installed above, for the reasons `rust` gives.
       - name: Restore the Cargo cache
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           prefix-key: v0-rust-1.97
       - name: Clippy
@@ -722,7 +722,7 @@ jobs:
       # Keyed on the toolchain as the Rust job's cache is, for the reason given
       # there.
       - name: Restore the Cargo cache
-        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           prefix-key: v0-rust-1.97
       # Ahead of the checks rather than left to the npm shim, so one compile
