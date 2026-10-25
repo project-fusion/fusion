@@ -29,6 +29,11 @@
  *   enforced by `fusion x workspace`'s `publishable`, but it is fatal only where declarations do
  *   not sit beside their runtime files, which is a build layout we do not have.
  *   What this catches is a subpath that resolves to nothing at all.
+ * - **Do those types hold up in an app that checks library types?** The same
+ *   imports again with `skipLibCheck` off, on two TypeScript versions, with
+ *   every optional peer installed. An app that sets it there fails on any
+ *   declaration of ours that contradicts itself, and the pass above cannot see
+ *   one.
  * - **Did anything unpublished come along?** A published package depending on an
  *   internal one 404s here rather than in someone's CI.
  *
@@ -160,6 +165,33 @@ if (registryTag !== undefined) {
 const project = join(scratch, 'project')
 mkdirSync(project)
 
+/** The version of a package the workspace has installed, so a probe pinned to it moves when the repository does. */
+const installedVersion = (name) =>
+  JSON.parse(readFileSync(join(root, 'node_modules', name, 'package.json'), 'utf8')).version
+
+/* What the strict type pass below installs beside the packages: the two
+   TypeScript versions it runs, React's types, which `types/jsx.d.ts` reads
+   where a consumer has them, and every optional peer a published package
+   declares. An entry such as `@fusion.dev/helix-graph/sigma` is typed against
+   its peer, and an app that imports it has installed that peer, so checking it
+   without one reports a fault no consumer meets. Beside `dependencies` and
+   never in `overrides`, since nothing published depends on them. */
+const optionalPeers = Object.fromEntries(
+  published.flatMap(([, { manifest }]) =>
+    Object.entries(manifest.peerDependencies ?? {}).filter(
+      ([peer]) =>
+        manifest.peerDependenciesMeta?.[peer]?.optional === true &&
+        !peer.startsWith('@fusion.dev/'),
+    ),
+  ),
+)
+const typeTools = {
+  ...optionalPeers,
+  '@types/react': installedVersion('@types/react'),
+  typescript: installedVersion('typescript'),
+  'typescript-5': 'npm:typescript@5.9.3',
+}
+
 /* Restricted packages need credentials, and the scratch project is outside the
    repository precisely so that it inherits nothing. Without this the install
    404s and the failure reads as "the package did not ship" rather than "you are
@@ -176,7 +208,7 @@ writeFileSync(
   join(project, 'package.json'),
   `${JSON.stringify(
     {
-      dependencies,
+      dependencies: { ...dependencies, ...typeTools },
       name: 'template',
       ...(registryTag === undefined ? { overrides: dependencies } : {}),
       private: true,
@@ -415,6 +447,83 @@ try {
   )
 }
 
+/* **The same imports with `skipLibCheck` off, as an app that checks library
+   types compiles them.** The pass above asks only whether types resolve, so a
+   declaration that contradicts itself, such as an accessor overriding a field,
+   passes it and fails every such app. Run on the workspace's TypeScript and on
+   the last 5.x, the two lines a consumer is likely to be on, with the optional
+   peers installed above. The `/vue` and `/svelte` entries are left out: they
+   are typed against frameworks no package declares as a peer, which only their
+   apps install, and the templates type-check them there. */
+const strict = imports.filter((specifier) => !/\/(vue|svelte)$/.test(specifier))
+writeFileSync(
+  join(project, 'strict.ts'),
+  `${strict.map((specifier, index) => `import * as m${index} from '${specifier}'`).join('\n')}\n` +
+    `export const loaded = [${strict.map((_, index) => `m${index}`).join(', ')}]\n`,
+)
+writeFileSync(
+  join(project, 'tsconfig.strict.json'),
+  `${JSON.stringify(
+    {
+      compilerOptions: {
+        module: 'esnext',
+        moduleResolution: 'bundler',
+        noEmit: true,
+        skipLibCheck: false,
+        strict: true,
+        target: 'es2022',
+        types: [],
+      },
+      include: ['strict.ts'],
+    },
+    null,
+    2,
+  )}\n`,
+)
+/**
+ * The errors `tsc` reports in Helix's own declarations or in the probe, each
+ * with the lines that continue it.
+ *
+ * **A peer's own declarations are its own.** Playwright's types need Node's,
+ * and sigma's name an `events` module with no types, so a strict pass with the
+ * peers installed reports both, and an app with `@types/node` meets neither.
+ * They are not faults this repository can fix, and reporting them would make
+ * the pass fail on every run until someone learned to ignore it.
+ */
+const ownErrors = (output) => {
+  const errors = []
+  for (const line of output.trim().split('\n')) {
+    if (/^\S.*\(\d+,\d+\): error TS\d+/.test(line)) {
+      errors.push([line])
+    } else if (errors.length > 0 && /^\s/.test(line)) {
+      errors.at(-1).push(line)
+    }
+  }
+  return errors
+    .filter(
+      ([first]) =>
+        !first.startsWith('node_modules/') || first.startsWith('node_modules/@fusion.dev/'),
+    )
+    .map((lines) => lines.join('\n'))
+}
+
+for (const [label, command, args] of [
+  [`TypeScript ${typeTools.typescript}`, join(project, 'node_modules', '.bin', 'tsc'), []],
+  ['TypeScript 5.9.3', 'node', [join(project, 'node_modules', 'typescript-5', 'bin', 'tsc')]],
+]) {
+  try {
+    run(command, [...args, '-p', 'tsconfig.strict.json'], project)
+  } catch (error) {
+    const ours = ownErrors(error.stdout ?? error.message)
+    if (ours.length > 0) {
+      problems.push(
+        `${label} finds errors in the installed packages' own types, with \`skipLibCheck\` off:\n` +
+          `    ${ours.join('\n').split('\n').join('\n    ')}`,
+      )
+    }
+  }
+}
+
 if (problems.length > 0) {
   console.error(`The published packages do not work when installed (${problems.length}):\n`)
   for (const problem of problems) {
@@ -427,6 +536,7 @@ console.log(
   `template: ${packed.length} packages installed from ` +
     (registryTag === undefined ? 'freshly packed tarballs' : `the registry at \`${registryTag}\``) +
     `, outside the workspace, ${imports.length} exported subpaths resolve with types` +
+    `, and ${strict.length} type-check with \`skipLibCheck\` off on TypeScript ${typeTools.typescript} and 5.9.3` +
     (unplaced.length === 0
       ? ''
       : `. ${unplaced.length} platform packages hold no binary, which a release places: ` +
