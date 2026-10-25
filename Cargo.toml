@@ -3,14 +3,22 @@ resolver = "2"
 # **Built for `wasm32-unknown-unknown` and for nothing else.** A member is built
 # for the host by every `cargo test`, and the example plugin generates bindings
 # that only exist there.
-exclude = ["fusion/plugins/example", "fusion/plugins/tool-example"]
+exclude = [
+	"fusion/plugins/example",
+	"fusion/plugins/tool-example",
+	"fusion/plugins/tracker-example",
+]
 members = [
 	"cortex/core",
 	"cortex/trace",
 	"cortex/engram",
 	"cortex/recall",
 	"fusion/cli",
-	"fusion/plugins",
+	"fusion/plugins/host",
+	"fusion/plugins/rules",
+	"fusion/plugins/sources",
+	"fusion/plugins/tools",
+	"fusion/plugins/tracker",
 	"fusion/rules",
 	"helix/cli",
 	"helix/theme",
@@ -49,6 +57,28 @@ sqlx = { version = "0.9", default-features = false, features = ["chrono", "json"
 thiserror = "2"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 uuid = { version = "1", features = ["serde", "v4", "v7"] }
+# **The runtime, with a compiler and the interpreter rather than a JIT backend.**
+# `cranelift` translates a component once per run and `pulley` executes the
+# result without generating native code, which is the trade a plugin wants: a
+# rule runs for milliseconds, so compiling to native buys nothing a portable
+# interpreter does not already give, and the artifact stays the same on every
+# platform.
+wasmtime = { version = "49", default-features = false, features = [
+  "component-model",
+  "cranelift",
+  "pulley",
+  "runtime",
+  "std",
+] }
+# Encodes a core module into a component, which is what a plugin author's
+# toolchain does for them. The plugin tests build each example the long way
+# round so the path an author takes is the path that is measured.
+#
+# **At the wasm-tools release `wasmtime` is built on**, which is 0.258 for
+# `wasmtime` 49, so the tests and the host compile one `wasmparser` and one
+# `wasm-encoder`. A newer one here builds a second copy of each. It moves with
+# `wasmtime`, and `.github/dependabot.yml` leaves it to that bump.
+wit-component = "0.258"
 
 # Internal crates. Path deps are relative: same-domain is `../<role>`.
 fusion-cortex-core = { path = "cortex/core", default-features = false }
@@ -56,12 +86,18 @@ fusion-cortex-engram = { path = "cortex/engram", default-features = false }
 fusion-cortex-recall = { path = "cortex/recall" }
 fusion-cortex-trace = { path = "cortex/trace", default-features = false }
 fusion-helix-theme = { path = "helix/theme" }
+# **Fusion Plugin Host: one loader, and a crate per world.** Both command
+# lines take the rules world, and other products embed the rest. The loader
+# crate's features are `loader` for the worlds and `net` for the address guard,
+# and each member names the ones it takes.
+fusion-plugin-host = { path = "fusion/plugins/host", default-features = false }
+fusion-plugin-rules = { path = "fusion/plugins/rules" }
+fusion-plugin-sources = { path = "fusion/plugins/sources" }
+fusion-plugin-tools = { path = "fusion/plugins/tools" }
+fusion-plugin-tracker = { path = "fusion/plugins/tracker" }
 # **The one crate both command lines take, and it belongs to neither product.**
 # It knows what a rule is and not what a component or a workspace is, which is
 # what keeps the helix and fusion domains free of each other: see its `lib.rs`.
-# Each member names the features it takes: `wasm` for the hosts, `net` for
-# the address guard.
-fusion-plugins = { path = "fusion/plugins", default-features = false }
 fusion-rules = { path = "fusion/rules" }
 
 # **No `version` here, and its absence is the point.**

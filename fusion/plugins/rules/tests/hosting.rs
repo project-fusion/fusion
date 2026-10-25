@@ -9,13 +9,13 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::OnceLock;
 
-use fusion_plugins::{Host, WORLD};
+use fusion_plugin_rules::{Host, WORLD};
 
 /// The workspace root, from this crate's own manifest.
 fn root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .and_then(Path::parent)
+        .ancestors()
+        .nth(3)
         .expect("the workspace above this crate")
         .to_path_buf()
 }
@@ -76,7 +76,7 @@ fn built(extra: &[&str]) -> Vec<u8> {
 
 /// A directory holding the modules a test wants the host to find.
 fn planted(name: &str, modules: &[(&str, &[u8])]) -> PathBuf {
-    let at = std::env::temp_dir().join(format!("fusion-plugins-{name}"));
+    let at = std::env::temp_dir().join(format!("fusion-plugin-rules-{name}"));
     let _ = std::fs::remove_dir_all(&at);
     std::fs::create_dir_all(&at).expect("a plugin directory");
     for (file, bytes) in modules {

@@ -176,8 +176,9 @@ cortex/    core trace engram docs
 fusion/    cli docs plugins rules scripts site: what belongs to the company
            rather than to a product. `docs/insights` is the published writing;
            `rules` is the crate every command line takes, which is what a rule
-           is and not what any product's rules read; `plugins` is the host that
-           runs one somebody else wrote
+           is and not what any product's rules read; `plugins` is Fusion
+           Plugin Host, which runs code somebody else wrote: one loader, a
+           crate per world, and the Agent Work Protocol
 .local/    per-machine scratch, gitignored
 ```
 
@@ -189,14 +190,15 @@ fusion/    cli docs plugins rules scripts site: what belongs to the company
   top-level folder.
 - **A crate exists when something outside the binary consumes it**, and not to
   make a large one smaller. Three do: `fusion-rules` because every command line
-  takes it and no product may depend on another, `fusion-helix-theme`
-  because the site needs it as WASM and a crate pulling in a terminal backend
-  would carry that into the build, and `fusion-plugins` because both command
-  lines host it. **Compile time is not the reason it looks like.** Measured 22
-  Sep 2026 on `fusion-helix-cli`, 24,429 lines across 85 files in four nouns: a
-  one-file change rebuilds the binary in 2.3 seconds and the test targets in
-  3.7, so splitting it would trade a real boundary for a saving that does not
-  exist.
+  takes it and no product may depend on another, `fusion-helix-theme` because
+  the site needs it as WASM and a crate pulling in a terminal backend would
+  carry that into the build, and the crates in `fusion/plugins` because both
+  command lines host plugins and other products embed the host, which is one
+  loader and a crate per world. **Compile time is not the reason it looks
+  like.** Measured 22 Sep 2026 on `fusion-helix-cli`, 24,429 lines across 85
+  files in four nouns: a one-file change rebuilds the binary in 2.3 seconds and
+  the test targets in 3.7, so splitting it would trade a real boundary for a
+  saving that does not exist.
 - **A check belongs to a CLI noun; a script belongs where its output belongs.**
   Everything that judges the workspace is a rule under `fusion x workspace`,
   `fusion x prose`, `fusion x spec` or `helix component`, reached from the root by
@@ -220,8 +222,8 @@ fusion/    cli docs plugins rules scripts site: what belongs to the company
   `specs`. One module may hold rules for several nouns, and each run takes the
   ones it can answer, names the rest in the register, and refuses a module with
   nothing for it at all.
-  `fusion/plugins` is the host and its `example/` is a whole plugin; the world
-  they share is `fusion/plugins/wit/rules.wit`.
+  `fusion/plugins/rules` is the host and `fusion/plugins/example/` is a whole
+  plugin; the world they share is `fusion/plugins/wit/rules.wit`.
 
   **What is left over is `fusion/scripts`, and it is small on purpose.** A
   script goes there when it is genuinely cross-cutting and cannot be a rule: the

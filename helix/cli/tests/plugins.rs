@@ -1,6 +1,6 @@
 //! A rule from outside, run by `helix component` as one of its own.
 //!
-//! **Through the binary rather than the host**, which `fusion-plugins` already
+//! **Through the binary rather than the host**, which `fusion-plugin-rules` already
 //! tests on its own. What is here is everything a person sees: the register in
 //! the output and in `--json`, a plugin's rule answering `--only`, its finding
 //! on stderr with the exit code that goes with it, and a module that will not

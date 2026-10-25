@@ -1,0 +1,39 @@
+[package]
+name = "fusion-plugin-host"
+description = "The loader every plugin world shares, and the address guard for what a plugin reaches."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+# Its own, never `workspace = true`: a version is a fact about a domain and this
+# workspace holds two. A crate that inherits one fails the build.
+version = "0.0.0-dev"
+
+# **`loader` loads and starts components, and `net` is the address guard.** A
+# world's crate takes `loader`. The desktop shell takes `net` alone, so its
+# release build links no `wasmtime`. Cargo unifies features across a workspace
+# build, so `cargo build --workspace` still compiles `wasmtime` once for every
+# member.
+[features]
+default = ["loader"]
+loader = ["dep:sha2", "dep:wasmtime"]
+net = ["dep:reqwest", "dep:tokio"]
+
+[dependencies]
+# **The guard's resolver**, which hands the client only the addresses a
+# grant lets through, and the lookup it runs.
+reqwest = { workspace = true, optional = true }
+# **The digest the register prints.** A hash is a primitive with one right
+# answer, and the crate that implements it is reviewed by more people than a
+# copy in this file would be.
+sha2 = { version = "0.11", optional = true }
+# **The guard's lookup**, which resolves each name once.
+tokio = { workspace = true, features = ["net"], optional = true }
+# **The runtime**, at the version and features the workspace pins.
+wasmtime = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "net", "rt"] }
+
+[lints]
+workspace = true

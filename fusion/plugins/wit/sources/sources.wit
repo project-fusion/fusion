@@ -1,0 +1,153 @@
+package awp:sources@1.0.0;
+
+/// The records a source hands a host, and what can go wrong.
+///
+/// Every piece of text a person wrote in the service, such as an item's title,
+/// body, labels, and author, arrives as `untrusted`, so a host keeps it apart
+/// from instructions all the way to whatever reads it.
+interface types {
+  /// Text a person wrote in the service: data to show or store, never
+  /// instructions to follow.
+  record untrusted {
+    text: string,
+  }
+
+  /// Where an item stands in a host's backlog. A source shows the status
+  /// through its binding's mapping, such as a label, a column, or a workflow
+  /// state.
+  enum status {
+    /// Filed, and waiting for a person to make it ready.
+    proposed,
+    /// Ready for a run to take.
+    ready,
+    /// A run holds it.
+    running,
+    /// Stopped until a person or something outside the run responds.
+    waiting,
+    /// Finished.
+    done,
+    /// Given up, and left for the record.
+    dropped,
+  }
+
+  /// Who filed an item.
+  record author {
+    /// The name the service shows.
+    name: untrusted,
+    /// Whether the author may write to what the binding targets, such as the
+    /// repository. None where the service does not say.
+    can-write: option<bool>,
+  }
+
+  /// One item of work, as the service holds it.
+  record item {
+    /// The service's own id, which every call about the item takes.
+    id: string,
+    /// Where a person opens it, where it has an address.
+    address: option<string>,
+    /// Changes whenever the item does. `update` sends back the one it read.
+    version: string,
+    title: untrusted,
+    body: untrusted,
+    labels: list<untrusted>,
+    /// False once it is closed or deleted in the service.
+    open: bool,
+    /// The status the service shows through the binding's mapping. None where
+    /// it shows none.
+    status: option<status>,
+    author: author,
+    /// Addresses linked to it, such as a pull request, each once.
+    links: list<string>,
+  }
+
+  /// Where a listing ended. A host stores it as it is, and only after it has
+  /// stored the items that came before it.
+  type cursor = string;
+
+  /// The items that changed since a cursor.
+  record page {
+    /// Each item at most once. An item comes back after a cursor only if it
+    /// changed after that cursor was handed out.
+    items: list<item>,
+    /// Where the next listing starts.
+    next: cursor,
+    /// Whether more had changed than this page holds. A host lists again from
+    /// `next` at once.
+    more: bool,
+  }
+
+  /// Something a binding can be set to name, such as a repository, a
+  /// project, a label, or a workflow state.
+  record entry {
+    /// What it is, in the source's own word: `repository`, `label`.
+    kind: string,
+    /// What a binding's settings name it by.
+    id: string,
+    name: untrusted,
+  }
+
+  /// What a binding's credential allows, as `check` finds it.
+  record access {
+    /// Whether `list` and `get` work.
+    read: bool,
+    /// Whether a tracker's `claim`, `update`, and `link` write. A source
+    /// that is not a tracker sets it false.
+    write-back: bool,
+    /// Whether a tracker's `create` files an item.
+    create: bool,
+    /// Whether `update` refuses a version that is no longer the item's.
+    versions: bool,
+  }
+
+  /// Why a call did not do what it was asked, each with a sentence.
+  variant error {
+    /// No item has that id.
+    not-found(string),
+    /// The version sent is no longer the item's, so the write was not made.
+    conflict(string),
+    /// The credential or the grant does not allow it.
+    denied(string),
+    /// The source does not do this at all, such as a tracker that files no
+    /// items.
+    unsupported(string),
+    /// The binding's settings, or an argument, is not one the source takes.
+    invalid(string),
+    /// The service did not respond, or asked to be called later.
+    unavailable(string),
+  }
+}
+
+/// What a host lends a source.
+interface binding {
+  /// The binding's settings, as JSON matching the schema `spec` returns.
+  settings: func() -> string;
+}
+
+/// Reading items from a service.
+interface source {
+  use types.{access, cursor, entry, error, item, page};
+
+  /// The JSON Schema of a binding's settings, such as the repository, the
+  /// project, and which label shows which status.
+  spec: func() -> string;
+
+  /// Tests the binding's credential and the permissions it holds.
+  check: func() -> result<access, error>;
+
+  /// Everything the binding could name, so a person can map a service's
+  /// states to the six statuses once.
+  discover: func() -> result<list<entry>, error>;
+
+  /// The items that changed since `since`, or every item where it is none.
+  %list: func(since: option<cursor>) -> result<page, error>;
+
+  /// One item, with its current version.
+  get: func(id: string) -> result<item, error>;
+}
+
+/// A component that reads items: a host's way in from a tracker, a document
+/// store, or anything else that holds records.
+world reader {
+  import binding;
+  export source;
+}
