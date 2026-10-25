@@ -46,6 +46,7 @@ pub mod composed;
 pub mod compositions;
 pub mod constructed;
 pub mod conventions;
+pub mod coordinated;
 pub mod corners;
 pub mod decided;
 pub mod decorator;
@@ -665,6 +666,12 @@ fn every() -> Vec<Rule> {
             name: "conventions",
             run: Runner::Source(conventions::run),
             summary: "a component says what it is for, and documents what it publishes",
+        },
+        Rule {
+            fix: None,
+            name: "coordinated",
+            run: Runner::Source(coordinated::run),
+            summary: "a member one element writes on another is internal",
         },
         Rule {
             fix: None,

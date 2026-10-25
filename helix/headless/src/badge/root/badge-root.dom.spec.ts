@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -208,8 +208,7 @@ describe('a badge around a control', () => {
     await badge.updateComplete
     return badge
   }
-  const internals = (host: HTMLElement): ElementInternals =>
-    (host as unknown as { internals: ElementInternals }).internals
+  const internals = (host: HTMLElement): ElementInternals => internalsOf(host)
   /* happy-dom has no element reflection, so the description is read where an
      engine has it: the browser harness. */
   /* A named helper rather than `test.if`, which the browser harness has not. */

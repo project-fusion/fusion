@@ -2,6 +2,7 @@ import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   hasLayout,
+  internalsOf,
   mount,
   registerDom,
   settle,
@@ -189,7 +190,7 @@ describe('a required field checked from a script', () => {
   }
 
   const shown = (host: Checked): boolean => {
-    const internals = (host as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     return (
       (internals.states as unknown as Set<string>).has('invalid') ||
       internals.ariaInvalid === 'true' ||
@@ -289,7 +290,7 @@ describe('a form checked from a script', () => {
       await Promise.all(hosts.map((host) => settle(host)))
       const marked = hosts
         .filter((host) => {
-          const internals = (host as unknown as { internals: ElementInternals }).internals
+          const internals = internalsOf(host)
           return (
             (internals.states as unknown as Set<string>).has('invalid') ||
             internals.ariaInvalid === 'true'

@@ -4,6 +4,7 @@ import {
   formatNumber,
   formatWords,
   HelixFormElement,
+  internalsOf,
   isRtl,
   ListedController,
   MixinControllerValue,
@@ -139,7 +140,7 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
   protected readonly listed = new ListedController(
     this,
     'focus',
-    () => this.internals?.ariaKeyShortcuts,
+    () => internalsOf(this)?.ariaKeyShortcuts,
   )
 
   /**
@@ -709,9 +710,9 @@ export class HelixHeadlessSlider extends MixinControllerValue(MixinField(HelixFo
    */
   private sync(): void {
     if (this.range && this.name) {
-      reportValues(this.internals, this.name, this.points.map(String))
+      reportValues(internalsOf(this), this.name, this.points.map(String))
     } else {
-      this.internals.setFormValue(this.value)
+      internalsOf(this).setFormValue(this.value)
     }
     this.refreshFeedback()
   }

@@ -4,6 +4,7 @@ import {
   formValue,
   hasLayout,
   hasState,
+  internalsOf,
   mount,
   part,
   registerDom,
@@ -351,7 +352,7 @@ describe('in a form', () => {
      restore brought back the declared draft they had deleted. */
   test('saves the draft as its state, an emptied one too', async () => {
     const element = await inForm('value="Hello"')
-    const internals = (element as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(element)
     const saved: unknown[] = []
     const report = internals.setFormValue.bind(internals)
     internals.setFormValue = (value, state) => {
@@ -390,7 +391,7 @@ describe('constraints', () => {
     /* The host is a group with a role, and a host with no `aria-invalid` is
        judged by its validity: Chromium exposed the untouched composer as
        invalid on load. */
-    const internals = (element as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(element)
     expect(internals.ariaInvalid).toBe('false')
 
     /* What a form's submission sends to a control that fails. */

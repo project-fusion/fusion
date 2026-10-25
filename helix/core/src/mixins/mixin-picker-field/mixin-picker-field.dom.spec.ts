@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /**
  * The protocol between a text field and the picker floating over it, asked of
@@ -392,7 +392,7 @@ describe('a refusal', () => {
 describe('what the form is told', () => {
   test('the value, whatever the markup arrived with', async () => {
     const host = await mount('default-value="v"')
-    expect(host.internals.validity.valid).toBe(true)
+    expect(internalsOf(host).validity.valid).toBe(true)
   })
 
   /* The control is `type="text"` and cannot know what a date or a color is, so
@@ -402,8 +402,8 @@ describe('what the form is told', () => {
     host.message = 'Not a thing.'
     host.requestValue('w')
     await host.updateComplete
-    expect(host.internals.validity.badInput).toBe(true)
-    expect(host.internals.validationMessage).toBe('Not a thing.')
+    expect(internalsOf(host).validity.badInput).toBe(true)
+    expect(internalsOf(host).validationMessage).toBe('Not a thing.')
   })
 
   test('and the platform’s once the family has nothing to say', async () => {
@@ -414,8 +414,8 @@ describe('what the form is told', () => {
     host.message = ''
     host.requestValue('x')
     await host.updateComplete
-    expect(host.internals.validity.valid).toBe(true)
-    expect(host.internals.validationMessage).toBe('')
+    expect(internalsOf(host).validity.valid).toBe(true)
+    expect(internalsOf(host).validationMessage).toBe('')
   })
 })
 

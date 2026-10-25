@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -19,8 +19,7 @@ const field = async (attrs = ''): Promise<InputColor> => {
 const control = (host: InputColor): HTMLInputElement => part(host, 'control') as HTMLInputElement
 
 /** Validity lives on the internals, not on the host, the same as Pin Input. */
-const internals = (host: HTMLElement): ElementInternals =>
-  (host as unknown as { internals: ElementInternals }).internals
+const internals = (host: HTMLElement): ElementInternals => internalsOf(host)
 
 const type = async (host: InputColor, text: string): Promise<void> => {
   control(host).value = text

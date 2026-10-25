@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -108,10 +108,10 @@ describe('icon rendering', () => {
     const icon = (await mount(
       '<helix-headless-icon name="x" aria-label="Delete"></helix-headless-icon>',
     )) as HTMLElement & { internals?: ElementInternals; updateComplete: Promise<unknown> }
-    expect(icon.internals?.role).toBe('img')
+    expect(internalsOf(icon)?.role).toBe('img')
     icon.removeAttribute('aria-label')
     await icon.updateComplete
-    expect(icon.internals?.role ?? null).toBeNull()
+    expect(internalsOf(icon)?.role ?? null).toBeNull()
   })
 
   test('is decoration by default, and hidden from assistive technology', async () => {

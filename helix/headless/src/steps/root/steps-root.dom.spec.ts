@@ -1,6 +1,14 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { at, hasState, mount, nextFrame, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  at,
+  hasState,
+  internalsOf,
+  mount,
+  nextFrame,
+  part,
+  registerDom,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -28,8 +36,7 @@ const steps = async (attrs = ''): Promise<Steps> => {
 }
 
 /** The semantics live on the internals, never as attributes on the host. */
-const internals = (host: HTMLElement): ElementInternals =>
-  (host as unknown as { internals: ElementInternals }).internals
+const internals = (host: HTMLElement): ElementInternals => internalsOf(host)
 
 describe('steps', () => {
   test('the list is the host, because the steps are the consumer’s elements', async () => {

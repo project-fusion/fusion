@@ -17,6 +17,7 @@ import {
   HelixMapTiltEvent,
   HelixMapZoomEvent,
   hostAria,
+  internalsOf,
   KeyboardNavigationController,
   MixinViewport,
   numberConverter,
@@ -1549,7 +1550,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     super.willUpdate(changed)
     /* The host carries the name, so a consumer's own `aria-label` is the thing
        that wins rather than fighting an attribute this wrote. */
-    hostAria(this.internals, { label: this.label })
+    hostAria(internalsOf(this), { label: this.label })
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
     this.toggleState('layers-open', this.layersOpen)

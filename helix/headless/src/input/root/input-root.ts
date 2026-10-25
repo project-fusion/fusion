@@ -6,6 +6,7 @@ import {
   HelixClearEvent,
   HelixFormElement,
   holdCaret,
+  internalsOf,
   ListedController,
   MixinControllerValue,
   MixinField,
@@ -107,7 +108,7 @@ export class HelixHeadlessInput extends MixinVoice(
   protected readonly listed = new ListedController(
     this,
     'focus',
-    () => this.internals?.ariaKeyShortcuts,
+    () => internalsOf(this)?.ariaKeyShortcuts,
   )
 
   /**
@@ -466,7 +467,7 @@ export class HelixHeadlessInput extends MixinVoice(
 
   /** Reports the value and the validity the host stands behind. */
   private sync(): void {
-    this.internals.setFormValue(this.value)
+    internalsOf(this).setFormValue(this.value)
     const control = this.control
     if (!control) {
       return
@@ -477,7 +478,7 @@ export class HelixHeadlessInput extends MixinVoice(
        without it the validity bubble points at the host, which is a box with no
        text in it. */
     this.copyValidity(control)
-    applyOwnRule(this.internals, control, this.validate, this.value)
+    applyOwnRule(internalsOf(this), control, this.validate, this.value)
     // Straight after, because validity moved without any property moving.
     this.refreshFeedback()
   }

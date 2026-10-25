@@ -3,6 +3,7 @@ import {
   HelixElement,
   headingLevel,
   hostAria,
+  internalsOf,
   numberConverter,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -57,7 +58,7 @@ export class HelixHeadlessTimelineGroup extends HelixElement {
      too. */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { role: 'listitem' })
+    hostAria(internalsOf(this), { role: 'listitem' })
   }
 
   protected override render(): TemplateResult {

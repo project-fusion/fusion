@@ -359,7 +359,7 @@ export {
   type ViewportPanDetail,
   type ViewportZoomDetail,
 } from './events/events.js'
-export { HelixElement, whenHydrated } from './helix-element/helix-element.js'
+export { HelixElement, internalsOf, whenHydrated } from './helix-element/helix-element.js'
 export {
   LAYERS_RULE,
   MIRROR_RULE,

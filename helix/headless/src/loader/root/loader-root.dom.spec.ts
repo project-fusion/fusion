@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  hasState,
+  internalsOf,
+  mount,
+  part,
+  registerDom,
+  role,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -136,12 +143,12 @@ describe('a loader with a delay', () => {
       '<helix-headless-loader delay="20"></helix-headless-loader>',
     )) as Loader
     expect(part(loader, 'svg')?.hasAttribute('hidden')).toBe(true)
-    expect(loader.internals.ariaHidden).toBe('true')
+    expect(internalsOf(loader).ariaHidden).toBe('true')
     expect(hasState(loader, 'waiting')).toBe(true)
     await new Promise((done) => setTimeout(done, 40))
     await loader.updateComplete
     expect(part(loader, 'svg')?.hasAttribute('hidden')).toBe(false)
-    expect(loader.internals.ariaHidden ?? null).toBeNull()
+    expect(internalsOf(loader).ariaHidden ?? null).toBeNull()
     expect(hasState(loader, 'waiting')).toBe(false)
   })
 
@@ -179,7 +186,7 @@ describe('a loader that stands in for its content', () => {
     expect(shown.hasAttribute('style')).toBe(false)
     expect(part(host, 'svg')).toBeNull()
     expect(role(host)).toBeNull()
-    expect(host.internals.ariaBusy).toBeNull()
+    expect(internalsOf(host).ariaBusy).toBeNull()
   })
 
   test('marks its region busy only while the work runs', async () => {

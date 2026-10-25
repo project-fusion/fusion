@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   formValue,
   hasState,
+  internalsOf,
   mount,
   notYetDefined,
   part,
@@ -240,7 +241,7 @@ describe('toggle group in a form', () => {
      before the reader had done anything. */
   test('a required group is not marked invalid before the reader has tried', async () => {
     const { group } = await inForm('required')
-    const internals = (group as Updatable & { internals: ElementInternals }).internals
+    const internals = internalsOf(group)
     expect(internals.validity.valueMissing).toBe(true)
     expect(internals.ariaInvalid).toBe('false')
   })
@@ -449,7 +450,7 @@ describe('a group where several can be pressed', () => {
       <helix-headless-toggle value="i">Italic</helix-headless-toggle>
       <helix-headless-toggle value="u">Under</helix-headless-toggle>
     </helix-headless-toggle-group>`)) as Toolbar
-    const internals = (group as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(group)
     const report = internals.setFormValue.bind(internals)
     let saved: string | File | FormData | null | undefined
     internals.setFormValue = (value, state) => {
@@ -488,7 +489,7 @@ describe('a vertical group', () => {
     const group = (await mount(
       markup.replace('default-value="light"', 'default-value="light" orientation="vertical"'),
     )) as Updatable & { internals: ElementInternals }
-    expect(group.internals.ariaOrientation).toBe('vertical')
+    expect(internalsOf(group).ariaOrientation).toBe('vertical')
   })
 })
 
@@ -516,9 +517,7 @@ describe('a required toggle group', () => {
      group was optional. */
   test('says so to the accessibility tree, as a radio group does', async () => {
     const group = await mount(markup.replace('default-value="light"', 'required'))
-    expect((group as unknown as { internals: ElementInternals }).internals.ariaRequired).toBe(
-      'true',
-    )
+    expect(internalsOf(group).ariaRequired).toBe('true')
   })
 })
 

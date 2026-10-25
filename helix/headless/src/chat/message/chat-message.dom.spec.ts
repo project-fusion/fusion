@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { label, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, label, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 /* One turn, and the four things that can have happened to it. */
 
@@ -141,11 +141,11 @@ describe('the states', () => {
    */
   test('a streaming turn is busy while it arrives, and settles', async () => {
     const element = await message('state="streaming"')
-    expect(element.internals?.ariaBusy).toBe('true')
+    expect(internalsOf(element)?.ariaBusy).toBe('true')
     expect(element.hasAttribute('aria-busy')).toBe(false)
     element.state = 'sent'
     await element.updateComplete
-    expect(element.internals?.ariaBusy).toBeNull()
+    expect(internalsOf(element)?.ariaBusy).toBeNull()
   })
 
   test('the state is an attribute, which is how a stylesheet knows', async () => {

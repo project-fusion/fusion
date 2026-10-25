@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* The first page served as rows, handed over to the rows the table draws.
  *
@@ -76,7 +76,7 @@ describe('a data table whose page served its first page', () => {
     expect(part(element, 'empty')).toBeNull()
     expect(element.matches(':state(empty)')).toBe(false)
     /* Not a count of nothing over rows a reader can see. */
-    const internals = (element as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(element)
     expect(internals.ariaRowCount).toBeNull()
   })
 

@@ -1,6 +1,12 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, registerDom, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  hasState,
+  internalsOf,
+  mount,
+  registerDom,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -185,7 +191,7 @@ describe('what it says and shows', () => {
       updateComplete: Promise<unknown>
     }
     await tip.updateComplete
-    expect(tip.internals.role).toBe('none')
+    expect(internalsOf(tip).role).toBe('none')
   })
 })
 

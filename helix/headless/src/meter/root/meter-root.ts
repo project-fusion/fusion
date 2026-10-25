@@ -6,6 +6,7 @@ import {
   HelixBandEvent,
   HelixElement,
   hostAria,
+  internalsOf,
   numberConverter,
   readingText,
   StatusController,
@@ -84,7 +85,7 @@ export type MeterBand = 'fair' | 'good' | 'poor'
 export class HelixHeadlessMeter extends HelixElement {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-meter': { label: 'Messwert' } })`.
+   * `registerWords('de', { 'helix-meter': { liveLabel: '{reading}, {band}' } })`.
    */
   static words = 'helix-meter'
 
@@ -425,16 +426,19 @@ export class HelixHeadlessMeter extends HelixElement {
        an author's own `aria-label` beats it without anything being written onto
        markup their server never had. `meter` is the ARIA role for exactly this
        and is not `progressbar`: a progress bar promises it is going somewhere. */
-    hostAria(this.internals, { label: slottedWords(this, ['label']) || this.label, role: 'meter' })
-    this.internals.ariaValueMin = String(min)
-    this.internals.ariaValueMax = String(max)
-    this.internals.ariaValueNow = String(this.reading)
+    hostAria(internalsOf(this), {
+      label: slottedWords(this, ['label']) || this.label,
+      role: 'meter',
+    })
+    internalsOf(this).ariaValueMin = String(min)
+    internalsOf(this).ariaValueMax = String(max)
+    internalsOf(this).ariaValueNow = String(this.reading)
     /* The words the meter shows, said whether or not they are shown, as
        `Progress` says them. Left to the platform, 18 of 32 was read as "18"
        where the meter draws 56%, and a value past an end as the end itself:
        `ariaValueNow` has to sit inside the range, so this is the only place a
        reader can be told that 250 is not 100. */
-    this.internals.ariaValueText = this.text
+    internalsOf(this).ariaValueText = this.text
     const band = this.computedBand
     const beyond = this.beyond
     this.toggleState('fair', band === 'fair')

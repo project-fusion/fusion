@@ -2,6 +2,7 @@ import {
   customElement,
   HelixElement,
   hostAria,
+  internalsOf,
   numberConverter,
   PaintGateController,
   readColorAlpha,
@@ -212,7 +213,7 @@ export class HelixVoiceLevel extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'img' })
+    hostAria(internalsOf(this), { label: this.label || this.fallbackLabel, role: 'img' })
     if (
       changed.has('level') ||
       changed.has('bands') ||

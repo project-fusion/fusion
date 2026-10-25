@@ -47,7 +47,7 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-video-playlist-item')
 export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   /**
-   * Whether this entry is the one playing.
+   * @internal Whether this entry is the one playing.
    *
    * Written by the playlist rather than by the entry, the way an option's
    * selection is: an entry that made itself current would be a second answer to
@@ -63,7 +63,7 @@ export class HelixHeadlessVideoPlaylistItem extends HelixElement {
   disabled = false
 
   /**
-   * Whether the entry holds the playlist's tab stop. Unset, every entry is in
+   * @internal Whether the entry holds the playlist's tab stop. Unset, every entry is in
    * the tab order, which is what a server renders.
    *
    * **Written by the playlist, with no attribute, and it reaches the button.**

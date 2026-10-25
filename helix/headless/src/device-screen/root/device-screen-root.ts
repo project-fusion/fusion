@@ -15,6 +15,7 @@ import {
   HelixDeviceTouchEvent,
   HelixElement,
   hostAria,
+  internalsOf,
   numberConverter,
   SPOKEN_RULE,
   stopPress,
@@ -1232,7 +1233,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
     super.willUpdate(changed)
     /* The host carries the name, so a consumer's own `aria-label` is the thing
        that wins rather than fighting an attribute this wrote. */
-    hostAria(this.internals, { label: this.label })
+    hostAria(internalsOf(this), { label: this.label })
     this.watch()
     this.measure()
     this.toggleState('empty', this.childrenKnown && this.stream === undefined)

@@ -4,6 +4,7 @@ import {
   drawIcon,
   focusTarget,
   HelixElement,
+  internalsOf,
   KeyboardNavigationController,
   linkDescription,
   MixinControllerOpen,
@@ -119,7 +120,7 @@ const navigable = (item: HelixHeadlessSpeedDialItem): NavigableItem => ({
 export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-speed-dial': { label: 'Aktionen' } })`.
+   * `registerWords('de', { 'helix-speed-dial': { fallbackLabel: 'Aktionen' } })`.
    */
   static words = 'helix-speed-dial'
 
@@ -432,7 +433,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     if (this.described) {
       unlinkDescription(this.described, this)
       this.described = undefined
-      this.internals.ariaLabel = null
+      internalsOf(this).ariaLabel = null
     }
     this.removeEventListener('helix-before-select', this.handleSelect)
     this.removeEventListener('keydown', this.handleKeydown)
@@ -549,7 +550,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
     if (control && control !== this.described && linkDescription(control, this, light)) {
       this.described = control
     }
-    this.internals.ariaLabel = this.described ? this.longPressLabel : null
+    internalsOf(this).ariaLabel = this.described ? this.longPressLabel : null
   }
 
   /** A reader reaching a slotted trigger, which is late enough to describe a plain one. */

@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom, slotted } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  internalsOf,
+  mount,
+  part,
+  registerDom,
+  slotted,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -786,9 +793,9 @@ describe('a table whose rows nest', () => {
     await settle(host)
     await row(host, 'lib').updateComplete
     expect(part(host, 'table')?.getAttribute('role')).toBe('treegrid')
-    expect(row(host, 'lib').internals.ariaLevel).toBe('2')
-    expect(row(host, 'lib').internals.ariaExpanded).toBe('false')
-    expect(row(host, 'src').internals.ariaExpanded).toBe('true')
+    expect(internalsOf(row(host, 'lib')).ariaLevel).toBe('2')
+    expect(internalsOf(row(host, 'lib')).ariaExpanded).toBe('false')
+    expect(internalsOf(row(host, 'src')).ariaExpanded).toBe('true')
   })
 })
 
@@ -832,7 +839,7 @@ describe('a table that loads more', () => {
    412 main Passed". */
 describe('a row is named by its header cell', () => {
   const labelledBy = (row: Element | null): readonly Element[] | null | undefined =>
-    (row as unknown as { internals: ElementInternals }).internals.ariaLabelledByElements
+    internalsOf(row).ariaLabelledByElements
 
   test('names each row by the cell with `header`, or by its first cell', async () => {
     const host = (await mount(`<helix-headless-table label="Runs" selectable grid>
@@ -852,7 +859,7 @@ describe('a row is named by its header cell', () => {
     /* By reference where the platform takes one, and by the cell's words
        where it does not. */
     const name = (row: Element | undefined): string | null | undefined => {
-      const internals = (row as unknown as { internals: Record<string, unknown> }).internals
+      const internals = internalsOf(row) as unknown as Record<string, unknown>
       return 'ariaLabelledByElements' in internals
         ? labelledBy(row ?? null)
             ?.map((cell) => cell.textContent)

@@ -6,6 +6,7 @@ import {
   HelixClearEvent,
   HelixFormElement,
   holdCaret,
+  internalsOf,
   isRtl,
   ListedController,
   MixinControllerValue,
@@ -98,7 +99,7 @@ export class HelixHeadlessTextarea extends MixinVoice(
   protected readonly listed = new ListedController(
     this,
     'focus',
-    () => this.internals?.ariaKeyShortcuts,
+    () => internalsOf(this)?.ariaKeyShortcuts,
   )
 
   /**
@@ -438,7 +439,7 @@ export class HelixHeadlessTextarea extends MixinVoice(
        `FormData`, and the browser saves what it is given: a restored form
        handed that back, which the restore cannot read, and the field came back
        empty. */
-    this.internals.setFormValue(this.formValue(), this.value)
+    internalsOf(this).setFormValue(this.formValue(), this.value)
     const control = this.control
     if (!control) {
       return
@@ -446,7 +447,7 @@ export class HelixHeadlessTextarea extends MixinVoice(
     // The platform's verdict, copied rather than recomputed, with the control as
     // the anchor so a validity bubble points at the text and not at the host.
     this.copyValidity(control)
-    applyOwnRule(this.internals, control, this.validate, this.value)
+    applyOwnRule(internalsOf(this), control, this.validate, this.value)
     this.refreshFeedback()
   }
 

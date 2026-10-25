@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /**
  * What the styled tier gives a windowed table, so a browser lays the rows out
@@ -62,8 +62,7 @@ const table = async (count: number, attributes = 'windowed'): Promise<Windowed> 
 }
 
 /** A row's place, as its internals tell the accessibility tree. */
-const rowIndex = (row: Element | null): string | null =>
-  (row as unknown as { internals: ElementInternals }).internals.ariaRowIndex
+const rowIndex = (row: Element | null): string | null => internalsOf(row).ariaRowIndex
 
 /* A table of thousands of rows laid every one of them out. */
 describe('a windowed table', () => {

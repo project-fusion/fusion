@@ -7,6 +7,7 @@ import {
   HelixFallbackCommandEvent,
   HelixFormElementBase,
   HelixPressEvent,
+  internalsOf,
   ListedController,
   pressType,
   type RecentPress,
@@ -123,7 +124,7 @@ export class HelixHeadlessButton extends HelixFormElementBase {
   protected readonly listed = new ListedController(
     this,
     'press',
-    () => this.internals?.ariaKeyShortcuts,
+    () => internalsOf(this)?.ariaKeyShortcuts,
   )
 
   /**
@@ -215,7 +216,7 @@ export class HelixHeadlessButton extends HelixFormElementBase {
   expanded?: boolean
 
   /**
-   * Whether the button holds its group's tab stop.
+   * @internal Whether the button holds its group's tab stop.
    *
    * A toolbar keeps one tab stop across its children, and the obvious way to do
    * that is to write `tabindex` onto each of them. That is a change to markup
@@ -343,7 +344,7 @@ export class HelixHeadlessButton extends HelixFormElementBase {
   pendingLabel = 'Loading'
 
   /**
-   * What kind of panel this button opens, where it opens one: `menu` for a
+   * @internal What kind of panel this button opens, where it opens one: `menu` for a
    * `Menu`.
    *
    * Set by the component that owns the panel, as a property for the reason

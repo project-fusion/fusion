@@ -36,7 +36,7 @@ import { property, state } from 'lit/decorators.js'
 @customElement('helix-headless-lightbox-item')
 export class HelixHeadlessLightboxItem extends HelixElement {
   /**
-   * Whether this item is the one shown.
+   * @internal Whether this item is the one shown.
    *
    * Written by the root, which is the only thing that sees the set.
    */

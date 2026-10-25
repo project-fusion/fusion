@@ -10,6 +10,7 @@ import {
   HelixElement,
   headingsIn,
   hostAria,
+  internalsOf,
   lockScroll,
   MixinControllerOpen,
   OpenPhaseController,
@@ -388,7 +389,7 @@ export class HelixHeadlessDialog extends MixinControllerOpen(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label })
+    hostAria(internalsOf(this), { label: this.label })
   }
 
   override connectedCallback(): void {

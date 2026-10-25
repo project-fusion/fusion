@@ -4,6 +4,7 @@ import {
   formValue,
   hasLayout,
   hasState,
+  internalsOf,
   part,
   registerDom,
   settle,
@@ -116,7 +117,7 @@ describe('the side the list opened on', () => {
     await settle(host)
     host.open = true
     await settle(host)
-    const states = (host as unknown as { internals: ElementInternals }).internals.states
+    const states = internalsOf(host).states
     states.add(hasState(host, 'placed-top') ? 'placed-top' : 'placed-bottom')
     host.open = false
     await settle(host)

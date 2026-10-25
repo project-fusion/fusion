@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -165,9 +165,6 @@ describe('one toast message', () => {
 })
 
 describe('what a message is to a screen reader', () => {
-  const internalsOf = (one: Element) =>
-    (one as unknown as { internals: ElementInternals }).internals
-
   test('an alertdialog, and never a live region of its own', async () => {
     const plain = (await mount(
       '<helix-headless-toast-item>Saved</helix-headless-toast-item>',

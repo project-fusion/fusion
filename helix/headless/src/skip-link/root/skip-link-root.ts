@@ -49,7 +49,7 @@ import { property } from 'lit/decorators.js'
 export class HelixHeadlessSkipLink extends HelixElement {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-skip-link': { label: 'Zum Inhalt springen' } })`.
+   * `registerWords('de', { 'helix-skip-link': { fallbackLabel: 'Zum Inhalt springen' } })`.
    */
   static words = 'helix-skip-link'
 

@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { at, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { at, internalsOf, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -566,8 +566,7 @@ describe('a speed dial opened by a long press', () => {
     /* By identity: a deep comparison walks the whole document from an element. */
     const describedBy = (element: Described, host: Element): boolean =>
       element.ariaDescribedByElements?.length === 1 && element.ariaDescribedByElements[0] === host
-    const labelOf = (host: Element): string | null =>
-      (host as unknown as { internals: ElementInternals }).internals.ariaLabel
+    const labelOf = (host: Element): string | null => internalsOf(host).ariaLabel
 
     test('is described by the host, which carries `long-press-label`', async () => {
       const host = (await mount(

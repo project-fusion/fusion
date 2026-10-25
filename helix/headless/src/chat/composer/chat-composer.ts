@@ -7,6 +7,7 @@ import {
   HelixStopEvent,
   HelixTypingEvent,
   hostAria,
+  internalsOf,
   MixinVoice,
   markRegion,
   motionPaused,
@@ -478,7 +479,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
       return false
     }
     /* A draft the form would refuse is refused here too, and shown as wrong. */
-    if (!this.internals.validity.valid) {
+    if (!internalsOf(this).validity.valid) {
       this.touch()
       return false
     }
@@ -799,20 +800,20 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
        puts back a draft the reader emptied as empty, and not the declared
        one. */
     if (changed.has('value')) {
-      this.internals.setFormValue(this.value, this.value)
+      internalsOf(this).setFormValue(this.value, this.value)
     }
     /* The browser's verdict on the field, copied with the field as the anchor,
        so the message is in the reader's language and points at the text. */
     const field = this.partNamed<HTMLTextAreaElement>('field')
     if (field?.validity) {
-      this.internals.setValidity(field.validity, field.validationMessage, field)
+      internalsOf(this).setValidity(field.validity, field.validationMessage, field)
     }
-    const invalid = this.feedback !== '' || (this.touched && !this.internals.validity.valid)
+    const invalid = this.feedback !== '' || (this.touched && !internalsOf(this).validity.valid)
     this.toggleState('invalid', invalid)
     /* **`false` while nothing is shown**: a host with a role and no
        `aria-invalid` is judged by its validity, and Chromium exposed an
        untouched required composer, a `group`, as invalid on load. */
-    this.internals.ariaInvalid = invalid ? 'true' : 'false'
+    internalsOf(this).ariaInvalid = invalid ? 'true' : 'false'
     if (invalid !== this.shownInvalid) {
       this.shownInvalid = invalid
     }
@@ -830,7 +831,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'group' })
+    hostAria(internalsOf(this), { label: this.label || this.fallbackLabel, role: 'group' })
     this.noteFocus()
   }
 

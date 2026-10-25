@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria, internalsOf } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -90,16 +90,16 @@ export class HelixHeadlessSkeleton extends HelixElement {
     super.willUpdate(changed)
     const wraps = this.wraps
     this.toggleState('wrapping', wraps)
-    this.internals.ariaBusy = this.loading ? 'true' : null
+    internalsOf(this).ariaBusy = this.loading ? 'true' : null
     /* Loaded content is the page's own and is read as it is. The busy
        indicator and its name belong to a placeholder or to content that is
        still loading. */
     if (this.label && (this.loading || !wraps)) {
-      hostAria(this.internals, { label: this.label, role: 'progressbar' })
-      this.internals.ariaHidden = null
+      hostAria(internalsOf(this), { label: this.label, role: 'progressbar' })
+      internalsOf(this).ariaHidden = null
     } else {
-      hostAria(this.internals, { label: '', role: '' })
-      this.internals.ariaHidden = wraps ? null : 'true'
+      hostAria(internalsOf(this), { label: '', role: '' })
+      internalsOf(this).ariaHidden = wraps ? null : 'true'
     }
   }
 

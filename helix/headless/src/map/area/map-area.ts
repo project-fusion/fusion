@@ -28,7 +28,7 @@ import { type MapPoint, pointsConverter } from '../route/map-route.js'
 export class HelixHeadlessMapArea extends HelixElement {
   /**
    * The key this part's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-map-area': { label: 'Gebiet' } })`.
+   * `registerWords('de', { 'helix-map-area': { fallbackLabel: 'Gebiet' } })`.
    */
   static words = 'helix-map-area'
 

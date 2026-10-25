@@ -7,6 +7,7 @@ import {
   formatWords,
   type HelixBeforeChangeEvent,
   HelixFormElement,
+  internalsOf,
   MixinControllerOpen,
   MixinControllerValue,
   MixinField,
@@ -435,7 +436,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
    * color having no native validity to adopt.
    */
   protected override sync(): void {
-    this.internals.setFormValue(this.value)
+    internalsOf(this).setFormValue(this.value)
     const anchor = this.anchor
     if (!anchor) {
       return
@@ -446,7 +447,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
        panel, and it would not have helped: it has no invalid state, because it
        cannot hold one. */
     if (this.value !== '' && parseColor(this.value) === null) {
-      this.internals.setValidity(
+      internalsOf(this).setValidity(
         { badInput: true },
         this.badInputMessage || 'Enter a color, like #ff0000, rgb(255 0 0) or hsl(0 100% 50%).',
         anchor,
@@ -457,7 +458,7 @@ export class HelixHeadlessColorInput extends MixinPickerField(
       /* A swatch has no native validity of its own, so `required` is the only
          thing left to check and this element has to check it: an empty value on
          a required field is the one state a block of color can be wrong in. */
-      this.internals.setValidity(
+      internalsOf(this).setValidity(
         this.required && this.value === '' ? { valueMissing: true } : {},
         this.required && this.value === '' ? this.valueMissingMessage || 'Choose a color.' : '',
         anchor,

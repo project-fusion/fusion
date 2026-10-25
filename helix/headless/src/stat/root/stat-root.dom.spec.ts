@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   hasLayout,
   hasState,
+  internalsOf,
   mount,
   part,
   registerDom,
@@ -199,17 +200,18 @@ describe('a stat with a label', () => {
   test('is a group named by the label', async () => {
     const stat = (await mount(markup)) as Stat
     await stat.updateComplete
-    expect(stat.internals.role).toBe('group')
-    const reflected = (stat.internals as ElementInternals & { ariaLabelledByElements?: Element[] })
-      .ariaLabelledByElements
+    expect(internalsOf(stat).role).toBe('group')
+    const reflected = (
+      internalsOf(stat) as ElementInternals & { ariaLabelledByElements?: Element[] }
+    ).ariaLabelledByElements
     const name = reflected ? reflected.map((element) => element.textContent).join(' ') : ''
-    expect(name || stat.internals.ariaLabel).toBe('Revenue')
+    expect(name || internalsOf(stat).ariaLabel).toBe('Revenue')
   })
 
   test('without a label, has no role', async () => {
     const stat = (await mount('<helix-headless-stat>42</helix-headless-stat>')) as Stat
     await stat.updateComplete
-    expect(stat.internals.role ?? null).toBeNull()
+    expect(internalsOf(stat).role ?? null).toBeNull()
   })
 
   test('a label arriving later names it', async () => {
@@ -220,7 +222,7 @@ describe('a stat with a label', () => {
     stat.append(label)
     await new Promise((resolve) => setTimeout(resolve, 0))
     await stat.updateComplete
-    expect(stat.internals.role).toBe('group')
+    expect(internalsOf(stat).role).toBe('group')
   })
 
   test('takes a trend in a slot of its own, after the value and the unit', async () => {

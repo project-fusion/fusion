@@ -2,6 +2,7 @@ import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import {
   hasState,
+  internalsOf,
   mount,
   notYetDefined,
   part,
@@ -70,11 +71,9 @@ const settle = async (one: { group: Group; tags: Tag[] }): Promise<void> => {
 describe('a tag group', () => {
   test('is a grid of rows, each with a cell, and named by `label`', async () => {
     const one = await group('', FRUIT)
-    const internals = (one.group as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(one.group)
     expect([internals.role, internals.ariaLabel]).toEqual(['grid', 'Fruit'])
-    const rows = one.tags.map(
-      (tag) => (tag as unknown as { internals: ElementInternals }).internals,
-    )
+    const rows = one.tags.map((tag) => internalsOf(tag))
     expect(rows.map((row) => row.role)).toEqual(['row', 'row', 'row'])
     expect(one.tags.map((tag) => cell(tag)?.getAttribute('role'))).toEqual([
       'gridcell',
@@ -158,7 +157,7 @@ describe('selecting tags', () => {
     await settle(one)
     expect(heard).toEqual(['a', 'change a', 'Plum', 'change Plum'])
     expect(one.tags.map((tag) => tag.selected)).toEqual([false, true])
-    const internals = (one.tags[1] as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(one.tags[1])
     expect(internals.ariaSelected).toBe('true')
   })
 
@@ -168,7 +167,7 @@ describe('selecting tags', () => {
     cell(one.tags[0] as Tag).click()
     await settle(one)
     expect(one.group.value).toBe('Plum,Apple')
-    const internals = (one.group as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(one.group)
     expect(internals.ariaMultiSelectable).toBe('true')
   })
 
@@ -403,7 +402,7 @@ describe('a tag removed from a group', () => {
     await one.group.updateComplete
     const empty = part(one.group, 'empty') as HTMLElement
     expect(one.group.shadowRoot?.activeElement).toBe(empty)
-    const internals = (one.group as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(one.group)
     expect(internals.role).toBe('group')
   })
 
@@ -469,7 +468,7 @@ describe('a row', () => {
     )
     const tag = one.tags[0] as Tag
     await tag.updateComplete
-    const internals = (tag as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(tag)
     expect([internals.ariaLabel, cell(tag).getAttribute('aria-label')]).toEqual([
       'Status Open',
       'Status Open',
@@ -480,7 +479,7 @@ describe('a row', () => {
     await mount('<helix-headless-tag dismissible>Open</helix-headless-tag>')
     const tag = document.querySelector('helix-headless-tag') as Tag
     await tag.updateComplete
-    const internals = (tag as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(tag)
     expect(internals.ariaLabel).toBeNull()
   })
 })

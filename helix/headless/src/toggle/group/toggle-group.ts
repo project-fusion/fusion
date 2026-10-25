@@ -5,6 +5,7 @@ import {
   HelixFormElement,
   hostAria,
   IndicatorController,
+  internalsOf,
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
@@ -236,7 +237,7 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
   allowEmptySelection = false
 
   /**
-   * Whether the group holds a tab stop of its own.
+   * @internal Whether the group holds a tab stop of its own.
    *
    * A toolbar is one tab stop, so a toolbar the group sits in sets this to
    * `false` while its stop is on another control, and every item, the chosen
@@ -477,12 +478,12 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
        `linkHost` sets, because this is the half a server can write. The
        reference wins on the client, which is what lets a consumer slot a label
        richer than a string. */
-    hostAria(this.internals, { label: this.label, role: this.groupRole })
-    this.internals.ariaOrientation = this.orientation ?? null
+    hostAria(internalsOf(this), { label: this.label, role: this.groupRole })
+    internalsOf(this).ariaOrientation = this.orientation ?? null
     /* `required` on the radio group, as `Radio.Group` says it, so a reader
        hears why the form would refuse the group. A toolbar takes no
        `aria-required`. */
-    this.internals.ariaRequired = this.required && !this.multiple ? 'true' : null
+    internalsOf(this).ariaRequired = this.required && !this.multiple ? 'true' : null
     // `null` rather than an empty string when nothing is chosen, which is the
     // difference between a control that submits nothing and one that submits a
     // blank. Under `selection-mode="multiple"`, one entry per pressed value, as
@@ -490,11 +491,11 @@ export class HelixHeadlessToggleGroup extends MixinControllerValue(MixinField(He
     // state the browser restores is those entries too, so a pressed value
     // holding a comma comes back whole and not split at the comma.
     if (!this.answered) {
-      this.internals.setFormValue(null)
+      internalsOf(this).setFormValue(null)
     } else if (this.multiple) {
-      reportValues(this.internals, this.name, this.values, { state: 'entries' })
+      reportValues(internalsOf(this), this.name, this.values, { state: 'entries' })
     } else {
-      this.internals.setFormValue(this.value)
+      internalsOf(this).setFormValue(this.value)
     }
   }
 

@@ -14,6 +14,7 @@ import {
   hostAria,
   IdleController,
   inlineStep,
+  internalsOf,
   isRtl,
   keyClaimed,
   lockScroll,
@@ -823,7 +824,7 @@ export class HelixHeadlessLightbox extends MixinControllerActive(
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label })
+    hostAria(internalsOf(this), { label: this.label })
     this.toggleState('fullscreen', this.filled)
     this.toggleState('idle', this.resting)
     this.toggleState('zoomable', this.maxZoom > 1)

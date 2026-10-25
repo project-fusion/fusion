@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  formValue,
+  hasState,
+  internalsOf,
+  mount,
+  part,
+  registerDom,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -167,7 +174,7 @@ describe('input number', () => {
     control(host).dispatchEvent(new Event('blur'))
     await host.updateComplete
     expect(host.value).toBe('12e')
-    const internals = (host as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     expect(internals.validity.badInput).toBe(true)
   })
 })
@@ -287,9 +294,7 @@ describe('input number validity', () => {
     /* The platform exempts a read-only control from validation, and the
        reader could not fill this one, so a form holding it could never send. */
     const host = await field('readonly required')
-    expect(
-      (host as unknown as { internals: ElementInternals }).internals.validity.valueMissing,
-    ).not.toBe(true)
+    expect(internalsOf(host).validity.valueMissing).not.toBe(true)
   })
 
   test('reports its value to the form', async () => {
@@ -321,28 +326,28 @@ describe('input number validity', () => {
        `validity.rangeUnderflow` still finds what they expect. */
     const host = await field('min="10"')
     await type(host, '4')
-    const internals = (host as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     expect(internals.validity.rangeUnderflow).toBe(true)
   })
 
   test('a value over the ceiling is a range overflow', async () => {
     const host = await field('max="10"')
     await type(host, '40')
-    const internals = (host as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     expect(internals.validity.rangeOverflow).toBe(true)
   })
 
   test('text that is not a number is bad input', async () => {
     const host = await field()
     await type(host, 'abc')
-    const internals = (host as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     expect(internals.validity.badInput).toBe(true)
   })
 
   test('and a number in range is valid', async () => {
     const host = await field('max="10" min="1"')
     await type(host, '5')
-    const internals = (host as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     expect(internals.validity.valid).toBe(true)
   })
 })
@@ -470,13 +475,9 @@ describe("input number in the page's words", () => {
     /* `feedback` replaces the message under the field and never reached the
        browser's own bubble, which a form in another language raised in English. */
     const low = await field('default-value="1" min="2" range-underflow-message="Au moins {min}."')
-    expect((low as unknown as { internals: ElementInternals }).internals.validationMessage).toBe(
-      'Au moins 2.',
-    )
+    expect(internalsOf(low).validationMessage).toBe('Au moins 2.')
     const empty = await field('required value-missing-message="Obligatoire."')
-    expect((empty as unknown as { internals: ElementInternals }).internals.validationMessage).toBe(
-      'Obligatoire.',
-    )
+    expect(internalsOf(empty).validationMessage).toBe('Obligatoire.')
   })
 })
 
@@ -663,7 +664,7 @@ describe('a formatted number', () => {
     await host.updateComplete
     expect(host.value).toBe('1500.25')
     expect(control(host).value).toBe('$1,500.25')
-    expect((host as unknown as { internals: ElementInternals }).internals.validity.valid).toBe(true)
+    expect(internalsOf(host).validity.valid).toBe(true)
     await type(host, '1.234')
     control(host).dispatchEvent(new Event('blur'))
     await host.updateComplete

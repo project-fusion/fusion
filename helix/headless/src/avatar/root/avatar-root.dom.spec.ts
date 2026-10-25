@@ -1,6 +1,14 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
+import {
+  hasState,
+  internalsOf,
+  mount,
+  part,
+  registerDom,
+  role,
+  slotted,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -66,7 +74,7 @@ describe('avatar', () => {
       internals?: ElementInternals
     }
     expect(role(avatar)).toBe('img')
-    expect(avatar.internals?.ariaLabel).toBe('Ross Sheppard')
+    expect(internalsOf(avatar)?.ariaLabel).toBe('Ross Sheppard')
     expect(avatar.hasAttribute('aria-label')).toBe(false)
   })
 
@@ -78,7 +86,7 @@ describe('avatar', () => {
     // no property mirrors it. Initials still come from the name, because that is
     // what they are drawn from; only what is announced changes.
     expect(avatar.getAttribute('aria-label')).toBe('The design team')
-    expect(avatar.internals?.ariaLabel).toBe('Ross Sheppard')
+    expect(internalsOf(avatar)?.ariaLabel).toBe('Ross Sheppard')
     expect(part(avatar, 'initials')?.textContent?.trim()).toBe('RS')
   })
 

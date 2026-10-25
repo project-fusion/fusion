@@ -7,6 +7,7 @@ import {
   type HelixDismissEvent,
   HelixElement,
   hostAria,
+  internalsOf,
   MixinDismissible,
   onUnlessFalse,
   slottedWords,
@@ -130,7 +131,7 @@ export class HelixHeadlessCallout extends MixinDismissible(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, since the host is the box.
-    hostAria(this.internals, { role: 'note' })
+    hostAria(internalsOf(this), { role: 'note' })
     this.toggleState('closed', !this.open)
   }
 

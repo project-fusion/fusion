@@ -2,6 +2,7 @@ import {
   customElement,
   HelixElement,
   hostAria,
+  internalsOf,
   type Relative,
   RelativeClockController,
   relativeTime,
@@ -188,7 +189,7 @@ export class HelixHeadlessTimelineItem extends HelixElement {
           ...(dateOnly ? { timeZone: 'UTC' } : { timeStyle: 'short' }),
         }).format(moment)
       : ''
-    hostAria(this.internals, { role: 'listitem' })
+    hostAria(internalsOf(this), { role: 'listitem' })
   }
 
   /**

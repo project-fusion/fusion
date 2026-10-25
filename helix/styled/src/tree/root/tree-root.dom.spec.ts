@@ -25,7 +25,7 @@ describe('tree', () => {
 
   test('a branch reports its children, a leaf reports none', async () => {
     const tree = await mount(markup)
-    const items = [...tree.querySelectorAll('helix-tree-item')] as (HTMLElement & {
+    const items = [...tree.querySelectorAll('helix-tree-item')] as unknown as (HTMLElement & {
       isBranch: boolean
       value: string
     })[]

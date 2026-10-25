@@ -2,6 +2,7 @@ import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   formValue,
+  internalsOf,
   mount,
   part,
   registerDom,
@@ -177,8 +178,8 @@ describe('a required filter input', () => {
        only what it is handed as own properties, and a `ValidityState` holds
        its flags as getters, so the shim reports valid whatever it was told. */
     const said: ValidityStateFlags[] = []
-    const set = filter.internals.setValidity.bind(filter.internals)
-    filter.internals.setValidity = (flags, ...rest) => {
+    const set = internalsOf(filter).setValidity.bind(internalsOf(filter))
+    internalsOf(filter).setValidity = (flags, ...rest) => {
       said.push(flags ?? {})
       set(flags, ...rest)
     }
@@ -265,8 +266,8 @@ describe('what a restored page gets back', () => {
       value: string
     }
     const states: unknown[] = []
-    const record = host.internals.setFormValue.bind(host.internals)
-    host.internals.setFormValue = (value, state) => {
+    const record = internalsOf(host).setFormValue.bind(internalsOf(host))
+    internalsOf(host).setFormValue = (value, state) => {
       states.push(state)
       record(value, state)
     }

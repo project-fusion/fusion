@@ -1,4 +1,10 @@
-import { customElement, HelixElement, hostAria, slottedWords } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixElement,
+  hostAria,
+  internalsOf,
+  slottedWords,
+} from '@fusion.dev/helix-core'
 import { dotsSixVertical } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -104,7 +110,7 @@ export class HelixHeadlessListItem extends HelixElement {
   disabled = false
 
   /**
-   * Whether the row holds its list's tab stop.
+   * @internal Whether the row holds its list's tab stop.
    *
    * Written by a list with `selection-mode` on every row it holds, and unset
    * otherwise, which is how a row knows it is a row of a grid. No attribute:
@@ -114,7 +120,7 @@ export class HelixHeadlessListItem extends HelixElement {
   focusable?: boolean | undefined
 
   /**
-   * The name of the row's grip, written by a `reorderable` list from its
+   * @internal The name of the row's grip, written by a `reorderable` list from its
    * `move-label`, and unset in a list that does not reorder, which draws no
    * grip. No attribute: it is coordination between elements, as `focusable`
    * is.
@@ -133,7 +139,7 @@ export class HelixHeadlessListItem extends HelixElement {
   href = ''
 
   /**
-   * Where the row stands in a move, written by a `reorderable` list: the row
+   * @internal Where the row stands in a move, written by a `reorderable` list: the row
    * being moved, or the one the drop indicator is beside. Unset otherwise.
    */
   @property({ attribute: false })
@@ -151,12 +157,14 @@ export class HelixHeadlessListItem extends HelixElement {
    *
    * Written by the list from its own `value`, and unset where nothing can be
    * selected, which keeps `aria-selected` off a list that does not select.
+   * Public because it is the row's own state as well, which a page reads to
+   * draw or count what is chosen.
    */
   @property({ attribute: false })
   selected?: boolean | undefined
 
   /**
-   * Whether `disabled` takes the row out of selection alone, written by a list
+   * @internal Whether `disabled` takes the row out of selection alone, written by a list
    * with `disabled-behavior="selection"`. No attribute: it is coordination
    * between elements, as `focusable` is.
    */
@@ -253,15 +261,15 @@ export class HelixHeadlessListItem extends HelixElement {
      calls too. */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { role: this.grouped ? 'row' : 'listitem' })
-    this.internals.ariaSelected = this.selected === undefined ? null : String(this.selected)
+    hostAria(internalsOf(this), { role: this.grouped ? 'row' : 'listitem' })
+    internalsOf(this).ariaSelected = this.selected === undefined ? null : String(this.selected)
     /* Not disabled to a reader where it is only out of selection, as React
        Aria's GridList has it: the row is reached and acted on. */
-    this.internals.ariaDisabled =
+    internalsOf(this).ariaDisabled =
       this.grouped && this.disabled && !this.selectionOnly ? 'true' : null
     /* On the link where there is one, which is what a reader lands on, and on
        the row otherwise. */
-    this.internals.ariaCurrent =
+    internalsOf(this).ariaCurrent =
       this.current !== undefined && this.href === '' ? this.current : null
     this.toggleState('selected', this.selected === true)
     this.toggleState('dragging', this.move === 'dragging')

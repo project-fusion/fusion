@@ -3,6 +3,7 @@ import {
   customElement,
   HelixFormElement,
   HostClickController,
+  internalsOf,
   ListedController,
   MixinControllerChecked,
   MixinField,
@@ -82,7 +83,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
   protected readonly listed = new ListedController(
     this,
     'press',
-    () => this.internals?.ariaKeyShortcuts,
+    () => internalsOf(this)?.ariaKeyShortcuts,
   )
 
   /**
@@ -172,7 +173,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
 
   /** Reports the value and the validity the host stands behind. */
   private sync(): void {
-    this.internals.setFormValue(this.checked ? this.value : null)
+    internalsOf(this).setFormValue(this.checked ? this.value : null)
     this.reportRequired(!this.checked, this.valueMissingMessage, 'control')
   }
 
@@ -187,7 +188,7 @@ export class HelixHeadlessCheckbox extends MixinControllerChecked(MixinField(Hel
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.internals.ariaRequired = this.required ? 'true' : null
+    internalsOf(this).ariaRequired = this.required ? 'true' : null
     this.toggleState('indeterminate', this.indeterminate)
     if (this.indeterminate) {
       this.dashed = true

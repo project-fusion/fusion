@@ -94,7 +94,7 @@ export class HelixHeadlessRadio extends MixinSelectableItem(HelixElement) {
   }
 
   /**
-   * Whether the radio holds the group's tab stop. Unset, the chosen radio
+   * @internal Whether the radio holds the group's tab stop. Unset, the chosen radio
    * holds it.
    *
    * The stop rides on the selection, and an unanswered group has no selection,

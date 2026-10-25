@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /**
  * The label, hint, feedback and validity contract every form control inherits.
@@ -67,7 +67,7 @@ describe('which message a field shows', () => {
      generic about an input. */
   test('and theirs beats the platform’s', async () => {
     const host = await field('feedback="Pick a color" required')
-    host.internals.setValidity({ valueMissing: true }, 'Please fill in this field')
+    internalsOf(host).setValidity({ valueMissing: true }, 'Please fill in this field')
     expect(host.resolvedFeedback).toBe('Pick a color')
   })
 
@@ -75,13 +75,13 @@ describe('which message a field shows', () => {
      with errors before they have typed is a form scolding them for arriving. */
   test('nothing at all before the field has been touched', async () => {
     const host = await field('required')
-    host.internals.setValidity({ valueMissing: true }, 'Please fill in this field')
+    internalsOf(host).setValidity({ valueMissing: true }, 'Please fill in this field')
     expect(host.resolvedFeedback).toBe('')
   })
 
   test('and nothing when the platform is content', async () => {
     const host = await field()
-    host.internals.setValidity({})
+    internalsOf(host).setValidity({})
     expect(host.resolvedFeedback).toBe('')
   })
 })
@@ -129,21 +129,21 @@ describe('being required', () => {
   test('reports a missing value with the sentence it was given', async () => {
     const host = await field('required')
     host.reportRequired(true, 'Tick this box', 'control')
-    expect(host.internals.validity.valueMissing).toBe(true)
-    expect(host.internals.validationMessage).toBe('Tick this box')
+    expect(internalsOf(host).validity.valueMissing).toBe(true)
+    expect(internalsOf(host).validationMessage).toBe('Tick this box')
   })
 
   test('and clears it once the control is no longer empty', async () => {
     const host = await field('required')
     host.reportRequired(true, 'Tick this box', 'control')
     host.reportRequired(false, 'Tick this box', 'control')
-    expect(host.internals.validity.valueMissing).toBeFalsy()
+    expect(internalsOf(host).validity.valueMissing).toBeFalsy()
   })
 
   test('a field that is not required reports nothing however empty it is', async () => {
     const host = await field()
     host.reportRequired(true, 'Tick this box', 'control')
-    expect(host.internals.validity.valueMissing).toBeFalsy()
+    expect(internalsOf(host).validity.valueMissing).toBeFalsy()
   })
 })
 

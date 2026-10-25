@@ -62,7 +62,7 @@ import '../../menu/index.js'
 export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
   /**
    * The key this part's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-video-playlist-menu': { label: 'Folgen' } })`.
+   * `registerWords('de', { 'helix-video-playlist-menu': { fallbackLabel: 'Folgen' } })`.
    */
   static words = 'helix-video-playlist-menu'
 

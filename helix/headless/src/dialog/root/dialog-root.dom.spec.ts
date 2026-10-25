@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  hasState,
+  internalsOf,
+  mount,
+  part,
+  registerDom,
+} from '@fusion.dev/helix-testing/dom'
 
 /* happy-dom before the element, and the import dynamic for it: an element
    registered against the `customElements` happy-dom replaces never upgrades. */
@@ -41,9 +48,7 @@ describe('dialog', () => {
   test('the name is on the host through internals, not as an attribute', async () => {
     const host = await dialog()
     expect(host.hasAttribute('aria-label')).toBe(false)
-    expect((host as unknown as { internals?: ElementInternals }).internals?.ariaLabel).toBe(
-      'Delete project',
-    )
+    expect(internalsOf(host)?.ariaLabel).toBe('Delete project')
   })
 
   test('opening is announced before it happens, so it can be refused', async () => {

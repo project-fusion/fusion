@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { label, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, label, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -9,7 +9,7 @@ beforeAll(async () => {
 
 /** What the host says names it, which is the heading and not a string. */
 const naming = (host: HTMLElement): Element | undefined =>
-  (host as unknown as { internals: ElementInternals }).internals.ariaLabelledByElements?.[0]
+  internalsOf(host).ariaLabelledByElements?.[0]
 
 /** Whether the heading this drew is the thing the host says names it. */
 const namedByItsHeading = (host: HTMLElement): boolean => {

@@ -10,6 +10,7 @@ import {
   type HourCycle,
   hostWords,
   inlineStep,
+  internalsOf,
   isTwelveHour,
   MixinControllerValue,
   MixinPickerFeedback,
@@ -172,7 +173,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
 ) {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-time-picker': { label: 'Uhrzeit' } })`.
+   * `registerWords('de', { 'helix-time-picker': { fallbackLabel: 'Uhrzeit' } })`.
    */
   static words = 'helix-time-picker'
 
@@ -921,10 +922,10 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   private reportRequired(): void {
     const problem = this.problem
     if (problem) {
-      this.internals.setValidity(problem[0], problem[1], this.partNamed('list') ?? undefined)
+      internalsOf(this).setValidity(problem[0], problem[1], this.partNamed('list') ?? undefined)
       return
     }
-    this.internals.setValidity({})
+    internalsOf(this).setValidity({})
   }
 
   /**
@@ -986,7 +987,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    */
   private report(): void {
     if (this.isDisabled) {
-      this.internals.setFormValue(null)
+      internalsOf(this).setFormValue(null)
       return
     }
     /* A time the picker cannot read is sent as one empty entry, as a native
@@ -995,7 +996,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
        text. */
     const held = this.held
     reportValues(
-      this.internals,
+      internalsOf(this),
       this.name,
       held.every((one) => valueAsSeconds(one) !== null) ? held : [''],
     )

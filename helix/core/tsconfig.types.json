@@ -1,3 +1,9 @@
 {
+  // Core keeps its `@internal` members in its declarations, because the
+  // headless and styled tiers subclass it from other packages and read them:
+  // `isDisabled` on every form control, and the overrides a form base offers
+  // its controls. Every package that nothing subclasses across a package
+  // boundary strips them, from the setting it extends.
+  "compilerOptions": { "stripInternal": false },
   "extends": ["./tsconfig.build.json", "../../tsconfig.types.json"]
 }

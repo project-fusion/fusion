@@ -5,6 +5,7 @@ import {
   formValue,
   hasLayout,
   hasState,
+  internalsOf,
   mount,
   notYetDefined,
   part,
@@ -1004,8 +1005,7 @@ describe('the statuses a combobox hands its list', () => {
   /* Removing the attribute gives the property null, which the combobox read
      as an error: its own `error` state stayed on. */
   test('removing `error-text`, or setting it to null, clears the error state', async () => {
-    const states = (host: Updatable) =>
-      (host as unknown as { internals: ElementInternals }).internals.states
+    const states = (host: Updatable) => internalsOf(host).states
     const host = (await combobox('error-text="Offline"')) as Updatable & {
       errorText: string | null
     }
@@ -1029,8 +1029,7 @@ describe('the statuses a combobox hands its list', () => {
   /* Measured before this: only the list inside had them, which no page
      stylesheet reaches. */
   test('`error` and `no-results` are states of the host as well', async () => {
-    const states = (host: Updatable) =>
-      (host as unknown as { internals: ElementInternals }).internals.states
+    const states = (host: Updatable) => internalsOf(host).states
     const failing = await combobox('error-text="Offline"')
     await settle(failing)
     expect(states(failing).has('error')).toBe(true)
@@ -1049,8 +1048,7 @@ describe('the statuses a combobox hands its list', () => {
 
   /* WA's combobox styles its loading and empty states from the host. */
   test('`loading` and `blank` are states of the host', async () => {
-    const states = (host: Updatable) =>
-      (host as unknown as { internals: ElementInternals }).internals.states
+    const states = (host: Updatable) => internalsOf(host).states
     const loading = await combobox('loading')
     await settle(list(loading) as unknown as Updatable)
     await settle(loading)

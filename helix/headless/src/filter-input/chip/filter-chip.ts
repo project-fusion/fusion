@@ -95,7 +95,7 @@ export class HelixHeadlessFilterChip extends MixinDismissible(HelixElement) {
   override dismissLabel = 'Remove filter'
 
   /**
-   * Whether the remove button is a tab stop of its own.
+   * @internal Whether the remove button is a tab stop of its own.
    *
    * `FilterInput` writes `false` on the chips in its `tags` slot: the field's
    * text is its one tab stop, and the arrow keys move from the text to the

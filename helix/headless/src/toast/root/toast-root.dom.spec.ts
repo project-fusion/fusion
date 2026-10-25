@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, nextFrame, registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, mount, nextFrame, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -72,7 +72,7 @@ describe('toast region', () => {
        live: a polite stack holding an assertive danger message made that
        message news to both. The `live` parts say each arrival once. */
     const host = await region()
-    const internals = (host as unknown as { internals?: ElementInternals }).internals
+    const internals = internalsOf(host)
     expect(internals?.role).toBe('region')
     expect(internals?.ariaLive ?? null).toBeNull()
   })
@@ -81,13 +81,9 @@ describe('toast region', () => {
     const host = (await mount(
       '<helix-headless-toast label="Mitteilungen ({hotkey})" hotkey="Alt+T"></helix-headless-toast>',
     )) as HTMLElement
-    expect((host as unknown as { internals?: ElementInternals }).internals?.ariaLabel).toBe(
-      'Mitteilungen (Alt+T)',
-    )
+    expect(internalsOf(host)?.ariaLabel).toBe('Mitteilungen (Alt+T)')
     const plain = (await mount('<helix-headless-toast></helix-headless-toast>')) as HTMLElement
-    expect((plain as unknown as { internals?: ElementInternals }).internals?.ariaLabel).toBe(
-      'Notifications (F8)',
-    )
+    expect(internalsOf(plain)?.ariaLabel).toBe('Notifications (F8)')
   })
 
   test('says an arrival once, politely, and a danger one assertively, and nothing when one goes', async () => {
@@ -172,9 +168,7 @@ describe('toast region', () => {
   test('the name is on the host through internals, not as an attribute', async () => {
     const host = await region()
     expect(host.hasAttribute('role')).toBe(false)
-    expect((host as unknown as { internals?: ElementInternals }).internals?.ariaLabel).toBe(
-      'Notifications',
-    )
+    expect(internalsOf(host)?.ariaLabel).toBe('Notifications')
   })
 })
 

@@ -9,6 +9,7 @@ import {
   HelixElement,
   HelixSelectEvent,
   hostAria,
+  internalsOf,
   isRtl,
   MIRROR_RULE,
   nameText,
@@ -413,7 +414,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
        first shows: until then there is no row to name. */
     /* The description by reference, from the host, where the host says what
        the row is. */
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       describedBy: this.onHost
         ? [...this.renderRoot.querySelectorAll('#description, #end-words')].filter((slot) =>
             slot.id === 'description' ? this.description : this.end,
@@ -784,7 +785,7 @@ export class HelixHeadlessMenuItem extends HelixElement {
        filter field, which can point only at an element in the tree around it,
        and on the row inside otherwise. */
     const host = this.onHost
-    const internals = this.internals
+    const internals = internalsOf(this)
     internals.role = host ? role : null
     internals.ariaChecked = host ? checkedState : null
     internals.ariaDisabled = host && this.disabled ? 'true' : null

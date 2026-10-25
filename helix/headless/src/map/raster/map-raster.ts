@@ -53,7 +53,7 @@ const framesConverter = {
 export class HelixHeadlessMapRaster extends HelixElement {
   /**
    * The key this part's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-map-raster': { label: 'Überlagerung' } })`.
+   * `registerWords('de', { 'helix-map-raster': { fallbackLabel: 'Überlagerung' } })`.
    */
   static words = 'helix-map-raster'
 

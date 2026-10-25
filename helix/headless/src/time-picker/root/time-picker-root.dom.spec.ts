@@ -4,6 +4,7 @@ import {
   formValue,
   hasLayout,
   hasState,
+  internalsOf,
   mount,
   part,
   registerDom,
@@ -494,7 +495,7 @@ describe('a grid of times that refuses or insists', () => {
     /* The message and the anchor are what a form's own report shows, so the
        verdict has to be on this element rather than on the field around it. */
     const host = await picker('required')
-    const internals = (host as Time & { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     expect(internals.validity.valid).toBe(false)
     expect(internals.validationMessage).toBe('Choose a time.')
     ;(host as Time & { requestValue: (next: string) => boolean }).requestValue('10:30')
@@ -520,7 +521,7 @@ describe('a grid of times that refuses or insists', () => {
      and submitted the text as its one entry. */
   test('a value it cannot read gives the form one empty entry', async () => {
     const host = await picker('name="pm" mode="multiple" value="09:00 10:30"')
-    expect((host as Time & { internals: ElementInternals }).internals.validity.badInput).toBe(true)
+    expect(internalsOf(host).validity.badInput).toBe(true)
     expect((formValue(host) as FormData).getAll('pm')).toEqual([''])
     host.value = '09:00,10:30'
     await host.updateComplete
@@ -529,7 +530,7 @@ describe('a grid of times that refuses or insists', () => {
 
   test('and a grid nobody insisted on is valid while empty', async () => {
     const host = await picker('')
-    expect((host as Time & { internals: ElementInternals }).internals.validity.valid).toBe(true)
+    expect(internalsOf(host).validity.valid).toBe(true)
   })
 })
 
@@ -563,18 +564,18 @@ describe('a time outside what the picker offers', () => {
 
   test('is invalid, with the bound it is past', async () => {
     const late = (await picker('max="17:00" default-value="18:00"')) as Checked
-    expect(late.internals.validity.rangeOverflow).toBe(true)
+    expect(internalsOf(late).validity.rangeOverflow).toBe(true)
     const early = (await picker('min="09:00" default-value="08:00"')) as Checked
-    expect(early.internals.validity.rangeUnderflow).toBe(true)
+    expect(internalsOf(early).validity.rangeUnderflow).toBe(true)
   })
 
   test('and so is a barred one, or one off the step', async () => {
     const barred = (await picker('disable-times="10:00 11:00" default-value="10:00"')) as Checked
-    expect(barred.internals.validity.valid).toBe(false)
+    expect(internalsOf(barred).validity.valid).toBe(false)
     const off = (await picker('default-value="09:07"')) as Checked
-    expect(off.internals.validity.stepMismatch).toBe(true)
+    expect(internalsOf(off).validity.stepMismatch).toBe(true)
     const fine = (await picker('default-value="09:15"')) as Checked
-    expect(fine.internals.validity.valid).toBe(true)
+    expect(internalsOf(fine).validity.valid).toBe(true)
   })
 })
 
@@ -588,15 +589,15 @@ describe('a time picker says when its time is wrong', () => {
      native time input past its `max` is invalid in Chromium's tree on load. */
   test('a time past a bound is marked at once, on the list and as a state', async () => {
     const host = (await picker('max="12:00" value="13:00"')) as Checked
-    expect(host.internals.validity.rangeOverflow).toBe(true)
+    expect(internalsOf(host).validity.rangeOverflow).toBe(true)
     expect(list(host)?.getAttribute('aria-invalid')).toBe('true')
     expect(hasState(host, 'invalid')).toBe(true)
-    expect(host.internals.ariaInvalid).toBe('true')
+    expect(internalsOf(host).ariaInvalid).toBe('true')
   })
 
   test('a missing time waits until a form refuses it, and a reset forgets that', async () => {
     const host = (await picker('required')) as Checked
-    expect(host.internals.validity.valueMissing).toBe(true)
+    expect(internalsOf(host).validity.valueMissing).toBe(true)
     expect(list(host)?.hasAttribute('aria-invalid')).toBe(false)
     expect(hasState(host, 'invalid')).toBe(false)
     host.dispatchEvent(new Event('invalid'))
@@ -816,8 +817,7 @@ describe('a time picker in a page written in another language', () => {
 
 describe('a time picker’s states', () => {
   test('`blank` while no time is chosen', async () => {
-    const states = (host: Time) =>
-      (host as unknown as { internals: ElementInternals }).internals.states
+    const states = (host: Time) => internalsOf(host).states
     const empty = await picker()
     expect(states(empty).has('blank')).toBe(true)
     const chosen = await picker('value="09:15"')
@@ -825,8 +825,7 @@ describe('a time picker’s states', () => {
   })
 
   test('`range-pending` while a range holds one time', async () => {
-    const states = (host: Time) =>
-      (host as unknown as { internals: ElementInternals }).internals.states
+    const states = (host: Time) => internalsOf(host).states
     expect(states(await picker('mode="range" value="09:15"')).has('range-pending')).toBe(true)
     expect(states(await picker('mode="range" value="09:15,10:00"')).has('range-pending')).toBe(
       false,

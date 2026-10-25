@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -111,14 +111,14 @@ if (hasLayout()) {
         '<helix-headless-input label="Nom" required value-missing-message="Obligatoire."></helix-headless-input>',
       )) as HTMLElement & { internals: ElementInternals; updateComplete: Promise<boolean> }
       await worded.updateComplete
-      expect(worded.internals.validationMessage).toBe('Obligatoire.')
+      expect(internalsOf(worded).validationMessage).toBe('Obligatoire.')
 
       const plain = (await mount(
         '<helix-headless-input label="Nom" required></helix-headless-input>',
       )) as HTMLElement & { internals: ElementInternals; updateComplete: Promise<boolean> }
       await plain.updateComplete
-      expect(plain.internals.validationMessage).not.toBe('')
-      expect(plain.internals.validationMessage).not.toBe('Obligatoire.')
+      expect(internalsOf(plain).validationMessage).not.toBe('')
+      expect(internalsOf(plain).validationMessage).not.toBe('Obligatoire.')
     })
   })
 }

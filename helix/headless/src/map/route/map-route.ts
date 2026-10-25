@@ -55,7 +55,7 @@ export const pointsConverter = { fromAttribute: pointsOf }
 export class HelixHeadlessMapRoute extends HelixElement {
   /**
    * The key this part's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-map-route': { label: 'Route' } })`.
+   * `registerWords('de', { 'helix-map-route': { fallbackLabel: 'Route' } })`.
    */
   static words = 'helix-map-route'
 

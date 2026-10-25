@@ -7,6 +7,7 @@ import {
   numberAsValue as fromNumber,
   HelixFormElement,
   holdCaret,
+  internalsOf,
   MixinControllerValue,
   MixinField,
   numberConverter,
@@ -950,30 +951,30 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
   private sync(): void {
     const control = this.control
     const parsed = this.numeric
-    this.internals.setFormValue(this.submitted(parsed), this.value)
+    internalsOf(this).setFormValue(this.submitted(parsed), this.value)
     if (!control) {
       return
     }
     /* Not while read-only, which the platform exempts from validation: the
        reader cannot fill it, so the form could never be sent. */
     if (this.readOnly) {
-      this.internals.setValidity({})
+      internalsOf(this).setValidity({})
     } else if (this.required && this.value.trim() === '') {
-      this.internals.setValidity(
+      internalsOf(this).setValidity(
         { valueMissing: true },
         this.valueMissingMessage || 'Please fill in this field.',
         control,
       )
     } else if (this.value.trim() !== '' && parsed === null) {
-      this.internals.setValidity({ badInput: true }, this.badInputMessage, control)
+      internalsOf(this).setValidity({ badInput: true }, this.badInputMessage, control)
     } else if (parsed !== null && this.min !== undefined && parsed < this.min) {
-      this.internals.setValidity(
+      internalsOf(this).setValidity(
         { rangeUnderflow: true },
         formatWords(this, 'rangeUnderflowMessage', { min: this.written(this.min) }),
         control,
       )
     } else if (parsed !== null && this.max !== undefined && parsed > this.max) {
-      this.internals.setValidity(
+      internalsOf(this).setValidity(
         { rangeOverflow: true },
         formatWords(this, 'rangeOverflowMessage', { max: this.written(this.max) }),
         control,
@@ -983,7 +984,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
       const anchor = this.min ?? 0
       const below = this.clamp(anchor + Math.floor((parsed - anchor) / step) * step)
       const above = this.clamp(anchor + Math.ceil((parsed - anchor) / step) * step)
-      this.internals.setValidity(
+      internalsOf(this).setValidity(
         { stepMismatch: true },
         formatWords(this, 'stepMismatchMessage', {
           above: this.written(above),
@@ -992,7 +993,7 @@ export class HelixHeadlessNumberInput extends MixinControllerValue(MixinField(He
         control,
       )
     } else {
-      this.internals.setValidity({}, '', control)
+      internalsOf(this).setValidity({}, '', control)
     }
     // Straight after, because validity moved without any property moving.
     this.refreshFeedback()

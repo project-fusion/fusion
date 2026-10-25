@@ -15,6 +15,7 @@ import {
   HelixFilterEvent,
   HelixFormElement,
   handedLocale,
+  internalsOf,
   ListedController,
   MixinControllerOpen,
   MixinControllerValue,
@@ -208,7 +209,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   protected readonly listed = new ListedController(
     this,
     'focus',
-    () => this.internals?.ariaKeyShortcuts,
+    () => internalsOf(this)?.ariaKeyShortcuts,
   )
 
   /**
@@ -1380,15 +1381,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
         : undefined
     const answers = words ? values.map((value) => words.get(value) ?? value) : values
     if (!this.multiple) {
-      this.internals.setFormValue(answers[0] ?? null, this.value)
+      internalsOf(this).setFormValue(answers[0] ?? null, this.value)
     } else if (words && this.name !== '' && answers.length > 0) {
       const data = new FormData()
       for (const answer of answers) {
         data.append(this.name, answer)
       }
-      this.internals.setFormValue(data, this.value)
+      internalsOf(this).setFormValue(data, this.value)
     } else {
-      reportValues(this.internals, this.name, answers)
+      reportValues(internalsOf(this), this.name, answers)
     }
     this.reportRequired(this.value === '', this.valueMissingMessage, 'control')
   }

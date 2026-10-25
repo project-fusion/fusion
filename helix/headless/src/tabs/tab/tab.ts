@@ -2,6 +2,7 @@ import {
   customElement,
   glyphPath,
   HelixElement,
+  internalsOf,
   ListedController,
   MixinDismissible,
   MixinSelectableItem,
@@ -59,7 +60,7 @@ export class HelixHeadlessTab extends MixinDismissible(MixinSelectableItem(Helix
   protected readonly listed = new ListedController(
     this,
     'press',
-    () => this.internals?.ariaKeyShortcuts,
+    () => internalsOf(this)?.ariaKeyShortcuts,
   )
 
   /**

@@ -4,6 +4,7 @@ import {
   HelixBeforeSelectEvent,
   HelixElement,
   hostAria,
+  internalsOf,
   type LinkModifiers,
   slotFilled,
 } from '@fusion.dev/helix-core'
@@ -71,7 +72,7 @@ export { isOption, optionsAmong } from '../among.js'
 @customElement('helix-headless-option')
 export class HelixHeadlessOption extends HelixElement {
   /**
-   * Whether this is the option the keyboard is on.
+   * @internal Whether this is the option the keyboard is on.
    *
    * Written by the listbox once a reader moves the highlight. Style it with
    * `:state(active)`, or `::part(item-active)` for an option inside another
@@ -244,7 +245,7 @@ export class HelixHeadlessOption extends HelixElement {
   selected = false
 
   /**
-   * Whether the option says it is selected while the keyboard is on it.
+   * @internal Whether the option says it is selected while the keyboard is on it.
    *
    * Written by a control whose list holds suggestions, such as `FilterInput`:
    * nothing there stays chosen, so the row the keyboard is on is the
@@ -396,7 +397,7 @@ export class HelixHeadlessOption extends HelixElement {
       ...(caption ? [caption] : this.knownChildren.filter((child) => child.slot === 'description')),
       ...(alternate ? [alternate] : []),
     ]
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       describedBy: described,
       labelledBy: named || !label ? [] : [label],
     })
@@ -424,20 +425,20 @@ export class HelixHeadlessOption extends HelixElement {
     /* `role` and `aria-selected` on the host through internals, because an
        option's semantics have to be visible to the listbox that owns it and a
        wrapper in here would put a box between them. */
-    this.internals.role = 'option'
+    internalsOf(this).role = 'option'
     /* A link is followed, not chosen, so it says nothing about being chosen,
        as React Aria's link items in a list that selects nothing. */
-    this.internals.ariaSelected =
+    internalsOf(this).ariaSelected =
       this.href === ''
         ? String(this.selected || (this.selectionFollowsActive && this.active))
         : null
-    this.internals.ariaDisabled = this.disabled ? 'true' : null
+    internalsOf(this).ariaDisabled = this.disabled ? 'true' : null
     const alternate = this.alternate !== '' && this.alternateLabel !== ''
     /* A description by reference outranks `aria-description`, so with a
        caption the alternate destination is read from a hidden element beside it. */
     const captioned =
       Boolean(this.description) || this.knownChildren.some((child) => child.slot === 'description')
-    this.internals.ariaDescription = alternate && !captioned ? this.alternateLabel : null
+    internalsOf(this).ariaDescription = alternate && !captioned ? this.alternateLabel : null
 
     /* A pointer reaches `select()` the way every other choosable row in this
        library does, from a `@click` in its own template: `Tabs.Tab`,

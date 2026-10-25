@@ -138,7 +138,7 @@ type Player = HTMLElement & {
 export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixElement) {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-video-playlist': { label: 'Wiedergabeliste' } })`.
+   * `registerWords('de', { 'helix-video-playlist': { fallbackLabel: 'Wiedergabeliste' } })`.
    */
   static words = 'helix-video-playlist'
 

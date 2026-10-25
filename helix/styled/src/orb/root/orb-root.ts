@@ -3,6 +3,7 @@ import {
   customElement,
   HelixElement,
   hostAria,
+  internalsOf,
   PaintGateController,
   readColorAlpha,
   slotFilled,
@@ -298,11 +299,11 @@ export class HelixOrb extends HelixElement {
 
        A `status` under `announce`, and never busy: a busy live region holds
        back what it says until it is not. */
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: this.label || this.word,
       role: this.announce ? 'status' : state === 'done' ? 'img' : 'progressbar',
     })
-    this.internals.ariaBusy = this.announce ? null : state === 'done' ? 'false' : 'true'
+    internalsOf(this).ariaBusy = this.announce ? null : state === 'done' ? 'false' : 'true'
 
     /* One literal per state, so each is documented and checked by name. */
     this.toggleState('connecting', state === 'connecting')

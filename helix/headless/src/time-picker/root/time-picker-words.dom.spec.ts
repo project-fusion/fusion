@@ -4,7 +4,13 @@ import type {
   clearWords as ClearWords,
   registerWords as RegisterWords,
 } from '@fusion.dev/helix-core'
-import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  internalsOf,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 /* Imported once the DOM is registered: core reads the globals it finds as
    it is evaluated, and a static import breaks the DOM when this file runs
@@ -31,8 +37,7 @@ const picker = async (around: string, attrs = ''): Promise<HTMLElement> => {
   return host
 }
 
-const bubble = (host: HTMLElement): string =>
-  (host as unknown as { internals: ElementInternals }).internals.validationMessage
+const bubble = (host: HTMLElement): string => internalsOf(host).validationMessage
 
 describe('a time picker on a page in another language', () => {
   test('is named in the words registered for the nearest `lang`', async () => {

@@ -8,6 +8,7 @@ import {
   HelixNavigateEvent,
   hostAria,
   inlineStep,
+  internalsOf,
   KeyboardNavigationController,
   keyClaimed,
   MIRROR_RULE,
@@ -452,7 +453,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
       }
     }
     /* The landmark, through internals, so nothing is written onto the host. */
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: this.navigation ? this.label : '',
       role: this.navigation ? 'navigation' : '',
     })

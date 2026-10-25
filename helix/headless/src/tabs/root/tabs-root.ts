@@ -120,8 +120,8 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
   protected static override markRules = [MIRROR_RULE]
 
   /**
-   * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-tabs': { label: 'Reiter' } })`.
+   * The key this family's words are registered under, its styled tag, kept
+   * for a subclass that adds words of its own. Tabs has no built-in name.
    */
   static words = 'helix-tabs'
 

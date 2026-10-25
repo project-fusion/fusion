@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   hasLayout,
   hasState,
+  internalsOf,
   mount,
   notYetDefined,
   part,
@@ -666,8 +667,8 @@ describe('moving between turns', () => {
       HTMLElement & { internals: ElementInternals; updateComplete: Promise<unknown> }
     >
     await Promise.all(turns.map((one) => one.updateComplete))
-    expect(turns.map((one) => one.internals.ariaPosInSet)).toEqual(['1', '2', '3'])
-    expect(turns.map((one) => one.internals.ariaSetSize)).toEqual(['3', '3', '3'])
+    expect(turns.map((one) => internalsOf(one).ariaPosInSet)).toEqual(['1', '2', '3'])
+    expect(turns.map((one) => internalsOf(one).ariaSetSize)).toEqual(['3', '3', '3'])
   })
 })
 

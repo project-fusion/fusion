@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
+import {
+  hasState,
+  internalsOf,
+  mount,
+  registerDom,
+  role,
+  slotted,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -19,7 +26,7 @@ describe('button group', () => {
     // what the grouping exists to say it is not.
     const group = (await mount(markup)) as HTMLElement & { internals?: ElementInternals }
     expect(role(group)).toBe('group')
-    expect(group.internals?.ariaLabel).toBe('Text alignment')
+    expect(internalsOf(group)?.ariaLabel).toBe('Text alignment')
     expect(group.getAttributeNames()).toEqual(['label'])
   })
 
@@ -330,7 +337,7 @@ describe('a button group with selection-mode', () => {
        before this: the group stayed a toolbar with aria-orientation, while
        every button was its own tab stop and the arrow keys did nothing. */
     const group = await mountGroup(view.replace('label=', 'orientation="vertical" label='))
-    const internals = (group as Group & { internals?: ElementInternals }).internals
+    const internals = internalsOf(group)
     expect(internals?.ariaOrientation).toBe('vertical')
     group.removeAttribute('selection-mode')
     await flush(group)
@@ -389,7 +396,7 @@ describe('a disabled button group', () => {
 
   test('disables every button in it and says so on the group, as React Aria isDisabled does', async () => {
     const group = (await mountGroup(view.replace('label=', 'disabled label='))) as Disableable
-    expect(group.internals?.ariaDisabled).toBe('true')
+    expect(internalsOf(group)?.ariaDisabled).toBe('true')
     expect(
       buttonsOf(group).map((button) => (button as Pressable & { disabled: boolean }).disabled),
     ).toEqual([true, true, true])
@@ -408,7 +415,7 @@ describe('a disabled button group', () => {
     expect(native.disabled).toBe(true)
     group.disabled = false
     await flush(group)
-    expect(group.internals?.ariaDisabled).toBeNull()
+    expect(internalsOf(group)?.ariaDisabled).toBeNull()
     expect(
       buttonsOf(group).map((button) => (button as Pressable & { disabled: boolean }).disabled),
     ).toEqual([false, true])

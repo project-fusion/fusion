@@ -179,6 +179,30 @@ const reported = new WeakMap<HTMLElement, FormValue>()
  */
 export const formValue = (host: HTMLElement): FormValue | undefined => reported.get(host)
 
+/* The internals each element attached, kept here as the element attaches them,
+   because the element keeps them where nothing outside it can reach. */
+const attached = new WeakMap<Element, ElementInternals>()
+
+/**
+ * The `ElementInternals` an element attached: the role, the name, the states
+ * and the form value an accessibility tree and a form are built from.
+ *
+ * **Recorded by the harness, because the element publishes none of it.** A
+ * Helix element keeps its internals off its own surface, as the platform
+ * means them to be kept, so a spec reads what the element wrote through the
+ * record `attachInternals` leaves here. Throws for an element that attached
+ * none, which is a spec reading the wrong element.
+ */
+export const internalsOf = (host: object | null | undefined): ElementInternals => {
+  const internals = host instanceof Element ? attached.get(host) : undefined
+  if (!internals) {
+    throw new Error(
+      `${host instanceof Element ? `<${host.localName}>` : String(host)} attached no internals.`,
+    )
+  }
+  return internals
+}
+
 const shimElementInternals = (): void => {
   const proto = HTMLElement.prototype as HTMLElement & {
     attachInternals?: () => ElementInternals
@@ -186,7 +210,13 @@ const shimElementInternals = (): void => {
   // Read through an index rather than testing the member directly. The DOM lib
   // types `attachInternals` as always present, so TypeScript narrows the guard
   // away entirely; happy-dom is the environment where it genuinely is not.
-  if (typeof (proto as unknown as Record<string, unknown>).attachInternals === 'function') {
+  const native = (proto as unknown as Record<string, unknown>).attachInternals
+  if (typeof native === 'function') {
+    proto.attachInternals = function attachInternals(this: HTMLElement): ElementInternals {
+      const internals = (native as () => ElementInternals).call(this)
+      attached.set(this, internals)
+      return internals
+    }
     return
   }
 
@@ -200,7 +230,7 @@ const shimElementInternals = (): void => {
       }
       return validity.valid
     }
-    return {
+    const internals = {
       ariaCurrent: null,
       /* Declared, not merely assignable: a component that guards on
          `'ariaDescribedByElements' in internals` skips the link entirely when
@@ -249,6 +279,8 @@ const shimElementInternals = (): void => {
         return true
       },
     } as unknown as ElementInternals
+    attached.set(host, internals)
+    return internals
   }
 }
 
@@ -306,9 +338,7 @@ export const logged = (): string[] => {
  * platform's own precedence and the reason this checks the attribute first.
  */
 export const role = (host: HTMLElement): string | null =>
-  host.getAttribute('role') ??
-  (host as unknown as { internals?: ElementInternals }).internals?.role ??
-  null
+  host.getAttribute('role') ?? attached.get(host)?.role ?? null
 
 /**
  * The accessible name a screen reader announces on the host.
@@ -320,9 +350,7 @@ export const role = (host: HTMLElement): string | null =>
  * precedence and why the attribute is checked first.
  */
 export const label = (host: HTMLElement): string | null =>
-  host.getAttribute('aria-label') ??
-  (host as unknown as { internals?: ElementInternals }).internals?.ariaLabel ??
-  null
+  host.getAttribute('aria-label') ?? attached.get(host)?.ariaLabel ?? null
 
 /**
  * Whether a component has recorded a custom state on itself.
@@ -338,9 +366,9 @@ export const label = (host: HTMLElement): string | null =>
  * matched is a browser's question and not one this environment can answer.
  */
 export const hasState = (host: Element, name: string): boolean =>
-  (
-    host as unknown as { internals?: { states?: { has(value: string): boolean } } }
-  ).internals?.states?.has(name) ?? false
+  (attached.get(host) as { states?: { has(value: string): boolean } } | undefined)?.states?.has(
+    name,
+  ) ?? false
 
 /**
  * Finds a shadow part by name.

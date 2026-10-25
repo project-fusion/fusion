@@ -6,6 +6,7 @@ import {
   edgeOffset,
   HelixElement,
   hostAria,
+  internalsOf,
   isRtl,
   MixinDismissible,
   requestChange,
@@ -391,8 +392,8 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
     /* A dialog a reader can move into, named by its words. Through internals,
        so nothing is written onto the consumer's element. Not a live region:
        the region says the message as it arrives, in the voice of its tone. */
-    hostAria(this.internals, { role: 'alertdialog' })
-    this.internals.ariaModal = 'false'
+    hostAria(internalsOf(this), { role: 'alertdialog' })
+    internalsOf(this).ariaModal = 'false'
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -432,7 +433,7 @@ export class HelixHeadlessToastItem extends MixinDismissible(HelixElement) {
       return
     }
     const heading = this.assigned('heading')
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       describedBy: this.assigned('description'),
       labelledBy: heading.length > 0 ? heading : [words],
     })

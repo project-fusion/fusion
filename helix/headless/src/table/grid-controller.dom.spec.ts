@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -277,7 +277,7 @@ describe('a grid table', () => {
     await settle(host)
     await settle(host)
     const api = host.querySelector('[value="api"]') as HTMLElement
-    const internals = (api as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(api)
     expect(internals.ariaDisabled).toBe('true')
     expect((part(api, 'checkbox') as HTMLElement & { disabled: boolean }).disabled).toBe(true)
 

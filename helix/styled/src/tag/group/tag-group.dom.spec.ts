@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -24,7 +24,7 @@ describe('the styled tag group', () => {
       '<helix-tag-group label="Filters"><helix-tag>Open</helix-tag></helix-tag-group>',
     )) as HTMLElement & { updateComplete: Promise<unknown> }
     await group.updateComplete
-    const internals = (group as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(group)
     expect(internals.role).toBe('grid')
   })
 

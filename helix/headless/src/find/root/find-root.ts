@@ -174,7 +174,7 @@ export class HelixHeadlessFind extends MixinControllerOpen(HelixElement) {
 
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-find': { label: 'Suchen' } })`.
+   * `registerWords('de', { 'helix-find': { fallbackLabel: 'Suchen' } })`.
    */
   static words = 'helix-find'
 

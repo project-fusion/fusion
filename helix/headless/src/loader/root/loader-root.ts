@@ -4,6 +4,7 @@ import {
   elementById,
   HelixElement,
   hostAria,
+  internalsOf,
   reportRuntime,
   timeConverter,
   words,
@@ -74,7 +75,7 @@ import { awaitRegion, claimBusy, releaseBusy } from '../busy.js'
 export class HelixHeadlessLoader extends HelixElement {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-loader': { label: 'Wird geladen' } })`.
+   * `registerWords('de', { 'helix-loader': { fallbackLabel: 'Wird geladen' } })`.
    */
   static words = 'helix-loader'
 
@@ -218,13 +219,13 @@ export class HelixHeadlessLoader extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: this.idle ? '' : this.label || this.fallbackLabel,
       role: this.idle ? '' : 'progressbar',
     })
-    this.internals.ariaBusy = this.idle ? null : 'true'
+    internalsOf(this).ariaBusy = this.idle ? null : 'true'
     /* Silent while it waits, as well as unseen. */
-    this.internals.ariaHidden = this.waiting ? 'true' : null
+    internalsOf(this).ariaHidden = this.waiting ? 'true' : null
     this.toggleState('waiting', this.waiting)
   }
 

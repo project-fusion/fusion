@@ -25,7 +25,7 @@ import { property } from 'lit/decorators.js'
 export class HelixHeadlessMapBuildings extends HelixElement {
   /**
    * The key this part's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-map-buildings': { label: '3D-Gebäude' } })`.
+   * `registerWords('de', { 'helix-map-buildings': { fallbackLabel: '3D-Gebäude' } })`.
    */
   static words = 'helix-map-buildings'
 

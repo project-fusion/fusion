@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* Rows moved by a grip, with `reorderable-rows`. The table moves no row: the
    specs that move one set `rows` to the order `helix-reorder` carries, as a
@@ -149,7 +149,7 @@ describe('a table with reorderable-rows', () => {
     expect(shadow(element, '[part~="select"]')[0]?.dataset.column).toBe('1')
     expect(shadow(element, '[part="select-all"]')[0]?.dataset.column).toBe('1')
     /* The grips, the checkboxes and the two columns. */
-    expect((element as unknown as { internals: ElementInternals }).internals.ariaColCount).toBe('4')
+    expect(internalsOf(element).ariaColCount).toBe('4')
   })
 
   test('picks up a row with Space, moves it with the arrows, and drops it with Enter', async () => {

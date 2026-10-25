@@ -62,7 +62,7 @@ import { property, state } from 'lit/decorators.js'
 export class HelixHeadlessMotionToggle extends HelixElement {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-motion-toggle': { label: 'Bewegung anhalten' } })`.
+   * `registerWords('de', { 'helix-motion-toggle': { fallbackLabel: 'Bewegung anhalten' } })`.
    */
   static words = 'helix-motion-toggle'
 

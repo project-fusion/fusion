@@ -8,6 +8,7 @@ import {
   hintInside,
   hintMayShow,
   hostAria,
+  internalsOf,
   linkDescription,
   MixinControllerOpen,
   numberConverter,
@@ -1030,7 +1031,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
      * reason. Where the trigger is the consumer's own plain element, the link is
      * written only after a reader has acted on it, which is after hydration;
      * `linkDescription` says the rest. */
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       describedBy: this.hasContent ? [bubble] : [],
       /* **And the host names itself, which is what makes `for` work when the
          bubble is down.**
@@ -1066,7 +1067,7 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
        the tooltip beside its trigger. A reference reads the words of an element
        hidden this way all the same. The wrapping form holds its trigger, so it
        cannot hide, and an open bubble is a `tooltip` a reader can find. */
-    this.internals.ariaHidden = this.for !== '' && !this.open ? 'true' : null
+    internalsOf(this).ariaHidden = this.for !== '' && !this.open ? 'true' : null
   }
 
   protected override render(): TemplateResult {

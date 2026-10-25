@@ -4,6 +4,7 @@ import {
   formValue,
   hasLayout,
   hasState,
+  internalsOf,
   mount,
   part,
   registerDom,
@@ -443,8 +444,7 @@ describe('input pin commit', () => {
 })
 
 describe('input pin validity', () => {
-  const internals = (host: HTMLElement): ElementInternals =>
-    (host as unknown as { internals: ElementInternals }).internals
+  const internals = (host: HTMLElement): ElementInternals => internalsOf(host)
 
   test('a half-entered code is too short, in the platform’s words', async () => {
     const host = await pin('length="6"')
@@ -690,7 +690,7 @@ describe('the gaps Zag and Web Awesome close', () => {
     await host.updateComplete
     /* What the platform reads, the internals, rather than the host's
        `validity`, which brings the verdict up to date as it is asked. */
-    const { internals } = host as unknown as { internals: ElementInternals }
+    const internals = internalsOf(host)
     const verdicts: boolean[] = []
     host.addEventListener('helix-complete', () => verdicts.push(internals.validity.valid))
     form.requestSubmit = () => {

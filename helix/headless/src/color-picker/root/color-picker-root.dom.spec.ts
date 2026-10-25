@@ -4,6 +4,7 @@ import {
   formValue,
   hasLayout,
   hasState,
+  internalsOf,
   mount,
   part,
   registerDom,
@@ -507,8 +508,7 @@ describe('a required color', () => {
      composition position both check it. This one carried the property nowhere,
      so a form holding an unanswered required picker submitted, `:valid` true
      and the entry absent. */
-  const internals = (host: HTMLElement): ElementInternals =>
-    (host as unknown as { internals: ElementInternals }).internals
+  const internals = (host: HTMLElement): ElementInternals => internalsOf(host)
 
   test('with nothing chosen is missing', async () => {
     const host = await picker('name="brand" required')
@@ -558,8 +558,7 @@ describe('a required color', () => {
    off, no control carried `aria-invalid`, and nothing was said. Date Picker
    marked both. */
 describe('an answer the picker refuses', () => {
-  const internals = (host: HTMLElement): ElementInternals =>
-    (host as unknown as { internals: ElementInternals }).internals
+  const internals = (host: HTMLElement): ElementInternals => internalsOf(host)
 
   const typeInto = async (host: Color, text: string, commit: boolean): Promise<void> => {
     const field = part(host, 'value') as HTMLInputElement
@@ -879,11 +878,11 @@ if (hasLayout()) {
       })[]
       await named?.updateComplete
       await bare?.updateComplete
-      expect(named?.internals.role).toBe('group')
-      expect(named?.internals.ariaLabelledByElements?.map((one) => one.textContent)).toEqual([
+      expect(internalsOf(named).role).toBe('group')
+      expect(internalsOf(named).ariaLabelledByElements?.map((one) => one.textContent)).toEqual([
         'Tint',
       ])
-      expect(bare?.internals.role).toBeNull()
+      expect(internalsOf(bare).role).toBeNull()
     })
   })
 }
@@ -1047,14 +1046,14 @@ describe('the message under a color picker', () => {
     expect(
       host.shadowRoot?.querySelector('[part="grid-saturation"]')?.getAttribute('aria-describedby'),
     ).toBe(message.id)
-    const internals = (host as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     expect(internals.validity.customError).toBe(true)
     expect(internals.validationMessage).toBe('Pick a darker red')
   })
 
   test('marks the picker invalid to a reader and to CSS, as a field’s `feedback` does', async () => {
     const host = await picker('value="#ff0000" feedback="Pick a darker red"')
-    const internals = (host as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     expect(part(host, 'grid-saturation')?.getAttribute('aria-invalid')).toBe('true')
     expect(part(host, 'grid-brightness')?.getAttribute('aria-invalid')).toBe('true')
     expect(part(host, 'value')?.getAttribute('aria-invalid')).toBe('true')
@@ -1153,9 +1152,6 @@ describe('the square’s vertical axis', () => {
 /* Web Awesome's and Shoelace's pickers take a label and a hint, and this one
    was named only by a page's `<label for>` or its `aria-label`. */
 describe('a color picker with a label and a hint', () => {
-  const internalsOf = (host: HTMLElement): ElementInternals =>
-    (host as unknown as { internals: ElementInternals }).internals
-
   test('shows the label, is a group by that name, and the square says it first', async () => {
     const host = await picker('label="Brand color" value="#ff0000"')
     expect((part(host, 'label') as HTMLElement | null)?.hidden).toBe(false)

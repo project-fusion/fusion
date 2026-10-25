@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, internalsOf, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { HelixHeadlessMarkdown } from './markdown-root.js'
 
 beforeAll(async () => {
@@ -192,7 +192,7 @@ describe('markdown', () => {
     const element = await fresh()
     element.streaming = true
     await element.updateComplete
-    const internals = (element as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(element)
     expect(internals.ariaBusy).toBe('true')
     expect(hasState(element, 'streaming')).toBe(true)
     element.streaming = false

@@ -1,4 +1,4 @@
-import { customElement, HelixElement } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, internalsOf } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -99,7 +99,7 @@ export class HelixHeadlessFilterOperator extends HelixElement {
        the accessibility tree because it is never on the page: the menu that
        offers these renders its own rows. Saying so here stops a consumer's own
        stylesheet or a future refactor from quietly giving it one. */
-    this.internals.role = 'none'
+    internalsOf(this).role = 'none'
   }
 
   /**

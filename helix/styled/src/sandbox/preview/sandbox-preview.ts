@@ -257,7 +257,7 @@ export type PreviewMessage =
 export class HelixSandboxPreview extends HelixElement {
   /**
    * The key this part's words are registered under, its tag:
-   * `registerWords('de', { 'helix-sandbox-preview': { label: 'Vorschau' } })`.
+   * `registerWords('de', { 'helix-sandbox-preview': { fallbackLabel: 'Vorschau' } })`.
    */
   static words = 'helix-sandbox-preview'
 

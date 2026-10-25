@@ -6,6 +6,7 @@ import {
   HelixElement,
   HelixScrolledEvent,
   hostAria,
+  internalsOf,
   MixinControllerOpen,
   numberConverter,
   words,
@@ -396,7 +397,7 @@ export class HelixHeadlessAppHeader extends MixinControllerOpen(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     // On the host, since the host is the banner.
-    hostAria(this.internals, { role: this.landmark })
+    hostAria(internalsOf(this), { role: this.landmark })
     this.toggleState('folded', this.folded)
     /* After the mixin's, which records `open` whenever `open` is true: here
        the state is the region showing, and a wide bar shows no folded region. */
@@ -429,7 +430,7 @@ export class HelixHeadlessAppHeader extends MixinControllerOpen(HelixElement) {
   /** Whether this header is the page's banner, read from where it sits. */
   private readLandmark(): void {
     this.landmark = inSectioningContent(this) ? '' : 'banner'
-    hostAria(this.internals, { role: this.landmark })
+    hostAria(internalsOf(this), { role: this.landmark })
   }
 
   override disconnectedCallback(): void {

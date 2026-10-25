@@ -6,6 +6,7 @@ import {
   HelixElement,
   HelixSelectEvent,
   hostAria,
+  internalsOf,
   MIRROR_RULE,
   slotFilled,
   slotNamed,
@@ -91,7 +92,7 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
   download = false
 
   /**
-   * Whether this row holds the region's tab stop. Set by the drill-down.
+   * @internal Whether this row holds the region's tab stop. Set by the drill-down.
    *
    * A drill-down keeps one stop and moves within it on the arrows, so every
    * other row is at `-1`. Leave it off every row, including the first, and
@@ -199,7 +200,7 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
        passes that page's rows through, and a row off the page draws nothing,
        so neither is an item of the list. */
     const item = this.listed && this.onPage && !this.showingPage && !this.onPath
-    hostAria(this.internals, { role: item ? 'listitem' : '' })
+    hostAria(internalsOf(this), { role: item ? 'listitem' : '' })
     if (this.childrenKnown) {
       const named = (name: string): boolean =>
         this.knownChildren.some((child) => child.slot === name)

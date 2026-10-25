@@ -13,6 +13,7 @@ import {
   HelixHistoryEvent,
   HelixPinEvent,
   hostAria,
+  internalsOf,
   MixinCollection,
   numberConverter,
   onUnlessFalse,
@@ -1172,7 +1173,7 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'region' })
+    hostAria(internalsOf(this), { label: this.label || this.fallbackLabel, role: 'region' })
     if (changed.has('meLabel') || changed.has('messageLabel') || changed.has('turnLabel')) {
       this.words = { me: this.meLabel, sentence: this.messageLabel, turn: this.turnLabel }
     }

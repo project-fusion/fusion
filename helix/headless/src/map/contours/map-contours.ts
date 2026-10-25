@@ -37,7 +37,7 @@ import type { MapTerrainEncoding } from '../terrain/map-terrain.js'
 export class HelixHeadlessMapContours extends HelixElement {
   /**
    * The key this part's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-map-contours': { label: 'Höhenlinien' } })`.
+   * `registerWords('de', { 'helix-map-contours': { fallbackLabel: 'Höhenlinien' } })`.
    */
   static words = 'helix-map-contours'
 

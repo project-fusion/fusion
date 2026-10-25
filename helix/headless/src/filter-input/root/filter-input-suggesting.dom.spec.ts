@@ -1,6 +1,12 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  internalsOf,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -388,9 +394,7 @@ describe('the highlighted suggestion', () => {
     const host = await mount(['absent', 'stale'])
     await enter(host)
     await press(host, 'ArrowDown')
-    const said = options(host).map(
-      (option) => (option as unknown as { internals: ElementInternals }).internals.ariaSelected,
-    )
+    const said = options(host).map((option) => internalsOf(option).ariaSelected)
     expect(said).toEqual(['true', 'false'])
   })
 })
@@ -399,7 +403,7 @@ describe('the highlighted suggestion', () => {
    a no-results line, each with a slot; the suggestions panel had neither. */
 describe('a panel that is loading or finds nothing', () => {
   const states = (host: Updatable): Set<string> =>
-    (host as unknown as { internals: ElementInternals }).internals.states as unknown as Set<string>
+    internalsOf(host).states as unknown as Set<string>
 
   test('opens on the loading line, says it, and shows the suggestions once they come', async () => {
     const host = await mount([], 'loading')

@@ -17,6 +17,7 @@ import {
   HelixSampleStartEvent,
   hostAria,
   hueName,
+  internalsOf,
   isRtl,
   KeyboardNavigationController,
   labelsOf,
@@ -1039,7 +1040,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
    * `required`.
    */
   private sync(): void {
-    this.internals.setFormValue(this.value === '' ? null : this.value)
+    internalsOf(this).setFormValue(this.value === '' ? null : this.value)
     this.reportRequired()
   }
 
@@ -1091,7 +1092,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
    */
   private reportRequired(): void {
     if (this.draft !== undefined) {
-      this.internals.setValidity(
+      internalsOf(this).setValidity(
         { badInput: true },
         this.badInputMessage,
         this.partNamed('value') ?? this.partNamed('grid') ?? undefined,
@@ -1099,7 +1100,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
       return
     }
     if (this.required && this.value === '') {
-      this.internals.setValidity(
+      internalsOf(this).setValidity(
         { valueMissing: true },
         this.valueMissingMessage,
         this.partNamed('grid') ?? undefined,
@@ -1107,14 +1108,14 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
       return
     }
     if (this.value !== '' && parseColor(this.value) === null) {
-      this.internals.setValidity(
+      internalsOf(this).setValidity(
         { badInput: true },
         this.badInputMessage,
         this.partNamed('value') ?? this.partNamed('grid') ?? undefined,
       )
       return
     }
-    this.internals.setValidity({})
+    internalsOf(this).setValidity({})
   }
 
   protected override updated(changed: import('lit').PropertyValues): void {
@@ -1388,7 +1389,7 @@ export class HelixHeadlessColorPicker extends MixinPickerFeedback(
        role, as it is inside Color Input. */
     const outside = labelsOf(this)
     const named = this.named
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: outside.length > 0 ? '' : named,
       labelledBy: outside,
       role: outside.length > 0 || named !== '' ? 'group' : '',

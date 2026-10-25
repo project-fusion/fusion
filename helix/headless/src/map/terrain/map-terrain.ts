@@ -40,7 +40,7 @@ export type MapTerrainEncoding = 'mapbox' | 'terrarium'
 export class HelixHeadlessMapTerrain extends HelixElement {
   /**
    * The key this part's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-map-terrain': { label: 'Gelände' } })`.
+   * `registerWords('de', { 'helix-map-terrain': { fallbackLabel: 'Gelände' } })`.
    */
   static words = 'helix-map-terrain'
 

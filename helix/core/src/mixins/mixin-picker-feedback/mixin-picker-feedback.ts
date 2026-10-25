@@ -1,5 +1,6 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { internalsOf } from '../../helix-element/helix-element.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
 import { hostAria } from '../../utils/host-aria/host-aria.js'
 
@@ -155,7 +156,7 @@ export const MixinPickerFeedback = <T extends Constructor<HelixFormElement>>(Bas
        an untouched required Date Picker, a `group`, as invalid on load. */
     protected override willUpdate(changed: PropertyValues): void {
       super.willUpdate(changed)
-      this.internals.ariaInvalid = this.marked ? 'true' : 'false'
+      internalsOf(this).ariaInvalid = this.marked ? 'true' : 'false'
       this.toggleState('invalid', this.marked)
     }
 
@@ -166,7 +167,7 @@ export const MixinPickerFeedback = <T extends Constructor<HelixFormElement>>(Bas
     protected override updated(changed: PropertyValues): void {
       super.updated(changed)
       const line = this.partNamed('feedback')
-      hostAria(this.internals, { describedBy: line ? [line] : [] })
+      hostAria(internalsOf(this), { describedBy: line ? [line] : [] })
     }
 
     /**

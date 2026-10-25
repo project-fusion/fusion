@@ -133,7 +133,7 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
 
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-shortcut-overlay': { label: 'Tastenkürzel' } })`.
+   * `registerWords('de', { 'helix-shortcut-overlay': { fallbackLabel: 'Tastenkürzel' } })`.
    */
   static words = 'helix-shortcut-overlay'
 

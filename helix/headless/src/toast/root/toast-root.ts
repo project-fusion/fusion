@@ -11,6 +11,7 @@ import {
   formatWords,
   HelixElement,
   hostAria,
+  internalsOf,
   keyClaimed,
   keyNames,
   matchesChord,
@@ -117,7 +118,7 @@ import { joinSaid, messageWords } from '../words.js'
 export class HelixHeadlessToast extends HelixElement {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-toast': { label: 'Benachrichtigungen ({hotkey})' } })`.
+   * `registerWords('de', { 'helix-toast': { fallbackLabel: 'Benachrichtigungen ({hotkey})' } })`.
    * A message's own words are under `helix-toast-item`.
    */
   static words = 'helix-toast'
@@ -211,7 +212,7 @@ export class HelixHeadlessToast extends HelixElement {
        `danger` message an assertive one inside it, so a danger message was
        news to both and could be said twice. The two `live` parts say each
        arrival once instead, in the voice its tone asks for. */
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: formatWords(this, this.label ? 'label' : 'fallbackLabel', { hotkey: this.hotkey }),
       role: 'region',
     })

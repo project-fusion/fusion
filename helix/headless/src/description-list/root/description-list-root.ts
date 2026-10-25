@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria, internalsOf } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -95,7 +95,7 @@ export class HelixHeadlessDescriptionList extends HelixElement {
      `willUpdate`, which a server calls too. */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label, role: this.named ? 'group' : '' })
+    hostAria(internalsOf(this), { label: this.label, role: this.named ? 'group' : '' })
   }
 
   protected override render(): TemplateResult {

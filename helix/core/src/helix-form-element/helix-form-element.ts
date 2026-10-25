@@ -1,4 +1,5 @@
 import type { PropertyValues } from 'lit'
+import { internalsOf } from '../helix-element/helix-element.js'
 import { HelixFormElementBase } from './helix-form-element-base.js'
 
 /** The flags a validity carries, read by name because a `ValidityState` keeps them on its prototype. */
@@ -154,7 +155,7 @@ export class HelixFormElement extends HelixFormElementBase {
        through `setCustomValidity` or `feedback` would be gone the moment the
        control next reported. Wrapping the one call every family already makes
        keeps the two in one place without asking each family to merge them. */
-    const internals = this.internals
+    const internals = internalsOf(this)
     const report = internals.setValidity.bind(internals)
     this.reportValidityTo = report
     internals.setValidity = (
@@ -236,7 +237,7 @@ export class HelixFormElement extends HelixFormElementBase {
     this.runPendingUpdate()
     this.checkInProgress = true
     try {
-      return this.internals.checkValidity()
+      return internalsOf(this).checkValidity()
     } finally {
       this.checkInProgress = false
     }
@@ -263,7 +264,7 @@ export class HelixFormElement extends HelixFormElementBase {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    watchFormChecks(this.internals.form)
+    watchFormChecks(internalsOf(this).form)
   }
 
   /**

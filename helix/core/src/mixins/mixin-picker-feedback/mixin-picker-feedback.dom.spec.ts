@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* The mark and the message of a picker standing on its own as a form control,
    asked of the mixin rather than of Color, Date or Time Picker. */
@@ -53,13 +53,14 @@ describe('a picker’s feedback', () => {
     expect(host.shadowRoot?.querySelector('[part="feedback"]')?.getAttribute('role')).toBe('alert')
     expect(host.validity.customError).toBe(true)
     expect(host.validationMessage).toBe('Pick a weekday')
-    expect(host.internals.ariaInvalid).toBe('true')
-    expect(host.internals.states.has('invalid')).toBe(true)
+    expect(internalsOf(host).ariaInvalid).toBe('true')
+    expect(internalsOf(host).states.has('invalid')).toBe(true)
     expect(host.shadowRoot?.querySelector('[part="answer"]')?.getAttribute('aria-invalid')).toBe(
       'true',
     )
-    const described = (host.internals as ElementInternals & { ariaDescribedByElements?: Element[] })
-      .ariaDescribedByElements
+    const described = (
+      internalsOf(host) as ElementInternals & { ariaDescribedByElements?: Element[] }
+    ).ariaDescribedByElements
     if (described !== undefined) {
       expect(described?.[0]?.textContent).toBe('Pick a weekday')
     }
@@ -69,11 +70,11 @@ describe('a picker’s feedback', () => {
     const host = await mount('invalid')
     expect(host.shadowRoot?.querySelector('[part="feedback"]')).toBeNull()
     expect(host.validity.valid).toBe(true)
-    expect(host.internals.states.has('invalid')).toBe(true)
+    expect(internalsOf(host).states.has('invalid')).toBe(true)
     host.invalid = false
     await host.updateComplete
-    expect(host.internals.ariaInvalid).toBe('false')
-    expect(host.internals.states.has('invalid')).toBe(false)
+    expect(internalsOf(host).ariaInvalid).toBe('false')
+    expect(internalsOf(host).states.has('invalid')).toBe(false)
   })
 })
 
@@ -82,8 +83,8 @@ describe('a picker’s own verdict', () => {
     const host = await mount()
     host.failing = 'refused'
     await host.updateComplete
-    expect(host.internals.ariaInvalid).toBe('true')
-    expect(host.internals.states.has('invalid')).toBe(true)
+    expect(internalsOf(host).ariaInvalid).toBe('true')
+    expect(internalsOf(host).states.has('invalid')).toBe(true)
   })
 
   test('marks a missing answer once a form has refused it, until a reset', async () => {
@@ -92,15 +93,15 @@ describe('a picker’s own verdict', () => {
     await host.updateComplete
     /* `false` until the reader has tried: a host with a role is otherwise judged by its
        validity, and reported invalid before the reader has done anything. */
-    expect(host.internals.ariaInvalid).toBe('false')
-    expect(host.internals.states.has('invalid')).toBe(false)
+    expect(internalsOf(host).ariaInvalid).toBe('false')
+    expect(internalsOf(host).states.has('invalid')).toBe(false)
     host.dispatchEvent(new Event('invalid'))
     await host.updateComplete
-    expect(host.internals.ariaInvalid).toBe('true')
-    expect(host.internals.states.has('invalid')).toBe(true)
+    expect(internalsOf(host).ariaInvalid).toBe('true')
+    expect(internalsOf(host).states.has('invalid')).toBe(true)
     host.formResetCallback()
     await host.updateComplete
-    expect(host.internals.states.has('invalid')).toBe(false)
+    expect(internalsOf(host).states.has('invalid')).toBe(false)
   })
 
   test('and once the reader has committed an answer', async () => {
@@ -109,6 +110,6 @@ describe('a picker’s own verdict', () => {
     await host.updateComplete
     host.dispatchEvent(new Event('change'))
     await host.updateComplete
-    expect(host.internals.states.has('invalid')).toBe(true)
+    expect(internalsOf(host).states.has('invalid')).toBe(true)
   })
 })

@@ -3,6 +3,7 @@ import {
   HelixElement,
   HelixSendEvent,
   hostAria,
+  internalsOf,
   markRegion,
   RelativeClockController,
   relativeTime,
@@ -234,13 +235,13 @@ export class HelixHeadlessChatMessage extends HelixElement {
        were each caught by. Internals carry it to the accessibility tree and
        nothing to the markup, which is what `Skeleton`, `Loader` and `Orb`
        already do with this exact flag. */
-    hostAria(this.internals, { label: this.name, role: 'article' })
-    this.internals.ariaBusy = this.state === 'streaming' ? 'true' : null
+    hostAria(internalsOf(this), { label: this.name, role: 'article' })
+    internalsOf(this).ariaBusy = this.state === 'streaming' ? 'true' : null
     /* Its place in the whole conversation, which a transcript drawn a window
        at a time cannot show by counting the articles a reader can reach. */
     const placed = this.turnPosition > 0 && this.turnCount > 0
-    this.internals.ariaPosInSet = placed ? String(this.turnPosition) : null
-    this.internals.ariaSetSize = placed ? String(this.turnCount) : null
+    internalsOf(this).ariaPosInSet = placed ? String(this.turnPosition) : null
+    internalsOf(this).ariaSetSize = placed ? String(this.turnCount) : null
   }
 
   /** The time as it reads now, or nothing where the turn has none. */
