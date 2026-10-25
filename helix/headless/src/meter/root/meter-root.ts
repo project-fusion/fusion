@@ -1,4 +1,5 @@
 import {
+  auditName,
   customElement,
   drawStatus,
   formatWords,
@@ -161,10 +162,12 @@ export class HelixHeadlessMeter extends HelixElement {
    *
    * A visible label in the `label` slot names it instead, with the words it
    * shows, so the name and the label cannot disagree.
+   *
+   * Empty by default, so a page that leaves it empty gives the element no
+   * name, and a development build warns.
    */
-  @words
   @property()
-  label = 'Meter'
+  label = ''
 
   /**
    * Says the reading in a polite `live` region each time it moves into
@@ -520,6 +523,17 @@ export class HelixHeadlessMeter extends HelixElement {
   /** A label's words changed, so the name is written again. */
   private readonly renamed = (): void => {
     this.requestUpdate()
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    /* Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'meter',
+      () => this.label !== '' || slottedWords(this, ['label']) !== '',
+    )
   }
 
   protected override render(): TemplateResult {

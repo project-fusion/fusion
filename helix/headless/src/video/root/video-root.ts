@@ -168,7 +168,7 @@ const clock = (seconds: number): string => {
  * @event {Event} durationchange - The duration changed, which it does once the metadata is in.
  * @event {Event} emptied - The media was reset, as when `src` changes.
  * @event {Event} ended - The video reached its end.
- * @event {Event} error - The source could not be loaded or played. The player shows `error-label` as well.
+ * @event {Event} error - The source could not be loaded or played. The player shows `error-text` as well.
  * @event {HelixNextEvent} helix-next - The next video was requested. Load it in response.
  * @event {HelixPreviousEvent} helix-previous - The previous video was requested. Load it in response.
  * @event {Event} loadeddata - The frame at the current position has loaded.
@@ -373,11 +373,19 @@ export class HelixHeadlessVideo extends HelixElement {
   downloadLabel = 'Download'
 
   /**
+   * The old name of `error-text`, read only where a page sets it.
+   *
+   * @deprecated Use `error-text`. Removed in the next release.
+   */
+  @property({ attribute: 'error-label' })
+  errorLabel?: string
+
+  /**
    * The message shown when the video cannot be played.
    */
   @words
-  @property({ attribute: 'error-label' })
-  errorLabel = 'This video could not be played'
+  @property({ attribute: 'error-text' })
+  errorText = 'This video could not be played'
 
   /**
    * Extra controls to add to the bar, named in the order they appear.
@@ -458,11 +466,19 @@ export class HelixHeadlessVideo extends HelixElement {
   label = ''
 
   /**
+   * The old name of `loading-text`, read only where a page sets it.
+   *
+   * @deprecated Use `loading-text`. Removed in the next release.
+   */
+  @property({ attribute: 'loading-label' })
+  loadingLabel?: string
+
+  /**
    * The text announced while the video waits for more data.
    */
   @words
-  @property({ attribute: 'loading-label' })
-  loadingLabel = 'Loading'
+  @property({ attribute: 'loading-text' })
+  loadingText = 'Loading'
 
   /**
    * Whether the video starts again at the end.
@@ -2182,7 +2198,7 @@ export class HelixHeadlessVideo extends HelixElement {
            spin. `polite`, so it waits its turn, and it goes when the frame moves
            again. */
         this.buffering && !this.failed
-          ? html`<div part="loading">${this.loadingLabel}</div>`
+          ? html`<div part="loading">${this.loadingLabel ?? this.loadingText}</div>`
           : nothing
       }
       ${
@@ -2192,7 +2208,7 @@ export class HelixHeadlessVideo extends HelixElement {
            best. */
         ''
       }
-      <span part="live" role="status">${this.buffering && !this.failed ? this.loadingLabel : this.said}</span>
+      <span part="live" role="status">${this.buffering && !this.failed ? (this.loadingLabel ?? this.loadingText) : this.said}</span>
       ${
         /* And the other thing a frozen frame can mean. `alert`, because nothing
            further is going to happen and a reader waiting politely for a video
@@ -2202,7 +2218,7 @@ export class HelixHeadlessVideo extends HelixElement {
               part="failure"
               role="alert"
             >
-              ${this.errorLabel}
+              ${this.errorLabel ?? this.errorText}
             </div>`
           : nothing
       }

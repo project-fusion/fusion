@@ -53,6 +53,17 @@ export class HelixHeadlessMapContours extends HelixElement {
   @property()
   encoding: MapTerrainEncoding = 'terrarium'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Contour lines'
+
+  /** Marks this as a layer for the frame and the connector, whatever its tag. */
+  readonly isMapLayer = true
+
+  /** @internal Which kind of layer, which is how the connector draws it. */
+  readonly layerKind = 'contours' as const
+
   /**
    * A name this layer shares with other layers, such as a route and its
    * dotted legs. The layers menu shows layers in the same group as one entry,
@@ -61,16 +72,13 @@ export class HelixHeadlessMapContours extends HelixElement {
   @property()
   group?: string
 
-  /** Marks this as a layer for the frame and the connector, whatever its tag. */
-  readonly isMapLayer = true
-
-  /** @internal Which kind of layer, which is how the connector draws it. */
-  readonly layerKind = 'contours' as const
-
-  /** The layer's name in the frame's list. */
-  @words
+  /**
+   * The layer's name in the frame's list.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
+   */
   @property()
-  label = 'Contour lines'
+  label = ''
 
   /** The deepest zoom the provider has tiles for. */
   @property({ attribute: 'max-zoom', converter: numberConverter('max-zoom', undefined) })

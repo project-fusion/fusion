@@ -1,5 +1,6 @@
 import {
   assignSlot,
+  auditName,
   ChildrenController,
   capturePointer,
   customElement,
@@ -218,6 +219,11 @@ export class HelixHeadlessCarousel extends HelixElement {
   @property({ attribute: 'default-index', converter: numberConverter('default-index', 0) })
   defaultIndex = 0
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Slides'
+
   /**
    * The slide in view, counted from zero.
    *
@@ -261,13 +267,6 @@ export class HelixHeadlessCarousel extends HelixElement {
   @property({ attribute: 'indicators-label' })
   indicatorsLabel = '{label} slides'
 
-  /**
-   * How long each slide is held, in milliseconds. The attribute also takes a
-   * CSS time, such as `5s`.
-   */
-  @property({ converter: timeConverter('interval', 5000) })
-  interval = 5000
-
   /** The slide in view, whoever set it, and `undefined` until somebody has. */
   private indexState: number | undefined = undefined
 
@@ -278,11 +277,19 @@ export class HelixHeadlessCarousel extends HelixElement {
   private said = ''
 
   /**
-   * The carousel's name, read by screen readers.
+   * How long each slide is held, in milliseconds. The attribute also takes a
+   * CSS time, such as `5s`.
    */
-  @words
+  @property({ converter: timeConverter('interval', 5000) })
+  interval = 5000
+
+  /**
+   * The carousel's name, read by screen readers.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
+   */
   @property()
-  label = 'Carousel'
+  label = ''
 
   /**
    * Whether moving past either end wraps to the other.
@@ -1368,7 +1375,7 @@ export class HelixHeadlessCarousel extends HelixElement {
     if (changed.has('perView')) {
       this.fitted = undefined
     }
-    hostAria(this.internals, { label: this.label, role: 'group' })
+    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'group' })
     // Announced as a carousel rather than as a bare group, so a reader knows
     // what the controls beside it are for. In the page's language, from
     // `roleLabel`, and with no role description where that is empty.
@@ -1377,6 +1384,13 @@ export class HelixHeadlessCarousel extends HelixElement {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    /* Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'carousel',
+      () => this.label !== '',
+    )
     this.watchPane()
     this.finishHydration()
     /* **Still where the reader asked for less motion or the page paused it**,
@@ -1707,7 +1721,7 @@ export class HelixHeadlessCarousel extends HelixElement {
            and the roving tab stop and every `aria-label` in the row would move
            with it. */
         this.slides.length > 1 && this.across !== undefined
-          ? html`<div part="indicators" role="group" aria-label=${formatWords(this, 'indicatorsLabel', { label: this.label })}>
+          ? html`<div part="indicators" role="group" aria-label=${formatWords(this, 'indicatorsLabel', { label: this.label || this.fallbackLabel })}>
               ${
                 /* Plain buttons, not a half-built tablist.
                  *

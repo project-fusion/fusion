@@ -113,12 +113,18 @@ export class HelixHeadlessFilterMenu extends HelixElement {
    */
   static words = 'helix-filter-menu'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Filter'
+
   /**
    * The menu's name, read by screen readers.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Filter'
+  label = ''
 
   /**
    * What is ticked, per field.
@@ -347,7 +353,7 @@ export class HelixHeadlessFilterMenu extends HelixElement {
       part="menu"
       exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header,
         live: menu-live, loading: menu-loading, search-field: menu-search-field, surface: menu-surface, title: menu-title"
-      label=${this.label}
+      label=${this.label || this.fallbackLabel}
       @helix-before-select=${this.handleSelect}
     >
       <slot name="trigger" slot="trigger"></slot>

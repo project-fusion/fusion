@@ -593,7 +593,7 @@ describe('entries that leave', () => {
 
   test('an empty playlist says so, and the `empty` slot replaces the words', async () => {
     const host = (await mount(
-      '<helix-headless-video-playlist empty-label="Nothing queued"></helix-headless-video-playlist>',
+      '<helix-headless-video-playlist empty-text="Nothing queued"></helix-headless-video-playlist>',
     )) as Playlist
     await host.updateComplete
     expect(part(host, 'empty')?.textContent?.trim()).toBe('Nothing queued')

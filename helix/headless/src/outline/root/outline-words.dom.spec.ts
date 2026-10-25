@@ -33,13 +33,13 @@ const outline = async (around = '', extra = ''): Promise<Updatable> => {
 
 describe('an outline on a page in another language', () => {
   test('is named with the words registered for the nearest `lang`', async () => {
-    registerWords('de', { 'helix-outline': { label: 'Auf dieser Seite' } })
+    registerWords('de', { 'helix-outline': { fallbackLabel: 'Auf dieser Seite' } })
     const host = await outline('lang="de"')
     expect(part(host, 'nav')?.getAttribute('aria-label')).toBe('Auf dieser Seite')
   })
 
   test('keeps a `label` the page wrote', async () => {
-    registerWords('de', { 'helix-outline': { label: 'Auf dieser Seite' } })
+    registerWords('de', { 'helix-outline': { fallbackLabel: 'Auf dieser Seite' } })
     const host = await outline('lang="de"', 'label="Inhalt"')
     expect(part(host, 'nav')?.getAttribute('aria-label')).toBe('Inhalt')
   })

@@ -266,6 +266,11 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   @property({ attribute: 'disable-days' })
   disableDays = ''
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Date Picker'
+
   /**
    * First column of the week, `0` for Sunday through `6` for Saturday.
    *
@@ -292,10 +297,11 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
 
   /**
    * Accessible name for the grid.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Date Picker'
+  label = ''
 
   /**
    * Locale for month and day names, and the day a week starts on.
@@ -1333,7 +1339,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
        page's language. */
     const outside = this.hasAttribute('label') ? [] : labelsOf(this)
     hostAria(this.internals, {
-      label: this.label,
+      label: this.label || this.fallbackLabel,
       labelledBy: outside,
       role: 'group',
     })

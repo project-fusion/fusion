@@ -69,7 +69,7 @@ import '../../select/index.js'
  * @csspart control-label - The label beside the number.
  * @csspart control-listbox - The list inside the panel.
  * @csspart control-listbox-empty - The text shown when the filter hides every option.
- * @csspart control-listbox-error - The inner list's `error` part, shown while its `load-error` is set.
+ * @csspart control-listbox-error - The inner list's `error` part, shown while its `error-text` is set.
  * @csspart control-listbox-feedback - The inner list's message that says what is wrong with the value.
  * @csspart control-listbox-filter-icon - The icon beside the filter field.
  * @csspart control-listbox-filter-mark - The default icon beside the filter field, shown when none is slotted.
@@ -113,12 +113,18 @@ export class HelixHeadlessPaginationSize extends HelixFormElement {
   @property({ attribute: 'default-value', converter: numberConverter('default-value', 0) })
   defaultValue = 0
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Per page'
+
   /**
    * The label beside the control.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Per page'
+  label = ''
 
   /**
    * The locale the words and the numbers are in, as a BCP 47 tag such as
@@ -285,7 +291,7 @@ export class HelixHeadlessPaginationSize extends HelixFormElement {
         listbox-search-field: control-listbox-search-field, listbox-voice: control-listbox-voice,
         listbox-voice-level: control-listbox-voice-level, listbox-voice-level-canvas: control-listbox-voice-level-canvas, listbox-voice-listening: control-listbox-voice-listening, listbox-voice-status: control-listbox-voice-status, live: control-live, surface: control-surface,
         trigger: control-trigger, value: control-value"
-      label=${named ? '' : this.label}
+      label=${named ? '' : this.label || this.fallbackLabel}
       aria-label=${named || nothing}
       ?disabled=${this.isDisabled}
       .value=${String(this.current)}

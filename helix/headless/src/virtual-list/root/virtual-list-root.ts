@@ -211,7 +211,7 @@ const LINE = 'helix-line-'
  * and `range` holds them. `helix-load-more` fires once a reader is within one
  * screen of the end, once for each length of the set: add to `items` and it can
  * fire again. While you fetch, set `loading`: the list is busy, and a row after
- * the last item says "Loading more" (`loading-label`, or your own content in
+ * the last item says "Loading more" (`loading-text`, or your own content in
  * the `loading` slot). `scrollToIndex` takes a reader to an item.
  *
  * **Moving items** is a separate import, `@fusion.dev/helix/virtual-list/reorder`,
@@ -231,7 +231,7 @@ const LINE = 'helix-line-'
  *   dragged carries `data-dragging`, and the row a drop would land beside
  *   `data-drop-before` or `data-drop-after`.
  *
- * **An empty list.** Set `empty-label`, or put your own content in the `empty`
+ * **An empty list.** Set `empty-text`, or put your own content in the `empty`
  * slot, for a row shown when there are no items and none are loading, such as
  * "No messages yet" and a link to write one. Without either, an empty list
  * shows nothing, since a list whose items have not arrived yet has not said
@@ -263,8 +263,8 @@ const LINE = 'helix-line-'
  * @documentation https://fusion.dev/helix/components/virtual-list
  *
  * @slot - The `<template>` that defines one row. The list writes the rows it renders beside it, and this slot shows them between the two spacers.
- * @slot empty - Content for the row shown when there are no items and none are loading. Falls back to `empty-label`.
- * @slot loading - Content for the row after the last item while `loading` is set. Falls back to `loading-label`.
+ * @slot empty - Content for the row shown when there are no items and none are loading. Falls back to `empty-text`.
+ * @slot loading - Content for the row after the last item while `loading` is set. Falls back to `loading-text`.
  *
  * @event {Event} change - Fired once a press or a key has changed which items are selected, in a list with `selection-mode`.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press or a key changes which items are selected, with the `value` it would leave. Cancelable.
@@ -275,7 +275,7 @@ const LINE = 'helix-line-'
  *
  * @csspart after - The space that stands in for the rows below the rendered ones.
  * @csspart before - The space that stands in for the rows above the rendered ones.
- * @csspart empty - The row shown when there are no items and none are loading, where `empty-label` or the `empty` slot gives it content.
+ * @csspart empty - The row shown when there are no items and none are loading, where `empty-text` or the `empty` slot gives it content.
  * @csspart loading - The row after the last item while `loading` is set.
  * @csspart viewport - The scrolling box. On this tier, it needs only a block size.
  *
@@ -289,7 +289,7 @@ export class HelixHeadlessVirtualList extends HelixElement {
 
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-virtual-list': { loadingLabel: 'Weitere werden geladen' } })`.
+   * `registerWords('de', { 'helix-virtual-list': { loadingText: 'Weitere werden geladen' } })`.
    */
   static words = 'helix-virtual-list'
 
@@ -309,11 +309,19 @@ export class HelixHeadlessVirtualList extends HelixElement {
   disabledKeys = ''
 
   /**
+   * The old name of `empty-text`, read only where a page sets it.
+   *
+   * @deprecated Use `empty-text`. Removed in the next release.
+   */
+  @property({ attribute: 'empty-label' })
+  emptyLabel?: string
+
+  /**
    * The text of the row shown when there are no items and none are loading,
    * where the `empty` slot is empty. Empty, the default, shows no row.
    */
-  @property({ attribute: 'empty-label' })
-  emptyLabel = ''
+  @property({ attribute: 'empty-text' })
+  emptyText = ''
 
   /**
    * The height of one row, in pixels, used to find the row at a scroll offset.
@@ -389,10 +397,18 @@ export class HelixHeadlessVirtualList extends HelixElement {
   @property({ type: Boolean })
   loading = false
 
+  /**
+   * The old name of `loading-text`, read only where a page sets it.
+   *
+   * @deprecated Use `loading-text`. Removed in the next release.
+   */
+  @property({ attribute: 'loading-label' })
+  loadingLabel?: string
+
   /** The text of the row drawn while `loading` is set, where the `loading` slot is empty. */
   @words
-  @property({ attribute: 'loading-label' })
-  loadingLabel = 'Loading more'
+  @property({ attribute: 'loading-text' })
+  loadingText = 'Loading more'
 
   /**
    * Places each row by its own measured height. Without it, rows are placed
@@ -1917,7 +1933,8 @@ export class HelixHeadlessVirtualList extends HelixElement {
       this.readFor !== undefined &&
       !this.loading &&
       this.data.length === 0 &&
-      (this.emptyLabel !== '' || this.querySelector(':scope > [slot="empty"]') !== null)
+      ((this.emptyLabel ?? this.emptyText) !== '' ||
+        this.querySelector(':scope > [slot="empty"]') !== null)
     const lined = this.lined
     /* A row of a list, or in a grid a line of one cell, for the two rows that
        are not items. */
@@ -1984,14 +2001,14 @@ export class HelixHeadlessVirtualList extends HelixElement {
            place in it, as React Aria's loading row does. */
         this.loading
           ? html`<div part="loading" role=${role}>
-              ${own(html`<slot name="loading">${this.loadingLabel}</slot>`)}
+              ${own(html`<slot name="loading">${this.loadingLabel ?? this.loadingText}</slot>`)}
             </div>`
           : nothing
       }
       ${
         empty
           ? html`<div part="empty" role=${role}>
-              ${own(html`<slot name="empty">${this.emptyLabel}</slot>`)}
+              ${own(html`<slot name="empty">${this.emptyLabel ?? this.emptyText}</slot>`)}
             </div>`
           : nothing
       }

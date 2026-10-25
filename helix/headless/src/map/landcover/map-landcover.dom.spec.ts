@@ -81,7 +81,8 @@ describe('map landcover', () => {
     expect(listed(host)).toEqual(['Vegetation'])
     layer.removeAttribute('label')
     await settle(host)
-    expect(layer.label).toBe('Land cover')
+    expect(layer.label || '').toBe('')
+    expect(listed(host)).toEqual(['Land cover'])
 
     const scripted = await frame('<helix-headless-map-landcover></helix-headless-map-landcover>')
     const other = scripted.querySelector('helix-headless-map-landcover') as Landcover
@@ -103,7 +104,7 @@ describe('map landcover', () => {
   })
 
   test('on a page in another language, it is named by the word registered for it', async () => {
-    registerWords('de', { 'helix-map-landcover': { label: 'Bodenbedeckung' } })
+    registerWords('de', { 'helix-map-landcover': { fallbackLabel: 'Bodenbedeckung' } })
     document.body.innerHTML = `<div lang="de"><helix-headless-map label="Hügelland">
       <helix-headless-map-landcover></helix-headless-map-landcover>
     </helix-headless-map></div>`

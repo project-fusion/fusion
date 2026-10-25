@@ -161,7 +161,7 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  * @aliases JSON viewer, Object viewer, Inspector, Data explorer
  * @documentation https://fusion.dev/helix/components/object-inspector
  *
- * @slot empty - Shown in the tree while it has no entries to show. Defaults to `empty-label`, or `no-matches-label` while a filter matched none.
+ * @slot empty - Shown in the tree while it has no entries to show. Defaults to `empty-text`, or `no-matches-label` while a filter matched none.
  *
  * @event {HelixActivateEvent} helix-activate - The active row moved, by a key or a click. The detail's `value` is its path.
  * @event {HelixBeforeActivateEvent} helix-before-activate - The active row is about to move, with its new path. Cancelable: cancel it to keep the row where it is.
@@ -274,12 +274,20 @@ export class HelixHeadlessObjectInspector extends HelixElement {
   defaultDepth = 1
 
   /**
+   * The old name of `empty-text`, read only where a page sets it.
+   *
+   * @deprecated Use `empty-text`. Removed in the next release.
+   */
+  @property({ attribute: 'empty-label' })
+  emptyLabel?: string
+
+  /**
    * What the tree says while there is no value to show, such as before a
    * fetch answers. The `empty` slot replaces it.
    */
   @words
-  @property({ attribute: 'empty-label' })
-  emptyLabel = 'Nothing to show'
+  @property({ attribute: 'empty-text' })
+  emptyText = 'Nothing to show'
 
   /**
    * The open branches, by path, in no set order.
@@ -1124,6 +1132,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
 
   protected override render(): TemplateResult {
     const rows = this.rows
+    const empty = this.found ? this.noMatchesLabel : (this.emptyLabel ?? this.emptyText)
     const { first, last } = this.windowed ? this.virtualize.window : { first: 0, last: rows.length }
     /* The row holding focus stays drawn when it scrolls out of the window,
        beside it on its side, and the spacer there gives up its room.
@@ -1195,9 +1204,7 @@ export class HelixHeadlessObjectInspector extends HelixElement {
             /* A row, so the tree holds only rows, and one a reader can find:
                an empty box said nothing, to the eye or to a screen reader. */
             this.blank
-              ? html`<div part="empty" role="row"><div role="gridcell"><slot name="empty">${
-                  this.found ? this.noMatchesLabel : this.emptyLabel
-                }</slot></div></div>`
+              ? html`<div part="empty" role="row"><div role="gridcell"><slot name="empty">${empty}</slot></div></div>`
               : nothing
           }
           ${this.windowed ? html`<div part="after" role="presentation" style="block-size: ${after}px"></div>` : nothing}

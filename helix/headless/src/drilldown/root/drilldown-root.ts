@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  auditName,
   customElement,
   DrilldownController,
   HelixBeforeNavigateEvent,
@@ -532,6 +533,17 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
         ${unsafeSVG(caretLeft.content)}
       </svg></slot
     >`
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    /* Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'drilldown',
+      () => this.label !== '',
+    )
   }
 
   protected override render(): TemplateResult {

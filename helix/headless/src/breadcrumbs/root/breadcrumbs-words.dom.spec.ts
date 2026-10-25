@@ -41,7 +41,7 @@ const POLISH = {
   'helix-breadcrumbs': {
     expandLabel:
       '{count, plural, one {Pokaż # więcej} few {Pokaż # kolejne} many {Pokaż # kolejnych} other {Pokaż # kolejnego}}',
-    label: 'Ścieżka',
+    fallbackLabel: 'Ścieżka',
   },
 }
 

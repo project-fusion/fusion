@@ -26,7 +26,9 @@ afterEach(() => {
 
 describe('a copy button on a page in another language', () => {
   test('is named in the words registered for the nearest `lang`', async () => {
-    registerWords('pl', { 'helix-copy-button': { copiedLabel: 'Skopiowano', label: 'Kopiuj' } })
+    registerWords('pl', {
+      'helix-copy-button': { copiedLabel: 'Skopiowano', fallbackLabel: 'Kopiuj' },
+    })
     document.body.innerHTML =
       '<div lang="pl"><helix-headless-copy-button value="x"></helix-headless-copy-button></div>'
     const host = document.querySelector('helix-headless-copy-button') as Updatable & {

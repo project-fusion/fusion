@@ -382,9 +382,9 @@ describe('an empty feed', () => {
   })
 
   test('says a page that could not load, under its rows and in place of empty', async () => {
-    type Feed = HTMLElement & { loadError: string; updateComplete: Promise<unknown> }
+    type Feed = HTMLElement & { errorText: string; updateComplete: Promise<unknown> }
     const host = (await mount(
-      `<helix-headless-notifications label="Activity" load-error="Could not load">
+      `<helix-headless-notifications label="Activity" error-text="Could not load">
         <div slot="error" id="retry">Could not load. <button>Try again</button></div>
       </helix-headless-notifications>`,
     )) as Feed
@@ -401,7 +401,7 @@ describe('an empty feed', () => {
     await new Promise((done) => setTimeout(done, 0))
     await host.updateComplete
     expect(part(host, 'error')).not.toBeNull()
-    host.loadError = ''
+    host.errorText = ''
     await host.updateComplete
     expect(hasState(host, 'error')).toBe(false)
     expect(part(host, 'error')).toBeNull()
@@ -413,19 +413,19 @@ describe('an empty feed', () => {
      the state stayed on, the error part stayed drawn and empty never came
      back. */
   test('clears the error when the attribute is removed or the property set to null', async () => {
-    type Feed = HTMLElement & { loadError: string | null; updateComplete: Promise<unknown> }
+    type Feed = HTMLElement & { errorText: string | null; updateComplete: Promise<unknown> }
     const host = (await mount(
       '<helix-headless-notifications label="Activity"></helix-headless-notifications>',
     )) as Feed
     await host.updateComplete
     const live = part(host, 'live')
-    host.setAttribute('load-error', 'Offline')
+    host.setAttribute('error-text', 'Offline')
     await host.updateComplete
     expect(hasState(host, 'error')).toBe(true)
     /* The region is the one that was there, and only its words change. */
     expect(part(host, 'live') === live).toBe(true)
     expect(live?.textContent).toBe('Offline')
-    host.removeAttribute('load-error')
+    host.removeAttribute('error-text')
     await host.updateComplete
     expect(hasState(host, 'error')).toBe(false)
     expect(part(host, 'error')).toBeNull()
@@ -433,9 +433,9 @@ describe('an empty feed', () => {
     expect(part(host, 'empty')).not.toBeNull()
     expect(part(host, 'live') === live).toBe(true)
     expect(live?.textContent).toBe('Nothing to show')
-    host.loadError = 'Offline'
+    host.errorText = 'Offline'
     await host.updateComplete
-    host.loadError = null
+    host.errorText = null
     await host.updateComplete
     expect(hasState(host, 'error')).toBe(false)
     expect(part(host, 'error')).toBeNull()

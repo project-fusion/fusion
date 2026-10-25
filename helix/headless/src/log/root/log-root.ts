@@ -1,4 +1,5 @@
 import {
+  auditName,
   customElement,
   drawIcon,
   formatWords,
@@ -326,7 +327,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
   /** The log's name, read by screen readers, where `label` is empty. */
   @words
   @property({ attribute: 'fallback-label' })
-  fallbackLabel = 'Log'
+  fallbackLabel = 'Output'
 
   /* Handed to the buffer at once, for `parse`'s reason. */
   set format(next: 'github-actions' | 'vercel' | undefined) {
@@ -1561,6 +1562,17 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
         <span part="resume-mark" aria-hidden="true">${drawIcon(arrowDown)}</span>${this.resumeLabel}
       </button></slot
     >`
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    /* Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'log',
+      () => this.label !== '',
+    )
   }
 
   protected override render(): TemplateResult {

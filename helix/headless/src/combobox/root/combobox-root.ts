@@ -135,7 +135,7 @@ const isInsertion = (event: Event): boolean =>
  * @slot - The options.
  * @slot empty - What the list shows when typing hides every option, for content richer than `empty-text`.
  * @slot end - After the text, for a unit or a clear button.
- * @slot error - What the list shows while `load-error` is set, for content richer than its text.
+ * @slot error - What the list shows while `error-text` is set, for content richer than its text.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot hint - The hint, for content richer than plain text.
  * @slot indicator - Replaces the caret that shows the field opens a list.
@@ -165,7 +165,7 @@ const isInsertion = (event: Event): boolean =>
  * @csspart label - The label above the field.
  * @csspart listbox - The list inside the panel.
  * @csspart listbox-empty - Shown when a filter has hidden everything.
- * @csspart listbox-error - Shown while `load-error` is set.
+ * @csspart listbox-error - Shown while `error-text` is set.
  * @csspart listbox-feedback - The inner list's error message.
  * @csspart listbox-filter-icon - The icon beside the list's filter field.
  * @csspart listbox-filter-mark - The glyph beside the filter field, where none is slotted.
@@ -194,7 +194,7 @@ const isInsertion = (event: Event): boolean =>
  * @csspart tags - The row of chosen options, when `multiple` is set.
  *
  * @cssstate blank - While nothing is chosen.
- * @cssstate error - While `load-error` is set.
+ * @cssstate error - While `error-text` is set.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate loading - While `loading` is set.
  * @cssstate no-results - What was typed hid every option of a list that has some.
@@ -296,6 +296,15 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   emptyText = 'No matches'
 
   /**
+   * What the list says when its options could not be loaded, such as after a
+   * request to a server fails. Empty, null or no attribute is no error, so
+   * removing the attribute clears it. Passed to the list, which shows it
+   * under any options there are and tells screen readers.
+   */
+  @property({ attribute: 'error-text' })
+  errorText: string | null = ''
+
+  /**
    * How long typing rests before the list is narrowed and `helix-before-filter` is
    * sent, in milliseconds. The attribute also takes a CSS time, such as
    * `300ms`.
@@ -328,13 +337,12 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
   listLabel = 'Options'
 
   /**
-   * What the list says when its options could not be loaded, such as after a
-   * request to a server fails. Empty, null or no attribute is no error, so
-   * removing the attribute clears it. Passed to the list, which shows it
-   * under any options there are and tells screen readers.
+   * The old name of `error-text`, read only where a page sets it.
+   *
+   * @deprecated Use `error-text`. Removed in the next release.
    */
   @property({ attribute: 'load-error' })
-  loadError: string | null = ''
+  loadError?: string | null
 
   /**
    * Whether the options are still loading.
@@ -712,7 +720,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     const list = this.listbox
     this.toggleState('blank', this.value === '')
     this.toggleState('loading', this.loading)
-    this.toggleState('error', Boolean(this.loadError))
+    this.toggleState('error', Boolean(this.loadError || this.errorText))
     this.toggleState(
       'no-results',
       list !== null &&
@@ -1565,7 +1573,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
         voice: listbox-voice, voice-level: listbox-voice-level, voice-level-canvas: listbox-voice-level-canvas, voice-listening: listbox-voice-listening, voice-status: listbox-voice-status"
       aria-label=${this.listLabel}
       empty-text=${this.emptyText}
-      load-error=${this.loadError}
+      error-text=${this.loadError || this.errorText}
       loading-text=${this.loadingText}
       no-results-text=${this.noResultsText ?? nothing}
       lang=${handedLocale(this) || nothing}
@@ -1584,7 +1592,7 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
       <slot @slotchange=${() => this.requestUpdate()}></slot>
       <slot name="empty" slot="empty">${this.emptyText}</slot>
       <slot name="loading" slot="loading">${this.loadingText}</slot>
-      <slot name="error" slot="error">${this.loadError}</slot>
+      <slot name="error" slot="error">${this.loadError || this.errorText}</slot>
       <slot
         name="no-results"
         slot=${this.querySelector?.(':scope > [slot="no-results"]') ? 'no-results' : nothing}

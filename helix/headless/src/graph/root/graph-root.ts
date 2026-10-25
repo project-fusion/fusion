@@ -116,12 +116,12 @@ const LONG_LAYOUT = 5000
  * @documentation https://fusion.dev/helix/components/graph
  *
  * @slot - The renderer's box, which the drawing is made in.
- * @slot empty - What the panel shows when the list holds no notes. Defaults to `empty-label`.
+ * @slot empty - What the panel shows when the list holds no notes. Defaults to `empty-text`.
  * @slot filter-icon - The icon in the search field. Defaults to a magnifying glass.
  * @slot footer - Content below the graph.
  * @slot fullscreen-icon - Replaces the glyph inside the fullscreen button.
  * @slot header - Content above the graph.
- * @slot loading - What the panel shows while `loading` is set and the list holds no notes. Defaults to `loading-label`.
+ * @slot loading - What the panel shows while `loading` is set and the list holds no notes. Defaults to `loading-text`.
  * @slot pan-down-icon - Replaces the glyph inside the pan down button.
  * @slot pan-end-icon - Replaces the glyph inside the button that pans toward the end of a line of text.
  * @slot pan-start-icon - Replaces the glyph inside the button that pans toward the start of a line of text.
@@ -280,12 +280,20 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   depth?: number
 
   /**
+   * The old name of `empty-text`, read only where a page sets it.
+   *
+   * @deprecated Use `empty-text`. Removed in the next release.
+   */
+  @property({ attribute: 'empty-label' })
+  emptyLabel?: string
+
+  /**
    * What the panel shows when the list holds no notes: the graph has none, or
    * a search or the legend hid them all. A slotted `empty` replaces it.
    */
   @words
-  @property({ attribute: 'empty-label' })
-  emptyLabel = 'No notes'
+  @property({ attribute: 'empty-text' })
+  emptyText = 'No notes'
 
   /**
    * The graph's name where `label` is empty and the host has no
@@ -353,10 +361,18 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
   @property({ reflect: true, type: Boolean })
   loading = false
 
+  /**
+   * The old name of `loading-text`, read only where a page sets it.
+   *
+   * @deprecated Use `loading-text`. Removed in the next release.
+   */
+  @property({ attribute: 'loading-label' })
+  loadingLabel?: string
+
   /** What the panel says while `loading` is set and the list holds no notes. */
   @words
-  @property({ attribute: 'loading-label' })
-  loadingLabel = 'Loading notes'
+  @property({ attribute: 'loading-text' })
+  loadingText = 'Loading notes'
 
   /** What screen readers hear once the drawing has moved down, after `moved()`. */
   @words
@@ -1530,8 +1546,8 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
                says the count, so this is for the eye. */
             this.entries.length === 0
               ? this.loading
-                ? html`<div part="loading"><slot name="loading">${this.loadingLabel}</slot></div>`
-                : html`<div part="empty"><slot name="empty">${this.emptyLabel}</slot></div>`
+                ? html`<div part="loading"><slot name="loading">${this.loadingLabel ?? this.loadingText}</slot></div>`
+                : html`<div part="empty"><slot name="empty">${this.emptyLabel ?? this.emptyText}</slot></div>`
               : nothing
           }
         </div>

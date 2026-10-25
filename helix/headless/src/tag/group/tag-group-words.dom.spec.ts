@@ -29,7 +29,7 @@ afterEach(() => {
 
 describe('tag words', () => {
   test('an emptied group shows the words registered for the nearest lang', async () => {
-    registerWords('de', { 'helix-tag-group': { emptyLabel: 'Keine Schlagwörter' } })
+    registerWords('de', { 'helix-tag-group': { emptyText: 'Keine Schlagwörter' } })
     document.body.innerHTML =
       '<div lang="de"><helix-headless-tag-group label="Filter"></helix-headless-tag-group></div>'
     const host = document.querySelector('helix-headless-tag-group') as Updatable

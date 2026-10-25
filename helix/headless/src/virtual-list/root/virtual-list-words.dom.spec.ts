@@ -33,7 +33,7 @@ const list = async (around = ''): Promise<Updatable> => {
 
 describe('a virtual list on a page in another language', () => {
   test('says it is loading in the words registered for the nearest `lang`', async () => {
-    registerWords('fr', { 'helix-virtual-list': { loadingLabel: 'Chargement de la suite' } })
+    registerWords('fr', { 'helix-virtual-list': { loadingText: 'Chargement de la suite' } })
     const host = await list('lang="fr"')
     expect(part(host, 'loading')?.textContent?.trim()).toBe('Chargement de la suite')
   })

@@ -73,6 +73,11 @@ export class HelixSandboxSpecs extends HelixElement {
   @property({ attribute: 'empty-text' })
   emptyText = 'No specs have been run.'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Spec results'
+
   /**
    * Which family's specs to run.
    *
@@ -83,10 +88,11 @@ export class HelixSandboxSpecs extends HelixElement {
 
   /**
    * Accessible name for the results.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Spec results'
+  label = ''
 
   /**
    * Shown while the specs run.
@@ -146,7 +152,7 @@ export class HelixSandboxSpecs extends HelixElement {
       return
     }
     const frame = document.createElement('iframe')
-    frame.title = this.label
+    frame.title = this.label || this.fallbackLabel
     frame.setAttribute('aria-hidden', 'true')
     frame.style.cssText =
       'position:fixed;inset-block-start:0;inset-inline-start:0;inline-size:1024px;' +
@@ -313,7 +319,7 @@ export class HelixSandboxSpecs extends HelixElement {
     const nothingYet = !this.running && this.failure === '' && this.results.length === 0
 
     return html`${this.summary()}
-      <div part="results" role="status" aria-label=${this.label} tabindex="0">
+      <div part="results" role="status" aria-label=${this.label || this.fallbackLabel} tabindex="0">
         ${
           nothingYet
             ? html`<p part="empty">${this.emptyText}</p>`

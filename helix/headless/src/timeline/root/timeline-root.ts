@@ -30,7 +30,7 @@ import { property } from 'lit/decorators.js'
  *
  * **A feed that loads more entries sets `loading` while it fetches.** The
  * timeline is busy, and an entry after the last says "Loading more"
- * (`loading-label`, or your own content in the `loading` slot). Put a button
+ * (`loading-text`, or your own content in the `loading` slot). Put a button
  * that asks for more after the timeline, and move focus to the first new
  * entry when they arrive.
  *
@@ -41,7 +41,7 @@ import { property } from 'lit/decorators.js'
  * @documentation https://fusion.dev/helix/components/timeline
  *
  * @slot - The entries, and any groups of them.
- * @slot loading - Content for the entry after the last while `loading` is set. Falls back to `loading-label`.
+ * @slot loading - Content for the entry after the last while `loading` is set. Falls back to `loading-text`.
  *
  * @csspart loading - The entry after the last while `loading` is set.
  *
@@ -51,7 +51,7 @@ import { property } from 'lit/decorators.js'
 export class HelixHeadlessTimeline extends HelixElement {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-timeline': { loadingLabel: 'Wird geladen' } })`.
+   * `registerWords('de', { 'helix-timeline': { loadingText: 'Wird geladen' } })`.
    */
   static words = 'helix-timeline'
 
@@ -68,15 +68,23 @@ export class HelixHeadlessTimeline extends HelixElement {
   @property({ reflect: true, type: Boolean })
   loading = false
 
+  /**
+   * The old name of `loading-text`, read only where a page sets it.
+   *
+   * @deprecated Use `loading-text`. Removed in the next release.
+   */
+  @property({ attribute: 'loading-label' })
+  loadingLabel?: string
+
   /** The text of the entry drawn while `loading` is set, where the `loading` slot is empty. */
   @words
-  @property({ attribute: 'loading-label' })
-  loadingLabel = 'Loading more'
+  @property({ attribute: 'loading-text' })
+  loadingText = 'Loading more'
 
   protected override render(): TemplateResult {
     return html`<slot></slot>${
       this.loading
-        ? html`<div part="loading" role="listitem"><slot name="loading">${this.loadingLabel}</slot></div>`
+        ? html`<div part="loading" role="listitem"><slot name="loading">${this.loadingLabel ?? this.loadingText}</slot></div>`
         : nothing
     }`
   }

@@ -51,6 +51,8 @@ import type { HelixHeadlessMapMarker } from '../marker/map-marker.js'
 /** What the frame reads off a layer, which is all its list and menu need. */
 interface MapLayer extends Element {
   description?: string | undefined
+  /** The layer's built-in name, which stands where `label` is empty. */
+  fallbackLabel?: string | undefined
   /** A raster layer's: whether it is imagery of the ground. */
   ground?: boolean | undefined
   group?: string | undefined
@@ -1227,7 +1229,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
                     <svg part="layer-icon" aria-hidden="true" fill="currentColor" viewBox=${iconOf(entry[0]).viewBox}>
                       ${unsafeSVG(iconOf(entry[0]).content)}
                     </svg>
-                    <span part="layer-name">${entry[0]?.label ?? ''}</span>
+                    <span part="layer-name">${entry[0]?.label || entry[0]?.fallbackLabel || ''}</span>
                   </button>`
                 })}
               </div>`
@@ -1579,7 +1581,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
     return html`<ul part="layers" aria-label=${this.layersLabel}>
       ${layers.map(
         (layer) =>
-          html`<li part="layer">${layer.label ?? ''}${layer.description ? `, ${layer.description}` : ''}</li>`,
+          html`<li part="layer">${layer.label || layer.fallbackLabel || ''}${layer.description ? `, ${layer.description}` : ''}</li>`,
       )}
     </ul>`
   }

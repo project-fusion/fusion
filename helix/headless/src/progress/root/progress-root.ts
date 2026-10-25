@@ -89,6 +89,11 @@ export class HelixHeadlessProgress extends HelixElement {
   @property({ attribute: 'complete-label' })
   completeLabel = 'Complete'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Progress'
+
   /**
    * `Intl.NumberFormat` options the reading is written with, as React Aria's
    * Meter and ProgressBar take them: a unit, a currency, or a number of
@@ -128,10 +133,11 @@ export class HelixHeadlessProgress extends HelixElement {
    *
    * A visible label in the `label` slot names it instead, with the words it
    * shows, so the name and the label cannot disagree.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Progress'
+  label = ''
 
   /**
    * The locale the words and the percentage are in, such as `fr` for `72 %`.
@@ -242,7 +248,7 @@ export class HelixHeadlessProgress extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, {
-      label: slottedWords(this, ['label']) || this.label,
+      label: slottedWords(this, ['label']) || this.label || this.fallbackLabel,
       role: 'progressbar',
     })
     /* The clamped value, not the given one, so what is announced is what is

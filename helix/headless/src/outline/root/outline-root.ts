@@ -151,6 +151,11 @@ export class HelixHeadlessOutline extends HelixElement {
   @property()
   behavior: ScrollBehavior = 'auto'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'On this page'
+
   /**
    * Keeps the link of the section in view in view itself, in an outline
    * longer than the box it scrolls in, such as a contents rail with a
@@ -163,10 +168,11 @@ export class HelixHeadlessOutline extends HelixElement {
   /**
    * The navigation's name, read by screen readers. A heading in the `heading`
    * slot names it in place of this.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'On this page'
+  label = ''
 
   /**
    * Which links are marked. `reading` marks the one section being read, the
@@ -902,7 +908,7 @@ export class HelixHeadlessOutline extends HelixElement {
   protected override render(): TemplateResult {
     const run = this.run
     return html`<div part="heading"><slot name="heading" @slotchange=${this.nameByHeading}></slot></div>
-      <nav part="nav" aria-label=${this.label} @slotchange=${this.handleSlotChange}>
+      <nav part="nav" aria-label=${this.label || this.fallbackLabel} @slotchange=${this.handleSlotChange}>
       ${run ? this.renderList(nest(run.map((link) => levelOf(link.getAttribute('data-level'))))) : html`<slot></slot>`}
       <span part="indicator" aria-hidden="true"><slot name="indicator"></slot></span>
     </nav>`

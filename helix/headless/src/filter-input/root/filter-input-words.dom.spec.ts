@@ -71,13 +71,13 @@ describe('the count of suggestions', () => {
 
 describe('the filter menu', () => {
   test('is named in the words registered for its own key', async () => {
-    registerWords('pl', { 'helix-filter-menu': { label: 'Filtruj' } })
+    registerWords('pl', { 'helix-filter-menu': { fallbackLabel: 'Filtruj' } })
     document.body.innerHTML =
       '<div lang="pl"><helix-headless-filter-menu></helix-headless-filter-menu></div>'
     const menu = document.querySelector('helix-headless-filter-menu') as Updatable & {
-      label: string
+      fallbackLabel: string
     }
     await settle(menu)
-    expect(menu.label).toBe('Filtruj')
+    expect(menu.fallbackLabel).toBe('Filtruj')
   })
 })

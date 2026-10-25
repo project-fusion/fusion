@@ -91,7 +91,7 @@ describe('notifications server output', () => {
   test('a load error is served, around a slot for richer content', () => {
     const failed = rendered(
       ssr(
-        html`<helix-headless-notifications label="Activity" load-error="Could not load"></helix-headless-notifications>`,
+        html`<helix-headless-notifications label="Activity" error-text="Could not load"></helix-headless-notifications>`,
       ),
       'helix-headless-notifications',
     )

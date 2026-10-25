@@ -195,6 +195,11 @@ export class HelixHeadlessPagination extends HelixElement {
   @property({ type: Boolean })
   ends = false
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Pagination'
+
   /**
    * Accessible name for the control that jumps to the first page.
    */
@@ -221,10 +226,11 @@ export class HelixHeadlessPagination extends HelixElement {
 
   /**
    * Accessible name for the navigation landmark.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Pagination'
+  label = ''
 
   /**
    * Accessible name for the control that jumps to the last page.
@@ -563,7 +569,7 @@ export class HelixHeadlessPagination extends HelixElement {
        screen-reader user chooses between them, which is why this carries a
        default name at all: an author's own `aria-label` is an attribute and
        beats internals, so naming it here costs them nothing. */
-    hostAria(this.internals, { label: this.label, role: 'navigation' })
+    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'navigation' })
 
     /* Through `toggleState`, which carries the feature test: an engine without
        `CustomStateSet` gets a control that renders its one page instead of

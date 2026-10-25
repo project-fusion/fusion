@@ -38,7 +38,7 @@ import '../../voice-level/index.js'
  * @cssproperty --listbox-dragging-opacity - The opacity of an option being dragged, in a `reorderable` list with `@fusion.dev/helix/listbox/reorder` imported.
  * @cssproperty --listbox-drop-indicator-color - The color of the line where a dragged option would land.
  * @cssproperty --listbox-drop-indicator-size - The thickness of the line where a dragged option would land.
- * @cssproperty --listbox-error-color - The color of the line shown while `load-error` is set.
+ * @cssproperty --listbox-error-color - The color of the line shown while `error-text` is set.
  * @cssproperty --listbox-max-block-size - Maximum height of the list before it scrolls.
  */
 @customElement('helix-listbox')

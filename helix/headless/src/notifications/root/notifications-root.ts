@@ -75,7 +75,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * nothing more. While the feed is loading the button stays, so focus stays on
  * it, and it is `aria-disabled` and sends nothing.
  *
- * **`load-error` says a page could not be fetched**, such as "Could not load
+ * **`error-text` says a page could not be fetched**, such as "Could not load
  * notifications": it shows under the rows there are, in the `error` part, in
  * place of the empty and loading lines, and a screen reader hears it. Clear it
  * when you ask again.
@@ -88,7 +88,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  *
  * @slot - The notifications.
  * @slot empty - Replaces the words of `empty-text` in the `empty` part, such as a picture and a line of your own. The live region still says `empty-text`.
- * @slot error - Replaces the words of `load-error` in the `error` part, such as a line with a retry button. The live region still says `load-error`.
+ * @slot error - Replaces the words of `error-text` in the `error` part, such as a line with a retry button. The live region still says `error-text`.
  * @slot footer - Below the list, for a link to everything.
  * @slot header - Above the list, for a title and the mark-all control.
  * @slot loading - Replaces the words of `loading-text` in the `loading` part, such as a loader. The live region still says `loading-text`.
@@ -99,7 +99,7 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @event {HelixReadEvent} helix-read - Fired by an item after it is marked read or unread, and by the feed after everything is marked read.
  *
  * @csspart empty - Shown when there is nothing in the feed.
- * @csspart error - Shown while `load-error` is set, under any rows there are, in place of the empty and loading lines.
+ * @csspart error - Shown while `error-text` is set, under any rows there are, in place of the empty and loading lines.
  * @csspart footer - The region below the list.
  * @csspart header - The region above the list.
  * @csspart list - The list itself, a `feed` whose rows are its articles.
@@ -108,8 +108,8 @@ import type { HelixHeadlessNotification } from '../notification/notification.js'
  * @csspart mark-all - The control that marks everything read.
  * @csspart more - The button after the list that asks for more, while `load-more` is set. It is `aria-disabled` while the feed is loading.
  *
- * @cssstate empty - While the feed holds no notification and is not loading, and `load-error` is not set. Never on the server, which cannot count the rows.
- * @cssstate error - While `load-error` is set.
+ * @cssstate empty - While the feed holds no notification and is not loading, and `error-text` is not set. Never on the server, which cannot count the rows.
+ * @cssstate error - While `error-text` is set.
  * @cssstate loading - While `loading` is set.
  * @cssstate media - While a notification in the list holds something in its media slot, so every row keeps that column.
  */
@@ -144,6 +144,17 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   @property({ attribute: 'arrived-label' })
   arrivedLabel = '{count, plural, one {# new notification} other {# new notifications}}'
 
+  /**
+   * What the feed says when a page of it could not be loaded, such as after a
+   * request to a server fails. Empty, null or no attribute is no error, so
+   * removing the attribute clears it.
+   *
+   * Set, it shows under the rows there are, in place of `empty-text` and
+   * `loading-text`, and a screen reader hears it. Clear it when you ask again.
+   */
+  @property({ attribute: 'error-text' })
+  errorText: string | null = ''
+
   /** The region's name where `label` is empty. */
   @words
   @property({ attribute: 'fallback-label' })
@@ -156,15 +167,12 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   label = ''
 
   /**
-   * What the feed says when a page of it could not be loaded, such as after a
-   * request to a server fails. Empty, null or no attribute is no error, so
-   * removing the attribute clears it.
+   * The old name of `error-text`, read only where a page sets it.
    *
-   * Set, it shows under the rows there are, in place of `empty-text` and
-   * `loading-text`, and a screen reader hears it. Clear it when you ask again.
+   * @deprecated Use `error-text`. Removed in the next release.
    */
   @property({ attribute: 'load-error' })
-  loadError: string | null = ''
+  loadError?: string | null
 
   /**
    * Whether to draw a button after the list that asks for the next page, by
@@ -570,7 +578,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    */
   protected override renderStatus(hasContent: boolean): TemplateResult | typeof nothing {
     if (this.failed) {
-      return html`<p part="error"><slot name="error">${this.loadError}</slot></p>`
+      return html`<p part="error"><slot name="error">${this.loadError || this.errorText}</slot></p>`
     }
     if (!this.loading && hasContent) {
       return nothing
@@ -589,7 +597,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
    */
   protected override renderLive(hasContent: boolean): TemplateResult {
     const said = this.failed
-      ? this.loadError
+      ? this.loadError || this.errorText
       : this.loading
         ? this.loadingText
         : hasContent
@@ -598,9 +606,9 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
     return html`<span part="live" role="status">${said}</span>`
   }
 
-  /** Whether `load-error` holds words, which a removed attribute does not. */
+  /** Whether `error-text` holds words, which a removed attribute does not. */
   private get failed(): boolean {
-    return Boolean(this.loadError)
+    return Boolean(this.loadError || this.errorText)
   }
 
   /**

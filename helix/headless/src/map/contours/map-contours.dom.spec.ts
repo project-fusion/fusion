@@ -128,7 +128,7 @@ describe('map contours', () => {
   })
 
   test('on a page in another language, it is named by the word registered for it', async () => {
-    registerWords('de', { 'helix-map-contours': { label: 'Höhenlinien' } })
+    registerWords('de', { 'helix-map-contours': { fallbackLabel: 'Höhenlinien' } })
     document.body.innerHTML = `<div lang="de"><helix-headless-map label="Tal">
       <helix-headless-map-contours></helix-headless-map-contours>
     </helix-headless-map></div>`

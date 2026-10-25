@@ -17,6 +17,13 @@
 //!    falls back to and what translators translate.
 //! 3. No plain template literal joins a word property with other text. The
 //!    order of a sentence is the translator's, so it belongs in the message.
+//! 4. `label` has no built-in default. It is the page's name for the element,
+//!    and a name the element gives itself is `fallbackLabel`, which is read
+//!    only where nothing else names it. Eleven families defaulted `label`
+//!    itself until October 25, 2026, so a missing name never warned.
+//! 5. No built-in name repeats the role the element writes. A screen reader
+//!    says the role after the name, so a tree named "Tree" is read as "Tree
+//!    tree", which the APG's naming guidance advises against.
 //!
 //! **The same in a project built on Helix**, whose components declare
 //! `@words` and `static words` from `@fusion.dev/helix-core` and are
@@ -67,7 +74,17 @@ struct Declared {
     words: bool,
     /// The initializer, where it is a string or a table holding a letter.
     english: bool,
+    /// The initializer as written, trimmed.
+    value: String,
 }
+
+/// A role a module writes: an attribute in a template, or an assignment.
+static ROLE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(
+        r#"\b(?:role|aria-roledescription)\s*[=:]\s*["'`]([a-z]+)["'`]|\.role\s*=\s*["'`]([a-z]+)["'`]"#,
+    )
+    .expect("a literal pattern compiles")
+});
 
 /// Every reactive property in a module.
 fn declared(code: &str) -> Vec<Declared> {
@@ -85,6 +102,7 @@ fn declared(code: &str) -> Vec<Declared> {
                 at: found.get(2).map_or(0, |one| one.start()),
                 english: (quoted || table) && value.chars().any(char::is_alphabetic),
                 name,
+                value: value.to_owned(),
                 words: found.get(1).is_some(),
             }
         })
@@ -281,6 +299,56 @@ fn judged(properties: &[Declared], at: &dyn Fn(usize) -> String) -> (usize, Vec<
     (checked, findings)
 }
 
+/// Every role a module writes.
+fn roles(code: &str) -> Vec<String> {
+    ROLE.captures_iter(code)
+        .filter_map(|one| one.get(1).or_else(|| one.get(2)))
+        .map(|one| one.as_str().to_owned())
+        .collect()
+}
+
+/// What a moved class says about its built-in names: a `label` that defaults
+/// to words, and a name that repeats a role the module writes.
+fn named(properties: &[Declared], code: &str, at: &dyn Fn(usize) -> String) -> Vec<Finding> {
+    let written = roles(code);
+    let mut findings = Vec::new();
+    for one in properties {
+        if !one.english || !matches!(one.name.as_str(), "label" | "fallbackLabel") {
+            continue;
+        }
+        let english = one.value.trim_matches(['\'', '"', '`']);
+        if one.name == "label" {
+            findings.push(Finding {
+                detail: "Leave `label` empty, as the page's name, and move the words to \
+                         `fallbackLabel`, which the element reads only where nothing else names \
+                         it. Call `auditName` so development warns about a missing name."
+                    .to_owned(),
+                file: at(one.at),
+                message: format!("`label` defaults to `{english}`"),
+            });
+        }
+        let lowered = english.to_lowercase();
+        let words: Vec<&str> = lowered
+            .split(|one: char| !one.is_alphabetic())
+            .filter(|one| !one.is_empty())
+            .collect();
+        if let Some(role) = written.iter().find(|role| words.contains(&role.as_str())) {
+            findings.push(Finding {
+                detail: format!(
+                    "A screen reader says the role after the name, so this is read as \"{english} \
+                     {role}\". Name what the element holds, or give it no built-in name."
+                ),
+                file: at(one.at),
+                message: format!(
+                    "`{}` defaults to `{english}`, which repeats the role `{role}`",
+                    one.name
+                ),
+            });
+        }
+    }
+    findings
+}
+
 /// Every plain template literal that joins one of `wordy` with other text.
 fn joins(code: &str, wordy: &[&str], at: &dyn Fn(usize) -> String) -> Vec<Finding> {
     let mut findings = Vec::new();
@@ -354,6 +422,7 @@ pub fn run(context: &Context) -> Report {
             let (counted, found) = judged(&properties, &at);
             checked += counted;
             findings.extend(found);
+            findings.extend(named(&properties, &code, &at));
             let wordy: Vec<&str> = properties
                 .iter()
                 .filter(|one| one.words)

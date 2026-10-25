@@ -65,17 +65,25 @@ export class HelixHeadlessMapPosition extends HelixElement {
   @property()
   description?: string
 
-  /** The direction it faces, in degrees clockwise from north. Shows an arrow. */
-  @property({ converter: numberConverter('heading', undefined, 'degrees'), reflect: true })
-  heading?: number
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Live position'
 
   /** Marks this as a position for the connector, whatever its tag. */
   readonly isMapPosition = true
 
-  /** What it is, such as "Van 12". Read by screen readers. Defaults to "Live position". */
-  @words
+  /** The direction it faces, in degrees clockwise from north. Shows an arrow. */
+  @property({ converter: numberConverter('heading', undefined, 'degrees'), reflect: true })
+  heading?: number
+
+  /**
+   * What it is, such as "Van 12". Read by screen readers. Defaults to "Live position".
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
+   */
   @property()
-  label = 'Live position'
+  label = ''
 
   /** Latitude, in degrees. */
   @property({ converter: numberConverter('lat', undefined, 'degrees') })
@@ -157,7 +165,7 @@ export class HelixHeadlessMapPosition extends HelixElement {
     /* **The status beside the picture, not in it.** An image's children are
        presentational, so a status inside `role="img"` was never spoken at
        all. */
-    return html`<span part="position" role="img" aria-label=${this.label ?? ''}>
+    return html`<span part="position" role="img" aria-label=${this.label || this.fallbackLabel}>
         <span part="accuracy"></span>
         <span part="heading"></span>
         <span part="pulse"></span>

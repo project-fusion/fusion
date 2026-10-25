@@ -1,5 +1,6 @@
 import {
   AriaForwardController,
+  auditName,
   customElement,
   deepActiveElement,
   glyphPath,
@@ -12,7 +13,6 @@ import {
   MixinControllerActive,
   scrollWithin,
   whenHydrated,
-  words,
 } from '@fusion.dev/helix-core'
 import { caretDown, caretLeft, caretRight, caretUp } from '@fusion.dev/helix-icons'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -156,10 +156,12 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
    *
    * An `aria-label` or `aria-labelledby` on the host names the tab list too,
    * and wins over this.
+   *
+   * Empty by default, so a page that leaves it empty gives the element no
+   * name, and a development build warns.
    */
-  @words
   @property()
-  label = 'Tabs'
+  label = ''
 
   /**
    * Stops the arrow keys from selecting each tab they move to. By default,
@@ -446,6 +448,13 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    /* Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'tabs',
+      () => this.label !== '',
+    )
     this.sync()
     /* Straight away, and again after a frame. The first call is what places it
        in a document that is already laid out; the second covers a first paint
@@ -558,7 +567,7 @@ export class HelixHeadlessTabs extends MixinControllerActive(HelixElement) {
     return html`<div
         part="tabs"
         role="tablist"
-        aria-label=${this.label}
+        aria-label=${this.label || nothing}
         aria-orientation=${this.orientation === 'vertical' ? 'vertical' : nothing}
         @scroll=${this.scrollControls ? this.measure : nothing}
       >

@@ -66,10 +66,18 @@ export class HelixHeadlessMotionToggle extends HelixElement {
    */
   static words = 'helix-motion-toggle'
 
-  /** The button's name, which stays the same whichever way it stands. */
+  /** The name the element gives itself where `label` is empty. */
   @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Pause motion'
+
+  /**
+   * The button's name, which stays the same whichever way it stands.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
+   */
   @property()
-  label = 'Pause motion'
+  label = ''
 
   /** Whether the page's motion is paused, kept with the document element's attribute. */
   @state()
@@ -105,7 +113,7 @@ export class HelixHeadlessMotionToggle extends HelixElement {
 
   protected override render(): TemplateResult {
     return html`<button
-      aria-label=${this.label}
+      aria-label=${this.label || this.fallbackLabel}
       aria-pressed=${this.paused ? 'true' : 'false'}
       part="button"
       type="button"

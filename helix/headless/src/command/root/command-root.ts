@@ -135,7 +135,7 @@ const CONTROL = 'helix-control:'
  *
  * @slot - The commands, and any groups of them.
  * @slot empty - What the palette shows when typing matches no commands, for content richer than `empty-text`.
- * @slot error - What the palette shows while `load-error` is set, for content richer than its text.
+ * @slot error - What the palette shows while `error-text` is set, for content richer than its text.
  * @slot filter-icon - Replaces the magnifying glass in the filter field.
  * @slot footer - Content under the list, such as the keys that work in the palette.
  * @slot header - Content above the filter field, such as a title or the scope being searched. A heading here does not rename the palette, which `label` names.
@@ -170,7 +170,7 @@ const CONTROL = 'helix-control:'
  * @csspart footer - The row under the list.
  * @csspart listbox - The listbox inside the palette.
  * @csspart listbox-empty - The text shown when the filter matches no commands.
- * @csspart listbox-error - The text shown while `load-error` is set.
+ * @csspart listbox-error - The text shown while `error-text` is set.
  * @csspart listbox-feedback - The listbox's error message.
  * @csspart listbox-filter-icon - The icon beside the filter field.
  * @csspart listbox-filter-mark - The default icon beside the filter field, drawn when no icon is slotted.
@@ -189,7 +189,7 @@ const CONTROL = 'helix-control:'
  * @csspart live - The region a screen reader announces the page shown from, by the words of the command that opens it, drawn once there is one to say. Visually hidden in the styled tier.
  *
  * @cssstate empty - The list shows no commands: there are none, or typing hid every one.
- * @cssstate error - While `load-error` is set.
+ * @cssstate error - While `error-text` is set.
  * @cssstate loading - While `loading` is set.
  * @cssstate no-results - Typing hid every one of the commands, where there are some.
  * @cssstate open - While the palette is open.
@@ -226,6 +226,20 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   @words
   @property({ attribute: 'empty-text' })
   emptyText = 'No commands'
+
+  /**
+   * What the list says when its commands could not be loaded, such as after a
+   * request to a server fails. Empty, null or no attribute is no error, so
+   * removing the attribute clears it. Passed to the list, which shows it
+   * under any commands there are and tells screen readers.
+   */
+  @property({ attribute: 'error-text' })
+  errorText: string | null = ''
+
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Commands'
 
   /**
    * How long typing rests before the commands are filtered, in milliseconds, so
@@ -303,10 +317,11 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
 
   /**
    * Accessible name for the overlay, which has no visible heading.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Commands'
+  label = ''
 
   /**
    * How the commands are laid out, as Listbox's `layout`: `grid` draws them in
@@ -317,13 +332,12 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   layout?: 'grid' | 'stack'
 
   /**
-   * What the list says when its commands could not be loaded, such as after a
-   * request to a server fails. Empty, null or no attribute is no error, so
-   * removing the attribute clears it. Passed to the list, which shows it
-   * under any commands there are and tells screen readers.
+   * The old name of `error-text`, read only where a page sets it.
+   *
+   * @deprecated Use `error-text`. Removed in the next release.
    */
   @property({ attribute: 'load-error' })
-  loadError: string | null = ''
+  loadError?: string | null
 
   /**
    * Whether the commands are still loading, for a palette that asks a server
@@ -539,10 +553,10 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    */
   private get listName(): string {
     if (this.page === '') {
-      return this.label
+      return this.label || this.fallbackLabel
     }
     const opener = optionsAmong(this.knownChildren).find((option) => option.opens === this.page)
-    return opener?.text || this.label
+    return opener?.text || this.label || this.fallbackLabel
   }
 
   /**
@@ -662,7 +676,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     document.addEventListener('keydown', this.handleHotkey)
     this.unregister = registerShortcut({
       keys: () => (this.inline ? '' : this.hotkey),
-      label: () => formatWords(this, 'hotkeyLabel', { label: this.label }),
+      label: () => formatWords(this, 'hotkeyLabel', { label: this.label || this.fallbackLabel }),
       owner: this,
     })
   }
@@ -723,7 +737,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     const shown = options.some((option) => !option.hidden)
     const settled = list !== null && !this.loading
     this.toggleState('loading', this.loading)
-    this.toggleState('error', Boolean(this.loadError))
+    this.toggleState('error', Boolean(this.loadError || this.errorText))
     if (this.items !== undefined) {
       /* Commands drawn from `items` are the list's own, and it says what it
          shows in its states, which a browser reads with `:state()`. */
@@ -798,7 +812,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     return html`<${this.tag('dialog')}
     exportparts="body: dialog-body, dismiss: dialog-dismiss, dismiss-mark: dialog-dismiss-mark,
       footer: dialog-footer, header: dialog-header, surface: dialog-surface"
-      label=${this.label}
+      label=${this.label || this.fallbackLabel}
       .open=${this.open}
       @helix-before-close=${() => {
         if (this.open) {
@@ -878,7 +892,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         filter-delay=${this.filterDelay}
         .filterMatch=${this.filterMatch}
         filter-label=${this.placeholder}
-        load-error=${this.loadError}
+        error-text=${this.loadError || this.errorText}
         loading-text=${this.loadingText}
         no-results-text=${this.noResultsText ?? nothing}
         result-label=${this.resultLabel ?? ''}
@@ -900,7 +914,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
              gives: the list's own fallback never shows behind a passed slot. -->
         <slot name="empty" slot="empty">${this.emptyText}</slot>
         <slot name="loading" slot="loading">${this.loadingText}</slot>
-        <slot name="error" slot="error">${this.loadError}</slot>
+        <slot name="error" slot="error">${this.loadError || this.errorText}</slot>
         <!-- Handed on only while something fills it: an assigned slot hides the
              list's own fallback, which is no-results-text or empty-text. -->
         <slot

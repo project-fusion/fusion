@@ -383,15 +383,15 @@ describe('a command that is a link', () => {
 })
 
 describe('a palette filtered on a server', () => {
-  test('hands `load-error` and `no-results-text` to its list', async () => {
+  test('hands `error-text` and `no-results-text` to its list', async () => {
     const host = await palette(
       markup.replace(
         '<helix-headless-command ',
-        '<helix-headless-command load-error="Offline" no-results-text="No such command" ',
+        '<helix-headless-command error-text="Offline" no-results-text="No such command" ',
       ),
     )
-    const inner = listbox(host) as unknown as { loadError: string; noResultsText?: string }
-    expect(inner.loadError).toBe('Offline')
+    const inner = listbox(host) as unknown as { errorText: string; noResultsText?: string }
+    expect(inner.errorText).toBe('Offline')
     expect(inner.noResultsText).toBe('No such command')
   })
 
@@ -410,14 +410,14 @@ describe('the palette’s own states and slots', () => {
     const host = await palette(
       markup.replace(
         '<helix-headless-command ',
-        '<helix-headless-command loading load-error="Offline" ',
+        '<helix-headless-command loading error-text="Offline" ',
       ),
     )
     expect(hasState(host, 'loading')).toBe(true)
     expect(hasState(host, 'error')).toBe(true)
     expect(hasState(host, 'empty')).toBe(false)
     host.removeAttribute('loading')
-    host.removeAttribute('load-error')
+    host.removeAttribute('error-text')
     await settle(host)
     expect(hasState(host, 'loading')).toBe(false)
     expect(hasState(host, 'error')).toBe(false)

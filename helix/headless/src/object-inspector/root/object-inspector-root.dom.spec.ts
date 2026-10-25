@@ -677,7 +677,7 @@ describe('a filtered object inspector', () => {
 describe('an object inspector with nothing to show', () => {
   test('says so in a row of the tree, in words the `empty` slot replaces', async () => {
     const host = (await mount(
-      '<helix-headless-object-inspector empty-label="Waiting for the response"></helix-headless-object-inspector>',
+      '<helix-headless-object-inspector empty-text="Waiting for the response"></helix-headless-object-inspector>',
     )) as Inspector
     await host.updateComplete
     const empty = host.shadowRoot?.querySelector('[part="empty"]')

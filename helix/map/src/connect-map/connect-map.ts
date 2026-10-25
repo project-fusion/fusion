@@ -505,6 +505,8 @@ interface Layer extends HTMLElement {
   encoding?: 'mapbox' | 'terrarium' | undefined
   /** A terrain layer's: how many times its real height the ground is raised. */
   exaggeration?: number | undefined
+  /** The layer's built-in name, which stands where `label` is empty. */
+  fallbackLabel?: string | undefined
   /** A raster layer's: drawn as the ground, under the roads. */
   ground?: boolean | undefined
   isMapLayer: true
@@ -1139,7 +1141,7 @@ export const connectMap = (
               encoding: layer.encoding === 'mapbox' ? 'mapbox' : 'terrarium',
               id: idOf(layer),
               kind: 'contours',
-              label: layer.label ?? '',
+              label: layer.label || layer.fallbackLabel || '',
               ...(typeof layer.maxZoom === 'number' ? { maxZoom: layer.maxZoom } : {}),
               points: [],
               src: layer.src,
@@ -1149,7 +1151,13 @@ export const connectMap = (
         }
         if (layer.layerKind === 'landcover') {
           return [
-            { color, id: idOf(layer), kind: 'landcover', label: layer.label ?? '', points: [] },
+            {
+              color,
+              id: idOf(layer),
+              kind: 'landcover',
+              label: layer.label || layer.fallbackLabel || '',
+              points: [],
+            },
           ]
         }
         if (layer.layerKind === 'terrain') {
@@ -1165,7 +1173,7 @@ export const connectMap = (
               highlight: settledColor(layer, 'border-top-color'),
               id: idOf(layer),
               kind: 'terrain',
-              label: layer.label ?? '',
+              label: layer.label || layer.fallbackLabel || '',
               ...(typeof layer.maxZoom === 'number' ? { maxZoom: layer.maxZoom } : {}),
               points: [],
               raised: layer.raised === true,
@@ -1175,7 +1183,13 @@ export const connectMap = (
         }
         if (layer.layerKind === 'buildings') {
           return [
-            { color, id: idOf(layer), kind: 'buildings', label: layer.label ?? '', points: [] },
+            {
+              color,
+              id: idOf(layer),
+              kind: 'buildings',
+              label: layer.label || layer.fallbackLabel || '',
+              points: [],
+            },
           ]
         }
         /* **A raster layer is its tile URLs and the one shown**, `src` being a
@@ -1195,7 +1209,7 @@ export const connectMap = (
               ...(layer.ground ? { ground: true } : {}),
               id: idOf(layer),
               kind: 'raster',
-              label: layer.label ?? '',
+              label: layer.label || layer.fallbackLabel || '',
               ...(typeof layer.maxZoom === 'number' ? { maxZoom: layer.maxZoom } : {}),
               opacity: Math.min(Math.max(0, layer.opacity ?? 0.7), 1),
               points: [],
@@ -1219,7 +1233,7 @@ export const connectMap = (
               id,
               ink: settledColor(layer, 'outline-color'),
               kind: 'points',
-              label: layer.label ?? '',
+              label: layer.label || layer.fallbackLabel || '',
               points,
             },
           ]
@@ -1242,7 +1256,7 @@ export const connectMap = (
           color,
           id: idOf(layer),
           kind: layer.layerKind,
-          label: layer.label ?? '',
+          label: layer.label || layer.fallbackLabel || '',
           ...(dotted ? { pattern: 'dotted' as const } : {}),
           points: (layer.points ?? []).map(({ lat, lng }) => ({ lat, lng })),
         }

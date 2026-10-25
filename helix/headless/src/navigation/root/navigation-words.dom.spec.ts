@@ -33,7 +33,7 @@ const mounted = async (around: string, extra = ''): Promise<Host> => {
   return host
 }
 
-const WORDS = { 'helix-navigation': { label: 'Hauptmenü' } }
+const WORDS = { 'helix-navigation': { fallbackLabel: 'Hauptmenü' } }
 
 describe('on a page in another language', () => {
   test('names its landmark in the registered words, and a page’s own over them', async () => {

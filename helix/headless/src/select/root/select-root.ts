@@ -140,7 +140,7 @@ import { over } from '../align.js'
  * @csspart label - The label above the trigger.
  * @csspart listbox - The list inside the panel.
  * @csspart listbox-empty - The text shown when the filter hides every option.
- * @csspart listbox-error - The inner list's `error` part, shown while its `load-error` is set.
+ * @csspart listbox-error - The inner list's `error` part, shown while its `error-text` is set.
  * @csspart listbox-feedback - The inner list's message that says what is wrong with the value.
  * @csspart listbox-filter-icon - The icon beside the filter field.
  * @csspart listbox-filter-mark - The default icon beside the filter field, shown when none is slotted.

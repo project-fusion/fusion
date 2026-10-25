@@ -119,6 +119,18 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   errorLabel = 'Could not copy'
 
   /**
+   * The name the button gives itself where `label` is empty, which is also
+   * its tooltip text before a copy.
+   *
+   * Defaulted where most fallbacks could be left empty. An icon-only control
+   * must be named, and the name of this one is not a judgment call: every copy
+   * button in the world is called Copy.
+   */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Copy'
+
+  /**
    * How long the confirmation or the failure stands, in milliseconds, before
    * the button goes back to `label`. The attribute also takes a CSS time, such
    * as `1.5s`.
@@ -136,15 +148,11 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
   from = ''
 
   /**
-   * The button's name and tooltip text before a copy.
-   *
-   * Defaulted rather than left empty. An icon-only control must be named, and
-   * the name of this one is not a judgment call: every copy button in the
-   * world is called Copy. A consumer with a better word still sets it.
+   * The button's name and tooltip text before a copy. Empty by default, which
+   * leaves the name to `fallbackLabel`. A consumer with a better word sets it.
    */
-  @words
   @property()
-  override label = 'Copy'
+  override label = ''
 
   /**
    * Draws the name as words beside the icon, and the result in their place
@@ -229,7 +237,7 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
     if (this.failed) {
       return this.errorLabel
     }
-    return this.copied ? this.copiedLabel : this.namedBy || this.label
+    return this.copied ? this.copiedLabel : this.namedBy || this.label || this.fallbackLabel
   }
 
   /**
@@ -432,7 +440,7 @@ export class HelixHeadlessCopyButton extends HelixHeadlessIconButton {
     }
     const resting = !this.copied && !this.failed
     return html`<span part="text" aria-hidden="true"
-      ><span ?hidden=${!resting}>${this.namedBy || this.label}</span
+      ><span ?hidden=${!resting}>${this.namedBy || this.label || this.fallbackLabel}</span
       ><span ?hidden=${!this.copied}>${this.copiedLabel}</span
       ><span ?hidden=${!this.failed}>${this.errorLabel}</span
     ></span>`

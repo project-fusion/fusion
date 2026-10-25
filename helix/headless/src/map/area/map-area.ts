@@ -53,13 +53,10 @@ export class HelixHeadlessMapArea extends HelixElement {
   @property()
   description?: string
 
-  /**
-   * A name this layer shares with other layers, such as a route and its
-   * dotted legs. The layers menu shows layers in the same group as one entry,
-   * named by the first of them, and its checkbox shows or hides them all.
-   */
-  @property()
-  group?: string
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Area'
 
   /** Marks this as a layer for the frame and the connector, whatever its tag. */
   readonly isMapLayer = true
@@ -68,12 +65,21 @@ export class HelixHeadlessMapArea extends HelixElement {
   readonly layerKind: 'area' | 'route' = 'area'
 
   /**
+   * A name this layer shares with other layers, such as a route and its
+   * dotted legs. The layers menu shows layers in the same group as one entry,
+   * named by the first of them, and its checkbox shows or hides them all.
+   */
+  @property()
+  group?: string
+
+  /**
    * The area's name, used in the frame's list and its tile in the layers
    * menu. Defaults to "Area", so neither is ever a control with no name.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Area'
+  label = ''
 
   /**
    * The corners of the shape, in order. The last point connects back to the

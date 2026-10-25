@@ -36,7 +36,7 @@ const bubble = (host: HTMLElement): string =>
 
 describe('a time picker on a page in another language', () => {
   test('is named in the words registered for the nearest `lang`', async () => {
-    registerWords('pl', { 'helix-time-picker': { label: 'Godzina' } })
+    registerWords('pl', { 'helix-time-picker': { fallbackLabel: 'Godzina' } })
     const host = await picker('lang="pl"')
     expect(part(host, 'list')?.getAttribute('aria-label')).toBe('Godzina')
   })

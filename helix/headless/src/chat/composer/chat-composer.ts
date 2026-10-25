@@ -217,6 +217,11 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
   @property({ reflect: true, type: Boolean })
   busy = false
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Message'
+
   /**
    * A message about the draft, shown under the field. While set, the composer
    * is invalid, does not send, and does not submit, as a field's `feedback`
@@ -227,10 +232,11 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
 
   /**
    * The field's name, read by screen readers.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Message'
+  label = ''
 
   /**
    * The most characters a draft can have. The field stops taking more.
@@ -824,7 +830,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label, role: 'group' })
+    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'group' })
     this.noteFocus()
   }
 
@@ -890,7 +896,7 @@ export class HelixHeadlessChatComposer extends MixinVoice(HelixFormElement) {
       <textarea
         part="field"
         .value=${live(this.value)}
-        aria-label=${this.label}
+        aria-label=${this.label || this.fallbackLabel}
         placeholder=${this.shownPlaceholder}
         rows=${this.rows}
         ?required=${this.required}

@@ -180,7 +180,7 @@ const pastes = (event: KeyboardEvent): boolean =>
  * @slot fullscreen-icon - Replaces the glyph inside the fullscreen button.
  * @slot header - Content above the device, such as its name and state.
  * @slot home-icon - Replaces the glyph inside the Home button.
- * @slot loading - Content shown over the screen while `loading` is set, such as a spinner. `loading-label` by default, which screen readers hear either way.
+ * @slot loading - Content shown over the screen while `loading` is set, such as a spinner. `loading-text` by default, which screen readers hear either way.
  * @slot power-icon - Replaces the glyph inside the Power button.
  * @slot recents-icon - Replaces the glyph inside the Recent apps button.
  * @slot rotate-left-icon - Replaces the glyph inside the Rotate left button.
@@ -220,7 +220,7 @@ const pastes = (event: KeyboardEvent): boolean =>
  * @csspart home-spinner - The ring the Home button turns while it is pending.
  * @csspart home-text - The box the Home button's icon sits in.
  * @csspart keys-hint - What a screen reader says about the keys when it reaches the screen, as its description. Read by screen readers only.
- * @csspart live - What screen readers hear while `loading` is set: `loading-label`. Read by screen readers only.
+ * @csspart live - What screen readers hear while `loading` is set: `loading-text`. Read by screen readers only.
  * @csspart loading - The box over the screen that holds the `loading` slot while `loading` is set. Screen readers hear `live` in its place.
  * @csspart picture - The box the stream is drawn in, turned by `rotation`.
  * @csspart power - The Power button.
@@ -367,15 +367,23 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
 
   /**
    * Shows the `loading` slot over the screen, for a stream that is starting
-   * or has stopped. Screen readers hear `loading-label`.
+   * or has stopped. Screen readers hear `loading-text`.
    */
   @property({ type: Boolean })
   loading = false
 
+  /**
+   * The old name of `loading-text`, read only where a page sets it.
+   *
+   * @deprecated Use `loading-text`. Removed in the next release.
+   */
+  @property({ attribute: 'loading-label' })
+  loadingLabel?: string
+
   /** What the screen shows and screen readers hear while `loading` is set and nothing is in the `loading` slot. */
   @words
-  @property({ attribute: 'loading-label' })
-  loadingLabel = 'Connecting to the device'
+  @property({ attribute: 'loading-text' })
+  loadingText = 'Connecting to the device'
 
   /** The Power button's label. */
   @words
@@ -1502,7 +1510,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
             </div>
             ${this.renderMarks()}
             <div part="loading" aria-hidden="true">
-              ${this.loading ? html`<slot name="loading">${this.loadingLabel}</slot>` : nothing}
+              ${this.loading ? html`<slot name="loading">${this.loadingLabel ?? this.loadingText}</slot>` : nothing}
             </div>
           </div>
           ${
@@ -1519,7 +1527,7 @@ export class HelixHeadlessDeviceScreen extends HelixElement {
         <slot name="footer"></slot>
       </div>
       <span part="keys-hint" id="keys-hint" aria-hidden="true" data-spoken>${interactive ? this.keysHintLabel : ''}</span>
-      <span part="live" role="status" data-spoken>${this.loading ? this.loadingLabel : ''}</span>
+      <span part="live" role="status" data-spoken>${this.loading ? (this.loadingLabel ?? this.loadingText) : ''}</span>
     </div>`
   }
 }

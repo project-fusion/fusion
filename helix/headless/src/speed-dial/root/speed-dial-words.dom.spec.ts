@@ -35,7 +35,7 @@ const mounted = async (around: string, extra = ''): Promise<Host> => {
 
 const WORDS = {
   'helix-speed-dial': {
-    label: 'Aktionen',
+    fallbackLabel: 'Aktionen',
     longPressLabel: 'Lange drücken oder Alt+Pfeil nach unten, um die Aktionen zu zeigen',
   },
 }

@@ -3440,6 +3440,72 @@ fn words_tables() {
     );
 }
 
+/// `label` is the page's name and has no built-in default: the clean tree
+/// names itself through `fallbackLabel`, and the fault moves the words back.
+#[test]
+fn words_label_default() {
+    let tree = |field: &str| {
+        format!(
+            "export class Tree extends HTMLElement {{
+  static words = 'helix-tree'
+
+  @words
+  @property({{ attribute: 'fallback-label' }})
+  {field} = 'Files'
+}}
+"
+        )
+    };
+    plant_in(
+        "words-label-default",
+        "words",
+        &[
+            ("helix.json", TIERS),
+            ("src/tree/tree.ts", &tree("fallbackLabel")),
+        ],
+        |planted| {
+            planted.write("src/tree/tree.ts", &tree("label"));
+        },
+        "`label` defaults to `Files`",
+        "src/tree/tree.ts:6",
+    );
+}
+
+/// A built-in name that repeats the role the module writes is read twice by
+/// a screen reader, so it is refused.
+#[test]
+fn words_role_in_name() {
+    let toolbar = |english: &str| {
+        format!(
+            "export class Toolbar extends HTMLElement {{
+  static words = 'helix-toolbar'
+
+  @words
+  @property({{ attribute: 'fallback-label' }})
+  fallbackLabel = '{english}'
+
+  render() {{
+    return html`<div role=\"toolbar\"></div>`
+  }}
+}}
+"
+        )
+    };
+    plant_in(
+        "words-role-in-name",
+        "words",
+        &[
+            ("helix.json", TIERS),
+            ("src/toolbar/toolbar.ts", &toolbar("Formatting")),
+        ],
+        |planted| {
+            planted.write("src/toolbar/toolbar.ts", &toolbar("Toolbar"));
+        },
+        "`fallbackLabel` defaults to `Toolbar`, which repeats the role `toolbar`",
+        "src/toolbar/toolbar.ts:6",
+    );
+}
+
 /// A slot name is held to its own registry, read from what the manifest
 /// documents: `heading` is the word, and `title`, which Callout published for the
 /// same thing, is refused in its favor.

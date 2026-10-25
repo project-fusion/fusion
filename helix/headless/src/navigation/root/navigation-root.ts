@@ -152,16 +152,22 @@ export class HelixHeadlessNavigation extends HelixElement {
   @property({ type: Boolean })
   arrows = false
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Main'
+
   /**
    * The landmark's name, read by screen readers.
    *
    * An `aria-label` or `aria-labelledby` on the host names the landmark too,
    * and wins over this, so a footer navigation written the usual way is not a
    * second "Main".
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Main'
+  label = ''
 
   /* The arrow keys, through the shared controller: from where focus is,
      choosing nothing, stopping at the ends. Only the axis the destinations run
@@ -246,7 +252,7 @@ export class HelixHeadlessNavigation extends HelixElement {
         .join(' ')
         .trim()
     }
-    return (this.getAttribute('aria-label') ?? this.label).trim()
+    return (this.getAttribute('aria-label') ?? (this.label || this.fallbackLabel)).trim()
   }
 
   /**
@@ -346,7 +352,7 @@ export class HelixHeadlessNavigation extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<nav part="nav" aria-label=${this.label}>
+    return html`<nav part="nav" aria-label=${this.label || this.fallbackLabel}>
       <div part="indicator" aria-hidden="true"><slot name="indicator"></slot></div>
       <slot @slotchange=${() => this.watch()}></slot>
     </nav>`

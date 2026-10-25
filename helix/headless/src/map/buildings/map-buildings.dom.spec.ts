@@ -121,7 +121,7 @@ describe('map buildings', () => {
   })
 
   test('on a page in another language, it is named by the word registered for it', async () => {
-    registerWords('de', { 'helix-map-buildings': { label: '3D-Gebäude' } })
+    registerWords('de', { 'helix-map-buildings': { fallbackLabel: '3D-Gebäude' } })
     document.body.innerHTML = `<div lang="de"><helix-headless-map label="Innenstadt">
       <helix-headless-map-buildings></helix-headless-map-buildings>
     </helix-headless-map></div>`
