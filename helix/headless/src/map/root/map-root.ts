@@ -1,4 +1,5 @@
 import {
+  auditChildren,
   auditName,
   customElement,
   focusItemOf,
@@ -177,6 +178,20 @@ const SETTLES = 400
  *
  * Markers, routes, areas, live positions, and points layers go inside the
  * frame as child elements.
+ *
+ * **Each element has an entry of its own.** A map draws the layers it is
+ * given, so `map/root` registers the frame alone. A page imports each layer it
+ * writes, such as a marker and a route:
+ *
+ * ```js
+ * import '@fusion.dev/helix/map/root'
+ * import '@fusion.dev/helix/map/marker'
+ * import '@fusion.dev/helix/map/route'
+ * ```
+ *
+ * A layer written without its entry is reported once the page has loaded, with
+ * the entry to add. The family's own entry, `@fusion.dev/helix/map`, registers
+ * every element.
  *
  * @since 0.100.0
  * @status stable
@@ -1054,6 +1069,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.finishHydration()
+    this.auditLayers()
     /* A map with no name is read as "Map", which says nothing of where it is.
        Development builds only. */
     auditName(
@@ -1062,6 +1078,28 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
       'map',
       () => this.label !== '',
     )
+  }
+
+  /**
+   * Says so when a layer is written in the map and never registered.
+   *
+   * Each layer has an entry of its own, so a page that imports only the map
+   * gets an inert element for each one it writes. Core's `auditChildren` asks
+   * once the page has loaded and painted, and again once it has registered
+   * nothing for `QUIET` milliseconds, so a later chunk is not taken for a
+   * missing entry.
+   */
+  private auditLayers(): void {
+    auditChildren(this, 'map-area', 'map/area', 'the map draws no area')
+    auditChildren(this, 'map-buildings', 'map/buildings', 'the map draws no buildings')
+    auditChildren(this, 'map-contours', 'map/contours', 'the map draws no contours')
+    auditChildren(this, 'map-landcover', 'map/landcover', 'the map draws no land cover')
+    auditChildren(this, 'map-marker', 'map/marker', 'the map draws no marker')
+    auditChildren(this, 'map-points', 'map/points', 'the map draws no points')
+    auditChildren(this, 'map-position', 'map/position', 'the map draws no position')
+    auditChildren(this, 'map-raster', 'map/raster', 'the map draws no raster tiles')
+    auditChildren(this, 'map-route', 'map/route', 'the map draws no route')
+    auditChildren(this, 'map-terrain', 'map/terrain', 'the map draws no terrain')
   }
 
   /**

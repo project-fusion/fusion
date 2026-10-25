@@ -1,3 +1,5 @@
+import '@fusion.dev/helix-headless/map'
+
 export { HelixMapArea } from './area/map-area.js'
 export { HelixMapBuildings } from './buildings/map-buildings.js'
 export { HelixMapContours } from './contours/map-contours.js'
