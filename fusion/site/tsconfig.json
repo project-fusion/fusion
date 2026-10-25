@@ -23,7 +23,7 @@
     "target": "ES2022",
     "useDefineForClassFields": false
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "**/*.spec.ts"],
   "include": [
     "**/*.ts",
     "**/*.tsx",

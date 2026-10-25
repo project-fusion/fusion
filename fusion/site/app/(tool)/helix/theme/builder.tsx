@@ -25,6 +25,7 @@ import {
   type Settings,
   stylesheet,
 } from '@/utils/theme-defaults/theme-defaults'
+import { usePreviewSettled } from '../../../../hooks/use-preview-settled/use-preview-settled'
 import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
 import { THEME_ENGINE } from '../../../../utils/theme-engine/theme-engine'
 import { THEMED_PAGE_STYLES } from './themed-page-styles'
@@ -634,6 +635,10 @@ export function ThemeBuilder({
     }
   }, [theme])
   const preview = useRef<HelixSandboxPreview>(null)
+  /* The stage holds still for a picture only once the preview has drawn. */
+  const stage = useRef<HTMLDivElement>(null)
+
+  usePreviewSettled(stage, preview)
 
   /* The pane holding the three face dropdowns, so the samples inside them can be
      watched. Every option is in the light DOM here whether the list is open or
@@ -1334,7 +1339,7 @@ export function ThemeBuilder({
           </helix-flex>
         </section>
 
-        <div className="themeStage" slot="end">
+        <div className="themeStage" ref={stage} slot="end">
           {/* `lead="preview"` because this is a place to look. The workbench
               leads with its source, being a place to write; here the artifact is
               an output rather than an input and a reader is judging a palette,

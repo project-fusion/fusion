@@ -178,3 +178,32 @@ helix-tree-item:hover .docsJump,
 helix-tree-item:focus-within .docsJump {
   opacity: 1;
 }
+
+/* The phone dialog: the code beside the steps, and the steps alone where the
+   sandbox is on a phone. */
+.phone {
+  align-items: start;
+  display: grid;
+  gap: var(--helix-space-lg);
+  grid-template-columns: auto 1fr;
+}
+
+/* A little wider than `md`, so the code and the steps sit side by side with
+   room for both. */
+.phoneDialog {
+  --dialog-inline-size: 36rem;
+}
+
+/* The corner squares carry the brand and the modules stay ink, as Helix's own
+   example has them: dark enough on the white field to scan in either mode. */
+.phoneCode {
+  --qr-code-finder-color: oklch(0.45 0.16 265);
+  --qr-code-radius: var(--helix-radii-md);
+  --qr-code-size: 12rem;
+}
+
+@media (max-width: 40rem) {
+  .phone {
+    grid-template-columns: 1fr;
+  }
+}

@@ -13,6 +13,7 @@ export { COLOR_MODE_KEY as STORAGE_KEY } from '@/utils/color-mode/color-mode'
 import { type ColorMode, COLOR_MODE_KEY as STORAGE_KEY } from '@/utils/color-mode/color-mode'
 
 import { MOTION_KEY, type Motion } from '@/utils/motion/motion'
+import { applyPlatform, PLATFORM_KEY, type Platform } from '@/utils/platform/platform'
 
 const TIER_KEY = 'fusion-api-tier'
 
@@ -65,6 +66,7 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
   const [mode, setMode] = useState<ColorMode>('system')
   const [tier, setTier] = useState<ApiTier>('styled')
   const [motion, setMotion] = useState<Motion>('on')
+  const [platform, setPlatform] = useState<Platform>('web')
 
   // Read after mount. The server has no localStorage, so choosing a mode during
   // render would make the first paint disagree with the stored choice.
@@ -81,6 +83,11 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
        attribute server-side, so this leaves it alone rather than racing it. */
     if (window.localStorage.getItem(MOTION_KEY) === 'off') {
       setMotion('off')
+    }
+    /* The pre-paint script has already put it on the document, as it does the
+       motion choice, so this only sets the control to match. */
+    if (window.localStorage.getItem(PLATFORM_KEY) === 'native') {
+      setPlatform('native')
     }
     const storedTier = window.localStorage.getItem(TIER_KEY) as ApiTier | null
     const asked = new URLSearchParams(window.location.search).get('tier')
@@ -140,6 +147,12 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
     window.localStorage.setItem(TIER_KEY, next)
   }
 
+  const choosePlatform = (next: Platform) => {
+    setPlatform(next)
+    applyPlatform(document.documentElement, next)
+    window.localStorage.setItem(PLATFORM_KEY, next)
+  }
+
   return (
     <helix-drawer
       label="Preferences"
@@ -184,6 +197,19 @@ export function PreferencesDrawer({ onOpenChange, open }: Props) {
         >
           <helix-toggle value="on">On</helix-toggle>
           <helix-toggle value="off">Off</helix-toggle>
+        </helix-toggle-group>
+
+        {/* **Beside the API tier, because it is the other axis of the same
+            reference.** A family Helix does not draw natively keeps its web
+            reference under Native. */}
+        <helix-toggle-group
+          hint="Native shows the React Native API."
+          label="Platform"
+          onChange={(event) => choosePlatform(event.currentTarget.value as Platform)}
+          value={platform}
+        >
+          <helix-toggle value="web">Web</helix-toggle>
+          <helix-toggle value="native">Native</helix-toggle>
         </helix-toggle-group>
 
         {/* Headless first, styled second, which is the order the tiers are in:

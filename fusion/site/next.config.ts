@@ -1,6 +1,44 @@
 import type { NextConfig } from 'next'
 
 /**
+ * The headers on a gallery manifest, as `helix/app/scripts/host.ts` gives
+ * them. **Without the protocol headers Expo Go reads the manifest as a legacy
+ * one and refuses it.** `no-cache` because each deploy writes new manifests at
+ * the same addresses, and `vary` because the base address answers by platform.
+ */
+const MANIFEST = [
+  { key: 'Cache-Control', value: 'no-cache' },
+  { key: 'Content-Type', value: 'application/expo+json' },
+  { key: 'expo-protocol-version', value: '0' },
+  { key: 'expo-sfv-version', value: '0' },
+  { key: 'Vary', value: 'expo-platform' },
+]
+
+/**
+ * The gallery Expo Go opens, from `public/helix/app`: each manifest at the
+ * base address and at its own name, the page a browser gets at the base
+ * address keyed by the same header, and the bundles and assets, which are
+ * named by their hash, kept for a year.
+ */
+const GALLERY_HEADERS = [
+  {
+    has: [{ key: 'expo-platform', type: 'header' as const }],
+    headers: MANIFEST,
+    source: '/helix/app',
+  },
+  {
+    headers: [{ key: 'Vary', value: 'expo-platform' }],
+    missing: [{ key: 'expo-platform', type: 'header' as const }],
+    source: '/helix/app',
+  },
+  { headers: MANIFEST, source: '/helix/app/:platform(ios|android).json' },
+  ...['/helix/app/_expo/:path*', '/helix/app/assets/:path*'].map((source) => ({
+    headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+    source,
+  })),
+]
+
+/**
  * No Lit SSR integration.
  *
  * `@lit-labs/nextjs` rendered declarative shadow DOM by monkey-patching
@@ -93,10 +131,32 @@ const config: NextConfig = {
         headers: [{ key: 'Access-Control-Allow-Origin', value: '*' }],
         source: '/media/models/:file*',
       },
+      ...GALLERY_HEADERS,
     ]
   },
 
   reactStrictMode: true,
+
+  /**
+   * **Expo Go asks the gallery's base address for a manifest**, and names its
+   * platform in the `expo-platform` header, so that request is answered with
+   * `ios.json` or `android.json` from `public/helix/app`. A browser sends no
+   * such header and gets the page at `app/(site)/helix/app`. Before the
+   * files, because the page is one.
+   */
+  async rewrites() {
+    return {
+      afterFiles: [],
+      beforeFiles: [
+        {
+          destination: '/helix/app/:platform.json',
+          has: [{ key: 'expo-platform', type: 'header', value: '(?<platform>ios|android)' }],
+          source: '/helix/app',
+        },
+      ],
+      fallback: [],
+    }
+  },
 
   // Helix ships ESM from workspace packages; Next has to compile it rather
   // than treat it as prebuilt CommonJS. Production resolves `dist` through

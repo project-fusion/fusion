@@ -21,6 +21,7 @@ import { scrollItemIntoView } from '@fusion.dev/helix-core'
 import type { HelixSandboxEditor } from '@fusion.dev/helix-sandbox/editor'
 import { jsxToHtml } from '@fusion.dev/helix-workbench'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import mark from '@/components/fusion-mark/fusion-mark.module.css'
 import { PreferencesDrawer } from '@/components/preferences/preferences'
 import { type Findable, SiteFind } from '@/components/site-find/site-find'
 import { SiteMenu } from '@/components/site-nav/site-nav'
@@ -29,7 +30,10 @@ import { PREVIEW_RELAY } from '@/preview/preview-relay'
 import type { Family, FamilyListing } from '../../../../content/catalog/catalog'
 import { useApiTier } from '../../../../hooks/use-api-tier/use-api-tier'
 import { useElementRef } from '../../../../hooks/use-element-ref/use-element-ref'
+import { usePlatform } from '../../../../hooks/use-platform/use-platform'
+import { usePreviewSettled } from '../../../../hooks/use-preview-settled/use-preview-settled'
 import { useSandboxEditor } from '../../../../hooks/use-sandbox-editor/use-sandbox-editor'
+import { readPlatform } from '../../../../utils/platform/platform'
 import shell from '../tool-shell.module.css'
 import { readHashState, writeHashState } from './hash-state'
 import { DEFAULTS, type Layout, readUrlState, type Section, writeUrlState } from './url-state'
@@ -47,6 +51,8 @@ interface Props {
   families: FamilyListing[]
   /** Where the palette can go, built on a server by the page above. */
   findable?: Findable[]
+  /** The families Helix draws on React Native, whose examples open on a phone. */
+  native?: readonly string[]
 }
 
 /**
@@ -122,10 +128,13 @@ const resolve = (
   return { example, family, withExamples }
 }
 
-export function SandboxWorkbench({ families, findable = [] }: Props) {
+export function SandboxWorkbench({ families, findable = [], native = [] }: Props) {
   useSandboxEditor()
 
   const preview = useRef<HelixSandboxPreview>(null)
+  /* The main pane holds still for a picture only once the preview has drawn. */
+  const main = useRef<HTMLDivElement>(null)
+  usePreviewSettled(main, preview)
   const _files = useRef<HelixToggleGroup>(null)
   const scroller = useRef<HTMLDivElement>(null)
   /* Held as state, not as a ref: an effect observes the splitter's width and a
@@ -171,6 +180,17 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      Held rather than applied, because the conversion is the thing being
      confirmed and doing it first would leave nothing to cancel. */
   const [pendingSyntax, setPendingSyntax] = useState<Syntax | null>(null)
+  /* **The platform preference chooses the syntax where nothing else has.** A
+     phone runs an example's TSX, so under Native the sandbox shows that file.
+     A switch the platform makes is not the reader's own choice, so it is not
+     stored, and going back to Web restores what the reader last chose. */
+  const platform = usePlatform()
+  const fromPlatform = useRef(false)
+  const addressedSyntax = useRef(false)
+  /* Whether the syntax showing is the platform's choice, which the address
+     leaves out: a link names what its sender chose, and a reload reads the
+     preference again. */
+  const syntaxByPlatform = useRef(false)
   const confirmSyntax = useRef<HelixDialog | null>(null)
   /* Where the divider is, held here rather than left on the element. Hiding the
      editor drives the split to zero, so showing it again has to put a number
@@ -208,6 +228,15 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   const [previewTheme, setPreviewTheme] = useState<'dark' | 'light' | null>(null)
   const [siteTheme, setSiteTheme] = useState<'dark' | 'light'>('dark')
   const [copied, setCopied] = useState(false)
+  const [phone, setPhone] = useState(false)
+  const [phoneCopied, setPhoneCopied] = useState(false)
+  /* The site's own address, so the code a phone scans opens the gallery this
+     server hosts: fusion.dev in production, and a local server while
+     developing. Read after hydration, since the server has no window. */
+  const [origin, setOrigin] = useState('')
+  useEffect(() => {
+    setOrigin(window.location.origin)
+  }, [])
   const [filter, setFilter] = useState('')
   const filterRef = useRef<HelixInput>(null)
 
@@ -337,8 +366,13 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
     const stored = readArrangement()
     // Only when the address did not say. A link that names a language is a
     // statement about what to show; what this browser last chose is not.
-    if (stored.syntax && !new URLSearchParams(window.location.search).has('x')) {
+    addressedSyntax.current = new URLSearchParams(window.location.search).has('x')
+    if (stored.syntax && !addressedSyntax.current) {
       setSyntax(stored.syntax)
+    }
+    if (!addressedSyntax.current && readPlatform(document.documentElement) === 'native') {
+      syntaxByPlatform.current = true
+      setSyntax('tsx')
     }
     if (typeof stored.split === 'number') {
       setSplit(stored.split)
@@ -572,6 +606,11 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
   const applySyntax = (next: Syntax) => {
     setSyntax(next)
     setPane('source')
+    syntaxByPlatform.current = fromPlatform.current
+    if (fromPlatform.current) {
+      fromPlatform.current = false
+      return
+    }
     const element = sandbox.current
     window.localStorage.setItem(
       ARRANGEMENT,
@@ -589,7 +628,31 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
      reopen it. */
   const confirmClosed = () => {
     setPendingSyntax(null)
+    fromPlatform.current = false
   }
+
+  /* A change of platform while the sandbox is open, after the first read:
+     Native shows the TSX, and Web goes back to the reader's own choice. Edits
+     are asked about first, as a change of syntax in the menu asks. */
+  const platformSeen = useRef<string | null>(null)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only a change of platform moves the syntax
+  useEffect(() => {
+    const previous = platformSeen.current
+    platformSeen.current = platform
+    if (previous === null || previous === platform || addressedSyntax.current) {
+      return
+    }
+    const next: Syntax = platform === 'native' ? 'tsx' : (readArrangement().syntax ?? 'html')
+    if (next === syntax) {
+      return
+    }
+    fromPlatform.current = true
+    if (markup !== pristine.current) {
+      setPendingSyntax(next)
+      return
+    }
+    applySyntax(next)
+  }, [platform])
 
   // One listener for the whole menu: the value says which setting and, where
   // it drilled down, which option.
@@ -658,7 +721,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
       family: familySlug,
       layout,
       panes,
-      syntax,
+      syntax: syntaxByPlatform.current ? DEFAULTS.syntax : syntax,
       /* **What is being shown, not only what the address asked for.**
          `forcedTier` is null unless the URL carried one, so writing it back
          meant a reader who switched to base in the drawer got a link that said
@@ -1268,7 +1331,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
         position={railPosition}
         ref={setRailSplitter}
       >
-        <div className={styles.workbenchMain} slot="start">
+        <div className={styles.workbenchMain} ref={main} slot="start">
           <helix-sandbox
             /* **The preview leads on a narrow viewport.** Stacked, the pane a
                reader came to see should be the one they land on, and the source
@@ -1325,6 +1388,16 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
                     <helix-icon name={copied ? 'check' : 'share-network'}></helix-icon>
                   </helix-icon-button>
                 </helix-tooltip>
+
+                {/* The gallery draws the styled tier, so a headless example
+                    has nothing on the phone to open. */}
+                {native.includes(family.slug) && listed.tier === 'styled' && (
+                  <helix-tooltip content="View on your phone" placement="bottom">
+                    <helix-icon-button label="View on your phone" onClick={() => setPhone(true)}>
+                      <helix-icon name="device-mobile"></helix-icon>
+                    </helix-icon-button>
+                  </helix-tooltip>
+                )}
 
                 {/* Layout and Direction drill down; the last three tick. The menu
                   reads its state from here rather than holding its own, so what
@@ -1571,6 +1644,90 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
               </helix-button>
               <helix-button onClick={() => setPendingSyntax(null)}>Keep editing</helix-button>
             </helix-flex>
+          </helix-dialog>
+
+          <helix-dialog
+            class={styles.phoneDialog}
+            dismissible
+            label="View on your phone"
+            onhelix-before-close={() => setPhone(false)}
+            open={phone}
+          >
+            <helix-text as="h2" slot="header">
+              View on your phone
+            </helix-text>
+            <div className={styles.phone}>
+              {narrow ? null : (
+                <helix-qr-code
+                  class={styles.phoneCode}
+                  correction="H"
+                  label={`Open ${family.label}, ${listed.label}, in Expo Go`}
+                  shape="square"
+                  value={`${origin}/helix/app/open/${family.slug}/${listed.slug}`}
+                >
+                  <helix-icon class={mark.mark} name="fusion" slot="logo"></helix-icon>
+                </helix-qr-code>
+              )}
+              <helix-flex direction="column" gap="md">
+                <helix-text>
+                  The {listed.label} example of {family.label} opens in the Helix gallery on your
+                  phone, drawn by the native renderer.
+                </helix-text>
+                <helix-list kind="ordered" label="Steps">
+                  <helix-list-item>
+                    Install Expo Go
+                    {/* No links here: the dialog focuses its first control as it
+                        opens, and that is the action below. The page the code
+                        opens, `/helix/app/open`, links to both stores. */}
+                    <span slot="description">Free on the App Store and Google Play.</span>
+                  </helix-list-item>
+                  <helix-list-item>
+                    {narrow ? 'Open the example' : 'Scan the code with your camera'}
+                    <span slot="description">Your phone asks to open Expo Go.</span>
+                  </helix-list-item>
+                  <helix-list-item>
+                    Browse the other examples
+                    <span slot="description">
+                      The gallery lists every component and its examples.
+                    </span>
+                  </helix-list-item>
+                </helix-list>
+              </helix-flex>
+            </div>
+            <helix-button-group label="Dialog actions" slot="footer" variant="spaced">
+              {narrow ? (
+                <>
+                  {/* A link, since it leaves the page for Expo Go: Helix's
+                      Button takes no `href`, and the site styles a link as one. */}
+                  <a
+                    data-button="solid"
+                    data-button-tone="primary"
+                    href={`${origin}/helix/app/open/${family.slug}/${listed.slug}`}
+                  >
+                    Open in Expo Go
+                  </a>
+                  <helix-button onClick={() => setPhone(false)}>Done</helix-button>
+                </>
+              ) : (
+                <>
+                  <helix-button emphasis="solid" onClick={() => setPhone(false)} tone="primary">
+                    Done
+                  </helix-button>
+                  <helix-button
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(
+                        `${origin}/helix/app/open/${family.slug}/${listed.slug}`,
+                      )
+                      setPhoneCopied(true)
+                      window.setTimeout(() => setPhoneCopied(false), 2000)
+                    }}
+                  >
+                    <helix-icon name={phoneCopied ? 'check' : 'link'} slot="start"></helix-icon>
+                    {phoneCopied ? 'Link copied' : 'Copy link'}
+                  </helix-button>
+                </>
+              )}
+            </helix-button-group>
           </helix-dialog>
         </div>
 
