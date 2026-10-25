@@ -568,18 +568,24 @@ export class HelixHeadlessPagination extends HelixElement {
        `CustomStateSet` gets a control that renders its one page instead of
        disappearing, which is degraded rather than broken. */
     this.toggleState('empty', this.count <= 1)
+    this.announce()
+  }
+
+  protected override updated(changed: PropertyValues): void {
+    super.updated(changed)
+    this.restoreFocus()
   }
 
   /**
    * Says where the reader now is, once they have moved.
    *
-   * In `updated` rather than in `request`, so it covers every path a page moves
-   * by: a consumer assigning `page` reaches no request at all, and a reader who
-   * got there that way deserves the same sentence.
+   * From `willUpdate` rather than from `request`, so it covers every path a
+   * page moves by: a consumer assigning `page` reaches no request at all, and a
+   * reader who got there that way deserves the same sentence. And from
+   * `willUpdate` rather than `updated`, so the sentence lands in the render
+   * that moved the page instead of costing a second one.
    */
-  protected override updated(changed: PropertyValues): void {
-    super.updated(changed)
-    this.restoreFocus()
+  private announce(): void {
     if (this.announced === undefined) {
       // The first render establishes where we started. Arriving is not moving.
       this.announced = this.page

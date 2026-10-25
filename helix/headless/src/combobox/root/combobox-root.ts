@@ -1422,6 +1422,28 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     if (this.creation === '') {
       this.onCreate = false
     }
+    /* The panel follows `open` through the controller. The filter goes with a
+       close, for the reason the class note records: a control reopened still
+       narrowed is one whose second use starts from the first one's leftovers.
+
+       All three, not the listbox's copy alone. A surviving `typed` is
+       invisible on close, because a closed single-choice field shows the
+       chosen words instead, and comes back with the list behind it showing
+       everything the moment it reopens.
+
+       With `open-on="manual"` the reader types into a shut field on purpose,
+       so there only the close itself clears it.
+
+       Here rather than in `updated`, so the close renders once, already
+       cleared, instead of rendering the leftovers and then again without
+       them. */
+    if (!this.open && (this.openOn !== 'manual' || changed.has('open'))) {
+      this.typed = ''
+      this.suggestion = ''
+      this.editing = false
+      this.onCreate = false
+      this.listbox?.requestFilter('')
+    }
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
@@ -1464,24 +1486,8 @@ export class HelixHeadlessCombobox extends MixinControllerOpen(
     if (control && this.suggestion !== '') {
       control.setSelectionRange(this.typed.length, this.suggestion.length)
     }
-    /* The panel follows `open` through the controller. The filter goes with a
-       close, for the reason the class note records: a control reopened still
-       narrowed is one whose second use starts from the first one's leftovers.
-
-       All three, not the listbox's copy alone. A surviving `typed` is
-       invisible on close, because a closed single-choice field shows the
-       chosen words instead, and comes back with the list behind it showing
-       everything the moment it reopens.
-
-       With `open-on="manual"` the reader types into a shut field on purpose,
-       so there only the close itself clears it. */
-    if (!this.open && (this.openOn !== 'manual' || changed.has('open'))) {
-      this.typed = ''
-      this.suggestion = ''
-      this.editing = false
-      this.onCreate = false
-      this.listbox?.requestFilter('')
-    } else if (changed.has('open')) {
+    /* What a close clears is cleared in `willUpdate`, before the render. */
+    if (this.open && changed.has('open')) {
       /* Opened by an arrow, the highlight goes where the arrow says. Opened
          with the chosen words in the field, they are selected, so the first
          letter typed replaces them. Only with focus in the field: Chromium's
