@@ -5,6 +5,8 @@
 //! belongs to memory lives in `fusion-cortex-engram`; anything that belongs to
 //! provenance lives in `fusion-cortex-trace`.
 
+use std::time::Duration;
+
 use serde::{Deserialize, Serialize};
 
 pub mod provider;
@@ -53,9 +55,22 @@ pub enum Error {
     #[error("storage: {0}")]
     Storage(String),
 
-    /// A model provider failed.
+    /// A model provider failed, or returned a response its client cannot read.
     #[error("provider: {0}")]
     Provider(String),
+
+    /// A model provider returned an error status.
+    #[error("provider returned {status}: {message}")]
+    Status {
+        message: String,
+        /// The wait the provider set in `retry-after`, where it set one.
+        retry_after: Option<Duration>,
+        status: u16,
+    },
+
+    /// The connection to a model provider failed before a response arrived.
+    #[error("transport: {0}")]
+    Transport(String),
 
     /// Output did not conform to the requested schema.
     #[error("invalid output: {0}")]
@@ -64,6 +79,23 @@ pub enum Error {
     /// The requested record does not exist.
     #[error("not found: {0}")]
     NotFound(Id),
+}
+
+impl Error {
+    /// Whether the same request may succeed if sent again.
+    ///
+    /// Rate limits, overload, server faults and dropped connections pass; a
+    /// request the provider rejected as written fails again unchanged.
+    #[must_use]
+    pub fn is_retryable(&self) -> bool {
+        match self {
+            Self::Status { status, .. } => matches!(status, 408 | 409 | 429) || *status >= 500,
+            Self::Transport(_) => true,
+            Self::InvalidOutput(_) | Self::NotFound(_) | Self::Provider(_) | Self::Storage(_) => {
+                false
+            }
+        }
+    }
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -77,6 +109,20 @@ mod tests {
         let first = Id::new();
         let second = Id::new();
         assert!(first <= second, "uuidv7 must be time-ordered");
+    }
+
+    #[test]
+    fn overload_and_rate_limits_are_retryable_and_a_bad_request_is_not() {
+        let status = |status| Error::Status {
+            message: String::new(),
+            retry_after: None,
+            status,
+        };
+        assert!(status(429).is_retryable());
+        assert!(status(529).is_retryable());
+        assert!(Error::Transport("reset".into()).is_retryable());
+        assert!(!status(400).is_retryable());
+        assert!(!status(401).is_retryable());
     }
 
     #[test]

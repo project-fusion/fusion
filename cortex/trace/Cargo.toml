@@ -7,16 +7,24 @@ publish.workspace = true
 rust-version.workspace = true
 version = "0.0.0-dev"
 
+[features]
+default = ["sqlite"]
+# The SQLite store, and the database it bundles.
+sqlite = ["dep:sqlx", "dep:tokio", "sqlx/sqlite-bundled"]
+
 [dependencies]
+async-trait.workspace = true
 chrono.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+sqlx = { workspace = true, optional = true }
+# The wait before a store that lost the race to create its file tries again.
+tokio = { workspace = true, optional = true, features = ["time"] }
 thiserror.workspace = true
 uuid.workspace = true
 fusion-cortex-core.workspace = true
 
 [dev-dependencies]
-async-trait.workspace = true
 fusion-cortex-engram.workspace = true
 tokio.workspace = true
 

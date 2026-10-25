@@ -38,7 +38,9 @@ memory.assert_fact(Fact::new("on a time-of-use plan", vec![episode], 0.9), None)
 
 Episodes accumulate, and consolidation distills them into semantic facts.
 `unconsolidated()` returns the episodes that no fact includes yet, which are the
-input to consolidation. Consolidation itself is not built yet.
+input to consolidation. The pass belongs to the product, which knows what its
+episodes mean: it asserts a new fact, supersedes one an episode corrects, or
+reinforces one an episode says again.
 
 [//]: # (rust:fusion-cortex-engram::Memory::unconsolidated)
 
@@ -84,5 +86,66 @@ assert!(fact.decayed_confidence(300.0, 30.0) < 0.01);  // ten half-lives
 
 [//]: # (/rust)
 
-Decay is exponential, with a half-life you can set. When new episodes support
-the same claim, its confidence goes back up.
+Decay is exponential, with a half-life you can set. When a new episode
+supports the same claim, `reinforce` adds it to the fact's sources, and the
+fact's age counts from then.
+
+[//]: # (rust:fusion-cortex-engram::Memory::reinforce)
+
+```rust
+let first = memory.record(Episode::new("the clock helper fixes the flaky test", Id::new()));
+let fact = memory.assert_fact(Fact::new("the clock helper fixes the flaky test", vec![first], 0.8), None);
+let again = memory.record(Episode::new("the clock helper fixed it again", Id::new()));
+
+assert!(memory.reinforce(fact, again));
+assert!(memory.unconsolidated().is_empty());
+```
+
+[//]: # (/rust)
+
+## Deletion cascades
+
+Each episode names the trace it came from, such as an agent session.
+Forgetting the trace removes its episodes and every fact derived from one of
+them, so a deleted session takes what it taught with it. A fact the removed one
+had superseded is current again. A fact the trace only reinforced stays,
+without that reinforcement, since what it says came from elsewhere.
+
+[//]: # (rust:fusion-cortex-engram::Memory::forget)
+
+```rust
+let (monday, tuesday) = (Id::new(), Id::new());
+let seen = memory.record(Episode::new("tests run with bun", monday));
+let old = memory.assert_fact(Fact::new("tests run with bun", vec![seen], 0.8), None);
+let wrong = memory.record(Episode::new("tests run with jest", tuesday));
+memory.assert_fact(Fact::new("tests run with jest", vec![wrong], 0.9), Some(old));
+
+memory.forget(tuesday);
+
+assert_eq!(memory.current_facts()[0].content, "tests run with bun");
+```
+
+[//]: # (/rust)
+
+## Storage
+
+`Memory` is the reference. The `store` module holds the same behavior behind
+the `Store` trait, in memory and in SQLite, and one conformance suite runs
+against both. A fact carries an optional embedding, which nothing computes yet,
+so scoring by vector later needs no migration.
+
+[//]: # (rust:fusion-cortex-engram::store::Store)
+
+```rust
+let store = InMemory::new(); // or store::Sqlite::open(path).await?
+let session = Id::new();
+let episode = Episode::new("tests run with bun", session);
+
+store.record(&episode).await.unwrap();
+store.assert_fact(&Fact::new("tests run with bun", vec![episode.id], 0.8), None).await.unwrap();
+store.forget(session).await.unwrap();
+
+assert!(store.current_facts().await.unwrap().is_empty());
+```
+
+[//]: # (/rust)

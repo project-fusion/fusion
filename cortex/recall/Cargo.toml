@@ -1,0 +1,18 @@
+[package]
+name = "fusion-cortex-recall"
+description = "Context assembly. What a model is shown, what it is never shown less of, and what was dropped to fit."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+version = "0.0.0-dev"
+
+[dependencies]
+fusion-cortex-core.workspace = true
+# The types and the scoring, and neither database.
+fusion-cortex-engram.workspace = true
+fusion-cortex-trace.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

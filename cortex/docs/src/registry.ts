@@ -47,6 +47,13 @@ export const pages: DocPage[] = [
     slug: 'trace',
     title: 'Trace',
   },
+  {
+    description: 'Context assembly: pins, compaction, and what was dropped.',
+    order: 3,
+    section: 'Primitives',
+    slug: 'recall',
+    title: 'Recall',
+  },
 ]
 
 export const findPage = (slug: string): DocPage | undefined =>

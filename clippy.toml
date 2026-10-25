@@ -1,0 +1,3 @@
+# Product names that `doc_markdown` reads as code and asks to wrap in
+# backticks. `..` keeps clippy's own list.
+doc-valid-idents = ["DeepSeek", "OpenAI", "OpenCode", "OpenRouter", "SQLite", ".."]

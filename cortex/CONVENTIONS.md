@@ -13,7 +13,7 @@ spine, not a module.
 |---|---|---|
 | **Engram** | `fusion-cortex-engram` | Memory: episodic, semantic, later procedural |
 | **Trace** | `fusion-cortex-trace` | Provenance: `why()`, replay, cascading deletion |
-| **Recall** | `fusion-cortex-recall` | Context assembly. Not built |
+| **Recall** | `fusion-cortex-recall` | Context assembly: pins, compaction, drop records |
 | Core | `fusion-cortex-core` | Ids, provider abstraction, shared errors |
 
 ## Invariants
@@ -37,10 +37,16 @@ spine, not a module.
   it, or "delete" is a promise the system cannot keep. Prune the reverse index
   too, or it grows across a session.
 - **Two storage backends are required**, SQLite and Postgres, held in lockstep by
-  a shared conformance suite. Neither is built: `Memory` and `Graph` are
-  in-memory reference stores, and they are the shape the backends must match
-  behind a trait. An abstraction with one implementation is a guess, and SQLite
-  assumptions leak into the domain model otherwise.
+  a shared conformance suite. Trace has its trait, `store::Store`, with
+  `InMemory` as the reference and `Sqlite` beside it, both run through
+  `store::conformance`; Postgres joins the same suite. Engram has the same
+  shape: its `store::Store`, with `InMemory` holding the reference `Memory`, and
+  `Sqlite`, both run through its own `store::conformance`. An abstraction with
+  one implementation is a guess, and SQLite assumptions leak into the domain
+  model otherwise.
+- **A trace is appended to and never edited.** A node is written once, which is
+  what lets a trace serve as an agent session's event log: a restarted loop loads
+  the trace and continues from its last node.
 - **A node's payload is typed, never a JSON blob.** `Detail` is what makes a
   trace executable rather than merely readable: a replay reconstitutes the call
   that produced a node, and `serde_json::Value` cannot promise the fields it
@@ -54,6 +60,11 @@ spine, not a module.
   Tool replay needs a sandbox and an explicit opt-in; until it has both, the
   runner carries `ToolCall` nodes forward untouched, and a test asserts the call
   count rather than inferring it from the diff.
+- **A pinned part is never dropped.** Recall clears old tool results, then
+  drops old turns, then facts, and never the rules, the task, or what the
+  person said. Every clear and drop is a `Dropped` on the context node, with
+  the node it came from, so a compaction is an explained step and never a
+  silent loss.
 - **A replay holds context fixed, and that is the experiment.** Recomputing
   retrieval alongside the model confounds the two variables, and the answer to
   "did this move because the model changed" stops being available. Varying
@@ -66,9 +77,10 @@ spine, not a module.
   measurement exists to detect.
 - **Vectors are deferred, the seam is not.** A memory record must carry a
   nullable embedding field and relevance scoring must be a strategy, so enabling
-  vectors is swapping a scorer rather than migrating a schema. Neither exists
-  yet: `Fact` carries no embedding field today. `pgvector` is an extension, not a
-  migration.
+  vectors is swapping a scorer rather than migrating a schema. `Fact` carries
+  the nullable `embedding`, and `SQLite` stores it as a nullable column;
+  Recall's `Scorer` is the strategy, and `Overlap` is the one it ships.
+  `pgvector` is an extension, not a migration.
 
 ## Documentation
 

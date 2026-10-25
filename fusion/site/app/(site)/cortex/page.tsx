@@ -84,10 +84,7 @@ export default function Page() {
               <span className={hero.tDisplayAccent}>kept across models.</span>
             </h1>
 
-            <Lede>
-              Cortex records what a system knows, where each fact came from, and how far to trust
-              it.
-            </Lede>
+            <Lede>Cortex records each fact, where it came from, and how far to trust it.</Lede>
 
             <helix-flex class={hero.heroActions} direction="column" gap="md">
               <helix-flex

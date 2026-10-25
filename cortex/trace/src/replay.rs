@@ -24,14 +24,14 @@
 //! version to the prompt it names needs a registry that does not exist. A field
 //! that only relabelled the output would be a lie about what ran.
 
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Instant};
 
 use fusion_cortex_core::{
-    provider::{Message, Provider},
+    provider::{Message, Provider, Request, Tool},
     Id,
 };
 
-use crate::{Detail, Graph, Node};
+use crate::{Call, Detail, Graph, Node};
 
 /// What went wrong, in terms of the trace rather than the transport.
 #[derive(Debug, thiserror::Error)]
@@ -174,11 +174,12 @@ impl Graph {
     /// #     vec![],
     /// # ));
     /// # let context = graph.insert(Node::new(
-    /// #     Detail::Context { messages: vec![], strategy: "recency".into() },
+    /// #     Detail::Context { dropped: vec![], messages: vec![], placed: vec![], strategy: "recency".into(), tools: vec![] },
     /// #     vec![source],
     /// # ));
     /// # let output = graph.insert(Node::new(
     /// #     Detail::Output {
+    /// #         call: None,
     /// #         content: "0.11.0 shipped on the 8th.".into(),
     /// #         input_tokens: 412,
     /// #         model: "local/llama-3.3-70b".into(),
@@ -237,16 +238,35 @@ impl Graph {
                     prompt_version,
                     ..
                 } => {
-                    let messages = self.messages_for(id)?;
-                    let completion = provider
-                        .complete(messages)
+                    let (messages, tools) = self.context_for(id)?;
+                    let request = Request {
+                        messages: messages.to_vec(),
+                        tools: tools.to_vec(),
+                        ..Request::default()
+                    };
+                    let started = Instant::now();
+                    let response = provider
+                        .complete(&request)
                         .await
                         .map_err(|error| Error::Provider(error.to_string()))?;
                     let after = Detail::Output {
-                        content: completion.content,
-                        input_tokens: completion.input_tokens,
-                        model: completion.model,
-                        output_tokens: completion.output_tokens,
+                        call: Some(Call {
+                            blocks: response.content.clone(),
+                            // A replay knows no prices, which belong to
+                            // whoever chose the model.
+                            cost: None,
+                            elapsed_ms: u64::try_from(started.elapsed().as_millis())
+                                .unwrap_or(u64::MAX),
+                            local: provider.is_local(),
+                            profile: None,
+                            provider: provider.id().to_owned(),
+                            stop: response.stop.clone(),
+                            usage: response.usage,
+                        }),
+                        content: response.joined(),
+                        input_tokens: response.usage.input,
+                        model: response.model,
+                        output_tokens: response.usage.output,
                         prompt_version: prompt_version.clone(),
                     };
                     divergences.push(Divergence {
@@ -273,18 +293,21 @@ impl Graph {
         })
     }
 
-    /// The messages that produced an output, found by walking its derivation.
+    /// The messages that produced an output, and the tools offered with
+    /// them, found by walking its derivation.
     ///
     /// [`Graph::why`] is breadth-first, so the first context it reaches is the
     /// nearest one. The property that makes it the right shape for an
     /// explanation makes it the right search here: an output assembled from a
     /// context that was itself summarized from an older one must replay against
     /// what actually went to the model, not against its ancestor.
-    fn messages_for(&self, id: Id) -> Result<&[Message]> {
+    fn context_for(&self, id: Id) -> Result<(&[Message], &[Tool])> {
         self.why(id)
             .into_iter()
             .find_map(|node| match &node.detail {
-                Detail::Context { messages, .. } => Some(messages.as_slice()),
+                Detail::Context {
+                    messages, tools, ..
+                } => Some((messages.as_slice(), tools.as_slice())),
                 _ => None,
             })
             .ok_or(Error::Unanchored(id))
@@ -312,7 +335,9 @@ mod tests {
     use std::sync::atomic::{AtomicUsize, Ordering};
 
     use async_trait::async_trait;
-    use fusion_cortex_core::provider::{Completion, MockProvider, Role};
+    use fusion_cortex_core::provider::{
+        Block, Events, MockProvider, Response, Role, Scripted, Stop, Usage,
+    };
 
     use super::*;
 
@@ -321,7 +346,7 @@ mod tests {
     #[derive(Default)]
     struct Counting {
         calls: AtomicUsize,
-        reply: String,
+        reply: MockProvider,
     }
 
     #[async_trait]
@@ -338,14 +363,9 @@ mod tests {
             true
         }
 
-        async fn complete(&self, _: &[Message]) -> fusion_cortex_core::Result<Completion> {
+        async fn stream(&self, request: &Request) -> fusion_cortex_core::Result<Events> {
             self.calls.fetch_add(1, Ordering::SeqCst);
-            Ok(Completion {
-                content: self.reply.clone(),
-                input_tokens: 1,
-                model: self.id().to_owned(),
-                output_tokens: 1,
-            })
+            self.reply.stream(request).await
         }
     }
 
@@ -374,6 +394,7 @@ mod tests {
 
     fn output() -> Detail {
         Detail::Output {
+            call: None,
             content: ANSWER.into(),
             input_tokens: 412,
             model: "local/llama-3.3-70b".into(),
@@ -394,11 +415,11 @@ mod tests {
         ));
         let context = graph.insert(Node::new(
             Detail::Context {
-                messages: vec![Message {
-                    content: "when did we ship 0.11?".into(),
-                    role: Role::User,
-                }],
+                dropped: vec![],
+                placed: vec![],
+                messages: vec![Message::text(Role::User, "when did we ship 0.11?")],
                 strategy: "recency".into(),
+                tools: vec![],
             },
             vec![source],
         ));
@@ -477,7 +498,9 @@ mod tests {
         let (graph, source, output) = trace();
         let provider = Counting {
             calls: AtomicUsize::new(0),
-            reply: ANSWER.into(),
+            reply: MockProvider {
+                reply: ANSWER.into(),
+            },
         };
 
         let replay = graph.replay(output, &provider, &Exact).await.unwrap();
@@ -512,23 +535,32 @@ mod tests {
         let mut graph = Graph::new();
         let context = graph.insert(Node::new(
             Detail::Context {
+                dropped: vec![],
+                placed: vec![],
                 messages: vec![],
                 strategy: "recency".into(),
+                tools: vec![],
             },
             vec![],
         ));
         let tool = graph.insert(Node::new(
             Detail::ToolCall {
                 arguments: serde_json::json!({ "to": "board@example.com" }),
+                call_id: Some("toolu_1".into()),
+                is_error: false,
                 name: "send_email".into(),
                 result: Some(serde_json::json!({ "delivered": true })),
+                source: None,
+                untrusted: false,
             },
             vec![context],
         ));
         let output = graph.insert(Node::new(output(), vec![tool]));
         let provider = Counting {
             calls: AtomicUsize::new(0),
-            reply: ANSWER.into(),
+            reply: MockProvider {
+                reply: ANSWER.into(),
+            },
         };
 
         let replay = graph.replay(output, &provider, &Exact).await.unwrap();
@@ -549,6 +581,48 @@ mod tests {
         };
         assert_eq!(name, "send_email");
         assert_eq!(result.as_ref().unwrap()["delivered"], true);
+    }
+
+    #[tokio::test]
+    async fn a_replay_offers_the_tools_the_context_offered_and_records_the_call() {
+        let weather = Tool {
+            description: "The weather in a city.".into(),
+            name: "weather".into(),
+            schema: serde_json::json!({ "type": "object" }),
+        };
+        let mut graph = Graph::new();
+        let context = graph.insert(Node::new(
+            Detail::Context {
+                dropped: vec![],
+                placed: vec![],
+                messages: vec![Message::text(Role::User, "weather in Paris?")],
+                strategy: "session".into(),
+                tools: vec![weather.clone()],
+            },
+            vec![],
+        ));
+        let output = graph.insert(Node::new(output(), vec![context]));
+        let answer = Response {
+            content: vec![Block::text(ANSWER)],
+            id: None,
+            model: "scripted/1".into(),
+            stop: Stop::EndTurn,
+            usage: Usage::default(),
+        };
+        let provider = Scripted::new("scripted/1", vec![Ok(answer)]);
+
+        let replay = graph.replay(output, &provider, &Exact).await.unwrap();
+
+        assert_eq!(provider.requests()[0].tools, vec![weather]);
+        let Detail::Output {
+            call: Some(call), ..
+        } = &replay.divergences[0].after
+        else {
+            panic!("a recomputed output records its call")
+        };
+        assert_eq!(call.provider, "scripted/1");
+        assert_eq!(call.blocks, vec![Block::text(ANSWER)]);
+        assert!(call.local);
     }
 
     #[tokio::test]

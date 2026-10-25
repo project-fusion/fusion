@@ -26,6 +26,7 @@ use fusion_cortex_trace::{Detail, Node, NodeKind};
 
 let node = Node::new(
     Detail::Output {
+        call: None,
         content: "0.11.0 shipped on the 8th.".into(),
         input_tokens: 412,
         model: "local/llama-3.3-70b".into(),
@@ -49,13 +50,32 @@ caller has to check for it.
 | --- | --- | --- |
 | `Source` | Raw input from outside the system | Held fixed |
 | `Memory` | Fact ids, so the memory has one home in Engram | Held fixed |
-| `Context` | The assembled messages, and the strategy that chose them | Held fixed |
-| `ToolCall` | Tool name, arguments, and result | Held fixed |
-| `Output` | Content, model, prompt version, and what it cost | Recomputed |
+| `Context` | The assembled messages, the tools offered with them, and the strategy that chose them | Held fixed |
+| `ToolCall` | Tool name, arguments, and result, and the extension a tool that is not built in came from | Held fixed |
+| `Output` | Content, model, prompt version, and what it cost, plus the whole response when an agent loop wrote it | Recomputed |
+| `Task` | A task given to an agent, and the commands that say it is done | Held fixed |
+| `Plan` | The steps an agent works to, and why the plan changed | Held fixed |
+| `Decision` | A choice made for an agent, such as which model takes a role, and the reasons | Held fixed |
+| `Check` | A done-check run, its exit code, and what it printed | Held fixed |
+| `Edit` | A file an agent changed, and the checkpoint that holds the change | Held fixed |
 
 `ToolCall` stores its arguments and result as `serde_json::Value`. Tool
 arguments can be any JSON, so a stricter type would describe a schema that
 Cortex cannot enforce.
+
+## Storage
+
+A store keeps many traces, each named by an id, such as an agent session's. A
+node is appended once and never changed, so a trace is also an event log: a
+loop that restarts loads its trace and continues from the last node.
+
+- `InMemory` is the reference store.
+- `Sqlite` keeps traces in a SQLite file.
+- Both pass the same conformance suite, and a Postgres store is planned behind
+  the same `Store` trait.
+
+Deleting a node removes everything derived from it, in every trace the store
+holds.
 
 ## why()
 

@@ -78,6 +78,12 @@ impl Example {
             Detail::Context { .. } => "context",
             Detail::ToolCall { .. } => "tool_call",
             Detail::Output { .. } => "output",
+            Detail::Task { .. }
+            | Detail::Plan { .. }
+            | Detail::Decision { .. }
+            | Detail::Check { .. }
+            | Detail::Edit { .. }
+            | Detail::Billed(_) => unreachable!("the example is a retrieval trace"),
         };
         let derived_from = from.iter().map(|one| self.id(one)).collect();
         let id = self.graph.insert(Node::new(detail, derived_from));
@@ -136,24 +142,22 @@ impl Example {
     /// The messages assembled for a question from what was retrieved for it.
     fn context(&mut self, name: &'static str, label: &'static str, question: &str, from: &[&str]) {
         let messages = vec![
-            Message {
-                content: "Answer from the facts given.".to_owned(),
-                role: Role::System,
-            },
-            Message {
-                content: question.to_owned(),
-                role: Role::User,
-            },
+            Message::text(Role::System, "Answer from the facts given."),
+            Message::text(Role::User, question),
         ];
         let detail = Detail::Context {
+            dropped: vec![],
+            placed: vec![],
             messages,
             strategy: "recency".to_owned(),
+            tools: vec![],
         };
         self.node(name, label, detail, from);
     }
 
     fn output(&mut self, name: &'static str, label: &'static str, context: &str) {
         let detail = Detail::Output {
+            call: None,
             content: label.trim_matches(['“', '”']).to_owned(),
             input_tokens: 412,
             model: MODEL.to_owned(),
@@ -174,8 +178,12 @@ impl Example {
     ) {
         let detail = Detail::ToolCall {
             arguments,
+            call_id: None,
+            is_error: false,
             name: tool.to_owned(),
             result: Some(result),
+            source: None,
+            untrusted: false,
         };
         self.node(name, tool, detail, &[question]);
     }

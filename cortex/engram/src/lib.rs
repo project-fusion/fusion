@@ -4,7 +4,14 @@
 //! material it operates on. What makes this a memory system is
 //! **consolidation**: episodic records accumulate and are distilled into
 //! semantic facts that supersede and decay. `unconsolidated()` identifies the
-//! episodes waiting for that, and the pass that consumes them is not built.
+//! episodes waiting for that, and a consolidation pass consumes them.
+//!
+//! **Deletion cascades.** [`Memory::forget`] removes a trace's episodes and
+//! every fact derived from one, so deleting a session deletes what it taught.
+//! A fact the removed one had superseded is current again.
+//!
+//! [`Memory`] is the reference, and [`store`] holds the same behavior behind a
+//! trait, in memory and in `SQLite`, held to one conformance suite.
 //!
 //! v0 ships episodic and semantic. Procedural memory (distilling repeated
 //! successful action sequences into reusable procedure) is deferred to v1
@@ -26,12 +33,17 @@ use fusion_cortex_core::Id;
 use serde::{Deserialize, Serialize};
 
 /// A raw, timestamped record of something that happened. Append-only.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct Episode {
     pub content: String,
     pub id: Id,
+    /// The node in the trace that showed it, such as the tool call a session
+    /// made to remember it.
+    #[serde(default)]
+    pub node: Option<Id>,
     pub occurred_at: DateTime<Utc>,
-    /// Provenance node for this episode, so anything derived can be traced.
+    /// The trace it came from, such as an agent session's. Forgetting the
+    /// trace forgets the episode and what was derived from it.
     pub trace_id: Id,
 }
 
@@ -41,21 +53,39 @@ impl Episode {
         Self {
             content: content.into(),
             id: Id::new(),
+            node: None,
             occurred_at: Utc::now(),
             trace_id,
         }
     }
+
+    /// The episode, naming the node in its trace that showed it.
+    #[must_use]
+    pub fn at(mut self, node: Id) -> Self {
+        self.node = Some(node);
+        self
+    }
 }
 
 /// A distilled claim, derived from one or more episodes.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct Fact {
     /// 0.0 to 1.0. Decays with age unless reinforced by new episodes.
     pub confidence: f32,
     pub content: String,
-    /// Episodes this was distilled from.
+    /// Episodes this was distilled from. Forgetting any one of them forgets
+    /// the fact.
     pub derived_from: Vec<Id>,
+    /// A vector for relevance scoring, which nothing computes yet. The field
+    /// is here so enabling vectors is a new scorer and never a migration.
+    #[serde(default)]
+    pub embedding: Option<Vec<f32>>,
     pub id: Id,
+    /// Episodes that said it again after it was distilled. They refresh its
+    /// age and nothing else, so forgetting one leaves the fact to the
+    /// episodes it came from.
+    #[serde(default)]
+    pub reinforced_by: Vec<Id>,
     /// Set when a newer fact contradicts or refines this one. Superseded facts
     /// are retained rather than deleted: provenance needs them to explain past
     /// outputs.
@@ -66,11 +96,20 @@ pub struct Fact {
 impl Fact {
     #[must_use]
     pub fn new(content: impl Into<String>, derived_from: Vec<Id>, confidence: f32) -> Self {
+        // Not a number is no confidence, and a negative zero is zero, so a
+        // store's order agrees with a comparison of the values.
+        let confidence = if confidence.is_nan() || confidence <= 0.0 {
+            0.0
+        } else {
+            confidence.min(1.0)
+        };
         Self {
-            confidence: confidence.clamp(0.0, 1.0),
+            confidence,
             content: content.into(),
             derived_from,
+            embedding: None,
             id: Id::new(),
+            reinforced_by: Vec::new(),
             superseded_by: None,
             updated_at: Utc::now(),
         }
@@ -159,6 +198,130 @@ impl Memory {
         id
     }
 
+    /// Adds `episode` to what reinforced the lineage `fact` belongs to, which
+    /// makes its age count from now: a fact seen again is not decaying.
+    ///
+    /// Returns `false` where no fact has the id.
+    ///
+    /// ```
+    /// # use fusion_cortex_core::Id;
+    /// # use fusion_cortex_engram::{Episode, Fact, Memory};
+    /// # let mut memory = Memory::new();
+    /// let first = memory.record(Episode::new("the clock helper fixes the flaky test", Id::new()));
+    /// let fact = memory.assert_fact(Fact::new("the clock helper fixes the flaky test", vec![first], 0.8), None);
+    /// let again = memory.record(Episode::new("the clock helper fixed it again", Id::new()));
+    ///
+    /// assert!(memory.reinforce(fact, again));
+    /// assert!(memory.unconsolidated().is_empty());
+    /// ```
+    pub fn reinforce(&mut self, fact: Id, episode: Id) -> bool {
+        let Some(head) = self.lineage_head(fact) else {
+            return false;
+        };
+        let Some(current) = self.facts.iter_mut().find(|f| f.id == head) else {
+            return false;
+        };
+        if !current.derived_from.contains(&episode) && !current.reinforced_by.contains(&episode) {
+            current.reinforced_by.push(episode);
+        }
+        current.updated_at = Utc::now();
+        true
+    }
+
+    /// Marks the lineage `old` belongs to as superseded by the fact `new`,
+    /// which is already held, such as when a correction says what another
+    /// current fact says. Returns `false` where either id is unknown, or
+    /// where both are in one lineage.
+    ///
+    /// ```
+    /// # use fusion_cortex_core::Id;
+    /// # use fusion_cortex_engram::{Episode, Fact, Memory};
+    /// # let mut memory = Memory::new();
+    /// # let seen = memory.record(Episode::new("x", Id::new()));
+    /// let wrong = memory.assert_fact(Fact::new("tests run with jest", vec![seen], 0.6), None);
+    /// let right = memory.assert_fact(Fact::new("tests run with bun", vec![seen], 0.8), None);
+    ///
+    /// assert!(memory.supersede(wrong, right));
+    /// assert_eq!(memory.current_facts().len(), 1);
+    /// ```
+    pub fn supersede(&mut self, old: Id, new: Id) -> bool {
+        let (Some(head), Some(target)) = (self.lineage_head(old), self.lineage_head(new)) else {
+            return false;
+        };
+        if head == target {
+            return false;
+        }
+        match self.facts.iter_mut().find(|f| f.id == head) {
+            Some(previous) => {
+                previous.superseded_by = Some(target);
+                true
+            }
+            None => false,
+        }
+    }
+
+    /// Forgets every episode from `trace`, and every fact derived from one of
+    /// them, and returns the ids removed, episodes first.
+    ///
+    /// A fact the removed one had superseded is current again: what replaced
+    /// it came from the forgotten trace, and what it says came from elsewhere.
+    /// A fact the trace only reinforced stays, without that reinforcement.
+    ///
+    /// ```
+    /// # use fusion_cortex_core::Id;
+    /// # use fusion_cortex_engram::{Episode, Fact, Memory};
+    /// # let mut memory = Memory::new();
+    /// let (monday, tuesday) = (Id::new(), Id::new());
+    /// let seen = memory.record(Episode::new("tests run with bun", monday));
+    /// let old = memory.assert_fact(Fact::new("tests run with bun", vec![seen], 0.8), None);
+    /// let wrong = memory.record(Episode::new("tests run with jest", tuesday));
+    /// memory.assert_fact(Fact::new("tests run with jest", vec![wrong], 0.9), Some(old));
+    ///
+    /// memory.forget(tuesday);
+    ///
+    /// assert_eq!(memory.current_facts()[0].content, "tests run with bun");
+    /// ```
+    pub fn forget(&mut self, trace: Id) -> Vec<Id> {
+        let episodes: std::collections::HashSet<Id> = self
+            .episodes
+            .iter()
+            .filter(|episode| episode.trace_id == trace)
+            .map(|episode| episode.id)
+            .collect();
+        let doomed: std::collections::HashMap<Id, Option<Id>> = self
+            .facts
+            .iter()
+            .filter(|fact| fact.derived_from.iter().any(|id| episodes.contains(id)))
+            .map(|fact| (fact.id, fact.superseded_by))
+            .collect();
+        for fact in &mut self.facts {
+            fact.superseded_by = past(fact.superseded_by, &doomed);
+            fact.reinforced_by.retain(|id| !episodes.contains(id));
+        }
+        let mut removed: Vec<Id> = self
+            .episodes
+            .iter()
+            .filter(|episode| episodes.contains(&episode.id))
+            .map(|episode| episode.id)
+            .collect();
+        removed.extend(
+            self.facts
+                .iter()
+                .filter(|fact| doomed.contains_key(&fact.id))
+                .map(|fact| fact.id),
+        );
+        self.episodes
+            .retain(|episode| !episodes.contains(&episode.id));
+        self.facts.retain(|fact| !doomed.contains_key(&fact.id));
+        removed
+    }
+
+    /// Every fact, superseded ones included, in the order they were asserted.
+    #[must_use]
+    pub fn facts(&self) -> &[Fact] {
+        &self.facts
+    }
+
     /// Walks a supersession chain to the fact that is still current.
     ///
     /// Returns `None` if the id is unknown. Terminates on a cycle, which a
@@ -207,7 +370,7 @@ impl Memory {
         let consumed: std::collections::HashSet<Id> = self
             .facts
             .iter()
-            .flat_map(|f| f.derived_from.iter().copied())
+            .flat_map(|f| f.derived_from.iter().chain(&f.reinforced_by).copied())
             .collect();
         self.episodes
             .iter()
@@ -215,6 +378,25 @@ impl Memory {
             .collect()
     }
 }
+
+/// The fact a supersession link leads to once the facts in `doomed` are gone:
+/// the first one along the chain that stays, or none. Stops on a cycle.
+pub(crate) fn past(
+    mut next: Option<Id>,
+    doomed: &std::collections::HashMap<Id, Option<Id>>,
+) -> Option<Id> {
+    let mut seen = std::collections::HashSet::new();
+    while let Some(id) = next {
+        match doomed.get(&id) {
+            Some(after) if seen.insert(id) => next = *after,
+            Some(_) => return None,
+            None => return Some(id),
+        }
+    }
+    None
+}
+
+pub mod store;
 
 #[cfg(test)]
 mod tests {
@@ -286,8 +468,28 @@ mod tests {
     }
 
     #[test]
+    fn forgetting_a_trace_that_only_reinforced_a_fact_keeps_the_fact() {
+        let mut memory = Memory::new();
+        let (taught, repeated) = (Id::new(), Id::new());
+        let first = memory.record(Episode::new("tests run with bun", taught));
+        let again = memory.record(Episode::new("tests run with bun", repeated));
+        let fact = memory.assert_fact(Fact::new("tests run with bun", vec![first], 0.8), None);
+        memory.reinforce(fact, again);
+
+        let removed = memory.forget(repeated);
+
+        assert_eq!(removed, [again]);
+        assert_eq!(memory.current_facts()[0].reinforced_by, Vec::<Id>::new());
+    }
+
+    #[test]
     fn confidence_is_clamped() {
         assert!((Fact::new("x", vec![], 5.0).confidence - 1.0).abs() < f32::EPSILON);
         assert!((Fact::new("x", vec![], -3.0).confidence).abs() < f32::EPSILON);
+        assert_eq!(Fact::new("x", vec![], f32::NAN).confidence.to_bits(), 0);
+        assert!(
+            Fact::new("x", vec![], -0.0).confidence.to_bits() == 0,
+            "no negative zero"
+        );
     }
 }
