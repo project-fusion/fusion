@@ -71,7 +71,7 @@ export default function Page() {
             </h1>
 
             <Lede>
-              Every component uses the same tokens, computed from one color, so your interface stays
+              Every component shares tokens computed from one color, so your interface stays
               consistent.
             </Lede>
 
