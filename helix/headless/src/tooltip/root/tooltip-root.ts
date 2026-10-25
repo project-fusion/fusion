@@ -198,12 +198,13 @@ export class HelixHeadlessTooltip extends MixinControllerOpen(HelixElement) {
    *
    * **In React this arrives as a property and not as an attribute**, which is
    * worth knowing before someone reads the DOM and thinks it did not take.
-   * Measured against React 19.2.8: `for` exists on the prototype, so React sets
-   * `element.for = 'save'` and writes nothing to the markup, where `content`
-   * and `placement`, which are not properties on the class at that moment, come
-   * through as attributes. Both paths reach the same place through Lit, so
-   * nothing is broken by it; a `[for]` selector would find nothing, which is
-   * why this does not reflect and nothing styles on it.
+   * Measured against React 19.3.1 on October 25, 2026, on a client mount: with
+   * the element defined, React sets `element.for = 'save'`, and `content` and
+   * `placement` as properties too, and writes none of them to the markup. With
+   * the element not yet defined, all three are written as attributes. Both
+   * paths reach the same place through Lit, so nothing is broken by it; a
+   * `[for]` selector would find nothing on a defined element, which is why
+   * this does not reflect and nothing styles on it.
    */
   @property()
   for = ''

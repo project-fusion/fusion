@@ -188,12 +188,15 @@ export class HelixHeadlessButton extends HelixFormElementBase {
    * **Set by whatever owns the panel, and a property rather than an attribute
    * for the reason `Menu` already states about its items**: an attribute
    * written onto a consumer's element after it upgrades is a hydration mismatch
-   * waiting to happen. Measured 28 Aug 2026 against React 19.2.8, server markup
+   * waiting to happen. First measured on 28 Aug 2026, on 19.2.8, server markup
    * hydrated with the definitions loaded either side of `hydrateRoot`:
    * `Megamenu` and `SpeedDial` wrote `aria-expanded` onto the slotted trigger
    * and React reported "some attributes of the server rendered HTML didn't
    * match the client properties. This won't be patched up" in both orders;
-   * `Popover` and `Menu`, which write nothing, were clean in both.
+   * `Popover` and `Menu`, which write nothing, were clean in both. Measured
+   * again against React 19.3.1 on October 25, 2026: an element writing the
+   * attribute before hydration still mismatches in both orders, and with a
+   * Helix trigger all four families are clean in both.
    *
    * **A property crosses that gap because React never looks at one.** It diffs
    * the attributes it rendered, and this one is `attribute: false`, so the state
