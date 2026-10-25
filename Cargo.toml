@@ -3,11 +3,12 @@ resolver = "2"
 # **Built for `wasm32-unknown-unknown` and for nothing else.** A member is built
 # for the host by every `cargo test`, and the example plugin generates bindings
 # that only exist there.
-exclude = ["fusion/plugins/example"]
+exclude = ["fusion/plugins/example", "fusion/plugins/tool-example"]
 members = [
 	"cortex/core",
 	"cortex/trace",
 	"cortex/engram",
+	"cortex/recall",
 	"fusion/cli",
 	"fusion/plugins",
 	"fusion/rules",
@@ -21,6 +22,7 @@ members = [
 [workspace.dependencies]
 async-trait = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
+futures-util = "0.3"
 # **One dependency, not two.** `ratatui` re-exports the `crossterm` it was built
 # against, so depending on both would be two versions to keep in step and a
 # terminal backend that disagrees with the widgets drawing into it.
@@ -30,27 +32,36 @@ ratatui = "0.30"
 # narrow questions about declarations, and a syntax tree is a dependency and a
 # grammar to keep current for answers a pattern already gives.
 regex = "1"
+# The plugin host's address guard resolves through it, and the Cortex model
+# clients in the products that use them take the same version. No default
+# features: `charset` decodes bodies these APIs only ever send as UTF-8, and
+# `rustls` is named so the TLS backend is a choice written down here.
+reqwest = { version = "0.13", default-features = false, features = ["http2", "rustls", "system-proxy"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-# **Referenced by no crate yet, and kept on purpose.** The Cortex stores are
-# in-memory references today, and `cortex/CONVENTIONS.md` commits to SQLite and
-# Postgres behind one trait as the two backends. Both will take this, and
-# neither database feature is chosen here because the crate that picks one is
-# the crate that has to justify it.
-sqlx = { version = "0.8", default-features = false, features = ["chrono", "json", "macros", "runtime-tokio", "uuid"] }
+# **The Cortex stores' database layer.** `cortex/CONVENTIONS.md` commits to
+# SQLite and Postgres behind one trait, and both take this. No database feature
+# is chosen here, because the crate that picks one is the crate that has to
+# justify it. No `macros` either: the stores write their queries at runtime,
+# since the macros check each query against a live database or a prepared
+# cache that every schema change must regenerate.
+sqlx = { version = "0.9", default-features = false, features = ["chrono", "json", "runtime-tokio", "uuid"] }
 thiserror = "2"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 uuid = { version = "1", features = ["serde", "v4", "v7"] }
 
 # Internal crates. Path deps are relative: same-domain is `../<role>`.
-fusion-cortex-core = { path = "cortex/core" }
-fusion-cortex-engram = { path = "cortex/engram" }
-fusion-cortex-trace = { path = "cortex/trace" }
+fusion-cortex-core = { path = "cortex/core", default-features = false }
+fusion-cortex-engram = { path = "cortex/engram", default-features = false }
+fusion-cortex-recall = { path = "cortex/recall" }
+fusion-cortex-trace = { path = "cortex/trace", default-features = false }
 fusion-helix-theme = { path = "helix/theme" }
 # **The one crate both command lines take, and it belongs to neither product.**
 # It knows what a rule is and not what a component or a workspace is, which is
 # what keeps the helix and fusion domains free of each other: see its `lib.rs`.
-fusion-plugins = { path = "fusion/plugins" }
+# Each member names the features it takes: `wasm` for the hosts, `net` for
+# the address guard.
+fusion-plugins = { path = "fusion/plugins", default-features = false }
 fusion-rules = { path = "fusion/rules" }
 
 # **No `version` here, and its absence is the point.**

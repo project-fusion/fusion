@@ -18,11 +18,16 @@
 //! executable, and [`Graph::plan`] is the order to execute it in.
 
 pub mod replay;
+pub mod search;
+pub mod store;
 
 use std::collections::{HashMap, HashSet, VecDeque};
 
 use chrono::{DateTime, Utc};
-use fusion_cortex_core::{provider::Message, Id};
+use fusion_cortex_core::{
+    provider::{Block, Message, Stop, Tool, Usage},
+    Id,
+};
 use serde::{Deserialize, Serialize};
 
 /// What a node represents.
@@ -43,6 +48,18 @@ pub enum NodeKind {
     ToolCall,
     /// Model output.
     Output,
+    /// A task given to an agent.
+    Task,
+    /// The plan an agent works to.
+    Plan,
+    /// A choice made for an agent, such as which model takes a role.
+    Decision,
+    /// A done-check run.
+    Check,
+    /// A file an agent changed.
+    Edit,
+    /// A request a tool made of a paid service, and what it cost.
+    Billed,
 }
 
 /// Kind-specific detail, typed so a node can be *re-executed* rather than
@@ -59,6 +76,7 @@ pub enum NodeKind {
 ///
 /// let node = Node::new(
 ///     Detail::Output {
+///         call: None,
 ///         content: "0.11.0 shipped on the 8th.".into(),
 ///         input_tokens: 412,
 ///         model: "local/llama-3.3-70b".into(),
@@ -89,8 +107,21 @@ pub enum Detail {
     /// so a diff can attribute a divergence to retrieval rather than to the
     /// model.
     Context {
+        /// What the strategy left out to fit the model's window, each with
+        /// the node it came from. Left out of the JSON when nothing was.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        dropped: Vec<Dropped>,
         messages: Vec<Message>,
+        /// Each part the strategy placed, and why. Left out of the JSON for
+        /// a strategy that records none.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        placed: Vec<Placed>,
         strategy: String,
+        /// The tools the model was offered, which a replay offers again: an
+        /// API that sees a tool call in the history may refuse a request that
+        /// declares no tools.
+        #[serde(default)]
+        tools: Vec<Tool>,
     },
     /// A tool invocation and its result.
     ///
@@ -100,19 +131,218 @@ pub enum Detail {
     /// would be this crate inventing a schema it cannot enforce.
     ToolCall {
         arguments: serde_json::Value,
+        /// The id the model gave the call, which its result names.
+        #[serde(default)]
+        call_id: Option<String>,
+        /// Whether the result reports a failure.
+        #[serde(default)]
+        is_error: bool,
         name: String,
         /// `None` until the call returns, so a trace written by a run that
         /// failed mid-tool is still a valid trace of what was attempted.
         result: Option<serde_json::Value>,
+        /// Where the tool came from when it is not built in, such as an
+        /// extension at its digest: `helix@sha256:68b7…`. Left out of the
+        /// JSON for a built-in tool.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        source: Option<String>,
+        /// Whether the result came from outside the person's control, such
+        /// as a web page or an MCP server's answer.
+        #[serde(default)]
+        untrusted: bool,
     },
     /// Model output, with enough to identify what produced it and what it cost.
     Output {
+        /// The rest of what an agent loop records about the call. `None` for
+        /// an output written outside a loop.
+        #[serde(default)]
+        call: Option<Call>,
         content: String,
         input_tokens: u32,
         model: String,
         output_tokens: u32,
         prompt_version: String,
     },
+    /// A task given to an agent, and the commands that say it is done. Held
+    /// fixed by a replay: it is the question.
+    Task {
+        checks: Vec<String>,
+        goal: String,
+        /// The project's folder, where there is one.
+        project: Option<String>,
+        /// The commit the project was at when the task began.
+        revision: Option<String>,
+    },
+    /// The plan an agent works to. Each change to it is a new node, and says
+    /// why it changed.
+    Plan { reason: String, steps: Vec<Step> },
+    /// A choice made for an agent, such as which model takes a role, with the
+    /// reasons for it.
+    Decision {
+        choice: String,
+        reasons: Vec<String>,
+        role: String,
+    },
+    /// A done-check run and what it printed. Held fixed by a replay, because
+    /// running it again runs a command again.
+    Check {
+        command: String,
+        /// `None` when the command did not exit on its own, such as at a
+        /// timeout.
+        exit: Option<i32>,
+        output: String,
+        passed: bool,
+    },
+    /// A file an agent changed, and the checkpoint that holds the change.
+    Edit { checkpoint: String, path: String },
+    /// A request a tool made of a paid service, such as a model provider's
+    /// own web search, and what it cost. Derived from the tool call that
+    /// made it. Held fixed by a replay, which never runs a tool.
+    Billed(Billed),
+}
+
+/// What one part of a context is.
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Part {
+    /// The rules the model works under, such as a system prompt.
+    Rules,
+    /// The task, as the person gave it.
+    Task,
+    /// Something the person said after the task.
+    Instruction,
+    /// Facts from memory.
+    Facts,
+    /// A model turn.
+    Turn,
+    /// The results of a turn's tool calls.
+    Results,
+    /// What the loop said back, such as a check that failed.
+    Feedback,
+    /// What a compaction kept of the turns it dropped.
+    Summary,
+}
+
+/// One thing a part of a context is made of, such as the skills in the rules.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct Piece {
+    /// What it is, in the strategy's own words: `system`, `instructions`,
+    /// `skills`, or `mcp`.
+    pub kind: String,
+    /// How many there are, such as the instruction files or the skills.
+    #[serde(default)]
+    pub count: u32,
+    /// Its size, estimated in tokens.
+    pub tokens: u32,
+}
+
+/// One part of a context, as the strategy that assembled it placed it.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct Placed {
+    /// How many of its message's blocks are its own, which come after those
+    /// of the parts placed in the message before it. Zero where a strategy
+    /// did not say, as one from before parts were counted.
+    #[serde(default)]
+    pub blocks: usize,
+    /// The message it is in, counting from zero. Two parts share a message
+    /// where the strategy merged them.
+    pub message: usize,
+    pub part: Part,
+    /// What it is made of, where the strategy that placed it says: the rules as
+    /// the system prompt, the instruction files, the skills, and what each
+    /// server says to follow, each with its size. Left out of the JSON for a
+    /// part that is one thing, and for a trace from before parts had pieces.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub pieces: Vec<Piece>,
+    /// Whether no compaction may drop it.
+    pub pinned: bool,
+    /// Why it is in the context.
+    pub reason: String,
+    /// The nodes it came from, such as a turn's output, or the tool call of
+    /// each result in order.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub sources: Vec<Id>,
+    /// Its size, estimated in tokens.
+    pub tokens: u32,
+}
+
+/// Something a strategy left out of a context to fit a model's window.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct Dropped {
+    /// Whether it was cleared to a line, where the rest of its message stayed,
+    /// or dropped whole.
+    pub cleared: bool,
+    pub part: Part,
+    /// The node it came from, such as the tool call whose result was cleared.
+    pub source: Option<Id>,
+    /// What it was, in a line, such as `read src/checkout.ts`.
+    pub summary: String,
+    /// The tokens it freed, estimated.
+    pub tokens: u32,
+}
+
+/// What an agent loop records about one model call, beyond what a replay
+/// compares.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct Call {
+    /// Every block of the response: text, reasoning, and tool calls. A loop
+    /// resumes from these.
+    pub blocks: Vec<Block>,
+    /// In US dollars, where the model's price is known.
+    pub cost: Option<f64>,
+    pub elapsed_ms: u64,
+    /// Whether the call stayed on the user's machine.
+    pub local: bool,
+    /// The model profile the loop used, by name and version.
+    pub profile: Option<String>,
+    /// The provider's id, such as `anthropic/claude-opus-5-5`.
+    pub provider: String,
+    pub stop: Stop,
+    pub usage: Usage,
+}
+
+/// A request a tool made of a paid service on its own, such as a model
+/// provider's web search, which a session's spend counts beside its model
+/// calls.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct Billed {
+    /// In US dollars: the tokens at the model's price and the fee together.
+    /// `None` where neither has a price.
+    pub cost: Option<f64>,
+    pub elapsed_ms: u64,
+    /// The service's own charge, in US dollars, where it has a price, which
+    /// `cost` counts too.
+    #[serde(default)]
+    pub fee: Option<f64>,
+    /// Whether the request stayed on the user's machine.
+    pub local: bool,
+    /// The model that ran the request, as the API named it, or the service,
+    /// such as `brave-search`.
+    pub model: String,
+    /// The provider's id, such as `anthropic/claude-opus-5-5`.
+    pub provider: String,
+    /// How many requests the service counted, such as searches.
+    pub requests: u32,
+    /// The tool that made the request, such as `web_search`.
+    pub tool: String,
+    pub usage: Usage,
+}
+
+/// One step of a [`Detail::Plan`].
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct Step {
+    pub state: StepState,
+    pub text: String,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum StepState {
+    Active,
+    Done,
+    /// Taken out of the plan, and kept so the plan's history reads whole.
+    Dropped,
+    Pending,
 }
 
 impl Detail {
@@ -125,6 +355,12 @@ impl Detail {
             Self::Context { .. } => NodeKind::Context,
             Self::ToolCall { .. } => NodeKind::ToolCall,
             Self::Output { .. } => NodeKind::Output,
+            Self::Task { .. } => NodeKind::Task,
+            Self::Plan { .. } => NodeKind::Plan,
+            Self::Decision { .. } => NodeKind::Decision,
+            Self::Check { .. } => NodeKind::Check,
+            Self::Edit { .. } => NodeKind::Edit,
+            Self::Billed(_) => NodeKind::Billed,
         }
     }
 
@@ -137,7 +373,10 @@ impl Detail {
     /// computation a replay *may* touch is not one any given runner does.
     #[must_use]
     pub fn is_input(&self) -> bool {
-        matches!(self, Self::Source { .. } | Self::Memory { .. })
+        matches!(
+            self,
+            Self::Source { .. } | Self::Memory { .. } | Self::Task { .. }
+        )
     }
 }
 
@@ -211,6 +450,11 @@ impl Graph {
         self.nodes.get(&id)
     }
 
+    /// Every node, in no particular order.
+    pub fn nodes(&self) -> impl Iterator<Item = &Node> {
+        self.nodes.values()
+    }
+
     #[must_use]
     pub fn len(&self) -> usize {
         self.nodes.len()
@@ -235,9 +479,10 @@ impl Graph {
     ///
     /// ```
     /// use fusion_cortex_trace::{Detail, Graph, Node};
-    /// # fn ctx() -> Detail { Detail::Context { messages: vec![], strategy: "recency".into() } }
+    /// # fn ctx() -> Detail { Detail::Context { dropped: vec![], messages: vec![], placed: vec![], strategy: "recency".into(), tools: vec![] } }
     /// # fn out() -> Detail {
     /// #     Detail::Output {
+    /// #         call: None,
     /// #         content: "0.11.0 shipped on the 8th.".into(),
     /// #         input_tokens: 412,
     /// #         model: "local/llama-3.3-70b".into(),
@@ -297,7 +542,7 @@ impl Graph {
     /// ```
     /// # use fusion_cortex_trace::{Detail, Graph, Node};
     /// # fn mem() -> Detail { Detail::Memory { fact_ids: vec![] } }
-    /// # fn ctx() -> Detail { Detail::Context { messages: vec![], strategy: "recency".into() } }
+    /// # fn ctx() -> Detail { Detail::Context { dropped: vec![], messages: vec![], placed: vec![], strategy: "recency".into(), tools: vec![] } }
     /// let mut graph = Graph::new();
     /// let source = graph.insert(Node::new(
     ///     Detail::Source { content: "…".into(), uri: None },
@@ -357,9 +602,10 @@ impl Graph {
     ///
     /// ```
     /// # use fusion_cortex_trace::{Detail, Graph, Node};
-    /// # fn ctx() -> Detail { Detail::Context { messages: vec![], strategy: "recency".into() } }
+    /// # fn ctx() -> Detail { Detail::Context { dropped: vec![], messages: vec![], placed: vec![], strategy: "recency".into(), tools: vec![] } }
     /// # fn out() -> Detail {
     /// #     Detail::Output {
+    /// #         call: None,
     /// #         content: "0.11.0 shipped on the 8th.".into(),
     /// #         input_tokens: 412,
     /// #         model: "local/llama-3.3-70b".into(),
@@ -424,8 +670,11 @@ mod tests {
 
     fn context() -> Detail {
         Detail::Context {
+            dropped: vec![],
+            placed: vec![],
             messages: vec![],
             strategy: "recency".into(),
+            tools: vec![],
         }
     }
 
@@ -435,6 +684,7 @@ mod tests {
 
     fn output() -> Detail {
         Detail::Output {
+            call: None,
             content: "0.11.0 shipped on the 8th.".into(),
             input_tokens: 412,
             model: "local/llama-3.3-70b".into(),
@@ -480,6 +730,62 @@ mod tests {
         let deep = graph.insert(Node::new(context(), vec![middle]));
         let target = graph.insert(Node::new(output(), vec![deep, shared]));
         (graph, shared, middle, deep, target)
+    }
+
+    fn task() -> Detail {
+        Detail::Task {
+            checks: vec!["bun test checkout".into()],
+            goal: "fix the flaky checkout test".into(),
+            project: None,
+            revision: None,
+        }
+    }
+
+    #[test]
+    fn a_task_is_an_input_and_a_check_is_computed() {
+        assert!(task().is_input());
+        let check = Detail::Check {
+            command: "bun test checkout".into(),
+            exit: Some(1),
+            output: "1 failed".into(),
+            passed: false,
+        };
+        assert!(!check.is_input());
+        assert_eq!(Node::new(check, vec![]).kind(), NodeKind::Check);
+        assert_eq!(Node::new(task(), vec![]).kind(), NodeKind::Task);
+    }
+
+    #[test]
+    fn a_loop_node_survives_a_round_trip_and_an_old_one_still_reads() {
+        let plan = Detail::Plan {
+            reason: "the failure points at the clock".into(),
+            steps: vec![
+                Step {
+                    state: StepState::Done,
+                    text: "reproduce the failure".into(),
+                },
+                Step {
+                    state: StepState::Active,
+                    text: "fix the clock helper".into(),
+                },
+            ],
+        };
+        let encoded = serde_json::to_string(&Node::new(plan.clone(), vec![])).unwrap();
+        let decoded: Node = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(decoded.kind(), NodeKind::Plan);
+
+        // An output and a context written before a loop recorded calls and
+        // tools still read, with neither.
+        let old = r#"{"kind":"output","content":"hi","input_tokens":1,"model":"m","output_tokens":1,"prompt_version":"v1"}"#;
+        let Detail::Output { call, .. } = serde_json::from_str(old).unwrap() else {
+            panic!("an output reads as an output")
+        };
+        assert!(call.is_none());
+        let old = r#"{"kind":"context","messages":[],"strategy":"recency"}"#;
+        let Detail::Context { tools, .. } = serde_json::from_str(old).unwrap() else {
+            panic!("a context reads as a context")
+        };
+        assert!(tools.is_empty());
     }
 
     #[test]

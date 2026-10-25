@@ -20,11 +20,10 @@ It adds two things to a model call:
 If a system that remembers you stores that memory on someone else's server, you
 still depend on that server.
 
-Cortex will store everything in a single SQLite file on your machine by
-default. Today the stores in the crates keep data in memory. SQLite and
-Postgres are planned behind a shared trait, and a hosted tier will be an
-option. The `Provider` trait has an `is_local` flag, so a product can tell you
-whether your data left the device:
+Cortex keeps its data in SQLite on your machine by default. Trace and Engram
+each have a SQLite store behind a trait that a Postgres store will share, and a
+hosted tier will be an option. The `Provider` trait has an `is_local` flag, so
+a product can tell you whether your data left the device:
 
 [//]: # (rust:fusion-cortex-core::provider::MockProvider)
 
@@ -43,7 +42,7 @@ assert!(provider.is_local());
 | --- | --- | --- |
 | **Engram** | `fusion-cortex-engram` | Memory: episodic, semantic, later procedural |
 | **Trace** | `fusion-cortex-trace` | Provenance: `why()`, replay, cascading deletion |
-| **Recall** | `fusion-cortex-recall` | Context assembly. Not yet built |
+| **Recall** | `fusion-cortex-recall` | Context assembly: pins, compaction, and drop records |
 | Core | `fusion-cortex-core` | Identifiers, provider abstraction, shared errors |
 
 Engram, Trace, and Recall have names of their own because each is a distinct

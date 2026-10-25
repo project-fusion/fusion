@@ -10,6 +10,7 @@ Packages are flat inside this folder, one directory each, the same arrangement
 | `core` | none | the substrate itself |
 | `docs` | `cortex-docs` | the documentation as content, versioned with Cortex |
 | `engram` | none | the memory store |
+| `recall` | none | context assembly |
 | `trace` | none | provenance capture |
 
 Only `docs` publishes today, and the release stamps its number into the manifest.

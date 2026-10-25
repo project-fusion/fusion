@@ -15,8 +15,8 @@
  * one level down, where each carries its own stage beside it and the difference
  * between them is visible.
  *
- * Two of the three are further along than the panel suggests and one has no
- * folder at all, which is exactly why they cannot share a label.
+ * Each is further along than the panel suggests, and not as far as the
+ * product, which is why each carries a stage of its own.
  */
 export interface CortexModule {
   /** What it does, in the product's own terms. */
@@ -47,10 +47,10 @@ export const CORTEX_MODULES: CortexModule[] = [
     title: 'Trace',
   },
   {
-    body: 'Recall chooses which known facts to give a model for the task at hand. It is planned, and work has not started.',
+    body: 'Recall chooses what a model is shown for each call. It keeps the rules and the task, drops the oldest work to fit the window, and records what it dropped.',
     job: 'Context',
     picture: 'recall',
-    stage: 'Declared',
+    stage: 'Building',
     title: 'Recall',
   },
 ]

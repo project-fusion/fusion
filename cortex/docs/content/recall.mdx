@@ -1,0 +1,111 @@
+---
+title: Recall
+description: How Cortex assembles what a model call is shown, keeps what is pinned, and records what it drops.
+---
+
+# Recall
+
+Recall builds the context for each model call. A loop keeps its whole history,
+and Recall chooses from it what fits the model's window. The trace's context
+node records each part it placed and why, and each thing it dropped, so you can
+see what the model saw.
+
+## Pinned parts are never dropped
+
+The rules, the task, and what the person said after the task are pinned. They
+stay whole however full the window gets, because they are what a harness that
+summarizes its history loses first.
+
+| Part | Pinned | Example |
+| --- | --- | --- |
+| Rules | Yes | The system prompt and a project's rules |
+| Task | Yes | "Fix the flaky checkout test" |
+| Instruction | Yes | "Never touch the generated folder," said mid-session |
+| Facts | No | What earlier sessions learned, from Engram |
+| Turn | No | A model reply and the tools it called |
+| Results | No | What those tools returned |
+| Feedback | No | A check that failed |
+
+## Compaction clears before it drops
+
+When the history no longer fits, Recall works in order, and stops as soon as
+the context fits:
+
+1. The oldest tool results are cleared to one line each, which names the call.
+   The call stays, so the model can make it again.
+2. The oldest whole turns are dropped, each with what came back from it.
+3. The facts from memory are dropped.
+
+The latest turns stay whole. The context then gains one pinned summary, joined
+to the task, that names what the dropped turns called and carries the loop's
+own account of where the task stands. A later compaction replaces it.
+
+[//]: # (rust:fusion-cortex-recall::assemble)
+
+```rust
+use fusion_cortex_core::provider::{Message, Role};
+use fusion_cortex_recall::{assemble, Item, Part, Window};
+
+let mut items = vec![
+    Item::new(Part::Rules, Message::text(Role::System, "Never edit generated files."), "the rules"),
+    Item::new(Part::Task, Message::text(Role::User, "fix the build"), "the task"),
+];
+for turn in 0..20 {
+    items.push(Item::new(Part::Turn, Message::text(Role::Assistant, "x".repeat(400)), "a turn"));
+    items.push(Item::new(Part::Feedback, Message::text(Role::User, "the build still fails"), "a check"));
+}
+let window = Window { tokens: 1_000, recent: 2, scale: 1.0 };
+
+let context = assemble(&items, window, Some("Plan: 1 of 3 steps done."));
+
+assert!(context.tokens <= 1_000);
+assert_eq!(context.messages[0].joined(), "Never edit generated files.");
+assert!(context.messages[1].joined().contains("Plan: 1 of 3 steps done."));
+assert!(!context.dropped.is_empty());
+```
+
+[//]: # (/rust)
+
+## Sizes are estimates the provider corrects
+
+Recall counts about four characters to a token. A loop compares that count with
+the one its provider reports for the context it sent, and passes the ratio as
+the window's scale, so the next estimate follows the model's own tokenizer.
+
+[//]: # (rust:fusion-cortex-recall::estimate)
+
+```rust
+use fusion_cortex_core::provider::{Message, Role};
+
+let message = Message::text(Role::User, "a".repeat(400));
+
+assert_eq!(fusion_cortex_recall::estimate(&message), 108);
+```
+
+[//]: # (/rust)
+
+## Retrieval is a strategy
+
+A scorer ranks Engram's facts against a query. The one Cortex ships counts the
+words a fact shares with the query. A fact that shares none still ranks, at
+half its confidence after decay, because what a project's sessions learned is
+often about the project and not the task. Scoring by vector is a second scorer,
+and a fact already carries the field it would read.
+
+[//]: # (rust:fusion-cortex-recall::relevant)
+
+```rust
+use fusion_cortex_engram::Fact;
+use fusion_cortex_recall::{relevant, Overlap};
+
+let facts = vec![
+    Fact::new("the clock helper fixes the flaky checkout test", vec![], 0.8),
+    Fact::new("the docs build with bun", vec![], 0.8),
+];
+
+let placed = relevant(&facts, "fix the flaky checkout test", &Overlap, 1, |_| 0.0, 30.0);
+
+assert_eq!(placed[0].0.content, "the clock helper fixes the flaky checkout test");
+```
+
+[//]: # (/rust)
