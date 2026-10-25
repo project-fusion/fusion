@@ -1,0 +1,18 @@
+/* The web's frame around the proof page: the page's background, and a column
+   that stops growing on a wide screen, with the gallery's 16px margin on a
+   phone. */
+.page {
+  background: var(--helix-color-background);
+  box-sizing: border-box;
+  color: var(--helix-color-foreground);
+  margin-inline: auto;
+  max-inline-size: 72rem;
+  min-block-size: 100dvh;
+  padding: var(--helix-space-lg) 16px var(--helix-space-3xl);
+}
+
+@media (width >= 48rem) {
+  .page {
+    padding-inline: var(--helix-space-2xl);
+  }
+}
