@@ -8,6 +8,7 @@
 - radio "styles.css"
 - toolbar "Sandbox actions":
   - button "Copy a link to this example"
+  - button "View on your phone"
   - button "Sandbox settings"
   - status
   - button "Hide examples"
