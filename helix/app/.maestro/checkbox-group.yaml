@@ -1,0 +1,94 @@
+# Checkbox Group: presses add boxes to the group's value, on the events
+# example, whose log lists what each press sent. Then `select-all`, on the
+# gallery's own check, `helix://checks/select-all`, since no example shows it:
+# its box checks every box from a partial set, clears them all, and shows the
+# set as partial again after one press. The check writes the group's value
+# below it. Recorded.
+#
+# Android gives each box's checked state, which the flow requires. iOS gives
+# React Native's value, such as "checkbox, mixed", which Maestro reads as the
+# element's text: that step is optional until a night shows what iOS gives.
+appId: dev.fusion.helix.app
+name: Checkbox Group
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://checkbox-group/events/preview
+      SHOWS: Write
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: checkbox-group
+- tapOn: Read
+- assertVisible: '.*value is now "read".*'
+- tapOn: Write
+- assertVisible: '.*value is now "read,write".*'
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: true
+          text: Read
+      - assertVisible:
+          checked: true
+          text: Write
+      - assertVisible:
+          checked: false
+          text: Admin
+- takeScreenshot: checkbox-group-events
+# Email starts checked, so the box that selects all starts partial.
+- openLink: helix://checks/select-all
+- extendedWaitUntil:
+    visible: Select all
+    timeout: 15000
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - assertVisible:
+          optional: true
+          text: checkbox, mixed
+- takeScreenshot: checkbox-group-select-all-partial
+- tapOn: Select all
+- assertVisible: 'Chosen: (?=.*email)(?=.*text)(?=.*app).*'
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: true
+          text: Select all
+      - assertVisible:
+          checked: true
+          text: Mobile app
+- takeScreenshot: checkbox-group-select-all-every
+- tapOn: Select all
+- assertVisible: 'Chosen: nothing'
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: false
+          text: Email
+- takeScreenshot: checkbox-group-select-all-none
+- tapOn: Text message
+- assertVisible: 'Chosen: text'
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - assertVisible:
+          checked: false
+          text: Select all
+- takeScreenshot: checkbox-group-select-all-one
+- stopRecording

@@ -1,0 +1,45 @@
+# Dialog: the preview's Cancel closes the dialog, its button opens it again,
+# and a press on the scrim closes it; the persistent dialog stays open on a
+# press on its scrim and closes from its own action. Recorded.
+#
+# The preview opens with the dialog up, a sheet at a phone's width, so the
+# touch the iOS simulator loses on a new screen lands on the dialog's words,
+# where it presses nothing.
+appId: dev.fusion.helix.app
+name: Dialog
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://dialog/preview/preview
+      SHOWS: .*This removes the project.*
+- tapOn:
+    text: .*This removes the project.*
+    retryTapIfNoChange: false
+- startRecording: dialog
+- tapOn: Cancel
+- assertNotVisible: .*This removes the project.*
+- tapOn: Delete project
+- extendedWaitUntil:
+    visible: .*This removes the project.*
+    timeout: 5000
+- takeScreenshot: dialog-reopened
+# The scrim, above the sheet and over the page.
+- tapOn:
+    point: 50%, 30%
+- assertNotVisible: .*This removes the project.*
+- openLink: helix://dialog/persistent/preview
+- extendedWaitUntil:
+    visible: .*two unsaved changes.*
+    timeout: 15000
+- tapOn:
+    text: .*two unsaved changes.*
+    retryTapIfNoChange: false
+- tapOn:
+    point: 50%, 30%
+- assertVisible: .*two unsaved changes.*
+- tapOn: Discard changes
+- assertNotVisible: .*two unsaved changes.*
+- stopRecording

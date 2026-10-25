@@ -1,0 +1,27 @@
+# Scroll Area: the release notes are a region named by their label, and a
+# swipe brings the last note into view. Recorded.
+#
+# The example's size is its stylesheet's, which a phone does not read, so
+# the area is as tall as its notes and the gallery's page scrolls them.
+appId: dev.fusion.helix.app
+name: Scroll Area
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://scroll-area/preview/preview
+      SHOWS: .*export reports.*
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: scroll-area
+- scrollUntilVisible:
+    element: .*remove members.*
+    direction: DOWN
+- assertVisible: .*remove members.*
+- takeScreenshot: scroll-area-scrolled
+- stopRecording

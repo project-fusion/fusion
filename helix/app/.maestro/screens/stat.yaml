@@ -1,0 +1,18 @@
+# Stat, each example drawn alone: a divided group of stats, and stats with
+# trends. One screenshot of each, named by the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Stat"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://stat/preview/preview
+- extendedWaitUntil:
+    visible: '.*Active users.*'
+    timeout: 30000
+- takeScreenshot: stat-preview-${MODE}-${SIZE}
+- openLink: helix://stat/trend/preview
+- extendedWaitUntil:
+    visible: '.*Response time.*'
+    timeout: 15000
+- takeScreenshot: stat-trend-${MODE}-${SIZE}

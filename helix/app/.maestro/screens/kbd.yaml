@@ -1,0 +1,18 @@
+# Kbd, each example drawn alone: keys inside a sentence, and keys in
+# capitals. One screenshot of each, named by the example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Kbd"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://kbd/preview/preview
+- extendedWaitUntil:
+    visible: '.*to search.*'
+    timeout: 30000
+- takeScreenshot: kbd-preview-${MODE}-${SIZE}
+- openLink: helix://kbd/caps/preview
+- extendedWaitUntil:
+    visible: '.*command palette.*'
+    timeout: 15000
+- takeScreenshot: kbd-caps-${MODE}-${SIZE}

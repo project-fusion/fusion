@@ -1,0 +1,22 @@
+# Callout: a press on the dismiss button of the dismissible example hides
+# the callout, as the web callout hides itself. Recorded.
+appId: dev.fusion.helix.app
+name: Callout
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://callout/dismissible/preview
+      SHOWS: .*Tip.*
+# The first touch on a new screen is lost on the iOS simulator, as
+# `button.yaml` says.
+- tapOn:
+    point: 50%, 90%
+    retryTapIfNoChange: false
+- startRecording: callout
+- tapOn: Dismiss Tip
+- assertNotVisible: .*Tip.*
+- takeScreenshot: callout-dismissed
+- stopRecording

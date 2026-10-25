@@ -1,0 +1,35 @@
+# Scroll Area, each example drawn alone: release notes, cards, a build log
+# on one axis, a changelog, and the notes under `scrollbars`, which a phone
+# draws with its own indicators. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Scroll Area"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://scroll-area/preview/preview
+- extendedWaitUntil:
+    visible: '.*export reports.*'
+    timeout: 30000
+- takeScreenshot: scroll-area-preview-${MODE}-${SIZE}
+- openLink: helix://scroll-area/horizontal/preview
+- extendedWaitUntil:
+    visible: '.*Overview.*'
+    timeout: 15000
+- takeScreenshot: scroll-area-horizontal-${MODE}-${SIZE}
+- openLink: helix://scroll-area/one-axis/preview
+- extendedWaitUntil:
+    visible: '.*Installing dependencies.*'
+    timeout: 15000
+- takeScreenshot: scroll-area-one-axis-${MODE}-${SIZE}
+- openLink: helix://scroll-area/one-edge/preview
+- extendedWaitUntil:
+    visible: '.*export reports.*'
+    timeout: 15000
+- takeScreenshot: scroll-area-one-edge-${MODE}-${SIZE}
+- openLink: helix://scroll-area/scrollbars/preview
+- extendedWaitUntil:
+    visible: '.*export reports.*'
+    timeout: 15000
+- takeScreenshot: scroll-area-scrollbars-${MODE}-${SIZE}

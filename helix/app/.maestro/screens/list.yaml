@@ -1,0 +1,13 @@
+# List's preview example, in its Preview tab. At the largest text size a row
+# can stand taller than the screen, so the example is scrolled toward the
+# middle of the screen until a quarter of it shows.
+appId: dev.fusion.helix.app
+name: "Screens: List"
+---
+- openLink: helix://list/preview
+- scrollUntilVisible:
+    centerElement: true
+    element: Quarterly report.*
+    timeout: 60000
+    visibilityPercentage: 25
+- takeScreenshot: list-${MODE}-${SIZE}

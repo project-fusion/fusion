@@ -1,0 +1,117 @@
+# Tour: the button opens the tour at its first stop, Next and Back move
+# between the stops, Done on the last stop finishes the tour, Skip ends it
+# early, the tour's own labels stand over each stop's, a stop whose target
+# is inside a menu opens the menu, and the page hears each move. Recorded.
+#
+# Each stop is a layer over the page, so a step names the control it
+# presses by its words. The first touch on a new screen is lost on the iOS
+# simulator, as `button.yaml` says, so each screen takes a touch on its
+# empty middle first.
+appId: dev.fusion.helix.app
+name: Tour
+tags:
+  - interactions
+---
+- runFlow:
+    file: open.yaml
+    env:
+      LINK: helix://tour/preview/preview
+      SHOWS: Take the tour
+- tapOn:
+    point: 50%, 95%
+    retryTapIfNoChange: false
+- startRecording: tour
+- tapOn: Take the tour
+- extendedWaitUntil:
+    visible: Find your documents
+    timeout: 5000
+- assertNotVisible: Back
+- takeScreenshot: tour-preview-first
+- tapOn: Next
+- extendedWaitUntil:
+    visible: Write your document
+    timeout: 5000
+- assertVisible: Back
+- tapOn: Back
+- extendedWaitUntil:
+    visible: Find your documents
+    timeout: 5000
+- tapOn: Next
+- tapOn: Next
+- tapOn: Next
+- extendedWaitUntil:
+    visible: Publish when you are ready
+    timeout: 5000
+- takeScreenshot: tour-preview-last
+- tapOn: Done
+- extendedWaitUntil:
+    notVisible: Publish when you are ready
+    timeout: 5000
+- tapOn: Take the tour
+- extendedWaitUntil:
+    visible: Find your documents
+    timeout: 5000
+- tapOn: Skip
+- extendedWaitUntil:
+    notVisible: Find your documents
+    timeout: 5000
+- openLink: helix://tour/relabeled/preview
+- extendedWaitUntil:
+    visible: Everything you have saved is here, newest first.
+    timeout: 15000
+- assertVisible: Not now
+- tapOn: Keep going
+- extendedWaitUntil:
+    visible: Create a folder to group related files.
+    timeout: 5000
+- assertVisible: Go back
+- tapOn: Keep going
+- extendedWaitUntil:
+    visible: Got it
+    timeout: 5000
+- takeScreenshot: tour-relabeled-last
+- openLink: helix://tour/inside-a-menu-and-drawer/preview
+- extendedWaitUntil:
+    visible: Take the tour
+    timeout: 15000
+- tapOn:
+    point: 50%, 95%
+    retryTapIfNoChange: false
+- tapOn: Take the tour
+- extendedWaitUntil:
+    visible: File actions
+    timeout: 5000
+- tapOn: Next
+- extendedWaitUntil:
+    visible: Export a file
+    timeout: 5000
+- assertVisible: Duplicate
+- takeScreenshot: tour-inside-a-menu
+- tapOn: Next
+- extendedWaitUntil:
+    visible: Autosave is on
+    timeout: 5000
+- assertVisible: Send me a weekly digest
+- takeScreenshot: tour-inside-a-drawer
+- tapOn: Done
+- extendedWaitUntil:
+    notVisible: Autosave is on
+    timeout: 5000
+- openLink: helix://tour/events/preview
+- extendedWaitUntil:
+    visible: No events yet
+    timeout: 15000
+- tapOn:
+    point: 50%, 95%
+    retryTapIfNoChange: false
+- tapOn: Next
+- extendedWaitUntil:
+    visible: helix-before-activate
+    timeout: 5000
+- assertVisible: helix-tour-ask
+- tapOn: Done
+- extendedWaitUntil:
+    visible: helix-complete
+    timeout: 5000
+- takeScreenshot: tour-events
+- stopRecording

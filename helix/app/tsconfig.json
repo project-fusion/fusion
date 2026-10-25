@@ -1,0 +1,15 @@
+{
+  // The app, which Metro bundles: React Native's types and JSX, and no DOM.
+  // The examples it runs are the web's, which the styled tier checks, so
+  // `examples.d.ts` declares each one as a component. What Bun and Node run at
+  // build time is `tsconfig.scripts.json`'s.
+  "compilerOptions": {
+    "customConditions": ["react-native"],
+    "jsx": "react-jsx",
+    "lib": ["ES2023"],
+    "rootDir": "${configDir}",
+    "types": []
+  },
+  "extends": "../../tsconfig.package.json",
+  "include": ["examples.d.ts", "index.ts", "helix-proof.d.ts", "src/**/*"]
+}

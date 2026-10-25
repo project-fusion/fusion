@@ -1,0 +1,20 @@
+# Button's preview example, in its Preview tab. It runs first in each pass,
+# as `config.yaml` here orders it, and stops the gallery first, so the pass
+# starts it at the text size `scripts/devices.sh` has just set.
+#
+# At the largest text size the example starts below the screen's edge, so it
+# is scrolled toward the middle of the screen until a quarter of it shows.
+appId: dev.fusion.helix.app
+name: "Screens: Button"
+---
+# A link opens the gallery from stopped. A link sent just after a launch
+# reached the gallery before it listened for links and was lost: seen in CI
+# and on an iOS 27 simulator on October 11, 2026.
+- stopApp
+- openLink: helix://button/preview
+- scrollUntilVisible:
+    centerElement: true
+    element: Save changes
+    timeout: 60000
+    visibilityPercentage: 25
+- takeScreenshot: button-${MODE}-${SIZE}

@@ -1,0 +1,9 @@
+# Opens and scrolls the list of 1,000 rows in one run of `maestro test`, for
+# iOS, where nothing runs between the two. On Android, `scripts/devices.sh`
+# runs `rows-open.yaml` and `rows-scroll.yaml` apart, to reset the system's
+# frame count between them.
+appId: dev.fusion.helix.app
+name: Rows
+---
+- runFlow: rows-open.yaml
+- runFlow: rows-scroll.yaml

@@ -1,0 +1,29 @@
+# Announcement, each example drawn alone: the preview, each tone, each
+# separation, and a band with actions. One screenshot of each, named by the
+# example, `MODE`, and `SIZE`.
+appId: dev.fusion.helix.app
+name: "Screens: Announcement"
+---
+- retry:
+    maxRetries: 1
+    commands:
+      - openLink: helix://announcement/preview/preview
+- extendedWaitUntil:
+    visible: '.*maintenance.*'
+    timeout: 30000
+- takeScreenshot: announcement-preview-${MODE}-${SIZE}
+- openLink: helix://announcement/tones/preview
+- extendedWaitUntil:
+    visible: '.*'
+    timeout: 15000
+- takeScreenshot: announcement-tones-${MODE}-${SIZE}
+- openLink: helix://announcement/separation/preview
+- extendedWaitUntil:
+    visible: '.*'
+    timeout: 15000
+- takeScreenshot: announcement-separation-${MODE}-${SIZE}
+- openLink: helix://announcement/with-actions/preview
+- extendedWaitUntil:
+    visible: '.*'
+    timeout: 15000
+- takeScreenshot: announcement-with-actions-${MODE}-${SIZE}
