@@ -1,0 +1,83 @@
+import { bind, box, fold, headless, prop, region } from '../../../tree.js'
+
+/**
+ * Breadcrumbs' headless tier: the trail of crumbs to the current page.
+ *
+ * **The host is the navigation landmark, named by `label`**, and it holds
+ * the list of crumbs. A phone announces the host by the same role and name.
+ *
+ * **The crumbs are passed in, in order**, and each draws the separator
+ * before it. A trail drawn from `items`, a property only, is the web's: a
+ * phone's app maps its data to crumbs, as React does on the web.
+ *
+ * **With `max-items`, a long trail folds its middle into a menu**: the first
+ * crumb and the last `max-items` less one stay, and the first draws a
+ * button named by `expand-label`, with `{count}` the crumbs it folded, that
+ * opens a menu of them, each a link to its crumb. A trail drawn from `items`
+ * is the web's, and folds the same way.
+ *
+ * **Held to `helix-breadcrumbs`.** `helix family check` compares the props,
+ * the region, and the parts with what the manifest says the element has.
+ */
+export default headless('breadcrumbs', {
+  events: [],
+  fold: fold({
+    max: 'max-items',
+    middle: { count: 'fold', items: 'fold-crumbs', label: 'fold-label', words: 'expand-label' },
+  }),
+  host: { label: bind('label'), role: 'navigation' },
+  props: [
+    prop('expand-label', 'string', { default: 'Show {count} more' }),
+    prop('label', 'string', { default: 'Breadcrumb' }),
+    prop('max-items', 'number'),
+    /* The mark between crumbs for the whole trail: unset a chevron, `slash` a
+       slash. */
+    prop('separator', ['slash']),
+  ],
+  states: ['settled'],
+  tree: [
+    box('list', { role: 'list' }, [
+      /* A crumb drawn from `items`, a `helix-breadcrumb` whose parts it
+         exposes, the fold among them. */
+      box('crumb', {
+        also: { 'crumb-current': true },
+        draws: 'breadcrumb',
+        exports: {
+          expand: true,
+          'expand-button': true,
+          'expand-live': true,
+          'expand-mark': true,
+          'expand-spinner': true,
+          'expand-text': true,
+          fold: true,
+          'fold-back': true,
+          'fold-back-mark': true,
+          'fold-empty': true,
+          'fold-header': true,
+          'fold-item': true,
+          'fold-item-end': true,
+          'fold-item-item': true,
+          'fold-item-mark': true,
+          'fold-item-shortcut': true,
+          'fold-item-shortcut-kbd': true,
+          'fold-item-shortcut-key': true,
+          'fold-item-shortcut-separator': true,
+          'fold-item-start': true,
+          'fold-item-surface': true,
+          'fold-live': true,
+          'fold-loading': true,
+          'fold-search-field': true,
+          'fold-separator': true,
+          'fold-separator-mark': true,
+          'fold-surface': true,
+          'fold-title': true,
+          link: true,
+          separator: true,
+          'separator-mark': true,
+        },
+        platform: 'web',
+      }),
+      region('default'),
+    ]),
+  ],
+})

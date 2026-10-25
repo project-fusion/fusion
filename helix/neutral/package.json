@@ -1,0 +1,26 @@
+{
+  "name": "@fusion.dev/helix-neutral",
+  "description": "The platform-neutral sources Helix compiles for the web and for React Native. A pilot, starting with Button.",
+  "version": "0.223.1",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "directory": "helix/neutral",
+    "type": "git",
+    "url": "git+https://github.com/project-fusion/fusion.git"
+  },
+  "type": "module",
+  "scripts": {
+    "survey:style": "bun scripts/style-survey/main.ts",
+    "test": "bun test src scripts --conditions helix-development",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@fusion.dev/helix": "workspace:*",
+    "@fusion.dev/helix-testing": "workspace:*",
+    "@lit-labs/ssr": "^4.1.0",
+    "css-tree": "^3.2.1",
+    "csstype": "^3.2.3",
+    "lit": "^3.2.1"
+  }
+}
