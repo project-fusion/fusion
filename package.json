@@ -60,6 +60,7 @@
     "serve:examples": "turbo run frame && bun fusion/scripts/serve-examples.mjs",
     "shot": "bun fusion/scripts/shot.mjs",
     "smoke:examples": "turbo run frame && bun fusion/scripts/run-example-smoke.mjs",
+    "smoke:react": "turbo run build --filter=@fusion.dev/helix && bun fusion/scripts/check-react-versions.mjs",
     "smoke:scaffold": "turbo run build analyze && bun fusion/scripts/run-template-build.mjs",
     "smoke:template": "turbo run build analyze --filter=!@fusion.dev/site && bun fusion/scripts/run-template-test.mjs",
     "specs:browser": "turbo run specs frame && bun fusion/scripts/run-browser-specs.mjs",
