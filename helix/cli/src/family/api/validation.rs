@@ -1,0 +1,113 @@
+//! How a form control says what makes its answer acceptable: the prop that
+//! makes an answer required, the page's own message, and the page's sentence
+//! for a missing answer. What the answer is comes from the element's toggle
+//! or its collection.
+
+use schemars::JsonSchema;
+use serde::Serialize;
+use ts_rs::TS;
+
+use super::Names;
+use crate::family::read::Lit;
+
+/// What a form control's verdict reads.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema, TS)]
+#[ts(optional_fields)]
+pub struct Validation {
+    /// The prop that holds the page's own message, which shows at once.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub feedback: Option<String>,
+    /// The prop that holds the sentence for a missing answer, whose default
+    /// is the control's own.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub missing: Option<String>,
+    /// The prop that makes an answer required.
+    pub required: String,
+}
+
+impl Validation {
+    /// Each name it holds, where a source writes it, and what it names.
+    pub fn references(&self) -> Vec<(&'static str, &str, Names)> {
+        [
+            ("feedback", self.feedback.as_ref()),
+            ("missing", self.missing.as_ref()),
+            ("required", Some(&self.required)),
+        ]
+        .into_iter()
+        .filter_map(|(at, name)| name.map(|name| (at, name.as_str(), Names::Prop)))
+        .collect()
+    }
+}
+
+/// `validation({ required, ... })`, each field a prop's name.
+pub fn validation(lit: &Lit) -> Result<Validation, String> {
+    let Lit::Call(helper, arguments) = lit else {
+        return Err("`validation` is a call to `validation()`".to_owned());
+    };
+    let (true, [Lit::Object(fields)]) = (helper == "validation", arguments.as_slice()) else {
+        return Err("`validation` is a call to `validation()` with an object".to_owned());
+    };
+    let mut read = Validation::default();
+    let mut required = None;
+    for (key, value) in fields {
+        let Lit::Text(name) = value else {
+            return Err(format!("validation: `{key}` is not a field it has"));
+        };
+        let slot = match key.as_str() {
+            "feedback" => &mut read.feedback,
+            "missing" => &mut read.missing,
+            "required" => &mut required,
+            _ => return Err(format!("validation: `{key}` is not a field it has")),
+        };
+        *slot = Some(name.clone());
+    }
+    read.required = required.ok_or("a validation names the prop that makes an answer required")?;
+    Ok(read)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{validation, Validation};
+    use crate::family::read::Lit;
+
+    fn call(fields: &[(&str, &str)]) -> Lit {
+        Lit::Call(
+            "validation".to_owned(),
+            vec![Lit::Object(
+                fields
+                    .iter()
+                    .map(|(key, value)| ((*key).to_owned(), Lit::Text((*value).to_owned())))
+                    .collect(),
+            )],
+        )
+    }
+
+    #[test]
+    fn reads_each_prop_it_names() {
+        assert_eq!(
+            validation(&call(&[
+                ("feedback", "feedback"),
+                ("missing", "value-missing-message"),
+                ("required", "required"),
+            ]))
+            .unwrap(),
+            Validation {
+                feedback: Some("feedback".to_owned()),
+                missing: Some("value-missing-message".to_owned()),
+                required: "required".to_owned(),
+            }
+        );
+    }
+
+    #[test]
+    fn refuses_a_validation_with_no_required_prop_or_a_field_it_lacks() {
+        assert_eq!(
+            validation(&call(&[("feedback", "feedback")])).unwrap_err(),
+            "a validation names the prop that makes an answer required"
+        );
+        assert_eq!(
+            validation(&call(&[("required", "required"), ("pattern", "pattern")])).unwrap_err(),
+            "validation: `pattern` is not a field it has"
+        );
+    }
+}

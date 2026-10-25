@@ -6,6 +6,36 @@ use serde_json::Value;
 
 use super::text;
 
+/// What an element is called on React Native, where Helix draws it there:
+/// the component, then each slot's and event's prop beside its web name.
+fn native(drawn: &Value) {
+    let Some(component) = drawn["component"].as_str() else {
+        return;
+    };
+    say!("  on React Native: <{component}>");
+    for slot in drawn["slots"].as_array().into_iter().flatten() {
+        let name = text(&slot["name"]);
+        let web = if name.is_empty() {
+            "the default slot".to_owned()
+        } else {
+            format!("slot {name}")
+        };
+        say!("    {} ({web})", text(&slot["prop"]));
+    }
+    for event in drawn["events"].as_array().into_iter().flatten() {
+        say!("    {} ({})", text(&event["prop"]), text(&event["name"]));
+    }
+    let omitted: Vec<String> = drawn["omitted"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .map(text)
+        .collect();
+    if !omitted.is_empty() {
+        say!("    leaves out {}", omitted.join(", "));
+    }
+}
+
 /// Prints one answer in the form `--json` asked for.
 pub fn print(answer: &Value, json: bool) {
     if json {
@@ -71,6 +101,13 @@ pub fn print(answer: &Value, json: bool) {
         say!("{missing}");
     }
     say!("{}", text(&family["summary"]));
+    if let Some(platforms) = family["platforms"].as_object() {
+        let each: Vec<String> = platforms
+            .iter()
+            .map(|(platform, one)| format!("{platform} {}", text(&one["status"])))
+            .collect();
+        say!("platforms: {}", each.join(", "));
+    }
     say!();
     let tier = family["elements"][0]["tier"].as_str().unwrap_or("styled");
     for line in family["usage"][tier].as_array().into_iter().flatten() {
@@ -85,6 +122,7 @@ pub fn print(answer: &Value, json: bool) {
         for event in element["events"].as_array().into_iter().flatten() {
             say!("  {} ({})", text(&event["name"]), text(&event["reactProp"]));
         }
+        native(&element["platforms"]["react-native"]);
     }
     let examples: Vec<String> = answer["examples"]
         .as_array()
