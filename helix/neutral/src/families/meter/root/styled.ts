@@ -1,0 +1,313 @@
+import printExact from '../../../fragments/print-exact.js'
+import { difference, list, measured, mix, product, quotient, token } from '../../../style.js'
+import { styles } from '../../../table.js'
+import { prop } from '../../../tree.js'
+import root from './headless.js'
+
+/**
+ * Meter's styled tier, which writes
+ * `helix/styled/src/meter/root/meter-root.generated.css`.
+ *
+ * **A row when there is a reading to put beside the bar**, and a bare block
+ * when there is not, as Progress has it, so the two read as one family. A
+ * label sits above the bar across the row, and under a ring or an arc.
+ *
+ * **The fill is a `scale` along the track**, from the inline start, of the
+ * share `--meter-fraction` carries. The track wears the house radius, not the
+ * pill Progress wears, and clips the fill's corners and the ticks.
+ *
+ * **The band colors the fill**: good is the success color, fair the warning
+ * color, and poor the danger color, through `--_meter-hue`, which
+ * `--meter-color` overrides. A value past an end squares the corner it ran
+ * out at, and each threshold is a mark in the ground's color.
+ *
+ * **A ring and an arc are the same reading drawn round**: circles a hundred
+ * units long in a box a hundred square, turned so a ring starts at twelve and
+ * an arc at seven, its fill and its ticks lengths along the circle.
+ *
+ * **Subtle is a wash of whichever color the band chose** over the track's.
+ */
+export default styles(
+  root,
+  {
+    prefix: 'meter',
+    hooks: [
+      'color',
+      'label-color',
+      'label-gap',
+      'label-size',
+      'ring-size',
+      'ring-width',
+      'size',
+      'tick-color',
+      'track-color',
+      'transition-duration',
+      'value-color',
+      'value-gap',
+      'value-size',
+    ],
+    own: ['meter-hue', 'meter-span', 'meter-stroke'],
+    props: [prop('emphasis', ['subtle'])],
+    stylesheet: 'meter/root/meter-root.generated.css',
+  },
+  ({ hook, include, on, own, rule, variants }) => [
+    on('host', [
+      rule({ display: 'block' }),
+      rule(
+        { 'show-value': true },
+        {
+          alignItems: 'center',
+          columnGap: hook.valueGap(token('space-sm')),
+          display: 'grid',
+          gridTemplateColumns: '1fr auto',
+          rowGap: hook.labelGap(token('space-2xs')),
+        },
+      ),
+      /* The same reading, drawn round. */
+      rule([{ shape: 'arc' }, { shape: 'ring' }], {
+        display: 'inline-grid',
+        placeItems: 'center',
+        rowGap: hook.labelGap(token('space-2xs')),
+      }),
+    ]),
+    /* A label above a meter, across the whole row when the reading sits
+       beside it. */
+    on({ region: 'label', slotted: '*' }, [
+      rule({
+        color: hook.labelColor(token('color-foreground')),
+        display: 'block',
+        fontSize: hook.labelSize(token('text-sm')),
+        gridColumn: '1 / -1',
+        marginBlockEnd: hook.labelGap(token('space-2xs')),
+      }),
+      /* In the grid the row gap is the space, so the margin would count it
+         twice. */
+      rule({ 'show-value': true }, { marginBlockEnd: 0 }),
+      /* Under a ring or an arc, in the drawing's own column, as a gauge's
+         caption. */
+      rule([{ shape: 'arc' }, { shape: 'ring' }], { gridColumn: 1, marginBlock: 0 }),
+    ]),
+    /* Said and not shown under `live`. A phone announces it and draws
+       nothing. */
+    on('live', [
+      rule(
+        { platform: 'web' },
+        {
+          blockSize: '1px',
+          clipPath: 'inset(50%)',
+          inlineSize: '1px',
+          margin: token('space-none'),
+          overflow: 'hidden',
+          position: 'absolute',
+          whiteSpace: 'nowrap',
+        },
+      ),
+    ]),
+    /* Tabular figures, right-aligned over a floor, as Progress's reading. */
+    on('value', [
+      rule({
+        color: hook.valueColor(token('color-foreground-muted')),
+        fontFamily: token('font-sans'),
+        fontSize: hook.valueSize(token('text-xs')),
+        fontVariantNumeric: 'tabular-nums',
+        minInlineSize: '3ch',
+        textAlign: 'end',
+      }),
+      /* In the middle, which is why the round shapes exist at all. */
+      rule([{ shape: 'arc' }, { shape: 'ring' }], { gridArea: '1 / 1' }),
+    ]),
+    /* The whole range, always drawn. */
+    on('track', [
+      rule({
+        backgroundColor: hook.trackColor(token('color-surface-sunken')),
+        blockSize: hook.size(token('size-meter')),
+        borderRadius: token('radii-sm'),
+        inlineSize: '100%',
+        overflow: 'hidden',
+        position: 'relative',
+      }),
+      /* A row for the segments, and the fill over the whole track, so a row of
+         segments beside it moves nothing. What the range holds is handed to
+         each segment on a phone, which divides its value by it. On the web
+         the segments are slotted and read `--meter-span` from the track. */
+      rule({ shape: false }, { display: 'flex' }),
+      rule({ platform: 'native', shape: false }, { own: { span: measured('meter-span', 1) } }),
+      rule([{ shape: 'arc' }, { shape: 'ring' }], {
+        backgroundColor: 'transparent',
+        blockSize: hook.ringSize('6rem'),
+        borderRadius: token('radii-none'),
+        gridArea: '1 / 1',
+        inlineSize: hook.ringSize('6rem'),
+        own: { stroke: hook.ringWidth(token('size-progress')) },
+      }),
+      /* Twelve o'clock for a ring, and seven for an arc, one end of its own
+         opening. */
+      variants('shape', {
+        ring: { rotate: '-90deg' },
+        arc: { rotate: '135deg' },
+      }),
+    ]),
+    on('indicator', [
+      rule({ shape: false, platform: 'web' }, { inset: 0 }),
+      rule({ shape: false, platform: 'web' }, { position: 'absolute' }),
+      rule({
+        backgroundColor: own.hue,
+        blockSize: '100%',
+        borderRadius: 'inherit',
+        inlineSize: '100%',
+        scale: [measured('meter-fraction', 0), 1],
+        transformOrigin: 'left center',
+        transition: list(
+          [
+            'background-color',
+            hook.transitionDuration(token('duration-normal')),
+            token('easing-standard'),
+          ],
+          ['scale', hook.transitionDuration(token('duration-normal')), token('easing-decelerate')],
+        ),
+        own: { hue: hook.color(token('color-primary')) },
+      }),
+      /* **A phone lays the fill over the whole track**, as Progress's fill is.
+         Past the largest standard text size the track's height is the least it
+         is, and a fill whose height is all of that measured against more: the
+         bar ran past the bottom of a simulator's screen and took the meters
+         below it along, at iOS's largest text size in run 38957410938. */
+      rule({ shape: false, platform: 'native' }, { inset: 0, position: 'absolute' }),
+      rule({ dir: 'rtl' }, { transformOrigin: 'right center' }),
+      /* The three bands. Color is the obvious half, and the ticks the other. */
+      rule(
+        { part: { 'data-band': 'good' } },
+        { backgroundColor: own.hue, own: { hue: hook.color(token('color-success')) } },
+      ),
+      rule(
+        { part: { 'data-band': 'fair' } },
+        { backgroundColor: own.hue, own: { hue: hook.color(token('color-warning')) } },
+      ),
+      rule(
+        { part: { 'data-band': 'poor' } },
+        { backgroundColor: own.hue, own: { hue: hook.color(token('color-danger')) } },
+      ),
+      /* Past an end, the corner it ran out at squares off. */
+      rule(
+        { part: { 'data-beyond': 'over' } },
+        { borderEndEndRadius: token('radii-none'), borderStartEndRadius: token('radii-none') },
+      ),
+      rule(
+        { part: { 'data-beyond': 'under' } },
+        { borderEndStartRadius: token('radii-none'), borderStartStartRadius: token('radii-none') },
+      ),
+      /* `scale: none` first: the bar's scale would leave the circle a pixel
+         wide. The round shapes' unbanded ink is muted. */
+      rule([{ shape: 'arc' }, { shape: 'ring' }], {
+        scale: 'none',
+        stroke: own.hue,
+        strokeDasharray: [measured('meter-along'), 100],
+        strokeLinecap: 'round',
+        transition: [
+          'stroke-dasharray',
+          hook.transitionDuration(token('duration-normal')),
+          token('easing-standard'),
+        ],
+        own: { hue: hook.color(token('color-foreground-muted')) },
+      }),
+      rule(
+        [
+          { part: { 'data-band': 'good' }, shape: 'arc' },
+          { part: { 'data-band': 'good' }, shape: 'ring' },
+        ],
+        { stroke: own.hue, own: { hue: hook.color(token('color-success')) } },
+      ),
+      rule(
+        [
+          { part: { 'data-band': 'fair' }, shape: 'arc' },
+          { part: { 'data-band': 'fair' }, shape: 'ring' },
+        ],
+        { stroke: own.hue, own: { hue: hook.color(token('color-warning')) } },
+      ),
+      rule(
+        [
+          { part: { 'data-band': 'poor' }, shape: 'arc' },
+          { part: { 'data-band': 'poor' }, shape: 'ring' },
+        ],
+        { stroke: own.hue, own: { hue: hook.color(token('color-danger')) } },
+      ),
+    ]),
+    /* A mark where a band begins, on the track, centered on the threshold. */
+    on('tick', [
+      rule({
+        backgroundColor: hook.tickColor(token('color-background')),
+        blockSize: '100%',
+        inlineSize: token('border-thick'),
+        insetBlockStart: 0,
+        insetInlineStart: measured('meter-at', '0%'),
+        position: 'absolute',
+        translate: '-50%',
+        zIndex: token('layer-raised'),
+      }),
+      /* A tick is one unit of the same circle, pushed round to where the
+         threshold falls, in the ground's color. */
+      rule([{ shape: 'arc' }, { shape: 'ring' }], {
+        insetInlineStart: 'auto',
+        position: 'static',
+        stroke: hook.tickColor(token('color-background')),
+        strokeDasharray: '1 99',
+        strokeDashoffset: product(measured('meter-along'), '-1'),
+      }),
+    ]),
+    /* Geometry as CSS, so every circle reads the same properties. */
+    on(
+      ['groove', 'indicator', 'tick'],
+      [
+        variants('shape', {
+          arc: {
+            cx: '50%',
+            cy: '50%',
+            fill: 'none',
+            r: difference('50%', quotient(own.stroke, 2)),
+            strokeWidth: own.stroke,
+          },
+          ring: {
+            cx: '50%',
+            cy: '50%',
+            fill: 'none',
+            r: difference('50%', quotient(own.stroke, 2)),
+            strokeWidth: own.stroke,
+          },
+        }),
+      ],
+    ),
+    on('groove', [
+      rule([{ shape: 'arc' }, { shape: 'ring' }], {
+        stroke: hook.trackColor(token('color-surface-sunken')),
+        strokeDasharray: [measured('meter-sweep'), 100],
+      }),
+    ]),
+    include(printExact),
+    /* Subtle, against `--_meter-hue`, so one pair of rules quietens every
+       color in every shape. */
+    on('indicator', [
+      rule(
+        { emphasis: 'subtle' },
+        { backgroundColor: mix(own.hue, 30, hook.trackColor(token('color-surface-sunken'))) },
+      ),
+      rule(
+        [
+          { emphasis: 'subtle', shape: 'arc' },
+          { emphasis: 'subtle', shape: 'ring' },
+        ],
+        { stroke: mix(own.hue, 30, hook.trackColor(token('color-surface-sunken'))) },
+      ),
+      rule({ forcedColors: true }, { backgroundColor: 'Highlight', forcedColorAdjust: 'none' }),
+      rule({ forcedColors: true, part: { 'data-band': true } }, { backgroundColor: own.hue }),
+    ]),
+    /* Forced colors paint every background Canvas: the track is outlined,
+       the fill is Highlight, a fill in a band keeps the band's color, and the
+       ticks keep the ground's. */
+    on('track', [
+      rule({ forcedColors: true }, { outline: [token('border-thin'), 'solid', 'CanvasText'] }),
+    ]),
+    on('tick', [
+      rule({ forcedColors: true }, { backgroundColor: 'Canvas', forcedColorAdjust: 'none' }),
+    ]),
+  ],
+)

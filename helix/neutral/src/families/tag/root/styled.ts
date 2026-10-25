@@ -1,0 +1,203 @@
+import { inherit, mix, product, token, web } from '../../../style.js'
+import { styles } from '../../../table.js'
+import { prop } from '../../../tree.js'
+import root from './headless.js'
+
+/**
+ * Tag's styled tier, which writes `helix/styled/src/tag/root/tag-root.generated.css`.
+ *
+ * **The host is the box, and its height is defined** rather than falling out
+ * of padding, so a tag beside a control lines up: the `size-tag` step of the
+ * region it is in, 24px at `md` and 20px at `sm`, against a 40px control and
+ * a 32px dense one.
+ *
+ * **Every tone is one status color**, tinted for the fill and the edge and
+ * deepened toward the foreground for the label. The fill and the edge mix in
+ * sRGB: measured in Chromium at 14 percent, an OKLab fill separated from a
+ * near-black page by 4 to 10 sRGB levels, where sRGB gives 26 to 37 in light
+ * and dark alike. The label mixes in OKLab, where four of five tones at full
+ * strength failed 4.5:1 at 12px on their own wash.
+ *
+ * **`solid`, and a selected tag in a group, fill with the tone** and put an
+ * inverse label on it. **`outlined` draws the tone at the edge alone.**
+ *
+ * **The label stays inside the tag.** The host is one line, so a tag given
+ * less room than its words, as a squeezed table cell gives it, ends the words
+ * with an ellipsis inside its rounded end. On the web the letters are trimmed
+ * to their capitals and baseline where the browser can, so they sit at the
+ * middle in any font.
+ *
+ * **In a `Tag.Group` the tag's cell takes focus**, stretched over the host's
+ * padding so the ring goes round the whole tag. A phone draws the cell on
+ * every tag, as the press the tag is, and its pull and its padding cancel.
+ *
+ * On a phone the height, the corners, the gaps and the remove mark stop
+ * growing at 1.353 times the default text size, and the words grow fully.
+ */
+export default styles(
+  root,
+  {
+    prefix: 'tag',
+    hooks: [
+      'background-color',
+      'border-color',
+      'disabled-opacity',
+      'font-weight',
+      'foreground-color',
+      'gap',
+      'radius',
+    ],
+    own: ['tag-color', 'tag-edge', 'tag-fill', 'tag-height', 'tag-inset', 'tag-label', 'tag-text'],
+    props: [
+      prop('emphasis', ['outlined', 'solid', 'subtle']),
+      prop('shape', ['pill']),
+      prop('tone', ['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
+    ],
+    stylesheet: 'tag/root/tag-root.generated.css',
+  },
+  ({ hook, on, own, rule, variants }) => [
+    on('host', [
+      rule({
+        alignItems: 'center',
+        backgroundColor: hook.backgroundColor(own.fill),
+        blockSize: own.height,
+        border: [token('border-thin'), 'solid', hook.borderColor(own.edge)],
+        borderRadius: hook.radius(token('radii-sm')),
+        color: hook.foregroundColor(own.label),
+        display: 'inline-flex',
+        fontSize: own.text,
+        fontWeight: hook.fontWeight(token('weight-medium')),
+        gap: hook.gap(token('space-2xs')),
+        lineHeight: token('leading-tight'),
+        paddingInline: own.inset,
+        whiteSpace: 'nowrap',
+        own: {
+          height: token('size-tag'),
+          color: token('color-foreground-muted'),
+          text: token('text-xs'),
+          inset: token('space-xs'),
+          fill: mix(own.color, 14, token('color-background'), 'srgb'),
+          edge: mix(own.color, 28, token('color-background'), 'srgb'),
+          label: mix(own.color, 55, token('color-foreground')),
+        },
+      }),
+      /* Fully rounded ends, and the remove button's ring rounded to match. */
+      rule({ shape: 'pill' }, { borderRadius: hook.radius(token('radii-full')) }),
+      variants('emphasis', {
+        solid: {
+          own: {
+            fill: mix(own.color, 82, token('color-foreground')),
+            edge: own.fill,
+            label: token('color-foreground-inverse'),
+          },
+        },
+        outlined: {
+          own: { fill: 'transparent', edge: mix(own.color, 45, token('color-background'), 'srgb') },
+        },
+      }),
+      variants('tone', {
+        primary: { own: { color: token('color-primary') } },
+        accent: { own: { color: token('color-accent') } },
+        info: { own: { color: token('color-info') } },
+        success: { own: { color: token('color-success') } },
+        warning: { own: { color: token('color-warning') } },
+        danger: { own: { color: token('color-danger') } },
+      }),
+      /* Out of reach, and drawn so: the platform's own disabled step. */
+      rule({ has: 'disabled' }, { opacity: hook.disabledOpacity(0.5) }),
+      /* Selected in a group that selects: the tone filled, as `solid` draws it. */
+      rule(
+        { state: 'selected' },
+        {
+          own: {
+            fill: mix(own.color, 82, token('color-foreground')),
+            edge: own.fill,
+            label: token('color-foreground-inverse'),
+          },
+        },
+      ),
+      rule({ print: true }, { printColorAdjust: web('economy') }),
+    ]),
+    on('dismiss', [
+      rule({ shape: 'pill' }, { borderRadius: token('radii-full') }),
+      /* Inside the tag's inline padding, and not pulled past it. The font is
+         the tag's, so the mark's em is the tag's em and not the button's. */
+      rule({
+        font: web('inherit'),
+        background: 'none',
+        border: 'none',
+        borderRadius: token('radii-sm'),
+        color: inherit(),
+        cursor: web('pointer'),
+        display: 'inline-flex',
+        marginInlineEnd: product(token('space-2xs'), '-1'),
+        padding: token('space-2xs'),
+      }),
+      rule({ hover: true }, { backgroundColor: mix(own.color, 20, 'transparent') }),
+      rule(
+        { focusVisible: true },
+        {
+          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+          outlineOffset: token('size-focus-offset'),
+        },
+      ),
+      rule({ has: 'disabled' }, { cursor: web('not-allowed') }),
+    ]),
+    /* A `<slot>` is `display: contents` and draws no box to end in an
+       ellipsis, and the block it becomes is a flex item, which keeps an
+       automatic least width until it is told otherwise. */
+    on({ region: 'default' }, [
+      rule({ display: 'block', minInlineSize: 0, overflow: 'hidden', textOverflow: 'ellipsis' }),
+      /* Trimmed to the capitals and the baseline, the box is the letters, and
+         the equal padding is room for the descenders the ellipsis's clip would
+         cut. Only where the trim is supported. */
+      rule(
+        { platform: 'web', supports: '(text-box: trim-both cap alphabetic)' },
+        { paddingBlock: token('space-2xs'), textBox: 'trim-both cap alphabetic' },
+      ),
+    ]),
+    /* An icon in the label sits on the middle of the line, not on its
+       baseline. */
+    on({ region: 'default', slotted: 'helix-icon' }, [rule({ verticalAlign: 'middle' })]),
+    on('dismiss-mark', [rule({ blockSize: '0.85em', inlineSize: '0.85em' })]),
+    /* The category a tag belongs to, before the label it qualifies, every
+       declaration on what is passed in, so an empty `start` draws nothing. */
+    on({ region: 'start', slotted: '*' }, [
+      rule({ fontWeight: token('weight-semibold'), marginInlineEnd: own.inset, opacity: 0.75 }),
+    ]),
+    /* A link tag keeps the tag's ink, takes an underline under a pointer, and
+       ends in an ellipsis as the plain label does. */
+    on('link', [
+      rule({ color: inherit(), display: 'block', minInlineSize: 0, textDecoration: 'none' }),
+      rule({ canHover: true, hover: true, part: { href: true } }, { textDecoration: 'underline' }),
+      rule(
+        { focusVisible: true },
+        {
+          borderRadius: token('radii-sm'),
+          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+          outlineOffset: token('size-focus-offset'),
+        },
+      ),
+    ]),
+    on('cell', [
+      rule({
+        alignItems: 'center',
+        alignSelf: 'stretch',
+        borderRadius: inherit(),
+        cursor: web('default'),
+        display: 'inline-flex',
+        gap: hook.gap(token('space-2xs')),
+        marginInline: product(own.inset, '-1'),
+        minInlineSize: 0,
+        paddingInline: own.inset,
+      }),
+      rule(
+        { focusVisible: true },
+        {
+          outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+          outlineOffset: token('size-focus-offset'),
+        },
+      ),
+    ]),
+  ],
+)

@@ -1,0 +1,9 @@
+{
+  // `scripts` is checked with `src`. Nothing here emits, so the root is the
+  // whole package.
+  "compilerOptions": {
+    "rootDir": "."
+  },
+  "extends": "../../tsconfig.package.json",
+  "include": ["src/**/*", "scripts/**/*"]
+}
