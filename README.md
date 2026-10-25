@@ -61,6 +61,7 @@ and documented CSS parts.
 | Package | Use when |
 |---|---|
 | `@fusion.dev/helix` | You want Helix components as they ship |
+| `@fusion.dev/helix-native` | You draw Helix components on React Native. Button, List, and Tabs so far, each experimental |
 | `@fusion.dev/helix-styles` | Always. Tokens and the base layer, and the styled tier already brings it |
 | `@fusion.dev/helix-headless` | You want the behavior and none of the styling |
 | `@fusion.dev/helix-theme` | You are generating or validating a theme |

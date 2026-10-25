@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 /**
  * Runs the DOM specs in a real browser, and reports what happened.
  *
@@ -16,8 +16,8 @@ import { readFile } from 'node:fs/promises'
  * rewriting: a spec deleted from the source stops being reported here the same
  * day.
  *
- * Run with `bun run specs:browser`, after `turbo run specs`. A family name limits
- * it to that one: `bun run specs:browser carousel`. `--shard <i> --of <n>` runs
+ * Run with `bun run specs:browser`, after `turbo run specs`. Family names limit
+ * it to those: `bun run specs:browser carousel tabs`. `--shard <i> --of <n>` runs
  * one of `n` shares of the families, as `@fusion.dev/scripts/shard` splits them
  * for CI. `--browser webkit` runs them in Playwright's WebKit, which is the
  * engine Safari and a Tauri app on macOS or Linux draw with.
@@ -43,6 +43,10 @@ import { readFile } from 'node:fs/promises'
  * action installs the browser and its system libraries in one step, and a
  * headless browser in CI fails far more often on a missing shared library than
  * on anything to do with the tests.
+ *
+ * **The conformance specs record what the elements did**, and this writes it
+ * to `.local/conformance/<browser>.json` for the comparison with React Native,
+ * from the families this run held: `helix/testing/README.md` has the suite.
  */
 import { createServer } from 'node:http'
 import { extname, join } from 'node:path'
@@ -114,7 +118,20 @@ const server = createServer(async (request, response) => {
   }
 })
 
-await new Promise((done) => server.listen(0, '127.0.0.1', done))
+/* **A shell that refuses a local server is said so, in words**, since the
+   error alone reads like a fault in the specs. A sandboxed agent's shell is
+   one such place. */
+try {
+  await new Promise((done, refuse) => {
+    server.once('error', refuse)
+    server.listen(0, '127.0.0.1', done)
+  })
+} catch (error) {
+  console.error(
+    `browser specs: this machine refused a local server on 127.0.0.1 (${error.code ?? error}), so the specs cannot run here.`,
+  )
+  process.exit(1)
+}
 const origin = `http://127.0.0.1:${server.address().port}`
 
 /* The families the builder wrote down, rather than every `.js` that does not
@@ -127,20 +144,21 @@ const origin = `http://127.0.0.1:${server.address().port}`
    a family, and neither is the engine after `--browser`. */
 const only = process.argv
   .slice(2)
-  .find(
+  .filter(
     (one, at, all) => !one.startsWith('--') && !/^\d+$/.test(one) && all[at - 1] !== '--browser',
   )
 const listed = JSON.parse(await readFile(join(specs, 'families.json'), 'utf8'))
 const bundles = listed
+  .filter((name) => only.length === 0 || only.includes(name))
   .map((name) => `${name}.js`)
-  .filter((file) => only === undefined || file === `${only}.js`)
   .sort()
+const unknown = only.filter((name) => !listed.includes(name))
 
-if (bundles.length === 0) {
+if (bundles.length === 0 || unknown.length > 0) {
   console.error(
-    only === undefined
+    only.length === 0
       ? 'browser specs: no bundles. Run `turbo run specs` first.'
-      : `browser specs: no bundle for \`${only}\`. Run \`turbo run specs\` first, and check the name.`,
+      : `browser specs: no bundle for \`${(unknown.length > 0 ? unknown : only).join('`, `')}\`. Run \`turbo run specs\` first, and check the name.`,
   )
   process.exit(1)
 }
@@ -236,7 +254,20 @@ const ready = async (made, crashes) => {
     await session.send('Emulation.setCPUThrottlingRate', { rate: THROTTLE })
   }
 
-  await made.goto(origin, { waitUntil: 'load' })
+  /* **One more try where the blank page times out**, and only then. The page
+     is this runner's own, with nothing under test in it yet, so a timeout here
+     is the browser and not the family: on October 14, 2026 WebKit timed out
+     loading it in four runs of one branch, a different family each time, with
+     every spec of those families passing on the next run. Any other error,
+     and a second timeout, are reported as the page not loading. */
+  try {
+    await made.goto(origin, { waitUntil: 'load' })
+  } catch (error) {
+    if (error?.name !== 'TimeoutError') {
+      throw error
+    }
+    await made.goto(origin, { waitUntil: 'load' })
+  }
 
   /* **Every font face loaded before a family starts.** A face loads when text
      first needs it, and its arrival is page activity, which the
@@ -319,6 +350,7 @@ const byFamily = await pool(families, {
        family reported as broken rather than the run ending with no results at
        all. A bundle that cannot even be imported is the failure most worth
        seeing, since it means the component does not load in a browser. */
+    let recorded = {}
     let results
     let stuck
     try {
@@ -337,30 +369,43 @@ const byFamily = await pool(families, {
        *
          Sixty seconds is thirty times the slowest family measured, so this can
          only ever catch something genuinely stuck. */
-      results = await Promise.race([
+      ;({ recorded, results } = await Promise.race([
         page.evaluate(async (url) => {
+          const unloaded = (error) => ({
+            recorded: {},
+            results: [{ error, name: 'load', passed: false, suite: '' }],
+          })
           try {
             const module = await import(url)
             if (typeof module.run !== 'function') {
-              return [
-                { error: 'the bundle exports no run()', name: 'load', passed: false, suite: '' },
-              ]
+              return unloaded('the bundle exports no run()')
             }
             const ran = await module.run()
+            /* What the family's conformance specs recorded as they ran. */
+            const recorded = Object.assign(
+              {},
+              ...(module.specs ?? []).map((spec) =>
+                typeof spec.conformance === 'object' ? spec.conformance : {},
+              ),
+            )
             const loops = window.__helixResizeLoops ?? []
-            return loops.length === 0
-              ? ran
-              : [
-                  ...ran,
-                  {
-                    error: `the page raised "${loops[0]}" ${loops.length === 1 ? 'once' : `${loops.length} times`}`,
-                    name: 'a resize loop',
-                    passed: false,
-                    suite: '',
-                  },
-                ]
+            return {
+              recorded,
+              results:
+                loops.length === 0
+                  ? ran
+                  : [
+                      ...ran,
+                      {
+                        error: `the page raised "${loops[0]}" ${loops.length === 1 ? 'once' : `${loops.length} times`}`,
+                        name: 'a resize loop',
+                        passed: false,
+                        suite: '',
+                      },
+                    ],
+            }
           } catch (error) {
-            return [{ error: String(error), name: 'load', passed: false, suite: '' }]
+            return unloaded(String(error))
           }
         }, `${origin}/${family}`),
         new Promise((_, reject) => {
@@ -368,7 +413,7 @@ const byFamily = await pool(families, {
             reject(new Error(`blocked the page for ${STUCK / 1000}s, so the run gave up on it`))
           }, STUCK)
         }),
-      ])
+      ]))
       /* Cleared as soon as the family answers. A timer left running holds the
          process open, so every family that finished would keep the run alive
          for its full sixty seconds after the last one reported. */
@@ -389,9 +434,22 @@ const byFamily = await pool(families, {
         },
       ]
     }
-    return { crashes, results }
+    return { crashes, recorded, results }
   },
 })
+
+/* **What the conformance specs recorded, for the comparison with React
+   Native**, which `compare-conformance.mjs` reads. A run holding none of their
+   families leaves the file alone. */
+const recorded = Object.assign({}, ...byFamily.map((one) => one.recorded ?? {}))
+if (Object.keys(recorded).length > 0) {
+  const record = Object.fromEntries(Object.entries(recorded).sort(([a], [b]) => (a < b ? -1 : 1)))
+  await mkdir(join(root, '.local/conformance'), { recursive: true })
+  await writeFile(
+    join(root, `.local/conformance/${chosen}.json`),
+    `${JSON.stringify({ platform: chosen, record }, null, 2)}\n`,
+  )
+}
 
 /* **What this engine is known to fail is reported and not counted**, and a
    listed spec that passes, or that this run's families no longer hold, fails

@@ -101,14 +101,36 @@ fn sort_by_list(object: &Map<String, Value>, list: &[&str]) -> Map<String, Value
 /// Where every key is known, or every key is a subpath, the canonical order
 /// holds; otherwise the only moves are the two that are always right, `types`
 /// to the top and `default` to the bottom.
+///
+/// **A set of its own ahead of `types` keeps its place**, as `react-native`
+/// does on `@fusion.dev/helix/tabs`. It carries its own `types`, and moving
+/// the outer one above it would hand a resolver asserting the condition the
+/// web's declarations. `publishable` holds it to starting with `types`.
 fn order_conditions(object: &Map<String, Value>) -> Map<String, Value> {
+    let ahead: Vec<&String> = if object.contains_key("types") {
+        object
+            .iter()
+            .take_while(|(key, _)| key.as_str() != "types")
+            .filter(|(_, value)| {
+                value
+                    .as_object()
+                    .is_some_and(|set| set.contains_key("types"))
+            })
+            .map(|(key, _)| key)
+            .collect()
+    } else {
+        Vec::new()
+    };
     let known = object
         .keys()
         .all(|key| key.starts_with('.') || CONDITIONS.contains(&key.as_str()));
-    if known {
+    if known && ahead.is_empty() {
         return sort_by_list(object, &CONDITIONS);
     }
     let mut ordered = Map::new();
+    for key in ahead {
+        ordered.insert(key.clone(), object[key].clone());
+    }
     if let Some(value) = object.get("types") {
         ordered.insert("types".to_owned(), value.clone());
     }
