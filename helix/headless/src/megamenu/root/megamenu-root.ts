@@ -745,12 +745,16 @@ export class HelixHeadlessMegamenu extends MixinControllerOpen(HelixElement) {
        because the slot works in every other respect and the failure is only
        audible.
 
-       **Never `setAttribute` here: that is a hydration mismatch.** Measured
-       against React 19.2.8, four families server-rendered and hydrated with the
+       **Never `setAttribute` here: that is a hydration mismatch.** First
+       measured on 19.2.8, four families server-rendered and hydrated with the
        definitions loaded either side of `hydrateRoot`: this one and `SpeedDial`
        produced "some attributes of the server rendered HTML didn't match the
        client properties. This won't be patched up" in both orders, and
-       `Popover` and `Menu`, which write nothing, were clean in both. React
+       `Popover` and `Menu`, which write nothing, were clean in both. Measured
+       again against React 19.3.1 on October 25, 2026: an element writing the
+       attribute onto its child before hydration still mismatches in both
+       orders, and with a Helix trigger this family, `SpeedDial`, `Popover`
+       and `Menu` are clean in both. React
        answers a mismatch by discarding the server's HTML for that subtree and
        rebuilding it, which is the expensive half rather than the console line.
 

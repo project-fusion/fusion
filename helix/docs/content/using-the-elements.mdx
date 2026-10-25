@@ -36,12 +36,36 @@ The bug is [facebook/react#35446](https://github.com/facebook/react/issues/35446
 and it is still open. The elements work around it for you.
 
 Every Helix element binds the handler itself, just before it dispatches any
-event, using the function React already holds for it. We measured this in
-Chrome against React 19.2.8, and the React bug is still open in 19.3. On a
-hydrated page, the first event reaches the handler. After React binds its own
-listener, no event is delivered twice.
+event, using the function React already holds for it. On a hydrated page, the
+first event reaches the handler. After React binds its own listener, no event
+is delivered twice.
 
 You do not need to do anything, and nothing changes when React fixes the bug.
+
+We measured this in Chromium against React 19.3.1 on October 25, 2026. Each
+version below rendered a page with `renderToString` and hydrated it with
+`hydrateRoot`:
+
+| React | Bug present | Helix handles it |
+| --- | --- | --- |
+| 19.0.9 | Yes | Yes |
+| 19.2.9 | Yes | Yes |
+| 19.3.1 | Yes | Yes |
+| 19.3.0 canary of October 23, 2026 | Yes | Yes |
+| 18.3.1 | Yes | The first event only |
+
+Helix supports React 19. React 18 binds no `on` prop on a custom element at
+all. Helix binds the first handler, but each render that passes a new function
+adds another listener, so a handler runs once for every render it has been
+through.
+
+In a development build, the page logs an error when React has a root and no
+Helix element finds the props React holds for it. This means the installed
+React stores its props under a key Helix does not read, and every `onhelix-*`
+handler on a server-rendered page is dead. Pin React to a version in the table,
+and open an issue at
+[github.com/project-fusion/fusion](https://github.com/project-fusion/fusion/issues)
+that names the version you installed.
 
 React's own events work when they bubble. `onClick` on a `<helix-button>` goes
 through React's synthetic event system, which hydration sets up.
@@ -64,8 +88,8 @@ written.
 - `onhelix-sample-start` reaches `helix-sample-start`. ✅
 - `onHelixOpen` binds an event called `HelixOpen`, which is never dispatched. ❌
 
-The number of hyphens does not matter. We measured this in Chrome against React
-19.2.8.
+The number of hyphens does not matter. We measured this in Chromium against
+React 19.3.1.
 
 ## Register the elements in one client component
 

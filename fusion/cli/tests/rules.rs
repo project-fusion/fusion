@@ -659,6 +659,125 @@ fn react_bridge_mark() {
     );
 }
 
+/// The mark a root leaves on the node it renders into is the third key, which
+/// the development warning about the other two reads.
+#[test]
+fn react_bridge_container() {
+    let bridge = "const REACT_PROPS = '__reactProps$'\nconst REACT_CONTAINER = '__reactContainer$'\n";
+    let bundle = "var key = '__reactProps$' + suffix;\nvar root = '__reactContainer$' + suffix;\n";
+    plant_in(
+        "workspace-react-bridge-container",
+        "workspace",
+        "react-bridge",
+        &[
+            ("package.json", ROOT),
+            ("fusion.json", EMPTY),
+            ("packages/bridge/src/audit.ts", bridge),
+            (
+                "node_modules/react-dom/package.json",
+                r#"{ "name": "react-dom", "version": "19.3.1" }"#,
+            ),
+            (
+                "node_modules/react-dom/cjs/react-dom-client.development.js",
+                bundle,
+            ),
+            (
+                "node_modules/react-dom/cjs/react-dom-client.production.js",
+                bundle,
+            ),
+        ],
+        |tree| {
+            tree.write(
+                "node_modules/react-dom/cjs/react-dom-client.production.js",
+                "var key = '__reactProps$' + suffix;\nvar root = '__reactRoot$' + suffix;\n",
+            );
+        },
+        "`__reactContainer$` is gone from react-dom 19.3.1",
+        "node_modules/react-dom/cjs/react-dom-client.production.js",
+    );
+}
+
+/// A tree whose bridge and framework agree, for the stamp tests.
+fn stamped(extra: &[(&'static str, &'static str)]) -> Vec<(&'static str, &'static str)> {
+    let mut files = vec![
+        ("package.json", ROOT),
+        ("fusion.json", EMPTY),
+        (
+            "packages/bridge/src/bridge.ts",
+            "const REACT_PROPS = '__reactProps$'\n",
+        ),
+        (
+            "node_modules/react-dom/package.json",
+            r#"{ "name": "react-dom", "version": "19.3.1" }"#,
+        ),
+        (
+            "node_modules/react-dom/cjs/react-dom-client.development.js",
+            "var key = '__reactProps$' + suffix;\n",
+        ),
+        (
+            "node_modules/react-dom/cjs/react-dom-client.production.js",
+            "var key = '__reactProps$' + suffix;\n",
+        ),
+    ];
+    files.extend_from_slice(extra);
+    files
+}
+
+/// A stamp in a TypeScript comment is held to the framework as one in Markdown
+/// is, and the copies a build writes of it are not read.
+#[test]
+fn react_bridge_stamp_in_typescript() {
+    plant_in(
+        "workspace-react-bridge-stamp-ts",
+        "workspace",
+        "react-bridge",
+        &stamped(&[
+            (
+                "packages/bridge/src/notes.ts",
+                "/** Measured against React 19.3.1. */\n",
+            ),
+            (
+                "packages/bridge/types/jsx.d.ts",
+                "/** Measured against React 19.2.8. */\n",
+            ),
+            (
+                "packages/bridge/src/sources.generated.ts",
+                "export const notes = 'Measured against React 19.2.8.'\n",
+            ),
+        ]),
+        |tree| {
+            tree.write(
+                "packages/bridge/src/notes.ts",
+                "/** Measured against\n * React 19.2.8. */\n",
+            );
+        },
+        "reports measurements against React 19.2.8 and react-dom is 19.3.1",
+        "packages/bridge/src/notes.ts",
+    );
+}
+
+/// A stamp in the docs a consumer reads, which are MDX.
+#[test]
+fn react_bridge_stamp_in_mdx() {
+    plant_in(
+        "workspace-react-bridge-stamp-mdx",
+        "workspace",
+        "react-bridge",
+        &stamped(&[(
+            "docs/content/using.mdx",
+            "We measured this in Chrome against React 19.3.1.\n",
+        )]),
+        |tree| {
+            tree.write(
+                "docs/content/using.mdx",
+                "We measured this in Chrome against React 19.2.8.\n",
+            );
+        },
+        "reports measurements against React 19.2.8 and react-dom is 19.3.1",
+        "docs/content/using.mdx",
+    );
+}
+
 /// The framework's files are read by path, so they are written by hand.
 #[test]
 fn react_bridge() {

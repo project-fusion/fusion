@@ -11,6 +11,11 @@
 //! only in a document that carries it, so a renamed mark leaves a hydrated
 //! data table empty, and silently, as a renamed props key does.
 //!
+//! **The mark it leaves on the node it renders into is the third.** A
+//! development build warns when React has a root on a page and no element found
+//! its props, and only for an element under that mark, so a renamed mark makes
+//! the warning that reports the first two keys going silent with them.
+//!
 //! **Both bundles**, because a key present in the development build and absent
 //! from the production one fails only where nobody is looking.
 //!
@@ -21,8 +26,18 @@
 //! not move when a dependency does. A note is true on a date, so a bump fails
 //! here until somebody re-runs the probe and moves the date, which is the only
 //! thing that makes the note worth trusting.
+//!
+//! **Wherever the note is written: Markdown, MDX, and the comments in
+//! TypeScript.** Most of the bridge's measurements are argued beside the code
+//! they shaped, and the docs a consumer reads state the range. Until October
+//! 25, 2026 only `.md` was read, so `react-bridge.ts` and
+//! `using-the-elements.mdx` still named 19.2.8 with 19.3.1 installed. A
+//! declaration file and a `*.generated.*` file are skipped: each is a copy a
+//! build wrote of a comment read where it was written, and would report it
+//! twice.
 
 use std::fs;
+use std::path::Path;
 use std::sync::LazyLock;
 
 use fusion_rules::walk::crawl;
@@ -32,7 +47,7 @@ use serde_json::Value;
 use crate::rules::{Context, Finding, Report};
 
 static DECLARED: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"const (REACT_PROPS|REACT_LISTENING) = '([^']+)'")
+    Regex::new(r"const (REACT_PROPS|REACT_LISTENING|REACT_CONTAINER) = '([^']+)'")
         .expect("a literal pattern compiles")
 });
 
@@ -42,8 +57,12 @@ static DECLARED: LazyLock<Regex> = LazyLock::new(|| {
 /// leave optional.** That one read one file and could afford `against 1.2.3`;
 /// this reads every note in the repository, where the same words describe a
 /// compiler probe, a bundler measurement and anything else somebody dated.
+///
+/// **A line break may fall anywhere in it**, and in a comment the next line
+/// starts with ` * ` or `// `, so those marks count as the space they replace.
 static MEASURED: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"[Aa]gainst\s+React\s+(\d+\.\d+\.\d+)").expect("a literal pattern compiles")
+    Regex::new(r"[Aa]gainst[\s*/]+React[\s*/]+(\d+\.\d+\.\d+)")
+        .expect("a literal pattern compiles")
 });
 
 /// The bridge's prefixes, each by the name it is declared under, found by
@@ -72,9 +91,30 @@ fn prefixes(context: &Context) -> Vec<(String, String)> {
     found
 }
 
+/// Whether a file is one a measurement is written in: Markdown, MDX, or a
+/// TypeScript source, and never a copy a build wrote of one.
+fn noted(path: &Path) -> bool {
+    let name = path
+        .file_name()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_ascii_lowercase();
+    if name.ends_with(".d.ts") || name.contains(".generated.") {
+        return false;
+    }
+    [".md", ".mdx", ".ts", ".tsx"]
+        .iter()
+        .any(|one| name.ends_with(one))
+}
+
 /// Why a prefix the installed framework no longer carries matters.
 fn why(name: &str) -> &'static str {
-    if name == "REACT_LISTENING" {
+    if name == "REACT_CONTAINER" {
+        "A development build warns when the framework has a root on a page and no element \
+         found its props, and only for an element under the node carrying this mark. Find \
+         the mark the framework now leaves on the node it renders into, and follow it, or \
+         the warning that reports the other two keys is silent with them."
+    } else if name == "REACT_LISTENING" {
         "An element whose props arrive after its first frame looks for them only in a \
          document carrying this mark, which the framework leaves as it makes a root. Find \
          the mark the framework now leaves on a document it has a root in, and follow it."
@@ -137,14 +177,7 @@ pub fn run(context: &Context) -> Report {
     /* Every version the rules the bridge rests on claim to have measured
     against, read rather than written here so the two cannot drift apart. */
     let mut prose = Vec::new();
-    crawl(
-        &context.root,
-        &|path| {
-            path.extension()
-                .is_some_and(|one| one.eq_ignore_ascii_case("md"))
-        },
-        &mut prose,
-    );
+    crawl(&context.root, &noted, &mut prose);
     for file in prose {
         let Ok(text) = fs::read_to_string(&file) else {
             continue;
