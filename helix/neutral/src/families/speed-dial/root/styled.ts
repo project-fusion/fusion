@@ -1,0 +1,250 @@
+import { hookOf, list, product, quotient, token, web } from '../../../style.js'
+import { styles } from '../../../table.js'
+import { prop } from '../../../tree.js'
+import root from './headless.js'
+
+/**
+ * Speed Dial's styled tier, which writes
+ * `helix/styled/src/speed-dial/root/speed-dial-root.generated.css`.
+ *
+ * **The drawn trigger is a round button in the primary surface**, raised,
+ * lifted further under the pointer and set down as it is pressed, with a
+ * plus at the icon size. **The actions are a column with no surface of
+ * their own**, lined up on the end of the trigger they open from, and the
+ * dial hands each action which way its name and its mark run.
+ *
+ * **They arrive from the button**, each a little smaller and a step toward
+ * it, once the column is placed, one after another, nearest the button
+ * first, and are simply there under reduced motion. Under `labels="hover"`
+ * each name shows only while its action is under the pointer or has focus,
+ * and takes no press. Print leaves the dial out, and is the web's.
+ */
+export default styles(
+  root,
+  {
+    prefix: 'speed-dial',
+    hooks: ['background-color', 'color', 'gap', 'shadow', 'size', 'stagger', 'travel'],
+    own: [
+      'dial-from',
+      'speed-dial-align',
+      'speed-dial-label-opacity',
+      'speed-dial-row',
+      'speed-dial-stagger',
+    ],
+    props: [prop('labels', ['hover'])],
+    stylesheet: 'speed-dial/root/speed-dial-root.generated.css',
+  },
+  ({ hook, on, own, rule }) => {
+    const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
+    const travel = hook.travel(token('space-md'))
+    const fast = token('duration-fast')
+    const arrived = { opacity: 1, scale: 1, translate: [0, 0] } as const
+    return [
+      /* The trigger's own box, which docks as anything else does. */
+      on('host', [rule({ display: 'inline-flex' })]),
+      on('actions', [
+        rule({
+          backgroundColor: 'transparent',
+          border: 'none',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: hook.gap(token('space-sm')),
+          margin: token('space-none'),
+          overflow: 'visible',
+          padding: token('space-none'),
+        }),
+        /* Lined up on the end the trigger is on, the row order handed down. */
+        rule({ own: { row: 'row-reverse' }, alignItems: 'flex-end' }),
+        rule(
+          { state: 'aligned-start' },
+          { own: { align: 'flex-start', row: 'row' }, alignItems: 'flex-start' },
+        ),
+      ]),
+      on({ part: 'actions', selector: '[part="actions"][hidden]' }, [
+        rule({ platform: 'web' }, { display: 'none' }),
+      ]),
+      /* They arrive from the button, once the column is placed. */
+      on('actions', [
+        rule({ own: { dialFrom: travel } }),
+        rule({ state: 'placed-bottom' }, { own: { dialFrom: product(travel, '-1') } }),
+      ]),
+      on({ region: 'default', slotted: '*' }, [
+        rule({
+          opacity: 0,
+          scale: 0.8,
+          transition: list(
+            ['opacity', fast, token('easing-standard')],
+            ['scale', fast, token('easing-emphasized')],
+            ['translate', fast, token('easing-emphasized')],
+          ),
+          translate: [0, own.dialFrom],
+        }),
+        /* A phone reads the side the column landed on, which it is given
+           once it is placed. */
+        rule(
+          [
+            { platform: 'native', state: 'placed-bottom' },
+            { platform: 'native', state: 'placed-left' },
+            { platform: 'native', state: 'placed-right' },
+            { platform: 'native', state: 'placed-top' },
+          ],
+          arrived,
+        ),
+      ]),
+      on({ part: 'actions', selector: '[part="actions"][data-placed] ::slotted(*)' }, [
+        rule({ platform: 'web' }, arrived),
+      ]),
+      /* Nearest the button first, counting from the end where the column
+         runs upward and from the start where it runs down. */
+      on('host', [rule({ own: { stagger: hook.stagger(quotient(fast, 3)) } })]),
+      on(
+        {
+          part: 'actions',
+          selector: '[part="actions"][data-placed] ::slotted(:nth-last-child(2))',
+        },
+        [rule({ platform: 'web' }, { transitionDelay: own.stagger })],
+      ),
+      on(
+        {
+          part: 'actions',
+          selector: '[part="actions"][data-placed] ::slotted(:nth-last-child(3))',
+        },
+        [rule({ platform: 'web' }, { transitionDelay: product(own.stagger, 2) })],
+      ),
+      on(
+        {
+          part: 'actions',
+          selector: '[part="actions"][data-placed] ::slotted(:nth-last-child(4))',
+        },
+        [rule({ platform: 'web' }, { transitionDelay: product(own.stagger, 3) })],
+      ),
+      on(
+        {
+          part: 'actions',
+          selector: '[part="actions"][data-placed] ::slotted(:nth-last-child(n + 5))',
+        },
+        [rule({ platform: 'web' }, { transitionDelay: product(own.stagger, 4) })],
+      ),
+      on(
+        {
+          part: 'actions',
+          selector:
+            ':host(:state(placed-bottom)) [part="actions"][data-placed] ::slotted(:nth-child(2))',
+        },
+        [rule({ platform: 'web' }, { transitionDelay: own.stagger })],
+      ),
+      on(
+        {
+          part: 'actions',
+          selector:
+            ':host(:state(placed-bottom)) [part="actions"][data-placed] ::slotted(:nth-child(3))',
+        },
+        [rule({ platform: 'web' }, { transitionDelay: product(own.stagger, 2) })],
+      ),
+      on(
+        {
+          part: 'actions',
+          selector:
+            ':host(:state(placed-bottom)) [part="actions"][data-placed] ::slotted(:nth-child(4))',
+        },
+        [rule({ platform: 'web' }, { transitionDelay: product(own.stagger, 3) })],
+      ),
+      on(
+        {
+          part: 'actions',
+          selector:
+            ':host(:state(placed-bottom)) [part="actions"][data-placed] ::slotted(:nth-child(n + 5))',
+        },
+        [rule({ platform: 'web' }, { transitionDelay: product(own.stagger, 4) })],
+      ),
+      /* A phone times them by the same places, once the column is placed:
+         from the end where it runs upward or beside the button, and from the
+         start where it runs down. */
+      on({ region: 'default', slotted: '*' }, [
+        rule(
+          [
+            { nthLast: 2, platform: 'native', state: 'placed-top' },
+            { nthLast: 2, platform: 'native', state: 'placed-left' },
+            { nthLast: 2, platform: 'native', state: 'placed-right' },
+            { nth: 2, platform: 'native', state: 'placed-bottom' },
+          ],
+          { transitionDelay: own.stagger },
+        ),
+        rule(
+          [
+            { nthLast: 3, platform: 'native', state: 'placed-top' },
+            { nthLast: 3, platform: 'native', state: 'placed-left' },
+            { nthLast: 3, platform: 'native', state: 'placed-right' },
+            { nth: 3, platform: 'native', state: 'placed-bottom' },
+          ],
+          { transitionDelay: product(own.stagger, 2) },
+        ),
+        rule(
+          [
+            { nthLast: 4, platform: 'native', state: 'placed-top' },
+            { nthLast: 4, platform: 'native', state: 'placed-left' },
+            { nthLast: 4, platform: 'native', state: 'placed-right' },
+            { nth: 4, platform: 'native', state: 'placed-bottom' },
+          ],
+          { transitionDelay: product(own.stagger, 3) },
+        ),
+        rule(
+          [
+            { nthLast: { from: 5 }, platform: 'native', state: 'placed-top' },
+            { nthLast: { from: 5 }, platform: 'native', state: 'placed-left' },
+            { nthLast: { from: 5 }, platform: 'native', state: 'placed-right' },
+            { nth: { from: 5 }, platform: 'native', state: 'placed-bottom' },
+          ],
+          { transitionDelay: product(own.stagger, 4) },
+        ),
+        /* Put down where they belong. */
+        rule(
+          { reducedMotion: true },
+          { opacity: 1, scale: 1, transition: 'none', transitionDelay: '0s', translate: [0, 0] },
+        ),
+      ]),
+      /* The trigger the dial draws where none is passed in. */
+      on('trigger', [
+        rule({
+          all: web('unset'),
+          '--icon-size': token('size-icon'),
+          alignItems: 'center',
+          backgroundColor: hook.backgroundColor(token('color-primary-surface')),
+          blockSize: hook.size(token('size-control')),
+          borderRadius: token('radii-full'),
+          boxShadow: hook.shadow(token('shadow-md')),
+          boxSizing: 'border-box',
+          color: hook.color(token('color-foreground-on-primary')),
+          cursor: web('pointer'),
+          display: 'inline-flex',
+          inlineSize: hook.size(token('size-control')),
+          justifyContent: 'center',
+          transition: ['box-shadow', fast, token('easing-standard')],
+        }),
+        rule({ hover: true }, { boxShadow: token('shadow-lg') }),
+        rule({ active: true }, { boxShadow: token('shadow-sm') }),
+        rule({ focusVisible: true }, { outline: ring, outlineOffset: token('size-focus-offset') }),
+        /* The lift arrives at once under reduced motion. */
+        rule({ reducedMotion: true }, { transition: 'none' }),
+      ]),
+      /* A glyph of your own takes the plus's size, and so does the plus. */
+      on({ region: 'icon', slotted: '*' }, [
+        rule({ blockSize: hookOf('icon', 'size'), inlineSize: hookOf('icon', 'size') }),
+      ]),
+      on('icon-mark', [
+        rule(
+          { platform: 'native' },
+          { blockSize: token('size-icon'), flex: '0 0 auto', inlineSize: token('size-icon') },
+        ),
+      ]),
+      on('host', [rule({ print: true }, { display: 'none' })]),
+      /* Names on demand: each shows while its action is under the pointer
+         or has focus, and only the marks take a press. */
+      on('host', [rule({ labels: 'hover' }, { own: { labelOpacity: 0 } })]),
+      on('actions', [rule({ labels: 'hover' }, { pointerEvents: 'none' })]),
+      on({ region: 'default', slotted: '*' }, [
+        rule({ labels: 'hover' }, { pointerEvents: 'none' }),
+      ]),
+    ]
+  },
+)
