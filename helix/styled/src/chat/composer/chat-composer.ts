@@ -1,5 +1,5 @@
 import { customElement } from '@fusion.dev/helix-core'
-import { HelixHeadlessChatComposer } from '@fusion.dev/helix-headless/chat'
+import { HelixHeadlessChatComposer } from '@fusion.dev/helix-headless/chat/composer'
 import { type CSSResultGroup, html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import { repeat } from 'lit/directives/repeat.js'

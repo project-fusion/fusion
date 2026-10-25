@@ -1,5 +1,5 @@
 import { customElement, type ViewportControlAxes } from '@fusion.dev/helix-core'
-import { HelixHeadlessMap } from '@fusion.dev/helix-headless/map'
+import { HelixHeadlessMap } from '@fusion.dev/helix-headless/map/root'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'

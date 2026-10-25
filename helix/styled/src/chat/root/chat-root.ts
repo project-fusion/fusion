@@ -1,11 +1,10 @@
 import { customElement } from '@fusion.dev/helix-core'
-import { HelixHeadlessChat } from '@fusion.dev/helix-headless/chat'
+import { HelixHeadlessChat } from '@fusion.dev/helix-headless/chat/root'
 import type { CSSResultGroup } from 'lit'
 import { styles as collectionStateStyles } from '../../shared/collection/state.css.js'
 import { styles as liveStyles } from '../../shared/live/live.css.js'
 import { styles as typingStyles } from '../typing.css.js'
 import { styles } from './chat-root.css.js'
-import '../composer/chat-composer.js'
 import '../message/chat-message.js'
 
 /**

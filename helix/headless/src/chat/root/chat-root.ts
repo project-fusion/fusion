@@ -1,5 +1,6 @@
 import {
   assignSlot,
+  auditChildren,
   ChildrenController,
   customElement,
   deepActiveElement,
@@ -33,6 +34,7 @@ import { repeat } from 'lit/directives/repeat.js'
 /* `static-html`'s `html`, because a turn fed as data is drawn with the tier's
    own message tag, and an interpolated tag is a static value. */
 import { html } from 'lit/static-html.js'
+import '../message/chat-message.js'
 import type { HelixHeadlessChatMessage } from '../message/chat-message.js'
 import { authorWords, TURN_WORDS, type TurnWords } from '../naming.js'
 
@@ -203,6 +205,19 @@ const drawnInFull = ({ element }: Rendered): boolean =>
  * types, set `typing` to their name: the status band draws three dots and
  * "Ada is typing" (`typing-label`), which a screen reader hears, and clearing
  * it takes them away. Anything slotted into `status` is drawn first.
+ *
+ * **The composer has an entry of its own.** A chat that only shows a
+ * conversation takes no new turns and needs no composer, so `chat/root` leaves
+ * it out. A page that writes a `Chat.Composer` imports both entries:
+ *
+ * ```js
+ * import '@fusion.dev/helix/chat/root'
+ * import '@fusion.dev/helix/chat/composer'
+ * ```
+ *
+ * A composer written without the second is reported once the page has loaded,
+ * with the entry to add. The family's own entry, `@fusion.dev/helix/chat`,
+ * registers every element.
  *
  * **Keyboard.** The transcript moves between turns the way a feed does. Each
  * turn says its place, such as "3 of 40", windowed or not. The transcript is
@@ -1109,6 +1124,9 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
+    /* The composer has an entry of its own, so a page that imports only the
+       chat gets an inert element in its slot. */
+    auditChildren(this, 'chat-composer', 'chat/composer', 'the chat takes no messages')
     /* The one thing inside a turn worth hearing about, and `attributeFilter`
        keeps it to that: a subtree watch of `state` alone never sees a token. */
     this.addEventListener('keydown', this.handleKeydown)

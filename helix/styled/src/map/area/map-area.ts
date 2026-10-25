@@ -1,5 +1,5 @@
 import { customElement } from '@fusion.dev/helix-core'
-import { HelixHeadlessMapArea } from '@fusion.dev/helix-headless/map'
+import { HelixHeadlessMapArea } from '@fusion.dev/helix-headless/map/area'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles } from './map-area.css.js'

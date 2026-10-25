@@ -1,5 +1,5 @@
 import { customElement } from '@fusion.dev/helix-core'
-import { HelixHeadlessMapLandcover } from '@fusion.dev/helix-headless/map'
+import { HelixHeadlessMapLandcover } from '@fusion.dev/helix-headless/map/landcover'
 import type { CSSResultGroup } from 'lit'
 import { styles } from './map-landcover.css.js'
 

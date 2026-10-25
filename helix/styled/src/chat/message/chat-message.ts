@@ -1,5 +1,5 @@
 import { customElement } from '@fusion.dev/helix-core'
-import { HelixHeadlessChatMessage } from '@fusion.dev/helix-headless/chat'
+import { HelixHeadlessChatMessage } from '@fusion.dev/helix-headless/chat/message'
 import type { CSSResultGroup } from 'lit'
 import { property } from 'lit/decorators.js'
 import { styles as typingStyles } from '../typing.css.js'
