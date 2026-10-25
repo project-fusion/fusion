@@ -15,9 +15,12 @@ const warned = new WeakSet<Element>()
  * consumer's markup after upgrading is one whose output a React consumer's
  * hydration disagrees with.
  *
- * **Measured 28 Aug 2026 against React 19.2.8.** Four
- * families were server-rendered as React emits them and hydrated with the
- * element definitions loaded either side of `hydrateRoot`:
+ * **Measured against React 19.3.1 on October 25, 2026**, with an element that
+ * writes `aria-expanded` onto its child as it connects, server-rendered and
+ * hydrated with its definition loaded either side of `hydrateRoot`: a
+ * mismatch in both orders, and the same state written as a property clean in
+ * both. The families were first measured on 28 Aug 2026, on 19.2.8, as React
+ * emits them and while two of them still wrote the attribute:
  *
  * ```
  * case        writes to trigger   hydration mismatch
