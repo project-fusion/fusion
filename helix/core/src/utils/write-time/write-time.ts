@@ -35,8 +35,25 @@ export const writeClock = (value: string, locale: string, seconds = false): stri
      how a twenty-four hour clock is written, while `hour: '2-digit'` gives
      `09:00 AM` for `en-US`, which is not how a twelve hour one is. `short` and
      `medium` are each locale's own answer: `09:00` and `9:00 AM`. */
-  return new Intl.DateTimeFormat(locale || undefined, {
-    timeStyle: seconds ? 'medium' : 'short',
-    timeZone: 'UTC',
-  }).format(new Date(at * 1000))
+  return formatter(locale, seconds).format(new Date(at * 1000))
+}
+
+/**
+ * One formatter per locale and precision, kept. Time Picker writes every row
+ * of its list, 5,760 of them for a day in 15 second steps, and building a
+ * formatter for each took over a second where the writing itself is quick.
+ */
+const FORMATTERS = new Map<string, Intl.DateTimeFormat>()
+
+const formatter = (locale: string, seconds: boolean): Intl.DateTimeFormat => {
+  const key = `${locale}|${seconds}`
+  let found = FORMATTERS.get(key)
+  if (!found) {
+    found = new Intl.DateTimeFormat(locale || undefined, {
+      timeStyle: seconds ? 'medium' : 'short',
+      timeZone: 'UTC',
+    })
+    FORMATTERS.set(key, found)
+  }
+  return found
 }

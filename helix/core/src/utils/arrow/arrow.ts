@@ -1,4 +1,6 @@
-import type { Placement, Side } from '../../controllers/floating-controller/floating-controller.js'
+import { reachOf } from '../layers/layers.js'
+
+export { sideOf } from '../layers/layers.js'
 
 /**
  * How far a panel's arrow reaches past the edge it sits on, which is what the
@@ -12,7 +14,4 @@ import type { Placement, Side } from '../../controllers/floating-controller/floa
  * the panel is closed and unrendered, when there is nothing to place.
  */
 export const arrowReach = (arrow: HTMLElement | null | undefined): number =>
-  (arrow?.offsetWidth ?? 0) / Math.SQRT2
-
-/** The side of its anchor a placement puts a panel on: `top-start` is `top`. */
-export const sideOf = (placement: Placement): Side => placement.split('-')[0] as Side
+  reachOf(arrow?.offsetWidth ?? 0)
