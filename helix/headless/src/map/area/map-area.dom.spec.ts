@@ -28,6 +28,7 @@ type Area = Updatable & {
   caption?: string
   captionPlacement: 'inside' | 'outside'
   description?: string
+  fallbackLabel: string
   isMapLayer: boolean
   label: string
   layerKind: string
@@ -60,7 +61,11 @@ describe('map area', () => {
       '<helix-headless-map-area caption="A" caption-placement="outside" points="1,1 2,2 1,3"></helix-headless-map-area>',
     )
     const area = host.querySelector('helix-headless-map-area') as Area
-    expect([area.caption, area.captionPlacement, area.label]).toEqual(['A', 'outside', 'Area'])
+    expect([area.caption, area.captionPlacement, area.label || area.fallbackLabel]).toEqual([
+      'A',
+      'outside',
+      'Area',
+    ])
     expect(area.points).toEqual([
       { lat: 1, lng: 1 },
       { lat: 2, lng: 2 },
@@ -154,7 +159,7 @@ describe('map area', () => {
   })
 
   test('on a page in another language, it is named by the word registered for it, and a label still wins', async () => {
-    registerWords('de', { 'helix-map-area': { label: 'Gebiet' } })
+    registerWords('de', { 'helix-map-area': { fallbackLabel: 'Gebiet' } })
     document.body.innerHTML = `<div lang="de"><helix-headless-map label="Lieferungen">
       <helix-headless-map-area points="1,1 2,2 1,3"></helix-headless-map-area>
       <helix-headless-map-area label="Zone A" points="1,1 2,2 1,3"></helix-headless-map-area>

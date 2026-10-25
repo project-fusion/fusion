@@ -112,7 +112,7 @@ import {
  * no `start` counts down from the number of rows, which a server cannot know,
  * so served markup counts from one until the list runs.
  *
- * **An empty list.** Set `empty-label`, or put your own content in the `empty`
+ * **An empty list.** Set `empty-text`, or put your own content in the `empty`
  * slot, for a row shown while the list has no rows and none are loading, such
  * as "No files yet" and a link to add one. Without either, an empty list shows
  * nothing. The list takes the `empty` state while it has no rows, whatever it
@@ -122,7 +122,7 @@ import {
  * list comes within a screen of view, in the box that scrolls it or the page,
  * once for each number of rows: add rows and it can send it again. While you
  * fetch, set `loading`: the list is busy, and a row after the last says
- * "Loading more" (`loading-label`, or your own content in the `loading`
+ * "Loading more" (`loading-text`, or your own content in the `loading`
  * slot). The list asks for nothing while `loading` is set.
  *
  * An interactive list with no name is reported once in a development build,
@@ -136,8 +136,8 @@ import {
  * @documentation https://fusion.dev/helix/components/list
  *
  * @slot - The rows.
- * @slot empty - Content for the row shown while the list has no rows and none are loading. Falls back to `empty-label`.
- * @slot loading - Content for the row after the last while `loading` is set. Falls back to `loading-label`.
+ * @slot empty - Content for the row shown while the list has no rows and none are loading. Falls back to `empty-text`.
+ * @slot loading - Content for the row after the last while `loading` is set. Falls back to `loading-text`.
  *
  * @event {Event} change - Fired once a press has changed which rows are selected.
  * @event {HelixActionEvent} helix-action - Sent from a row when the reader acts on it: Enter, or a press in a list that selects nothing. Read the row from `target`. A row with `href` follows its link instead.
@@ -147,7 +147,7 @@ import {
  * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your rows to the order in `keys`.
  *
  * @csspart drag-preview - A copy of the row a pointer drags, which follows the pointer in the top layer until the row is let go, in a `reorderable` list. Hidden from assistive technology.
- * @csspart empty - The row shown while the list has no rows and none are loading, where `empty-label` or the `empty` slot gives it content. A grid row with one cell in a list that selects.
+ * @csspart empty - The row shown while the list has no rows and none are loading, where `empty-text` or the `empty` slot gives it content. A grid row with one cell in a list that selects.
  * @csspart live - The region that says each step of a move to screen readers, in a `reorderable` list. Drawn from the first move. Visually hidden in the styled tier.
  * @csspart loading - The row after the last while `loading` is set. A grid row with one cell in a list that selects.
  *
@@ -190,11 +190,19 @@ export class HelixHeadlessList extends HelixElement {
   droppedLabel = 'Dropped'
 
   /**
+   * The old name of `empty-text`, read only where a page sets it.
+   *
+   * @deprecated Use `empty-text`. Removed in the next release.
+   */
+  @property({ attribute: 'empty-label' })
+  emptyLabel?: string
+
+  /**
    * The text of the row shown while the list has no rows, where the `empty`
    * slot is empty. Empty, the default, shows no row.
    */
-  @property({ attribute: 'empty-label' })
-  emptyLabel = ''
+  @property({ attribute: 'empty-text' })
+  emptyText = ''
 
   /**
    * The kind of list, which follows from the content.
@@ -234,10 +242,18 @@ export class HelixHeadlessList extends HelixElement {
   @property({ type: Boolean })
   loading = false
 
+  /**
+   * The old name of `loading-text`, read only where a page sets it.
+   *
+   * @deprecated Use `loading-text`. Removed in the next release.
+   */
+  @property({ attribute: 'loading-label' })
+  loadingLabel?: string
+
   /** The text of the row drawn while `loading` is set, where the `loading` slot is empty. */
   @words
-  @property({ attribute: 'loading-label' })
-  loadingLabel = 'Loading more'
+  @property({ attribute: 'loading-text' })
+  loadingText = 'Loading more'
 
   /**
    * Sends `helix-load-more` once the end of the list comes within a screen of
@@ -886,14 +902,16 @@ export class HelixHeadlessList extends HelixElement {
    * The row shown while the list has no rows: a list item, or a grid row with
    * one cell in a list that selects. Drawn only once the children are known,
    * so a server and a hydrating render never claim an empty list, and hidden
-   * while it has neither `empty-label` nor content in the `empty` slot.
+   * while it has neither `empty-text` nor content in the `empty` slot.
    */
   private drawEmpty(): TemplateResult | typeof nothing {
     if (!this.childrenKnown || this.rows.length > 0 || this.loading) {
       return nothing
     }
-    const shown = this.emptyLabel !== '' || this.querySelector(':scope > [slot="empty"]') !== null
-    const content = html`<slot name="empty" @slotchange=${this.handleEmptyChange}>${this.emptyLabel}</slot>`
+    const shown =
+      (this.emptyLabel ?? this.emptyText) !== '' ||
+      this.querySelector(':scope > [slot="empty"]') !== null
+    const content = html`<slot name="empty" @slotchange=${this.handleEmptyChange}>${this.emptyLabel ?? this.emptyText}</slot>`
     return this.interactive
       ? html`<div part="empty" role="row" ?hidden=${!shown}><div role="gridcell">${content}</div></div>`
       : html`<div part="empty" role="listitem" ?hidden=${!shown}>${content}</div>`
@@ -908,7 +926,7 @@ export class HelixHeadlessList extends HelixElement {
     if (!this.loading) {
       return nothing
     }
-    const content = html`<slot name="loading">${this.loadingLabel}</slot>`
+    const content = html`<slot name="loading">${this.loadingLabel ?? this.loadingText}</slot>`
     return this.interactive
       ? html`<div part="loading" role="row"><div role="gridcell">${content}</div></div>`
       : html`<div part="loading" role="listitem">${content}</div>`

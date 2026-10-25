@@ -285,15 +285,21 @@ export class HelixHeadlessSplitter extends HelixElement {
   @property({ attribute: 'end-min' })
   endMin: number | string = 0
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Resize panes'
+
   /**
    * The divider's name, read by screen readers.
    *
    * An `aria-label` or `aria-labelledby` on the host names the divider too,
    * and wins over this.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Resize panes'
+  label = ''
 
   /** Carries a host `aria-label` and `aria-labelledby` to the divider. */
   protected readonly aria = new AriaForwardController(this, {
@@ -1540,7 +1546,7 @@ export class HelixHeadlessSplitter extends HelixElement {
         role="separator"
         tabindex="0"
         aria-controls="start"
-        aria-label=${this.label}
+        aria-label=${this.label || this.fallbackLabel}
         aria-orientation=${this.vertical ? 'horizontal' : 'vertical'}
         aria-valuemax=${this.collapsed ? 100 : this.clamp(this.maxPercent)}
         aria-valuemin=${this.collapsed ? 0 : this.clamp(this.minPercent)}

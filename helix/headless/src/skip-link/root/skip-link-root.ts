@@ -59,6 +59,11 @@ export class HelixHeadlessSkipLink extends HelixElement {
     delegatesFocus: true,
   }
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Skip to content'
+
   /**
    * The in-page fragment the link moves focus to, such as `#main`.
    *
@@ -75,10 +80,11 @@ export class HelixHeadlessSkipLink extends HelixElement {
    *
    * The fallback of the default slot, so slotted content replaces it rather than
    * appearing beside it.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Skip to content'
+  label = ''
 
   /**
    * The element `href` names, looked up the way the browser would.
@@ -151,7 +157,7 @@ export class HelixHeadlessSkipLink extends HelixElement {
   }
 
   protected override render(): TemplateResult {
-    return html`<a part="link" href=${this.href} @click=${this.skip}><slot>${this.label}</slot></a>`
+    return html`<a part="link" href=${this.href} @click=${this.skip}><slot>${this.label || this.fallbackLabel}</slot></a>`
   }
 }
 

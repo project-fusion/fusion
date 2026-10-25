@@ -38,12 +38,12 @@ const mounted = async (around: string, markup: string): Promise<HTMLElement> => 
 
 const GERMAN = {
   'helix-pagination': {
-    label: 'Seitennavigation',
+    fallbackLabel: 'Seitennavigation',
     nextLabel: 'Nächste Seite',
     pageLabel: 'Seite {page} von {pages}',
     statusLabel: '{page} von {pages}',
   },
-  'helix-pagination-size': { label: 'Pro Seite' },
+  'helix-pagination-size': { fallbackLabel: 'Pro Seite' },
   'helix-pagination-summary': { format: '{from}–{to} von {total}' },
 }
 
@@ -91,7 +91,7 @@ describe('pagination on a page in another language', () => {
     const size = (await mounted(
       'lang="de"',
       '<helix-headless-pagination-size></helix-headless-pagination-size>',
-    )) as HTMLElement & { label: string }
-    expect(size.label).toBe('Pro Seite')
+    )) as HTMLElement & { fallbackLabel: string }
+    expect(size.fallbackLabel).toBe('Pro Seite')
   })
 })

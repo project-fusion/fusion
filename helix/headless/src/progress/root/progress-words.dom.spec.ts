@@ -39,7 +39,9 @@ const progress = async (around = ''): Promise<Bar> => {
 
 describe('progress words', () => {
   test('the name and the finishing words are the ones registered for the nearest lang', async () => {
-    registerWords('de', { 'helix-progress': { completeLabel: 'Fertig', label: 'Fortschritt' } })
+    registerWords('de', {
+      'helix-progress': { completeLabel: 'Fertig', fallbackLabel: 'Fortschritt' },
+    })
     const host = await progress('lang="de"')
     expect(label(host)).toBe('Fortschritt')
     host.value = 200

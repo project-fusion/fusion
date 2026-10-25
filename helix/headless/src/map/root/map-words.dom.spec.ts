@@ -75,7 +75,7 @@ const POLISH = {
   'helix-map-points': {
     countLabel:
       '{count, plural, one {# miejsce} few {# miejsca} many {# miejsc} other {# miejsca}}',
-    label: 'Miejsca',
+    fallbackLabel: 'Miejsca',
   },
 }
 

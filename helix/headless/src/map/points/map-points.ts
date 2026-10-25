@@ -116,6 +116,14 @@ export class HelixHeadlessMapPoints extends HelixElement {
   @property()
   description?: string
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Places'
+
+  /** Marks this as a layer for the frame and the connector, whatever its tag. */
+  readonly isMapLayer = true
+
   /**
    * A name this layer shares with other layers, such as a route and its
    * dotted legs. The layers menu shows layers in the same group as one entry,
@@ -124,16 +132,14 @@ export class HelixHeadlessMapPoints extends HelixElement {
   @property()
   group?: string
 
-  /** Marks this as a layer for the frame and the connector, whatever its tag. */
-  readonly isMapLayer = true
-
   /**
    * The layer's name, used in the frame's list, its tile in the layers menu,
    * and the group of places the keyboard walks. Defaults to "Places".
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Places'
+  label = ''
 
   /** @internal Which kind of layer, which is how the connector draws it. */
   readonly layerKind = 'points' as const
@@ -280,7 +286,7 @@ export class HelixHeadlessMapPoints extends HelixElement {
       return nothing
     }
     const stop = this.walk.some((one) => one.key === this.stop) ? this.stop : this.walk[0]?.key
-    return html`<span part="places" role="group" aria-label=${this.label ?? ''} @focusin=${this.handleFocusin} @keydown=${this.handleKeydown} @keyup=${this.handleKeyup}>${repeat(
+    return html`<span part="places" role="group" aria-label=${this.label || this.fallbackLabel} @focusin=${this.handleFocusin} @keydown=${this.handleKeydown} @keyup=${this.handleKeyup}>${repeat(
       this.walk,
       (one) => one.key,
       (one) => {

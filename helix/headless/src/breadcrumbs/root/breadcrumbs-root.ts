@@ -101,6 +101,11 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
   @property({ attribute: 'expand-label' })
   expandLabel = 'Show {count} more'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Breadcrumb'
+
   /**
    * The trail as data, drawn as crumbs before any you slot. The last item is the
    * current page.
@@ -114,10 +119,11 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
   /**
    * The landmark's name, read by screen readers. An `aria-label` on the host
    * wins over it.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Breadcrumb'
+  label = ''
 
   /**
    * The most crumbs a trail drawn from `items` shows before it folds its middle
@@ -181,7 +187,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
     // On the host through internals, so the landmark is the element itself and
     // an author's `aria-label` names it without anything being copied inward.
     // The default name goes the same way, and an attribute beats internals.
-    hostAria(this.internals, { label: this.label, role: 'navigation' })
+    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'navigation' })
     if (changed.has('items') && changed.get('items') !== undefined) {
       this.expanded = false
     }

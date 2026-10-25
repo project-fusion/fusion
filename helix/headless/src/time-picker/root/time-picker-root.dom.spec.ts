@@ -880,7 +880,7 @@ describe('an unnamed time picker', () => {
      reported only as the list inside it, a list the page never wrote. */
   test('is reported once, as itself, and a named one is not', async () => {
     const unnamed = await warnedOn(
-      '<helix-headless-time-picker label=""></helix-headless-time-picker>',
+      '<helix-headless-time-picker fallback-label="" label=""></helix-headless-time-picker>',
     )
     const said = unnamed.filter((one) => one.includes('no accessible name'))
     expect(said).toHaveLength(1)

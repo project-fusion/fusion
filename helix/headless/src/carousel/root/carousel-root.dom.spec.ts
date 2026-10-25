@@ -217,14 +217,15 @@ describe('carousel', () => {
 })
 
 describe('carousel naming', () => {
-  test('an emptied label leaves the host unnamed, not named with nothing', async () => {
+  test('an emptied name leaves the host unnamed, not named with nothing', async () => {
     /* The distinction `hostAria` exists for. `ariaLabel = ''` is a name of no
        characters, which a screen reader announces as an unnamed control while
        every check for "is it labeled" passes. Assigning the property straight
        through hands that broken half to a consumer who empties the label on
-       purpose, which is what you do when a wrapper already names the thing. */
+       purpose, which is what you do when a wrapper already names the thing.
+       The built-in name is emptied as well, or it would stand in. */
     const host = (await mount(
-      '<helix-headless-carousel label=""></helix-headless-carousel>',
+      '<helix-headless-carousel fallback-label="" label=""></helix-headless-carousel>',
     )) as Updatable & {
       internals: ElementInternals
     }

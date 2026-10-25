@@ -118,7 +118,7 @@ type Player = HTMLElement & {
  * @documentation https://fusion.dev/helix/components/video-playlist
  *
  * @slot - The entries.
- * @slot empty - Shown while the playlist has no entries. Defaults to `empty-label`.
+ * @slot empty - Shown while the playlist has no entries. Defaults to `empty-text`.
  * @slot player - The player that plays the entries.
  *
  * @event {HelixActivateEvent} helix-activate - The current entry changed. The playlist already holds the new entry when this is sent, and `detail.previous` is the entry it left. `currentEntry` is the entry itself, with its `src`, `poster` and name.
@@ -159,18 +159,32 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   droppedLabel = 'Dropped'
 
   /**
+   * The old name of `empty-text`, read only where a page sets it.
+   *
+   * @deprecated Use `empty-text`. Removed in the next release.
+   */
+  @property({ attribute: 'empty-label' })
+  emptyLabel?: string
+
+  /**
    * What the playlist says while it has no entries. The `empty` slot replaces it.
    */
   @words
-  @property({ attribute: 'empty-label' })
-  emptyLabel = 'No videos'
+  @property({ attribute: 'empty-text' })
+  emptyText = 'No videos'
+
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Playlist'
 
   /**
    * The list's name, read by screen readers.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Playlist'
+  label = ''
 
   /**
    * What screen readers hear each time a key moves an entry, in a
@@ -802,10 +816,10 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
        is the one an empty state must never be. */
     const empty = this.childrenKnown && this.items.length === 0
     return html`<div part="player"><slot name="player"></slot></div>
-      <div part="items" role="list" aria-label=${this.label}>
+      <div part="items" role="list" aria-label=${this.label || this.fallbackLabel}>
         <slot></slot>
       </div>
-      ${empty ? html`<div part="empty"><slot name="empty">${this.emptyLabel}</slot></div>` : nothing}
+      ${empty ? html`<div part="empty"><slot name="empty">${this.emptyLabel ?? this.emptyText}</slot></div>` : nothing}
       ${drawStatus(this.status)}`
   }
 }

@@ -26,12 +26,12 @@ import { styles } from './notifications-root.css.js'
  *
  * @slot - The notifications.
  * @slot empty - Replaces the words of `empty-text` in the `empty` part, such as a picture and a line of your own.
- * @slot error - Replaces the words of `load-error` in the `error` part, such as a line with a retry button.
+ * @slot error - Replaces the words of `error-text` in the `error` part, such as a line with a retry button.
  * @slot footer - Below the list, for a link to everything.
  * @slot header - Above the list, for a title and the mark-all control.
  * @slot loading - Replaces the words of `loading-text` in the `loading` part, such as a loader.
  *
- * @csspart error - The line `load-error` shows under the rows, in the danger color.
+ * @csspart error - The line `error-text` shows under the rows, in the danger color.
  * @csspart list - The list itself.
  * @csspart live - A copy of the empty, loading and error messages, in a live region that screen readers announce when they change. Visually hidden in the styled tier.
  * @csspart mark-all - The control that marks everything read.

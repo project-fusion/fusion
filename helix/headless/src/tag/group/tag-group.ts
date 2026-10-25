@@ -60,7 +60,7 @@ export type TagSelectionMode = SelectionMode
  * **Removing the last tag keeps focus in the group.** With no tags left the
  * set is a `group`, and focus moves to its `empty` part,
  * which holds the `empty` slot: put words there such as "No filters" for a
- * reader to hear. With nothing slotted it says `empty-label`, "No tags".
+ * reader to hear. With nothing slotted it says `empty-text`, "No tags".
  * Where only disabled tags are left, the first of them holds the tab stop and
  * takes focus, so the reader stays in the set.
  *
@@ -76,7 +76,7 @@ export type TagSelectionMode = SelectionMode
  * @documentation https://fusion.dev/helix/components/tag
  *
  * @slot - The tags, in the order they are read.
- * @slot empty - Shown in place of the tags while there are none, such as "No filters". Its fallback is `empty-label`.
+ * @slot empty - Shown in place of the tags while there are none, such as "No filters". Its fallback is `empty-text`.
  *
  * @event {Event} change - Fired once a press has changed which tags are selected.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired before a press changes which tags are selected, with the `value` it would leave. Cancelable.
@@ -88,7 +88,7 @@ export type TagSelectionMode = SelectionMode
 export class HelixHeadlessTagGroup extends HelixElement {
   /**
    * The key this part's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-tag-group': { emptyLabel: 'Keine Schlagwörter' } })`.
+   * `registerWords('de', { 'helix-tag-group': { emptyText: 'Keine Schlagwörter' } })`.
    */
   static words = 'helix-tag-group'
 
@@ -101,12 +101,20 @@ export class HelixHeadlessTagGroup extends HelixElement {
   disallowEmptySelection = false
 
   /**
+   * The old name of `empty-text`, read only where a page sets it.
+   *
+   * @deprecated Use `empty-text`. Removed in the next release.
+   */
+  @property({ attribute: 'empty-label' })
+  emptyLabel?: string
+
+  /**
    * The words the group shows and says once its last tag is removed, where
    * nothing is in the `empty` slot.
    */
   @words
-  @property({ attribute: 'empty-label' })
-  emptyLabel = 'No tags'
+  @property({ attribute: 'empty-text' })
+  emptyText = 'No tags'
 
   /**
    * The name of the set, such as "Filters", which a screen reader announces
@@ -532,7 +540,7 @@ export class HelixHeadlessTagGroup extends HelixElement {
        set is empty. The `empty` part only while it is, so a set of tags
        renders what it did. */
     const empty = this.empty
-      ? html`<div part="empty" tabindex="-1"><slot name="empty">${this.emptyLabel}</slot></div>`
+      ? html`<div part="empty" tabindex="-1"><slot name="empty">${this.emptyLabel ?? this.emptyText}</slot></div>`
       : nothing
     return html`<slot @slotchange=${this.handleSlotchange}></slot>${empty}`
   }

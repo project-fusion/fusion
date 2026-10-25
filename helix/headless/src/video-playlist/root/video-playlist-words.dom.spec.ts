@@ -42,8 +42,8 @@ const menu = (host: Updatable): Updatable =>
   host.querySelector('helix-headless-video-playlist-menu') as Updatable
 
 const GERMAN = {
-  'helix-video-playlist': { label: 'Wiedergabeliste' },
-  'helix-video-playlist-menu': { label: 'Folgen' },
+  'helix-video-playlist': { fallbackLabel: 'Wiedergabeliste' },
+  'helix-video-playlist-menu': { fallbackLabel: 'Folgen' },
 }
 
 describe('a video playlist on a page in another language', () => {

@@ -995,7 +995,7 @@ describe('what the player says', () => {
 
   test('the stall says the consumer words, in the live region that announces them', async () => {
     const { host, video } = await media(
-      '<helix-headless-video loading-label="Still fetching" src="/clip.mp4"></helix-headless-video>',
+      '<helix-headless-video loading-text="Still fetching" src="/clip.mp4"></helix-headless-video>',
     )
     video.dispatchEvent(new Event('waiting'))
     await host.updateComplete
@@ -1004,7 +1004,7 @@ describe('what the player says', () => {
 
   test('and the refusal does too, in the one that interrupts', async () => {
     const { host, video } = await media(
-      '<helix-headless-video error-label="No luck with that one" src="/clip.mp4"></helix-headless-video>',
+      '<helix-headless-video error-text="No luck with that one" src="/clip.mp4"></helix-headless-video>',
     )
     video.dispatchEvent(new Event('error'))
     await host.updateComplete

@@ -188,6 +188,11 @@ export class HelixHeadlessFind extends MixinControllerOpen(HelixElement) {
   @property({ attribute: 'controls-label' })
   controlsLabel = 'Find controls'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Find'
+
   /**
    * The id of the element whose text Find searches, in the same tree as Find.
    * With a finder attached, it names only where the find key opens the bar.
@@ -200,10 +205,13 @@ export class HelixHeadlessFind extends MixinControllerOpen(HelixElement) {
   @property({ attribute: 'invalid-label' })
   invalidLabel = 'Not a valid regular expression'
 
-  /** The field's name and placeholder, and the name of the bar. */
-  @words
+  /**
+   * The field's name and placeholder, and the name of the bar.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
+   */
   @property()
-  label = 'Find'
+  label = ''
 
   /** Whether case has to match, so "Error" does not find "error". The reader turns it on and off from the bar. */
   @property({ attribute: 'match-case', type: Boolean })
@@ -834,7 +842,7 @@ export class HelixHeadlessFind extends MixinControllerOpen(HelixElement) {
     return html`<div
         part="bar"
         role="search"
-        aria-label=${this.label}
+        aria-label=${this.label || this.fallbackLabel}
         ?hidden=${!this.open}
         @keydown=${this.handleKeys}
       >
@@ -842,9 +850,9 @@ export class HelixHeadlessFind extends MixinControllerOpen(HelixElement) {
         <input
           part="field"
           aria-invalid=${this.readable ? nothing : 'true'}
-          aria-label=${this.label}
+          aria-label=${this.label || this.fallbackLabel}
           autocomplete="off"
-          placeholder=${this.label}
+          placeholder=${this.label || this.fallbackLabel}
           spellcheck="false"
           type="search"
           .value=${live(this.query)}

@@ -36,9 +36,13 @@ const mounted = async (around: string, extra = ''): Promise<Host> => {
 const WORDS = { 'helix-tabs': { label: 'Reiter' } }
 
 describe('on a page in another language', () => {
-  test('names its list of tabs in the registered words', async () => {
+  /* "Tabs" was its built-in name. `label` is the page's now, and no word
+     registered for it reaches it. */
+  test('names its list of tabs only by the page, whatever is registered', async () => {
     registerWords('de', WORDS)
-    expect(part(await mounted('lang="de"'), 'tabs')?.getAttribute('aria-label')).toBe('Reiter')
-    expect(part(await mounted(''), 'tabs')?.getAttribute('aria-label')).toBe('Tabs')
+    expect(part(await mounted('lang="de"'), 'tabs')?.hasAttribute('aria-label')).toBe(false)
+    expect(
+      part(await mounted('lang="de"', 'label="Ansichten"'), 'tabs')?.getAttribute('aria-label'),
+    ).toBe('Ansichten')
   })
 })

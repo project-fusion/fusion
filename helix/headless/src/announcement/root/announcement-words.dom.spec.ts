@@ -33,13 +33,13 @@ const announcement = async (around = '', attributes = ''): Promise<Updatable> =>
 
 describe('announcement words', () => {
   test('the region is named by the word registered for the nearest lang', async () => {
-    registerWords('de', { 'helix-announcement': { label: 'Mitteilung' } })
+    registerWords('de', { 'helix-announcement': { fallbackLabel: 'Mitteilung' } })
     expect(label(await announcement('lang="de"'))).toBe('Mitteilung')
     expect(label(await announcement())).toBe('Announcement')
   })
 
   test('an empty label still leaves no region, whatever is registered', async () => {
-    registerWords('de', { 'helix-announcement': { label: 'Mitteilung' } })
+    registerWords('de', { 'helix-announcement': { fallbackLabel: 'Mitteilung' } })
     const host = await announcement('lang="de"', 'label=""')
     expect([label(host), role(host)]).toEqual([null, null])
   })

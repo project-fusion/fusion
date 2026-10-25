@@ -1,4 +1,5 @@
 import {
+  auditName,
   CommandController,
   customElement,
   focusItemOf,
@@ -146,15 +147,21 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
   @property({ reflect: true })
   completion?: 'passed'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Steps'
+
   /**
    * The sequence's name, read by screen readers.
    *
    * A list of stages is a landmark a reader arrives at out of order, so it
    * needs a name of its own rather than borrowing the heading above it.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Steps'
+  label = ''
 
   /**
    * Whether a reader has to finish each stage, or pass an `optional` one,
@@ -515,13 +522,20 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label, role: 'list' })
+    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'list' })
     const known = this.known
     this.toggleState('complete', known.length > 0 && known.every((step) => step.complete))
   }
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    /* Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'steps',
+      () => this.label !== '',
+    )
     this.finishHydration()
   }
 
@@ -553,7 +567,7 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
       <div
         part="progress"
         role="progressbar"
-        aria-label=${this.label}
+        aria-label=${this.label || this.fallbackLabel}
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow=${progress}

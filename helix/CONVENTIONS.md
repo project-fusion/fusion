@@ -1708,7 +1708,42 @@ declares it. So every English default a component ships is a word property, and
   `aria-label` and a heading all leave it unnamed. `label` stays the page's
   name and empty by default, and the element reads `this.label ||
   this.fallbackLabel`. One spelling, so a page and a translator find it in
-  each family by one name.
+  each family by one name. `words` refuses a `label` with a default, which
+  42 classes had until October 25, 2026, eleven of them naming a landmark or
+  a set.
+- **A built-in name does not repeat the role.** A screen reader says the role
+  after the name, so a tree named "Tree" is read as "Tree tree", which the
+  APG's naming guidance advises against. `words` refuses a `label` or a
+  `fallbackLabel` default holding a role the module writes. Tabs, Toolbar,
+  Tree and Meter have no built-in name for that reason; Carousel's is
+  "Slides" and Log's is "Output".
+- **A family whose name a page should give calls `auditName`**, so a
+  development build warns where the page left it to the fallback or to
+  nothing: `auditName(this, () => null, 'tabs', () => this.label !== '')` in
+  `firstUpdated`, with the sentence that says how to name it in `FIXES`. A
+  family whose fallback is the right name for nearly every page does not:
+  Copy Button's "Copy", and the landmarks a page has one of, Breadcrumbs'
+  "Breadcrumb", Navigation's "Main", Outline's "On this page", Pagination's
+  "Pagination" and Notifications' "Notifications". Navigation warns instead
+  where two of them share a name.
+- **Words an element shows in place of its content end in `-text`, and a name
+  ends in `-label`.** `empty-text`, `loading-text`, `error-text` and
+  `no-results-text` are what a collection shows for its state; `fallback-label`,
+  `remove-label` and `moved-label` name a thing or say what a screen reader
+  hears about a change. Until October 25, 2026 the first set was also spelled
+  `empty-label`, `loading-label`, `load-error` and, on Video, `error-label`.
+  Each of those stays a deprecated `@property` with no default for one
+  release, read only where a page sets it. A validation message ends in
+  `Message`, as below, which is why the segmented fields' `empty-message`
+  keeps its name.
+- **A collection message is an attribute and a slot.** The attribute is a word
+  property: the words the part shows by default and the words the live region
+  says. A slot of the state's name, `empty`, `loading` or `error`, takes
+  richer content, such as a link or a picture, and replaces only what is
+  shown, so the live region still says the attribute's words: a slot holds
+  markup, and markup is no sentence. A family with the slot declares the
+  attribute too. Canvas's `empty` and `loading` slots and Device Screen's
+  `empty` slot have no attribute yet.
 - **A mixin's words resolve under its host's key.** The mixin writes
   `static words = ''` and `@words` on its own words; a host with no key reads
   its tag name. A family that rewords one, such as Tag's `Remove {label}` over

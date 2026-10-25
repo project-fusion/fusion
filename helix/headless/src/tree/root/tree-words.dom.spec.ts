@@ -36,17 +36,20 @@ const mounted = async (around: string, extra = ''): Promise<Host> => {
 const WORDS = {
   'helix-tree': {
     droppedLabel: 'Abgelegt',
-    label: 'Baum',
     movedLabel: '{name} an Position {position} von {count} verschoben',
   },
 }
 
 describe('on a page in another language', () => {
-  test('names itself in the registered words, and moves in them', async () => {
+  /* "Tree" was its built-in name, which a screen reader read as "Tree
+     tree". It has none now, so only the page names it. */
+  test('moves in the registered words, and is named only by the page', async () => {
     registerWords('de', WORDS)
     const host = await mounted('lang="de"')
-    expect(part(host, 'tree')?.getAttribute('aria-label')).toBe('Baum')
+    expect(part(host, 'tree')?.hasAttribute('aria-label')).toBe(false)
     expect(host.droppedLabel).toBe('Abgelegt')
-    expect(part(await mounted(''), 'tree')?.getAttribute('aria-label')).toBe('Tree')
+    expect(
+      part(await mounted('lang="de"', 'label="Dateien"'), 'tree')?.getAttribute('aria-label'),
+    ).toBe('Dateien')
   })
 })

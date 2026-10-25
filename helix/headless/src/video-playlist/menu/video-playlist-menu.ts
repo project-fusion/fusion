@@ -66,15 +66,21 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
    */
   static words = 'helix-video-playlist-menu'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Episodes'
+
   /**
    * The name of the menu and its trigger, read by screen readers.
    *
    * "Episodes" suits a series and is wrong for a set of camera angles, and the
    * component cannot know which one it is in.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Episodes'
+  label = ''
 
   /**
    * Where the menu opens relative to its trigger.
@@ -240,13 +246,13 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
   protected renderMenu(): TemplateResult {
     return html`<${this.tag('menu')} part="menu"
     exportparts="back: menu-back, back-mark: menu-back-mark, empty: menu-empty, header: menu-header,
-      live: menu-live, loading: menu-loading, search-field: menu-search-field, surface: menu-surface, title: menu-title" label=${this.label} placement=${this.placement}
+      live: menu-live, loading: menu-loading, search-field: menu-search-field, surface: menu-surface, title: menu-title" label=${this.label || this.fallbackLabel} placement=${this.placement}
       @toggle=${this.heardToggle}>
       <slot name="trigger" slot="trigger">
         <button
           part="trigger"
           type="button"
-          aria-label=${this.label}
+          aria-label=${this.label || this.fallbackLabel}
           aria-haspopup="menu"
           aria-expanded=${this.open ? 'true' : 'false'}
         >${drawIcon(list)}</button>

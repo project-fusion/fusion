@@ -54,7 +54,7 @@ const steps = async (around: string): Promise<HTMLElement> => {
 
 const FRENCH = {
   'helix-step': { completedLabel: 'Étape {name} terminée', completeLabel: 'Terminée' },
-  'helix-steps': { label: 'Étapes', progressLabel: '{share, number, percent} terminé' },
+  'helix-steps': { fallbackLabel: 'Étapes', progressLabel: '{share, number, percent} terminé' },
 }
 
 describe('steps on a page in another language', () => {

@@ -39,7 +39,7 @@ const splitter = async (around: string, extra = ''): Promise<HTMLElement> => {
 }
 
 const FRENCH = {
-  'helix-splitter': { collapsedLabel: 'Replié', label: 'Redimensionner les volets' },
+  'helix-splitter': { collapsedLabel: 'Replié', fallbackLabel: 'Redimensionner les volets' },
 }
 
 describe('a splitter on a page in another language', () => {

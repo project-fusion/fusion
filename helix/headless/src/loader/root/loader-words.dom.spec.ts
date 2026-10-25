@@ -33,7 +33,7 @@ const loader = async (around = ''): Promise<Updatable> => {
 
 describe('loader words', () => {
   test('is named by the word registered for the nearest lang, and in English as before', async () => {
-    registerWords('de', { 'helix-loader': { label: 'Wird geladen' } })
+    registerWords('de', { 'helix-loader': { fallbackLabel: 'Wird geladen' } })
     expect(label(await loader('lang="de"'))).toBe('Wird geladen')
     expect(label(await loader())).toBe('Loading')
   })

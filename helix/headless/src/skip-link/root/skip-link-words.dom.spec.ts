@@ -33,7 +33,7 @@ const mounted = async (around: string, extra = ''): Promise<Host> => {
   return host
 }
 
-const WORDS = { 'helix-skip-link': { label: 'Zum Inhalt springen' } }
+const WORDS = { 'helix-skip-link': { fallbackLabel: 'Zum Inhalt springen' } }
 
 describe('on a page in another language', () => {
   test('shows the registered words where nothing is slotted', async () => {

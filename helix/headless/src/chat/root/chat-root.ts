@@ -1,6 +1,7 @@
 import {
   assignSlot,
   auditChildren,
+  auditName,
   ChildrenController,
   customElement,
   deepActiveElement,
@@ -1632,6 +1633,17 @@ export class HelixHeadlessChat extends MixinCollection(HelixElement) {
         <span part="resume-mark" aria-hidden="true">${drawIcon(arrowDown)}</span>${this.resumeLabel}
       </button></slot
     >`
+  }
+
+  protected override firstUpdated(changed: PropertyValues): void {
+    super.firstUpdated(changed)
+    /* Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'chat',
+      () => this.label !== '',
+    )
   }
 
   protected override render(): TemplateResult {

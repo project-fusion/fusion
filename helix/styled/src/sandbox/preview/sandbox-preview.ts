@@ -313,6 +313,11 @@ export class HelixSandboxPreview extends HelixElement {
   @property()
   direction?: 'rtl'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Preview'
+
   /**
    * The packages an example can import by name in the built-in document,
    * each mapped to the address of an ES module, as an import map's `imports`.
@@ -324,10 +329,11 @@ export class HelixSandboxPreview extends HelixElement {
 
   /**
    * The frame's name, read by screen readers.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Preview'
+  label = ''
 
   /**
    * How the example is placed in the frame.
@@ -764,12 +770,12 @@ export class HelixSandboxPreview extends HelixElement {
     }
     tab.opener = null
     const { body } = tab.document
-    tab.document.title = this.label
+    tab.document.title = this.label || this.fallbackLabel
     body.style.margin = '0'
     const frame = tab.document.createElement('iframe')
     frame.setAttribute('allow', ALLOW)
     frame.setAttribute('sandbox', SANDBOX)
-    frame.title = this.label
+    frame.title = this.label || this.fallbackLabel
     frame.style.cssText = 'block-size: 100vh; border: none; display: block; inline-size: 100vw'
     if (this.src === '') {
       frame.srcdoc = defaultFrame(this.map)
@@ -994,7 +1000,7 @@ frame.onload = () => frame.contentWindow.postMessage(${JSON.stringify(this.messa
       @load=${this.handleFrameLoad}
       src=${this.src || nothing}
       srcdoc=${this.src === '' ? defaultFrame(this.map) : nothing}
-      title=${this.label}
+      title=${this.label || this.fallbackLabel}
       aria-describedby=${this.failure === undefined ? nothing : 'error'}
       allow=${ALLOW}
       sandbox=${SANDBOX}

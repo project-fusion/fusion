@@ -115,6 +115,11 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   @property({ converter: timeConverter('duration', undefined) })
   duration?: number
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Announcement'
+
   /**
    * The key that moves focus to the announcement's first control, and back
    * to where it was, written as keys joined by `+`, such as `F6` or `Alt+A`.
@@ -127,13 +132,13 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
 
   /**
    * The name of the announcement's region, which screen readers list among
-   * the page's landmarks. Translate it with the rest of your interface.
+   * the page's landmarks.
    *
-   * Empty leaves the announcement no region.
+   * Unset by default, which leaves the name to `fallbackLabel`. Empty leaves
+   * the announcement no region.
    */
-  @words
   @property()
-  label = 'Announcement'
+  label?: string
 
   /**
    * Whether the announcement waits its turn behind the queued announcements
@@ -260,8 +265,8 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
     super.willUpdate(changed)
     /* Through internals, so nothing is written onto the host. */
     hostAria(this.internals, {
-      label: this.label,
-      role: this.label.trim() && !this.waiting ? 'region' : '',
+      label: this.label ?? this.fallbackLabel,
+      role: (this.label ?? this.fallbackLabel).trim() && !this.waiting ? 'region' : '',
     })
     if ('ariaKeyShortcuts' in this.internals) {
       this.internals.ariaKeyShortcuts = ariaChord(this.hotkey, onApple()) || null

@@ -123,12 +123,18 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    */
   static words = 'helix-speed-dial'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Actions'
+
   /**
    * Accessible name for the trigger and the set of actions it opens.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Actions'
+  label = ''
 
   /**
    * The description the trigger gives under `open-on="long-press"`, saying how
@@ -624,7 +630,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
         aria-describedby=${held ? 'long-press' : nothing}
         aria-expanded=${this.open ? 'true' : 'false'}
         aria-haspopup="menu"
-        aria-label=${this.label}
+        aria-label=${this.label || this.fallbackLabel}
       >
         ${
           /* A glyph, so a consumer who slots no trigger does not get an empty
@@ -644,7 +650,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
         part="actions"
         popover="manual"
         role="menu"
-        aria-label=${this.label || nothing}
+        aria-label=${this.label || this.fallbackLabel || nothing}
         ?hidden=${!this.open}
       >
         <slot></slot>

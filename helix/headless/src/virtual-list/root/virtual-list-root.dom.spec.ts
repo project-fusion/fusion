@@ -277,15 +277,15 @@ describe('virtual list', () => {
     const quiet = await list(0)
     expect(part(quiet, 'empty')).toBeNull()
 
-    const said = await list(0, 'empty-label="No rows yet"')
+    const said = await list(0, 'empty-text="No rows yet"')
     const row = part(said, 'empty') as HTMLElement
     expect(row.getAttribute('role')).toBe('listitem')
     expect(row.textContent?.trim()).toBe('No rows yet')
 
-    const busy = await list(0, 'empty-label="No rows yet" loading')
+    const busy = await list(0, 'empty-text="No rows yet" loading')
     expect(part(busy, 'empty')).toBeNull()
 
-    const full = await list(3, 'empty-label="No rows yet"')
+    const full = await list(3, 'empty-text="No rows yet"')
     expect(part(full, 'empty')).toBeNull()
   })
 
@@ -813,7 +813,7 @@ describe('loading more', () => {
     expect(part(host, 'viewport')?.getAttribute('aria-busy')).toBe('true')
     // After the room the undrawn rows stand for, so it closes the list.
     expect(row.previousElementSibling?.getAttribute('part')).toBe('after')
-    host.loadingLabel = 'Fetching files'
+    host.loadingText = 'Fetching files'
     await settle(host)
     expect(row.textContent?.trim()).toBe('Fetching files')
   })

@@ -33,12 +33,12 @@ const toast = async (around: string, extra = ''): Promise<HTMLElement> => {
 
 describe('a toast region on a page in another language', () => {
   test('is named in the registered words, with its key put in', async () => {
-    registerWords('de', { 'helix-toast': { label: 'Benachrichtigungen ({hotkey})' } })
+    registerWords('de', { 'helix-toast': { fallbackLabel: 'Benachrichtigungen ({hotkey})' } })
     expect(label(await toast('lang="de"', 'hotkey="Alt+T"'))).toBe('Benachrichtigungen (Alt+T)')
   })
 
   test('keeps the English where nothing is registered for the language', async () => {
-    registerWords('de', { 'helix-toast': { label: 'Benachrichtigungen ({hotkey})' } })
+    registerWords('de', { 'helix-toast': { fallbackLabel: 'Benachrichtigungen ({hotkey})' } })
     expect(label(await toast('lang="fr"'))).toBe('Notifications (F8)')
   })
 })

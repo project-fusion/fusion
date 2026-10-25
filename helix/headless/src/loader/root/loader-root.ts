@@ -89,6 +89,11 @@ export class HelixHeadlessLoader extends HelixElement {
   @property({ converter: timeConverter('delay', 0) })
   delay = 0
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Loading'
+
   /**
    * The id of the region being loaded, which is marked `aria-busy` while the
    * loader is on the page.
@@ -110,10 +115,11 @@ export class HelixHeadlessLoader extends HelixElement {
   /**
    * The loader's name, announced by screen readers while the work is in
    * progress.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Loading'
+  label = ''
 
   /** The wait `delay` asks for, and whether it has run out. */
   private readonly due = new DelayController(this)
@@ -213,7 +219,7 @@ export class HelixHeadlessLoader extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     hostAria(this.internals, {
-      label: this.idle ? '' : this.label,
+      label: this.idle ? '' : this.label || this.fallbackLabel,
       role: this.idle ? '' : 'progressbar',
     })
     this.internals.ariaBusy = this.idle ? null : 'true'

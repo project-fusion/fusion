@@ -988,11 +988,11 @@ describe('choosing the option already chosen', () => {
 describe('the statuses a combobox hands its list', () => {
   const list = (host: Updatable): HTMLElement => part(host as HTMLElement, 'listbox') as HTMLElement
 
-  test('`no-results-text` and `load-error` reach the list', async () => {
-    const host = await combobox('no-results-text="Nothing like it" load-error="Offline"')
-    const inner = list(host) as HTMLElement & { loadError: string; noResultsText?: string }
+  test('`no-results-text` and `error-text` reach the list', async () => {
+    const host = await combobox('no-results-text="Nothing like it" error-text="Offline"')
+    const inner = list(host) as HTMLElement & { errorText: string; noResultsText?: string }
     expect(inner.noResultsText).toBe('Nothing like it')
-    expect(inner.loadError).toBe('Offline')
+    expect(inner.errorText).toBe('Offline')
     expect(part(inner, 'error')?.textContent?.trim()).toBe('Offline')
     const plain = await combobox('no-results-text="Nothing like it"')
     await type(plain, 'zzz')
@@ -1003,23 +1003,23 @@ describe('the statuses a combobox hands its list', () => {
 
   /* Removing the attribute gives the property null, which the combobox read
      as an error: its own `error` state stayed on. */
-  test('removing `load-error`, or setting it to null, clears the error state', async () => {
+  test('removing `error-text`, or setting it to null, clears the error state', async () => {
     const states = (host: Updatable) =>
       (host as unknown as { internals: ElementInternals }).internals.states
-    const host = (await combobox('load-error="Offline"')) as Updatable & {
-      loadError: string | null
+    const host = (await combobox('error-text="Offline"')) as Updatable & {
+      errorText: string | null
     }
     await settle(host)
     expect(states(host).has('error')).toBe(true)
-    ;(host as unknown as HTMLElement).removeAttribute('load-error')
+    ;(host as unknown as HTMLElement).removeAttribute('error-text')
     await settle(host)
     await settle(list(host) as unknown as Updatable)
     expect(states(host).has('error')).toBe(false)
     expect(part(list(host), 'error')).toBeNull()
-    host.loadError = 'Offline'
+    host.errorText = 'Offline'
     await settle(host)
     expect(states(host).has('error')).toBe(true)
-    host.loadError = null
+    host.errorText = null
     await settle(host)
     await settle(list(host) as unknown as Updatable)
     expect(states(host).has('error')).toBe(false)
@@ -1031,7 +1031,7 @@ describe('the statuses a combobox hands its list', () => {
   test('`error` and `no-results` are states of the host as well', async () => {
     const states = (host: Updatable) =>
       (host as unknown as { internals: ElementInternals }).internals.states
-    const failing = await combobox('load-error="Offline"')
+    const failing = await combobox('error-text="Offline"')
     await settle(failing)
     expect(states(failing).has('error')).toBe(true)
     const host = await combobox()

@@ -22,7 +22,7 @@ import { styles } from './virtual-list-root.css.js'
  *
  * @csspart after - The space that stands in for the rows below the rendered ones.
  * @csspart before - The space that stands in for the rows above the rendered ones.
- * @csspart empty - The row shown when there are no items and none are loading, where `empty-label` or the `empty` slot gives it content.
+ * @csspart empty - The row shown when there are no items and none are loading, where `empty-text` or the `empty` slot gives it content.
  * @csspart loading - The row after the last item while `loading` is set.
  * @csspart viewport - The scrolling box.
  *

@@ -220,6 +220,11 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
   @property({ attribute: 'empty-text' })
   emptyText = 'No times to choose from'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Time'
+
   /**
    * Help under the times, such as the hours a shop is open, read by screen
    * readers as the list's description. A message in `feedback` replaces it.
@@ -254,10 +259,11 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    *
    * An `aria-label` or `aria-labelledby` on the host names the list instead,
    * and so does a label slotted into `label`, which is also drawn above it.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Time'
+  label = ''
 
   /**
    * Language tag the times and the wheels' names are written in.
@@ -1048,7 +1054,7 @@ export class HelixHeadlessTimePicker extends MixinPickerFeedback(
    */
   private get listName(): string {
     const slotted = this.labelSlotted ? slottedWords(this, ['label']) : ''
-    return hostWords(this, slotted || this.label)
+    return hostWords(this, slotted || this.label || this.fallbackLabel)
   }
 
   /** Whether a hint is slotted, which draws the `hint` part around it. */

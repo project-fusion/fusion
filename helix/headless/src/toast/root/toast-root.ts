@@ -122,6 +122,11 @@ export class HelixHeadlessToast extends HelixElement {
    */
   static words = 'helix-toast'
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Notifications ({hotkey})'
+
   /**
    * The key that takes focus to the stack and back, such as `F8` or `Alt+T`:
    * keys joined by `+`, the last one the key, as `Announcement`'s `hotkey`
@@ -139,10 +144,11 @@ export class HelixHeadlessToast extends HelixElement {
   /**
    * Accessible name for the region, with `{hotkey}` filled in. Translate it with
    * the rest of your interface.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Notifications ({hotkey})'
+  label = ''
 
   /**
    * How many messages show at once. The messages after that many wait, hidden
@@ -206,7 +212,7 @@ export class HelixHeadlessToast extends HelixElement {
        news to both and could be said twice. The two `live` parts say each
        arrival once instead, in the voice its tone asks for. */
     hostAria(this.internals, {
-      label: formatWords(this, 'label', { hotkey: this.hotkey }),
+      label: formatWords(this, this.label ? 'label' : 'fallbackLabel', { hotkey: this.hotkey }),
       role: 'region',
     })
   }

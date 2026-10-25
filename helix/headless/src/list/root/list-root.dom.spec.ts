@@ -56,7 +56,7 @@ const settled = async (markup: string): Promise<Updatable> => {
 describe('an empty list', () => {
   test('shows the empty row where it was given words, as a list item, and takes the empty state', async () => {
     const list = await settled(
-      '<helix-headless-list label="Files" empty-label="No files yet"></helix-headless-list>',
+      '<helix-headless-list label="Files" empty-text="No files yet"></helix-headless-list>',
     )
     const row = part(list, 'empty') as HTMLElement
     expect(row.getAttribute('role')).toBe('listitem')
@@ -85,7 +85,7 @@ describe('an empty list', () => {
 
   test('drops the row and the state once a row arrives', async () => {
     const list = await settled(
-      '<helix-headless-list label="Files" empty-label="No files yet"></helix-headless-list>',
+      '<helix-headless-list label="Files" empty-text="No files yet"></helix-headless-list>',
     )
     list.append(document.createElement('helix-headless-list-item'))
     await new Promise((done) => setTimeout(done, 0))
@@ -236,7 +236,7 @@ describe('a list that loads more', () => {
 
   test('shows its loading row as a grid row with one cell in a list that selects, and no empty row', async () => {
     const list = await settled(
-      '<helix-headless-list label="Files" selection-mode="single" loading empty-label="None"></helix-headless-list>',
+      '<helix-headless-list label="Files" selection-mode="single" loading empty-text="None"></helix-headless-list>',
     )
     const row = part(list, 'loading') as HTMLElement
     expect(row.getAttribute('role')).toBe('row')

@@ -159,19 +159,33 @@ export class HelixSandboxConsole extends HelixElement {
   controls = false
 
   /**
+   * The old name of `empty-text`, read only where a page sets it.
+   *
+   * @deprecated Use `empty-text`. Removed in the next release.
+   */
+  @property({ attribute: 'empty-label' })
+  emptyLabel?: string
+
+  /**
    * Text shown before anything has been written, and while the level filter
    * hides every line.
    */
   @words
-  @property({ attribute: 'empty-label' })
-  emptyLabel = 'Nothing written to the console yet.'
+  @property({ attribute: 'empty-text' })
+  emptyText = 'Nothing written to the console yet.'
+
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Console output'
 
   /**
    * The log's name, read by screen readers.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Console output'
+  label = ''
 
   /**
    * The quietest level shown: `info` hides plain logs, `warn` shows warnings
@@ -361,8 +375,8 @@ export class HelixSandboxConsole extends HelixElement {
         resume-button: output-resume-button, resume-mark: output-resume-mark, row: output-row,
         toolbar: output-toolbar"
         collapse
-        empty-text=${this.emptyLabel}
-        label=${this.label}
+        empty-text=${this.emptyLabel ?? this.emptyText}
+        label=${this.label || this.fallbackLabel}
         level=${this.level ?? nothing}
         limit=${LIMIT}
         quiet

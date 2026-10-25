@@ -40,7 +40,7 @@ const bubble = (host: HTMLElement): string =>
 describe('a date picker on a page in another language', () => {
   test('names its controls in the words registered for the nearest `lang`', async () => {
     registerWords('pl', {
-      'helix-date-picker': { label: 'Kalendarz', nextLabel: 'Następny miesiąc' },
+      'helix-date-picker': { fallbackLabel: 'Kalendarz', nextLabel: 'Następny miesiąc' },
     })
     const host = await picker('lang="pl"', 'default-month="2026-01"')
     expect(part(host, 'next')?.getAttribute('aria-label')).toBe('Następny miesiąc')

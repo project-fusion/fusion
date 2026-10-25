@@ -141,10 +141,23 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
   @property({ converter: timeConverter('delay', 600) })
   delay = 600
 
+  /**
+   * The old name of `empty-text`, read only where a page sets it.
+   *
+   * @deprecated Use `empty-text`. Removed in the next release.
+   */
+  @property({ attribute: 'empty-label' })
+  emptyLabel?: string
+
   /** What the sheet says when the page has no shortcuts. */
   @words
-  @property({ attribute: 'empty-label' })
-  emptyLabel = 'No shortcuts on this screen.'
+  @property({ attribute: 'empty-text' })
+  emptyText = 'No shortcuts on this screen.'
+
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Keyboard shortcuts'
 
   /**
    * The key a reader holds: `mod` (Command on an Apple keyboard, Control
@@ -153,10 +166,13 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
   @property()
   hold: HoldKey = 'mod'
 
-  /** The sheet's name and heading. */
-  @words
+  /**
+   * The sheet's name and heading.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
+   */
   @property()
-  label = 'Keyboard shortcuts'
+  label = ''
 
   /**
    * The chord that opens the sheet, `?` by default, which a press in a text
@@ -409,16 +425,16 @@ export class HelixHeadlessShortcutOverlay extends HelixElement {
       part="sheet"
       exportparts="body: sheet-body, dismiss: sheet-dismiss, dismiss-mark: sheet-dismiss-mark,
         footer: sheet-footer, header: sheet-header, surface: sheet-surface"
-      label=${this.label}
+      label=${this.label || this.fallbackLabel}
       .open=${this.sheetOpen}
       @close=${() => {
         this.sheetOpen = false
       }}
     >
-      <h2 slot="header">${this.label}</h2>
+      <h2 slot="header">${this.label || this.fallbackLabel}</h2>
       ${
         this.rows.length === 0
-          ? html`<p part="empty">${this.emptyLabel}</p>`
+          ? html`<p part="empty">${this.emptyLabel ?? this.emptyText}</p>`
           : html`<dl part="list">
               ${this.rows.map(
                 (row) =>

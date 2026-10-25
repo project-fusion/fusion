@@ -65,6 +65,11 @@ export class HelixHeadlessMapRaster extends HelixElement {
   @property()
   description?: string
 
+  /** The name the element gives itself where `label` is empty. */
+  @words
+  @property({ attribute: 'fallback-label' })
+  fallbackLabel = 'Overlay'
+
   /** Which of `frames` shows, counting from `0`. Starts at the last frame. */
   @property({ converter: numberConverter('frame', undefined) })
   frame?: number
@@ -88,13 +93,6 @@ export class HelixHeadlessMapRaster extends HelixElement {
   @property()
   group?: string
 
-  /**
-   * How long each frame shows while `playing`, in milliseconds. The attribute
-   * also takes a CSS time, such as `0.6s`.
-   */
-  @property({ converter: timeConverter('interval', 600) })
-  interval = 600
-
   /** Marks this as a layer for the frame and the connector, whatever its tag. */
   readonly isMapLayer = true
 
@@ -102,12 +100,20 @@ export class HelixHeadlessMapRaster extends HelixElement {
   readonly layerKind = 'raster' as const
 
   /**
+   * How long each frame shows while `playing`, in milliseconds. The attribute
+   * also takes a CSS time, such as `0.6s`.
+   */
+  @property({ converter: timeConverter('interval', 600) })
+  interval = 600
+
+  /**
    * The layer's name in the frame's list and its tile in the layers menu.
    * Defaults to "Overlay", so neither is ever a control with no name.
+   *
+   * Empty by default, which leaves the name to `fallbackLabel`.
    */
-  @words
   @property()
-  label = 'Overlay'
+  label = ''
 
   /**
    * The deepest zoom the provider has tiles for. The map enlarges those tiles

@@ -776,15 +776,15 @@ describe('the no-results and error lines', () => {
     expect(hasState(host, 'no-results')).toBe(true)
   })
 
-  test('`load-error` shows under the options and is heard', async () => {
-    const host = (await list('load-error="Could not load people"')) as Updatable & {
-      loadError: string
+  test('`error-text` shows under the options and is heard', async () => {
+    const host = (await list('error-text="Could not load people"')) as Updatable & {
+      errorText: string
     }
     expect(part(host, 'error')?.textContent?.trim()).toBe('Could not load people')
     expect(live(host)).toBe('Could not load people')
     expect(hasState(host, 'error')).toBe(true)
     expect(host.querySelectorAll('helix-headless-option').length).toBeGreaterThan(0)
-    host.loadError = ''
+    host.errorText = ''
     await settle(host)
     expect(part(host, 'error')).toBeNull()
     expect(hasState(host, 'error')).toBe(false)
@@ -793,18 +793,18 @@ describe('the no-results and error lines', () => {
   /* Removing the attribute gives the property null, which the list read as
      an error with no words: the state stayed on and the error part stayed
      drawn, empty. */
-  test('removing `load-error`, or setting it to null, clears the error', async () => {
-    const host = (await list('load-error="Could not load people"')) as Updatable & {
-      loadError: string | null
+  test('removing `error-text`, or setting it to null, clears the error', async () => {
+    const host = (await list('error-text="Could not load people"')) as Updatable & {
+      errorText: string | null
     }
-    host.removeAttribute('load-error')
+    host.removeAttribute('error-text')
     await settle(host)
     expect(part(host, 'error')).toBeNull()
     expect(hasState(host, 'error')).toBe(false)
-    host.loadError = 'Offline'
+    host.errorText = 'Offline'
     await settle(host)
     expect(hasState(host, 'error')).toBe(true)
-    host.loadError = null
+    host.errorText = null
     await settle(host)
     expect(part(host, 'error')).toBeNull()
     expect(hasState(host, 'error')).toBe(false)

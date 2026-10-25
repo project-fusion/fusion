@@ -94,7 +94,10 @@ const FIXES = new Map([
   ['button', 'Give it words, a `label`, or an `aria-label`.'],
   ['button-group', 'Give it a `label`, or an `aria-label` that says what the buttons are for.'],
   ['canvas', 'Give it a `label` that says what the board holds, such as "Release plan".'],
+  ['carousel', 'Give it a `label` that says what the slides show, such as "Featured products".'],
+  ['chat', 'Give it a `label` that names the conversation, such as "Support".'],
   ['dialog', 'Give it a `label`, or a heading in the `header` slot.'],
+  ['drilldown', 'Give it a `label` that says what the pages hold, such as "Settings".'],
   [
     'field',
     'Give it a `label`, an `aria-label`, words in its label, or a `<label for>` that names it.',
@@ -102,14 +105,18 @@ const FIXES = new Map([
   ['graph', 'Give it a `label` that says what the notes are, such as "Research notes".'],
   ['lightbox', 'Give it a `label`, such as "Project photos".'],
   ['list', 'Give it a `label`, or an `aria-label` that says what the rows are.'],
+  ['log', 'Give it a `label` that says what the log holds, such as "Build output".'],
   ['map', 'Give it a `label` that says what the map shows, such as "Stores in Edinburgh".'],
+  ['meter', 'Give it a `label`, or words in its `label` slot, that say what it measures.'],
   ['popover', 'Give it a `label`, or a heading in the panel.'],
   ['row', 'Give the row words in its default slot, or a label on the icon it holds.'],
   ['sandbox', 'Give each source pane a `label` or a `name`, which its file tab shows.'],
+  ['steps', 'Give it a `label` that says what the steps lead to, such as "Checkout".'],
   [
     'table',
     'Give it a `label`, or put a heading in its `heading` slot, that says what the rows are.',
   ],
+  ['tabs', 'Give it a `label`, or an `aria-labelledby` that names the heading above it.'],
   [
     'time-picker',
     'Give it a `label`, a label in the `label` slot, or an `aria-label` that says what the time is for.',
@@ -118,6 +125,7 @@ const FIXES = new Map([
     'toggle',
     'Give it words in its default slot, an `aria-label`, or a label on the icon it holds.',
   ],
+  ['toolbar', 'Give it a `label` that says what its controls act on, such as "Formatting".'],
   ['tour', 'Give it a `label`, such as "Getting started".'],
   ['tree', 'Give it a `label` that says what it holds, such as "Files".'],
   ['video', 'Give it a `label` that says what the video shows, such as "Product tour".'],
@@ -199,12 +207,15 @@ export const auditName = (
       return
     }
     const placeholder = [host, inner].some((one) => one?.getAttribute('placeholder')?.trim())
+    const fallback = (host as HTMLElement & { fallbackLabel?: unknown }).fallbackLabel
     const sentence = FIXES.get(fix) ?? fix
     reportRuntime({
       kind: 'missing-name',
       message: placeholder
         ? `<${host.localName}> is named only by its placeholder, which is gone once a person types. ${sentence}`
-        : `<${host.localName}> has no accessible name, so a screen reader announces it by its role alone. ${sentence}`,
+        : typeof fallback === 'string' && fallback.trim() !== ''
+          ? `<${host.localName}> has no accessible name of its own, only its built-in "${fallback}", which says nothing about this one. ${sentence}`
+          : `<${host.localName}> has no accessible name, so a screen reader announces it by its role alone. ${sentence}`,
       tag: host.localName,
     })
   })

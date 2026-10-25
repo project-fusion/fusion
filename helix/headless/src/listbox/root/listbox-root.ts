@@ -167,7 +167,7 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  *
  * @slot - The options, and any groups of them.
  * @slot empty - What the list shows when it has no options to show, for content richer than `empty-text`.
- * @slot error - What the list shows while `load-error` is set, for content richer than its text.
+ * @slot error - What the list shows while `error-text` is set, for content richer than its text.
  * @slot feedback - The message that says what is wrong, for content richer than a string. It shows while there is a message.
  * @slot filter-icon - The icon in the filter field. Defaults to a magnifying glass.
  * @slot hint - The hint, for content richer than plain text.
@@ -187,7 +187,7 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * @event {Event} input - Fired after the value changes.
  *
  * @csspart empty - The text shown when the list has no options to show, or the filter hides every one. `:state(no-results)` is set for the second.
- * @csspart error - The text shown while `load-error` is set.
+ * @csspart error - The text shown while `error-text` is set.
  * @csspart feedback - The message that says what is wrong with the value.
  * @csspart filter-icon - The icon beside the filter field.
  * @csspart filter-mark - The default icon beside the filter field, shown when none is slotted.
@@ -205,7 +205,7 @@ type Entry = HelixHeadlessOption | (DataOption & { href?: undefined })
  * @csspart voice-status - What a screen reader hears as dictation starts and stops, drawn for no one else.
  *
  * @cssstate empty - The list has no options to show: none were given, or the filter hid every one.
- * @cssstate error - While `load-error` is set.
+ * @cssstate error - While `error-text` is set.
  * @cssstate invalid - The control has an error to show, from the browser's validation or from your `feedback`.
  * @cssstate listening - While the field listens for dictation. The element sets `--dictation-level` on itself meanwhile, from 0 to 1, for a meter.
  * @cssstate loading - While `loading` is set.
@@ -267,6 +267,17 @@ export class HelixHeadlessListbox extends MixinVoice(
 
   /** What the list is narrowed to, whoever set it. */
   private filterState: string | undefined = undefined
+
+  /**
+   * What the list says when its options could not be loaded, such as after a
+   * request to a server fails. Empty, null or no attribute is no error, so
+   * removing the attribute clears it.
+   *
+   * Set, it shows under any options there are, in place of `empty-text` and
+   * `loading-text`, and a screen reader hears it. Clear it when you ask again.
+   */
+  @property({ attribute: 'error-text' })
+  errorText: string | null = ''
 
   /**
    * @internal Set by `Command` under `home-end="list"`: whether Home and End
@@ -360,6 +371,12 @@ export class HelixHeadlessListbox extends MixinVoice(
   @property({ attribute: false })
   items: readonly DataOptionItem[] | undefined = undefined
 
+  /** Draws `items` a window at a time. See core's `OptionWindowController`. */
+  private readonly data = new OptionWindowController(this, {
+    current: () => this.currentValue,
+    items: () => this.items,
+  })
+
   /**
    * How the options are laid out, which the arrow keys follow: `stack`, one
    * under another, or `grid`, in rows and columns, as React Aria's `ListBox`
@@ -375,22 +392,13 @@ export class HelixHeadlessListbox extends MixinVoice(
   @property({ reflect: true })
   layout?: 'grid' | 'stack'
 
-  /** Draws `items` a window at a time. See core's `OptionWindowController`. */
-  private readonly data = new OptionWindowController(this, {
-    current: () => this.currentValue,
-    items: () => this.items,
-  })
-
   /**
-   * What the list says when its options could not be loaded, such as after a
-   * request to a server fails. Empty, null or no attribute is no error, so
-   * removing the attribute clears it.
+   * The old name of `error-text`, read only where a page sets it.
    *
-   * Set, it shows under any options there are, in place of `empty-text` and
-   * `loading-text`, and a screen reader hears it. Clear it when you ask again.
+   * @deprecated Use `error-text`. Removed in the next release.
    */
   @property({ attribute: 'load-error' })
-  loadError: string | null = ''
+  loadError?: string | null
 
   /**
    * Stops the arrow keys from choosing each option they move to. Enter, Space
@@ -1672,7 +1680,7 @@ export class HelixHeadlessListbox extends MixinVoice(
    */
   protected override renderStatus(hasContent: boolean): TemplateResult | typeof nothing {
     if (this.failed) {
-      return html`<p part="error"><slot name="error">${this.loadError}</slot></p>`
+      return html`<p part="error"><slot name="error">${this.loadError || this.errorText}</slot></p>`
     }
     if (!this.loading && hasContent) {
       return nothing
@@ -1707,14 +1715,15 @@ export class HelixHeadlessListbox extends MixinVoice(
     )
   }
 
-  /** Whether `load-error` holds words, which a removed attribute does not. */
+  /** Whether `error-text` holds words, which a removed attribute does not. */
   private get failed(): boolean {
-    return Boolean(this.loadError)
+    return Boolean(this.loadError || this.errorText)
   }
 
   /** The error, or what a filter that hid everything says, before the shared words. */
   protected override renderLive(hasContent: boolean): TemplateResult {
-    const words = this.loadError || (this.noResults ? this.noResultsText : undefined)
+    const words =
+      this.loadError || this.errorText || (this.noResults ? this.noResultsText : undefined)
     return words === undefined
       ? super.renderLive(hasContent)
       : html`<span part="live" role="status">${words}</span>`

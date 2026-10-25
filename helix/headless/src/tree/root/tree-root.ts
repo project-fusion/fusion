@@ -153,10 +153,12 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
    *
    * An `aria-label` or `aria-labelledby` on the host names the tree too, and
    * wins over this.
+   *
+   * Empty by default, so a page that leaves it empty gives the element no
+   * name, and a development build warns.
    */
-  @words
   @property()
-  label = 'Tree'
+  label = ''
 
   /**
    * What screen readers hear when an item moves into another branch, in a
@@ -929,13 +931,13 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
     this.syncItems()
-    /* Named only by the default, the tree is "Tree" to a screen reader.
+    /* A tree has no built-in name, so one the page did not name is unnamed.
        Development builds only. */
     auditName(
       this,
       () => null,
       'tree',
-      () => this.hasAttribute('label') || this.label !== 'Tree',
+      () => this.label !== '',
     )
   }
 
@@ -958,7 +960,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
       role="tree"
       aria-busy=${this.loading ? 'true' : nothing}
       aria-multiselectable=${this.multiple ? 'true' : nothing}
-      aria-label=${this.label}
+      aria-label=${this.label || nothing}
     >
       <slot
         @slotchange=${(event: Event) => {

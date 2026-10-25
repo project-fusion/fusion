@@ -1,11 +1,11 @@
 import {
   AriaForwardController,
+  auditName,
   closestInstance,
   customElement,
   HelixElement,
   ToolbarController,
   toolbarAround,
-  words,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
@@ -105,10 +105,12 @@ export class HelixHeadlessToolbar extends HelixElement {
    *
    * An `aria-label` or `aria-labelledby` on the host names the toolbar too,
    * and wins over this.
+   *
+   * Empty by default, so a page that leaves it empty gives the element no
+   * name, and a development build warns.
    */
-  @words
   @property()
-  label = 'Toolbar'
+  label = ''
 
   /** Carries a host `aria-label` and `aria-labelledby` to the toolbar. */
   protected readonly aria = new AriaForwardController(this, {
@@ -173,6 +175,13 @@ export class HelixHeadlessToolbar extends HelixElement {
 
   protected override firstUpdated(changed: PropertyValues): void {
     super.firstUpdated(changed)
+    /* Development builds only. */
+    auditName(
+      this,
+      () => null,
+      'toolbar',
+      () => this.label !== '',
+    )
     void this.tabStop.claim()
   }
 
@@ -196,7 +205,7 @@ export class HelixHeadlessToolbar extends HelixElement {
     return html`<div
       part="toolbar"
       role=${nested ? 'group' : 'toolbar'}
-      aria-label=${this.label}
+      aria-label=${this.label || nothing}
       aria-orientation=${nested ? nothing : this.axis}
     >
       <slot @slotchange=${() => this.tabStop.claim()}></slot>

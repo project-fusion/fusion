@@ -4,7 +4,7 @@ import type {
   clearWords as ClearWords,
   registerWords as RegisterWords,
 } from '@fusion.dev/helix-core'
-import { label, part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 /* Imported once the DOM is registered: core reads the globals it finds as
    it is evaluated, and a static import breaks the DOM when this file runs
@@ -48,16 +48,14 @@ const said = async (host: Meter, value: number): Promise<string> => {
 const FRENCH = {
   'helix-meter': {
     bandLabels: { poor: 'Presque plein' },
-    label: 'Jauge',
     liveLabel: '{band} : {reading}',
   },
 }
 
 describe('meter words', () => {
-  test('the name and the live sentence are the words registered for the nearest lang', async () => {
+  test('the live sentence is the words registered for the nearest lang', async () => {
     registerWords('fr', FRENCH)
     const host = await meter('lang="fr"')
-    expect(label(host)).toBe('Jauge')
     expect(await said(host, 92)).toBe(
       `Presque plein : ${new Intl.NumberFormat('fr', { maximumFractionDigits: 0, style: 'percent' }).format(0.92)}`,
     )
