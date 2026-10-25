@@ -2141,7 +2141,8 @@ export class Column extends HTMLElement {{
 }
 
 /// Exactly two files: the last `layer` sheet and, hardcoded under the last
-/// `layers` source, `button/root/button-root.css`.
+/// `layers` source, `button/root/button-root.generated.css` or, where there
+/// is none, `button/root/button-root.css`.
 #[test]
 fn recipes() {
     let element = |color: &str| {

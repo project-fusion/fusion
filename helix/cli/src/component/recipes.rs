@@ -48,9 +48,9 @@ const CELLS: [(&str, &str, &str); 3] = [
         r#"^:host\(\[emphasis="([a-z]+)"\]\) \[part="button"\]$"#,
     ),
     (
-        "emphasis hover",
-        r#"^\[data-button="([a-z]+)"\]:not\(:disabled\):hover$"#,
-        r#"^:host\(:not\(:disabled\)\[emphasis="([a-z]+)"\]\) \[part="button"\]:hover$"#,
+        "emphasis hover and press",
+        r#"^\[data-button="([a-z]+)"\]:not\(:disabled\):is\(:hover, :active\)$"#,
+        r#"^:host\(:not\(:disabled\)\[emphasis="([a-z]+)"\]\) \[part="button"\]:is\(:hover, :active\)$"#,
     ),
 ];
 
@@ -60,9 +60,16 @@ static RULE: LazyLock<Regex> =
 static COMMENT: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(r"(?s)/\*.*?\*/").expect("a literal pattern compiles"));
 
-/// One space between tokens, so a wrapped `var()` reads as its own spelling.
+/// One space between tokens and none inside a parenthesis, so a wrapped
+/// `var()` reads as its own spelling: `var( --a, b )` written by hand is
+/// `var(--a, b)` as the compiler writes it.
 fn flatten(value: &str) -> String {
-    value.split_whitespace().collect::<Vec<&str>>().join(" ")
+    value
+        .split_whitespace()
+        .collect::<Vec<&str>>()
+        .join(" ")
+        .replace("( ", "(")
+        .replace(" )", ")")
 }
 
 /// Every rule in a sheet as `selector` to its declarations, each `property:
@@ -159,10 +166,14 @@ pub fn run(context: &Context) -> Report {
         return empty;
     };
     let recipe_at = context.root.join(layer);
-    let element_at = context
-        .root
-        .join(&styled.source)
-        .join("button/root/button-root.css");
+    /* The stylesheet `helix family stylesheets` writes from Button's table,
+    or one written by hand where a styled layer has no table. */
+    let folder = context.root.join(&styled.source).join("button/root");
+    let element_at = ["button-root.generated.css", "button-root.css"]
+        .iter()
+        .map(|name| folder.join(name))
+        .find(|path| path.is_file())
+        .unwrap_or_else(|| folder.join("button-root.css"));
     let (Ok(recipe), Ok(element)) = (
         fs::read_to_string(&recipe_at),
         fs::read_to_string(&element_at),
@@ -225,5 +236,18 @@ pub fn run(context: &Context) -> Report {
         findings,
         notes: Vec::new(),
         unit: "cells of the button matrix",
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::flatten;
+
+    #[test]
+    fn a_wrapped_value_reads_as_the_compiler_writes_it() {
+        assert_eq!(
+            flatten("var(\n    --button-fill,\n    color-mix(in oklab, red 14%, transparent)\n  )"),
+            "var(--button-fill, color-mix(in oklab, red 14%, transparent))"
+        );
     }
 }

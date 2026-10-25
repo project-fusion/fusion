@@ -20,10 +20,13 @@ mod args;
 mod component;
 mod config;
 mod diagnostics;
+#[cfg(feature = "internal")]
+mod family;
 mod manifest;
 mod mcp;
 mod new;
 mod scan;
+mod shared;
 mod theme;
 
 use std::path::PathBuf;
@@ -32,6 +35,8 @@ use fusion_rules::error::Failure;
 use fusion_rules::exit::Code;
 use fusion_rules::style::Paint;
 
+#[cfg(feature = "internal")]
+use crate::args::Family;
 use crate::args::{Api, Cli, Component, Manifest, McpVerb, Noun, Theme};
 
 /// The word every printed failure opens with, and the corner of every screen.
@@ -119,7 +124,21 @@ fn main() {
         },
         Noun::Diagnostics(args) => diagnostics::run(args, &from, cli.json, paint),
         Noun::New(args) => new::run(args, &from, cli.json, paint),
+        #[cfg(feature = "internal")]
+        Noun::Family { verb } => match verb {
+            Family::Build(args) => family::build(args, &from, cli.json),
+            Family::Capabilities(args) => family::capabilities(args, &from, cli.json),
+            Family::Check(args) => family::check(args, &from, cli.json),
+            Family::Components(args) => family::components(args, &from, cli.json),
+            Family::DesignTokens(args) => family::design_tokens(args, &from, cli.json),
+            Family::Machines(args) => family::machines(args, &from, cli.json),
+            Family::Platforms(args) => family::platforms(args, &from),
+            Family::Stylesheets(args) => family::stylesheets(args, &from, cli.json),
+            Family::Tokens(args) => family::tokens(args, &from, cli.json),
+            Family::Types(args) => family::types(args, &from, cli.json),
+        },
         Noun::Scan(args) => scan::run(args, &from, cli.json, paint),
+        Noun::Shared(args) => shared::run(args, &from, cli.json, paint),
         Noun::Theme { verb } => match verb {
             Theme::Audit(args) => theme::audit::run(args, &from, cli.json, paint),
             Theme::Build(args) => theme::build::run(args, &from, cli.json),
