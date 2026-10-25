@@ -419,7 +419,7 @@ describe('the object property React is holding', () => {
   /* **In the first render, and with no second update after it.** Assigned from
      `firstUpdated`, the value scheduled an update as the first one finished,
      which Lit's development build reports as `change-in-update`: Command's
-     `filterMatch` and Chat Composer's `placeholders` did in the Hartley app.
+     `filterMatch` and Chat Composer's `placeholders` did in a desktop app.
      `updateComplete` resolves `false` while another update is pending. */
   test('is rendered by the first update, with no update after it', async () => {
     const rows = [{ name: 'Ines Duarte' }]

@@ -537,7 +537,7 @@ export class HelixElement extends LitElement {
    * **Before the render, because `firstUpdated` is too late.** A value
    * assigned there schedules a second update as the first one finishes, which
    * Lit's development build reports as `change-in-update`: Command's
-   * `filterMatch` did in the Hartley app until October 14, 2026. A hydrating
+   * `filterMatch` did in a desktop app until October 14, 2026. A hydrating
    * render has to be the server's, so that element looks in `firstUpdated`,
    * where `finishHydration` asks for the update after it anyway.
    */

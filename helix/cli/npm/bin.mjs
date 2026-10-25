@@ -231,12 +231,11 @@ const run = (binary) => {
 }
 
 /**
- * What a build here asks cargo for: the selection `rs:build` and CI build,
- * the workspace without the desktop app's shell. The shell links the system's
- * webview, which a machine building only the command lines may not have: on
- * CI's runner its `glib-sys` found no `glib-2.0` and every rule check failed.
+ * What a build here asks cargo for: the selection `rs:build` and CI build, the
+ * whole workspace. Kept in one place, so the build this runs and the build
+ * `rs:build` runs unify the same features and neither undoes the other's work.
  */
-const SELECTION = ['--workspace', '--exclude', 'fusion-hartley-desktop']
+const SELECTION = ['--workspace']
 
 /* **In this repository, cargo is asked first, and asking is cheap.** A binary
    under `target/` is whatever the last build left, so after an edit to a rule,
