@@ -1,5 +1,5 @@
 import type { LitElement } from 'lit'
-import { auditReactProps } from '#react-audit'
+import { auditReactMissing, auditReactProps } from '#react-audit'
 
 /*
  * What a Helix element does about React's hydration, kept out of the base class.
@@ -19,6 +19,30 @@ import { auditReactProps } from '#react-audit'
  * `fusion x workspace audit`'s `react-bridge` reads `REACT_PROPS` out of whichever
  * file declares it and holds the installed `react-dom` to the version the
  * notes below were measured against.
+ *
+ * **The measured range.** Measured against React 19.3.1 on October 25, 2026,
+ * by `fusion/scripts/check-react-versions.mjs`, which renders a page with
+ * `renderToString` and hydrates it in Chromium, production and development
+ * builds, definitions loaded before and after `hydrateRoot`:
+ *
+ * ```
+ * react-dom                          bridge needed   bridge works
+ * 18.3.1                             yes             first press only, see below
+ * 19.0.9                             yes             yes
+ * 19.2.9                             yes             yes
+ * 19.3.1 (latest)                    yes             yes
+ * 19.3.0-canary-a6b912fb-20261023    yes             yes
+ * ```
+ *
+ * "Needed" is read off a plain custom element given the same handler and
+ * array: on every version, React reached neither. On React 18 the first press
+ * and the array arrive, but React 18 binds no `on` prop on a custom element at
+ * all, so each commit that hands it a new handler leaves the old one bound
+ * here as well: two calls after one commit, three after two. Helix supports
+ * React 19. The workflow `react-versions.yml` asks the same each week of
+ * `latest` and `canary`, and says when a version stops needing this file; the
+ * site's `check-hydration.mjs` asks the React the site installs, on every
+ * pull request.
  */
 
 /**
@@ -93,13 +117,14 @@ const REACT_LISTENING = '_reactListening'
 const REACT_EVENTS = '__reactEvents$'
 
 /**
- * Whether React has a root in the document a node is in.
+ * The mark React left on the document a node is in, if React has a root there.
  *
  * A scan of the document's own keys, which are `location` and little else:
- * much cheaper than a scan of each element waiting to look.
+ * much cheaper than a scan of each element waiting to look. The mark's random
+ * suffix is one React's own, so it also tells one React on a page from another.
  */
-const reactOnPage = (node: Node): boolean =>
-  Object.keys(node.ownerDocument ?? node).some(
+const reactMarkOf = (node: Node): string | undefined =>
+  Object.keys(node.ownerDocument ?? node).find(
     (key) => key.startsWith(REACT_LISTENING) || key.startsWith(REACT_EVENTS),
   )
 
@@ -155,6 +180,22 @@ interface Looking {
  */
 const looking: Looking[] = []
 
+/**
+ * The root marks of the pages where an element has found React's props.
+ *
+ * **What makes a silent break loud.** A document carrying React's root mark
+ * where no element ever finds a props bag is the one way this file fails
+ * without a symptom of its own: React renamed the key, every handler on a
+ * server-rendered page is dead again, and nothing says so. An element whose
+ * window closes on such a page is handed to `auditReactMissing`, which in a
+ * development build says so once. See `react-audit.ts`.
+ *
+ * Kept by mark rather than by document, because the mark's suffix is React's
+ * own: a second copy of React on the page is a second question, and a spec can
+ * stand for a new page by writing a new mark.
+ */
+const found = new Set<string>()
+
 /** The ticks run so far, so an element can count its own. */
 let ticks = 0
 
@@ -166,11 +207,12 @@ let booked = false
  * where `applied` says the first update did not, and says whether it found
  * any.
  */
-const take = (host: LitElement, applied: boolean): boolean => {
+const take = (host: LitElement, applied: boolean, mark: string): boolean => {
   const props = reactPropsOf(host)
   if (props === undefined) {
     return false
   }
+  found.add(mark)
   if (!applied) {
     applyReactProperties(host)
   }
@@ -189,18 +231,20 @@ const tick = (): void => {
   ticks += 1
   const now = performance.now()
   let page: Node | undefined
-  let react = false
+  let mark: string | undefined
   let kept = 0
   for (const one of looking) {
     const own = one.host.ownerDocument ?? one.host
     if (own !== page) {
       page = own
-      react = reactOnPage(one.host)
+      mark = reactMarkOf(one.host)
     }
-    const done =
-      (react && take(one.host, false)) ||
-      (ticks - one.after >= LOOK_FOR / LOOK_EVERY && now - one.since >= LOOK_FOR)
-    if (!done) {
+    const taken = mark !== undefined && take(one.host, false, mark)
+    const over = ticks - one.after >= LOOK_FOR / LOOK_EVERY && now - one.since >= LOOK_FOR
+    if (!taken && over && mark !== undefined && !found.has(mark)) {
+      auditReactMissing(one.host, LOOK_FOR, mark)
+    }
+    if (!(taken || over)) {
       looking[kept] = one
       kept += 1
     }
@@ -234,7 +278,8 @@ const book = (): void => {
  * set.
  */
 export const lookForReact = (host: LitElement, applied: boolean): void => {
-  if (!(reactOnPage(host) && take(host, applied))) {
+  const mark = reactMarkOf(host)
+  if (!(mark !== undefined && take(host, applied, mark))) {
     looking.push({ after: ticks, host, since: performance.now() })
     book()
   }
@@ -244,8 +289,9 @@ export const lookForReact = (host: LitElement, applied: boolean): void => {
  * Binds the handler React is holding for this event, if it has not bound it.
  *
  * **React attaches no custom element listener while hydrating.** Measured in
- * Chrome against 19.2.8, and reported against 19.3 in facebook/react#35446,
- * still open on October 25, 2026: on a server-rendered page every `onhelix-*` prop is
+ * Chromium on every 19 release in the range above, and reported in
+ * facebook/react#35446, still open on October 25, 2026, with its fix
+ * (facebook/react#37797) unmerged: on a server-rendered page every `onhelix-*` prop is
  * dead, whatever it is called, until React commits an update for some other
  * reason, at which point it silently starts working. That is why it looks fine
  * while developing and fails on a page somebody actually loaded. It is React's
@@ -287,8 +333,8 @@ const REACT_WIRES = new Set(['scroll', 'scrollend'])
  * The prop React would be holding for this event, if it is holding one.
  *
  * **A relayed native event needs a different answer from one of ours, and
- * getting it wrong doubles every call.** Measured against React 19.2.8, and
- * not measured since:
+ * getting it wrong doubles every call.** Measured against React 19.3.1 on
+ * October 25, 2026, on a client mount, as it was on 19.2.8 before it:
  *
  * ```
  * onhelix-before-change <- helix-before-change  REACHED (React binds it with addEventListener)

@@ -111,3 +111,65 @@ export const auditReactProps = (host: EventTarget, props: Record<string, unknown
     }
   }
 }
+
+/**
+ * The prefix of the mark React leaves on the node it makes a root in.
+ *
+ * `createRoot` and `hydrateRoot` write it and a random suffix on their
+ * container, which is the document itself on a Next.js App Router page and a
+ * `<div>` everywhere else. Read from the source of 17.0.2 and 18.2.0 and from
+ * react-dom 19.3.1, as the bridge's own two marks were.
+ */
+const REACT_CONTAINER = '__reactContainer$'
+
+/** The root marks of the pages already told that no element found React's props. */
+const told = new Set<string>()
+
+/** Whether a node is in the tree React renders into, its root's container or below it. */
+const insideReact = (host: Node): boolean => {
+  for (let node: Node | null = host.parentNode; node !== null; node = node.parentNode) {
+    if (Object.keys(node).some((key) => key.startsWith(REACT_CONTAINER))) {
+      return true
+    }
+  }
+  return false
+}
+
+/**
+ * Says so when React has a root on the page and no element found its props.
+ *
+ * **The bridge's one silent failure.** It finds React's props by a prefix of
+ * React's own, so the day React renames that key every `onhelix-*` handler on
+ * a server-rendered page is dead again, and every object property a server
+ * dropped stays unset, with nothing in the console. The bridge calls this for
+ * an element whose window closed in a document carrying React's root mark,
+ * where no element has found a props bag, with the window it looked for and
+ * the mark, whose suffix is that React's own.
+ *
+ * **Only for an element React renders.** It has to sit in the document's own
+ * tree, never in a shadow root, which is where Lit renders most of this
+ * library's elements and where React holds nothing, and under the node React
+ * made its root in. A page whose React island renders no Helix element keeps
+ * its static ones outside that node, and is told nothing.
+ *
+ * **An error, once a page.** It means the elements cannot work with the React
+ * installed, which is a failure of the page rather than advice, and it is
+ * printed as `console.error` so a run that fails on the console fails here.
+ */
+export const auditReactMissing = (host: Node, window: number, mark: string): void => {
+  if (told.has(mark) || host.getRootNode() !== host.ownerDocument || !insideReact(host)) {
+    return
+  }
+  told.add(mark)
+  reportRuntime({
+    kind: 'react-props-missing',
+    level: 'error',
+    message:
+      `React has a root on this page, and no Helix element found the props React holds for it ` +
+      `within ${window} ms. Helix reads them under a key starting \`__reactProps$\`, and this ` +
+      'React no longer writes one. `onhelix-*` handlers on a server-rendered page will not run, and ' +
+      'object properties the server could not write will not arrive. Pin React to a version in the ' +
+      'range https://fusion.dev/helix/docs/using-the-elements states, and report the one installed.',
+    tag: host instanceof Element ? host.localName : undefined,
+  })
+}

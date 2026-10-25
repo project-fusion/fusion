@@ -421,6 +421,7 @@ diagnostics counts it by kind and tag. None fails a CI job.
 | `not-a-number` | A numeric attribute holds something that is not a number, such as `page-size="1O"`, or an attribute in milliseconds something that is not a time, such as `delay="soon"`, so the property keeps its default. Development builds only (the `development` export condition) |
 | `not-a-plot` | `connectSpatialScatterChart` or `connectSpatialSurfaceChart` was given an element that is not the chart it connects |
 | `picture-in-picture-refused` | The browser refused picture in picture |
+| `react-props-missing` | React has a root on the page and no element found the props it holds, so `onhelix-*` handlers and object properties never arrive. Printed as an error. Development builds only (the `development` export condition) |
 | `refused-length` | A grid's `min` is not a length it can write, so it lays out by `columns` |
 | `removed-callback` | A React prop is a callback that was removed and never ran from JSX. Development builds only (the `development` export condition) |
 | `served-rows-differ` | A data table's first drawn page differs from the rows the page served, so the rows change once it draws. Development builds only (the `development` export condition) |

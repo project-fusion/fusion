@@ -1,4 +1,4 @@
-import type { auditReactProps as audit } from './react-audit.js'
+import type { auditReactProps as audit, auditReactMissing as missing } from './react-audit.js'
 
 /**
  * The React prop audit in a production build: nothing.
@@ -10,3 +10,6 @@ import type { auditReactProps as audit } from './react-audit.js'
  * `react-audit.ts`.
  */
 export const auditReactProps: typeof audit = () => {}
+
+/** The missing-props error in a production build: nothing. See `react-audit.ts`. */
+export const auditReactMissing: typeof missing = () => {}
