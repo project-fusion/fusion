@@ -3,6 +3,7 @@ import {
   customElement,
   HelixFormElement,
   HostClickController,
+  internalsOf,
   ListedController,
   MixinControllerChecked,
   MixinField,
@@ -74,7 +75,7 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
   protected readonly listed = new ListedController(
     this,
     'press',
-    () => this.internals?.ariaKeyShortcuts,
+    () => internalsOf(this)?.ariaKeyShortcuts,
   )
 
   /**
@@ -135,7 +136,7 @@ export class HelixHeadlessSwitch extends MixinControllerChecked(MixinField(Helix
   private sync(): void {
     // `null` rather than the value when it is off, which is how a checkbox
     // behaves: an unticked box submits nothing rather than a blank.
-    this.internals.setFormValue(this.checked ? this.value : null)
+    internalsOf(this).setFormValue(this.checked ? this.value : null)
     this.reportRequired(!this.checked, this.valueMissingMessage, 'control')
   }
 

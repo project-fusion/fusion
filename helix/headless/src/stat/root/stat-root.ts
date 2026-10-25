@@ -3,6 +3,7 @@ import {
   formatNumber,
   HelixElement,
   hostAria,
+  internalsOf,
   numberConverter,
   reportRuntime,
   slotFilled,
@@ -132,9 +133,9 @@ export class HelixHeadlessStat extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     const labels = this.knownChildren.filter((child) => child.slot === 'label')
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label:
-        labels.length > 0 && !('ariaLabelledByElements' in this.internals)
+        labels.length > 0 && !('ariaLabelledByElements' in internalsOf(this))
           ? slottedWords(this, ['label'])
           : '',
       labelledBy: labels,

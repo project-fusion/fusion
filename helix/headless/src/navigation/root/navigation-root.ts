@@ -119,7 +119,7 @@ const warned = new WeakSet<HelixHeadlessNavigation>()
 export class HelixHeadlessNavigation extends HelixElement {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-navigation': { label: 'Hauptmenü' } })`.
+   * `registerWords('de', { 'helix-navigation': { fallbackLabel: 'Hauptmenü' } })`.
    */
   static words = 'helix-navigation'
 

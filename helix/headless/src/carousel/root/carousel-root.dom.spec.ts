@@ -2,6 +2,7 @@ import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
 import {
   hasLayout,
+  internalsOf,
   mount,
   part,
   registerDom,
@@ -38,7 +39,7 @@ describe('carousel', () => {
   test('announces itself as a carousel, not as a bare group', async () => {
     const cal = await carousel()
     expect(role(cal)).toBe('group')
-    expect(cal.internals?.ariaRoleDescription).toBe('carousel')
+    expect(internalsOf(cal)?.ariaRoleDescription).toBe('carousel')
     expect(cal.getAttributeNames()).toEqual(['label'])
   })
 
@@ -46,11 +47,11 @@ describe('carousel', () => {
     /* The slides' word was a property and the carousel's own was English
        whatever the page was written in. */
     const cal = await carousel('role-label="Karussell" slide-role-label=""')
-    expect(cal.internals?.ariaRoleDescription).toBe('Karussell')
+    expect(internalsOf(cal)?.ariaRoleDescription).toBe('Karussell')
     expect(panes(cal).every((pane) => !pane.hasAttribute('aria-roledescription'))).toBe(true)
     ;(cal as Carousel & { roleLabel: string }).roleLabel = ''
     await cal.updateComplete
-    expect(cal.internals?.ariaRoleDescription ?? null).toBe(null)
+    expect(internalsOf(cal)?.ariaRoleDescription ?? null).toBe(null)
   })
 
   test('names each slide by its place in the set', async () => {
@@ -229,7 +230,7 @@ describe('carousel naming', () => {
     )) as Updatable & {
       internals: ElementInternals
     }
-    expect(host.internals.ariaLabel).toBeNull()
+    expect(internalsOf(host).ariaLabel).toBeNull()
   })
 })
 
@@ -1022,7 +1023,8 @@ describe('a mouse dragging the track', () => {
   }
 
   const dragging = (cal: Carousel): boolean =>
-    (cal.internals as ElementInternals & { states?: Set<string> })?.states?.has('dragging') ?? false
+    (internalsOf(cal) as ElementInternals & { states?: Set<string> })?.states?.has('dragging') ??
+    false
 
   test('turns snapping off for the length of the drag, under mouse-drag', async () => {
     const cal = await carousel('mouse-drag')

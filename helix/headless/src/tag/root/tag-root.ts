@@ -5,6 +5,7 @@ import {
   formatWords,
   HelixElement,
   hostAria,
+  internalsOf,
   MixinDismissible,
   slottedWords,
   words,
@@ -96,7 +97,7 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
   override dismissLabel = 'Remove {label}'
 
   /**
-   * Whether the remove button is a tab stop of its own, outside a `Tag.Group`.
+   * @internal Whether the remove button is a tab stop of its own, outside a `Tag.Group`.
    *
    * A field that holds tags as its tokens, such as a `multiple` Combobox,
    * writes `false`: the field's text is its one tab stop, and the arrow keys
@@ -107,7 +108,7 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
   dismissTabStop = true
 
   /**
-   * Whether the tag holds its group's tab stop.
+   * @internal Whether the tag holds its group's tab stop.
    *
    * Written by `Tag.Group` on every tag it holds, and unset outside one, which
    * is how a tag knows it is a row. No attribute: it is coordination between
@@ -127,7 +128,8 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
    *
    * Written by the group from its own `value`, and unset where nothing can be
    * selected, which is what keeps `aria-selected` off a set that does not
-   * select.
+   * select. Public because it is the tag's own state as well, which a page
+   * reads to draw or count what is chosen.
    */
   @property({ attribute: false })
   selected?: boolean | undefined
@@ -183,12 +185,12 @@ export class HelixHeadlessTag extends MixinDismissible(HelixElement) {
      reader reaches it. */
   protected override willUpdate(changed: PropertyValues<this>): void {
     super.willUpdate(changed)
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: this.grouped ? this.words : '',
       role: this.grouped ? 'row' : '',
     })
-    this.internals.ariaSelected = this.selected === undefined ? null : String(this.selected)
-    this.internals.ariaDisabled = this.disabled ? 'true' : null
+    internalsOf(this).ariaSelected = this.selected === undefined ? null : String(this.selected)
+    internalsOf(this).ariaDisabled = this.disabled ? 'true' : null
     this.toggleState('selected', this.selected === true)
   }
 

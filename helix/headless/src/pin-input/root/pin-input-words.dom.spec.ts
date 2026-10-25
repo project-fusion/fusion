@@ -4,7 +4,7 @@ import type {
   clearWords as ClearWords,
   registerWords as RegisterWords,
 } from '@fusion.dev/helix-core'
-import { registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 /* Imported once the DOM is registered: core reads the globals it finds as
    it is evaluated, and a static import breaks the DOM when this file runs
@@ -34,8 +34,7 @@ const pin = async (around: string, attrs: string): Promise<HTMLElement> => {
   return host
 }
 
-const bubble = (host: HTMLElement): string =>
-  (host as unknown as { internals: ElementInternals }).internals.validationMessage
+const bubble = (host: HTMLElement): string => internalsOf(host).validationMessage
 
 describe('the sentence a pin input raises for a short code', () => {
   test('is one plural message in English', async () => {

@@ -5,6 +5,7 @@ import {
   HelixBeforeSelectEvent,
   HelixElement,
   hostAria,
+  internalsOf,
   StatusController,
   slottedWords,
   words,
@@ -233,7 +234,7 @@ export class HelixHeadlessStep extends HelixElement {
     super.willUpdate(changed)
     /* No `ariaCurrent` here: the name's button carries `aria-current="step"`,
        and the state is said once, on the control a reader is on. */
-    hostAria(this.internals, { role: 'listitem' })
+    hostAria(internalsOf(this), { role: 'listitem' })
     this.toggleState('invalid', this.invalid)
     this.toggleState('locked', this.locked)
   }

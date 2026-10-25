@@ -3,6 +3,7 @@ import {
   followLink,
   HelixElement,
   hostAria,
+  internalsOf,
   MIRROR_RULE,
   pressedOwnControl,
 } from '@fusion.dev/helix-core'
@@ -263,19 +264,19 @@ export class HelixHeadlessTableRow extends HelixElement {
     // and no rows, which is a broken table rather than a plain one.
     //
     // Set in `willUpdate`, which the server does call, unlike `connectedCallback`.
-    hostAria(this.internals, { role: 'row' })
+    hostAria(internalsOf(this), { role: 'row' })
     this.nameByHeader()
     /* `aria-selected` in a grid only, where the row is what a reader moves
        through: in a plain table a row is not a thing that can be selected,
        and its checkbox already says so. */
-    this.internals.ariaSelected = this.gridCell && this.selectable ? String(this.selected) : null
-    this.internals.ariaDisabled = this.disabled ? 'true' : null
-    this.internals.ariaRowIndex = this.rowIndex > 0 ? String(this.rowIndex) : null
+    internalsOf(this).ariaSelected = this.gridCell && this.selectable ? String(this.selected) : null
+    internalsOf(this).ariaDisabled = this.disabled ? 'true' : null
+    internalsOf(this).ariaRowIndex = this.rowIndex > 0 ? String(this.rowIndex) : null
     /* A tree's depth and whether a branch is open, in a grid, which is then a
        `treegrid`. A plain table's disclosure button says it instead. */
     const tree = this.gridCell && this.level > 0
-    this.internals.ariaLevel = tree ? String(this.level) : null
-    this.internals.ariaExpanded = tree && this.branch ? String(this.open) : null
+    internalsOf(this).ariaLevel = tree ? String(this.level) : null
+    internalsOf(this).ariaExpanded = tree && this.branch ? String(this.open) : null
     this.toggleState('expanded', this.branch && this.open)
     this.toggleState('selected', this.selectable && this.selected)
     this.toggleState('link', this.href !== '' && !this.disabled)
@@ -304,10 +305,10 @@ export class HelixHeadlessTableRow extends HelixElement {
     const header =
       (values ? cells.find((cell) => cell.hasAttribute('header')) : undefined) ?? cells[0]
     const own = this.hasAttribute('aria-label') || this.hasAttribute('aria-labelledby')
-    if ('ariaLabelledByElements' in this.internals) {
-      hostAria(this.internals, { labelledBy: header && !own ? [header] : [] })
+    if ('ariaLabelledByElements' in internalsOf(this)) {
+      hostAria(internalsOf(this), { labelledBy: header && !own ? [header] : [] })
     } else {
-      hostAria(this.internals, {
+      hostAria(internalsOf(this), {
         label: header && !own ? (header.textContent ?? '').replace(/\s+/g, ' ').trim() : '',
       })
     }

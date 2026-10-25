@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /** Read inside `beforeAll`, so it is a `let` rather than an import. */
 let FOLDS_UP_TO = 0
@@ -43,8 +43,8 @@ describe('avatar group', () => {
   test('is a named group, said through internals rather than as an attribute', async () => {
     const host = await group(3)
     expect(host.hasAttribute('role')).toBe(false)
-    expect(host.internals?.role).toBe('group')
-    expect(host.internals?.ariaLabel).toBe('Reviewers')
+    expect(internalsOf(host)?.role).toBe('group')
+    expect(internalsOf(host)?.ariaLabel).toBe('Reviewers')
   })
 
   test('counts what it is not showing', async () => {

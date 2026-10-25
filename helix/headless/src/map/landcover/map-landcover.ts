@@ -27,7 +27,7 @@ import { property } from 'lit/decorators.js'
 export class HelixHeadlessMapLandcover extends HelixElement {
   /**
    * The key this part's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-map-landcover': { label: 'Bodenbedeckung' } })`.
+   * `registerWords('de', { 'helix-map-landcover': { fallbackLabel: 'Bodenbedeckung' } })`.
    */
   static words = 'helix-map-landcover'
 

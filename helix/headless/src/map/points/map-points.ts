@@ -86,7 +86,7 @@ export interface MapPointsCollection {
 export class HelixHeadlessMapPoints extends HelixElement {
   /**
    * The key this part's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-map-points': { label: 'Orte' } })`.
+   * `registerWords('de', { 'helix-map-points': { fallbackLabel: 'Orte' } })`.
    */
   static words = 'helix-map-points'
 

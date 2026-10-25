@@ -168,7 +168,7 @@ const FOCUSABLE =
 export class HelixHeadlessSplitter extends HelixElement {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-splitter': { label: 'Bereiche anpassen' } })`.
+   * `registerWords('de', { 'helix-splitter': { fallbackLabel: 'Bereiche anpassen' } })`.
    */
   static words = 'helix-splitter'
 

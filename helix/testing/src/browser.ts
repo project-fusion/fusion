@@ -609,6 +609,30 @@ const reported: WeakMap<HTMLElement, FormValue> =
   shared.__helixReported ?? new WeakMap<HTMLElement, FormValue>()
 shared.__helixReported = reported
 
+/* The internals each element attached, shared across copies of this module
+   for the reason `reported` is. */
+const held = globalThis as typeof globalThis & {
+  __helixAttached?: WeakMap<Element, ElementInternals>
+}
+const attached: WeakMap<Element, ElementInternals> =
+  held.__helixAttached ?? new WeakMap<Element, ElementInternals>()
+held.__helixAttached = attached
+
+/**
+ * The `ElementInternals` an element attached, recorded as it attached them,
+ * because a Helix element keeps them off its own surface. The same helper as
+ * `dom.ts`'s. Throws for an element that attached none.
+ */
+export const internalsOf = (host: object | null | undefined): ElementInternals => {
+  const internals = host instanceof Element ? attached.get(host) : undefined
+  if (!internals) {
+    throw new Error(
+      `${host instanceof Element ? `<${host.localName}>` : String(host)} attached no internals.`,
+    )
+  }
+  return internals
+}
+
 /**
  * Nothing to register, but `setFormValue` is watched on the way past.
  *
@@ -634,6 +658,7 @@ export const registerDom = (): void => {
   const original = proto.attachInternals
   proto.attachInternals = function attachInternals(this: HTMLElement): ElementInternals {
     const internals = original.call(this)
+    attached.set(this, internals)
     const send = internals.setFormValue.bind(internals)
     internals.setFormValue = (value: FormValue, state?: FormValue): void => {
       reported.set(this, value)
@@ -816,9 +841,7 @@ export const logged = (): string[] => {
 
 /** The role a screen reader sees on the host. */
 export const role = (host: HTMLElement): string | null =>
-  host.getAttribute('role') ??
-  (host as unknown as { internals?: ElementInternals }).internals?.role ??
-  null
+  host.getAttribute('role') ?? attached.get(host)?.role ?? null
 
 /**
  * The accessible name a screen reader announces on the host.
@@ -830,9 +853,7 @@ export const role = (host: HTMLElement): string | null =>
  * precedence and why the attribute is checked first.
  */
 export const label = (host: HTMLElement): string | null =>
-  host.getAttribute('aria-label') ??
-  (host as unknown as { internals?: ElementInternals }).internals?.ariaLabel ??
-  null
+  host.getAttribute('aria-label') ?? attached.get(host)?.ariaLabel ?? null
 
 /**
  * Whether a component has recorded a custom state on itself.

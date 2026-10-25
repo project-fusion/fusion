@@ -6,6 +6,7 @@ import {
   formatWords,
   HelixElement,
   hostAria,
+  internalsOf,
   KeyboardNavigationController,
   MixinControllerActive,
   type NavigableItem,
@@ -522,7 +523,7 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'list' })
+    hostAria(internalsOf(this), { label: this.label || this.fallbackLabel, role: 'list' })
     const known = this.known
     this.toggleState('complete', known.length > 0 && known.every((step) => step.complete))
   }

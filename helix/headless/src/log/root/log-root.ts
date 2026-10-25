@@ -10,6 +10,7 @@ import {
   HelixPinEvent,
   HelixSelectEvent,
   hostAria,
+  internalsOf,
   MixinCollection,
   numberConverter,
   onUnlessFalse,
@@ -1350,7 +1351,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'region' })
+    hostAria(internalsOf(this), { label: this.label || this.fallbackLabel, role: 'region' })
     /* Every update, since a parser's steps change with the text as well as a
        page's `groups` do. */
     this.reopen(this.lastGroups)

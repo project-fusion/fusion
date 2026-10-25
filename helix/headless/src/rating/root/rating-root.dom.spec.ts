@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  formValue,
+  hasLayout,
+  internalsOf,
+  mount,
+  part,
+  registerDom,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -226,9 +233,7 @@ describe('the lowest score a rating offers', () => {
        the moment it rendered. */
     const host = await rating('min="2" name="score" required')
     expect((host as HTMLElement & { value: string }).value).toBe('')
-    expect(
-      (host as unknown as { internals: ElementInternals }).internals.validity.valueMissing,
-    ).toBe(true)
+    expect(internalsOf(host).validity.valueMissing).toBe(true)
     // Nothing submitted, as a radio group submits nothing: an empty entry reads as an answer.
     expect(formValue(host)).toBeNull()
   })

@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   formValue,
   hasState,
+  internalsOf,
   mount,
   part,
   registerDom,
@@ -94,8 +95,8 @@ describe('textarea', () => {
       '<helix-headless-textarea label="A" name="notes" dirname="notes.dir" default-value="hi"></helix-headless-textarea>',
     )) as Updatable & { internals: ElementInternals; value: string }
     const states: unknown[] = []
-    const report = host.internals.setFormValue.bind(host.internals)
-    host.internals.setFormValue = (value, state) => {
+    const report = internalsOf(host).setFormValue.bind(internalsOf(host))
+    internalsOf(host).setFormValue = (value, state) => {
       states.push(state)
       report(value, state)
     }

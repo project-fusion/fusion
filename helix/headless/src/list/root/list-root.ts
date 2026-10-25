@@ -12,6 +12,7 @@ import {
   hostAria,
   inlineStep,
   inRowOrder,
+  internalsOf,
   KeyboardNavigationController,
   type NavigableItem,
   numberConverter,
@@ -865,9 +866,9 @@ export class HelixHeadlessList extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label, role: this.interactive ? 'grid' : 'list' })
-    this.internals.ariaBusy = this.loading ? 'true' : null
-    this.internals.ariaMultiSelectable = this.selectionMode === 'multiple' ? 'true' : null
+    hostAria(internalsOf(this), { label: this.label, role: this.interactive ? 'grid' : 'list' })
+    internalsOf(this).ariaBusy = this.loading ? 'true' : null
+    internalsOf(this).ariaMultiSelectable = this.selectionMode === 'multiple' ? 'true' : null
     /* `role="list"` at every kind, including `description`. A description list
        has its own native role, but this renders divs rather than `<dl>`, and
        claiming `term`/`definition` without the owning `list` those roles

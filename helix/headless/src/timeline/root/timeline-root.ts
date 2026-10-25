@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria, words } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria, internalsOf, words } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -94,8 +94,8 @@ export class HelixHeadlessTimeline extends HelixElement {
     /* On the host through internals rather than as an attribute, so the role is
        there for a screen reader without being markup the server never wrote.
        `Steps` says the same about its own list. */
-    hostAria(this.internals, { label: this.label, role: 'list' })
-    this.internals.ariaBusy = this.loading ? 'true' : null
+    hostAria(internalsOf(this), { label: this.label, role: 'list' })
+    internalsOf(this).ariaBusy = this.loading ? 'true' : null
     this.toggleState('loading', this.loading)
   }
 }

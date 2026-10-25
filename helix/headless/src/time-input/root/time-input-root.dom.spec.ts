@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { formValue, hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  formValue,
+  hasState,
+  internalsOf,
+  mount,
+  part,
+  registerDom,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -19,8 +26,7 @@ const field = async (attrs = ''): Promise<InputTime> => {
 
 const control = (host: InputTime): HTMLInputElement => part(host, 'control') as HTMLInputElement
 
-const internals = (host: HTMLElement): ElementInternals =>
-  (host as unknown as { internals: ElementInternals }).internals
+const internals = (host: HTMLElement): ElementInternals => internalsOf(host)
 
 /* Focus first, because typing into an unfocused field is not a thing that
    happens and the two are not equivalent here: the field renders when idle and

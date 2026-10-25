@@ -4,6 +4,7 @@ import {
   formValue,
   hasLayout,
   hasState,
+  internalsOf,
   mount,
   part,
   registerDom,
@@ -255,7 +256,7 @@ describe('input date holds more than one', () => {
     const host = await many(
       'date-style="medium" default-value="2026-08-04,2026-09-01" locale="en-GB" max="2026-08-31" mode="range"',
     )
-    const internals = (host as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     // The bound as the field writes a date, so the reader is told about the day they can see.
     expect(internals.validationMessage).toContain('31 Aug 2026')
   })
@@ -267,29 +268,25 @@ describe('input date holds more than one', () => {
     const late = await many(
       'date-style="iso" default-value="2026-09-01" max="2026-08-31" mode="multiple" range-overflow-message="Au plus tard le {max}."',
     )
-    expect((late as unknown as { internals: ElementInternals }).internals.validationMessage).toBe(
-      'Au plus tard le 2026-08-31.',
-    )
+    expect(internalsOf(late).validationMessage).toBe('Au plus tard le 2026-08-31.')
     const wrong = await many(
       'default-value="not-a-date" mode="multiple" bad-input-message="Pas une date."',
     )
-    expect((wrong as unknown as { internals: ElementInternals }).internals.validationMessage).toBe(
-      'Pas une date.',
-    )
+    expect(internalsOf(wrong).validationMessage).toBe('Pas une date.')
   })
 
   test('an empty message is no message, and the control says its own', async () => {
     /* A page passing a translation before it has loaded passes the empty
        string, which read as the page's own words and waved the date through. */
     const wrong = await many('default-value="not-a-date" mode="multiple" bad-input-message=""')
-    const internals = (wrong as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(wrong)
     expect(internals.validity.valid).toBe(false)
     expect(internals.validationMessage).not.toBe('')
   })
 
   test('and a range refuses a third date', async () => {
     const host = await many('default-value="2026-08-04,2026-08-11,2026-08-18" mode="range"')
-    const internals = (host as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     expect(internals.validationMessage).toBe('A range is two dates.')
   })
 
@@ -364,9 +361,7 @@ describe('input date shows what it holds', () => {
     control.dispatchEvent(new Event('input', { bubbles: true }))
     await host.updateComplete
     expect(host.value).toBe('2026-08-04')
-    expect((host as unknown as { internals: ElementInternals }).internals.validationMessage).toBe(
-      '',
-    )
+    expect(internalsOf(host).validationMessage).toBe('')
   })
 
   test('a single date is shown as itself, with no dash anywhere near it', async () => {
@@ -847,19 +842,19 @@ describe('a date input and the dates its calendar bars', () => {
     const host = (await field(
       'disable-days="0 6" disable-dates="2026-08-12" default-value="2026-08-12"',
     )) as Checked
-    expect(host.internals.validity.valid).toBe(false)
-    expect(host.internals.validationMessage).toBe('Choose a date that is available.')
+    expect(internalsOf(host).validity.valid).toBe(false)
+    expect(internalsOf(host).validationMessage).toBe('Choose a date that is available.')
     host.value = '2026-08-15'
     await host.updateComplete
-    expect(host.internals.validity.valid).toBe(false)
+    expect(internalsOf(host).validity.valid).toBe(false)
     host.value = '2026-08-13'
     await host.updateComplete
-    expect(host.internals.validity.valid).toBe(true)
+    expect(internalsOf(host).validity.valid).toBe(true)
   })
 
   test('and so is a date off the step', async () => {
     const host = (await field('min="2026-08-03" step="7" default-value="2026-08-04"')) as Checked
-    expect(host.internals.validity.valid).toBe(false)
+    expect(internalsOf(host).validity.valid).toBe(false)
   })
 })
 
@@ -964,16 +959,16 @@ describe('input date says which rule a date breaks', () => {
       internals: ElementInternals
     }
     await type(host, '2026-08-01')
-    expect(host.internals.validity.rangeUnderflow).toBe(true)
-    expect(host.internals.validity.badInput).toBeFalsy()
+    expect(internalsOf(host).validity.rangeUnderflow).toBe(true)
+    expect(internalsOf(host).validity.badInput).toBeFalsy()
     await type(host, '2026-08-30')
-    expect(host.internals.validity.rangeOverflow).toBe(true)
+    expect(internalsOf(host).validity.rangeOverflow).toBe(true)
     await type(host, '2026-08-11')
-    expect(host.internals.validity.stepMismatch).toBe(true)
+    expect(internalsOf(host).validity.stepMismatch).toBe(true)
     await type(host, '2026-08-12')
-    expect(host.internals.validity.valid).toBe(true)
+    expect(internalsOf(host).validity.valid).toBe(true)
     await type(host, '12 August')
-    expect(host.internals.validity.badInput).toBe(true)
+    expect(internalsOf(host).validity.badInput).toBe(true)
   })
 })
 
@@ -985,8 +980,8 @@ describe('input date hands its calendar a rule, a drawing and the months', () =>
     }
     host.isDateUnavailable = (date) => date === '2026-08-13'
     await type(host, '2026-08-13')
-    expect(host.internals.validity.badInput).toBe(true)
-    expect(host.internals.validationMessage).toBe('Choose a date that is available.')
+    expect(internalsOf(host).validity.badInput).toBe(true)
+    expect(internalsOf(host).validationMessage).toBe('Choose a date that is available.')
     const calendar = picker(host) as HTMLElement & {
       isDateUnavailable?: (date: string) => boolean
     }
@@ -1061,11 +1056,11 @@ describe('segmented', () => {
     }
     await press(host, segments(host)[1] as HTMLElement, 'Home')
     expect(host.value).toBe('2026-08-01')
-    expect(host.internals.validity.valid).toBe(true)
+    expect(internalsOf(host).validity.valid).toBe(true)
     await press(host, segments(host)[0] as HTMLElement, 'ArrowDown')
     expect(host.value).toBe('2026-07-01')
-    expect(host.internals.validity.rangeUnderflow).toBe(true)
-    expect(host.internals.validity.badInput).toBeFalsy()
+    expect(internalsOf(host).validity.rangeUnderflow).toBe(true)
+    expect(internalsOf(host).validity.badInput).toBeFalsy()
   })
 
   test('Home on the year is year 1, a date the field takes and submits', async () => {
@@ -1074,7 +1069,7 @@ describe('segmented', () => {
     }
     await press(host, segments(host)[2] as HTMLElement, 'Home')
     expect(host.value).toBe('0001-08-04')
-    expect(host.internals.validity.valid).toBe(true)
+    expect(internalsOf(host).validity.valid).toBe(true)
     expect(formValue(host)).toBe('0001-08-04')
   })
 
@@ -1122,7 +1117,7 @@ describe('segmented', () => {
       await press(host, segments(host)[at] as HTMLElement, key)
     }
     expect(host.value).toBe('')
-    expect(host.internals.validity.badInput).toBe(true)
+    expect(internalsOf(host).validity.badInput).toBe(true)
   })
   /* Measured before this: the start stepped a month past the end, the field
      reported valid, and the form sent 2026-06-03 and 2026-05-09, where React
@@ -1131,11 +1126,11 @@ describe('segmented', () => {
     const host = (await field(
       'segmented mode="range" name="trip" locale="en-US" default-value="2026-05-01,2026-05-09"',
     )) as InputDate & { internals: ElementInternals }
-    expect(host.internals.validity.valid).toBe(true)
+    expect(internalsOf(host).validity.valid).toBe(true)
     await press(host, segments(host)[0] as HTMLElement, 'ArrowUp')
     expect(host.value).toBe('2026-06-01,2026-05-09')
-    expect(host.internals.validity.rangeUnderflow).toBe(true)
-    expect(host.internals.validationMessage).toBe('Choose an end on or after June 1, 2026.')
+    expect(internalsOf(host).validity.rangeUnderflow).toBe(true)
+    expect(internalsOf(host).validationMessage).toBe('Choose an end on or after June 1, 2026.')
   })
 })
 
@@ -1315,7 +1310,7 @@ describe('a date input reads a date as its locale writes one', () => {
   test('text that is no date names a date as the field writes one, and that date reads back', async () => {
     const host = await field('locale="en-US"')
     await type(host, 'soon')
-    const internals = (host as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     expect(internals.validationMessage).toBe('Enter a date such as August 24, 2026.')
     await type(host, 'August 24, 2026')
     control(host).dispatchEvent(new Event('change'))
@@ -1324,7 +1319,7 @@ describe('a date input reads a date as its locale writes one', () => {
     const german = await field(
       'locale="de-DE" date-style="medium" default-value="bald" mode="range"',
     )
-    expect((german as unknown as { internals: ElementInternals }).internals.validationMessage).toBe(
+    expect(internalsOf(german).validationMessage).toBe(
       'Enter dates such as 24.08.2026, separated by commas.',
     )
   })

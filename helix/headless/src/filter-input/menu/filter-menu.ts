@@ -109,7 +109,7 @@ import '../../menu/index.js'
 export class HelixHeadlessFilterMenu extends HelixElement {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-filter-menu': { label: 'Filtern' } })`.
+   * `registerWords('de', { 'helix-filter-menu': { fallbackLabel: 'Filtern' } })`.
    */
   static words = 'helix-filter-menu'
 

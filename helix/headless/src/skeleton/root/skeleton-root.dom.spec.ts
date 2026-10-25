@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -17,8 +17,8 @@ describe('skeleton', () => {
     )) as HTMLElement & {
       internals?: ElementInternals
     }
-    expect(skeleton.internals?.ariaHidden).toBe('true')
-    expect(skeleton.internals?.ariaLive ?? null).toBeNull()
+    expect(internalsOf(skeleton)?.ariaHidden).toBe('true')
+    expect(internalsOf(skeleton)?.ariaLive ?? null).toBeNull()
     expect(skeleton.hasAttribute('aria-hidden')).toBe(false)
   })
 
@@ -28,9 +28,9 @@ describe('skeleton', () => {
     )) as HTMLElement & {
       internals?: ElementInternals
     }
-    expect(skeleton.internals?.role).toBe('progressbar')
-    expect(skeleton.internals?.ariaLabel).toBe('Loading profile')
-    expect(skeleton.internals?.ariaHidden ?? null).toBeNull()
+    expect(internalsOf(skeleton)?.role).toBe('progressbar')
+    expect(internalsOf(skeleton)?.ariaLabel).toBe('Loading profile')
+    expect(internalsOf(skeleton)?.ariaHidden ?? null).toBeNull()
   })
 
   test("the shape is the styled tier's, not the headless tier's", async () => {
@@ -67,8 +67,8 @@ describe('a skeleton around content', () => {
     )) as Skeleton
     await skeleton.updateComplete
     expect(part(skeleton, 'content')?.hasAttribute('inert')).toBe(true)
-    expect(skeleton.internals.ariaBusy).toBe('true')
-    expect(skeleton.internals.ariaHidden ?? null).toBeNull()
+    expect(internalsOf(skeleton).ariaBusy).toBe('true')
+    expect(internalsOf(skeleton).ariaHidden ?? null).toBeNull()
   })
 
   test('and shows it as it is once loaded', async () => {
@@ -78,8 +78,8 @@ describe('a skeleton around content', () => {
     skeleton.loading = false
     await skeleton.updateComplete
     expect(part(skeleton, 'content')?.hasAttribute('inert')).toBe(false)
-    expect(skeleton.internals.ariaBusy ?? null).toBeNull()
-    expect(skeleton.internals.ariaHidden ?? null).toBeNull()
+    expect(internalsOf(skeleton).ariaBusy ?? null).toBeNull()
+    expect(internalsOf(skeleton).ariaHidden ?? null).toBeNull()
   })
 
   /* A labeled skeleton stayed a progress bar named "Loading card" around the
@@ -90,22 +90,22 @@ describe('a skeleton around content', () => {
       '<helix-headless-skeleton label="Loading card" loading><p>Card</p></helix-headless-skeleton>',
     )) as Skeleton
     await skeleton.updateComplete
-    expect([skeleton.internals.role, skeleton.internals.ariaLabel]).toEqual([
+    expect([internalsOf(skeleton).role, internalsOf(skeleton).ariaLabel]).toEqual([
       'progressbar',
       'Loading card',
     ])
     skeleton.loading = false
     await skeleton.updateComplete
-    expect(skeleton.internals.role ?? null).toBeNull()
-    expect(skeleton.internals.ariaLabel ?? null).toBeNull()
-    expect(skeleton.internals.ariaHidden ?? null).toBeNull()
+    expect(internalsOf(skeleton).role ?? null).toBeNull()
+    expect(internalsOf(skeleton).ariaLabel ?? null).toBeNull()
+    expect(internalsOf(skeleton).ariaHidden ?? null).toBeNull()
   })
 
   test('an empty skeleton stays hidden, loading or not', async () => {
     const skeleton = (await mount(
       '<helix-headless-skeleton loading> </helix-headless-skeleton>',
     )) as Skeleton
-    expect(skeleton.internals.ariaHidden).toBe('true')
+    expect(internalsOf(skeleton).ariaHidden).toBe('true')
   })
 
   /* The styled sheet lays a wrapper out on this state. A skeleton written
@@ -133,7 +133,7 @@ describe('a skeleton around content', () => {
     skeleton.append(document.createTextNode('Ada'))
     await new Promise((done) => setTimeout(done, 0))
     await skeleton.updateComplete
-    expect(skeleton.internals.ariaHidden ?? null).toBeNull()
+    expect(internalsOf(skeleton).ariaHidden ?? null).toBeNull()
     expect(hasState(skeleton, 'wrapping')).toBe(true)
   })
 })

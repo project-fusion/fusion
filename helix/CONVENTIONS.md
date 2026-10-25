@@ -1462,6 +1462,32 @@ for the tier and whether to publish typings, and finds everything else.
   `helix/styled/src/accordion`; the site composes
   `{repository}/tree/{ref}/{path}`.
 
+**A member another element writes is `@internal`.** `focusable`, an option's
+`active`, a list row's `grip` and `move`, `dismissTabStop`, the `current` of a
+lightbox item, a tour stop and a playlist entry, a tab panel's `label` and a
+button's `popup` are a parent's bookkeeping on its children: published, each
+printed a row on a reference page and invited a page to write a value the
+parent overwrote on its next update. `helix component`'s `coordinated` holds
+it, reading the sentence that says a parent writes the member, and a member
+that is written by a parent and also mirrors state a page reads, such as a
+list row's `selected`, stays public and says why with `Public because`.
+`focusable` is documented once, as Toolbar's protocol, on Toolbar.
+
+**`ElementInternals` is not on the element.** A component reads its own
+through `internalsOf(this)` from core, which holds each element's internals
+in a module-scoped map. Kept as a property they were `protected` in the types
+and a plain field at run time, so any script could set a control's form value
+or its role, which `attachInternals` throwing on a second call exists to
+prevent. A spec reads them through `@fusion.dev/helix-testing`'s `internalsOf`,
+which records the internals each element attaches; `role`, `label` and
+`hasState` read the same record.
+
+**The declaration files leave `@internal` members out**, through
+`stripInternal` in `tsconfig.types.json`, in every package but core. Headless
+and styled subclass core across a package boundary and read its internal
+members, `isDisabled` on every form control among them, so core keeps them in
+its declarations.
+
   **The split is about versioning and is worth keeping even before it matters.**
   Documentation will be versioned and a reader will choose the version, so the
   ref belongs to whoever renders the link. A URL baked into the manifest makes

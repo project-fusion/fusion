@@ -1,6 +1,12 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  internalsOf,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 import type { FilterSource, FilterSourceRequest, FilterSuggestion } from '../suggest.js'
 
 beforeAll(async () => {
@@ -57,8 +63,7 @@ const shown = (host: Field): string[] =>
 
 const live = (host: Field): string => part(host, 'live')?.textContent ?? ''
 
-const states = (host: Field): Set<string> =>
-  (host as unknown as { internals: ElementInternals }).internals.states as unknown as Set<string>
+const states = (host: Field): Set<string> => internalsOf(host).states as unknown as Set<string>
 
 const wait = (ms: number): Promise<void> => new Promise((done) => setTimeout(done, ms))
 

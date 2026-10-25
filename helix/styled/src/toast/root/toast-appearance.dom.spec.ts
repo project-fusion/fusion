@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -412,9 +412,7 @@ if (hasLayout()) {
       /* A live stack re-read itself, or a danger message inside it, when a
          message arrived. The `live` parts say the one that arrived. */
       const host = await region()
-      expect(
-        (host as unknown as { internals?: ElementInternals }).internals?.ariaLive ?? null,
-      ).toBeNull()
+      expect(internalsOf(host)?.ariaLive ?? null).toBeNull()
     })
 
     test('two reasons to hold the clock take two releases', async () => {

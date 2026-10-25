@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -46,7 +46,7 @@ describe('option', () => {
     )) as HTMLElement & {
       internals: ElementInternals
     }
-    expect(host.internals.role).toBe('option')
+    expect(internalsOf(host).role).toBe('option')
   })
 
   test('announces rather than selecting itself', async () => {
@@ -223,8 +223,8 @@ describe('an option that is a link', () => {
     const host = (await mount(
       '<helix-headless-option value="docs" href="/docs">Docs</helix-headless-option>',
     )) as HTMLElement & { internals: ElementInternals }
-    expect(host.internals.role).toBe('option')
-    expect(host.internals.ariaSelected).toBeNull()
+    expect(internalsOf(host).role).toBe('option')
+    expect(internalsOf(host).ariaSelected).toBeNull()
     expect(host.shadowRoot?.querySelector('a')).toBeNull()
   })
 })
@@ -280,13 +280,13 @@ describe('an option’s own content', () => {
     )) as Option
     host.active = true
     await host.updateComplete
-    expect(host.internals.ariaSelected).toBe('false')
+    expect(internalsOf(host).ariaSelected).toBe('false')
     host.selectionFollowsActive = true
     await host.updateComplete
-    expect(host.internals.ariaSelected).toBe('true')
+    expect(internalsOf(host).ariaSelected).toBe('true')
     host.active = false
     await host.updateComplete
-    expect(host.internals.ariaSelected).toBe('false')
+    expect(internalsOf(host).ariaSelected).toBe('false')
   })
 })
 
@@ -309,8 +309,10 @@ describe('what an option is called', () => {
       '<helix-headless-option value="p" description="Lead designer"><span slot="start">P</span>Priya Shah<kbd slot="end">⌘P</kbd></helix-headless-option>',
     )) as Option
     await host.updateComplete
-    expect(host.internals.ariaLabelledByElements).toEqual([part(host, 'label') as Element])
-    expect(host.internals.ariaDescribedByElements).toEqual([part(host, 'description') as Element])
+    expect(internalsOf(host).ariaLabelledByElements).toEqual([part(host, 'label') as Element])
+    expect(internalsOf(host).ariaDescribedByElements).toEqual([
+      part(host, 'description') as Element,
+    ])
   })
 
   test('a slotted caption is its description too', async () => {
@@ -318,7 +320,7 @@ describe('what an option is called', () => {
       '<helix-headless-option value="h">Helix<em slot="description">the design system</em></helix-headless-option>',
     )) as Option
     await host.updateComplete
-    expect(host.internals.ariaDescribedByElements?.map((one) => one.localName)).toEqual(['em'])
+    expect(internalsOf(host).ariaDescribedByElements?.map((one) => one.localName)).toEqual(['em'])
   })
 
   test('a name written on the host wins', async () => {
@@ -326,7 +328,7 @@ describe('what an option is called', () => {
       '<helix-headless-option value="p" aria-label="Priya">Priya Shah</helix-headless-option>',
     )) as Option
     await host.updateComplete
-    expect(host.internals.ariaLabelledByElements ?? null).toBeNull()
+    expect(internalsOf(host).ariaLabelledByElements ?? null).toBeNull()
   })
 
   /* A description by reference outranks `aria-description`, so the second
@@ -336,12 +338,12 @@ describe('what an option is called', () => {
       '<helix-headless-option value="h" description="the design system" alternate="/sandbox" alternate-label="Opens the sandbox with Shift">Helix</helix-headless-option>',
     )) as Option
     await host.updateComplete
-    const said = host.internals.ariaDescribedByElements?.map((one) => one.textContent?.trim())
+    const said = internalsOf(host).ariaDescribedByElements?.map((one) => one.textContent?.trim())
     expect(said).toEqual(['the design system', 'Opens the sandbox with Shift'])
-    expect(host.internals.ariaDescription ?? null).toBeNull()
+    expect(internalsOf(host).ariaDescription ?? null).toBeNull()
     ;(host as unknown as { description: string }).description = ''
     await host.updateComplete
-    expect(host.internals.ariaDescription).toBe('Opens the sandbox with Shift')
+    expect(internalsOf(host).ariaDescription).toBe('Opens the sandbox with Shift')
   })
 })
 

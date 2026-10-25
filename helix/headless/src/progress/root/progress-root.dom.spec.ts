@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
+import {
+  hasState,
+  internalsOf,
+  mount,
+  part,
+  registerDom,
+  settle,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -47,7 +54,7 @@ describe('format-options', () => {
     )
     const words = new Intl.NumberFormat('en', { style: 'unit', unit: 'megabyte' }).format(45)
     expect(bar.shadowRoot?.querySelector('[part="value"]')?.textContent?.trim()).toBe(words)
-    expect(bar.internals?.ariaValueText).toBe(words)
+    expect(internalsOf(bar)?.ariaValueText).toBe(words)
   })
 
   test('writes a share of the range for a percent, and says nothing extra while indeterminate', async () => {
@@ -56,7 +63,7 @@ describe('format-options', () => {
     )
     expect(bar.shadowRoot?.querySelector('[part="value"]')?.textContent?.trim()).toBe('12.5%')
     const busy = await progress(`indeterminate format-options='{"style":"percent"}'`)
-    expect(busy.internals?.ariaValueText).toBeNull()
+    expect(internalsOf(busy)?.ariaValueText).toBeNull()
   })
 
   /* Left to the platform, a range from 12 to 20 at 16 was read out as "16",
@@ -66,9 +73,9 @@ describe('format-options', () => {
   test('absent writes a whole percentage, and says the same words it shows', async () => {
     const bar = await progress('show-value value="62" locale="en"')
     expect(bar.shadowRoot?.querySelector('[part="value"]')?.textContent?.trim()).toBe('62%')
-    expect(bar.internals?.ariaValueText).toBe('62%')
+    expect(internalsOf(bar)?.ariaValueText).toBe('62%')
     const ranged = await progress('min="12" max="20" value="16" locale="fr"')
-    expect(ranged.internals?.ariaValueText).toBe(
+    expect(internalsOf(ranged)?.ariaValueText).toBe(
       new Intl.NumberFormat('fr', { style: 'percent' }).format(0.5),
     )
   })
@@ -78,8 +85,8 @@ describe('progress', () => {
   test('announces itself as a progress bar with a name, through internals', async () => {
     const bar = await progress()
     expect(bar.hasAttribute('role')).toBe(false)
-    expect(bar.internals?.role).toBe('progressbar')
-    expect(bar.internals?.ariaLabel).toBe('Uploading')
+    expect(internalsOf(bar)?.role).toBe('progressbar')
+    expect(internalsOf(bar)?.ariaLabel).toBe('Uploading')
   })
 
   test('the announced value and the drawn one are the same number', async () => {
@@ -88,14 +95,14 @@ describe('progress', () => {
        two readers different things about the same state. */
     const bar = await progress('max="8" value="12"')
     expect(bar.fraction).toBe(1)
-    expect(bar.internals?.ariaValueNow).toBe('8')
-    expect(bar.internals?.ariaValueMax).toBe('8')
+    expect(internalsOf(bar)?.ariaValueNow).toBe('8')
+    expect(internalsOf(bar)?.ariaValueMax).toBe('8')
   })
 
   test('a negative value is nothing done rather than a reversed bar', async () => {
     const bar = await progress('value="-5"')
     expect(bar.fraction).toBe(0)
-    expect(bar.internals?.ariaValueNow).toBe('0')
+    expect(internalsOf(bar)?.ariaValueNow).toBe('0')
   })
 
   test('a max of zero falls back to the default, and says so as well as draws it', async () => {
@@ -111,8 +118,8 @@ describe('progress', () => {
        two readers being told different things. */
     const bar = await progress('max="0" value="5"')
     expect(within(bar.fraction, 0.05, 0.0001)).toBe(true)
-    expect(bar.internals?.ariaValueMax).toBe('100')
-    expect(bar.internals?.ariaValueNow).toBe('5')
+    expect(internalsOf(bar)?.ariaValueMax).toBe('100')
+    expect(internalsOf(bar)?.ariaValueNow).toBe('5')
   })
 
   /* A range had to start at zero, which a measure such as a version number
@@ -120,11 +127,11 @@ describe('progress', () => {
   test('a range can start above zero, and the bar and the announcement measure from it', async () => {
     const bar = await progress('min="12" max="20" value="16"')
     expect(bar.fraction).toBe(0.5)
-    expect(bar.internals?.ariaValueMin).toBe('12')
-    expect(bar.internals?.ariaValueMax).toBe('20')
-    expect(bar.internals?.ariaValueNow).toBe('16')
+    expect(internalsOf(bar)?.ariaValueMin).toBe('12')
+    expect(internalsOf(bar)?.ariaValueMax).toBe('20')
+    expect(internalsOf(bar)?.ariaValueNow).toBe('16')
     const under = await progress('min="12" max="20" value="4"')
-    expect([under.fraction, under.internals?.ariaValueNow]).toEqual([0, '12'])
+    expect([under.fraction, internalsOf(under)?.ariaValueNow]).toEqual([0, '12'])
   })
 
   /* Zero is a value like any other once the range runs below it. Read as
@@ -133,17 +140,17 @@ describe('progress', () => {
   test('a value of zero inside a range that runs below zero is announced as zero', async () => {
     const bar = await progress('min="-10" max="10" value="0"')
     expect(bar.fraction).toBe(0.5)
-    expect(bar.internals?.ariaValueNow).toBe('0')
+    expect(internalsOf(bar)?.ariaValueNow).toBe('0')
   })
 
   test('value text is announced beside the number, never instead of it', async () => {
     const bar = await progress('max="8" value="3" value-text="3 of 8 records"')
-    expect(bar.internals?.ariaValueText).toBe('3 of 8 records')
-    expect(bar.internals?.ariaValueNow).toBe('3')
+    expect(internalsOf(bar)?.ariaValueText).toBe('3 of 8 records')
+    expect(internalsOf(bar)?.ariaValueNow).toBe('3')
   })
 
   test('no value text means the percentage is announced, rather than an empty text', async () => {
-    expect((await progress('value="62" locale="en"')).internals?.ariaValueText).toBe('62%')
+    expect(internalsOf(await progress('value="62" locale="en"'))?.ariaValueText).toBe('62%')
   })
   test('reports no value at all, which is how the platform says unknown', async () => {
     /* Absent, not zero. An omitted `aria-valuenow` is the platform's own
@@ -151,21 +158,21 @@ describe('progress', () => {
          "0 percent" for work that is running, which is wrong rather than
          merely unknown. */
     const bar = await progress('indeterminate')
-    expect(bar.internals?.ariaValueNow ?? null).toBeNull()
-    expect(bar.internals?.role).toBe('progressbar')
-    expect(bar.internals?.ariaValueMax).toBe('100')
+    expect(internalsOf(bar)?.ariaValueNow ?? null).toBeNull()
+    expect(internalsOf(bar)?.role).toBe('progressbar')
+    expect(internalsOf(bar)?.ariaValueMax).toBe('100')
   })
 
   test('a value is ignored while it is set, rather than half-honored', async () => {
     const bar = await progress('indeterminate value="40"')
-    expect(bar.internals?.ariaValueNow ?? null).toBeNull()
+    expect(internalsOf(bar)?.ariaValueNow ?? null).toBeNull()
   })
 
   test('going determinate restores the number', async () => {
     const bar = await progress('indeterminate value="40"')
     ;(bar as unknown as { indeterminate: boolean }).indeterminate = false
     await bar.updateComplete
-    expect(bar.internals?.ariaValueNow).toBe('40')
+    expect(internalsOf(bar)?.ariaValueNow).toBe('40')
   })
 })
 
@@ -178,25 +185,25 @@ describe('a visible label', () => {
     const host = (await mount(
       '<helix-headless-progress label="Fallback" value="40"><span slot="label">Disk  used</span></helix-headless-progress>',
     )) as Host
-    expect(host.internals.ariaLabel).toBe('Disk used')
+    expect(internalsOf(host).ariaLabel).toBe('Disk used')
   })
 
   test('arriving later renames it, and leaving gives `label` back', async () => {
     const host = (await mount(
       '<helix-headless-progress label="Fallback" value="40"></helix-headless-progress>',
     )) as Host
-    expect(host.internals.ariaLabel).toBe('Fallback')
+    expect(internalsOf(host).ariaLabel).toBe('Fallback')
     const words = document.createElement('span')
     words.slot = 'label'
     words.textContent = 'Memory'
     host.append(words)
     await new Promise((resolve) => setTimeout(resolve, 0))
     await host.updateComplete
-    expect(host.internals.ariaLabel).toBe('Memory')
+    expect(internalsOf(host).ariaLabel).toBe('Memory')
     words.remove()
     await new Promise((resolve) => setTimeout(resolve, 0))
     await host.updateComplete
-    expect(host.internals.ariaLabel).toBe('Fallback')
+    expect(internalsOf(host).ariaLabel).toBe('Fallback')
   })
 
   test('is a bare slot, so without one nothing new is drawn', async () => {
@@ -268,15 +275,15 @@ describe('words in the default slot', () => {
     expect(content?.getAttribute('aria-hidden')).toBe('true')
     expect(content?.querySelector('slot:not([name])')).not.toBeNull()
     expect(hasState(bar, 'content')).toBe(true)
-    expect(bar.internals?.ariaValueText).toBe('47% uploaded')
-    expect(bar.internals?.ariaValueNow).toBe('47')
+    expect(internalsOf(bar)?.ariaValueText).toBe('47% uploaded')
+    expect(internalsOf(bar)?.ariaValueNow).toBe('47')
   })
 
   test('give way to value text, and a ring draws them too', async () => {
     const worded = (await mount(
       '<helix-headless-progress label="Import" value="3" max="8" value-text="3 of 8 records">38%</helix-headless-progress>',
     )) as Progress
-    expect(worded.internals?.ariaValueText).toBe('3 of 8 records')
+    expect(internalsOf(worded)?.ariaValueText).toBe('3 of 8 records')
     const ring = await progress('shape="ring" value="62"')
     expect(part(ring, 'content')?.querySelector('slot:not([name])')).not.toBeNull()
   })

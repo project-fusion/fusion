@@ -8,6 +8,7 @@ import {
   HelixElement,
   HelixNavigateEvent,
   hostAria,
+  internalsOf,
   MIRROR_RULE,
   numberConverter,
   requestChange,
@@ -569,7 +570,7 @@ export class HelixHeadlessPagination extends HelixElement {
        screen-reader user chooses between them, which is why this carries a
        default name at all: an author's own `aria-label` is an attribute and
        beats internals, so naming it here costs them nothing. */
-    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'navigation' })
+    hostAria(internalsOf(this), { label: this.label || this.fallbackLabel, role: 'navigation' })
 
     /* Through `toggleState`, which carries the feature test: an engine without
        `CustomStateSet` gets a control that renders its one page instead of

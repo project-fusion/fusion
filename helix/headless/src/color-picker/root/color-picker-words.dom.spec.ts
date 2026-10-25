@@ -4,7 +4,13 @@ import type {
   clearWords as ClearWords,
   registerWords as RegisterWords,
 } from '@fusion.dev/helix-core'
-import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  internalsOf,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 /* Imported once the DOM is registered: core reads the globals it finds as
    it is evaluated, and a static import breaks the DOM when this file runs
@@ -71,12 +77,8 @@ describe('the sentences a color picker raises', () => {
   test('are the words registered for the nearest `lang`', async () => {
     registerWords('pl', { 'helix-color-picker': { valueMissingMessage: 'Wybierz kolor.' } })
     const host = await picker('lang="pl"', 'required')
-    expect((host as unknown as { internals: ElementInternals }).internals.validationMessage).toBe(
-      'Wybierz kolor.',
-    )
+    expect(internalsOf(host).validationMessage).toBe('Wybierz kolor.')
     const english = await picker('', 'required')
-    expect(
-      (english as unknown as { internals: ElementInternals }).internals.validationMessage,
-    ).toBe('Choose a color.')
+    expect(internalsOf(english).validationMessage).toBe('Choose a color.')
   })
 })

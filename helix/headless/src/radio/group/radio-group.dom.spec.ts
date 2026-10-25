@@ -4,6 +4,7 @@ import {
   at,
   formValue,
   hasState,
+  internalsOf,
   mount,
   notYetDefined,
   part,
@@ -45,7 +46,7 @@ describe('radio group', () => {
     // Through internals, so nothing lands on the host as an attribute a React
     // consumer's server markup never had.
     const host = (await group()) as Updatable & { internals: ElementInternals }
-    expect(host.internals.role).toBe('radiogroup')
+    expect(internalsOf(host).role).toBe('radiogroup')
     expect(host.getAttribute('role')).toBeNull()
   })
 
@@ -224,8 +225,8 @@ describe('radio group in a form', () => {
 describe('radio group as a field', () => {
   test('the question is named and described on the host', async () => {
     const host = (await group('hint="Hint"')) as Updatable & { internals: ElementInternals }
-    expect(host.internals.ariaLabelledByElements?.[0]?.textContent?.trim()).toBe('Label')
-    expect(host.internals.ariaDescribedByElements?.[0]?.textContent?.trim()).toBe('Hint')
+    expect(internalsOf(host).ariaLabelledByElements?.[0]?.textContent?.trim()).toBe('Label')
+    expect(internalsOf(host).ariaDescribedByElements?.[0]?.textContent?.trim()).toBe('Hint')
   })
 
   test('orientation lays out the choices, not the field', async () => {
@@ -307,7 +308,7 @@ describe('radio group after a reset', () => {
     host.formResetCallback()
     await settle(host)
     expect(host.value).toBe('')
-    expect(host.internals.ariaInvalid).toBe('false')
+    expect(internalsOf(host).ariaInvalid).toBe('false')
   })
 })
 
@@ -316,7 +317,7 @@ describe("radio group in the page's words", () => {
     const host = (await group('required value-missing-message="Choisissez-en un."')) as unknown as {
       internals: ElementInternals
     }
-    expect(host.internals.validationMessage).toBe('Choisissez-en un.')
+    expect(internalsOf(host).validationMessage).toBe('Choisissez-en un.')
   })
 })
 
@@ -411,7 +412,7 @@ describe('a read-only radio group', () => {
     expect(document.activeElement).toBe(at(options(host), 2))
     expect(value()).toBe('one')
     expect(formValue(host)).toBe('one')
-    expect((host as unknown as { internals: ElementInternals }).internals.ariaReadOnly).toBe('true')
+    expect(internalsOf(host).ariaReadOnly).toBe('true')
   })
 
   test('a script still sets the value, and leaving read-only lets the keys move it', async () => {

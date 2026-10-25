@@ -150,7 +150,7 @@ export class HelixHeadlessTourStop extends HelixElement {
   backLabel = 'Back'
 
   /**
-   * Whether the stop is the one being shown.
+   * @internal Whether the stop is the one being shown.
    *
    * Written by the root rather than by a consumer, which is the one place this
    * family writes onto markup it does not own. It is acceptable here for a

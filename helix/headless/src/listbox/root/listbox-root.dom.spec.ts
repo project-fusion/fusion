@@ -4,6 +4,7 @@ import {
   formValue,
   hasLayout,
   hasState,
+  internalsOf,
   mount,
   notYetDefined,
   part,
@@ -51,7 +52,7 @@ describe('listbox', () => {
     const named = items.getAttribute('aria-labelledby') ?? ''
     const scope = items.getRootNode() as ShadowRoot
     expect(scope.getElementById(named)?.textContent?.trim()).not.toBe('')
-    expect(host.internals.role).toBeFalsy()
+    expect(internalsOf(host).role).toBeFalsy()
     expect(host.getAttribute('role')).toBeNull()
   })
 

@@ -4,6 +4,7 @@ import {
   customElement,
   HelixElement,
   hostAria,
+  internalsOf,
   MixinControllerOpen,
   numberConverter,
   UpgradeController,
@@ -163,7 +164,7 @@ export class HelixHeadlessNotificationGroup extends MixinControllerOpen(HelixEle
        it are the articles of the nested feed, which is named by the label in
        its own tree. Not `region`, which is a landmark: a feed cut into five
        days would put five landmarks on the page. */
-    hostAria(this.internals, { label: this.label, role: 'article' })
+    hostAria(internalsOf(this), { label: this.label, role: 'article' })
   }
 
   protected override firstUpdated(changed: PropertyValues): void {

@@ -45,7 +45,7 @@ import { property, state } from 'lit/decorators.js'
 export class HelixHeadlessMapPosition extends HelixElement {
   /**
    * The key this part's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-map-position': { label: 'Aktueller Standort' } })`.
+   * `registerWords('de', { 'helix-map-position': { fallbackLabel: 'Aktueller Standort' } })`.
    */
   static words = 'helix-map-position'
 

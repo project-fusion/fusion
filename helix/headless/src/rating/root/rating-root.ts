@@ -7,6 +7,7 @@ import {
   HelixClearEvent,
   HelixFormElement,
   HelixPreviewEvent,
+  internalsOf,
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
@@ -516,7 +517,7 @@ export class HelixHeadlessRating extends MixinControllerValue(MixinField(HelixFo
   private sync(): void {
     /* Nothing where nothing is chosen, which is what a radio group submits:
        an empty entry reads on the server as a rating somebody gave. */
-    this.internals.setFormValue(this.value === '' ? null : this.value)
+    internalsOf(this).setFormValue(this.value === '' ? null : this.value)
     this.reportRequired(this.value === '', this.valueMissingMessage, 'marks')
   }
 

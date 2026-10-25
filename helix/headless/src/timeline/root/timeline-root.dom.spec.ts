@@ -1,6 +1,14 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { at, hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  at,
+  hasState,
+  internalsOf,
+  mount,
+  part,
+  registerDom,
+  role,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -72,7 +80,7 @@ describe('a timeline', () => {
     const loading = part(host, 'loading') as HTMLElement
     expect(loading.getAttribute('role')).toBe('listitem')
     expect(loading.textContent?.trim()).toBe('Loading more')
-    const internals = (host as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     expect(internals.ariaBusy).toBe('true')
     expect(hasState(host, 'loading')).toBe(true)
     host.loading = false

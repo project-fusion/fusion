@@ -7,6 +7,7 @@ import {
   hostAria,
   inheritDisabled,
   inlineStep,
+  internalsOf,
   pressedValue,
   reportRuntime,
   requestValue,
@@ -491,12 +492,12 @@ export class HelixHeadlessButtonGroup extends HelixElement {
        otherwise, since a toolbar inside a toolbar is a reader's dead end. */
     const toolbar = this.roving
     const radios = this.selectionMode === 'single'
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: this.label,
       role: radios ? 'radiogroup' : toolbar ? 'toolbar' : 'group',
     })
-    this.internals.ariaOrientation = toolbar ? (this.orientation ?? null) : null
-    this.internals.ariaDisabled = this.disabled ? 'true' : null
+    internalsOf(this).ariaOrientation = toolbar ? (this.orientation ?? null) : null
+    internalsOf(this).ariaDisabled = this.disabled ? 'true' : null
     this.toggleState('pressed', Boolean(this.selectionMode) && commaList(this.value).length > 0)
   }
 

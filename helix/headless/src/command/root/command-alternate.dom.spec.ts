@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, mount, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -90,7 +90,7 @@ describe('a command row with two destinations', () => {
     expect(row.textContent?.trim()).toBe('Card')
     expect(
       row.getAttribute('aria-description') ??
-        (row as unknown as { internals?: { ariaDescription?: string } }).internals?.ariaDescription,
+        (internalsOf(row) as unknown as { ariaDescription?: string })?.ariaDescription,
     ).toBe('Open in the sandbox')
   })
 })

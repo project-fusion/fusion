@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
-import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, registerDom } from '@fusion.dev/helix-testing/dom'
 
 const tag = 'probe-element'
 
@@ -309,14 +309,14 @@ describe('the settled mark', () => {
   test('is absent through the first update, so an arriving sheet has nothing to transition', async () => {
     const element = mounted()
     await element.updateComplete
-    expect(element.internals.states.has('settled')).toBe(false)
+    expect(internalsOf(element).states.has('settled')).toBe(false)
   })
 
   test('lands a frame later, by which point the resting value is already resolved', async () => {
     const element = mounted()
     await element.updateComplete
     await frame()
-    expect(element.internals.states.has('settled')).toBe(true)
+    expect(internalsOf(element).states.has('settled')).toBe(true)
   })
 
   test('is a state and never an attribute, which is what hydration reads', async () => {
@@ -329,7 +329,7 @@ describe('the settled mark', () => {
     const element = mounted()
     await element.updateComplete
     await frame()
-    expect(element.internals.states.has('settled')).toBe(true)
+    expect(internalsOf(element).states.has('settled')).toBe(true)
     expect(element.getAttributeNames()).not.toContain('data-settled')
   })
 

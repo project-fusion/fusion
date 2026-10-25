@@ -11,6 +11,7 @@ import {
   HelixLoadMoreEvent,
   HelixReadEvent,
   hostAria,
+  internalsOf,
   MixinCollection,
   markRegion,
   numberConverter,
@@ -560,7 +561,7 @@ export class HelixHeadlessNotifications extends MixinCollection(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     this.noteArrivals()
-    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'region' })
+    hostAria(internalsOf(this), { label: this.label || this.fallbackLabel, role: 'region' })
     const failed = this.failed
     this.toggleState('error', failed)
     this.toggleState('loading', this.loading)

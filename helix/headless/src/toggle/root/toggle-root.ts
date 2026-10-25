@@ -3,6 +3,7 @@ import {
   customElement,
   HelixElement,
   HostClickController,
+  internalsOf,
   ListedController,
   MixinSelectableItem,
 } from '@fusion.dev/helix-core'
@@ -52,7 +53,7 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
   protected readonly listed = new ListedController(
     this,
     'press',
-    () => this.internals?.ariaKeyShortcuts,
+    () => internalsOf(this)?.ariaKeyShortcuts,
   )
 
   /** A click on the element itself, `click()` included, chooses it, as on `Radio`. */
@@ -94,7 +95,7 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
   }
 
   /**
-   * Whether the item holds the group's tab stop. Unset, no group holds the
+   * @internal Whether the item holds the group's tab stop. Unset, no group holds the
    * item, and it is a toggle button with a tab stop of its own.
    *
    * Written by the group on every item: `true` for the chosen item, or for the
@@ -111,7 +112,8 @@ export class HelixHeadlessToggle extends MixinSelectableItem(HelixElement) {
    * Whether the item is pressed, in a group where several can be, and
    * `undefined` in a group where one is chosen.
    *
-   * Written by the group, like `selected`, so no attribute.
+   * Written by the group, like `selected`, so no attribute. Public because it
+   * is the item's own state as well, which a page reads to know what is on.
    */
   @property({ attribute: false })
   pressed?: boolean | undefined

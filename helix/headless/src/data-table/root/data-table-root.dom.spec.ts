@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   hasLayout,
   hasState,
+  internalsOf,
   mount as mountMarkup,
   part,
   registerDom,
@@ -60,8 +61,7 @@ const mount = async (markup: string, data: readonly Record<string, unknown>[] = 
 }
 
 /** The grid's own semantics, which the host carries on its internals. */
-const grid = (element: HTMLElement): ElementInternals =>
-  (element as unknown as { internals: ElementInternals }).internals
+const grid = (element: HTMLElement): ElementInternals => internalsOf(element)
 
 /** Lets a spec write the change and then read what it produced. */
 const settled = async (element: Table): Promise<void> => {

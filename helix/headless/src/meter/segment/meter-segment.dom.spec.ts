@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, mount, part, registerDom, settle } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -13,8 +13,7 @@ const segmented = async (attrs = ''): Promise<HTMLElement> =>
     <helix-headless-meter-segment label="Tools" value="200"></helix-headless-meter-segment>
   </helix-headless-meter>`)
 
-const internals = (host: HTMLElement): ElementInternals =>
-  (host as unknown as { internals: ElementInternals }).internals
+const internals = (host: HTMLElement): ElementInternals => internalsOf(host)
 
 describe('meter segment', () => {
   test('the meter reads the sum of its segments', async () => {

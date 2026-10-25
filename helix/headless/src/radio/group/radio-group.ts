@@ -4,6 +4,7 @@ import {
   type HelixBeforeSelectEvent,
   HelixFormElement,
   hostAria,
+  internalsOf,
   KeyboardNavigationController,
   MixinControllerValue,
   MixinField,
@@ -88,7 +89,7 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
   static words = 'helix-radio-group'
 
   /**
-   * Whether the group holds a tab stop of its own.
+   * @internal Whether the group holds a tab stop of its own.
    *
    * A toolbar is one tab stop, so a toolbar the group sits in sets this to
    * `false` while its stop is on another control, and every radio, the chosen
@@ -318,7 +319,7 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
   /** Reports the answer and the verdict on it. */
   private sync(): void {
     const answered = this.answered
-    this.internals.setFormValue(answered ? this.value : null)
+    internalsOf(this).setFormValue(answered ? this.value : null)
     this.reportRequired(!answered, this.valueMissingMessage, 'items')
   }
 
@@ -344,13 +345,13 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
        element references on the client, and those win where a consumer slotted
        a label richer than a string. */
     this.adopt()
-    hostAria(this.internals, { label: this.label, role: 'radiogroup' })
+    hostAria(internalsOf(this), { label: this.label, role: 'radiogroup' })
     /* `required` reflects, sets validity and paints the asterisk the field
        sheet draws, and tells the accessibility tree nothing on its own. Without
        this a reader meets a mark beside the label they cannot see, and no
        announcement of why the form would refuse the group. */
-    this.internals.ariaRequired = this.required ? 'true' : null
-    this.internals.ariaReadOnly = this.readOnly ? 'true' : null
+    internalsOf(this).ariaRequired = this.required ? 'true' : null
+    internalsOf(this).ariaReadOnly = this.readOnly ? 'true' : null
   }
 
   protected override updated(changed: PropertyValues): void {

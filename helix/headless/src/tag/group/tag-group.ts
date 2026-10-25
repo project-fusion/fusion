@@ -6,6 +6,7 @@ import {
   focusItemOf,
   HelixElement,
   hostAria,
+  internalsOf,
   KeyboardNavigationController,
   type NavigableItem,
   pressedValue,
@@ -526,8 +527,9 @@ export class HelixHeadlessTagGroup extends HelixElement {
   protected override willUpdate(changed: PropertyValues<this>): void {
     super.willUpdate(changed)
     const empty = this.empty
-    hostAria(this.internals, { label: this.label, role: empty ? 'group' : 'grid' })
-    this.internals.ariaMultiSelectable = this.selectionMode === 'multiple' && !empty ? 'true' : null
+    hostAria(internalsOf(this), { label: this.label, role: empty ? 'group' : 'grid' })
+    internalsOf(this).ariaMultiSelectable =
+      this.selectionMode === 'multiple' && !empty ? 'true' : null
   }
 
   protected override updated(changed: PropertyValues<this>): void {

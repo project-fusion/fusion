@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria, internalsOf } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -62,7 +62,7 @@ export class HelixHeadlessStatGroup extends HelixElement {
       this.label.trim() !== '' ||
       Boolean(this.getAttribute?.('aria-label')?.trim()) ||
       Boolean(this.getAttribute?.('aria-labelledby')?.trim())
-    hostAria(this.internals, { label: this.label, role: named ? 'group' : '' })
+    hostAria(internalsOf(this), { label: this.label, role: named ? 'group' : '' })
   }
 
   protected override render(): TemplateResult {

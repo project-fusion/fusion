@@ -3,6 +3,7 @@ import {
   formatWords,
   HelixElement,
   hostAria,
+  internalsOf,
   numberConverter,
   UpgradeController,
   whenHydrated,
@@ -87,7 +88,7 @@ export interface BreadcrumbItem {
 export class HelixHeadlessBreadcrumbs extends HelixElement {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-breadcrumbs': { label: 'Brotkrümelpfad' } })`.
+   * `registerWords('de', { 'helix-breadcrumbs': { fallbackLabel: 'Brotkrümelpfad' } })`.
    */
   static words = 'helix-breadcrumbs'
 
@@ -187,7 +188,7 @@ export class HelixHeadlessBreadcrumbs extends HelixElement {
     // On the host through internals, so the landmark is the element itself and
     // an author's `aria-label` names it without anything being copied inward.
     // The default name goes the same way, and an attribute beats internals.
-    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'navigation' })
+    hostAria(internalsOf(this), { label: this.label || this.fallbackLabel, role: 'navigation' })
     if (changed.has('items') && changed.get('items') !== undefined) {
       this.expanded = false
     }

@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, registerDom, role, slotted } from '@fusion.dev/helix-testing/dom'
+import {
+  hasState,
+  internalsOf,
+  mount,
+  registerDom,
+  role,
+  slotted,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -104,7 +111,7 @@ describe('card regions', () => {
       updateComplete: Promise<boolean>
     }
     expect(role(card)).toBe('group')
-    expect(card.internals.ariaLabel).toBe('Storage')
+    expect(internalsOf(card).ariaLabel).toBe('Storage')
     expect(card.hasAttribute('aria-label')).toBe(false)
     card.label = ''
     await card.updateComplete
@@ -129,21 +136,21 @@ describe('card regions', () => {
     await card.updateComplete
     const heading = card.querySelector('h2')
     /* An engine without element references hears the heading's words. */
-    const references = 'ariaLabelledByElements' in (card.internals as object)
+    const references = 'ariaLabelledByElements' in (internalsOf(card) as object)
     expect(role(card)).toBe('group')
     if (references) {
-      expect(card.internals.ariaLabelledByElements).toEqual([heading as Element])
+      expect(internalsOf(card).ariaLabelledByElements).toEqual([heading as Element])
     } else {
-      expect(card.internals.ariaLabel).toBe('Storage')
+      expect(internalsOf(card).ariaLabel).toBe('Storage')
     }
     expect(card.hasAttribute('aria-labelledby')).toBe(false)
 
     card.setAttribute('aria-label', 'Disk')
     await card.updateComplete
     expect(role(card)).toBe('group')
-    expect(card.internals.ariaLabel).toBeNull()
+    expect(internalsOf(card).ariaLabel).toBeNull()
     if (references) {
-      expect(card.internals.ariaLabelledByElements).toBeNull()
+      expect(internalsOf(card).ariaLabelledByElements).toBeNull()
     }
   })
 

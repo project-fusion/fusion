@@ -1,6 +1,14 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  hasState,
+  internalsOf,
+  mount,
+  part,
+  registerDom,
+  role,
+} from '@fusion.dev/helix-testing/dom'
 
 /* happy-dom before the element, and the import dynamic for that reason: an
    element registered against the `customElements` happy-dom then replaces never
@@ -496,13 +504,12 @@ describe('a drilldown with navigation', () => {
         <helix-headless-drilldown-item value="blog" href="/blog">Blog</helix-headless-drilldown-item>
       </helix-headless-drilldown>`,
     )) as Stack
-  const internalRole = (element: Element): string | null =>
-    (element as unknown as { internals: ElementInternals }).internals.role ?? null
+  const internalRole = (element: Element): string | null => internalsOf(element).role ?? null
 
   test('is a navigation landmark named by its label, whose page is a list of items', async () => {
     const host = await site()
     expect(internalRole(host)).toBe('navigation')
-    expect((host as unknown as { internals: ElementInternals }).internals.ariaLabel).toBe('Site')
+    expect(internalsOf(host).ariaLabel).toBe('Site')
     const page = part(host, 'page')
     expect(page?.getAttribute('role')).toBe('list')
     const [docs, blog] = [...host.children] as HTMLElement[]
@@ -526,7 +533,7 @@ describe('a drilldown with navigation', () => {
       </helix-headless-drilldown>`,
     )) as Stack
     expect(internalRole(host)).toBe('navigation')
-    expect((host as unknown as { internals: ElementInternals }).internals.ariaLabel).toBeNull()
+    expect(internalsOf(host).ariaLabel).toBeNull()
     expect(part(host, 'page')?.hasAttribute('aria-label')).toBe(false)
   })
 

@@ -228,7 +228,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   target = ''
 
   /**
-   * Whether this item holds the tree's single tab stop.
+   * @internal Whether this item holds the tree's single tab stop.
    */
   @state()
   focusable = false

@@ -4,6 +4,7 @@ import {
   HelixBeforeChangeEvent,
   HelixFormElement,
   hostWords,
+  internalsOf,
   numberConverter,
   requestChange,
   words,
@@ -103,7 +104,7 @@ import '../../select/index.js'
 export class HelixHeadlessPaginationSize extends HelixFormElement {
   /**
    * The key this part's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-pagination-size': { label: 'Pro Seite' } })`.
+   * `registerWords('de', { 'helix-pagination-size': { fallbackLabel: 'Pro Seite' } })`.
    */
   static words = 'helix-pagination-size'
 
@@ -259,7 +260,7 @@ export class HelixHeadlessPaginationSize extends HelixFormElement {
     /* The size in force, which is what the select shows, and nothing where no
        size is offered. */
     const current = this.current
-    this.internals.setFormValue(current > 0 ? String(current) : null)
+    internalsOf(this).setFormValue(current > 0 ? String(current) : null)
   }
 
   /**

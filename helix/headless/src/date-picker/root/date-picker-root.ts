@@ -15,6 +15,7 @@ import {
   handedLocale,
   hostAria,
   inlineStep,
+  internalsOf,
   labelsOf,
   commaList as list,
   MIRROR_RULE,
@@ -1264,10 +1265,10 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
   private reportRequired(): void {
     const problem = this.problem
     if (problem) {
-      this.internals.setValidity(problem[0], problem[1], this.partNamed('grid') ?? undefined)
+      internalsOf(this).setValidity(problem[0], problem[1], this.partNamed('grid') ?? undefined)
       return
     }
-    this.internals.setValidity({})
+    internalsOf(this).setValidity({})
   }
 
   /**
@@ -1338,7 +1339,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
        attribute and not the words, which may be the ones registered for the
        page's language. */
     const outside = this.hasAttribute('label') ? [] : labelsOf(this)
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: this.label || this.fallbackLabel,
       labelledBy: outside,
       role: 'group',
@@ -1350,7 +1351,7 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
        exists: a calendar inside a disabled fieldset is disabled and its own
        property says nothing about it. Writing `disabled` here also overwrote
        the answer `HelixFormElement.willUpdate` had just computed. */
-    this.internals.ariaDisabled = this.isDisabled ? 'true' : null
+    internalsOf(this).ariaDisabled = this.isDisabled ? 'true' : null
     this.toggleState('blank', this.value === '')
     this.toggleState('range-pending', this.pending)
     this.toggleState('month-view', this.view === 'month')
@@ -1390,10 +1391,10 @@ export class HelixHeadlessDatePicker extends MixinPickerFeedback(
    */
   private report(): void {
     if (this.isDisabled) {
-      this.internals.setFormValue(null)
+      internalsOf(this).setFormValue(null)
       return
     }
-    reportValues(this.internals, this.name, this.selected)
+    reportValues(internalsOf(this), this.name, this.selected)
   }
 
   /**

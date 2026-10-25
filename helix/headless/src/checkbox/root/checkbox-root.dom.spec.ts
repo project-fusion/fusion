@@ -4,6 +4,7 @@ import {
   formValue,
   hasLayout,
   hasState,
+  internalsOf,
   mount,
   part,
   registerDom,
@@ -180,7 +181,7 @@ describe('checkbox', () => {
 
   test('required is announced, not only enforced', async () => {
     const box = (await checkbox('required')) as Checkbox & { internals?: ElementInternals }
-    expect(box.internals?.ariaRequired).toBe('true')
+    expect(internalsOf(box)?.ariaRequired).toBe('true')
     expect(box.getAttributeNames().includes('required')).toBe(true)
   })
 })

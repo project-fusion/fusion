@@ -2,6 +2,7 @@ import {
   customElement,
   focusTarget,
   HelixElement,
+  internalsOf,
   numberConverter,
   wordsLocale,
 } from '@fusion.dev/helix-core'
@@ -215,7 +216,7 @@ export class HelixHeadlessBadge extends HelixElement {
     if (control !== this.described && own) {
       return
     }
-    this.internals.ariaLabel = words
+    internalsOf(this).ariaLabel = words
     control.ariaDescribedByElements = [this]
     this.described = control
   }
@@ -225,7 +226,7 @@ export class HelixHeadlessBadge extends HelixElement {
       this.described.ariaDescribedByElements = null
     }
     this.described = undefined
-    this.internals.ariaLabel = null
+    internalsOf(this).ariaLabel = null
   }
 
   private readonly handleSlotchange = (): void => {

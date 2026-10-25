@@ -6,6 +6,7 @@ import {
   findRanges,
   formatWords,
   HelixFormElement,
+  internalsOf,
   ListedController,
   MixinControllerValue,
   MixinField,
@@ -342,7 +343,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
   protected readonly listed = new ListedController(
     this,
     'focus',
-    () => this.internals?.ariaKeyShortcuts,
+    () => internalsOf(this)?.ariaKeyShortcuts,
   )
 
   protected readonly aria = new AriaForwardController(this, {
@@ -571,7 +572,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    this.internals.setFormValue(this.value)
+    internalsOf(this).setFormValue(this.value)
     const control = this.control
     if (control) {
       this.copyValidity(control)
@@ -581,7 +582,7 @@ export class HelixHeadlessCodeEditor extends MixinControllerValue(MixinField(Hel
         ? this.partNamed('view')?.querySelector<HTMLElement>('[contenteditable]')
         : undefined
       if (anchor && !control.validity.valid) {
-        this.internals.setValidity(control.validity, this.internals.validationMessage, anchor)
+        internalsOf(this).setValidity(control.validity, internalsOf(this).validationMessage, anchor)
       }
       this.refreshFeedback()
     }

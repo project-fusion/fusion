@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* The reading, after hydration. What is asserted here is what the element
    decides: which of the two modes it is in, where it takes its value from, and
@@ -211,8 +211,7 @@ describe('a frozen reading', () => {
 
 describe('which side of now a reading is on', () => {
   test('is a state a page can style, and a date is on neither side', async () => {
-    const states = (element: Stamp) =>
-      (element as unknown as { internals: ElementInternals }).internals.states
+    const states = (element: Stamp) => internalsOf(element).states
     const ago = await stamp(
       `<helix-headless-format-date relative="long" date="${at}"></helix-headless-format-date>`,
     )

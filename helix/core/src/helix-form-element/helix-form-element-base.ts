@@ -1,6 +1,6 @@
 import type { PropertyValues } from 'lit'
 import { property, state } from 'lit/decorators.js'
-import { HelixElement } from '../helix-element/helix-element.js'
+import { HelixElement, internalsOf } from '../helix-element/helix-element.js'
 import { watchLabels } from '../utils/watch-labels/watch-labels.js'
 
 /** Whether `element` is where Tab would stop: focusable, in the sequence, and drawn. */
@@ -195,7 +195,7 @@ export class HelixFormElementBase extends HelixElement {
       this.formDisabled = this.heldByFieldset
     }
     // Off for either reason, and said once for every control in the library.
-    this.internals.ariaDisabled = this.isDisabled ? 'true' : null
+    internalsOf(this).ariaDisabled = this.isDisabled ? 'true' : null
   }
 
   /**
@@ -242,10 +242,10 @@ export class HelixFormElementBase extends HelixElement {
    */
   protected applyValidity(): void {
     if (this.customValidity === '') {
-      this.internals.setValidity({})
+      internalsOf(this).setValidity({})
       return
     }
-    this.internals.setValidity(
+    internalsOf(this).setValidity(
       { customError: true },
       this.customValidity,
       this.focusTarget ?? undefined,
@@ -259,13 +259,13 @@ export class HelixFormElementBase extends HelixElement {
    */
   get validity(): ValidityState {
     this.runPendingUpdate()
-    return this.internals.validity
+    return internalsOf(this).validity
   }
 
   /** The message the browser would show for the control, or an empty string. */
   get validationMessage(): string {
     this.runPendingUpdate()
-    return this.internals.validationMessage
+    return internalsOf(this).validationMessage
   }
 
   /** Whether an update is running, so `runPendingUpdate` never starts one inside another. */
@@ -303,7 +303,7 @@ export class HelixFormElementBase extends HelixElement {
 
   /** Whether the control is checked when its form is submitted. */
   get willValidate(): boolean {
-    return this.internals.willValidate
+    return internalsOf(this).willValidate
   }
 
   /**
@@ -312,7 +312,7 @@ export class HelixFormElementBase extends HelixElement {
    */
   checkValidity(): boolean {
     this.runPendingUpdate()
-    return this.internals.checkValidity()
+    return internalsOf(this).checkValidity()
   }
 
   /**
@@ -322,7 +322,7 @@ export class HelixFormElementBase extends HelixElement {
   reportValidity(): boolean {
     this.runPendingUpdate()
     this.applyValidity()
-    return this.internals.reportValidity()
+    return internalsOf(this).reportValidity()
   }
 
   /**
@@ -381,7 +381,7 @@ export class HelixFormElementBase extends HelixElement {
    * was the best there was.
    */
   private readonly refreshAnchor = (): void => {
-    if (!this.internals.validity.valid) {
+    if (!internalsOf(this).validity.valid) {
       this.applyValidity()
     }
   }
@@ -433,7 +433,7 @@ export class HelixFormElementBase extends HelixElement {
    * @reference https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements form-associated custom elements
    */
   get form(): HTMLFormElement | null {
-    return this.internals.form
+    return internalsOf(this).form
   }
 
   /**
@@ -442,6 +442,6 @@ export class HelixFormElementBase extends HelixElement {
    * @reference https://html.spec.whatwg.org/multipage/custom-elements.html#form-associated-custom-elements form-associated custom elements
    */
   get labels(): NodeList {
-    return this.internals.labels
+    return internalsOf(this).labels
   }
 }

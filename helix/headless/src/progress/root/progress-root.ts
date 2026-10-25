@@ -4,6 +4,7 @@ import {
   HelixCompleteEvent,
   HelixElement,
   hostAria,
+  internalsOf,
   numberConverter,
   readingText,
   StatusController,
@@ -247,7 +248,7 @@ export class HelixHeadlessProgress extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: slottedWords(this, ['label']) || this.label || this.fallbackLabel,
       role: 'progressbar',
     })
@@ -256,8 +257,8 @@ export class HelixHeadlessProgress extends HelixElement {
        a number assigned here is stringified anyway and reads as though the
        type were checked. */
     const { max, min } = this.range
-    this.internals.ariaValueMin = String(min)
-    this.internals.ariaValueMax = String(max)
+    internalsOf(this).ariaValueMin = String(min)
+    internalsOf(this).ariaValueMax = String(max)
     /* Absent while indeterminate, not zero. An omitted `aria-valuenow` is the
      * platform's own signal for indeterminate, and it is the only one:
      * `aria-busy` says the element is being updated, which is a different claim.
@@ -269,7 +270,7 @@ export class HelixHeadlessProgress extends HelixElement {
      * float, and for roughly one integer pair in sixteen it does not come back:
      * `1/3*3` is `0.9999999999999998`, which is what the accessibility tree
      * carried and what a screen reader read out. */
-    this.internals.ariaValueNow = this.indeterminate
+    internalsOf(this).ariaValueNow = this.indeterminate
       ? null
       : String(Math.min(Math.max(Number.isNaN(this.value) ? min : this.value, min), max))
     /* The words the bar shows, said whether or not they are shown. Left to the
@@ -277,7 +278,7 @@ export class HelixHeadlessProgress extends HelixElement {
        draws half, and in the runtime's digits rather than the page's. React
        Aria's ProgressBar writes its formatted reading here the same way. */
     const shown = this.valueText || slottedWords(this, [''])
-    this.internals.ariaValueText = this.indeterminate ? shown || null : shown || this.text
+    internalsOf(this).ariaValueText = this.indeterminate ? shown || null : shown || this.text
     this.toggleState('complete', this.complete)
   }
 

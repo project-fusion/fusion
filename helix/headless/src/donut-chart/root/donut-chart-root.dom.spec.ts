@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -476,7 +476,7 @@ describe('the slice, heard by the page', () => {
    is supplied, as `field-invalid.dom.spec.ts` reads it. */
 describe('the states a stylesheet reads', () => {
   const states = (host: HTMLElement): Set<string> => {
-    const internals = (host as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(host)
     if (!('states' in internals)) {
       Object.defineProperty(internals, 'states', { value: new Set<string>() })
     }

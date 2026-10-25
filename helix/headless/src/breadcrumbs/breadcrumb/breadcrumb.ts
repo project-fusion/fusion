@@ -4,6 +4,7 @@ import {
   HelixElement,
   HelixSelectEvent,
   hostAria,
+  internalsOf,
   MIRROR_RULE,
   plainClick,
   slotFilled,
@@ -175,8 +176,8 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
     // On the host, because the item is an `<ol>` child in the flat tree and the
     // role has to be there for the list to have items. In `willUpdate` rather
     // than `connectedCallback`, which the server never calls.
-    hostAria(this.internals, { role: 'listitem' })
-    this.internals.ariaCurrent = this.current || this.implied ? 'page' : null
+    hostAria(internalsOf(this), { role: 'listitem' })
+    internalsOf(this).ariaCurrent = this.current || this.implied ? 'page' : null
     this.toggleState('current', this.current || this.implied)
     this.toggleState('folded', this.folded)
   }

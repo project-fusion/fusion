@@ -25,6 +25,7 @@ import {
   HelixSelectEvent,
   hostAria,
   inlineStep,
+  internalsOf,
   isRtl,
   MixinViewport,
   type MoveDetail,
@@ -4160,7 +4161,7 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (this.watched && !this.touched) {
       this.fitInto(true)
     }
-    hostAria(this.internals, { label: this.label })
+    hostAria(internalsOf(this), { label: this.label })
     this.toggleState('connecting', this.drawing)
     this.toggleState('direct', this.direct)
     this.toggleState('pressing', this.pressing)

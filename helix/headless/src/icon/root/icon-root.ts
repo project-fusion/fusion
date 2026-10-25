@@ -3,6 +3,7 @@ import {
   customElement,
   HelixElement,
   hostAria,
+  internalsOf,
   MIRROR_RULE,
   reportRuntime,
 } from '@fusion.dev/helix-core'
@@ -236,7 +237,7 @@ export class HelixHeadlessIcon extends HelixElement {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     const named = this.label === '' && (this.getAttribute?.('aria-label') ?? '') !== ''
-    hostAria(this.internals, { role: named ? 'img' : '' })
+    hostAria(internalsOf(this), { role: named ? 'img' : '' })
     this.drawn = this.icon ?? this.lookup()
   }
 

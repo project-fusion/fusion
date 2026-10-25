@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { afterEach, beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasState, internalsOf, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -80,13 +80,13 @@ describe('tooltip', () => {
     // from a slotted trigger at a bubble in the shadow root resolves to
     // nothing at all.
     const tip = await tooltip()
-    const linked = tip.internals?.ariaDescribedByElements
+    const linked = internalsOf(tip)?.ariaDescribedByElements
     expect(Array.isArray(linked) ? linked[0] : null).toBe(part(tip, 'surface'))
   })
 
   test('nothing is linked when there is nothing to say', async () => {
     const tip = await tooltip('content=""')
-    expect(tip.internals?.ariaDescribedByElements ?? null).toBeNull()
+    expect(internalsOf(tip)?.ariaDescribedByElements ?? null).toBeNull()
   })
 
   test('it answers the keyboard as well as the pointer', async () => {
@@ -195,7 +195,7 @@ describe('tooltip', () => {
     tip.show()
     await tip.updateComplete
     expect(tip.open).toBe(true)
-    const linked = tip.internals?.ariaDescribedByElements
+    const linked = internalsOf(tip)?.ariaDescribedByElements
     expect(Array.isArray(linked) ? linked[0] : null).toBe(part(tip, 'surface'))
   })
 
@@ -265,7 +265,7 @@ describe('tooltip for', () => {
        a name of its own the host described nothing until the bubble was already
        up, and a screen reader computes the description as focus lands. */
     const { tip } = await pair()
-    expect(tip.internals?.ariaLabel).toBe('Writes the file to disk')
+    expect(internalsOf(tip)?.ariaLabel).toBe('Writes the file to disk')
   })
 
   test('the host is out of the accessibility tree while the bubble is down, and back while it shows', async () => {
@@ -273,13 +273,13 @@ describe('tooltip for', () => {
        tooltip to a reader walking the page. The trigger's reference still
        reads its name. */
     const { tip } = await pair()
-    expect(tip.internals?.ariaHidden).toBe('true')
+    expect(internalsOf(tip)?.ariaHidden).toBe('true')
     tip.show()
     await tip.updateComplete
-    expect(tip.internals?.ariaHidden ?? null).toBeNull()
+    expect(internalsOf(tip)?.ariaHidden ?? null).toBeNull()
     tip.hide()
     await tip.updateComplete
-    expect(tip.internals?.ariaHidden).toBe('true')
+    expect(internalsOf(tip)?.ariaHidden).toBe('true')
   })
 
   test('slotted content is named by its text, flattened', async () => {
@@ -289,13 +289,13 @@ describe('tooltip for', () => {
     )
     const tip = host.querySelector('helix-headless-tooltip') as unknown as Tooltip
     await tip.updateComplete
-    expect(tip.internals?.ariaLabel).toBe('Save now')
+    expect(internalsOf(tip)?.ariaLabel).toBe('Save now')
   })
 
   test('wrapping names the host too, since the trigger references it in both forms', async () => {
     const tip = await tooltip()
     await tip.updateComplete
-    expect(tip.internals?.ariaLabel ?? null).toBe('Regenerates the manifests')
+    expect(internalsOf(tip)?.ariaLabel ?? null).toBe('Regenerates the manifests')
   })
 
   /* Named and described by its words, the host was a generic of its own
@@ -305,9 +305,9 @@ describe('tooltip for', () => {
   test('the host is no box of its own in the accessibility tree, in both forms', async () => {
     const tip = await tooltip()
     await tip.updateComplete
-    expect(tip.internals?.role).toBe('none')
+    expect(internalsOf(tip)?.role).toBe('none')
     const { tip: beside } = await pair()
-    expect(beside.internals?.role).toBe('none')
+    expect(internalsOf(beside)?.role).toBe('none')
   })
 
   test('an id that names nothing resolves to no trigger', async () => {
@@ -685,7 +685,7 @@ describe('the wrapping form', () => {
 
   test('stays in the accessibility tree, since it holds its trigger', async () => {
     const tip = await tooltip()
-    expect(tip.internals?.ariaHidden ?? null).toBeNull()
+    expect(internalsOf(tip)?.ariaHidden ?? null).toBeNull()
   })
 
   test('warns where the tooltip says what the trigger’s name does not', async () => {

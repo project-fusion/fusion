@@ -52,12 +52,18 @@ import { property } from 'lit/decorators.js'
  * has focus, so a radio-style toggle group or a select answers them itself.
  * The toolbar is `role="toolbar"` with `aria-orientation`, named by `label`.
  *
- * The stop moves through a control's own `focusable` property where it has
- * one, as Button, Select and Toggle Group do. A control without one has
- * `tabindex` written on the element that takes focus: a native element
- * itself, or the control inside a custom element's open shadow root, so the
- * host keeps the markup you rendered. Only a custom element whose shadow root
- * is closed takes it on the host.
+ * **A control takes the stop through a `focusable` property.** Where a
+ * control has a boolean `focusable`, the toolbar sets it `true` on the control
+ * that holds the stop and `false` on every other, and the control puts its
+ * own focusable part in or out of the tab order. Button, Select, Radio Group
+ * and Toggle Group take part this way, and a control of your own takes part
+ * by declaring the same property. This is the one place the property is
+ * documented: on Helix's own controls it is internal, because only a toolbar
+ * or a set writes it. A control without one has `tabindex` written on the
+ * element that takes focus: a native element itself, or the control inside a
+ * custom element's open shadow root, so the host keeps the markup you
+ * rendered. Only a custom element whose shadow root is closed takes it on the
+ * host.
  *
  * A toggle group of pressed buttons, `selection-mode="multiple"`, is walked
  * through the same way, each toggle a stop on the toolbar's axis, as React
@@ -95,8 +101,8 @@ import { property } from 'lit/decorators.js'
 @customElement('helix-headless-toolbar')
 export class HelixHeadlessToolbar extends HelixElement {
   /**
-   * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-toolbar': { label: 'Werkzeugleiste' } })`.
+   * The key this family's words are registered under, its styled tag, kept
+   * for a subclass that adds words of its own. Toolbar has no built-in name.
    */
   static words = 'helix-toolbar'
 

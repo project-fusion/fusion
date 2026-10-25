@@ -3,6 +3,7 @@ import {
   HelixElement,
   headingIn,
   hostAria,
+  internalsOf,
   slotFilled,
 } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
@@ -158,8 +159,8 @@ export class HelixHeadlessCard extends HelixElement {
     const heading = named
       ? null
       : headingIn(this.knownChildren.filter((child) => child.slot === 'header'))
-    const references = 'ariaLabelledByElements' in this.internals
-    hostAria(this.internals, {
+    const references = 'ariaLabelledByElements' in internalsOf(this)
+    hostAria(internalsOf(this), {
       label: heading && !references ? (heading.textContent ?? '').trim() : this.label,
       labelledBy: heading ? [heading] : [],
       role: named || heading ? 'group' : '',

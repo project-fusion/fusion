@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -10,8 +10,7 @@ beforeAll(async () => {
 type Field = Updatable & { value: string }
 
 /** The validity the host stands behind, which is where this element writes it. */
-const internals = (host: Field): ElementInternals =>
-  (host as unknown as { internals: ElementInternals }).internals
+const internals = (host: Field): ElementInternals => internalsOf(host)
 
 /** What a reader would be told, or nothing where the field is content. */
 const complaint = (host: Field): string => internals(host).validationMessage

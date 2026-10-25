@@ -10,6 +10,7 @@ import {
   focusTarget,
   HelixElement,
   inlineStep,
+  internalsOf,
   KeyboardNavigationController,
   linkDescription,
   MIRROR_RULE,
@@ -1154,7 +1155,7 @@ export class HelixHeadlessMenu extends MixinCollection(MixinControllerOpen(Helix
     if (control && control !== this.described && linkDescription(control, this, light)) {
       this.described = control
     }
-    this.internals.ariaLabel = this.described ? this.longPressLabel : null
+    internalsOf(this).ariaLabel = this.described ? this.longPressLabel : null
   }
 
   /** A reader reaching the trigger, which is late enough to describe a plain one. */

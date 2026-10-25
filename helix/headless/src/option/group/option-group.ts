@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria, internalsOf } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -38,7 +38,7 @@ export class HelixHeadlessOptionGroup extends HelixElement {
     /* The string half, which is what a server can write. `nameFromHeading`
        adds the element reference on the client and wins where a consumer
        slotted a heading richer than a string. */
-    hostAria(this.internals, { label: this.label, role: 'group' })
+    hostAria(internalsOf(this), { label: this.label, role: 'group' })
   }
 
   protected override updated(changed: PropertyValues): void {
@@ -69,7 +69,7 @@ export class HelixHeadlessOptionGroup extends HelixElement {
    */
   private nameFromHeading(): void {
     const heading = this.partNamed('label')
-    hostAria(this.internals, { labelledBy: heading ? [heading] : [] })
+    hostAria(internalsOf(this), { labelledBy: heading ? [heading] : [] })
   }
 
   protected override render(): TemplateResult {

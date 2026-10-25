@@ -4,6 +4,7 @@ import {
   formValue,
   hasLayout,
   hasState,
+  internalsOf,
   mount,
   part,
   registerDom,
@@ -498,8 +499,7 @@ describe('a day from a neighboring month is filler', () => {
 })
 
 describe('an invalid calendar says so where it can be heard', () => {
-  const internals = (host: HTMLElement): ElementInternals =>
-    (host as unknown as { internals: ElementInternals }).internals
+  const internals = (host: HTMLElement): ElementInternals => internalsOf(host)
 
   test('through internals, not an attribute the consumer never wrote', async () => {
     const cal = await calendar('default-month="2026-08" invalid')
@@ -642,12 +642,12 @@ describe("a date picker in the page's words", () => {
       '<helix-headless-date-picker required value-missing-message="Choisissez une date."></helix-headless-date-picker>',
     )) as HTMLElement & { internals: ElementInternals; updateComplete: Promise<boolean> }
     await empty.updateComplete
-    expect(empty.internals.validationMessage).toBe('Choisissez une date.')
+    expect(internalsOf(empty).validationMessage).toBe('Choisissez une date.')
     const wrong = (await mount(
       '<helix-headless-date-picker value="not-a-date" bad-input-message="Pas une date."></helix-headless-date-picker>',
     )) as HTMLElement & { internals: ElementInternals; updateComplete: Promise<boolean> }
     await wrong.updateComplete
-    expect(wrong.internals.validationMessage).toBe('Pas une date.')
+    expect(internalsOf(wrong).validationMessage).toBe('Pas une date.')
   })
 })
 
@@ -724,13 +724,13 @@ describe('the bounds of a date picker', () => {
   test('make a value outside them invalid, with the bound it is past', async () => {
     const early = (await calendar('min="2026-01-01" default-value="2020-01-01"')) as Checked
     await early.updateComplete
-    expect(early.internals.validity.rangeUnderflow).toBe(true)
+    expect(internalsOf(early).validity.rangeUnderflow).toBe(true)
     const late = (await calendar(
       'max="2026-01-01" default-value="2026-03-01" range-overflow-message="Too late: {max}"',
     )) as Checked
     await late.updateComplete
-    expect(late.internals.validity.rangeOverflow).toBe(true)
-    expect(late.internals.validationMessage.startsWith('Too late: ')).toBe(true)
+    expect(internalsOf(late).validity.rangeOverflow).toBe(true)
+    expect(internalsOf(late).validationMessage.startsWith('Too late: ')).toBe(true)
   })
 
   /* Date Input reported a range ending before it starts, and a calendar
@@ -740,13 +740,13 @@ describe('the bounds of a date picker', () => {
       'mode="range" default-value="2026-06-03,2026-05-09" locale="en-US"',
     )) as Checked
     await backward.updateComplete
-    expect(backward.internals.validity.rangeUnderflow).toBe(true)
-    expect(backward.internals.validationMessage).toBe('Choose an end on or after June 3, 2026.')
+    expect(internalsOf(backward).validity.rangeUnderflow).toBe(true)
+    expect(internalsOf(backward).validationMessage).toBe('Choose an end on or after June 3, 2026.')
     const forward = (await calendar(
       'mode="range" default-value="2026-05-09,2026-06-03"',
     )) as Checked
     await forward.updateComplete
-    expect(forward.internals.validity.valid).toBe(true)
+    expect(internalsOf(forward).validity.valid).toBe(true)
   })
 
   test('and a barred day or one off the step invalid too', async () => {
@@ -754,10 +754,10 @@ describe('the bounds of a date picker', () => {
       'disable-dates="2026-08-12" default-value="2026-08-12"',
     )) as Checked
     await barred.updateComplete
-    expect(barred.internals.validity.valid).toBe(false)
+    expect(internalsOf(barred).validity.valid).toBe(false)
     const off = (await calendar('min="2026-08-03" step="7" default-value="2026-08-04"')) as Checked
     await off.updateComplete
-    expect(off.internals.validity.stepMismatch).toBe(true)
+    expect(internalsOf(off).validity.stepMismatch).toBe(true)
   })
 })
 
@@ -858,8 +858,9 @@ if (hasLayout()) {
         updateComplete: Promise<unknown>
       }
       await picker.updateComplete
-      const names = (picker.internals as ElementInternals & { ariaLabelledByElements: Element[] })
-        .ariaLabelledByElements
+      const names = (
+        internalsOf(picker) as ElementInternals & { ariaLabelledByElements: Element[] }
+      ).ariaLabelledByElements
       expect(names.map((one) => one.textContent)).toEqual(['Due'])
     })
   })
@@ -882,7 +883,7 @@ describe('a rule and a drawing for each day', () => {
     expect(thirteenth?.getAttribute('aria-disabled')).toBe('true')
     cal.value = '2026-08-13'
     await cal.updateComplete
-    expect(cal.internals.validity.badInput).toBe(true)
+    expect(internalsOf(cal).validity.badInput).toBe(true)
   })
 
   test('dayContent draws what each day shows, and the cell is still named by its date', async () => {
@@ -1078,7 +1079,7 @@ describe('a date picker’s own message', () => {
     )) as DatePicker & { internals: ElementInternals; validationMessage: string }
     expect(part(host, 'feedback')?.textContent).toBe('Pick a weekday')
     expect(host.validationMessage).toBe('Pick a weekday')
-    expect(host.internals.ariaInvalid).toBe('true')
+    expect(internalsOf(host).ariaInvalid).toBe('true')
     expect(hasState(host, 'invalid')).toBe(true)
   })
 })

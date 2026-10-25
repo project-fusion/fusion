@@ -1,6 +1,7 @@
 import type { PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import { PopoverController } from '../../controllers/popover-controller/popover-controller.js'
+import { internalsOf } from '../../helix-element/helix-element.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
 import { submitImplicitly } from '../../utils/implicit-submit/implicit-submit.js'
 import { reportValues } from '../../utils/report-values/report-values.js'
@@ -317,9 +318,9 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
     protected sync(): void {
       const answers = this.answers
       if (answers === undefined) {
-        this.internals.setFormValue(this.value)
+        internalsOf(this).setFormValue(this.value)
       } else {
-        reportValues(this.internals, this.name, answers)
+        reportValues(internalsOf(this), this.name, answers)
       }
       const control = this.control
       if (!control) {
@@ -329,7 +330,7 @@ export const MixinPickerField = <T extends Constructor<PickerBase>>(Base: T) => 
       if (fault === null) {
         this.copyValidity(control)
       } else {
-        this.internals.setValidity(fault[0], fault[1], control)
+        internalsOf(this).setValidity(fault[0], fault[1], control)
       }
       this.refreshFeedback()
     }

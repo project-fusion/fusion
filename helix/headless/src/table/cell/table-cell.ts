@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria, internalsOf } from '@fusion.dev/helix-core'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 
@@ -76,7 +76,9 @@ export class HelixHeadlessTableCell extends HelixElement {
     super.willUpdate(changed)
     // In `willUpdate`, which the server does call, unlike `connectedCallback`.
     const header = this.headsRow ? 'rowheader' : 'columnheader'
-    hostAria(this.internals, { role: this.header ? header : this.gridCell ? 'gridcell' : 'cell' })
+    hostAria(internalsOf(this), {
+      role: this.header ? header : this.gridCell ? 'gridcell' : 'cell',
+    })
   }
 
   protected override updated(changed: PropertyValues): void {

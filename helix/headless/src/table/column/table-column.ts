@@ -6,6 +6,7 @@ import {
   HelixResizedEvent,
   hostAria,
   inlineStep,
+  internalsOf,
   isRtl,
   requestChange,
   valueAt,
@@ -422,13 +423,13 @@ export class HelixHeadlessTableColumn extends HelixElement {
        controls keep their own names. */
     const named = this.movable || this.resizable
     const host = !this.gridCell
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: host && named ? this.name : '',
       role: host ? 'columnheader' : '',
     })
     /* Set here rather than through `hostAria`, which carries the four semantics
        every family needs and not this one. */
-    this.internals.ariaSort = host && this.canSort ? (this.sorted ?? 'none') : null
+    internalsOf(this).ariaSort = host && this.canSort ? (this.sorted ?? 'none') : null
     /* And the same fact as a custom state, because ARIA is not a style hook.
        Whoever draws this column draws the caret, and had nothing to draw it
        from: no state and no part told the sorted column from the rest, so the

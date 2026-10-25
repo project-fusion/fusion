@@ -10,6 +10,7 @@ import {
   HelixElement,
   hostAria,
   inlineStep,
+  internalsOf,
   isRtl,
   MIRROR_RULE,
   motionPaused,
@@ -1375,11 +1376,11 @@ export class HelixHeadlessCarousel extends HelixElement {
     if (changed.has('perView')) {
       this.fitted = undefined
     }
-    hostAria(this.internals, { label: this.label || this.fallbackLabel, role: 'group' })
+    hostAria(internalsOf(this), { label: this.label || this.fallbackLabel, role: 'group' })
     // Announced as a carousel rather than as a bare group, so a reader knows
     // what the controls beside it are for. In the page's language, from
     // `roleLabel`, and with no role description where that is empty.
-    this.internals.ariaRoleDescription = this.roleLabel || null
+    internalsOf(this).ariaRoleDescription = this.roleLabel || null
   }
 
   protected override firstUpdated(changed: PropertyValues): void {

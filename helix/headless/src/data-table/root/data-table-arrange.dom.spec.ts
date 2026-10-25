@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount as mountMarkup, registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, mount as mountMarkup, registerDom } from '@fusion.dev/helix-testing/dom'
 
 /* What a reader arranges: which rows are chosen, which order the columns sit in,
    how wide one is, and what leaves as CSV. Each is the table's to hold and the
@@ -123,7 +123,7 @@ describe('selection', () => {
 
   test('says the grid takes more than one choice, and each row whether it is one', async () => {
     const element = await table('selectable row-key="id" default-selected="b"')
-    const internals = (element as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(element)
     expect(internals.ariaMultiSelectable).toBe('true')
     expect(
       shadow(element, '[part~="row"]').map((row) => row.getAttribute('aria-selected')),

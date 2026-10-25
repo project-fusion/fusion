@@ -3440,6 +3440,37 @@ fn words_tables() {
     );
 }
 
+/// A member a parent writes is internal: the clean row says so, and the fault
+/// takes the tag away.
+#[test]
+fn coordinated() {
+    let row = |tag: &str| {
+        format!(
+            "export class Row extends HTMLElement {{
+  /**
+   * {tag}Whether the row holds its list's tab stop. No attribute: it is
+   * coordination between elements.
+   */
+  @property({{ attribute: false }})
+  focusable = false
+}}
+"
+        )
+    };
+    plant(
+        "coordinated",
+        &[
+            ("helix.json", TIERS),
+            ("src/list/row.ts", &row("@internal ")),
+        ],
+        |tree| {
+            tree.write("src/list/row.ts", &row(""));
+        },
+        "`focusable` is written by another element and is public",
+        "src/list/row.ts:7",
+    );
+}
+
 /// `label` is the page's name and has no built-in default: the clean tree
 /// names itself through `fallbackLabel`, and the fault moves the words back.
 #[test]

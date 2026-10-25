@@ -101,7 +101,7 @@ const isFragment = (element: Element): element is HTMLAnchorElement =>
 export class HelixHeadlessOutline extends HelixElement {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-outline': { label: 'Auf dieser Seite' } })`.
+   * `registerWords('de', { 'helix-outline': { fallbackLabel: 'Auf dieser Seite' } })`.
    */
   static words = 'helix-outline'
 

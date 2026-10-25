@@ -21,6 +21,7 @@ import {
   HelixLoadMoreEvent,
   hostAria,
   inlineStep,
+  internalsOf,
   MixinCollection,
   MixinControllerValue,
   MixinField,
@@ -1306,9 +1307,9 @@ export class HelixHeadlessListbox extends MixinVoice(
        sends them; see `reportValues`. One answer as the string it is, since
        a single option's value may hold a comma. */
     if (this.multiple) {
-      reportValues(this.internals, this.name, this.values)
+      reportValues(internalsOf(this), this.name, this.values)
     } else {
-      this.internals.setFormValue(this.value === '' ? null : this.value)
+      internalsOf(this).setFormValue(this.value === '' ? null : this.value)
     }
     this.reportRequired(this.value === '', this.valueMissingMessage, 'items')
   }
@@ -1345,7 +1346,7 @@ export class HelixHeadlessListbox extends MixinVoice(
        holds the label, the filter, the hint and the feedback, none of which a
        listbox may contain, while the element that took focus and held the
        active descendant had no role at all. They are `[part="items"]`'s now. */
-    hostAria(this.internals, { role: '' })
+    hostAria(internalsOf(this), { role: '' })
     /* A value moved from outside, by a script or by the field a list sits
        under, takes the highlight with it. Left where it was, the first arrow
        moved from the option picked before, and in a list that chooses as it

@@ -9,6 +9,7 @@ import {
   framesBooked,
   hasLayout,
   hasState,
+  internalsOf,
   label,
   mount,
   readyToMove,
@@ -98,7 +99,7 @@ describe('orb', () => {
     await host.updateComplete
     expect(role(host)).toBe('progressbar')
     expect(label(host)).toBe('Fetching')
-    expect(host.internals?.ariaBusy).toBe('true')
+    expect(internalsOf(host)?.ariaBusy).toBe('true')
     /* Said through `ElementInternals`, so a consumer's server markup never had
        an attribute here to reconcile. */
     expect(host.getAttribute('role')).toBeNull()
@@ -114,7 +115,7 @@ describe('orb', () => {
        reader waiting for a bar that never fills. */
     expect(role(host)).toBe('img')
     expect(label(host)).toBe('Done')
-    expect(host.internals?.ariaBusy).toBe('false')
+    expect(internalsOf(host)?.ariaBusy).toBe('false')
   })
 
   test('a label the caller wrote wins over the state word', async () => {
@@ -175,7 +176,7 @@ describe('orb', () => {
 
     const loud = (await mount('<helix-orb announce state="working"></helix-orb>')) as Upgraded
     expect(role(loud)).toBe('status')
-    expect(loud.internals?.ariaBusy ?? null).toBeNull()
+    expect(internalsOf(loud)?.ariaBusy ?? null).toBeNull()
     expect(label(loud)).toBe('Working')
     const live = loud.shadowRoot?.querySelector('[part="live"]')
     expect(live?.getAttribute('role')).toBeNull()

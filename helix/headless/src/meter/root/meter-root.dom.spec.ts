@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  hasState,
+  internalsOf,
+  mount,
+  part,
+  registerDom,
+  role,
+} from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -13,8 +20,7 @@ const meter = async (attrs = ''): Promise<HTMLElement> =>
 const band = (host: HTMLElement): string | null =>
   part(host, 'indicator')?.getAttribute('data-band') ?? null
 
-const internals = (host: HTMLElement): ElementInternals =>
-  (host as unknown as { internals: ElementInternals }).internals
+const internals = (host: HTMLElement): ElementInternals => internalsOf(host)
 
 describe('meter', () => {
   test('announces itself as a meter, not as a progress bar', async () => {
@@ -334,25 +340,25 @@ describe('a visible label', () => {
     const host = (await mount(
       '<helix-headless-meter label="Fallback" value="40"><span slot="label">Disk  used</span></helix-headless-meter>',
     )) as Host
-    expect(host.internals.ariaLabel).toBe('Disk used')
+    expect(internalsOf(host).ariaLabel).toBe('Disk used')
   })
 
   test('arriving later renames it, and leaving gives `label` back', async () => {
     const host = (await mount(
       '<helix-headless-meter label="Fallback" value="40"></helix-headless-meter>',
     )) as Host
-    expect(host.internals.ariaLabel).toBe('Fallback')
+    expect(internalsOf(host).ariaLabel).toBe('Fallback')
     const words = document.createElement('span')
     words.slot = 'label'
     words.textContent = 'Memory'
     host.append(words)
     await new Promise((resolve) => setTimeout(resolve, 0))
     await host.updateComplete
-    expect(host.internals.ariaLabel).toBe('Memory')
+    expect(internalsOf(host).ariaLabel).toBe('Memory')
     words.remove()
     await new Promise((resolve) => setTimeout(resolve, 0))
     await host.updateComplete
-    expect(host.internals.ariaLabel).toBe('Fallback')
+    expect(internalsOf(host).ariaLabel).toBe('Fallback')
   })
 
   test('is a bare slot, so without one nothing new is drawn', async () => {

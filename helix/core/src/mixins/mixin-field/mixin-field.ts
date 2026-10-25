@@ -2,6 +2,7 @@ import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
 import { auditField } from '#audit-name'
 import type { HelixElement } from '../../helix-element/helix-element.js'
+import { internalsOf } from '../../helix-element/helix-element.js'
 import { hostAria } from '../../utils/host-aria/host-aria.js'
 
 // biome-ignore lint/suspicious/noExplicitAny: mixin constructors are variadic by nature
@@ -433,10 +434,10 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
       if (this.feedback !== '') {
         return this.feedback
       }
-      if (!this.validates || !this.touched || this.internals.validity.valid) {
+      if (!this.validates || !this.touched || internalsOf(this).validity.valid) {
         return ''
       }
-      return this.internals.validationMessage
+      return internalsOf(this).validationMessage
     }
 
     /**
@@ -586,7 +587,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      */
     protected linkHost(): void {
       const label = this.partNamed('label')
-      hostAria(this.internals, {
+      hostAria(internalsOf(this), {
         describedBy: [HINT_ID, FEEDBACK_ID]
           .map((id) => this.renderRoot.querySelector(`#${id}`))
           .filter((node): node is Element => node !== null),
@@ -633,13 +634,13 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
      */
     protected reportRequired(empty: boolean, message: string, anchor: string): void {
       if (this.required && empty) {
-        this.internals.setValidity(
+        internalsOf(this).setValidity(
           { valueMissing: true },
           this.valueMissingMessage || message,
           this.partNamed(anchor) ?? undefined,
         )
       } else {
-        this.internals.setValidity({})
+        internalsOf(this).setValidity({})
       }
       // Straight after, because validity moved without any property moving.
       this.refreshFeedback()
@@ -665,7 +666,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
          Input threw. The platform submits a barred control as it is, so the
          host reports nothing wrong either. */
       if (!control.willValidate) {
-        this.internals.setValidity({})
+        internalsOf(this).setValidity({})
         return
       }
       /* An empty sentence is no sentence: the page has not said anything, and
@@ -674,7 +675,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
         control.validity.valueMissing && this.valueMissingMessage
           ? this.valueMissingMessage
           : control.validationMessage
-      this.internals.setValidity(control.validity, message, control)
+      internalsOf(this).setValidity(control.validity, message, control)
     }
 
     /**
@@ -705,7 +706,7 @@ export const MixinField = <T extends Constructor<HelixElement>>(Base: T) => {
        * its validity, and Chromium's tree reported an untouched required
        * Toggle Group, a `radiogroup`, as invalid on load, where a native
        * required text field is not. */
-      this.internals.ariaInvalid =
+      internalsOf(this).ariaInvalid =
         this.shownFeedback !== '' ? 'true' : this.validates ? 'false' : null
     }
 

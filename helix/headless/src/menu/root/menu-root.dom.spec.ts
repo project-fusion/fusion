@@ -4,6 +4,7 @@ import {
   at,
   hasLayout,
   hasState,
+  internalsOf,
   mount,
   part,
   registerDom,
@@ -1158,9 +1159,7 @@ describe('a menu opened by a long press', () => {
     expect(described).toBeNull()
     trigger.dispatchEvent(new FocusEvent('focusin', { bubbles: true, composed: true }))
     expect(described?.[0] === host).toBe(true)
-    expect((host as unknown as { internals: ElementInternals }).internals.ariaLabel).toContain(
-      'Alt+Down',
-    )
+    expect(internalsOf(host).ariaLabel).toContain('Alt+Down')
   })
 })
 

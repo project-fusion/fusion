@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, registerDom } from '@fusion.dev/helix-testing/dom'
 import type { TemplateResult } from 'lit'
 
 /**
@@ -96,7 +96,7 @@ describe('the validity API on the host', () => {
   test('and the control’s next report keeps it, beside its own flags', async () => {
     const host = await mount('<probe-form-control></probe-form-control>')
     host.setCustomValidity('That name is taken.')
-    host.internals.setValidity({ valueMissing: true }, 'Fill this in.')
+    internalsOf(host).setValidity({ valueMissing: true }, 'Fill this in.')
     expect(host.validity.customError).toBe(true)
     expect(host.validity.valueMissing).toBe(true)
     expect(host.validationMessage).toBe('That name is taken.')
@@ -104,7 +104,7 @@ describe('the validity API on the host', () => {
 
   test('an empty message clears it and the control’s own verdict stands', async () => {
     const host = await mount('<probe-form-control></probe-form-control>')
-    host.internals.setValidity({ valueMissing: true }, 'Fill this in.')
+    internalsOf(host).setValidity({ valueMissing: true }, 'Fill this in.')
     host.setCustomValidity('That name is taken.')
     host.setCustomValidity('')
     expect(host.validity.customError).toBeFalsy()

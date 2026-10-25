@@ -131,7 +131,7 @@ const KEYS = new Set([
 export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(HelixElement)) {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-tree': { label: 'Baum' } })`.
+   * `registerWords('de', { 'helix-tree': { droppedLabel: 'Abgelegt' } })`.
    */
   static words = 'helix-tree'
 

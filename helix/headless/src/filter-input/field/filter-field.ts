@@ -1,4 +1,4 @@
-import { customElement, HelixElement, reportRuntime } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, internalsOf, reportRuntime } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 import { property } from 'lit/decorators.js'
 import type { HelixHeadlessOption } from '../../option/index.js'
@@ -164,7 +164,7 @@ export class HelixHeadlessFilterField extends HelixElement {
     super.willUpdate(changed)
     // Never in the accessibility tree, because never on the page. See the note
     // on `FilterOperator`, which says the same for the same reason.
-    this.internals.role = 'none'
+    internalsOf(this).role = 'none'
   }
 
   /**

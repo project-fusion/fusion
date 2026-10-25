@@ -117,6 +117,29 @@ const SETTLED =
  */
 const BASE = unsafeCSS(BOX_SIZING + HIDDEN + SETTLED)
 
+/* Held here rather than on the element, so a script holding the element
+   cannot reach them. */
+const attached = new WeakMap<HelixElement, ElementInternals>()
+
+/**
+ * @internal The `ElementInternals` an element attached: the role, the name,
+ * the states and the form value it sets without touching the DOM.
+ *
+ * **Off the element, as the platform means them to be.** `attachInternals`
+ * throws on a second call so that only the element holds its internals. Kept
+ * on the element as a property, `protected` in the types and a plain field at
+ * run time, any script could call `element.internals.setFormValue()` or set
+ * its role. The headless and styled tiers subclass this class from other
+ * packages, so no member is private to every class that needs them; a
+ * module-scoped map takes them off the element's surface, and this is how a
+ * subclass reaches its own.
+ *
+ * Available during server rendering. Lit's shim implements `attachInternals`,
+ * so nothing here needs a guard.
+ */
+export const internalsOf = (element: HelixElement): ElementInternals =>
+  attached.get(element) as ElementInternals
+
 /**
  * @summary Base class every Helix element extends.
  *
@@ -215,20 +238,6 @@ export class HelixElement extends LitElement {
   }
 
   /**
-   * The element's semantics, set without touching the DOM.
-   *
-   * `ElementInternals` sets the implicit role, which an author's own `role`
-   * attribute still overrides, and it writes no attribute. Setting `role` on the
-   * host directly would: that is an attribute the element gives itself after it
-   * upgrades, which a React consumer's server markup never had, and hydration
-   * reports it as a mismatch.
-   *
-   * Available during server rendering. Lit's shim implements `attachInternals`,
-   * so nothing here needs a guard.
-   */
-  protected readonly internals: ElementInternals
-
-  /**
    * Records a boolean fact about this element as a custom state.
    *
    * **The host belongs to whoever rendered it, and a component's own
@@ -260,8 +269,9 @@ export class HelixElement extends LitElement {
    * state nothing reads, which is harmless.
    */
   protected toggleState(name: string, on: boolean): void {
-    if ('states' in this.internals) {
-      this.internals.states[on ? 'add' : 'delete'](name)
+    const internals = internalsOf(this)
+    if ('states' in internals) {
+      internals.states[on ? 'add' : 'delete'](name)
     }
   }
 
@@ -294,7 +304,7 @@ export class HelixElement extends LitElement {
 
   constructor() {
     super()
-    this.internals = this.attachInternals()
+    attached.set(this, this.attachInternals())
     this.whenSettled = new Promise<void>((resolve) => {
       this.resolveSettled = resolve
     })

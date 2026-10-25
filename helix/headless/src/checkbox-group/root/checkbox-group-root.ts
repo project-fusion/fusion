@@ -6,6 +6,7 @@ import {
   type HelixBeforeCheckEvent,
   HelixFormElement,
   hostAria,
+  internalsOf,
   MixinField,
   UpgradeController,
   words,
@@ -418,8 +419,8 @@ export class HelixHeadlessCheckboxGroup extends MixinField(HelixFormElement) {
     /* The string half, which is what a server can write. `linkHost` adds the
        element references on the client, and those win where a consumer slotted
        a label richer than a string. */
-    hostAria(this.internals, { label: this.label, role: 'group' })
-    this.internals.ariaRequired = this.required ? 'true' : null
+    hostAria(internalsOf(this), { label: this.label, role: 'group' })
+    internalsOf(this).ariaRequired = this.required ? 'true' : null
   }
 
   /**

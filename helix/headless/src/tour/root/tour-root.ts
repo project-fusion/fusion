@@ -12,6 +12,7 @@ import {
   HelixTourStatusEvent,
   hostAria,
   inlineStep,
+  internalsOf,
   keyClaimed,
   MixinControllerOpen,
   numberConverter,
@@ -441,7 +442,7 @@ export class HelixHeadlessTour extends MixinControllerOpen(HelixElement) {
     /* A landmark only while there is something in it. A closed tour on every
        page that carries one put an empty "Getting started" in landmark
        navigation. */
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: this.open ? this.label : '',
       role: this.open ? 'region' : '',
     })

@@ -1,4 +1,4 @@
-import { customElement, HelixElement, hostAria } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, hostAria, internalsOf } from '@fusion.dev/helix-core'
 import { nothing, type PropertyValues } from 'lit'
 
 /**
@@ -26,7 +26,7 @@ export class HelixHeadlessOptionSeparator extends HelixElement {
      carries an attribute the element did not write. */
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { role: 'separator' })
+    hostAria(internalsOf(this), { role: 'separator' })
   }
 
   /* No content: the rule is the host's own box, which the styled tier draws. */

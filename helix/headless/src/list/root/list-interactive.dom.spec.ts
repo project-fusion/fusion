@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasState, mount, part, registerDom, role } from '@fusion.dev/helix-testing/dom'
+import {
+  hasState,
+  internalsOf,
+  mount,
+  part,
+  registerDom,
+  role,
+} from '@fusion.dev/helix-testing/dom'
 
 /* A list with `selection-mode`: a grid of rows a reader moves through, selects
    from and acts on. The default list is `list-root.dom.spec.ts`'s. */
@@ -88,9 +95,7 @@ describe('the grid', () => {
 
   test('says it selects several only where it does', async () => {
     const list = await grid('multiple')
-    expect((list as unknown as { internals: ElementInternals }).internals.ariaMultiSelectable).toBe(
-      'true',
-    )
+    expect(internalsOf(list).ariaMultiSelectable).toBe('true')
   })
 })
 
@@ -143,7 +148,7 @@ describe('the keys', () => {
   test('under disabled-behavior="selection" a disabled row is reached and acted on, and never selected', async () => {
     const list = await grid('multiple', 'disabled-behavior="selection"')
     const [first, second] = list.rows as [Row, Row, Row]
-    expect(second.internals?.ariaDisabled ?? null).toBeNull()
+    expect(internalsOf(second)?.ariaDisabled ?? null).toBeNull()
     cell(first).focus()
     press(cell(first), 'ArrowDown')
     expect(focused(list)).toBe(cell(second))
@@ -189,7 +194,7 @@ describe('the keys', () => {
     press(cell(first), ' ')
     await settle(list)
     expect(list.value).toBe('a')
-    expect(first.internals?.ariaSelected).toBe('true')
+    expect(internalsOf(first)?.ariaSelected).toBe('true')
     expect(hasState(first, 'selected')).toBe(true)
     press(cell(first), 'Enter')
     expect(acted.length).toBe(1)
@@ -236,14 +241,18 @@ describe('selection', () => {
   test('a disabled row is announced as disabled and cannot be selected', async () => {
     const list = await grid()
     const beta = list.rows[1] as Row
-    expect(beta.internals?.ariaDisabled).toBe('true')
+    expect(internalsOf(beta)?.ariaDisabled).toBe('true')
     cell(beta).click()
     expect(list.value).toBe('')
   })
 
   test('a list that selects nothing acts on a press, and says nothing about selection', async () => {
     const list = await grid('none')
-    expect(list.rows.map((row) => row.internals?.ariaSelected ?? null)).toEqual([null, null, null])
+    expect(list.rows.map((row) => internalsOf(row)?.ariaSelected ?? null)).toEqual([
+      null,
+      null,
+      null,
+    ])
     let acted = 0
     list.addEventListener('helix-action', () => {
       acted += 1

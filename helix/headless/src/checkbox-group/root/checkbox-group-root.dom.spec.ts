@@ -1,6 +1,7 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
+  internalsOf,
   mount,
   notYetDefined,
   part,
@@ -44,7 +45,7 @@ describe('checkbox group', () => {
   test('is a named group, set on internals rather than on the host', async () => {
     const g = await group()
     expect(role(g)).toBe('group')
-    expect(g.internals?.ariaLabel).toBe('Verticals')
+    expect(internalsOf(g)?.ariaLabel).toBe('Verticals')
     expect(g.getAttributeNames()).toEqual(['label', 'name', 'value'])
   })
 
@@ -141,9 +142,9 @@ describe('checkbox group as a field', () => {
     )) as Updatable & { internals: ElementInternals }
     await settle(host)
 
-    expect(host.internals.role).toBe('group')
-    expect(host.internals.ariaLabelledByElements?.[0]?.textContent?.trim()).toBe('Label')
-    expect(host.internals.ariaDescribedByElements?.[0]?.textContent?.trim()).toBe('Hint')
+    expect(internalsOf(host).role).toBe('group')
+    expect(internalsOf(host).ariaLabelledByElements?.[0]?.textContent?.trim()).toBe('Label')
+    expect(internalsOf(host).ariaDescribedByElements?.[0]?.textContent?.trim()).toBe('Hint')
   })
 
   test('its message is given, never derived', async () => {

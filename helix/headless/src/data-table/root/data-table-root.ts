@@ -35,6 +35,7 @@ import {
   hostAria,
   inlineStep,
   inRowOrder,
+  internalsOf,
   MIRROR_RULE,
   MixinCollection,
   markRegion,
@@ -2168,11 +2169,11 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
     super.willUpdate(changed)
     this.hadFocus = this.hasUpdated && this.gridHasFocus()
     this.announced = this.news()
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: this.label || 'Table',
       role: this.childField ? 'treegrid' : 'grid',
     })
-    this.internals.ariaMultiSelectable = this.selectable ? 'true' : null
+    internalsOf(this).ariaMultiSelectable = this.selectable ? 'true' : null
     /* **Anything that changes which row sits at which index**, and not just a
        new array. Heights are recorded against a position in the drawn set, so a
        sort, a filter, a page or a switch to `server` all leave measurements
@@ -2214,8 +2215,9 @@ export class HelixHeadlessDataTable extends MixinCollection(HelixElement) {
 
   protected override updated(changed: PropertyValues): void {
     super.updated(changed)
-    this.internals.ariaRowCount = this.counts.rows === undefined ? null : String(this.counts.rows)
-    this.internals.ariaColCount =
+    internalsOf(this).ariaRowCount =
+      this.counts.rows === undefined ? null : String(this.counts.rows)
+    internalsOf(this).ariaColCount =
       this.counts.columns === undefined ? null : String(this.counts.columns)
     this.markEmpty()
     this.toggleState('error', this.errorText !== '')

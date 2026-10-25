@@ -4,6 +4,7 @@ import {
   HelixElement,
   HelixLoadEvent,
   hostAria,
+  internalsOf,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
@@ -46,7 +47,7 @@ import { property, state } from 'lit/decorators.js'
 @customElement('helix-headless-tab-panel')
 export class HelixHeadlessTabPanel extends HelixElement {
   /**
-   * The name of the panel, which is the text of the tab that opens it.
+   * @internal The name of the panel, which is the text of the tab that opens it.
    *
    * Set by the root, which is the only thing that sees both. No attribute,
    * because it is coordination between elements rather than anything a consumer
@@ -162,7 +163,7 @@ export class HelixHeadlessTabPanel extends HelixElement {
     this.toggleState('selected', this.selected)
     /* The role only while showing: a hidden panel's host is not hidden itself,
        and an empty `tabpanel` would be one more stop in a reader's list. */
-    hostAria(this.internals, { label: this.label, role: this.selected ? 'tabpanel' : '' })
+    hostAria(internalsOf(this), { label: this.label, role: this.selected ? 'tabpanel' : '' })
   }
 
   protected override render(): TemplateResult {

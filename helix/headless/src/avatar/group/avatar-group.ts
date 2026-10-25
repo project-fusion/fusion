@@ -3,6 +3,7 @@ import {
   formatWords,
   HelixElement,
   hostAria,
+  internalsOf,
   numberConverter,
   whenHydrated,
   words,
@@ -121,7 +122,7 @@ export class HelixHeadlessAvatarGroup extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label, role: 'group' })
+    hostAria(internalsOf(this), { label: this.label, role: 'group' })
   }
 
   protected override firstUpdated(changed: PropertyValues): void {

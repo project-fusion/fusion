@@ -1,5 +1,6 @@
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
 import { property, state } from 'lit/decorators.js'
+import { internalsOf } from '../../helix-element/helix-element.js'
 import type { HelixFormElement } from '../../helix-form-element/helix-form-element.js'
 import type { MonthSystem } from '../../utils/calendar/calendar.js'
 import {
@@ -604,23 +605,23 @@ export const MixinSegmentedField = <T extends Constructor<SegmentedBase>>(Base: 
           this.parts.some((one) => Object.values(one).some((part) => part !== undefined)))
       const fault = verdictFlags(this.validate())
       if (partial) {
-        this.internals.setValidity(
+        internalsOf(this).setValidity(
           { badInput: true },
           this.badInputMessage ||
             formatWords(this, 'incompleteMessage', { kind: this.segmentedKind }),
           anchor,
         )
       } else if (this.required && this.value === '') {
-        this.internals.setValidity(
+        internalsOf(this).setValidity(
           { valueMissing: true },
           this.valueMissingMessage ||
             formatWords(this, 'emptyMessage', { kind: this.segmentedKind }),
           anchor,
         )
       } else if (fault !== null) {
-        this.internals.setValidity(fault[0], fault[1], anchor)
+        internalsOf(this).setValidity(fault[0], fault[1], anchor)
       } else {
-        this.internals.setValidity({})
+        internalsOf(this).setValidity({})
       }
       this.refreshFeedback()
     }

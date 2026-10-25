@@ -414,7 +414,9 @@ describe('connectMap with markers', () => {
       `<helix-headless-map-marker label="Open water" lat="1" lng="1"></helix-headless-map-marker>
        <helix-headless-map-marker label="Right by the edge" lat="1" lng="35"></helix-headless-map-marker>`,
     )
-    const [open, edge] = [...host.querySelectorAll('helix-headless-map-marker')] as (HTMLElement & {
+    const [open, edge] = [
+      ...host.querySelectorAll('helix-headless-map-marker'),
+    ] as unknown as (HTMLElement & {
       extent(): number
       side: 'end' | 'start'
     })[]
@@ -435,7 +437,7 @@ describe('connectMap with markers', () => {
       '<helix-headless-map-marker label="Right by the edge" lat="1" lng="35"></helix-headless-map-marker>',
     )
     host.style.direction = 'rtl'
-    const edge = host.querySelector('helix-headless-map-marker') as HTMLElement & {
+    const edge = host.querySelector('helix-headless-map-marker') as unknown as HTMLElement & {
       extent(): number
       side: 'end' | 'start'
     }
@@ -1107,7 +1109,10 @@ describe('connectMap with a frame that gathers its markers', () => {
     )
     ;(host as Frame & { cluster: boolean }).cluster = true
     await host.updateComplete
-    return { host, places: [...host.querySelectorAll('helix-headless-map-marker')] as Gathered[] }
+    return {
+      host,
+      places: [...host.querySelectorAll('helix-headless-map-marker')] as unknown as Gathered[],
+    }
   }
 
   test('markers whose points would meet are drawn as one, at their middle, and come apart zoomed in', async () => {
@@ -1187,7 +1192,7 @@ describe('connectMap with a frame that gathers its markers', () => {
     )
     ;(host as Frame & { cluster: boolean }).cluster = true
     await host.updateComplete
-    const [depot] = [...host.querySelectorAll('helix-headless-map-marker')] as Gathered[]
+    const [depot] = [...host.querySelectorAll('helix-headless-map-marker')] as unknown as Gathered[]
     const { driver, fitted } = zooming()
     connectMap(host, driver)
     await depot?.updateComplete
@@ -1209,7 +1214,9 @@ describe('connectMap with a frame that gathers its markers', () => {
     )
     ;(host as Frame & { cluster: boolean }).cluster = true
     await host.updateComplete
-    const studios = [...host.querySelectorAll('helix-headless-map-marker')] as (Gathered & {
+    const studios = [
+      ...host.querySelectorAll('helix-headless-map-marker'),
+    ] as unknown as (Gathered & {
       fanned: boolean
     })[]
     const [first] = studios as [Gathered & { fanned: boolean }]
@@ -1252,7 +1259,7 @@ describe('connectMap with a frame that gathers its markers', () => {
        <helix-headless-map-marker label="Ferry" lat="1" lng="1"></helix-headless-map-marker>`,
     )
     connectMap(host, zooming().driver)
-    const [depot] = [...host.querySelectorAll('helix-headless-map-marker')] as Gathered[]
+    const [depot] = [...host.querySelectorAll('helix-headless-map-marker')] as unknown as Gathered[]
     expect(depot?.gathered).toEqual([])
   })
 })
@@ -1400,7 +1407,7 @@ describe('connectMap walking a points layer', () => {
     const host = await frame(
       '<helix-headless-map-points label="Cafés"></helix-headless-map-points>',
     )
-    const points = host.querySelector('helix-headless-map-points') as HTMLElement & {
+    const points = host.querySelector('helix-headless-map-points') as unknown as HTMLElement & {
       data?: unknown
       updateComplete: Promise<boolean>
       walk: { count?: number; key: string; label?: string; x: number; y: number }[]

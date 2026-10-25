@@ -13,6 +13,7 @@ import {
   hostAria,
   hostWords,
   inlineStep,
+  internalsOf,
   isRtl,
   ListedController,
   labelsOf,
@@ -177,7 +178,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   protected readonly listed = new ListedController(
     this,
     'focus',
-    () => this.internals?.ariaKeyShortcuts,
+    () => internalsOf(this)?.ariaKeyShortcuts,
   )
 
   /**
@@ -231,7 +232,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   filterable = false
 
   /**
-   * Whether the trigger holds its group's tab stop.
+   * @internal Whether the trigger holds its group's tab stop.
    *
    * A toolbar keeps one tab stop across its controls, and writing `tabindex`
    * onto this element would change markup the consumer rendered, which a React
@@ -866,16 +867,16 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
        sends them; see `reportValues`. One answer as the string it is, since
        a single option's value may hold a comma. */
     if (this.multiple) {
-      reportValues(this.internals, this.name, this.chosen)
+      reportValues(internalsOf(this), this.name, this.chosen)
     } else {
-      this.internals.setFormValue(this.value === '' ? null : this.value)
+      internalsOf(this).setFormValue(this.value === '' ? null : this.value)
     }
     this.reportRequired(this.value === '', this.valueMissingMessage, 'trigger')
   }
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    hostAria(this.internals, { label: this.label })
+    hostAria(internalsOf(this), { label: this.label })
     if (this.childrenKnown || this.items) {
       this.reconcileOptions()
     }

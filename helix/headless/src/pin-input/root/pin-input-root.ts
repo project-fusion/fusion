@@ -4,6 +4,7 @@ import {
   formatWords,
   HelixCompleteEvent,
   HelixFormElement,
+  internalsOf,
   MixinControllerValue,
   MixinField,
   numberConverter,
@@ -566,7 +567,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
    * which is what stops a reader being told off before they have had a go.
    */
   private sync(): void {
-    this.internals.setFormValue(this.value)
+    internalsOf(this).setFormValue(this.value)
     const control = this.control
     if (!control) {
       return
@@ -577,7 +578,7 @@ export class HelixHeadlessPinInput extends MixinControllerValue(MixinField(Helix
         short: (length) => formatWords(this, 'tooShortMessage', { length }),
       }),
     )
-    this.internals.setValidity(found?.[0] ?? {}, found?.[1] ?? '', control)
+    internalsOf(this).setValidity(found?.[0] ?? {}, found?.[1] ?? '', control)
     // Straight after, because validity moved without any property moving.
     this.refreshFeedback()
   }

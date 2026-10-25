@@ -4,7 +4,13 @@ import type {
   clearWords as ClearWords,
   registerWords as RegisterWords,
 } from '@fusion.dev/helix-core'
-import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  internalsOf,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 /* Imported once the DOM is registered: core reads the globals it finds as
    it is evaluated, and a static import breaks the DOM when this file runs
@@ -34,8 +40,7 @@ const picker = async (around: string, attrs: string): Promise<HTMLElement> => {
   return host
 }
 
-const bubble = (host: HTMLElement): string =>
-  (host as unknown as { internals: ElementInternals }).internals.validationMessage
+const bubble = (host: HTMLElement): string => internalsOf(host).validationMessage
 
 describe('a date picker on a page in another language', () => {
   test('names its controls in the words registered for the nearest `lang`', async () => {
@@ -44,9 +49,7 @@ describe('a date picker on a page in another language', () => {
     })
     const host = await picker('lang="pl"', 'default-month="2026-01"')
     expect(part(host, 'next')?.getAttribute('aria-label')).toBe('Następny miesiąc')
-    expect((host as unknown as { internals: ElementInternals }).internals.ariaLabel).toBe(
-      'Kalendarz',
-    )
+    expect(internalsOf(host).ariaLabel).toBe('Kalendarz')
   })
 
   test('raises the registered sentences, with the bound written as the language writes a date', async () => {

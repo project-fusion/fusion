@@ -4,7 +4,13 @@ import type {
   clearWords as ClearWords,
   registerWords as RegisterWords,
 } from '@fusion.dev/helix-core'
-import { part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  internalsOf,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 
 /* Imported once the DOM is registered: core reads the globals it finds as
    it is evaluated, and a static import breaks the DOM when this file runs
@@ -60,7 +66,7 @@ describe('a carousel on a page in another language', () => {
     const host = await carousel('lang="de"')
     expect(slides(host)).toEqual(['1 von 3', '2 von 3', '3 von 3'])
     expect(part(host, 'next')?.getAttribute('aria-label')).toBe('Nächste Folie')
-    expect(host.internals?.ariaRoleDescription).toBe('Karussell')
+    expect(internalsOf(host)?.ariaRoleDescription).toBe('Karussell')
   })
 
   test('writes the numbers in its sentences in the page’s language', async () => {
@@ -71,6 +77,6 @@ describe('a carousel on a page in another language', () => {
   test('keeps a `label` the page wrote', async () => {
     registerWords('de', GERMAN)
     const host = await carousel('lang="de"', 'label="Themen"')
-    expect(host.internals?.ariaLabel).toBe('Themen')
+    expect(internalsOf(host)?.ariaLabel).toBe('Themen')
   })
 })

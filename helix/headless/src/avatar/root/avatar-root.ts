@@ -3,6 +3,7 @@ import {
   DelayController,
   HelixElement,
   hostAria,
+  internalsOf,
   timeConverter,
 } from '@fusion.dev/helix-core'
 import { html, nothing, type PropertyValues, type TemplateResult } from 'lit'
@@ -185,7 +186,7 @@ export class HelixHeadlessAvatar extends HelixElement {
      * image: a screen reader announces "image" and stops, which is worse than
      * announcing nothing, because nothing is what a decorative mark should be.
      * With a name it is content and needs the role to hold it. */
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: this.name,
       role: this.name === '' ? '' : 'img',
     })

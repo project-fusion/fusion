@@ -7,6 +7,7 @@ import {
   HelixBeforeChangeEvent,
   HelixFormElement,
   HelixRejectEvent,
+  internalsOf,
   labelWith,
   MixinField,
   numberConverter,
@@ -653,7 +654,7 @@ export class HelixHeadlessFileInput extends MixinField(HelixFormElement) {
        already, for the neighboring reason that the native one is
        `C:\fakepath\name`; this is the same component declining to reproduce a
        lie, one level down. */
-    this.internals.setFormValue(data)
+    internalsOf(this).setFormValue(data)
     const control = this.control
     if (!control) {
       return

@@ -7,6 +7,7 @@ import {
   FocusScopeController,
   HelixElement,
   hostAria,
+  internalsOf,
   MixinDismissible,
   markRegion,
   matchesChord,
@@ -100,7 +101,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
 export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   /**
    * The key this family's words are registered under, its styled tag:
-   * `registerWords('de', { 'helix-announcement': { label: 'Mitteilung' } })`.
+   * `registerWords('de', { 'helix-announcement': { fallbackLabel: 'Mitteilung' } })`.
    */
   static words = 'helix-announcement'
 
@@ -264,12 +265,12 @@ export class HelixHeadlessAnnouncement extends MixinDismissible(HelixElement) {
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
     /* Through internals, so nothing is written onto the host. */
-    hostAria(this.internals, {
+    hostAria(internalsOf(this), {
       label: this.label ?? this.fallbackLabel,
       role: (this.label ?? this.fallbackLabel).trim() && !this.waiting ? 'region' : '',
     })
-    if ('ariaKeyShortcuts' in this.internals) {
-      this.internals.ariaKeyShortcuts = ariaChord(this.hotkey, onApple()) || null
+    if ('ariaKeyShortcuts' in internalsOf(this)) {
+      internalsOf(this).ariaKeyShortcuts = ariaChord(this.hotkey, onApple()) || null
     }
   }
 

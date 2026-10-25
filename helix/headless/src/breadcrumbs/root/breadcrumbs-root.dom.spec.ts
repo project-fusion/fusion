@@ -2,6 +2,7 @@ import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
 import {
   hasState,
+  internalsOf,
   mount,
   notYetDefined,
   part,
@@ -75,7 +76,7 @@ describe('breadcrumb items', () => {
       internals?: ElementInternals
     }
     expect(current.querySelector('a')).toBeNull()
-    expect(current.internals?.ariaCurrent).toBe('page')
+    expect(internalsOf(current)?.ariaCurrent).toBe('page')
     expect(current.hasAttribute('aria-current')).toBe(false)
   })
 
@@ -120,7 +121,7 @@ describe('the trail without a name of its own', () => {
      every example was adding "Breadcrumb" by hand. */
   test('is named Breadcrumb, through internals so the host stays as written', async () => {
     const crumbs = await mount(trail)
-    const internals = (crumbs as unknown as { internals: ElementInternals }).internals
+    const internals = internalsOf(crumbs)
     expect(internals.ariaLabel).toBe('Breadcrumb')
     expect(crumbs.hasAttribute('aria-label')).toBe(false)
   })

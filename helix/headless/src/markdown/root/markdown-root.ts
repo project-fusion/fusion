@@ -1,4 +1,4 @@
-import { customElement, HelixElement, words } from '@fusion.dev/helix-core'
+import { customElement, HelixElement, internalsOf, words } from '@fusion.dev/helix-core'
 import { type CSSResultGroup, css, html, type PropertyValues, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 import '../../callout/index.js'
@@ -123,7 +123,7 @@ export class HelixHeadlessMarkdown extends HelixElement {
 
   protected override willUpdate(changed: PropertyValues): void {
     super.willUpdate(changed)
-    this.internals.ariaBusy = this.streaming ? 'true' : null
+    internalsOf(this).ariaBusy = this.streaming ? 'true' : null
     this.toggleState('streaming', this.streaming)
   }
 
