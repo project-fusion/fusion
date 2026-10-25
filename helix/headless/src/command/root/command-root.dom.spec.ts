@@ -503,7 +503,7 @@ describe('a palette given a filter match', () => {
   /* React hydrating a page drops a function prop, and core assigns it from the
      props React holds. Assigned after the first render, it scheduled a second
      update, which Lit's development build reported as `change-in-update` in
-     the Hartley app's palette. `updateComplete` resolves `false` while another
+     a desktop app's palette. `updateComplete` resolves `false` while another
      update is pending. */
   test('takes the function React holds in its first render, with no update after it', async () => {
     const filterMatch = (text: string, filter: string): boolean => text.startsWith(filter)

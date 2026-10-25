@@ -24,7 +24,7 @@ const afterPaint = (check: () => void): void => {
  * **An app that imports its families with `import()` registers them after
  * the page has loaded**, each as its chunk arrives, so a container can be
  * defined and painted while the chunk holding its children is still in
- * flight. Measured in the Hartley desktop app on October 14, 2026: Command was
+ * flight. Measured in a desktop app on October 14, 2026: Command was
  * defined 90 ms before Option, and its families arrived over 230 ms.
  */
 export const QUIET = 500
