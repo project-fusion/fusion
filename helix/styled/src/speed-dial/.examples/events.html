@@ -78,7 +78,7 @@
   dial.addEventListener('toggle', (event) => {
     say('toggle', `${event.oldState} to ${event.newState}, after the state moved`)
   })
-  dial.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" was chosen, and the event bubbles`)
+  dial.addEventListener('helix-before-select', (event) => {
+    say('helix-before-select', `"${event.detail.value}" was chosen, and the event bubbles`)
   })
 </script>

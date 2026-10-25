@@ -2,6 +2,7 @@ import {
   AriaForwardController,
   customElement,
   DrilldownController,
+  HelixBeforeNavigateEvent,
   HelixElement,
   HelixNavigateEvent,
   hostAria,
@@ -42,8 +43,9 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  *
  * **`page` is the page showing**, as the `value` of the row that opens it,
  * and empty on the top page. Set it to show a page, such as one a link to a
- * settings screen names. A reader's move updates it, and `helix-navigate`
- * comes first, so you can refuse the move or take it yourself.
+ * settings screen names. A reader's move updates it, and `helix-before-navigate`
+ * comes first, so you can refuse the move or take it yourself. `helix-navigate`
+ * follows once the page shows.
  *
  * After each move the host carries `data-direction`, `forward` into a page or
  * `back` out of one, and records `:state(forward)` or `:state(back)`, so a
@@ -59,7 +61,7 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * | Down Arrow, Up Arrow | Moves to the next or the previous row. |
  * | Home, End | Moves to the first or the last row. |
  * | A letter | Moves to the next row whose name starts with it. |
- * | Enter, Space | Chooses the row: opens its page, follows its link, or sends `helix-select`. |
+ * | Enter, Space | Chooses the row: opens its page, follows its link, or sends `helix-before-select`. |
  * | Right Arrow | Opens the row's page. Left Arrow on a right-to-left page. |
  * | Left Arrow, Escape | Goes back one page, with focus on the row that opened it. Right Arrow on a right-to-left page. |
  *
@@ -85,8 +87,10 @@ import { HelixHeadlessDrilldownItem } from '../item/drilldown-item.js'
  * @slot - The rows of the top page.
  * @slot back-icon - Replaces the icon on the back button.
  *
- * @event {HelixNavigateEvent} helix-navigate - Fired before a reader moves into a page or back out of one. `detail.value` is the `value` of the row whose page is about to show, empty for the top page. Cancelable: cancel it to stay on the page showing.
- * @event {HelixSelectEvent} helix-select - Fired when a row with no page is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
+ * @event {HelixBeforeNavigateEvent} helix-before-navigate - Fired before a reader moves into a page or back out of one. `detail.value` is the `value` of the row whose page is about to show, empty for the top page. Cancelable: cancel it to stay on the page showing.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when a row with no page is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
+ * @event {HelixNavigateEvent} helix-navigate - Fired after a reader moves into a page or back out of one, with the `value` of the row whose page shows in `detail.value`, empty for the top page, which `page` also holds.
+ * @event {HelixSelectEvent} helix-select - Fired after a row with no page is chosen, once the choice stands.
  *
  * @csspart back - The button that goes back one page.
  * @csspart back-mark - The icon on the back button.
@@ -265,7 +269,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
    * returns whether the move may go ahead.
    */
   private navigate(to: HelixHeadlessDrilldownItem | null): boolean {
-    return this.dispatchEvent(new HelixNavigateEvent({ value: to?.value ?? '' }))
+    return this.dispatchEvent(new HelixBeforeNavigateEvent({ value: to?.value ?? '' }))
   }
 
   /** The row whose page holds a row, or null for the top page. */
@@ -282,6 +286,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     this.page = item.value
     this.direction = 'forward'
     this.moved = true
+    this.dispatchEvent(new HelixNavigateEvent({ value: this.page }))
     this.updateComplete.then(() => this.items[0]?.focusItem())
   }
 
@@ -305,6 +310,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
     this.page = to?.value ?? ''
     this.direction = 'back'
     this.moved = true
+    this.dispatchEvent(new HelixNavigateEvent({ value: this.page }))
     this.updateComplete.then(() => leaving?.focusItem())
     return true
   }
@@ -349,7 +355,7 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
        had to tell them apart would be doing the stack's job.
 
        **And only if the choice stood**, which is the whole of what makes the
-       row's `helix-select` refusable: the drill is the one thing in the library
+       row's `helix-before-select` refusable: the drill is the one thing in the library
        that acts on it, so a refusal nothing read left the stack moving anyway.
        The stop stays synchronous, the decision does not: this listener is in
        capture and the dispatch is synchronous, so a microtask is after every
@@ -409,14 +415,14 @@ export class HelixHeadlessDrilldown extends MixinCollection(HelixElement) {
        navigation is swallowed comes down to which was registered first.
        Capture reaches the host before the row it came from, so stopping there
        stops it for everyone, whatever order anybody bound in. */
-    this.addEventListener('helix-select', this.handleSelect, true)
+    this.addEventListener('helix-before-select', this.handleSelect, true)
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('focusin', this.handleFocusIn)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-select', this.handleSelect, true)
+    this.removeEventListener('helix-before-select', this.handleSelect, true)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('focusin', this.handleFocusIn)
   }

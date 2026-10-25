@@ -1,4 +1,4 @@
-<!-- @summary Choosing an option sends `helix-select`, which bubbles to the listbox around it. -->
+<!-- @summary Choosing an option sends `helix-before-select`, which bubbles to the listbox around it. -->
 <!-- @min 300 -->
 <helix-flex
   direction="column"
@@ -51,9 +51,9 @@
     }
   }
 
-  /* `helix-select` bubbles, so the listbox hears it from every option.
+  /* `helix-before-select` bubbles, so the listbox hears it from every option.
      `composedPath()[0]` is the option that sent it. */
-  owner.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" from <${event.composedPath()[0].localName}>`)
+  owner.addEventListener('helix-before-select', (event) => {
+    say('helix-before-select', `"${event.detail.value}" from <${event.composedPath()[0].localName}>`)
   })
 </script>

@@ -1,9 +1,11 @@
 import type { GraphFilterDetail } from './details.js'
 
 /**
- * A reader pressed a group in the graph's legend, which would show or hide
- * its notes, sent from the frame before it does. Cancelable: cancel it to
- * keep the groups as they were, or to set `hiddenGroups` yourself.
+ * The graph shows or hides a group's notes.
+ *
+ * The notification after `helix-before-graph-filter`, sent once `hiddenGroups`
+ * holds the change, with every group now hidden. Not cancelable: the decision was
+ * the request's.
  */
 export class HelixGraphFilterEvent extends CustomEvent<GraphFilterDetail> {
   static readonly eventName = 'helix-graph-filter'
@@ -11,7 +13,7 @@ export class HelixGraphFilterEvent extends CustomEvent<GraphFilterDetail> {
   constructor(detail: GraphFilterDetail) {
     super(HelixGraphFilterEvent.eventName, {
       bubbles: true,
-      cancelable: true,
+      cancelable: false,
       composed: true,
       detail,
     })

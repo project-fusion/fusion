@@ -127,8 +127,9 @@ import { over } from '../align.js'
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Relayed from the listbox when the value is about to change. Cancelable: canceling it stops the change and leaves the decision to you.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the list closes. Cancelable: canceling it keeps the list open and leaves the decision to you.
+ * @event {HelixBeforeFilterEvent} helix-before-filter - Fired as the user types in the filter field of a `filterable` select, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and filter the options yourself.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the list opens. Cancelable: canceling it keeps the list closed and leaves the decision to you.
- * @event {HelixFilterEvent} helix-filter - Fired as the user types in the filter field of a `filterable` select, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and filter the options yourself.
+ * @event {HelixFilterEvent} helix-filter - Fired after the list of a `filterable` select is filtered, with the text it is filtered by.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired once the list is scrolled within a screen of its end, once for each number of options, and not while `loading` is set. Add the next page and set `loading` while you fetch it.
  * @event {Event} input - Fired after the value changes.
  * @event {ToggleEvent} toggle - Fired after the list opens or closes, with `newState` and `oldState`.
@@ -580,7 +581,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
     super.connectedCallback()
     auditChildren(this, 'option', 'option', 'it offers no choices')
     auditChildren(this, 'listbox', 'listbox', 'its panel has no working list', true)
-    this.addEventListener('helix-select', this.handleLinkFollowed)
+    this.addEventListener('helix-before-select', this.handleLinkFollowed)
     const words = new MutationObserver(() => this.requestUpdate())
     words.observe(this, {
       attributeFilter: ['label', 'value'],
@@ -596,7 +597,7 @@ export class HelixHeadlessSelect extends MixinControllerOpen(
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.stopAligning()
-    this.removeEventListener('helix-select', this.handleLinkFollowed)
+    this.removeEventListener('helix-before-select', this.handleLinkFollowed)
     for (const watcher of this.watchers) {
       watcher.disconnect()
     }

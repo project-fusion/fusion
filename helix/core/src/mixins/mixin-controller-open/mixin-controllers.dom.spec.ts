@@ -49,7 +49,7 @@ interface Kind {
 /* **They do not announce the same event, and that is the difference a shared
    table is for.** Open says which way it went, because a listener that only
    cares about dismissal should not have to read a detail to find out; Checked
-   is `helix-toggle`, which the events file explains is checkedness having its
+   is `helix-before-check`, which the events file explains is checkedness having its
    own name and its own boolean; Active is a plain `helix-change`. Three files
    would each have hardcoded their own and nothing would have said they differ. */
 const KINDS: Kind[] = [
@@ -64,10 +64,10 @@ const KINDS: Kind[] = [
     tag: 'probe-open',
   },
   {
-    closing: 'helix-before-toggle',
+    closing: 'helix-before-check',
     fallback: 'default-checked',
     moved: true,
-    opening: 'helix-before-toggle',
+    opening: 'helix-before-check',
     request: 'requestChecked',
     resting: false,
     state: 'checked',

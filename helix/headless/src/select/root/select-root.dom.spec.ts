@@ -587,7 +587,7 @@ describe('a select with an option that is a link', () => {
   test('stays open and follows nothing where the page cancels it', async () => {
     catchLinks()
     const host = await linked()
-    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.addEventListener('helix-before-select', (event) => event.preventDefault())
     ;(host.children[1] as HTMLElement & { select(): void }).select()
     await settle(host)
     expect(followed).toEqual([])

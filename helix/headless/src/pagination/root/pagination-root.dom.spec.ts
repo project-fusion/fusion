@@ -235,7 +235,7 @@ describe('pagination state', () => {
       '<helix-headless-pagination default-page="2" pages="12"></helix-headless-pagination>',
     )
     let announced: string | undefined
-    nav.addEventListener('helix-navigate', (event) => {
+    nav.addEventListener('helix-before-navigate', (event) => {
       announced = (event as CustomEvent<{ value: string }>).detail.value
       // Read from inside the handler: nothing has moved yet, which is what
       // makes `preventDefault()` a refusal rather than an undo.
@@ -256,7 +256,7 @@ describe('pagination state', () => {
       '<helix-headless-pagination page="2" pages="12"></helix-headless-pagination>',
     )
     let announced = ''
-    nav.addEventListener('helix-navigate', (event) => {
+    nav.addEventListener('helix-before-navigate', (event) => {
       announced = (event as CustomEvent<{ value: string }>).detail.value
     })
     part(nav, 'next')?.dispatchEvent(new Event('click', { bubbles: true }))
@@ -270,7 +270,7 @@ describe('pagination state', () => {
       '<helix-headless-pagination default-page="4" pages="12"></helix-headless-pagination>',
     )
     let detail: { page?: number; value: string } | undefined
-    nav.addEventListener('helix-navigate', (event) => {
+    nav.addEventListener('helix-before-navigate', (event) => {
       detail = (event as CustomEvent<{ page?: number; value: string }>).detail
     })
     part(nav, 'previous')?.dispatchEvent(new Event('click', { bubbles: true }))
@@ -282,21 +282,21 @@ describe('pagination state', () => {
       '<helix-headless-pagination default-page="1" pages="3"></helix-headless-pagination>',
     )
     let announced = false
-    nav.addEventListener('helix-navigate', () => {
+    nav.addEventListener('helix-before-navigate', () => {
       announced = true
     })
     part(nav, 'previous')?.dispatchEvent(new Event('click', { bubbles: true }))
     expect(announced).toBe(false)
   })
 
-  /* `helix-navigate` is the request, so a consumer following the page needs
+  /* `helix-before-navigate` is the request, so a consumer following the page needs
      the notification after it, sent once the page is on the element. */
   test('says where it is once it has moved', async () => {
     const nav = (await mount(
       '<helix-headless-pagination default-page="2" pages="12"></helix-headless-pagination>',
     )) as HTMLElement & { page: number }
     const heard: string[] = []
-    nav.addEventListener('helix-activate', (event) => {
+    nav.addEventListener('helix-navigate', (event) => {
       heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${nav.page}`)
       expect(event.cancelable).toBe(false)
     })
@@ -308,9 +308,9 @@ describe('pagination state', () => {
     const nav = await mount(
       '<helix-headless-pagination default-page="2" pages="12"></helix-headless-pagination>',
     )
-    nav.addEventListener('helix-navigate', (event) => event.preventDefault())
+    nav.addEventListener('helix-before-navigate', (event) => event.preventDefault())
     let heard = false
-    nav.addEventListener('helix-activate', () => {
+    nav.addEventListener('helix-navigate', () => {
       heard = true
     })
     part(nav, 'next')?.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }))
@@ -353,7 +353,7 @@ describe('pagination links', () => {
     const nav = await mount(
       '<helix-headless-pagination default-page="2" href="/p/{page}" pages="6"></helix-headless-pagination>',
     )
-    nav.addEventListener('helix-navigate', (event) => event.preventDefault())
+    nav.addEventListener('helix-before-navigate', (event) => event.preventDefault())
     expect(click(part(nav, 'next'))).toBe(false)
   })
 
@@ -371,7 +371,7 @@ describe('pagination links', () => {
       '<helix-headless-pagination default-page="2" href="/p/{page}" pages="6"></helix-headless-pagination>',
     )) as HTMLElement & { page: number }
     const heard: number[] = []
-    nav.addEventListener('helix-activate', () => heard.push(nav.page))
+    nav.addEventListener('helix-navigate', () => heard.push(nav.page))
     click(part(nav, 'next'))
     expect(heard).toEqual([])
     await new Promise((resolve) => setTimeout(resolve))

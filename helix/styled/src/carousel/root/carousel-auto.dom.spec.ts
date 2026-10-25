@@ -136,12 +136,12 @@ if (hasLayout()) {
        declared one's never does. Widened, the reader is left resting somewhere
        the track can no longer be, so the index comes back inside what the new
        count leaves. Nobody asked for that move, so it is written with no
-       `helix-select`: a request a consumer could refuse would leave the index
-       past the last place. */
+       `helix-before-activate`: a request a consumer could refuse would leave
+       the index past the last place. */
     test('widening the track brings the index back inside what it leaves', async () => {
       const host = await shelf(340)
       const heard: string[] = []
-      host.addEventListener('helix-select', () => heard.push('helix-select'))
+      host.addEventListener('helix-before-activate', () => heard.push('helix-before-activate'))
       host.index = 7
       await host.updateComplete
       host.style.inlineSize = '1281px'

@@ -118,8 +118,8 @@ const KEYS = new Set([
  * @event {HelixActivateEvent} helix-activate - Fired after the current node changes, so the tree already holds the new one.
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the current node changes, and cancelable. Canceling it is the only way to stop the change.
  * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when an item is dropped at a new place among its siblings, in a `reorderable` tree, with the siblings' keys in the new order. Cancelable: cancel it to keep the item where it is.
- * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your items to the order in `keys`, each an item's `value`, or its words where it has none. Cancelable: cancel it to say the move did not happen.
- * @event {HelixSelectEvent} helix-select - Fired when an item is chosen. The item sends it, and you can listen for it on the tree. Cancelable: canceling it changes nothing.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when an item is chosen. The item sends it, and you can listen for it on the tree. Cancelable: canceling it changes nothing.
+ * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your items to the order in `keys`, each an item's `value`, or its words where it has none.
  *
  * @csspart drag-preview - A copy of the row a pointer drags by its grip, which follows the pointer in the top layer until the item is let go, in a `reorderable` tree. Hidden from assistive technology.
  * @csspart empty - Shown when there are no rows to show.
@@ -431,14 +431,14 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
      straight from the event makes `helix-before-activate` an announcement
      nobody can answer.
 
-     **And only if the item's own choice stood.** `helix-select` is cancelable
+     **And only if the item's own choice stood.** `helix-before-select` is cancelable
      and the item documents it as refusable; this element is the only thing that
      acts on it, so a refusal nothing read was a veto that did nothing. The rows
      are still synced either way: what a refusal stops is the selection moving,
      not the tree redrawing what it already holds. */
   private readonly handleSelection = (event: Event): void => {
     /* Only a choice made by one of this tree's own items. A menu in a row's
-       `end` slot sends `helix-select` too, and it bubbles out of the row. */
+       `end` slot sends `helix-before-select` too, and it bubbles out of the row. */
     const origin = event.target
     if (!(origin instanceof HelixHeadlessTreeItem) || !this.items.includes(origin)) {
       return
@@ -900,7 +900,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('helix-select', this.handleSelection)
+    this.addEventListener('helix-before-select', this.handleSelection)
     this.addEventListener('toggle', this.handleBranch, true)
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('focusin', this.handleFocusIn)
@@ -918,7 +918,7 @@ export class HelixHeadlessTree extends MixinCollection(MixinControllerActive(Hel
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-select', this.handleSelection)
+    this.removeEventListener('helix-before-select', this.handleSelection)
     this.removeEventListener('toggle', this.handleBranch, true)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('focusin', this.handleFocusIn)

@@ -9,10 +9,10 @@ import {
   HelixActivateEvent,
   HelixBeforeActivateEvent,
   HelixBeforeCloseEvent,
+  HelixBeforeFilterEvent,
   HelixBeforeOpenEvent,
   HelixElement,
   HelixFilterEvent,
-  HelixFilteredEvent,
   inlineStep,
   MIRROR_RULE,
   numberConverter,
@@ -133,7 +133,7 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  * branch keeps everything under it. Each matched row carries `row-match`, and
  * a screen reader hears how many entries matched from `results-label`.
  * `filterable` adds a field that sets it: typing sends
- * `helix-filter`, which you can cancel, and then `helix-filtered`, and Down
+ * `helix-before-filter`, which you can cancel, and then `helix-filter`, and Down
  * moves from the field to the tree.
  *
  * A new `value` keeps the branches a reader opened or closed, and the active
@@ -166,10 +166,10 @@ const kindOf = (value: unknown): ObjectInspectorEntry['type'] => {
  * @event {HelixActivateEvent} helix-activate - The active row moved, by a key or a click. The detail's `value` is its path.
  * @event {HelixBeforeActivateEvent} helix-before-activate - The active row is about to move, with its new path. Cancelable: cancel it to keep the row where it is.
  * @event {HelixBeforeCloseEvent} helix-before-close - A reader is about to close the active branch. Cancelable: cancel it to keep the branch open.
+ * @event {HelixBeforeFilterEvent} helix-before-filter - Text was typed in the filter field, with what it now holds. Cancelable: cancel it to keep the filter as it was.
  * @event {HelixBeforeOpenEvent} helix-before-open - A reader is about to open the active branch, or `*` the branches beside it. Cancelable: cancel it to keep them closed.
  * @event {HelixCopyEvent} helix-copy - A value was put on the clipboard, from the copy button or the keyboard.
- * @event {HelixFilterEvent} helix-filter - Text was typed in the filter field, with what it now holds. Cancelable: cancel it to keep the filter as it was.
- * @event {HelixFilteredEvent} helix-filtered - The filter field changed `filter`, which now holds the text.
+ * @event {HelixFilterEvent} helix-filter - The filter field changed `filter`, which now holds the text.
  * @event {ToggleEvent} toggle - A reader opened or closed a branch, with `newState` and `oldState`. `expanded` holds every open branch.
  *
  * @csspart after - The space the rows below the drawn rows would take, when `windowed` is set.
@@ -960,12 +960,12 @@ export class HelixHeadlessObjectInspector extends HelixElement {
       apply: (value) => {
         this.filter = value
       },
-      event: (value) => new HelixFilterEvent({ value }),
+      event: (value) => new HelixBeforeFilterEvent({ value }),
       host: this,
       next: field.value,
     })
     if (applied) {
-      this.dispatchEvent(new HelixFilteredEvent({ value: field.value }))
+      this.dispatchEvent(new HelixFilterEvent({ value: field.value }))
     } else {
       field.value = this.filter
     }

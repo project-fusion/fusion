@@ -61,7 +61,7 @@
   actions.addEventListener('toggle', (event) => {
     say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   })
-  actions.addEventListener('helix-select', (event) => {
-    say('helix-select', `Chose "${event.detail.value}"`)
+  actions.addEventListener('helix-before-select', (event) => {
+    say('helix-before-select', `Chose "${event.detail.value}"`)
   })
 </script>

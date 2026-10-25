@@ -8,7 +8,7 @@ export function Example() {
       filter={filter}
       filterable
       label="Time zone"
-      onhelix-filter={(event) => setFilter(event.detail.value)}
+      onhelix-before-filter={(event) => setFilter(event.detail.value)}
     >
       <helix-option value="lisbon">Europe/Lisbon</helix-option>
       <helix-option value="london">Europe/London</helix-option>

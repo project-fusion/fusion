@@ -111,7 +111,11 @@ describe('video playlist menu', () => {
   test('choosing moves the playlist, through the event an entry dispatches', async () => {
     const { menu, playlist } = await mountMenu()
     menu.dispatchEvent(
-      new CustomEvent('helix-select', { bubbles: true, composed: true, detail: { value: 'two' } }),
+      new CustomEvent('helix-before-select', {
+        bubbles: true,
+        composed: true,
+        detail: { value: 'two' },
+      }),
     )
     await playlist.updateComplete
     expect(playlist.active).toBe('two')
@@ -123,11 +127,15 @@ describe('video playlist menu', () => {
        the shorter path and skips `helix-before-activate`, so a consumer gets
        no chance to refuse the move. The menu requests instead. */
     menu.dispatchEvent(
-      new CustomEvent('helix-select', { bubbles: true, composed: true, detail: { value: 'two' } }),
+      new CustomEvent('helix-before-select', {
+        bubbles: true,
+        composed: true,
+        detail: { value: 'two' },
+      }),
     )
     await playlist.updateComplete
     menu.dispatchEvent(
-      new CustomEvent('helix-select', {
+      new CustomEvent('helix-before-select', {
         bubbles: true,
         composed: true,
         detail: { value: 'three' },
@@ -145,13 +153,17 @@ describe('video playlist menu', () => {
        other assertion here would still pass. */
     const { menu, playlist } = await mountMenu()
     entries(menu)[1]?.dispatchEvent(
-      new CustomEvent('helix-select', { bubbles: true, composed: true, detail: { value: 'two' } }),
+      new CustomEvent('helix-before-select', {
+        bubbles: true,
+        composed: true,
+        detail: { value: 'two' },
+      }),
     )
     await playlist.updateComplete
     expect(playlist.active).toBe('two')
   })
 
-  /* A row checks itself after `helix-before-toggle`, and this menu already
+  /* A row checks itself after `helix-before-check`, and this menu already
      marks the current entry from the playlist. With both at it, a refused
      choice left the tick on the entry that was refused, on every later open. */
   describe('the tick, read when the menu next opens', () => {
@@ -168,7 +180,7 @@ describe('video playlist menu', () => {
     test('is on the entry chosen, and only that one', async () => {
       const { menu, playlist } = await mountMenu()
       const asked: string[] = []
-      playlist.addEventListener('helix-before-toggle', (event) => asked.push(event.type))
+      playlist.addEventListener('helix-before-check', (event) => asked.push(event.type))
       pick(entries(menu)[1])
       await playlist.updateComplete
       await reopen(menu)
@@ -194,11 +206,15 @@ describe('video playlist menu', () => {
        which is also what makes `preventDefault()` a refusal in one place. */
     const { menu } = await mountMenu()
     let from: EventTarget | null = null
-    menu.addEventListener('helix-select', (event) => {
+    menu.addEventListener('helix-before-select', (event) => {
       from = event.target
     })
     entries(menu)[1]?.dispatchEvent(
-      new CustomEvent('helix-select', { bubbles: true, composed: true, detail: { value: 'two' } }),
+      new CustomEvent('helix-before-select', {
+        bubbles: true,
+        composed: true,
+        detail: { value: 'two' },
+      }),
     )
     expect<EventTarget | null>(from).toBe(menu)
   })

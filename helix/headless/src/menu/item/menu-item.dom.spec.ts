@@ -43,7 +43,7 @@ describe('one menu row', () => {
   test('is chosen by its own click(), once, as by a press on its control', async () => {
     const host = await row('value="a"')
     const heard: string[] = []
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     let clicks = 0
@@ -158,7 +158,7 @@ describe('choosing a row that can be ticked', () => {
       '<helix-headless-menu-item checkable value="a">Show hidden</helix-headless-menu-item>',
     )) as [Row]
     let heard: boolean | undefined
-    row.addEventListener('helix-select', () => {
+    row.addEventListener('helix-before-select', () => {
       heard = row.checked
     })
     await choose(row)
@@ -182,7 +182,7 @@ describe('choosing a row that can be ticked', () => {
     const [row] = (await rows(
       '<helix-headless-menu-item checkable value="a">Show hidden</helix-headless-menu-item>',
     )) as [Row]
-    row.addEventListener('helix-before-toggle', (event) => event.preventDefault())
+    row.addEventListener('helix-before-check', (event) => event.preventDefault())
     await choose(row)
     expect(row.checked).toBe(false)
   })

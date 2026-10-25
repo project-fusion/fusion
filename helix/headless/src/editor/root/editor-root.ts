@@ -1331,8 +1331,8 @@ export class HelixHeadlessEditor extends HelixElement {
           ?checked=${tool === current}
           ?disabled=${this.disabled(tool)}
           shortcut=${SHORTCUTS[tool] ?? nothing}
-          @helix-before-toggle=${this.keepTick}
-          @helix-select=${() => this.choose(tool)}
+          @helix-before-check=${this.keepTick}
+          @helix-before-select=${() => this.choose(tool)}
         >
           ${this.nameOf(tool)}
         </${item}>`,

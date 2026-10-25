@@ -40,7 +40,7 @@ describe('tree', () => {
     // consumer holds a reference to.
     const tree = await mount(markup)
     let seen = ''
-    tree.addEventListener('helix-select', (event) => {
+    tree.addEventListener('helix-before-select', (event) => {
       seen = (event as CustomEvent<{ value: string }>).detail.value
     })
 
@@ -68,7 +68,7 @@ describe('tree selection can be refused', () => {
       (item) => item.getAttribute('value') !== started && item.getAttribute('value'),
     ) as HTMLElement
     other.dispatchEvent(
-      new CustomEvent('helix-select', {
+      new CustomEvent('helix-before-select', {
         bubbles: true,
         composed: true,
         detail: { value: other.getAttribute('value') },
@@ -260,7 +260,7 @@ describe('a tree used as navigation follows its links', () => {
   test('an item with no link is chosen and nothing else happens', async () => {
     const tree = await mount(nav)
     const chosen: string[] = []
-    tree.addEventListener('helix-select', (event) =>
+    tree.addEventListener('helix-before-select', (event) =>
       chosen.push((event as CustomEvent<{ value: string }>).detail.value),
     )
     const item = itemNamed(tree, 'plain')

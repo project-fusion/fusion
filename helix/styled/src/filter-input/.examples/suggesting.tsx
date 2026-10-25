@@ -74,12 +74,12 @@ export function Example() {
       direction="column"
       gap="md"
     >
-      {/* The option sends `helix-select` when it is pressed or chosen with
+      {/* The option sends `helix-before-select` when it is pressed or chosen with
           Enter, so one handler covers both. */}
       <helix-filter-input
         hint="Type a letter, or press Down. Choosing a key offers its values next."
         label="Filter rows"
-        onhelix-select={choose}
+        onhelix-before-select={choose}
         onInput={offer}
         placeholder="owner:ada status:open"
         ref={filter}

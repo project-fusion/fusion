@@ -3,6 +3,7 @@ import {
   customElement,
   formatWords,
   type GraphSignalDetail,
+  HelixBeforeGraphFilterEvent,
   HelixElement,
   HelixGraphFilterEvent,
   HelixGraphLayoutEvent,
@@ -130,7 +131,8 @@ const LONG_LAYOUT = 5000
  *
  * @event {HelixActivateEvent} helix-activate - A note was selected, in the list or in the drawing. The detail's `value` is its `id`.
  * @event {HelixBeforeActivateEvent} helix-before-activate - A note is about to be selected. Cancelable: cancel it to keep the selection in your own state.
- * @event {HelixGraphFilterEvent} helix-graph-filter - A group in the legend was pressed, to show or hide its notes. The detail's `hidden` is every group that would be hidden. Cancelable: cancel it to keep the groups as they were, or to set `hiddenGroups` yourself.
+ * @event {HelixBeforeGraphFilterEvent} helix-before-graph-filter - A group in the legend was pressed, to show or hide its notes. The detail's `hidden` is every group that would be hidden. Cancelable: cancel it to keep the groups as they were, or to set `hiddenGroups` yourself.
+ * @event {HelixGraphFilterEvent} helix-graph-filter - A legend press showed or hid a group's notes. The detail's `hidden` is every group now hidden, which `hiddenGroups` also holds.
  * @event {HelixGraphLayoutEvent} helix-graph-layout - A layout settled, with where it put each note, sent by `laidOut()`. Keep the positions and pass them back as each note's `x` and `y`, and `z` where a renderer draws in three dimensions.
  * @event {HelixGraphPanEvent} helix-graph-pan - A pan button or arrow key was pressed. `connectGraph` moves the drawing, then calls `moved()`.
  * @event {HelixGraphPartChangeEvent} helix-graph-part-change - The notes, the links, the selection, the depth, the note the keys are on, or the gestures changed. Used by `connectGraph`; pages do not need to listen for it.
@@ -935,9 +937,10 @@ export class HelixHeadlessGraph extends MixinViewport(MixinControllerActive(Heli
     const hidden = this.hiddenGroups.includes(name)
       ? this.hiddenGroups.filter((group) => group !== name)
       : [...this.hiddenGroups, name]
-    if (this.dispatchEvent(new HelixGraphFilterEvent({ hidden }))) {
+    if (this.dispatchEvent(new HelixBeforeGraphFilterEvent({ hidden }))) {
       this.hiddenGroups = hidden
       this.countAsked = true
+      this.dispatchEvent(new HelixGraphFilterEvent({ hidden }))
     }
   }
 

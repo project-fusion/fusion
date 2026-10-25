@@ -36,7 +36,7 @@
   ]
 
   /* `search` sends the same request the table makes for itself. The page hears
-     `helix-filter` and can refuse it, as a server-side search would. */
+     `helix-before-filter` and can refuse it, as a server-side search would. */
   document.getElementById('query').addEventListener('helix-before-change', (event) => {
     people.search(event.detail.value)
   })

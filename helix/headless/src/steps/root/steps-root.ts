@@ -111,7 +111,7 @@ const keyOf = (step: HelixHeadlessStep, index: number): string => step.value || 
  *
  * @event {HelixActivateEvent} helix-activate - Fired after the current step changes, when the element already holds the new step.
  * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the active step changes. Cancelable: cancel it to keep the current step.
- * @event {HelixSelectEvent} helix-select - Fired when a step is pressed. The step dispatches it, and you can listen for it on the sequence. Cancelable: cancel it to keep the current step.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when a step is pressed. The step dispatches it, and you can listen for it on the sequence. Cancelable: cancel it to keep the current step.
  *
  * @csspart progress - How far through the sequence is, as a `progressbar` carrying `--steps-progress`. Hidden until a stylesheet gives it a `display`.
  *
@@ -405,7 +405,7 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
      `helix-before-activate`.
 
      **And only if the step's own choice stood, read a microtask later.**
-     `helix-select` is cancelable, and the docblock tells you to listen for it
+     `helix-before-select` is cancelable, and the docblock tells you to listen for it
      on the sequence. This listener is on the sequence too, added when it
      connected, so it runs ahead of a listener you add afterwards, and read
      inline the flag was not set yet: a refusal on the sequence changed
@@ -414,7 +414,7 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
      event. */
   private readonly handleSelection = (event: Event): void => {
     /* Only a choice made by one of this sequence's own steps. A tab set, a tree
-       or a menu in a step's `content` sends `helix-select` too, and it bubbles
+       or a menu in a step's `content` sends `helix-before-select` too, and it bubbles
        out of the step: acted on, it set `active` to a value no step has. */
     if (!this.steps.includes(event.target as HelixHeadlessStep)) {
       return
@@ -480,7 +480,7 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('helix-select', this.handleSelection)
+    this.addEventListener('helix-before-select', this.handleSelection)
     this.addEventListener('focusin', this.handleFocus)
     /* A stage a script finishes, or one the reader arrives at, moves what a
        linear sequence can reach. Both are reflected, so their attributes say
@@ -499,7 +499,7 @@ export class HelixHeadlessSteps extends MixinControllerActive(HelixElement) {
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-select', this.handleSelection)
+    this.removeEventListener('helix-before-select', this.handleSelection)
     this.removeEventListener('focusin', this.handleFocus)
     this.watcher?.disconnect()
     this.watcher = undefined

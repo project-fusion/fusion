@@ -1,4 +1,4 @@
-<!-- @summary Switching sends `helix-before-toggle`, `input`, and `change`. -->
+<!-- @summary Switching sends `helix-before-check`, `input`, and `change`. -->
 <helix-flex
   direction="column"
   gap="md"
@@ -47,8 +47,8 @@
     }
   }
 
-  setting.addEventListener('helix-before-toggle', (event) => {
-    say('helix-before-toggle', `about to change to ${event.detail.checked}, can be canceled`)
+  setting.addEventListener('helix-before-check', (event) => {
+    say('helix-before-check', `about to change to ${event.detail.checked}, can be canceled`)
   })
   setting.addEventListener('input', (event) => {
     say('input', `${event.currentTarget.checked}, sent as the value changes`)

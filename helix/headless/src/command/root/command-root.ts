@@ -6,8 +6,9 @@ import {
   drawStatus,
   formatWords,
   type HelixBeforeChangeEvent,
+  type HelixBeforeFilterEvent,
+  HelixBeforeSelectEvent,
   HelixElement,
-  type HelixFilterEvent,
   HelixSelectEvent,
   keyNames,
   type ListedControl,
@@ -17,6 +18,7 @@ import {
   onApple,
   registerShortcut,
   runControl,
+  type SelectDetail,
   StatusController,
   timeConverter,
   words,
@@ -54,7 +56,7 @@ const CONTROL = 'helix-control:'
  * that opens it.
  *
  * The palette keeps no value. It is not a form control and submits nothing.
- * Choosing an option dispatches `helix-select` once. To remember the last
+ * Choosing an option dispatches `helix-before-select` once. To remember the last
  * command, store it yourself. An option with `href` is a link to a page, which
  * the browser follows once the palette has closed.
  *
@@ -78,7 +80,7 @@ const CONTROL = 'helix-control:'
  * </helix-command>
  * ```
  *
- * Choosing the opener says `helix-select` with its value, and canceling it
+ * Choosing the opener says `helix-before-select` with its value, and canceling it
  * keeps the page that is shown. The list then shows the page, named by the
  * opener's words, and a screen reader hears those words. Backspace in an empty
  * filter goes back, and a screen reader hears the name of the page it goes
@@ -141,10 +143,12 @@ const CONTROL = 'helix-control:'
  * @slot no-results - What the palette shows when typing matches no commands, for content richer than `no-results-text`.
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - The palette is about to close. Cancelable: cancel it to keep it open.
+ * @event {HelixBeforeFilterEvent} helix-before-filter - Fired as the user types, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and filter the commands yourself, for example on a server while `loading` is set.
  * @event {HelixBeforeOpenEvent} helix-before-open - The palette is about to open. Cancelable: cancel it to keep it closed.
- * @event {HelixFilterEvent} helix-filter - Fired as the user types, with the text the list is filtered by. Cancelable: cancel it to leave the list unfiltered and filter the commands yourself, for example on a server while `loading` is set.
+ * @event {HelixBeforeSelectEvent} helix-before-select - A command was chosen, with its `href` where the option is a link. Cancelable: cancel it to keep the palette open, and to keep the browser from following the link.
+ * @event {HelixFilterEvent} helix-filter - Fired after the list is filtered, with the text it is filtered by.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired once the list is scrolled within a screen of its end, once for each number of commands, and not while `loading` is set. Add the next page and set `loading` while you fetch it.
- * @event {HelixSelectEvent} helix-select - A command was chosen, with its `href` where the option is a link. Cancelable: cancel it to keep the palette open, and to keep the browser from following the link.
+ * @event {HelixSelectEvent} helix-select - Fired after a choice stood, with the same detail as `helix-before-select`. Run the command from it.
  * @event {ToggleEvent} toggle - The palette opened or closed. The event carries `newState` and `oldState`.
  *
  * @csspart control - A control on screen, listed with `controls`.
@@ -225,7 +229,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
 
   /**
    * How long typing rests before the commands are filtered, in milliseconds, so
-   * a palette filtered on a server sends one `helix-filter` for a word. `0`
+   * a palette filtered on a server sends one `helix-before-filter` for a word. `0`
    * filters on every keystroke. See Listbox's `filter-delay`. The attribute
    * also takes a CSS time, such as `300ms`.
    */
@@ -278,7 +282,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    * over a list of commands, as React Aria's Autocomplete is drawn.
    *
    * The list is always shown, and `hotkey` puts focus in its filter field.
-   * Choosing a command says `helix-select` and leaves the list where it is,
+   * Choosing a command says `helix-before-select` and leaves the list where it is,
    * and `open`, `toggle` and the dialog's parts do nothing.
    */
   @property({ reflect: true, type: Boolean })
@@ -290,7 +294,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    * `disabled`. Handed to the list, which draws only the commands in sight and
    * reads no children while it is set. See Listbox's `items`.
    *
-   * Choosing one says `helix-select` with its value, as a child option does.
+   * Choosing one says `helix-before-select` with its value, as a child option does.
    * A command that is a link, or that has an `alternate`, is an option you
    * write as a child.
    */
@@ -481,7 +485,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
       void this.updateComplete.then(() => runControl(control))
       return
     }
-    if (!this.dispatchEvent(new HelixSelectEvent({ value }))) {
+    if (!this.choose({ value })) {
       return
     }
     /* A command that opens a page goes there, and the palette stays open. */
@@ -594,15 +598,27 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     }
     event.preventDefault()
     event.stopImmediatePropagation()
-    if (this.dispatchEvent(new HelixSelectEvent({ alternate: true, value: alternate }))) {
+    if (this.choose({ alternate: true, value: alternate })) {
       this.requestOpen(false)
     }
+  }
+
+  /**
+   * Asks whether a command may run, and says it was chosen once nobody
+   * refused: `helix-before-select`, then `helix-select` with the same detail.
+   */
+  private choose(detail: SelectDetail): boolean {
+    if (!this.dispatchEvent(new HelixBeforeSelectEvent(detail))) {
+      return false
+    }
+    this.dispatchEvent(new HelixSelectEvent(detail))
+    return true
   }
 
   /*
    * Keeps an option's own announcement inside the palette.
    *
-   * Every option says `helix-select` when it is chosen, which is how the list
+   * Every option says `helix-before-select` when it is chosen, which is how the list
    * hears it, and the options are light DOM children of this element, so it
    * carries straight on out to the consumer: two selections for one command
    * under one event name, told apart only by the target. The one this element
@@ -623,11 +639,11 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
        and the palette closes as it does for any command. Canceled, the palette
        stays open and the row does not follow its link, so a client-side router
        takes it. */
-    const { href, value } = (event as HelixSelectEvent).detail
+    const { href, value } = (event as HelixBeforeSelectEvent).detail
     if (href === undefined) {
       return
     }
-    if (!this.dispatchEvent(new HelixSelectEvent({ href, value }))) {
+    if (!this.choose({ href, value })) {
       event.preventDefault()
       return
     }
@@ -638,7 +654,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
     super.connectedCallback()
     auditChildren(this, 'option', 'option', 'the palette lists no commands')
     auditChildren(this, 'listbox', 'listbox', 'the palette has no working list', true)
-    this.addEventListener('helix-select', this.swallowOptionSelect)
+    this.addEventListener('helix-before-select', this.swallowOptionSelect)
     /* Capture, so both reach this before the listbox and the row do. */
     this.addEventListener('keydown', this.handleAlternate, { capture: true })
     this.addEventListener('keydown', this.handleBack)
@@ -665,7 +681,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.unregister?.()
-    this.removeEventListener('helix-select', this.swallowOptionSelect)
+    this.removeEventListener('helix-before-select', this.swallowOptionSelect)
     this.removeEventListener('keydown', this.handleAlternate, { capture: true })
     this.removeEventListener('keydown', this.handleBack)
     this.removeEventListener('click', this.handleAlternate, { capture: true })
@@ -724,7 +740,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
    * filter is applied, so the list's update is waited for a turn later.
    */
   private readonly handleFilter = (event: Event): void => {
-    const typed = (event as HelixFilterEvent).detail?.value ?? ''
+    const typed = (event as HelixBeforeFilterEvent).detail?.value ?? ''
     /* Read as typing starts, which is when they are first shown, so a palette
        drawn `inline`, which never opens, reads them too. */
     if (this.typed.trim() === '' && typed.trim() !== '') {
@@ -874,7 +890,7 @@ export class HelixHeadlessCommand extends MixinControllerOpen(HelixElement) {
         ?voice=${this.voice}
         filterable
         @helix-before-change=${this.handleChange}
-        @helix-filter=${this.handleFilter}
+        @helix-before-filter=${this.handleFilter}
         @change=${this.stopInner}
         @input=${this.stopInner}
       >

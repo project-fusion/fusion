@@ -24,7 +24,7 @@ describe('the events example', () => {
     await example(events)
     choose(document.querySelector('helix-option[value="grace"]'))
     await idle()
-    expect(logged()).toEqual(['helix-select'])
+    expect(logged()).toEqual(['helix-before-select'])
   })
 })
 

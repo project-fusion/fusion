@@ -26,7 +26,7 @@ describe('the events example', () => {
     await idle()
     /* The root acts on the press once every listener has had the chance to
        refuse it, so the press is heard before the request it makes. */
-    expect(logged()).toEqual(['helix-select', 'helix-before-activate'])
+    expect(logged()).toEqual(['helix-before-select', 'helix-before-activate'])
   })
 })
 

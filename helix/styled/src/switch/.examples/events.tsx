@@ -19,7 +19,7 @@ export function Example() {
   }
 
   const proposed = (event: CustomEvent<{ checked: boolean }>) => {
-    say('helix-before-toggle', `about to change to ${event.detail.checked}, can be canceled`)
+    say('helix-before-check', `about to change to ${event.detail.checked}, can be canceled`)
   }
 
   const moved = (event: Event & { currentTarget: HelixSwitch }) => {
@@ -39,7 +39,7 @@ export function Example() {
         label="Automatic updates"
         name="autodeploy"
         onChange={settled}
-        onhelix-before-toggle={proposed}
+        onhelix-before-check={proposed}
         onInput={moved}
       />
 

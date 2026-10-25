@@ -59,7 +59,7 @@ describe('option', () => {
       selected: boolean
     }
     let announced = ''
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       announced = (event as CustomEvent<{ value: string }>).detail.value
     })
     host.select()
@@ -72,7 +72,7 @@ describe('option', () => {
       '<helix-headless-option disabled value="a">Alpha</helix-headless-option>',
     )) as HTMLElement & { select: () => void }
     let announced = false
-    host.addEventListener('helix-select', () => {
+    host.addEventListener('helix-before-select', () => {
       announced = true
     })
     host.select()
@@ -195,24 +195,26 @@ describe('an option that is a link', () => {
     return heard
   }
 
-  test('says helix-select with its href, then follows it with the keys held', async () => {
+  test('says helix-before-select with its href, then follows it with the keys held', async () => {
     const heard = followed()
     const host = (await mount(
       '<helix-headless-option value="docs" href="/docs" target="_blank">Docs</helix-headless-option>',
     )) as HTMLElement & { select(modifiers?: { metaKey?: boolean }): void }
     const said: unknown[] = []
-    host.addEventListener('helix-select', (event) => said.push((event as CustomEvent).detail))
+    host.addEventListener('helix-before-select', (event) =>
+      said.push((event as CustomEvent).detail),
+    )
     part(host, 'item')?.dispatchEvent(new MouseEvent('click', { bubbles: true, metaKey: true }))
     expect(said).toEqual([{ href: '/docs', value: 'docs' }])
     expect(heard).toEqual(['/docs _blank meta'])
   })
 
-  test('follows nothing where helix-select is canceled, so a router can take it', async () => {
+  test('follows nothing where helix-before-select is canceled, so a router can take it', async () => {
     const heard = followed()
     const host = (await mount(
       '<helix-headless-option value="docs" href="/docs">Docs</helix-headless-option>',
     )) as HTMLElement & { select(): void }
-    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.addEventListener('helix-before-select', (event) => event.preventDefault())
     host.select()
     expect(heard).toEqual([])
   })

@@ -88,14 +88,14 @@ describe('checkbox group', () => {
   })
 
   test('a box that refused its own change is not counted into the set', async () => {
-    /* `helix-before-toggle` is cancelable and the box honors it, so a consumer
+    /* `helix-before-check` is cancelable and the box honors it, so a consumer
        refusing on the box leaves that box exactly where it was. The group read
        the request rather than the answer and took the value anyway, which left
        a set naming a box that never ticked: no error, and a form carrying the
        group's answer beside boxes that disagree with it. */
     const g = await group()
     const box = g.boxes[2] as HTMLElement
-    box.addEventListener('helix-before-toggle', (event) => event.preventDefault())
+    box.addEventListener('helix-before-check', (event) => event.preventDefault())
     await tick(g, 2)
     expect(g.value).toBe('design,mind')
     expect(g.boxes.map((one) => one.checked)).toEqual([true, true, false])

@@ -3,6 +3,7 @@
 import type {
   HelixBeforeEditEvent,
   HelixBeforeResizeEvent,
+  HelixBeforeSelectEvent,
   HelixDialog,
   HelixInput,
   HelixMenu,
@@ -615,7 +616,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
       setShowStatus((was) => !was)
     }
   }
-  const exampleChosen = (event: HelixSelectEvent) => {
+  const exampleChosen = (event: HelixBeforeSelectEvent) => {
     select(event.detail.value)
   }
 
@@ -1137,7 +1138,7 @@ export function SandboxWorkbench({ families, findable = [] }: Props) {
             chevron-placement="end"
             label="Examples"
             nesting="subordinate"
-            onhelix-select={exampleChosen}
+            onhelix-before-select={exampleChosen}
             ref={setTree}
           >
             {shown.map((entry) => (

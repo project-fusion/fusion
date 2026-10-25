@@ -1,4 +1,4 @@
-<!-- @summary The `helix-read` and `helix-dismiss` events, which report two different changes. -->
+<!-- @summary The `helix-before-read` and `helix-dismiss` events, which report two different changes. -->
 <helix-flex
   direction="column"
   gap="md"
@@ -60,8 +60,8 @@
     }
   }
 
-  feed.addEventListener('helix-read', (event) => {
-    say('helix-read', `Mark as ${event.detail.read ? 'read' : 'unread'}`)
+  feed.addEventListener('helix-before-read', (event) => {
+    say('helix-before-read', `Mark as ${event.detail.read ? 'read' : 'unread'}`)
   })
   feed.addEventListener('helix-dismiss', (event) => {
     say('helix-dismiss', `Dismissed "${event.detail.label}"`)

@@ -27,7 +27,7 @@ export function Example() {
   }
 
   const chosen = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `"${event.detail.value}" was chosen, and the event bubbles`)
+    say('helix-before-select', `"${event.detail.value}" was chosen, and the event bubbles`)
   }
 
   return (
@@ -39,7 +39,7 @@ export function Example() {
         default-active="usage"
         label="Account"
         onhelix-before-activate={moving}
-        onhelix-select={chosen}
+        onhelix-before-select={chosen}
       >
         <helix-tab value="usage">Usage</helix-tab>
         <helix-tab value="billing">Billing</helix-tab>

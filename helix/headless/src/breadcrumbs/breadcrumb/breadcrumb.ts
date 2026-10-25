@@ -1,5 +1,6 @@
 import {
   customElement,
+  HelixBeforeSelectEvent,
   HelixElement,
   HelixSelectEvent,
   hostAria,
@@ -32,7 +33,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * click, and the status bar, and before any JavaScript runs. A router cannot
  * reach an anchor inside a shadow root, so intercept the click for client-side
  * navigation, as with `Tree.Item` and `List.Item`: a plain press on the link
- * sends `helix-select` with the `href` as its value first, and canceling it
+ * sends `helix-before-select` with the `href` as its value first, and canceling it
  * keeps the browser from following, so a client-side router follows it
  * instead, as React Aria's `onAction` lets a router do. A press with a
  * modifier opens the link where the browser opens it and sends nothing.
@@ -60,7 +61,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot separator - Replaces the mark shown before this item, a chevron or the trail's `separator`.
  * @slot start - Content before the label, such as an icon.
  *
- * @event {HelixSelectEvent} helix-select - A plain press on the crumb's link, with its `href` as the value, before the browser follows it. Cancelable: cancel it to keep the browser from following, as a client-side router does.
+ * @event {HelixBeforeSelectEvent} helix-before-select - A plain press on the crumb's link, with its `href` as the value, before the browser follows it. Cancelable: cancel it to keep the browser from following, as a client-side router does.
+ * @event {HelixSelectEvent} helix-select - Fired after a plain press on the crumb's link stood, with its `href` as the value, before the browser follows it.
  *
  * @csspart expand - The button after the first crumb of a folded slotted trail, which shows the folded crumbs.
  * @csspart fold-separator - The chevron before that button.
@@ -180,16 +182,19 @@ export class HelixHeadlessBreadcrumb extends HelixElement {
   }
 
   /**
-   * Sends `helix-select` for a plain press on the link, and keeps the browser
+   * Sends `helix-before-select` for a plain press on the link, and keeps the browser
    * from following where it was canceled.
    */
   private readonly handleLinkClick = (event: MouseEvent): void => {
     if (!plainClick(event)) {
       return
     }
-    if (!this.dispatchEvent(new HelixSelectEvent({ value: this.href ?? '' }))) {
+    const detail = { value: this.href ?? '' }
+    if (!this.dispatchEvent(new HelixBeforeSelectEvent(detail))) {
       event.preventDefault()
+      return
     }
+    this.dispatchEvent(new HelixSelectEvent(detail))
   }
 
   /**

@@ -1,9 +1,9 @@
 import {
   auditNesting,
   customElement,
+  HelixBeforeSelectEvent,
   HelixElement,
   HelixLoadEvent,
-  HelixSelectEvent,
   MixinControllerOpen,
 } from '@fusion.dev/helix-core'
 import { caretDown, check, dotsSixVertical, minus } from '@fusion.dev/helix-icons'
@@ -34,7 +34,7 @@ export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
  * click, and the status bar then work anywhere on the row.
  *
  * Pressing a branch, or Enter or Space on it, opens or closes it. A branch with
- * a `value` is chosen as well and sends `helix-select`, unless the tree has
+ * a `value` is chosen as well and sends `helix-before-select`, unless the tree has
  * `nesting="heading"`, where a branch names the list under it, or
  * `selection-mode="leaf"`, where only the items at the ends are chosen.
  *
@@ -67,8 +67,8 @@ export type TreeItemMove = 'dragging' | 'drop-after' | 'drop-before'
  *
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before a branch closes, and cancelable.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before a branch opens, and cancelable.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when the item is chosen, and cancelable. Canceling it changes nothing.
  * @event {HelixLoadEvent} helix-load - Fired when a `lazy` item opens, so you can load its children.
- * @event {HelixSelectEvent} helix-select - Fired when the item is chosen, and cancelable. Canceling it changes nothing.
  * @event {ToggleEvent} toggle - Sent when the branch opens or closes, with `newState` and `oldState`.
  *
  * @csspart checkbox - The check mark's box, in a tree with `selection-mode="multiple"`.
@@ -234,7 +234,7 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
   focusable = false
 
   /**
-   * Identifies the item to your code. It is sent in `helix-select`.
+   * Identifies the item to your code. It is sent in `helix-before-select`.
    */
   @property()
   value = ''
@@ -310,12 +310,12 @@ export class HelixHeadlessTreeItem extends MixinControllerOpen(HelixElement) {
     )
   }
 
-  /** Selects this node and sends `helix-select`. A disabled node sends nothing. */
+  /** Selects this node and sends `helix-before-select`. A disabled node sends nothing. */
   select(): void {
     if (this.disabled) {
       return
     }
-    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    this.dispatchEvent(new HelixBeforeSelectEvent({ value: this.value }))
   }
 
   /**

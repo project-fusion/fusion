@@ -77,7 +77,7 @@ describe('the horizontal arrows', () => {
    deep each row sits. Neither is drawn here and both are readable. */
 describe('a choice the item refuses', () => {
   test('leaves the selection where it was', async () => {
-    /* `helix-select` is cancelable and the item documents it as refusable. The
+    /* `helix-before-select` is cancelable and the item documents it as refusable. The
        tree is the one thing that acts on it, so a refusal it ignored was a veto
        that did nothing anywhere: valid code, no error, and the selection
        happening regardless. Bound on the item, which is the position that can
@@ -88,7 +88,7 @@ describe('a choice the item refuses', () => {
     await host.updateComplete
     expect(host.active).toBe('branch')
 
-    child.addEventListener('helix-select', (event) => event.preventDefault())
+    child.addEventListener('helix-before-select', (event) => event.preventDefault())
     child.select()
     await host.updateComplete
     expect(host.active).toBe('branch')
@@ -200,7 +200,7 @@ describe('what a tree acts on', () => {
     inside.slot = 'end'
     branch.append(inside)
     inside.dispatchEvent(
-      new CustomEvent('helix-select', {
+      new CustomEvent('helix-before-select', {
         bubbles: true,
         cancelable: true,
         composed: true,

@@ -8,6 +8,7 @@ import {
   drawStatus,
   type FacetDetail,
   formatWords,
+  HelixBeforeFacetEvent,
   HelixFacetEvent,
   HelixFormElement,
   holdCaret,
@@ -139,8 +140,8 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * so the picker and the text share one set. On Enter, the field reads the text
  * against them, and a paste is read the same way as soon as it lands.
  * `disposition:refunded,settled` and `-disposition:refunded` fire
- * `helix-facet` exactly as ticking those values in the picker would, and the
- * parsed text is removed. Everything else stays, so `refund tuesday
+ * `helix-before-facet` and `helix-facet` exactly as ticking those values in the
+ * picker would, and the parsed text is removed. Everything else stays, so `refund tuesday
  * disposition:settled` is a filter and a search at once. Helix defines the
  * punctuation and you define every word. `grammar.ts` has the full rule, so
  * read it before you rely on it. A field with no `FilterField` in it parses
@@ -165,7 +166,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  *
  * **Suggestions.** Slot options into `suggestions` and the field shows them,
  * moves through them with the arrow keys, and presses one on Enter. The option
- * fires its own `helix-select`, and you decide what choosing it means. Keys
+ * fires its own `helix-before-select`, and you decide what choosing it means. Keys
  * before a colon and values after it use the same panel with different
  * contents. `filter-suggestions` narrows the panel to the options whose words
  * hold the term at the caret, after its colon, ignoring case and accents, and
@@ -186,7 +187,7 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * panel shows `loading-text` and a screen reader hears it, then the count.
  * Choosing a suggestion writes its value over the term at the caret, and a
  * finished `field:value` is read into a chip as Enter would. Cancel its
- * `helix-select` to write it yourself.
+ * `helix-before-select` to write it yourself.
  *
  * ```js
  * filter.source = async ({ field, term, signal }) => {
@@ -209,9 +210,9 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  *   declared field works differently, because the picker holds what is ticked
  *   and removing the chip alone would leave its value ticked in the hidden
  *   menu. Its dismissal is treated as the field being filtered by nothing, so
- *   it fires `helix-facet` like every other change, and the chip goes when the
- *   filter goes. Set `chips` and the field adds, updates, and removes those
- *   chips itself, from every `helix-facet` you do not cancel.
+ *   it fires `helix-before-facet` like every other change, and the chip goes
+ *   when the filter goes. Set `chips` and the field adds, updates, and removes
+ *   those chips itself, from every `helix-facet`.
  *
  * **The suggestions you write are an import of their own.** A suggestion is an
  * option, the Option family's, which the field does not register, so a page
@@ -246,12 +247,13 @@ const isOption = (node: Element): node is SuggestionOption => 'active' in node &
  * @event {Event} change - Fired from the input when the user finishes editing the text.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired as the text changes. Cancelable: call `preventDefault()` to keep the current text.
  * @event {HelixBeforeCloseEvent} helix-before-close - Fired before the suggestions close. Cancelable: call `preventDefault()` to keep them open.
+ * @event {HelixBeforeFacetEvent} helix-before-facet - Fired when a filter is about to change, whether it was typed, picked, or removed. Cancelable: call `preventDefault()` to leave the text and the chip as they were.
  * @event {HelixBeforeListenEvent} helix-before-listen - The dictation button was pressed. Cancelable: cancel it to keep the field from listening.
  * @event {HelixBeforeOpenEvent} helix-before-open - Fired before the suggestions open. Cancelable: call `preventDefault()` to keep them closed.
- * @event {HelixDismissEvent} helix-dismiss - Fired when the user removes a token with its remove button or with Backspace in an empty field. A `FilterChip` that names a declared field sends `helix-facet` instead. Cancelable: call `preventDefault()` to keep the token.
- * @event {HelixFacetEvent} helix-facet - Fired when a filter changes, whether it was typed, picked, or removed. Cancelable: call `preventDefault()` to leave the text and the chip as they were.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired by an option in `suggestions` when it is chosen, and bubbles out of the field. Cancelable: call `preventDefault()` to stop other listeners acting on it. The field takes no action on an option you slotted, and you decide what it does. A suggestion from `source` is written over the term at the caret unless you cancel it.
+ * @event {HelixDismissEvent} helix-dismiss - Fired when the user removes a token with its remove button or with Backspace in an empty field. A `FilterChip` that names a declared field sends `helix-before-facet` instead. Cancelable: call `preventDefault()` to keep the token.
+ * @event {HelixFacetEvent} helix-facet - Fired after a filter changes, with the field's values now in force. Draw the chip from it, or set `chips`.
  * @event {HelixListenEvent} helix-listen - Dictation settled on a phrase and put it in the field, after the field's own `input`.
- * @event {HelixSelectEvent} helix-select - Fired by an option in `suggestions` when it is chosen, and bubbles out of the field. Cancelable: call `preventDefault()` to stop other listeners acting on it. The field takes no action on an option you slotted, and you decide what it does. A suggestion from `source` is written over the term at the caret unless you cancel it.
  * @event {Event} input - Fired when the text changes.
  * @event {ToggleEvent} toggle - Fired when the suggestions panel opens or closes, with `newState` and `oldState`.
  *
@@ -309,7 +311,7 @@ export class HelixHeadlessFilterInput extends MixinVoice(
    * the filters. On, a filter typed, picked, or changed adds or updates the
    * chip for its field, one with no values takes it away (unless its
    * comparison takes none, such as "is empty"), and removing the chip clears
-   * the filter. A `helix-facet` you cancel changes no chip.
+   * the filter. A `helix-before-facet` you cancel changes no chip.
    *
    * The chips are elements the field adds to its own children, so leave this
    * off where a framework renders those children and would remove them.
@@ -738,28 +740,24 @@ export class HelixHeadlessFilterInput extends MixinVoice(
    */
   private announceFacet(facet: FacetDetail): boolean {
     const menu = this.menuFor(facet.field)
-    return menu
-      ? menu.apply(facet.field, facet.values, facet.operator)
-      : this.dispatchEvent(new HelixFacetEvent(facet))
+    if (menu) {
+      return menu.apply(facet.field, facet.values, facet.operator)
+    }
+    if (!this.dispatchEvent(new HelixBeforeFacetEvent(facet))) {
+      return false
+    }
+    this.dispatchEvent(new HelixFacetEvent(facet))
+    return true
   }
 
   /**
-   * Keeps the chip for a filter in step with it, under `chips`.
-   *
-   * After every listener has had its turn, so a consumer's `preventDefault()`
-   * on the same event, on this element or above it, is read: `dispatchEvent`
-   * runs them all before the microtask does.
+   * Keeps the chip for a filter in step with it, under `chips`, from the
+   * notification, which is sent only for a filter that stood.
    */
   private readonly handleFacet = (event: Event): void => {
-    if (!this.chips) {
-      return
+    if (this.chips) {
+      this.drawChip((event as CustomEvent<FacetDetail>).detail)
     }
-    const facet = (event as CustomEvent<FacetDetail>).detail
-    queueMicrotask(() => {
-      if (!event.defaultPrevented) {
-        this.drawChip(facet)
-      }
-    })
   }
 
   /** Adds, updates or removes the chip for one filter. See `chips`. */
@@ -794,8 +792,8 @@ export class HelixHeadlessFilterInput extends MixinVoice(
    * press on it read as *unticking*: they pressed `Refunded` and nothing came
    * back. Turning the request into `apply(field, [])` puts it down the one road
    * every other filter takes, so the chip goes because the filter went. A
-   * consumer refusing that `helix-facet` keeps both, which is the answer a
-   * refusal should give.
+   * consumer refusing that `helix-before-facet` keeps both, which is the answer
+   * a refusal should give.
    *
    * Everything else in the row is untouched: a plain `Tag`, or a chip for
    * something no `FilterField` declares, is the consumer's to answer.
@@ -806,7 +804,7 @@ export class HelixHeadlessFilterInput extends MixinVoice(
    * on this element or above it hears it. Heard on the way up, `stopPropagation`
    * kept it from the ancestors and not from this element's other listeners, so a
    * consumer listening on the field heard `helix-dismiss` as well as the
-   * `helix-facet` that answered it.
+   * `helix-before-facet` that answered it.
    */
   private readonly handleDismiss = (event: Event): void => {
     const chip = event.composedPath()[0]
@@ -817,7 +815,7 @@ export class HelixHeadlessFilterInput extends MixinVoice(
     /* **Any declared field, in the menu or outside it.** Only a field in a
        picker was taken, so a chip for `assignee`, declared outside the menu
        because its values cannot be listed, sent `helix-dismiss` where every
-       other declared chip sent `helix-facet`. */
+       other declared chip sent `helix-before-facet`. */
     const declared =
       field === '' ? undefined : this.fields.find((one) => (one.name ?? '') === field)
     if (!declared) {
@@ -851,9 +849,9 @@ export class HelixHeadlessFilterInput extends MixinVoice(
    * `FilterField` in it has no vocabulary to read against, so Enter stays the
    * form's and every keystroke is still just text.
    *
-   * Refusing a `helix-facet` leaves that term's text where the reader wrote it,
-   * so a consumer who declines one is not left with a box that has silently
-   * emptied itself of a filter they did not take.
+   * Refusing a `helix-before-facet` leaves that term's text where the reader
+   * wrote it, so a consumer who declines one is not left with a box that has
+   * silently emptied itself of a filter they did not take.
    */
   private readFilters(): number {
     const fields = this.fields
@@ -1096,7 +1094,7 @@ export class HelixHeadlessFilterInput extends MixinVoice(
    * caret, and a finished `field:value` read into a chip, as Enter reads it.
    *
    * **After every listener has had its turn**, as a chip under `chips` is
-   * drawn, so a `preventDefault()` on the `helix-select` is read and leaves the
+   * drawn, so a `preventDefault()` on the `helix-before-select` is read and leaves the
    * text to you.
    */
   private readonly handleSourcedSelect = (event: Event): void => {
@@ -1239,7 +1237,7 @@ export class HelixHeadlessFilterInput extends MixinVoice(
            from a handler on its inner part rather than from the host, so a click
            on the host reaches nothing; and asking an element to make its own
            choice is the API rather than an imitation of a pointer. It fires
-           `helix-select`, cancelable and composed, so the consumer hears the
+           `helix-before-select`, cancelable and composed, so the consumer hears the
            same event from the keyboard as from a press and this element never
            has to say what choosing means. */
         event.preventDefault()
@@ -1378,14 +1376,14 @@ export class HelixHeadlessFilterInput extends MixinVoice(
     auditChildren(this, 'option', 'option', 'the field suggests nothing')
     this.addEventListener('helix-dismiss', this.handleDismiss, { capture: true })
     this.addEventListener(HelixFacetEvent.eventName, this.handleFacet)
-    this.addEventListener('helix-select', this.handleSourcedSelect)
+    this.addEventListener('helix-before-select', this.handleSourcedSelect)
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
     this.removeEventListener('helix-dismiss', this.handleDismiss, { capture: true })
     this.removeEventListener(HelixFacetEvent.eventName, this.handleFacet)
-    this.removeEventListener('helix-select', this.handleSourcedSelect)
+    this.removeEventListener('helix-before-select', this.handleSourcedSelect)
     this.request?.abort()
     this.request = undefined
     this.fetching = false

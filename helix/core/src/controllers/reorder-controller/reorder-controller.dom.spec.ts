@@ -540,6 +540,7 @@ describe('asking for a move', () => {
     host.addEventListener('helix-reorder', (event) => {
       heard.push(event.type)
       expect(event.detail).toEqual(detail)
+      expect(event.cancelable).toBe(false)
     })
     expect(requestReorder(host, detail)).toBe(true)
     expect(heard).toEqual(['helix-before-reorder', 'helix-reorder'])

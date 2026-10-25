@@ -31,7 +31,7 @@ export function Example() {
   }
 
   const pressed = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `"${event.detail.value}" was pressed`)
+    say('helix-before-select', `"${event.detail.value}" was pressed`)
   }
 
   return (
@@ -43,7 +43,7 @@ export function Example() {
         label="Density"
         onChange={settled}
         onhelix-before-change={proposed}
-        onhelix-select={pressed}
+        onhelix-before-select={pressed}
         onInput={moved}
       >
         <helix-toggle value="sm">Compact</helix-toggle>

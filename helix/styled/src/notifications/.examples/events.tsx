@@ -20,7 +20,7 @@ export function Example() {
   }
 
   const read = (event: CustomEvent<{ read: boolean }>) => {
-    say('helix-read', `Mark as ${event.detail.read ? 'read' : 'unread'}`)
+    say('helix-before-read', `Mark as ${event.detail.read ? 'read' : 'unread'}`)
   }
 
   const dismissed = (event: CustomEvent<{ label: string }>) => {
@@ -35,8 +35,8 @@ export function Example() {
       <helix-notifications
         label="Notifications"
         mark-all
+        onhelix-before-read={read}
         onhelix-dismiss={dismissed}
-        onhelix-read={read}
       >
         <helix-notification dismissible>
           <strong>Ada Okonjo</strong> approved your deploy.

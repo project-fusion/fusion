@@ -13,7 +13,7 @@
 <script>
   const reel = document.getElementById('reel')
 
-  reel.addEventListener('helix-select', (event) => {
+  reel.addEventListener('helix-before-activate', (event) => {
     reel.index = Number(event.detail.value)
   })
 </script>

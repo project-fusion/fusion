@@ -271,7 +271,7 @@ const LINE = 'helix-line-'
  * @event {HelixBeforeReorderEvent} helix-before-reorder - Fired when an item is dropped at a new place, in a `reorderable` list with `@fusion.dev/helix/virtual-list/reorder` imported, with every key in the new order. Cancelable: cancel it to keep the item where it is.
  * @event {HelixLoadMoreEvent} helix-load-more - Fired when a reader comes within one screen of the last item, once for each length of the set.
  * @event {HelixRangeChangeEvent} helix-range-change - Fired when the items on screen change, with the new `first` and `last`, which `range` also holds.
- * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Set `items` to the order in `keys`. Cancelable: cancel it to say the move did not happen.
+ * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Set `items` to the order in `keys`.
  *
  * @csspart after - The space that stands in for the rows below the rendered ones.
  * @csspart before - The space that stands in for the rows above the rendered ones.

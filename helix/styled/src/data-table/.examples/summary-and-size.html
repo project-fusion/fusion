@@ -52,11 +52,7 @@
     range.pageSize = table.pageSize
   }
 
-  table.addEventListener('helix-navigate', () => {
-    /* The event is sent before the table changes page, so the sync waits for
-       the next microtask. */
-    queueMicrotask(sync)
-  })
+  table.addEventListener('helix-navigate', sync)
 
   size.addEventListener('helix-before-change', (event) => {
     table.pageSize = Number(event.detail.value)

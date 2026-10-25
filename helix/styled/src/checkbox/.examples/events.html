@@ -1,4 +1,4 @@
-<!-- @summary The events a click sends: `helix-before-toggle` with a boolean, then `input` and `change`. -->
+<!-- @summary The events a click sends: `helix-before-check` with a boolean, then `input` and `change`. -->
 <helix-flex
   direction="column"
   gap="md"
@@ -48,8 +48,8 @@
     }
   }
 
-  box.addEventListener('helix-before-toggle', (event) => {
-    say('helix-before-toggle', `about to change to ${event.detail.checked}`)
+  box.addEventListener('helix-before-check', (event) => {
+    say('helix-before-check', `about to change to ${event.detail.checked}`)
   })
   box.addEventListener('input', (event) => {
     say('input', `checked is now ${event.currentTarget.checked}`)

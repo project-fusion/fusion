@@ -59,7 +59,7 @@
   density.addEventListener('change', (event) => {
     say('change', `"${event.currentTarget.value}", sent when the value is committed`)
   })
-  density.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" was pressed`)
+  density.addEventListener('helix-before-select', (event) => {
+    say('helix-before-select', `"${event.detail.value}" was pressed`)
   })
 </script>

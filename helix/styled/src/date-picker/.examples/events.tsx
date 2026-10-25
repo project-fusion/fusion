@@ -33,7 +33,7 @@ export function Example() {
   }
 
   const paged = (event: CustomEvent<{ value: string }>) => {
-    say('helix-navigate', `Showing ${event.detail.value}`)
+    say('helix-before-navigate', `Showing ${event.detail.value}`)
   }
 
   return (
@@ -46,7 +46,7 @@ export function Example() {
         label="Delivery date"
         onChange={settled}
         onhelix-before-change={proposed}
-        onhelix-navigate={paged}
+        onhelix-before-navigate={paged}
         onInput={moved}
       />
 

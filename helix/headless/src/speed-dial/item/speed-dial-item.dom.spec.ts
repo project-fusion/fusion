@@ -40,7 +40,7 @@ describe('one speed dial action', () => {
     expect(item.getAttribute('aria-disabled')).toBe('true')
 
     let heard = 0
-    host.addEventListener('helix-select', () => {
+    host.addEventListener('helix-before-select', () => {
       heard += 1
     })
     item.click()
@@ -50,7 +50,7 @@ describe('one speed dial action', () => {
   test('announces what it stands for when it is chosen', async () => {
     const host = await action()
     let value: string | undefined
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       value = (event as CustomEvent<{ value: string }>).detail.value
     })
     ;(part(host, 'item') as HTMLElement).click()
@@ -62,7 +62,7 @@ describe('one speed dial action', () => {
   test('is chosen by its own click(), once, as a native button is', async () => {
     const host = await action()
     const heard: string[] = []
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       heard.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     let clicks = 0
@@ -167,7 +167,7 @@ describe('an action with an href', () => {
     expect(item.getAttribute('rel')).toBe('noopener')
     expect(item.getAttribute('tabindex')).toBe('-1')
     const chosen: string[] = []
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       chosen.push((event as CustomEvent<{ value: string }>).detail.value)
       event.preventDefault()
     })

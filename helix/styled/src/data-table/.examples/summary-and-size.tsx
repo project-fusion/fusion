@@ -27,7 +27,7 @@ export function Example() {
   return (
     <helix-data-table
       label="Files"
-      onhelix-navigate={paged}
+      onhelix-before-navigate={paged}
       page={page}
       page-size={pageSize}
       rows={rows}

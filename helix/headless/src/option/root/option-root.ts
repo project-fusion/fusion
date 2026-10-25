@@ -1,8 +1,8 @@
 import {
   customElement,
   followLink,
+  HelixBeforeSelectEvent,
   HelixElement,
-  HelixSelectEvent,
   hostAria,
   type LinkModifiers,
   slotFilled,
@@ -52,7 +52,7 @@ export { isOption, optionsAmong } from '../among.js'
  * @slot indicator - An icon shown while the option is chosen, in place of the check the styled option draws.
  * @slot start - Content before the label, such as an icon or an avatar.
  *
- * @event {HelixSelectEvent} helix-select - The option was chosen. Cancelable: canceling it leaves the selection as it was, and keeps the browser from following an option's `href`.
+ * @event {HelixBeforeSelectEvent} helix-before-select - The option was chosen. Cancelable: canceling it leaves the selection as it was, and keeps the browser from following an option's `href`.
  *
  * @csspart description - The description under the label, when there is one.
  * @csspart item - The row.
@@ -188,7 +188,7 @@ export class HelixHeadlessOption extends HelixElement {
    * as React Aria's items with `href` do. Command, Control and Shift open it
    * where they open a link, in a new tab or a new window.
    *
-   * `helix-select` is said first with the `href` in it, and canceling it keeps
+   * `helix-before-select` is said first with the `href` in it, and canceling it keeps
    * the browser from following, so a client-side router follows it instead.
    *
    * **The option stays an option**, and an anchor is never drawn inside it:
@@ -337,7 +337,7 @@ export class HelixHeadlessOption extends HelixElement {
   }
 
   /**
-   * Sends `helix-select` for this option. Does nothing when it is disabled.
+   * Sends `helix-before-select` for this option. Does nothing when it is disabled.
    *
    * An option with an `href` then follows its link, unless the event was
    * canceled, with the keys `modifiers` names held.
@@ -347,10 +347,10 @@ export class HelixHeadlessOption extends HelixElement {
       return
     }
     if (this.href === '') {
-      this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+      this.dispatchEvent(new HelixBeforeSelectEvent({ value: this.value }))
       return
     }
-    if (this.dispatchEvent(new HelixSelectEvent({ href: this.href, value: this.value }))) {
+    if (this.dispatchEvent(new HelixBeforeSelectEvent({ href: this.href, value: this.value }))) {
       followLink(this.ownerDocument, this, modifiers)
     }
   }

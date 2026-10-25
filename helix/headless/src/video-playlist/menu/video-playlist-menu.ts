@@ -2,8 +2,8 @@ import {
   closestInstance,
   customElement,
   drawIcon,
+  HelixBeforeSelectEvent,
   HelixElement,
-  HelixSelectEvent,
   type Placement,
   words,
 } from '@fusion.dev/helix-core'
@@ -33,7 +33,7 @@ import '../../menu/index.js'
  *
  * @slot trigger - Replaces the button that opens the menu.
  *
- * @event {HelixSelectEvent} helix-select - An entry was chosen. The event carries its value, and the playlist listens for it. Cancelable: cancel it to keep the current entry.
+ * @event {HelixBeforeSelectEvent} helix-before-select - An entry was chosen. The event carries its value, and the playlist listens for it. Cancelable: cancel it to keep the current entry.
  *
  * @csspart entry - One entry in the menu.
  * @csspart entry-end - The column at the end of an entry, which holds its shortcut. It is always present.
@@ -216,7 +216,7 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
   /**
    * Keeps each choice row's tick where this element puts it.
    *
-   * A choice row checks itself after `helix-before-toggle`, and this element
+   * A choice row checks itself after `helix-before-check`, and this element
    * already sets `checked` on every row from its own state. The request is
    * refused, so a tick moves only when the choice is applied, and stopped, so
    * it does not reach a page that never placed the row.
@@ -229,7 +229,7 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
   }
 
   private readonly choose = (value: string): void => {
-    this.dispatchEvent(new HelixSelectEvent({ value }))
+    this.dispatchEvent(new HelixBeforeSelectEvent({ value }))
   }
 
   protected override render(): TemplateResult {
@@ -262,8 +262,8 @@ export class HelixHeadlessVideoPlaylistMenu extends HelixElement {
           ?checked=${entry.current}
           ?disabled=${entry.disabled}
           exclusive
-          @helix-before-toggle=${this.keepTick}
-          @helix-select=${(event: Event) => {
+          @helix-before-check=${this.keepTick}
+          @helix-before-select=${(event: Event) => {
             /* Stopped and re-announced from the host rather than let through.
                What travels up is then this element's own event, so a consumer
                listening on the menu sees what the playlist sees, and

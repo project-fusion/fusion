@@ -177,7 +177,7 @@ describe('map layers menu', () => {
     const host = await menuFrame()
     const [route] = [...host.children] as HTMLElement[]
     const asked: Array<{ checked: boolean; from: EventTarget | null }> = []
-    host.addEventListener('helix-before-toggle', (event) => {
+    host.addEventListener('helix-before-check', (event) => {
       asked.push({
         checked: (event as CustomEvent<{ checked: boolean }>).detail.checked,
         from: event.target,
@@ -197,7 +197,7 @@ describe('map layers menu', () => {
     const host = await menuFrame()
     const [route] = [...host.children] as HTMLElement[]
     const told: Array<{ checked: unknown; from: EventTarget | null; hidden: unknown }> = []
-    host.addEventListener('helix-toggle', (event) =>
+    host.addEventListener('helix-check', (event) =>
       told.push({
         checked: (event as CustomEvent<{ checked: boolean }>).detail.checked,
         from: event.target,
@@ -209,7 +209,7 @@ describe('map layers menu', () => {
     tile().click()
     await settle(host)
     expect(told).toEqual([{ checked: false, from: route ?? null, hidden: true }])
-    host.addEventListener('helix-before-toggle', (event) => event.preventDefault())
+    host.addEventListener('helix-before-check', (event) => event.preventDefault())
     tile().click()
     await settle(host)
     expect(told).toHaveLength(1)

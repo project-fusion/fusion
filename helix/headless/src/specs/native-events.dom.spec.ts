@@ -241,7 +241,7 @@ describe('a control that renders a native control', () => {
      keystroke reaches a consumer twice and one of the two carries the value from
      before the change. Measured in Chrome 148 on `<helix-headless-checkbox>`: `input`
      from the inner control with `checked` still false, then
-     `helix-before-toggle`, then `input` from the host with it true. Stopping the
+     `helix-before-check`, then `input` from the host with it true. Stopping the
      inner `change` and not the inner `input` is half the pair. */
   const NATIVE: Array<[string, string, 'bare' | 'check' | 'text']> = [
     ['helix-headless-input', `<helix-headless-input label="L"></helix-headless-input>`, 'text'],

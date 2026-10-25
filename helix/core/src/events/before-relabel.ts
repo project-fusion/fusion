@@ -9,6 +9,8 @@ import type { RelabelDetail } from './details.js'
  * the way it writes a card's position; a page holding them in state refuses
  * this and writes them there. A card's own content is the page's, which is why
  * that is `helix-canvas-edit`, a request, rather than this.
+ *
+ * @followedBy helix-relabel
  */
 export class HelixBeforeRelabelEvent extends CustomEvent<RelabelDetail> {
   static readonly eventName = 'helix-before-relabel'

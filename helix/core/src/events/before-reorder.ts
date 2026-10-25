@@ -8,6 +8,8 @@ import type { ReorderDetail } from './details.js'
  * the move would leave. Call `preventDefault()` to keep the item where it is: a
  * pinned row, or a place the item may not go. Nothing has moved yet, and
  * `helix-reorder` follows where nobody refused.
+ *
+ * @followedBy helix-reorder
  */
 export class HelixBeforeReorderEvent extends CustomEvent<ReorderDetail> {
   static readonly eventName = 'helix-before-reorder'

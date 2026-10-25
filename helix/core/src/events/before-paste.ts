@@ -7,6 +7,8 @@ import type { PasteDetail } from './details.js'
  * `helix-canvas-node` and `helix-canvas-edge` elements. A page that renders
  * its cards from its own state calls `preventDefault()` here and adds the
  * detail's document to that state, through `fromJsonCanvas`.
+ *
+ * @followedBy helix-pasted
  */
 export class HelixBeforePasteEvent extends CustomEvent<PasteDetail> {
   static readonly eventName = 'helix-before-paste'

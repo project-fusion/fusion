@@ -6,6 +6,8 @@ import type { ChangeDetail } from './details.js'
  * Its own verb rather than a `helix-before-resize` carrying which divider moved:
  * a sandbox has two, and they were told apart by a field on a detail every other
  * request in this file also carries.
+ *
+ * @followedBy helix-split
  */
 export class HelixBeforeSplitEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-before-split'

@@ -22,7 +22,7 @@ export function Example() {
   }
 
   const chosen = (event: CustomEvent<{ value: string }>) => {
-    say('helix-select', `"${event.detail.value}" was chosen, and the event bubbles`)
+    say('helix-before-select', `"${event.detail.value}" was chosen, and the event bubbles`)
   }
 
   /* The open and close events do not bubble, so each node has its own
@@ -48,7 +48,7 @@ export function Example() {
         default-active="core"
         label="Folders"
         onhelix-before-activate={proposed}
-        onhelix-select={chosen}
+        onhelix-before-select={chosen}
       >
         <helix-tree-item
           onhelix-before-close={closing('helix')}

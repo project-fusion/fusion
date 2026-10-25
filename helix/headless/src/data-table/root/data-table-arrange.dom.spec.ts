@@ -66,7 +66,7 @@ describe('selection', () => {
   test('selects by key, so the choice follows the row through a sort', async () => {
     const element = await table('selectable row-key="id"')
     const seen: string[] = []
-    element.addEventListener('helix-select', (event) =>
+    element.addEventListener('helix-before-select', (event) =>
       seen.push((event as CustomEvent<{ value: string }>).detail.value),
     )
     boxes(element)[1]?.requestChecked(true)
@@ -82,12 +82,12 @@ describe('selection', () => {
     ])
   })
 
-  /* `helix-select` is the request, so a consumer storing the selection needs
+  /* `helix-before-select` is the request, so a consumer storing the selection needs
      the notification after it, sent once `selected` has moved. */
-  test('a choice that stood is announced again as `helix-selected`', async () => {
+  test('a choice that stood is announced as `helix-select`', async () => {
     const element = await table('selectable row-key="id"')
     const heard: string[] = []
-    element.addEventListener('helix-selected', (event) => {
+    element.addEventListener('helix-select', (event) => {
       heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${element.selected}`)
       expect(event.cancelable).toBe(false)
     })
@@ -98,7 +98,7 @@ describe('selection', () => {
 
   test('refusing the choice leaves the selection as it was', async () => {
     const element = await table('selectable row-key="id" default-selected="a"')
-    element.addEventListener('helix-select', (event) => event.preventDefault())
+    element.addEventListener('helix-before-select', (event) => event.preventDefault())
     boxes(element)[1]?.requestChecked(true)
     await element.updateComplete
     expect(element.selected).toBe('a')
@@ -204,7 +204,7 @@ describe('column order', () => {
   test('an arrow on a grip asks to move its column a place, and refusing keeps it', async () => {
     const element = await table('reorderable')
     const seen: string[] = []
-    element.addEventListener('helix-reorder', (event) => {
+    element.addEventListener('helix-before-reorder', (event) => {
       seen.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     const grip = element
@@ -217,7 +217,7 @@ describe('column order', () => {
     expect(seen).toEqual(['size name'])
     expect(element.order).toBe('size name')
 
-    element.addEventListener('helix-reorder', (event) => event.preventDefault())
+    element.addEventListener('helix-before-reorder', (event) => event.preventDefault())
     const moved = element
       .querySelector('helix-headless-table-column[field="name"]')
       ?.shadowRoot?.querySelector('[part="grip"]') as HTMLElement
@@ -228,10 +228,10 @@ describe('column order', () => {
     expect(element.order).toBe('size name')
   })
 
-  test('a move that stood is announced again as `helix-reordered`, and a refused one is not', async () => {
+  test('a move that stood is announced as `helix-reorder`, and a refused one is not', async () => {
     const element = await table('reorderable')
     const heard: string[] = []
-    element.addEventListener('helix-reordered', (event) => {
+    element.addEventListener('helix-reorder', (event) => {
       heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${element.order}`)
     })
     const grip = (field: string): HTMLElement =>
@@ -242,7 +242,7 @@ describe('column order', () => {
       new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowRight' }),
     )
     await element.updateComplete
-    element.addEventListener('helix-reorder', (event) => event.preventDefault())
+    element.addEventListener('helix-before-reorder', (event) => event.preventDefault())
     grip('name').dispatchEvent(
       new KeyboardEvent('keydown', { bubbles: true, composed: true, key: 'ArrowLeft' }),
     )

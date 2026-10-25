@@ -53,7 +53,7 @@ describe('a speed dial', () => {
   test('a choice is heard before the dial closes, and a refused one leaves it open', async () => {
     const { actions, host } = await dial()
     const heard: string[] = []
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       const value = (event as CustomEvent<{ value: string }>).detail.value
       heard.push(`select ${value}`)
       if (value === 'delete') {
@@ -263,7 +263,7 @@ describe('a speed dial', () => {
   test('and arriving at an action does not take it', async () => {
     const { host } = await dial()
     const taken: string[] = []
-    host.addEventListener('helix-select', (event) => {
+    host.addEventListener('helix-before-select', (event) => {
       taken.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     host.open = true
@@ -305,7 +305,7 @@ describe('a speed dial', () => {
     const action = host.querySelector('helix-headless-speed-dial-item') as Action
     await action.updateComplete
     const taken: string[] = []
-    host.addEventListener('helix-select', () => taken.push('x'))
+    host.addEventListener('helix-before-select', () => taken.push('x'))
     ;(part(action, 'item') as HTMLElement).click()
     expect(taken).toEqual([])
   })

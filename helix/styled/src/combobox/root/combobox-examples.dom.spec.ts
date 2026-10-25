@@ -40,7 +40,7 @@ describe('the events example', () => {
     const control = part(language, 'control') as HTMLInputElement
     type(control, 'ru')
     await idle()
-    expect(logged()).toEqual(['helix-filter', 'helix-before-open', 'toggle'])
+    expect(logged()).toEqual(['helix-before-filter', 'helix-before-open', 'toggle'])
     choose(document.querySelector('helix-option[value="rust"]'))
     await idle()
     expect(language.value).toBe('rust')

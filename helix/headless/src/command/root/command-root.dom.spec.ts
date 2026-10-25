@@ -184,7 +184,7 @@ if (hasLayout()) {
          fail the test, it stops the run. */
       const heard: string[] = []
       const targets: EventTarget[] = []
-      host.addEventListener('helix-select', (event) => {
+      host.addEventListener('helix-before-select', (event) => {
         heard.push((event as CustomEvent<{ value: string }>).detail.value)
         targets.push(event.target as EventTarget)
       })
@@ -223,7 +223,7 @@ if (hasLayout()) {
     test('the same command chosen twice runs twice, the list keeping no answer between', async () => {
       const host = await palette()
       const heard: string[] = []
-      host.addEventListener('helix-select', (event) =>
+      host.addEventListener('helix-before-select', (event) =>
         heard.push((event as CustomEvent<{ value: string }>).detail.value),
       )
       const choose = async (): Promise<void> => {
@@ -246,7 +246,7 @@ if (hasLayout()) {
       const host = await palette()
       press('k', { metaKey: true })
       await settle(host)
-      host.addEventListener('helix-select', (event) => event.preventDefault())
+      host.addEventListener('helix-before-select', (event) => event.preventDefault())
       ;(
         host.querySelector('helix-headless-option[value="new"]') as HTMLElement & {
           select: () => void
@@ -261,7 +261,7 @@ if (hasLayout()) {
          and shut the palette with the filter emptied. */
       const host = await palette()
       const heard: string[] = []
-      host.addEventListener('helix-select', (event) =>
+      host.addEventListener('helix-before-select', (event) =>
         heard.push((event as CustomEvent<{ value: string }>).detail.value),
       )
       press('k', { metaKey: true })
@@ -359,7 +359,9 @@ describe('a command that is a link', () => {
     host.open = true
     await settle(host)
     const said: unknown[] = []
-    host.addEventListener('helix-select', (event) => said.push((event as CustomEvent).detail))
+    host.addEventListener('helix-before-select', (event) =>
+      said.push((event as CustomEvent).detail),
+    )
     ;(host.firstElementChild as HTMLElement & { select(): void }).select()
     await settle(host)
     expect(said).toEqual([{ href: '/docs', value: 'docs' }])
@@ -372,7 +374,7 @@ describe('a command that is a link', () => {
     const host = await palette(linked)
     host.open = true
     await settle(host)
-    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.addEventListener('helix-before-select', (event) => event.preventDefault())
     ;(host.firstElementChild as HTMLElement & { select(): void }).select()
     await settle(host)
     expect(host.open).toBe(true)
@@ -462,7 +464,7 @@ describe('a palette of commands given as data', () => {
     await settle(host)
     expect((listbox(host) as unknown as { items: string[] }).items).toEqual(['Alpha', 'Beta'])
     const said: string[] = []
-    host.addEventListener('helix-select', (event) =>
+    host.addEventListener('helix-before-select', (event) =>
       said.push((event as CustomEvent<{ value: string }>).detail.value),
     )
     const field = listbox(host).shadowRoot?.querySelector('[part="search-field"]') as HTMLElement
@@ -533,7 +535,7 @@ describe('a palette drawn in the page', () => {
     expect(host.shadowRoot?.querySelector('[part="listbox"]')).not.toBeNull()
     expect(host.shadowRoot?.querySelector('helix-headless-dialog')).toBeNull()
     const said: string[] = []
-    host.addEventListener('helix-select', (event) =>
+    host.addEventListener('helix-before-select', (event) =>
       said.push((event as CustomEvent<{ value: string }>).detail.value),
     )
     const field = listbox(host).shadowRoot?.querySelector('[part="search-field"]') as HTMLElement

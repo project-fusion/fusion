@@ -3,11 +3,11 @@ import {
   drawIcon,
   formatWords,
   HelixBeforePinEvent,
+  HelixBeforeSelectEvent,
   HelixElement,
   HelixExpandEvent,
   HelixPinEvent,
   HelixSelectEvent,
-  HelixSelectedEvent,
   hostAria,
   MixinCollection,
   numberConverter,
@@ -140,7 +140,7 @@ interface Heard {
  * **`selectable` lets a reader select lines**, as a code host does: pressing a
  * number selects its line, and pressing another with Shift selects every line
  * between them. `selected-lines` holds the selection, such as `12-20`, and
- * `helix-select` asks before it changes. With a `line-href` that is a
+ * `helix-before-select` asks before it changes. With a `line-href` that is a
  * fragment, the address follows the selection, `#L12` or `#L12-L20`, and a
  * page opened at one selects it and scrolls to it.
  *
@@ -176,10 +176,10 @@ interface Heard {
  * @slot toolbar - Controls above the log, such as a search field or a button that wraps lines.
  *
  * @event {HelixBeforePinEvent} helix-before-pin - Fired when the reader leaves the newest line by scrolling, or comes back to it. Cancelable.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when a reader presses a number to change the selection, with the lines asked for in `detail.value`. Cancelable.
  * @event {HelixExpandEvent} helix-expand - Fired after a reader opens or closes a step drawn from `groups` or opened by a parser, with the `id` of every open group in `detail.value`, separated by commas.
  * @event {HelixPinEvent} helix-pin - Fired after the log follows the newest line or lets go of it, with `true` or `false` in `detail.value`.
- * @event {HelixSelectEvent} helix-select - Fired when a reader presses a number to change the selection, with the lines asked for in `detail.value`. Cancelable.
- * @event {HelixSelectedEvent} helix-selected - Fired after the selection changes, with the lines now selected in `detail.value`, such as `12-20`.
+ * @event {HelixSelectEvent} helix-select - Fired after the selection changes, with the lines now selected in `detail.value`, such as `12-20`.
  *
  * @csspart after - The space the rows below the drawn ones would take. Only for lines drawn from data.
  * @csspart before - The space the rows above the drawn ones would take. Only for lines drawn from data.
@@ -498,7 +498,7 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
 
   /**
    * The lines selected, as a number or a range such as `12-20`. Empty selects
-   * none. A reader's press asks first: `helix-select` is cancelable.
+   * none. A reader's press asks first: `helix-before-select` is cancelable.
    */
   @property({ attribute: 'selected-lines' })
   selectedLines = ''
@@ -810,10 +810,10 @@ export class HelixHeadlessLog extends MixinCollection(HelixElement) {
     requestChange({
       apply: (next) => {
         this.selectedLines = next
-        this.dispatchEvent(new HelixSelectedEvent({ value: next }))
+        this.dispatchEvent(new HelixSelectEvent({ value: next }))
         this.writeAddress(next)
       },
-      event: (next) => new HelixSelectEvent({ value: next }),
+      event: (next) => new HelixBeforeSelectEvent({ value: next }),
       host: this,
       next: value,
     })

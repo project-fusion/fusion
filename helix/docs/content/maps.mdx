@@ -626,7 +626,7 @@ tile is lit while its layer is shown. Pressing a tile sets its layer's `hidden`
 attribute, and `connectMap` does not draw a hidden layer. Write `hidden` on a
 layer to start it turned off.
 
-Before it sets `hidden`, a tile sends `helix-before-toggle` from the layer, with
+Before it sets `hidden`, a tile sends `helix-before-check` from the layer, with
 `checked` true when the layer is to be shown. Store the choice from it, or
 cancel it to keep the layer as it is.
 

@@ -1,8 +1,8 @@
 import {
   customElement,
   DisabledCascadeController,
+  type HelixBeforeSelectEvent,
   HelixFormElement,
-  type HelixSelectEvent,
   hostAria,
   KeyboardNavigationController,
   MixinControllerValue,
@@ -35,11 +35,11 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  * the value until something is chosen, and where a reset returns. The two work
  * like `checked` and `defaultChecked`.
  *
- * A choice sends its events in this order: `helix-select` from the radio, then,
+ * A choice sends its events in this order: `helix-before-select` from the radio, then,
  * a microtask later and only if nobody refused it, `helix-before-change` from
  * the group, and once the value has moved, `input` and `change`. The microtask
  * is what lets a listener you add to the group after it connected refuse the
- * `helix-select`. A native radio sends `input` and `change` in the same task as
+ * `helix-before-select`. A native radio sends `input` and `change` in the same task as
  * the click.
  *
  * **Keyboard.** The group is one tab stop: the chosen radio, or the first that
@@ -69,7 +69,7 @@ import { HelixHeadlessRadio } from '../root/radio-root.js'
  *
  * @event {Event} change - Fired after the value changes.
  * @event {HelixBeforeChangeEvent} helix-before-change - Fired when the choice changes. Cancelable: call `preventDefault()` to keep the current choice.
- * @event {HelixSelectEvent} helix-select - Fired when a radio is chosen. The radio sends it, and you listen for it on the group. Cancelable: call `preventDefault()` to keep the current choice.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when a radio is chosen. The radio sends it, and you listen for it on the group. Cancelable: call `preventDefault()` to keep the current choice.
  * @event {Event} input - Fired after the value changes.
  *
  * @csspart feedback - The error message under the group.
@@ -189,7 +189,7 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
    * The item has not moved by the time this runs, unlike a native input, so
    * refusing is simply not writing the value: there is nothing to put back.
    *
-   * **The radio's own `helix-select` is a request, and the argument that it was
+   * **The radio's own `helix-before-select` is a request, and the argument that it was
    * a notification is the one this settles.** That argument ran: the group's
    * veto is `helix-before-change` a step later, so the item could be read as
    * announcing a choice the group then decides about. What it leaves out is who
@@ -198,14 +198,14 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
    * answer binds to that answer. Two gates in two positions is the shape, and
    * the item's is the one that was doing nothing.
    */
-  private readonly handleSelection = (event: HelixSelectEvent): void => {
+  private readonly handleSelection = (event: HelixBeforeSelectEvent): void => {
     event.stopPropagation()
     if (this.readOnly) {
       event.preventDefault()
       return
     }
     /* **And only if the item's own choice stood, read a microtask later.**
-       `Radio` documents `helix-select` as refusable, and its docblock tells you
+       `Radio` documents `helix-before-select` as refusable, and its docblock tells you
        to listen for it on the group. This listener is on the group too, added
        when the group connected, so it runs ahead of a listener a consumer adds
        afterwards, which is the usual order, and read inline the flag was never
@@ -324,14 +324,14 @@ export class HelixHeadlessRadioGroup extends MixinControllerValue(MixinField(Hel
 
   override connectedCallback(): void {
     super.connectedCallback()
-    this.addEventListener('helix-select', this.handleSelection as EventListener)
+    this.addEventListener('helix-before-select', this.handleSelection as EventListener)
     this.observer = new MutationObserver(() => this.requestUpdate())
     this.observer.observe(this, { childList: true, subtree: true })
   }
 
   override disconnectedCallback(): void {
     super.disconnectedCallback()
-    this.removeEventListener('helix-select', this.handleSelection as EventListener)
+    this.removeEventListener('helix-before-select', this.handleSelection as EventListener)
     this.observer?.disconnect()
     this.observer = undefined
   }

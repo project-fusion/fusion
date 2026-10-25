@@ -122,7 +122,7 @@ describe('marking everything read', () => {
    */
   test('an item that refuses stays unread while the rest move', async () => {
     const element = await feed()
-    element.items[1]?.addEventListener('helix-read', (event) => event.preventDefault())
+    element.items[1]?.addEventListener('helix-before-read', (event) => event.preventDefault())
     element.markEveryoneRead()
     await element.updateComplete
     expect(element.items[0]?.read).toBe(true)
@@ -132,7 +132,7 @@ describe('marking everything read', () => {
 
   test('refusing the list-level event stops the whole thing', async () => {
     const element = await feed()
-    element.addEventListener('helix-read', (event) => {
+    element.addEventListener('helix-before-read', (event) => {
       if (event.target === element) {
         event.preventDefault()
       }

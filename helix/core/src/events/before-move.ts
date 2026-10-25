@@ -11,6 +11,8 @@ import type { MoveDetail } from './details.js'
  *
  * Sent for every step of a drag, so a controlled board follows the pointer
  * rather than jumping on the drop.
+ *
+ * @followedBy helix-move
  */
 export class HelixBeforeMoveEvent extends CustomEvent<MoveDetail> {
   static readonly eventName = 'helix-before-move'

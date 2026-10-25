@@ -512,7 +512,7 @@ describe('video', () => {
     expect(part(host, 'captions')).toBeNull()
   })
 
-  /* Each row checks itself after `helix-before-toggle`, and the player already
+  /* Each row checks itself after `helix-before-check`, and the player already
      marks the track showing. The request is the player's own business, and a
      page listening on the player heard it for markup it never wrote. */
   test('choosing a track leaves exactly one row checked, and keeps the request inside', async () => {
@@ -522,7 +522,7 @@ describe('video', () => {
     </helix-headless-video>`)
     await host.updateComplete
     const asked: string[] = []
-    host.addEventListener('helix-before-toggle', (event) => asked.push(event.type))
+    host.addEventListener('helix-before-check', (event) => asked.push(event.type))
     const menu = part(host, 'captions-menu') as HTMLElement
     const rows = [...menu.querySelectorAll<Player>('[part="entry"]')]
     const pick = (row: HTMLElement | undefined): void => {

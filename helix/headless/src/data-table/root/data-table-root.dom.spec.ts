@@ -353,10 +353,10 @@ describe('sorting', () => {
     remove()
   })
 
-  test('`helix-sort` carries the order asked for, and is cancelable', async () => {
+  test('`helix-before-sort` carries the order asked for, and is cancelable', async () => {
     const { element, remove } = await mount(SCHEMA)
     const seen: string[] = []
-    element.addEventListener('helix-sort', (event) => {
+    element.addEventListener('helix-before-sort', (event) => {
       seen.push((event as CustomEvent<{ value: string }>).detail.value)
     })
     heading(element).click()
@@ -370,9 +370,9 @@ describe('sorting', () => {
    * themselves: a server-side sort is exactly refusing the local reorder and
    * handing back a new set.
    */
-  test('refusing `helix-sort` leaves the order where it was', async () => {
+  test('refusing `helix-before-sort` leaves the order where it was', async () => {
     const { element, remove } = await mount(SCHEMA)
-    element.addEventListener('helix-sort', (event) => event.preventDefault())
+    element.addEventListener('helix-before-sort', (event) => event.preventDefault())
     heading(element).click()
     await settled(element)
     expect(element.sort).toBe('')
@@ -383,14 +383,13 @@ describe('sorting', () => {
 
 /* Each request here is a proposal another listener may refuse, so a consumer
    storing the table's state needs a notification after each, sent once the
-   state is on the element. The request had the plain verb first, so the
-   notification takes its past tense, and a page is `helix-activate`, as it is
-   from Pagination. */
+   state is on the element. The notification is the request's verb without
+   `before`, and a page is `helix-navigate`, as it is from Pagination. */
 describe('what moved, said after it moved', () => {
-  test('a sort that stood is announced again as `helix-sorted`', async () => {
+  test('a sort that stood is announced as `helix-sort`', async () => {
     const { element, remove } = await mount(SCHEMA)
     const heard: string[] = []
-    element.addEventListener('helix-sorted', (event) => {
+    element.addEventListener('helix-sort', (event) => {
       heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${element.sort}`)
       expect(event.cancelable).toBe(false)
     })
@@ -402,9 +401,9 @@ describe('what moved, said after it moved', () => {
 
   test('and a refused one is not', async () => {
     const { element, remove } = await mount(SCHEMA)
-    element.addEventListener('helix-sort', (event) => event.preventDefault())
+    element.addEventListener('helix-before-sort', (event) => event.preventDefault())
     let heard = false
-    element.addEventListener('helix-sorted', () => {
+    element.addEventListener('helix-sort', () => {
       heard = true
     })
     heading(element).click()
@@ -413,10 +412,10 @@ describe('what moved, said after it moved', () => {
     remove()
   })
 
-  test('a query that stood is announced again as `helix-filtered`', async () => {
+  test('a query that stood is announced as `helix-filter`', async () => {
     const { element, remove } = await mount(SCHEMA)
     const heard: string[] = []
-    element.addEventListener('helix-filtered', (event) => {
+    element.addEventListener('helix-filter', (event) => {
       heard.push(`${(event as CustomEvent<{ value: string }>).detail.value}@${element.filter}`)
     })
     element.search('alpha')
@@ -433,7 +432,7 @@ describe('what moved, said after it moved', () => {
         <helix-headless-table-column field="name">Name</helix-headless-table-column>
       </helix-headless-data-table>`)
     const heard: string[] = []
-    element.addEventListener('helix-activate', (event) => {
+    element.addEventListener('helix-navigate', (event) => {
       const from = (event.composedPath()[0] as Element).localName
       heard.push(
         `${(event as CustomEvent<{ value: string }>).detail.value}@${element.page} ${from}`,
@@ -574,7 +573,7 @@ describe('controlled and uncontrolled', () => {
         <helix-headless-table-column field="name" sortable>Name</helix-headless-table-column>
         <helix-headless-table-column field="size" sortable>Size</helix-headless-table-column>
       </helix-headless-data-table>`)
-    element.addEventListener('helix-sort', (event: Event) => {
+    element.addEventListener('helix-before-sort', (event: Event) => {
       event.preventDefault()
     })
     heading(element).click()
@@ -632,9 +631,9 @@ describe('filtering', () => {
     remove()
   })
 
-  test('refusing `helix-filter` leaves the rows alone', async () => {
+  test('refusing `helix-before-filter` leaves the rows alone', async () => {
     const { element, remove } = await mount(SCHEMA)
-    element.addEventListener('helix-filter', (event) => event.preventDefault())
+    element.addEventListener('helix-before-filter', (event) => event.preventDefault())
     element.search('alpha')
     await settled(element)
     expect(bodyRows(element)).toHaveLength(4)
@@ -1321,7 +1320,7 @@ describe('the grid keyboard', () => {
       (row) => row.querySelector('[role="rowheader"]')?.textContent?.trim() ?? '',
     )
     const heard: string[] = []
-    element.addEventListener('helix-select', (event) =>
+    element.addEventListener('helix-before-select', (event) =>
       heard.push((event as CustomEvent<{ value: string }>).detail.value),
     )
     await press(element, 'ArrowDown')
@@ -1414,7 +1413,7 @@ describe('the grid keyboard', () => {
       new PointerEvent('pointerdown', { bubbles: true, composed: true, shiftKey: true }),
     )
     box.dispatchEvent(
-      new CustomEvent('helix-before-toggle', {
+      new CustomEvent('helix-before-check', {
         bubbles: true,
         cancelable: true,
         composed: true,
@@ -1642,7 +1641,7 @@ describe('rows that hold rows', () => {
         '[part="select-all"] [part="checkbox"]',
       ) as HTMLElement | null
     )?.dispatchEvent(
-      new CustomEvent('helix-before-toggle', {
+      new CustomEvent('helix-before-check', {
         bubbles: true,
         cancelable: true,
         composed: true,

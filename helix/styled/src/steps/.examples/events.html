@@ -1,4 +1,4 @@
-<!-- @summary A pressed step fires `helix-select`, and the sequence fires `helix-before-activate` before it changes. -->
+<!-- @summary A pressed step fires `helix-before-select`, and the sequence fires `helix-before-activate` before it changes. -->
 <helix-flex
   direction="column"
   gap="md"
@@ -53,7 +53,7 @@
   flow.addEventListener('helix-before-activate', (event) => {
     say('helix-before-activate', `about to change to "${event.detail.value}", can be canceled`)
   })
-  flow.addEventListener('helix-select', (event) => {
-    say('helix-select', `"${event.detail.value}" was pressed`)
+  flow.addEventListener('helix-before-select', (event) => {
+    say('helix-before-select', `"${event.detail.value}" was pressed`)
   })
 </script>

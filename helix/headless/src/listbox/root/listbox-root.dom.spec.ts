@@ -111,14 +111,14 @@ describe('listbox', () => {
   })
 
   test('and refusing the option`s own event leaves it alone too', async () => {
-    /* `helix-select` is cancelable and `Option` documents it as refusable. The
+    /* `helix-before-select` is cancelable and `Option` documents it as refusable. The
        list is the one thing that acts on it, so a refusal it ignored was a veto
        that did nothing anywhere: valid code, no error, and the option being
        chosen regardless. Bound on the option, which is the position that can
        refuse a bubbling event before the list sees it. */
     const host = (await list('default-value="one"')) as Updatable & { value: string }
     const third = options(host)[2] as HTMLElement & { select(): void }
-    third.addEventListener('helix-select', (event) => event.preventDefault())
+    third.addEventListener('helix-before-select', (event) => event.preventDefault())
     third.select()
     await settle(host)
     expect(host.value).toBe('one')
@@ -170,7 +170,7 @@ describe('a list with nothing in it', () => {
 describe('listbox filtering ownership', () => {
   test('typing is announced, and refusing it leaves the list as it was', async () => {
     const host = (await list('filterable')) as Updatable & { filter: string }
-    host.addEventListener('helix-filter', (event) => event.preventDefault())
+    host.addEventListener('helix-before-filter', (event) => event.preventDefault())
     type(host, 'gam')
     await host.updateComplete
     expect(host.filter).toBe('')
@@ -190,7 +190,7 @@ describe('listbox filtering ownership', () => {
   test('a declared filter is a seed, and typing still moves it', async () => {
     const host = (await list('filterable filter="be"')) as Updatable & { filter: string }
     let announced: string | undefined
-    host.addEventListener('helix-filter', (event) => {
+    host.addEventListener('helix-before-filter', (event) => {
       announced = (event as CustomEvent<{ value: string }>).detail.value
     })
     type(host, 'gam')
@@ -215,7 +215,7 @@ describe('listbox filtering ownership', () => {
 
   test('Escape goes down the same path, so a consumer can refuse the clearing', async () => {
     const host = (await list('filterable default-filter="be"')) as Updatable & { filter: string }
-    host.addEventListener('helix-filter', (event) => event.preventDefault())
+    host.addEventListener('helix-before-filter', (event) => event.preventDefault())
     field(host).dispatchEvent(
       new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Escape' }),
     )
@@ -899,11 +899,11 @@ describe('an option that is a link', () => {
     expect(host.value).toBe('one')
   })
 
-  test('is followed by a press, and its helix-select reaches the page', async () => {
+  test('is followed by a press, and its helix-before-select reaches the page', async () => {
     catchLinks()
     const host = await linked()
     const said: unknown[] = []
-    document.body.addEventListener('helix-select', (event) =>
+    document.body.addEventListener('helix-before-select', (event) =>
       said.push((event as CustomEvent).detail),
     )
     ;(host.children[1] as HTMLElement & { select(): void }).select()
@@ -920,7 +920,7 @@ describe('a filter that waits for typing to rest', () => {
   test('filters once, on the word, after `filter-delay`', async () => {
     const host = (await list('filterable filter-delay="30"')) as Updatable & { filter: string }
     const heard: string[] = []
-    host.addEventListener('helix-filter', (event) =>
+    host.addEventListener('helix-before-filter', (event) =>
       heard.push((event as CustomEvent<{ value: string }>).detail.value),
     )
     type(host, 'g')

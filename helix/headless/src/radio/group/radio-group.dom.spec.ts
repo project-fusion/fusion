@@ -76,14 +76,14 @@ describe('radio group', () => {
   })
 
   test('and refusing the choice`s own event leaves the answer alone too', async () => {
-    /* `helix-select` is cancelable and `Radio` documents it as refusable. The
+    /* `helix-before-select` is cancelable and `Radio` documents it as refusable. The
        group is the one thing that acts on it, so a refusal it ignored was a
        veto that did nothing anywhere: valid code, no error, and the answer
        moving regardless. Bound on the choice, which is the position a consumer
        ruling out one answer has and `helix-before-change` does not reach. */
     const host = await group()
     const second = options(host)[1] as unknown as HTMLElement & { select: () => void }
-    second.addEventListener('helix-select', (event) => event.preventDefault())
+    second.addEventListener('helix-before-select', (event) => event.preventDefault())
     second.select()
     await settle(host)
     expect((host as Updatable & { value: string }).value).toBe('')
@@ -363,12 +363,12 @@ describe('a chosen radio that is disabled', () => {
 })
 
 describe('a refusal on the group itself', () => {
-  /* The docblock says to listen for `helix-select` on the group, and the
+  /* The docblock says to listen for `helix-before-select` on the group, and the
      group's own listener, added first, applied the choice before a consumer's
      could refuse it. */
   test('keeps the current choice', async () => {
     const host = (await group('', 'one')) as Updatable & { value: string }
-    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.addEventListener('helix-before-select', (event) => event.preventDefault())
     options(host)[2]?.click()
     await settle(host)
     await new Promise((resolve) => setTimeout(resolve))

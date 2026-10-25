@@ -1,4 +1,4 @@
-<!-- @summary A checkbox whose `checked` your code sets in response to `helix-before-toggle`. -->
+<!-- @summary A checkbox whose `checked` your code sets in response to `helix-before-check`. -->
 <helix-checkbox
   checked
   id="terms"
@@ -8,7 +8,7 @@
 <script>
   const terms = document.getElementById('terms')
 
-  terms.addEventListener('helix-before-toggle', (event) => {
+  terms.addEventListener('helix-before-check', (event) => {
     terms.checked = event.detail.checked
   })
 </script>

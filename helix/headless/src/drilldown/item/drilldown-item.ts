@@ -2,6 +2,7 @@ import {
   auditName,
   customElement,
   deepActiveElement,
+  HelixBeforeSelectEvent,
   HelixElement,
   HelixSelectEvent,
   hostAria,
@@ -42,7 +43,7 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * **A row with an `href` is a link.** The row itself renders as an `<a>`
  * carrying `menuitem`, as `Menu.Item` does, so a middle click, a modified
  * click and the status bar keep working. Enter follows it, and Space does too.
- * Choosing it fires `helix-select` first: cancel the event and the link is not
+ * Choosing it fires `helix-before-select` first: cancel the event and the link is not
  * followed, so a router can take the navigation. A row that opens a page, or a
  * disabled row, renders no link.
  *
@@ -65,7 +66,8 @@ import { unsafeSVG } from 'lit/directives/unsafe-svg.js'
  * @slot page - The rows of the page this row opens.
  * @slot start - Content before the label, usually an icon.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the row is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when the row is chosen. Cancelable: canceling it stops the change and leaves the decision to you.
+ * @event {HelixSelectEvent} helix-select - Fired after the row is chosen, once the choice stands.
  *
  * @csspart item - The row itself, which is an `<a>` where `href` is set.
  * @csspart label - The row's label.
@@ -291,21 +293,25 @@ export class HelixHeadlessDrilldownItem extends HelixElement {
     return this.active
   }
 
-  /** Fires `helix-select` for this row. */
+  /** Fires `helix-before-select` for this row. */
   select(): void {
     this.choose()
   }
 
-  /** Fires `helix-select`, and returns whether the choice stood. */
+  /** Fires `helix-before-select`, and returns whether the choice stood. */
   private choose(): boolean {
     if (this.disabled) {
       return false
     }
-    return this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    if (!this.dispatchEvent(new HelixBeforeSelectEvent({ value: this.value }))) {
+      return false
+    }
+    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    return true
   }
 
   /**
-   * A press on the row. On a link, a refused `helix-select` stops the link
+   * A press on the row. On a link, a refused `helix-before-select` stops the link
    * from being followed, so a router can take the navigation.
    */
   private readonly handleClick = (event: MouseEvent): void => {

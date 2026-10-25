@@ -9,7 +9,7 @@ beforeAll(async () => {
 
 type Updatable = HTMLElement & { updateComplete: Promise<unknown> }
 
-/* A choice is applied a microtask after its `helix-select`, once every
+/* A choice is applied a microtask after its `helix-before-select`, once every
    listener has had the chance to refuse it, so the update to wait for is
    requested after that. */
 const turn = async (host: Updatable): Promise<void> => {
@@ -51,14 +51,14 @@ describe('tabs selection', () => {
   })
 
   test('and refusing the tab`s own event leaves the strip where it was', async () => {
-    /* `helix-select` is cancelable and the tab documents it as refusable. This
+    /* `helix-before-select` is cancelable and the tab documents it as refusable. This
        element is the one thing that acts on it, so a refusal it ignored was a
        veto that did nothing anywhere: valid code, no error, and the selection
        happening regardless. Bound on the tab, which is the position that can
        refuse a bubbling event before the strip sees it. */
     const host = (await mount(markup)) as Updatable & { active: string }
     const second = tabs(host)[1] as Updatable & { select(): void }
-    second.addEventListener('helix-select', (event) => event.preventDefault())
+    second.addEventListener('helix-before-select', (event) => event.preventDefault())
     second.select()
     await turn(host)
 
@@ -72,7 +72,7 @@ describe('tabs selection', () => {
        added first, so it applied the choice before a listener on the same
        element could refuse it. */
     const host = (await mount(markup)) as Updatable & { active: string }
-    host.addEventListener('helix-select', (event) => event.preventDefault())
+    host.addEventListener('helix-before-select', (event) => event.preventDefault())
     ;(part(tabs(host)[1] as HTMLElement, 'tab') as HTMLElement).click()
     await turn(host)
     expect(host.active).toBe('one')
@@ -289,7 +289,7 @@ describe('tabs selection can be refused', () => {
       (tab) => tab.getAttribute('value') !== started,
     ) as HTMLElement
     other.dispatchEvent(
-      new CustomEvent('helix-select', {
+      new CustomEvent('helix-before-select', {
         bubbles: true,
         composed: true,
         detail: { value: other.getAttribute('value') },
@@ -453,7 +453,7 @@ describe('tabs modes are decided once', () => {
 })
 
 describe('tabs and what is inside a panel', () => {
-  /* `helix-select` bubbles and is composed, and a tree, a menu or another tab
+  /* `helix-before-select` bubbles and is composed, and a tree, a menu or another tab
      set inside a panel sends it. Only this set's own tabs may move it. */
   test('a choice from inside a panel leaves the tab set where it is', async () => {
     const host = (await mount(markup)) as Updatable & { active: string }
@@ -462,7 +462,7 @@ describe('tabs and what is inside a panel', () => {
     const inside = document.createElement('div')
     panels(host)[1]?.append(inside)
     inside.dispatchEvent(
-      new CustomEvent('helix-select', {
+      new CustomEvent('helix-before-select', {
         bubbles: true,
         cancelable: true,
         composed: true,
@@ -584,7 +584,7 @@ describe('tabs that are links', () => {
   test('a refused choice keeps the browser from following the link', async () => {
     const host = await mount(links)
     const docs = tabs(host)[1] as Updatable
-    docs.addEventListener('helix-select', (event) => event.preventDefault())
+    docs.addEventListener('helix-before-select', (event) => event.preventDefault())
     const click = new MouseEvent('click', { bubbles: true, cancelable: true, composed: true })
     part(docs, 'tab')?.dispatchEvent(click)
     expect(click.defaultPrevented).toBe(true)

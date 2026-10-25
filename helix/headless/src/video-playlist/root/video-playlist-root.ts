@@ -125,7 +125,7 @@ type Player = HTMLElement & {
  * @event {HelixBeforeActivateEvent} helix-before-activate - The current entry is about to change, and `detail.cause` says why: `press`, `next`, `previous`, `ended`, or `removed`. Cancelable: cancel it to keep the current entry.
  * @event {HelixBeforeReorderEvent} helix-before-reorder - An entry was moved to a new place, in a `reorderable` playlist, with every entry's value in the new order in `detail.keys`. Cancelable: cancel it to keep the entry where it is.
  * @event {HelixEndEvent} helix-end - The last entry finished playing, and the playlist stopped there. Not sent while `repeat` is set.
- * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your entries to the order in `keys`. Cancelable: cancel it to say the move did not happen.
+ * @event {HelixReorderEvent} helix-reorder - Fired after `helix-before-reorder` when nobody canceled it. Move your entries to the order in `keys`.
  *
  * @csspart empty - The box that holds the `empty` slot, drawn while there are no entries.
  * @csspart items - The list of entries.
@@ -486,7 +486,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
        the *next* node: every listener already bound here still runs, so the
        entry's selection reaches them anyway. Command carries the longer note. */
     event.stopImmediatePropagation()
-    /* **And only if the choice stood.** `helix-select` is cancelable and both
+    /* **And only if the choice stood.** `helix-before-select` is cancelable and both
        the entry and the menu document it as refusable, the menu saying in its
        own words that stopping the item's event and re-announcing it from the
        host is what makes `preventDefault()` refuse the selection in one place.
@@ -684,7 +684,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
   override connectedCallback(): void {
     super.connectedCallback()
     this.addEventListener('focusin', this.handleFocusIn)
-    this.addEventListener('helix-select', this.handleSelect)
+    this.addEventListener('helix-before-select', this.handleSelect)
     this.addEventListener('keydown', this.handleKeydown)
     this.addEventListener('helix-next', this.handleNext)
     this.addEventListener('helix-previous', this.handlePrevious)
@@ -709,7 +709,7 @@ export class HelixHeadlessVideoPlaylist extends MixinControllerActive(HelixEleme
     super.disconnectedCallback()
     this.watcher?.disconnect()
     this.removeEventListener('focusin', this.handleFocusIn)
-    this.removeEventListener('helix-select', this.handleSelect)
+    this.removeEventListener('helix-before-select', this.handleSelect)
     this.removeEventListener('keydown', this.handleKeydown)
     this.removeEventListener('helix-next', this.handleNext)
     this.removeEventListener('helix-previous', this.handlePrevious)

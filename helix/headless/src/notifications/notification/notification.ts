@@ -4,6 +4,7 @@ import {
   deepContains,
   focusableElements,
   formatWords,
+  HelixBeforeReadEvent,
   HelixElement,
   HelixReadEvent,
   MixinDismissible,
@@ -40,8 +41,9 @@ import '../../format-date/index.js'
  * `<time datetime>` element, and the shared timer that keeps it current.
  *
  * Read state is reported to you. Marking a notification read is usually a round
- * trip to a server, so `helix-read` is cancelable, and when you set `read`
- * yourself the element leaves it to you.
+ * trip to a server, so `helix-before-read` is cancelable, and when you set
+ * `read` yourself the element leaves it to you. `helix-read` follows once the
+ * state has changed.
  *
  * @since 0.1.0
  * @status stable
@@ -62,8 +64,9 @@ import '../../format-date/index.js'
  * only when the row is `dismissible`.
  * @slot media - An avatar or icon identifying who or what it came from.
  *
+ * @event {HelixBeforeReadEvent} helix-before-read - Fired when the notification is about to be marked read or unread. Cancelable.
  * @event {HelixDismissEvent} helix-dismiss - Fired when the user dismisses the notification. Cancelable.
- * @event {HelixReadEvent} helix-read - Fired when the notification is marked read or unread. Cancelable.
+ * @event {HelixReadEvent} helix-read - Fired after the notification is marked read or unread, with the state now in force.
  *
  * @csspart actions - The trailing slot's box.
  * @csspart body - The label and the caption together.
@@ -147,8 +150,8 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
   /**
    * Whether the notification has been read.
    *
-   * Set it and this element defers: a reader's click fires `helix-read` and
-   * changes nothing until a new value arrives. `default-read` seeds a state
+   * Set it and this element defers: a reader's click fires `helix-before-read`
+   * and changes nothing until a new value arrives. `default-read` seeds a state
    * this element then owns.
    *
    * **Not reflected.** Unread is a visual state, which is why the four mixins
@@ -211,8 +214,9 @@ export class HelixHeadlessNotification extends MixinDismissible(HelixElement) {
         const previous = this.read
         this.readState = read
         this.requestUpdate('read', previous)
+        this.dispatchEvent(new HelixReadEvent({ read }))
       },
-      event: (read) => new HelixReadEvent({ read }),
+      event: (read) => new HelixBeforeReadEvent({ read }),
       host: this,
       next,
     })

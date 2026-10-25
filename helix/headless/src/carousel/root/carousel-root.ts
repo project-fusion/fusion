@@ -5,8 +5,8 @@ import {
   customElement,
   formatWords,
   HelixActivateEvent,
+  HelixBeforeActivateEvent,
   HelixElement,
-  HelixSelectEvent,
   hostAria,
   inlineStep,
   isRtl,
@@ -121,7 +121,7 @@ const DRAG_SLOP = 4
  * @slot previous-icon - The glyph on the control that moves to the previous slide. Defaults to a caret.
  *
  * @event {HelixActivateEvent} helix-activate - Fired after the slide in view changes, with the new index as a string in `detail.value`.
- * @event {HelixSelectEvent} helix-select - Fired before the slide in view changes, with the requested index. Cancelable: cancel it to keep the current slide. Nothing moves, and a drag returns to the slide the index still holds. See `handleScroll`.
+ * @event {HelixBeforeActivateEvent} helix-before-activate - Fired before the slide in view changes, with the requested index. Cancelable: cancel it to keep the current slide. Nothing moves, and a drag returns to the slide the index still holds. See `handleScroll`.
  *
  * @csspart controls - The row of controls.
  * @csspart indicator - One indicator. Pressing it moves to its slide.
@@ -224,7 +224,7 @@ export class HelixHeadlessCarousel extends HelixElement {
    * Reading gives the real slide. Writing always applies, the way a script
    * assigning to a native control does, and is a seed and a correction rather
    * than a claim of ownership: a consumer who wants the decision refuses the
-   * `helix-select`. `default-index` is where the carousel starts until
+   * `helix-before-activate`. `default-index` is where the carousel starts until
    * something moves it.
    *
    * The same contract the four mixins carry, written out here rather than
@@ -594,7 +594,7 @@ export class HelixHeadlessCarousel extends HelixElement {
    *
    * **Written, with no request.** Nobody asked for this move: a slide was
    * removed, the window widened, or `per-view` went up. It went out as a
-   * cancelable `helix-select`, which a consumer reading the event as a reader's
+   * cancelable request, which a consumer reading the event as a reader's
    * request had no reason to expect, and refusing it left the index past the
    * last slide, with no current indicator and no tab stop, and asked again on
    * every update. An index that cannot be refused is not a request.
@@ -782,8 +782,8 @@ export class HelixHeadlessCarousel extends HelixElement {
   /**
    * Puts a requested slide in view, and says so.
    *
-   * `helix-activate` is the notification after `helix-select`, the one Tour
-   * and Tabs send once a different member is current. A clamp in `holdIndex`
+   * `helix-activate` is the notification after `helix-before-activate`, the
+   * pair Tour and Tabs send once a different member is current. A clamp in `holdIndex`
    * sends neither, being a correction rather than a move anybody asked for.
    */
   private applyIndex(value: number): void {
@@ -816,7 +816,7 @@ export class HelixHeadlessCarousel extends HelixElement {
     }
     requestChange({
       apply: (value) => this.applyIndex(value),
-      event: (value) => new HelixSelectEvent({ value: String(value) }),
+      event: (value) => new HelixBeforeActivateEvent({ value: String(value) }),
       host: this,
       next,
     })
@@ -1042,7 +1042,7 @@ export class HelixHeadlessCarousel extends HelixElement {
       nearest !== this.index &&
       requestChange({
         apply: (value) => this.applyIndex(value),
-        event: (value) => new HelixSelectEvent({ value: String(value) }),
+        event: (value) => new HelixBeforeActivateEvent({ value: String(value) }),
         host: this,
         next: nearest,
       })
@@ -1236,7 +1236,7 @@ export class HelixHeadlessCarousel extends HelixElement {
        library dispatching a cancelable event that nothing read. */
     const applied = requestChange({
       apply: (value) => this.applyIndex(value),
-      event: (value) => new HelixSelectEvent({ value: String(value) }),
+      event: (value) => new HelixBeforeActivateEvent({ value: String(value) }),
       host: this,
       next: nearest,
     })
@@ -1394,7 +1394,7 @@ export class HelixHeadlessCarousel extends HelixElement {
      *
      * Not from inside `goTo`'s apply callback, which is not the only path here:
      * a plain `carousel.index = 2` reaches no apply at all, and a refused
-     * `helix-select` reaches none either. */
+     * `helix-before-activate` reaches none either. */
     /* And the first time there are panes to follow it to: a carousel whose
        slides arrived after its first render, which is every carousel that
        hydrated a server's markup, had an `index` and nothing to scroll to, and

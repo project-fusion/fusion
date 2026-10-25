@@ -12,12 +12,14 @@ import type { ChangeDetail } from './details.js'
  * **This fires before the state moves.** Inside a handler `currentTarget.active`
  * still holds the previous value, and `detail.value` is a proposal another
  * listener may refuse, so a consumer who only wants to know which child is
- * current listens for `helix-activate` instead. `helix-select` is not that
+ * current listens for `helix-activate` instead. `helix-before-select` is not that
  * notification either: it fires when an item is *chosen*, not when `active` is
  * assigned.
  *
  * The shape is the one `MixinControllerOpen` already has, a cancelable request
  * and a plain notification after the state has moved.
+ *
+ * @followedBy helix-activate
  */
 export class HelixBeforeActivateEvent extends CustomEvent<ChangeDetail> {
   static readonly eventName = 'helix-before-activate'

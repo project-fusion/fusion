@@ -6,7 +6,8 @@ import {
   formatWords,
   HelixActivateEvent,
   HelixBeforeChangeEvent,
-  HelixBeforeToggleEvent,
+  HelixBeforeCheckEvent,
+  HelixCheckEvent,
   HelixElement,
   HelixMapClusterEvent,
   HelixMapPanEvent,
@@ -15,7 +16,6 @@ import {
   HelixMapRotateEvent,
   HelixMapTiltEvent,
   HelixMapZoomEvent,
-  HelixToggleEvent,
   hostAria,
   KeyboardNavigationController,
   MixinViewport,
@@ -163,8 +163,8 @@ const SETTLES = 400
  * Add `layers` to `controls` for a layers button. It opens a menu with a tile
  * for each layer, which sets the layer's `hidden` attribute. Layers with the
  * same `group`, such as a route and its dotted legs, share one tile. A tile
- * sends `helix-before-toggle` from the layer first, so you can store the
- * choice or refuse it, and `helix-toggle` from it once `hidden` holds the
+ * sends `helix-before-check` from the layer first, so you can store the
+ * choice or refuse it, and `helix-check` from it once `hidden` holds the
  * choice. Escape closes the menu and returns focus to its button, and the menu
  * closes when focus moves on from it or a press lands outside the map.
  *
@@ -219,7 +219,8 @@ const SETTLES = 400
  * @event {Event} change - The layers menu changed the map type, which `map-type` now holds.
  * @event {HelixActivateEvent} helix-activate - A marker was pressed. The value is the marker's `name`, or its `label` if it has no name. A cluster sends `helix-map-cluster` instead.
  * @event {HelixBeforeChangeEvent} helix-before-change - A map type was chosen in the layers menu, with its name: `standard`, `hybrid`, or `satellite`. Cancelable: cancel it to keep the current type.
- * @event {HelixBeforeToggleEvent} helix-before-toggle - A layer's tile in the layers menu was pressed. Sent from the layer, with `checked` true when it is to be shown. Cancelable: cancel it to keep the layer as it is.
+ * @event {HelixBeforeCheckEvent} helix-before-check - A layer's tile in the layers menu was pressed. Sent from the layer, with `checked` true when it is to be shown. Cancelable: cancel it to keep the layer as it is.
+ * @event {HelixCheckEvent} helix-check - A layer's tile in the layers menu showed or hid it. Sent from the layer once its `hidden` attribute holds the choice, with `checked` true when it is shown.
  * @event {HelixMapClusterEvent} helix-map-cluster - A cluster was pressed. Sent from the marker that shows the cluster, with the names of its places.
  * @event {HelixMapPanEvent} helix-map-pan - A pan button or arrow key was pressed. Move your map in response.
  * @event {HelixMapPartChangeEvent} helix-map-part-change - Clustering was turned on or off. Used by `connectMap`; pages do not need to listen for it.
@@ -227,7 +228,6 @@ const SETTLES = 400
  * @event {HelixMapRotateEvent} helix-map-rotate - A rotate or Face north button, or Shift with Left or Right, was pressed. Turn your map in response.
  * @event {HelixMapTiltEvent} helix-map-tilt - The 3D button, or Shift with Up or Down, was pressed. Tilt your map in response.
  * @event {HelixMapZoomEvent} helix-map-zoom - A zoom button or key was pressed, with a direction. Zoom your map in response.
- * @event {HelixToggleEvent} helix-toggle - A layer's tile in the layers menu showed or hid it. Sent from the layer once its `hidden` attribute holds the choice, with `checked` true when it is shown.
  *
  * @csspart attribution - The strip under the map that holds the credit.
  * @csspart compass - The compass and the pan and rotate buttons around it.
@@ -763,7 +763,7 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
    * consumer's element and said nothing, so a page could neither keep the
    * choice nor keep its own state in step. The request comes from the first
    * layer of the tile, which is the element the page wrote. Once `hidden`
-   * holds the answer, the same layer sends `helix-toggle`, the request's verb
+   * holds the answer, the same layer sends `helix-check`, the request's verb
    * without `before`, since the platform has no word for a layer shown.
    */
   private showLayers(layers: readonly MapLayer[], shown: boolean): void {
@@ -778,12 +778,12 @@ export class HelixHeadlessMap extends MixinViewport(HelixElement) {
         }
         this.requestUpdate()
       },
-      event: (checked) => new HelixBeforeToggleEvent({ checked }),
+      event: (checked) => new HelixBeforeCheckEvent({ checked }),
       host: first,
       next: shown,
     })
     if (applied) {
-      first.dispatchEvent(new HelixToggleEvent({ checked: shown }))
+      first.dispatchEvent(new HelixCheckEvent({ checked: shown }))
     }
   }
 

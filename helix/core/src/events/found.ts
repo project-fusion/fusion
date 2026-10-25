@@ -6,7 +6,7 @@ import type { FoundDetail } from './details.js'
  *
  * Sent by Find after each search and each move, and again when content that
  * changed under an open search is searched again. Not cancelable: it reports
- * matches already marked, as `helix-filtered` reports a list already
+ * matches already marked, as `helix-filter` reports a list already
  * narrowed.
  */
 export class HelixFoundEvent extends CustomEvent<FoundDetail> {

@@ -18,6 +18,6 @@ describe('the events example', () => {
     await example(events)
     ;(part(document.getElementById('setting') as HTMLElement, 'control') as HTMLElement).click()
     await idle()
-    expect(logged()).toEqual(['helix-before-toggle', 'input', 'change'])
+    expect(logged()).toEqual(['helix-before-check', 'input', 'change'])
   })
 })

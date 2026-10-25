@@ -216,7 +216,7 @@ describe('a reorderable tree', () => {
     const tree = await make()
     const heard = follow(tree)
     const chosen: string[] = []
-    tree.addEventListener('helix-select', (event) =>
+    tree.addEventListener('helix-before-select', (event) =>
       chosen.push((event as CustomEvent<{ value: string }>).detail.value),
     )
     click(grip(item(tree, 'c')) as Element)

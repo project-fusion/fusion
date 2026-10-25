@@ -6,8 +6,8 @@ const acknowledge = async (): Promise<boolean> => Promise.resolve(true)
 
 /**
  * `read` is a boolean attribute, so markup cannot set it to false. To control
- * read state, cancel `helix-read`, save the change on your server, and then set
- * `read`.
+ * read state, cancel `helix-before-read`, save the change on your server, and
+ * then set `read`.
  */
 function Owned({ at, children }: { at: string | undefined; children: ReactNode }) {
   const [read, setRead] = useState(false)
@@ -16,7 +16,7 @@ function Owned({ at, children }: { at: string | undefined; children: ReactNode }
     <helix-notification
       at={at}
       onClick={(event) => event.currentTarget.markRead(true)}
-      onhelix-read={async (event) => {
+      onhelix-before-read={async (event) => {
         event.preventDefault()
         const asked = event.detail.read
         if (await acknowledge()) {

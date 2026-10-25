@@ -33,7 +33,7 @@ export function Example() {
   }
 
   const filtered = (event: CustomEvent<{ value: string }>) => {
-    say('helix-filter', `Filter text is "${event.detail.value}"`)
+    say('helix-before-filter', `Filter text is "${event.detail.value}"`)
   }
 
   return (
@@ -47,7 +47,7 @@ export function Example() {
         name="region"
         onChange={settled}
         onhelix-before-change={proposed}
-        onhelix-filter={filtered}
+        onhelix-before-filter={filtered}
         onInput={moved}
       >
         <helix-option value="lhr">London</helix-option>

@@ -10,6 +10,7 @@ import {
   HelixBeforePasteEvent,
   HelixBeforeReconnectEvent,
   HelixBeforeRelabelEvent,
+  HelixBeforeSelectEvent,
   HelixCanvasEditEvent,
   HelixCanvasPanEvent,
   HelixCanvasViewEvent,
@@ -358,6 +359,7 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @event {HelixBeforePasteEvent} helix-before-paste - Cards and connections are about to be pasted. Cancelable: cancel it to add the detail's document to your own state.
  * @event {HelixBeforeReconnectEvent} helix-before-reconnect - A connection's end is about to move to another card or side. Cancelable: cancel it to keep connections in your own state.
  * @event {HelixBeforeRelabelEvent} helix-before-relabel - A connection's label or a group's name is about to change. Cancelable: cancel it to keep labels in your own state.
+ * @event {HelixBeforeSelectEvent} helix-before-select - The selection is about to change. The detail's `value` is the names, comma separated, empty for none. Cancelable: canceling it keeps the selection as it was.
  * @event {HelixCanvasEditEvent} helix-canvas-edit - A card was double-clicked, or Enter or F2 was pressed on it. Open your own editor for the card.
  * @event {HelixCanvasPanEvent} helix-canvas-pan - The board moved one step, from its controls or the arrow keys. A drag sends `helix-canvas-view`.
  * @event {HelixCanvasViewEvent} helix-canvas-view - The board's view changed, by any means. The detail is the new view.
@@ -368,7 +370,7 @@ const size = (value: number): string | undefined => (value > 0 ? `${value}px` : 
  * @event {HelixReconnectEvent} helix-reconnect - A connection's end moved, and the move is finished.
  * @event {HelixRelabelEvent} helix-relabel - A connection's label or a group's name changed.
  * @event {HelixRemoveEvent} helix-remove - Cards or connections were chosen for removal. Remove the elements it names.
- * @event {HelixSelectEvent} helix-select - The selection changed. The detail's `value` is the names, comma separated, empty for none. Cancelable: canceling it keeps the selection as it was.
+ * @event {HelixSelectEvent} helix-select - Fired after the selection changes, with the names now selected, comma separated, empty for none.
  *
  * @csspart arrow - The arrowhead at an end of a connection that has one.
  * @csspart board - The plane the cards are placed on, which pans and zooms.
@@ -1929,8 +1931,8 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
   }
 
   /**
-   * Selects stops, or nothing, and says so: `helix-select`, which a page can
-   * refuse, with the names as its value.
+   * Selects stops, or nothing, and says so: `helix-before-select`, which a page
+   * can refuse, with the names as its value, and `helix-select` once it stands.
    */
   private choose(keys: string | readonly string[] | undefined, said = false): void {
     const list = keys === undefined ? [] : typeof keys === 'string' ? [keys] : [...new Set(keys)]
@@ -1938,8 +1940,9 @@ export class HelixHeadlessCanvas extends MixinViewport(HelixElement) {
     if (value === this.selected) {
       return
     }
-    if (this.dispatchEvent(new HelixSelectEvent({ value }))) {
+    if (this.dispatchEvent(new HelixBeforeSelectEvent({ value }))) {
       this.selected = value
+      this.dispatchEvent(new HelixSelectEvent({ value }))
       if (said) {
         this.say(formatWords(this, 'selectionLabel', { count: list.length }))
       }

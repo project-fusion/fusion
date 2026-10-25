@@ -61,7 +61,7 @@
   plan.addEventListener('change', (event) => {
     say('change', `Chose "${event.currentTarget.value}"`)
   })
-  plan.addEventListener('helix-select', (event) => {
-    say('helix-select', `Pressed "${event.detail.value}"`)
+  plan.addEventListener('helix-before-select', (event) => {
+    say('helix-before-select', `Pressed "${event.detail.value}"`)
   })
 </script>

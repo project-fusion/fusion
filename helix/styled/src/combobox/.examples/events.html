@@ -62,8 +62,8 @@
   language.addEventListener('toggle', (event) => {
     say('toggle', `Changed from ${event.oldState} to ${event.newState}`)
   })
-  language.addEventListener('helix-filter', (event) => {
-    say('helix-filter', `Filter text is "${event.detail.value}"`)
+  language.addEventListener('helix-before-filter', (event) => {
+    say('helix-before-filter', `Filter text is "${event.detail.value}"`)
   })
   language.addEventListener('helix-before-change', (event) => {
     say('helix-before-change', `Proposed "${event.detail.value}"`)

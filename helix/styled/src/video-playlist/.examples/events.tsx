@@ -21,7 +21,7 @@ export function Example() {
     say('helix-before-activate', `about to change to "${event.detail.value}", can be canceled`)
   }
 
-  /* The playlist stops each entry's `helix-select`, so listen for
+  /* The playlist stops each entry's `helix-before-select`, so listen for
      `helix-activate` on the playlist. */
   const moved = (event: CustomEvent<{ value: string }>) => {
     say('helix-activate', `"${event.detail.value}" is now playing`)

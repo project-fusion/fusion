@@ -3,6 +3,7 @@ import {
   chordParts,
   customElement,
   deepActiveElement,
+  HelixBeforeSelectEvent,
   HelixElement,
   HelixSelectEvent,
   keyNames,
@@ -38,7 +39,7 @@ let toldSelected = false
  * `href` makes the action a link, as Menu's rows take one: the `item` part is
  * then an `<a>` carrying `menuitem`, so the browser follows it, opens it in a
  * new tab on a middle press, and offers its own menu for it. Choosing it still
- * sends `helix-select` and closes the dial. A disabled action draws no link.
+ * sends `helix-before-select` and closes the dial. A disabled action draws no link.
  *
  * @since 0.1.0
  * @status stable
@@ -50,7 +51,8 @@ let toldSelected = false
  * @slot icon - The action's icon, the main way the action is recognized.
  * @slot shortcut - The action's keyboard shortcut, drawn after its name, such as a `Kbd`. It replaces the text drawn for `shortcut`, and is hidden from the name, which `aria-keyshortcuts` carries instead.
  *
- * @event {HelixSelectEvent} helix-select - The action was chosen. Cancelable: cancel it to keep the dial open.
+ * @event {HelixBeforeSelectEvent} helix-before-select - The action was chosen. Cancelable: cancel it to keep the dial open.
+ * @event {HelixSelectEvent} helix-select - Fired after the action is chosen, once the choice stands.
  *
  * @csspart icon - The box that holds the icon.
  * @csspart item - The control for the action, which is an `<a>` where `href` is set.
@@ -100,7 +102,7 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
   target = ''
 
   /**
-   * The action's value, sent in `helix-select` when the action is chosen.
+   * The action's value, sent in `helix-before-select` when the action is chosen.
    */
   @property()
   value = ''
@@ -188,7 +190,9 @@ export class HelixHeadlessSpeedDialItem extends HelixElement {
     if (this.disabled) {
       return
     }
-    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    if (this.dispatchEvent(new HelixBeforeSelectEvent({ value: this.value }))) {
+      this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    }
   }
 
   private readonly handleClick = (): void => {

@@ -47,7 +47,7 @@ describe('toggle group', () => {
   test('choosing an item moves the selection and reports the new value', async () => {
     const group = await mount(markup)
     let seen = ''
-    group.addEventListener('helix-select', (event) => {
+    group.addEventListener('helix-before-select', (event) => {
       seen = (event as CustomEvent<{ value: string }>).detail.value
     })
 
@@ -67,14 +67,14 @@ describe('toggle group', () => {
   })
 
   test('and refusing the item`s own event leaves the group where it was', async () => {
-    /* `helix-select` is cancelable and the item documents it as refusable. The
+    /* `helix-before-select` is cancelable and the item documents it as refusable. The
        group is the one thing that acts on it, so a refusal it ignored was a
        veto that did nothing anywhere: valid code, no error, and the selection
        happening regardless. Bound on the item, which is the position that can
        refuse a bubbling event before the group sees it. */
     const group = (await mount(markup)) as Updatable & { value: string }
     const dark = items(group)[2] as unknown as HTMLElement & { select: () => void }
-    dark.addEventListener('helix-select', (event) => event.preventDefault())
+    dark.addEventListener('helix-before-select', (event) => event.preventDefault())
     dark.select()
     await Promise.resolve()
 
@@ -324,7 +324,7 @@ describe('toggle group edges', () => {
 
   test('a refusal on the group itself keeps the current choice', async () => {
     const group = (await mount(markup)) as Updatable & { value: string }
-    group.addEventListener('helix-select', (event) => event.preventDefault())
+    group.addEventListener('helix-before-select', (event) => event.preventDefault())
     ;(items(group)[2] as unknown as { select: () => void }).select()
     await new Promise((resolve) => setTimeout(resolve))
     expect(group.value).toBe('light')

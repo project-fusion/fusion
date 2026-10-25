@@ -23,7 +23,7 @@ import { styles } from './tree-item.css.js'
  *   turned like the drawn one.
  * @slot children - Nested items, which make this a branch.
  *
- * @event {HelixSelectEvent} helix-select - Fired when the item is chosen, and cancelable. Canceling it changes nothing.
+ * @event {HelixBeforeSelectEvent} helix-before-select - Fired when the item is chosen, and cancelable. Canceling it changes nothing.
  *
  * @csspart checkbox - The check mark's box, in a tree with `selection-mode="multiple"`.
  * @csspart checkbox-checked - The check mark's box while the item is checked.
