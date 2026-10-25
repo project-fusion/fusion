@@ -49,6 +49,7 @@ import { extname, join } from 'node:path'
 import { argument } from '@fusion.dev/scripts/argv'
 import { costOf } from '@fusion.dev/scripts/cost'
 import { KNOWN_IN_WEBKIT } from '@fusion.dev/scripts/known-in-webkit'
+import { leave } from '@fusion.dev/scripts/leave'
 import { offline, pool, workers } from '@fusion.dev/scripts/pool'
 import { owner, shard, which } from '@fusion.dev/scripts/shard'
 import { root } from '@fusion.dev/scripts/workspace'
@@ -236,6 +237,17 @@ const ready = async (made, crashes) => {
   }
 
   await made.goto(origin, { waitUntil: 'load' })
+
+  /* **Every font face loaded before a family starts.** A face loads when text
+     first needs it, and its arrival is page activity, which the
+     unregistered-child audit waits out: it reports once the page has loaded
+     nothing for `QUIET` milliseconds. A family whose first spec mounted the
+     first text waited for Geist too, and its report came a period after the
+     spec stopped listening. Measured in Chromium on October 15, 2026: the font
+     arrived 66 ms after that mount, and six families failed that way. */
+  await made.evaluate(() =>
+    Promise.all([...document.fonts].map((face) => face.load().catch(() => undefined))),
+  )
 
   /* **The pointer starts at 0,0 and specs mount at 0,0.** `mount` assigns
      `document.body.innerHTML`, so content appears directly under where the
@@ -454,7 +466,7 @@ if (failures.length > 0) {
     console.error(`  ${failure}\n`)
   }
   console.error(owed)
-  process.exit(1)
+  await leave(1)
 }
 
 console.log(

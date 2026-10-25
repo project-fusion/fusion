@@ -35,6 +35,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { argument } from '@fusion.dev/scripts/argv'
 import { expand, floored, PREREQUISITES, sharded, tally } from '@fusion.dev/scripts/checks'
+import { leave } from '@fusion.dev/scripts/leave'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
@@ -147,7 +148,7 @@ const run = (command) =>
 for (const step of PREREQUISITES) {
   if (!(await run(step)).passed) {
     console.error(`\nrun-checks: prerequisite \`${step}\` failed, so nothing ran.`)
-    process.exit(1)
+    await leave(1)
   }
 }
 
@@ -192,5 +193,5 @@ if (empty.length > 0) {
   console.error(`Checks that passed on an empty scan:\n  ${empty.join('\n  ')}`)
 }
 if (failed.length > 0 || empty.length > 0) {
-  process.exit(1)
+  await leave(1)
 }
