@@ -101,6 +101,17 @@ pub enum Noun {
     /// your `helix-diagnostics.json` to the page.
     Diagnostics(Diagnostics),
 
+    /* **This repository's compiler, so only in its builds**, for the reason
+    `manifest build` gives: it reads Helix's own platform-neutral sources, and
+    what a consumer installs is its output. */
+    /// Compile each family's platform-neutral source for the web and for React Native.
+    #[cfg(feature = "internal")]
+    #[command(subcommand_required = true, arg_required_else_help = true)]
+    Family {
+        #[command(subcommand)]
+        verb: Family,
+    },
+
     /* **A noun for the artifact rather than a verb on the component noun.**
     `component` holds a design system to its conventions; a manifest is a file,
     and what is asked of a file is whether two of them say the same thing. */
@@ -131,6 +142,17 @@ pub enum Noun {
     /// beside the runs `helix diagnostics` writes there. Exits 1 on a finding
     /// at `error`.
     Scan(Scan),
+
+    /* **A noun with no verb, like `scan`**: it does one thing to the code an
+    app shares between the web and a phone. */
+    /// Check the code an app shares between the web and a phone for what only the web has.
+    ///
+    /// Reads each module under the paths given, or under the directory it runs
+    /// in, except the files named for one platform, such as page.web.tsx and
+    /// page.native.tsx. Reports the browser's globals, DOM elements, CSS, and
+    /// the Helix families, props, and events a phone does not have, judged
+    /// against the Helix packages you installed. Exits 1 on a finding.
+    Shared(Shared),
 
     /// Derive, verify and inspect a theme.
     #[command(subcommand_required = true, arg_required_else_help = true)]
@@ -183,6 +205,14 @@ pub struct Diagnostics {
     /// `error`.
     #[arg(long, value_name = "URL")]
     pub once: Vec<String>,
+}
+
+/// What `helix shared` takes.
+#[derive(Args, Debug)]
+pub struct Shared {
+    /// The files and folders to read. Defaults to the directory it runs in.
+    #[arg(value_name = "PATH")]
+    pub paths: Vec<PathBuf>,
 }
 
 /// What `helix scan` takes.
@@ -340,6 +370,215 @@ pub enum Manifest {
     /// Writes to stdout.
     #[cfg(feature = "internal")]
     Build(ManifestBuild),
+}
+
+/// The verbs of `helix family`.
+#[cfg(feature = "internal")]
+#[derive(Debug, Subcommand)]
+pub enum Family {
+    /// Write each family's intermediate form and web stylesheet to the package's `dist`.
+    ///
+    /// With `--check`, writes nothing and exits 1 when a written one differs
+    /// from what the sources compile to, so a build and a check are two
+    /// builds compared.
+    Build(FamilyBuild),
+
+    /// Write each capability's contract into core's sources.
+    ///
+    /// Writes `src/capabilities/<capability>/contract.generated.ts` and the
+    /// types they share, from the contracts the compiler defines. With
+    /// `--check`, writes nothing and exits 1 when one is missing or out of
+    /// date.
+    Capabilities(FamilyCapabilities),
+
+    /// Hold each element's API to the manifest.
+    ///
+    /// Exits 1 when an element's attributes, events, slots, parts or states
+    /// differ from the manifest's.
+    Check(FamilyArgs),
+
+    /// Write each family's native components, with their props typed, for the styled package.
+    ///
+    /// Writes `<family>/index.native.ts` under `--out`: each element's
+    /// intermediate form, its props type, and its component, which draws the
+    /// form with `@fusion.dev/helix-native`. Each prop, slot and event is
+    /// described from the styled manifest, and each event's detail is typed
+    /// from core's event classes. With `--check`, writes nothing and exits 1
+    /// when a written module is missing or out of date.
+    Components(FamilyComponents),
+
+    /// Write the token layer as a Design Tokens Format Module file, with a resolver for its modes.
+    ///
+    /// Reads the token layer in the styles package and writes
+    /// `dist/helix.tokens.json`, light mode at the default density, and
+    /// `dist/helix.resolver.json`, which adds dark mode and each density stop.
+    /// Refuses a token whose CSS differs from what `tokens.ts` writes for it,
+    /// which `dist/tokens.json` records. With `--check`, writes nothing and
+    /// exits 1 when a written file is missing or out of date.
+    DesignTokens(FamilyDesignTokens),
+
+    /// Print what each element is called on each platform, as JSON.
+    ///
+    /// For each element with a native component: the component's name, and
+    /// the name each property, slot, and event of the web element takes as a
+    /// prop. `analyze` writes it into the styled package's `api.json`, which
+    /// `helix api` and the MCP server read.
+    Platforms(FamilyArgs),
+
+    /// Write each generated stylesheet into the styled package's sources.
+    ///
+    /// With `--check`, writes nothing and exits 1 when one is missing or out of
+    /// date.
+    Stylesheets(FamilyStylesheets),
+
+    /// Compile each machine in core to the flat module beside it.
+    ///
+    /// Reads `src/machines/<machine>/machine.ts` and writes
+    /// `<machine>.generated.ts` beside it. Refuses a machine that is not total,
+    /// has a state it can never enter, or names anything it does not define.
+    /// With `--check`, writes nothing and exits 1 when a written module is
+    /// missing or out of date.
+    Machines(FamilyMachines),
+
+    /// Write each mode's native token module into the package's sources.
+    ///
+    /// Reads the token layer in the styles package beside it, types every
+    /// token, and writes `src/theme/light.generated.ts` and
+    /// `dark.generated.ts` with each token's value as the native renderer
+    /// takes it. Refuses a token whose value it cannot type. With `--check`,
+    /// writes nothing and exits 1 when a written module is missing or out of
+    /// date.
+    Tokens(FamilyTokens),
+
+    /// Write the intermediate form's TypeScript types into the package's sources.
+    ///
+    /// With `--check`, writes nothing and exits 1 when the written types are
+    /// missing or out of date.
+    Types(FamilyTypes),
+}
+
+/// What `family capabilities` takes.
+#[cfg(feature = "internal")]
+#[derive(Args, Debug)]
+pub struct FamilyCapabilities {
+    /// Say which written contracts are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The package holding the capabilities, which is the directory holding its `src`.
+    #[arg(default_value = "helix/core")]
+    pub package: PathBuf,
+}
+
+/// What `family components` takes.
+#[cfg(feature = "internal")]
+#[derive(Args, Debug)]
+pub struct FamilyComponents {
+    /// Say which written modules are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The directory each family's module is written under, as
+    /// `<family>/index.native.ts`: the `native` folder of the styled package
+    /// beside the neutral one, unless given.
+    #[arg(long, value_name = "DIR")]
+    pub out: Option<PathBuf>,
+
+    /// The package holding the sources, which is the directory holding its `src`.
+    #[arg(default_value = "helix/neutral")]
+    pub package: PathBuf,
+}
+
+/// What `family design-tokens` takes.
+#[cfg(feature = "internal")]
+#[derive(Args, Debug)]
+pub struct FamilyDesignTokens {
+    /// Say which written files are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The styles package, which is the directory holding its `src`.
+    #[arg(default_value = "helix/styles")]
+    pub package: PathBuf,
+}
+
+/// What `family machines` takes.
+#[cfg(feature = "internal")]
+#[derive(Args, Debug)]
+pub struct FamilyMachines {
+    /// Say which written modules are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The package holding the machines, which is the directory holding its `src`.
+    #[arg(default_value = "helix/core")]
+    pub package: PathBuf,
+}
+
+/// What `family tokens` takes.
+#[cfg(feature = "internal")]
+#[derive(Args, Debug)]
+pub struct FamilyTokens {
+    /// Say which written modules are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The package the modules are written into, which is the directory holding its `src`.
+    #[arg(default_value = "helix/native")]
+    pub package: PathBuf,
+}
+
+/// What `family types` takes.
+#[cfg(feature = "internal")]
+#[derive(Args, Debug)]
+pub struct FamilyTypes {
+    /// Say whether the written types are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The package the types are written into, which is the directory holding its `src`.
+    #[arg(default_value = "helix/native")]
+    pub package: PathBuf,
+}
+
+/// What `family stylesheets` takes.
+#[cfg(feature = "internal")]
+#[derive(Args, Debug)]
+pub struct FamilyStylesheets {
+    /// Say which generated stylesheets are missing or out of date, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The directory a stylesheet's path is under: the `src` of the styled
+    /// package beside the neutral one, unless given.
+    #[arg(long, value_name = "DIR")]
+    pub out: Option<PathBuf>,
+
+    /// The package holding the sources, which is the directory holding its `src`.
+    #[arg(default_value = "helix/neutral")]
+    pub package: PathBuf,
+}
+
+/// What `family build` takes.
+#[cfg(feature = "internal")]
+#[derive(Args, Debug)]
+pub struct FamilyBuild {
+    /// Say which written outputs differ from what the sources compile to, and write nothing.
+    #[arg(long)]
+    pub check: bool,
+
+    /// The package holding the sources, which is the directory holding its `src`.
+    #[arg(default_value = "helix/neutral")]
+    pub package: PathBuf,
+}
+
+/// What `family check` takes.
+#[cfg(feature = "internal")]
+#[derive(Args, Debug)]
+pub struct FamilyArgs {
+    /// The package holding the sources, which is the directory holding its `src`.
+    #[arg(default_value = "helix/neutral")]
+    pub package: PathBuf,
 }
 
 /// What `manifest build` takes.
