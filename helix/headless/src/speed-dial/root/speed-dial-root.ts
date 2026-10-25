@@ -451,7 +451,7 @@ export class HelixHeadlessSpeedDial extends MixinControllerOpen(HelixElement) {
    *
    * **Never `setAttribute`.** Writing `aria-expanded` onto the consumer's
    * element is a hydration mismatch React reports and does not patch up,
-   * measured against React 19.2.8. `tellDisclosure` carries the argument and the
+   * measured against React 19.3.1. `tellDisclosure` carries the argument and the
    * measurement: the state travels as a property, into the trigger's own shadow
    * root, where React neither looks nor compares.
    *
