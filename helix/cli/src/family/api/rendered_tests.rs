@@ -23,9 +23,9 @@ fn a_source_written_with_render_compiles_to_what_the_builder_form_does() {
         &default_export(
             "export default headless('tab', {
               events: [
-                event('dismiss', { cancelable: true, detail: ['label'] }),
                 event('before-select', { cancelable: true, detail: ['value'] }),
                 event('change', { bare: true }),
+                event('dismiss', { cancelable: true, detail: ['label'] }),
                 event('filter', { detail: ['value'], platform: 'web' }),
               ],
               derived: { 'hold-hint': derive('menu-hold-hint') },
@@ -33,12 +33,12 @@ fn a_source_written_with_render_compiles_to_what_the_builder_form_does() {
               props: [
                 prop('disabled', 'boolean', { default: false }),
                 prop('dismiss-label', 'string', { default: 'Close' }),
-                prop('offset', 'number', { default: 4 }),
-                prop('href', 'string'),
                 prop('expanded', 'boolean', { attribute: false }),
+                prop('href', 'string'),
+                prop('name', 'string', { default: '', platform: 'web' }),
+                prop('offset', 'number', { default: 4 }),
                 prop('open-on', ['click', 'long-press'], { default: 'click' }),
                 prop('rel', 'string', { platform: 'web' }),
-                prop('name', 'string', { default: '', platform: 'web' }),
               ],
               states: ['selected'],
               tree: [
@@ -61,17 +61,17 @@ fn a_source_written_with_render_compiles_to_what_the_builder_form_does() {
           props: {
             disabled: false,
             dismissLabel: 'Close',
-            offset: 4,
-            href: string(),
             expanded: property(boolean()),
+            href: string(),
+            name: web(''),
+            offset: 4,
             openOn: oneOf(['click', 'long-press'], 'click'),
             rel: web(string()),
-            name: web(''),
           },
           events: {
-            dismiss: cancelable(['label']),
             beforeSelect: cancelable(['value']),
             change: bare(),
+            dismiss: cancelable(['label']),
             filter: web(['value']),
           },
           states: ['selected'],
@@ -142,4 +142,72 @@ fn a_member_chooses_where_its_press_says_chooses_and_only_there() {
         r#"{"chooses":true,"of":"y"}"#
     );
     assert_eq!(item(r#"<Pressable part="press" />"#), r#"{"of":"y"}"#);
+}
+
+#[test]
+fn the_props_events_computed_values_and_states_are_in_alphabetical_order() {
+    let refused = |body: &str| {
+        rendered(&format!(
+            "export default headless('x', {{ {body}, render: () => <View part=\"x\" /> }})"
+        ))
+        .unwrap_err()
+    };
+    let props = refused("props: { selected: false, href: string(), value: '' }");
+    assert!(
+        props.contains(
+            "`props` is in alphabetical order, and `href` comes before `selected`: write `href`, `selected`, `value`"
+        ),
+        "{props}"
+    );
+    let events = refused("events: { dismiss: [], beforeSelect: [] }");
+    assert!(
+        events.contains("`beforeSelect` comes before `dismiss`"),
+        "{events}"
+    );
+    let derived = refused("derived: { rows: bind('default'), name: derive('x') }");
+    assert!(derived.contains("`name` comes before `rows`"), "{derived}");
+    let states = refused("states: ['settled', 'open']");
+    assert!(states.contains("`open` comes before `settled`"), "{states}");
+    /* Biome's order: a number by its value, and letters whatever their case. */
+    rendered(
+        "export default headless('x', { props: { a9: 1, a10: 2, opened: false, openOn: '' }, render: () => <View part=\"x\" /> })",
+    )
+    .unwrap();
+}
+
+#[test]
+fn natural_order_is_biomes() {
+    use super::natural;
+    let mut names = vec![
+        "openOn",
+        "opened",
+        "abd",
+        "a10",
+        "a9",
+        "aZ",
+        "aa",
+        "ab",
+        "aB",
+        "ab1",
+        "focusableX",
+        "focusable-when-disabled",
+    ];
+    names.sort_by(|a, b| natural(a, b));
+    assert_eq!(
+        names,
+        [
+            "a9",
+            "a10",
+            "aa",
+            "aB",
+            "ab",
+            "ab1",
+            "abd",
+            "aZ",
+            "focusable-when-disabled",
+            "focusableX",
+            "opened",
+            "openOn",
+        ]
+    );
 }
