@@ -240,13 +240,13 @@ export interface Headless {
    *
    * A range's reading is the host's too, as a meter's and a progress bar's
    * are, `valuemin`, `valuemax`, `valuenow` and `valuetext`, and so are
-   * `busy` and `decorative`, as a skeleton is busy while what it holds
+   * `busy` and `ariaHidden`, as a skeleton is busy while what it holds
    * loads. A role may bind a value the element computes, as a skeleton is a
    * progress bar only while it has a name.
    */
   readonly host?: Readonly<{
+    ariaHidden?: Attribute
     busy?: Attribute
-    decorative?: Attribute
     label?: Attribute
     role?: string | { readonly bind: string }
     valuemax?: Attribute

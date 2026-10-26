@@ -134,10 +134,10 @@ export default headless('megamenu', {
       >
         <Slot name="trigger">
           <Pressable
-            chooses
             expanded={props.open}
             part="trigger"
             role="button"
+            selects
           >
             <Text part="trigger-words">{props.label}</Text>
           </Pressable>
@@ -153,14 +153,14 @@ export default headless('megamenu', {
       <Layer
         alone
         anchor="anchor"
+        anchorPress="toggle"
         band
         closedby="any"
-        enters="down"
+        initialFocus="down"
         label={props.label}
         open={props.open}
         part="surface"
-        presses="toggle"
-        returns="dismissed"
+        restoreFocus="dismissed"
         role="group"
       >
         <Slot part="columns" />

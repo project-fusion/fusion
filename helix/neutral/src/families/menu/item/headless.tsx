@@ -98,7 +98,6 @@ export default headless('menu-item', {
   render: ({ derived, props, send }) => (
     <>
       <Pressable
-        chooses
         describedby="description end"
         disabled={props.disabled}
         href={props.href}
@@ -106,6 +105,7 @@ export default headless('menu-item', {
         part="item"
         popup={derived.hasSubmenu ? 'menu' : ''}
         role={derived.role}
+        selects
       >
         <View part="start">
           <Slot name="start" />

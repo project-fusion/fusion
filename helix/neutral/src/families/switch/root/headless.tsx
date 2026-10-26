@@ -63,9 +63,9 @@ export default headless('switch', {
     <>
       <Pressable
         disabled={props.disabled}
-        keys="space"
         label={props.ariaLabel}
         part="field"
+        pressKey="space"
         readonly={props.readonly}
         required={props.required}
         role="switch"

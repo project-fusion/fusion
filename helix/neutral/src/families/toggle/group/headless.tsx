@@ -116,7 +116,7 @@ export default headless('toggle-group', {
           )}
           <View
             ariaHidden
-            marks="chosen"
+            indicator
             part="indicator"
           />
           <Slot />

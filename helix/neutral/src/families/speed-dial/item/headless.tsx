@@ -48,12 +48,12 @@ export default headless('speed-dial-item', {
   },
   render: ({ derived, props, send }) => (
     <Pressable
-      chooses
       disabled={props.disabled}
       href={props.href}
       onPress={send.beforeSelect}
       part="item"
       role="menuitem"
+      selects
     >
       <View part="icon">
         <Slot name="icon" />
