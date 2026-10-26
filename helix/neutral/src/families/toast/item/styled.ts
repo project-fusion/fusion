@@ -130,12 +130,12 @@ export default styles(
             },
           ),
           rule(
-            { state: 'entering' },
+            { entering: true },
             {
               transition: list(['opacity', normal, decelerate], ['translate', normal, decelerate]),
             },
           ),
-          rule({ startingStyle: true, state: 'entering' }, { opacity: 0 }),
+          rule({ startingStyle: true, entering: true }, { opacity: 0 }),
           rule({ closed: true }, { display: 'none' }),
         ]),
         rule([{ reducedMotion: true }, { reducedMotion: true, closed: true }], {
@@ -145,7 +145,7 @@ export default styles(
           rule(
             [
               { reducedMotion: true, exiting: true },
-              { reducedMotion: true, state: 'entering' },
+              { reducedMotion: true, entering: true },
             ],
             { transition: 'none' },
           ),

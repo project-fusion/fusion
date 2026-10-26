@@ -104,7 +104,7 @@ export default styles(
         backgroundColor: first(hook.fallbackBackgroundColor, hook.placeholderColor),
         color: hook.fallbackColor,
       }),
-      native([rule({ state: { error: false } }, { display: 'none' })]),
+      native([rule({ error: false }, { display: 'none' })]),
     ]),
     /* `hidden` hides nothing an author gave a display to, so the stand-ins
        say it again. */

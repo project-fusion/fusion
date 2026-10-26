@@ -15,7 +15,7 @@ const dash = web(
 const ease = [token('duration-fast'), token('easing-standard')] as const
 /* A card: either separation that draws a bounded surface. */
 const card = { separation: ['filled', 'outlined'] } as const
-const marked = [{ state: 'checked' }, { state: 'indeterminate' }] as const
+const marked = [{ checked: true }, { indeterminate: true }] as const
 const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
 
 /**
@@ -155,9 +155,15 @@ export default styles(
       rule([{ invalid: true }, { invalid: true, within: { field: { hover: true } } }], {
         borderColor: token('color-danger'),
       }),
-      rule([{ state: ['invalid', 'checked'] }, { state: ['invalid', 'indeterminate'] }], {
-        borderColor: token('color-danger'),
-      }),
+      rule(
+        [
+          { invalid: true, checked: true },
+          { invalid: true, indeterminate: true },
+        ],
+        {
+          borderColor: token('color-danger'),
+        },
+      ),
       rule({ focusVisible: true, ...card }, { outline: 'none' }),
     ]),
     /* The tick by default, and not only when the box is ticked, which stops
@@ -195,8 +201,8 @@ export default styles(
          and the icon takes the ink. It still scales in and out with the mark. */
       rule(
         [
-          { also: { 'mark-dash': false }, state: 'hasCheck' },
-          { also: { 'mark-dash': true }, state: 'hasDash' },
+          { also: { 'mark-dash': false }, hasCheck: true },
+          { also: { 'mark-dash': true }, hasDash: true },
         ],
         {
           backgroundColor: 'transparent',
@@ -230,9 +236,7 @@ export default styles(
       /* Nothing to read, so nothing to space away from the box. A label drawn
          to carry the host's `aria-label` is kept, clipped by the field's rule.
          A phone draws the label's box whatever it holds. */
-      web([
-        rule({ part: { 'data-hidden': false }, state: { hasLabel: false } }, { display: 'none' }),
-      ]),
+      web([rule({ part: { 'data-hidden': false }, hasLabel: false }, { display: 'none' })]),
       /* A card's first line is a sentence somebody reads. */
       rule(card, { fontSize: token('text-md'), lineHeight: token('leading-normal') }),
     ]),

@@ -130,7 +130,7 @@ export default styles(
             transition: ['background-color', token('duration-fast'), token('easing-standard')],
           }),
           rule({ place: 'first' }, pulled),
-          rule({ state: 'end' }, split),
+          rule({ end: true }, split),
           rule({ hover: true }, { backgroundColor: hover }),
           rule(
             { focusVisible: true },
@@ -140,7 +140,7 @@ export default styles(
             },
           ),
           rule(
-            { focusVisible: true, state: 'end' },
+            { focusVisible: true, end: true },
             {
               outlineOffset: product(token('size-focus-offset'), '-1'),
             },
@@ -148,7 +148,7 @@ export default styles(
           /* A focused half draws above its neighbor, so nothing paints over its
            ring. */
           rule(
-            { focusVisible: true, state: 'end' },
+            { focusVisible: true, end: true },
             {
               position: 'relative',
               zIndex: token('layer-raised'),

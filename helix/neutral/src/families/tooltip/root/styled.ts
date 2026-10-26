@@ -108,21 +108,15 @@ export default styles(
         }),
         /* It grows out of its own point, wherever the point landed. */
         rule(
-          { state: 'placedTop' },
+          { placedTop: true },
           { transformOrigin: [measured('floating-arrow-x', '50%'), '100%'] },
         ),
+        rule({ placedBottom: true }, { transformOrigin: [measured('floating-arrow-x', '50%'), 0] }),
         rule(
-          { state: 'placedBottom' },
-          { transformOrigin: [measured('floating-arrow-x', '50%'), 0] },
-        ),
-        rule(
-          { state: 'placedLeft' },
+          { placedLeft: true },
           { transformOrigin: ['100%', measured('floating-arrow-y', '50%')] },
         ),
-        rule(
-          { state: 'placedRight' },
-          { transformOrigin: [0, measured('floating-arrow-y', '50%')] },
-        ),
+        rule({ placedRight: true }, { transformOrigin: [0, measured('floating-arrow-y', '50%')] }),
       ]),
       /* A closed tooltip is not drawn, as the UA's sheet has it, which the
          rules above outrank. */

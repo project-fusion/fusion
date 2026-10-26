@@ -64,7 +64,7 @@ export default styles(
         /* Lined up on the end the trigger is on, the row order handed down. */
         rule({ own: { row: 'row-reverse' }, alignItems: 'flex-end' }),
         rule(
-          { state: 'alignedStart' },
+          { alignedStart: true },
           { own: { align: 'flex-start', row: 'row' }, alignItems: 'flex-start' },
         ),
       ]),
@@ -74,7 +74,7 @@ export default styles(
       /* They arrive from the button, once the column is placed. */
       on('actions', [
         rule({ own: { dialFrom: travel } }),
-        rule({ state: 'placedBottom' }, { own: { dialFrom: product(travel, '-1') } }),
+        rule({ placedBottom: true }, { own: { dialFrom: product(travel, '-1') } }),
       ]),
       on({ region: 'default', slotted: '*' }, [
         rule({
@@ -92,10 +92,10 @@ export default styles(
         native([
           rule(
             [
-              { state: 'placedBottom' },
-              { state: 'placedLeft' },
-              { state: 'placedRight' },
-              { state: 'placedTop' },
+              { placedBottom: true },
+              { placedLeft: true },
+              { placedRight: true },
+              { placedTop: true },
             ],
             arrived,
           ),
@@ -174,37 +174,37 @@ export default styles(
         native([
           rule(
             [
-              { nthLast: 2, state: 'placedTop' },
-              { nthLast: 2, state: 'placedLeft' },
-              { nthLast: 2, state: 'placedRight' },
-              { nth: 2, state: 'placedBottom' },
+              { nthLast: 2, placedTop: true },
+              { nthLast: 2, placedLeft: true },
+              { nthLast: 2, placedRight: true },
+              { nth: 2, placedBottom: true },
             ],
             { transitionDelay: own.stagger },
           ),
           rule(
             [
-              { nthLast: 3, state: 'placedTop' },
-              { nthLast: 3, state: 'placedLeft' },
-              { nthLast: 3, state: 'placedRight' },
-              { nth: 3, state: 'placedBottom' },
+              { nthLast: 3, placedTop: true },
+              { nthLast: 3, placedLeft: true },
+              { nthLast: 3, placedRight: true },
+              { nth: 3, placedBottom: true },
             ],
             { transitionDelay: product(own.stagger, 2) },
           ),
           rule(
             [
-              { nthLast: 4, state: 'placedTop' },
-              { nthLast: 4, state: 'placedLeft' },
-              { nthLast: 4, state: 'placedRight' },
-              { nth: 4, state: 'placedBottom' },
+              { nthLast: 4, placedTop: true },
+              { nthLast: 4, placedLeft: true },
+              { nthLast: 4, placedRight: true },
+              { nth: 4, placedBottom: true },
             ],
             { transitionDelay: product(own.stagger, 3) },
           ),
           rule(
             [
-              { nthLast: { from: 5 }, state: 'placedTop' },
-              { nthLast: { from: 5 }, state: 'placedLeft' },
-              { nthLast: { from: 5 }, state: 'placedRight' },
-              { nth: { from: 5 }, state: 'placedBottom' },
+              { nthLast: { from: 5 }, placedTop: true },
+              { nthLast: { from: 5 }, placedLeft: true },
+              { nthLast: { from: 5 }, placedRight: true },
+              { nth: { from: 5 }, placedBottom: true },
             ],
             { transitionDelay: product(own.stagger, 4) },
           ),

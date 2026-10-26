@@ -203,14 +203,13 @@ export type When<Asked, State extends string, Part extends string, Alias extends
     /** The part's own `hidden` or `href`, over a source written with `render`. */
     readonly hidden?: boolean
     readonly href?: boolean
-    /** A `data-` attribute the part carries, over a source written with `render`. */
-    readonly [data: `data-${string}`]: boolean | undefined
+    /** A `data-` attribute the part carries, present, absent, or holding a value, over a source written with `render`. */
+    readonly [data: `data-${string}`]: boolean | string | undefined
     /** Where the node is the part `name` as well, or is not. */
     readonly also?: Readonly<Partial<Record<Alias, boolean>>>
     readonly holds?: Partial<Record<Part, boolean | Interaction | readonly Interaction[]>> & Holds
     /** The web's alone, or a phone's alone. */
     readonly platform?: 'native' | 'web'
-    readonly state?: State | readonly State[] | Readonly<Partial<Record<State, boolean>>>
     /** A feature query around the rule, on the web. */
     readonly supports?: string
     /**

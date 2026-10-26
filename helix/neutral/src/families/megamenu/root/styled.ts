@@ -208,13 +208,19 @@ export default styles(
             position: 'fixed',
           },
         }),
-        rule([{ open: true, variant: 'band' }, { state: ['narrow', 'open'] }], {
-          clipPath: fn('inset', [0, 0, out, 0]),
-        }),
+        rule(
+          [
+            { open: true, variant: 'band' },
+            { narrow: true, open: true },
+          ],
+          {
+            clipPath: fn('inset', [0, 0, out, 0]),
+          },
+        ),
         rule(
           [
             { startingStyle: true, open: true, variant: 'band' },
-            { startingStyle: true, state: ['narrow', 'open'] },
+            { startingStyle: true, narrow: true, open: true },
           ],
           { clipPath: fn('inset', [0, 0, '100%', 0]) },
         ),
