@@ -1,4 +1,4 @@
-import { list, mix, product, token, web } from '../../../style.js'
+import { list, mix, product, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import item from './headless.js'
 
@@ -19,17 +19,17 @@ export default styles(
   item,
   {
     prefix: 'navigation-item',
-    hooks: [
-      'color',
-      'current-color',
-      'current-font-weight',
-      'font-size',
-      'font-weight',
-      'hover-background-color',
-      'hover-color',
-      'padding-inline',
-      'radius',
-    ],
+    hooks: {
+      color: token('color-foreground-muted'),
+      currentColor: token('color-foreground'),
+      currentFontWeight: token('weight-semibold'),
+      fontSize: token('text-sm'),
+      fontWeight: token('weight-medium'),
+      hoverBackgroundColor: mix(token('color-foreground'), 5, 'transparent'),
+      hoverColor: token('color-foreground'),
+      paddingInline: token('space-sm'),
+      radius: token('radii-sm'),
+    },
     own: ['navigation-item-display', 'navigation-item-floor', 'navigation-item-justify'],
     stylesheet: 'navigation/item/navigation-item.generated.css',
   },
@@ -50,16 +50,16 @@ export default styles(
       rule({
         alignItems: 'center',
         backgroundColor: 'transparent',
-        borderRadius: hook.radius(token('radii-sm')),
-        color: hook.color(token('color-foreground-muted')),
-        cursor: web('pointer'),
+        borderRadius: hook.radius,
+        color: hook.color,
+        web: { cursor: 'pointer' },
         display: 'flex',
         flexGrow: 1,
         fontFamily: token('font-sans'),
-        fontSize: hook.fontSize(token('text-sm')),
-        fontWeight: hook.fontWeight(token('weight-medium')),
+        fontSize: hook.fontSize,
+        fontWeight: hook.fontWeight,
         justifyContent: own.justify('center'),
-        paddingInline: hook.paddingInline(token('space-sm')),
+        paddingInline: hook.paddingInline,
         textDecoration: 'none',
         transition: list(
           ['background-color', token('duration-fast'), token('easing-standard')],
@@ -70,18 +70,16 @@ export default styles(
       rule(
         { hover: true },
         {
-          backgroundColor: hook.hoverBackgroundColor(
-            mix(token('color-foreground'), 5, 'transparent'),
-          ),
-          color: hook.hoverColor(token('color-foreground')),
+          backgroundColor: hook.hoverBackgroundColor,
+          color: hook.hoverColor,
         },
       ),
       /* No surface of its own: the mark is the navigation's. */
       rule(
         { current: 'page' },
         {
-          color: hook.currentColor(token('color-foreground')),
-          fontWeight: hook.currentFontWeight(token('weight-semibold')),
+          color: hook.currentColor,
+          fontWeight: hook.currentFontWeight,
         },
       ),
       /* The ring turns inward, because the bar has no room to draw it outside. */

@@ -1,17 +1,18 @@
 import {
-  bind,
-  box,
-  derive,
-  event,
+  Announce,
+  bare,
+  boolean,
+  cancelable,
   headless,
-  layer,
-  live,
-  prop,
-  region,
-  toggle,
-  when,
-  wrap,
-} from '../../../tree.js'
+  Layer,
+  number,
+  oneOf,
+  Slot,
+  View,
+  Wrap,
+  web,
+} from '../../../render.js'
+import { derive, toggle } from '../../../tree.js'
 
 /**
  * Popover's headless tier: a panel that opens next to its trigger and holds
@@ -48,24 +49,21 @@ import {
  * the element has.
  */
 export default headless('popover', {
-  derived: { name: derive('popover-name') },
-  events: [
-    event('before-close', { cancelable: true, detail: ['open'] }),
-    event('before-open', { cancelable: true, detail: ['open'] }),
-    event('toggle', { bare: true, detail: ['newState', 'oldState'] }),
-  ],
-  props: [
-    prop('arrow', 'boolean', { default: false }),
-    prop('cross-offset', 'number', { default: 0 }),
-    prop('default-open', 'boolean', { default: false }),
-    prop('fallback-label', 'string', { default: 'Popover' }),
-    prop('flip', 'boolean', { default: true }),
-    prop('label', 'string', { default: '' }),
-    prop('modal', 'boolean', { default: false }),
-    prop('offset', 'number', { default: 4 }),
-    prop('open', 'boolean'),
-    prop(
-      'placement',
+  props: {
+    /* `anchor` is an element by its id, and `containerPadding` the room kept
+       from the window's edges. */
+    anchor: web(''),
+    arrow: false,
+    containerPadding: web(number()),
+    crossOffset: 0,
+    defaultOpen: false,
+    fallbackLabel: 'Popover',
+    flip: true,
+    label: '',
+    modal: false,
+    offset: 4,
+    open: boolean(),
+    placement: oneOf(
       [
         'bottom',
         'bottom-end',
@@ -80,12 +78,14 @@ export default headless('popover', {
         'top-end',
         'top-start',
       ],
-      { default: 'bottom-start' },
+      'bottom-start',
     ),
-    /* An element by its id, and the room kept from the window's edges. */
-    prop('anchor', 'string', { default: '', platform: 'web' }),
-    prop('container-padding', 'number', { platform: 'web' }),
-  ],
+  },
+  events: {
+    beforeClose: cancelable(['open']),
+    beforeOpen: cancelable(['open']),
+    toggle: bare(['newState', 'oldState']),
+  },
   states: [
     'aligned-end',
     'aligned-start',
@@ -98,6 +98,9 @@ export default headless('popover', {
     'placed-top',
     'settled',
   ],
+  derived: {
+    name: derive('popover-name'),
+  },
   toggle: toggle({
     changes: 'toggle',
     checked: 'open',
@@ -105,42 +108,54 @@ export default headless('popover', {
     initial: 'default-open',
     opens: 'before-open',
   }),
-  tree: [
-    /* The trigger's own box on a phone, which the panel is placed against.
-       The web places it against the trigger passed in. */
-    wrap('trigger', { platform: 'native', while: true }, [region('trigger')]),
-    layer(
-      'surface',
-      {
-        anchor: 'trigger',
-        arrow: 'arrow',
-        closedby: 'any',
-        'cross-offset': bind('cross-offset'),
-        flip: bind('flip'),
-        label: bind('name'),
-        modal: bind('modal'),
-        offset: bind('offset'),
-        open: bind('open'),
-        placement: bind('placement'),
-        presses: 'toggle',
-        role: 'dialog',
-      },
-      [
-        when(
-          'arrow',
-          box('arrow', {
-            also: {
-              'arrow-bottom': bind('placed-bottom'),
-              'arrow-left': bind('placed-left'),
-              'arrow-right': bind('placed-right'),
-              'arrow-top': bind('placed-top'),
-            },
-            decorative: true,
-          }),
-        ),
-        box('content', {}, [region('default')]),
-        live('opening', { arrives: true, platform: 'native', says: bind('name') }),
-      ],
-    ),
-  ],
+  render: ({ derived, props, state }) => (
+    <>
+      {/* The trigger's own box on a phone, which the panel is placed against.
+          The web places it against the trigger passed in. */}
+      <Wrap
+        part="trigger"
+        platform="native"
+      >
+        <Slot name="trigger" />
+      </Wrap>
+      <Layer
+        anchor="trigger"
+        arrow="arrow"
+        closedby="any"
+        cross-offset={props.crossOffset}
+        flip={props.flip}
+        label={derived.name}
+        modal={props.modal}
+        offset={props.offset}
+        open={props.open}
+        part="surface"
+        placement={props.placement}
+        presses="toggle"
+        role="dialog"
+      >
+        {props.arrow && (
+          <View
+            also={{
+              'arrow-bottom': state.placedBottom,
+              'arrow-left': state.placedLeft,
+              'arrow-right': state.placedRight,
+              'arrow-top': state.placedTop,
+            }}
+            ariaHidden
+            part="arrow"
+          />
+        )}
+        <View part="content">
+          <Slot />
+        </View>
+        <Announce
+          arrives
+          part="opening"
+          platform="native"
+        >
+          {derived.name}
+        </Announce>
+      </Layer>
+    </>
+  ),
 })

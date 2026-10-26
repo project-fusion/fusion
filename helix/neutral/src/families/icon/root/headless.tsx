@@ -1,4 +1,4 @@
-import { bind, box, event, headless, not, prop } from '../../../tree.js'
+import { bare, headless, View, web } from '../../../render.js'
 
 /**
  * Icon's headless tier: what it takes, what it sends, and its one part.
@@ -20,23 +20,24 @@ import { bind, box, event, headless, not, prop } from '../../../tree.js'
  * prop here.
  */
 export default headless('icon', {
-  events: [
-    event('error', { bare: true, platform: 'web' }),
-    event('load', { bare: true, platform: 'web' }),
-  ],
-  props: [
-    prop('label', 'string', { default: '' }),
-    prop('mirror', 'boolean', { default: false }),
-    prop('name', 'string', { default: '' }),
-    prop('src', 'string', { default: '', platform: 'web' }),
-  ],
+  props: {
+    label: '',
+    mirror: false,
+    name: '',
+    src: web(''),
+  },
+  events: {
+    error: web(bare()),
+    load: web(bare()),
+  },
   states: ['settled'],
-  tree: [
-    box('svg', {
-      decorative: not('label'),
-      glyph: bind('name'),
-      label: bind('label'),
-      role: 'img',
-    }),
-  ],
+  render: ({ props }) => (
+    <View
+      ariaHidden={!props.label}
+      icon={props.name}
+      label={props.label}
+      part="svg"
+      role="img"
+    />
+  ),
 })

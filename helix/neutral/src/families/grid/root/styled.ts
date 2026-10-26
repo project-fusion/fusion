@@ -30,7 +30,11 @@ export default styles(
   root,
   {
     prefix: 'grid',
-    hooks: ['areas', 'columns', 'rows'],
+    hooks: {
+      areas: 'none',
+      columns: null,
+      rows: 'none',
+    },
     own: ['grid-column-gap', 'grid-gap', 'grid-row-gap'],
     stylesheet: 'grid/root/grid-root.generated.css',
   },
@@ -39,9 +43,9 @@ export default styles(
       rule({
         columnGap: own.columnGap,
         display: 'grid',
-        gridTemplateAreas: web(hook.areas('none')),
+        web: { gridTemplateAreas: hook.areas },
         gridTemplateColumns: hook.columns(derived('grid-template', 'minmax(0, 1fr)')),
-        gridTemplateRows: hook.rows('none'),
+        gridTemplateRows: hook.rows,
         rowGap: own.rowGap,
         own: { columnGap: own.gap, gap: token('space-none'), rowGap: own.gap },
       }),
@@ -111,9 +115,11 @@ export default styles(
         end: { justifyItems: 'end' },
       }),
       /* A phone places each cell in row order. */
-      rule({ 'auto-flow': 'column', platform: 'web' }, { gridAutoFlow: 'column' }),
-      rule({ 'auto-flow': 'dense', platform: 'web' }, { gridAutoFlow: 'dense' }),
-      rule({ 'auto-flow': 'column-dense', platform: 'web' }, { gridAutoFlow: 'column dense' }),
+      web([
+        rule({ 'auto-flow': 'column' }, { gridAutoFlow: 'column' }),
+        rule({ 'auto-flow': 'dense' }, { gridAutoFlow: 'dense' }),
+        rule({ 'auto-flow': 'column-dense' }, { gridAutoFlow: 'column dense' }),
+      ]),
     ]),
     /* A child that spans columns. */
     on({ slotted: '[data-grid-span="full"]' }, [rule({ gridColumn: '1 / -1' })]),

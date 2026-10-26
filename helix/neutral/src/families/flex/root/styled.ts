@@ -1,5 +1,5 @@
 import printEconomy from '../../../fragments/print-economy.js'
-import { difference, product, token } from '../../../style.js'
+import { difference, native, product, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -37,7 +37,11 @@ export default styles(
   root,
   {
     prefix: 'flex',
-    hooks: ['flank-min', 'flank-size', 'switch-at'],
+    hooks: {
+      flankMin: '50%',
+      flankSize: 'auto',
+      switchAt: '30rem',
+    },
     own: ['flex-column-gap', 'flex-gap', 'flex-row-gap'],
     stylesheet: 'flex/root/flex-root.generated.css',
   },
@@ -134,21 +138,21 @@ export default styles(
           { child: 'first', layout: 'flank' },
           { child: 'last', layout: 'flank-end' },
         ],
-        { flexBasis: hook.flankSize('auto'), flexGrow: 1 },
+        { flexBasis: hook.flankSize, flexGrow: 1 },
       ),
       rule(
         [
           { child: 'last', layout: 'flank' },
           { child: 'first', layout: 'flank-end' },
         ],
-        { flexBasis: 0, flexGrow: 999, minInlineSize: hook.flankMin('50%') },
+        { flexBasis: 0, flexGrow: 999, minInlineSize: hook.flankMin },
       ),
       rule(
         { layout: 'switch' },
-        { flexBasis: product(difference(hook.switchAt('30rem'), '100%'), 999), flexGrow: 1 },
+        { flexBasis: product(difference(hook.switchAt, '100%'), 999), flexGrow: 1 },
       ),
       /* A view does not shrink unless it says so, and a flex item does. */
-      rule({ layout: 'switch', platform: 'native' }, { flexShrink: 1 }),
+      native([rule({ layout: 'switch' }, { flexShrink: 1 })]),
     ]),
     /* Layout only, and it keeps its own. */
     include(printEconomy),

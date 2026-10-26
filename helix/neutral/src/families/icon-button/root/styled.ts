@@ -1,6 +1,6 @@
 import iconButtonFloating from '../../../fragments/icon-button-floating.js'
 import iconButtonTones from '../../../fragments/icon-button-tones.js'
-import { hookOf, inherit, list, mix, token, web } from '../../../style.js'
+import { first, hookOf, inherit, list, mix, native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -29,20 +29,20 @@ export default styles(
   root,
   {
     prefix: 'icon-button',
-    hooks: [
-      'background-color',
-      'background-color-active',
-      'background-color-hover',
-      'border-color',
-      'border-width',
-      'foreground-color',
-      'foreground-color-active',
-      'radius',
-      'size',
-      'spinner-color',
-      'spinner-duration',
-      'spinner-size',
-    ],
+    hooks: ({ own }) => ({
+      backgroundColor: null,
+      backgroundColorActive: null,
+      backgroundColorHover: null,
+      borderColor: null,
+      borderWidth: token('border-thin'),
+      foregroundColor: null,
+      foregroundColorActive: null,
+      radius: token('radii-sm'),
+      size: token('size-control'),
+      spinnerColor: 'currentColor',
+      spinnerDuration: own.turn,
+      spinnerSize: '1.15em',
+    }),
     own: [
       'icon-button-crawl',
       'icon-button-edge',
@@ -67,7 +67,7 @@ export default styles(
     stylesheet: 'icon-button/root/icon-button-root.generated.css',
   },
   ({ hook, include, keyframes, on, own, rule }) => [
-    on('host', [rule({ display: 'inline-flex', own: { size: hook.size(token('size-control')) } })]),
+    on('host', [rule({ display: 'inline-flex', own: { size: hook.size } })]),
     include(iconButtonTones),
     /* Square by construction: one length for both sides, so the control stays
        the same box whatever glyph it holds. The edge is written in longhands,
@@ -76,35 +76,35 @@ export default styles(
     on('button', [
       rule({
         alignItems: 'center',
-        backgroundColor: own.pressedFill(hook.backgroundColor('transparent')),
+        backgroundColor: first(own.pressedFill, hook.backgroundColor, 'transparent'),
         blockSize: own.size,
         borderColor: hook.borderColor('transparent'),
         borderStyle: 'solid',
-        borderWidth: hook.borderWidth(token('border-thin')),
+        borderWidth: hook.borderWidth,
         /* A corner apiece, read from Button's corner hooks, so a Button Group
            flattens the corners it joins on an icon button as on a button. */
-        borderEndEndRadius: hookOf(
-          'button',
-          'radius-end-end',
-          hookOf('button', 'radius-end', hook.radius(token('radii-sm'))),
+        borderEndEndRadius: first(
+          hookOf('button', 'radius-end-end'),
+          hookOf('button', 'radius-end'),
+          hook.radius,
         ),
-        borderEndStartRadius: hookOf(
-          'button',
-          'radius-end-start',
-          hookOf('button', 'radius-start', hook.radius(token('radii-sm'))),
+        borderEndStartRadius: first(
+          hookOf('button', 'radius-end-start'),
+          hookOf('button', 'radius-start'),
+          hook.radius,
         ),
-        borderStartEndRadius: hookOf(
-          'button',
-          'radius-start-end',
-          hookOf('button', 'radius-end', hook.radius(token('radii-sm'))),
+        borderStartEndRadius: first(
+          hookOf('button', 'radius-start-end'),
+          hookOf('button', 'radius-end'),
+          hook.radius,
         ),
-        borderStartStartRadius: hookOf(
-          'button',
-          'radius-start-start',
-          hookOf('button', 'radius-start', hook.radius(token('radii-sm'))),
+        borderStartStartRadius: first(
+          hookOf('button', 'radius-start-start'),
+          hookOf('button', 'radius-start'),
+          hook.radius,
         ),
-        color: own.pressedInk(hook.foregroundColor(own.ink)),
-        cursor: web('pointer'),
+        color: first(own.pressedInk, hook.foregroundColor, own.ink),
+        web: { cursor: 'pointer' },
         display: 'inline-flex',
         /* A browser gives a button its own font, which the first content that
            is not an icon would show. */
@@ -121,18 +121,21 @@ export default styles(
          the button sits on in either mode. A rung of the surface ladder vanished
          inside a menu, a dialog, or a popover in dark mode. */
       rule(
-        { disabled: false, hover: true },
+        { within: { host: { disabled: false } }, hover: true },
         {
-          backgroundColor: own.pressedFill(
-            hook.backgroundColorHover(hook.backgroundColor(mix(own.tone, 8, 'transparent'))),
+          backgroundColor: first(
+            own.pressedFill,
+            hook.backgroundColorHover,
+            hook.backgroundColor,
+            mix(own.tone, 8, 'transparent'),
           ),
-          color: own.pressedInk(hook.foregroundColor(own.inkHover)),
+          color: first(own.pressedInk, hook.foregroundColor, own.inkHover),
         },
       ),
       /* Pressed: the two values every color rule reads through, from the
          `-active` hooks alone. */
       rule(
-        { active: true, disabled: false },
+        { active: true, within: { host: { disabled: false } } },
         {
           own: {
             pressedFill: hook.backgroundColorActive(),
@@ -152,18 +155,21 @@ export default styles(
       rule(
         { emphasis: 'solid' },
         {
-          backgroundColor: own.pressedFill(hook.backgroundColor(own.fill)),
+          backgroundColor: first(own.pressedFill, hook.backgroundColor, own.fill),
           borderColor: hook.borderColor('transparent'),
-          color: own.pressedInk(hook.foregroundColor(own.onTone)),
+          color: first(own.pressedInk, hook.foregroundColor, own.onTone),
         },
       ),
       rule(
-        { disabled: false, emphasis: 'solid', hover: true },
+        { within: { host: { disabled: false } }, emphasis: 'solid', hover: true },
         {
-          backgroundColor: own.pressedFill(
-            hook.backgroundColorHover(hook.backgroundColor(own.fillHover)),
+          backgroundColor: first(
+            own.pressedFill,
+            hook.backgroundColorHover,
+            hook.backgroundColor,
+            own.fillHover,
           ),
-          color: own.pressedInk(hook.foregroundColor(own.onTone)),
+          color: first(own.pressedInk, hook.foregroundColor, own.onTone),
         },
       ),
       /* Framed, for a control beside a field, with the same 6% wash Button
@@ -172,83 +178,103 @@ export default styles(
       rule(
         { emphasis: 'outlined' },
         {
-          backgroundColor: own.pressedFill(hook.backgroundColor(mix(own.tone, 6, 'transparent'))),
-          borderColor: hook.borderColor(own.edge),
-          color: own.pressedInk(hook.foregroundColor(own.tone)),
+          backgroundColor: first(
+            own.pressedFill,
+            hook.backgroundColor,
+            mix(own.tone, 6, 'transparent'),
+          ),
+          borderColor: first(hook.borderColor, own.edge),
+          color: first(own.pressedInk, hook.foregroundColor, own.tone),
         },
       ),
       rule(
-        { disabled: false, emphasis: 'outlined', hover: true },
+        { within: { host: { disabled: false } }, emphasis: 'outlined', hover: true },
         {
-          backgroundColor: own.pressedFill(
-            hook.backgroundColorHover(hook.backgroundColor(mix(own.tone, 12, 'transparent'))),
+          backgroundColor: first(
+            own.pressedFill,
+            hook.backgroundColorHover,
+            hook.backgroundColor,
+            mix(own.tone, 12, 'transparent'),
           ),
-          color: own.pressedInk(hook.foregroundColor(own.tone)),
+          color: first(own.pressedInk, hook.foregroundColor, own.tone),
         },
       ),
       rule(
         { emphasis: 'subtle' },
         {
-          backgroundColor: own.pressedFill(hook.backgroundColor(mix(own.tone, 14, 'transparent'))),
+          backgroundColor: first(
+            own.pressedFill,
+            hook.backgroundColor,
+            mix(own.tone, 14, 'transparent'),
+          ),
           borderColor: hook.borderColor('transparent'),
-          color: own.pressedInk(hook.foregroundColor(own.tone)),
+          color: first(own.pressedInk, hook.foregroundColor, own.tone),
         },
       ),
       rule(
-        { disabled: false, emphasis: 'subtle', hover: true },
+        { within: { host: { disabled: false } }, emphasis: 'subtle', hover: true },
         {
-          backgroundColor: own.pressedFill(
-            hook.backgroundColorHover(hook.backgroundColor(mix(own.tone, 22, 'transparent'))),
+          backgroundColor: first(
+            own.pressedFill,
+            hook.backgroundColorHover,
+            hook.backgroundColor,
+            mix(own.tone, 22, 'transparent'),
           ),
-          color: own.pressedInk(hook.foregroundColor(own.tone)),
+          color: first(own.pressedInk, hook.foregroundColor, own.tone),
         },
       ),
       /* `:disabled` on the host, which a form's disabled fieldset sets too. */
-      rule({ disabled: true }, { cursor: web('not-allowed'), opacity: 0.5 }),
+      rule(
+        { within: { host: { disabled: true } } },
+        { web: { cursor: 'not-allowed' }, opacity: 0.5 },
+      ),
       /* **Pending: the icon stays where it is, unseen, and a ring turns over
          it**, as on Button. The ring is the `spinner` part, drawn only while
          pending. */
-      rule({ state: 'pending' }, { cursor: web('progress'), position: 'relative' }),
+      rule({ pending: true }, { web: { cursor: 'progress' }, position: 'relative' }),
     ]),
     /* **Pressed by a Button Group, the solid fill**, as a Button takes it. The
        web group writes these hooks onto a pressed button's control. A phone's
        icon button reads the group's own hooks, with the same fallbacks. */
     on('host', [
-      rule(
-        { state: 'pressed', platform: 'native' },
-        {
-          '--icon-button-background-color': hookOf(
-            'button-group',
-            'pressed-background-color',
-            token('color-foreground'),
-          ),
-          '--icon-button-border-color': hookOf(
-            'button-group',
-            'pressed-border-color',
-            hookOf('button-group', 'pressed-background-color', token('color-foreground')),
-          ),
-          '--icon-button-foreground-color': hookOf(
-            'button-group',
-            'pressed-color',
-            token('color-background'),
-          ),
-        },
-      ),
+      native([
+        rule(
+          { pressed: true },
+          {
+            '--icon-button-background-color': hookOf(
+              'button-group',
+              'pressed-background-color',
+              token('color-foreground'),
+            ),
+            '--icon-button-border-color': first(
+              hookOf('button-group', 'pressed-border-color'),
+              hookOf('button-group', 'pressed-background-color'),
+              token('color-foreground'),
+            ),
+            '--icon-button-foreground-color': hookOf(
+              'button-group',
+              'pressed-color',
+              token('color-background'),
+            ),
+          },
+        ),
+      ]),
     ]),
-    on({ region: '*' }, [rule({ state: 'pending' }, { visibility: 'hidden' })]),
+    on({ region: '*' }, [rule({ pending: true }, { visibility: 'hidden' })]),
     on('spinner', [
       rule({
-        animation: ['helix-icon-button-turn', hook.spinnerDuration(own.turn), 'linear', 'infinite'],
-        blockSize: hook.spinnerSize('1.15em'),
-        border: [
-          token('border-thick'),
-          'solid',
-          mix(hook.spinnerColor('currentColor'), 30, 'transparent'),
+        animation: [
+          'helix-icon-button-turn',
+          first(hook.spinnerDuration, own.turn),
+          'linear',
+          'infinite',
         ],
-        borderBlockStartColor: hook.spinnerColor('currentColor'),
+        blockSize: hook.spinnerSize,
+        border: [token('border-thick'), 'solid', mix(hook.spinnerColor, 30, 'transparent')],
+        borderBlockStartColor: hook.spinnerColor,
         borderRadius: token('radii-full'),
         boxSizing: 'border-box',
-        inlineSize: hook.spinnerSize('1.15em'),
+        inlineSize: hook.spinnerSize,
         inset: 0,
         margin: 'auto',
         position: 'absolute',

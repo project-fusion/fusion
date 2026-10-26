@@ -1,17 +1,16 @@
 import {
-  bind,
-  box,
-  derive,
-  event,
+  Announce,
+  bare,
+  boolean,
+  cancelable,
   headless,
-  layer,
-  live,
-  pressable,
-  prop,
-  region,
-  toggle,
-  when,
-} from '../../../tree.js'
+  Layer,
+  oneOf,
+  Pressable,
+  Slot,
+  View,
+} from '../../../render.js'
+import { derive, toggle } from '../../../tree.js'
 
 /**
  * Drawer's headless tier: a panel that slides in from an edge of the
@@ -58,33 +57,33 @@ import {
  * the element has.
  */
 export default headless('drawer', {
+  props: {
+    closedby: oneOf(['any', 'closerequest', 'none']),
+    defaultOpen: false,
+    dismissible: false,
+    dismissLabel: 'Close',
+    fallbackLabel: 'Drawer',
+    label: '',
+    modal: true,
+    open: boolean(),
+    persistent: false,
+    placement: oneOf(['start', 'end', 'top', 'bottom']),
+    snapPoints: '',
+    swipe: true,
+  },
+  events: {
+    beforeClose: cancelable(['open']),
+    beforeOpen: cancelable(['open']),
+    close: bare(),
+    toggle: bare(['newState', 'oldState']),
+  },
+  states: ['entering', 'exiting', 'open', 'settled', 'snapped'],
   derived: {
-    'dismiss-name': derive('drawer-dismiss-name'),
     dismissal: derive('drawer-dismissal'),
+    dismissName: derive('drawer-dismiss-name'),
     edge: derive('drawer-edge'),
     name: derive('drawer-name'),
   },
-  events: [
-    event('before-close', { cancelable: true, detail: ['open'] }),
-    event('before-open', { cancelable: true, detail: ['open'] }),
-    event('close', { bare: true }),
-    event('toggle', { bare: true, detail: ['newState', 'oldState'] }),
-  ],
-  props: [
-    prop('closedby', ['any', 'closerequest', 'none']),
-    prop('default-open', 'boolean', { default: false }),
-    prop('dismiss-label', 'string', { default: 'Close' }),
-    prop('dismissible', 'boolean', { default: false }),
-    prop('fallback-label', 'string', { default: 'Drawer' }),
-    prop('label', 'string', { default: '' }),
-    prop('modal', 'boolean', { default: true }),
-    prop('open', 'boolean'),
-    prop('persistent', 'boolean', { default: false }),
-    prop('placement', ['start', 'end', 'top', 'bottom']),
-    prop('snap-points', 'string', { default: '' }),
-    prop('swipe', 'boolean', { default: true }),
-  ],
-  states: ['entering', 'exiting', 'open', 'settled', 'snapped'],
   toggle: toggle({
     changes: 'toggle',
     checked: 'open',
@@ -93,31 +92,50 @@ export default headless('drawer', {
     initial: 'default-open',
     opens: 'before-open',
   }),
-  tree: [
-    layer(
-      'panel',
-      {
-        closedby: bind('dismissal'),
-        edge: bind('edge'),
-        label: bind('name'),
-        modal: bind('modal'),
-        open: bind('open'),
-        role: 'dialog',
-        snap: bind('snap-points'),
-        swipe: bind('swipe'),
-      },
-      [
-        box('header', {}, [region('header')]),
-        box('content', {}, [region('default')]),
-        box('footer', {}, [region('footer')]),
-        when(
-          'dismissible',
-          pressable('dismiss', { label: bind('dismiss-name'), role: 'button', toggles: true }, [
-            region('dismiss-icon', {}, [box('dismiss-mark', { decorative: true, glyph: 'x' })]),
-          ]),
-        ),
-        live('opening', { arrives: true, platform: 'native', says: bind('name') }),
-      ],
-    ),
-  ],
+  render: ({ derived, props }) => (
+    <Layer
+      closedby={derived.dismissal}
+      edge={derived.edge}
+      label={derived.name}
+      modal={props.modal}
+      open={props.open}
+      part="panel"
+      role="dialog"
+      snap={props.snapPoints}
+      swipe={props.swipe}
+    >
+      <View part="header">
+        <Slot name="header" />
+      </View>
+      <View part="content">
+        <Slot />
+      </View>
+      <View part="footer">
+        <Slot name="footer" />
+      </View>
+      {props.dismissible && (
+        <Pressable
+          label={derived.dismissName}
+          part="dismiss"
+          role="button"
+          toggles
+        >
+          <Slot name="dismiss-icon">
+            <View
+              ariaHidden
+              icon="x"
+              part="dismiss-mark"
+            />
+          </Slot>
+        </Pressable>
+      )}
+      <Announce
+        arrives
+        part="opening"
+        platform="native"
+      >
+        {derived.name}
+      </Announce>
+    </Layer>
+  ),
 })

@@ -1,4 +1,4 @@
-import { difference, list, product, quotient, token, web } from '../../../style.js'
+import { difference, list, native, product, quotient, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import item from './headless.js'
 
@@ -41,7 +41,7 @@ export default styles(
         backgroundColor: 'transparent',
         borderRadius: token('radii-sm'),
         color: token('color-foreground-muted'),
-        cursor: web('pointer'),
+        web: { cursor: 'pointer' },
         display: 'flex',
         fontFamily: token('font-sans'),
         fontSize: token('text-sm'),
@@ -69,16 +69,12 @@ export default styles(
       }),
       /* A phone stands the icon or the dot beside the words, which hold
          the name over the line about it. */
-      rule(
-        [
-          { filled: 'description', platform: 'native' },
-          { filled: 'icon', platform: 'native' },
-        ],
-        {
+      native([
+        rule([{ filled: 'description' }, { filled: 'icon' }], {
           display: 'flex',
           flexDirection: 'row',
-        },
-      ),
+        }),
+      ]),
       rule({ hover: true }, { color: token('color-foreground') }),
       rule(
         { current: 'page' },
@@ -100,17 +96,16 @@ export default styles(
       }),
     ]),
     on('words', [
-      rule(
-        { platform: 'native' },
-        {
+      native([
+        rule({
           display: 'flex',
           flexDirection: 'column',
           flexGrow: 1,
           flexShrink: 1,
           gap: token('space-2xs'),
           minInlineSize: 0,
-        },
-      ),
+        }),
+      ]),
     ]),
     /* No color of its own. */
     on({ region: 'icon', slotted: '*' }, [
@@ -145,16 +140,18 @@ export default styles(
       ),
       /* A phone's row centers nothing on the name's line, so the dot is set
          down by half the room the line has around it. */
-      rule(
-        { filled: { description: true, icon: false }, platform: 'native' },
-        {
-          alignSelf: 'flex-start',
-          marginBlockStart: quotient(
-            difference(product(token('text-sm'), token('leading-normal')), token('space-xs')),
-            2,
-          ),
-        },
-      ),
+      native([
+        rule(
+          { filled: { description: true, icon: false } },
+          {
+            alignSelf: 'flex-start',
+            marginBlockStart: quotient(
+              difference(product(token('text-sm'), token('leading-normal')), token('space-xs')),
+              2,
+            ),
+          },
+        ),
+      ]),
       rule(
         { current: 'page', filled: { description: true, icon: false } },
         {

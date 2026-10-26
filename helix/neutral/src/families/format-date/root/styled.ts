@@ -1,4 +1,3 @@
-import { web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -27,7 +26,7 @@ export default styles(
       rule({ elapsed: true }, { fontVariantNumeric: 'tabular-nums' }),
     ]),
     on({ after: 'time' }, [
-      rule({ elapsed: true, print: true }, { content: web('" (" attr(datetime) ")"') }),
+      rule({ elapsed: true, print: true }, { web: { content: '" (" attr(datetime) ")"' } }),
     ]),
   ],
 )

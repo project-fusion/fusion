@@ -1,4 +1,4 @@
-import { bind, box, headless, live, not, prop, region, text, when } from '../../../tree.js'
+import { Announce, headless, number, Slot, Text, View } from '../../../render.js'
 
 /**
  * Empty's headless tier: what it takes and its regions.
@@ -22,31 +22,47 @@ import { bind, box, headless, live, not, prop, region, text, when } from '../../
  * has.
  */
 export default headless('empty', {
-  events: [],
-  props: [
-    prop('heading', 'string', { default: '' }),
-    prop('heading-level', 'number'),
-    prop('no-announce', 'boolean', { default: false }),
-  ],
+  props: {
+    heading: '',
+    headingLevel: number(),
+    noAnnounce: false,
+  },
+  events: {},
   states: ['has-actions', 'has-icon', 'settled'],
-  tree: [
-    region('icon', { part: 'icon' }),
-    region('heading', {}, [
-      when(
-        'heading',
-        box('heading', { level: bind('heading-level'), role: 'heading' }, [
-          text('heading-words', { says: bind('heading') }),
-        ]),
-      ),
-    ]),
-    region('default', { part: 'message' }),
-    region('actions', { part: 'actions' }),
-    live('live', { platform: 'web' }),
-    live('arrival', {
-      arrives: true,
-      platform: 'native',
-      says: bind('heading'),
-      while: not('no-announce'),
-    }),
-  ],
+  render: ({ props }) => (
+    <>
+      <Slot
+        name="icon"
+        part="icon"
+      />
+      <Slot name="heading">
+        {props.heading && (
+          <View
+            level={props.headingLevel}
+            part="heading"
+            role="heading"
+          >
+            <Text part="heading-words">{props.heading}</Text>
+          </View>
+        )}
+      </Slot>
+      <Slot part="message" />
+      <Slot
+        name="actions"
+        part="actions"
+      />
+      <Announce
+        part="live"
+        platform="web"
+      />
+      <Announce
+        arrives
+        part="arrival"
+        platform="native"
+        when={!props.noAnnounce}
+      >
+        {props.heading}
+      </Announce>
+    </>
+  ),
 })

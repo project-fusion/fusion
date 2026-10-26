@@ -1,4 +1,14 @@
-import { bind, box, event, headless, item, pressable, prop, region, wrap } from '../../../tree.js'
+import {
+  cancelable,
+  headless,
+  oneOf,
+  Pressable,
+  Slot,
+  set,
+  View,
+  Wrap,
+  web,
+} from '../../../render.js'
 
 /**
  * A megamenu item's headless tier: one destination of a megamenu's panel,
@@ -32,36 +42,44 @@ import { bind, box, event, headless, item, pressable, prop, region, wrap } from 
  * manifest says the element has.
  */
 export default headless('megamenu-item', {
-  events: [
-    event('before-select', { cancelable: true, detail: ['value'] }),
-    event('select', { detail: ['value'] }),
-  ],
-  item: item('megamenu', { chooses: true, flag: 'current', value: 'href' }),
-  props: [
-    prop('current', ['date', 'location', 'page', 'step', 'time', 'true']),
-    prop('href', 'string', { default: '' }),
-    prop('rel', 'string', { default: '', platform: 'web' }),
-    prop('target', 'string', { default: '', platform: 'web' }),
-  ],
+  memberOf: set('megamenu', { flag: 'current', value: 'href' }),
+  props: {
+    current: oneOf(['date', 'location', 'page', 'step', 'time', 'true']),
+    href: '',
+    rel: web(''),
+    target: web(''),
+  },
+  events: {
+    beforeSelect: cancelable(['value']),
+    select: ['value'],
+  },
   states: ['has-description', 'has-icon', 'settled'],
-  tree: [
-    pressable(
-      'link',
-      {
-        chooses: true,
-        current: bind('current'),
-        href: bind('href'),
-        sends: 'before-select',
-      },
-      [
-        region('icon', { part: 'icon' }),
-        /* The name over the line about it on a phone, which the web stands
-           in the link's two rows. */
-        wrap('words', { platform: 'native', while: true }, [
-          box('name', {}, [region('default')]),
-          region('description', { part: 'description' }),
-        ]),
-      ],
-    ),
-  ],
+  render: ({ props, send }) => (
+    <Pressable
+      chooses
+      current={props.current}
+      href={props.href}
+      onPress={send.beforeSelect}
+      part="link"
+    >
+      <Slot
+        name="icon"
+        part="icon"
+      />
+      {/* The name over the line about it on a phone, which the web stands
+          in the link's two rows. */}
+      <Wrap
+        part="words"
+        platform="native"
+      >
+        <View part="name">
+          <Slot />
+        </View>
+        <Slot
+          name="description"
+          part="description"
+        />
+      </Wrap>
+    </Pressable>
+  ),
 })

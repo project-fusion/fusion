@@ -1,4 +1,4 @@
-import { bind, event, headless, item, pressable, prop, region } from '../../../tree.js'
+import { cancelable, headless, oneOf, Pressable, Slot, set, web } from '../../../render.js'
 
 /**
  * A navigation item's headless tier: one destination, a link that says
@@ -23,23 +23,27 @@ import { bind, event, headless, item, pressable, prop, region } from '../../../t
  * manifest says the element has.
  */
 export default headless('navigation-item', {
-  events: [
-    event('before-select', { cancelable: true, detail: ['value'] }),
-    event('select', { detail: ['value'] }),
-  ],
-  item: item('navigation', { chooses: true, flag: 'current', value: 'href' }),
-  props: [
-    prop('current', ['date', 'location', 'page', 'step', 'time', 'true']),
-    prop('href', 'string', { default: '' }),
-    prop('rel', 'string', { default: '', platform: 'web' }),
-    prop('target', 'string', { default: '', platform: 'web' }),
-  ],
+  memberOf: set('navigation', { flag: 'current', value: 'href' }),
+  props: {
+    current: oneOf(['date', 'location', 'page', 'step', 'time', 'true']),
+    href: '',
+    rel: web(''),
+    target: web(''),
+  },
+  events: {
+    beforeSelect: cancelable(['value']),
+    select: ['value'],
+  },
   states: ['settled'],
-  tree: [
-    pressable(
-      'link',
-      { chooses: true, current: bind('current'), href: bind('href'), sends: 'before-select' },
-      [region('default')],
-    ),
-  ],
+  render: ({ props, send }) => (
+    <Pressable
+      chooses
+      current={props.current}
+      href={props.href}
+      onPress={send.beforeSelect}
+      part="link"
+    >
+      <Slot />
+    </Pressable>
+  ),
 })

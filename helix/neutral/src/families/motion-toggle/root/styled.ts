@@ -1,4 +1,4 @@
-import { mix, token, web } from '../../../style.js'
+import { mix, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -19,7 +19,9 @@ export default styles(
   root,
   {
     prefix: 'motion-toggle',
-    hooks: ['background-color'],
+    hooks: {
+      backgroundColor: token('color-surface-overlay'),
+    },
     stylesheet: 'motion-toggle/root/motion-toggle-root.generated.css',
   },
   ({ hook, on, rule }) => [
@@ -31,12 +33,12 @@ export default styles(
     on('button', [
       rule({
         alignItems: 'center',
-        backgroundColor: hook.backgroundColor(token('color-surface-overlay')),
+        backgroundColor: hook.backgroundColor,
         border: [token('border-floating'), 'solid', token('color-border')],
         borderRadius: token('radii-sm'),
         boxShadow: token('shadow-floating'),
         color: token('color-foreground'),
-        cursor: web('pointer'),
+        web: { cursor: 'pointer' },
         display: 'inline-flex',
         fontFamily: token('font-sans'),
         fontSize: token('text-sm'),
@@ -51,11 +53,7 @@ export default styles(
       rule(
         { hover: true },
         {
-          backgroundColor: mix(
-            token('color-foreground'),
-            10,
-            hook.backgroundColor(token('color-surface-overlay')),
-          ),
+          backgroundColor: mix(token('color-foreground'), 10, hook.backgroundColor),
         },
       ),
       rule(
@@ -67,39 +65,26 @@ export default styles(
       ),
       /* Paused: the button reads pressed, in the ink of a chosen control. */
       rule(
-        { state: 'paused' },
+        { paused: true },
         {
-          backgroundColor: mix(
-            token('color-foreground'),
-            16,
-            hook.backgroundColor(token('color-surface-overlay')),
-          ),
+          backgroundColor: mix(token('color-foreground'), 16, hook.backgroundColor),
         },
       ),
-      rule({ forcedColors: true }, { borderColor: web('ButtonText') }),
+      rule({ forcedColors: true }, { web: { borderColor: 'ButtonText' } }),
       rule(
-        { forcedColors: true, state: 'paused' },
-        { backgroundColor: web('Highlight'), color: web('HighlightText') },
+        { forcedColors: true, paused: true },
+        { web: { backgroundColor: 'Highlight', color: 'HighlightText' } },
       ),
     ]),
     on('icon', [rule({ display: 'inline-flex' })]),
     on({ part: 'icon', selector: '[part="icon"] svg,\n[part="icon"] ::slotted(*)' }, [
-      rule(
-        { platform: 'web' },
-        { blockSize: token('size-icon-sm'), inlineSize: token('size-icon-sm') },
-      ),
+      web([rule({ blockSize: token('size-icon-sm'), inlineSize: token('size-icon-sm') })]),
     ]),
     on('glyph', [
-      rule(
-        { platform: 'native' },
-        { blockSize: token('size-icon-sm'), inlineSize: token('size-icon-sm') },
-      ),
+      native([rule({ blockSize: token('size-icon-sm'), inlineSize: token('size-icon-sm') })]),
     ]),
     on({ region: 'icon', slotted: '*' }, [
-      rule(
-        { platform: 'native' },
-        { blockSize: token('size-icon-sm'), inlineSize: token('size-icon-sm') },
-      ),
+      native([rule({ blockSize: token('size-icon-sm'), inlineSize: token('size-icon-sm') })]),
     ]),
   ],
 )

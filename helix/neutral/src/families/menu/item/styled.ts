@@ -1,4 +1,16 @@
-import { fn, hookOf, list, measured, mix, product, sum, token, web } from '../../../style.js'
+import {
+  first,
+  fn,
+  hookOf,
+  list,
+  measured,
+  mix,
+  native,
+  product,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import row from './headless.js'
 
@@ -27,13 +39,13 @@ export default styles(
   row,
   {
     prefix: 'menu',
-    hooks: [
-      'item-description-color',
-      'item-detail-color',
-      'item-end',
-      'item-hover-color',
-      'item-start',
-    ],
+    hooks: {
+      itemDescriptionColor: token('color-foreground-muted'),
+      itemDetailColor: token('color-foreground-muted'),
+      itemEnd: '0px',
+      itemHoverColor: mix(token('color-foreground'), 8, 'transparent'),
+      itemStart: '0px',
+    },
     own: ['menu-from', 'menu-material-backdrop', 'menu-material-fill', 'menu-travel'],
     stylesheet: 'menu/item/menu-item.generated.css',
   },
@@ -41,7 +53,7 @@ export default styles(
     const fast = token('duration-fast')
     const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
     const column = sum(token('size-icon'), token('space-xs'))
-    const lit = hook.itemHoverColor(mix(token('color-foreground'), 8, 'transparent'))
+    const lit = hook.itemHoverColor
     const mark = {
       blockSize: token('size-icon'),
       gridColumn: 4,
@@ -57,30 +69,25 @@ export default styles(
           textDecoration: 'none',
           borderRadius: token('radii-none'),
           color: token('color-foreground'),
-          cursor: web('pointer'),
+          web: { cursor: 'pointer' },
           display: 'grid',
           fontSize: token('text-xs'),
           fontWeight: token('weight-medium'),
-          gridTemplateColumns: [
-            hook.itemStart('0px'),
-            fn('minmax', 0, '1fr'),
-            'auto',
-            hook.itemEnd('0px'),
-          ],
+          gridTemplateColumns: [hook.itemStart, fn('minmax', 0, '1fr'), 'auto', hook.itemEnd],
           minBlockSize: token('size-control'),
           paddingInline: token('space-sm'),
           transition: ['background-color', fast, token('easing-standard')],
           userSelect: 'none',
         }),
         rule({ hover: true }, { backgroundColor: lit }),
-        rule({ state: 'highlighted' }, { backgroundColor: lit }),
+        rule({ highlighted: true }, { backgroundColor: lit }),
         rule(
           { focusVisible: true },
           { outline: ring, outlineOffset: product(token('size-focus-offset'), '-1') },
         ),
         /* Dimmed by the row's own `disabled`, which holds in a filtered
            menu too, where the web marks the host disabled for the filter. */
-        rule({ has: 'disabled' }, { cursor: web('not-allowed'), opacity: 0.5 }),
+        rule({ has: 'disabled' }, { web: { cursor: 'not-allowed' }, opacity: 0.5 }),
       ]),
       on('start', [
         rule({
@@ -95,34 +102,31 @@ export default styles(
         }),
         rule({ gridColumn: 1 }),
         /* A phone keeps the column the page keeps, empty or not. */
-        rule(
-          { platform: 'native' },
-          { inlineSize: hook.itemStart('0px'), paddingInlineEnd: token('space-none') },
-        ),
-        rule({ platform: 'native', state: 'started' }, { paddingInlineEnd: token('space-xs') }),
+        native([
+          rule({ inlineSize: hook.itemStart, paddingInlineEnd: token('space-none') }),
+          rule({ started: true }, { paddingInlineEnd: token('space-xs') }),
+        ]),
       ]),
       /* A phone's label takes what the row leaves, over its description. */
       on('label', [
-        rule(
-          { platform: 'native' },
-          { display: 'flex', flex: '1 1 0', flexDirection: 'column', minInlineSize: 0 },
-        ),
+        native([
+          rule({ display: 'flex', flex: '1 1 0', flexDirection: 'column', minInlineSize: 0 }),
+        ]),
       ]),
       on('tail', [
-        rule(
-          { platform: 'native' },
-          {
+        native([
+          rule({
             alignItems: 'center',
             display: 'flex',
-            inlineSize: hook.itemEnd('0px'),
+            inlineSize: hook.itemEnd,
             justifyContent: 'flex-end',
-          },
-        ),
+          }),
+        ]),
       ]),
       on({ region: 'default' }, [rule({ display: 'block', gridColumn: 2, minInlineSize: 0 })]),
       on({ region: 'description' }, [
         rule({
-          color: hook.itemDescriptionColor(token('color-foreground-muted')),
+          color: hook.itemDescriptionColor,
           display: 'block',
           fontWeight: token('weight-regular'),
           gridColumn: 2,
@@ -131,7 +135,7 @@ export default styles(
         }),
       ]),
       on({ part: 'item', selector: 'slot[name="description"][data-empty]' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
+        web([rule({ display: 'none' })]),
       ]),
       /* Two lines outgrow the row's least height, so they take an inset. */
       on(
@@ -139,57 +143,57 @@ export default styles(
           part: 'item',
           selector: '[part="item"]:has(> slot[name="description"]:not([data-empty]))',
         },
-        [rule({ platform: 'web' }, { paddingBlock: token('space-xs') })],
+        [web([rule({ paddingBlock: token('space-xs') })])],
       ),
-      on('item', [
-        rule({ platform: 'native', state: 'described' }, { paddingBlock: token('space-xs') }),
-      ]),
+      on('item', [native([rule({ described: true }, { paddingBlock: token('space-xs') })])]),
       on('end', [
         rule({
           alignItems: 'center',
-          color: hook.itemDetailColor(token('color-foreground-muted')),
+          color: hook.itemDetailColor,
           display: 'flex',
           gap: token('space-2xs'),
           gridColumn: 3,
           paddingInlineStart: token('space-sm'),
         }),
         rule({ part: { 'data-empty': true } }, { display: 'none' }),
-        rule({ part: { hidden: true }, platform: 'native' }, { display: 'none' }),
+        native([rule({ hidden: true }, { display: 'none' })]),
       ]),
       /* A row with nothing before its label draws no box there, and the
          column the menu keeps still lines its label up with its neighbors'. */
-      on('start', [rule({ part: { 'data-empty': true }, platform: 'web' }, { display: 'none' })]),
+      on('start', [web([rule({ part: { 'data-empty': true } }, { display: 'none' })])]),
       on('mark', [rule(mark)]),
       on({ region: 'check', slotted: '*' }, [rule(mark)]),
       on({ region: 'chevron', slotted: '*' }, [rule(mark)]),
       on('mark', [
         rule({ color: token('color-foreground-subtle') }),
-        rule({ state: 'checked' }, { color: token('color-foreground') }),
+        rule({ checked: true }, { color: token('color-foreground') }),
         /* The caret points into the page, so it turns in a right-to-left
            page, as the web's mirror rule turns it. */
-        rule({ dir: 'rtl', platform: 'native', state: 'has-submenu' }, { scale: '-1 1' }),
+        native([rule({ dir: 'rtl', state: 'has-submenu' }, { scale: '-1 1' })]),
       ]),
       on({ region: 'chevron', slotted: '*' }, [rule({ color: token('color-foreground-subtle') })]),
       on({ region: 'check', slotted: '*' }, [rule({ color: token('color-foreground') })]),
       /* A row's page draws where the row stood. */
-      on({ region: 'submenu' }, [rule({ platform: 'web' }, { display: 'contents' })]),
+      on({ region: 'submenu' }, [web([rule({ display: 'contents' })])]),
       on({ region: 'submenu', slotted: 'helix-divider' }, [
         rule({ marginBlock: token('space-2xs') }),
       ]),
       /* **A row's page keeps its own columns**, as a flyout's panel does on
          the web: a phone draws the page's rows inside the row. */
       on({ region: 'submenu', slotted: '*' }, [
-        rule({ platform: 'native' }, { '--menu-item-start': '0px', '--menu-item-end': '0px' }),
-        rule({ platform: 'native', state: 'submenu-started' }, { '--menu-item-start': column }),
-        rule({ platform: 'native', state: 'submenu-marked' }, { '--menu-item-end': column }),
+        native([
+          rule({ '--menu-item-start': '0px', '--menu-item-end': '0px' }),
+          rule({ state: 'submenu-started' }, { '--menu-item-start': column }),
+          rule({ state: 'submenu-marked' }, { '--menu-item-end': column }),
+        ]),
       ]),
       /* The flyout, the menu's own surface beside the row. */
       on('surface', [
         rule({
-          backgroundColor: hookOf(
-            'menu',
-            'background-color',
-            own.materialFill(token('color-surface-overlay')),
+          backgroundColor: first(
+            hookOf('menu', 'background-color'),
+            own.materialFill,
+            token('color-surface-overlay'),
           ),
           border: [
             hookOf('menu', 'border-width', token('border-floating')),
@@ -198,15 +202,15 @@ export default styles(
           ],
           borderRadius: token('radii-sm'),
           boxShadow: hookOf('menu', 'shadow', token('shadow-floating')),
-          inset: web('auto'),
+          web: { inset: 'auto' },
           margin: token('space-none'),
         }),
       ]),
       on({ part: 'surface', selector: '[part="surface"][hidden]' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
+        web([rule({ display: 'none' })]),
       ]),
       on({ part: 'surface', selector: '[part="surface"]:not(:popover-open)' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
+        web([rule({ display: 'none' })]),
       ]),
       on('surface', [
         rule({
@@ -239,10 +243,7 @@ export default styles(
           transform: 'none',
           transition: 'none',
         }),
-        rule(
-          { platform: 'web', supports: 'not (overlay: auto)' },
-          { transitionBehavior: 'normal' },
-        ),
+        web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
         rule({
           '--menu-item-start': '0px',
           '--menu-item-end': '0px',

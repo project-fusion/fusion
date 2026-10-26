@@ -1,4 +1,4 @@
-import { mix, product, token, web } from '../../../style.js'
+import { mix, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -19,34 +19,34 @@ export default styles(
   root,
   {
     prefix: 'drilldown',
-    hooks: [
-      'back-color',
-      'back-hover-background-color',
-      'background-color',
-      'duration',
-      'header-block-size',
-      'header-border-color',
-      'inline-size',
-      'page-padding-block',
-      'title-color',
-      'title-font-size',
-      'title-font-weight',
-      'travel',
-    ],
+    hooks: {
+      backColor: token('color-foreground-muted'),
+      backHoverBackgroundColor: mix(token('color-foreground'), 8, 'transparent'),
+      backgroundColor: token('color-surface'),
+      duration: token('duration-normal'),
+      headerBlockSize: token('size-control'),
+      headerBorderColor: token('color-border'),
+      inlineSize: '100%',
+      pagePaddingBlock: token('space-2xs'),
+      titleColor: token('color-foreground'),
+      titleFontSize: token('text-sm'),
+      titleFontWeight: token('weight-medium'),
+      travel: '12%',
+    },
     own: ['drilldown-sign'],
     stylesheet: 'drilldown/root/drilldown-root.generated.css',
   },
   ({ hook, keyframes, on, own, rule }) => {
     const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
-    const travel = product(hook.travel('12%'), own.sign(1))
-    const duration = hook.duration(token('duration-normal'))
+    const travel = product(hook.travel, own.sign(1))
+    const duration = hook.duration
     return [
       on('host', [
         rule({
-          backgroundColor: hook.backgroundColor(token('color-surface')),
+          backgroundColor: hook.backgroundColor,
           blockSize: 'fit-content',
           display: 'block',
-          inlineSize: hook.inlineSize('100%'),
+          inlineSize: hook.inlineSize,
           overflow: 'hidden',
         }),
         rule({ print: true }, { display: 'none' }),
@@ -55,12 +55,8 @@ export default styles(
       on('header', [
         rule({
           alignItems: 'center',
-          blockSize: hook.headerBlockSize(token('size-control')),
-          borderBlockEnd: [
-            token('border-thin'),
-            'solid',
-            hook.headerBorderColor(token('color-border')),
-          ],
+          blockSize: hook.headerBlockSize,
+          borderBlockEnd: [token('border-thin'), 'solid', hook.headerBorderColor],
           display: 'flex',
           gap: token('space-2xs'),
           paddingInline: token('space-2xs'),
@@ -73,7 +69,7 @@ export default styles(
           blockSize: token('size-control-tight'),
           borderRadius: token('radii-sm'),
           boxSizing: 'border-box',
-          color: hook.backColor(token('color-foreground-muted')),
+          color: hook.backColor,
           cursor: web('pointer'),
           display: 'flex',
           inlineSize: token('size-control-tight'),
@@ -84,7 +80,7 @@ export default styles(
         rule({ blockSize: token('size-icon-tight'), inlineSize: token('size-icon-tight') }),
         /* The caret points back along the line, so it turns in a
            right-to-left page, as the web's mirror rule turns it. */
-        rule({ dir: 'rtl', platform: 'native' }, { scale: '-1 1' }),
+        native([rule({ dir: 'rtl' }, { scale: '-1 1' })]),
       ]),
       on({ region: 'back-icon', slotted: '*' }, [
         rule({ blockSize: token('size-icon-tight'), inlineSize: token('size-icon-tight') }),
@@ -93,9 +89,7 @@ export default styles(
         rule(
           { hover: true },
           {
-            backgroundColor: hook.backHoverBackgroundColor(
-              mix(token('color-foreground'), 8, 'transparent'),
-            ),
+            backgroundColor: hook.backHoverBackgroundColor,
             color: token('color-foreground'),
           },
         ),
@@ -103,10 +97,10 @@ export default styles(
       ]),
       on('title', [
         rule({
-          color: hook.titleColor(token('color-foreground')),
+          color: hook.titleColor,
           fontFamily: token('font-sans'),
-          fontSize: hook.titleFontSize(token('text-sm')),
-          fontWeight: hook.titleFontWeight(token('weight-medium')),
+          fontSize: hook.titleFontSize,
+          fontWeight: hook.titleFontWeight,
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
@@ -117,15 +111,15 @@ export default styles(
       on('page', [
         rule({
           own: { sign: 1 },
-          paddingBlock: hook.pagePaddingBlock(token('space-2xs')),
+          paddingBlock: hook.pagePaddingBlock,
         }),
         rule({ dir: 'rtl' }, { own: { sign: '-1' } }),
         rule(
-          { state: 'forward' },
+          { forward: true },
           { animation: ['drilldown-forward', duration, token('easing-decelerate')] },
         ),
         rule(
-          { state: 'back' },
+          { back: true },
           { animation: ['drilldown-back', duration, token('easing-decelerate')] },
         ),
       ]),
@@ -135,8 +129,8 @@ export default styles(
       }),
       /* The instant swap: the header and the title still say where you are. */
       on('page', [
-        rule({ reducedMotion: true, state: 'forward' }, { animation: 'none' }),
-        rule({ reducedMotion: true, state: 'back' }, { animation: 'none' }),
+        rule({ reducedMotion: true, forward: true }, { animation: 'none' }),
+        rule({ reducedMotion: true, back: true }, { animation: 'none' }),
       ]),
       /* What a collection says in place of rows, quiet and centered. */
       on(

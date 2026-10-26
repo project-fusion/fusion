@@ -3,6 +3,7 @@ import {
   fn,
   inherit,
   list,
+  native,
   product,
   quotient,
   sum,
@@ -28,19 +29,19 @@ export default styles(
   root,
   {
     prefix: 'kbd',
-    hooks: [
-      'background-color',
-      'block-size',
-      'border-color',
-      'color',
-      'font-family',
-      'font-size',
-      'font-weight',
-      'gap',
-      'padding-inline',
-      'radius',
-      'separator-color',
-    ],
+    hooks: {
+      backgroundColor: token('color-surface-sunken'),
+      blockSize: '1.5em',
+      borderColor: token('color-border'),
+      color: token('color-foreground-muted'),
+      fontFamily: token('font-mono'),
+      fontSize: '0.85em',
+      fontWeight: token('weight-medium'),
+      gap: token('space-2xs'),
+      paddingInline: '0.4em',
+      radius: token('radii-sm'),
+      separatorColor: token('color-foreground-muted'),
+    },
     own: ['kbd-height', 'kbd-inset', 'kbd-size'],
     stylesheet: 'kbd/root/kbd-root.generated.css',
   },
@@ -61,7 +62,7 @@ export default styles(
       on('host', [
         rule({
           font: inherit(),
-          own: { size: hook.fontSize('0.85em'), inset: hook.paddingInline('0.4em') },
+          own: { size: hook.fontSize, inset: hook.paddingInline },
         }),
         /* **The key is centered on the capitals of the words beside it.** `middle`
          on the face puts its middle half an x-height above this box's baseline,
@@ -71,37 +72,33 @@ export default styles(
          in a flex row. The height is in whole pixels, so the face is drawn at the
          height it is laid out at: unrounded, a 17.85px face drew 17px tall in
          Chromium and 18px in WebKit. */
-        rule(
-          { platform: 'web' },
-          {
+        web([
+          rule({
             display: 'inline-block',
             lineHeight: 0,
-            verticalAlign: web('calc(0.5cap - 0.5ex - 0.5px)'),
-            own: { height: fn('round', hook.blockSize('1.5em'), '1px') },
-          },
-        ),
+            web: { verticalAlign: 'calc(0.5cap - 0.5ex - 0.5px)' },
+            own: { height: fn('round', hook.blockSize, '1px') },
+          }),
+        ]),
         /* A phone lays the key out as a box in the line of words. */
-        rule(
-          { platform: 'native' },
-          { display: 'inline-flex', own: { height: hook.blockSize('1.5em') } },
-        ),
+        native([rule({ display: 'inline-flex', own: { height: hook.blockSize } })]),
         rule({ print: true }, { boxShadow: 'none' }),
       ]),
       on('kbd', [
         rule({
-          backgroundColor: hook.backgroundColor(token('color-surface-sunken')),
+          backgroundColor: hook.backgroundColor,
           blockSize: own.height,
-          border: [token('border-thin'), 'solid', hook.borderColor(token('color-border'))],
-          borderRadius: hook.radius(token('radii-sm')),
+          border: [token('border-thin'), 'solid', hook.borderColor],
+          borderRadius: hook.radius,
           /* One edge rather than a drop shadow: a key is pressed into the page. */
-          boxShadow: ['inset', 0, '-1px', 0, 0, hook.borderColor(token('color-border'))],
-          color: hook.color(token('color-foreground-muted')),
-          fontFamily: hook.fontFamily(token('font-mono')),
+          boxShadow: ['inset', 0, '-1px', 0, 0, hook.borderColor],
+          color: hook.color,
+          fontFamily: hook.fontFamily,
           /* A key label is literal: `<-` and `=>` must not become arrows. */
           fontFeatureSettings: list(['"liga"', 0], ['"calt"', 0]),
           fontSize: own.size,
           fontVariantLigatures: 'none',
-          fontWeight: hook.fontWeight(token('weight-medium')),
+          fontWeight: hook.fontWeight,
           /* Square at minimum, so one character is not a narrow sliver. */
           minInlineSize: own.height,
           paddingInline: own.inset,
@@ -109,23 +106,26 @@ export default styles(
           whiteSpace: 'nowrap',
         }),
         /* The label's line takes its height from the empty block below alone. */
-        rule(
-          { platform: 'web' },
-          { display: 'inline-block', lineHeight: 0, textAlign: 'center', verticalAlign: 'middle' },
-        ),
+        web([
+          rule({
+            display: 'inline-block',
+            lineHeight: 0,
+            textAlign: 'center',
+            verticalAlign: 'middle',
+          }),
+        ]),
         /* Centered in the box on a phone, and down by the floor: the inset shadow
          takes a pixel off the bottom, so centering in the box centers in the
          wrong one. */
-        rule(
-          { platform: 'native' },
-          {
+        native([
+          rule({
             alignItems: 'center',
             display: 'inline-flex',
             justifyContent: 'center',
             lineHeight: 1,
             paddingBlockStart: token('border-thin'),
-          },
-        ),
+          }),
+        ]),
         /* Under `caps` a chord is a key per key: the whole is a row of caps with
          a gap between, and each key takes the cap the whole took. The `+`
          between two keys keeps a line of its own, centered between them. */
@@ -136,7 +136,7 @@ export default styles(
             border: 0,
             boxShadow: 'none',
             display: 'inline-flex',
-            gap: hook.gap(token('space-2xs')),
+            gap: hook.gap,
             lineHeight: 1,
             minInlineSize: 0,
             padding: 0,
@@ -150,55 +150,57 @@ export default styles(
        the capitals where the face's ascent and descent did: 0.66px high for K
        and 0.95px high for Cmd on a 14px line in Chromium. */
       on({ before: 'kbd' }, [
-        rule(
-          { platform: 'web' },
-          {
+        web([
+          rule({
             blockSize: lift,
             content: '""',
             display: 'inline-block',
-          },
-        ),
-        rule({ caps: true, platform: 'web' }, { content: 'none' }),
+          }),
+          rule({ caps: true }, { content: 'none' }),
+        ]),
       ]),
       on({ before: 'key' }, [
-        rule(
-          { caps: true, platform: 'web' },
-          {
-            blockSize: lift,
-            content: '""',
-            display: 'inline-block',
-          },
-        ),
+        web([
+          rule(
+            { caps: true },
+            {
+              blockSize: lift,
+              content: '""',
+              display: 'inline-block',
+            },
+          ),
+        ]),
       ]),
       on('key', [
         rule(
           { caps: true },
           {
-            backgroundColor: hook.backgroundColor(token('color-surface-sunken')),
+            backgroundColor: hook.backgroundColor,
             blockSize: own.height,
-            border: [token('border-thin'), 'solid', hook.borderColor(token('color-border'))],
-            borderRadius: hook.radius(token('radii-sm')),
-            boxShadow: ['inset', 0, '-1px', 0, 0, hook.borderColor(token('color-border'))],
+            border: [token('border-thin'), 'solid', hook.borderColor],
+            borderRadius: hook.radius,
+            boxShadow: ['inset', 0, '-1px', 0, 0, hook.borderColor],
             minInlineSize: own.height,
             paddingInline: own.inset,
           },
         ),
-        rule(
-          { caps: true, platform: 'web' },
-          { display: 'inline-block', lineHeight: 0, textAlign: 'center' },
-        ),
-        rule(
-          { caps: true, platform: 'native' },
-          {
-            alignItems: 'center',
-            display: 'inline-flex',
-            justifyContent: 'center',
-            paddingBlockStart: token('border-thin'),
-          },
-        ),
+        web([
+          rule({ caps: true }, { display: 'inline-block', lineHeight: 0, textAlign: 'center' }),
+        ]),
+        native([
+          rule(
+            { caps: true },
+            {
+              alignItems: 'center',
+              display: 'inline-flex',
+              justifyContent: 'center',
+              paddingBlockStart: token('border-thin'),
+            },
+          ),
+        ]),
       ]),
       /* The `+` between two caps, where the platform writes one. */
-      on('separator', [rule({ color: hook.separatorColor(token('color-foreground-muted')) })]),
+      on('separator', [rule({ color: hook.separatorColor })]),
     ]
   },
 )

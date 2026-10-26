@@ -1,19 +1,5 @@
-import {
-  bind,
-  box,
-  collection,
-  derive,
-  event,
-  headless,
-  live,
-  pressable,
-  prop,
-  region,
-  stack,
-  text,
-  unless,
-  when,
-} from '../../../tree.js'
+import { Announce, cancelable, headless, Pressable, Slot, Text, View } from '../../../render.js'
+import { bind, collection, derive, stack } from '../../../tree.js'
 
 /**
  * Drilldown's headless tier: a stack of pages of rows, one page showing at
@@ -49,38 +35,39 @@ import {
  * manifest says the element has.
  */
 export default headless('drilldown', {
+  props: {
+    backLabel: 'Back',
+    emptyText: 'Nothing to show',
+    fallbackLabel: 'Navigation',
+    label: '',
+    loading: false,
+    loadingText: 'Loading',
+    navigation: false,
+    page: '',
+  },
+  events: {
+    beforeNavigate: cancelable(['value']),
+    beforeSelect: cancelable(['value']),
+    navigate: ['value'],
+    select: ['value'],
+  },
+  states: ['back', 'drilled', 'forward', 'settled'],
+  derived: {
+    backName: derive('drilldown-back-name'),
+    emptyWords: derive('drilldown-empty'),
+    landmark: derive('drilldown-landmark'),
+    landmarkName: derive('drilldown-landmark-name'),
+    loadingWords: derive('drilldown-loading'),
+    pageRole: derive('drilldown-page-role'),
+    rows: bind('default'),
+    status: derive('drilldown-status'),
+    topName: derive('drilldown-top-name'),
+  },
   collection: collection({
     keys: { chooses: false, keeps: ['ArrowLeft', 'ArrowRight'], wrap: true },
     mixes: true,
   }),
-  derived: {
-    'back-name': derive('drilldown-back-name'),
-    'empty-words': derive('drilldown-empty'),
-    landmark: derive('drilldown-landmark'),
-    'landmark-name': derive('drilldown-landmark-name'),
-    'loading-words': derive('drilldown-loading'),
-    'page-role': derive('drilldown-page-role'),
-    rows: bind('default'),
-    status: derive('drilldown-status'),
-    'top-name': derive('drilldown-top-name'),
-  },
-  events: [
-    event('before-navigate', { cancelable: true, detail: ['value'] }),
-    event('before-select', { cancelable: true, detail: ['value'] }),
-    event('navigate', { detail: ['value'] }),
-    event('select', { detail: ['value'] }),
-  ],
   host: { label: bind('landmark-name'), role: bind('landmark') },
-  props: [
-    prop('back-label', 'string', { default: 'Back' }),
-    prop('empty-text', 'string', { default: 'Nothing to show' }),
-    prop('fallback-label', 'string', { default: 'Navigation' }),
-    prop('label', 'string', { default: '' }),
-    prop('loading', 'boolean', { default: false }),
-    prop('loading-text', 'string', { default: 'Loading' }),
-    prop('navigation', 'boolean', { default: false }),
-    prop('page', 'string', { default: '' }),
-  ],
   stack: stack({
     back: 'back',
     before: 'before-navigate',
@@ -92,27 +79,54 @@ export default headless('drilldown', {
     top: 'top-name',
     writes: { listed: 'navigation' },
   }),
-  states: ['back', 'drilled', 'forward', 'settled'],
-  tree: [
-    when(
-      'drilled',
-      box('header', {}, [
-        pressable('back', { label: bind('back-name') }, [
-          region('back-icon', { decorative: true }, [
-            box('back-mark', { decorative: true, glyph: 'caret-left' }),
-          ]),
-        ]),
-        box('title', {}, [text('title-words', { says: bind('page-label') })]),
-      ]),
-    ),
-    box('page', { busy: bind('loading'), label: bind('page-label'), role: bind('page-role') }, [
-      region('default'),
-      when('loading', box('loading', {}, [text('loading-words', { says: bind('loading-words') })])),
-      unless(
-        'loading',
-        unless('rows', box('empty', {}, [text('empty-words', { says: bind('empty-words') })])),
-      ),
-    ]),
-    live('live', { follows: 'status', says: bind('status') }),
-  ],
+  render: ({ derived, props, stack, state }) => (
+    <>
+      {state.drilled && (
+        <View part="header">
+          <Pressable
+            label={derived.backName}
+            part="back"
+          >
+            <Slot
+              ariaHidden
+              name="back-icon"
+            >
+              <View
+                ariaHidden
+                icon="caret-left"
+                part="back-mark"
+              />
+            </Slot>
+          </Pressable>
+          <View part="title">
+            <Text part="title-words">{stack.label}</Text>
+          </View>
+        </View>
+      )}
+      <View
+        busy={props.loading}
+        label={stack.label}
+        part="page"
+        role={derived.pageRole}
+      >
+        <Slot />
+        {props.loading && (
+          <View part="loading">
+            <Text part="loading-words">{derived.loadingWords}</Text>
+          </View>
+        )}
+        {!props.loading && !derived.rows && (
+          <View part="empty">
+            <Text part="empty-words">{derived.emptyWords}</Text>
+          </View>
+        )}
+      </View>
+      <Announce
+        follows="status"
+        part="live"
+      >
+        {derived.status}
+      </Announce>
+    </>
+  ),
 })
