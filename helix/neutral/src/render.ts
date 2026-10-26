@@ -4,7 +4,7 @@
  *
  * ```tsx
  * export default headless('tab', {
- *   memberOf: set('tabs', { pressChooses: true }),
+ *   memberOf: set('tabs'),
  *   props: { disabled: false, dismissLabel: 'Close', href: string() },
  *   events: { dismiss: cancelable(['label']) },
  *   states: ['selected'],
@@ -166,7 +166,7 @@ export const headless = <
 >(
   name: string,
   body: Passed & {
-    /** The collection the element joins, as `set('tabs', { pressChooses: true })`. */
+    /** The collection the element joins, as `set('tabs')`. */
     readonly memberOf?: Member
     readonly props?: Props
     readonly events?: Events
@@ -205,20 +205,13 @@ export interface Member {
 
 /**
  * The collection an element joins, by its family, as `item()` says.
- * `pressChooses` is the builder form's `chooses`: pressing the element
- * chooses it, through the press that says `chooses`.
+ * Pressing the element chooses it where a `<Pressable>` in its render says
+ * `chooses`, which `helix family` reads from the render, so it is said once.
  */
 export const set = (
   of: string,
-  extra: Omit<NonNullable<Headless['item']>, 'chooses' | 'of'> & {
-    readonly pressChooses?: boolean
-  } = {},
-): Member => {
-  const { pressChooses, ...rest } = extra
-  return {
-    item: pressChooses === undefined ? { of, ...rest } : { chooses: pressChooses, of, ...rest },
-  }
-}
+  extra: Omit<NonNullable<Headless['item']>, 'chooses' | 'of'> = {},
+): Member => ({ item: { of, ...extra } })
 
 const spec = <Type extends PropType>(
   type: Type,
@@ -483,14 +476,18 @@ export interface RepeatAttributes extends Common {
 /** A repeat. */
 export const Repeat = (_: RepeatAttributes): Drawn => node()
 
-/** A box drawn around its children while `when` holds, as `wrap()` says. */
+/**
+ * A box drawn around its children, as `wrap()` says: always, or only while
+ * `when` holds. With an `href`, it is the link around what it holds.
+ */
 export interface WrapAttributes extends Common, Drawing {
   readonly also?: Readonly<Record<string, boolean | Read>>
   readonly children?: Child
   readonly current?: Given
   readonly href?: Given
   readonly part: string
-  readonly when: Given
+  /** Drawn only while this holds. */
+  readonly when?: Read
 }
 
 /** A wrap. */
