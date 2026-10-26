@@ -48,11 +48,9 @@ export default styles(
   ({ hook, on, own, rule }) => {
     /* Half the inside of the face, less a pixel, and half the cap height:
        how far the label's baseline sits below the face's top border. */
-    const lift = web(
-      sum(
-        quotient(difference(difference(own.height, product(token('border-thin'), 2)), '1px'), 2),
-        '0.5cap',
-      ),
+    const lift = sum(
+      quotient(difference(difference(own.height, product(token('border-thin'), 2)), '1px'), 2),
+      '0.5cap',
     )
     return [
       /* Relative to the words around it, because a key inside a heading has
@@ -76,7 +74,7 @@ export default styles(
           rule({
             display: 'inline-block',
             lineHeight: 0,
-            web: { verticalAlign: 'calc(0.5cap - 0.5ex - 0.5px)' },
+            verticalAlign: 'calc(0.5cap - 0.5ex - 0.5px)',
             own: { height: fn('round', hook.blockSize, '1px') },
           }),
         ]),

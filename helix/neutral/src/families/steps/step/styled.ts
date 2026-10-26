@@ -1,4 +1,4 @@
-import { first, fit, list, mix, native, product, sum, token, web } from '../../../style.js'
+import { fit, list, mix, native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import step from './headless.js'
 
@@ -187,21 +187,18 @@ export default styles(
       rule(
         { complete: true },
         {
-          color: first(hook.completeColor, own.inkComplete, token('color-success')),
+          color: hook.completeColor,
           fontWeight: token('weight-semibold'),
         },
       ),
       rule(
         { current: true },
         {
-          color: first(hook.currentColor, own.inkCurrent, token('color-primary')),
+          color: hook.currentColor,
           fontWeight: token('weight-semibold'),
         },
       ),
-      rule(
-        { complete: true, current: true },
-        { color: first(hook.completeColor, own.inkComplete, token('color-success')) },
-      ),
+      rule({ complete: true, current: true }, { color: hook.completeColor }),
     ]),
     on({ part: 'marker', inner: 'slot' }, [
       web([rule({ alignItems: 'center', display: 'inline-flex', justifyContent: 'center' })]),
