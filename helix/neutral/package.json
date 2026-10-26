@@ -22,5 +22,9 @@
     "css-tree": "^3.2.1",
     "csstype": "^3.2.3",
     "lit": "^3.2.1"
+  },
+  "imports": {
+    "#render/jsx-dev-runtime": "./src/jsx-dev-runtime.ts",
+    "#render/jsx-runtime": "./src/jsx-runtime.ts"
   }
 }
