@@ -89,11 +89,16 @@
       "assist": {
         "actions": {
           "source": {
+            "useSortedAttributes": "off",
             "useSortedKeys": "off"
           }
         }
       },
-      "includes": ["helix/neutral/src/families/**/styled.ts", "helix/neutral/src/fragments/**"]
+      "includes": [
+        "helix/neutral/src/families/**/headless.tsx",
+        "helix/neutral/src/families/**/styled.ts",
+        "helix/neutral/src/fragments/**"
+      ]
     },
     {
       "includes": [
@@ -177,6 +182,14 @@
     },
     {
       "includes": ["**/.examples/*.tsx"],
+      "javascript": {
+        "formatter": {
+          "attributePosition": "multiline"
+        }
+      }
+    },
+    {
+      "includes": ["helix/neutral/**/*.tsx"],
       "javascript": {
         "formatter": {
           "attributePosition": "multiline"

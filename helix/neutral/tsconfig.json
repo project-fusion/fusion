@@ -1,7 +1,12 @@
 {
   // `scripts` is checked with `src`. Nothing here emits, so the root is the
   // whole package.
+  //
+  // A `headless.tsx` source types its JSX against the nodes in `src/render.ts`,
+  // through the runtime the package's `imports` map names `#render`.
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "#render",
     "rootDir": "."
   },
   "extends": "../../tsconfig.package.json",
