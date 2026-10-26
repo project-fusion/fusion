@@ -195,6 +195,7 @@ jobs:
       matrix: ${{ steps.browser.outputs.matrix }}
       of: ${{ steps.shards.outputs.of }}
       shards: ${{ steps.shards.outputs.shards }}
+      typings: ${{ steps.typings.outputs.typings }}
     steps:
       # Full history, because `scope` below diffs against the base and a
       # depth-1 checkout has nothing to diff against. Without the blobs, which
@@ -240,6 +241,17 @@ jobs:
           BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
           HEAD: ${{ github.sha }}
         run: .github/scripts/touched.sh
+
+      # Whether the framework typings can have changed, from the packages
+      # `smoke:typings` packs, the generators, and the manifest builder:
+      # [VERIFYING.md](../VERIFYING.md#the-typings-run-where-they-can-change).
+      - name: Decide whether the typings can have changed
+        id: typings
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          echo "typings=$(bun fusion/scripts/run-typings-test.mjs --touched "$BASE")" >> "$GITHUB_OUTPUT"
 
       # How many jobs each browser check takes, from how much of the corpus the
       # change reaches: [VERIFYING.md](../VERIFYING.md#how-many-browser-jobs).
@@ -480,6 +492,27 @@ jobs:
 
       - name: Install a template out of the pack
         run: bun run smoke:template
+
+  # **Each framework's checker over the typings, good usage and bad.**
+  # `smoke:typings` installs the packed tarballs into a project per framework
+  # and checks it with `skipLibCheck` off, every guarded line refused and
+  # nothing else: [VERIFYING.md](../VERIFYING.md#the-typings-run-where-they-can-change).
+  # It builds what it packs, so this job does not build first, for the reason
+  # `packaging` gives.
+  typings:
+    needs: [plan, warm]
+    if: ${{ !cancelled() && needs.plan.outputs.typings == 'true' && needs.warm.result == 'success' }}  # dialect:quoted, GitHub's function
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up bun and the dependencies
+        uses: ./.github/actions/setup
+
+      - name: Type-check each framework's project against the packed typings
+        run: bun run smoke:typings
 
   # Its own job because it reads every file regardless of who owns it, so
   # sharding it would mean a pass over the same tree per shard.
@@ -1243,7 +1276,7 @@ jobs:
   verify:
     if: always()
     needs:
-      [proven, plan, warm, warm-browser, checks, cli, floors, packaging, lint, types, tests, rust, clippy, browser, site]
+      [proven, plan, warm, warm-browser, checks, cli, floors, packaging, typings, lint, types, tests, rust, clippy, browser, site]
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
