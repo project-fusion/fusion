@@ -17,12 +17,15 @@
 //!   and from what its set says, and every style table that has both reads
 //!   the state.
 //! - **A prop** is one the headless source or the table declares.
-//! - A part's attribute that is a state as well, or bound to another value
-//!   than the prop of its name, is ambiguous, and is refused with the two
-//!   spellings that say which.
+//! - A part's attribute that is a state as well is the state, as an app
+//!   header's `hidden` is: `part: { hidden: true }` reads the attribute.
+//!   One bound to another value than the prop of its name is ambiguous, and
+//!   is refused with the spellings that say which.
 //!
-//! **The older spellings keep their meaning**: `part: { ... }`, `state: ...`,
-//! and every condition the vocabulary names, such as `hover`.
+//! **`part: { ... }` reads an attribute the part carries that the source
+//! does not write**, as the floating controller's `data-placed` and a copy's
+//! `data-copied`, and an attribute whose name is a state as well. A state
+//! is read by its name alone, and `state: ...` is refused.
 //! `formDisabled` is the host's own `:disabled`, which a disabled fieldset
 //! around it sets too, on the host and on any part, and
 //! `within: { host: ['hover', 'focusWithin'] }` is any one of several, as a
@@ -193,12 +196,14 @@ impl Names {
                     "`entering` names a state, which a table reads by its name over a headless source written with `render`: the values a part starts from are `startingStyle`"
                         .to_owned(),
                 );
+            } else if key == "state" {
+                return Err(
+                    "`state: ...` is written as each state's name alone, as `{ open: true }`"
+                        .to_owned(),
+                );
             } else if key == "within" {
                 read = host(read, value)?;
-            } else if self.source.is_none()
-                || RESERVED.contains(&key.as_str())
-                || target.slotted.is_some()
-            {
+            } else if self.source.is_none() || RESERVED.contains(&key.as_str()) {
                 push(&mut read, key, value.clone());
             } else {
                 let (key, value) = self.resolved(key, value, target)?;
@@ -247,9 +252,10 @@ impl Names {
             )
         };
         match (part, state, prop) {
-            (true, true, _) => Err(format!(
-                "`{name}` is an attribute of `{on}` and a state: write `part: {{ {name}: ... }}` or `state: {{ {name}: ... }}`"
-            )),
+            (true, true, _) => match value {
+                Lit::Bool(_) => Ok(one("state")),
+                _ => Err(format!("`{name}` is a state, which is `true` or `false`")),
+            },
             (true, false, true) if !bound => Err(format!(
                 "`{name}` is an attribute of `{on}` and a prop it is not bound to: write `part: {{ {name}: ... }}`, or the prop's name with `has`"
             )),

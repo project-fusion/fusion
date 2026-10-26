@@ -211,7 +211,7 @@ export default styles(
       web([rule({ 'data-dot': true }, { margin: quotient(own.inset, 2) })]),
     ]),
     on({ region: 'icon', slotted: '*' }, [
-      native([rule({ state: 'unset' }, { margin: quotient(own.inset, 2) })]),
+      native([rule({ unset: true }, { margin: quotient(own.inset, 2) })]),
       rule({ '--icon-size': hook.iconSize, flex: 'none' }),
     ]),
     keyframes('badge-pulse', {

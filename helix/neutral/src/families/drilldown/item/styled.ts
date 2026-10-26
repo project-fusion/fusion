@@ -112,7 +112,7 @@ export default styles(
       on({ region: 'start', slotted: '*' }, [
         native([
           rule(
-            { state: 'described' },
+            { described: true },
             { gridColumn: 1, ...spans, marginInlineEnd: token('space-xs') },
           ),
         ]),
@@ -127,7 +127,7 @@ export default styles(
       on({ region: 'end', slotted: '*' }, [
         native([
           rule(
-            { state: 'described' },
+            { described: true },
             { gridColumn: 3, ...spans, marginInlineStart: token('space-xs') },
           ),
         ]),
@@ -153,7 +153,7 @@ export default styles(
       on({ region: 'chevron', slotted: '*' }, [
         native([
           rule(
-            { state: 'described' },
+            { described: true },
             { gridColumn: 4, ...spans, marginInlineStart: token('space-xs') },
           ),
         ]),

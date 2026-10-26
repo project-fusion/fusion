@@ -180,24 +180,24 @@ export default styles(
       rule({ dir: 'rtl' }, { transformOrigin: 'right center' }),
       /* The three bands. Color is the obvious half, and the ticks the other. */
       rule(
-        { part: { 'data-band': 'good' } },
+        { 'data-band': 'good' },
         { backgroundColor: own.hue, own: { hue: hook.color(token('color-success')) } },
       ),
       rule(
-        { part: { 'data-band': 'fair' } },
+        { 'data-band': 'fair' },
         { backgroundColor: own.hue, own: { hue: hook.color(token('color-warning')) } },
       ),
       rule(
-        { part: { 'data-band': 'poor' } },
+        { 'data-band': 'poor' },
         { backgroundColor: own.hue, own: { hue: hook.color(token('color-danger')) } },
       ),
       /* Past an end, the corner it ran out at squares off. */
       rule(
-        { part: { 'data-beyond': 'over' } },
+        { 'data-beyond': 'over' },
         { borderEndEndRadius: token('radii-none'), borderStartEndRadius: token('radii-none') },
       ),
       rule(
-        { part: { 'data-beyond': 'under' } },
+        { 'data-beyond': 'under' },
         { borderEndStartRadius: token('radii-none'), borderStartStartRadius: token('radii-none') },
       ),
       /* `scale: none` first: the bar's scale would leave the circle a pixel
@@ -212,22 +212,22 @@ export default styles(
       }),
       rule(
         [
-          { part: { 'data-band': 'good' }, shape: 'arc' },
-          { part: { 'data-band': 'good' }, shape: 'ring' },
+          { 'data-band': 'good', shape: 'arc' },
+          { 'data-band': 'good', shape: 'ring' },
         ],
         { stroke: own.hue, own: { hue: hook.color(token('color-success')) } },
       ),
       rule(
         [
-          { part: { 'data-band': 'fair' }, shape: 'arc' },
-          { part: { 'data-band': 'fair' }, shape: 'ring' },
+          { 'data-band': 'fair', shape: 'arc' },
+          { 'data-band': 'fair', shape: 'ring' },
         ],
         { stroke: own.hue, own: { hue: hook.color(token('color-warning')) } },
       ),
       rule(
         [
-          { part: { 'data-band': 'poor' }, shape: 'arc' },
-          { part: { 'data-band': 'poor' }, shape: 'ring' },
+          { 'data-band': 'poor', shape: 'arc' },
+          { 'data-band': 'poor', shape: 'ring' },
         ],
         { stroke: own.hue, own: { hue: hook.color(token('color-danger')) } },
       ),

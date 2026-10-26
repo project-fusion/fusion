@@ -56,11 +56,7 @@ export default styles(
       rule({ blockSize: '100%', inlineSize: '100%', objectFit: 'cover' }),
       native([
         rule(
-          [
-            { state: 'loaded' },
-            { state: { loading: true, waiting: true } },
-            { state: { delays: false, loading: true } },
-          ],
+          [{ loaded: true }, { loading: true, waiting: true }, { delays: false, loading: true }],
           { display: 'none' },
         ),
       ]),
@@ -71,7 +67,7 @@ export default styles(
          place of the other. */
       native([
         rule({ inset: 0, position: 'absolute' }),
-        rule([{ error: true }, { state: { delays: true, loading: true, waiting: false } }], {
+        rule([{ error: true }, { delays: true, loading: true, waiting: false }], {
           display: 'none',
         }),
       ]),
@@ -94,11 +90,7 @@ export default styles(
       native([
         rule({ fontSize: fn('min', product(own.size, 0.4)) }),
         rule(
-          [
-            { loaded: true },
-            { state: { loading: true, waiting: true } },
-            { state: { delays: false, loading: true } },
-          ],
+          [{ loaded: true }, { loading: true, waiting: true }, { delays: false, loading: true }],
           { display: 'none' },
         ),
       ]),

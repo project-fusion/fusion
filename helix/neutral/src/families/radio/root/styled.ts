@@ -216,7 +216,7 @@ export default styles(
       }),
       rule({ selected: true }, { scale: 1 }),
       /* A slotted indicator is the mark, so the dot goes. */
-      rule({ state: 'hasIndicator' }, { content: 'none' }),
+      rule({ hasIndicator: true }, { content: 'none' }),
     ]),
     on({ region: 'indicator', slotted: '*' }, [
       rule({
@@ -226,7 +226,7 @@ export default styles(
         scale: 0,
         transition: ['scale', token('duration-fast'), token('easing-emphasized')],
       }),
-      rule({ state: 'selected' }, { scale: 1 }),
+      rule({ selected: true }, { scale: 1 }),
     ]),
     /* A step up from body weight: a radio's label is one of the answers. */
     on('label', [
