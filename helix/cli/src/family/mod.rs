@@ -5,8 +5,9 @@
 //! as a request to run a file.
 //!
 //! **Each folder under the package's `src/families/<family>/<element>` is one
-//! element**: `headless.ts` holds its API and part tree, and `styled.ts` its
-//! own props, its style table, and the stylesheet the web build reads it as.
+//! element**: `headless.ts` holds its API and part tree, or `headless.tsx`
+//! the same written as JSX, and `styled.ts` its own props, its style table,
+//! and the stylesheet the web build reads it as.
 //!
 //! **Every element's web stylesheet is generated.** `stylesheets` writes it
 //! into the styled package, which runs it before compiling its sheets, and the

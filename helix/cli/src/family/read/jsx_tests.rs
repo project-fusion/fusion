@@ -1,0 +1,490 @@
+use crate::family::read::{headless_tsx, Lit};
+
+/// A source with a render, and the keys before it that every test reads.
+fn source(given: &str, render: &str) -> String {
+    format!(
+        "import {{ headless }} from '../../../render.js'
+export default headless('x', {{
+  derived: {{ holdHint: derive('menu-hold-hint'), rows: bind('default') }},
+  events: {{ beforeSelect: cancelable(['value']), dismiss: [] }},
+  props: {{ dismissLabel: 'Close', disabled: false, loading: false }},
+  stack: stack({{ label: 'page-label' }}),
+  states: ['placed-top', 'settled'],
+  render: ({{ {given} }}) => (
+{render}
+  ),
+}})"
+    )
+}
+
+/// The nodes a render draws, as the builder form writes them.
+fn tree(render: &str) -> Vec<Lit> {
+    let read = headless_tsx(&source(
+        "derived, entry, index, props, send, stack, state",
+        render,
+    ))
+    .unwrap_or_else(|why| panic!("{why}"));
+    let Lit::Call(_, arguments) = read else {
+        panic!("a call");
+    };
+    let Some(Lit::Object(body)) = arguments.get(1) else {
+        panic!("an object");
+    };
+    match body.iter().find(|(key, _)| key == "render") {
+        Some((_, Lit::Array(nodes))) => nodes.clone(),
+        _ => panic!("a render"),
+    }
+}
+
+fn refused(render: &str) -> String {
+    headless_tsx(&source(
+        "derived, entry, index, props, send, stack, state",
+        render,
+    ))
+    .unwrap_err()
+}
+
+fn text(value: &str) -> Lit {
+    Lit::Text(value.to_owned())
+}
+
+fn call(helper: &str, arguments: Vec<Lit>) -> Lit {
+    Lit::Call(helper.to_owned(), arguments)
+}
+
+fn object(fields: &[(&str, Lit)]) -> Lit {
+    Lit::Object(
+        fields
+            .iter()
+            .map(|(key, value)| ((*key).to_owned(), value.clone()))
+            .collect(),
+    )
+}
+
+fn bind(name: &str) -> Lit {
+    call("bind", vec![text(name)])
+}
+
+#[test]
+fn a_node_is_its_helper_with_its_part_as_its_name() {
+    assert_eq!(
+        tree(r#"<View part="track" ariaHidden icon="x" level={2} role="group" />"#),
+        [call(
+            "box",
+            vec![
+                text("track"),
+                object(&[
+                    ("decorative", Lit::Bool(true)),
+                    ("glyph", text("x")),
+                    ("level", Lit::Number(2.0)),
+                    ("role", text("group")),
+                ]),
+                Lit::Array(Vec::new()),
+            ],
+        )]
+    );
+}
+
+#[test]
+fn a_read_binds_its_name_and_a_negation_is_not() {
+    assert_eq!(
+        tree(
+            r#"<Pressable part="tab" chooses label={props.dismissLabel} hidden={!props.disabled} hint={derived.holdHint} placed={state.placedTop} named={stack.label} offset={-1} onPress={send.beforeSelect} />"#
+        ),
+        [call(
+            "pressable",
+            vec![
+                text("tab"),
+                object(&[
+                    ("chooses", Lit::Bool(true)),
+                    ("label", bind("dismiss-label")),
+                    ("hidden", call("not", vec![text("disabled")])),
+                    ("hint", bind("hold-hint")),
+                    ("placed", bind("placed-top")),
+                    ("named", bind("page-label")),
+                    ("offset", Lit::Number(-1.0)),
+                    ("sends", text("before-select")),
+                ]),
+                Lit::Array(Vec::new()),
+            ],
+        )]
+    );
+}
+
+#[test]
+fn a_choice_of_strings_is_a_pick() {
+    let [Lit::Call(_, arguments)]: [Lit; 1] = tree(
+        r#"<Layer part="surface" presses={derived.rows ? 'none' : 'toggle'} returns={!props.loading ? 'held' : 'always'} />"#,
+    )
+    .try_into()
+    .unwrap() else {
+        panic!("one node");
+    };
+    assert_eq!(
+        arguments[1],
+        object(&[
+            (
+                "presses",
+                call(
+                    "pick",
+                    vec![
+                        text("rows"),
+                        object(&[("true", text("none"))]),
+                        text("toggle")
+                    ]
+                )
+            ),
+            (
+                "returns",
+                call(
+                    "pick",
+                    vec![
+                        text("loading"),
+                        object(&[("true", text("always"))]),
+                        text("held")
+                    ]
+                )
+            ),
+        ])
+    );
+}
+
+#[test]
+fn a_condition_is_a_when_and_a_negated_one_an_unless_nested_in_order() {
+    let mark = || {
+        call(
+            "box",
+            vec![text("mark"), object(&[]), Lit::Array(Vec::new())],
+        )
+    };
+    assert_eq!(
+        tree(
+            r#"<>
+  {props.loading && <View part="mark" />}
+  {!props.loading && !derived.rows && <View part="mark" />}
+  {state.settled ? <View part="mark" /> : <View part="mark" />}
+  {/* A comment is no node. */}
+</>"#
+        ),
+        [
+            call("when", vec![text("loading"), mark()]),
+            call(
+                "unless",
+                vec![text("loading"), call("unless", vec![text("rows"), mark()])]
+            ),
+            call("when", vec![text("settled"), mark()]),
+            call("unless", vec![text("settled"), mark()]),
+        ]
+    );
+}
+
+#[test]
+fn a_slot_is_a_region_named_for_its_slot_with_its_fallback() {
+    assert_eq!(
+        tree(
+            r#"<>
+  <Slot part="label" />
+  <Slot name="icon"><View part="mark" /></Slot>
+</>"#
+        ),
+        [
+            call(
+                "region",
+                vec![
+                    text("default"),
+                    object(&[("part", text("label"))]),
+                    Lit::Array(Vec::new())
+                ]
+            ),
+            call(
+                "region",
+                vec![
+                    text("icon"),
+                    object(&[]),
+                    Lit::Array(vec![call(
+                        "box",
+                        vec![text("mark"), object(&[]), Lit::Array(Vec::new())]
+                    )]),
+                ]
+            ),
+        ]
+    );
+}
+
+#[test]
+fn words_are_what_a_text_or_an_announcement_says() {
+    assert_eq!(
+        tree(
+            r#"<>
+  <Text part="title">{stack.label}</Text>
+  <Text part="hint">Press here</Text>
+  <Announce part="live" when={props.loading}>{props.dismissLabel}</Announce>
+</>"#
+        ),
+        [
+            call(
+                "text",
+                vec![text("title"), object(&[("says", bind("page-label"))])]
+            ),
+            call(
+                "text",
+                vec![text("hint"), object(&[("says", text("Press here"))])]
+            ),
+            call(
+                "live",
+                vec![
+                    text("live"),
+                    object(&[("while", bind("loading")), ("says", bind("dismiss-label"))])
+                ]
+            ),
+        ]
+    );
+}
+
+#[test]
+fn a_wrap_a_repeat_and_a_vector_are_their_nodes() {
+    assert_eq!(
+        tree(
+            r#"<Wrap part="link" when={props.loading}>
+  <Repeat part="keys" each={derived.rows} key="at">
+    <Text part="key">{entry.key}</Text>
+    <View part="at" level={index} />
+  </Repeat>
+  <Svg part="ring" viewBox="0 0 10 10">
+    <Path part="arc" d="M0 0" />
+    <Circle part="dot" cx={5} cy={5} r={1} />
+  </Svg>
+</Wrap>"#
+        ),
+        [call(
+            "wrap",
+            vec![
+                text("link"),
+                object(&[("while", bind("loading"))]),
+                Lit::Array(vec![
+                    call(
+                        "repeat",
+                        vec![
+                            text("keys"),
+                            object(&[("each", bind("rows")), ("key", text("at"))]),
+                            Lit::Array(vec![
+                                call(
+                                    "text",
+                                    vec![
+                                        text("key"),
+                                        object(&[("says", call("field", vec![text("key")]))])
+                                    ]
+                                ),
+                                call(
+                                    "box",
+                                    vec![
+                                        text("at"),
+                                        object(&[("level", call("index", Vec::new()))]),
+                                        Lit::Array(Vec::new())
+                                    ]
+                                ),
+                            ]),
+                        ],
+                    ),
+                    call(
+                        "box",
+                        vec![
+                            text("ring"),
+                            object(&[("viewBox", text("0 0 10 10"))]),
+                            Lit::Array(vec![
+                                call(
+                                    "box",
+                                    vec![
+                                        text("arc"),
+                                        object(&[("d", text("M0 0")), ("shape", text("path"))]),
+                                        Lit::Array(Vec::new())
+                                    ]
+                                ),
+                                call(
+                                    "box",
+                                    vec![
+                                        text("dot"),
+                                        object(&[
+                                            ("cx", Lit::Number(5.0)),
+                                            ("cy", Lit::Number(5.0)),
+                                            ("r", Lit::Number(1.0)),
+                                            ("shape", text("circle")),
+                                        ]),
+                                        Lit::Array(Vec::new())
+                                    ]
+                                ),
+                            ]),
+                        ],
+                    ),
+                ]),
+            ],
+        )]
+    );
+}
+
+#[test]
+fn an_object_of_parts_takes_reads_and_flags() {
+    let [Lit::Call(_, arguments)]: [Lit; 1] =
+        tree(r#"<View part="row" also={{ "row-current": props.loading, quiet: true }} />"#)
+            .try_into()
+            .unwrap()
+    else {
+        panic!("one node");
+    };
+    assert_eq!(
+        arguments[1],
+        object(&[(
+            "also",
+            object(&[("row-current", bind("loading")), ("quiet", Lit::Bool(true))])
+        )])
+    );
+}
+
+/// Each refused form, and the words its refusal holds.
+const REFUSED: &[(&str, &str)] = &[
+    (
+        r#"<div part="x" />"#,
+        "`<div>` is an element of the page, which a render does not draw: write a node",
+    ),
+    (
+        r#"<Box part="x" />"#,
+        "`<Box>` is not a node: a render draws",
+    ),
+    (
+        r#"<View part="x" {...props} />"#,
+        "a spread of attributes: write each one",
+    ),
+    (
+        r#"<View part="x">{...[]}</View>"#,
+        "a spread of children: write each node",
+    ),
+    (
+        r#"<View part="x" level={props.loading + 1} />"#,
+        "an expression the compiler would have to run: write a literal",
+    ),
+    (
+        r#"<View part="x" label={props.dismisLabel} />"#,
+        "`props.dismisLabel` names no prop the source declares",
+    ),
+    (
+        r#"<View part="x" label={derived.typo} />"#,
+        "`derived.typo` names no computed value",
+    ),
+    (
+        r#"<View part="x" label={state.typo} />"#,
+        "`state.typo` names no state",
+    ),
+    (
+        r#"<View part="x" label={stack.typo} />"#,
+        "`stack.typo` names no value",
+    ),
+    (
+        r#"<View part="x" label={send.dismiss} />"#,
+        "`send.x` is what a press sends: write it as `onPress={send.x}`",
+    ),
+    (
+        r#"<Pressable part="x" onPress={send.dismis} />"#,
+        "`send.dismis` names no event the source declares",
+    ),
+    (
+        r#"<Pressable part="x" onPress={props.loading} />"#,
+        "`onPress` sends an event: write it as `onPress={send.x}`",
+    ),
+    (
+        r#"<View part="x">Words</View>"#,
+        "words in a node: write them as `<Text part=",
+    ),
+    (
+        r#"<View part="x">{props.loading ? <View part="y" /> : null}</View>"#,
+        "a condition draws one node",
+    ),
+    (
+        r#"<View part="x">{props.loading || <View part="y" />}</View>"#,
+        "a child is a node, `props.x && <Node />`",
+    ),
+    (
+        r#"<View part="x">{props.loading && <><View part="y" /></>}</View>"#,
+        "a condition draws one node",
+    ),
+    (
+        r#"<View part="x" decorative />"#,
+        "`decorative` is the builder form's: write it as `ariaHidden`",
+    ),
+    (
+        r#"<View part="x" glyph="x" />"#,
+        "`glyph` is the builder form's: write it as `icon`",
+    ),
+    (
+        r#"<View part="x" viewBox="0 0 1 1" />"#,
+        "a box that draws a vector is `<Svg viewBox=",
+    ),
+    (
+        r#"<View part="x" shape="path" />"#,
+        "a shape inside a vector is `<Path>`",
+    ),
+    (
+        r#"<View role="group" />"#,
+        "`<View>` names the part it is with `part=\"...\"`",
+    ),
+    (
+        r"<View part={props.dismissLabel} />",
+        "`part` is a name written as a string",
+    ),
+    (
+        r#"<View part="x" label={`words`} />"#,
+        "an expression the compiler would have to run",
+    ),
+    (
+        r#"<View part="x" label={entry.key ? 'a' : 'b'} />"#,
+        "a condition reads a prop, a computed value, or a state",
+    ),
+    (
+        r#"<View part="x" label={props.loading ? 'a' : 1} />"#,
+        "a choice of values picks between strings",
+    ),
+    (
+        r#"<Image part="x"><View part="y" /></Image>"#,
+        "`<Image>` holds no nodes",
+    ),
+    (
+        r#"<Text part="x">{props.loading}{props.disabled}</Text>"#,
+        "words are one read or one string",
+    ),
+    (
+        r#"<Svg part="x" />"#,
+        "`<Svg>` takes the `viewBox` it draws in",
+    ),
+    (
+        r#"<View part="x" ns:a="b" />"#,
+        "an attribute's name is one name",
+    ),
+    (r"props.loading", "`render` returns a node"),
+];
+
+/// Each refused form names its line and the form to write.
+#[test]
+fn every_form_outside_the_grammar_is_refused_with_its_line_and_the_form_to_write() {
+    for (render, says) in REFUSED {
+        let why = refused(render);
+        assert!(why.contains(*says), "{render}: {why}");
+        assert!(
+            why.starts_with("line 9:") || why.starts_with("line 10:"),
+            "{render}: {why}"
+        );
+    }
+}
+
+#[test]
+fn render_is_given_only_what_it_reads_by_its_own_name() {
+    let unknown = headless_tsx(&source("props, other", "<View part=\"x\" />")).unwrap_err();
+    assert!(
+        unknown.contains("`render` is given derived, entry"),
+        "{unknown}"
+    );
+    let missing =
+        headless_tsx(&source("props", "<View part=\"x\" label={derived.rows} />")).unwrap_err();
+    assert!(
+        missing.contains("`derived` is not something `render` is given: write `({ derived }) =>`"),
+        "{missing}"
+    );
+}
