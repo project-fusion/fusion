@@ -1,4 +1,4 @@
-import { hookOf, list, mix, token, web } from '../../../style.js'
+import { first, hookOf, list, mix, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import button from './headless.js'
@@ -24,26 +24,28 @@ export default styles(
   button,
   {
     prefix: 'button',
-    hooks: [
-      'background-color',
-      'background-color-hover',
-      'border-color',
-      'foreground-color',
-      'gap',
-      'inline-size',
-      'padding-inline',
-      'radius',
-      'radius-end',
-      'radius-end-end',
-      'radius-end-start',
-      'radius-start',
-      'radius-start-end',
-      'radius-start-start',
-      'size',
-      'spinner-color',
-      'spinner-duration',
-      'spinner-size',
-    ],
+    /* The fills and the label's color differ with the emphasis, so each rule
+       gives its own. The corners fall back one to the next, through `first()`. */
+    hooks: ({ own }) => ({
+      backgroundColor: null,
+      backgroundColorHover: null,
+      borderColor: own.edge,
+      foregroundColor: null,
+      gap: token('space-xs'),
+      inlineSize: 'auto',
+      paddingInline: token('space-control'),
+      radius: token('radii-sm'),
+      radiusEnd: null,
+      radiusEndEnd: null,
+      radiusEndStart: null,
+      radiusStart: null,
+      radiusStartEnd: null,
+      radiusStartStart: null,
+      size: token('size-control'),
+      spinnerColor: 'currentColor',
+      spinnerDuration: own.turn,
+      spinnerSize: '1.15em',
+    }),
     own: [
       'button-crawl',
       'button-edge',
@@ -67,7 +69,7 @@ export default styles(
       /* `auto` is the initial value, so an unset hook changes nothing. */
       rule({
         display: 'inline-flex',
-        minInlineSize: hook.inlineSize('auto'),
+        minInlineSize: hook.inlineSize,
         maxInlineSize: '100%',
       }),
       rule({
@@ -129,26 +131,28 @@ export default styles(
       /* **Pressed by a Button Group, the solid fill.** The web group writes
          these hooks onto a pressed button's control. A phone's button reads
          the group's own hooks, with the same fallbacks. */
-      rule(
-        { platform: 'native', state: 'pressed' },
-        {
-          '--button-background-color': hookOf(
-            'button-group',
-            'pressed-background-color',
-            token('color-foreground'),
-          ),
-          '--button-border-color': hookOf(
-            'button-group',
-            'pressed-border-color',
-            hookOf('button-group', 'pressed-background-color', token('color-foreground')),
-          ),
-          '--button-foreground-color': hookOf(
-            'button-group',
-            'pressed-color',
-            token('color-background'),
-          ),
-        },
-      ),
+      native([
+        rule(
+          { pressed: true },
+          {
+            '--button-background-color': hookOf(
+              'button-group',
+              'pressed-background-color',
+              token('color-foreground'),
+            ),
+            '--button-border-color': first(
+              hookOf('button-group', 'pressed-border-color'),
+              hookOf('button-group', 'pressed-background-color'),
+              token('color-foreground'),
+            ),
+            '--button-foreground-color': hookOf(
+              'button-group',
+              'pressed-color',
+              token('color-background'),
+            ),
+          },
+        ),
+      ]),
       /* Block-level at full width. */
       rule({ width: 'full' }, { display: 'flex', inlineSize: '100%' }),
       /* A control is not printed. */
@@ -161,11 +165,11 @@ export default styles(
          sets `size` and `padding-inline`: a crumb is 28px, between `sm` at 32
          and nothing, so a button slotted into one stepped the whole trail. */
       rule({
-        all: web('unset'),
+        web: { all: 'unset' },
         alignItems: 'center',
         backgroundColor: hook.backgroundColor(mix(own.tone, 6, 'transparent')),
-        blockSize: hook.size(token('size-control')),
-        border: [token('border-thin'), 'solid', hook.borderColor(own.edge)],
+        blockSize: hook.size,
+        border: [token('border-thin'), 'solid', hook.borderColor],
         boxSizing: 'border-box',
         color: hook.foregroundColor(own.ink),
         cursor: web('pointer'),
@@ -173,12 +177,12 @@ export default styles(
         fontFamily: token('font-sans'),
         fontSize: token('text-control'),
         fontWeight: token('weight-medium'),
-        gap: hook.gap(token('space-xs')),
+        gap: hook.gap,
         inlineSize: '100%',
         justifyContent: 'center',
         letterSpacing: token('tracking-normal'),
         lineHeight: token('leading-tight'),
-        paddingInline: hook.paddingInline(token('space-control')),
+        paddingInline: hook.paddingInline,
         textDecoration: 'none',
         transition: list(
           ['background-color', token('duration-fast'), token('easing-standard')],
@@ -192,19 +196,19 @@ export default styles(
          needs: the first keeps its leading corners and the last its trailing
          ones. */
       rule({
-        borderEndEndRadius: hook.radiusEndEnd(hook.radiusEnd(hook.radius(token('radii-sm')))),
-        borderEndStartRadius: hook.radiusEndStart(hook.radiusStart(hook.radius(token('radii-sm')))),
-        borderStartEndRadius: hook.radiusStartEnd(hook.radiusEnd(hook.radius(token('radii-sm')))),
-        borderStartStartRadius: hook.radiusStartStart(
-          hook.radiusStart(hook.radius(token('radii-sm'))),
-        ),
+        borderEndEndRadius: first(hook.radiusEndEnd, hook.radiusEnd, hook.radius),
+        borderEndStartRadius: first(hook.radiusEndStart, hook.radiusStart, hook.radius),
+        borderStartEndRadius: first(hook.radiusStartEnd, hook.radiusEnd, hook.radius),
+        borderStartStartRadius: first(hook.radiusStartStart, hook.radiusStart, hook.radius),
       }),
       /* Hover deepens the wash. */
       rule(
-        { disabled: false, interaction: ['hover', 'active'] },
+        { within: { host: { disabled: false } }, interaction: ['hover', 'active'] },
         {
-          backgroundColor: hook.backgroundColorHover(
-            hook.backgroundColor(mix(own.tone, 12, 'transparent')),
+          backgroundColor: first(
+            hook.backgroundColorHover,
+            hook.backgroundColor,
+            mix(own.tone, 12, 'transparent'),
           ),
         },
       ),
@@ -224,9 +228,13 @@ export default styles(
         },
       ),
       rule(
-        { disabled: false, emphasis: 'solid', interaction: ['hover', 'active'] },
         {
-          backgroundColor: hook.backgroundColorHover(hook.backgroundColor(own.fillHover)),
+          within: { host: { disabled: false } },
+          emphasis: 'solid',
+          interaction: ['hover', 'active'],
+        },
+        {
+          backgroundColor: first(hook.backgroundColorHover, hook.backgroundColor, own.fillHover),
           borderColor: 'transparent',
         },
       ),
@@ -256,10 +264,16 @@ export default styles(
         },
       ),
       rule(
-        { disabled: false, emphasis: 'subtle', interaction: ['hover', 'active'] },
         {
-          backgroundColor: hook.backgroundColorHover(
-            hook.backgroundColor(mix(own.tone, 22, 'transparent')),
+          within: { host: { disabled: false } },
+          emphasis: 'subtle',
+          interaction: ['hover', 'active'],
+        },
+        {
+          backgroundColor: first(
+            hook.backgroundColorHover,
+            hook.backgroundColor,
+            mix(own.tone, 22, 'transparent'),
           ),
           borderColor: 'transparent',
         },
@@ -275,22 +289,31 @@ export default styles(
       /* A wash of the tone. A fixed sunken surface was a 1.39 step darker
          than a raised dialog panel in dark mode, which reads as a hole. */
       rule(
-        { disabled: false, emphasis: 'ghost', interaction: ['hover', 'active'] },
         {
-          backgroundColor: hook.backgroundColorHover(
-            hook.backgroundColor(mix(own.tone, 8, 'transparent')),
+          within: { host: { disabled: false } },
+          emphasis: 'ghost',
+          interaction: ['hover', 'active'],
+        },
+        {
+          backgroundColor: first(
+            hook.backgroundColorHover,
+            hook.backgroundColor,
+            mix(own.tone, 8, 'transparent'),
           ),
           borderColor: 'transparent',
           color: hook.foregroundColor(own.ink),
         },
       ),
       /* `:disabled` on the host, which a form's disabled fieldset sets too. */
-      rule({ disabled: true }, { cursor: web('not-allowed'), opacity: 0.5 }),
+      rule(
+        { within: { host: { disabled: true } } },
+        { web: { cursor: 'not-allowed' }, opacity: 0.5 },
+      ),
       /* **Pending: the words stay where they are, unseen, and a ring turns
          over them**, so the button keeps its width and nothing beside it
          moves. The ring is the `spinner` part, drawn only while pending. The
          cursor says the press is held. */
-      rule({ state: 'pending' }, { cursor: web('progress'), position: 'relative' }),
+      rule({ pending: true }, { web: { cursor: 'progress' }, position: 'relative' }),
     ]),
     /* **The letters at the middle, in any font.** The line box is centered
        and the letters sit in it where the font's ascent and descent put
@@ -301,33 +324,31 @@ export default styles(
        Only where the trim is supported, the padding being only a taller line
        without it. */
     on({ region: 'default' }, [
-      rule(
-        { platform: 'web', supports: '(text-box: trim-both cap alphabetic)' },
-        {
-          display: 'block',
-          paddingBlock: token('space-2xs'),
-          textBox: 'trim-both cap alphabetic',
-        },
-      ),
+      web([
+        rule(
+          { supports: '(text-box: trim-both cap alphabetic)' },
+          {
+            display: 'block',
+            paddingBlock: token('space-2xs'),
+            textBox: 'trim-both cap alphabetic',
+          },
+        ),
+      ]),
     ]),
     /* Icons scale with the label, so a large button does not draw a small
        glyph beside big text. An icon reads `--icon-size`, and a phone stops
        it growing at the largest standard text size. */
     on({ region: '*', slotted: 'helix-icon' }, [rule({ '--icon-size': '1.15em' })]),
-    on({ region: '*' }, [rule({ state: 'pending' }, { visibility: 'hidden' })]),
+    on({ region: '*' }, [rule({ pending: true }, { visibility: 'hidden' })]),
     on('spinner', [
       rule({
-        animation: ['helix-button-turn', hook.spinnerDuration(own.turn), 'linear', 'infinite'],
-        blockSize: hook.spinnerSize('1.15em'),
-        border: [
-          token('border-thick'),
-          'solid',
-          mix(hook.spinnerColor('currentColor'), 30, 'transparent'),
-        ],
-        borderBlockStartColor: hook.spinnerColor('currentColor'),
+        animation: ['helix-button-turn', hook.spinnerDuration, 'linear', 'infinite'],
+        blockSize: hook.spinnerSize,
+        border: [token('border-thick'), 'solid', mix(hook.spinnerColor, 30, 'transparent')],
+        borderBlockStartColor: hook.spinnerColor,
         borderRadius: token('radii-full'),
         boxSizing: 'border-box',
-        inlineSize: hook.spinnerSize('1.15em'),
+        inlineSize: hook.spinnerSize,
         inset: 0,
         margin: 'auto',
         position: 'absolute',
