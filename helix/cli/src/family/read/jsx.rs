@@ -1,5 +1,5 @@
-//! A `headless.tsx` source's `render`, read into the nodes the builder form
-//! writes, so the rest of the compiler reads one shape.
+//! A `headless.tsx` source's `render`, read into the compiler's own shape of
+//! nodes, which the rest of the compiler reads.
 //!
 //! ```tsx
 //! render: ({ props, send }) => (
@@ -26,7 +26,7 @@
 //! [`api::computed`](crate::family::api::computed) lists them: `stop.place`,
 //! `tour.spot.height`, `copy.told`. **Whether a slot holds something** is
 //! `slots.x`, which a `<Wrap when>` and a `<View hidden>` read, as the
-//! builder form's `while` and `hidden` read a region's name, so
+//! compiler's own `while` and `hidden` read a region's name, so
 //! `hidden={!slots.logo}` is hidden while nothing is passed into `logo`. **A CSS custom property a node sets** is in its
 //! `style`, `style={{ '--meter-fraction': derived.fraction }}`.
 //!
@@ -44,7 +44,7 @@ use super::{line, Lit};
 #[path = "jsx_tests.rs"]
 mod tests;
 
-/// Each tag a render may write: its builder helper, and the shape a box
+/// Each tag a render may write: the node the compiler reads it as, and the shape a box
 /// draws inside a vector.
 const TAGS: &[(&str, &str, Option<&str>)] = &[
     ("Announce", "live", None),
@@ -96,7 +96,7 @@ struct Render<'s> {
     computed: Vec<(String, String)>,
 }
 
-/// A value a render reads, as a name the builder form binds.
+/// A value a render reads, as a name the compiler's own shape binds.
 enum Read {
     /// A prop, a computed value, a state, or a value of a stack, by name.
     Named(String),
@@ -130,7 +130,7 @@ fn keys(fields: &[(String, Lit)], key: &str) -> Vec<String> {
     }
 }
 
-/// The nodes `render` draws, as the builder form's `tree`.
+/// The nodes `render` draws, as the compiler's own `tree`.
 ///
 /// # Errors
 ///
@@ -329,6 +329,5 @@ impl Render<'_> {
 
 #[path = "jsx_element.rs"]
 mod element;
-pub(crate) use element::RENAMED;
 #[path = "jsx_values.rs"]
 mod values;

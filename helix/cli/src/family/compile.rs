@@ -134,13 +134,10 @@ fn one(family: &Path, folder: &Path) -> Result<Compiled, Failure> {
     let source = folder.join("styled.ts");
     /* The package's fragments sit beside its families. */
     let src = family.parent().and_then(Path::parent).unwrap_or(family);
-    let (headless, rendered) = headless_of(folder)?;
-    /* A table over a source written with `render` reads its conditions in
-    one namespace, resolved against that source. */
-    let context = headless
-        .as_ref()
-        .filter(|_| rendered)
-        .map(ir::sugar::Source::of);
+    let headless = headless_of(folder)?;
+    /* A table reads its conditions in one namespace, resolved against its
+    headless source. */
+    let context = headless.as_ref().map(ir::sugar::Source::of);
     let mut over = None;
     let styled = export(&source).and_then(|export| {
         ir::sugar::desugar_with(&export, context.as_ref())
@@ -168,46 +165,38 @@ fn one(family: &Path, folder: &Path) -> Result<Compiled, Failure> {
     })
 }
 
-/// An element's headless source, `headless.ts` in the builder form or
-/// `headless.tsx` written with `render`, and whether it is the second.
-fn headless_of(folder: &Path) -> Result<(Option<api::Headless>, bool), Failure> {
+/// An element's headless source, `headless.tsx`, written with `render`.
+/// A `headless.ts`, the builder form the families were once written in, is
+/// refused.
+fn headless_of(folder: &Path) -> Result<Option<api::Headless>, Failure> {
     let builder = folder.join("headless.ts");
     let rendered = folder.join("headless.tsx");
-    match (builder.is_file(), rendered.is_file()) {
-        (true, true) => Err(cannot_compile(
-            folder,
-            "the element has both `headless.ts` and `headless.tsx`: keep one".to_owned(),
-        )),
-        (true, false) => export(&builder)
+    if builder.is_file() {
+        return Err(cannot_compile(
+            &builder,
+            "a headless source is `headless.tsx`, its part tree written as JSX in `render`: write `headless.tsx`, as every family's is".to_owned(),
+        ));
+    }
+    if !rendered.is_file() {
+        return Ok(None);
+    }
+    {
+        let text = fs::read_to_string(&rendered).map_err(|error| {
+            Failure::input(
+                "cannot read a source",
+                format!("{}: {error}", rendered.display()),
+            )
+        })?;
+        read::headless_tsx(&text)
             .and_then(|export| {
-                if api::rendered::is_rendered(&export) {
-                    return Err(cannot_compile(
-                        &builder,
-                        "a source written with `render` is `headless.tsx`".to_owned(),
-                    ));
+                if !api::rendered::is_rendered(&export) {
+                    return Err("`headless.tsx` declares its parts in `render`".to_owned());
                 }
-                api::headless(&export).map_err(|why| cannot_compile(&builder, why))
+                api::rendered::rewrite(&export)
             })
-            .map(|read| (Some(read), false)),
-        (false, true) => {
-            let text = fs::read_to_string(&rendered).map_err(|error| {
-                Failure::input(
-                    "cannot read a source",
-                    format!("{}: {error}", rendered.display()),
-                )
-            })?;
-            read::headless_tsx(&text)
-                .and_then(|export| {
-                    if !api::rendered::is_rendered(&export) {
-                        return Err("`headless.tsx` declares its parts in `render`".to_owned());
-                    }
-                    api::rendered::rewrite(&export)
-                })
-                .and_then(|export| api::headless(&export))
-                .map(|read| (Some(read), true))
-                .map_err(|why| cannot_compile(&rendered, why))
-        }
-        (false, false) => Ok((None, false)),
+            .and_then(|export| api::headless(&export))
+            .map(Some)
+            .map_err(|why| cannot_compile(&rendered, why))
     }
 }
 
@@ -224,4 +213,26 @@ fn export(source: &Path) -> Result<read::Lit, Failure> {
 
 fn cannot_compile(source: &Path, why: String) -> Failure {
     Failure::input(format!("cannot compile {}", source.display()), why)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::headless_of;
+
+    #[test]
+    fn a_headless_source_in_the_builder_form_is_refused_with_the_form_to_write() {
+        let folder = std::env::temp_dir().join(format!("helix-builder-{}", std::process::id()));
+        std::fs::create_dir_all(&folder).unwrap();
+        std::fs::write(
+            folder.join("headless.ts"),
+            "export default headless('x', {})",
+        )
+        .unwrap();
+        let refused = headless_of(&folder).unwrap_err();
+        std::fs::remove_dir_all(&folder).unwrap();
+        assert!(
+            format!("{refused:?}").contains("write `headless.tsx`"),
+            "{refused:?}"
+        );
+    }
 }
