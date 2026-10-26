@@ -20,6 +20,7 @@ mod members;
 mod notices;
 mod page;
 mod parity;
+pub mod rendered;
 mod scroll;
 mod sections;
 mod stack;

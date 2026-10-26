@@ -134,22 +134,26 @@ fn one(family: &Path, folder: &Path) -> Result<Compiled, Failure> {
     let source = folder.join("styled.ts");
     /* The package's fragments sit beside its families. */
     let src = family.parent().and_then(Path::parent).unwrap_or(family);
+    let (headless, rendered) = headless_of(folder)?;
+    /* A table over a source written with `render` reads its conditions in
+    one namespace, resolved against that source. */
+    let context = headless
+        .as_ref()
+        .filter(|_| rendered)
+        .map(ir::sugar::Source::of);
     let mut over = None;
+    let mut sugar_notes = Vec::new();
     let styled = export(&source).and_then(|export| {
-        ir::sugar::desugar(&export)
+        ir::sugar::desugar_with(&export, context.as_ref())
+            .map(|(export, notes)| {
+                sugar_notes = notes;
+                export
+            })
             .inspect(|export| over = underlay::over(export))
             .and_then(|export| ir::expand(&export, &mut loader(src)))
             .and_then(|export| ir::styled(&export))
             .map_err(|why| cannot_compile(&source, why))
     })?;
-    let headless_source = folder.join("headless.ts");
-    let headless = if headless_source.is_file() {
-        Some(export(&headless_source).and_then(|export| {
-            api::headless(&export).map_err(|why| cannot_compile(&headless_source, why))
-        })?)
-    } else {
-        None
-    };
     let family_name = name(family);
     let element = name(folder);
     let compiled = Family::new(styled, headless, &family_name, &element);
@@ -157,7 +161,8 @@ fn one(family: &Path, folder: &Path) -> Result<Compiled, Failure> {
     if !unresolved.is_empty() {
         return Err(cannot_compile(folder, unresolved.join("\n")));
     }
-    let notes = ir::checks::check(&compiled).map_err(|why| cannot_compile(&source, why))?;
+    let mut notes = ir::checks::check(&compiled).map_err(|why| cannot_compile(&source, why))?;
+    notes.extend(sugar_notes);
     let web = css::emit(&compiled);
     Ok(Compiled {
         notes,
@@ -167,6 +172,49 @@ fn one(family: &Path, folder: &Path) -> Result<Compiled, Failure> {
         source: folder.to_path_buf(),
         web,
     })
+}
+
+/// An element's headless source, `headless.ts` in the builder form or
+/// `headless.tsx` written with `render`, and whether it is the second.
+fn headless_of(folder: &Path) -> Result<(Option<api::Headless>, bool), Failure> {
+    let builder = folder.join("headless.ts");
+    let rendered = folder.join("headless.tsx");
+    match (builder.is_file(), rendered.is_file()) {
+        (true, true) => Err(cannot_compile(
+            folder,
+            "the element has both `headless.ts` and `headless.tsx`: keep one".to_owned(),
+        )),
+        (true, false) => export(&builder)
+            .and_then(|export| {
+                if api::rendered::is_rendered(&export) {
+                    return Err(cannot_compile(
+                        &builder,
+                        "a source written with `render` is `headless.tsx`".to_owned(),
+                    ));
+                }
+                api::headless(&export).map_err(|why| cannot_compile(&builder, why))
+            })
+            .map(|read| (Some(read), false)),
+        (false, true) => {
+            let text = fs::read_to_string(&rendered).map_err(|error| {
+                Failure::input(
+                    "cannot read a source",
+                    format!("{}: {error}", rendered.display()),
+                )
+            })?;
+            read::headless_tsx(&text)
+                .and_then(|export| {
+                    if !api::rendered::is_rendered(&export) {
+                        return Err("`headless.tsx` declares its parts in `render`".to_owned());
+                    }
+                    api::rendered::rewrite(&export)
+                })
+                .and_then(|export| api::headless(&export))
+                .map(|read| (Some(read), true))
+                .map_err(|why| cannot_compile(&rendered, why))
+        }
+        (false, false) => Ok((None, false)),
+    }
 }
 
 /// A source module's default export.

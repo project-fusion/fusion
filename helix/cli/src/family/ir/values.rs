@@ -260,6 +260,7 @@ fn value(lit: &Lit) -> Result<Value, String> {
         | Lit::Bool(_)
         | Lit::Member(..)
         | Lit::Name(_)
+        | Lit::Null
         | Lit::Object(_) => Err("a value is a string, a number, an array or a helper".to_owned()),
     }
 }
