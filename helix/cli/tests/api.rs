@@ -84,6 +84,7 @@ impl Project {
         let project = Self::new(name);
         let element = |tag: &str, specifier: &str| {
             json!({
+                "anatomy": anatomy(),
                 "events": [{ "name": "change", "reactProp": "onchange" }],
                 "properties": [{ "name": "placeholder", "type": "string" }],
                 "specifier": specifier,
@@ -298,6 +299,22 @@ impl Project {
     }
 }
 
+/// An element's anatomy as `analyze` writes it: a press with a slot in it,
+/// on the web and on a phone.
+fn anatomy() -> Value {
+    json!({
+        "native": {
+            "takes": [{ "holds": "string", "name": "placeholder" }],
+            "tree": [{ "draws": "Pressable trigger", "kind": "pressable", "name": "trigger", "children": [{ "draws": "{children}", "kind": "region", "name": "default" }] }],
+        },
+        "web": {
+            "states": ["open"],
+            "takes": [{ "holds": "string", "name": "placeholder" }],
+            "tree": [{ "draws": "pressable part=\"trigger\"", "kind": "pressable", "name": "trigger", "says": ["role=\"combobox\""], "children": [{ "draws": "slot", "kind": "region", "name": "default" }] }],
+        },
+    })
+}
+
 /// An element as `api.json` lists it, with its entry and import line.
 fn sandbox_element(tag: &str, package: &str, entry: &str, label: &str) -> Value {
     json!({
@@ -345,6 +362,34 @@ fn a_family_answers_to_its_slug_tag_or_alias_with_its_examples_and_version() {
             "import '@fusion.dev/helix/option' // Option"
         );
     }
+}
+
+/// **An element's anatomy is what its package recorded**, the web tree under
+/// the tag and the phone's under the component its `platforms` names.
+#[test]
+fn a_familys_anatomy_is_each_element_s_two_trees() {
+    let project = Project::helix("anatomy");
+    let answer = project.json(&["api", "anatomy", "select"]);
+    assert_eq!(answer["family"], "select");
+    assert_eq!(answer["anatomy"][0]["tag"], "helix-select");
+    assert_eq!(
+        answer["anatomy"][0]["anatomy"]["web"]["states"],
+        json!(["open"])
+    );
+    let printed = String::from_utf8(project.run(&["api", "anatomy", "select"]).stdout).unwrap();
+    assert!(printed.starts_with("<helix-select>\n"), "{printed}");
+    assert!(printed.contains("  states: open\n  #shadow-root\n    pressable part=\"trigger\"  role=\"combobox\"\n      slot\n"), "{printed}");
+}
+
+#[test]
+fn a_family_whose_package_records_no_anatomy_says_so() {
+    let project = Project::new("no-anatomy");
+    project.sandbox_root();
+    let failure = project.failure(&["api", "anatomy", "sandbox"]);
+    assert_eq!(
+        failure["error"]["what"], "no anatomy for `sandbox`",
+        "{failure}"
+    );
 }
 
 /// **An alias two families share is refused, never picked**, with both as
@@ -503,7 +548,7 @@ fn every_tool_declares_an_output_schema_and_read_only_annotations() {
     let project = Project::helix("list");
     let replies = project.talk(&[json!({ "id": 1, "jsonrpc": "2.0", "method": "tools/list" })]);
     let tools = replies[0]["result"]["tools"].as_array().expect("tools");
-    assert_eq!(tools.len(), 9);
+    assert_eq!(tools.len(), 10);
     for tool in tools {
         assert_eq!(tool["outputSchema"]["type"], "object", "{}", tool["name"]);
         assert_eq!(

@@ -1,0 +1,73 @@
+/* An element's tree, in the code face, on the sunken ground a code block
+   stands on. Sideways scrolling, so a long line of attributes never widens
+   the page. */
+.surface {
+  background-color: var(--helix-color-surface-sunken);
+  border: var(--helix-border-thin) solid var(--helix-color-border);
+  border-radius: var(--helix-radii-md);
+  overflow-x: auto;
+  padding: var(--helix-space-md) var(--helix-space-lg);
+}
+
+.tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Each level stands in from the one around it, on a line that says which
+   node it is inside. */
+.tree .tree {
+  border-inline-start: var(--helix-border-thin) solid var(--helix-color-border);
+  margin-inline-start: var(--helix-space-2xs);
+  padding-inline-start: var(--helix-space-md);
+}
+
+.row {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  font-family: var(--helix-font-mono);
+  font-size: var(--helix-text-sm);
+  gap: var(--helix-space-none) var(--helix-space-sm);
+  line-height: var(--helix-leading-normal);
+  padding-block: var(--helix-space-2xs);
+}
+
+.row code {
+  font: inherit;
+  white-space: nowrap;
+}
+
+.host {
+  color: var(--helix-color-primary);
+  font-weight: var(--helix-weight-medium);
+}
+
+.root {
+  color: var(--helix-color-foreground-muted);
+}
+
+.draws {
+  color: var(--helix-color-foreground);
+}
+
+.says {
+  color: var(--helix-color-foreground-muted);
+}
+
+/* On a phone the levels stand in less and the lines are a step smaller, so
+   a fourth level still fits beside its line. */
+@media (width < 40rem) {
+  .surface {
+    padding: var(--helix-space-sm) var(--helix-space-md);
+  }
+
+  .tree .tree {
+    padding-inline-start: var(--helix-space-sm);
+  }
+
+  .row {
+    font-size: var(--helix-text-xs);
+  }
+}

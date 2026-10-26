@@ -376,6 +376,15 @@ pub enum Manifest {
 #[cfg(feature = "internal")]
 #[derive(Debug, Subcommand)]
 pub enum Family {
+    /// Print what each element is made of on each platform, as JSON.
+    ///
+    /// For each element, by its tag: the attributes the web element takes,
+    /// its custom states and events, and the tree in its shadow root, and,
+    /// where Helix draws it on React Native, the props the component takes
+    /// and the tree it draws. `analyze` writes it into the styled package's
+    /// `api.json`, which `helix api anatomy` prints.
+    Anatomy(FamilyArgs),
+
     /// Write each family's intermediate form and web stylesheet to the package's `dist`.
     ///
     /// With `--check`, writes nothing and exits 1 when a written one differs
@@ -741,6 +750,12 @@ pub enum Api {
     Find(ApiFind),
     /// One family's API: tags, properties, events, slots, parts, words, and imports.
     Family(ApiFamily),
+    /// What each element of a family is made of, on the web and on React Native.
+    ///
+    /// For each styled element: the attributes it takes, its custom states
+    /// and events, and the tree in its shadow root, then, where Helix draws
+    /// it on a phone, the props its component takes and the tree it draws.
+    Anatomy(ApiFamily),
     /// One example of a family, with the import lines it needs.
     Example(ApiExample),
     /// The import lines that register the given tags.
