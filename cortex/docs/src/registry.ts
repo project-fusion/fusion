@@ -68,6 +68,13 @@ export const pages: DocPage[] = [
     slug: 'extraction',
     title: 'Extracting typed values',
   },
+  {
+    description: 'SQLite or Postgres, local or hosted, picked by one connection string.',
+    order: 3,
+    section: 'Guides',
+    slug: 'storage',
+    title: 'Choosing storage',
+  },
 ]
 
 export const findPage = (slug: string): DocPage | undefined =>

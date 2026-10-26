@@ -1,0 +1,135 @@
+---
+title: Choosing storage
+description: Keep traces and memory in a SQLite file, a local Postgres, or a hosted Postgres, picked by one connection string.
+---
+
+# Choosing storage
+
+Trace and Engram keep their data in a store, and a store is SQLite or
+Postgres. One connection string picks the backend. Both backends pass the same
+conformance suites, so your program behaves the same on either one.
+
+## Open a store by its connection string
+
+`store::open` in `fusion-cortex-trace` and in `fusion-cortex-engram` takes a
+connection string and returns the store it names.
+
+[//]: # (rust:fusion-cortex-trace::store::open)
+
+```rust
+// A path, `sqlite:memory.db`, or `postgres://…` opens the same way.
+let store = fusion_cortex_trace::store::open("sqlite::memory:").await.unwrap();
+
+assert!(store.traces().await.unwrap().is_empty());
+```
+
+[//]: # (/rust)
+
+| Connection string | Store |
+|---|---|
+| `memory.db` or `./data/memory.db` | A SQLite file, created where it does not exist |
+| `sqlite:memory.db` or `sqlite://memory.db` | The same SQLite file |
+| `sqlite::memory:` | A SQLite database that lives as long as the store |
+| `postgres://…` or `postgresql://…` | A Postgres database |
+
+Any other scheme is an error. An error names what was wrong with a connection
+string and never repeats it, since it can hold a password.
+
+Trace and Engram can share one SQLite file or one Postgres database, because
+their tables have different names.
+
+## Keep a local SQLite file
+
+A SQLite file needs no server and keeps your data on your machine. Use it for
+one person's agent on one computer. The `sqlite` feature bundles SQLite, so
+there is nothing else to install.
+
+## Run a local Postgres
+
+Use Postgres when several programs share one store, or when you want the same
+database locally that you run in production. Start Postgres 16 or later, for
+example in a container:
+
+```bash
+docker run --name cortex-postgres -e POSTGRES_PASSWORD=cortex -p 5432:5432 postgres:16
+```
+
+Then open `postgres://postgres:cortex@localhost:5432/postgres`.
+
+A store creates its tables the first time it opens a database. The table
+`cortex_migrations` records the schema version of each store, and a newer
+release runs only the steps past it. Two stores that open one database at the
+same time take turns, so the schema is migrated once.
+
+The tables go in the first schema of the connection's search path. To keep
+them in a schema of their own, create the schema and add
+`options[search_path]=cortex` to the URL.
+
+## Connect to a hosted Postgres
+
+Supabase, Neon, and Amazon RDS are Postgres databases, and a store connects to
+each one by its URL. Copy the connection string your provider shows.
+
+| Provider | Connection string |
+|---|---|
+| Supabase, direct | `postgres://postgres:PASSWORD@db.PROJECT.supabase.co:5432/postgres` |
+| Supabase, transaction pooler | `postgres://postgres.PROJECT:PASSWORD@aws-0-REGION.pooler.supabase.com:6543/postgres` |
+| Neon | `postgres://USER:PASSWORD@ENDPOINT.REGION.aws.neon.tech/neondb?sslmode=require` |
+| Neon, pooled | `postgres://USER:PASSWORD@ENDPOINT-pooler.REGION.aws.neon.tech/neondb?sslmode=require&pooler=transaction` |
+| Amazon RDS | `postgres://USER:PASSWORD@INSTANCE.ID.REGION.rds.amazonaws.com:5432/DATABASE?sslmode=require` |
+
+The `postgres` feature includes TLS. `sslmode=require` encrypts the
+connection. To check the server's certificate as well, use
+`sslmode=verify-full` and set `sslrootcert` to your provider's certificate
+bundle.
+
+## Connect through a transaction-mode pooler
+
+**Add `pooler=transaction` to the URL when the connection goes through a
+pooler in transaction mode**, such as PgBouncer or Supavisor. A pooler in
+transaction mode gives each transaction whichever server connection is free.
+A statement prepared by name on one server connection is missing on the next,
+so the store prepares each statement without a name and runs it inside its
+transaction. The store also leaves out the `extra_float_digits` setting, which
+PgBouncer refuses.
+
+The store turns this on in two cases:
+
+- The URL sets `pooler=transaction`.
+- The URL names port 6543, the port of Supabase's transaction pooler, and does
+  not set `pooler=session`.
+
+Set `pooler=session` for a direct connection or a session-mode pooler on port
+6543.
+
+[//]: # (rust:fusion-cortex-core::storage)
+
+```rust
+use fusion_cortex_core::storage::Location;
+
+let local = Location::parse("memory.db").unwrap();
+let pooled = Location::parse("postgres://cortex@db.example.com:6543/cortex").unwrap();
+
+assert!(matches!(local, Location::Sqlite(_)));
+assert!(matches!(pooled, Location::Postgres(postgres) if postgres.pooled));
+```
+
+[//]: # (/rust)
+
+A store behind a transaction-mode pooler parses each statement every time it
+runs it. Use a direct connection or a session-mode pooler where your provider
+offers one. A pooler may also refuse the `options` parameter, so set the search
+path on the database role there.
+
+## What differs between the backends
+
+- **Times.** SQLite keeps a time to the nanosecond, and Postgres keeps it to
+  the microsecond.
+- **Search ranking.** Both backends find a word as characters anywhere in an
+  entry, in any case. Each ranks matches by its own measure. SQLite uses
+  `bm25` over its trigram index, and Postgres uses `ts_rank` over a `tsvector`
+  of trigrams. On both, more of a word ranks higher, and a newer match ranks
+  above an equal older one.
+- **The NUL character.** Postgres does not store it in text. Trace keeps a node
+  with one as it was, and indexes the character as a space for search. Engram
+  refuses an episode or a fact whose text holds one.

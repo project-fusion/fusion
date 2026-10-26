@@ -227,16 +227,18 @@ assert_eq!(Scope::narrowest([&core, &web]), Some(Scope::Personal));
 ## Storage
 
 `Memory` is the reference. The `store` module holds the same behavior behind
-the `Store` trait, in memory and in SQLite, and one conformance suite runs
-against both. A fact carries an optional embedding, which nothing computes yet,
-so scoring by vector later needs no migration. A SQLite file from before scopes
+the `Store` trait, in memory, in SQLite, and in Postgres, and one conformance
+suite runs against all three. `store::open` picks a backend by its connection
+string, as the Choosing storage guide describes. A fact carries an optional
+embedding, which nothing computes yet, so scoring by vector later needs no
+migration. A SQLite file from before scopes
 gains the scope and consolidation columns when it is opened, and its episodes
 and facts are personal.
 
 [//]: # (rust:fusion-cortex-engram::store::Store)
 
 ```rust
-let store = InMemory::new(); // or store::Sqlite::open(path).await?
+let store = InMemory::new(); // or store::open(location).await?
 let session = Id::new();
 let episode = Episode::new("tests run with bun", session);
 
