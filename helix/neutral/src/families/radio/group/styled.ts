@@ -14,7 +14,11 @@ import group from './headless.js'
  */
 export default styles(
   group,
-  { prefix: 'radio-group', hooks: ['gap'], stylesheet: 'radio/group/radio-group.generated.css' },
+  {
+    prefix: 'radio-group',
+    hooks: { gap: null },
+    stylesheet: 'radio/group/radio-group.generated.css',
+  },
   ({ hook, include, on, rule }) => [
     include(field),
     include(fieldStacked),

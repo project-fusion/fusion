@@ -227,8 +227,8 @@ pub fn fragment(export: &Lit) -> Result<Lit, String> {
             for (key, value) in header {
                 match key.as_str() {
                     "parts" => names.parts = Some(texts(value, "parts")?),
-                    "hooks" => names.hooks = declared(value, "hooks", hook_key)?,
-                    "own" => names.own = declared(value, "own", hook_key)?,
+                    "hooks" => names.hooks = names.header(value, "hooks")?,
+                    "own" => names.own = names.header(value, "own")?,
                     /* The includer's props, which the editor holds every
                     includer to; the includer's own reading checks them. */
                     "props" => {
@@ -371,10 +371,11 @@ impl Names {
     /// Hooks may be given as `({ own }) => ({ ... })`, to read private values.
     fn header(&mut self, lit: &Lit, field: &str) -> Result<Vec<(String, String)>, String> {
         let entries = match (field, lit) {
-            ("hooks", Lit::Array(_)) => return declared(lit, field, hook_key),
-            ("own", Lit::Array(_)) => {
-                let prefix = self.prefix.clone();
-                return declared(lit, field, |name| own_key(&prefix, name));
+            (_, Lit::Array(_)) => {
+                return Err(format!(
+                    "`{field}` is an object of each one's default by its name in camelCase, `null` for one with none: `{field}: {{ {}: null }}`",
+                    if field == "own" { "buttonFill" } else { "color" }
+                ))
             }
             (_, Lit::Object(entries)) => entries,
             ("hooks", Lit::Arrow(given, body)) => match &**body {
@@ -390,7 +391,7 @@ impl Names {
             },
             _ => {
                 return Err(format!(
-                    "`{field}` is an array of names, or an object of each one's default by its name in camelCase"
+                    "`{field}` is an object of each one's default by its name in camelCase"
                 ))
             }
         };
@@ -448,38 +449,6 @@ fn texts(lit: &Lit, field: &str) -> Result<Vec<String>, String> {
             _ => Err(format!("`{field}` is an array of names")),
         })
         .collect()
-}
-
-/// The names a `hooks` or `own` list declares, each with its key.
-fn declared(
-    lit: &Lit,
-    field: &str,
-    key: impl Fn(&str) -> String,
-) -> Result<Vec<(String, String)>, String> {
-    let mut read: Vec<(String, String)> = Vec::new();
-    for name in texts(lit, field)? {
-        let written = key(&name);
-        if let Some((_, held)) = read.iter().find(|(other, _)| *other == written) {
-            return Err(format!(
-                "`{field}` declares `{held}` and `{name}`, which are both written `{written}`"
-            ));
-        }
-        read.push((written, name));
-    }
-    Ok(read)
-}
-
-/// How a private value is written: its name less the family's prefix, in
-/// camelCase, so `button-tone-hover` in Button is `toneHover`. A value
-/// another family names, as `field-control-inline-size`, keeps its whole
-/// name.
-fn own_key(prefix: &str, name: &str) -> String {
-    let short = name
-        .strip_prefix(prefix)
-        .and_then(|rest| rest.strip_prefix('-'))
-        .filter(|rest| !rest.is_empty())
-        .unwrap_or(name);
-    hook_key(short)
 }
 
 /// A hyphenated name in camelCase: `background-color` is `backgroundColor`.

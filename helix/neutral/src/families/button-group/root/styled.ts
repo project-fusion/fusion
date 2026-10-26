@@ -35,14 +35,14 @@ export default styles(
     hooks: ({ own }) => ({
       gap: token('space-xs'),
       pressedBackgroundColor: token('color-foreground'),
-      pressedBorderColor: own.pressedBackground,
+      pressedBorderColor: own.buttonGroupPressedBackground,
       pressedColor: token('color-background'),
     }),
-    own: [
-      'button-group-pressed-background',
-      'button-group-pressed-border',
-      'button-group-pressed-foreground',
-    ],
+    own: {
+      buttonGroupPressedBackground: null,
+      buttonGroupPressedBorder: null,
+      buttonGroupPressedForeground: null,
+    },
     props: { size: oneOf(['sm', 'md', 'lg']), variant: oneOf(['joined', 'spaced']) },
     stylesheet: 'button-group/root/button-group-root.generated.css',
   },
@@ -88,9 +88,9 @@ export default styles(
         { selectionMode: true },
         {
           own: {
-            pressedBackground: hook.pressedBackgroundColor,
-            pressedBorder: hook.pressedBorderColor,
-            pressedForeground: hook.pressedColor,
+            buttonGroupPressedBackground: hook.pressedBackgroundColor,
+            buttonGroupPressedBorder: hook.pressedBorderColor,
+            buttonGroupPressedForeground: hook.pressedColor,
           },
         },
       ),

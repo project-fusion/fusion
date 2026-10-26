@@ -8,9 +8,9 @@ export default styles(
   {
     prefix: 'tabs-panel',
     hooks: ({ own }) => ({
-      paddingBlockStart: own.paddingBlockStart(token('space-md')),
+      paddingBlockStart: own.tabsPanelPaddingBlockStart(token('space-md')),
     }),
-    own: ['tabs-panel-padding-block-start', 'tabs-panel-padding-inline-start'],
+    own: { tabsPanelPaddingBlockStart: null, tabsPanelPaddingInlineStart: null },
     stylesheet: 'tabs/panel/tab-panel.generated.css',
   },
   ({ hook, on, own, rule }) => [
@@ -25,7 +25,7 @@ export default styles(
         minInlineSize: 0,
         outline: 'none',
         paddingBlockStart: hook.paddingBlockStart,
-        paddingInlineStart: own.paddingInlineStart(token('space-none')),
+        paddingInlineStart: own.tabsPanelPaddingInlineStart(token('space-none')),
       }),
       rule({ hidden: true }, { display: 'none' }),
     ]),

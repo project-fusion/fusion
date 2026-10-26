@@ -44,23 +44,23 @@ export default styles(
   root,
   {
     prefix: 'menu',
-    hooks: [
-      'backdrop',
-      'background-color',
-      'border-color',
-      'border-width',
-      'max-block-size',
-      'min-inline-size',
-      'scrim',
-      'shadow',
-    ],
-    own: [
-      'menu-from',
-      'menu-material-backdrop',
-      'menu-material-fill',
-      'menu-section-heading',
-      'menu-travel',
-    ],
+    hooks: {
+      backdrop: null,
+      backgroundColor: null,
+      borderColor: null,
+      borderWidth: null,
+      maxBlockSize: null,
+      minInlineSize: null,
+      scrim: null,
+      shadow: null,
+    },
+    own: {
+      menuFrom: null,
+      menuMaterialBackdrop: null,
+      menuMaterialFill: null,
+      menuSectionHeading: null,
+      menuTravel: null,
+    },
     props: { material: oneOf(['frosted', 'glass']) },
     stylesheet: 'menu/root/menu-root.generated.css',
   },
@@ -108,10 +108,10 @@ export default styles(
       /* It travels a little out of the edge it opened against, once placed. */
       on('surface', [
         rule({
-          own: { travel: product(token('space-2xs'), '-1'), from: 0.96 },
+          own: { menuTravel: product(token('space-2xs'), '-1'), menuFrom: 0.96 },
           opacity: 0,
-          scale: own.from,
-          transform: fn('translateY', own.travel),
+          scale: own.menuFrom,
+          transform: fn('translateY', own.menuTravel),
           transition: list(
             ['opacity', fast, token('easing-standard')],
             ['scale', fast, token('easing-emphasized')],
@@ -123,13 +123,13 @@ export default styles(
         rule(
           { placedTop: true },
           {
-            own: { travel: token('space-2xs') },
+            own: { menuTravel: token('space-2xs') },
             transformOrigin: [measured('floating-arrow-x', '50%'), '100%'],
           },
         ),
         rule({ placedBottom: true }, { transformOrigin: [measured('floating-arrow-x', '50%'), 0] }),
         /* A sheet rises from under the edge. */
-        rule({ sheet: true }, { own: { from: 1, travel: '100%' } }),
+        rule({ sheet: true }, { own: { menuFrom: 1, menuTravel: '100%' } }),
         rule({ part: { 'data-placed': true } }, { opacity: 1, scale: 1, transform: 'none' }),
         rule([{ reducedMotion: true }, { part: { 'data-placed': true }, reducedMotion: true }], {
           scale: 1,
@@ -171,22 +171,22 @@ export default styles(
         variants('material', {
           glass: {
             own: {
-              materialFill: scheme(
+              menuMaterialFill: scheme(
                 token('material-translucent-strong'),
                 token('material-translucent'),
               ),
-              materialBackdrop: hook.backdrop(token('material-backdrop')),
+              menuMaterialBackdrop: hook.backdrop(token('material-backdrop')),
             },
-            backgroundColor: hook.backgroundColor(own.materialFill),
-            backdropFilter: own.materialBackdrop,
+            backgroundColor: hook.backgroundColor(own.menuMaterialFill),
+            backdropFilter: own.menuMaterialBackdrop,
           },
           frosted: {
             own: {
-              materialFill: token('material-translucent-strong'),
-              materialBackdrop: hook.backdrop(fn('blur', token('material-blur-lg'))),
+              menuMaterialFill: token('material-translucent-strong'),
+              menuMaterialBackdrop: hook.backdrop(fn('blur', token('material-blur-lg'))),
             },
-            backgroundColor: hook.backgroundColor(own.materialFill),
-            backdropFilter: own.materialBackdrop,
+            backgroundColor: hook.backgroundColor(own.menuMaterialFill),
+            backdropFilter: own.menuMaterialBackdrop,
           },
         }),
         /* A row on the page has a mark before its label, so every row on it
@@ -285,7 +285,7 @@ export default styles(
         rule({ platform: 'native', drilled: true }, { display: 'none' }),
       ]),
       on({ region: 'default', slotted: 'helix-menu-section' }, [
-        rule({ platform: 'native', drilled: true }, { own: { sectionHeading: 'none' } }),
+        rule({ platform: 'native', drilled: true }, { own: { menuSectionHeading: 'none' } }),
       ]),
       /* What a collection says in place of rows, quiet and centered. */
       on(

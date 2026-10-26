@@ -51,10 +51,10 @@ export default styles(
       padding: token('space-lg'),
       radius: token('radii-sm'),
       rise: token('space-lg'),
-      scrim: own.scrim,
+      scrim: own.dialogScrim,
       shadow: token('shadow-floating'),
     }),
-    own: ['dialog-scrim', 'dialog-width'],
+    own: { dialogScrim: null, dialogWidth: null },
     props: {
       material: oneOf(['frosted', 'glass']),
       size: oneOf(['sm', 'md', 'lg', 'full']),
@@ -73,12 +73,12 @@ export default styles(
       /* The host draws nothing, and holds the scrim's tint for the backdrop to read. */
       on('host', [
         rule({ display: 'contents' }),
-        rule({ own: { scrim: token('color-overlay') } }),
+        rule({ own: { dialogScrim: token('color-overlay') } }),
         rule({ print: true }, { display: 'none' }),
       ]),
       on('surface', [
         rule({
-          own: { width: hook.inlineSize },
+          own: { dialogWidth: hook.inlineSize },
           backgroundColor: hook.backgroundColor(token('color-surface-overlay')),
           border: [hook.borderWidth, 'solid', hook.borderColor],
           borderRadius: hook.radius,
@@ -88,7 +88,7 @@ export default styles(
           display: 'flex',
           flexDirection: 'column',
           gap: token('space-md'),
-          inlineSize: fn('min', own.width, difference('100vw', token('space-xl'))),
+          inlineSize: fn('min', own.dialogWidth, difference('100vw', token('space-xl'))),
           maxBlockSize: difference('100dvh', token('space-xl')),
           overflowY: 'auto',
           padding,
@@ -101,10 +101,10 @@ export default styles(
       ]),
       on('surface', [
         variants('size', {
-          sm: { own: { width: '22rem' } },
-          md: { own: { width: '28rem' } },
-          lg: { own: { width: '44rem' } },
-          full: { own: { width: '100vw' } },
+          sm: { own: { dialogWidth: '22rem' } },
+          md: { own: { dialogWidth: '28rem' } },
+          lg: { own: { dialogWidth: '44rem' } },
+          full: { own: { dialogWidth: '100vw' } },
         }),
         /* No ring on the panel itself. */
         rule({ outline: 'none' }),

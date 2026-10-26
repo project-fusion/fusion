@@ -65,7 +65,7 @@
  *   names.
  *
  * The value helpers are `style.ts`'s, beside the given `hook` and `own`:
- * `token`, `mix`, `list`, `web`, `derived`, `fit`, `measured`, `product`, `sum`,
+ * `token`, `mix`, `list`, `web`, `derive`, `fit`, `measured`, `product`, `sum`,
  * `difference`, `quotient`, `fn`, `safeArea`, `scheme`, `quote`, `inherit`,
  * `initial`, `unset`, `inherited` and `hookOf`.
  *
@@ -92,11 +92,6 @@ export const csstypeResolved: Resolved = true
 export type Camel<Name extends string> = Name extends `${infer Head}-${infer Tail}`
   ? `${Head}${Capitalize<Camel<Tail>>}`
   : Name
-
-/** A private value's key: its name less the family's prefix, in camelCase. */
-export type OwnKey<Name extends string, Prefix extends string> = Camel<
-  Name extends `${Prefix}-${infer Rest extends string}` ? (Rest extends '' ? Name : Rest) : Name
->
 
 /**
  * Every part a tree draws: each node's name but a region's or a `when`'s, a
@@ -298,24 +293,16 @@ export type HookValue = Extract<Read, { readonly hook: string }> & ((fallback?: 
 type Defaults = Readonly<Record<string, Value | null>>
 
 /**
- * A table's hooks: their names, or each one's default by its name in
- * camelCase, given the private values to read.
+ * A table's hooks: each one's default by its name in camelCase, `null` for
+ * one with none, given the private values to read.
  */
 type HooksField<Own extends string> =
-  | readonly string[]
   | Defaults
   | ((given: { readonly own: { readonly [Key in Own]: OwnValue } }) => Defaults)
 
 /** The hooks a `hooks` field declares, as the rules read them. */
-type HookKeys<Field> = Field extends readonly (infer Name extends string)[]
-  ? Camel<Name>
-  : Field extends (given: never) => infer Returned
-    ? keyof Returned & string
-    : keyof Field & string
-
-/** The private values an `own` field declares, as the rules read them. */
-type OwnKeys<Field, Prefix extends string> = Field extends readonly (infer Name extends string)[]
-  ? OwnKey<Name, Prefix>
+type HookKeys<Field> = Field extends (given: never) => infer Returned
+  ? keyof Returned & string
   : keyof Field & string
 
 /** The values a prop's `when` may ask for, as strings, which `variants` keys. */
@@ -345,7 +332,7 @@ export interface Given<
   readonly keyframes: (name: string, frames: Readonly<Record<string, Css>>) => Group
   /** A group: every rule in it is on `target`. */
   readonly on: (target: Target<Part, Region>, rules: readonly Rule[]) => Group
-  /** Each private value `own` declares, by its name less the prefix in camelCase. */
+  /** Each private value `own` declares, by its whole name in camelCase. */
   readonly own: { readonly [Key in Own]: OwnValue }
   /** One rule. */
   readonly rule: {
@@ -369,7 +356,7 @@ const kebab = (key: string): string => key.replace(/[A-Z]/g, (upper) => `-${uppe
  * The values the editor sees at runtime. The compiler never runs them: it
  * reads the call as syntax and rewrites it.
  */
-const given = (named: (name: string) => string): Record<string, unknown> => ({
+const given = (): Record<string, unknown> => ({
   hook: new Proxy(
     {},
     {
@@ -388,8 +375,8 @@ const given = (named: (name: string) => string): Record<string, unknown> => ({
     {},
     {
       get: (_, key: string) =>
-        Object.assign((fallback: Value) => ({ fallback, own: named(kebab(key)) }), {
-          own: named(kebab(key)),
+        Object.assign((fallback: Value) => ({ fallback, own: kebab(key) }), {
+          own: kebab(key),
         }),
     },
   ),
@@ -402,8 +389,8 @@ export const styles = <
   const H extends Source,
   const Prefix extends string,
   /* No default: a header's `({ own }) => ({...})` takes its parameter's type from this constraint. */
-  const Hooks extends HooksField<OwnKeys<Own, Prefix>>,
-  const Own extends readonly string[] | Defaults = readonly [],
+  const Hooks extends HooksField<keyof Own & string>,
+  const Own extends Defaults = Record<never, never>,
   const StyledProps extends Readonly<Record<string, PropValue>> = Record<never, never>,
 >(
   _headless: H,
@@ -411,16 +398,18 @@ export const styles = <
     /** The hooks' prefix, `--<prefix>-...`, which is not always the element's name. */
     readonly prefix: Prefix
     /**
-     * The hooks, by name, or each one's default by its name in camelCase,
+     * Each hook's default by its name in camelCase, `null` for one with none,
      * which a rule reads as `hook.color` and overrides at its site as
-     * `hook.color(fallback)`.
+     * `hook.color(fallback)`. The web's name is `--<prefix>-color`.
      */
     readonly hooks?: Hooks
     /** The element drawn under this one, `icon-button`, whose rules a phone lays first. */
     readonly over?: string
     /**
-     * The private values, by name, or each one's default by its whole name
-     * in camelCase, which a rule reads as `own.tabJustify`.
+     * Each private value's default by its whole name in camelCase, `null`
+     * for one with none, which a rule reads as `own.tabJustify` and the web
+     * names `--_tab-justify`: the table's own, and another family's it reads
+     * or sets.
      */
     readonly own?: Own
     /** The props only the styled tier has, by name in camelCase, as a headless source declares its own. */
@@ -434,18 +423,15 @@ export const styles = <
       AsksOf<H['props'][number] | PropsList<StyledProps>[number]>,
       StatesOf<H>,
       HookKeys<Hooks>,
-      OwnKeys<Own, Prefix>,
+      keyof Own & string,
       AliasesOf<H['tree']> & string
     >,
   ) => readonly Group[],
 ): Family => {
-  const owned = Array.isArray(declared.own) ? (declared.own as readonly string[]) : []
-  const named = (name: string): string =>
-    owned.find((own) => own === name || own === `${declared.prefix}-${name}`) ?? name
   return {
     name: declared.prefix,
     props: [],
-    rules: rules(given(named) as never) as unknown as Family['rules'],
+    rules: rules(given() as never) as unknown as Family['rules'],
     stylesheet: declared.stylesheet,
   }
 }
@@ -458,15 +444,17 @@ export const styles = <
  */
 export const fragment = <
   const Need extends string,
-  const Hooks extends string = never,
-  const Own extends string = never,
+  const Hooks extends Defaults = Record<never, never>,
+  const Own extends Defaults = Record<never, never>,
   const Props extends string = never,
 >(
   name: string,
   declared: {
     readonly parts: readonly Need[]
-    readonly hooks?: readonly Hooks[]
-    readonly own?: readonly Own[]
+    /** The includer's hooks the rules read, each by its name in camelCase. */
+    readonly hooks?: Hooks
+    /** The private values the rules read or set, each by its whole name in camelCase. */
+    readonly own?: Own
     /** The includer's props the rules ask of, which every includer has. */
     readonly props?: readonly Props[]
   },
@@ -477,8 +465,8 @@ export const fragment = <
         never,
         { readonly [Key in Props]?: Asks<string[]> },
         string,
-        Camel<Hooks>,
-        Camel<Own>,
+        keyof Hooks & string,
+        keyof Own & string,
         string
       >,
       'include' | 'variants'
@@ -488,7 +476,7 @@ export const fragment = <
   ({
     name,
     need: declared.parts,
-    rules: rules(given((own) => own) as never),
+    rules: rules(given() as never),
   }) as unknown as Fragment<Need>
 
 /** A fragment of declarations, which a rule's `set` takes in where it stands. */
