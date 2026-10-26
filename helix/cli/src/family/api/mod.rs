@@ -282,7 +282,9 @@ const FIELDS: &[&str] = &[
     "validation",
 ];
 
-/// Reads a headless source from its default export.
+/// Reads a headless source in the compiler's own shape, which
+/// [`rendered::rewrite`] writes from a `headless.tsx` and the compiler's
+/// tests write directly.
 ///
 /// # Errors
 ///

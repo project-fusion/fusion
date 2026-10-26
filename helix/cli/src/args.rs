@@ -425,16 +425,6 @@ pub enum Family {
     /// `helix api` and the MCP server read.
     Platforms(FamilyArgs),
 
-    /// Print a headless source written in the builder form as `headless.tsx`.
-    ///
-    /// Reads each element's `headless.ts` with the compiler's reader and
-    /// prints it with its part tree last, as JSX, its props, events,
-    /// computed values, and attributes in alphabetical order, and every
-    /// comment where it stood. Refuses one whose printed form compiles to
-    /// anything but what it does, the order of its props and events aside.
-    /// With `--write`, writes `headless.tsx` in place of `headless.ts`.
-    Print(FamilyPrint),
-
     /// Write each generated stylesheet into the styled package's sources.
     ///
     /// With `--check`, writes nothing and exits 1 when one is missing or out of
@@ -589,19 +579,6 @@ pub struct FamilyArgs {
     /// The package holding the sources, which is the directory holding its `src`.
     #[arg(default_value = "helix/neutral")]
     pub package: PathBuf,
-}
-
-/// What `family print` takes.
-#[cfg(feature = "internal")]
-#[derive(Args, Debug)]
-pub struct FamilyPrint {
-    /// Write `headless.tsx` beside each source and remove its `headless.ts`.
-    #[arg(long)]
-    pub write: bool,
-
-    /// Each element's folder, or its `headless.ts`.
-    #[arg(required = true)]
-    pub sources: Vec<PathBuf>,
 }
 
 /// What `manifest build` takes.

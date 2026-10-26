@@ -1,4 +1,4 @@
-//! One element of a render, read into the builder helper its tag names.
+//! One element of a render, read into the node its tag names.
 
 use oxc_ast::ast::{
     JSXAttribute, JSXAttributeItem, JSXAttributeName, JSXAttributeValue, JSXElement, JSXElementName,
@@ -10,7 +10,7 @@ use crate::family::read::Lit;
 /// Each attribute the JSX form spells another way than the intermediate
 /// form: the word a React, React Native, or ARIA reader knows, and the name
 /// the native runtime reads.
-pub(crate) const RENAMED: &[(&str, &str)] = &[
+const RENAMED: &[(&str, &str)] = &[
     ("anchorPress", "presses"),
     ("ariaHidden", "decorative"),
     ("icon", "glyph"),
@@ -32,7 +32,7 @@ const HOLDS: &[&str] = &["box", "layer", "pressable", "region", "repeat", "wrap"
 const SAYS: &[&str] = &["live", "text"];
 
 impl Render<'_> {
-    /// An element, as the builder helper its tag names.
+    /// An element, as the node its tag names.
     pub(super) fn element(&self, element: &JSXElement) -> Result<Lit, String> {
         let opening = &element.opening_element;
         let tag = match &opening.name {
@@ -92,7 +92,7 @@ impl Render<'_> {
         Ok(Lit::Call((*helper).to_owned(), arguments))
     }
 
-    /// The node's name and its attributes, each spelled as the builder form
+    /// The node's name and its attributes, each spelled as the compiler's own
     /// spells it.
     fn attributes(
         &self,
@@ -191,7 +191,7 @@ impl Render<'_> {
             (_, "sends" | "while" | "says") => Err(self.at(
                 attribute.span,
                 &format!(
-                    "`{key}` is the builder form's: write it as {}",
+                    "`{key}` is the compiler's own spelling: write it as {}",
                     match key {
                         "sends" => "`onPress={send.x}`",
                         "while" => "`when`",

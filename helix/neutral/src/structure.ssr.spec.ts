@@ -180,15 +180,12 @@ import type { Headless, Node } from './tree.js'
  */
 
 /**
- * An element's source with its tree. A source written with `render` holds its
- * tree as JSX that nothing runs, so its tree is the compiled one, from the
- * native module `helix family components` writes and `check:families` holds
- * to a fresh compile.
+ * An element's source with its tree. A source holds its tree as JSX that
+ * nothing runs, so its tree is the compiled one, from the native module
+ * `helix family components` writes and `check:families` holds to a fresh
+ * compile.
  */
 const withTree = (family: Headless): Headless => {
-  if (!('render' in family)) {
-    return family
-  }
   const native = new URL('../../styled/native/', import.meta.url)
   for (const folder of readdirSync(native)) {
     const module = readFileSync(new URL(`${folder}/index.native.ts`, native), 'utf8')

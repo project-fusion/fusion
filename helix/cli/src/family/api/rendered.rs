@@ -1,17 +1,19 @@
-//! A headless source written with `render`, rewritten into the builder
-//! form's keys, so [`super::headless`] reads one shape.
+//! A headless source written with `render`, rewritten into the compiler's
+//! own keys, so [`super::headless`] reads one shape, as the style table's
+//! sugar rewrites a table into the `family()` shape. The compiler's tests
+//! write that shape directly, and no source does.
 //!
-//! **A spelling of one shape, as the style table's sugar is.** `memberOf:
-//! set(of, { ... })` is `item: item(of, { ... })`, with `chooses` where a
-//! `<Pressable>` in the render says `chooses`: pressing is declared once, on
-//! the press that chooses. `props` is an
+//! **A spelling of one shape.** `memberOf: set(of, { ... })` is
+//! `item: item(of, { ... })`, with `chooses` where a `<Pressable>` in the
+//! render says `selects`: pressing is declared once, on the press that
+//! selects. `props` is an
 //! object by name in camelCase, each a default or a spec: `dismissLabel:
 //! 'Close'` is `prop('dismiss-label', 'string', { default: 'Close' })`, and
 //! `string()`, `oneOf()`, `property()` and `web()` say the rest. `events` is
 //! an object too: `beforeSelect: cancelable(['value'])` is
 //! `event('before-select', { cancelable: true, detail: ['value'] })`. The
 //! keys of `derived` are camelCase, and `render` is the `tree` the reader
-//! has already read. Every other key is the builder form's, as written.
+//! has already read. Every other key is a feature, read as `spelling` says.
 //!
 //! **The props, the events, the computed values, and the states are in
 //! alphabetical order**, as Biome orders keys elsewhere: by letter whatever
@@ -44,7 +46,7 @@ pub fn is_rendered(export: &Lit) -> bool {
             && matches!(arguments.get(1), Some(Lit::Object(body)) if body.iter().any(|(key, _)| key == "render")))
 }
 
-/// The source in the builder form's keys.
+/// The source in the compiler's own keys.
 ///
 /// # Errors
 ///
@@ -76,7 +78,7 @@ pub fn rewrite(export: &Lit) -> Result<Lit, String> {
             "render" => ("tree".to_owned(), value.clone()),
             "item" | "tree" => {
                 return Err(format!(
-                    "`{key}` is the builder form's: a source written with `render` writes {}",
+                    "`{key}` is the compiler's own key: a source writes {}",
                     if key == "item" {
                         "`memberOf: set(...)`"
                     } else {
@@ -349,7 +351,7 @@ fn events(value: &Lit) -> Result<Lit, String> {
 }
 
 /// One event's value: its detail's fields, `cancelable()`, `bare()`,
-/// `web()`, or an object of the builder form's fields.
+/// `web()`, or an object of the compiler's own fields.
 fn event_spec(name: &str, value: &Lit, extra: &mut Vec<(String, Lit)>) -> Result<(), String> {
     let detail = |arguments: &[Lit], extra: &mut Vec<(String, Lit)>| match arguments {
         [] => Ok(()),
