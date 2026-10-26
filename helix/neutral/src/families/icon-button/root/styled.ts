@@ -121,7 +121,7 @@ export default styles(
          the button sits on in either mode. A rung of the surface ladder vanished
          inside a menu, a dialog, or a popover in dark mode. */
       rule(
-        { within: { host: { disabled: false } }, hover: true },
+        { formDisabled: false, hover: true },
         {
           backgroundColor: first(
             own.pressedFill,
@@ -135,7 +135,7 @@ export default styles(
       /* Pressed: the two values every color rule reads through, from the
          `-active` hooks alone. */
       rule(
-        { active: true, within: { host: { disabled: false } } },
+        { active: true, formDisabled: false },
         {
           own: {
             pressedFill: hook.backgroundColorActive(),
@@ -161,7 +161,7 @@ export default styles(
         },
       ),
       rule(
-        { within: { host: { disabled: false } }, emphasis: 'solid', hover: true },
+        { formDisabled: false, emphasis: 'solid', hover: true },
         {
           backgroundColor: first(
             own.pressedFill,
@@ -188,7 +188,7 @@ export default styles(
         },
       ),
       rule(
-        { within: { host: { disabled: false } }, emphasis: 'outlined', hover: true },
+        { formDisabled: false, emphasis: 'outlined', hover: true },
         {
           backgroundColor: first(
             own.pressedFill,
@@ -212,7 +212,7 @@ export default styles(
         },
       ),
       rule(
-        { within: { host: { disabled: false } }, emphasis: 'subtle', hover: true },
+        { formDisabled: false, emphasis: 'subtle', hover: true },
         {
           backgroundColor: first(
             own.pressedFill,
@@ -224,10 +224,7 @@ export default styles(
         },
       ),
       /* `:disabled` on the host, which a form's disabled fieldset sets too. */
-      rule(
-        { within: { host: { disabled: true } } },
-        { web: { cursor: 'not-allowed' }, opacity: 0.5 },
-      ),
+      rule({ formDisabled: true }, { web: { cursor: 'not-allowed' }, opacity: 0.5 }),
       /* **Pending: the icon stays where it is, unseen, and a ring turns over
          it**, as on Button. The ring is the `spinner` part, drawn only while
          pending. */
