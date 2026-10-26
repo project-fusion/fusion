@@ -46,7 +46,7 @@ export {
 export { glyphs, type Icon } from './render/vector'
 export { webOnly } from './render/web-only'
 export type { KeyboardHandling } from './root/layers'
-export { HelixRoot, type HelixRootProps } from './root/root'
+export { HelixRoot, type HelixRootProps, useInsideHelixRoot } from './root/root'
 export type { Family } from './style/form'
 export { SPACE_SCALE_LIMIT, type Tokens } from './theme/drawn'
 export type { ThemeSeeds } from './theme/engine'

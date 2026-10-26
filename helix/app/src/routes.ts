@@ -1,5 +1,3 @@
-import type { Tab } from 'helix-proof'
-
 /** The gallery's screens, and what each one is opened with. */
 export type Routes = {
   /**
@@ -15,11 +13,12 @@ export type Routes = {
   /** One family's examples. */
   Family: { family: string }
   /**
-   * The proof page: a project dashboard written once for the web and a phone,
-   * open at a project and a tab where they are given, as
-   * `helix://proof/website/activity` opens it.
+   * The proof app: a project dashboard on Expo Router, written once for the
+   * web and a phone, open at the route `path` names, as
+   * `helix://proof/projects/website/activity` opens it at
+   * `/projects/website/activity`.
    */
-  Proof: { project?: string; tab?: Tab } | undefined
+  Proof: { path?: string } | undefined
   /** The families, and the settings. */
   Home: undefined
   /** A list of 1,000 rows, and the frame rate it scrolls at. */

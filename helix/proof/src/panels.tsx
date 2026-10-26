@@ -79,30 +79,32 @@ export function Overview({ project }: Props) {
   )
 }
 
-/** What happened on the project, newest first, in an area that scrolls once it is long. */
+/**
+ * What happened on the project, newest first, in the page's own scroll: a
+ * nested area that scrolls cut the timeline off partway down a phone's
+ * screen.
+ */
 export function Activity({ project }: Props) {
   return (
-    <helix-scroll-area label="Activity" max-block-size="lg" orientation="vertical">
-      <helix-timeline label={`Activity on ${project.name}`}>
-        {project.activity.map((change) => (
-          <helix-timeline-item datetime={change.at} key={change.at} tone={change.tone}>
-            <helix-format-date
-              date={change.at}
-              day="numeric"
-              hour="numeric"
-              minute="2-digit"
-              month="short"
-              slot="time"
-              time-zone="UTC"
-            ></helix-format-date>
-            <helix-text variant="body-strong">{change.title}</helix-text>
-            <helix-text emphasis="muted" variant="caption">
-              {`${change.detail} ${change.by}.`}
-            </helix-text>
-          </helix-timeline-item>
-        ))}
-      </helix-timeline>
-    </helix-scroll-area>
+    <helix-timeline label={`Activity on ${project.name}`}>
+      {project.activity.map((change) => (
+        <helix-timeline-item datetime={change.at} key={change.at} tone={change.tone}>
+          <helix-format-date
+            date={change.at}
+            day="numeric"
+            hour="numeric"
+            minute="2-digit"
+            month="short"
+            slot="time"
+            time-zone="UTC"
+          ></helix-format-date>
+          <helix-text variant="body-strong">{change.title}</helix-text>
+          <helix-text emphasis="muted" variant="caption">
+            {`${change.detail} ${change.by}.`}
+          </helix-text>
+        </helix-timeline-item>
+      ))}
+    </helix-timeline>
   )
 }
 

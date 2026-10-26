@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "experiments": {
+      "baseUrl": "/helix/app/proof"
+    },
+    "name": "Helix proof",
+    "orientation": "portrait",
+    "platforms": ["ios", "android", "web"],
+    "plugins": ["expo-router"],
+    "scheme": "helix-proof",
+    "slug": "helix-proof",
+    "userInterfaceStyle": "automatic",
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    }
+  }
+}

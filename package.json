@@ -13,7 +13,7 @@
     "check": "bun run check:cli && bun run check:css && bun run check:families && bun run check:gen && bun run check:lengths && bun run check:prose && bun run check:withheld && bun run check:spec",
     "check:cli": "bun run check:cli:component && bun run check:cli:workspace && bun run check:cli:shared",
     "check:cli:component": "turbo run analyze token-layer && bun run helix component audit",
-    "check:cli:shared": "bun run helix shared helix/app/proof",
+    "check:cli:shared": "bun run helix shared helix/proof/app helix/proof/src",
     "check:cli:workspace": "bun run fusion x workspace audit",
     "check:css": "bun run check:css:hexes && bun run check:css:seeds && turbo run wasm-check",
     "check:css:hexes": "turbo run frame && bun fusion/scripts/check-token-hexes.mjs",
