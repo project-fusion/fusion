@@ -1,4 +1,5 @@
-import { bind, box, derive, headless, not, prop, region, text } from '../../../tree.js'
+import { headless, Slot, Text, View } from '../../../render.js'
+import { derive } from '../../../tree.js'
 
 /**
  * A menu section's headless tier: a group of the menu's rows under a
@@ -15,16 +16,31 @@ import { bind, box, derive, headless, not, prop, region, text } from '../../../t
  * has.
  */
 export default headless('menu-section', {
-  derived: { named: derive('menu-section-named'), started: derive('menu-section-start') },
-  events: [],
-  props: [prop('label', 'string', { default: '' })],
+  props: {
+    label: '',
+  },
+  events: {},
   states: ['settled', 'start'],
-  tree: [
-    box('section', { labelledby: 'heading', role: 'group' }, [
-      box('heading', { hidden: not('named'), role: 'presentation' }, [
-        region('heading', {}, [text('heading-words', { says: bind('label') })]),
-      ]),
-      region('default'),
-    ]),
-  ],
+  derived: {
+    named: derive('menu-section-named'),
+    started: derive('menu-section-start'),
+  },
+  render: ({ derived, props }) => (
+    <View
+      labelledby="heading"
+      part="section"
+      role="group"
+    >
+      <View
+        hidden={!derived.named}
+        part="heading"
+        role="presentation"
+      >
+        <Slot name="heading">
+          <Text part="heading-words">{props.label}</Text>
+        </Slot>
+      </View>
+      <Slot />
+    </View>
+  ),
 })

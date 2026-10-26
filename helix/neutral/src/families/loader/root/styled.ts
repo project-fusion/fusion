@@ -1,4 +1,4 @@
-import { product, token, web } from '../../../style.js'
+import { first, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -33,7 +33,13 @@ export default styles(
   root,
   {
     prefix: 'loader',
-    hooks: ['color', 'duration', 'size', 'track-color', 'track-width'],
+    hooks: ({ own }) => ({
+      color: 'currentColor',
+      duration: own.turn,
+      size: own.size,
+      trackColor: 'currentColor',
+      trackWidth: own.stroke,
+    }),
     own: [
       'loader-breathe',
       'loader-crawl',
@@ -49,7 +55,7 @@ export default styles(
     on('host', [
       rule({
         /* A phone's words already take the color around them. */
-        color: web('inherit'),
+        web: { color: 'inherit' },
         display: 'inline-grid',
         flexShrink: 0,
         own: {
@@ -74,33 +80,31 @@ export default styles(
       /* A phone has no grid to stack the cell: the host is at least the
          ring, the content lies in it, and the ring and the mark lie over it
          in the middle. */
-      rule(
-        { platform: 'native' },
-        {
+      native([
+        rule({
           justifyContent: 'center',
-          minBlockSize: hook.size(own.size),
-          minInlineSize: hook.size(own.size),
-        },
-      ),
+          minBlockSize: first(hook.size, own.size),
+          minInlineSize: first(hook.size, own.size),
+        }),
+      ]),
       /* On paper, a loader promises what will not come. */
       rule({ print: true }, { display: 'none' }),
     ]),
     on('content', [
       rule({ gridArea: '1 / 1' }),
       /* The web hides it in its markup, on every tier; a phone here. */
-      rule({ idle: false, platform: 'native' }, { visibility: 'hidden' }),
+      native([rule({ idle: false }, { visibility: 'hidden' })]),
     ]),
     on('svg', [
       rule({
-        animation: ['helix-loader-turn', hook.duration(own.turn), 'linear', 'infinite'],
-        blockSize: hook.size(own.size),
+        animation: ['helix-loader-turn', first(hook.duration, own.turn), 'linear', 'infinite'],
+        blockSize: first(hook.size, own.size),
         gridArea: '1 / 1',
-        inlineSize: hook.size(own.size),
+        inlineSize: first(hook.size, own.size),
       }),
       rule({ reducedMotion: true }, { animationDuration: own.crawl }),
       rule({ variant: 'pulse' }, { animation: 'none' }),
-      rule({ platform: 'native' }, { position: 'absolute' }),
-      rule({ platform: 'native', state: 'waiting' }, { visibility: 'hidden' }),
+      native([rule({ position: 'absolute' }), rule({ waiting: true }, { visibility: 'hidden' })]),
     ]),
     on('track', [
       rule({
@@ -108,8 +112,8 @@ export default styles(
         /* The web's circles say `fill="none"` in their markup. */
         fill: 'none',
         opacity: 0.18,
-        stroke: hook.trackColor('currentColor'),
-        strokeWidth: hook.trackWidth(own.stroke),
+        stroke: hook.trackColor,
+        strokeWidth: first(hook.trackWidth, own.stroke),
       }),
       rule({ reducedMotion: true }, { animation: 'none' }),
       rule({ variant: 'pulse' }, { display: 'none' }),
@@ -118,10 +122,10 @@ export default styles(
     on('indicator', [
       rule({
         fill: 'none',
-        stroke: hook.color('currentColor'),
+        stroke: hook.color,
         strokeDasharray: '50, 100',
         strokeLinecap: 'round',
-        strokeWidth: hook.trackWidth(own.stroke),
+        strokeWidth: first(hook.trackWidth, own.stroke),
       }),
       rule({ variant: 'pulse' }, { display: 'none' }),
     ]),
@@ -137,23 +141,22 @@ export default styles(
         gridArea: '1 / 1',
         inlineSize: own.markSize,
         justifyContent: 'center',
-        own: { markSize: product(hook.size(own.size), 0.4) },
+        own: { markSize: product(first(hook.size, own.size), 0.4) },
       }),
       rule({ reducedMotion: true }, { animation: 'none' }),
       /* Opacity alone, where the default appearance also scales. */
       rule({ variant: 'pulse' }, { animationName: 'helix-loader-pulse-mark' }),
       rule({ reducedMotion: true, variant: 'pulse' }, { animation: 'none', opacity: 1 }),
-      rule({ platform: 'native' }, { position: 'absolute' }),
-      rule({ platform: 'native', state: 'waiting' }, { visibility: 'hidden' }),
+      native([rule({ position: 'absolute' }), rule({ waiting: true }, { visibility: 'hidden' })]),
     ]),
     on({ region: 'default', slotted: '*' }, [rule({ blockSize: '100%', inlineSize: '100%' })]),
     /* Waiting out `delay`: the web marks the drawing `hidden`, and keeps its
        box. */
     on({ part: 'svg', selector: '[part="svg"][hidden]' }, [
-      rule({ platform: 'web' }, { display: 'inline', visibility: 'hidden' }),
+      web([rule({ display: 'inline', visibility: 'hidden' })]),
     ]),
     on({ part: 'mark', selector: '[part="mark"][hidden]' }, [
-      rule({ platform: 'web' }, { display: 'flex', visibility: 'hidden' }),
+      web([rule({ display: 'flex', visibility: 'hidden' })]),
     ]),
     keyframes('helix-loader-breathe', {
       '0%, 100%': { opacity: 0.12 },

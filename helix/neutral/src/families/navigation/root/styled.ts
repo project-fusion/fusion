@@ -1,4 +1,4 @@
-import { difference, fn, list, measured, token } from '../../../style.js'
+import { difference, fn, list, measured, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import navigation from './headless.js'
 
@@ -21,20 +21,20 @@ export default styles(
   navigation,
   {
     prefix: 'navigation',
-    hooks: [
-      'block-size',
-      'gap',
-      'indicator-color',
-      'indicator-radius',
-      'indicator-shadow',
-      'indicator-thickness',
-      'rule-color',
-    ],
+    hooks: {
+      blockSize: null,
+      gap: token('space-2xs'),
+      indicatorColor: null,
+      indicatorRadius: null,
+      indicatorShadow: null,
+      indicatorThickness: token('border-thick'),
+      ruleColor: token('color-border'),
+    },
     own: ['navigation-item-display', 'navigation-item-floor', 'navigation-item-justify'],
     stylesheet: 'navigation/root/navigation-root.generated.css',
   },
   ({ hook, on, rule }) => {
-    const ruled = hook.ruleColor(token('color-border'))
+    const ruled = hook.ruleColor
     return [
       on('host', [
         rule({ display: 'block' }),
@@ -54,7 +54,7 @@ export default styles(
              bar and its items have to agree. */
           blockSize: hook.blockSize(token('size-control-sm')),
           display: 'flex',
-          gap: hook.gap(token('space-2xs')),
+          gap: hook.gap,
           /* Long navigation scrolls inside the bar instead of widening the page. */
           minInlineSize: 0,
           overflowX: 'auto',
@@ -115,22 +115,21 @@ export default styles(
       /* A list of destinations lays out as bare links do: the list is the
          row, or the column, and its items lose their bullets. */
       on({ slotted: ':is(ul, ol, [role="list"])' }, [
-        rule(
-          { platform: 'web' },
-          {
+        web([
+          rule({
             alignItems: 'center',
             blockSize: '100%',
             display: 'flex',
-            gap: hook.gap(token('space-2xs')),
+            gap: hook.gap,
             listStyle: 'none',
             margin: token('space-none'),
             padding: token('space-none'),
-          },
-        ),
-        rule(
-          { orientation: 'vertical', platform: 'web' },
-          { alignItems: 'stretch', blockSize: 'auto', flexDirection: 'column' },
-        ),
+          }),
+          rule(
+            { orientation: 'vertical' },
+            { alignItems: 'stretch', blockSize: 'auto', flexDirection: 'column' },
+          ),
+        ]),
       ]),
       /* Behind the destinations and out of flow, so moving it reflows nothing. */
       on('indicator', [
@@ -158,13 +157,15 @@ export default styles(
         /* A phone's mark travels by the measured place alone, so it stands at
            the destination's top where the web centers it on the bar. Each
            destination fills the bar, so the two are one place. */
-        rule(
-          { orientation: false, platform: 'native', variant: { not: 'underlined' } },
-          {
-            insetBlockStart: 0,
-            translate: [measured('indicator-x', 0), measured('indicator-y', 0)],
-          },
-        ),
+        native([
+          rule(
+            { orientation: false, variant: { not: 'underlined' } },
+            {
+              insetBlockStart: 0,
+              translate: [measured('indicator-x', 0), measured('indicator-y', 0)],
+            },
+          ),
+        ]),
         rule(
           { orientation: 'vertical' },
           {
@@ -177,7 +178,7 @@ export default styles(
           { variant: 'underlined' },
           {
             backgroundColor: hook.indicatorColor(token('color-primary')),
-            blockSize: hook.indicatorThickness(token('border-thick')),
+            blockSize: hook.indicatorThickness,
             borderRadius: hook.indicatorRadius(token('radii-none')),
             insetBlockEnd: 0,
             insetBlockStart: 'auto',
@@ -199,7 +200,7 @@ export default styles(
           { orientation: 'vertical', variant: 'underlined' },
           {
             blockSize: measured('indicator-block-size', 0),
-            inlineSize: hook.indicatorThickness(token('border-thick')),
+            inlineSize: hook.indicatorThickness,
             insetBlockStart: 0,
             insetInlineEnd: 0,
             insetInlineStart: 'auto',

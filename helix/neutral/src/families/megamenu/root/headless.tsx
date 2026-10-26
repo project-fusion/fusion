@@ -1,19 +1,18 @@
 import {
-  bind,
-  collection,
-  derive,
-  event,
+  bare,
+  boolean,
+  cancelable,
   headless,
-  item,
-  layer,
-  pressable,
-  prop,
-  region,
-  text,
-  toggle,
-  when,
-  wrap,
-} from '../../../tree.js'
+  Layer,
+  oneOf,
+  Pressable,
+  Slot,
+  set,
+  Text,
+  Wrap,
+  web,
+} from '../../../render.js'
+import { collection, derive, toggle } from '../../../tree.js'
 
 /**
  * Megamenu's headless tier: a section of a navigation, a trigger that
@@ -65,6 +64,49 @@ import {
  * manifest says the element has.
  */
 export default headless('megamenu', {
+  memberOf: set('navigation', { flag: 'current', value: 'label' }),
+  props: {
+    bandBelow: 640,
+    /* `closeDelay` and `openDelay` are hover intent, and `placement` the card
+       placed against the trigger. */
+    closeDelay: web(220),
+    defaultOpen: false,
+    label: '',
+    open: boolean(),
+    openDelay: web(120),
+    /* A phone opens on a press under either, having no pointer to rest. */
+    openOn: oneOf(['click', 'hover'], 'hover'),
+    placement: web(
+      oneOf(
+        [
+          'bottom',
+          'bottom-end',
+          'bottom-start',
+          'left',
+          'left-end',
+          'left-start',
+          'right',
+          'right-end',
+          'right-start',
+          'top',
+          'top-end',
+          'top-start',
+        ],
+        'bottom-start',
+      ),
+    ),
+    variant: oneOf(['band']),
+  },
+  events: {
+    beforeClose: cancelable(['open']),
+    beforeOpen: cancelable(['open']),
+    toggle: bare(['newState', 'oldState']),
+  },
+  states: ['current', 'from-end', 'from-start', 'narrow', 'open', 'settled', 'to-end', 'to-start'],
+  derived: {
+    current: derive('megamenu-current'),
+    narrow: derive('megamenu-narrow'),
+  },
   collection: collection({
     closes: { event: 'select' },
     keys: {
@@ -75,47 +117,6 @@ export default headless('megamenu', {
     },
     marked: true,
   }),
-  derived: {
-    current: derive('megamenu-current'),
-    narrow: derive('megamenu-narrow'),
-  },
-  events: [
-    event('before-close', { cancelable: true, detail: ['open'] }),
-    event('before-open', { cancelable: true, detail: ['open'] }),
-    event('toggle', { bare: true, detail: ['newState', 'oldState'] }),
-  ],
-  item: item('navigation', { chooses: true, flag: 'current', value: 'label' }),
-  props: [
-    prop('band-below', 'number', { default: 640 }),
-    prop('default-open', 'boolean', { default: false }),
-    prop('label', 'string', { default: '' }),
-    prop('open', 'boolean'),
-    /* A phone opens on a press under either, having no pointer to rest. */
-    prop('open-on', ['click', 'hover'], { default: 'hover' }),
-    prop('variant', ['band']),
-    /* Hover intent, and the card placed against the trigger. */
-    prop('close-delay', 'number', { default: 220, platform: 'web' }),
-    prop('open-delay', 'number', { default: 120, platform: 'web' }),
-    prop(
-      'placement',
-      [
-        'bottom',
-        'bottom-end',
-        'bottom-start',
-        'left',
-        'left-end',
-        'left-start',
-        'right',
-        'right-end',
-        'right-start',
-        'top',
-        'top-end',
-        'top-start',
-      ],
-      { default: 'bottom-start', platform: 'web' },
-    ),
-  ],
-  states: ['current', 'from-end', 'from-start', 'narrow', 'open', 'settled', 'to-end', 'to-start'],
   toggle: toggle({
     changes: 'toggle',
     checked: 'open',
@@ -123,32 +124,47 @@ export default headless('megamenu', {
     initial: 'default-open',
     opens: 'before-open',
   }),
-  tree: [
-    /* The trigger's own box on a phone, which the band hangs from. The web
-       hangs it from the bar the trigger stands in. */
-    wrap('anchor', { platform: 'native', while: true }, [
-      region('trigger', {}, [
-        pressable('trigger', { chooses: true, expanded: bind('open'), role: 'button' }, [
-          text('trigger-words', { says: bind('label') }),
-        ]),
-      ]),
-    ]),
-    when('open', region('indicator', { decorative: true, part: 'indicator' })),
-    layer(
-      'surface',
-      {
-        alone: true,
-        anchor: 'anchor',
-        band: true,
-        closedby: 'any',
-        enters: 'down',
-        label: bind('label'),
-        open: bind('open'),
-        presses: 'toggle',
-        returns: 'dismissed',
-        role: 'group',
-      },
-      [region('default', { part: 'columns' })],
-    ),
-  ],
+  render: ({ props }) => (
+    <>
+      {/* The trigger's own box on a phone, which the band hangs from. The web
+          hangs it from the bar the trigger stands in. */}
+      <Wrap
+        part="anchor"
+        platform="native"
+      >
+        <Slot name="trigger">
+          <Pressable
+            chooses
+            expanded={props.open}
+            part="trigger"
+            role="button"
+          >
+            <Text part="trigger-words">{props.label}</Text>
+          </Pressable>
+        </Slot>
+      </Wrap>
+      {props.open && (
+        <Slot
+          ariaHidden
+          name="indicator"
+          part="indicator"
+        />
+      )}
+      <Layer
+        alone
+        anchor="anchor"
+        band
+        closedby="any"
+        enters="down"
+        label={props.label}
+        open={props.open}
+        part="surface"
+        presses="toggle"
+        returns="dismissed"
+        role="group"
+      >
+        <Slot part="columns" />
+      </Layer>
+    </>
+  ),
 })

@@ -1,4 +1,5 @@
-import { headless, prop, region, section } from '../../../tree.js'
+import { headless, Slot } from '../../../render.js'
+import { section } from '../../../tree.js'
 
 /**
  * An outline section's headless tier: a section of the page that an outline
@@ -17,13 +18,13 @@ import { headless, prop, region, section } from '../../../tree.js'
  * has.
  */
 export default headless('outline-section', {
-  events: [],
-  props: [
-    prop('anchor', 'string', { default: '' }),
-    prop('label', 'string', { default: '' }),
-    prop('level', 'number', { default: 1 }),
-  ],
-  section: section({ id: 'anchor', label: 'label', level: 'level' }),
+  props: {
+    anchor: '',
+    label: '',
+    level: 1,
+  },
+  events: {},
   states: ['settled'],
-  tree: [region('default')],
+  section: section({ id: 'anchor', label: 'label', level: 'level' }),
+  render: () => <Slot />,
 })

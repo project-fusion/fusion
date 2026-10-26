@@ -1,17 +1,5 @@
-import {
-  bind,
-  box,
-  derive,
-  event,
-  field,
-  headless,
-  pressable,
-  prop,
-  region,
-  repeat,
-  sections,
-  text,
-} from '../../../tree.js'
+import { headless, oneOf, Pressable, Repeat, Slot, Text, View } from '../../../render.js'
+import { derive, sections } from '../../../tree.js'
 
 /**
  * Outline's headless tier: links to the sections of a page, with the link
@@ -50,16 +38,21 @@ import {
  * the element has.
  */
 export default headless('outline', {
-  derived: { name: derive('outline-name') },
-  events: [event('activate', { detail: ['value'] })],
-  props: [
-    prop('behavior', ['auto', 'instant', 'smooth'], { default: 'auto' }),
-    prop('follow', 'boolean', { default: false }),
-    prop('fallback-label', 'string', { default: 'On this page' }),
-    prop('label', 'string', { default: '' }),
-    prop('marks', ['reading', 'visible'], { default: 'reading' }),
-    prop('offset', 'number', { default: 0 }),
-  ],
+  props: {
+    behavior: oneOf(['auto', 'instant', 'smooth'], 'auto'),
+    fallbackLabel: 'On this page',
+    follow: false,
+    label: '',
+    marks: oneOf(['reading', 'visible'], 'reading'),
+    offset: 0,
+  },
+  events: {
+    activate: ['value'],
+  },
+  states: ['settled'],
+  derived: {
+    name: derive('outline-name'),
+  },
   sections: sections({
     behavior: 'behavior',
     changes: 'activate',
@@ -70,32 +63,48 @@ export default headless('outline', {
     marks: 'marks',
     offset: 'offset',
   }),
-  states: ['settled'],
-  tree: [
-    box('heading', {}, [region('heading')]),
-    box('nav', { label: bind('name'), labelledby: 'heading', role: 'navigation' }, [
-      region('default', { platform: 'web' }),
-      /* A phone's link for each section the page registers. */
-      repeat('links', { each: bind('sections'), key: 'id' }, [
-        pressable(
-          'link',
-          {
-            also: {
-              'link-current': field('marked'),
-              'link-depth-2': field('depth-2'),
-              'link-depth-3': field('depth-3'),
-              'link-depth-4': field('depth-4'),
-              'link-depth-5': field('depth-5'),
-              'link-depth-6': field('depth-6'),
-            },
-            current: field('current'),
-            href: field('href'),
-            platform: 'native',
-          },
-          [text('link-words', { says: field('label') })],
-        ),
-      ]),
-      box('indicator', { decorative: true }, [region('indicator')]),
-    ]),
-  ],
+  render: ({ derived, entry, sections }) => (
+    <>
+      <View part="heading">
+        <Slot name="heading" />
+      </View>
+      <View
+        label={derived.name}
+        labelledby="heading"
+        part="nav"
+        role="navigation"
+      >
+        <Slot platform="web" />
+        {/* A phone's link for each section the page registers. */}
+        <Repeat
+          each={sections.list}
+          key="id"
+          part="links"
+        >
+          <Pressable
+            also={{
+              'link-current': entry.marked,
+              'link-depth-2': entry['depth-2'],
+              'link-depth-3': entry['depth-3'],
+              'link-depth-4': entry['depth-4'],
+              'link-depth-5': entry['depth-5'],
+              'link-depth-6': entry['depth-6'],
+            }}
+            current={entry.current}
+            href={entry.href}
+            part="link"
+            platform="native"
+          >
+            <Text part="link-words">{entry.label}</Text>
+          </Pressable>
+        </Repeat>
+        <View
+          ariaHidden
+          part="indicator"
+        >
+          <Slot name="indicator" />
+        </View>
+      </View>
+    </>
+  ),
 })

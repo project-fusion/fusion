@@ -1,4 +1,5 @@
-import { bind, box, derive, headless, prop } from '../../../tree.js'
+import { headless, number, oneOf, View } from '../../../render.js'
+import { derive } from '../../../tree.js'
 
 /**
  * A meter segment's headless tier: one share of a meter's whole, drawn as a
@@ -18,14 +19,23 @@ import { bind, box, derive, headless, prop } from '../../../tree.js'
  * and the parts with what the manifest says the element has.
  */
 export default headless('meter-segment', {
-  derived: { amount: derive('meter-segment-amount') },
-  events: [],
-  props: [
+  props: {
     /* Names the slice where a pointer rests on it, on the web. */
-    prop('label', 'string', { default: '' }),
-    prop('tone', ['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
-    prop('value', 'number'),
-  ],
+    label: '',
+    tone: oneOf(['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
+    value: number(),
+  },
+  events: {},
   states: ['settled'],
-  tree: [box('fill', { '--meter-segment-value': bind('amount') })],
+  derived: {
+    amount: derive('meter-segment-amount'),
+  },
+  render: ({ derived }) => (
+    <View
+      part="fill"
+      style={{
+        '--meter-segment-value': derived.amount,
+      }}
+    />
+  ),
 })

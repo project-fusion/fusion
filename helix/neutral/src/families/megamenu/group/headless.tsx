@@ -1,4 +1,5 @@
-import { bind, box, derive, headless, not, prop, region, text } from '../../../tree.js'
+import { headless, Slot, Text, View } from '../../../render.js'
+import { derive } from '../../../tree.js'
 
 /**
  * A megamenu group's headless tier: a column of a megamenu's panel, a
@@ -14,16 +15,31 @@ import { bind, box, derive, headless, not, prop, region, text } from '../../../t
  * has.
  */
 export default headless('megamenu-group', {
-  derived: { named: derive('megamenu-group-named') },
-  events: [],
-  props: [prop('label', 'string', { default: '' })],
+  props: {
+    label: '',
+  },
+  events: {},
   states: ['settled'],
-  tree: [
-    box('group', { labelledby: 'label', role: 'group' }, [
-      box('label', { hidden: not('named'), level: 3, role: 'heading' }, [
-        region('label', {}, [text('label-words', { says: bind('label') })]),
-      ]),
-      region('default'),
-    ]),
-  ],
+  derived: {
+    named: derive('megamenu-group-named'),
+  },
+  render: ({ derived, props }) => (
+    <View
+      labelledby="label"
+      part="group"
+      role="group"
+    >
+      <View
+        hidden={!derived.named}
+        level={3}
+        part="label"
+        role="heading"
+      >
+        <Slot name="label">
+          <Text part="label-words">{props.label}</Text>
+        </Slot>
+      </View>
+      <Slot />
+    </View>
+  ),
 })

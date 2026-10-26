@@ -1,5 +1,5 @@
 import printEconomy from '../../../fragments/print-economy.js'
-import { product, token } from '../../../style.js'
+import { native, product, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -22,7 +22,11 @@ export default styles(
   root,
   {
     prefix: 'icon',
-    hooks: ['animation-duration', 'rotate', 'size'],
+    hooks: {
+      animationDuration: null,
+      rotate: 'none',
+      size: token('size-icon'),
+    },
     props: [
       prop('animation', ['beat', 'pulse', 'spin']),
       prop('auto-width', 'boolean', { default: false }),
@@ -38,10 +42,10 @@ export default styles(
        gap under it and sits on the text baseline of whatever it accompanies. */
     on('host', [
       rule({
-        blockSize: hook.size(token('size-icon')),
+        blockSize: hook.size,
         display: 'inline-flex',
         flex: '0 0 auto',
-        inlineSize: hook.size(token('size-icon')),
+        inlineSize: hook.size,
       }),
       /* Under `auto-width`, the box takes the glyph's proportions: its height
          from the size, its width from the drawing's own box. Written beside each
@@ -84,7 +88,7 @@ export default styles(
       ),
     ]),
     on('svg', [
-      rule({ blockSize: '100%', inlineSize: '100%', rotate: hook.rotate('none') }),
+      rule({ blockSize: '100%', inlineSize: '100%', rotate: hook.rotate }),
       rule({ 'auto-width': true }, { inlineSize: 'auto' }),
       /* Turned and flipped on the glyph, inside the box. A flip is a
          `transform`, which composes with the `scale` that `mirror` sets on a
@@ -102,7 +106,7 @@ export default styles(
       /* A glyph that means forward or back points the way a right-to-left page
          reads. Core's mirror rule turns the web's `<svg>` already, by its
          `data-mirror`, so this rule is the same turn for a phone alone. */
-      rule({ dir: 'rtl', mirror: true, platform: 'native' }, { scale: '-1 1' }),
+      native([rule({ dir: 'rtl', mirror: true }, { scale: '-1 1' })]),
     ]),
     keyframes('helix-icon-spin', { to: { rotate: '1turn' } }),
     keyframes('helix-icon-pulse', { '50%': { opacity: 0.4 } }),

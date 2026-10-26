@@ -4,10 +4,12 @@ import {
   list,
   measured,
   mix,
+  native,
   product,
   quotient,
   sum,
   token,
+  web,
 } from '../../../style.js'
 import { styles } from '../../../table.js'
 import outline from './headless.js'
@@ -31,38 +33,38 @@ export default styles(
   outline,
   {
     prefix: 'outline',
-    hooks: [
-      'heading-color',
-      'indent',
-      'indicator-color',
-      'link-color',
-      'link-current-color',
-      'link-current-weight',
-      'link-font-size',
-      'link-hover-background-color',
-      'link-hover-color',
-      'link-padding-block',
-      'link-padding-inline',
-      'link-radius',
-      'rail',
-      'rule-color',
-    ],
+    hooks: {
+      headingColor: token('color-foreground'),
+      indent: token('space-sm'),
+      indicatorColor: token('color-primary'),
+      linkColor: token('color-foreground-muted'),
+      linkCurrentColor: token('color-foreground'),
+      linkCurrentWeight: token('weight-semibold'),
+      linkFontSize: token('text-xs'),
+      linkHoverBackgroundColor: mix(token('color-foreground'), 5, 'transparent'),
+      linkHoverColor: token('color-foreground'),
+      linkPaddingBlock: token('space-2xs'),
+      linkPaddingInline: token('space-sm'),
+      linkRadius: token('radii-sm'),
+      rail: null,
+      ruleColor: token('color-border'),
+    },
     own: ['mark-width'],
     stylesheet: 'outline/root/outline-root.generated.css',
   },
   ({ hook, on, own, rule }) => {
     const rail = hook.rail(token('space-2xs'))
-    const ruleColor = hook.ruleColor(token('color-border'))
-    const padding = hook.linkPaddingInline(token('space-sm'))
-    const indent = hook.indent(token('space-sm'))
+    const ruleColor = hook.ruleColor
+    const padding = hook.linkPaddingInline
+    const indent = hook.indent
     const spring = [token('duration-normal'), token('easing-spring')]
     const link = {
-      borderRadius: hook.linkRadius(token('radii-sm')),
-      color: hook.linkColor(token('color-foreground-muted')),
-      fontSize: hook.linkFontSize(token('text-xs')),
+      borderRadius: hook.linkRadius,
+      color: hook.linkColor,
+      fontSize: hook.linkFontSize,
       fontWeight: token('weight-medium'),
       lineHeight: token('leading-normal'),
-      paddingBlock: hook.linkPaddingBlock(token('space-2xs')),
+      paddingBlock: hook.linkPaddingBlock,
       paddingInline: padding,
       textDecoration: 'none',
       transition: list(
@@ -71,8 +73,8 @@ export default styles(
       ),
     }
     const current = {
-      color: hook.linkCurrentColor(token('color-foreground')),
-      fontWeight: hook.linkCurrentWeight(token('weight-semibold')),
+      color: hook.linkCurrentColor,
+      fontWeight: hook.linkCurrentWeight,
     }
     const level2 = { paddingInlineStart: sum(padding, indent) }
     const level3 = { paddingInlineStart: sum(padding, product(2, indent)) }
@@ -102,7 +104,7 @@ export default styles(
       on('indicator', [
         rule({
           own: { markWidth: token('border-thin') },
-          backgroundColor: hook.indicatorColor(token('color-primary')),
+          backgroundColor: hook.indicatorColor,
           blockSize: measured('indicator-block-size', 0),
           borderRadius: token('radii-full'),
           inlineSize: own.markWidth,
@@ -130,7 +132,7 @@ export default styles(
            one-second guard, a swell with no travel. A page whose stylesheet
            arrived after the first placement drew the wide mark at rest. */
         rule(
-          { part: { 'data-moving': true }, state: 'settled' },
+          { part: { 'data-moving': true }, settled: true },
           {
             own: { markWidth: hook.rail() },
             transition: list(
@@ -145,53 +147,40 @@ export default styles(
       ]),
       /* The links passed in on the web. */
       on({ part: 'nav', selector: '::slotted(a)' }, [
-        rule({ platform: 'web' }, { ...link, marginInlineStart: hook.rail(token('border-thick')) }),
+        web([rule({ ...link, marginInlineStart: hook.rail(token('border-thick')) })]),
       ]),
       on({ part: 'nav', selector: '::slotted(a):hover' }, [
-        rule(
-          { platform: 'web' },
-          {
-            backgroundColor: hook.linkHoverBackgroundColor(
-              mix(token('color-foreground'), 5, 'transparent'),
-            ),
-            color: hook.linkHoverColor(token('color-foreground')),
+        web([
+          rule({
+            backgroundColor: hook.linkHoverBackgroundColor,
+            color: hook.linkHoverColor,
             textDecoration: 'none',
-          },
-        ),
+          }),
+        ]),
       ]),
-      on({ part: 'nav', selector: '::slotted(a[aria-current])' }, [
-        rule({ platform: 'web' }, current),
-      ]),
-      on({ part: 'nav', selector: '::slotted(a[data-level="2"])' }, [
-        rule({ platform: 'web' }, level2),
-      ]),
-      on({ part: 'nav', selector: '::slotted(a[data-level="3"])' }, [
-        rule({ platform: 'web' }, level3),
-      ]),
-      on({ part: 'nav', selector: '::slotted(a[data-level="4"])' }, [
-        rule({ platform: 'web' }, level4),
-      ]),
-      on({ part: 'nav', selector: '::slotted(a[data-level="5"])' }, [
-        rule({ platform: 'web' }, level5),
-      ]),
-      on({ part: 'nav', selector: '::slotted(a[data-level="6"])' }, [
-        rule({ platform: 'web' }, level6),
-      ]),
+      on({ part: 'nav', selector: '::slotted(a[aria-current])' }, [web([rule(current)])]),
+      on({ part: 'nav', selector: '::slotted(a[data-level="2"])' }, [web([rule(level2)])]),
+      on({ part: 'nav', selector: '::slotted(a[data-level="3"])' }, [web([rule(level3)])]),
+      on({ part: 'nav', selector: '::slotted(a[data-level="4"])' }, [web([rule(level4)])]),
+      on({ part: 'nav', selector: '::slotted(a[data-level="5"])' }, [web([rule(level5)])]),
+      on({ part: 'nav', selector: '::slotted(a[data-level="6"])' }, [web([rule(level6)])]),
       /* The links a phone draws, with the same values. */
       on('link', [
-        rule({ platform: 'native' }, { ...link, marginInlineStart: rail, position: 'relative' }),
-        rule({ also: { 'link-current': true }, platform: 'native' }, current),
-        rule({ also: { 'link-depth-2': true }, platform: 'native' }, level2),
-        rule({ also: { 'link-depth-3': true }, platform: 'native' }, level3),
-        rule({ also: { 'link-depth-4': true }, platform: 'native' }, level4),
-        rule({ also: { 'link-depth-5': true }, platform: 'native' }, level5),
-        rule({ also: { 'link-depth-6': true }, platform: 'native' }, level6),
+        native([
+          rule({ ...link, marginInlineStart: rail, position: 'relative' }),
+          rule({ also: { 'link-current': true } }, current),
+          rule({ also: { 'link-depth-2': true } }, level2),
+          rule({ also: { 'link-depth-3': true } }, level3),
+          rule({ also: { 'link-depth-4': true } }, level4),
+          rule({ also: { 'link-depth-5': true } }, level5),
+          rule({ also: { 'link-depth-6': true } }, level6),
+        ]),
       ]),
       /* The heading above the links, set like them and a step heavier, its
          text lined up with theirs past the rail. */
       on({ region: 'heading', slotted: '*' }, [
         rule({
-          color: hook.headingColor(token('color-foreground')),
+          color: hook.headingColor,
           fontSize: token('text-xs'),
           fontWeight: token('weight-semibold'),
           lineHeight: token('leading-normal'),

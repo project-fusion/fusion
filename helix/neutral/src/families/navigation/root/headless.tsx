@@ -1,4 +1,5 @@
-import { bind, box, collection, derive, headless, prop, region } from '../../../tree.js'
+import { boolean, headless, oneOf, Slot, View } from '../../../render.js'
+import { collection, derive } from '../../../tree.js'
 
 /**
  * A navigation's headless tier: a landmark of destinations, with a mark that
@@ -34,27 +35,39 @@ import { bind, box, collection, derive, headless, prop, region } from '../../../
  * element has.
  */
 export default headless('navigation', {
+  props: {
+    /* Unset is no value, so the arrows rove only while it is set. */
+    arrows: boolean(),
+    fallbackLabel: 'Main',
+    label: '',
+    orientation: oneOf(['vertical']),
+    variant: oneOf(['segmented', 'underlined']),
+  },
+  events: {},
+  states: ['open', 'settled'],
+  derived: {
+    name: derive('navigation-name'),
+  },
   collection: collection({
     disclosed: 'open',
     keys: { along: 'orientation', chooses: false, letters: false, wrap: false },
     marked: true,
     roves: 'arrows',
   }),
-  derived: { name: derive('navigation-name') },
-  events: [],
-  props: [
-    /* Unset is no value, so the arrows rove only while it is set. */
-    prop('arrows', 'boolean'),
-    prop('fallback-label', 'string', { default: 'Main' }),
-    prop('label', 'string', { default: '' }),
-    prop('orientation', ['vertical']),
-    prop('variant', ['segmented', 'underlined']),
-  ],
-  states: ['open', 'settled'],
-  tree: [
-    box('nav', { label: bind('name'), role: 'navigation' }, [
-      box('indicator', { decorative: true, marks: 'chosen' }, [region('indicator')]),
-      region('default'),
-    ]),
-  ],
+  render: ({ derived }) => (
+    <View
+      label={derived.name}
+      part="nav"
+      role="navigation"
+    >
+      <View
+        ariaHidden
+        marks="chosen"
+        part="indicator"
+      >
+        <Slot name="indicator" />
+      </View>
+      <Slot />
+    </View>
+  ),
 })
