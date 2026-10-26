@@ -20,17 +20,17 @@ export default styles(
   root,
   {
     prefix: 'radio',
-    hooks: [
-      'background-color',
-      'border-color',
-      'card-background-color',
-      'card-border-color',
-      'card-padding',
-      'chip-size',
-      'indicator-size',
-      'mark-color',
-      'size',
-    ],
+    hooks: ({ own }) => ({
+      backgroundColor: 'transparent',
+      borderColor: null,
+      cardBackgroundColor: token('color-surface'),
+      cardBorderColor: token('color-border'),
+      cardPadding: token('space-md'),
+      chipSize: token('size-control'),
+      indicatorSize: product(own.size, 0.75),
+      markColor: token('color-foreground'),
+      size: token('size-checkbox'),
+    }),
     own: ['radio-chip-lift', 'radio-size'],
     props: [
       prop('hide-control', 'boolean', { default: false }),
@@ -41,13 +41,13 @@ export default styles(
   },
   ({ hook, on, own, rule }) => [
     on('host', [
-      rule({ own: { size: hook.size(token('size-checkbox')) } }),
+      rule({ own: { size: hook.size } }),
       rule({ display: 'block' }),
       rule({ has: 'disabled' }, { opacity: 0.5 }),
       /* A card is the same radio in a bounded surface. */
       rule({ separation: ['filled', 'outlined'] }, { display: 'block' }),
       /* A chosen dot must print, or the answer prints empty. */
-      rule({ print: true }, { boxShadow: 'none', printColorAdjust: web('exact') }),
+      rule({ print: true }, { boxShadow: 'none', web: { printColorAdjust: 'exact' } }),
     ]),
     /* The row is the button, so the whole of it is the target. */
     on('item', [
@@ -59,18 +59,18 @@ export default styles(
         display: 'inline-flex',
         gap: token('space-xs'),
       }),
-      rule({ has: 'disabled', platform: 'web' }, { cursor: web('default') }),
+      web([rule({ has: 'disabled' }, { web: { cursor: 'default' } })]),
       rule(
         { separation: ['filled', 'outlined'] },
         {
           alignItems: 'start',
-          backgroundColor: hook.cardBackgroundColor(token('color-surface')),
-          border: [token('border-thin'), 'solid', hook.cardBorderColor(token('color-border'))],
+          backgroundColor: hook.cardBackgroundColor,
+          border: [token('border-thin'), 'solid', hook.cardBorderColor],
           borderRadius: token('radii-sm'),
           display: 'flex',
           gap: token('space-sm'),
           inlineSize: '100%',
-          padding: hook.cardPadding(token('space-md')),
+          padding: hook.cardPadding,
           transition: list(
             ['background-color', token('duration-fast'), token('easing-standard')],
             ['border-color', token('duration-fast'), token('easing-standard')],
@@ -85,7 +85,7 @@ export default styles(
       ),
       /* Chosen: the brand color, as a ring laid outside the edge. */
       rule(
-        { separation: ['filled', 'outlined'], state: 'selected' },
+        { separation: ['filled', 'outlined'], selected: true },
         {
           backgroundColor: token('color-surface-raised'),
           borderColor: token('color-primary'),
@@ -106,12 +106,12 @@ export default styles(
         {
           alignItems: 'center',
           backgroundColor: token('color-surface-sunken'),
-          blockSize: hook.chipSize(token('size-control')),
+          blockSize: hook.chipSize,
           borderRadius: token('radii-full'),
           color: token('color-foreground-muted'),
-          cursor: web('pointer'),
+          web: { cursor: 'pointer' },
           display: 'inline-flex',
-          inlineSize: hook.chipSize(token('size-control')),
+          inlineSize: hook.chipSize,
           justifyContent: 'center',
           padding: 0,
           transition: list(
@@ -124,7 +124,7 @@ export default styles(
       ),
       /* Weight and height carry the choice: solid, and forward. */
       rule(
-        { state: 'selected', variant: 'chip' },
+        { selected: true, variant: 'chip' },
         {
           backgroundColor: token('color-surface-inverse'),
           boxShadow: token('shadow-md'),
@@ -147,7 +147,7 @@ export default styles(
       rule({ reducedMotion: true, variant: 'chip' }, { transition: 'none' }),
       rule(
         [
-          { reducedMotion: true, state: 'selected', variant: 'chip' },
+          { reducedMotion: true, selected: true, variant: 'chip' },
           { hover: true, lacks: 'disabled', reducedMotion: true, variant: 'chip' },
         ],
         { translate: 'none' },
@@ -159,7 +159,7 @@ export default styles(
        mark ink, not the rule ink, which drew no ring around it there. */
     on('box', [
       rule({
-        backgroundColor: hook.backgroundColor('transparent'),
+        backgroundColor: hook.backgroundColor,
         blockSize: own.size,
         border: [token('border-thin'), 'solid', hook.borderColor(token('color-foreground-subtle'))],
         borderRadius: token('radii-full'),
@@ -175,7 +175,7 @@ export default styles(
         { lacks: 'disabled', within: { item: { hover: true } } },
         { borderColor: hook.borderColor(token('color-foreground-muted')) },
       ),
-      rule({ state: 'selected' }, { borderColor: hook.borderColor(token('color-foreground')) }),
+      rule({ selected: true }, { borderColor: hook.borderColor(token('color-foreground')) }),
       /* Offset, because the ring surrounds a circle whose own edge is not moving. */
       rule(
         { within: { item: { focusVisible: true } } },
@@ -206,7 +206,7 @@ export default styles(
     /* A dot under half the circle, so the pair reads as a mark in a circle. */
     on({ after: 'box' }, [
       rule({
-        backgroundColor: hook.markColor(token('color-foreground')),
+        backgroundColor: hook.markColor,
         blockSize: product(own.size, 0.4),
         borderRadius: token('radii-full'),
         content: '""',
@@ -214,15 +214,15 @@ export default styles(
         scale: 0,
         transition: ['scale', token('duration-fast'), token('easing-emphasized')],
       }),
-      rule({ state: 'selected' }, { scale: 1 }),
+      rule({ selected: true }, { scale: 1 }),
       /* A slotted indicator is the mark, so the dot goes. */
       rule({ state: 'has-indicator' }, { content: 'none' }),
     ]),
     on({ region: 'indicator', slotted: '*' }, [
       rule({
-        blockSize: hook.indicatorSize(product(own.size, 0.75)),
-        color: hook.markColor(token('color-foreground')),
-        inlineSize: hook.indicatorSize(product(own.size, 0.75)),
+        blockSize: hook.indicatorSize,
+        color: hook.markColor,
+        inlineSize: hook.indicatorSize,
         scale: 0,
         transition: ['scale', token('duration-fast'), token('easing-emphasized')],
       }),

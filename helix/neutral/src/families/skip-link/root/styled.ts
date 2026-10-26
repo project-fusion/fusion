@@ -1,4 +1,4 @@
-import { token, web } from '../../../style.js'
+import { token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -15,28 +15,28 @@ export default styles(
   root,
   {
     prefix: 'skip-link',
-    hooks: [
-      'background-color',
-      'border-color',
-      'border-width',
-      'color',
-      'font-size',
-      'inset-block',
-      'inset-inline',
-      'padding-block',
-      'padding-inline',
-      'radius',
-      'shadow',
-    ],
+    hooks: {
+      backgroundColor: token('color-surface-inverse'),
+      borderColor: token('color-border'),
+      borderWidth: token('border-floating'),
+      color: token('color-foreground-inverse'),
+      fontSize: token('text-sm'),
+      insetBlock: token('space-sm'),
+      insetInline: token('space-sm'),
+      paddingBlock: token('space-sm'),
+      paddingInline: token('space-md'),
+      radius: token('radii-sm'),
+      shadow: token('shadow-floating'),
+    },
     stylesheet: 'skip-link/root/skip-link-root.generated.css',
   },
   ({ hook, on, rule }) => [
     on('host', [
       rule({
         display: 'block',
-        insetBlockStart: hook.insetBlock(token('space-sm')),
-        insetInlineStart: hook.insetInline(token('space-sm')),
-        position: web('fixed'),
+        insetBlockStart: hook.insetBlock,
+        insetInlineStart: hook.insetInline,
+        web: { position: 'fixed' },
         zIndex: token('layer-overlay'),
       }),
       rule(
@@ -44,7 +44,7 @@ export default styles(
         {
           blockSize: '1px',
           border: token('space-none'),
-          clipPath: web('inset(50%)'),
+          web: { clipPath: 'inset(50%)' },
           inlineSize: '1px',
           margin: token('space-none'),
           overflow: 'hidden',
@@ -58,22 +58,18 @@ export default styles(
     ]),
     on('link', [
       rule({
-        backgroundColor: hook.backgroundColor(token('color-surface-inverse')),
-        border: [
-          hook.borderWidth(token('border-floating')),
-          'solid',
-          hook.borderColor(token('color-border')),
-        ],
-        borderRadius: hook.radius(token('radii-sm')),
-        boxShadow: hook.shadow(token('shadow-floating')),
-        color: hook.color(token('color-foreground-inverse')),
+        backgroundColor: hook.backgroundColor,
+        border: [hook.borderWidth, 'solid', hook.borderColor],
+        borderRadius: hook.radius,
+        boxShadow: hook.shadow,
+        color: hook.color,
         display: 'inline-block',
         fontFamily: token('font-sans'),
-        fontSize: hook.fontSize(token('text-sm')),
+        fontSize: hook.fontSize,
         fontWeight: token('weight-medium'),
         lineHeight: token('leading-normal'),
-        paddingBlock: hook.paddingBlock(token('space-sm')),
-        paddingInline: hook.paddingInline(token('space-md')),
+        paddingBlock: hook.paddingBlock,
+        paddingInline: hook.paddingInline,
         textDecoration: 'none',
       }),
       rule(

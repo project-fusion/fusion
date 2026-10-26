@@ -1,4 +1,4 @@
-import { hookOf, list, product, quotient, token, web } from '../../../style.js'
+import { hookOf, list, native, product, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -23,7 +23,15 @@ export default styles(
   root,
   {
     prefix: 'speed-dial',
-    hooks: ['background-color', 'color', 'gap', 'shadow', 'size', 'stagger', 'travel'],
+    hooks: {
+      backgroundColor: token('color-primary-surface'),
+      color: token('color-foreground-on-primary'),
+      gap: token('space-sm'),
+      shadow: token('shadow-md'),
+      size: token('size-control'),
+      stagger: null,
+      travel: token('space-md'),
+    },
     own: [
       'dial-from',
       'speed-dial-align',
@@ -36,7 +44,7 @@ export default styles(
   },
   ({ hook, on, own, rule }) => {
     const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
-    const travel = hook.travel(token('space-md'))
+    const travel = hook.travel
     const fast = token('duration-fast')
     const arrived = { opacity: 1, scale: 1, translate: [0, 0] } as const
     return [
@@ -48,7 +56,7 @@ export default styles(
           border: 'none',
           display: 'flex',
           flexDirection: 'column',
-          gap: hook.gap(token('space-sm')),
+          gap: hook.gap,
           margin: token('space-none'),
           overflow: 'visible',
           padding: token('space-none'),
@@ -61,7 +69,7 @@ export default styles(
         ),
       ]),
       on({ part: 'actions', selector: '[part="actions"][hidden]' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
+        web([rule({ display: 'none' })]),
       ]),
       /* They arrive from the button, once the column is placed. */
       on('actions', [
@@ -81,18 +89,20 @@ export default styles(
         }),
         /* A phone reads the side the column landed on, which it is given
            once it is placed. */
-        rule(
-          [
-            { platform: 'native', state: 'placed-bottom' },
-            { platform: 'native', state: 'placed-left' },
-            { platform: 'native', state: 'placed-right' },
-            { platform: 'native', state: 'placed-top' },
-          ],
-          arrived,
-        ),
+        native([
+          rule(
+            [
+              { state: 'placed-bottom' },
+              { state: 'placed-left' },
+              { state: 'placed-right' },
+              { state: 'placed-top' },
+            ],
+            arrived,
+          ),
+        ]),
       ]),
       on({ part: 'actions', selector: '[part="actions"][data-placed] ::slotted(*)' }, [
-        rule({ platform: 'web' }, arrived),
+        web([rule(arrived)]),
       ]),
       /* Nearest the button first, counting from the end where the column
          runs upward and from the start where it runs down. */
@@ -102,28 +112,28 @@ export default styles(
           part: 'actions',
           selector: '[part="actions"][data-placed] ::slotted(:nth-last-child(2))',
         },
-        [rule({ platform: 'web' }, { transitionDelay: own.stagger })],
+        [web([rule({ transitionDelay: own.stagger })])],
       ),
       on(
         {
           part: 'actions',
           selector: '[part="actions"][data-placed] ::slotted(:nth-last-child(3))',
         },
-        [rule({ platform: 'web' }, { transitionDelay: product(own.stagger, 2) })],
+        [web([rule({ transitionDelay: product(own.stagger, 2) })])],
       ),
       on(
         {
           part: 'actions',
           selector: '[part="actions"][data-placed] ::slotted(:nth-last-child(4))',
         },
-        [rule({ platform: 'web' }, { transitionDelay: product(own.stagger, 3) })],
+        [web([rule({ transitionDelay: product(own.stagger, 3) })])],
       ),
       on(
         {
           part: 'actions',
           selector: '[part="actions"][data-placed] ::slotted(:nth-last-child(n + 5))',
         },
-        [rule({ platform: 'web' }, { transitionDelay: product(own.stagger, 4) })],
+        [web([rule({ transitionDelay: product(own.stagger, 4) })])],
       ),
       on(
         {
@@ -131,7 +141,7 @@ export default styles(
           selector:
             ':host(:state(placed-bottom)) [part="actions"][data-placed] ::slotted(:nth-child(2))',
         },
-        [rule({ platform: 'web' }, { transitionDelay: own.stagger })],
+        [web([rule({ transitionDelay: own.stagger })])],
       ),
       on(
         {
@@ -139,7 +149,7 @@ export default styles(
           selector:
             ':host(:state(placed-bottom)) [part="actions"][data-placed] ::slotted(:nth-child(3))',
         },
-        [rule({ platform: 'web' }, { transitionDelay: product(own.stagger, 2) })],
+        [web([rule({ transitionDelay: product(own.stagger, 2) })])],
       ),
       on(
         {
@@ -147,7 +157,7 @@ export default styles(
           selector:
             ':host(:state(placed-bottom)) [part="actions"][data-placed] ::slotted(:nth-child(4))',
         },
-        [rule({ platform: 'web' }, { transitionDelay: product(own.stagger, 3) })],
+        [web([rule({ transitionDelay: product(own.stagger, 3) })])],
       ),
       on(
         {
@@ -155,48 +165,50 @@ export default styles(
           selector:
             ':host(:state(placed-bottom)) [part="actions"][data-placed] ::slotted(:nth-child(n + 5))',
         },
-        [rule({ platform: 'web' }, { transitionDelay: product(own.stagger, 4) })],
+        [web([rule({ transitionDelay: product(own.stagger, 4) })])],
       ),
       /* A phone times them by the same places, once the column is placed:
          from the end where it runs upward or beside the button, and from the
          start where it runs down. */
       on({ region: 'default', slotted: '*' }, [
-        rule(
-          [
-            { nthLast: 2, platform: 'native', state: 'placed-top' },
-            { nthLast: 2, platform: 'native', state: 'placed-left' },
-            { nthLast: 2, platform: 'native', state: 'placed-right' },
-            { nth: 2, platform: 'native', state: 'placed-bottom' },
-          ],
-          { transitionDelay: own.stagger },
-        ),
-        rule(
-          [
-            { nthLast: 3, platform: 'native', state: 'placed-top' },
-            { nthLast: 3, platform: 'native', state: 'placed-left' },
-            { nthLast: 3, platform: 'native', state: 'placed-right' },
-            { nth: 3, platform: 'native', state: 'placed-bottom' },
-          ],
-          { transitionDelay: product(own.stagger, 2) },
-        ),
-        rule(
-          [
-            { nthLast: 4, platform: 'native', state: 'placed-top' },
-            { nthLast: 4, platform: 'native', state: 'placed-left' },
-            { nthLast: 4, platform: 'native', state: 'placed-right' },
-            { nth: 4, platform: 'native', state: 'placed-bottom' },
-          ],
-          { transitionDelay: product(own.stagger, 3) },
-        ),
-        rule(
-          [
-            { nthLast: { from: 5 }, platform: 'native', state: 'placed-top' },
-            { nthLast: { from: 5 }, platform: 'native', state: 'placed-left' },
-            { nthLast: { from: 5 }, platform: 'native', state: 'placed-right' },
-            { nth: { from: 5 }, platform: 'native', state: 'placed-bottom' },
-          ],
-          { transitionDelay: product(own.stagger, 4) },
-        ),
+        native([
+          rule(
+            [
+              { nthLast: 2, state: 'placed-top' },
+              { nthLast: 2, state: 'placed-left' },
+              { nthLast: 2, state: 'placed-right' },
+              { nth: 2, state: 'placed-bottom' },
+            ],
+            { transitionDelay: own.stagger },
+          ),
+          rule(
+            [
+              { nthLast: 3, state: 'placed-top' },
+              { nthLast: 3, state: 'placed-left' },
+              { nthLast: 3, state: 'placed-right' },
+              { nth: 3, state: 'placed-bottom' },
+            ],
+            { transitionDelay: product(own.stagger, 2) },
+          ),
+          rule(
+            [
+              { nthLast: 4, state: 'placed-top' },
+              { nthLast: 4, state: 'placed-left' },
+              { nthLast: 4, state: 'placed-right' },
+              { nth: 4, state: 'placed-bottom' },
+            ],
+            { transitionDelay: product(own.stagger, 3) },
+          ),
+          rule(
+            [
+              { nthLast: { from: 5 }, state: 'placed-top' },
+              { nthLast: { from: 5 }, state: 'placed-left' },
+              { nthLast: { from: 5 }, state: 'placed-right' },
+              { nth: { from: 5 }, state: 'placed-bottom' },
+            ],
+            { transitionDelay: product(own.stagger, 4) },
+          ),
+        ]),
         /* Put down where they belong. */
         rule(
           { reducedMotion: true },
@@ -209,15 +221,15 @@ export default styles(
           all: web('unset'),
           '--icon-size': token('size-icon'),
           alignItems: 'center',
-          backgroundColor: hook.backgroundColor(token('color-primary-surface')),
-          blockSize: hook.size(token('size-control')),
+          backgroundColor: hook.backgroundColor,
+          blockSize: hook.size,
           borderRadius: token('radii-full'),
-          boxShadow: hook.shadow(token('shadow-md')),
+          boxShadow: hook.shadow,
           boxSizing: 'border-box',
-          color: hook.color(token('color-foreground-on-primary')),
+          color: hook.color,
           cursor: web('pointer'),
           display: 'inline-flex',
-          inlineSize: hook.size(token('size-control')),
+          inlineSize: hook.size,
           justifyContent: 'center',
           transition: ['box-shadow', fast, token('easing-standard')],
         }),
@@ -232,10 +244,9 @@ export default styles(
         rule({ blockSize: hookOf('icon', 'size'), inlineSize: hookOf('icon', 'size') }),
       ]),
       on('icon-mark', [
-        rule(
-          { platform: 'native' },
-          { blockSize: token('size-icon'), flex: '0 0 auto', inlineSize: token('size-icon') },
-        ),
+        native([
+          rule({ blockSize: token('size-icon'), flex: '0 0 auto', inlineSize: token('size-icon') }),
+        ]),
       ]),
       on('host', [rule({ print: true }, { display: 'none' })]),
       /* Names on demand: each shows while its action is under the pointer

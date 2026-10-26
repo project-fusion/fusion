@@ -1,7 +1,7 @@
 import printExact from '../../../fragments/print-exact.js'
 import progressRing from '../../../fragments/progress-ring.js'
 import progressWords from '../../../fragments/progress-words.js'
-import { fn, measured, mix, product, token } from '../../../style.js'
+import { fn, measured, mix, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -32,19 +32,19 @@ export default styles(
   root,
   {
     prefix: 'progress',
-    hooks: [
-      'color',
-      'label-color',
-      'label-gap',
-      'label-size',
-      'radius',
-      'size',
-      'track-color',
-      'transition-duration',
-      'value-color',
-      'value-gap',
-      'value-size',
-    ],
+    hooks: {
+      color: token('color-primary-surface'),
+      labelColor: token('color-foreground'),
+      labelGap: token('space-2xs'),
+      labelSize: token('text-sm'),
+      radius: token('radii-full'),
+      size: token('size-progress'),
+      trackColor: token('color-surface-sunken'),
+      transitionDuration: token('duration-normal'),
+      valueColor: token('color-foreground-muted'),
+      valueGap: token('space-sm'),
+      valueSize: token('text-xs'),
+    },
     own: ['progress-crawl', 'progress-cycle', 'progress-over', 'progress-under', 'progress-way'],
     props: [prop('emphasis', ['subtle'])],
     stylesheet: 'progress/root/progress-root.generated.css',
@@ -56,10 +56,10 @@ export default styles(
         { 'show-value': true },
         {
           alignItems: 'center',
-          columnGap: hook.valueGap(token('space-sm')),
+          columnGap: hook.valueGap,
           display: 'grid',
           gridTemplateColumns: '1fr auto',
-          rowGap: hook.labelGap(token('space-2xs')),
+          rowGap: hook.labelGap,
         },
       ),
       /* Slow enough to read as work. The crawl is the ring's turn under reduced
@@ -73,11 +73,11 @@ export default styles(
        beside it. */
     on({ region: 'label', slotted: '*' }, [
       rule({
-        color: hook.labelColor(token('color-foreground')),
+        color: hook.labelColor,
         display: 'block',
-        fontSize: hook.labelSize(token('text-sm')),
+        fontSize: hook.labelSize,
         gridColumn: '1 / -1',
-        marginBlockEnd: hook.labelGap(token('space-2xs')),
+        marginBlockEnd: hook.labelGap,
       }),
       /* In the grid the row gap is the space, so the margin would count it
          twice. */
@@ -89,9 +89,9 @@ export default styles(
        jog as it counts and `100%` keeps the room `9%` had. */
     on('value', [
       rule({
-        color: hook.valueColor(token('color-foreground-muted')),
+        color: hook.valueColor,
         fontFamily: token('font-sans'),
-        fontSize: hook.valueSize(token('text-xs')),
+        fontSize: hook.valueSize,
         fontVariantNumeric: 'tabular-nums',
         minInlineSize: '3ch',
         textAlign: 'end',
@@ -100,9 +100,8 @@ export default styles(
     /* Said and not shown: the filled bar is the picture of it. A phone
        announces it and draws nothing. */
     on('live', [
-      rule(
-        { platform: 'web' },
-        {
+      web([
+        rule({
           blockSize: '1px',
           clipPath: 'inset(50%)',
           inlineSize: '1px',
@@ -110,33 +109,29 @@ export default styles(
           overflow: 'hidden',
           position: 'absolute',
           whiteSpace: 'nowrap',
-        },
-      ),
+        }),
+      ]),
     ]),
     /* The whole length, always drawn, at least the bar's thickness and as
        tall as words on it. */
     on('track', [
       rule({
-        backgroundColor: hook.trackColor(token('color-surface-sunken')),
-        minBlockSize: hook.size(token('size-progress')),
-        borderRadius: hook.radius(token('radii-full')),
+        backgroundColor: hook.trackColor,
+        minBlockSize: hook.size,
+        borderRadius: hook.radius,
         inlineSize: '100%',
         overflow: 'hidden',
       }),
     ]),
     on('indicator', [
       rule({
-        backgroundColor: hook.color(token('color-primary-surface')),
+        backgroundColor: hook.color,
         blockSize: '100%',
         borderRadius: 'inherit',
         inlineSize: '100%',
         scale: [measured('progress-fraction', 0), 1],
         transformOrigin: 'left center',
-        transition: [
-          'scale',
-          hook.transitionDuration(token('duration-normal')),
-          token('easing-decelerate'),
-        ],
+        transition: ['scale', hook.transitionDuration, token('easing-decelerate')],
       }),
       rule({ dir: 'rtl' }, { transformOrigin: 'right center' }),
       rule(
@@ -167,23 +162,28 @@ export default styles(
       ),
       /* A phone draws no repeating gradient, so its hatch is one tile of
          stripes repeated, the same stripes as far apart. */
-      rule(
-        { indeterminate: true, reducedMotion: true, platform: 'native' },
-        {
-          backgroundImage: fn(
-            'linear-gradient',
-            '-45deg',
-            [token('color-background'), '25%'],
-            'transparent 25%',
-            'transparent 50%',
-            [token('color-background'), '50%'],
-            [token('color-background'), '75%'],
-            'transparent 75%',
-            'transparent',
-          ),
-          backgroundSize: [product(token('space-xs'), 2.8284), product(token('space-xs'), 2.8284)],
-        },
-      ),
+      native([
+        rule(
+          { indeterminate: true, reducedMotion: true },
+          {
+            backgroundImage: fn(
+              'linear-gradient',
+              '-45deg',
+              [token('color-background'), '25%'],
+              'transparent 25%',
+              'transparent 50%',
+              [token('color-background'), '50%'],
+              [token('color-background'), '75%'],
+              'transparent 75%',
+              'transparent',
+            ),
+            backgroundSize: [
+              product(token('space-xs'), 2.8284),
+              product(token('space-xs'), 2.8284),
+            ],
+          },
+        ),
+      ]),
     ]),
     /* The segment is never anchored to either end: it covers 30% of the
        track in the first third, 40% in the second and 48% in the last, so it
@@ -222,21 +222,13 @@ export default styles(
       rule(
         { emphasis: 'subtle' },
         {
-          backgroundColor: mix(
-            hook.color(token('color-primary-surface')),
-            30,
-            hook.trackColor(token('color-surface-sunken')),
-          ),
+          backgroundColor: mix(hook.color, 30, hook.trackColor),
         },
       ),
       rule(
         { emphasis: 'subtle', shape: 'ring' },
         {
-          stroke: mix(
-            hook.color(token('color-primary-surface')),
-            30,
-            hook.trackColor(token('color-surface-sunken')),
-          ),
+          stroke: mix(hook.color, 30, hook.trackColor),
         },
       ),
     ]),

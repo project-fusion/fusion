@@ -1,5 +1,5 @@
 import printEconomy from '../../../fragments/print-economy.js'
-import { product, quotient, token } from '../../../style.js'
+import { native, product, quotient, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -25,15 +25,15 @@ export default styles(
   root,
   {
     prefix: 'stat',
-    hooks: [
-      'gap',
-      'label-color',
-      'label-size',
-      'unit-color',
-      'unit-size',
-      'value-color',
-      'value-size',
-    ],
+    hooks: {
+      gap: null,
+      labelColor: token('color-foreground-muted'),
+      labelSize: product(quotient(token('text-xs'), token('text-md')), '1em'),
+      unitColor: token('color-foreground-muted'),
+      unitSize: product(quotient(token('text-md'), token('text-md')), '1em'),
+      valueColor: token('color-foreground'),
+      valueSize: product(quotient(token('text-3xl'), token('text-md')), '1em'),
+    },
     stylesheet: 'stat/root/stat-root.generated.css',
   },
   ({ hook, include, on, rule }) => [
@@ -46,46 +46,34 @@ export default styles(
         gridTemplateColumns: 'auto 1fr',
       }),
       /* A phone stacks the label, the figure's line and the trend. */
-      rule(
-        { platform: 'native' },
-        { alignItems: 'stretch', display: 'flex', flexDirection: 'column' },
-      ),
+      native([rule({ alignItems: 'stretch', display: 'flex', flexDirection: 'column' })]),
       /* Side by side, on one baseline. */
       rule([{ direction: 'row' }, { direction: 'row-reverse' }], {
         alignItems: 'baseline',
         display: 'flex',
         gap: hook.gap(token('space-xs')),
       }),
-      rule(
-        [
-          { direction: 'row', platform: 'native' },
-          { direction: 'row-reverse', platform: 'native' },
-        ],
-        { flexDirection: 'row' },
-      ),
+      native([
+        rule([{ direction: 'row' }, { direction: 'row-reverse' }], { flexDirection: 'row' }),
+      ]),
     ]),
     on('figure', [
-      rule(
-        { platform: 'native' },
-        {
+      native([
+        rule({
           alignItems: 'baseline',
           display: 'flex',
           flexDirection: 'row',
           gap: hook.gap(token('space-2xs')),
-        },
-      ),
-      rule(
-        [
-          { direction: 'row', platform: 'native' },
-          { direction: 'row-reverse', platform: 'native' },
-        ],
-        { gap: hook.gap(token('space-xs')) },
-      ),
+        }),
+        rule([{ direction: 'row' }, { direction: 'row-reverse' }], {
+          gap: hook.gap(token('space-xs')),
+        }),
+      ]),
     ]),
     on({ region: 'label', slotted: '*' }, [
       rule({
-        color: hook.labelColor(token('color-foreground-muted')),
-        fontSize: hook.labelSize(product(quotient(token('text-xs'), token('text-md')), '1em')),
+        color: hook.labelColor,
+        fontSize: hook.labelSize,
         fontWeight: token('weight-medium'),
         gridColumn: '1 / -1',
         letterSpacing: token('tracking-wide'),
@@ -95,9 +83,9 @@ export default styles(
     ]),
     on('value', [
       rule({
-        color: hook.valueColor(token('color-foreground')),
+        color: hook.valueColor,
         fontFamily: token('font-display'),
-        fontSize: hook.valueSize(product(quotient(token('text-3xl'), token('text-md')), '1em')),
+        fontSize: hook.valueSize,
         fontWeight: token('weight-semibold'),
         letterSpacing: token('tracking-tight'),
         lineHeight: token('leading-tight'),
@@ -105,8 +93,8 @@ export default styles(
     ]),
     on({ region: 'unit', slotted: '*' }, [
       rule({
-        color: hook.unitColor(token('color-foreground-muted')),
-        fontSize: hook.unitSize(product(quotient(token('text-md'), token('text-md')), '1em')),
+        color: hook.unitColor,
+        fontSize: hook.unitSize,
         fontWeight: token('weight-medium'),
       }),
     ]),

@@ -1,4 +1,4 @@
-import { fn, hookOf, token } from '../../../style.js'
+import { first, fn, hookOf, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import item from './headless.js'
 
@@ -28,15 +28,15 @@ export default styles(
   item,
   {
     prefix: 'timeline',
-    hooks: [
-      'column-gap',
-      'marker-color',
-      'marker-radius',
-      'marker-size',
-      'rail-color',
-      'rail-size',
-      'time-color',
-    ],
+    hooks: {
+      columnGap: token('space-md'),
+      markerColor: token('color-foreground-subtle'),
+      markerRadius: token('radii-full'),
+      markerSize: token('size-icon-md'),
+      railColor: token('color-border'),
+      railSize: token('border-thin'),
+      timeColor: token('color-foreground-muted'),
+    },
     own: [
       'timeline-above',
       'timeline-arrive-display',
@@ -78,9 +78,9 @@ export default styles(
     stylesheet: 'timeline/item/timeline-item.generated.css',
   },
   ({ hook, on, own, rule, variants }) => {
-    const railSize = hook.railSize(token('border-thin'))
-    const railColor = hook.railColor(token('color-border'))
-    const markerSize = hook.markerSize(token('size-icon-md'))
+    const railSize = hook.railSize
+    const railColor = hook.railColor
+    const markerSize = hook.markerSize
     /* A dash and a gap, drawn again down the line, on both platforms. */
     const pendingLine = fn(
       'repeating-linear-gradient',
@@ -90,16 +90,18 @@ export default styles(
     )
     return [
       on('host', [
-        rule({ platform: 'web' }, [
-          {
-            columnGap: hook.columnGap(token('space-md')),
-            display: 'grid',
-            gridTemplateColumns: own.columns('auto minmax(0, 1fr)'),
-            gridTemplateRows: own.rows('auto minmax(0, 1fr)'),
-          },
+        web([
+          rule([
+            {
+              columnGap: hook.columnGap,
+              display: 'grid',
+              gridTemplateColumns: own.columns('auto minmax(0, 1fr)'),
+              gridTemplateRows: own.rows('auto minmax(0, 1fr)'),
+            },
+          ]),
         ]),
         /* A phone's entry is its two rows, one over the other. */
-        rule({ platform: 'native' }, { display: 'flex', flexDirection: 'column' }),
+        native([rule({ display: 'flex', flexDirection: 'column' })]),
         variants('tone', {
           danger: { own: { tone: token('color-danger') } },
           info: { own: { tone: token('color-info') } },
@@ -110,9 +112,8 @@ export default styles(
         }),
       ]),
       on('rail', [
-        rule(
-          { platform: 'web' },
-          {
+        web([
+          rule({
             alignItems: own.railAlign('normal'),
             display: 'grid',
             gridColumn: own.railColumn('auto'),
@@ -120,24 +121,22 @@ export default styles(
             gridTemplateColumns: own.railColumns('none'),
             gridTemplateRows: own.railRows('subgrid'),
             justifyItems: own.railJustify('center'),
-          },
-        ),
+          }),
+        ]),
         /* The mark, then the line that leaves it, down the rail or along it. */
-        rule(
-          { platform: 'native' },
-          {
+        native([
+          rule({
             alignItems: 'center',
             display: 'flex',
             flexDirection: own.railDirection('column'),
             inlineSize: own.railInlineSize(markerSize),
-          },
-        ),
+          }),
+        ]),
       ]),
       /* The line arriving from the entry above, the height of the time. */
       on({ before: 'rail' }, [
-        rule(
-          { platform: 'web' },
-          {
+        web([
+          rule({
             backgroundColor: railColor,
             blockSize: '100%',
             content: '""',
@@ -145,17 +144,17 @@ export default styles(
             gridColumn: 1,
             gridRow: 1,
             inlineSize: railSize,
-          },
-        ),
-        rule({ place: 'first', platform: 'web' }, { visibility: 'hidden' }),
-        /* The way to an event still to come is drawn and not yet traveled. */
-        rule(
-          { pending: true, platform: 'web' },
-          {
-            backgroundColor: 'transparent',
-            backgroundImage: pendingLine,
-          },
-        ),
+          }),
+          rule({ place: 'first' }, { visibility: 'hidden' }),
+          /* The way to an event still to come is drawn and not yet traveled. */
+          rule(
+            { pending: true },
+            {
+              backgroundColor: 'transparent',
+              backgroundImage: pendingLine,
+            },
+          ),
+        ]),
       ]),
       /* The rest of the line, from under the mark to the end of the entry. */
       on({ after: 'rail' }, [
@@ -164,18 +163,17 @@ export default styles(
           content: '""',
           inlineSize: own.leaveInlineSize(railSize),
         }),
-        rule(
-          { platform: 'web' },
-          {
+        web([
+          rule({
             alignSelf: own.leaveAlign('stretch'),
             blockSize: own.leaveBlockSize('auto'),
             gridColumn: own.leaveColumn(1),
             gridRow: own.leaveRow(2),
             justifySelf: own.leaveJustify('auto'),
             marginBlockStart: own.leaveMarginBlock(markerSize),
-          },
-        ),
-        rule({ platform: 'native' }, { blockSize: own.leaveBlockSize(railSize), flex: '1 1 0' }),
+          }),
+        ]),
+        native([rule({ blockSize: own.leaveBlockSize(railSize), flex: '1 1 0' })]),
         rule({ place: 'last' }, { visibility: 'hidden' }),
       ]),
       on('marker', [
@@ -184,39 +182,38 @@ export default styles(
           alignItems: 'center',
           alignSelf: 'start',
           aspectRatio: 1,
-          borderRadius: hook.markerRadius(token('radii-full')),
-          color: own.tone(hook.markerColor(token('color-foreground-subtle'))),
+          borderRadius: hook.markerRadius,
+          color: first(own.tone, hook.markerColor),
           display: 'inline-flex',
           inlineSize: markerSize,
           justifyContent: 'center',
         }),
-        rule({ platform: 'web' }, { gridColumn: 1, gridRow: own.markerRow(2) }),
+        web([rule({ gridColumn: 1, gridRow: own.markerRow(2) })]),
       ]),
       on('dot', [rule({ blockSize: token('size-icon-sm'), inlineSize: token('size-icon-sm') })]),
       on('time', [
         rule({
-          color: hook.timeColor(token('color-foreground-muted')),
+          color: hook.timeColor,
           fontFamily: token('font-sans'),
           fontSize: token('text-xs'),
           fontWeight: token('weight-medium'),
           paddingBlockEnd: token('space-2xs'),
           textAlign: own.timeAlign,
         }),
-        rule(
-          { platform: 'web' },
-          {
+        web([
+          rule({
             gridColumn: own.timeColumn(2),
             gridRow: own.timeRow(1),
-          },
-        ),
-        rule(
-          { place: 'even', platform: 'web' },
-          {
-            gridColumn: own.evenColumn(own.timeColumn(2)),
-          },
-        ),
-        rule({ place: 'even' }, { textAlign: own.evenAlign(own.timeAlign) }),
-        rule({ platform: 'native' }, { flex: '1 1 0', minInlineSize: 0 }),
+          }),
+          rule(
+            { place: 'even' },
+            {
+              gridColumn: first(own.evenColumn, own.timeColumn, 2),
+            },
+          ),
+        ]),
+        rule({ place: 'even' }, { textAlign: first(own.evenAlign, own.timeAlign) }),
+        native([rule({ flex: '1 1 0', minInlineSize: 0 })]),
       ]),
       on('content', [
         rule({
@@ -224,16 +221,15 @@ export default styles(
           flexDirection: 'column',
           gap: token('space-2xs'),
           minInlineSize: 0,
-          paddingBlockEnd: own.contentBlockEnd(hookOf('timeline', 'gap', token('space-lg'))),
+          paddingBlockEnd: first(own.contentBlockEnd, hookOf('timeline', 'gap'), token('space-lg')),
           paddingInlineEnd: own.contentInlineEnd(token('space-none')),
         }),
-        rule(
-          { platform: 'web' },
-          {
+        web([
+          rule({
             gridColumn: own.contentColumn(2),
             gridRow: own.contentRow(2),
-          },
-        ),
+          }),
+        ]),
         rule(
           { place: 'last' },
           {
@@ -241,93 +237,84 @@ export default styles(
             paddingInlineEnd: token('space-none'),
           },
         ),
-        rule(
-          { place: 'even', platform: 'web' },
-          {
-            gridColumn: own.evenColumn(own.contentColumn(2)),
-          },
-        ),
+        web([
+          rule(
+            { place: 'even' },
+            {
+              gridColumn: first(own.evenColumn, own.contentColumn, 2),
+            },
+          ),
+        ]),
         rule({ place: 'even' }, { textAlign: own.evenAlign }),
       ]),
       /* A phone's rows, which the timeline's layout shows, hides and turns. */
       on('head', [
-        rule(
-          { platform: 'native' },
-          {
-            columnGap: hook.columnGap(token('space-md')),
+        native([
+          rule({
+            columnGap: hook.columnGap,
             display: own.head('flex'),
             flexDirection: 'row',
-          },
-        ),
-        rule(
-          { place: 'even', platform: 'native' },
-          {
-            flexDirection: own.evenDirection('row'),
-          },
-        ),
+          }),
+          rule(
+            { place: 'even' },
+            {
+              flexDirection: own.evenDirection('row'),
+            },
+          ),
+        ]),
       ]),
       on('body', [
-        rule(
-          { platform: 'native' },
-          {
-            columnGap: hook.columnGap(token('space-md')),
+        native([
+          rule({
+            columnGap: hook.columnGap,
             display: 'flex',
             flexDirection: own.bodyDirection('row'),
             flexGrow: 1,
-          },
-        ),
-        rule(
-          { place: 'even', platform: 'native' },
-          {
-            flexDirection: own.evenDirection(own.bodyDirection('row')),
-          },
-        ),
+          }),
+          rule(
+            { place: 'even' },
+            {
+              flexDirection: first(own.evenDirection, own.bodyDirection, 'row'),
+            },
+          ),
+        ]),
       ]),
       /* The side of the line before it, where the line runs down the middle. */
       on(
         ['head-lead', 'lead'],
-        [
-          rule(
-            { platform: 'native' },
-            { display: own.lead('none'), flex: own.leadFlex('0 0 auto') },
-          ),
-        ],
+        [native([rule({ display: own.lead('none'), flex: own.leadFlex('0 0 auto') })])],
       ),
-      on('beside', [
-        rule({ platform: 'native' }, { display: own.leadTime('flex'), flex: '1 1 0' }),
-      ]),
-      on('above', [rule({ platform: 'native' }, { display: own.above('none') })]),
-      on('main', [rule({ platform: 'native' }, { flex: '1 1 0', minInlineSize: 0 })]),
+      on('beside', [native([rule({ display: own.leadTime('flex'), flex: '1 1 0' })])]),
+      on('above', [native([rule({ display: own.above('none') })])]),
+      on('main', [native([rule({ flex: '1 1 0', minInlineSize: 0 })])]),
       /* The arriving line, as wide as the mark, so it stands over the rail. */
       on('arrive', [
-        rule(
-          { platform: 'native' },
-          {
+        native([
+          rule({
             alignItems: 'center',
             display: own.arriveDisplay('flex'),
             flexDirection: 'column',
             inlineSize: markerSize,
-          },
-        ),
+          }),
+        ]),
       ]),
       on({ before: 'arrive' }, [
-        rule(
-          { platform: 'native' },
-          {
+        native([
+          rule({
             backgroundColor: railColor,
             content: '""',
             flex: '1 1 0',
             inlineSize: railSize,
-          },
-        ),
-        rule({ place: 'first', platform: 'native' }, { visibility: 'hidden' }),
-        rule(
-          { pending: true, platform: 'native' },
-          {
-            backgroundColor: 'transparent',
-            backgroundImage: pendingLine,
-          },
-        ),
+          }),
+          rule({ place: 'first' }, { visibility: 'hidden' }),
+          rule(
+            { pending: true },
+            {
+              backgroundColor: 'transparent',
+              backgroundImage: pendingLine,
+            },
+          ),
+        ]),
       ]),
     ]
   },

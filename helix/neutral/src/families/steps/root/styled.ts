@@ -1,4 +1,4 @@
-import { difference, fn, measured, quotient, sum, token, web } from '../../../style.js'
+import { difference, fn, measured, native, quotient, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -26,14 +26,14 @@ export default styles(
   root,
   {
     prefix: 'steps',
-    hooks: [
-      'connector-inset',
-      'gap',
-      'marker-size',
-      'progress-color',
-      'progress-thickness',
-      'progress-track-color',
-    ],
+    hooks: {
+      connectorInset: token('space-2xs'),
+      gap: token('space-md'),
+      markerSize: token('size-icon'),
+      progressColor: token('color-success'),
+      progressThickness: token('border-thick'),
+      progressTrackColor: token('color-border'),
+    },
     own: [
       'steps-body-align',
       'steps-body-basis',
@@ -86,12 +86,12 @@ export default styles(
         display: 'flex',
         /* So a progress bar a page shows takes a line of its own. */
         flexWrap: 'wrap',
-        gap: hook.gap(token('space-md')),
+        gap: hook.gap,
         own: {
-          m: hook.markerSize(token('size-icon')),
+          m: hook.markerSize,
           markBox: own.m,
           /* Air either side of every mark, so the line arrives at it. */
-          connectorInset: hook.connectorInset(token('space-2xs')),
+          connectorInset: hook.connectorInset,
           columns: 'minmax(0, 1fr)',
           markerColumn: 1,
           markerJustify: 'center',
@@ -100,22 +100,16 @@ export default styles(
           bodyAlign: 'center',
           rowGap: token('space-xs'),
           content: 'none',
-          leadInlineStart: quotient(hook.gap(token('space-md')), '-2'),
+          leadInlineStart: quotient(hook.gap, '-2'),
           leadInlineSize: difference(
-            difference(
-              sum('50%', quotient(hook.gap(token('space-md')), 2)),
-              quotient(own.markBox, 2),
-            ),
+            difference(sum('50%', quotient(hook.gap, 2)), quotient(own.markBox, 2)),
             own.connectorInset,
           ),
           leadBlockStart: quotient(own.markBox, 2),
           leadBlockSize: token('border-thin'),
           trailInlineStart: sum('50%', quotient(own.markBox, 2), own.connectorInset),
           trailInlineSize: difference(
-            difference(
-              sum('50%', quotient(hook.gap(token('space-md')), 2)),
-              quotient(own.markBox, 2),
-            ),
+            difference(sum('50%', quotient(hook.gap, 2)), quotient(own.markBox, 2)),
             own.connectorInset,
           ),
           trailBlockStart: quotient(own.markBox, 2),
@@ -140,15 +134,12 @@ export default styles(
             content: 'grid',
             leadInlineStart: quotient(own.markBox, 2),
             leadInlineSize: token('border-thin'),
-            leadBlockStart: quotient(hook.gap(token('space-md')), '-2'),
-            leadBlockSize: quotient(hook.gap(token('space-md')), 2),
+            leadBlockStart: quotient(hook.gap, '-2'),
+            leadBlockSize: quotient(hook.gap, 2),
             trailInlineStart: quotient(own.markBox, 2),
             trailInlineSize: token('border-thin'),
             trailBlockStart: own.markBox,
-            trailBlockSize: sum(
-              difference('100%', own.markBox),
-              quotient(hook.gap(token('space-md')), 2),
-            ),
+            trailBlockSize: sum(difference('100%', own.markBox), quotient(hook.gap, 2)),
           },
         },
       ),
@@ -170,68 +161,67 @@ export default styles(
       /* Where a phone draws the halves of the line, as insets from the step's
          edges: in a row, from half the gap before the step to the middle,
          short of the mark, and from the middle to half the gap past it. */
-      rule(
-        { platform: 'native' },
-        {
+      native([
+        rule({
           own: {
             flow: 'column',
             bodyBasis: 'auto',
             bodyGrow: 0,
             leadTop: quotient(own.markBox, 2),
             leadBottom: 'auto',
-            leadStart: quotient(hook.gap(token('space-md')), '-2'),
+            leadStart: quotient(hook.gap, '-2'),
             leadEnd: '50%',
             leadWidth: 'auto',
             leadHeight: token('border-thin'),
             trailTop: quotient(own.markBox, 2),
             trailBottom: 'auto',
             trailStart: '50%',
-            trailEnd: quotient(hook.gap(token('space-md')), '-2'),
+            trailEnd: quotient(hook.gap, '-2'),
             trailWidth: 'auto',
             trailHeight: token('border-thin'),
             railMargin: sum(quotient(own.markBox, 2), own.connectorInset),
           },
-        },
-      ),
-      /* Down a column, from half the gap above the step to its top, and from
+        }),
+        /* Down a column, from half the gap above the step to its top, and from
          under the mark to half the gap below the step. */
-      rule(
-        { orientation: 'vertical', platform: 'native' },
-        {
-          own: {
-            flow: 'row',
-            bodyBasis: 0,
-            bodyGrow: 1,
-            leadTop: quotient(hook.gap(token('space-md')), '-2'),
-            leadStart: quotient(own.markBox, 2),
-            leadEnd: 'auto',
-            leadWidth: token('border-thin'),
-            leadHeight: quotient(hook.gap(token('space-md')), 2),
-            trailTop: own.markBox,
-            trailBottom: quotient(hook.gap(token('space-md')), '-2'),
-            trailStart: quotient(own.markBox, 2),
-            trailEnd: 'auto',
-            trailWidth: token('border-thin'),
-            trailHeight: 'auto',
-            railMargin: 0,
+        rule(
+          { orientation: 'vertical' },
+          {
+            own: {
+              flow: 'row',
+              bodyBasis: 0,
+              bodyGrow: 1,
+              leadTop: quotient(hook.gap, '-2'),
+              leadStart: quotient(own.markBox, 2),
+              leadEnd: 'auto',
+              leadWidth: token('border-thin'),
+              leadHeight: quotient(hook.gap, 2),
+              trailTop: own.markBox,
+              trailBottom: quotient(hook.gap, '-2'),
+              trailStart: quotient(own.markBox, 2),
+              trailEnd: 'auto',
+              trailWidth: token('border-thin'),
+              trailHeight: 'auto',
+              railMargin: 0,
+            },
           },
-        },
-      ),
+        ),
+      ]),
       /* Where a process reached, which is a fact and not a control. */
-      rule({ print: true }, { printColorAdjust: web('economy') }),
+      rule({ print: true }, { web: { printColorAdjust: 'economy' } }),
     ]),
     /* How far through the sequence is: a bar, once a page gives the part a
        `display`. Last, across the whole row or column. */
     on('progress', [
       rule({
-        backgroundColor: hook.progressTrackColor(token('color-border')),
+        backgroundColor: hook.progressTrackColor,
         backgroundImage: fn(
           'linear-gradient',
           'to right',
-          [hook.progressColor(token('color-success')), measured('steps-progress', '0%')],
+          [hook.progressColor, measured('steps-progress', '0%')],
           ['transparent', 0],
         ),
-        blockSize: hook.progressThickness(token('border-thick')),
+        blockSize: hook.progressThickness,
         borderRadius: token('radii-full'),
         flex: [0, 0, '100%'],
         order: 1,
@@ -239,28 +229,26 @@ export default styles(
       rule({ orientation: 'vertical' }, { flex: 'none', inlineSize: '100%' }),
     ]),
     on({ part: 'progress', selector: '[part="progress"]:dir(rtl)' }, [
-      rule(
-        { platform: 'web' },
-        {
+      web([
+        rule({
           backgroundImage: fn(
             'linear-gradient',
             'to left',
-            [hook.progressColor(token('color-success')), measured('steps-progress', '0%')],
+            [hook.progressColor, measured('steps-progress', '0%')],
             ['transparent', 0],
           ),
-        },
-      ),
+        }),
+      ]),
     ]),
     /* A row hands each step an equal share, whatever the names measure. */
     on({ slotted: '*' }, [
       rule({ orientation: { not: 'vertical' } }, { flex: [1, 1, 0], minInlineSize: 0 }),
       /* A phone counts each step as the sequence draws it, and hands each its
          own number. */
-      rule({ platform: 'native' }, { counterIncrement: 'helix-step' }),
-      rule(
-        { variant: 'numeric', platform: 'native' },
-        { own: { count: fn('counter', 'helix-step') } },
-      ),
+      native([
+        rule({ counterIncrement: 'helix-step' }),
+        rule({ variant: 'numeric' }, { own: { count: fn('counter', 'helix-step') } }),
+      ]),
     ]),
   ],
 )

@@ -1,6 +1,16 @@
 import field from '../../../fragments/field.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
-import { difference, list, measured, product, sum, token } from '../../../style.js'
+import {
+  difference,
+  first,
+  list,
+  measured,
+  native,
+  product,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import group from './headless.js'
@@ -24,14 +34,14 @@ export default styles(
   group,
   {
     prefix: 'toggle-group',
-    hooks: [
-      'background-color',
-      'border-color',
-      'indicator-color',
-      'indicator-shadow',
-      'item-radius',
-      'radius',
-    ],
+    hooks: ({ own }) => ({
+      backgroundColor: token('color-surface-sunken'),
+      borderColor: token('color-border'),
+      indicatorColor: own.indicatorSurface,
+      indicatorShadow: token('shadow-sm'),
+      itemRadius: null,
+      radius: token('radii-sm'),
+    }),
     own: [
       'indicator-surface',
       'toggle-height',
@@ -70,19 +80,21 @@ export default styles(
     /* The rule, on the track: sixty percent of the row the toggles fill,
        which is a length where the track's own height is not. */
     on({ before: 'track' }, [
-      rule(
-        { 'label-placement': 'start', platform: 'web' },
-        {
-          alignSelf: 'center',
-          backgroundColor: token('color-border'),
-          blockSize: product(own.toggleHeight, 0.6),
-          content: '""',
-          flex: 'none',
-          inlineSize: token('border-thin'),
-          marginInline: token('space-xs'),
-          order: '-1',
-        },
-      ),
+      web([
+        rule(
+          { 'label-placement': 'start' },
+          {
+            alignSelf: 'center',
+            backgroundColor: token('color-border'),
+            blockSize: product(own.toggleHeight, 0.6),
+            content: '""',
+            flex: 'none',
+            inlineSize: token('border-thin'),
+            marginInline: token('space-xs'),
+            order: '-1',
+          },
+        ),
+      ]),
     ]),
     on('track', [
       rule({
@@ -107,13 +119,11 @@ export default styles(
       }),
       /* A framed track, concentric: the outer radius less the border. */
       rule([{ separation: false }, { separation: 'outlined' }], {
-        backgroundColor: hook.backgroundColor(token('color-surface-sunken')),
-        border: [token('border-thin'), 'solid', hook.borderColor(token('color-border'))],
-        borderRadius: hook.radius(token('radii-sm')),
+        backgroundColor: hook.backgroundColor,
+        border: [token('border-thin'), 'solid', hook.borderColor],
+        borderRadius: hook.radius,
         own: {
-          toggleRadius: hook.itemRadius(
-            difference(hook.radius(token('radii-sm')), token('border-thin')),
-          ),
+          toggleRadius: hook.itemRadius(difference(hook.radius, token('border-thin'))),
           /* The border joins the padding in what the row gives back. */
           toggleHeight: difference(
             token('size-control'),
@@ -125,7 +135,7 @@ export default styles(
       }),
       /* Wrong, and the strip says so. */
       rule(
-        { state: 'invalid' },
+        { invalid: true },
         {
           outline: [token('size-focus-ring'), 'solid', token('color-danger')],
           outlineOffset: product(token('size-focus-offset'), '-1'),
@@ -139,16 +149,18 @@ export default styles(
       /* What a phone's toggle reads of the group: no wash under a finger, since
          the indicator is the one surface, and, where several can be pressed,
          the indicator's fill on each pressed toggle. */
-      rule({ platform: 'native' }, { own: { toggleHoverSurface: 'transparent' } }),
-      rule(
-        { 'selection-mode': 'multiple', platform: 'native' },
-        {
-          own: {
-            togglePressedSurface: hook.indicatorColor(own.indicatorSurface),
-            togglePressedShadow: hook.indicatorShadow(token('shadow-sm')),
+      native([
+        rule({ own: { toggleHoverSurface: 'transparent' } }),
+        rule(
+          { 'selection-mode': 'multiple' },
+          {
+            own: {
+              togglePressedSurface: first(hook.indicatorColor, own.indicatorSurface),
+              togglePressedShadow: hook.indicatorShadow,
+            },
           },
-        },
-      ),
+        ),
+      ]),
     ]),
     /* The toggles share the row, each at its own width and the row's height. */
     on({ slotted: 'helix-toggle' }, [
@@ -159,10 +171,10 @@ export default styles(
        pressed, since one marker cannot travel to two places. */
     on('indicator', [
       rule({
-        backgroundColor: hook.indicatorColor(own.indicatorSurface),
+        backgroundColor: first(hook.indicatorColor, own.indicatorSurface),
         /* The track always sets it, and the marker and the items inherit it there. */
         borderRadius: own.toggleRadius,
-        boxShadow: hook.indicatorShadow(token('shadow-sm')),
+        boxShadow: hook.indicatorShadow,
       }),
       /* One marker that travels. */
       rule({
@@ -188,31 +200,29 @@ export default styles(
         selector: ':host([selection-mode="multiple"]) ::slotted(helix-toggle:state(pressed))',
       },
       [
-        rule(
-          { platform: 'web' },
-          {
-            backgroundColor: hook.indicatorColor(own.indicatorSurface),
+        web([
+          rule({
+            backgroundColor: first(hook.indicatorColor, own.indicatorSurface),
             borderRadius: own.toggleRadius,
-            boxShadow: hook.indicatorShadow(token('shadow-sm')),
-          },
-        ),
+            boxShadow: hook.indicatorShadow,
+          }),
+        ]),
       ],
     ),
     /* The row that holds the track and whatever flanks it. */
     on('row', [rule({ alignItems: 'center', display: 'flex', gap: token('space-sm') })]),
     /* A phone's rule after an inline label, as a box of its own. */
     on('rule', [
-      rule(
-        { platform: 'native' },
-        {
+      native([
+        rule({
           alignSelf: 'center',
           backgroundColor: token('color-border'),
           blockSize: product(own.toggleHeight, 0.6),
           flex: 'none',
           inlineSize: token('border-thin'),
           marginInline: token('space-xs'),
-        },
-      ),
+        }),
+      ]),
     ]),
   ],
 )

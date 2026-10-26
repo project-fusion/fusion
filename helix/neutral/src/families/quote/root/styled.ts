@@ -1,5 +1,5 @@
 import printEconomy from '../../../fragments/print-economy.js'
-import { inherit, quote, token } from '../../../style.js'
+import { inherit, native, quote, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -19,29 +19,34 @@ export default styles(
   root,
   {
     prefix: 'quote',
-    hooks: ['color', 'font-family', 'font-style', 'font-weight'],
+    hooks: {
+      color: token('color-foreground-muted'),
+      fontFamily: inherit(),
+      fontStyle: 'italic',
+      fontWeight: inherit(),
+    },
     stylesheet: 'quote/root/quote-root.generated.css',
   },
   ({ hook, include, on, rule }) => [
     on('host', [rule({ display: 'inline', font: inherit() })]),
     on('quote', [
       rule({
-        color: hook.color(token('color-foreground-muted')),
+        color: hook.color,
         font: inherit(),
-        fontFamily: hook.fontFamily(inherit()),
-        fontStyle: hook.fontStyle('italic'),
-        fontWeight: hook.fontWeight(inherit()),
+        fontFamily: hook.fontFamily,
+        fontStyle: hook.fontStyle,
+        fontWeight: hook.fontWeight,
       }),
     ]),
     /* The marks a `<q>` draws on the web, which a phone draws from these. */
     on({ before: 'quote' }, [
-      rule({ platform: 'native' }, { content: quote('open') }),
+      native([rule({ content: quote('open') })]),
       /* `no-open-quote` draws nothing and still counts the level, so a quote
          nested inside one without marks takes the inner marks. */
       rule({ 'no-marks': true }, { content: quote('no-open') }),
     ]),
     on({ after: 'quote' }, [
-      rule({ platform: 'native' }, { content: quote('close') }),
+      native([rule({ content: quote('close') })]),
       rule({ 'no-marks': true }, { content: quote('no-close') }),
     ]),
     /* The marks and the slant print, with no fill behind them. */

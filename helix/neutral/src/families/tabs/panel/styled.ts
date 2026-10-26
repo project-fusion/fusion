@@ -1,4 +1,4 @@
-import { token } from '../../../style.js'
+import { first, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import panel from './headless.js'
 
@@ -7,7 +7,9 @@ export default styles(
   panel,
   {
     prefix: 'tabs-panel',
-    hooks: ['padding-block-start'],
+    hooks: ({ own }) => ({
+      paddingBlockStart: own.paddingBlockStart(token('space-md')),
+    }),
     own: ['tabs-panel-padding-block-start', 'tabs-panel-padding-inline-start'],
     stylesheet: 'tabs/panel/tab-panel.generated.css',
   },
@@ -22,10 +24,10 @@ export default styles(
         minBlockSize: 0,
         minInlineSize: 0,
         outline: 'none',
-        paddingBlockStart: hook.paddingBlockStart(own.paddingBlockStart(token('space-md'))),
+        paddingBlockStart: first(hook.paddingBlockStart, own.paddingBlockStart, token('space-md')),
         paddingInlineStart: own.paddingInlineStart(token('space-none')),
       }),
-      rule({ part: { hidden: true } }, { display: 'none' }),
+      rule({ hidden: true }, { display: 'none' }),
     ]),
   ],
 )

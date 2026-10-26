@@ -24,16 +24,16 @@ export default styles(
   root,
   {
     prefix: 'toolbar',
-    hooks: [
-      'align',
-      'background-color',
-      'border-color',
-      'border-width',
-      'gap',
-      'padding',
-      'radius',
-      'separator-gap',
-    ],
+    hooks: {
+      align: 'center',
+      backgroundColor: 'transparent',
+      borderColor: 'transparent',
+      borderWidth: 0,
+      gap: token('space-2xs'),
+      padding: token('space-none'),
+      radius: token('radii-none'),
+      separatorGap: 0,
+    },
     props: [prop('size', ['sm', 'md', 'lg'])],
     stylesheet: 'toolbar/root/toolbar-root.generated.css',
   },
@@ -89,23 +89,23 @@ export default styles(
       rule({
         /* Across the toolbar's axis: centered, or `stretch` for a column of
            controls as wide as the toolbar. */
-        alignItems: hook.align('center'),
-        backgroundColor: hook.backgroundColor('transparent'),
-        border: [hook.borderWidth(0), 'solid', hook.borderColor('transparent')],
-        borderRadius: hook.radius(token('radii-none')),
+        alignItems: hook.align,
+        backgroundColor: hook.backgroundColor,
+        border: [hook.borderWidth, 'solid', hook.borderColor],
+        borderRadius: hook.radius,
         display: 'flex',
-        gap: hook.gap(token('space-2xs')),
-        padding: hook.padding(token('space-none')),
+        gap: hook.gap,
+        padding: hook.padding,
       }),
       rule({ orientation: 'vertical' }, { flexDirection: 'column' }),
     ]),
     /* A divider between controls, and the space either side of it along the
        toolbar's axis. None unless set: the toolbar's gap already parts them. */
     on({ slotted: 'helix-divider' }, [
-      rule({ marginInline: hook.separatorGap(0) }),
+      rule({ marginInline: hook.separatorGap }),
       rule(
         { orientation: 'vertical' },
-        { alignSelf: 'stretch', marginBlock: hook.separatorGap(0), marginInline: 0 },
+        { alignSelf: 'stretch', marginBlock: hook.separatorGap, marginInline: 0 },
       ),
     ]),
   ],

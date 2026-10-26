@@ -1,4 +1,4 @@
-import { hookOf, token } from '../../../style.js'
+import { hookOf, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -28,7 +28,9 @@ export default styles(
   root,
   {
     prefix: 'timeline',
-    hooks: ['gap'],
+    hooks: {
+      gap: token('space-lg'),
+    },
     own: [
       'timeline-above',
       'timeline-arrive-display',
@@ -88,10 +90,9 @@ export default styles(
         },
       ),
       /* A phone's time stands before the line, beside what happened. */
-      rule(
-        { layout: 'opposite', platform: 'native' },
-        { own: { head: 'none', lead: 'flex', leadFlex: '1 1 0' } },
-      ),
+      native([
+        rule({ layout: 'opposite' }, { own: { head: 'none', lead: 'flex', leadFlex: '1 1 0' } }),
+      ]),
       rule(
         { layout: 'alternate' },
         {
@@ -107,12 +108,19 @@ export default styles(
       ),
       /* A phone's even entry turns its rows round the line, and the side
          before the line is empty. */
-      rule(
-        { layout: 'alternate', platform: 'native' },
-        {
-          own: { evenDirection: 'row-reverse', lead: 'flex', leadFlex: '1 1 0', leadTime: 'none' },
-        },
-      ),
+      native([
+        rule(
+          { layout: 'alternate' },
+          {
+            own: {
+              evenDirection: 'row-reverse',
+              lead: 'flex',
+              leadFlex: '1 1 0',
+              leadTime: 'none',
+            },
+          },
+        ),
+      ]),
       rule(
         { orientation: 'horizontal' },
         {
@@ -124,7 +132,7 @@ export default styles(
             columns: 'minmax(min-content, 1fr)',
             contentBlockEnd: token('space-none'),
             contentColumn: 1,
-            contentInlineEnd: hook.gap(token('space-lg')),
+            contentInlineEnd: hook.gap,
             contentRow: 3,
             direction: 'row',
             entryFlex: '1 1 0',
@@ -153,22 +161,24 @@ export default styles(
       ),
       /* A phone's entry is the mark and its line, then the time, then what
          happened. */
-      rule(
-        { orientation: 'horizontal', platform: 'native' },
-        {
-          own: {
-            above: 'flex',
-            bodyDirection: 'column',
-            evenDirection: 'column',
-            head: 'none',
-            lead: 'none',
-            railDirection: 'row',
-            /* Across the whole entry, so the line that leaves the mark
+      native([
+        rule(
+          { orientation: 'horizontal' },
+          {
+            own: {
+              above: 'flex',
+              bodyDirection: 'column',
+              evenDirection: 'column',
+              head: 'none',
+              lead: 'none',
+              railDirection: 'row',
+              /* Across the whole entry, so the line that leaves the mark
                reaches the next one. */
-            railInlineSize: '100%',
+              railInlineSize: '100%',
+            },
           },
-        },
-      ),
+        ),
+      ]),
       rule({ print: true }, { printColorAdjust: 'economy' }),
     ]),
     /* **An entry across is never narrower than its words**: the web's is as
@@ -178,8 +188,8 @@ export default styles(
        lays the timeline out at its own width and the entries share it. */
     on({ region: 'default', slotted: '*' }, [
       rule({ orientation: 'horizontal' }, { flex: '1 1 0' }),
-      rule({ orientation: 'horizontal', platform: 'web' }, { minInlineSize: 'min-content' }),
-      rule({ orientation: 'horizontal', platform: 'native' }, { minInlineSize: '6em' }),
+      web([rule({ orientation: 'horizontal' }, { minInlineSize: 'min-content' })]),
+      native([rule({ orientation: 'horizontal' }, { minInlineSize: '6em' })]),
     ]),
     /* The entry that says more are on their way, in the time's ink. */
     on('loading', [
@@ -187,7 +197,7 @@ export default styles(
         color: hookOf('timeline', 'time-color', token('color-foreground-muted')),
         fontFamily: token('font-sans'),
         fontSize: token('text-xs'),
-        paddingBlockStart: hook.gap(token('space-lg')),
+        paddingBlockStart: hook.gap,
       }),
       rule({ orientation: 'horizontal' }, { paddingBlockStart: token('space-none') }),
     ]),

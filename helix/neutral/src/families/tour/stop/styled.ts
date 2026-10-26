@@ -1,4 +1,4 @@
-import { safeArea, sum, token, web } from '../../../style.js'
+import { native, safeArea, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import stop from './headless.js'
 
@@ -25,11 +25,18 @@ export default styles(
   stop,
   {
     prefix: 'tour',
-    hooks: ['arrow-size', 'border-width', 'bubble-size', 'padding', 'shadow', 'surface-color'],
+    hooks: {
+      arrowSize: '0.5rem',
+      borderWidth: token('border-thin'),
+      bubbleSize: '22rem',
+      padding: token('space-md'),
+      shadow: token('shadow-floating'),
+      surfaceColor: token('color-surface-raised'),
+    },
     stylesheet: 'tour/stop/tour-stop.generated.css',
   },
   ({ hook, on, rule }) => {
-    const fill = hook.surfaceColor(token('color-surface-raised'))
+    const fill = hook.surfaceColor
     const edge = [token('border-thin'), 'solid', token('color-border')] as const
     const muted = token('color-foreground-muted')
     return [
@@ -37,9 +44,9 @@ export default styles(
       on('surface', [
         rule({
           backgroundColor: fill,
-          border: [hook.borderWidth(token('border-thin')), 'solid', token('color-border')],
+          border: [hook.borderWidth, 'solid', token('color-border')],
           borderRadius: token('radii-sm'),
-          boxShadow: hook.shadow(token('shadow-floating')),
+          boxShadow: hook.shadow,
           boxSizing: 'border-box',
           color: token('color-foreground'),
           display: 'flex',
@@ -47,9 +54,9 @@ export default styles(
           gap: token('space-md'),
           inlineSize: web('max-content'),
           margin: token('space-none'),
-          maxInlineSize: hook.bubbleSize('22rem'),
+          maxInlineSize: hook.bubbleSize,
           overflow: 'visible',
-          padding: hook.padding(token('space-md')),
+          padding: hook.padding,
           position: web('fixed'),
         }),
         /* No ring on the panel, which takes focus only so a reader lands on the stop. */
@@ -58,24 +65,28 @@ export default styles(
         rule(
           { type: 'floating' },
           {
-            inset: web('auto'),
-            insetBlockEnd: web(token('space-lg')),
-            insetInlineEnd: web(token('space-lg')),
+            web: {
+              inset: 'auto',
+              insetBlockEnd: token('space-lg'),
+              insetInlineEnd: token('space-lg'),
+            },
           },
         ),
         /* A phone stands a floating panel along the window's bottom edge, at its end. */
-        rule(
-          { platform: 'native', type: 'floating' },
-          {
-            alignSelf: 'flex-end',
-            marginBlockEnd: sum(token('space-lg'), safeArea('bottom')),
-            marginInlineEnd: token('space-lg'),
-          },
-        ),
+        native([
+          rule(
+            { type: 'floating' },
+            {
+              alignSelf: 'flex-end',
+              marginBlockEnd: sum(token('space-lg'), safeArea('bottom')),
+              marginInlineEnd: token('space-lg'),
+            },
+          ),
+        ]),
       ]),
       /* A panel that is not shown draws nothing, which the rules above outrank. */
       on({ part: 'surface', selector: ':host [part="surface"][hidden]' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
+        web([rule({ display: 'none' })]),
       ]),
       /* The title, and the line under it, when they are passed in on their own. */
       on({ region: 'heading', slotted: '*' }, [
@@ -104,8 +115,8 @@ export default styles(
       on('arrow', [
         rule({
           backgroundColor: fill,
-          blockSize: hook.arrowSize('0.5rem'),
-          inlineSize: hook.arrowSize('0.5rem'),
+          blockSize: hook.arrowSize,
+          inlineSize: hook.arrowSize,
           position: 'absolute',
           rotate: '45deg',
         }),
