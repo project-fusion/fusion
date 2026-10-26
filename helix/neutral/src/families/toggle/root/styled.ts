@@ -92,7 +92,7 @@ export default styles(
         /* A disabled toggle that lit up under a finger would say it can be
          pressed. */
         rule(
-          { within: { host: { disabled: false } }, interaction: ['hover', 'active'] },
+          { formDisabled: false, interaction: ['hover', 'active'] },
           {
             backgroundColor: own.hoverSurface(mix(token('color-foreground'), 5, 'transparent')),
             color: token('color-foreground'),
@@ -101,7 +101,7 @@ export default styles(
         /* Pressed: the words at full strength, over the indicator's fill where
          the group around draws one on each pressed toggle. */
         rule({ selected: true }, { color: hook.itemColorSelected }),
-        rule({ within: { host: { disabled: true } } }, { opacity: 0.5 }),
+        rule({ formDisabled: true }, { opacity: 0.5 }),
       ]),
     ]),
     /* An icon before the label, or a count after it, set off by a step. */

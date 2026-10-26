@@ -283,10 +283,10 @@ export default styles(
         }),
         rule([{ complete: true }, { current: true }], { color: token('color-foreground') }),
         rule(
-          { active: true, within: { host: { disabled: false } } },
+          { active: true, formDisabled: false },
           { backgroundColor: mix(token('color-foreground'), 8, 'transparent') },
         ),
-        rule({ within: { host: { disabled: true } } }, { opacity: 0.5 }),
+        rule({ formDisabled: true }, { opacity: 0.5 }),
       ]),
     ]),
     /* The same inset the name takes as padding, so the two start on one line. */

@@ -185,10 +185,7 @@ export type StatesOf<H extends Source> =
 type AsksOf<P extends Prop> = { readonly [One in P as Camel<One['name']>]?: Asks<One['type']> }
 
 /** An interaction on the host that a rule on a part may ask for, any of several in an array. */
-type HostAround = Around & {
-  /** The host is disabled, `:host(:disabled)`, as a form's disabled fieldset makes it. */
-  readonly disabled?: boolean
-}
+type HostAround = Around
 
 /**
  * The conditions a rule applies under: the family's props, its states, and what every rule takes.
@@ -221,8 +218,8 @@ export type When<Asked, State extends string, Part extends string, Alias extends
      * for the host's own interaction on a part: `:host(:hover) [part="x"]`.
      */
     /*
-     * On `host`, `disabled` is the host's own `:disabled`, and an array is any
-     * one of several interactions: `within: { host: ['hover', 'focusWithin'] }`.
+     * On `host`, an array is any one of several interactions:
+     * `within: { host: ['hover', 'focusWithin'] }`.
      */
     readonly within?:
       | Part
