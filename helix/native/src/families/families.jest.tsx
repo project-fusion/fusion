@@ -44,7 +44,7 @@ describe('the generated Tabs', () => {
       <HelixTabs
         onActivate={(event) => told.push(`activate ${event.detail.previous}>${event.detail.value}`)}
         onBeforeActivate={(event) => told.push(`before ${event.detail.value}`)}
-        onSelect={(event) => told.push(`set from ${event.target.value}`)}
+        onBeforeSelect={(event) => told.push(`set from ${event.target.value}`)}
         panels={[
           <HelixTabPanel key="a" value="a">
             First
@@ -54,10 +54,10 @@ describe('the generated Tabs', () => {
           </HelixTabPanel>,
         ]}
       >
-        <HelixTab onSelect={(event) => told.push(`tab ${event.detail.value}`)} value="a">
+        <HelixTab onBeforeSelect={(event) => told.push(`tab ${event.detail.value}`)} value="a">
           Alpha
         </HelixTab>
-        <HelixTab onSelect={(event) => told.push(`tab ${event.detail.value}`)} value="b">
+        <HelixTab onBeforeSelect={(event) => told.push(`tab ${event.detail.value}`)} value="b">
           Beta
         </HelixTab>
       </HelixTabs>,

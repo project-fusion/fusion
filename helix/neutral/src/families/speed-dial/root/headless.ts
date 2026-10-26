@@ -26,8 +26,8 @@ import {
  * press or a key opens them. Down and Up on the trigger open them on the
  * first action or the last.
  *
- * **Choosing an action sends its `select`**, which a handler may refuse,
- * and closes the dial once it stands, with focus back on the trigger. A
+ * **Choosing an action sends its `before-select`**, which a handler may
+ * refuse, then its `select`, and closes the dial once it stands, with focus back on the trigger. A
  * close request and a press outside close it too. Every way it opens and
  * closes asks `before-open` or `before-close` first, which a handler may
  * refuse, and `toggle` is sent once it stands the other way.
@@ -45,7 +45,7 @@ import {
  */
 export default headless('speed-dial', {
   collection: collection({
-    closes: { event: 'select' },
+    closes: { event: 'before-select' },
     keys: { chooses: false, wrap: true },
     mixes: true,
   }),
@@ -57,12 +57,14 @@ export default headless('speed-dial', {
   events: [
     event('before-close', { cancelable: true, detail: ['open'] }),
     event('before-open', { cancelable: true, detail: ['open'] }),
-    event('select', { cancelable: true, detail: ['value'] }),
+    event('before-select', { cancelable: true, detail: ['value'] }),
+    event('select', { detail: ['value'] }),
     event('toggle', { bare: true, detail: ['newState', 'oldState'] }),
   ],
   props: [
     prop('default-open', 'boolean', { default: false }),
-    prop('label', 'string', { default: 'Actions' }),
+    prop('fallback-label', 'string', { default: 'Actions' }),
+    prop('label', 'string', { default: '' }),
     prop('long-press-label', 'string', {
       default: 'Long press or press Alt+Down to show the actions',
     }),

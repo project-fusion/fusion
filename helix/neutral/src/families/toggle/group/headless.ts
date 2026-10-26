@@ -19,8 +19,8 @@ import {
  * several, with an indicator under the chosen one.
  *
  * **The group holds the answer in `value`**, seeded by `default-value` or by
- * a toggle its markup writes `selected`. A toggle's `select` reaches the
- * group, then the group asks with `before-change`, and once the answer has
+ * a toggle its markup writes `selected`. A toggle's `before-select` reaches
+ * the group, then the group asks with `before-change`, and once the answer has
  * moved it sends `input` and `change`. With `allow-empty-selection`, a press
  * on the chosen toggle takes it back.
  *
@@ -58,7 +58,7 @@ export default headless('toggle-group', {
     event('change', { bare: true }),
     event('input', { bare: true }),
     /* A toggle's choice, which reaches the group before the group acts on it. */
-    event('select', { cancelable: true, detail: ['value'] }),
+    event('before-select', { cancelable: true, detail: ['value'] }),
   ],
   props: [
     prop('allow-empty-selection', 'boolean', { default: false }),

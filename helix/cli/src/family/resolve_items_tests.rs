@@ -70,7 +70,7 @@ fn a_rule_on_a_drawn_part_reads_the_element_around_alone() {
 fn menu_item(fields: &str) -> Family {
     let source = format!(
         "export default headless('menu-item', {{
-          events: [event('before-toggle', {{ cancelable: true }}), event('toggle')],
+          events: [event('before-check', {{ cancelable: true }}), event('toggle')],
           item: item('menu', {{ {fields} }}),
           props: [prop('checkable', 'boolean'), prop('checked', 'boolean'), prop('label', 'string')],
           tree: [pressable('item', {{ chooses: true, role: 'menuitem' }}, [region('default')])],
@@ -94,7 +94,7 @@ fn menu_item(fields: &str) -> Family {
 fn an_item_of_a_set_that_mixes_reads_switches_and_asks_through_a_cancelable_event() {
     assert_eq!(
         unresolved(&menu_item(
-            "before: 'before-toggle', checkable: 'checkable', checked: 'checked'"
+            "before: 'before-check', checkable: 'checkable', checked: 'checked'"
         )),
         Vec::<String>::new()
     );

@@ -225,13 +225,10 @@ describe('asking for a move (reorder-controller.dom.spec.ts)', () => {
     expect([one.asked, one.log.at(-2)]).toEqual([['before-reorder', 'reorder'], 'moved'])
   })
 
-  test('stops at a refused helix-before-reorder, and a refused helix-reorder puts the item back', () => {
+  test('stops at a refused helix-before-reorder, and sends no helix-reorder', () => {
     const before = host(false, (ask) => ask === 'before-reorder')
     before.send(NUDGE, { key: 'a' })
-    const after = host(false, (ask) => ask === 'reorder')
-    after.send(NUDGE, { key: 'a' })
     expect([before.asked, before.log.at(-1)]).toEqual([['before-reorder'], 'canceled'])
-    expect([after.asked, after.log.at(-1)]).toEqual([['before-reorder', 'reorder'], 'canceled'])
   })
 })
 

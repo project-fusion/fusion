@@ -21,7 +21,7 @@ export function ProjectScreen({ onBack, project, tab = 'overview' }: Props) {
       <helix-breadcrumbs label="Project">
         <helix-breadcrumb
           href="#projects"
-          onhelix-select={(event: { preventDefault: () => void }) => {
+          onhelix-before-select={(event: { preventDefault: () => void }) => {
             event.preventDefault()
             onBack()
           }}

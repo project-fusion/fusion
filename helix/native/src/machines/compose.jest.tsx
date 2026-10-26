@@ -69,12 +69,12 @@ describe('behaviorFor a set of tabs', () => {
         onBeforeActivate={(event: { detail: { value: string } }) =>
           told.push(`before ${event.detail.value}`)
         }
-        onSelect={(event: { detail: { value: string }; target: { value: string } }) =>
+        onBeforeSelect={(event: { detail: { value: string }; target: { value: string } }) =>
           told.push(`set hears ${event.detail.value} from ${event.target.value}`)
         }
       >
         <Tab
-          onSelect={(event: { detail: { value: string } }) =>
+          onBeforeSelect={(event: { detail: { value: string } }) =>
             told.push(`tab ${event.detail.value}`)
           }
           value="a"
@@ -94,14 +94,17 @@ describe('behaviorFor a set of tabs', () => {
   test('keeps its choice where the tab or the set refuses the select', async () => {
     await render(
       <Tabs
-        onSelect={(event: { detail: { value: string }; preventDefault(): void }) => {
+        onBeforeSelect={(event: { detail: { value: string }; preventDefault(): void }) => {
           if (event.detail.value === 'c') {
             event.preventDefault()
           }
         }}
       >
         <Tab value="a">Alpha</Tab>
-        <Tab onSelect={(event: { preventDefault(): void }) => event.preventDefault()} value="b">
+        <Tab
+          onBeforeSelect={(event: { preventDefault(): void }) => event.preventDefault()}
+          value="b"
+        >
           Beta
         </Tab>
         <Tab value="c">Gamma</Tab>
@@ -120,7 +123,7 @@ describe('behaviorFor a set of tabs', () => {
         </Tab>
         <Tab
           href="/two"
-          onSelect={(event: { preventDefault(): void }) => event.preventDefault()}
+          onBeforeSelect={(event: { preventDefault(): void }) => event.preventDefault()}
           value="b"
         >
           Two
@@ -158,7 +161,7 @@ describe('behaviorFor a set of tabs', () => {
     const told: string[] = []
     await render(
       <Tabs
-        onSelect={(event: { preventDefault(): void; target: { value: string } }) => {
+        onBeforeSelect={(event: { preventDefault(): void; target: { value: string } }) => {
           told.push(`set hears ${event.target.value}`)
           if (event.target.value === 'c') {
             event.preventDefault()
@@ -167,7 +170,7 @@ describe('behaviorFor a set of tabs', () => {
       >
         <Tab value="a">Alpha</Tab>
         <Tab
-          onSelect={(event: { detail: { value: string } }) =>
+          onBeforeSelect={(event: { detail: { value: string } }) =>
             told.push(`tab ${event.detail.value}`)
           }
           value="b"
@@ -224,7 +227,9 @@ describe('behaviorFor a set of tabs', () => {
   test('passes over a tab with no words for a letter, and reads the words of elements a tab holds', async () => {
     const values: string[] = []
     await render(
-      <Tabs onSelect={(event: { detail: { value: string } }) => values.push(event.detail.value)}>
+      <Tabs
+        onBeforeSelect={(event: { detail: { value: string } }) => values.push(event.detail.value)}
+      >
         <Tab value="a">Alpha</Tab>
         <Tab value="b" />
         <Tab value="x">

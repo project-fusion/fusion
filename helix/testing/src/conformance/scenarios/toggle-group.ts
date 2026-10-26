@@ -47,10 +47,10 @@ export const TOGGLE_GROUP: readonly Scenario[] = [
   {
     family: 'toggle-group',
     intents: [
-      { event: 'select', kind: 'refuse' },
+      { event: 'before-select', kind: 'refuse' },
       { item: 'grid', kind: 'press' },
     ],
-    name: 'a refused select keeps the choice',
+    name: 'a refused before-select keeps the choice',
     setup: group({ 'default-value': 'list' }, THREE),
   },
   {

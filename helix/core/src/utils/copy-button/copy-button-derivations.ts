@@ -26,10 +26,13 @@ const wordOf = (props: DerivationProps, prop: string, key: string, english: stri
 
 /**
  * `copy-button-name`: what the button is named by before a copy: its
- * `aria-label`, then `label` or the word registered for it, Copy.
+ * `aria-label`, then `label`, then `fallback-label` or the word registered
+ * for it, Copy.
  */
 export const copyButtonName: Derivation = (props) =>
-  textOf(props['aria-label']).trim() || wordOf(props, 'label', 'label', 'Copy')
+  textOf(props['aria-label']).trim() ||
+  textOf(props.label) ||
+  wordOf(props, 'fallback-label', 'fallbackLabel', 'Copy')
 
 /** `copy-button-copied`: its name once a copy is confirmed, `copied-label` or Copied. */
 export const copyButtonCopied: Derivation = (props) =>

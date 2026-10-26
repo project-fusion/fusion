@@ -34,7 +34,7 @@ import {
  */
 export default headless('switch', {
   events: [
-    event('before-toggle', { cancelable: true, detail: ['checked'] }),
+    event('before-check', { cancelable: true, detail: ['checked'] }),
     event('change', { bare: true }),
     event('input', { bare: true }),
   ],
@@ -56,7 +56,7 @@ export default headless('switch', {
   states: ['checked', 'invalid', 'settled'],
   toggle: toggle({
     after: ['input', 'change'],
-    before: 'before-toggle',
+    before: 'before-check',
     checked: 'checked',
     initial: 'default-checked',
     readonly: 'readonly',

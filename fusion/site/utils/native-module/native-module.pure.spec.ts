@@ -35,10 +35,10 @@ export type HelixTabsActivateEvent = HelixEvent<{
 }>
 
 /**
- * What \`onSelect\` receives: the web's \`helix-select\`, with the fields of its
+ * What \`onBeforeSelect\` receives: the web's \`helix-before-select\`, with the fields of its
  * detail that a phone sends.
  */
-export type HelixTabsSelectEvent = HelixEvent<
+export type HelixTabsBeforeSelectEvent = HelixEvent<
   {
     /**
      * Value of the item the reader chose, which a \`{ value }\` names, as in
@@ -94,7 +94,7 @@ export type HelixTabsProps = {
   /** Fired after the active tab changes. */
   readonly onActivate?: (event: HelixTabsActivateEvent) => void
   /** Fired when a tab is chosen. */
-  readonly onSelect?: (event: HelixTabsSelectEvent) => void
+  readonly onBeforeSelect?: (event: HelixTabsBeforeSelectEvent) => void
   /** The direction the tabs run. */
   readonly orientation?: 'horizontal' | 'vertical'
 }
@@ -222,7 +222,7 @@ describe('a native module', () => {
   })
 
   test('says where the target carries a value, with a detail or without one', () => {
-    const select = tabs?.events.find((one) => one.name === 'onSelect')
+    const select = tabs?.events.find((one) => one.name === 'onBeforeSelect')
     expect(select?.detail.map((field) => field.name)).toEqual(['value'])
     expect(select?.detail[0]?.description).toBe(
       'Value of the item the reader chose, which a `{ value }` names, as in `a => b`.',

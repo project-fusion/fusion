@@ -214,7 +214,7 @@ mod tests {
     fn reads_each_name_it_holds() {
         let read = toggle(&call(&[
             ("after", "change"),
-            ("before", "before-toggle"),
+            ("before", "before-check"),
             ("checked", "checked"),
             ("initial", "default-checked"),
             ("mixed", "indeterminate"),
@@ -225,7 +225,7 @@ mod tests {
             read,
             Toggle {
                 after: vec!["change".to_owned()],
-                before: Some("before-toggle".to_owned()),
+                before: Some("before-check".to_owned()),
                 changes: None,
                 checked: Some("checked".to_owned()),
                 closed: None,
@@ -301,7 +301,7 @@ mod tests {
         assert_eq!(closing.opens, None);
         assert_eq!(
             toggle(&call(&[
-                ("before", "before-toggle"),
+                ("before", "before-check"),
                 ("checked", "open"),
                 ("closes", "before-close"),
                 ("opens", "before-open"),

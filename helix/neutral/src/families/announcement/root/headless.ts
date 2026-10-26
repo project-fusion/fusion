@@ -64,7 +64,8 @@ export default headless('announcement', {
     prop('dismiss-label', 'string', { default: 'Dismiss' }),
     prop('dismissible', 'boolean', { default: false }),
     prop('duration', 'number'),
-    prop('label', 'string', { default: 'Announcement' }),
+    prop('fallback-label', 'string', { default: 'Announcement' }),
+    prop('label', 'string'),
     prop('queued', 'boolean', { default: false }),
     prop('tone', ['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
     /* The key that moves focus in and out, which a phone has no first control for. */

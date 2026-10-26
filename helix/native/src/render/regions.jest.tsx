@@ -30,7 +30,7 @@ const list: Family = {
       {
         attribute: true,
         default: 'Loading more',
-        name: 'loading-label',
+        name: 'loading-text',
         tier: 'headless',
         type: 'string',
       },
@@ -47,7 +47,7 @@ const list: Family = {
         {
           children: [
             {
-              attributes: { says: { bind: 'loading-label' } },
+              attributes: { says: { bind: 'loading-text' } },
               kind: 'text',
               name: 'loading-words',
             },

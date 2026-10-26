@@ -25,14 +25,14 @@ export const SPEED_DIAL: readonly Scenario[] = [
       { kind: 'set', prop: 'open', value: true },
       { item: 'copy', kind: 'press' },
     ],
-    name: 'choosing an action sends select and closes the dial',
+    name: 'choosing an action asks, says select, and closes the dial',
     setup: dial(),
   },
   {
     family: 'speed-dial',
     intents: [
       { kind: 'set', prop: 'open', value: true },
-      { event: 'select', kind: 'refuse' },
+      { event: 'before-select', kind: 'refuse' },
       { item: 'copy', kind: 'press' },
     ],
     name: 'a refused choice keeps the dial open',

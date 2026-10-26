@@ -8,7 +8,7 @@ import { bind, box, headless, prop, region, text, when } from '../../../tree.js'
  * scheduled: no entry is current or complete, which is `Steps`' job.
  *
  * **A feed that loads more sets `loading`.** The timeline is busy, and an
- * entry after the last says so: `loading-label`, or content passed into
+ * entry after the last says so: `loading-text`, or content passed into
  * `loading`.
  *
  * **Held to `helix-timeline`.** `helix family check` compares the props, the
@@ -21,7 +21,9 @@ export default headless('timeline', {
   props: [
     prop('label', 'string', { default: '' }),
     prop('loading', 'boolean', { default: false }),
-    prop('loading-label', 'string', { default: 'Loading more' }),
+    /* The old name of `loading-text`, which the web reads for one release. */
+    prop('loading-label', 'string', { platform: 'web' }),
+    prop('loading-text', 'string', { default: 'Loading more' }),
   ],
   states: ['loading', 'settled'],
   tree: [
@@ -29,7 +31,7 @@ export default headless('timeline', {
     when(
       'loading',
       box('loading', { role: 'listitem' }, [
-        region('loading', {}, [text('loading-text', { says: bind('loading-label') })]),
+        region('loading', {}, [text('loading-text', { says: bind('loading-text') })]),
       ]),
     ),
   ],

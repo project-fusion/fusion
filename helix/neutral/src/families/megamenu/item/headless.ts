@@ -4,8 +4,9 @@ import { bind, box, event, headless, item, pressable, prop, region, wrap } from 
  * A megamenu item's headless tier: one destination of a megamenu's panel,
  * a link with a name, a line about it, and an icon.
  *
- * **The item is a link to its `href`**, which sends `select` with the
- * `href` as its value and opens unless the event was refused: on the web
+ * **The item is a link to its `href`**, which asks with `before-select`,
+ * the `href` as its value, says `select` once it stands, and opens unless
+ * the request was refused: on the web
  * the browser follows it, and on a phone the app's open-link, its router
  * where it set one. **A press that stands closes the megamenu around it**,
  * as its set's `closes` says. An item with no `href` draws its words as a
@@ -31,7 +32,10 @@ import { bind, box, event, headless, item, pressable, prop, region, wrap } from 
  * manifest says the element has.
  */
 export default headless('megamenu-item', {
-  events: [event('select', { cancelable: true, detail: ['value'] })],
+  events: [
+    event('before-select', { cancelable: true, detail: ['value'] }),
+    event('select', { detail: ['value'] }),
+  ],
   item: item('megamenu', { chooses: true, flag: 'current', value: 'href' }),
   props: [
     prop('current', ['date', 'location', 'page', 'step', 'time', 'true']),
@@ -47,7 +51,7 @@ export default headless('megamenu-item', {
         chooses: true,
         current: bind('current'),
         href: bind('href'),
-        sends: 'select',
+        sends: 'before-select',
       },
       [
         region('icon', { part: 'icon' }),

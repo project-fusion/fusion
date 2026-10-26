@@ -22,11 +22,11 @@ const drilldownForm: Family = {
       keys: { chooses: false, keeps: ['ArrowLeft', 'ArrowRight'], wrap: false },
       mixes: true,
     },
-    events: [{ cancelable: true, detail: ['value'], name: 'navigate' }],
+    events: [{ cancelable: true, detail: ['value'], name: 'before-navigate' }],
     props: [{ attribute: true, default: '', name: 'page', tier: 'headless', type: 'string' }],
     stack: {
       back: 'back',
-      before: 'navigate',
+      before: 'before-navigate',
       drilled: 'drilled',
       label: 'page-label',
       page: 'page',
@@ -40,7 +40,7 @@ const drilldownForm: Family = {
     {
       bind: {
         back: { part: 'back' },
-        before: { event: 'navigate' },
+        before: { event: 'before-navigate' },
         drilled: { state: 'drilled' },
         label: { state: 'page-label' },
         page: { prop: 'page' },
@@ -73,13 +73,13 @@ const drilldownForm: Family = {
 
 const rowForm: Family = {
   api: {
-    events: [{ cancelable: true, detail: ['value'], name: 'select' }],
+    events: [{ cancelable: true, detail: ['value'], name: 'before-select' }],
     item: { chooses: true, of: 'drilldown', page: 'page' },
     props: [{ attribute: true, default: '', name: 'value', tier: 'headless', type: 'string' }],
     states: [],
   },
   machines: [
-    { bind: { part: { part: 'row' }, sends: { event: 'select' } }, machine: 'press' },
+    { bind: { part: { part: 'row' }, sends: { event: 'before-select' } }, machine: 'press' },
     { bind: { page: { region: 'page' } }, machine: 'stack-row' },
   ],
   name: 'drilldown-item',
@@ -87,7 +87,7 @@ const rowForm: Family = {
   tag: 'helix-drilldown-item',
   tree: [
     {
-      attributes: { chooses: true, role: 'menuitem', sends: 'select' },
+      attributes: { chooses: true, role: 'menuitem', sends: 'before-select' },
       children: [{ kind: 'region', name: 'default' }],
       kind: 'pressable',
       name: 'row',
@@ -116,7 +116,7 @@ type Navigate = (event: { detail: { value: string }; preventDefault: () => void 
 /** Settings, holding Display, which holds Text size, and About; and Help, with no page. */
 const drawn = (navigate: Navigate = () => undefined, page?: string) => (
   <ThemeProvider tokens={{}}>
-    <Drilldown onNavigate={navigate} {...(page === undefined ? {} : { page })}>
+    <Drilldown onBeforeNavigate={navigate} {...(page === undefined ? {} : { page })}>
       <Row
         page={
           <>

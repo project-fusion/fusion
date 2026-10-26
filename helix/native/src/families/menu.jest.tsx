@@ -1,7 +1,8 @@
 /*
  * The generated Menu, drawn from its real intermediate forms in the layer
  * host: a panel its trigger's press opens, focus on its first row, a row
- * that sends `select` and closes the menu once it stands, choices that turn
+ * that asks with `before-select`, says `select`, and closes the menu once
+ * it stands, choices that turn
  * before their event and a menu that sends `change`, a Space on a choice
  * that keeps the menu open, a row whose page shows
  * in place of the one showing under a header with the way back, a sheet
@@ -171,29 +172,32 @@ describe('the generated Menu', () => {
     expect(row('Rename')).toBeDefined()
   })
 
-  test('choosing a row sends select on the row and the menu, then closes it, and a refused one keeps it', async () => {
+  test('choosing a row asks and says select on the row and the menu, then closes it, and a refused one keeps it', async () => {
     const heard: string[] = []
     await draw(
       menu({
         onBeforeClose: () => heard.push('before-close'),
+        onBeforeSelect: (event: Told) =>
+          heard.push(`menu before-select ${String(event.detail.value)}`),
         onSelect: (event: Told) => heard.push(`menu select ${String(event.detail.value)}`),
       }),
     )
     await press(trigger())
     await press(row('Rename'))
-    expect(heard).toEqual(['menu select rename', 'before-close'])
+    expect(heard).toEqual(['menu before-select rename', 'menu select rename', 'before-close'])
     expect(panel()).toBeUndefined()
-    await draw(menu({ onSelect: (event: Told) => event.preventDefault() }))
+    await draw(menu({ onBeforeSelect: (event: Told) => event.preventDefault() }))
     await press(trigger())
     await press(row('Rename'))
     expect(panel()).toBeDefined()
   })
 
-  test('a choice turns before its select, says whether it is checked, and the menu sends change after it', async () => {
+  test('a choice turns before its before-select, says whether it is checked, and the menu sends change after it', async () => {
     const heard: string[] = []
     await draw(
       menu({
         closeOnSelect: false,
+        onBeforeSelect: (event: Told) => heard.push(`before-select ${String(event.detail.value)}`),
         onChange: () => heard.push('change'),
         onSelect: (event: Told) => heard.push(`select ${String(event.detail.value)}`),
       }),
@@ -202,7 +206,7 @@ describe('the generated Menu', () => {
     const choice = row('Show hidden files')
     expect(choice?.props.accessibilityState?.checked).toBe(false)
     await press(choice)
-    expect(heard).toEqual(['select hidden', 'change'])
+    expect(heard).toEqual(['before-select hidden', 'change', 'select hidden'])
     expect(row('Show hidden files')?.props.accessibilityState?.checked).toBe(true)
     expect(panel()).toBeDefined()
   })

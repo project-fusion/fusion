@@ -1,4 +1,10 @@
-import { customElement, HelixElement, HelixSelectEvent, plainClick } from '@fusion.dev/helix-core'
+import {
+  customElement,
+  HelixBeforeSelectEvent,
+  HelixElement,
+  HelixSelectEvent,
+  plainClick,
+} from '@fusion.dev/helix-core'
 import { html, nothing, type TemplateResult } from 'lit'
 import { property } from 'lit/decorators.js'
 
@@ -20,7 +26,7 @@ export type NavigationItemCurrent = 'date' | 'location' | 'page' | 'step' | 'tim
  * and move it as the page changes: the marker follows it.
  *
  * A router cannot reach an anchor inside a shadow root, so a plain press on
- * the link sends `helix-select` with the `href` as its value first, and
+ * the link sends `helix-before-select` with the `href` as its value first, and
  * canceling it keeps the browser from following, so a client-side router
  * follows it instead, as a `Breadcrumb` does. A press with a modifier opens
  * the link where the browser opens it and sends nothing.
@@ -35,7 +41,8 @@ export type NavigationItemCurrent = 'date' | 'location' | 'page' | 'step' | 'tim
  *
  * @slot - The destination's name.
  *
- * @event {HelixSelectEvent} helix-select - A plain press on the link, with its `href` as the value, before the browser follows it. Cancelable: cancel it to keep the browser from following, as a client-side router does.
+ * @event {HelixBeforeSelectEvent} helix-before-select - A plain press on the link, with its `href` as the value, before the browser follows it. Cancelable: cancel it to keep the browser from following, as a client-side router does.
+ * @event {HelixSelectEvent} helix-select - Fired after a plain press on the link stood, with its `href` as the value, before the browser follows it.
  *
  * @csspart link - The destination, an `<a>` where `href` is set and a `<span>` where it is not.
  */
@@ -99,16 +106,19 @@ export class HelixHeadlessNavigationItem extends HelixElement {
   }
 
   /**
-   * Sends `helix-select` for a plain press on the link, and keeps the browser
-   * from following where it was canceled.
+   * Sends `helix-before-select` for a plain press on the link, and keeps the
+   * browser from following where it was canceled.
    */
   private readonly handleClick = (event: MouseEvent): void => {
     if (!plainClick(event)) {
       return
     }
-    if (!this.dispatchEvent(new HelixSelectEvent({ value: this.href }))) {
+    const detail = { value: this.href }
+    if (!this.dispatchEvent(new HelixBeforeSelectEvent(detail))) {
       event.preventDefault()
+      return
     }
+    this.dispatchEvent(new HelixSelectEvent(detail))
   }
 
   protected override render(): TemplateResult {

@@ -1,6 +1,7 @@
 import {
   bind,
   box,
+  derive,
   event,
   headless,
   pressable,
@@ -27,7 +28,7 @@ import {
  * a keyframe stops or slows as its reduced-motion rule says, and a transition
  * takes no time.
  *
- * **A press asks, then turns**: `before-toggle`, with `checked` `true` where
+ * **A press asks, then turns**: `before-check`, with `checked` `true` where
  * the press pauses, which a handler can refuse to leave the motion as it is,
  * then `change`. It is announced as a toggle button named by `label`, pressed
  * while the motion is paused.
@@ -42,15 +43,19 @@ import {
  * manifest says `helix-motion-toggle` has. The two glyphs are a phone's alone.
  */
 export default headless('motion-toggle', {
+  derived: { name: derive('motion-toggle-name') },
   events: [
-    event('before-toggle', { cancelable: true, detail: ['checked'] }),
+    event('before-check', { cancelable: true, detail: ['checked'] }),
     event('change', { bare: true }),
   ],
-  props: [prop('label', 'string', { default: 'Pause motion' })],
+  props: [
+    prop('fallback-label', 'string', { default: 'Pause motion' }),
+    prop('label', 'string', { default: '' }),
+  ],
   states: ['paused', 'settled'],
-  toggle: toggle({ after: 'change', before: 'before-toggle', held: 'page-motion' }),
+  toggle: toggle({ after: 'change', before: 'before-check', held: 'page-motion' }),
   tree: [
-    pressable('button', { label: bind('label'), role: 'button', toggles: true }, [
+    pressable('button', { label: bind('name'), role: 'button', toggles: true }, [
       box('icon', {}, [
         region('icon', {}, [
           unless('paused', box('glyph', { decorative: true, glyph: 'pause', platform: 'native' })),

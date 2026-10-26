@@ -1,4 +1,4 @@
-import { bind, box, collection, headless, prop, region } from '../../../tree.js'
+import { bind, box, collection, derive, headless, prop, region } from '../../../tree.js'
 
 /**
  * A navigation's headless tier: a landmark of destinations, with a mark that
@@ -40,17 +40,19 @@ export default headless('navigation', {
     marked: true,
     roves: 'arrows',
   }),
+  derived: { name: derive('navigation-name') },
   events: [],
   props: [
     /* Unset is no value, so the arrows rove only while it is set. */
     prop('arrows', 'boolean'),
-    prop('label', 'string', { default: 'Main' }),
+    prop('fallback-label', 'string', { default: 'Main' }),
+    prop('label', 'string', { default: '' }),
     prop('orientation', ['vertical']),
     prop('variant', ['segmented', 'underlined']),
   ],
   states: ['open', 'settled'],
   tree: [
-    box('nav', { label: bind('label'), role: 'navigation' }, [
+    box('nav', { label: bind('name'), role: 'navigation' }, [
       box('indicator', { decorative: true, marks: 'chosen' }, [region('indicator')]),
       region('default'),
     ]),

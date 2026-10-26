@@ -15,6 +15,7 @@ import { badgeMark } from '../badge-count/badge-props.js'
 import { foldedCrumb } from '../breadcrumbs/breadcrumbs-derivations.js'
 import { chordParts } from '../chord/chord.js'
 import { type KeyNames, keyNames } from '../chord/key-names.js'
+import { labelOr } from '../drilldown/drilldown-derivations.js'
 import { gridTracks } from '../grid-template/grid-template.js'
 import { formatNumber } from '../number-format/number-format.js'
 import { numberOf, numberOptions, textOf } from '../number-format/props.js'
@@ -213,10 +214,35 @@ export const statFigure: Derivation = (props) => {
 
 /**
  * `loader-name`: what a loader is named while work is in progress, its
- * `label`, and nothing while it is `idle`, when it draws nothing of its own.
+ * `label`, then `fallback-label` or Loading, and nothing while it is `idle`,
+ * when it draws nothing of its own.
  */
 export const loaderName: Derivation = (props) =>
-  props.idle === true ? undefined : textOf(props.label) || undefined
+  props.idle === true ? undefined : labelOr(props, 'helix-loader', 'Loading') || undefined
+
+/** `breadcrumbs-name`: the trail's landmark name, `label`, then `fallback-label` or Breadcrumb. */
+export const breadcrumbsName: Derivation = (props) =>
+  labelOr(props, 'helix-breadcrumbs', 'Breadcrumb')
+
+/** `motion-toggle-name`: the button's name, `label`, then `fallback-label` or Pause motion. */
+export const motionToggleName: Derivation = (props) =>
+  labelOr(props, 'helix-motion-toggle', 'Pause motion')
+
+/** `navigation-name`: the landmark's name, `label`, then `fallback-label` or Main. */
+export const navigationName: Derivation = (props) => labelOr(props, 'helix-navigation', 'Main')
+
+/** `outline-name`: the landmark's name, `label`, then `fallback-label` or On this page. */
+export const outlineName: Derivation = (props) => labelOr(props, 'helix-outline', 'On this page')
+
+/** `progress-name`: the bar's name, `label`, then `fallback-label` or Progress. */
+export const progressName: Derivation = (props) => labelOr(props, 'helix-progress', 'Progress')
+
+/** `skip-link-words`: the link's words, `label`, then `fallback-label` or Skip to content. */
+export const skipLinkWords: Derivation = (props) =>
+  labelOr(props, 'helix-skip-link', 'Skip to content')
+
+/** `steps-name`: the list's name, `label`, then `fallback-label` or Steps. */
+export const stepsName: Derivation = (props) => labelOr(props, 'helix-steps', 'Steps')
 
 /** `loader-role`: `progressbar` while work is in progress, and nothing while a loader is `idle`. */
 export const loaderRole: Derivation = (props) => (props.idle === true ? undefined : 'progressbar')

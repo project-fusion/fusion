@@ -14,7 +14,7 @@ import { bind, box, event, headless, item, pressable, prop, region, when } from 
 export default headless('tab', {
   events: [
     event('dismiss', { cancelable: true, detail: ['label'] }),
-    event('select', { cancelable: true, detail: ['value'] }),
+    event('before-select', { cancelable: true, detail: ['value'] }),
   ],
   item: item('tabs', { chooses: true }),
   props: [
@@ -38,7 +38,7 @@ export default headless('tab', {
         href: bind('href'),
         role: 'tab',
         selected: bind('selected'),
-        sends: 'select',
+        sends: 'before-select',
       },
       [
         region('default', { part: 'label' }),

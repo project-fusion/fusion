@@ -3,7 +3,8 @@
  * crumb and the last `maxItems` less one stay, and the first draws a button
  * named by `expandLabel` with the count it folded, which opens a menu of the
  * crumbs folded away, each a link opened through the app's open-link, which
- * sends the first crumb's `select` first. The
+ * sends the first crumb's `before-select` first and its `select` once that
+ * stands. The
  * layer host draws the menu. Floating UI's hook stands in for the one that
  * measures views on a device. `test:native` writes the components beside
  * this file.
@@ -137,18 +138,21 @@ describe('a trail that folds', () => {
     expect(row('Inputs')).toBeUndefined()
   })
 
-  test('a row sends the first crumb’s select with its link, and a refused one opens nothing', async () => {
+  test('a row asks with the first crumb’s before-select with its link, says select, and a refused one opens nothing', async () => {
     const heard: unknown[] = []
     const choose = async (refuse: boolean) => {
       await draw(
         trail(
           {},
           {
-            onSelect: (event: { detail: { value: unknown }; preventDefault: () => void }) => {
+            onBeforeSelect: (event: { detail: { value: unknown }; preventDefault: () => void }) => {
               heard.push(event.detail.value)
               if (refuse) {
                 event.preventDefault()
               }
+            },
+            onSelect: (event: { detail: { value: unknown } }) => {
+              heard.push(`select ${event.detail.value}`)
             },
           },
         ),
@@ -163,10 +167,10 @@ describe('a trail that folds', () => {
       await frames()
     }
     await choose(false)
-    expect(heard).toEqual(['/components'])
+    expect(heard).toEqual(['/components', 'select /components'])
     expect(opened.opened).toEqual(['/components'])
     await choose(true)
-    expect(heard).toEqual(['/components', '/components'])
+    expect(heard).toEqual(['/components', 'select /components', '/components'])
     expect(opened.opened).toEqual(['/components'])
   })
 

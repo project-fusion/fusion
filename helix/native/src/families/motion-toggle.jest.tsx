@@ -19,7 +19,7 @@ import type { GlyphProps } from '../theme/theme'
 import { HelixIcon } from './icon/index.native'
 import {
   HelixMotionToggle,
-  type HelixMotionToggleBeforeToggleEvent,
+  type HelixMotionToggleBeforeCheckEvent,
 } from './motion-toggle/index.native'
 
 /** A glyph that shows what it was asked to draw, as a view a spec can read. */
@@ -137,7 +137,7 @@ describe('a press on a Motion Toggle', () => {
     await render(
       themed(
         <HelixMotionToggle
-          onBeforeToggle={(event) => heard.push(`before ${event.detail.checked} ${motionPaused()}`)}
+          onBeforeCheck={(event) => heard.push(`before ${event.detail.checked} ${motionPaused()}`)}
           onChange={() => heard.push(`change ${motionPaused()}`)}
         />,
       ),
@@ -149,12 +149,12 @@ describe('a press on a Motion Toggle', () => {
     expect(heard).toEqual(['before true false', 'change true', 'before false true', 'change false'])
   })
 
-  test('leaves the motion as it is where `helix-before-toggle` is refused', async () => {
+  test('leaves the motion as it is where `helix-before-check` is refused', async () => {
     const heard: string[] = []
     await render(
       themed(
         <HelixMotionToggle
-          onBeforeToggle={(event: HelixMotionToggleBeforeToggleEvent) => event.preventDefault()}
+          onBeforeCheck={(event: HelixMotionToggleBeforeCheckEvent) => event.preventDefault()}
           onChange={() => heard.push('change')}
         />,
       ),

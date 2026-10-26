@@ -32,12 +32,12 @@ import {
  * **The hint and the message share one line under the row**, as Switch's do.
  *
  * **In a Checkbox Group, the box joins the group's set** and still turns on
- * its own. Its turn asks the group once its own `before-toggle` stands, and
+ * its own. Its turn asks the group once its own `before-check` stands, and
  * the group's disabled disables it.
  */
 export default headless('checkbox', {
   events: [
-    event('before-toggle', { cancelable: true, detail: ['checked'] }),
+    event('before-check', { cancelable: true, detail: ['checked'] }),
     event('change', { bare: true }),
     event('input', { bare: true }),
   ],
@@ -61,7 +61,7 @@ export default headless('checkbox', {
   states: ['checked', 'has-check', 'has-dash', 'has-label', 'indeterminate', 'invalid', 'settled'],
   toggle: toggle({
     after: ['input', 'change'],
-    before: 'before-toggle',
+    before: 'before-check',
     checked: 'checked',
     initial: 'default-checked',
     mixed: 'indeterminate',

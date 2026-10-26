@@ -24,7 +24,7 @@ export const tabs = {
     events: [
       { cancelable: false, detail: ['previous', 'value'], name: 'activate' },
       { cancelable: true, detail: ['value'], name: 'before-activate' },
-      { cancelable: true, detail: ['value'], name: 'select' },
+      { cancelable: true, detail: ['value'], name: 'before-select' },
     ],
     props: [prop('active'), prop('default-active'), prop('manual', false)],
     states: [],
@@ -59,14 +59,18 @@ export const tabs = {
 /* A tab in miniature, bound as the expansion binds Tab. */
 export const tab = {
   api: {
-    events: [{ cancelable: true, detail: ['value'], name: 'select' }],
+    events: [{ cancelable: true, detail: ['value'], name: 'before-select' }],
     item: { chooses: true, of: 'tabs' },
     props: [prop('disabled', false), prop('href'), prop('selected', false), prop('value')],
     states: [],
   },
   machines: [
     {
-      bind: { disabled: { prop: 'disabled' }, part: { part: 'tab' }, sends: { event: 'select' } },
+      bind: {
+        disabled: { prop: 'disabled' },
+        part: { part: 'tab' },
+        sends: { event: 'before-select' },
+      },
       machine: 'press',
     },
   ],
@@ -80,7 +84,7 @@ export const tab = {
         disabled: { bind: 'disabled' },
         role: 'tab',
         selected: { bind: 'selected' },
-        sends: 'select',
+        sends: 'before-select',
       },
       children: [{ kind: 'region', name: 'default' }],
       kind: 'pressable',

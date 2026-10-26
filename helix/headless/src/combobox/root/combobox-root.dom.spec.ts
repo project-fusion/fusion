@@ -5,7 +5,6 @@ import {
   formValue,
   hasLayout,
   hasState,
-  internalsOf,
   mount,
   notYetDefined,
   part,

@@ -4,7 +4,7 @@ import type { Answer, Statechart } from '../statechart.js'
  * Toggle: one control that is on or off, and a press that turns it the other
  * way. A checkbox is checked, a switch is on, a toggle button is pressed, and
  * Motion Toggle has paused the page. A press is a request: every family asks
- * first with the cancelable `helix-before-toggle`, and where no listener
+ * first with the cancelable `helix-before-check`, and where no listener
  * refuses it the control turns and says so. A refusal leaves the control as it was and says nothing.
  *
  * A checkbox can also show neither state, `indeterminate`, which the machine

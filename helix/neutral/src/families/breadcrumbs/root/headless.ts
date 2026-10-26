@@ -1,4 +1,4 @@
-import { bind, box, fold, headless, prop, region } from '../../../tree.js'
+import { bind, box, derive, fold, headless, prop, region } from '../../../tree.js'
 
 /**
  * Breadcrumbs' headless tier: the trail of crumbs to the current page.
@@ -20,15 +20,17 @@ import { bind, box, fold, headless, prop, region } from '../../../tree.js'
  * the region, and the parts with what the manifest says the element has.
  */
 export default headless('breadcrumbs', {
+  derived: { name: derive('breadcrumbs-name') },
   events: [],
   fold: fold({
     max: 'max-items',
     middle: { count: 'fold', items: 'fold-crumbs', label: 'fold-label', words: 'expand-label' },
   }),
-  host: { label: bind('label'), role: 'navigation' },
+  host: { label: bind('name'), role: 'navigation' },
   props: [
     prop('expand-label', 'string', { default: 'Show {count} more' }),
-    prop('label', 'string', { default: 'Breadcrumb' }),
+    prop('fallback-label', 'string', { default: 'Breadcrumb' }),
+    prop('label', 'string', { default: '' }),
     prop('max-items', 'number'),
     /* The mark between crumbs for the whole trail: unset a chevron, `slash` a
        slash. */

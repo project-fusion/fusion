@@ -86,7 +86,7 @@ export const VECTORS: readonly Vector[] = [
   },
   {
     cites:
-      'toggle-root.dom.spec.ts, "is a toggle button that a press flips, saying so with aria-pressed", where `helix-before-toggle` is refused once pressed',
+      'toggle-root.dom.spec.ts, "is a toggle button that a press flips, saying so with aria-pressed", where `helix-before-check` is refused once pressed',
     from: AT_REST,
     name: 'a refusal holds a pressed toggle pressed',
     steps: [

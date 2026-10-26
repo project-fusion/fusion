@@ -19,8 +19,9 @@ export type { ReorderContext, ReorderInput, ReorderSpan } from './context.js'
  * Reorder: one item of a set moves to a new place. A key or a click on its
  * grip holds it for the arrows, a pointer drags it by its grip, and Alt with
  * an arrow moves it at once. A move is a request: the host sends
- * `helix-before-reorder` and then `helix-reorder` with the new order, and
- * stops at the first a listener refuses. A refused move goes back. The words
+ * `helix-before-reorder`, which a listener may refuse, and then
+ * `helix-reorder` with the new order, which says the move stood and which no
+ * listener refuses. A refused move goes back. The words
  * a screen reader hears ride the moves as effects: `picked-up`, `moved`,
  * `dropped`, and `canceled`, which a native host also gives as a tap.
  *

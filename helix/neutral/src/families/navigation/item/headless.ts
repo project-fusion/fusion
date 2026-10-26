@@ -4,8 +4,9 @@ import { bind, event, headless, item, pressable, prop, region } from '../../../t
  * A navigation item's headless tier: one destination, a link that says
  * whether it is current.
  *
- * **The item is a link to its `href`**, which sends `select` with the
- * `href` as its value and opens unless the event was refused: on the web
+ * **The item is a link to its `href`**, which asks with `before-select`,
+ * the `href` as its value, says `select` once it stands, and opens unless
+ * the request was refused: on the web
  * the browser follows it, and on a phone the app's open-link, its router
  * where it set one. An item with no `href` draws its words as a box.
  *
@@ -22,7 +23,10 @@ import { bind, event, headless, item, pressable, prop, region } from '../../../t
  * manifest says the element has.
  */
 export default headless('navigation-item', {
-  events: [event('select', { cancelable: true, detail: ['value'] })],
+  events: [
+    event('before-select', { cancelable: true, detail: ['value'] }),
+    event('select', { detail: ['value'] }),
+  ],
   item: item('navigation', { chooses: true, flag: 'current', value: 'href' }),
   props: [
     prop('current', ['date', 'location', 'page', 'step', 'time', 'true']),
@@ -34,7 +38,7 @@ export default headless('navigation-item', {
   tree: [
     pressable(
       'link',
-      { chooses: true, current: bind('current'), href: bind('href'), sends: 'select' },
+      { chooses: true, current: bind('current'), href: bind('href'), sends: 'before-select' },
       [region('default')],
     ),
   ],

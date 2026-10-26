@@ -130,21 +130,21 @@ describe('a toggle group that chooses one', () => {
     await render(
       <Views
         onBeforeChange={(event) => told.push(`before-change ${event.detail.value}`)}
+        onBeforeSelect={(event) => told.push(`before-select ${event.detail.value}`)}
         onChange={(event) => told.push(`change ${event.target.value}`)}
         onInput={() => told.push('input')}
-        onSelect={(event) => told.push(`select ${event.detail.value}`)}
       />,
     )
     await fireEvent.press(screen.getByRole('radio', { name: 'Grid' }))
     expect([checked('radio', 'List'), checked('radio', 'Grid')]).toEqual([false, true])
-    expect(told).toEqual(['select grid', 'before-change grid', 'input', 'change grid'])
+    expect(told).toEqual(['before-select grid', 'before-change grid', 'input', 'change grid'])
   })
 
   test('keeps its choice where the group refuses the change, or the toggle its choice', async () => {
     const view = await render(<Views onBeforeChange={(event) => event.preventDefault()} />)
     await fireEvent.press(screen.getByRole('radio', { name: 'Grid' }))
     expect(checked('radio', 'List')).toBe(true)
-    await view.rerender(<Views onSelect={(event) => event.preventDefault()} />)
+    await view.rerender(<Views onBeforeSelect={(event) => event.preventDefault()} />)
     await fireEvent.press(screen.getByRole('radio', { name: 'Grid' }))
     expect(checked('radio', 'List')).toBe(true)
   })

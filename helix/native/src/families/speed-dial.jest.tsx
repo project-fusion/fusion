@@ -1,8 +1,8 @@
 /*
  * The generated Speed Dial, drawn from its real intermediate forms in the
  * layer host: a round trigger that opens its actions beside it, focus on the
- * first of them, an action that sends `select` and closes the dial once it
- * stands, Down and Up that open it on the first action or the last, and a
+ * first of them, an action that asks with `before-select`, says `select`,
+ * and closes the dial once it stands, Down and Up that open it on the first action or the last, and a
  * trigger whose own press stands under `open-on="long-press"`, which a
  * finger held still opens instead, and actions that arrive one after another,
  * nearest the trigger first. Floating UI's hook stands in for the one
@@ -194,11 +194,12 @@ describe('the generated Speed Dial', () => {
     setEnvironment(fakeEnvironment())
   })
 
-  test('choosing an action sends select and closes the dial, and a refused one keeps it', async () => {
+  test('choosing an action asks, says select, and closes the dial, and a refused one keeps it', async () => {
     const heard: string[] = []
     await draw(
       dial({
         onBeforeClose: () => heard.push('before-close'),
+        onBeforeSelect: (event: Told) => heard.push(`before-select ${String(event.detail.value)}`),
         onSelect: (event: Told) => heard.push(`select ${String(event.detail.value)}`),
       }),
     )
@@ -210,9 +211,9 @@ describe('the generated Speed Dial', () => {
       fireEvent.press(action('Duplicate') as never)
     })
     await frames()
-    expect(heard).toEqual(['select copy', 'before-close'])
+    expect(heard).toEqual(['before-select copy', 'select copy', 'before-close'])
     heard.length = 0
-    await draw(dial({ onSelect: (event: Told) => event.preventDefault() }))
+    await draw(dial({ onBeforeSelect: (event: Told) => event.preventDefault() }))
     await act(async () => {
       fireEvent.press(trigger() as never)
     })

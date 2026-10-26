@@ -20,8 +20,8 @@ import {
  * one of a run of choices, which a press chooses, follows its link, or
  * opens a page of its own.
  *
- * **A press sends `select`** with the row's `value`, which a handler may
- * refuse, and the menu closes once it stands, unless the row's
+ * **A press asks with `before-select`** and the row's `value`, which a
+ * handler may refuse, then says `select`, and the menu closes once it stands, unless the row's
  * `close-on-select` is false. A row with an `href` follows its link once
  * the event stands: on the web the browser follows it, and on a phone the
  * app's open-link. `disabled` keeps it from being chosen.
@@ -29,7 +29,7 @@ import {
  * **`checkable` makes the row a choice**, which a press turns over, and
  * `exclusive` one of a run of choices next to each other, which a press
  * turns on and the rest of the run off. `checked` is the state it starts
- * in. Each turn asks `before-toggle` first, with the `checked` it asks for,
+ * in. Each turn asks `before-check` first, with the `checked` it asks for,
  * which a handler may refuse. A checked row draws a check at its end.
  *
  * **A row whose `submenu` holds rows opens that page**, and its caret says
@@ -59,11 +59,12 @@ export default headless('menu-item', {
     'submenu-started': derive('menu-item-submenu-start'),
   },
   events: [
-    event('before-toggle', { cancelable: true, detail: ['checked'] }),
-    event('select', { cancelable: true, detail: ['value'] }),
+    event('before-check', { cancelable: true, detail: ['checked'] }),
+    event('before-select', { cancelable: true, detail: ['value'] }),
+    event('select', { detail: ['value'] }),
   ],
   item: item('menu', {
-    before: 'before-toggle',
+    before: 'before-check',
     checkable: 'checkable',
     checked: 'checked',
     chooses: true,
@@ -108,7 +109,7 @@ export default headless('menu-item', {
         href: bind('href'),
         popup: pick('has-submenu', { true: 'menu' }, ''),
         role: bind('role'),
-        sends: 'select',
+        sends: 'before-select',
       },
       [
         box('start', {}, [region('start')]),

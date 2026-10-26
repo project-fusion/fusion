@@ -1,4 +1,4 @@
-import { bind, headless, pressable, prop, region, text } from '../../../tree.js'
+import { bind, derive, headless, pressable, prop, region, text } from '../../../tree.js'
 
 /**
  * A skip link's headless tier: a link at the start of a page that moves
@@ -16,16 +16,18 @@ import { bind, headless, pressable, prop, region, text } from '../../../tree.js'
  * element has.
  */
 export default headless('skip-link', {
+  derived: { words: derive('skip-link-words') },
   events: [],
   platform: 'web',
   props: [
     prop('href', 'string', { default: '#main' }),
-    prop('label', 'string', { default: 'Skip to content' }),
+    prop('fallback-label', 'string', { default: 'Skip to content' }),
+    prop('label', 'string', { default: '' }),
   ],
   states: ['settled'],
   tree: [
     pressable('link', { href: bind('href') }, [
-      region('default', {}, [text('label-words', { says: bind('label') })]),
+      region('default', {}, [text('label-words', { says: bind('words') })]),
     ]),
   ],
 })

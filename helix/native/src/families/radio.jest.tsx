@@ -160,14 +160,19 @@ describe('the generated Radio Group', () => {
     await render(
       <Plans
         onBeforeChange={(event) => told.push(`before-change ${event.detail.value}`)}
+        onBeforeSelect={(event) => told.push(`before-select ${event.detail.value}`)}
         onChange={(event) => told.push(`change ${event.target.value}`)}
         onInput={() => told.push('input')}
-        onSelect={(event) => told.push(`select ${event.detail.value}`)}
       />,
     )
     await fireEvent.press(radio('Company'))
     expect([checked('Team'), checked('Company')]).toEqual([false, true])
-    expect(told).toEqual(['select company', 'before-change company', 'input', 'change company'])
+    expect(told).toEqual([
+      'before-select company',
+      'before-change company',
+      'input',
+      'change company',
+    ])
   })
 
   test('draws the chosen radio’s dot and firms its circle to the ink', async () => {
@@ -180,7 +185,7 @@ describe('the generated Radio Group', () => {
     const view = await render(<Plans onBeforeChange={(event) => event.preventDefault()} />)
     await fireEvent.press(radio('Solo'))
     expect(checked('Team')).toBe(true)
-    await view.rerender(<Plans onSelect={(event) => event.preventDefault()} />)
+    await view.rerender(<Plans onBeforeSelect={(event) => event.preventDefault()} />)
     await fireEvent.press(radio('Solo'))
     expect(checked('Team')).toBe(true)
   })

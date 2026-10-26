@@ -777,7 +777,7 @@ describe('a panel of Megamenu Items', () => {
     expect(hasState(host, 'current')).toBe(true)
   })
 
-  test('shuts as a reader takes an item, and stays open where its select was refused', async () => {
+  test('shuts as a reader takes an item, and stays open where its `before-select` was refused', async () => {
     const host = (await mount(
       `<helix-headless-megamenu label="Products"><helix-headless-megamenu-item href="#one">One</helix-headless-megamenu-item></helix-headless-megamenu>`,
     )) as Section
@@ -786,7 +786,7 @@ describe('a panel of Megamenu Items', () => {
     await host.updateComplete
     expect(host.open).toBe(true)
     const item = host.querySelector('helix-headless-megamenu-item') as HTMLElement
-    item.addEventListener('helix-select', (event) => event.preventDefault(), { once: true })
+    item.addEventListener('helix-before-select', (event) => event.preventDefault(), { once: true })
     const link = part(item, 'link') as HTMLElement
     link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, composed: true }))
     await host.updateComplete

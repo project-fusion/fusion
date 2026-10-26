@@ -23,7 +23,7 @@ import { bind, box, collection, event, headless, prop, region, text, when } from
  * **Delete or Backspace on a `dismissible` tag sends its `dismiss`**, as its
  * remove button does, which reaches the group too. Once the page takes the
  * tag out, focus moves to the next tag, or to the one before after the last,
- * and to the `empty` part once none is left, which says `empty-label` or
+ * and to the `empty` part once none is left, which says `empty-text` or
  * what is passed into `empty`.
  *
  * **On a phone the set is a group named by `label`**, where the web is a
@@ -57,7 +57,9 @@ export default headless('tag-group', {
   ],
   props: [
     prop('disallow-empty-selection', 'boolean', { default: false }),
-    prop('empty-label', 'string', { default: 'No tags' }),
+    /* The old name of `empty-text`, which the web reads for one release. */
+    prop('empty-label', 'string', { platform: 'web' }),
+    prop('empty-text', 'string', { default: 'No tags' }),
     prop('label', 'string', { default: '' }),
     prop('selection-behavior', ['replace', 'toggle'], { default: 'toggle' }),
     prop('selection-mode', ['multiple', 'single']),
@@ -68,7 +70,7 @@ export default headless('tag-group', {
     region('default'),
     when(
       'empty',
-      box('empty', {}, [region('empty', {}, [text('empty-words', { says: bind('empty-label') })])]),
+      box('empty', {}, [region('empty', {}, [text('empty-words', { says: bind('empty-text') })])]),
     ),
   ],
 })

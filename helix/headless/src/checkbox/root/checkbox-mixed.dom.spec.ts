@@ -18,10 +18,10 @@ const checkbox = async (attrs = ''): Promise<Checkbox> =>
 
 const control = (box: Checkbox): HTMLInputElement => part(box, 'control') as HTMLInputElement
 
-/** A box whose every `helix-before-toggle` is refused. */
+/** A box whose every `helix-before-check` is refused. */
 const refusing = async (attrs: string): Promise<Checkbox> => {
   const box = await checkbox(attrs)
-  box.addEventListener('helix-before-toggle', (event) => event.preventDefault())
+  box.addEventListener('helix-before-check', (event) => event.preventDefault())
   return box
 }
 
@@ -57,7 +57,7 @@ describe('a refused press on an indeterminate checkbox', () => {
   test('and a press nobody refuses still resolves the input with the element', async () => {
     const box = await checkbox('indeterminate')
     let refuse = true
-    box.addEventListener('helix-before-toggle', (event) => {
+    box.addEventListener('helix-before-check', (event) => {
       if (refuse) {
         event.preventDefault()
       }

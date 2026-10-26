@@ -90,9 +90,9 @@ fn says_each_name_that_resolves_to_nothing() {
 fn holds_a_toggle_to_its_props_and_events_and_to_one_pressable() {
     let checkbox = family(
         "export default headless('checkbox', {
-          events: [event('chang', { bare: true }), event('before-toggle', { cancelable: true })],
+          events: [event('chang', { bare: true }), event('before-check', { cancelable: true })],
           props: [prop('checked', 'boolean'), prop('readonly', 'boolean')],
-          toggle: toggle({ after: 'change', before: 'before-toggle', checked: 'checked', mixed: 'indeterminate', readonly: 'readonly' }),
+          toggle: toggle({ after: 'change', before: 'before-check', checked: 'checked', mixed: 'indeterminate', readonly: 'readonly' }),
           tree: [pressable('control', {}, [])],
         })",
         STYLED,

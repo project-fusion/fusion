@@ -132,7 +132,7 @@ describe('the generated Checkbox Group', () => {
             Email
           </HelixCheckbox>
           <HelixCheckbox
-            onBeforeToggle={(event) => told.push(`box before-toggle ${event.detail.checked}`)}
+            onBeforeCheck={(event) => told.push(`box before-check ${event.detail.checked}`)}
             onChange={() => told.push('box change')}
             value="text"
           >
@@ -144,7 +144,7 @@ describe('the generated Checkbox Group', () => {
     await fireEvent.press(box('Text'))
     expect(checked('Text')).toBe(true)
     expect(told).toEqual([
-      'box before-toggle true',
+      'box before-check true',
       'group before-change email,text',
       'group input',
       'group change email,text',
@@ -169,7 +169,7 @@ describe('the generated Checkbox Group', () => {
     await render(
       themed(
         <HelixCheckboxGroup label="Notify me" onBeforeChange={() => told.push('before-change')}>
-          <HelixCheckbox onBeforeToggle={(event) => event.preventDefault()} value="email">
+          <HelixCheckbox onBeforeCheck={(event) => event.preventDefault()} value="email">
             Email
           </HelixCheckbox>
         </HelixCheckboxGroup>,
