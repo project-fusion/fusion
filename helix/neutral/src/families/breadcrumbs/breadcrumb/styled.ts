@@ -1,4 +1,4 @@
-import { mix, product, sum, token } from '../../../style.js'
+import { mix, native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import breadcrumb from './headless.js'
 
@@ -33,17 +33,20 @@ export default styles(
   breadcrumb,
   {
     prefix: 'breadcrumbs',
-    hooks: [
-      'control-padding-inline',
-      'control-size',
-      'current-color',
-      'font-weight',
-      'gap',
-      'hover-color',
-      'link-color',
-      'radius',
-      'separator-color',
-    ],
+    hooks: {
+      controlPaddingInline: token('space-xs'),
+      controlSize: sum(
+        product(token('text-control'), token('leading-normal')),
+        product(token('space-2xs'), 2),
+      ),
+      currentColor: token('color-foreground'),
+      fontWeight: token('weight-medium'),
+      gap: token('space-xs'),
+      hoverColor: mix(token('color-foreground'), 8, 'transparent'),
+      linkColor: token('color-foreground-muted'),
+      radius: token('radii-sm'),
+      separatorColor: token('color-foreground-subtle'),
+    },
     /* Set by the trail, `breadcrumbs/root`, by its `separation`; read here. */
     own: [
       'breadcrumbs-mark-glyph',
@@ -55,13 +58,11 @@ export default styles(
   },
   ({ hook, on, own, rule }) => {
     /* A crumb's height: the text size times the leading, and never `1lh`. */
-    const control = hook.controlSize(
-      sum(product(token('text-control'), token('leading-normal')), product(token('space-2xs'), 2)),
-    )
-    const hover = hook.hoverColor(mix(token('color-foreground'), 8, 'transparent'))
+    const control = hook.controlSize
+    const hover = hook.hoverColor
     const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
     const separator = {
-      color: hook.separatorColor(token('color-foreground-subtle')),
+      color: hook.separatorColor,
       display: 'block',
       userSelect: 'none',
     } as const
@@ -84,145 +85,139 @@ export default styles(
         rule({
           '--icon-button-size': control,
           '--button-size': control,
-          '--button-padding-inline': hook.controlPaddingInline(token('space-xs')),
+          '--button-padding-inline': hook.controlPaddingInline,
           /* What sits between a trigger's label and its chevron. */
           '--button-gap': token('space-2xs'),
           alignItems: 'center',
           display: 'inline-flex',
-          gap: hook.gap(token('space-xs')),
+          gap: hook.gap,
         }),
-        rule({ fontWeight: hook.fontWeight(token('weight-medium')) }),
-        rule({ current: true }, { color: hook.currentColor(token('color-foreground')) }),
+        rule({ fontWeight: hook.fontWeight }),
+        rule({ has: 'current' }, { color: hook.currentColor }),
         /* A hidden crumb takes no room, and nor does one a long trail folded
            away. */
-        rule({ state: 'folded' }, { display: 'none' }),
+        rule({ folded: true }, { display: 'none' }),
       ]),
       /* `hidden` is the web's own attribute and no prop, so it stays written
          out. */
-      on({ part: 'host', selector: ':host([hidden])' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
-      ]),
+      on({ part: 'host', selector: ':host([hidden])' }, [web([rule({ display: 'none' })])]),
       /* Each crumb draws the separator before it, and the first draws none. */
       on('separator', [rule(separator), rule({ place: 'first' }, { display: 'none' })]),
-      on({ part: 'separator', inner: 'svg' }, [rule({ platform: 'web' }, chevron)]),
+      on({ part: 'separator', inner: 'svg' }, [web([rule(chevron)])]),
       /* The slash takes the chevron's box, an em wide and centered in it, so a trail
          keeps its spacing whichever mark it draws. Before the crumb and before its
          fold button alike: the fold separator's rule is with its group. */
-      on('separator-mark', [rule({ part: { 'data-mark': 'slash' }, platform: 'web' }, slash)]),
+      on('separator-mark', [web([rule({ part: { 'data-mark': 'slash' } }, slash)])]),
       /* **A phone's slash is the same box**, drawn ahead of the separator's
          chevron, which the trail puts away under `separator="slash"`, before
          a crumb and before its fold button alike. */
-      on({ before: 'separator' }, [
-        rule({ platform: 'native' }, { ...slash, content: own.markWords('none') }),
-      ]),
+      on({ before: 'separator' }, [native([rule({ ...slash, content: own.markWords('none') })])]),
       on({ before: 'fold-separator' }, [
-        rule({ platform: 'native' }, { ...slash, content: own.markWords('none') }),
+        native([rule({ ...slash, content: own.markWords('none') })]),
       ]),
       on(
         ['separator-mark', 'fold-separator-mark'],
-        [rule({ platform: 'native' }, { display: own.markGlyph('flex') })],
+        [native([rule({ display: own.markGlyph('flex') })])],
       ),
       /* An anchor of your own, which belongs to the page and is styled here
          through the slot. */
       on({ slotted: 'a' }, [
-        rule(
-          { platform: 'web' },
-          {
+        web([
+          rule({
             backgroundColor: 'transparent',
-            borderRadius: hook.radius(token('radii-sm')),
+            borderRadius: hook.radius,
             padding: [token('space-2xs'), token('space-xs')],
             transition: ['background-color', token('duration-fast'), token('easing-standard')],
-          },
-        ),
-        rule({ place: 'first', platform: 'web' }, pulled),
-        rule({ platform: 'web', state: 'end' }, split),
-        rule({ hover: true, platform: 'web' }, { backgroundColor: hover }),
-        rule(
-          { focusVisible: true, platform: 'web' },
-          {
-            outline: ring,
-            outlineOffset: token('size-focus-offset'),
-          },
-        ),
-        rule(
-          { focusVisible: true, platform: 'web', state: 'end' },
-          {
-            outlineOffset: product(token('size-focus-offset'), '-1'),
-          },
-        ),
-        /* A focused half draws above its neighbor, so nothing paints over its
+          }),
+          rule({ place: 'first' }, pulled),
+          rule({ state: 'end' }, split),
+          rule({ hover: true }, { backgroundColor: hover }),
+          rule(
+            { focusVisible: true },
+            {
+              outline: ring,
+              outlineOffset: token('size-focus-offset'),
+            },
+          ),
+          rule(
+            { focusVisible: true, state: 'end' },
+            {
+              outlineOffset: product(token('size-focus-offset'), '-1'),
+            },
+          ),
+          /* A focused half draws above its neighbor, so nothing paints over its
            ring. */
-        rule(
-          { focusVisible: true, platform: 'web', state: 'end' },
-          {
-            position: 'relative',
-            zIndex: token('layer-raised'),
-          },
-        ),
+          rule(
+            { focusVisible: true, state: 'end' },
+            {
+              position: 'relative',
+              zIndex: token('layer-raised'),
+            },
+          ),
+        ]),
       ]),
       /* The crumb itself, a link or the current page. The gap is what sits
          between a mark and the word beside it. */
       on('link', [
         rule({
           alignItems: 'center',
-          borderRadius: hook.radius(token('radii-sm')),
-          color: hook.linkColor(token('color-foreground-muted')),
+          borderRadius: hook.radius,
+          color: hook.linkColor,
           display: 'inline-flex',
           gap: token('space-xs'),
           padding: [token('space-2xs'), token('space-xs')],
           textDecoration: 'none',
         }),
         /* The first link is pulled back, as the first slotted anchor is. */
-        rule({ current: false, href: true, place: 'first' }, pulled),
+        rule({ lacks: 'current', has: 'href', place: 'first' }, pulled),
         /* The block half of the padding is the hover fill's, which a crumb that
            is no link does not draw, and the inline half is for words the crumb
            draws itself, the current page's. */
-        rule({ href: false }, { paddingBlock: token('space-none') }),
-        rule({ current: false, href: false }, { paddingInline: token('space-none') }),
-        rule({ current: true }, { color: hook.currentColor(token('color-foreground')) }),
+        rule({ lacks: 'href' }, { paddingBlock: token('space-none') }),
+        rule({ lacks: ['current', 'href'] }, { paddingInline: token('space-none') }),
+        rule({ has: 'current' }, { color: hook.currentColor }),
         /* The split control's label half: square inner corners, and the space
            between the word and the chevron split across the seam. */
-        rule({ state: 'end' }, split),
+        rule({ end: true }, split),
         /* `outlined`: a hairline between the halves, at rest as well, on the
            trigger's side of the seam. Under `plain` it is transparent. */
-        rule({ state: 'end' }, { position: 'relative' }),
-        rule(
-          { current: false, hover: true, href: true, platform: 'web' },
-          {
-            backgroundColor: hover,
-            color: hook.currentColor(token('color-foreground')),
-          },
-        ),
-        rule(
-          { current: false, focusVisible: true, href: true, platform: 'web' },
-          {
-            outline: ring,
-            outlineOffset: token('size-focus-offset'),
-          },
-        ),
-        rule(
-          { current: false, focusVisible: true, href: true, platform: 'web', state: 'end' },
-          {
-            outlineOffset: product(token('size-focus-offset'), '-1'),
-          },
-        ),
-        /* A focused half draws above its neighbor, so nothing paints over its
+        rule({ end: true }, { position: 'relative' }),
+        web([
+          rule(
+            { lacks: 'current', hover: true, has: 'href' },
+            {
+              backgroundColor: hover,
+              color: hook.currentColor,
+            },
+          ),
+          rule(
+            { lacks: 'current', focusVisible: true, has: 'href' },
+            {
+              outline: ring,
+              outlineOffset: token('size-focus-offset'),
+            },
+          ),
+          rule(
+            { lacks: 'current', focusVisible: true, has: 'href', end: true },
+            {
+              outlineOffset: product(token('size-focus-offset'), '-1'),
+            },
+          ),
+          /* A focused half draws above its neighbor, so nothing paints over its
            ring. */
-        rule(
-          { focusVisible: true, platform: 'web', state: 'end' },
-          {
-            position: 'relative',
-            zIndex: token('layer-raised'),
-          },
-        ),
+          rule(
+            { focusVisible: true, end: true },
+            {
+              position: 'relative',
+              zIndex: token('layer-raised'),
+            },
+          ),
+        ]),
       ]),
       /* `plain`: both halves take the light fill while either is under the
          pointer, and the half under it the full fill over that. */
       on({ part: 'link', selector: ':host(:state(end)) [part="link"]:hover ~ slot[name="end"]' }, [
-        rule(
-          { platform: 'web' },
-          { '--icon-button-background-color': own.splitFill('transparent') },
-        ),
+        web([rule({ '--icon-button-background-color': own.splitFill('transparent') })]),
       ]),
       on(
         {
@@ -230,11 +225,11 @@ export default styles(
           selector:
             ':host(:state(end)) [part="link"]:has(~ slot[name="end"]:hover),\n:host(:state(end)) [part="link"]:has(~ slot[name="end"]:hover) ::slotted(a)',
         },
-        [rule({ platform: 'web' }, { backgroundColor: own.splitFill('transparent') })],
+        [web([rule({ backgroundColor: own.splitFill('transparent') })])],
       ),
       on({ after: 'link' }, [
         rule(
-          { state: 'end' },
+          { end: true },
           {
             backgroundColor: own.splitRule('transparent'),
             content: '""',
@@ -251,34 +246,32 @@ export default styles(
          of the label's last letter. */
       on({ region: 'end' }, [
         rule(
-          { state: 'end' },
+          { end: true },
           {
-            '--button-radius': hook.radius(token('radii-sm')),
+            '--button-radius': hook.radius,
             '--button-radius-start': token('radii-none'),
             '--helix-size-focus-offset': product(token('size-focus-ring'), '-1'),
             '--icon-button-background-color-hover': hover,
-            '--icon-button-radius': hook.radius(token('radii-sm')),
+            '--icon-button-radius': hook.radius,
             '--icon-size': '1.15em',
             alignItems: 'center',
             display: 'inline-flex',
-            marginInlineStart: product(hook.gap(token('space-xs')), '-1'),
+            marginInlineStart: product(hook.gap, '-1'),
           },
         ),
       ]),
       /* A slot holds no interaction a condition names, so the trigger half's
          stays written out. */
       on({ part: 'host', selector: ':host(:state(end)) slot[name="end"]:focus-within' }, [
-        rule({ platform: 'web' }, { position: 'relative', zIndex: token('layer-raised') }),
+        web([rule({ position: 'relative', zIndex: token('layer-raised') })]),
       ]),
       /* The fold after the first crumb of a long slotted trail: a chevron, and
          the ghost icon button that opens its menu, which the host sizes as
          any control in a crumb. */
       on('fold-separator', [rule(separator)]),
-      on({ part: 'fold-separator', inner: 'svg' }, [rule({ platform: 'web' }, chevron)]),
+      on({ part: 'fold-separator', inner: 'svg' }, [web([rule(chevron)])]),
       /* The fold's slash takes the same box as the slash before a crumb. */
-      on({ part: 'fold-separator', inner: '[data-mark="slash"]' }, [
-        rule({ platform: 'web' }, slash),
-      ]),
+      on({ part: 'fold-separator', inner: '[data-mark="slash"]' }, [web([rule(slash)])]),
     ]
   },
 )

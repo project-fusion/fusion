@@ -1,5 +1,5 @@
 import printEconomy from '../../../fragments/print-economy.js'
-import { inherit, token, web } from '../../../style.js'
+import { first, inherit, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -25,20 +25,20 @@ export default styles(
   root,
   {
     prefix: 'divider',
-    hooks: [
-      'color',
-      'content-color',
-      'content-font-family',
-      'content-font-size',
-      'content-font-weight',
-      'content-gap',
-      'content-offset',
-      'length',
-      'padding',
-      'padding-end',
-      'padding-start',
-      'thickness',
-    ],
+    hooks: {
+      color: token('color-border'),
+      contentColor: token('color-foreground-muted'),
+      contentFontFamily: token('font-sans'),
+      contentFontSize: token('text-xs'),
+      contentFontWeight: inherit(),
+      contentGap: token('space-sm'),
+      contentOffset: token('space-lg'),
+      length: 'auto',
+      padding: token('space-none'),
+      paddingEnd: null,
+      paddingStart: null,
+      thickness: token('border-thin'),
+    },
     own: ['divider-thickness'],
     props: [prop('content-placement', ['end', 'start'])],
     stylesheet: 'divider/root/divider-root.generated.css',
@@ -48,77 +48,71 @@ export default styles(
       rule({
         alignItems: 'center',
         display: 'flex',
-        own: { thickness: hook.thickness(token('border-thin')) },
+        own: { thickness: hook.thickness },
       }),
       rule({
-        paddingInlineEnd: hook.paddingEnd(hook.padding(token('space-none'))),
-        paddingInlineStart: hook.paddingStart(hook.padding(token('space-none'))),
+        paddingInlineEnd: first(hook.paddingEnd, hook.padding),
+        paddingInlineStart: first(hook.paddingStart, hook.padding),
       }),
       /* Stretched to the flex or grid parent, so a divider between toolbar
          items matches them without being told how tall they are, unless
          `--divider-length` says how long it is. */
       rule(
-        { state: 'vertical' },
+        { vertical: true },
         {
-          paddingBlockEnd: hook.paddingEnd(hook.padding(token('space-none'))),
-          paddingBlockStart: hook.paddingStart(hook.padding(token('space-none'))),
+          paddingBlockEnd: first(hook.paddingEnd, hook.padding),
+          paddingBlockStart: first(hook.paddingStart, hook.padding),
           paddingInline: token('space-none'),
           alignSelf: 'stretch',
           display: 'inline-flex',
           flexDirection: 'column',
-          blockSize: hook.length('auto'),
+          blockSize: hook.length,
         },
       ),
     ]),
     /* What is set into the line, and the space either side of it. */
     on('content', [
       rule({
-        color: hook.contentColor(token('color-foreground-muted')),
-        marginInline: hook.contentGap(token('space-sm')),
+        color: hook.contentColor,
+        marginInline: hook.contentGap,
         display: 'inline-flex',
         flex: '0 0 auto',
-        fontFamily: hook.contentFontFamily(token('font-sans')),
-        fontSize: hook.contentFontSize(token('text-xs')),
-        fontWeight: hook.contentFontWeight(inherit()),
+        fontFamily: hook.contentFontFamily,
+        fontSize: hook.contentFontSize,
+        fontWeight: hook.contentFontWeight,
         lineHeight: token('leading-tight'),
         whiteSpace: 'nowrap',
       }),
       /* Nothing set in: no region, and no gap either side of it. */
       rule({ part: { 'data-empty': true } }, { display: 'none' }),
-      rule({ part: { hidden: true }, platform: 'native' }, { display: 'none' }),
-      rule(
-        { state: 'vertical' },
-        { marginBlock: hook.contentGap(token('space-sm')), marginInline: token('space-none') },
-      ),
+      native([rule({ hidden: true }, { display: 'none' })]),
+      rule({ vertical: true }, { marginBlock: hook.contentGap, marginInline: token('space-none') }),
     ]),
     /* An element set in keeps to one line too, over a white-space of its
        own. The words a phone sets in take the content's one line. */
-    on({ part: 'content', inner: 'slot::slotted(*)' }, [
-      rule({ platform: 'web' }, { whiteSpace: 'nowrap' }),
-    ]),
+    on({ part: 'content', inner: 'slot::slotted(*)' }, [web([rule({ whiteSpace: 'nowrap' })])]),
     on('line', [
-      rule({ backgroundColor: hook.color(token('color-border')) }),
+      rule({ backgroundColor: hook.color }),
       /* `flex: 1` and no full width, so the two halves share what the content
          leaves. */
       rule({ state: { vertical: false } }, { blockSize: own.thickness, flex: '1 1 0' }),
       /* One line of text is the least a stretched line is, where its parent
          resolves to no height. */
-      rule(
-        { state: 'vertical' },
-        { flex: '1 1 0', inlineSize: own.thickness, minBlockSize: '1em' },
-      ),
-      rule(
-        [
-          { child: 'first', 'content-placement': 'start', platform: 'native' },
-          { child: 'last', 'content-placement': 'end', platform: 'native' },
-        ],
-        { flex: ['0', '0', hook.contentOffset(token('space-lg'))] },
-      ),
+      rule({ vertical: true }, { flex: '1 1 0', inlineSize: own.thickness, minBlockSize: '1em' }),
+      native([
+        rule(
+          [
+            { child: 'first', 'content-placement': 'start' },
+            { child: 'last', 'content-placement': 'end' },
+          ],
+          { flex: ['0', '0', hook.contentOffset] },
+        ),
+      ]),
       /* Forced colors paint every background the page's Canvas color, so the
          line keeps the text color, as an `<hr>` does there. */
       rule(
         { forcedColors: true },
-        { backgroundColor: web('CanvasText'), forcedColorAdjust: web('none') },
+        { web: { backgroundColor: 'CanvasText', forcedColorAdjust: 'none' } },
       ),
     ]),
     on(
@@ -127,7 +121,7 @@ export default styles(
         selector:
           ':host([content-placement="start"]) [part="line"]:has(+ [part="content"]:not([data-empty])),\n:host([content-placement="end"]) [part="content"]:not([data-empty]) + [part="line"]',
       },
-      [rule({ platform: 'web' }, { flex: ['0', '0', hook.contentOffset(token('space-lg'))] })],
+      [web([rule({ flex: ['0', '0', hook.contentOffset] })])],
     ),
     /* A rule, which prints. */
     include(printEconomy),

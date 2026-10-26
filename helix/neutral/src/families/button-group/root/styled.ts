@@ -1,4 +1,4 @@
-import { hookOf, product, token } from '../../../style.js'
+import { first, hookOf, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -32,7 +32,12 @@ export default styles(
   root,
   {
     prefix: 'button-group',
-    hooks: ['gap', 'pressed-background-color', 'pressed-border-color', 'pressed-color'],
+    hooks: ({ own }) => ({
+      gap: token('space-xs'),
+      pressedBackgroundColor: token('color-foreground'),
+      pressedBorderColor: own.pressedBackground,
+      pressedColor: token('color-background'),
+    }),
     own: [
       'button-group-pressed-background',
       'button-group-pressed-border',
@@ -83,9 +88,9 @@ export default styles(
         { 'selection-mode': true },
         {
           own: {
-            pressedBackground: hook.pressedBackgroundColor(token('color-foreground')),
-            pressedBorder: hook.pressedBorderColor(own.pressedBackground),
-            pressedForeground: hook.pressedColor(token('color-background')),
+            pressedBackground: hook.pressedBackgroundColor,
+            pressedBorder: first(hook.pressedBorderColor, own.pressedBackground),
+            pressedForeground: hook.pressedColor,
           },
         },
       ),
@@ -94,7 +99,7 @@ export default styles(
          along the block axis. */
       rule({ orientation: 'vertical' }, { alignItems: 'stretch', flexDirection: 'column' }),
       /* The same set, spaced. */
-      rule({ variant: 'spaced' }, { gap: hook.gap(token('space-xs')) }),
+      rule({ variant: 'spaced' }, { gap: hook.gap }),
       /* A control is not printed. */
       rule({ print: true }, { display: 'none' }),
     ]),
@@ -103,10 +108,9 @@ export default styles(
        in a large group. Only under `size`, so a group without one leaves it
        as it was. A phone has no native button. */
     on({ slotted: 'button' }, [
-      rule(
-        { size: true, platform: 'web' },
-        { blockSize: token('size-control'), fontSize: token('text-control') },
-      ),
+      web([
+        rule({ size: true }, { blockSize: token('size-control'), fontSize: token('text-control') }),
+      ]),
     ]),
     /* Each button after the first is pulled onto its neighbor's border, so
        the two share one line. */

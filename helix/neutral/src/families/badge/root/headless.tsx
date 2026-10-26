@@ -1,4 +1,5 @@
-import { bind, box, derive, headless, not, prop, region, text } from '../../../tree.js'
+import { headless, number, numberOrString, object, Slot, Text, View } from '../../../render.js'
+import { bind, derive } from '../../../tree.js'
 
 /**
  * Badge's headless tier: a count, a dot, or words, pinned to what it wraps.
@@ -22,42 +23,50 @@ import { bind, box, derive, headless, not, prop, region, text } from '../../../t
  * sibling's words, so the control and the count are two stops.
  */
 export default headless('badge', {
+  props: {
+    /* JSON on the web's attribute, such as `{"notation":"compact"}`. */
+    formatOptions: object(),
+    label: '',
+    locale: '',
+    max: number(),
+    value: numberOrString(''),
+  },
+  events: {},
+  states: ['blank', 'capped', 'dot', 'has-icon', 'settled'],
   derived: {
     blank: derive('badge-blank'),
     capped: derive('badge-capped'),
     dot: derive('badge-dot'),
-    'has-icon': bind('icon'),
+    hasIcon: bind('icon'),
     shows: derive('badge-text'),
     single: derive('badge-single'),
     unset: derive('badge-unset'),
     words: derive('badge-words'),
   },
-  events: [],
-  props: [
-    /* JSON on the web's attribute, such as `{"notation":"compact"}`. */
-    prop('format-options', 'object'),
-    prop('label', 'string', { default: '' }),
-    prop('locale', 'string', { default: '' }),
-    prop('max', 'number'),
-    prop('value', 'number | string', { default: '' }),
-  ],
-  states: ['blank', 'capped', 'dot', 'has-icon', 'settled'],
-  tree: [
-    region('default'),
-    box(
-      'indicator',
-      {
-        'data-blank': bind('blank'),
-        'data-dot': bind('unset'),
-        'data-single': bind('single'),
-        decorative: not('words'),
-        label: bind('words'),
-        role: 'status',
-      },
-      [
-        region('icon', { decorative: true, part: 'icon' }),
-        text('count', { decorative: bind('blank'), says: bind('shows') }),
-      ],
-    ),
-  ],
+  render: ({ derived }) => (
+    <>
+      <Slot />
+      <View
+        ariaHidden={!derived.words}
+        data-blank={derived.blank}
+        data-dot={derived.unset}
+        data-single={derived.single}
+        label={derived.words}
+        part="indicator"
+        role="status"
+      >
+        <Slot
+          ariaHidden
+          name="icon"
+          part="icon"
+        />
+        <Text
+          ariaHidden={derived.blank}
+          part="count"
+        >
+          {derived.shows}
+        </Text>
+      </View>
+    </>
+  ),
 })

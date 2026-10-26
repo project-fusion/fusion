@@ -1,4 +1,5 @@
-import { bind, box, headless, prop, region } from '../../../tree.js'
+import { headless, oneOf, Slot, View } from '../../../render.js'
+import { bind } from '../../../tree.js'
 
 /**
  * A description list's headless tier: what it takes and its one part, the
@@ -15,9 +16,19 @@ import { bind, box, headless, prop, region } from '../../../tree.js'
  * element has.
  */
 export default headless('description-list', {
-  events: [],
-  host: { label: bind('label'), role: 'group' },
-  props: [prop('direction', ['row']), prop('label', 'string', { default: '' })],
+  props: {
+    direction: oneOf(['row']),
+    label: '',
+  },
+  events: {},
   states: ['settled'],
-  tree: [box('list', { element: 'description-list' }, [region('default')])],
+  host: { label: bind('label'), role: 'group' },
+  render: () => (
+    <View
+      element="description-list"
+      part="list"
+    >
+      <Slot />
+    </View>
+  ),
 })

@@ -1,15 +1,5 @@
-import {
-  bind,
-  box,
-  derive,
-  event,
-  headless,
-  pressable,
-  prop,
-  region,
-  toggle,
-  when,
-} from '../../../tree.js'
+import { headless, object, oneOf, Pressable, Slot, View } from '../../../render.js'
+import { derive, toggle } from '../../../tree.js'
 
 /**
  * Callout's headless tier: a passage set apart as a note, information, a
@@ -39,38 +29,64 @@ import {
  * the element has.
  */
 export default headless('callout', {
-  derived: {
-    'dismiss-name': derive('callout-dismiss-name'),
-    dismissed: derive('callout-dismissed'),
-    glyph: derive('callout-glyph'),
-    'tone-name': derive('callout-tone-name'),
+  props: {
+    dismissible: false,
+    dismissLabel: 'Dismiss {label}',
+    open: true,
+    tone: oneOf(['danger', 'info', 'neutral', 'success', 'warning']),
+    toneLabel: '',
+    toneLabels: object(),
   },
-  events: [
-    event('dismiss', { cancelable: true, detail: ['label'], gives: { label: 'dismissed' } }),
-  ],
-  host: { role: 'note' },
-  props: [
-    prop('dismiss-label', 'string', { default: 'Dismiss {label}' }),
-    prop('dismissible', 'boolean', { default: false }),
-    prop('open', 'boolean', { default: true }),
-    prop('tone', ['danger', 'info', 'neutral', 'success', 'warning']),
-    prop('tone-label', 'string', { default: '' }),
-    prop('tone-labels', 'object'),
-  ],
+  events: {
+    dismiss: { cancelable: true, detail: ['label'], gives: { label: 'dismissed' } },
+  },
   states: ['closed', 'entering', 'exiting', 'has-heading', 'has-icon', 'settled'],
+  derived: {
+    dismissed: derive('callout-dismissed'),
+    dismissName: derive('callout-dismiss-name'),
+    glyph: derive('callout-glyph'),
+    toneName: derive('callout-tone-name'),
+  },
+  host: { role: 'note' },
   toggle: toggle({ checked: 'open', closes: 'dismiss' }),
-  tree: [
-    box('icon', { label: bind('tone-name'), role: 'img' }, [
-      region('icon', { decorative: true }, [
-        box('icon-mark', { decorative: true, glyph: bind('glyph') }),
-      ]),
-    ]),
-    box('content', {}, [region('heading'), region('default')]),
-    when(
-      'dismissible',
-      pressable('dismiss', { label: bind('dismiss-name'), role: 'button', toggles: true }, [
-        region('dismiss-icon', {}, [box('dismiss-mark', { decorative: true, glyph: 'x' })]),
-      ]),
-    ),
-  ],
+  render: ({ derived, props }) => (
+    <>
+      <View
+        label={derived.toneName}
+        part="icon"
+        role="img"
+      >
+        <Slot
+          ariaHidden
+          name="icon"
+        >
+          <View
+            ariaHidden
+            icon={derived.glyph}
+            part="icon-mark"
+          />
+        </Slot>
+      </View>
+      <View part="content">
+        <Slot name="heading" />
+        <Slot />
+      </View>
+      {props.dismissible && (
+        <Pressable
+          label={derived.dismissName}
+          part="dismiss"
+          role="button"
+          toggles
+        >
+          <Slot name="dismiss-icon">
+            <View
+              ariaHidden
+              icon="x"
+              part="dismiss-mark"
+            />
+          </Slot>
+        </Pressable>
+      )}
+    </>
+  ),
 })
