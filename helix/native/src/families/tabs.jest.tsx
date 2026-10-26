@@ -1,7 +1,8 @@
 /*
  * The generated Tabs' own glyphs, drawn from the real intermediate forms: the
  * close mark of a dismissible tab is an em of the tab's words, as
- * `[part="dismiss-mark"]` sizes it on the web. `test:native` writes the
+ * `[part="dismiss-mark"]` sizes it on the web, and a disabled tab is drawn
+ * at half its opacity, as its own `disabled` says. `test:native` writes the
  * components beside this file.
  */
 import { setFocus } from '@fusion.dev/helix-core/capabilities/focus'
@@ -62,5 +63,22 @@ describe("a dismissible tab's close mark", () => {
     const at = markHeight()
     await act(() => atTextSize(3.571))
     expect(markHeight()).toBeCloseTo(at * 1.353, 1)
+  })
+})
+
+describe('a disabled tab', () => {
+  test('is drawn at half its opacity, and the tab beside it is not', async () => {
+    await render(
+      <HelixTheme Glyph={Recorded} mode="light">
+        <HelixTabs>
+          <HelixTab value="a">Alpha</HelixTab>
+          <HelixTab disabled value="b">
+            Beta
+          </HelixTab>
+        </HelixTabs>
+      </HelixTheme>,
+    )
+    expect(styleOf(screen.getByRole('tab', { name: 'Beta' })).opacity).toBe(0.5)
+    expect(styleOf(screen.getByRole('tab', { name: 'Alpha' })).opacity ?? 1).toBe(1)
   })
 })

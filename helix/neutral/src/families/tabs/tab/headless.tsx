@@ -12,7 +12,7 @@ import { cancelable, headless, Pressable, Slot, set, string, View, web } from '.
  * an action of its own. The tab does not remove itself: its owner does.
  */
 export default headless('tab', {
-  memberOf: set('tabs', { pressChooses: true }),
+  memberOf: set('tabs'),
   props: {
     disabled: false,
     dismissLabel: 'Close',
