@@ -236,11 +236,14 @@ export default styles(
         ),
         rule({ placedBottom: true }, { transformOrigin: [measured('floating-arrow-x', '50%'), 0] }),
         rule({ part: { 'data-placed': true } }, { opacity: 1, scale: 1, transform: 'none' }),
-        rule([{ reducedMotion: true }, { part: { 'data-placed': true }, reducedMotion: true }], {
-          scale: 1,
-          transform: 'none',
-          transition: 'none',
-        }),
+        rule(
+          { reducedMotion: true },
+          {
+            scale: 1,
+            transform: 'none',
+            transition: 'none',
+          },
+        ),
         web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
         rule({
           '--menu-item-start': '0px',

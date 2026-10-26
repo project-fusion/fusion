@@ -31,6 +31,10 @@
       "types": "./dist/register.d.ts",
       "default": "./dist/register.js"
     },
+    "./sheets": {
+      "types": "./dist/sheets.d.ts",
+      "default": "./dist/sheets.js"
+    },
     "./ssr": {
       "types": "./dist/ssr.d.ts",
       "default": "./dist/ssr.js"

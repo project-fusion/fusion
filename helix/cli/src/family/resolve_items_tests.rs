@@ -42,7 +42,7 @@ fn the_web_reaches_a_drawn_part_through_the_box_that_draws_it() {
     let css = emit(&group);
     assert!(css.contains("[part=\"select-all\"]::part(box) {"), "{css}");
     assert!(
-        css.contains(":host(:state(invalid)) [part=\"select-all\"]::part(mark) {"),
+        css.contains(":where(:host(:state(invalid))) [part=\"select-all\"]::part(mark) {"),
         "{css}"
     );
 }

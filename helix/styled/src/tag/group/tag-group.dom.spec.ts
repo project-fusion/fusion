@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { internalsOf, mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { internalsOf, mount, registerDom, unweighted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -12,10 +12,12 @@ beforeAll(async () => {
    are the base tier's and are tested there. */
 const sheet = (tag: string): string => {
   const declared = (customElements.get(tag) as unknown as { styles: unknown }).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 describe('the styled tag group', () => {

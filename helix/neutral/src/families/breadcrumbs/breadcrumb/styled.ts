@@ -98,8 +98,6 @@ export default styles(
            away. */
         rule({ folded: true }, { display: 'none' }),
       ]),
-      /* `hidden` is the web's own attribute and no prop, so it stays written
-         out. */
       /* Written out: `hidden` is the global attribute, which is no prop of the element. */
       on({ part: 'host', selector: ':host([hidden])' }, [web([rule({ display: 'none' })])]),
       /* Each crumb draws the separator before it, and the first draws none. */
@@ -177,7 +175,6 @@ export default styles(
            is no link does not draw, and the inline half is for words the crumb
            draws itself, the current page's. */
         rule({ lacks: 'href' }, { paddingBlock: token('space-none') }),
-        rule({ lacks: ['current', 'href'] }, { paddingInline: token('space-none') }),
         rule({ has: 'current' }, { color: hook.currentColor }),
         /* The split control's label half: square inner corners, and the space
            between the word and the chevron split across the seam. */
@@ -185,6 +182,9 @@ export default styles(
         /* `outlined`: a hairline between the halves, at rest as well, on the
            trigger's side of the seam. Under `plain` it is transparent. */
         rule({ end: true }, { position: 'relative' }),
+        /* After the split, which pads the words: a crumb that is no link and
+           no current page draws no words of its own to pad. */
+        rule({ lacks: ['current', 'href'] }, { paddingInline: token('space-none') }),
         web([
           rule(
             { lacks: 'current', hover: true, has: 'href' },

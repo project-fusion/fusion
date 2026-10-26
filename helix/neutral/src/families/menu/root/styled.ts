@@ -130,11 +130,14 @@ export default styles(
         /* A sheet rises from under the edge. */
         rule({ sheet: true }, { own: { menuFrom: 1, menuTravel: '100%' } }),
         rule({ part: { 'data-placed': true } }, { opacity: 1, scale: 1, transform: 'none' }),
-        rule([{ reducedMotion: true }, { part: { 'data-placed': true }, reducedMotion: true }], {
-          scale: 1,
-          transform: 'none',
-          transition: 'none',
-        }),
+        rule(
+          { reducedMotion: true },
+          {
+            scale: 1,
+            transform: 'none',
+            transition: 'none',
+          },
+        ),
         rule(
           { platform: 'web', supports: 'not (overlay: auto)' },
           { transitionBehavior: 'normal' },
@@ -239,7 +242,7 @@ export default styles(
           border: 'none',
           borderRadius: token('radii-sm'),
           color: token('color-foreground-muted'),
-          cursor: web('pointer'),
+          web: { cursor: 'pointer' },
           display: 'inline-flex',
           justifyContent: 'center',
           blockSize: column,

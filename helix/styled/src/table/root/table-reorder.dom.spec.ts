@@ -1,6 +1,14 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { example, hasLayout, idle, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import {
+  example,
+  hasLayout,
+  idle,
+  mount,
+  part,
+  registerDom,
+  unweighted,
+} from '@fusion.dev/helix-testing/dom'
 import reordering from '../.examples/reordering.html' with { type: 'text' }
 
 beforeAll(async () => {
@@ -13,10 +21,12 @@ beforeAll(async () => {
    place and the line where a row lands are measured in Chromium. */
 const sheet = (tag: 'helix-table' | 'helix-table-row'): string => {
   const declared = (customElements.get(tag) as unknown as { styles: unknown }).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 /** The declarations of the first rule written for `selector`. */
