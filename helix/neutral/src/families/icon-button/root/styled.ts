@@ -1,8 +1,8 @@
 import iconButtonFloating from '../../../fragments/icon-button-floating.js'
 import iconButtonTones from '../../../fragments/icon-button-tones.js'
+import { oneOf } from '../../../render.js'
 import { first, hookOf, inherit, list, mix, native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -57,13 +57,13 @@ export default styles(
       'icon-button-tone',
       'icon-button-turn',
     ],
-    props: [
-      prop('emphasis', ['ghost', 'outlined', 'solid', 'subtle']),
-      prop('material', ['frosted', 'glass', 'transparent']),
-      prop('raised', 'boolean', { default: false }),
-      prop('shape', ['circle']),
-      prop('tone', ['accent', 'danger', 'neutral', 'primary']),
-    ],
+    props: {
+      emphasis: oneOf(['ghost', 'outlined', 'solid', 'subtle']),
+      material: oneOf(['frosted', 'glass', 'transparent']),
+      raised: false,
+      shape: oneOf(['circle']),
+      tone: oneOf(['accent', 'danger', 'neutral', 'primary']),
+    },
     stylesheet: 'icon-button/root/icon-button-root.generated.css',
   },
   ({ hook, include, keyframes, on, own, rule }) => [

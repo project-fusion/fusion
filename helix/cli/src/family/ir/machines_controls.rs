@@ -101,9 +101,18 @@ pub(super) fn copied(copy: &Copy, tree: &[Node]) -> MachineUse {
         ("sends".to_owned(), Bound::Event(copy.sends.clone())),
         ("text".to_owned(), Bound::Prop(copy.text.clone())),
         ("told".to_owned(), Bound::State(copy.told.clone())),
-        ("words-copied".to_owned(), Bound::Prop(copy.words.copied.clone())),
-        ("words-failed".to_owned(), Bound::Prop(copy.words.failed.clone())),
-        ("words-resting".to_owned(), Bound::Prop(copy.words.resting.clone())),
+        (
+            "words-copied".to_owned(),
+            Bound::Prop(copy.words.copied.clone()),
+        ),
+        (
+            "words-failed".to_owned(),
+            Bound::Prop(copy.words.failed.clone()),
+        ),
+        (
+            "words-resting".to_owned(),
+            Bound::Prop(copy.words.resting.clone()),
+        ),
     ]);
     let mut copying = Vec::new();
     crate::family::resolve::pressables_that_copy(tree, &mut copying);

@@ -32,7 +32,7 @@ export default headless('badge', {
     value: numberOrString(''),
   },
   events: {},
-  states: ['blank', 'capped', 'dot', 'has-icon', 'settled'],
+  states: ['blank', 'capped', 'dot', 'hasIcon', 'settled'],
   derived: {
     blank: derive('badge-blank'),
     capped: derive('badge-capped'),

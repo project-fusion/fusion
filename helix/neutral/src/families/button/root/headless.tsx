@@ -27,7 +27,7 @@ import {
  * says `helix-button` has, so the source cannot drop or invent one unseen.
  */
 export default headless('button', {
-  memberOf: set('button-group', { state: 'pressed' }),
+  memberOf: set('button-group', { selectedState: 'pressed' }),
   props: {
     /* `command` and `commandfor` are an invoker's, and the `form` ones,
        `name`, and `type` a form's, which a phone has neither of. */

@@ -1,7 +1,7 @@
 import printEconomy from '../../../fragments/print-economy.js'
+import { oneOf } from '../../../render.js'
 import { first, inherit, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -40,7 +40,7 @@ export default styles(
       thickness: token('border-thin'),
     },
     own: ['divider-thickness'],
-    props: [prop('content-placement', ['end', 'start'])],
+    props: { contentPlacement: oneOf(['end', 'start']) },
     stylesheet: 'divider/root/divider-root.generated.css',
   },
   ({ hook, include, on, own, rule }) => [
@@ -102,8 +102,8 @@ export default styles(
       native([
         rule(
           [
-            { child: 'first', 'content-placement': 'start' },
-            { child: 'last', 'content-placement': 'end' },
+            { child: 'first', contentPlacement: 'start' },
+            { child: 'last', contentPlacement: 'end' },
           ],
           { flex: ['0', '0', hook.contentOffset] },
         ),

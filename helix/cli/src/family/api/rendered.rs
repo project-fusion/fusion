@@ -72,6 +72,7 @@ pub fn rewrite(export: &Lit) -> Result<Lit, String> {
             "props" => ("props".to_owned(), props(value)?),
             "events" => ("events".to_owned(), events(value)?),
             "derived" => ("derived".to_owned(), derived(value)?),
+            "states" => ("states".to_owned(), states(value)?),
             "render" => ("tree".to_owned(), value.clone()),
             "item" | "tree" => {
                 return Err(format!(
@@ -248,8 +249,9 @@ struct Spec {
     property: bool,
 }
 
-/// `props: { dismissLabel: 'Close', href: string() }` as `prop()` calls.
-fn props(value: &Lit) -> Result<Lit, String> {
+/// `props: { dismissLabel: 'Close', href: string() }` as `prop()` calls, as
+/// a headless source and a style table's header declare them.
+pub(crate) fn props(value: &Lit) -> Result<Lit, String> {
     let Lit::Object(entries) = value else {
         return Err("`props` is an object of each prop's default or spec, by name".to_owned());
     };
@@ -387,6 +389,22 @@ fn event_spec(name: &str, value: &Lit, extra: &mut Vec<(String, Lit)>) -> Result
         }
     }
     Ok(())
+}
+
+/// `states: ['placedTop']`, each named in camelCase as `state.placedTop`
+/// reads it, as the web's hyphenated name.
+fn states(value: &Lit) -> Result<Lit, String> {
+    let Lit::Array(names) = value else {
+        return Err("`states` is an array of names".to_owned());
+    };
+    names
+        .iter()
+        .map(|name| match name {
+            Lit::Text(name) => camel_key(name, "state").map(Lit::Text),
+            _ => Err("a state is a name".to_owned()),
+        })
+        .collect::<Result<_, String>>()
+        .map(Lit::Array)
 }
 
 /// `derived: { backName: derive(...) }` with each key the name it is read by.

@@ -57,7 +57,7 @@ pub fn clock(lit: &Lit) -> Result<Clock, String> {
             ("restarts", Lit::Array(names)) => {
                 for name in names {
                     let Lit::Text(name) = name else {
-                        return Err("clock: `restarts` is a list of prop names".to_owned());
+                        return Err("clock: `restartOn` is a list of prop names".to_owned());
                     };
                     clock.restarts.push(name.clone());
                 }
@@ -127,7 +127,7 @@ mod tests {
         ]));
         assert_eq!(
             read,
-            Err("clock: `restarts` is a list of prop names".to_owned())
+            Err("clock: `restartOn` is a list of prop names".to_owned())
         );
     }
 

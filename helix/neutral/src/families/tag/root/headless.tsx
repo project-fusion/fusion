@@ -40,7 +40,7 @@ import { derive } from '../../../tree.js'
  * the element has.
  */
 export default headless('tag', {
-  memberOf: set('tag-group', { named: ['start', 'default'] }),
+  memberOf: set('tag-group', { labelledby: ['start', 'default'] }),
   props: {
     disabled: false,
     dismissible: false,
@@ -53,7 +53,7 @@ export default headless('tag', {
   events: {
     dismiss: cancelable(['label']),
   },
-  states: ['focus-visible', 'selected', 'settled'],
+  states: ['focusVisible', 'selected', 'settled'],
   render: ({ props, send }) => (
     <Pressable
       chooses

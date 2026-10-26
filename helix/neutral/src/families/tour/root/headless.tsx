@@ -1,5 +1,4 @@
 import { bare, boolean, cancelable, headless, Layer, number, oneOf, Slot } from '../../../render.js'
-import { toggle, tour } from '../../../tree.js'
 
 /**
  * Tour's headless tier: a guided tour of an interface, one stop at a time.
@@ -69,35 +68,35 @@ export default headless('tour', {
     tourStatus: ['index', 'status'],
   },
   states: ['open', 'preparing', 'settled', 'waiting'],
-  toggle: toggle({
-    changes: 'toggle',
-    checked: 'open',
-    closes: 'before-close',
-    initial: 'default-open',
-    opens: 'before-open',
-  }),
-  tour: tour({
-    asks: 'tour-ask',
-    back: 'back-label',
-    before: 'before-activate',
-    completes: 'complete',
-    done: 'done-label',
-    index: 'index',
-    initial: 'default-index',
+  toggle: {
+    defaultProp: 'defaultOpen',
+    onBeforeClose: 'beforeClose',
+    onBeforeOpen: 'beforeOpen',
+    onToggle: 'toggle',
+    prop: 'open',
+  },
+  tour: {
+    backLabel: 'backLabel',
+    defaultProp: 'defaultIndex',
+    doneLabel: 'doneLabel',
     lit: 'lit',
-    moves: 'activate',
-    next: 'next-label',
-    outside: 'outside-press',
-    padding: 'spotlight-padding',
-    place: 'progress-label',
+    nextLabel: 'nextLabel',
+    onAsk: 'tourAsk',
+    onBeforeChange: 'beforeActivate',
+    onChange: 'activate',
+    onComplete: 'complete',
+    onStatus: 'tourStatus',
+    outsidePress: 'outsidePress',
     preparing: 'preparing',
     progress: 'progress',
-    reports: 'tour-status',
-    skip: 'skip-label',
-    spot: 'spot',
+    progressLabel: 'progressLabel',
+    prop: 'index',
+    skipLabel: 'skipLabel',
+    spotlight: 'spot',
+    spotlightPadding: 'spotlightPadding',
     veiled: 'veiled',
     waiting: 'waiting',
-  }),
+  },
   render: ({ tour }) => (
     <>
       {/* Behind a dialog or a floating stop, which lights nothing, drawn only
@@ -117,10 +116,10 @@ export default headless('tour', {
           open={tour.lit}
           part="spotlight"
           style={{
-            '--tour-spotlight-height': tour.spot.height,
-            '--tour-spotlight-width': tour.spot.width,
-            '--tour-spotlight-x': tour.spot.x,
-            '--tour-spotlight-y': tour.spot.y,
+            '--tour-spotlight-height': tour.spotlight.height,
+            '--tour-spotlight-width': tour.spotlight.width,
+            '--tour-spotlight-x': tour.spotlight.x,
+            '--tour-spotlight-y': tour.spotlight.y,
           }}
         />
       )}

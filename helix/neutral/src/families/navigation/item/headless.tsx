@@ -23,7 +23,7 @@ import { cancelable, headless, oneOf, Pressable, Slot, set, web } from '../../..
  * manifest says the element has.
  */
 export default headless('navigation-item', {
-  memberOf: set('navigation', { flag: 'current', value: 'href' }),
+  memberOf: set('navigation', { current: 'current', value: 'href' }),
   props: {
     current: oneOf(['date', 'location', 'page', 'step', 'time', 'true']),
     href: '',

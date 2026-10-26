@@ -10,7 +10,7 @@ import {
   View,
   Wrap,
 } from '../../../render.js'
-import { derive, stop } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * Tour Stop's headless tier: one stop on a tour, the element it points at,
@@ -86,22 +86,21 @@ export default headless('tour-stop', {
     tourAsk: ['what'],
   },
   states: [
-    'aligned-end',
-    'aligned-start',
+    'alignedEnd',
+    'alignedStart',
     'entering',
     'exiting',
-    'placed-bottom',
-    'placed-left',
-    'placed-right',
-    'placed-top',
+    'placedBottom',
+    'placedLeft',
+    'placedRight',
+    'placedTop',
     'settled',
   ],
   derived: {
     aim: derive('tour-stop-aim'),
     edge: derive('tour-stop-edge'),
   },
-  stop: stop({
-    asks: 'tour-ask',
+  stop: {
     back: 'back',
     counted: 'counted',
     current: 'current',
@@ -110,6 +109,7 @@ export default headless('tour-stop', {
     last: 'last',
     name: 'name',
     next: 'next',
+    onAsk: 'tourAsk',
     place: 'place',
     reach: 'reach',
     said: 'said',
@@ -118,7 +118,7 @@ export default headless('tour-stop', {
     target: 'for',
     type: 'type',
     words: 'words',
-  }),
+  },
   render: ({ derived, props, state, stop }) => (
     <Layer
       arrow="arrow"

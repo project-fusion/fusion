@@ -116,7 +116,7 @@ pub fn removes(fields: &[(String, Lit)]) -> Result<Removes, String> {
     let mut read = names(fields, &["empty", "event"], "removes.")?;
     Ok(Removes {
         empty: read.remove("empty"),
-        event: needed(&mut read, "event", "collection: `removes` names its")?,
+        event: needed(&mut read, "event", "collection: `removeOn` names its")?,
     })
 }
 
@@ -138,7 +138,7 @@ pub fn closes(fields: &[(String, Lit)]) -> Result<Closes, String> {
     let mut read = names(fields, &["event", "while"], "closes.")?;
     Ok(Closes {
         r#while: read.remove("while"),
-        event: needed(&mut read, "event", "collection: `closes` names its")?,
+        event: needed(&mut read, "event", "collection: `closeOn` names its")?,
     })
 }
 
@@ -199,7 +199,7 @@ pub fn keys(fields: &[(String, Lit)]) -> Result<Keys, String> {
                         }
                         _ => {
                             return Err(format!(
-                                "collection: `keys.keeps` holds the keys that move focus, {}",
+                                "collection: `keys.itemKeys` holds the keys that move focus, {}",
                                 MOVING.join(", ")
                             ))
                         }
@@ -209,9 +209,10 @@ pub fn keys(fields: &[(String, Lit)]) -> Result<Keys, String> {
             (key, _) => return Err(format!("collection: `keys.{key}` is not a field it has")),
         }
     }
-    keys.chooses =
-        chooses.ok_or("collection: `keys` says whether arriving chooses, as `chooses`")?;
-    keys.wrap = wrap.ok_or("collection: `keys` says whether a move comes round, as `wrap`")?;
+    keys.chooses = chooses.ok_or(
+        "collection: `keys` says whether focus selects as it arrives, as `selectionFollowsFocus`",
+    )?;
+    keys.wrap = wrap.ok_or("collection: `keys` says whether a move comes round, as `loop`")?;
     Ok(keys)
 }
 
@@ -221,12 +222,12 @@ pub fn keys(fields: &[(String, Lit)]) -> Result<Keys, String> {
 /// other kind that names no chosen value.
 pub fn kept(collection: &Collection, chosen: Option<&str>) -> Result<(), String> {
     if collection.opens.is_some() && !collection.toggles {
-        return Err("collection: a set whose items open says `toggles: true`".to_owned());
+        return Err("collection: a set whose items open says `itemsToggle: true`".to_owned());
     }
     /* A set that mixes holds no chosen value, and its items do not turn as a set's. */
     if collection.mixes && (chosen.is_some() || collection.toggles || collection.mode.is_some()) {
         return Err(
-            "collection: a set that `mixes` holds no `chosen` value, no `mode`, and does not say `toggles`"
+            "collection: a set that `mixes` names no `prop`, no `selectionMode`, and does not say `itemsToggle`"
                 .to_owned(),
         );
     }
@@ -234,12 +235,14 @@ pub fn kept(collection: &Collection, chosen: Option<&str>) -> Result<(), String>
     let held = chosen.is_some() || collection.toggles || collection.mode.is_some();
     if collection.marked && (held || collection.mixes || collection.opens.is_some()) {
         return Err(
-            "collection: a set whose items are `marked` holds no `chosen` value or `mode`, and does not open, mix, or say `toggles`"
+            "collection: a set whose items are `currentFromItems` names no `prop` or `selectionMode`, and does not open, mix, or say `itemsToggle`"
                 .to_owned(),
         );
     }
     if chosen.is_none() && collection.opens.is_none() && !collection.mixes && !collection.marked {
-        return Err("a collection names the prop that holds the chosen value".to_owned());
+        return Err(
+            "a collection names the prop that holds the chosen value, as `prop`".to_owned(),
+        );
     }
     Ok(())
 }

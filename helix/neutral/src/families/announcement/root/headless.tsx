@@ -9,7 +9,7 @@ import {
   View,
   web,
 } from '../../../render.js'
-import { bind, countdown, derive, queue } from '../../../tree.js'
+import { bind, derive } from '../../../tree.js'
 
 /**
  * Announcement's headless tier: a message for the whole page, above its
@@ -68,9 +68,9 @@ export default headless('announcement', {
     regionRole: derive('announcement-role'),
     words: derive('announcement-words'),
   },
-  countdown: countdown({ after: 'duration', done: 'dismiss', paused: 'paused', waits: 'waiting' }),
-  host: { label: bind('name'), role: bind('region-role') },
-  queue: queue({ queued: 'queued', waiting: 'waiting' }),
+  countdown: { duration: 'duration', onDone: 'dismiss', paused: 'paused', waitWhile: 'waiting' },
+  host: { label: bind('name'), role: bind('regionRole') },
+  queue: { prop: 'queued', queued: 'waiting' },
   render: ({ derived, props, send, state }) => (
     <>
       <View part="content">

@@ -8,7 +8,7 @@
  * tour holds its stops:
  *
  * ```ts
- * tour({ asks: 'tour-ask', before: 'before-activate', index: 'index', ... })
+ * tour: { onAsk: 'tourAsk', onBeforeChange: 'beforeActivate', prop: 'index', ... }
  * ```
  *
  * **Its stops are the elements drawn inside it whose source declares a
@@ -16,18 +16,18 @@
  * holds whether it runs: a skip asks the toggle to close, and finishing the
  * last stop closes it with nothing asked.
  *
- * - **A move asks `before` first**, with the new index as `value`, which a
- *   handler may refuse, and sends `moves` once it stands. Next on the last
- *   stop sends `completes` and ends the tour. Back passes over a `wait`
+ * - **A move asks `onBeforeChange` first**, with the new index as `value`, which a
+ *   handler may refuse, and sends `onChange` once it stands. Next on the last
+ *   stop sends `onComplete` and ends the tour. Back passes over a `wait`
  *   stop.
  * - **A `wait` stop waits for its target to be drawn**, in the state
  *   `waiting`, and moves on by itself once it is.
  * - **A stop's `effect` runs as the tour reaches it**, before it is shown,
  *   in the state `preparing` while a promise it returns settles.
  * - **The spotlight lights the current target**: `lit` holds while it does,
- *   and the four lengths named after `spot` hold the lit box in the window,
+ *   and the four lengths named after `spotlight` hold the lit box in the window,
  *   `spot-x`, `spot-y`, `spot-width`, and `spot-height`, the target and
- *   `padding` around it. `veiled` holds while a stop with nothing to light
+ *   `spotlightPadding` around it. `veiled` holds while a stop with nothing to light
  *   shows.
  * - **Focus follows the run**: opening moves it to the first stop's panel, a
  *   move from inside the tour to the next one, and ending gives it back to
@@ -35,55 +35,52 @@
  */
 export interface Tour {
   /** The event its stops send as one of their controls is pressed, which it answers. */
-  readonly asks: string
+  readonly onAsk: string
   /** The prop that labels each stop's way back, where it holds words. */
-  readonly back?: string
+  readonly backLabel?: string
   /** The cancelable event a move sends first, its `value` the new index. */
-  readonly before: string
+  readonly onBeforeChange: string
   /** The event sent once the last stop is finished. */
-  readonly completes: string
+  readonly onComplete: string
   /** The prop that labels the last stop's way on, where it holds words. */
-  readonly done?: string
+  readonly doneLabel?: string
   /** The prop that holds the index of the stop shown. */
-  readonly index: string
+  readonly prop: string
   /** The prop that seeds the index where nothing else writes one. */
-  readonly initial?: string
+  readonly defaultProp?: string
   /** The name of the value it computes, whether the spotlight lights a target. */
   readonly lit: string
   /** The event sent once a move stands, its `value` the new index. */
-  readonly moves: string
+  readonly onChange: string
   /** The prop that labels each stop's way on, where it holds words. */
-  readonly next?: string
+  readonly nextLabel?: string
   /** The prop that says what a press outside the stop and its target does: `close` ends the tour. */
-  readonly outside?: string
+  readonly outsidePress?: string
   /** The prop that holds the room around the target inside the spotlight, in pixels. */
-  readonly padding?: string
+  readonly spotlightPadding?: string
   /** The prop that holds each stop's place in words, with `{index}` and `{count}`. */
-  readonly place?: string
+  readonly progressLabel?: string
   /** The state that holds while a stop's `effect` settles. */
   readonly preparing: string
   /** The prop that draws each stop's place as well as saying it. */
   readonly progress?: string
   /** The event sent as it waits at a `wait` stop, is skipped, or is completed. */
-  readonly reports?: string
+  readonly onStatus?: string
   /** The prop that labels each stop's way out, where it holds words. */
-  readonly skip?: string
+  readonly skipLabel?: string
   /** The start of the names of the lit box's four lengths. */
-  readonly spot: string
+  readonly spotlight: string
   /** The name of the value it computes, whether a stop with nothing to light shows. */
   readonly veiled: string
   /** The state that holds while a `wait` stop waits for its target. */
   readonly waiting: string
 }
 
-/** The stops passed into the element. */
-export const tour = (fields: Tour): Tour => fields
-
 /**
  * One stop of the `tour` around it, as a tour stop:
  *
  * ```ts
- * stop({ asks: 'tour-ask', back: 'back', next: 'next', skip: 'skip', target: 'for', ... })
+ * stop: { back: 'back', next: 'next', onAsk: 'tourAsk', skip: 'skip', target: 'for', ... }
  * ```
  *
  * **Its panel is placed against its `target`**, the view registered under
@@ -95,11 +92,11 @@ export const tour = (fields: Tour): Tour => fields
  * what it `said` as it shows, how far its panel stands from its target,
  * `reach`, and the words of its three controls, `back-`, `next-`, and
  * `skip-` before `words`. **A press on `back`, `next`, or `skip` sends
- * `asks`**, with `what` it asks, and the tour answers it.
+ * `onAsk`**, with `what` it asks, and the tour answers it.
  */
 export interface Stop {
   /** The event a press on one of its controls sends, its `what` the control. */
-  readonly asks: string
+  readonly onAsk: string
   /** The part whose press goes back. */
   readonly back: string
   /** The name of the value it computes, whether its place is drawn as well as said. */
@@ -133,6 +130,3 @@ export interface Stop {
   /** The end of the names of the words its controls say: `back-words`, `next-words`, `skip-words`. */
   readonly words: string
 }
-
-/** One stop of the tour around it. */
-export const stop = (fields: Stop): Stop => fields

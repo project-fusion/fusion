@@ -1,3 +1,4 @@
+import { oneOf } from '../../../render.js'
 import {
   difference,
   fn,
@@ -12,7 +13,6 @@ import {
   web,
 } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -61,7 +61,7 @@ export default styles(
       'menu-section-heading',
       'menu-travel',
     ],
-    props: [prop('material', ['frosted', 'glass'])],
+    props: { material: oneOf(['frosted', 'glass']) },
     stylesheet: 'menu/root/menu-root.generated.css',
   },
   ({ hook, on, own, rule, variants }) => {
@@ -121,14 +121,14 @@ export default styles(
           ),
         }),
         rule(
-          { state: 'placed-top' },
+          { state: 'placedTop' },
           {
             own: { travel: token('space-2xs') },
             transformOrigin: [measured('floating-arrow-x', '50%'), '100%'],
           },
         ),
         rule(
-          { state: 'placed-bottom' },
+          { state: 'placedBottom' },
           { transformOrigin: [measured('floating-arrow-x', '50%'), 0] },
         ),
         /* A sheet rises from under the edge. */
@@ -201,11 +201,11 @@ export default styles(
         rule({ platform: 'native', state: 'marked' }, { '--menu-item-end': column }),
         /* Opening sideways, out of the edge it opened against. */
         rule(
-          { state: 'placed-left' },
+          { state: 'placedLeft' },
           { transformOrigin: ['100%', measured('floating-arrow-y', '50%')] },
         ),
         rule(
-          { state: 'placed-right' },
+          { state: 'placedRight' },
           { transformOrigin: [0, measured('floating-arrow-y', '50%')] },
         ),
       ]),

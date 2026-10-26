@@ -8,8 +8,8 @@ export default headless('x', {{
   derived: {{ holdHint: derive('menu-hold-hint'), rows: bind('default') }},
   events: {{ beforeSelect: cancelable(['value']), dismiss: [] }},
   props: {{ dismissLabel: 'Close', disabled: false, loading: false }},
-  stack: stack({{ back: 'back', label: 'page-label' }}),
-  states: ['placed-top', 'settled'],
+  stack: {{ back: 'back', title: 'pageLabel' }},
+  states: ['placedTop', 'settled'],
   render: ({{ {given} }}) => (
 {render}
   ),
@@ -89,7 +89,7 @@ fn a_node_is_its_helper_with_its_part_as_its_name() {
 fn a_read_binds_its_name_and_a_negation_is_not() {
     assert_eq!(
         tree(
-            r#"<Pressable part="tab" chooses label={props.dismissLabel} hidden={!props.disabled} hint={derived.holdHint} placed={state.placedTop} named={stack.label} offset={-1} onPress={send.beforeSelect} />"#
+            r#"<Pressable part="tab" chooses label={props.dismissLabel} hidden={!props.disabled} hint={derived.holdHint} placed={state.placedTop} named={stack.title} offset={-1} onPress={send.beforeSelect} />"#
         ),
         [call(
             "pressable",
@@ -216,7 +216,7 @@ fn words_are_what_a_text_or_an_announcement_says() {
     assert_eq!(
         tree(
             r#"<>
-  <Text part="title">{stack.label}</Text>
+  <Text part="title">{stack.title}</Text>
   <Text part="hint">Press here</Text>
   <Announce part="live" when={props.loading}>{props.dismissLabel}</Announce>
 </>"#
@@ -577,8 +577,8 @@ fn a_test_of_a_value_is_a_pick_by_that_value() {
 fn a_feature_value_is_read_by_the_feature_and_its_field() {
     let read = headless_tsx(
         "export default headless('x', {
-  stop: stop({ asks: 'a', back: 'b', counted: 'counted', current: 'u', first: 'f', last: 'l', name: 'name', next: 'x', place: 'place', reach: 'r', said: 's', shown: 'h', skip: 'k', target: 't', words: 'words' }),
-  total: total({ holds: 'segmented', into: 'i', of: 'o', prop: 'p' }),
+  stop: { back: 'b', counted: 'counted', current: 'u', first: 'f', last: 'l', name: 'name', next: 'x', onAsk: 'a', place: 'place', reach: 'r', said: 's', shown: 'h', skip: 'k', target: 't', words: 'words' },
+  total: { holds: 'segmented', itemProp: 'p', of: 'o', prop: 'i' },
   render: ({ stop, total }) => (
     <View part=\"x\" label={stop.name}>
       {total.holds && <Text part=\"w\">{stop.words.back}</Text>}
@@ -616,7 +616,7 @@ fn a_feature_value_is_read_by_the_feature_and_its_field() {
     );
     let unknown = headless_tsx(
         "export default headless('x', {
-  total: total({ holds: 'segmented', into: 'i', of: 'o', prop: 'p' }),
+  total: { holds: 'segmented', itemProp: 'p', of: 'o', prop: 'i' },
   render: ({ total }) => <View part=\"x\" label={total.into} />,
 })",
     )

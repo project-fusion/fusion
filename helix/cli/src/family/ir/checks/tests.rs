@@ -6,7 +6,7 @@ use crate::family::read::default_export;
 /// The checks on a table written with `styles()` against a tree.
 fn checked(tree: &str, rules: &str) -> Result<Vec<String>, String> {
     let source = format!(
-        "import b from './headless.js'\nexport default styles(b, {{ prefix: 'b', props: [prop('tone', ['a', 'b'])], stylesheet: 's' }}, ({{ on, rule }}) => [\n{rules}\n])"
+        "import b from './headless.js'\nexport default styles(b, {{ prefix: 'b', props: {{ tone: oneOf(['a', 'b']) }}, stylesheet: 's' }}, ({{ on, rule }}) => [\n{rules}\n])"
     );
     let table = sugar::desugar(&default_export(&source).unwrap()).unwrap();
     let family = Family::new(

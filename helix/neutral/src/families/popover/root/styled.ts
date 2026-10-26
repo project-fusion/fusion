@@ -1,3 +1,4 @@
+import { oneOf } from '../../../render.js'
 import {
   difference,
   fn,
@@ -10,7 +11,6 @@ import {
   web,
 } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -47,7 +47,7 @@ export default styles(
       shadow: token('shadow-floating'),
     },
     own: ['popover-edge', 'popover-from', 'popover-travel'],
-    props: [prop('material', ['frosted', 'glass']), prop('separation', ['plain'])],
+    props: { material: oneOf(['frosted', 'glass']), separation: oneOf(['plain']) },
     stylesheet: 'popover/root/popover-root.generated.css',
   },
   ({ hook, on, own, rule, variants }) => {
@@ -98,23 +98,23 @@ export default styles(
           ),
         }),
         /* Opening upward, it comes up from the trigger. */
-        rule({ state: 'placed-top' }, { own: { travel: token('space-2xs') } }),
+        rule({ state: 'placedTop' }, { own: { travel: token('space-2xs') } }),
         rule({ part: { 'data-placed': true } }, { opacity: 1, scale: 1, transform: 'none' }),
         /* Out of the near edge, and out of the arrow where there is one. */
         rule(
-          { state: 'placed-top' },
+          { state: 'placedTop' },
           { transformOrigin: [measured('floating-arrow-x', '50%'), '100%'] },
         ),
         rule(
-          { state: 'placed-bottom' },
+          { state: 'placedBottom' },
           { transformOrigin: [measured('floating-arrow-x', '50%'), 0] },
         ),
         rule(
-          { state: 'placed-left' },
+          { state: 'placedLeft' },
           { transformOrigin: ['100%', measured('floating-arrow-y', '50%')] },
         ),
         rule(
-          { state: 'placed-right' },
+          { state: 'placedRight' },
           { transformOrigin: [0, measured('floating-arrow-y', '50%')] },
         ),
         rule([{ reducedMotion: true }, { part: { 'data-placed': true }, reducedMotion: true }], {
@@ -145,18 +145,18 @@ export default styles(
           rotate: '45deg',
         }),
         /* Physical sides, as a placement is, in either direction. */
-        rule({ dir: 'ltr', state: 'placed-bottom' }, { borderInlineStart: own.edge }),
-        rule({ dir: 'rtl', state: 'placed-bottom' }, { borderInlineEnd: own.edge }),
-        rule({ state: 'placed-bottom' }, { borderBlockStart: own.edge }),
-        rule({ dir: 'ltr', state: 'placed-top' }, { borderInlineEnd: own.edge }),
-        rule({ dir: 'rtl', state: 'placed-top' }, { borderInlineStart: own.edge }),
-        rule({ state: 'placed-top' }, { borderBlockEnd: own.edge }),
-        rule({ dir: 'ltr', state: 'placed-right' }, { borderInlineStart: own.edge }),
-        rule({ dir: 'rtl', state: 'placed-right' }, { borderInlineEnd: own.edge }),
-        rule({ state: 'placed-right' }, { borderBlockEnd: own.edge }),
-        rule({ dir: 'ltr', state: 'placed-left' }, { borderInlineEnd: own.edge }),
-        rule({ dir: 'rtl', state: 'placed-left' }, { borderInlineStart: own.edge }),
-        rule({ state: 'placed-left' }, { borderBlockStart: own.edge }),
+        rule({ dir: 'ltr', state: 'placedBottom' }, { borderInlineStart: own.edge }),
+        rule({ dir: 'rtl', state: 'placedBottom' }, { borderInlineEnd: own.edge }),
+        rule({ state: 'placedBottom' }, { borderBlockStart: own.edge }),
+        rule({ dir: 'ltr', state: 'placedTop' }, { borderInlineEnd: own.edge }),
+        rule({ dir: 'rtl', state: 'placedTop' }, { borderInlineStart: own.edge }),
+        rule({ state: 'placedTop' }, { borderBlockEnd: own.edge }),
+        rule({ dir: 'ltr', state: 'placedRight' }, { borderInlineStart: own.edge }),
+        rule({ dir: 'rtl', state: 'placedRight' }, { borderInlineEnd: own.edge }),
+        rule({ state: 'placedRight' }, { borderBlockEnd: own.edge }),
+        rule({ dir: 'ltr', state: 'placedLeft' }, { borderInlineEnd: own.edge }),
+        rule({ dir: 'rtl', state: 'placedLeft' }, { borderInlineStart: own.edge }),
+        rule({ state: 'placedLeft' }, { borderBlockStart: own.edge }),
       ]),
       on(
         ['surface', 'arrow'],

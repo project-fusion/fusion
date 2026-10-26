@@ -123,8 +123,8 @@ type TypeOf<Value> =
         ? 'number'
         : 'string'
 
-/** The props as the builder form lists them, each by its attribute's name. */
-type PropsList<Props> = readonly {
+/** The props as the intermediate form lists them, each by its attribute's name. */
+export type PropsList<Props> = readonly {
   readonly [Key in keyof Props & string]: {
     readonly name: Kebab<Key>
     readonly type: TypeOf<Props[Key]>
@@ -153,20 +153,20 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly state: { readonly [Key in States[number] as Camel<Key>]: Read }
   /** Whether the slot `x` holds something, which a `<Wrap when>` and a `<View hidden>` read. */
   readonly slots: Readonly<Record<string, Read>>
-  /** A value the stack computes, by its field: `stack.label` is the words of the page showing. */
-  readonly stack: Computes<'drilled' | 'label'>
-  /** What a copy computes: whether it copied or failed, and the words it says and tells. */
-  readonly copy: Computes<'copied' | 'failed' | 'says' | 'told'>
+  /** A value the stack computes, by its field: `stack.title` is the words of the page showing. */
+  readonly stack: Computes<'drilled' | 'title'>
+  /** What a copy computes: whether it copied or failed, the words it is named by, and its status. */
+  readonly copy: Computes<'copied' | 'failed' | 'label' | 'status'>
   /** Whether a countdown is paused. */
   readonly countdown: Computes<'paused'>
   /** Whether a delay is still running. */
-  readonly delay: Computes<'waiting'>
-  /** Whether a notice waits to be shown. */
-  readonly notice: Computes<'waiting'>
+  readonly delay: Computes<'pending'>
+  /** Whether a notice is held back past the stack's `maxVisible`. */
+  readonly notice: Computes<'held'>
   /** Whether a stack of notices shows one. */
   readonly notices: Computes<'showing'>
-  /** Whether a queue holds one waiting. */
-  readonly queue: Computes<'waiting'>
+  /** Whether the element waits its turn in its queue. */
+  readonly queue: Computes<'queued'>
   /** The list of sections an element's sections give it. */
   readonly sections: Computes<'list'>
   /** What a tour's stop computes, and the words of its Back, Next, and Skip. */
@@ -177,7 +177,7 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly total: Computes<'holds'>
   /** What a tour computes, and the lit box's lengths. */
   readonly tour: Computes<'lit' | 'veiled'> & {
-    readonly spot: Computes<'height' | 'width' | 'x' | 'y'>
+    readonly spotlight: Computes<'height' | 'width' | 'x' | 'y'>
   }
   /** A field of the entry a copy of a repeat over a list draws, `entry['depth-2']` where it is no name. */
   readonly entry: Readonly<Record<string, Read>>
@@ -185,7 +185,7 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly index: Read
 }
 
-/** The keys a source written with `render` passes through as the builder form has them. */
+/** The features a source declares, each an object of its fields. */
 type Passed = Omit<Headless, 'derived' | 'events' | 'item' | 'name' | 'props' | 'states' | 'tree'>
 
 /** A source written with `render`, typed so a style table is checked against its props and states. */
@@ -263,10 +263,9 @@ export interface Member {
  * Pressing the element chooses it where a `<Pressable>` in its render says
  * `chooses`, which `helix family` reads from the render, so it is said once.
  */
-export const set = (
-  of: string,
-  extra: Omit<NonNullable<Headless['item']>, 'chooses' | 'of'> = {},
-): Member => ({ item: { of, ...extra } })
+export const set = (of: string, extra: Omit<NonNullable<Headless['item']>, 'of'> = {}): Member => ({
+  item: { of, ...extra },
+})
 
 const spec = <Type extends PropType>(
   type: Type,

@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { inherit, mix, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -48,11 +48,11 @@ export default styles(
       radius: null,
     }),
     own: ['tag-color', 'tag-edge', 'tag-fill', 'tag-height', 'tag-inset', 'tag-label', 'tag-text'],
-    props: [
-      prop('emphasis', ['outlined', 'solid', 'subtle']),
-      prop('shape', ['pill']),
-      prop('tone', ['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
-    ],
+    props: {
+      emphasis: oneOf(['outlined', 'solid', 'subtle']),
+      shape: oneOf(['pill']),
+      tone: oneOf(['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
+    },
     stylesheet: 'tag/root/tag-root.generated.css',
   },
   ({ hook, on, own, rule, variants }) => [

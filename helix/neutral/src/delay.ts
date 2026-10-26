@@ -13,24 +13,21 @@
  */
 export interface Delay {
   /** The prop that holds the wait, in milliseconds. */
-  readonly after: string
+  readonly duration: string
   /**
    * A prop whose change starts the wait again, as an image's `src`: a new
    * picture waits again before its placeholder shows.
    */
-  readonly again?: string
+  readonly restartOn?: string
   /**
    * A prop that, while it holds, stops the state from holding, and that
    * starts the wait again as it stops holding, as a loader's `idle`.
    */
-  readonly restarts?: string
+  readonly idleWhen?: string
   /**
-   * The state that holds while the wait runs, which `when()`, `bind()` and
-   * a rule's `state` read, as a loader is `waiting`. The source declares it
+   * The state that holds while the wait runs, which a render reads as
+   * `delay.pending` and a rule by its name, as a loader is `waiting`. The source declares it
    * in `states`.
    */
-  readonly waiting: string
+  readonly pending: string
 }
-
-/** A wait an element starts as it is drawn. */
-export const delay = (fields: Delay): Delay => fields

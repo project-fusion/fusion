@@ -14,7 +14,7 @@ const POPOVER: &str = "export default headless('popover', {
   events: [event('before-open', { cancelable: true }), event('before-close', { cancelable: true })],
   props: [prop('open', 'boolean'), prop('modal', 'boolean'), prop('placement', 'string')],
   states: ['open', 'placed-bottom', 'placed-left', 'placed-right', 'placed-top', 'aligned-end', 'aligned-start'],
-  toggle: toggle({ checked: 'open', closes: 'before-close', opens: 'before-open' }),
+  toggle: { onBeforeClose: 'beforeClose', onBeforeOpen: 'beforeOpen', prop: 'open' },
   tree: [
     region('trigger', { part: 'trigger' }),
     layer('surface', { anchor: 'trigger', modal: bind('modal'), open: bind('open'), placement: bind('placement'), role: 'dialog' }, [
@@ -27,7 +27,7 @@ const POPOVER: &str = "export default headless('popover', {
 const MENU: &str = "export default headless('menu', {
   props: [prop('open', 'boolean'), prop('presentation', ['auto', 'popover', 'sheet'])],
   states: ['open', 'sheet', 'placed-bottom', 'placed-left', 'placed-right', 'placed-top', 'aligned-end', 'aligned-start'],
-  toggle: toggle({ checked: 'open' }),
+  toggle: { prop: 'open' },
   tree: [
     region('trigger', { part: 'trigger' }),
     layer('surface', { anchor: 'trigger', arrow: 'arrow', open: bind('open'), presentation: bind('presentation'), role: 'menu' }, [
@@ -85,7 +85,7 @@ fn a_layer_reads_its_anchor_its_states_and_its_toggle() {
         "export default headless('popover', {
           props: [prop('open', 'boolean'), prop('shown', 'boolean')],
           states: [],
-          toggle: toggle({ checked: 'shown' }),
+          toggle: { prop: 'shown' },
           tree: [layer('surface', { anchor: 'trigger', open: bind('open') }, [region('default')])],
         })",
         "",
@@ -109,7 +109,7 @@ fn a_layer_reads_its_anchor_its_states_and_its_toggle() {
         "export default headless('popover', {
           props: [prop('open', 'boolean')],
           states: ['open', 'placed-bottom', 'placed-left', 'placed-right', 'placed-top', 'aligned-end', 'aligned-start'],
-          toggle: toggle({ checked: 'open' }),
+          toggle: { prop: 'open' },
           tree: [layer('surface', { anchor: 'content', open: bind('open') }, [box('content', {}, [region('default')])])],
         })",
         "",
@@ -126,7 +126,7 @@ fn a_toggle_that_opens_a_layer_needs_no_press() {
         "export default headless('dialog', {
           props: [prop('open', 'boolean')],
           states: ['open'],
-          toggle: toggle({ checked: 'open' }),
+          toggle: { prop: 'open' },
           tree: [layer('surface', { modal: true, open: bind('open') }, [region('default')])],
         })",
         "",
@@ -207,7 +207,7 @@ fn a_layer_placed_against_a_target_binds_the_prop_and_lands_in_the_placed_states
         "export default headless('tour-stop', {
           props: [prop('open', 'boolean'), prop('for', 'string')],
           states: ['open'],
-          toggle: toggle({ checked: 'open' }),
+          toggle: { prop: 'open' },
           tree: [layer('surface', { open: bind('open'), target: bind('for') }, [region('default')])],
         })",
         "",
@@ -308,7 +308,7 @@ fn a_layer_binds_its_offsets_its_flip_and_its_hint_and_is_another_part_while_a_s
           derived: { hint: derive('tooltip-hint') },
           props: [prop('content', 'string'), prop('flip', 'boolean'), prop('offset', 'number'), prop('open', 'boolean'), prop('persist', 'boolean')],
           states: ['open', 'placed-bottom', 'placed-left', 'placed-right', 'placed-top', 'aligned-end', 'aligned-start'],
-          toggle: toggle({ checked: 'open' }),
+          toggle: { prop: 'open' },
           tree: [
             wrap('trigger', { platform: 'native', while: true }, [region('default')]),
             layer('surface', { also: { 'surface-top': bind('placed-top') }, anchor: 'trigger', flip: bind('flip'), hint: bind('hint'), offset: bind('offset'), open: bind('open'), presses: pick('persist', { true: 'none' }, 'close'), role: 'tooltip' }, [
@@ -335,7 +335,7 @@ fn a_layer_binds_its_offsets_its_flip_and_its_hint_and_is_another_part_while_a_s
         "export default headless('tooltip', {
           props: [prop('open', 'boolean')],
           states: ['open', 'placed-bottom', 'placed-left', 'placed-right', 'placed-top', 'aligned-end', 'aligned-start'],
-          toggle: toggle({ checked: 'open' }),
+          toggle: { prop: 'open' },
           tree: [
             region('trigger', { part: 'trigger' }),
             layer('surface', { also: { 'surface-top': bind('placed-top') }, anchor: 'trigger', open: bind('open') }, [region('default')]),
@@ -352,7 +352,7 @@ fn a_band_stands_under_its_anchor_on_no_side_so_it_declares_no_placed_states() {
         "export default headless('popover', {
           props: [prop('open', 'boolean')],
           states: ['open'],
-          toggle: toggle({ checked: 'open' }),
+          toggle: { prop: 'open' },
           tree: [
             region('trigger', { part: 'trigger' }),
             layer('surface', { anchor: 'trigger', band: true, enters: 'down', open: bind('open'), presses: 'toggle', returns: 'dismissed' }, [region('default')]),
@@ -367,7 +367,7 @@ fn a_band_stands_under_its_anchor_on_no_side_so_it_declares_no_placed_states() {
 fn a_stack_of_messages_opens_its_notice_on_what_it_holds_with_no_toggle_or_open_state() {
     let stack = family(
         "export default headless('toast', {
-          notices: notices({ max: 'max-visible', showing: 'showing' }),
+          notices: { maxVisible: 'maxVisible', showing: 'showing' },
           props: [prop('max-visible', 'number')],
           states: [],
           tree: [layer('region', { closedby: 'none', notice: true, open: bind('showing') }, [region('default')])],

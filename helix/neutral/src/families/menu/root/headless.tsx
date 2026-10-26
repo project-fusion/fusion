@@ -13,7 +13,7 @@ import {
   Wrap,
   web,
 } from '../../../render.js'
-import { bind, collection, derive, stack, toggle } from '../../../tree.js'
+import { bind, derive } from '../../../tree.js'
 
 /**
  * Menu's headless tier: a panel of rows that opens from its trigger, opened
@@ -119,17 +119,17 @@ export default headless('menu', {
     toggle: bare(['newState', 'oldState']),
   },
   states: [
-    'aligned-end',
-    'aligned-start',
+    'alignedEnd',
+    'alignedStart',
     'drilled',
     'entering',
     'exiting',
     'mark',
     'open',
-    'placed-bottom',
-    'placed-left',
-    'placed-right',
-    'placed-top',
+    'placedBottom',
+    'placedLeft',
+    'placedRight',
+    'placedTop',
     'settled',
     'sheet',
     'start',
@@ -147,20 +147,21 @@ export default headless('menu', {
     started: derive('menu-start'),
     status: derive('menu-status'),
   },
-  collection: collection({
-    after: 'change',
-    closes: { event: 'before-select', while: 'close-on-select' },
-    keys: { chooses: false, keeps: ['ArrowLeft', 'ArrowRight'], wrap: true },
+  collection: {
+    closeOn: 'beforeSelect',
+    closeWhen: 'closeOnSelect',
+    keys: { itemKeys: ['ArrowLeft', 'ArrowRight'], loop: true, selectionFollowsFocus: false },
     mixes: true,
-  }),
-  stack: stack({ back: 'back', drilled: 'drilled', label: 'page-label', top: 'name' }),
-  toggle: toggle({
-    changes: 'toggle',
-    checked: 'open',
-    closes: 'before-close',
-    initial: 'default-open',
-    opens: 'before-open',
-  }),
+    onChange: 'change',
+  },
+  stack: { back: 'back', drilled: 'drilled', title: 'pageLabel', topTitle: 'name' },
+  toggle: {
+    defaultProp: 'defaultOpen',
+    onBeforeClose: 'beforeClose',
+    onBeforeOpen: 'beforeOpen',
+    onToggle: 'toggle',
+    prop: 'open',
+  },
   render: ({ derived, props, stack, state }) => (
     <>
       {/* The trigger's own box on a phone, which the panel is placed against.
@@ -178,7 +179,7 @@ export default headless('menu', {
         enters="press"
         hint={derived.holdHint}
         holds={derived.holds}
-        label={stack.label}
+        label={stack.title}
         offset={props.offset}
         open={props.open}
         part="surface"
@@ -202,7 +203,7 @@ export default headless('menu', {
               />
             </Pressable>
             <View part="title">
-              <Text part="title-words">{stack.label}</Text>
+              <Text part="title-words">{stack.title}</Text>
             </View>
           </View>
         )}

@@ -1,5 +1,5 @@
 import { Announce, headless, number, oneOf, Pressable, Slot, View } from '../../../render.js'
-import { countdown, derive, notice, toggle } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * Toast Item's headless tier: one message in a toast's stack.
@@ -64,9 +64,9 @@ export default headless('toast-item', {
     urgent: derive('toast-item-urgent'),
     words: derive('toast-item-words'),
   },
-  countdown: countdown({ after: 'duration', done: 'dismiss', paused: 'paused', waits: 'waiting' }),
-  notice: notice({ part: 'item', waiting: 'waiting' }),
-  toggle: toggle({ checked: 'open', closes: 'dismiss', escapes: true }),
+  countdown: { duration: 'duration', onDone: 'dismiss', paused: 'paused', waitWhile: 'waiting' },
+  notice: { held: 'waiting', part: 'item' },
+  toggle: { closeOnEscape: true, onBeforeClose: 'dismiss', prop: 'open' },
   render: ({ derived, props, state }) => (
     <>
       <View part="item">

@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { first, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -38,7 +38,7 @@ export default styles(
       position: 'center',
       radius: token('radii-md'),
     },
-    props: [prop('shape', ['rounded'])],
+    props: { shape: oneOf(['rounded']) },
     stylesheet: 'image/root/image-root.generated.css',
   },
   ({ hook, on, rule }) => [

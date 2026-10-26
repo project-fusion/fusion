@@ -36,7 +36,7 @@ use crate::family::api::{self, Attribute, Binding, Node};
 use crate::family::read::Lit;
 
 /// The keys a `when` reads as the vocabulary's own conditions.
-const RESERVED: &[&str] = &[
+pub(super) const RESERVED: &[&str] = &[
     "active",
     "also",
     "canHover",

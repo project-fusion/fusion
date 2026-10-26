@@ -25,8 +25,5 @@ export interface Clock {
    * afresh, as a date's `date` and `relative` do. A change of any other prop
    * draws again from the last tick, as the web does. None names every prop.
    */
-  readonly restarts?: readonly string[]
+  readonly restartOn?: readonly string[]
 }
-
-/** A tick on the time of day. */
-export const clock = (fields: Clock): Clock => fields

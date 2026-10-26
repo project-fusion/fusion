@@ -9,7 +9,7 @@
  * toast's region holds its items:
  *
  * ```ts
- * notices({ hears: 'dismiss', max: 'max-visible', showing: 'showing', toward: 'swipe-direction' })
+ * notices: { bubbles: 'dismiss', maxVisible: 'maxVisible', showing: 'showing', swipeDirection: 'swipeDirection' }
  * ```
  *
  * **Its messages are the elements drawn inside it whose source declares a
@@ -23,13 +23,13 @@ export interface Notices {
    * handler, which a handler on the element may refuse, as the web's event
    * bubbles from a message to its region.
    */
-  readonly hears?: string
+  readonly bubbles?: string
   /**
    * The prop that says how many messages show at once. Past that many open
    * messages, in the order they were drawn, a message waits until one before
    * it goes. Unset, every message shows.
    */
-  readonly max?: string
+  readonly maxVisible?: string
   /**
    * The name of the value the element computes, whether one of its messages
    * shows, which its layer's `open` binds.
@@ -39,21 +39,18 @@ export interface Notices {
    * The prop that names the edge a swipe dismisses a message toward: `end`,
    * the end of the line, `start`, `top`, or `bottom`. Unset is `end`.
    */
-  readonly toward?: string
+  readonly swipeDirection?: string
 }
-
-/** The messages passed into the element. */
-export const notices = (fields: Notices): Notices => fields
 
 /**
  * One message of the `notices` around it, as a toast item in its region:
  *
  * ```ts
- * notice({ part: 'item', waiting: 'waiting' })
+ * notice: { held: 'waiting', part: 'item' }
  * ```
  *
- * **It waits while the element around holds it back** past its `max`, in the
- * state `waiting`, which a countdown's `waits` reads, so its clock starts as
+ * **It waits while the element around holds it back** past its `maxVisible`,
+ * in the state `held` names, which a countdown's `waitWhile` reads, so its clock starts as
  * it shows. **A touch swipes its `part` toward the edge the element around
  * names**, and past halfway, or quickly, asks its toggle to close, as its
  * dismiss button does. A refused close springs it back. Outside any
@@ -63,8 +60,5 @@ export interface Notice {
   /** The part a touch swipes. */
   readonly part: string
   /** The state that holds while the element around holds the message back. */
-  readonly waiting: string
+  readonly held: string
 }
-
-/** One message of the `notices` around it. */
-export const notice = (fields: Notice): Notice => fields

@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { first, hookOf, list, mix, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import button from './headless.js'
 
 /**
@@ -57,11 +57,11 @@ export default styles(
       'button-tone-hover',
       'button-turn',
     ],
-    props: [
-      prop('emphasis', ['ghost', 'outlined', 'solid', 'subtle']),
-      prop('tone', ['accent', 'danger', 'neutral', 'primary']),
-      prop('width', ['auto', 'full']),
-    ],
+    props: {
+      emphasis: oneOf(['ghost', 'outlined', 'solid', 'subtle']),
+      tone: oneOf(['accent', 'danger', 'neutral', 'primary']),
+      width: oneOf(['auto', 'full']),
+    },
     stylesheet: 'button/root/button-root.generated.css',
   },
   ({ hook, keyframes, on, own, rule, variants }) => [

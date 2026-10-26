@@ -46,12 +46,12 @@ import { bind, derive } from '../../../tree.js'
  */
 export default headless('menu-item', {
   memberOf: set('menu', {
-    before: 'before-check',
     checkable: 'checkable',
     checked: 'checked',
-    closes: 'close-on-select',
+    closeWhen: 'closeOnSelect',
     exclusive: 'exclusive',
-    page: 'submenu',
+    onBeforeChange: 'beforeCheck',
+    pageSlot: 'submenu',
   }),
   props: {
     checkable: false,
@@ -78,13 +78,13 @@ export default headless('menu-item', {
     'disabled',
     'expanded',
     'highlighted',
-    'placed-bottom',
-    'placed-left',
-    'placed-right',
-    'placed-top',
+    'placedBottom',
+    'placedLeft',
+    'placedRight',
+    'placedTop',
     'settled',
-    'submenu-mark',
-    'submenu-start',
+    'submenuMark',
+    'submenuStart',
   ],
   derived: {
     described: bind('description'),

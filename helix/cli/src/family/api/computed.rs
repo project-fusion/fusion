@@ -36,25 +36,29 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
     let mut read = Vec::new();
     let mut push = |path: &str, name: &str| read.push((path.to_owned(), name.to_owned()));
     for (key, value) in fields {
+        let Some((key, value)) = super::spelling::feature(key, value)? else {
+            continue;
+        };
+        let value = &value;
         match key.as_str() {
             "copy" => {
                 let copy = copy::copy(value)?;
                 push("copy.copied", &copy.copied);
                 push("copy.failed", &copy.failed);
-                push("copy.says", &copy.says);
-                push("copy.told", &copy.told);
+                push("copy.label", &copy.says);
+                push("copy.status", &copy.told);
             }
             "countdown" => push("countdown.paused", &countdown::countdown(value)?.paused),
-            "delay" => push("delay.waiting", &delay::delay(value)?.waiting),
-            "notice" => push("notice.waiting", &notices::notice(value)?.waiting),
+            "delay" => push("delay.pending", &delay::delay(value)?.waiting),
+            "notice" => push("notice.held", &notices::notice(value)?.waiting),
             "notices" => push("notices.showing", &notices::notices(value)?.showing),
-            "queue" => push("queue.waiting", &countdown::queue(value)?.waiting),
+            "queue" => push("queue.queued", &countdown::queue(value)?.waiting),
             "sections" => push("sections.list", &sections::sections(value)?.list),
             "stack" => {
                 let stack = stack::stack(value)?;
                 for (path, name) in [
                     ("stack.drilled", &stack.drilled),
-                    ("stack.label", &stack.label),
+                    ("stack.title", &stack.label),
                 ] {
                     if let Some(name) = name {
                         push(path, name);
@@ -90,7 +94,10 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
                 push("tour.lit", &tour.lit);
                 push("tour.veiled", &tour.veiled);
                 for one in ["height", "width", "x", "y"] {
-                    push(&format!("tour.spot.{one}"), &format!("{}-{one}", tour.spot));
+                    push(
+                        &format!("tour.spotlight.{one}"),
+                        &format!("{}-{one}", tour.spot),
+                    );
                 }
             }
             _ => {}
@@ -111,10 +118,10 @@ mod tests {
     #[test]
     fn each_feature_value_a_render_reads_is_one_the_compiler_computes() {
         for (key, source) in [
-            ("copy", "copy({ after: 'a', copied: 'c', failed: 'f', fails: 'x', says: 's', sends: 'e', text: 't', told: 'o', words: { copied: 'C', failed: 'F', resting: 'R' } })"),
-            ("stop", "stop({ asks: 'a', back: 'b', counted: 'c', current: 'u', first: 'f', last: 'l', name: 'n', next: 'x', place: 'p', reach: 'r', said: 's', shown: 'h', skip: 'k', target: 't', words: 'words' })"),
-            ("tour", "tour({ asks: 'a', before: 'b', completes: 'c', index: 'i', lit: 'l', moves: 'm', preparing: 'p', spot: 'spot', veiled: 'v', waiting: 'w' })"),
-            ("total", "total({ holds: 'h', into: 'i', of: 'o', prop: 'p' })"),
+            ("copy", "{ copied: 'c', duration: 'a', failed: 'f', label: 's', labels: { copied: 'cc', failed: 'ff', idle: 'r' }, onCopy: 'e', onError: 'x', prop: 't', status: 'o' }"),
+            ("stop", "{ back: 'b', counted: 'c', current: 'u', first: 'f', last: 'l', name: 'n', next: 'x', onAsk: 'a', place: 'p', reach: 'r', said: 's', shown: 'h', skip: 'k', target: 't', words: 'words' }"),
+            ("tour", "{ lit: 'l', onAsk: 'a', onBeforeChange: 'b', onChange: 'm', onComplete: 'c', preparing: 'p', prop: 'i', spotlight: 'spot', veiled: 'v', waiting: 'w' }"),
+            ("total", "{ holds: 'h', itemProp: 'p', of: 'o', prop: 'i' }"),
         ] {
             let lit = default_export(&format!("export default {source}")).unwrap();
             let read: BTreeSet<String> = reads(&[(key.to_owned(), lit.clone())])
@@ -122,6 +129,7 @@ mod tests {
                 .into_iter()
                 .map(|(_, name)| name)
                 .collect();
+            let (_, lit) = super::super::spelling::feature(key, &lit).unwrap().unwrap();
             let computed: BTreeSet<String> = match key {
                 "copy" => super::copy::copy(&lit).unwrap().computed().map(str::to_owned).into(),
                 "stop" => super::tour::stop(&lit).unwrap().computed().map(str::to_owned).collect(),

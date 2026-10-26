@@ -137,6 +137,8 @@ impl Names {
         place: (&str, &str, Option<&str>),
     ) -> Result<Lit, String> {
         let (at, group, platform) = place;
+        let when = when.map(spelled).transpose()?;
+        let when = when.as_ref();
         let named = self.namespace(when, target)?;
         let mut when = split(named.as_ref().or(when))?;
         if let Some(platform) = platform {
@@ -191,12 +193,13 @@ impl Names {
         arguments: &[Lit],
         place: (&str, &str, Option<&str>),
     ) -> Result<Vec<Lit>, String> {
-        let [Lit::Text(prop), Lit::Object(entries)] = arguments else {
+        let [Lit::Text(written), Lit::Object(entries)] = arguments else {
             return Err(
                 "`variants()` takes a prop's name and an object of its values' declarations"
                     .to_owned(),
             );
         };
+        let prop = &crate::family::api::spelling::name_of("variants", written)?;
         if target.web {
             return Err("`variants()` is not taken on a web-only target".to_owned());
         }
@@ -208,7 +211,7 @@ impl Names {
                         "`variants('{prop}')` gives `{value}` an object of declarations"
                     ));
                 }
-                let when = Lit::Object(vec![(prop.clone(), Lit::Text(value.clone()))]);
+                let when = Lit::Object(vec![(written.clone(), Lit::Text(value.clone()))]);
                 self.rule(target, Some(&when), set, place)
             })
             .collect()
@@ -233,6 +236,54 @@ impl Names {
             ("frames".to_owned(), Lit::Array(frames)),
             ("keyframes".to_owned(), name.clone()),
         ]))
+    }
+}
+
+/// A `when` with each prop and state it names, written in camelCase as the
+/// headless source declares it, in the web's hyphenated name. The
+/// vocabulary's own conditions, a part's `data-` attribute, and the parts,
+/// regions, and attributes a condition names keep their spelling.
+fn spelled(when: &Lit) -> Result<Lit, String> {
+    let name = |name: &str| crate::family::api::spelling::name_of("when", name);
+    match when {
+        Lit::Array(each) => each
+            .iter()
+            .map(spelled)
+            .collect::<Result<_, _>>()
+            .map(Lit::Array),
+        Lit::Object(fields) => fields
+            .iter()
+            .map(|(key, value)| {
+                if key == "state" {
+                    let value = match value {
+                        Lit::Text(state) => Lit::Text(name(state)?),
+                        Lit::Array(states) => Lit::Array(
+                            states
+                                .iter()
+                                .map(|state| match state {
+                                    Lit::Text(state) => name(state).map(Lit::Text),
+                                    other => Ok(other.clone()),
+                                })
+                                .collect::<Result<_, _>>()?,
+                        ),
+                        Lit::Object(states) => Lit::Object(
+                            states
+                                .iter()
+                                .map(|(state, holds)| Ok((name(state)?, holds.clone())))
+                                .collect::<Result<_, String>>()?,
+                        ),
+                        other => other.clone(),
+                    };
+                    return Ok((key.clone(), value));
+                }
+                if super::namespace::RESERVED.contains(&key.as_str()) || key.starts_with("data-") {
+                    return Ok((key.clone(), value.clone()));
+                }
+                Ok((name(key)?, value.clone()))
+            })
+            .collect::<Result<_, String>>()
+            .map(Lit::Object),
+        other => Ok(other.clone()),
     }
 }
 

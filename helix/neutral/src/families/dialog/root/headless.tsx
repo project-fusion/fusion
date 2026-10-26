@@ -10,7 +10,7 @@ import {
   Slot,
   View,
 } from '../../../render.js'
-import { derive, toggle } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * Dialog's headless tier: a modal window over the page, opened on `open`.
@@ -70,14 +70,14 @@ export default headless('dialog', {
     name: derive('dialog-name'),
     said: derive('dialog-said'),
   },
-  toggle: toggle({
-    changes: 'toggle',
-    checked: 'open',
-    closed: 'close',
-    closes: 'before-close',
-    initial: 'default-open',
-    opens: 'before-open',
-  }),
+  toggle: {
+    defaultProp: 'defaultOpen',
+    onBeforeClose: 'beforeClose',
+    onBeforeOpen: 'beforeOpen',
+    onClose: 'close',
+    onToggle: 'toggle',
+    prop: 'open',
+  },
   render: ({ derived, props }) => (
     <Layer
       closedby={derived.dismissal}

@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { difference, fn, list, measured, mix, product, sum, token } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import tabs from './headless.js'
 
 /**
@@ -49,11 +49,11 @@ export default styles(
       'tabs-panel-padding-inline-start',
       'tabs-rule',
     ],
-    props: [
-      prop('dismiss-marks', ['always', 'hover']),
-      prop('emphasis', ['subtle']),
-      prop('width', ['auto', 'full']),
-    ],
+    props: {
+      dismissMarks: oneOf(['always', 'hover']),
+      emphasis: oneOf(['subtle']),
+      width: oneOf(['auto', 'full']),
+    },
     stylesheet: 'tabs/root/tabs-root.generated.css',
   },
   ({ hook, on, own, rule }) => [
@@ -113,7 +113,7 @@ export default styles(
       /* `dismiss-marks="hover"`: each tab reads this and shows its mark only while it
          is current, hovered, or holds focus. A private value, inherited by the
          tabs, because the set decides and each tab draws. */
-      rule({ 'dismiss-marks': 'hover' }, { own: { dismissRest: 0 } }),
+      rule({ dismissMarks: 'hover' }, { own: { dismissRest: 0 } }),
     ]),
     /* The tabs stack above the mark. */
     on({ slotted: 'helix-tab' }, [

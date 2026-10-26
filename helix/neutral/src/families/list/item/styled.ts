@@ -71,13 +71,13 @@ export default styles(
          around it. */
       rule({ dragging: true }, { opacity: hook.draggingOpacity }),
       rule(
-        { state: 'drop-before' },
+        { state: 'dropBefore' },
         {
           boxShadow: ['inset', 0, hook.dropIndicatorSize, 0, 0, hook.dropIndicatorColor],
         },
       ),
       rule(
-        { state: 'drop-after' },
+        { state: 'dropAfter' },
         {
           boxShadow: [
             'inset',

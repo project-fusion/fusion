@@ -1,7 +1,7 @@
 import printEconomy from '../../../fragments/print-economy.js'
+import { oneOf } from '../../../render.js'
 import { inherit, native, quote, token } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -38,23 +38,20 @@ export default styles(
       markSize: token('text-3xl'),
       size: token('text-xl'),
     },
-    props: [
-      prop('text-align', ['start', 'center', 'end']),
-      prop('text-wrap', ['balance', 'pretty']),
-    ],
+    props: { textAlign: oneOf(['start', 'center', 'end']), textWrap: oneOf(['balance', 'pretty']) },
     stylesheet: 'blockquote/root/blockquote-root.generated.css',
   },
   ({ hook, include, on, rule, variants }) => [
     on('host', [
       rule({ display: 'block' }),
       /* Logical values, so `end` is the far edge in a right-to-left column too. */
-      variants('text-align', {
+      variants('textAlign', {
         start: { textAlign: 'start' },
         center: { textAlign: 'center' },
         end: { textAlign: 'end' },
       }),
       /* Inherited by the passage and the attribution alike. */
-      variants('text-wrap', {
+      variants('textWrap', {
         balance: { textWrap: 'balance' },
         pretty: { textWrap: 'pretty' },
       }),
@@ -87,8 +84,8 @@ export default styles(
          stays close under it. */
       rule(
         [
-          { marks: true, 'text-align': 'center' },
-          { marks: true, 'text-align': 'end' },
+          { marks: true, textAlign: 'center' },
+          { marks: true, textAlign: 'end' },
         ],
         {
           display: 'block',
