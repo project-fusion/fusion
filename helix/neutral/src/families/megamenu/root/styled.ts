@@ -176,7 +176,7 @@ export default styles(
           ),
         }),
         rule({ open: true }, { clipPath: fn('inset', [0, out, out, out]) }),
-        rule({ entering: true, open: true }, { clipPath: fn('inset', [0, out, '100%', out]) }),
+        rule({ startingStyle: true, open: true }, { clipPath: fn('inset', [0, out, '100%', out]) }),
         /* A card grows out of the corner it hangs from, rightwards and
            downwards, where a band sweeps down across its whole width. */
         web([
@@ -191,7 +191,7 @@ export default styles(
             { clipPath: fn('inset', [0, out, out, out]) },
           ),
           rule(
-            { entering: true, open: true, variant: { not: 'band' } },
+            { startingStyle: true, open: true, variant: { not: 'band' } },
             { clipPath: fn('inset', [0, '100%', '100%', out]) },
           ),
         ]),
@@ -213,8 +213,8 @@ export default styles(
         }),
         rule(
           [
-            { entering: true, open: true, variant: 'band' },
-            { entering: true, state: ['narrow', 'open'] },
+            { startingStyle: true, open: true, variant: 'band' },
+            { startingStyle: true, state: ['narrow', 'open'] },
           ],
           { clipPath: fn('inset', [0, 0, '100%', 0]) },
         ),
@@ -223,7 +223,7 @@ export default styles(
         native([
           rule({ ...band, paddingInline: token('space-xl') }),
           rule({ open: true }, { clipPath: fn('inset', [0, 0, out, 0]) }),
-          rule({ entering: true, open: true }, { clipPath: fn('inset', [0, 0, '100%', 0]) }),
+          rule({ startingStyle: true, open: true }, { clipPath: fn('inset', [0, 0, '100%', 0]) }),
         ]),
         /* A column does not shrink past `--megamenu-column-size`, so in a
            narrow page the groups stand in one column, to the bottom of the

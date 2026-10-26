@@ -44,7 +44,6 @@ pub(super) const RESERVED: &[&str] = &[
     "coarsePointer",
     "defined",
     "dir",
-    "entering",
     "filled",
     "focusVisible",
     "focusWithin",
@@ -64,6 +63,7 @@ pub(super) const RESERVED: &[&str] = &[
     "platform",
     "print",
     "reducedMotion",
+    "startingStyle",
     "state",
     "supports",
     "window",
@@ -183,6 +183,16 @@ impl Names {
         for (key, value) in fields {
             if key == "formDisabled" {
                 push(&mut read, "disabled", value.clone());
+            } else if key == "startingStyle" {
+                /* The values a part starts from as it is drawn, which the
+                intermediate form calls `entering`: a state may be named
+                `entering`, as a callout's is while it shows again. */
+                push(&mut read, "entering", value.clone());
+            } else if key == "entering" && self.source.is_none() {
+                return Err(
+                    "`entering` names a state, which a table reads by its name over a headless source written with `render`: the values a part starts from are `startingStyle`"
+                        .to_owned(),
+                );
             } else if key == "within" {
                 read = host(read, value)?;
             } else if self.source.is_none()

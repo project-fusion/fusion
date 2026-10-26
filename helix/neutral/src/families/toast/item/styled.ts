@@ -135,7 +135,7 @@ export default styles(
               transition: list(['opacity', normal, decelerate], ['translate', normal, decelerate]),
             },
           ),
-          rule({ entering: true, state: 'entering' }, { opacity: 0 }),
+          rule({ startingStyle: true, state: 'entering' }, { opacity: 0 }),
           rule({ closed: true }, { display: 'none' }),
         ]),
         rule([{ reducedMotion: true }, { reducedMotion: true, closed: true }], {

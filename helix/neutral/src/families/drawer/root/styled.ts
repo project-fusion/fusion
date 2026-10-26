@@ -91,7 +91,7 @@ export default styles(
           ),
         }),
         rule({ open: true }, { opacity: 1 }),
-        rule({ entering: true, open: true }, { opacity: 0 }),
+        rule({ startingStyle: true, open: true }, { opacity: 0 }),
         web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
       on('panel', [
@@ -226,7 +226,7 @@ export default styles(
           { transition: 'none', web: { userSelect: 'none' } },
         ),
         /* The slide in starts from past the edge. */
-        rule({ entering: true, open: true }, { transform: own.away }),
+        rule({ startingStyle: true, open: true }, { transform: own.away }),
         web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
       on('header', [rule({ flex: '0 0 auto' })]),
