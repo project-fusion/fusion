@@ -71,7 +71,7 @@ export default headless('tabs', {
         <Slot />
         <View
           ariaHidden
-          marks="chosen"
+          indicator
           part="indicator"
         >
           <Slot name="indicator" />

@@ -59,7 +59,6 @@ export default headless('drilldown-item', {
   render: ({ derived, props, send }) => (
     <>
       <Pressable
-        chooses
         describedby="description end"
         disabled={props.disabled}
         focusable-when-disabled
@@ -68,6 +67,7 @@ export default headless('drilldown-item', {
         part="item"
         popup={derived.popup}
         role={derived.rowRole}
+        selects
       >
         <Slot name="start" />
         <View part="label">

@@ -56,11 +56,11 @@ export default headless('megamenu-item', {
   states: ['hasDescription', 'hasIcon', 'settled'],
   render: ({ props, send }) => (
     <Pressable
-      chooses
       current={props.current}
       href={props.href}
       onPress={send.beforeSelect}
       part="link"
+      selects
     >
       <Slot
         name="icon"

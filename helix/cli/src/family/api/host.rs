@@ -50,12 +50,19 @@ pub fn host(lit: &Lit) -> Result<BTreeMap<String, Attribute>, String> {
     };
     entries
         .iter()
-        .map(|(key, value)| {
+        .map(|(written, value)| {
+            /* Out of a screen reader's reach is `ariaHidden`, as a node
+            writes it, which the intermediate form calls `decorative`. */
+            let key = match written.as_str() {
+                "ariaHidden" => "decorative",
+                "decorative" => return Err("`host.decorative` is written `ariaHidden`".to_owned()),
+                other => other,
+            };
             /* A range's reading, as a meter's and a progress bar's, and
             whether the host is busy or out of a screen reader's reach, as a
             skeleton's, are the host's too. */
             if !matches!(
-                key.as_str(),
+                key,
                 "busy"
                     | "decorative"
                     | "label"
@@ -66,13 +73,13 @@ pub fn host(lit: &Lit) -> Result<BTreeMap<String, Attribute>, String> {
                     | "valuetext"
             ) {
                 return Err(format!(
-                    "`host` takes `busy`, `decorative`, `label`, `role`, and a range's `valuemin`, `valuemax`, `valuenow` and `valuetext`, and `{key}` is none of them"
+                    "`host` takes `ariaHidden`, `busy`, `label`, `role`, and a range's `valuemin`, `valuemax`, `valuenow` and `valuetext`, and `{key}` is none of them"
                 ));
             }
             let value = super::spelling::bound(&format!("host.{key}"), value)?;
             let value = attribute(&value).map_err(|why| format!("`host`: `{key}` {why}"))?;
             vocabulary::attribute(NodeKind::Box, "host", key, &value)?;
-            Ok((key.clone(), value))
+            Ok((key.to_owned(), value))
         })
         .collect()
 }

@@ -131,17 +131,17 @@ export default headless('speed-dial', {
       </Wrap>
       <Layer
         anchor="anchor"
+        anchorPress={props.openOn === 'long-press' ? 'none' : 'toggle'}
         arrows
         closedby="any"
-        enters="press"
         hint={derived.holdHint}
-        holds={derived.holds}
+        initialFocus="press"
         label={derived.name}
+        longPress={derived.holds}
         offset={props.offset}
         open={props.open}
         part="actions"
         placement={props.placement}
-        presses={props.openOn === 'long-press' ? 'none' : 'toggle'}
         role="menu"
       >
         <Slot />

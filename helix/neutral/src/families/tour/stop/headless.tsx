@@ -123,14 +123,14 @@ export default headless('tour-stop', {
     <Layer
       arrow="arrow"
       closedby="any"
-      edge={derived.edge}
-      enters="press"
+      initialFocus="press"
       label={stop.name}
       offset={stop.reach}
       open={stop.shown}
       part="surface"
       placement={props.placement}
       role={props.type === 'dialog' ? 'dialog' : 'group'}
+      side={derived.edge}
       target={derived.aim}
     >
       <View

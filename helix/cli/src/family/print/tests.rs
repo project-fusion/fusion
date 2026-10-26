@@ -69,7 +69,7 @@ fn a_builder_source_prints_as_jsx_with_every_comment_where_it_stood() {
         "    /* What the row says. */\n    rowWords: derive('menu-hold-hint'),",
         "  total: { holds: 'holding', itemProp: 'value', of: 'row-item', prop: 'count' },",
         "      {/* The row itself. */}\n      <View\n        also={{ 'row-top': state.placedTop }}\n        /* Out of a screen reader's way. */\n        ariaHidden\n        part=\"row\"",
-        "        <Pressable\n          chooses\n          part=\"press\"\n        />",
+        "        <Pressable\n          part=\"press\"\n          selects\n        />",
         "        role={props.kind === 'raised' ? 'group' : 'presentation'}",
         "        style={{\n          '--row-count': props.count,\n        }}",
         "        {props.disabled ? (",

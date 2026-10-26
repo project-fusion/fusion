@@ -37,11 +37,11 @@ export default headless('navigation-item', {
   states: ['settled'],
   render: ({ props, send }) => (
     <Pressable
-      chooses
       current={props.current}
       href={props.href}
       onPress={send.beforeSelect}
       part="link"
+      selects
     >
       <Slot />
     </Pressable>

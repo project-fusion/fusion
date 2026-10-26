@@ -174,19 +174,19 @@ export default headless('menu', {
       </Wrap>
       <Layer
         anchor="trigger"
+        anchorPress={derived.holds ? 'none' : 'toggle'}
         arrows={derived.arrows}
         closedby="any"
-        enters="press"
         hint={derived.holdHint}
-        holds={derived.holds}
+        initialFocus="press"
         label={stack.title}
+        longPress={derived.holds}
         offset={props.offset}
         open={props.open}
         part="surface"
         placement={props.placement}
         presentation={props.presentation}
-        presses={derived.holds ? 'none' : 'toggle'}
-        returns="held"
+        restoreFocus="held"
         role="menu"
       >
         {state.drilled && (
