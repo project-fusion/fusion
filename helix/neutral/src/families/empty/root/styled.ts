@@ -18,18 +18,18 @@ export default styles(
   root,
   {
     prefix: 'empty',
-    hooks: [
-      'actions-gap',
-      'gap',
-      'heading-color',
-      'heading-size',
-      'icon-color',
-      'icon-size',
-      'message-color',
-      'message-measure',
-      'message-size',
-      'padding',
-    ],
+    hooks: {
+      actionsGap: token('space-sm'),
+      gap: token('space-sm'),
+      headingColor: token('color-foreground'),
+      headingSize: token('text-lg'),
+      iconColor: token('color-foreground-subtle'),
+      iconSize: token('size-icon-lg'),
+      messageColor: token('color-foreground-muted'),
+      messageMeasure: '46ch',
+      messageSize: token('text-sm'),
+      padding: token('space-2xl'),
+    },
     stylesheet: 'empty/root/empty-root.generated.css',
   },
   ({ hook, include, on, rule }) => [
@@ -38,23 +38,23 @@ export default styles(
         alignItems: 'center',
         display: 'flex',
         flexDirection: 'column',
-        gap: hook.gap(token('space-sm')),
-        padding: hook.padding(token('space-2xl')),
+        gap: hook.gap,
+        padding: hook.padding,
         textAlign: 'center',
       }),
     ]),
     /* The `lg` step, not a raw rem, so the icon moves with density. */
     on({ region: 'icon', slotted: '*' }, [
       rule({
-        '--icon-size': hook.iconSize(token('size-icon-lg')),
-        color: hook.iconColor(token('color-foreground-subtle')),
+        '--icon-size': hook.iconSize,
+        color: hook.iconColor,
       }),
     ]),
     /* A heading passed in is set as the one `heading` draws. */
     on({ region: 'heading', slotted: '*' }, [
       rule({
-        color: hook.headingColor(token('color-foreground')),
-        fontSize: hook.headingSize(token('text-lg')),
+        color: hook.headingColor,
+        fontSize: hook.headingSize,
         fontWeight: token('weight-semibold'),
         letterSpacing: token('tracking-tight'),
         margin: token('space-none'),
@@ -62,8 +62,8 @@ export default styles(
     ]),
     on('heading', [
       rule({
-        color: hook.headingColor(token('color-foreground')),
-        fontSize: hook.headingSize(token('text-lg')),
+        color: hook.headingColor,
+        fontSize: hook.headingSize,
         fontWeight: token('weight-semibold'),
         letterSpacing: token('tracking-tight'),
         margin: token('space-none'),
@@ -72,19 +72,17 @@ export default styles(
     /* The inherited half on the region, the rest on what is passed in. */
     on({ region: 'default' }, [
       rule({
-        color: hook.messageColor(token('color-foreground-muted')),
-        fontSize: hook.messageSize(token('text-sm')),
+        color: hook.messageColor,
+        fontSize: hook.messageSize,
       }),
     ]),
     /* The explanation runs to a measure even though the block is centered:
        centered text past about 50 characters loses the reader on the return
        sweep. */
     on({ region: 'default', slotted: '*' }, [
-      rule({ margin: token('space-none'), maxInlineSize: hook.messageMeasure('46ch') }),
+      rule({ margin: token('space-none'), maxInlineSize: hook.messageMeasure }),
     ]),
-    on({ region: 'actions', slotted: '*' }, [
-      rule({ marginBlockStart: hook.actionsGap(token('space-sm')) }),
-    ]),
+    on({ region: 'actions', slotted: '*' }, [rule({ marginBlockStart: hook.actionsGap })]),
     /* A notice on paper, and no panel. */
     include(printEconomy),
   ],

@@ -1,16 +1,5 @@
-import {
-  bind,
-  box,
-  derive,
-  event,
-  headless,
-  pressable,
-  prop,
-  region,
-  toggle,
-  unless,
-  when,
-} from '../../../tree.js'
+import { bare, cancelable, headless, Pressable, Slot, View } from '../../../render.js'
+import { derive, toggle } from '../../../tree.js'
 
 /**
  * Motion Toggle's headless tier: one toggle button that pauses every motion
@@ -43,26 +32,46 @@ import {
  * manifest says `helix-motion-toggle` has. The two glyphs are a phone's alone.
  */
 export default headless('motion-toggle', {
-  derived: { name: derive('motion-toggle-name') },
-  events: [
-    event('before-check', { cancelable: true, detail: ['checked'] }),
-    event('change', { bare: true }),
-  ],
-  props: [
-    prop('fallback-label', 'string', { default: 'Pause motion' }),
-    prop('label', 'string', { default: '' }),
-  ],
+  props: {
+    fallbackLabel: 'Pause motion',
+    label: '',
+  },
+  events: {
+    beforeCheck: cancelable(['checked']),
+    change: bare(),
+  },
   states: ['paused', 'settled'],
+  derived: {
+    name: derive('motion-toggle-name'),
+  },
   toggle: toggle({ after: 'change', before: 'before-check', held: 'page-motion' }),
-  tree: [
-    pressable('button', { label: bind('name'), role: 'button', toggles: true }, [
-      box('icon', {}, [
-        region('icon', {}, [
-          unless('paused', box('glyph', { decorative: true, glyph: 'pause', platform: 'native' })),
-          when('paused', box('glyph', { decorative: true, glyph: 'play', platform: 'native' })),
-        ]),
-      ]),
-      region('default'),
-    ]),
-  ],
+  render: ({ derived, state }) => (
+    <Pressable
+      label={derived.name}
+      part="button"
+      role="button"
+      toggles
+    >
+      <View part="icon">
+        <Slot name="icon">
+          {!state.paused ? (
+            <View
+              ariaHidden
+              icon="pause"
+              part="glyph"
+              platform="native"
+            />
+          ) : (
+            <View
+              ariaHidden
+              icon="play"
+              part="glyph"
+              platform="native"
+            />
+          )}
+        </Slot>
+      </View>
+      <Slot />
+    </Pressable>
+  ),
 })

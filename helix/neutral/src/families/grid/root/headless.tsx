@@ -1,4 +1,4 @@
-import { headless, prop, region } from '../../../tree.js'
+import { headless, number, oneOf, Slot, web } from '../../../render.js'
 
 /**
  * Grid's element: what it takes and the content it lays out. Grid has no
@@ -22,17 +22,17 @@ import { headless, prop, region } from '../../../tree.js'
  * states, and the region with what the manifest says the element has.
  */
 export default headless('grid', {
-  events: [],
-  props: [
-    prop('align-items', ['start', 'center', 'end', 'stretch']),
-    prop('auto-flow', ['row', 'column', 'dense', 'column-dense'], { platform: 'web' }),
-    prop('column-gap', ['none', '2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl']),
-    prop('columns', 'number'),
-    prop('gap', ['none', '2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl']),
-    prop('justify-items', ['start', 'center', 'end', 'stretch']),
-    prop('min', 'string', { default: '' }),
-    prop('row-gap', ['none', '2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl']),
-  ],
+  props: {
+    alignItems: oneOf(['start', 'center', 'end', 'stretch']),
+    autoFlow: web(oneOf(['row', 'column', 'dense', 'column-dense'])),
+    columnGap: oneOf(['none', '2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl']),
+    columns: number(),
+    gap: oneOf(['none', '2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl']),
+    justifyItems: oneOf(['start', 'center', 'end', 'stretch']),
+    min: '',
+    rowGap: oneOf(['none', '2xs', 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl']),
+  },
+  events: {},
   states: ['settled'],
-  tree: [region('default')],
+  render: () => <Slot />,
 })

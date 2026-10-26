@@ -1,8 +1,10 @@
 import {
   difference,
+  first,
   fn,
   list,
   mix,
+  native,
   product,
   quotient,
   safeArea,
@@ -41,20 +43,20 @@ export default styles(
   root,
   {
     prefix: 'drawer',
-    hooks: [
-      'backdrop',
-      'background-color',
-      'border-color',
-      'border-width',
-      'padding',
-      'padding-block-start',
-      'radius',
-      'scrim',
-      'shadow',
-      'size',
-      'swipe-x',
-      'swipe-y',
-    ],
+    hooks: ({ own }) => ({
+      backdrop: null,
+      backgroundColor: null,
+      borderColor: token('color-border'),
+      borderWidth: token('border-floating'),
+      padding: null,
+      paddingBlockStart: null,
+      radius: token('radii-sm'),
+      scrim: own.scrim,
+      shadow: token('shadow-floating'),
+      size: '20rem',
+      swipeX: 0,
+      swipeY: 0,
+    }),
     own: ['drawer-away', 'drawer-lead', 'drawer-scrim', 'drawer-size', 'drawer-trail'],
     props: [prop('material', ['frosted', 'glass'])],
     stylesheet: 'drawer/root/drawer-root.generated.css',
@@ -62,7 +64,7 @@ export default styles(
   ({ hook, on, own, rule }) => {
     const move = token('duration-normal')
     const padding = hook.padding(token('space-lg'))
-    const paddingTop = hook.paddingBlockStart(hook.padding(token('space-2xl')))
+    const paddingTop = first(hook.paddingBlockStart, hook.padding, token('space-2xl'))
     const dismissSize = token('size-control-sm')
     /* The padding at an edge the panel meets the window along, clear of the
        status bar, a notch, and the home indicator there. */
@@ -73,14 +75,14 @@ export default styles(
     return [
       /* The host draws nothing, and holds the panel's size and the scrim's tint. */
       on('host', [
-        rule({ own: { size: hook.size('20rem') }, display: 'contents' }),
+        rule({ own: { size: hook.size }, display: 'contents' }),
         rule({ own: { scrim: token('color-overlay') } }),
         rule({ print: true }, { display: 'none' }),
       ]),
       /* The scrim fades in as the panel slides, and out as it leaves. */
       on({ backdrop: 'panel' }, [
         rule({
-          backgroundColor: hook.scrim(own.scrim),
+          backgroundColor: first(hook.scrim, own.scrim),
           opacity: 0,
           transition: list(
             ['opacity', move, token('easing-standard')],
@@ -88,16 +90,13 @@ export default styles(
             ['overlay', move, 'allow-discrete'],
           ),
         }),
-        rule({ state: 'open' }, { opacity: 1 }),
-        rule({ entering: true, state: 'open' }, { opacity: 0 }),
-        rule(
-          { platform: 'web', supports: 'not (overlay: auto)' },
-          { transitionBehavior: 'normal' },
-        ),
+        rule({ open: true }, { opacity: 1 }),
+        rule({ entering: true, open: true }, { opacity: 0 }),
+        web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
       on('panel', [
         rule({
-          borderRadius: hook.radius(token('radii-sm')),
+          borderRadius: hook.radius,
           margin: token('space-none'),
           border: 'none',
           maxInlineSize: 'none',
@@ -126,7 +125,7 @@ export default styles(
          `display` above takes away. The `display` transition holds it on
          screen until the slide out has finished. */
       on({ part: 'panel', selector: '[part="panel"]:not([open])' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
+        web([rule({ display: 'none' })]),
       ]),
       on('panel', [
         rule(
@@ -151,8 +150,7 @@ export default styles(
           borderEndEndRadius: token('radii-none'),
           blockSize: '100%',
           inlineSize: fn('min', own.size, '100%'),
-          insetBlock: web(0),
-          insetInlineEnd: web(0),
+          web: { insetBlock: 0, insetInlineEnd: 0 },
           own: { away: fn('translateX', '100%'), lead: clearTop, trail: clearBottom },
         }),
         rule(
@@ -162,8 +160,7 @@ export default styles(
             borderEndStartRadius: token('radii-none'),
             blockSize: '100%',
             inlineSize: fn('min', own.size, '100%'),
-            insetBlock: web(0),
-            insetInlineStart: web(0),
+            web: { insetBlock: 0, insetInlineStart: 0 },
             own: { away: fn('translateX', '-100%'), lead: clearTop, trail: clearBottom },
           },
         ),
@@ -173,8 +170,7 @@ export default styles(
             borderEndStartRadius: token('radii-none'),
             borderEndEndRadius: token('radii-none'),
             blockSize: fn('min', own.size, '100%'),
-            insetBlockEnd: web(0),
-            insetInline: web(0),
+            web: { insetBlockEnd: 0, insetInline: 0 },
             own: { away: fn('translateY', '100%'), lead: paddingTop, trail: clearBottom },
           },
         ),
@@ -184,25 +180,20 @@ export default styles(
             borderStartStartRadius: token('radii-none'),
             borderStartEndRadius: token('radii-none'),
             blockSize: fn('min', own.size, '100%'),
-            insetBlockStart: web(0),
-            insetInline: web(0),
+            web: { insetBlockStart: 0, insetInline: 0 },
             own: { away: fn('translateY', '-100%'), lead: clearTop, trail: padding },
           },
         ),
         /* A phone takes no share inside `min()`, which the window it stands
            in has no length for until it is laid out: the size, and never more
            than the window across it. */
-        rule(
-          [
-            { placement: false, platform: 'native' },
-            { placement: ['end', 'start'], platform: 'native' },
-          ],
-          { inlineSize: own.size, maxInlineSize: '100%' },
-        ),
-        rule(
-          { placement: ['bottom', 'top'], platform: 'native' },
-          { blockSize: own.size, maxBlockSize: '100%' },
-        ),
+        native([
+          rule([{ placement: false }, { placement: ['end', 'start'] }], {
+            inlineSize: own.size,
+            maxInlineSize: '100%',
+          }),
+          rule({ placement: ['bottom', 'top'] }, { blockSize: own.size, maxBlockSize: '100%' }),
+        ]),
         /* The inline edges are logical and `translateX` is physical, so on a
            right-to-left page the end sits on the left and slides out leftward. */
         rule(
@@ -216,31 +207,27 @@ export default styles(
         /* Home, less however far a swipe or a snap point has moved it toward
            its edge, which is nothing at rest. */
         rule(
-          { state: 'open' },
+          { open: true },
           {
-            border: [
-              hook.borderWidth(token('border-floating')),
-              'solid',
-              hook.borderColor(token('color-border')),
-            ],
-            boxShadow: hook.shadow(token('shadow-floating')),
-            transform: fn('translate', hook.swipeX(0), hook.swipeY(0)),
+            border: [hook.borderWidth, 'solid', hook.borderColor],
+            boxShadow: hook.shadow,
+            transform: fn('translate', hook.swipeX, hook.swipeY),
           },
         ),
       ]),
       /* The page's own panning stays off the swipe's axis, and the content
          keeps its own scrolling down. */
-      on(['panel', 'content'], [rule({ platform: 'web' }, { touchAction: 'pan-y' })]),
+      on(['panel', 'content'], [web([rule({ touchAction: 'pan-y' })])]),
       on('panel', [
-        rule({ platform: 'web', placement: ['bottom', 'top'] }, { touchAction: 'pan-x' }),
+        web([rule({ placement: ['bottom', 'top'] }, { touchAction: 'pan-x' })]),
         /* Under the finger while it moves, and back to the slide once it lets go. */
-        rule({ part: { 'data-swiping': true } }, { transition: 'none', userSelect: web('none') }),
-        /* The slide in starts from past the edge. */
-        rule({ entering: true, state: 'open' }, { transform: own.away }),
         rule(
-          { platform: 'web', supports: 'not (overlay: auto)' },
-          { transitionBehavior: 'normal' },
+          { part: { 'data-swiping': true } },
+          { transition: 'none', web: { userSelect: 'none' } },
         ),
+        /* The slide in starts from past the edge. */
+        rule({ entering: true, open: true }, { transform: own.away }),
+        web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
       on('header', [rule({ flex: '0 0 auto' })]),
       /* The title, whatever was passed in, set as a title and a step clear of

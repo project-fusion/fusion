@@ -1,5 +1,5 @@
 import printEconomy from '../../../fragments/print-economy.js'
-import { fn, inherited, token, web } from '../../../style.js'
+import { fn, inherited, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -17,26 +17,26 @@ export default styles(
   root,
   {
     prefix: 'list',
-    hooks: [
-      'drag-preview-background-color',
-      'drag-preview-border-color',
-      'drag-preview-border-width',
-      'drag-preview-opacity',
-      'drag-preview-radius',
-      'drag-preview-shadow',
-      'empty-color',
-      'empty-padding',
-      'gap',
-      'loading-color',
-      'loading-padding',
-      'marker-gutter',
-    ],
+    hooks: {
+      dragPreviewBackgroundColor: token('color-surface-raised'),
+      dragPreviewBorderColor: token('color-border'),
+      dragPreviewBorderWidth: token('border-floating'),
+      dragPreviewOpacity: 0.9,
+      dragPreviewRadius: token('radii-sm'),
+      dragPreviewShadow: token('shadow-floating'),
+      emptyColor: token('color-foreground-muted'),
+      emptyPadding: token('space-md'),
+      gap: token('space-none'),
+      loadingColor: token('color-foreground-muted'),
+      loadingPadding: token('space-sm'),
+      markerGutter: token('space-md'),
+    },
     props: [prop('divided', 'boolean', { default: false }), prop('marker', ['rail'])],
     stylesheet: 'list/root/list-root.generated.css',
   },
   ({ hook, include, on, rule, variants }) => [
     on('host', [
-      rule({ display: 'flex', flexDirection: 'column', gap: hook.gap(token('space-none')) }),
+      rule({ display: 'flex', flexDirection: 'column', gap: hook.gap }),
       /* The markers. **`outside`, with a gutter of our own for it to hang into.**
          Never `inside`: an inside marker is the first inline box in the row, and
          the next thing there is the row's block-level grid. **Its own count,
@@ -44,8 +44,8 @@ export default styles(
          the `list-item` counter, so the list contains style. Wide enough for a
          two-digit marker and no wider. */
       rule([{ kind: 'ordered' }, { kind: 'unordered' }], {
-        contain: web('style'),
-        paddingInlineStart: hook.markerGutter(token('space-md')),
+        web: { contain: 'style' },
+        paddingInlineStart: hook.markerGutter,
       }),
       /* The rail: the same numbering, at the start edge of the block, where a
          native marker cannot be moved. */
@@ -122,19 +122,19 @@ export default styles(
        reads as the list's own state and not as a row of yours. */
     on('empty', [
       rule({
-        color: hook.emptyColor(token('color-foreground-muted')),
+        color: hook.emptyColor,
         fontSize: token('text-sm'),
-        padding: hook.emptyPadding(token('space-md')),
+        padding: hook.emptyPadding,
         textAlign: 'center',
       }),
-      rule({ part: { hidden: true } }, { display: 'none' }),
+      rule({ hidden: true }, { display: 'none' }),
     ]),
     /* The row after the last while more are fetched, quiet in the same way. */
     on('loading', [
       rule({
-        color: hook.loadingColor(token('color-foreground-muted')),
+        color: hook.loadingColor,
         fontSize: token('text-sm'),
-        padding: hook.loadingPadding(token('space-sm')),
+        padding: hook.loadingPadding,
         textAlign: 'center',
       }),
     ]),
@@ -143,15 +143,11 @@ export default styles(
        with nothing animated. */
     on('drag-preview', [
       rule({
-        backgroundColor: hook.dragPreviewBackgroundColor(token('color-surface-raised')),
-        border: [
-          hook.dragPreviewBorderWidth(token('border-floating')),
-          'solid',
-          hook.dragPreviewBorderColor(token('color-border')),
-        ],
-        borderRadius: hook.dragPreviewRadius(token('radii-sm')),
-        boxShadow: hook.dragPreviewShadow(token('shadow-floating')),
-        opacity: hook.dragPreviewOpacity(0.9),
+        backgroundColor: hook.dragPreviewBackgroundColor,
+        border: [hook.dragPreviewBorderWidth, 'solid', hook.dragPreviewBorderColor],
+        borderRadius: hook.dragPreviewRadius,
+        boxShadow: hook.dragPreviewShadow,
+        opacity: hook.dragPreviewOpacity,
       }),
     ]),
     include(printEconomy),

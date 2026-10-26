@@ -1,4 +1,4 @@
-import { fn, hookOf, inherited, measured, product, quotient, token } from '../../../style.js'
+import { first, fn, hookOf, inherited, measured, product, quotient, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import segment from './headless.js'
 
@@ -25,7 +25,10 @@ export default styles(
   segment,
   {
     prefix: 'meter-segment',
-    hooks: ['color', 'gap-color'],
+    hooks: ({ own }) => ({
+      color: own.hue(token('color-series-1')),
+      gapColor: token('color-background'),
+    }),
     own: ['meter-segment-hue'],
     stylesheet: 'meter/segment/meter-segment.generated.css',
   },
@@ -53,9 +56,9 @@ export default styles(
     ]),
     on('fill', [
       rule({
-        backgroundColor: hook.color(own.hue(token('color-series-1'))),
+        backgroundColor: first(hook.color, own.hue, token('color-series-1')),
         blockSize: '100%',
-        boxShadow: ['inset', token('border-thin'), 0, 0, hook.gapColor(token('color-background'))],
+        boxShadow: ['inset', token('border-thin'), 0, 0, hook.gapColor],
         boxSizing: 'border-box',
         flexBasis: product(
           quotient(measured('meter-segment-value', 0), inherited('meter-span', 1)),

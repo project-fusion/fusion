@@ -1,4 +1,14 @@
-import { difference, fn, list, measured, product, scheme, token, web } from '../../../style.js'
+import {
+  difference,
+  fn,
+  list,
+  measured,
+  native,
+  product,
+  scheme,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -25,31 +35,31 @@ export default styles(
   root,
   {
     prefix: 'popover',
-    hooks: [
-      'arrow-size',
-      'backdrop',
-      'background-color',
-      'border-color',
-      'border-width',
-      'inline-size',
-      'max-block-size',
-      'padding',
-      'shadow',
-    ],
+    hooks: {
+      arrowSize: '0.5rem',
+      backdrop: null,
+      backgroundColor: null,
+      borderColor: token('color-border'),
+      borderWidth: token('border-floating'),
+      inlineSize: web('max-content'),
+      maxBlockSize: measured('floating-available-block-size', 'none'),
+      padding: null,
+      shadow: token('shadow-floating'),
+    },
     own: ['popover-edge', 'popover-from', 'popover-travel'],
     props: [prop('material', ['frosted', 'glass']), prop('separation', ['plain'])],
     stylesheet: 'popover/root/popover-root.generated.css',
   },
   ({ hook, on, own, rule, variants }) => {
     const fast = token('duration-fast')
-    const width = hook.borderWidth(token('border-floating'))
-    const ink = hook.borderColor(token('color-border'))
+    const width = hook.borderWidth
+    const ink = hook.borderColor
     const fill = hook.backgroundColor(token('color-surface-overlay'))
     return [
       /* No box of its own: the trigger is passed in and the panel is in the top layer. */
       on('host', [rule({ display: 'contents' }), rule({ print: true }, { display: 'none' })]),
       /* The trigger's box on a phone, as wide as the trigger, which the panel is placed against. */
-      on('trigger', [rule({ platform: 'native' }, { inlineSize: 'fit-content' })]),
+      on('trigger', [native([rule({ inlineSize: 'fit-content' })])]),
       on('surface', [
         rule({
           overflow: 'visible',
@@ -57,20 +67,20 @@ export default styles(
           border: [width, 'solid', ink],
           own: { edge: [width, 'solid', ink] },
           borderRadius: token('radii-sm'),
-          boxShadow: hook.shadow(token('shadow-floating')),
+          boxShadow: hook.shadow,
           boxSizing: 'border-box',
           color: token('color-foreground'),
-          inset: web('auto'),
+          web: { inset: 'auto' },
           margin: token('space-none'),
           maxInlineSize: difference('100vw', token('space-lg')),
           padding: token('space-none'),
-          inlineSize: hook.inlineSize(web('max-content')),
+          inlineSize: hook.inlineSize,
         }),
       ]),
       /* A closed popover is not drawn, as the UA's sheet has it, which the
          rules above outrank. */
       on({ part: 'surface', selector: '[part="surface"]:not(:popover-open)' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
+        web([rule({ display: 'none' })]),
       ]),
       /* It travels a little out of the edge it opened against. */
       on('surface', [
@@ -116,7 +126,7 @@ export default styles(
       /* The scrolling happens in here, with the inset inside it. */
       on('content', [
         rule({
-          maxBlockSize: hook.maxBlockSize(measured('floating-available-block-size', 'none')),
+          maxBlockSize: hook.maxBlockSize,
           overflow: 'auto',
           padding: hook.padding(token('space-md')),
         }),
@@ -129,8 +139,8 @@ export default styles(
       on('arrow', [
         rule({
           backgroundColor: fill,
-          blockSize: hook.arrowSize('0.5rem'),
-          inlineSize: hook.arrowSize('0.5rem'),
+          blockSize: hook.arrowSize,
+          inlineSize: hook.arrowSize,
           position: 'absolute',
           rotate: '45deg',
         }),
@@ -166,10 +176,7 @@ export default styles(
         ],
       ),
       on('surface', [
-        rule(
-          { platform: 'web', supports: 'not (overlay: auto)' },
-          { transitionBehavior: 'normal' },
-        ),
+        web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
     ]
   },
