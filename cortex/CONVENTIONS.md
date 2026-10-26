@@ -15,6 +15,7 @@ spine, not a module.
 | **Trace** | `fusion-cortex-trace` | Provenance: `why()`, replay, cascading deletion |
 | **Recall** | `fusion-cortex-recall` | Context assembly: pins, compaction, drop records |
 | Core | `fusion-cortex-core` | Ids, provider abstraction, shared errors |
+| Providers | `fusion-cortex-provider` | Model clients, one per API and each a feature, local first |
 
 ## Invariants
 

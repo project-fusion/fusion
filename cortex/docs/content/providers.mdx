@@ -1,0 +1,99 @@
+---
+title: Choosing a provider
+description: How to pick the model client Cortex calls, starting with a model on your own machine.
+---
+
+# Choosing a provider
+
+A provider is the client Cortex uses to call a model. The `fusion-cortex-provider`
+crate has one client for each model API, and each one implements Core's
+`Provider` trait. Trace and Recall read the same request and response types
+whichever client you choose.
+
+| Client | Feature | API | Servers |
+| --- | --- | --- | --- |
+| `Ollama` | `ollama` | Ollama's `/api/chat` | Ollama on your machine, or Ollama's hosted service |
+| `Chat` | `chat` | OpenAI Chat Completions | vLLM, llama.cpp, LM Studio, OpenRouter, and xAI |
+| `Responses` | `responses` | OpenAI Responses | OpenAI, xAI, LM Studio, and OpenRouter |
+| `Anthropic` | `anthropic` | Anthropic Messages | Anthropic |
+| `Gemini` | `gemini` | Gemini `generateContent` | Google |
+
+## Start with a local model
+
+A model on your own machine keeps every request on the device. Start there, and
+add a hosted model when a task needs more than the local one can do.
+
+Ollama is the shortest path. Pull a model, and the client calls it at
+`http://localhost:11434`. Set the context window on each request, because
+Ollama truncates a prompt longer than its default window without an error.
+
+[//]: # (rust:fusion-cortex-provider::ollama::Ollama)
+
+```rust
+let transport = Arc::new(Reqwest::new().unwrap());
+let provider = Ollama::new("qwen3-coder:30b", transport).context(65_536);
+
+assert_eq!(provider.id(), "local/qwen3-coder:30b");
+assert!(provider.is_local(), "a local server is the default");
+```
+
+[//]: # (/rust)
+
+vLLM, llama.cpp, and LM Studio serve the Chat Completions API, so the `Chat`
+client calls them. Mark the server as local yourself. A server on `localhost`
+can still forward requests to a hosted model, so the URL does not decide it.
+
+[//]: # (rust:fusion-cortex-provider::chat::Chat)
+
+```rust
+let transport = Arc::new(Reqwest::new().unwrap());
+let provider = Chat::new("http://localhost:8000/v1", "qwen3-coder", transport)
+    .named("vllm/qwen3-coder")
+    .local(true);
+
+assert_eq!(provider.id(), "vllm/qwen3-coder");
+assert!(provider.is_local());
+```
+
+[//]: # (/rust)
+
+## Tell people when data leaves the device
+
+`is_local` reports whether a provider runs on your own hardware. A hosted
+client always reports `false`. An application can read it before each call and
+tell the person using it that their data is about to leave the device.
+
+[//]: # (rust:fusion-cortex-provider::anthropic::Anthropic)
+
+```rust
+let transport = Arc::new(Reqwest::new().unwrap());
+let provider = Anthropic::new("sk-ant-...", "claude-opus-5-5", transport);
+
+assert_eq!(provider.id(), "anthropic/claude-opus-5-5");
+assert!(!provider.is_local());
+```
+
+[//]: # (/rust)
+
+## Take only the clients you call
+
+Each client is a feature, and the default takes all five and `http`. Turn the
+default off and name the ones you call, so your build compiles only those
+clients.
+
+```toml
+[dependencies]
+fusion-cortex-provider = { git = "https://github.com/project-fusion/fusion.git", default-features = false, features = ["http", "ollama"] }
+```
+
+The `http` feature adds `Reqwest`, the one transport that opens a socket. Leave
+it out to send requests through your own HTTP stack: implement the `Transport`
+trait and pass it to any client.
+
+## Retry what can succeed later
+
+A failed call returns an `Error`. `is_retryable` is true for a rate limit, an
+overloaded or failing server, and a dropped connection. It is false for a
+request the API rejected as written, such as a bad key or a model name the
+server does not have, because sending the same request again fails the same way.
+A rate limit can carry a `retry_after` wait from the server.

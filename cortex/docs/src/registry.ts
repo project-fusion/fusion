@@ -54,6 +54,13 @@ export const pages: DocPage[] = [
     slug: 'recall',
     title: 'Recall',
   },
+  {
+    description: 'The model clients, and how to start with a model on your own machine.',
+    order: 1,
+    section: 'Guides',
+    slug: 'providers',
+    title: 'Choosing a provider',
+  },
 ]
 
 export const findPage = (slug: string): DocPage | undefined =>

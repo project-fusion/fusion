@@ -1,0 +1,39 @@
+[package]
+name = "fusion-cortex-provider"
+description = "Cortex's model clients, one per API, on Core's provider types."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+# Its own, never `workspace = true`. See the note in the root manifest.
+version = "0.0.0-dev"
+
+[features]
+default = ["anthropic", "chat", "gemini", "http", "ollama", "responses"]
+# **One feature per client**, so a crate that takes one compiles only that one.
+anthropic = []
+# OpenAI-compatible Chat Completions, which vLLM, llama.cpp, LM Studio,
+# OpenRouter and xAI serve.
+chat = []
+gemini = []
+ollama = []
+# OpenAI Responses, which xAI, LM Studio and OpenRouter also serve.
+responses = []
+# **The one transport that opens a socket.** Every client builds its requests
+# and reads its streams without it, so a crate that takes a client with no
+# `http` compiles no HTTP stack and no TLS.
+http = ["dep:reqwest"]
+
+[dependencies]
+async-trait.workspace = true
+fusion-cortex-core.workspace = true
+futures-util.workspace = true
+reqwest = { workspace = true, optional = true }
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["io-util", "net"] }
+
+[lints]
+workspace = true
