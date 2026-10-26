@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { first, list, mix, native, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -39,12 +39,12 @@ export default styles(
       ringColor: token('color-background'),
     }),
     own: ['badge-dot', 'badge-fill', 'badge-inset', 'badge-on', 'badge-size', 'badge-text'],
-    props: [
-      prop('attention', ['bounce', 'pulse']),
-      prop('emphasis', ['outlined', 'solid', 'subtle']),
-      prop('placement', ['bottom-end', 'bottom-start', 'inline', 'top-start']),
-      prop('tone', ['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
-    ],
+    props: {
+      attention: oneOf(['bounce', 'pulse']),
+      emphasis: oneOf(['outlined', 'solid', 'subtle']),
+      placement: oneOf(['bottom-end', 'bottom-start', 'inline', 'top-start']),
+      tone: oneOf(['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
+    },
     stylesheet: 'badge/root/badge-root.generated.css',
   },
   ({ hook, keyframes, on, own, rule, variants }) => [

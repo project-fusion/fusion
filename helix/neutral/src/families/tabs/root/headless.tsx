@@ -1,5 +1,4 @@
 import { cancelable, headless, oneOf, Pressable, Slot, string, View } from '../../../render.js'
-import { collection } from '../../../tree.js'
 
 /**
  * A tab set's headless tier: what it takes, what it sends, and its parts.
@@ -33,16 +32,16 @@ export default headless('tabs', {
     beforeSelect: cancelable(['value']),
   },
   states: ['settled'],
-  collection: collection({
-    after: 'activate',
-    before: 'before-activate',
-    chosen: 'active',
-    initial: 'default-active',
+  collection: {
+    defaultProp: 'defaultActive',
     /* **The keys come round from the last tab, and choose where they
        arrive**, as the web's tab set does, unless the set is manual. */
-    keys: { chooses: true, wrap: true },
-    manual: 'manual',
-  }),
+    keys: { loop: true, selectionFollowsFocus: true },
+    manualActivation: 'manual',
+    onBeforeChange: 'beforeActivate',
+    onChange: 'activate',
+    prop: 'active',
+  },
   render: ({ props }) => (
     <>
       <View

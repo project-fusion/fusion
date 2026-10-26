@@ -1,6 +1,6 @@
+import { number, oneOf } from '../../../render.js'
 import { difference, fn, mix, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -37,13 +37,13 @@ export default styles(
       sheenColor: mix(token('color-foreground'), 8, 'transparent'),
       size: token('size-control'),
     },
-    props: [
-      prop('effect', ['none', 'pulse']),
+    props: {
+      effect: oneOf(['none', 'pulse']),
       /* A number on the web, which reads the attribute as one, reflected so
          the sheet sizes a paragraph by it. */
-      prop('lines', 'number'),
-      prop('shape', ['circle', 'text']),
-    ],
+      lines: number(),
+      shape: oneOf(['circle', 'text']),
+    },
     stylesheet: 'skeleton/root/skeleton-root.generated.css',
   },
   ({ hook, keyframes, on, rule }) => [

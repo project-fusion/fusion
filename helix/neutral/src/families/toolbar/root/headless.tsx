@@ -1,5 +1,4 @@
 import { headless, oneOf, Slot, View } from '../../../render.js'
-import { toolbar } from '../../../tree.js'
 
 /**
  * Toolbar's headless tier: a group of controls that share one tab stop.
@@ -35,7 +34,7 @@ export default headless('toolbar', {
   },
   events: {},
   states: ['horizontal', 'nested', 'settled', 'vertical'],
-  toolbar: toolbar({ ends: 'stop-at-ends', orientation: 'orientation' }),
+  toolbar: { orientation: 'orientation', stopAtEnds: 'stopAtEnds' },
   render: ({ props }) => (
     <View
       label={props.label}

@@ -1,6 +1,6 @@
+import { number } from '../../../render.js'
 import { difference, native, product, token } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import group from './headless.js'
 
 /**
@@ -25,7 +25,7 @@ export default styles(
       gap: token('space-2xl'),
     },
     own: ['stat-group-gap'],
-    props: [prop('columns', 'number'), prop('divided', 'boolean', { default: false })],
+    props: { columns: number(), divided: false },
     stylesheet: 'stat/group/stat-group.generated.css',
   },
   ({ hook, on, own, rule, variants }) => [

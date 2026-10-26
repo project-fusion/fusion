@@ -231,7 +231,7 @@ export interface Headless {
    * The prop that says how many of the elements passed in are drawn, as an
    * avatar group folds the people past its `max` into a count.
    */
-  readonly fold?: Fold
+  readonly maxVisible?: Fold
   /**
    * What a screen reader hears of the host, where the web element sets it
    * through `ElementInternals` and draws no part to carry it: its `role`, and
@@ -267,7 +267,7 @@ export interface Headless {
   /** The messages passed into it, which it stacks and holds, as a toast's region does. */
   readonly notices?: Notices
   /** The page it follows as it scrolls, as an app header lifts off it. */
-  readonly page?: Page
+  readonly pageScroll?: Page
   /**
    * `web` for an element only the web has, such as a skip link. A phone's
    * component of the same name draws nothing.

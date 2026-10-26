@@ -18,12 +18,9 @@ export interface Validation {
    * The prop that holds the sentence for a missing answer. Its default is the
    * control's own sentence.
    */
-  readonly missing?: string
+  readonly valueMissing?: string
   /**
    * The prop that makes an answer required.
    */
   readonly required: string
 }
-
-/** What a form control's verdict reads. */
-export const validation = (fields: Validation): Validation => fields

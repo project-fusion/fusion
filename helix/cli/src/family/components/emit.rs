@@ -120,7 +120,11 @@ fn event_type(sends: &Sends) -> String {
     };
     /* The platform's own event carries its detail's fields on itself as
     well, as a `ToggleEvent` carries `newState`. */
-    let class = if sends.bare { "PlatformEvent" } else { "HelixEvent" };
+    let class = if sends.bare {
+        "PlatformEvent"
+    } else {
+        "HelixEvent"
+    };
     let _ = writeln!(out, "export type {} = {class}{open}", sends.type_name);
     for field in &sends.fields {
         out.push_str(&doc(indent, &field.doc.iter().cloned().collect::<Vec<_>>()));

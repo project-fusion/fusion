@@ -28,7 +28,7 @@ export default headless('empty', {
     noAnnounce: false,
   },
   events: {},
-  states: ['has-actions', 'has-icon', 'settled'],
+  states: ['hasActions', 'hasIcon', 'settled'],
   render: ({ props }) => (
     <>
       <Slot

@@ -106,8 +106,13 @@ pub fn item(lit: &Lit) -> Result<Item, String> {
         of: of.clone(),
         ..Item::default()
     };
-    if let Some(Lit::Object(fields)) = arguments.get(1) {
-        for (key, value) in fields {
+    if let Some(Lit::Object(written)) = arguments.get(1) {
+        let Lit::Object(fields) =
+            super::spelling::object("memberOf", super::spelling::ITEM, written)?
+        else {
+            return Err("`memberOf` takes an object".to_owned());
+        };
+        for (key, value) in &fields {
             match (key.as_str(), value) {
                 ("chooses", Lit::Bool(chooses)) => item.chooses = Some(*chooses),
                 ("named", Lit::Array(regions)) => {
@@ -142,7 +147,7 @@ pub fn item(lit: &Lit) -> Result<Item, String> {
         && (item.checkable.is_some() || item.exclusive.is_some() || item.before.is_some());
     if unchecked {
         return Err(
-            "item: an item that is `checkable`, `exclusive`, or asks `before` names the prop that holds whether it is `checked`"
+            "memberOf: an item that is `checkable`, `exclusive`, or names `onBeforeChange` names the prop that holds whether it is `checked`"
                 .to_owned(),
         );
     }

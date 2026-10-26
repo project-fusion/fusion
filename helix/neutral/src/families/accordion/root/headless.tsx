@@ -1,5 +1,4 @@
 import { headless, number, oneOf, Slot, web } from '../../../render.js'
-import { collection } from '../../../tree.js'
 
 /**
  * An accordion's headless tier: a set of sections that open and close.
@@ -32,6 +31,6 @@ export default headless('accordion', {
   },
   events: {},
   states: ['settled'],
-  collection: collection({ opens: 'mode', toggles: true }),
+  collection: { itemsToggle: true, openMode: 'mode' },
   render: () => <Slot />,
 })

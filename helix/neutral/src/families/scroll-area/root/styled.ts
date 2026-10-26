@@ -101,10 +101,10 @@ export default styles(
           rule({ orientation: 'horizontal' }, { overflowY: 'hidden' }),
         ]),
         /* The scale `max-block-size` names, for code shared with a phone. */
-        rule({ 'max-block-size': 'sm' }, { maxBlockSize: '8rem' }),
-        rule({ 'max-block-size': 'md' }, { maxBlockSize: '12rem' }),
-        rule({ 'max-block-size': 'lg' }, { maxBlockSize: '16rem' }),
-        rule({ 'max-block-size': 'xl' }, { maxBlockSize: '24rem' }),
+        rule({ maxBlockSize: 'sm' }, { maxBlockSize: '8rem' }),
+        rule({ maxBlockSize: 'md' }, { maxBlockSize: '12rem' }),
+        rule({ maxBlockSize: 'lg' }, { maxBlockSize: '16rem' }),
+        rule({ maxBlockSize: 'xl' }, { maxBlockSize: '24rem' }),
         /* The scrollbar, made to belong to the system: `thin` rather than a
            width in pixels, and the shared scrollbar tokens, which clear 3:1
            on every ground, after this family's own hooks. */
@@ -159,18 +159,15 @@ export default styles(
           ),
           /* Each edge's depth, while there is more past it. */
           rule(
-            { state: 'more-block-start' },
+            { state: 'moreBlockStart' },
             { own: { depthBlockStart: hook.fadeBlockStart(depth) } },
           ),
-          rule({ state: 'more-block-end' }, { own: { depthBlockEnd: hook.fadeBlockEnd(depth) } }),
+          rule({ state: 'moreBlockEnd' }, { own: { depthBlockEnd: hook.fadeBlockEnd(depth) } }),
           rule(
-            { state: 'more-inline-start' },
+            { state: 'moreInlineStart' },
             { own: { depthInlineStart: hook.fadeInlineStart(depth) } },
           ),
-          rule(
-            { state: 'more-inline-end' },
-            { own: { depthInlineEnd: hook.fadeInlineEnd(depth) } },
-          ),
+          rule({ state: 'moreInlineEnd' }, { own: { depthInlineEnd: hook.fadeInlineEnd(depth) } }),
           /* Only while the content scrolls, because a mask makes the viewport a
            stacking context. The prefixed name as well, for WebKit releases
            that read only that one. */
@@ -206,13 +203,13 @@ export default styles(
         web([
           rule({ inlineSize: barSize, insetBlock: 0, insetInlineEnd: 0 }),
           /* Each stops short of the corner while the other is drawn. */
-          rule({ state: 'scrollbar-horizontal' }, { insetBlockEnd: barSize }),
+          rule({ state: 'scrollbarHorizontal' }, { insetBlockEnd: barSize }),
         ]),
       ]),
       on('scrollbar-horizontal', [
         web([
           rule({ blockSize: barSize, insetBlockEnd: 0, insetInline: 0 }),
-          rule({ state: 'scrollbar-vertical' }, { insetInlineEnd: barSize }),
+          rule({ state: 'scrollbarVertical' }, { insetInlineEnd: barSize }),
         ]),
       ]),
       on('thumb', [
@@ -273,7 +270,7 @@ export default styles(
         native([
           rule({ backgroundImage: fn('linear-gradient', 'to bottom', fadeColor, 'transparent') }),
         ]),
-        rule({ state: 'more-block-start' }, { opacity: 1 }),
+        rule({ state: 'moreBlockStart' }, { opacity: 1 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
       on({ after: 'host' }, [
@@ -292,7 +289,7 @@ export default styles(
         native([
           rule({ backgroundImage: fn('linear-gradient', 'to top', fadeColor, 'transparent') }),
         ]),
-        rule({ state: 'more-block-end' }, { opacity: 1 }),
+        rule({ state: 'moreBlockEnd' }, { opacity: 1 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
       /* The sideways pair, on an element of its own, because the host has
@@ -333,7 +330,7 @@ export default styles(
         native([
           rule({ backgroundImage: fn('linear-gradient', own.fromStart, fadeColor, 'transparent') }),
         ]),
-        rule({ state: 'more-inline-start' }, { opacity: 1 }),
+        rule({ state: 'moreInlineStart' }, { opacity: 1 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
       on({ after: 'edges' }, [
@@ -351,7 +348,7 @@ export default styles(
         native([
           rule({ backgroundImage: fn('linear-gradient', own.fromEnd, fadeColor, 'transparent') }),
         ]),
-        rule({ state: 'more-inline-end' }, { opacity: 1 }),
+        rule({ state: 'moreInlineEnd' }, { opacity: 1 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
       /* A scrolling region takes focus when it scrolls, and says so when it

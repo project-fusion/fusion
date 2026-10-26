@@ -93,7 +93,7 @@ mod tests {
     #[test]
     fn a_swiping_layer_binds_its_edge_points_and_swipe_to_its_machine() {
         let drawer = family(
-            "export default headless('drawer', { props: [prop('open', 'boolean'), prop('placement', ['bottom', 'end', 'start', 'top']), prop('snap-points', 'string'), prop('swipe', 'boolean')], states: ['open', 'snapped'], toggle: toggle({ checked: 'open' }), tree: [layer('panel', { edge: bind('placement'), open: bind('open'), snap: bind('snap-points'), swipe: bind('swipe') }, [region('default')])] })",
+            "export default headless('drawer', { props: [prop('open', 'boolean'), prop('placement', ['bottom', 'end', 'start', 'top']), prop('snap-points', 'string'), prop('swipe', 'boolean')], states: ['open', 'snapped'], toggle: { prop: 'open' }, tree: [layer('panel', { edge: bind('placement'), open: bind('open'), snap: bind('snap-points'), swipe: bind('swipe') }, [region('default')])] })",
         );
         assert_eq!(resolved(&drawer), Vec::<String>::new());
         let layer = drawer
@@ -126,7 +126,7 @@ mod tests {
             "{found:?}"
         );
         let toggled = unresolved(
-            "export default headless('dial', { props: [prop('open', 'boolean')], states: ['open'], toggle: toggle({ checked: 'open' }), tree: [pressable('trigger', { held: true, toggles: true }, [region('default')])] })",
+            "export default headless('dial', { props: [prop('open', 'boolean')], states: ['open'], toggle: { prop: 'open' }, tree: [pressable('trigger', { held: true, toggles: true }, [region('default')])] })",
         );
         assert!(
             !toggled.iter().any(|one| one.contains("`held`")),
@@ -137,7 +137,7 @@ mod tests {
     #[test]
     fn a_layer_that_snaps_reads_words_and_has_a_state_to_stand_in() {
         let found = unresolved(
-            "export default headless('drawer', { props: [prop('open', 'boolean'), prop('snap-points', 'number')], states: ['open'], toggle: toggle({ checked: 'open' }), tree: [layer('panel', { edge: 'end', open: bind('open'), snap: bind('snap-points'), swipe: true }, [region('default')])] })",
+            "export default headless('drawer', { props: [prop('open', 'boolean'), prop('snap-points', 'number')], states: ['open'], toggle: { prop: 'open' }, tree: [layer('panel', { edge: 'end', open: bind('open'), snap: bind('snap-points'), swipe: true }, [region('default')])] })",
         );
         assert!(
             found

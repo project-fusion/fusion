@@ -10,7 +10,7 @@ import {
   View,
   Wrap,
 } from '../../../render.js'
-import { collection, derive, toggle } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * Speed Dial's headless tier: a floating action button and the actions it
@@ -76,13 +76,13 @@ export default headless('speed-dial', {
     toggle: bare(['newState', 'oldState']),
   },
   states: [
-    'aligned-end',
-    'aligned-start',
+    'alignedEnd',
+    'alignedStart',
     'open',
-    'placed-bottom',
-    'placed-left',
-    'placed-right',
-    'placed-top',
+    'placedBottom',
+    'placedLeft',
+    'placedRight',
+    'placedTop',
     'settled',
   ],
   derived: {
@@ -90,18 +90,18 @@ export default headless('speed-dial', {
     holds: derive('speed-dial-holds'),
     name: derive('speed-dial-name'),
   },
-  collection: collection({
-    closes: { event: 'before-select' },
-    keys: { chooses: false, wrap: true },
+  collection: {
+    closeOn: 'beforeSelect',
+    keys: { loop: true, selectionFollowsFocus: false },
     mixes: true,
-  }),
-  toggle: toggle({
-    changes: 'toggle',
-    checked: 'open',
-    closes: 'before-close',
-    initial: 'default-open',
-    opens: 'before-open',
-  }),
+  },
+  toggle: {
+    defaultProp: 'defaultOpen',
+    onBeforeClose: 'beforeClose',
+    onBeforeOpen: 'beforeOpen',
+    onToggle: 'toggle',
+    prop: 'open',
+  },
   render: ({ derived, props }) => (
     <>
       {/* The trigger's own box on a phone, which the actions are placed

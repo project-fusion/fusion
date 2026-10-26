@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { mix, native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -31,7 +31,7 @@ export default styles(
       'breadcrumbs-split-fill',
       'breadcrumbs-split-rule',
     ],
-    props: [prop('separation', ['outlined', 'plain'])],
+    props: { separation: oneOf(['outlined', 'plain']) },
     stylesheet: 'breadcrumbs/root/breadcrumbs-root.generated.css',
   },
   ({ hook, on, rule }) => [

@@ -94,18 +94,18 @@ fn menu_item(fields: &str) -> Family {
 fn an_item_of_a_set_that_mixes_reads_switches_and_asks_through_a_cancelable_event() {
     assert_eq!(
         unresolved(&menu_item(
-            "before: 'before-check', checkable: 'checkable', checked: 'checked'"
+            "checkable: 'checkable', checked: 'checked', onBeforeChange: 'beforeCheck'"
         )),
         Vec::<String>::new()
     );
     assert_eq!(
         unresolved(&menu_item(
-            "before: 'toggle', checked: 'label', exclusive: 'exclusiv'"
+            "checked: 'label', exclusive: 'exclusiv', onBeforeChange: 'toggle'"
         )),
         vec![
-            "the item's `before` names `toggle`, which is not cancelable, so a page cannot keep the item as it is",
-            "the item's `checked` reads `label`, which is not a boolean",
-            "the item's `exclusive` reads `exclusiv`, and no prop has that name",
+            "`memberOf.onBeforeChange` names `toggle`, which is not cancelable, so a page cannot keep the item as it is",
+            "`memberOf.checked` reads `label`, which is not a boolean",
+            "`memberOf.exclusive` reads `exclusiv`, and no prop has that name",
         ]
     );
 }

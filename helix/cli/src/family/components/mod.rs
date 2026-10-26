@@ -140,7 +140,10 @@ pub fn modules(
     let folders: BTreeMap<String, String> = drawn
         .iter()
         .map(|one| {
-            let folder = one.element.split_once('/').map_or(one.element.as_str(), |(f, _)| f);
+            let folder = one
+                .element
+                .split_once('/')
+                .map_or(one.element.as_str(), |(f, _)| f);
             (
                 one.family.tag.trim_start_matches("helix-").to_owned(),
                 folder.to_owned(),

@@ -17,15 +17,12 @@ export interface Total {
    */
   readonly holds?: string
   /** The element's prop the sum stands in for. */
-  readonly into: string
+  readonly prop: string
   /** The family whose elements are summed, by its tag without `helix-`. */
   readonly of: string
   /**
    * The prop of each of them that is summed. A value that is not a number,
    * or is below zero, adds nothing.
    */
-  readonly prop: string
+  readonly itemProp: string
 }
-
-/** A prop an element reads as a sum. */
-export const total = (fields: Total): Total => fields

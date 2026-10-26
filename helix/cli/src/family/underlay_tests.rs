@@ -12,7 +12,10 @@ fn names_the_root_of_a_family_or_an_element_written_out() {
             ],
         )
     };
-    assert_eq!(over(&call("icon-button")), Some("icon-button/root".to_owned()));
+    assert_eq!(
+        over(&call("icon-button")),
+        Some("icon-button/root".to_owned())
+    );
     assert_eq!(over(&call("tabs/tab")), Some("tabs/tab".to_owned()));
     let none = default_export("export default family('b', { rules: [] })").unwrap();
     assert_eq!(over(&none), None);

@@ -10,6 +10,7 @@
 //! - An item's `page` names a region its tree holds.
 
 use super::{references, Names};
+use crate::family::api::spelling::camel;
 use crate::family::api::{Node, NodeKind};
 use crate::family::ir::Family;
 
@@ -23,18 +24,20 @@ pub(super) fn stacked(family: &Family, names: &Names, found: &mut Vec<String>) {
     {
         if !names.regions.contains(page) {
             found.push(format!(
-                "the item's `page` names `{page}`, and no region has that name"
+                "`memberOf.pageSlot` names `{}`, and no region has that name",
+                camel(page)
             ));
         }
     }
     let Some(stack) = &family.api.stack else {
         return;
     };
-    references("the stack", stack.references(), names, found);
+    references("stack", stack.references(), names, found);
     if let Some(top) = &stack.top {
         if names.prop(top).is_none() && !names.derived.contains(top.as_str()) {
             found.push(format!(
-                "the stack's `top` names `{top}`, and no prop or computed value has that name"
+                "`stack.topTitle` names `{}`, and no prop or computed value has that name",
+                camel(top)
             ));
         }
     }
@@ -52,13 +55,14 @@ pub(super) fn stacked(family: &Family, names: &Names, found: &mut Vec<String>) {
             .any(|event| &event.name == before && event.cancelable);
         if names.events.contains(before.as_str()) && !cancelable {
             found.push(format!(
-                "the stack's `before` names `{before}`, which is not cancelable, so a page cannot refuse a move"
+                "`stack.onBeforeChange` names `{}`, which is not cancelable, so a page cannot refuse a move",
+                camel(before)
             ));
         }
     }
     if names.parts.contains(&stack.back) && !pressable(&family.tree, &stack.back) {
         found.push(format!(
-            "the stack's `back` names `{}`, which is no pressable",
+            "`stack.back` names `{}`, which is no pressable",
             stack.back
         ));
     }

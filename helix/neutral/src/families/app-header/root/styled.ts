@@ -1,6 +1,6 @@
+import { boolean, oneOf } from '../../../render.js'
 import { difference, fn, list, mix, native, product, safeArea, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -43,11 +43,11 @@ export default styles(
       maxInlineSize: '72rem',
       padding: null,
     },
-    props: [
-      prop('material', ['frosted', 'glass', 'transparent']),
-      prop('overlay', 'boolean'),
-      prop('sticky', 'boolean'),
-    ],
+    props: {
+      material: oneOf(['frosted', 'glass', 'transparent']),
+      overlay: boolean(),
+      sticky: boolean(),
+    },
     stylesheet: 'app-header/root/app-header-root.generated.css',
   },
   ({ hook, on, rule, variants }) => {
@@ -148,7 +148,7 @@ export default styles(
           paddingInline: hook.padding(token('space-lg')),
         }),
         /* Beside the brand, with the slack after it. */
-        rule({ 'content-align': 'start' }, { gridTemplateColumns: 'auto 1fr auto' }),
+        rule({ contentAlign: 'start' }, { gridTemplateColumns: 'auto 1fr auto' }),
         /* A phone-sized bar spends less on its insets, so two destinations
            fit a 360 point phone. */
         rule(
@@ -219,7 +219,7 @@ export default styles(
         }),
         /* A phone's scroll view is as wide as what it holds, so centered is safe. */
         native([rule({ flexShrink: 1, justifyContent: 'center' })]),
-        rule({ 'content-align': 'start' }, { justifyContent: 'flex-start' }),
+        rule({ contentAlign: 'start' }, { justifyContent: 'flex-start' }),
         rule(
           { folded: true },
           {

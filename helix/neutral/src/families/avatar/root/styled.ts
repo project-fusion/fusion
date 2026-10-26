@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { fn, inherited, native, product, token } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -29,7 +29,7 @@ export default styles(
       size: null,
     },
     own: ['avatar-size'],
-    props: [prop('shape', ['circle', 'rounded']), prop('size', ['sm', 'md', 'lg'])],
+    props: { shape: oneOf(['circle', 'rounded']), size: oneOf(['sm', 'md', 'lg']) },
     stylesheet: 'avatar/root/avatar-root.generated.css',
   },
   ({ hook, on, own, rule }) => [

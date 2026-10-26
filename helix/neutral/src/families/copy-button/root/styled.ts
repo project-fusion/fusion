@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { first, hookOf, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -31,10 +31,10 @@ export default styles(
       successColor: token('color-success'),
     },
     own: ['icon-button-ink', 'icon-button-ink-hover', 'icon-button-size'],
-    props: [
-      prop('emphasis', ['ghost', 'outlined', 'solid', 'subtle']),
-      prop('tone', ['accent', 'danger', 'neutral', 'primary']),
-    ],
+    props: {
+      emphasis: oneOf(['ghost', 'outlined', 'solid', 'subtle']),
+      tone: oneOf(['accent', 'danger', 'neutral', 'primary']),
+    },
     stylesheet: 'copy-button/root/copy-button-root.generated.css',
   },
   ({ hook, on, rule }) => {
@@ -57,7 +57,7 @@ export default styles(
       /* Under `show-label`, the words sit in a second cell beside the icon. */
       on('button', [
         rule(
-          { 'show-label': true },
+          { showLabel: true },
           {
             columnGap: token('space-xs'),
             web: { gridAutoFlow: 'column' },

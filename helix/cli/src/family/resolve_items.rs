@@ -18,6 +18,7 @@
 mod tests;
 
 use super::{expect_prop, Names};
+use crate::family::api::spelling::{camel, ITEM};
 use crate::family::api::{exported, Item, Names as Refers, Primitive, PropType};
 use crate::family::ir::{scope, Condition, Family, Rule, Scope};
 
@@ -27,7 +28,7 @@ pub(super) fn item(family: &Family, names: &Names, found: &mut Vec<String>) {
         return;
     };
     if let Some(grip) = item.grip.as_deref() {
-        expect_prop(names, grip, "the item's `grip`", found);
+        expect_prop(names, grip, "`memberOf.grip`", found);
     }
     /* A flag may be a value the element computes, as a megamenu is
     current while its panel holds the page. */
@@ -36,22 +37,24 @@ pub(super) fn item(family: &Family, names: &Names, found: &mut Vec<String>) {
         .as_deref()
         .filter(|flag| !names.derived.contains(flag))
     {
-        expect_prop(names, flag, "the item's `flag`", found);
+        expect_prop(names, flag, "`memberOf.current`", found);
     }
     if let Some(value) = item.value.as_deref() {
-        expect_prop(names, value, "the item's `value`", found);
+        expect_prop(names, value, "`memberOf.value`", found);
     }
     for region in &item.named {
         if !names.regions.contains(region.as_str()) {
             found.push(format!(
-                "the item's `named` lists `{region}`, and no region has that name"
+                "`memberOf.labelledby` lists `{}`, and no region has that name",
+                camel(region)
             ));
         }
     }
     if let Some(state) = item.state.as_deref() {
         if !names.states.contains(state) {
             found.push(format!(
-                "the item's `state` names `{state}`, and no state has that name"
+                "`memberOf.selectedState` names `{}`, and no state has that name",
+                camel(state)
             ));
         }
     }
@@ -62,24 +65,26 @@ pub(super) fn item(family: &Family, names: &Names, found: &mut Vec<String>) {
 /// asks before a press turns it can be refused.
 fn mixed(family: &Family, item: &Item, names: &Names, found: &mut Vec<String>) {
     for (at, name, what) in item.mixed_references() {
+        let at = written(at);
+        let name = &camel(name);
         if what == Refers::Event {
-            match family.api.events.iter().find(|event| event.name == name) {
+            match family.api.events.iter().find(|event| camel(&event.name) == *name) {
                 None => found.push(format!(
-                    "the item's `{at}` names `{name}`, and no event has that name"
+                    "`memberOf.{at}` names `{name}`, and no event has that name"
                 )),
                 Some(event) if !event.cancelable => found.push(format!(
-                    "the item's `{at}` names `{name}`, which is not cancelable, so a page cannot keep the item as it is"
+                    "`memberOf.{at}` names `{name}`, which is not cancelable, so a page cannot keep the item as it is"
                 )),
                 Some(_) => {}
             }
             continue;
         }
-        match names.prop(name) {
+        match names.prop(&crate::family::read::kebab(name)) {
             None => found.push(format!(
-                "the item's `{at}` reads `{name}`, and no prop has that name"
+                "`memberOf.{at}` reads `{name}`, and no prop has that name"
             )),
             Some(prop) if prop.kind != PropType::Primitive(Primitive::Boolean) => found.push(
-                format!("the item's `{at}` reads `{name}`, which is not a boolean"),
+                format!("`memberOf.{at}` reads `{name}`, which is not a boolean"),
             ),
             Some(_) => {}
         }
@@ -125,4 +130,11 @@ fn on_the_part(condition: &Condition) -> bool {
         Condition::Within { .. } => true,
         other => scope(other) == Scope::Target,
     }
+}
+
+/// An item's field as `memberOf` writes it, from the intermediate form's name.
+fn written(ir: &str) -> &'static str {
+    ITEM.iter()
+        .find(|(_, held, _)| *held == ir)
+        .map_or("item", |(written, ..)| *written)
 }

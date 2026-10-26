@@ -1,5 +1,5 @@
 import { Circle, headless, Slot, Svg, View, web } from '../../../render.js'
-import { bind, delay, derive, not } from '../../../tree.js'
+import { bind, derive, not } from '../../../tree.js'
 
 /**
  * Loader's headless tier: work of unknown length in progress.
@@ -35,12 +35,12 @@ export default headless('loader', {
     spokenLabel: derive('loader-name'),
     spokenRole: derive('loader-role'),
   },
-  delay: delay({ after: 'delay', restarts: 'idle', waiting: 'waiting' }),
+  delay: { duration: 'delay', idleWhen: 'idle', pending: 'waiting' },
   host: {
     busy: not('idle'),
     decorative: bind('waiting'),
-    label: bind('spoken-label'),
-    role: bind('spoken-role'),
+    label: bind('spokenLabel'),
+    role: bind('spokenRole'),
   },
   render: ({ props }) => (
     <>

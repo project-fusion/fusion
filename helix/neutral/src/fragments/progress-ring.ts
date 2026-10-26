@@ -22,7 +22,7 @@ export default fragment(
       'transition-duration',
     ],
     own: ['progress-crawl', 'progress-cycle', 'ring-stroke'],
-    props: ['indeterminate', 'shape', 'show-value'],
+    props: ['indeterminate', 'shape', 'showValue'],
   },
   ({ hook, keyframes, on, own, rule }) => [
     /* The ring: the loader's shape carrying the bar's value. */
@@ -33,7 +33,7 @@ export default fragment(
       ),
       /* In the middle, where a dial puts its reading. */
       rule(
-        { shape: 'ring', 'show-value': true },
+        { shape: 'ring', showValue: true },
         { gap: token('space-none'), gridTemplateColumns: 'auto' },
       ),
     ]),

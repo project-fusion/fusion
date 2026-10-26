@@ -10,7 +10,7 @@ import {
   string,
   View,
 } from '../../../render.js'
-import { derive, page, toggle } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * App Header's headless tier: the page's banner, a row of leading content,
@@ -73,21 +73,21 @@ export default headless('app-header', {
     toggleStart: derive('app-header-toggle-start'),
   },
   host: { role: 'banner' },
-  page: page({
+  pageScroll: {
     hidden: 'hidden',
-    hides: 'hide-on-scroll',
+    hideOnScroll: 'hideOnScroll',
+    keepInView: 'open',
+    onScrolledChange: 'scrolled',
     scrolled: 'scrolled',
     scroller: 'scroller',
-    sends: 'scrolled',
-    stays: 'open',
-  }),
-  toggle: toggle({
-    changes: 'toggle',
-    checked: 'open',
-    closes: 'before-close',
-    initial: 'default-open',
-    opens: 'before-open',
-  }),
+  },
+  toggle: {
+    defaultProp: 'defaultOpen',
+    onBeforeClose: 'beforeClose',
+    onBeforeOpen: 'beforeOpen',
+    onToggle: 'toggle',
+    prop: 'open',
+  },
   render: ({ derived, props }) => (
     <View part="row">
       {/* The toggle that opens a folded middle region, at the start of the

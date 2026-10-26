@@ -10,7 +10,7 @@ import {
   View,
   web,
 } from '../../../render.js'
-import { bind, delay, derive } from '../../../tree.js'
+import { bind, derive } from '../../../tree.js'
 
 /**
  * Avatar's headless tier: a person or an entity, as a picture or as
@@ -48,8 +48,8 @@ export default headless('avatar', {
     delays: derive('avatar-delays'),
     spokenRole: derive('avatar-role'),
   },
-  delay: delay({ after: 'fallback-delay', again: 'src', waiting: 'waiting' }),
-  host: { label: bind('name'), role: bind('spoken-role') },
+  delay: { duration: 'fallbackDelay', pending: 'waiting', restartOn: 'src' },
+  host: { label: bind('name'), role: bind('spokenRole') },
   render: ({ props }) => (
     <>
       <Slot>

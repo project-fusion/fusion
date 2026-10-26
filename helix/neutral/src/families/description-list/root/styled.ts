@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -38,11 +38,7 @@ export default styles(
       'description-list-value-align',
       'description-list-value-figures',
     ],
-    props: [
-      prop('divided', 'boolean', { default: false }),
-      prop('justify', ['between']),
-      prop('width', ['auto']),
-    ],
+    props: { divided: false, justify: oneOf(['between']), width: oneOf(['auto']) },
     stylesheet: 'description-list/root/description-list-root.generated.css',
   },
   ({ hook, on, own, rule }) => [

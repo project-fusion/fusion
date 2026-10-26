@@ -26,11 +26,13 @@ pub fn over(export: &Lit) -> Option<String> {
     let [_, Lit::Object(fields)] = arguments.as_slice() else {
         return None;
     };
-    fields.iter().find_map(|(key, value)| match (key.as_str(), value) {
-        ("over", Lit::Text(name)) if name.contains('/') => Some(name.clone()),
-        ("over", Lit::Text(name)) => Some(format!("{name}/root")),
-        _ => None,
-    })
+    fields
+        .iter()
+        .find_map(|(key, value)| match (key.as_str(), value) {
+            ("over", Lit::Text(name)) if name.contains('/') => Some(name.clone()),
+            ("over", Lit::Text(name)) => Some(format!("{name}/root")),
+            _ => None,
+        })
 }
 
 /// Lays each element's `over` element's rules under its own.
@@ -89,7 +91,11 @@ fn count(items: &[Item]) -> usize {
 /// reads that family's hook on the element it is laid under.
 pub(crate) fn qualify(value: &mut Value, of: &str) {
     match value {
-        Value::Hook { fallback, of: family, .. } => {
+        Value::Hook {
+            fallback,
+            of: family,
+            ..
+        } => {
             if family.is_none() {
                 *family = Some(of.to_owned());
             }
@@ -97,7 +103,9 @@ pub(crate) fn qualify(value: &mut Value, of: &str) {
                 qualify(fallback, of);
             }
         }
-        Value::Calc { operands: values, .. }
+        Value::Calc {
+            operands: values, ..
+        }
         | Value::Function {
             arguments: values, ..
         }

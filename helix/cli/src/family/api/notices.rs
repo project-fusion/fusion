@@ -106,7 +106,7 @@ pub fn notice(lit: &Lit) -> Result<Notice, String> {
         }
     }
     if notice.part.is_empty() || notice.waiting.is_empty() {
-        return Err("notice: a message names its `part` and its `waiting` state".to_owned());
+        return Err("notice: a message names its `part` and its `held` state".to_owned());
     }
     Ok(notice)
 }
@@ -161,7 +161,7 @@ mod tests {
         assert_eq!(read.references().len(), 2);
         assert_eq!(
             notice(&call("notice", &[("part", "item")])).unwrap_err(),
-            "notice: a message names its `part` and its `waiting` state"
+            "notice: a message names its `part` and its `held` state"
         );
     }
 }

@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { fn, list, native, product, scheme, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -43,11 +43,11 @@ export default styles(
       shadow: token('shadow-surface'),
     },
     own: ['card-inset', 'card-media', 'heading-ink'],
-    props: [
-      prop('material', ['frosted', 'glass', 'transparent']),
-      prop('orientation', ['horizontal', 'vertical']),
-      prop('separation', ['elevated', 'filled', 'outlined', 'plain']),
-    ],
+    props: {
+      material: oneOf(['frosted', 'glass', 'transparent']),
+      orientation: oneOf(['horizontal', 'vertical']),
+      separation: oneOf(['elevated', 'filled', 'outlined', 'plain']),
+    },
     stylesheet: 'card/root/card-root.generated.css',
   },
   ({ hook, on, own, rule, variants }) => [
@@ -125,7 +125,7 @@ export default styles(
         objectFit: hook.mediaFit,
       }),
       rule(
-        { 'media-placement': 'end' },
+        { mediaPlacement: 'end' },
         { marginBlockEnd: product(own.inset, '-1'), marginBlockStart: 0, order: 1 },
       ),
       rule(

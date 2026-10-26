@@ -42,7 +42,7 @@ export default styles(
   ({ hook, on, rule }) => {
     /* Where the chevron stands, how it turns, and its color under the pointer. */
     const placed = [
-      rule({ 'chevron-placement': { not: 'start' } }, { marginInlineStart: 'auto' }),
+      rule({ chevronPlacement: { not: 'start' } }, { marginInlineStart: 'auto' }),
       rule({ state: 'open' }, { transform: 'scaleY(-1)' }),
       rule({ within: { trigger: { hover: true } } }, { color: hook.chevronHoverColor }),
     ]
@@ -127,7 +127,7 @@ export default styles(
           paddingBlockStart: 0,
         }),
         rule(
-          { 'chevron-placement': 'start' },
+          { chevronPlacement: 'start' },
           { marginInlineStart: sum(token('text-md'), token('space-xs')) },
         ),
       ]),

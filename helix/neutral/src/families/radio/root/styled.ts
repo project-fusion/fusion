@@ -1,7 +1,7 @@
 import visuallyHidden from '../../../fragments/visually-hidden.js'
+import { oneOf } from '../../../render.js'
 import { difference, list, product, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -32,11 +32,11 @@ export default styles(
       size: token('size-checkbox'),
     }),
     own: ['radio-chip-lift', 'radio-size'],
-    props: [
-      prop('hide-control', 'boolean', { default: false }),
-      prop('separation', ['filled', 'outlined', 'plain']),
-      prop('variant', ['chip']),
-    ],
+    props: {
+      hideControl: false,
+      separation: oneOf(['filled', 'outlined', 'plain']),
+      variant: oneOf(['chip']),
+    },
     stylesheet: 'radio/root/radio-root.generated.css',
   },
   ({ hook, on, own, rule }) => [
@@ -199,7 +199,7 @@ export default styles(
         },
       ),
       /* The card is the control, so the circle can go. */
-      rule({ 'hide-control': true, separation: ['filled', 'outlined'] }, { display: 'none' }),
+      rule({ hideControl: true, separation: ['filled', 'outlined'] }, { display: 'none' }),
       /* A chip is a card that gave up its words. */
       rule({ variant: 'chip' }, { display: 'none' }),
     ]),
@@ -216,7 +216,7 @@ export default styles(
       }),
       rule({ selected: true }, { scale: 1 }),
       /* A slotted indicator is the mark, so the dot goes. */
-      rule({ state: 'has-indicator' }, { content: 'none' }),
+      rule({ state: 'hasIndicator' }, { content: 'none' }),
     ]),
     on({ region: 'indicator', slotted: '*' }, [
       rule({

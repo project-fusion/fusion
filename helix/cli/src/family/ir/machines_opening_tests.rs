@@ -6,7 +6,7 @@ use super::*;
 fn a_set_whose_items_open_runs_the_toggle_set_bound_to_its_mode() {
     let accordion = family(
         "export default headless('accordion', {
-          collection: collection({ opens: 'mode', toggles: true }),
+          collection: { itemsToggle: true, openMode: 'mode' },
           events: [],
           props: [prop('mode', ['multiple', 'single', 'single-collapsible'])],
           tree: [region('default')],
@@ -26,7 +26,7 @@ fn an_item_that_opens_binds_an_event_for_each_direction() {
           events: [event('before-close', { cancelable: true }), event('before-open', { cancelable: true })],
           item: item('accordion'),
           props: [prop('open', 'boolean')],
-          toggle: toggle({ checked: 'open', closes: 'before-close', opens: 'before-open' }),
+          toggle: { onBeforeClose: 'beforeClose', onBeforeOpen: 'beforeOpen', prop: 'open' },
           tree: [pressable('trigger', { toggles: true }, [region('summary')]), box('content', { closed: not('open') }, [region('default')])],
         })",
     );
@@ -46,7 +46,7 @@ fn a_set_whose_items_open_says_they_turn_and_needs_no_chosen_prop() {
     let refused = headless(
         &default_export(
             "export default headless('accordion', {
-              collection: collection({ keys: { chooses: false, wrap: false }, opens: 'mode' }),
+              collection: { keys: { loop: false, selectionFollowsFocus: false }, openMode: 'mode' },
               events: [],
               props: [prop('mode', ['single'])],
               tree: [region('default')],
@@ -55,7 +55,7 @@ fn a_set_whose_items_open_says_they_turn_and_needs_no_chosen_prop() {
         .unwrap(),
     )
     .unwrap_err();
-    assert!(refused.contains("says `toggles: true`"), "{refused}");
+    assert!(refused.contains("says `itemsToggle: true`"), "{refused}");
 }
 
 #[test]
@@ -65,7 +65,7 @@ fn a_toggle_drawn_at_either_end_of_a_bar_runs_one_press_and_one_toggle() {
           derived: { 'toggle-end': derive('app-header-toggle-end'), 'toggle-start': derive('app-header-toggle-start') },
           events: [event('before-close', { cancelable: true }), event('before-open', { cancelable: true })],
           props: [prop('open', 'boolean')],
-          toggle: toggle({ checked: 'open', closes: 'before-close', opens: 'before-open' }),
+          toggle: { onBeforeClose: 'beforeClose', onBeforeOpen: 'beforeOpen', prop: 'open' },
           tree: [
             when('toggle-start', pressable('toggle', { toggles: true }, [])),
             region('default'),

@@ -156,10 +156,19 @@ pub fn desugar_with(export: &Lit, source: Option<&Source>) -> Result<Lit, String
             ("prefix", Lit::Text(name)) => prefix = Some(name.clone()),
             ("hooks", value) => hooks = Some(value),
             ("own", value) => own = Some(value),
-            ("props", Lit::Array(props)) => {
-                reserved(props)?;
+            ("props", Lit::Object(_)) => {
+                let Lit::Array(props) = crate::family::api::rendered::props(value)? else {
+                    return Err("`props` is an object of each prop's default or spec".to_owned());
+                };
+                reserved(&props)?;
                 styled_props = props.iter().filter_map(prop_name).collect();
-                fields.push((key.clone(), value.clone()));
+                fields.push((key.clone(), Lit::Array(props)));
+            }
+            ("props", Lit::Array(_)) => {
+                return Err(
+                    "`props` is an object of each prop's default or spec, by name in camelCase, as a headless source writes it: `props: { tone: oneOf(['a', 'b']) }`"
+                        .to_owned(),
+                )
             }
             ("over" | "stylesheet", Lit::Text(_)) => fields.push((key.clone(), value.clone())),
             (other, _) => {
@@ -223,7 +232,9 @@ pub fn fragment(export: &Lit) -> Result<Lit, String> {
                     /* The includer's props, which the editor holds every
                     includer to; the includer's own reading checks them. */
                     "props" => {
-                        texts(value, "props")?;
+                        for name in texts(value, "props")? {
+                            crate::family::api::spelling::name_of("props", &name)?;
+                        }
                     }
                     other => return Err(format!("`{other}` is not a field `fragment()` takes")),
                 }

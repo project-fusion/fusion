@@ -1,5 +1,4 @@
 import { bare, headless, oneOf, Slot, View, web } from '../../../render.js'
-import { scroll } from '../../../tree.js'
 
 /**
  * Scroll Area's headless tier: a box that scrolls and says which of its
@@ -45,25 +44,25 @@ export default headless('scroll-area', {
     scrollend: bare(),
   },
   states: [
-    'more-block-end',
-    'more-block-start',
-    'more-inline-end',
-    'more-inline-start',
-    'scrollbar-horizontal',
-    'scrollbar-vertical',
+    'moreBlockEnd',
+    'moreBlockStart',
+    'moreInlineEnd',
+    'moreInlineStart',
+    'scrollbarHorizontal',
+    'scrollbarVertical',
     'scrolls',
     'settled',
   ],
-  scroll: scroll({
-    'block-end': 'more-block-end',
-    'block-start': 'more-block-start',
-    'inline-end': 'more-inline-end',
-    'inline-start': 'more-inline-start',
-    moves: 'scroll',
+  scroll: {
+    blockEnd: 'moreBlockEnd',
+    blockStart: 'moreBlockStart',
+    inlineEnd: 'moreInlineEnd',
+    inlineStart: 'moreInlineStart',
+    onScroll: 'scroll',
+    onScrollEnd: 'scrollend',
     overflows: 'scrolls',
     part: 'viewport',
-    settles: 'scrollend',
-  }),
+  },
   render: ({ props }) => (
     <>
       <View

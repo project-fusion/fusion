@@ -1,8 +1,8 @@
 import field from '../../../fragments/field.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
+import { oneOf } from '../../../render.js'
 import { difference, list, measured, native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import group from './headless.js'
 
 /**
@@ -40,7 +40,7 @@ export default styles(
       'toggle-pressed-surface',
       'toggle-radius',
     ],
-    props: [prop('separation', ['outlined', 'plain'])],
+    props: { separation: oneOf(['outlined', 'plain']) },
     stylesheet: 'toggle/group/toggle-group.generated.css',
   },
   ({ hook, include, on, own, rule }) => [
@@ -48,7 +48,7 @@ export default styles(
     include(fieldStacked),
     on('host', [
       rule({ display: 'inline-flex', flexDirection: 'column', gap: token('space-2xs') }),
-      rule({ 'label-placement': 'start' }, { alignItems: 'start' }),
+      rule({ labelPlacement: 'start' }, { alignItems: 'start' }),
     ]),
     /* The label inside the track, with a rule after it. Ahead of the rule,
        which is the track's `::before` on the web, and ahead of the toggles. The
@@ -56,7 +56,7 @@ export default styles(
        the toggles' words. */
     on('label', [
       rule(
-        { 'label-placement': 'start' },
+        { labelPlacement: 'start' },
         {
           alignSelf: 'center',
           marginBlock: 0,
@@ -72,7 +72,7 @@ export default styles(
     on({ before: 'track' }, [
       web([
         rule(
-          { 'label-placement': 'start' },
+          { labelPlacement: 'start' },
           {
             alignSelf: 'center',
             backgroundColor: token('color-border'),
@@ -142,7 +142,7 @@ export default styles(
       native([
         rule({ own: { toggleHoverSurface: 'transparent' } }),
         rule(
-          { 'selection-mode': 'multiple' },
+          { selectionMode: 'multiple' },
           {
             own: {
               togglePressedSurface: hook.indicatorColor,

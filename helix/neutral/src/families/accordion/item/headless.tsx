@@ -12,7 +12,7 @@ import {
   View,
   web,
 } from '../../../render.js'
-import { derive, toggle } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * An accordion section's headless tier: a trigger inside a heading, and the
@@ -74,13 +74,13 @@ export default headless('accordion-item', {
     chevronNone: derive('accordion-chevron-none'),
     chevronStart: derive('accordion-chevron-start'),
   },
-  toggle: toggle({
-    changes: 'toggle',
-    checked: 'open',
-    closes: 'before-close',
-    initial: 'default-open',
-    opens: 'before-open',
-  }),
+  toggle: {
+    defaultProp: 'defaultOpen',
+    onBeforeClose: 'beforeClose',
+    onBeforeOpen: 'beforeOpen',
+    onToggle: 'toggle',
+    prop: 'open',
+  },
   render: ({ derived, props }) => (
     <View part="container">
       <View

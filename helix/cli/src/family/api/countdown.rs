@@ -103,7 +103,7 @@ pub fn countdown(lit: &Lit) -> Result<Countdown, String> {
         }
     }
     if countdown.after.is_empty() || countdown.done.is_empty() || countdown.paused.is_empty() {
-        return Err("countdown: a countdown names `after`, `done`, and `paused`".to_owned());
+        return Err("countdown: a countdown names `duration`, `onDone`, and `paused`".to_owned());
     }
     Ok(countdown)
 }
@@ -120,7 +120,7 @@ pub fn queue(lit: &Lit) -> Result<Queue, String> {
         }
     }
     if queue.queued.is_empty() || queue.waiting.is_empty() {
-        return Err("queue: a queue names `queued` and `waiting`".to_owned());
+        return Err("queue: a queue names `prop` and `queued`".to_owned());
     }
     Ok(queue)
 }
@@ -161,7 +161,7 @@ mod tests {
     fn refuses_a_countdown_with_no_event_or_a_field_it_lacks() {
         assert_eq!(
             countdown(&call("countdown", &[("after", "duration")])).unwrap_err(),
-            "countdown: a countdown names `after`, `done`, and `paused`"
+            "countdown: a countdown names `duration`, `onDone`, and `paused`"
         );
         assert_eq!(
             countdown(&call("countdown", &[("holds", "x")])).unwrap_err(),
@@ -179,7 +179,7 @@ mod tests {
         assert_eq!(read.references().len(), 2);
         assert_eq!(
             queue(&call("queue", &[("queued", "queued")])).unwrap_err(),
-            "queue: a queue names `queued` and `waiting`"
+            "queue: a queue names `prop` and `queued`"
         );
     }
 }

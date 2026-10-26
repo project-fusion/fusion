@@ -81,7 +81,7 @@ export default styles(
         /* `3xl` is the top of the space scale, and the pair stops where it does. */
         '3xl': { own: { gap: token('space-3xl') } },
       }),
-      variants('row-gap', {
+      variants('rowGap', {
         none: { own: { rowGap: token('space-none') } },
         '2xs': { own: { rowGap: token('space-2xs') } },
         xs: { own: { rowGap: token('space-xs') } },
@@ -92,7 +92,7 @@ export default styles(
         '2xl': { own: { rowGap: token('space-2xl') } },
         '3xl': { own: { rowGap: token('space-3xl') } },
       }),
-      variants('column-gap', {
+      variants('columnGap', {
         none: { own: { columnGap: token('space-none') } },
         '2xs': { own: { columnGap: token('space-2xs') } },
         xs: { own: { columnGap: token('space-xs') } },
@@ -104,21 +104,21 @@ export default styles(
         '3xl': { own: { columnGap: token('space-3xl') } },
       }),
       /* The attribute is named for the property, so the rule is the value. */
-      variants('align-items', {
+      variants('alignItems', {
         start: { alignItems: 'start' },
         center: { alignItems: 'center' },
         end: { alignItems: 'end' },
       }),
-      variants('justify-items', {
+      variants('justifyItems', {
         start: { justifyItems: 'start' },
         center: { justifyItems: 'center' },
         end: { justifyItems: 'end' },
       }),
       /* A phone places each cell in row order. */
       web([
-        rule({ 'auto-flow': 'column' }, { gridAutoFlow: 'column' }),
-        rule({ 'auto-flow': 'dense' }, { gridAutoFlow: 'dense' }),
-        rule({ 'auto-flow': 'column-dense' }, { gridAutoFlow: 'column dense' }),
+        rule({ autoFlow: 'column' }, { gridAutoFlow: 'column' }),
+        rule({ autoFlow: 'dense' }, { gridAutoFlow: 'dense' }),
+        rule({ autoFlow: 'column-dense' }, { gridAutoFlow: 'column dense' }),
       ]),
     ]),
     /* A child that spans columns. */

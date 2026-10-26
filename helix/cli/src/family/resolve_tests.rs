@@ -92,7 +92,7 @@ fn holds_a_toggle_to_its_props_and_events_and_to_one_pressable() {
         "export default headless('checkbox', {
           events: [event('chang', { bare: true }), event('before-check', { cancelable: true })],
           props: [prop('checked', 'boolean'), prop('readonly', 'boolean')],
-          toggle: toggle({ after: 'change', before: 'before-check', checked: 'checked', mixed: 'indeterminate', readonly: 'readonly' }),
+          toggle: { indeterminate: 'indeterminate', onBeforeChange: 'beforeCheck', onChange: 'change', prop: 'checked', readonly: 'readonly' },
           tree: [pressable('control', {}, [])],
         })",
         STYLED,
@@ -100,8 +100,8 @@ fn holds_a_toggle_to_its_props_and_events_and_to_one_pressable() {
     assert_eq!(
         unresolved(&checkbox),
         vec![
-            "the toggle's `after` names `change`, and no event has that name",
-            "the toggle's `mixed` names `indeterminate`, and no prop has that name",
+            "`toggle.onChange` names `change`, and no event has that name",
+            "`toggle.indeterminate` names `indeterminate`, and no prop has that name",
             "the element declares a `toggle`, and 0 pressables toggle it, where one does",
         ]
     );
@@ -121,7 +121,7 @@ fn holds_a_toggle_to_its_props_and_events_and_to_one_pressable() {
 fn holds_a_collection_to_its_props_events_and_states() {
     let list = family(
         "export default headless('list', {
-          collection: collection({ chosen: 'value', after: 'change', empty: 'empty', keys: { chooses: false, wrap: false } }),
+          collection: { empty: 'empty', keys: { loop: false, selectionFollowsFocus: false }, onChange: 'change', prop: 'value' },
           events: [event('chang', { bare: true })],
           props: [prop('valu', 'string')],
         })",
@@ -130,9 +130,9 @@ fn holds_a_collection_to_its_props_events_and_states() {
     assert_eq!(
         unresolved(&list),
         vec![
-            "the collection's `after` names `change`, and no event has that name",
-            "the collection's `chosen` names `value`, and no prop has that name",
-            "the collection's `empty` names `empty`, and no state has that name",
+            "`collection.onChange` names `change`, and no event has that name",
+            "`collection.prop` names `value`, and no prop has that name",
+            "`collection.empty` names `empty`, and no state has that name",
         ]
     );
 }
@@ -187,7 +187,7 @@ fn a_toolbar_needs_a_part_whose_role_is_toolbar() {
     let toolbar = family(
         "export default headless('toolbar', {
           props: [prop('orientation', ['horizontal', 'vertical'])],
-          toolbar: toolbar({ ends: 'stop-at-ends', orientation: 'orientation' }),
+          toolbar: { orientation: 'orientation', stopAtEnds: 'stopAtEnds' },
           tree: [box('toolbar', {}, [region('default')])],
         })",
         STYLED,
@@ -195,7 +195,7 @@ fn a_toolbar_needs_a_part_whose_role_is_toolbar() {
     assert_eq!(
         unresolved(&toolbar),
         vec![
-            "the toolbar's `ends` names `stop-at-ends`, and no prop has that name",
+            "`toolbar.stopAtEnds` names `stopAtEnds`, and no prop has that name",
             "the element declares a `toolbar`, and no part has the role `toolbar`",
         ]
     );
@@ -205,7 +205,7 @@ fn a_toolbar_needs_a_part_whose_role_is_toolbar() {
 fn an_item_state_and_a_pressing_mode_resolve_to_what_the_elements_have() {
     let button = family(
         "export default headless('button', {
-          item: item('button-group', { chooses: true, state: 'held' }),
+          item: item('button-group', { chooses: true, selectedState: 'held' }),
           states: ['pressed'],
           tree: [pressable('button', { chooses: true })],
         })",
@@ -213,11 +213,11 @@ fn an_item_state_and_a_pressing_mode_resolve_to_what_the_elements_have() {
     );
     assert_eq!(
         unresolved(&button),
-        vec!["the item's `state` names `held`, and no state has that name"]
+        vec!["`memberOf.selectedState` names `held`, and no state has that name"]
     );
     let group = family(
         "export default headless('button-group', {
-          collection: collection({ chosen: 'value', keys: { chooses: false, wrap: true }, mode: 'selection-mode', presses: 'selection-mode' }),
+          collection: { keys: { loop: true, selectionFollowsFocus: false }, pressMode: 'selectionMode', prop: 'value', selectionMode: 'selectionMode' },
           props: [prop('selection-mode', ['one', 'single']), prop('value', 'string')],
           tree: [region('default')],
         })",
@@ -225,7 +225,7 @@ fn an_item_state_and_a_pressing_mode_resolve_to_what_the_elements_have() {
     );
     assert_eq!(
         unresolved(&group),
-        vec!["the collection's `presses` reads `selection-mode=\"multiple\"`, and `selection-mode` never takes `multiple`"]
+        vec!["`collection.pressMode` reads `selection-mode=\"multiple\"`, and `selection-mode` never takes `multiple`"]
     );
 }
 
@@ -297,7 +297,7 @@ fn an_event_follows_a_computed_value_and_gives_fields_its_detail_has() {
 fn a_link_part_reads_its_href_and_an_item_is_named_by_regions_it_draws() {
     let tag = family(
         "export default headless('tag', {
-          item: item('tag-group', { named: ['start', 'default'] }),
+          item: item('tag-group', { labelledby: ['start', 'default'] }),
           props: [prop('href', 'string')],
           tree: [region('start'), wrap('link', { href: bind('href') }, [region('default')])],
         })",
@@ -308,14 +308,14 @@ fn a_link_part_reads_its_href_and_an_item_is_named_by_regions_it_draws() {
     assert_eq!(unresolved(&tag), Vec::<String>::new());
     let unnamed = family(
         "export default headless('tag', {
-          item: item('tag-group', { named: ['category'] }),
+          item: item('tag-group', { labelledby: ['category'] }),
           tree: [region('default')],
         })",
         STYLED,
     );
     assert_eq!(
         unresolved(&unnamed),
-        vec!["the item's `named` lists `category`, and no region has that name"]
+        vec!["`memberOf.labelledby` lists `category`, and no region has that name"]
     );
 }
 
@@ -324,7 +324,7 @@ fn copying(presses: &str) -> Family {
     family(
         &format!(
             "export default headless('copy-button', {{
-          copy: copy({{ after: 'feedback-duration', copied: 'copied', failed: 'failed', fails: 'copy-error', says: 'says', sends: 'copy', text: 'value', told: 'told', words: {{ copied: 'copied-label', failed: 'error-label', resting: 'label' }} }}),
+          copy: {{ copied: 'copied', duration: 'feedbackDuration', failed: 'failed', label: 'says', labels: {{ copied: 'copiedLabel', failed: 'errorLabel', idle: 'label' }}, onCopy: 'copy', onError: 'copyError', prop: 'value', status: 'told' }},
           events: [event('copy', {{ detail: ['value'] }}), event('copy-error')],
           props: [prop('copied-label', 'string'), prop('error-label', 'string'), prop('feedback-duration', 'number'), prop('label', 'string'), prop('value', 'string')],
           states: ['copied', 'failed'],
@@ -348,7 +348,9 @@ fn a_copy_names_what_it_reads_and_one_pressable_copies() {
         .expect("a copy machine");
     assert_eq!(
         copy.bind.get("part"),
-        Some(&crate::family::ir::machines::Bound::Part("button".to_owned()))
+        Some(&crate::family::ir::machines::Bound::Part(
+            "button".to_owned()
+        ))
     );
     assert_eq!(
         unresolved(&copying("pressable('button', { role: 'button' }, [])")),

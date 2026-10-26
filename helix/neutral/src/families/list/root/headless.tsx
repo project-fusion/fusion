@@ -11,7 +11,6 @@ import {
   View,
   web,
 } from '../../../render.js'
-import { collection } from '../../../tree.js'
 
 /**
  * A list's headless tier: what it takes, what it sends, and its parts.
@@ -68,32 +67,32 @@ export default headless('list', {
     reorder: ['keys'],
   },
   states: ['empty', 'loading', 'settled'],
-  collection: collection({
-    after: 'change',
-    before: 'before-change',
-    behavior: 'selection-behavior',
-    chosen: 'value',
-    counts: { first: 'list-first', reversed: 'reversed', start: 'start', step: 'list-step' },
-    empty: 'empty',
+  collection: {
     /* **The keys only move focus down the rows, and stop at the ends**, as
        the web's list does. Left and Right are the row's own. */
-    keys: { chooses: false, keeps: ['ArrowLeft', 'ArrowRight'], wrap: false },
-    mode: 'selection-mode',
+    keys: { itemKeys: ['ArrowLeft', 'ArrowRight'], loop: false, selectionFollowsFocus: false },
+    numbering: { first: 'listFirst', reversed: 'reversed', start: 'start', step: 'listStep' },
+    empty: 'empty',
+    onBeforeChange: 'beforeChange',
+    onChange: 'change',
+    prop: 'value',
     /* **A `reorderable` list lets a reader move its rows**, by a grip on each
        row. It moves no row itself: it asks with `before-reorder`, then says
        the new order in `reorder`, and the page moves its rows. */
     reorder: {
-      after: 'reorder',
-      before: 'before-reorder',
-      canceled: 'canceled-label',
-      dropped: 'dropped-label',
+      canceled: 'canceledLabel',
+      dropped: 'droppedLabel',
       enabled: 'reorderable',
-      move: 'move-label',
-      moved: 'moved-label',
-      picked: 'picked-up-label',
+      move: 'moveLabel',
+      moved: 'movedLabel',
+      onBeforeReorder: 'beforeReorder',
+      onReorder: 'reorder',
+      picked: 'pickedUpLabel',
       preview: 'drag-preview',
     },
-  }),
+    selectionBehavior: 'selectionBehavior',
+    selectionMode: 'selectionMode',
+  },
   render: ({ props, state }) => (
     <>
       <Slot />

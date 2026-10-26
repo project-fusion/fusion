@@ -23,6 +23,7 @@ pub fn computed(lit: &Lit) -> Result<BTreeMap<String, Attribute>, String> {
     entries
         .iter()
         .map(|(name, value)| {
+            let value = &super::spelling::bound(&format!("derived.{name}"), value)?;
             let read = match (derived(value), binding(value)) {
                 (Some(Ok(Attribute::Derived { derive })), _) if is_list(&derive) => {
                     Err("computes a list, which only a repeat's `each` reads".to_owned())
@@ -68,7 +69,8 @@ pub fn host(lit: &Lit) -> Result<BTreeMap<String, Attribute>, String> {
                     "`host` takes `busy`, `decorative`, `label`, `role`, and a range's `valuemin`, `valuemax`, `valuenow` and `valuetext`, and `{key}` is none of them"
                 ));
             }
-            let value = attribute(value).map_err(|why| format!("`host`: `{key}` {why}"))?;
+            let value = super::spelling::bound(&format!("host.{key}"), value)?;
+            let value = attribute(&value).map_err(|why| format!("`host`: `{key}` {why}"))?;
             vocabulary::attribute(NodeKind::Box, "host", key, &value)?;
             Ok((key.clone(), value))
         })

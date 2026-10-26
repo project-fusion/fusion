@@ -43,11 +43,11 @@ export default styles(
       native([rule({ content: quote('open') })]),
       /* `no-open-quote` draws nothing and still counts the level, so a quote
          nested inside one without marks takes the inner marks. */
-      rule({ 'no-marks': true }, { content: quote('no-open') }),
+      rule({ noMarks: true }, { content: quote('no-open') }),
     ]),
     on({ after: 'quote' }, [
       native([rule({ content: quote('close') })]),
-      rule({ 'no-marks': true }, { content: quote('no-close') }),
+      rule({ noMarks: true }, { content: quote('no-close') }),
     ]),
     /* The marks and the slant print, with no fill behind them. */
     include(printEconomy),

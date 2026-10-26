@@ -1,4 +1,5 @@
 import printExact from '../../../fragments/print-exact.js'
+import { oneOf } from '../../../render.js'
 import {
   difference,
   list,
@@ -11,7 +12,6 @@ import {
   web,
 } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -57,14 +57,14 @@ export default styles(
       valueSize: token('text-xs'),
     },
     own: ['meter-hue', 'meter-span', 'meter-stroke'],
-    props: [prop('emphasis', ['subtle'])],
+    props: { emphasis: oneOf(['subtle']) },
     stylesheet: 'meter/root/meter-root.generated.css',
   },
   ({ hook, include, on, own, rule, variants }) => [
     on('host', [
       rule({ display: 'block' }),
       rule(
-        { 'show-value': true },
+        { showValue: true },
         {
           alignItems: 'center',
           columnGap: hook.valueGap,
@@ -92,7 +92,7 @@ export default styles(
       }),
       /* In the grid the row gap is the space, so the margin would count it
          twice. */
-      rule({ 'show-value': true }, { marginBlockEnd: 0 }),
+      rule({ showValue: true }, { marginBlockEnd: 0 }),
       /* Under a ring or an arc, in the drawing's own column, as a gauge's
          caption. */
       rule([{ shape: 'arc' }, { shape: 'ring' }], { gridColumn: 1, marginBlock: 0 }),
