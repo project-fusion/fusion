@@ -1,4 +1,4 @@
-import { list, mix, token, web } from '../../../style.js'
+import { list, mix, native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -27,7 +27,11 @@ export default styles(
   root,
   {
     prefix: 'toggle',
-    hooks: ['item-color', 'item-color-selected', 'item-padding-inline'],
+    hooks: {
+      itemColor: token('color-foreground-muted'),
+      itemColorSelected: token('color-foreground'),
+      itemPaddingInline: token('space-sm'),
+    },
     own: [
       'toggle-height',
       'toggle-hover-surface',
@@ -42,19 +46,21 @@ export default styles(
        indicator, which sits behind every item. */
     on('host', [
       rule({ display: 'inline-flex', position: 'relative', zIndex: token('layer-raised') }),
-      rule(
-        { state: 'selected', platform: 'native' },
-        {
-          backgroundColor: own.pressedSurface('transparent'),
-          borderRadius: own.radius(token('radii-sm')),
-          boxShadow: own.pressedShadow('none'),
-        },
-      ),
+      native([
+        rule(
+          { selected: true },
+          {
+            backgroundColor: own.pressedSurface('transparent'),
+            borderRadius: own.radius(token('radii-sm')),
+            boxShadow: own.pressedShadow('none'),
+          },
+        ),
+      ]),
       /* A control is not printed: paper cannot be pressed. */
       rule({ print: true }, { display: 'none' }),
     ]),
     on('item', [
-      rule({ all: web('unset'), boxSizing: 'border-box' }),
+      rule({ web: { all: 'unset' }, boxSizing: 'border-box' }),
       rule(
         { focusVisible: true },
         {
@@ -63,44 +69,40 @@ export default styles(
         },
       ),
       /* The base layer's look, for a phone. */
-      rule(
-        { platform: 'native' },
-        {
+      native([
+        rule({
           alignItems: 'center',
           backgroundColor: 'transparent',
           blockSize: own.height('auto'),
           borderRadius: own.radius(token('radii-sm')),
-          color: hook.itemColor(token('color-foreground-muted')),
+          color: hook.itemColor,
           display: 'inline-flex',
           flex: '1 1 auto',
           fontFamily: token('font-sans'),
           fontSize: token('text-sm'),
           fontWeight: token('weight-medium'),
           justifyContent: 'center',
-          paddingInline: hook.itemPaddingInline(token('space-sm')),
+          paddingInline: hook.itemPaddingInline,
           transition: list(
             ['background-color', token('duration-fast'), token('easing-standard')],
             ['color', token('duration-fast'), token('easing-standard')],
           ),
           whiteSpace: 'nowrap',
-        },
-      ),
-      /* A disabled toggle that lit up under a finger would say it can be
+        }),
+        /* A disabled toggle that lit up under a finger would say it can be
          pressed. */
-      rule(
-        { disabled: false, interaction: ['hover', 'active'], platform: 'native' },
-        {
-          backgroundColor: own.hoverSurface(mix(token('color-foreground'), 5, 'transparent')),
-          color: token('color-foreground'),
-        },
-      ),
-      /* Pressed: the words at full strength, over the indicator's fill where
+        rule(
+          { within: { host: { disabled: false } }, interaction: ['hover', 'active'] },
+          {
+            backgroundColor: own.hoverSurface(mix(token('color-foreground'), 5, 'transparent')),
+            color: token('color-foreground'),
+          },
+        ),
+        /* Pressed: the words at full strength, over the indicator's fill where
          the group around draws one on each pressed toggle. */
-      rule(
-        { state: 'selected', platform: 'native' },
-        { color: hook.itemColorSelected(token('color-foreground')) },
-      ),
-      rule({ disabled: true, platform: 'native' }, { opacity: 0.5 }),
+        rule({ selected: true }, { color: hook.itemColorSelected }),
+        rule({ within: { host: { disabled: true } } }, { opacity: 0.5 }),
+      ]),
     ]),
     /* An icon before the label, or a count after it, set off by a step. */
     on({ region: 'start', slotted: '*' }, [rule({ marginInlineEnd: token('space-xs') })]),

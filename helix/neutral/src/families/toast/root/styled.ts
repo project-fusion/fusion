@@ -1,4 +1,14 @@
-import { difference, inherit, product, safeArea, scheme, sum, token, web } from '../../../style.js'
+import {
+  difference,
+  inherit,
+  native,
+  product,
+  safeArea,
+  scheme,
+  sum,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -23,14 +33,17 @@ export default styles(
   root,
   {
     prefix: 'toast',
-    hooks: ['gap', 'inset'],
+    hooks: {
+      gap: token('space-xs'),
+      inset: token('space-lg'),
+    },
     own: ['toast-enter', 'toast-gap', 'toast-inset', 'toast-most', 'toast-width'],
     stylesheet: 'toast/root/toast-root.generated.css',
   },
   ({ hook, on, own, rule }) => {
     return [
       on('host', [
-        rule({ own: { inset: hook.inset(token('space-lg')) }, display: 'contents' }),
+        rule({ own: { inset: hook.inset }, display: 'contents' }),
         /* Which way the nearest edge is, which a message arrives from and leaves toward. */
         rule({ placement: false }, { own: { enter: token('space-lg') } }),
         rule(
@@ -47,7 +60,7 @@ export default styles(
          popover box undone, since the stack has no surface of its own. */
       on('region', [
         rule({
-          own: { gap: hook.gap(token('space-xs')) },
+          own: { gap: hook.gap },
           background: web('none'),
           blockSize: web('auto'),
           border: web('none'),
@@ -66,14 +79,14 @@ export default styles(
           position: web('fixed'),
           zIndex: web(token('layer-toast')),
         }),
-        rule({ placement: false }, { insetBlockEnd: web(own.inset) }),
+        rule({ placement: false }, { web: { insetBlockEnd: own.inset } }),
         rule(
           { placement: ['bottom-center', 'bottom-end', 'bottom-start'] },
-          { insetBlockEnd: web(own.inset) },
+          { web: { insetBlockEnd: own.inset } },
         ),
         rule(
           { placement: ['top-center', 'top-end', 'top-start'] },
-          { insetBlockStart: web(own.inset) },
+          { web: { insetBlockStart: own.inset } },
         ),
         rule(
           { placement: ['top-center', 'top-end', 'top-start'] },
@@ -84,35 +97,29 @@ export default styles(
         rule({ placement: ['bottom-end', 'top-end'] }, { alignItems: 'flex-end' }),
         rule({ placement: ['bottom-center', 'top-center'] }, { alignItems: 'center' }),
         /* A message is never wider than the window less a margin. */
-        rule({ platform: 'web' }, { own: { most: difference('100vw', token('space-xl')) } }),
+        web([rule({ own: { most: difference('100vw', token('space-xl')) } })]),
         /* Each message the whole width of the stack where the window is narrow. */
         rule({ window: { below: '30rem' } }, { own: { width: '100%' } }),
         /* A phone keeps the stack from the edges, clear of the home indicator
            at the bottom and of the status bar at the top. */
-        rule(
-          { platform: 'native' },
-          {
+        native([
+          rule({
             marginBlockEnd: sum(own.inset, safeArea('bottom')),
             marginInline: own.inset,
-          },
-        ),
-        rule(
-          { platform: 'native', placement: ['top-center', 'top-end', 'top-start'] },
-          { marginBlockEnd: 0, marginBlockStart: sum(own.inset, safeArea('top')) },
-        ),
-        rule(
-          { lacks: 'data-color-mode', platform: 'native' },
-          { colorScheme: scheme('dark', 'light') },
-        ),
+          }),
+          rule(
+            { placement: ['top-center', 'top-end', 'top-start'] },
+            { marginBlockEnd: 0, marginBlockStart: sum(own.inset, safeArea('top')) },
+          ),
+          rule({ lacks: 'data-color-mode' }, { colorScheme: scheme('dark', 'light') }),
+        ]),
       ]),
       /* The UA hides a popover that is not showing, said again since `display: flex` takes it away. */
       on({ part: 'region', selector: '[part="region"]:not(:popover-open)' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
+        web([rule({ display: 'none' })]),
       ]),
       /* Only the messages take a pointer. */
-      on({ region: 'default', slotted: '*' }, [
-        rule({ platform: 'web' }, { pointerEvents: 'auto' }),
-      ]),
+      on({ region: 'default', slotted: '*' }, [web([rule({ pointerEvents: 'auto' })])]),
     ]
   },
 )

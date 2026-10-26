@@ -27,7 +27,7 @@ export default styles(
         { columnGap: hook.gap(token('space-md')), flexDirection: 'row', flexWrap: 'wrap' },
       ),
       /* Wrong, and the set says so on the controls rather than around them. */
-      rule({ state: 'invalid' }, { '--radio-border-color': token('color-danger') }),
+      rule({ invalid: true }, { '--radio-border-color': token('color-danger') }),
     ]),
   ],
 )

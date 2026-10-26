@@ -1,7 +1,7 @@
 import field from '../../../fragments/field.js'
 import fieldInline from '../../../fragments/field-inline.js'
 import printExact from '../../../fragments/print-exact.js'
-import { difference, list, product, quotient, scheme, token, web } from '../../../style.js'
+import { difference, first, list, product, quotient, scheme, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -25,7 +25,13 @@ export default styles(
   root,
   {
     prefix: 'switch',
-    hooks: ['block-size', 'icon-color', 'inline-size', 'on-color', 'thumb-color'],
+    hooks: ({ own }) => ({
+      blockSize: token('size-switch'),
+      iconColor: null,
+      inlineSize: product(own.height, 1.75),
+      onColor: token('color-primary-surface'),
+      thumbColor: null,
+    }),
     own: ['field-control-inline-size', 'switch-height', 'switch-inset', 'switch-width'],
     stylesheet: 'switch/root/switch-root.generated.css',
   },
@@ -37,8 +43,8 @@ export default styles(
     on('host', [
       rule({
         own: {
-          height: hook.blockSize(token('size-switch')),
-          width: hook.inlineSize(product(own.height, 1.75)),
+          height: hook.blockSize,
+          width: hook.inlineSize,
           inset: quotient(token('space-2xs'), 2),
           /* What `field-inline` indents the hint by, so it starts under the
              words, declared beside the size it derives from. */
@@ -46,17 +52,17 @@ export default styles(
         },
       }),
       rule({ display: 'inline-flex', flexDirection: 'column', gap: token('space-2xs') }),
-      rule({ disabled: true }, { opacity: 0.5 }),
+      rule({ within: { host: { disabled: true } } }, { opacity: 0.5 }),
     ]),
     on('field', [
       rule({
         alignItems: 'center',
-        cursor: web('pointer'),
+        web: { cursor: 'pointer' },
         display: 'inline-flex',
         gap: token('space-xs'),
       }),
       /* `:disabled` matches a disabled fieldset around the switch as well. */
-      rule({ disabled: true, platform: 'web' }, { cursor: web('default') }),
+      web([rule({ within: { host: { disabled: true } } }, { web: { cursor: 'default' } })]),
     ]),
     /* The groove. One cell, so the input lies over the whole of it. */
     on('track', [
@@ -75,13 +81,13 @@ export default styles(
         ),
       }),
       rule(
-        { state: 'checked' },
+        { checked: true },
         {
-          backgroundColor: hook.onColor(token('color-primary-surface')),
-          borderColor: hook.onColor(token('color-primary-surface')),
+          backgroundColor: hook.onColor,
+          borderColor: hook.onColor,
         },
       ),
-      rule({ state: 'invalid' }, { borderColor: token('color-danger') }),
+      rule({ invalid: true }, { borderColor: token('color-danger') }),
     ]),
     /* A hairline, which is symmetric where a shadow is not. Over the groove,
        which is `overlay`: lighter than the groove in light, a step up in
@@ -115,16 +121,16 @@ export default styles(
       }),
       /* No hairline once it is on: the thumb on the fill is distinct already. */
       rule(
-        { state: 'checked' },
+        { checked: true },
         {
           borderColor: 'transparent',
-          color: hook.iconColor(hook.onColor(token('color-primary-surface'))),
+          color: first(hook.iconColor, hook.onColor),
         },
       ),
       /* On the fill, so it takes the ink meant to sit on it. The travel is the
          track less the thumb and the gap at both ends. */
       rule(
-        { state: 'checked' },
+        { checked: true },
         {
           backgroundColor: hook.thumbColor(token('color-foreground-on-primary')),
           translate: [difference(own.width, own.height), '-50%'],

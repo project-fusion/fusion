@@ -1,4 +1,4 @@
-import { difference, product, token } from '../../../style.js'
+import { difference, native, product, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import group from './headless.js'
@@ -20,7 +20,10 @@ export default styles(
   group,
   {
     prefix: 'stat-group',
-    hooks: ['columns', 'gap'],
+    hooks: {
+      columns: null,
+      gap: token('space-2xl'),
+    },
     own: ['stat-group-gap'],
     props: [prop('columns', 'number'), prop('divided', 'boolean', { default: false })],
     stylesheet: 'stat/group/stat-group.generated.css',
@@ -31,7 +34,7 @@ export default styles(
         display: 'flex',
         flexWrap: 'wrap',
         gap: own.gap,
-        own: { gap: hook.gap(token('space-2xl')) },
+        own: { gap: hook.gap },
       }),
       rule({ has: 'columns' }, { display: 'grid' }),
       variants('columns', {
@@ -43,7 +46,7 @@ export default styles(
       }),
       /* A rule before every figure, the one that starts a row clipped. */
       rule({ divided: true }, { columnGap: product(own.gap, 2), overflowX: 'clip' }),
-      rule({ divided: true, platform: 'native' }, { overflow: 'hidden' }),
+      native([rule({ divided: true }, { overflow: 'hidden' })]),
     ]),
     on({ region: '*', slotted: '*' }, [
       rule(
