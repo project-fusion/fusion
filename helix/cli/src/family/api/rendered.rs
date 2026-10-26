@@ -12,6 +12,14 @@
 //! `event('before-select', { cancelable: true, detail: ['value'] })`. The
 //! keys of `derived` are camelCase, and `render` is the `tree` the reader
 //! has already read. Every other key is the builder form's, as written.
+//!
+//! **The props, the events, the computed values, and the states are in
+//! alphabetical order**, as Biome orders keys elsewhere: by letter whatever
+//! the case, a run of digits by its number. The keys around them keep the
+//! order they are read in, with `render` last, so the order is checked here
+//! rather than by sorting the whole object.
+
+use std::cmp::Ordering;
 
 use crate::family::read::{kebab, Lit};
 
@@ -51,6 +59,9 @@ pub fn rewrite(export: &Lit) -> Result<Lit, String> {
     if body.last().is_some_and(|(key, _)| key != "render") {
         return Err("`render` comes last, after the keys it reads".to_owned());
     }
+    for (key, value) in body {
+        alphabetical(key, value)?;
+    }
     let chooses = body
         .iter()
         .any(|(key, value)| key == "render" && presses_choose(value));
@@ -80,6 +91,77 @@ pub fn rewrite(export: &Lit) -> Result<Lit, String> {
         helper.clone(),
         vec![Lit::Text(name.clone()), Lit::Object(fields)],
     ))
+}
+
+/// Refuses `props`, `events`, `derived`, or `states` out of alphabetical
+/// order, naming the first two out of it and the order to write.
+fn alphabetical(key: &str, value: &Lit) -> Result<(), String> {
+    let names: Vec<&str> = match (key, value) {
+        ("props" | "events" | "derived", Lit::Object(entries)) => {
+            entries.iter().map(|(name, _)| name.as_str()).collect()
+        }
+        ("states", Lit::Array(states)) => states
+            .iter()
+            .filter_map(|state| match state {
+                Lit::Text(state) => Some(state.as_str()),
+                _ => None,
+            })
+            .collect(),
+        _ => return Ok(()),
+    };
+    let Some(at) = names
+        .windows(2)
+        .position(|pair| natural(pair[0], pair[1]) == Ordering::Greater)
+    else {
+        return Ok(());
+    };
+    let mut sorted = names.clone();
+    sorted.sort_by(|a, b| natural(a, b));
+    Err(format!(
+        "`{key}` is in alphabetical order, and `{}` comes before `{}`: write {}",
+        names[at + 1],
+        names[at],
+        sorted
+            .iter()
+            .map(|name| format!("`{name}`"))
+            .collect::<Vec<_>>()
+            .join(", ")
+    ))
+}
+
+/// Biome's natural order: letters compared whatever their case, a run of
+/// digits by its number, and a name that differs only in case after the one
+/// with the capital, so `a9` is before `a10` and `openOn` after `opened`.
+pub(crate) fn natural(a: &str, b: &str) -> Ordering {
+    let (mut left, mut right) = (a.chars().peekable(), b.chars().peekable());
+    loop {
+        match (left.peek().copied(), right.peek().copied()) {
+            (None, None) => return a.cmp(b),
+            (None, Some(_)) => return Ordering::Less,
+            (Some(_), None) => return Ordering::Greater,
+            (Some(x), Some(y)) if x.is_ascii_digit() && y.is_ascii_digit() => {
+                let number = |chars: &mut std::iter::Peekable<std::str::Chars>| {
+                    let mut digits = String::new();
+                    while let Some(digit) = chars.peek().copied().filter(char::is_ascii_digit) {
+                        digits.push(digit);
+                        chars.next();
+                    }
+                    digits.parse::<u128>().unwrap_or(u128::MAX)
+                };
+                match number(&mut left).cmp(&number(&mut right)) {
+                    Ordering::Equal => {}
+                    other => return other,
+                }
+            }
+            (Some(x), Some(y)) => match x.to_ascii_lowercase().cmp(&y.to_ascii_lowercase()) {
+                Ordering::Equal => {
+                    left.next();
+                    right.next();
+                }
+                other => return other,
+            },
+        }
+    }
 }
 
 /// `set(of, { ... })` as `item(of, { ... })`, with `chooses` where a press

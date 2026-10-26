@@ -29,30 +29,31 @@ import {
 export default headless('button', {
   memberOf: set('button-group', { state: 'pressed' }),
   props: {
+    /* `command` and `commandfor` are an invoker's, and the `form` ones,
+       `name`, and `type` a form's, which a phone has neither of. */
+    command: web(''),
+    commandfor: web(''),
     disabled: false,
     expanded: property(boolean()),
     focusable: property(true),
     /* A disabled control kept in the tab order and announced as disabled, so
        a tooltip can say why. */
     focusableWhenDisabled: false,
-    label: string(),
-    pending: false,
-    pendingLabel: 'Loading',
-    popup: property(oneOf(['dialog', 'grid', 'listbox', 'menu', 'tree'])),
-    pressed: property(boolean()),
-    /* What names it among a Button Group's pressed values, and its form
-       value on the web. */
-    value: '',
-    /* A form's and an invoker's, which a phone has neither of. */
-    command: web(''),
-    commandfor: web(''),
     formaction: web(''),
     formenctype: web(''),
     formmethod: web(''),
     formnovalidate: web(false),
     formtarget: web(''),
+    label: string(),
     name: web(''),
+    pending: false,
+    pendingLabel: 'Loading',
+    popup: property(oneOf(['dialog', 'grid', 'listbox', 'menu', 'tree'])),
+    pressed: property(boolean()),
     type: web(oneOf(['button', 'submit', 'reset'], 'button')),
+    /* What names it among a Button Group's pressed values, and its form
+       value on the web. */
+    value: '',
   },
   events: {
     press: ['pointerType'],
@@ -61,25 +62,25 @@ export default headless('button', {
   render: ({ props, send }) => (
     <>
       <Pressable
-        part="button"
-        chooses
-        role="button"
         busy={props.pending}
+        chooses
         disabled={props.disabled}
         expanded={props.expanded}
         focusable-when-disabled={props.focusableWhenDisabled}
         label={props.label}
+        onPress={send.press}
+        part="button"
         popup={props.popup}
         pressed={props.pressed}
-        onPress={send.press}
+        role="button"
       >
         <Slot name="start" />
         <Slot part="text" />
         <Slot name="end" />
         {props.pending && (
           <View
-            part="spinner"
             ariaHidden
+            part="spinner"
           />
         )}
       </Pressable>

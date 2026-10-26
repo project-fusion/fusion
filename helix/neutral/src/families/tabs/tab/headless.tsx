@@ -15,44 +15,45 @@ export default headless('tab', {
   memberOf: set('tabs'),
   props: {
     disabled: false,
-    dismissLabel: 'Close',
     dismissible: false,
-    selected: false,
-    value: '',
-    /* A link's, for tabs a router drives, each still controlling its panel. */
+    dismissLabel: 'Close',
+    /* `href`, `rel`, and `target` are a link's, for tabs a router drives,
+       each still controlling its panel. */
     href: string(),
     rel: web(string()),
+    selected: false,
     target: web(string()),
+    value: '',
   },
   events: {
-    dismiss: cancelable(['label']),
     beforeSelect: cancelable(['value']),
+    dismiss: cancelable(['label']),
   },
   states: ['selected', 'settled'],
   render: ({ props, send }) => (
     <Pressable
-      part="tab"
       chooses
-      role="tab"
-      href={props.href}
       disabled={props.disabled}
-      selected={props.selected}
+      href={props.href}
       onPress={send.beforeSelect}
+      part="tab"
+      role="tab"
+      selected={props.selected}
     >
       <Slot part="label" />
       {props.dismissible && (
         <Pressable
-          part="dismiss"
           ariaHidden
-          label={props.dismissLabel}
           disabled={props.disabled}
+          label={props.dismissLabel}
           onPress={send.dismiss}
+          part="dismiss"
         >
           <Slot name="dismiss-icon">
             <View
-              part="dismiss-mark"
               ariaHidden
               icon="x"
+              part="dismiss-mark"
             />
           </Slot>
         </Pressable>

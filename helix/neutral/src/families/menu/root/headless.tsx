@@ -100,10 +100,18 @@ export default headless('menu', {
     context: false,
     defaultOpen: false,
     emptyText: 'Nothing to show',
+    /* `filter`, `filterLabel`, `filterable`, `for`, `noResultsText`,
+       `resultsLabel`, and `targets` are the web's: the filter, an area by its
+       id, and the things in it a context menu is about. */
+    filter: web(''),
+    filterable: web(false),
+    filterLabel: web('Filter'),
+    for: web(''),
     label: '',
     loading: false,
     loadingText: 'Loading',
     longPressLabel: 'Long press or press Alt+Down to show the menu',
+    noResultsText: web('No matches'),
     offset: 4,
     open: boolean(),
     openOn: oneOf(['click', 'long-press'], 'click'),
@@ -125,14 +133,8 @@ export default headless('menu', {
       'bottom-start',
     ),
     presentation: oneOf(['auto', 'popover', 'sheet'], 'auto'),
-    submenus: oneOf(['drill', 'flyout'], 'drill'),
-    /* The filter, an area by its id, and the things in it a context menu is about. */
-    filter: web(''),
-    filterLabel: web('Filter'),
-    filterable: web(false),
-    for: web(''),
-    noResultsText: web('No matches'),
     resultsLabel: web('{count, plural, one {# result} other {# results}}'),
+    submenus: oneOf(['drill', 'flyout'], 'drill'),
     targets: web(''),
   },
   stack: stack({ back: 'back', drilled: 'drilled', label: 'page-label', top: 'name' }),
@@ -170,33 +172,33 @@ export default headless('menu', {
         <Slot name="trigger" />
       </Wrap>
       <Layer
-        part="surface"
-        role="menu"
         anchor="trigger"
+        arrows={derived.arrows}
         closedby="any"
         enters="press"
-        returns="held"
-        arrows={derived.arrows}
         hint={derived.holdHint}
         holds={derived.holds}
         label={stack.label}
         offset={props.offset}
         open={props.open}
+        part="surface"
         placement={props.placement}
         presentation={props.presentation}
         presses={derived.holds ? 'none' : 'toggle'}
+        returns="held"
+        role="menu"
       >
         {state.drilled && (
           <View part="header">
             <Pressable
+              label={derived.backName}
               part="back"
               role="menuitem"
-              label={derived.backName}
             >
               <View
-                part="back-mark"
                 ariaHidden
                 icon="caret-left"
+                part="back-mark"
               />
             </Pressable>
             <View part="title">
@@ -230,8 +232,8 @@ export default headless('menu', {
         )}
       </Layer>
       <Announce
-        part="live"
         follows="status"
+        part="live"
       >
         {derived.status}
       </Announce>
