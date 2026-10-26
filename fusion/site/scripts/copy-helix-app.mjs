@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 /**
- * Puts the Helix gallery where Expo Go opens it: `public/helix/app`.
+ * Puts the Helix gallery where Expo Go opens it, `public/helix/app`, and the
+ * proof app's website beside it, `public/helix/app/proof`.
  *
  * `@fusion.dev/helix-app`'s `bundle` writes the bundles and their assets,
  * which name no address. This copies them and writes the two manifests beside
@@ -16,7 +17,10 @@
  *
  * `next.config.ts` answers the base address with the manifest for the
  * platform Expo Go names, and `app/message/route.ts` holds the socket Expo Go
- * opens. Ignored by git, like the other copies under `public`.
+ * opens. The proof app's website is `@fusion.dev/helix-proof`'s `bundle`, a
+ * web export for the base URL `/helix/app/proof`, which needs no address of
+ * its own: `next.config.ts` answers each of its routes with its page.
+ * Ignored by git, like the other copies under `public`.
  */
 import { spawnSync } from 'node:child_process'
 import { cpSync, existsSync, rmSync } from 'node:fs'
@@ -26,6 +30,7 @@ import { parseArgs } from 'node:util'
 const ROOT = join(import.meta.dirname, '..', '..', '..')
 const APP = join(ROOT, 'helix', 'app')
 const DIST = join(APP, 'dist')
+const PROOF = join(ROOT, 'helix', 'proof', 'dist')
 const SERVED = join(import.meta.dirname, '..', 'public', 'helix', 'app')
 const PATH = '/helix/app'
 
@@ -49,6 +54,10 @@ if (!existsSync(join(DIST, 'metadata.json'))) {
   console.error('helix-app: helix/app/dist has no export. Run `turbo run bundle` for it first.')
   process.exit(1)
 }
+if (!existsSync(join(PROOF, 'index.html'))) {
+  console.error('helix-app: helix/proof/dist has no export. Run `turbo run bundle` for it first.')
+  process.exit(1)
+}
 
 const base = baseOf()
 rmSync(SERVED, { force: true, recursive: true })
@@ -69,4 +78,9 @@ for (const file of ['metadata.json', 'host.json']) {
   rmSync(join(SERVED, file), { force: true })
 }
 
-console.log(`helix-app: the gallery copied to public${PATH}, for ${base}`)
+cpSync(PROOF, join(SERVED, 'proof'), { recursive: true })
+rmSync(join(SERVED, 'proof', 'metadata.json'), { force: true })
+
+console.log(
+  `helix-app: the gallery copied to public${PATH}, for ${base}, and the proof app to public${PATH}/proof`,
+)

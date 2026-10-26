@@ -32,7 +32,12 @@ const GALLERY_HEADERS = [
     source: '/helix/app',
   },
   { headers: MANIFEST, source: '/helix/app/:platform(ios|android).json' },
-  ...['/helix/app/_expo/:path*', '/helix/app/assets/:path*'].map((source) => ({
+  ...[
+    '/helix/app/_expo/:path*',
+    '/helix/app/assets/:path*',
+    '/helix/app/proof/_expo/:path*',
+    '/helix/app/proof/assets/:path*',
+  ].map((source) => ({
     headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
     source,
   })),
@@ -143,10 +148,18 @@ const config: NextConfig = {
    * `ios.json` or `android.json` from `public/helix/app`. A browser sends no
    * such header and gets the page at `app/(site)/helix/app`. Before the
    * files, because the page is one.
+   *
+   * **The proof app's website is one page for every route**, the
+   * `index.html` its web export writes, which reads the route from the
+   * address. After the files, so its scripts and assets are served as they
+   * are.
    */
   async rewrites() {
     return {
-      afterFiles: [],
+      afterFiles: [
+        { destination: '/helix/app/proof/index.html', source: '/helix/app/proof' },
+        { destination: '/helix/app/proof/index.html', source: '/helix/app/proof/:path*' },
+      ],
       beforeFiles: [
         {
           destination: '/helix/app/:platform.json',
