@@ -1,19 +1,18 @@
 import {
-  bind,
-  box,
-  derive,
-  event,
+  bare,
+  boolean,
+  cancelable,
   headless,
-  item,
-  not,
-  pick,
-  pressable,
-  prop,
-  region,
-  toggle,
-  unless,
-  when,
-} from '../../../tree.js'
+  number,
+  oneOf,
+  Pressable,
+  Slot,
+  set,
+  string,
+  View,
+  web,
+} from '../../../render.js'
+import { derive, toggle } from '../../../tree.js'
 
 /**
  * An accordion section's headless tier: a trigger inside a heading, and the
@@ -54,27 +53,27 @@ import {
  * manifest says the element has.
  */
 export default headless('accordion-item', {
-  derived: {
-    'chevron-none': derive('accordion-chevron-none'),
-    'chevron-start': derive('accordion-chevron-start'),
-  },
-  events: [
-    event('before-close', { cancelable: true, detail: ['open'] }),
-    event('before-open', { cancelable: true, detail: ['open'] }),
-    event('toggle', { bare: true, detail: ['newState', 'oldState'] }),
-  ],
-  item: item('accordion'),
-  props: [
-    prop('chevron-placement', ['auto', 'start', 'end', 'none']),
-    prop('default-open', 'boolean', { default: false }),
-    prop('disabled', 'boolean', { default: false }),
-    prop('heading-level', 'number'),
-    prop('open', 'boolean'),
+  memberOf: set('accordion'),
+  props: {
+    chevronPlacement: oneOf(['auto', 'start', 'end', 'none']),
+    defaultOpen: false,
+    disabled: false,
+    headingLevel: number(),
     /* Find in page and a group by name across the page, which a phone has none of. */
-    prop('hidden-until-found', 'boolean', { platform: 'web' }),
-    prop('name', 'string', { platform: 'web' }),
-  ],
+    hiddenUntilFound: web(boolean()),
+    name: web(string()),
+    open: boolean(),
+  },
+  events: {
+    beforeClose: cancelable(['open']),
+    beforeOpen: cancelable(['open']),
+    toggle: bare(['newState', 'oldState']),
+  },
   states: ['closing', 'open', 'settled'],
+  derived: {
+    chevronNone: derive('accordion-chevron-none'),
+    chevronStart: derive('accordion-chevron-start'),
+  },
   toggle: toggle({
     changes: 'toggle',
     checked: 'open',
@@ -82,37 +81,51 @@ export default headless('accordion-item', {
     initial: 'default-open',
     opens: 'before-open',
   }),
-  tree: [
-    box('container', {}, [
-      box('heading', { level: bind('heading-level'), role: 'heading' }, [
-        pressable(
-          'trigger',
-          { disabled: bind('disabled'), expanded: bind('open'), role: 'button', toggles: true },
-          [
-            when(
-              'chevron-start',
-              region('chevron', {}, [box('chevron', { decorative: true, glyph: 'caret-down' })]),
-            ),
-            region('summary'),
-            unless(
-              'chevron-none',
-              unless(
-                'chevron-start',
-                region('chevron', {}, [box('chevron', { decorative: true, glyph: 'caret-down' })]),
-              ),
-            ),
-          ],
-        ),
-      ]),
-      box(
-        'content',
-        {
-          closed: not('open'),
-          labelledby: 'summary',
-          role: pick('open', { true: 'region' }, ''),
-        },
-        [box('content-inner', {}, [region('default')])],
-      ),
-    ]),
-  ],
+  render: ({ derived, props }) => (
+    <View part="container">
+      <View
+        level={props.headingLevel}
+        part="heading"
+        role="heading"
+      >
+        <Pressable
+          disabled={props.disabled}
+          expanded={props.open}
+          part="trigger"
+          role="button"
+          toggles
+        >
+          {derived.chevronStart && (
+            <Slot name="chevron">
+              <View
+                ariaHidden
+                icon="caret-down"
+                part="chevron"
+              />
+            </Slot>
+          )}
+          <Slot name="summary" />
+          {!derived.chevronNone && !derived.chevronStart && (
+            <Slot name="chevron">
+              <View
+                ariaHidden
+                icon="caret-down"
+                part="chevron"
+              />
+            </Slot>
+          )}
+        </Pressable>
+      </View>
+      <View
+        closed={!props.open}
+        labelledby="summary"
+        part="content"
+        role={props.open ? 'region' : ''}
+      >
+        <View part="content-inner">
+          <Slot />
+        </View>
+      </View>
+    </View>
+  ),
 })

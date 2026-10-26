@@ -34,7 +34,7 @@ export default styles(
         { columnGap: hook.gap(token('space-md')), flexDirection: 'row', flexWrap: 'wrap' },
       ),
       /* Wrong, and the set says so on the controls rather than around them. */
-      rule({ state: 'invalid' }, { '--checkbox-border-color': token('color-danger') }),
+      rule({ invalid: true }, { '--checkbox-border-color': token('color-danger') }),
     ]),
     /* A tick that is a fill prints as an empty box, which says the opposite
        of the truth. */

@@ -1,4 +1,4 @@
-import { fn, inherited, product, token } from '../../../style.js'
+import { fn, inherited, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import group from './headless.js'
 
@@ -25,13 +25,13 @@ export default styles(
   group,
   {
     prefix: 'avatar-group',
-    hooks: [
-      'overflow-background-color',
-      'overflow-color',
-      'overflow-font-size',
-      'overlap',
-      'ring-color',
-    ],
+    hooks: {
+      overflowBackgroundColor: token('color-surface-sunken'),
+      overflowColor: token('color-foreground-muted'),
+      overflowFontSize: token('text-xs'),
+      overlap: null,
+      ringColor: token('color-background'),
+    },
     own: ['avatar-group-clear', 'avatar-group-ring'],
     stylesheet: 'avatar/group/avatar-group.generated.css',
   },
@@ -43,7 +43,7 @@ export default styles(
         rule({
           alignItems: 'center',
           display: 'flex',
-          own: { ring: hook.ringColor(token('color-background')) },
+          own: { ring: hook.ringColor },
         }),
       ]),
       on({ region: 'default', slotted: '*' }, [
@@ -59,20 +59,20 @@ export default styles(
           selector:
             ':host([max="1"]) ::slotted(:nth-child(n + 2)), :host([max="2"]) ::slotted(:nth-child(n + 3)), :host([max="3"]) ::slotted(:nth-child(n + 4)), :host([max="4"]) ::slotted(:nth-child(n + 5)), :host([max="5"]) ::slotted(:nth-child(n + 6)), :host([max="6"]) ::slotted(:nth-child(n + 7)), :host([max="7"]) ::slotted(:nth-child(n + 8)), :host([max="8"]) ::slotted(:nth-child(n + 9)), :host([max="9"]) ::slotted(:nth-child(n + 10)), :host([max="10"]) ::slotted(:nth-child(n + 11)), :host([max="11"]) ::slotted(:nth-child(n + 12)), :host([max="12"]) ::slotted(:nth-child(n + 13))',
         },
-        [rule({ platform: 'web' }, { display: 'none' })],
+        [web([rule({ display: 'none' })])],
       ),
       on('overflow', [
         rule({
           alignItems: 'center',
-          backgroundColor: hook.overflowBackgroundColor(token('color-surface-sunken')),
+          backgroundColor: hook.overflowBackgroundColor,
           blockSize: inherited('avatar-size', token('size-control-md')),
           borderRadius: token('radii-full'),
           boxShadow: [0, 0, 0, token('border-thick'), own.ring],
-          color: hook.overflowColor(token('color-foreground-muted')),
+          color: hook.overflowColor,
           display: 'inline-flex',
           flex: '0 0 auto',
           fontFamily: token('font-sans'),
-          fontSize: hook.overflowFontSize(token('text-xs')),
+          fontSize: hook.overflowFontSize,
           fontWeight: token('weight-medium'),
           inlineSize: inherited('avatar-size', token('size-control-md')),
           justifyContent: 'center',
@@ -82,10 +82,7 @@ export default styles(
            standard text size, so the count stops there too and fits it, as
            the web's grows with its circle. `min()` of one length is that
            length in space's points. */
-        rule(
-          { platform: 'native' },
-          { fontSize: fn('min', hook.overflowFontSize(token('text-xs'))) },
-        ),
+        native([rule({ fontSize: fn('min', hook.overflowFontSize) })]),
       ]),
     ]
   },

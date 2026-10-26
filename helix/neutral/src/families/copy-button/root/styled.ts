@@ -1,4 +1,4 @@
-import { hookOf, token, web } from '../../../style.js'
+import { first, hookOf, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -22,7 +22,14 @@ export default styles(
   {
     prefix: 'copy-button',
     over: 'icon-button',
-    hooks: ['color', 'color-hover', 'error-color', 'icon-size', 'size', 'success-color'],
+    hooks: {
+      color: null,
+      colorHover: null,
+      errorColor: token('color-danger'),
+      iconSize: token('size-icon-tight'),
+      size: hookOf('icon-button', 'size', token('size-control')),
+      successColor: token('color-success'),
+    },
     own: ['icon-button-ink', 'icon-button-ink-hover', 'icon-button-size'],
     props: [
       prop('emphasis', ['ghost', 'outlined', 'solid', 'subtle']),
@@ -31,29 +38,29 @@ export default styles(
     stylesheet: 'copy-button/root/copy-button-root.generated.css',
   },
   ({ hook, on, rule }) => {
-    const success = hook.successColor(token('color-success'))
-    const danger = hook.errorColor(token('color-danger'))
+    const success = hook.successColor
+    const danger = hook.errorColor
     return [
       /* Its own hooks over the icon button's defaults. A `tone` keeps its own ink. */
       on('host', [
         rule({
           own: {
             iconButtonInk: hook.color(token('color-foreground-muted')),
-            iconButtonInkHover: hook.colorHover(hook.color(token('color-foreground'))),
-            iconButtonSize: hook.size(hookOf('icon-button', 'size', token('size-control'))),
+            iconButtonInkHover: first(hook.colorHover, hook.color, token('color-foreground')),
+            iconButtonSize: first(hook.size, hookOf('icon-button', 'size'), token('size-control')),
           },
         }),
       ]),
       /* The confirmation must not resize the button. */
-      on('button', [rule({ platform: 'web' }, { display: 'inline-grid', placeItems: 'center' })]),
-      on({ part: 'button', inner: '> slot' }, [rule({ platform: 'web' }, { gridArea: '1 / 1' })]),
+      on('button', [web([rule({ display: 'inline-grid', placeItems: 'center' })])]),
+      on({ part: 'button', inner: '> slot' }, [web([rule({ gridArea: '1 / 1' })])]),
       /* Under `show-label`, the words sit in a second cell beside the icon. */
       on('button', [
         rule(
           { 'show-label': true },
           {
             columnGap: token('space-xs'),
-            gridAutoFlow: web('column'),
+            web: { gridAutoFlow: 'column' },
             inlineSize: 'auto',
             paddingInline: token('space-sm'),
           },
@@ -68,22 +75,23 @@ export default styles(
           justifyItems: web('start'),
         }),
       ]),
-      on({ part: 'text', inner: '> span' }, [rule({ platform: 'web' }, { gridArea: '1 / 1' })]),
+      on({ part: 'text', inner: '> span' }, [web([rule({ gridArea: '1 / 1' })])]),
       on({ part: 'text', inner: '> [hidden]' }, [
-        rule({ platform: 'web' }, { display: 'block', visibility: 'hidden' }),
+        web([rule({ display: 'block', visibility: 'hidden' })]),
       ]),
       /* A slot is `display: contents`, which `[hidden]` in the UA sheet does not beat. */
-      on({ part: 'button', selector: 'slot[hidden]' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
-      ]),
+      on({ part: 'button', selector: 'slot[hidden]' }, [web([rule({ display: 'none' })])]),
       /* The confirmation is the one moment this control is loud, under the pointer too. */
       on('button', [
         rule({ part: { 'data-copied': true } }, { color: success }),
-        rule({ disabled: false, hover: true, part: { 'data-copied': true } }, { color: success }),
+        rule(
+          { within: { host: { disabled: false } }, hover: true, part: { 'data-copied': true } },
+          { color: success },
+        ),
         rule(
           [
             { part: { 'data-failed': true } },
-            { disabled: false, hover: true, part: { 'data-failed': true } },
+            { within: { host: { disabled: false } }, hover: true, part: { 'data-failed': true } },
           ],
           { color: danger },
         ),
@@ -91,8 +99,8 @@ export default styles(
       /* The marks drawn by default, which an icon passed in replaces. */
       on('mark', [
         rule({
-          blockSize: hook.iconSize(token('size-icon-tight')),
-          inlineSize: hook.iconSize(token('size-icon-tight')),
+          blockSize: hook.iconSize,
+          inlineSize: hook.iconSize,
         }),
       ]),
       on('host', [rule({ print: true }, { display: 'none' })]),

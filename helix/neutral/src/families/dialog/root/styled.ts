@@ -1,5 +1,6 @@
 import {
   difference,
+  first,
   fn,
   list,
   mix,
@@ -40,20 +41,20 @@ export default styles(
   root,
   {
     prefix: 'dialog',
-    hooks: [
-      'backdrop',
-      'background-color',
-      'border-color',
-      'border-width',
-      'color',
-      'icon-size',
-      'inline-size',
-      'padding',
-      'radius',
-      'rise',
-      'scrim',
-      'shadow',
-    ],
+    hooks: ({ own }) => ({
+      backdrop: null,
+      backgroundColor: null,
+      borderColor: token('color-border'),
+      borderWidth: token('border-floating'),
+      color: token('color-foreground'),
+      iconSize: product(token('size-icon-lg'), 2),
+      inlineSize: '28rem',
+      padding: token('space-lg'),
+      radius: token('radii-sm'),
+      rise: token('space-lg'),
+      scrim: own.scrim,
+      shadow: token('shadow-floating'),
+    }),
     own: ['dialog-scrim', 'dialog-width'],
     props: [
       prop('material', ['frosted', 'glass']),
@@ -63,8 +64,8 @@ export default styles(
     stylesheet: 'dialog/root/dialog-root.generated.css',
   },
   ({ hook, keyframes, on, own, rule, variants }) => {
-    const padding = hook.padding(token('space-lg'))
-    const rise = hook.rise(token('space-lg'))
+    const padding = hook.padding
+    const rise = hook.rise
     const move = token('duration-normal')
     /* The title's first line, where the close control is centered. */
     const titleLine = product(token('text-xl'), token('leading-tight'))
@@ -78,17 +79,13 @@ export default styles(
       ]),
       on('surface', [
         rule({
-          own: { width: hook.inlineSize('28rem') },
+          own: { width: hook.inlineSize },
           backgroundColor: hook.backgroundColor(token('color-surface-overlay')),
-          border: [
-            hook.borderWidth(token('border-floating')),
-            'solid',
-            hook.borderColor(token('color-border')),
-          ],
-          borderRadius: hook.radius(token('radii-sm')),
-          boxShadow: hook.shadow(token('shadow-floating')),
+          border: [hook.borderWidth, 'solid', hook.borderColor],
+          borderRadius: hook.radius,
+          boxShadow: hook.shadow,
           boxSizing: 'border-box',
-          color: hook.color(token('color-foreground')),
+          color: hook.color,
           display: 'flex',
           flexDirection: 'column',
           gap: token('space-md'),
@@ -101,7 +98,7 @@ export default styles(
       /* A closed dialog is not drawn, as the UA's sheet has it, which the
          `display` above takes away. */
       on({ part: 'surface', selector: '[part="surface"]:not([open])' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
+        web([rule({ display: 'none' })]),
       ]),
       on('surface', [
         variants('size', {
@@ -113,7 +110,7 @@ export default styles(
         /* No ring on the panel itself. */
         rule({ outline: 'none' }),
       ]),
-      on({ backdrop: 'surface' }, [rule({ backgroundColor: hook.scrim(own.scrim) })]),
+      on({ backdrop: 'surface' }, [rule({ backgroundColor: first(hook.scrim, own.scrim) })]),
       on({ region: 'header', slotted: '*' }, [
         rule({
           color: token('color-foreground'),
@@ -140,8 +137,8 @@ export default styles(
           ),
           translate: [0, rise],
         }),
-        rule({ state: 'open' }, { opacity: 1, translate: [0, 0] }),
-        rule({ entering: true, state: 'open' }, { opacity: 0, translate: [0, rise] }),
+        rule({ open: true }, { opacity: 1, translate: [0, 0] }),
+        rule({ entering: true, open: true }, { opacity: 0, translate: [0, rise] }),
         /* A sheet below a phone's width, pinned to the window's bottom edge. */
         rule(
           { window: { below: '30rem' } },
@@ -161,7 +158,7 @@ export default styles(
           },
         ),
         rule(
-          { entering: true, state: 'open', window: { below: '30rem' } },
+          { entering: true, open: true, window: { below: '30rem' } },
           { translate: [0, '100%'] },
         ),
         /* Saying no, by moving. */
@@ -171,10 +168,7 @@ export default styles(
         ),
         rule({ reducedMotion: true }, { transition: 'none' }),
         rule({ part: { 'data-refused': true }, reducedMotion: true }, { animation: 'none' }),
-        rule(
-          { platform: 'web', supports: 'not (overlay: auto)' },
-          { transitionBehavior: 'normal' },
-        ),
+        web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
       on({ backdrop: 'surface' }, [
         rule({
@@ -185,26 +179,23 @@ export default styles(
             ['overlay', move, 'allow-discrete'],
           ),
         }),
-        rule({ state: 'open' }, { opacity: 1 }),
-        rule({ entering: true, state: 'open' }, { opacity: 0 }),
+        rule({ open: true }, { opacity: 1 }),
+        rule({ entering: true, open: true }, { opacity: 0 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
         /* Where `overlay` cannot be transitioned, as in WebKit, a closing
            panel leaves the top layer at once while `display` holds it for the
            fade, and a fixed panel out of the top layer is placed against the
            nearest ancestor with a filter or a transform. There it closes at
            once. */
-        rule(
-          { platform: 'web', supports: 'not (overlay: auto)' },
-          { transitionBehavior: 'normal' },
-        ),
+        web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
       keyframes('helix-dialog-refuse', { '50%': { scale: 1.02 } }),
       /* The mark above the title, for a dialog that warns. */
       on({ region: 'icon', slotted: '*' }, [
         rule({
-          blockSize: hook.iconSize(product(token('size-icon-lg'), 2)),
+          blockSize: hook.iconSize,
           display: 'block',
-          inlineSize: hook.iconSize(product(token('size-icon-lg'), 2)),
+          inlineSize: hook.iconSize,
         }),
       ]),
       /* Centered on the panel, and the actions and the mark with it. */
