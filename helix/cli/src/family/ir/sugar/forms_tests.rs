@@ -254,6 +254,16 @@ fn within_the_host_an_array_is_any_of_and_disabled_is_the_hosts_own() {
             "({ on, rule }) => [on('button', [rule({ disabled: false, within: { host: { hover: true } } }, { opacity: 1 })])]",
         )),
     );
+    assert_eq!(
+        ir(&table(
+            "",
+            "({ on, rule }) => [on('button', [rule({ within: { host: { disabled: false }, text: { hover: true } } }, { opacity: 1 })])]",
+        )),
+        ir(&table(
+            "",
+            "({ on, rule }) => [on('button', [rule({ disabled: false, within: { text: { hover: true } } }, { opacity: 1 })])]",
+        )),
+    );
 }
 
 /// A tab's source: a press that carries `disabled` bound to the prop, a
