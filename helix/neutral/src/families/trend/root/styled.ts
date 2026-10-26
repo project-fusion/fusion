@@ -29,7 +29,7 @@ export default styles(
     prefix: 'trend',
     hooks: ({ own }) => ({
       betterColor: token('color-success'),
-      color: own.color,
+      color: own.trendColor,
       downColor: token('color-fall'),
       gap: token('space-2xs'),
       iconSize: '1em',
@@ -38,7 +38,7 @@ export default styles(
       upColor: token('color-rise'),
       worseColor: token('color-danger'),
     }),
-    own: ['trend-color'],
+    own: { trendColor: null },
     props: { colorBy: oneOf(['judgment', 'movement']) },
     stylesheet: 'trend/root/trend-root.generated.css',
   },
@@ -55,7 +55,7 @@ export default styles(
       /* Gray until told what good means. */
       rule({
         color: hook.color,
-        own: { color: hook.neutralColor },
+        own: { trendColor: hook.neutralColor },
       }),
       /* The judgment, and the attribute pairs that stand in for it served. */
       rule(
@@ -64,7 +64,7 @@ export default styles(
           { defined: false, good: 'up', movement: 'up' },
           { defined: false, good: 'down', movement: 'down' },
         ],
-        { own: { color: hook.betterColor } },
+        { own: { trendColor: hook.betterColor } },
       ),
       rule(
         [
@@ -72,7 +72,7 @@ export default styles(
           { defined: false, good: 'up', movement: 'down' },
           { defined: false, good: 'down', movement: 'up' },
         ],
-        { own: { color: hook.worseColor } },
+        { own: { trendColor: hook.worseColor } },
       ),
       /* The movement, for a page whose colors follow its market, after the
          judgment and one attribute heavier, so it wins on a trend that sets
@@ -82,14 +82,14 @@ export default styles(
           { colorBy: 'movement', up: true },
           { colorBy: 'movement', defined: false, movement: 'up' },
         ],
-        { own: { color: hook.upColor } },
+        { own: { trendColor: hook.upColor } },
       ),
       rule(
         [
           { colorBy: 'movement', down: true },
           { colorBy: 'movement', defined: false, movement: 'down' },
         ],
-        { own: { color: hook.downColor } },
+        { own: { trendColor: hook.downColor } },
       ),
     ]),
     on('icon', [

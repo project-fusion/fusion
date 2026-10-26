@@ -48,12 +48,12 @@ export default styles(
       separatorColor: token('color-foreground-subtle'),
     },
     /* Set by the trail, `breadcrumbs/root`, by its `separation`; read here. */
-    own: [
-      'breadcrumbs-mark-glyph',
-      'breadcrumbs-mark-words',
-      'breadcrumbs-split-fill',
-      'breadcrumbs-split-rule',
-    ],
+    own: {
+      breadcrumbsMarkGlyph: null,
+      breadcrumbsMarkWords: null,
+      breadcrumbsSplitFill: null,
+      breadcrumbsSplitRule: null,
+    },
     stylesheet: 'breadcrumbs/breadcrumb/breadcrumb.generated.css',
   },
   ({ hook, on, own, rule }) => {
@@ -111,13 +111,15 @@ export default styles(
       /* **A phone's slash is the same box**, drawn ahead of the separator's
          chevron, which the trail puts away under `separator="slash"`, before
          a crumb and before its fold button alike. */
-      on({ before: 'separator' }, [native([rule({ ...slash, content: own.markWords('none') })])]),
+      on({ before: 'separator' }, [
+        native([rule({ ...slash, content: own.breadcrumbsMarkWords('none') })]),
+      ]),
       on({ before: 'fold-separator' }, [
-        native([rule({ ...slash, content: own.markWords('none') })]),
+        native([rule({ ...slash, content: own.breadcrumbsMarkWords('none') })]),
       ]),
       on(
         ['separator-mark', 'fold-separator-mark'],
-        [native([rule({ display: own.markGlyph('flex') })])],
+        [native([rule({ display: own.breadcrumbsMarkGlyph('flex') })])],
       ),
       /* An anchor of your own, which belongs to the page and is styled here
          through the slot. */
@@ -217,7 +219,7 @@ export default styles(
       /* `plain`: both halves take the light fill while either is under the
          pointer, and the half under it the full fill over that. */
       on({ part: 'link', selector: ':host(:state(end)) [part="link"]:hover ~ slot[name="end"]' }, [
-        web([rule({ '--icon-button-background-color': own.splitFill('transparent') })]),
+        web([rule({ '--icon-button-background-color': own.breadcrumbsSplitFill('transparent') })]),
       ]),
       on(
         {
@@ -225,13 +227,13 @@ export default styles(
           selector:
             ':host(:state(end)) [part="link"]:has(~ slot[name="end"]:hover),\n:host(:state(end)) [part="link"]:has(~ slot[name="end"]:hover) ::slotted(a)',
         },
-        [web([rule({ backgroundColor: own.splitFill('transparent') })])],
+        [web([rule({ backgroundColor: own.breadcrumbsSplitFill('transparent') })])],
       ),
       on({ after: 'link' }, [
         rule(
           { end: true },
           {
-            backgroundColor: own.splitRule('transparent'),
+            backgroundColor: own.breadcrumbsSplitRule('transparent'),
             content: '""',
             inlineSize: token('border-thin'),
             insetBlock: '20%',

@@ -42,14 +42,14 @@ export default styles(
       radius: token('radii-sm'),
       separatorColor: token('color-foreground-muted'),
     },
-    own: ['kbd-height', 'kbd-inset', 'kbd-size'],
+    own: { kbdHeight: null, kbdInset: null, kbdSize: null },
     stylesheet: 'kbd/root/kbd-root.generated.css',
   },
   ({ hook, on, own, rule }) => {
     /* Half the inside of the face, less a pixel, and half the cap height:
        how far the label's baseline sits below the face's top border. */
     const lift = sum(
-      quotient(difference(difference(own.height, product(token('border-thin'), 2)), '1px'), 2),
+      quotient(difference(difference(own.kbdHeight, product(token('border-thin'), 2)), '1px'), 2),
       '0.5cap',
     )
     return [
@@ -60,7 +60,7 @@ export default styles(
       on('host', [
         rule({
           font: inherit(),
-          own: { size: hook.fontSize, inset: hook.paddingInline },
+          own: { kbdSize: hook.fontSize, kbdInset: hook.paddingInline },
         }),
         /* **The key is centered on the capitals of the words beside it.** `middle`
          on the face puts its middle half an x-height above this box's baseline,
@@ -75,17 +75,17 @@ export default styles(
             display: 'inline-block',
             lineHeight: 0,
             verticalAlign: 'calc(0.5cap - 0.5ex - 0.5px)',
-            own: { height: fn('round', hook.blockSize, '1px') },
+            own: { kbdHeight: fn('round', hook.blockSize, '1px') },
           }),
         ]),
         /* A phone lays the key out as a box in the line of words. */
-        native([rule({ display: 'inline-flex', own: { height: hook.blockSize } })]),
+        native([rule({ display: 'inline-flex', own: { kbdHeight: hook.blockSize } })]),
         rule({ print: true }, { boxShadow: 'none' }),
       ]),
       on('kbd', [
         rule({
           backgroundColor: hook.backgroundColor,
-          blockSize: own.height,
+          blockSize: own.kbdHeight,
           border: [token('border-thin'), 'solid', hook.borderColor],
           borderRadius: hook.radius,
           /* One edge rather than a drop shadow: a key is pressed into the page. */
@@ -94,12 +94,12 @@ export default styles(
           fontFamily: hook.fontFamily,
           /* A key label is literal: `<-` and `=>` must not become arrows. */
           fontFeatureSettings: list(['"liga"', 0], ['"calt"', 0]),
-          fontSize: own.size,
+          fontSize: own.kbdSize,
           fontVariantLigatures: 'none',
           fontWeight: hook.fontWeight,
           /* Square at minimum, so one character is not a narrow sliver. */
-          minInlineSize: own.height,
-          paddingInline: own.inset,
+          minInlineSize: own.kbdHeight,
+          paddingInline: own.kbdInset,
           /* The box has a fixed `block-size`, so a wrapped label overflows it. */
           whiteSpace: 'nowrap',
         }),
@@ -174,12 +174,12 @@ export default styles(
           { caps: true },
           {
             backgroundColor: hook.backgroundColor,
-            blockSize: own.height,
+            blockSize: own.kbdHeight,
             border: [token('border-thin'), 'solid', hook.borderColor],
             borderRadius: hook.radius,
             boxShadow: ['inset', 0, '-1px', 0, 0, hook.borderColor],
-            minInlineSize: own.height,
-            paddingInline: own.inset,
+            minInlineSize: own.kbdHeight,
+            paddingInline: own.kbdInset,
           },
         ),
         web([

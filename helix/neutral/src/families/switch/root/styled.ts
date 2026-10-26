@@ -28,11 +28,11 @@ export default styles(
     hooks: ({ own }) => ({
       blockSize: token('size-switch'),
       iconColor: null,
-      inlineSize: product(own.height, 1.75),
+      inlineSize: product(own.switchHeight, 1.75),
       onColor: token('color-primary-surface'),
       thumbColor: null,
     }),
-    own: ['field-control-inline-size', 'switch-height', 'switch-inset', 'switch-width'],
+    own: { fieldControlInlineSize: null, switchHeight: null, switchInset: null, switchWidth: null },
     stylesheet: 'switch/root/switch-root.generated.css',
   },
   ({ hook, include, on, own, rule }) => [
@@ -43,12 +43,12 @@ export default styles(
     on('host', [
       rule({
         own: {
-          height: hook.blockSize,
-          width: hook.inlineSize,
-          inset: quotient(token('space-2xs'), 2),
+          switchHeight: hook.blockSize,
+          switchWidth: hook.inlineSize,
+          switchInset: quotient(token('space-2xs'), 2),
           /* What `field-inline` indents the hint by, so it starts under the
              words, declared beside the size it derives from. */
-          fieldControlInlineSize: own.width,
+          fieldControlInlineSize: own.switchWidth,
         },
       }),
       rule({ display: 'inline-flex', flexDirection: 'column', gap: token('space-2xs') }),
@@ -68,12 +68,12 @@ export default styles(
     on('track', [
       rule({
         backgroundColor: token('color-surface-sunken'),
-        blockSize: own.height,
+        blockSize: own.switchHeight,
         border: [token('border-thin'), 'solid', token('color-border')],
         borderRadius: token('radii-full'),
         display: 'grid',
         flex: '0 0 auto',
-        inlineSize: own.width,
+        inlineSize: own.switchWidth,
         position: 'relative',
         transition: list(
           ['background-color', token('duration-fast'), token('easing-standard')],
@@ -108,12 +108,12 @@ export default styles(
         backgroundColor: hook.thumbColor(
           scheme(token('color-surface-overlay'), token('color-foreground-muted')),
         ),
-        blockSize: difference(own.height, product(own.inset, 2)),
+        blockSize: difference(own.switchHeight, product(own.switchInset, 2)),
         border: [token('border-thin'), 'solid', token('color-border')],
         borderRadius: token('radii-full'),
-        inlineSize: difference(own.height, product(own.inset, 2)),
+        inlineSize: difference(own.switchHeight, product(own.switchInset, 2)),
         insetBlockStart: '50%',
-        insetInlineStart: difference(own.inset, token('border-thin')),
+        insetInlineStart: difference(own.switchInset, token('border-thin')),
         pointerEvents: 'none',
         position: 'absolute',
         translate: '0 -50%',
@@ -133,7 +133,7 @@ export default styles(
         { checked: true },
         {
           backgroundColor: hook.thumbColor(token('color-foreground-on-primary')),
-          translate: [difference(own.width, own.height), '-50%'],
+          translate: [difference(own.switchWidth, own.switchHeight), '-50%'],
         },
       ),
       rule(
@@ -146,7 +146,9 @@ export default styles(
     ]),
     /* An icon takes most of the thumb, and the thumb's own color. */
     on({ region: ['on', 'off'], slotted: '*' }, [
-      rule({ '--icon-size': product(difference(own.height, product(own.inset, 2)), 0.7) }),
+      rule({
+        '--icon-size': product(difference(own.switchHeight, product(own.switchInset, 2)), 0.7),
+      }),
     ]),
     /* The input is the track on the web: stretched over it, invisible, and
        still what takes the press and the focus. */

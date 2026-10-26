@@ -30,7 +30,7 @@ export default styles(
       size: hookOf('icon-button', 'size', token('size-control')),
       successColor: token('color-success'),
     },
-    own: ['icon-button-ink', 'icon-button-ink-hover', 'icon-button-size'],
+    own: { iconButtonInk: null, iconButtonInkHover: null, iconButtonSize: null },
     props: {
       emphasis: oneOf(['ghost', 'outlined', 'solid', 'subtle']),
       tone: oneOf(['accent', 'danger', 'neutral', 'primary']),

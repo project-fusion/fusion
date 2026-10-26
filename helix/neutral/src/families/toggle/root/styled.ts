@@ -32,13 +32,13 @@ export default styles(
       itemColorSelected: token('color-foreground'),
       itemPaddingInline: token('space-sm'),
     },
-    own: [
-      'toggle-height',
-      'toggle-hover-surface',
-      'toggle-pressed-shadow',
-      'toggle-pressed-surface',
-      'toggle-radius',
-    ],
+    own: {
+      toggleHeight: null,
+      toggleHoverSurface: null,
+      togglePressedShadow: null,
+      togglePressedSurface: null,
+      toggleRadius: null,
+    },
     stylesheet: 'toggle/root/toggle-root.generated.css',
   },
   ({ hook, on, own, rule }) => [
@@ -50,9 +50,9 @@ export default styles(
         rule(
           { selected: true },
           {
-            backgroundColor: own.pressedSurface('transparent'),
-            borderRadius: own.radius(token('radii-sm')),
-            boxShadow: own.pressedShadow('none'),
+            backgroundColor: own.togglePressedSurface('transparent'),
+            borderRadius: own.toggleRadius(token('radii-sm')),
+            boxShadow: own.togglePressedShadow('none'),
           },
         ),
       ]),
@@ -73,8 +73,8 @@ export default styles(
         rule({
           alignItems: 'center',
           backgroundColor: 'transparent',
-          blockSize: own.height('auto'),
-          borderRadius: own.radius(token('radii-sm')),
+          blockSize: own.toggleHeight('auto'),
+          borderRadius: own.toggleRadius(token('radii-sm')),
           color: hook.itemColor,
           display: 'inline-flex',
           flex: '1 1 auto',
@@ -94,7 +94,9 @@ export default styles(
         rule(
           { formDisabled: false, interaction: ['hover', 'active'] },
           {
-            backgroundColor: own.hoverSurface(mix(token('color-foreground'), 5, 'transparent')),
+            backgroundColor: own.toggleHoverSurface(
+              mix(token('color-foreground'), 5, 'transparent'),
+            ),
             color: token('color-foreground'),
           },
         ),

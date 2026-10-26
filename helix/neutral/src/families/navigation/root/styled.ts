@@ -30,7 +30,7 @@ export default styles(
       indicatorThickness: token('border-thick'),
       ruleColor: token('color-border'),
     },
-    own: ['navigation-item-display', 'navigation-item-floor', 'navigation-item-justify'],
+    own: { navigationItemDisplay: null, navigationItemFloor: null, navigationItemJustify: null },
     stylesheet: 'navigation/root/navigation-root.generated.css',
   },
   ({ hook, on, rule }) => {
@@ -40,10 +40,13 @@ export default styles(
         rule({ display: 'block' }),
         /* Down a column an item fills it and reads from its start, as every
            sidebar's does. */
-        rule({ orientation: 'vertical' }, { own: { itemDisplay: 'flex', itemJustify: 'start' } }),
+        rule(
+          { orientation: 'vertical' },
+          { own: { navigationItemDisplay: 'flex', navigationItemJustify: 'start' } },
+        ),
         /* Inside a segmented track the items take the track's height, which
            is under the floor an item keeps in a bar. */
-        rule({ variant: 'segmented' }, { own: { itemFloor: 0 } }),
+        rule({ variant: 'segmented' }, { own: { navigationItemFloor: 0 } }),
         /* Print: the bar, and the mark under it marks a page nobody is on. */
         rule({ print: true }, { display: 'none' }),
       ]),

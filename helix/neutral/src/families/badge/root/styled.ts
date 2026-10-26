@@ -33,12 +33,19 @@ export default styles(
       color: null,
       fontWeight: token('weight-semibold'),
       gap: token('space-2xs'),
-      iconSize: own.text,
-      offset: quotient(own.size, 4),
+      iconSize: own.badgeText,
+      offset: quotient(own.badgeSize, 4),
       radius: token('radii-full'),
       ringColor: token('color-background'),
     }),
-    own: ['badge-dot', 'badge-fill', 'badge-inset', 'badge-on', 'badge-size', 'badge-text'],
+    own: {
+      badgeDot: null,
+      badgeFill: null,
+      badgeInset: null,
+      badgeOn: null,
+      badgeSize: null,
+      badgeText: null,
+    },
     props: {
       attention: oneOf(['bounce', 'pulse']),
       emphasis: oneOf(['outlined', 'solid', 'subtle']),
@@ -54,29 +61,31 @@ export default styles(
         position: 'relative',
         web: { verticalAlign: 'middle' },
         own: {
-          size: token('size-badge'),
-          text: token('text-xs'),
-          inset: token('space-2xs'),
-          dot: token('space-xs'),
-          on: token('color-foreground-on-primary'),
-          fill: token('color-primary-surface'),
+          badgeSize: token('size-badge'),
+          badgeText: token('text-xs'),
+          badgeInset: token('space-2xs'),
+          badgeDot: token('space-xs'),
+          badgeOn: token('color-foreground-on-primary'),
+          badgeFill: token('color-primary-surface'),
         },
       }),
       /* The fills, which are Tag's, each with the ink its family's fill takes. */
       variants('tone', {
-        primary: { own: { fill: token('color-primary-surface') } },
-        accent: { own: { fill: token('color-accent-surface') } },
+        primary: { own: { badgeFill: token('color-primary-surface') } },
+        accent: { own: { badgeFill: token('color-accent-surface') } },
       }),
-      rule({ tone: 'accent' }, { own: { on: token('color-foreground-on-accent') } }),
+      rule({ tone: 'accent' }, { own: { badgeOn: token('color-foreground-on-accent') } }),
       rule([{ tone: 'danger' }, { tone: 'info' }, { tone: 'success' }, { tone: 'warning' }], {
-        own: { on: token('color-foreground-on-status') },
+        own: { badgeOn: token('color-foreground-on-status') },
       }),
       variants('tone', {
-        info: { own: { fill: token('color-info-surface') } },
-        success: { own: { fill: token('color-success-surface') } },
-        warning: { own: { fill: token('color-warning-surface') } },
-        danger: { own: { fill: token('color-danger-surface') } },
-        neutral: { own: { fill: token('color-surface-raised'), on: token('color-foreground') } },
+        info: { own: { badgeFill: token('color-info-surface') } },
+        success: { own: { badgeFill: token('color-success-surface') } },
+        warning: { own: { badgeFill: token('color-warning-surface') } },
+        danger: { own: { badgeFill: token('color-danger-surface') } },
+        neutral: {
+          own: { badgeFill: token('color-surface-raised'), badgeOn: token('color-foreground') },
+        },
       }),
       /* In the line, after what it counts, with no ring. */
       rule({ placement: 'inline' }, { alignItems: 'center', gap: hook.gap }),
@@ -85,20 +94,20 @@ export default styles(
     on('indicator', [
       rule({
         alignItems: 'center',
-        backgroundColor: first(hook.backgroundColor, own.fill),
-        blockSize: own.size,
+        backgroundColor: first(hook.backgroundColor, own.badgeFill),
+        blockSize: own.badgeSize,
         borderRadius: hook.radius,
         boxShadow: [0, 0, 0, token('border-thick'), hook.ringColor],
-        color: first(hook.color, own.on),
+        color: first(hook.color, own.badgeOn),
         display: 'inline-flex',
-        fontSize: own.text,
+        fontSize: own.badgeText,
         fontWeight: hook.fontWeight,
         insetBlockStart: hook.offset,
         insetInlineEnd: hook.offset,
         justifyContent: 'center',
         lineHeight: 1,
-        minInlineSize: own.size,
-        paddingInline: own.inset,
+        minInlineSize: own.badgeSize,
+        paddingInline: own.badgeInset,
         pointerEvents: 'none',
         position: 'absolute',
         translate: '50% -50%',
@@ -109,12 +118,12 @@ export default styles(
         { 'data-dot': true },
         {
           blockSize: 'auto',
-          minBlockSize: own.dot,
-          minInlineSize: own.dot,
+          minBlockSize: own.badgeDot,
+          minInlineSize: own.badgeDot,
           paddingInline: token('space-none'),
         },
       ),
-      rule({ gap: quotient(own.inset, 2) }),
+      rule({ gap: quotient(own.badgeInset, 2) }),
       /* One character is a circle. */
       rule({ 'data-single': true }, { paddingInline: token('space-none') }),
       /* Arriving, and leaving at zero. */
@@ -156,19 +165,19 @@ export default styles(
         outlined: {
           backgroundColor: hook.backgroundColor(token('color-background')),
           boxShadow: list(
-            ['inset', 0, 0, 0, token('border-thick'), own.fill],
+            ['inset', 0, 0, 0, token('border-thick'), own.badgeFill],
             [0, 0, 0, token('border-thick'), hook.ringColor],
           ),
           color: hook.color(token('color-foreground')),
         },
         subtle: {
-          backgroundColor: hook.backgroundColor(mix(own.fill, 22, token('color-background'))),
+          backgroundColor: hook.backgroundColor(mix(own.badgeFill, 22, token('color-background'))),
           color: hook.color(token('color-foreground')),
         },
       }),
       rule(
         { emphasis: 'outlined', placement: 'inline' },
-        { boxShadow: ['inset', 0, 0, 0, token('border-thick'), own.fill] },
+        { boxShadow: ['inset', 0, 0, 0, token('border-thick'), own.badgeFill] },
       ),
       /* Attention, which a mark going away does not draw. */
       rule(
@@ -208,10 +217,10 @@ export default styles(
       ),
     ]),
     on({ part: 'indicator', inner: 'slot[name="icon"]::slotted(*)' }, [
-      web([rule({ 'data-dot': true }, { margin: quotient(own.inset, 2) })]),
+      web([rule({ 'data-dot': true }, { margin: quotient(own.badgeInset, 2) })]),
     ]),
     on({ region: 'icon', slotted: '*' }, [
-      native([rule({ unset: true }, { margin: quotient(own.inset, 2) })]),
+      native([rule({ unset: true }, { margin: quotient(own.badgeInset, 2) })]),
       rule({ '--icon-size': hook.iconSize, flex: 'none' }),
     ]),
     keyframes('badge-pulse', {

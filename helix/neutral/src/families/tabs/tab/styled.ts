@@ -1,14 +1,4 @@
-import {
-  difference,
-  first,
-  list,
-  mix,
-  ownOf,
-  product,
-  quotient,
-  token,
-  web,
-} from '../../../style.js'
+import { difference, first, list, mix, product, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import tab from './headless.js'
 
@@ -46,6 +36,7 @@ export default styles(
       tabRadius: null,
       tabSelectedShadow: 'none',
       tabSelectedSurface: null,
+      tabsDismissRest: null,
     },
     stylesheet: 'tabs/tab/tab.generated.css',
   },
@@ -157,7 +148,7 @@ export default styles(
         marginInline: [token('space-2xs'), product(token('space-2xs'), '-1')],
         /* Out of sight at rest only where the set asks, with `dismiss-marks`, and
            still holding its room, so the label does not move as it comes and goes. */
-        opacity: ownOf('tabs', 'dismiss-rest', 1),
+        opacity: own.tabsDismissRest(1),
         padding: token('space-none'),
         transition: ['opacity', token('duration-fast'), token('easing-standard')],
       }),

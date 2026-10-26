@@ -37,22 +37,22 @@ export default styles(
       gap: token('space-xs'),
       inset: token('space-lg'),
     },
-    own: ['toast-enter', 'toast-gap', 'toast-inset', 'toast-most', 'toast-width'],
+    own: { toastEnter: null, toastGap: null, toastInset: null, toastMost: null, toastWidth: null },
     stylesheet: 'toast/root/toast-root.generated.css',
   },
   ({ hook, on, own, rule }) => {
     return [
       on('host', [
-        rule({ own: { inset: hook.inset }, display: 'contents' }),
+        rule({ own: { toastInset: hook.inset }, display: 'contents' }),
         /* Which way the nearest edge is, which a message arrives from and leaves toward. */
-        rule({ placement: false }, { own: { enter: token('space-lg') } }),
+        rule({ placement: false }, { own: { toastEnter: token('space-lg') } }),
         rule(
           { placement: ['bottom-center', 'bottom-end', 'bottom-start'] },
-          { own: { enter: token('space-lg') } },
+          { own: { toastEnter: token('space-lg') } },
         ),
         rule(
           { placement: ['top-center', 'top-end', 'top-start'] },
-          { own: { enter: product(token('space-lg'), '-1') } },
+          { own: { toastEnter: product(token('space-lg'), '-1') } },
         ),
         rule({ print: true }, { display: 'none' }),
       ]),
@@ -60,7 +60,7 @@ export default styles(
          popover box undone, since the stack has no surface of its own. */
       on('region', [
         rule({
-          own: { gap: hook.gap },
+          own: { toastGap: hook.gap },
           background: web('none'),
           blockSize: web('auto'),
           border: web('none'),
@@ -69,7 +69,7 @@ export default styles(
           flexDirection: 'column',
           inlineSize: web('auto'),
           inset: web('auto'),
-          insetInline: web(own.inset),
+          insetInline: web(own.toastInset),
           margin: web(token('space-none')),
           maxBlockSize: web('none'),
           maxInlineSize: web('none'),
@@ -79,14 +79,14 @@ export default styles(
           position: web('fixed'),
           zIndex: web(token('layer-toast')),
         }),
-        rule({ placement: false }, { web: { insetBlockEnd: own.inset } }),
+        rule({ placement: false }, { web: { insetBlockEnd: own.toastInset } }),
         rule(
           { placement: ['bottom-center', 'bottom-end', 'bottom-start'] },
-          { web: { insetBlockEnd: own.inset } },
+          { web: { insetBlockEnd: own.toastInset } },
         ),
         rule(
           { placement: ['top-center', 'top-end', 'top-start'] },
-          { web: { insetBlockStart: own.inset } },
+          { web: { insetBlockStart: own.toastInset } },
         ),
         rule(
           { placement: ['top-center', 'top-end', 'top-start'] },
@@ -97,19 +97,19 @@ export default styles(
         rule({ placement: ['bottom-end', 'top-end'] }, { alignItems: 'flex-end' }),
         rule({ placement: ['bottom-center', 'top-center'] }, { alignItems: 'center' }),
         /* A message is never wider than the window less a margin. */
-        web([rule({ own: { most: difference('100vw', token('space-xl')) } })]),
+        web([rule({ own: { toastMost: difference('100vw', token('space-xl')) } })]),
         /* Each message the whole width of the stack where the window is narrow. */
-        rule({ window: { below: '30rem' } }, { own: { width: '100%' } }),
+        rule({ window: { below: '30rem' } }, { own: { toastWidth: '100%' } }),
         /* A phone keeps the stack from the edges, clear of the home indicator
            at the bottom and of the status bar at the top. */
         native([
           rule({
-            marginBlockEnd: sum(own.inset, safeArea('bottom')),
-            marginInline: own.inset,
+            marginBlockEnd: sum(own.toastInset, safeArea('bottom')),
+            marginInline: own.toastInset,
           }),
           rule(
             { placement: ['top-center', 'top-end', 'top-start'] },
-            { marginBlockEnd: 0, marginBlockStart: sum(own.inset, safeArea('top')) },
+            { marginBlockEnd: 0, marginBlockStart: sum(own.toastInset, safeArea('top')) },
           ),
           rule({ lacks: 'data-color-mode' }, { colorScheme: scheme('dark', 'light') }),
         ]),
