@@ -1,4 +1,14 @@
-import { difference, list, mix, product, quotient, token, web } from '../../../style.js'
+import {
+  difference,
+  first,
+  list,
+  mix,
+  ownOf,
+  product,
+  quotient,
+  token,
+  web,
+} from '../../../style.js'
 import { styles } from '../../../table.js'
 import tab from './headless.js'
 
@@ -14,34 +24,33 @@ export default styles(
   tab,
   {
     prefix: 'tabs-tab',
-    hooks: [
-      'block-size',
-      'color',
-      'disabled-opacity',
-      'dismiss-color',
-      'font-size',
-      'font-weight',
-      'hover-background-color',
-      'hover-color',
-      'max-inline-size',
-      'padding-inline',
-      'radius',
-      'selected-background-color',
-      'selected-color',
-    ],
-    own: [
-      'tab-height',
-      'tab-inline-size',
-      'tab-justify',
-      'tab-radius',
-      'tab-selected-shadow',
-      'tab-selected-surface',
-      'tabs-dismiss-rest',
-    ],
+    hooks: ({ own }) => ({
+      blockSize: token('size-control'),
+      color: token('color-foreground-muted'),
+      disabledOpacity: 0.5,
+      dismissColor: 'currentColor',
+      fontSize: token('text-control'),
+      fontWeight: token('weight-medium'),
+      hoverBackgroundColor: mix(token('color-foreground'), 5, 'transparent'),
+      hoverColor: token('color-foreground'),
+      maxInlineSize: 'none',
+      paddingInline: token('space-sm'),
+      radius: first(own.tabRadius, token('radii-none')),
+      selectedBackgroundColor: first(own.tabSelectedSurface, 'transparent'),
+      selectedColor: token('color-foreground'),
+    }),
+    own: {
+      tabHeight: null,
+      tabInlineSize: 'auto',
+      tabJustify: 'center',
+      tabRadius: null,
+      tabSelectedShadow: 'none',
+      tabSelectedSurface: null,
+    },
     stylesheet: 'tabs/tab/tab.generated.css',
   },
   ({ hook, on, own, rule }) => [
-    on('host', [rule({ display: 'inline-flex', maxInlineSize: hook.maxInlineSize('none') })]),
+    on('host', [rule({ display: 'inline-flex', maxInlineSize: hook.maxInlineSize })]),
     on('tab', [
       /* A label longer than the tab may be ends in an ellipsis, as a tag's does.
          Only once a page caps a tab: unset, a tab is its label's width, so a strip
@@ -57,31 +66,30 @@ export default styles(
            Through a private value, because a variant that puts a frame around the
            row has to hand the tab a share of the frame, which the whole control
            height would overflow. `segmented` does exactly that. */
-        blockSize: own.tabHeight(hook.blockSize(token('size-control'))),
+        blockSize: first(own.tabHeight, hook.blockSize),
         border: 'none',
         /* Transparent always. The mark that says which tab is current is one
            element in the strip, which travels from tab to tab. The width is kept
            so the box is the same either way. */
         borderBlockEnd: [token('border-thick'), 'solid', 'transparent'],
-        borderRadius: hook.radius(own.tabRadius(token('radii-none'))),
-        color: hook.color(token('color-foreground-muted')),
-        cursor: web('pointer'),
-        font: web('inherit'),
+        borderRadius: hook.radius,
+        color: hook.color,
+        web: { cursor: 'pointer', font: 'inherit' },
         /* The control text, so a tab in a `data-density` region follows it as the
            controls beside it do; it is `text-sm` at rest. */
-        fontSize: hook.fontSize(token('text-control')),
-        fontWeight: hook.fontWeight(token('weight-medium')),
+        fontSize: hook.fontSize,
+        fontWeight: hook.fontWeight,
         display: 'inline-flex',
         /* A tab set in a column makes each tab as wide as the column, its words at
            the start. */
-        inlineSize: own.tabInlineSize('auto'),
-        justifyContent: own.tabJustify('center'),
+        inlineSize: own.tabInlineSize,
+        justifyContent: own.tabJustify,
         /* The transparent edge at the bottom is matched at the top, so what the tab
            centers is centered on the whole tab. A button's own padding goes with it:
            1px at each end in Chromium, and 2px over 3px in WebKit, which put the
            label half a pixel higher there. */
         paddingBlock: [token('border-thick'), 0],
-        paddingInline: hook.paddingInline(token('space-sm')),
+        paddingInline: hook.paddingInline,
         /* A tab with an `href` is an anchor, and reads as a tab all the same. */
         textDecoration: 'none',
         transition: list(
@@ -99,23 +107,15 @@ export default styles(
          nothing at all. The same five percent wash the nav bar uses, so a row of
          tabs and a row of navigation behave alike. */
       rule(
-        { hover: true, part: { disabled: false } },
-        {
-          backgroundColor: hook.hoverBackgroundColor(
-            mix(token('color-foreground'), 5, 'transparent'),
-          ),
-          color: hook.hoverColor(token('color-foreground')),
-        },
+        { hover: true, disabled: false },
+        { backgroundColor: hook.hoverBackgroundColor, color: hook.hoverColor },
       ),
-      rule([{ state: 'selected' }, { hover: true, state: 'selected' }], {
-        backgroundColor: hook.selectedBackgroundColor(own.tabSelectedSurface('transparent')),
-        boxShadow: own.tabSelectedShadow('none'),
-        color: hook.selectedColor(token('color-foreground')),
+      rule([{ selected: true }, { hover: true, selected: true }], {
+        backgroundColor: hook.selectedBackgroundColor,
+        boxShadow: own.tabSelectedShadow,
+        color: hook.selectedColor,
       }),
-      rule(
-        { part: { disabled: true } },
-        { cursor: web('not-allowed'), opacity: hook.disabledOpacity(0.5) },
-      ),
+      rule({ disabled: true }, { web: { cursor: 'not-allowed' }, opacity: hook.disabledOpacity }),
       /* Inset, because the tab sits against the list's own rule and an outset ring
          would be clipped by the scroll container. */
       rule(
@@ -137,39 +137,35 @@ export default styles(
          given back half the leading at each end, the label box is one line tall as
          before, with the capitals in its middle. Centering the line box put them
          where the face's ascent and descent did: 0.25px high at 12px in Chromium. */
-      rule(
-        { platform: 'web', supports: '(text-box: trim-both cap alphabetic)' },
-        {
-          paddingBlock: quotient(difference('1lh', '1cap'), 2),
-          textBox: 'trim-both cap alphabetic',
-        },
-      ),
+      web([
+        rule(
+          { supports: '(text-box: trim-both cap alphabetic)' },
+          {
+            paddingBlock: quotient(difference('1lh', '1cap'), 2),
+            textBox: 'trim-both cap alphabetic',
+          },
+        ),
+      ]),
     ]),
     on('dismiss', [
       /* The close mark of a dismissible tab, after its label, sized to the text. */
       rule({
         alignItems: 'center',
         borderRadius: token('radii-sm'),
-        color: hook.dismissColor('currentColor'),
+        color: hook.dismissColor,
         display: 'inline-flex',
         marginInline: [token('space-2xs'), product(token('space-2xs'), '-1')],
         /* Out of sight at rest only where the set asks, with `dismiss-marks`, and
            still holding its room, so the label does not move as it comes and goes. */
-        opacity: own.tabsDismissRest(1),
+        opacity: ownOf('tabs', 'dismiss-rest', 1),
         padding: token('space-none'),
         transition: ['opacity', token('duration-fast'), token('easing-standard')],
       }),
       /* The mark shows on the current tab, under the pointer, and while the tab
          holds focus. A phone has no pointer, and draws it on the current tab. */
-      rule({ state: 'selected' }, { opacity: 1 }),
+      rule({ selected: true }, { opacity: 1 }),
       rule({ hover: true }, { backgroundColor: mix(token('color-foreground'), 10, 'transparent') }),
-      rule(
-        [
-          { platform: 'web', within: { host: { hover: true } } },
-          { platform: 'web', within: { host: { focusWithin: true } } },
-        ],
-        { opacity: 1 },
-      ),
+      web([rule({ within: { host: ['hover', 'focusWithin'] } }, { opacity: 1 })]),
     ]),
     on('dismiss-mark', [rule({ blockSize: '1em', inlineSize: '1em' })]),
     on({ region: 'dismiss-icon', slotted: '*' }, [

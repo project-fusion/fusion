@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import { readdirSync, readFileSync } from 'node:fs'
 import { rendered, ssr, withoutStyles } from '@fusion.dev/helix-testing/ssr'
 import { html, unsafeStatic } from 'lit/static-html.js'
 import '@fusion.dev/helix/accordion'
@@ -178,6 +179,36 @@ import type { Headless, Node } from './tree.js'
  * one press a phone draws for every tag.
  */
 
+/**
+ * An element's source with its tree. A source written with `render` holds its
+ * tree as JSX that nothing runs, so its tree is the compiled one, from the
+ * native module `helix family components` writes and `check:families` holds
+ * to a fresh compile.
+ */
+const withTree = (family: Headless): Headless => {
+  if (!('render' in family)) {
+    return family
+  }
+  const native = new URL('../../styled/native/', import.meta.url)
+  for (const folder of readdirSync(native)) {
+    const module = readFileSync(new URL(`${folder}/index.native.ts`, native), 'utf8')
+    for (const line of module.split('\n')) {
+      const form = /^const \w+Form: Family = (.*)$/.exec(line)?.[1]
+      const compiled = form === undefined ? undefined : (JSON.parse(form) as Compiled)
+      if (compiled?.tag === `helix-${family.name}`) {
+        return { ...family, tree: compiled.tree }
+      }
+    }
+  }
+  throw new Error(`no native module holds the compiled form of helix-${family.name}`)
+}
+
+/** What of a compiled form the judge reads. */
+interface Compiled {
+  readonly tag: string
+  readonly tree: readonly Node[]
+}
+
 /** The attributes an element is drawn with before any `when` is turned on, by its family. */
 const GIVEN: Readonly<Record<string, string>> = { icon: 'name="gear"' }
 
@@ -322,7 +353,7 @@ describe('the structural judge', () => {
     tour,
     tourStop,
     trend,
-  ]) {
+  ].map(withTree)) {
     test(`helix-${family.name} draws its tree`, () => {
       expect(differences(family, new Set())).toEqual([])
     })
