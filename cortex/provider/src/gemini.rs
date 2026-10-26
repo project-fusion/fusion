@@ -161,6 +161,15 @@ impl Gemini {
                 json!({ "includeThoughts": true, "thinkingLevel": level }),
             );
         }
+        // `responseFormat` replaces `responseSchema`, which took the OpenAPI
+        // subset, and takes JSON Schema. The server drops the keywords it does
+        // not enforce rather than refusing the request.
+        if let Some(format) = &request.format {
+            config.insert(
+                "responseFormat".into(),
+                json!({ "text": { "mimeType": "APPLICATION_JSON", "schema": format.schema } }),
+            );
+        }
         if !config.is_empty() {
             body["generationConfig"] = Value::Object(config);
         }
@@ -511,7 +520,7 @@ impl Decode for Decoder {
 mod tests {
     use super::*;
     use crate::http::canned::Canned;
-    use fusion_cortex_core::provider::{Response, Tool};
+    use fusion_cortex_core::provider::{Format, Response, Tool};
 
     const STREAM: &str = r#"data: {"candidates":[{"content":{"parts":[{"text":"Two cities, ","thought":true}],"role":"model"},"index":0}],"modelVersion":"gemini-3.5-pro","responseId":"r1"}
 
@@ -595,6 +604,7 @@ data: {"candidates":[{"content":{"parts":[{"functionCall":{"id":"8f2b","name":"w
             .unwrap();
         let request = Request {
             effort: Some(Effort::Xhigh),
+            format: None,
             max_tokens: Some(1024),
             messages: vec![
                 Message::text(Role::System, "Answer briefly."),
@@ -917,5 +927,27 @@ data: {"candidates":[{"content":{"parts":[{"functionCall":{"id":"8f2b","name":"w
             !error.is_retryable(),
             "a request rejected as written fails again unchanged"
         );
+    }
+
+    #[tokio::test]
+    async fn a_format_asks_for_json_that_matches_its_schema() {
+        let transport = Arc::new(Canned::new(STREAM, usize::MAX));
+        let request = Request {
+            format: Some(Format {
+                name: "forecast".into(),
+                schema: json!({
+                    "properties": { "city": { "type": "string" } },
+                    "required": ["city"],
+                    "type": "object",
+                }),
+            }),
+            ..Request::default()
+        };
+
+        provider(&transport).complete(&request).await.unwrap();
+
+        let format = &transport.body()["generationConfig"]["responseFormat"]["text"];
+        assert_eq!(format["mimeType"], "APPLICATION_JSON");
+        assert_eq!(format["schema"]["required"], json!(["city"]));
     }
 }

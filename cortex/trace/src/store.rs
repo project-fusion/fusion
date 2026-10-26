@@ -706,6 +706,7 @@ pub(crate) mod conformance {
         Node::new(
             Detail::Context {
                 dropped: vec![],
+                format: None,
                 placed: vec![],
                 messages: vec![Message::text(
                     fusion_cortex_core::provider::Role::User,

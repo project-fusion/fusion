@@ -16,6 +16,7 @@ spine, not a module.
 | **Recall** | `fusion-cortex-recall` | Context assembly: pins, compaction, drop records |
 | Core | `fusion-cortex-core` | Ids, provider abstraction, shared errors |
 | Providers | `fusion-cortex-provider` | Model clients, one per API and each a feature, local first |
+| Extraction | `fusion-cortex-extract` | Typed extraction: a reply checked against a schema, one retry, and its trace |
 
 ## Invariants
 
@@ -53,9 +54,10 @@ spine, not a module.
   that produced a node, and `serde_json::Value` cannot promise the fields it
   needs exist or are spelled the way last release spelled them. `NodeKind` is
   derived from `Detail` rather than stored beside it, so the two cannot
-  disagree. `ToolCall`'s arguments stay untyped and that is the one place it is
-  correct, because tool arguments are arbitrary JSON by the wire format's
-  definition.
+  disagree. `ToolCall`'s arguments stay untyped, because tool arguments are
+  arbitrary JSON by the wire format's definition, and so does `Extraction`'s
+  value, whose shape is the caller's schema. Those are the two places it is
+  correct, and every field around them is typed.
 - **A replay never executes tool calls.** Re-running a tool re-performs its
   side effects, so a replay of a trace that sent an email would send it again.
   Tool replay needs a sandbox and an explicit opt-in; until it has both, the
