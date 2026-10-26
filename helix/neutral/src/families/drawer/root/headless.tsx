@@ -95,13 +95,13 @@ export default headless('drawer', {
   render: ({ derived, props }) => (
     <Layer
       closedby={derived.dismissal}
-      edge={derived.edge}
       label={derived.name}
       modal={props.modal}
       open={props.open}
       part="panel"
       role="dialog"
-      snap={props.snapPoints}
+      side={derived.edge}
+      snapPoints={props.snapPoints}
       swipe={props.swipe}
     >
       <View part="header">

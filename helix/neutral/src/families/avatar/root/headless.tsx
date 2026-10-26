@@ -65,8 +65,8 @@ export default headless('avatar', {
         <Image
           alt=""
           empty="error"
-          fails="error"
-          loads="load"
+          onError="error"
+          onLoad="load"
           part="image"
           src={props.src}
         />

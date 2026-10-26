@@ -332,5 +332,6 @@ impl Render<'_> {
 
 #[path = "jsx_element.rs"]
 mod element;
+pub(crate) use element::RENAMED;
 #[path = "jsx_values.rs"]
 mod values;

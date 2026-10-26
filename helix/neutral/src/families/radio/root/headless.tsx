@@ -27,11 +27,11 @@ export default headless('radio', {
   render: ({ props, send }) => (
     <Pressable
       checked={props.selected}
-      chooses
       disabled={props.disabled}
       onPress={send.beforeSelect}
       part="item"
       role="radio"
+      selects
     >
       <View
         ariaHidden

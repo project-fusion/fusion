@@ -81,7 +81,6 @@ export default headless('step', {
           platform="web"
         />
         <Pressable
-          chooses
           current={props.current ? 'step' : ''}
           description={derive('step-said')}
           disabled={props.disabled}
@@ -89,6 +88,7 @@ export default headless('step', {
           part="label"
           platform="native"
           role="button"
+          selects
         >
           <Slot />
         </Pressable>

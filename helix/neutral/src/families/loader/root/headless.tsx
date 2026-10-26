@@ -38,7 +38,7 @@ export default headless('loader', {
   delay: { duration: 'delay', idleWhen: 'idle', pending: 'waiting' },
   host: {
     busy: not('idle'),
-    decorative: bind('waiting'),
+    ariaHidden: bind('waiting'),
     label: bind('spokenLabel'),
     role: bind('spokenRole'),
   },

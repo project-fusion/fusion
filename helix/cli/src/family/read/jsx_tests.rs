@@ -89,7 +89,7 @@ fn a_node_is_its_helper_with_its_part_as_its_name() {
 fn a_read_binds_its_name_and_a_negation_is_not() {
     assert_eq!(
         tree(
-            r#"<Pressable part="tab" chooses label={props.dismissLabel} hidden={!props.disabled} hint={derived.holdHint} placed={state.placedTop} named={stack.title} offset={-1} onPress={send.beforeSelect} />"#
+            r#"<Pressable part="tab" selects label={props.dismissLabel} hidden={!props.disabled} hint={derived.holdHint} placed={state.placedTop} named={stack.title} offset={-1} onPress={send.beforeSelect} />"#
         ),
         [call(
             "pressable",
@@ -114,7 +114,7 @@ fn a_read_binds_its_name_and_a_negation_is_not() {
 #[test]
 fn a_choice_of_strings_is_a_pick() {
     let [Lit::Call(_, arguments)]: [Lit; 1] = tree(
-        r#"<Layer part="surface" presses={derived.rows ? 'none' : 'toggle'} returns={!props.loading ? 'held' : 'always'} />"#,
+        r#"<Layer part="surface" anchorPress={derived.rows ? 'none' : 'toggle'} restoreFocus={!props.loading ? 'held' : 'always'} />"#,
     )
     .try_into()
     .unwrap() else {
@@ -408,11 +408,11 @@ const REFUSED: &[(&str, &str)] = &[
     ),
     (
         r#"<View part="x" decorative />"#,
-        "`decorative` is the builder form's: write it as `ariaHidden`",
+        "`decorative` is written `ariaHidden`",
     ),
     (
         r#"<View part="x" glyph="x" />"#,
-        "`glyph` is the builder form's: write it as `icon`",
+        "`glyph` is written `icon`",
     ),
     (
         r#"<View part="x" viewBox="0 0 1 1" />"#,

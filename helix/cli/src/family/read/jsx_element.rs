@@ -7,8 +7,23 @@ use oxc_ast::ast::{
 use super::{Render, TAGS};
 use crate::family::read::Lit;
 
-/// Each attribute the JSX form spells another way than the builder form.
-const RENAMED: &[(&str, &str)] = &[("ariaHidden", "decorative"), ("icon", "glyph")];
+/// Each attribute the JSX form spells another way than the intermediate
+/// form: the word a React, React Native, or ARIA reader knows, and the name
+/// the native runtime reads.
+pub(crate) const RENAMED: &[(&str, &str)] = &[
+    ("anchorPress", "presses"),
+    ("ariaHidden", "decorative"),
+    ("icon", "glyph"),
+    ("initialFocus", "enters"),
+    ("longPress", "holds"),
+    ("onError", "fails"),
+    ("onLoad", "loads"),
+    ("pressKey", "keys"),
+    ("restoreFocus", "returns"),
+    ("selects", "chooses"),
+    ("side", "edge"),
+    ("snapPoints", "snap"),
+];
 
 /// The helpers whose node holds children of its own, or a fallback.
 const HOLDS: &[&str] = &["box", "layer", "pressable", "region", "repeat", "wrap"];
@@ -152,6 +167,16 @@ impl Render<'_> {
                 read => Ok(("while".to_owned(), read)),
             },
             ("Announce", "when") => Ok(("while".to_owned(), self.value(value, attribute.span)?)),
+            /* A box drawn while closed is `open` while it shows, as a
+            `<details>` is. */
+            ("View", "open") => Ok(("closed".to_owned(), negated(self.value(value, attribute.span)?))),
+            ("View", "indicator") => match self.value(value, attribute.span)? {
+                Lit::Bool(true) => Ok(("marks".to_owned(), Lit::Text("chosen".to_owned()))),
+                _ => Err(self.at(
+                    attribute.span,
+                    "`indicator` is a flag: the box stands at the item its set has selected",
+                )),
+            },
             ("View", "viewBox") => Err(self.at(
                 attribute.span,
                 "a box that draws a vector is `<Svg viewBox=\"...\">`",
@@ -160,19 +185,35 @@ impl Render<'_> {
                 attribute.span,
                 "a shape inside a vector is `<Path>`, `<Circle>`, `<Ellipse>`, `<Line>` or `<Rect>`",
             )),
-            (_, "decorative" | "glyph" | "sends" | "while" | "says") => Err(self.at(
+            (_, "sends" | "while" | "says") => Err(self.at(
                 attribute.span,
                 &format!(
                     "`{key}` is the builder form's: write it as {}",
                     match key {
-                        "decorative" => "`ariaHidden`",
-                        "glyph" => "`icon`",
                         "sends" => "`onPress={send.x}`",
                         "while" => "`when`",
                         _ => "the node's child, `<Text part=\"...\">{props.x}</Text>`",
                     }
                 ),
             )),
+            ("View", "closed" | "marks") => Err(self.at(
+                attribute.span,
+                &format!(
+                    "`{key}` is written {}",
+                    if key == "closed" {
+                        "`open`, which holds while the box shows: `open={props.open}`"
+                    } else {
+                        "`indicator`"
+                    }
+                ),
+            )),
+            (_, old) if RENAMED.iter().any(|(_, written)| *written == old) => {
+                let new = RENAMED
+                    .iter()
+                    .find(|(_, written)| *written == old)
+                    .map_or(old, |(new, _)| *new);
+                Err(self.at(attribute.span, &format!("`{old}` is written `{new}`")))
+            }
             _ => {
                 let renamed = RENAMED
                     .iter()
@@ -255,5 +296,16 @@ impl Render<'_> {
                 &format!("`{key}` is a name written as a string, as `{key}=\"label\"`"),
             )),
         }
+    }
+}
+
+/// The opposite of a value: `not()` of what a `bind()` reads, and the other
+/// way round, and a literal flag turned over.
+fn negated(value: Lit) -> Lit {
+    match value {
+        Lit::Bool(flag) => Lit::Bool(!flag),
+        Lit::Call(helper, arguments) if helper == "bind" => Lit::Call("not".to_owned(), arguments),
+        Lit::Call(helper, arguments) if helper == "not" => Lit::Call("bind".to_owned(), arguments),
+        other => other,
     }
 }

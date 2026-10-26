@@ -184,7 +184,7 @@ fn member(value: &Lit, chooses: bool) -> Result<Lit, String> {
         .find(|(key, _)| key == "chooses" || key == "pressChooses")
     {
         return Err(format!(
-            "`set()` takes no `{key}`: pressing chooses where a `<Pressable>` in the render says `chooses`"
+            "`set()` takes no `{key}`: pressing selects where a `<Pressable>` in the render says `selects`"
         ));
     }
     if chooses {

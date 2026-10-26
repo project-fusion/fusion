@@ -271,12 +271,12 @@ fn swipes(node: &Node, at: &str) -> Result<(), String> {
         && !node.attributes.contains_key("presentation")
     {
         return Err(format!(
-            "{at}: a layer that swipes stands along an edge: name its `edge`, or give it a `presentation` that makes it a sheet"
+            "{at}: a layer that swipes stands along an edge: name its `side`, or give it a `presentation` that makes it a sheet"
         ));
     }
     if !swipes && node.attributes.contains_key("snap") {
         return Err(format!(
-            "{at}: `snap` names where a swipe comes to rest, and the layer does not swipe"
+            "{at}: `snapPoints` names where a swipe comes to rest, and the layer does not swipe"
         ));
     }
     if node
@@ -285,7 +285,7 @@ fn swipes(node: &Node, at: &str) -> Result<(), String> {
         .is_some_and(|snap| !matches!(snap, Attribute::Bound(Binding::Bind(_))))
     {
         return Err(format!(
-            "{at}: `snap` binds the prop that holds the snap points, `snap: bind('snap-points')`"
+            "{at}: `snapPoints` binds the prop that holds the snap points, `snapPoints={{props.snapPoints}}`"
         ));
     }
     Ok(())
