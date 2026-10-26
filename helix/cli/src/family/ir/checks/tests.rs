@@ -75,17 +75,17 @@ fn an_alias_competes_with_its_base_part_unless_it_is_asked_away() {
 #[test]
 fn a_shorthand_competes_with_its_longhand() {
     let refused = checked(
-        "box('a', {}, [])",
-        "on('a', [rule({ border: 'none' })]),\non(['a'], [rule({ borderBlockStartColor: 'red' })]),",
+        MARK,
+        "on('mark', [rule({ border: 'none' })]),\non('mark-dash', [rule({ borderBlockStartColor: 'red' })]),",
     )
     .unwrap_err();
     assert!(refused.contains("`border`"), "{refused}");
 }
 
 #[test]
-fn specificity_two_values_of_a_prop_and_one_target_settle_it() {
+fn two_values_of_a_prop_and_one_target_settle_it() {
     let tree = "box('a', {}, [])";
-    /* More specific. */
+    /* One target, where the later rule wins whatever its conditions. */
     checked(
         tree,
         "on('a', [rule({ opacity: 1 })]),\non(['a'], [rule({ hover: true }, { opacity: 0 })]),",

@@ -145,18 +145,7 @@ export default styles(
           rule({ startingStyle: true, entering: true }, { opacity: 0 }),
           rule({ closed: true }, { display: 'none' }),
         ]),
-        rule([{ reducedMotion: true }, { reducedMotion: true, closed: true }], {
-          transition: 'none',
-        }),
-        native([
-          rule(
-            [
-              { reducedMotion: true, exiting: true },
-              { reducedMotion: true, entering: true },
-            ],
-            { transition: 'none' },
-          ),
-        ]),
+        rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
       /* Hidden and still laid out while it leaves. A waiting message takes no box. */
       /* Written out: the vocabulary names no value an attribute does not hold beside a state. */
@@ -271,7 +260,7 @@ export default styles(
       /* The close, in the corner and out of the flow, centered on the first line. */
       on('dismiss', [
         rule({
-          all: web('unset'),
+          web: { all: 'unset', cursor: 'pointer' },
           boxSizing: 'border-box',
           position: 'absolute',
           insetBlockStart: sum(
@@ -282,7 +271,6 @@ export default styles(
           blockSize: token('size-control'),
           borderRadius: token('radii-sm'),
           color: hook.dismissColor,
-          cursor: web('pointer'),
           display: 'inline-flex',
           flex: '0 0 auto',
           inlineSize: token('size-control'),
@@ -321,9 +309,9 @@ export default styles(
         }),
         web([rule({ touchAction: 'pan-y' })]),
         rule({ dir: 'rtl' }, { transformOrigin: '100% 50%' }),
-        rule({ paused: true }, { animationPlayState: 'paused' }),
         /* Under reduced motion as well: the bar is the one place that says how long is left. */
         rule({ reducedMotion: true }, { animation: drain }),
+        rule({ paused: true }, { animationPlayState: 'paused' }),
       ]),
       keyframes('helix-toast-drain', { to: { scale: '0 1' } }),
       keyframes('helix-toast-in', { from: { opacity: 0, translate: [0, enter] } }),

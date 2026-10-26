@@ -72,6 +72,42 @@ fn flatten(value: &str) -> String {
         .replace(" )", ")")
 }
 
+/// A selector with each `:where(...)` replaced by what it holds, so
+/// `:where(:host([emphasis="solid"])) [part="button"]`, as Helix's compiler
+/// writes a rule whose conditions add no weight, reads as the selector a
+/// hand-written sheet has.
+fn unwrapped(selector: &str) -> String {
+    let mut out = String::with_capacity(selector.len());
+    let mut rest = selector;
+    let mut closes: Vec<usize> = Vec::new();
+    let mut depth = 0usize;
+    while let Some(character) = rest.chars().next() {
+        if rest.starts_with(":where(") {
+            depth += 1;
+            closes.push(depth);
+            rest = &rest[":where(".len()..];
+            continue;
+        }
+        match character {
+            '(' => {
+                depth += 1;
+                out.push(character);
+            }
+            ')' => {
+                if closes.last() == Some(&depth) {
+                    closes.pop();
+                } else {
+                    out.push(character);
+                }
+                depth = depth.saturating_sub(1);
+            }
+            _ => out.push(character),
+        }
+        rest = &rest[character.len_utf8()..];
+    }
+    out
+}
+
 /// Every rule in a sheet as `selector` to its declarations, each `property:
 /// value` flattened, in source order.
 fn rules(css: &str) -> Vec<(String, Vec<String>)> {
@@ -111,9 +147,9 @@ fn matrix(css: &str, side: usize) -> BTreeMap<(String, String), Vec<String>> {
     for (selector, declarations) in rules(css) {
         /* Each selector of a list on its own, so `a, b { }` reaches both. */
         for one in selector.split(',') {
-            let one = one.trim();
+            let one = unwrapped(one.trim());
             for (cell, pattern) in &patterns {
-                if let Some(captured) = pattern.captures(one) {
+                if let Some(captured) = pattern.captures(&one) {
                     found
                         .entry(((*cell).to_owned(), captured[1].to_owned()))
                         .or_default()
@@ -241,7 +277,21 @@ pub fn run(context: &Context) -> Report {
 
 #[cfg(test)]
 mod tests {
-    use super::flatten;
+    use super::{flatten, unwrapped};
+
+    #[test]
+    fn a_selector_with_no_weight_reads_as_one_written_by_hand() {
+        assert_eq!(
+            unwrapped(
+                r#":where(:host(:not(:disabled)[emphasis="solid"])) [part="button"]:where(:is(:hover, :active))"#
+            ),
+            r#":host(:not(:disabled)[emphasis="solid"]) [part="button"]:is(:hover, :active)"#
+        );
+        assert_eq!(
+            unwrapped(r#":host(:where([tone="primary"]))"#),
+            r#":host([tone="primary"])"#
+        );
+    }
 
     #[test]
     fn a_wrapped_value_reads_as_the_compiler_writes_it() {

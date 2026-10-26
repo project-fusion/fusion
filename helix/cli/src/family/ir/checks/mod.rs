@@ -5,18 +5,20 @@
 //! by specificity and then by where they are written, and a native view does
 //! the same. Writing a table as groups puts a group's rules in its order and
 //! the groups in theirs, which reads as if the order between groups did not
-//! matter. It does wherever two rules in different groups can match one
-//! node, under conditions that can hold at once, set one property, or a
-//! shorthand and its longhand, and tie on specificity: then the later one
-//! wins only because of where its group stands. [`check`] refuses each such
-//! pair with both lines, and the fix is one group, or one rule more specific.
-//! Skeleton's `skeleton` and `line` are one node, `part="skeleton line"`, so
-//! their rules compete; so are a checkbox's `mark` and `mark-dash` while the
-//! box is mixed.
+//! matter. It does wherever two rules in different groups on different
+//! targets can match one node, under conditions that can hold at once, set
+//! one property to different values, or a shorthand and its longhand, and
+//! tie on specificity: then the later one wins only because of where its
+//! group stands. [`check`] refuses each such pair with both lines, and the
+//! fix is one group. A checkbox's `mark` and `mark-dash` are one node while
+//! the box is mixed, so their rules compete.
 //!
 //! **Two groups on one target are one group written twice**, as a table
-//! converted a run at a time has them, and their rules keep the order they
-//! are written in; only groups on different targets are held apart.
+//! converted a run at a time has them, and as a group on several targets and
+//! a group on one of them are. Every rule on one target ranks the same,
+//! whatever its conditions, so their rules keep the order they are written
+//! in; only groups on different targets are held apart. A part alone, as
+//! `exact` names it, is that part.
 //!
 //! **A written-out selector is located where it can be**: its last compound's
 //! `[part]`, `slot` or `::slotted()`, at the specificity a browser gives it.
@@ -33,7 +35,7 @@
 use std::collections::BTreeSet;
 
 use crate::family::api::{Attribute, Node as TreeNode, NodeKind};
-use crate::family::ir::{Condition, Family, Item, Rule};
+use crate::family::ir::{Condition, Family, Item, Rule, Value};
 use shorthands::{overlap, resets};
 
 mod selector;
@@ -92,7 +94,11 @@ pub fn check(family: &Family) -> Result<Vec<String>, String> {
             let (Some(one), Some(other)) = (&first.group, &second.group) else {
                 continue;
             };
-            if one == other || on(one) == on(other) || !compatible(first, second) {
+            if one == other
+                || on(one) == on(other)
+                || same_target(first, second)
+                || !compatible(first, second)
+            {
                 continue;
             }
             let Some(property) = shared(first, second) else {
@@ -105,7 +111,7 @@ pub fn check(family: &Family) -> Result<Vec<String>, String> {
                         && meets(&a, &b, first, second, &drawn)
                     {
                         refused.insert(format!(
-                            "{at} and {later} are in different groups and can both set `{property}` on one node at one specificity, so the drawing follows where the groups stand: put them in one group, or make one more specific"
+                            "{at} and {later} are in different groups and can both set `{property}` on one node at one specificity, so the drawing follows where the groups stand: put them in one group"
                         ));
                     }
                 }
@@ -130,6 +136,21 @@ pub fn check(family: &Family) -> Result<Vec<String>, String> {
 /// their rules are compared as the cascade compares them and never refused.
 fn on(group: &str) -> &str {
     group.split_once(" on ").map_or(group, |(_, target)| target)
+}
+
+/// Whether two rules are on one target, the same part, region, or children,
+/// as a group on several targets and a group on one of them are: every rule
+/// on a target ranks the same, so the later one wins, wherever its group
+/// stands. A part alone is that part where it has no other name, and ranks
+/// as the part does. A written-out selector ranks as the browser ranks it,
+/// so it is judged on its own.
+fn same_target(first: &Rule, second: &Rule) -> bool {
+    first.selector.is_none()
+        && second.selector.is_none()
+        && first.target == second.target
+        && first.region == second.region
+        && first.slotted == second.slotted
+        && first.inner == second.inner
 }
 
 fn at(rule: &Rule) -> String {
@@ -261,16 +282,29 @@ fn child_of(parent: &Node, child: &Node, drawn: &[Drawn]) -> bool {
 
 /// What a rule sets: its declarations, and its private values as the
 /// custom properties they are.
-fn properties(rule: &Rule) -> impl Iterator<Item = String> + '_ {
+fn properties(rule: &Rule) -> impl Iterator<Item = (String, &Value)> + '_ {
     rule.set
         .iter()
-        .map(|(property, _)| property.clone())
-        .chain(rule.values.iter().map(|(name, _)| format!("--_{name}")))
+        .map(|(property, value)| (property.clone(), value))
+        .chain(
+            rule.values
+                .iter()
+                .map(|(name, value)| (format!("--_{name}"), value)),
+        )
 }
 
-/// A property both rules set, or one sets a shorthand of.
+/// A property both rules set to different values, or one sets a shorthand
+/// of. Two rules that set one property to one value draw the same whichever
+/// of them wins.
 fn shared(first: &Rule, second: &Rule) -> Option<String> {
-    properties(first).find(|one| properties(second).any(|other| overlap(one, &other)))
+    properties(first)
+        .find(|(one, value)| {
+            properties(second).any(|(other, given)| {
+                overlap(one, &other)
+                    && (*one != other || format!("{value:?}") != format!("{given:?}"))
+            })
+        })
+        .map(|(property, _)| property)
 }
 
 /// Whether two rules' conditions can hold at once, as far as each pair of
@@ -357,13 +391,13 @@ fn shadowed(rules: &[&Rule]) -> Vec<String> {
             continue;
         };
         let mut by = BTreeSet::new();
-        let every = properties(rule).all(|property| {
+        let every = properties(rule).all(|(property, _)| {
             let winner = rules.iter().find(|other| {
                 !std::ptr::eq(**other, *rule)
                     && place(other).as_ref() == Some(&own)
                     && wins(other, rule)
                     && covers(other, rule)
-                    && properties(other).any(|set| set == property || resets(&set, &property))
+                    && properties(other).any(|(set, _)| set == property || resets(&set, &property))
             });
             winner.map(|winner| by.insert(at(winner))).is_some()
         });

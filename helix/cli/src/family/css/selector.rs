@@ -180,7 +180,25 @@ fn on_target(rule: &Rule, test: impl Fn(&Condition) -> bool) -> String {
     on
 }
 
+/// What a rule's conditions write, inside `:where()`, so they add nothing to
+/// the selector's specificity.
+fn unranked(conditions: &str) -> String {
+    if conditions.is_empty() {
+        String::new()
+    } else {
+        format!(":where({conditions})")
+    }
+}
+
 /// The selector a rule is written under.
+///
+/// **Every rule on one target ranks the same**, whatever it asks: what holds
+/// of the host, of a part around the target, of the target itself, and of
+/// the children passed in is written inside `:where()`, so a selector's
+/// specificity is its target's alone, and the later of two rules on one
+/// target wins, as the later of two rules of equal specificity does in CSS.
+/// A group that writes `[{ selected: true }, { hover: true, selected: true }]`
+/// to outrank an earlier hover writes `{ selected: true }` after it.
 pub fn selector(rule: &Rule, tokens: &BTreeSet<String>) -> String {
     if let Some(selector) = &rule.selector {
         return selector.clone();
@@ -196,6 +214,22 @@ pub fn selector(rule: &Rule, tokens: &BTreeSet<String>) -> String {
     let mut host = on_host(rule);
     if host_rule && slotted.is_none() {
         host.push_str(&on_target(rule, |_| true));
+    }
+    /* On the host itself, its conditions go inside `:host()`, which ranks
+    as one pseudo-class whatever its argument ranks. */
+    if host_rule && slotted.is_none() {
+        return format!(
+            ":host{}{}",
+            if host.is_empty() {
+                String::new()
+            } else {
+                format!("({})", unranked(&host))
+            },
+            rule.inner.as_deref().map_or_else(String::new, |inner| {
+                let gap = if inner.starts_with(':') { "" } else { " " };
+                format!("{gap}{inner}")
+            })
+        );
     }
     let mut written = if host.is_empty() {
         String::new()
@@ -234,26 +268,18 @@ pub fn selector(rule: &Rule, tokens: &BTreeSet<String>) -> String {
         None => part(&rule.target),
     };
     if rule.region.is_none() && !host_rule {
-        target.push_str(&on_target(rule, |condition| {
+        target.push_str(&unranked(&on_target(rule, |condition| {
             slotted.is_none() || !in_slot(condition)
-        }));
+        })));
     }
     if let Some(tag) = slotted {
         let own = on_target(rule, in_slot);
-        /* `:first-child` stands alone, and `:not(:first-child)` on `*`, as the
-        sheets written by hand put them. */
-        let tag = if tag == "*" && own == ":first-child" {
-            ""
-        } else {
-            tag
-        };
-        let _ = write!(target, "::slotted({tag}{own})");
+        let _ = write!(target, "::slotted({tag}{})", unranked(&own));
     }
-    if host_rule && slotted.is_none() {
-        if written.is_empty() {
-            written.push_str(":host");
-        }
-    } else if !target.is_empty() {
+    /* What holds of the host and of the parts around the target ranks
+    nothing either. */
+    let mut written = unranked(&written);
+    if !target.is_empty() {
         if !written.is_empty() {
             written.push(' ');
         }

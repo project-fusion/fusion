@@ -242,7 +242,7 @@ mod tests {
         .tree;
         assert_eq!(
             shipped(&emit(&row)),
-            "[part~=\"row-current\"] {color: red}[part=\"start\"]::slotted(*) {margin: 0}[part=\"rail\"]::before {content: var(--list-item-rail-content, \"\")}:host([disabled]) {opacity: 0.5}"
+            "[part~=\"row-current\"] {color: red}[part=\"start\"]::slotted(*) {margin: 0}[part=\"rail\"]::before {content: var(--list-item-rail-content, \"\")}:host(:where([disabled])) {opacity: 0.5}"
         );
     }
 
@@ -253,7 +253,7 @@ mod tests {
         );
         assert_eq!(
             shipped(&written),
-            ":host(:not(:disabled)) [part=\"button\"]:is(:hover, :active) {color: red}"
+            ":where(:host(:not(:disabled))) [part=\"button\"]:where(:is(:hover, :active)) {color: red}"
         );
     }
 
@@ -264,7 +264,7 @@ mod tests {
         );
         assert_eq!(
             shipped(&written),
-            ":host(:not(:disabled)[emphasis=\"solid\"]) [part=\"button\"]:hover {color: var(--button-foreground-color, var(--_button-tone))}"
+            ":where(:host(:not(:disabled)[emphasis=\"solid\"])) [part=\"button\"]:where(:hover) {color: var(--button-foreground-color, var(--_button-tone))}"
         );
     }
 
@@ -286,7 +286,7 @@ mod tests {
         );
         assert_eq!(
             shipped(&written),
-            "@container (inline-size < 22rem) {:host([direction=\"row\"]) [part=\"list\"] {gap: 0}}"
+            "@container (inline-size < 22rem) {:where(:host([direction=\"row\"])) [part=\"list\"] {gap: 0}}"
         );
     }
 
@@ -320,7 +320,7 @@ mod tests {
         .tree;
         assert_eq!(
             shipped(&emit(&skeleton)),
-            "[part~=\"skeleton\"] {display: block}:host(:state(wrapping)) [part=\"skeleton\"] {inset: 0}[part~=\"line\"]:last-child:not(:first-child) {inline-size: 60%}"
+            "[part~=\"skeleton\"] {display: block}:where(:host(:state(wrapping))) [part=\"skeleton\"] {inset: 0}[part~=\"line\"]:where(:last-child:not(:first-child)) {inline-size: 60%}"
         );
         let refused = family(
             &default_export(

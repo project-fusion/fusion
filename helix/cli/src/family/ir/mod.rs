@@ -7,11 +7,12 @@
 //!
 //! **Each rule carries the specificity of the selector the web output writes
 //! for it.** A browser orders matching rules by specificity and then by source
-//! order, and a native runtime that applied them in source order alone would
-//! disagree with the browser wherever the two orders differ. Button's generic
-//! hover is four class-equivalents and an emphasis rule is three, which is why
-//! every emphasis declares its own hover; the native side gets that right only
-//! by sorting the way the browser does.
+//! order, and the native runtime sorts them the same way. The web output
+//! writes every condition inside `:where()`, so a rule's specificity is its
+//! target's alone: every rule on one part ranks the same, and the later one
+//! wins, whatever it asks. Button's generic hover and an emphasis rule both
+//! rank as the button part does, so the emphasis written after the hover
+//! wins, which is why every emphasis declares its own hover after it.
 //!
 //! **Versioned as `major.minor`.** A reader refuses a major it does not know.
 //! A minor adds only what an older reader may ignore, such as an optional
@@ -19,8 +20,8 @@
 //! draw, is a major.
 //!
 //! **A rule with several `when`s is several rules.** A selector list means
-//! each of its selectors, with each one's own specificity, so the reader writes
-//! one rule per alternative and the web output writes them one after another.
+//! each of its selectors, so the reader writes one rule per alternative and
+//! the web output writes them one after another.
 
 use std::fmt;
 

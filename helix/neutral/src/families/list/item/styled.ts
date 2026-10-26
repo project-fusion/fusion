@@ -49,6 +49,12 @@ export default styles(
         gridTemplateColumns: 'auto auto 1fr auto auto',
         padding: hook.padding,
       }),
+      /* The row a reader is on, by the part it is as well, `row-current`, which
+         a property sets with no attribute. A chosen row keeps its own ground. */
+      rule(
+        { also: { 'row-current': true } },
+        { backgroundColor: hook.currentBackgroundColor, borderRadius: token('radii-sm') },
+      ),
       /* In a list with `selection-mode`, the row is the cell that takes focus, so
          the ring goes inside it, where the next row cannot cover it. */
       rule(
@@ -183,28 +189,19 @@ export default styles(
         textDecoration: 'none',
       }),
     ]),
-    /* The row a reader is on. */
-    on('row-current', [
-      rule({
-        backgroundColor: hook.currentBackgroundColor,
-        borderRadius: token('radii-sm'),
-      }),
-    ]),
     /* The grip, in a `reorderable` list: after `end`, quiet until held. */
     on('grip', [
       rule({
-        all: web('unset'),
+        web: { all: 'unset', cursor: 'grab', touchAction: 'none' },
         alignItems: 'center',
         borderRadius: token('radii-sm'),
         boxSizing: 'border-box',
         color: hook.gripColor,
-        cursor: web('grab'),
         display: 'inline-flex',
         gridColumn: 5,
         gridRow: '1 / span 2',
         marginInlineStart: token('space-sm'),
         /* So a drag on a phone moves the row and does not scroll the page. */
-        touchAction: web('none'),
       }),
       rule({ active: true }, { web: { cursor: 'grabbing' } }),
       rule(

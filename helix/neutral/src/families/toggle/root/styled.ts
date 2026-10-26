@@ -89,8 +89,11 @@ export default styles(
           ),
           whiteSpace: 'nowrap',
         }),
+        /* Pressed: the words at full strength, over the indicator's fill where
+         the group around draws one on each pressed toggle. */
+        rule({ selected: true }, { color: hook.itemColorSelected }),
         /* A disabled toggle that lit up under a finger would say it can be
-         pressed. */
+         pressed. Pressed or not, the words under a finger are the page's. */
         rule(
           { formDisabled: false, interaction: ['hover', 'active'] },
           {
@@ -100,9 +103,6 @@ export default styles(
             color: token('color-foreground'),
           },
         ),
-        /* Pressed: the words at full strength, over the indicator's fill where
-         the group around draws one on each pressed toggle. */
-        rule({ selected: true }, { color: hook.itemColorSelected }),
         rule({ formDisabled: true }, { opacity: 0.5 }),
       ]),
     ]),

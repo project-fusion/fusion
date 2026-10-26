@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, registerDom, unweighted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -60,7 +60,7 @@ describe('card actions and gap', () => {
     const card = customElements.get('helix-card') as unknown as {
       elementStyles: Array<{ cssText: string }>
     }
-    return card.elementStyles.map((style) => style.cssText).join('\n')
+    return unweighted(card.elementStyles.map((style) => style.cssText).join('\n'))
   }
 
   test('a line with actions lays its two ends out side by side', () => {

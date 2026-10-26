@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { mount, part, registerDom, unweighted } from '@fusion.dev/helix-testing/dom'
 
 /* The styled tier, which is paint over the headless relief. The drawing, the
  * heights, and the keys are the headless tier's and are asserted there. */
@@ -34,10 +34,12 @@ const relief = async (attributes = '') => {
 /** Every sheet a tag adopts, as one text. */
 const sheet = (tag: string): string => {
   const declared = (customElements.get(tag) as unknown as { styles: unknown }).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 /** The `--heatmap-tone-*` declarations in a sheet, with the spacing taken out. */

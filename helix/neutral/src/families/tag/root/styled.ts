@@ -130,7 +130,6 @@ export default styles(
       rule({ print: true }, { web: { printColorAdjust: 'economy' } }),
     ]),
     on('dismiss', [
-      rule({ shape: 'pill' }, { borderRadius: token('radii-full') }),
       /* Inside the tag's inline padding, and not pulled past it. The font is
          the tag's, so the mark's em is the tag's em and not the button's. */
       rule({
@@ -139,11 +138,12 @@ export default styles(
         border: 'none',
         borderRadius: token('radii-sm'),
         color: inherit(),
-        cursor: web('pointer'),
+        web: { cursor: 'pointer' },
         display: 'inline-flex',
         marginInlineEnd: product(token('space-2xs'), '-1'),
         padding: token('space-2xs'),
       }),
+      rule({ shape: 'pill' }, { borderRadius: token('radii-full') }),
       rule({ hover: true }, { backgroundColor: mix(own.tagColor, 20, 'transparent') }),
       rule(
         { focusVisible: true },

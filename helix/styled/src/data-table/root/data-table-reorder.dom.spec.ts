@@ -6,6 +6,7 @@ import {
   registerDom,
   settle,
   type Updatable,
+  unweighted,
 } from '@fusion.dev/helix-testing/dom'
 
 /* How rows moved by a grip are drawn, with `reorderable-rows`. Which order is
@@ -26,10 +27,12 @@ type Table = HTMLElement & Updatable & { rows: readonly Record<string, unknown>[
    is held that a rule exists, and the browser cases that it applies. */
 const sheet = (): string => {
   const declared = (customElements.get('helix-data-table') as unknown as { styles: unknown }).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 const rule = (selector: string): string => sheet().split(`${selector} {`)[1]?.split('}')[0] ?? ''

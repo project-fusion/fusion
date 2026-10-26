@@ -61,7 +61,7 @@ export default styles(
       on('region', [
         rule({
           own: { toastGap: hook.gap },
-          background: web('none'),
+          web: { background: 'none' },
           blockSize: web('auto'),
           border: web('none'),
           color: web(inherit()),

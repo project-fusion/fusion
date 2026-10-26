@@ -8,6 +8,7 @@ import {
   part,
   registerDom,
   type Updatable,
+  unweighted,
 } from '@fusion.dev/helix-testing/dom'
 import reordering from '../.examples/reordering.html' with { type: 'text' }
 
@@ -22,10 +23,12 @@ beforeAll(async () => {
    and are tested there. */
 const sheet = (tag: 'helix-list' | 'helix-list-item'): string => {
   const declared = (customElements.get(tag) as unknown as { styles: unknown }).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 /** The declarations of the first rule written for `selector`, in either sheet. */
@@ -137,17 +140,19 @@ describe('list', () => {
      on the first row moves it, measured in Chromium, where the markers read
      5, 6 for `start="5"` and 3, 2, 1 for a reversed list of three. */
   test('an ordered list counts from what its slot says, and the rail does too', () => {
-    expect(rule('helix-list', ':host([kind="ordered"]) ::slotted(:first-child)')).toContain(
+    expect(rule('helix-list', ':host([kind="ordered"]) ::slotted(*:first-child)')).toContain(
       'counter-set: list-item var(--list-first)',
     )
     expect(sheet('helix-list')).toContain('counter-increment: list-item var(--list-step, 1)')
-    expect(rule('helix-list', ':host([marker="rail"]) ::slotted(:first-child)')).toContain(
+    expect(rule('helix-list', ':host([marker="rail"]) ::slotted(*:first-child)')).toContain(
       'counter-set: list-rail var(--list-first)',
     )
   })
 
   test('a current row and a selected row are drawn from their part and their state', () => {
-    expect(rule('helix-list-item', '[part~="row-current"]')).toContain('background-color')
+    expect(rule('helix-list-item', '[part~="row"][part~="row-current"]')).toContain(
+      'background-color',
+    )
     expect(rule('helix-list-item', ':host(:state(selected)) [part~="row"]')).toContain(
       'background-color',
     )

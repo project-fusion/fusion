@@ -1,4 +1,4 @@
-import { fit, product, sum, token, web } from '../../../style.js'
+import { fit, product, sum, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import item from './headless.js'
 
@@ -50,11 +50,10 @@ export default styles(
       on('host', [rule({ display: 'block' })]),
       on('trigger', [
         rule({
-          all: web('unset'),
+          web: { all: 'unset', cursor: 'pointer' },
           boxSizing: 'border-box',
           alignItems: 'center',
           color: hook.color,
-          cursor: web('pointer'),
           display: 'flex',
           fontSize: hook.fontSize,
           fontWeight: hook.fontWeight,

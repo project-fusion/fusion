@@ -101,11 +101,14 @@ export default styles(
         { hover: true, disabled: false },
         { backgroundColor: hook.hoverBackgroundColor, color: hook.hoverColor },
       ),
-      rule([{ selected: true }, { hover: true, selected: true }], {
-        backgroundColor: hook.selectedBackgroundColor,
-        boxShadow: own.tabSelectedShadow,
-        color: hook.selectedColor,
-      }),
+      rule(
+        { selected: true },
+        {
+          backgroundColor: hook.selectedBackgroundColor,
+          boxShadow: own.tabSelectedShadow,
+          color: hook.selectedColor,
+        },
+      ),
       rule({ disabled: true }, { web: { cursor: 'not-allowed' }, opacity: hook.disabledOpacity }),
       /* Inset, because the tab sits against the list's own rule and an outset ring
          would be clipped by the scroll container. */

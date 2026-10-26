@@ -8,6 +8,7 @@ import {
   readyToMove,
   registerDom,
   settled,
+  unweighted,
 } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
@@ -19,10 +20,12 @@ beforeAll(async () => {
    so what can be held here is that a rule exists rather than that it applied. */
 const sheet = (): string => {
   const declared = (customElements.get('helix-line-chart') as unknown as { styles: unknown }).styles
-  return (Array.isArray(declared) ? declared : [declared])
-    .flat(Number.POSITIVE_INFINITY)
-    .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-    .join('\n')
+  return unweighted(
+    (Array.isArray(declared) ? declared : [declared])
+      .flat(Number.POSITIVE_INFINITY)
+      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+      .join('\n'),
+  )
 }
 
 /** The declarations of every rule written for `selector` outside a starting style. */
