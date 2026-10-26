@@ -8,13 +8,19 @@ rust-version.workspace = true
 version = "0.0.0-dev"
 
 [features]
-default = ["sqlite"]
+default = ["consolidate", "sqlite"]
+# The consolidation pass, which asks a model for facts through typed extraction
+# and records each step in Trace.
+consolidate = ["dep:fusion-cortex-extract", "dep:fusion-cortex-trace", "dep:schemars"]
 # The SQLite store, and the database it bundles.
 sqlite = ["dep:sqlx", "dep:tokio", "sqlx/sqlite-bundled"]
 
 [dependencies]
 async-trait.workspace = true
 chrono.workspace = true
+fusion-cortex-extract = { workspace = true, optional = true }
+fusion-cortex-trace = { workspace = true, optional = true }
+schemars = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true
 sqlx = { workspace = true, optional = true }
@@ -25,6 +31,8 @@ uuid.workspace = true
 fusion-cortex-core.workspace = true
 
 [dev-dependencies]
+# The opt-in live consolidation test, against a local Ollama.
+fusion-cortex-provider = { workspace = true, features = ["http", "ollama"] }
 tokio.workspace = true
 
 [lints]

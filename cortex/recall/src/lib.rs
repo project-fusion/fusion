@@ -20,6 +20,9 @@
 //! **Retrieval is a strategy.** A [`Scorer`] ranks Engram's facts against a
 //! query, and the one here counts shared words. Scoring by vector is a second
 //! scorer, and the fact already carries the field it would read.
+//!
+//! **A caller names the scopes it may read.** [`relevant`] places no fact
+//! whose scope is outside them, however well it scores.
 
 use std::{collections::HashMap, fmt::Write as _};
 
@@ -27,7 +30,7 @@ use fusion_cortex_core::{
     provider::{Block, Message, Role},
     Id,
 };
-use fusion_cortex_engram::Fact;
+use fusion_cortex_engram::{Fact, Scope};
 pub use fusion_cortex_trace::{Dropped, Part, Piece, Placed};
 
 /// The name a context node records for this assembly.
@@ -704,7 +707,9 @@ impl Scorer for Overlap {
     }
 }
 
-/// The facts worth placing for `query`, most worth first, and at most `most`.
+/// The facts worth placing for `query`, most worth first, and at most `most`,
+/// from the current facts in `scopes`, the scopes the caller may read. A fact
+/// in any other scope is never placed.
 ///
 /// Each is ranked by its confidence after decay, weighed by its score: a fact
 /// that shares no word with the query still ranks, at half its confidence,
@@ -712,21 +717,25 @@ impl Scorer for Overlap {
 /// not the task. A fact whose decayed confidence is below a tenth is left out.
 ///
 /// ```
-/// use fusion_cortex_engram::Fact;
+/// use fusion_cortex_engram::{Fact, Scope};
 /// use fusion_cortex_recall::{relevant, Overlap};
 ///
+/// let core = Scope::Team("core".into());
 /// let facts = vec![
 ///     Fact::new("the clock helper fixes the flaky checkout test", vec![], 0.8),
 ///     Fact::new("the docs build with bun", vec![], 0.8),
+///     Fact::new("the core team fixes flaky tests on Fridays", vec![], 0.9).within(core),
 /// ];
 ///
-/// let placed = relevant(&facts, "fix the flaky checkout test", &Overlap, 1, |_| 0.0, 30.0);
+/// let placed = relevant(&facts, &[Scope::Personal], "fix the flaky checkout test", &Overlap, 2, |_| 0.0, 30.0);
 ///
 /// assert_eq!(placed[0].0.content, "the clock helper fixes the flaky checkout test");
+/// assert!(placed.iter().all(|(fact, _)| fact.scope == Scope::Personal));
 /// ```
 #[must_use]
 pub fn relevant<'a>(
     facts: &'a [Fact],
+    scopes: &[Scope],
     query: &str,
     scorer: &dyn Scorer,
     most: usize,
@@ -735,7 +744,7 @@ pub fn relevant<'a>(
 ) -> Vec<(&'a Fact, f32)> {
     let mut ranked: Vec<(&Fact, f32)> = facts
         .iter()
-        .filter(|fact| fact.is_current())
+        .filter(|fact| fact.is_current() && scopes.contains(&fact.scope))
         .filter_map(|fact| {
             let confidence = fact.decayed_confidence(age_days(fact), half_life_days);
             (confidence >= 0.1)
@@ -1106,5 +1115,75 @@ mod tests {
         assert!(
             Overlap.score("fix the checkout test", &fact) > Overlap.score("update the docs", &fact)
         );
+    }
+
+    #[test]
+    fn a_fact_outside_the_callers_scopes_is_never_placed() {
+        let core = Scope::Team("core".into());
+        let checkout = Scope::Project("checkout".into());
+        let facts = vec![
+            Fact::new("the release checklist lives in the wiki", vec![], 0.9).within(core.clone()),
+            Fact::new("the release checklist needs a signoff", vec![], 0.9)
+                .within(Scope::Organization),
+            Fact::new("the release checklist runs in checkout", vec![], 0.9)
+                .within(checkout.clone()),
+            Fact::new("I keep the release checklist open", vec![], 0.2),
+        ];
+        let placed = |scopes: &[Scope]| -> Vec<Scope> {
+            relevant(
+                &facts,
+                scopes,
+                "the release checklist",
+                &Overlap,
+                10,
+                |_| 0.0,
+                30.0,
+            )
+            .into_iter()
+            .map(|(fact, _)| fact.scope.clone())
+            .collect()
+        };
+
+        assert_eq!(
+            placed(&[Scope::Personal]),
+            [Scope::Personal],
+            "a team fact never reaches a personal-only caller, however well it scores"
+        );
+        let mut scopes = placed(&[Scope::Personal, core.clone()]);
+        scopes.sort_by_key(ToString::to_string);
+        assert_eq!(scopes, [Scope::Personal, core.clone()]);
+        assert_eq!(
+            placed(&[Scope::Organization]),
+            [Scope::Organization],
+            "the organization's scope holds no team's facts"
+        );
+        assert_eq!(placed(&[Scope::Team("web".into())]), Vec::<Scope>::new());
+        assert!(placed(&[]).is_empty());
+    }
+
+    #[test]
+    fn a_deleted_fact_is_never_placed() {
+        use fusion_cortex_engram::{Episode, Memory};
+
+        let mut memory = Memory::new();
+        let seen = memory.record(Episode::new("tests run with jest", Id::new()));
+        let wrong = memory.assert_fact(Fact::new("tests run with jest", vec![seen], 0.9), None);
+        let placed = |memory: &Memory| -> usize {
+            relevant(
+                memory.facts(),
+                &[Scope::Personal],
+                "how do tests run",
+                &Overlap,
+                10,
+                |_| 0.0,
+                30.0,
+            )
+            .len()
+        };
+        assert_eq!(placed(&memory), 1);
+
+        memory.delete_fact(wrong);
+
+        assert_eq!(placed(&memory), 0);
     }
 }
