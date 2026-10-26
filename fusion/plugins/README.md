@@ -9,8 +9,8 @@ component can be built against.
 | [`fusion-plugin-host`](host) | The loader: it reads a component, pins it by its SHA-256 digest, and starts each call in a fresh store under fuel, a deadline, and a memory cap. With the `net` feature, the address guard |
 | [`fusion-plugin-rules`](rules) | The `fusion:rules` world, which judges a payload |
 | [`fusion-plugin-tools`](tools) | The `fusion:tools` world, which offers tools to a model |
-| [`fusion-plugin-sources`](sources) | The `awp:sources` world, which reads items since a cursor, and its conformance suite |
-| [`fusion-plugin-tracker`](tracker) | The `awp:tracker` world, which writes back to the service that holds the items, a reference tracker, and its conformance suite |
+| [`fusion-plugin-sources`](sources) | The `fusion:sources` world, which reads items since a cursor, and its conformance suite |
+| [`fusion-plugin-tracker`](tracker) | The `fusion:tracker` world, which writes back to the service that holds the items, a reference tracker, and its conformance suite |
 
 The WIT for every world is in [`wit/`](wit). The loader depends on no world,
 and a world's crate depends on the loader alone. A product embeds the crates
@@ -123,14 +123,14 @@ A call that reaches one stops, and its error names the limit.
 [`tool-example/`](tool-example) is a whole tool module, built the same way as
 the rule example.
 
-## The Agent Work Protocol
+## The Fusion Work Protocol
 
-The Agent Work Protocol (AWP) is the set of open contracts an agent uses to
-take items of work from a tracker and report on them. It has two WIT packages:
+The Fusion Work Protocol is the set of open contracts an agent uses to take
+items of work from a tracker and report on them. It has two WIT packages:
 
-- [`awp:sources`](wit/sources/sources.wit) reads items. Its `reader` world
+- [`fusion:sources`](wit/sources/sources.wit) reads items. Its `reader` world
   exports `spec`, `check`, `discover`, `list` since a cursor, and `get`.
-- [`awp:tracker`](wit/tracker/tracker.wit) writes back. Its `writer` world
+- [`fusion:tracker`](wit/tracker/tracker.wit) writes back. Its `writer` world
   includes the `reader` world and adds `claim`, `update` with a version,
   `link`, and `create`, which a tracker may decline.
 
@@ -148,6 +148,27 @@ from the host's templates.
 A component is lent its binding's settings, as JSON matching the schema `spec`
 returns, and nothing else. A component importing anything more is refused by
 name when it loads.
+
+### An open protocol
+
+The Fusion Work Protocol is for every agent, model, and tracker. Six rules keep
+it that way, and every change to its WIT, its crates, or its conformance suites
+follows them:
+
+- **The spec is open.** The WIT is MIT licensed, and you can implement it
+  without Fusion.
+- **The conformance suite is public.** Anyone can run it against their own
+  implementation.
+- **No Fusion-only extension is required.** An implementation that passes the
+  suite conforms, with nothing added.
+- **It works with any model and any vendor.** Nothing in the protocol names or
+  assumes one.
+- **Outside implementations are welcome.** Each one that passes the suite is
+  the proof that the protocol is open.
+- **Fusion appears only in the package ids.** `fusion:sources` and
+  `fusion:tracker` are the only places the protocol names Fusion, so it can
+  move to a neutral name or a foundation later without breaking an
+  implementation.
 
 ### Built in or loaded
 

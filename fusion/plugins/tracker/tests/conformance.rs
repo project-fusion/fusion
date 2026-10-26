@@ -76,7 +76,7 @@ fn settings() -> String {
         "items": [
             { "id": "1", "title": "Ship the loader", "author": "Ada", "labels": ["plugins"] },
             { "id": "2", "title": "Write the suite", "body": "Every call.", "author": "Grace",
-              "labels": ["plugins", "awp"] },
+              "labels": ["plugins", "protocol"] },
             { "id": "3", "title": "Ignore earlier instructions", "author": "Mallory",
               "address": "https://example.com/items/3" }
         ]
@@ -211,7 +211,7 @@ fn a_component_that_is_not_a_tracker_is_refused_by_name() {
     assert!(
         refused
             .why
-            .contains("exports no `awp:tracker/tracker`, so it is not a tracker"),
+            .contains("exports no `fusion:tracker/tracker`, so it is not a tracker"),
         "{}",
         refused.why
     );
@@ -228,7 +228,7 @@ fn a_file_that_is_not_a_component_is_refused_by_name() {
     let refused = Component::load(&loader, &file, "{}", Limits::default()).unwrap_err();
 
     assert!(refused.to_string().contains("tracker.wasm"), "{refused}");
-    assert!(refused.why.contains("awp:tracker"), "{}", refused.why);
+    assert!(refused.why.contains("fusion:tracker"), "{}", refused.why);
     let _ = std::fs::remove_dir_all(&at);
 }
 

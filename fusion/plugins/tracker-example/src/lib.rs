@@ -1,4 +1,4 @@
-//! A tracker from outside, which is what the `awp:tracker` world exists to
+//! A tracker from outside, which is what the `fusion:tracker` world exists to
 //! run.
 //!
 //! **Its items are its binding's settings.** A tracker is lent its binding's
@@ -10,16 +10,16 @@
 
 wit_bindgen::generate!({
     path: ["../wit/sources", "../wit/tracker"],
-    world: "awp:tracker/writer",
+    world: "fusion:tracker/writer",
     // The sources world's records come from its own package, generated here
     // beside the tracker's.
     generate_all,
 });
 
-use awp::sources::binding;
-use awp::sources::types::{Access, Author, Entry, Error, Item, Page, Untrusted};
-use exports::awp::sources::source::Guest as Source;
-use exports::awp::tracker::tracker::{Change, Draft, Guest as Tracker};
+use fusion::sources::binding;
+use fusion::sources::types::{Access, Author, Entry, Error, Item, Page, Untrusted};
+use exports::fusion::sources::source::Guest as Source;
+use exports::fusion::tracker::tracker::{Change, Draft, Guest as Tracker};
 use serde::Deserialize;
 
 /// The most items one page of a listing holds, small so a host meets paging.

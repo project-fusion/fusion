@@ -6,7 +6,7 @@
 //! world it is built against, and each world is a crate of its own:
 //! `fusion-plugin-rules` judges a payload, `fusion-plugin-tools` offers tools
 //! to a model, and `fusion-plugin-sources` and `fusion-plugin-tracker` speak
-//! the Agent Work Protocol. A world added later takes this crate and changes
+//! the Fusion Work Protocol. A world added later takes this crate and changes
 //! nothing in it.
 //!
 //! **WASM rather than a linked crate or a binary on the path.** A plugin system

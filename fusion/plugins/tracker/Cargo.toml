@@ -1,6 +1,6 @@
 [package]
 name = "fusion-plugin-tracker"
-description = "The awp:tracker world of the Agent Work Protocol: a source that writes back, a reference tracker, and the suite every tracker passes."
+description = "The fusion:tracker world of the Fusion Work Protocol: a source that writes back, a reference tracker, and the suite every tracker passes."
 edition.workspace = true
 license.workspace = true
 publish.workspace = true

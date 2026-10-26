@@ -1,4 +1,4 @@
-package awp:tracker@1.0.0;
+package fusion:tracker@1.0.0;
 
 /// Writing back to the service that holds the items.
 ///
@@ -7,7 +7,7 @@ package awp:tracker@1.0.0;
 /// and every word it writes comes from the host's templates, never from a
 /// model.
 interface tracker {
-  use awp:sources/types@1.0.0.{error, item, status};
+  use fusion:sources/types@1.0.0.{error, item, status};
 
   /// What `update` writes.
   record change {
@@ -45,6 +45,6 @@ interface tracker {
 /// A component that reads items and writes back to the service that holds
 /// them.
 world writer {
-  include awp:sources/reader@1.0.0;
+  include fusion:sources/reader@1.0.0;
   export tracker;
 }

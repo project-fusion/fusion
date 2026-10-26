@@ -1,7 +1,7 @@
-//! The `awp:tracker` world of the Agent Work Protocol: a source that writes
+//! The `fusion:tracker` world of the Fusion Work Protocol: a source that writes
 //! back to the service that holds the items.
 //!
-//! **It includes `awp:sources` and adds four calls**: `claim` shows the
+//! **It includes `fusion:sources` and adds four calls**: `claim` shows the
 //! host's claim, `update` writes a status with the version it read, `link`
 //! attaches an address such as a pull request, and `create` files an item,
 //! which a tracker may decline. [`Tracker`] is the world's exports as a Rust
@@ -34,24 +34,24 @@ pub use memory::Memory;
 pub mod bindings {
     fusion_plugin_host::wasmtime::component::bindgen!({
         path: ["../wit/sources", "../wit/tracker"],
-        world: "awp:tracker/writer",
+        world: "fusion:tracker/writer",
         wasmtime_crate: fusion_plugin_host::wasmtime,
         additional_derives: [PartialEq, Eq, serde::Serialize, serde::Deserialize],
         with: {
-            "awp:sources/types": fusion_plugin_sources::bindings::awp::sources::types,
-            "awp:sources/binding": fusion_plugin_sources::bindings::awp::sources::binding,
+            "fusion:sources/types": fusion_plugin_sources::bindings::fusion::sources::types,
+            "fusion:sources/binding": fusion_plugin_sources::bindings::fusion::sources::binding,
         },
     });
 }
 
-pub use bindings::exports::awp::tracker::tracker::{Change, Draft};
+pub use bindings::exports::fusion::tracker::tracker::{Change, Draft};
 
-/// The version of `awp:tracker` this host speaks.
+/// The version of `fusion:tracker` this host speaks.
 pub const VERSION: &str = "1.0.0";
 
 /// The tracker world, as a refusal names it.
 pub const TRACKERS: World = World {
-    package: "awp:tracker",
+    package: "fusion:tracker",
     noun: "tracker",
 };
 
@@ -93,7 +93,7 @@ pub trait Tracker: Source {
     fn create(&self, draft: &Draft) -> Result<Item, Error>;
 }
 
-/// A component built against `awp:tracker`, opened for one binding.
+/// A component built against `fusion:tracker`, opened for one binding.
 pub struct Component {
     limits: Limits,
     linker: Linker<Bounded<Lent>>,
@@ -201,45 +201,45 @@ impl Component {
 
 impl Source for Component {
     fn spec(&self) -> Result<String, Error> {
-        self.call(|store, writer| writer.awp_sources_source().call_spec(store).map(Ok))
+        self.call(|store, writer| writer.fusion_sources_source().call_spec(store).map(Ok))
     }
 
     fn check(&self) -> Result<Access, Error> {
-        self.call(|store, writer| writer.awp_sources_source().call_check(store))
+        self.call(|store, writer| writer.fusion_sources_source().call_check(store))
     }
 
     fn discover(&self) -> Result<Vec<Entry>, Error> {
-        self.call(|store, writer| writer.awp_sources_source().call_discover(store))
+        self.call(|store, writer| writer.fusion_sources_source().call_discover(store))
     }
 
     fn list(&self, since: Option<&str>) -> Result<Page, Error> {
         let since = since.map(str::to_owned);
-        self.call(|store, writer| writer.awp_sources_source().call_list(store, since.as_ref()))
+        self.call(|store, writer| writer.fusion_sources_source().call_list(store, since.as_ref()))
     }
 
     fn get(&self, id: &str) -> Result<Item, Error> {
-        self.call(|store, writer| writer.awp_sources_source().call_get(store, id))
+        self.call(|store, writer| writer.fusion_sources_source().call_get(store, id))
     }
 }
 
 impl Tracker for Component {
     fn claim(&self, id: &str, holder: Option<&str>) -> Result<(), Error> {
-        self.call(|store, writer| writer.awp_tracker_tracker().call_claim(store, id, holder))
+        self.call(|store, writer| writer.fusion_tracker_tracker().call_claim(store, id, holder))
     }
 
     fn update(&self, id: &str, version: &str, change: &Change) -> Result<String, Error> {
         self.call(|store, writer| {
             writer
-                .awp_tracker_tracker()
+                .fusion_tracker_tracker()
                 .call_update(store, id, version, change)
         })
     }
 
     fn link(&self, id: &str, address: &str) -> Result<(), Error> {
-        self.call(|store, writer| writer.awp_tracker_tracker().call_link(store, id, address))
+        self.call(|store, writer| writer.fusion_tracker_tracker().call_link(store, id, address))
     }
 
     fn create(&self, draft: &Draft) -> Result<Item, Error> {
-        self.call(|store, writer| writer.awp_tracker_tracker().call_create(store, draft))
+        self.call(|store, writer| writer.fusion_tracker_tracker().call_create(store, draft))
     }
 }

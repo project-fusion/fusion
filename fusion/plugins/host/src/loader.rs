@@ -85,7 +85,7 @@ impl Default for Limits {
 /// sentences that refuse one.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct World {
-    /// The WIT package, without its version: `fusion:rules`, `awp:tracker`.
+    /// The WIT package, without its version: `fusion:rules`, `fusion:tracker`.
     pub package: &'static str,
     /// What a component built against it is called: a plugin, a tool, a
     /// tracker.

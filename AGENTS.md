@@ -178,7 +178,7 @@ fusion/    cli docs plugins rules scripts site: what belongs to the company
            `rules` is the crate every command line takes, which is what a rule
            is and not what any product's rules read; `plugins` is Fusion
            Plugin Host, which runs code somebody else wrote: one loader, a
-           crate per world, and the Agent Work Protocol
+           crate per world, and the Fusion Work Protocol
 .local/    per-machine scratch, gitignored
 ```
 
@@ -224,6 +224,11 @@ fusion/    cli docs plugins rules scripts site: what belongs to the company
   nothing for it at all.
   `fusion/plugins/rules` is the host and `fusion/plugins/example/` is a whole
   plugin; the world they share is `fusion/plugins/wit/rules.wit`.
+
+  **Read "An open protocol" in `fusion/plugins/README.md` before you change the
+  Fusion Work Protocol.** Its six rules keep the protocol open to every model,
+  vendor, and outside implementation, and every change to `fusion:sources`,
+  `fusion:tracker`, their crates, or their conformance suites follows them.
 
   **What is left over is `fusion/scripts`, and it is small on purpose.** A
   script goes there when it is genuinely cross-cutting and cannot be a rule: the
