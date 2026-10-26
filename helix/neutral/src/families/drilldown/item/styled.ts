@@ -1,4 +1,4 @@
-import { mix, product, token, web } from '../../../style.js'
+import { mix, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import row from './headless.js'
 
@@ -22,20 +22,20 @@ export default styles(
   row,
   {
     prefix: 'drilldown-item',
-    hooks: [
-      'block-size',
-      'color',
-      'description-color',
-      'disabled-opacity',
-      'font-size',
-      'hover-color',
-      'mark-color',
-      'padding-inline',
-    ],
+    hooks: {
+      blockSize: token('size-control-tight'),
+      color: token('color-foreground'),
+      descriptionColor: token('color-foreground-muted'),
+      disabledOpacity: 0.5,
+      fontSize: token('text-sm'),
+      hoverColor: mix(token('color-foreground'), 8, 'transparent'),
+      markColor: token('color-foreground-subtle'),
+      paddingInline: token('space-sm'),
+    },
     stylesheet: 'drilldown/item/drilldown-item.generated.css',
   },
   ({ hook, on, rule }) => {
-    const height = hook.blockSize(token('size-control-tight'))
+    const height = hook.blockSize
     const spans = { gridRow: '1 / span 2' } as const
     /* A described row: the label over its description, with what is
        before and after them centered across both. */
@@ -49,7 +49,7 @@ export default styles(
     } as const
     const mark = {
       blockSize: token('size-icon-tight'),
-      color: hook.markColor(token('color-foreground-subtle')),
+      color: hook.markColor,
       flex: 'none',
       inlineSize: token('size-icon-tight'),
     } as const
@@ -62,13 +62,13 @@ export default styles(
           blockSize: height,
           boxSizing: 'border-box',
           inlineSize: '100%',
-          color: hook.color(token('color-foreground')),
+          color: hook.color,
           cursor: web('pointer'),
           display: 'flex',
           fontFamily: token('font-sans'),
-          fontSize: hook.fontSize(token('text-sm')),
+          fontSize: hook.fontSize,
           gap: token('space-xs'),
-          paddingInline: hook.paddingInline(token('space-sm')),
+          paddingInline: hook.paddingInline,
           userSelect: 'none',
         }),
       ]),
@@ -84,12 +84,12 @@ export default styles(
         rule(mark),
         /* The caret points into the page, so it turns in a right-to-left
            page, as the web's mirror rule turns it. */
-        rule({ dir: 'rtl', platform: 'native' }, { scale: '-1 1' }),
+        native([rule({ dir: 'rtl' }, { scale: '-1 1' })]),
       ]),
       on({ region: 'chevron', slotted: '*' }, [rule(mark)]),
       on({ region: 'description' }, [
         rule({
-          color: hook.descriptionColor(token('color-foreground-muted')),
+          color: hook.descriptionColor,
           display: 'block',
           fontSize: token('text-xs'),
           gridColumn: 2,
@@ -101,80 +101,65 @@ export default styles(
         }),
       ]),
       on({ part: 'item', selector: 'slot[name="description"][data-empty]' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
+        web([rule({ display: 'none' })]),
       ]),
-      on({ part: 'item', selector: '[part="item"][data-described]' }, [
-        rule({ platform: 'web' }, grid),
-      ]),
-      on('item', [rule({ platform: 'native', state: 'described' }, grid)]),
+      on({ part: 'item', selector: '[part="item"][data-described]' }, [web([rule(grid)])]),
+      on('item', [native([rule({ described: true }, grid)])]),
       on(
         { part: 'item', selector: '[part="item"][data-described] slot[name="start"]::slotted(*)' },
-        [
-          rule(
-            { platform: 'web' },
-            { gridColumn: 1, ...spans, marginInlineEnd: token('space-xs') },
-          ),
-        ],
+        [web([rule({ gridColumn: 1, ...spans, marginInlineEnd: token('space-xs') })])],
       ),
       on({ region: 'start', slotted: '*' }, [
-        rule(
-          { platform: 'native', state: 'described' },
-          { gridColumn: 1, ...spans, marginInlineEnd: token('space-xs') },
-        ),
+        native([
+          rule(
+            { state: 'described' },
+            { gridColumn: 1, ...spans, marginInlineEnd: token('space-xs') },
+          ),
+        ]),
       ]),
       on({ part: 'item', selector: '[part="item"][data-described] [part="label"]' }, [
-        rule({ platform: 'web' }, { gridColumn: 2, gridRow: 1 }),
+        web([rule({ gridColumn: 2, gridRow: 1 })]),
       ]),
-      on('label', [
-        rule({ platform: 'native', state: 'described' }, { gridColumn: 2, gridRow: 1 }),
-      ]),
+      on('label', [native([rule({ described: true }, { gridColumn: 2, gridRow: 1 })])]),
       on({ part: 'item', selector: '[part="item"][data-described] slot[name="end"]::slotted(*)' }, [
-        rule(
-          { platform: 'web' },
-          { gridColumn: 3, ...spans, marginInlineStart: token('space-xs') },
-        ),
+        web([rule({ gridColumn: 3, ...spans, marginInlineStart: token('space-xs') })]),
       ]),
       on({ region: 'end', slotted: '*' }, [
-        rule(
-          { platform: 'native', state: 'described' },
-          { gridColumn: 3, ...spans, marginInlineStart: token('space-xs') },
-        ),
+        native([
+          rule(
+            { state: 'described' },
+            { gridColumn: 3, ...spans, marginInlineStart: token('space-xs') },
+          ),
+        ]),
       ]),
       on({ part: 'item', selector: '[part="item"][data-described] [part="mark"]' }, [
-        rule(
-          { platform: 'web' },
-          { gridColumn: 4, ...spans, marginInlineStart: token('space-xs') },
-        ),
+        web([rule({ gridColumn: 4, ...spans, marginInlineStart: token('space-xs') })]),
       ]),
       on('mark', [
-        rule(
-          { platform: 'native', state: 'described' },
-          { gridColumn: 4, ...spans, marginInlineStart: token('space-xs') },
-        ),
+        native([
+          rule(
+            { described: true },
+            { gridColumn: 4, ...spans, marginInlineStart: token('space-xs') },
+          ),
+        ]),
       ]),
       on(
         {
           part: 'item',
           selector: '[part="item"][data-described] slot[name="chevron"]::slotted(*)',
         },
-        [
-          rule(
-            { platform: 'web' },
-            { gridColumn: 4, ...spans, marginInlineStart: token('space-xs') },
-          ),
-        ],
+        [web([rule({ gridColumn: 4, ...spans, marginInlineStart: token('space-xs') })])],
       ),
       on({ region: 'chevron', slotted: '*' }, [
-        rule(
-          { platform: 'native', state: 'described' },
-          { gridColumn: 4, ...spans, marginInlineStart: token('space-xs') },
-        ),
+        native([
+          rule(
+            { state: 'described' },
+            { gridColumn: 4, ...spans, marginInlineStart: token('space-xs') },
+          ),
+        ]),
       ]),
       on('item', [
-        rule(
-          { hover: true, lacks: 'disabled' },
-          { backgroundColor: hook.hoverColor(mix(token('color-foreground'), 8, 'transparent')) },
-        ),
+        rule({ hover: true, lacks: 'disabled' }, { backgroundColor: hook.hoverColor }),
         rule(
           { focusVisible: true },
           {
@@ -182,7 +167,7 @@ export default styles(
             outlineOffset: product(token('size-focus-offset'), '-1'),
           },
         ),
-        rule({ has: 'disabled' }, { cursor: web('default'), opacity: hook.disabledOpacity(0.5) }),
+        rule({ has: 'disabled' }, { web: { cursor: 'default' }, opacity: hook.disabledOpacity }),
       ]),
     ]
   },

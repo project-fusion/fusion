@@ -39,7 +39,7 @@ export default styles(
         margin: [token('space-none'), token('space-none'), token('space-2xs')],
         paddingInline: token('space-sm'),
       }),
-      rule({ part: { hidden: true } }, { display: 'none' }),
+      rule({ hidden: true }, { display: 'none' }),
     ]),
     /* The product's own mark, where the product is named. */
     on({ region: 'label', slotted: 'helix-icon' }, [

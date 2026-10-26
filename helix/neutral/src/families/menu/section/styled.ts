@@ -1,4 +1,4 @@
-import { sum, token } from '../../../style.js'
+import { native, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import section from './headless.js'
 
@@ -15,25 +15,28 @@ export default styles(
   section,
   {
     prefix: 'menu',
-    hooks: ['section-heading-color'],
+    hooks: {
+      sectionHeadingColor: token('color-foreground-muted'),
+    },
     own: ['menu-section-heading'],
     stylesheet: 'menu/section/menu-section.generated.css',
   },
   ({ hook, on, own, rule }) => [
     on('host', [
       rule({ '--menu-item-start': '0px', display: 'block' }),
-      rule(
-        { platform: 'web', state: 'start' },
-        { '--menu-item-start': sum(token('size-icon'), token('space-xs')) },
-      ),
-      rule(
-        { platform: 'native', state: 'started' },
-        { '--menu-item-start': sum(token('size-icon'), token('space-xs')) },
-      ),
+      web([
+        rule({ start: true }, { '--menu-item-start': sum(token('size-icon'), token('space-xs')) }),
+      ]),
+      native([
+        rule(
+          { started: true },
+          { '--menu-item-start': sum(token('size-icon'), token('space-xs')) },
+        ),
+      ]),
     ]),
     on('heading', [
       rule({
-        color: hook.sectionHeadingColor(token('color-foreground-muted')),
+        color: hook.sectionHeadingColor,
         fontSize: token('text-xs'),
         fontWeight: token('weight-medium'),
         lineHeight: token('leading-normal'),
@@ -43,7 +46,7 @@ export default styles(
       }),
       /* A phone's heading stands down on a page below the top, where its
          rows are not, as the web's section draws nothing there. */
-      rule({ platform: 'native' }, { display: own.sectionHeading('flex') }),
+      native([rule({ display: own.sectionHeading('flex') })]),
     ]),
   ],
 )
