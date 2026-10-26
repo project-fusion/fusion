@@ -97,7 +97,7 @@ export default styles(
           { state: 'entering' },
           { transition: ['opacity', token('duration-normal'), token('easing-decelerate')] },
         ),
-        rule({ entering: true, state: 'entering' }, { opacity: 0 }),
+        rule({ startingStyle: true, state: 'entering' }, { opacity: 0 }),
         rule(
           [
             { reducedMotion: true, exiting: true },

@@ -221,7 +221,7 @@ export default styles(
         }),
         rule({ state: 'sheet' }, { backgroundColor: hook.scrim(token('color-overlay')) }),
         rule({ state: ['open', 'sheet'] }, { opacity: 1 }),
-        rule({ entering: true, state: ['open', 'sheet'] }, { opacity: 0 }),
+        rule({ startingStyle: true, state: ['open', 'sheet'] }, { opacity: 0 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
         rule(
           { platform: 'web', supports: 'not (overlay: auto)' },
