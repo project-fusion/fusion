@@ -1,4 +1,4 @@
-import { token, web } from '../../../style.js'
+import { native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -24,7 +24,13 @@ export default styles(
   root,
   {
     prefix: 'description-list',
-    hooks: ['column-gap', 'divider-color', 'divider-width', 'gap', 'label-width'],
+    hooks: {
+      columnGap: token('space-lg'),
+      dividerColor: token('color-border'),
+      dividerWidth: token('border-thin'),
+      gap: null,
+      labelWidth: 'max-content',
+    },
     own: [
       'description-list-column-gap',
       'description-list-direction',
@@ -41,20 +47,22 @@ export default styles(
   },
   ({ hook, on, own, rule }) => [
     on('host', [
-      rule({ containerType: web('inline-size'), display: 'block' }),
+      rule({ web: { containerType: 'inline-size' }, display: 'block' }),
       /* A phone has no inheritance through a slot, so the host holds the gap
          its rule between pairs reads, as the list holds it on the web. */
-      rule({ platform: 'native' }, { own: { gap: hook.gap(token('space-md')) } }),
-      rule({ direction: 'row', platform: 'native' }, { own: { gap: hook.gap(token('space-sm')) } }),
-      rule(
-        { direction: 'row', inlineSize: { below: '22rem' }, platform: 'native' },
-        { own: { gap: hook.gap(token('space-md')) } },
-      ),
+      native([
+        rule({ own: { gap: hook.gap(token('space-md')) } }),
+        rule({ direction: 'row' }, { own: { gap: hook.gap(token('space-sm')) } }),
+        rule(
+          { direction: 'row', inlineSize: { below: '22rem' } },
+          { own: { gap: hook.gap(token('space-md')) } },
+        ),
+      ]),
       /* As wide as the widest pair, and no longer a container: containment
          sizes an element as though it were empty. */
       rule(
         { width: 'auto' },
-        { containerType: web('normal'), inlineSize: 'fit-content', maxInlineSize: '100%' },
+        { web: { containerType: 'normal' }, inlineSize: 'fit-content', maxInlineSize: '100%' },
       ),
       /* Values on the end edge, which the list hands its items. */
       rule(
@@ -69,8 +77,8 @@ export default styles(
       rule(
         { direction: 'row' },
         {
-          columnGap: hook.columnGap(token('space-lg')),
-          gridTemplateColumns: [hook.labelWidth('max-content'), 'minmax(0, 1fr)'],
+          columnGap: hook.columnGap,
+          gridTemplateColumns: [hook.labelWidth, 'minmax(0, 1fr)'],
           rowGap: own.gap,
           own: { gap: hook.gap(token('space-sm')) },
         },
@@ -84,28 +92,26 @@ export default styles(
         },
       ),
       /* A phone's list is a column of its items, which lay out beside. */
-      rule(
-        { direction: 'row', platform: 'native' },
-        {
-          gridTemplateColumns: 'minmax(0, 1fr)',
-          own: { direction: 'row', columnGap: hook.columnGap(token('space-lg')) },
-        },
-      ),
-      rule(
-        { direction: 'row', inlineSize: { below: '22rem' }, platform: 'native' },
-        { own: { direction: 'column' } },
-      ),
+      native([
+        rule(
+          { direction: 'row' },
+          {
+            gridTemplateColumns: 'minmax(0, 1fr)',
+            own: { direction: 'row', columnGap: hook.columnGap },
+          },
+        ),
+        rule(
+          { direction: 'row', inlineSize: { below: '22rem' } },
+          { own: { direction: 'column' } },
+        ),
+      ]),
     ]),
     /* A rule between pairs, in the middle of the gap. */
     on({ slotted: '*' }, [
       rule(
         { child: 'later', divided: true },
         {
-          borderBlockStart: [
-            hook.dividerWidth(token('border-thin')),
-            'solid',
-            hook.dividerColor(token('color-border')),
-          ],
+          borderBlockStart: [hook.dividerWidth, 'solid', hook.dividerColor],
           paddingBlockStart: own.gap,
         },
       ),

@@ -1,4 +1,5 @@
-import { bind, headless, prop, region, wrap } from '../../../tree.js'
+import { headless, oneOf, Slot, Wrap } from '../../../render.js'
+import { bind } from '../../../tree.js'
 
 /**
  * Card's headless tier: what it takes and its regions.
@@ -25,20 +26,46 @@ import { bind, headless, prop, region, wrap } from '../../../tree.js'
  * has.
  */
 export default headless('card', {
-  events: [],
-  host: { label: bind('label'), role: 'group' },
-  props: [prop('label', 'string', { default: '' }), prop('media-placement', ['end'])],
+  props: {
+    label: '',
+    mediaPlacement: oneOf(['end']),
+  },
+  events: {},
   states: ['has-footer', 'has-header', 'has-media', 'settled'],
-  tree: [
-    region('media', { part: 'media' }),
-    wrap('header-row', { while: bind('header-actions') }, [
-      region('header', { part: 'header' }),
-      region('header-actions', { part: 'header-actions' }),
-    ]),
-    region('default', { part: 'body' }),
-    wrap('footer-row', { while: bind('footer-actions') }, [
-      region('footer', { part: 'footer' }),
-      region('footer-actions', { part: 'footer-actions' }),
-    ]),
-  ],
+  host: { label: bind('label'), role: 'group' },
+  render: ({ slots }) => (
+    <>
+      <Slot
+        name="media"
+        part="media"
+      />
+      <Wrap
+        part="header-row"
+        when={slots.headerActions}
+      >
+        <Slot
+          name="header"
+          part="header"
+        />
+        <Slot
+          name="header-actions"
+          part="header-actions"
+        />
+      </Wrap>
+      <Slot part="body" />
+      <Wrap
+        part="footer-row"
+        when={slots.footerActions}
+      >
+        <Slot
+          name="footer"
+          part="footer"
+        />
+        <Slot
+          name="footer-actions"
+          part="footer-actions"
+        />
+      </Wrap>
+    </>
+  ),
 })

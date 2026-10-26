@@ -1,4 +1,4 @@
-import { list, mix, product, sum, token, web } from '../../../style.js'
+import { first, list, mix, native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -30,15 +30,15 @@ export default styles(
   root,
   {
     prefix: 'callout',
-    hooks: [
-      'accent-color',
-      'background-color',
-      'bar-thickness',
-      'font-size',
-      'gap',
-      'padding',
-      'radius',
-    ],
+    hooks: ({ own }) => ({
+      accentColor: own.tone,
+      backgroundColor: null,
+      barThickness: token('border-thick'),
+      fontSize: token('text-control'),
+      gap: token('space-sm'),
+      padding: token('space-control'),
+      radius: token('radii-sm'),
+    }),
     own: ['callout-bar', 'callout-color', 'callout-inset', 'callout-tone'],
     props: [prop('separation', ['filled', 'outlined', 'plain'])],
     stylesheet: 'callout/root/callout-root.generated.css',
@@ -50,18 +50,18 @@ export default styles(
         rule({
           own: {
             tone: token('color-info'),
-            color: hook.accentColor(own.tone),
-            bar: hook.barThickness(token('border-thick')),
-            inset: hook.padding(token('space-control')),
+            color: first(hook.accentColor, own.tone),
+            bar: hook.barThickness,
+            inset: hook.padding,
           },
-          fontSize: hook.fontSize(token('text-control')),
+          fontSize: hook.fontSize,
           backgroundColor: hook.backgroundColor(mix(own.color, 10, 'transparent')),
           overflow: 'hidden',
           position: 'relative',
-          borderRadius: hook.radius(token('radii-sm')),
+          borderRadius: hook.radius,
           color: token('color-foreground'),
           display: 'flex',
-          gap: hook.gap(token('space-sm')),
+          gap: hook.gap,
           padding: own.inset,
           paddingInlineStart: sum(own.inset, own.bar),
         }),
@@ -87,7 +87,7 @@ export default styles(
         ),
         rule({ separation: 'plain' }, { backgroundColor: hook.backgroundColor('transparent') }),
         rule(
-          { state: 'exiting' },
+          { exiting: true },
           {
             opacity: 0,
             transition: ['opacity', token('duration-normal'), token('easing-accelerate')],
@@ -100,13 +100,13 @@ export default styles(
         rule({ entering: true, state: 'entering' }, { opacity: 0 }),
         rule(
           [
-            { reducedMotion: true, state: 'exiting' },
+            { reducedMotion: true, exiting: true },
             { reducedMotion: true, state: 'entering' },
           ],
           { transition: 'none' },
         ),
         /* A phone draws nothing of a callout once it has faded out. */
-        rule({ platform: 'native', state: 'closed' }, { display: 'none' }),
+        native([rule({ closed: true }, { display: 'none' })]),
         rule({ print: true }, { backgroundColor: 'transparent' }),
       ]),
       /* The tone's edge. Straight, and clipped to the host's corners. */
@@ -129,7 +129,7 @@ export default styles(
          the content takes the room the dismiss button leaves it. */
       on('content', [
         rule({ lineHeight: token('leading-normal'), minInlineSize: 0 }),
-        rule({ platform: 'native' }, { flex: '1 1 auto' }),
+        native([rule({ flex: '1 1 auto' })]),
       ]),
       /* At the end of the first line, as quiet as the mark at the start. */
       on('dismiss', [
@@ -180,7 +180,7 @@ export default styles(
         rule({
           color: token('color-foreground'),
           display: 'block',
-          fontSize: hook.fontSize(token('text-control')),
+          fontSize: hook.fontSize,
           fontWeight: token('weight-semibold'),
           margin: token('space-none'),
         }),

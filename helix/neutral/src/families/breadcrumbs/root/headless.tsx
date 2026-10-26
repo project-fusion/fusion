@@ -1,4 +1,5 @@
-import { bind, box, derive, fold, headless, prop, region } from '../../../tree.js'
+import { headless, number, oneOf, Slot, View } from '../../../render.js'
+import { bind, derive, fold } from '../../../tree.js'
 
 /**
  * Breadcrumbs' headless tier: the trail of crumbs to the current page.
@@ -20,31 +21,36 @@ import { bind, box, derive, fold, headless, prop, region } from '../../../tree.j
  * the region, and the parts with what the manifest says the element has.
  */
 export default headless('breadcrumbs', {
-  derived: { name: derive('breadcrumbs-name') },
-  events: [],
+  props: {
+    expandLabel: 'Show {count} more',
+    fallbackLabel: 'Breadcrumb',
+    label: '',
+    maxItems: number(),
+    /* The mark between crumbs for the whole trail: unset a chevron, `slash` a
+       slash. */
+    separator: oneOf(['slash']),
+  },
+  events: {},
+  states: ['settled'],
+  derived: {
+    name: derive('breadcrumbs-name'),
+  },
   fold: fold({
     max: 'max-items',
     middle: { count: 'fold', items: 'fold-crumbs', label: 'fold-label', words: 'expand-label' },
   }),
   host: { label: bind('name'), role: 'navigation' },
-  props: [
-    prop('expand-label', 'string', { default: 'Show {count} more' }),
-    prop('fallback-label', 'string', { default: 'Breadcrumb' }),
-    prop('label', 'string', { default: '' }),
-    prop('max-items', 'number'),
-    /* The mark between crumbs for the whole trail: unset a chevron, `slash` a
-       slash. */
-    prop('separator', ['slash']),
-  ],
-  states: ['settled'],
-  tree: [
-    box('list', { role: 'list' }, [
-      /* A crumb drawn from `items`, a `helix-breadcrumb` whose parts it
-         exposes, the fold among them. */
-      box('crumb', {
-        also: { 'crumb-current': true },
-        draws: 'breadcrumb',
-        exports: {
+  render: () => (
+    <View
+      part="list"
+      role="list"
+    >
+      {/* A crumb drawn from `items`, a `helix-breadcrumb` whose parts it
+          exposes, the fold among them. */}
+      <View
+        also={{ 'crumb-current': true }}
+        draws="breadcrumb"
+        exports={{
           expand: true,
           'expand-button': true,
           'expand-live': true,
@@ -76,10 +82,11 @@ export default headless('breadcrumbs', {
           link: true,
           separator: true,
           'separator-mark': true,
-        },
-        platform: 'web',
-      }),
-      region('default'),
-    ]),
-  ],
+        }}
+        part="crumb"
+        platform="web"
+      />
+      <Slot />
+    </View>
+  ),
 })
