@@ -16,10 +16,9 @@
  * })
  * ```
  *
- * **Read as syntax and never run**, as `tree.ts` says of the builder form.
- * `helix family` parses the module and rewrites it into the builder form
- * (`helix/cli/src/family/read/jsx.rs`), so both forms compile to the same
- * intermediate form while the families move.
+ * **Read as syntax and never run.** `helix family` parses the module
+ * (`helix/cli/src/family/read/jsx.rs`) and compiles it to the intermediate
+ * form, and nothing in it runs.
  *
  * **What a render may hold.** The nodes below, each with its attributes. An
  * attribute or a child reads `props.x`, `derived.x`, `state.x`, a value a
@@ -127,7 +126,7 @@ type TypeOf<Value> =
         ? 'number'
         : 'string'
 
-/** The props as the intermediate form lists them, each by its attribute's name. */
+/** The props as the compiler lists them, each by its attribute's name. */
 export type PropsList<Props> = readonly {
   readonly [Key in keyof Props & string]: {
     readonly name: Kebab<Key>
@@ -213,9 +212,9 @@ const isSpec = (value: PropValue): value is PropSpec => typeof value === 'object
  * Declares a family's headless source with its part tree last, as JSX.
  *
  * **The keys before `render` type what it reads.** `memberOf` is the
- * collection the element joins. `props` and `events` are objects by name in
- * camelCase. `states`, `derived`, and every other key the builder form has
- * are written as the builder form writes them.
+ * collection the element joins. `props`, `events`, and `derived` are objects
+ * by name in camelCase, `states` an array of names in camelCase, and each
+ * feature an object of its fields.
  */
 export const headless = <
   const Props extends Readonly<Record<string, PropValue>> = Record<never, never>,

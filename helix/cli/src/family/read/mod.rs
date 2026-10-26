@@ -23,7 +23,7 @@
 //! nothing, and any name in it is refused.
 //!
 //! **A headless source written with `render` is `headless.tsx`**, read with
-//! JSX, and its part tree is read by [`jsx`] into the builder form's nodes,
+//! JSX, and its part tree is read by [`jsx`] into the compiler's own nodes,
 //! so everything after reading sees one shape.
 
 use std::collections::BTreeMap;
@@ -104,7 +104,7 @@ pub fn default_export(source: &str) -> Result<Lit, String> {
 }
 
 /// A `headless.tsx` module's default export, with its `render` read into
-/// the builder form's nodes, as [`jsx`] says.
+/// the compiler's own nodes, as [`jsx`] says.
 ///
 /// # Errors
 ///
@@ -143,25 +143,6 @@ fn export_of(source: &str, jsx: bool) -> Result<Lit, String> {
         }
     }
     Err("the module has no default export".to_owned())
-}
-
-/// One expression of a builder-form source, read as [`default_export`]
-/// reads it, for the printer, which walks the source's syntax for its
-/// comments and reads each value it prints.
-///
-/// # Errors
-///
-/// A sentence naming the line of what a table may not hold.
-pub(crate) fn expression<'a>(source: &str, expression: &'a Expression<'a>) -> Result<Lit, String> {
-    let mut reader = Reader {
-        jsx: false,
-        names_everywhere: false,
-        reading: Vec::new(),
-        scope: Scope::default(),
-        source,
-        styles: false,
-    };
-    reader.read(expression)
 }
 
 /// The constants a module declares at its top level and the names it
@@ -363,7 +344,7 @@ pub(super) fn refused(span: Span, source: &str, what: &str) -> String {
 mod jsx;
 mod reader;
 
-pub(crate) use jsx::{kebab, RENAMED};
+pub(crate) use jsx::kebab;
 
 #[cfg(test)]
 mod tests;
