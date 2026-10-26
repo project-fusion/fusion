@@ -12,6 +12,7 @@ members = [
 	"cortex/core",
 	"cortex/trace",
 	"cortex/engram",
+	"cortex/provider",
 	"cortex/recall",
 	"fusion/cli",
 	"fusion/plugins/host",
@@ -40,10 +41,10 @@ ratatui = "0.30"
 # narrow questions about declarations, and a syntax tree is a dependency and a
 # grammar to keep current for answers a pattern already gives.
 regex = "1"
-# The plugin host's address guard resolves through it, and the Cortex model
-# clients in the products that use them take the same version. No default
-# features: `charset` decodes bodies these APIs only ever send as UTF-8, and
-# `rustls` is named so the TLS backend is a choice written down here.
+# The plugin host's address guard resolves through it, and so does the `http`
+# transport under Cortex's model clients. No default features: `charset`
+# decodes bodies these APIs only ever send as UTF-8, and `rustls` is named so
+# the TLS backend is a choice written down here.
 reqwest = { version = "0.13", default-features = false, features = ["http2", "rustls", "system-proxy"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -83,6 +84,7 @@ wit-component = "0.258"
 # Internal crates. Path deps are relative: same-domain is `../<role>`.
 fusion-cortex-core = { path = "cortex/core", default-features = false }
 fusion-cortex-engram = { path = "cortex/engram", default-features = false }
+fusion-cortex-provider = { path = "cortex/provider", default-features = false }
 fusion-cortex-recall = { path = "cortex/recall" }
 fusion-cortex-trace = { path = "cortex/trace", default-features = false }
 fusion-helix-theme = { path = "helix/theme" }

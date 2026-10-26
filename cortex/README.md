@@ -10,6 +10,7 @@ Packages are flat inside this folder, one directory each, the same arrangement
 | `core` | none | the substrate itself |
 | `docs` | `cortex-docs` | the documentation as content, versioned with Cortex |
 | `engram` | none | the memory store |
+| `provider` | none | the model clients, one per API |
 | `recall` | none | context assembly |
 | `trace` | none | provenance capture |
 
