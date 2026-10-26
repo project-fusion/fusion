@@ -77,6 +77,7 @@ export default styles(
       ),
     ]),
     on('icon', [rule({ display: 'inline-flex' })]),
+    /* Written out: an element the tree does not draw, beside what a region holds. */
     on({ part: 'icon', selector: '[part="icon"] svg,\n[part="icon"] ::slotted(*)' }, [
       web([rule({ blockSize: token('size-icon-sm'), inlineSize: token('size-icon-sm') })]),
     ]),

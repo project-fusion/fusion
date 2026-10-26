@@ -68,9 +68,7 @@ export default styles(
           { own: { speedDialAlign: 'flex-start', speedDialRow: 'row' }, alignItems: 'flex-start' },
         ),
       ]),
-      on({ part: 'actions', selector: '[part="actions"][hidden]' }, [
-        web([rule({ display: 'none' })]),
-      ]),
+      on('actions', [web([rule({ part: { hidden: true } }, { display: 'none' })])]),
       /* They arrive from the button, once the column is placed. */
       on('actions', [
         rule({ own: { dialFrom: travel } }),
@@ -101,12 +99,14 @@ export default styles(
           ),
         ]),
       ]),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on({ part: 'actions', selector: '[part="actions"][data-placed] ::slotted(*)' }, [
         web([rule(arrived)]),
       ]),
       /* Nearest the button first, counting from the end where the column
          runs upward and from the start where it runs down. */
       on('host', [rule({ own: { speedDialStagger: hook.stagger(quotient(fast, 3)) } })]),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on(
         {
           part: 'actions',
@@ -114,6 +114,7 @@ export default styles(
         },
         [web([rule({ transitionDelay: own.speedDialStagger })])],
       ),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on(
         {
           part: 'actions',
@@ -121,6 +122,7 @@ export default styles(
         },
         [web([rule({ transitionDelay: product(own.speedDialStagger, 2) })])],
       ),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on(
         {
           part: 'actions',
@@ -128,6 +130,7 @@ export default styles(
         },
         [web([rule({ transitionDelay: product(own.speedDialStagger, 3) })])],
       ),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on(
         {
           part: 'actions',
@@ -135,6 +138,7 @@ export default styles(
         },
         [web([rule({ transitionDelay: product(own.speedDialStagger, 4) })])],
       ),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on(
         {
           part: 'actions',
@@ -143,6 +147,7 @@ export default styles(
         },
         [web([rule({ transitionDelay: own.speedDialStagger })])],
       ),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on(
         {
           part: 'actions',
@@ -151,6 +156,7 @@ export default styles(
         },
         [web([rule({ transitionDelay: product(own.speedDialStagger, 2) })])],
       ),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on(
         {
           part: 'actions',
@@ -159,6 +165,7 @@ export default styles(
         },
         [web([rule({ transitionDelay: product(own.speedDialStagger, 3) })])],
       ),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on(
         {
           part: 'actions',

@@ -100,11 +100,13 @@ export default styles(
           whiteSpace: 'nowrap',
         }),
       ]),
+      /* Written out: a condition reads no attribute of a slot. */
       on({ part: 'item', selector: 'slot[name="description"][data-empty]' }, [
         web([rule({ display: 'none' })]),
       ]),
-      on({ part: 'item', selector: '[part="item"][data-described]' }, [web([rule(grid)])]),
+      on('item', [web([rule({ part: { 'data-described': true } }, grid)])]),
       on('item', [native([rule({ described: true }, grid)])]),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on(
         { part: 'item', selector: '[part="item"][data-described] slot[name="start"]::slotted(*)' },
         [web([rule({ gridColumn: 1, ...spans, marginInlineEnd: token('space-xs') })])],
@@ -117,10 +119,12 @@ export default styles(
           ),
         ]),
       ]),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on({ part: 'item', selector: '[part="item"][data-described] [part="label"]' }, [
         web([rule({ gridColumn: 2, gridRow: 1 })]),
       ]),
       on('label', [native([rule({ described: true }, { gridColumn: 2, gridRow: 1 })])]),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on({ part: 'item', selector: '[part="item"][data-described] slot[name="end"]::slotted(*)' }, [
         web([rule({ gridColumn: 3, ...spans, marginInlineStart: token('space-xs') })]),
       ]),
@@ -132,6 +136,7 @@ export default styles(
           ),
         ]),
       ]),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on({ part: 'item', selector: '[part="item"][data-described] [part="mark"]' }, [
         web([rule({ gridColumn: 4, ...spans, marginInlineStart: token('space-xs') })]),
       ]),
@@ -143,6 +148,7 @@ export default styles(
           ),
         ]),
       ]),
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on(
         {
           part: 'item',
