@@ -1,0 +1,17 @@
+{
+  // The app as the web builds it: its routes and the modules they share with
+  // a phone, typed as the web's elements from the styled tier's typings, with
+  // imports resolved as a browser's are and each `.web.tsx` file in place of
+  // its pair. `helix shared` checks that the shared files use nothing only
+  // the web has. The `.native.tsx` files are `tsconfig.native.json`'s.
+  "compilerOptions": {
+    "customConditions": [],
+    "jsx": "react-jsx",
+    "moduleSuffixes": [".web", ""],
+    "rootDir": "${configDir}",
+    "types": []
+  },
+  "exclude": ["src/**/*.native.tsx"],
+  "extends": "../../tsconfig.package.json",
+  "include": ["app/**/*", "src/**/*", "stylesheets.d.ts", "../styled/types/jsx.d.ts"]
+}
