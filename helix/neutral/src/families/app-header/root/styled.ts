@@ -23,11 +23,13 @@ import root from './headless.js'
  * point phone. **Dense by nature**: the host sets the small steps of every
  * control size, as Toolbar does.
  *
- * **On a phone the bar stands clear of the status bar and the notch** where
- * it is at the top of the window: its host is padded by the share of the
- * window's top safe area that reaches into it, which is none where the bar
- * stands lower, as under a router's own header, or inside a scroll view. The web leaves the page's
- * `viewport-fit` to the page.
+ * **The bar stands clear of the status bar and the notch** where it is at
+ * the top of the window: its host is padded by the window's top safe area.
+ * On a phone that is the share of the inset that reaches into the host,
+ * which is none where the bar stands lower, as under a router's own header,
+ * or inside a scroll view. On the web it is `env(safe-area-inset-top)`,
+ * which is 0 unless the page draws under the notch with
+ * `viewport-fit=cover`.
  */
 export default styles(
   root,
@@ -77,6 +79,9 @@ export default styles(
           containerType: web('inline-size'),
           display: 'block',
           inlineSize: '100%',
+          /* Clear of the status bar and the notch, by the window's top safe
+             area, or on a phone the share of it that reaches into the bar. */
+          paddingBlockStart: safeArea('top'),
           /* The fill and the edge fade with the blur, or `transparent` takes
              its surface in a single frame. */
           transition: list(
@@ -85,9 +90,6 @@ export default styles(
             ['border-color', pace, easing],
           ),
         }),
-        /* Clear of the status bar and the notch, by as much of the window's
-           top safe area as reaches into the bar. */
-        rule({ platform: 'native' }, { paddingBlockStart: safeArea('top') }),
         variants('material', {
           glass: { ...glass },
           frosted: {
@@ -99,19 +101,15 @@ export default styles(
         /* Scrolled, it takes the glass. */
         rule({ material: 'transparent', state: 'scrolled' }, { ...glass }),
         /* Over the top of the page: the section under the bar starts
-           behind it, drawn under it. */
+           behind it, drawn under it, by the bar's height and the safe area
+           the bar stands clear of. */
         rule(
           { overlay: true },
           {
-            marginBlockEnd: product(header, '-1'),
+            marginBlockEnd: difference(product(header, '-1'), safeArea('top')),
             position: 'relative',
             zIndex: token('layer-sticky'),
           },
-        ),
-        /* A phone's bar is taller by the safe area it stands clear of. */
-        rule(
-          { overlay: true, platform: 'native' },
-          { marginBlockEnd: difference(product(header, '-1'), safeArea('top')) },
         ),
         rule(
           { sticky: true },

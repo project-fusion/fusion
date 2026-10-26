@@ -130,6 +130,16 @@ export const MENU: readonly Scenario[] = [
     intents: [
       { kind: 'focus', page: true },
       { kind: 'set', prop: 'open', value: true },
+      { by: 'outside', kind: 'dismiss' },
+    ],
+    name: 'a press beside a sheet closes it',
+    setup: menu({ presentation: 'sheet' }),
+  },
+  {
+    family: 'menu',
+    intents: [
+      { kind: 'focus', page: true },
+      { kind: 'set', prop: 'open', value: true },
       { event: 'before-close', kind: 'refuse' },
       { by: 'escape', kind: 'dismiss' },
     ],

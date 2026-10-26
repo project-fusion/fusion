@@ -14,7 +14,8 @@ import { styles } from './menu-root.generated.css.js'
  *
  * A submenu replaces the current page, so the menu stays one panel and works
  * the same on a phone as on a desktop. In a window narrower than 30rem the
- * panel is a sheet along the window's bottom edge, over a scrim.
+ * panel is a sheet along the window's bottom edge, over a scrim. A press on
+ * the scrim closes the sheet and reaches nothing under it.
  *
  * @since 0.1.0
  * @status stable

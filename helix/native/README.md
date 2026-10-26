@@ -1475,7 +1475,9 @@ so two destinations fit a 360 point phone.
 
 **At the top of the window it stands clear of the status bar and the notch**
 by the safe area, as [Window and safe area](#window-and-safe-area) says, and
-under a header of the router's it takes no more room than on the web.
+under a header of the router's it takes no more room than on the web. The
+web's bar reads the top safe area too, on a page drawn under the notch with
+`viewport-fit=cover`.
 
 **Its `material` is what the page shows through**: opaque by default,
 `glass` translucent with the page blurred behind it through expo-blur,
@@ -1530,8 +1532,6 @@ bar holds in order. These are the web's:
 - **The folded region closing on Escape, as focus leaves the bar, and on a
   press outside it, and the hidden bar shown again as focus moves into it.**
   A press on the toggle closes it on a phone.
-- **The web's `viewport-fit`.** On the web the bar reads no safe area, and a
-  page drawn under the status bar keeps its own header clear of it.
 
 ## Toast
 
