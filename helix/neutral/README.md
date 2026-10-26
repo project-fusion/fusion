@@ -12,8 +12,7 @@ Trend.
 
 | Path | What it is |
 |---|---|
-| `src/families/<family>/<element>/headless.ts` | The element's props, events, states, collection, and part tree |
-| `src/families/<family>/<element>/headless.tsx` | The same, written as one object with its part tree last, as JSX |
+| `src/families/<family>/<element>/headless.tsx` | The element's props, events, states, collection, and part tree, written as one object with its part tree last, as JSX |
 | `src/render.ts` | How a `headless.tsx` source is written: `headless()`, its nodes, and the helpers its props and events take |
 | `src/families/<family>/<element>/styled.ts` | The props only the styled tier has, and the style table |
 | `src/table.ts` | How a style table is written: `styles()`, its groups and rules, and fragments |
@@ -25,9 +24,9 @@ Trend.
 The runtime that draws the families on React Native is
 [`helix/native`](../native), published as `@fusion.dev/helix-native`.
 
-A headless source may be written with its part tree last, as JSX, in
-`headless.tsx`. Tabs' Tab, Button, and Menu are written this way, and the
-other families move to it one at a time. Both forms compile to the same
+Every element's headless source is written with its part tree last, as
+JSX, in `headless.tsx`. The compiler still reads the builder form a
+`headless.ts` writes, with `tree.ts`'s helpers, and both compile to the same
 intermediate form:
 
 ```tsx
@@ -181,11 +180,11 @@ a private value no family sets, and a custom property read inside a string.
 `src/table.ts` describes every form.
 
 Text, Flex, and Grid have no headless tier on the web, and each one's
-`headless.ts` holds the props and the tree of its element all the same.
+`headless.tsx` holds the props and the tree of its element all the same.
 
 A prop's values may include `true`, the attribute present with no value, so
-`prop('wrap', [true, 'reverse'])` is a switch with one named value: a phone
-types it `boolean | 'reverse'`.
+`wrap: oneOf([true, 'reverse'], false)` is a switch with one named value: a
+phone types it `boolean | 'reverse'`.
 
 A box marked `run` is a run of words: a phone draws it as a `Text`, so the
 words and the runs passed into it flow as one paragraph, and a run nested in
