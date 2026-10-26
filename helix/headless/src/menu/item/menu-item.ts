@@ -103,7 +103,7 @@ import '../../kbd/index.js'
  *
  * @event {HelixBeforeCheckEvent} helix-before-check - A choice row is about to be checked or unchecked, carrying the state asked for. Cancelable: cancel it to keep the row as it is.
  * @event {HelixBeforeSelectEvent} helix-before-select - The row was chosen. Cancelable: cancel it to keep the menu open.
- * @event {HelixSelectEvent} helix-select - Fired after the row is chosen, once the choice stands.
+ * @event {HelixSelectEvent} helix-select - Fired after the row is chosen, once the choice stands. A row that opens a submenu chooses nothing and sends none.
  *
  * @csspart end - The trailing column that holds the shortcut and the `end` slot. It is always rendered.
  * @csspart item - The row, which is an `<a>` where `href` is set.
@@ -680,7 +680,12 @@ export class HelixHeadlessMenuItem extends HelixElement {
     if (!this.dispatchEvent(new HelixBeforeSelectEvent({ value: this.value }))) {
       return
     }
-    this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    /* A row that opens a submenu has chosen nothing, so nothing is said to
+       stand: its menu shows the page, and a consumer listening for a choice
+       does not hear navigation as one. */
+    if (!this.hasSubmenu) {
+      this.dispatchEvent(new HelixSelectEvent({ value: this.value }))
+    }
     if (this.virtual && this.href !== '') {
       followLink(this.ownerDocument, this)
     }

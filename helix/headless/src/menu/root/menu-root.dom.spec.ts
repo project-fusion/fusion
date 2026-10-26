@@ -595,6 +595,31 @@ describe('menu submenus, coming and going', () => {
     expect(row(host).hasSubmenu).toBe(true)
   })
 
+  /* A row that opens a submenu chooses nothing, as the menu's `helix-select`
+     says: its request still goes out, and nothing is said to stand. A row
+     with no submenu says `helix-select` once its request stands. */
+  test('a row that opens a submenu sends no helix-select, and a row with none does', async () => {
+    const heard: string[] = []
+    const listen = (host: Menu) => {
+      for (const name of ['helix-before-select', 'helix-select']) {
+        host.addEventListener(name, (event) => {
+          heard.push(`${name} ${(event as CustomEvent<{ value: string }>).detail.value}`)
+        })
+      }
+    }
+    const host = await nested()
+    await (row(host) as unknown as Menu).updateComplete
+    listen(host)
+    const opens = part(row(host), 'item') as HTMLElement | null
+    opens?.click()
+    const plain = await menu()
+    listen(plain)
+    const copy = plain.querySelector('helix-headless-menu-item') as HTMLElement
+    const chooses = part(copy, 'item') as HTMLElement | null
+    chooses?.click()
+    expect(heard).toEqual(['helix-before-select copy', 'helix-select copy'])
+  })
+
   /* **Drilling in and back out cannot be asserted here, and a spec that says it
      can is worse than none.** The fault it would cover is that the row renders a
      `slot[name="submenu"]` in two template branches, so moving between them
