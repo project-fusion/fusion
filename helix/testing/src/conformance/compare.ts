@@ -185,7 +185,7 @@ export const judge = (
   }
 }
 
-/** An event in one line: `select from b {"value":"b"} refused`. */
+/** An event in one line: `before-select from b {"value":"b"} refused`. */
 const line = (sent: Sent): string =>
   `${sent.name}${sent.from === null ? '' : ` from ${sent.from}`} ${canonical(sent.detail)}${
     sent.canceled ? ' refused' : ''

@@ -329,7 +329,7 @@ fn carries_a_value_in_the_target_where_the_element_that_sends_the_event_has_one(
     let set = headless_family(
         "tabs",
         "export default headless('tabs', {
-          events: [event('activate'), event('select')],
+          events: [event('activate'), event('before-select', { cancelable: true })],
           props: [prop('active', 'string')],
           tree: [region('default')],
         })",
@@ -337,10 +337,10 @@ fn carries_a_value_in_the_target_where_the_element_that_sends_the_event_has_one(
     let tab = headless_family(
         "tab",
         "export default headless('tab', {
-          events: [event('select')],
+          events: [event('before-select', { cancelable: true })],
           item: item('tabs'),
           props: [prop('value', 'string', { default: '' })],
-          tree: [pressable('tab', { sends: 'select' }, [region('default')])],
+          tree: [pressable('tab', { sends: 'before-select' }, [region('default')])],
         })",
     );
     /* Each handler, and whether its target carries a value. */
@@ -351,12 +351,12 @@ fn carries_a_value_in_the_target_where_the_element_that_sends_the_event_has_one(
             .map(|one| format!("{} {}", one.handler, one.target))
             .collect()
     };
-    /* A tab's select bubbles to the set on the web, so its target is the tab. */
+    /* A tab's before-select bubbles to the set on the web, so its target is the tab. */
     assert_eq!(
         targets(&set, &[&tab]),
-        ["onActivate false", "onSelect true"]
+        ["onActivate false", "onBeforeSelect true"]
     );
-    assert_eq!(targets(&tab, &[]), ["onSelect true"]);
+    assert_eq!(targets(&tab, &[]), ["onBeforeSelect true"]);
     /* A button's value and its form's `invalid` are the web's own. */
     let button = headless_family(
         "button",

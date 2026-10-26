@@ -37,7 +37,8 @@ export default headless('loader', {
     prop('delay', 'number', { default: 0 }),
     prop('for', 'string', { default: '', platform: 'web' }),
     prop('idle', 'boolean', { default: false }),
-    prop('label', 'string', { default: 'Loading' }),
+    prop('fallback-label', 'string', { default: 'Loading' }),
+    prop('label', 'string', { default: '' }),
   ],
   states: ['settled', 'waiting'],
   tree: [

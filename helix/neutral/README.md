@@ -137,6 +137,17 @@ stand in the host's grid on the web.
 `helix family check` also holds each element with a part tree to what the
 styled manifest says it has: its attributes, events, slots, parts, and states.
 
+Events follow the web's grammar. A request a handler may refuse is
+`before-<verb>` and declared `cancelable`, and the plain verb, declared
+without it, is the notification once the change stood, as a menu row sends
+`before-select` and then `select`. Where an element declares both, the native
+runtime sends the notification once nothing refused the request, before
+anything the change does, as a menu's close. An element that declares the
+request alone sends nothing after it, as a tab's `before-select` is followed
+by its tab set's `activate`. An attribute the web keeps for one release under
+an old name, as List's `empty-label` beside `empty-text`, is declared with
+`platform: 'web'`, so a phone's component has only the new name.
+
 The elements of one family find each other through a collection. A tab set
 holds which tab is chosen, and its tabs and panels join it by `value`: the
 web element reads its children, and the native runtime joins them through
@@ -288,8 +299,8 @@ as a megamenu is `current` in its navigation while `derive('megamenu-current')`
 finds the page among what is passed into it, so it holds while its panel is
 closed. A set whose items mark themselves may close its element as an item
 is chosen, with its collection's `closes`, whose `event` then names the
-items' own event, as a megamenu closes once a Megamenu Item's `select`
-stands. An element may join a set as an item and hold a set of its own, as
+items' own event, as a megamenu closes once a Megamenu Item's
+`before-select` stands. An element may join a set as an item and hold a set of its own, as
 a megamenu is a navigation's destination and holds its panel's items.
 
 A collection's `disclosed` names the state the element is in while an
@@ -321,7 +332,7 @@ radio and keep the answer as it is, while the arrow keys still move focus.
 
 A checkbox group's collection says `toggles: true`: its items turn on their
 own, and the chosen prop holds the values of those that are on. A box's turn
-asks its own `before-toggle`, then the group's `before-change`, with the
+asks its own `before-check`, then the group's `before-change`, with the
 whole set that would result, and either refusal keeps the box as it was. Each
 box is a stop of its own, so the collection says nothing of keys, and the
 native runtime hosts the set as `toggle-set`. Its `all` names the box that
@@ -336,7 +347,7 @@ choice names its props in `item()`:
 
 ```ts
 item('menu', {
-  before: 'before-toggle',
+  before: 'before-check',
   checkable: 'checkable',
   checked: 'checked',
   chooses: true,
@@ -353,7 +364,7 @@ item('menu', {
 
 A set that mixes may close its element as an item is chosen, as a speed
 dial and a menu do: its collection's `closes` names the item's event and
-the element's prop that must hold, `{ event: 'select', while:
+the element's prop that must hold, `{ event: 'before-select', while:
 'close-on-select' }`, and an item's own `closes` names its prop that wins
 where it holds a value. A choice that stands closes the element's toggle,
 and a row that opens a page closes nothing. The set's `after` events are
@@ -373,7 +384,7 @@ page names the region its page is passed into with `item()`'s `page`:
 ```ts
 stack({
   back: 'back',
-  before: 'navigate',
+  before: 'before-navigate',
   drilled: 'drilled',
   label: 'page-label',
   page: 'page',
@@ -956,8 +967,9 @@ menu, and an item an element draws of its own set joins no set, as a
 checkbox group's select-all is no box of the group. `bubbles` names the
 drawn element's events, separated by spaces, that reach the element around
 as its own, as a composed event leaves a shadow root on the web: a crumb's
-fold `bubbles: 'select'`, so choosing a row of its menu sends the crumb's
-`select`, and a handler that refuses it refuses the row's.
+fold `bubbles: 'before-select select'`, so choosing a row of its menu sends
+the crumb's `before-select` and `select`, and a handler that refuses the
+request refuses the row's.
 
 A `live()` node holds words a screen reader is told, its `says`: a live
 region on the web, and an announcement on a phone. A node that `follows` a

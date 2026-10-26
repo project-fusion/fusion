@@ -35,10 +35,10 @@ export const MEGAMENU: readonly Scenario[] = [
     family: 'megamenu',
     intents: [
       { kind: 'open' },
-      { event: 'select', kind: 'refuse' },
+      { event: 'before-select', kind: 'refuse' },
       { item: '#documents', kind: 'press' },
     ],
-    name: 'a refused select keeps the link closed and the panel open',
+    name: 'a refused before-select keeps the link closed and the panel open',
     setup: megamenu(),
   },
   {

@@ -9,7 +9,7 @@ import { environment } from '../../capabilities/environment/index.js'
 import { chordParts } from '../chord/chord.js'
 import { keyNames } from '../chord/key-names.js'
 import type { Derivation } from '../derivations/derivations.js'
-import { holdsRows, wordIn } from '../drilldown/drilldown-derivations.js'
+import { holdsRows, labelOr, wordIn } from '../drilldown/drilldown-derivations.js'
 import { textOf } from '../number-format/props.js'
 import { onApple } from '../platform/platform.js'
 
@@ -22,8 +22,11 @@ export const SPEED_DIAL_LONG_PRESS = 'Long press or press Alt+Down to show the a
 /** `speed-dial-holds`: whether a long press on the trigger opens the actions, under `open-on="long-press"`. */
 export const speedDialHolds: Derivation = (props) => textOf(props['open-on']) === 'long-press'
 
-/** `speed-dial-name`: what the drawn trigger and the actions are named by, `label` or Actions. */
-export const speedDialName: Derivation = (props) => wordIn(props, TAG, 'label', 'label', 'Actions')
+/**
+ * `speed-dial-name`: what the drawn trigger and the actions are named by,
+ * `label`, then `fallback-label` or Actions.
+ */
+export const speedDialName: Derivation = (props) => labelOr(props, TAG, 'Actions')
 
 /**
  * `speed-dial-hold-hint`: the words the trigger is described by under

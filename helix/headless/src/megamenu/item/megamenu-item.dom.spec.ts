@@ -66,17 +66,19 @@ describe('a megamenu item', () => {
     expect(item.getAttribute('current')).toBe('location')
   })
 
-  test('sends `select` with its `href` on a plain press, and keeps the link where it was refused', async () => {
+  test('sends `before-select` with its `href` on a plain press, and keeps the link where it was refused', async () => {
     const item = await mount(
       '<helix-headless-megamenu-item href="#docs">Docs</helix-headless-megamenu-item>',
     )
     const told: unknown[] = []
-    item.addEventListener('helix-select', (event) => told.push((event as CustomEvent).detail.value))
+    item.addEventListener('helix-before-select', (event) =>
+      told.push((event as CustomEvent).detail.value),
+    )
     const click = new MouseEvent('click', { bubbles: true, cancelable: true, composed: true })
     link(item)?.dispatchEvent(click)
     expect(told).toEqual(['#docs'])
     expect(click.defaultPrevented).toBe(false)
-    item.addEventListener('helix-select', (event) => event.preventDefault())
+    item.addEventListener('helix-before-select', (event) => event.preventDefault())
     const refused = new MouseEvent('click', { bubbles: true, cancelable: true, composed: true })
     link(item)?.dispatchEvent(refused)
     expect(refused.defaultPrevented).toBe(true)

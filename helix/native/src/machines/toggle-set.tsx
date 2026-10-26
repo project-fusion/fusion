@@ -269,7 +269,7 @@ export const useToggleSet = (
                   disabled: off,
                   indeterminate: every.indeterminate,
                   label: typeof words === 'string' ? words : '',
-                  onBeforeToggle: all,
+                  onBeforeCheck: all,
                 },
               },
             },

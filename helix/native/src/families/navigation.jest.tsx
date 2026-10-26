@@ -169,21 +169,25 @@ describe('the generated Navigation', () => {
     expect(screen.queryByRole('link', { name: 'Activity' })).toBeNull()
   })
 
-  test('sends `select` with the `href` as its value, then opens the link, and chooses nothing', async () => {
+  test('asks with `before-select` and the `href` as its value, says `select`, then opens the link, and chooses nothing', async () => {
     const told: unknown[] = []
     await render(
       <Sections
-        activity={{ onSelect: (event) => told.push((event.detail as { value: unknown }).value) }}
+        activity={{
+          onBeforeSelect: (event) =>
+            told.push(`before ${(event.detail as { value: unknown }).value}`),
+          onSelect: (event) => told.push(`select ${(event.detail as { value: unknown }).value}`),
+        }}
       />,
     )
     await fireEvent.press(screen.getByRole('link', { name: 'Activity' }))
-    expect(told).toEqual(['/two'])
+    expect(told).toEqual(['before /two', 'select /two'])
     expect(opened.opened).toEqual(['/two'])
     expect(reached('Overview')?.props.accessibilityValue).toEqual({ text: 'Current page' })
   })
 
-  test('opens nothing where a handler refused `select`', async () => {
-    await render(<Sections activity={{ onSelect: (event) => event.preventDefault() }} />)
+  test('opens nothing where a handler refused `before-select`', async () => {
+    await render(<Sections activity={{ onBeforeSelect: (event) => event.preventDefault() }} />)
     await fireEvent.press(screen.getByRole('link', { name: 'Activity' }))
     expect(opened.opened).toEqual([])
   })

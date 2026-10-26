@@ -62,16 +62,20 @@ export default headless('list', {
     /* The platform's own name, as a form control sends it. */
     event('change', { bare: true }),
     event('load-more'),
-    event('reorder', { cancelable: true, detail: ['keys'] }),
+    event('reorder', { detail: ['keys'] }),
   ],
   props: [
     prop('disabled-behavior', ['all', 'selection']),
-    prop('empty-label', 'string', { default: '' }),
+    /* The old name of `empty-text`, which the web reads for one release. */
+    prop('empty-label', 'string', { platform: 'web' }),
+    prop('empty-text', 'string', { default: '' }),
     prop('kind', ['default', 'description', 'ordered', 'unordered']),
     prop('label', 'string', { default: '' }),
     prop('load-more', 'boolean', { default: false }),
     prop('loading', 'boolean', { default: false }),
-    prop('loading-label', 'string', { default: 'Loading more' }),
+    /* The old name of `loading-text`, which the web reads for one release. */
+    prop('loading-label', 'string', { platform: 'web' }),
+    prop('loading-text', 'string', { default: 'Loading more' }),
     prop('reorderable', 'boolean', { default: false }),
     prop('reversed', 'boolean', { default: false }),
     prop('selection-behavior', ['replace', 'toggle'], { default: 'toggle' }),
@@ -92,13 +96,13 @@ export default headless('list', {
     when(
       'loading',
       box('loading', { role: 'listitem' }, [
-        region('loading', {}, [text('loading-words', { says: bind('loading-label') })]),
+        region('loading', {}, [text('loading-words', { says: bind('loading-text') })]),
       ]),
     ),
     when(
       'empty',
-      box('empty', { hidden: not('empty-label'), role: 'listitem' }, [
-        region('empty', {}, [text('empty-words', { says: bind('empty-label') })]),
+      box('empty', { hidden: not('empty-text'), role: 'listitem' }, [
+        region('empty', {}, [text('empty-words', { says: bind('empty-text') })]),
       ]),
     ),
     /* A pointer's move, and what it says on the way, are the web's for now. */

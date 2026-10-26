@@ -17,7 +17,7 @@ export interface Stack {
   /**
    * The cancelable event sent before a move into a page or back out of one,
    * its detail the `value` of the row whose page would show, empty for the
-   * top page, as a drilldown's `navigate`.
+   * top page, as a drilldown's `before-navigate`.
    */
   readonly before?: string
   /**

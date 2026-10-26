@@ -83,7 +83,7 @@ export default headless('meter', {
     /* JSON on the web's attribute, such as `{"style":"unit","unit":"gigabyte"}`. */
     prop('format-options', 'object'),
     prop('high', 'number'),
-    prop('label', 'string', { default: 'Meter' }),
+    prop('label', 'string', { default: '' }),
     prop('live', 'boolean', { default: false }),
     prop('live-label', 'string', { default: '{reading}, {band}' }),
     prop('locale', 'string', { default: '' }),

@@ -23,7 +23,7 @@ const prop = (name: string, value?: boolean | string) => ({
 const checkbox = {
   api: {
     events: [
-      { cancelable: true, detail: ['checked'], name: 'before-toggle' },
+      { cancelable: true, detail: ['checked'], name: 'before-check' },
       { bare: true, cancelable: false, detail: [], name: 'change' },
     ],
     props: [
@@ -37,7 +37,7 @@ const checkbox = {
     states: [],
     toggle: {
       after: 'change',
-      before: 'before-toggle',
+      before: 'before-check',
       checked: 'checked',
       initial: 'default-checked',
       mixed: 'indeterminate',
@@ -52,7 +52,7 @@ const checkbox = {
     {
       bind: {
         after: { event: 'change' },
-        before: { event: 'before-toggle' },
+        before: { event: 'before-check' },
         checked: { prop: 'checked' },
         disabled: { prop: 'disabled' },
         mixed: { prop: 'indeterminate' },
@@ -146,7 +146,7 @@ describe('a toggle bound through its form', () => {
     const heard: string[] = []
     await render(
       <Checkbox
-        onBeforeToggle={(event: Turn) =>
+        onBeforeCheck={(event: Turn) =>
           heard.push(`before ${event.detail.checked} from ${event.target.checked}`)
         }
         onChange={(event: Turn) =>
@@ -173,7 +173,7 @@ describe('a toggle bound through its form', () => {
     const heard: string[] = []
     await render(
       <Checkbox
-        onBeforeToggle={(event: Turn) => event.preventDefault()}
+        onBeforeCheck={(event: Turn) => event.preventDefault()}
         onChange={() => heard.push('change')}
       >
         Terms
@@ -225,7 +225,7 @@ describe('a toggle bound through its form', () => {
     for (const flags of [{ readonly: true }, { disabled: true }]) {
       const heard: string[] = []
       const view = await render(
-        <Checkbox {...flags} onBeforeToggle={() => heard.push('before')}>
+        <Checkbox {...flags} onBeforeCheck={() => heard.push('before')}>
           Terms
         </Checkbox>,
       )

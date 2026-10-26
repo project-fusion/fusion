@@ -88,7 +88,7 @@ export const TABS: readonly Scenario[] = [
   {
     family: 'tabs',
     intents: [
-      { event: 'select', kind: 'refuse' },
+      { event: 'before-select', kind: 'refuse' },
       { item: 'b', kind: 'press' },
       { item: 'a', kind: 'focus' },
       { key: 'ArrowRight', kind: 'key' },
@@ -120,7 +120,7 @@ export const TABS: readonly Scenario[] = [
   {
     family: 'tabs',
     intents: [
-      { event: 'select', kind: 'refuse' },
+      { event: 'before-select', kind: 'refuse' },
       { item: 'b', kind: 'press' },
     ],
     name: "a refused tab's choice keeps its link closed",

@@ -16,9 +16,10 @@ import {
  * A speed dial action's headless tier: a round mark and its name, which a
  * press chooses.
  *
- * **A press sends `select`** with the action's `value`, which a handler may
- * refuse, and its dial closes once it stands. An action with an `href`
- * follows its link once the event stands: on the web the browser follows
+ * **A press asks with `before-select`** and the action's `value`, which a
+ * handler may refuse, then says `select`, and its dial closes once it
+ * stands. An action with an `href` follows its link once the request
+ * stands: on the web the browser follows
  * it, and on a phone the app's open-link. `disabled` keeps it from being
  * chosen.
  *
@@ -39,7 +40,10 @@ export default headless('speed-dial-item', {
     'shortcut-words': derive('speed-dial-shortcut'),
     'shows-shortcut': derive('speed-dial-shows-shortcut'),
   },
-  events: [event('select', { cancelable: true, detail: ['value'] })],
+  events: [
+    event('before-select', { cancelable: true, detail: ['value'] }),
+    event('select', { detail: ['value'] }),
+  ],
   item: item('speed-dial', { chooses: true }),
   props: [
     prop('disabled', 'boolean', { default: false }),
@@ -60,7 +64,7 @@ export default headless('speed-dial-item', {
         disabled: bind('disabled'),
         href: bind('href'),
         role: 'menuitem',
-        sends: 'select',
+        sends: 'before-select',
       },
       [
         box('icon', {}, [region('icon')]),

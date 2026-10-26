@@ -144,7 +144,7 @@ describe('the generated Checkbox', () => {
     const told: string[] = []
     await render(
       <Checkbox
-        onBeforeToggle={(event) => told.push(`before ${event.detail.checked}`)}
+        onBeforeCheck={(event) => told.push(`before ${event.detail.checked}`)}
         onChange={(event) => told.push(`change ${event.target.value}`)}
         onInput={() => told.push('input')}
         value="terms"
@@ -178,7 +178,7 @@ describe('the generated Checkbox', () => {
     const told: string[] = []
     await render(
       <Checkbox
-        onBeforeToggle={(event) => event.preventDefault()}
+        onBeforeCheck={(event) => event.preventDefault()}
         onChange={() => told.push('change')}
       >
         Terms
@@ -215,7 +215,7 @@ describe('the generated Checkbox', () => {
   test('takes no press while read-only', async () => {
     const told: string[] = []
     await render(
-      <Checkbox defaultChecked onBeforeToggle={() => told.push('before')} readonly>
+      <Checkbox defaultChecked onBeforeCheck={() => told.push('before')} readonly>
         Terms
       </Checkbox>,
     )
@@ -274,7 +274,7 @@ describe('a mixed checkbox', () => {
     await render(
       <Checkbox
         indeterminate
-        onBeforeToggle={(event) => told.push(`before ${event.detail.checked}`)}
+        onBeforeCheck={(event) => told.push(`before ${event.detail.checked}`)}
       >
         Select all
       </Checkbox>,
@@ -297,7 +297,7 @@ describe('a mixed checkbox', () => {
 
   test('stays mixed where a handler refuses the press', async () => {
     await render(
-      <Checkbox indeterminate onBeforeToggle={(event) => event.preventDefault()}>
+      <Checkbox indeterminate onBeforeCheck={(event) => event.preventDefault()}>
         Select all
       </Checkbox>,
     )

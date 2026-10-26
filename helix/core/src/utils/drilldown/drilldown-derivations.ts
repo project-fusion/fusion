@@ -28,6 +28,14 @@ export const wordIn = (
   return typeof registered === 'string' ? registered : english
 }
 
+/**
+ * An element's name: its `label`, then `fallback-label` or the word
+ * registered for it under `tag`, then the English, as a web element reads
+ * `label || fallbackLabel`.
+ */
+export const labelOr = (props: DerivationProps, tag: string, english: string): string =>
+  textOf(props.label) || wordIn(props, tag, 'fallback-label', 'fallbackLabel', english)
+
 /** Whether content passed into a region holds anything: a node, or words. */
 export const holdsRows = (content: unknown): boolean => {
   if (Array.isArray(content)) {
@@ -68,9 +76,8 @@ export const drilldownEmpty: Derivation = (props) =>
 export const drilldownBackName: Derivation = (props) =>
   wordIn(props, TAG, 'back-label', 'backLabel', 'Back')
 
-/** `drilldown-name`: what the drilldown is named by, `label` or Navigation. */
-export const drilldownName: Derivation = (props) =>
-  wordIn(props, TAG, 'label', 'label', 'Navigation')
+/** `drilldown-name`: what the drilldown's top page is named by, `label`, then `fallback-label` or Navigation. */
+export const drilldownName: Derivation = (props) => labelOr(props, TAG, 'Navigation')
 
 /**
  * `drilldown-landmark`: the host's role, a navigation landmark under
@@ -79,9 +86,13 @@ export const drilldownName: Derivation = (props) =>
 export const drilldownLandmark: Derivation = (props) =>
   props.navigation === true ? 'navigation' : ''
 
-/** `drilldown-landmark-name`: the landmark's name under `navigation`, and none otherwise. */
+/**
+ * `drilldown-landmark-name`: the landmark's name under `navigation`, its
+ * `label` alone, and none otherwise. A page with one navigation landmark
+ * needs no name for it, so `fallback-label` names none.
+ */
 export const drilldownLandmarkName: Derivation = (props) =>
-  props.navigation === true ? (drilldownName(props) as string) : ''
+  props.navigation === true ? textOf(props.label) : ''
 
 /** `drilldown-top-name`: the top page's name, the drilldown's own unless it is a landmark. */
 export const drilldownTopName: Derivation = (props) =>

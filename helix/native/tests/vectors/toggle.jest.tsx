@@ -22,7 +22,7 @@ import type { Family } from '../../src/style/form'
 const FORM = {
   api: {
     events: [
-      { cancelable: true, detail: ['checked'], name: 'before-toggle' },
+      { cancelable: true, detail: ['checked'], name: 'before-check' },
       { bare: true, cancelable: false, detail: [], name: 'change' },
     ],
     props: [{ name: 'checked' }, { name: 'disabled' }, { name: 'mixed' }, { name: 'readonly' }],
@@ -37,7 +37,7 @@ const FORM = {
 const USE: MachineUse = {
   bind: {
     after: { event: 'change' },
-    before: { event: 'before-toggle' },
+    before: { event: 'before-check' },
     checked: { prop: 'checked' },
     disabled: { prop: 'disabled' },
     mixed: { prop: 'mixed' },
@@ -73,7 +73,7 @@ describe('the native toggle host, held to the toggle vectors', () => {
           checked={from.checked}
           disabled={from.disabled}
           mixed={from.mixed}
-          onBeforeToggle={(event: HelixEvent) => {
+          onBeforeCheck={(event: HelixEvent) => {
             heard.push('toggle')
             if (refuse) {
               event.preventDefault()

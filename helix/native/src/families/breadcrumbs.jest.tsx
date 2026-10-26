@@ -151,22 +151,35 @@ describe('the generated Breadcrumbs', () => {
     expect(reached('Docs')).toBeNull()
   })
 
-  test('sends `select` with the `href` as its value, then opens the link through open-link', async () => {
+  test('asks with `before-select` and the `href` as its value, says `select`, then opens the link through open-link', async () => {
     const told: unknown[] = []
     await render(
       <Trail
-        docs={{ onSelect: (event) => told.push((event.detail as { value: unknown }).value) }}
+        docs={{
+          onBeforeSelect: (event) =>
+            told.push(`before ${(event.detail as { value: unknown }).value}`),
+          onSelect: (event) => told.push(`select ${(event.detail as { value: unknown }).value}`),
+        }}
       />,
     )
     await fireEvent.press(screen.getByRole('link', { name: 'Docs' }))
-    expect(told).toEqual(['/docs'])
+    expect(told).toEqual(['before /docs', 'select /docs'])
     expect(opened.opened).toEqual(['/docs'])
   })
 
-  test('opens nothing where a handler refused `select`', async () => {
-    await render(<Trail docs={{ onSelect: (event) => event.preventDefault() }} />)
+  test('opens nothing, and says nothing, where a handler refused `before-select`', async () => {
+    const told: unknown[] = []
+    await render(
+      <Trail
+        docs={{
+          onBeforeSelect: (event) => event.preventDefault(),
+          onSelect: () => told.push('select'),
+        }}
+      />,
+    )
     await fireEvent.press(screen.getByRole('link', { name: 'Docs' }))
     expect(opened.opened).toEqual([])
+    expect(told).toEqual([])
   })
 
   test('hides each separator from screen readers, and draws none before the first crumb', async () => {

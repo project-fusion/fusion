@@ -36,13 +36,18 @@ const wordOf = (
   return typeof registered === 'string' ? registered : english
 }
 
-/** `announcement-label`: the region's name, `label`, or the word registered for it. */
+/**
+ * `announcement-label`: the region's name, `label` where it is set, even
+ * empty, and `fallback-label` or the word registered for it where it is not.
+ */
 export const announcementLabel: Derivation = (props) =>
-  wordOf(props, 'label', 'label', ANNOUNCEMENT_LABEL)
+  props.label === undefined
+    ? wordOf(props, 'fallback-label', 'fallbackLabel', ANNOUNCEMENT_LABEL)
+    : textOf(props.label)
 
 /**
  * `announcement-role`: `region` while the announcement has a name, and none
- * once `label` is empty, as the web leaves it no region.
+ * once `label` is set empty, as the web leaves it no region.
  */
 export const announcementRole: Derivation = (props) =>
   String(announcementLabel(props) ?? '').trim() === '' ? '' : 'region'

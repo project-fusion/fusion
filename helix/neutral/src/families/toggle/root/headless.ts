@@ -5,11 +5,11 @@ import { bind, event, headless, item, pressable, prop, region, toggle } from '..
  * Toggle Group.
  *
  * **On its own, it is a toggle button.** A press, Enter, or Space sends
- * `before-toggle` with the state it turns to in `checked`, which a handler can
+ * `before-check` with the state it turns to in `checked`, which a handler can
  * refuse, then turns and sends `change`. `selected` holds whether it is
  * pressed, and a phone announces it as a toggle button, pressed or not.
  *
- * **In a Toggle Group, a press chooses it**, and it sends `select`, which a
+ * **In a Toggle Group, a press chooses it**, and it sends `before-select`, which a
  * handler can refuse, in place of turning: the item joins the group as a
  * set's items do, and turns as a toggle only while it has joined none. A
  * phone announces it as a radio where the group chooses one, and as a toggle
@@ -25,9 +25,9 @@ import { bind, event, headless, item, pressable, prop, region, toggle } from '..
  */
 export default headless('toggle', {
   events: [
-    event('before-toggle', { cancelable: true, detail: ['checked'] }),
+    event('before-check', { cancelable: true, detail: ['checked'] }),
     event('change', { bare: true }),
-    event('select', { cancelable: true, detail: ['value'] }),
+    event('before-select', { cancelable: true, detail: ['value'] }),
   ],
   item: item('toggle-group', { chooses: true }),
   props: [
@@ -36,11 +36,17 @@ export default headless('toggle', {
     prop('value', 'string', { default: '' }),
   ],
   states: ['pressed', 'selected', 'settled'],
-  toggle: toggle({ after: 'change', before: 'before-toggle', checked: 'selected' }),
+  toggle: toggle({ after: 'change', before: 'before-check', checked: 'selected' }),
   tree: [
     pressable(
       'item',
-      { chooses: true, disabled: bind('disabled'), role: 'button', sends: 'select', toggles: true },
+      {
+        chooses: true,
+        disabled: bind('disabled'),
+        role: 'button',
+        sends: 'before-select',
+        toggles: true,
+      },
       [region('start'), region('default'), region('end')],
     ),
   ],

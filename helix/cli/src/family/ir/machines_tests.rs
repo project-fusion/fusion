@@ -121,9 +121,9 @@ fn an_element_with_no_behavior_runs_no_machine() {
 fn an_element_that_turns_runs_toggle_bound_to_the_pressable_that_toggles_it() {
     let checkbox = family(
         "export default headless('checkbox', {
-          events: [event('change', { bare: true }), event('before-toggle', { cancelable: true, detail: ['checked'] })],
+          events: [event('change', { bare: true }), event('before-check', { cancelable: true, detail: ['checked'] })],
           props: [prop('checked', 'boolean'), prop('default-checked', 'boolean'), prop('disabled', 'boolean'), prop('indeterminate', 'boolean'), prop('readonly', 'boolean')],
-          toggle: toggle({ after: 'change', before: 'before-toggle', checked: 'checked', initial: 'default-checked', mixed: 'indeterminate', readonly: 'readonly' }),
+          toggle: toggle({ after: 'change', before: 'before-check', checked: 'checked', initial: 'default-checked', mixed: 'indeterminate', readonly: 'readonly' }),
           tree: [pressable('control', { disabled: bind('disabled'), toggles: true }, [region('default')])],
         })",
     );
@@ -133,7 +133,7 @@ fn an_element_that_turns_runs_toggle_bound_to_the_pressable_that_toggles_it() {
         MachineUse {
             bind: bound(&[
                 ("after", Bound::Event("change".to_owned())),
-                ("before", Bound::Event("before-toggle".to_owned())),
+                ("before", Bound::Event("before-check".to_owned())),
                 ("checked", Bound::Prop("checked".to_owned())),
                 ("disabled", Bound::Prop("disabled".to_owned())),
                 ("mixed", Bound::Prop("indeterminate".to_owned())),
@@ -150,8 +150,8 @@ fn an_element_that_turns_runs_toggle_bound_to_the_pressable_that_toggles_it() {
 fn a_toggle_the_runtime_holds_binds_what_holds_it_and_no_prop() {
     let motion = family(
         "export default headless('motion-toggle', {
-          events: [event('change', { bare: true }), event('before-toggle', { cancelable: true, detail: ['checked'] })],
-          toggle: toggle({ after: 'change', before: 'before-toggle', held: 'page-motion' }),
+          events: [event('change', { bare: true }), event('before-check', { cancelable: true, detail: ['checked'] })],
+          toggle: toggle({ after: 'change', before: 'before-check', held: 'page-motion' }),
           tree: [pressable('button', { toggles: true }, [])],
         })",
     );
@@ -160,7 +160,7 @@ fn a_toggle_the_runtime_holds_binds_what_holds_it_and_no_prop() {
         MachineUse {
             bind: bound(&[
                 ("after", Bound::Event("change".to_owned())),
-                ("before", Bound::Event("before-toggle".to_owned())),
+                ("before", Bound::Event("before-check".to_owned())),
                 ("held", Bound::Held("page-motion".to_owned())),
                 ("part", Bound::Part("button".to_owned())),
             ]),
