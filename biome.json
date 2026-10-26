@@ -29,6 +29,8 @@
       "!**/.probe",
       "!helix/icons/raw",
       "!helix/templates/templates",
+      "!helix/cem/typings/*/src/*.svelte",
+      "!helix/cem/typings/*/src/*.vue",
       "!.claude/worktrees"
     ]
   },

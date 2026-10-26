@@ -1,0 +1,25 @@
+{
+  // The strictest options a consumer sets: `skipLibCheck` off, so the
+  // declarations themselves are checked, and `exactOptionalPropertyTypes`, which
+  // tells `?: T` apart from `?: T | undefined`.
+  //
+  // `strictTemplates` makes an unknown prop or event on a tag an error. Without
+  // it, Vue passes the name through as an attribute, and the misspelled cases
+  // compile.
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": true,
+    "lib": ["DOM", "DOM.Iterable", "ES2023"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "skipLibCheck": false,
+    "strict": true,
+    "target": "ES2023",
+    "types": [],
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue"],
+  "vueCompilerOptions": {
+    "strictTemplates": true
+  }
+}

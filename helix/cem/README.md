@@ -35,3 +35,31 @@ any TypeScript and so never carried the version pin that replacing the
 analyzer ended. The linter it also held is `helix component`'s `conventions`
 rule now, which is what [the JSDoc contract](../CONVENTIONS.md#jsdoc-contract)
 is checked by.
+
+## The typings are tested in each framework
+
+`typings/` holds a project per framework: React, Preact, and Solid on `tsc`, Vue
+on `vue-tsc`, and Svelte on `svelte-check`. `bun run smoke:typings` packs the
+packages, installs them into each project outside the repository, and checks it
+with `skipLibCheck` off.
+
+Each project writes good usage, and bad usage under a guard:
+
+- a value outside an enum
+- a misspelled property, and a misspelled event
+- a `detail` field the event does not carry
+- a word for a numeric attribute
+- an `@internal` coordination member, `focusable`
+- a removed name, `helix-toggle` and `HelixToggleEvent`
+
+A guarded line that compiles fails the run, and so does an error on any other
+line. `bun run smoke:typings --list` prints every guarded line with the error it
+raises. [run-typings-test.mjs](../../fusion/scripts/run-typings-test.mjs) says how
+the guards are judged.
+
+**A misspelled event written as a JSX prop compiles.** TypeScript checks
+a JSX attribute whose name holds a dash only when the element's props declare
+that name, so `onhelix-before-chek` and Solid's `on:helix-before-chek` compile on
+every tag. The JSX
+projects catch the misspelling through `addEventListener`, which reads the event
+map. Vue, with `strictTemplates`, and Svelte refuse it in the template.
