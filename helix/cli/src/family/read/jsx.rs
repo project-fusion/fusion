@@ -49,13 +49,10 @@ mod tests;
 const TAGS: &[(&str, &str, Option<&str>)] = &[
     ("Announce", "live", None),
     ("Circle", "box", Some("circle")),
-    ("Ellipse", "box", Some("ellipse")),
     ("Image", "image", None),
     ("Layer", "layer", None),
-    ("Line", "box", Some("line")),
     ("Path", "box", Some("path")),
     ("Pressable", "pressable", None),
-    ("Rect", "box", Some("rect")),
     ("Repeat", "repeat", None),
     ("Slot", "region", None),
     ("Svg", "box", None),

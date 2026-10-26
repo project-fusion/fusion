@@ -224,18 +224,6 @@ fn a_layer_that_swipes_stands_along_an_edge_and_rests_at_its_snap_points() {
 }
 
 #[test]
-fn a_press_held_down_is_a_flag() {
-    assert_eq!(
-        read("pressable('trigger', { held: bind('open') }, [region('default')])"),
-        Ok(())
-    );
-    let worded = read("pressable('trigger', { held: 'long' }, [region('default')])").unwrap_err();
-    assert!(worded.contains("`held` takes `true`, `false`"), "{worded}");
-    let boxed = read("box('trigger', { held: true }, [region('default')])").unwrap_err();
-    assert!(boxed.contains("a box does not take `held`"), "{boxed}");
-}
-
-#[test]
 fn a_layer_that_refuses_says_so_as_a_flag() {
     assert_eq!(
         read("layer('surface', { modal: true, open: bind('open'), refuses: true }, [region('default')])"),

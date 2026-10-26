@@ -46,11 +46,11 @@ export interface Notices {
  * One message of the `notices` around it, as a toast item in its region:
  *
  * ```ts
- * notice: { held: 'waiting', part: 'item' }
+ * notice: { deferred: 'waiting', part: 'item' }
  * ```
  *
  * **It waits while the element around holds it back** past its `maxVisible`,
- * in the state `held` names, which a countdown's `waitWhile` reads, so its clock starts as
+ * in the state `deferred` names, which a countdown's `waitWhile` reads, so its clock starts as
  * it shows. **A touch swipes its `part` toward the edge the element around
  * names**, and past halfway, or quickly, asks its toggle to close, as its
  * dismiss button does. A refused close springs it back. Outside any
@@ -60,5 +60,5 @@ export interface Notice {
   /** The part a touch swipes. */
   readonly part: string
   /** The state that holds while the element around holds the message back. */
-  readonly held: string
+  readonly deferred: string
 }

@@ -383,11 +383,5 @@ export const pick = (
  */
 export const field = (name: string): { readonly field: string } => ({ field: name })
 
-/**
- * Where a copy stands among the copies a repeat draws, counting from 0.
- * `helix family` refuses one outside a repeat.
- */
-export const index = (): { readonly index: true } => ({ index: true })
-
 /** An attribute that is set while the prop `name` is not. */
 export const not = (name: string): { readonly not: string } => ({ not: name })

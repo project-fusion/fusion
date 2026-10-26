@@ -262,7 +262,7 @@ const NOTICES: &[Field] = &[
     ("swipeDirection", "toward", Name),
 ];
 
-const NOTICE: &[Field] = &[("held", "waiting", Name), ("part", "part", Part)];
+const NOTICE: &[Field] = &[("deferred", "waiting", Name), ("part", "part", Part)];
 
 const TOTAL: &[Field] = &[
     ("holds", "holds", Name),
