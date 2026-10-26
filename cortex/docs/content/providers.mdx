@@ -77,9 +77,16 @@ assert!(!provider.is_local());
 
 ## Take only the clients you call
 
-Each client is a feature, and the default takes all five and `http`. Turn the
-default off and name the ones you call, so your build compiles only those
+Each client is a feature, and the default takes all of them and `http`. Turn
+the default off and name the ones you call, so your build compiles only those
 clients.
+
+## Embed text
+
+The `ollama` and `gemini` features also add an embedding client, and the
+`embeddings` feature adds one for OpenAI's `/v1/embeddings` and the servers that
+copy it. Anthropic offers no embeddings API. The Scoring memory by meaning
+guide shows how to embed memory with a local model.
 
 ```toml
 [dependencies]

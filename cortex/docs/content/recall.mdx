@@ -86,11 +86,12 @@ assert_eq!(fusion_cortex_recall::estimate(&message), 108);
 
 ## Retrieval is a strategy
 
-A scorer ranks Engram's facts against a query. The one Cortex ships counts the
-words a fact shares with the query. A fact that shares none still ranks, at
-half its confidence after decay, because what a project's sessions learned is
-often about the project and not the task. Scoring by vector is a second scorer,
-and a fact already carries the field it would read.
+A scorer ranks Engram's facts against a query. `Overlap` counts the words a
+fact shares with the query. `Vector` compares the query's embedding with each
+fact's, and `Weighted` combines the two, as the Scoring memory by meaning guide
+describes. A fact that scores nothing still ranks, at half its confidence after
+decay, because what a project's sessions learned is often about the project and
+not the task.
 
 You pass the scopes the caller may read, and Recall places no fact outside
 them, however well it scores. A scope matches only itself, so a caller that may

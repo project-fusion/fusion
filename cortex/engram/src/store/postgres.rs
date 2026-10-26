@@ -1,10 +1,23 @@
 //! Memory in Postgres.
+//!
+//! **Vectors are scored by `pgvector` where the database has it, and in Rust
+//! where it does not.** [`Postgres::connect`] decides when it opens a
+//! database. Where the `vector` extension is installed, or the role may
+//! create it, the store adds `embedding_vector`, a `vector` column generated
+//! from `embedding`, and `nearest` orders by `<=>` under an HNSW index for
+//! each model. Elsewhere the store keeps `real[]` alone and ranks in Rust, as
+//! `SQLite` does. The column is the record of the choice: a schema that has it
+//! scores with `pgvector` from then on, and a schema without it tries again at
+//! the next open, so installing the extension later takes effect then.
 
-use std::collections::HashMap;
+use std::{
+    collections::{HashMap, HashSet},
+    sync::{Arc, Mutex},
+};
 
 use async_trait::async_trait;
 use chrono::Utc;
-use fusion_cortex_core::{postgres::Database, storage, Error, Id, Result};
+use fusion_cortex_core::{embed::Embedding, postgres::Database, storage, Error, Id, Result};
 use sqlx::{postgres::PgRow, PgConnection, Row};
 
 use super::Store;
@@ -59,9 +72,29 @@ const MEMORY: &str = "
     CREATE INDEX IF NOT EXISTS reinforcements_by_episode ON reinforcements (episode);
 ";
 
+/// The model that made each fact's embedding, added on October 26, 2026. A
+/// vector with no model is read as no embedding.
+const MODEL: &str = "ALTER TABLE facts ADD COLUMN IF NOT EXISTS embedding_model TEXT;";
+
 /// The schema, a step at a time. A released step is never edited, and a
 /// change is a new step at the end.
-const STEPS: &[&str] = &[MEMORY];
+///
+/// The `pgvector` column is no step, because it exists only where the server
+/// has the extension: [`Postgres::over`] adds it when it opens a database.
+const STEPS: &[&str] = &[MEMORY, MODEL];
+
+/// The columns a fact is read from. `SELECT *` would also read the generated
+/// `vector` column, whose type a schema without `pgvector` does not have.
+macro_rules! fact_columns {
+    () => {
+        "seq, id, content, confidence, embedding, embedding_model, superseded_by, updated_at,
+         scope, scope_name, node"
+    };
+}
+
+/// The most dimensions an HNSW index holds for a `vector`. A model with more
+/// is scored by an exact scan of its rows.
+const INDEXED: usize = 2000;
 
 /// The name the schema's version is recorded under.
 const COMPONENT: &str = "engram";
@@ -71,14 +104,32 @@ const COMPONENT: &str = "engram";
 /// by one writer at a time.
 const WRITE_LOCK: i64 = 0x656e_6772_616d;
 
+/// How a Postgres store scores vectors, as it chose when it opened.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub enum Vectors {
+    /// With `pgvector`, installed in the schema this names.
+    Pgvector(String),
+    /// In Rust, over the `real[]` column, where the server lacks `pgvector`
+    /// or the role may not create it.
+    Rust,
+}
+
 /// Memory in a Postgres database.
 ///
 /// [`Postgres::open`] takes a `postgres://` URL, and
 /// [`fusion_cortex_core::storage`] says how it reads one, with the setting for
-/// a transaction-mode pooler.
+/// a transaction-mode pooler. [`Postgres::vectors`] says how it scores
+/// vectors.
 #[derive(Clone, Debug)]
 pub struct Postgres {
     database: Database,
+    /// The HNSW indexes this store has made or found, by name, so each is
+    /// created once, shared by its clones.
+    indexed: Arc<Mutex<HashSet<String>>>,
+    /// Whether `pgvector` filters inside its index scan, which 0.8 added, so
+    /// a search confined to some scopes still finds as many facts as asked.
+    iterative: bool,
+    vectors: Vectors,
 }
 
 fn storage_error(error: impl std::fmt::Display) -> Error {
@@ -109,6 +160,137 @@ fn uuids(ids: &[Id]) -> Vec<uuid::Uuid> {
     ids.iter().map(|id| id.0).collect()
 }
 
+/// `name` as a quoted SQL identifier.
+fn identifier(name: &str) -> String {
+    format!("\"{}\"", name.replace('"', "\"\""))
+}
+
+/// `text` as a quoted SQL string. Postgres refuses the NUL character in text,
+/// so a model named with one is refused here.
+fn literal(text: &str) -> Result<String> {
+    if text.contains('\0') {
+        return Err(Error::Storage(
+            "a model name holds the NUL character, which Postgres refuses".into(),
+        ));
+    }
+    Ok(format!("'{}'", text.replace('\'', "''")))
+}
+
+/// The name of the HNSW index for one model at one length: a 64-bit FNV-1a
+/// hash of the two, so any model name makes a short identifier.
+fn index_name(model: &str, dimensions: usize) -> String {
+    let mut hash: u64 = 0xcbf2_9ce4_8422_2325;
+    for byte in model.bytes().chain(dimensions.to_le_bytes()) {
+        hash ^= u64::from(byte);
+        hash = hash.wrapping_mul(0x0100_0000_01b3);
+    }
+    format!("facts_embedding_{hash:016x}")
+}
+
+/// Decides how the store at `database` scores vectors, under the write lock:
+/// with `pgvector` where the schema has its column already, or where
+/// `pgvector` is wanted and the extension is installed or can be created,
+/// and in Rust otherwise. Also says whether the extension filters inside its
+/// index scan.
+async fn vectors(database: &Database, pgvector: bool) -> Result<(Vectors, bool)> {
+    let mut transaction = database.begin().await?;
+    database
+        .query("SELECT pg_advisory_xact_lock($1)")
+        .bind(WRITE_LOCK)
+        .execute(&mut *transaction)
+        .await
+        .map_err(storage_error)?;
+    let column: bool = database
+        .scalar(
+            "SELECT EXISTS (
+                 SELECT 1 FROM information_schema.columns
+                 WHERE table_schema = current_schema()
+                   AND table_name = 'facts' AND column_name = 'embedding_vector'
+             )",
+        )
+        .fetch_one(&mut *transaction)
+        .await
+        .map_err(storage_error)?;
+    let mut installed = extension(database, &mut transaction).await?;
+    if !column && pgvector && installed.is_none() {
+        let available: bool = database
+            .scalar("SELECT EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = 'vector')")
+            .fetch_one(&mut *transaction)
+            .await
+            .map_err(storage_error)?;
+        if available {
+            // A role without the privilege to create it is refused, and the
+            // savepoint keeps the refusal from ending the transaction.
+            let mut attempt = sqlx::Connection::begin(&mut *transaction)
+                .await
+                .map_err(storage_error)?;
+            match sqlx::raw_sql("CREATE EXTENSION IF NOT EXISTS vector")
+                .execute(&mut *attempt)
+                .await
+            {
+                Ok(_) => attempt.commit().await.map_err(storage_error)?,
+                Err(_) => attempt.rollback().await.map_err(storage_error)?,
+            }
+            installed = extension(database, &mut transaction).await?;
+        }
+    }
+    let chosen = match installed {
+        Some((schema, version)) if column || pgvector => {
+            if !column {
+                let quoted = identifier(&schema);
+                sqlx::raw_sql(sqlx::AssertSqlSafe(format!(
+                    "ALTER TABLE facts ADD COLUMN IF NOT EXISTS embedding_vector {quoted}.vector
+                     GENERATED ALWAYS AS (
+                         CASE WHEN cardinality(embedding) > 0 THEN embedding::{quoted}.vector END
+                     ) STORED"
+                )))
+                .execute(&mut *transaction)
+                .await
+                .map_err(storage_error)?;
+            }
+            (Vectors::Pgvector(schema), iterative(&version))
+        }
+        _ => (Vectors::Rust, false),
+    };
+    transaction.commit().await.map_err(storage_error)?;
+    Ok(chosen)
+}
+
+/// The schema `pgvector` is installed in, and its version, where it is.
+async fn extension(
+    database: &Database,
+    connection: &mut PgConnection,
+) -> Result<Option<(String, String)>> {
+    let row = database
+        .query(
+            "SELECT namespace.nspname AS schema, extension.extversion AS version
+             FROM pg_extension extension
+             JOIN pg_namespace namespace ON namespace.oid = extension.extnamespace
+             WHERE extension.extname = 'vector'",
+        )
+        .fetch_optional(&mut *connection)
+        .await
+        .map_err(storage_error)?;
+    row.map(|row| {
+        Ok((
+            row.try_get("schema").map_err(storage_error)?,
+            row.try_get("version").map_err(storage_error)?,
+        ))
+    })
+    .transpose()
+}
+
+/// Whether `pgvector` at `version` filters inside its index scan, which 0.8.0
+/// added.
+fn iterative(version: &str) -> bool {
+    let mut parts = version
+        .split('.')
+        .map(|part| part.parse::<u32>().unwrap_or(0));
+    let major = parts.next().unwrap_or(0);
+    let minor = parts.next().unwrap_or(0);
+    (major, minor) >= (0, 8)
+}
+
 impl Postgres {
     /// Connects to the database `url` names, creating the tables or bringing
     /// them up to date.
@@ -137,14 +319,161 @@ impl Postgres {
         Self::over(Database::connect(location).await?).await
     }
 
-    /// A store over `database`, whose tables it creates or brings up to date.
+    /// A store over `database`, whose tables it creates or brings up to date,
+    /// scoring vectors with `pgvector` where it can.
     ///
     /// # Errors
     ///
     /// [`Error::Storage`] if the database refuses the schema.
     pub async fn over(database: Database) -> Result<Self> {
+        Self::opened(database, true).await
+    }
+
+    /// A store that scores vectors in Rust on a server that has `pgvector`,
+    /// so one database runs both paths.
+    #[cfg(test)]
+    pub(crate) async fn scoring_in_rust(location: &storage::Postgres) -> Result<Self> {
+        Self::opened(Database::connect(location).await?, false).await
+    }
+
+    async fn opened(database: Database, pgvector: bool) -> Result<Self> {
         database.migrate(COMPONENT, STEPS).await?;
-        Ok(Self { database })
+        let (vectors, iterative) = vectors(&database, pgvector).await?;
+        Ok(Self {
+            database,
+            indexed: Arc::new(Mutex::new(HashSet::new())),
+            iterative,
+            vectors,
+        })
+    }
+
+    /// How this store scores vectors.
+    #[must_use]
+    pub fn vectors(&self) -> &Vectors {
+        &self.vectors
+    }
+
+    /// Creates the HNSW index for `embedding`'s model and length, where it
+    /// is missing, so `nearest` for that model orders by the index. The
+    /// index is partial, over that model's rows, and casts the column to the
+    /// model's length, which an HNSW index needs.
+    async fn index(
+        &self,
+        connection: &mut PgConnection,
+        embedding: &Embedding,
+    ) -> Result<Option<String>> {
+        let Vectors::Pgvector(schema) = &self.vectors else {
+            return Ok(None);
+        };
+        let dimensions = embedding.values.len();
+        if dimensions > INDEXED {
+            return Ok(None);
+        }
+        let name = index_name(&embedding.model, dimensions);
+        if self.held(&name)? {
+            return Ok(None);
+        }
+        let schema = identifier(schema);
+        sqlx::raw_sql(sqlx::AssertSqlSafe(format!(
+            "CREATE INDEX IF NOT EXISTS {name} ON facts
+             USING hnsw ((embedding_vector::{schema}.vector({dimensions})) {schema}.vector_cosine_ops)
+             WHERE embedding_model = {model} AND {schema}.vector_dims(embedding_vector) = {dimensions}",
+            model = literal(&embedding.model)?,
+        )))
+        .execute(&mut *connection)
+        .await
+        .map_err(storage_error)?;
+        Ok(Some(name))
+    }
+
+    fn held(&self, index: &str) -> Result<bool> {
+        Ok(self
+            .indexed
+            .lock()
+            .map_err(|_| Error::Storage("a thread panicked while it held the index list".into()))?
+            .contains(index))
+    }
+
+    /// Records an index once the transaction that made it has committed.
+    fn made(&self, index: Option<String>) -> Result<()> {
+        if let Some(index) = index {
+            self.indexed
+                .lock()
+                .map_err(|_| {
+                    Error::Storage("a thread panicked while it held the index list".into())
+                })?
+                .insert(index);
+        }
+        Ok(())
+    }
+
+    /// The facts embedded by `query`'s model, ordered by `<=>`.
+    async fn nearest_by_pgvector(
+        &self,
+        schema: &str,
+        query: &Embedding,
+        scopes: &[Scope],
+        most: usize,
+    ) -> Result<Vec<(Fact, f32)>> {
+        let schema = identifier(schema);
+        let dimensions = query.values.len();
+        // The model and length are written into the statement, so the
+        // planner matches it with the partial index for them.
+        let sql = format!(
+            concat!(
+                "SELECT ",
+                fact_columns!(),
+                ", (embedding_vector::{schema}.vector({dimensions}))
+                     OPERATOR({schema}.<=>) $1::real[]::{schema}.vector({dimensions}) AS distance
+                 FROM facts
+                 WHERE superseded_by IS NULL
+                   AND embedding_model = {model}
+                   AND {schema}.vector_dims(embedding_vector) = {dimensions}
+                   AND EXISTS (
+                       SELECT 1 FROM unnest($2::text[], $3::text[]) AS readable (kind, name)
+                       WHERE readable.kind = facts.scope
+                         AND readable.name IS NOT DISTINCT FROM facts.scope_name
+                   )
+                 ORDER BY distance
+                 LIMIT $4"
+            ),
+            dimensions = dimensions,
+            model = literal(&query.model)?,
+            schema = schema,
+        );
+        let mut transaction = self.database.begin().await?;
+        if self.iterative {
+            sqlx::raw_sql("SET LOCAL hnsw.iterative_scan = strict_order")
+                .execute(&mut *transaction)
+                .await
+                .map_err(storage_error)?;
+        }
+        let rows = self
+            .database
+            .query(sqlx::AssertSqlSafe(sql))
+            .bind(&query.values)
+            .bind(scopes.iter().map(Scope::kind).collect::<Vec<_>>())
+            .bind(scopes.iter().map(Scope::name).collect::<Vec<_>>())
+            .bind(i64::try_from(most).unwrap_or(i64::MAX))
+            .fetch_all(&mut *transaction)
+            .await
+            .map_err(storage_error)?;
+        let distances: Vec<f64> = rows
+            .iter()
+            .map(|row| row.try_get("distance").map_err(storage_error))
+            .collect::<Result<_>>()?;
+        let facts = self.read(&mut transaction, rows).await?;
+        transaction.commit().await.map_err(storage_error)?;
+        #[expect(
+            clippy::cast_possible_truncation,
+            reason = "a cosine, from -1 to 1, which an f32 holds"
+        )]
+        let ranked = facts
+            .into_iter()
+            .zip(distances)
+            .map(|(fact, distance)| (fact, (1.0 - distance) as f32))
+            .collect();
+        Ok(ranked)
     }
 
     /// A transaction that holds the write lock.
@@ -328,11 +657,16 @@ impl Postgres {
                 let superseded_by: Option<uuid::Uuid> =
                     row.try_get("superseded_by").map_err(storage_error)?;
                 let node: Option<uuid::Uuid> = row.try_get("node").map_err(storage_error)?;
+                let values: Option<Vec<f32>> = row.try_get("embedding").map_err(storage_error)?;
+                let model: Option<String> =
+                    row.try_get("embedding_model").map_err(storage_error)?;
                 Ok(Fact {
                     confidence: row.try_get("confidence").map_err(storage_error)?,
                     content: row.try_get("content").map_err(storage_error)?,
                     derived_from: sources.remove(&id).unwrap_or_default(),
-                    embedding: row.try_get("embedding").map_err(storage_error)?,
+                    embedding: values
+                        .zip(model)
+                        .map(|(values, model)| Embedding::new(model, values)),
                     id: Id(id),
                     node: node.map(Id),
                     reinforced_by: reinforced.remove(&id).unwrap_or_default(),
@@ -414,6 +748,7 @@ impl Store for Postgres {
     }
 
     async fn assert_fact(&self, fact: &Fact, supersedes: Option<Id>) -> Result<()> {
+        super::checked(fact)?;
         let mut transaction = self.write().await?;
         if let Some(old) = supersedes {
             let links = self.links(&mut transaction).await?;
@@ -434,13 +769,15 @@ impl Store for Postgres {
         self.database
             .query(
                 "INSERT INTO facts
-                     (id, content, confidence, embedding, superseded_by, updated_at, scope, scope_name, node)
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
+                     (id, content, confidence, embedding, embedding_model, superseded_by,
+                      updated_at, scope, scope_name, node)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
             )
             .bind(fact.id.0)
             .bind(&fact.content)
             .bind(fact.confidence)
-            .bind(fact.embedding.as_ref())
+            .bind(fact.embedding.as_ref().map(|embedding| &embedding.values))
+            .bind(fact.embedding.as_ref().map(|embedding| &embedding.model))
             .bind(fact.superseded_by.map(|id| id.0))
             .bind(fact.updated_at)
             .bind(scope.kind())
@@ -477,7 +814,63 @@ impl Store for Postgres {
                 .await
                 .map_err(storage_error)?;
         }
-        transaction.commit().await.map_err(storage_error)
+        let index = match &fact.embedding {
+            Some(embedding) => self.index(&mut transaction, embedding).await?,
+            None => None,
+        };
+        transaction.commit().await.map_err(storage_error)?;
+        self.made(index)
+    }
+
+    async fn set_embedding(&self, fact: Id, embedding: &Embedding) -> Result<bool> {
+        embedding.check()?;
+        // The write lock, so two stores never create one index at once.
+        let mut transaction = self.write().await?;
+        let set = self
+            .database
+            .query("UPDATE facts SET embedding = $1, embedding_model = $2 WHERE id = $3")
+            .bind(&embedding.values)
+            .bind(&embedding.model)
+            .bind(fact.0)
+            .execute(&mut *transaction)
+            .await
+            .map_err(storage_error)?;
+        let index = self.index(&mut transaction, embedding).await?;
+        transaction.commit().await.map_err(storage_error)?;
+        self.made(index)?;
+        Ok(set.rows_affected() > 0)
+    }
+
+    async fn nearest(
+        &self,
+        query: &Embedding,
+        scopes: &[Scope],
+        most: usize,
+    ) -> Result<Vec<(Fact, f32)>> {
+        if query.check().is_err() || most == 0 || scopes.is_empty() {
+            return Ok(Vec::new());
+        }
+        if let Vectors::Pgvector(schema) = &self.vectors {
+            return self.nearest_by_pgvector(schema, query, scopes, most).await;
+        }
+        let mut transaction = self.database.begin().await?;
+        let rows = self
+            .database
+            .query(concat!(
+                "SELECT ",
+                fact_columns!(),
+                " FROM facts
+                 WHERE superseded_by IS NULL AND embedding_model = $1 AND cardinality(embedding) = $2
+                 ORDER BY seq"
+            ))
+            .bind(&query.model)
+            .bind(i32::try_from(query.values.len()).map_err(storage_error)?)
+            .fetch_all(&mut *transaction)
+            .await
+            .map_err(storage_error)?;
+        let facts = self.read(&mut transaction, rows).await?;
+        transaction.commit().await.map_err(storage_error)?;
+        Ok(crate::nearest(facts, query, scopes, most))
     }
 
     async fn supersede(&self, old: Id, new: Id) -> Result<bool> {
@@ -502,7 +895,12 @@ impl Store for Postgres {
     }
 
     async fn facts(&self) -> Result<Vec<Fact>> {
-        self.facts_where("SELECT * FROM facts ORDER BY seq").await
+        self.facts_where(concat!(
+            "SELECT ",
+            fact_columns!(),
+            " FROM facts ORDER BY seq"
+        ))
+        .await
     }
 
     async fn reinforce(&self, fact: Id, episode: Id) -> Result<bool> {
@@ -612,9 +1010,11 @@ impl Store for Postgres {
     }
 
     async fn current_facts(&self) -> Result<Vec<Fact>> {
-        self.facts_where(
-            "SELECT * FROM facts WHERE superseded_by IS NULL ORDER BY confidence DESC, seq",
-        )
+        self.facts_where(concat!(
+            "SELECT ",
+            fact_columns!(),
+            " FROM facts WHERE superseded_by IS NULL ORDER BY confidence DESC, seq"
+        ))
         .await
     }
 

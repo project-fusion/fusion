@@ -19,7 +19,13 @@
 //! trait, in memory and in `SQLite`, held to one conformance suite.
 //!
 //! With the `consolidate` feature, [`consolidate`] is the pass that distills
-//! episodes into facts with a model.
+//! episodes into facts with a model, and embeds each one where an embedder is
+//! configured.
+//!
+//! **A fact's embedding names its model.** [`Memory::nearest`] and every
+//! store's `nearest` compare a question's vector only with facts embedded by
+//! the same model at the same length, so a change of model leaves the old
+//! vectors unread until [`embed::backfill`] replaces them.
 //!
 //! v0 ships episodic and semantic. Procedural memory (distilling repeated
 //! successful action sequences into reusable procedure) is deferred to v1
@@ -39,7 +45,7 @@
 use std::collections::{HashMap, HashSet};
 
 use chrono::{DateTime, Utc};
-use fusion_cortex_core::Id;
+use fusion_cortex_core::{embed::Embedding, Id};
 use serde::{Deserialize, Serialize};
 
 /// A raw, timestamped record of something that happened. Append-only.
@@ -98,10 +104,13 @@ pub struct Fact {
     /// The episodes it rests on. Forgetting one removes it from the list, and
     /// forgetting the last one forgets the fact.
     pub derived_from: Vec<Id>,
-    /// A vector for relevance scoring, which nothing computes yet. The field
-    /// is here so enabling vectors is a new scorer and never a migration.
+    /// The fact's content as a vector, with the model that made it, for
+    /// scoring by meaning. Consolidation sets it where an embedder is
+    /// configured, and [`embed::backfill`] sets it for a fact without one or
+    /// with another model's. A vector is compared only with one from its own
+    /// model.
     #[serde(default)]
-    pub embedding: Option<Vec<f32>>,
+    pub embedding: Option<Embedding>,
     pub id: Id,
     /// The node in a trace that records it, such as the memory node a
     /// consolidation pass wrote. `why()` on the node reaches the episodes it
@@ -495,6 +504,48 @@ impl Memory {
         true
     }
 
+    /// Sets the embedding of the fact `fact`, replacing any it had, and
+    /// returns whether this memory held the fact. The embedding belongs to
+    /// that fact's words, so it is set on the fact itself and never moves
+    /// along its lineage.
+    pub fn set_embedding(&mut self, fact: Id, embedding: Embedding) -> bool {
+        match self.facts.iter_mut().find(|held| held.id == fact) {
+            Some(held) => {
+                held.embedding = Some(embedding);
+                true
+            }
+            None => false,
+        }
+    }
+
+    /// The current facts in `scopes` nearest `query`, most similar first,
+    /// and at most `most`, each with its cosine similarity. A fact embedded
+    /// by another model, or at another length, is never compared, and a fact
+    /// with no embedding is left out. Two as similar keep the order they were
+    /// asserted in.
+    ///
+    /// ```
+    /// # use fusion_cortex_core::{embed::Embedding, Id};
+    /// # use fusion_cortex_engram::{Episode, Fact, Memory, Scope};
+    /// # let mut memory = Memory::new();
+    /// # let seen = memory.record(Episode::new("x", Id::new()));
+    /// let mut owner = Fact::new("Dana owns the release notes", vec![seen], 0.8);
+    /// owner.embedding = Some(Embedding::new("scripted/1", vec![0.9, 0.1]));
+    /// let mut docs = Fact::new("the docs build with bun", vec![seen], 0.8);
+    /// docs.embedding = Some(Embedding::new("scripted/1", vec![0.1, 0.9]));
+    /// memory.assert_fact(owner, None);
+    /// memory.assert_fact(docs, None);
+    ///
+    /// let question = Embedding::new("scripted/1", vec![0.8, 0.2]);
+    /// let near = memory.nearest(&question, &[Scope::Personal], 1);
+    ///
+    /// assert_eq!(near[0].0.content, "Dana owns the release notes");
+    /// ```
+    #[must_use]
+    pub fn nearest(&self, query: &Embedding, scopes: &[Scope], most: usize) -> Vec<(&Fact, f32)> {
+        nearest(self.facts.iter(), query, scopes, most)
+    }
+
     /// Every fact, superseded ones included, in the order they were asserted.
     #[must_use]
     pub fn facts(&self) -> &[Fact] {
@@ -559,6 +610,32 @@ impl Memory {
     }
 }
 
+/// The facts of `facts` that are current, in `scopes`, and embedded
+/// comparably with `query`, most similar first and at most `most`. Two as
+/// similar keep the order `facts` gave them, which every store gives in the
+/// order they were asserted.
+pub(crate) fn nearest<T: std::borrow::Borrow<Fact>>(
+    facts: impl IntoIterator<Item = T>,
+    query: &Embedding,
+    scopes: &[Scope],
+    most: usize,
+) -> Vec<(T, f32)> {
+    let mut ranked: Vec<(T, f32)> = facts
+        .into_iter()
+        .filter_map(|held| {
+            let fact = held.borrow();
+            if !fact.is_current() || !scopes.contains(&fact.scope) {
+                return None;
+            }
+            let similarity = query.cosine(fact.embedding.as_ref()?)?;
+            Some((held, similarity))
+        })
+        .collect();
+    ranked.sort_by(|a, b| b.1.total_cmp(&a.1));
+    ranked.truncate(most);
+    ranked
+}
+
 /// The fact a supersession link leads to once the facts in `doomed` are gone:
 /// the first one along the chain that stays, or none. Stops on a cycle.
 pub(crate) fn past(mut next: Option<Id>, doomed: &HashMap<Id, Option<Id>>) -> Option<Id> {
@@ -575,6 +652,7 @@ pub(crate) fn past(mut next: Option<Id>, doomed: &HashMap<Id, Option<Id>>) -> Op
 
 #[cfg(feature = "consolidate")]
 pub mod consolidate;
+pub mod embed;
 mod scope;
 pub mod store;
 

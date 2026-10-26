@@ -1,18 +1,28 @@
-//! Ollama's own chat API, `POST /api/chat`, streamed as newline-delimited JSON.
+//! Ollama's own chat API, `POST /api/chat`, streamed as newline-delimited JSON,
+//! and its embeddings API, `POST /api/embed`.
 //!
 //! **Each request sets its context window.** A request that names no
 //! `num_ctx` runs at the server's default, which is shorter than an agent
 //! session, and the prompt is truncated without an error.
 //! [`Ollama::context`] sets it, and the caller chooses it from what the model
 //! can take.
+//!
+//! **[`Embeddings`] is the local default for vectors.** A small embedding
+//! model, such as `nomic-embed-text` or `all-minilm`, runs on the same server
+//! as the chat model, so memory is embedded without the text leaving the
+//! machine.
 
-use std::{collections::HashMap, sync::Arc};
+use std::{
+    collections::HashMap,
+    sync::{Arc, OnceLock},
+};
 
 use async_trait::async_trait;
 use serde::Deserialize;
 use serde_json::{json, Value};
 
 use crate::http::{self, Decode, Post, Transport};
+use fusion_cortex_core::embed::{Embedder, Embedding, Purpose};
 use fusion_cortex_core::provider::{
     Api, Block, Delta, Event, Events, Message, Provider, Request, Role, Stop, Usage,
 };
@@ -295,6 +305,139 @@ impl Provider for Ollama {
             sent => sent?,
         };
         Ok(http::decode(http::ndjson(sent), Decoder::default()))
+    }
+}
+
+/// An embedding model on an Ollama server, through `/api/embed`.
+///
+/// ```
+/// # use std::sync::Arc;
+/// # use fusion_cortex_core::embed::Embedder;
+/// # use fusion_cortex_provider::{http::Reqwest, ollama::Embeddings};
+/// let transport = Arc::new(Reqwest::new().unwrap());
+/// let embedder = Embeddings::new("nomic-embed-text", transport)
+///     .prefixes("search_query: ", "search_document: ");
+///
+/// assert_eq!(embedder.model(), "ollama/nomic-embed-text");
+/// assert!(embedder.is_local(), "a local server is the default");
+/// ```
+pub struct Embeddings {
+    base: String,
+    dimensions: Option<usize>,
+    id: String,
+    known: OnceLock<usize>,
+    local: bool,
+    name: String,
+    prefixes: Option<(String, String)>,
+    transport: Arc<dyn Transport>,
+}
+
+impl std::fmt::Debug for Embeddings {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Embeddings")
+            .field("base", &self.base)
+            .field("id", &self.id)
+            .field("local", &self.local)
+            .finish_non_exhaustive()
+    }
+}
+
+impl Embeddings {
+    /// An embedding model on the server at `http://localhost:11434`.
+    #[must_use]
+    pub fn new(model: impl Into<String>, transport: Arc<dyn Transport>) -> Self {
+        let model = model.into();
+        Self {
+            base: "http://localhost:11434".into(),
+            dimensions: None,
+            id: crate::embedder_id("ollama", &model, None),
+            known: OnceLock::new(),
+            local: true,
+            name: model,
+            prefixes: None,
+            transport,
+        }
+    }
+
+    /// Sends requests to a server on another host.
+    #[must_use]
+    pub fn base(mut self, base: impl Into<String>) -> Self {
+        self.base = crate::trimmed(base);
+        self
+    }
+
+    /// Whether the server runs on the user's own hardware, which the caller
+    /// judges, as for [`Ollama::local`].
+    #[must_use]
+    pub fn local(mut self, local: bool) -> Self {
+        self.local = local;
+        self
+    }
+
+    /// Asks for vectors of `dimensions` values, for a model trained to
+    /// shorten its vectors. The identifier takes the length, as in
+    /// `ollama/qwen3-embedding@512`.
+    #[must_use]
+    pub fn output_dimensions(mut self, dimensions: usize) -> Self {
+        self.dimensions = Some(dimensions);
+        self.id = crate::embedder_id("ollama", &self.name, Some(dimensions));
+        self.known = OnceLock::from(dimensions);
+        self
+    }
+
+    /// The text put before a query and before a document, for a model
+    /// trained with them, such as `search_query: ` and `search_document: `
+    /// for `nomic-embed-text`.
+    #[must_use]
+    pub fn prefixes(mut self, query: impl Into<String>, document: impl Into<String>) -> Self {
+        self.prefixes = Some((query.into(), document.into()));
+        self
+    }
+
+    fn body(&self, texts: &[&str], purpose: Purpose) -> Value {
+        let input: Vec<String> = texts
+            .iter()
+            .map(|text| crate::prefixed(self.prefixes.as_ref(), text, purpose))
+            .collect();
+        let mut body = json!({ "input": input, "model": self.name });
+        if let Some(dimensions) = self.dimensions {
+            body["dimensions"] = json!(dimensions);
+        }
+        body
+    }
+}
+
+#[derive(Deserialize)]
+struct Embedded {
+    embeddings: Vec<Vec<f32>>,
+}
+
+#[async_trait]
+impl Embedder for Embeddings {
+    fn model(&self) -> &str {
+        &self.id
+    }
+
+    fn dimensions(&self) -> Option<usize> {
+        self.known.get().copied()
+    }
+
+    fn is_local(&self) -> bool {
+        self.local
+    }
+
+    async fn embed(&self, texts: &[&str], purpose: Purpose) -> Result<Vec<Embedding>> {
+        if texts.is_empty() {
+            return Ok(Vec::new());
+        }
+        let post = Post {
+            body: self.body(texts, purpose).to_string().into_bytes(),
+            headers: Vec::new(),
+            url: format!("{}/api/embed", self.base),
+        };
+        let body = http::whole(self.transport.post(post).await?).await?;
+        let reply: Embedded = http::parse("Ollama", &String::from_utf8_lossy(&body))?;
+        crate::embedded(self, &self.known, texts.len(), reply.embeddings)
     }
 }
 
@@ -774,6 +917,99 @@ mod tests {
         assert!(
             !error.is_retryable(),
             "a request rejected as written fails again unchanged"
+        );
+    }
+
+    /// A reply from `/api/embed` with `all-minilm`, cut to three values.
+    const EMBEDDED: &str = r#"{"model":"all-minilm","embeddings":[[0.010071029,-0.0017594862,0.05007221],[-0.009854669,0.060322512,0.0010021433]],"total_duration":14143917,"load_duration":1019500,"prompt_eval_count":8}"#;
+
+    #[tokio::test]
+    async fn embeddings_come_back_in_order_with_the_model_that_made_them() {
+        let transport = Arc::new(Canned::new(EMBEDDED, 7));
+        let embedder = Embeddings::new("all-minilm", transport.clone());
+        assert_eq!(embedder.dimensions(), None, "unknown until the first reply");
+
+        let vectors = embedder
+            .embed(
+                &["Dana owns the release notes", "the suite runs nightly"],
+                Purpose::Document,
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(transport.last().url, "http://localhost:11434/api/embed");
+        assert_eq!(
+            transport.body(),
+            json!({
+                "input": ["Dana owns the release notes", "the suite runs nightly"],
+                "model": "all-minilm",
+            })
+        );
+        assert_eq!(vectors.len(), 2);
+        assert_eq!(
+            vectors[1].values,
+            [-0.009_854_669, 0.060_322_512, 0.001_002_143_3]
+        );
+        assert_eq!(vectors[0].model, "ollama/all-minilm");
+        assert_eq!(embedder.dimensions(), Some(3), "learned from the reply");
+        assert!(embedder
+            .embed(&[], Purpose::Query)
+            .await
+            .unwrap()
+            .is_empty());
+    }
+
+    #[tokio::test]
+    async fn a_query_and_a_document_take_their_own_prefixes() {
+        let transport = Arc::new(Canned::new(EMBEDDED, usize::MAX));
+        let embedder = Embeddings::new("nomic-embed-text", transport.clone())
+            .prefixes("search_query: ", "search_document: ")
+            .output_dimensions(3);
+
+        embedder
+            .embed(&["who owns the notes?", "Dana does"], Purpose::Query)
+            .await
+            .unwrap();
+
+        assert_eq!(
+            transport.body(),
+            json!({
+                "dimensions": 3,
+                "input": ["search_query: who owns the notes?", "search_query: Dana does"],
+                "model": "nomic-embed-text",
+            })
+        );
+        assert_eq!(embedder.model(), "ollama/nomic-embed-text@3");
+    }
+
+    #[tokio::test]
+    async fn a_reply_with_too_few_vectors_or_the_wrong_length_is_refused() {
+        let transport = Arc::new(Canned::new(EMBEDDED, usize::MAX));
+
+        let short = Embeddings::new("all-minilm", transport.clone())
+            .embed(&["a", "b", "c"], Purpose::Document)
+            .await
+            .unwrap_err();
+        assert!(matches!(short, Error::InvalidOutput(_)), "{short}");
+
+        let longer = Embeddings::new("all-minilm", transport.clone())
+            .output_dimensions(384)
+            .embed(&["a", "b"], Purpose::Document)
+            .await
+            .unwrap_err();
+        assert!(longer.to_string().contains("not 384"), "{longer}");
+
+        let missing = Arc::new(Canned::status(
+            404,
+            r#"{"error":"model \"all-minilm\" not found, try pulling it first"}"#,
+        ));
+        let error = Embeddings::new("all-minilm", missing)
+            .embed(&["a"], Purpose::Document)
+            .await
+            .unwrap_err();
+        assert!(
+            matches!(&error, Error::Status { status: 404, message, .. } if message.contains("try pulling it")),
+            "{error}"
         );
     }
 

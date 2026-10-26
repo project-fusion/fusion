@@ -33,8 +33,10 @@ uuid.workspace = true
 fusion-cortex-core.workspace = true
 
 [dev-dependencies]
-# The opt-in live consolidation test, against a local Ollama.
+# The opt-in live consolidation and embedding tests, against a local Ollama.
 fusion-cortex-provider = { workspace = true, features = ["http", "ollama"] }
+# The vector tests rank what a store finds the way a context would.
+fusion-cortex-recall.workspace = true
 tokio.workspace = true
 
 [lints]

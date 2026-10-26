@@ -1,6 +1,6 @@
 [package]
 name = "fusion-cortex-core"
-description = "Cortex primitives: identifiers, the provider abstraction, and the errors they share."
+description = "Cortex primitives: identifiers, the provider and embedder abstractions, and the errors they share."
 edition.workspace = true
 license.workspace = true
 publish.workspace = true

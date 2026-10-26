@@ -10,9 +10,16 @@
 //! same code, so a server whose streamed tool calls are broken fails the check
 //! before it can fail the task.
 //!
-//! **Each client is a feature.** `anthropic`, `chat`, `gemini`, `ollama` and
-//! `responses` each add one module, so a crate that takes one client compiles
-//! only that one.
+//! **Each client is a feature.** `anthropic`, `chat`, `embeddings`, `gemini`,
+//! `ollama` and `responses` each add one module, so a crate that takes one
+//! client compiles only that one.
+//!
+//! **Three APIs embed text**, and each has an [`Embedder`] client beside its
+//! chat client: [`ollama::Embeddings`] for Ollama's `/api/embed`,
+//! [`embeddings::Embeddings`] for OpenAI's `/v1/embeddings` and the servers
+//! that copy it, and [`gemini::Embeddings`] for Gemini. Anthropic offers no
+//! embeddings API, and the Responses API embeds nothing, so those two have
+//! none.
 //!
 //! **The one transport that opens a socket is the `http` feature's.** Every
 //! client builds its requests and reads its streams without it, so a crate
@@ -27,10 +34,21 @@
 ))]
 use fusion_cortex_core::provider::Block;
 
+#[cfg(any(feature = "embeddings", feature = "gemini", feature = "ollama"))]
+use std::sync::OnceLock;
+
+#[cfg(any(feature = "embeddings", feature = "gemini", feature = "ollama"))]
+use fusion_cortex_core::{
+    embed::{Embedder, Embedding},
+    Error, Result,
+};
+
 #[cfg(feature = "anthropic")]
 pub mod anthropic;
 #[cfg(feature = "chat")]
 pub mod chat;
+#[cfg(feature = "embeddings")]
+pub mod embeddings;
 #[cfg(feature = "gemini")]
 pub mod gemini;
 pub mod http;
@@ -43,6 +61,7 @@ pub mod responses;
 #[cfg(any(
     feature = "anthropic",
     feature = "chat",
+    feature = "embeddings",
     feature = "gemini",
     feature = "ollama",
     feature = "responses"
@@ -74,6 +93,67 @@ pub(crate) fn paragraphs(blocks: &[Block]) -> String {
         })
         .collect::<Vec<_>>()
         .join("\n\n")
+}
+
+/// `text` after the prefix for `purpose`, for an API that takes no task and
+/// a model trained with one prefix for queries and another for documents.
+#[cfg(any(feature = "embeddings", feature = "ollama"))]
+pub(crate) fn prefixed(
+    prefixes: Option<&(String, String)>,
+    text: &str,
+    purpose: fusion_cortex_core::embed::Purpose,
+) -> String {
+    use fusion_cortex_core::embed::Purpose;
+    match (prefixes, purpose) {
+        (Some((query, _)), Purpose::Query) => format!("{query}{text}"),
+        (Some((_, document)), Purpose::Document) => format!("{document}{text}"),
+        (None, _) => text.to_owned(),
+    }
+}
+
+/// The identifier an embedder records with each vector: `prefix/model`, and
+/// the length after an `@` where the caller set one, since the same model at
+/// two lengths places text in two spaces.
+#[cfg(any(feature = "embeddings", feature = "gemini", feature = "ollama"))]
+pub(crate) fn embedder_id(prefix: &str, model: &str, dimensions: Option<usize>) -> String {
+    match dimensions {
+        Some(dimensions) => format!("{prefix}/{model}@{dimensions}"),
+        None => format!("{prefix}/{model}"),
+    }
+}
+
+/// The vectors an API returned for `asked` texts, as embeddings from `id`.
+/// Each must be there, of one length, and fit to compare, and the first
+/// response sets the length where the caller did not.
+#[cfg(any(feature = "embeddings", feature = "gemini", feature = "ollama"))]
+pub(crate) fn embedded(
+    embedder: &dyn Embedder,
+    known: &OnceLock<usize>,
+    asked: usize,
+    vectors: Vec<Vec<f32>>,
+) -> Result<Vec<Embedding>> {
+    let model = embedder.model();
+    if vectors.len() != asked {
+        return Err(Error::InvalidOutput(format!(
+            "{model} returned {} vectors for {asked} texts",
+            vectors.len()
+        )));
+    }
+    vectors
+        .into_iter()
+        .map(|values| {
+            let dimensions = *known.get_or_init(|| values.len());
+            if values.len() != dimensions {
+                return Err(Error::InvalidOutput(format!(
+                    "{model} returned a vector of {} values, not {dimensions}",
+                    values.len()
+                )));
+            }
+            let embedding = Embedding::new(model, values);
+            embedding.check()?;
+            Ok(embedding)
+        })
+        .collect()
 }
 
 /// The output count, reasoning included, from an API that also reports a

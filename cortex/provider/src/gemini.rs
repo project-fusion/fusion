@@ -1,4 +1,5 @@
-//! Gemini `generateContent`, streamed from `:streamGenerateContent?alt=sse`.
+//! Gemini `generateContent`, streamed from `:streamGenerateContent?alt=sse`,
+//! and its embeddings, from `:batchEmbedContents`.
 //!
 //! **Google now calls this API legacy**, and recommends the Interactions API
 //! for new work. This client is built on `generateContent` because it is the
@@ -11,13 +12,17 @@
 //! signature into a [`Block::Thinking`] with no text, placed before the block
 //! it came on, and the encoder puts it back on the part that follows.
 
-use std::{collections::HashMap, sync::Arc};
+use std::{
+    collections::HashMap,
+    sync::{Arc, OnceLock},
+};
 
 use async_trait::async_trait;
 use serde::Deserialize;
 use serde_json::{json, Value};
 
 use crate::http::{self, Decode, Post, Transport};
+use fusion_cortex_core::embed::{Embedder, Embedding, Purpose};
 use fusion_cortex_core::provider::{
     Api, Block, Delta, Effort, Event, Events, Message, Provider, Request, Role, Stop, Usage,
 };
@@ -269,6 +274,147 @@ impl Provider for Gemini {
         };
         let body = self.transport.post(post).await?;
         Ok(http::decode(http::sse(body), Decoder::default()))
+    }
+}
+
+/// A Gemini embedding model, through `:batchEmbedContents`.
+///
+/// **Each text is sent with its task**, `RETRIEVAL_QUERY` for a query and
+/// `RETRIEVAL_DOCUMENT` for a document, which the model is trained to embed
+/// apart.
+///
+/// ```
+/// # use std::sync::Arc;
+/// # use fusion_cortex_core::embed::Embedder;
+/// # use fusion_cortex_provider::{gemini::Embeddings, http::Reqwest};
+/// let transport = Arc::new(Reqwest::new().unwrap());
+/// let embedder = Embeddings::new("AIza...", "gemini-embedding-001", transport).output_dimensions(768);
+///
+/// assert_eq!(embedder.model(), "gemini/gemini-embedding-001@768");
+/// assert!(!embedder.is_local());
+/// ```
+pub struct Embeddings {
+    base: String,
+    dimensions: Option<usize>,
+    id: String,
+    key: String,
+    known: OnceLock<usize>,
+    name: String,
+    transport: Arc<dyn Transport>,
+}
+
+impl std::fmt::Debug for Embeddings {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Embeddings")
+            .field("base", &self.base)
+            .field("id", &self.id)
+            .finish_non_exhaustive()
+    }
+}
+
+impl Embeddings {
+    #[must_use]
+    pub fn new(
+        key: impl Into<String>,
+        model: impl Into<String>,
+        transport: Arc<dyn Transport>,
+    ) -> Self {
+        let model = model.into();
+        Self {
+            base: "https://generativelanguage.googleapis.com".into(),
+            dimensions: None,
+            id: crate::embedder_id("gemini", &model, None),
+            key: key.into(),
+            known: OnceLock::new(),
+            name: model,
+            transport,
+        }
+    }
+
+    /// Sends requests to another host that speaks this API.
+    #[must_use]
+    pub fn base(mut self, base: impl Into<String>) -> Self {
+        self.base = crate::trimmed(base);
+        self
+    }
+
+    /// Asks for vectors of `dimensions` values, as `outputDimensionality`.
+    #[must_use]
+    pub fn output_dimensions(mut self, dimensions: usize) -> Self {
+        self.dimensions = Some(dimensions);
+        self.id = crate::embedder_id("gemini", &self.name, Some(dimensions));
+        self.known = OnceLock::from(dimensions);
+        self
+    }
+
+    fn body(&self, texts: &[&str], purpose: Purpose) -> Value {
+        let task = match purpose {
+            Purpose::Document => "RETRIEVAL_DOCUMENT",
+            Purpose::Query => "RETRIEVAL_QUERY",
+        };
+        let requests: Vec<Value> = texts
+            .iter()
+            .map(|text| {
+                let mut request = json!({
+                    "content": { "parts": [{ "text": text }] },
+                    "model": format!("models/{}", self.name),
+                    "taskType": task,
+                });
+                if let Some(dimensions) = self.dimensions {
+                    request["outputDimensionality"] = json!(dimensions);
+                }
+                request
+            })
+            .collect();
+        json!({ "requests": requests })
+    }
+}
+
+#[derive(Deserialize)]
+struct Embedded {
+    #[serde(default)]
+    embeddings: Vec<Values>,
+}
+
+#[derive(Deserialize)]
+struct Values {
+    values: Vec<f32>,
+}
+
+#[async_trait]
+impl Embedder for Embeddings {
+    fn model(&self) -> &str {
+        &self.id
+    }
+
+    fn dimensions(&self) -> Option<usize> {
+        self.known.get().copied()
+    }
+
+    fn is_local(&self) -> bool {
+        false
+    }
+
+    async fn embed(&self, texts: &[&str], purpose: Purpose) -> Result<Vec<Embedding>> {
+        if texts.is_empty() {
+            return Ok(Vec::new());
+        }
+        let post = Post {
+            body: self.body(texts, purpose).to_string().into_bytes(),
+            headers: vec![("x-goog-api-key".into(), self.key.clone())],
+            url: format!(
+                "{}/v1beta/models/{}:batchEmbedContents",
+                self.base, self.name
+            ),
+        };
+        let body = http::whole(self.transport.post(post).await?).await?;
+        let reply: Embedded = http::parse("Gemini", &String::from_utf8_lossy(&body))?;
+        let vectors = reply
+            .embeddings
+            .into_iter()
+            .map(|each| each.values)
+            .collect();
+        crate::embedded(self, &self.known, texts.len(), vectors)
     }
 }
 
@@ -949,5 +1095,78 @@ data: {"candidates":[{"content":{"parts":[{"functionCall":{"id":"8f2b","name":"w
         let format = &transport.body()["generationConfig"]["responseFormat"]["text"];
         assert_eq!(format["mimeType"], "APPLICATION_JSON");
         assert_eq!(format["schema"]["required"], json!(["city"]));
+    }
+
+    /// A reply from `:batchEmbedContents` with `gemini-embedding-001`, cut to
+    /// three values.
+    const EMBEDDED: &str = r#"{
+  "embeddings": [
+    { "values": [-0.022374554, -0.004560777, 0.013309286] },
+    { "values": [0.0018738473, 0.0145103, -0.06309785] }
+  ]
+}"#;
+
+    #[tokio::test]
+    async fn each_text_is_sent_with_its_task_and_comes_back_in_order() {
+        let transport = Arc::new(Canned::new(EMBEDDED, 5));
+        let embedder = Embeddings::new("AIza-test", "gemini-embedding-001", transport.clone())
+            .output_dimensions(3);
+
+        let vectors = embedder
+            .embed(&["who owns the notes?", "and the suite?"], Purpose::Query)
+            .await
+            .unwrap();
+
+        let post = transport.last();
+        assert_eq!(
+            post.url,
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:batchEmbedContents"
+        );
+        assert!(post
+            .headers
+            .contains(&("x-goog-api-key".into(), "AIza-test".into())));
+        assert_eq!(
+            transport.body()["requests"][1],
+            json!({
+                "content": { "parts": [{ "text": "and the suite?" }] },
+                "model": "models/gemini-embedding-001",
+                "outputDimensionality": 3,
+                "taskType": "RETRIEVAL_QUERY",
+            })
+        );
+        assert_eq!(
+            vectors[1].values,
+            [0.001_873_847_3, 0.014_510_3, -0.063_097_85]
+        );
+        assert_eq!(vectors[0].model, "gemini/gemini-embedding-001@3");
+
+        // The canned reply holds two vectors, so one text is refused, and its
+        // request still shows the task.
+        let one = embedder
+            .embed(&["Dana owns the notes"], Purpose::Document)
+            .await;
+        assert!(matches!(one, Err(Error::InvalidOutput(_))), "{one:?}");
+        assert_eq!(
+            transport.body()["requests"][0]["taskType"],
+            "RETRIEVAL_DOCUMENT"
+        );
+    }
+
+    #[tokio::test]
+    async fn an_embedding_request_refused_gives_the_status_and_the_message() {
+        let refused = Arc::new(Canned::status(
+            400,
+            r#"{"error":{"code":400,"message":"API key not valid. Please pass a valid API key.","status":"INVALID_ARGUMENT"}}"#,
+        ));
+
+        let error = Embeddings::new("AIza-test", "gemini-embedding-001", refused)
+            .embed(&["a"], Purpose::Document)
+            .await
+            .unwrap_err();
+
+        assert!(
+            matches!(&error, Error::Status { status: 400, message, .. } if message.starts_with("API key not valid")),
+            "{error}"
+        );
     }
 }
