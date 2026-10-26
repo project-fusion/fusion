@@ -57,7 +57,25 @@ export function HelixElements(): null {
 
   useEffect(() => {
     let live = true
+    /* **The bar's families first, then the library.** `helix.css` hides a tag
+       until its definition loads, and a hidden link takes no focus, so until
+       then the bar can neither be seen nor used: a key pressed on the Helix
+       product 300 ms into a cold load did nothing. With the whole library in
+       one import the megamenu was defined 348 to 366 ms into a cold load of the
+       home page and about 1,300 ms at a quarter of the CPU, measured on October
+       25, 2026. With the bar's own families asked for first, 168 to 235 ms and
+       815 ms, and the rest of the library arrives when it did. The bar at rest
+       is these; its drawer, tree, and palette open later and come with the
+       rest. */
     const elements = Promise.allSettled([
+      import('@fusion.dev/helix/app-header'),
+      import('@fusion.dev/helix/navigation'),
+      import('@fusion.dev/helix/megamenu'),
+      import('@fusion.dev/helix/button'),
+      import('@fusion.dev/helix/icon-button'),
+      import('@fusion.dev/helix/icon'),
+      import('@fusion.dev/helix/tooltip'),
+      import('@fusion.dev/helix/kbd'),
       import('@fusion.dev/helix'),
       import('@fusion.dev/helix-workbench/specs'),
     ])

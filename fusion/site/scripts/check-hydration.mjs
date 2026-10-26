@@ -62,6 +62,7 @@ const hydrated = (selector) =>
 const PAGES = [
   {
     name: 'megamenu opens on the first key',
+    needs: ['helix-megamenu'],
     path: '/',
     run: async (page) => {
       const trigger = page.locator('helix-megamenu[label="Helix"] a[slot="trigger"]')
@@ -85,6 +86,7 @@ const PAGES = [
   },
   {
     name: '`/` moves focus to the search',
+    needs: ['helix-kbd', 'helix-input'],
     path: '/insights',
     run: async (page) => {
       /* The page focuses its search on arrival, where `/` would only type a
@@ -106,6 +108,7 @@ const PAGES = [
   },
   {
     name: 'an array prop arrives',
+    needs: ['helix-map-route'],
     path: '/helix/maps',
     run: (page) =>
       page
@@ -161,23 +164,19 @@ try {
       const page = await context.newPage()
       const errors = []
       page.on('pageerror', (error) => errors.push(error.message))
-      await page.goto(`${origin}${one.path}`, { waitUntil: 'networkidle' })
+      await page.goto(`${origin}${one.path}`, { waitUntil: 'load' })
       await page.waitForFunction(hydrated(one.waitFor), undefined, { timeout: 15000 })
-      /* **Settled as the visual check settles a page**: the network quiet,
-         every Helix element's `whenSettled`, then two frames. Pressed sooner,
-         in the first second of a cold load, Down Arrow opened the megamenu, the
-         handler ran, and the update React made of it took focus to the page,
-         which closed the panel: measured three times on October 25, 2026, and
-         never with the bridge blind, where no update was made. That is a
-         question about the site, not the bridge, so the press waits for a page
-         at rest. Nothing here commits React. */
-      await page.evaluate(async () => {
-        const elements = [...document.querySelectorAll('*')].filter((one) =>
-          one.localName.startsWith('helix-'),
-        )
-        await Promise.all(elements.map((one) => one.whenSettled))
+      /* **And the elements the press needs are defined**, then two frames.
+         `elements.css` hides a tag until its definition loads, and a hidden
+         link takes no focus, so a key pressed sooner reaches the page: on
+         October 25, 2026 the megamenu was defined 348 to 366 ms into a cold
+         load, after the whole library, and a press at 300 ms did nothing.
+         `HelixElements` now loads the bar's families first. Nothing here
+         commits React. */
+      await page.evaluate(async (tags) => {
+        await Promise.all(tags.map((tag) => customElements.whenDefined(tag)))
         await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)))
-      })
+      }, one.needs)
       results[blind ? 'blind' : 'bridged'] = await one.run(page)
       if (!blind && errors.length > 0) {
         failures.push(`${one.path}: threw ${errors.join(' / ')}`)
