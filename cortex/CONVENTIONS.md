@@ -11,7 +11,7 @@ spine, not a module.
 
 | Module | Crate | Owns |
 |---|---|---|
-| **Engram** | `fusion-cortex-engram` | Memory: episodic, semantic, later procedural |
+| **Engram** | `fusion-cortex-engram` | Memory: episodic, semantic, consolidation, and scopes; later procedural |
 | **Trace** | `fusion-cortex-trace` | Provenance: `why()`, replay, cascading deletion |
 | **Recall** | `fusion-cortex-recall` | Context assembly: pins, compaction, drop records |
 | Core | `fusion-cortex-core` | Ids, provider abstraction, shared errors |
@@ -38,6 +38,24 @@ spine, not a module.
 - **Deletion cascades.** Removing a memory must remove everything derived from
   it, or "delete" is a promise the system cannot keep. Prune the reverse index
   too, or it grows across a session.
+- **A fact goes with its last source.** Engram's `derived_from` is a fact's
+  support: forgetting an episode removes the edge, in the store's `sources`
+  rows as well, and removes a fact only when no source is left. A fact another
+  episode still supports stays. Trace's cascade is by derivation and goes
+  further: deleting an episode's node removes every node computed after it,
+  so a consolidation pass's extraction goes with any episode it read.
+- **Every episode and fact carries a scope**: personal, project, team, or
+  organization, with the project or team it names. An episode takes its scope
+  when it is recorded. A fact takes the narrowest scope of its sources by
+  `Scope::narrowest`: personal wins, the organization yields, and two
+  different projects or teams, or a project and a team, make it personal,
+  because Cortex does not know how they nest. Adding a source can narrow a
+  fact's scope, and forgetting one never widens it. Recall's `relevant` takes
+  the scopes a caller may read and places nothing outside them, and a scope
+  matches only itself.
+- **Consolidation reads each scope apart.** The pass batches a scope's
+  episodes and shows the model only that scope's current facts, so a fact never
+  rests on an episode some of its readers may not read.
 - **Two storage backends are required**, SQLite and Postgres, held in lockstep by
   a shared conformance suite. Trace has its trait, `store::Store`, with
   `InMemory` as the reference and `Sqlite` beside it, both run through
@@ -119,5 +137,8 @@ behavioral claims (`trace.len() == 4`) that no signature check could.
 - **Walk to the head of a supersession chain.** Callers hold whichever fact id
   they read; pointing at an already-superseded fact forks the lineage and leaves
   two current facts where there should be one.
+- **Mark what a pass read.** An episode no fact rests on is pending until a
+  pass marks it consolidated. Deleting a fact marks its sources too, or the
+  next pass distills the deleted fact again from the same episodes.
 - **Clamp elapsed time at zero when decaying confidence.** A negative age raises
   confidence above anything recorded, manufacturing belief from clock skew.
