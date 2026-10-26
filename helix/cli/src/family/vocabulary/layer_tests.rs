@@ -218,7 +218,7 @@ fn a_layer_that_swipes_stands_along_an_edge_and_rests_at_its_snap_points() {
     assert!(still.contains("the layer does not swipe"), "{still}");
     let written = read("layer('panel', { edge: 'bottom', open: bind('open'), snap: '0.5 1', swipe: true }, [region('default')])").unwrap_err();
     assert!(
-        written.contains("`snap` binds the prop that holds the snap points"),
+        written.contains("`snapPoints` binds the prop that holds the snap points"),
         "{written}"
     );
 }

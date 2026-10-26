@@ -77,12 +77,12 @@ export default headless('toast', {
   render: ({ derived, notices }) => (
     <Layer
       closedby="none"
-      edge={derived.edge}
-      enters="press"
+      initialFocus="press"
       notice
       open={notices.showing}
       part="region"
-      returns="held"
+      restoreFocus="held"
+      side={derived.edge}
     >
       <Slot />
       <Announce

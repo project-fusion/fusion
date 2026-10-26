@@ -37,7 +37,7 @@ export default headless('skeleton', {
   },
   host: {
     busy: bind('loading'),
-    decorative: bind('unread'),
+    ariaHidden: bind('unread'),
     label: bind('spokenLabel'),
     role: bind('spokenRole'),
   },

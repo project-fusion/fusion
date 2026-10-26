@@ -120,6 +120,7 @@ export default headless('popover', {
       </Wrap>
       <Layer
         anchor="trigger"
+        anchorPress="toggle"
         arrow="arrow"
         closedby="any"
         cross-offset={props.crossOffset}
@@ -130,7 +131,6 @@ export default headless('popover', {
         open={props.open}
         part="surface"
         placement={props.placement}
-        presses="toggle"
         role="dialog"
       >
         {props.arrow && (

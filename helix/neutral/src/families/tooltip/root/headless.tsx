@@ -126,6 +126,7 @@ export default headless('tooltip', {
           'surface-top': state.placedTop,
         }}
         anchor="trigger"
+        anchorPress={props.persist ? 'none' : 'close'}
         arrow="arrow"
         closedby="any"
         hint={derived.hint}
@@ -133,7 +134,6 @@ export default headless('tooltip', {
         open={props.open}
         part="surface"
         placement={props.placement}
-        presses={props.persist ? 'none' : 'close'}
         role="tooltip"
       >
         <View

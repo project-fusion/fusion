@@ -33,8 +33,8 @@ pub(super) const SHAPES: &[(&str, &str)] = &[
     ("rect", "Rect"),
 ];
 
-/// Each attribute the JSX form spells another way.
-pub(super) const RENAMED: &[(&str, &str)] = &[("decorative", "ariaHidden"), ("glyph", "icon")];
+/// Each attribute the JSX form spells another way, as the reader maps it.
+pub(super) use crate::family::read::RENAMED;
 
 /// What a render reads, by the name the builder form binds.
 pub struct Names {

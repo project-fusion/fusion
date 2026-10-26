@@ -39,11 +39,11 @@ export default headless('toggle', {
   toggle: { onBeforeChange: 'beforeCheck', onChange: 'change', prop: 'selected' },
   render: ({ props, send }) => (
     <Pressable
-      chooses
       disabled={props.disabled}
       onPress={send.beforeSelect}
       part="item"
       role="button"
+      selects
       toggles
     >
       <Slot name="start" />

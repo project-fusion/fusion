@@ -77,7 +77,7 @@ fn a_source_written_with_render_compiles_to_what_the_builder_form_does() {
           states: ['selected'],
           render: ({ derived, props, send }) => (
             <>
-              <Pressable part=\"tab\" chooses disabled={props.disabled} onPress={send.beforeSelect}>
+              <Pressable part=\"tab\" selects disabled={props.disabled} onPress={send.beforeSelect}>
                 <Slot part=\"label\" />
                 {props.disabled ? <View part=\"mark\" ariaHidden icon=\"x\" /> : <Text part=\"hint\">{derived.holdHint}</Text>}
               </Pressable>
@@ -116,7 +116,7 @@ fn render_comes_last_and_the_builder_keys_are_refused() {
         .unwrap_err();
         assert!(
             chooses.contains(&format!(
-                "`set()` takes no `{key}`: pressing chooses where a `<Pressable>`"
+                "`set()` takes no `{key}`: pressing selects where a `<Pressable>`"
             )),
             "{chooses}"
         );
@@ -138,7 +138,7 @@ fn a_member_chooses_where_its_press_says_chooses_and_only_there() {
         serde_json::to_string(&read.api.item).unwrap()
     };
     assert_eq!(
-        item(r#"<View part="row"><Pressable part="press" chooses /></View>"#),
+        item(r#"<View part="row"><Pressable part="press" selects /></View>"#),
         r#"{"chooses":true,"of":"y"}"#
     );
     assert_eq!(item(r#"<Pressable part="press" />"#), r#"{"of":"y"}"#);

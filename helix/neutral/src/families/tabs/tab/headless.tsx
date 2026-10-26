@@ -32,13 +32,13 @@ export default headless('tab', {
   states: ['selected', 'settled'],
   render: ({ props, send }) => (
     <Pressable
-      chooses
       disabled={props.disabled}
       href={props.href}
       onPress={send.beforeSelect}
       part="tab"
       role="tab"
       selected={props.selected}
+      selects
     >
       <Slot part="label" />
       {props.dismissible && (

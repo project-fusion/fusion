@@ -67,7 +67,7 @@ export default headless('navigation', {
     >
       <View
         ariaHidden
-        marks="chosen"
+        indicator
         part="indicator"
       >
         <Slot name="indicator" />

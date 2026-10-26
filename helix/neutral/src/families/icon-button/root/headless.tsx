@@ -73,7 +73,6 @@ export default headless('icon-button', {
     <>
       <Pressable
         busy={props.pending}
-        chooses
         disabled={props.disabled}
         expanded={props.expanded}
         focusable-when-disabled={props.focusableWhenDisabled}
@@ -83,6 +82,7 @@ export default headless('icon-button', {
         popup={props.popup}
         pressed={props.pressed}
         role="button"
+        selects
       >
         <Slot name="start" />
         <Slot part="text" />

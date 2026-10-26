@@ -55,10 +55,10 @@ export default headless('list-item', {
   render: ({ props }) => (
     <Pressable
       also={{ 'row-current': props.current }}
-      chooses
       disabled={props.disabled}
       part="row"
       selected={props.selected}
+      selects
     >
       {/* Everything but `end` is the link, so a control there is a control of
         its own. */}

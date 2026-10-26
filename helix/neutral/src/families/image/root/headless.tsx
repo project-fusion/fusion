@@ -42,8 +42,8 @@ export default headless('image', {
     <>
       <Image
         alt={props.alt}
-        fails="error"
-        loads="load"
+        onError="error"
+        onLoad="load"
         part="image"
         src={props.src}
       />

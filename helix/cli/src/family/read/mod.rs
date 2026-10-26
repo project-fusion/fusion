@@ -363,7 +363,7 @@ pub(super) fn refused(span: Span, source: &str, what: &str) -> String {
 mod jsx;
 mod reader;
 
-pub(crate) use jsx::kebab;
+pub(crate) use jsx::{kebab, RENAMED};
 
 #[cfg(test)]
 mod tests;

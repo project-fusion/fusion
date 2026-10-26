@@ -56,11 +56,11 @@ export default headless('tag', {
   states: ['focusVisible', 'selected', 'settled'],
   render: ({ props, send }) => (
     <Pressable
-      chooses
       disabled={props.disabled}
       href={props.href}
       part="cell"
       selected={props.selected}
+      selects
     >
       <Slot
         name="start"

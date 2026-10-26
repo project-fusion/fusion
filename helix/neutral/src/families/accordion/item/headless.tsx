@@ -117,8 +117,8 @@ export default headless('accordion-item', {
         </Pressable>
       </View>
       <View
-        closed={!props.open}
         labelledby="summary"
+        open={props.open}
         part="content"
         role={props.open ? 'region' : ''}
       >

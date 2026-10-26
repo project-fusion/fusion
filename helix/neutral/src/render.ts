@@ -9,7 +9,7 @@
  *   events: { dismiss: cancelable(['label']) },
  *   states: ['selected'],
  *   render: ({ props, send }) => (
- *     <Pressable chooses disabled={props.disabled} part="tab" role="tab">
+ *     <Pressable disabled={props.disabled} part="tab" role="tab" selects>
  *       <Slot part="label" />
  *     </Pressable>
  *   ),
@@ -357,13 +357,11 @@ interface Named extends Common {
   readonly busy?: Given
   readonly describedby?: string
   readonly description?: Given
-  readonly invalid?: Given
   readonly label?: Given
   readonly labelledby?: string
   readonly readonly?: Given
   readonly required?: Given
   readonly role?: Given
-  readonly roledescription?: Given
   readonly valuemax?: Given
   readonly valuemin?: Given
   readonly valuenow?: Given
@@ -383,16 +381,22 @@ interface Drawing {
 export interface ViewAttributes extends Named, Drawing {
   readonly children?: Child
   readonly style?: Style
-  readonly closed?: Given
   readonly current?: Given
   readonly element?: Given
   readonly hidden?: Given
   /** A glyph a phone draws in the box, by its name. */
   readonly icon?: Given
+  /** The box stands at the item its set has selected, as a tab set's moving mark does. */
+  readonly indicator?: boolean
   readonly inert?: Given
   readonly level?: number | Read
   readonly lines?: Given
-  readonly marks?: 'chosen'
+  /**
+   * Whether the box shows, where it stays drawn while closed, as a
+   * `<details>`'s content does: `hidden="until-found"` and `inert` on the
+   * web while it does not.
+   */
+  readonly open?: Given
   readonly orientation?: Given
   readonly part: string
   readonly run?: boolean
@@ -419,8 +423,10 @@ export const Text = (_: TextAttributes): Drawn => node()
 export interface ImageAttributes extends Common {
   readonly alt?: Given
   readonly empty?: 'error' | 'loading'
-  readonly fails?: string
-  readonly loads?: string
+  /** The event sent once the picture fails to load. */
+  readonly onError?: string
+  /** The event sent once the picture has loaded. */
+  readonly onLoad?: string
   readonly part: string
   readonly src?: Given
 }
@@ -432,24 +438,24 @@ export const Image = (_: ImageAttributes): Drawn => node()
 export interface PressableAttributes extends Named {
   readonly checked?: Given
   readonly children?: Child
-  /** The press asks the collection its element joins to choose it. */
-  readonly chooses?: boolean
   readonly copies?: boolean
   readonly current?: Given
   readonly disabled?: Given
   readonly expanded?: Given
   readonly 'focusable-when-disabled'?: Given
-  readonly held?: Given
   readonly href?: Given
   readonly into?: string
-  readonly keys?: 'enter' | 'space'
   /** The event a press sends first. */
   readonly onPress?: Send
   readonly part: string
   readonly popup?: Given
+  /** The one key that presses it, where Enter and Space do not both, as Space alone presses a checkbox. */
+  readonly pressKey?: 'enter' | 'space'
   readonly pressed?: Given
   readonly scrolls?: 'end' | 'start'
   readonly selected?: Given
+  /** The press asks the collection its element joins to select it. */
+  readonly selects?: boolean
   readonly toggles?: boolean
 }
 
@@ -477,6 +483,8 @@ export interface LayerAttributes extends Common {
   readonly style?: Style
   readonly also?: Readonly<Record<string, boolean | Read | undefined>>
   readonly anchor?: string
+  /** What a press drawn in the anchor does to the layer once its own event stands. */
+  readonly anchorPress?: 'close' | 'none' | 'toggle' | Read
   readonly ariaHidden?: boolean | Read
   readonly arrow?: string
   readonly arrows?: Given
@@ -486,13 +494,14 @@ export interface LayerAttributes extends Common {
   readonly 'cross-offset'?: Given
   readonly describedby?: string
   readonly description?: Given
-  readonly edge?: Given
-  readonly enters?: 'always' | 'down' | 'press'
   readonly flip?: Given
   readonly hint?: Given
-  readonly holds?: Given
+  /** When opening moves focus into the layer, as a dialog's `initialFocus` says where it lands. */
+  readonly initialFocus?: 'always' | 'down' | 'press'
   readonly label?: Given
   readonly labelledby?: string
+  /** A long press of a press drawn in the anchor opens the layer. */
+  readonly longPress?: Given
   readonly modal?: Given
   readonly notice?: Given
   readonly offset?: Given
@@ -500,12 +509,14 @@ export interface LayerAttributes extends Common {
   readonly part: string
   readonly placement?: Given
   readonly presentation?: Given
-  readonly presses?: 'close' | 'none' | 'toggle' | Read
   readonly refuses?: Given
-  readonly returns?: 'always' | 'dismissed' | 'held'
+  /** When closing gives focus back to the anchor. */
+  readonly restoreFocus?: 'always' | 'dismissed' | 'held'
   readonly role?: Given
-  readonly roledescription?: Given
-  readonly snap?: Given
+  /** The edge of the window the layer stands along: `top`, `bottom`, `start`, or `end`. */
+  readonly side?: Given
+  /** The shares of the layer a reader can leave on screen, as a drawer's `snap-points`. */
+  readonly snapPoints?: Given
   readonly swipe?: Given
   readonly target?: Given
 }

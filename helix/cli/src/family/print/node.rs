@@ -223,8 +223,8 @@ impl Printer<'_, '_> {
             (_, written, value) => {
                 let renamed = RENAMED
                     .iter()
-                    .find(|(builder, _)| *builder == written)
-                    .map_or(written, |(_, jsx)| *jsx);
+                    .find(|(_, builder)| *builder == written)
+                    .map_or(written, |(jsx, _)| *jsx);
                 if !(identifier(renamed) || renamed.split('-').all(identifier)) {
                     return Err(format!(
                         "an attribute named `{renamed}`, which JSX cannot name"
