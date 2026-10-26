@@ -1,7 +1,7 @@
 //! Cortex primitives.
 //!
-//! The substrate every Cortex module builds on: identifiers, the provider
-//! abstraction, and the errors they share. Deliberately small. Anything that
+//! The substrate every Cortex module builds on: identifiers, the provider and
+//! embedder abstractions, and the errors they share. Deliberately small. Anything that
 //! belongs to memory lives in `fusion-cortex-engram`; anything that belongs to
 //! provenance lives in `fusion-cortex-trace`.
 
@@ -9,6 +9,7 @@ use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 
+pub mod embed;
 #[cfg(feature = "postgres")]
 pub mod postgres;
 pub mod provider;

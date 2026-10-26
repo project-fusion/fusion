@@ -1,0 +1,265 @@
+---
+title: Scoring memory by meaning
+description: Embed facts with a local model, store the vectors in SQLite or Postgres, and find a fact asked about in other words.
+---
+
+# Scoring memory by meaning
+
+An embedding model turns text into a vector, and two texts that mean the same
+thing get vectors that point the same way. Cortex embeds each fact Engram
+keeps, stores the vector beside it, and lets Recall rank facts by how close
+their vectors are to a question's. A question can then find a fact that shares
+none of its words.
+
+Start with a model on your own machine. The text you embed is your memory, and
+a local model keeps it on the device.
+
+## Embed with a local model
+
+Ollama serves embedding models beside chat models. Pull one, and the
+`ollama::Embeddings` client calls it at `http://localhost:11434`.
+
+```bash
+ollama pull nomic-embed-text
+```
+
+`nomic-embed-text` was trained with a prefix for each side of a search, so set
+them with `prefixes`.
+
+[//]: # (rust:fusion-cortex-provider::ollama::Embeddings)
+
+```rust
+let transport = Arc::new(Reqwest::new().unwrap());
+let embedder = Embeddings::new("nomic-embed-text", transport)
+    .prefixes("search_query: ", "search_document: ");
+
+assert_eq!(embedder.model(), "ollama/nomic-embed-text");
+assert!(embedder.is_local(), "a local server is the default");
+```
+
+[//]: # (/rust)
+
+Every embedder implements Core's `Embedder` trait. It reports the model it
+records with each vector, how many values each vector has, and `is_local`, so a
+product can tell you whether your text left the device.
+
+| Client | Feature | API | Servers |
+| --- | --- | --- | --- |
+| `ollama::Embeddings` | `ollama` | Ollama's `/api/embed` | Ollama on your machine or your network |
+| `embeddings::Embeddings` | `embeddings` | OpenAI's `/v1/embeddings` | LM Studio, vLLM, llama.cpp, and OpenAI |
+| `gemini::Embeddings` | `gemini` | Gemini `batchEmbedContents` | Google |
+
+Anthropic offers no embeddings API, and the Responses API embeds nothing, so
+the `anthropic` and `responses` features have no embedder. Pair a model from
+either one with an embedder from the table.
+
+Mark an OpenAI-compatible server as local yourself, as you do for the `Chat`
+client. A server on `localhost` can forward your text to a hosted model.
+
+[//]: # (rust:fusion-cortex-provider::embeddings::Embeddings)
+
+```rust
+let transport = Arc::new(Reqwest::new().unwrap());
+let embedder = Embeddings::new("http://localhost:1234/v1", "text-embedding-nomic-embed-text-v1.5", transport)
+    .named("lmstudio/nomic-embed-text-v1.5")
+    .local(true);
+
+assert_eq!(embedder.model(), "lmstudio/nomic-embed-text-v1.5");
+assert!(embedder.is_local());
+```
+
+[//]: # (/rust)
+
+## Choose a local model
+
+We measured two local models on October 26, 2026, with four notes and the
+question "Who writes up what changed in each release?". Its answer is "Dana is
+responsible for writing the changelog.", which shares none of its words.
+
+| Model | Size | Answer's similarity | Next note's similarity | With a note that shares the question's words |
+| --- | --- | --- | --- | --- |
+| `nomic-embed-text`, with its prefixes | 274 MB | 0.73 | 0.52 | The answer still ranks first |
+| `all-minilm` | 45 MB | 0.45 | 0.34 | The other note ranks first |
+
+`all-minilm` finds a paraphrase among notes on other subjects. A note that
+shares the question's words, such as "Each release changed how the docs site
+looks.", draws it away from the answer. Use `nomic-embed-text` where you can.
+
+## Embed facts as they are written
+
+Pass an embedder to `consolidate_with`, and the consolidation pass embeds each
+fact before it writes it, in one call for each batch. When the embedder fails,
+the pass keeps the facts without a vector and names them in `unembedded`.
+
+[//]: # (rust:fusion-cortex-engram::consolidate::consolidate_with)
+
+```rust
+let store = InMemory::new();
+store.record(&Episode::new("Dana writes the release notes from now on.", Id::new())).await.unwrap();
+let provider = Scripted::new("scripted/1", vec![Ok(reply(
+    r#"{"facts": [{"statement": "Dana owns the release notes.", "confidence": 0.9, "episodes": [1]}]}"#,
+))]);
+let embedder = Embedder::new("scripted/embed", 2).with("Dana owns the release notes.", vec![0.9, 0.1]);
+
+consolidate_with(&provider, Some(&embedder), &store, &Options::default()).await.unwrap();
+
+let fact = &store.current_facts().await.unwrap()[0];
+assert_eq!(fact.embedding.as_ref().unwrap().model, "scripted/embed");
+```
+
+[//]: # (/rust)
+
+## Embed what is already stored
+
+`backfill` embeds every current fact without a vector, or with a vector from
+another model. Run it once after you configure an embedder for the first time,
+and again after you change models. Each batch is written as it is embedded, so
+a backfill that stops partway carries on where it stopped when you run it again.
+
+[//]: # (rust:fusion-cortex-engram::embed::backfill)
+
+```rust
+let store = InMemory::new();
+let episode = Episode::new("Dana owns the release notes now.", Id::new());
+store.record(&episode).await.unwrap();
+store.assert_fact(&Fact::new("Dana owns the release notes", vec![episode.id], 0.9), None).await.unwrap();
+let embedder = Scripted::new("scripted/1", 2).with("Dana owns the release notes", vec![0.9, 0.1]);
+
+let embedded = backfill(&store, &embedder, 32).await.unwrap();
+
+assert_eq!(embedded.len(), 1);
+let fact = &store.current_facts().await.unwrap()[0];
+assert_eq!(fact.embedding.as_ref().unwrap().model, "scripted/1");
+assert!(backfill(&store, &embedder, 32).await.unwrap().is_empty(), "nothing is left to embed");
+```
+
+[//]: # (/rust)
+
+## A vector from another model is never compared
+
+Two models place the same text in different spaces, so a similarity between
+their vectors means nothing. Each `Embedding` names the model that made it,
+and `cosine` compares two vectors only when the model and the length agree.
+
+[//]: # (rust:fusion-cortex-core::embed::Embedding)
+
+```rust
+use fusion_cortex_core::embed::Embedding;
+
+let fact = Embedding::new("ollama/nomic-embed-text", vec![0.6, 0.8]);
+let question = Embedding::new("ollama/nomic-embed-text", vec![0.8, 0.6]);
+let other = Embedding::new("gemini/gemini-embedding-001", vec![0.8, 0.6]);
+
+assert!((question.cosine(&fact).unwrap() - 0.96).abs() < 1e-6);
+assert_eq!(question.cosine(&other), None, "another model's space");
+```
+
+[//]: # (/rust)
+
+An embedder's model name includes the length when you set one, as in
+`gemini/gemini-embedding-001@768`, because one model at two lengths also makes
+two spaces. After a change of model, a fact embedded by the old one scores
+nothing by vector until `backfill` embeds it again.
+
+## Rank facts with Recall
+
+`Vector` is a Recall scorer. It embeds the question as a query and scores each
+fact by the cosine similarity of the two vectors. `Weighted` combines scorers,
+so the words a fact shares with the question count beside its meaning.
+`relevant` places no fact outside the scopes you pass, whichever scorer ranks
+it.
+
+[//]: # (rust:fusion-cortex-recall::Vector)
+
+```rust
+let embedder = Scripted::new("scripted/1", 2)
+    .with("Dana owns the release notes", vec![0.9, 0.1])
+    .with("each version changed what the docs site looks like", vec![0.1, 0.9])
+    .with("who writes up what changed in each version?", vec![0.8, 0.3]);
+let mut facts = vec![
+    Fact::new("Dana owns the release notes", vec![], 0.8),
+    Fact::new("each version changed what the docs site looks like", vec![], 0.8),
+];
+for fact in &mut facts {
+    fact.embedding = Some(embedder.embed_one(&fact.content, Purpose::Document).await.unwrap());
+}
+let question = "who writes up what changed in each version?";
+
+let vector = Vector::of(&embedder, question).await.unwrap();
+let both = Weighted::new(vec![(&Overlap, 0.3), (&vector, 0.7)]);
+let placed = relevant(&facts, &[Scope::Personal], question, &both, 1, |_| 0.0, 30.0);
+
+assert_eq!(placed[0].0.content, "Dana owns the release notes");
+let by_words = relevant(&facts, &[Scope::Personal], question, &Overlap, 1, |_| 0.0, 30.0);
+assert_eq!(by_words[0].0.content, "each version changed what the docs site looks like");
+```
+
+[//]: # (/rust)
+
+Each scorer has a versioned id that names its parts, such as
+`weighted/1 (overlap/1 0.30, vector/1 ollama/nomic-embed-text 0.70)`, and
+`explain` says how a fact scored on each part. Record it as the reason a fact
+was placed.
+
+## Find candidates in a large memory
+
+`relevant` ranks the facts you pass it. For a large memory, ask the store for
+the facts nearest the question first, and rank those. `nearest` returns the current facts in the scopes you pass, most similar first,
+compared only with vectors from the question's model.
+
+[//]: # (rust:fusion-cortex-engram::Memory::nearest)
+
+```rust
+let mut owner = Fact::new("Dana owns the release notes", vec![seen], 0.8);
+owner.embedding = Some(Embedding::new("scripted/1", vec![0.9, 0.1]));
+let mut docs = Fact::new("the docs build with bun", vec![seen], 0.8);
+docs.embedding = Some(Embedding::new("scripted/1", vec![0.1, 0.9]));
+memory.assert_fact(owner, None);
+memory.assert_fact(docs, None);
+
+let question = Embedding::new("scripted/1", vec![0.8, 0.2]);
+let near = memory.nearest(&question, &[Scope::Personal], 1);
+
+assert_eq!(near[0].0.content, "Dana owns the release notes");
+```
+
+[//]: # (/rust)
+
+Each backend finds the nearest facts its own way:
+
+- **SQLite** stores each vector as bytes and ranks the facts in Rust. It needs
+  no extension.
+- **Postgres with `pgvector`** orders by the `<=>` operator under an HNSW index
+  for each model.
+- **Postgres without `pgvector`** stores each vector as `real[]` and ranks the
+  facts in Rust, as SQLite does.
+
+The Choosing storage guide describes when a Postgres store uses `pgvector`.
+
+## Test without a model
+
+`embed::Scripted` returns the vector you script for each text, so a test can
+place a paraphrase near its fact with no model and no network.
+
+[//]: # (rust:fusion-cortex-core::embed::Scripted)
+
+```rust
+let embedder = Scripted::new("scripted/1", 2)
+    .with("Dana owns the release notes", vec![0.9, 0.1])
+    .with("who writes up each release?", vec![0.8, 0.2]);
+
+let fact = embedder.embed_one("Dana owns the release notes", Purpose::Document).await.unwrap();
+let question = embedder.embed_one("who writes up each release?", Purpose::Query).await.unwrap();
+
+assert!(question.cosine(&fact).unwrap() > 0.99);
+assert!(embedder.embed_one("anything else", Purpose::Query).await.is_err());
+```
+
+[//]: # (/rust)
+
+To run the opt-in tests against a local model, name it in
+`CORTEX_OLLAMA_EMBED_MODEL`:
+
+```bash
+CORTEX_OLLAMA_EMBED_MODEL=nomic-embed-text cargo test -p fusion-cortex-engram --test ollama
+```

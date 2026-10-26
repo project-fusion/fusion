@@ -14,7 +14,7 @@ spine, not a module.
 | **Engram** | `fusion-cortex-engram` | Memory: episodic, semantic, consolidation, and scopes; later procedural |
 | **Trace** | `fusion-cortex-trace` | Provenance: `why()`, replay, cascading deletion |
 | **Recall** | `fusion-cortex-recall` | Context assembly: pins, compaction, drop records |
-| Core | `fusion-cortex-core` | Ids, provider abstraction, shared errors, storage locations, and the Postgres connection and migrations the stores share |
+| Core | `fusion-cortex-core` | Ids, the provider and embedder abstractions, shared errors, storage locations, and the Postgres connection and migrations the stores share |
 | Providers | `fusion-cortex-provider` | Model clients, one per API and each a feature, local first |
 | Extraction | `fusion-cortex-extract` | Typed extraction: a reply checked against a schema, one retry, and its trace |
 
@@ -131,14 +131,45 @@ spine, not a module.
   local provider requirement buys, beyond privacy: a hosted model can be
   updated behind a stable name, which is precisely the phenomenon a drift
   measurement exists to detect.
-- **Vectors are deferred, the seam is not.** A memory record must carry a
-  nullable embedding field and relevance scoring must be a strategy, so enabling
-  vectors is swapping a scorer rather than migrating a schema. `Fact` carries
-  the nullable `embedding`, and `SQLite` stores it as a nullable column;
-  Recall's `Scorer` is the strategy, and `Overlap` is the one it ships.
-  Postgres stores the embedding as a nullable `real[]`, which `pgvector` casts
-  to a `vector`, so `pgvector` is an extension and a new step, never a change
-  to a released one.
+- **A vector names its model, and two models are never compared.** A fact's
+  `embedding` is an `embed::Embedding`: the values and the `Embedder::model`
+  that made them, which includes the length where the caller set one
+  (`gemini/gemini-embedding-001@768`). `Embedding::cosine` returns `None` unless
+  the model and the length agree, every store's `nearest` reads only the
+  query's model at its length, and Recall's `Vector` scores another model's
+  fact zero. A change of model is `embed::backfill`, never a comparison of old
+  vectors with new ones. A stored vector with no model reads as no embedding.
+- **A store refuses a vector that cannot be compared**: empty, holding a value
+  that is not finite, or all zeros. `pgvector` refuses the same ones, so every
+  backend refuses them in Rust first, and `Embedding::check` is the one test.
+- **Embedders are local first, as providers are.** `Embedder` carries
+  `is_local`, `ollama::Embeddings` is the default client, and Anthropic and the
+  Responses API have no embedder because neither API embeds text.
+- **Consolidation never drops a fact for its vector.** A failed embedding call
+  leaves the batch's facts without one, named in `Consolidation::unembedded`,
+  for `backfill`.
+- **Scoring is a strategy, and a combination records its parts.** Recall's
+  `Scorer` is the strategy, with `Overlap`, `Vector`, and `Weighted`. A
+  scorer's `id` names the model it reads, a `Weighted` id names each part and
+  weight, and `explain` is what a context records as the reason a fact was
+  placed.
+- **`pgvector` where the database has it, Rust where it does not, chosen at
+  open.** `SQLite` keeps the vector as bytes and ranks in Rust with no
+  extension. Postgres keeps `real[]` in every schema. Where the `vector`
+  extension is installed, or the role may create it, `Postgres::over` adds
+  `embedding_vector`, a stored column generated from `real[]`, and `nearest`
+  orders by `<=>`. Otherwise it ranks in Rust as `SQLite` does. The column is
+  the record: a schema that has it stays on `pgvector`, and one without it
+  tries again at the next open. The column is no migration step, because it
+  exists only where the server has the extension; the model's column is step 2.
+- **One HNSW index per model and length, partial, written with literals.** An
+  HNSW index needs a fixed length, so each model gets
+  `facts_embedding_<hash>`, over `embedding_vector::vector(n)` where the model
+  and `vector_dims` match. The query writes the model and the length into its
+  text, because a partial index matches only a predicate the planner can see,
+  and quotes them with `identifier` and `literal`. A model longer than 2,000
+  values has no index and is scanned. The pgvector suite checks the plan uses
+  the index.
 
 ## Documentation
 
@@ -182,5 +213,14 @@ behavioral claims (`trace.len() == 4`) that no signature check could.
   as a space. Engram's text columns refuse one, which the storage guide says.
 - **Postgres has no `min()` for `uuid`.** Read a trace's first node with
   `DISTINCT ON (trace) … ORDER BY trace, id`.
+- **Migrate a `SQLite` file on one connection, then open the pool.** A pool
+  connection opened before a column was added prepares `SELECT *` with the old
+  columns, `SQLite` prepares it again with the new ones when it runs, and
+  `sqlx` indexes past its cached list and panics in its worker.
+- **Install `pgvector` outside the scratch schemas in a test.** A store that
+  creates the extension puts it in the first schema of its search path, so the
+  suite's scratch schema would hold it, and dropping that schema would drop
+  every other schema's vector column. Engram's Postgres tests install it in the
+  database's default schema first.
 - **Clamp elapsed time at zero when decaying confidence.** A negative age raises
   confidence above anything recorded, manufacturing belief from clock skew.

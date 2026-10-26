@@ -8,9 +8,9 @@
 use std::sync::Mutex;
 
 use async_trait::async_trait;
-use fusion_cortex_core::{Error, Id, Result};
+use fusion_cortex_core::{embed::Embedding, Error, Id, Result};
 
-use crate::{Episode, Fact, Memory};
+use crate::{Episode, Fact, Memory, Scope};
 
 /// Keeps episodes and the facts distilled from them.
 ///
@@ -47,8 +47,34 @@ pub trait Store: Send + Sync {
     /// # Errors
     ///
     /// [`Error::Storage`] if a fact with this id is already held, or the
-    /// backend fails.
+    /// backend fails, and [`Error::InvalidOutput`] if its embedding fails
+    /// [`Embedding::check`].
     async fn assert_fact(&self, fact: &Fact, supersedes: Option<Id>) -> Result<()>;
+
+    /// Sets the embedding of the fact `fact`, replacing any it had, as
+    /// [`Memory::set_embedding`] does, and returns whether the store held the
+    /// fact.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::InvalidOutput`] if the embedding fails [`Embedding::check`],
+    /// and [`Error::Storage`] if the backend fails.
+    async fn set_embedding(&self, fact: Id, embedding: &Embedding) -> Result<bool>;
+
+    /// The current facts in `scopes` nearest `query`, most similar first and
+    /// at most `most`, each with its cosine similarity, as
+    /// [`Memory::nearest`] ranks them. Only a fact embedded by the query's
+    /// model, at its length, is compared.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Storage`] if the backend fails.
+    async fn nearest(
+        &self,
+        query: &Embedding,
+        scopes: &[Scope],
+        most: usize,
+    ) -> Result<Vec<(Fact, f32)>>;
 
     /// Marks `old`'s lineage as superseded by the held fact `new`, as
     /// [`Memory::supersede`] does, and returns whether it did.
@@ -173,12 +199,32 @@ impl Store for InMemory {
     }
 
     async fn assert_fact(&self, fact: &Fact, supersedes: Option<Id>) -> Result<()> {
+        checked(fact)?;
         let mut memory = self.lock()?;
         if memory.facts().iter().any(|held| held.id == fact.id) {
             return Err(Error::Storage(format!("fact {} is already held", fact.id)));
         }
         memory.assert_fact(fact.clone(), supersedes);
         Ok(())
+    }
+
+    async fn set_embedding(&self, fact: Id, embedding: &Embedding) -> Result<bool> {
+        embedding.check()?;
+        Ok(self.lock()?.set_embedding(fact, embedding.clone()))
+    }
+
+    async fn nearest(
+        &self,
+        query: &Embedding,
+        scopes: &[Scope],
+        most: usize,
+    ) -> Result<Vec<(Fact, f32)>> {
+        Ok(self
+            .lock()?
+            .nearest(query, scopes, most)
+            .into_iter()
+            .map(|(fact, similarity)| (fact.clone(), similarity))
+            .collect())
     }
 
     async fn supersede(&self, old: Id, new: Id) -> Result<bool> {
@@ -271,6 +317,11 @@ pub async fn open(location: &str) -> Result<Box<dyn Store>> {
     }
 }
 
+/// Checks the embedding a fact carries, where it carries one.
+fn checked(fact: &Fact) -> Result<()> {
+    fact.embedding.as_ref().map_or(Ok(()), Embedding::check)
+}
+
 /// The head of the lineage `from` belongs to, walking `links`, or none for an
 /// unknown id. Stops on a cycle.
 #[cfg(any(feature = "postgres", feature = "sqlite"))]
@@ -290,7 +341,7 @@ fn head(links: &std::collections::HashMap<Id, Option<Id>>, from: Id) -> Option<I
 #[cfg(feature = "postgres")]
 mod postgres;
 #[cfg(feature = "postgres")]
-pub use postgres::Postgres;
+pub use postgres::{Postgres, Vectors};
 
 #[cfg(feature = "sqlite")]
 pub use sqlite::Sqlite;
@@ -309,12 +360,17 @@ mod sqlite {
 
     use super::Store;
     use crate::{Episode, Fact, Scope};
+    use fusion_cortex_core::embed::Embedding;
 
     /// An episode and a fact are rows, and each source of a fact is a row of
     /// its own, so a cascade finds a trace's facts in SQL; an episode that
     /// reinforced a fact is a row of another table, which a cascade only
     /// removes. An embedding is the little-endian bytes of its floats, or
-    /// null.
+    /// null, and the model that made it is a column beside it, which
+    /// [`VECTORS`] adds. A vector with no model is read as no embedding,
+    /// since nothing can say which vectors it may be compared with. `SQLite`
+    /// needs no extension for vectors: `nearest` reads the facts embedded by
+    /// the query's model and ranks them in Rust.
     ///
     /// **Postgres matches it column for column.** Ids and times are text here
     /// and `uuid` and `timestamptz` there. A scope is two columns, its kind
@@ -370,19 +426,37 @@ mod sqlite {
         ALTER TABLE facts ADD COLUMN node TEXT;
     ";
 
+    /// The column vectors added on October 26, 2026: the model that made a
+    /// fact's embedding.
+    const VECTORS: &str = "ALTER TABLE facts ADD COLUMN embedding_model TEXT;";
+
     /// Creates the tables, and adds what a file from an earlier release lacks,
     /// once, under the write lock, so two stores opening one old file add the
     /// columns once between them.
-    async fn migrate(pool: &SqlitePool) -> std::result::Result<(), sqlx::Error> {
-        sqlx::raw_sql(SCHEMA).execute(pool).await?;
-        let mut transaction = pool.begin_with("BEGIN IMMEDIATE").await?;
-        let scoped: i64 = sqlx::query_scalar(
-            "SELECT COUNT(*) FROM pragma_table_info('episodes') WHERE name = 'scope'",
-        )
-        .fetch_one(&mut *transaction)
-        .await?;
-        if scoped == 0 {
-            sqlx::raw_sql(SCOPES).execute(&mut *transaction).await?;
+    ///
+    /// **It runs on one connection, before the pool opens any other.** A
+    /// connection opened before a column was added prepares `SELECT *` with
+    /// the columns it last saw, `SQLite` prepares it again with the new ones
+    /// when it runs, and `sqlx` reads past the list it kept, which panics.
+    async fn migrate(
+        connection: &mut sqlx::SqliteConnection,
+    ) -> std::result::Result<(), sqlx::Error> {
+        use sqlx::Connection as _;
+        sqlx::raw_sql(SCHEMA).execute(&mut *connection).await?;
+        let mut transaction = connection.begin_with("BEGIN IMMEDIATE").await?;
+        for (table, column, sql) in [
+            ("episodes", "scope", SCOPES),
+            ("facts", "embedding_model", VECTORS),
+        ] {
+            let held: i64 =
+                sqlx::query_scalar("SELECT COUNT(*) FROM pragma_table_info(?) WHERE name = ?")
+                    .bind(table)
+                    .bind(column)
+                    .fetch_one(&mut *transaction)
+                    .await?;
+            if held == 0 {
+                sqlx::raw_sql(sql).execute(&mut *transaction).await?;
+            }
         }
         transaction.commit().await
     }
@@ -429,13 +503,11 @@ mod sqlite {
         time.to_rfc3339_opts(SecondsFormat::Nanos, true)
     }
 
-    fn bytes(embedding: Option<&Vec<f32>>) -> Option<Vec<u8>> {
-        embedding.map(|values| {
-            values
-                .iter()
-                .flat_map(|value| value.to_le_bytes())
-                .collect()
-        })
+    fn bytes(values: &[f32]) -> Vec<u8> {
+        values
+            .iter()
+            .flat_map(|value| value.to_le_bytes())
+            .collect()
     }
 
     fn floats(bytes: &[u8]) -> Vec<f32> {
@@ -503,8 +575,10 @@ mod sqlite {
                 .create_if_missing(true)
                 .foreign_keys(true)
                 .journal_mode(sqlx::sqlite::SqliteJournalMode::Wal);
+            let mut connection = sqlx::ConnectOptions::connect(&options).await?;
+            migrate(&mut connection).await?;
+            sqlx::Connection::close(connection).await?;
             let pool = SqlitePoolOptions::new().connect_with(options).await?;
-            migrate(&pool).await?;
             Ok(Self { pool })
         }
 
@@ -530,7 +604,9 @@ mod sqlite {
         }
 
         async fn ready(pool: SqlitePool) -> Result<Self> {
-            migrate(&pool).await.map_err(storage)?;
+            migrate(&mut *pool.acquire().await.map_err(storage)?)
+                .await
+                .map_err(storage)?;
             Ok(Self { pool })
         }
 
@@ -689,6 +765,7 @@ mod sqlite {
                 .await
                 .map_err(storage)?;
                 let embedding: Option<Vec<u8>> = row.try_get("embedding").map_err(storage)?;
+                let model: Option<String> = row.try_get("embedding_model").map_err(storage)?;
                 let superseded_by: Option<String> =
                     row.try_get("superseded_by").map_err(storage)?;
                 let node: Option<String> = row.try_get("node").map_err(storage)?;
@@ -706,7 +783,9 @@ mod sqlite {
                             parse(&source.try_get::<String, _>("episode").map_err(storage)?)
                         })
                         .collect::<Result<_>>()?,
-                    embedding: embedding.as_deref().map(floats),
+                    embedding: embedding
+                        .zip(model)
+                        .map(|(values, model)| Embedding::new(model, floats(&values))),
                     id: parse(&id)?,
                     node: node.as_deref().map(parse).transpose()?,
                     reinforced_by: reinforced
@@ -748,6 +827,7 @@ mod sqlite {
         }
 
         async fn assert_fact(&self, fact: &Fact, supersedes: Option<Id>) -> Result<()> {
+            super::checked(fact)?;
             let mut transaction = self
                 .pool
                 .begin_with("BEGIN IMMEDIATE")
@@ -769,13 +849,19 @@ mod sqlite {
                 .unwrap_or_else(|| fact.scope.clone());
             sqlx::query(
                 "INSERT INTO facts
-                     (id, content, confidence, embedding, superseded_by, updated_at, scope, scope_name, node)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                     (id, content, confidence, embedding, embedding_model, superseded_by,
+                      updated_at, scope, scope_name, node)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             )
             .bind(fact.id.to_string())
             .bind(&fact.content)
             .bind(f64::from(fact.confidence))
-            .bind(bytes(fact.embedding.as_ref()))
+            .bind(
+                fact.embedding
+                    .as_ref()
+                    .map(|embedding| bytes(&embedding.values)),
+            )
+            .bind(fact.embedding.as_ref().map(|embedding| &embedding.model))
             .bind(fact.superseded_by.map(|id| id.to_string()))
             .bind(written(fact.updated_at))
             .bind(scope.kind())
@@ -842,6 +928,38 @@ mod sqlite {
                 .map_err(storage)?;
             transaction.commit().await.map_err(storage)?;
             Ok(true)
+        }
+
+        async fn set_embedding(&self, fact: Id, embedding: &Embedding) -> Result<bool> {
+            embedding.check()?;
+            let set =
+                sqlx::query("UPDATE facts SET embedding = ?, embedding_model = ? WHERE id = ?")
+                    .bind(bytes(&embedding.values))
+                    .bind(&embedding.model)
+                    .bind(fact.to_string())
+                    .execute(&self.pool)
+                    .await
+                    .map_err(storage)?;
+            Ok(set.rows_affected() > 0)
+        }
+
+        async fn nearest(
+            &self,
+            query: &Embedding,
+            scopes: &[Scope],
+            most: usize,
+        ) -> Result<Vec<(Fact, f32)>> {
+            let rows = sqlx::query(
+                "SELECT * FROM facts
+                 WHERE superseded_by IS NULL AND embedding_model = ? AND length(embedding) = ?
+                 ORDER BY rowid",
+            )
+            .bind(&query.model)
+            .bind(i64::try_from(query.values.len() * 4).map_err(storage)?)
+            .fetch_all(&self.pool)
+            .await
+            .map_err(storage)?;
+            Ok(crate::nearest(self.read(rows).await?, query, scopes, most))
         }
 
         async fn current_facts(&self) -> Result<Vec<Fact>> {
@@ -1033,7 +1151,7 @@ mod sqlite {
 /// The behavior every store must have, run against each one.
 #[cfg(test)]
 pub(crate) mod conformance {
-    use fusion_cortex_core::Id;
+    use fusion_cortex_core::{embed::Embedding, Id};
 
     use super::Store;
     use crate::{Episode, Fact, Scope};
@@ -1054,6 +1172,209 @@ pub(crate) mod conformance {
         adding_a_source_narrows_the_scope_and_moves_the_node(store).await;
         an_episode_a_pass_read_is_no_longer_pending(store).await;
         deleting_a_fact_restores_what_it_superseded(store).await;
+        a_paraphrase_finds_its_fact_over_one_that_shares_its_words(store).await;
+        nearest_reads_only_current_facts_in_the_callers_scopes(store).await;
+        another_models_vectors_are_never_compared(store).await;
+        a_new_embedding_replaces_another_models(store).await;
+        a_vector_that_cannot_be_compared_is_refused(store).await;
+    }
+
+    /// The vectors a scripted model gives the facts and questions below. The
+    /// question about release notes shares no word with the fact that answers
+    /// it, and shares four with the distractor.
+    fn scripted() -> fusion_cortex_core::embed::Scripted {
+        fusion_cortex_core::embed::Scripted::new("scripted/1", 4)
+            .with("Dana owns the release notes", vec![0.9, 0.1, 0.0, 0.1])
+            .with(
+                "each version changed what the docs site looks like",
+                vec![0.1, 0.9, 0.3, 0.0],
+            )
+            .with("the suite runs nightly", vec![0.0, 0.2, 0.9, 0.1])
+            .with(
+                "who writes up what changed in each version?",
+                vec![0.8, 0.3, 0.1, 0.0],
+            )
+    }
+
+    async fn embedded(text: &str) -> Embedding {
+        use fusion_cortex_core::embed::{Embedder, Purpose};
+        scripted().embed_one(text, Purpose::Document).await.unwrap()
+    }
+
+    async fn assert_embedded(store: &dyn Store, fact: &mut Fact) {
+        fact.embedding = Some(embedded(&fact.content).await);
+        store.assert_fact(fact, None).await.unwrap();
+    }
+
+    async fn a_paraphrase_finds_its_fact_over_one_that_shares_its_words(store: &dyn Store) {
+        use fusion_cortex_core::embed::{Embedder, Purpose};
+        let trace = Id::new();
+        let seen = record(store, "paraphrase", trace).await;
+        let mut owner = Fact::new("Dana owns the release notes", vec![seen.id], 0.8);
+        let mut distractor = Fact::new(
+            "each version changed what the docs site looks like",
+            vec![seen.id],
+            0.8,
+        );
+        let mut nightly = Fact::new("the suite runs nightly", vec![seen.id], 0.8);
+        for fact in [&mut owner, &mut distractor, &mut nightly] {
+            assert_embedded(store, fact).await;
+        }
+        let question = scripted()
+            .embed_one(
+                "who writes up what changed in each version?",
+                Purpose::Query,
+            )
+            .await
+            .unwrap();
+
+        let near = store
+            .nearest(&question, &[Scope::Personal], 2)
+            .await
+            .unwrap();
+
+        let found: Vec<Id> = near.iter().map(|(fact, _)| fact.id).collect();
+        assert_eq!(found, [owner.id, distractor.id], "{near:?}");
+        let expected = question.cosine(owner.embedding.as_ref().unwrap()).unwrap();
+        assert!((near[0].1 - expected).abs() < 1e-4, "{near:?}");
+        assert!(near[0].1 > near[1].1);
+        assert_eq!(
+            near[0].0,
+            held(store, owner.id).await.unwrap(),
+            "the whole fact"
+        );
+        store.forget(trace).await.unwrap();
+    }
+
+    async fn nearest_reads_only_current_facts_in_the_callers_scopes(store: &dyn Store) {
+        let trace = Id::new();
+        let core = Scope::Team("core".into());
+        let personal = record(store, "scoped: mine", trace).await;
+        let team = record_within(store, "scoped: core", trace, core.clone()).await;
+        let mut old = Fact::new("Dana owns the release notes", vec![personal.id], 0.8);
+        assert_embedded(store, &mut old).await;
+        let mut new = Fact::new("the suite runs nightly", vec![personal.id], 0.8);
+        new.embedding = Some(embedded("the suite runs nightly").await);
+        store.assert_fact(&new, Some(old.id)).await.unwrap();
+        let mut theirs = Fact::new(
+            "each version changed what the docs site looks like",
+            vec![team.id],
+            0.8,
+        );
+        assert_embedded(store, &mut theirs).await;
+        let question = embedded("Dana owns the release notes").await;
+
+        let mine: Vec<Id> = store
+            .nearest(&question, &[Scope::Personal], 10)
+            .await
+            .unwrap()
+            .into_iter()
+            .map(|(fact, _)| fact.id)
+            .collect();
+        assert_eq!(mine, [new.id], "neither a superseded fact nor a team's");
+        let both = store
+            .nearest(&question, &[Scope::Personal, core.clone()], 10)
+            .await
+            .unwrap();
+        assert_eq!(both.len(), 2);
+        assert!(store.nearest(&question, &[], 10).await.unwrap().is_empty());
+        assert!(store
+            .nearest(&question, &[Scope::Personal], 0)
+            .await
+            .unwrap()
+            .is_empty());
+        store.forget(trace).await.unwrap();
+    }
+
+    async fn another_models_vectors_are_never_compared(store: &dyn Store) {
+        let trace = Id::new();
+        let seen = record(store, "models", trace).await;
+        let values = vec![0.9, 0.1, 0.0, 0.1];
+        let mut ours = Fact::new("models: ours", vec![seen.id], 0.8);
+        ours.embedding = Some(Embedding::new("scripted/1", values.clone()));
+        let mut theirs = Fact::new("models: theirs", vec![seen.id], 0.8);
+        theirs.embedding = Some(Embedding::new("scripted/2", values.clone()));
+        let mut longer = Fact::new("models: longer", vec![seen.id], 0.8);
+        longer.embedding = Some(Embedding::new("scripted/1", vec![0.9, 0.1, 0.0, 0.1, 0.0]));
+        let plain = Fact::new("models: none", vec![seen.id], 0.8);
+        for fact in [&ours, &theirs, &longer, &plain] {
+            store.assert_fact(fact, None).await.unwrap();
+        }
+
+        let near = store
+            .nearest(
+                &Embedding::new("scripted/1", values),
+                &[Scope::Personal],
+                10,
+            )
+            .await
+            .unwrap();
+
+        let found: Vec<&str> = near
+            .iter()
+            .map(|(fact, _)| fact.content.as_str())
+            .filter(|content| content.starts_with("models"))
+            .collect();
+        assert_eq!(found, ["models: ours"], "{near:?}");
+        let read = held(store, theirs.id).await.unwrap();
+        assert_eq!(
+            read.embedding.unwrap().model,
+            "scripted/2",
+            "the model is kept"
+        );
+        store.forget(trace).await.unwrap();
+    }
+
+    async fn a_new_embedding_replaces_another_models(store: &dyn Store) {
+        let trace = Id::new();
+        let seen = record(store, "replaced", trace).await;
+        let mut fact = Fact::new("Dana owns the release notes", vec![seen.id], 0.8);
+        fact.embedding = Some(Embedding::new("retired/1", vec![1.0, 0.0]));
+        store.assert_fact(&fact, None).await.unwrap();
+        let fresh = embedded("Dana owns the release notes").await;
+
+        assert!(store.set_embedding(fact.id, &fresh).await.unwrap());
+        assert!(!store.set_embedding(Id::new(), &fresh).await.unwrap());
+
+        assert_eq!(
+            held(store, fact.id).await.unwrap().embedding,
+            Some(fresh.clone())
+        );
+        let retired = Embedding::new("retired/1", vec![1.0, 0.0]);
+        assert!(store
+            .nearest(&retired, &[Scope::Personal], 10)
+            .await
+            .unwrap()
+            .is_empty());
+        assert_eq!(
+            store.nearest(&fresh, &[Scope::Personal], 10).await.unwrap()[0]
+                .0
+                .id,
+            fact.id
+        );
+        store.forget(trace).await.unwrap();
+    }
+
+    async fn a_vector_that_cannot_be_compared_is_refused(store: &dyn Store) {
+        let trace = Id::new();
+        let seen = record(store, "refused", trace).await;
+        let held_fact = Fact::new("refused: held", vec![seen.id], 0.8);
+        store.assert_fact(&held_fact, None).await.unwrap();
+        for values in [
+            vec![],
+            vec![0.0, 0.0],
+            vec![f32::NAN, 1.0],
+            vec![f32::INFINITY],
+        ] {
+            let bad = Embedding::new("scripted/1", values);
+            let mut fact = Fact::new("refused: bad", vec![seen.id], 0.8);
+            fact.embedding = Some(bad.clone());
+
+            assert!(store.assert_fact(&fact, None).await.is_err(), "{bad:?}");
+            assert!(store.set_embedding(held_fact.id, &bad).await.is_err());
+        }
+        assert!(held(store, held_fact.id).await.unwrap().embedding.is_none());
+        store.forget(trace).await.unwrap();
     }
 
     async fn a_fact_another_episode_supports_outlives_forgetting_one(store: &dyn Store) {
@@ -1461,7 +1782,7 @@ pub(crate) mod conformance {
         let trace = Id::new();
         let seen = record(store, "embedded", trace).await;
         let mut fact = Fact::new("embedded", vec![seen.id], 0.4);
-        fact.embedding = Some(vec![0.25, -1.5, 3.0]);
+        fact.embedding = Some(Embedding::new("scripted/1", vec![0.25, -1.5, 3.0]));
         store.assert_fact(&fact, None).await.unwrap();
 
         let read = store
@@ -1494,11 +1815,155 @@ mod tests {
         conformance::run(&super::Sqlite::in_memory().await.unwrap()).await;
     }
 
+    /// Installs `pgvector` in the database's default schema, where the server
+    /// has it, before a suite makes a scratch schema. A store would otherwise
+    /// create it in the first scratch schema to open, and dropping that
+    /// schema would take the extension, and every other schema's vector
+    /// column, with it. Returns whether `pgvector` is installed, which a
+    /// role without the privilege to create it may leave it not.
+    #[cfg(feature = "postgres")]
+    async fn with_pgvector() -> bool {
+        let Ok(url) = std::env::var(fusion_cortex_core::postgres::TEST_DATABASE) else {
+            return false;
+        };
+        let pool = sqlx::PgPool::connect(&url).await.unwrap();
+        let available: bool = sqlx::query_scalar(
+            "SELECT EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = 'vector')",
+        )
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+        if available {
+            // Two suites may race to create it, and the one that loses finds
+            // it made.
+            let _ = sqlx::raw_sql("CREATE EXTENSION IF NOT EXISTS vector")
+                .execute(&pool)
+                .await;
+        }
+        let installed: bool = sqlx::query_scalar(
+            "SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'vector')",
+        )
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+        pool.close().await;
+        installed
+    }
+
+    /// Runs `run` in a scratch schema, once `pgvector` is installed outside
+    /// it where the server has it.
+    #[cfg(feature = "postgres")]
+    async fn scratch<F, Run>(run: F) -> bool
+    where
+        F: FnOnce(fusion_cortex_core::storage::Postgres) -> Run,
+        Run: std::future::Future<Output = ()> + Send + 'static,
+    {
+        with_pgvector().await;
+        fusion_cortex_core::postgres::in_scratch_schema(run).await
+    }
+
     #[cfg(feature = "postgres")]
     #[tokio::test]
     async fn the_postgres_store_conforms() {
-        fusion_cortex_core::postgres::in_scratch_schema(|location| async move {
-            conformance::run(&super::Postgres::connect(&location).await.unwrap()).await;
+        let pgvector = with_pgvector().await;
+        scratch(|location| async move {
+            let store = super::Postgres::connect(&location).await.unwrap();
+            assert_eq!(
+                matches!(store.vectors(), super::postgres::Vectors::Pgvector(_)),
+                pgvector,
+                "pgvector scores where it is installed"
+            );
+            conformance::run(&store).await;
+        })
+        .await;
+    }
+
+    #[cfg(feature = "postgres")]
+    #[tokio::test]
+    async fn the_postgres_store_conforms_scoring_in_rust() {
+        scratch(|location| async move {
+            let store = super::Postgres::scoring_in_rust(&location).await.unwrap();
+            assert_eq!(store.vectors(), &super::postgres::Vectors::Rust);
+            conformance::run(&store).await;
+        })
+        .await;
+    }
+
+    #[cfg(feature = "postgres")]
+    #[tokio::test]
+    async fn a_pgvector_store_orders_by_an_index_for_each_model() {
+        use super::{postgres::Vectors, Postgres, Store};
+        use crate::{Episode, Fact, Scope};
+        use fusion_cortex_core::{embed::Embedding, Id};
+
+        if !with_pgvector().await {
+            eprintln!("skipped: pgvector is not installed");
+            return;
+        }
+        scratch(|location| async move {
+            let store = Postgres::connect(&location).await.unwrap();
+            let Vectors::Pgvector(schema) = store.vectors().clone() else {
+                panic!("pgvector is installed");
+            };
+            let episode = Episode::new("indexed", Id::new());
+            store.record(&episode).await.unwrap();
+            for values in [[0.9, 0.1, 0.0], [0.1, 0.9, 0.0], [0.0, 0.1, 0.9]] {
+                let mut fact = Fact::new("indexed", vec![episode.id], 0.5);
+                fact.embedding = Some(Embedding::new("it's/1", values.to_vec()));
+                store.assert_fact(&fact, None).await.unwrap();
+            }
+            let reopened = Postgres::connect(&location).await.unwrap();
+            assert_eq!(
+                reopened.vectors(),
+                store.vectors(),
+                "the column records the choice"
+            );
+
+            let pool = sqlx::PgPool::connect(&location.url).await.unwrap();
+            let indexes: Vec<String> = sqlx::query_scalar(
+                "SELECT indexdef FROM pg_indexes
+                 WHERE schemaname = current_schema() AND tablename = 'facts'
+                   AND indexdef LIKE '%hnsw%'",
+            )
+            .fetch_all(&pool)
+            .await
+            .unwrap();
+            assert_eq!(indexes.len(), 1, "{indexes:?}");
+            assert!(indexes[0].contains("'it''s/1'"), "{indexes:?}");
+            let mut connection = pool.acquire().await.unwrap();
+            sqlx::raw_sql("SET enable_seqscan = off")
+                .execute(&mut *connection)
+                .await
+                .unwrap();
+            let schema = format!("\"{schema}\"");
+            let plan: Vec<String> = sqlx::query_scalar(sqlx::AssertSqlSafe(format!(
+                "EXPLAIN SELECT id FROM facts
+                 WHERE superseded_by IS NULL AND embedding_model = 'it''s/1'
+                   AND {schema}.vector_dims(embedding_vector) = 3
+                 ORDER BY (embedding_vector::{schema}.vector(3))
+                     OPERATOR({schema}.<=>) '[1,0,0]'::{schema}.vector(3)
+                 LIMIT 2"
+            )))
+            .fetch_all(&mut *connection)
+            .await
+            .unwrap();
+            assert!(
+                plan.iter().any(|line| line.contains("facts_embedding_")),
+                "{plan:?}"
+            );
+            drop(connection);
+            pool.close().await;
+
+            let near = store
+                .nearest(
+                    &Embedding::new("it's/1", vec![1.0, 0.0, 0.0]),
+                    &[Scope::Personal],
+                    2,
+                )
+                .await
+                .unwrap();
+            assert_eq!(near.len(), 2);
+            assert!(near[0].1 > near[1].1);
         })
         .await;
     }
@@ -1510,7 +1975,7 @@ mod tests {
         use crate::{Episode, Fact};
         use fusion_cortex_core::Id;
 
-        fusion_cortex_core::postgres::in_scratch_schema(|location| async move {
+        scratch(|location| async move {
             let write = |location: fusion_cortex_core::storage::Postgres| async move {
                 let store = Postgres::connect(&location).await.unwrap();
                 let trace = Id::new();
@@ -1545,7 +2010,7 @@ mod tests {
         use crate::{Episode, Fact};
         use fusion_cortex_core::Id;
 
-        fusion_cortex_core::postgres::in_scratch_schema(|location| async move {
+        scratch(|location| async move {
             let store = Postgres::connect(&location).await.unwrap();
             let (monday, tuesday) = (
                 Episode::new("bun", Id::new()),
@@ -1581,7 +2046,7 @@ mod tests {
         use crate::Episode;
         use fusion_cortex_core::Id;
 
-        fusion_cortex_core::postgres::in_scratch_schema(|location| async move {
+        scratch(|location| async move {
             let store = Postgres::connect(&location).await.unwrap();
 
             let refused = store.record(&Episode::new("a\0b", Id::new())).await;

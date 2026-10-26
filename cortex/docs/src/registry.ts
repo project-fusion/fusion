@@ -75,6 +75,13 @@ export const pages: DocPage[] = [
     slug: 'storage',
     title: 'Choosing storage',
   },
+  {
+    description: 'Embed facts with a local model and find a fact asked about in other words.',
+    order: 4,
+    section: 'Guides',
+    slug: 'vectors',
+    title: 'Scoring memory by meaning',
+  },
 ]
 
 export const findPage = (slug: string): DocPage | undefined =>

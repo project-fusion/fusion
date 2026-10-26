@@ -18,8 +18,10 @@
 //! the task stands.
 //!
 //! **Retrieval is a strategy.** A [`Scorer`] ranks Engram's facts against a
-//! query, and the one here counts shared words. Scoring by vector is a second
-//! scorer, and the fact already carries the field it would read.
+//! query. [`Overlap`] counts shared words, [`Vector`] compares the question's
+//! embedding with each fact's, and [`Weighted`] combines scorers, so a
+//! paraphrase and an exact term both count. Each reports a pinned id, and
+//! [`Scorer::explain`] records why a fact was placed.
 //!
 //! **A caller names the scopes it may read.** [`relevant`] places no fact
 //! whose scope is outside them, however well it scores.
@@ -27,8 +29,9 @@
 use std::{collections::HashMap, fmt::Write as _};
 
 use fusion_cortex_core::{
+    embed::{Embedder, Embedding, Purpose},
     provider::{Block, Message, Role},
-    Id,
+    Id, Result,
 };
 use fusion_cortex_engram::{Fact, Scope};
 pub use fusion_cortex_trace::{Dropped, Part, Piece, Placed};
@@ -668,11 +671,18 @@ pub fn assemble(items: &[Item], window: Window, state: Option<&str>) -> Assemble
 
 /// Ranks facts by how well each answers a query.
 pub trait Scorer: Send + Sync {
-    /// The scorer's pinned, versioned name, which a context records.
-    fn id(&self) -> &'static str;
+    /// The scorer's pinned, versioned name, which a context records. A
+    /// scorer that reads vectors names their model in it.
+    fn id(&self) -> &str;
 
     /// How well `fact` answers `query`, from 0 to 1.
     fn score(&self, query: &str, fact: &Fact) -> f32;
+
+    /// Why `fact` scored as it did, for the reason a context records: the
+    /// scorer's id and the score, and for a combination, each part.
+    fn explain(&self, query: &str, fact: &Fact) -> String {
+        format!("{} {:.2}", self.id(), self.score(query, fact))
+    }
 }
 
 /// Scores a fact by the share of its words the query holds, ignoring case
@@ -688,7 +698,10 @@ fn words(text: &str) -> std::collections::HashSet<String> {
 }
 
 impl Scorer for Overlap {
-    fn id(&self) -> &'static str {
+    // A literal satisfies the trait's `&str`, which a scorer naming its
+    // model needs, and that trips the lint.
+    #[allow(clippy::unnecessary_literal_bound)]
+    fn id(&self) -> &str {
         "overlap/1"
     }
 
@@ -704,6 +717,158 @@ impl Scorer for Overlap {
         )]
         let share = said.intersection(&asked).count() as f32 / said.len() as f32;
         share
+    }
+}
+
+/// Scores a fact by the cosine similarity of its embedding to the question's,
+/// below zero counted as zero.
+///
+/// **Only a fact embedded by the question's model, at its length, scores.**
+/// One with no embedding, or another model's, scores zero, so a change of
+/// model loses the vector's share until Engram's backfill embeds the facts
+/// again, and never compares two spaces. Its id names the model, as in
+/// `vector/1 ollama/nomic-embed-text`.
+///
+/// ```
+/// # use fusion_cortex_core::embed::{Embedder, Purpose, Scripted};
+/// # use fusion_cortex_engram::{Fact, Scope};
+/// # use fusion_cortex_recall::{relevant, Overlap, Scorer, Vector, Weighted};
+/// # #[tokio::main]
+/// # async fn main() {
+/// let embedder = Scripted::new("scripted/1", 2)
+///     .with("Dana owns the release notes", vec![0.9, 0.1])
+///     .with("each version changed what the docs site looks like", vec![0.1, 0.9])
+///     .with("who writes up what changed in each version?", vec![0.8, 0.3]);
+/// let mut facts = vec![
+///     Fact::new("Dana owns the release notes", vec![], 0.8),
+///     Fact::new("each version changed what the docs site looks like", vec![], 0.8),
+/// ];
+/// for fact in &mut facts {
+///     fact.embedding = Some(embedder.embed_one(&fact.content, Purpose::Document).await.unwrap());
+/// }
+/// let question = "who writes up what changed in each version?";
+///
+/// let vector = Vector::of(&embedder, question).await.unwrap();
+/// let both = Weighted::new(vec![(&Overlap, 0.3), (&vector, 0.7)]);
+/// let placed = relevant(&facts, &[Scope::Personal], question, &both, 1, |_| 0.0, 30.0);
+///
+/// assert_eq!(placed[0].0.content, "Dana owns the release notes");
+/// let by_words = relevant(&facts, &[Scope::Personal], question, &Overlap, 1, |_| 0.0, 30.0);
+/// assert_eq!(by_words[0].0.content, "each version changed what the docs site looks like");
+/// # }
+/// ```
+#[derive(Clone, Debug, PartialEq)]
+pub struct Vector {
+    id: String,
+    query: Embedding,
+}
+
+impl Vector {
+    /// The scorer for a question already embedded.
+    #[must_use]
+    pub fn new(query: Embedding) -> Self {
+        Self {
+            id: format!("vector/1 {}", query.model),
+            query,
+        }
+    }
+
+    /// Embeds `question` as a query and returns its scorer.
+    ///
+    /// # Errors
+    ///
+    /// Anything [`Embedder::embed`] returns.
+    pub async fn of(embedder: &dyn Embedder, question: &str) -> Result<Self> {
+        Ok(Self::new(
+            embedder.embed_one(question, Purpose::Query).await?,
+        ))
+    }
+
+    /// The question's embedding, which a store's `nearest` takes to find the
+    /// candidates in a large memory.
+    #[must_use]
+    pub fn query(&self) -> &Embedding {
+        &self.query
+    }
+}
+
+impl Scorer for Vector {
+    fn id(&self) -> &str {
+        &self.id
+    }
+
+    fn score(&self, _query: &str, fact: &Fact) -> f32 {
+        fact.embedding
+            .as_ref()
+            .and_then(|embedding| self.query.cosine(embedding))
+            .map_or(0.0, |cosine| cosine.max(0.0))
+    }
+}
+
+/// Scores a fact by several scorers, each by its weight: the weighted mean of
+/// their scores. A weight below zero, or not a number, counts as zero.
+#[derive(Clone)]
+pub struct Weighted<'a> {
+    id: String,
+    parts: Vec<(&'a dyn Scorer, f32)>,
+}
+
+impl std::fmt::Debug for Weighted<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Weighted")
+            .field("id", &self.id)
+            .finish_non_exhaustive()
+    }
+}
+
+impl<'a> Weighted<'a> {
+    /// The scorers and their weights. The id names each, as in
+    /// `weighted/1 (overlap/1 0.30, vector/1 ollama/nomic-embed-text 0.70)`.
+    #[must_use]
+    pub fn new(parts: Vec<(&'a dyn Scorer, f32)>) -> Self {
+        let parts: Vec<(&dyn Scorer, f32)> = parts
+            .into_iter()
+            .map(|(scorer, weight)| (scorer, if weight > 0.0 { weight } else { 0.0 }))
+            .collect();
+        let named: Vec<String> = parts
+            .iter()
+            .map(|(scorer, weight)| format!("{} {weight:.2}", scorer.id()))
+            .collect();
+        Self {
+            id: format!("weighted/1 ({})", named.join(", ")),
+            parts,
+        }
+    }
+}
+
+impl Scorer for Weighted<'_> {
+    fn id(&self) -> &str {
+        &self.id
+    }
+
+    fn score(&self, query: &str, fact: &Fact) -> f32 {
+        let total: f32 = self.parts.iter().map(|(_, weight)| weight).sum();
+        if total <= 0.0 {
+            return 0.0;
+        }
+        self.parts
+            .iter()
+            .map(|(scorer, weight)| scorer.score(query, fact) * weight)
+            .sum::<f32>()
+            / total
+    }
+
+    fn explain(&self, query: &str, fact: &Fact) -> String {
+        let parts: Vec<String> = self
+            .parts
+            .iter()
+            .map(|(scorer, weight)| format!("{} weighed {weight:.2}", scorer.explain(query, fact)))
+            .collect();
+        format!(
+            "weighted/1 {:.2}: {}",
+            self.score(query, fact),
+            parts.join(", ")
+        )
     }
 }
 
@@ -1159,6 +1324,80 @@ mod tests {
         );
         assert_eq!(placed(&[Scope::Team("web".into())]), Vec::<Scope>::new());
         assert!(placed(&[]).is_empty());
+    }
+
+    fn embedded(content: &str, model: &str, values: Vec<f32>) -> Fact {
+        let mut fact = Fact::new(content, vec![], 0.8);
+        fact.embedding = Some(Embedding::new(model, values));
+        fact
+    }
+
+    #[test]
+    fn a_vector_scores_only_facts_from_its_own_model() {
+        let vector = Vector::new(Embedding::new("scripted/1", vec![1.0, 0.0]));
+        let same = embedded("a", "scripted/1", vec![0.6, 0.8]);
+        let opposite = embedded("b", "scripted/1", vec![-1.0, 0.0]);
+        let other = embedded("c", "scripted/2", vec![1.0, 0.0]);
+        let plain = Fact::new("d", vec![], 0.8);
+
+        assert!((vector.score("", &same) - 0.6).abs() < 1e-6);
+        assert!(
+            vector.score("", &opposite).abs() < f32::EPSILON,
+            "below zero is zero"
+        );
+        assert!(
+            vector.score("", &other).abs() < f32::EPSILON,
+            "another model's space"
+        );
+        assert!(vector.score("", &plain).abs() < f32::EPSILON);
+        assert_eq!(vector.id(), "vector/1 scripted/1");
+    }
+
+    #[test]
+    fn a_weighted_scorer_is_the_weighted_mean_and_says_why() {
+        let vector = Vector::new(Embedding::new("scripted/1", vec![1.0, 0.0]));
+        let fact = embedded("the release notes", "scripted/1", vec![1.0, 0.0]);
+        let both = Weighted::new(vec![(&Overlap, 1.0), (&vector, 3.0), (&Overlap, -2.0)]);
+
+        let score = both.score("notes about something else", &fact);
+
+        // The query holds one of the fact's three words, and the vector
+        // matches whole.
+        assert!((score - (1.0 / 3.0 + 3.0) / 4.0).abs() < 1e-6, "{score}");
+        assert_eq!(
+            both.id(),
+            "weighted/1 (overlap/1 1.00, vector/1 scripted/1 3.00, overlap/1 0.00)"
+        );
+        let why = both.explain("notes about something else", &fact);
+        assert!(
+            why.starts_with("weighted/1 0.83: overlap/1 0.33 weighed 1.00, vector/1 scripted/1 1.00 weighed 3.00"),
+            "{why}"
+        );
+        assert!(Weighted::new(vec![]).score("x", &fact).abs() < f32::EPSILON);
+    }
+
+    #[test]
+    fn a_combined_scorer_still_places_nothing_outside_the_callers_scopes() {
+        let vector = Vector::new(Embedding::new("scripted/1", vec![1.0, 0.0]));
+        let both = Weighted::new(vec![(&Overlap, 0.5), (&vector, 0.5)]);
+        let facts = vec![
+            embedded("the team's answer", "scripted/1", vec![1.0, 0.0])
+                .within(Scope::Team("core".into())),
+            embedded("my answer", "scripted/1", vec![0.0, 1.0]),
+        ];
+
+        let placed = relevant(
+            &facts,
+            &[Scope::Personal],
+            "answer",
+            &both,
+            10,
+            |_| 0.0,
+            30.0,
+        );
+
+        assert_eq!(placed.len(), 1);
+        assert_eq!(placed[0].0.content, "my answer");
     }
 
     #[test]

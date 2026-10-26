@@ -1213,6 +1213,7 @@ dependencies = [
  "fusion-cortex-core",
  "fusion-cortex-extract",
  "fusion-cortex-provider",
+ "fusion-cortex-recall",
  "fusion-cortex-trace",
  "schemars",
  "serde",
@@ -1259,6 +1260,7 @@ dependencies = [
  "fusion-cortex-engram",
  "fusion-cortex-trace",
  "serde_json",
+ "tokio",
 ]
 
 [[package]]

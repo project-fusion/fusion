@@ -29,12 +29,22 @@
 //! together and matched only against facts of that scope, so a fact never
 //! rests on episodes some of its readers may not read.
 //!
+//! **An embedder, where one is configured, embeds each new fact before it is
+//! written.** [`consolidate_with`] embeds a batch's statements in one call. A
+//! failed call leaves the batch's facts without a vector, named in
+//! [`Consolidation::unembedded`], and [`crate::embed::backfill`] embeds them
+//! later. A fact is worth more than its vector, so a failure never drops one.
+//!
 //! Like extraction, the pass writes no trace: it returns the nodes, parents
 //! first, for the caller to append.
 
 use std::{collections::HashMap, fmt::Write as _};
 
-use fusion_cortex_core::{provider::Provider, Error, Id, Result};
+use fusion_cortex_core::{
+    embed::{Embedder, Embedding, Purpose},
+    provider::Provider,
+    Error, Id, Result,
+};
 use fusion_cortex_extract::{extract, JsonSchema, Prompt, Schema};
 use fusion_cortex_trace::{Detail, Node};
 use serde::Deserialize;
@@ -105,6 +115,13 @@ pub struct Failed {
     pub error: fusion_cortex_extract::Error,
 }
 
+/// Facts a pass asserted without a vector, because the embedder failed.
+#[derive(Debug)]
+pub struct Unembedded {
+    pub error: Error,
+    pub facts: Vec<Id>,
+}
+
 /// What a pass did.
 #[derive(Debug, Default)]
 pub struct Consolidation {
@@ -124,6 +141,9 @@ pub struct Consolidation {
     pub sourced: Vec<(Id, Id)>,
     /// Each fact it superseded, as the old fact and the new one.
     pub superseded: Vec<(Id, Id)>,
+    /// The facts it asserted without a vector, by batch, where an embedder
+    /// was configured and failed.
+    pub unembedded: Vec<Unembedded>,
 }
 
 /// The prompt the pass sends.
@@ -175,6 +195,45 @@ pub async fn consolidate(
     store: &dyn Store,
     options: &Options,
 ) -> Result<Consolidation> {
+    consolidate_with(provider, None, store, options).await
+}
+
+/// Distills the episodes no pass has read into facts, as [`consolidate`]
+/// does, and embeds each new fact with `embedder` where one is given.
+///
+/// ```
+/// # use fusion_cortex_core::{embed::Scripted as Embedder, provider::{Block, Response, Scripted, Stop, Usage}, Id};
+/// # use fusion_cortex_engram::{consolidate::{consolidate_with, Options}, store::{InMemory, Store}, Episode};
+/// # fn reply(text: &str) -> Response {
+/// #     Response { content: vec![Block::text(text)], id: None, model: "scripted/1".into(), stop: Stop::EndTurn, usage: Usage::default() }
+/// # }
+/// # #[tokio::main]
+/// # async fn main() {
+/// let store = InMemory::new();
+/// store.record(&Episode::new("Dana writes the release notes from now on.", Id::new())).await.unwrap();
+/// let provider = Scripted::new("scripted/1", vec![Ok(reply(
+///     r#"{"facts": [{"statement": "Dana owns the release notes.", "confidence": 0.9, "episodes": [1]}]}"#,
+/// ))]);
+/// let embedder = Embedder::new("scripted/embed", 2).with("Dana owns the release notes.", vec![0.9, 0.1]);
+///
+/// consolidate_with(&provider, Some(&embedder), &store, &Options::default()).await.unwrap();
+///
+/// let fact = &store.current_facts().await.unwrap()[0];
+/// assert_eq!(fact.embedding.as_ref().unwrap().model, "scripted/embed");
+/// # }
+/// ```
+///
+/// # Errors
+///
+/// [`Error::Storage`] if the store fails. A failed extraction is no error: its
+/// batch is in [`Consolidation::failed`]. A failed embedding is none either:
+/// its facts are in [`Consolidation::unembedded`].
+pub async fn consolidate_with(
+    provider: &dyn Provider,
+    embedder: Option<&dyn Embedder>,
+    store: &dyn Store,
+    options: &Options,
+) -> Result<Consolidation> {
     let schema =
         Schema::of::<Claims>("facts").map_err(|error| Error::InvalidOutput(error.to_string()))?;
     let prompt = prompt();
@@ -196,6 +255,7 @@ pub async fn consolidate(
                 .take(options.known)
                 .collect();
             Batch {
+                embedder,
                 episodes: batch,
                 known: &known,
                 scope: &scope,
@@ -210,6 +270,7 @@ pub async fn consolidate(
 
 /// The episodes one extraction reads, and what it matches them against.
 struct Batch<'a> {
+    embedder: Option<&'a dyn Embedder>,
     episodes: &'a [Episode],
     known: &'a [Fact],
     scope: &'a Scope,
@@ -284,9 +345,28 @@ impl Batch<'_> {
                 )
             })
             .collect();
+        let vectors = self.vectors(&extraction.value.facts).await;
+        let mut unembedded = Vec::new();
         for claim in extraction.value.facts {
-            self.apply(claim, extraction.id, &shown, &mut held, pass)
+            let asserted = self
+                .apply(
+                    claim,
+                    extraction.id,
+                    &shown,
+                    &mut held,
+                    vectors.as_ref().ok(),
+                    pass,
+                )
                 .await?;
+            if let Some((fact, false)) = asserted {
+                unembedded.push(fact);
+            }
+        }
+        if let (Err(error), false) = (vectors, unembedded.is_empty()) {
+            pass.unembedded.push(Unembedded {
+                error,
+                facts: unembedded,
+            });
         }
 
         self.store.mark_consolidated(&ids).await?;
@@ -294,16 +374,41 @@ impl Batch<'_> {
         Ok(())
     }
 
+    /// The vector for each claim's statement, by the statement, from one call
+    /// to the embedder. Empty where no embedder is configured.
+    async fn vectors(&self, claims: &[Claim]) -> Result<HashMap<String, Embedding>> {
+        let Some(embedder) = self.embedder else {
+            return Ok(HashMap::new());
+        };
+        let mut statements: Vec<&str> = claims
+            .iter()
+            .map(|claim| claim.statement.trim())
+            .filter(|statement| !statement.is_empty())
+            .collect();
+        statements.dedup();
+        if statements.is_empty() {
+            return Ok(HashMap::new());
+        }
+        let vectors = embedder.embed(&statements, Purpose::Document).await?;
+        Ok(statements
+            .into_iter()
+            .map(str::to_owned)
+            .zip(vectors)
+            .collect())
+    }
+
     /// Stores one claim: a source added to the fact it says again, or a new
-    /// fact, superseding the one it contradicts.
+    /// fact, superseding the one it contradicts. Returns a new fact's id, and
+    /// whether it was written with a vector where an embedder is configured.
     async fn apply(
         &self,
         claim: Claim,
         extraction: Id,
         shown: &[Id],
         held: &mut Held,
+        vectors: Option<&HashMap<String, Embedding>>,
         pass: &mut Consolidation,
-    ) -> Result<()> {
+    ) -> Result<Option<(Id, bool)>> {
         let mut rests_on: Vec<(Id, Id)> = Vec::new();
         for number in &claim.episodes {
             let found = usize::try_from(*number)
@@ -317,7 +422,7 @@ impl Batch<'_> {
         let statement = claim.statement.trim();
         if rests_on.is_empty() || statement.is_empty() {
             pass.skipped.push(claim);
-            return Ok(());
+            return Ok(None);
         }
         let key = normalized(statement);
         let known = |number: Option<u32>| {
@@ -338,7 +443,7 @@ impl Batch<'_> {
                 .filter(|(episode, _)| !sources.contains(episode))
                 .collect();
             if added.is_empty() {
-                return Ok(());
+                return Ok(None);
             }
             let mut parents = vec![extraction];
             parents.extend(added.iter().map(|(_, shown)| *shown));
@@ -352,7 +457,7 @@ impl Batch<'_> {
                 pass.sourced.push((*fact, episode));
             }
             *node = Some(recorded);
-            return Ok(());
+            return Ok(None);
         }
 
         #[expect(
@@ -366,6 +471,7 @@ impl Batch<'_> {
         let mut parents = vec![extraction];
         parents.extend(rests_on.iter().map(|(_, shown)| *shown));
         fact.node = Some(memory_node(fact.id, parents, pass));
+        fact.embedding = vectors.and_then(|vectors| vectors.get(statement).cloned());
         self.store
             .assert_fact(&fact, contradicted.map(|old| old.id))
             .await?;
@@ -374,7 +480,7 @@ impl Batch<'_> {
             pass.superseded.push((old.id, fact.id));
         }
         held.insert(key, (fact.id, episodes, fact.node));
-        Ok(())
+        Ok(Some((fact.id, fact.embedding.is_some())))
     }
 
     /// The known facts and the episodes, each numbered from one.

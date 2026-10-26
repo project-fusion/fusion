@@ -26,6 +26,7 @@ use std::collections::VecDeque;
 #[cfg(any(
     feature = "anthropic",
     feature = "chat",
+    feature = "embeddings",
     feature = "gemini",
     feature = "ollama",
     feature = "responses"
@@ -54,6 +55,7 @@ use fusion_cortex_core::provider::{Event, Events};
 #[cfg(any(
     feature = "anthropic",
     feature = "chat",
+    feature = "embeddings",
     feature = "gemini",
     feature = "http",
     feature = "ollama",
@@ -341,10 +343,21 @@ where
     }))
 }
 
+/// Reads a whole body, for an API that answers in one JSON value.
+#[cfg(any(feature = "embeddings", feature = "gemini", feature = "ollama"))]
+pub(crate) async fn whole(mut body: Body) -> Result<Vec<u8>> {
+    let mut bytes = Vec::new();
+    while let Some(chunk) = body.next().await {
+        bytes.extend(chunk?);
+    }
+    Ok(bytes)
+}
+
 /// Parses one frame's JSON, naming the API that sent it when it fails.
 #[cfg(any(
     feature = "anthropic",
     feature = "chat",
+    feature = "embeddings",
     feature = "gemini",
     feature = "ollama",
     feature = "responses"
@@ -462,6 +475,7 @@ impl Transport for Reqwest {
     any(
         feature = "anthropic",
         feature = "chat",
+        feature = "embeddings",
         feature = "gemini",
         feature = "ollama",
         feature = "responses"
@@ -469,6 +483,8 @@ impl Transport for Reqwest {
 ))]
 pub(crate) mod canned {
     use std::sync::Mutex;
+
+    use futures_util::stream;
 
     use super::*;
 

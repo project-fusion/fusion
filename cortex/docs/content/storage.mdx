@@ -121,6 +121,41 @@ runs it. Use a direct connection or a session-mode pooler where your provider
 offers one. A pooler may also refuse the `options` parameter, so set the search
 path on the database role there.
 
+## Store vectors with or without pgvector
+
+Engram stores each fact's embedding beside the model that made it, on every
+backend. A SQLite store keeps the vector as bytes and ranks facts by it in
+Rust, with no extension. A Postgres store decides when it opens a database:
+
+- **Where `pgvector` is installed, or the role may create it**, the store adds
+  `embedding_vector`, a `vector` column generated from the `real[]` one, and
+  orders by `<=>`. The first fact a model embeds creates an HNSW index for
+  that model and length.
+- **Elsewhere**, the store keeps `real[]` alone and ranks facts in Rust, as
+  SQLite does.
+
+Both pass the same conformance suite. Supabase, Neon, and Amazon RDS offer
+`pgvector`. Creating it takes a privilege that a hosted role may lack, so
+enable it from your provider's dashboard or as an administrator, with
+`CREATE EXTENSION vector`. A store that cannot create it ranks in Rust and
+says so in `Postgres::vectors`.
+
+The `embedding_vector` column records the choice. A schema that has it keeps
+`pgvector` from then on. A schema without it tries again each time a store
+opens it, so installing `pgvector` later takes effect at the next open.
+
+**Install `pgvector` in a schema every store can read, such as `public` or
+`extensions`, when stores in several schemas share one database.** A store
+that creates the extension itself puts it in its own schema, the first in its
+search path, and dropping that schema drops every other schema's vector column
+with it.
+
+An HNSW index finds nearest neighbors approximately, so in a large memory it
+can miss a fact that ranking in Rust would place. An HNSW index holds a
+`vector` of at most 2,000 values. A model with longer
+vectors, such as `gemini-embedding-001` at its default 3,072, is ranked by an
+exact scan of its rows. Set `output_dimensions` to 2,000 or fewer to index it.
+
 ## What differs between the backends
 
 - **Times.** SQLite keeps a time to the nanosecond, and Postgres keeps it to
@@ -133,3 +168,11 @@ path on the database role there.
 - **The NUL character.** Postgres does not store it in text. Trace keeps a node
   with one as it was, and indexes the character as a space for search. Engram
   refuses an episode or a fact whose text holds one.
+- **Vector similarity.** `pgvector` computes cosine distance in its own code,
+  and the stores that rank in Rust compute it in `f64`. The two agree to about
+  six decimal places, so two facts within that of each other can swap places.
+- **Vectors in scopes the caller may not read.** `pgvector` 0.8 and later keeps
+  scanning its index until it has found as many facts in the caller's scopes as
+  you asked for. An earlier `pgvector` filters the facts one scan returns, which
+  can return fewer than you asked for when most of the nearest are in other
+  scopes.

@@ -230,8 +230,10 @@ assert_eq!(Scope::narrowest([&core, &web]), Some(Scope::Personal));
 the `Store` trait, in memory, in SQLite, and in Postgres, and one conformance
 suite runs against all three. `store::open` picks a backend by its connection
 string, as the Choosing storage guide describes. A fact carries an optional
-embedding, which nothing computes yet, so scoring by vector later needs no
-migration. A SQLite file from before scopes
+embedding with the model that made it. Consolidation embeds each fact it writes
+when you give it an embedder, `embed::backfill` embeds the rest, and each
+store's `nearest` finds the facts closest to a question. The Scoring memory by
+meaning guide describes them. A SQLite file from before scopes
 gains the scope and consolidation columns when it is opened, and its episodes
 and facts are personal.
 

@@ -9,12 +9,15 @@ rust-version.workspace = true
 version = "0.0.0-dev"
 
 [features]
-default = ["anthropic", "chat", "gemini", "http", "ollama", "responses"]
+default = ["anthropic", "chat", "embeddings", "gemini", "http", "ollama", "responses"]
 # **One feature per client**, so a crate that takes one compiles only that one.
 anthropic = []
 # OpenAI-compatible Chat Completions, which vLLM, llama.cpp, LM Studio,
 # OpenRouter and xAI serve.
 chat = []
+# OpenAI's `/v1/embeddings`, which LM Studio, vLLM, llama.cpp and others serve
+# for an embedding model.
+embeddings = []
 gemini = []
 ollama = []
 # OpenAI Responses, which xAI, LM Studio and OpenRouter also serve.
