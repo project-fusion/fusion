@@ -4,8 +4,9 @@ import { hasLayout, part, registerDom, settle, type Updatable } from '@fusion.de
 
 /* A menu drawn as a sheet, where there is a browser to lay it out: along the
    window's bottom edge, as wide as the window, over a scrim, and shown once
-   a frame has passed. `presentation="sheet"` draws it at the width the specs
-   run at, which a window narrower than 30rem draws under `auto`. */
+   a frame has passed, and a press beside it stops at the scrim.
+   `presentation="sheet"` draws it at the width the specs run at, which a
+   window narrower than 30rem draws under `auto`. */
 
 if (hasLayout()) {
   describe('a menu drawn as a sheet', () => {
@@ -43,6 +44,49 @@ if (hasLayout()) {
       expect(Math.round(box.width)).toBe(document.documentElement.clientWidth)
       expect(Math.round(box.bottom)).toBe(window.innerHeight)
       expect(getComputedStyle(surface, '::backdrop').backgroundColor).not.toBe('rgba(0, 0, 0, 0)')
+    })
+
+    /** A press on `target`, from its `pointerdown` to its `click`, and what the page heard of it. */
+    const press = (target: HTMLElement): string[] => {
+      const heard: string[] = []
+      const init = { bubbles: true, cancelable: true, composed: true }
+      for (const type of ['pointerdown', 'pointerup', 'click']) {
+        target.addEventListener(type, () => heard.push(type))
+      }
+      target.dispatchEvent(new PointerEvent('pointerdown', init))
+      target.dispatchEvent(new PointerEvent('pointerup', init))
+      target.dispatchEvent(new MouseEvent('click', { ...init, detail: 1 }))
+      return heard
+    }
+
+    test('closes on a press beside it, which stops at the scrim', async () => {
+      document.body.innerHTML = `<button id="page">Page</button>
+        <helix-menu label="Actions" presentation="sheet" open>
+          <helix-button slot="trigger">Actions</helix-button>
+          <helix-menu-item value="rename">Rename</helix-menu-item>
+        </helix-menu>`
+      const menu = document.querySelector('helix-menu') as Updatable & { open: boolean }
+      await settle(menu)
+      await frames()
+      const heard = press(document.getElementById('page') as HTMLElement)
+      await settle(menu)
+      expect(menu.open).toBe(false)
+      expect(heard).toEqual([])
+    })
+
+    test('closes on a press beside it as a popover, which reaches the page', async () => {
+      document.body.innerHTML = `<button id="page">Page</button>
+        <helix-menu label="Actions" presentation="popover" open>
+          <helix-button slot="trigger">Actions</helix-button>
+          <helix-menu-item value="rename">Rename</helix-menu-item>
+        </helix-menu>`
+      const menu = document.querySelector('helix-menu') as Updatable & { open: boolean }
+      await settle(menu)
+      await frames()
+      const heard = press(document.getElementById('page') as HTMLElement)
+      await settle(menu)
+      expect(menu.open).toBe(false)
+      expect(heard).toEqual(['pointerdown', 'pointerup', 'click'])
     })
 
     test('is placed against its trigger again as a popover', async () => {

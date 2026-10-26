@@ -78,12 +78,9 @@ export default styles(
           { focusVisible: true },
           { outline: ring, outlineOffset: product(token('size-focus-offset'), '-1') },
         ),
-        rule({ platform: 'native', has: 'disabled' }, { opacity: 0.5 }),
-      ]),
-      /* The web dims a row that says it is disabled, which a row in a
-         filtered menu says on its host instead. */
-      on({ part: 'item', selector: '[part="item"][aria-disabled="true"]' }, [
-        rule({ platform: 'web' }, { cursor: 'not-allowed', opacity: 0.5 }),
+        /* Dimmed by the row's own `disabled`, which holds in a filtered
+           menu too, where the web marks the host disabled for the filter. */
+        rule({ has: 'disabled' }, { cursor: web('not-allowed'), opacity: 0.5 }),
       ]),
       on('start', [
         rule({

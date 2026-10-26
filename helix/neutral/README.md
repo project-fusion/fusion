@@ -576,9 +576,10 @@ pressable. The element is in the state `open` while the layer stands open.
   element is in the state `sheet` and in no `placed-` or `aligned-` state,
   and a press beside it dismisses it as `closedby` says and reaches nothing
   under it. The web element passes `presentation` to core's
-  `PopoverController`, which runs `PresentationController` and lets go of
-  the anchor while the panel is a sheet, and a phone reads the window at the
-  reader's text size.
+  `PopoverController`, which runs `PresentationController`, lets go of the
+  anchor while the panel is a sheet, and stops a press beside the sheet on
+  the window, as a popover's `::backdrop` takes no press. A phone reads the
+  window at the reader's text size.
 - `notice` draws the layer above every other, dialogs included, whenever it
   opened: it stays read and pressable while a modal layer holds the reader,
   and a close request goes to the layer under it while one is open, as a
