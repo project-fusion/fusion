@@ -16,10 +16,19 @@
 //!
 //! **A restricted grammar, read and never run.** A node is one of the tags
 //! [`TAGS`] names. An attribute is a literal, a read (`props.x`, `derived.x`,
-//! `state.x`, `stack.x`, `entry.x`, `index`), `!` before one, or
-//! `read ? 'a' : 'b'`. A child is a node, `read && <Node />`, `!read &&
-//! <Node />`, or `read ? <A /> : <B />`. Everything else is refused with its
-//! line and the form to write it in, and nothing is dropped.
+//! `state.x`, a feature's value as `stack.label`, `entry.x`, `index`), `!`
+//! before one, `read ? 'a' : 'b'`, `read === 'v' ? 'a' : 'b'`, or a core
+//! derivation, `derive('kbd-label')`. A child is a node, `read && <Node />`,
+//! `!read && <Node />`, or `read ? <A /> : <B />`. Everything else is refused
+//! with its line and the form to write it in, and nothing is dropped.
+//!
+//! **A feature's value is read by the feature and its field**, as
+//! [`api::computed`](crate::family::api::computed) lists them: `stop.place`,
+//! `tour.spot.height`, `copy.told`. **Whether a slot holds something** is
+//! `slots.x`, which a `<Wrap when>` and a `<View hidden>` read, as the
+//! builder form's `while` and `hidden` read a region's name, so
+//! `hidden={!slots.logo}` is hidden while nothing is passed into `logo`. **A CSS custom property a node sets** is in its
+//! `style`, `style={{ '--meter-fraction': derived.fraction }}`.
 //!
 //! **Each name is the API's in camelCase.** `props.dismissLabel` reads the
 //! prop `dismiss-label`, and `send.beforeSelect` is the event `before-select`.
@@ -57,7 +66,24 @@ const TAGS: &[(&str, &str, Option<&str>)] = &[
 
 /// The names a render's parameter gives, each one what it reads.
 const GIVEN: &[&str] = &[
-    "derived", "entry", "index", "props", "send", "stack", "state",
+    "copy",
+    "countdown",
+    "delay",
+    "derived",
+    "entry",
+    "index",
+    "notice",
+    "notices",
+    "props",
+    "queue",
+    "sections",
+    "send",
+    "slots",
+    "stack",
+    "state",
+    "stop",
+    "total",
+    "tour",
 ];
 
 /// What reading a render needs: the source for lines, and what the keys
@@ -69,7 +95,8 @@ struct Render<'s> {
     derived: Vec<String>,
     events: Vec<String>,
     states: Vec<String>,
-    stack: Vec<(String, String)>,
+    /// Each value a feature computes, by the path a render reads it at.
+    computed: Vec<(String, String)>,
 }
 
 /// A value a render reads, as a name the builder form binds.
@@ -80,6 +107,8 @@ enum Read {
     Field(String),
     /// Where a copy stands among the copies a repeat draws.
     Index,
+    /// Whether the slot of this name holds something.
+    Slot(String),
 }
 
 /// `dismissLabel` as `dismiss-label`.
@@ -155,19 +184,7 @@ pub(super) fn render(
             "`render` returns its nodes, with no statements before them",
         ));
     };
-    let stack = match fields.iter().find(|(name, _)| name == "stack") {
-        Some((_, Lit::Call(_, arguments))) => match arguments.first() {
-            Some(Lit::Object(entries)) => entries
-                .iter()
-                .filter_map(|(key, value)| match value {
-                    Lit::Text(name) => Some((key.clone(), name.clone())),
-                    _ => None,
-                })
-                .collect(),
-            _ => Vec::new(),
-        },
-        _ => Vec::new(),
-    };
+    let computed = crate::family::api::computed::reads(fields)?;
     let states = match fields.iter().find(|(name, _)| name == "states") {
         Some((_, Lit::Array(names))) => names
             .iter()
@@ -184,7 +201,7 @@ pub(super) fn render(
         given,
         props: keys(fields, "props"),
         source,
-        stack,
+        computed,
         states,
     };
     reader.root(body).map(Lit::Array)
@@ -305,7 +322,7 @@ impl Render<'_> {
         };
         match self.read(inner)? {
             Read::Named(name) => Ok((name, unless)),
-            Read::Field(_) | Read::Index => Err(self.at(
+            Read::Field(_) | Read::Index | Read::Slot(_) => Err(self.at(
                 inner.span(),
                 "a condition reads a prop, a computed value, or a state: write it as `props.x && <Node />`",
             )),

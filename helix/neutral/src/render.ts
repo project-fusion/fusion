@@ -22,11 +22,15 @@
  * intermediate form while the families move.
  *
  * **What a render may hold.** The nodes below, each with its attributes. An
- * attribute or a child reads `props.x`, `derived.x`, `state.x`, or
- * `stack.x`, `!` before one, `x ? 'a' : 'b'`, and string, number, and
- * boolean literals. A child is a node, `x && <Node />`, `!x && <Node />`, or
- * `x ? <A /> : <B />`. `onPress={send.x}` sends an event. A lowercase tag is
- * refused, and so is every other expression, with its line.
+ * attribute or a child reads `props.x`, `derived.x`, `state.x`, a value a
+ * feature computes as `stack.label` or `stop.words.back`, `entry.x`, or
+ * `index`, `!` before one, `x ? 'a' : 'b'`, `x === 'v' ? 'a' : 'b'`, a core
+ * derivation, `derive('kbd-label')`, and string, number, and boolean
+ * literals. A child is a node, `x && <Node />`, `!x && <Node />`, or
+ * `x ? <A /> : <B />`. `onPress={send.x}` sends an event. A `<Wrap when>` and
+ * a `<View hidden>` read whether a slot holds something, `slots.x`. A node's
+ * `style` sets CSS custom properties. A lowercase tag is refused, and so is
+ * every other expression, with its line.
  *
  * **Each name is the API's, spelled in camelCase.** A prop `dismissLabel` is
  * the attribute `dismiss-label` on the web, and an event `beforeSelect` is
@@ -46,10 +50,12 @@ declare const drawn: unique symbol
 declare const declared: unique symbol
 declare const rendered: unique symbol
 
-/** A value a render reads: a prop, a computed value, a state, or a value of a stack. */
-export interface Read {
-  readonly [reads]: true
-}
+/**
+ * A value a render reads: a prop, a computed value, a state, or a value a
+ * feature computes. Typed as the values it holds, so a render may test one
+ * against a literal, `props.type === 'dialog'`.
+ */
+export type Read = (boolean | number | string) & { readonly [reads]: true }
 
 /** An event a press sends, as `send.dismiss` names it. */
 export interface Send {
@@ -61,11 +67,26 @@ export interface Drawn {
   readonly [drawn]: true
 }
 
-/** What a node holds: a node, a node drawn while a value holds, or several. */
-export type Child = Drawn | boolean | readonly Child[]
+/**
+ * What a node holds: a node, a node drawn while a value holds, a comment,
+ * or several.
+ */
+export type Child = Drawn | Read | boolean | undefined | readonly Child[]
 
-/** An attribute's value: a literal, or a value the render reads. */
-export type Given = boolean | number | string | Read
+/** A derivation in core, computed where the node is drawn, as `derive('kbd-label')` writes it. */
+export interface Derivation {
+  readonly derive: string
+}
+
+/**
+ * An attribute's value: a literal, a value the render reads, or a
+ * derivation. A field of a repeat's entry may be missing, so it is read as
+ * possibly undefined.
+ */
+export type Given = boolean | number | string | Read | Derivation | undefined
+
+/** CSS custom properties a node sets, as `style={{ '--meter-fraction': derived.fraction }}`. */
+export type Style = Readonly<Record<`--${string}`, Given>>
 
 /** A prop declared with no default, or with more than its default to say. */
 export interface PropSpec<Type extends PropType = PropType> {
@@ -81,6 +102,11 @@ export type PropValue = boolean | number | string | PropSpec
 
 /** An event: the fields of its detail, or a spec from `cancelable()` and `bare()`. */
 export type EventValue = readonly string[] | Omit<Event, 'name'>
+
+/** `placed-top` as `placedTop`, the key a render reads a state by. */
+export type Camel<Name extends string> = Name extends `${infer Head}-${infer Tail}`
+  ? `${Head}${Capitalize<Camel<Tail>>}`
+  : Name
 
 /** `dismissLabel` as `dismiss-label`, the name the web gives the attribute. */
 export type Kebab<Name extends string> = Name extends `${infer Head}${infer Tail}`
@@ -112,6 +138,9 @@ export interface Rendered {
   readonly name: string
 }
 
+/** Values a feature computes, by the fields that name them. */
+type Computes<Field extends string> = { readonly [Key in Field]: Read }
+
 /** What a render is given, each typed from the keys before it. */
 export interface Render<Props, Events, States extends readonly string[], Derived> {
   /** The prop `x`, by its name in camelCase. */
@@ -120,11 +149,37 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly send: { readonly [Key in keyof Events]: Send }
   /** The value `x` the element computes, by its name in camelCase. */
   readonly derived: { readonly [Key in keyof Derived]: Read }
-  /** The custom state `x`. */
-  readonly state: { readonly [Key in States[number]]: Read }
+  /** The custom state `x`, by its name in camelCase. */
+  readonly state: { readonly [Key in States[number] as Camel<Key>]: Read }
+  /** Whether the slot `x` holds something, which a `<Wrap when>` and a `<View hidden>` read. */
+  readonly slots: Readonly<Record<string, Read>>
   /** A value the stack computes, by its field: `stack.label` is the words of the page showing. */
-  readonly stack: { readonly [Key in 'drilled' | 'label']: Read }
-  /** A field of the entry a copy of a repeat over a list draws. */
+  readonly stack: Computes<'drilled' | 'label'>
+  /** What a copy computes: whether it copied or failed, and the words it says and tells. */
+  readonly copy: Computes<'copied' | 'failed' | 'says' | 'told'>
+  /** Whether a countdown is paused. */
+  readonly countdown: Computes<'paused'>
+  /** Whether a delay is still running. */
+  readonly delay: Computes<'waiting'>
+  /** Whether a notice waits to be shown. */
+  readonly notice: Computes<'waiting'>
+  /** Whether a stack of notices shows one. */
+  readonly notices: Computes<'showing'>
+  /** Whether a queue holds one waiting. */
+  readonly queue: Computes<'waiting'>
+  /** The list of sections an element's sections give it. */
+  readonly sections: Computes<'list'>
+  /** What a tour's stop computes, and the words of its Back, Next, and Skip. */
+  readonly stop: Computes<'counted' | 'name' | 'place' | 'reach' | 'said' | 'shown'> & {
+    readonly words: Computes<'back' | 'next' | 'skip'>
+  }
+  /** What a total computes: whether it holds any. */
+  readonly total: Computes<'holds'>
+  /** What a tour computes, and the lit box's lengths. */
+  readonly tour: Computes<'lit' | 'veiled'> & {
+    readonly spot: Computes<'height' | 'width' | 'x' | 'y'>
+  }
+  /** A field of the entry a copy of a repeat over a list draws, `entry['depth-2']` where it is no name. */
   readonly entry: Readonly<Record<string, Read>>
   /** Where a copy stands among the copies a repeat draws, counting from 0. */
   readonly index: Read
@@ -228,19 +283,24 @@ export const boolean = (): PropSpec<'boolean'> => spec('boolean')
 /** A number prop with no default. */
 export const number = (): PropSpec<'number'> => spec('number')
 
-/** A prop that holds a number or a string, as a badge's `value` holds `8` or `New`. */
-export const numberOrString = (): PropSpec<'number | string'> => spec('number | string')
+/** A prop that holds a number or a string, as a badge's `value` holds `8` or `New`, with its default where it has one. */
+export const numberOrString = (fallback?: number | string): PropSpec<'number | string'> =>
+  spec('number | string', fallback)
 
 /** A prop that holds an object, which the web's attribute writes as JSON. */
 export const object = (): PropSpec<'object'> => spec('object')
 
-/** A prop that holds a moment, as `tree.ts` says of `time`. */
-export const time = (): PropSpec<'time'> => spec('time')
+/** A prop that holds a moment, as `tree.ts` says of `time`, with its default where it has one. */
+export const time = (fallback?: string): PropSpec<'time'> => spec('time', fallback)
 
-/** A prop that takes one of `values`, with `fallback` as its default where it has one. */
+/**
+ * A prop that takes one of `values`, with `fallback` as its default where it
+ * has one. A prop that takes `true` as one of them is off by default with
+ * `false`, as a flex's `wrap`.
+ */
 export const oneOf = <const Values extends readonly (string | true)[]>(
   values: Values,
-  fallback?: Exclude<Values[number], true>,
+  fallback?: Exclude<Values[number], true> | (true extends Values[number] ? false : never),
 ): PropSpec<Values> => spec(values, fallback)
 
 /** A prop that is a property only on the web element, with no attribute, such as `expanded`. */
@@ -286,11 +346,13 @@ const node = (): Drawn => ({}) as Drawn
 interface Common {
   /** `web` for a node only the web draws, `native` for one only a phone draws. */
   readonly platform?: 'native' | 'web'
+  /** A `data-` attribute the part carries, which its style table reads. */
+  readonly [data: `data-${string}`]: Given
 }
 
 /** What a node a screen reader reaches as one thing takes. */
 interface Named extends Common {
-  readonly also?: Readonly<Record<string, boolean | Read>>
+  readonly also?: Readonly<Record<string, boolean | Read | undefined>>
   /** Out of what a screen reader reaches, with what it holds: `aria-hidden`. */
   readonly ariaHidden?: boolean | Read
   readonly busy?: Given
@@ -301,7 +363,7 @@ interface Named extends Common {
   readonly labelledby?: string
   readonly readonly?: Given
   readonly required?: Given
-  readonly role?: string
+  readonly role?: Given
   readonly roledescription?: Given
   readonly valuemax?: Given
   readonly valuemin?: Given
@@ -313,22 +375,23 @@ interface Named extends Common {
 interface Drawing {
   readonly bubbles?: string
   readonly draws?: string
-  readonly exports?: Readonly<Record<string, boolean | string | Read>>
-  readonly gives?: Readonly<Record<string, boolean | string | Read>>
+  readonly exports?: Readonly<Record<string, boolean | string | Read | undefined>>
+  readonly gives?: Readonly<Record<string, boolean | string | Read | undefined>>
   readonly into?: string
 }
 
 /** A box: a part that groups or draws, as `box()` says. */
 export interface ViewAttributes extends Named, Drawing {
   readonly children?: Child
+  readonly style?: Style
   readonly closed?: Given
   readonly current?: Given
-  readonly element?: string
+  readonly element?: Given
   readonly hidden?: Given
   /** A glyph a phone draws in the box, by its name. */
   readonly icon?: Given
   readonly inert?: Given
-  readonly level?: number
+  readonly level?: number | Read
   readonly lines?: Given
   readonly marks?: 'chosen'
   readonly orientation?: Given
@@ -343,11 +406,11 @@ export const View = (_: ViewAttributes): Drawn => node()
 /** Words a node says: a prop's, a computed value's, or a field of a repeat's entry. */
 export interface TextAttributes extends Common {
   readonly ariaHidden?: boolean | Read
-  readonly children: Read | string
+  readonly children?: Read | Derivation | string | undefined
   readonly label?: Given
   readonly lines?: Given
   readonly part: string
-  readonly widest?: Readonly<Record<string, boolean | Read>>
+  readonly widest?: Readonly<Record<string, boolean | Read | undefined>>
 }
 
 /** Words drawn as text, as `text()` says. */
@@ -412,7 +475,8 @@ export const Slot = (_: SlotAttributes): Drawn => node()
 /** What the element opens over the page, as `layer()` says. */
 export interface LayerAttributes extends Common {
   readonly alone?: boolean
-  readonly also?: Readonly<Record<string, boolean | Read>>
+  readonly style?: Style
+  readonly also?: Readonly<Record<string, boolean | Read | undefined>>
   readonly anchor?: string
   readonly ariaHidden?: boolean | Read
   readonly arrow?: string
@@ -440,7 +504,7 @@ export interface LayerAttributes extends Common {
   readonly presses?: 'close' | 'none' | 'toggle' | Read
   readonly refuses?: Given
   readonly returns?: 'always' | 'dismissed' | 'held'
-  readonly role?: string
+  readonly role?: Given
   readonly roledescription?: Given
   readonly snap?: Given
   readonly swipe?: Given
@@ -453,8 +517,9 @@ export const Layer = (_: LayerAttributes): Drawn => node()
 /** Words said to a screen reader, as `live()` says. */
 export interface AnnounceAttributes extends Common {
   readonly arrives?: boolean
-  readonly children: Read | string
-  readonly follows?: string
+  /** What it says, where it says anything of its own. */
+  readonly children?: Read | Derivation | string | undefined
+  readonly follows?: string | Read
   readonly part: string
   readonly urgent?: Given
   /** Said only while this holds. */
@@ -468,7 +533,7 @@ export const Announce = (_: AnnounceAttributes): Drawn => node()
 export interface RepeatAttributes extends Common {
   readonly children?: Child
   readonly count?: number | Read
-  readonly each?: Read
+  readonly each?: Read | Derivation
   readonly key?: string
   readonly part: string
 }
@@ -481,13 +546,13 @@ export const Repeat = (_: RepeatAttributes): Drawn => node()
  * `when` holds. With an `href`, it is the link around what it holds.
  */
 export interface WrapAttributes extends Common, Drawing {
-  readonly also?: Readonly<Record<string, boolean | Read>>
+  readonly also?: Readonly<Record<string, boolean | Read | undefined>>
   readonly children?: Child
   readonly current?: Given
   readonly href?: Given
   readonly part: string
   /** Drawn only while this holds. */
-  readonly when?: Read
+  readonly when?: Read | undefined
 }
 
 /** A wrap. */
@@ -505,17 +570,19 @@ export const Svg = (_: SvgAttributes): Drawn => node()
 
 /** What every shape inside a vector takes. */
 interface Shape extends Common {
+  readonly also?: Readonly<Record<string, boolean | Read | undefined>>
   readonly ariaHidden?: boolean | Read
   readonly part: string
   readonly pathLength?: number
+  readonly style?: Style
 }
 
 /** A path inside a vector. */
-export const Path = (_: Shape & { readonly d: string }): Drawn => node()
+export const Path = (_: Shape & { readonly d: string | Read }): Drawn => node()
 
-/** A circle inside a vector. */
+/** A circle inside a vector, its geometry its style table's where it gives none. */
 export const Circle = (
-  _: Shape & { readonly cx: Given; readonly cy: Given; readonly r: Given },
+  _: Shape & { readonly cx?: Given; readonly cy?: Given; readonly r?: Given },
 ): Drawn => node()
 
 /** An ellipse inside a vector. */

@@ -104,11 +104,17 @@ impl Render<'_> {
                 name = Some(self.literal(attribute, &key)?);
                 continue;
             }
-            let (key, value) = self.attribute(tag, &key, attribute)?;
-            if attributes.iter().any(|(held, _)| *held == key) {
-                return Err(self.at(attribute.span, &format!("`{key}` a second time")));
+            let read = if key == "style" {
+                self.style(attribute)?
+            } else {
+                vec![self.attribute(tag, &key, attribute)?]
+            };
+            for (key, value) in read {
+                if attributes.iter().any(|(held, _)| *held == key) {
+                    return Err(self.at(attribute.span, &format!("`{key}` a second time")));
+                }
+                attributes.push((key, value));
             }
-            attributes.push((key, value));
         }
         let Some(name) = name else {
             return Err(self.at(
@@ -134,6 +140,10 @@ impl Render<'_> {
         let value = attribute.value.as_ref();
         match (tag, key) {
             (_, "onPress") => Ok(("sends".to_owned(), self.send(attribute)?)),
+            ("Wrap", "when") | ("View", "hidden") if self.slot(value).is_some() => Ok((
+                if key == "when" { "while" } else { "hidden" }.to_owned(),
+                self.slot(value).unwrap_or(Lit::Null),
+            )),
             ("Wrap", "when") => match self.value(value, attribute.span)? {
                 Lit::Bool(true) => Err(self.at(
                     attribute.span,
@@ -171,6 +181,69 @@ impl Render<'_> {
                 Ok((renamed.to_owned(), self.value(value, attribute.span)?))
             }
         }
+    }
+
+    /// `slots.x`, whether the slot holds something, as a bind of its name,
+    /// and `!slots.x` as a `not()` of it, which a `<Wrap when>` and a
+    /// `<View hidden>` read.
+    fn slot(&self, value: Option<&JSXAttributeValue>) -> Option<Lit> {
+        let expression = match value? {
+            JSXAttributeValue::ExpressionContainer(container) => {
+                container.expression.as_expression()?
+            }
+            _ => return None,
+        };
+        let (read, negated) = match expression {
+            oxc_ast::ast::Expression::UnaryExpression(unary)
+                if unary.operator == oxc_ast::ast::UnaryOperator::LogicalNot =>
+            {
+                (&unary.argument, true)
+            }
+            other => (other, false),
+        };
+        match self.read(read).ok()? {
+            super::Read::Slot(name) if negated => {
+                Some(Lit::Call("not".to_owned(), vec![Lit::Text(name)]))
+            }
+            super::Read::Slot(name) => Some(super::values::bound(super::Read::Slot(name))),
+            _ => None,
+        }
+    }
+
+    /// `style={{ '--meter-fraction': derived.fraction }}`: each CSS custom
+    /// property the node sets, as an attribute of its own name.
+    fn style(&self, attribute: &JSXAttribute) -> Result<Vec<(String, Lit)>, String> {
+        let refuse = || {
+            self.at(
+                attribute.span,
+                "`style` sets CSS custom properties: `style={{ '--name': props.x }}`",
+            )
+        };
+        let Some(JSXAttributeValue::ExpressionContainer(container)) = &attribute.value else {
+            return Err(refuse());
+        };
+        let Some(oxc_ast::ast::Expression::ObjectExpression(object)) =
+            container.expression.as_expression()
+        else {
+            return Err(refuse());
+        };
+        let mut read = Vec::new();
+        for property in &object.properties {
+            let oxc_ast::ast::ObjectPropertyKind::ObjectProperty(property) = property else {
+                return Err(refuse());
+            };
+            let Some(name) = property.key.static_name().filter(|_| !property.computed) else {
+                return Err(refuse());
+            };
+            if !name.starts_with("--") {
+                return Err(self.at(
+                    property.span,
+                    &format!("`{name}` in `style` is not a CSS custom property: a style table sets the rest"),
+                ));
+            }
+            read.push((name.to_string(), self.expression(&property.value)?));
+        }
+        Ok(read)
     }
 
     /// A name written as a literal string, as `part="tab"`.
