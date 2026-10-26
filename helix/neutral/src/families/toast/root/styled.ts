@@ -115,6 +115,7 @@ export default styles(
         ]),
       ]),
       /* The UA hides a popover that is not showing, said again since `display: flex` takes it away. */
+      /* Written out: the vocabulary names no `:popover-open`. */
       on({ part: 'region', selector: '[part="region"]:not(:popover-open)' }, [
         web([rule({ display: 'none' })]),
       ]),

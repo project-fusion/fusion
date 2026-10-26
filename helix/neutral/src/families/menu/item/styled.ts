@@ -134,10 +134,12 @@ export default styles(
           minInlineSize: 0,
         }),
       ]),
+      /* Written out: a condition reads no attribute of a slot. */
       on({ part: 'item', selector: 'slot[name="description"][data-empty]' }, [
         web([rule({ display: 'none' })]),
       ]),
       /* Two lines outgrow the row's least height, so they take an inset. */
+      /* Written out: the vocabulary names no part beside another, and no slot in a state. */
       on(
         {
           part: 'item',
@@ -206,9 +208,8 @@ export default styles(
           margin: token('space-none'),
         }),
       ]),
-      on({ part: 'surface', selector: '[part="surface"][hidden]' }, [
-        web([rule({ display: 'none' })]),
-      ]),
+      on('surface', [web([rule({ part: { hidden: true } }, { display: 'none' })])]),
+      /* Written out: the vocabulary names no `:popover-open`. */
       on({ part: 'surface', selector: '[part="surface"]:not(:popover-open)' }, [
         web([rule({ display: 'none' })]),
       ]),

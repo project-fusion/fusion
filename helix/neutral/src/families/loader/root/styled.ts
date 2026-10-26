@@ -152,11 +152,11 @@ export default styles(
     on({ region: 'default', slotted: '*' }, [rule({ blockSize: '100%', inlineSize: '100%' })]),
     /* Waiting out `delay`: the web marks the drawing `hidden`, and keeps its
        box. */
-    on({ part: 'svg', selector: '[part="svg"][hidden]' }, [
-      web([rule({ display: 'inline', visibility: 'hidden' })]),
+    on('svg', [
+      web([rule({ part: { hidden: true } }, { display: 'inline', visibility: 'hidden' })]),
     ]),
-    on({ part: 'mark', selector: '[part="mark"][hidden]' }, [
-      web([rule({ display: 'flex', visibility: 'hidden' })]),
+    on('mark', [
+      web([rule({ part: { hidden: true } }, { display: 'flex', visibility: 'hidden' })]),
     ]),
     keyframes('helix-loader-breathe', {
       '0%, 100%': { opacity: 0.12 },

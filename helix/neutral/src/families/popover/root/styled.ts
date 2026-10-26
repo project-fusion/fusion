@@ -79,6 +79,7 @@ export default styles(
       ]),
       /* A closed popover is not drawn, as the UA's sheet has it, which the
          rules above outrank. */
+      /* Written out: the vocabulary names no `:popover-open`. */
       on({ part: 'surface', selector: '[part="surface"]:not(:popover-open)' }, [
         web([rule({ display: 'none' })]),
       ]),

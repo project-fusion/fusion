@@ -76,9 +76,11 @@ export default styles(
     /* **A picture that fails has no size to give the box**, so the box is 16
        by 9 until `--image-aspect` says otherwise, and holds the fallback, on
        both platforms. */
+    /* Written out: a condition reads no attribute the web element writes on its own host. */
     on({ part: 'host', selector: ':host([data-status="error"])' }, [
       web([rule({ aspectRatio: hook.aspect('16 / 9') })]),
     ]),
+    /* Written out: a condition reads no attribute the web element writes on its own host. */
     on({ part: 'image', selector: ':host([data-status="loaded"]) [part="image"]' }, [
       web([rule({ opacity: 1 })]),
     ]),
@@ -108,9 +110,11 @@ export default styles(
     ]),
     /* `hidden` hides nothing an author gave a display to, so the stand-ins
        say it again. */
+    /* Written out: `:host` before the part outranks the part's other rules, which `part: { hidden }` would tie. */
     on({ part: 'placeholder', selector: ':host [part="placeholder"][hidden]' }, [
       web([rule({ display: 'none' })]),
     ]),
+    /* Written out: `:host` before the part outranks the part's other rules, which `part: { hidden }` would tie. */
     on({ part: 'fallback', selector: ':host [part="fallback"][hidden]' }, [
       web([rule({ display: 'none' })]),
     ]),

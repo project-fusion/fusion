@@ -96,6 +96,7 @@ export default styles(
       ]),
       /* A closed dialog is not drawn, as the UA's sheet has it, which the
          `display` above takes away. */
+      /* Written out: the vocabulary names no dialog's own `open` attribute. */
       on({ part: 'surface', selector: '[part="surface"]:not([open])' }, [
         web([rule({ display: 'none' })]),
       ]),

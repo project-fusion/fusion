@@ -85,7 +85,11 @@ export interface Derivation {
  */
 export type Given = boolean | number | string | Read | Derivation | undefined
 
-/** CSS custom properties a node sets, as `style={{ '--meter-fraction': derived.fraction }}`. */
+/**
+ * CSS custom properties a node sets, as `style={{ '--meter-fraction': derived.fraction }}`,
+ * which its style table reads with `measured()`. Written as React's `style`
+ * writes them, since each is the property the web element sets on the part.
+ */
 export type Style = Readonly<Record<`--${string}`, Given>>
 
 /** A prop declared with no default, or with more than its default to say. */
@@ -345,7 +349,13 @@ const node = (): Drawn => ({}) as Drawn
 interface Common {
   /** `web` for a node only the web draws, `native` for one only a phone draws. */
   readonly platform?: 'native' | 'web'
-  /** A `data-` attribute the part carries, which its style table reads. */
+  /**
+   * A `data-` attribute the part carries, which its style table reads by
+   * its name, as a badge's indicator is `data-dot` while it draws a dot.
+   * Written as HTML writes it, since it is the attribute the web element
+   * puts on the part: a word of the vocabulary in its place would be a
+   * second name for the same attribute.
+   */
   readonly [data: `data-${string}`]: Given
 }
 

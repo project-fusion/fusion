@@ -184,6 +184,7 @@ export default styles(
       /* Hidden until it has somewhere to be. */
       rule({ part: { 'data-placed': false } }, { opacity: 0 }),
     ]),
+    /* Written out: a rule on an element passed in reads no state of that element. */
     on(
       {
         part: 'host',

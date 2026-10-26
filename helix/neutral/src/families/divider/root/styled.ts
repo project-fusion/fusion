@@ -118,6 +118,7 @@ export default styles(
         { web: { backgroundColor: 'CanvasText', forcedColorAdjust: 'none' } },
       ),
     ]),
+    /* Written out: the vocabulary names no part beside another, and no slot in a state. */
     on(
       {
         part: 'line',

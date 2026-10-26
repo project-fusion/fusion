@@ -388,6 +388,7 @@ export default styles(
       /* A scrolling region takes focus when it scrolls, and says so when it
          has it. The ring is drawn on the layer over the viewport, since the
          fade mask would take it out at every edge that fades. */
+      /* Written out: the vocabulary names no part beside another. */
       on({ part: 'edges', selector: '[part="viewport"]:focus-visible ~ [part="edges"]' }, [
         web([
           rule({

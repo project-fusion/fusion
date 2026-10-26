@@ -228,6 +228,7 @@ export default styles(
       }),
       rule({ orientation: 'vertical' }, { flex: 'none', inlineSize: '100%' }),
     ]),
+    /* Written out: `dir` reads the host's direction, and this reads the part's own. */
     on({ part: 'progress', selector: '[part="progress"]:dir(rtl)' }, [
       web([
         rule({
