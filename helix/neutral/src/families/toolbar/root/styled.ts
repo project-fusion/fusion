@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { product, token } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -34,7 +34,7 @@ export default styles(
       radius: token('radii-none'),
       separatorGap: 0,
     },
-    props: [prop('size', ['sm', 'md', 'lg'])],
+    props: { size: oneOf(['sm', 'md', 'lg']) },
     stylesheet: 'toolbar/root/toolbar-root.generated.css',
   },
   ({ hook, on, rule, variants }) => [

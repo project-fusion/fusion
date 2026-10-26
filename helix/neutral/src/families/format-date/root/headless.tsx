@@ -1,5 +1,5 @@
 import { boolean, headless, number, oneOf, string, Text, time, View, web } from '../../../render.js'
-import { clock, derive } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * Format Date's headless tier: a timestamp, formatted for the reader's
@@ -62,10 +62,10 @@ export default headless('format-date', {
     spoken: derive('format-date-spoken'),
     whole: derive('format-date-whole'),
   },
-  clock: clock({
+  clock: {
     expires: 'format-date-expires',
-    restarts: ['date', 'elapsed', 'frozen', 'locale', 'numeric', 'relative'],
-  }),
+    restartOn: ['date', 'elapsed', 'frozen', 'locale', 'numeric', 'relative'],
+  },
   render: ({ derived }) => (
     <>
       {derived.shown && (

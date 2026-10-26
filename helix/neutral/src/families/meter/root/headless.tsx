@@ -10,7 +10,7 @@ import {
   Text,
   View,
 } from '../../../render.js'
-import { bind, derive, total } from '../../../tree.js'
+import { bind, derive } from '../../../tree.js'
 
 /**
  * Meter's headless tier: a measurement in a known range, as a bar, a ring,
@@ -93,14 +93,14 @@ export default headless('meter', {
   host: {
     label: bind('label'),
     role: 'meter',
-    valuemax: bind('reading-max'),
-    valuemin: bind('reading-min'),
-    valuenow: bind('reading-now'),
-    valuetext: bind('reading-text'),
+    valuemax: bind('readingMax'),
+    valuemin: bind('readingMin'),
+    valuenow: bind('readingNow'),
+    valuetext: bind('readingText'),
   },
   /* The meter measures the sum of its segments where it has any, and is
      `segmented` while it does, which the segments are the fill then. */
-  total: total({ holds: 'segmented', into: 'value', of: 'meter-segment', prop: 'value' }),
+  total: { holds: 'segmented', itemProp: 'value', of: 'meter-segment', prop: 'value' },
   render: ({ derived, props, total }) => (
     <>
       <Slot

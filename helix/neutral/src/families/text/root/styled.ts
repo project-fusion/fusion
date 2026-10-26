@@ -1,7 +1,7 @@
 import printEconomy from '../../../fragments/print-economy.js'
+import { oneOf } from '../../../render.js'
 import { inherit, inherited, token } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -26,10 +26,10 @@ export default styles(
   {
     prefix: 'text',
     hooks: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'line-height'],
-    props: [
-      prop('emphasis', ['muted']),
-      prop('tone', ['accent', 'danger', 'info', 'primary', 'success', 'warning']),
-      prop('variant', [
+    props: {
+      emphasis: oneOf(['muted']),
+      tone: oneOf(['accent', 'danger', 'info', 'primary', 'success', 'warning']),
+      variant: oneOf([
         'display',
         'heading',
         'subheading',
@@ -40,7 +40,7 @@ export default styles(
         'label',
         'code',
       ]),
-    ],
+    },
     stylesheet: 'text/root/text-root.generated.css',
   },
   ({ hook, include, on, rule, variants }) => [
@@ -173,13 +173,13 @@ export default styles(
          count cuts nothing off. */
       rule({ lines: true }, { display: 'block', minInlineSize: 0 }),
       /* Named for the CSS properties they set, so each rule is the value. */
-      variants('text-align', {
+      variants('textAlign', {
         start: { textAlign: 'start' },
         center: { textAlign: 'center' },
         end: { textAlign: 'end' },
         justify: { textAlign: 'justify' },
       }),
-      variants('text-wrap', {
+      variants('textWrap', {
         balance: { textWrap: 'balance' },
         pretty: { textWrap: 'pretty' },
         nowrap: { textWrap: 'nowrap' },

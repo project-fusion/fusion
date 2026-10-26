@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { fn, list, mix, native, product, scheme, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -41,7 +41,7 @@ export default styles(
       toneColor: own.color,
     }),
     own: ['announcement-color', 'announcement-ground', 'announcement-tint'],
-    props: [prop('separation', ['elevated', 'filled', 'outlined'])],
+    props: { separation: oneOf(['elevated', 'filled', 'outlined']) },
     stylesheet: 'announcement/root/announcement-root.generated.css',
   },
   ({ hook, on, own, rule, variants }) => {

@@ -1,5 +1,5 @@
 import { boolean, cancelable, headless, oneOf, Slot, string, View, web } from '../../../render.js'
-import { bind, collection, derive } from '../../../tree.js'
+import { bind, derive } from '../../../tree.js'
 
 /**
  * Steps' headless tier: the stages of a sequence and which one the reader is
@@ -55,15 +55,20 @@ export default headless('steps', {
   derived: {
     name: derive('steps-name'),
   },
-  collection: collection({
-    after: 'activate',
-    before: 'before-activate',
-    chosen: 'active',
-    initial: 'default-active',
-    keys: { along: 'orientation', chooses: false, letters: false, wrap: false },
+  collection: {
+    defaultProp: 'defaultActive',
+    keys: {
+      loop: false,
+      orientation: 'orientation',
+      selectionFollowsFocus: false,
+      typeahead: false,
+    },
+    onBeforeChange: 'beforeActivate',
+    onChange: 'activate',
     optional: true,
+    prop: 'active',
     roves: 'arrows',
-  }),
+  },
   host: { label: bind('name'), role: 'list' },
   render: ({ props }) => (
     <>

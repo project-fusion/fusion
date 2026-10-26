@@ -6,7 +6,7 @@ use super::*;
 fn a_set_that_mixes_runs_the_mixed_set_with_roving_focus_and_typeahead() {
     let menu = family(
         "export default headless('menu', {
-          collection: collection({ disabled: 'disabled', keys: { chooses: false, wrap: true }, mixes: true }),
+          collection: { disabled: 'disabled', keys: { loop: true, selectionFollowsFocus: false }, mixes: true },
           events: [],
           props: [prop('disabled', 'boolean')],
           tree: [region('default')],
@@ -27,7 +27,7 @@ fn an_item_of_a_set_that_mixes_binds_its_switches_and_the_event_it_asks() {
     let row = family(
         "export default headless('menu-item', {
           events: [event('before-check', { cancelable: true }), event('before-select', { cancelable: true })],
-          item: item('menu', { before: 'before-check', checkable: 'checkable', checked: 'checked', exclusive: 'exclusive' }),
+          item: item('menu', { checkable: 'checkable', checked: 'checked', exclusive: 'exclusive', onBeforeChange: 'beforeCheck' }),
           props: [prop('checkable', 'boolean'), prop('checked', 'boolean'), prop('exclusive', 'boolean')],
           tree: [pressable('item', { chooses: true, role: 'menuitem', sends: 'before-select' }, [region('default')])],
         })",
@@ -49,14 +49,14 @@ fn a_set_that_mixes_holds_no_chosen_value_and_an_item_that_turns_names_checked()
     let chosen = headless(
         &default_export(
             "export default headless('menu', {
-              collection: collection({ chosen: 'value', keys: { chooses: false, wrap: true }, mixes: true }),
+              collection: { keys: { loop: true, selectionFollowsFocus: false }, mixes: true, prop: 'value' },
               props: [prop('value', 'string')],
             })",
         )
         .unwrap(),
     )
     .unwrap_err();
-    assert!(chosen.contains("holds no `chosen` value"), "{chosen}");
+    assert!(chosen.contains("names no `prop`"), "{chosen}");
     let unchecked = headless(
         &default_export(
             "export default headless('menu-item', { item: item('menu', { exclusive: 'exclusive' }) })",

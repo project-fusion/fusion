@@ -29,7 +29,7 @@ fn a_source_written_with_render_compiles_to_what_the_builder_form_does() {
                 event('filter', { detail: ['value'], platform: 'web' }),
               ],
               derived: { 'hold-hint': derive('menu-hold-hint') },
-              item: item('tabs', { chooses: true, state: 'selected' }),
+              item: item('tabs', { chooses: true, selectedState: 'selected' }),
               props: [
                 prop('disabled', 'boolean', { default: false }),
                 prop('dismiss-label', 'string', { default: 'Close' }),
@@ -56,7 +56,7 @@ fn a_source_written_with_render_compiles_to_what_the_builder_form_does() {
     .unwrap();
     let written = rendered(
         "export default headless('tab', {
-          memberOf: set('tabs', { state: 'selected' }),
+          memberOf: set('tabs', { selectedState: 'selected' }),
           derived: { holdHint: derive('menu-hold-hint') },
           props: {
             disabled: false,

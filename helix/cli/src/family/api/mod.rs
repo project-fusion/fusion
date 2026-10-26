@@ -24,6 +24,7 @@ mod parity;
 pub mod rendered;
 mod scroll;
 mod sections;
+pub mod spelling;
 mod stack;
 mod toggle;
 mod toggling;
@@ -290,9 +291,10 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
     let Lit::Call(helper, arguments) = export else {
         return Err("the default export is not a call to `headless()`".to_owned());
     };
-    let [Lit::Text(name), Lit::Object(body)] = arguments.as_slice() else {
+    let [Lit::Text(name), Lit::Object(written)] = arguments.as_slice() else {
         return Err(format!("`{helper}()` takes a family's name and an object"));
     };
+    let body = &spelled(written)?;
     if let Some((key, _)) = body.iter().find(|(key, _)| !FIELDS.contains(&key.as_str())) {
         return Err(format!("`{key}` is not a field a headless source has"));
     }
@@ -386,6 +388,17 @@ pub fn headless(export: &Lit) -> Result<Headless, String> {
         name: name.clone(),
         tree,
     })
+}
+
+/// A headless source's fields with each feature in the intermediate form's
+/// names, as [`spelling`] reads it.
+fn spelled(written: &[(String, Lit)]) -> Result<Vec<(String, Lit)>, String> {
+    written
+        .iter()
+        .map(|(key, value)| {
+            Ok(spelling::feature(key, value)?.unwrap_or_else(|| (key.clone(), value.clone())))
+        })
+        .collect()
 }
 
 #[cfg(test)]

@@ -29,7 +29,7 @@ import { bind, derive } from '../../../tree.js'
  * the element has.
  */
 export default headless('drilldown-item', {
-  memberOf: set('drilldown', { page: 'page' }),
+  memberOf: set('drilldown', { pageSlot: 'page' }),
   props: {
     disabled: false,
     /* `download`, `rel`, and `target` are a link's, for a row that is a
@@ -55,7 +55,7 @@ export default headless('drilldown-item', {
     popup: derive('drilldown-item-popup'),
     rowRole: derive('drilldown-item-role'),
   },
-  host: { role: bind('host-role') },
+  host: { role: bind('hostRole') },
   render: ({ derived, props, send }) => (
     <>
       <Pressable

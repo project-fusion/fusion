@@ -1,5 +1,4 @@
 import { headless, Slot } from '../../../render.js'
-import { section } from '../../../tree.js'
 
 /**
  * An outline section's headless tier: a section of the page that an outline
@@ -25,6 +24,6 @@ export default headless('outline-section', {
   },
   events: {},
   states: ['settled'],
-  section: section({ id: 'anchor', label: 'label', level: 'level' }),
+  section: { id: 'anchor', label: 'label', level: 'level' },
   render: () => <Slot />,
 })

@@ -28,7 +28,7 @@ import { derive } from '../../../tree.js'
  * the element has.
  */
 export default headless('step', {
-  memberOf: set('steps', { flag: 'current' }),
+  memberOf: set('steps', { current: 'current' }),
   props: {
     complete: false,
     completedLabel: '{name}, {complete}',

@@ -1,5 +1,4 @@
 import { bare, headless, Image, oneOf, Slot, string, View, web } from '../../../render.js'
-import { delay } from '../../../tree.js'
 
 /**
  * Image's headless tier: a picture that shows a placeholder while it loads
@@ -38,7 +37,7 @@ export default headless('image', {
     load: bare(),
   },
   states: ['error', 'loaded', 'loading', 'settled', 'waiting'],
-  delay: delay({ after: 'placeholder-delay', again: 'src', waiting: 'waiting' }),
+  delay: { duration: 'placeholderDelay', pending: 'waiting', restartOn: 'src' },
   render: ({ props }) => (
     <>
       <Image

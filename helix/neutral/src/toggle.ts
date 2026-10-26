@@ -13,67 +13,64 @@ export interface Toggle {
    * The event sent once the element has turned, or several in the order
    * they are sent, as a checkbox sends `input` and then `change`.
    */
-  readonly after?: string | readonly string[]
+  readonly onChange?: string | readonly string[]
   /**
    * The event sent before it turns, which a handler can cancel.
    */
-  readonly before?: string
+  readonly onBeforeChange?: string
   /**
    * The event sent once it stands the other way, however it came to: a
    * press, the page writing its prop, or its set, as an accordion section
    * sends `toggle`. Its detail is `newState` and `oldState`, each `open` or
    * `closed`, as the platform's `ToggleEvent` carries them.
    */
-  readonly changes?: string
+  readonly onToggle?: string
   /**
    * The prop that holds whether it is checked, on, or pressed. Absent where
-   * the runtime holds it, under `held`.
+   * the runtime holds it, under `shared`.
    */
-  readonly checked?: string
+  readonly prop?: string
   /**
    * The event sent once it stands closed, however it came to, after
-   * `changes`, as a dialog sends `close`.
+   * `onToggle`, as a dialog sends `close`.
    */
-  readonly closed?: string
+  readonly onClose?: string
   /**
    * The event sent before it closes, which a handler can cancel, as an
-   * accordion section's `before-close`. Named with `opens`, in place of
-   * `before`.
+   * accordion section's `before-close`. Named with `onBeforeOpen`, in
+   * place of `onBeforeChange`.
    */
-  readonly closes?: string
+  readonly onBeforeClose?: string
   /**
    * Whether Escape on its pressable that `toggles` closes it as a press
    * does, as a toast item's dismiss button closes its message. Named with
-   * `closes`.
+   * `onBeforeClose`.
    */
-  readonly escapes?: true
+  readonly closeOnEscape?: true
   /**
    * What the runtime holds whether it is checked in, where no prop holds it:
    * `page-motion`, whether the page's motion is paused, which every Motion
    * Toggle on a page shares. The web keeps it on the document element, and a
    * phone in the native runtime.
    */
-  readonly held?: 'page-motion'
+  readonly shared?: 'page-motion'
   /**
    * The prop that seeds it where nothing sets it.
    */
-  readonly initial?: string
+  readonly defaultProp?: string
   /**
    * The prop that shows it as neither, as an indeterminate checkbox does. A
    * press resolves it to the opposite of the state under it.
    */
-  readonly mixed?: string
+  readonly indeterminate?: string
   /**
    * The event sent before it opens, which a handler can cancel, as an
-   * accordion section's `before-open`. Named with `closes`.
+   * accordion section's `before-open`. Named with `onBeforeClose`.
    */
-  readonly opens?: string
+  readonly onBeforeOpen?: string
   /**
    * The prop that keeps a press from changing it, while a reader can still
    * see and focus it.
    */
   readonly readonly?: string
 }
-
-/** What an element that turns on and off holds. */
-export const toggle = (fields: Toggle): Toggle => fields

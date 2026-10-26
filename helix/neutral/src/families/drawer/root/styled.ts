@@ -1,3 +1,4 @@
+import { oneOf } from '../../../render.js'
 import {
   difference,
   first,
@@ -14,7 +15,6 @@ import {
   web,
 } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -58,7 +58,7 @@ export default styles(
       swipeY: 0,
     }),
     own: ['drawer-away', 'drawer-lead', 'drawer-scrim', 'drawer-size', 'drawer-trail'],
-    props: [prop('material', ['frosted', 'glass'])],
+    props: { material: oneOf(['frosted', 'glass']) },
     stylesheet: 'drawer/root/drawer-root.generated.css',
   },
   ({ hook, on, own, rule }) => {

@@ -1,5 +1,5 @@
 import { headless, object, oneOf, Slot, Text, time, View, Wrap } from '../../../render.js'
-import { clock, derive } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * A timeline entry's headless tier: when it happened, and what it was.
@@ -47,7 +47,7 @@ export default headless('timeline-item', {
     reading: derive('timeline-item-reading'),
     whole: derive('timeline-item-whole'),
   },
-  clock: clock({ expires: 'timeline-item-expires', restarts: ['datetime', 'relative'] }),
+  clock: { expires: 'timeline-item-expires', restartOn: ['datetime', 'relative'] },
   host: { role: 'listitem' },
   render: ({ derived }) => (
     <>

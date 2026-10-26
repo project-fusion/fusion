@@ -34,7 +34,7 @@ export default headless('stat', {
     value: number(),
   },
   events: {},
-  states: ['has-label', 'has-trend', 'has-unit', 'settled'],
+  states: ['hasLabel', 'hasTrend', 'hasUnit', 'settled'],
   derived: {
     hasLabel: bind('label'),
     hasTrend: bind('trend'),

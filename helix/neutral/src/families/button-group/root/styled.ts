@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { hookOf, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -43,7 +43,7 @@ export default styles(
       'button-group-pressed-border',
       'button-group-pressed-foreground',
     ],
-    props: [prop('size', ['sm', 'md', 'lg']), prop('variant', ['joined', 'spaced'])],
+    props: { size: oneOf(['sm', 'md', 'lg']), variant: oneOf(['joined', 'spaced']) },
     stylesheet: 'button-group/root/button-group-root.generated.css',
   },
   ({ hook, on, rule, variants }) => [
@@ -85,7 +85,7 @@ export default styles(
          resolved here so a hook set on the group or above it reaches every
          button. */
       rule(
-        { 'selection-mode': true },
+        { selectionMode: true },
         {
           own: {
             pressedBackground: hook.pressedBackgroundColor,

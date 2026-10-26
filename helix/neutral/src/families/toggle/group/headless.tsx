@@ -10,7 +10,6 @@ import {
   Wrap,
   web,
 } from '../../../render.js'
-import { collection, validation } from '../../../tree.js'
 
 /**
  * Toggle Group's headless tier: a row of toggles that chooses one, or presses
@@ -65,22 +64,18 @@ export default headless('toggle-group', {
     input: bare(),
   },
   states: ['invalid', 'settled'],
-  collection: collection({
-    after: ['input', 'change'],
-    before: 'before-change',
-    chosen: 'value',
-    clears: 'allow-empty-selection',
+  collection: {
+    allowEmptySelection: 'allowEmptySelection',
+    defaultProp: 'defaultValue',
     disabled: 'disabled',
-    initial: 'default-value',
-    keys: { chooses: true, letters: false, wrap: true },
+    keys: { loop: true, selectionFollowsFocus: true, typeahead: false },
+    onBeforeChange: 'beforeChange',
+    onChange: ['input', 'change'],
     optional: true,
-    presses: 'selection-mode',
-  }),
-  validation: validation({
-    feedback: 'feedback',
-    missing: 'value-missing-message',
-    required: 'required',
-  }),
+    pressMode: 'selectionMode',
+    prop: 'value',
+  },
+  validation: { feedback: 'feedback', required: 'required', valueMissing: 'valueMissingMessage' },
   render: ({ props, state }) => (
     <>
       {!props.labelPlacement && (

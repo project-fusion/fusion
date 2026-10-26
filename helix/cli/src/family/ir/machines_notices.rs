@@ -14,7 +14,9 @@ use crate::family::api::{Api, Notice, Notices};
 /// its source declares it.
 pub(super) fn noticing(api: &Api) -> impl Iterator<Item = MachineUse> + '_ {
     let notice = api.notice.as_ref().map(noticed);
-    notice.into_iter().chain(api.notices.as_ref().map(stacked_notices))
+    notice
+        .into_iter()
+        .chain(api.notices.as_ref().map(stacked_notices))
 }
 
 /// The stack, bound to the value it computes, whether a message shows, the

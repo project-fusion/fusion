@@ -127,12 +127,7 @@ pub fn unresolved(family: &Family) -> Vec<String> {
     gestures::gestures(family, &names, &mut found);
     stack::stacked(family, &names, &mut found);
     if let Some(validation) = &family.api.validation {
-        references(
-            "the validation",
-            validation.references(),
-            &names,
-            &mut found,
-        );
+        references("validation", validation.references(), &names, &mut found);
         if family.api.toggle.is_none() && family.api.collection.is_none() {
             found.push(
                 "the element declares a `validation`, and neither a `toggle` nor a `collection` holds its answer"
@@ -259,16 +254,16 @@ fn computed(api: &Api, names: &Names, found: &mut Vec<String>) {
 /// The collection's fields, each held to what its docs say it names.
 fn collection(api: &Api, names: &Names, found: &mut Vec<String>) {
     if let Some(collection) = &api.collection {
-        references("the collection", collection.references(), names, found);
+        references("collection", collection.references(), names, found);
         /* The prop that says how the items are pressed takes `multiple`,
         under which each item presses on its own. */
         if let Some(presses) = &collection.presses {
             let prop = names.prop(presses);
             let listed = prop.is_some_and(|prop| matches!(prop.kind, PropType::Values(_)));
             match attribute_value(prop, presses, "multiple") {
-                Some(why) => found.push(format!("the collection's `presses` {why}")),
+                Some(why) => found.push(format!("`collection.pressMode` {why}")),
                 None if !listed => found.push(format!(
-                    "the collection's `presses` reads `{presses}`, which takes no values to name `multiple` among"
+                    "`collection.pressMode` reads `{presses}`, which takes no values to name `multiple` among"
                 )),
                 None => {}
             }
@@ -289,7 +284,7 @@ fn toggle(family: &Family, names: &Names, found: &mut Vec<String>) {
         }
         return;
     };
-    references("the toggle", toggle.references(), names, found);
+    references("toggle", toggle.references(), names, found);
     /* A layer's toggle may have no pressable: the page or the layer's
     anchor opens it, and a dismissal closes it. */
     let unpressed = toggling.is_empty() && layered::opened_by(family, toggle);
@@ -311,7 +306,7 @@ fn toolbar(family: &Family, names: &Names, found: &mut Vec<String>) {
     let Some(toolbar) = &family.api.toolbar else {
         return;
     };
-    references("the toolbar", toolbar.references(), names, found);
+    references("toolbar", toolbar.references(), names, found);
     if !family.tree.is_empty() && toolbar_part(&family.tree).is_none() {
         found.push(
             "the element declares a `toolbar`, and no part has the role `toolbar`".to_owned(),
@@ -344,9 +339,10 @@ pub fn pressables_that_toggle<'a>(nodes: &'a [Node], found: &mut Vec<&'a str>) {
     }
 }
 
-/// Each name a collection or a toggle holds, held to what it names.
+/// Each name a feature holds, held to what it names, and said as the
+/// source writes it: `toggle.onChange` names `beforeX`.
 fn references(
-    whose: &str,
+    feature: &str,
     references: Vec<(&'static str, &str, Refers)>,
     names: &Names,
     found: &mut Vec<String>,
@@ -359,8 +355,13 @@ fn references(
             Refers::State => names.states.contains(name),
         };
         if !resolves {
+            let field = api::spelling::written(feature, at);
+            let name = match what {
+                Refers::Part => name.to_owned(),
+                _ => api::spelling::camel(name),
+            };
             found.push(format!(
-                "{whose}'s `{at}` names `{name}`, and no {} has that name",
+                "`{field}` names `{name}`, and no {} has that name",
                 what.word()
             ));
         }

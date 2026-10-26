@@ -12,7 +12,7 @@ import {
   Wrap,
   web,
 } from '../../../render.js'
-import { collection, derive, toggle } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * Megamenu's headless tier: a section of a navigation, a trigger that
@@ -64,7 +64,7 @@ import { collection, derive, toggle } from '../../../tree.js'
  * manifest says the element has.
  */
 export default headless('megamenu', {
-  memberOf: set('navigation', { flag: 'current', value: 'label' }),
+  memberOf: set('navigation', { current: 'current', value: 'label' }),
   props: {
     bandBelow: 640,
     /* `closeDelay` and `openDelay` are hover intent, and `placement` the card
@@ -102,28 +102,28 @@ export default headless('megamenu', {
     beforeOpen: cancelable(['open']),
     toggle: bare(['newState', 'oldState']),
   },
-  states: ['current', 'from-end', 'from-start', 'narrow', 'open', 'settled', 'to-end', 'to-start'],
+  states: ['current', 'fromEnd', 'fromStart', 'narrow', 'open', 'settled', 'toEnd', 'toStart'],
   derived: {
     current: derive('megamenu-current'),
     narrow: derive('megamenu-narrow'),
   },
-  collection: collection({
-    closes: { event: 'select' },
+  collection: {
+    closeOn: 'select',
+    currentFromItems: true,
     keys: {
-      chooses: false,
-      keeps: ['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 'Home'],
-      letters: false,
-      wrap: false,
+      itemKeys: ['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 'Home'],
+      loop: false,
+      selectionFollowsFocus: false,
+      typeahead: false,
     },
-    marked: true,
-  }),
-  toggle: toggle({
-    changes: 'toggle',
-    checked: 'open',
-    closes: 'before-close',
-    initial: 'default-open',
-    opens: 'before-open',
-  }),
+  },
+  toggle: {
+    defaultProp: 'defaultOpen',
+    onBeforeClose: 'beforeClose',
+    onBeforeOpen: 'beforeOpen',
+    onToggle: 'toggle',
+    prop: 'open',
+  },
   render: ({ props }) => (
     <>
       {/* The trigger's own box on a phone, which the band hangs from. The web

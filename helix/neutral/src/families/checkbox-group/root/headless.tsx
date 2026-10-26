@@ -10,7 +10,6 @@ import {
   Wrap,
   web,
 } from '../../../render.js'
-import { collection, validation } from '../../../tree.js'
 
 /**
  * Checkbox Group's headless tier: a name for a set of checkboxes, the boxes,
@@ -58,19 +57,15 @@ export default headless('checkbox-group', {
     input: bare(),
   },
   states: ['invalid', 'settled'],
-  collection: collection({
-    after: ['input', 'change'],
-    all: { enabled: 'select-all', label: 'select-all-label', part: 'select-all' },
-    before: 'before-change',
-    chosen: 'value',
+  collection: {
     disabled: 'disabled',
-    toggles: true,
-  }),
-  validation: validation({
-    feedback: 'feedback',
-    missing: 'value-missing-message',
-    required: 'required',
-  }),
+    itemsToggle: true,
+    onBeforeChange: 'beforeChange',
+    onChange: ['input', 'change'],
+    prop: 'value',
+    selectAll: { label: 'selectAllLabel', part: 'select-all', prop: 'selectAll' },
+  },
+  validation: { feedback: 'feedback', required: 'required', valueMissing: 'valueMissingMessage' },
   render: ({ props, state }) => (
     <>
       <Wrap

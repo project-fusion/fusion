@@ -161,7 +161,11 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     /* The region of the element a wrap draws that a node the wrap holds is
     passed into, in place of its default region, as a crumb's fold button is
     the trigger of the menu the crumb draws. */
-    ("into", &[NodeKind::Box, NodeKind::Pressable, NodeKind::Wrap], Shape::Name),
+    (
+        "into",
+        &[NodeKind::Box, NodeKind::Pressable, NodeKind::Wrap],
+        Shape::Name,
+    ),
     ("invalid", PART, Shape::Flag),
     // The one key that presses it, where Enter and Space do not both: Space
     // alone on a checkbox or a switch, as a native checkbox takes.

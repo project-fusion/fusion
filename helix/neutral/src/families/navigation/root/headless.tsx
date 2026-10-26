@@ -1,5 +1,5 @@
 import { boolean, headless, oneOf, Slot, View } from '../../../render.js'
-import { collection, derive } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * A navigation's headless tier: a landmark of destinations, with a mark that
@@ -48,12 +48,17 @@ export default headless('navigation', {
   derived: {
     name: derive('navigation-name'),
   },
-  collection: collection({
-    disclosed: 'open',
-    keys: { along: 'orientation', chooses: false, letters: false, wrap: false },
-    marked: true,
+  collection: {
+    currentFromItems: true,
+    itemOpen: 'open',
+    keys: {
+      loop: false,
+      orientation: 'orientation',
+      selectionFollowsFocus: false,
+      typeahead: false,
+    },
     roves: 'arrows',
-  }),
+  },
   render: ({ derived }) => (
     <View
       label={derived.name}

@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { token } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -29,7 +29,7 @@ export default styles(
       gap: token('space-xs'),
       radius: token('radii-sm'),
     },
-    props: [prop('separation', ['outlined', 'plain'])],
+    props: { separation: oneOf(['outlined', 'plain']) },
     stylesheet: 'accordion/root/accordion-root.generated.css',
   },
   ({ hook, on, rule }) => [

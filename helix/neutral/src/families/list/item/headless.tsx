@@ -51,7 +51,7 @@ export default headless('list-item', {
   events: {
     action: [],
   },
-  states: ['dragging', 'drop-after', 'drop-before', 'focus-visible', 'selected', 'settled'],
+  states: ['dragging', 'dropAfter', 'dropBefore', 'focusVisible', 'selected', 'settled'],
   render: ({ props }) => (
     <Pressable
       also={{ 'row-current': props.current }}

@@ -10,7 +10,7 @@ import {
   Wrap,
   web,
 } from '../../../render.js'
-import { copy, derive } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * Copy Button's headless tier: a button that copies `value` to the clipboard
@@ -90,17 +90,17 @@ export default headless('copy-button', {
     name: derive('copy-button-name'),
     tips: derive('copy-button-tips'),
   },
-  copy: copy({
-    after: 'feedback-duration',
+  copy: {
     copied: 'copied',
+    duration: 'feedbackDuration',
     failed: 'failed',
-    fails: 'copy-error',
-    says: 'says',
-    sends: 'copy',
-    text: 'value',
-    told: 'told',
-    words: { copied: 'copied-words', failed: 'failed-words', resting: 'name' },
-  }),
+    label: 'says',
+    labels: { copied: 'copiedWords', failed: 'failedWords', idle: 'name' },
+    onCopy: 'copy',
+    onError: 'copyError',
+    prop: 'value',
+    status: 'told',
+  },
   render: ({ copy, derived, props, send, state }) => (
     <>
       <Wrap
@@ -119,8 +119,8 @@ export default headless('copy-button', {
         }}
         /* The result's words, shown while they stand. */
         gives={{
-          content: copy.told,
-          open: copy.told,
+          content: copy.status,
+          open: copy.status,
           persist: true,
           placement: props.tooltipPlacement,
         }}
@@ -132,7 +132,7 @@ export default headless('copy-button', {
           copies
           disabled={props.disabled}
           focusable-when-disabled={props.focusableWhenDisabled}
-          label={copy.says}
+          label={copy.label}
           onPress={send.press}
           part="button"
           role="button"
@@ -157,7 +157,7 @@ export default headless('copy-button', {
               part="mark"
             />
           </Slot>
-          <Slot hidden={copy.told}>
+          <Slot hidden={copy.status}>
             <View
               ariaHidden
               icon="copy"
@@ -185,7 +185,7 @@ export default headless('copy-button', {
                   resting: props.name,
                 }}
               >
-                {copy.says}
+                {copy.label}
               </Text>
             </View>
           )}

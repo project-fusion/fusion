@@ -1,7 +1,7 @@
 import printEconomy from '../../../fragments/print-economy.js'
+import { oneOf } from '../../../render.js'
 import { fn, inherited, token } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -31,7 +31,7 @@ export default styles(
       loadingPadding: token('space-sm'),
       markerGutter: token('space-md'),
     },
-    props: [prop('divided', 'boolean', { default: false }), prop('marker', ['rail'])],
+    props: { divided: false, marker: oneOf(['rail']) },
     stylesheet: 'list/root/list-root.generated.css',
   },
   ({ hook, include, on, rule, variants }) => [

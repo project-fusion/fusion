@@ -1,5 +1,4 @@
 import { bare, cancelable, headless, oneOf, Slot } from '../../../render.js'
-import { collection } from '../../../tree.js'
 
 /**
  * Button Group's headless tier: buttons joined into one control, which can
@@ -47,17 +46,17 @@ export default headless('button-group', {
     change: bare(),
   },
   states: ['pressed', 'settled'],
-  collection: collection({
-    after: 'change',
-    before: 'before-change',
-    chosen: 'value',
+  collection: {
     disabled: 'disabled',
-    keeps: 'disallow-empty-selection',
-    keys: { chooses: false, letters: false, selects: false, wrap: true },
+    disallowEmptySelection: 'disallowEmptySelection',
+    keys: { loop: true, selectionFollowsFocus: false, selects: false, typeahead: false },
     label: 'label',
-    mode: 'selection-mode',
-    presses: 'selection-mode',
-    roves: 'selection-mode',
-  }),
+    onBeforeChange: 'beforeChange',
+    onChange: 'change',
+    pressMode: 'selectionMode',
+    prop: 'value',
+    roves: 'selectionMode',
+    selectionMode: 'selectionMode',
+  },
   render: () => <Slot />,
 })

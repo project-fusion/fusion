@@ -17,7 +17,7 @@ export default headless('row', {
     event('change', { bare: true }),
     event('filter', { detail: ['value'], platform: 'web' }),
   ],
-  item: item('rows', { chooses: true, state: 'chosen' }),
+  item: item('rows', { chooses: true, selectedState: 'chosen' }),
   props: [
     prop('value', 'string', { default: '' }),
     /* A link's, for a row that goes somewhere. */
@@ -29,7 +29,7 @@ export default headless('row', {
     prop('expanded', 'boolean', { attribute: false }),
   ],
   states: ['chosen', 'placed-top'],
-  total: total({ holds: 'holding', into: 'count', of: 'row-item', prop: 'value' }),
+  total: { holds: 'holding', itemProp: 'value', of: 'row-item', prop: 'count' },
   tree: [
     /* The row itself. */
     box(
@@ -61,13 +61,13 @@ fn a_builder_source_prints_as_jsx_with_every_comment_where_it_stood() {
     let printed = headless(SOURCE).unwrap();
     let text = printed.text;
     for expected in [
-        "import { Announce, bare, boolean, cancelable, headless, numberOrString, oneOf, Pressable, property, set, Slot, string, Text, View, web, Wrap } from '../../../render.js'\nimport { derive, total } from '../../../tree.js'\n",
+        "import { Announce, bare, boolean, cancelable, headless, numberOrString, oneOf, Pressable, property, set, Slot, string, Text, View, web, Wrap } from '../../../render.js'\nimport { derive } from '../../../tree.js'\n",
         "/**\n * A row's headless tier.\n */\nexport default headless('row', {",
-        "  memberOf: set('rows', { state: 'chosen' }),",
+        "  memberOf: set('rows', { selectedState: 'chosen' }),",
         "    count: numberOrString(''),\n    disabled: false,\n    expanded: property(boolean()),\n    /* A link's, for a row that goes somewhere. */\n    href: web(string()),\n    kind: oneOf(['plain', 'raised'], 'plain'),\n    target: web(string()),\n    value: '',",
         "    beforeSelect: cancelable(['value']),\n    change: bare(),\n    filter: web(['value']),\n    select: ['value'],",
         "    /* What the row says. */\n    rowWords: derive('menu-hold-hint'),",
-        "  total: total({ holds: 'holding', into: 'count', of: 'row-item', prop: 'value' }),",
+        "  total: { holds: 'holding', itemProp: 'value', of: 'row-item', prop: 'count' },",
         "      {/* The row itself. */}\n      <View\n        also={{ 'row-top': state.placedTop }}\n        /* Out of a screen reader's way. */\n        ariaHidden\n        part=\"row\"",
         "        <Pressable\n          chooses\n          part=\"press\"\n        />",
         "        role={props.kind === 'raised' ? 'group' : 'presentation'}",

@@ -107,7 +107,10 @@ fn a_fallback_that_repeats_the_default_and_a_default_that_reads_itself_are_refus
         None,
     )
     .unwrap();
-    for read in ["hook.color(token('ink'))", "first(hook.color, token('ink'))"] {
+    for read in [
+        "hook.color(token('ink'))",
+        "first(hook.color, token('ink'))",
+    ] {
         let repeated = refused(
             &table(
                 "hooks: { color: token('ink') }",
@@ -116,7 +119,9 @@ fn a_fallback_that_repeats_the_default_and_a_default_that_reads_itself_are_refus
             None,
         );
         assert!(
-            repeated.contains("`hook.color(…)` repeats the default `hooks` gives it: write `hook.color`"),
+            repeated.contains(
+                "`hook.color(…)` repeats the default `hooks` gives it: write `hook.color`"
+            ),
             "{repeated}"
         );
     }
@@ -208,14 +213,14 @@ fn a_sets_web_block_is_each_declaration_where_it_stands() {
 fn a_platforms_group_says_its_platform_of_each_rule_inside() {
     assert_eq!(
         ir(&table(
-            "props: [prop('tone', ['a', 'b'])]",
+            "props: { tone: oneOf(['a', 'b']) }",
             "({ on, rule, variants }) => [on('host', [
               web([rule({ hover: true }, { opacity: 1 }), rule({ supports: '(x: y)' }, { opacity: 0 })]),
               native([variants('tone', { a: { opacity: 1 } })]),
             ])]",
         )),
         ir(&table(
-            "props: [prop('tone', ['a', 'b'])]",
+            "props: { tone: oneOf(['a', 'b']) }",
             "({ on, rule }) => [on('host', [
               rule({ hover: true, platform: 'web' }, { opacity: 1 }),
               rule({ platform: 'web', supports: '(x: y)' }, { opacity: 0 }),

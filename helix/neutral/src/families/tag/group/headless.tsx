@@ -9,7 +9,6 @@ import {
   View,
   web,
 } from '../../../render.js'
-import { collection } from '../../../tree.js'
 
 /**
  * Tag Group's headless tier: a set of tags that the arrow keys move through,
@@ -64,19 +63,26 @@ export default headless('tag-group', {
     dismiss: cancelable(['label']),
   },
   states: ['empty', 'settled'],
-  collection: collection({
-    after: 'change',
-    before: 'before-change',
-    behavior: 'selection-behavior',
-    chosen: 'value',
+  collection: {
+    disallowEmptySelection: 'disallowEmptySelection',
     empty: 'empty',
-    keeps: 'disallow-empty-selection',
-    keys: { adds: 'replace', chooses: false, enter: 'selects', escape: 'plain', wrap: false },
+    focusWhenEmpty: 'empty',
+    keys: {
+      adds: 'replace',
+      enter: 'selects',
+      escape: 'plain',
+      loop: false,
+      selectionFollowsFocus: false,
+    },
     label: 'label',
-    mode: 'selection-mode',
+    onBeforeChange: 'beforeChange',
+    onChange: 'change',
     order: 'pressed',
-    removes: { empty: 'empty', event: 'dismiss' },
-  }),
+    prop: 'value',
+    removeOn: 'dismiss',
+    selectionBehavior: 'selectionBehavior',
+    selectionMode: 'selectionMode',
+  },
   render: ({ props, state }) => (
     <>
       <Slot />
