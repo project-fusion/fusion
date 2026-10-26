@@ -37,20 +37,54 @@ memory.assert_fact(Fact::new("on a time-of-use plan", vec![episode], 0.9), None)
 ## Consolidation
 
 Episodes accumulate, and consolidation distills them into semantic facts.
-`unconsolidated()` returns the episodes that no fact includes yet, which are the
-input to consolidation. The pass belongs to the product, which knows what its
-episodes mean: it asserts a new fact, supersedes one an episode corrects, or
-reinforces one an episode says again.
+`unconsolidated()` returns the episodes that no pass has read and no fact rests
+on yet. The `consolidate` pass reads them, asks a model for the facts they
+state through typed extraction, and marks every episode it read as
+consolidated, including one that held no fact. It takes any provider, so a
+local model runs it.
 
-[//]: # (rust:fusion-cortex-engram::Memory::unconsolidated)
+[//]: # (rust:fusion-cortex-engram::consolidate::consolidate)
 
 ```rust
-let pending = memory.unconsolidated();
+let store = InMemory::new();
+let session = Id::new();
+store.record(&Episode::new("We run the tests with bun now.", session)).await.unwrap();
+let provider = Scripted::new("scripted/1", vec![Ok(reply(
+    r#"{"facts": [{"statement": "The tests run with bun.", "confidence": 0.9, "episodes": [1]}]}"#,
+))]);
+
+let pass = consolidate(&provider, &store, &Options::default()).await.unwrap();
+
+let fact = &store.current_facts().await.unwrap()[0];
+assert_eq!(fact.content, "The tests run with bun.");
+assert!(store.unconsolidated().await.unwrap().is_empty());
+// The fact's node reaches the episode it rests on.
+let mut graph = Graph::new();
+pass.nodes.into_iter().for_each(|node| { graph.insert(node); });
+let why: Vec<NodeKind> = graph.why(fact.node.unwrap()).iter().map(|node| node.kind()).collect();
+assert_eq!(why[..3], [NodeKind::Memory, NodeKind::Extraction, NodeKind::Source]);
 ```
 
 [//]: # (/rust)
 
-Consolidation will run as a background job. On the request path, it would slow
+Each fact names the episodes it rests on, and the pass gives it an edge to every
+one of them, in Engram and in Trace. `why()` on the fact's node reaches its
+episodes. The model is shown the current facts of the same scope, numbered, and
+the pass applies three rules to what it replies:
+
+- **A contradiction supersedes.** A fact that contradicts a known fact becomes
+  its successor, and the known fact is kept.
+- **A repeated fact gains a source.** A fact that says what a known fact says
+  adds its episodes to the known fact's sources, and no second fact is made.
+  The pass treats two statements as the same when the model says so, or when
+  they match once case, spacing, and a final period are set aside.
+- **A fact without an episode is dropped.** A fact that names no episode of
+  its batch is reported and never stored.
+
+A batch whose extraction fails stays unconsolidated for the next pass. The pass
+writes no trace itself: it returns its nodes, parents first, for you to append.
+
+Consolidation runs as a background job. On the request path, it would slow
 every request down.
 
 ## Newer facts supersede older ones
@@ -87,18 +121,19 @@ assert!(fact.decayed_confidence(300.0, 30.0) < 0.01);  // ten half-lives
 [//]: # (/rust)
 
 Decay is exponential, with a half-life you can set. When a new episode
-supports the same claim, `reinforce` adds it to the fact's sources, and the
-fact's age counts from then.
+supports the same claim, `add_source` adds it to the fact's sources, and the
+fact's age counts from then. `reinforce` refreshes the age without making the
+episode a source, so forgetting that episode leaves the fact as it was.
 
-[//]: # (rust:fusion-cortex-engram::Memory::reinforce)
+[//]: # (rust:fusion-cortex-engram::Memory::add_source)
 
 ```rust
-let first = memory.record(Episode::new("the clock helper fixes the flaky test", Id::new()));
-let fact = memory.assert_fact(Fact::new("the clock helper fixes the flaky test", vec![first], 0.8), None);
-let again = memory.record(Episode::new("the clock helper fixed it again", Id::new()));
+let monday = memory.record(Episode::new("tests run with bun", Id::new()));
+let fact = memory.assert_fact(Fact::new("tests run with bun", vec![monday], 0.8), None);
+let tuesday = memory.record(Episode::new("bun runs the tests", Id::new()));
 
-assert!(memory.reinforce(fact, again));
-assert!(memory.unconsolidated().is_empty());
+assert!(memory.add_source(fact, tuesday, None));
+assert_eq!(memory.current_facts()[0].derived_from, [monday, tuesday]);
 ```
 
 [//]: # (/rust)
@@ -106,10 +141,11 @@ assert!(memory.unconsolidated().is_empty());
 ## Deletion cascades
 
 Each episode names the trace it came from, such as an agent session.
-Forgetting the trace removes its episodes and every fact derived from one of
-them, so a deleted session takes what it taught with it. A fact the removed one
-had superseded is current again. A fact the trace only reinforced stays,
-without that reinforcement, since what it says came from elsewhere.
+Forgetting the trace removes its episodes and every fact that rests on them
+alone, so a deleted session takes what it taught with it. A fact another
+episode still supports stays, and loses its edge to the forgotten one. A fact
+the removed one had superseded is current again. A fact the trace only
+reinforced stays, without that reinforcement.
 
 [//]: # (rust:fusion-cortex-engram::Memory::forget)
 
@@ -127,12 +163,75 @@ assert_eq!(memory.current_facts()[0].content, "tests run with bun");
 
 [//]: # (/rust)
 
+`forget_episode` does the same for one episode.
+
+[//]: # (rust:fusion-cortex-engram::Memory::forget_episode)
+
+```rust
+let monday = memory.record(Episode::new("tests run with bun", Id::new()));
+let tuesday = memory.record(Episode::new("bun runs the tests", Id::new()));
+let fact = memory.assert_fact(Fact::new("tests run with bun", vec![monday, tuesday], 0.8), None);
+
+assert_eq!(memory.forget_episode(monday), [monday]);  // tuesday still supports it
+assert_eq!(memory.forget_episode(tuesday), [tuesday, fact]);
+```
+
+[//]: # (/rust)
+
+`delete_fact` removes one fact. A fact it superseded is current again, and the
+episodes it rested on stay marked as consolidated, so the next pass does not
+distill the deleted fact again. Recall places only the facts a store holds, so
+a deleted fact leaves its results.
+
+## Scopes
+
+Every episode and fact carries a scope, which says who may read it.
+
+| Scope | Who reads it | Names |
+| --- | --- | --- |
+| Personal | The person whose memory it is | Nothing |
+| Project | Everyone working in the project | The project |
+| Team | Everyone in the team | The team |
+| Organization | Everyone in the organization | Nothing |
+
+An episode takes its scope when it is recorded, and is personal unless you give
+it another. A fact takes the narrowest scope of its sources:
+
+- Personal is inside every scope, so any personal source makes the fact
+  personal.
+- The organization holds every scope, so it yields to any other source's.
+- Cortex does not know which projects belong to which teams, so sources in two
+  projects, two teams, or a project and a team make the fact personal.
+
+Adding a source can narrow a fact's scope. Forgetting a source never widens it,
+because the fact's words may have come from the episode that went. A fact with
+no source the store holds keeps the scope it was given. The consolidation pass
+reads each scope apart, so the facts it writes rest on episodes of their own
+scope.
+
+[//]: # (rust:fusion-cortex-engram::scope::Scope::narrowest)
+
+```rust
+use fusion_cortex_engram::Scope;
+
+let core = Scope::Team("core".into());
+let web = Scope::Team("web".into());
+
+assert_eq!(Scope::narrowest([&core, &Scope::Organization]), Some(core.clone()));
+assert_eq!(Scope::narrowest([&core, &Scope::Personal]), Some(Scope::Personal));
+assert_eq!(Scope::narrowest([&core, &web]), Some(Scope::Personal));
+```
+
+[//]: # (/rust)
+
 ## Storage
 
 `Memory` is the reference. The `store` module holds the same behavior behind
 the `Store` trait, in memory and in SQLite, and one conformance suite runs
 against both. A fact carries an optional embedding, which nothing computes yet,
-so scoring by vector later needs no migration.
+so scoring by vector later needs no migration. A SQLite file from before scopes
+gains the scope and consolidation columns when it is opened, and its episodes
+and facts are personal.
 
 [//]: # (rust:fusion-cortex-engram::store::Store)
 

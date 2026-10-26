@@ -92,20 +92,28 @@ half its confidence after decay, because what a project's sessions learned is
 often about the project and not the task. Scoring by vector is a second scorer,
 and a fact already carries the field it would read.
 
+You pass the scopes the caller may read, and Recall places no fact outside
+them, however well it scores. A scope matches only itself, so a caller that may
+read the organization's facts reads a team's only when its scopes name that
+team too. The Engram page describes the scopes.
+
 [//]: # (rust:fusion-cortex-recall::relevant)
 
 ```rust
-use fusion_cortex_engram::Fact;
+use fusion_cortex_engram::{Fact, Scope};
 use fusion_cortex_recall::{relevant, Overlap};
 
+let core = Scope::Team("core".into());
 let facts = vec![
     Fact::new("the clock helper fixes the flaky checkout test", vec![], 0.8),
     Fact::new("the docs build with bun", vec![], 0.8),
+    Fact::new("the core team fixes flaky tests on Fridays", vec![], 0.9).within(core),
 ];
 
-let placed = relevant(&facts, "fix the flaky checkout test", &Overlap, 1, |_| 0.0, 30.0);
+let placed = relevant(&facts, &[Scope::Personal], "fix the flaky checkout test", &Overlap, 2, |_| 0.0, 30.0);
 
 assert_eq!(placed[0].0.content, "the clock helper fixes the flaky checkout test");
+assert!(placed.iter().all(|(fact, _)| fact.scope == Scope::Personal));
 ```
 
 [//]: # (/rust)
