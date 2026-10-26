@@ -382,15 +382,15 @@ pub fn collection(lit: &Lit) -> Result<Collection, String> {
     kept(&collection, chosen.as_deref())?;
     collection.chosen = chosen;
     /* Each item that turns is a stop of its own, so its keys are its own. */
-    collection.keys = match moves {
-        Some(moves) => moves,
-        None if collection.toggles => Keys::default(),
-        None => {
-            return Err(
-                "a collection says how its keys move, as `keys: { chooses, wrap }`".to_owned(),
-            )
-        }
-    };
+    collection.keys =
+        match moves {
+            Some(moves) => moves,
+            None if collection.toggles => Keys::default(),
+            None => return Err(
+                "a collection says how its keys move, as `keys: { loop, selectionFollowsFocus }`"
+                    .to_owned(),
+            ),
+        };
     Ok(collection)
 }
 

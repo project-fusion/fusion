@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -48,7 +48,7 @@ export default styles(
       'loader-turn',
       'mark-size',
     ],
-    props: [prop('size', ['sm', 'md', 'lg']), prop('variant', ['pulse'])],
+    props: { size: oneOf(['sm', 'md', 'lg']), variant: oneOf(['pulse']) },
     stylesheet: 'loader/root/loader-root.generated.css',
   },
   ({ hook, keyframes, on, own, rule }) => [

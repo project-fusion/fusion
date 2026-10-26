@@ -31,7 +31,7 @@ export default headless('card', {
     mediaPlacement: oneOf(['end']),
   },
   events: {},
-  states: ['has-footer', 'has-header', 'has-media', 'settled'],
+  states: ['hasFooter', 'hasHeader', 'hasMedia', 'settled'],
   host: { label: bind('label'), role: 'group' },
   render: ({ slots }) => (
     <>

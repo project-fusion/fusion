@@ -58,7 +58,7 @@ pub fn total(lit: &Lit) -> Result<Total, String> {
         }
     }
     if total.into.is_empty() || total.of.is_empty() || total.prop.is_empty() {
-        return Err("total: a total names `into`, `of` and `prop`".to_owned());
+        return Err("total: a total names `itemProp`, `of` and `prop`".to_owned());
     }
     Ok(total)
 }
@@ -116,7 +116,7 @@ mod tests {
         ));
         assert_eq!(
             read,
-            Err("total: a total names `into`, `of` and `prop`".to_owned())
+            Err("total: a total names `itemProp`, `of` and `prop`".to_owned())
         );
     }
 }

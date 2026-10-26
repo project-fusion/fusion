@@ -1,5 +1,5 @@
 import { headless, object, oneOf, Pressable, Slot, View } from '../../../render.js'
-import { derive, toggle } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * Callout's headless tier: a passage set apart as a note, information, a
@@ -40,7 +40,7 @@ export default headless('callout', {
   events: {
     dismiss: { cancelable: true, detail: ['label'], gives: { label: 'dismissed' } },
   },
-  states: ['closed', 'entering', 'exiting', 'has-heading', 'has-icon', 'settled'],
+  states: ['closed', 'entering', 'exiting', 'hasHeading', 'hasIcon', 'settled'],
   derived: {
     dismissed: derive('callout-dismissed'),
     dismissName: derive('callout-dismiss-name'),
@@ -48,7 +48,7 @@ export default headless('callout', {
     toneName: derive('callout-tone-name'),
   },
   host: { role: 'note' },
-  toggle: toggle({ checked: 'open', closes: 'dismiss' }),
+  toggle: { onBeforeClose: 'dismiss', prop: 'open' },
   render: ({ derived, props }) => (
     <>
       <View

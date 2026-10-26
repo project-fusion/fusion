@@ -1,5 +1,5 @@
 import { bare, cancelable, headless, Pressable, Slot, View } from '../../../render.js'
-import { derive, toggle } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * Motion Toggle's headless tier: one toggle button that pauses every motion
@@ -44,7 +44,7 @@ export default headless('motion-toggle', {
   derived: {
     name: derive('motion-toggle-name'),
   },
-  toggle: toggle({ after: 'change', before: 'before-check', held: 'page-motion' }),
+  toggle: { onBeforeChange: 'beforeCheck', onChange: 'change', shared: 'page-motion' },
   render: ({ derived, state }) => (
     <Pressable
       label={derived.name}

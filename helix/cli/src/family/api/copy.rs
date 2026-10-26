@@ -124,7 +124,7 @@ pub fn copy(lit: &Lit) -> Result<Copy, String> {
     ];
     if named.iter().any(|name| name.is_empty()) {
         return Err(
-            "copy: a copy names `after`, `copied`, `failed`, `fails`, `says`, `sends`, `text`, `told`, and its `words`, `copied`, `failed`, and `resting`"
+            "copy: a copy names `copied`, `duration`, `failed`, `label`, `onCopy`, `onError`, `prop`, `status`, and its `labels`, `copied`, `failed`, and `idle`"
                 .to_owned(),
         );
     }

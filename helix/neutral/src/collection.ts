@@ -13,37 +13,41 @@ export interface Collection {
    * The box a set whose items turn draws above them, which turns every
    * enabled item on, or every one off once all of them are, as a checkbox
    * group's select-all: the prop that draws it, the prop that holds its
-   * words, and the part it is drawn as, a box that `draws` the item's
-   * element.
+   * words, `label`, and the part it is drawn as, a box that `draws` the
+   * item's element. `prop` is the one that draws it.
    */
-  readonly all?: { readonly enabled: string; readonly label: string; readonly part: string }
+  readonly selectAll?: { readonly label: string; readonly part: string; readonly prop: string }
   /**
    * The event sent once the chosen item has changed, or several in the order
    * they are sent, as a radio group sends `input` and then `change`.
    */
-  readonly after?: string | readonly string[]
+  readonly onChange?: string | readonly string[]
   /**
    * The event sent before it changes, which a handler can cancel.
    */
-  readonly before?: string
+  readonly onBeforeChange?: string
   /**
    * The prop that holds the chosen item's value. A set whose items open may
    * have none, as an accordion holds no value.
    */
-  readonly chosen?: string
+  readonly prop?: string
   /**
    * The prop that lets a press on the chosen item take it back, so the set
    * holds no choice, as a toggle group's `allow-empty-selection` does.
    */
-  readonly clears?: string
+  readonly allowEmptySelection?: string
   /**
    * The item's event that closes the element's toggle once it stands, in a
-   * set that mixes, as a menu and a speed dial close as an item is chosen,
-   * and the element's prop that must hold for it to, as a menu's
-   * `close-on-select`. An item's own `closes` prop wins where it holds a
-   * value. A choice of a row that opens a page closes nothing.
+   * set that mixes, as a menu and a speed dial close as an item is chosen. A
+   * choice of a row that opens a page closes nothing.
    */
-  readonly closes?: { readonly event: string; readonly while?: string }
+  readonly closeOn?: string
+  /**
+   * The element's prop that must hold for `closeOn` to close it, as a menu's
+   * `close-on-select`. An item's own `closeWhen` prop wins where it holds a
+   * value.
+   */
+  readonly closeWhen?: string
   /**
    * The prop that disables every item while it holds, as a disabled radio
    * group does, and gives each its own state back once it does not.
@@ -56,16 +60,16 @@ export interface Collection {
    * each element said `open`, and on a phone, while an element drawn inside
    * it is in its own `open` state.
    */
-  readonly disclosed?: string
+  readonly itemOpen?: string
   /**
    * The prop that seeds it where nothing sets it.
    */
-  readonly initial?: string
+  readonly defaultProp?: string
   /**
    * The prop that refuses a press that would leave nothing chosen, as a
    * button group's `disallow-empty-selection` does.
    */
-  readonly keeps?: string
+  readonly disallowEmptySelection?: string
   /**
    * The prop that names the set, which a phone announces on the element
    * itself where no part carries the set's role, as a button group's
@@ -77,20 +81,20 @@ export interface Collection {
    * The prop that stops an item from being chosen when focus arrives on it,
    * so the keys move focus and Enter or Space chooses.
    */
-  readonly manual?: string
+  readonly manualActivation?: string
   /**
    * Whether the items say themselves which of them is current, each by the
-   * prop its `item()`'s `flag` names, as a navigation's destinations do. The
+   * prop its `memberOf`'s `current` names, as a navigation's destinations do. The
    * set holds no chosen value and a press chooses nothing: the page moves the
    * mark by writing the flag, and a mark the tree draws stands at the item
    * flagged, the one flagged `page` where several are.
    */
-  readonly marked?: true
+  readonly currentFromItems?: true
   /**
    * The prop that says how many items a reader can choose: `none`, `single`,
    * or `multiple`. Absent, one item is always chosen, as a tab is.
    */
-  readonly mode?: string
+  readonly selectionMode?: string
   /**
    * Whether the set mixes commands, choices that turn on and off, and runs
    * of choices of which one is on, as a menu's rows do. It holds no chosen
@@ -105,9 +109,9 @@ export interface Collection {
    * The prop that says how many of the set's opening items stand open, as
    * an accordion's `mode`: any number where it holds nothing or `multiple`,
    * one under `single`, and one or none under `single-collapsible`. The set
-   * says `toggles: true` too.
+   * says `itemsToggle: true` too.
    */
-  readonly opens?: string
+  readonly openMode?: string
   /**
    * Whether the set may hold no choice, as a radio group does until a reader
    * answers, where a tab set always has one. It opens on the item whose
@@ -132,7 +136,7 @@ export interface Collection {
    * set is a radio group. Where `roves` names a prop that holds nothing, each
    * item is a control of its own and is neither.
    */
-  readonly presses?: string
+  readonly pressMode?: string
   /**
    * Whether the items turn on their own, as a checkbox group's boxes do. The
    * chosen prop holds the values of those that are on, separated by commas,
@@ -140,7 +144,7 @@ export interface Collection {
    * then the set's, and either refusal keeps the item as it was. Each item is
    * a stop of its own, so the set says nothing of keys.
    */
-  readonly toggles?: true
+  readonly itemsToggle?: true
   /**
    * The prop that keeps a reader from changing the choice, while the keys
    * still move focus among the items, as a read-only radio group does.
@@ -159,17 +163,17 @@ export interface Collection {
    * The prop that says what a press does to the items already chosen:
    * `toggle` adds or takes out the item, and `replace` chooses it alone.
    */
-  readonly behavior?: string
+  readonly selectionBehavior?: string
   /**
    * The state set while no item has joined.
    */
   readonly empty?: string
   /**
-   * How the keys move among the items: whether arriving on an item chooses
-   * it, where `manual` does not say otherwise and the item is no link,
-   * whether a move past the last item comes round to the first, the moving
-   * keys the items keep for themselves, whether a typed letter moves focus,
-   * which it does unless `letters` is `false`, as on a radio group, and
+   * How the keys move among the items: whether arriving on an item selects
+   * it, `selectionFollowsFocus`, where `manualActivation` does not say otherwise and the item is no link,
+   * whether a move past the last item comes round to the first, `loop`, the
+   * moving keys the items keep for themselves, `itemKeys`, whether a typed
+   * letter moves focus, which it does unless `typeahead` is `false`, as on a radio group, and
    * whether Space and Enter go to the set's selection, which they do unless
    * `selects` is `false`. A button group's buttons take Space and Enter as
    * their own press, which chooses them as a tap does. `enter: 'selects'`
@@ -180,7 +184,7 @@ export interface Collection {
    * group's does, where a list's adds or takes out the row wherever Space
    * presses it. `escape: 'plain'` has Escape let go of the selection only
    * with neither Control nor Command held, as a tag group's does, where a
-   * list's lets go with either held too. Where `along` names
+   * list's lets go with either held too. Where `orientation` names
    * the prop that says which way the items run, only the arrows along it
    * move focus: Up and Down under `vertical`, and Left and Right otherwise.
    * The arrows across it are left to the page, as a sequence of steps leaves
@@ -188,13 +192,13 @@ export interface Collection {
    */
   readonly keys?: {
     readonly adds?: 'replace'
-    readonly along?: string
-    readonly chooses: boolean
+    readonly orientation?: string
+    readonly selectionFollowsFocus: boolean
     readonly enter?: 'selects'
     readonly escape?: 'plain'
-    readonly letters?: false
+    readonly typeahead?: false
     readonly selects?: false
-    readonly keeps?: readonly (
+    readonly itemKeys?: readonly (
       | 'ArrowDown'
       | 'ArrowLeft'
       | 'ArrowRight'
@@ -202,7 +206,7 @@ export interface Collection {
       | 'End'
       | 'Home'
     )[]
-    readonly wrap: boolean
+    readonly loop: boolean
   }
   /**
    * How a reader removes an item, as a tag group's tags are removed: the
@@ -212,15 +216,17 @@ export interface Collection {
    * page takes the item out. **Once it does, focus that was on the item
    * moves to the next item, or to the one before after the last**, passing
    * over a disabled one, to the first where only disabled ones are left, and
-   * to the `empty` part where none is.
+   * to the `focusWhenEmpty` part where none is.
    */
-  readonly removes?: { readonly empty?: string; readonly event: string }
+  readonly removeOn?: string
+  /** The part that takes focus once no item is left, in a set whose items a reader removes. */
+  readonly focusWhenEmpty?: string
   /**
    * How the items are numbered: the props that say where the count starts
    * and whether it runs down, and the values the items read the first number
    * and the step as.
    */
-  readonly counts?: {
+  readonly numbering?: {
     readonly first: string
     readonly reversed?: string
     readonly start?: string
@@ -232,8 +238,8 @@ export interface Collection {
    * hears at each step, and the part a lifted item looks like.
    */
   readonly reorder?: {
-    readonly after: string
-    readonly before: string
+    readonly onReorder: string
+    readonly onBeforeReorder: string
     readonly canceled?: string
     readonly dropped?: string
     readonly enabled: string
@@ -251,7 +257,7 @@ export interface Item {
    * turns it, its detail the `checked` the press asks for, as a menu item's
    * `before-check`. A refusal keeps the item and its run as they were.
    */
-  readonly before?: string
+  readonly onBeforeChange?: string
   /**
    * The prop that makes the item a choice that turns on and off where it is
    * not checked yet, in a set that `mixes`, as a menu item's `checkable`.
@@ -265,10 +271,10 @@ export interface Item {
   readonly checked?: string
   /**
    * The item's own prop that says whether its event closes the element its
-   * set's `closes` names, where it holds a value, as a menu row's
+   * set's `closeOn` closes, where it holds a value, as a menu row's
    * `close-on-select` keeps the menu open after it is chosen.
    */
-  readonly closes?: string
+  readonly closeWhen?: string
   /**
    * The prop that makes the item one of a run, in a set that `mixes`: the
    * items next to it that say it too, up to the first that does not. A press
@@ -277,18 +283,13 @@ export interface Item {
    */
   readonly exclusive?: string
   /**
-   * Whether pressing the item chooses it. A tab chooses, and its panel only
-   * shows when its tab is chosen.
-   */
-  readonly chooses?: boolean
-  /**
    * The prop that says the item is the one its set chooses, where it is not
    * `selected`: a step is `current` while its sequence is on it. Its markup
    * writes it to open the set there, and the set holds it as a state of the
    * same name. A flag that holds a word flags the item while it holds any
    * but `false`, as a destination is `current` as `page` or `location`.
    */
-  readonly flag?: string
+  readonly current?: string
   /**
    * The prop its set fills with the name of the item's grip while items can
    * move, which is also the name of the press that moves it.
@@ -300,7 +301,7 @@ export interface Item {
    * stands for in its set's value where it has no `value`, as a tag's
    * category and label are, `['start', 'default']`.
    */
-  readonly named?: readonly string[]
+  readonly labelledby?: readonly string[]
   /**
    * The family whose collection it joins.
    */
@@ -310,12 +311,12 @@ export interface Item {
    * shows a `stack` of pages: the rows passed into it are that page's rows,
    * and a press on the item shows them, as a drilldown row's `page`.
    */
-  readonly page?: string
+  readonly pageSlot?: string
   /**
    * The item's own state that holds while its set chooses it, where the set
    * is in a selection mode, as a Button in a Button Group is `pressed`.
    */
-  readonly state?: string
+  readonly selectedState?: string
   /**
    * The prop that holds what the item stands for in its set, where it has no
    * `value`, as a navigation's destination stands for its `href`: the value
@@ -323,9 +324,3 @@ export interface Item {
    */
   readonly value?: string
 }
-
-/** What the items that join an element share. */
-export const collection = (fields: Collection): Collection => fields
-
-/** The collection of the family `of`, joined as an item. */
-export const item = (of: string, extra: Omit<Item, 'of'> = {}): Item => ({ of, ...extra })

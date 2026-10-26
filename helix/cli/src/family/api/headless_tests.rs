@@ -61,7 +61,7 @@ fn reads_a_collection_its_items_and_what_a_region_draws_while_empty() {
     let set = headless(
         &default_export(
             "export default headless('tabs', {
-              collection: collection({ chosen: 'active', initial: 'default-active', keys: { chooses: true, wrap: true } }),
+              collection: { defaultProp: 'defaultActive', keys: { loop: true, selectionFollowsFocus: true }, prop: 'active' },
               tree: [box('tabs', {}, [region('end', {}, [box('end-mark', { glyph: 'x' })])])],
             })",
         )
@@ -109,10 +109,8 @@ fn refuses_a_field_a_headless_source_does_not_have() {
 #[test]
 fn a_collection_names_what_holds_the_choice() {
     let refused = headless(
-        &default_export(
-            "export default headless('tabs', { collection: collection({ initial: 'x' }) })",
-        )
-        .unwrap(),
+        &default_export("export default headless('tabs', { collection: { defaultProp: 'x' } })")
+            .unwrap(),
     );
     assert!(refused.is_err_and(|why| why.contains("chosen value")));
 }
@@ -122,17 +120,7 @@ fn reads_how_a_collection_reorders_and_the_grip_its_items_carry() {
     let list = headless(
         &default_export(
             "export default headless('list', {
-              collection: collection({
-                chosen: 'value',
-                keys: { chooses: false, keeps: ['ArrowLeft', 'ArrowRight'], wrap: false },
-                reorder: {
-                  after: 'reorder',
-                  before: 'before-reorder',
-                  enabled: 'reorderable',
-                  move: 'move-label',
-                  moved: 'moved-label',
-                },
-              }),
+              collection: { keys: { itemKeys: ['ArrowLeft', 'ArrowRight'], loop: false, selectionFollowsFocus: false }, prop: 'value', reorder: { enabled: 'reorderable', move: 'moveLabel', moved: 'movedLabel', onBeforeReorder: 'beforeReorder', onReorder: 'reorder' } },
             })",
         )
         .unwrap(),
@@ -166,7 +154,7 @@ fn reads_how_a_collection_reorders_and_the_grip_its_items_carry() {
     let partial = headless(
         &default_export(
             "export default headless('list', {
-              collection: collection({ chosen: 'value', reorder: { enabled: 'reorderable' } }),
+              collection: { prop: 'value', reorder: { enabled: 'reorderable' } },
             })",
         )
         .unwrap(),
@@ -178,7 +166,7 @@ fn reads_how_a_collection_reorders_and_the_grip_its_items_carry() {
 fn reads_the_prop_that_flags_an_item_chosen() {
     let step = headless(
         &default_export(
-            "export default headless('step', { item: item('steps', { chooses: true, flag: 'current' }) })",
+            "export default headless('step', { item: item('steps', { chooses: true, current: 'current' }) })",
         )
         .unwrap(),
     )

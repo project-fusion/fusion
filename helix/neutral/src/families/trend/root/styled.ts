@@ -1,8 +1,8 @@
 import printEconomy from '../../../fragments/print-economy.js'
 import visuallyHidden from '../../../fragments/visually-hidden.js'
+import { oneOf } from '../../../render.js'
 import { native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -39,7 +39,7 @@ export default styles(
       worseColor: token('color-danger'),
     }),
     own: ['trend-color'],
-    props: [prop('color-by', ['judgment', 'movement'])],
+    props: { colorBy: oneOf(['judgment', 'movement']) },
     stylesheet: 'trend/root/trend-root.generated.css',
   },
   ({ hook, include, on, rule }) => [
@@ -79,15 +79,15 @@ export default styles(
          `good`. */
       rule(
         [
-          { 'color-by': 'movement', up: true },
-          { 'color-by': 'movement', defined: false, movement: 'up' },
+          { colorBy: 'movement', up: true },
+          { colorBy: 'movement', defined: false, movement: 'up' },
         ],
         { own: { color: hook.upColor } },
       ),
       rule(
         [
-          { 'color-by': 'movement', down: true },
-          { 'color-by': 'movement', defined: false, movement: 'down' },
+          { colorBy: 'movement', down: true },
+          { colorBy: 'movement', defined: false, movement: 'down' },
         ],
         { own: { color: hook.downColor } },
       ),

@@ -11,19 +11,19 @@ use crate::family::ir::Family;
 /// Where the names those sources hold resolve to nothing, one sentence each.
 pub(super) fn timed(family: &Family, names: &Names, found: &mut Vec<String>) {
     if let Some(total) = &family.api.total {
-        references("the total", total.references(), names, found);
+        references("total", total.references(), names, found);
     }
     if let Some(delay) = &family.api.delay {
-        references("the delay", delay.references(), names, found);
+        references("delay", delay.references(), names, found);
     }
     if let Some(countdown) = &family.api.countdown {
-        references("the countdown", countdown.references(), names, found);
+        references("countdown", countdown.references(), names, found);
     }
     if let Some(queue) = &family.api.queue {
-        references("the queue", queue.references(), names, found);
+        references("queue", queue.references(), names, found);
     }
     if let Some(clock) = &family.api.clock {
-        references("the clock", clock.references(), names, found);
+        references("clock", clock.references(), names, found);
         if !crate::family::ir::DERIVATIONS
             .iter()
             .any(|(name, _)| *name == clock.expires)
@@ -35,31 +35,31 @@ pub(super) fn timed(family: &Family, names: &Names, found: &mut Vec<String>) {
         }
     }
     if let Some(fold) = &family.api.fold {
-        references("the fold", fold.references(), names, found);
+        references("fold", fold.references(), names, found);
     }
     if let Some(scroll) = &family.api.scroll {
-        references("the scroll", scroll.references(), names, found);
+        references("scroll", scroll.references(), names, found);
     }
     if let Some(page) = &family.api.page {
-        references("the page", page.references(), names, found);
+        references("page", page.references(), names, found);
     }
     if let Some(notices) = &family.api.notices {
-        references("the stack", notices.references(), names, found);
+        references("notices", notices.references(), names, found);
     }
     if let Some(notice) = &family.api.notice {
-        references("the message", notice.references(), names, found);
+        references("notice", notice.references(), names, found);
     }
     if let Some(tour) = &family.api.tour {
-        references("the tour", tour.references(), names, found);
+        references("tour", tour.references(), names, found);
     }
     if let Some(stop) = &family.api.stop {
-        references("the stop", stop.references(), names, found);
+        references("stop", stop.references(), names, found);
     }
     if let Some(section) = &family.api.section {
-        references("the section", section.references(), names, found);
+        references("section", section.references(), names, found);
     }
     if let Some(sections) = &family.api.sections {
-        references("the sections", sections.references(), names, found);
+        references("sections", sections.references(), names, found);
     }
     copied(family, names, found);
 }
@@ -76,7 +76,7 @@ fn copied(family: &Family, names: &Names, found: &mut Vec<String>) {
         }
         return;
     };
-    references("the copy", copy.references(), names, found);
+    references("copy", copy.references(), names, found);
     for (at, name) in copy.worded() {
         if names.prop(name).is_none() && !names.derived.contains(name) {
             found.push(format!(

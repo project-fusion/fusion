@@ -64,10 +64,16 @@ pub fn print_sources(args: &crate::args::FamilyPrint, from: &Path) -> Result<Cod
             source
         };
         let text = fs::read_to_string(&path).map_err(|error| {
-            Failure::input("cannot read a source", format!("{}: {error}", path.display()))
+            Failure::input(
+                "cannot read a source",
+                format!("{}: {error}", path.display()),
+            )
         })?;
         let printed = print::headless(&text).map_err(|why| {
-            Failure::input("cannot print a source", format!("{}: {why}", path.display()))
+            Failure::input(
+                "cannot print a source",
+                format!("{}: {why}", path.display()),
+            )
         })?;
         for note in &printed.notes {
             eprintln!("{}: {note}", path.display());
@@ -75,10 +81,16 @@ pub fn print_sources(args: &crate::args::FamilyPrint, from: &Path) -> Result<Cod
         if args.write {
             let written = path.with_extension("tsx");
             fs::write(&written, &printed.text).map_err(|error| {
-                Failure::input("cannot write a source", format!("{}: {error}", written.display()))
+                Failure::input(
+                    "cannot write a source",
+                    format!("{}: {error}", written.display()),
+                )
             })?;
             fs::remove_file(&path).map_err(|error| {
-                Failure::input("cannot remove a source", format!("{}: {error}", path.display()))
+                Failure::input(
+                    "cannot remove a source",
+                    format!("{}: {error}", path.display()),
+                )
             })?;
             eprintln!("wrote {}", written.display());
         } else {

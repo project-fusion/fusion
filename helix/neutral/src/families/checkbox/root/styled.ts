@@ -1,8 +1,8 @@
 import field from '../../../fragments/field.js'
 import fieldInline from '../../../fragments/field-inline.js'
+import { oneOf } from '../../../render.js'
 import { first, list, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import checkbox from './headless.js'
 
 /* The two masks, named once, since each is a line of percent-encoding. */
@@ -52,7 +52,7 @@ export default styles(
       size: token('size-checkbox'),
     },
     own: ['checkbox-size', 'field-control-inline-size'],
-    props: [prop('separation', ['filled', 'outlined', 'plain'])],
+    props: { separation: oneOf(['filled', 'outlined', 'plain']) },
     stylesheet: 'checkbox/root/checkbox-root.generated.css',
   },
   ({ hook, include, on, own, rule }) => [
@@ -195,8 +195,8 @@ export default styles(
          and the icon takes the ink. It still scales in and out with the mark. */
       rule(
         [
-          { also: { 'mark-dash': false }, state: 'has-check' },
-          { also: { 'mark-dash': true }, state: 'has-dash' },
+          { also: { 'mark-dash': false }, state: 'hasCheck' },
+          { also: { 'mark-dash': true }, state: 'hasDash' },
         ],
         {
           backgroundColor: 'transparent',
@@ -231,10 +231,7 @@ export default styles(
          to carry the host's `aria-label` is kept, clipped by the field's rule.
          A phone draws the label's box whatever it holds. */
       web([
-        rule(
-          { part: { 'data-hidden': false }, state: { 'has-label': false } },
-          { display: 'none' },
-        ),
+        rule({ part: { 'data-hidden': false }, state: { hasLabel: false } }, { display: 'none' }),
       ]),
       /* A card's first line is a sentence somebody reads. */
       rule(card, { fontSize: token('text-md'), lineHeight: token('leading-normal') }),

@@ -69,7 +69,7 @@ pub fn delay(lit: &Lit) -> Result<Delay, String> {
         }
     }
     if delay.after.is_empty() || delay.waiting.is_empty() {
-        return Err("delay: a delay names `after` and `waiting`".to_owned());
+        return Err("delay: a delay names `duration` and `pending`".to_owned());
     }
     Ok(delay)
 }
@@ -119,7 +119,7 @@ mod tests {
         let read = delay(&call(vec![("after", text("delay"))]));
         assert_eq!(
             read,
-            Err("delay: a delay names `after` and `waiting`".to_owned())
+            Err("delay: a delay names `duration` and `pending`".to_owned())
         );
     }
 

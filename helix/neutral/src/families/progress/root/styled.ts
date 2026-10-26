@@ -1,9 +1,9 @@
 import printExact from '../../../fragments/print-exact.js'
 import progressRing from '../../../fragments/progress-ring.js'
 import progressWords from '../../../fragments/progress-words.js'
+import { oneOf } from '../../../render.js'
 import { fn, measured, mix, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -46,14 +46,14 @@ export default styles(
       valueSize: token('text-xs'),
     },
     own: ['progress-crawl', 'progress-cycle', 'progress-over', 'progress-under', 'progress-way'],
-    props: [prop('emphasis', ['subtle'])],
+    props: { emphasis: oneOf(['subtle']) },
     stylesheet: 'progress/root/progress-root.generated.css',
   },
   ({ hook, include, keyframes, on, own, rule }) => [
     on('host', [
       rule({ display: 'block' }),
       rule(
-        { 'show-value': true },
+        { showValue: true },
         {
           alignItems: 'center',
           columnGap: hook.valueGap,
@@ -81,7 +81,7 @@ export default styles(
       }),
       /* In the grid the row gap is the space, so the margin would count it
          twice. */
-      rule({ 'show-value': true }, { marginBlockEnd: 0 }),
+      rule({ showValue: true }, { marginBlockEnd: 0 }),
       /* Under a ring, in the drawing's own column, as a gauge's caption. */
       rule({ shape: 'ring' }, { gridColumn: 1, marginBlock: 0 }),
     ]),

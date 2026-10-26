@@ -10,7 +10,6 @@ import {
   Wrap,
   web,
 } from '../../../render.js'
-import { collection, validation } from '../../../tree.js'
 
 /**
  * Radio Group's headless tier: the question, the radios that answer it, and
@@ -55,21 +54,17 @@ export default headless('radio-group', {
     input: bare(),
   },
   states: ['invalid', 'settled'],
-  collection: collection({
-    after: ['input', 'change'],
-    before: 'before-change',
-    chosen: 'value',
+  collection: {
+    defaultProp: 'defaultValue',
     disabled: 'disabled',
-    initial: 'default-value',
-    keys: { chooses: true, letters: false, wrap: true },
+    keys: { loop: true, selectionFollowsFocus: true, typeahead: false },
+    onBeforeChange: 'beforeChange',
+    onChange: ['input', 'change'],
     optional: true,
+    prop: 'value',
     readonly: 'readonly',
-  }),
-  validation: validation({
-    feedback: 'feedback',
-    missing: 'value-missing-message',
-    required: 'required',
-  }),
+  },
+  validation: { feedback: 'feedback', required: 'required', valueMissing: 'valueMissingMessage' },
   render: ({ props, state }) => (
     <>
       <Wrap

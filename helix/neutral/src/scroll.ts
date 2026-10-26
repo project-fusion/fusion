@@ -12,20 +12,20 @@
  * **It reads the scroll capability's `observe`**, which tells where the part
  * stands at each end of each axis on both platforms. The web element works
  * its states out itself, and a phone's runtime sets them from what the
- * capability tells. Each edge is named in logical terms: `block-start` is
+ * capability tells. Each edge is named in logical terms: `blockStart` is
  * the top, and `inline-start` the edge a line of words starts from.
  */
 export interface Scroll {
   /** The state that holds while there is more past the bottom edge. */
-  readonly 'block-end'?: string
+  readonly blockEnd?: string
   /** The state that holds while there is more before the top edge. */
-  readonly 'block-start'?: string
+  readonly blockStart?: string
   /** The state that holds while there is more past the edge a line ends at. */
-  readonly 'inline-end'?: string
+  readonly inlineEnd?: string
   /** The state that holds while there is more before the edge a line starts from. */
-  readonly 'inline-start'?: string
+  readonly inlineStart?: string
   /** The event sent each time the part moves, as the web's `scroll`. */
-  readonly moves?: string
+  readonly onScroll?: string
   /**
    * The state that holds while what the part holds is longer than the part
    * along an axis it scrolls.
@@ -34,11 +34,8 @@ export interface Scroll {
   /** The part that scrolls. */
   readonly part: string
   /** The event sent once the part comes to rest, as the web's `scrollend`. */
-  readonly settles?: string
+  readonly onScrollEnd?: string
 }
-
-/** A part of the element that scrolls, and what it tells as it stands. */
-export const scroll = (fields: Scroll): Scroll => fields
 
 /**
  * The sections of the page the element follows as it scrolls, as an
@@ -54,9 +51,9 @@ export const scroll = (fields: Scroll): Scroll => fields
  */
 export interface Sections {
   /** The prop that says how a press on a link scrolls: `smooth`, `instant`, or `auto`. */
-  readonly behavior?: string
+  readonly scrollBehavior?: string
   /** The event sent as the section being read changes, with its id as `value`. */
-  readonly changes?: string
+  readonly onChange?: string
   /**
    * The prop that says whether the element keeps the marked link in view in
    * a box of its own that scrolls.
@@ -68,7 +65,7 @@ export interface Sections {
    * The part that travels to the link of the section being read, placed
    * against the box that holds it, as the web's moving mark is.
    */
-  readonly mark?: string
+  readonly indicator?: string
   /** The value the element computes that holds the sections, which a repeat's `each` binds. */
   readonly list: string
   /** The prop that says which sections are marked: `reading` or `visible`. */
@@ -79,9 +76,6 @@ export interface Sections {
    */
   readonly offset?: string
 }
-
-/** The sections of the page an element follows. */
-export const sections = (fields: Sections): Sections => fields
 
 /**
  * The section of the page an element is, which an outline draws a link for.
@@ -98,6 +92,3 @@ export interface Section {
   /** The prop that holds its heading's level, from 1. */
   readonly level?: string
 }
-
-/** The section of the page an element is. */
-export const section = (fields: Section): Section => fields

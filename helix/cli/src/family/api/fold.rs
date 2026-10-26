@@ -71,7 +71,7 @@ pub fn fold(lit: &Lit) -> Result<Fold, String> {
         }
     }
     if fold.max.is_empty() {
-        return Err("fold: a fold names `max`".to_owned());
+        return Err("maxVisible: names its `prop`".to_owned());
     }
     Ok(fold)
 }
@@ -81,14 +81,14 @@ fn middle(fields: &[(String, Lit)]) -> Result<Middle, String> {
     let mut middle = Middle::default();
     for (key, value) in fields {
         let Lit::Text(name) = value else {
-            return Err(format!("fold: `middle.{key}` is a name"));
+            return Err(format!("maxVisible: `middle.{key}` is a name"));
         };
         match key.as_str() {
             "count" => middle.count.clone_from(name),
             "items" => middle.items.clone_from(name),
             "label" => middle.label.clone_from(name),
             "words" => middle.words.clone_from(name),
-            key => return Err(format!("fold: `middle.{key}` is not a field it has")),
+            key => return Err(format!("maxVisible: `middle.{key}` is not a field it has")),
         }
     }
     for (name, value) in [
@@ -98,7 +98,7 @@ fn middle(fields: &[(String, Lit)]) -> Result<Middle, String> {
         ("words", &middle.words),
     ] {
         if value.is_empty() {
-            return Err(format!("fold: `middle` names `{name}`"));
+            return Err(format!("maxVisible: `middle` names `{name}`"));
         }
     }
     Ok(middle)
@@ -135,7 +135,7 @@ mod tests {
     #[test]
     fn refuses_a_fold_with_no_count() {
         let read = fold(&Lit::Call("fold".to_owned(), vec![object(&[])]));
-        assert_eq!(read, Err("fold: a fold names `max`".to_owned()));
+        assert_eq!(read, Err("maxVisible: names its `prop`".to_owned()));
     }
 
     #[test]
@@ -170,6 +170,6 @@ mod tests {
                 ("middle", object(&[("count", text("fold"))])),
             ])],
         ));
-        assert_eq!(read, Err("fold: `middle` names `items`".to_owned()));
+        assert_eq!(read, Err("maxVisible: `middle` names `items`".to_owned()));
     }
 }

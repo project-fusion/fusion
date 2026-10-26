@@ -1,5 +1,5 @@
 import { headless, oneOf, Pressable, Repeat, Slot, Text, View } from '../../../render.js'
-import { derive, sections } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * Outline's headless tier: links to the sections of a page, with the link
@@ -53,16 +53,16 @@ export default headless('outline', {
   derived: {
     name: derive('outline-name'),
   },
-  sections: sections({
-    behavior: 'behavior',
-    changes: 'activate',
+  sections: {
     follow: 'follow',
+    indicator: 'indicator',
     link: 'link',
     list: 'sections',
-    mark: 'indicator',
     marks: 'marks',
     offset: 'offset',
-  }),
+    onChange: 'activate',
+    scrollBehavior: 'behavior',
+  },
   render: ({ derived, entry, sections }) => (
     <>
       <View part="heading">

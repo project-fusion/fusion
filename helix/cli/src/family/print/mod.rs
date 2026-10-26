@@ -330,6 +330,26 @@ fn read_keys<'a>(
                 entries.sort_by(|a, b| natural(&a.key, &b.key));
                 keys.push(("derived".to_owned(), above, object(&entries, 4)));
             }
+            ("states", Expression::ArrayExpression(_)) => {
+                printer.comments.take(value.span().start, value.span().end);
+                let Some(Lit::Array(states)) = field else {
+                    return Err("`states` is an array of names".to_owned());
+                };
+                let names: Vec<String> = states
+                    .iter()
+                    .filter_map(|state| match state {
+                        Lit::Text(state) => {
+                            Some(format!("'{}'", crate::family::api::spelling::camel(state)))
+                        }
+                        _ => None,
+                    })
+                    .collect();
+                keys.push((
+                    "states".to_owned(),
+                    above,
+                    format!("[{}]", names.join(", ")),
+                ));
+            }
             ("tree", Expression::ArrayExpression(array)) => render = Some((above, &**array)),
             ("props" | "events" | "derived" | "tree", _) => {
                 return Err(format!(

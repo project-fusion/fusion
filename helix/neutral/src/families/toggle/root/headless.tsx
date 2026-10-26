@@ -1,5 +1,4 @@
 import { bare, cancelable, headless, Pressable, Slot, set } from '../../../render.js'
-import { toggle } from '../../../tree.js'
 
 /**
  * Toggle's headless tier: a toggle button on its own, and one option of a
@@ -37,7 +36,7 @@ export default headless('toggle', {
     change: bare(),
   },
   states: ['pressed', 'selected', 'settled'],
-  toggle: toggle({ after: 'change', before: 'before-check', checked: 'selected' }),
+  toggle: { onBeforeChange: 'beforeCheck', onChange: 'change', prop: 'selected' },
   render: ({ props, send }) => (
     <Pressable
       chooses

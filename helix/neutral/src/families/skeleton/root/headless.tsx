@@ -38,8 +38,8 @@ export default headless('skeleton', {
   host: {
     busy: bind('loading'),
     decorative: bind('unread'),
-    label: bind('spoken-label'),
-    role: bind('spoken-role'),
+    label: bind('spokenLabel'),
+    role: bind('spokenRole'),
   },
   render: ({ derived, props }) => (
     <>

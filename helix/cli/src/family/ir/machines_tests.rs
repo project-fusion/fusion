@@ -52,7 +52,7 @@ fn a_pressable_part_runs_press_bound_to_what_it_sends_and_reads() {
 fn a_collection_with_one_chosen_item_runs_single_selection_focus_typeahead_and_its_indicator() {
     let tabs = family(
         "export default headless('tabs', {
-          collection: collection({ after: 'activate', before: 'before-activate', chosen: 'active', initial: 'default-active', keys: { chooses: true, wrap: true }, manual: 'manual' }),
+          collection: { defaultProp: 'defaultActive', keys: { loop: true, selectionFollowsFocus: true }, manualActivation: 'manual', onBeforeChange: 'beforeActivate', onChange: 'activate', prop: 'active' },
           events: [event('activate'), event('before-activate', { cancelable: true })],
           props: [prop('active', 'string'), prop('default-active', 'string'), prop('manual', 'boolean')],
           tree: [box('tabs', {}, [region('default'), box('indicator', { decorative: true, marks: 'chosen' })])],
@@ -85,7 +85,7 @@ fn a_collection_with_one_chosen_item_runs_single_selection_focus_typeahead_and_i
 fn a_selection_mode_makes_the_selection_multiple_and_a_reorder_adds_its_machine() {
     let list = family(
         "export default headless('list', {
-          collection: collection({ behavior: 'selection-behavior', chosen: 'value', keys: { chooses: false, keeps: ['ArrowLeft', 'ArrowRight'], wrap: false }, mode: 'selection-mode', reorder: { after: 'reorder', before: 'before-reorder', enabled: 'reorderable', move: 'Move' } }),
+          collection: { keys: { itemKeys: ['ArrowLeft', 'ArrowRight'], loop: false, selectionFollowsFocus: false }, prop: 'value', reorder: { enabled: 'reorderable', move: 'Move', onBeforeReorder: 'beforeReorder', onReorder: 'reorder' }, selectionBehavior: 'selectionBehavior', selectionMode: 'selectionMode' },
           events: [event('before-reorder', { cancelable: true }), event('reorder')],
           props: [prop('reorderable', 'boolean'), prop('selection-behavior', ['replace', 'toggle']), prop('selection-mode', ['multiple', 'none', 'single']), prop('value', 'string')],
           tree: [box('list', {}, [region('default')])],
@@ -123,7 +123,7 @@ fn an_element_that_turns_runs_toggle_bound_to_the_pressable_that_toggles_it() {
         "export default headless('checkbox', {
           events: [event('change', { bare: true }), event('before-check', { cancelable: true, detail: ['checked'] })],
           props: [prop('checked', 'boolean'), prop('default-checked', 'boolean'), prop('disabled', 'boolean'), prop('indeterminate', 'boolean'), prop('readonly', 'boolean')],
-          toggle: toggle({ after: 'change', before: 'before-check', checked: 'checked', initial: 'default-checked', mixed: 'indeterminate', readonly: 'readonly' }),
+          toggle: { defaultProp: 'defaultChecked', indeterminate: 'indeterminate', onBeforeChange: 'beforeCheck', onChange: 'change', prop: 'checked', readonly: 'readonly' },
           tree: [pressable('control', { disabled: bind('disabled'), toggles: true }, [region('default')])],
         })",
     );
@@ -151,7 +151,7 @@ fn a_toggle_the_runtime_holds_binds_what_holds_it_and_no_prop() {
     let motion = family(
         "export default headless('motion-toggle', {
           events: [event('change', { bare: true }), event('before-check', { cancelable: true, detail: ['checked'] })],
-          toggle: toggle({ after: 'change', before: 'before-check', held: 'page-motion' }),
+          toggle: { onBeforeChange: 'beforeCheck', onChange: 'change', shared: 'page-motion' },
           tree: [pressable('button', { toggles: true }, [])],
         })",
     );
@@ -197,7 +197,7 @@ fn a_toggle_that_sends_several_events_after_it_turns_binds_them_in_order() {
         "export default headless('checkbox', {
           events: [event('change', { bare: true }), event('input', { bare: true })],
           props: [prop('checked', 'boolean')],
-          toggle: toggle({ after: ['input', 'change'], checked: 'checked' }),
+          toggle: { onChange: ['input', 'change'], prop: 'checked' },
           tree: [pressable('field', { toggles: true }, [])],
         })",
     );
@@ -215,7 +215,7 @@ fn a_press_only_the_web_draws_runs_no_machine() {
     let switch = family(
         "export default headless('switch', {
           props: [prop('checked', 'boolean')],
-          toggle: toggle({ checked: 'checked' }),
+          toggle: { prop: 'checked' },
           tree: [pressable('field', { toggles: true }, [
             pressable('control', { checked: bind('checked'), platform: 'web', role: 'switch' }, []),
           ])],
@@ -233,9 +233,9 @@ fn a_form_control_runs_validation_bound_to_where_its_answer_is_held() {
     let switch = family(
         "export default headless('switch', {
           props: [prop('checked', 'boolean'), prop('disabled', 'boolean'), prop('feedback', 'string'), prop('readonly', 'boolean'), prop('required', 'boolean'), prop('value-missing-message', 'string')],
-          toggle: toggle({ checked: 'checked', readonly: 'readonly' }),
+          toggle: { prop: 'checked', readonly: 'readonly' },
           tree: [pressable('field', { toggles: true }, [])],
-          validation: validation({ feedback: 'feedback', missing: 'value-missing-message', required: 'required' }),
+          validation: { feedback: 'feedback', required: 'required', valueMissing: 'valueMissingMessage' },
         })",
     );
     assert_eq!(
@@ -258,7 +258,7 @@ fn a_form_control_runs_validation_bound_to_where_its_answer_is_held() {
 fn a_set_with_no_letters_runs_no_typeahead_and_binds_what_it_may_hold() {
     let group = family(
         "export default headless('radio-group', {
-          collection: collection({ after: ['input', 'change'], chosen: 'value', disabled: 'disabled', keys: { chooses: true, letters: false, wrap: true }, optional: true, readonly: 'readonly' }),
+          collection: { disabled: 'disabled', keys: { loop: true, selectionFollowsFocus: true, typeahead: false }, onChange: ['input', 'change'], optional: true, prop: 'value', readonly: 'readonly' },
           events: [event('change', { bare: true }), event('input', { bare: true })],
           props: [prop('disabled', 'boolean'), prop('readonly', 'boolean'), prop('value', 'string')],
           tree: [region('default')],
@@ -287,7 +287,7 @@ fn a_set_with_no_letters_runs_no_typeahead_and_binds_what_it_may_hold() {
 fn a_set_whose_items_turn_runs_the_toggle_set_and_no_keys() {
     let group = family(
         "export default headless('checkbox-group', {
-          collection: collection({ after: 'change', all: { enabled: 'select-all', label: 'select-all-label', part: 'select-all' }, before: 'before-change', chosen: 'value', toggles: true }),
+          collection: { itemsToggle: true, onBeforeChange: 'beforeChange', onChange: 'change', prop: 'value', selectAll: { label: 'selectAllLabel', part: 'select-all', prop: 'selectAll' } },
           events: [event('before-change', { cancelable: true }), event('change', { bare: true })],
           props: [prop('select-all', 'boolean'), prop('select-all-label', 'string'), prop('value', 'string')],
           tree: [box('select-all', { draws: 'checkbox' }), region('default')],
@@ -311,7 +311,7 @@ fn a_set_whose_items_turn_runs_the_toggle_set_and_no_keys() {
 fn a_set_whose_items_press_on_their_own_runs_single_selection_bound_to_that_prop() {
     let group = family(
         "export default headless('toggle-group', {
-          collection: collection({ chosen: 'value', clears: 'allow-empty-selection', keys: { chooses: true, letters: false, wrap: true }, presses: 'selection-mode' }),
+          collection: { allowEmptySelection: 'allowEmptySelection', keys: { loop: true, selectionFollowsFocus: true, typeahead: false }, pressMode: 'selectionMode', prop: 'value' },
           events: [],
           props: [prop('allow-empty-selection', 'boolean'), prop('selection-mode', ['multiple', 'single']), prop('value', 'string')],
           tree: [region('default')],
@@ -335,7 +335,7 @@ fn a_set_whose_items_press_on_their_own_runs_single_selection_bound_to_that_prop
 fn a_set_that_keeps_one_chosen_and_roves_in_a_mode_binds_both() {
     let group = family(
         "export default headless('button-group', {
-          collection: collection({ chosen: 'value', keeps: 'disallow-empty-selection', keys: { chooses: false, letters: false, selects: false, wrap: true }, mode: 'selection-mode', presses: 'selection-mode', roves: 'selection-mode' }),
+          collection: { disallowEmptySelection: 'disallowEmptySelection', keys: { loop: true, selectionFollowsFocus: false, selects: false, typeahead: false }, pressMode: 'selectionMode', prop: 'value', roves: 'selectionMode', selectionMode: 'selectionMode' },
           props: [prop('disallow-empty-selection', 'boolean'), prop('selection-mode', ['multiple', 'single']), prop('value', 'string')],
           tree: [region('default')],
         })",
@@ -363,7 +363,7 @@ fn a_toolbar_runs_roving_focus_over_the_part_whose_role_is_toolbar() {
     let toolbar = family(
         "export default headless('toolbar', {
           props: [prop('orientation', ['horizontal', 'vertical']), prop('stop-at-ends', 'boolean')],
-          toolbar: toolbar({ ends: 'stop-at-ends', orientation: 'orientation' }),
+          toolbar: { orientation: 'orientation', stopAtEnds: 'stopAtEnds' },
           tree: [box('toolbar', { role: 'toolbar' }, [region('default')])],
         })",
     );

@@ -79,7 +79,7 @@
  */
 
 import type { Properties } from 'csstype'
-import type { Rendered } from './render.js'
+import type { PropsList, PropValue, Rendered } from './render.js'
 import type { Around, When as Conditions, Family, Holds, Interaction } from './rules.js'
 import type { Read, Tagged, Value } from './style.js'
 import type { Headless, Prop } from './tree.js'
@@ -173,13 +173,16 @@ type Source = Pick<Headless, 'props' | 'states' | 'tree'> & {
   readonly derived?: Readonly<Record<string, unknown>>
 }
 
-/** The states a rule's `state` names: the custom states, and the values the element computes. */
+/**
+ * The states a rule names, in camelCase as the source declares them: the
+ * custom states, and the values the element computes.
+ */
 export type StatesOf<H extends Source> =
-  | H['states'][number]
-  | (H extends { readonly derived: infer Derived } ? keyof Derived & string : never)
+  | Camel<H['states'][number]>
+  | (H extends { readonly derived: infer Derived } ? Camel<keyof Derived & string> : never)
 
-/** What a `when` may ask of each prop, by its name. */
-type AsksOf<P extends Prop> = { readonly [One in P as One['name']]?: Asks<One['type']> }
+/** What a `when` may ask of each prop, by its name in camelCase. */
+type AsksOf<P extends Prop> = { readonly [One in P as Camel<One['name']>]?: Asks<One['type']> }
 
 /** An interaction on the host that a rule on a part may ask for, any of several in an array. */
 type HostAround = Around & {
@@ -405,7 +408,7 @@ export const styles = <
   /* No default: a header's `({ own }) => ({...})` takes its parameter's type from this constraint. */
   const Hooks extends HooksField<OwnKeys<Own, Prefix>>,
   const Own extends readonly string[] | Defaults = readonly [],
-  const StyledProps extends readonly Prop[] = [],
+  const StyledProps extends Readonly<Record<string, PropValue>> = Record<never, never>,
 >(
   _headless: H,
   declared: {
@@ -424,6 +427,7 @@ export const styles = <
      * in camelCase, which a rule reads as `own.tabJustify`.
      */
     readonly own?: Own
+    /** The props only the styled tier has, by name in camelCase, as a headless source declares its own. */
     readonly props?: StyledProps
     readonly stylesheet: string
   },
@@ -431,7 +435,7 @@ export const styles = <
     given: Given<
       PartsOf<H['tree']> & string,
       RegionsOf<H['tree']> & string,
-      AsksOf<H['props'][number] | StyledProps[number]>,
+      AsksOf<H['props'][number] | PropsList<StyledProps>[number]>,
       StatesOf<H>,
       HookKeys<Hooks>,
       OwnKeys<Own, Prefix>,
@@ -444,7 +448,7 @@ export const styles = <
     owned.find((own) => own === name || own === `${declared.prefix}-${name}`) ?? name
   return {
     name: declared.prefix,
-    props: declared.props ?? [],
+    props: [],
     rules: rules(given(named) as never) as unknown as Family['rules'],
     stylesheet: declared.stylesheet,
   }

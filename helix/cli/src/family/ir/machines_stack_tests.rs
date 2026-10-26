@@ -7,10 +7,10 @@ use crate::family::resolve::unresolved;
 fn drilldown(stack: &str, cancelable: bool) -> Family {
     family(&format!(
         "export default headless('drilldown', {{
-          collection: collection({{ keys: {{ chooses: false, wrap: false }}, mixes: true }}),
+          collection: {{ keys: {{ loop: false, selectionFollowsFocus: false }}, mixes: true }},
           events: [event('before-navigate', {{ cancelable: {cancelable} }})],
           props: [prop('page', 'string')],
-          stack: stack({{ {stack} }}),
+          stack: {{ {stack} }},
           tree: [
             when('drilled', box('header', {{}}, [pressable('back', {{}}, []), box('title', {{}}, [text('title-words', {{ says: bind('page-label') }})])])),
             region('default'),
@@ -22,7 +22,7 @@ fn drilldown(stack: &str, cancelable: bool) -> Family {
 #[test]
 fn a_stack_runs_stack_bound_to_its_press_its_event_its_values_and_its_page() {
     let root = drilldown(
-        "back: 'back', before: 'before-navigate', drilled: 'drilled', label: 'page-label', page: 'page'",
+        "back: 'back', drilled: 'drilled', onBeforeChange: 'beforeNavigate', prop: 'page', title: 'pageLabel'",
         true,
     );
     assert_eq!(unresolved(&root), Vec::<String>::new());
@@ -42,14 +42,14 @@ fn a_stack_runs_stack_bound_to_its_press_its_event_its_values_and_its_page() {
 #[test]
 fn a_stack_goes_back_through_a_press_and_asks_through_a_cancelable_event() {
     let root = drilldown(
-        "back: 'title', before: 'before-navigate', drilled: 'drilled', label: 'page-label'",
+        "back: 'title', drilled: 'drilled', onBeforeChange: 'beforeNavigate', title: 'pageLabel'",
         false,
     );
     assert_eq!(
         unresolved(&root),
         vec![
-            "the stack's `before` names `before-navigate`, which is not cancelable, so a page cannot refuse a move",
-            "the stack's `back` names `title`, which is no pressable",
+            "`stack.onBeforeChange` names `beforeNavigate`, which is not cancelable, so a page cannot refuse a move",
+            "`stack.back` names `title`, which is no pressable",
         ]
     );
 }
@@ -58,7 +58,7 @@ fn a_stack_goes_back_through_a_press_and_asks_through_a_cancelable_event() {
 fn a_row_that_holds_a_page_runs_stack_row_bound_to_its_region() {
     let row = family(
         "export default headless('drilldown-item', {
-          item: item('drilldown', { chooses: true, page: 'page' }),
+          item: item('drilldown', { chooses: true, pageSlot: 'page' }),
           tree: [pressable('row', { chooses: true }, [region('default')]), region('page')],
         })",
     );
@@ -69,12 +69,12 @@ fn a_row_that_holds_a_page_runs_stack_row_bound_to_its_region() {
     );
     let missing = family(
         "export default headless('drilldown-item', {
-          item: item('drilldown', { page: 'pages' }),
+          item: item('drilldown', { pageSlot: 'pages' }),
           tree: [region('default')],
         })",
     );
     assert_eq!(
         unresolved(&missing),
-        vec!["the item's `page` names `pages`, and no region has that name"]
+        vec!["`memberOf.pageSlot` names `pages`, and no region has that name"]
     );
 }

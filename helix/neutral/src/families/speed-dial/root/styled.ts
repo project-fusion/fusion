@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { hookOf, list, native, product, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -39,7 +39,7 @@ export default styles(
       'speed-dial-row',
       'speed-dial-stagger',
     ],
-    props: [prop('labels', ['hover'])],
+    props: { labels: oneOf(['hover']) },
     stylesheet: 'speed-dial/root/speed-dial-root.generated.css',
   },
   ({ hook, on, own, rule }) => {
@@ -64,7 +64,7 @@ export default styles(
         /* Lined up on the end the trigger is on, the row order handed down. */
         rule({ own: { row: 'row-reverse' }, alignItems: 'flex-end' }),
         rule(
-          { state: 'aligned-start' },
+          { state: 'alignedStart' },
           { own: { align: 'flex-start', row: 'row' }, alignItems: 'flex-start' },
         ),
       ]),
@@ -74,7 +74,7 @@ export default styles(
       /* They arrive from the button, once the column is placed. */
       on('actions', [
         rule({ own: { dialFrom: travel } }),
-        rule({ state: 'placed-bottom' }, { own: { dialFrom: product(travel, '-1') } }),
+        rule({ state: 'placedBottom' }, { own: { dialFrom: product(travel, '-1') } }),
       ]),
       on({ region: 'default', slotted: '*' }, [
         rule({
@@ -92,10 +92,10 @@ export default styles(
         native([
           rule(
             [
-              { state: 'placed-bottom' },
-              { state: 'placed-left' },
-              { state: 'placed-right' },
-              { state: 'placed-top' },
+              { state: 'placedBottom' },
+              { state: 'placedLeft' },
+              { state: 'placedRight' },
+              { state: 'placedTop' },
             ],
             arrived,
           ),
@@ -174,37 +174,37 @@ export default styles(
         native([
           rule(
             [
-              { nthLast: 2, state: 'placed-top' },
-              { nthLast: 2, state: 'placed-left' },
-              { nthLast: 2, state: 'placed-right' },
-              { nth: 2, state: 'placed-bottom' },
+              { nthLast: 2, state: 'placedTop' },
+              { nthLast: 2, state: 'placedLeft' },
+              { nthLast: 2, state: 'placedRight' },
+              { nth: 2, state: 'placedBottom' },
             ],
             { transitionDelay: own.stagger },
           ),
           rule(
             [
-              { nthLast: 3, state: 'placed-top' },
-              { nthLast: 3, state: 'placed-left' },
-              { nthLast: 3, state: 'placed-right' },
-              { nth: 3, state: 'placed-bottom' },
+              { nthLast: 3, state: 'placedTop' },
+              { nthLast: 3, state: 'placedLeft' },
+              { nthLast: 3, state: 'placedRight' },
+              { nth: 3, state: 'placedBottom' },
             ],
             { transitionDelay: product(own.stagger, 2) },
           ),
           rule(
             [
-              { nthLast: 4, state: 'placed-top' },
-              { nthLast: 4, state: 'placed-left' },
-              { nthLast: 4, state: 'placed-right' },
-              { nth: 4, state: 'placed-bottom' },
+              { nthLast: 4, state: 'placedTop' },
+              { nthLast: 4, state: 'placedLeft' },
+              { nthLast: 4, state: 'placedRight' },
+              { nth: 4, state: 'placedBottom' },
             ],
             { transitionDelay: product(own.stagger, 3) },
           ),
           rule(
             [
-              { nthLast: { from: 5 }, state: 'placed-top' },
-              { nthLast: { from: 5 }, state: 'placed-left' },
-              { nthLast: { from: 5 }, state: 'placed-right' },
-              { nth: { from: 5 }, state: 'placed-bottom' },
+              { nthLast: { from: 5 }, state: 'placedTop' },
+              { nthLast: { from: 5 }, state: 'placedLeft' },
+              { nthLast: { from: 5 }, state: 'placedRight' },
+              { nth: { from: 5 }, state: 'placedBottom' },
             ],
             { transitionDelay: product(own.stagger, 4) },
           ),

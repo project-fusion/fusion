@@ -14,7 +14,6 @@ import {
   Wrap,
   web,
 } from '../../../render.js'
-import { toggle, validation } from '../../../tree.js'
 
 /**
  * Checkbox's headless tier: what it takes, what it sends, and its parts.
@@ -59,20 +58,16 @@ export default headless('checkbox', {
     change: bare(),
     input: bare(),
   },
-  states: ['checked', 'has-check', 'has-dash', 'has-label', 'indeterminate', 'invalid', 'settled'],
-  toggle: toggle({
-    after: ['input', 'change'],
-    before: 'before-check',
-    checked: 'checked',
-    initial: 'default-checked',
-    mixed: 'indeterminate',
+  states: ['checked', 'hasCheck', 'hasDash', 'hasLabel', 'indeterminate', 'invalid', 'settled'],
+  toggle: {
+    defaultProp: 'defaultChecked',
+    indeterminate: 'indeterminate',
+    onBeforeChange: 'beforeCheck',
+    onChange: ['input', 'change'],
+    prop: 'checked',
     readonly: 'readonly',
-  }),
-  validation: validation({
-    feedback: 'feedback',
-    missing: 'value-missing-message',
-    required: 'required',
-  }),
+  },
+  validation: { feedback: 'feedback', required: 'required', valueMissing: 'valueMissingMessage' },
   render: ({ props, state }) => (
     <>
       <Pressable

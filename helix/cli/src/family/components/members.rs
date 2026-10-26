@@ -359,7 +359,11 @@ pub fn typed_members(
     if quotes(family) {
         members.push(language());
     }
-    members.extend([hooks::prop(component, family)].into_iter().chain(hooks::id(family)));
+    members.extend(
+        [hooks::prop(component, family)]
+            .into_iter()
+            .chain(hooks::id(family)),
+    );
     /* A form control's ref is its handle, as a field's is on the web. */
     if family.api.validation.is_some() {
         members.push(Member {

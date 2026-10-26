@@ -11,7 +11,6 @@ import {
   Wrap,
   web,
 } from '../../../render.js'
-import { toggle, validation } from '../../../tree.js'
 
 /**
  * Switch's headless tier: what it takes, what it sends, and its parts.
@@ -52,18 +51,14 @@ export default headless('switch', {
     input: bare(),
   },
   states: ['checked', 'invalid', 'settled'],
-  toggle: toggle({
-    after: ['input', 'change'],
-    before: 'before-check',
-    checked: 'checked',
-    initial: 'default-checked',
+  toggle: {
+    defaultProp: 'defaultChecked',
+    onBeforeChange: 'beforeCheck',
+    onChange: ['input', 'change'],
+    prop: 'checked',
     readonly: 'readonly',
-  }),
-  validation: validation({
-    feedback: 'feedback',
-    missing: 'value-missing-message',
-    required: 'required',
-  }),
+  },
+  validation: { feedback: 'feedback', required: 'required', valueMissing: 'valueMissingMessage' },
   render: ({ props, state }) => (
     <>
       <Pressable

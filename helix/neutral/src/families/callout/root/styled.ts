@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { list, mix, native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -40,7 +40,7 @@ export default styles(
       radius: token('radii-sm'),
     }),
     own: ['callout-bar', 'callout-color', 'callout-inset', 'callout-tone'],
-    props: [prop('separation', ['filled', 'outlined', 'plain'])],
+    props: { separation: oneOf(['filled', 'outlined', 'plain']) },
     stylesheet: 'callout/root/callout-root.generated.css',
   },
   ({ hook, on, own, rule, variants }) => {

@@ -42,7 +42,7 @@ import {
  * manifest says the element has.
  */
 export default headless('megamenu-item', {
-  memberOf: set('megamenu', { flag: 'current', value: 'href' }),
+  memberOf: set('megamenu', { current: 'current', value: 'href' }),
   props: {
     current: oneOf(['date', 'location', 'page', 'step', 'time', 'true']),
     href: '',
@@ -53,7 +53,7 @@ export default headless('megamenu-item', {
     beforeSelect: cancelable(['value']),
     select: ['value'],
   },
-  states: ['has-description', 'has-icon', 'settled'],
+  states: ['hasDescription', 'hasIcon', 'settled'],
   render: ({ props, send }) => (
     <Pressable
       chooses

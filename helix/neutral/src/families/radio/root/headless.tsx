@@ -23,7 +23,7 @@ export default headless('radio', {
   events: {
     beforeSelect: cancelable(['value']),
   },
-  states: ['has-indicator', 'selected', 'settled'],
+  states: ['hasIndicator', 'selected', 'settled'],
   render: ({ props, send }) => (
     <Pressable
       checked={props.selected}

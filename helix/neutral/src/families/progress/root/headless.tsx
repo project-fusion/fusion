@@ -65,10 +65,10 @@ export default headless('progress', {
   host: {
     label: bind('name'),
     role: 'progressbar',
-    valuemax: bind('reading-max'),
-    valuemin: bind('reading-min'),
-    valuenow: bind('reading-now'),
-    valuetext: bind('reading-said'),
+    valuemax: bind('readingMax'),
+    valuemin: bind('readingMin'),
+    valuenow: bind('readingNow'),
+    valuetext: bind('readingSaid'),
   },
   render: ({ derived, props }) => (
     <>

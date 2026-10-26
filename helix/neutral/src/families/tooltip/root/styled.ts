@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { fn, list, measured, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -34,7 +34,7 @@ export default styles(
       padding: [token('space-2xs'), token('space-xs')],
       radius: token('radii-sm'),
     },
-    props: [prop('material', ['frosted', 'glass'])],
+    props: { material: oneOf(['frosted', 'glass']) },
     stylesheet: 'tooltip/root/tooltip-root.generated.css',
   },
   ({ hook, on, rule, variants }) => {
@@ -108,19 +108,19 @@ export default styles(
         }),
         /* It grows out of its own point, wherever the point landed. */
         rule(
-          { state: 'placed-top' },
+          { state: 'placedTop' },
           { transformOrigin: [measured('floating-arrow-x', '50%'), '100%'] },
         ),
         rule(
-          { state: 'placed-bottom' },
+          { state: 'placedBottom' },
           { transformOrigin: [measured('floating-arrow-x', '50%'), 0] },
         ),
         rule(
-          { state: 'placed-left' },
+          { state: 'placedLeft' },
           { transformOrigin: ['100%', measured('floating-arrow-y', '50%')] },
         ),
         rule(
-          { state: 'placed-right' },
+          { state: 'placedRight' },
           { transformOrigin: [0, measured('floating-arrow-y', '50%')] },
         ),
       ]),

@@ -10,7 +10,7 @@ export interface CopyWords {
   /** Its name once a press put nothing on the clipboard, as `error-label`. */
   readonly failed: string
   /** Its name at rest, as `label`. */
-  readonly resting: string
+  readonly idle: string
 }
 
 /**
@@ -24,24 +24,21 @@ export interface CopyWords {
  */
 export interface Copy {
   /** The prop that holds how long the result stands, in milliseconds. */
-  readonly after: string
+  readonly duration: string
   /** The state that holds while a copy stands confirmed. The source declares it in `states`. */
   readonly copied: string
   /** The state that holds while a failed copy is said. The source declares it in `states`. */
   readonly failed: string
   /** The event sent when a press put nothing on the clipboard. */
-  readonly fails: string
+  readonly onError: string
   /** The value the element computes: the words it is named by now. */
-  readonly says: string
+  readonly label: string
   /** The event sent once the text is on the clipboard, its `value` the text. */
-  readonly sends: string
+  readonly onCopy: string
   /** The prop that holds the text a press copies. */
-  readonly text: string
+  readonly prop: string
   /** The value the element computes: the result's words while it stands, and none at rest. */
-  readonly told: string
+  readonly status: string
   /** The words it is named by, as the copy stands. */
-  readonly words: CopyWords
+  readonly labels: CopyWords
 }
-
-/** A copy to the clipboard as the element's pressable that `copies` is pressed. */
-export const copy = (fields: Copy): Copy => fields

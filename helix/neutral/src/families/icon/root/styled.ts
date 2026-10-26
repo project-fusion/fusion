@@ -1,7 +1,7 @@
 import printEconomy from '../../../fragments/print-economy.js'
+import { number, oneOf } from '../../../render.js'
 import { native, product, token } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -27,14 +27,14 @@ export default styles(
       rotate: 'none',
       size: token('size-icon'),
     },
-    props: [
-      prop('animation', ['beat', 'pulse', 'spin']),
-      prop('auto-width', 'boolean', { default: false }),
-      prop('flip', ['both', 'x', 'y']),
+    props: {
+      animation: oneOf(['beat', 'pulse', 'spin']),
+      autoWidth: false,
+      flip: oneOf(['both', 'x', 'y']),
       /* 90, 180 or 270 on the web, which reads the attribute as a number. A
          phone matches the number it is given against the same words. */
-      prop('rotate', 'number'),
-    ],
+      rotate: number(),
+    },
     stylesheet: 'icon/root/icon-root.generated.css',
   },
   ({ hook, include, keyframes, on, rule, variants }) => [
@@ -50,7 +50,7 @@ export default styles(
       /* Under `auto-width`, the box takes the glyph's proportions: its height
          from the size, its width from the drawing's own box. Written beside each
          target's own sizing, so the web keeps a rule for each. */
-      rule({ 'auto-width': true }, { inlineSize: 'auto' }),
+      rule({ autoWidth: true }, { inlineSize: 'auto' }),
       /* On the host, which turns, fades or swells as a whole. */
       variants('animation', {
         spin: {
@@ -89,7 +89,7 @@ export default styles(
     ]),
     on('svg', [
       rule({ blockSize: '100%', inlineSize: '100%', rotate: hook.rotate }),
-      rule({ 'auto-width': true }, { inlineSize: 'auto' }),
+      rule({ autoWidth: true }, { inlineSize: 'auto' }),
       /* Turned and flipped on the glyph, inside the box. A flip is a
          `transform`, which composes with the `scale` that `mirror` sets on a
          right-to-left page. */

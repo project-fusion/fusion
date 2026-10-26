@@ -169,7 +169,7 @@ export default styles(
         rule({ checked: true }, { color: token('color-foreground') }),
         /* The caret points into the page, so it turns in a right-to-left
            page, as the web's mirror rule turns it. */
-        native([rule({ dir: 'rtl', state: 'has-submenu' }, { scale: '-1 1' })]),
+        native([rule({ dir: 'rtl', state: 'hasSubmenu' }, { scale: '-1 1' })]),
       ]),
       on({ region: 'chevron', slotted: '*' }, [rule({ color: token('color-foreground-subtle') })]),
       on({ region: 'check', slotted: '*' }, [rule({ color: token('color-foreground') })]),
@@ -183,8 +183,8 @@ export default styles(
       on({ region: 'submenu', slotted: '*' }, [
         native([
           rule({ '--menu-item-start': '0px', '--menu-item-end': '0px' }),
-          rule({ state: 'submenu-started' }, { '--menu-item-start': column }),
-          rule({ state: 'submenu-marked' }, { '--menu-item-end': column }),
+          rule({ state: 'submenuStarted' }, { '--menu-item-start': column }),
+          rule({ state: 'submenuMarked' }, { '--menu-item-end': column }),
         ]),
       ]),
       /* The flyout, the menu's own surface beside the row. */
@@ -227,14 +227,14 @@ export default styles(
           ),
         }),
         rule(
-          { state: 'placed-top' },
+          { state: 'placedTop' },
           {
             own: { travel: token('space-2xs') },
             transformOrigin: [measured('floating-arrow-x', '50%'), '100%'],
           },
         ),
         rule(
-          { state: 'placed-bottom' },
+          { state: 'placedBottom' },
           { transformOrigin: [measured('floating-arrow-x', '50%'), 0] },
         ),
         rule({ part: { 'data-placed': true } }, { opacity: 1, scale: 1, transform: 'none' }),
@@ -258,10 +258,10 @@ export default styles(
           paddingBlock: token('space-xs'),
           paddingInline: token('space-none'),
         }),
-        rule({ state: 'submenu-start' }, { '--menu-item-start': column }),
-        rule({ state: 'submenu-mark' }, { '--menu-item-end': column }),
-        rule({ state: 'placed-left' }, { transformOrigin: ['100%', 0] }),
-        rule({ state: 'placed-right' }, { transformOrigin: [0, 0] }),
+        rule({ state: 'submenuStart' }, { '--menu-item-start': column }),
+        rule({ state: 'submenuMark' }, { '--menu-item-end': column }),
+        rule({ state: 'placedLeft' }, { transformOrigin: ['100%', 0] }),
+        rule({ state: 'placedRight' }, { transformOrigin: [0, 0] }),
       ]),
     ]
   },

@@ -81,7 +81,7 @@ export default styles(
         /* `3xl` is the top of the space scale, and the pair stops where it does. */
         '3xl': { own: { gap: token('space-3xl') } },
       }),
-      variants('row-gap', {
+      variants('rowGap', {
         none: { own: { rowGap: token('space-none') } },
         '2xs': { own: { rowGap: token('space-2xs') } },
         xs: { own: { rowGap: token('space-xs') } },
@@ -92,7 +92,7 @@ export default styles(
         '2xl': { own: { rowGap: token('space-2xl') } },
         '3xl': { own: { rowGap: token('space-3xl') } },
       }),
-      variants('column-gap', {
+      variants('columnGap', {
         none: { own: { columnGap: token('space-none') } },
         '2xs': { own: { columnGap: token('space-2xs') } },
         xs: { own: { columnGap: token('space-xs') } },
@@ -105,13 +105,13 @@ export default styles(
       }),
       /* The attribute is named for the property, so the rule is the value with
          the flex spelling where CSS has one. */
-      variants('align-items', {
+      variants('alignItems', {
         start: { alignItems: 'flex-start' },
         center: { alignItems: 'center' },
         end: { alignItems: 'flex-end' },
         baseline: { alignItems: 'baseline' },
       }),
-      variants('align-content', {
+      variants('alignContent', {
         start: { alignContent: 'flex-start' },
         center: { alignContent: 'center' },
         end: { alignContent: 'flex-end' },
@@ -119,8 +119,8 @@ export default styles(
         around: { alignContent: 'space-around' },
         stretch: { alignContent: 'stretch' },
       }),
-      rule({ 'align-items': 'stretch' }, { alignItems: 'stretch' }),
-      variants('justify-content', {
+      rule({ alignItems: 'stretch' }, { alignItems: 'stretch' }),
+      variants('justifyContent', {
         start: { justifyContent: 'flex-start' },
         center: { justifyContent: 'center' },
         end: { justifyContent: 'flex-end' },

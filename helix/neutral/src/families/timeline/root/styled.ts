@@ -1,6 +1,6 @@
+import { oneOf } from '../../../render.js'
 import { hookOf, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -70,7 +70,7 @@ export default styles(
       'timeline-time-column',
       'timeline-time-row',
     ],
-    props: [prop('layout', ['alternate', 'opposite']), prop('orientation', ['horizontal'])],
+    props: { layout: oneOf(['alternate', 'opposite']), orientation: oneOf(['horizontal']) },
     stylesheet: 'timeline/root/timeline-root.generated.css',
   },
   ({ hook, on, rule }) => [

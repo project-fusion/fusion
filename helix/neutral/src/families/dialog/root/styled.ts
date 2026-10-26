@@ -1,3 +1,4 @@
+import { oneOf } from '../../../render.js'
 import {
   difference,
   fn,
@@ -12,7 +13,6 @@ import {
   web,
 } from '../../../style.js'
 import { styles } from '../../../table.js'
-import { prop } from '../../../tree.js'
 import root from './headless.js'
 
 /**
@@ -55,11 +55,11 @@ export default styles(
       shadow: token('shadow-floating'),
     }),
     own: ['dialog-scrim', 'dialog-width'],
-    props: [
-      prop('material', ['frosted', 'glass']),
-      prop('size', ['sm', 'md', 'lg', 'full']),
-      prop('text-align', ['center', 'start']),
-    ],
+    props: {
+      material: oneOf(['frosted', 'glass']),
+      size: oneOf(['sm', 'md', 'lg', 'full']),
+      textAlign: oneOf(['center', 'start']),
+    },
     stylesheet: 'dialog/root/dialog-root.generated.css',
   },
   ({ hook, keyframes, on, own, rule, variants }) => {
@@ -198,12 +198,12 @@ export default styles(
         }),
       ]),
       /* Centered on the panel, and the actions and the mark with it. */
-      on('surface', [rule({ 'text-align': 'center' }, { textAlign: 'center' })]),
+      on('surface', [rule({ textAlign: 'center' }, { textAlign: 'center' })]),
       on({ region: 'footer', slotted: '*' }, [
-        rule({ 'text-align': 'center' }, { justifyContent: 'center' }),
+        rule({ textAlign: 'center' }, { justifyContent: 'center' }),
       ]),
       on({ region: 'icon', slotted: '*' }, [
-        rule({ 'text-align': 'center' }, { marginInline: 'auto' }),
+        rule({ textAlign: 'center' }, { marginInline: 'auto' }),
       ]),
       /* In the corner and out of the flow, centered on the title's first line. */
       on('dismiss', [

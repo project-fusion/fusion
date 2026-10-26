@@ -45,11 +45,11 @@ fn reads_how_the_keys_move() {
 fn refuses_a_collection_that_does_not_say_how_its_keys_move() {
     assert_eq!(
         collection(&with(None)).unwrap_err(),
-        "a collection says how its keys move, as `keys: { chooses, wrap }`"
+        "a collection says how its keys move, as `keys: { loop, selectionFollowsFocus }`"
     );
     assert_eq!(
         collection(&with(Some(vec![("wrap".to_owned(), Lit::Bool(true))]))).unwrap_err(),
-        "collection: `keys` says whether arriving chooses, as `chooses`"
+        "collection: `keys` says whether focus selects as it arrives, as `selectionFollowsFocus`"
     );
 }
 
@@ -76,7 +76,7 @@ fn refuses_a_kept_key_that_moves_no_focus() {
     ])));
     assert_eq!(
         read.unwrap_err(),
-        "collection: `keys.keeps` holds the keys that move focus, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, End, Home"
+        "collection: `keys.itemKeys` holds the keys that move focus, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, End, Home"
     );
 }
 
@@ -136,7 +136,7 @@ fn reads_the_state_an_item_shows_while_chosen() {
         "item".to_owned(),
         vec![
             text("button-group"),
-            Lit::Object(vec![("state".to_owned(), text("pressed"))]),
+            Lit::Object(vec![("selectedState".to_owned(), text("pressed"))]),
         ],
     ))
     .unwrap();
@@ -203,7 +203,7 @@ fn reads_the_regions_an_item_is_named_by() {
         vec![
             text("tag-group"),
             Lit::Object(vec![(
-                "named".to_owned(),
+                "labelledby".to_owned(),
                 Lit::Array(vec![text("start"), text("default")]),
             )]),
         ],

@@ -1,5 +1,5 @@
 import { Announce, cancelable, headless, Pressable, Slot, Text, View } from '../../../render.js'
-import { bind, collection, derive, stack } from '../../../tree.js'
+import { bind, derive } from '../../../tree.js'
 
 /**
  * Drilldown's headless tier: a stack of pages of rows, one page showing at
@@ -63,22 +63,22 @@ export default headless('drilldown', {
     status: derive('drilldown-status'),
     topName: derive('drilldown-top-name'),
   },
-  collection: collection({
-    keys: { chooses: false, keeps: ['ArrowLeft', 'ArrowRight'], wrap: true },
+  collection: {
+    keys: { itemKeys: ['ArrowLeft', 'ArrowRight'], loop: true, selectionFollowsFocus: false },
     mixes: true,
-  }),
-  host: { label: bind('landmark-name'), role: bind('landmark') },
-  stack: stack({
+  },
+  host: { label: bind('landmarkName'), role: bind('landmark') },
+  stack: {
     back: 'back',
-    before: 'before-navigate',
+    backward: 'back',
     drilled: 'drilled',
-    entered: 'forward',
-    label: 'page-label',
-    left: 'back',
-    page: 'page',
-    top: 'top-name',
+    forward: 'forward',
+    onBeforeChange: 'beforeNavigate',
+    prop: 'page',
+    title: 'pageLabel',
+    topTitle: 'topName',
     writes: { listed: 'navigation' },
-  }),
+  },
   render: ({ derived, props, stack, state }) => (
     <>
       {state.drilled && (
@@ -99,13 +99,13 @@ export default headless('drilldown', {
             </Slot>
           </Pressable>
           <View part="title">
-            <Text part="title-words">{stack.label}</Text>
+            <Text part="title-words">{stack.title}</Text>
           </View>
         </View>
       )}
       <View
         busy={props.loading}
-        label={stack.label}
+        label={stack.title}
         part="page"
         role={derived.pageRole}
       >

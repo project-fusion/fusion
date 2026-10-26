@@ -272,7 +272,11 @@ fn toggled(toggle: &Toggle, tree: &[Node]) -> MachineUse {
             bind.insert(name.to_owned(), Bound::Event(event.clone()));
         }
     }
-    bind.extend(toggle.escapes.then(|| ("escapes".to_owned(), Bound::Key("Escape".to_owned()))));
+    bind.extend(
+        toggle
+            .escapes
+            .then(|| ("escapes".to_owned(), Bound::Key("Escape".to_owned()))),
+    );
     match toggle.after.as_slice() {
         [] => {}
         [event] => {

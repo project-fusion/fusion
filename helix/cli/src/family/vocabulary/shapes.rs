@@ -67,7 +67,9 @@ pub fn describe(shape: Shape) -> String {
         Shape::Name => "a string".to_owned(),
         Shape::Number => "a number or `bind()`".to_owned(),
         Shape::OneOf(values) => listed(&mut values.iter().copied()),
-        Shape::Parts => "an object of parts, each `true`, `false`, `bind()`, `not()` or `field()`".to_owned(),
+        Shape::Parts => {
+            "an object of parts, each `true`, `false`, `bind()`, `not()` or `field()`".to_owned()
+        }
         Shape::Path => "a string of SVG path data, `bind()` or `derive()`".to_owned(),
         Shape::Positive => "a number above zero".to_owned(),
         Shape::List => "`bind()` to a prop or `derive()` of a list".to_owned(),

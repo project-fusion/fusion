@@ -150,21 +150,24 @@ pub fn toggle(lit: &Lit) -> Result<Toggle, String> {
     }
     directions(&toggle)?;
     if toggle.escapes && toggle.closes.is_none() {
-        return Err("a toggle that `escapes` names the event it closes with, `closes`".to_owned());
+        return Err(
+            "a toggle that says `closeOnEscape` names the event it closes with, `onBeforeClose`"
+                .to_owned(),
+        );
     }
     match (&toggle.checked, &toggle.held) {
         (None, None) => {
             return Err(
-                "a toggle names the prop that holds whether it is checked, or what the runtime holds it in with `held`"
+                "a toggle names the prop that holds whether it is checked, `prop`, or what the runtime holds it in, `shared`"
                     .to_owned(),
             )
         }
         (Some(_), Some(_)) => {
-            return Err("a toggle names `checked` or `held`, and not both".to_owned())
+            return Err("a toggle names `prop` or `shared`, and not both".to_owned())
         }
         (None, Some(held)) if !HELD.contains(&held.as_str()) => {
             return Err(format!(
-                "toggle: `held` names `{held}`, and the runtime holds {}",
+                "toggle: `shared` names `{held}`, and the runtime holds {}",
                 HELD.iter()
                     .map(|name| format!("`{name}`"))
                     .collect::<Vec<_>>()
@@ -183,11 +186,11 @@ pub fn toggle(lit: &Lit) -> Result<Toggle, String> {
 fn directions(toggle: &Toggle) -> Result<(), String> {
     match (&toggle.opens, &toggle.closes, &toggle.before) {
         (Some(_), None, _) => Err(
-            "a toggle that opens names the event sent before each direction, `opens` and `closes`"
+            "a toggle that opens names the event sent before each direction, `onBeforeOpen` and `onBeforeClose`"
                 .to_owned(),
         ),
         (Some(_), Some(_), Some(_)) => {
-            Err("a toggle names `before`, or `opens` and `closes`, and not both".to_owned())
+            Err("a toggle names `onBeforeChange`, or `onBeforeOpen` and `onBeforeClose`, and not both".to_owned())
         }
         _ => Ok(()),
     }
@@ -259,7 +262,7 @@ mod tests {
     fn refuses_a_toggle_with_no_checked_prop_or_a_field_it_lacks() {
         assert_eq!(
             toggle(&call(&[("after", "change")])).unwrap_err(),
-            "a toggle names the prop that holds whether it is checked, or what the runtime holds it in with `held`"
+            "a toggle names the prop that holds whether it is checked, `prop`, or what the runtime holds it in, `shared`"
         );
         assert_eq!(
             toggle(&call(&[("checked", "checked"), ("pressed", "pressed")])).unwrap_err(),
@@ -274,11 +277,11 @@ mod tests {
         assert_eq!(read.checked, None);
         assert_eq!(
             toggle(&call(&[("held", "page-color")])).unwrap_err(),
-            "toggle: `held` names `page-color`, and the runtime holds `page-motion`"
+            "toggle: `shared` names `page-color`, and the runtime holds `page-motion`"
         );
         assert_eq!(
             toggle(&call(&[("checked", "checked"), ("held", "page-motion")])).unwrap_err(),
-            "a toggle names `checked` or `held`, and not both"
+            "a toggle names `prop` or `shared`, and not both"
         );
     }
 
@@ -294,7 +297,7 @@ mod tests {
         assert_eq!(read.closes.as_deref(), Some("before-close"));
         assert_eq!(
             toggle(&call(&[("checked", "open"), ("opens", "before-open")])).unwrap_err(),
-            "a toggle that opens names the event sent before each direction, `opens` and `closes`"
+            "a toggle that opens names the event sent before each direction, `onBeforeOpen` and `onBeforeClose`"
         );
         let closing = toggle(&call(&[("checked", "open"), ("closes", "dismiss")])).unwrap();
         assert_eq!(closing.closes.as_deref(), Some("dismiss"));
@@ -307,7 +310,7 @@ mod tests {
                 ("opens", "before-open"),
             ]))
             .unwrap_err(),
-            "a toggle names `before`, or `opens` and `closes`, and not both"
+            "a toggle names `onBeforeChange`, or `onBeforeOpen` and `onBeforeClose`, and not both"
         );
     }
 
@@ -326,7 +329,7 @@ mod tests {
         ];
         assert_eq!(
             toggle(&Lit::Call("toggle".to_owned(), vec![Lit::Object(alone)])).unwrap_err(),
-            "a toggle that `escapes` names the event it closes with, `closes`"
+            "a toggle that says `closeOnEscape` names the event it closes with, `onBeforeClose`"
         );
     }
 }

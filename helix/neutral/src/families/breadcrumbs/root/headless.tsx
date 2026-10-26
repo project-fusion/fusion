@@ -1,5 +1,5 @@
 import { headless, number, oneOf, Slot, View } from '../../../render.js'
-import { bind, derive, fold } from '../../../tree.js'
+import { bind, derive } from '../../../tree.js'
 
 /**
  * Breadcrumbs' headless tier: the trail of crumbs to the current page.
@@ -35,10 +35,10 @@ export default headless('breadcrumbs', {
   derived: {
     name: derive('breadcrumbs-name'),
   },
-  fold: fold({
-    max: 'max-items',
-    middle: { count: 'fold', items: 'fold-crumbs', label: 'fold-label', words: 'expand-label' },
-  }),
+  maxVisible: {
+    middle: { count: 'fold', items: 'foldCrumbs', label: 'foldLabel', words: 'expandLabel' },
+    prop: 'maxItems',
+  },
   host: { label: bind('name'), role: 'navigation' },
   render: () => (
     <View

@@ -1,5 +1,5 @@
 import { headless, number, Slot, Text, View } from '../../../render.js'
-import { bind, derive, fold } from '../../../tree.js'
+import { bind, derive } from '../../../tree.js'
 
 /**
  * Avatar Group's headless tier: a row of avatars that overlap, folded into a
@@ -25,7 +25,7 @@ export default headless('avatar-group', {
     folds: derive('avatar-group-folds'),
     overflowName: derive('avatar-group-overflow-name'),
   },
-  fold: fold({ max: 'max' }),
+  maxVisible: { prop: 'max' },
   host: { label: bind('label'), role: 'group' },
   render: ({ derived }) => (
     <>

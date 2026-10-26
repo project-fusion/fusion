@@ -12,7 +12,7 @@ import {
   Wrap,
   web,
 } from '../../../render.js'
-import { derive, toggle } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * Popover's headless tier: a panel that opens next to its trigger and holds
@@ -87,27 +87,27 @@ export default headless('popover', {
     toggle: bare(['newState', 'oldState']),
   },
   states: [
-    'aligned-end',
-    'aligned-start',
+    'alignedEnd',
+    'alignedStart',
     'entering',
     'exiting',
     'open',
-    'placed-bottom',
-    'placed-left',
-    'placed-right',
-    'placed-top',
+    'placedBottom',
+    'placedLeft',
+    'placedRight',
+    'placedTop',
     'settled',
   ],
   derived: {
     name: derive('popover-name'),
   },
-  toggle: toggle({
-    changes: 'toggle',
-    checked: 'open',
-    closes: 'before-close',
-    initial: 'default-open',
-    opens: 'before-open',
-  }),
+  toggle: {
+    defaultProp: 'defaultOpen',
+    onBeforeClose: 'beforeClose',
+    onBeforeOpen: 'beforeOpen',
+    onToggle: 'toggle',
+    prop: 'open',
+  },
   render: ({ derived, props, state }) => (
     <>
       {/* The trigger's own box on a phone, which the panel is placed against.

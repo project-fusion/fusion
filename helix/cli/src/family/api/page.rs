@@ -79,10 +79,13 @@ pub fn page(lit: &Lit) -> Result<Page, String> {
         }
     }
     if page.scrolled.is_empty() {
-        return Err("page: a page names its `scrolled` state".to_owned());
+        return Err("pageScroll: names its `scrolled` state".to_owned());
     }
     if page.hides.is_some() != page.hidden.is_some() {
-        return Err("page: `hides` and `hidden` name the prop and the state together".to_owned());
+        return Err(
+            "pageScroll: `hideOnScroll` and `hidden` name the prop and the state together"
+                .to_owned(),
+        );
     }
     Ok(page)
 }
@@ -125,7 +128,7 @@ mod tests {
     fn refuses_a_page_with_no_scrolled_state() {
         assert_eq!(
             page(&call(&[("sends", "scrolled")])),
-            Err("page: a page names its `scrolled` state".to_owned())
+            Err("pageScroll: names its `scrolled` state".to_owned())
         );
     }
 
@@ -136,7 +139,10 @@ mod tests {
                 ("hides", "hide-on-scroll"),
                 ("scrolled", "scrolled")
             ])),
-            Err("page: `hides` and `hidden` name the prop and the state together".to_owned())
+            Err(
+                "pageScroll: `hideOnScroll` and `hidden` name the prop and the state together"
+                    .to_owned()
+            )
         );
     }
 

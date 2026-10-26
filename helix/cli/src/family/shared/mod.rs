@@ -165,7 +165,7 @@ mod tests {
 
     #[test]
     fn says_where_an_item_joins_no_collection() {
-        let set = family("export default headless('tabs', { collection: collection({ chosen: 'active', keys: { chooses: false, wrap: false } }), props: [prop('active', 'string')] })", STYLED);
+        let set = family("export default headless('tabs', { collection: { keys: { loop: false, selectionFollowsFocus: false }, prop: 'active' }, props: [prop('active', 'string')] })", STYLED);
         let tab = family(
             "export default headless('tab', { item: item('tab-set') })",
             STYLED,
@@ -178,8 +178,8 @@ mod tests {
 
     #[test]
     fn says_where_an_item_that_is_checked_joins_a_set_that_does_not_mix() {
-        let tabs = family("export default headless('tabs', { collection: collection({ chosen: 'active', keys: { chooses: false, wrap: false } }), props: [prop('active', 'string')] })", STYLED);
-        let menu = family("export default headless('menu', { collection: collection({ keys: { chooses: false, wrap: true }, mixes: true }) })", STYLED);
+        let tabs = family("export default headless('tabs', { collection: { keys: { loop: false, selectionFollowsFocus: false }, prop: 'active' }, props: [prop('active', 'string')] })", STYLED);
+        let menu = family("export default headless('menu', { collection: { keys: { loop: true, selectionFollowsFocus: false }, mixes: true } })", STYLED);
         let row = |of: &str| {
             family(
                 &format!("export default headless('row', {{ item: item('{of}', {{ checked: 'checked' }}), props: [prop('checked', 'boolean')] }})"),
@@ -194,9 +194,9 @@ mod tests {
 
     #[test]
     fn says_where_an_item_that_holds_a_page_joins_an_element_with_no_stack() {
-        let menu = family("export default headless('menu', { collection: collection({ keys: { chooses: false, wrap: true }, mixes: true }) })", STYLED);
+        let menu = family("export default headless('menu', { collection: { keys: { loop: true, selectionFollowsFocus: false }, mixes: true } })", STYLED);
         let row = family(
-            "export default headless('row', { item: item('menu', { page: 'page' }), tree: [region('page')] })",
+            "export default headless('row', { item: item('menu', { pageSlot: 'page' }), tree: [region('page')] })",
             STYLED,
         );
         assert_eq!(

@@ -10,7 +10,7 @@ import {
   Slot,
   View,
 } from '../../../render.js'
-import { derive, toggle } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * Drawer's headless tier: a panel that slides in from an edge of the
@@ -84,14 +84,14 @@ export default headless('drawer', {
     edge: derive('drawer-edge'),
     name: derive('drawer-name'),
   },
-  toggle: toggle({
-    changes: 'toggle',
-    checked: 'open',
-    closed: 'close',
-    closes: 'before-close',
-    initial: 'default-open',
-    opens: 'before-open',
-  }),
+  toggle: {
+    defaultProp: 'defaultOpen',
+    onBeforeClose: 'beforeClose',
+    onBeforeOpen: 'beforeOpen',
+    onClose: 'close',
+    onToggle: 'toggle',
+    prop: 'open',
+  },
   render: ({ derived, props }) => (
     <Layer
       closedby={derived.dismissal}

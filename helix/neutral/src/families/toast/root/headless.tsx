@@ -1,5 +1,5 @@
 import { Announce, cancelable, headless, Layer, number, oneOf, Slot, web } from '../../../render.js'
-import { derive, notices } from '../../../tree.js'
+import { derive } from '../../../tree.js'
 
 /**
  * Toast's headless tier: the stack that holds toast messages, above every
@@ -68,12 +68,12 @@ export default headless('toast', {
   derived: {
     edge: derive('toast-edge'),
   },
-  notices: notices({
-    hears: 'dismiss',
-    max: 'max-visible',
+  notices: {
+    bubbles: 'dismiss',
+    maxVisible: 'maxVisible',
     showing: 'showing',
-    toward: 'swipe-direction',
-  }),
+    swipeDirection: 'swipeDirection',
+  },
   render: ({ derived, notices }) => (
     <Layer
       closedby="none"
