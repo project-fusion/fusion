@@ -127,12 +127,14 @@ export interface When {
   readonly focusWithin?: boolean
   readonly filled?: string | readonly string[] | Readonly<Record<string, boolean>>
   readonly forcedColors?: boolean
-  readonly has?: string
+  /** An attribute present, or each of several. */
+  readonly has?: string | readonly string[]
   readonly holds?: Holds
   readonly hover?: boolean
   readonly inlineSize?: Below
   readonly interaction?: readonly Interaction[]
-  readonly lacks?: string
+  /** An attribute absent, or each of several. */
+  readonly lacks?: string | readonly string[]
   readonly nth?: number | { readonly from: number }
   readonly nthLast?: number | { readonly from: number }
   readonly ofType?: number

@@ -200,6 +200,11 @@ export type When<Asked, State extends string, Part extends string, Alias extends
 > &
   Asked &
   (string extends State ? unknown : { readonly [Name in State]?: boolean }) & {
+    /** The part's own `hidden` or `href`, over a source written with `render`. */
+    readonly hidden?: boolean
+    readonly href?: boolean
+    /** A `data-` attribute the part carries, over a source written with `render`. */
+    readonly [data: `data-${string}`]: boolean | undefined
     /** Where the node is the part `name` as well, or is not. */
     readonly also?: Readonly<Partial<Record<Alias, boolean>>>
     readonly holds?: Partial<Record<Part, boolean | Interaction | readonly Interaction[]>> & Holds

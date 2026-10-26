@@ -268,3 +268,19 @@ fn reads_a_place_counted_from_either_end_and_the_web_writes_it() {
     assert!(read("{ nth: 0 }").is_err());
     assert!(read("{ nthLast: { to: 2 } }").is_err());
 }
+
+#[test]
+fn has_and_lacks_take_several_attributes_in_the_order_written() {
+    let read = |when: &str| {
+        let lit = default_export(&format!("export default {when}")).unwrap();
+        serde_json::to_string(&conditions(&lit).unwrap()).unwrap()
+    };
+    for key in ["has", "lacks"] {
+        let one = read(&format!("{{ {key}: 'current' }}"));
+        let two = read(&format!("{{ {key}: 'href' }}"));
+        assert_eq!(
+            read(&format!("{{ {key}: ['current', 'href'] }}")),
+            format!("{},{}", &one[..one.len() - 1], &two[1..])
+        );
+    }
+}

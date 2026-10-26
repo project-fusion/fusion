@@ -39,6 +39,16 @@ pub fn read(key: &str, value: &Lit, read: &mut Vec<Condition>) -> Result<(), Str
         /* An attribute that is absent, as `:not([disabled])` on an element
         no form owns, which `:disabled` never matches. */
         ("lacks", Lit::Text(name)) => read.push(Condition::Absent { name: name.clone() }),
+        /* Several absent at once, in the order written, as a crumb that is
+        neither the current page nor a link. */
+        ("lacks", Lit::Array(names)) if !names.is_empty() => {
+            for name in names {
+                let Lit::Text(name) = name else {
+                    return Err("`lacks` lists attributes by name".to_owned());
+                };
+                read.push(Condition::Absent { name: name.clone() });
+            }
+        }
         _ => return Err(format!("`{key}` in `when` does not take that value")),
     }
     Ok(())
