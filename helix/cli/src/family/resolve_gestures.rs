@@ -1,29 +1,17 @@
 //! What a gesture a source declares reads, held to what the element has.
 //!
-//! - **A press that is `held` opens the element's toggle**, as a speed
-//!   dial's trigger opens its actions under a long press, so the element
-//!   declares a `toggle`.
 //! - **A layer that swipes and rests at snap points says where it rests.**
 //!   Its `snap` reads a prop that holds words, `0.5 1`, and the element
 //!   declares the state `snapped`, which holds while the layer rests short of
 //!   the whole, as a drawer's does.
 
 use super::{expect_prop, Names};
-use crate::family::api::{Attribute, Binding, Node, NodeKind, Primitive, PropType};
+use crate::family::api::{Attribute, Binding, Primitive, PropType};
 use crate::family::ir::Family;
 use crate::family::vocabulary::layer::layers;
 
 /// Where the family's gestures read what it lacks, one sentence each.
 pub(super) fn gestures(family: &Family, names: &Names, found: &mut Vec<String>) {
-    let mut held = Vec::new();
-    holding(&family.tree, &mut held);
-    if family.api.toggle.is_none() {
-        for name in held {
-            found.push(format!(
-                "`pressable('{name}')` is `held`, which opens the element's toggle, and the element declares no `toggle`"
-            ));
-        }
-    }
     for layer in layers(&family.tree) {
         let Some(Attribute::Bound(Binding::Bind(snap))) = layer.attributes.get("snap") else {
             continue;
@@ -43,21 +31,6 @@ pub(super) fn gestures(family: &Family, names: &Names, found: &mut Vec<String>) 
                 "{at} rests at snap points, and the element declares no state `snapped` for it to stand in short of the whole"
             ));
         }
-    }
-}
-
-/// The name of each press that is `held`, or may be, in the order the tree draws them.
-fn holding(nodes: &[Node], into: &mut Vec<String>) {
-    for node in nodes {
-        if node.kind == NodeKind::Pressable
-            && node
-                .attributes
-                .get("held")
-                .is_some_and(|held| !matches!(held, Attribute::Flag(false)))
-        {
-            into.push(node.name.clone());
-        }
-        holding(&node.children, into);
     }
 }
 
@@ -112,26 +85,6 @@ mod tests {
                 "{name}"
             );
         }
-    }
-
-    #[test]
-    fn a_held_press_opens_the_toggle() {
-        let found = unresolved(
-            "export default headless('dial', { props: [prop('open', 'boolean')], states: ['open'], tree: [pressable('trigger', { held: true }, [region('default')])] })",
-        );
-        assert!(
-            found
-                .iter()
-                .any(|one| one.contains("is `held`, which opens the element's toggle")),
-            "{found:?}"
-        );
-        let toggled = unresolved(
-            "export default headless('dial', { props: [prop('open', 'boolean')], states: ['open'], toggle: { prop: 'open' }, tree: [pressable('trigger', { held: true, toggles: true }, [region('default')])] })",
-        );
-        assert!(
-            !toggled.iter().any(|one| one.contains("`held`")),
-            "{toggled:?}"
-        );
     }
 
     #[test]
