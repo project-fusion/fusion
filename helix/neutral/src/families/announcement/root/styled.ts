@@ -1,4 +1,4 @@
-import { fn, list, mix, product, scheme, sum, token, web } from '../../../style.js'
+import { first, fn, list, mix, native, product, scheme, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -31,15 +31,15 @@ export default styles(
   root,
   {
     prefix: 'announcement',
-    hooks: [
-      'background-color',
-      'block-size',
-      'font-size',
-      'foreground-color',
-      'inset',
-      'text-align',
-      'tone-color',
-    ],
+    hooks: ({ own }) => ({
+      backgroundColor: null,
+      blockSize: sum(token('size-control'), product(token('space-xs'), 2)),
+      fontSize: token('text-sm'),
+      foregroundColor: token('color-foreground'),
+      inset: token('space-lg'),
+      textAlign: 'center',
+      toneColor: own.color,
+    }),
     own: ['announcement-color', 'announcement-ground', 'announcement-tint'],
     props: [prop('separation', ['elevated', 'filled', 'outlined'])],
     stylesheet: 'announcement/root/announcement-root.generated.css',
@@ -64,21 +64,21 @@ export default styles(
           own: {
             color: token('color-foreground-muted'),
             ground: token('color-background'),
-            tint: hook.toneColor(own.color),
+            tint: first(hook.toneColor, own.color),
           },
           alignItems: 'center',
           backgroundColor: hook.backgroundColor(token('color-surface-sunken')),
-          color: hook.foregroundColor(token('color-foreground')),
+          color: hook.foregroundColor,
           columnGap: token('space-md'),
           display: 'flex',
           flexWrap: 'wrap',
-          fontSize: hook.fontSize(token('text-sm')),
+          fontSize: hook.fontSize,
           fontWeight: token('weight-medium'),
           inlineSize: '100%',
           justifyContent: 'center',
-          minBlockSize: hook.blockSize(sum(token('size-control'), product(token('space-xs'), 2))),
+          minBlockSize: hook.blockSize,
           paddingBlock: token('space-xs'),
-          paddingInline: hook.inset(token('space-lg')),
+          paddingInline: hook.inset,
           position: 'relative',
           rowGap: token('space-2xs'),
         }),
@@ -117,17 +117,17 @@ export default styles(
           },
           { borderBlockEndColor: mix(own.tint, 40, own.ground) },
         ),
-        rule({ state: 'waiting' }, { display: 'none' }),
+        rule({ waiting: true }, { display: 'none' }),
         rule({ print: true }, { backgroundColor: 'transparent' }),
       ]),
       /* Centered, and clear of the dismiss button where there is one. */
       on('content', [
-        rule({ flex: '1 1 auto', minInlineSize: 0, textAlign: hook.textAlign('center') }),
+        rule({ flex: '1 1 auto', minInlineSize: 0, textAlign: hook.textAlign }),
         /* A phone breaks the line from a basis that does not shrink, since
            it lays the words out at the room they are given, so the message
            asks for sixteen ems, and no more than the line, before the
            actions may stand beside it. */
-        rule({ platform: 'native' }, { flex: '1 0 16em', maxInlineSize: '100%' }),
+        native([rule({ flex: '1 0 16em', maxInlineSize: '100%' })]),
         rule({ dismissible: true }, { paddingInline: clearance }),
       ]),
       on('actions', [
@@ -141,7 +141,7 @@ export default styles(
           minInlineSize: 0,
         }),
         rule({ dismissible: true }, { marginInlineEnd: clearance }),
-        rule({ part: { 'data-empty': true } }, { display: 'none' }),
+        rule({ 'data-empty': true }, { display: 'none' }),
       ]),
       on({ region: 'actions', slotted: '*' }, [
         rule({ child: 'later' }, { marginInlineStart: token('space-md') }),
@@ -161,7 +161,7 @@ export default styles(
           placeContent: 'center',
           placeItems: 'center',
           position: 'absolute',
-          insetInlineEnd: hook.inset(token('space-lg')),
+          insetInlineEnd: hook.inset,
           transition: list(
             ['background-color', token('duration-fast'), token('easing-standard')],
             ['color', token('duration-fast'), token('easing-standard')],

@@ -1,4 +1,4 @@
-import { bind, box, headless, not, prop, region, text, when } from '../../../tree.js'
+import { headless, Slot, Text, View, web } from '../../../render.js'
 
 /**
  * Blockquote's headless tier: a passage set off from the prose around it,
@@ -20,21 +20,32 @@ import { bind, box, headless, not, prop, region, text, when } from '../../../tre
  * keeps and does not show.
  */
 export default headless('blockquote', {
-  events: [],
-  props: [
-    prop('attribution', 'string', { default: '' }),
-    prop('cite', 'string', { default: '', platform: 'web' }),
-    prop('marks', 'boolean', { default: false }),
-  ],
+  props: {
+    attribution: '',
+    cite: web(''),
+    marks: false,
+  },
+  events: {},
   states: ['settled'],
-  tree: [
-    box('figure', { role: 'figure' }, [
-      box('blockquote', { element: 'passage' }, [region('default')]),
-      box('attribution', { hidden: not('attribution') }, [
-        region('attribution', {}, [
-          when('attribution', text('attribution-words', { says: bind('attribution') })),
-        ]),
-      ]),
-    ]),
-  ],
+  render: ({ props }) => (
+    <View
+      part="figure"
+      role="figure"
+    >
+      <View
+        element="passage"
+        part="blockquote"
+      >
+        <Slot />
+      </View>
+      <View
+        hidden={!props.attribution}
+        part="attribution"
+      >
+        <Slot name="attribution">
+          {props.attribution && <Text part="attribution-words">{props.attribution}</Text>}
+        </Slot>
+      </View>
+    </View>
+  ),
 })

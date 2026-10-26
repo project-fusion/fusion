@@ -19,7 +19,14 @@ export default styles(
   root,
   {
     prefix: 'code',
-    hooks: ['background-color', 'font-family', 'foreground-color', 'padding', 'radius', 'size'],
+    hooks: {
+      backgroundColor: mix(token('color-foreground'), 6, 'transparent'),
+      fontFamily: token('font-mono'),
+      foregroundColor: mix(token('color-foreground'), 30, token('color-foreground-muted')),
+      padding: product(token('space-2xs'), 0.5),
+      radius: token('radii-sm'),
+      size: product(quotient(token('text-sm'), token('text-md')), '1em'),
+    },
     stylesheet: 'code/root/code-root.generated.css',
   },
   ({ hook, on, rule }) => [
@@ -29,8 +36,8 @@ export default styles(
         /* A wash of the ink, not a surface: `surface-raised` is absolute
            lightness and stepped 1.09 against the page in light, 1.48 in dark.
            A mix composites, so 6% measures 1.14 and 1.10. */
-        backgroundColor: hook.backgroundColor(mix(token('color-foreground'), 6, 'transparent')),
-        borderRadius: hook.radius(token('radii-sm')),
+        backgroundColor: hook.backgroundColor,
+        borderRadius: hook.radius,
         /* A fragment longer than the line, a path or an identifier, breaks
            inside itself where it would run out of the text, and each piece
            keeps the wash and the padding. */
@@ -40,20 +47,18 @@ export default styles(
            link. `foreground-muted` alone is too far back at 5.27 light and
            7.42 dark where the prose runs at 21; mixed 30% it measures 9.98 and
            10.20. */
-        color: hook.foregroundColor(
-          mix(token('color-foreground'), 30, token('color-foreground-muted')),
-        ),
-        fontFamily: hook.fontFamily(token('font-mono')),
+        color: hook.foregroundColor,
+        fontFamily: hook.fontFamily,
         /* A ratio, not a rung: a fixed 13px inside a 32px heading is 0.41 of
            it and sits on the line like a footnote. `sm` over `md` leaves body
            text unchanged to the pixel. */
-        fontSize: hook.size(product(quotient(token('text-sm'), token('text-md')), '1em')),
+        fontSize: hook.size,
         overflowWrap: web('break-word'),
         paddingBlock: token('space-none'),
         /* Half a step: `2xs` is 4px against a word space of 3.5px, so
            `(code)` renders as `( code )`. A margin would add the same space
            beside a comma. */
-        paddingInline: hook.padding(product(token('space-2xs'), 0.5)),
+        paddingInline: hook.padding,
       }),
       /* The wash is ink a printer may leave out. */
       rule({ print: true }, { backgroundColor: 'transparent' }),

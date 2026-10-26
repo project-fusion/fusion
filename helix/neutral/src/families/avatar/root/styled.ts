@@ -1,4 +1,4 @@
-import { fn, inherited, product, token, web } from '../../../style.js'
+import { fn, inherited, native, product, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -22,7 +22,12 @@ export default styles(
   root,
   {
     prefix: 'avatar',
-    hooks: ['background-color', 'color', 'font-weight', 'size'],
+    hooks: {
+      backgroundColor: token('color-surface-raised'),
+      color: token('color-foreground'),
+      fontWeight: token('weight-medium'),
+      size: null,
+    },
     own: ['avatar-size'],
     props: [prop('shape', ['circle', 'rounded']), prop('size', ['sm', 'md', 'lg'])],
     stylesheet: 'avatar/root/avatar-root.generated.css',
@@ -31,10 +36,10 @@ export default styles(
     on('host', [
       rule({
         alignItems: 'center',
-        backgroundColor: hook.backgroundColor(token('color-surface-raised')),
+        backgroundColor: hook.backgroundColor,
         blockSize: own.size,
         borderRadius: token('radii-full'),
-        color: hook.color(token('color-foreground')),
+        color: hook.color,
         display: 'inline-flex',
         flex: '0 0 auto',
         inlineSize: own.size,
@@ -45,36 +50,36 @@ export default styles(
       rule({ size: 'sm' }, { own: { size: hook.size(token('size-avatar-sm')) } }),
       rule({ size: 'lg' }, { own: { size: hook.size(token('size-avatar-lg')) } }),
       rule({ shape: 'rounded' }, { borderRadius: token('radii-md') }),
-      rule({ print: true }, { printColorAdjust: web('economy') }),
+      rule({ print: true }, { web: { printColorAdjust: 'economy' } }),
     ]),
     on({ region: 'default', slotted: '*' }, [
       rule({ blockSize: '100%', inlineSize: '100%', objectFit: 'cover' }),
-      rule(
-        [
-          { platform: 'native', state: 'loaded' },
-          { platform: 'native', state: { loading: true, waiting: true } },
-          { platform: 'native', state: { delays: false, loading: true } },
-        ],
-        { display: 'none' },
-      ),
+      native([
+        rule(
+          [
+            { state: 'loaded' },
+            { state: { loading: true, waiting: true } },
+            { state: { delays: false, loading: true } },
+          ],
+          { display: 'none' },
+        ),
+      ]),
     ]),
     on('image', [
       rule({ blockSize: '100%', inlineSize: '100%', objectFit: 'cover' }),
       /* A phone lays the picture over the initials, as the web draws one in
          place of the other. */
-      rule({ platform: 'native' }, { inset: 0, position: 'absolute' }),
-      rule(
-        [
-          { platform: 'native', state: 'error' },
-          { platform: 'native', state: { delays: true, loading: true, waiting: false } },
-        ],
-        { display: 'none' },
-      ),
+      native([
+        rule({ inset: 0, position: 'absolute' }),
+        rule([{ error: true }, { state: { delays: true, loading: true, waiting: false } }], {
+          display: 'none',
+        }),
+      ]),
     ]),
     on('initials', [
       rule({
         fontSize: product(own.size, 0.4),
-        fontWeight: hook.fontWeight(token('weight-medium')),
+        fontWeight: hook.fontWeight,
         letterSpacing: token('tracking-wide'),
         lineHeight: 1,
         /* Clear of the avatar that overlaps this one in a group, by the
@@ -86,15 +91,17 @@ export default styles(
          standard text size, so the initials, a share of it, stop there too
          and fit it at every size, as the web's grow with their circle.
          `min()` of one length is that length in space's points. */
-      rule({ platform: 'native' }, { fontSize: fn('min', product(own.size, 0.4)) }),
-      rule(
-        [
-          { platform: 'native', state: 'loaded' },
-          { platform: 'native', state: { loading: true, waiting: true } },
-          { platform: 'native', state: { delays: false, loading: true } },
-        ],
-        { display: 'none' },
-      ),
+      native([
+        rule({ fontSize: fn('min', product(own.size, 0.4)) }),
+        rule(
+          [
+            { loaded: true },
+            { state: { loading: true, waiting: true } },
+            { state: { delays: false, loading: true } },
+          ],
+          { display: 'none' },
+        ),
+      ]),
     ]),
   ],
 )

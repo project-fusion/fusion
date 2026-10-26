@@ -1,5 +1,5 @@
 import printEconomy from '../../../fragments/print-economy.js'
-import { inherit, quote, token, web } from '../../../style.js'
+import { inherit, native, quote, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -23,21 +23,21 @@ export default styles(
   root,
   {
     prefix: 'blockquote',
-    hooks: [
-      'attribution-color',
-      'attribution-font-family',
-      'attribution-font-weight',
-      'attribution-size',
-      'color',
-      'font-family',
-      'font-weight',
-      'gap',
-      'letter-spacing',
-      'line-height',
-      'mark-color',
-      'mark-size',
-      'size',
-    ],
+    hooks: {
+      attributionColor: token('color-foreground-muted'),
+      attributionFontFamily: inherit(),
+      attributionFontWeight: inherit(),
+      attributionSize: token('text-sm'),
+      color: token('color-foreground-muted'),
+      fontFamily: token('font-display'),
+      fontWeight: token('weight-medium'),
+      gap: token('space-sm'),
+      letterSpacing: token('tracking-tight'),
+      lineHeight: token('leading-tight'),
+      markColor: token('color-foreground-subtle'),
+      markSize: token('text-3xl'),
+      size: token('text-xl'),
+    },
     props: [
       prop('text-align', ['start', 'center', 'end']),
       prop('text-wrap', ['balance', 'pretty']),
@@ -72,11 +72,11 @@ export default styles(
       rule(
         { marks: true },
         {
-          color: hook.markColor(token('color-foreground-subtle')),
+          color: hook.markColor,
           content: quote('open', '""'),
-          float: web('inline-start'),
-          fontFamily: hook.fontFamily(token('font-display')),
-          fontSize: hook.markSize(token('text-3xl')),
+          web: { float: 'inline-start' },
+          fontFamily: hook.fontFamily,
+          fontSize: hook.markSize,
           lineHeight: 1,
           marginInlineEnd: token('space-xs'),
         },
@@ -92,7 +92,7 @@ export default styles(
         ],
         {
           display: 'block',
-          float: web('none'),
+          web: { float: 'none' },
           lineHeight: 0.75,
           marginInlineEnd: token('space-none'),
         },
@@ -103,29 +103,29 @@ export default styles(
        strength, in the display face. */
     on({ region: 'default' }, [
       rule({
-        color: hook.color(token('color-foreground-muted')),
-        fontFamily: hook.fontFamily(token('font-display')),
-        fontSize: hook.size(token('text-xl')),
-        fontWeight: hook.fontWeight(token('weight-medium')),
-        letterSpacing: hook.letterSpacing(token('tracking-tight')),
-        lineHeight: hook.lineHeight(token('leading-tight')),
+        color: hook.color,
+        fontFamily: hook.fontFamily,
+        fontSize: hook.size,
+        fontWeight: hook.fontWeight,
+        letterSpacing: hook.letterSpacing,
+        lineHeight: hook.lineHeight,
       }),
     ]),
     on({ region: 'default', slotted: '*' }, [rule({ margin: token('space-none') })]),
     on('attribution', [
       rule({
-        color: hook.attributionColor(token('color-foreground-muted')),
-        fontFamily: hook.attributionFontFamily(inherit()),
-        fontSize: hook.attributionSize(token('text-sm')),
-        fontWeight: hook.attributionFontWeight(inherit()),
+        color: hook.attributionColor,
+        fontFamily: hook.attributionFontFamily,
+        fontSize: hook.attributionSize,
+        fontWeight: hook.attributionFontWeight,
         /* Room to be a separate thing. */
-        marginBlockStart: hook.gap(token('space-sm')),
+        marginBlockStart: hook.gap,
       }),
       /* Nothing said it, so no caption and no gap under the passage. The web
          element marks the caption empty once it sees it is; a phone reads the
          same from the attribution it is given. */
       rule({ part: { 'data-empty': true } }, { display: 'none' }),
-      rule({ part: { hidden: true }, platform: 'native' }, { display: 'none' }),
+      native([rule({ hidden: true }, { display: 'none' })]),
     ]),
     include(printEconomy),
   ],

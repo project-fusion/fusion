@@ -1,18 +1,16 @@
 import {
-  bind,
-  box,
-  derive,
-  event,
+  bare,
+  boolean,
+  cancelable,
   headless,
-  not,
-  page,
-  pressable,
-  prop,
-  region,
-  toggle,
-  unless,
-  when,
-} from '../../../tree.js'
+  number,
+  oneOf,
+  Pressable,
+  Slot,
+  string,
+  View,
+} from '../../../render.js'
+import { derive, page, toggle } from '../../../tree.js'
 
 /**
  * App Header's headless tier: the page's banner, a row of leading content,
@@ -52,17 +50,28 @@ import {
  * says the element has.
  */
 export default headless('app-header', {
+  props: {
+    contentAlign: oneOf(['start']),
+    defaultOpen: false,
+    foldBelow: number(),
+    hideOnScroll: false,
+    menuLabel: 'Menu',
+    open: boolean(),
+    scroller: string(),
+    togglePlacement: oneOf(['start']),
+  },
+  events: {
+    beforeClose: cancelable(['open']),
+    beforeOpen: cancelable(['open']),
+    scrolled: ['scrolled'],
+    toggle: bare(['newState', 'oldState']),
+  },
+  states: ['folded', 'hidden', 'open', 'scrolled', 'settled'],
   derived: {
     folded: derive('app-header-folded'),
-    'toggle-end': derive('app-header-toggle-end'),
-    'toggle-start': derive('app-header-toggle-start'),
+    toggleEnd: derive('app-header-toggle-end'),
+    toggleStart: derive('app-header-toggle-start'),
   },
-  events: [
-    event('before-close', { cancelable: true, detail: ['open'] }),
-    event('before-open', { cancelable: true, detail: ['open'] }),
-    event('scrolled', { detail: ['scrolled'] }),
-    event('toggle', { bare: true, detail: ['newState', 'oldState'] }),
-  ],
   host: { role: 'banner' },
   page: page({
     hidden: 'hidden',
@@ -72,17 +81,6 @@ export default headless('app-header', {
     sends: 'scrolled',
     stays: 'open',
   }),
-  props: [
-    prop('content-align', ['start']),
-    prop('default-open', 'boolean', { default: false }),
-    prop('fold-below', 'number'),
-    prop('hide-on-scroll', 'boolean', { default: false }),
-    prop('menu-label', 'string', { default: 'Menu' }),
-    prop('open', 'boolean'),
-    prop('scroller', 'string'),
-    prop('toggle-placement', ['start']),
-  ],
-  states: ['folded', 'hidden', 'open', 'scrolled', 'settled'],
   toggle: toggle({
     changes: 'toggle',
     checked: 'open',
@@ -90,37 +88,66 @@ export default headless('app-header', {
     initial: 'default-open',
     opens: 'before-open',
   }),
-  tree: [
-    box('row', {}, [
-      /* The toggle that opens a folded middle region, at the start of the
-         bar under `toggle-placement="start"` and at its end otherwise. */
-      box('start', {}, [
-        when(
-          'toggle-start',
-          pressable(
-            'toggle',
-            { expanded: bind('open'), label: bind('menu-label'), role: 'button', toggles: true },
-            [region('menu-icon', {}, [box('toggle-mark', { decorative: true, glyph: 'list' })])],
-          ),
-        ),
-        region('start'),
-      ]),
-      /* Between the brand and the actions while the bar is wide, and after
-         both, on a line of its own, while it is folded, so focus reaches it
-         after the toggle at the end. */
-      unless('folded', box('content', {}, [region('default')])),
-      box('end', {}, [
-        region('end'),
-        when(
-          'toggle-end',
-          pressable(
-            'toggle',
-            { expanded: bind('open'), label: bind('menu-label'), role: 'button', toggles: true },
-            [region('menu-icon', {}, [box('toggle-mark', { decorative: true, glyph: 'list' })])],
-          ),
-        ),
-      ]),
-      when('folded', box('content', { hidden: not('open') }, [region('default')])),
-    ]),
-  ],
+  render: ({ derived, props }) => (
+    <View part="row">
+      {/* The toggle that opens a folded middle region, at the start of the
+          bar under `toggle-placement="start"` and at its end otherwise. */}
+      <View part="start">
+        {derived.toggleStart && (
+          <Pressable
+            expanded={props.open}
+            label={props.menuLabel}
+            part="toggle"
+            role="button"
+            toggles
+          >
+            <Slot name="menu-icon">
+              <View
+                ariaHidden
+                icon="list"
+                part="toggle-mark"
+              />
+            </Slot>
+          </Pressable>
+        )}
+        <Slot name="start" />
+      </View>
+      {/* Between the brand and the actions while the bar is wide, and after
+          both, on a line of its own, while it is folded, so focus reaches it
+          after the toggle at the end. */}
+      {!derived.folded && (
+        <View part="content">
+          <Slot />
+        </View>
+      )}
+      <View part="end">
+        <Slot name="end" />
+        {derived.toggleEnd && (
+          <Pressable
+            expanded={props.open}
+            label={props.menuLabel}
+            part="toggle"
+            role="button"
+            toggles
+          >
+            <Slot name="menu-icon">
+              <View
+                ariaHidden
+                icon="list"
+                part="toggle-mark"
+              />
+            </Slot>
+          </Pressable>
+        )}
+      </View>
+      {derived.folded && (
+        <View
+          hidden={!props.open}
+          part="content"
+        >
+          <Slot />
+        </View>
+      )}
+    </View>
+  ),
 })

@@ -1,4 +1,4 @@
-import { list, mix, quotient, token, web } from '../../../style.js'
+import { first, list, mix, native, quotient, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -27,17 +27,17 @@ export default styles(
   root,
   {
     prefix: 'badge',
-    hooks: [
-      'attention-duration',
-      'background-color',
-      'color',
-      'font-weight',
-      'gap',
-      'icon-size',
-      'offset',
-      'radius',
-      'ring-color',
-    ],
+    hooks: ({ own }) => ({
+      attentionDuration: null,
+      backgroundColor: null,
+      color: null,
+      fontWeight: token('weight-semibold'),
+      gap: token('space-2xs'),
+      iconSize: own.text,
+      offset: quotient(own.size, 4),
+      radius: token('radii-full'),
+      ringColor: token('color-background'),
+    }),
     own: ['badge-dot', 'badge-fill', 'badge-inset', 'badge-on', 'badge-size', 'badge-text'],
     props: [
       prop('attention', ['bounce', 'pulse']),
@@ -52,7 +52,7 @@ export default styles(
       rule({
         display: 'inline-flex',
         position: 'relative',
-        verticalAlign: web('middle'),
+        web: { verticalAlign: 'middle' },
         own: {
           size: token('size-badge'),
           text: token('text-xs'),
@@ -79,22 +79,22 @@ export default styles(
         neutral: { own: { fill: token('color-surface-raised'), on: token('color-foreground') } },
       }),
       /* In the line, after what it counts, with no ring. */
-      rule({ placement: 'inline' }, { alignItems: 'center', gap: hook.gap(token('space-2xs')) }),
+      rule({ placement: 'inline' }, { alignItems: 'center', gap: hook.gap }),
       rule({ print: true }, { boxShadow: 'none' }),
     ]),
     on('indicator', [
       rule({
         alignItems: 'center',
-        backgroundColor: hook.backgroundColor(own.fill),
+        backgroundColor: first(hook.backgroundColor, own.fill),
         blockSize: own.size,
-        borderRadius: hook.radius(token('radii-full')),
-        boxShadow: [0, 0, 0, token('border-thick'), hook.ringColor(token('color-background'))],
-        color: hook.color(own.on),
+        borderRadius: hook.radius,
+        boxShadow: [0, 0, 0, token('border-thick'), hook.ringColor],
+        color: first(hook.color, own.on),
         display: 'inline-flex',
         fontSize: own.text,
-        fontWeight: hook.fontWeight(token('weight-semibold')),
-        insetBlockStart: hook.offset(quotient(own.size, 4)),
-        insetInlineEnd: hook.offset(quotient(own.size, 4)),
+        fontWeight: hook.fontWeight,
+        insetBlockStart: hook.offset,
+        insetInlineEnd: hook.offset,
         justifyContent: 'center',
         lineHeight: 1,
         minInlineSize: own.size,
@@ -106,7 +106,7 @@ export default styles(
       }),
       /* No value: a dot of its own size, which grows round an icon. */
       rule(
-        { part: { 'data-dot': true } },
+        { 'data-dot': true },
         {
           blockSize: 'auto',
           minBlockSize: own.dot,
@@ -116,7 +116,7 @@ export default styles(
       ),
       rule({ gap: quotient(own.inset, 2) }),
       /* One character is a circle. */
-      rule({ part: { 'data-single': true } }, { paddingInline: token('space-none') }),
+      rule({ 'data-single': true }, { paddingInline: token('space-none') }),
       /* Arriving, and leaving at zero. */
       rule({
         scale: 1,
@@ -126,7 +126,7 @@ export default styles(
         ),
       }),
       rule(
-        { part: { 'data-blank': true } },
+        { 'data-blank': true },
         {
           opacity: 0,
           scale: 0,
@@ -139,10 +139,10 @@ export default styles(
       /* Another corner, with the same pull and the same half-overhang. */
       rule([{ placement: 'top-start' }, { placement: 'bottom-start' }], {
         insetInlineEnd: 'auto',
-        insetInlineStart: hook.offset(quotient(own.size, 4)),
+        insetInlineStart: hook.offset,
       }),
       rule([{ placement: 'bottom-end' }, { placement: 'bottom-start' }], {
-        insetBlockEnd: hook.offset(quotient(own.size, 4)),
+        insetBlockEnd: hook.offset,
         insetBlockStart: 'auto',
       }),
       variants('placement', {
@@ -157,7 +157,7 @@ export default styles(
           backgroundColor: hook.backgroundColor(token('color-background')),
           boxShadow: list(
             ['inset', 0, 0, 0, token('border-thick'), own.fill],
-            [0, 0, 0, token('border-thick'), hook.ringColor(token('color-background'))],
+            [0, 0, 0, token('border-thick'), hook.ringColor],
           ),
           color: hook.color(token('color-foreground')),
         },
@@ -172,7 +172,7 @@ export default styles(
       ),
       /* Attention, which a mark going away does not draw. */
       rule(
-        { attention: 'pulse', part: { 'data-blank': false } },
+        { attention: 'pulse', 'data-blank': false },
         {
           animation: [
             'badge-pulse',
@@ -183,7 +183,7 @@ export default styles(
         },
       ),
       rule(
-        { attention: 'bounce', part: { 'data-blank': false } },
+        { attention: 'bounce', 'data-blank': false },
         {
           animation: [
             'badge-bounce',
@@ -195,8 +195,8 @@ export default styles(
       ),
       rule(
         [
-          { attention: 'pulse', part: { 'data-blank': false }, reducedMotion: true },
-          { attention: 'bounce', part: { 'data-blank': false }, reducedMotion: true },
+          { attention: 'pulse', 'data-blank': false, reducedMotion: true },
+          { attention: 'bounce', 'data-blank': false, reducedMotion: true },
         ],
         { animation: 'none' },
       ),
@@ -208,11 +208,11 @@ export default styles(
       ),
     ]),
     on({ part: 'indicator', inner: 'slot[name="icon"]::slotted(*)' }, [
-      rule({ part: { 'data-dot': true }, platform: 'web' }, { margin: quotient(own.inset, 2) }),
+      web([rule({ 'data-dot': true }, { margin: quotient(own.inset, 2) })]),
     ]),
     on({ region: 'icon', slotted: '*' }, [
-      rule({ state: 'unset', platform: 'native' }, { margin: quotient(own.inset, 2) }),
-      rule({ '--icon-size': hook.iconSize(own.text), flex: 'none' }),
+      native([rule({ state: 'unset' }, { margin: quotient(own.inset, 2) })]),
+      rule({ '--icon-size': first(hook.iconSize, own.text), flex: 'none' }),
     ]),
     keyframes('badge-pulse', {
       '0%, 100%': { transform: 'scale(1)' },

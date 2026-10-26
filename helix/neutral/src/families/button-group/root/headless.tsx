@@ -1,4 +1,5 @@
-import { collection, event, headless, prop, region } from '../../../tree.js'
+import { bare, cancelable, headless, oneOf, Slot } from '../../../render.js'
+import { collection } from '../../../tree.js'
 
 /**
  * Button Group's headless tier: buttons joined into one control, which can
@@ -33,6 +34,19 @@ import { collection, event, headless, prop, region } from '../../../tree.js'
  * alone, since a phone reads `value`.
  */
 export default headless('button-group', {
+  props: {
+    disabled: false,
+    disallowEmptySelection: false,
+    label: '',
+    orientation: oneOf(['horizontal', 'vertical']),
+    selectionMode: oneOf(['multiple', 'single']),
+    value: '',
+  },
+  events: {
+    beforeChange: cancelable(['value']),
+    change: bare(),
+  },
+  states: ['pressed', 'settled'],
   collection: collection({
     after: 'change',
     before: 'before-change',
@@ -45,18 +59,5 @@ export default headless('button-group', {
     presses: 'selection-mode',
     roves: 'selection-mode',
   }),
-  events: [
-    event('before-change', { cancelable: true, detail: ['value'] }),
-    event('change', { bare: true }),
-  ],
-  props: [
-    prop('disabled', 'boolean', { default: false }),
-    prop('disallow-empty-selection', 'boolean', { default: false }),
-    prop('label', 'string', { default: '' }),
-    prop('orientation', ['horizontal', 'vertical']),
-    prop('selection-mode', ['multiple', 'single']),
-    prop('value', 'string', { default: '' }),
-  ],
-  states: ['pressed', 'settled'],
-  tree: [region('default')],
+  render: () => <Slot />,
 })

@@ -1,4 +1,4 @@
-import { mix, token, web } from '../../../style.js'
+import { mix, native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -19,7 +19,12 @@ export default styles(
   root,
   {
     prefix: 'breadcrumbs',
-    hooks: ['font-size', 'gap', 'split-divider-color', 'split-fill'],
+    hooks: {
+      fontSize: token('text-sm'),
+      gap: token('space-xs'),
+      splitDividerColor: token('color-border'),
+      splitFill: mix(token('color-foreground'), 4, 'transparent'),
+    },
     own: [
       'breadcrumbs-mark-glyph',
       'breadcrumbs-mark-words',
@@ -34,7 +39,7 @@ export default styles(
       rule({
         display: 'block',
         own: {
-          splitFill: hook.splitFill(mix(token('color-foreground'), 4, 'transparent')),
+          splitFill: hook.splitFill,
           splitRule: 'transparent',
         },
       }),
@@ -45,20 +50,17 @@ export default styles(
         {
           own: {
             splitFill: 'transparent',
-            splitRule: hook.splitDividerColor(token('color-border')),
+            splitRule: hook.splitDividerColor,
           },
         },
       ),
       /* **The trail's mark under `separator="slash"`**, which each crumb draws
          from these two values: the slash's words, and the chevron put away.
          The web's crumbs are told the mark by the trail's element. */
-      rule(
-        { platform: 'native', separator: 'slash' },
-        { own: { markGlyph: 'none', markWords: '"/"' } },
-      ),
+      native([rule({ separator: 'slash' }, { own: { markGlyph: 'none', markWords: '"/"' } })]),
       /* Where this page sits, which is worth having on a page with no back
          button. */
-      rule({ print: true }, { printColorAdjust: web('economy') }),
+      rule({ print: true }, { web: { printColorAdjust: 'economy' } }),
     ]),
     /* No markers, which is why the web element writes `role="list"`: Safari
        drops a list's semantics when it sees `list-style: none`. */
@@ -67,8 +69,8 @@ export default styles(
         alignItems: 'center',
         display: 'flex',
         flexWrap: 'wrap',
-        fontSize: hook.fontSize(token('text-sm')),
-        gap: hook.gap(token('space-xs')),
+        fontSize: hook.fontSize,
+        gap: hook.gap,
         listStyle: 'none',
         margin: token('space-none'),
         padding: token('space-none'),

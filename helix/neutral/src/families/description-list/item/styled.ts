@@ -1,4 +1,4 @@
-import { token, web } from '../../../style.js'
+import { native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import item from './headless.js'
 
@@ -18,15 +18,15 @@ export default styles(
   item,
   {
     prefix: 'description-list',
-    hooks: [
-      'actions-gap',
-      'item-align',
-      'item-gap',
-      'label-color',
-      'label-font-size',
-      'label-weight',
-      'value-color',
-    ],
+    hooks: {
+      actionsGap: token('space-xs'),
+      itemAlign: 'baseline',
+      itemGap: token('space-2xs'),
+      labelColor: token('color-foreground-muted'),
+      labelFontSize: token('text-sm'),
+      labelWeight: token('weight-medium'),
+      valueColor: token('color-foreground'),
+    },
     own: [
       'description-list-column-gap',
       'description-list-direction',
@@ -38,26 +38,29 @@ export default styles(
   ({ hook, on, own, rule }) => [
     on('host', [
       rule({
-        alignItems: hook.itemAlign('baseline'),
+        alignItems: hook.itemAlign,
         display: 'grid',
         gridColumn: '1 / -1',
         gridTemplateColumns: 'subgrid',
-        rowGap: hook.itemGap(token('space-2xs')),
+        rowGap: hook.itemGap,
       }),
-      rule(
-        { platform: 'native' },
-        { columnGap: own.columnGap(0), display: 'flex', flexDirection: own.direction('column') },
-      ),
+      native([
+        rule({
+          columnGap: own.columnGap(0),
+          display: 'flex',
+          flexDirection: own.direction('column'),
+        }),
+      ]),
       /* A label never ends one page with its value starting the next. */
-      rule({ print: true }, { breakInside: web('avoid') }),
+      rule({ print: true }, { web: { breakInside: 'avoid' } }),
     ]),
     /* `muted`, because a label is content, and `subtle` falls under the
        contrast a small label needs. */
     on('label', [
       rule({
-        color: hook.labelColor(token('color-foreground-muted')),
-        fontSize: hook.labelFontSize(token('text-sm')),
-        fontWeight: hook.labelWeight(token('weight-medium')),
+        color: hook.labelColor,
+        fontSize: hook.labelFontSize,
+        fontWeight: hook.labelWeight,
         margin: 0,
       }),
     ]),
@@ -65,7 +68,7 @@ export default styles(
        or an address has no spaces to wrap at. */
     on('value', [
       rule({
-        color: hook.valueColor(token('color-foreground')),
+        color: hook.valueColor,
         fontVariantNumeric: own.valueFigures('normal'),
         justifySelf: web(own.valueAlign('stretch')),
         margin: 0,
@@ -73,15 +76,14 @@ export default styles(
         overflowWrap: web('anywhere'),
         textAlign: own.valueAlign('start'),
       }),
-      rule({ platform: 'native' }, { flex: '1 1 auto' }),
+      native([rule({ flex: '1 1 auto' })]),
     ]),
     /* Several values, as `<dd>` elements of the page's: each drawn as the
        value is, in the values' column. */
     on({ slotted: 'dd' }, [
-      rule(
-        { platform: 'web' },
-        {
-          color: hook.valueColor(token('color-foreground')),
+      web([
+        rule({
+          color: hook.valueColor,
           fontVariantNumeric: own.valueFigures('normal'),
           gridColumn: '-2 / -1',
           justifySelf: own.valueAlign('stretch'),
@@ -89,12 +91,12 @@ export default styles(
           minInlineSize: 0,
           overflowWrap: 'anywhere',
           textAlign: own.valueAlign('start'),
-        },
-      ),
+        }),
+      ]),
     ]),
     /* Controls after the value, on its line where they fit. */
     on({ region: 'actions', slotted: '*' }, [
-      rule({ marginInlineStart: hook.actionsGap(token('space-xs')), verticalAlign: web('middle') }),
+      rule({ marginInlineStart: hook.actionsGap, web: { verticalAlign: 'middle' } }),
     ]),
   ],
 )

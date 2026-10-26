@@ -1,4 +1,5 @@
-import { bind, box, derive, fold, headless, prop, region, text, when } from '../../../tree.js'
+import { headless, number, Slot, Text, View } from '../../../render.js'
+import { bind, derive, fold } from '../../../tree.js'
 
 /**
  * Avatar Group's headless tier: a row of avatars that overlap, folded into a
@@ -12,29 +13,32 @@ import { bind, box, derive, fold, headless, prop, region, text, when } from '../
  * for and their names.
  */
 export default headless('avatar-group', {
+  props: {
+    label: '',
+    max: number(),
+    overflowLabel: '{count, plural, one {# more: {names}} other {# more: {names}}}',
+  },
+  events: {},
+  states: ['settled'],
   derived: {
     count: derive('avatar-group-count'),
     folds: derive('avatar-group-folds'),
-    'overflow-name': derive('avatar-group-overflow-name'),
+    overflowName: derive('avatar-group-overflow-name'),
   },
-  events: [],
   fold: fold({ max: 'max' }),
   host: { label: bind('label'), role: 'group' },
-  props: [
-    prop('label', 'string', { default: '' }),
-    prop('max', 'number'),
-    prop('overflow-label', 'string', {
-      default: '{count, plural, one {# more: {names}} other {# more: {names}}}',
-    }),
-  ],
-  states: ['settled'],
-  tree: [
-    region('default'),
-    when(
-      'folds',
-      box('overflow', { label: bind('overflow-name'), role: 'img' }, [
-        text('overflow-count', { says: bind('count') }),
-      ]),
-    ),
-  ],
+  render: ({ derived }) => (
+    <>
+      <Slot />
+      {derived.folds && (
+        <View
+          label={derived.overflowName}
+          part="overflow"
+          role="img"
+        >
+          <Text part="overflow-count">{derived.count}</Text>
+        </View>
+      )}
+    </>
+  ),
 })

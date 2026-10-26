@@ -24,25 +24,26 @@ export default styles(
   root,
   {
     prefix: 'accordion',
-    hooks: ['border-color', 'gap', 'radius'],
+    hooks: {
+      borderColor: token('color-border'),
+      gap: token('space-xs'),
+      radius: token('radii-sm'),
+    },
     props: [prop('separation', ['outlined', 'plain'])],
     stylesheet: 'accordion/root/accordion-root.generated.css',
   },
   ({ hook, on, rule }) => [
     on('host', [
       rule({ display: 'block' }),
-      rule(
-        { separation: 'outlined' },
-        { display: 'flex', flexDirection: 'column', gap: hook.gap(token('space-xs')) },
-      ),
+      rule({ separation: 'outlined' }, { display: 'flex', flexDirection: 'column', gap: hook.gap }),
       rule({ print: true }, { printColorAdjust: 'economy' }),
     ]),
     on({ region: 'default', slotted: '*' }, [
       rule(
         { separation: 'outlined' },
         {
-          border: [token('border-thin'), 'solid', hook.borderColor(token('color-border'))],
-          borderRadius: hook.radius(token('radii-sm')),
+          border: [token('border-thin'), 'solid', hook.borderColor],
+          borderRadius: hook.radius,
           /* Clips the trigger's own hover fill to the section's corners. */
           overflow: 'hidden',
         },

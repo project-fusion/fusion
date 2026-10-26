@@ -1,4 +1,5 @@
-import { collection, headless, prop, region } from '../../../tree.js'
+import { headless, number, oneOf, Slot, web } from '../../../render.js'
+import { collection } from '../../../tree.js'
 
 /**
  * An accordion's headless tier: a set of sections that open and close.
@@ -23,14 +24,14 @@ import { collection, headless, prop, region } from '../../../tree.js'
  * element has.
  */
 export default headless('accordion', {
-  collection: collection({ opens: 'mode', toggles: true }),
-  events: [],
-  props: [
-    prop('heading-level', 'number'),
-    prop('mode', ['single', 'single-collapsible']),
+  props: {
+    headingLevel: number(),
     /* Find in page, which a phone has none of. */
-    prop('hidden-until-found', 'boolean', { default: true, platform: 'web' }),
-  ],
+    hiddenUntilFound: web(true),
+    mode: oneOf(['single', 'single-collapsible']),
+  },
+  events: {},
   states: ['settled'],
-  tree: [region('default')],
+  collection: collection({ opens: 'mode', toggles: true }),
+  render: () => <Slot />,
 })

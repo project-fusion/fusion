@@ -1,4 +1,4 @@
-import { bind, box, headless, prop, region, text } from '../../../tree.js'
+import { headless, Slot, Text, View, web } from '../../../render.js'
 
 /**
  * A description list item's headless tier: a term and the value it
@@ -19,19 +19,31 @@ import { bind, box, headless, prop, region, text } from '../../../tree.js'
  * says the element has.
  */
 export default headless('description-list-item', {
-  events: [],
-  props: [
-    prop('label', 'string', { default: '' }),
-    prop('several', 'boolean', { default: false, platform: 'web' }),
-  ],
+  props: {
+    label: '',
+    several: web(false),
+  },
+  events: {},
   states: ['settled', 'several'],
-  tree: [
-    box('label', { element: 'term' }, [
-      region('label', {}, [text('label-words', { says: bind('label') })]),
-    ]),
-    box('value', { element: 'definition' }, [
-      region('default'),
-      box('actions', {}, [region('actions')]),
-    ]),
-  ],
+  render: ({ props }) => (
+    <>
+      <View
+        element="term"
+        part="label"
+      >
+        <Slot name="label">
+          <Text part="label-words">{props.label}</Text>
+        </Slot>
+      </View>
+      <View
+        element="definition"
+        part="value"
+      >
+        <Slot />
+        <View part="actions">
+          <Slot name="actions" />
+        </View>
+      </View>
+    </>
+  ),
 })

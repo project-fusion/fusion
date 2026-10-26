@@ -26,17 +26,17 @@ export default styles(
   item,
   {
     prefix: 'accordion-item',
-    hooks: [
-      'chevron-color',
-      'chevron-hover-color',
-      'color',
-      'content-color',
-      'disabled-opacity',
-      'font-size',
-      'font-weight',
-      'hover-background-color',
-      'padding',
-    ],
+    hooks: {
+      chevronColor: token('color-foreground-subtle'),
+      chevronHoverColor: token('color-foreground'),
+      color: token('color-foreground'),
+      contentColor: token('color-foreground-muted'),
+      disabledOpacity: 0.5,
+      fontSize: token('text-md'),
+      fontWeight: token('weight-medium'),
+      hoverBackgroundColor: 'transparent',
+      padding: [token('space-sm'), token('space-md')],
+    },
     stylesheet: 'accordion/item/accordion-item.generated.css',
   },
   ({ hook, on, rule }) => {
@@ -44,10 +44,7 @@ export default styles(
     const placed = [
       rule({ 'chevron-placement': { not: 'start' } }, { marginInlineStart: 'auto' }),
       rule({ state: 'open' }, { transform: 'scaleY(-1)' }),
-      rule(
-        { within: { trigger: { hover: true } } },
-        { color: hook.chevronHoverColor(token('color-foreground')) },
-      ),
+      rule({ within: { trigger: { hover: true } } }, { color: hook.chevronHoverColor }),
     ]
     return [
       on('host', [rule({ display: 'block' })]),
@@ -56,27 +53,24 @@ export default styles(
           all: web('unset'),
           boxSizing: 'border-box',
           alignItems: 'center',
-          color: hook.color(token('color-foreground')),
+          color: hook.color,
           cursor: web('pointer'),
           display: 'flex',
-          fontSize: hook.fontSize(token('text-md')),
-          fontWeight: hook.fontWeight(token('weight-medium')),
+          fontSize: hook.fontSize,
+          fontWeight: hook.fontWeight,
           inlineSize: '100%',
           gap: token('space-xs'),
           minBlockSize: token('size-control'),
-          padding: hook.padding([token('space-sm'), token('space-md')]),
+          padding: hook.padding,
           transition: ['background-color', token('duration-fast'), token('easing-standard')],
         }),
         /* No fill under the pointer, unless a page asks for one. */
-        rule(
-          { hover: true, lacks: 'disabled' },
-          { backgroundColor: hook.hoverBackgroundColor('transparent') },
-        ),
+        rule({ hover: true, lacks: 'disabled' }, { backgroundColor: hook.hoverBackgroundColor }),
         /* Disabled alone, and not the open section under `single`, which is
            `aria-disabled` and still looks like the others. */
         rule(
           { has: 'disabled' },
-          { cursor: web('not-allowed'), opacity: hook.disabledOpacity(0.5) },
+          { web: { cursor: 'not-allowed' }, opacity: hook.disabledOpacity },
         ),
         rule(
           { focusVisible: true },
@@ -89,7 +83,7 @@ export default styles(
       on('chevron', [
         rule({
           blockSize: '1em',
-          color: hook.chevronColor(token('color-foreground-subtle')),
+          color: hook.chevronColor,
           flex: '0 0 auto',
           inlineSize: '1em',
           transform: 'scaleY(1)',
@@ -101,7 +95,7 @@ export default styles(
       on({ region: 'chevron', slotted: '*' }, [
         rule({
           blockSize: '1em',
-          color: hook.chevronColor(token('color-foreground-subtle')),
+          color: hook.chevronColor,
           flex: '0 0 auto',
           inlineSize: '1em',
           transition: ['transform', token('duration-fast'), token('easing-standard')],
@@ -114,7 +108,7 @@ export default styles(
           gridTemplateRows: fit(0),
           transition: ['grid-template-rows', token('duration-normal'), token('easing-standard')],
         }),
-        rule({ state: 'open' }, { gridTemplateRows: fit(1) }),
+        rule({ open: true }, { gridTemplateRows: fit(1) }),
       ]),
       on('content-inner', [
         /* The row is what moves, so what it holds may be clipped below its own
@@ -126,10 +120,10 @@ export default styles(
          own view. */
       on({ part: 'content-inner', inner: '> slot' }, [
         rule({
-          color: hook.contentColor(token('color-foreground-muted')),
+          color: hook.contentColor,
           display: 'block',
           lineHeight: token('leading-normal'),
-          padding: hook.padding([token('space-sm'), token('space-md')]),
+          padding: hook.padding,
           paddingBlockStart: 0,
         }),
         rule(

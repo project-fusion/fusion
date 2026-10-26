@@ -1,4 +1,4 @@
-import { box, headless, region } from '../../../tree.js'
+import { headless, Slot, View } from '../../../render.js'
 
 /**
  * Code's headless tier: one run of code in a line of prose.
@@ -12,8 +12,17 @@ import { box, headless, region } from '../../../tree.js'
  * translates nothing.
  */
 export default headless('code', {
-  events: [],
-  props: [],
+  props: {},
+  events: {},
   states: ['settled'],
-  tree: [box('code', { element: 'code', run: true, translate: 'no' }, [region('default')])],
+  render: () => (
+    <View
+      element="code"
+      part="code"
+      run
+      translate="no"
+    >
+      <Slot />
+    </View>
+  ),
 })

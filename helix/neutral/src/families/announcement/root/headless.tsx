@@ -1,19 +1,15 @@
 import {
-  bind,
-  box,
-  countdown,
-  derive,
-  event,
+  Announce,
   headless,
-  live,
-  not,
-  pressable,
-  prop,
-  queue,
-  region,
-  unless,
-  when,
-} from '../../../tree.js'
+  number,
+  oneOf,
+  Pressable,
+  Slot,
+  string,
+  View,
+  web,
+} from '../../../render.js'
+import { bind, countdown, derive, queue } from '../../../tree.js'
 
 /**
  * Announcement's headless tier: a message for the whole page, above its
@@ -50,43 +46,74 @@ import {
  * says the element has.
  */
 export default headless('announcement', {
-  countdown: countdown({ after: 'duration', done: 'dismiss', paused: 'paused', waits: 'waiting' }),
+  props: {
+    dismissible: false,
+    dismissLabel: 'Dismiss',
+    duration: number(),
+    fallbackLabel: 'Announcement',
+    /* The key that moves focus in and out, which a phone has no first control for. */
+    hotkey: web('F6'),
+    label: string(),
+    queued: false,
+    tone: oneOf(['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
+  },
+  events: {
+    dismiss: { cancelable: true, detail: ['label'], gives: { label: 'words' } },
+  },
+  states: ['paused', 'settled', 'waiting'],
   derived: {
-    'dismiss-name': derive('announcement-dismiss-name'),
-    'holds-actions': bind('actions'),
+    dismissName: derive('announcement-dismiss-name'),
+    holdsActions: bind('actions'),
     name: derive('announcement-label'),
-    'region-role': derive('announcement-role'),
+    regionRole: derive('announcement-role'),
     words: derive('announcement-words'),
   },
-  events: [event('dismiss', { cancelable: true, detail: ['label'], gives: { label: 'words' } })],
+  countdown: countdown({ after: 'duration', done: 'dismiss', paused: 'paused', waits: 'waiting' }),
   host: { label: bind('name'), role: bind('region-role') },
-  props: [
-    prop('dismiss-label', 'string', { default: 'Dismiss' }),
-    prop('dismissible', 'boolean', { default: false }),
-    prop('duration', 'number'),
-    prop('fallback-label', 'string', { default: 'Announcement' }),
-    prop('label', 'string'),
-    prop('queued', 'boolean', { default: false }),
-    prop('tone', ['accent', 'danger', 'info', 'neutral', 'primary', 'success', 'warning']),
-    /* The key that moves focus in and out, which a phone has no first control for. */
-    prop('hotkey', 'string', { default: 'F6', platform: 'web' }),
-  ],
   queue: queue({ queued: 'queued', waiting: 'waiting' }),
-  states: ['paused', 'settled', 'waiting'],
-  tree: [
-    box('content', {}, [region('default')]),
-    live('live', { platform: 'web' }),
-    unless('waiting', live('arrival', { arrives: true, platform: 'native', says: bind('words') })),
-    box('actions', { 'data-empty': not('holds-actions'), hidden: not('holds-actions') }, [
-      region('actions'),
-    ]),
-    when(
-      'dismissible',
-      pressable('dismiss', { label: bind('dismiss-name'), role: 'button', sends: 'dismiss' }, [
-        region('dismiss-icon', {}, [
-          region('icon', {}, [box('dismiss-mark', { decorative: true, glyph: 'x' })]),
-        ]),
-      ]),
-    ),
-  ],
+  render: ({ derived, props, send, state }) => (
+    <>
+      <View part="content">
+        <Slot />
+      </View>
+      <Announce
+        part="live"
+        platform="web"
+      />
+      {!state.waiting && (
+        <Announce
+          arrives
+          part="arrival"
+          platform="native"
+        >
+          {derived.words}
+        </Announce>
+      )}
+      <View
+        data-empty={!derived.holdsActions}
+        hidden={!derived.holdsActions}
+        part="actions"
+      >
+        <Slot name="actions" />
+      </View>
+      {props.dismissible && (
+        <Pressable
+          label={derived.dismissName}
+          onPress={send.dismiss}
+          part="dismiss"
+          role="button"
+        >
+          <Slot name="dismiss-icon">
+            <Slot name="icon">
+              <View
+                ariaHidden
+                icon="x"
+                part="dismiss-mark"
+              />
+            </Slot>
+          </Slot>
+        </Pressable>
+      )}
+    </>
+  ),
 })

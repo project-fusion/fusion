@@ -1,4 +1,4 @@
-import { fn, list, product, scheme, sum, token } from '../../../style.js'
+import { fn, list, native, product, scheme, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -25,23 +25,23 @@ export default styles(
   root,
   {
     prefix: 'card',
-    hooks: [
-      'align',
-      'backdrop',
-      'background-color',
-      'border-color',
-      'border-width',
-      'color',
-      'gap',
-      'heading-color',
-      'line-height',
-      'media-block-size',
-      'media-fit',
-      'media-size',
-      'padding',
-      'radius',
-      'shadow',
-    ],
+    hooks: {
+      align: 'start',
+      backdrop: null,
+      backgroundColor: null,
+      borderColor: token('color-border'),
+      borderWidth: token('border-surface'),
+      color: token('color-foreground-muted'),
+      gap: token('space-sm'),
+      headingColor: token('color-foreground'),
+      lineHeight: token('leading-normal'),
+      mediaBlockSize: 'auto',
+      mediaFit: 'cover',
+      mediaSize: '12rem',
+      padding: token('space-control'),
+      radius: token('radii-lg'),
+      shadow: token('shadow-surface'),
+    },
     own: ['card-inset', 'card-media', 'heading-ink'],
     props: [
       prop('material', ['frosted', 'glass', 'transparent']),
@@ -54,19 +54,15 @@ export default styles(
     on('host', [
       rule({
         backgroundColor: hook.backgroundColor(token('color-surface')),
-        border: [
-          hook.borderWidth(token('border-surface')),
-          'solid',
-          hook.borderColor(token('color-border')),
-        ],
-        borderRadius: hook.radius(token('radii-lg')),
-        boxShadow: hook.shadow(token('shadow-surface')),
-        color: hook.color(token('color-foreground-muted')),
-        alignContent: hook.align('start'),
+        border: [hook.borderWidth, 'solid', hook.borderColor],
+        borderRadius: hook.radius,
+        boxShadow: hook.shadow,
+        color: hook.color,
+        alignContent: hook.align,
         display: 'grid',
-        gap: hook.gap(token('space-sm')),
+        gap: hook.gap,
         gridTemplateColumns: 'minmax(0, 1fr)',
-        lineHeight: hook.lineHeight(token('leading-normal')),
+        lineHeight: hook.lineHeight,
         overflow: 'hidden',
         padding: own.inset,
         transition: list(
@@ -74,9 +70,9 @@ export default styles(
           ['box-shadow', token('duration-fast'), token('easing-standard')],
         ),
         own: {
-          inset: hook.padding(token('space-control')),
-          media: hook.mediaSize('12rem'),
-          headingInk: hook.headingColor(token('color-foreground')),
+          inset: hook.padding,
+          media: hook.mediaSize,
+          headingInk: hook.headingColor,
         },
       }),
       variants('separation', {
@@ -121,12 +117,12 @@ export default styles(
     /* Media runs edge to edge, outside the inset. */
     on({ region: 'media', slotted: '*' }, [
       rule({
-        blockSize: hook.mediaBlockSize('auto'),
+        blockSize: hook.mediaBlockSize,
         display: 'block',
         inlineSize: sum('100%', product(own.inset, 2)),
         margin: product(own.inset, '-1'),
         marginBlockEnd: 0,
-        objectFit: hook.mediaFit('cover'),
+        objectFit: hook.mediaFit,
       }),
       rule(
         { 'media-placement': 'end' },
@@ -153,7 +149,7 @@ export default styles(
       rule({ justifySelf: 'end' }),
       /* In its row, the footer sits on the row's center line, where a phone
          would read `justify-self` as an alignment across the row. */
-      rule({ within: 'footer-row', platform: 'native' }, { justifySelf: 'auto' }),
+      native([rule({ within: 'footer-row' }, { justifySelf: 'auto' })]),
     ]),
     /* A line of its own, with its actions at the end, which a narrow card
        puts under what they belong to. */
@@ -164,7 +160,7 @@ export default styles(
           alignItems: 'center',
           display: 'flex',
           flexWrap: 'wrap',
-          gap: hook.gap(token('space-sm')),
+          gap: hook.gap,
           minInlineSize: 0,
         }),
       ],
@@ -173,11 +169,8 @@ export default styles(
        places nothing: the web keeps it from before rows were drawn. */
     on({ region: ['header-actions', 'footer-actions'], slotted: '*' }, [
       rule({ flex: 'none' }),
-      rule({ platform: 'web' }, { justifySelf: 'end' }),
-      rule(
-        { defined: false },
-        { alignSelf: 'center', gridColumn: 2, marginInlineStart: hook.gap(token('space-sm')) },
-      ),
+      web([rule({ justifySelf: 'end' })]),
+      rule({ defined: false }, { alignSelf: 'center', gridColumn: 2, marginInlineStart: hook.gap }),
     ]),
     on({ region: 'footer-actions', slotted: '*' }, [
       rule({ within: 'footer-row' }, { marginInlineStart: 'auto' }),

@@ -1,4 +1,4 @@
-import { bind, box, headless, not, prop, region } from '../../../tree.js'
+import { headless, oneOf, Slot, View, web } from '../../../render.js'
 
 /**
  * Divider's headless tier: what it takes, and a line, what is set into it,
@@ -26,20 +26,31 @@ import { bind, box, headless, not, prop, region } from '../../../tree.js'
  * has.
  */
 export default headless('divider', {
-  events: [],
-  props: [
-    prop('announced', 'boolean', { default: false, platform: 'web' }),
-    prop('decorative', 'boolean', { default: false }),
-    prop('orientation', ['horizontal', 'vertical']),
-  ],
+  props: {
+    announced: web(false),
+    decorative: false,
+    orientation: oneOf(['horizontal', 'vertical']),
+  },
+  events: {},
   states: ['settled', 'vertical'],
-  tree: [
-    box('line', {
-      decorative: bind('decorative'),
-      orientation: bind('orientation'),
-      role: 'separator',
-    }),
-    box('content', { hidden: not('default') }, [region('default')]),
-    box('line', { role: 'presentation' }),
-  ],
+  render: ({ props, slots }) => (
+    <>
+      <View
+        ariaHidden={props.decorative}
+        orientation={props.orientation}
+        part="line"
+        role="separator"
+      />
+      <View
+        hidden={!slots.default}
+        part="content"
+      >
+        <Slot />
+      </View>
+      <View
+        part="line"
+        role="presentation"
+      />
+    </>
+  ),
 })

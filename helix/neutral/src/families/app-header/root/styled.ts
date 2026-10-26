@@ -1,4 +1,4 @@
-import { difference, fn, list, mix, product, safeArea, token, web } from '../../../style.js'
+import { difference, fn, list, mix, native, product, safeArea, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -35,14 +35,14 @@ export default styles(
   root,
   {
     prefix: 'app-header',
-    hooks: [
-      'backdrop',
-      'background-color',
-      'block-size',
-      'border-color',
-      'max-inline-size',
-      'padding',
-    ],
+    hooks: {
+      backdrop: null,
+      backgroundColor: null,
+      blockSize: token('size-header'),
+      borderColor: 'transparent',
+      maxInlineSize: '72rem',
+      padding: null,
+    },
     props: [
       prop('material', ['frosted', 'glass', 'transparent']),
       prop('overlay', 'boolean'),
@@ -51,7 +51,7 @@ export default styles(
     stylesheet: 'app-header/root/app-header-root.generated.css',
   },
   ({ hook, on, rule, variants }) => {
-    const header = hook.blockSize(token('size-header'))
+    const header = hook.blockSize
     const pace = token('duration-normal')
     const easing = token('easing-standard')
     const glass = {
@@ -74,9 +74,9 @@ export default styles(
           '--helix-size-control-tight': product(token('size-control'), 0.8),
           '--helix-size-tag': token('size-tag-sm'),
           backgroundColor: hook.backgroundColor(token('color-background')),
-          borderBlockEnd: [token('border-thin'), 'solid', hook.borderColor('transparent')],
+          borderBlockEnd: [token('border-thin'), 'solid', hook.borderColor],
           /* What the narrow row measures itself against: the bar's own width. */
-          containerType: web('inline-size'),
+          web: { containerType: 'inline-size' },
           display: 'block',
           inlineSize: '100%',
           /* Clear of the status bar and the notch, by the window's top safe
@@ -99,7 +99,7 @@ export default styles(
           transparent: { backgroundColor: hook.backgroundColor('transparent') },
         }),
         /* Scrolled, it takes the glass. */
-        rule({ material: 'transparent', state: 'scrolled' }, { ...glass }),
+        rule({ material: 'transparent', scrolled: true }, { ...glass }),
         /* Over the top of the page: the section under the bar starts
            behind it, drawn under it, by the bar's height and the safe area
            the bar stands clear of. */
@@ -113,7 +113,7 @@ export default styles(
         ),
         rule(
           { sticky: true },
-          { insetBlockStart: 0, position: web('sticky'), zIndex: token('layer-sticky') },
+          { insetBlockStart: 0, web: { position: 'sticky' }, zIndex: token('layer-sticky') },
         ),
         /* Out of the way under `hide-on-scroll`: a sticky bar slides up by
            its own height, and one that is not has scrolled away already. */
@@ -128,7 +128,7 @@ export default styles(
             ),
           },
         ),
-        rule({ state: 'hidden', sticky: true }, { translate: [0, '-100%'] }),
+        rule({ hidden: true, sticky: true }, { translate: [0, '-100%'] }),
         rule({ reducedMotion: true, sticky: true }, { transition: 'none' }),
         /* Print: a bar of destinations, and a printed page has no elsewhere. */
         rule({ print: true }, { display: 'none' }),
@@ -144,7 +144,7 @@ export default styles(
           gap: token('space-lg'),
           gridTemplateColumns: 'minmax(max-content, 1fr) minmax(0, auto) minmax(max-content, 1fr)',
           marginInline: 'auto',
-          maxInlineSize: hook.maxInlineSize('72rem'),
+          maxInlineSize: hook.maxInlineSize,
           paddingInline: hook.padding(token('space-lg')),
         }),
         /* Beside the brand, with the slack after it. */
@@ -158,7 +158,7 @@ export default styles(
         /* Folded: the brand and the actions share the row, and the middle
            region opens as a column below. */
         rule(
-          { state: 'folded' },
+          { folded: true },
           {
             blockSize: 'auto',
             gridTemplateColumns: 'minmax(0, 1fr) auto',
@@ -168,7 +168,7 @@ export default styles(
         ),
         /* A phone lays the row out along a line, so the folded region wraps
            onto a line of its own. */
-        rule({ platform: 'native', state: 'folded' }, { flexWrap: 'wrap' }),
+        native([rule({ folded: true }, { flexWrap: 'wrap' })]),
       ]),
       on('start', [rule({ alignItems: 'center', display: 'flex', minInlineSize: 0 })]),
       /* Against the trailing edge, so the row reads brand, middle, actions
@@ -187,10 +187,7 @@ export default styles(
          equal tracks put it. Folded, they keep the bar's height. */
       on(
         ['start', 'end'],
-        [
-          rule({ platform: 'native' }, { flexShrink: 0 }),
-          rule({ platform: 'native', state: 'folded' }, { minBlockSize: header }),
-        ],
+        [native([rule({ flexShrink: 0 }), rule({ folded: true }, { minBlockSize: header })])],
       ),
       on({ region: 'start', slotted: '*' }, [
         rule({
@@ -204,7 +201,7 @@ export default styles(
         }),
         /* A phone fits words to the box they are measured in, so the brand
            keeps to one line, as the web's track at its widest content does. */
-        rule({ platform: 'native' }, { whiteSpace: 'nowrap' }),
+        native([rule({ whiteSpace: 'nowrap' })]),
       ]),
       on('content', [
         rule({
@@ -221,10 +218,10 @@ export default styles(
           overflowX: 'auto',
         }),
         /* A phone's scroll view is as wide as what it holds, so centered is safe. */
-        rule({ platform: 'native' }, { flexShrink: 1, justifyContent: 'center' }),
+        native([rule({ flexShrink: 1, justifyContent: 'center' })]),
         rule({ 'content-align': 'start' }, { justifyContent: 'flex-start' }),
         rule(
-          { state: 'folded' },
+          { folded: true },
           {
             alignItems: 'stretch',
             flexDirection: 'column',
@@ -235,7 +232,7 @@ export default styles(
             paddingBlockEnd: token('space-sm'),
           },
         ),
-        rule({ platform: 'native', state: 'folded' }, { flexBasis: '100%' }),
+        native([rule({ folded: true }, { flexBasis: '100%' })]),
         /* `display: flex` above outranks the user agent's `[hidden]`. */
         rule({ part: { hidden: true } }, { display: 'none' }),
       ]),
@@ -255,7 +252,7 @@ export default styles(
         }),
         /* At the start, the toggle leads the brand by the gap the actions keep. */
         rule({ within: 'start' }, { marginInlineEnd: token('space-xs') }),
-        rule([{ hover: true }, { state: 'open' }], {
+        rule([{ hover: true }, { open: true }], {
           backgroundColor: mix(token('color-foreground'), 8, 'transparent'),
           color: token('color-foreground'),
         }),

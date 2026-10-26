@@ -1,18 +1,16 @@
 import {
-  bind,
-  box,
-  derive,
-  event,
+  Announce,
+  bare,
+  boolean,
+  cancelable,
   headless,
-  layer,
-  live,
-  pick,
-  pressable,
-  prop,
-  region,
-  toggle,
-  when,
-} from '../../../tree.js'
+  Layer,
+  oneOf,
+  Pressable,
+  Slot,
+  View,
+} from '../../../render.js'
+import { derive, toggle } from '../../../tree.js'
 
 /**
  * Dialog's headless tier: a modal window over the page, opened on `open`.
@@ -48,30 +46,30 @@ import {
  * the element has.
  */
 export default headless('dialog', {
+  props: {
+    alert: false,
+    closedby: oneOf(['any', 'closerequest', 'none']),
+    defaultOpen: false,
+    dismissible: false,
+    dismissLabel: 'Close',
+    fallbackLabel: 'Dialog',
+    label: '',
+    open: boolean(),
+    persistent: false,
+  },
+  events: {
+    beforeClose: cancelable(['open']),
+    beforeOpen: cancelable(['open']),
+    close: bare(),
+    toggle: bare(['newState', 'oldState']),
+  },
+  states: ['entering', 'exiting', 'open', 'settled'],
   derived: {
-    'dismiss-name': derive('dialog-dismiss-name'),
     dismissal: derive('dialog-dismissal'),
+    dismissName: derive('dialog-dismiss-name'),
     name: derive('dialog-name'),
     said: derive('dialog-said'),
   },
-  events: [
-    event('before-close', { cancelable: true, detail: ['open'] }),
-    event('before-open', { cancelable: true, detail: ['open'] }),
-    event('close', { bare: true }),
-    event('toggle', { bare: true, detail: ['newState', 'oldState'] }),
-  ],
-  props: [
-    prop('alert', 'boolean', { default: false }),
-    prop('closedby', ['any', 'closerequest', 'none']),
-    prop('default-open', 'boolean', { default: false }),
-    prop('dismiss-label', 'string', { default: 'Close' }),
-    prop('dismissible', 'boolean', { default: false }),
-    prop('fallback-label', 'string', { default: 'Dialog' }),
-    prop('label', 'string', { default: '' }),
-    prop('open', 'boolean'),
-    prop('persistent', 'boolean', { default: false }),
-  ],
-  states: ['entering', 'exiting', 'open', 'settled'],
   toggle: toggle({
     changes: 'toggle',
     checked: 'open',
@@ -80,30 +78,49 @@ export default headless('dialog', {
     initial: 'default-open',
     opens: 'before-open',
   }),
-  tree: [
-    layer(
-      'surface',
-      {
-        closedby: bind('dismissal'),
-        label: bind('name'),
-        modal: true,
-        open: bind('open'),
-        refuses: true,
-        role: pick('alert', { true: 'alertdialog' }, 'dialog'),
-      },
-      [
-        region('icon'),
-        region('header', { part: 'header' }),
-        region('default', { part: 'body' }),
-        region('footer', { part: 'footer' }),
-        when(
-          'dismissible',
-          pressable('dismiss', { label: bind('dismiss-name'), role: 'button', toggles: true }, [
-            region('dismiss-icon', {}, [box('dismiss-mark', { decorative: true, glyph: 'x' })]),
-          ]),
-        ),
-        live('opening', { arrives: true, platform: 'native', says: bind('said') }),
-      ],
-    ),
-  ],
+  render: ({ derived, props }) => (
+    <Layer
+      closedby={derived.dismissal}
+      label={derived.name}
+      modal
+      open={props.open}
+      part="surface"
+      refuses
+      role={props.alert ? 'alertdialog' : 'dialog'}
+    >
+      <Slot name="icon" />
+      <Slot
+        name="header"
+        part="header"
+      />
+      <Slot part="body" />
+      <Slot
+        name="footer"
+        part="footer"
+      />
+      {props.dismissible && (
+        <Pressable
+          label={derived.dismissName}
+          part="dismiss"
+          role="button"
+          toggles
+        >
+          <Slot name="dismiss-icon">
+            <View
+              ariaHidden
+              icon="x"
+              part="dismiss-mark"
+            />
+          </Slot>
+        </Pressable>
+      )}
+      <Announce
+        arrives
+        part="opening"
+        platform="native"
+      >
+        {derived.said}
+      </Announce>
+    </Layer>
+  ),
 })
