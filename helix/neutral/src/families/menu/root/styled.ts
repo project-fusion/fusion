@@ -89,7 +89,7 @@ export default styles(
         }),
         /* A sheet stands on the window's bottom edge, square where it meets it. */
         rule(
-          { state: 'sheet' },
+          { sheet: true },
           {
             borderEndEndRadius: token('radii-none'),
             borderEndStartRadius: token('radii-none'),
@@ -121,18 +121,15 @@ export default styles(
           ),
         }),
         rule(
-          { state: 'placedTop' },
+          { placedTop: true },
           {
             own: { travel: token('space-2xs') },
             transformOrigin: [measured('floating-arrow-x', '50%'), '100%'],
           },
         ),
-        rule(
-          { state: 'placedBottom' },
-          { transformOrigin: [measured('floating-arrow-x', '50%'), 0] },
-        ),
+        rule({ placedBottom: true }, { transformOrigin: [measured('floating-arrow-x', '50%'), 0] }),
         /* A sheet rises from under the edge. */
-        rule({ state: 'sheet' }, { own: { from: 1, travel: '100%' } }),
+        rule({ sheet: true }, { own: { from: 1, travel: '100%' } }),
         rule({ part: { 'data-placed': true } }, { opacity: 1, scale: 1, transform: 'none' }),
         rule([{ reducedMotion: true }, { part: { 'data-placed': true }, reducedMotion: true }], {
           scale: 1,
@@ -163,7 +160,7 @@ export default styles(
         /* A sheet is as wide as the window, never taller than most of it, and
            its last row is clear of the home indicator. */
         rule(
-          { state: 'sheet' },
+          { sheet: true },
           {
             inlineSize: web('auto'),
             maxBlockSize: hook.maxBlockSize(difference('100dvh', token('space-3xl'))),
@@ -194,20 +191,17 @@ export default styles(
         }),
         /* A row on the page has a mark before its label, so every row on it
            keeps the column. */
-        rule({ platform: 'web', state: 'start' }, { '--menu-item-start': column }),
-        rule({ platform: 'native', state: 'started' }, { '--menu-item-start': column }),
+        rule({ platform: 'web', start: true }, { '--menu-item-start': column }),
+        rule({ platform: 'native', started: true }, { '--menu-item-start': column }),
         /* A row on the page can be ticked or opens a page. */
-        rule({ platform: 'web', state: 'mark' }, { '--menu-item-end': column }),
-        rule({ platform: 'native', state: 'marked' }, { '--menu-item-end': column }),
+        rule({ platform: 'web', mark: true }, { '--menu-item-end': column }),
+        rule({ platform: 'native', marked: true }, { '--menu-item-end': column }),
         /* Opening sideways, out of the edge it opened against. */
         rule(
-          { state: 'placedLeft' },
+          { placedLeft: true },
           { transformOrigin: ['100%', measured('floating-arrow-y', '50%')] },
         ),
-        rule(
-          { state: 'placedRight' },
-          { transformOrigin: [0, measured('floating-arrow-y', '50%')] },
-        ),
+        rule({ placedRight: true }, { transformOrigin: [0, measured('floating-arrow-y', '50%')] }),
       ]),
       /* The scrim behind a sheet, which fades in as it rises. */
       on({ backdrop: 'surface' }, [
@@ -219,9 +213,9 @@ export default styles(
             ['overlay', fast, 'allow-discrete'],
           ),
         }),
-        rule({ state: 'sheet' }, { backgroundColor: hook.scrim(token('color-overlay')) }),
-        rule({ state: ['open', 'sheet'] }, { opacity: 1 }),
-        rule({ startingStyle: true, state: ['open', 'sheet'] }, { opacity: 0 }),
+        rule({ sheet: true }, { backgroundColor: hook.scrim(token('color-overlay')) }),
+        rule({ open: true, sheet: true }, { opacity: 1 }),
+        rule({ startingStyle: true, open: true, sheet: true }, { opacity: 0 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
         rule(
           { platform: 'web', supports: 'not (overlay: auto)' },
@@ -288,10 +282,10 @@ export default styles(
       ),
       /* A phone's sections and rules, which hold no row of a page below the top. */
       on({ region: 'default', slotted: 'helix-divider' }, [
-        rule({ platform: 'native', state: 'drilled' }, { display: 'none' }),
+        rule({ platform: 'native', drilled: true }, { display: 'none' }),
       ]),
       on({ region: 'default', slotted: 'helix-menu-section' }, [
-        rule({ platform: 'native', state: 'drilled' }, { own: { sectionHeading: 'none' } }),
+        rule({ platform: 'native', drilled: true }, { own: { sectionHeading: 'none' } }),
       ]),
       /* What a collection says in place of rows, quiet and centered. */
       on(

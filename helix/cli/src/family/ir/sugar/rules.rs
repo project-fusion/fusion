@@ -254,28 +254,6 @@ fn spelled(when: &Lit) -> Result<Lit, String> {
         Lit::Object(fields) => fields
             .iter()
             .map(|(key, value)| {
-                if key == "state" {
-                    let value = match value {
-                        Lit::Text(state) => Lit::Text(name(state)?),
-                        Lit::Array(states) => Lit::Array(
-                            states
-                                .iter()
-                                .map(|state| match state {
-                                    Lit::Text(state) => name(state).map(Lit::Text),
-                                    other => Ok(other.clone()),
-                                })
-                                .collect::<Result<_, _>>()?,
-                        ),
-                        Lit::Object(states) => Lit::Object(
-                            states
-                                .iter()
-                                .map(|(state, holds)| Ok((name(state)?, holds.clone())))
-                                .collect::<Result<_, String>>()?,
-                        ),
-                        other => other.clone(),
-                    };
-                    return Ok((key.clone(), value));
-                }
                 if super::namespace::RESERVED.contains(&key.as_str()) || key.starts_with("data-") {
                     return Ok((key.clone(), value.clone()));
                 }
