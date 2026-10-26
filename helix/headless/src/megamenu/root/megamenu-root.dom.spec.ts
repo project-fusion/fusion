@@ -486,6 +486,13 @@ describe('the regions a sheet reaches', () => {
   })
 })
 
+/**
+ * Past the frame and the window a page without React's root mark is looked at
+ * for, which is when a plain trigger is first told. See `untilReactHydrated`.
+ */
+const told = (host: { whenSettled: Promise<void> }): Promise<void> =>
+  host.whenSettled.then(() => new Promise((done) => setTimeout(done, 150)))
+
 describe('a megamenu whose trigger the consumer slotted', () => {
   const slotted = async (): Promise<Section> => {
     const host = (await mount(
@@ -567,11 +574,34 @@ describe('a megamenu whose trigger the consumer slotted', () => {
        framework has finished hydrating it, as `Popover` does. */
     const host = (await slotted()) as Section & { whenSettled: Promise<void> }
     expect(own(host).hasAttribute('aria-expanded')).toBe(false)
-    await host.whenSettled
+    await told(host)
     expect(own(host).getAttribute('aria-expanded')).toBe('false')
     host.open = true
     await host.updateComplete
     expect(own(host).getAttribute('aria-expanded')).toBe('true')
+  })
+
+  /* **On a page React is hydrating, not until React holds this element's
+     props.** React compares a node's attributes as it begins hydrating it and
+     writes its props as it completes it, after the nodes inside it, so a
+     trigger written before then is a mismatch React reports and never patches:
+     measured against React 19.3.1 with the definitions loaded first. */
+  test('a plain trigger on a page React is hydrating is told once React reaches the megamenu', async () => {
+    const mark = '_reactListeningm2q7'
+    const root = '__reactContainer$m2q7'
+    Object.assign(document, { [mark]: true })
+    Object.assign(document.body, { [root]: {} })
+    try {
+      const host = (await slotted()) as Section & { whenSettled: Promise<void> }
+      await told(host)
+      expect(own(host).hasAttribute('aria-expanded')).toBe(false)
+      Object.assign(host, { __reactProps$m2q7: { label: 'Products' } })
+      await new Promise((done) => setTimeout(done, 50))
+      expect(own(host).getAttribute('aria-expanded')).toBe('false')
+    } finally {
+      delete (document as unknown as Record<string, unknown>)[mark]
+      delete (document.body as unknown as Record<string, unknown>)[root]
+    }
   })
 
   test('a plain trigger that says its own state is left to the page', async () => {

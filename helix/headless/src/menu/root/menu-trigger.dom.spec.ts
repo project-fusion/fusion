@@ -14,6 +14,13 @@ beforeAll(async () => {
   await import('../../button/index.js')
 })
 
+/**
+ * Past the frame and the window a page without React's root mark is looked at
+ * for, which is when a plain trigger is first told. See `untilReactHydrated`.
+ */
+const told = (host: { whenSettled: Promise<void> }): Promise<void> =>
+  host.whenSettled.then(() => new Promise((done) => setTimeout(done, 150)))
+
 describe('a menu trigger', () => {
   test('says it opens a menu, inside its own shadow root', async () => {
     const host = (await mount(`<helix-headless-menu label="Actions">
@@ -36,7 +43,7 @@ describe('a menu trigger', () => {
     const button = host.querySelector('button') as HTMLButtonElement
     /* Not in the first render, which a framework may still be hydrating. */
     expect(button.hasAttribute('aria-expanded')).toBe(false)
-    await host.whenSettled
+    await told(host)
     expect(button.getAttribute('aria-haspopup')).toBe('menu')
     expect(button.getAttribute('aria-expanded')).toBe('false')
     host.open = true

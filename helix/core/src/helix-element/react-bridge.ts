@@ -1,5 +1,6 @@
 import type { LitElement } from 'lit'
 import { auditReactMissing, auditReactProps } from '#react-audit'
+import { insideReact } from './react-root.js'
 
 /*
  * What a Helix element does about React's hydration, kept out of the base class.
@@ -284,6 +285,67 @@ export const lookForReact = (host: LitElement, applied: boolean): void => {
     book()
   }
 }
+
+/**
+ * How long `untilReactHydrated` waits for React to reach an element, at most.
+ *
+ * A bound, not a measurement: React hydrates a server-rendered page's shell
+ * within a few frames, and a Suspense boundary waits for its data, which no
+ * number here can know. An element under React's root that React never
+ * reaches, such as one a script appended there, is let go at this point.
+ */
+const HYDRATION_BOUND = 5000
+
+/**
+ * Resolves once React has hydrated an element, and soon after where React
+ * will not.
+ *
+ * **For a write onto markup a server rendered.** React compares a node's
+ * attributes with the server's as it begins hydrating that node, and writes
+ * the node's props as it completes it, after every node inside it. So once
+ * the element holds React's props, it and every node in it have been
+ * compared, and an attribute written then is no mismatch. Popover, Menu and
+ * Megamenu write `aria-expanded` onto a plain slotted trigger, and before
+ * October 25, 2026 they wrote it a frame after their first render. On a page
+ * whose definitions load before `hydrateRoot`, that frame came before React
+ * reached the trigger, and React reported "some attributes of the server
+ * rendered HTML didn't match the client properties", measured against React
+ * 19.3.1 with Megamenu and Popover.
+ *
+ * **A page whose mark has not arrived yet is waited for, for `LOOK_FOR`.** An
+ * app that defines the elements and calls `hydrateRoot` after a gap, an
+ * awaited import or a fetch, has no mark when the frame comes, and Megamenu
+ * and Popover were written to early on exactly such a page. So a page without
+ * the mark is looked at for the bridge's own window, and one that gains it is
+ * waited for as any other. A page that calls `hydrateRoot` later than that is
+ * still written to early, and a page without React pays the window once. On
+ * the site, which defers registration past hydration, React held the
+ * megamenu's props 7 to 33 ms after marking the page and 187 to 562 ms before
+ * the element's first frame, six loads, so it waits for nothing.
+ *
+ * Resolves for an element outside the node React renders into. Asked on the
+ * bridge's own interval, on a timer and never a frame, for the reason
+ * `LOOK_EVERY` gives.
+ */
+export const untilReactHydrated = (host: Element): Promise<void> =>
+  new Promise((done) => {
+    const since = performance.now()
+    const look = (): void => {
+      const waited = performance.now() - since
+      const marked = reactMarkOf(host) !== undefined
+      if (
+        (!marked && waited >= LOOK_FOR) ||
+        reactPropsOf(host) !== undefined ||
+        (marked && !insideReact(host)) ||
+        waited >= HYDRATION_BOUND
+      ) {
+        done()
+        return
+      }
+      setTimeout(look, LOOK_EVERY)
+    }
+    look()
+  })
 
 /*
  * Binds the handler React is holding for this event, if it has not bound it.

@@ -401,6 +401,13 @@ describe('the panel’s name and its point', () => {
   })
 })
 
+/**
+ * Past the frame and the window a page without React's root mark is looked at
+ * for, which is when a plain trigger is first told. See `untilReactHydrated`.
+ */
+const told = (host: { whenSettled: Promise<void> }): Promise<void> =>
+  host.whenSettled.then(() => new Promise((done) => setTimeout(done, 150)))
+
 describe('a plain trigger', () => {
   const plain = async (extra = ''): Promise<Popover> =>
     (await mount(
@@ -415,7 +422,7 @@ describe('a plain trigger', () => {
       whenSettled: Promise<void>
     }
     const trigger = host.querySelector('[slot="trigger"]') as HTMLButtonElement
-    await host.whenSettled
+    await told(host)
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
     trigger.click()
     /* happy-dom does not carry an event through slot assignment, so the
