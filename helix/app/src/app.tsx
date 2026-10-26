@@ -8,7 +8,6 @@ import {
 } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { StatusBar } from 'expo-status-bar'
-import { TABS } from 'helix-proof'
 import { StrictMode, useEffect, useState } from 'react'
 import { Linking, useColorScheme } from 'react-native'
 import { CHECKS, ChecksScreen } from './checks'
@@ -25,8 +24,8 @@ import { color } from './tokens'
    examples as the sandbox shows it, drawn natively. A link opens it at a
    component or an example: `/--/list`, or `/--/list/selectable`, after the
    address Expo Go opens, and `helix://list/selectable` in a build of the
-   gallery. `rows` opens the list of 1,000 rows, `proof` the proof page,
-   `proof/website/activity` that page at one project and one of its tabs, and
+   gallery. `rows` opens the list of 1,000 rows, `proof` the proof app,
+   `proof/projects/website/activity` that app at one of its routes, and
    `checks/<name>` one of the checks the device runs make that no example
    shows. */
 
@@ -46,22 +45,16 @@ const pathOf = (url: string): string => {
 
 /** The screens a link opens, from its path. */
 const stateFor = (url: string | null | undefined): State => {
-  const [family = '', example = '', view = ''] = pathOf(url ?? '')
+  const parts = pathOf(url ?? '')
     .split('/')
     .filter((part) => part !== '')
+  const [family = '', example = '', view = ''] = parts
   const routes: { name: keyof Routes; params?: Routes[keyof Routes] }[] = [{ name: 'Home' }]
   if (family === 'rows') {
     routes.push({ name: 'Rows' })
   } else if (family === 'proof') {
-    /* A tab the page lacks opens the project's overview. */
-    const tab = TABS.find((one) => one === view)
-    routes.push({
-      name: 'Proof',
-      params: {
-        ...(example === '' ? {} : { project: example }),
-        ...(tab === undefined ? {} : { tab }),
-      },
-    })
+    /* The rest of the path is the route the proof app opens at. */
+    routes.push({ name: 'Proof', params: { path: `/${parts.slice(1).join('/')}` } })
   } else if (family === 'checks' && CHECKS[example] !== undefined) {
     routes.push({ name: 'Checks', params: { check: example } })
   } else if (familyOf(family) !== undefined) {
@@ -185,7 +178,11 @@ function Gallery() {
           })}
         />
         <Stack.Screen component={RowsScreen} name="Rows" options={{ title: '1,000 rows' }} />
-        <Stack.Screen component={ProofScreen} name="Proof" options={{ title: 'Proof page' }} />
+        <Stack.Screen
+          component={ProofScreen}
+          name="Proof"
+          options={{ headerShown: false, title: 'Proof app' }}
+        />
         <Stack.Screen
           component={ChecksScreen}
           name="Checks"

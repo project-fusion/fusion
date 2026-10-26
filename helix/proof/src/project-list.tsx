@@ -1,10 +1,15 @@
+import { useHelixRoute } from '@fusion.dev/helix/expo-router'
 import { PROJECTS, STATUS } from './data'
 
 const open = PROJECTS.filter((project) => project.status !== 'done')
 const late = PROJECTS.filter((project) => project.status === 'at-risk')
 
-/** The first screen: the week in numbers, the projects, and what needs a look. */
-export function ProjectList({ onOpen }: { readonly onOpen: (id: string) => void }) {
+/**
+ * The first screen: the week in numbers, the projects, and what needs a
+ * look. Each row links to its project's route.
+ */
+export function ProjectList() {
+  const route = useHelixRoute()
   return (
     <helix-flex direction="column" gap="lg">
       <helix-flex direction="column" gap="2xs">
@@ -40,14 +45,13 @@ export function ProjectList({ onOpen }: { readonly onOpen: (id: string) => void 
         <helix-text as="h2" slot="header" variant="title">
           All projects
         </helix-text>
-        <helix-list
-          divided
-          label="Projects"
-          onhelix-action={(event) => onOpen((event.target as { value: string }).value)}
-          selection-mode="none"
-        >
+        <helix-list divided label="Projects" selection-mode="none">
           {PROJECTS.map((project) => (
-            <helix-list-item key={project.id} value={project.id}>
+            <helix-list-item
+              href={route.href(`/projects/${project.id}`)}
+              key={project.id}
+              value={project.id}
+            >
               <helix-avatar
                 initials={project.owner.initials}
                 name={project.owner.name}

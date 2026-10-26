@@ -20,26 +20,21 @@ you make in it. `preview` after an example, as in `helix://list/selectable/previ
 opens its preview alone, without the Preview and Code tabs. `checks/<name>`
 opens one of the checks the device runs make that no example shows, from
 `src/checks.tsx`: `select-all`, `numbers`, `motion`, `rtl`, and `ltr`.
-`proof` opens the proof page.
+`proof` opens the proof app, and `proof/<route>` that app at one of its routes.
 
-## The proof page
+## The proof app
 
-`proof` holds a project dashboard written once, as ordinary React, from Helix
-families alone: a list of projects, and one project's overview, activity, and
-settings in tabs. It names no platform. The site draws it at
-`/helix/app/proof`, where each tag is the web element, and the gallery draws it
-at `helix://proof`, where each tag is the native component.
+`proof` opens the proof app, `@fusion.dev/helix-proof` in `helix/proof`: a
+project dashboard on Expo Router, written once for the web and a phone. The
+gallery draws its route tree in a screen of its own with Expo Router's
+`ExpoRoot`, at the route the rest of the link names: `helix://proof` opens it
+at its start, and `helix://proof/projects/website/activity` at
+`/projects/website/activity`. The app draws its own bar, so the gallery's
+header is hidden there, and the system's back returns to the gallery.
 
-- **`helix shared` checks it** for what only the web has, such as a DOM
-  element, CSS, or a web-only family or prop. `bun run check:cli:shared` runs
-  that check from the repository's root.
-- **On a phone, its JSX goes through `@fusion.dev/helix/jsx-runtime`**, the
-  runtime an app uses for shared code, which draws each tag as the native
-  component and in a development build warns about a tag a phone does not
-  draw. `metro.config.ts` gives it the files under `proof`.
-- **`tests/proof.jest.tsx` draws it** with the native runtime and presses
-  through its screens, and fails on any warning about shared code.
-- **`tsconfig.proof.json` types its tags** as the web's elements.
+`metro.config.ts` gives the app's files `@fusion.dev/helix/jsx-runtime`, as
+the app's own Metro config does. The app's specs, its website, and the check
+that its code names no platform are its own, in `helix/proof`.
 
 ## Scripts
 
@@ -50,7 +45,7 @@ at `helix://proof`, where each tag is the native component.
 | `export` | Runs `bundle`, then writes the manifests into `dist` for the base address given as `--base` |
 | `serve` | Serves `dist` as the site does, at the address the export was written for |
 | `start` | Starts Metro, for Expo Go on a simulator or on a phone on your network |
-| `test` | Draws the proof page with the native runtime and presses through its screens |
+| `test` | Draws the shared-code checks with the native runtime |
 | `typecheck` | Checks the app, and the scripts and Metro config, with their own types |
 
 The app reaches the workspace packages through what each one exports, so they
@@ -144,7 +139,7 @@ another, at once. The run keeps these for seven days:
 | `motion.yaml` | Pauses and starts the motion of Icon, Badge, Progress, and Skeleton with Motion Toggle |
 | `navigation.yaml` | Presses destinations, which the page marks current, along a row and down a column |
 | `numbers.yaml` | Reads Trend's numbers in German, compact and as a percent |
-| `proof.yaml` | Opens a project on the proof page, presses each tab, archives the project, and goes back to the list |
+| `proof.yaml` | Opens a project in the proof app, presses each tab, archives the project, goes back to the list, and opens every project's activity from the header |
 | `radio.yaml` | Chooses radios |
 | `readings.yaml` | Reads the values of Meter and Progress |
 | `right-to-left.yaml` | Draws the gallery right to left, takes a screenshot of the examples whose offsets follow the direction, and sets it back |

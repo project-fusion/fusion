@@ -9,7 +9,7 @@ import { Bleed, Described, Onward, styles } from './page'
 import type { Routes } from './routes'
 import { color } from './tokens'
 
-/** The families, each opening its examples, the proof page, the list of 1,000 rows, and the appearance setting. */
+/** The families, each opening its examples, the proof app, the list of 1,000 rows, and the appearance setting. */
 export function Home({ navigation }: NativeStackScreenProps<Routes, 'Home'>) {
   const tokens = useTokens()
   const muted = { color: color(tokens, 'color-foreground-muted') }
@@ -42,7 +42,7 @@ export function Home({ navigation }: NativeStackScreenProps<Routes, 'Home'>) {
       <Bleed>
         <HelixList label="Pages" onAction={() => navigation.navigate('Proof')} selectionMode="none">
           <HelixListItem
-            description="A project dashboard written once for the web and a phone"
+            description="A project dashboard on Expo Router, written once for the web and a phone"
             end={<Onward />}
             value="proof"
           >

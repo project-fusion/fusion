@@ -64,13 +64,12 @@
       "env": ["SOURCE_DATE_EPOCH"],
       "outputs": ["dist/**"]
     },
-    // **The proof page's specs draw the native runtime's components from its
+    // **The gallery's specs draw the native runtime's components from its
     // source**, which `components` writes into `helix/native/src/families`. The
-    // native specs write the same files, so these run after them, and the proof
-    // page is an input.
+    // native specs write the same files, so these run after them.
     "@fusion.dev/helix-app#test": {
       "dependsOn": ["^build", "analyze", "@fusion.dev/helix-native#test"],
-      "inputs": ["src/**", "tests/**", "proof/**", "$TURBO_ROOT$/helix/native/src/**"],
+      "inputs": ["src/**", "tests/**", "$TURBO_ROOT$/helix/native/src/**"],
       "outputs": []
     },
     // **The specs read packages this one does not depend on, so their files are
@@ -271,6 +270,22 @@
     "@fusion.dev/helix-neutral#test": {
       "dependsOn": ["^build", "analyze"],
       "inputs": ["scripts/**", "src/**"],
+      "outputs": []
+    },
+    // The proof app's website: the web export of its route tree, under the
+    // base URL `/helix/app/proof` its Expo config names, which the site
+    // serves. It bundles what its workspace packages export, so it waits on
+    // their builds.
+    "@fusion.dev/helix-proof#bundle": {
+      "dependsOn": ["^build", "^analyze"],
+      "outputs": ["dist/**"]
+    },
+    // **The proof app's specs draw the native runtime's components from its
+    // source**, as the gallery's do, so they run after the native specs that
+    // write the same files. Its routes are inputs.
+    "@fusion.dev/helix-proof#test": {
+      "dependsOn": ["^build", "analyze", "@fusion.dev/helix-native#test"],
+      "inputs": ["app/**", "src/**", "tests/**", "$TURBO_ROOT$/helix/native/src/**"],
       "outputs": []
     },
     // `token-layer` writes `src/tokens.css` from `src/_modes.css` and the
@@ -486,13 +501,14 @@
       "persistent": true
     },
     // **The gallery Expo Go opens, copied into `public/helix/app` with
-    // manifests for this deploy's own address.** Uncached, because the address
+    // manifests for this deploy's own address, and the proof app's website
+    // into `public/helix/app/proof`.** Uncached, because the address
     // differs on every preview and the manifests take a second to write; the
     // bundling it waits on is the cached part. Beside `build`, which does not
     // wait for it: `vercel.json` runs both, and Vercel reads `public` after.
     "@fusion.dev/site#helix-app": {
       "cache": false,
-      "dependsOn": ["@fusion.dev/helix-app#bundle"],
+      "dependsOn": ["@fusion.dev/helix-app#bundle", "@fusion.dev/helix-proof#bundle"],
       "passThroughEnv": [
         "HELIX_APP_BASE",
         "SOURCE_DATE_EPOCH",

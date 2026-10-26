@@ -103,6 +103,10 @@
       "types": "./dist/utils/reorder/reorder.d.ts",
       "default": "./dist/utils/reorder/reorder.js"
     },
+    "./route-paths": {
+      "types": "./dist/utils/route-paths/route-paths.d.ts",
+      "default": "./dist/utils/route-paths/route-paths.js"
+    },
     "./select-all": {
       "types": "./dist/utils/select-all/select-all.d.ts",
       "default": "./dist/utils/select-all/select-all.js"

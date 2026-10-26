@@ -192,6 +192,14 @@
       "default": "./dist/empty/index.js"
     },
     "./examples.json": "./examples.json",
+    "./expo-router": {
+      "react-native": {
+        "types": "./dist/expo-router/index.native.d.ts",
+        "default": "./dist/expo-router/index.native.js"
+      },
+      "types": "./dist/expo-router/expo-router.d.ts",
+      "default": "./dist/expo-router/expo-router.js"
+    },
     "./flex": {
       "react-native": {
         "types": "./dist/flex/index.native.d.ts",
@@ -560,6 +568,7 @@
     "@lit-labs/ssr": "^4.1.0",
     "@types/bun": "^1.4.4",
     "@types/react": "^19.3.0",
+    "expo-router": "58.0.17",
     "lit": "^3.2.1",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
@@ -575,6 +584,7 @@
     "lit"
   ],
   "peerDependencies": {
+    "expo-router": "^58.0.0",
     "lit": "^3.2.1",
     "react": "^19",
     "react-native": "*",
@@ -583,6 +593,9 @@
     "react-native-worklets": "*"
   },
   "peerDependenciesMeta": {
+    "expo-router": {
+      "optional": true
+    },
     "react": {
       "optional": true
     },
