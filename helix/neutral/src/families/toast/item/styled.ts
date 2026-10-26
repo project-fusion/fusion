@@ -1,6 +1,5 @@
 import {
   difference,
-  first,
   list,
   measured,
   mix,
@@ -67,7 +66,7 @@ export default styles(
     const decelerate = token('easing-decelerate')
     const accelerate = token('easing-accelerate')
     const padding = hook.itemPadding
-    const tone = first(hook.toneColor, own.severity, token('color-foreground-muted'))
+    const tone = hook.toneColor
     const enter = own.enter(token('space-lg'))
     const drain = ['helix-toast-drain', measured('toast-duration', '0ms'), 'linear', 'forwards']
     return [
@@ -89,7 +88,7 @@ export default styles(
             ['opacity', normal, decelerate],
             ['translate', normal, decelerate],
           ),
-          inlineSize: first(hook.inlineSize, own.width, '22rem'),
+          inlineSize: hook.inlineSize,
           maxInlineSize: own.most('100%'),
         }),
         native([rule({ maxInlineSize: '100%' })]),

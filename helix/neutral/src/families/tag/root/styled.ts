@@ -1,4 +1,4 @@
-import { first, inherit, mix, product, token, web } from '../../../style.js'
+import { inherit, mix, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -59,11 +59,11 @@ export default styles(
     on('host', [
       rule({
         alignItems: 'center',
-        backgroundColor: first(hook.backgroundColor, own.fill),
+        backgroundColor: hook.backgroundColor,
         blockSize: own.height,
-        border: [token('border-thin'), 'solid', first(hook.borderColor, own.edge)],
+        border: [token('border-thin'), 'solid', hook.borderColor],
         borderRadius: hook.radius(token('radii-sm')),
-        color: first(hook.foregroundColor, own.label),
+        color: hook.foregroundColor,
         display: 'inline-flex',
         fontSize: own.text,
         fontWeight: hook.fontWeight,

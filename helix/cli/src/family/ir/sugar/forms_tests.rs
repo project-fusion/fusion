@@ -15,16 +15,14 @@ fn table(header: &str, rules: &str) -> String {
 }
 
 /// What a table compiles to, over a source written with `render` or none.
-fn compiled(source: &str, over: Option<&Source>) -> Result<(String, Vec<String>), String> {
-    let (lit, notes) = desugar_with(&default_export(source)?, over)?;
+fn compiled(source: &str, over: Option<&Source>) -> Result<String, String> {
+    let lit = desugar_with(&default_export(source)?, over)?;
     let family = styled(&lit)?;
-    Ok((serde_json::to_string(&family.rules).unwrap(), notes))
+    Ok(serde_json::to_string(&family.rules).unwrap())
 }
 
 fn ir(source: &str) -> String {
-    compiled(source, None)
-        .unwrap_or_else(|why| panic!("{why}"))
-        .0
+    compiled(source, None).unwrap_or_else(|why| panic!("{why}"))
 }
 
 fn refused(source: &str, over: Option<&Source>) -> String {
@@ -100,8 +98,8 @@ fn the_header_gives_each_hook_and_private_value_its_default_once() {
 }
 
 #[test]
-fn a_hook_read_with_several_fallbacks_is_noted_and_a_default_that_reads_itself_refused() {
-    let (_, notes) = compiled(
+fn a_fallback_that_repeats_the_default_and_a_default_that_reads_itself_are_refused() {
+    compiled(
         &table(
             "hooks: { color: token('ink'), size: null }",
             "({ hook, on, rule }) => [on('host', [rule({ color: hook.color, outlineColor: hook.color('red'), blockSize: hook.size(1), inlineSize: hook.size(1) })])]",
@@ -109,10 +107,27 @@ fn a_hook_read_with_several_fallbacks_is_noted_and_a_default_that_reads_itself_r
         None,
     )
     .unwrap();
-    assert_eq!(
-        notes,
-        ["the hook `color` is read with 2 different fallbacks: give it one default in `hooks`, or keep each as its rule's own"]
+    for read in ["hook.color(token('ink'))", "first(hook.color, token('ink'))"] {
+        let repeated = refused(
+            &table(
+                "hooks: { color: token('ink') }",
+                &format!("({{ hook, on, rule }}) => [on('host', [rule({{ color: {read} }})])]"),
+            ),
+            None,
+        );
+        assert!(
+            repeated.contains("`hook.color(…)` repeats the default `hooks` gives it: write `hook.color`"),
+            "{repeated}"
+        );
+    }
+    let own = refused(
+        &table(
+            "own: { buttonInk: 'red' }",
+            "({ on, own, rule }) => [on('host', [rule({ color: own.buttonInk('red') })])]",
+        ),
+        None,
     );
+    assert!(own.contains("write `own.buttonInk`"), "{own}");
     let itself = refused(
         &table(
             "hooks: ({ own }) => ({ color: own.ink }), own: { ink: own.ink }",
@@ -230,6 +245,25 @@ fn a_platforms_group_says_its_platform_of_each_rule_inside() {
         nested.contains("inside another platform's group"),
         "{nested}"
     );
+    for rule in [
+        "web([rule({ web: { cursor: 'pointer' } })])",
+        "web([rule({ cursor: web('pointer') })])",
+        "rule({ platform: 'web' }, { web: { cursor: 'pointer' } })",
+    ] {
+        let said = refused(
+            &table("", &format!("({{ on, rule }}) => [on('host', [{rule}])]")),
+            None,
+        );
+        assert!(
+            said.contains("inside a rule that is the web's alone says nothing"),
+            "{said}"
+        );
+    }
+    /* A phone's own rule may spread a set both platforms read. */
+    ir(&table(
+        "",
+        "({ on, rule }) => [on('host', [native([rule({ cursor: web('pointer'), opacity: 1 })])])]",
+    ));
 }
 
 #[test]
@@ -292,9 +326,7 @@ fn tab() -> Source {
 fn a_name_alone_resolves_to_the_parts_attribute_a_state_or_a_prop() {
     let source = tab();
     let resolved = |rules: &str| {
-        compiled(&table("", rules), Some(&source))
-            .unwrap_or_else(|why| panic!("{why}"))
-            .0
+        compiled(&table("", rules), Some(&source)).unwrap_or_else(|why| panic!("{why}"))
     };
     assert_eq!(
         resolved("({ on, rule }) => [on('tab', [rule({ hover: true, disabled: false }, { opacity: 1 })])]"),

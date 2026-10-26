@@ -1,4 +1,4 @@
-import { first, fn, list, mix, native, product, scheme, sum, token, web } from '../../../style.js'
+import { fn, list, mix, native, product, scheme, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -64,7 +64,7 @@ export default styles(
           own: {
             color: token('color-foreground-muted'),
             ground: token('color-background'),
-            tint: first(hook.toneColor, own.color),
+            tint: hook.toneColor,
           },
           alignItems: 'center',
           backgroundColor: hook.backgroundColor(token('color-surface-sunken')),

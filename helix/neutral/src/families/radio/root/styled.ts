@@ -59,7 +59,7 @@ export default styles(
         display: 'inline-flex',
         gap: token('space-xs'),
       }),
-      web([rule({ has: 'disabled' }, { web: { cursor: 'default' } })]),
+      web([rule({ has: 'disabled' }, { cursor: 'default' })]),
       rule(
         { separation: ['filled', 'outlined'] },
         {

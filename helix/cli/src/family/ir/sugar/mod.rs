@@ -48,12 +48,14 @@
 //! `hook.color` and `own.tabJustify` with the default, and `hook.color(x)` is
 //! the site's own fallback. `first(a, b, fallback)` is the chain of fallbacks
 //! read left to right, and `ownOf(family, name)` another family's private
-//! value, as `hookOf()` reads its hook. A note says which hooks are read
-//! with several fallbacks.
+//! value, as `hookOf()` reads its hook. A site's fallback that only repeats
+//! the header's default is refused, so a reader sees at a glance which sites
+//! differ.
 //!
 //! **`web([...])` and `native([...])` are groups of rules one platform's
 //! alone**, and a set's `web: { cursor: 'pointer' }` is declarations a phone
-//! does not have, each written where it stands.
+//! does not have, each written where it stands. A rule that is the web's
+//! alone holds no `web` block and no `web()` value, which say nothing there.
 //!
 //! **Over a headless source written with `render`, a condition's name is
 //! resolved against the source**: a name alone is a prop, a custom state, or
@@ -107,17 +109,17 @@ const FRAGMENT_GIVEN: &[&str] = &["hook", "keyframes", "on", "own", "rule"];
 /// not, or names a hook or a private value it does not declare.
 #[cfg(test)]
 pub fn desugar(export: &Lit) -> Result<Lit, String> {
-    desugar_with(export, None).map(|(lit, _)| lit)
+    desugar_with(export, None)
 }
 
 /// As [`desugar`], over the headless source the table styles where it is
-/// written with `render`, with the notes the header's defaults raise.
+/// written with `render`.
 ///
 /// # Errors
 ///
 /// As [`desugar`] says, and a condition's name that resolves to nothing in
 /// the source, or to two things.
-pub fn desugar_with(export: &Lit, source: Option<&Source>) -> Result<(Lit, Vec<String>), String> {
+pub fn desugar_with(export: &Lit, source: Option<&Source>) -> Result<Lit, String> {
     let Lit::Call(helper, arguments) = export else {
         return Err(STYLES.to_owned());
     };
@@ -180,14 +182,10 @@ pub fn desugar_with(export: &Lit, source: Option<&Source>) -> Result<(Lit, Vec<S
     names.source = source.map(|source| source.with_props(&styled_props));
     let rules = names.items(body, "")?;
     names.unused()?;
-    let notes = names.notes();
     fields.push(("rules".to_owned(), Lit::Array(rules)));
-    Ok((
-        Lit::Call(
-            "family".to_owned(),
-            vec![Lit::Text(prefix), Lit::Object(fields)],
-        ),
-        notes,
+    Ok(Lit::Call(
+        "family".to_owned(),
+        vec![Lit::Text(prefix), Lit::Object(fields)],
     ))
 }
 
@@ -307,11 +305,9 @@ struct Names {
     defaults: BTreeMap<String, Lit>,
     /// The defaults being read, so one that reads itself is refused.
     resolving: Vec<String>,
-    /// Whether the header gives the hooks' defaults, which the notes are
-    /// about.
-    defaulted: bool,
-    /// The fallbacks each hook is read with, by its name.
-    sites: BTreeMap<String, BTreeSet<String>>,
+    /// The platform the rule being read is alone on, so a `web` block or a
+    /// `web()` value inside the web's own is refused.
+    platform: Option<String>,
     /// The headless source written with `render` the conditions resolve
     /// against, with the table's own props.
     source: Option<Source>,
@@ -320,10 +316,9 @@ struct Names {
 impl Names {
     fn new(prefix: &str) -> Self {
         Self {
-            defaulted: false,
             defaults: BTreeMap::new(),
             resolving: Vec::new(),
-            sites: BTreeMap::new(),
+            platform: None,
             source: None,
             groups: 0,
             hooks: Vec::new(),
@@ -388,9 +383,6 @@ impl Names {
                 ))
             }
         };
-        if field == "hooks" {
-            self.defaulted = true;
-        }
         let mut read = Vec::new();
         for (key, default) in entries {
             if key.contains('-') {
@@ -408,24 +400,6 @@ impl Names {
             read.push((key.clone(), name));
         }
         Ok(read)
-    }
-
-    /// A note for each hook read with several fallbacks in a table whose
-    /// header gives the hooks' defaults.
-    fn notes(&self) -> Vec<String> {
-        if !self.defaulted {
-            return Vec::new();
-        }
-        self.sites
-            .iter()
-            .filter(|(_, fallbacks)| fallbacks.len() > 1)
-            .map(|(name, fallbacks)| {
-                format!(
-                    "the hook `{name}` is read with {} different fallbacks: give it one default in `hooks`, or keep each as its rule's own",
-                    fallbacks.len()
-                )
-            })
-            .collect()
     }
 
     /// Refuses a hook or a private value declared and never used, so each

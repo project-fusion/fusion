@@ -1,4 +1,4 @@
-import { first, list, mix, native, product, sum, token, web } from '../../../style.js'
+import { list, mix, native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -50,7 +50,7 @@ export default styles(
         rule({
           own: {
             tone: token('color-info'),
-            color: first(hook.accentColor, own.tone),
+            color: hook.accentColor,
             bar: hook.barThickness,
             inset: hook.padding,
           },

@@ -1,6 +1,6 @@
 import printEconomy from '../../../fragments/print-economy.js'
 import visuallyHidden from '../../../fragments/visually-hidden.js'
-import { first, native, token } from '../../../style.js'
+import { native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -42,7 +42,7 @@ export default styles(
     props: [prop('color-by', ['judgment', 'movement'])],
     stylesheet: 'trend/root/trend-root.generated.css',
   },
-  ({ hook, include, on, own, rule }) => [
+  ({ hook, include, on, rule }) => [
     on('host', [
       rule({
         alignItems: 'center',
@@ -54,7 +54,7 @@ export default styles(
       }),
       /* Gray until told what good means. */
       rule({
-        color: first(hook.color, own.color),
+        color: hook.color,
         own: { color: hook.neutralColor },
       }),
       /* The judgment, and the attribute pairs that stand in for it served. */

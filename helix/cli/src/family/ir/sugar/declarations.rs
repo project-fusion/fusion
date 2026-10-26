@@ -24,6 +24,7 @@ impl Names {
                     for (key, value) in pairs {
                         /* Declarations a phone does not have, each where it stands. */
                         if key == "web" {
+                            self.alone("a `web` block")?;
                             let Lit::Object(web) = value else {
                                 return Err(
                                     "`web` in a `set` is an object of declarations".to_owned()
@@ -107,15 +108,23 @@ impl Names {
                 match helper.split_once('.') {
                     Some(("hook", key)) => {
                         let name = self.hook_name(key)?;
-                        self.site(&name, arguments.first());
+                        self.repeats("hook", key, &name, arguments.first())?;
                         Ok(Lit::Call("hook".to_owned(), spelled(name, arguments)))
                     }
-                    Some(("own", key)) => Ok(Lit::Call("own".to_owned(), spelled(self.own_name(key)?, arguments))),
+                    Some(("own", key)) => {
+                        let name = self.own_name(key)?;
+                        self.repeats("own", key, &name, arguments.first())?;
+                        Ok(Lit::Call("own".to_owned(), spelled(name, arguments)))
+                    }
                     Some(_) => Err(format!("`{helper}()` is not in the vocabulary")),
                     None if helper == "hook" || helper == "own" => Err(format!(
                         "`{helper}('…')` is the older spelling: `{helper}.name` reads one the source declares"
                     )),
                     None if helper == "import" => Err("an imported module is not a value".to_owned()),
+                    None if helper == "web" => {
+                        self.alone("a `web()` value")?;
+                        Ok(Lit::Call(helper.clone(), arguments))
+                    }
                     None => Ok(Lit::Call(helper.clone(), arguments)),
                 }
             }
@@ -139,9 +148,6 @@ impl Names {
     fn defaulted_read(&mut self, kind: &str, name: &str) -> Result<Lit, String> {
         let key = format!("{kind} {name}");
         let Some(default) = self.defaults.get(&key).cloned() else {
-            if kind == "hook" {
-                self.site(name, None);
-            }
             return Ok(Lit::Call(kind.to_owned(), vec![Lit::Text(name.to_owned())]));
         };
         if self.resolving.contains(&key) {
@@ -151,21 +157,53 @@ impl Names {
         let fallback = self.value(&default);
         self.resolving.pop();
         let fallback = fallback?;
-        if kind == "hook" {
-            self.site(name, Some(&fallback));
-        }
         Ok(Lit::Call(
             kind.to_owned(),
             vec![Lit::Text(name.to_owned()), fallback],
         ))
     }
 
-    /// Records the fallback a hook is read with, for the notes.
-    fn site(&mut self, name: &str, fallback: Option<&Lit>) {
-        self.sites
-            .entry(name.to_owned())
-            .or_default()
-            .insert(fallback.map_or_else(String::new, |fallback| format!("{fallback:?}")));
+    /// Refuses `what`, a `web` block or a `web()` value, in a rule that is
+    /// the web's alone, where it says nothing. A phone's own rule may still
+    /// spread a set both platforms read, whose web values it leaves out.
+    fn alone(&self, what: &str) -> Result<(), String> {
+        if self.platform.as_deref() == Some("web") {
+            return Err(format!(
+                "{what} inside a rule that is the web's alone says nothing: write what it holds in the rule's set"
+            ));
+        }
+        Ok(())
+    }
+
+    /// Refuses a site's fallback that is the header's default for the same
+    /// read, which `hook.x` alone already reads.
+    fn repeats(
+        &mut self,
+        kind: &str,
+        key: &str,
+        name: &str,
+        fallback: Option<&Lit>,
+    ) -> Result<(), String> {
+        let Some(fallback) = fallback else {
+            return Ok(());
+        };
+        let held = format!("{kind} {name}");
+        let Some(default) = self.defaults.get(&held).cloned() else {
+            return Ok(());
+        };
+        if self.resolving.contains(&held) {
+            return Ok(());
+        }
+        self.resolving.push(held);
+        let default = self.value(&default);
+        self.resolving.pop();
+        if default? == *fallback {
+            let header = if kind == "hook" { "hooks" } else { "own" };
+            return Err(format!(
+                "`{kind}.{key}(…)` repeats the default `{header}` gives it: write `{kind}.{key}`"
+            ));
+        }
+        Ok(())
     }
 
     /// `first(a, b, fallback)`: `a` with `b` as its fallback, and `b` with
@@ -193,11 +231,13 @@ impl Names {
         match read {
             Lit::Member(object, key) if object == "hook" => {
                 let name = self.hook_name(key)?;
-                self.site(&name, Some(&fallback));
+                self.repeats("hook", key, &name, Some(&fallback))?;
                 Ok(call("hook", vec![Lit::Text(name)], fallback))
             }
             Lit::Member(object, key) if object == "own" => {
-                Ok(call("own", vec![Lit::Text(self.own_name(key)?)], fallback))
+                let name = self.own_name(key)?;
+                self.repeats("own", key, &name, Some(&fallback))?;
+                Ok(call("own", vec![Lit::Text(name)], fallback))
             }
             Lit::Call(helper, arguments) => match (helper.as_str(), arguments.as_slice()) {
                 ("hookOf", [of @ Lit::Text(_), name @ Lit::Text(_)]) => {

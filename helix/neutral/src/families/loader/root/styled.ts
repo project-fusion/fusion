@@ -1,4 +1,4 @@
-import { first, native, product, token, web } from '../../../style.js'
+import { native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -83,8 +83,8 @@ export default styles(
       native([
         rule({
           justifyContent: 'center',
-          minBlockSize: first(hook.size, own.size),
-          minInlineSize: first(hook.size, own.size),
+          minBlockSize: hook.size,
+          minInlineSize: hook.size,
         }),
       ]),
       /* On paper, a loader promises what will not come. */
@@ -97,10 +97,10 @@ export default styles(
     ]),
     on('svg', [
       rule({
-        animation: ['helix-loader-turn', first(hook.duration, own.turn), 'linear', 'infinite'],
-        blockSize: first(hook.size, own.size),
+        animation: ['helix-loader-turn', hook.duration, 'linear', 'infinite'],
+        blockSize: hook.size,
         gridArea: '1 / 1',
-        inlineSize: first(hook.size, own.size),
+        inlineSize: hook.size,
       }),
       rule({ reducedMotion: true }, { animationDuration: own.crawl }),
       rule({ variant: 'pulse' }, { animation: 'none' }),
@@ -113,7 +113,7 @@ export default styles(
         fill: 'none',
         opacity: 0.18,
         stroke: hook.trackColor,
-        strokeWidth: first(hook.trackWidth, own.stroke),
+        strokeWidth: hook.trackWidth,
       }),
       rule({ reducedMotion: true }, { animation: 'none' }),
       rule({ variant: 'pulse' }, { display: 'none' }),
@@ -125,7 +125,7 @@ export default styles(
         stroke: hook.color,
         strokeDasharray: '50, 100',
         strokeLinecap: 'round',
-        strokeWidth: first(hook.trackWidth, own.stroke),
+        strokeWidth: hook.trackWidth,
       }),
       rule({ variant: 'pulse' }, { display: 'none' }),
     ]),
@@ -141,7 +141,7 @@ export default styles(
         gridArea: '1 / 1',
         inlineSize: own.markSize,
         justifyContent: 'center',
-        own: { markSize: product(first(hook.size, own.size), 0.4) },
+        own: { markSize: product(hook.size, 0.4) },
       }),
       rule({ reducedMotion: true }, { animation: 'none' }),
       /* Opacity alone, where the default appearance also scales. */

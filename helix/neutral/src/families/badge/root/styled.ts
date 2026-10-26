@@ -212,7 +212,7 @@ export default styles(
     ]),
     on({ region: 'icon', slotted: '*' }, [
       native([rule({ state: 'unset' }, { margin: quotient(own.inset, 2) })]),
-      rule({ '--icon-size': first(hook.iconSize, own.text), flex: 'none' }),
+      rule({ '--icon-size': hook.iconSize, flex: 'none' }),
     ]),
     keyframes('badge-pulse', {
       '0%, 100%': { transform: 'scale(1)' },

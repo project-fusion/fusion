@@ -156,15 +156,16 @@ export default styles(
   `hooks: ({ own }) => ({ color: token('color-foreground-muted') })`, and
   `own` each private value's, by its whole name in camelCase, `null` for one
   with none. A rule then reads `hook.color`, and `hook.color(fallback)` is
-  its own fallback. `helix family build` notes a hook read with several
-  fallbacks.
+  its own fallback. `helix family build` refuses a fallback that is the
+  default the header gives, which `hook.color` reads already.
 - `first(own.tabHeight, hook.blockSize, token('size-control'))` is the first
   of several reads that is set, and the last argument where none is.
 - `ownOf('tabs', 'dismiss-rest', 1)` reads another family's private value,
   as `hookOf()` reads its hook.
 - `web([rule(...)])` and `native([rule(...)])` are rules one platform's
   alone, and a set's `web: { cursor: 'pointer' }` holds declarations a phone
-  does not have.
+  does not have. A rule that is the web's alone holds no `web` block and no
+  `web()` value, which would say nothing there.
 - `include(field)` takes in a fragment imported from `src/fragments`, written
   with `fragment()`, or `declarations()` for a fragment a `set` takes in.
 - `over` names the element a table is drawn over, as Copy Button's names

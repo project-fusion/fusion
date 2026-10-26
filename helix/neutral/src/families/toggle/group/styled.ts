@@ -1,16 +1,6 @@
 import field from '../../../fragments/field.js'
 import fieldStacked from '../../../fragments/field-stacked.js'
-import {
-  difference,
-  first,
-  list,
-  measured,
-  native,
-  product,
-  sum,
-  token,
-  web,
-} from '../../../style.js'
+import { difference, list, measured, native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import group from './headless.js'
@@ -155,7 +145,7 @@ export default styles(
           { 'selection-mode': 'multiple' },
           {
             own: {
-              togglePressedSurface: first(hook.indicatorColor, own.indicatorSurface),
+              togglePressedSurface: hook.indicatorColor,
               togglePressedShadow: hook.indicatorShadow,
             },
           },
@@ -171,7 +161,7 @@ export default styles(
        pressed, since one marker cannot travel to two places. */
     on('indicator', [
       rule({
-        backgroundColor: first(hook.indicatorColor, own.indicatorSurface),
+        backgroundColor: hook.indicatorColor,
         /* The track always sets it, and the marker and the items inherit it there. */
         borderRadius: own.toggleRadius,
         boxShadow: hook.indicatorShadow,
@@ -202,7 +192,7 @@ export default styles(
       [
         web([
           rule({
-            backgroundColor: first(hook.indicatorColor, own.indicatorSurface),
+            backgroundColor: hook.indicatorColor,
             borderRadius: own.toggleRadius,
             boxShadow: hook.indicatorShadow,
           }),

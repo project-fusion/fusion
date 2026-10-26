@@ -142,13 +142,8 @@ fn one(family: &Path, folder: &Path) -> Result<Compiled, Failure> {
         .filter(|_| rendered)
         .map(ir::sugar::Source::of);
     let mut over = None;
-    let mut sugar_notes = Vec::new();
     let styled = export(&source).and_then(|export| {
         ir::sugar::desugar_with(&export, context.as_ref())
-            .map(|(export, notes)| {
-                sugar_notes = notes;
-                export
-            })
             .inspect(|export| over = underlay::over(export))
             .and_then(|export| ir::expand(&export, &mut loader(src)))
             .and_then(|export| ir::styled(&export))
@@ -161,8 +156,7 @@ fn one(family: &Path, folder: &Path) -> Result<Compiled, Failure> {
     if !unresolved.is_empty() {
         return Err(cannot_compile(folder, unresolved.join("\n")));
     }
-    let mut notes = ir::checks::check(&compiled).map_err(|why| cannot_compile(&source, why))?;
-    notes.extend(sugar_notes);
+    let notes = ir::checks::check(&compiled).map_err(|why| cannot_compile(&source, why))?;
     let web = css::emit(&compiled);
     Ok(Compiled {
         notes,
