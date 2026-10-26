@@ -49,6 +49,8 @@ impl<'a> Reader<'a, '_> {
             Expression::StringLiteral(text) => Ok(Lit::Text(text.value.to_string())),
             Expression::NumericLiteral(number) => Ok(Lit::Number(number.value)),
             Expression::BooleanLiteral(flag) => Ok(Lit::Bool(flag.value)),
+            Expression::NullLiteral(_) => Ok(Lit::Null),
+            Expression::ParenthesizedExpression(inner) => self.read(&inner.expression),
             Expression::ArrayExpression(array) => self.array(array),
             Expression::ObjectExpression(object) => {
                 let mut fields: Vec<(String, Lit)> = Vec::new();
@@ -61,10 +63,14 @@ impl<'a> Reader<'a, '_> {
                             if property.computed {
                                 return Err(self.refused(property.span, "a computed key"));
                             }
-                            (
-                                vec![(key.to_string(), self.read(&property.value)?)],
-                                property.span,
-                            )
+                            /* A `headless.tsx` source's part tree, read with
+                            the keys before it, which type what it reads. */
+                            let value = if self.jsx && key == "render" {
+                                super::jsx::render(&property.value, &fields, self.source)?
+                            } else {
+                                self.read(&property.value)?
+                            };
+                            (vec![(key.to_string(), value)], property.span)
                         }
                         ObjectPropertyKind::SpreadProperty(spread) => {
                             (self.spreads(&spread.argument, spread.span)?, spread.span)
