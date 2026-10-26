@@ -5,8 +5,9 @@
 #
 # **Only on the pull requests that can break one**, and not in `verify`, because
 # it installs a framework per template and most changes reach neither. A
-# template's own dependencies, which is what the dependency bot bumps, and the
-# scaffolder are the paths below. A change to the packages a template imports
+# template's own dependencies, which is what the dependency bot bumps, the
+# scaffolder, and `helix/cem`, which writes the typings every template's checker
+# reads, are the paths below. A change to the packages a template imports
 # is `smoke:template`'s question, and `verify` already asks it.
 
 name: templates
@@ -17,6 +18,7 @@ on:
       - .github/workflows/templates.yml
       - fusion/scripts/lib/settle.mjs
       - fusion/scripts/run-template-build.mjs
+      - helix/cem/**
       - helix/cli/src/new.rs
       - helix/create-app/**
       - helix/templates/**

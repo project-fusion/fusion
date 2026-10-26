@@ -58,6 +58,26 @@ correctly. `ugrep`, a drop-in replacement common enough to be on a contributor's
 inverts and the browser jobs are skipped for a change to `helix/styled`. Comparing
 two counts asks nothing of `-v` and means the same thing to every grep.
 
+## The typings run where they can change
+
+`typings` runs `smoke:typings`, which installs the packed tarballs into a project
+per framework under `helix/cem/typings` and runs that framework's own checker
+with `skipLibCheck` off: `tsc` for React, Preact, and Solid, `vue-tsc` for Vue,
+and `svelte-check` for Svelte. Each project writes good usage and guarded bad
+usage, and the runner fails on a guarded line that compiles and on an error
+anywhere else.
+
+**`plan` decides, from the same set the run packs.** `run-typings-test.mjs
+--touched <base>` answers `true` when a change reaches the packages the projects
+install or any workspace package they depend on, `helix/cem`, the manifest
+builder in `helix/cli/src/manifest`, or the runner itself. Those are what the
+typings are written from and what judges them. A package the projects come to
+depend on is in the reach the day they depend on it, with no list here to
+update. An unresolvable base answers `true`.
+
+The five installs and checks run side by side and took 16 seconds on a laptop,
+measured October 25, 2026, after the build and `analyze` that `warm` restores.
+
 ## What every job pays
 
 `setup-bun` caches the binary and not what it installs, so each job used to pay a
