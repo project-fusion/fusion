@@ -1,0 +1,145 @@
+{
+  "replies": [
+    {
+      "reply": {
+        "facts": [
+          {
+            "confidence": 0.95,
+            "episodes": [1],
+            "statement": "Release 0.12 ships on Thursday, October 22."
+          },
+          {
+            "confidence": 0.9,
+            "episodes": [2],
+            "statement": "Dana owns the release notes."
+          },
+          {
+            "confidence": 0.6,
+            "episodes": [3],
+            "statement": "Standup is at 10:00."
+          }
+        ]
+      },
+      "when": ["(October 19, 2026) Planning for 0.12"]
+    },
+    {
+      "reply": {
+        "facts": [
+          {
+            "confidence": 0.88,
+            "episodes": [1],
+            "statement": "Release 0.12 includes the schema migration."
+          },
+          {
+            "confidence": 0.85,
+            "episodes": [1],
+            "statement": "Priya reviews every schema migration before a release ships."
+          },
+          {
+            "confidence": 0.7,
+            "episodes": [2],
+            "statement": "The clock helper fixes the flaky checkout test."
+          }
+        ]
+      },
+      "when": ["(October 20, 2026) The 0.12 release includes"]
+    },
+    {
+      "reply": {
+        "facts": [
+          {
+            "confidence": 0.8,
+            "episodes": [1],
+            "statement": "Priya is out on Thursday, October 22."
+          },
+          {
+            "confidence": 0.78,
+            "episodes": [1],
+            "statement": "Sam covers Priya's reviews while she is out."
+          },
+          {
+            "confidence": 0.65,
+            "episodes": [2],
+            "statement": "The design review is next Tuesday."
+          }
+        ]
+      },
+      "when": ["(October 21, 2026) Priya is out"]
+    },
+    {
+      "reply": {
+        "facts": [
+          {
+            "confidence": 0.75,
+            "contradicts": 9,
+            "episodes": [1],
+            "statement": "Standup is at 9:30 starting next week."
+          },
+          {
+            "confidence": 0.72,
+            "episodes": [2],
+            "statement": "The docs site builds with bun."
+          }
+        ]
+      },
+      "when": ["(October 22, 2026) Standup moves"]
+    },
+    {
+      "reply": {
+        "facts": [
+          {
+            "confidence": 0.68,
+            "episodes": [1],
+            "statement": "Every migration on the release checklist names its reviewer."
+          },
+          {
+            "confidence": 0.9,
+            "episodes": [2],
+            "restates": 2,
+            "statement": "Dana owns the release notes."
+          }
+        ]
+      },
+      "when": ["(October 23, 2026) Retro:"]
+    },
+    {
+      "model": "large",
+      "reply": "Sam reviews the 0.12 schema migration, because Priya is out on Thursday, October 22, the day the release ships.",
+      "when": [
+        "Who reviews the 0.12 schema migration, and when does the release ship?",
+        "Fact: Sam covers Priya's reviews while she is out."
+      ]
+    },
+    {
+      "reply": "Release 0.12 ships on Thursday, October 22. Priya reviews every schema migration, but she is out that day, so Sam reviews the 0.12 migration.",
+      "when": [
+        "Who reviews the 0.12 schema migration, and when does the release ship?",
+        "Fact: Sam covers Priya's reviews while she is out.",
+        "Fact: Priya is out on Thursday, October 22."
+      ]
+    },
+    {
+      "reply": "Release 0.12 ships on Thursday, October 22, and Priya reviews its schema migration before it ships.",
+      "when": ["Who reviews the 0.12 schema migration, and when does the release ship?"]
+    }
+  ],
+  "vectors": {
+    "dimensions": 4,
+    "model": "week",
+    "values": {
+      "Dana owns the release notes.": [0.3, 0.1, 0.1, 0.9],
+      "Every migration on the release checklist names its reviewer.": [0.5, 0.5, 0.1, 0.3],
+      "Priya is out on Thursday, October 22.": [0.6, 0.6, 0.3, 0.0],
+      "Priya reviews every schema migration before a release ships.": [0.6, 0.7, 0.0, 0.1],
+      "Release 0.12 includes the schema migration.": [0.8, 0.3, 0.0, 0.3],
+      "Release 0.12 ships on Thursday, October 22.": [0.9, 0.1, 0.1, 0.1],
+      "Sam covers Priya's reviews while she is out.": [0.6, 0.7, 0.2, 0.1],
+      "Standup is at 9:30 starting next week.": [0.0, 0.1, 0.9, 0.1],
+      "Standup is at 10:00.": [0.0, 0.1, 0.9, 0.0],
+      "The clock helper fixes the flaky checkout test.": [0.1, 0.0, 0.1, 0.9],
+      "The design review is next Tuesday.": [0.1, 0.3, 0.8, 0.0],
+      "The docs site builds with bun.": [0.0, 0.0, 0.2, 0.9],
+      "Who reviews the 0.12 schema migration, and when does the release ship?": [0.7, 0.6, 0.2, 0.1]
+    }
+  }
+}

@@ -2,8 +2,8 @@
 //! repository's own checks behind `x`.
 //!
 //! **Each product's command line is routed, never reimplemented.** `fusion
-//! helix ...` hands the rest of the line to that binary and returns its exit
-//! code, and it works on its own without this one.
+//! helix ...` and `fusion cortex ...` hand the rest of the line to that binary
+//! and return its exit code, and each works on its own without this one.
 //!
 //! **This repository's checks are under `x`, and only in its own builds.**
 //! `workspace`, `prose` and `spec` hold this repository to its conventions, which
@@ -54,7 +54,7 @@ fn shipped() -> &'static str {
 #[derive(Debug, Parser)]
 #[command(
     name = "fusion",
-    about = "The Fusion command line: Helix, and the checks this repository holds itself to.",
+    about = "The Fusion command line: Helix, Cortex, and the checks this repository holds itself to.",
     version = shipped(),
     subcommand_required = true,
     arg_required_else_help = true
@@ -70,8 +70,8 @@ struct Cli {
     reader's and carries no markup. */
     /// Emit machine-readable JSON on stdout.
     ///
-    /// Passed to `helix` when written before its name, and read by every `x`
-    /// verb. A usage error is JSON on stderr.
+    /// Passed to `helix` and `cortex` when written before their names, and
+    /// read by every `x` verb. A usage error is JSON on stderr.
     #[arg(long, global = true)]
     json: bool,
 
@@ -97,6 +97,17 @@ enum Noun {
     #[command(disable_help_flag = true)]
     Helix {
         /// Everything after `helix`, handed over as written.
+        #[arg(allow_hyphen_values = true, trailing_var_arg = true)]
+        args: Vec<String>,
+    },
+    /// Run the Cortex command line: memory, and answers traced to their
+    /// sources.
+    ///
+    /// Everything after `cortex` is passed to it as written, and its exit code
+    /// is returned. Needs `cortex` installed.
+    #[command(disable_help_flag = true)]
+    Cortex {
+        /// Everything after `cortex`, handed over as written.
         #[arg(allow_hyphen_values = true, trailing_var_arg = true)]
         args: Vec<String>,
     },
@@ -146,6 +157,23 @@ const _: () = {
     assert!(Code::Usage as i32 == 2);
     assert!(Code::Internal as i32 == 4);
 };
+/// The line a routed noun hands over.
+///
+/// **The channel flags reach the product**, which takes both, when they are
+/// written before its name: `fusion --json helix scan` would otherwise swallow
+/// `--json` and print prose.
+fn forwarded(cli: &Cli, args: &[String]) -> Vec<String> {
+    let mut forwarded: Vec<String> = Vec::new();
+    if cli.json {
+        forwarded.push("--json".to_owned());
+    }
+    if cli.no_color {
+        forwarded.push("--no-color".to_owned());
+    }
+    forwarded.extend(args.iter().cloned());
+    forwarded
+}
+
 /// The whole command, as the exit code it ends with.
 ///
 /// **A routed noun returns the child's own code**, whatever it was, which is
@@ -161,20 +189,8 @@ const _: () = {
 )]
 fn run(cli: &Cli, paint: Paint) -> Outcome<i32> {
     match &cli.noun {
-        /* **The channel flags reach `helix`**, which takes both, when they are
-        written before its name: `fusion --json helix scan` would otherwise
-        swallow `--json` and print prose. */
-        Noun::Helix { args } => {
-            let mut forwarded: Vec<String> = Vec::new();
-            if cli.json {
-                forwarded.push("--json".to_owned());
-            }
-            if cli.no_color {
-                forwarded.push("--no-color".to_owned());
-            }
-            forwarded.extend(args.iter().cloned());
-            route::to("helix", &forwarded)
-        }
+        Noun::Helix { args } => route::to("helix", &forwarded(cli, args)),
+        Noun::Cortex { args } => route::to("cortex", &forwarded(cli, args)),
         #[cfg(feature = "internal")]
         Noun::X { noun } => x::run(noun, cli.json, paint),
     }

@@ -40,6 +40,29 @@ fn helix() -> PathBuf {
     path
 }
 
+/// The `cortex` binary beside it, built if it is not there yet, for the same
+/// reason as [`helix`].
+fn cortex() -> PathBuf {
+    let mut path = fusion();
+    path.set_file_name(if cfg!(windows) {
+        "cortex.exe"
+    } else {
+        "cortex"
+    });
+    if !path.is_file() {
+        let cargo = std::env::var_os("CARGO").unwrap_or_else(|| "cargo".into());
+        let mut build = Command::new(cargo);
+        build.args(["build", "-p", "fusion-cortex-cli"]);
+        if path.parent().is_some_and(|dir| dir.ends_with("release")) {
+            build.arg("--release");
+        }
+        let status = build.status().expect("cargo runs");
+        assert!(status.success(), "cortex did not build");
+    }
+    assert!(path.is_file(), "no cortex at {}", path.display());
+    path
+}
+
 fn run(binary: &Path, directory: &Path, args: &[&str]) -> Output {
     Command::new(binary)
         .args(args)
@@ -326,4 +349,26 @@ fn a_routed_command_returns_the_child_code() {
         .expect("the binary runs");
     assert_eq!(code(&output), 3, "{}", err(&output));
     assert!(err(&output).starts_with("helix:"), "{}", err(&output));
+}
+
+/// `fusion cortex ...` is `cortex ...`, with `--json` written before the name
+/// handed over and the exit code returned.
+#[test]
+fn cortex_is_routed_with_its_channel_flags() {
+    let sandbox = Sandbox::new("cortex", ORDERED, None);
+    let output = Command::new(fusion())
+        .args(["--json", "cortex", "why"])
+        .current_dir(&sandbox.0)
+        .env("CORTEX_BIN", cortex())
+        .env("CORTEX_STORE", sandbox.0.join("cortex.db"))
+        .env("XDG_CONFIG_HOME", &sandbox.0)
+        .env_remove("CORTEX_CONFIG")
+        .env("NO_COLOR", "1")
+        .output()
+        .expect("the binary runs");
+    assert_eq!(code(&output), 3, "{}", err(&output));
+    assert!(out(&output).is_empty(), "{}", out(&output));
+    let error: serde_json::Value = serde_json::from_str(&err(&output)).expect("a JSON error");
+    assert_eq!(error["code"], 3);
+    assert_eq!(error["error"]["what"], "no answer matches `last`");
 }

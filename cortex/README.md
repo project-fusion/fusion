@@ -7,6 +7,7 @@ Packages are flat inside this folder, one directory each, the same arrangement
 
 | Package | Publishes as | What it is |
 |---|---|---|
+| `cli` | none | the `cortex` command |
 | `core` | none | the substrate itself |
 | `docs` | `cortex-docs` | the documentation as content, versioned with Cortex |
 | `engram` | none | the memory store |
@@ -16,6 +17,7 @@ Packages are flat inside this folder, one directory each, the same arrangement
 | `trace` | none | provenance capture |
 
 Only `docs` publishes today, and the release stamps its number into the manifest.
+The `cortex` command installs with cargo from the repository.
 The crates are not on the registry yet and rest at `0.0.0-dev`, because nothing
 stamps them.
 

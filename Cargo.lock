@@ -1190,6 +1190,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "fusion-cortex-cli"
+version = "0.0.0-dev"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "clap",
+ "fusion-cortex-core",
+ "fusion-cortex-engram",
+ "fusion-cortex-provider",
+ "fusion-cortex-recall",
+ "fusion-cortex-trace",
+ "fusion-rules",
+ "futures-util",
+ "serde",
+ "serde_json",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
 name = "fusion-cortex-core"
 version = "0.0.0-dev"
 dependencies = [

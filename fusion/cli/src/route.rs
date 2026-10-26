@@ -69,11 +69,17 @@ fn installed(name: &str) -> Option<PathBuf> {
         .find(|path| path.is_file())
 }
 
-/// The npm package each product's command ships in, which is what to install.
-fn package(product: &str) -> String {
+/// The command that installs each product's command line.
+///
+/// `cortex` is not on npm yet, so it installs from the repository with cargo.
+fn install(product: &str) -> String {
     match product {
-        "helix" => "@fusion.dev/helix-cli".to_owned(),
-        other => format!("@fusion.dev/{other}"),
+        "helix" => "npm install --save-dev @fusion.dev/helix-cli".to_owned(),
+        "cortex" => {
+            "cargo install --git https://github.com/project-fusion/fusion fusion-cortex-cli"
+                .to_owned()
+        }
+        other => format!("npm install --save-dev @fusion.dev/{other}"),
     }
 }
 
@@ -103,7 +109,7 @@ pub fn to(product: &str, args: &[String]) -> Outcome<i32> {
                  node_modules/.bin, and `{product}` on PATH"
             ),
         )
-        .hint(format!("npm install --save-dev {}", package(product)))),
+        .hint(install(product))),
         Err(error) => Err(Failure::new(
             Code::Internal,
             format!("could not run `{}`", binary.display()),
