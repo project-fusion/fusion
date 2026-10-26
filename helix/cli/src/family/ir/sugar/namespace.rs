@@ -23,7 +23,8 @@
 //!
 //! **The older spellings keep their meaning**: `part: { ... }`, `state: ...`,
 //! and every condition the vocabulary names, such as `hover`. On a part,
-//! `within: { host: { disabled: false } }` is the host's own `:disabled`, and
+//! `within: { host: { disabled: false } }` is the host's own `:disabled`,
+//! beside any other part the rule is within, and
 //! `within: { host: ['hover', 'focusWithin'] }` is any one of several, as a
 //! `when` of several alternatives is; both hold in every table.
 
@@ -288,20 +289,37 @@ fn host(read: Vec<Fields>, value: &Lit) -> Result<Vec<Fields>, String> {
                 }
                 Ok(each)
             }
-            [(part, Lit::Object(inner))]
-                if part == "host" && inner.iter().any(|(key, _)| key == "disabled") =>
+            /* The host's `disabled`, taken out first, beside whatever else
+            the rule is within, as `{ host: { disabled: false }, field: {
+            hover: true } }`. */
+            entries
+                if entries.iter().any(|(part, inner)| {
+                    part == "host"
+                        && matches!(inner, Lit::Object(inner) if inner.iter().any(|(key, _)| key == "disabled"))
+                }) =>
             {
                 let mut read = read;
-                for (_, disabled) in inner.iter().filter(|(key, _)| key == "disabled") {
-                    read = with(&read, "disabled", disabled.clone());
+                let mut rest: Fields = Vec::new();
+                for (part, inner) in entries {
+                    match inner {
+                        Lit::Object(inner) if part == "host" => {
+                            for (_, disabled) in inner.iter().filter(|(key, _)| key == "disabled") {
+                                read = with(&read, "disabled", disabled.clone());
+                            }
+                            let host: Fields = inner
+                                .iter()
+                                .filter(|(key, _)| key != "disabled")
+                                .cloned()
+                                .collect();
+                            if !host.is_empty() {
+                                rest.push((part.clone(), Lit::Object(host)));
+                            }
+                        }
+                        _ => rest.push((part.clone(), inner.clone())),
+                    }
                 }
-                let rest: Fields = inner
-                    .iter()
-                    .filter(|(key, _)| key != "disabled")
-                    .cloned()
-                    .collect();
                 if !rest.is_empty() {
-                    read = with(&read, "within", within(Lit::Object(rest)));
+                    read = with(&read, "within", Lit::Object(rest));
                 }
                 Ok(read)
             }
