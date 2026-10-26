@@ -4,10 +4,12 @@ import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { lintOf, type ManifestSource } from '@fusion.dev/helix-diagnostics'
 import {
+  type Anatomy,
   catalog,
   type ExampleSource,
   type NativeRecord,
   publishedBy,
+  withAnatomy,
   withPlatforms,
 } from './catalog.js'
 import type { HelixManifest, HelixMetadata } from './types.js'
@@ -374,6 +376,27 @@ const nativeOf = (native: string | undefined, cwd: string): NativeRecord => {
 }
 
 /**
+ * What each element is made of on each platform, from `helix family anatomy`
+ * over the neutral sources at `native`, by tag. Empty where the package draws
+ * nothing from them.
+ */
+const anatomyOf = (native: string | undefined, cwd: string): Record<string, Anatomy> => {
+  if (native === undefined) {
+    return {}
+  }
+  const read = spawnSync(process.execPath, [helix(), 'family', 'anatomy', native], {
+    cwd,
+    encoding: 'utf8',
+    maxBuffer: 1024 * 1024 * 16,
+    stdio: ['ignore', 'pipe', 'inherit'],
+  })
+  if (read.status !== 0) {
+    throw new Error(`helix family anatomy exited ${read.status} in ${cwd}`)
+  }
+  return JSON.parse(read.stdout) as Record<string, Anatomy>
+}
+
+/**
  * Writes a package's manifest, then its typings.
  *
  * The manifest is `helix manifest build`'s, which is byte for byte what
@@ -410,12 +433,15 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
     const below = [...new Map([...dependencies, ...peersOf(cwd)])]
       .filter(([dependency]) => dependency.startsWith('@fusion.dev/helix'))
       .map(([, at]) => JSON.parse(readFileSync(at, 'utf8')) as HelixManifest)
-    const families = withPlatforms(
-      publishedBy(
-        catalog([customElementsManifest, ...below], examplesOnDisk(cwd), bubblingOf(cwd)),
-        name,
+    const families = withAnatomy(
+      withPlatforms(
+        publishedBy(
+          catalog([customElementsManifest, ...below], examplesOnDisk(cwd), bubblingOf(cwd)),
+          name,
+        ),
+        nativeOf(options.native, cwd),
       ),
-      nativeOf(options.native, cwd),
+      anatomyOf(options.native, cwd),
     )
     writeFileSync(
       join(cwd, API),
@@ -440,6 +466,9 @@ export const analyze = (options: HelixCemOptions, cwd = process.cwd()): HelixMan
 }
 
 export {
+  type Anatomy,
+  type AnatomyNode,
+  type AnatomySide,
   type ApiMember,
   type Contribution,
   catalog,
@@ -456,6 +485,7 @@ export {
   publishedBy,
   type Render,
   rendersOf,
+  withAnatomy,
   withPlatforms,
 } from './catalog.js'
 export { displayName, familyOf, place, startCase, tierOf } from './naming.js'

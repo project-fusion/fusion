@@ -92,6 +92,7 @@ fn it_negotiates_and_lists_its_tools() {
         [
             "helix_find",
             "helix_family",
+            "helix_anatomy",
             "helix_example",
             "helix_imports",
             "helix_tokens",

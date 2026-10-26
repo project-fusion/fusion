@@ -19,6 +19,7 @@ import {
   getFamilies,
 } from '../../../../../../content/catalog/catalog'
 import { sourceUrl } from '../../../../../../utils/source/source'
+import { ANATOMY_ID, Anatomy, withAnatomy } from './anatomy'
 import { DESCRIPTION, first, MemberTable, NAME, PropertyTable, stacked } from './api-table'
 import { DocumentActions } from './document-actions'
 import { ExampleSummary, NativeReference, NativeUsage, railLinks, WebOnly } from './native-api'
@@ -39,6 +40,7 @@ export function generateStaticParams() {
 const SECTIONS = [
   { id: 'usage', label: 'Usage' },
   { id: 'preview', label: 'Preview' },
+  { id: ANATOMY_ID, label: 'Anatomy' },
   { id: 'api', label: 'API Reference' },
 ] as const
 
@@ -360,6 +362,8 @@ export default async function FamilyDocs({
             )}
           </helix-flex>
 
+          <Anatomy elements={family.elements} native={native} web={web} />
+
           {/* Wide between one element and the next, tight inside each, or there
               is no seam between one element's API and another's. `2xl` because
               that is the top of `Flex`'s scale: the token `space-3xl` exists but
@@ -450,7 +454,9 @@ export default async function FamilyDocs({
           On this page
         </helix-text>
         <helix-outline label="On this page">
-          {SECTIONS.map((section) => (
+          {SECTIONS.filter(
+            (section) => section.id !== ANATOMY_ID || withAnatomy(family.elements).length > 0,
+          ).map((section) => (
             <a
               data-platform={section.id === 'preview' ? web : undefined}
               href={`#${section.id}`}

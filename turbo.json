@@ -686,6 +686,7 @@
         "$TURBO_ROOT$/helix/headless/custom-elements.json",
         "$TURBO_ROOT$/helix/sandbox/custom-elements.json",
         "$TURBO_ROOT$/helix/styled/custom-elements.json",
+        "$TURBO_ROOT$/helix/styled/api.json",
         "$TURBO_ROOT$/helix/*/package.json",
         "$TURBO_ROOT$/helix/headless/src/*/.examples/**",
         "$TURBO_ROOT$/helix/sandbox/src/*/.examples/**",

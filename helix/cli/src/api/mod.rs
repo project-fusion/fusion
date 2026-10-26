@@ -17,8 +17,10 @@
 //! rule, the one `catalog()` follows: the package holding its root supplies its
 //! facts, and every package adds its elements and examples.
 
+mod anatomy;
 mod print;
 
+pub use anatomy::anatomy;
 pub use print::print;
 
 use std::collections::{BTreeMap, HashSet};

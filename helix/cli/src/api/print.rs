@@ -42,6 +42,10 @@ pub fn print(answer: &Value, json: bool) {
         say!("{answer}");
         return;
     }
+    if answer["anatomy"].is_array() {
+        super::anatomy::print(answer);
+        return;
+    }
     if let Some(matches) = answer["matches"].as_array() {
         for found in matches {
             say!("{:<20} {}", text(&found["slug"]), text(&found["summary"]));

@@ -20,6 +20,7 @@
 //! `dist`, where the `react-native` condition of each family's entry names
 //! them.
 
+pub mod anatomy;
 mod details;
 mod emit;
 mod hooks;
