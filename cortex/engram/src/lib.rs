@@ -7,11 +7,19 @@
 //! episodes waiting for that, and a consolidation pass consumes them.
 //!
 //! **Deletion cascades.** [`Memory::forget`] removes a trace's episodes and
-//! every fact derived from one, so deleting a session deletes what it taught.
-//! A fact the removed one had superseded is current again.
+//! every fact that rests on them alone, so deleting a session deletes what it
+//! taught. A fact another episode still supports stays, without the forgotten
+//! source. A fact the removed one had superseded is current again.
+//!
+//! **Every episode and fact carries a [`Scope`].** An episode takes its scope
+//! when it is recorded, and a fact takes the narrowest scope of its sources,
+//! by the rule [`Scope::narrowest`] states.
 //!
 //! [`Memory`] is the reference, and [`store`] holds the same behavior behind a
 //! trait, in memory and in `SQLite`, held to one conformance suite.
+//!
+//! With the `consolidate` feature, [`consolidate`] is the pass that distills
+//! episodes into facts with a model.
 //!
 //! v0 ships episodic and semantic. Procedural memory (distilling repeated
 //! successful action sequences into reusable procedure) is deferred to v1
@@ -28,6 +36,8 @@
 //! memory.assert_fact(Fact::new("on a time-of-use plan", vec![episode], 0.9), None);
 //! ```
 
+use std::collections::{HashMap, HashSet};
+
 use chrono::{DateTime, Utc};
 use fusion_cortex_core::Id;
 use serde::{Deserialize, Serialize};
@@ -42,6 +52,10 @@ pub struct Episode {
     #[serde(default)]
     pub node: Option<Id>,
     pub occurred_at: DateTime<Utc>,
+    /// Who may read it, set when it is recorded. Personal where an earlier
+    /// release recorded it without one.
+    #[serde(default)]
+    pub scope: Scope,
     /// The trace it came from, such as an agent session's. Forgetting the
     /// trace forgets the episode and what was derived from it.
     pub trace_id: Id,
@@ -55,8 +69,16 @@ impl Episode {
             id: Id::new(),
             node: None,
             occurred_at: Utc::now(),
+            scope: Scope::Personal,
             trace_id,
         }
+    }
+
+    /// The episode, readable within `scope`.
+    #[must_use]
+    pub fn within(mut self, scope: Scope) -> Self {
+        self.scope = scope;
+        self
     }
 
     /// The episode, naming the node in its trace that showed it.
@@ -73,19 +95,28 @@ pub struct Fact {
     /// 0.0 to 1.0. Decays with age unless reinforced by new episodes.
     pub confidence: f32,
     pub content: String,
-    /// Episodes this was distilled from. Forgetting any one of them forgets
-    /// the fact.
+    /// The episodes it rests on. Forgetting one removes it from the list, and
+    /// forgetting the last one forgets the fact.
     pub derived_from: Vec<Id>,
     /// A vector for relevance scoring, which nothing computes yet. The field
     /// is here so enabling vectors is a new scorer and never a migration.
     #[serde(default)]
     pub embedding: Option<Vec<f32>>,
     pub id: Id,
+    /// The node in a trace that records it, such as the memory node a
+    /// consolidation pass wrote. `why()` on the node reaches the episodes it
+    /// rests on.
+    #[serde(default)]
+    pub node: Option<Id>,
     /// Episodes that said it again after it was distilled. They refresh its
     /// age and nothing else, so forgetting one leaves the fact to the
     /// episodes it came from.
     #[serde(default)]
     pub reinforced_by: Vec<Id>,
+    /// Who may read it: the narrowest scope of its sources, or the one it was
+    /// given where a store holds none of them.
+    #[serde(default)]
+    pub scope: Scope,
     /// Set when a newer fact contradicts or refines this one. Superseded facts
     /// are retained rather than deleted: provenance needs them to explain past
     /// outputs.
@@ -109,10 +140,21 @@ impl Fact {
             derived_from,
             embedding: None,
             id: Id::new(),
+            node: None,
             reinforced_by: Vec::new(),
+            scope: Scope::Personal,
             superseded_by: None,
             updated_at: Utc::now(),
         }
+    }
+
+    /// The fact, readable within `scope` where a store holds none of its
+    /// sources. A store gives a fact with held sources the narrowest of
+    /// theirs.
+    #[must_use]
+    pub fn within(mut self, scope: Scope) -> Self {
+        self.scope = scope;
+        self
     }
 
     /// Whether this fact is still the current view.
@@ -150,6 +192,9 @@ impl Fact {
 /// otherwise leak into the domain model.
 #[derive(Clone, Debug, Default)]
 pub struct Memory {
+    /// Episodes a consolidation pass has read, whether or not it found a fact
+    /// in them.
+    consolidated: HashSet<Id>,
     episodes: Vec<Episode>,
     facts: Vec<Fact>,
 }
@@ -167,7 +212,8 @@ impl Memory {
     }
 
     /// Adds a distilled fact, superseding the lineage that `supersedes` belongs
-    /// to.
+    /// to. The fact takes the narrowest scope of the sources this memory
+    /// holds, and keeps its own where it holds none.
     ///
     /// The id may point anywhere in a chain, not only at its head. Callers hold
     /// whichever id they happened to read, and pointing at an already-superseded
@@ -185,8 +231,11 @@ impl Memory {
     /// assert_eq!(memory.current_facts().len(), 1); // only the newer one is current
     /// # assert_eq!(memory.current_facts()[0].id, new);
     /// ```
-    pub fn assert_fact(&mut self, fact: Fact, supersedes: Option<Id>) -> Id {
+    pub fn assert_fact(&mut self, mut fact: Fact, supersedes: Option<Id>) -> Id {
         let id = fact.id;
+        if let Some(scope) = self.scope_of(&fact.derived_from) {
+            fact.scope = scope;
+        }
         if let Some(old) = supersedes {
             if let Some(head) = self.lineage_head(old) {
                 if let Some(previous) = self.facts.iter_mut().find(|f| f.id == head) {
@@ -198,8 +247,65 @@ impl Memory {
         id
     }
 
+    /// The narrowest scope of the episodes in `sources` this memory holds.
+    fn scope_of(&self, sources: &[Id]) -> Option<Scope> {
+        Scope::narrowest(
+            self.episodes
+                .iter()
+                .filter(|episode| sources.contains(&episode.id))
+                .map(|episode| &episode.scope),
+        )
+    }
+
+    /// Adds `episode` to the sources of the lineage `fact` belongs to, so the
+    /// fact rests on it too, and makes its age count from now. The fact's
+    /// scope narrows to take the episode's in, and never widens. `node`, where
+    /// given, becomes the fact's node: the trace node that records the new
+    /// source.
+    ///
+    /// Returns `false` where no fact has the id.
+    ///
+    /// ```
+    /// # use fusion_cortex_core::Id;
+    /// # use fusion_cortex_engram::{Episode, Fact, Memory};
+    /// # let mut memory = Memory::new();
+    /// let monday = memory.record(Episode::new("tests run with bun", Id::new()));
+    /// let fact = memory.assert_fact(Fact::new("tests run with bun", vec![monday], 0.8), None);
+    /// let tuesday = memory.record(Episode::new("bun runs the tests", Id::new()));
+    ///
+    /// assert!(memory.add_source(fact, tuesday, None));
+    /// assert_eq!(memory.current_facts()[0].derived_from, [monday, tuesday]);
+    /// ```
+    pub fn add_source(&mut self, fact: Id, episode: Id, node: Option<Id>) -> bool {
+        let Some(head) = self.lineage_head(fact) else {
+            return false;
+        };
+        let scope = self
+            .episodes
+            .iter()
+            .find(|held| held.id == episode)
+            .map(|held| held.scope.clone());
+        let Some(current) = self.facts.iter_mut().find(|f| f.id == head) else {
+            return false;
+        };
+        if !current.derived_from.contains(&episode) {
+            current.derived_from.push(episode);
+        }
+        current.reinforced_by.retain(|id| *id != episode);
+        if let Some(narrower) = scope.and_then(|scope| Scope::narrowest([&current.scope, &scope])) {
+            current.scope = narrower;
+        }
+        if node.is_some() {
+            current.node = node;
+        }
+        current.updated_at = Utc::now();
+        true
+    }
+
     /// Adds `episode` to what reinforced the lineage `fact` belongs to, which
-    /// makes its age count from now: a fact seen again is not decaying.
+    /// makes its age count from now: a fact seen again is not decaying. A
+    /// reinforcement is no source, so forgetting it leaves the fact to its
+    /// sources; [`Memory::add_source`] makes the fact rest on the episode.
     ///
     /// Returns `false` where no fact has the id.
     ///
@@ -260,12 +366,25 @@ impl Memory {
         }
     }
 
-    /// Forgets every episode from `trace`, and every fact derived from one of
-    /// them, and returns the ids removed, episodes first.
+    /// Marks `episodes` as read by a consolidation pass, so
+    /// [`Memory::unconsolidated`] leaves them out whether or not the pass
+    /// found a fact in them. Ids this memory does not hold are ignored.
+    pub fn mark_consolidated(&mut self, episodes: &[Id]) {
+        for id in episodes {
+            if self.episodes.iter().any(|episode| episode.id == *id) {
+                self.consolidated.insert(*id);
+            }
+        }
+    }
+
+    /// Forgets every episode from `trace`, and every fact that rests on them
+    /// alone, and returns the ids removed, episodes first.
     ///
-    /// A fact the removed one had superseded is current again: what replaced
-    /// it came from the forgotten trace, and what it says came from elsewhere.
-    /// A fact the trace only reinforced stays, without that reinforcement.
+    /// A fact another episode still supports stays, without the forgotten
+    /// sources. A fact the removed one had superseded is current again: what
+    /// replaced it came from the forgotten trace, and what it says came from
+    /// elsewhere. A fact the trace only reinforced stays, without that
+    /// reinforcement.
     ///
     /// ```
     /// # use fusion_cortex_core::Id;
@@ -282,20 +401,50 @@ impl Memory {
     /// assert_eq!(memory.current_facts()[0].content, "tests run with bun");
     /// ```
     pub fn forget(&mut self, trace: Id) -> Vec<Id> {
-        let episodes: std::collections::HashSet<Id> = self
+        let episodes: HashSet<Id> = self
             .episodes
             .iter()
             .filter(|episode| episode.trace_id == trace)
             .map(|episode| episode.id)
             .collect();
-        let doomed: std::collections::HashMap<Id, Option<Id>> = self
+        self.forget_episodes(&episodes)
+    }
+
+    /// Forgets one episode, and every fact that rests on it alone, as
+    /// [`Memory::forget`] does for a trace, and returns the ids removed, the
+    /// episode first. An episode this memory does not hold removes nothing.
+    ///
+    /// ```
+    /// # use fusion_cortex_core::Id;
+    /// # use fusion_cortex_engram::{Episode, Fact, Memory};
+    /// # let mut memory = Memory::new();
+    /// let monday = memory.record(Episode::new("tests run with bun", Id::new()));
+    /// let tuesday = memory.record(Episode::new("bun runs the tests", Id::new()));
+    /// let fact = memory.assert_fact(Fact::new("tests run with bun", vec![monday, tuesday], 0.8), None);
+    ///
+    /// assert_eq!(memory.forget_episode(monday), [monday]);  // tuesday still supports it
+    /// assert_eq!(memory.forget_episode(tuesday), [tuesday, fact]);
+    /// ```
+    pub fn forget_episode(&mut self, episode: Id) -> Vec<Id> {
+        if !self.episodes.iter().any(|held| held.id == episode) {
+            return Vec::new();
+        }
+        self.forget_episodes(&HashSet::from([episode]))
+    }
+
+    fn forget_episodes(&mut self, episodes: &HashSet<Id>) -> Vec<Id> {
+        let doomed: HashMap<Id, Option<Id>> = self
             .facts
             .iter()
-            .filter(|fact| fact.derived_from.iter().any(|id| episodes.contains(id)))
+            .filter(|fact| {
+                !fact.derived_from.is_empty()
+                    && fact.derived_from.iter().all(|id| episodes.contains(id))
+            })
             .map(|fact| (fact.id, fact.superseded_by))
             .collect();
         for fact in &mut self.facts {
             fact.superseded_by = past(fact.superseded_by, &doomed);
+            fact.derived_from.retain(|id| !episodes.contains(id));
             fact.reinforced_by.retain(|id| !episodes.contains(id));
         }
         let mut removed: Vec<Id> = self
@@ -312,8 +461,38 @@ impl Memory {
         );
         self.episodes
             .retain(|episode| !episodes.contains(&episode.id));
+        self.consolidated.retain(|id| !episodes.contains(id));
         self.facts.retain(|fact| !doomed.contains_key(&fact.id));
         removed
+    }
+
+    /// Deletes one fact and returns whether this memory held it. A fact it
+    /// superseded is current again, and the episodes it rested on stay, marked
+    /// as consolidated, so the next pass does not distill it again.
+    ///
+    /// ```
+    /// # use fusion_cortex_core::Id;
+    /// # use fusion_cortex_engram::{Episode, Fact, Memory};
+    /// # let mut memory = Memory::new();
+    /// let seen = memory.record(Episode::new("tests run with jest", Id::new()));
+    /// let wrong = memory.assert_fact(Fact::new("tests run with jest", vec![seen], 0.8), None);
+    ///
+    /// assert!(memory.delete_fact(wrong));
+    /// assert!(memory.current_facts().is_empty());
+    /// assert!(memory.unconsolidated().is_empty());
+    /// ```
+    pub fn delete_fact(&mut self, fact: Id) -> bool {
+        let Some(held) = self.facts.iter().find(|held| held.id == fact) else {
+            return false;
+        };
+        let sources = held.derived_from.clone();
+        let doomed = HashMap::from([(fact, held.superseded_by)]);
+        for other in &mut self.facts {
+            other.superseded_by = past(other.superseded_by, &doomed);
+        }
+        self.facts.retain(|held| held.id != fact);
+        self.mark_consolidated(&sources);
+        true
     }
 
     /// Every fact, superseded ones included, in the order they were asserted.
@@ -327,7 +506,7 @@ impl Memory {
     /// Returns `None` if the id is unknown. Terminates on a cycle, which a
     /// corrupted store could contain.
     fn lineage_head(&self, from: Id) -> Option<Id> {
-        let mut seen = std::collections::HashSet::new();
+        let mut seen = HashSet::new();
         let mut current = self.facts.iter().find(|f| f.id == from)?;
 
         while let Some(next) = current.superseded_by {
@@ -356,7 +535,8 @@ impl Memory {
         &self.episodes
     }
 
-    /// Episodes not yet distilled into any fact. The input to consolidation.
+    /// Episodes no consolidation pass has read and no fact rests on or was
+    /// reinforced by. The input to consolidation.
     #[must_use]
     /// ```
     /// # use fusion_cortex_core::Id;
@@ -367,25 +547,22 @@ impl Memory {
     /// # assert_eq!(pending.len(), 1);
     /// ```
     pub fn unconsolidated(&self) -> Vec<&Episode> {
-        let consumed: std::collections::HashSet<Id> = self
+        let consumed: HashSet<Id> = self
             .facts
             .iter()
             .flat_map(|f| f.derived_from.iter().chain(&f.reinforced_by).copied())
             .collect();
         self.episodes
             .iter()
-            .filter(|e| !consumed.contains(&e.id))
+            .filter(|e| !consumed.contains(&e.id) && !self.consolidated.contains(&e.id))
             .collect()
     }
 }
 
 /// The fact a supersession link leads to once the facts in `doomed` are gone:
 /// the first one along the chain that stays, or none. Stops on a cycle.
-pub(crate) fn past(
-    mut next: Option<Id>,
-    doomed: &std::collections::HashMap<Id, Option<Id>>,
-) -> Option<Id> {
-    let mut seen = std::collections::HashSet::new();
+pub(crate) fn past(mut next: Option<Id>, doomed: &HashMap<Id, Option<Id>>) -> Option<Id> {
+    let mut seen = HashSet::new();
     while let Some(id) = next {
         match doomed.get(&id) {
             Some(after) if seen.insert(id) => next = *after,
@@ -396,7 +573,12 @@ pub(crate) fn past(
     None
 }
 
+#[cfg(feature = "consolidate")]
+pub mod consolidate;
+mod scope;
 pub mod store;
+
+pub use scope::Scope;
 
 #[cfg(test)]
 mod tests {

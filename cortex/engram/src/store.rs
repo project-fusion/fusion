@@ -39,7 +39,8 @@ pub trait Store: Send + Sync {
     async fn record(&self, episode: &Episode) -> Result<()>;
 
     /// Adds a fact, superseding the lineage `supersedes` belongs to, as
-    /// [`Memory::assert_fact`] does.
+    /// [`Memory::assert_fact`] does. The fact takes the narrowest scope of the
+    /// sources the store holds, and keeps its own where it holds none.
     ///
     /// # Errors
     ///
@@ -70,6 +71,23 @@ pub trait Store: Send + Sync {
     /// [`Error::Storage`] if the backend fails.
     async fn reinforce(&self, fact: Id, episode: Id) -> Result<bool>;
 
+    /// Adds `episode` to the sources of `fact`'s lineage, narrows its scope to
+    /// take the episode's in, and makes `node`, where given, its node, as
+    /// [`Memory::add_source`] does. Returns whether a fact had the id.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Storage`] if the backend fails.
+    async fn add_source(&self, fact: Id, episode: Id, node: Option<Id>) -> Result<bool>;
+
+    /// Marks `episodes` as read by a consolidation pass, as
+    /// [`Memory::mark_consolidated`] does.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Storage`] if the backend fails.
+    async fn mark_consolidated(&self, episodes: &[Id]) -> Result<()>;
+
     /// Current facts, most confident first, and in the order they were
     /// asserted where two are as confident.
     ///
@@ -85,20 +103,38 @@ pub trait Store: Send + Sync {
     /// [`Error::Storage`] if the backend fails.
     async fn episodes(&self) -> Result<Vec<Episode>>;
 
-    /// Episodes no fact is derived from, in the order they were recorded.
+    /// Episodes no consolidation pass has read and no fact rests on or was
+    /// reinforced by, in the order they were recorded.
     ///
     /// # Errors
     ///
     /// [`Error::Storage`] if the backend fails.
     async fn unconsolidated(&self) -> Result<Vec<Episode>>;
 
-    /// Forgets a trace's episodes and every fact derived from one, as
+    /// Forgets a trace's episodes and every fact that rests on them alone, as
     /// [`Memory::forget`] does, and returns the ids removed, episodes first.
     ///
     /// # Errors
     ///
     /// [`Error::Storage`] if the backend fails.
     async fn forget(&self, trace: Id) -> Result<Vec<Id>>;
+
+    /// Forgets one episode and every fact that rests on it alone, as
+    /// [`Memory::forget_episode`] does, and returns the ids removed, the
+    /// episode first.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Storage`] if the backend fails.
+    async fn forget_episode(&self, episode: Id) -> Result<Vec<Id>>;
+
+    /// Deletes one fact, as [`Memory::delete_fact`] does, and returns whether
+    /// the store held it.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Storage`] if the backend fails.
+    async fn delete_fact(&self, fact: Id) -> Result<bool>;
 }
 
 /// The reference store: a [`Memory`] behind a lock.
@@ -170,6 +206,23 @@ impl Store for InMemory {
     async fn forget(&self, trace: Id) -> Result<Vec<Id>> {
         Ok(self.lock()?.forget(trace))
     }
+
+    async fn add_source(&self, fact: Id, episode: Id, node: Option<Id>) -> Result<bool> {
+        Ok(self.lock()?.add_source(fact, episode, node))
+    }
+
+    async fn mark_consolidated(&self, episodes: &[Id]) -> Result<()> {
+        self.lock()?.mark_consolidated(episodes);
+        Ok(())
+    }
+
+    async fn forget_episode(&self, episode: Id) -> Result<Vec<Id>> {
+        Ok(self.lock()?.forget_episode(episode))
+    }
+
+    async fn delete_fact(&self, fact: Id) -> Result<bool> {
+        Ok(self.lock()?.delete_fact(fact))
+    }
 }
 
 #[cfg(feature = "sqlite")]
@@ -188,7 +241,7 @@ mod sqlite {
     };
 
     use super::Store;
-    use crate::{Episode, Fact};
+    use crate::{Episode, Fact, Scope};
 
     /// An episode and a fact are rows, and each source of a fact is a row of
     /// its own, so a cascade finds a trace's facts in SQL; an episode that
@@ -196,10 +249,16 @@ mod sqlite {
     /// removes. An embedding is the little-endian bytes of its floats, or
     /// null.
     ///
+    /// **Postgres matches it column for column.** Ids and times are text here
+    /// and `uuid` and `timestamptz` there. A scope is two columns, its kind
+    /// and the name of its project or team, and [`SCOPES`] adds them. A list
+    /// is bound as a JSON array read with `json_each`, which Postgres writes
+    /// as `= ANY($1)`.
+    ///
     /// **A write that reads first takes the write lock first**, with
     /// `BEGIN IMMEDIATE`, so a second session writing the same file waits for
     /// it and does not fail on a lock it could have waited for.
-    const SCHEMA: &str = "
+    pub(super) const SCHEMA: &str = "
         CREATE TABLE IF NOT EXISTS episodes (
             id TEXT PRIMARY KEY,
             trace TEXT NOT NULL,
@@ -231,6 +290,36 @@ mod sqlite {
         CREATE INDEX IF NOT EXISTS reinforcements_by_episode ON reinforcements (episode);
     ";
 
+    /// The columns scopes and consolidation added on October 25, 2026, which a
+    /// file from before gains when it is opened. Its episodes and facts are
+    /// personal, the narrowest scope, and an episode a fact rests on is
+    /// consolidated already, so none needs a value written.
+    const SCOPES: &str = "
+        ALTER TABLE episodes ADD COLUMN scope TEXT NOT NULL DEFAULT 'personal';
+        ALTER TABLE episodes ADD COLUMN scope_name TEXT;
+        ALTER TABLE episodes ADD COLUMN consolidated_at TEXT;
+        ALTER TABLE facts ADD COLUMN scope TEXT NOT NULL DEFAULT 'personal';
+        ALTER TABLE facts ADD COLUMN scope_name TEXT;
+        ALTER TABLE facts ADD COLUMN node TEXT;
+    ";
+
+    /// Creates the tables, and adds what a file from an earlier release lacks,
+    /// once, under the write lock, so two stores opening one old file add the
+    /// columns once between them.
+    async fn migrate(pool: &SqlitePool) -> std::result::Result<(), sqlx::Error> {
+        sqlx::raw_sql(SCHEMA).execute(pool).await?;
+        let mut transaction = pool.begin_with("BEGIN IMMEDIATE").await?;
+        let scoped: i64 = sqlx::query_scalar(
+            "SELECT COUNT(*) FROM pragma_table_info('episodes') WHERE name = 'scope'",
+        )
+        .fetch_one(&mut *transaction)
+        .await?;
+        if scoped == 0 {
+            sqlx::raw_sql(SCOPES).execute(&mut *transaction).await?;
+        }
+        transaction.commit().await
+    }
+
     /// Memory in a `SQLite` database.
     ///
     /// ```
@@ -251,7 +340,7 @@ mod sqlite {
     /// ```
     #[derive(Clone, Debug)]
     pub struct Sqlite {
-        pool: SqlitePool,
+        pub(super) pool: SqlitePool,
     }
 
     fn storage(error: impl std::fmt::Display) -> Error {
@@ -289,6 +378,20 @@ mod sqlite {
             .collect()
     }
 
+    /// A list of ids as the JSON array `json_each` reads.
+    fn listed<'a>(ids: impl IntoIterator<Item = &'a Id>) -> String {
+        let ids: Vec<String> = ids.into_iter().map(ToString::to_string).collect();
+        serde_json::to_string(&ids).unwrap_or_else(|_| "[]".to_owned())
+    }
+
+    /// The scope a row's `scope` and `scope_name` columns hold.
+    fn scope(row: &SqliteRow) -> Result<Scope> {
+        let kind: String = row.try_get("scope").map_err(storage)?;
+        let name: Option<String> = row.try_get("scope_name").map_err(storage)?;
+        Scope::parts(&kind, name.as_deref())
+            .ok_or_else(|| Error::Storage(format!("{kind} {name:?} is not a scope")))
+    }
+
     fn episode(row: &SqliteRow) -> Result<Episode> {
         let node: Option<String> = row.try_get("node").map_err(storage)?;
         Ok(Episode {
@@ -296,6 +399,7 @@ mod sqlite {
             id: parse(&row.try_get::<String, _>("id").map_err(storage)?)?,
             node: node.as_deref().map(parse).transpose()?,
             occurred_at: time(&row.try_get::<String, _>("occurred_at").map_err(storage)?)?,
+            scope: scope(row)?,
             trace_id: parse(&row.try_get::<String, _>("trace").map_err(storage)?)?,
         })
     }
@@ -333,7 +437,7 @@ mod sqlite {
                 .foreign_keys(true)
                 .journal_mode(sqlx::sqlite::SqliteJournalMode::Wal);
             let pool = SqlitePoolOptions::new().connect_with(options).await?;
-            sqlx::raw_sql(SCHEMA).execute(&pool).await?;
+            migrate(&pool).await?;
             Ok(Self { pool })
         }
 
@@ -359,11 +463,129 @@ mod sqlite {
         }
 
         async fn ready(pool: SqlitePool) -> Result<Self> {
-            sqlx::raw_sql(SCHEMA)
-                .execute(&pool)
+            migrate(&pool).await.map_err(storage)?;
+            Ok(Self { pool })
+        }
+
+        /// The narrowest scope of the episodes in `sources` the store holds.
+        async fn scope_of(
+            executor: impl sqlx::SqliteExecutor<'_>,
+            sources: &[Id],
+        ) -> Result<Option<Scope>> {
+            let rows = sqlx::query(
+                "SELECT scope, scope_name FROM episodes WHERE id IN (SELECT value FROM json_each(?))",
+            )
+            .bind(listed(sources))
+            .fetch_all(executor)
+            .await
+            .map_err(storage)?;
+            let scopes = rows.iter().map(scope).collect::<Result<Vec<_>>>()?;
+            Ok(Scope::narrowest(&scopes))
+        }
+
+        /// Marks the episodes `ids` names as consolidated, where they are not
+        /// already.
+        async fn consolidate(executor: impl sqlx::SqliteExecutor<'_>, ids: &str) -> Result<()> {
+            sqlx::query(
+                "UPDATE episodes SET consolidated_at = ?
+                 WHERE consolidated_at IS NULL AND id IN (SELECT value FROM json_each(?))",
+            )
+            .bind(written(Utc::now()))
+            .bind(ids)
+            .execute(executor)
+            .await
+            .map_err(storage)?;
+            Ok(())
+        }
+
+        /// Repoints every supersession link that leads to a fact in `doomed`
+        /// past it, as [`crate::past`] does.
+        async fn repoint(
+            transaction: &mut sqlx::SqliteConnection,
+            doomed: &HashMap<Id, Option<Id>>,
+        ) -> Result<()> {
+            let links = Self::links(&mut *transaction).await?;
+            for (id, next) in &links {
+                if doomed.contains_key(id) {
+                    continue;
+                }
+                let after = crate::past(*next, doomed);
+                if after != *next {
+                    sqlx::query("UPDATE facts SET superseded_by = ? WHERE id = ?")
+                        .bind(after.map(|id| id.to_string()))
+                        .bind(id.to_string())
+                        .execute(&mut *transaction)
+                        .await
+                        .map_err(storage)?;
+                }
+            }
+            Ok(())
+        }
+
+        /// Forgets the episodes `episodes` names, every fact that rests on
+        /// them alone, and their edges, and returns the ids removed, episodes
+        /// first.
+        async fn forget_all(&self, episodes: Vec<String>) -> Result<Vec<Id>> {
+            let mut transaction = self
+                .pool
+                .begin_with("BEGIN IMMEDIATE")
                 .await
                 .map_err(storage)?;
-            Ok(Self { pool })
+            let set = serde_json::to_string(&episodes).map_err(storage)?;
+            let doomed: Vec<String> = sqlx::query_scalar(
+                "SELECT id FROM facts
+                 WHERE id IN (SELECT fact FROM sources
+                              WHERE episode IN (SELECT value FROM json_each(?)))
+                   AND id NOT IN (SELECT fact FROM sources
+                                  WHERE episode NOT IN (SELECT value FROM json_each(?)))
+                 ORDER BY rowid",
+            )
+            .bind(&set)
+            .bind(&set)
+            .fetch_all(&mut *transaction)
+            .await
+            .map_err(storage)?;
+            let links = Self::links(&mut *transaction).await?;
+            let doomed_links: HashMap<Id, Option<Id>> = doomed
+                .iter()
+                .map(|id| {
+                    let id = parse(id)?;
+                    Ok((id, links.get(&id).copied().flatten()))
+                })
+                .collect::<Result<_>>()?;
+            Self::repoint(&mut transaction, &doomed_links).await?;
+            for id in &doomed {
+                sqlx::query("DELETE FROM facts WHERE id = ?")
+                    .bind(id)
+                    .execute(&mut *transaction)
+                    .await
+                    .map_err(storage)?;
+            }
+            // The edges from what stays to what went, and the reverse index
+            // over them with the rows.
+            sqlx::query("DELETE FROM sources WHERE episode IN (SELECT value FROM json_each(?))")
+                .bind(&set)
+                .execute(&mut *transaction)
+                .await
+                .map_err(storage)?;
+            sqlx::query(
+                "DELETE FROM reinforcements WHERE episode IN (SELECT value FROM json_each(?))",
+            )
+            .bind(&set)
+            .execute(&mut *transaction)
+            .await
+            .map_err(storage)?;
+            sqlx::query("DELETE FROM episodes WHERE id IN (SELECT value FROM json_each(?))")
+                .bind(&set)
+                .execute(&mut *transaction)
+                .await
+                .map_err(storage)?;
+            transaction.commit().await.map_err(storage)?;
+            episodes
+                .iter()
+                .chain(doomed.iter())
+                .map(|id| parse(id))
+                .collect()
         }
 
         /// Every fact's supersession link, by id.
@@ -417,6 +639,7 @@ mod sqlite {
                 let embedding: Option<Vec<u8>> = row.try_get("embedding").map_err(storage)?;
                 let superseded_by: Option<String> =
                     row.try_get("superseded_by").map_err(storage)?;
+                let node: Option<String> = row.try_get("node").map_err(storage)?;
                 #[expect(
                     clippy::cast_possible_truncation,
                     reason = "a confidence was an f32 when it was written"
@@ -433,10 +656,12 @@ mod sqlite {
                         .collect::<Result<_>>()?,
                     embedding: embedding.as_deref().map(floats),
                     id: parse(&id)?,
+                    node: node.as_deref().map(parse).transpose()?,
                     reinforced_by: reinforced
                         .iter()
                         .map(|episode| parse(episode))
                         .collect::<Result<_>>()?,
+                    scope: scope(&row)?,
                     superseded_by: superseded_by.as_deref().map(parse).transpose()?,
                     updated_at: time(&row.try_get::<String, _>("updated_at").map_err(storage)?)?,
                 });
@@ -449,13 +674,16 @@ mod sqlite {
     impl Store for Sqlite {
         async fn record(&self, episode: &Episode) -> Result<()> {
             sqlx::query(
-                "INSERT INTO episodes (id, trace, node, occurred_at, content) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO episodes (id, trace, node, occurred_at, content, scope, scope_name)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)",
             )
             .bind(episode.id.to_string())
             .bind(episode.trace_id.to_string())
             .bind(episode.node.map(|node| node.to_string()))
             .bind(written(episode.occurred_at))
             .bind(&episode.content)
+            .bind(episode.scope.kind())
+            .bind(episode.scope.name())
             .execute(&self.pool)
             .await
             .map_err(|error| match error {
@@ -484,9 +712,13 @@ mod sqlite {
                         .map_err(storage)?;
                 }
             }
+            let scope = Self::scope_of(&mut *transaction, &fact.derived_from)
+                .await?
+                .unwrap_or_else(|| fact.scope.clone());
             sqlx::query(
-                "INSERT INTO facts (id, content, confidence, embedding, superseded_by, updated_at)
-                 VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO facts
+                     (id, content, confidence, embedding, superseded_by, updated_at, scope, scope_name, node)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             )
             .bind(fact.id.to_string())
             .bind(&fact.content)
@@ -494,6 +726,9 @@ mod sqlite {
             .bind(bytes(fact.embedding.as_ref()))
             .bind(fact.superseded_by.map(|id| id.to_string()))
             .bind(written(fact.updated_at))
+            .bind(scope.kind())
+            .bind(scope.name())
+            .bind(fact.node.map(|node| node.to_string()))
             .execute(&mut *transaction)
             .await
             .map_err(|error| match error {
@@ -612,7 +847,8 @@ mod sqlite {
         async fn unconsolidated(&self) -> Result<Vec<Episode>> {
             sqlx::query(
                 "SELECT * FROM episodes
-                 WHERE id NOT IN (SELECT episode FROM sources)
+                 WHERE consolidated_at IS NULL
+                   AND id NOT IN (SELECT episode FROM sources)
                    AND id NOT IN (SELECT episode FROM reinforcements)
                  ORDER BY rowid",
             )
@@ -625,74 +861,119 @@ mod sqlite {
         }
 
         async fn forget(&self, trace: Id) -> Result<Vec<Id>> {
+            let episodes: Vec<String> =
+                sqlx::query_scalar("SELECT id FROM episodes WHERE trace = ? ORDER BY rowid")
+                    .bind(trace.to_string())
+                    .fetch_all(&self.pool)
+                    .await
+                    .map_err(storage)?;
+            self.forget_all(episodes).await
+        }
+
+        async fn forget_episode(&self, episode: Id) -> Result<Vec<Id>> {
+            let episodes: Vec<String> = sqlx::query_scalar("SELECT id FROM episodes WHERE id = ?")
+                .bind(episode.to_string())
+                .fetch_all(&self.pool)
+                .await
+                .map_err(storage)?;
+            self.forget_all(episodes).await
+        }
+
+        async fn add_source(&self, fact: Id, episode: Id, node: Option<Id>) -> Result<bool> {
             let mut transaction = self
                 .pool
                 .begin_with("BEGIN IMMEDIATE")
                 .await
                 .map_err(storage)?;
-            let episodes: Vec<String> =
-                sqlx::query_scalar("SELECT id FROM episodes WHERE trace = ? ORDER BY rowid")
-                    .bind(trace.to_string())
-                    .fetch_all(&mut *transaction)
-                    .await
-                    .map_err(storage)?;
-            let doomed: Vec<String> = sqlx::query_scalar(
-                "SELECT id FROM facts WHERE id IN (
-                     SELECT fact FROM sources WHERE episode IN (
-                         SELECT id FROM episodes WHERE trace = ?))
-                 ORDER BY rowid",
-            )
-            .bind(trace.to_string())
-            .fetch_all(&mut *transaction)
-            .await
-            .map_err(storage)?;
             let links = Self::links(&mut *transaction).await?;
-            let doomed_links: HashMap<Id, Option<Id>> = doomed
-                .iter()
-                .map(|id| {
-                    let id = parse(id)?;
-                    Ok((id, links.get(&id).copied().flatten()))
-                })
-                .collect::<Result<_>>()?;
-            for (id, next) in &links {
-                if doomed_links.contains_key(id) {
-                    continue;
-                }
-                let after = crate::past(*next, &doomed_links);
-                if after != *next {
-                    sqlx::query("UPDATE facts SET superseded_by = ? WHERE id = ?")
-                        .bind(after.map(|id| id.to_string()))
-                        .bind(id.to_string())
-                        .execute(&mut *transaction)
-                        .await
-                        .map_err(storage)?;
-                }
-            }
-            for id in &doomed {
-                sqlx::query("DELETE FROM facts WHERE id = ?")
-                    .bind(id)
-                    .execute(&mut *transaction)
+            let Some(head) = Self::head(&links, fact) else {
+                return Ok(false);
+            };
+            let (head, episode) = (head.to_string(), episode.to_string());
+            let sourced: i64 =
+                sqlx::query_scalar("SELECT COUNT(*) FROM sources WHERE fact = ? AND episode = ?")
+                    .bind(&head)
+                    .bind(&episode)
+                    .fetch_one(&mut *transaction)
                     .await
                     .map_err(storage)?;
-            }
-            sqlx::query(
-                "DELETE FROM reinforcements WHERE episode IN (SELECT id FROM episodes WHERE trace = ?)",
-            )
-            .bind(trace.to_string())
-            .execute(&mut *transaction)
-            .await
-            .map_err(storage)?;
-            sqlx::query("DELETE FROM episodes WHERE trace = ?")
-                .bind(trace.to_string())
+            if sourced == 0 {
+                sqlx::query(
+                    "INSERT INTO sources (fact, position, episode)
+                     SELECT ?, COALESCE(MAX(position) + 1, 0), ? FROM sources WHERE fact = ?",
+                )
+                .bind(&head)
+                .bind(&episode)
+                .bind(&head)
                 .execute(&mut *transaction)
                 .await
                 .map_err(storage)?;
+            }
+            sqlx::query("DELETE FROM reinforcements WHERE fact = ? AND episode = ?")
+                .bind(&head)
+                .bind(&episode)
+                .execute(&mut *transaction)
+                .await
+                .map_err(storage)?;
+            let row = sqlx::query("SELECT scope, scope_name FROM facts WHERE id = ?")
+                .bind(&head)
+                .fetch_one(&mut *transaction)
+                .await
+                .map_err(storage)?;
+            let before = scope(&row)?;
+            let added = Self::scope_of(&mut *transaction, &[parse(&episode)?]).await?;
+            let narrowed = added
+                .and_then(|added| Scope::narrowest([&before, &added]))
+                .unwrap_or(before);
+            sqlx::query(
+                "UPDATE facts SET scope = ?, scope_name = ?, node = COALESCE(?, node), updated_at = ?
+                 WHERE id = ?",
+            )
+            .bind(narrowed.kind())
+            .bind(narrowed.name())
+            .bind(node.map(|node| node.to_string()))
+            .bind(written(Utc::now()))
+            .bind(&head)
+            .execute(&mut *transaction)
+            .await
+            .map_err(storage)?;
             transaction.commit().await.map_err(storage)?;
-            episodes
-                .iter()
-                .chain(doomed.iter())
-                .map(|id| parse(id))
-                .collect()
+            Ok(true)
+        }
+
+        async fn mark_consolidated(&self, episodes: &[Id]) -> Result<()> {
+            Self::consolidate(&self.pool, &listed(episodes)).await
+        }
+
+        async fn delete_fact(&self, fact: Id) -> Result<bool> {
+            let mut transaction = self
+                .pool
+                .begin_with("BEGIN IMMEDIATE")
+                .await
+                .map_err(storage)?;
+            let links = Self::links(&mut *transaction).await?;
+            let Some(next) = links.get(&fact) else {
+                return Ok(false);
+            };
+            let sources: Vec<String> =
+                sqlx::query_scalar("SELECT episode FROM sources WHERE fact = ?")
+                    .bind(fact.to_string())
+                    .fetch_all(&mut *transaction)
+                    .await
+                    .map_err(storage)?;
+            Self::repoint(&mut transaction, &HashMap::from([(fact, *next)])).await?;
+            sqlx::query("DELETE FROM facts WHERE id = ?")
+                .bind(fact.to_string())
+                .execute(&mut *transaction)
+                .await
+                .map_err(storage)?;
+            Self::consolidate(
+                &mut *transaction,
+                &serde_json::to_string(&sources).map_err(storage)?,
+            )
+            .await?;
+            transaction.commit().await.map_err(storage)?;
+            Ok(true)
         }
     }
 }
@@ -703,7 +984,7 @@ pub(crate) mod conformance {
     use fusion_cortex_core::Id;
 
     use super::Store;
-    use crate::{Episode, Fact};
+    use crate::{Episode, Fact, Scope};
 
     pub(crate) async fn run(store: &dyn Store) {
         an_episode_waits_for_consolidation_until_a_fact_derives_from_it(store).await;
@@ -716,6 +997,192 @@ pub(crate) mod conformance {
         a_fact_is_asserted_once(store).await;
         a_lineage_can_be_superseded_by_a_held_fact(store).await;
         forgetting_a_trace_that_only_reinforced_a_fact_keeps_the_fact(store).await;
+        a_fact_another_episode_supports_outlives_forgetting_one(store).await;
+        a_fact_takes_the_narrowest_scope_of_its_sources(store).await;
+        adding_a_source_narrows_the_scope_and_moves_the_node(store).await;
+        an_episode_a_pass_read_is_no_longer_pending(store).await;
+        deleting_a_fact_restores_what_it_superseded(store).await;
+    }
+
+    async fn a_fact_another_episode_supports_outlives_forgetting_one(store: &dyn Store) {
+        let trace = Id::new();
+        let monday = record(store, "outlives: bun", trace).await;
+        let tuesday = record(store, "outlives: bun again", trace).await;
+        let fact = Fact::new("outlives: tests run with bun", vec![monday.id], 0.8);
+        store.assert_fact(&fact, None).await.unwrap();
+        assert!(store.add_source(fact.id, tuesday.id, None).await.unwrap());
+        assert!(
+            store.add_source(fact.id, tuesday.id, None).await.unwrap(),
+            "a source added twice is held once"
+        );
+        assert!(!store.add_source(Id::new(), tuesday.id, None).await.unwrap());
+
+        assert_eq!(store.forget_episode(monday.id).await.unwrap(), [monday.id]);
+        let kept = held(store, fact.id).await.unwrap();
+        assert_eq!(
+            kept.derived_from,
+            [tuesday.id],
+            "the edge goes with the episode"
+        );
+
+        assert_eq!(
+            store.forget_episode(Id::new()).await.unwrap(),
+            Vec::<Id>::new()
+        );
+        assert_eq!(
+            store.forget_episode(tuesday.id).await.unwrap(),
+            [tuesday.id, fact.id],
+            "the last source takes the fact with it"
+        );
+        assert!(held(store, fact.id).await.is_none());
+        store.forget(trace).await.unwrap();
+    }
+
+    async fn a_fact_takes_the_narrowest_scope_of_its_sources(store: &dyn Store) {
+        let trace = Id::new();
+        let core = Scope::Team("core".into());
+        let team = record_within(store, "narrowest: team", trace, core.clone()).await;
+        let everyone = record_within(store, "narrowest: all", trace, Scope::Organization).await;
+        let web = record_within(store, "narrowest: web", trace, Scope::Team("web".into())).await;
+        assert_eq!(
+            store
+                .episodes()
+                .await
+                .unwrap()
+                .into_iter()
+                .find(|episode| episode.id == team.id)
+                .unwrap()
+                .scope,
+            core,
+            "an episode keeps the scope it was recorded with"
+        );
+
+        let shared = Fact::new("narrowest: shared", vec![team.id, everyone.id], 0.5)
+            .within(Scope::Organization);
+        let mixed = Fact::new("narrowest: mixed", vec![team.id, web.id], 0.5);
+        let unsourced =
+            Fact::new("narrowest: given", vec![Id::new()], 0.5).within(Scope::Organization);
+        for fact in [&shared, &mixed, &unsourced] {
+            store.assert_fact(fact, None).await.unwrap();
+        }
+
+        assert_eq!(held(store, shared.id).await.unwrap().scope, core);
+        assert_eq!(
+            held(store, mixed.id).await.unwrap().scope,
+            Scope::Personal,
+            "two teams make a fact personal"
+        );
+        assert_eq!(
+            held(store, unsourced.id).await.unwrap().scope,
+            Scope::Organization,
+            "a fact with no held source keeps its own"
+        );
+        store.forget(trace).await.unwrap();
+        store.delete_fact(unsourced.id).await.unwrap();
+    }
+
+    async fn adding_a_source_narrows_the_scope_and_moves_the_node(store: &dyn Store) {
+        let trace = Id::new();
+        let everyone = record_within(store, "narrows: all", trace, Scope::Organization).await;
+        let checkout = Scope::Project("checkout".into());
+        let project = record_within(store, "narrows: project", trace, checkout.clone()).await;
+        let mut fact = Fact::new("narrows: the suite is slow", vec![everyone.id], 0.5);
+        let first = Id::new();
+        fact.node = Some(first);
+        store.assert_fact(&fact, None).await.unwrap();
+        assert_eq!(
+            held(store, fact.id).await.unwrap().scope,
+            Scope::Organization
+        );
+
+        let second = Id::new();
+        store
+            .add_source(fact.id, project.id, Some(second))
+            .await
+            .unwrap();
+
+        let read = held(store, fact.id).await.unwrap();
+        assert_eq!(read.scope, checkout);
+        assert_eq!(read.node, Some(second));
+        assert_eq!(read.derived_from, [everyone.id, project.id]);
+        store.forget_episode(project.id).await.unwrap();
+        assert_eq!(
+            held(store, fact.id).await.unwrap().scope,
+            checkout,
+            "forgetting a source never widens a fact"
+        );
+        store.forget(trace).await.unwrap();
+    }
+
+    async fn an_episode_a_pass_read_is_no_longer_pending(store: &dyn Store) {
+        let trace = Id::new();
+        let read = record(store, "pending: read", trace).await;
+        let unread = record(store, "pending: unread", trace).await;
+
+        store
+            .mark_consolidated(&[read.id, Id::new()])
+            .await
+            .unwrap();
+
+        let pending: Vec<Id> = store
+            .unconsolidated()
+            .await
+            .unwrap()
+            .into_iter()
+            .map(|episode| episode.id)
+            .collect();
+        assert!(pending.contains(&unread.id));
+        assert!(!pending.contains(&read.id));
+        store.forget(trace).await.unwrap();
+    }
+
+    async fn deleting_a_fact_restores_what_it_superseded(store: &dyn Store) {
+        let trace = Id::new();
+        let seen = record(store, "deleted: bun", trace).await;
+        let wrong = record(store, "deleted: jest", trace).await;
+        let old = Fact::new("deleted: tests run with bun", vec![seen.id], 0.8);
+        let new = Fact::new("deleted: tests run with jest", vec![wrong.id], 0.9);
+        store.assert_fact(&old, None).await.unwrap();
+        store.assert_fact(&new, Some(old.id)).await.unwrap();
+
+        assert!(store.delete_fact(new.id).await.unwrap());
+        assert!(!store.delete_fact(new.id).await.unwrap());
+
+        let current: Vec<Id> = store
+            .current_facts()
+            .await
+            .unwrap()
+            .into_iter()
+            .map(|fact| fact.id)
+            .collect();
+        assert!(current.contains(&old.id) && !current.contains(&new.id));
+        let pending: Vec<Id> = store
+            .unconsolidated()
+            .await
+            .unwrap()
+            .into_iter()
+            .map(|episode| episode.id)
+            .collect();
+        assert!(
+            !pending.contains(&wrong.id),
+            "a pass does not distill a deleted fact again"
+        );
+        store.forget(trace).await.unwrap();
+    }
+
+    async fn held(store: &dyn Store, fact: Id) -> Option<Fact> {
+        store
+            .facts()
+            .await
+            .unwrap()
+            .into_iter()
+            .find(|held| held.id == fact)
+    }
+
+    async fn record_within(store: &dyn Store, content: &str, trace: Id, scope: Scope) -> Episode {
+        let episode = Episode::new(content, trace).within(scope);
+        store.record(&episode).await.unwrap();
+        episode
     }
 
     async fn a_fact_is_asserted_once(store: &dyn Store) {
@@ -910,7 +1377,7 @@ pub(crate) mod conformance {
 
         let removed = store.forget(tuesday).await.unwrap();
 
-        assert_eq!(removed, [doomed.id, both.id, wrong.id, mixed.id]);
+        assert_eq!(removed, [doomed.id, both.id, wrong.id]);
         let current: Vec<Id> = store
             .current_facts()
             .await
@@ -923,9 +1390,10 @@ pub(crate) mod conformance {
             "what the forgotten fact replaced is current again"
         );
         assert!(
-            !current.contains(&mixed.id),
-            "a fact with any forgotten source goes"
+            current.contains(&mixed.id),
+            "a fact another episode supports stays"
         );
+        assert_eq!(held(store, mixed.id).await.unwrap().derived_from, [kept.id]);
         let episodes: Vec<Id> = store
             .episodes()
             .await
@@ -1030,6 +1498,109 @@ mod tests {
 
         assert_eq!(reopened.episodes().await.unwrap(), [episode]);
         drop(reopened);
+        std::fs::remove_dir_all(&folder).unwrap();
+    }
+
+    #[cfg(feature = "sqlite")]
+    #[tokio::test]
+    async fn forgetting_a_source_prunes_its_rows() {
+        use super::{Sqlite, Store};
+        use crate::{Episode, Fact};
+        use fusion_cortex_core::Id;
+
+        let store = Sqlite::in_memory().await.unwrap();
+        let (monday, tuesday) = (
+            Episode::new("bun", Id::new()),
+            Episode::new("bun", Id::new()),
+        );
+        store.record(&monday).await.unwrap();
+        store.record(&tuesday).await.unwrap();
+        let fact = Fact::new("tests run with bun", vec![monday.id, tuesday.id], 0.8);
+        store.assert_fact(&fact, None).await.unwrap();
+        store.reinforce(fact.id, monday.id).await.unwrap();
+
+        store.forget_episode(monday.id).await.unwrap();
+
+        let rows: i64 = sqlx::query_scalar(
+            "SELECT (SELECT COUNT(*) FROM sources WHERE episode = ?1)
+                  + (SELECT COUNT(*) FROM reinforcements WHERE episode = ?1)",
+        )
+        .bind(monday.id.to_string())
+        .fetch_one(&store.pool)
+        .await
+        .unwrap();
+        assert_eq!(rows, 0, "no row names the forgotten episode");
+    }
+
+    #[cfg(feature = "sqlite")]
+    #[tokio::test]
+    async fn a_file_from_before_scopes_opens_with_its_memory_personal() {
+        use super::{Sqlite, Store};
+        use crate::Scope;
+        use fusion_cortex_core::Id;
+
+        let folder = std::env::temp_dir().join(format!("cortex-engram-{}", Id::new()));
+        std::fs::create_dir_all(&folder).unwrap();
+        let path = folder.join("memory.db");
+        // The file as the release before scopes left it.
+        let (episode, fact, pending) = (Id::new(), Id::new(), Id::new());
+        let pool = sqlx::SqlitePool::connect(&format!("sqlite://{}?mode=rwc", path.display()))
+            .await
+            .unwrap();
+        sqlx::raw_sql(super::sqlite::SCHEMA)
+            .execute(&pool)
+            .await
+            .unwrap();
+        sqlx::query(
+            "INSERT INTO episodes (id, trace, node, occurred_at, content)
+             VALUES (?, ?, NULL, '2026-10-01T09:00:00.000000000Z', 'bun'),
+                    (?, ?, NULL, '2026-10-02T09:00:00.000000000Z', 'pending')",
+        )
+        .bind(episode.to_string())
+        .bind(Id::new().to_string())
+        .bind(pending.to_string())
+        .bind(Id::new().to_string())
+        .execute(&pool)
+        .await
+        .unwrap();
+        sqlx::query(
+            "INSERT INTO facts (id, content, confidence, embedding, superseded_by, updated_at)
+             VALUES (?, 'tests run with bun', 0.8, NULL, NULL, '2026-10-01T09:00:00.000000000Z')",
+        )
+        .bind(fact.to_string())
+        .execute(&pool)
+        .await
+        .unwrap();
+        sqlx::query("INSERT INTO sources (fact, position, episode) VALUES (?, 0, ?)")
+            .bind(fact.to_string())
+            .bind(episode.to_string())
+            .execute(&pool)
+            .await
+            .unwrap();
+        pool.close().await;
+
+        let store = Sqlite::open(&path).await.unwrap();
+
+        let episodes = store.episodes().await.unwrap();
+        assert!(episodes
+            .iter()
+            .all(|episode| episode.scope == Scope::Personal));
+        let facts = store.facts().await.unwrap();
+        assert_eq!(facts[0].scope, Scope::Personal);
+        assert_eq!(facts[0].node, None);
+        let unread: Vec<Id> = store
+            .unconsolidated()
+            .await
+            .unwrap()
+            .into_iter()
+            .map(|episode| episode.id)
+            .collect();
+        assert_eq!(unread, [pending], "an episode a fact rests on was read");
+        drop(store);
+        assert!(
+            Sqlite::open(&path).await.is_ok(),
+            "and opens again without adding the columns twice"
+        );
         std::fs::remove_dir_all(&folder).unwrap();
     }
 }
