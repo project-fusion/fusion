@@ -1,12 +1,14 @@
 /**
- * The vocabulary a family's headless source is written in: its API and its
- * part tree.
+ * The shape of a family's headless source as the compiler reads it: its
+ * props, events, features, and part tree, and the helpers a source's
+ * `derived` and `host` take, `derive()`, `bind()`, and `not()`.
  *
  * **Read as syntax, like a style table.** `helix family` recognizes each
- * helper by name and never runs the module, so a source holds literals,
- * arrays, objects, and calls to these helpers.
+ * helper by name and never runs the module. A source is written in
+ * `headless.tsx` with `render.ts`'s `headless()`, and these types are what it
+ * compiles from.
  *
- * **The tree names parts and props, and never a platform.** `pressable` is
+ * **The tree names parts and props, and never a platform.** A pressable is
  * whatever a platform presses, a `<button>` on the web and a `Pressable` in
  * React Native, and an attribute bound to a prop says which prop drives it.
  * How a platform spells that attribute is the platform's.
@@ -18,7 +20,6 @@ export * from './copy.js'
 export * from './countdown.js'
 export * from './delay.js'
 export * from './fold.js'
-export * from './nodes.js'
 export * from './notices.js'
 export * from './page.js'
 export * from './scroll.js'
@@ -315,35 +316,6 @@ export interface Headless {
   readonly validation?: Validation
 }
 
-/**
- * Declares a family's headless source.
- *
- * **The literal types are kept**, so a style table written with `styles()`
- * is checked against the props, states and parts this source declares. A
- * field `Headless` does not have is still refused.
- */
-export const headless = <const Body extends Omit<Headless, 'name'>>(
-  name: string,
-  body: Body & Record<Exclude<keyof Body, keyof Headless>, never>,
-): Body & Headless => ({
-  name,
-  ...body,
-})
-
-/** A prop, with its name and its type kept as written. */
-export const prop = <const Name extends string, const Type extends PropType>(
-  name: Name,
-  type: Type,
-  extra: Omit<Prop, 'name' | 'type'> = {},
-): Prop & { readonly name: Name; readonly type: Type } => ({
-  name,
-  type,
-  ...extra,
-})
-
-/** An event. */
-export const event = (name: string, extra: Omit<Event, 'name'> = {}): Event => ({ name, ...extra })
-
 /** An attribute the prop `name` drives. */
 export const bind = (name: string): { readonly bind: string } => ({ bind: name })
 
@@ -355,33 +327,6 @@ export const bind = (name: string): { readonly bind: string } => ({ bind: name }
  * derivation.
  */
 export const derive = (name: string): { readonly derive: string } => ({ derive: name })
-
-/**
- * A string chosen by the value of the prop `name`: the one `values` gives
- * that value, or `otherwise`. A toggle group is a toolbar where several items
- * can be pressed, and a radio group otherwise:
- * `pick('selection-mode', { multiple: 'toolbar' }, 'radiogroup')`.
- */
-export const pick = (
-  name: string,
-  values: Readonly<Record<string, string>>,
-  otherwise: string,
-): {
-  readonly otherwise: string
-  readonly pick: string
-  readonly values: Readonly<Record<string, string>>
-} => ({
-  otherwise,
-  pick: name,
-  values,
-})
-
-/**
- * The field `name` of the entry a copy of a repeat over a list draws, as a
- * key's words in a chord: `text('key', { says: field('key') })`. `helix
- * family` refuses one outside a repeat that has an `each`.
- */
-export const field = (name: string): { readonly field: string } => ({ field: name })
 
 /** An attribute that is set while the prop `name` is not. */
 export const not = (name: string): { readonly not: string } => ({ not: name })

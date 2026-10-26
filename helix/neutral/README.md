@@ -25,9 +25,7 @@ The runtime that draws the families on React Native is
 [`helix/native`](../native), published as `@fusion.dev/helix-native`.
 
 Every element's headless source is written with its part tree last, as
-JSX, in `headless.tsx`. The compiler still reads the builder form a
-`headless.ts` writes, with `tree.ts`'s helpers, and both compile to the same
-intermediate form:
+JSX, in `headless.tsx`, and `helix family` refuses a `headless.ts`:
 
 ```tsx
 export default headless('tab', {
@@ -95,10 +93,6 @@ export default headless('tab', {
   them.
 - `helix family` refuses anything else with its line and the form to write
   it in, and an older spelling with the one that replaced it.
-- `helix family print` prints a source written in the builder form as
-  `headless.tsx`, every comment where it stood, and refuses one whose
-  printed form compiles to anything but what it does, the order of its
-  props and events aside.
 
 `helix family build` writes each element's intermediate form to
 `dist/ir/<family>/<element>.json` and its web stylesheet to

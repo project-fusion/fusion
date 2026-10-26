@@ -144,7 +144,7 @@ impl Render<'_> {
         Ok(Lit::Text(kebab(&key)))
     }
 
-    /// An attribute's value, as the builder form writes it.
+    /// An attribute's value, in the compiler's own shape.
     pub(super) fn value(
         &self,
         value: Option<&JSXAttributeValue>,
@@ -224,7 +224,7 @@ impl Render<'_> {
     }
 
     /// `derive('kbd-label')`: a derivation in core, computed where the node
-    /// is drawn, as the builder form's `derive()`.
+    /// is drawn, as the compiler's own `derive()`.
     pub(super) fn derive(&self, call: &oxc_ast::ast::CallExpression) -> Result<Lit, String> {
         let refuse = || {
             self.at(
@@ -382,7 +382,7 @@ impl Render<'_> {
     }
 }
 
-/// A read as the attribute the builder form writes for it.
+/// A read as the attribute the compiler's own shape holds for it.
 pub(super) fn bound(read: Read) -> Lit {
     match read {
         Read::Named(name) | Read::Slot(name) => Lit::Call("bind".to_owned(), vec![Lit::Text(name)]),
