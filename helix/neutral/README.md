@@ -13,6 +13,8 @@ Trend.
 | Path | What it is |
 |---|---|
 | `src/families/<family>/<element>/headless.ts` | The element's props, events, states, collection, and part tree |
+| `src/families/<family>/<element>/headless.tsx` | The same, written as one object with its part tree last, as JSX |
+| `src/render.ts` | How a `headless.tsx` source is written: `headless()`, its nodes, and the helpers its props and events take |
 | `src/families/<family>/<element>/styled.ts` | The props only the styled tier has, and the style table |
 | `src/table.ts` | How a style table is written: `styles()`, its groups and rules, and fragments |
 | `src/style.ts` | The values a style table's declarations take |
@@ -22,6 +24,50 @@ Trend.
 
 The runtime that draws the families on React Native is
 [`helix/native`](../native), published as `@fusion.dev/helix-native`.
+
+A headless source may be written with its part tree last, as JSX, in
+`headless.tsx`. Tabs' Tab, Button, and Menu are written this way, and the
+other families move to it one at a time. Both forms compile to the same
+intermediate form:
+
+```tsx
+export default headless('tab', {
+  memberOf: set('tabs', { pressChooses: true }),
+  props: { disabled: false, dismissLabel: 'Close', href: string() },
+  events: { beforeSelect: cancelable(['value']) },
+  states: ['selected'],
+  render: ({ props, send }) => (
+    <Pressable
+      part="tab"
+      chooses
+      role="tab"
+      disabled={props.disabled}
+      onPress={send.beforeSelect}
+    >
+      <Slot part="label" />
+    </Pressable>
+  ),
+})
+```
+
+- Each prop and event is named in camelCase, and the web's name is its
+  hyphenated form: `dismissLabel` is the attribute `dismiss-label`.
+- A prop is its default, which says its type, or `string()`, `boolean()`,
+  `number()`, `oneOf([...], default)`, with `property()` for one that is no
+  attribute and `web()` for one only the web element has.
+- An event is its detail's fields, `cancelable([...])`, or `bare([...])`.
+- The nodes are `View`, `Text`, `Image`, `Pressable`, `Slot`, `Layer`,
+  `Announce`, `Repeat`, `Wrap`, `Svg`, and the shapes inside a vector.
+- A render reads `props.x`, `derived.x`, `state.x`, and `stack.x`, each typed
+  from the keys before it. A child is a node, `x && <Node />`, `!x &&
+  <Node />`, or `x ? <A /> : <B />`, and an attribute is a literal, a read,
+  `!` before one, or `x ? 'a' : 'b'`. `helix family` refuses anything else
+  with its line and the form to write it in.
+
+A style table over a source written this way reads a condition's name in
+one namespace: `{ hover: true, disabled: false }` is the part's `disabled`
+where the part carries it, a state, or a prop, resolved from the source, and
+a name that is two of those is refused.
 
 `helix family build` writes each element's intermediate form to
 `dist/ir/<family>/<element>.json` and its web stylesheet to
@@ -81,6 +127,19 @@ export default styles(
   quoted custom property, and the private values the rule sets under `own`.
 - `hook.color()` reads a hook `hooks` declares, and `own.radius` a private
   value `own` declares, its name less the prefix.
+- `hooks` may give each hook's default once, by its name in camelCase,
+  `hooks: ({ own }) => ({ color: token('color-foreground-muted') })`, and
+  `own` each private value's, by its whole name in camelCase, `null` for one
+  with none. A rule then reads `hook.color`, and `hook.color(fallback)` is
+  its own fallback. `helix family build` notes a hook read with several
+  fallbacks.
+- `first(own.tabHeight, hook.blockSize, token('size-control'))` is the first
+  of several reads that is set, and the last argument where none is.
+- `ownOf('tabs', 'dismiss-rest', 1)` reads another family's private value,
+  as `hookOf()` reads its hook.
+- `web([rule(...)])` and `native([rule(...)])` are rules one platform's
+  alone, and a set's `web: { cursor: 'pointer' }` holds declarations a phone
+  does not have.
 - `include(field)` takes in a fragment imported from `src/fragments`, written
   with `fragment()`, or `declarations()` for a fragment a `set` takes in.
 - `over` names the element a table is drawn over, as Copy Button's names

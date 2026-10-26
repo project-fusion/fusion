@@ -1,23 +1,19 @@
 import {
-  bind,
-  box,
-  collection,
-  derive,
-  event,
+  Announce,
+  bare,
+  boolean,
+  cancelable,
   headless,
-  layer,
-  live,
-  pick,
-  pressable,
-  prop,
-  region,
-  stack,
-  text,
-  toggle,
-  unless,
-  when,
-  wrap,
-} from '../../../tree.js'
+  Layer,
+  oneOf,
+  Pressable,
+  Slot,
+  Text,
+  View,
+  Wrap,
+  web,
+} from '../../../render.js'
+import { bind, collection, derive, stack, toggle } from '../../../tree.js'
 
 /**
  * Menu's headless tier: a panel of rows that opens from its trigger, opened
@@ -77,44 +73,41 @@ export default headless('menu', {
   }),
   derived: {
     arrows: derive('menu-arrows'),
-    'back-name': derive('menu-back-name'),
-    'empty-words': derive('menu-empty'),
-    'hold-hint': derive('menu-hold-hint'),
+    backName: derive('menu-back-name'),
+    emptyWords: derive('menu-empty'),
+    holdHint: derive('menu-hold-hint'),
     holds: derive('menu-holds'),
-    'loading-words': derive('menu-loading'),
+    loadingWords: derive('menu-loading'),
     marked: derive('menu-mark'),
     name: derive('menu-name'),
     rows: bind('default'),
     started: derive('menu-start'),
     status: derive('menu-status'),
   },
-  events: [
-    event('before-close', { cancelable: true, detail: ['open'] }),
-    event('before-filter', { cancelable: true, detail: ['value'], platform: 'web' }),
-    event('before-open', { cancelable: true, detail: ['open'] }),
-    event('before-select', { cancelable: true, detail: ['value'] }),
-    event('change', { bare: true }),
-    event('filter', { detail: ['value'], platform: 'web' }),
-    event('select', { detail: ['value'] }),
-    event('toggle', { bare: true, detail: ['newState', 'oldState'] }),
-  ],
-  props: [
-    prop('back-label', 'string', { default: 'Back' }),
-    prop('close-on-select', 'boolean', { default: true }),
-    prop('context', 'boolean', { default: false }),
-    prop('default-open', 'boolean', { default: false }),
-    prop('empty-text', 'string', { default: 'Nothing to show' }),
-    prop('label', 'string', { default: '' }),
-    prop('loading', 'boolean', { default: false }),
-    prop('loading-text', 'string', { default: 'Loading' }),
-    prop('long-press-label', 'string', {
-      default: 'Long press or press Alt+Down to show the menu',
-    }),
-    prop('offset', 'number', { default: 4 }),
-    prop('open', 'boolean'),
-    prop('open-on', ['click', 'long-press'], { default: 'click' }),
-    prop(
-      'placement',
+  events: {
+    beforeClose: cancelable(['open']),
+    beforeFilter: web(cancelable(['value'])),
+    beforeOpen: cancelable(['open']),
+    beforeSelect: cancelable(['value']),
+    change: bare(),
+    filter: web(['value']),
+    select: ['value'],
+    toggle: bare(['newState', 'oldState']),
+  },
+  props: {
+    backLabel: 'Back',
+    closeOnSelect: true,
+    context: false,
+    defaultOpen: false,
+    emptyText: 'Nothing to show',
+    label: '',
+    loading: false,
+    loadingText: 'Loading',
+    longPressLabel: 'Long press or press Alt+Down to show the menu',
+    offset: 4,
+    open: boolean(),
+    openOn: oneOf(['click', 'long-press'], 'click'),
+    placement: oneOf(
       [
         'bottom',
         'bottom-end',
@@ -129,22 +122,19 @@ export default headless('menu', {
         'top-end',
         'top-start',
       ],
-      { default: 'bottom-start' },
+      'bottom-start',
     ),
-    prop('presentation', ['auto', 'popover', 'sheet'], { default: 'auto' }),
-    prop('submenus', ['drill', 'flyout'], { default: 'drill' }),
+    presentation: oneOf(['auto', 'popover', 'sheet'], 'auto'),
+    submenus: oneOf(['drill', 'flyout'], 'drill'),
     /* The filter, an area by its id, and the things in it a context menu is about. */
-    prop('filter', 'string', { default: '', platform: 'web' }),
-    prop('filter-label', 'string', { default: 'Filter', platform: 'web' }),
-    prop('filterable', 'boolean', { default: false, platform: 'web' }),
-    prop('for', 'string', { default: '', platform: 'web' }),
-    prop('no-results-text', 'string', { default: 'No matches', platform: 'web' }),
-    prop('results-label', 'string', {
-      default: '{count, plural, one {# result} other {# results}}',
-      platform: 'web',
-    }),
-    prop('targets', 'string', { default: '', platform: 'web' }),
-  ],
+    filter: web(''),
+    filterLabel: web('Filter'),
+    filterable: web(false),
+    for: web(''),
+    noResultsText: web('No matches'),
+    resultsLabel: web('{count, plural, one {# result} other {# results}}'),
+    targets: web(''),
+  },
   stack: stack({ back: 'back', drilled: 'drilled', label: 'page-label', top: 'name' }),
   states: [
     'aligned-end',
@@ -169,59 +159,83 @@ export default headless('menu', {
     initial: 'default-open',
     opens: 'before-open',
   }),
-  tree: [
-    /* The trigger's own box on a phone, which the panel is placed against.
-       The web places it against the trigger passed in. */
-    wrap('trigger', { platform: 'native', while: true }, [region('trigger')]),
-    layer(
-      'surface',
-      {
-        anchor: 'trigger',
-        arrows: bind('arrows'),
-        closedby: 'any',
-        enters: 'press',
-        hint: bind('hold-hint'),
-        holds: bind('holds'),
-        label: bind('page-label'),
-        offset: bind('offset'),
-        open: bind('open'),
-        placement: bind('placement'),
-        presentation: bind('presentation'),
-        presses: pick('holds', { true: 'none' }, 'toggle'),
-        returns: 'held',
-        role: 'menu',
-      },
-      [
-        when(
-          'drilled',
-          box('header', {}, [
-            pressable('back', { label: bind('back-name'), role: 'menuitem' }, [
-              box('back-mark', { decorative: true, glyph: 'caret-left' }),
-            ]),
-            box('title', {}, [text('title-words', { says: bind('page-label') })]),
-          ]),
-        ),
-        box('search-field', { platform: 'web' }),
-        region('default'),
-        /* What the filter says where it keeps no rows. */
-        region('no-results', { platform: 'web' }),
-        when(
-          'loading',
-          box('loading', {}, [
-            region('loading', {}, [text('loading-words', { says: bind('loading-words') })]),
-          ]),
-        ),
-        unless(
-          'loading',
-          unless(
-            'rows',
-            box('empty', {}, [
-              region('empty', {}, [text('empty-words', { says: bind('empty-words') })]),
-            ]),
-          ),
-        ),
-      ],
-    ),
-    live('live', { follows: 'status', says: bind('status') }),
-  ],
+  render: ({ derived, props, stack, state }) => (
+    <>
+      {/* The trigger's own box on a phone, which the panel is placed against.
+          The web places it against the trigger passed in. */}
+      <Wrap
+        part="trigger"
+        platform="native"
+        when
+      >
+        <Slot name="trigger" />
+      </Wrap>
+      <Layer
+        part="surface"
+        role="menu"
+        anchor="trigger"
+        closedby="any"
+        enters="press"
+        returns="held"
+        arrows={derived.arrows}
+        hint={derived.holdHint}
+        holds={derived.holds}
+        label={stack.label}
+        offset={props.offset}
+        open={props.open}
+        placement={props.placement}
+        presentation={props.presentation}
+        presses={derived.holds ? 'none' : 'toggle'}
+      >
+        {state.drilled && (
+          <View part="header">
+            <Pressable
+              part="back"
+              role="menuitem"
+              label={derived.backName}
+            >
+              <View
+                part="back-mark"
+                ariaHidden
+                icon="caret-left"
+              />
+            </Pressable>
+            <View part="title">
+              <Text part="title-words">{stack.label}</Text>
+            </View>
+          </View>
+        )}
+        <View
+          part="search-field"
+          platform="web"
+        />
+        <Slot />
+        {/* What the filter says where it keeps no rows. */}
+        <Slot
+          name="no-results"
+          platform="web"
+        />
+        {props.loading && (
+          <View part="loading">
+            <Slot name="loading">
+              <Text part="loading-words">{derived.loadingWords}</Text>
+            </Slot>
+          </View>
+        )}
+        {!props.loading && !derived.rows && (
+          <View part="empty">
+            <Slot name="empty">
+              <Text part="empty-words">{derived.emptyWords}</Text>
+            </Slot>
+          </View>
+        )}
+      </Layer>
+      <Announce
+        part="live"
+        follows="status"
+      >
+        {derived.status}
+      </Announce>
+    </>
+  ),
 })
