@@ -27,7 +27,7 @@ import {
  * says `helix-button` has, so the source cannot drop or invent one unseen.
  */
 export default headless('button', {
-  memberOf: set('button-group', { pressChooses: true, state: 'pressed' }),
+  memberOf: set('button-group', { state: 'pressed' }),
   props: {
     disabled: false,
     expanded: property(boolean()),

@@ -47,6 +47,15 @@ impl Render<'_> {
         if let Some(shape) = shape {
             attributes.push(("shape".to_owned(), Lit::Text((*shape).to_owned())));
         }
+        /* A wrap with no condition always wraps, and a link wraps what it
+        links. */
+        if tag == "Wrap"
+            && !attributes
+                .iter()
+                .any(|(key, _)| key == "while" || key == "href")
+        {
+            attributes.push(("while".to_owned(), Lit::Bool(true)));
+        }
         if tag == "Svg" && !attributes.iter().any(|(key, _)| key == "viewBox") {
             return Err(self.at(opening.span, "`<Svg>` takes the `viewBox` it draws in"));
         }
@@ -125,7 +134,14 @@ impl Render<'_> {
         let value = attribute.value.as_ref();
         match (tag, key) {
             (_, "onPress") => Ok(("sends".to_owned(), self.send(attribute)?)),
-            ("Wrap" | "Announce", "when") => Ok(("while".to_owned(), self.value(value, attribute.span)?)),
+            ("Wrap", "when") => match self.value(value, attribute.span)? {
+                Lit::Bool(true) => Err(self.at(
+                    attribute.span,
+                    "a wrap that always wraps writes no `when`: `<Wrap part=\"...\">`",
+                )),
+                read => Ok(("while".to_owned(), read)),
+            },
+            ("Announce", "when") => Ok(("while".to_owned(), self.value(value, attribute.span)?)),
             ("View", "viewBox") => Err(self.at(
                 attribute.span,
                 "a box that draws a vector is `<Svg viewBox=\"...\">`",
