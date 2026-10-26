@@ -35,7 +35,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { bubblingOf, catalog, tierOf } from '@fusion.dev/helix-cem'
+import { bubblingOf, catalog, tierOf, withAnatomy } from '@fusion.dev/helix-cem'
 import { pages as docPages, reference } from '@fusion.dev/helix-docs'
 import { findSitePage, sitePageSources } from '@fusion.dev/insights'
 import { documented, root } from '@fusion.dev/scripts/workspace'
@@ -80,6 +80,29 @@ const MANIFESTS = DOCUMENTED.map((one) => one.manifest)
  * preference set sees the tier almost everyone consumes.
  */
 const EXAMPLES = DOCUMENTED.map((one) => join(root, one.directory, 'src'))
+
+/**
+ * Each element's anatomy, by tag, from the `api.json` every documented package
+ * writes: `analyze` asks the compiler for it, so the page draws what the
+ * package records and `helix api anatomy` prints.
+ */
+function anatomyOf(packages) {
+  const found = {}
+  for (const one of packages) {
+    const file = join(root, one.api)
+    if (!existsSync(file)) {
+      continue
+    }
+    for (const family of JSON.parse(readFileSync(file, 'utf8')).families) {
+      for (const element of family.elements) {
+        if (element.anatomy) {
+          found[element.tagName] = element.anatomy
+        }
+      }
+    }
+  }
+  return found
+}
 
 const manifests = MANIFESTS.map((path) => {
   const file = join(root, path)
@@ -143,7 +166,10 @@ for (const source of EXAMPLES) {
 /* Whether each event bubbles, read from the event classes as `analyze` reads
    them, so a family's `.json` and `/helix/api.json` say what each package's
    `api.json` says. */
-const families = catalog(manifests, examples, bubblingOf(join(root, 'fusion/site')))
+const families = withAnatomy(
+  catalog(manifests, examples, bubblingOf(join(root, 'fusion/site'))),
+  anatomyOf(DOCUMENTED),
+)
 mkdirSync(dirname(OUT), { recursive: true })
 writeFileSync(OUT, `${JSON.stringify(families)}\n`)
 

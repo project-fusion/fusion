@@ -46,6 +46,7 @@ use crate::args::{
     FamilyStylesheets, FamilyTypes,
 };
 use crate::family::compile::Compiled;
+pub use components::anatomy::print as anatomy;
 pub use components::print as platforms;
 
 pub use tokens::{design_files as design_tokens, native_modules as tokens};
