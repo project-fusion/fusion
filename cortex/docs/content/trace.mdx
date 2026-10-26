@@ -71,8 +71,9 @@ loop that restarts loads its trace and continues from the last node.
 
 - `InMemory` is the reference store.
 - `Sqlite` keeps traces in a SQLite file.
-- Both pass the same conformance suite, and a Postgres store is planned behind
-  the same `Store` trait.
+- `Postgres` keeps traces in a Postgres database, local or hosted.
+- All three pass the same conformance suite, and `store::open` picks a backend
+  by its connection string, as the Choosing storage guide describes.
 
 Deleting a node removes everything derived from it, in every trace the store
 holds.

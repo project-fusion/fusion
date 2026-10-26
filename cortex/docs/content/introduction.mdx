@@ -21,8 +21,9 @@ If a system that remembers you stores that memory on someone else's server, you
 still depend on that server.
 
 Cortex keeps its data in SQLite on your machine by default. Trace and Engram
-each have a SQLite store behind a trait that a Postgres store will share, and a
-hosted tier will be an option. The `Provider` trait has an `is_local` flag, so
+each have a SQLite store and a Postgres store behind one trait, and the
+Choosing storage guide shows how to pick one by its connection string. A hosted
+tier will be an option. The `Provider` trait has an `is_local` flag, so
 a product can tell you whether your data left the device:
 
 [//]: # (rust:fusion-cortex-core::provider::MockProvider)
