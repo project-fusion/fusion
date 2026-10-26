@@ -2,6 +2,7 @@ import type { ReactiveController, ReactiveControllerHost } from 'lit'
 import { DismissController } from '../dismiss-controller/dismiss-controller.js'
 import { FloatingController, type Placement } from '../floating-controller/floating-controller.js'
 import { PresentationController } from '../presentation-controller/presentation-controller.js'
+import { Scrim } from './scrim.js'
 
 export interface PopoverOptions {
   /** The element the surface opens against. */
@@ -129,7 +130,10 @@ export interface PopoverOptions {
    * a window narrower than 30rem, as `PresentationController` decides it and
    * a phone's layer does. **A sheet is placed by its own stylesheet**, as
    * `place` false is, and the host is told each turn in `onPresent`, where it
-   * sets its `sheet` state. Left unset, the surface is never a sheet.
+   * sets its `sheet` state. **A press beside a sheet stops at its scrim**:
+   * it closes the sheet through `onDismiss` and reaches nothing under it, as
+   * `Scrim` says. Beside a popover, a press closes the panel and reaches the
+   * page. Left unset, the surface is never a sheet.
    */
   presentation?: () => unknown
 
@@ -291,8 +295,19 @@ export class PopoverController implements ReactiveController {
             asked,
             changed: (sheet) => options.onPresent?.(sheet),
           })
+    this.scrim =
+      asked === undefined
+        ? undefined
+        : new Scrim({
+            holds: (layer) => drawnInside(layer, host),
+            onPress: options.onDismiss,
+            surface: options.surface,
+          })
     host.addController(this)
   }
+
+  /** What takes a press beside the surface while it is a sheet. */
+  private readonly scrim: Scrim | undefined
 
   /** Whether the surface is a sheet, where the host asks for a presentation. */
   private readonly presenting: PresentationController | undefined
@@ -316,6 +331,16 @@ export class PopoverController implements ReactiveController {
       this.hide()
     }
     this.replace()
+    this.cover()
+  }
+
+  /** Puts the scrim's presses where the surface is: beside a sheet that shows. */
+  private cover(): void {
+    if (this.shown && this.sheet) {
+      this.scrim?.cover()
+    } else {
+      this.scrim?.uncover()
+    }
   }
 
   /** Whether the surface shown now is placed against its anchor. */
@@ -409,6 +434,7 @@ export class PopoverController implements ReactiveController {
     }
     this.settle(surface, false)
     this.dismisser.activate()
+    this.cover()
     if (this.options.hints !== 'keep') {
       const panels = openPanels()
       this.held = surface
@@ -435,6 +461,7 @@ export class PopoverController implements ReactiveController {
     }
     this.shown = false
     this.freeHints()
+    this.scrim?.uncover()
     this.dismisser.deactivate()
     this.floating.stop()
     surface?.hidePopover?.()
@@ -478,6 +505,7 @@ export class PopoverController implements ReactiveController {
   hostDisconnected(): void {
     this.shown = false
     this.freeHints()
+    this.scrim?.uncover()
   }
 
   /**

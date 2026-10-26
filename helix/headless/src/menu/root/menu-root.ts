@@ -120,7 +120,9 @@ const isSection = (element: Element): element is HelixHeadlessMenuSection =>
  * **In a window narrower than 30rem the panel is a sheet** along the
  * window's bottom edge, clear of the home indicator, as it is on a phone, and
  * in a wider one a popover against its trigger. `presentation` draws either
- * one at any width.
+ * one at any width. A press beside the sheet closes it and stops at its
+ * scrim, as a phone's does. A press beside the popover closes it and reaches
+ * the page.
  *
  * While it is open, the surface carries the trigger's width as
  * `--floating-anchor-inline-size` and the room left below it as

@@ -24,6 +24,11 @@ import { styles } from './app-header-root.generated.css.js'
  * against a hero and lifts off the content afterwards. The header has no
  * shadow.
  *
+ * The header pads its top by the window's top safe area,
+ * `env(safe-area-inset-top)`, so it stands clear of a notch on a page with
+ * `viewport-fit=cover`, as it does on a phone. On any other page that inset
+ * is 0.
+ *
  * @since 0.1.0
  * @status stable
  * @category navigation
@@ -96,9 +101,8 @@ export class HelixAppHeader extends HelixHeadlessAppHeader {
    * it, as a hero under a `glass` or `transparent` bar does, and pads its own
    * top by the bar's height. Opt in: absent, the bar is in the flow.
    *
-   * It pairs with `material`, which is what lets the section show through. A
-   * phone takes the same room back, and the safe area the bar stands clear of
-   * at the top of the window too.
+   * It pairs with `material`, which is what lets the section show through. It
+   * takes back the top safe area the bar stands clear of too, as a phone does.
    */
   @property({ reflect: true, type: Boolean })
   overlay = false

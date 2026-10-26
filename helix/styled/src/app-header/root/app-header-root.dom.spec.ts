@@ -43,9 +43,13 @@ describe('app header', () => {
   test('takes back its own height under overlay and stands over the section after it', () => {
     const overlay = rule(':host([overlay])')
     expect(overlay).toContain(
-      'margin-block-end: calc(var(--app-header-block-size, var(--helix-size-header)) * -1)',
+      'margin-block-end: calc(var(--app-header-block-size, var(--helix-size-header)) * -1 - env(safe-area-inset-top, 0px))',
     )
     expect(overlay).toContain('z-index: var(--helix-layer-sticky)')
+  })
+
+  test('stands clear of the notch by the top safe area, as a phone’s bar does', () => {
+    expect(rule(':host')).toContain('padding-block-start: env(safe-area-inset-top, 0px)')
   })
 
   test('draws the generated sheet, with the glass a transparent bar takes once scrolled', () => {

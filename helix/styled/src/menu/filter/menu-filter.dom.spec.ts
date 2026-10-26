@@ -1,6 +1,13 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { mount, part, registerDom, settle, type Updatable } from '@fusion.dev/helix-testing/dom'
+import {
+  hasLayout,
+  mount,
+  part,
+  registerDom,
+  settle,
+  type Updatable,
+} from '@fusion.dev/helix-testing/dom'
 import type { CSSResult } from 'lit'
 
 /* Imported after registration, as every element is, so Lit reads the DOM the
@@ -47,5 +54,25 @@ describe('a filterable styled menu', () => {
     expect(part(host, 'search-field')).toBeNull()
     expect(adopted(host)).toBe(false)
     expect(adopted(await menu(''))).toBe(false)
+  })
+
+  /* Disabled on its host, where the filter field's focus can point at it,
+     and dimmed as a phone dims it. */
+  test('dims a disabled row', async () => {
+    const host = (await mount(`<helix-menu filterable>
+      <button slot="trigger">Move to</button>
+      <helix-menu-item value="inbox">Inbox</helix-menu-item>
+      <helix-menu-item value="archive" disabled>Archive</helix-menu-item>
+    </helix-menu>`)) as Menu
+    host.show()
+    await settle(host)
+    const row = host.querySelector('[disabled]') as Updatable
+    await settle(row)
+    const item = part(row, 'item') as HTMLElement
+    expect(item.hasAttribute('aria-disabled')).toBe(false)
+    expect(row.matches('[disabled]')).toBe(true)
+    if (hasLayout()) {
+      expect(getComputedStyle(item).opacity).toBe('0.5')
+    }
   })
 })
