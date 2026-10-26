@@ -27,7 +27,7 @@
 use std::{collections::HashMap, time::Instant};
 
 use fusion_cortex_core::{
-    provider::{Message, Provider, Request, Tool},
+    provider::{Format, Message, Provider, Request, Tool},
     Id,
 };
 
@@ -174,7 +174,7 @@ impl Graph {
     /// #     vec![],
     /// # ));
     /// # let context = graph.insert(Node::new(
-    /// #     Detail::Context { dropped: vec![], messages: vec![], placed: vec![], strategy: "recency".into(), tools: vec![] },
+    /// #     Detail::Context { dropped: vec![], format: None, messages: vec![], placed: vec![], strategy: "recency".into(), tools: vec![] },
     /// #     vec![source],
     /// # ));
     /// # let output = graph.insert(Node::new(
@@ -238,10 +238,11 @@ impl Graph {
                     prompt_version,
                     ..
                 } => {
-                    let (messages, tools) = self.context_for(id)?;
+                    let asked = self.context_for(id)?;
                     let request = Request {
-                        messages: messages.to_vec(),
-                        tools: tools.to_vec(),
+                        format: asked.format.cloned(),
+                        messages: asked.messages.to_vec(),
+                        tools: asked.tools.to_vec(),
                         ..Request::default()
                     };
                     let started = Instant::now();
@@ -293,25 +294,39 @@ impl Graph {
         })
     }
 
-    /// The messages that produced an output, and the tools offered with
-    /// them, found by walking its derivation.
+    /// The messages that produced an output, with the tools offered and the
+    /// format asked for, found by walking its derivation.
     ///
     /// [`Graph::why`] is breadth-first, so the first context it reaches is the
     /// nearest one. The property that makes it the right shape for an
     /// explanation makes it the right search here: an output assembled from a
     /// context that was itself summarized from an older one must replay against
     /// what actually went to the model, not against its ancestor.
-    fn context_for(&self, id: Id) -> Result<(&[Message], &[Tool])> {
+    fn context_for(&self, id: Id) -> Result<Asked<'_>> {
         self.why(id)
             .into_iter()
             .find_map(|node| match &node.detail {
                 Detail::Context {
-                    messages, tools, ..
-                } => Some((messages.as_slice(), tools.as_slice())),
+                    format,
+                    messages,
+                    tools,
+                    ..
+                } => Some(Asked {
+                    format: format.as_ref(),
+                    messages,
+                    tools,
+                }),
                 _ => None,
             })
             .ok_or(Error::Unanchored(id))
     }
+}
+
+/// What a context node asked the model.
+struct Asked<'a> {
+    format: Option<&'a Format>,
+    messages: &'a [Message],
+    tools: &'a [Tool],
 }
 
 /// Compares an output's content with what the replay produced.
@@ -416,6 +431,7 @@ mod tests {
         let context = graph.insert(Node::new(
             Detail::Context {
                 dropped: vec![],
+                format: None,
                 placed: vec![],
                 messages: vec![Message::text(Role::User, "when did we ship 0.11?")],
                 strategy: "recency".into(),
@@ -536,6 +552,7 @@ mod tests {
         let context = graph.insert(Node::new(
             Detail::Context {
                 dropped: vec![],
+                format: None,
                 placed: vec![],
                 messages: vec![],
                 strategy: "recency".into(),
@@ -584,16 +601,21 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn a_replay_offers_the_tools_the_context_offered_and_records_the_call() {
+    async fn a_replay_asks_with_the_tools_and_the_format_of_its_context_and_records_the_call() {
         let weather = Tool {
             description: "The weather in a city.".into(),
             name: "weather".into(),
+            schema: serde_json::json!({ "type": "object" }),
+        };
+        let format = Format {
+            name: "forecast".into(),
             schema: serde_json::json!({ "type": "object" }),
         };
         let mut graph = Graph::new();
         let context = graph.insert(Node::new(
             Detail::Context {
                 dropped: vec![],
+                format: Some(format.clone()),
                 placed: vec![],
                 messages: vec![Message::text(Role::User, "weather in Paris?")],
                 strategy: "session".into(),
@@ -614,6 +636,7 @@ mod tests {
         let replay = graph.replay(output, &provider, &Exact).await.unwrap();
 
         assert_eq!(provider.requests()[0].tools, vec![weather]);
+        assert_eq!(provider.requests()[0].format, Some(format));
         let Detail::Output {
             call: Some(call), ..
         } = &replay.divergences[0].after

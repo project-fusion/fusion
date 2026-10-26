@@ -121,11 +121,90 @@ impl Anthropic {
                 .collect();
         }
         if let Some(effort) = request.effort {
-            body["output_config"] = json!({ "effort": effort.name() });
+            body["output_config"]["effort"] = json!(effort.name());
             body["thinking"] = json!({ "display": "summarized", "type": "adaptive" });
+        }
+        if let Some(format) = &request.format {
+            body["output_config"]["format"] =
+                json!({ "schema": decodable(&format.schema), "type": "json_schema" });
         }
         body
     }
+}
+
+/// Keywords the API refuses in an output schema. It decodes under the schema,
+/// and a bound on a number or a length is not something it decodes to, so the
+/// caller's validation holds them instead.
+const UNDECODABLE: [&str; 8] = [
+    "exclusiveMaximum",
+    "exclusiveMinimum",
+    "maxItems",
+    "maxLength",
+    "maximum",
+    "minLength",
+    "minimum",
+    "multipleOf",
+];
+
+/// The formats the API decodes. A schema generated from a Rust type names
+/// others, such as `uint32`.
+const FORMATS: [&str; 10] = [
+    "date",
+    "date-time",
+    "duration",
+    "email",
+    "hostname",
+    "ipv4",
+    "ipv6",
+    "time",
+    "uri",
+    "uuid",
+];
+
+/// `schema` as the API takes it: every object closed to other properties,
+/// which the API requires, and the keywords it cannot decode left out.
+///
+/// Walked by keyword, so a property named `minimum` keeps its name: only a
+/// keyword's own value is a schema, and only a schema loses keywords.
+fn decodable(schema: &Value) -> Value {
+    let Value::Object(fields) = schema else {
+        return schema.clone();
+    };
+    let mut out = serde_json::Map::new();
+    for (key, value) in fields {
+        let kept = match key.as_str() {
+            "$defs" | "definitions" | "properties" => match value {
+                Value::Object(named) => Value::Object(
+                    named
+                        .iter()
+                        .map(|(name, schema)| (name.clone(), decodable(schema)))
+                        .collect(),
+                ),
+                other => other.clone(),
+            },
+            "allOf" | "anyOf" | "oneOf" | "prefixItems" => match value {
+                Value::Array(schemas) => schemas.iter().map(decodable).collect(),
+                other => other.clone(),
+            },
+            "items" | "not" => decodable(value),
+            "format" if !value.as_str().is_some_and(|name| FORMATS.contains(&name)) => continue,
+            "minItems" if value.as_u64().is_none_or(|count| count > 1) => continue,
+            key if UNDECODABLE.contains(&key) => continue,
+            _ => value.clone(),
+        };
+        out.insert(key.clone(), kept);
+    }
+    let object = out.contains_key("properties")
+        || out.get("type").is_some_and(|kind| {
+            kind == "object"
+                || kind
+                    .as_array()
+                    .is_some_and(|kinds| kinds.contains(&json!("object")))
+        });
+    if object {
+        out.insert("additionalProperties".into(), json!(false));
+    }
+    Value::Object(out)
 }
 
 /// A text block that has text. The API rejects an empty one, and one of
@@ -460,7 +539,7 @@ impl Decode for Decoder {
 mod tests {
     use super::*;
     use crate::http::canned::Canned;
-    use fusion_cortex_core::provider::{collect, Effort, Tool};
+    use fusion_cortex_core::provider::{collect, Effort, Format, Tool};
 
     const STREAM: &str = r#"event: message_start
 data: {"type":"message_start","message":{"id":"msg_01","type":"message","role":"assistant","model":"claude-opus-5-5","content":[],"stop_reason":null,"usage":{"input_tokens":12,"cache_creation_input_tokens":300,"cache_read_input_tokens":2000,"output_tokens":1}}}
@@ -613,6 +692,7 @@ data: {"type":"message_stop"}
     fn conversation() -> Request {
         Request {
             effort: Some(Effort::Xhigh),
+            format: None,
             max_tokens: Some(4096),
             messages: vec![
                 Message::text(Role::System, "Answer briefly."),
@@ -910,5 +990,51 @@ data: {"type":"message_stop"}
         .unwrap();
 
         assert_eq!(response.content, vec![Block::text("Done.")]);
+    }
+
+    #[tokio::test]
+    async fn a_format_closes_each_object_and_leaves_out_what_the_api_cannot_decode() {
+        let transport = Arc::new(Canned::new(STREAM, usize::MAX));
+        let request = Request {
+            effort: Some(Effort::Low),
+            format: Some(Format {
+                name: "reading".into(),
+                schema: json!({
+                    "properties": {
+                        "minimum": { "format": "uint32", "minimum": 0, "type": "integer" },
+                        "taken": { "format": "date-time", "type": "string" },
+                        "tags": { "items": { "type": "string" }, "maxItems": 3, "type": "array" },
+                    },
+                    "required": ["minimum"],
+                    "type": "object",
+                }),
+            }),
+            ..Request::default()
+        };
+
+        provider(&transport).complete(&request).await.unwrap();
+
+        let config = &transport.body()["output_config"];
+        assert_eq!(
+            config["effort"], "low",
+            "the effort stays beside the format"
+        );
+        assert_eq!(
+            config["format"],
+            json!({
+                "schema": {
+                    "additionalProperties": false,
+                    "properties": {
+                        "minimum": { "type": "integer" },
+                        "taken": { "format": "date-time", "type": "string" },
+                        "tags": { "items": { "type": "string" }, "type": "array" },
+                    },
+                    "required": ["minimum"],
+                    "type": "object",
+                },
+                "type": "json_schema",
+            }),
+            "a property named for a keyword keeps its name"
+        );
     }
 }

@@ -83,7 +83,9 @@ impl Example {
             | Detail::Decision { .. }
             | Detail::Check { .. }
             | Detail::Edit { .. }
-            | Detail::Billed(_) => unreachable!("the example is a retrieval trace"),
+            | Detail::Billed(_)
+            | Detail::Validation(_)
+            | Detail::Extraction { .. } => unreachable!("the example is a retrieval trace"),
         };
         let derived_from = from.iter().map(|one| self.id(one)).collect();
         let id = self.graph.insert(Node::new(detail, derived_from));
@@ -147,6 +149,7 @@ impl Example {
         ];
         let detail = Detail::Context {
             dropped: vec![],
+            format: None,
             placed: vec![],
             messages,
             strategy: "recency".to_owned(),

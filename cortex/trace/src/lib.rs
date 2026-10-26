@@ -25,7 +25,7 @@ use std::collections::{HashMap, HashSet, VecDeque};
 
 use chrono::{DateTime, Utc};
 use fusion_cortex_core::{
-    provider::{Block, Message, Stop, Tool, Usage},
+    provider::{Block, Format, Message, Stop, Tool, Usage},
     Id,
 };
 use serde::{Deserialize, Serialize};
@@ -60,6 +60,10 @@ pub enum NodeKind {
     Edit,
     /// A request a tool made of a paid service, and what it cost.
     Billed,
+    /// A model's reply checked against a schema.
+    Validation,
+    /// A value extracted from a model's reply, which its schema accepted.
+    Extraction,
 }
 
 /// Kind-specific detail, typed so a node can be *re-executed* rather than
@@ -111,6 +115,10 @@ pub enum Detail {
         /// the node it came from. Left out of the JSON when nothing was.
         #[serde(default, skip_serializing_if = "Vec::is_empty")]
         dropped: Vec<Dropped>,
+        /// The JSON the reply had to be, which a replay asks for again. Left
+        /// out of the JSON for a context that asked for prose.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        format: Option<Format>,
         messages: Vec<Message>,
         /// Each part the strategy placed, and why. Left out of the JSON for
         /// a strategy that records none.
@@ -125,10 +133,11 @@ pub enum Detail {
     },
     /// A tool invocation and its result.
     ///
-    /// `arguments` and `result` stay `serde_json::Value` on purpose, and this
-    /// is the one payload where that is the right type: tool arguments are
-    /// arbitrary JSON by the wire format's definition, so a stricter type here
-    /// would be this crate inventing a schema it cannot enforce.
+    /// `arguments` and `result` stay `serde_json::Value` on purpose, and with
+    /// an extraction's value they are the payloads where that is the right
+    /// type: tool arguments are arbitrary JSON by the wire format's definition,
+    /// so a stricter type here would be this crate inventing a schema it cannot
+    /// enforce.
     ToolCall {
         arguments: serde_json::Value,
         /// The id the model gave the call, which its result names.
@@ -199,6 +208,59 @@ pub enum Detail {
     /// own web search, and what it cost. Derived from the tool call that
     /// made it. Held fixed by a replay, which never runs a tool.
     Billed(Billed),
+    /// A model's reply checked against a schema, and what it broke. Derived
+    /// from the output it checked.
+    Validation(Validation),
+    /// A value extracted from a model's reply, which its schema accepted.
+    /// Derived from the validation that passed it.
+    ///
+    /// `value` is `serde_json::Value` for the reason `ToolCall`'s arguments
+    /// are: its shape is the schema's, which the caller chose and this crate
+    /// cannot name. The fields a reader or a replay needs, which schema and
+    /// which check, are typed.
+    Extraction {
+        /// The schema's name, such as `facts`.
+        schema: String,
+        value: serde_json::Value,
+    },
+}
+
+/// What a check of a reply against a schema found.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct Validation {
+    /// Which attempt this checked, counting from one.
+    pub attempt: u32,
+    /// What the reply broke, in the order the check found it. Empty where the
+    /// reply passed.
+    pub errors: Vec<Violation>,
+    /// The schema's name, such as `facts`.
+    pub schema: String,
+}
+
+impl Validation {
+    #[must_use]
+    pub fn passed(&self) -> bool {
+        self.errors.is_empty()
+    }
+}
+
+/// One way a reply broke its schema.
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct Violation {
+    /// Where in the reply, as a JSON Pointer such as `/facts/0/confidence`.
+    /// Empty for the reply as a whole, such as one that is not JSON.
+    pub at: String,
+    pub message: String,
+}
+
+impl std::fmt::Display for Violation {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.at.is_empty() {
+            write!(f, "{}", self.message)
+        } else {
+            write!(f, "{}: {}", self.at, self.message)
+        }
+    }
 }
 
 /// What one part of a context is.
@@ -361,6 +423,8 @@ impl Detail {
             Self::Check { .. } => NodeKind::Check,
             Self::Edit { .. } => NodeKind::Edit,
             Self::Billed(_) => NodeKind::Billed,
+            Self::Validation(_) => NodeKind::Validation,
+            Self::Extraction { .. } => NodeKind::Extraction,
         }
     }
 
@@ -479,7 +543,7 @@ impl Graph {
     ///
     /// ```
     /// use fusion_cortex_trace::{Detail, Graph, Node};
-    /// # fn ctx() -> Detail { Detail::Context { dropped: vec![], messages: vec![], placed: vec![], strategy: "recency".into(), tools: vec![] } }
+    /// # fn ctx() -> Detail { Detail::Context { dropped: vec![], format: None, messages: vec![], placed: vec![], strategy: "recency".into(), tools: vec![] } }
     /// # fn out() -> Detail {
     /// #     Detail::Output {
     /// #         call: None,
@@ -542,7 +606,7 @@ impl Graph {
     /// ```
     /// # use fusion_cortex_trace::{Detail, Graph, Node};
     /// # fn mem() -> Detail { Detail::Memory { fact_ids: vec![] } }
-    /// # fn ctx() -> Detail { Detail::Context { dropped: vec![], messages: vec![], placed: vec![], strategy: "recency".into(), tools: vec![] } }
+    /// # fn ctx() -> Detail { Detail::Context { dropped: vec![], format: None, messages: vec![], placed: vec![], strategy: "recency".into(), tools: vec![] } }
     /// let mut graph = Graph::new();
     /// let source = graph.insert(Node::new(
     ///     Detail::Source { content: "…".into(), uri: None },
@@ -602,7 +666,7 @@ impl Graph {
     ///
     /// ```
     /// # use fusion_cortex_trace::{Detail, Graph, Node};
-    /// # fn ctx() -> Detail { Detail::Context { dropped: vec![], messages: vec![], placed: vec![], strategy: "recency".into(), tools: vec![] } }
+    /// # fn ctx() -> Detail { Detail::Context { dropped: vec![], format: None, messages: vec![], placed: vec![], strategy: "recency".into(), tools: vec![] } }
     /// # fn out() -> Detail {
     /// #     Detail::Output {
     /// #         call: None,
@@ -671,6 +735,7 @@ mod tests {
     fn context() -> Detail {
         Detail::Context {
             dropped: vec![],
+            format: None,
             placed: vec![],
             messages: vec![],
             strategy: "recency".into(),
@@ -786,6 +851,34 @@ mod tests {
             panic!("a context reads as a context")
         };
         assert!(tools.is_empty());
+    }
+
+    #[test]
+    fn a_validation_and_an_extraction_are_stored_under_their_kinds_name() {
+        let validation = Detail::Validation(Validation {
+            attempt: 1,
+            errors: vec![Violation {
+                at: "/day".into(),
+                message: "\"8th\" is not of type \"integer\"".into(),
+            }],
+            schema: "release".into(),
+        });
+        let extraction = Detail::Extraction {
+            schema: "release".into(),
+            value: serde_json::json!({ "day": 8 }),
+        };
+
+        for (detail, kind) in [
+            (validation, NodeKind::Validation),
+            (extraction, NodeKind::Extraction),
+        ] {
+            let encoded = serde_json::to_value(&detail).unwrap();
+            // A store finds nodes of a kind by the detail's tag.
+            assert_eq!(encoded["kind"], serde_json::to_value(kind).unwrap());
+            let decoded: Detail = serde_json::from_value(encoded).unwrap();
+            assert_eq!(decoded.kind(), kind);
+            assert!(!decoded.is_input());
+        }
     }
 
     #[test]

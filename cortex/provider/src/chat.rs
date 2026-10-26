@@ -154,6 +154,14 @@ impl Chat {
         if let Some(effort) = request.effort {
             body["reasoning_effort"] = json!(effort.name());
         }
+        // Not strict, for the reason a tool is not on the Responses API:
+        // strict mode refuses a schema that does not require every property.
+        if let Some(format) = &request.format {
+            body["response_format"] = json!({
+                "json_schema": { "name": format.name, "schema": format.schema, "strict": false },
+                "type": "json_schema",
+            });
+        }
         body
     }
 
@@ -531,7 +539,7 @@ impl Decode for Decoder {
 mod tests {
     use super::*;
     use crate::http::canned::Canned;
-    use fusion_cortex_core::provider::{Effort, Tool};
+    use fusion_cortex_core::provider::{Effort, Format, Tool};
 
     const STREAM: &str = r#"data: {"id":"chatcmpl-1","object":"chat.completion.chunk","model":"qwen3-coder","choices":[{"index":0,"delta":{"role":"assistant","reasoning_content":"Two "},"finish_reason":null}],"usage":null}
 
@@ -625,6 +633,7 @@ data: [DONE]
         let transport = Arc::new(Canned::new(STREAM, usize::MAX));
         let request = Request {
             effort: Some(Effort::Low),
+            format: None,
             max_tokens: Some(256),
             messages: vec![
                 Message::text(Role::System, "Answer briefly."),
@@ -892,6 +901,40 @@ data: [DONE]
         assert!(
             !error.is_retryable(),
             "a request rejected as written fails again unchanged"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_format_asks_for_json_that_matches_its_schema() {
+        let transport = Arc::new(Canned::new(STREAM, usize::MAX));
+        let request = Request {
+            format: Some(Format {
+                name: "forecast".into(),
+                schema: json!({
+                    "properties": { "city": { "type": "string" } },
+                    "required": ["city"],
+                    "type": "object",
+                }),
+            }),
+            ..Request::default()
+        };
+
+        provider(&transport).complete(&request).await.unwrap();
+
+        assert_eq!(
+            transport.body()["response_format"],
+            json!({
+                "json_schema": {
+                    "name": "forecast",
+                    "schema": {
+                        "properties": { "city": { "type": "string" } },
+                        "required": ["city"],
+                        "type": "object",
+                    },
+                    "strict": false,
+                },
+                "type": "json_schema",
+            })
         );
     }
 }

@@ -168,6 +168,16 @@ impl Responses {
         if let Some(effort) = request.effort {
             body["reasoning"] = json!({ "effort": effort.name(), "summary": "auto" });
         }
+        if let Some(format) = &request.format {
+            body["text"] = json!({
+                "format": {
+                    "name": format.name,
+                    "schema": format.schema,
+                    "strict": false,
+                    "type": "json_schema",
+                },
+            });
+        }
         body
     }
 }
@@ -613,7 +623,7 @@ impl Decode for Decoder {
 mod tests {
     use super::*;
     use crate::http::canned::Canned;
-    use fusion_cortex_core::provider::{Effort, Tool};
+    use fusion_cortex_core::provider::{Effort, Format, Tool};
 
     /// A reasoning item, a message, and two calls, the second sending its
     /// arguments only in the finished item.
@@ -722,6 +732,7 @@ data: {"type":"response.completed","sequence_number":16,"response":{"id":"resp_1
         let transport = Arc::new(Canned::new(STREAM, usize::MAX));
         let request = Request {
             effort: Some(Effort::High),
+            format: None,
             max_tokens: Some(2048),
             messages: vec![
                 Message::text(Role::System, "Answer briefly."),
@@ -956,5 +967,29 @@ data: {"type":"response.incomplete","response":{"id":"resp_2","model":"gpt-6.1-s
             !error.is_retryable(),
             "a request rejected as written fails again unchanged"
         );
+    }
+
+    #[tokio::test]
+    async fn a_format_asks_for_json_that_matches_its_schema() {
+        let transport = Arc::new(Canned::new(STREAM, usize::MAX));
+        let request = Request {
+            format: Some(Format {
+                name: "forecast".into(),
+                schema: json!({
+                    "properties": { "city": { "type": "string" } },
+                    "required": ["city"],
+                    "type": "object",
+                }),
+            }),
+            ..Request::default()
+        };
+
+        provider(&transport).complete(&request).await.unwrap();
+
+        let format = &transport.body()["text"]["format"];
+        assert_eq!(format["type"], "json_schema");
+        assert_eq!(format["name"], "forecast");
+        assert_eq!(format["strict"], false);
+        assert_eq!(format["schema"]["required"], json!(["city"]));
     }
 }

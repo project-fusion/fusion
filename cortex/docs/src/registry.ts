@@ -61,6 +61,13 @@ export const pages: DocPage[] = [
     slug: 'providers',
     title: 'Choosing a provider',
   },
+  {
+    description: 'Typed values from a model reply: a schema, validation, one retry, and the trace.',
+    order: 2,
+    section: 'Guides',
+    slug: 'extraction',
+    title: 'Extracting typed values',
+  },
 ]
 
 export const findPage = (slug: string): DocPage | undefined =>

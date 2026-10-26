@@ -12,6 +12,7 @@ members = [
 	"cortex/core",
 	"cortex/trace",
 	"cortex/engram",
+	"cortex/extract",
 	"cortex/provider",
 	"cortex/recall",
 	"fusion/cli",
@@ -32,6 +33,10 @@ members = [
 async-trait = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
 futures-util = "0.3"
+# **Typed extraction's validator.** No default features: they resolve a `$ref`
+# over HTTP and from files, and an extraction schema is one document that names
+# nothing outside itself.
+jsonschema = { version = "0.60", default-features = false }
 # **One dependency, not two.** `ratatui` re-exports the `crossterm` it was built
 # against, so depending on both would be two versions to keep in step and a
 # terminal backend that disagrees with the widgets drawing into it.
@@ -41,6 +46,9 @@ ratatui = "0.30"
 # narrow questions about declarations, and a syntax tree is a dependency and a
 # grammar to keep current for answers a pattern already gives.
 regex = "1"
+# Typed extraction derives the schema it asks a model for from the Rust type the
+# reply becomes, so the two cannot disagree.
+schemars = "1"
 # The plugin host's address guard resolves through it, and so does the `http`
 # transport under Cortex's model clients. No default features: `charset`
 # decodes bodies these APIs only ever send as UTF-8, and `rustls` is named so
@@ -84,6 +92,7 @@ wit-component = "0.258"
 # Internal crates. Path deps are relative: same-domain is `../<role>`.
 fusion-cortex-core = { path = "cortex/core", default-features = false }
 fusion-cortex-engram = { path = "cortex/engram", default-features = false }
+fusion-cortex-extract = { path = "cortex/extract" }
 fusion-cortex-provider = { path = "cortex/provider", default-features = false }
 fusion-cortex-recall = { path = "cortex/recall" }
 fusion-cortex-trace = { path = "cortex/trace", default-features = false }

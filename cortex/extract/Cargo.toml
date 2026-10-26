@@ -1,0 +1,26 @@
+[package]
+name = "fusion-cortex-extract"
+description = "Typed extraction: JSON a model writes to a schema, validated, retried once, and traced."
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+# Its own, never `workspace = true`. See the note in the root manifest.
+version = "0.0.0-dev"
+
+[dependencies]
+fusion-cortex-core.workspace = true
+fusion-cortex-trace.workspace = true
+jsonschema.workspace = true
+schemars.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+# The opt-in live test, against a local Ollama.
+fusion-cortex-provider = { workspace = true, features = ["http", "ollama"] }
+tokio.workspace = true
+
+[lints]
+workspace = true

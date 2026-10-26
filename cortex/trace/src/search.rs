@@ -848,6 +848,7 @@ pub(crate) mod conformance {
         Node::new(
             Detail::Context {
                 dropped: Vec::new(),
+                format: None,
                 messages,
                 placed,
                 strategy: "test".into(),

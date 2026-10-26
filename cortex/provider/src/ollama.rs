@@ -144,6 +144,10 @@ impl Ollama {
         if request.effort.is_some() {
             body["think"] = json!(true);
         }
+        // The server turns the schema into a grammar the model decodes under.
+        if let Some(format) = &request.format {
+            body["format"] = format.schema.clone();
+        }
         let mut options = serde_json::Map::new();
         if let Some(context) = self.context {
             options.insert("num_ctx".into(), json!(context));
@@ -432,7 +436,7 @@ impl Decode for Decoder {
 mod tests {
     use super::*;
     use crate::http::canned::Canned;
-    use fusion_cortex_core::provider::{Effort, Response, Tool};
+    use fusion_cortex_core::provider::{Effort, Format, Response, Tool};
 
     const STREAM: &str = r#"{"model":"qwen3-coder:30b","created_at":"2026-10-11T12:00:00Z","message":{"role":"assistant","content":"","thinking":"Two "},"done":false}
 {"model":"qwen3-coder:30b","created_at":"2026-10-11T12:00:00Z","message":{"role":"assistant","content":"","thinking":"cities."},"done":false}
@@ -503,6 +507,7 @@ mod tests {
         let generated = response.tool_uses().next().unwrap().0.to_owned();
         let request = Request {
             effort: Some(Effort::High),
+            format: None,
             max_tokens: Some(512),
             messages: vec![
                 Message::text(Role::System, "Answer briefly."),
@@ -770,5 +775,25 @@ mod tests {
             !error.is_retryable(),
             "a request rejected as written fails again unchanged"
         );
+    }
+
+    #[tokio::test]
+    async fn a_format_asks_for_json_that_matches_its_schema() {
+        let transport = Arc::new(Canned::new(STREAM, usize::MAX));
+        let request = Request {
+            format: Some(Format {
+                name: "forecast".into(),
+                schema: json!({
+                    "properties": { "city": { "type": "string" } },
+                    "required": ["city"],
+                    "type": "object",
+                }),
+            }),
+            ..Request::default()
+        };
+
+        provider(&transport).complete(&request).await.unwrap();
+
+        assert_eq!(transport.body()["format"]["required"], json!(["city"]));
     }
 }

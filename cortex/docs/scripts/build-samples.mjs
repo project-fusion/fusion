@@ -49,6 +49,7 @@ const CONTENT = join(ROOT, 'cortex/docs/content')
 const CRATES = {
   'fusion-cortex-core': 'cortex/core/src',
   'fusion-cortex-engram': 'cortex/engram/src',
+  'fusion-cortex-extract': 'cortex/extract/src',
   'fusion-cortex-provider': 'cortex/provider/src',
   'fusion-cortex-recall': 'cortex/recall/src',
   'fusion-cortex-trace': 'cortex/trace/src',

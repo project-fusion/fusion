@@ -174,12 +174,29 @@ impl Effort {
     }
 }
 
+/// The JSON a reply must be: one value matching a JSON Schema.
+///
+/// A client whose API can hold a reply to a schema sends it, and one whose API
+/// cannot leaves it out. **Either way the caller validates the reply.** An API
+/// that accepts a schema may support only part of JSON Schema, and a server
+/// that copies an API may accept the field and ignore it.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct Format {
+    /// What the value is, such as `facts`. Letters, digits, `_` and `-`, which
+    /// is what every API that takes a name accepts.
+    pub name: String,
+    /// The JSON Schema the reply must match.
+    pub schema: serde_json::Value,
+}
+
 /// A request to a provider.
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Request {
     /// How much to reason. `None` leaves the model's default, and a level
     /// also requests visible reasoning where the API offers it.
     pub effort: Option<Effort>,
+    /// The JSON the reply must be. `None` lets the model reply in prose.
+    pub format: Option<Format>,
     /// The cap on output tokens, thinking included. `None` takes the client's
     /// default.
     pub max_tokens: Option<u32>,
