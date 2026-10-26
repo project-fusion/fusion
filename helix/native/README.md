@@ -198,7 +198,7 @@ toolbar: a menu opened from a toolbar is in no toolbar, as on the web.
   0.88 already measures from the root view's top, so the layer takes it back
   out, with the host's own place in the window.
 - **A press drawn in a layer's anchor reaches the layer** once its own
-  event stands, as its `presses` says: a popover's trigger opens it and
+  event stands, as its `anchorPress` says: a popover's trigger opens it and
   closes it, and says whether it is expanded, and using a tooltip's trigger
   takes the bubble down unless `persist` is set. The anchor's view provides
   a context each press inside it reads, since a phone has no element to
@@ -207,18 +207,18 @@ toolbar: a menu opened from a toolbar is in no toolbar, as on the web.
   already the press's name, and a long press on the press shows the bubble
   where the press has no long press of its own. A tooltip leaves focus where
   it is as it opens and as it closes.
-- **A layer that `holds` opens on a long press** of a press in its anchor,
+- **A layer with a `longPress` opens on a long press** of a press in its anchor,
   ranked as that press's own long press, as a speed dial's trigger under
   `openOn="long-press"` opens its actions, while a quick press stays the
   press's own. **A layer that takes `arrows` opens on Down or Up** from a
   hardware keyboard on a press in its anchor, with focus on its first or its
   last control, and with Alt where it holds. A press its own element draws
   in the anchor reaches the layer too, as a speed dial's drawn trigger does.
-- **A layer that `enters` on a press takes focus only as a press, a long
+- **A layer whose `initialFocus` is `press` takes focus only as a press, a long
   press, or a key in its anchor opens it**, and leaves focus where it is
   when your app writes `open`. Closing gives focus to its anchor all the
   same, as a speed dial gives its trigger focus however it closes, and a
-  layer that `returns: 'held'` gives it to its anchor only where a control
+  layer whose `restoreFocus` is `held` gives it to its anchor only where a control
   inside it held focus, as a menu leaves focus where a press outside put it.
 - **A close request on a page below the top goes back a page** in a layer
   whose element shows a stack of pages, as Escape leaves a menu's page, and
@@ -230,14 +230,14 @@ toolbar: a menu opened from a toolbar is in no toolbar, as on the web.
   side, so its element is in no `placed-` or `aligned-` state, and its rules
   read the room left under it, less the software keyboard, as
   `floating-available-block-size`.
-- **A layer that `enters` on `down` takes focus only from Down** on a press
+- **A layer whose `initialFocus` is `down` takes focus only from Down** on a press
   in its anchor, from a hardware keyboard: Down opens it with focus on its
   first control where it stands closed, and moves focus there where it
   stands open, as a megamenu's trigger does. A press that opens it leaves
   focus on the press, and Up is the press's own.
 - **Focus goes back to the anchor's first press**, never to the box around
   it, so the next key from a hardware keyboard reaches the trigger. A layer
-  that `returns: 'dismissed'` gives it back only where a reader dismissed
+  whose `restoreFocus` is `dismissed` gives it back only where a reader dismissed
   it, by a close request or a press outside, as the web's megamenu does,
   and leaves it where a press on its trigger or on a control inside put it.
 - **A layer that stands open `alone` is one of its kind open at a time**,
@@ -265,7 +265,7 @@ toolbar: a menu opened from a toolbar is in no toolbar, as on the web.
   while they are drawn. In code shared with the web, any element with an
   `id`, a `div` among them, registers its view through the JSX runtime. A
   `target` that holds no id places the layer in the window, along its
-  `edge` or in the middle, as a tour's dialog stop stands.
+  `side` or in the middle, as a tour's dialog stop stands.
 - **A decorative layer is a look alone**, as a tour's spotlight and its
   backdrop are: drawn under every other layer, it takes no touch, no key,
   no close request, and no focus, and no screen reader reaches it. It may
@@ -294,7 +294,7 @@ toolbar: a menu opened from a toolbar is in no toolbar, as on the web.
   before it computes**, where no toggle holds it, as a toast's stack opens
   while a message is passed into it.
 - **A layer that swipes follows the finger** toward the edge of the window
-  it stands along, its `edge`, or the bottom edge while it is a sheet, on
+  it stands along, its `side`, or the bottom edge while it is a sheet, on
   the UI thread through Gesture Handler. A release rests it at the snap
   point core's `settleSwipe` gives, as the web's drawer rests, or takes it
   out through the edge, which asks its toggle to close as every other way
@@ -535,7 +535,7 @@ trigger's own wins, as the plan's decision on hover-only patterns says:
 1. The press's own, where its node says `held`, which opens its element's
    toggle, as a speed dial's trigger opens its actions.
 2. The last claim of the trigger's own made on its view with
-   `claimLongPress(view, 'own', take)`, as a layer that `holds` claims each
+   `claimLongPress(view, 'own', take)`, as a layer with a `longPress` claims each
    press in its anchor, as a speed dial under `openOn="long-press"` does.
 3. The last `hint` claim, as a tooltip shows its bubble on a long press of
    the control it describes, where that control has no long press of its own.
