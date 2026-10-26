@@ -45,7 +45,13 @@ export default styles(
       valueGap: token('space-sm'),
       valueSize: token('text-xs'),
     },
-    own: ['progress-crawl', 'progress-cycle', 'progress-over', 'progress-under', 'progress-way'],
+    own: {
+      progressCrawl: null,
+      progressCycle: null,
+      progressOver: null,
+      progressUnder: null,
+      progressWay: null,
+    },
     props: { emphasis: oneOf(['subtle']) },
     stylesheet: 'progress/root/progress-root.generated.css',
   },
@@ -66,7 +72,7 @@ export default styles(
          motion, a fixed rate, since every duration token is near zero then. */
       rule(
         { indeterminate: true },
-        { own: { crawl: '19.2s', cycle: product(token('duration-slow'), 5) } },
+        { own: { progressCrawl: '19.2s', progressCycle: product(token('duration-slow'), 5) } },
       ),
     ]),
     /* A label above a bar, across the whole row when the reading sits
@@ -137,14 +143,14 @@ export default styles(
       rule(
         { indeterminate: true },
         {
-          animation: ['helix-progress-indeterminate', own.cycle, 'linear', 'infinite'],
+          animation: ['helix-progress-indeterminate', own.progressCycle, 'linear', 'infinite'],
           transition: 'none',
         },
       ),
       /* The travel is signed, because `translate` is physical and the track
          is not. */
-      rule({ indeterminate: true }, { own: { way: 1 } }),
-      rule({ dir: 'rtl', indeterminate: true }, { own: { way: '-1' } }),
+      rule({ indeterminate: true }, { own: { progressWay: 1 } }),
+      rule({ dir: 'rtl', indeterminate: true }, { own: { progressWay: '-1' } }),
       /* Still, and no longer a segment: a hatch, which is no quantity. */
       rule(
         { indeterminate: true, reducedMotion: true },
@@ -189,10 +195,10 @@ export default styles(
        track in the first third, 40% in the second and 48% in the last, so it
        accelerates across. */
     keyframes('helix-progress-indeterminate', {
-      '0%': { scale: '0.18 1', translate: product('-18%', own.way(1)) },
-      '35%': { scale: '0.5 1', translate: product('12%', own.way(1)) },
-      '65%': { scale: '0.5 1', translate: product('52%', own.way(1)) },
-      '100%': { scale: '0.18 1', translate: product('100%', own.way(1)) },
+      '0%': { scale: '0.18 1', translate: product('-18%', own.progressWay(1)) },
+      '35%': { scale: '0.5 1', translate: product('12%', own.progressWay(1)) },
+      '65%': { scale: '0.5 1', translate: product('52%', own.progressWay(1)) },
+      '100%': { scale: '0.18 1', translate: product('100%', own.progressWay(1)) },
     }),
     include(progressWords),
     include(progressRing),
@@ -211,7 +217,10 @@ export default styles(
     on('content', [
       rule(
         { forcedColors: true },
-        { forcedColorAdjust: 'none', own: { over: 'HighlightText', under: 'CanvasText' } },
+        {
+          forcedColorAdjust: 'none',
+          own: { progressOver: 'HighlightText', progressUnder: 'CanvasText' },
+        },
       ),
       rule({ forcedColors: true, shape: 'ring' }, { color: 'CanvasText' }),
     ]),

@@ -25,12 +25,12 @@ export default styles(
       splitDividerColor: token('color-border'),
       splitFill: mix(token('color-foreground'), 4, 'transparent'),
     },
-    own: [
-      'breadcrumbs-mark-glyph',
-      'breadcrumbs-mark-words',
-      'breadcrumbs-split-fill',
-      'breadcrumbs-split-rule',
-    ],
+    own: {
+      breadcrumbsMarkGlyph: null,
+      breadcrumbsMarkWords: null,
+      breadcrumbsSplitFill: null,
+      breadcrumbsSplitRule: null,
+    },
     props: { separation: oneOf(['outlined', 'plain']) },
     stylesheet: 'breadcrumbs/root/breadcrumbs-root.generated.css',
   },
@@ -39,8 +39,8 @@ export default styles(
       rule({
         display: 'block',
         own: {
-          splitFill: hook.splitFill,
-          splitRule: 'transparent',
+          breadcrumbsSplitFill: hook.splitFill,
+          breadcrumbsSplitRule: 'transparent',
         },
       }),
       /* A line between the halves, and no shared fill: the border every
@@ -49,15 +49,20 @@ export default styles(
         { separation: 'outlined' },
         {
           own: {
-            splitFill: 'transparent',
-            splitRule: hook.splitDividerColor,
+            breadcrumbsSplitFill: 'transparent',
+            breadcrumbsSplitRule: hook.splitDividerColor,
           },
         },
       ),
       /* **The trail's mark under `separator="slash"`**, which each crumb draws
          from these two values: the slash's words, and the chevron put away.
          The web's crumbs are told the mark by the trail's element. */
-      native([rule({ separator: 'slash' }, { own: { markGlyph: 'none', markWords: '"/"' } })]),
+      native([
+        rule(
+          { separator: 'slash' },
+          { own: { breadcrumbsMarkGlyph: 'none', breadcrumbsMarkWords: '"/"' } },
+        ),
+      ]),
       /* Where this page sits, which is worth having on a page with no back
          button. */
       rule({ print: true }, { web: { printColorAdjust: 'economy' } }),

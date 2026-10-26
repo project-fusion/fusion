@@ -46,7 +46,7 @@ export default styles(
       itemHoverColor: mix(token('color-foreground'), 8, 'transparent'),
       itemStart: '0px',
     },
-    own: ['menu-from', 'menu-material-backdrop', 'menu-material-fill', 'menu-travel'],
+    own: { menuFrom: null, menuMaterialBackdrop: null, menuMaterialFill: null, menuTravel: null },
     stylesheet: 'menu/item/menu-item.generated.css',
   },
   ({ hook, on, own, rule }) => {
@@ -192,7 +192,7 @@ export default styles(
         rule({
           backgroundColor: first(
             hookOf('menu', 'background-color'),
-            own.materialFill,
+            own.menuMaterialFill,
             token('color-surface-overlay'),
           ),
           border: [
@@ -214,10 +214,10 @@ export default styles(
       ]),
       on('surface', [
         rule({
-          own: { travel: product(token('space-2xs'), '-1'), from: 0.96 },
+          own: { menuTravel: product(token('space-2xs'), '-1'), menuFrom: 0.96 },
           opacity: 0,
-          scale: own.from,
-          transform: fn('translateY', own.travel),
+          scale: own.menuFrom,
+          transform: fn('translateY', own.menuTravel),
           transition: list(
             ['opacity', fast, token('easing-standard')],
             ['scale', fast, token('easing-emphasized')],
@@ -229,7 +229,7 @@ export default styles(
         rule(
           { placedTop: true },
           {
-            own: { travel: token('space-2xs') },
+            own: { menuTravel: token('space-2xs') },
             transformOrigin: [measured('floating-arrow-x', '50%'), '100%'],
           },
         ),
@@ -244,7 +244,7 @@ export default styles(
         rule({
           '--menu-item-start': '0px',
           '--menu-item-end': '0px',
-          backdropFilter: own.materialBackdrop('none'),
+          backdropFilter: own.menuMaterialBackdrop('none'),
           maxBlockSize: hookOf(
             'menu',
             'max-block-size',

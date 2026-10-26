@@ -63,14 +63,14 @@ fn a_table_compiles_to_the_family_shape() {
     )
     .unwrap();
     let newer = desugared(&table(
-        "hooks: ['background-color'], own: ['button-fill']",
+        "hooks: { backgroundColor: null }, own: { buttonFill: null }",
         "({ hook, keyframes, on, own, rule }) => [
           on('host', [rule({ display: 'inline-flex' })]),
           on('button', [
             rule({ emphasis: 'solid' }, {
-              backgroundColor: hook.backgroundColor(own.fill),
+              backgroundColor: hook.backgroundColor(own.buttonFill),
               '--icon-size': '1em',
-              own: { fill: token('color-primary') },
+              own: { buttonFill: token('color-primary') },
             }),
           ]),
           on({ region: 'default' }, [
@@ -105,8 +105,8 @@ fn platform_and_supports_in_a_when_are_the_rules_own() {
 #[test]
 fn variants_are_one_rule_per_value_in_the_order_written() {
     let read = rules(&table(
-        "own: ['button-tone']",
-        "({ on, rule, variants }) => [on('host', [variants('tone', { primary: { own: { tone: 'red' } }, accent: { own: { tone: 'blue' } } })])]",
+        "own: { buttonTone: null }",
+        "({ on, rule, variants }) => [on('host', [variants('tone', { primary: { own: { buttonTone: 'red' } }, accent: { own: { buttonTone: 'blue' } } })])]",
     ));
     assert_eq!(read.len(), 2);
     assert_eq!(
@@ -126,7 +126,7 @@ fn variants_are_one_rule_per_value_in_the_order_written() {
 #[test]
 fn every_name_is_declared_and_used() {
     let unused = refusal(&table(
-        "hooks: ['size']",
+        "hooks: { size: null }",
         "({ on, rule }) => [on('host', [rule({ opacity: 1 })])]",
     ));
     assert_eq!(unused, "declared and never used: the hook `size`");
@@ -227,7 +227,7 @@ fn a_rules_function_reads_its_constants_and_spreads() {
         "import b from './headless.js'
         const ease = ['1s', 'linear'] as const
         const card = { tone: ['primary', 'accent'] } as const
-        export default styles(b, { prefix: 'button', hooks: ['size'], stylesheet: 's' }, ({ hook, on, rule }) => {
+        export default styles(b, { prefix: 'button', hooks: { size: null }, stylesheet: 's' }, ({ hook, on, rule }) => {
           const size = hook.size('1em')
           return [on('host', [rule({ hover: true, ...card }, { blockSize: size, transition: ['opacity', ...ease] })])]
         })",
@@ -239,7 +239,7 @@ fn a_rules_function_reads_its_constants_and_spreads() {
 #[test]
 fn a_fragment_is_rewritten_and_styles_only_its_parts() {
     let export = default_export(
-        "export default fragment('field', { parts: ['label'], own: ['field-gap'] }, ({ on, own, rule }) => [
+        "export default fragment('field', { parts: ['label'], own: { fieldGap: null } }, ({ on, own, rule }) => [
           on('label', [rule({ gap: own.fieldGap('0px') })]),
         ])",
     )

@@ -30,7 +30,7 @@ export default styles(
       paddingInline: token('space-sm'),
       radius: token('radii-sm'),
     },
-    own: ['navigation-item-display', 'navigation-item-floor', 'navigation-item-justify'],
+    own: { navigationItemDisplay: null, navigationItemFloor: null, navigationItemJustify: null },
     stylesheet: 'navigation/item/navigation-item.generated.css',
   },
   ({ hook, on, own, rule }) => [
@@ -40,8 +40,8 @@ export default styles(
     on('host', [
       rule({
         blockSize: '100%',
-        display: own.display('inline-flex'),
-        minBlockSize: own.floor(token('size-control-sm')),
+        display: own.navigationItemDisplay('inline-flex'),
+        minBlockSize: own.navigationItemFloor(token('size-control-sm')),
         position: 'relative',
         zIndex: token('layer-raised'),
       }),
@@ -58,7 +58,7 @@ export default styles(
         fontFamily: token('font-sans'),
         fontSize: hook.fontSize,
         fontWeight: hook.fontWeight,
-        justifyContent: own.justify('center'),
+        justifyContent: own.navigationItemJustify('center'),
         paddingInline: hook.paddingInline,
         textDecoration: 'none',
         transition: list(

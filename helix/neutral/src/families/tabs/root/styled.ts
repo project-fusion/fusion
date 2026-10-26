@@ -28,27 +28,27 @@ export default styles(
       ruleColor: token('color-border'),
       scrollBackgroundColor: token('color-surface'),
     }),
-    own: [
-      'indicator-block',
-      'indicator-border',
-      'indicator-border-color',
-      'indicator-color',
-      'indicator-offset',
-      'indicator-offset-x',
-      'indicator-radius',
-      'indicator-shadow',
-      'tab-height',
-      'tab-inline-size',
-      'tab-justify',
-      'tab-radius',
-      'tab-selected-shadow',
-      'tab-selected-surface',
-      'tabs-dismiss-rest',
-      'tabs-inline-sign',
-      'tabs-panel-padding-block-start',
-      'tabs-panel-padding-inline-start',
-      'tabs-rule',
-    ],
+    own: {
+      indicatorBlock: null,
+      indicatorBorder: null,
+      indicatorBorderColor: null,
+      indicatorColor: null,
+      indicatorOffset: null,
+      indicatorOffsetX: null,
+      indicatorRadius: null,
+      indicatorShadow: null,
+      tabHeight: null,
+      tabInlineSize: null,
+      tabJustify: null,
+      tabRadius: null,
+      tabSelectedShadow: null,
+      tabSelectedSurface: null,
+      tabsDismissRest: null,
+      tabsInlineSign: null,
+      tabsPanelPaddingBlockStart: null,
+      tabsPanelPaddingInlineStart: null,
+      tabsRule: null,
+    },
     props: {
       dismissMarks: oneOf(['always', 'hover']),
       emphasis: oneOf(['subtle']),
@@ -70,7 +70,7 @@ export default styles(
         /* The default look, and where every variant starts from: a raised pill on
            the selected tab and nothing at all behind the row. */
         own: {
-          rule: 'none',
+          tabsRule: 'none',
           tabRadius: token('radii-sm'),
           tabSelectedShadow: token('shadow-sm'),
           tabSelectedSurface: token('color-surface-raised'),
@@ -81,7 +81,7 @@ export default styles(
         { variant: 'underlined' },
         {
           own: {
-            rule: fn('linear-gradient', hook.ruleColor, hook.ruleColor),
+            tabsRule: fn('linear-gradient', hook.ruleColor, hook.ruleColor),
             tabRadius: token('radii-none'),
             tabSelectedShadow: 'none',
             tabSelectedSurface: 'transparent',
@@ -101,19 +101,19 @@ export default styles(
           gridTemplateRows: 'minmax(0, 1fr)',
           own: {
             /* Which way the inline axis runs, for the bar at the column's inline end. */
-            inlineSign: 1,
-            panelPaddingBlockStart: token('space-none'),
-            panelPaddingInlineStart: token('space-md'),
+            tabsInlineSign: 1,
+            tabsPanelPaddingBlockStart: token('space-none'),
+            tabsPanelPaddingInlineStart: token('space-md'),
           },
         },
       ),
-      rule({ dir: 'rtl', orientation: 'vertical' }, { own: { inlineSign: '-1' } }),
+      rule({ dir: 'rtl', orientation: 'vertical' }, { own: { tabsInlineSign: '-1' } }),
       /* Print: the panel that is open, without the strip that would open another. */
       rule({ print: true }, { boxShadow: 'none', overflow: 'visible' }),
       /* `dismiss-marks="hover"`: each tab reads this and shows its mark only while it
          is current, hovered, or holds focus. A private value, inherited by the
          tabs, because the set decides and each tab draws. */
-      rule({ dismissMarks: 'hover' }, { own: { dismissRest: 0 } }),
+      rule({ dismissMarks: 'hover' }, { own: { tabsDismissRest: 0 } }),
     ]),
     /* The tabs stack above the mark. */
     on({ slotted: 'helix-tab' }, [
@@ -131,7 +131,7 @@ export default styles(
     on('tabs', [
       /* The rule is a background, which is what lets a tab sit on it. */
       rule({
-        backgroundImage: own.rule('none'),
+        backgroundImage: own.tabsRule('none'),
         backgroundPosition: 'bottom',
         backgroundRepeat: 'repeat-x',
         backgroundSize: ['100%', token('border-thin')],
@@ -338,7 +338,7 @@ export default styles(
             indicatorOffset: '0px',
             indicatorOffsetX: product(
               difference(measured('indicator-inline-size', '0px'), hook.indicatorThickness),
-              own.inlineSign(1),
+              own.tabsInlineSign(1),
             ),
           },
         },

@@ -49,16 +49,23 @@ export default styles(
       dismissColor: token('color-foreground-muted'),
       fontSize: token('text-sm'),
       headingWeight: token('weight-semibold'),
-      inlineSize: own.width('22rem'),
+      inlineSize: own.toastWidth('22rem'),
       itemPadding: token('space-sm'),
       radius: token('radii-sm'),
       shadow: token('shadow-floating'),
       swipeX: 0,
       swipeY: 0,
       timerSize: token('space-2xs'),
-      toneColor: own.severity(token('color-foreground-muted')),
+      toneColor: own.toastSeverity(token('color-foreground-muted')),
     }),
-    own: ['toast-enter', 'toast-gap', 'toast-line', 'toast-most', 'toast-severity', 'toast-width'],
+    own: {
+      toastEnter: null,
+      toastGap: null,
+      toastLine: null,
+      toastMost: null,
+      toastSeverity: null,
+      toastWidth: null,
+    },
     stylesheet: 'toast/item/toast-item.generated.css',
   },
   ({ hook, keyframes, on, own, rule, variants }) => {
@@ -67,7 +74,7 @@ export default styles(
     const accelerate = token('easing-accelerate')
     const padding = hook.itemPadding
     const tone = hook.toneColor
-    const enter = own.enter(token('space-lg'))
+    const enter = own.toastEnter(token('space-lg'))
     const drain = ['helix-toast-drain', measured('toast-duration', '0ms'), 'linear', 'forwards']
     return [
       on('host', [
@@ -78,10 +85,10 @@ export default styles(
           '--helix-size-control': token('size-control-sm'),
           '--helix-size-control-loose': product(token('size-control'), 1.2),
           '--helix-size-control-tight': product(token('size-control'), 0.8),
-          own: { line: product(hook.fontSize, token('leading-normal')) },
+          own: { toastLine: product(hook.fontSize, token('leading-normal')) },
           display: 'grid',
           web: { gridTemplateRows: 'minmax(0, 1fr)' },
-          marginBlockStart: own.gap(token('space-xs')),
+          marginBlockStart: own.toastGap(token('space-xs')),
           transition: list(
             ['grid-template-rows', normal, decelerate],
             ['margin-block-start', normal, decelerate],
@@ -89,15 +96,15 @@ export default styles(
             ['translate', normal, decelerate],
           ),
           inlineSize: hook.inlineSize,
-          maxInlineSize: own.most('100%'),
+          maxInlineSize: own.toastMost('100%'),
         }),
         native([rule({ maxInlineSize: '100%' })]),
         /* Color on the mark and the bar, never a fill behind the words. */
         variants('tone', {
-          danger: { own: { severity: token('color-danger') } },
-          info: { own: { severity: token('color-primary') } },
-          success: { own: { severity: token('color-success') } },
-          warning: { own: { severity: token('color-warning') } },
+          danger: { own: { toastSeverity: token('color-danger') } },
+          info: { own: { toastSeverity: token('color-primary') } },
+          success: { own: { toastSeverity: token('color-success') } },
+          warning: { own: { toastSeverity: token('color-warning') } },
         }),
         /* Held back by the stack's `max-visible`, until a message before it goes. */
         rule({ waiting: true }, { display: 'none' }),
@@ -213,7 +220,7 @@ export default styles(
           display: 'inline-flex',
           gridArea: '1 / 1',
           marginInlineEnd: token('space-sm'),
-          marginBlockStart: quotient(difference(own.line, token('size-icon')), 2),
+          marginBlockStart: quotient(difference(own.toastLine, token('size-icon')), 2),
         }),
         web([rule({ touchAction: 'pan-y' })]),
       ]),
@@ -266,7 +273,10 @@ export default styles(
           all: web('unset'),
           boxSizing: 'border-box',
           position: 'absolute',
-          insetBlockStart: sum(padding, quotient(difference(own.line, token('size-control')), 2)),
+          insetBlockStart: sum(
+            padding,
+            quotient(difference(own.toastLine, token('size-control')), 2),
+          ),
           insetInlineEnd: token('space-sm'),
           blockSize: token('size-control'),
           borderRadius: token('radii-sm'),

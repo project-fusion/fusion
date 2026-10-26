@@ -42,7 +42,7 @@ export default styles(
       radius: token('radii-lg'),
       shadow: token('shadow-surface'),
     },
-    own: ['card-inset', 'card-media', 'heading-ink'],
+    own: { cardInset: null, cardMedia: null, headingInk: null },
     props: {
       material: oneOf(['frosted', 'glass', 'transparent']),
       orientation: oneOf(['horizontal', 'vertical']),
@@ -64,14 +64,14 @@ export default styles(
         gridTemplateColumns: 'minmax(0, 1fr)',
         lineHeight: hook.lineHeight,
         overflow: 'hidden',
-        padding: own.inset,
+        padding: own.cardInset,
         transition: list(
           ['border-color', token('duration-fast'), token('easing-standard')],
           ['box-shadow', token('duration-fast'), token('easing-standard')],
         ),
         own: {
-          inset: hook.padding,
-          media: hook.mediaSize,
+          cardInset: hook.padding,
+          cardMedia: hook.mediaSize,
           headingInk: hook.headingColor,
         },
       }),
@@ -96,7 +96,7 @@ export default styles(
       /* Sideways: the same stack, with the media out of flow beside it. */
       rule(
         { orientation: 'horizontal' },
-        { paddingInlineStart: sum(own.media, own.inset), position: 'relative' },
+        { paddingInlineStart: sum(own.cardMedia, own.cardInset), position: 'relative' },
       ),
       rule({ reducedMotion: true }, { transition: 'none' }),
       variants('material', {
@@ -119,20 +119,20 @@ export default styles(
       rule({
         blockSize: hook.mediaBlockSize,
         display: 'block',
-        inlineSize: sum('100%', product(own.inset, 2)),
-        margin: product(own.inset, '-1'),
+        inlineSize: sum('100%', product(own.cardInset, 2)),
+        margin: product(own.cardInset, '-1'),
         marginBlockEnd: 0,
         objectFit: hook.mediaFit,
       }),
       rule(
         { mediaPlacement: 'end' },
-        { marginBlockEnd: product(own.inset, '-1'), marginBlockStart: 0, order: 1 },
+        { marginBlockEnd: product(own.cardInset, '-1'), marginBlockStart: 0, order: 1 },
       ),
       rule(
         { orientation: 'horizontal' },
         {
           blockSize: '100%',
-          inlineSize: own.media,
+          inlineSize: own.cardMedia,
           insetBlock: 0,
           insetInlineStart: 0,
           margin: token('space-none'),

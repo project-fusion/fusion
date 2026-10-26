@@ -84,17 +84,22 @@ impl Names {
                 "`{object}.{key}` is not a value: a private value is `own.{key}`"
             )),
             Lit::Call(helper, arguments) if helper == "first" => self.first(arguments),
-            Lit::Call(helper, arguments) if helper == "ownOf" => match arguments.as_slice() {
-                [Lit::Text(of), Lit::Text(name), rest @ ..] if rest.len() <= 1 => {
-                    let mut spelled = vec![Lit::Text(format!("{of}-{name}"))];
-                    for fallback in rest {
-                        spelled.push(self.value(fallback)?);
-                    }
-                    Ok(Lit::Call("own".to_owned(), spelled))
-                }
-                _ => Err("`ownOf()` takes a family's prefix, a private value's name less it, and a fallback".to_owned()),
-            },
+            Lit::Call(helper, _) if helper == "ownOf" => Err(
+                "`ownOf()` is written as a private value of the table's own: declare it in `own` by its whole name in camelCase, `own: { tabsDismissRest: null }`, and read `own.tabsDismissRest`".to_owned(),
+            ),
             Lit::Null => Err("`null` is a default in the header alone: a hook or a private value with none".to_owned()),
+            /* A derivation in core, as a headless source's `derive()` names
+            one, which the intermediate form calls `derived`. */
+            Lit::Call(helper, _) if helper == "derived" => {
+                Err("`derived()` is written `derive()`, as a headless source names a derivation".to_owned())
+            }
+            Lit::Call(helper, arguments) if helper == "derive" => {
+                let arguments = arguments
+                    .iter()
+                    .map(|argument| self.value(argument))
+                    .collect::<Result<Vec<_>, _>>()?;
+                Ok(Lit::Call("derived".to_owned(), arguments))
+            }
             Lit::Call(helper, arguments) => {
                 let arguments = arguments
                     .iter()
@@ -140,7 +145,7 @@ impl Names {
 }
 
 /// What `first()` takes, for a refusal.
-const FIRST: &str = "`first()` takes reads and then a fallback: each but the last is a hook, a private value, `hookOf()`, `ownOf()`, `inherited()`, `measured()` or `derived()`, written with no fallback of its own";
+const FIRST: &str = "`first()` takes reads and then a fallback: each but the last is a hook, a private value, `hookOf()`, `inherited()`, `measured()` or `derive()`, written with no fallback of its own";
 
 impl Names {
     /// `hook.name` or `own.name` alone: the read with the header's default,
@@ -243,13 +248,12 @@ impl Names {
                 ("hookOf", [of @ Lit::Text(_), name @ Lit::Text(_)]) => {
                     Ok(call("hookOf", vec![of.clone(), name.clone()], fallback))
                 }
-                ("ownOf", [Lit::Text(of), Lit::Text(name)]) => Ok(call(
-                    "own",
-                    vec![Lit::Text(format!("{of}-{name}"))],
-                    fallback,
-                )),
-                ("inherited" | "measured" | "derived", [name @ Lit::Text(_)]) => {
+
+                ("inherited" | "measured", [name @ Lit::Text(_)]) => {
                     Ok(call(helper, vec![name.clone()], fallback))
+                }
+                ("derive", [name @ Lit::Text(_)]) => {
+                    Ok(call("derived", vec![name.clone()], fallback))
                 }
                 _ => Err(FIRST.to_owned()),
             },

@@ -12,8 +12,8 @@ export default fragment(
   'progress-words',
   {
     parts: ['content', 'content-fill', 'indicator', 'track'],
-    hooks: ['content-color', 'content-fill-color', 'content-size'],
-    own: ['progress-over', 'progress-split', 'progress-under'],
+    hooks: { contentColor: null, contentFillColor: null, contentSize: null },
+    own: { progressOver: null, progressSplit: null, progressUnder: null },
     props: ['emphasis', 'indeterminate', 'shape'],
   },
   ({ hook, on, own, rule }) => [

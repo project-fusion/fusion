@@ -51,7 +51,7 @@ export default styles(
       markColor: token('color-foreground'),
       size: token('size-checkbox'),
     },
-    own: ['checkbox-size', 'field-control-inline-size'],
+    own: { checkboxSize: null, fieldControlInlineSize: null },
     props: { separation: oneOf(['filled', 'outlined', 'plain']) },
     stylesheet: 'checkbox/root/checkbox-root.generated.css',
   },
@@ -61,9 +61,9 @@ export default styles(
     on('host', [
       rule({
         own: {
-          size: hook.size,
+          checkboxSize: hook.size,
           /* What `field-inline` indents the hint by, so it starts under the words. */
-          fieldControlInlineSize: own.size,
+          fieldControlInlineSize: own.checkboxSize,
         },
       }),
       rule({ display: 'inline-flex', flexDirection: 'column', gap: token('space-2xs') }),
@@ -134,11 +134,11 @@ export default styles(
       rule({
         appearance: web('none'),
         backgroundColor: hook.backgroundColor,
-        blockSize: own.size,
+        blockSize: own.checkboxSize,
         border: [token('border-thin'), 'solid', hook.borderColor(token('color-foreground-subtle'))],
         borderRadius: token('radii-sm'),
         cursor: web('inherit'),
-        inlineSize: own.size,
+        inlineSize: own.checkboxSize,
         margin: token('space-none'),
         transition: list(['background-color', ...ease], ['border-color', ...ease]),
       }),
@@ -174,8 +174,8 @@ export default styles(
     on('mark', [
       rule({
         backgroundColor: web(hook.markColor),
-        blockSize: own.size,
-        inlineSize: own.size,
+        blockSize: own.checkboxSize,
+        inlineSize: own.checkboxSize,
         maskImage: tick,
         maskPosition: web('center'),
         maskRepeat: web('no-repeat'),

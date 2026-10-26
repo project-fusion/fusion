@@ -202,7 +202,7 @@ impl Names {
                         .to_owned(),
                 );
             } else if key == "within" {
-                read = host(read, value)?;
+                read = host(&read, value)?;
             } else if self.source.is_none() || RESERVED.contains(&key.as_str()) {
                 push(&mut read, key, value.clone());
             } else {
@@ -252,15 +252,11 @@ impl Names {
             )
         };
         match (part, state, prop) {
-            (true, true, _) => match value {
-                Lit::Bool(_) => Ok(one("state")),
-                _ => Err(format!("`{name}` is a state, which is `true` or `false`")),
-            },
             (true, false, true) if !bound => Err(format!(
                 "`{name}` is an attribute of `{on}` and a prop it is not bound to: write `part: {{ {name}: ... }}`, or the prop's name with `has`"
             )),
-            (true, ..) => Ok(one("part")),
-            (false, true, _) => match value {
+            (true, false, _) => Ok(one("part")),
+            (_, true, _) => match value {
                 Lit::Bool(_) => Ok(one("state")),
                 _ => Err(format!("`{name}` is a state, which is `true` or `false`")),
             },
@@ -281,7 +277,7 @@ impl Names {
 
 /// `within`, with an array of the host's interactions as one alternative
 /// each. The host's own `:disabled` is `formDisabled`.
-fn host(read: Vec<Fields>, value: &Lit) -> Result<Vec<Fields>, String> {
+fn host(read: &[Fields], value: &Lit) -> Result<Vec<Fields>, String> {
     let with = |read: &[Fields], key: &str, value: Lit| -> Vec<Fields> {
         read.iter()
             .map(|one| {
@@ -303,7 +299,7 @@ fn host(read: Vec<Fields>, value: &Lit) -> Result<Vec<Fields>, String> {
                         );
                     };
                     let one = Lit::Object(vec![(name.clone(), Lit::Bool(true))]);
-                    each.extend(with(&read, "within", within(one)));
+                    each.extend(with(read, "within", within(one)));
                 }
                 Ok(each)
             }
@@ -318,8 +314,8 @@ fn host(read: Vec<Fields>, value: &Lit) -> Result<Vec<Fields>, String> {
                         .to_owned(),
                 )
             }
-            _ => Ok(with(&read, "within", value.clone())),
+            _ => Ok(with(read, "within", value.clone())),
         },
-        _ => Ok(with(&read, "within", value.clone())),
+        _ => Ok(with(read, "within", value.clone())),
     }
 }

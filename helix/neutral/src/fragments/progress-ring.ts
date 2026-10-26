@@ -12,16 +12,16 @@ export default fragment(
   'progress-ring',
   {
     parts: ['content', 'groove', 'indicator', 'track', 'value'],
-    hooks: [
-      'color',
-      'content-color',
-      'label-gap',
-      'ring-size',
-      'ring-width',
-      'track-color',
-      'transition-duration',
-    ],
-    own: ['progress-crawl', 'progress-cycle', 'ring-stroke'],
+    hooks: {
+      color: null,
+      contentColor: null,
+      labelGap: null,
+      ringSize: null,
+      ringWidth: null,
+      trackColor: null,
+      transitionDuration: null,
+    },
+    own: { progressCrawl: null, progressCycle: null, ringStroke: null },
     props: ['indeterminate', 'shape', 'showValue'],
   },
   ({ hook, keyframes, on, own, rule }) => [

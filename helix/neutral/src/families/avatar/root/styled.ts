@@ -28,7 +28,7 @@ export default styles(
       fontWeight: token('weight-medium'),
       size: null,
     },
-    own: ['avatar-size'],
+    own: { avatarSize: null },
     props: { shape: oneOf(['circle', 'rounded']), size: oneOf(['sm', 'md', 'lg']) },
     stylesheet: 'avatar/root/avatar-root.generated.css',
   },
@@ -37,18 +37,18 @@ export default styles(
       rule({
         alignItems: 'center',
         backgroundColor: hook.backgroundColor,
-        blockSize: own.size,
+        blockSize: own.avatarSize,
         borderRadius: token('radii-full'),
         color: hook.color,
         display: 'inline-flex',
         flex: '0 0 auto',
-        inlineSize: own.size,
+        inlineSize: own.avatarSize,
         justifyContent: 'center',
         overflow: 'hidden',
-        own: { size: hook.size(token('size-avatar')) },
+        own: { avatarSize: hook.size(token('size-avatar')) },
       }),
-      rule({ size: 'sm' }, { own: { size: hook.size(token('size-avatar-sm')) } }),
-      rule({ size: 'lg' }, { own: { size: hook.size(token('size-avatar-lg')) } }),
+      rule({ size: 'sm' }, { own: { avatarSize: hook.size(token('size-avatar-sm')) } }),
+      rule({ size: 'lg' }, { own: { avatarSize: hook.size(token('size-avatar-lg')) } }),
       rule({ shape: 'rounded' }, { borderRadius: token('radii-md') }),
       rule({ print: true }, { web: { printColorAdjust: 'economy' } }),
     ]),
@@ -74,13 +74,13 @@ export default styles(
     ]),
     on('initials', [
       rule({
-        fontSize: product(own.size, 0.4),
+        fontSize: product(own.avatarSize, 0.4),
         fontWeight: hook.fontWeight,
         letterSpacing: token('tracking-wide'),
         lineHeight: 1,
         /* Clear of the avatar that overlaps this one in a group, by the
            share of it the group says the next one covers. */
-        marginInlineEnd: product(own.size, inherited('_avatar-group-clear', 0)),
+        marginInlineEnd: product(own.avatarSize, inherited('_avatar-group-clear', 0)),
         userSelect: 'none',
       }),
       /* A phone's circle is space, which stops growing at the largest
@@ -88,7 +88,7 @@ export default styles(
          and fit it at every size, as the web's grow with their circle.
          `min()` of one length is that length in space's points. */
       native([
-        rule({ fontSize: fn('min', product(own.size, 0.4)) }),
+        rule({ fontSize: fn('min', product(own.avatarSize, 0.4)) }),
         rule(
           [{ loaded: true }, { loading: true, waiting: true }, { delays: false, loading: true }],
           { display: 'none' },

@@ -10,7 +10,7 @@ import { fragment } from '../table.js'
  */
 export default fragment(
   'field-inline',
-  { parts: ['hint', 'feedback'], own: ['field-control-inline-size'] },
+  { parts: ['hint', 'feedback'], own: { fieldControlInlineSize: null } },
   ({ on, own, rule }) => [
     on(
       ['hint', 'feedback'],

@@ -25,7 +25,13 @@ export default styles(
   root,
   {
     prefix: 'text',
-    hooks: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'line-height'],
+    hooks: {
+      fontFamily: null,
+      fontSize: null,
+      fontWeight: null,
+      letterSpacing: null,
+      lineHeight: null,
+    },
     props: {
       emphasis: oneOf(['muted']),
       tone: oneOf(['accent', 'danger', 'info', 'primary', 'success', 'warning']),

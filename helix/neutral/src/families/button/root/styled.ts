@@ -29,7 +29,7 @@ export default styles(
     hooks: ({ own }) => ({
       backgroundColor: null,
       backgroundColorHover: null,
-      borderColor: own.edge,
+      borderColor: own.buttonEdge,
       foregroundColor: null,
       gap: token('space-xs'),
       inlineSize: 'auto',
@@ -43,20 +43,20 @@ export default styles(
       radiusStartStart: null,
       size: token('size-control'),
       spinnerColor: 'currentColor',
-      spinnerDuration: own.turn,
+      spinnerDuration: own.buttonTurn,
       spinnerSize: '1.15em',
     }),
-    own: [
-      'button-crawl',
-      'button-edge',
-      'button-fill',
-      'button-fill-hover',
-      'button-ink',
-      'button-on-tone',
-      'button-tone',
-      'button-tone-hover',
-      'button-turn',
-    ],
+    own: {
+      buttonCrawl: null,
+      buttonEdge: null,
+      buttonFill: null,
+      buttonFillHover: null,
+      buttonInk: null,
+      buttonOnTone: null,
+      buttonTone: null,
+      buttonToneHover: null,
+      buttonTurn: null,
+    },
     props: {
       emphasis: oneOf(['ghost', 'outlined', 'solid', 'subtle']),
       tone: oneOf(['accent', 'danger', 'neutral', 'primary']),
@@ -74,23 +74,23 @@ export default styles(
       }),
       rule({
         own: {
-          edge: token('color-border'),
+          buttonEdge: token('color-border'),
           /* The solid fill is separate from the tone, and it has to be.
              Measured: primary 2.80, warning 1.84. */
-          fill: own.tone,
-          fillHover: own.toneHover,
+          buttonFill: own.buttonTone,
+          buttonFillHover: own.buttonToneHover,
           /* The label wherever it sits on a wash of its own tone, deepened
              toward the foreground. The `subtle` emphasis below says why. */
-          ink: mix(own.tone, 78, token('color-foreground')),
-          onTone: token('color-background'),
-          tone: token('color-foreground'),
+          buttonInk: mix(own.buttonTone, 78, token('color-foreground')),
+          buttonOnTone: token('color-background'),
+          buttonTone: token('color-foreground'),
           /* Loader's own turn and crawl, so two rings on one page agree. No
              rung of the duration scale is that long. */
-          crawl: '4s',
-          turn: '0.8s',
+          buttonCrawl: '4s',
+          buttonTurn: '0.8s',
           /* Softened toward the page, because neutral's tone is already the
              darkest ink there is and there is nothing past it to go to. */
-          toneHover: mix(token('color-foreground'), 86, token('color-background')),
+          buttonToneHover: mix(token('color-foreground'), 86, token('color-background')),
         },
       }),
       /* Each tone takes the same six values, so a consumer learns one tone
@@ -98,33 +98,33 @@ export default styles(
       variants('tone', {
         primary: {
           own: {
-            edge: token('color-primary'),
-            fill: token('color-primary-surface'),
-            fillHover: token('color-primary-surface-hover'),
-            onTone: token('color-foreground-on-primary'),
-            tone: token('color-primary'),
-            toneHover: token('color-primary-hover'),
+            buttonEdge: token('color-primary'),
+            buttonFill: token('color-primary-surface'),
+            buttonFillHover: token('color-primary-surface-hover'),
+            buttonOnTone: token('color-foreground-on-primary'),
+            buttonTone: token('color-primary'),
+            buttonToneHover: token('color-primary-hover'),
           },
         },
         accent: {
           own: {
-            edge: token('color-accent'),
-            fill: token('color-accent-surface'),
-            fillHover: token('color-accent-surface-hover'),
-            onTone: token('color-foreground-on-accent'),
-            tone: token('color-accent'),
-            toneHover: token('color-accent-hover'),
+            buttonEdge: token('color-accent'),
+            buttonFill: token('color-accent-surface'),
+            buttonFillHover: token('color-accent-surface-hover'),
+            buttonOnTone: token('color-foreground-on-accent'),
+            buttonTone: token('color-accent'),
+            buttonToneHover: token('color-accent-hover'),
           },
         },
         danger: {
           own: {
-            edge: token('color-danger'),
-            fill: token('color-danger-surface'),
-            fillHover: token('color-danger-surface-hover'),
-            onTone: token('color-foreground-on-status'),
-            tone: token('color-danger'),
+            buttonEdge: token('color-danger'),
+            buttonFill: token('color-danger-surface'),
+            buttonFillHover: token('color-danger-surface-hover'),
+            buttonOnTone: token('color-foreground-on-status'),
+            buttonTone: token('color-danger'),
             /* Mixed toward the ink, for the ink states. */
-            toneHover: mix(token('color-danger'), 86, token('color-foreground')),
+            buttonToneHover: mix(token('color-danger'), 86, token('color-foreground')),
           },
         },
       }),
@@ -167,11 +167,11 @@ export default styles(
       rule({
         web: { all: 'unset', cursor: 'pointer' },
         alignItems: 'center',
-        backgroundColor: hook.backgroundColor(mix(own.tone, 6, 'transparent')),
+        backgroundColor: hook.backgroundColor(mix(own.buttonTone, 6, 'transparent')),
         blockSize: hook.size,
         border: [token('border-thin'), 'solid', hook.borderColor],
         boxSizing: 'border-box',
-        color: hook.foregroundColor(own.ink),
+        color: hook.foregroundColor(own.buttonInk),
         display: 'inline-flex',
         fontFamily: token('font-sans'),
         fontSize: token('text-control'),
@@ -207,7 +207,7 @@ export default styles(
           backgroundColor: first(
             hook.backgroundColorHover,
             hook.backgroundColor,
-            mix(own.tone, 12, 'transparent'),
+            mix(own.buttonTone, 12, 'transparent'),
           ),
         },
       ),
@@ -221,9 +221,9 @@ export default styles(
       rule(
         { emphasis: 'solid' },
         {
-          backgroundColor: hook.backgroundColor(own.fill),
+          backgroundColor: hook.backgroundColor(own.buttonFill),
           borderColor: 'transparent',
-          color: hook.foregroundColor(own.onTone),
+          color: hook.foregroundColor(own.buttonOnTone),
         },
       ),
       rule(
@@ -233,7 +233,11 @@ export default styles(
           interaction: ['hover', 'active'],
         },
         {
-          backgroundColor: first(hook.backgroundColorHover, hook.backgroundColor, own.fillHover),
+          backgroundColor: first(
+            hook.backgroundColorHover,
+            hook.backgroundColor,
+            own.buttonFillHover,
+          ),
           borderColor: 'transparent',
         },
       ),
@@ -257,9 +261,9 @@ export default styles(
       rule(
         { emphasis: 'subtle' },
         {
-          backgroundColor: hook.backgroundColor(mix(own.tone, 14, 'transparent')),
+          backgroundColor: hook.backgroundColor(mix(own.buttonTone, 14, 'transparent')),
           borderColor: 'transparent',
-          color: hook.foregroundColor(own.ink),
+          color: hook.foregroundColor(own.buttonInk),
         },
       ),
       rule(
@@ -272,7 +276,7 @@ export default styles(
           backgroundColor: first(
             hook.backgroundColorHover,
             hook.backgroundColor,
-            mix(own.tone, 22, 'transparent'),
+            mix(own.buttonTone, 22, 'transparent'),
           ),
           borderColor: 'transparent',
         },
@@ -282,7 +286,7 @@ export default styles(
         {
           backgroundColor: hook.backgroundColor('transparent'),
           borderColor: 'transparent',
-          color: hook.foregroundColor(own.tone),
+          color: hook.foregroundColor(own.buttonTone),
         },
       ),
       /* A wash of the tone. A fixed sunken surface was a 1.39 step darker
@@ -297,10 +301,10 @@ export default styles(
           backgroundColor: first(
             hook.backgroundColorHover,
             hook.backgroundColor,
-            mix(own.tone, 8, 'transparent'),
+            mix(own.buttonTone, 8, 'transparent'),
           ),
           borderColor: 'transparent',
-          color: hook.foregroundColor(own.ink),
+          color: hook.foregroundColor(own.buttonInk),
         },
       ),
       /* `:disabled` on the host, which a form's disabled fieldset sets too. */
@@ -353,7 +357,7 @@ export default styles(
          crawl is a fixed rate. The base layer sets every duration token to
          0.01ms under the preference, so a rate scaled from one turned the
          ring about eight thousand times a second. */
-      rule({ reducedMotion: true }, { animationDuration: own.crawl }),
+      rule({ reducedMotion: true }, { animationDuration: own.buttonCrawl }),
     ]),
     keyframes('helix-button-turn', { to: { rotate: '1turn' } }),
   ],

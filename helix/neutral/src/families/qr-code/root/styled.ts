@@ -38,7 +38,7 @@ export default styles(
       radius: token('radii-sm'),
       size: '12rem',
     },
-    own: ['qr-size'],
+    own: { qrSize: null },
     stylesheet: 'qr-code/root/qr-code-root.generated.css',
   },
   ({ hook, on, own, rule }) => [

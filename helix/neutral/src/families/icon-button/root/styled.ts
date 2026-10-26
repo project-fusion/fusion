@@ -40,23 +40,23 @@ export default styles(
       radius: token('radii-sm'),
       size: token('size-control'),
       spinnerColor: 'currentColor',
-      spinnerDuration: own.turn,
+      spinnerDuration: own.iconButtonTurn,
       spinnerSize: '1.15em',
     }),
-    own: [
-      'icon-button-crawl',
-      'icon-button-edge',
-      'icon-button-fill',
-      'icon-button-fill-hover',
-      'icon-button-ink',
-      'icon-button-ink-hover',
-      'icon-button-on-tone',
-      'icon-button-pressed-fill',
-      'icon-button-pressed-ink',
-      'icon-button-size',
-      'icon-button-tone',
-      'icon-button-turn',
-    ],
+    own: {
+      iconButtonCrawl: null,
+      iconButtonEdge: null,
+      iconButtonFill: null,
+      iconButtonFillHover: null,
+      iconButtonInk: null,
+      iconButtonInkHover: null,
+      iconButtonOnTone: null,
+      iconButtonPressedFill: null,
+      iconButtonPressedInk: null,
+      iconButtonSize: null,
+      iconButtonTone: null,
+      iconButtonTurn: null,
+    },
     props: {
       emphasis: oneOf(['ghost', 'outlined', 'solid', 'subtle']),
       material: oneOf(['frosted', 'glass', 'transparent']),
@@ -67,7 +67,7 @@ export default styles(
     stylesheet: 'icon-button/root/icon-button-root.generated.css',
   },
   ({ hook, include, keyframes, on, own, rule }) => [
-    on('host', [rule({ display: 'inline-flex', own: { size: hook.size } })]),
+    on('host', [rule({ display: 'inline-flex', own: { iconButtonSize: hook.size } })]),
     include(iconButtonTones),
     /* Square by construction: one length for both sides, so the control stays
        the same box whatever glyph it holds. The edge is written in longhands,
@@ -76,8 +76,8 @@ export default styles(
     on('button', [
       rule({
         alignItems: 'center',
-        backgroundColor: first(own.pressedFill, hook.backgroundColor, 'transparent'),
-        blockSize: own.size,
+        backgroundColor: first(own.iconButtonPressedFill, hook.backgroundColor, 'transparent'),
+        blockSize: own.iconButtonSize,
         borderColor: hook.borderColor('transparent'),
         borderStyle: 'solid',
         borderWidth: hook.borderWidth,
@@ -103,13 +103,13 @@ export default styles(
           hookOf('button', 'radius-start'),
           hook.radius,
         ),
-        color: first(own.pressedInk, hook.foregroundColor, own.ink),
+        color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonInk),
         web: { cursor: 'pointer' },
         display: 'inline-flex',
         /* A browser gives a button its own font, which the first content that
            is not an icon would show. */
         font: inherit(),
-        inlineSize: own.size,
+        inlineSize: own.iconButtonSize,
         justifyContent: 'center',
         padding: token('space-none'),
         transition: list(
@@ -124,12 +124,12 @@ export default styles(
         { formDisabled: false, hover: true },
         {
           backgroundColor: first(
-            own.pressedFill,
+            own.iconButtonPressedFill,
             hook.backgroundColorHover,
             hook.backgroundColor,
-            mix(own.tone, 8, 'transparent'),
+            mix(own.iconButtonTone, 8, 'transparent'),
           ),
-          color: first(own.pressedInk, hook.foregroundColor, own.inkHover),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonInkHover),
         },
       ),
       /* Pressed: the two values every color rule reads through, from the
@@ -138,8 +138,8 @@ export default styles(
         { active: true, formDisabled: false },
         {
           own: {
-            pressedFill: hook.backgroundColorActive(),
-            pressedInk: hook.foregroundColorActive(),
+            iconButtonPressedFill: hook.backgroundColorActive(),
+            iconButtonPressedInk: hook.foregroundColorActive(),
           },
         },
       ),
@@ -155,21 +155,25 @@ export default styles(
       rule(
         { emphasis: 'solid' },
         {
-          backgroundColor: first(own.pressedFill, hook.backgroundColor, own.fill),
+          backgroundColor: first(
+            own.iconButtonPressedFill,
+            hook.backgroundColor,
+            own.iconButtonFill,
+          ),
           borderColor: hook.borderColor('transparent'),
-          color: first(own.pressedInk, hook.foregroundColor, own.onTone),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonOnTone),
         },
       ),
       rule(
         { formDisabled: false, emphasis: 'solid', hover: true },
         {
           backgroundColor: first(
-            own.pressedFill,
+            own.iconButtonPressedFill,
             hook.backgroundColorHover,
             hook.backgroundColor,
-            own.fillHover,
+            own.iconButtonFillHover,
           ),
-          color: first(own.pressedInk, hook.foregroundColor, own.onTone),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonOnTone),
         },
       ),
       /* Framed, for a control beside a field, with the same 6% wash Button
@@ -179,48 +183,48 @@ export default styles(
         { emphasis: 'outlined' },
         {
           backgroundColor: first(
-            own.pressedFill,
+            own.iconButtonPressedFill,
             hook.backgroundColor,
-            mix(own.tone, 6, 'transparent'),
+            mix(own.iconButtonTone, 6, 'transparent'),
           ),
-          borderColor: first(hook.borderColor, own.edge),
-          color: first(own.pressedInk, hook.foregroundColor, own.tone),
+          borderColor: first(hook.borderColor, own.iconButtonEdge),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonTone),
         },
       ),
       rule(
         { formDisabled: false, emphasis: 'outlined', hover: true },
         {
           backgroundColor: first(
-            own.pressedFill,
+            own.iconButtonPressedFill,
             hook.backgroundColorHover,
             hook.backgroundColor,
-            mix(own.tone, 12, 'transparent'),
+            mix(own.iconButtonTone, 12, 'transparent'),
           ),
-          color: first(own.pressedInk, hook.foregroundColor, own.tone),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonTone),
         },
       ),
       rule(
         { emphasis: 'subtle' },
         {
           backgroundColor: first(
-            own.pressedFill,
+            own.iconButtonPressedFill,
             hook.backgroundColor,
-            mix(own.tone, 14, 'transparent'),
+            mix(own.iconButtonTone, 14, 'transparent'),
           ),
           borderColor: hook.borderColor('transparent'),
-          color: first(own.pressedInk, hook.foregroundColor, own.tone),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonTone),
         },
       ),
       rule(
         { formDisabled: false, emphasis: 'subtle', hover: true },
         {
           backgroundColor: first(
-            own.pressedFill,
+            own.iconButtonPressedFill,
             hook.backgroundColorHover,
             hook.backgroundColor,
-            mix(own.tone, 22, 'transparent'),
+            mix(own.iconButtonTone, 22, 'transparent'),
           ),
-          color: first(own.pressedInk, hook.foregroundColor, own.tone),
+          color: first(own.iconButtonPressedInk, hook.foregroundColor, own.iconButtonTone),
         },
       ),
       /* `:disabled` on the host, which a form's disabled fieldset sets too. */
@@ -274,7 +278,7 @@ export default styles(
       /* Slowed to a fixed rate, as Loader does. The base layer sets every
          duration token to 0.01ms under the preference, so a rate scaled from one
          turned the ring about eight thousand times a second. */
-      rule({ reducedMotion: true }, { animationDuration: own.crawl }),
+      rule({ reducedMotion: true }, { animationDuration: own.iconButtonCrawl }),
     ]),
     keyframes('helix-icon-button-turn', { to: { rotate: '1turn' } }),
     include(iconButtonFloating),

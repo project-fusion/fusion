@@ -24,7 +24,7 @@ export default styles(
       columns: null,
       gap: token('space-2xl'),
     },
-    own: ['stat-group-gap'],
+    own: { statGroupGap: null },
     props: { columns: number(), divided: false },
     stylesheet: 'stat/group/stat-group.generated.css',
   },
@@ -33,8 +33,8 @@ export default styles(
       rule({
         display: 'flex',
         flexWrap: 'wrap',
-        gap: own.gap,
-        own: { gap: hook.gap },
+        gap: own.statGroupGap,
+        own: { statGroupGap: hook.gap },
       }),
       rule({ has: 'columns' }, { display: 'grid' }),
       variants('columns', {
@@ -45,7 +45,7 @@ export default styles(
         '6': { gridTemplateColumns: hook.columns('repeat(6, minmax(0, 1fr))') },
       }),
       /* A rule before every figure, the one that starts a row clipped. */
-      rule({ divided: true }, { columnGap: product(own.gap, 2), overflowX: 'clip' }),
+      rule({ divided: true }, { columnGap: product(own.statGroupGap, 2), overflowX: 'clip' }),
       native([rule({ divided: true }, { overflow: 'hidden' })]),
     ]),
     on({ region: '*', slotted: '*' }, [
@@ -53,8 +53,8 @@ export default styles(
         { divided: true },
         {
           borderInlineStart: [token('border-thin'), 'solid', token('color-border')],
-          marginInlineStart: difference(product(own.gap, '-1'), token('border-thin')),
-          paddingInlineStart: own.gap,
+          marginInlineStart: difference(product(own.statGroupGap, '-1'), token('border-thin')),
+          paddingInlineStart: own.statGroupGap,
         },
       ),
     ]),

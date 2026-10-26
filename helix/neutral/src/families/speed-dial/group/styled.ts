@@ -22,14 +22,14 @@ export default styles(
       groupLabelFontSize: token('text-xs'),
       labelBackgroundColor: token('color-surface-overlay'),
     },
-    own: ['speed-dial-align'],
+    own: { speedDialAlign: null },
     stylesheet: 'speed-dial/group/speed-dial-group.generated.css',
   },
   ({ hook, on, own, rule }) => [
     on('host', [rule({ display: 'block' })]),
     on('group', [
       rule({
-        alignItems: own.align('flex-end'),
+        alignItems: own.speedDialAlign('flex-end'),
         display: 'flex',
         flexDirection: 'column',
         gap: hook.gap,

@@ -46,7 +46,7 @@ export default styles(
       padding: null,
       shadow: token('shadow-floating'),
     },
-    own: ['popover-edge', 'popover-from', 'popover-travel'],
+    own: { popoverEdge: null, popoverFrom: null, popoverTravel: null },
     props: { material: oneOf(['frosted', 'glass']), separation: oneOf(['plain']) },
     stylesheet: 'popover/root/popover-root.generated.css',
   },
@@ -65,7 +65,7 @@ export default styles(
           overflow: 'visible',
           backgroundColor: fill,
           border: [width, 'solid', ink],
-          own: { edge: [width, 'solid', ink] },
+          own: { popoverEdge: [width, 'solid', ink] },
           borderRadius: token('radii-sm'),
           boxShadow: hook.shadow,
           boxSizing: 'border-box',
@@ -85,10 +85,10 @@ export default styles(
       /* It travels a little out of the edge it opened against. */
       on('surface', [
         rule({
-          own: { travel: product(token('space-2xs'), '-1'), from: 0.96 },
+          own: { popoverTravel: product(token('space-2xs'), '-1'), popoverFrom: 0.96 },
           opacity: 0,
-          transform: fn('translateY', own.travel),
-          scale: own.from,
+          transform: fn('translateY', own.popoverTravel),
+          scale: own.popoverFrom,
           transition: list(
             ['opacity', fast, token('easing-standard')],
             ['scale', fast, token('easing-emphasized')],
@@ -98,7 +98,7 @@ export default styles(
           ),
         }),
         /* Opening upward, it comes up from the trigger. */
-        rule({ placedTop: true }, { own: { travel: token('space-2xs') } }),
+        rule({ placedTop: true }, { own: { popoverTravel: token('space-2xs') } }),
         rule({ part: { 'data-placed': true } }, { opacity: 1, scale: 1, transform: 'none' }),
         /* Out of the near edge, and out of the arrow where there is one. */
         rule(
@@ -139,18 +139,18 @@ export default styles(
           rotate: '45deg',
         }),
         /* Physical sides, as a placement is, in either direction. */
-        rule({ dir: 'ltr', placedBottom: true }, { borderInlineStart: own.edge }),
-        rule({ dir: 'rtl', placedBottom: true }, { borderInlineEnd: own.edge }),
-        rule({ placedBottom: true }, { borderBlockStart: own.edge }),
-        rule({ dir: 'ltr', placedTop: true }, { borderInlineEnd: own.edge }),
-        rule({ dir: 'rtl', placedTop: true }, { borderInlineStart: own.edge }),
-        rule({ placedTop: true }, { borderBlockEnd: own.edge }),
-        rule({ dir: 'ltr', placedRight: true }, { borderInlineStart: own.edge }),
-        rule({ dir: 'rtl', placedRight: true }, { borderInlineEnd: own.edge }),
-        rule({ placedRight: true }, { borderBlockEnd: own.edge }),
-        rule({ dir: 'ltr', placedLeft: true }, { borderInlineEnd: own.edge }),
-        rule({ dir: 'rtl', placedLeft: true }, { borderInlineStart: own.edge }),
-        rule({ placedLeft: true }, { borderBlockStart: own.edge }),
+        rule({ dir: 'ltr', placedBottom: true }, { borderInlineStart: own.popoverEdge }),
+        rule({ dir: 'rtl', placedBottom: true }, { borderInlineEnd: own.popoverEdge }),
+        rule({ placedBottom: true }, { borderBlockStart: own.popoverEdge }),
+        rule({ dir: 'ltr', placedTop: true }, { borderInlineEnd: own.popoverEdge }),
+        rule({ dir: 'rtl', placedTop: true }, { borderInlineStart: own.popoverEdge }),
+        rule({ placedTop: true }, { borderBlockEnd: own.popoverEdge }),
+        rule({ dir: 'ltr', placedRight: true }, { borderInlineStart: own.popoverEdge }),
+        rule({ dir: 'rtl', placedRight: true }, { borderInlineEnd: own.popoverEdge }),
+        rule({ placedRight: true }, { borderBlockEnd: own.popoverEdge }),
+        rule({ dir: 'ltr', placedLeft: true }, { borderInlineEnd: own.popoverEdge }),
+        rule({ dir: 'rtl', placedLeft: true }, { borderInlineStart: own.popoverEdge }),
+        rule({ placedLeft: true }, { borderBlockStart: own.popoverEdge }),
       ]),
       on(
         ['surface', 'arrow'],

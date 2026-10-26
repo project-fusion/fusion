@@ -51,13 +51,19 @@ export default styles(
       padding: null,
       paddingBlockStart: null,
       radius: token('radii-sm'),
-      scrim: own.scrim,
+      scrim: own.drawerScrim,
       shadow: token('shadow-floating'),
       size: '20rem',
       swipeX: 0,
       swipeY: 0,
     }),
-    own: ['drawer-away', 'drawer-lead', 'drawer-scrim', 'drawer-size', 'drawer-trail'],
+    own: {
+      drawerAway: null,
+      drawerLead: null,
+      drawerScrim: null,
+      drawerSize: null,
+      drawerTrail: null,
+    },
     props: { material: oneOf(['frosted', 'glass']) },
     stylesheet: 'drawer/root/drawer-root.generated.css',
   },
@@ -75,8 +81,8 @@ export default styles(
     return [
       /* The host draws nothing, and holds the panel's size and the scrim's tint. */
       on('host', [
-        rule({ own: { size: hook.size }, display: 'contents' }),
-        rule({ own: { scrim: token('color-overlay') } }),
+        rule({ own: { drawerSize: hook.size }, display: 'contents' }),
+        rule({ own: { drawerScrim: token('color-overlay') } }),
         rule({ print: true }, { display: 'none' }),
       ]),
       /* The scrim fades in as the panel slides, and out as it leaves. */
@@ -106,13 +112,13 @@ export default styles(
           blockSize: 'auto',
           backgroundColor: hook.backgroundColor(token('color-surface-overlay')),
           padding,
-          paddingBlockStart: own.lead(paddingTop),
-          paddingBlockEnd: own.trail(padding),
+          paddingBlockStart: own.drawerLead(paddingTop),
+          paddingBlockEnd: own.drawerTrail(padding),
           display: 'flex',
           flexDirection: 'column',
           outline: 'none',
           position: web('fixed'),
-          transform: own.away,
+          transform: own.drawerAway,
           transition: list(
             ['transform', move, token('easing-decelerate')],
             ['display', move, 'allow-discrete'],
@@ -149,9 +155,13 @@ export default styles(
           borderStartEndRadius: token('radii-none'),
           borderEndEndRadius: token('radii-none'),
           blockSize: '100%',
-          inlineSize: fn('min', own.size, '100%'),
+          inlineSize: fn('min', own.drawerSize, '100%'),
           web: { insetBlock: 0, insetInlineEnd: 0 },
-          own: { away: fn('translateX', '100%'), lead: clearTop, trail: clearBottom },
+          own: {
+            drawerAway: fn('translateX', '100%'),
+            drawerLead: clearTop,
+            drawerTrail: clearBottom,
+          },
         }),
         rule(
           { placement: 'start' },
@@ -159,9 +169,13 @@ export default styles(
             borderStartStartRadius: token('radii-none'),
             borderEndStartRadius: token('radii-none'),
             blockSize: '100%',
-            inlineSize: fn('min', own.size, '100%'),
+            inlineSize: fn('min', own.drawerSize, '100%'),
             web: { insetBlock: 0, insetInlineStart: 0 },
-            own: { away: fn('translateX', '-100%'), lead: clearTop, trail: clearBottom },
+            own: {
+              drawerAway: fn('translateX', '-100%'),
+              drawerLead: clearTop,
+              drawerTrail: clearBottom,
+            },
           },
         ),
         rule(
@@ -169,9 +183,13 @@ export default styles(
           {
             borderEndStartRadius: token('radii-none'),
             borderEndEndRadius: token('radii-none'),
-            blockSize: fn('min', own.size, '100%'),
+            blockSize: fn('min', own.drawerSize, '100%'),
             web: { insetBlockEnd: 0, insetInline: 0 },
-            own: { away: fn('translateY', '100%'), lead: paddingTop, trail: clearBottom },
+            own: {
+              drawerAway: fn('translateY', '100%'),
+              drawerLead: paddingTop,
+              drawerTrail: clearBottom,
+            },
           },
         ),
         rule(
@@ -179,9 +197,13 @@ export default styles(
           {
             borderStartStartRadius: token('radii-none'),
             borderStartEndRadius: token('radii-none'),
-            blockSize: fn('min', own.size, '100%'),
+            blockSize: fn('min', own.drawerSize, '100%'),
             web: { insetBlockStart: 0, insetInline: 0 },
-            own: { away: fn('translateY', '-100%'), lead: clearTop, trail: padding },
+            own: {
+              drawerAway: fn('translateY', '-100%'),
+              drawerLead: clearTop,
+              drawerTrail: padding,
+            },
           },
         ),
         /* A phone takes no share inside `min()`, which the window it stands
@@ -189,10 +211,13 @@ export default styles(
            than the window across it. */
         native([
           rule([{ placement: false }, { placement: ['end', 'start'] }], {
-            inlineSize: own.size,
+            inlineSize: own.drawerSize,
             maxInlineSize: '100%',
           }),
-          rule({ placement: ['bottom', 'top'] }, { blockSize: own.size, maxBlockSize: '100%' }),
+          rule(
+            { placement: ['bottom', 'top'] },
+            { blockSize: own.drawerSize, maxBlockSize: '100%' },
+          ),
         ]),
         /* The inline edges are logical and `translateX` is physical, so on a
            right-to-left page the end sits on the left and slides out leftward. */
@@ -201,9 +226,9 @@ export default styles(
             { dir: 'rtl', placement: false },
             { dir: 'rtl', placement: 'end' },
           ],
-          { own: { away: fn('translateX', '-100%') } },
+          { own: { drawerAway: fn('translateX', '-100%') } },
         ),
-        rule({ dir: 'rtl', placement: 'start' }, { own: { away: fn('translateX', '100%') } }),
+        rule({ dir: 'rtl', placement: 'start' }, { own: { drawerAway: fn('translateX', '100%') } }),
         /* Home, less however far a swipe or a snap point has moved it toward
            its edge, which is nothing at rest. */
         rule(
@@ -226,7 +251,7 @@ export default styles(
           { transition: 'none', web: { userSelect: 'none' } },
         ),
         /* The slide in starts from past the edge. */
-        rule({ startingStyle: true, open: true }, { transform: own.away }),
+        rule({ startingStyle: true, open: true }, { transform: own.drawerAway }),
         web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
       on('header', [rule({ flex: '0 0 auto' })]),
@@ -272,7 +297,7 @@ export default styles(
           boxSizing: 'border-box',
           position: 'absolute',
           insetBlockStart: sum(
-            own.lead(paddingTop),
+            own.drawerLead(paddingTop),
             quotient(difference(titleLine, dismissSize), 2),
           ),
           insetInlineEnd: token('space-md'),

@@ -19,7 +19,7 @@ export default styles(
   root,
   {
     prefix: 'checkbox-group',
-    hooks: ['gap'],
+    hooks: { gap: null },
     stylesheet: 'checkbox-group/root/checkbox-group-root.generated.css',
   },
   ({ hook, include, on, rule }) => [

@@ -31,13 +31,13 @@ export default styles(
       gap: null,
       labelWidth: 'max-content',
     },
-    own: [
-      'description-list-column-gap',
-      'description-list-direction',
-      'description-list-gap',
-      'description-list-value-align',
-      'description-list-value-figures',
-    ],
+    own: {
+      descriptionListColumnGap: null,
+      descriptionListDirection: null,
+      descriptionListGap: null,
+      descriptionListValueAlign: null,
+      descriptionListValueFigures: null,
+    },
     props: { divided: false, justify: oneOf(['between']), width: oneOf(['auto']) },
     stylesheet: 'description-list/root/description-list-root.generated.css',
   },
@@ -47,11 +47,11 @@ export default styles(
       /* A phone has no inheritance through a slot, so the host holds the gap
          its rule between pairs reads, as the list holds it on the web. */
       native([
-        rule({ own: { gap: hook.gap(token('space-md')) } }),
-        rule({ direction: 'row' }, { own: { gap: hook.gap(token('space-sm')) } }),
+        rule({ own: { descriptionListGap: hook.gap(token('space-md')) } }),
+        rule({ direction: 'row' }, { own: { descriptionListGap: hook.gap(token('space-sm')) } }),
         rule(
           { direction: 'row', inlineSize: { below: '22rem' } },
-          { own: { gap: hook.gap(token('space-md')) } },
+          { own: { descriptionListGap: hook.gap(token('space-md')) } },
         ),
       ]),
       /* As wide as the widest pair, and no longer a container: containment
@@ -63,28 +63,33 @@ export default styles(
       /* Values on the end edge, which the list hands its items. */
       rule(
         { direction: 'row', justify: 'between' },
-        { own: { valueAlign: 'end', valueFigures: 'tabular-nums' } },
+        { own: { descriptionListValueAlign: 'end', descriptionListValueFigures: 'tabular-nums' } },
       ),
     ]),
     /* The gap between pairs is one private value, so the rule `divided`
        draws sits in the middle of it whichever default is in force. */
     on('list', [
-      rule({ display: 'grid', gap: own.gap, margin: 0, own: { gap: hook.gap(token('space-md')) } }),
+      rule({
+        display: 'grid',
+        gap: own.descriptionListGap,
+        margin: 0,
+        own: { descriptionListGap: hook.gap(token('space-md')) },
+      }),
       rule(
         { direction: 'row' },
         {
           columnGap: hook.columnGap,
           gridTemplateColumns: [hook.labelWidth, 'minmax(0, 1fr)'],
-          rowGap: own.gap,
-          own: { gap: hook.gap(token('space-sm')) },
+          rowGap: own.descriptionListGap,
+          own: { descriptionListGap: hook.gap(token('space-sm')) },
         },
       ),
       rule(
         { direction: 'row', inlineSize: { below: '22rem' } },
         {
           gridTemplateColumns: 'minmax(0, 1fr)',
-          rowGap: own.gap,
-          own: { gap: hook.gap(token('space-md')) },
+          rowGap: own.descriptionListGap,
+          own: { descriptionListGap: hook.gap(token('space-md')) },
         },
       ),
       /* A phone's list is a column of its items, which lay out beside. */
@@ -93,12 +98,12 @@ export default styles(
           { direction: 'row' },
           {
             gridTemplateColumns: 'minmax(0, 1fr)',
-            own: { direction: 'row', columnGap: hook.columnGap },
+            own: { descriptionListDirection: 'row', descriptionListColumnGap: hook.columnGap },
           },
         ),
         rule(
           { direction: 'row', inlineSize: { below: '22rem' } },
-          { own: { direction: 'column' } },
+          { own: { descriptionListDirection: 'column' } },
         ),
       ]),
     ]),
@@ -108,7 +113,7 @@ export default styles(
         { child: 'later', divided: true },
         {
           borderBlockStart: [hook.dividerWidth, 'solid', hook.dividerColor],
-          paddingBlockStart: own.gap,
+          paddingBlockStart: own.descriptionListGap,
         },
       ),
     ]),

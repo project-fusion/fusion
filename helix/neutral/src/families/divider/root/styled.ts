@@ -39,7 +39,7 @@ export default styles(
       paddingStart: null,
       thickness: token('border-thin'),
     },
-    own: ['divider-thickness'],
+    own: { dividerThickness: null },
     props: { contentPlacement: oneOf(['end', 'start']) },
     stylesheet: 'divider/root/divider-root.generated.css',
   },
@@ -48,7 +48,7 @@ export default styles(
       rule({
         alignItems: 'center',
         display: 'flex',
-        own: { thickness: hook.thickness },
+        own: { dividerThickness: hook.thickness },
       }),
       rule({
         paddingInlineEnd: first(hook.paddingEnd, hook.padding),
@@ -95,10 +95,13 @@ export default styles(
       rule({ backgroundColor: hook.color }),
       /* `flex: 1` and no full width, so the two halves share what the content
          leaves. */
-      rule({ vertical: false }, { blockSize: own.thickness, flex: '1 1 0' }),
+      rule({ vertical: false }, { blockSize: own.dividerThickness, flex: '1 1 0' }),
       /* One line of text is the least a stretched line is, where its parent
          resolves to no height. */
-      rule({ vertical: true }, { flex: '1 1 0', inlineSize: own.thickness, minBlockSize: '1em' }),
+      rule(
+        { vertical: true },
+        { flex: '1 1 0', inlineSize: own.dividerThickness, minBlockSize: '1em' },
+      ),
       native([
         rule(
           [

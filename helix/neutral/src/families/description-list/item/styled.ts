@@ -27,12 +27,12 @@ export default styles(
       labelWeight: token('weight-medium'),
       valueColor: token('color-foreground'),
     },
-    own: [
-      'description-list-column-gap',
-      'description-list-direction',
-      'description-list-value-align',
-      'description-list-value-figures',
-    ],
+    own: {
+      descriptionListColumnGap: null,
+      descriptionListDirection: null,
+      descriptionListValueAlign: null,
+      descriptionListValueFigures: null,
+    },
     stylesheet: 'description-list/item/description-list-item.generated.css',
   },
   ({ hook, on, own, rule }) => [
@@ -46,9 +46,9 @@ export default styles(
       }),
       native([
         rule({
-          columnGap: own.columnGap(0),
+          columnGap: own.descriptionListColumnGap(0),
           display: 'flex',
-          flexDirection: own.direction('column'),
+          flexDirection: own.descriptionListDirection('column'),
         }),
       ]),
       /* A label never ends one page with its value starting the next. */
@@ -69,12 +69,12 @@ export default styles(
     on('value', [
       rule({
         color: hook.valueColor,
-        fontVariantNumeric: own.valueFigures('normal'),
-        justifySelf: web(own.valueAlign('stretch')),
+        fontVariantNumeric: own.descriptionListValueFigures('normal'),
+        justifySelf: web(own.descriptionListValueAlign('stretch')),
         margin: 0,
         minInlineSize: 0,
         overflowWrap: web('anywhere'),
-        textAlign: own.valueAlign('start'),
+        textAlign: own.descriptionListValueAlign('start'),
       }),
       native([rule({ flex: '1 1 auto' })]),
     ]),
@@ -84,13 +84,13 @@ export default styles(
       web([
         rule({
           color: hook.valueColor,
-          fontVariantNumeric: own.valueFigures('normal'),
+          fontVariantNumeric: own.descriptionListValueFigures('normal'),
           gridColumn: '-2 / -1',
-          justifySelf: own.valueAlign('stretch'),
+          justifySelf: own.descriptionListValueAlign('stretch'),
           margin: 0,
           minInlineSize: 0,
           overflowWrap: 'anywhere',
-          textAlign: own.valueAlign('start'),
+          textAlign: own.descriptionListValueAlign('start'),
         }),
       ]),
     ]),
