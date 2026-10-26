@@ -22,6 +22,22 @@ impl Names {
                 Lit::Object(pairs) => {
                     let mut written: Vec<String> = Vec::new();
                     for (key, value) in pairs {
+                        /* Declarations a phone does not have, each where it stands. */
+                        if key == "web" {
+                            let Lit::Object(web) = value else {
+                                return Err(
+                                    "`web` in a `set` is an object of declarations".to_owned()
+                                );
+                            };
+                            for (key, value) in web {
+                                let name = property(key);
+                                ordered(&written, &name)?;
+                                written.push(name.clone());
+                                let value = Lit::Call("web".to_owned(), vec![self.value(value)?]);
+                                declarations.push(Lit::Array(vec![Lit::Text(name), value]));
+                            }
+                            continue;
+                        }
                         if key == "own" {
                             let Lit::Object(own) = value else {
                                 return Err(
@@ -55,13 +71,29 @@ impl Names {
     /// A value, with every `hook.name(...)` and `own.name` spelled out.
     pub(super) fn value(&mut self, value: &Lit) -> Result<Lit, String> {
         match value {
-            Lit::Member(object, key) if object == "own" => Ok(Lit::Call(
-                "own".to_owned(),
-                vec![Lit::Text(self.own_name(key)?)],
-            )),
+            Lit::Member(object, key) if object == "own" => {
+                let name = self.own_name(key)?;
+                self.defaulted_read("own", &name)
+            }
+            Lit::Member(object, key) if object == "hook" => {
+                let name = self.hook_name(key)?;
+                self.defaulted_read("hook", &name)
+            }
             Lit::Member(object, key) => Err(format!(
                 "`{object}.{key}` is not a value: a private value is `own.{key}`"
             )),
+            Lit::Call(helper, arguments) if helper == "first" => self.first(arguments),
+            Lit::Call(helper, arguments) if helper == "ownOf" => match arguments.as_slice() {
+                [Lit::Text(of), Lit::Text(name), rest @ ..] if rest.len() <= 1 => {
+                    let mut spelled = vec![Lit::Text(format!("{of}-{name}"))];
+                    for fallback in rest {
+                        spelled.push(self.value(fallback)?);
+                    }
+                    Ok(Lit::Call("own".to_owned(), spelled))
+                }
+                _ => Err("`ownOf()` takes a family's prefix, a private value's name less it, and a fallback".to_owned()),
+            },
+            Lit::Null => Err("`null` is a default in the header alone: a hook or a private value with none".to_owned()),
             Lit::Call(helper, arguments) => {
                 let arguments = arguments
                     .iter()
@@ -73,7 +105,11 @@ impl Names {
                     spelled
                 };
                 match helper.split_once('.') {
-                    Some(("hook", key)) => Ok(Lit::Call("hook".to_owned(), spelled(self.hook_name(key)?, arguments))),
+                    Some(("hook", key)) => {
+                        let name = self.hook_name(key)?;
+                        self.site(&name, arguments.first());
+                        Ok(Lit::Call("hook".to_owned(), spelled(name, arguments)))
+                    }
                     Some(("own", key)) => Ok(Lit::Call("own".to_owned(), spelled(self.own_name(key)?, arguments))),
                     Some(_) => Err(format!("`{helper}()` is not in the vocabulary")),
                     None if helper == "hook" || helper == "own" => Err(format!(
@@ -90,6 +126,94 @@ impl Names {
                 .map(Lit::Array),
             Lit::At(..) => Err(format!("a call to `{}` is not a value", self.prefix)),
             other => Ok(other.clone()),
+        }
+    }
+}
+
+/// What `first()` takes, for a refusal.
+const FIRST: &str = "`first()` takes reads and then a fallback: each but the last is a hook, a private value, `hookOf()`, `ownOf()`, `inherited()`, `measured()` or `derived()`, written with no fallback of its own";
+
+impl Names {
+    /// `hook.name` or `own.name` alone: the read with the header's default,
+    /// where it gives one.
+    fn defaulted_read(&mut self, kind: &str, name: &str) -> Result<Lit, String> {
+        let key = format!("{kind} {name}");
+        let Some(default) = self.defaults.get(&key).cloned() else {
+            if kind == "hook" {
+                self.site(name, None);
+            }
+            return Ok(Lit::Call(kind.to_owned(), vec![Lit::Text(name.to_owned())]));
+        };
+        if self.resolving.contains(&key) {
+            return Err(format!("the default of `{name}` reads itself"));
+        }
+        self.resolving.push(key);
+        let fallback = self.value(&default);
+        self.resolving.pop();
+        let fallback = fallback?;
+        if kind == "hook" {
+            self.site(name, Some(&fallback));
+        }
+        Ok(Lit::Call(
+            kind.to_owned(),
+            vec![Lit::Text(name.to_owned()), fallback],
+        ))
+    }
+
+    /// Records the fallback a hook is read with, for the notes.
+    fn site(&mut self, name: &str, fallback: Option<&Lit>) {
+        self.sites
+            .entry(name.to_owned())
+            .or_default()
+            .insert(fallback.map_or_else(String::new, |fallback| format!("{fallback:?}")));
+    }
+
+    /// `first(a, b, fallback)`: `a` with `b` as its fallback, and `b` with
+    /// `fallback`.
+    fn first(&mut self, arguments: &[Lit]) -> Result<Lit, String> {
+        let Some((last, reads)) = arguments
+            .split_last()
+            .filter(|(_, reads)| !reads.is_empty())
+        else {
+            return Err(FIRST.to_owned());
+        };
+        let mut fallback = self.value(last)?;
+        for read in reads.iter().rev() {
+            fallback = self.chained(read, fallback)?;
+        }
+        Ok(fallback)
+    }
+
+    /// One read of `first()`, with the fallback the reads after it give.
+    fn chained(&mut self, read: &Lit, fallback: Lit) -> Result<Lit, String> {
+        let call = |helper: &str, mut spelled: Vec<Lit>, fallback: Lit| {
+            spelled.push(fallback);
+            Lit::Call(helper.to_owned(), spelled)
+        };
+        match read {
+            Lit::Member(object, key) if object == "hook" => {
+                let name = self.hook_name(key)?;
+                self.site(&name, Some(&fallback));
+                Ok(call("hook", vec![Lit::Text(name)], fallback))
+            }
+            Lit::Member(object, key) if object == "own" => {
+                Ok(call("own", vec![Lit::Text(self.own_name(key)?)], fallback))
+            }
+            Lit::Call(helper, arguments) => match (helper.as_str(), arguments.as_slice()) {
+                ("hookOf", [of @ Lit::Text(_), name @ Lit::Text(_)]) => {
+                    Ok(call("hookOf", vec![of.clone(), name.clone()], fallback))
+                }
+                ("ownOf", [Lit::Text(of), Lit::Text(name)]) => Ok(call(
+                    "own",
+                    vec![Lit::Text(format!("{of}-{name}"))],
+                    fallback,
+                )),
+                ("inherited" | "measured" | "derived", [name @ Lit::Text(_)]) => {
+                    Ok(call(helper, vec![name.clone()], fallback))
+                }
+                _ => Err(FIRST.to_owned()),
+            },
+            _ => Err(FIRST.to_owned()),
         }
     }
 }

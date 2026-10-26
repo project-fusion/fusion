@@ -62,10 +62,37 @@ impl Names {
             );
         };
         let target = self.target(target)?;
+        self.held(&target, items, group, file, None)
+    }
+
+    /// The rules a group holds, each one platform's alone where a `web([...])`
+    /// or a `native([...])` around it says so.
+    fn held(
+        &mut self,
+        target: &Target,
+        items: &[Lit],
+        group: &str,
+        file: &str,
+        platform: Option<&str>,
+    ) -> Result<Vec<Lit>, String> {
         let mut rules = Vec::new();
         for item in items {
+            if let Lit::Call(helper, arguments) = item {
+                if let ("web" | "native", [Lit::Array(inner)]) =
+                    (helper.as_str(), arguments.as_slice())
+                {
+                    if platform.is_some() {
+                        return Err(format!("`{helper}([...])` inside another platform's group"));
+                    }
+                    rules.extend(self.held(target, inner, group, file, Some(helper))?);
+                    continue;
+                }
+            }
             let Lit::At(line, call) = item else {
-                return Err("a group holds `rule(...)` and `variants(...)`".to_owned());
+                return Err(
+                    "a group holds `rule(...)`, `variants(...)`, `web([...])` and `native([...])`"
+                        .to_owned(),
+                );
             };
             let at = format!("{file}line {line}");
             let read = match &**call {
@@ -77,11 +104,11 @@ impl Names {
                             return Err(format!("{at}: `rule()` takes `set`, or `when` and `set`"))
                         }
                     };
-                    self.rule(&target, when, set, &at, group)
+                    self.rule(target, when, set, (&at, group, platform))
                         .map(|rule| vec![rule])
                 }
                 Lit::Call(helper, arguments) if helper == "variants" => {
-                    self.variants(&target, arguments, &at, group)
+                    self.variants(target, arguments, (&at, group, platform))
                 }
                 _ => {
                     return Err(format!(
@@ -100,16 +127,26 @@ impl Names {
         Ok(rules)
     }
 
-    /// One rule, as `family()` writes it.
+    /// One rule, as `family()` writes it. `place` is its line, its group,
+    /// and the platform a group around it says.
     fn rule(
         &mut self,
         target: &Target,
         when: Option<&Lit>,
         set: &Lit,
-        at: &str,
-        group: &str,
+        place: (&str, &str, Option<&str>),
     ) -> Result<Lit, String> {
-        let when = split(when)?;
+        let (at, group, platform) = place;
+        let named = self.namespace(when, target)?;
+        let mut when = split(named.as_ref().or(when))?;
+        if let Some(platform) = platform {
+            if when.platform.is_some() {
+                return Err(format!(
+                    "a rule inside `{platform}([...])` says no `platform` of its own"
+                ));
+            }
+            when.platform = Some(platform.to_owned());
+        }
         if target.web && when.platform.as_deref() != Some("web") {
             return Err("a rule on `{ part, inner }` or `{ part, selector }` is the web's alone, but for `inner: '> slot'`, and its `when` says `platform: 'web'`".to_owned());
         }
@@ -149,8 +186,7 @@ impl Names {
         &mut self,
         target: &Target,
         arguments: &[Lit],
-        at: &str,
-        group: &str,
+        place: (&str, &str, Option<&str>),
     ) -> Result<Vec<Lit>, String> {
         let [Lit::Text(prop), Lit::Object(entries)] = arguments else {
             return Err(
@@ -170,7 +206,7 @@ impl Names {
                     ));
                 }
                 let when = Lit::Object(vec![(prop.clone(), Lit::Text(value.clone()))]);
-                self.rule(target, Some(&when), set, at, group)
+                self.rule(target, Some(&when), set, place)
             })
             .collect()
     }

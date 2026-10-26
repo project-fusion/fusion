@@ -21,6 +21,10 @@
 //! key written twice, by a spread or otherwise, is refused. The `family()`
 //! shape the compiler rewrites a table into, which its tests write, names
 //! nothing, and any name in it is refused.
+//!
+//! **A headless source written with `render` is `headless.tsx`**, read with
+//! JSX, and its part tree is read by [`jsx`] into the builder form's nodes,
+//! so everything after reading sees one shape.
 
 use std::collections::BTreeMap;
 
@@ -51,6 +55,9 @@ pub enum Lit {
     /// and it takes the line off before anything else reads the call.
     At(usize, Box<Lit>),
     Number(f64),
+    /// `null`, which only a style table's header gives a meaning: a hook or
+    /// a private value with no default.
+    Null,
     /// An object's properties, in the order they are written.
     Object(Vec<(String, Lit)>),
     Text(String),
@@ -82,6 +89,8 @@ pub(super) struct Reader<'a, 's> {
     names_everywhere: bool,
     /// Whether the reader is inside a rules function.
     styles: bool,
+    /// Whether the module is a `headless.tsx`, whose `render` is JSX.
+    jsx: bool,
 }
 
 /// The module's default export.
@@ -91,8 +100,28 @@ pub(super) struct Reader<'a, 's> {
 /// A sentence naming the line, when the module does not parse, has no default
 /// export, or holds anything a table may not.
 pub fn default_export(source: &str) -> Result<Lit, String> {
+    export_of(source, false)
+}
+
+/// A `headless.tsx` module's default export, with its `render` read into
+/// the builder form's nodes, as [`jsx`] says.
+///
+/// # Errors
+///
+/// As [`default_export`] says, and a sentence naming the line of anything
+/// in the render that is not in the JSX form's grammar.
+pub fn headless_tsx(source: &str) -> Result<Lit, String> {
+    export_of(source, true)
+}
+
+fn export_of(source: &str, jsx: bool) -> Result<Lit, String> {
     let allocator = Allocator::default();
-    let parsed = Parser::new(&allocator, source, SourceType::ts()).parse();
+    let kind = if jsx {
+        SourceType::tsx()
+    } else {
+        SourceType::ts()
+    };
+    let parsed = Parser::new(&allocator, source, kind).parse();
     if let Some(error) = parsed.diagnostics.first() {
         return Err(format!("the module does not parse: {error}"));
     }
@@ -103,6 +132,7 @@ pub fn default_export(source: &str) -> Result<Lit, String> {
                 return Err("the default export is a declaration, not a table".to_owned());
             };
             let mut reader = Reader {
+                jsx,
                 names_everywhere: false,
                 reading: Vec::new(),
                 scope,
@@ -193,6 +223,7 @@ pub fn machine_module(source: &str) -> Result<MachineModule, String> {
     };
     let functions = scope.functions.clone();
     let mut reader = Reader {
+        jsx: false,
         names_everywhere: true,
         reading: Vec::new(),
         scope,
@@ -310,7 +341,10 @@ pub(super) fn refused(span: Span, source: &str, what: &str) -> String {
     )
 }
 
+mod jsx;
 mod reader;
+
+pub(crate) use jsx::kebab;
 
 #[cfg(test)]
 mod tests;

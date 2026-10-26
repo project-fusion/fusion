@@ -40,17 +40,42 @@
 //! **A fragment is written the same way**, with `fragment(name, { parts },
 //! rules)` for rules and `declarations(name, set)` for declarations, and is
 //! rewritten into the `fragment()` shape [`super::fragments`] reads.
+//!
+//! **Defaults are written once, in the header.** `hooks` may give each hook's
+//! default by its name in camelCase, `hooks: ({ own }) => ({ color:
+//! token('color-foreground-muted') })`, and `own` each private value's, by
+//! its whole name in camelCase, `null` for one with none. A rule then reads
+//! `hook.color` and `own.tabJustify` with the default, and `hook.color(x)` is
+//! the site's own fallback. `first(a, b, fallback)` is the chain of fallbacks
+//! read left to right, and `ownOf(family, name)` another family's private
+//! value, as `hookOf()` reads its hook. A note says which hooks are read
+//! with several fallbacks.
+//!
+//! **`web([...])` and `native([...])` are groups of rules one platform's
+//! alone**, and a set's `web: { cursor: 'pointer' }` is declarations a phone
+//! does not have, each written where it stands.
+//!
+//! **Over a headless source written with `render`, a condition's name is
+//! resolved against the source**: a name alone is a prop, a custom state, or
+//! an attribute of the part the rule is on, as [`Source`] says.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 use crate::family::read::Lit;
 
 mod declarations;
+mod namespace;
 mod rules;
 mod target;
 
+pub use namespace::Source;
+
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+#[path = "forms_tests.rs"]
+mod forms_tests;
 
 /// The helpers a table's rules function may take from its parameter.
 const GIVEN: &[&str] = &[
@@ -80,7 +105,19 @@ const FRAGMENT_GIVEN: &[&str] = &["hook", "keyframes", "on", "own", "rule"];
 ///
 /// A sentence naming the line, when the source holds what the syntax does
 /// not, or names a hook or a private value it does not declare.
+#[cfg(test)]
 pub fn desugar(export: &Lit) -> Result<Lit, String> {
+    desugar_with(export, None).map(|(lit, _)| lit)
+}
+
+/// As [`desugar`], over the headless source the table styles where it is
+/// written with `render`, with the notes the header's defaults raise.
+///
+/// # Errors
+///
+/// As [`desugar`] says, and a condition's name that resolves to nothing in
+/// the source, or to two things.
+pub fn desugar_with(export: &Lit, source: Option<&Source>) -> Result<(Lit, Vec<String>), String> {
     let Lit::Call(helper, arguments) = export else {
         return Err(STYLES.to_owned());
     };
@@ -110,6 +147,7 @@ pub fn desugar(export: &Lit) -> Result<Lit, String> {
     allowed(given, GIVEN)?;
     let mut prefix = None;
     let mut fields = Vec::new();
+    let mut styled_props: Vec<String> = Vec::new();
     let (mut hooks, mut own) = (None, None);
     for (key, value) in header {
         match (key.as_str(), value) {
@@ -118,6 +156,7 @@ pub fn desugar(export: &Lit) -> Result<Lit, String> {
             ("own", value) => own = Some(value),
             ("props", Lit::Array(props)) => {
                 reserved(props)?;
+                styled_props = props.iter().filter_map(prop_name).collect();
                 fields.push((key.clone(), value.clone()));
             }
             ("over" | "stylesheet", Lit::Text(_)) => fields.push((key.clone(), value.clone())),
@@ -132,21 +171,35 @@ pub fn desugar(export: &Lit) -> Result<Lit, String> {
         return Err("`styles()` names the hook `prefix`".to_owned());
     };
     let mut names = Names::new(&prefix);
-    names.hooks = hooks
-        .map(|lit| declared(lit, "hooks", hook_key))
-        .transpose()?
-        .unwrap_or_default();
-    names.own = own
-        .map(|lit| declared(lit, "own", |name| own_key(&prefix, name)))
-        .transpose()?
-        .unwrap_or_default();
+    if let Some(lit) = hooks {
+        names.hooks = names.header(lit, "hooks")?;
+    }
+    if let Some(lit) = own {
+        names.own = names.header(lit, "own")?;
+    }
+    names.source = source.map(|source| source.with_props(&styled_props));
     let rules = names.items(body, "")?;
     names.unused()?;
+    let notes = names.notes();
     fields.push(("rules".to_owned(), Lit::Array(rules)));
-    Ok(Lit::Call(
-        "family".to_owned(),
-        vec![Lit::Text(prefix), Lit::Object(fields)],
+    Ok((
+        Lit::Call(
+            "family".to_owned(),
+            vec![Lit::Text(prefix), Lit::Object(fields)],
+        ),
+        notes,
     ))
+}
+
+/// A styled prop's name, from its `prop()` call.
+fn prop_name(prop: &Lit) -> Option<String> {
+    match prop {
+        Lit::Call(_, arguments) => match arguments.first() {
+            Some(Lit::Text(name)) => Some(name.clone()),
+            _ => None,
+        },
+        _ => None,
+    }
 }
 
 /// A fragment's module, `fragment(name, { parts }, rules)` or
@@ -250,11 +303,28 @@ struct Names {
     groups: usize,
     /// The hook prefix, for a message.
     prefix: String,
+    /// Each default the header gives, by `hook <name>` or `own <name>`.
+    defaults: BTreeMap<String, Lit>,
+    /// The defaults being read, so one that reads itself is refused.
+    resolving: Vec<String>,
+    /// Whether the header gives the hooks' defaults, which the notes are
+    /// about.
+    defaulted: bool,
+    /// The fallbacks each hook is read with, by its name.
+    sites: BTreeMap<String, BTreeSet<String>>,
+    /// The headless source written with `render` the conditions resolve
+    /// against, with the table's own props.
+    source: Option<Source>,
 }
 
 impl Names {
     fn new(prefix: &str) -> Self {
         Self {
+            defaulted: false,
+            defaults: BTreeMap::new(),
+            resolving: Vec::new(),
+            sites: BTreeMap::new(),
+            source: None,
             groups: 0,
             hooks: Vec::new(),
             own: Vec::new(),
@@ -288,6 +358,74 @@ impl Names {
         let name = name.clone();
         self.used.insert(format!("own {name}"));
         Ok(name)
+    }
+
+    /// A header's `hooks` or `own`: an array of names, as before, or each
+    /// one's default by its name in camelCase, `null` for one with none.
+    /// Hooks may be given as `({ own }) => ({ ... })`, to read private values.
+    fn header(&mut self, lit: &Lit, field: &str) -> Result<Vec<(String, String)>, String> {
+        let entries = match (field, lit) {
+            ("hooks", Lit::Array(_)) => return declared(lit, field, hook_key),
+            ("own", Lit::Array(_)) => {
+                let prefix = self.prefix.clone();
+                return declared(lit, field, |name| own_key(&prefix, name));
+            }
+            (_, Lit::Object(entries)) => entries,
+            ("hooks", Lit::Arrow(given, body)) => match &**body {
+                Lit::Object(entries) => {
+                    allowed(given, &["own"])?;
+                    entries
+                }
+                _ => {
+                    return Err(
+                        "`hooks: ({ own }) => ({ ... })` returns an object of defaults".to_owned(),
+                    )
+                }
+            },
+            _ => {
+                return Err(format!(
+                    "`{field}` is an array of names, or an object of each one's default by its name in camelCase"
+                ))
+            }
+        };
+        if field == "hooks" {
+            self.defaulted = true;
+        }
+        let mut read = Vec::new();
+        for (key, default) in entries {
+            if key.contains('-') {
+                return Err(format!(
+                    "`{field}` names `{key}` in camelCase, as `{}`",
+                    hook_key(key)
+                ));
+            }
+            let name = crate::family::read::kebab(key);
+            if !matches!(default, Lit::Null) {
+                let kind = if field == "hooks" { "hook" } else { "own" };
+                self.defaults
+                    .insert(format!("{kind} {name}"), default.clone());
+            }
+            read.push((key.clone(), name));
+        }
+        Ok(read)
+    }
+
+    /// A note for each hook read with several fallbacks in a table whose
+    /// header gives the hooks' defaults.
+    fn notes(&self) -> Vec<String> {
+        if !self.defaulted {
+            return Vec::new();
+        }
+        self.sites
+            .iter()
+            .filter(|(_, fallbacks)| fallbacks.len() > 1)
+            .map(|(name, fallbacks)| {
+                format!(
+                    "the hook `{name}` is read with {} different fallbacks: give it one default in `hooks`, or keep each as its rule's own",
+                    fallbacks.len()
+                )
+            })
+            .collect()
     }
 
     /// Refuses a hook or a private value declared and never used, so each
