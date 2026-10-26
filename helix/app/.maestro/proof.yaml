@@ -1,9 +1,11 @@
-# The proof page, a project dashboard written once for the web and a phone:
-# a row opens its project, each tab shows its panel, the archive button
-# archives, the outline goes to a section, and the first crumb goes back
-# to the list, recorded.
+# The proof app, a project dashboard on Expo Router written once for the web
+# and a phone: a row opens its project, each tab opens its route, the
+# archive button archives, the outline goes to a section, the first crumb
+# goes back to the list, and the header opens every project's activity,
+# recorded. "Activity" and "Projects" are each a destination in the header
+# first, so the tab and the crumb are the second of each.
 appId: dev.fusion.helix.app
-name: Proof page
+name: Proof app
 tags:
   - interactions
 ---
@@ -22,7 +24,9 @@ tags:
 - tapOn: .*Website redesign.*
 - assertVisible: Progress
 - assertVisible: Ada Okonjo
-- tapOn: Activity
+- tapOn:
+    text: Activity
+    index: 1
 - assertVisible: Merged the pricing page
 - tapOn: Settings
 - assertVisible: Email when a task is overdue
@@ -36,8 +40,14 @@ tags:
     visible: Website redesign is archived
     timeout: 10000
 - scrollUntilVisible:
-    element: Projects
+    element: Website redesign
     direction: UP
-- tapOn: Projects
+- tapOn:
+    text: Projects
+    index: 1
 - assertVisible: 3 active, 1 at risk
+- tapOn:
+    text: Activity
+    index: 0
+- assertVisible: 8 changes across every project
 - stopRecording

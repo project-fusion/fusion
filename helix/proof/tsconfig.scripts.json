@@ -1,0 +1,8 @@
+{
+  // What runs at build time, with Bun's types: Metro's config, which Node loads.
+  "compilerOptions": {
+    "rootDir": "${configDir}"
+  },
+  "extends": "../../tsconfig.package.json",
+  "include": ["metro.config.ts"]
+}

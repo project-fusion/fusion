@@ -1433,10 +1433,15 @@ the web draws them, so an app that draws a checkbox installs it.
 A tab, a list row, a crumb, or a navigation item with an `href` is a link. A press sends the
 item's request first, and the link opens unless a handler refused the request. An address with a
 scheme, such as `https:` or `mailto:`, opens with the phone's own handler, and a
-path goes nowhere. To send paths to your router, such as Expo Router's
-`router.push`, call `setOpenLink` from
+path goes nowhere. In an app on Expo Router, `HelixAppRoot` from
+`@fusion.dev/helix/expo-router` draws `HelixRoot` and opens each path through
+the router, as [Routing and navigation](https://fusion.dev/helix/docs/routing)
+says. With another router, call `setOpenLink` from
 `@fusion.dev/helix-core/capabilities/open-link` with an `open` of your own,
 after `HelixRoot` first draws, since the root installs the phone's.
+
+A list row's link opens in a list with `selectionMode="none"`. A press on a
+row of a list with no `selectionMode` sends nothing on a phone yet.
 
 ## Breadcrumbs
 

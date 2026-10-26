@@ -43,7 +43,10 @@ const reached = (directory: string, found: Set<string>): Set<string> => {
 const EXAMPLE = /^helix-example:([a-z0-9-]+)\/([a-z0-9-]+)$/
 const examples = join(located('@fusion.dev/helix'), 'src')
 const inExample = `${sep}.examples${sep}`
-const proof = `${join(here, 'proof')}${sep}`
+/* The proof app's files, which the gallery draws through its route tree. */
+const proof = ['app', 'src'].map(
+  (folder) => `${join(located('@fusion.dev/helix-proof'), folder)}${sep}`,
+)
 
 const base = getDefaultConfig(here)
 
@@ -58,15 +61,13 @@ const resolveRequest: Resolve = (context, moduleName, platform) => {
     }
     return { filePath, type: 'sourceFile' }
   }
-  if (moduleName === 'helix-proof') {
-    return { filePath: join(here, 'proof/index.tsx'), type: 'sourceFile' }
-  }
-  /* **The proof page and the examples are code the gallery shares with the
+  /* **The proof app and the examples are code the gallery shares with the
      web**, so their JSX goes through `@fusion.dev/helix/jsx-runtime`, which
      draws each tag as the native component and warns about one a phone does
      not draw, as an app's would. */
   const shared =
-    context.originModulePath.startsWith(proof) || context.originModulePath.includes(inExample)
+    proof.some((folder) => context.originModulePath.startsWith(folder)) ||
+    context.originModulePath.includes(inExample)
   if (shared && (moduleName === 'react/jsx-runtime' || moduleName === 'react/jsx-dev-runtime')) {
     return context.resolveRequest(context, '@fusion.dev/helix/jsx-runtime', platform)
   }

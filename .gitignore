@@ -41,7 +41,8 @@ helix/styled/src/sandbox/compile-worker.generated.ts
 # family's intermediate forms, which change with every style rule: the ones
 # the styled package compiles, and the ones the native package's specs draw.
 helix/styled/native/*
-# The JSX runtime beside them is written by hand.
+# The JSX runtime and the Expo Router entry beside them are written by hand.
+!helix/styled/native/expo-router/
 !helix/styled/native/jsx-runtime/
 !helix/styled/native/jsx-dev-runtime/
 helix/native/src/families/*/

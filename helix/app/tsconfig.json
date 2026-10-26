@@ -11,5 +11,5 @@
     "types": []
   },
   "extends": "../../tsconfig.package.json",
-  "include": ["examples.d.ts", "index.ts", "helix-proof.d.ts", "src/**/*"]
+  "include": ["examples.d.ts", "index.ts", "require-context.d.ts", "src/**/*"]
 }

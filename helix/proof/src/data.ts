@@ -161,3 +161,17 @@ export const PROJECTS: readonly Project[] = [
     tasks: 26,
   },
 ]
+
+/** One thing that happened, with the project it happened on. */
+export interface ProjectChange extends Change {
+  readonly project: Project
+}
+
+/** What happened on every project, newest first. */
+export const ACTIVITY: readonly ProjectChange[] = PROJECTS.flatMap((project) =>
+  project.activity.map((change) => ({ ...change, project })),
+).sort((one, other) => other.at.localeCompare(one.at))
+
+/** The project with the id a route names. */
+export const projectOf = (id: string | string[] | undefined): Project | undefined =>
+  PROJECTS.find((project) => project.id === id)

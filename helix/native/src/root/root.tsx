@@ -1,3 +1,4 @@
+import { createContext, useContext } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { heardTouch } from '../capabilities/focus-visible'
@@ -8,6 +9,16 @@ import { SafeArea } from './safe-area'
 
 /** Whether the capabilities are installed, which happens once for the app. */
 let installed = false
+
+/** Whether a `HelixRoot` is drawn around, which only the root itself provides. */
+const AroundContext = createContext(false)
+
+/**
+ * Whether a `HelixRoot` is drawn around the component that calls it, so code
+ * that draws a root of its own, such as a router's layout, draws none inside
+ * another.
+ */
+export const useInsideHelixRoot = (): boolean => useContext(AroundContext)
 
 /** What `HelixRoot` takes: a theme, how layers meet the keyboard, and a style for the view that fills the app. */
 export interface HelixRootProps extends HelixThemeProps {
@@ -49,7 +60,7 @@ export const HelixRoot = ({ children, keyboard, style, ...theme }: HelixRootProp
       <SafeArea>
         <HelixTheme {...theme}>
           <LayerHostView {...(keyboard === undefined ? {} : { keyboard })}>
-            {children}
+            <AroundContext.Provider value={true}>{children}</AroundContext.Provider>
           </LayerHostView>
         </HelixTheme>
       </SafeArea>
