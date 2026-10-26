@@ -1,6 +1,6 @@
 [package]
 name = "fusion-plugin-sources"
-description = "The awp:sources world of the Agent Work Protocol: items read from a service since a cursor, and the suite every source passes."
+description = "The fusion:sources world of the Fusion Work Protocol: items read from a service since a cursor, and the suite every source passes."
 edition.workspace = true
 license.workspace = true
 publish.workspace = true

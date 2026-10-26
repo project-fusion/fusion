@@ -1,4 +1,4 @@
-//! The `awp:sources` world of the Agent Work Protocol: items read from a
+//! The `fusion:sources` world of the Fusion Work Protocol: items read from a
 //! service since a cursor.
 //!
 //! **One contract, built in or loaded.** [`Source`] is the world's exports as
@@ -37,15 +37,15 @@ pub mod bindings {
 }
 
 /// The world's records, generated from its WIT.
-pub use bindings::awp::sources::types;
+pub use bindings::fusion::sources::types;
 pub use types::{Access, Author, Cursor, Entry, Error, Item, Page, Status, Untrusted};
 
-/// The version of `awp:sources` this host speaks.
+/// The version of `fusion:sources` this host speaks.
 pub const VERSION: &str = "1.0.0";
 
 /// The sources world, as a refusal names it.
 pub const SOURCES: World = World {
-    package: "awp:sources",
+    package: "fusion:sources",
     noun: "source",
 };
 
@@ -125,15 +125,15 @@ pub struct Lent {
     pub settings: String,
 }
 
-impl bindings::awp::sources::types::Host for Lent {}
+impl bindings::fusion::sources::types::Host for Lent {}
 
-impl bindings::awp::sources::binding::Host for Lent {
+impl bindings::fusion::sources::binding::Host for Lent {
     fn settings(&mut self) -> String {
         self.settings.clone()
     }
 }
 
-/// A component built against `awp:sources`, opened for one binding.
+/// A component built against `fusion:sources`, opened for one binding.
 pub struct Component {
     limits: Limits,
     linker: Linker<Bounded<Lent>>,
@@ -235,23 +235,23 @@ impl Component {
 
 impl Source for Component {
     fn spec(&self) -> Result<String, Error> {
-        self.call(|store, reader| reader.awp_sources_source().call_spec(store).map(Ok))
+        self.call(|store, reader| reader.fusion_sources_source().call_spec(store).map(Ok))
     }
 
     fn check(&self) -> Result<Access, Error> {
-        self.call(|store, reader| reader.awp_sources_source().call_check(store))
+        self.call(|store, reader| reader.fusion_sources_source().call_check(store))
     }
 
     fn discover(&self) -> Result<Vec<Entry>, Error> {
-        self.call(|store, reader| reader.awp_sources_source().call_discover(store))
+        self.call(|store, reader| reader.fusion_sources_source().call_discover(store))
     }
 
     fn list(&self, since: Option<&str>) -> Result<Page, Error> {
         let since = since.map(str::to_owned);
-        self.call(|store, reader| reader.awp_sources_source().call_list(store, since.as_ref()))
+        self.call(|store, reader| reader.fusion_sources_source().call_list(store, since.as_ref()))
     }
 
     fn get(&self, id: &str) -> Result<Item, Error> {
-        self.call(|store, reader| reader.awp_sources_source().call_get(store, id))
+        self.call(|store, reader| reader.fusion_sources_source().call_get(store, id))
     }
 }

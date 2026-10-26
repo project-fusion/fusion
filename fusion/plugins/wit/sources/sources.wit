@@ -1,4 +1,4 @@
-package awp:sources@1.0.0;
+package fusion:sources@1.0.0;
 
 /// The records a source hands a host, and what can go wrong.
 ///
