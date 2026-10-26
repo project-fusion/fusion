@@ -1,0 +1,291 @@
+---
+title: The cortex command
+description: Record notes, distill them into facts, answer questions from the facts, and trace each answer back to your notes, on your own machine.
+---
+
+# The cortex command
+
+`cortex` keeps a memory of the notes you give it and answers questions from
+that memory. Each answer records the facts it was given and why each one was
+chosen, and each fact records the notes it came from. `cortex why` prints that
+path from an answer back to your notes, and `cortex forget` removes a note and
+everything derived from it.
+
+By default the memory is a SQLite file in your data directory, and the models
+run in Ollama on your machine. A session needs no account and no key.
+
+## Install the command
+
+Build `cortex` from the repository with cargo:
+
+```bash
+cargo install --git https://github.com/project-fusion/fusion fusion-cortex-cli
+```
+
+In a checkout, `cargo build -p fusion-cortex-cli` builds it into `target`. The
+Fusion command line routes to it, so `fusion cortex ask …` runs `cortex ask …`
+and returns its exit code.
+
+Then pull the two default models:
+
+```bash
+ollama pull qwen3:4b
+ollama pull nomic-embed-text
+```
+
+`qwen3:4b` answers questions and extracts facts. `nomic-embed-text` embeds each
+fact, so a question finds a fact that says the same thing in other words.
+
+## Walk through a week of notes
+
+The repository holds a week of notes in `cortex/cli/demo/notes`, one file for
+each day. The question at the end needs three of them: Monday sets the release
+date, Tuesday says who reviews migrations, and Wednesday says that reviewer is
+out. Run the commands from `cortex/cli/demo`.
+
+The transcripts below come from the `scripted` provider, which answers from
+`cortex/cli/demo/week.json` and needs no model, so they name the model
+`scripted/week`. The ids are shortened, and differ on every run.
+
+### Record each day and consolidate it
+
+`ingest` records each paragraph of a file as an episode, and `--at` dates it.
+`consolidate` asks the model for the facts the new episodes state, and prints
+each fact with the episodes it rests on.
+
+```bash
+cortex ingest notes/monday.md --at 2026-10-19
+cortex consolidate
+```
+
+```text
+Read 3 episodes and wrote 3 facts.
+
+  fact Release 0.12 ships on Thursday, October 22.
+    01a17a1d-d343-…  confidence 0.95, personal, vector scripted/week
+    episode 01a17a1d-d328-…  notes/monday.md, paragraph 1, October 19, 2026
+      Planning for 0.12: we agreed to ship it on Thursday, October 22.
+```
+
+The model reads a day's episodes beside the facts already held. A fact that
+contradicts one supersedes it, and the old fact is kept for `why`. On Thursday,
+the new standup time supersedes Monday's:
+
+```text
+superseded Standup is at 10:00.
+  by Standup is at 9:30 starting next week.
+```
+
+A fact the model states again gains the new episode as a source. On Friday,
+the draft release notes become a second source for the fact that Dana owns
+them.
+
+### Ask a question
+
+```bash
+cortex ask "Who reviews the 0.12 schema migration, and when does the release ship?"
+```
+
+```text
+Release 0.12 ships on Thursday, October 22. Priya reviews every schema
+migration, but she is out that day, so Sam reviews the 0.12 migration.
+
+01a17a1d-d44e-… from scripted/week, on this machine, given 8 facts ranked by
+weighted/1 (overlap/1 0.30, vector/1 scripted/week 0.70)
+Trace the answer: cortex why 01a17a1d-d44e-…
+```
+
+Recall ranks the facts in the scopes you read by the words they share with the
+question and by how close their vectors are, and places the best eight. The
+question, the context the model was given, and the answer are recorded in
+Trace.
+
+### Trace the answer to its notes
+
+`why` prints the answer, the question, each fact the context placed with the
+score that placed it, and the episodes under each fact. With no argument it
+explains the latest answer.
+
+```bash
+cortex why
+```
+
+```text
+answer 01a17a1d-d44e-…  scripted/week, October 26, 2026
+  Release 0.12 ships on Thursday, October 22. Priya reviews every schema migration, …
+  question Who reviews the 0.12 schema migration, and when does the release ship?
+  context 01a17a1d-d44e-…  recall/1, 8 facts placed
+    fact Sam covers Priya's reviews while she is out.
+      01a17a1d-d3b3-…  confidence 0.78
+      placed: weighted/1 0.74: overlap/1 0.14 weighed 0.30, vector/1 scripted/week 0.99 weighed 0.70
+      episode 01a17a1d-d39a-…  notes/wednesday.md, paragraph 1, October 21, 2026
+        Priya is out on Thursday, October 22. Sam covers her reviews while she is out.
+    fact Priya is out on Thursday, October 22.
+      01a17a1d-d3b2-…  confidence 0.80
+      placed: weighted/1 0.69: overlap/1 0.00 weighed 0.30, vector/1 scripted/week 0.98 weighed 0.70
+      episode 01a17a1d-d39a-…  notes/wednesday.md, paragraph 1, October 21, 2026
+        Priya is out on Thursday, October 22. Sam covers her reviews while she is out.
+```
+
+The fact that Priya is out shares no word with the question, and its vector
+placed it. `why` also takes an answer's id, text from an answer or its
+question, a fact's id, or the id of any node in the trace.
+
+### Replay the answer on another model
+
+`replay` gives another model the context the first answer was given, and
+prints both answers and the words that changed. The context is the same, so a
+difference between the answers comes from the model.
+
+```bash
+cortex replay --model qwen3:1.7b
+```
+
+On the script, the other model is `large`:
+
+```text
+changes
+  [-Release 0.12 ships on Thursday, October 22. Priya-] {+Sam+} reviews [-every-] {+the 0.12+} schema migration, …
+```
+
+Removed words are in `[-…-]` and added words in `{+…+}`.
+
+### Forget a note
+
+`forget` takes an episode's id or a file you ingested. It removes the episodes,
+every fact that rests on them alone, and every answer that drew on them.
+
+```bash
+cortex forget notes/wednesday.md
+```
+
+```text
+Forgot 2 episodes.
+
+Removed 3 facts that rested on nothing else.
+  fact Priya is out on Thursday, October 22.
+  fact Sam covers Priya's reviews while she is out.
+  fact The design review is next Tuesday.
+
+Removed 1 answer that drew on them and 11 trace nodes in all.
+```
+
+A fact another episode supports stays. A fact that a forgotten fact superseded
+is current again, so forgetting Thursday's note brings back the 10:00 standup.
+
+### Ask again
+
+```bash
+cortex ask "Who reviews the 0.12 schema migration, and when does the release ship?"
+```
+
+```text
+Release 0.12 ships on Thursday, October 22, and Priya reviews its schema
+migration before it ships.
+```
+
+`cortex why` now lists no episode from `notes/wednesday.md`.
+
+## Run the walkthrough without a model
+
+`cortex/cli/demo/session.sh` runs every step above. By default it runs on the
+`scripted` provider and embedder, which answer from `cortex/cli/demo/week.json`,
+so it needs no model and prints the same answers every time. The transcripts on
+this page come from that script. `cargo test -p fusion-cortex-cli` runs the
+same session on SQLite, and on Postgres where `CORTEX_POSTGRES_URL` names a
+database.
+
+```bash
+cortex/cli/demo/session.sh
+```
+
+To run it on Ollama, name the models. `CORTEX_OLLAMA_REPLAY_MODEL` names the
+model `replay` runs on.
+
+```bash
+CORTEX_OLLAMA_MODEL=qwen3:4b CORTEX_OLLAMA_EMBED_MODEL=nomic-embed-text \
+  CORTEX_OLLAMA_REPLAY_MODEL=qwen3:1.7b cortex/cli/demo/session.sh
+```
+
+A model writes its own facts and answers, so a live run differs from the
+transcript. A small model can miss a fact or leave it out of an answer. `why`
+shows which facts it was given.
+
+## Settings
+
+Each setting is a flag, a `CORTEX_` variable, or a field in the config file,
+and the first of those that is set wins. The config file is JSON, named
+`config.json` in a `cortex` folder in your config directory, or the file
+`--config` names.
+
+| Flag | Variable | Default | Sets |
+| --- | --- | --- | --- |
+| `--store` | `CORTEX_STORE` | `cortex.db` in a `cortex` folder in your data directory | A SQLite file, `sqlite:<path>`, or a `postgres://` URL |
+| `--provider` | `CORTEX_PROVIDER` | `ollama` | The chat model's client |
+| `--model` | `CORTEX_MODEL` | `qwen3:4b` on Ollama | The chat model |
+| `--base` | `CORTEX_BASE` | `http://localhost:11434` on Ollama | The chat model's server |
+| `--key-env` | `CORTEX_KEY_ENV` | the client's own variable | The variable that holds the chat model's key |
+| `--embedder` | `CORTEX_EMBEDDER` | `ollama` | The embedding client, or `none` |
+| `--embed-model` | `CORTEX_EMBED_MODEL` | `nomic-embed-text` on Ollama | The embedding model |
+| `--embed-base` | `CORTEX_EMBED_BASE` | `http://localhost:11434` on Ollama | The embedding server |
+| `--embed-key-env` | `CORTEX_EMBED_KEY_ENV` | the client's own variable | The variable that holds the embedding model's key |
+| `--scope` | `CORTEX_SCOPE` | `personal` | The scope new episodes are recorded in |
+| `--read` | `CORTEX_READ` | `personal` and the scope you write to | The scopes `ask` reads, comma-separated in the variable |
+| `--script` | `CORTEX_SCRIPT` | none | The script the `scripted` provider and embedder answer from |
+
+The config file uses the names after `--`, with underscores:
+
+```json
+{
+  "embed_model": "nomic-embed-text",
+  "model": "qwen3:4b",
+  "read": ["personal", "project:checkout"],
+  "scope": "project:checkout",
+  "store": "postgres://cortex@db.example.com/cortex"
+}
+```
+
+The config file names the variable that holds a key, as `key_env`, and never
+holds the key itself.
+
+## Choose a model
+
+| `--provider` | API | Key |
+| --- | --- | --- |
+| `ollama` | Ollama, on your machine or at `--base` | none, or `--key-env` for Ollama's hosted service |
+| `chat` | OpenAI-compatible `/chat/completions` at `--base`, such as LM Studio or llama.cpp | `--key-env`, where the server takes one |
+| `responses` | The Responses API at `--base`, or OpenAI | `--key-env`, where the server takes one |
+| `openai` | OpenAI's Responses API | `OPENAI_API_KEY` |
+| `anthropic` | Anthropic's Messages API | `ANTHROPIC_API_KEY` |
+| `gemini` | Gemini | `GEMINI_API_KEY` |
+| `scripted` | The replies in `--script` | none |
+
+Every client but `ollama` and `scripted` needs `--model`. Pass `--local` when a
+`chat` or `responses` server runs on your machine, so the answer says so. The
+embedders are `ollama`, `embeddings` for an OpenAI-compatible `/embeddings`,
+`gemini`, `scripted`, and `none`. With `none`, facts have no vectors and `ask`
+ranks them by the words they share with the question.
+
+## Scopes
+
+Every episode is recorded in one scope: `personal`, `organization`,
+`project:<name>`, or `team:<name>`. A fact takes the narrowest scope of its
+episodes. `ask` places only facts in the scopes you read.
+
+```bash
+cortex --scope project:checkout ingest notes/standup.md
+cortex --read project:checkout ask "When is the checkout freeze?"
+```
+
+## Read the output in a script
+
+Every command takes `--json` and prints one JSON document on stdout. An error
+goes to stderr, as JSON under `--json`, and stdout stays empty.
+
+| Exit code | Means |
+| --- | --- |
+| 0 | The command did what it was asked |
+| 1 | `consolidate` ran and a batch failed, and the next pass reads that batch again |
+| 2 | The command line does not parse |
+| 3 | The input is unusable, such as an answer that does not exist or a model server that is not running |
+| 4 | The command broke |

@@ -34,6 +34,14 @@ export const pages: DocPage[] = [
     title: 'Introduction',
   },
   {
+    description:
+      'Record notes, distill them into facts, answer questions from the facts, and trace each answer to its notes.',
+    order: 2,
+    section: 'Overview',
+    slug: 'command',
+    title: 'The cortex command',
+  },
+  {
     description: 'Episodic and semantic memory, consolidation, and decay.',
     order: 1,
     section: 'Primitives',
