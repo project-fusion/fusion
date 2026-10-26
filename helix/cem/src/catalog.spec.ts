@@ -5,6 +5,7 @@ import {
   findInCatalog,
   publishedBy,
   rendersOf,
+  withAnatomy,
   withPlatforms,
 } from './catalog.js'
 import type { HelixManifest } from './types.js'
@@ -702,6 +703,21 @@ describe('withPlatforms', () => {
     expect(by('helix-tabs')?.platforms).toEqual({ 'react-native': named })
     expect(by('helix-tabs-scroller')?.platforms).toBeUndefined()
     expect(by('helix-headless-tabs')?.platforms).toBeUndefined()
+  })
+
+  test('gives a styled element the anatomy its tag has, and leaves the rest as they were', () => {
+    const anatomy = {
+      web: { takes: [], tree: [{ draws: 'box part="tabs"', kind: 'box', name: 'tabs' }] },
+    }
+    const elements =
+      withAnatomy(catalog([tabs]), {
+        'helix-headless-tabs': anatomy,
+        'helix-tabs': anatomy,
+      }).find((family) => family.slug === 'tabs')?.elements ?? []
+    const by = (tag: string) => elements.find((element) => element.tagName === tag)
+    expect(by('helix-tabs')?.anatomy).toEqual(anatomy)
+    expect(by('helix-tabs-scroller')?.anatomy).toBeUndefined()
+    expect(by('helix-headless-tabs')?.anatomy).toBeUndefined()
   })
 
   test('names the web alone where nothing is drawn natively', () => {

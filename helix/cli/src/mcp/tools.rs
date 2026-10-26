@@ -117,8 +117,15 @@ const TIER: (&str, &str) = (
     "`styled` or `headless`. Defaults to the styled tier where it is installed.",
 );
 
-/// Every tool, as `tools/list` returns them.
+/// Every tool, as `tools/list` returns them: the lookups, then the checks.
 pub fn catalog() -> Vec<Value> {
+    let mut all = lookups();
+    all.extend(checks());
+    all
+}
+
+/// The tools that read the installed packages, each a `helix api` verb.
+fn lookups() -> Vec<Value> {
     vec![
         json!({
             "annotations": annotations("Find a Helix family"),
@@ -142,6 +149,14 @@ pub fn catalog() -> Vec<Value> {
             "name": "helix_family",
             "outputSchema": output(&[("examples", "array"), ("family", "object"), ("package", "string"), ("version", "string"), ("versions", "object")]),
             "title": "Read a Helix family",
+        }),
+        json!({
+            "annotations": annotations("Read a Helix family's anatomy"),
+            "description": "Returns what each styled element of a Helix family is made of, from the installed packages: the attributes the web element takes with what each holds, its custom states and events, and the tree in its shadow root, each part by its `part` name and each slot by its name. Where Helix draws the element on React Native, the same for its component: the props it takes, and the tree it draws, each region as the prop that fills it. Use it to see which part a `::part()` selector reaches and which slot content goes into.",
+            "inputSchema": strings(&[("family", "The family's slug, label, alias, or one of its tags."), TIER], &["family"]),
+            "name": "helix_anatomy",
+            "outputSchema": output(&[("anatomy", "array"), ("family", "string"), ("package", "string"), ("version", "string")]),
+            "title": "Read a Helix family's anatomy",
         }),
         json!({
             "annotations": annotations("Read a Helix example"),
@@ -173,6 +188,12 @@ pub fn catalog() -> Vec<Value> {
             "outputSchema": output(&[("categories", "array"), ("package", "string"), ("tokens", "array"), ("version", "string")]),
             "title": "Find Helix tokens",
         }),
+    ]
+}
+
+/// The tools that judge code, a page, or a theme.
+fn checks() -> Vec<Value> {
+    vec![
         json!({
             "annotations": annotations("Check Helix code"),
             "description": "Checks Helix code you wrote against the installed packages, as `helix scan` does: unknown tags, attributes, values, slots, parts, hooks, events, and tokens, a `--_helix-` primitive read, `[disabled]` on a form control, a tag whose entry nothing imports, a native element a Helix family replaces, an interactive element inside a button or a link, and `\"false\"` on an attribute that is on wherever it is present. Pass `files`, paths in the project, or `code` with its `language`. The whole project is read, so imports elsewhere count. Fix every finding at `error`.",
@@ -272,6 +293,13 @@ pub fn call(name: &str, arguments: &Value, from: &Path) -> Result<Answer, String
                 .map_err(|failure| said(&failure))
         }
         "helix_family" => api::family(
+            from,
+            argument(arguments, "family")?,
+            arguments["tier"].as_str(),
+        )
+        .map(Answer::of)
+        .map_err(|failure| said(&failure)),
+        "helix_anatomy" => api::anatomy(
             from,
             argument(arguments, "family")?,
             arguments["tier"].as_str(),

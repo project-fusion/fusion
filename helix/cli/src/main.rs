@@ -102,6 +102,7 @@ fn main() {
                     args.example.as_deref(),
                     args.tier.as_deref(),
                 ),
+                Api::Anatomy(args) => api::anatomy(&from, &args.family, args.tier.as_deref()),
                 Api::Imports(args) => api::imports(&from, &args.tags),
                 Api::Tokens(args) => {
                     api::tokens(&from, args.query.as_deref(), args.category.as_deref())
@@ -126,6 +127,7 @@ fn main() {
         Noun::New(args) => new::run(args, &from, cli.json, paint),
         #[cfg(feature = "internal")]
         Noun::Family { verb } => match verb {
+            Family::Anatomy(args) => family::anatomy(args, &from),
             Family::Build(args) => family::build(args, &from, cli.json),
             Family::Capabilities(args) => family::capabilities(args, &from, cli.json),
             Family::Check(args) => family::check(args, &from, cli.json),
