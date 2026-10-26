@@ -156,6 +156,11 @@ export default styles(
   `before` and `after`.
 - `rule(set)` or `rule(when, set)`. `platform` and `supports` are conditions
   in `when`.
+- **The later rule on a target wins**, however many conditions either has.
+  The web writes every condition inside `:where()`, so each rule on one
+  part ranks as the part does, and a phone ranks them the same way. A
+  selected tab drawn over its hover writes `{ selected: true }` after
+  `{ hover: true }`. A `{ part, selector }` rule ranks as its selector does.
 - `variants(prop, { value: set })` is one rule for each value of a prop.
 - **A condition's name is resolved in one namespace**, from the headless
   source: `{ hover: true, disabled: false }` on a tab is the part's
@@ -189,9 +194,11 @@ export default styles(
   `style`, and `derive('grid-template')` a derivation in core, as a headless
   source names one.
 - `web([rule(...)])` and `native([rule(...)])` are rules one platform's
-  alone, and a set's `web: { cursor: 'pointer' }` holds declarations a phone
-  does not have. A rule that is the web's alone holds no `web` block and no
-  `web()` value, which would say nothing there.
+  alone, and a set's `web: { cursor: 'pointer' }` holds declarations of
+  properties a phone does not have. `inlineSize: web('max-content')` is a
+  value a phone does not have, of a property it does. A rule that is the
+  web's alone holds no `web` block and no `web()` value, which would say
+  nothing there.
 - `include(field)` takes in a fragment imported from `src/fragments`, written
   with `fragment()`, or `declarations()` for a fragment a `set` takes in.
 - `over` names the element a table is drawn over, as Copy Button's names
@@ -204,8 +211,9 @@ export default styles(
   `Written out:`.
 
 `helix family build` refuses a name the source does not declare, a declared
-name no rule uses, and two rules in different groups that compete for one
-property on one node. It also refuses a hook another family does not read,
+name no rule uses, and two rules in groups on different targets, as a part
+and the second name it carries, that set one property on one node to
+different values. It also refuses a hook another family does not read,
 a private value no family sets, and a custom property read inside a string.
 `src/table.ts` describes every form.
 

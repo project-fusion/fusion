@@ -52,10 +52,9 @@ export default styles(
     /* The row is the button, so the whole of it is the target. */
     on('item', [
       rule({
-        all: web('unset'),
+        web: { all: 'unset', cursor: 'pointer' },
         alignItems: 'center',
         boxSizing: 'border-box',
-        cursor: web('pointer'),
         display: 'inline-flex',
         gap: token('space-xs'),
       }),
@@ -79,10 +78,6 @@ export default styles(
       ),
       /* The ground carries it and the edge goes, transparent so the card keeps its size. */
       rule({ separation: 'filled' }, { borderColor: 'transparent' }),
-      rule(
-        { hover: true, lacks: 'disabled', separation: ['filled', 'outlined'] },
-        { borderColor: token('color-foreground-muted') },
-      ),
       /* Chosen: the brand color, as a ring laid outside the edge. */
       rule(
         { separation: ['filled', 'outlined'], selected: true },
@@ -91,6 +86,11 @@ export default styles(
           borderColor: token('color-primary'),
           boxShadow: ['0', '0', '0', token('border-thick'), token('color-primary')],
         },
+      ),
+      /* Under a pointer, the edge is muted, chosen or not: the ring says it is chosen. */
+      rule(
+        { hover: true, lacks: 'disabled', separation: ['filled', 'outlined'] },
+        { borderColor: token('color-foreground-muted') },
       ),
       /* On the whole card, because the card is the target. */
       rule(
@@ -143,15 +143,7 @@ export default styles(
           outlineOffset: token('size-focus-offset'),
         },
       ),
-      /* Repeating the selector exactly, so the reduced motion wins. */
-      rule({ reducedMotion: true, variant: 'chip' }, { transition: 'none' }),
-      rule(
-        [
-          { reducedMotion: true, selected: true, variant: 'chip' },
-          { hover: true, lacks: 'disabled', reducedMotion: true, variant: 'chip' },
-        ],
-        { translate: 'none' },
-      ),
+      rule({ reducedMotion: true, variant: 'chip' }, { transition: 'none', translate: 'none' }),
     ]),
     /* One cell, so the dot is centered in the circle. No fill of its own, so an
        unchosen circle is an empty ring on whatever it sits on: the page's own
@@ -169,13 +161,13 @@ export default styles(
         placeItems: 'center',
         transition: ['border-color', token('duration-fast'), token('easing-standard')],
       }),
+      rule({ selected: true }, { borderColor: hook.borderColor(token('color-foreground')) }),
       /* The edge firms up and takes no color, through the hook, so a group
-         saying "these are wrong" is not undone by a pointer. */
+         saying "these are wrong" is not undone by a pointer, chosen or not. */
       rule(
         { lacks: 'disabled', within: { item: { hover: true } } },
         { borderColor: hook.borderColor(token('color-foreground-muted')) },
       ),
-      rule({ selected: true }, { borderColor: hook.borderColor(token('color-foreground')) }),
       /* Offset, because the ring surrounds a circle whose own edge is not moving. */
       rule(
         { within: { item: { focusVisible: true } } },

@@ -1,6 +1,6 @@
 import '@fusion.dev/helix-testing/dom/register'
 import { beforeAll, describe, expect, test } from 'bun:test'
-import { hasLayout, mount, part, registerDom } from '@fusion.dev/helix-testing/dom'
+import { hasLayout, mount, part, registerDom, unweighted } from '@fusion.dev/helix-testing/dom'
 
 beforeAll(async () => {
   registerDom()
@@ -137,10 +137,12 @@ describe('tone and emphasis', () => {
      that painted text in it. */
   test('muted is the one emphasis, and no rule selects subtle', () => {
     const declared = (customElements.get('helix-text') as unknown as { styles: unknown }).styles
-    const sheet = (Array.isArray(declared) ? declared : [declared])
-      .flat(Number.POSITIVE_INFINITY)
-      .map((one) => String((one as { cssText?: string }).cssText ?? ''))
-      .join('\n')
+    const sheet = unweighted(
+      (Array.isArray(declared) ? declared : [declared])
+        .flat(Number.POSITIVE_INFINITY)
+        .map((one) => String((one as { cssText?: string }).cssText ?? ''))
+        .join('\n'),
+    )
     expect(sheet).toContain(':host([emphasis="muted"])')
     expect(sheet).not.toContain('emphasis="subtle"')
     expect(sheet).not.toContain('foreground-subtle')

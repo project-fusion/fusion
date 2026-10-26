@@ -1,5 +1,5 @@
 import { boolean, oneOf } from '../../../render.js'
-import { difference, fn, list, mix, native, product, safeArea, token, web } from '../../../style.js'
+import { difference, fn, list, mix, native, product, safeArea, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -238,14 +238,13 @@ export default styles(
       ]),
       on('toggle', [
         rule({
-          all: web('unset'),
+          web: { all: 'unset', cursor: 'pointer' },
           /* `all: unset` takes the `border-box` every shadow root is given. */
           boxSizing: 'border-box',
           alignItems: 'center',
           blockSize: token('size-control'),
           borderRadius: token('radii-sm'),
           color: token('color-foreground-muted'),
-          cursor: web('pointer'),
           display: 'inline-flex',
           inlineSize: token('size-control'),
           justifyContent: 'center',

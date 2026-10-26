@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { unweighted } from '@fusion.dev/helix-testing/sheets'
 
 /**
  * Quiet text that is read is painted in `foreground-muted`.
@@ -100,7 +101,12 @@ const literal = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, '\
  * ink in a rule of its own, so the list would answer for the wrong rule.
  */
 const declared = (sheet: string, selector: string, property: string): string | undefined => {
-  const css = readFileSync(join(SRC, sheet), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+  const text = readFileSync(join(SRC, sheet), 'utf8')
+  /* A generated sheet's conditions weigh nothing, and the selector reads as written. */
+  const css = (sheet.endsWith('.generated.css') ? unweighted(text) : text).replace(
+    /\/\*[\s\S]*?\*\//g,
+    '',
+  )
   for (const after of ['\\s*\\{', ',\\n']) {
     const opening = new RegExp(`(?:^|\\n)${literal(selector)}${after}`, 'g')
     for (const found of css.matchAll(opening)) {
@@ -149,8 +155,8 @@ describe('quiet text', () => {
   /* A step ahead sat one ink below a finished one, and the range holds one
      quiet ink, so the step between them is a weight. */
   test('a numeric step ahead is set lighter than a finished one', () => {
-    const root = readFileSync(join(SRC, 'steps/root/steps-root.generated.css'), 'utf8')
-    const step = readFileSync(join(SRC, 'steps/step/step.generated.css'), 'utf8')
+    const root = unweighted(readFileSync(join(SRC, 'steps/root/steps-root.generated.css'), 'utf8'))
+    const step = unweighted(readFileSync(join(SRC, 'steps/step/step.generated.css'), 'utf8'))
     expect(root).toMatch(
       /:host\(\[marker="numeric"\]\) \{[^}]*--_steps-marker-weight: var\(--helix-weight-regular\);/,
     )

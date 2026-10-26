@@ -146,12 +146,6 @@ export default styles(
         insetInlineStart: 0,
         position: 'absolute',
       }),
-      /* `effect` picks how the placeholder says it is waiting: the sweep when
-         unset, `pulse` fading the fill instead, or `none` sitting still. */
-      rule([{ effect: 'pulse' }, { effect: 'none' }], {
-        animation: 'none',
-        backgroundImage: 'none',
-      }),
       /* The sweep is the whole effect, so with motion reduced the placeholder
          sits there, with nothing animated in its place. */
       rule({ reducedMotion: true }, { animation: 'none', backgroundImage: 'none' }),
@@ -168,6 +162,13 @@ export default styles(
           web: { forcedColorAdjust: 'none' },
         },
       ),
+      /* `effect` picks how the placeholder says it is waiting: the sweep when
+         unset, `pulse` fading the fill instead, or `none` sitting still, in
+         forced colors too. */
+      rule([{ effect: 'pulse' }, { effect: 'none' }], {
+        animation: 'none',
+        backgroundImage: 'none',
+      }),
     ]),
     /* The full radius token, not a bare 50%: `radii-full` is what every
        other circle in the library names. */

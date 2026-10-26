@@ -95,10 +95,6 @@ export default styles(
       }),
       /* The ground carries it and the edge goes, transparent so the box keeps its size. */
       rule({ separation: 'filled' }, { borderColor: 'transparent' }),
-      rule(
-        { formDisabled: false, hover: true, ...card },
-        { borderColor: token('color-foreground-muted') },
-      ),
       /* Chosen, as a chosen radio card is: a ring drawn outside the edge. */
       rule(
         { ...card, checked: true },
@@ -107,6 +103,11 @@ export default styles(
           borderColor: token('color-primary'),
           boxShadow: ['0', '0', '0', token('border-thick'), token('color-primary')],
         },
+      ),
+      /* Under a pointer, the edge is muted, chosen or not: the ring says it is chosen. */
+      rule(
+        { formDisabled: false, hover: true, ...card },
+        { borderColor: token('color-foreground-muted') },
       ),
       /* The ring goes on the card, because the card is the target. */
       rule(
@@ -132,29 +133,27 @@ export default styles(
        rule's color drew no edge around the box in a card in dark mode. */
     on('control', [
       rule({
-        appearance: web('none'),
+        web: { appearance: 'none', cursor: 'inherit' },
         backgroundColor: hook.backgroundColor,
         blockSize: own.checkboxSize,
         border: [token('border-thin'), 'solid', hook.borderColor(token('color-foreground-subtle'))],
         borderRadius: token('radii-sm'),
-        cursor: web('inherit'),
         inlineSize: own.checkboxSize,
         margin: token('space-none'),
         transition: list(['background-color', ...ease], ['border-color', ...ease]),
       }),
-      /* Monotone under a pointer, which would otherwise say "recommended". */
+      /* Being ticked is an answer, which takes no color. */
+      rule(marked, { borderColor: first(hook.borderColor, hook.checkedColor) }),
+      /* Monotone under a pointer, which would otherwise say "recommended",
+         ticked or not. */
       rule(
         { formDisabled: false, within: { field: { hover: true } } },
         { borderColor: hook.borderColor(token('color-foreground-muted')) },
       ),
-      /* Being ticked is an answer, which takes no color. */
-      rule(marked, { borderColor: first(hook.borderColor, hook.checkedColor) }),
       /* Offset, because the ring surrounds a box whose own edge is not moving. */
       rule({ focusVisible: true }, { outline: ring, outlineOffset: token('size-focus-offset') }),
       /* Wrong, and the reader knows it: the box's own edge. */
-      rule([{ invalid: true }, { invalid: true, within: { field: { hover: true } } }], {
-        borderColor: token('color-danger'),
-      }),
+      rule({ invalid: true }, { borderColor: token('color-danger') }),
       rule(
         [
           { invalid: true, checked: true },
@@ -177,9 +176,7 @@ export default styles(
         blockSize: own.checkboxSize,
         inlineSize: own.checkboxSize,
         maskImage: tick,
-        maskPosition: web('center'),
-        maskRepeat: web('no-repeat'),
-        maskSize: web('100%'),
+        web: { maskPosition: 'center', maskRepeat: 'no-repeat', maskSize: '100%' },
         pointerEvents: 'none',
         scale: 0,
         transition: ['scale', token('duration-fast'), token('easing-emphasized')],
