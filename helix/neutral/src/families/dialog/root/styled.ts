@@ -1,6 +1,5 @@
 import {
   difference,
-  first,
   fn,
   list,
   mix,
@@ -110,7 +109,7 @@ export default styles(
         /* No ring on the panel itself. */
         rule({ outline: 'none' }),
       ]),
-      on({ backdrop: 'surface' }, [rule({ backgroundColor: first(hook.scrim, own.scrim) })]),
+      on({ backdrop: 'surface' }, [rule({ backgroundColor: hook.scrim })]),
       on({ region: 'header', slotted: '*' }, [
         rule({
           color: token('color-foreground'),

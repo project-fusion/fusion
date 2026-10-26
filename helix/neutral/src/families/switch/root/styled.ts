@@ -62,7 +62,7 @@ export default styles(
         gap: token('space-xs'),
       }),
       /* `:disabled` matches a disabled fieldset around the switch as well. */
-      web([rule({ within: { host: { disabled: true } } }, { web: { cursor: 'default' } })]),
+      web([rule({ within: { host: { disabled: true } } }, { cursor: 'default' })]),
     ]),
     /* The groove. One cell, so the input lies over the whole of it. */
     on('track', [

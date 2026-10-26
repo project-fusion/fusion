@@ -1,4 +1,4 @@
-import { token, web } from '../style.js'
+import { token } from '../style.js'
 import { fragment } from '../table.js'
 import visuallyHidden from './visually-hidden.js'
 
@@ -34,7 +34,7 @@ export default fragment('field', { parts: ['label', 'hint', 'feedback'] }, ({ on
     ),
     rule(
       { has: 'required', platform: 'web', supports: '(content: "*" / "")' },
-      { content: web('"*" / ""') },
+      { content: '"*" / ""' },
     ),
   ]),
   /* The space above is the one margin here that is not zero. */

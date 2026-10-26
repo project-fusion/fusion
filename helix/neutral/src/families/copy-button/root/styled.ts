@@ -47,7 +47,7 @@ export default styles(
           own: {
             iconButtonInk: hook.color(token('color-foreground-muted')),
             iconButtonInkHover: first(hook.colorHover, hook.color, token('color-foreground')),
-            iconButtonSize: first(hook.size, hookOf('icon-button', 'size'), token('size-control')),
+            iconButtonSize: hook.size,
           },
         }),
       ]),
