@@ -202,7 +202,7 @@ export default styles(
       }),
       /* Hover deepens the wash. */
       rule(
-        { within: { host: { disabled: false } }, interaction: ['hover', 'active'] },
+        { formDisabled: false, interaction: ['hover', 'active'] },
         {
           backgroundColor: first(
             hook.backgroundColorHover,
@@ -228,7 +228,7 @@ export default styles(
       ),
       rule(
         {
-          within: { host: { disabled: false } },
+          formDisabled: false,
           emphasis: 'solid',
           interaction: ['hover', 'active'],
         },
@@ -264,7 +264,7 @@ export default styles(
       ),
       rule(
         {
-          within: { host: { disabled: false } },
+          formDisabled: false,
           emphasis: 'subtle',
           interaction: ['hover', 'active'],
         },
@@ -289,7 +289,7 @@ export default styles(
          than a raised dialog panel in dark mode, which reads as a hole. */
       rule(
         {
-          within: { host: { disabled: false } },
+          formDisabled: false,
           emphasis: 'ghost',
           interaction: ['hover', 'active'],
         },
@@ -304,10 +304,7 @@ export default styles(
         },
       ),
       /* `:disabled` on the host, which a form's disabled fieldset sets too. */
-      rule(
-        { within: { host: { disabled: true } } },
-        { web: { cursor: 'not-allowed' }, opacity: 0.5 },
-      ),
+      rule({ formDisabled: true }, { web: { cursor: 'not-allowed' }, opacity: 0.5 }),
       /* **Pending: the words stay where they are, unseen, and a ring turns
          over them**, so the button keeps its width and nothing beside it
          moves. The ring is the `spinner` part, drawn only while pending. The

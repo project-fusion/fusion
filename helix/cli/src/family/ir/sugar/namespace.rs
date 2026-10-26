@@ -22,9 +22,9 @@
 //!   spellings that say which.
 //!
 //! **The older spellings keep their meaning**: `part: { ... }`, `state: ...`,
-//! and every condition the vocabulary names, such as `hover`. On a part,
-//! `within: { host: { disabled: false } }` is the host's own `:disabled`,
-//! beside any other part the rule is within, and
+//! and every condition the vocabulary names, such as `hover`.
+//! `formDisabled` is the host's own `:disabled`, which a disabled fieldset
+//! around it sets too, on the host and on any part, and
 //! `within: { host: ['hover', 'focusWithin'] }` is any one of several, as a
 //! `when` of several alternatives is; both hold in every table.
 
@@ -49,6 +49,7 @@ pub(super) const RESERVED: &[&str] = &[
     "focusVisible",
     "focusWithin",
     "forcedColors",
+    "formDisabled",
     "has",
     "holds",
     "hover",
@@ -180,7 +181,9 @@ impl Names {
             }
         };
         for (key, value) in fields {
-            if key == "within" {
+            if key == "formDisabled" {
+                push(&mut read, "disabled", value.clone());
+            } else if key == "within" {
                 read = host(read, value)?;
             } else if self.source.is_none()
                 || RESERVED.contains(&key.as_str())
@@ -260,9 +263,8 @@ impl Names {
     }
 }
 
-/// `within`, with the host's `disabled` taken out as the host's own
-/// condition, and an array of the host's interactions as one alternative
-/// each.
+/// `within`, with an array of the host's interactions as one alternative
+/// each. The host's own `:disabled` is `formDisabled`.
 fn host(read: Vec<Fields>, value: &Lit) -> Result<Vec<Fields>, String> {
     let with = |read: &[Fields], key: &str, value: Lit| -> Vec<Fields> {
         read.iter()
@@ -289,39 +291,16 @@ fn host(read: Vec<Fields>, value: &Lit) -> Result<Vec<Fields>, String> {
                 }
                 Ok(each)
             }
-            /* The host's `disabled`, taken out first, beside whatever else
-            the rule is within, as `{ host: { disabled: false }, field: {
-            hover: true } }`. */
             entries
                 if entries.iter().any(|(part, inner)| {
                     part == "host"
                         && matches!(inner, Lit::Object(inner) if inner.iter().any(|(key, _)| key == "disabled"))
                 }) =>
             {
-                let mut read = read;
-                let mut rest: Fields = Vec::new();
-                for (part, inner) in entries {
-                    match inner {
-                        Lit::Object(inner) if part == "host" => {
-                            for (_, disabled) in inner.iter().filter(|(key, _)| key == "disabled") {
-                                read = with(&read, "disabled", disabled.clone());
-                            }
-                            let host: Fields = inner
-                                .iter()
-                                .filter(|(key, _)| key != "disabled")
-                                .cloned()
-                                .collect();
-                            if !host.is_empty() {
-                                rest.push((part.clone(), Lit::Object(host)));
-                            }
-                        }
-                        _ => rest.push((part.clone(), inner.clone())),
-                    }
-                }
-                if !rest.is_empty() {
-                    read = with(&read, "within", Lit::Object(rest));
-                }
-                Ok(read)
+                Err(
+                    "`within: { host: { disabled } }` is written `formDisabled`, the host's own `:disabled`"
+                        .to_owned(),
+                )
             }
             _ => Ok(with(&read, "within", value.clone())),
         },
