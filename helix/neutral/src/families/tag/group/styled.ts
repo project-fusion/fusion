@@ -13,9 +13,15 @@ import group from './headless.js'
  */
 export default styles(
   group,
-  { prefix: 'tag-group', hooks: ['gap'], stylesheet: 'tag/group/tag-group.generated.css' },
+  {
+    prefix: 'tag-group',
+    hooks: {
+      gap: token('space-2xs'),
+    },
+    stylesheet: 'tag/group/tag-group.generated.css',
+  },
   ({ hook, on, rule }) => [
-    on('host', [rule({ display: 'flex', flexWrap: 'wrap', gap: hook.gap(token('space-2xs')) })]),
+    on('host', [rule({ display: 'flex', flexWrap: 'wrap', gap: hook.gap })]),
     on('empty', [
       rule(
         { focusVisible: true },

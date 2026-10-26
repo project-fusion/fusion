@@ -1,4 +1,4 @@
-import { difference, fn, list, measured, product, sum, token, web } from '../../../style.js'
+import { difference, fn, list, measured, native, product, sum, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import scrollArea from './headless.js'
 
@@ -26,20 +26,20 @@ export default styles(
   scrollArea,
   {
     prefix: 'scroll-area',
-    hooks: [
-      'fade',
-      'fade-block-end',
-      'fade-block-start',
-      'fade-color',
-      'fade-inline-end',
-      'fade-inline-start',
-      'scrollbar',
-      'scrollbar-size',
-      'thumb-color',
-      'thumb-hover-color',
-      'thumb-min-size',
-      'track-color',
-    ],
+    hooks: {
+      fade: token('space-xl'),
+      fadeBlockEnd: null,
+      fadeBlockStart: null,
+      fadeColor: null,
+      fadeInlineEnd: null,
+      fadeInlineStart: null,
+      scrollbar: 'thin',
+      scrollbarSize: token('space-sm'),
+      thumbColor: token('scrollbar-thumb-color'),
+      thumbHoverColor: token('scrollbar-thumb-hover-color'),
+      thumbMinSize: token('space-lg'),
+      trackColor: token('scrollbar-track-color'),
+    },
     own: [
       'scroll-area-content-size',
       'scroll-area-depth-block-end',
@@ -54,10 +54,10 @@ export default styles(
   },
   ({ hook, on, own, rule }) => {
     const motion = [token('duration-fast'), token('easing-standard')]
-    const thumbColor = hook.thumbColor(token('scrollbar-thumb-color'))
-    const trackColor = hook.trackColor(token('scrollbar-track-color'))
-    const barSize = hook.scrollbarSize(token('space-sm'))
-    const depth = hook.fade(token('space-xl'))
+    const thumbColor = hook.thumbColor
+    const trackColor = hook.trackColor
+    const barSize = hook.scrollbarSize
+    const depth = hook.fade
     const gutterInline = measured('scroll-area-gutter-inline-end', '0px')
     const gutterBlock = measured('scroll-area-gutter-block-end', '0px')
     const solid = fn('linear-gradient', '#000 0 0')
@@ -93,11 +93,13 @@ export default styles(
         rule({ print: true }, { overflow: 'visible' }),
       ]),
       on('viewport', [
-        rule({ blockSize: '100%', overflow: 'auto', overscrollBehavior: web('contain') }),
+        rule({ blockSize: '100%', overflow: 'auto', web: { overscrollBehavior: 'contain' } }),
         /* The axis `orientation` takes away clips what is past it. The web
            element writes it in the viewport's own style. */
-        rule({ orientation: 'vertical', platform: 'native' }, { overflowX: 'hidden' }),
-        rule({ orientation: 'horizontal', platform: 'native' }, { overflowY: 'hidden' }),
+        native([
+          rule({ orientation: 'vertical' }, { overflowX: 'hidden' }),
+          rule({ orientation: 'horizontal' }, { overflowY: 'hidden' }),
+        ]),
         /* The scale `max-block-size` names, for code shared with a phone. */
         rule({ 'max-block-size': 'sm' }, { maxBlockSize: '8rem' }),
         rule({ 'max-block-size': 'md' }, { maxBlockSize: '12rem' }),
@@ -106,42 +108,32 @@ export default styles(
         /* The scrollbar, made to belong to the system: `thin` rather than a
            width in pixels, and the shared scrollbar tokens, which clear 3:1
            on every ground, after this family's own hooks. */
-        rule(
-          { platform: 'web' },
-          {
+        web([
+          rule({
             scrollbarColor: [thumbColor, trackColor],
-            scrollbarWidth: hook.scrollbar('thin'),
-          },
-        ),
-        /* A browser's thin bar has no hover of its own on the thumb. */
-        rule(
-          { hover: true, platform: 'web' },
-          {
-            scrollbarColor: [
-              hook.thumbHoverColor(token('scrollbar-thumb-hover-color')),
-              trackColor,
-            ],
-          },
-        ),
-        rule({ platform: 'web', scrollbars: true }, { scrollbarWidth: 'none' }),
-        /* Four mask layers, top first: a strip for each of the browser's
+            scrollbarWidth: hook.scrollbar,
+          }),
+          /* A browser's thin bar has no hover of its own on the thumb. */
+          rule(
+            { hover: true },
+            {
+              scrollbarColor: [hook.thumbHoverColor, trackColor],
+            },
+          ),
+          rule({ scrollbars: true }, { scrollbarWidth: 'none' }),
+          /* Four mask layers, top first: a strip for each of the browser's
            scrollbars, which a mask would wash out, and the two fades, which
            meet in the content's box. */
-        rule(
-          { platform: 'web' },
-          {
+          rule({
             own: { fromEnd: 'to left', fromStart: 'to right' },
-          },
-        ),
-        rule(
-          { dir: 'rtl', platform: 'web' },
-          {
-            own: { fromEnd: 'to right', fromStart: 'to left' },
-          },
-        ),
-        rule(
-          { platform: 'web' },
-          {
+          }),
+          rule(
+            { dir: 'rtl' },
+            {
+              own: { fromEnd: 'to right', fromStart: 'to left' },
+            },
+          ),
+          rule({
             own: {
               contentSize: [difference('100%', gutterInline), difference('100%', gutterBlock)],
             },
@@ -160,45 +152,41 @@ export default styles(
               ['--_scroll-area-depth-inline-start', ...motion],
               ['--_scroll-area-depth-inline-end', ...motion],
             ),
-          },
-        ),
-        rule(
-          { dir: 'rtl', platform: 'web' },
-          { maskPosition: list('left top', 'left bottom', 'right top', 'right top') },
-        ),
-        /* Each edge's depth, while there is more past it. */
-        rule(
-          { platform: 'web', state: 'more-block-start' },
-          { own: { depthBlockStart: hook.fadeBlockStart(depth) } },
-        ),
-        rule(
-          { platform: 'web', state: 'more-block-end' },
-          { own: { depthBlockEnd: hook.fadeBlockEnd(depth) } },
-        ),
-        rule(
-          { platform: 'web', state: 'more-inline-start' },
-          { own: { depthInlineStart: hook.fadeInlineStart(depth) } },
-        ),
-        rule(
-          { platform: 'web', state: 'more-inline-end' },
-          { own: { depthInlineEnd: hook.fadeInlineEnd(depth) } },
-        ),
-        /* Only while the content scrolls, because a mask makes the viewport a
+          }),
+          rule(
+            { dir: 'rtl' },
+            { maskPosition: list('left top', 'left bottom', 'right top', 'right top') },
+          ),
+          /* Each edge's depth, while there is more past it. */
+          rule(
+            { state: 'more-block-start' },
+            { own: { depthBlockStart: hook.fadeBlockStart(depth) } },
+          ),
+          rule({ state: 'more-block-end' }, { own: { depthBlockEnd: hook.fadeBlockEnd(depth) } }),
+          rule(
+            { state: 'more-inline-start' },
+            { own: { depthInlineStart: hook.fadeInlineStart(depth) } },
+          ),
+          rule(
+            { state: 'more-inline-end' },
+            { own: { depthInlineEnd: hook.fadeInlineEnd(depth) } },
+          ),
+          /* Only while the content scrolls, because a mask makes the viewport a
            stacking context. The prefixed name as well, for WebKit releases
            that read only that one. */
-        rule({ platform: 'web', state: 'scrolls' }, { WebkitMaskImage: mask, maskImage: mask }),
-        rule({ platform: 'web', reducedMotion: true }, { transition: 'none' }),
+          rule({ scrolls: true }, { WebkitMaskImage: mask, maskImage: mask }),
+          rule({ reducedMotion: true }, { transition: 'none' }),
+        ]),
       ]),
       /* The scrollbars drawn under `scrollbars`, over the content at the
          edge, as the browser's overlay scrollbars are. */
       on('scrollbar', [
-        rule(
-          { platform: 'web' },
-          {
+        web([
+          rule({
             own: {
               thumb: fn(
                 'max',
-                hook.thumbMinSize(token('space-lg')),
+                hook.thumbMinSize,
                 product(measured('scroll-area-thumb-fraction', 1), '100%'),
               ),
             },
@@ -209,54 +197,63 @@ export default styles(
             transition: ['opacity', ...motion],
             userSelect: 'none',
             zIndex: sum(token('layer-raised'), 1),
-          },
-        ),
-        rule({ platform: 'web', also: { 'scrollbar-visible': true } }, { opacity: 1 }),
-        rule({ platform: 'web', reducedMotion: true }, { transition: 'none' }),
+          }),
+          rule({ also: { 'scrollbar-visible': true } }, { opacity: 1 }),
+          rule({ reducedMotion: true }, { transition: 'none' }),
+        ]),
       ]),
       on('scrollbar-vertical', [
-        rule({ platform: 'web' }, { inlineSize: barSize, insetBlock: 0, insetInlineEnd: 0 }),
-        /* Each stops short of the corner while the other is drawn. */
-        rule({ platform: 'web', state: 'scrollbar-horizontal' }, { insetBlockEnd: barSize }),
+        web([
+          rule({ inlineSize: barSize, insetBlock: 0, insetInlineEnd: 0 }),
+          /* Each stops short of the corner while the other is drawn. */
+          rule({ state: 'scrollbar-horizontal' }, { insetBlockEnd: barSize }),
+        ]),
       ]),
       on('scrollbar-horizontal', [
-        rule({ platform: 'web' }, { blockSize: barSize, insetBlockEnd: 0, insetInline: 0 }),
-        rule({ platform: 'web', state: 'scrollbar-vertical' }, { insetInlineEnd: barSize }),
+        web([
+          rule({ blockSize: barSize, insetBlockEnd: 0, insetInline: 0 }),
+          rule({ state: 'scrollbar-vertical' }, { insetInlineEnd: barSize }),
+        ]),
       ]),
       on('thumb', [
-        rule(
-          { platform: 'web' },
-          { backgroundColor: thumbColor, borderRadius: token('radii-full'), position: 'absolute' },
-        ),
-        rule(
-          { hover: true, platform: 'web' },
-          { backgroundColor: hook.thumbHoverColor(token('scrollbar-thumb-hover-color')) },
-        ),
+        web([
+          rule({
+            backgroundColor: thumbColor,
+            borderRadius: token('radii-full'),
+            position: 'absolute',
+          }),
+          rule({ hover: true }, { backgroundColor: hook.thumbHoverColor }),
+        ]),
       ]),
       on('thumb-vertical', [
-        rule(
-          { platform: 'web' },
-          { blockSize: own.thumb, insetBlockStart: along, insetInline: token('border-thick') },
-        ),
+        web([
+          rule({
+            blockSize: own.thumb,
+            insetBlockStart: along,
+            insetInline: token('border-thick'),
+          }),
+        ]),
       ]),
       on('thumb-horizontal', [
-        rule(
-          { platform: 'web' },
-          { inlineSize: own.thumb, insetBlock: token('border-thick'), insetInlineStart: along },
-        ),
+        web([
+          rule({
+            inlineSize: own.thumb,
+            insetBlock: token('border-thick'),
+            insetInlineStart: along,
+          }),
+        ]),
       ]),
       on('corner', [
-        rule(
-          { platform: 'web' },
-          {
+        web([
+          rule({
             backgroundColor: trackColor,
             blockSize: barSize,
             inlineSize: barSize,
             insetBlockEnd: 0,
             insetInlineEnd: 0,
             position: 'absolute',
-          },
-        ),
+          }),
+        ]),
       ]),
       /* The painted fades, under `--scroll-area-fade-color`: a gradient from
          that color over the content at each edge. */
@@ -273,10 +270,9 @@ export default styles(
           transition: ['opacity', ...motion],
           zIndex: token('layer-raised'),
         }),
-        rule(
-          { platform: 'native' },
-          { backgroundImage: fn('linear-gradient', 'to bottom', fadeColor, 'transparent') },
-        ),
+        native([
+          rule({ backgroundImage: fn('linear-gradient', 'to bottom', fadeColor, 'transparent') }),
+        ]),
         rule({ state: 'more-block-start' }, { opacity: 1 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
@@ -293,10 +289,9 @@ export default styles(
           transition: ['opacity', ...motion],
           zIndex: token('layer-raised'),
         }),
-        rule(
-          { platform: 'native' },
-          { backgroundImage: fn('linear-gradient', 'to top', fadeColor, 'transparent') },
-        ),
+        native([
+          rule({ backgroundImage: fn('linear-gradient', 'to top', fadeColor, 'transparent') }),
+        ]),
         rule({ state: 'more-block-end' }, { opacity: 1 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
@@ -312,14 +307,16 @@ export default styles(
         rule({ dir: 'rtl' }, { own: { fromEnd: 'to right', fromStart: 'to left' } }),
         /* A phone's ring, while the frame around its scroll view shows
            keyboard focus, on this layer raised over the painted fades. */
-        rule(
-          { platform: 'native', within: { host: { focusVisible: true } } },
-          {
-            outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
-            outlineOffset: product(token('size-focus-offset'), '-1'),
-            zIndex: sum(token('layer-raised'), 1),
-          },
-        ),
+        native([
+          rule(
+            { within: { host: { focusVisible: true } } },
+            {
+              outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
+              outlineOffset: product(token('size-focus-offset'), '-1'),
+              zIndex: sum(token('layer-raised'), 1),
+            },
+          ),
+        ]),
       ]),
       on({ before: 'edges' }, [
         rule({
@@ -333,10 +330,9 @@ export default styles(
           transition: ['opacity', ...motion],
           zIndex: token('layer-raised'),
         }),
-        rule(
-          { platform: 'native' },
-          { backgroundImage: fn('linear-gradient', own.fromStart, fadeColor, 'transparent') },
-        ),
+        native([
+          rule({ backgroundImage: fn('linear-gradient', own.fromStart, fadeColor, 'transparent') }),
+        ]),
         rule({ state: 'more-inline-start' }, { opacity: 1 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
@@ -352,10 +348,9 @@ export default styles(
           transition: ['opacity', ...motion],
           zIndex: token('layer-raised'),
         }),
-        rule(
-          { platform: 'native' },
-          { backgroundImage: fn('linear-gradient', own.fromEnd, fadeColor, 'transparent') },
-        ),
+        native([
+          rule({ backgroundImage: fn('linear-gradient', own.fromEnd, fadeColor, 'transparent') }),
+        ]),
         rule({ state: 'more-inline-end' }, { opacity: 1 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
@@ -363,20 +358,19 @@ export default styles(
          has it. The ring is drawn on the layer over the viewport, since the
          fade mask would take it out at every edge that fades. */
       on({ part: 'edges', selector: '[part="viewport"]:focus-visible ~ [part="edges"]' }, [
-        rule(
-          { platform: 'web' },
-          {
+        web([
+          rule({
             outline: [token('size-focus-ring'), 'solid', token('color-focus-ring')],
             outlineOffset: product(token('size-focus-offset'), '-1'),
-          },
-        ),
+          }),
+        ]),
       ]),
       /* **What a phone scrolls across is as wide as the frame**, as a block
          fills the viewport on the web, and the frame's width is what it lays
          its own content out at, so entries that share it share it there.
          What runs past it, as items at their least do, scrolls. */
       on({ region: 'default', slotted: '*' }, [
-        rule({ orientation: 'horizontal', platform: 'native' }, { flexGrow: 1, flexShrink: 1 }),
+        native([rule({ orientation: 'horizontal' }, { flexGrow: 1, flexShrink: 1 })]),
       ]),
     ]
   },

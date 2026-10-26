@@ -1,8 +1,10 @@
 import {
   difference,
+  first,
   list,
   measured,
   mix,
+  native,
   product,
   quotient,
   sum,
@@ -39,24 +41,24 @@ export default styles(
   item,
   {
     prefix: 'toast',
-    hooks: [
-      'background-color',
-      'border-color',
-      'border-width',
-      'color',
-      'description-color',
-      'dismiss-color',
-      'font-size',
-      'heading-weight',
-      'inline-size',
-      'item-padding',
-      'radius',
-      'shadow',
-      'swipe-x',
-      'swipe-y',
-      'timer-size',
-      'tone-color',
-    ],
+    hooks: ({ own }) => ({
+      backgroundColor: token('color-surface-overlay'),
+      borderColor: token('color-border'),
+      borderWidth: token('border-floating'),
+      color: token('color-foreground'),
+      descriptionColor: token('color-foreground-muted'),
+      dismissColor: token('color-foreground-muted'),
+      fontSize: token('text-sm'),
+      headingWeight: token('weight-semibold'),
+      inlineSize: own.width('22rem'),
+      itemPadding: token('space-sm'),
+      radius: token('radii-sm'),
+      shadow: token('shadow-floating'),
+      swipeX: 0,
+      swipeY: 0,
+      timerSize: token('space-2xs'),
+      toneColor: own.severity(token('color-foreground-muted')),
+    }),
     own: ['toast-enter', 'toast-gap', 'toast-line', 'toast-most', 'toast-severity', 'toast-width'],
     stylesheet: 'toast/item/toast-item.generated.css',
   },
@@ -64,8 +66,8 @@ export default styles(
     const normal = token('duration-normal')
     const decelerate = token('easing-decelerate')
     const accelerate = token('easing-accelerate')
-    const padding = hook.itemPadding(token('space-sm'))
-    const tone = hook.toneColor(own.severity(token('color-foreground-muted')))
+    const padding = hook.itemPadding
+    const tone = first(hook.toneColor, own.severity, token('color-foreground-muted'))
     const enter = own.enter(token('space-lg'))
     const drain = ['helix-toast-drain', measured('toast-duration', '0ms'), 'linear', 'forwards']
     return [
@@ -77,9 +79,9 @@ export default styles(
           '--helix-size-control': token('size-control-sm'),
           '--helix-size-control-loose': product(token('size-control'), 1.2),
           '--helix-size-control-tight': product(token('size-control'), 0.8),
-          own: { line: product(hook.fontSize(token('text-sm')), token('leading-normal')) },
+          own: { line: product(hook.fontSize, token('leading-normal')) },
           display: 'grid',
-          gridTemplateRows: web('minmax(0, 1fr)'),
+          web: { gridTemplateRows: 'minmax(0, 1fr)' },
           marginBlockStart: own.gap(token('space-xs')),
           transition: list(
             ['grid-template-rows', normal, decelerate],
@@ -87,10 +89,10 @@ export default styles(
             ['opacity', normal, decelerate],
             ['translate', normal, decelerate],
           ),
-          inlineSize: hook.inlineSize(own.width('22rem')),
+          inlineSize: first(hook.inlineSize, own.width, '22rem'),
           maxInlineSize: own.most('100%'),
         }),
-        rule({ platform: 'native' }, { maxInlineSize: '100%' }),
+        native([rule({ maxInlineSize: '100%' })]),
         /* Color on the mark and the bar, never a fill behind the words. */
         variants('tone', {
           danger: { own: { severity: token('color-danger') } },
@@ -99,12 +101,12 @@ export default styles(
           warning: { own: { severity: token('color-warning') } },
         }),
         /* Held back by the stack's `max-visible`, until a message before it goes. */
-        rule({ state: 'waiting' }, { display: 'none' }),
+        rule({ waiting: true }, { display: 'none' }),
         /* Gone, and its place in the stack with it. */
         rule(
-          { state: 'closed' },
+          { closed: true },
           {
-            gridTemplateRows: web('minmax(0, 0fr)'),
+            web: { gridTemplateRows: 'minmax(0, 0fr)' },
             marginBlockStart: 0,
             opacity: 0,
             translate: [0, enter],
@@ -119,32 +121,36 @@ export default styles(
           },
         ),
         /* A phone fades the message out toward the edge, then draws nothing of it. */
-        rule(
-          { platform: 'native', state: 'exiting' },
-          {
-            opacity: 0,
-            translate: [0, enter],
-            transition: list(['opacity', normal, accelerate], ['translate', normal, accelerate]),
-          },
-        ),
-        rule(
-          { platform: 'native', state: 'entering' },
-          {
-            transition: list(['opacity', normal, decelerate], ['translate', normal, decelerate]),
-          },
-        ),
-        rule({ entering: true, platform: 'native', state: 'entering' }, { opacity: 0 }),
-        rule({ platform: 'native', state: 'closed' }, { display: 'none' }),
-        rule([{ reducedMotion: true }, { reducedMotion: true, state: 'closed' }], {
+        native([
+          rule(
+            { exiting: true },
+            {
+              opacity: 0,
+              translate: [0, enter],
+              transition: list(['opacity', normal, accelerate], ['translate', normal, accelerate]),
+            },
+          ),
+          rule(
+            { state: 'entering' },
+            {
+              transition: list(['opacity', normal, decelerate], ['translate', normal, decelerate]),
+            },
+          ),
+          rule({ entering: true, state: 'entering' }, { opacity: 0 }),
+          rule({ closed: true }, { display: 'none' }),
+        ]),
+        rule([{ reducedMotion: true }, { reducedMotion: true, closed: true }], {
           transition: 'none',
         }),
-        rule(
-          [
-            { platform: 'native', reducedMotion: true, state: 'exiting' },
-            { platform: 'native', reducedMotion: true, state: 'entering' },
-          ],
-          { transition: 'none' },
-        ),
+        native([
+          rule(
+            [
+              { reducedMotion: true, exiting: true },
+              { reducedMotion: true, state: 'entering' },
+            ],
+            { transition: 'none' },
+          ),
+        ]),
       ]),
       /* Hidden and still laid out while it leaves. A waiting message takes no box. */
       on(
@@ -152,25 +158,21 @@ export default styles(
           part: 'host',
           selector: ':host([hidden]:not([hidden="until-found"], :state(waiting)))',
         },
-        [rule({ platform: 'web' }, { display: 'grid' })],
+        [web([rule({ display: 'grid' })])],
       ),
       on('item', [
         rule({
           alignItems: 'start',
           display: 'grid',
           gridTemplateColumns: ['auto', '1fr'],
-          backgroundColor: hook.backgroundColor(token('color-surface-overlay')),
-          borderRadius: hook.radius(token('radii-sm')),
-          border: [
-            hook.borderWidth(token('border-floating')),
-            'solid',
-            hook.borderColor(token('color-border')),
-          ],
-          boxShadow: hook.shadow(token('shadow-floating')),
+          backgroundColor: hook.backgroundColor,
+          borderRadius: hook.radius,
+          border: [hook.borderWidth, 'solid', hook.borderColor],
+          boxShadow: hook.shadow,
           boxSizing: 'border-box',
-          color: hook.color(token('color-foreground')),
+          color: hook.color,
           fontFamily: token('font-sans'),
-          fontSize: hook.fontSize(token('text-sm')),
+          fontSize: hook.fontSize,
           lineHeight: token('leading-normal'),
           padding,
           paddingInlineEnd: sum(token('space-sm'), token('size-control'), token('space-2xs')),
@@ -180,17 +182,17 @@ export default styles(
         }),
         /* The page's own panning stays on, here and on each part inside, and
            the swipe takes the rest. */
-        rule({ platform: 'web' }, { touchAction: 'pan-y' }),
+        web([rule({ touchAction: 'pan-y' })]),
         /* A phone lays the mark and the words in a line, and the actions on
            a line of their own under the words, as the web's two columns do. */
-        rule({ platform: 'native' }, { flexWrap: 'wrap' }),
+        native([rule({ flexWrap: 'wrap' })]),
         /* Under the finger while a swipe moves it, and back to rest as it lets go. */
         rule(
           { part: { 'data-swiping': true } },
           {
             transition: 'none',
-            translate: [hook.swipeX(0), hook.swipeY(0)],
-            userSelect: web('none'),
+            translate: [hook.swipeX, hook.swipeY],
+            web: { userSelect: 'none' },
           },
         ),
         /* It arrives from the edge the stack stands along. */
@@ -199,11 +201,11 @@ export default styles(
           { animation: ['helix-toast-in', normal, decelerate, 'backwards'] },
         ),
         rule(
-          { state: 'closed' },
+          { closed: true },
           { paddingBlock: 0, transition: ['padding-block', normal, accelerate] },
         ),
         rule({ reducedMotion: true }, { animation: 'none' }),
-        rule({ reducedMotion: true, state: 'closed' }, { transition: 'none' }),
+        rule({ reducedMotion: true, closed: true }, { transition: 'none' }),
       ]),
       /* The mark, centered on the first line, with its own gap after it. */
       on('icon', [
@@ -214,7 +216,7 @@ export default styles(
           marginInlineEnd: token('space-sm'),
           marginBlockStart: quotient(difference(own.line, token('size-icon')), 2),
         }),
-        rule({ platform: 'web' }, { touchAction: 'pan-y' }),
+        web([rule({ touchAction: 'pan-y' })]),
       ]),
       on('icon-mark', [rule({ blockSize: token('size-icon'), inlineSize: token('size-icon') })]),
       /* A mark passed in is sized like the tone's. */
@@ -229,32 +231,34 @@ export default styles(
         rule({ gridArea: '1 / 2', minInlineSize: 0 }),
         /* Never quite nothing wide, so the actions' whole line never fits
            beside it, and they wrap under it with no mark before it too. */
-        rule({ platform: 'native' }, { flex: '1 1 0', minInlineSize: 1 }),
-        rule({ platform: 'web' }, { touchAction: 'pan-y' }),
+        native([rule({ flex: '1 1 0', minInlineSize: 1 })]),
+        web([rule({ touchAction: 'pan-y' })]),
       ]),
       /* A block holding the words lays them out as the region does, and keeps the swipe. */
       on({ part: 'content', inner: '> slot' }, [
-        rule({ platform: 'web' }, { display: 'block', touchAction: 'pan-y' }),
+        web([rule({ display: 'block', touchAction: 'pan-y' })]),
       ]),
       /* A title in a heavier weight, and a line of detail quieter under it. */
       on({ region: 'heading', slotted: '*' }, [
-        rule({ display: 'block', fontWeight: hook.headingWeight(token('weight-semibold')) }),
+        rule({ display: 'block', fontWeight: hook.headingWeight }),
       ]),
       on({ region: 'description', slotted: '*' }, [
         rule({
-          color: hook.descriptionColor(token('color-foreground-muted')),
+          color: hook.descriptionColor,
           display: 'block',
         }),
       ]),
       /* The actions' own row, in the words' column. */
       on('actions', [
         rule({ display: 'flex', gap: token('space-2xs'), gridArea: '2 / 2' }),
-        rule({ platform: 'native' }, { flexBasis: '100%' }),
-        rule(
-          { platform: 'native', tone: ['danger', 'info', 'success', 'warning'] },
-          { paddingInlineStart: sum(token('size-icon'), token('space-sm')) },
-        ),
-        rule({ platform: 'web' }, { touchAction: 'pan-y' }),
+        native([
+          rule({ flexBasis: '100%' }),
+          rule(
+            { tone: ['danger', 'info', 'success', 'warning'] },
+            { paddingInlineStart: sum(token('size-icon'), token('space-sm')) },
+          ),
+        ]),
+        web([rule({ touchAction: 'pan-y' })]),
       ]),
       on({ region: 'actions', slotted: '*' }, [rule({ marginBlockStart: token('space-xs') })]),
       /* The close, in the corner and out of the flow, centered on the first line. */
@@ -267,7 +271,7 @@ export default styles(
           insetInlineEnd: token('space-sm'),
           blockSize: token('size-control'),
           borderRadius: token('radii-sm'),
-          color: hook.dismissColor(token('color-foreground-muted')),
+          color: hook.dismissColor,
           cursor: web('pointer'),
           display: 'inline-flex',
           flex: '0 0 auto',
@@ -276,7 +280,7 @@ export default styles(
           placeItems: 'center',
           transition: ['color', token('duration-fast'), token('easing-standard')],
         }),
-        rule({ platform: 'web' }, { touchAction: 'pan-y' }),
+        web([rule({ touchAction: 'pan-y' })]),
         rule(
           { hover: true },
           {
@@ -299,15 +303,15 @@ export default styles(
         rule({
           animation: drain,
           backgroundColor: tone,
-          blockSize: hook.timerSize(token('space-2xs')),
+          blockSize: hook.timerSize,
           insetBlockStart: 0,
           insetInline: 0,
           position: 'absolute',
           transformOrigin: '0 50%',
         }),
-        rule({ platform: 'web' }, { touchAction: 'pan-y' }),
+        web([rule({ touchAction: 'pan-y' })]),
         rule({ dir: 'rtl' }, { transformOrigin: '100% 50%' }),
-        rule({ state: 'paused' }, { animationPlayState: 'paused' }),
+        rule({ paused: true }, { animationPlayState: 'paused' }),
         /* Under reduced motion as well: the bar is the one place that says how long is left. */
         rule({ reducedMotion: true }, { animation: drain }),
       ]),

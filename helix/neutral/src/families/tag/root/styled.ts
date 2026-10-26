@@ -1,4 +1,4 @@
-import { inherit, mix, product, token, web } from '../../../style.js'
+import { first, inherit, mix, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -38,15 +38,15 @@ export default styles(
   root,
   {
     prefix: 'tag',
-    hooks: [
-      'background-color',
-      'border-color',
-      'disabled-opacity',
-      'font-weight',
-      'foreground-color',
-      'gap',
-      'radius',
-    ],
+    hooks: ({ own }) => ({
+      backgroundColor: own.fill,
+      borderColor: own.edge,
+      disabledOpacity: 0.5,
+      fontWeight: token('weight-medium'),
+      foregroundColor: own.label,
+      gap: token('space-2xs'),
+      radius: null,
+    }),
     own: ['tag-color', 'tag-edge', 'tag-fill', 'tag-height', 'tag-inset', 'tag-label', 'tag-text'],
     props: [
       prop('emphasis', ['outlined', 'solid', 'subtle']),
@@ -59,15 +59,15 @@ export default styles(
     on('host', [
       rule({
         alignItems: 'center',
-        backgroundColor: hook.backgroundColor(own.fill),
+        backgroundColor: first(hook.backgroundColor, own.fill),
         blockSize: own.height,
-        border: [token('border-thin'), 'solid', hook.borderColor(own.edge)],
+        border: [token('border-thin'), 'solid', first(hook.borderColor, own.edge)],
         borderRadius: hook.radius(token('radii-sm')),
-        color: hook.foregroundColor(own.label),
+        color: first(hook.foregroundColor, own.label),
         display: 'inline-flex',
         fontSize: own.text,
-        fontWeight: hook.fontWeight(token('weight-medium')),
-        gap: hook.gap(token('space-2xs')),
+        fontWeight: hook.fontWeight,
+        gap: hook.gap,
         lineHeight: token('leading-tight'),
         paddingInline: own.inset,
         whiteSpace: 'nowrap',
@@ -104,10 +104,10 @@ export default styles(
         danger: { own: { color: token('color-danger') } },
       }),
       /* Out of reach, and drawn so: the platform's own disabled step. */
-      rule({ has: 'disabled' }, { opacity: hook.disabledOpacity(0.5) }),
+      rule({ has: 'disabled' }, { opacity: hook.disabledOpacity }),
       /* Selected in a group that selects: the tone filled, as `solid` draws it. */
       rule(
-        { state: 'selected' },
+        { selected: true },
         {
           own: {
             fill: mix(own.color, 82, token('color-foreground')),
@@ -116,7 +116,7 @@ export default styles(
           },
         },
       ),
-      rule({ print: true }, { printColorAdjust: web('economy') }),
+      rule({ print: true }, { web: { printColorAdjust: 'economy' } }),
     ]),
     on('dismiss', [
       rule({ shape: 'pill' }, { borderRadius: token('radii-full') }),
@@ -141,7 +141,7 @@ export default styles(
           outlineOffset: token('size-focus-offset'),
         },
       ),
-      rule({ has: 'disabled' }, { cursor: web('not-allowed') }),
+      rule({ has: 'disabled' }, { web: { cursor: 'not-allowed' } }),
     ]),
     /* A `<slot>` is `display: contents` and draws no box to end in an
        ellipsis, and the block it becomes is a flex item, which keeps an
@@ -151,10 +151,12 @@ export default styles(
       /* Trimmed to the capitals and the baseline, the box is the letters, and
          the equal padding is room for the descenders the ellipsis's clip would
          cut. Only where the trim is supported. */
-      rule(
-        { platform: 'web', supports: '(text-box: trim-both cap alphabetic)' },
-        { paddingBlock: token('space-2xs'), textBox: 'trim-both cap alphabetic' },
-      ),
+      web([
+        rule(
+          { supports: '(text-box: trim-both cap alphabetic)' },
+          { paddingBlock: token('space-2xs'), textBox: 'trim-both cap alphabetic' },
+        ),
+      ]),
     ]),
     /* An icon in the label sits on the middle of the line, not on its
        baseline. */
@@ -169,7 +171,7 @@ export default styles(
        ends in an ellipsis as the plain label does. */
     on('link', [
       rule({ color: inherit(), display: 'block', minInlineSize: 0, textDecoration: 'none' }),
-      rule({ canHover: true, hover: true, part: { href: true } }, { textDecoration: 'underline' }),
+      rule({ canHover: true, hover: true, href: true }, { textDecoration: 'underline' }),
       rule(
         { focusVisible: true },
         {
@@ -184,9 +186,9 @@ export default styles(
         alignItems: 'center',
         alignSelf: 'stretch',
         borderRadius: inherit(),
-        cursor: web('default'),
+        web: { cursor: 'default' },
         display: 'inline-flex',
-        gap: hook.gap(token('space-2xs')),
+        gap: hook.gap,
         marginInline: product(own.inset, '-1'),
         minInlineSize: 0,
         paddingInline: own.inset,

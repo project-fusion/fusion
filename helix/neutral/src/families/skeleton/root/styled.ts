@@ -1,4 +1,4 @@
-import { difference, fn, mix, product, token, web } from '../../../style.js'
+import { difference, fn, mix, native, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -28,7 +28,15 @@ export default styles(
   root,
   {
     prefix: 'skeleton',
-    hooks: ['block-size', 'color', 'duration', 'last-line-size', 'radius', 'sheen-color', 'size'],
+    hooks: {
+      blockSize: token('size-control'),
+      color: mix(token('color-foreground'), 8, 'transparent'),
+      duration: product(token('duration-slow'), 4),
+      lastLineSize: '60%',
+      radius: token('radii-sm'),
+      sheenColor: mix(token('color-foreground'), 8, 'transparent'),
+      size: token('size-control'),
+    },
     props: [
       prop('effect', ['none', 'pulse']),
       /* A number on the web, which reads the attribute as one, reflected so
@@ -44,20 +52,17 @@ export default styles(
       /* A block stands in for something with no line height to borrow, so it
          takes the control step until a page sizes it. With no height it drew
          nothing. */
-      rule({ shape: false }, { blockSize: hook.blockSize(token('size-control')) }),
+      rule({ shape: false }, { blockSize: hook.blockSize }),
       /* A line of text is one line tall whatever it is standing in for. */
       rule({ shape: 'text' }, { blockSize: '1em' }),
-      rule({ state: 'paragraph', platform: 'native' }, { blockSize: 'auto' }),
+      native([rule({ paragraph: true }, { blockSize: 'auto' })]),
       /* The control step, not the bare `2.5rem` it works out to, so a circle
          standing in for an avatar keeps its size inside a `data-density`
          region as the avatar does. */
-      rule(
-        { shape: 'circle' },
-        { aspectRatio: '1 / 1', inlineSize: hook.size(token('size-control')) },
-      ),
+      rule({ shape: 'circle' }, { aspectRatio: '1 / 1', inlineSize: hook.size }),
       /* Around content: the host takes the content's box. */
       rule(
-        { state: 'wrapping' },
+        { wrapping: true },
         {
           blockSize: 'auto',
           inlineSize: 'fit-content',
@@ -74,15 +79,15 @@ export default styles(
        works out. */
     on(
       { part: 'host', selector: ':host([shape="text"][lines]:not([lines="1"]):not([lines="0"]))' },
-      [rule({ platform: 'web' }, { blockSize: 'auto' })],
+      [web([rule({ blockSize: 'auto' })])],
     ),
     /* The base fill, the containing block for the sweep, and the clip that
        keeps it inside the corner radius. Nothing on it moves. */
     on('skeleton', [
       rule({
-        backgroundColor: hook.color(mix(token('color-foreground'), 8, 'transparent')),
+        backgroundColor: hook.color,
         blockSize: '100%',
-        borderRadius: hook.radius(token('radii-sm')),
+        borderRadius: hook.radius,
         display: 'block',
         inlineSize: '100%',
         overflow: 'hidden',
@@ -92,12 +97,7 @@ export default styles(
       rule(
         { effect: 'pulse' },
         {
-          animation: [
-            'helix-skeleton-pulse',
-            hook.duration(product(token('duration-slow'), 4)),
-            'ease-in-out',
-            'infinite',
-          ],
+          animation: ['helix-skeleton-pulse', hook.duration, 'ease-in-out', 'infinite'],
         },
       ),
       rule({ effect: 'pulse', reducedMotion: true }, { animation: 'none' }),
@@ -115,10 +115,7 @@ export default styles(
       /* A paragraph's line is a skeleton as well, so its rules are the
          skeleton's, on the shape that is a line. */
       rule({ also: { line: true } }, { blockSize: '1em' }),
-      rule(
-        { also: { line: true }, child: ['last', 'later'] },
-        { inlineSize: hook.lastLineSize('60%') },
-      ),
+      rule({ also: { line: true }, child: ['last', 'later'] }, { inlineSize: hook.lastLineSize }),
     ]),
     on('lines', [
       rule({
@@ -126,25 +123,20 @@ export default styles(
         flexDirection: 'column',
         gap: product(difference(token('leading-normal'), 1), '1em'),
       }),
-      rule({ state: 'wrapping' }, { blockSize: 'auto', inset: 0, position: 'absolute' }),
-      rule({ loading: false, state: 'wrapping' }, { display: 'none' }),
+      rule({ wrapping: true }, { blockSize: 'auto', inset: 0, position: 'absolute' }),
+      rule({ loading: false, wrapping: true }, { display: 'none' }),
     ]),
     /* The sweep, on a layer of its own so it is moved and not drawn again,
        and an element rather than `::after`, so a page reaches it as
        `::part(sheen)`. */
     on('sheen', [
       rule({
-        animation: [
-          'helix-skeleton-sweep',
-          hook.duration(product(token('duration-slow'), 4)),
-          'ease-in-out',
-          'infinite',
-        ],
+        animation: ['helix-skeleton-sweep', hook.duration, 'ease-in-out', 'infinite'],
         backgroundImage: fn(
           'linear-gradient',
           '90deg',
           'transparent 0%',
-          [hook.sheenColor(mix(token('color-foreground'), 8, 'transparent')), '50%'],
+          [hook.sheenColor, '50%'],
           'transparent 100%',
         ),
         display: 'block',
@@ -172,7 +164,7 @@ export default styles(
             'GrayText 50%',
             'transparent 65%',
           ),
-          forcedColorAdjust: web('none'),
+          web: { forcedColorAdjust: 'none' },
         },
       ),
     ]),
@@ -181,57 +173,56 @@ export default styles(
     on({ part: 'skeleton', exact: true }, [
       rule({ shape: 'circle' }, { borderRadius: token('radii-full') }),
       /* The shape lies over the content's box. */
-      rule({ state: 'wrapping' }, { blockSize: 'auto', inset: 0, position: 'absolute' }),
+      rule({ wrapping: true }, { blockSize: 'auto', inset: 0, position: 'absolute' }),
       /* Once `loading` goes, the shape goes. */
-      rule({ loading: false, state: 'wrapping' }, { display: 'none' }),
+      rule({ loading: false, wrapping: true }, { display: 'none' }),
     ]),
     keyframes('helix-skeleton-pulse', { '50%': { opacity: 0.4 } }),
     on({ part: 'host', selector: ':host(:not(:defined):not(:empty))' }, [
-      rule(
-        { platform: 'web' },
-        {
+      web([
+        rule({
           blockSize: 'auto',
           inlineSize: 'fit-content',
           maxInlineSize: '100%',
           position: 'relative',
-        },
-      ),
+        }),
+      ]),
     ]),
     on('content', [
-      rule({ state: 'wrapping' }, { display: 'block' }),
-      rule({ loading: true, state: 'wrapping', platform: 'native' }, { visibility: 'hidden' }),
+      rule({ wrapping: true }, { display: 'block' }),
+      native([rule({ loading: true, wrapping: true }, { visibility: 'hidden' })]),
     ]),
     on({ part: 'content', selector: ':host(:not(:defined):not(:empty)) [part="content"]' }, [
-      rule({ platform: 'web' }, { display: 'block' }),
+      web([rule({ display: 'block' })]),
     ]),
     on({ part: 'skeleton', selector: ':host(:not(:defined):not(:empty)) [part="skeleton"]' }, [
-      rule({ platform: 'web' }, { blockSize: 'auto', inset: 0, position: 'absolute' }),
+      web([rule({ blockSize: 'auto', inset: 0, position: 'absolute' })]),
     ]),
     on({ part: 'lines', selector: ':host(:not(:defined):not(:empty)) [part="lines"]' }, [
-      rule({ platform: 'web' }, { blockSize: 'auto', inset: 0, position: 'absolute' }),
+      web([rule({ blockSize: 'auto', inset: 0, position: 'absolute' })]),
     ]),
     on(
       {
         part: 'skeleton',
         selector: ':host(:not(:defined):not(:empty):not([loading])) [part="skeleton"]',
       },
-      [rule({ platform: 'web' }, { display: 'none' })],
+      [web([rule({ display: 'none' })])],
     ),
     on(
       {
         part: 'lines',
         selector: ':host(:not(:defined):not(:empty):not([loading])) [part="lines"]',
       },
-      [rule({ platform: 'web' }, { display: 'none' })],
+      [web([rule({ display: 'none' })])],
     ),
     /* While it loads, the content keeps its place unseen. The web's
        selector keeps the attribute before the state. */
     on({ part: 'content', selector: ':host([loading]:state(wrapping)) [part="content"]' }, [
-      rule({ platform: 'web' }, { visibility: 'hidden' }),
+      web([rule({ visibility: 'hidden' })]),
     ]),
     on(
       { part: 'content', selector: ':host([loading]:not(:defined):not(:empty)) [part="content"]' },
-      [rule({ platform: 'web' }, { visibility: 'hidden' })],
+      [web([rule({ visibility: 'hidden' })])],
     ),
     keyframes('helix-skeleton-sweep', {
       from: { translate: '-50% 0' },

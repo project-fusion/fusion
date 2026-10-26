@@ -18,23 +18,23 @@ export default styles(
   item,
   {
     prefix: 'speed-dial',
-    hooks: [
-      'item-background-color',
-      'item-color',
-      'item-disabled-opacity',
-      'item-hover-background-color',
-      'item-size',
-      'label-background-color',
-      'label-color',
-      'label-font-size',
-      'shortcut-color',
-    ],
+    hooks: {
+      itemBackgroundColor: token('color-surface-overlay'),
+      itemColor: token('color-foreground'),
+      itemDisabledOpacity: 0.5,
+      itemHoverBackgroundColor: mix(token('color-foreground'), 6, token('color-surface-overlay')),
+      itemSize: token('size-control-tight'),
+      labelBackgroundColor: token('color-surface-overlay'),
+      labelColor: token('color-foreground'),
+      labelFontSize: token('text-sm'),
+      shortcutColor: token('color-foreground-muted'),
+    },
     own: ['speed-dial-label-opacity', 'speed-dial-row'],
     stylesheet: 'speed-dial/item/speed-dial-item.generated.css',
   },
   ({ hook, on, own, rule }) => {
     const fast = token('duration-fast')
-    const surface = hook.labelBackgroundColor(token('color-surface-overlay'))
+    const surface = hook.labelBackgroundColor
     return [
       on('host', [rule({ display: 'block' })]),
       on('item', [
@@ -51,22 +51,19 @@ export default styles(
           padding: token('space-none'),
           textDecoration: 'none',
         }),
-        rule(
-          { part: { disabled: true } },
-          { cursor: 'not-allowed', opacity: hook.itemDisabledOpacity(0.5) },
-        ),
+        rule({ disabled: true }, { cursor: 'not-allowed', opacity: hook.itemDisabledOpacity }),
       ]),
       on('icon', [
         rule({
           '--icon-size': token('size-icon'),
           alignItems: 'center',
           aspectRatio: 1,
-          backgroundColor: hook.itemBackgroundColor(token('color-surface-overlay')),
+          backgroundColor: hook.itemBackgroundColor,
           borderRadius: token('radii-full'),
           boxShadow: token('shadow-md'),
-          color: hook.itemColor(token('color-foreground')),
+          color: hook.itemColor,
           display: 'inline-flex',
-          inlineSize: hook.itemSize(token('size-control-tight')),
+          inlineSize: hook.itemSize,
           justifyContent: 'center',
           pointerEvents: 'auto',
           transition: list(
@@ -77,9 +74,7 @@ export default styles(
         rule(
           { lacks: 'disabled', within: { item: { hover: true } } },
           {
-            backgroundColor: hook.itemHoverBackgroundColor(
-              mix(token('color-foreground'), 6, token('color-surface-overlay')),
-            ),
+            backgroundColor: hook.itemHoverBackgroundColor,
             boxShadow: token('shadow-lg'),
           },
         ),
@@ -101,9 +96,9 @@ export default styles(
           backgroundColor: surface,
           borderRadius: token('radii-sm'),
           boxShadow: token('shadow-sm'),
-          color: hook.labelColor(token('color-foreground')),
+          color: hook.labelColor,
           fontFamily: token('font-sans'),
-          fontSize: hook.labelFontSize(token('text-sm')),
+          fontSize: hook.labelFontSize,
           fontWeight: token('weight-medium'),
           opacity: own.labelOpacity(1),
           padding: [token('space-2xs'), token('space-xs')],
@@ -117,10 +112,10 @@ export default styles(
       ]),
       on('shortcut', [
         rule({
-          color: hook.shortcutColor(token('color-foreground-muted')),
+          color: hook.shortcutColor,
           marginInlineStart: token('space-sm'),
         }),
-        rule({ part: { hidden: true } }, { display: 'none' }),
+        rule({ hidden: true }, { display: 'none' }),
       ]),
     ]
   },

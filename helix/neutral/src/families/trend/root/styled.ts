@@ -1,6 +1,6 @@
 import printEconomy from '../../../fragments/print-economy.js'
 import visuallyHidden from '../../../fragments/visually-hidden.js'
-import { token } from '../../../style.js'
+import { first, native, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -27,17 +27,17 @@ export default styles(
   root,
   {
     prefix: 'trend',
-    hooks: [
-      'better-color',
-      'color',
-      'down-color',
-      'gap',
-      'icon-size',
-      'label-color',
-      'neutral-color',
-      'up-color',
-      'worse-color',
-    ],
+    hooks: ({ own }) => ({
+      betterColor: token('color-success'),
+      color: own.color,
+      downColor: token('color-fall'),
+      gap: token('space-2xs'),
+      iconSize: '1em',
+      labelColor: token('color-foreground-muted'),
+      neutralColor: token('color-foreground-muted'),
+      upColor: token('color-rise'),
+      worseColor: token('color-danger'),
+    }),
     own: ['trend-color'],
     props: [prop('color-by', ['judgment', 'movement'])],
     stylesheet: 'trend/root/trend-root.generated.css',
@@ -49,69 +49,66 @@ export default styles(
         display: 'inline-flex',
         fontSize: token('text-sm'),
         fontWeight: token('weight-medium'),
-        gap: hook.gap(token('space-2xs')),
+        gap: hook.gap,
         lineHeight: token('leading-tight'),
       }),
       /* Gray until told what good means. */
       rule({
-        color: hook.color(own.color),
-        own: { color: hook.neutralColor(token('color-foreground-muted')) },
+        color: first(hook.color, own.color),
+        own: { color: hook.neutralColor },
       }),
       /* The judgment, and the attribute pairs that stand in for it served. */
       rule(
         [
-          { state: 'better' },
+          { better: true },
           { defined: false, good: 'up', movement: 'up' },
           { defined: false, good: 'down', movement: 'down' },
         ],
-        { own: { color: hook.betterColor(token('color-success')) } },
+        { own: { color: hook.betterColor } },
       ),
       rule(
         [
-          { state: 'worse' },
+          { worse: true },
           { defined: false, good: 'up', movement: 'down' },
           { defined: false, good: 'down', movement: 'up' },
         ],
-        { own: { color: hook.worseColor(token('color-danger')) } },
+        { own: { color: hook.worseColor } },
       ),
       /* The movement, for a page whose colors follow its market, after the
          judgment and one attribute heavier, so it wins on a trend that sets
          `good`. */
       rule(
         [
-          { 'color-by': 'movement', state: 'up' },
+          { 'color-by': 'movement', up: true },
           { 'color-by': 'movement', defined: false, movement: 'up' },
         ],
-        { own: { color: hook.upColor(token('color-rise')) } },
+        { own: { color: hook.upColor } },
       ),
       rule(
         [
-          { 'color-by': 'movement', state: 'down' },
+          { 'color-by': 'movement', down: true },
           { 'color-by': 'movement', defined: false, movement: 'down' },
         ],
-        { own: { color: hook.downColor(token('color-fall')) } },
+        { own: { color: hook.downColor } },
       ),
     ]),
     on('icon', [
-      rule({ '--icon-size': hook.iconSize('1em') }),
-      rule(
-        { platform: 'native' },
-        { blockSize: hook.iconSize('1em'), flex: '0 0 auto', inlineSize: hook.iconSize('1em') },
-      ),
+      rule({ '--icon-size': hook.iconSize }),
+      native([rule({ blockSize: hook.iconSize, flex: '0 0 auto', inlineSize: hook.iconSize })]),
     ]),
     /* A glyph of the page's own takes the arrow's size and its color. */
     on({ region: ['icon', 'up-icon', 'down-icon', 'neutral-icon'], slotted: '*' }, [
       rule({
-        '--icon-size': hook.iconSize('1em'),
-        blockSize: hook.iconSize('1em'),
-        inlineSize: hook.iconSize('1em'),
+        '--icon-size': hook.iconSize,
+        blockSize: hook.iconSize,
+        inlineSize: hook.iconSize,
       }),
     ]),
     /* Out of sight and still read. */
     on('direction', [rule([visuallyHidden])]),
     on({ region: 'label' }, [
       rule({
-        color: hook.labelColor(token('color-foreground-muted')),
+        color: hook.labelColor,
         fontWeight: token('weight-regular'),
       }),
     ]),

@@ -1,4 +1,4 @@
-import { fn, list, measured, token, web } from '../../../style.js'
+import { fn, list, measured, native, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -22,18 +22,18 @@ export default styles(
   root,
   {
     prefix: 'tooltip',
-    hooks: [
-      'arrow-size',
-      'backdrop',
-      'background-color',
-      'border-color',
-      'color',
-      'font-size',
-      'gap',
-      'max-inline-size',
-      'padding',
-      'radius',
-    ],
+    hooks: {
+      arrowSize: '0.5rem',
+      backdrop: null,
+      backgroundColor: null,
+      borderColor: token('color-border'),
+      color: null,
+      fontSize: token('text-xs'),
+      gap: token('space-2xs'),
+      maxInlineSize: '16rem',
+      padding: [token('space-2xs'), token('space-xs')],
+      radius: token('radii-sm'),
+    },
     props: [prop('material', ['frosted', 'glass'])],
     stylesheet: 'tooltip/root/tooltip-root.generated.css',
   },
@@ -44,26 +44,26 @@ export default styles(
       /* No box of its own: the trigger is passed in and the bubble is in the top layer. */
       on('host', [rule({ display: 'contents' }), rule({ print: true }, { display: 'none' })]),
       /* The trigger's box on a phone, as wide as the trigger, which the bubble is placed against. */
-      on('trigger', [rule({ platform: 'native' }, { inlineSize: 'fit-content' })]),
+      on('trigger', [native([rule({ inlineSize: 'fit-content' })])]),
       on('surface', [
         rule({
           overflow: 'visible',
           alignItems: 'center',
           display: 'flex',
-          gap: hook.gap(token('space-2xs')),
+          gap: hook.gap,
           backgroundColor: ground,
           border: 'none',
-          borderRadius: hook.radius(token('radii-sm')),
+          borderRadius: hook.radius,
           color: hook.color(token('color-foreground-inverse')),
           fontFamily: token('font-sans'),
-          fontSize: hook.fontSize(token('text-xs')),
+          fontSize: hook.fontSize,
           fontWeight: token('weight-regular'),
           inlineSize: web('max-content'),
           lineHeight: token('leading-tight'),
           margin: token('space-none'),
-          maxInlineSize: hook.maxInlineSize('16rem'),
+          maxInlineSize: hook.maxInlineSize,
           opacity: 0,
-          padding: hook.padding([token('space-2xs'), token('space-xs')]),
+          padding: hook.padding,
           position: web('fixed'),
           scale: 0,
           transition: list(
@@ -79,8 +79,8 @@ export default styles(
       on('arrow', [
         rule({
           backgroundColor: ground,
-          blockSize: hook.arrowSize('0.5rem'),
-          inlineSize: hook.arrowSize('0.5rem'),
+          blockSize: hook.arrowSize,
+          inlineSize: hook.arrowSize,
           position: 'absolute',
           rotate: '45deg',
         }),
@@ -103,7 +103,7 @@ export default styles(
       ),
       on('surface', [
         rule([{ material: 'frosted' }, { material: 'glass' }], {
-          border: [token('border-thin'), 'solid', hook.borderColor(token('color-border'))],
+          border: [token('border-thin'), 'solid', hook.borderColor],
           color: hook.color(token('color-foreground')),
         }),
         /* It grows out of its own point, wherever the point landed. */
@@ -127,16 +127,13 @@ export default styles(
       /* A closed tooltip is not drawn, as the UA's sheet has it, which the
          rules above outrank. */
       on({ part: 'surface', selector: '[part~="surface"]:not(:popover-open)' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
+        web([rule({ display: 'none' })]),
       ]),
       /* With motion reduced it simply appears. */
       on('surface', [
         rule({ reducedMotion: true }, { scale: 1, transition: 'none' }),
         rule({ part: { 'data-placed': true }, reducedMotion: true }, { scale: 1 }),
-        rule(
-          { platform: 'web', supports: 'not (overlay: auto)' },
-          { transitionBehavior: 'normal' },
-        ),
+        web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
     ]
   },
