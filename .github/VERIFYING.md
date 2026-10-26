@@ -153,29 +153,65 @@ depends on. The shards and `floors` restore `warm`'s build and ask their
 question on top of it. The remaining `-- --check` runs depend on nothing, so
 the flag in their key costs nothing.
 
-`tests` is the JavaScript specs. The Rust is two jobs, and the line between them
-is whether a step reads what `turbo run build` wrote.
+`tests` is the JavaScript specs. The Rust jobs split on whether a step reads
+what `turbo run build` wrote.
 
-**`rust` waits for nothing**, because cargo does not read the workspace build:
-it installs the toolchain, restores its cache and runs clippy and the Rust tests
-from the first second of the run. It was one job behind `warm`, which put the
-toolchain install and the compile behind a build none of it reads. Measured on
-run 35041878434, `warm` ended at 155 seconds and the Rust job at 262.
+**`rust` and `clippy` wait for nothing**, because cargo does not read the
+workspace build. Each installs the toolchain, restores its own Cargo cache and
+compiles from the first seconds of the run.
 
-**`cli` is the checks that run a binary over the built tree**, `check:cli`,
-the seed tokens, the prose and the spec rules. It starts with the run and
-compiles first, since cargo reads none of the build, and then restores what
-`warm` wrote, which `warm` has finished by then. Behind `warm` the compile ended
-the run. The two jobs compile the same workspace twice
-and each keeps a cache of its own, which is what leaving `rust-cache`'s key
-alone gives: clippy writes metadata where `cargo build` writes a binary, so one
-shared entry would be whichever job saved first and a recompile in the other.
-Handing the binary from one job to the other as an artifact would save the
-second compile and make every check that runs a rule wait on clippy, which is
-the thing this split just took off the critical path.
+- `rust` runs the tests with cargo-nextest, which runs the test binaries side
+  by side, and the doctests with `cargo test --doc`, since nextest runs none.
+  Together the two run what `rs:test` runs: 812 tests, 2 of them ignored,
+  and 30 doctests, the same names in both lists, on October 25, 2026.
+- `clippy` runs `rs:check`.
 
-Both install the floor `Cargo.toml` declares rather than stable, so
-`rust-version` is a number something compiles against rather than a promise.
+**`cli` is the checks that run a binary over the built tree**: `check:cli`,
+the seed tokens, the prose and the spec rules. It compiles from the start of
+the run and then waits for `warm` to finish before its own build. Turbo
+restores a task only once `warm` has saved it, so a build started earlier
+rebuilt what `warm` was still writing, on this job's two cores: 126 seconds on
+run 38851933010, where the same step took 8 on run 38675337572 with `warm`
+done first. A step asks the API for `warm`'s state, because a `needs` would put
+the compile behind `warm` again.
+
+**Each job keeps a Cargo cache of its own, because each builds something
+different.** Clippy writes metadata where `cargo build` writes a binary, and
+`cargo build` and `cargo test` unify features differently: on a laptop on
+October 16, 2026, 257 of the 782 files `rs:build` wrote for dependencies were
+missing from what `rs:test` wrote. One shared entry would be whichever job
+saved first and a recompile in the others. Handing the binary to `cli` as an
+artifact would make every check that runs a rule wait on the job that built it.
+
+**`seed-cargo` writes those entries on `main`.** A push whose tree a pull
+request verified runs none of the Rust jobs, and an entry a pull request saves
+is visible to that pull request alone, so every pull request after a lockfile
+change compiled every dependency from cold: 23 minutes for `rust` on run
+38697333389. `seed-cargo` looks each entry up first, and on a miss runs the
+job's own command under the job's own key, so a change to one of those jobs'
+caches is a change to its matrix too.
+
+**A compile that stops short keeps what it compiled.** `rust-cache` saves only
+when a job passes, so a cold compile that ran out of time kept nothing and the
+next run started as cold. A job that fails or is stopped saves its target
+directory, without the binaries it linked, as a `cargo-progress-…` entry, and
+the next run lays the newest one over what `rust-cache` restored. Each run
+starts where the last one stopped, until one passes and `rust-cache` saves the
+whole. `.github/scripts/stop-cargo.sh` stops the compile first, since a step
+that runs out of time leaves cargo running and tar cannot read a directory
+rustc is still writing.
+
+**Line tables only** in `rust` and `cli`. On Linux each binary carries the
+debug info of every dependency it links: the tests filled the runner's disk
+once they linked Wasmtime, and `cli`'s entry was 1,138 MB on run 38851933010
+with full debug info. A panic's backtrace still names its file and line.
+
+**Each limit is a warm run and a margin.** A cold compile is the exception
+that `seed-cargo` and the progress entries end, and a limit sized for one would
+let a hung test hold the gate for half an hour.
+
+Every Rust job installs the floor `Cargo.toml` declares, so `rust-version` is
+a number something compiles against.
 
 ## How many browser jobs
 
@@ -265,8 +301,8 @@ rather than a green one.
 
 `release.yml` does not wait on `verify`, and nothing reads its jobs, so a
 skipped run takes nothing from it. What a skipped run would have left behind is
-the caches a pull request cannot share, which `seed` writes on `main` when they
-are missing.
+the caches a pull request cannot share, which `seed`, `seed-webkit` and
+`seed-cargo` write on `main` when they are missing.
 
 **The examples' diagnostics follow the tree to `main` the same way.** Each
 browser shard keeps its runs as an artifact, and on a push to `main` the
