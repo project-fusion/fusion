@@ -608,6 +608,25 @@ describe('the page showing', () => {
     expect(showing(host)).toEqual(['appearance', 'about'])
   })
 
+  /* A row that opens a page chooses nothing, as the drilldown's `helix-select`
+     says: the move is said by `helix-navigate`, and a row with no page says
+     `helix-select` once its request stands. */
+  test('a row that opens a page sends no helix-select, and a row with none does', async () => {
+    const host = (await stack()) as Paged
+    const heard: string[] = []
+    for (const name of ['helix-select', 'helix-navigate']) {
+      host.addEventListener(name, (event) => {
+        heard.push(`${name} ${(event as CustomEvent<{ value: string }>).detail.value}`)
+      })
+    }
+    await press(host, host.querySelector('[value="appearance"]') as Element)
+    await host.updateComplete
+    host.back()
+    await host.updateComplete
+    await press(host, host.querySelector('[value="about"]') as Element)
+    expect(heard).toEqual(['helix-navigate appearance', 'helix-navigate ', 'helix-select about'])
+  })
+
   test('setting `page` shows that row’s page, and a value no page has shows the top', async () => {
     const host = (await stack()) as Paged
     host.page = 'appearance'
