@@ -100,6 +100,7 @@ export default styles(
       ]),
       /* `hidden` is the web's own attribute and no prop, so it stays written
          out. */
+      /* Written out: `hidden` is the global attribute, which is no prop of the element. */
       on({ part: 'host', selector: ':host([hidden])' }, [web([rule({ display: 'none' })])]),
       /* Each crumb draws the separator before it, and the first draws none. */
       on('separator', [rule(separator), rule({ place: 'first' }, { display: 'none' })]),
@@ -218,9 +219,11 @@ export default styles(
       ]),
       /* `plain`: both halves take the light fill while either is under the
          pointer, and the half under it the full fill over that. */
+      /* Written out: the vocabulary names no part beside another. */
       on({ part: 'link', selector: ':host(:state(end)) [part="link"]:hover ~ slot[name="end"]' }, [
         web([rule({ '--icon-button-background-color': own.breadcrumbsSplitFill('transparent') })]),
       ]),
+      /* Written out: the vocabulary names no part beside another, and no slot in a state. */
       on(
         {
           part: 'link',
@@ -264,6 +267,7 @@ export default styles(
       ]),
       /* A slot holds no interaction a condition names, so the trigger half's
          stays written out. */
+      /* Written out: a condition reads no interaction of a slot. */
       on({ part: 'host', selector: ':host(:state(end)) slot[name="end"]:focus-within' }, [
         web([rule({ position: 'relative', zIndex: token('layer-raised') })]),
       ]),

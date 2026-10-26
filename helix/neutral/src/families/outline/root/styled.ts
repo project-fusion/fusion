@@ -146,9 +146,11 @@ export default styles(
         ),
       ]),
       /* The links passed in on the web. */
+      /* Written out: a rule on a link passed in reads no attribute and no interaction of the link. */
       on({ part: 'nav', selector: '::slotted(a)' }, [
         web([rule({ ...link, marginInlineStart: hook.rail(token('border-thick')) })]),
       ]),
+      /* Written out: a rule on a link passed in reads no attribute and no interaction of the link. */
       on({ part: 'nav', selector: '::slotted(a):hover' }, [
         web([
           rule({
@@ -158,11 +160,17 @@ export default styles(
           }),
         ]),
       ]),
+      /* Written out: a rule on a link passed in reads no attribute and no interaction of the link. */
       on({ part: 'nav', selector: '::slotted(a[aria-current])' }, [web([rule(current)])]),
+      /* Written out: a rule on a link passed in reads no attribute and no interaction of the link. */
       on({ part: 'nav', selector: '::slotted(a[data-level="2"])' }, [web([rule(level2)])]),
+      /* Written out: a rule on a link passed in reads no attribute and no interaction of the link. */
       on({ part: 'nav', selector: '::slotted(a[data-level="3"])' }, [web([rule(level3)])]),
+      /* Written out: a rule on a link passed in reads no attribute and no interaction of the link. */
       on({ part: 'nav', selector: '::slotted(a[data-level="4"])' }, [web([rule(level4)])]),
+      /* Written out: a rule on a link passed in reads no attribute and no interaction of the link. */
       on({ part: 'nav', selector: '::slotted(a[data-level="5"])' }, [web([rule(level5)])]),
+      /* Written out: a rule on a link passed in reads no attribute and no interaction of the link. */
       on({ part: 'nav', selector: '::slotted(a[data-level="6"])' }, [web([rule(level6)])]),
       /* The links a phone draws, with the same values. */
       on('link', [

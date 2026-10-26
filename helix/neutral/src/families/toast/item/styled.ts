@@ -159,6 +159,7 @@ export default styles(
         ]),
       ]),
       /* Hidden and still laid out while it leaves. A waiting message takes no box. */
+      /* Written out: the vocabulary names no value an attribute does not hold beside a state. */
       on(
         {
           part: 'host',

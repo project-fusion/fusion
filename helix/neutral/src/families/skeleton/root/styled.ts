@@ -77,6 +77,7 @@ export default styles(
        reads as none, is the single line above. The web's selector keeps the
        shape before the count, and a phone reads the paragraph the element
        works out. */
+    /* Written out: a prop's values are refused as one `:not()`, and this writes one for each. */
     on(
       { part: 'host', selector: ':host([shape="text"][lines]:not([lines="1"]):not([lines="0"]))' },
       [web([rule({ blockSize: 'auto' })])],
@@ -178,6 +179,7 @@ export default styles(
       rule({ loading: false, wrapping: true }, { display: 'none' }),
     ]),
     keyframes('helix-skeleton-pulse', { '50%': { opacity: 0.4 } }),
+    /* Written out: the vocabulary names no `:empty`. */
     on({ part: 'host', selector: ':host(:not(:defined):not(:empty))' }, [
       web([
         rule({
@@ -192,15 +194,19 @@ export default styles(
       rule({ wrapping: true }, { display: 'block' }),
       native([rule({ loading: true, wrapping: true }, { visibility: 'hidden' })]),
     ]),
+    /* Written out: the vocabulary names no `:empty`. */
     on({ part: 'content', selector: ':host(:not(:defined):not(:empty)) [part="content"]' }, [
       web([rule({ display: 'block' })]),
     ]),
+    /* Written out: the vocabulary names no `:empty`. */
     on({ part: 'skeleton', selector: ':host(:not(:defined):not(:empty)) [part="skeleton"]' }, [
       web([rule({ blockSize: 'auto', inset: 0, position: 'absolute' })]),
     ]),
+    /* Written out: the vocabulary names no `:empty`. */
     on({ part: 'lines', selector: ':host(:not(:defined):not(:empty)) [part="lines"]' }, [
       web([rule({ blockSize: 'auto', inset: 0, position: 'absolute' })]),
     ]),
+    /* Written out: the vocabulary names no `:empty`. */
     on(
       {
         part: 'skeleton',
@@ -208,6 +214,7 @@ export default styles(
       },
       [web([rule({ display: 'none' })])],
     ),
+    /* Written out: the vocabulary names no `:empty`. */
     on(
       {
         part: 'lines',
@@ -220,6 +227,7 @@ export default styles(
     on({ part: 'content', selector: ':host([loading]:state(wrapping)) [part="content"]' }, [
       web([rule({ visibility: 'hidden' })]),
     ]),
+    /* Written out: the vocabulary names no `:empty`. */
     on(
       { part: 'content', selector: ':host([loading]:not(:defined):not(:empty)) [part="content"]' },
       [web([rule({ visibility: 'hidden' })])],

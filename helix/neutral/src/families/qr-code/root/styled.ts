@@ -100,12 +100,10 @@ export default styles(
         rule({ '--icon-size': product(own.qrSize, 0.15) }),
       ]),
     ]),
-    on({ part: 'logo', selector: ':host(:dir(rtl)) [part="logo"]' }, [
-      web([rule({ translate: '50% -50%' })]),
-    ]),
+    on('logo', [web([rule({ dir: 'rtl' }, { translate: '50% -50%' })])]),
     on({ region: 'logo', slotted: '*' }, [
       rule({ blockSize: '100%', inlineSize: '100%', objectFit: 'contain' }),
     ]),
-    on({ part: 'logo', selector: '[part="logo"][hidden]' }, [web([rule({ display: 'none' })])]),
+    on('logo', [web([rule({ part: { hidden: true } }, { display: 'none' })])]),
   ],
 )

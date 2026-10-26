@@ -56,6 +56,7 @@ export default styles(
            keep clear of. */
         rule({ child: 'earlier' }, { own: { avatarGroupClear: 0.25 } }),
       ]),
+      /* Written out: one rule for each value of a prop, each on the children past it. */
       on(
         {
           part: 'host',

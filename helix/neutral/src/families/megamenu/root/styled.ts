@@ -281,6 +281,7 @@ export default styles(
         web([rule({ supports: 'not (overlay: auto)' }, { transitionBehavior: 'normal' })]),
       ]),
       /* Every rule giving the panel a display overrules the UA's own hide. */
+      /* Written out: `:host` before the part outranks the part's other rules, which `part: { hidden }` would tie. */
       on({ part: 'surface', selector: ':host [part="surface"][hidden]' }, [
         web([rule({ display: 'none' })]),
       ]),

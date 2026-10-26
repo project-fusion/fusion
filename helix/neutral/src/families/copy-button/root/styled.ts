@@ -80,6 +80,7 @@ export default styles(
         web([rule({ display: 'block', visibility: 'hidden' })]),
       ]),
       /* A slot is `display: contents`, which `[hidden]` in the UA sheet does not beat. */
+      /* Written out: a condition reads no attribute of a slot. */
       on({ part: 'button', selector: 'slot[hidden]' }, [web([rule({ display: 'none' })])]),
       /* The confirmation is the one moment this control is loud, under the pointer too. */
       on('button', [

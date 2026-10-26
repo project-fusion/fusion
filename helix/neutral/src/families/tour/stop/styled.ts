@@ -85,6 +85,7 @@ export default styles(
         ]),
       ]),
       /* A panel that is not shown draws nothing, which the rules above outrank. */
+      /* Written out: `:host` before the part outranks the part's other rules, which `part: { hidden }` would tie. */
       on({ part: 'surface', selector: ':host [part="surface"][hidden]' }, [
         web([rule({ display: 'none' })]),
       ]),

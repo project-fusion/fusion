@@ -99,9 +99,8 @@ export default styles(
         ),
       ]),
       /* Closed, by the server's `hidden` and by the popover's own closed state. */
-      on({ part: 'surface', selector: '[part="surface"][hidden]' }, [
-        rule({ platform: 'web' }, { display: 'none' }),
-      ]),
+      on('surface', [rule({ part: { hidden: true }, platform: 'web' }, { display: 'none' })]),
+      /* Written out: the vocabulary names no `:popover-open`. */
       on({ part: 'surface', selector: '[part="surface"]:not(:popover-open)' }, [
         rule({ platform: 'web' }, { display: 'none' }),
       ]),
@@ -273,6 +272,7 @@ export default styles(
         rule({ marginBlock: token('space-2xs') }),
       ]),
       /* What is not a row leaves with the top page. */
+      /* Written out: a rule on what a region holds reads no state of the part around it. */
       on(
         {
           part: 'surface',

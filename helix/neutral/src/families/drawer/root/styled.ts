@@ -130,6 +130,7 @@ export default styles(
       /* A closed drawer is not drawn, as the UA's sheet has it, which the
          `display` above takes away. The `display` transition holds it on
          screen until the slide out has finished. */
+      /* Written out: the vocabulary names no dialog's own `open` attribute. */
       on({ part: 'panel', selector: '[part="panel"]:not([open])' }, [
         web([rule({ display: 'none' })]),
       ]),
