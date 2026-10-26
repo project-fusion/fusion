@@ -85,13 +85,13 @@ export default styles(
       on('button', [
         rule({ part: { 'data-copied': true } }, { color: success }),
         rule(
-          { within: { host: { disabled: false } }, hover: true, part: { 'data-copied': true } },
+          { formDisabled: false, hover: true, part: { 'data-copied': true } },
           { color: success },
         ),
         rule(
           [
             { part: { 'data-failed': true } },
-            { within: { host: { disabled: false } }, hover: true, part: { 'data-failed': true } },
+            { formDisabled: false, hover: true, part: { 'data-failed': true } },
           ],
           { color: danger },
         ),

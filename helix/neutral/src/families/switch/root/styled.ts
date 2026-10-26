@@ -52,7 +52,7 @@ export default styles(
         },
       }),
       rule({ display: 'inline-flex', flexDirection: 'column', gap: token('space-2xs') }),
-      rule({ within: { host: { disabled: true } } }, { opacity: 0.5 }),
+      rule({ formDisabled: true }, { opacity: 0.5 }),
     ]),
     on('field', [
       rule({
@@ -62,7 +62,7 @@ export default styles(
         gap: token('space-xs'),
       }),
       /* `:disabled` matches a disabled fieldset around the switch as well. */
-      web([rule({ within: { host: { disabled: true } } }, { cursor: 'default' })]),
+      web([rule({ formDisabled: true }, { cursor: 'default' })]),
     ]),
     /* The groove. One cell, so the input lies over the whole of it. */
     on('track', [

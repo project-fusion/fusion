@@ -67,7 +67,7 @@ export default styles(
         },
       }),
       rule({ display: 'inline-flex', flexDirection: 'column', gap: token('space-2xs') }),
-      rule({ within: { host: { disabled: true } } }, { opacity: 0.5 }),
+      rule({ formDisabled: true }, { opacity: 0.5 }),
       /* A card is the same checkbox in a bounded surface. */
       rule(card, { display: 'block' }),
       /* A tick that is a fill must print, or the box prints empty. */
@@ -81,7 +81,7 @@ export default styles(
         display: 'inline-flex',
         gap: token('space-xs'),
       }),
-      web([rule({ within: { host: { disabled: true } } }, { cursor: 'default' })]),
+      web([rule({ formDisabled: true }, { cursor: 'default' })]),
       rule(card, {
         alignItems: 'start',
         backgroundColor: hook.cardBackgroundColor,
@@ -96,7 +96,7 @@ export default styles(
       /* The ground carries it and the edge goes, transparent so the box keeps its size. */
       rule({ separation: 'filled' }, { borderColor: 'transparent' }),
       rule(
-        { within: { host: { disabled: false } }, hover: true, ...card },
+        { formDisabled: false, hover: true, ...card },
         { borderColor: token('color-foreground-muted') },
       ),
       /* Chosen, as a chosen radio card is: a ring drawn outside the edge. */
@@ -144,7 +144,7 @@ export default styles(
       }),
       /* Monotone under a pointer, which would otherwise say "recommended". */
       rule(
-        { within: { host: { disabled: false }, field: { hover: true } } },
+        { formDisabled: false, within: { field: { hover: true } } },
         { borderColor: hook.borderColor(token('color-foreground-muted')) },
       ),
       /* Being ticked is an answer, which takes no color. */

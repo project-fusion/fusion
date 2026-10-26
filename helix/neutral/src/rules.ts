@@ -51,6 +51,8 @@ export type Place = 'earlier' | 'even' | 'first' | 'last' | 'later' | 'odd' | 'o
  * - `state` names a custom state, `:state(open)`; an array, every one of them;
  *   or an object, each state that must hold and each that must not.
  * - `disabled`, `:disabled` or `:not(:disabled)`, and `dir`, `:dir(rtl)`.
+ * - `formDisabled`, the host's `:disabled`, which a disabled fieldset around
+ *   it sets too, on the host and on a part.
  * - `hover`, `focusVisible`, `focusWithin` and `active`, an interaction that
  *   holds or does not; `interaction`, any one of several. On the host they
  *   are the host's, `:host(:focus-within)`; on a part, the part's; on a rule
@@ -127,6 +129,12 @@ export interface When {
   readonly focusWithin?: boolean
   readonly filled?: string | readonly string[] | Readonly<Record<string, boolean>>
   readonly forcedColors?: boolean
+  /**
+   * The host is disabled as a form control is, `:host(:disabled)`: by its
+   * own `disabled`, or by a disabled fieldset around it. On a part, the
+   * host's, `:host(:disabled) [part="x"]`.
+   */
+  readonly formDisabled?: boolean
   /** An attribute present, or each of several. */
   readonly has?: string | readonly string[]
   readonly holds?: Holds
