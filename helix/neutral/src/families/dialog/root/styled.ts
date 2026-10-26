@@ -137,7 +137,7 @@ export default styles(
           translate: [0, rise],
         }),
         rule({ open: true }, { opacity: 1, translate: [0, 0] }),
-        rule({ entering: true, open: true }, { opacity: 0, translate: [0, rise] }),
+        rule({ startingStyle: true, open: true }, { opacity: 0, translate: [0, rise] }),
         /* A sheet below a phone's width, pinned to the window's bottom edge. */
         rule(
           { window: { below: '30rem' } },
@@ -157,7 +157,7 @@ export default styles(
           },
         ),
         rule(
-          { entering: true, open: true, window: { below: '30rem' } },
+          { startingStyle: true, open: true, window: { below: '30rem' } },
           { translate: [0, '100%'] },
         ),
         /* Saying no, by moving. */
@@ -179,7 +179,7 @@ export default styles(
           ),
         }),
         rule({ open: true }, { opacity: 1 }),
-        rule({ entering: true, open: true }, { opacity: 0 }),
+        rule({ startingStyle: true, open: true }, { opacity: 0 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
         /* Where `overlay` cannot be transitioned, as in WebKit, a closing
            panel leaves the top layer at once while `display` holds it for the
