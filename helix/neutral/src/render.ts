@@ -165,8 +165,8 @@ export interface Render<Props, Events, States extends readonly string[], Derived
   readonly countdown: Computes<'paused'>
   /** Whether a delay is still running. */
   readonly delay: Computes<'pending'>
-  /** Whether a notice is held back past the stack's `maxVisible`. */
-  readonly notice: Computes<'held'>
+  /** Whether a notice is deferred past the stack's `maxVisible`. */
+  readonly notice: Computes<'deferred'>
   /** Whether a stack of notices shows one. */
   readonly notices: Computes<'showing'>
   /** Whether the element waits its turn in its queue. */
@@ -603,26 +603,4 @@ export const Path = (_: Shape & { readonly d: string | Read }): Drawn => node()
 /** A circle inside a vector, its geometry its style table's where it gives none. */
 export const Circle = (
   _: Shape & { readonly cx?: Given; readonly cy?: Given; readonly r?: Given },
-): Drawn => node()
-
-/** An ellipse inside a vector. */
-export const Ellipse = (
-  _: Shape & { readonly cx: Given; readonly cy: Given; readonly rx: Given; readonly ry: Given },
-): Drawn => node()
-
-/** A line inside a vector. */
-export const Line = (
-  _: Shape & { readonly x1: Given; readonly x2: Given; readonly y1: Given; readonly y2: Given },
-): Drawn => node()
-
-/** A rectangle inside a vector. */
-export const Rect = (
-  _: Shape & {
-    readonly height: Given
-    readonly rx?: Given
-    readonly ry?: Given
-    readonly width: Given
-    readonly x?: Given
-    readonly y?: Given
-  },
 ): Drawn => node()

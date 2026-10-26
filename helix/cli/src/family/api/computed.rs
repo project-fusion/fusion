@@ -50,7 +50,7 @@ pub fn reads(fields: &[(String, Lit)]) -> Result<Vec<(String, String)>, String> 
             }
             "countdown" => push("countdown.paused", &countdown::countdown(value)?.paused),
             "delay" => push("delay.pending", &delay::delay(value)?.waiting),
-            "notice" => push("notice.held", &notices::notice(value)?.waiting),
+            "notice" => push("notice.deferred", &notices::notice(value)?.waiting),
             "notices" => push("notices.showing", &notices::notices(value)?.showing),
             "queue" => push("queue.queued", &countdown::queue(value)?.waiting),
             "sections" => push("sections.list", &sections::sections(value)?.list),
