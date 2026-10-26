@@ -43,7 +43,7 @@ export default styles(
     /* Where the chevron stands, how it turns, and its color under the pointer. */
     const placed = [
       rule({ chevronPlacement: { not: 'start' } }, { marginInlineStart: 'auto' }),
-      rule({ state: 'open' }, { transform: 'scaleY(-1)' }),
+      rule({ open: true }, { transform: 'scaleY(-1)' }),
       rule({ within: { trigger: { hover: true } } }, { color: hook.chevronHoverColor }),
     ]
     return [

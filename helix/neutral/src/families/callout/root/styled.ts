@@ -94,14 +94,14 @@ export default styles(
           },
         ),
         rule(
-          { state: 'entering' },
+          { entering: true },
           { transition: ['opacity', token('duration-normal'), token('easing-decelerate')] },
         ),
-        rule({ startingStyle: true, state: 'entering' }, { opacity: 0 }),
+        rule({ startingStyle: true, entering: true }, { opacity: 0 }),
         rule(
           [
             { reducedMotion: true, exiting: true },
-            { reducedMotion: true, state: 'entering' },
+            { reducedMotion: true, entering: true },
           ],
           { transition: 'none' },
         ),

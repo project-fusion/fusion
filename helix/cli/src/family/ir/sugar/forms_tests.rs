@@ -335,9 +335,26 @@ fn a_name_alone_resolves_to_the_parts_attribute_a_state_or_a_prop() {
         resolved("({ on, rule }) => [on('tab', [rule({ hover: true, disabled: false }, { opacity: 1 })])]"),
         ir(&table("", "({ on, rule }) => [on('tab', [rule({ hover: true, part: { disabled: false } }, { opacity: 1 })])]")),
     );
-    assert_eq!(
-        resolved("({ on, rule }) => [on('tab', [rule([{ selected: true }, { hover: true, selected: false }], { opacity: 1 })])]"),
-        ir(&table("", "({ on, rule }) => [on('tab', [rule([{ state: 'selected' }, { hover: true, state: { selected: false } }], { opacity: 1 })])]")),
+    let states =
+        resolved("({ on, rule }) => [on('tab', [rule([{ selected: true }, { hover: true, selected: false }], { opacity: 1 })])]");
+    assert!(
+        states.contains(r#"{"kind":"state","name":"selected"}"#),
+        "{states}"
+    );
+    assert!(
+        states.contains(r#"{"kind":"not","condition":{"kind":"state","name":"selected"}}"#),
+        "{states}"
+    );
+    let old = refused(
+        &table(
+            "",
+            "({ on, rule }) => [on('tab', [rule({ state: 'selected' }, { opacity: 1 })])]",
+        ),
+        Some(&source),
+    );
+    assert!(
+        old.contains("`state: ...` is written as each state's name alone"),
+        "{old}"
     );
     assert_eq!(
         resolved("({ on, rule }) => [on('host', [rule({ variant: 'a', disabled: true }, { opacity: 1 })])]"),
@@ -388,15 +405,25 @@ fn a_name_that_resolves_to_two_things_or_none_is_refused() {
         )
         .unwrap(),
     );
-    let why = refused(
+    let state = compiled(
         &table(
             "",
             "({ on, rule }) => [on('mark', [rule({ hidden: true }, { opacity: 1 })])]",
         ),
         Some(&both),
-    );
+    )
+    .unwrap();
     assert!(
-        why.contains("`hidden` is an attribute of `mark` and a state: write `part: { hidden: ... }` or `state: { hidden: ... }`"),
-        "{why}"
+        state.contains(r#"{"kind":"state","name":"hidden"}"#),
+        "{state}"
     );
+    let attribute = compiled(
+        &table(
+            "",
+            "({ on, rule }) => [on('mark', [rule({ part: { hidden: true } }, { opacity: 1 })])]",
+        ),
+        Some(&both),
+    )
+    .unwrap();
+    assert!(!attribute.contains(r#""kind":"state""#), "{attribute}");
 }

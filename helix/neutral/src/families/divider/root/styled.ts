@@ -95,7 +95,7 @@ export default styles(
       rule({ backgroundColor: hook.color }),
       /* `flex: 1` and no full width, so the two halves share what the content
          leaves. */
-      rule({ state: { vertical: false } }, { blockSize: own.thickness, flex: '1 1 0' }),
+      rule({ vertical: false }, { blockSize: own.thickness, flex: '1 1 0' }),
       /* One line of text is the least a stretched line is, where its parent
          resolves to no height. */
       rule({ vertical: true }, { flex: '1 1 0', inlineSize: own.thickness, minBlockSize: '1em' }),
