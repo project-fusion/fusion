@@ -8,7 +8,7 @@ export default headless('x', {{
   derived: {{ holdHint: derive('menu-hold-hint'), rows: bind('default') }},
   events: {{ beforeSelect: cancelable(['value']), dismiss: [] }},
   props: {{ dismissLabel: 'Close', disabled: false, loading: false }},
-  stack: stack({{ label: 'page-label' }}),
+  stack: stack({{ back: 'back', label: 'page-label' }}),
   states: ['placed-top', 'settled'],
   render: ({{ {given} }}) => (
 {render}
@@ -20,7 +20,7 @@ export default headless('x', {{
 /// The nodes a render draws, as the builder form writes them.
 fn tree(render: &str) -> Vec<Lit> {
     let read = headless_tsx(&source(
-        "derived, entry, index, props, send, stack, state",
+        "derived, entry, index, props, send, slots, stack, state",
         render,
     ))
     .unwrap_or_else(|why| panic!("{why}"));
@@ -38,7 +38,7 @@ fn tree(render: &str) -> Vec<Lit> {
 
 fn refused(render: &str) -> String {
     headless_tsx(&source(
-        "derived, entry, index, props, send, stack, state",
+        "derived, entry, index, props, send, slots, stack, state",
         render,
     ))
     .unwrap_err()
@@ -478,7 +478,7 @@ fn every_form_outside_the_grammar_is_refused_with_its_line_and_the_form_to_write
 fn render_is_given_only_what_it_reads_by_its_own_name() {
     let unknown = headless_tsx(&source("props, other", "<View part=\"x\" />")).unwrap_err();
     assert!(
-        unknown.contains("`render` is given derived, entry"),
+        unknown.contains("`render` is given copy, countdown, delay, derived, entry"),
         "{unknown}"
     );
     let missing =
@@ -529,4 +529,180 @@ fn a_wrap_with_no_condition_always_wraps_and_a_link_wraps_what_it_links() {
             "{why}"
         );
     }
+}
+
+/// The one attribute object a single `<View>` takes.
+fn attributes_of(render: &str) -> Lit {
+    let [Lit::Call(_, arguments)]: [Lit; 1] = tree(render).try_into().unwrap() else {
+        panic!("one node");
+    };
+    arguments[1].clone()
+}
+
+#[test]
+fn a_test_of_a_value_is_a_pick_by_that_value() {
+    assert_eq!(
+        attributes_of(
+            r#"<View part="x" role={props.dismissLabel === 'a' ? 'b' : props.dismissLabel === 'c' ? 'd' : 'e'} />"#
+        ),
+        object(&[(
+            "role",
+            call(
+                "pick",
+                vec![
+                    text("dismiss-label"),
+                    object(&[("a", text("b")), ("c", text("d"))]),
+                    text("e"),
+                ],
+            ),
+        )])
+    );
+    assert_eq!(
+        attributes_of(r#"<View part="x" role={state.settled === false ? 'img' : ''} />"#),
+        object(&[(
+            "role",
+            call(
+                "pick",
+                vec![text("settled"), object(&[("false", text("img"))]), text("")],
+            ),
+        )])
+    );
+    let other = refused(
+        r#"<View part="x" role={props.loading === 'a' ? 'b' : props.disabled === 'c' ? 'd' : 'e'} />"#,
+    );
+    assert!(other.contains("tests one read"), "{other}");
+}
+
+#[test]
+fn a_feature_value_is_read_by_the_feature_and_its_field() {
+    let read = headless_tsx(
+        "export default headless('x', {
+  stop: stop({ asks: 'a', back: 'b', counted: 'counted', current: 'u', first: 'f', last: 'l', name: 'name', next: 'x', place: 'place', reach: 'r', said: 's', shown: 'h', skip: 'k', target: 't', words: 'words' }),
+  total: total({ holds: 'segmented', into: 'i', of: 'o', prop: 'p' }),
+  render: ({ stop, total }) => (
+    <View part=\"x\" label={stop.name}>
+      {total.holds && <Text part=\"w\">{stop.words.back}</Text>}
+    </View>
+  ),
+})",
+    )
+    .unwrap();
+    let Lit::Call(_, arguments) = read else {
+        panic!("a call");
+    };
+    let Some(Lit::Object(body)) = arguments.get(1) else {
+        panic!("an object");
+    };
+    let (_, render) = body.iter().find(|(key, _)| key == "render").unwrap();
+    assert_eq!(
+        render,
+        &Lit::Array(vec![call(
+            "box",
+            vec![
+                text("x"),
+                object(&[("label", bind("name"))]),
+                Lit::Array(vec![call(
+                    "when",
+                    vec![
+                        text("segmented"),
+                        call(
+                            "text",
+                            vec![text("w"), object(&[("says", bind("back-words"))])]
+                        ),
+                    ]
+                )]),
+            ],
+        )])
+    );
+    let unknown = headless_tsx(
+        "export default headless('x', {
+  total: total({ holds: 'segmented', into: 'i', of: 'o', prop: 'p' }),
+  render: ({ total }) => <View part=\"x\" label={total.into} />,
+})",
+    )
+    .unwrap_err();
+    assert!(
+        unknown.contains("`total.into` names no value the source's `total` computes: total.holds"),
+        "{unknown}"
+    );
+}
+
+#[test]
+fn whether_a_slot_holds_something_is_read_by_a_wrap_and_a_hidden_view() {
+    assert_eq!(
+        tree(
+            r#"<>
+  <Wrap part="row" when={slots.headerActions}><Slot name="header-actions" /></Wrap>
+  <View part="d" hidden={!slots.default}><Slot /></View>
+</>"#
+        ),
+        [
+            call(
+                "wrap",
+                vec![
+                    text("row"),
+                    object(&[("while", bind("header-actions"))]),
+                    Lit::Array(vec![call(
+                        "region",
+                        vec![text("header-actions"), object(&[]), Lit::Array(Vec::new())]
+                    )]),
+                ],
+            ),
+            call(
+                "box",
+                vec![
+                    text("d"),
+                    object(&[("hidden", call("not", vec![text("default")]))]),
+                    Lit::Array(vec![call(
+                        "region",
+                        vec![text("default"), object(&[]), Lit::Array(Vec::new())]
+                    )]),
+                ],
+            ),
+        ]
+    );
+    let elsewhere = refused(r#"<View part="d" label={slots.default} />"#);
+    assert!(
+        elsewhere.contains("`slots.x` is read by a `<Wrap when>` and a `<View hidden>`"),
+        "{elsewhere}"
+    );
+}
+
+#[test]
+fn a_derivation_and_a_custom_property_are_written_in_place() {
+    assert_eq!(
+        tree(
+            r#"<View part="k" label={derive('kbd-label')} style={{ '--meter-at': derived.holdHint, '--meter-span': 2 }}>
+  <Text part="w">{derive('kbd-says')}</Text>
+</View>"#
+        ),
+        [call(
+            "box",
+            vec![
+                text("k"),
+                object(&[
+                    ("label", call("derive", vec![text("kbd-label")])),
+                    ("--meter-at", bind("hold-hint")),
+                    ("--meter-span", Lit::Number(2.0)),
+                ]),
+                Lit::Array(vec![call(
+                    "text",
+                    vec![
+                        text("w"),
+                        object(&[("says", call("derive", vec![text("kbd-says")]))])
+                    ]
+                )]),
+            ],
+        )]
+    );
+    let property = refused(r#"<View part="k" style={{ color: 'red' }} />"#);
+    assert!(
+        property.contains("is not a CSS custom property"),
+        "{property}"
+    );
+    let call_of = refused(r#"<View part="k" label={format('x')} />"#);
+    assert!(
+        call_of.contains("a call the compiler would have to run"),
+        "{call_of}"
+    );
 }

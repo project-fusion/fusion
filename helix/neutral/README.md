@@ -57,8 +57,9 @@ export default headless('tab', {
   attributes, which Biome sorts. The keys around them are in the order they
   are read, with `render` last.
 - A prop is its default, which says its type, or `string()`, `boolean()`,
-  `number()`, `oneOf([...], default)`, with `property()` for one that is no
-  attribute and `web()` for one only the web element has.
+  `number()`, `object()`, `oneOf([...], default)`, and `numberOrString()` and
+  `time()`, which take a default where the prop has one, with `property()`
+  for one that is no attribute and `web()` for one only the web element has.
 - An event is its detail's fields, `cancelable([...])`, or `bare([...])`.
 - The nodes are `View`, `Text`, `Image`, `Pressable`, `Slot`, `Layer`,
   `Announce`, `Repeat`, `Wrap`, `Svg`, and the shapes inside a vector.
@@ -68,11 +69,26 @@ export default headless('tab', {
   only while `x` holds. A `<Wrap href={props.href}>` is the link around what
   it holds.
 - `<View draws="button">` draws another family's element in the part.
-- A render reads `props.x`, `derived.x`, `state.x`, and `stack.x`, each typed
-  from the keys before it. A child is a node, `x && <Node />`, `!x &&
-  <Node />`, or `x ? <A /> : <B />`, and an attribute is a literal, a read,
-  `!` before one, or `x ? 'a' : 'b'`. `helix family` refuses anything else
-  with its line and the form to write it in.
+- A render reads `props.x`, `derived.x`, and `state.x`, each typed from the
+  keys before it, and a value a feature computes by the feature and its
+  field: `stack.label`, `stop.place`, `stop.words.back`, `tour.spot.height`,
+  `copy.told`, `total.holds`. A repeat's copy reads `entry.x`, or
+  `entry['depth-2']` for a field that is no name, and `index`.
+- A child is a node, `x && <Node />`, `!x && <Node />`, or
+  `x ? <A /> : <B />`, and an attribute is a literal, a read, `!` before one,
+  `x ? 'a' : 'b'`, `x === 'v' ? 'a' : x === 'w' ? 'b' : 'c'`, or a core
+  derivation, `derive('kbd-label')`.
+- `slots.x` is whether the slot `x` holds something, which a `<Wrap when>`
+  and a `<View hidden>` read: `<View hidden={!slots.logo}>` is hidden while
+  nothing is passed into `logo`.
+- `style={{ '--meter-fraction': derived.fraction }}` sets a CSS custom
+  property on the part.
+- `helix family` refuses anything else with its line and the form to write
+  it in.
+- `helix family print` prints a source written in the builder form as
+  `headless.tsx`, every comment where it stood, and refuses one whose
+  printed form compiles to anything but what it does, the order of its
+  props and events aside.
 
 A style table over a source written this way reads a condition's name in
 one namespace: `{ hover: true, disabled: false }` is the part's `disabled`
