@@ -10,6 +10,8 @@
  * execute to read.
  */
 
+import type { Rule } from './table.js'
+
 export * from './rules.js'
 
 /**
@@ -171,7 +173,7 @@ export type Declaration = readonly [property: string, value: Value]
  * The web element writes the value, and a native view calls the derivation
  * with the element's props. `helix family` refuses a name with no derivation.
  */
-export const derived = (name: string, fallback?: Value): Tagged =>
+export const derived = (name: string, fallback?: Value): Read =>
   fallback === undefined ? { derived: name } : { derived: name, fallback }
 
 /** `a - b`. */
@@ -199,14 +201,14 @@ export const fn = (name: string, ...values: Value[]): Tagged => ({ arguments: va
  * `hookOf('button', 'radius-end-end', token('radii-sm'))`. A native view reads
  * it from what the element around gives this one.
  */
-export const hookOf = (family: string, name: string, fallback?: Value): Tagged =>
+export const hookOf = (family: string, name: string, fallback?: Value): Read =>
   fallback === undefined ? { hook: name, of: family } : { fallback, hook: name, of: family }
 
 /** Values joined with commas. */
 export const list = (...values: Value[]): Tagged => ({ list: values })
 
 /** A length a script measures and sets, `--<name>`, with its value before then. */
-export const measured = (name: string, fallback?: Value): Tagged =>
+export const measured = (name: string, fallback?: Value): Read =>
   fallback === undefined ? { measured: name } : { fallback, measured: name }
 
 /**
@@ -230,7 +232,7 @@ export const unset = (): Tagged => ({ keyword: 'unset' })
  * `list-rail-inline-size` on its rows, with the value it takes where none is
  * set.
  */
-export const inherited = (name: string, fallback?: Value): Tagged =>
+export const inherited = (name: string, fallback?: Value): Read =>
   fallback === undefined ? { inherited: name } : { fallback, inherited: name }
 
 /**
@@ -297,5 +299,58 @@ export const sum = (...values: Value[]): Tagged => ({ calc: '+', operands: value
 /** A semantic token, `--helix-<name>`. */
 export const token = (name: string): Tagged => ({ token: name })
 
-/** A value only the web output writes, such as a cursor. */
-export const web = (value: Value): Tagged => ({ web: value })
+/**
+ * A value only the web output writes, such as a cursor's `zoom-in`, where
+ * React Native has the property and not the value.
+ *
+ * Given rules in place of a value, it is a group of rules the web's alone:
+ * `web([rule(...), ...])` says `platform: 'web'` of each one, inside an
+ * `on()`. A declaration React Native does not have at all goes in a set's
+ * `web: { cursor: 'pointer' }` block.
+ */
+export function web(rules: readonly Rule[]): Rule
+export function web(value: Value): Tagged
+export function web(value: Value | readonly Rule[]): Rule | Tagged {
+  return { web: value } as Rule | Tagged
+}
+
+/**
+ * A group of rules a phone's alone: `native([rule(...), ...])` says
+ * `platform: 'native'` of each one, inside an `on()`.
+ */
+export const native = (rules: readonly Rule[]): Rule => ({ native: rules }) as unknown as Rule
+
+/** A value that can take a fallback: a hook, a private value, or a value something else sets. */
+export type Read = Extract<
+  Tagged,
+  | { readonly hook: string }
+  | { readonly own: string }
+  | { readonly inherited: string }
+  | { readonly measured: string }
+  | { readonly derived: string }
+>
+
+/**
+ * The first of several reads that is set, and `fallback` where none is:
+ * `first(own.tabHeight, hook.blockSize, token('size-control'))` is the
+ * private value, else the hook, else the token. Every argument but the last
+ * is a read written with no fallback of its own: a hook, a private value,
+ * `hookOf()`, `ownOf()`, `inherited()`, `measured()`, or `derived()`. It is
+ * the chain of fallbacks written inside out, read left to right.
+ */
+export const first = (head: Read, ...rest: readonly [...Read[], Value]): Tagged => {
+  const [next, ...after] = rest
+  const fallback: Value =
+    after.length === 0 ? (next as Value) : first(next as Read, ...(after as [Value]))
+  return { ...head, fallback } as Tagged
+}
+
+/**
+ * Another family's private value, `--_<family>-<name>`, which that family's
+ * root sets on the elements inside it, as a tab set sets how its tabs' close
+ * marks rest: `ownOf('tabs', 'dismiss-rest', 1)`. The `own` list names a
+ * table's own values, and this reads one it does not declare, as `hookOf()`
+ * reads a hook.
+ */
+export const ownOf = (family: string, name: string, fallback?: Value): Read =>
+  fallback === undefined ? { own: `${family}-${name}` } : { fallback, own: `${family}-${name}` }

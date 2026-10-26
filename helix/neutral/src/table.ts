@@ -47,6 +47,16 @@
  *   `own.fill` a private value `own` declares, its name less the family's
  *   prefix in camelCase; another family's keeps its whole name,
  *   `own.fieldControlInlineSize`. `own.fill(fallback)` gives it a fallback.
+ * - `hooks` may be each hook's default by its name in camelCase, `null` for
+ *   one with none, as `({ own }) => ({ radius: first(own.tabRadius, 0) })`,
+ *   and `own` each private value's by its whole name in camelCase. A rule
+ *   reads `hook.radius` with the default, and `hook.radius(x)` with its own.
+ * - A set's `web: { cursor: 'pointer' }` holds declarations a phone does not
+ *   have, and `web([...])` and `native([...])` in a group hold rules one
+ *   platform's alone.
+ * - Over a headless source written with `render`, a name alone in a `when`
+ *   is a prop, a state, or an attribute of the part the rule is on, which
+ *   the compiler resolves from the source.
  * - `include(fragment)` takes in a fragment of rules imported from
  *   `src/fragments`, and `keyframes(name, { to: { rotate: '1turn' } })` is an
  *   animation.
@@ -69,8 +79,9 @@
  */
 
 import type { Properties } from 'csstype'
+import type { Rendered } from './render.js'
 import type { Around, When as Conditions, Family, Holds, Interaction } from './rules.js'
-import type { Tagged, Value } from './style.js'
+import type { Read, Tagged, Value } from './style.js'
 import type { Headless, Prop } from './tree.js'
 
 /** A lost `csstype` import makes `Properties` empty and passes every property: this fails instead. */
@@ -92,7 +103,11 @@ export type OwnKey<Name extends string, Prefix extends string> = Camel<
  * region's `part`, the parts a node is as well through `also`, and the parts
  * of an element a box draws, as its `exports` names them: `select-all-box`.
  */
-export type PartsOf<Tree> = Tree extends readonly unknown[] ? PartOf<Tree[number]> : never
+export type PartsOf<Tree> = Tree extends readonly Rendered[]
+  ? string
+  : Tree extends readonly unknown[]
+    ? PartOf<Tree[number]>
+    : never
 type PartOf<One> = One extends { readonly kind: infer Kind; readonly name: infer Name }
   ? string extends Name
     ? never
@@ -109,7 +124,11 @@ type PartOf<One> = One extends { readonly kind: infer Kind; readonly name: infer
   : never
 
 /** Every part a node is as well, through `also`, as a mark is `mark-dash`. */
-export type AliasesOf<Tree> = Tree extends readonly unknown[] ? AliasOf<Tree[number]> : never
+export type AliasesOf<Tree> = Tree extends readonly Rendered[]
+  ? string
+  : Tree extends readonly unknown[]
+    ? AliasOf<Tree[number]>
+    : never
 type AliasOf<One> = One extends { readonly kind: unknown; readonly name: infer Name }
   ? string extends Name
     ? never
@@ -121,7 +140,11 @@ type AliasOf<One> = One extends { readonly kind: unknown; readonly name: infer N
   : never
 
 /** Every region a tree holds, by its slot's name. */
-export type RegionsOf<Tree> = Tree extends readonly unknown[] ? RegionOf<Tree[number]> : never
+export type RegionsOf<Tree> = Tree extends readonly Rendered[]
+  ? string
+  : Tree extends readonly unknown[]
+    ? RegionOf<Tree[number]>
+    : never
 type RegionOf<One> = One extends { readonly kind: infer Kind; readonly name: infer Name }
   ? string extends Name
     ? never
@@ -158,12 +181,25 @@ export type StatesOf<H extends Source> =
 /** What a `when` may ask of each prop, by its name. */
 type AsksOf<P extends Prop> = { readonly [One in P as One['name']]?: Asks<One['type']> }
 
-/** The conditions a rule applies under: the family's props, its states, and what every rule takes. */
+/** An interaction on the host that a rule on a part may ask for, any of several in an array. */
+type HostAround = Around & {
+  /** The host is disabled, `:host(:disabled)`, as a form's disabled fieldset makes it. */
+  readonly disabled?: boolean
+}
+
+/**
+ * The conditions a rule applies under: the family's props, its states, and what every rule takes.
+ *
+ * Over a headless source written with `render`, a name alone is a prop, a
+ * state, or an attribute of the part the rule is on, which the compiler
+ * resolves from the source: `{ hover: true, disabled: false }`.
+ */
 export type When<Asked, State extends string, Part extends string, Alias extends string> = Omit<
   Common,
   'also' | 'holds' | 'state' | 'within'
 > &
-  Asked & {
+  Asked &
+  (string extends State ? unknown : { readonly [Name in State]?: boolean }) & {
     /** Where the node is the part `name` as well, or is not. */
     readonly also?: Readonly<Partial<Record<Alias, boolean>>>
     readonly holds?: Partial<Record<Part, boolean | Interaction | readonly Interaction[]>> & Holds
@@ -176,7 +212,20 @@ export type When<Asked, State extends string, Part extends string, Alias extends
      * A part the target is drawn inside, with what holds of it, or `host`,
      * for the host's own interaction on a part: `:host(:hover) [part="x"]`.
      */
-    readonly within?: Part | Readonly<Partial<Record<Part | 'host', Around>>>
+    /*
+     * On `host`, `disabled` is the host's own `:disabled`, and an array is any
+     * one of several interactions: `within: { host: ['hover', 'focusWithin'] }`.
+     */
+    readonly within?:
+      | Part
+      | Readonly<
+          Partial<
+            Record<
+              Part | 'host',
+              HostAround | readonly ('active' | 'focusVisible' | 'focusWithin' | 'hover')[]
+            >
+          >
+        >
   }
 
 /** The host, or a part. */
@@ -207,6 +256,8 @@ type Css = { readonly [Key in keyof Properties]?: Value }
 /** A rule's declarations: CSS properties, custom properties, and the private values it sets. */
 export type Set<Own extends string> = Css & {
   readonly own?: { readonly [Key in Own]?: Value }
+  /** Declarations a phone does not have, such as `cursor` and `font`, written where they stand. */
+  readonly web?: Css
 } & { readonly [custom: `--${string}`]: Value }
 
 declare const written: unique symbol
@@ -233,8 +284,35 @@ export interface Declarations {
   readonly [written]: 'declarations'
 }
 
-/** A private value: a value, and with a fallback when called. */
-export type OwnValue = Tagged & ((fallback: Value) => Tagged)
+/** A private value: a value, with the header's default, and with a fallback when called. */
+export type OwnValue = Extract<Read, { readonly own: string }> & ((fallback: Value) => Tagged)
+
+/** A hook: a value, with the header's default, and with a fallback of the site's own when called. */
+export type HookValue = Extract<Read, { readonly hook: string }> & ((fallback?: Value) => Tagged)
+
+/** The defaults a header gives, by name in camelCase, `null` for one with none. */
+type Defaults = Readonly<Record<string, Value | null>>
+
+/**
+ * A table's hooks: their names, or each one's default by its name in
+ * camelCase, given the private values to read.
+ */
+type HooksField<Own extends string> =
+  | readonly string[]
+  | Defaults
+  | ((given: { readonly own: { readonly [Key in Own]: OwnValue } }) => Defaults)
+
+/** The hooks a `hooks` field declares, as the rules read them. */
+type HookKeys<Field> = Field extends readonly (infer Name extends string)[]
+  ? Camel<Name>
+  : Field extends (given: never) => infer Returned
+    ? keyof Returned & string
+    : keyof Field & string
+
+/** The private values an `own` field declares, as the rules read them. */
+type OwnKeys<Field, Prefix extends string> = Field extends readonly (infer Name extends string)[]
+  ? OwnKey<Name, Prefix>
+  : keyof Field & string
 
 /** The values a prop's `when` may ask for, as strings, which `variants` keys. */
 type ValuesOf<Asked, Key extends keyof Asked> = Extract<NonNullable<Asked[Key]>, string>
@@ -254,7 +332,7 @@ export interface Given<
   Alias extends string = never,
 > {
   /** Each hook `hooks` declares, by its name in camelCase. */
-  readonly hook: { readonly [Key in Hook]: (fallback?: Value) => Tagged }
+  readonly hook: { readonly [Key in Hook]: HookValue }
   /** A fragment of rules, which must style only parts this tree draws. */
   readonly include: <Need extends Part | 'host', Props extends keyof Asked & string = never>(
     fragment: Fragment<Need, Props>,
@@ -291,8 +369,12 @@ const given = (named: (name: string) => string): Record<string, unknown> => ({
   hook: new Proxy(
     {},
     {
-      get: (_, key: string) => (fallback?: Value) =>
-        fallback === undefined ? { hook: kebab(key) } : { fallback, hook: kebab(key) },
+      get: (_, key: string) =>
+        Object.assign(
+          (fallback?: Value) =>
+            fallback === undefined ? { hook: kebab(key) } : { fallback, hook: kebab(key) },
+          { hook: kebab(key) },
+        ),
     },
   ),
   include: (fragment: unknown) => ({ include: fragment }),
@@ -315,18 +397,28 @@ const given = (named: (name: string) => string): Record<string, unknown> => ({
 export const styles = <
   const H extends Source,
   const Prefix extends string,
-  const Hooks extends string = never,
-  const Own extends string = never,
+  /* No default: a header's `({ own }) => ({...})` takes its parameter's type from this constraint. */
+  const Hooks extends HooksField<OwnKeys<Own, Prefix>>,
+  const Own extends readonly string[] | Defaults = readonly [],
   const StyledProps extends readonly Prop[] = [],
 >(
   _headless: H,
   declared: {
     /** The hooks' prefix, `--<prefix>-...`, which is not always the element's name. */
     readonly prefix: Prefix
-    readonly hooks?: readonly Hooks[]
+    /**
+     * The hooks, by name, or each one's default by its name in camelCase,
+     * which a rule reads as `hook.color` and overrides at its site as
+     * `hook.color(fallback)`.
+     */
+    readonly hooks?: Hooks
     /** The element drawn under this one, `icon-button`, whose rules a phone lays first. */
     readonly over?: string
-    readonly own?: readonly Own[]
+    /**
+     * The private values, by name, or each one's default by its whole name
+     * in camelCase, which a rule reads as `own.tabJustify`.
+     */
+    readonly own?: Own
     readonly props?: StyledProps
     readonly stylesheet: string
   },
@@ -336,14 +428,15 @@ export const styles = <
       RegionsOf<H['tree']> & string,
       AsksOf<H['props'][number] | StyledProps[number]>,
       StatesOf<H>,
-      Camel<Hooks>,
-      OwnKey<Own, Prefix>,
+      HookKeys<Hooks>,
+      OwnKeys<Own, Prefix>,
       AliasesOf<H['tree']> & string
     >,
   ) => readonly Group[],
 ): Family => {
+  const owned = Array.isArray(declared.own) ? (declared.own as readonly string[]) : []
   const named = (name: string): string =>
-    declared.own?.find((own) => own === name || own === `${declared.prefix}-${name}`) ?? name
+    owned.find((own) => own === name || own === `${declared.prefix}-${name}`) ?? name
   return {
     name: declared.prefix,
     props: declared.props ?? [],
