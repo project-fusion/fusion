@@ -8,7 +8,9 @@ rust-version.workspace = true
 version = "0.0.0-dev"
 
 [features]
-default = ["sqlite"]
+default = ["postgres", "sqlite"]
+# The Postgres store, for a local database or a hosted one by its URL.
+postgres = ["dep:sqlx", "fusion-cortex-core/postgres", "sqlx/postgres"]
 # The SQLite store, and the database it bundles.
 sqlite = ["dep:sqlx", "dep:tokio", "sqlx/sqlite-bundled"]
 

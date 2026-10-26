@@ -1,4 +1,5 @@
-//! Where traces are kept: one trait, an in-memory reference, and `SQLite`.
+//! Where traces are kept: one trait, an in-memory reference, `SQLite`, and
+//! Postgres.
 //!
 //! **A store holds many traces, each named by an id**, such as an agent
 //! session's. A node is appended once and never changed, which is what lets a
@@ -10,7 +11,7 @@
 //! in both.
 //!
 //! [`InMemory`] is the reference, and every backend passes the same
-//! conformance suite. Postgres joins it behind the same trait.
+//! conformance suite. [`open`] picks a backend by its connection string.
 
 use std::{
     collections::{HashMap, HashSet},
@@ -303,6 +304,55 @@ impl Store for InMemory {
         Ok(removed)
     }
 }
+
+// A build with no backend opens nothing, and waits for nothing.
+#[cfg_attr(
+    not(any(feature = "postgres", feature = "sqlite")),
+    allow(clippy::unused_async)
+)]
+/// Opens the store `location` names: a `SQLite` file for `sqlite:` or a
+/// path, a `SQLite` database in memory for `sqlite::memory:`, and Postgres for
+/// `postgres://`. [`fusion_cortex_core::storage`] says how a location is read,
+/// with the setting for a transaction-mode pooler.
+///
+/// ```
+/// # #[tokio::main]
+/// # async fn main() {
+/// // A path, `sqlite:memory.db`, or `postgres://…` opens the same way.
+/// let store = fusion_cortex_trace::store::open("sqlite::memory:").await.unwrap();
+///
+/// assert!(store.traces().await.unwrap().is_empty());
+/// # }
+/// ```
+///
+/// # Errors
+///
+/// [`Error::Storage`] if `location` names no store, this build lacks the
+/// feature for its backend, or the backend fails to open.
+pub async fn open(location: &str) -> Result<Box<dyn Store>> {
+    use fusion_cortex_core::storage::Location;
+    match Location::parse(location)? {
+        #[cfg(feature = "sqlite")]
+        Location::Sqlite(path) => Ok(Box::new(Sqlite::open(path).await?)),
+        #[cfg(feature = "sqlite")]
+        Location::Memory => Ok(Box::new(Sqlite::in_memory().await?)),
+        #[cfg(feature = "postgres")]
+        Location::Postgres(postgres) => Ok(Box::new(Postgres::connect(&postgres).await?)),
+        #[allow(unreachable_patterns)]
+        Location::Postgres(_) => Err(Error::Storage(
+            "this build has no Postgres store: turn on the postgres feature".into(),
+        )),
+        #[allow(unreachable_patterns)]
+        _ => Err(Error::Storage(
+            "this build has no SQLite store: turn on the sqlite feature".into(),
+        )),
+    }
+}
+
+#[cfg(feature = "postgres")]
+mod postgres;
+#[cfg(feature = "postgres")]
+pub use postgres::Postgres;
 
 #[cfg(feature = "sqlite")]
 pub use sqlite::Sqlite;
@@ -901,13 +951,117 @@ mod tests {
 
     #[tokio::test]
     async fn the_in_memory_store_conforms() {
-        conformance::run(&InMemory::new()).await;
+        let store = InMemory::new();
+        conformance::run(&store).await;
+        crate::search::conformance::ranking(&store).await;
     }
 
     #[cfg(feature = "sqlite")]
     #[tokio::test]
     async fn the_sqlite_store_conforms() {
-        conformance::run(&Sqlite::in_memory().await.unwrap()).await;
+        let store = Sqlite::in_memory().await.unwrap();
+        conformance::run(&store).await;
+        crate::search::conformance::ranking(&store).await;
+    }
+
+    #[cfg(feature = "postgres")]
+    #[tokio::test]
+    async fn the_postgres_store_conforms() {
+        fusion_cortex_core::postgres::in_scratch_schema(|location| async move {
+            let store = Postgres::connect(&location).await.unwrap();
+            conformance::run(&store).await;
+            crate::search::conformance::ranking(&store).await;
+        })
+        .await;
+    }
+
+    #[cfg(feature = "postgres")]
+    #[tokio::test]
+    async fn two_postgres_stores_opening_one_new_schema_migrate_it_once() {
+        fusion_cortex_core::postgres::in_scratch_schema(|location| async move {
+            let (first, second) =
+                tokio::join!(Postgres::connect(&location), Postgres::connect(&location));
+            assert!(first.is_ok() && second.is_ok(), "{first:?} {second:?}");
+            let trace = Id::new();
+            let node = Node::new(
+                crate::Detail::Source {
+                    content: "kept".into(),
+                    uri: None,
+                },
+                vec![],
+            );
+            first.unwrap().append(trace, &node).await.unwrap();
+
+            let reopened = open(&location.url).await.unwrap();
+
+            assert!(reopened.load(trace).await.unwrap().get(node.id).is_some());
+        })
+        .await;
+    }
+
+    #[cfg(feature = "postgres")]
+    #[tokio::test]
+    async fn a_nul_is_kept_in_a_postgres_node_and_indexed_as_a_space() {
+        use crate::search::{Query, Search};
+        fusion_cortex_core::postgres::in_scratch_schema(|location| async move {
+            let store = Postgres::connect(&location).await.unwrap();
+            let trace = Id::new();
+            let node = Node::new(
+                crate::Detail::Check {
+                    command: "cat dump".into(),
+                    exit: Some(0),
+                    output: "head\0ocelot".into(),
+                    passed: true,
+                },
+                vec![],
+            );
+            store.append(trace, &node).await.unwrap();
+
+            let page = store
+                .find(&Search {
+                    within: Some(vec![trace]),
+                    ..Search::new(Query::parse("ocelot"))
+                })
+                .await
+                .unwrap();
+
+            let loaded = store.load(trace).await.unwrap();
+            assert!(matches!(
+                &loaded.get(node.id).unwrap().detail,
+                crate::Detail::Check { output, .. } if output == "head\0ocelot"
+            ));
+            assert_eq!(page.found[0].hits[0].snippet.text, "head ocelot");
+        })
+        .await;
+    }
+
+    #[cfg(feature = "sqlite")]
+    #[tokio::test]
+    async fn a_location_picks_the_backend() {
+        let folder = std::env::temp_dir().join(format!("cortex-trace-{}", Id::new()));
+        std::fs::create_dir_all(&folder).unwrap();
+        let path = folder.join("trace.db");
+        let trace = Id::new();
+        let node = Node::new(
+            crate::Detail::Source {
+                content: "kept".into(),
+                uri: None,
+            },
+            vec![],
+        );
+
+        open(&format!("sqlite:{}", path.display()))
+            .await
+            .unwrap()
+            .append(trace, &node)
+            .await
+            .unwrap();
+        let reopened = open(path.to_str().unwrap()).await.unwrap();
+
+        assert!(reopened.load(trace).await.unwrap().get(node.id).is_some());
+        assert!(open("mysql://localhost/cortex").await.is_err());
+        drop(reopened);
+        std::fs::remove_dir_all(&folder).unwrap();
     }
 
     #[cfg(feature = "sqlite")]

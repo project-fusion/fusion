@@ -14,7 +14,7 @@ spine, not a module.
 | **Engram** | `fusion-cortex-engram` | Memory: episodic, semantic, consolidation, and scopes; later procedural |
 | **Trace** | `fusion-cortex-trace` | Provenance: `why()`, replay, cascading deletion |
 | **Recall** | `fusion-cortex-recall` | Context assembly: pins, compaction, drop records |
-| Core | `fusion-cortex-core` | Ids, provider abstraction, shared errors |
+| Core | `fusion-cortex-core` | Ids, provider abstraction, shared errors, storage locations, and the Postgres connection and migrations the stores share |
 | Providers | `fusion-cortex-provider` | Model clients, one per API and each a feature, local first |
 | Extraction | `fusion-cortex-extract` | Typed extraction: a reply checked against a schema, one retry, and its trace |
 
@@ -58,12 +58,47 @@ spine, not a module.
   rests on an episode some of its readers may not read.
 - **Two storage backends are required**, SQLite and Postgres, held in lockstep by
   a shared conformance suite. Trace has its trait, `store::Store`, with
-  `InMemory` as the reference and `Sqlite` beside it, both run through
-  `store::conformance`; Postgres joins the same suite. Engram has the same
-  shape: its `store::Store`, with `InMemory` holding the reference `Memory`, and
-  `Sqlite`, both run through its own `store::conformance`. An abstraction with
-  one implementation is a guess, and SQLite assumptions leak into the domain
-  model otherwise.
+  `InMemory` as the reference and `Sqlite` and `Postgres` beside it, all run
+  through `store::conformance`. Engram has the same shape: its `store::Store`,
+  with `InMemory` holding the reference `Memory`, and `Sqlite` and `Postgres`,
+  all run through its own `store::conformance`. An abstraction with one
+  implementation is a guess, and SQLite assumptions leak into the domain model
+  otherwise. Each backend is a feature, `sqlite` and `postgres`, and both are
+  default so `cargo clippy` and `cargo test` build them.
+- **A connection string picks the backend.** `store::open` in each crate reads
+  it with `fusion_cortex_core::storage::Location`: `sqlite:` or a path is
+  SQLite, and `postgres://` is Postgres. A hosted Postgres is a URL like any
+  other, and no store names a vendor. The one exception is port 6543, where
+  Supabase's transaction pooler listens, which turns prepared statements off as
+  `pooler=transaction` does. An error never repeats the string, which can hold
+  a password.
+- **The Postgres suites run when `CORTEX_POSTGRES_URL` names a database.**
+  `fusion_cortex_core::postgres::in_scratch_schema` gives each run a schema of
+  its own and drops it after, even when the suite panics. Without the variable
+  the Postgres tests pass without running and print a note, so
+  `cargo test --workspace` needs no database.
+- **A Postgres schema is a list of steps, recorded and idempotent.**
+  `Database::migrate` runs the steps past the version `cortex_migrations`
+  records for the store, in one transaction under an advisory lock, and each
+  step's DDL says `IF NOT EXISTS`. A released step is never edited, and a
+  change to the schema is a new step at the end. SQLite keeps its own path:
+  Trace's search index is versioned in `user_version`, and Engram's columns are
+  added by `pragma_table_info`, because both stores may share one file.
+- **Behind a transaction-mode pooler, every statement is unnamed and inside a
+  transaction.** A pooler gives each transaction any free server connection,
+  so a statement prepared by name on one is missing on the next. A Postgres
+  store builds each statement with `Database::query` or `Database::scalar`,
+  which prepare it by name only when `Database::prepared` says so, and runs it
+  in a transaction, reads included. A write that reads first takes an advisory
+  lock, as SQLite's `BEGIN IMMEDIATE` takes the write lock.
+- **The search suite holds which entries match, and each backend ranks.**
+  Every backend finds a word as characters anywhere, in any case: SQLite with
+  FTS5 trigrams, and Postgres with a `tsvector` whose lexemes are trigrams Rust
+  folds, under a GIN index, and a substring check of the folded text. Postgres's
+  stemmed text search would miss a word inside an identifier, which is why the
+  lexemes are trigrams. The order of traces is each backend's measure,
+  `bm25` or `ts_rank`; `search::conformance::ranking` holds the reference's
+  order, and a backend whose measure keeps it runs that beside the suite.
 - **A trace is appended to and never edited.** A node is written once, which is
   what lets a trace serve as an agent session's event log: a restarted loop loads
   the trace and continues from its last node.
@@ -101,7 +136,9 @@ spine, not a module.
   vectors is swapping a scorer rather than migrating a schema. `Fact` carries
   the nullable `embedding`, and `SQLite` stores it as a nullable column;
   Recall's `Scorer` is the strategy, and `Overlap` is the one it ships.
-  `pgvector` is an extension, not a migration.
+  Postgres stores the embedding as a nullable `real[]`, which `pgvector` casts
+  to a `vector`, so `pgvector` is an extension and a new step, never a change
+  to a released one.
 
 ## Documentation
 
@@ -140,5 +177,10 @@ behavioral claims (`trace.len() == 4`) that no signature check could.
 - **Mark what a pass read.** An episode no fact rests on is pending until a
   pass marks it consolidated. Deleting a fact marks its sources too, or the
   next pass distills the deleted fact again from the same episodes.
+- **Postgres text refuses the NUL character, and `jsonb` refuses `\u0000`.**
+  Trace keeps a node's detail as JSON text, which escapes it, and indexes a NUL
+  as a space. Engram's text columns refuse one, which the storage guide says.
+- **Postgres has no `min()` for `uuid`.** Read a trace's first node with
+  `DISTINCT ON (trace) … ORDER BY trace, id`.
 - **Clamp elapsed time at zero when decaying confidence.** A negative age raises
   confidence above anything recorded, manufacturing belief from clock skew.

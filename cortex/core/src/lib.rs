@@ -9,7 +9,10 @@ use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "postgres")]
+pub mod postgres;
 pub mod provider;
+pub mod storage;
 
 /// A stable identifier for anything Cortex stores.
 ///
