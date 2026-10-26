@@ -1,4 +1,4 @@
-import { difference, first, fn, list, measured, mix, product, sum, token } from '../../../style.js'
+import { difference, fn, list, measured, mix, product, sum, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import tabs from './headless.js'
@@ -255,8 +255,8 @@ export default styles(
            measured 0.004 apart in OKLCH lightness, so the only thing separating the
            tab you are on from the tab under your pointer was a `shadow-sm`. */
         border: [own.indicatorBorder(0), 'solid', own.indicatorBorderColor('transparent')],
-        borderRadius: first(hook.indicatorRadius, own.indicatorRadius, token('radii-none')),
-        boxShadow: first(hook.indicatorShadow, own.indicatorShadow, 'none'),
+        borderRadius: hook.indicatorRadius,
+        boxShadow: hook.indicatorShadow,
         inlineSize: measured('indicator-inline-size', 0),
         insetBlockStart: 0,
         insetInlineStart: 0,

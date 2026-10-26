@@ -154,7 +154,10 @@ impl Names {
             "on".to_owned(),
             target.on.clone().unwrap_or(Lit::Bool(false)),
         )];
-        let (set, values) = self.set(set)?;
+        self.platform.clone_from(&when.platform);
+        let read = self.set(set);
+        self.platform = None;
+        let (set, values) = read?;
         if !set.is_empty() {
             fields.push(("set".to_owned(), Lit::Array(set)));
         }

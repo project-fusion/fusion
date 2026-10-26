@@ -91,7 +91,7 @@ fn a_table_compiles_to_the_family_shape() {
 fn platform_and_supports_in_a_when_are_the_rules_own() {
     let read = rules(&table(
         "",
-        "({ on, rule }) => [on('button', [rule({ disabled: true, platform: 'web' }, { cursor: web('default') })])]",
+        "({ on, rule }) => [on('button', [rule({ disabled: true, platform: 'web' }, { cursor: 'default' })])]",
     ));
     assert!(read[0].web_only);
     assert_eq!(read[0].when.len(), 1);

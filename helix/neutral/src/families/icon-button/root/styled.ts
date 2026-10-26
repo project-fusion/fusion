@@ -263,12 +263,7 @@ export default styles(
     on({ region: '*' }, [rule({ pending: true }, { visibility: 'hidden' })]),
     on('spinner', [
       rule({
-        animation: [
-          'helix-icon-button-turn',
-          first(hook.spinnerDuration, own.turn),
-          'linear',
-          'infinite',
-        ],
+        animation: ['helix-icon-button-turn', hook.spinnerDuration, 'linear', 'infinite'],
         blockSize: hook.spinnerSize,
         border: [token('border-thick'), 'solid', mix(hook.spinnerColor, 30, 'transparent')],
         borderBlockStartColor: hook.spinnerColor,

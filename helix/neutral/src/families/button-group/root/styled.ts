@@ -1,4 +1,4 @@
-import { first, hookOf, product, token, web } from '../../../style.js'
+import { hookOf, product, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import { prop } from '../../../tree.js'
 import root from './headless.js'
@@ -46,7 +46,7 @@ export default styles(
     props: [prop('size', ['sm', 'md', 'lg']), prop('variant', ['joined', 'spaced'])],
     stylesheet: 'button-group/root/button-group-root.generated.css',
   },
-  ({ hook, on, own, rule, variants }) => [
+  ({ hook, on, rule, variants }) => [
     on('host', [
       rule({ display: 'inline-flex' }),
       variants('size', {
@@ -89,7 +89,7 @@ export default styles(
         {
           own: {
             pressedBackground: hook.pressedBackgroundColor,
-            pressedBorder: first(hook.pressedBorderColor, own.pressedBackground),
+            pressedBorder: hook.pressedBorderColor,
             pressedForeground: hook.pressedColor,
           },
         },

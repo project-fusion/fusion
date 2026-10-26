@@ -1,4 +1,4 @@
-import { first, token } from '../../../style.js'
+import { token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import panel from './headless.js'
 
@@ -24,7 +24,7 @@ export default styles(
         minBlockSize: 0,
         minInlineSize: 0,
         outline: 'none',
-        paddingBlockStart: first(hook.paddingBlockStart, own.paddingBlockStart, token('space-md')),
+        paddingBlockStart: hook.paddingBlockStart,
         paddingInlineStart: own.paddingInlineStart(token('space-none')),
       }),
       rule({ hidden: true }, { display: 'none' }),

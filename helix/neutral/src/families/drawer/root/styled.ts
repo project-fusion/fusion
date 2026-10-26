@@ -82,7 +82,7 @@ export default styles(
       /* The scrim fades in as the panel slides, and out as it leaves. */
       on({ backdrop: 'panel' }, [
         rule({
-          backgroundColor: first(hook.scrim, own.scrim),
+          backgroundColor: hook.scrim,
           opacity: 0,
           transition: list(
             ['opacity', move, token('easing-standard')],

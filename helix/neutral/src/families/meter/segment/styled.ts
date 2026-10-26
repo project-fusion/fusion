@@ -1,4 +1,4 @@
-import { first, fn, hookOf, inherited, measured, product, quotient, token } from '../../../style.js'
+import { fn, hookOf, inherited, measured, product, quotient, token } from '../../../style.js'
 import { styles } from '../../../table.js'
 import segment from './headless.js'
 
@@ -32,7 +32,7 @@ export default styles(
     own: ['meter-segment-hue'],
     stylesheet: 'meter/segment/meter-segment.generated.css',
   },
-  ({ hook, on, own, rule }) => [
+  ({ hook, on, rule }) => [
     on('host', [
       rule({ display: 'contents' }),
       rule({ ofType: 1 }, { own: { hue: token('color-series-1') } }),
@@ -56,7 +56,7 @@ export default styles(
     ]),
     on('fill', [
       rule({
-        backgroundColor: first(hook.color, own.hue, token('color-series-1')),
+        backgroundColor: hook.color,
         blockSize: '100%',
         boxShadow: ['inset', token('border-thin'), 0, 0, hook.gapColor],
         boxSizing: 'border-box',

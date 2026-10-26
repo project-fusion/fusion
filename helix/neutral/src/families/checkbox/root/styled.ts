@@ -81,7 +81,7 @@ export default styles(
         display: 'inline-flex',
         gap: token('space-xs'),
       }),
-      web([rule({ within: { host: { disabled: true } } }, { web: { cursor: 'default' } })]),
+      web([rule({ within: { host: { disabled: true } } }, { cursor: 'default' })]),
       rule(card, {
         alignItems: 'start',
         backgroundColor: hook.cardBackgroundColor,
