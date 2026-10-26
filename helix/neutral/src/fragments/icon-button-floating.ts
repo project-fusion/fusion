@@ -13,15 +13,15 @@ export default fragment(
   'icon-button-floating',
   {
     parts: ['button'],
-    hooks: [
-      'backdrop',
-      'background-color',
-      'background-color-hover',
-      'border-color',
-      'border-width',
-      'shadow',
-    ],
-    own: ['icon-button-pressed-fill'],
+    hooks: {
+      backdrop: null,
+      backgroundColor: null,
+      backgroundColorHover: null,
+      borderColor: null,
+      borderWidth: null,
+      shadow: null,
+    },
+    own: { iconButtonPressedFill: null },
     props: ['emphasis', 'material', 'raised'],
   },
   ({ hook, on, own, rule }) => [

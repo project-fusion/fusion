@@ -32,7 +32,7 @@ export default styles(
       overlap: null,
       ringColor: token('color-background'),
     },
-    own: ['avatar-group-clear', 'avatar-group-ring'],
+    own: { avatarGroupClear: null, avatarGroupRing: null },
     stylesheet: 'avatar/group/avatar-group.generated.css',
   },
   ({ hook, on, own, rule }) => {
@@ -43,15 +43,18 @@ export default styles(
         rule({
           alignItems: 'center',
           display: 'flex',
-          own: { ring: hook.ringColor },
+          own: { avatarGroupRing: hook.ringColor },
         }),
       ]),
       on({ region: 'default', slotted: '*' }, [
-        rule({ boxShadow: [0, 0, 0, token('border-thick'), own.ring], flex: '0 0 auto' }),
+        rule({
+          boxShadow: [0, 0, 0, token('border-thick'), own.avatarGroupRing],
+          flex: '0 0 auto',
+        }),
         rule({ child: 'later' }, { marginInlineStart: product(hook.overlap(overlap), '-1') }),
         /* The share of each avatar the next one covers, which its initials
            keep clear of. */
-        rule({ child: 'earlier' }, { own: { clear: 0.25 } }),
+        rule({ child: 'earlier' }, { own: { avatarGroupClear: 0.25 } }),
       ]),
       on(
         {
@@ -67,7 +70,7 @@ export default styles(
           backgroundColor: hook.overflowBackgroundColor,
           blockSize: inherited('avatar-size', token('size-control-md')),
           borderRadius: token('radii-full'),
-          boxShadow: [0, 0, 0, token('border-thick'), own.ring],
+          boxShadow: [0, 0, 0, token('border-thick'), own.avatarGroupRing],
           color: hook.overflowColor,
           display: 'inline-flex',
           flex: '0 0 auto',

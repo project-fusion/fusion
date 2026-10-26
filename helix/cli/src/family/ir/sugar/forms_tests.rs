@@ -1,4 +1,4 @@
-//! The spellings the header's defaults, `first()`, `ownOf()`, the platform
+//! The spellings the header's defaults, `first()`, the platform
 //! groups, a set's `web` block, and the one condition namespace add, each
 //! held to the intermediate form the older spelling compiles to.
 
@@ -33,17 +33,17 @@ fn refused(source: &str, over: Option<&Source>) -> String {
 fn first_is_the_chain_of_fallbacks_read_left_to_right() {
     assert_eq!(
         ir(&table(
-            "hooks: ['radius', 'radius-end'], own: ['button-edge']",
+            "hooks: { radius: null, radiusEnd: null }, own: { buttonEdge: null, tabsRest: null }",
             "({ hook, on, own, rule }) => [on('host', [rule({
-              borderRadius: first(hook.radiusEnd, hook.radius, own.edge, hookOf('group', 'radius'), ownOf('tabs', 'rest'), inherited('list-gap'), measured('width'), 0),
+              borderRadius: first(hook.radiusEnd, hook.radius, own.buttonEdge, hookOf('group', 'radius'), own.tabsRest, inherited('list-gap'), measured('width'), derive('grid-template'), 0),
             })])]",
         )),
         ir(&table(
-            "hooks: ['radius', 'radius-end'], own: ['button-edge']",
+            "hooks: { radius: null, radiusEnd: null }, own: { buttonEdge: null, tabsRest: null }",
             "({ hook, on, own, rule }) => [on('host', [rule({
-              borderRadius: hook.radiusEnd(hook.radius(own.edge(hookOf('group', 'radius', own.tabsRest(inherited('list-gap', measured('width', 0))))))),
+              borderRadius: hook.radiusEnd(hook.radius(own.buttonEdge(hookOf('group', 'radius', own.tabsRest(inherited('list-gap', measured('width', derive('grid-template', 0)))))))),
             })])]",
-        ).replace("own: ['button-edge']", "own: ['button-edge', 'tabs-rest']")),
+        )),
     );
     for (written, says) in [
         (
@@ -62,7 +62,7 @@ fn first_is_the_chain_of_fallbacks_read_left_to_right() {
     ] {
         let why = refused(
             &table(
-                "hooks: ['radius']",
+                "hooks: { radius: null }",
                 &format!("({{ hook, on, rule }}) => [on('host', [rule({{ opacity: hook.radius, margin: {written} }})])]"),
             ),
             None,
@@ -85,7 +85,7 @@ fn the_header_gives_each_hook_and_private_value_its_default_once() {
             })])]",
         )),
         ir(&table(
-            "hooks: ['color', 'radius', 'size'], own: ['j', 'r']",
+            "hooks: { color: null, radius: null, size: null }, own: { j: null, r: null }",
             "({ hook, on, own, rule }) => [on('host', [rule({
               color: hook.color(token('ink')),
               borderRadius: hook.radius(own.r(0)),
@@ -163,27 +163,41 @@ fn a_fallback_that_repeats_the_default_and_a_default_that_reads_itself_are_refus
 }
 
 #[test]
-fn own_of_reads_another_familys_private_value() {
-    assert_eq!(
-        ir(&table(
-            "",
-            "({ on, rule }) => [on('host', [rule({ opacity: ownOf('tabs', 'dismiss-rest', 1) })])]",
-        )),
-        ir(&table(
-            "own: ['tabs-dismiss-rest']",
-            "({ on, own, rule }) => [on('host', [rule({ opacity: own.tabsDismissRest(1) })])]",
-        )),
-    );
-    let wrong = refused(
+fn another_familys_private_value_is_one_the_table_declares_and_lists_are_refused() {
+    let own_of = refused(
         &table(
             "",
-            "({ on, rule }) => [on('host', [rule({ opacity: ownOf('tabs') })])]",
+            "({ on, rule }) => [on('host', [rule({ opacity: ownOf('tabs', 'dismiss-rest', 1) })])]",
         ),
         None,
     );
     assert!(
-        wrong.contains("`ownOf()` takes a family's prefix"),
-        "{wrong}"
+        own_of.contains("declare it in `own` by its whole name"),
+        "{own_of}"
+    );
+    for header in ["hooks: ['color']", "own: ['button-tone']"] {
+        let listed = refused(
+            &table(
+                header,
+                "({ on, rule }) => [on('host', [rule({ opacity: 1 })])]",
+            ),
+            None,
+        );
+        assert!(
+            listed.contains("is an object of each one's default"),
+            "{listed}"
+        );
+    }
+    let derived = refused(
+        &table(
+            "",
+            "({ on, rule }) => [on('host', [rule({ gridTemplateColumns: derived('grid-template') })])]",
+        ),
+        None,
+    );
+    assert!(
+        derived.contains("`derived()` is written `derive()`"),
+        "{derived}"
     );
 }
 

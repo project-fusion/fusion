@@ -18,7 +18,7 @@ export default styles(
     hooks: {
       sectionHeadingColor: token('color-foreground-muted'),
     },
-    own: ['menu-section-heading'],
+    own: { menuSectionHeading: null },
     stylesheet: 'menu/section/menu-section.generated.css',
   },
   ({ hook, on, own, rule }) => [
@@ -46,7 +46,7 @@ export default styles(
       }),
       /* A phone's heading stands down on a page below the top, where its
          rows are not, as the web's section draws nothing there. */
-      native([rule({ display: own.sectionHeading('flex') })]),
+      native([rule({ display: own.menuSectionHeading('flex') })]),
     ]),
   ],
 )

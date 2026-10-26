@@ -1,5 +1,5 @@
 import printEconomy from '../../../fragments/print-economy.js'
-import { derived, token, web } from '../../../style.js'
+import { derive, token, web } from '../../../style.js'
 import { styles } from '../../../table.js'
 import root from './headless.js'
 
@@ -35,73 +35,73 @@ export default styles(
       columns: null,
       rows: 'none',
     },
-    own: ['grid-column-gap', 'grid-gap', 'grid-row-gap'],
+    own: { gridColumnGap: null, gridGap: null, gridRowGap: null },
     stylesheet: 'grid/root/grid-root.generated.css',
   },
   ({ hook, include, on, own, rule, variants }) => [
     on('host', [
       rule({
-        columnGap: own.columnGap,
+        columnGap: own.gridColumnGap,
         display: 'grid',
         web: { gridTemplateAreas: hook.areas },
-        gridTemplateColumns: hook.columns(derived('grid-template', 'minmax(0, 1fr)')),
+        gridTemplateColumns: hook.columns(derive('grid-template', 'minmax(0, 1fr)')),
         gridTemplateRows: hook.rows,
-        rowGap: own.rowGap,
-        own: { columnGap: own.gap, gap: token('space-none'), rowGap: own.gap },
+        rowGap: own.gridRowGap,
+        own: { gridColumnGap: own.gridGap, gridGap: token('space-none'), gridRowGap: own.gridGap },
       }),
       /* A fixed count is plain CSS, so it is right in server-rendered markup
          with no JavaScript. */
       variants('columns', {
         '2': {
-          gridTemplateColumns: hook.columns(derived('grid-template', 'repeat(2, minmax(0, 1fr))')),
+          gridTemplateColumns: hook.columns(derive('grid-template', 'repeat(2, minmax(0, 1fr))')),
         },
         '3': {
-          gridTemplateColumns: hook.columns(derived('grid-template', 'repeat(3, minmax(0, 1fr))')),
+          gridTemplateColumns: hook.columns(derive('grid-template', 'repeat(3, minmax(0, 1fr))')),
         },
         '4': {
-          gridTemplateColumns: hook.columns(derived('grid-template', 'repeat(4, minmax(0, 1fr))')),
+          gridTemplateColumns: hook.columns(derive('grid-template', 'repeat(4, minmax(0, 1fr))')),
         },
         '5': {
-          gridTemplateColumns: hook.columns(derived('grid-template', 'repeat(5, minmax(0, 1fr))')),
+          gridTemplateColumns: hook.columns(derive('grid-template', 'repeat(5, minmax(0, 1fr))')),
         },
         '6': {
-          gridTemplateColumns: hook.columns(derived('grid-template', 'repeat(6, minmax(0, 1fr))')),
+          gridTemplateColumns: hook.columns(derive('grid-template', 'repeat(6, minmax(0, 1fr))')),
         },
       }),
       /* `none`, which is what `Flex` has. */
       variants('gap', {
-        none: { own: { gap: token('space-none') } },
-        '2xs': { own: { gap: token('space-2xs') } },
-        xs: { own: { gap: token('space-xs') } },
-        sm: { own: { gap: token('space-sm') } },
-        md: { own: { gap: token('space-md') } },
-        lg: { own: { gap: token('space-lg') } },
-        xl: { own: { gap: token('space-xl') } },
-        '2xl': { own: { gap: token('space-2xl') } },
+        none: { own: { gridGap: token('space-none') } },
+        '2xs': { own: { gridGap: token('space-2xs') } },
+        xs: { own: { gridGap: token('space-xs') } },
+        sm: { own: { gridGap: token('space-sm') } },
+        md: { own: { gridGap: token('space-md') } },
+        lg: { own: { gridGap: token('space-lg') } },
+        xl: { own: { gridGap: token('space-xl') } },
+        '2xl': { own: { gridGap: token('space-2xl') } },
         /* `3xl` is the top of the space scale, and the pair stops where it does. */
-        '3xl': { own: { gap: token('space-3xl') } },
+        '3xl': { own: { gridGap: token('space-3xl') } },
       }),
       variants('rowGap', {
-        none: { own: { rowGap: token('space-none') } },
-        '2xs': { own: { rowGap: token('space-2xs') } },
-        xs: { own: { rowGap: token('space-xs') } },
-        sm: { own: { rowGap: token('space-sm') } },
-        md: { own: { rowGap: token('space-md') } },
-        lg: { own: { rowGap: token('space-lg') } },
-        xl: { own: { rowGap: token('space-xl') } },
-        '2xl': { own: { rowGap: token('space-2xl') } },
-        '3xl': { own: { rowGap: token('space-3xl') } },
+        none: { own: { gridRowGap: token('space-none') } },
+        '2xs': { own: { gridRowGap: token('space-2xs') } },
+        xs: { own: { gridRowGap: token('space-xs') } },
+        sm: { own: { gridRowGap: token('space-sm') } },
+        md: { own: { gridRowGap: token('space-md') } },
+        lg: { own: { gridRowGap: token('space-lg') } },
+        xl: { own: { gridRowGap: token('space-xl') } },
+        '2xl': { own: { gridRowGap: token('space-2xl') } },
+        '3xl': { own: { gridRowGap: token('space-3xl') } },
       }),
       variants('columnGap', {
-        none: { own: { columnGap: token('space-none') } },
-        '2xs': { own: { columnGap: token('space-2xs') } },
-        xs: { own: { columnGap: token('space-xs') } },
-        sm: { own: { columnGap: token('space-sm') } },
-        md: { own: { columnGap: token('space-md') } },
-        lg: { own: { columnGap: token('space-lg') } },
-        xl: { own: { columnGap: token('space-xl') } },
-        '2xl': { own: { columnGap: token('space-2xl') } },
-        '3xl': { own: { columnGap: token('space-3xl') } },
+        none: { own: { gridColumnGap: token('space-none') } },
+        '2xs': { own: { gridColumnGap: token('space-2xs') } },
+        xs: { own: { gridColumnGap: token('space-xs') } },
+        sm: { own: { gridColumnGap: token('space-sm') } },
+        md: { own: { gridColumnGap: token('space-md') } },
+        lg: { own: { gridColumnGap: token('space-lg') } },
+        xl: { own: { gridColumnGap: token('space-xl') } },
+        '2xl': { own: { gridColumnGap: token('space-2xl') } },
+        '3xl': { own: { gridColumnGap: token('space-3xl') } },
       }),
       /* The attribute is named for the property, so the rule is the value. */
       variants('alignItems', {

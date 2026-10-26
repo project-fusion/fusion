@@ -56,7 +56,7 @@ export default styles(
       valueGap: token('space-sm'),
       valueSize: token('text-xs'),
     },
-    own: ['meter-hue', 'meter-span', 'meter-stroke'],
+    own: { meterHue: null, meterSpan: null, meterStroke: null },
     props: { emphasis: oneOf(['subtle']) },
     stylesheet: 'meter/root/meter-root.generated.css',
   },
@@ -140,14 +140,14 @@ export default styles(
          each segment on a phone, which divides its value by it. On the web
          the segments are slotted and read `--meter-span` from the track. */
       rule({ shape: false }, { display: 'flex' }),
-      native([rule({ shape: false }, { own: { span: measured('meter-span', 1) } })]),
+      native([rule({ shape: false }, { own: { meterSpan: measured('meter-span', 1) } })]),
       rule([{ shape: 'arc' }, { shape: 'ring' }], {
         backgroundColor: 'transparent',
         blockSize: hook.ringSize,
         borderRadius: token('radii-none'),
         gridArea: '1 / 1',
         inlineSize: hook.ringSize,
-        own: { stroke: hook.ringWidth },
+        own: { meterStroke: hook.ringWidth },
       }),
       /* Twelve o'clock for a ring, and seven for an arc, one end of its own
          opening. */
@@ -159,7 +159,7 @@ export default styles(
     on('indicator', [
       web([rule({ shape: false }, { inset: 0 }), rule({ shape: false }, { position: 'absolute' })]),
       rule({
-        backgroundColor: own.hue,
+        backgroundColor: own.meterHue,
         blockSize: '100%',
         borderRadius: 'inherit',
         inlineSize: '100%',
@@ -169,7 +169,7 @@ export default styles(
           ['background-color', hook.transitionDuration, token('easing-standard')],
           ['scale', hook.transitionDuration, token('easing-decelerate')],
         ),
-        own: { hue: hook.color(token('color-primary')) },
+        own: { meterHue: hook.color(token('color-primary')) },
       }),
       /* **A phone lays the fill over the whole track**, as Progress's fill is.
          Past the largest standard text size the track's height is the least it
@@ -181,15 +181,15 @@ export default styles(
       /* The three bands. Color is the obvious half, and the ticks the other. */
       rule(
         { 'data-band': 'good' },
-        { backgroundColor: own.hue, own: { hue: hook.color(token('color-success')) } },
+        { backgroundColor: own.meterHue, own: { meterHue: hook.color(token('color-success')) } },
       ),
       rule(
         { 'data-band': 'fair' },
-        { backgroundColor: own.hue, own: { hue: hook.color(token('color-warning')) } },
+        { backgroundColor: own.meterHue, own: { meterHue: hook.color(token('color-warning')) } },
       ),
       rule(
         { 'data-band': 'poor' },
-        { backgroundColor: own.hue, own: { hue: hook.color(token('color-danger')) } },
+        { backgroundColor: own.meterHue, own: { meterHue: hook.color(token('color-danger')) } },
       ),
       /* Past an end, the corner it ran out at squares off. */
       rule(
@@ -204,32 +204,32 @@ export default styles(
          wide. The round shapes' unbanded ink is muted. */
       rule([{ shape: 'arc' }, { shape: 'ring' }], {
         scale: 'none',
-        stroke: own.hue,
+        stroke: own.meterHue,
         strokeDasharray: [measured('meter-along'), 100],
         strokeLinecap: 'round',
         transition: ['stroke-dasharray', hook.transitionDuration, token('easing-standard')],
-        own: { hue: hook.color(token('color-foreground-muted')) },
+        own: { meterHue: hook.color(token('color-foreground-muted')) },
       }),
       rule(
         [
           { 'data-band': 'good', shape: 'arc' },
           { 'data-band': 'good', shape: 'ring' },
         ],
-        { stroke: own.hue, own: { hue: hook.color(token('color-success')) } },
+        { stroke: own.meterHue, own: { meterHue: hook.color(token('color-success')) } },
       ),
       rule(
         [
           { 'data-band': 'fair', shape: 'arc' },
           { 'data-band': 'fair', shape: 'ring' },
         ],
-        { stroke: own.hue, own: { hue: hook.color(token('color-warning')) } },
+        { stroke: own.meterHue, own: { meterHue: hook.color(token('color-warning')) } },
       ),
       rule(
         [
           { 'data-band': 'poor', shape: 'arc' },
           { 'data-band': 'poor', shape: 'ring' },
         ],
-        { stroke: own.hue, own: { hue: hook.color(token('color-danger')) } },
+        { stroke: own.meterHue, own: { meterHue: hook.color(token('color-danger')) } },
       ),
     ]),
     /* A mark where a band begins, on the track, centered on the threshold. */
@@ -263,15 +263,15 @@ export default styles(
             cx: '50%',
             cy: '50%',
             fill: 'none',
-            r: difference('50%', quotient(own.stroke, 2)),
-            strokeWidth: own.stroke,
+            r: difference('50%', quotient(own.meterStroke, 2)),
+            strokeWidth: own.meterStroke,
           },
           ring: {
             cx: '50%',
             cy: '50%',
             fill: 'none',
-            r: difference('50%', quotient(own.stroke, 2)),
-            strokeWidth: own.stroke,
+            r: difference('50%', quotient(own.meterStroke, 2)),
+            strokeWidth: own.meterStroke,
           },
         }),
       ],
@@ -286,16 +286,16 @@ export default styles(
     /* Subtle, against `--_meter-hue`, so one pair of rules quietens every
        color in every shape. */
     on('indicator', [
-      rule({ emphasis: 'subtle' }, { backgroundColor: mix(own.hue, 30, hook.trackColor) }),
+      rule({ emphasis: 'subtle' }, { backgroundColor: mix(own.meterHue, 30, hook.trackColor) }),
       rule(
         [
           { emphasis: 'subtle', shape: 'arc' },
           { emphasis: 'subtle', shape: 'ring' },
         ],
-        { stroke: mix(own.hue, 30, hook.trackColor) },
+        { stroke: mix(own.meterHue, 30, hook.trackColor) },
       ),
       rule({ forcedColors: true }, { backgroundColor: 'Highlight', forcedColorAdjust: 'none' }),
-      rule({ forcedColors: true, 'data-band': true }, { backgroundColor: own.hue }),
+      rule({ forcedColors: true, 'data-band': true }, { backgroundColor: own.meterHue }),
     ]),
     /* Forced colors paint every background Canvas: the track is outlined,
        the fill is Highlight, a fill in a band keeps the band's color, and the

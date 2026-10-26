@@ -33,12 +33,12 @@ export default styles(
       titleFontWeight: token('weight-medium'),
       travel: '12%',
     },
-    own: ['drilldown-sign'],
+    own: { drilldownSign: null },
     stylesheet: 'drilldown/root/drilldown-root.generated.css',
   },
   ({ hook, keyframes, on, own, rule }) => {
     const ring = [token('size-focus-ring'), 'solid', token('color-focus-ring')] as const
-    const travel = product(hook.travel, own.sign(1))
+    const travel = product(hook.travel, own.drilldownSign(1))
     const duration = hook.duration
     return [
       on('host', [
@@ -110,10 +110,10 @@ export default styles(
          text runs going deeper. */
       on('page', [
         rule({
-          own: { sign: 1 },
+          own: { drilldownSign: 1 },
           paddingBlock: hook.pagePaddingBlock,
         }),
-        rule({ dir: 'rtl' }, { own: { sign: '-1' } }),
+        rule({ dir: 'rtl' }, { own: { drilldownSign: '-1' } }),
         rule(
           { forward: true },
           { animation: ['drilldown-forward', duration, token('easing-decelerate')] },

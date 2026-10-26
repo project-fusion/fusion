@@ -38,9 +38,9 @@ export default styles(
       foregroundColor: token('color-foreground'),
       inset: token('space-lg'),
       textAlign: 'center',
-      toneColor: own.color,
+      toneColor: own.announcementColor,
     }),
-    own: ['announcement-color', 'announcement-ground', 'announcement-tint'],
+    own: { announcementColor: null, announcementGround: null, announcementTint: null },
     props: { separation: oneOf(['elevated', 'filled', 'outlined']) },
     stylesheet: 'announcement/root/announcement-root.generated.css',
   },
@@ -50,8 +50,14 @@ export default styles(
     const dismissSize = sum(iconSize, product(token('space-2xs'), 2))
     const clearance = sum(iconSize, product(token('space-2xs'), 2), token('space-xs'))
     /* More of the hue in the dark scheme, at the band's start and its end. */
-    const tintStart = scheme(mix(own.tint, 18, own.ground), mix(own.tint, 32, own.ground))
-    const tintEnd = scheme(mix(own.tint, 10, own.ground), mix(own.tint, 20, own.ground))
+    const tintStart = scheme(
+      mix(own.announcementTint, 18, own.announcementGround),
+      mix(own.announcementTint, 32, own.announcementGround),
+    )
+    const tintEnd = scheme(
+      mix(own.announcementTint, 10, own.announcementGround),
+      mix(own.announcementTint, 20, own.announcementGround),
+    )
     return [
       on('host', [
         rule({
@@ -62,9 +68,9 @@ export default styles(
           '--helix-size-control-loose': product(token('size-control'), 1.2),
           '--helix-size-control-tight': product(token('size-control'), 0.8),
           own: {
-            color: token('color-foreground-muted'),
-            ground: token('color-background'),
-            tint: hook.toneColor,
+            announcementColor: token('color-foreground-muted'),
+            announcementGround: token('color-background'),
+            announcementTint: hook.toneColor,
           },
           alignItems: 'center',
           backgroundColor: hook.backgroundColor(token('color-surface-sunken')),
@@ -83,13 +89,13 @@ export default styles(
           rowGap: token('space-2xs'),
         }),
         variants('tone', {
-          accent: { own: { color: token('color-accent') } },
-          danger: { own: { color: token('color-danger') } },
-          info: { own: { color: token('color-info') } },
+          accent: { own: { announcementColor: token('color-accent') } },
+          danger: { own: { announcementColor: token('color-danger') } },
+          info: { own: { announcementColor: token('color-info') } },
           neutral: { backgroundImage: 'none' },
-          primary: { own: { color: token('color-primary') } },
-          success: { own: { color: token('color-success') } },
-          warning: { own: { color: token('color-warning') } },
+          primary: { own: { announcementColor: token('color-primary') } },
+          success: { own: { announcementColor: token('color-success') } },
+          warning: { own: { announcementColor: token('color-warning') } },
         }),
         rule(
           { tone: ['accent', 'danger', 'info', 'primary', 'success', 'warning'] },
@@ -102,7 +108,7 @@ export default styles(
         rule(
           { separation: 'elevated' },
           {
-            own: { ground: token('color-surface') },
+            own: { announcementGround: token('color-surface') },
             backgroundColor: hook.backgroundColor(token('color-surface')),
           },
         ),
@@ -115,7 +121,7 @@ export default styles(
             separation: 'outlined',
             tone: ['accent', 'danger', 'info', 'primary', 'success', 'warning'],
           },
-          { borderBlockEndColor: mix(own.tint, 40, own.ground) },
+          { borderBlockEndColor: mix(own.announcementTint, 40, own.announcementGround) },
         ),
         rule({ waiting: true }, { display: 'none' }),
         rule({ print: true }, { backgroundColor: 'transparent' }),

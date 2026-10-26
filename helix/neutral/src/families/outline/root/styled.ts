@@ -49,7 +49,7 @@ export default styles(
       rail: null,
       ruleColor: token('color-border'),
     },
-    own: ['mark-width'],
+    own: { markWidth: null },
     stylesheet: 'outline/root/outline-root.generated.css',
   },
   ({ hook, on, own, rule }) => {

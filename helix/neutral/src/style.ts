@@ -173,7 +173,7 @@ export type Declaration = readonly [property: string, value: Value]
  * The web element writes the value, and a native view calls the derivation
  * with the element's props. `helix family` refuses a name with no derivation.
  */
-export const derived = (name: string, fallback?: Value): Read =>
+export const derive = (name: string, fallback?: Value): Read =>
   fallback === undefined ? { derived: name } : { derived: name, fallback }
 
 /** `a - b`. */
@@ -335,7 +335,7 @@ export type Read = Extract<
  * `first(own.tabHeight, hook.blockSize, token('size-control'))` is the
  * private value, else the hook, else the token. Every argument but the last
  * is a read written with no fallback of its own: a hook, a private value,
- * `hookOf()`, `ownOf()`, `inherited()`, `measured()`, or `derived()`. It is
+ * `hookOf()`, `inherited()`, `measured()`, or `derive()`. It is
  * the chain of fallbacks written inside out, read left to right.
  */
 export const first = (head: Read, ...rest: readonly [...Read[], Value]): Tagged => {
@@ -344,13 +344,3 @@ export const first = (head: Read, ...rest: readonly [...Read[], Value]): Tagged 
     after.length === 0 ? (next as Value) : first(next as Read, ...(after as [Value]))
   return { ...head, fallback } as Tagged
 }
-
-/**
- * Another family's private value, `--_<family>-<name>`, which that family's
- * root sets on the elements inside it, as a tab set sets how its tabs' close
- * marks rest: `ownOf('tabs', 'dismiss-rest', 1)`. The `own` list names a
- * table's own values, and this reads one it does not declare, as `hookOf()`
- * reads a hook.
- */
-export const ownOf = (family: string, name: string, fallback?: Value): Read =>
-  fallback === undefined ? { own: `${family}-${name}` } : { fallback, own: `${family}-${name}` }

@@ -27,11 +27,11 @@ export default styles(
       cardBorderColor: token('color-border'),
       cardPadding: token('space-md'),
       chipSize: token('size-control'),
-      indicatorSize: product(own.size, 0.75),
+      indicatorSize: product(own.radioSize, 0.75),
       markColor: token('color-foreground'),
       size: token('size-checkbox'),
     }),
-    own: ['radio-chip-lift', 'radio-size'],
+    own: { radioChipLift: null, radioSize: null },
     props: {
       hideControl: false,
       separation: oneOf(['filled', 'outlined', 'plain']),
@@ -41,7 +41,7 @@ export default styles(
   },
   ({ hook, on, own, rule }) => [
     on('host', [
-      rule({ own: { size: hook.size } }),
+      rule({ own: { radioSize: hook.size } }),
       rule({ display: 'block' }),
       rule({ has: 'disabled' }, { opacity: 0.5 }),
       /* A card is the same radio in a bounded surface. */
@@ -119,7 +119,7 @@ export default styles(
             ['box-shadow', token('duration-fast'), token('easing-standard')],
             ['translate', token('duration-fast'), token('easing-standard')],
           ),
-          own: { chipLift: '2px' },
+          own: { radioChipLift: '2px' },
         },
       ),
       /* Weight and height carry the choice: solid, and forward. */
@@ -129,12 +129,12 @@ export default styles(
           backgroundColor: token('color-surface-inverse'),
           boxShadow: token('shadow-md'),
           color: token('color-foreground-inverse'),
-          translate: ['0', product(own.chipLift, '-1')],
+          translate: ['0', product(own.radioChipLift, '-1')],
         },
       ),
       rule(
         { hover: true, lacks: 'disabled', variant: 'chip' },
-        { translate: ['0', quotient(own.chipLift, '-2')] },
+        { translate: ['0', quotient(own.radioChipLift, '-2')] },
       ),
       rule(
         { focusVisible: true, variant: 'chip' },
@@ -160,12 +160,12 @@ export default styles(
     on('box', [
       rule({
         backgroundColor: hook.backgroundColor,
-        blockSize: own.size,
+        blockSize: own.radioSize,
         border: [token('border-thin'), 'solid', hook.borderColor(token('color-foreground-subtle'))],
         borderRadius: token('radii-full'),
         display: 'grid',
         flex: '0 0 auto',
-        inlineSize: own.size,
+        inlineSize: own.radioSize,
         placeItems: 'center',
         transition: ['border-color', token('duration-fast'), token('easing-standard')],
       }),
@@ -195,7 +195,7 @@ export default styles(
         {
           fontSize: token('text-md'),
           lineHeight: token('leading-normal'),
-          marginBlockStart: quotient(difference('1lh', own.size), 2),
+          marginBlockStart: quotient(difference('1lh', own.radioSize), 2),
         },
       ),
       /* The card is the control, so the circle can go. */
@@ -207,10 +207,10 @@ export default styles(
     on({ after: 'box' }, [
       rule({
         backgroundColor: hook.markColor,
-        blockSize: product(own.size, 0.4),
+        blockSize: product(own.radioSize, 0.4),
         borderRadius: token('radii-full'),
         content: '""',
-        inlineSize: product(own.size, 0.4),
+        inlineSize: product(own.radioSize, 0.4),
         scale: 0,
         transition: ['scale', token('duration-fast'), token('easing-emphasized')],
       }),

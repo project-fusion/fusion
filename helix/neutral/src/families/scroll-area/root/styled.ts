@@ -40,16 +40,16 @@ export default styles(
       thumbMinSize: token('space-lg'),
       trackColor: token('scrollbar-track-color'),
     },
-    own: [
-      'scroll-area-content-size',
-      'scroll-area-depth-block-end',
-      'scroll-area-depth-block-start',
-      'scroll-area-depth-inline-end',
-      'scroll-area-depth-inline-start',
-      'scroll-area-from-end',
-      'scroll-area-from-start',
-      'scroll-area-thumb',
-    ],
+    own: {
+      scrollAreaContentSize: null,
+      scrollAreaDepthBlockEnd: null,
+      scrollAreaDepthBlockStart: null,
+      scrollAreaDepthInlineEnd: null,
+      scrollAreaDepthInlineStart: null,
+      scrollAreaFromEnd: null,
+      scrollAreaFromStart: null,
+      scrollAreaThumb: null,
+    },
     stylesheet: 'scroll-area/root/scroll-area-root.generated.css',
   },
   ({ hook, on, own, rule }) => {
@@ -66,24 +66,27 @@ export default styles(
       solid,
       fn(
         'linear-gradient',
-        own.fromStart,
+        own.scrollAreaFromStart,
         ['transparent', 0],
-        ['#000', own.depthInlineStart('0px')],
-        ['#000', difference('100%', own.depthInlineEnd('0px'))],
+        ['#000', own.scrollAreaDepthInlineStart('0px')],
+        ['#000', difference('100%', own.scrollAreaDepthInlineEnd('0px'))],
         ['transparent', '100%'],
       ),
       fn(
         'linear-gradient',
         'to bottom',
         ['transparent', 0],
-        ['#000', own.depthBlockStart('0px')],
-        ['#000', difference('100%', own.depthBlockEnd('0px'))],
+        ['#000', own.scrollAreaDepthBlockStart('0px')],
+        ['#000', difference('100%', own.scrollAreaDepthBlockEnd('0px'))],
         ['transparent', '100%'],
       ),
     )
     /* A phone's painted fades, in the surface color until one is set. */
     const fadeColor = hook.fadeColor(token('color-background'))
-    const along = product(measured('scroll-area-scroll-fraction', 0), difference('100%', own.thumb))
+    const along = product(
+      measured('scroll-area-scroll-fraction', 0),
+      difference('100%', own.scrollAreaThumb),
+    )
     return [
       /* The painted fades and the focus ring sit over the viewport, so they
          stay put while the content moves under them. */
@@ -125,17 +128,20 @@ export default styles(
            scrollbars, which a mask would wash out, and the two fades, which
            meet in the content's box. */
           rule({
-            own: { fromEnd: 'to left', fromStart: 'to right' },
+            own: { scrollAreaFromEnd: 'to left', scrollAreaFromStart: 'to right' },
           }),
           rule(
             { dir: 'rtl' },
             {
-              own: { fromEnd: 'to right', fromStart: 'to left' },
+              own: { scrollAreaFromEnd: 'to right', scrollAreaFromStart: 'to left' },
             },
           ),
           rule({
             own: {
-              contentSize: [difference('100%', gutterInline), difference('100%', gutterBlock)],
+              scrollAreaContentSize: [
+                difference('100%', gutterInline),
+                difference('100%', gutterBlock),
+              ],
             },
             maskComposite: list('add', 'add', 'intersect', 'add'),
             maskPosition: list('right top', 'left bottom', 'left top', 'left top'),
@@ -143,8 +149,8 @@ export default styles(
             maskSize: list(
               [gutterInline, '100%'],
               ['100%', gutterBlock],
-              own.contentSize,
-              own.contentSize,
+              own.scrollAreaContentSize,
+              own.scrollAreaContentSize,
             ),
             transition: list(
               ['--_scroll-area-depth-block-start', ...motion],
@@ -158,13 +164,22 @@ export default styles(
             { maskPosition: list('left top', 'left bottom', 'right top', 'right top') },
           ),
           /* Each edge's depth, while there is more past it. */
-          rule({ moreBlockStart: true }, { own: { depthBlockStart: hook.fadeBlockStart(depth) } }),
-          rule({ moreBlockEnd: true }, { own: { depthBlockEnd: hook.fadeBlockEnd(depth) } }),
+          rule(
+            { moreBlockStart: true },
+            { own: { scrollAreaDepthBlockStart: hook.fadeBlockStart(depth) } },
+          ),
+          rule(
+            { moreBlockEnd: true },
+            { own: { scrollAreaDepthBlockEnd: hook.fadeBlockEnd(depth) } },
+          ),
           rule(
             { moreInlineStart: true },
-            { own: { depthInlineStart: hook.fadeInlineStart(depth) } },
+            { own: { scrollAreaDepthInlineStart: hook.fadeInlineStart(depth) } },
           ),
-          rule({ moreInlineEnd: true }, { own: { depthInlineEnd: hook.fadeInlineEnd(depth) } }),
+          rule(
+            { moreInlineEnd: true },
+            { own: { scrollAreaDepthInlineEnd: hook.fadeInlineEnd(depth) } },
+          ),
           /* Only while the content scrolls, because a mask makes the viewport a
            stacking context. The prefixed name as well, for WebKit releases
            that read only that one. */
@@ -178,7 +193,7 @@ export default styles(
         web([
           rule({
             own: {
-              thumb: fn(
+              scrollAreaThumb: fn(
                 'max',
                 hook.thumbMinSize,
                 product(measured('scroll-area-thumb-fraction', 1), '100%'),
@@ -222,7 +237,7 @@ export default styles(
       on('thumb-vertical', [
         web([
           rule({
-            blockSize: own.thumb,
+            blockSize: own.scrollAreaThumb,
             insetBlockStart: along,
             insetInline: token('border-thick'),
           }),
@@ -231,7 +246,7 @@ export default styles(
       on('thumb-horizontal', [
         web([
           rule({
-            inlineSize: own.thumb,
+            inlineSize: own.scrollAreaThumb,
             insetBlock: token('border-thick'),
             insetInlineStart: along,
           }),
@@ -293,12 +308,15 @@ export default styles(
          two pseudo-elements and four edges want four. */
       on('edges', [
         rule({
-          own: { fromEnd: 'to left', fromStart: 'to right' },
+          own: { scrollAreaFromEnd: 'to left', scrollAreaFromStart: 'to right' },
           inset: 0,
           pointerEvents: 'none',
           position: 'absolute',
         }),
-        rule({ dir: 'rtl' }, { own: { fromEnd: 'to right', fromStart: 'to left' } }),
+        rule(
+          { dir: 'rtl' },
+          { own: { scrollAreaFromEnd: 'to right', scrollAreaFromStart: 'to left' } },
+        ),
         /* A phone's ring, while the frame around its scroll view shows
            keyboard focus, on this layer raised over the painted fades. */
         native([
@@ -314,7 +332,12 @@ export default styles(
       ]),
       on({ before: 'edges' }, [
         rule({
-          backgroundImage: fn('linear-gradient', own.fromStart, hook.fadeColor(), 'transparent'),
+          backgroundImage: fn(
+            'linear-gradient',
+            own.scrollAreaFromStart,
+            hook.fadeColor(),
+            'transparent',
+          ),
           content: '""',
           inlineSize: hook.fadeInlineStart(depth),
           insetBlock: 0,
@@ -325,14 +348,26 @@ export default styles(
           zIndex: token('layer-raised'),
         }),
         native([
-          rule({ backgroundImage: fn('linear-gradient', own.fromStart, fadeColor, 'transparent') }),
+          rule({
+            backgroundImage: fn(
+              'linear-gradient',
+              own.scrollAreaFromStart,
+              fadeColor,
+              'transparent',
+            ),
+          }),
         ]),
         rule({ moreInlineStart: true }, { opacity: 1 }),
         rule({ reducedMotion: true }, { transition: 'none' }),
       ]),
       on({ after: 'edges' }, [
         rule({
-          backgroundImage: fn('linear-gradient', own.fromEnd, hook.fadeColor(), 'transparent'),
+          backgroundImage: fn(
+            'linear-gradient',
+            own.scrollAreaFromEnd,
+            hook.fadeColor(),
+            'transparent',
+          ),
           content: '""',
           inlineSize: hook.fadeInlineEnd(depth),
           insetBlock: 0,
@@ -343,7 +378,9 @@ export default styles(
           zIndex: token('layer-raised'),
         }),
         native([
-          rule({ backgroundImage: fn('linear-gradient', own.fromEnd, fadeColor, 'transparent') }),
+          rule({
+            backgroundImage: fn('linear-gradient', own.scrollAreaFromEnd, fadeColor, 'transparent'),
+          }),
         ]),
         rule({ moreInlineEnd: true }, { opacity: 1 }),
         rule({ reducedMotion: true }, { transition: 'none' }),

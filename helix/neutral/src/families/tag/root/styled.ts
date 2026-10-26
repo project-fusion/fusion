@@ -39,15 +39,23 @@ export default styles(
   {
     prefix: 'tag',
     hooks: ({ own }) => ({
-      backgroundColor: own.fill,
-      borderColor: own.edge,
+      backgroundColor: own.tagFill,
+      borderColor: own.tagEdge,
       disabledOpacity: 0.5,
       fontWeight: token('weight-medium'),
-      foregroundColor: own.label,
+      foregroundColor: own.tagLabel,
       gap: token('space-2xs'),
       radius: null,
     }),
-    own: ['tag-color', 'tag-edge', 'tag-fill', 'tag-height', 'tag-inset', 'tag-label', 'tag-text'],
+    own: {
+      tagColor: null,
+      tagEdge: null,
+      tagFill: null,
+      tagHeight: null,
+      tagInset: null,
+      tagLabel: null,
+      tagText: null,
+    },
     props: {
       emphasis: oneOf(['outlined', 'solid', 'subtle']),
       shape: oneOf(['pill']),
@@ -60,25 +68,25 @@ export default styles(
       rule({
         alignItems: 'center',
         backgroundColor: hook.backgroundColor,
-        blockSize: own.height,
+        blockSize: own.tagHeight,
         border: [token('border-thin'), 'solid', hook.borderColor],
         borderRadius: hook.radius(token('radii-sm')),
         color: hook.foregroundColor,
         display: 'inline-flex',
-        fontSize: own.text,
+        fontSize: own.tagText,
         fontWeight: hook.fontWeight,
         gap: hook.gap,
         lineHeight: token('leading-tight'),
-        paddingInline: own.inset,
+        paddingInline: own.tagInset,
         whiteSpace: 'nowrap',
         own: {
-          height: token('size-tag'),
-          color: token('color-foreground-muted'),
-          text: token('text-xs'),
-          inset: token('space-xs'),
-          fill: mix(own.color, 14, token('color-background'), 'srgb'),
-          edge: mix(own.color, 28, token('color-background'), 'srgb'),
-          label: mix(own.color, 55, token('color-foreground')),
+          tagHeight: token('size-tag'),
+          tagColor: token('color-foreground-muted'),
+          tagText: token('text-xs'),
+          tagInset: token('space-xs'),
+          tagFill: mix(own.tagColor, 14, token('color-background'), 'srgb'),
+          tagEdge: mix(own.tagColor, 28, token('color-background'), 'srgb'),
+          tagLabel: mix(own.tagColor, 55, token('color-foreground')),
         },
       }),
       /* Fully rounded ends, and the remove button's ring rounded to match. */
@@ -86,22 +94,25 @@ export default styles(
       variants('emphasis', {
         solid: {
           own: {
-            fill: mix(own.color, 82, token('color-foreground')),
-            edge: own.fill,
-            label: token('color-foreground-inverse'),
+            tagFill: mix(own.tagColor, 82, token('color-foreground')),
+            tagEdge: own.tagFill,
+            tagLabel: token('color-foreground-inverse'),
           },
         },
         outlined: {
-          own: { fill: 'transparent', edge: mix(own.color, 45, token('color-background'), 'srgb') },
+          own: {
+            tagFill: 'transparent',
+            tagEdge: mix(own.tagColor, 45, token('color-background'), 'srgb'),
+          },
         },
       }),
       variants('tone', {
-        primary: { own: { color: token('color-primary') } },
-        accent: { own: { color: token('color-accent') } },
-        info: { own: { color: token('color-info') } },
-        success: { own: { color: token('color-success') } },
-        warning: { own: { color: token('color-warning') } },
-        danger: { own: { color: token('color-danger') } },
+        primary: { own: { tagColor: token('color-primary') } },
+        accent: { own: { tagColor: token('color-accent') } },
+        info: { own: { tagColor: token('color-info') } },
+        success: { own: { tagColor: token('color-success') } },
+        warning: { own: { tagColor: token('color-warning') } },
+        danger: { own: { tagColor: token('color-danger') } },
       }),
       /* Out of reach, and drawn so: the platform's own disabled step. */
       rule({ has: 'disabled' }, { opacity: hook.disabledOpacity }),
@@ -110,9 +121,9 @@ export default styles(
         { selected: true },
         {
           own: {
-            fill: mix(own.color, 82, token('color-foreground')),
-            edge: own.fill,
-            label: token('color-foreground-inverse'),
+            tagFill: mix(own.tagColor, 82, token('color-foreground')),
+            tagEdge: own.tagFill,
+            tagLabel: token('color-foreground-inverse'),
           },
         },
       ),
@@ -133,7 +144,7 @@ export default styles(
         marginInlineEnd: product(token('space-2xs'), '-1'),
         padding: token('space-2xs'),
       }),
-      rule({ hover: true }, { backgroundColor: mix(own.color, 20, 'transparent') }),
+      rule({ hover: true }, { backgroundColor: mix(own.tagColor, 20, 'transparent') }),
       rule(
         { focusVisible: true },
         {
@@ -165,7 +176,7 @@ export default styles(
     /* The category a tag belongs to, before the label it qualifies, every
        declaration on what is passed in, so an empty `start` draws nothing. */
     on({ region: 'start', slotted: '*' }, [
-      rule({ fontWeight: token('weight-semibold'), marginInlineEnd: own.inset, opacity: 0.75 }),
+      rule({ fontWeight: token('weight-semibold'), marginInlineEnd: own.tagInset, opacity: 0.75 }),
     ]),
     /* A link tag keeps the tag's ink, takes an underline under a pointer, and
        ends in an ellipsis as the plain label does. */
@@ -189,9 +200,9 @@ export default styles(
         web: { cursor: 'default' },
         display: 'inline-flex',
         gap: hook.gap,
-        marginInline: product(own.inset, '-1'),
+        marginInline: product(own.tagInset, '-1'),
         minInlineSize: 0,
-        paddingInline: own.inset,
+        paddingInline: own.tagInset,
       }),
       rule(
         { focusVisible: true },

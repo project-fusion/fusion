@@ -32,13 +32,13 @@ export default styles(
       stagger: null,
       travel: token('space-md'),
     },
-    own: [
-      'dial-from',
-      'speed-dial-align',
-      'speed-dial-label-opacity',
-      'speed-dial-row',
-      'speed-dial-stagger',
-    ],
+    own: {
+      dialFrom: null,
+      speedDialAlign: null,
+      speedDialLabelOpacity: null,
+      speedDialRow: null,
+      speedDialStagger: null,
+    },
     props: { labels: oneOf(['hover']) },
     stylesheet: 'speed-dial/root/speed-dial-root.generated.css',
   },
@@ -62,10 +62,10 @@ export default styles(
           padding: token('space-none'),
         }),
         /* Lined up on the end the trigger is on, the row order handed down. */
-        rule({ own: { row: 'row-reverse' }, alignItems: 'flex-end' }),
+        rule({ own: { speedDialRow: 'row-reverse' }, alignItems: 'flex-end' }),
         rule(
           { alignedStart: true },
-          { own: { align: 'flex-start', row: 'row' }, alignItems: 'flex-start' },
+          { own: { speedDialAlign: 'flex-start', speedDialRow: 'row' }, alignItems: 'flex-start' },
         ),
       ]),
       on({ part: 'actions', selector: '[part="actions"][hidden]' }, [
@@ -106,34 +106,34 @@ export default styles(
       ]),
       /* Nearest the button first, counting from the end where the column
          runs upward and from the start where it runs down. */
-      on('host', [rule({ own: { stagger: hook.stagger(quotient(fast, 3)) } })]),
+      on('host', [rule({ own: { speedDialStagger: hook.stagger(quotient(fast, 3)) } })]),
       on(
         {
           part: 'actions',
           selector: '[part="actions"][data-placed] ::slotted(:nth-last-child(2))',
         },
-        [web([rule({ transitionDelay: own.stagger })])],
+        [web([rule({ transitionDelay: own.speedDialStagger })])],
       ),
       on(
         {
           part: 'actions',
           selector: '[part="actions"][data-placed] ::slotted(:nth-last-child(3))',
         },
-        [web([rule({ transitionDelay: product(own.stagger, 2) })])],
+        [web([rule({ transitionDelay: product(own.speedDialStagger, 2) })])],
       ),
       on(
         {
           part: 'actions',
           selector: '[part="actions"][data-placed] ::slotted(:nth-last-child(4))',
         },
-        [web([rule({ transitionDelay: product(own.stagger, 3) })])],
+        [web([rule({ transitionDelay: product(own.speedDialStagger, 3) })])],
       ),
       on(
         {
           part: 'actions',
           selector: '[part="actions"][data-placed] ::slotted(:nth-last-child(n + 5))',
         },
-        [web([rule({ transitionDelay: product(own.stagger, 4) })])],
+        [web([rule({ transitionDelay: product(own.speedDialStagger, 4) })])],
       ),
       on(
         {
@@ -141,7 +141,7 @@ export default styles(
           selector:
             ':host(:state(placed-bottom)) [part="actions"][data-placed] ::slotted(:nth-child(2))',
         },
-        [web([rule({ transitionDelay: own.stagger })])],
+        [web([rule({ transitionDelay: own.speedDialStagger })])],
       ),
       on(
         {
@@ -149,7 +149,7 @@ export default styles(
           selector:
             ':host(:state(placed-bottom)) [part="actions"][data-placed] ::slotted(:nth-child(3))',
         },
-        [web([rule({ transitionDelay: product(own.stagger, 2) })])],
+        [web([rule({ transitionDelay: product(own.speedDialStagger, 2) })])],
       ),
       on(
         {
@@ -157,7 +157,7 @@ export default styles(
           selector:
             ':host(:state(placed-bottom)) [part="actions"][data-placed] ::slotted(:nth-child(4))',
         },
-        [web([rule({ transitionDelay: product(own.stagger, 3) })])],
+        [web([rule({ transitionDelay: product(own.speedDialStagger, 3) })])],
       ),
       on(
         {
@@ -165,7 +165,7 @@ export default styles(
           selector:
             ':host(:state(placed-bottom)) [part="actions"][data-placed] ::slotted(:nth-child(n + 5))',
         },
-        [web([rule({ transitionDelay: product(own.stagger, 4) })])],
+        [web([rule({ transitionDelay: product(own.speedDialStagger, 4) })])],
       ),
       /* A phone times them by the same places, once the column is placed:
          from the end where it runs upward or beside the button, and from the
@@ -179,7 +179,7 @@ export default styles(
               { nthLast: 2, placedRight: true },
               { nth: 2, placedBottom: true },
             ],
-            { transitionDelay: own.stagger },
+            { transitionDelay: own.speedDialStagger },
           ),
           rule(
             [
@@ -188,7 +188,7 @@ export default styles(
               { nthLast: 3, placedRight: true },
               { nth: 3, placedBottom: true },
             ],
-            { transitionDelay: product(own.stagger, 2) },
+            { transitionDelay: product(own.speedDialStagger, 2) },
           ),
           rule(
             [
@@ -197,7 +197,7 @@ export default styles(
               { nthLast: 4, placedRight: true },
               { nth: 4, placedBottom: true },
             ],
-            { transitionDelay: product(own.stagger, 3) },
+            { transitionDelay: product(own.speedDialStagger, 3) },
           ),
           rule(
             [
@@ -206,7 +206,7 @@ export default styles(
               { nthLast: { from: 5 }, placedRight: true },
               { nth: { from: 5 }, placedBottom: true },
             ],
-            { transitionDelay: product(own.stagger, 4) },
+            { transitionDelay: product(own.speedDialStagger, 4) },
           ),
         ]),
         /* Put down where they belong. */
@@ -251,7 +251,7 @@ export default styles(
       on('host', [rule({ print: true }, { display: 'none' })]),
       /* Names on demand: each shows while its action is under the pointer
          or has focus, and only the marks take a press. */
-      on('host', [rule({ labels: 'hover' }, { own: { labelOpacity: 0 } })]),
+      on('host', [rule({ labels: 'hover' }, { own: { speedDialLabelOpacity: 0 } })]),
       on('actions', [rule({ labels: 'hover' }, { pointerEvents: 'none' })]),
       on({ region: 'default', slotted: '*' }, [
         rule({ labels: 'hover' }, { pointerEvents: 'none' }),
