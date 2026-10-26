@@ -65,7 +65,7 @@ export default headless('toast-item', {
     words: derive('toast-item-words'),
   },
   countdown: { duration: 'duration', onDone: 'dismiss', paused: 'paused', waitWhile: 'waiting' },
-  notice: { held: 'waiting', part: 'item' },
+  notice: { deferred: 'waiting', part: 'item' },
   toggle: { closeOnEscape: true, onBeforeClose: 'dismiss', prop: 'open' },
   render: ({ derived, props, state }) => (
     <>

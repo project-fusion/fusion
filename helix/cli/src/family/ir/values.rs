@@ -214,7 +214,7 @@ fn value(lit: &Lit) -> Result<Value, String> {
                 derived(name, rest.first())
             }
             ("fit", arguments) => fit(arguments),
-            (name @ ("inherit" | "initial" | "unset"), []) => Ok(Value::Keyword(keyword(name))),
+            ("inherit", []) => Ok(Value::Keyword(keyword("inherit"))),
             ("quote", [Lit::Text(mark), rest @ ..]) if rest.len() <= 1 => quote(mark, rest.first()),
             ("scheme", [light, dark]) => Ok(Value::Scheme {
                 dark: Box::new(value(dark)?),

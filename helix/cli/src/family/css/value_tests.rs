@@ -25,10 +25,10 @@ fn writes_another_familys_hook_and_each_keyword() {
         "var(--button-radius-end-end, var(--helix-radii-sm))"
     );
     assert_eq!(
-        written("hook('color', initial())"),
-        "var(--b-color, initial)"
+        written("hook('color', inherit())"),
+        "var(--b-color, inherit)"
     );
-    assert_eq!(written("unset()"), "unset");
+    assert_eq!(written("inherit()"), "inherit");
 }
 
 #[test]

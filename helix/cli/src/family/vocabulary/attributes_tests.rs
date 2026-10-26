@@ -185,7 +185,7 @@ fn a_level_and_a_line_count_are_whole() {
 
 #[test]
 fn takes_a_press_that_is_checked_or_pressed() {
-    for name in ["checked", "pressed", "invalid", "required", "readonly"] {
+    for name in ["checked", "pressed", "required", "readonly"] {
         assert!(
             attribute(NodeKind::Pressable, "control", name, &bind("on")).is_ok(),
             "{name}"
@@ -327,8 +327,6 @@ fn takes_the_wave_two_roles_a_role_description_and_bound_geometry() {
     for role in ["note", "region"] {
         assert!(attribute(NodeKind::Box, "section", "role", &text(role)).is_ok());
     }
-    assert!(attribute(NodeKind::Box, "entry", "roledescription", &bind("kind")).is_ok());
-    assert!(attribute(NodeKind::Pressable, "go", "roledescription", &text("slide")).is_ok());
     let derived = Attribute::Derived {
         derive: "qrPath".to_owned(),
     };

@@ -141,18 +141,10 @@ pub const ELEMENTS: &[Element] = &[
 ];
 
 /// The shapes a box inside a vector may draw, and the geometry each takes.
-pub const SHAPES: &[(&str, &[&str])] = &[
-    ("circle", &["cx", "cy", "r"]),
-    ("ellipse", &["cx", "cy", "rx", "ry"]),
-    ("line", &["x1", "x2", "y1", "y2"]),
-    ("path", &["d"]),
-    ("rect", &["height", "rx", "ry", "width", "x", "y"]),
-];
+pub const SHAPES: &[(&str, &[&str])] = &[("circle", &["cx", "cy", "r"]), ("path", &["d"])];
 
 /// Every geometry attribute some shape takes.
-pub const GEOMETRY: &[&str] = &[
-    "cx", "cy", "d", "height", "r", "rx", "ry", "width", "x", "x1", "x2", "y", "y1", "y2",
-];
+pub const GEOMETRY: &[&str] = &["cx", "cy", "d", "r"];
 
 /// Whether `name` names a role.
 pub fn is_role(name: &str) -> bool {

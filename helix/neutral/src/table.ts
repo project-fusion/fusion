@@ -67,7 +67,7 @@
  * The value helpers are `style.ts`'s, beside the given `hook` and `own`:
  * `token`, `mix`, `list`, `web`, `derive`, `fit`, `measured`, `product`, `sum`,
  * `difference`, `quotient`, `fn`, `safeArea`, `scheme`, `quote`, `inherit`,
- * `initial`, `unset`, `inherited` and `hookOf`.
+ * `inherited` and `hookOf`.
  *
  * **What the editor refuses**: a part the tree does not draw, a region it
  * does not hold, a `when` key that is none of the family's props, states or

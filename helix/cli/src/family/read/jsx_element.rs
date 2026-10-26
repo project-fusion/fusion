@@ -169,7 +169,10 @@ impl Render<'_> {
             ("Announce", "when") => Ok(("while".to_owned(), self.value(value, attribute.span)?)),
             /* A box drawn while closed is `open` while it shows, as a
             `<details>` is. */
-            ("View", "open") => Ok(("closed".to_owned(), negated(self.value(value, attribute.span)?))),
+            ("View", "open") => Ok((
+                "closed".to_owned(),
+                negated(self.value(value, attribute.span)?),
+            )),
             ("View", "indicator") => match self.value(value, attribute.span)? {
                 Lit::Bool(true) => Ok(("marks".to_owned(), Lit::Text("chosen".to_owned()))),
                 _ => Err(self.at(
@@ -183,7 +186,7 @@ impl Render<'_> {
             )),
             ("View", "shape") => Err(self.at(
                 attribute.span,
-                "a shape inside a vector is `<Path>`, `<Circle>`, `<Ellipse>`, `<Line>` or `<Rect>`",
+                "a shape inside a vector is `<Path>` or `<Circle>`",
             )),
             (_, "sends" | "while" | "says") => Err(self.at(
                 attribute.span,

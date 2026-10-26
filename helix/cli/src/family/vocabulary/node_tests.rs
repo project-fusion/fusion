@@ -49,15 +49,15 @@ fn vector(children: Vec<Node>) -> Node {
 #[test]
 fn a_shape_takes_its_own_geometry() {
     assert!(node(&circle("groove")).is_ok());
-    let line = with(
+    let path = with(
         NodeKind::Box,
         "tick",
-        &[("shape", text("line")), ("r", Attribute::Number(1.0))],
+        &[("shape", text("path")), ("r", Attribute::Number(1.0))],
         Vec::new(),
     );
     assert_eq!(
-        node(&line).unwrap_err(),
-        "`box('tick')`: a line does not take `r`, and takes `x1`, `x2`, `y1`, `y2`"
+        node(&path).unwrap_err(),
+        "`box('tick')`: a path does not take `r`, and takes `d`"
     );
     let loose = with(
         NodeKind::Box,

@@ -146,10 +146,6 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     `Glyph` draws it. A prop that holds the name, as an icon's `name`, binds
     it. */
     ("glyph", BOX, Shape::Words),
-    ("height", BOX, Shape::Length),
-    /* A press that a hold of half a second opens its element's toggle
-    with, while a quick press stays its own, as a speed dial's trigger. */
-    ("held", PRESS, Shape::Flag),
     /* A box drawn and not shown, or a region that draws nothing while it
     holds, as a switch's `on` region while the switch is off. */
     ("hidden", &[NodeKind::Box, NodeKind::Region], Shape::Flag),
@@ -157,7 +153,6 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     /* `inert`: no press, no focus, and nothing a screen reader reaches.
     `pointerEvents: 'none'` and hidden from accessibility on a phone. */
     ("inert", BOX, Shape::Flag),
-    /* `aria-invalid`. A phone has no such state, and its hint says it. */
     /* The region of the element a wrap draws that a node the wrap holds is
     passed into, in place of its default region, as a crumb's fold button is
     the trigger of the menu the crumb draws. */
@@ -166,7 +161,6 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
         &[NodeKind::Box, NodeKind::Pressable, NodeKind::Wrap],
         Shape::Name,
     ),
-    ("invalid", PART, Shape::Flag),
     // The one key that presses it, where Enter and Space do not both: Space
     // alone on a checkbox or a switch, as a native checkbox takes.
     ("keys", PRESS, Shape::OneOf(&["enter", "space"])),
@@ -223,24 +217,17 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     /* `aria-roledescription`: what a screen reader calls the part in place
     of its role, as a timeline entry is an "event". A phone has no such
     state, and says it first in the hint. */
-    ("roledescription", NAMED, Shape::Words),
     /* A run of words: a phone draws the box as a `Text`, so the words and
     the runs passed into it flow as one paragraph, and a run inside the
     words around it wraps with them, as a `<code>` or a `<q>` does. */
     ("run", BOX, Shape::Set),
-    ("rx", BOX, Shape::Length),
-    ("ry", BOX, Shape::Length),
     ("says", &[NodeKind::Live, NodeKind::Text], Shape::Words),
     ("scrolls", PRESS, Shape::OneOf(&["end", "start"])),
     ("selected", PRESS, Shape::Flag),
     ("sends", PRESS, Shape::Name),
     /* The shape a box inside a vector draws, at the geometry its own
     attributes give. */
-    (
-        "shape",
-        BOX,
-        Shape::OneOf(&["circle", "ellipse", "line", "path", "rect"]),
-    ),
+    ("shape", BOX, Shape::OneOf(&["circle", "path"])),
     /* Where a picture loads from, a URL or the prop that holds one. */
     ("src", IMAGE, Shape::Words),
     /* The press that turns the element's toggle the other way. */
@@ -266,13 +253,6 @@ const ATTRIBUTES: &[(&str, &[NodeKind], Shape)] = &[
     the text is as wide as the widest of them on both platforms, where the
     web stacks them in one cell and a phone measures each. */
     ("widest", &[NodeKind::Text], Shape::Parts),
-    ("width", BOX, Shape::Length),
-    ("x", BOX, Shape::Length),
-    ("x1", BOX, Shape::Length),
-    ("x2", BOX, Shape::Length),
-    ("y", BOX, Shape::Length),
-    ("y1", BOX, Shape::Length),
-    ("y2", BOX, Shape::Length),
 ];
 
 /// Holds one attribute of a node to the table.

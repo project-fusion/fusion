@@ -221,12 +221,6 @@ export const measured = (name: string, fallback?: Value): Read =>
  */
 export const inherit = (): Tagged => ({ keyword: 'inherit' })
 
-/** `initial`, the property's initial value. A native view leaves it unset, as `inherit()` says. */
-export const initial = (): Tagged => ({ keyword: 'initial' })
-
-/** `unset`, `inherit` or `initial` by the property. A native view leaves it unset, as `inherit()` says. */
-export const unset = (): Tagged => ({ keyword: 'unset' })
-
 /**
  * A custom property the element around sets, `--<name>`, such as a list's
  * `list-rail-inline-size` on its rows, with the value it takes where none is

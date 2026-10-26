@@ -28,18 +28,18 @@ fn reads_each_css_wide_keyword_as_a_whole_value() {
     let Ok(Value::Hook {
         fallback: Some(fallback),
         ..
-    }) = read("color", "hook('color', initial())")
+    }) = read("color", "hook('color', inherit())")
     else {
         panic!("a hook");
     };
-    assert!(matches!(*fallback, Value::Keyword(Keyword::Initial)));
+    assert!(matches!(*fallback, Value::Keyword(Keyword::Inherit)));
     assert!(matches!(
-        read("margin", "unset()"),
-        Ok(Value::Keyword(Keyword::Unset))
+        read("margin", "inherit()"),
+        Ok(Value::Keyword(Keyword::Inherit))
     ));
-    assert!(read("margin", "['1px', unset()]")
+    assert!(read("margin", "['1px', inherit()]")
         .unwrap_err()
-        .contains("`unset()` is a whole value"));
+        .contains("`inherit()` is a whole value"));
 }
 
 #[test]
