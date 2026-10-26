@@ -301,11 +301,19 @@ fn prop_spec(name: &str, value: &Lit, spec: &mut Spec) -> Result<(), String> {
                 spec.kind = Some(values.clone());
                 spec.default = rest.first().cloned();
             }
-            (helper, []) => {
+            /* A type a default does not say, as `numberOrString(8)` or
+            `time('')`, with the default where it has one. */
+            (helper, [] | [Lit::Bool(_) | Lit::Number(_) | Lit::Text(_)]) => {
                 let Some((_, kind)) = TYPES.iter().find(|(written, _)| *written == helper) else {
                     return Err(refused());
                 };
+                if !arguments.is_empty() && !matches!(helper, "numberOrString" | "time") {
+                    return Err(format!(
+                        "prop `{name}`: a default says its type, so `{helper}(x)` is written `x`"
+                    ));
+                }
                 spec.kind = Some(text(kind));
+                spec.default = arguments.first().cloned();
             }
             _ => return Err(refused()),
         },

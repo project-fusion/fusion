@@ -27,6 +27,7 @@ mod css;
 mod ir;
 mod machine;
 mod output;
+mod print;
 mod read;
 mod resolve;
 mod shared;
@@ -47,6 +48,45 @@ use crate::args::{
 };
 use crate::family::compile::Compiled;
 pub use components::print as platforms;
+
+/// Prints each builder-form headless source as `headless.tsx`, to stdout or,
+/// with `--write`, in its place, and its notes to stderr.
+///
+/// # Errors
+///
+/// [`Failure`] when a source cannot be read, printed, or written.
+pub fn print_sources(args: &crate::args::FamilyPrint, from: &Path) -> Result<Code, Failure> {
+    for source in &args.sources {
+        let source = locate(source, from);
+        let path = if source.is_dir() {
+            source.join("headless.ts")
+        } else {
+            source
+        };
+        let text = fs::read_to_string(&path).map_err(|error| {
+            Failure::input("cannot read a source", format!("{}: {error}", path.display()))
+        })?;
+        let printed = print::headless(&text).map_err(|why| {
+            Failure::input("cannot print a source", format!("{}: {why}", path.display()))
+        })?;
+        for note in &printed.notes {
+            eprintln!("{}: {note}", path.display());
+        }
+        if args.write {
+            let written = path.with_extension("tsx");
+            fs::write(&written, &printed.text).map_err(|error| {
+                Failure::input("cannot write a source", format!("{}: {error}", written.display()))
+            })?;
+            fs::remove_file(&path).map_err(|error| {
+                Failure::input("cannot remove a source", format!("{}: {error}", path.display()))
+            })?;
+            eprintln!("wrote {}", written.display());
+        } else {
+            print!("{}", printed.text);
+        }
+    }
+    Ok(Code::Ok)
+}
 pub use tokens::{design_files as design_tokens, native_modules as tokens};
 
 /// Writes each element's intermediate form and web stylesheet to `dist`, or

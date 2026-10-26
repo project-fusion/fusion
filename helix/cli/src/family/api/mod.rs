@@ -10,6 +10,7 @@
 mod clock;
 mod collection;
 mod collection_fields;
+pub mod computed;
 mod copy;
 mod countdown;
 mod delay;
