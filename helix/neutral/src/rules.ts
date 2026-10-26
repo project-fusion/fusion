@@ -88,7 +88,7 @@ export type Place = 'earlier' | 'even' | 'first' | 'last' | 'later' | 'odd' | 'o
  *   web, which the element sets and declares, and what is passed into the
  *   region on a phone. Several regions, or an object of regions that hold
  *   something and regions that do not.
- * - `entering`, the values a part starts from as it is drawn, which its
+ * - `startingStyle`, the values a part starts from as it is drawn, which its
  *   transitions move away from: `@starting-style` on the web, and the
  *   element's first render on a phone.
  * - `also`, the parts the target is as well, or is not, as a mark is
@@ -122,7 +122,6 @@ export interface When {
   readonly coarsePointer?: boolean
   readonly child?: Place | readonly Place[]
   readonly defined?: boolean
-  readonly entering?: true
   readonly dir?: 'ltr' | 'rtl'
   readonly disabled?: boolean
   readonly focusVisible?: boolean
@@ -150,6 +149,7 @@ export interface When {
   readonly place?: Place
   readonly print?: true
   readonly reducedMotion?: boolean
+  readonly startingStyle?: true
   readonly state?: string | readonly string[] | Readonly<Record<string, boolean>>
   readonly window?: Below
   readonly within?: string | Readonly<Record<string, Around>>
